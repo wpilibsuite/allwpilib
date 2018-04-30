@@ -6,8 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "gtest/gtest.h"
-#include "llvm/SmallString.h"
-#include "support/Base64.h"
+#include "wpi/Base64.h"
+#include "wpi/SmallString.h"
 
 namespace wpi {
 
@@ -26,11 +26,11 @@ std::ostream& operator<<(std::ostream& os, const Base64TestParam& param) {
 
 class Base64Test : public ::testing::TestWithParam<Base64TestParam> {
  protected:
-  llvm::StringRef GetPlain() {
+  StringRef GetPlain() {
     if (GetParam().plain_len < 0)
-      return llvm::StringRef(GetParam().plain);
+      return StringRef(GetParam().plain);
     else
-      return llvm::StringRef(GetParam().plain, GetParam().plain_len);
+      return StringRef(GetParam().plain, GetParam().plain_len);
   }
 };
 
@@ -45,7 +45,7 @@ TEST_P(Base64Test, EncodeStdString) {
 }
 
 TEST_P(Base64Test, EncodeSmallString) {
-  llvm::SmallString<128> buf;
+  SmallString<128> buf;
   ASSERT_EQ(GetParam().encoded, Base64Encode(GetPlain(), buf));
   // reuse buf
   ASSERT_EQ(GetParam().encoded, Base64Encode(GetPlain(), buf));
@@ -53,7 +53,7 @@ TEST_P(Base64Test, EncodeSmallString) {
 
 TEST_P(Base64Test, DecodeStdString) {
   std::string s;
-  llvm::StringRef encoded = GetParam().encoded;
+  StringRef encoded = GetParam().encoded;
   EXPECT_EQ(encoded.size(), Base64Decode(encoded, &s));
   ASSERT_EQ(GetPlain(), s);
 
@@ -63,10 +63,10 @@ TEST_P(Base64Test, DecodeStdString) {
 }
 
 TEST_P(Base64Test, DecodeSmallString) {
-  llvm::SmallString<128> buf;
-  llvm::StringRef encoded = GetParam().encoded;
+  SmallString<128> buf;
+  StringRef encoded = GetParam().encoded;
   size_t len;
-  llvm::StringRef plain = Base64Decode(encoded, &len, buf);
+  StringRef plain = Base64Decode(encoded, &len, buf);
   EXPECT_EQ(encoded.size(), len);
   ASSERT_EQ(GetPlain(), plain);
 

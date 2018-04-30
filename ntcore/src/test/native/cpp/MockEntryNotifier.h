@@ -21,13 +21,13 @@ class MockEntryNotifier : public IEntryNotifier {
   MOCK_METHOD3(
       Add,
       unsigned int(std::function<void(const EntryNotification& event)> callback,
-                   llvm::StringRef prefix, unsigned int flags));
+                   wpi::StringRef prefix, unsigned int flags));
   MOCK_METHOD3(
       Add,
       unsigned int(std::function<void(const EntryNotification& event)> callback,
                    unsigned int local_id, unsigned int flags));
   MOCK_METHOD3(AddPolled,
-               unsigned int(unsigned int poller_uid, llvm::StringRef prefix,
+               unsigned int(unsigned int poller_uid, wpi::StringRef prefix,
                             unsigned int flags));
   MOCK_METHOD3(AddPolled,
                unsigned int(unsigned int poller_uid, unsigned int local_id,

@@ -10,7 +10,7 @@
 
 #include <functional>
 
-#include <support/SafeThread.h>
+#include <wpi/SafeThread.h>
 
 #include "cscore_cpp.h"
 
@@ -42,16 +42,16 @@ class Notifier {
   void RemoveListener(int uid);
 
   // Notification events
-  void NotifySource(llvm::StringRef name, CS_Source source, CS_EventKind kind);
+  void NotifySource(wpi::StringRef name, CS_Source source, CS_EventKind kind);
   void NotifySource(const SourceImpl& source, CS_EventKind kind);
   void NotifySourceVideoMode(const SourceImpl& source, const VideoMode& mode);
   void NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
-                            llvm::StringRef propertyName, int property,
+                            wpi::StringRef propertyName, int property,
                             CS_PropertyKind propertyKind, int value,
-                            llvm::StringRef valueStr);
-  void NotifySink(llvm::StringRef name, CS_Sink sink, CS_EventKind kind);
+                            wpi::StringRef valueStr);
+  void NotifySink(wpi::StringRef name, CS_Sink sink, CS_EventKind kind);
   void NotifySink(const SinkImpl& sink, CS_EventKind kind);
-  void NotifySinkSourceChanged(llvm::StringRef name, CS_Sink sink,
+  void NotifySinkSourceChanged(wpi::StringRef name, CS_Sink sink,
                                CS_Source source);
   void NotifyNetworkInterfacesChanged();
   void NotifyTelemetryUpdated();

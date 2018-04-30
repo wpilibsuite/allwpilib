@@ -9,9 +9,9 @@
 
 #include <chrono>
 
-#include <support/condition_variable.h>
-#include <support/mutex.h>
-#include <support/timestamp.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
+#include <wpi/timestamp.h>
 
 #include "HAL/HAL.h"
 #include "HAL/cpp/fpga_clock.h"

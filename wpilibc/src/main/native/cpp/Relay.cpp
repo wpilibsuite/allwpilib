@@ -10,7 +10,7 @@
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
 #include <HAL/Relay.h>
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "MotorSafetyHelper.h"
 #include "SensorBase.h"
@@ -32,7 +32,7 @@ Relay::Relay(int channel, Relay::Direction direction)
     : m_channel(channel), m_direction(direction) {
   if (!SensorBase::CheckRelayChannel(m_channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "Relay Channel " + llvm::Twine(m_channel));
+                               "Relay Channel " + wpi::Twine(m_channel));
     return;
   }
 
@@ -268,7 +268,7 @@ bool Relay::IsSafetyEnabled() const {
   return m_safetyHelper->IsSafetyEnabled();
 }
 
-void Relay::GetDescription(llvm::raw_ostream& desc) const {
+void Relay::GetDescription(wpi::raw_ostream& desc) const {
   desc << "Relay " << GetChannel();
 }
 
@@ -277,7 +277,7 @@ void Relay::InitSendable(SendableBuilder& builder) {
   builder.SetSafeState([=]() { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",
-      [=](llvm::SmallVectorImpl<char>& buf) -> llvm::StringRef {
+      [=](wpi::SmallVectorImpl<char>& buf) -> wpi::StringRef {
         switch (Get()) {
           case kOn:
             return "On";
@@ -289,7 +289,7 @@ void Relay::InitSendable(SendableBuilder& builder) {
             return "Off";
         }
       },
-      [=](llvm::StringRef value) {
+      [=](wpi::StringRef value) {
         if (value == "Off")
           Set(kOff);
         else if (value == "Forward")

@@ -12,13 +12,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "llvm/SmallPtrSet.h"
-#include "llvm/DenseMapInfo.h"
-#include "llvm/MathExtras.h"
+#include "wpi/SmallPtrSet.h"
+#include "wpi/DenseMapInfo.h"
+#include "wpi/MathExtras.h"
 #include <algorithm>
 #include <cstdlib>
 
-using namespace llvm;
+using namespace wpi;
 
 void SmallPtrSetImplBase::shrink_and_clear() {
   assert(!isSmall() && "Can't shrink a small set!");

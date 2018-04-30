@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <llvm/Twine.h>
+#include <wpi/Twine.h>
 
 #include "Commands/Command.h"
 
@@ -20,7 +20,7 @@ namespace frc {
  */
 class TimedCommand : public Command {
  public:
-  TimedCommand(const llvm::Twine& name, double timeout);
+  TimedCommand(const wpi::Twine& name, double timeout);
   explicit TimedCommand(double timeout);
   virtual ~TimedCommand() = default;
 

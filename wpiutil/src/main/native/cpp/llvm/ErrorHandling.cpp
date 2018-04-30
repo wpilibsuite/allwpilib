@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "llvm/WindowsError.h"
+#include "wpi/WindowsError.h"
 
 #ifdef _WIN32
 
@@ -24,7 +24,7 @@
   case x:                                                                      \
     return std::make_error_code(std::errc::y)
 
-std::error_code llvm::mapWindowsError(unsigned EV) {
+std::error_code wpi::mapWindowsError(unsigned EV) {
   switch (EV) {
     MAP_ERR_TO_COND(ERROR_ACCESS_DENIED, permission_denied);
     MAP_ERR_TO_COND(ERROR_ALREADY_EXISTS, file_exists);

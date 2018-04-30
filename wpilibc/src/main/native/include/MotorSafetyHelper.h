@@ -9,7 +9,7 @@
 
 #include <set>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "ErrorBase.h"
 

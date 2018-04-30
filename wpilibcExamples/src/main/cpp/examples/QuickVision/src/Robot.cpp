@@ -7,7 +7,7 @@
 
 #include <CameraServer.h>
 #include <IterativeRobot.h>
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 /**
  * Uses the CameraServer class to automatically capture video from a USB webcam
@@ -22,8 +22,8 @@ public:
 #if defined(__linux__)
 		CameraServer::GetInstance()->StartAutomaticCapture();
 #else
-		llvm::errs() << "Vision only available on Linux.\n";
-		llvm::errs().flush();
+		wpi::errs() << "Vision only available on Linux.\n";
+		wpi::errs().flush();
 #endif
 	}
 };

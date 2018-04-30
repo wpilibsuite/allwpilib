@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "HAL/Types.h"
 #include "HAL/handles/HandlesInternal.h"

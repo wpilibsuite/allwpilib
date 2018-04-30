@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "HAL/ChipObject.h"
 #include "HAL/Types.h"

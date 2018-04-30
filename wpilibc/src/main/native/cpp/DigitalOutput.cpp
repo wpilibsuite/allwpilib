@@ -31,7 +31,7 @@ DigitalOutput::DigitalOutput(int channel) {
   m_pwmGenerator = HAL_kInvalidHandle;
   if (!SensorBase::CheckDigitalChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "Digital Channel " + llvm::Twine(channel));
+                               "Digital Channel " + wpi::Twine(channel));
     m_channel = std::numeric_limits<int>::max();
     return;
   }

@@ -7,7 +7,7 @@
 
 #include "JpegUtil.h"
 
-#include <support/raw_istream.h>
+#include <wpi/raw_istream.h>
 
 namespace cs {
 
@@ -49,7 +49,7 @@ static const unsigned char dhtData[] = {
     0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7,
     0xe8, 0xe9, 0xea, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa};
 
-bool IsJpeg(llvm::StringRef data) {
+bool IsJpeg(wpi::StringRef data) {
   if (data.size() < 11) return false;
 
   // Check for valid SOI
@@ -58,7 +58,7 @@ bool IsJpeg(llvm::StringRef data) {
   return true;
 }
 
-bool GetJpegSize(llvm::StringRef data, int* width, int* height) {
+bool GetJpegSize(wpi::StringRef data, int* width, int* height) {
   if (!IsJpeg(data)) return false;
 
   data = data.substr(2);  // Get to the first block
@@ -82,7 +82,7 @@ bool GetJpegSize(llvm::StringRef data, int* width, int* height) {
 }
 
 bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
-  llvm::StringRef sdata(data, *size);
+  wpi::StringRef sdata(data, *size);
   if (!IsJpeg(sdata)) return false;
 
   *locSOF = *size;
@@ -109,8 +109,8 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
   return false;
 }
 
-llvm::StringRef JpegGetDHT() {
-  return llvm::StringRef(reinterpret_cast<const char*>(dhtData),
+wpi::StringRef JpegGetDHT() {
+  return wpi::StringRef(reinterpret_cast<const char*>(dhtData),
                          sizeof(dhtData));
 }
 

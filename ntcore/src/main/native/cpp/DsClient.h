@@ -8,7 +8,7 @@
 #ifndef NTCORE_DSCLIENT_H_
 #define NTCORE_DSCLIENT_H_
 
-#include <support/SafeThread.h>
+#include <wpi/SafeThread.h>
 
 #include "Log.h"
 

@@ -10,7 +10,7 @@
 #include <atomic>
 #include <memory>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "MockData/DigitalPWMData.h"
 #include "MockData/NotifyListenerVector.h"

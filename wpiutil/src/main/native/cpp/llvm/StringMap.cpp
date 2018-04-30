@@ -11,12 +11,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "llvm/StringMap.h"
-#include "llvm/MathExtras.h"
-#include "llvm/StringExtras.h"
-#include "llvm/Compiler.h"
+#include "wpi/StringMap.h"
+#include "wpi/MathExtras.h"
+#include "wpi/StringExtras.h"
+#include "wpi/Compiler.h"
 #include <cassert>
-using namespace llvm;
+using namespace wpi;
 
 /// Returns the number of buckets to allocate to ensure that the DenseMap can
 /// accommodate \p NumEntries without need to grow().

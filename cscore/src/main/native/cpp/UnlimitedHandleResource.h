@@ -12,9 +12,9 @@
 #include <utility>
 #include <vector>
 
-#include <llvm/ArrayRef.h>
-#include <llvm/SmallVector.h>
-#include <support/mutex.h>
+#include <wpi/ArrayRef.h>
+#include <wpi/SmallVector.h>
+#include <wpi/mutex.h>
 
 namespace cs {
 
@@ -53,7 +53,7 @@ class UnlimitedHandleResource {
   void Free(THandle handle);
 
   template <typename T>
-  llvm::ArrayRef<T> GetAll(llvm::SmallVectorImpl<T>& vec);
+  wpi::ArrayRef<T> GetAll(wpi::SmallVectorImpl<T>& vec);
 
   // @param func functor with (THandle, const TStruct&) parameters
   template <typename F>
@@ -133,9 +133,9 @@ inline void UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Free(
 
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename T>
-inline llvm::ArrayRef<T>
+inline wpi::ArrayRef<T>
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll(
-    llvm::SmallVectorImpl<T>& vec) {
+    wpi::SmallVectorImpl<T>& vec) {
   ForEach([&](THandle handle, const TStruct& data) { vec.push_back(handle); });
   return vec;
 }

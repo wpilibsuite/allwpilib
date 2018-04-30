@@ -9,10 +9,10 @@
 
 #include <CameraServer.h>
 #include <IterativeRobot.h>
-#include <llvm/raw_ostream.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <wpi/raw_ostream.h>
 
 /**
  * This is a demo program showing the use of OpenCV to do vision processing. The
@@ -69,8 +69,8 @@ private:
 		std::thread visionThread(VisionThread);
 		visionThread.detach();
 #else
-		llvm::errs() << "Vision only available on Linux.\n";
-		llvm::errs().flush();
+		wpi::errs() << "Vision only available on Linux.\n";
+		wpi::errs().flush();
 #endif
 	}
 };

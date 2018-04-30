@@ -11,7 +11,7 @@
 
 #include <array>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "DigitalSource.h"
 #include "SensorBase.h"

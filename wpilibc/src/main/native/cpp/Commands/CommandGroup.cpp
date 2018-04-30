@@ -16,7 +16,7 @@ using namespace frc;
  *
  * @param name The name for this command group
  */
-CommandGroup::CommandGroup(const llvm::Twine& name) : Command(name) {}
+CommandGroup::CommandGroup(const wpi::Twine& name) : Command(name) {}
 
 /**
  * Adds a new Command to the group. The Command will be started after all the

@@ -14,8 +14,8 @@
 #include <string>
 #include <vector>
 
-#include <llvm/StringRef.h>
-#include <llvm/Twine.h>
+#include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 
 #include "networktables/NetworkTableType.h"
 #include "networktables/NetworkTableValue.h"
@@ -25,9 +25,9 @@
 
 namespace nt {
 
-using llvm::ArrayRef;
-using llvm::StringRef;
-using llvm::Twine;
+using wpi::ArrayRef;
+using wpi::StringRef;
+using wpi::Twine;
 
 class NetworkTableInstance;
 

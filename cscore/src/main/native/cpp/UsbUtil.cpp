@@ -14,10 +14,10 @@
 #include <sys/ioctl.h>
 #endif
 
-#include <llvm/Format.h>
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
-#include <support/raw_istream.h>
+#include <wpi/Format.h>
+#include <wpi/SmallString.h>
+#include <wpi/raw_istream.h>
+#include <wpi/raw_ostream.h>
 
 #include "Log.h"
 
@@ -25,22 +25,22 @@ namespace cs {
 
 #ifdef __linux__
 
-static llvm::StringRef GetUsbNameFromFile(int vendor, int product,
-                                          llvm::SmallVectorImpl<char>& buf) {
+static wpi::StringRef GetUsbNameFromFile(int vendor, int product,
+                                         wpi::SmallVectorImpl<char>& buf) {
   int fd = open("/var/lib/usbutils/usb.ids", O_RDONLY);
-  if (fd < 0) return llvm::StringRef{};
+  if (fd < 0) return wpi::StringRef{};
 
-  llvm::raw_svector_ostream os{buf};
+  wpi::raw_svector_ostream os{buf};
   wpi::raw_fd_istream is{fd, true};
 
   // build vendor and product 4-char hex strings
-  llvm::SmallString<16> vendorStr, productStr;
-  llvm::raw_svector_ostream vendorOs{vendorStr}, productOs{productStr};
-  vendorOs << llvm::format_hex_no_prefix(vendor, 4);
-  productOs << llvm::format_hex_no_prefix(product, 4);
+  wpi::SmallString<16> vendorStr, productStr;
+  wpi::raw_svector_ostream vendorOs{vendorStr}, productOs{productStr};
+  vendorOs << wpi::format_hex_no_prefix(vendor, 4);
+  productOs << wpi::format_hex_no_prefix(product, 4);
 
   // scan file
-  llvm::SmallString<128> lineBuf;
+  wpi::SmallString<128> lineBuf;
   bool foundVendor = false;
   for (;;) {
     auto line = is.getline(lineBuf, 4096);
@@ -70,17 +70,17 @@ static llvm::StringRef GetUsbNameFromFile(int vendor, int product,
     }
   }
 
-  return llvm::StringRef{};
+  return wpi::StringRef{};
 }
 
-llvm::StringRef GetUsbNameFromId(int vendor, int product,
-                                 llvm::SmallVectorImpl<char>& buf) {
+wpi::StringRef GetUsbNameFromId(int vendor, int product,
+                                wpi::SmallVectorImpl<char>& buf) {
   // try reading usb.ids
-  llvm::StringRef rv = GetUsbNameFromFile(vendor, product, buf);
+  wpi::StringRef rv = GetUsbNameFromFile(vendor, product, buf);
   if (!rv.empty()) return rv;
 
   // Fall back to internal database
-  llvm::raw_svector_ostream os{buf};
+  wpi::raw_svector_ostream os{buf};
   switch (vendor) {
     case 0x046d:
       os << "Logitech, Inc. ";
@@ -153,7 +153,7 @@ int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
                  const char* name, const char* file, int line, bool quiet) {
   int retval = ioctl(fd, req, data);
   if (!quiet && retval < 0) {
-    llvm::SmallString<64> localfile{file};
+    wpi::SmallString<64> localfile{file};
     localfile.push_back('\0');
     ERROR("ioctl " << name << " failed at " << basename(localfile.data()) << ":"
                    << line << ": " << std::strerror(errno));

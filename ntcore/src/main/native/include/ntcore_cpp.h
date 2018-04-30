@@ -17,18 +17,18 @@
 #include <utility>
 #include <vector>
 
-#include <llvm/ArrayRef.h>
-#include <llvm/StringRef.h>
-#include <llvm/Twine.h>
-#include <support/deprecated.h>
+#include <wpi/ArrayRef.h>
+#include <wpi/StringRef.h>
+#include <wpi/Twine.h>
+#include <wpi/deprecated.h>
 
 #include "networktables/NetworkTableValue.h"
 
 namespace nt {
 
-using llvm::ArrayRef;
-using llvm::StringRef;
-using llvm::Twine;
+using wpi::ArrayRef;
+using wpi::StringRef;
+using wpi::Twine;
 
 /** NetworkTables Entry Information */
 struct EntryInfo {

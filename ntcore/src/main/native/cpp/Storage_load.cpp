@@ -8,10 +8,10 @@
 #include <cctype>
 #include <string>
 
-#include <llvm/SmallString.h>
-#include <llvm/StringExtras.h>
-#include <support/Base64.h>
-#include <support/raw_istream.h>
+#include <wpi/Base64.h>
+#include <wpi/SmallString.h>
+#include <wpi/StringExtras.h>
+#include <wpi/raw_istream.h>
 
 #include "IDispatcher.h"
 #include "IEntryNotifier.h"
@@ -35,7 +35,7 @@ class LoadPersistentImpl {
   bool ReadLine();
   bool ReadHeader();
   NT_Type ReadType();
-  llvm::StringRef ReadName(llvm::SmallVectorImpl<char>& buf);
+  wpi::StringRef ReadName(wpi::SmallVectorImpl<char>& buf);
   std::shared_ptr<Value> ReadValue(NT_Type type);
   std::shared_ptr<Value> ReadBooleanValue();
   std::shared_ptr<Value> ReadDoubleValue();
@@ -52,8 +52,8 @@ class LoadPersistentImpl {
   wpi::raw_istream& m_is;
   WarnFunc m_warn;
 
-  llvm::StringRef m_line;
-  llvm::SmallString<128> m_line_buf;
+  wpi::StringRef m_line;
+  wpi::SmallString<128> m_line_buf;
   size_t m_line_num = 0;
 
   std::vector<int> m_buf_boolean_array;
@@ -71,11 +71,11 @@ class LoadPersistentImpl {
  * Returns a pair containing the extracted token (if any) and the remaining
  * tail string.
  */
-static std::pair<llvm::StringRef, llvm::StringRef> ReadStringToken(
-    llvm::StringRef source) {
+static std::pair<wpi::StringRef, wpi::StringRef> ReadStringToken(
+    wpi::StringRef source) {
   // Match opening quote
   if (source.empty() || source.front() != '"')
-    return std::make_pair(llvm::StringRef(), source);
+    return std::make_pair(wpi::StringRef(), source);
 
   // Scan for ending double quote, checking for escaped as we go.
   size_t size = source.size();
@@ -98,8 +98,8 @@ static int fromxdigit(char ch) {
     return ch - '0';
 }
 
-static llvm::StringRef UnescapeString(llvm::StringRef source,
-                                      llvm::SmallVectorImpl<char>& buf) {
+static wpi::StringRef UnescapeString(wpi::StringRef source,
+                                      wpi::SmallVectorImpl<char>& buf) {
   assert(source.size() >= 2 && source.front() == '"' && source.back() == '"');
   buf.clear();
   buf.reserve(source.size() - 2);
@@ -137,7 +137,7 @@ static llvm::StringRef UnescapeString(llvm::StringRef source,
         break;
     }
   }
-  return llvm::StringRef{buf.data(), buf.size()};
+  return wpi::StringRef{buf.data(), buf.size()};
 }
 
 bool LoadPersistentImpl::Load(StringRef prefix, std::vector<Entry>* entries) {
@@ -152,8 +152,8 @@ bool LoadPersistentImpl::Load(StringRef prefix, std::vector<Entry>* entries) {
     }
 
     // name
-    llvm::SmallString<128> buf;
-    llvm::StringRef name = ReadName(buf);
+    wpi::SmallString<128> buf;
+    wpi::StringRef name = ReadName(buf);
     if (name.empty() || !name.startswith(prefix)) continue;
 
     // =
@@ -194,7 +194,7 @@ bool LoadPersistentImpl::ReadHeader() {
 }
 
 NT_Type LoadPersistentImpl::ReadType() {
-  llvm::StringRef tok;
+  wpi::StringRef tok;
   std::tie(tok, m_line) = m_line.split(' ');
   if (tok == "boolean") {
     return NT_BOOLEAN;
@@ -205,7 +205,7 @@ NT_Type LoadPersistentImpl::ReadType() {
   } else if (tok == "raw") {
     return NT_RAW;
   } else if (tok == "array") {
-    llvm::StringRef array_tok;
+    wpi::StringRef array_tok;
     std::tie(array_tok, m_line) = m_line.split(' ');
     if (array_tok == "boolean")
       return NT_BOOLEAN_ARRAY;
@@ -217,16 +217,16 @@ NT_Type LoadPersistentImpl::ReadType() {
   return NT_UNASSIGNED;
 }
 
-llvm::StringRef LoadPersistentImpl::ReadName(llvm::SmallVectorImpl<char>& buf) {
-  llvm::StringRef tok;
+wpi::StringRef LoadPersistentImpl::ReadName(wpi::SmallVectorImpl<char>& buf) {
+  wpi::StringRef tok;
   std::tie(tok, m_line) = ReadStringToken(m_line);
   if (tok.empty()) {
     Warn("missing name");
-    return llvm::StringRef{};
+    return wpi::StringRef{};
   }
   if (tok.back() != '"') {
     Warn("unterminated name string");
-    return llvm::StringRef{};
+    return wpi::StringRef{};
   }
   return UnescapeString(tok, buf);
 }
@@ -262,7 +262,7 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadBooleanValue() {
 
 std::shared_ptr<Value> LoadPersistentImpl::ReadDoubleValue() {
   // need to convert to null-terminated string for std::strtod()
-  llvm::SmallString<64> buf;
+  wpi::SmallString<64> buf;
   char* end;
   double v = std::strtod(m_line.c_str(buf), &end);
   if (*end != '\0') {
@@ -273,7 +273,7 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadDoubleValue() {
 }
 
 std::shared_ptr<Value> LoadPersistentImpl::ReadStringValue() {
-  llvm::StringRef tok;
+  wpi::StringRef tok;
   std::tie(tok, m_line) = ReadStringToken(m_line);
   if (tok.empty()) {
     Warn("missing string value");
@@ -283,12 +283,12 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadStringValue() {
     Warn("unterminated string value");
     return nullptr;
   }
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   return Value::MakeString(UnescapeString(tok, buf));
 }
 
 std::shared_ptr<Value> LoadPersistentImpl::ReadRawValue() {
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   size_t nr;
   return Value::MakeRaw(wpi::Base64Decode(m_line, &nr, buf));
 }
@@ -296,7 +296,7 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadRawValue() {
 std::shared_ptr<Value> LoadPersistentImpl::ReadBooleanArrayValue() {
   m_buf_boolean_array.clear();
   while (!m_line.empty()) {
-    llvm::StringRef tok;
+    wpi::StringRef tok;
     std::tie(tok, m_line) = m_line.split(',');
     tok = tok.trim(" \t");
     if (tok == "true") {
@@ -314,11 +314,11 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadBooleanArrayValue() {
 std::shared_ptr<Value> LoadPersistentImpl::ReadDoubleArrayValue() {
   m_buf_double_array.clear();
   while (!m_line.empty()) {
-    llvm::StringRef tok;
+    wpi::StringRef tok;
     std::tie(tok, m_line) = m_line.split(',');
     tok = tok.trim(" \t");
     // need to convert to null-terminated string for std::strtod()
-    llvm::SmallString<64> buf;
+    wpi::SmallString<64> buf;
     char* end;
     double v = std::strtod(tok.c_str(buf), &end);
     if (*end != '\0') {
@@ -334,7 +334,7 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadDoubleArrayValue() {
 std::shared_ptr<Value> LoadPersistentImpl::ReadStringArrayValue() {
   m_buf_string_array.clear();
   while (!m_line.empty()) {
-    llvm::StringRef tok;
+    wpi::StringRef tok;
     std::tie(tok, m_line) = ReadStringToken(m_line);
     if (tok.empty()) {
       Warn("missing string value");
@@ -345,7 +345,7 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadStringArrayValue() {
       return nullptr;
     }
 
-    llvm::SmallString<128> buf;
+    wpi::SmallString<128> buf;
     m_buf_string_array.push_back(UnescapeString(tok, buf));
 
     m_line = m_line.ltrim(" \t");
@@ -363,7 +363,7 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadStringArrayValue() {
 bool Storage::LoadEntries(
     wpi::raw_istream& is, const Twine& prefix, bool persistent,
     std::function<void(size_t line, const char* msg)> warn) {
-  llvm::SmallString<128> prefixBuf;
+  wpi::SmallString<128> prefixBuf;
   StringRef prefixStr = prefix.toStringRef(prefixBuf);
 
   // entries to add

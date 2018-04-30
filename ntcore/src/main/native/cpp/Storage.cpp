@@ -7,7 +7,7 @@
 
 #include "Storage.h"
 
-#include <support/timestamp.h>
+#include <wpi/timestamp.h>
 
 #include "Handle.h"
 #include "IDispatcher.h"
@@ -386,7 +386,7 @@ void Storage::GetInitialAssignments(
 }
 
 void Storage::ApplyInitialAssignments(
-    INetworkConnection& conn, llvm::ArrayRef<std::shared_ptr<Message>> msgs,
+    INetworkConnection& conn, wpi::ArrayRef<std::shared_ptr<Message>> msgs,
     bool new_server, std::vector<std::shared_ptr<Message>>* out_msgs) {
   std::unique_lock<wpi::mutex> lock(m_mutex);
   if (m_server) return;  // should not do this on server
@@ -758,7 +758,7 @@ void Storage::DeleteAllEntries() {
 }
 
 Storage::Entry* Storage::GetOrNew(const Twine& name) {
-  llvm::SmallString<128> nameBuf;
+  wpi::SmallString<128> nameBuf;
   StringRef nameStr = name.toStringRef(nameBuf);
   auto& entry = m_entries[nameStr];
   if (!entry) {
@@ -779,7 +779,7 @@ unsigned int Storage::GetEntry(const Twine& name) {
 
 std::vector<unsigned int> Storage::GetEntries(const Twine& prefix,
                                               unsigned int types) {
-  llvm::SmallString<128> prefixBuf;
+  wpi::SmallString<128> prefixBuf;
   StringRef prefixStr = prefix.toStringRef(prefixBuf);
   std::lock_guard<wpi::mutex> lock(m_mutex);
   std::vector<unsigned int> ids;
@@ -837,7 +837,7 @@ uint64_t Storage::GetEntryLastChange(unsigned int local_id) const {
 
 std::vector<EntryInfo> Storage::GetEntryInfo(int inst, const Twine& prefix,
                                              unsigned int types) {
-  llvm::SmallString<128> prefixBuf;
+  wpi::SmallString<128> prefixBuf;
   StringRef prefixStr = prefix.toStringRef(prefixBuf);
   std::lock_guard<wpi::mutex> lock(m_mutex);
   std::vector<EntryInfo> infos;
@@ -861,7 +861,7 @@ unsigned int Storage::AddListener(
     const Twine& prefix,
     std::function<void(const EntryNotification& event)> callback,
     unsigned int flags) const {
-  llvm::SmallString<128> prefixBuf;
+  wpi::SmallString<128> prefixBuf;
   StringRef prefixStr = prefix.toStringRef(prefixBuf);
   std::lock_guard<wpi::mutex> lock(m_mutex);
   unsigned int uid = m_notifier.Add(callback, prefixStr, flags);
@@ -898,7 +898,7 @@ unsigned int Storage::AddListener(
 unsigned int Storage::AddPolledListener(unsigned int poller,
                                         const Twine& prefix,
                                         unsigned int flags) const {
-  llvm::SmallString<128> prefixBuf;
+  wpi::SmallString<128> prefixBuf;
   StringRef prefixStr = prefix.toStringRef(prefixBuf);
   std::lock_guard<wpi::mutex> lock(m_mutex);
   unsigned int uid = m_notifier.AddPolled(poller, prefixStr, flags);
@@ -965,7 +965,7 @@ bool Storage::GetEntries(
     const Twine& prefix,
     std::vector<std::pair<std::string, std::shared_ptr<Value>>>* entries)
     const {
-  llvm::SmallString<128> prefixBuf;
+  wpi::SmallString<128> prefixBuf;
   StringRef prefixStr = prefix.toStringRef(prefixBuf);
   // copy values out of storage as quickly as possible so lock isn't held
   {

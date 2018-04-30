@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include <llvm/StringRef.h>
+#include <wpi/StringRef.h>
 
 #include "SendableBuilder.h"
 
@@ -29,7 +29,7 @@ namespace frc {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddObject(llvm::StringRef name, T object) {
+void SendableChooser<T>::AddObject(wpi::StringRef name, T object) {
   m_choices[name] = std::move(object);
 }
 
@@ -43,7 +43,7 @@ void SendableChooser<T>::AddObject(llvm::StringRef name, T object) {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddDefault(llvm::StringRef name, T object) {
+void SendableChooser<T>::AddDefault(wpi::StringRef name, T object) {
   m_defaultChoice = name;
   AddObject(name, std::move(object));
 }
@@ -83,7 +83,7 @@ void SendableChooser<T>::InitSendable(SendableBuilder& builder) {
                                      keys.push_back(choice.first());
                                    }
 
-                                   // Unlike std::map, llvm::StringMap elements
+                                   // Unlike std::map, wpi::StringMap elements
                                    // are not sorted
                                    std::sort(keys.begin(), keys.end());
 
@@ -92,7 +92,7 @@ void SendableChooser<T>::InitSendable(SendableBuilder& builder) {
                                  nullptr);
   builder.AddSmallStringProperty(
       kDefault,
-      [=](const llvm::SmallVectorImpl<char>&) -> llvm::StringRef {
+      [=](const wpi::SmallVectorImpl<char>&) -> wpi::StringRef {
         return m_defaultChoice;
       },
       nullptr);

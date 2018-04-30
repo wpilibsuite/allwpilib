@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <support/priority_condition_variable.h>
-#include <support/priority_mutex.h>
+#include <wpi/priority_condition_variable.h>
+#include <wpi/priority_mutex.h>
 
 #include <atomic>
 #include <chrono>

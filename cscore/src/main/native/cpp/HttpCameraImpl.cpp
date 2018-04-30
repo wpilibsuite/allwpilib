@@ -7,9 +7,9 @@
 
 #include "HttpCameraImpl.h"
 
-#include <llvm/STLExtras.h>
-#include <support/timestamp.h>
-#include <tcpsockets/TCPConnector.h>
+#include <wpi/STLExtras.h>
+#include <wpi/TCPConnector.h>
+#include <wpi/timestamp.h>
 
 #include "Handle.h"
 #include "JpegUtil.h"
@@ -20,7 +20,7 @@
 
 using namespace cs;
 
-HttpCameraImpl::HttpCameraImpl(llvm::StringRef name, CS_HttpCameraKind kind)
+HttpCameraImpl::HttpCameraImpl(wpi::StringRef name, CS_HttpCameraKind kind)
     : SourceImpl{name}, m_kind{kind} {}
 
 HttpCameraImpl::~HttpCameraImpl() {
@@ -79,7 +79,7 @@ void HttpCameraImpl::StreamThreadMain() {
     }
 
     // connect
-    llvm::SmallString<64> boundary;
+    wpi::SmallString<64> boundary;
     wpi::HttpConnection* conn = DeviceStreamConnect(boundary);
 
     if (!m_active) break;
@@ -99,7 +99,7 @@ void HttpCameraImpl::StreamThreadMain() {
 }
 
 wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
-    llvm::SmallVectorImpl<char>& boundary) {
+    wpi::SmallVectorImpl<char>& boundary) {
   // Build the request
   wpi::HttpRequest req;
   {
@@ -120,7 +120,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
 
   if (!m_active || !stream) return nullptr;
 
-  auto connPtr = llvm::make_unique<wpi::HttpConnection>(std::move(stream), 1);
+  auto connPtr = wpi::make_unique<wpi::HttpConnection>(std::move(stream), 1);
   wpi::HttpConnection* conn = connPtr.get();
 
   // update m_streamConn
@@ -138,7 +138,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   }
 
   // Parse Content-Type header to get the boundary
-  llvm::StringRef mediaType, contentType;
+  wpi::StringRef mediaType, contentType;
   std::tie(mediaType, contentType) = conn->contentType.str().split(';');
   mediaType = mediaType.trim();
   if (mediaType != "multipart/x-mixed-replace") {
@@ -152,10 +152,10 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   // media parameters
   boundary.clear();
   while (!contentType.empty()) {
-    llvm::StringRef keyvalue;
+    wpi::StringRef keyvalue;
     std::tie(keyvalue, contentType) = contentType.split(';');
     contentType = contentType.ltrim();
-    llvm::StringRef key, value;
+    wpi::StringRef key, value;
     std::tie(key, value) = keyvalue.split('=');
     if (key.trim() == "boundary") {
       value = value.trim().trim('"');  // value may be quoted
@@ -175,7 +175,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
 }
 
 void HttpCameraImpl::DeviceStream(wpi::raw_istream& is,
-                                  llvm::StringRef boundary) {
+                                  wpi::StringRef boundary) {
   // Stored here so we reuse it from frame to frame
   std::string imageBuf;
 
@@ -205,8 +205,8 @@ void HttpCameraImpl::DeviceStream(wpi::raw_istream& is,
 bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
                                        std::string& imageBuf) {
   // Read the headers
-  llvm::SmallString<64> contentTypeBuf;
-  llvm::SmallString<64> contentLengthBuf;
+  wpi::SmallString<64> contentTypeBuf;
+  wpi::SmallString<64> contentLengthBuf;
   if (!ParseHttpHeaders(is, &contentTypeBuf, &contentLengthBuf)) {
     SWARNING("disconnected during headers");
     PutError("disconnected during headers", wpi::Now());
@@ -216,8 +216,8 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
   // Check the content type (if present)
   if (!contentTypeBuf.str().empty() &&
       !contentTypeBuf.str().startswith("image/jpeg")) {
-    llvm::SmallString<64> errBuf;
-    llvm::raw_svector_ostream errMsg{errBuf};
+    wpi::SmallString<64> errBuf;
+    wpi::raw_svector_ostream errMsg{errBuf};
     errMsg << "received unknown Content-Type \"" << contentTypeBuf << "\"";
     SWARNING(errMsg.str());
     PutError(errMsg.str(), wpi::Now());
@@ -282,7 +282,7 @@ void HttpCameraImpl::DeviceSendSettings(wpi::HttpRequest& req) {
 
   if (!m_active || !stream) return;
 
-  auto connPtr = llvm::make_unique<wpi::HttpConnection>(std::move(stream), 1);
+  auto connPtr = wpi::make_unique<wpi::HttpConnection>(std::move(stream), 1);
   wpi::HttpConnection* conn = connPtr.get();
 
   // update m_settingsConn
@@ -303,7 +303,7 @@ CS_HttpCameraKind HttpCameraImpl::GetKind() const {
   return m_kind;
 }
 
-bool HttpCameraImpl::SetUrls(llvm::ArrayRef<std::string> urls,
+bool HttpCameraImpl::SetUrls(wpi::ArrayRef<std::string> urls,
                              CS_Status* status) {
   std::vector<wpi::HttpLocation> locations;
   for (const auto& url : urls) {
@@ -331,27 +331,27 @@ std::vector<std::string> HttpCameraImpl::GetUrls() const {
   return urls;
 }
 
-void HttpCameraImpl::CreateProperty(llvm::StringRef name,
-                                    llvm::StringRef httpParam, bool viaSettings,
+void HttpCameraImpl::CreateProperty(wpi::StringRef name,
+                                    wpi::StringRef httpParam, bool viaSettings,
                                     CS_PropertyKind kind, int minimum,
                                     int maximum, int step, int defaultValue,
                                     int value) const {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  m_propertyData.emplace_back(llvm::make_unique<PropertyData>(
+  m_propertyData.emplace_back(wpi::make_unique<PropertyData>(
       name, httpParam, viaSettings, kind, minimum, maximum, step, defaultValue,
       value));
 
   Notifier::GetInstance().NotifySourceProperty(
       *this, CS_SOURCE_PROPERTY_CREATED, name, m_propertyData.size() + 1, kind,
-      value, llvm::StringRef{});
+      value, wpi::StringRef{});
 }
 
 template <typename T>
 void HttpCameraImpl::CreateEnumProperty(
-    llvm::StringRef name, llvm::StringRef httpParam, bool viaSettings,
+    wpi::StringRef name, wpi::StringRef httpParam, bool viaSettings,
     int defaultValue, int value, std::initializer_list<T> choices) const {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  m_propertyData.emplace_back(llvm::make_unique<PropertyData>(
+  m_propertyData.emplace_back(wpi::make_unique<PropertyData>(
       name, httpParam, viaSettings, CS_PROP_ENUM, 0, choices.size() - 1, 1,
       defaultValue, value));
 
@@ -361,15 +361,15 @@ void HttpCameraImpl::CreateEnumProperty(
 
   Notifier::GetInstance().NotifySourceProperty(
       *this, CS_SOURCE_PROPERTY_CREATED, name, m_propertyData.size() + 1,
-      CS_PROP_ENUM, value, llvm::StringRef{});
+      CS_PROP_ENUM, value, wpi::StringRef{});
   Notifier::GetInstance().NotifySourceProperty(
       *this, CS_SOURCE_PROPERTY_CHOICES_UPDATED, name,
-      m_propertyData.size() + 1, CS_PROP_ENUM, value, llvm::StringRef{});
+      m_propertyData.size() + 1, CS_PROP_ENUM, value, wpi::StringRef{});
 }
 
 std::unique_ptr<PropertyImpl> HttpCameraImpl::CreateEmptyProperty(
-    llvm::StringRef name) const {
-  return llvm::make_unique<PropertyData>(name);
+    wpi::StringRef name) const {
+  return wpi::make_unique<PropertyData>(name);
 }
 
 bool HttpCameraImpl::CacheProperties(CS_Status* status) const {
@@ -389,7 +389,7 @@ void HttpCameraImpl::SetProperty(int property, int value, CS_Status* status) {
   // TODO
 }
 
-void HttpCameraImpl::SetStringProperty(int property, llvm::StringRef value,
+void HttpCameraImpl::SetStringProperty(int property, wpi::StringRef value,
                                        CS_Status* status) {
   // TODO
 }
@@ -473,7 +473,7 @@ bool AxisCameraImpl::CacheProperties(CS_Status* status) const {
 
 namespace cs {
 
-CS_Source CreateHttpCamera(llvm::StringRef name, llvm::StringRef url,
+CS_Source CreateHttpCamera(wpi::StringRef name, wpi::StringRef url,
                            CS_HttpCameraKind kind, CS_Status* status) {
   std::shared_ptr<HttpCameraImpl> source;
   switch (kind) {
@@ -493,8 +493,8 @@ CS_Source CreateHttpCamera(llvm::StringRef name, llvm::StringRef url,
   return handle;
 }
 
-CS_Source CreateHttpCamera(llvm::StringRef name,
-                           llvm::ArrayRef<std::string> urls,
+CS_Source CreateHttpCamera(wpi::StringRef name,
+                           wpi::ArrayRef<std::string> urls,
                            CS_HttpCameraKind kind, CS_Status* status) {
   if (urls.empty()) {
     *status = CS_EMPTY_VALUE;
@@ -518,7 +518,7 @@ CS_HttpCameraKind GetHttpCameraKind(CS_Source source, CS_Status* status) {
   return static_cast<HttpCameraImpl&>(*data->source).GetKind();
 }
 
-void SetHttpCameraUrls(CS_Source source, llvm::ArrayRef<std::string> urls,
+void SetHttpCameraUrls(CS_Source source, wpi::ArrayRef<std::string> urls,
                        CS_Status* status) {
   if (urls.empty()) {
     *status = CS_EMPTY_VALUE;
@@ -554,7 +554,7 @@ CS_Source CS_CreateHttpCamera(const char* name, const char* url,
 CS_Source CS_CreateHttpCameraMulti(const char* name, const char** urls,
                                    int count, CS_HttpCameraKind kind,
                                    CS_Status* status) {
-  llvm::SmallVector<std::string, 4> vec;
+  wpi::SmallVector<std::string, 4> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) vec.push_back(urls[i]);
   return cs::CreateHttpCamera(name, vec, kind, status);
@@ -566,7 +566,7 @@ CS_HttpCameraKind CS_GetHttpCameraKind(CS_Source source, CS_Status* status) {
 
 void CS_SetHttpCameraUrls(CS_Source source, const char** urls, int count,
                           CS_Status* status) {
-  llvm::SmallVector<std::string, 4> vec;
+  wpi::SmallVector<std::string, 4> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) vec.push_back(urls[i]);
   cs::SetHttpCameraUrls(source, vec, status);

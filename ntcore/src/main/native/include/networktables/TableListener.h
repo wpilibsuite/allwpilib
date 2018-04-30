@@ -11,13 +11,13 @@
 #include <functional>
 #include <memory>
 
-#include <llvm/StringRef.h>
+#include <wpi/StringRef.h>
 
 namespace nt {
 
 class NetworkTable;
 
-using llvm::StringRef;
+using wpi::StringRef;
 
 /**
  * A listener that listens to new sub-tables in a NetworkTable.

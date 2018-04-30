@@ -9,8 +9,8 @@
 
 #include <memory>
 
-#include <llvm/ArrayRef.h>
-#include <llvm/raw_ostream.h>
+#include <wpi/ArrayRef.h>
+#include <wpi/raw_ostream.h>
 
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
@@ -53,12 +53,12 @@ class RobotDriveBase : public MotorSafety, public SendableBase {
   void StopMotor() override = 0;
   bool IsSafetyEnabled() const override;
   void SetSafetyEnabled(bool enabled) override;
-  void GetDescription(llvm::raw_ostream& desc) const override = 0;
+  void GetDescription(wpi::raw_ostream& desc) const override = 0;
 
  protected:
   double Limit(double number);
   double ApplyDeadband(double number, double deadband);
-  void Normalize(llvm::MutableArrayRef<double> wheelSpeeds);
+  void Normalize(wpi::MutableArrayRef<double> wheelSpeeds);
 
   double m_deadband = 0.02;
   double m_maxOutput = 1.0;

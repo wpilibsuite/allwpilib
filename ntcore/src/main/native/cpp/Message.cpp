@@ -126,7 +126,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       if (!decoder.ReadUleb128(&size)) return nullptr;
       const char* params;
       if (!decoder.Read(&params, size)) return nullptr;
-      msg->m_str = llvm::StringRef(params, size);
+      msg->m_str = wpi::StringRef(params, size);
       break;
     }
     case kRpcResponse: {
@@ -140,7 +140,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       if (!decoder.ReadUleb128(&size)) return nullptr;
       const char* results;
       if (!decoder.Read(&results, size)) return nullptr;
-      msg->m_str = llvm::StringRef(results, size);
+      msg->m_str = wpi::StringRef(results, size);
       break;
     }
     default:
@@ -151,21 +151,21 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
   return msg;
 }
 
-std::shared_ptr<Message> Message::ClientHello(llvm::StringRef self_id) {
+std::shared_ptr<Message> Message::ClientHello(wpi::StringRef self_id) {
   auto msg = std::make_shared<Message>(kClientHello, private_init());
   msg->m_str = self_id;
   return msg;
 }
 
 std::shared_ptr<Message> Message::ServerHello(unsigned int flags,
-                                              llvm::StringRef self_id) {
+                                              wpi::StringRef self_id) {
   auto msg = std::make_shared<Message>(kServerHello, private_init());
   msg->m_str = self_id;
   msg->m_flags = flags;
   return msg;
 }
 
-std::shared_ptr<Message> Message::EntryAssign(llvm::StringRef name,
+std::shared_ptr<Message> Message::EntryAssign(wpi::StringRef name,
                                               unsigned int id,
                                               unsigned int seq_num,
                                               std::shared_ptr<Value> value,
@@ -204,7 +204,7 @@ std::shared_ptr<Message> Message::EntryDelete(unsigned int id) {
 }
 
 std::shared_ptr<Message> Message::ExecuteRpc(unsigned int id, unsigned int uid,
-                                             llvm::StringRef params) {
+                                             wpi::StringRef params) {
   auto msg = std::make_shared<Message>(kExecuteRpc, private_init());
   msg->m_str = params;
   msg->m_id = id;
@@ -213,7 +213,7 @@ std::shared_ptr<Message> Message::ExecuteRpc(unsigned int id, unsigned int uid,
 }
 
 std::shared_ptr<Message> Message::RpcResponse(unsigned int id, unsigned int uid,
-                                              llvm::StringRef result) {
+                                              wpi::StringRef result) {
   auto msg = std::make_shared<Message>(kRpcResponse, private_init());
   msg->m_str = result;
   msg->m_id = id;

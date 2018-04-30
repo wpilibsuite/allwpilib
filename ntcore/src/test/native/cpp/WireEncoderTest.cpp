@@ -9,7 +9,7 @@
 #include <climits>
 #include <string>
 
-#include <llvm/StringRef.h>
+#include <wpi/StringRef.h>
 
 #include "TestPrinters.h"
 #include "WireEncoder.h"
@@ -25,8 +25,8 @@ class WireEncoderTest : public ::testing::Test {
     v_empty = std::make_shared<Value>();
     v_boolean = Value::MakeBoolean(true);
     v_double = Value::MakeDouble(1.0);
-    v_string = Value::MakeString(llvm::StringRef("hello"));
-    v_raw = Value::MakeRaw(llvm::StringRef("hello"));
+    v_string = Value::MakeString(wpi::StringRef("hello"));
+    v_raw = Value::MakeRaw(wpi::StringRef("hello"));
     v_boolean_array = Value::MakeBooleanArray(std::vector<int>{0, 1, 0});
     v_boolean_array_big = Value::MakeBooleanArray(std::vector<int>(256));
     v_double_array = Value::MakeDoubleArray(std::vector<double>{0.5, 0.25});
@@ -82,8 +82,8 @@ TEST_F(WireEncoderTest, Write8) {
   e.Write8(0x101u);  // should be truncated
   e.Write8(0u);
   ASSERT_EQ(3u, e.size() - off);
-  ASSERT_EQ(llvm::StringRef("\x05\x01\x00", 3),
-            llvm::StringRef(e.data(), e.size()).substr(off));
+  ASSERT_EQ(wpi::StringRef("\x05\x01\x00", 3),
+            wpi::StringRef(e.data(), e.size()).substr(off));
 }
 
 TEST_F(WireEncoderTest, Write16) {
@@ -95,8 +95,8 @@ TEST_F(WireEncoderTest, Write16) {
   e.Write16(0x4567u);
   e.Write16(0u);
   ASSERT_EQ(8u, e.size() - off);
-  ASSERT_EQ(llvm::StringRef("\x00\x05\x00\x01\x45\x67\x00\x00", 8),
-            llvm::StringRef(e.data(), e.size()).substr(off));
+  ASSERT_EQ(wpi::StringRef("\x00\x05\x00\x01\x45\x67\x00\x00", 8),
+            wpi::StringRef(e.data(), e.size()).substr(off));
 }
 
 TEST_F(WireEncoderTest, Write32) {
@@ -109,10 +109,10 @@ TEST_F(WireEncoderTest, Write32) {
   e.Write32(0x12345678ul);
   e.Write32(0ul);
   ASSERT_EQ(20u, e.size() - off);
-  ASSERT_EQ(llvm::StringRef("\x00\x00\x00\x05\x00\x00\x00\x01\x00\x00\xab\xcd"
-                            "\x12\x34\x56\x78\x00\x00\x00\x00",
-                            20),
-            llvm::StringRef(e.data(), e.size()).substr(off));
+  ASSERT_EQ(wpi::StringRef("\x00\x00\x00\x05\x00\x00\x00\x01\x00\x00\xab\xcd"
+                           "\x12\x34\x56\x78\x00\x00\x00\x00",
+                           20),
+            wpi::StringRef(e.data(), e.size()).substr(off));
 }
 
 TEST_F(WireEncoderTest, WriteDouble) {
@@ -127,13 +127,13 @@ TEST_F(WireEncoderTest, WriteDouble) {
   ASSERT_EQ(40u, e.size() - off);
   // golden values except min and max from
   // http://www.binaryconvert.com/result_double.html
-  ASSERT_EQ(llvm::StringRef("\x00\x00\x00\x00\x00\x00\x00\x00"
-                            "\x41\x0c\x13\x80\x00\x00\x00\x00"
-                            "\x7f\xf0\x00\x00\x00\x00\x00\x00"
-                            "\x00\x10\x00\x00\x00\x00\x00\x00"
-                            "\x7f\xef\xff\xff\xff\xff\xff\xff",
-                            40),
-            llvm::StringRef(e.data(), e.size()).substr(off));
+  ASSERT_EQ(wpi::StringRef("\x00\x00\x00\x00\x00\x00\x00\x00"
+                           "\x41\x0c\x13\x80\x00\x00\x00\x00"
+                           "\x7f\xf0\x00\x00\x00\x00\x00\x00"
+                           "\x00\x10\x00\x00\x00\x00\x00\x00"
+                           "\x7f\xef\xff\xff\xff\xff\xff\xff",
+                           40),
+            wpi::StringRef(e.data(), e.size()).substr(off));
 }
 
 TEST_F(WireEncoderTest, WriteUleb128) {
@@ -144,8 +144,8 @@ TEST_F(WireEncoderTest, WriteUleb128) {
   e.WriteUleb128(0x7ful);
   e.WriteUleb128(0x80ul);
   ASSERT_EQ(4u, e.size() - off);
-  ASSERT_EQ(llvm::StringRef("\x00\x7f\x80\x01", 4),
-            llvm::StringRef(e.data(), e.size()).substr(off));
+  ASSERT_EQ(wpi::StringRef("\x00\x7f\x80\x01", 4),
+            wpi::StringRef(e.data(), e.size()).substr(off));
 }
 
 TEST_F(WireEncoderTest, WriteType) {
@@ -162,8 +162,8 @@ TEST_F(WireEncoderTest, WriteType) {
   e.WriteType(NT_RPC);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(8u, e.size() - off);
-  ASSERT_EQ(llvm::StringRef("\x00\x01\x02\x03\x10\x11\x12\x20", 8),
-            llvm::StringRef(e.data(), e.size()).substr(off));
+  ASSERT_EQ(wpi::StringRef("\x00\x01\x02\x03\x10\x11\x12\x20", 8),
+            wpi::StringRef(e.data(), e.size()).substr(off));
 }
 
 TEST_F(WireEncoderTest, WriteTypeError) {
@@ -224,8 +224,8 @@ TEST_F(WireEncoderTest, WriteBooleanValue2) {
   e.WriteValue(*v_false);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(2u, e.size());
-  ASSERT_EQ(llvm::StringRef("\x01\x00", 2),
-            llvm::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x01\x00", 2),
+            wpi::StringRef(e.data(), e.size()));
 }
 
 TEST_F(WireEncoderTest, WriteDoubleValue2) {
@@ -233,8 +233,8 @@ TEST_F(WireEncoderTest, WriteDoubleValue2) {
   e.WriteValue(*v_double);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(8u, e.size());
-  ASSERT_EQ(llvm::StringRef("\x3f\xf0\x00\x00\x00\x00\x00\x00", 8),
-            llvm::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x3f\xf0\x00\x00\x00\x00\x00\x00", 8),
+            wpi::StringRef(e.data(), e.size()));
 }
 
 TEST_F(WireEncoderTest, WriteStringValue2) {
@@ -242,8 +242,8 @@ TEST_F(WireEncoderTest, WriteStringValue2) {
   e.WriteValue(*v_string);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(7u, e.size());
-  ASSERT_EQ(llvm::StringRef("\x00\x05hello", 7),
-            llvm::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x00\x05hello", 7),
+            wpi::StringRef(e.data(), e.size()));
 }
 
 TEST_F(WireEncoderTest, WriteBooleanArrayValue2) {
@@ -251,15 +251,15 @@ TEST_F(WireEncoderTest, WriteBooleanArrayValue2) {
   e.WriteValue(*v_boolean_array);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(1u + 3u, e.size());
-  ASSERT_EQ(llvm::StringRef("\x03\x00\x01\x00", 4),
-            llvm::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x03\x00\x01\x00", 4),
+            wpi::StringRef(e.data(), e.size()));
 
   // truncated
   e.Reset();
   e.WriteValue(*v_boolean_array_big);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(1u + 255u, e.size());
-  ASSERT_EQ(llvm::StringRef("\xff\x00", 2), llvm::StringRef(e.data(), 2));
+  ASSERT_EQ(wpi::StringRef("\xff\x00", 2), wpi::StringRef(e.data(), 2));
 }
 
 TEST_F(WireEncoderTest, WriteDoubleArrayValue2) {
@@ -267,17 +267,17 @@ TEST_F(WireEncoderTest, WriteDoubleArrayValue2) {
   e.WriteValue(*v_double_array);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(1u + 2u * 8u, e.size());
-  ASSERT_EQ(llvm::StringRef("\x02\x3f\xe0\x00\x00\x00\x00\x00\x00"
-                            "\x3f\xd0\x00\x00\x00\x00\x00\x00",
-                            17),
-            llvm::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x02\x3f\xe0\x00\x00\x00\x00\x00\x00"
+                           "\x3f\xd0\x00\x00\x00\x00\x00\x00",
+                           17),
+            wpi::StringRef(e.data(), e.size()));
 
   // truncated
   e.Reset();
   e.WriteValue(*v_double_array_big);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(1u + 255u * 8u, e.size());
-  ASSERT_EQ(llvm::StringRef("\xff\x00", 2), llvm::StringRef(e.data(), 2));
+  ASSERT_EQ(wpi::StringRef("\xff\x00", 2), wpi::StringRef(e.data(), 2));
 }
 
 TEST_F(WireEncoderTest, WriteStringArrayValue2) {
@@ -285,15 +285,15 @@ TEST_F(WireEncoderTest, WriteStringArrayValue2) {
   e.WriteValue(*v_string_array);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(1u + 7u + 9u, e.size());
-  ASSERT_EQ(llvm::StringRef("\x02\x00\x05hello\x00\x07goodbye", 17),
-            llvm::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x02\x00\x05hello\x00\x07goodbye", 17),
+            wpi::StringRef(e.data(), e.size()));
 
   // truncated
   e.Reset();
   e.WriteValue(*v_string_array_big);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(1u + 255u * 3u, e.size());
-  ASSERT_EQ(llvm::StringRef("\xff\x00\x01", 3), llvm::StringRef(e.data(), 3));
+  ASSERT_EQ(wpi::StringRef("\xff\x00\x01", 3), wpi::StringRef(e.data(), 3));
 }
 
 TEST_F(WireEncoderTest, WriteValueError2) {
@@ -336,8 +336,8 @@ TEST_F(WireEncoderTest, WriteBooleanValue3) {
   e.WriteValue(*v_false);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(2u, e.size());
-  ASSERT_EQ(llvm::StringRef("\x01\x00", 2),
-            llvm::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x01\x00", 2),
+            wpi::StringRef(e.data(), e.size()));
 }
 
 TEST_F(WireEncoderTest, WriteDoubleValue3) {
@@ -345,8 +345,8 @@ TEST_F(WireEncoderTest, WriteDoubleValue3) {
   e.WriteValue(*v_double);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(8u, e.size());
-  ASSERT_EQ(llvm::StringRef("\x3f\xf0\x00\x00\x00\x00\x00\x00", 8),
-            llvm::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x3f\xf0\x00\x00\x00\x00\x00\x00", 8),
+            wpi::StringRef(e.data(), e.size()));
 }
 
 TEST_F(WireEncoderTest, WriteStringValue3) {
@@ -354,8 +354,8 @@ TEST_F(WireEncoderTest, WriteStringValue3) {
   e.WriteValue(*v_string);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(6u, e.size());
-  ASSERT_EQ(llvm::StringRef("\x05hello", 6),
-            llvm::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x05hello", 6),
+            wpi::StringRef(e.data(), e.size()));
 }
 
 TEST_F(WireEncoderTest, WriteRawValue3) {
@@ -363,8 +363,8 @@ TEST_F(WireEncoderTest, WriteRawValue3) {
   e.WriteValue(*v_raw);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(6u, e.size());
-  ASSERT_EQ(llvm::StringRef("\x05hello", 6),
-            llvm::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x05hello", 6),
+            wpi::StringRef(e.data(), e.size()));
 }
 
 TEST_F(WireEncoderTest, WriteBooleanArrayValue3) {
@@ -372,15 +372,15 @@ TEST_F(WireEncoderTest, WriteBooleanArrayValue3) {
   e.WriteValue(*v_boolean_array);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(1u + 3u, e.size());
-  ASSERT_EQ(llvm::StringRef("\x03\x00\x01\x00", 4),
-            llvm::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x03\x00\x01\x00", 4),
+            wpi::StringRef(e.data(), e.size()));
 
   // truncated
   e.Reset();
   e.WriteValue(*v_boolean_array_big);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(1u + 255u, e.size());
-  ASSERT_EQ(llvm::StringRef("\xff\x00", 2), llvm::StringRef(e.data(), 2));
+  ASSERT_EQ(wpi::StringRef("\xff\x00", 2), wpi::StringRef(e.data(), 2));
 }
 
 TEST_F(WireEncoderTest, WriteDoubleArrayValue3) {
@@ -388,17 +388,17 @@ TEST_F(WireEncoderTest, WriteDoubleArrayValue3) {
   e.WriteValue(*v_double_array);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(1u + 2u * 8u, e.size());
-  ASSERT_EQ(llvm::StringRef("\x02\x3f\xe0\x00\x00\x00\x00\x00\x00"
-                            "\x3f\xd0\x00\x00\x00\x00\x00\x00",
-                            17),
-            llvm::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x02\x3f\xe0\x00\x00\x00\x00\x00\x00"
+                           "\x3f\xd0\x00\x00\x00\x00\x00\x00",
+                           17),
+            wpi::StringRef(e.data(), e.size()));
 
   // truncated
   e.Reset();
   e.WriteValue(*v_double_array_big);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(1u + 255u * 8u, e.size());
-  ASSERT_EQ(llvm::StringRef("\xff\x00", 2), llvm::StringRef(e.data(), 2));
+  ASSERT_EQ(wpi::StringRef("\xff\x00", 2), wpi::StringRef(e.data(), 2));
 }
 
 TEST_F(WireEncoderTest, WriteStringArrayValue3) {
@@ -406,15 +406,15 @@ TEST_F(WireEncoderTest, WriteStringArrayValue3) {
   e.WriteValue(*v_string_array);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(1u + 6u + 8u, e.size());
-  ASSERT_EQ(llvm::StringRef("\x02\x05hello\x07goodbye", 15),
-            llvm::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x02\x05hello\x07goodbye", 15),
+            wpi::StringRef(e.data(), e.size()));
 
   // truncated
   e.Reset();
   e.WriteValue(*v_string_array_big);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(1u + 255u * 2u, e.size());
-  ASSERT_EQ(llvm::StringRef("\xff\x01", 2), llvm::StringRef(e.data(), 2));
+  ASSERT_EQ(wpi::StringRef("\xff\x01", 2), wpi::StringRef(e.data(), 2));
 }
 
 TEST_F(WireEncoderTest, WriteValueError3) {
@@ -438,14 +438,14 @@ TEST_F(WireEncoderTest, WriteString2) {
   e.WriteString(s_normal);
   EXPECT_EQ(nullptr, e.error());
   EXPECT_EQ(7u, e.size());
-  EXPECT_EQ(llvm::StringRef("\x00\x05hello", 7),
-            llvm::StringRef(e.data(), e.size()));
+  EXPECT_EQ(wpi::StringRef("\x00\x05hello", 7),
+            wpi::StringRef(e.data(), e.size()));
 
   e.Reset();
   e.WriteString(s_long);
   EXPECT_EQ(nullptr, e.error());
   ASSERT_EQ(130u, e.size());
-  EXPECT_EQ(llvm::StringRef("\x00\x80**", 4), llvm::StringRef(e.data(), 4));
+  EXPECT_EQ(wpi::StringRef("\x00\x80**", 4), wpi::StringRef(e.data(), 4));
   EXPECT_EQ('*', e.data()[128]);
   EXPECT_EQ('x', e.data()[129]);
 
@@ -454,7 +454,7 @@ TEST_F(WireEncoderTest, WriteString2) {
   e.WriteString(s_big);
   EXPECT_EQ(nullptr, e.error());
   ASSERT_EQ(65537u, e.size());
-  EXPECT_EQ(llvm::StringRef("\xff\xff**", 4), llvm::StringRef(e.data(), 4));
+  EXPECT_EQ(wpi::StringRef("\xff\xff**", 4), wpi::StringRef(e.data(), 4));
   EXPECT_EQ('*', e.data()[65535]);
   EXPECT_EQ('x', e.data()[65536]);
 }
@@ -472,14 +472,14 @@ TEST_F(WireEncoderTest, WriteString3) {
   e.WriteString(s_normal);
   EXPECT_EQ(nullptr, e.error());
   EXPECT_EQ(6u, e.size());
-  EXPECT_EQ(llvm::StringRef("\x05hello", 6),
-            llvm::StringRef(e.data(), e.size()));
+  EXPECT_EQ(wpi::StringRef("\x05hello", 6),
+            wpi::StringRef(e.data(), e.size()));
 
   e.Reset();
   e.WriteString(s_long);
   EXPECT_EQ(nullptr, e.error());
   ASSERT_EQ(130u, e.size());
-  EXPECT_EQ(llvm::StringRef("\x80\x01**", 4), llvm::StringRef(e.data(), 4));
+  EXPECT_EQ(wpi::StringRef("\x80\x01**", 4), wpi::StringRef(e.data(), 4));
   EXPECT_EQ('*', e.data()[128]);
   EXPECT_EQ('x', e.data()[129]);
 
@@ -488,7 +488,7 @@ TEST_F(WireEncoderTest, WriteString3) {
   e.WriteString(s_big);
   EXPECT_EQ(nullptr, e.error());
   ASSERT_EQ(65540u, e.size());
-  EXPECT_EQ(llvm::StringRef("\x81\x80\x04*", 4), llvm::StringRef(e.data(), 4));
+  EXPECT_EQ(wpi::StringRef("\x81\x80\x04*", 4), wpi::StringRef(e.data(), 4));
   EXPECT_EQ('*', e.data()[65536]);
   EXPECT_EQ('x', e.data()[65537]);
   EXPECT_EQ('x', e.data()[65538]);

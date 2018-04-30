@@ -19,12 +19,12 @@
 #include <utility>
 #include <vector>
 
-#include <llvm/STLExtras.h>
-#include <llvm/SmallVector.h>
-#include <llvm/raw_ostream.h>
-#include <support/condition_variable.h>
-#include <support/mutex.h>
-#include <support/raw_istream.h>
+#include <wpi/STLExtras.h>
+#include <wpi/SmallVector.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_istream.h>
+#include <wpi/raw_ostream.h>
 
 #include "SourceImpl.h"
 #include "UsbCameraBuffer.h"
@@ -34,14 +34,14 @@ namespace cs {
 
 class UsbCameraImpl : public SourceImpl {
  public:
-  UsbCameraImpl(llvm::StringRef name, llvm::StringRef path);
+  UsbCameraImpl(wpi::StringRef name, wpi::StringRef path);
   ~UsbCameraImpl() override;
 
   void Start();
 
   // Property functions
   void SetProperty(int property, int value, CS_Status* status) override;
-  void SetStringProperty(int property, llvm::StringRef value,
+  void SetStringProperty(int property, wpi::StringRef value,
                          CS_Status* status) override;
 
   // Standard common camera properties
@@ -93,7 +93,7 @@ class UsbCameraImpl : public SourceImpl {
 
  protected:
   std::unique_ptr<PropertyImpl> CreateEmptyProperty(
-      llvm::StringRef name) const override;
+      wpi::StringRef name) const override;
 
   // Cache properties.  Immediately successful if properties are already cached.
   // If they are not, tries to connect to the camera to do so; returns false and

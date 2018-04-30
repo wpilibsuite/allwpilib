@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include <llvm/Twine.h>
+#include <wpi/Twine.h>
 
 #include "Commands/Subsystem.h"
 #include "PIDController.h"
@@ -29,9 +29,9 @@ namespace frc {
  */
 class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
  public:
-  PIDSubsystem(const llvm::Twine& name, double p, double i, double d);
-  PIDSubsystem(const llvm::Twine& name, double p, double i, double d, double f);
-  PIDSubsystem(const llvm::Twine& name, double p, double i, double d, double f,
+  PIDSubsystem(const wpi::Twine& name, double p, double i, double d);
+  PIDSubsystem(const wpi::Twine& name, double p, double i, double d, double f);
+  PIDSubsystem(const wpi::Twine& name, double p, double i, double d, double f,
                double period);
   PIDSubsystem(double p, double i, double d);
   PIDSubsystem(double p, double i, double d, double f);

@@ -19,21 +19,21 @@
 #include <string>
 
 #include "gtest/gtest.h"
-#include "llvm/SmallString.h"
-#include "llvm/StringRef.h"
-#include "support/leb128.h"
-#include "support/raw_istream.h"
+#include "wpi/SmallString.h"
+#include "wpi/StringRef.h"
+#include "wpi/leb128.h"
+#include "wpi/raw_istream.h"
 
 namespace wpi {
 
 TEST(LEB128Test, WriteUleb128) {
-#define EXPECT_ULEB128_EQ(EXPECTED, VALUE, PAD)               \
-  do {                                                        \
-    llvm::StringRef expected(EXPECTED, sizeof(EXPECTED) - 1); \
-    llvm::SmallString<32> buf;                                \
-    size_t size = WriteUleb128(buf, VALUE);                   \
-    EXPECT_EQ(size, buf.size());                              \
-    EXPECT_EQ(expected, buf.str());                           \
+#define EXPECT_ULEB128_EQ(EXPECTED, VALUE, PAD)         \
+  do {                                                  \
+    StringRef expected(EXPECTED, sizeof(EXPECTED) - 1); \
+    SmallString<32> buf;                                \
+    size_t size = WriteUleb128(buf, VALUE);             \
+    EXPECT_EQ(size, buf.size());                        \
+    EXPECT_EQ(expected, buf.str());                     \
   } while (0)
 
   // Write ULEB128

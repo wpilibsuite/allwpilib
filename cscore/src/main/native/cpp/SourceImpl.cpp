@@ -10,8 +10,8 @@
 #include <algorithm>
 #include <cstring>
 
-#include <llvm/STLExtras.h>
-#include <support/timestamp.h>
+#include <wpi/STLExtras.h>
+#include <wpi/timestamp.h>
 
 #include "Log.h"
 #include "Notifier.h"
@@ -21,8 +21,8 @@ using namespace cs;
 
 static constexpr size_t kMaxImagesAvail = 32;
 
-SourceImpl::SourceImpl(llvm::StringRef name) : m_name{name} {
-  m_frame = Frame{*this, llvm::StringRef{}, 0};
+SourceImpl::SourceImpl(wpi::StringRef name) : m_name{name} {
+  m_frame = Frame{*this, wpi::StringRef{}, 0};
 }
 
 SourceImpl::~SourceImpl() {
@@ -38,16 +38,16 @@ SourceImpl::~SourceImpl() {
   // Everything else can clean up itself.
 }
 
-void SourceImpl::SetDescription(llvm::StringRef description) {
+void SourceImpl::SetDescription(wpi::StringRef description) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   m_description = description;
 }
 
-llvm::StringRef SourceImpl::GetDescription(
-    llvm::SmallVectorImpl<char>& buf) const {
+wpi::StringRef SourceImpl::GetDescription(
+    wpi::SmallVectorImpl<char>& buf) const {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
-  return llvm::StringRef{buf.data(), buf.size()};
+  return wpi::StringRef{buf.data(), buf.size()};
 }
 
 void SourceImpl::SetConnected(bool connected) {
@@ -89,12 +89,12 @@ Frame SourceImpl::GetNextFrame(double timeout) {
 void SourceImpl::Wakeup() {
   {
     std::lock_guard<wpi::mutex> lock{m_frameMutex};
-    m_frame = Frame{*this, llvm::StringRef{}, 0};
+    m_frame = Frame{*this, wpi::StringRef{}, 0};
   }
   m_frameCv.notify_all();
 }
 
-int SourceImpl::GetPropertyIndex(llvm::StringRef name) const {
+int SourceImpl::GetPropertyIndex(wpi::StringRef name) const {
   // We can't fail, so instead we create a new index if caching fails.
   CS_Status status = 0;
   if (!m_properties_cached) CacheProperties(&status);
@@ -108,10 +108,10 @@ int SourceImpl::GetPropertyIndex(llvm::StringRef name) const {
   return ndx;
 }
 
-llvm::ArrayRef<int> SourceImpl::EnumerateProperties(
-    llvm::SmallVectorImpl<int>& vec, CS_Status* status) const {
+wpi::ArrayRef<int> SourceImpl::EnumerateProperties(
+    wpi::SmallVectorImpl<int>& vec, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status))
-    return llvm::ArrayRef<int>{};
+    return wpi::ArrayRef<int>{};
   std::lock_guard<wpi::mutex> lock(m_mutex);
   for (int i = 0; i < static_cast<int>(m_propertyData.size()); ++i) {
     if (m_propertyData[i]) vec.push_back(i + 1);
@@ -128,16 +128,16 @@ CS_PropertyKind SourceImpl::GetPropertyKind(int property) const {
   return prop->propKind;
 }
 
-llvm::StringRef SourceImpl::GetPropertyName(int property,
-                                            llvm::SmallVectorImpl<char>& buf,
-                                            CS_Status* status) const {
+wpi::StringRef SourceImpl::GetPropertyName(int property,
+                                           wpi::SmallVectorImpl<char>& buf,
+                                           CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status))
-    return llvm::StringRef{};
+    return wpi::StringRef{};
   std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
-    return llvm::StringRef{};
+    return wpi::StringRef{};
   }
   // safe to not copy because we never modify it after caching
   return prop->name;
@@ -203,24 +203,24 @@ int SourceImpl::GetPropertyDefault(int property, CS_Status* status) const {
   return prop->defaultValue;
 }
 
-llvm::StringRef SourceImpl::GetStringProperty(int property,
-                                              llvm::SmallVectorImpl<char>& buf,
-                                              CS_Status* status) const {
+wpi::StringRef SourceImpl::GetStringProperty(int property,
+                                             wpi::SmallVectorImpl<char>& buf,
+                                             CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status))
-    return llvm::StringRef{};
+    return wpi::StringRef{};
   std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
-    return llvm::StringRef{};
+    return wpi::StringRef{};
   }
   if (prop->propKind != CS_PROP_STRING) {
     *status = CS_WRONG_PROPERTY_TYPE;
-    return llvm::StringRef{};
+    return wpi::StringRef{};
   }
   buf.clear();
   buf.append(prop->valueStr.begin(), prop->valueStr.end());
-  return llvm::StringRef(buf.data(), buf.size());
+  return wpi::StringRef(buf.data(), buf.size());
 }
 
 std::vector<std::string> SourceImpl::GetEnumPropertyChoices(
@@ -313,7 +313,7 @@ std::unique_ptr<Image> SourceImpl::AllocImage(
 }
 
 void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
-                          int height, llvm::StringRef data, Frame::Time time) {
+                          int height, wpi::StringRef data, Frame::Time time) {
   auto image = AllocImage(pixelFormat, width, height, data.size());
 
   // Copy in image data
@@ -342,7 +342,7 @@ void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
   m_frameCv.notify_all();
 }
 
-void SourceImpl::PutError(llvm::StringRef msg, Frame::Time time) {
+void SourceImpl::PutError(wpi::StringRef msg, Frame::Time time) {
   // Update frame
   {
     std::lock_guard<wpi::mutex> lock{m_frameMutex};
@@ -362,11 +362,11 @@ void SourceImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
   if (prop.propKind == CS_PROP_ENUM)
     notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
                                   prop.name, propIndex, prop.propKind,
-                                  prop.value, llvm::StringRef{});
+                                  prop.value, wpi::StringRef{});
 }
 
 void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
-                                     llvm::StringRef valueStr) {
+                                     wpi::StringRef valueStr) {
   auto prop = GetProperty(property);
   if (!prop) return;
 
@@ -407,7 +407,7 @@ void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
 std::unique_ptr<Frame::Impl> SourceImpl::AllocFrameImpl() {
   std::lock_guard<wpi::mutex> lock{m_poolMutex};
 
-  if (m_framesAvail.empty()) return llvm::make_unique<Frame::Impl>(*this);
+  if (m_framesAvail.empty()) return wpi::make_unique<Frame::Impl>(*this);
 
   auto impl = std::move(m_framesAvail.back());
   m_framesAvail.pop_back();

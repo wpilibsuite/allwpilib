@@ -93,7 +93,7 @@ double RobotDriveBase::ApplyDeadband(double value, double deadband) {
 /**
  * Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0.
  */
-void RobotDriveBase::Normalize(llvm::MutableArrayRef<double> wheelSpeeds) {
+void RobotDriveBase::Normalize(wpi::MutableArrayRef<double> wheelSpeeds) {
   double maxMagnitude = std::abs(wheelSpeeds[0]);
   for (size_t i = 1; i < wheelSpeeds.size(); i++) {
     double temp = std::abs(wheelSpeeds[i]);

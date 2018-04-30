@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include <support/SafeThread.h>
+#include <wpi/SafeThread.h>
 
 #include "DigitalInternal.h"
 #include "HAL/ChipObject.h"

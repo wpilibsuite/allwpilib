@@ -150,7 +150,7 @@ void KilloughDrive::StopMotor() {
   m_safetyHelper.Feed();
 }
 
-void KilloughDrive::GetDescription(llvm::raw_ostream& desc) const {
+void KilloughDrive::GetDescription(wpi::raw_ostream& desc) const {
   desc << "KilloughDrive";
 }
 

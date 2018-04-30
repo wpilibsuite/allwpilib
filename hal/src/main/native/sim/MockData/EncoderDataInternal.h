@@ -11,7 +11,7 @@
 #include <limits>
 #include <memory>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "MockData/EncoderData.h"
 #include "MockData/NotifyListenerVector.h"

@@ -11,8 +11,8 @@
 #include <atomic>
 #include <memory>
 
-#include <support/UidVector.h>
-#include <support/mutex.h>
+#include <wpi/UidVector.h>
+#include <wpi/mutex.h>
 
 #include "ConnectionNotifier.h"
 #include "Dispatcher.h"

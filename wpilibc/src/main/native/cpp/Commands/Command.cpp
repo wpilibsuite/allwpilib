@@ -33,7 +33,7 @@ Command::Command() : Command("", -1.0) {}
  *
  * @param name the name for this command
  */
-Command::Command(const llvm::Twine& name) : Command(name, -1.0) {}
+Command::Command(const wpi::Twine& name) : Command(name, -1.0) {}
 
 /**
  * Creates a new command with the given timeout and a default name.
@@ -50,7 +50,7 @@ Command::Command(double timeout) : Command("", timeout) {}
  * @param timeout the time (in seconds) before this command "times out"
  * @see IsTimedOut()
  */
-Command::Command(const llvm::Twine& name, double timeout)
+Command::Command(const wpi::Twine& name, double timeout)
     : SendableBase(false) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0.0 && timeout != -1.0)
@@ -61,7 +61,7 @@ Command::Command(const llvm::Twine& name, double timeout)
   // If name contains an empty string
   if (name.isTriviallyEmpty() ||
       (name.isSingleStringRef() && name.getSingleStringRef().empty())) {
-    SetName("Command_" + llvm::Twine(typeid(*this).name()));
+    SetName("Command_" + wpi::Twine(typeid(*this).name()));
   } else {
     SetName(name);
   }

@@ -7,8 +7,8 @@
 
 #include "UsbCameraProperty.h"
 
-#include <llvm/STLExtras.h>
-#include <llvm/SmallString.h>
+#include <wpi/STLExtras.h>
+#include <wpi/SmallString.h>
 
 #include "UsbUtil.h"
 
@@ -92,8 +92,8 @@ static int GetStringCtrlIoctl(int fd, int id, int maximum, std::string* value) {
 }
 
 static int SetStringCtrlIoctl(int fd, int id, int maximum,
-                              llvm::StringRef value) {
-  llvm::SmallString<64> str{
+                              wpi::StringRef value) {
+  wpi::SmallString<64> str{
       value.substr(0, std::min(value.size(), static_cast<size_t>(maximum)))};
 
   struct v4l2_ext_control ctrl;
@@ -111,8 +111,8 @@ static int SetStringCtrlIoctl(int fd, int id, int maximum,
 
 // Removes non-alphanumeric characters and replaces spaces with underscores.
 // e.g. "Zoom, Absolute" -> "zoom_absolute", "Pan (Absolute)" -> "pan_absolute"
-static llvm::StringRef NormalizeName(llvm::StringRef name,
-                                     llvm::SmallVectorImpl<char>& buf) {
+static wpi::StringRef NormalizeName(wpi::StringRef name,
+                                    wpi::SmallVectorImpl<char>& buf) {
   bool newWord = false;
   for (auto ch : name) {
     if (std::isalnum(ch)) {
@@ -123,12 +123,12 @@ static llvm::StringRef NormalizeName(llvm::StringRef name,
       newWord = true;
     }
   }
-  return llvm::StringRef(buf.data(), buf.size());
+  return wpi::StringRef(buf.data(), buf.size());
 }
 
 #ifdef VIDIOC_QUERY_EXT_CTRL
 UsbCameraProperty::UsbCameraProperty(const struct v4l2_query_ext_ctrl& ctrl)
-    : PropertyImpl(llvm::StringRef{}, CS_PROP_NONE, ctrl.step,
+    : PropertyImpl(wpi::StringRef{}, CS_PROP_NONE, ctrl.step,
                    ctrl.default_value, 0),
       id(ctrl.id & V4L2_CTRL_ID_MASK),
       type(ctrl.type) {
@@ -160,13 +160,13 @@ UsbCameraProperty::UsbCameraProperty(const struct v4l2_query_ext_ctrl& ctrl)
   // name
   size_t len = 0;
   while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') ++len;
-  llvm::SmallString<64> name_buf;
-  name = NormalizeName(llvm::StringRef(ctrl.name, len), name_buf);
+  wpi::SmallString<64> name_buf;
+  name = NormalizeName(wpi::StringRef(ctrl.name, len), name_buf);
 }
 #endif
 
 UsbCameraProperty::UsbCameraProperty(const struct v4l2_queryctrl& ctrl)
-    : PropertyImpl(llvm::StringRef{}, CS_PROP_NONE, ctrl.step,
+    : PropertyImpl(wpi::StringRef{}, CS_PROP_NONE, ctrl.step,
                    ctrl.default_value, 0),
       id(ctrl.id & V4L2_CTRL_ID_MASK),
       type(ctrl.type) {
@@ -198,9 +198,9 @@ UsbCameraProperty::UsbCameraProperty(const struct v4l2_queryctrl& ctrl)
   // name
   size_t len = 0;
   while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') ++len;
-  llvm::SmallString<64> name_buf;
+  wpi::SmallString<64> name_buf;
   name = NormalizeName(
-      llvm::StringRef(reinterpret_cast<const char*>(ctrl.name), len), name_buf);
+      wpi::StringRef(reinterpret_cast<const char*>(ctrl.name), len), name_buf);
 }
 
 std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
@@ -216,7 +216,7 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
     *id = qc_ext.id;  // copy back
     // We don't support array types
     if (qc_ext.elems > 1 || qc_ext.nr_of_dims > 0) return nullptr;
-    prop = llvm::make_unique<UsbCameraProperty>(qc_ext);
+    prop = wpi::make_unique<UsbCameraProperty>(qc_ext);
   }
 #endif
   if (!prop) {
@@ -227,7 +227,7 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
     rc = TryIoctl(fd, VIDIOC_QUERYCTRL, &qc);
     *id = qc.id;  // copy back
     if (rc != 0) return nullptr;
-    prop = llvm::make_unique<UsbCameraProperty>(qc);
+    prop = wpi::make_unique<UsbCameraProperty>(qc);
   }
 
   // Cache enum property choices
@@ -282,13 +282,13 @@ bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock, int fd) {
 bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
                                   int fd) const {
   // Make a copy of the string as we're about to release the lock
-  llvm::SmallString<128> valueStrCopy{valueStr};
+  wpi::SmallString<128> valueStrCopy{valueStr};
   return DeviceSet(lock, fd, value, valueStrCopy);
 }
 
 bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd,
                                   int newValue,
-                                  llvm::StringRef newValueStr) const {
+                                  wpi::StringRef newValueStr) const {
   if (fd < 0) return true;
   unsigned idCopy = id;
   int rv = 0;

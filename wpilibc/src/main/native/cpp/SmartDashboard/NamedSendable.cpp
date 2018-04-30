@@ -9,10 +9,10 @@
 
 using namespace frc;
 
-void NamedSendable::SetName(const llvm::Twine&) {}
+void NamedSendable::SetName(const wpi::Twine&) {}
 
 std::string NamedSendable::GetSubsystem() const { return std::string(); }
 
-void NamedSendable::SetSubsystem(const llvm::Twine&) {}
+void NamedSendable::SetSubsystem(const wpi::Twine&) {}
 
 void NamedSendable::InitSendable(SendableBuilder&) {}

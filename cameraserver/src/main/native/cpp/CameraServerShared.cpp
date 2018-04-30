@@ -7,7 +7,7 @@
 
 #include "CameraServerShared.h"
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 namespace {
 class DefaultCameraServerShared : public frc::CameraServerShared {
@@ -15,9 +15,9 @@ class DefaultCameraServerShared : public frc::CameraServerShared {
   void ReportUsbCamera(int id) override {}
   void ReportAxisCamera(int id) override {}
   void ReportVideoServer(int id) override {}
-  void SetCameraServerError(llvm::StringRef error) override {}
-  void SetVisionRunnerError(llvm::StringRef error) override {}
-  void ReportDriverStationError(llvm::StringRef error) override {}
+  void SetCameraServerError(wpi::StringRef error) override {}
+  void SetVisionRunnerError(wpi::StringRef error) override {}
+  void ReportDriverStationError(wpi::StringRef error) override {}
   std::pair<std::thread::id, bool> GetRobotMainThreadId() const override {
     return std::make_pair(std::thread::id(), false);
   }

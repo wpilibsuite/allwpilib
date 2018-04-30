@@ -13,7 +13,7 @@
 
 #include "HAL/I2C.h"
 #include "HALUtil.h"
-#include "support/jni_util.h"
+#include "wpi/jni_util.h"
 
 using namespace frc;
 using namespace wpi::java;
@@ -83,7 +83,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CTransactionB(
   I2CJNI_LOG(logDEBUG) << "Port = " << port;
   I2CJNI_LOG(logDEBUG) << "Address = " << (jint)address;
   I2CJNI_LOG(logDEBUG) << "SendSize = " << (jint)sendSize;
-  llvm::SmallVector<uint8_t, 128> recvBuf;
+  wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(receiveSize);
   I2CJNI_LOG(logDEBUG) << "ReceiveSize = " << (jint)receiveSize;
   jint returnValue =
@@ -173,7 +173,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CReadB(
   I2CJNI_LOG(logDEBUG) << "Port = " << port;
   I2CJNI_LOG(logDEBUG) << "Address = " << address;
   I2CJNI_LOG(logDEBUG) << "ReceiveSize = " << receiveSize;
-  llvm::SmallVector<uint8_t, 128> recvBuf;
+  wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(receiveSize);
   jint returnValue = HAL_ReadI2C(static_cast<HAL_I2CPort>(port), address, recvBuf.data(), receiveSize);
   env->SetByteArrayRegion(dataReceived, 0, receiveSize,

@@ -10,15 +10,15 @@
 
 #include <stdint.h>
 
-#include <llvm/SmallVector.h>
-#include <llvm/StringRef.h>
+#include <wpi/SmallVector.h>
+#include <wpi/StringRef.h>
 
 namespace cs {
 
 #ifdef __linux__
 
-llvm::StringRef GetUsbNameFromId(int vendor, int product,
-                                 llvm::SmallVectorImpl<char>& buf);
+wpi::StringRef GetUsbNameFromId(int vendor, int product,
+                                wpi::SmallVectorImpl<char>& buf);
 
 int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
                  const char* name, const char* file, int line, bool quiet);

@@ -10,7 +10,7 @@
 #include <memory>
 #include <vector>
 
-#include <llvm/ArrayRef.h>
+#include <wpi/ArrayRef.h>
 
 #include "Filter.h"
 #include "circular_buffer.h"
@@ -69,11 +69,11 @@ namespace frc {
  */
 class LinearDigitalFilter : public Filter {
  public:
-  LinearDigitalFilter(PIDSource& source, llvm::ArrayRef<double> ffGains,
-                      llvm::ArrayRef<double> fbGains);
+  LinearDigitalFilter(PIDSource& source, wpi::ArrayRef<double> ffGains,
+                      wpi::ArrayRef<double> fbGains);
   LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                      llvm::ArrayRef<double> ffGains,
-                      llvm::ArrayRef<double> fbGains);
+                      wpi::ArrayRef<double> ffGains,
+                      wpi::ArrayRef<double> fbGains);
 
   // Static methods to create commonly used filters
   static LinearDigitalFilter SinglePoleIIR(PIDSource& source,

@@ -11,14 +11,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "llvm/raw_ostream.h"
-#include "llvm/SmallString.h"
-#include "llvm/SmallVector.h"
-#include "llvm/StringExtras.h"
-#include "llvm/Compiler.h"
-#include "llvm/Format.h"
-#include "llvm/MathExtras.h"
-#include "llvm/WindowsError.h"
+#include "wpi/raw_ostream.h"
+#include "wpi/SmallString.h"
+#include "wpi/SmallVector.h"
+#include "wpi/StringExtras.h"
+#include "wpi/Compiler.h"
+#include "wpi/Format.h"
+#include "wpi/MathExtras.h"
+#include "wpi/WindowsError.h"
 #include <cctype>
 #include <cerrno>
 #include <sys/stat.h>
@@ -53,7 +53,7 @@
 #include "Windows/WindowsSupport.h"
 #endif
 
-using namespace llvm;
+using namespace wpi;
 
 raw_ostream::~raw_ostream() {
   // raw_ostream's subclasses should take care to flush the buffer
@@ -657,7 +657,7 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
 
 /// outs() - This returns a reference to a raw_ostream for standard output.
 /// Use it like: outs() << "foo" << "bar";
-raw_ostream &llvm::outs() {
+raw_ostream &wpi::outs() {
   // Set buffer settings to model stdout behavior.  Delete the file descriptor
   // when the program exits, forcing error detection.  This means that if you
   // ever call outs(), you can't open another raw_fd_ostream on stdout, as we'll
@@ -670,14 +670,14 @@ raw_ostream &llvm::outs() {
 
 /// errs() - This returns a reference to a raw_ostream for standard error.
 /// Use it like: errs() << "foo" << "bar";
-raw_ostream &llvm::errs() {
+raw_ostream &wpi::errs() {
   // Set standard error to be unbuffered by default.
   static raw_fd_ostream S(STDERR_FILENO, false, true);
   return S;
 }
 
 /// nulls() - This returns a reference to a raw_ostream which discards output.
-raw_ostream &llvm::nulls() {
+raw_ostream &wpi::nulls() {
   static raw_null_ostream S;
   return S;
 }

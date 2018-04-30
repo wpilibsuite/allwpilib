@@ -7,7 +7,7 @@
 
 #include "HAL/cpp/fpga_clock.h"
 
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "HAL/HAL.h"
 
@@ -20,10 +20,10 @@ fpga_clock::time_point fpga_clock::now() noexcept {
   int32_t status = 0;
   uint64_t currentTime = HAL_GetFPGATime(&status);
   if (status != 0) {
-    llvm::errs()
+    wpi::errs()
         << "Call to HAL_GetFPGATime failed."
         << "Initialization might have failed. Time will not be correct\n";
-    llvm::errs().flush();
+    wpi::errs().flush();
     return epoch();
   }
   return time_point(std::chrono::microseconds(currentTime));

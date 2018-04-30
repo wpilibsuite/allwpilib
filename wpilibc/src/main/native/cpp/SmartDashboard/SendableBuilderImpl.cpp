@@ -7,7 +7,7 @@
 
 #include "SmartDashboard/SendableBuilderImpl.h"
 
-#include <llvm/SmallString.h>
+#include <wpi/SmallString.h>
 
 #include "ntcore_cpp.h"
 
@@ -47,7 +47,7 @@ void SendableBuilderImpl::StopLiveWindowMode() {
   if (m_safeState) m_safeState();
 }
 
-void SendableBuilderImpl::SetSmartDashboardType(const llvm::Twine& type) {
+void SendableBuilderImpl::SetSmartDashboardType(const wpi::Twine& type) {
   m_table->GetEntry(".type").SetString(type);
 }
 
@@ -59,11 +59,11 @@ void SendableBuilderImpl::SetUpdateTable(std::function<void()> func) {
   m_updateTable = func;
 }
 
-nt::NetworkTableEntry SendableBuilderImpl::GetEntry(const llvm::Twine& key) {
+nt::NetworkTableEntry SendableBuilderImpl::GetEntry(const wpi::Twine& key) {
   return m_table->GetEntry(key);
 }
 
-void SendableBuilderImpl::AddBooleanProperty(const llvm::Twine& key,
+void SendableBuilderImpl::AddBooleanProperty(const wpi::Twine& key,
                                              std::function<bool()> getter,
                                              std::function<void(bool)> setter) {
   m_properties.emplace_back(*m_table, key);
@@ -87,7 +87,7 @@ void SendableBuilderImpl::AddBooleanProperty(const llvm::Twine& key,
 }
 
 void SendableBuilderImpl::AddDoubleProperty(
-    const llvm::Twine& key, std::function<double()> getter,
+    const wpi::Twine& key, std::function<double()> getter,
     std::function<void(double)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
@@ -110,8 +110,8 @@ void SendableBuilderImpl::AddDoubleProperty(
 }
 
 void SendableBuilderImpl::AddStringProperty(
-    const llvm::Twine& key, std::function<std::string()> getter,
-    std::function<void(llvm::StringRef)> setter) {
+    const wpi::Twine& key, std::function<std::string()> getter,
+    std::function<void(wpi::StringRef)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
@@ -133,8 +133,8 @@ void SendableBuilderImpl::AddStringProperty(
 }
 
 void SendableBuilderImpl::AddBooleanArrayProperty(
-    const llvm::Twine& key, std::function<std::vector<int>()> getter,
-    std::function<void(llvm::ArrayRef<int>)> setter) {
+    const wpi::Twine& key, std::function<std::vector<int>()> getter,
+    std::function<void(wpi::ArrayRef<int>)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
@@ -156,8 +156,8 @@ void SendableBuilderImpl::AddBooleanArrayProperty(
 }
 
 void SendableBuilderImpl::AddDoubleArrayProperty(
-    const llvm::Twine& key, std::function<std::vector<double>()> getter,
-    std::function<void(llvm::ArrayRef<double>)> setter) {
+    const wpi::Twine& key, std::function<std::vector<double>()> getter,
+    std::function<void(wpi::ArrayRef<double>)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
@@ -179,8 +179,8 @@ void SendableBuilderImpl::AddDoubleArrayProperty(
 }
 
 void SendableBuilderImpl::AddStringArrayProperty(
-    const llvm::Twine& key, std::function<std::vector<std::string>()> getter,
-    std::function<void(llvm::ArrayRef<std::string>)> setter) {
+    const wpi::Twine& key, std::function<std::vector<std::string>()> getter,
+    std::function<void(wpi::ArrayRef<std::string>)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
@@ -202,8 +202,8 @@ void SendableBuilderImpl::AddStringArrayProperty(
 }
 
 void SendableBuilderImpl::AddRawProperty(
-    const llvm::Twine& key, std::function<std::string()> getter,
-    std::function<void(llvm::StringRef)> setter) {
+    const wpi::Twine& key, std::function<std::string()> getter,
+    std::function<void(wpi::StringRef)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
@@ -225,7 +225,7 @@ void SendableBuilderImpl::AddRawProperty(
 }
 
 void SendableBuilderImpl::AddValueProperty(
-    const llvm::Twine& key, std::function<std::shared_ptr<nt::Value>()> getter,
+    const wpi::Twine& key, std::function<std::shared_ptr<nt::Value>()> getter,
     std::function<void(std::shared_ptr<nt::Value>)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
@@ -245,14 +245,14 @@ void SendableBuilderImpl::AddValueProperty(
 }
 
 void SendableBuilderImpl::AddSmallStringProperty(
-    const llvm::Twine& key,
-    std::function<llvm::StringRef(llvm::SmallVectorImpl<char>& buf)> getter,
-    std::function<void(llvm::StringRef)> setter) {
+    const wpi::Twine& key,
+    std::function<wpi::StringRef(wpi::SmallVectorImpl<char>& buf)> getter,
+    std::function<void(wpi::StringRef)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
-      llvm::SmallString<128> buf;
+      wpi::SmallString<128> buf;
       entry.SetValue(nt::Value::MakeString(getter(buf), time));
     };
   }
@@ -270,14 +270,14 @@ void SendableBuilderImpl::AddSmallStringProperty(
 }
 
 void SendableBuilderImpl::AddSmallBooleanArrayProperty(
-    const llvm::Twine& key,
-    std::function<llvm::ArrayRef<int>(llvm::SmallVectorImpl<int>& buf)> getter,
-    std::function<void(llvm::ArrayRef<int>)> setter) {
+    const wpi::Twine& key,
+    std::function<wpi::ArrayRef<int>(wpi::SmallVectorImpl<int>& buf)> getter,
+    std::function<void(wpi::ArrayRef<int>)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
-      llvm::SmallVector<int, 16> buf;
+      wpi::SmallVector<int, 16> buf;
       entry.SetValue(nt::Value::MakeBooleanArray(getter(buf), time));
     };
   }
@@ -295,15 +295,15 @@ void SendableBuilderImpl::AddSmallBooleanArrayProperty(
 }
 
 void SendableBuilderImpl::AddSmallDoubleArrayProperty(
-    const llvm::Twine& key,
-    std::function<llvm::ArrayRef<double>(llvm::SmallVectorImpl<double>& buf)>
+    const wpi::Twine& key,
+    std::function<wpi::ArrayRef<double>(wpi::SmallVectorImpl<double>& buf)>
         getter,
-    std::function<void(llvm::ArrayRef<double>)> setter) {
+    std::function<void(wpi::ArrayRef<double>)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
-      llvm::SmallVector<double, 16> buf;
+      wpi::SmallVector<double, 16> buf;
       entry.SetValue(nt::Value::MakeDoubleArray(getter(buf), time));
     };
   }
@@ -321,16 +321,16 @@ void SendableBuilderImpl::AddSmallDoubleArrayProperty(
 }
 
 void SendableBuilderImpl::AddSmallStringArrayProperty(
-    const llvm::Twine& key,
+    const wpi::Twine& key,
     std::function<
-        llvm::ArrayRef<std::string>(llvm::SmallVectorImpl<std::string>& buf)>
+        wpi::ArrayRef<std::string>(wpi::SmallVectorImpl<std::string>& buf)>
         getter,
-    std::function<void(llvm::ArrayRef<std::string>)> setter) {
+    std::function<void(wpi::ArrayRef<std::string>)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
-      llvm::SmallVector<std::string, 16> buf;
+      wpi::SmallVector<std::string, 16> buf;
       entry.SetValue(nt::Value::MakeStringArray(getter(buf), time));
     };
   }
@@ -348,14 +348,14 @@ void SendableBuilderImpl::AddSmallStringArrayProperty(
 }
 
 void SendableBuilderImpl::AddSmallRawProperty(
-    const llvm::Twine& key,
-    std::function<llvm::StringRef(llvm::SmallVectorImpl<char>& buf)> getter,
-    std::function<void(llvm::StringRef)> setter) {
+    const wpi::Twine& key,
+    std::function<wpi::StringRef(wpi::SmallVectorImpl<char>& buf)> getter,
+    std::function<void(wpi::StringRef)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
-      llvm::SmallVector<char, 128> buf;
+      wpi::SmallVector<char, 128> buf;
       entry.SetValue(nt::Value::MakeRaw(getter(buf), time));
     };
   }

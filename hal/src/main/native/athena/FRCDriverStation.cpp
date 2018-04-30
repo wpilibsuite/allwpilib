@@ -13,9 +13,9 @@
 
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/NetCommRPCProxy_Occur.h>
-#include <llvm/raw_ostream.h>
-#include <support/condition_variable.h>
-#include <support/mutex.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
 
 #include "HAL/DriverStation.h"
 
@@ -73,12 +73,12 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                                                 details, location, callStack);
     if (printMsg) {
       if (location && location[0] != '\0') {
-        llvm::errs() << (isError ? "Error" : "Warning") << " at " << location
-                     << ": ";
+        wpi::errs() << (isError ? "Error" : "Warning") << " at " << location
+                    << ": ";
       }
-      llvm::errs() << details << "\n";
+      wpi::errs() << details << "\n";
       if (callStack && callStack[0] != '\0') {
-        llvm::errs() << callStack << "\n";
+        wpi::errs() << callStack << "\n";
       }
     }
     if (i == KEEP_MSGS) {

@@ -27,7 +27,7 @@ using namespace frc;
 AnalogInput::AnalogInput(int channel) {
   if (!SensorBase::CheckAnalogInputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "Analog Input " + llvm::Twine(channel));
+                               "Analog Input " + wpi::Twine(channel));
     return;
   }
 

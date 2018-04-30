@@ -10,7 +10,7 @@
 #include <memory>
 #include <string>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "Sendable.h"
 
@@ -24,16 +24,16 @@ class SendableBase : public Sendable {
   using Sendable::SetName;
 
   std::string GetName() const final;
-  void SetName(const llvm::Twine& name) final;
+  void SetName(const wpi::Twine& name) final;
   std::string GetSubsystem() const final;
-  void SetSubsystem(const llvm::Twine& subsystem) final;
+  void SetSubsystem(const wpi::Twine& subsystem) final;
 
  protected:
   void AddChild(std::shared_ptr<Sendable> child);
   void AddChild(void* child);
 
-  void SetName(const llvm::Twine& moduleType, int channel);
-  void SetName(const llvm::Twine& moduleType, int moduleNumber, int channel);
+  void SetName(const wpi::Twine& moduleType, int channel);
+  void SetName(const wpi::Twine& moduleType, int moduleNumber, int channel);
 
  private:
   mutable wpi::mutex m_mutex;

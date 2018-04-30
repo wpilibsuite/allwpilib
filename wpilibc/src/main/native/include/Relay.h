@@ -10,7 +10,7 @@
 #include <memory>
 
 #include <HAL/Types.h>
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "ErrorBase.h"
 #include "MotorSafety.h"
@@ -50,7 +50,7 @@ class Relay : public MotorSafety, public ErrorBase, public SendableBase {
   void StopMotor() override;
   bool IsSafetyEnabled() const override;
   void SetSafetyEnabled(bool enabled) override;
-  void GetDescription(llvm::raw_ostream& desc) const override;
+  void GetDescription(wpi::raw_ostream& desc) const override;
 
   void InitSendable(SendableBuilder& builder) override;
 

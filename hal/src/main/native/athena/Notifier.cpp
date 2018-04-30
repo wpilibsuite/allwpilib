@@ -11,8 +11,8 @@
 #include <cstdlib>  // For std::atexit()
 #include <memory>
 
-#include <support/condition_variable.h>
-#include <support/mutex.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
 
 #include "HAL/ChipObject.h"
 #include "HAL/Errors.h"

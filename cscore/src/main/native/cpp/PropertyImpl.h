@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include <llvm/StringRef.h>
+#include <wpi/StringRef.h>
 
 #include "cscore_c.h"
 
@@ -21,8 +21,8 @@ namespace cs {
 class PropertyImpl {
  public:
   PropertyImpl() = default;
-  explicit PropertyImpl(llvm::StringRef name_) : name{name_} {}
-  PropertyImpl(llvm::StringRef name_, CS_PropertyKind kind_, int step_,
+  explicit PropertyImpl(wpi::StringRef name_) : name{name_} {}
+  PropertyImpl(wpi::StringRef name_, CS_PropertyKind kind_, int step_,
                int defaultValue_, int value_)
       : name{name_},
         propKind{kind_},
@@ -43,7 +43,7 @@ class PropertyImpl {
     valueSet = true;
   }
 
-  void SetValue(llvm::StringRef v) {
+  void SetValue(wpi::StringRef v) {
     valueStr = v;
     valueSet = true;
   }

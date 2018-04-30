@@ -7,24 +7,24 @@
 
 #include "Log.h"
 
-#include <llvm/Path.h>
-#include <llvm/SmallString.h>
-#include <llvm/StringRef.h>
-#include <llvm/raw_ostream.h>
+#include <wpi/Path.h>
+#include <wpi/SmallString.h>
+#include <wpi/StringRef.h>
+#include <wpi/raw_ostream.h>
 
 using namespace cs;
 
 static void def_log_func(unsigned int level, const char* file,
                          unsigned int line, const char* msg) {
-  llvm::SmallString<128> buf;
-  llvm::raw_svector_ostream oss(buf);
+  wpi::SmallString<128> buf;
+  wpi::raw_svector_ostream oss(buf);
   if (level == 20) {
     oss << "CS: " << msg << '\n';
-    llvm::errs() << oss.str();
+    wpi::errs() << oss.str();
     return;
   }
 
-  llvm::StringRef levelmsg;
+  wpi::StringRef levelmsg;
   if (level >= 50)
     levelmsg = "CRITICAL: ";
   else if (level >= 40)
@@ -33,9 +33,9 @@ static void def_log_func(unsigned int level, const char* file,
     levelmsg = "WARNING: ";
   else
     return;
-  oss << "CS: " << levelmsg << msg << " (" << llvm::sys::path::filename(file)
+  oss << "CS: " << levelmsg << msg << " (" << wpi::sys::path::filename(file)
       << ':' << line << ")\n";
-  llvm::errs() << oss.str();
+  wpi::errs() << oss.str();
 }
 
 Logger::Logger() { SetDefaultLogger(); }

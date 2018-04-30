@@ -37,8 +37,8 @@ SOFTWARE.
 #include "unit-json.h"
 using wpi::json;
 
-#include "llvm/Format.h"
-#include "llvm/StringExtras.h"
+#include "wpi/Format.h"
+#include "wpi/StringExtras.h"
 
 #include <fstream>
 
@@ -90,18 +90,18 @@ using wpi::json;
 
 error:
     auto result = ::testing::AssertionFailure();
-    result << basemsg << " with {" << llvm::utohexstr(byte1);
+    result << basemsg << " with {" << wpi::utohexstr(byte1);
     if (byte2 != -1)
     {
-        result << ',' << llvm::utohexstr(byte2);
+        result << ',' << wpi::utohexstr(byte2);
     }
     if (byte3 != -1)
     {
-        result << ',' << llvm::utohexstr(byte3);
+        result << ',' << wpi::utohexstr(byte3);
     }
     if (byte4 != -1)
     {
-        result << ',' << llvm::utohexstr(byte4);
+        result << ',' << wpi::utohexstr(byte4);
     }
     result << '}';
     return result;
@@ -919,8 +919,8 @@ static std::string codepoint_to_unicode(std::size_t cp)
     // by four hexadecimal digits that encode the character's code
     // point
     std::string s;
-    llvm::raw_string_ostream ss(s);
-    ss << "\\u" << llvm::format_hex_no_prefix(cp, 4);
+    wpi::raw_string_ostream ss(s);
+    ss << "\\u" << wpi::format_hex_no_prefix(cp, 4);
     ss.flush();
     return s;
 }

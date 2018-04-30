@@ -10,7 +10,7 @@
 #include <cassert>
 #include <cstdlib>
 
-#include <support/timestamp.h>
+#include <wpi/timestamp.h>
 
 #include "Value_internal.h"
 #include "ntcore.h"
@@ -19,7 +19,7 @@ using namespace nt;
 
 // Conversion helpers
 
-static void ConvertToC(llvm::StringRef in, char** out) {
+static void ConvertToC(wpi::StringRef in, char** out) {
   *out = static_cast<char*>(std::malloc(in.size() + 1));
   std::memmove(*out, in.data(), in.size());
   (*out)[in.size()] = '\0';
@@ -915,11 +915,11 @@ NT_Bool NT_SetEntryBooleanArray(NT_Entry entry, uint64_t time,
                                 NT_Bool force) {
   if (force != 0) {
     nt::SetEntryTypeValue(
-        entry, Value::MakeBooleanArray(llvm::makeArrayRef(arr, size), time));
+        entry, Value::MakeBooleanArray(wpi::makeArrayRef(arr, size), time));
     return 1;
   } else {
     return nt::SetEntryValue(
-        entry, Value::MakeBooleanArray(llvm::makeArrayRef(arr, size), time));
+        entry, Value::MakeBooleanArray(wpi::makeArrayRef(arr, size), time));
   }
 }
 
@@ -927,11 +927,11 @@ NT_Bool NT_SetEntryDoubleArray(NT_Entry entry, uint64_t time, const double* arr,
                                size_t size, NT_Bool force) {
   if (force != 0) {
     nt::SetEntryTypeValue(
-        entry, Value::MakeDoubleArray(llvm::makeArrayRef(arr, size), time));
+        entry, Value::MakeDoubleArray(wpi::makeArrayRef(arr, size), time));
     return 1;
   } else {
     return nt::SetEntryValue(
-        entry, Value::MakeDoubleArray(llvm::makeArrayRef(arr, size), time));
+        entry, Value::MakeDoubleArray(wpi::makeArrayRef(arr, size), time));
   }
 }
 
@@ -1061,7 +1061,7 @@ NT_Bool NT_SetDefaultEntryBooleanArray(NT_Entry entry, uint64_t time,
                                        size_t default_size) {
   return nt::SetDefaultEntryValue(
       entry, Value::MakeBooleanArray(
-                 llvm::makeArrayRef(default_value, default_size), time));
+                 wpi::makeArrayRef(default_value, default_size), time));
 }
 
 NT_Bool NT_SetDefaultEntryDoubleArray(NT_Entry entry, uint64_t time,
@@ -1069,7 +1069,7 @@ NT_Bool NT_SetDefaultEntryDoubleArray(NT_Entry entry, uint64_t time,
                                       size_t default_size) {
   return nt::SetDefaultEntryValue(
       entry, Value::MakeDoubleArray(
-                 llvm::makeArrayRef(default_value, default_size), time));
+                 wpi::makeArrayRef(default_value, default_size), time));
 }
 
 NT_Bool NT_SetDefaultEntryStringArray(NT_Entry entry, uint64_t time,

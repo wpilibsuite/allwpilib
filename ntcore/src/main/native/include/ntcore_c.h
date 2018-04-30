@@ -12,7 +12,7 @@
 
 #include <cstddef>
 
-#include <support/deprecated.h>
+#include <wpi/deprecated.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -23,5 +23,5 @@ WaitCommand::WaitCommand(double timeout)
  *
  * @param timeout the time (in seconds) before this command "times out"
  */
-WaitCommand::WaitCommand(const llvm::Twine& name, double timeout)
+WaitCommand::WaitCommand(const wpi::Twine& name, double timeout)
     : TimedCommand(name, timeout) {}

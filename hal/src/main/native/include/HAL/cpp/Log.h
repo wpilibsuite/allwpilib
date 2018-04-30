@@ -10,8 +10,8 @@
 #include <chrono>
 #include <string>
 
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
+#include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
 
 inline std::string NowTime();
 
@@ -31,7 +31,7 @@ class Log {
  public:
   Log();
   virtual ~Log();
-  llvm::raw_ostream& Get(TLogLevel level = logINFO);
+  wpi::raw_ostream& Get(TLogLevel level = logINFO);
 
  public:
   static TLogLevel& ReportingLevel();
@@ -39,8 +39,8 @@ class Log {
   static TLogLevel FromString(const std::string& level);
 
  protected:
-  llvm::SmallString<128> buf;
-  llvm::raw_svector_ostream oss{buf};
+  wpi::SmallString<128> buf;
+  wpi::raw_svector_ostream oss{buf};
 
  private:
   Log(const Log&);
@@ -49,7 +49,7 @@ class Log {
 
 inline Log::Log() {}
 
-inline llvm::raw_ostream& Log::Get(TLogLevel level) {
+inline wpi::raw_ostream& Log::Get(TLogLevel level) {
   oss << "- " << NowTime();
   oss << " " << ToString(level) << ": ";
   if (level > logDEBUG) {
@@ -60,7 +60,7 @@ inline llvm::raw_ostream& Log::Get(TLogLevel level) {
 
 inline Log::~Log() {
   oss << "\n";
-  llvm::errs() << oss.str();
+  wpi::errs() << oss.str();
 }
 
 inline TLogLevel& Log::ReportingLevel() {
@@ -99,8 +99,8 @@ typedef Log FILELog;
     Log().Get(level)
 
 inline std::string NowTime() {
-  llvm::SmallString<128> buf;
-  llvm::raw_svector_ostream oss(buf);
+  wpi::SmallString<128> buf;
+  wpi::raw_svector_ostream oss(buf);
 
   using std::chrono::duration_cast;
 

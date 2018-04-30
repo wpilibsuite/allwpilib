@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <llvm/Twine.h>
+#include <wpi/Twine.h>
 
 #include "Commands/Command.h"
 
@@ -20,7 +20,7 @@ namespace frc {
  */
 class InstantCommand : public Command {
  public:
-  explicit InstantCommand(const llvm::Twine& name);
+  explicit InstantCommand(const wpi::Twine& name);
   InstantCommand() = default;
   virtual ~InstantCommand() = default;
 

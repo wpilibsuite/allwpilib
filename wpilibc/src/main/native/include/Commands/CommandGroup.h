@@ -10,7 +10,7 @@
 #include <list>
 #include <vector>
 
-#include <llvm/Twine.h>
+#include <wpi/Twine.h>
 
 #include "Commands/Command.h"
 #include "Commands/CommandGroupEntry.h"
@@ -37,7 +37,7 @@ namespace frc {
 class CommandGroup : public Command {
  public:
   CommandGroup() = default;
-  explicit CommandGroup(const llvm::Twine& name);
+  explicit CommandGroup(const wpi::Twine& name);
   virtual ~CommandGroup() = default;
 
   void AddSequential(Command* command);

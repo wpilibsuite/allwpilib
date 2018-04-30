@@ -11,7 +11,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "llvm/Path.h"
+#include "wpi/Path.h"
 
 #include <cctype>
 #include <cstring>
@@ -22,14 +22,14 @@
 #include <io.h>
 #endif
 
-#include "llvm/FileSystem.h"
-#include "llvm/SmallString.h"
+#include "wpi/FileSystem.h"
+#include "wpi/SmallString.h"
 
-using namespace llvm;
+using namespace wpi;
 
 namespace {
-  using llvm::StringRef;
-  using llvm::sys::path::is_separator;
+  using wpi::StringRef;
+  using wpi::sys::path::is_separator;
 
 #ifdef _WIN32
   const char *separators = "\\/";
@@ -148,7 +148,7 @@ namespace {
   }
 } // end unnamed namespace
 
-namespace llvm {
+namespace wpi {
 namespace sys  {
 namespace path {
 
@@ -626,7 +626,7 @@ static SmallString<256> remove_dots(StringRef path, bool remove_dot_dot) {
 
   // Skip the root path, then look for traversal in the components.
   StringRef rel = path::relative_path(path);
-  for (StringRef C : llvm::make_range(path::begin(rel), path::end(rel))) {
+  for (StringRef C : wpi::make_range(path::begin(rel), path::end(rel))) {
     if (C == ".")
       continue;
     if (remove_dot_dot) {
@@ -795,7 +795,7 @@ std::error_code directory_entry::status(file_status &result) const {
 
 } // end namespace fs
 } // end namespace sys
-} // end namespace llvm
+} // end namespace wpi
 
 // Include the truly platform-specific parts.
 #ifdef _WIN32
@@ -804,7 +804,7 @@ std::error_code directory_entry::status(file_status &result) const {
 #include "Unix/Path.inc"
 #endif
 
-namespace llvm {
+namespace wpi {
 namespace sys {
 namespace path {
 
@@ -819,4 +819,4 @@ bool user_cache_directory(SmallVectorImpl<char> &Result, const Twine &Path1,
 
 } // end namespace path
 } // end namsspace sys
-} // end namespace llvm
+} // end namespace wpi

@@ -27,9 +27,9 @@
 
 #include <algorithm>
 
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
-#include <support/timestamp.h>
+#include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
+#include <wpi/timestamp.h>
 
 #include "Handle.h"
 #include "Log.h"
@@ -97,7 +97,7 @@ static __u32 FromPixelFormat(VideoMode::PixelFormat pixelFormat) {
   }
 }
 
-static bool IsPercentageProperty(llvm::StringRef name) {
+static bool IsPercentageProperty(wpi::StringRef name) {
   if (name.startswith("raw_")) name = name.substr(4);
   return name == "brightness" || name == "contrast" || name == "saturation" ||
          name == "hue" || name == "sharpness" || name == "gain" ||
@@ -112,7 +112,7 @@ int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
   // LifeCam exposure setting quirk
   if (m_lifecam_exposure && rawProp.name == "raw_exposure_absolute" &&
       rawProp.minimum == 5 && rawProp.maximum == 20000) {
-    int nelems = llvm::array_lengthof(quirkLifeCamHd3000);
+    int nelems = wpi::array_lengthof(quirkLifeCamHd3000);
     for (int i = 0; i < nelems; ++i) {
       if (rawValue < quirkLifeCamHd3000[i]) return 100.0 * i / nelems;
     }
@@ -127,7 +127,7 @@ int UsbCameraImpl::PercentageToRaw(const UsbCameraProperty& rawProp,
   // LifeCam exposure setting quirk
   if (m_lifecam_exposure && rawProp.name == "raw_exposure_absolute" &&
       rawProp.minimum == 5 && rawProp.maximum == 20000) {
-    int nelems = llvm::array_lengthof(quirkLifeCamHd3000);
+    int nelems = wpi::array_lengthof(quirkLifeCamHd3000);
     int ndx = nelems * percentValue / 100.0;
     if (ndx < 0) ndx = 0;
     if (ndx >= nelems) ndx = nelems - 1;
@@ -137,8 +137,8 @@ int UsbCameraImpl::PercentageToRaw(const UsbCameraProperty& rawProp,
          (rawProp.maximum - rawProp.minimum) * (percentValue / 100.0);
 }
 
-static bool GetDescriptionSysV4L(llvm::StringRef path, std::string* desc) {
-  llvm::SmallString<64> ifpath{"/sys/class/video4linux/"};
+static bool GetDescriptionSysV4L(wpi::StringRef path, std::string* desc) {
+  wpi::SmallString<64> ifpath{"/sys/class/video4linux/"};
   ifpath += path.substr(5);
   ifpath += "/device/interface";
 
@@ -151,7 +151,7 @@ static bool GetDescriptionSysV4L(llvm::StringRef path, std::string* desc) {
 
   if (n <= 0) return false;
 
-  *desc = llvm::StringRef(readBuf, n).rtrim();
+  *desc = wpi::StringRef(readBuf, n).rtrim();
   return true;
 }
 
@@ -167,15 +167,15 @@ static bool GetDescriptionIoctl(const char* cpath, std::string* desc) {
   }
   close(fd);
 
-  llvm::StringRef card{reinterpret_cast<const char*>(vcap.card)};
+  wpi::StringRef card{reinterpret_cast<const char*>(vcap.card)};
   // try to convert "UVC Camera (0000:0000)" into a better name
   int vendor = 0;
   int product = 0;
   if (card.startswith("UVC Camera (") &&
       !card.substr(12, 4).getAsInteger(16, vendor) &&
       !card.substr(17, 4).getAsInteger(16, product)) {
-    llvm::SmallString<64> card2Buf;
-    llvm::StringRef card2 = GetUsbNameFromId(vendor, product, card2Buf);
+    wpi::SmallString<64> card2Buf;
+    wpi::StringRef card2 = GetUsbNameFromId(vendor, product, card2Buf);
     if (!card2.empty()) {
       *desc = card2;
       return true;
@@ -187,17 +187,17 @@ static bool GetDescriptionIoctl(const char* cpath, std::string* desc) {
 }
 
 static std::string GetDescriptionImpl(const char* cpath) {
-  llvm::StringRef path{cpath};
+  wpi::StringRef path{cpath};
   char pathBuf[128];
   std::string rv;
 
   // If trying to get by id or path, follow symlink
   if (path.startswith("/dev/v4l/by-id/")) {
     ssize_t n = readlink(cpath, pathBuf, sizeof(pathBuf));
-    if (n > 0) path = llvm::StringRef(pathBuf, n);
+    if (n > 0) path = wpi::StringRef(pathBuf, n);
   } else if (path.startswith("/dev/v4l/by-path/")) {
     ssize_t n = readlink(cpath, pathBuf, sizeof(pathBuf));
-    if (n > 0) path = llvm::StringRef(pathBuf, n);
+    if (n > 0) path = wpi::StringRef(pathBuf, n);
   }
 
   if (path.startswith("/dev/video")) {
@@ -211,7 +211,7 @@ static std::string GetDescriptionImpl(const char* cpath) {
   return std::string{};
 }
 
-UsbCameraImpl::UsbCameraImpl(llvm::StringRef name, llvm::StringRef path)
+UsbCameraImpl::UsbCameraImpl(wpi::StringRef name, wpi::StringRef path)
     : SourceImpl{name},
       m_path{path},
       m_fd{-1},
@@ -258,7 +258,7 @@ void UsbCameraImpl::CameraThreadMain() {
   int notify_fd = inotify_init();
   if (notify_fd >= 0) {
     // need to make a copy as dirname can modify it
-    llvm::SmallString<64> pathCopy{m_path};
+    wpi::SmallString<64> pathCopy{m_path};
     pathCopy.push_back('\0');
     if (inotify_add_watch(notify_fd, dirname(pathCopy.data()),
                           IN_CREATE | IN_DELETE) < 0) {
@@ -272,9 +272,9 @@ void UsbCameraImpl::CameraThreadMain() {
   bool notified = (notify_fd < 0);  // treat as always notified if cannot notify
 
   // Get the basename for later notify use
-  llvm::SmallString<64> pathCopy{m_path};
+  wpi::SmallString<64> pathCopy{m_path};
   pathCopy.push_back('\0');
-  llvm::SmallString<64> base{basename(pathCopy.data())};
+  wpi::SmallString<64> base{basename(pathCopy.data())};
 
   // Used to restart streaming on reconnect
   bool wasStreaming = false;
@@ -341,11 +341,11 @@ void UsbCameraImpl::CameraThreadMain() {
         // Read the event structure
         notify_is->read(&event, sizeof(event));
         // Read the event name
-        llvm::SmallString<64> raw_name;
+        wpi::SmallString<64> raw_name;
         raw_name.resize(event.len);
         notify_is->read(raw_name.data(), event.len);
         // If the name is what we expect...
-        llvm::StringRef name{raw_name.c_str()};
+        wpi::StringRef name{raw_name.c_str()};
         SDEBUG4("got event on '" << name << "' (" << name.size()
                                  << ") compare to '" << base << "' ("
                                  << base.size() << ") mask " << event.mask);
@@ -401,7 +401,7 @@ void UsbCameraImpl::CameraThreadMain() {
 
         PutFrame(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat),
                  m_mode.width, m_mode.height,
-                 llvm::StringRef(
+                 wpi::StringRef(
                      static_cast<const char*>(m_buffers[buf.index].m_data),
                      static_cast<size_t>(buf.bytesused)),
                  wpi::Now());  // TODO: time
@@ -649,7 +649,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
   bool setString = (msg.kind == Message::kCmdSetPropertyStr);
   int property = msg.data[0];
   int value = msg.data[1];
-  llvm::StringRef valueStr = msg.dataStr;
+  wpi::StringRef valueStr = msg.dataStr;
 
   // Look up
   auto prop = static_cast<UsbCameraProperty*>(GetProperty(property));
@@ -885,7 +885,7 @@ void UsbCameraImpl::DeviceCacheProperty(
   std::unique_ptr<UsbCameraProperty> perProp;
   if (IsPercentageProperty(rawProp->name)) {
     perProp =
-        llvm::make_unique<UsbCameraProperty>(rawProp->name, 0, *rawProp, 0, 0);
+        wpi::make_unique<UsbCameraProperty>(rawProp->name, 0, *rawProp, 0, 0);
     rawProp->name = "raw_" + perProp->name;
   }
 
@@ -1107,8 +1107,8 @@ void UsbCameraImpl::Send(Message&& msg) const {
 }
 
 std::unique_ptr<PropertyImpl> UsbCameraImpl::CreateEmptyProperty(
-    llvm::StringRef name) const {
-  return llvm::make_unique<UsbCameraProperty>(name);
+    wpi::StringRef name) const {
+  return wpi::make_unique<UsbCameraProperty>(name);
 }
 
 bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
@@ -1123,8 +1123,8 @@ bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
 }
 
 void UsbCameraImpl::SetQuirks() {
-  llvm::SmallString<128> descbuf;
-  llvm::StringRef desc = GetDescription(descbuf);
+  wpi::SmallString<128> descbuf;
+  wpi::StringRef desc = GetDescription(descbuf);
   m_lifecam_exposure =
       desc.endswith("LifeCam HD-3000") || desc.endswith("LifeCam Cinema (TM)");
 }
@@ -1136,7 +1136,7 @@ void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
   *status = SendAndWait(std::move(msg));
 }
 
-void UsbCameraImpl::SetStringProperty(int property, llvm::StringRef value,
+void UsbCameraImpl::SetStringProperty(int property, wpi::StringRef value,
                                       CS_Status* status) {
   Message msg{Message::kCmdSetPropertyStr};
   msg.data[0] = property;
@@ -1232,14 +1232,14 @@ void UsbCameraImpl::NumSinksEnabledChanged() {
 
 namespace cs {
 
-CS_Source CreateUsbCameraDev(llvm::StringRef name, int dev, CS_Status* status) {
-  llvm::SmallString<32> path;
-  llvm::raw_svector_ostream oss{path};
+CS_Source CreateUsbCameraDev(wpi::StringRef name, int dev, CS_Status* status) {
+  wpi::SmallString<32> path;
+  wpi::raw_svector_ostream oss{path};
   oss << "/dev/video" << dev;
   return CreateUsbCameraPath(name, oss.str(), status);
 }
 
-CS_Source CreateUsbCameraPath(llvm::StringRef name, llvm::StringRef path,
+CS_Source CreateUsbCameraPath(wpi::StringRef name, wpi::StringRef path,
                               CS_Status* status) {
   auto source = std::make_shared<UsbCameraImpl>(name, path);
   auto handle = Sources::GetInstance().Allocate(CS_SOURCE_USB, source);
@@ -1264,13 +1264,13 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
 
   if (DIR* dp = opendir("/dev")) {
     while (struct dirent* ep = readdir(dp)) {
-      llvm::StringRef fname{ep->d_name};
+      wpi::StringRef fname{ep->d_name};
       if (!fname.startswith("video")) continue;
 
       UsbCameraInfo info;
       info.dev = -1;
       fname.substr(5).getAsInteger(10, info.dev);
-      llvm::SmallString<32> path{"/dev/"};
+      wpi::SmallString<32> path{"/dev/"};
       path += fname;
       info.path = path.str();
 

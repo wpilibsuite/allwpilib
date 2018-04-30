@@ -11,7 +11,7 @@
 #include <climits>
 #include <string>
 
-#include <llvm/StringRef.h>
+#include <wpi/StringRef.h>
 
 #include "TestPrinters.h"
 #include "WireDecoder.h"
@@ -24,8 +24,8 @@ class WireDecoderTest : public ::testing::Test {
   WireDecoderTest() {
     v_boolean = Value::MakeBoolean(true);
     v_double = Value::MakeDouble(1.0);
-    v_string = Value::MakeString(llvm::StringRef("hello"));
-    v_raw = Value::MakeRaw(llvm::StringRef("hello"));
+    v_string = Value::MakeString(wpi::StringRef("hello"));
+    v_raw = Value::MakeRaw(wpi::StringRef("hello"));
     v_boolean_array = Value::MakeBooleanArray(std::vector<int>{0, 1, 0});
     v_boolean_array_big = Value::MakeBooleanArray(std::vector<int>(255));
     v_double_array = Value::MakeDoubleArray(std::vector<double>{0.5, 0.25});
@@ -269,7 +269,7 @@ TEST_F(WireDecoderTest, ReadStringValue2) {
   ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_string, *val);
 
-  auto v_bye = Value::MakeString(llvm::StringRef("bye"));
+  auto v_bye = Value::MakeString(wpi::StringRef("bye"));
   val = d.ReadValue(NT_STRING);
   ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_bye, *val);
@@ -442,7 +442,7 @@ TEST_F(WireDecoderTest, ReadStringValue3) {
   ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_string, *val);
 
-  auto v_bye = Value::MakeString(llvm::StringRef("bye"));
+  auto v_bye = Value::MakeString(wpi::StringRef("bye"));
   val = d.ReadValue(NT_STRING);
   ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_bye, *val);
@@ -466,7 +466,7 @@ TEST_F(WireDecoderTest, ReadRawValue3) {
   ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_raw, *val);
 
-  auto v_bye = Value::MakeRaw(llvm::StringRef("bye"));
+  auto v_bye = Value::MakeRaw(wpi::StringRef("bye"));
   val = d.ReadValue(NT_RAW);
   ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_bye, *val);

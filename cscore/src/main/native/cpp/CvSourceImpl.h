@@ -20,14 +20,14 @@ namespace cs {
 
 class CvSourceImpl : public SourceImpl {
  public:
-  CvSourceImpl(llvm::StringRef name, const VideoMode& mode);
+  CvSourceImpl(wpi::StringRef name, const VideoMode& mode);
   ~CvSourceImpl() override;
 
   void Start();
 
   // Property functions
   void SetProperty(int property, int value, CS_Status* status) override;
-  void SetStringProperty(int property, llvm::StringRef value,
+  void SetStringProperty(int property, wpi::StringRef value,
                          CS_Status* status) override;
 
   // Standard common camera properties
@@ -47,21 +47,21 @@ class CvSourceImpl : public SourceImpl {
 
   // OpenCV-specific functions
   void PutFrame(cv::Mat& image);
-  void NotifyError(llvm::StringRef msg);
-  int CreateProperty(llvm::StringRef name, CS_PropertyKind kind, int minimum,
+  void NotifyError(wpi::StringRef msg);
+  int CreateProperty(wpi::StringRef name, CS_PropertyKind kind, int minimum,
                      int maximum, int step, int defaultValue, int value);
-  int CreateProperty(llvm::StringRef name, CS_PropertyKind kind, int minimum,
+  int CreateProperty(wpi::StringRef name, CS_PropertyKind kind, int minimum,
                      int maximum, int step, int defaultValue, int value,
                      std::function<void(CS_Property property)> onChange);
-  void SetEnumPropertyChoices(int property, llvm::ArrayRef<std::string> choices,
+  void SetEnumPropertyChoices(int property, wpi::ArrayRef<std::string> choices,
                               CS_Status* status);
 
   // Property data
   class PropertyData : public PropertyImpl {
    public:
     PropertyData() = default;
-    explicit PropertyData(llvm::StringRef name_) : PropertyImpl{name_} {}
-    PropertyData(llvm::StringRef name_, CS_PropertyKind kind_, int minimum_,
+    explicit PropertyData(wpi::StringRef name_) : PropertyImpl{name_} {}
+    PropertyData(wpi::StringRef name_, CS_PropertyKind kind_, int minimum_,
                  int maximum_, int step_, int defaultValue_, int value_)
         : PropertyImpl{name_, kind_, step_, defaultValue_, value_} {
       hasMinimum = true;
@@ -76,7 +76,7 @@ class CvSourceImpl : public SourceImpl {
 
  protected:
   std::unique_ptr<PropertyImpl> CreateEmptyProperty(
-      llvm::StringRef name) const override;
+      wpi::StringRef name) const override;
 
   bool CacheProperties(CS_Status* status) const override;
 

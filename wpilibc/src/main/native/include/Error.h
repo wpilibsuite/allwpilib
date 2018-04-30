@@ -11,8 +11,8 @@
 
 #include <string>
 
-#include <llvm/StringRef.h>
-#include <llvm/Twine.h>
+#include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -47,8 +47,8 @@ class Error {
   const ErrorBase* GetOriginatingObject() const;
   double GetTimestamp() const;
   void Clear();
-  void Set(Code code, const llvm::Twine& contextMessage,
-           llvm::StringRef filename, llvm::StringRef function, int lineNumber,
+  void Set(Code code, const wpi::Twine& contextMessage,
+           wpi::StringRef filename, wpi::StringRef function, int lineNumber,
            const ErrorBase* originatingObject);
 
  private:

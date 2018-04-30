@@ -18,9 +18,9 @@
 
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/LoadOut.h>
-#include <llvm/raw_ostream.h>
-#include <support/mutex.h>
-#include <support/timestamp.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
+#include <wpi/timestamp.h>
 
 #include "HAL/ChipObject.h"
 #include "HAL/DriverStation.h"
@@ -329,20 +329,20 @@ static bool killExistingProgram(int timeout, int mode) {
     // see if the pid is around, but we don't want to mess with init id=1, or
     // ourselves
     if (pid >= 2 && kill(pid, 0) == 0 && pid != getpid()) {
-      llvm::outs() << "Killing previously running FRC program...\n";
+      wpi::outs() << "Killing previously running FRC program...\n";
       kill(pid, SIGTERM);  // try to kill it
       std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
       if (kill(pid, 0) == 0) {
         // still not successfull
         if (mode == 0) {
-          llvm::outs() << "FRC pid " << pid << " did not die within " << timeout
-                       << "ms. Aborting\n";
+          wpi::outs() << "FRC pid " << pid << " did not die within " << timeout
+                      << "ms. Aborting\n";
           return 0;              // just fail
         } else if (mode == 1) {  // kill -9 it
           kill(pid, SIGKILL);
         } else {
-          llvm::outs() << "WARNING: FRC pid " << pid << " did not die within "
-                       << timeout << "ms.\n";
+          wpi::outs() << "WARNING: FRC pid " << pid << " did not die within "
+                      << timeout << "ms.\n";
         }
       }
     }
@@ -374,7 +374,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   setlinebuf(stdin);
   setlinebuf(stdout);
-  llvm::outs().SetUnbuffered();
+  wpi::outs().SetUnbuffered();
 
   prctl(PR_SET_PDEATHSIG, SIGTERM);
 
@@ -401,10 +401,10 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     int32_t status = 0;
     uint64_t rv = HAL_GetFPGATime(&status);
     if (status != 0) {
-      llvm::errs()
+      wpi::errs()
           << "Call to HAL_GetFPGATime failed."
           << "Initialization might have failed. Time will not be correct\n";
-      llvm::errs().flush();
+      wpi::errs().flush();
       return 0u;
     }
     return rv;

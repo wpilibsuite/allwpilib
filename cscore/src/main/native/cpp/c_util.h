@@ -11,11 +11,11 @@
 #include <cstdlib>
 #include <cstring>
 
-#include <llvm/StringRef.h>
+#include <wpi/StringRef.h>
 
 namespace cs {
 
-inline char* ConvertToC(llvm::StringRef in) {
+inline char* ConvertToC(wpi::StringRef in) {
   char* out = static_cast<char*>(std::malloc(in.size() + 1));
   std::memmove(out, in.data(), in.size());
   out[in.size()] = '\0';

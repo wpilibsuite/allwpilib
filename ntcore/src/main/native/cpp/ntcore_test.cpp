@@ -13,7 +13,7 @@ extern "C" {
 struct NT_String* NT_GetStringForTesting(const char* string, int* struct_size) {
   struct NT_String* str =
       static_cast<NT_String*>(std::calloc(1, sizeof(NT_String)));
-  nt::ConvertToC(llvm::StringRef(string), str);
+  nt::ConvertToC(wpi::StringRef(string), str);
   *struct_size = sizeof(NT_String);
   return str;
 }
@@ -25,7 +25,7 @@ struct NT_EntryInfo* NT_GetEntryInfoForTesting(const char* name,
                                                int* struct_size) {
   struct NT_EntryInfo* entry_info =
       static_cast<NT_EntryInfo*>(std::calloc(1, sizeof(NT_EntryInfo)));
-  nt::ConvertToC(llvm::StringRef(name), &entry_info->name);
+  nt::ConvertToC(wpi::StringRef(name), &entry_info->name);
   entry_info->type = type;
   entry_info->flags = flags;
   entry_info->last_change = last_change;
@@ -43,8 +43,8 @@ struct NT_ConnectionInfo* NT_GetConnectionInfoForTesting(
     uint64_t last_update, unsigned int protocol_version, int* struct_size) {
   struct NT_ConnectionInfo* conn_info = static_cast<NT_ConnectionInfo*>(
       std::calloc(1, sizeof(NT_ConnectionInfo)));
-  nt::ConvertToC(llvm::StringRef(remote_id), &conn_info->remote_id);
-  nt::ConvertToC(llvm::StringRef(remote_ip), &conn_info->remote_ip);
+  nt::ConvertToC(wpi::StringRef(remote_id), &conn_info->remote_id);
+  nt::ConvertToC(wpi::StringRef(remote_ip), &conn_info->remote_ip);
   conn_info->remote_port = remote_port;
   conn_info->last_update = last_update;
   conn_info->protocol_version = protocol_version;
@@ -87,7 +87,7 @@ struct NT_Value* NT_GetValueStringForTesting(uint64_t last_change,
       static_cast<NT_Value*>(std::calloc(1, sizeof(NT_Value)));
   value->type = NT_STRING;
   value->last_change = last_change;
-  nt::ConvertToC(llvm::StringRef(str), &value->data.v_string);
+  nt::ConvertToC(wpi::StringRef(str), &value->data.v_string);
   *struct_size = sizeof(NT_Value);
   return value;
 }
@@ -98,7 +98,7 @@ struct NT_Value* NT_GetValueRawForTesting(uint64_t last_change, const char* raw,
       static_cast<NT_Value*>(std::calloc(1, sizeof(NT_Value)));
   value->type = NT_RAW;
   value->last_change = last_change;
-  nt::ConvertToC(llvm::StringRef(raw, raw_len), &value->data.v_string);
+  nt::ConvertToC(wpi::StringRef(raw, raw_len), &value->data.v_string);
   *struct_size = sizeof(NT_Value);
   return value;
 }
@@ -165,7 +165,7 @@ static void CopyNtValue(const struct NT_Value* copy_from,
 
 static void CopyNtString(const struct NT_String* copy_from,
                          struct NT_String* copy_to) {
-  nt::ConvertToC(llvm::StringRef(copy_from->str, copy_from->len), copy_to);
+  nt::ConvertToC(wpi::StringRef(copy_from->str, copy_from->len), copy_to);
 }
 
 struct NT_RpcParamDef* NT_GetRpcParamDefForTesting(const char* name,
@@ -173,7 +173,7 @@ struct NT_RpcParamDef* NT_GetRpcParamDefForTesting(const char* name,
                                                    int* struct_size) {
   struct NT_RpcParamDef* def =
       static_cast<NT_RpcParamDef*>(std::calloc(1, sizeof(NT_RpcParamDef)));
-  nt::ConvertToC(llvm::StringRef(name), &def->name);
+  nt::ConvertToC(wpi::StringRef(name), &def->name);
   CopyNtValue(val, &def->def_value);
   *struct_size = sizeof(NT_RpcParamDef);
   return def;
@@ -190,7 +190,7 @@ struct NT_RpcResultDef* NT_GetRpcResultsDefForTesting(const char* name,
                                                       int* struct_size) {
   struct NT_RpcResultDef* def =
       static_cast<NT_RpcResultDef*>(std::calloc(1, sizeof(NT_RpcResultDef)));
-  nt::ConvertToC(llvm::StringRef(name), &def->name);
+  nt::ConvertToC(wpi::StringRef(name), &def->name);
   def->type = type;
   *struct_size = sizeof(NT_RpcResultDef);
   return def;
@@ -208,7 +208,7 @@ struct NT_RpcDefinition* NT_GetRpcDefinitionForTesting(
   struct NT_RpcDefinition* def =
       static_cast<NT_RpcDefinition*>(std::calloc(1, sizeof(NT_RpcDefinition)));
   def->version = version;
-  nt::ConvertToC(llvm::StringRef(name), &def->name);
+  nt::ConvertToC(wpi::StringRef(name), &def->name);
   def->num_params = num_params;
   def->params = static_cast<NT_RpcParamDef*>(
       std::malloc(num_params * sizeof(NT_RpcParamDef)));
@@ -235,8 +235,8 @@ struct NT_RpcAnswer* NT_GetRpcAnswerForTesting(
       static_cast<NT_RpcAnswer*>(std::calloc(1, sizeof(NT_RpcAnswer)));
   info->entry = rpc_id;
   info->call = call_uid;
-  nt::ConvertToC(llvm::StringRef(name), &info->name);
-  nt::ConvertToC(llvm::StringRef(params, params_len), &info->params);
+  nt::ConvertToC(wpi::StringRef(name), &info->name);
+  nt::ConvertToC(wpi::StringRef(params, params_len), &info->params);
   *struct_size = sizeof(NT_RpcAnswer);
   return info;
 }

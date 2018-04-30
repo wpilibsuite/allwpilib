@@ -7,13 +7,13 @@
 
 #include "DsClient.h"
 
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
-#include <support/raw_socket_istream.h>
+#include <wpi/SmallString.h>
+#include <wpi/TCPConnector.h>
+#include <wpi/raw_ostream.h>
+#include <wpi/raw_socket_istream.h>
 
 #include "Dispatcher.h"
 #include "Log.h"
-#include "tcpsockets/TCPConnector.h"
 
 using namespace nt;
 
@@ -80,7 +80,7 @@ void DsClient::Thread::Main() {
     while (m_active && !is.has_error()) {
       // Read JSON "{...}".  This is very limited, does not handle quoted "}" or
       // nested {}, but is sufficient for this purpose.
-      llvm::SmallString<128> json;
+      wpi::SmallString<128> json;
       char ch;
 
       // Throw away characters until {
@@ -112,10 +112,10 @@ void DsClient::Thread::Main() {
 
       // Look for "robotIP":12345, and get 12345 portion
       size_t pos = json.find("\"robotIP\"");
-      if (pos == llvm::StringRef::npos) continue;  // could not find?
+      if (pos == wpi::StringRef::npos) continue;  // could not find?
       pos += 9;
       pos = json.find(':', pos);
-      if (pos == llvm::StringRef::npos) continue;  // could not find?
+      if (pos == wpi::StringRef::npos) continue;  // could not find?
       size_t endpos = json.find_first_not_of("0123456789", pos + 1);
       DEBUG3("found robotIP=" << json.slice(pos + 1, endpos));
 
@@ -136,7 +136,7 @@ void DsClient::Thread::Main() {
 
       // Convert number into dotted quad
       json.clear();
-      llvm::raw_svector_ostream os{json};
+      wpi::raw_svector_ostream os{json};
       os << ((ip >> 24) & 0xff) << "." << ((ip >> 16) & 0xff) << "."
          << ((ip >> 8) & 0xff) << "." << (ip & 0xff);
       INFO("client: DS overriding server IP to " << os.str());

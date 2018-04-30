@@ -17,17 +17,17 @@
 #include <utility>
 #include <vector>
 
-#include <llvm/ArrayRef.h>
-#include <llvm/StringRef.h>
-#include <llvm/Twine.h>
+#include <wpi/ArrayRef.h>
+#include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 
 #include "ntcore_c.h"
 
 namespace nt {
 
-using llvm::ArrayRef;
-using llvm::StringRef;
-using llvm::Twine;
+using wpi::ArrayRef;
+using wpi::StringRef;
+using wpi::Twine;
 
 /**
  * A network table entry value.

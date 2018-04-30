@@ -11,8 +11,8 @@
 #include <memory>
 #include <string>
 
-#include <llvm/StringRef.h>
-#include <support/mutex.h>
+#include <wpi/StringRef.h>
+#include <wpi/mutex.h>
 
 #include "SourceImpl.h"
 
@@ -22,15 +22,15 @@ class Frame;
 
 class SinkImpl {
  public:
-  explicit SinkImpl(llvm::StringRef name);
+  explicit SinkImpl(wpi::StringRef name);
   virtual ~SinkImpl();
   SinkImpl(const SinkImpl& queue) = delete;
   SinkImpl& operator=(const SinkImpl& queue) = delete;
 
-  llvm::StringRef GetName() const { return m_name; }
+  wpi::StringRef GetName() const { return m_name; }
 
-  void SetDescription(llvm::StringRef description);
-  llvm::StringRef GetDescription(llvm::SmallVectorImpl<char>& buf) const;
+  void SetDescription(wpi::StringRef description);
+  wpi::StringRef GetDescription(wpi::SmallVectorImpl<char>& buf) const;
 
   void Enable();
   void Disable();
@@ -44,7 +44,7 @@ class SinkImpl {
   }
 
   std::string GetError() const;
-  llvm::StringRef GetError(llvm::SmallVectorImpl<char>& buf) const;
+  wpi::StringRef GetError(wpi::SmallVectorImpl<char>& buf) const;
 
  protected:
   virtual void SetSourceImpl(std::shared_ptr<SourceImpl> source);

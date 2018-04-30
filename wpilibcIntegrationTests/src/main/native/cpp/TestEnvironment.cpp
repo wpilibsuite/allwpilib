@@ -8,7 +8,7 @@
 #include <cstdlib>
 
 #include <HAL/HAL.h>
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "DriverStation.h"
 #include "LiveWindow/LiveWindow.h"
@@ -30,7 +30,7 @@ class TestEnvironment : public testing::Environment {
     m_alreadySetUp = true;
 
     if (!HAL_Initialize(500, 0)) {
-      llvm::errs() << "FATAL ERROR: HAL could not be initialized\n";
+      wpi::errs() << "FATAL ERROR: HAL could not be initialized\n";
       std::exit(-1);
     }
 
@@ -43,20 +43,20 @@ class TestEnvironment : public testing::Environment {
     HAL_ObserveUserProgramStarting();
     LiveWindow::GetInstance()->SetEnabled(false);
 
-    llvm::outs() << "Started coms\n";
+    wpi::outs() << "Started coms\n";
 
     int enableCounter = 0;
     while (!DriverStation::GetInstance().IsEnabled()) {
       if (enableCounter > 50) {
         // Robot did not enable properly after 5 seconds.
         // Force exit
-        llvm::errs() << " Failed to enable. Aborting\n";
+        wpi::errs() << " Failed to enable. Aborting\n";
         std::terminate();
       }
 
       Wait(0.1);
 
-      llvm::outs() << "Waiting for enable: " << enableCounter++ << "\n";
+      wpi::outs() << "Waiting for enable: " << enableCounter++ << "\n";
     }
   }
 

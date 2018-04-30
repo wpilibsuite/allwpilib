@@ -124,7 +124,7 @@ void MecanumDrive::StopMotor() {
   m_safetyHelper.Feed();
 }
 
-void MecanumDrive::GetDescription(llvm::raw_ostream& desc) const {
+void MecanumDrive::GetDescription(wpi::raw_ostream& desc) const {
   desc << "MecanumDrive";
 }
 

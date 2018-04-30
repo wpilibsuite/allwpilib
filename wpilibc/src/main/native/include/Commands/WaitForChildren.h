@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <llvm/Twine.h>
+#include <wpi/Twine.h>
 
 #include "Commands/Command.h"
 
@@ -16,7 +16,7 @@ namespace frc {
 class WaitForChildren : public Command {
  public:
   explicit WaitForChildren(double timeout);
-  WaitForChildren(const llvm::Twine& name, double timeout);
+  WaitForChildren(const wpi::Twine& name, double timeout);
   virtual ~WaitForChildren() = default;
 
  protected:

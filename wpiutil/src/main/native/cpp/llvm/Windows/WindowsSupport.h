@@ -34,11 +34,11 @@
 #define NOMINMAX
 #endif
 
-#include "llvm/SmallVector.h"
-#include "llvm/StringExtras.h"
-#include "llvm/StringRef.h"
-#include "llvm/Twine.h"
-#include "llvm/Compiler.h"
+#include "wpi/SmallVector.h"
+#include "wpi/StringExtras.h"
+#include "wpi/StringRef.h"
+#include "wpi/Twine.h"
+#include "wpi/Compiler.h"
 #include <system_error>
 #include <windows.h>
 #include <cassert>
@@ -79,7 +79,7 @@ inline bool MakeErrMsg(std::string *ErrMsg, const std::string &prefix) {
     *ErrMsg = prefix + ": " + buffer;
   else
     *ErrMsg = prefix + ": Unknown error";
-  *ErrMsg += " (0x" + llvm::utohexstr(LastError) + ")";
+  *ErrMsg += " (0x" + wpi::utohexstr(LastError) + ")";
 
   LocalFree(buffer);
   return R != 0;
@@ -179,7 +179,7 @@ typedef ScopedHandle<RegTraits>          ScopedRegHandle;
 typedef ScopedHandle<FindHandleTraits>   ScopedFindHandle;
 typedef ScopedHandle<JobHandleTraits>    ScopedJobHandle;
 
-namespace llvm {
+namespace wpi {
 template <class T>
 class SmallVectorImpl;
 
@@ -206,6 +206,6 @@ std::error_code UTF16ToCurCP(const wchar_t *utf16, size_t utf16_len,
                              SmallVectorImpl<char> &utf8);
 } // end namespace windows
 } // end namespace sys
-} // end namespace llvm.
+} // end namespace wpi.
 
 #endif

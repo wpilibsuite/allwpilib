@@ -10,8 +10,8 @@
 #include <chrono>
 #include <limits>
 
-#include <llvm/DenseMap.h>
-#include <support/timestamp.h>
+#include <wpi/DenseMap.h>
+#include <wpi/timestamp.h>
 
 #include "Handle.h"
 #include "Notifier.h"
@@ -23,8 +23,8 @@ class Telemetry::Thread : public wpi::SafeThread {
  public:
   void Main();
 
-  llvm::DenseMap<std::pair<CS_Handle, int>, int64_t> m_user;
-  llvm::DenseMap<std::pair<CS_Handle, int>, int64_t> m_current;
+  wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_user;
+  wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_current;
   double m_period = 0.0;
   double m_elapsed = 0.0;
   bool m_updated = false;

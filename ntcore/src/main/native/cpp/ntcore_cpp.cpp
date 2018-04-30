@@ -11,7 +11,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <support/timestamp.h>
+#include <wpi/timestamp.h>
 
 #include "Handle.h"
 #include "InstanceImpl.h"

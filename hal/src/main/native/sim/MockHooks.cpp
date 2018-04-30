@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <thread>
 
-#include <support/timestamp.h>
+#include <wpi/timestamp.h>
 
 #include "MockHooksInternal.h"
 

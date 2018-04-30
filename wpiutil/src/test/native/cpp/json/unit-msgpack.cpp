@@ -1008,31 +1008,31 @@ TEST(MessagePackErrorTest, TooShortByteVector)
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
     EXPECT_THROW_MSG(json::from_msgpack("\xcd"), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(llvm::StringRef("\xcd\x00", 2)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcd\x00", 2)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 3: unexpected end of input");
     EXPECT_THROW_MSG(json::from_msgpack("\xce"), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(llvm::StringRef("\xce\x00", 2)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xce\x00", 2)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 3: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(llvm::StringRef("\xce\x00\x00", 3)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xce\x00\x00", 3)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 4: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(llvm::StringRef("\xce\x00\x00\x00", 4)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xce\x00\x00\x00", 4)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 5: unexpected end of input");
     EXPECT_THROW_MSG(json::from_msgpack("\xcf"), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(llvm::StringRef("\xcf\x00", 2)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00", 2)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 3: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(llvm::StringRef("\xcf\x00\x00", 3)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00\x00", 3)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 4: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(llvm::StringRef("\xcf\x00\x00\x00", 4)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00\x00\x00", 4)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 5: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(llvm::StringRef("\xcf\x00\x00\x00\x00", 5)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00\x00\x00\x00", 5)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 6: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(llvm::StringRef("\xcf\x00\x00\x00\x00\x00", 6)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00\x00\x00\x00\x00", 6)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 7: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(llvm::StringRef("\xcf\x00\x00\x00\x00\x00\x00", 7)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00\x00\x00\x00\x00\x00", 7)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 8: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(llvm::StringRef("\xcf\x00\x00\x00\x00\x00\x00\x00", 8)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00\x00\x00\x00\x00\x00\x00", 8)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 9: unexpected end of input");
 }
 

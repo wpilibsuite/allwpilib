@@ -7,9 +7,9 @@
 
 #include "CameraServer.h"
 
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
 
 #include "CameraServerShared.h"
 #include "ntcore_cpp.h"
@@ -21,14 +21,14 @@ CameraServer* CameraServer::GetInstance() {
   return &instance;
 }
 
-static llvm::StringRef MakeSourceValue(CS_Source source,
-                                       llvm::SmallVectorImpl<char>& buf) {
+static wpi::StringRef MakeSourceValue(CS_Source source,
+                                      wpi::SmallVectorImpl<char>& buf) {
   CS_Status status = 0;
   buf.clear();
   switch (cs::GetSourceKind(source, &status)) {
 #ifdef __linux__
     case cs::VideoSource::kUsb: {
-      llvm::StringRef prefix{"usb:"};
+      wpi::StringRef prefix{"usb:"};
       buf.append(prefix.begin(), prefix.end());
       auto path = cs::GetUsbCameraPath(source, &status);
       buf.append(path.begin(), path.end());
@@ -36,7 +36,7 @@ static llvm::StringRef MakeSourceValue(CS_Source source,
     }
 #endif
     case cs::VideoSource::kHttp: {
-      llvm::StringRef prefix{"ip:"};
+      wpi::StringRef prefix{"ip:"};
       buf.append(prefix.begin(), prefix.end());
       auto urls = cs::GetHttpCameraUrls(source, &status);
       if (!urls.empty()) buf.append(urls[0].begin(), urls[0].end());
@@ -50,12 +50,12 @@ static llvm::StringRef MakeSourceValue(CS_Source source,
       return "unknown:";
   }
 
-  return llvm::StringRef{buf.begin(), buf.size()};
+  return wpi::StringRef{buf.begin(), buf.size()};
 }
 
-static std::string MakeStreamValue(llvm::StringRef address, int port) {
+static std::string MakeStreamValue(wpi::StringRef address, int port) {
   std::string rv;
-  llvm::raw_string_ostream stream(rv);
+  wpi::raw_string_ostream stream(rv);
   stream << "mjpg:http://" << address << ':' << port << "/?action=stream";
   stream.flush();
   return rv;
@@ -178,7 +178,7 @@ static std::string PixelFormatToString(int pixelFormat) {
 
 static std::string VideoModeToString(const cs::VideoMode& mode) {
   std::string rv;
-  llvm::raw_string_ostream oss{rv};
+  wpi::raw_string_ostream oss{rv};
   oss << mode.width << "x" << mode.height;
   oss << " " << PixelFormatToString(mode.pixelFormat) << " ";
   oss << mode.fps << " fps";
@@ -193,20 +193,20 @@ static std::vector<std::string> GetSourceModeValues(int source) {
   return rv;
 }
 
-static inline llvm::StringRef Concatenate(llvm::StringRef lhs,
-                                          llvm::StringRef rhs,
-                                          llvm::SmallVectorImpl<char>& buf) {
+static inline wpi::StringRef Concatenate(wpi::StringRef lhs,
+                                         wpi::StringRef rhs,
+                                         wpi::SmallVectorImpl<char>& buf) {
   buf.clear();
-  llvm::raw_svector_ostream oss{buf};
+  wpi::raw_svector_ostream oss{buf};
   oss << lhs << rhs;
   return oss.str();
 }
 
 static void PutSourcePropertyValue(nt::NetworkTable* table,
                                    const cs::VideoEvent& event, bool isNew) {
-  llvm::SmallString<64> name;
-  llvm::SmallString<64> infoName;
-  if (llvm::StringRef{event.name}.startswith("raw_")) {
+  wpi::SmallString<64> name;
+  wpi::SmallString<64> infoName;
+  if (wpi::StringRef{event.name}.startswith("raw_")) {
     name = "RawProperty/";
     name += event.name;
     infoName = "RawPropertyInfo/";
@@ -218,7 +218,7 @@ static void PutSourcePropertyValue(nt::NetworkTable* table,
     infoName += event.name;
   }
 
-  llvm::SmallString<64> buf;
+  wpi::SmallString<64> buf;
   CS_Status status = 0;
   nt::NetworkTableEntry entry = table->GetEntry(name);
   switch (event.propertyKind) {
@@ -282,10 +282,10 @@ CameraServer::CameraServer()
               std::lock_guard<wpi::mutex> lock(m_mutex);
               m_tables.insert(std::make_pair(event.sourceHandle, table));
             }
-            llvm::SmallString<64> buf;
+            wpi::SmallString<64> buf;
             table->GetEntry("source").SetString(
                 MakeSourceValue(event.sourceHandle, buf));
-            llvm::SmallString<64> descBuf;
+            wpi::SmallString<64> descBuf;
             table->GetEntry("description")
                 .SetString(cs::GetSourceDescription(event.sourceHandle, descBuf,
                                                     &status));
@@ -314,7 +314,7 @@ CameraServer::CameraServer()
             auto table = GetSourceTable(event.sourceHandle);
             if (table) {
               // update the description too (as it may have changed)
-              llvm::SmallString<64> descBuf;
+              wpi::SmallString<64> descBuf;
               table->GetEntry("description")
                   .SetString(cs::GetSourceDescription(event.sourceHandle,
                                                       descBuf, &status));
@@ -353,7 +353,7 @@ CameraServer::CameraServer()
           case cs::VideoEvent::kSourcePropertyChoicesUpdated: {
             auto table = GetSourceTable(event.sourceHandle);
             if (table) {
-              llvm::SmallString<64> name{"PropertyInfo/"};
+              wpi::SmallString<64> name{"PropertyInfo/"};
               name += event.name;
               name += "/choices";
               auto choices =
@@ -380,17 +380,17 @@ CameraServer::CameraServer()
   // We don't currently support changing settings via NT due to
   // synchronization issues, so just update to current setting if someone
   // else tries to change it.
-  llvm::SmallString<64> buf;
+  wpi::SmallString<64> buf;
   m_tableListener = nt::NetworkTableInstance::GetDefault().AddEntryListener(
       Concatenate(kPublishName, "/", buf),
       [=](const nt::EntryNotification& event) {
-        llvm::StringRef relativeKey =
-            event.name.substr(llvm::StringRef(kPublishName).size() + 1);
+        wpi::StringRef relativeKey =
+            event.name.substr(wpi::StringRef(kPublishName).size() + 1);
 
         // get source (sourceName/...)
         auto subKeyIndex = relativeKey.find('/');
-        if (subKeyIndex == llvm::StringRef::npos) return;
-        llvm::StringRef sourceName = relativeKey.slice(0, subKeyIndex);
+        if (subKeyIndex == wpi::StringRef::npos) return;
+        wpi::StringRef sourceName = relativeKey.slice(0, subKeyIndex);
         auto sourceIt = m_sources.find(sourceName);
         if (sourceIt == m_sources.end()) return;
 
@@ -398,7 +398,7 @@ CameraServer::CameraServer()
         relativeKey = relativeKey.substr(subKeyIndex + 1);
 
         // handle standard names
-        llvm::StringRef propName;
+        wpi::StringRef propName;
         nt::NetworkTableEntry entry{event.entry};
         if (relativeKey == "mode") {
           // reset to current mode
@@ -442,8 +442,8 @@ cs::UsbCamera CameraServer::StartAutomaticCapture() {
 }
 
 cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
-  llvm::SmallString<64> buf;
-  llvm::raw_svector_ostream name{buf};
+  wpi::SmallString<64> buf;
+  wpi::raw_svector_ostream name{buf};
   name << "USB Camera " << dev;
 
   cs::UsbCamera camera{name.str(), dev};
@@ -453,7 +453,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
   return camera;
 }
 
-cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
+cs::UsbCamera CameraServer::StartAutomaticCapture(wpi::StringRef name,
                                                   int dev) {
   cs::UsbCamera camera{name, dev};
   StartAutomaticCapture(camera);
@@ -462,8 +462,8 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
   return camera;
 }
 
-cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
-                                                  llvm::StringRef path) {
+cs::UsbCamera CameraServer::StartAutomaticCapture(wpi::StringRef name,
+                                                  wpi::StringRef path) {
   cs::UsbCamera camera{name, path};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
@@ -472,7 +472,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
 }
 #endif
 
-cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef host) {
+cs::AxisCamera CameraServer::AddAxisCamera(wpi::StringRef host) {
   return AddAxisCamera("Axis Camera", host);
 }
 
@@ -484,12 +484,12 @@ cs::AxisCamera CameraServer::AddAxisCamera(const std::string& host) {
   return AddAxisCamera("Axis Camera", host);
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(llvm::ArrayRef<std::string> hosts) {
+cs::AxisCamera CameraServer::AddAxisCamera(wpi::ArrayRef<std::string> hosts) {
   return AddAxisCamera("Axis Camera", hosts);
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
-                                           llvm::StringRef host) {
+cs::AxisCamera CameraServer::AddAxisCamera(wpi::StringRef name,
+                                           wpi::StringRef host) {
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
@@ -497,7 +497,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
   return camera;
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
+cs::AxisCamera CameraServer::AddAxisCamera(wpi::StringRef name,
                                            const char* host) {
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
@@ -506,7 +506,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
   return camera;
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
+cs::AxisCamera CameraServer::AddAxisCamera(wpi::StringRef name,
                                            const std::string& host) {
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
@@ -515,8 +515,8 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
   return camera;
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
-                                           llvm::ArrayRef<std::string> hosts) {
+cs::AxisCamera CameraServer::AddAxisCamera(wpi::StringRef name,
+                                           wpi::ArrayRef<std::string> hosts) {
   cs::AxisCamera camera{name, hosts};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
@@ -525,7 +525,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
 }
 
 void CameraServer::StartAutomaticCapture(const cs::VideoSource& camera) {
-  llvm::SmallString<64> name{"serve_"};
+  wpi::SmallString<64> name{"serve_"};
   name += camera.GetName();
 
   AddCamera(camera);
@@ -553,7 +553,7 @@ cs::CvSink CameraServer::GetVideo() {
 }
 
 cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
-  llvm::SmallString<64> name{"opencv_"};
+  wpi::SmallString<64> name{"opencv_"};
   name += camera.GetName();
 
   {
@@ -562,8 +562,8 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
     if (it != m_sinks.end()) {
       auto kind = it->second.GetKind();
       if (kind != cs::VideoSink::kCv) {
-        llvm::SmallString<64> buf;
-        llvm::raw_svector_ostream err{buf};
+        wpi::SmallString<64> buf;
+        wpi::raw_svector_ostream err{buf};
         err << "expected OpenCV sink, but got " << kind;
         auto csShared = GetCameraServerShared();
         csShared->SetCameraServerError(err.str());
@@ -579,14 +579,14 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
   return newsink;
 }
 
-cs::CvSink CameraServer::GetVideo(llvm::StringRef name) {
+cs::CvSink CameraServer::GetVideo(wpi::StringRef name) {
   cs::VideoSource source;
   {
     std::lock_guard<wpi::mutex> lock(m_mutex);
     auto it = m_sources.find(name);
     if (it == m_sources.end()) {
-      llvm::SmallString<64> buf;
-      llvm::raw_svector_ostream err{buf};
+      wpi::SmallString<64> buf;
+      wpi::raw_svector_ostream err{buf};
       err << "could not find camera " << name;
       auto csShared = GetCameraServerShared();
       csShared->SetCameraServerError(err.str());
@@ -597,14 +597,14 @@ cs::CvSink CameraServer::GetVideo(llvm::StringRef name) {
   return GetVideo(source);
 }
 
-cs::CvSource CameraServer::PutVideo(llvm::StringRef name, int width,
+cs::CvSource CameraServer::PutVideo(wpi::StringRef name, int width,
                                     int height) {
   cs::CvSource source{name, cs::VideoMode::kMJPEG, width, height, 30};
   StartAutomaticCapture(source);
   return source;
 }
 
-cs::MjpegServer CameraServer::AddServer(llvm::StringRef name) {
+cs::MjpegServer CameraServer::AddServer(wpi::StringRef name) {
   int port;
   {
     std::lock_guard<wpi::mutex> lock(m_mutex);
@@ -613,7 +613,7 @@ cs::MjpegServer CameraServer::AddServer(llvm::StringRef name) {
   return AddServer(name, port);
 }
 
-cs::MjpegServer CameraServer::AddServer(llvm::StringRef name, int port) {
+cs::MjpegServer CameraServer::AddServer(wpi::StringRef name, int port) {
   cs::MjpegServer server{name, port};
   AddServer(server);
   return server;
@@ -624,13 +624,13 @@ void CameraServer::AddServer(const cs::VideoSink& server) {
   m_sinks.emplace_second(server.GetName(), server);
 }
 
-void CameraServer::RemoveServer(llvm::StringRef name) {
+void CameraServer::RemoveServer(wpi::StringRef name) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   m_sinks.erase(name);
 }
 
 cs::VideoSink CameraServer::GetServer() {
-  llvm::SmallString<64> name;
+  wpi::SmallString<64> name;
   {
     std::lock_guard<wpi::mutex> lock(m_mutex);
     if (m_primarySourceName.empty()) {
@@ -644,12 +644,12 @@ cs::VideoSink CameraServer::GetServer() {
   return GetServer(name);
 }
 
-cs::VideoSink CameraServer::GetServer(llvm::StringRef name) {
+cs::VideoSink CameraServer::GetServer(wpi::StringRef name) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   auto it = m_sinks.find(name);
   if (it == m_sinks.end()) {
-    llvm::SmallString<64> buf;
-    llvm::raw_svector_ostream err{buf};
+    wpi::SmallString<64> buf;
+    wpi::raw_svector_ostream err{buf};
     err << "could not find server " << name;
     auto csShared = GetCameraServerShared();
     csShared->SetCameraServerError(err.str());
@@ -665,7 +665,7 @@ void CameraServer::AddCamera(const cs::VideoSource& camera) {
   m_sources.emplace_second(name, camera);
 }
 
-void CameraServer::RemoveCamera(llvm::StringRef name) {
+void CameraServer::RemoveCamera(wpi::StringRef name) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   m_sources.erase(name);
 }

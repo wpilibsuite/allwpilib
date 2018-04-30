@@ -9,14 +9,14 @@
 
 #include <algorithm>
 
-#include <llvm/SmallVector.h>
-#include <support/mutex.h>
+#include <wpi/SmallVector.h>
+#include <wpi/mutex.h>
 
 namespace hal {
-static llvm::SmallVector<HandleBase*, 32>* globalHandles = nullptr;
+static wpi::SmallVector<HandleBase*, 32>* globalHandles = nullptr;
 static wpi::mutex globalHandleMutex;
 HandleBase::HandleBase() {
-  static llvm::SmallVector<HandleBase*, 32> gH;
+  static wpi::SmallVector<HandleBase*, 32> gH;
   std::lock_guard<wpi::mutex> lock(globalHandleMutex);
   if (!globalHandles) {
     globalHandles = &gH;

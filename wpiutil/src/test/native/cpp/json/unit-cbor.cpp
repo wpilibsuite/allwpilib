@@ -735,7 +735,7 @@ TEST(CborFloatTest, Number)
 
 TEST(CborFloatTest, HalfInfinity)
 {
-    json j = json::from_cbor(llvm::StringRef("\xf9\x7c\x00", 3));
+    json j = json::from_cbor(wpi::StringRef("\xf9\x7c\x00", 3));
     json::number_float_t d = j;
     EXPECT_FALSE(std::isfinite(d));
     EXPECT_EQ(j.dump(), "null");
@@ -1138,31 +1138,31 @@ TEST(CborErrorTest, TooShortByteVector)
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
     EXPECT_THROW_MSG(json::from_cbor("\x19"), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(llvm::StringRef("\x19\x00", 2)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x19\x00", 2)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 3: unexpected end of input");
     EXPECT_THROW_MSG(json::from_cbor("\x1a"), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(llvm::StringRef("\x1a\x00", 2)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1a\x00", 2)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 3: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(llvm::StringRef("\x1a\x00\x00", 3)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1a\x00\x00", 3)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 4: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(llvm::StringRef("\x1a\x00\x00\x00", 4)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1a\x00\x00\x00", 4)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 5: unexpected end of input");
     EXPECT_THROW_MSG(json::from_cbor("\x1b"), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(llvm::StringRef("\x1b\x00", 2)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00", 2)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 3: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(llvm::StringRef("\x1b\x00\x00", 3)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00\x00", 3)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 4: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(llvm::StringRef("\x1b\x00\x00\x00", 4)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00\x00\x00", 4)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 5: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(llvm::StringRef("\x1b\x00\x00\x00\x00", 5)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00\x00\x00\x00", 5)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 6: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(llvm::StringRef("\x1b\x00\x00\x00\x00\x00", 6)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00\x00\x00\x00\x00", 6)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 7: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(llvm::StringRef("\x1b\x00\x00\x00\x00\x00\x00", 7)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00\x00\x00\x00\x00\x00", 7)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 8: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(llvm::StringRef("\x1b\x00\x00\x00\x00\x00\x00\x00", 8)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00\x00\x00\x00\x00\x00\x00", 8)), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 9: unexpected end of input");
 }
 
@@ -1547,7 +1547,7 @@ TEST(CborFirstBytesTest, Unsupported)
 
         try
         {
-            json::from_cbor(llvm::StringRef(&byte, 1));
+            json::from_cbor(wpi::StringRef(&byte, 1));
         }
         catch (const json::parse_error& e)
         {
@@ -1571,7 +1571,7 @@ TEST(CborFirstBytesTest, Unsupported)
 namespace {
 struct CborRoundtripTestParam {
   const char* plain;
-  llvm::StringRef encoded;
+  wpi::StringRef encoded;
   bool test_encode;
 };
 }  // anonymous namespace
@@ -1589,7 +1589,7 @@ TEST_P(CborRoundtripTest, Case)
 }
 
 static const CborRoundtripTestParam rfc7049_appendix_a_numbers[] = {
-    {"0", llvm::StringRef("\x00", 1), true},
+    {"0", wpi::StringRef("\x00", 1), true},
     {"1", "\x01", true},
     {"10", "\x0a", true},
     {"23", "\x17", true},
@@ -1597,38 +1597,38 @@ static const CborRoundtripTestParam rfc7049_appendix_a_numbers[] = {
     {"25", "\x18\x19", true},
     {"100", "\x18\x64", true},
     {"1000", "\x19\x03\xe8", true},
-    {"1000000", llvm::StringRef("\x1a\x00\x0f\x42\x40", 5), true},
-    {"1000000000000", llvm::StringRef("\x1b\x00\x00\x00\xe8\xd4\xa5\x10\x00", 9), true},
+    {"1000000", wpi::StringRef("\x1a\x00\x0f\x42\x40", 5), true},
+    {"1000000000000", wpi::StringRef("\x1b\x00\x00\x00\xe8\xd4\xa5\x10\x00", 9), true},
     {"18446744073709551615", "\x1b\xff\xff\xff\xff\xff\xff\xff\xff", true},
     // positive bignum is not supported
-    //{"18446744073709551616", llvm::StringRef("\xc2\x49\x01\x00\x00\x00\x00\x00\x00\x00\x00", 11), true},
+    //{"18446744073709551616", wpi::StringRef("\xc2\x49\x01\x00\x00\x00\x00\x00\x00\x00\x00", 11), true},
     //{"-18446744073709551616", "\x3b\xff\xff\xff\xff\xff\xff\xff\xff", true},
     // negative bignum is not supported
-    //{"-18446744073709551617", llvm::StringRef("\xc3\x49\x01\x00\x00\x00\x00\x00\x00\x00\x00", 11), true},
+    //{"-18446744073709551617", wpi::StringRef("\xc3\x49\x01\x00\x00\x00\x00\x00\x00\x00\x00", 11), true},
     {"-1", "\x20", true},
     {"-10", "\x29", true},
     {"-100", "\x38\x63", true},
     {"-1000", "\x39\x03\xe7", true},
     // half-precision float
-    {"0.0", llvm::StringRef("\xf9\x00\x00", 3), false},
+    {"0.0", wpi::StringRef("\xf9\x00\x00", 3), false},
     // half-precision float
-    {"-0.0", llvm::StringRef("\xf9\x80\x00", 3), false},
+    {"-0.0", wpi::StringRef("\xf9\x80\x00", 3), false},
     // half-precision float
-    {"1.0", llvm::StringRef("\xf9\x3c\x00", 3), false},
+    {"1.0", wpi::StringRef("\xf9\x3c\x00", 3), false},
     {"1.1", "\xfb\x3f\xf1\x99\x99\x99\x99\x99\x9a", true},
     // half-precision float
-    {"1.5", llvm::StringRef("\xf9\x3e\x00", 3), false},
+    {"1.5", wpi::StringRef("\xf9\x3e\x00", 3), false},
     // half-precision float
     {"65504.0", "\xf9\x7b\xff", false},
-    {"100000.0", llvm::StringRef("\xfa\x47\xc3\x50\x00", 5), false},
+    {"100000.0", wpi::StringRef("\xfa\x47\xc3\x50\x00", 5), false},
     {"3.4028234663852886e+38", "\xfa\x7f\x7f\xff\xff", false},
-    {"1.0e+300", llvm::StringRef("\xfb\x7e\x37\xe4\x3c\x88\x00\x75\x9c", 9), true},
+    {"1.0e+300", wpi::StringRef("\xfb\x7e\x37\xe4\x3c\x88\x00\x75\x9c", 9), true},
     // half-precision float
-    {"5.960464477539063e-8", llvm::StringRef("\xf9\x00\x01", 3), false},
+    {"5.960464477539063e-8", wpi::StringRef("\xf9\x00\x01", 3), false},
     // half-precision float
-    {"0.00006103515625", llvm::StringRef("\xf9\x04\x00", 3), false},
+    {"0.00006103515625", wpi::StringRef("\xf9\x04\x00", 3), false},
     // half-precision float
-    {"-4.0", llvm::StringRef("\xf9\xc4\x00", 3), false},
+    {"-4.0", wpi::StringRef("\xf9\xc4\x00", 3), false},
     {"-4.1", "\xfb\xc0\x10\x66\x66\x66\x66\x66\x66", true},
 };
 

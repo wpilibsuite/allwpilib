@@ -15,7 +15,7 @@
 #include <utility>
 
 #include <HAL/Notifier.h>
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "ErrorBase.h"
 

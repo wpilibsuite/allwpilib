@@ -3,10 +3,10 @@
 
 #include "edu_wpi_first_networktables_NetworkTablesJNI.h"
 #include "ntcore.h"
-#include "support/jni_util.h"
-#include "llvm/ConvertUTF.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
+#include "wpi/ConvertUTF.h"
+#include "wpi/SmallString.h"
+#include "wpi/jni_util.h"
+#include "wpi/raw_ostream.h"
 
 using namespace wpi::java;
 
@@ -141,7 +141,7 @@ std::shared_ptr<nt::Value> FromJavaBooleanArray(JNIEnv* env, jbooleanArray jarr,
                                                 jlong time) {
   CriticalJBooleanArrayRef ref{env, jarr};
   if (!ref) return nullptr;
-  llvm::ArrayRef<jboolean> elements{ref};
+  wpi::ArrayRef<jboolean> elements{ref};
   size_t len = elements.size();
   std::vector<int> arr;
   arr.reserve(len);
@@ -286,7 +286,7 @@ static jobject MakeJObject(JNIEnv *env, jobject inst,
 }
 
 static jobjectArray MakeJObject(JNIEnv *env, jobject inst,
-                                llvm::ArrayRef<nt::ConnectionNotification> arr) {
+                                wpi::ArrayRef<nt::ConnectionNotification> arr) {
   jobjectArray jarr = env->NewObjectArray(arr.size(), connectionNotificationCls, nullptr);
   if (!jarr) return nullptr;
   for (size_t i = 0; i < arr.size(); ++i) {
@@ -297,7 +297,7 @@ static jobjectArray MakeJObject(JNIEnv *env, jobject inst,
 }
 
 static jobjectArray MakeJObject(JNIEnv *env, jobject inst,
-                                llvm::ArrayRef<nt::EntryNotification> arr) {
+                                wpi::ArrayRef<nt::EntryNotification> arr) {
   jobjectArray jarr = env->NewObjectArray(arr.size(), entryNotificationCls, nullptr);
   if (!jarr) return nullptr;
   for (size_t i = 0; i < arr.size(); ++i) {
@@ -308,7 +308,7 @@ static jobjectArray MakeJObject(JNIEnv *env, jobject inst,
 }
 
 static jobjectArray MakeJObject(JNIEnv *env, jobject inst,
-                                llvm::ArrayRef<nt::LogMessage> arr) {
+                                wpi::ArrayRef<nt::LogMessage> arr) {
   jobjectArray jarr = env->NewObjectArray(arr.size(), logMessageCls, nullptr);
   if (!jarr) return nullptr;
   for (size_t i = 0; i < arr.size(); ++i) {
@@ -319,7 +319,7 @@ static jobjectArray MakeJObject(JNIEnv *env, jobject inst,
 }
 
 static jobjectArray MakeJObject(JNIEnv *env, jobject inst,
-                                llvm::ArrayRef<nt::RpcAnswer> arr) {
+                                wpi::ArrayRef<nt::RpcAnswer> arr) {
   jobjectArray jarr = env->NewObjectArray(arr.size(), rpcAnswerCls, nullptr);
   if (!jarr) return nullptr;
   for (size_t i = 0; i < arr.size(); ++i) {
@@ -1593,8 +1593,8 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI
   std::vector<std::string> warns;
   const char* err = nt::LoadPersistent(inst, JStringRef{env, filename}.str(),
                                        [&](size_t line, const char* msg) {
-                                         llvm::SmallString<128> warn;
-                                         llvm::raw_svector_ostream oss(warn);
+                                         wpi::SmallString<128> warn;
+                                         wpi::raw_svector_ostream oss(warn);
                                          oss << line << ": " << msg;
                                          warns.emplace_back(oss.str());
                                        });
@@ -1646,8 +1646,8 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI
   const char* err = nt::LoadEntries(inst, JStringRef{env, filename}.str(),
                                     JStringRef{env, prefix}.str(),
                                     [&](size_t line, const char* msg) {
-                                      llvm::SmallString<128> warn;
-                                      llvm::raw_svector_ostream oss(warn);
+                                      wpi::SmallString<128> warn;
+                                      wpi::raw_svector_ostream oss(warn);
                                       oss << line << ": " << msg;
                                       warns.emplace_back(oss.str());
                                     });

@@ -16,8 +16,8 @@
 #include <cstring>
 #include <string>
 
-#include <support/condition_variable.h>
-#include <support/mutex.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
 
 #include "MockData/DriverStationDataInternal.h"
 #include "MockData/MockHooks.h"

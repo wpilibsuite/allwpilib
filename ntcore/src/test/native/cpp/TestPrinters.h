@@ -11,17 +11,17 @@
 #include <memory>
 #include <ostream>
 
-#include <llvm/StringRef.h>
+#include <wpi/StringRef.h>
 
 #include "gtest/gtest.h"
 
-namespace llvm {
+namespace wpi {
 
 inline void PrintTo(StringRef str, ::std::ostream* os) {
   ::testing::internal::PrintStringTo(str.str(), os);
 }
 
-}  // namespace llvm
+}  // namespace wpi
 
 namespace nt {
 

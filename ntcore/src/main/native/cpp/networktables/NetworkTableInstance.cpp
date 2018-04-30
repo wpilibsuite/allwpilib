@@ -7,7 +7,7 @@
 
 #include "networktables/NetworkTableInstance.h"
 
-#include <llvm/SmallString.h>
+#include <wpi/SmallString.h>
 
 using namespace nt;
 
@@ -31,7 +31,7 @@ std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
 
 void NetworkTableInstance::StartClient(ArrayRef<StringRef> servers,
                                        unsigned int port) {
-  llvm::SmallVector<std::pair<StringRef, unsigned int>, 8> server_ports;
+  wpi::SmallVector<std::pair<StringRef, unsigned int>, 8> server_ports;
   for (const auto& server : servers)
     server_ports.emplace_back(std::make_pair(server, port));
   StartClient(server_ports);
@@ -39,7 +39,7 @@ void NetworkTableInstance::StartClient(ArrayRef<StringRef> servers,
 
 void NetworkTableInstance::SetServer(ArrayRef<StringRef> servers,
                                      unsigned int port) {
-  llvm::SmallVector<std::pair<StringRef, unsigned int>, 8> server_ports;
+  wpi::SmallVector<std::pair<StringRef, unsigned int>, 8> server_ports;
   for (const auto& server : servers)
     server_ports.emplace_back(std::make_pair(server, port));
   SetServer(server_ports);

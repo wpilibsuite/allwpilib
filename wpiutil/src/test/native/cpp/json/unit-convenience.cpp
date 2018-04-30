@@ -34,11 +34,10 @@ SOFTWARE.
 
 #include "gtest/gtest.h"
 
-#include "llvm/SmallString.h"
+#include "wpi/SmallString.h"
 
 #include "unit-json.h"
-
-#include "support/json_serializer.h"
+#include "json_serializer.h"
 
 using wpi::json;
 
@@ -68,11 +67,11 @@ class JsonStringEscapeTest
     : public ::testing::TestWithParam<std::pair<const char*, const char*>> {};
 TEST_P(JsonStringEscapeTest, Case)
 {
-    llvm::SmallString<32> buf;
-    llvm::raw_svector_ostream ss(buf);
+    wpi::SmallString<32> buf;
+    wpi::raw_svector_ostream ss(buf);
     json::serializer s(ss);
     s.dump_escaped(GetParam().first);
-    EXPECT_EQ(ss.str(), llvm::StringRef(GetParam().second));
+    EXPECT_EQ(ss.str(), wpi::StringRef(GetParam().second));
 }
 
 static const std::pair<const char*, const char*> string_escape_cases[] = {

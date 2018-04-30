@@ -7,11 +7,11 @@
 
 #include "CvSourceImpl.h"
 
-#include <llvm/STLExtras.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <support/timestamp.h>
+#include <wpi/STLExtras.h>
+#include <wpi/timestamp.h>
 
 #include "Handle.h"
 #include "Log.h"
@@ -21,7 +21,7 @@
 
 using namespace cs;
 
-CvSourceImpl::CvSourceImpl(llvm::StringRef name, const VideoMode& mode)
+CvSourceImpl::CvSourceImpl(wpi::StringRef name, const VideoMode& mode)
     : SourceImpl{name} {
   m_mode = mode;
   m_videoModes.push_back(m_mode);
@@ -32,8 +32,8 @@ CvSourceImpl::~CvSourceImpl() {}
 void CvSourceImpl::Start() {}
 
 std::unique_ptr<PropertyImpl> CvSourceImpl::CreateEmptyProperty(
-    llvm::StringRef name) const {
-  return llvm::make_unique<PropertyData>(name);
+    wpi::StringRef name) const {
+  return wpi::make_unique<PropertyData>(name);
 }
 
 bool CvSourceImpl::CacheProperties(CS_Status* status) const {
@@ -59,10 +59,10 @@ void CvSourceImpl::SetProperty(int property, int value, CS_Status* status) {
     return;
   }
 
-  UpdatePropertyValue(property, false, value, llvm::StringRef{});
+  UpdatePropertyValue(property, false, value, wpi::StringRef{});
 }
 
-void CvSourceImpl::SetStringProperty(int property, llvm::StringRef value,
+void CvSourceImpl::SetStringProperty(int property, wpi::StringRef value,
                                      CS_Status* status) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = static_cast<PropertyData*>(GetProperty(property));
@@ -168,11 +168,11 @@ void CvSourceImpl::PutFrame(cv::Mat& image) {
   SourceImpl::PutFrame(std::move(dest), wpi::Now());
 }
 
-void CvSourceImpl::NotifyError(llvm::StringRef msg) {
+void CvSourceImpl::NotifyError(wpi::StringRef msg) {
   PutError(msg, wpi::Now());
 }
 
-int CvSourceImpl::CreateProperty(llvm::StringRef name, CS_PropertyKind kind,
+int CvSourceImpl::CreateProperty(wpi::StringRef name, CS_PropertyKind kind,
                                  int minimum, int maximum, int step,
                                  int defaultValue, int value) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
@@ -180,7 +180,7 @@ int CvSourceImpl::CreateProperty(llvm::StringRef name, CS_PropertyKind kind,
   if (ndx == 0) {
     // create a new index
     ndx = m_propertyData.size() + 1;
-    m_propertyData.emplace_back(llvm::make_unique<PropertyData>(
+    m_propertyData.emplace_back(wpi::make_unique<PropertyData>(
         name, kind, minimum, maximum, step, defaultValue, value));
   } else {
     // update all but value
@@ -194,12 +194,12 @@ int CvSourceImpl::CreateProperty(llvm::StringRef name, CS_PropertyKind kind,
   }
   Notifier::GetInstance().NotifySourceProperty(
       *this, CS_SOURCE_PROPERTY_CREATED, name, ndx, kind, value,
-      llvm::StringRef{});
+      wpi::StringRef{});
   return ndx;
 }
 
 int CvSourceImpl::CreateProperty(
-    llvm::StringRef name, CS_PropertyKind kind, int minimum, int maximum,
+    wpi::StringRef name, CS_PropertyKind kind, int minimum, int maximum,
     int step, int defaultValue, int value,
     std::function<void(CS_Property property)> onChange) {
   // TODO
@@ -207,7 +207,7 @@ int CvSourceImpl::CreateProperty(
 }
 
 void CvSourceImpl::SetEnumPropertyChoices(int property,
-                                          llvm::ArrayRef<std::string> choices,
+                                          wpi::ArrayRef<std::string> choices,
                                           CS_Status* status) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
@@ -222,12 +222,12 @@ void CvSourceImpl::SetEnumPropertyChoices(int property,
   prop->enumChoices = choices;
   Notifier::GetInstance().NotifySourceProperty(
       *this, CS_SOURCE_PROPERTY_CHOICES_UPDATED, prop->name, property,
-      CS_PROP_ENUM, prop->value, llvm::StringRef{});
+      CS_PROP_ENUM, prop->value, wpi::StringRef{});
 }
 
 namespace cs {
 
-CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
+CS_Source CreateCvSource(wpi::StringRef name, const VideoMode& mode,
                          CS_Status* status) {
   auto source = std::make_shared<CvSourceImpl>(name, mode);
   auto handle = Sources::GetInstance().Allocate(CS_SOURCE_CV, source);
@@ -250,7 +250,7 @@ void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status) {
   static_cast<CvSourceImpl&>(*data->source).PutFrame(image);
 }
 
-void NotifySourceError(CS_Source source, llvm::StringRef msg,
+void NotifySourceError(CS_Source source, wpi::StringRef msg,
                        CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data || data->kind != CS_SOURCE_CV) {
@@ -269,7 +269,7 @@ void SetSourceConnected(CS_Source source, bool connected, CS_Status* status) {
   static_cast<CvSourceImpl&>(*data->source).SetConnected(connected);
 }
 
-void SetSourceDescription(CS_Source source, llvm::StringRef description,
+void SetSourceDescription(CS_Source source, wpi::StringRef description,
                           CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data || data->kind != CS_SOURCE_CV) {
@@ -279,7 +279,7 @@ void SetSourceDescription(CS_Source source, llvm::StringRef description,
   static_cast<CvSourceImpl&>(*data->source).SetDescription(description);
 }
 
-CS_Property CreateSourceProperty(CS_Source source, llvm::StringRef name,
+CS_Property CreateSourceProperty(CS_Source source, wpi::StringRef name,
                                  CS_PropertyKind kind, int minimum, int maximum,
                                  int step, int defaultValue, int value,
                                  CS_Status* status) {
@@ -295,7 +295,7 @@ CS_Property CreateSourceProperty(CS_Source source, llvm::StringRef name,
 }
 
 CS_Property CreateSourcePropertyCallback(
-    CS_Source source, llvm::StringRef name, CS_PropertyKind kind, int minimum,
+    CS_Source source, wpi::StringRef name, CS_PropertyKind kind, int minimum,
     int maximum, int step, int defaultValue, int value,
     std::function<void(CS_Property property)> onChange, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
@@ -310,7 +310,7 @@ CS_Property CreateSourcePropertyCallback(
 }
 
 void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
-                                  llvm::ArrayRef<std::string> choices,
+                                  wpi::ArrayRef<std::string> choices,
                                   CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data || data->kind != CS_SOURCE_CV) {
@@ -390,7 +390,7 @@ CS_Property CS_CreateSourcePropertyCallback(
 void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
                                      const char** choices, int count,
                                      CS_Status* status) {
-  llvm::SmallVector<std::string, 8> vec;
+  wpi::SmallVector<std::string, 8> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) vec.push_back(choices[i]);
   return cs::SetSourceEnumPropertyChoices(source, property, vec, status);

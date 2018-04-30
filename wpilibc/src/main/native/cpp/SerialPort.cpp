@@ -73,14 +73,14 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
  * @param stopBits The number of stop bits to use as defined by the enum
  *                 StopBits.
  */
-SerialPort::SerialPort(int baudRate, llvm::StringRef portName, Port port,
+SerialPort::SerialPort(int baudRate, wpi::StringRef portName, Port port,
                        int dataBits, SerialPort::Parity parity,
                        SerialPort::StopBits stopBits) {
   int32_t status = 0;
 
   m_port = port;
 
-  llvm::SmallVector<char, 64> buf;
+  wpi::SmallVector<char, 64> buf;
   const char* portNameC = portName.c_str(buf);
 
   HAL_InitializeSerialPortDirect(static_cast<HAL_SerialPort>(port), portNameC,
@@ -194,7 +194,7 @@ int SerialPort::Read(char* buffer, int count) {
  * @return The number of bytes actually written into the port.
  */
 int SerialPort::Write(const char* buffer, int count) {
-  return Write(llvm::StringRef(buffer, static_cast<size_t>(count)));
+  return Write(wpi::StringRef(buffer, static_cast<size_t>(count)));
 }
 
 /**
@@ -206,7 +206,7 @@ int SerialPort::Write(const char* buffer, int count) {
  * @param buffer StringRef to the buffer to read the bytes from.
  * @return The number of bytes actually written into the port.
  */
-int SerialPort::Write(llvm::StringRef buffer) {
+int SerialPort::Write(wpi::StringRef buffer) {
   int32_t status = 0;
   int retVal = HAL_WriteSerial(static_cast<HAL_SerialPort>(m_port),
                                buffer.data(), buffer.size(), &status);

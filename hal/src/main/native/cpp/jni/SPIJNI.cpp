@@ -13,7 +13,7 @@
 
 #include "HAL/SPI.h"
 #include "HALUtil.h"
-#include "support/jni_util.h"
+#include "wpi/jni_util.h"
 
 using namespace frc;
 using namespace wpi::java;
@@ -79,7 +79,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiTransactionB(
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiTransactionB";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
-  llvm::SmallVector<uint8_t, 128> recvBuf;
+  wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(size);
   jint retVal =
       HAL_TransactionSPI(static_cast<HAL_SPIPort>(port),
@@ -146,7 +146,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiRead(
   SPIJNI_LOG(logDEBUG) << "DataReceivedPtr = " << dataReceivedPtr;
   jint retVal;
   if (initiate) {
-    llvm::SmallVector<uint8_t, 128> sendBuf;
+    wpi::SmallVector<uint8_t, 128> sendBuf;
     sendBuf.resize(size);
     retVal = HAL_TransactionSPI(static_cast<HAL_SPIPort>(port), sendBuf.data(), dataReceivedPtr, size);
   } else {
@@ -168,10 +168,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiReadB(
   SPIJNI_LOG(logDEBUG) << "Initiate = " << (jboolean)initiate;
   SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
   jint retVal;
-  llvm::SmallVector<uint8_t, 128> recvBuf;
+  wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(size);
   if (initiate) {
-    llvm::SmallVector<uint8_t, 128> sendBuf;
+    wpi::SmallVector<uint8_t, 128> sendBuf;
     sendBuf.resize(size);
     retVal = HAL_TransactionSPI(static_cast<HAL_SPIPort>(port), sendBuf.data(), recvBuf.data(), size);
   } else {
@@ -404,7 +404,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiReadAutoReceived
   SPIJNI_LOG(logDEBUG) << "Port = " << port;
   SPIJNI_LOG(logDEBUG) << "NumToRead = " << numToRead;
   SPIJNI_LOG(logDEBUG) << "Timeout = " << timeout;
-  llvm::SmallVector<uint8_t, 128> recvBuf;
+  wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(numToRead);
   int32_t status = 0;
   jint retval = HAL_ReadSPIAutoReceivedData(static_cast<HAL_SPIPort>(port), recvBuf.data(), numToRead, timeout, &status);

@@ -12,7 +12,7 @@
 
 using namespace cs;
 
-SinkImpl::SinkImpl(llvm::StringRef name) : m_name{name} {}
+SinkImpl::SinkImpl(wpi::StringRef name) : m_name{name} {}
 
 SinkImpl::~SinkImpl() {
   if (m_source) {
@@ -21,16 +21,16 @@ SinkImpl::~SinkImpl() {
   }
 }
 
-void SinkImpl::SetDescription(llvm::StringRef description) {
+void SinkImpl::SetDescription(wpi::StringRef description) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   m_description = description;
 }
 
-llvm::StringRef SinkImpl::GetDescription(
-    llvm::SmallVectorImpl<char>& buf) const {
+wpi::StringRef SinkImpl::GetDescription(
+    wpi::SmallVectorImpl<char>& buf) const {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
-  return llvm::StringRef{buf.data(), buf.size()};
+  return wpi::StringRef{buf.data(), buf.size()};
 }
 
 void SinkImpl::Enable() {
@@ -87,14 +87,14 @@ std::string SinkImpl::GetError() const {
   return m_source->GetCurFrame().GetError();
 }
 
-llvm::StringRef SinkImpl::GetError(llvm::SmallVectorImpl<char>& buf) const {
+wpi::StringRef SinkImpl::GetError(wpi::SmallVectorImpl<char>& buf) const {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   if (!m_source) return "no source connected";
   // Make a copy as it's shared data
-  llvm::StringRef error = m_source->GetCurFrame().GetError();
+  wpi::StringRef error = m_source->GetCurFrame().GetError();
   buf.clear();
   buf.append(error.data(), error.data() + error.size());
-  return llvm::StringRef{buf.data(), buf.size()};
+  return wpi::StringRef{buf.data(), buf.size()};
 }
 
 void SinkImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {}

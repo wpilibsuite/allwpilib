@@ -41,7 +41,7 @@ bool impl::EntryNotifierThread::Matches(const EntryListenerData& listener,
   // must match local id or prefix
   if (listener.entry != 0 && data.entry != listener.entry) return false;
   if (listener.entry == 0 &&
-      !llvm::StringRef(data.name).startswith(listener.prefix))
+      !wpi::StringRef(data.name).startswith(listener.prefix))
     return false;
 
   return true;
@@ -62,7 +62,7 @@ unsigned int EntryNotifier::Add(
 }
 
 unsigned int EntryNotifier::AddPolled(unsigned int poller_uid,
-                                      llvm::StringRef prefix,
+                                      wpi::StringRef prefix,
                                       unsigned int flags) {
   if ((flags & NT_NOTIFY_LOCAL) != 0) m_local_notifiers = true;
   return DoAdd(poller_uid, prefix, flags);

@@ -14,11 +14,11 @@
 #include <string>
 #include <vector>
 
-#include <llvm/DenseMap.h>
-#include <llvm/StringMap.h>
-#include <llvm/StringRef.h>
 #include <networktables/NetworkTable.h>
-#include <support/mutex.h>
+#include <wpi/DenseMap.h>
+#include <wpi/StringMap.h>
+#include <wpi/StringRef.h>
+#include <wpi/mutex.h>
 
 #include "cscore.h"
 
@@ -72,7 +72,7 @@ class CameraServer {
    * @param name The name to give the camera
    * @param dev  The device number of the camera interface
    */
-  cs::UsbCamera StartAutomaticCapture(llvm::StringRef name, int dev);
+  cs::UsbCamera StartAutomaticCapture(wpi::StringRef name, int dev);
 
   /**
    * Start automatically capturing images to send to the dashboard.
@@ -80,8 +80,8 @@ class CameraServer {
    * @param name The name to give the camera
    * @param path The device path (e.g. "/dev/video0") of the camera
    */
-  cs::UsbCamera StartAutomaticCapture(llvm::StringRef name,
-                                      llvm::StringRef path);
+  cs::UsbCamera StartAutomaticCapture(wpi::StringRef name,
+                                      wpi::StringRef path);
 #endif
 
   /**
@@ -99,7 +99,7 @@ class CameraServer {
    *
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
-  cs::AxisCamera AddAxisCamera(llvm::StringRef host);
+  cs::AxisCamera AddAxisCamera(wpi::StringRef host);
 
   /**
    * Adds an Axis IP camera.
@@ -126,7 +126,7 @@ class CameraServer {
    *
    * @param hosts Array of Camera host IPs/DNS names
    */
-  cs::AxisCamera AddAxisCamera(llvm::ArrayRef<std::string> hosts);
+  cs::AxisCamera AddAxisCamera(wpi::ArrayRef<std::string> hosts);
 
   /**
    * Adds an Axis IP camera.
@@ -144,7 +144,7 @@ class CameraServer {
    * @param name The name to give the camera
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
-  cs::AxisCamera AddAxisCamera(llvm::StringRef name, llvm::StringRef host);
+  cs::AxisCamera AddAxisCamera(wpi::StringRef name, wpi::StringRef host);
 
   /**
    * Adds an Axis IP camera.
@@ -152,7 +152,7 @@ class CameraServer {
    * @param name The name to give the camera
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
-  cs::AxisCamera AddAxisCamera(llvm::StringRef name, const char* host);
+  cs::AxisCamera AddAxisCamera(wpi::StringRef name, const char* host);
 
   /**
    * Adds an Axis IP camera.
@@ -160,7 +160,7 @@ class CameraServer {
    * @param name The name to give the camera
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
-  cs::AxisCamera AddAxisCamera(llvm::StringRef name, const std::string& host);
+  cs::AxisCamera AddAxisCamera(wpi::StringRef name, const std::string& host);
 
   /**
    * Adds an Axis IP camera.
@@ -168,8 +168,8 @@ class CameraServer {
    * @param name The name to give the camera
    * @param hosts Array of Camera host IPs/DNS names
    */
-  cs::AxisCamera AddAxisCamera(llvm::StringRef name,
-                               llvm::ArrayRef<std::string> hosts);
+  cs::AxisCamera AddAxisCamera(wpi::StringRef name,
+                               wpi::ArrayRef<std::string> hosts);
 
   /**
    * Adds an Axis IP camera.
@@ -178,7 +178,7 @@ class CameraServer {
    * @param hosts Array of Camera host IPs/DNS names
    */
   template <typename T>
-  cs::AxisCamera AddAxisCamera(llvm::StringRef name,
+  cs::AxisCamera AddAxisCamera(wpi::StringRef name,
                                std::initializer_list<T> hosts);
 
   /**
@@ -204,7 +204,7 @@ class CameraServer {
    *
    * @param name Camera name
    */
-  cs::CvSink GetVideo(llvm::StringRef name);
+  cs::CvSink GetVideo(wpi::StringRef name);
 
   /**
    * Create a MJPEG stream with OpenCV input. This can be called to pass custom
@@ -214,21 +214,21 @@ class CameraServer {
    * @param width Width of the image being sent
    * @param height Height of the image being sent
    */
-  cs::CvSource PutVideo(llvm::StringRef name, int width, int height);
+  cs::CvSource PutVideo(wpi::StringRef name, int width, int height);
 
   /**
    * Adds a MJPEG server at the next available port.
    *
    * @param name Server name
    */
-  cs::MjpegServer AddServer(llvm::StringRef name);
+  cs::MjpegServer AddServer(wpi::StringRef name);
 
   /**
    * Adds a MJPEG server.
    *
    * @param name Server name
    */
-  cs::MjpegServer AddServer(llvm::StringRef name, int port);
+  cs::MjpegServer AddServer(wpi::StringRef name, int port);
 
   /**
    * Adds an already created server.
@@ -242,7 +242,7 @@ class CameraServer {
    *
    * @param name Server name
    */
-  void RemoveServer(llvm::StringRef name);
+  void RemoveServer(wpi::StringRef name);
 
   /**
    * Get server for the primary camera feed.
@@ -257,7 +257,7 @@ class CameraServer {
    *
    * @param name Server name
    */
-  cs::VideoSink GetServer(llvm::StringRef name);
+  cs::VideoSink GetServer(wpi::StringRef name);
 
   /**
    * Adds an already created camera.
@@ -271,7 +271,7 @@ class CameraServer {
    *
    * @param name Camera name
    */
-  void RemoveCamera(llvm::StringRef name);
+  void RemoveCamera(wpi::StringRef name);
 
   /**
    * Sets the size of the image to use. Use the public kSize constants to set
@@ -297,9 +297,9 @@ class CameraServer {
   wpi::mutex m_mutex;
   std::atomic<int> m_defaultUsbDevice;
   std::string m_primarySourceName;
-  llvm::StringMap<cs::VideoSource> m_sources;
-  llvm::StringMap<cs::VideoSink> m_sinks;
-  llvm::DenseMap<CS_Source, std::shared_ptr<nt::NetworkTable>> m_tables;
+  wpi::StringMap<cs::VideoSource> m_sources;
+  wpi::StringMap<cs::VideoSink> m_sinks;
+  wpi::DenseMap<CS_Source, std::shared_ptr<nt::NetworkTable>> m_tables;
   std::shared_ptr<nt::NetworkTable> m_publishTable;
   cs::VideoListener m_videoListener;
   int m_tableListener;
