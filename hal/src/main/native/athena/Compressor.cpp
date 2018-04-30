@@ -9,6 +9,7 @@
 
 #include "HAL/Errors.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "PCMInternal.h"
 #include "PortsInternal.h"
 #include "ctre/PCM.h"
@@ -24,6 +25,7 @@ void InitializeCompressor() {}
 extern "C" {
 
 HAL_CompressorHandle HAL_InitializeCompressor(int32_t module, int32_t* status) {
+  hal::init::CheckInit();
   // Use status to check for invalid index
   initializePCM(module, status);
   if (*status != 0) {

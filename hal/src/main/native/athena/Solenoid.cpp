@@ -14,6 +14,7 @@
 #include "HAL/Ports.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/IndexedHandleResource.h"
+#include "HALInitializer.h"
 #include "PCMInternal.h"
 #include "PortsInternal.h"
 #include "ctre/PCM.h"
@@ -49,6 +50,7 @@ extern "C" {
 
 HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
                                               int32_t* status) {
+  hal::init::CheckInit();
   int16_t channel = getPortHandleChannel(portHandle);
   int16_t module = getPortHandleModule(portHandle);
   if (channel == InvalidHandleIndex) {

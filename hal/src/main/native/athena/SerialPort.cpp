@@ -10,6 +10,7 @@
 #include <string>
 
 #include "HAL/cpp/SerialHelper.h"
+#include "HALInitializer.h"
 #include "visa/visa.h"
 
 static int32_t resourceManagerHandle{0};
@@ -24,6 +25,7 @@ void InitializeSerialPort() {}
 extern "C" {
 
 void HAL_InitializeSerialPort(HAL_SerialPort port, int32_t* status) {
+  hal::init::CheckInit();
   std::string portName;
 
   if (resourceManagerHandle == 0)

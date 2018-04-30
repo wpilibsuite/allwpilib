@@ -18,6 +18,7 @@
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"
 #include "HAL/HAL.h"
+#include "HALInitializer.h"
 
 using namespace hal;
 
@@ -46,6 +47,7 @@ extern "C" {
  * @param port The port to open, 0 for the on-board, 1 for the MXP.
  */
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
+  hal::init::CheckInit();
   initializeDigital(status);
   if (*status != 0) return;
 

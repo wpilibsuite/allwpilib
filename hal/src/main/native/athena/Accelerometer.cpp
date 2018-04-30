@@ -15,6 +15,7 @@
 
 #include "HAL/ChipObject.h"
 #include "HAL/HAL.h"
+#include "HALInitializer.h"
 
 using namespace hal;
 
@@ -92,6 +93,7 @@ static uint8_t readRegister(Register reg);
  * Initialize the accelerometer.
  */
 static void initializeAccelerometer() {
+  hal::init::CheckInit();
   int32_t status;
 
   if (!accel) {

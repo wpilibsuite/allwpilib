@@ -18,6 +18,7 @@
 #include "HAL/Errors.h"
 #include "HAL/HAL.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
+#include "HALInitializer.h"
 
 using namespace hal;
 
@@ -113,6 +114,7 @@ void InitializeNotifier() {
 extern "C" {
 
 HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
+  hal::init::CheckInit();
   if (!notifierAtexitRegistered.test_and_set())
     std::atexit(cleanupNotifierAtExit);
 

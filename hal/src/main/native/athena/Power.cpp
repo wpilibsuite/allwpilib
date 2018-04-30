@@ -10,6 +10,7 @@
 #include <memory>
 
 #include "HAL/ChipObject.h"
+#include "HALInitializer.h"
 
 using namespace hal;
 
@@ -18,6 +19,7 @@ namespace hal {
 static std::unique_ptr<tPower> power{nullptr};
 
 static void initializePower(int32_t* status) {
+  hal::init::CheckInit();
   if (power == nullptr) {
     power.reset(tPower::create(status));
   }

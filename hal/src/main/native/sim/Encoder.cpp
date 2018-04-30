@@ -12,6 +12,7 @@
 #include "HAL/Errors.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
+#include "HALInitializer.h"
 #include "MockData/EncoderDataInternal.h"
 #include "PortsInternal.h"
 
@@ -56,6 +57,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(
     HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
     HAL_Bool reverseDirection, HAL_EncoderEncodingType encodingType,
     int32_t* status) {
+  hal::init::CheckInit();
   HAL_Handle nativeHandle = HAL_kInvalidHandle;
   if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
     // k4x, allocate encoder

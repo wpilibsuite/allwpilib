@@ -13,6 +13,7 @@
 
 #include "HAL/AnalogInput.h"
 #include "HAL/ChipObject.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 namespace hal {
@@ -44,6 +45,7 @@ void InitializeAnalogInternal() {
  * Initialize the analog System.
  */
 void initializeAnalog(int32_t* status) {
+  hal::init::CheckInit();
   if (analogSystemInitialized) return;
   std::lock_guard<wpi::mutex> lock(analogRegisterWindowMutex);
   if (analogSystemInitialized) return;

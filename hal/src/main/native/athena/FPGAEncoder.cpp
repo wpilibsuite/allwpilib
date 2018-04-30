@@ -11,6 +11,7 @@
 
 #include "DigitalInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 using namespace hal;
@@ -46,6 +47,7 @@ HAL_FPGAEncoderHandle HAL_InitializeFPGAEncoder(
     HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
     HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
     HAL_Bool reverseDirection, int32_t* index, int32_t* status) {
+  hal::init::CheckInit();
   bool routingAnalogTriggerA = false;
   uint8_t routingChannelA = 0;
   uint8_t routingModuleA = 0;
