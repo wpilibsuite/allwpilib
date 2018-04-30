@@ -7,11 +7,10 @@
 
 #pragma once
 
-#include <atomic>
-#include <memory>
+#include <HAL/Notifier.h>
 
+#include "ErrorBase.h"
 #include "IterativeRobotBase.h"
-#include "Notifier.h"
 
 namespace frc {
 
@@ -24,7 +23,7 @@ namespace frc {
  * Periodic() functions from the base class are called on an interval by a
  * Notifier instance.
  */
-class TimedRobot : public IterativeRobotBase {
+class TimedRobot : public IterativeRobotBase, public ErrorBase {
  public:
   static constexpr double kDefaultPeriod = 0.02;
 
@@ -35,15 +34,21 @@ class TimedRobot : public IterativeRobotBase {
 
  protected:
   TimedRobot();
-  virtual ~TimedRobot();
+  ~TimedRobot() override;
 
  private:
-  std::atomic<double> m_period{kDefaultPeriod};
-
   // Prevents loop from starting if user calls SetPeriod() in RobotInit()
   bool m_startLoop = false;
 
-  std::unique_ptr<Notifier> m_loop;
+  HAL_NotifierHandle m_notifier{0};
+
+  // The absolute expiration time
+  double m_expirationTime = 0;
+
+  // The relative time
+  double m_period = kDefaultPeriod;
+
+  void UpdateAlarm();
 };
 
 }  // namespace frc
