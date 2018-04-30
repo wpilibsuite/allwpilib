@@ -15,7 +15,6 @@
 #include <support/mutex.h>
 
 #include "HAL/Types.h"
-#include "HAL/cpp/make_unique.h"
 #include "HandlesInternal.h"
 
 namespace hal {

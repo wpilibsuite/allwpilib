@@ -17,7 +17,6 @@
 #include "HAL/ChipObject.h"
 #include "HAL/Errors.h"
 #include "HAL/HAL.h"
-#include "HAL/cpp/make_unique.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
 
 using namespace hal;

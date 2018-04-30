@@ -16,7 +16,6 @@
 
 #include "HAL/Errors.h"
 #include "HAL/Types.h"
-#include "HAL/cpp/make_unique.h"
 #include "HAL/handles/HandlesInternal.h"
 
 namespace hal {

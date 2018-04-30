@@ -15,7 +15,6 @@
 
 #include "HAL/HAL.h"
 #include "HAL/cpp/fpga_clock.h"
-#include "HAL/cpp/make_unique.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
 
 namespace {

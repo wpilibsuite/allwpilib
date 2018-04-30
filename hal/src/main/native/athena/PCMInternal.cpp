@@ -9,7 +9,6 @@
 
 #include "HAL/Errors.h"
 #include "HAL/Solenoid.h"
-#include "HAL/cpp/make_unique.h"
 #include "PortsInternal.h"
 
 namespace hal {
