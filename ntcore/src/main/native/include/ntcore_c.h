@@ -10,7 +10,11 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
 #include <cstddef>
+#else
+#include <stddef.h>
+#endif
 
 #include <wpi/deprecated.h>
 
@@ -192,9 +196,9 @@ struct NT_RpcDefinition {
   unsigned int version;
   struct NT_String name;
   size_t num_params;
-  NT_RpcParamDef* params;
+  struct NT_RpcParamDef* params;
   size_t num_results;
-  NT_RpcResultDef* results;
+  struct NT_RpcResultDef* results;
 };
 
 /** NetworkTables RPC Call Data */
@@ -485,7 +489,7 @@ NT_Bool NT_GetEntryInfoHandle(NT_Entry entry, struct NT_EntryInfo* info);
  * @param event           event information
  */
 typedef void (*NT_EntryListenerCallback)(void* data,
-                                         const NT_EntryNotification* event);
+                                         const struct NT_EntryNotification* event);
 
 /**
  * Add a listener for all entries starting with a certain prefix.
@@ -934,7 +938,7 @@ char* NT_PackRpcValues(const struct NT_Value** values, size_t values_len,
  * @return Array of NT_Value's.
  */
 struct NT_Value** NT_UnpackRpcValues(const char* packed, size_t packed_len,
-                                     const NT_Type* types, size_t types_len);
+                                     const enum NT_Type* types, size_t types_len);
 
 /** @} */
 
@@ -1623,8 +1627,8 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
  * but the entire array should be freed at once. The NT_FreeStringArray()
  * function will free all the NT_Strings.
  */
-NT_String* NT_GetValueStringArray(const struct NT_Value* value,
-                                  uint64_t* last_change, size_t* arr_size);
+struct NT_String* NT_GetValueStringArray(const struct NT_Value* value,
+                                         uint64_t* last_change, size_t* arr_size);
 
 /**
  * Returns the boolean currently assigned to the entry name.
@@ -1732,8 +1736,8 @@ double* NT_GetEntryDoubleArray(NT_Entry entry, uint64_t* last_change,
  * should be freed at once. The NT_FreeStringArray() function will free all the
  * NT_Strings.
  */
-NT_String* NT_GetEntryStringArray(NT_Entry entry, uint64_t* last_change,
-                                  size_t* arr_size);
+struct NT_String* NT_GetEntryStringArray(NT_Entry entry, uint64_t* last_change,
+                                         size_t* arr_size);
 
 /** @} */
 
