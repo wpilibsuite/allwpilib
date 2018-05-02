@@ -1,0 +1,9 @@
+include(CMakeFindDependencyMacro)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_dependency(Threads)
+find_dependency(wpiutil)
+find_dependency(ntcore)
+@CSCORE_DEP_REPLACE@
+@CAMERASERVER_DEP_REPLACE@
+@HAL_DEP_REPLACE@
+@WPILIBC_DEP_REPLACE@
