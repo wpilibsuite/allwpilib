@@ -7,9 +7,13 @@
 
 #include "HAL/DIO.h"
 
+#include <wpi/raw_ostream.h>
+
 #include <cmath>
+#include <thread>
 
 #include "DigitalInternal.h"
+#include "HAL/cpp/fpga_clock.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
 #include "PortsInternal.h"
@@ -124,8 +128,21 @@ HAL_Bool HAL_CheckDIOChannel(int32_t channel) {
 void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   // no status, so no need to check for a proper free.
-  digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) return;
+  digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
+
+  // Wait for no other object to hold this handle.
+  auto start = hal::fpga_clock::now();
+  while (port.use_count() != 1) {
+    auto current = hal::fpga_clock::now();
+    if (start + std::chrono::seconds(1) < current) {
+      wpi::outs() << "DIO handle free timeout\n";
+      wpi::outs().flush();
+      break;
+    }
+    std::this_thread::yield();
+  }
+
   int32_t status = 0;
   std::lock_guard<wpi::mutex> lock(digitalDIOMutex);
   if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {

@@ -7,10 +7,14 @@
 
 #include "HAL/PWM.h"
 
+#include <wpi/raw_ostream.h>
+
 #include <cmath>
+#include <thread>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
+#include "HAL/cpp/fpga_clock.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "PortsInternal.h"
 
@@ -116,6 +120,20 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return;
   }
 
+  digitalChannelHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
+
+  // Wait for no other object to hold this handle.
+  auto start = hal::fpga_clock::now();
+  while (port.use_count() != 1) {
+    auto current = hal::fpga_clock::now();
+    if (start + std::chrono::seconds(1) < current) {
+      wpi::outs() << "PWM handle free timeout\n";
+      wpi::outs().flush();
+      break;
+    }
+    std::this_thread::yield();
+  }
+
   if (port->channel > tPWM::kNumHdrRegisters - 1) {
     int32_t bitToUnset = 1 << remapMXPPWMChannel(port->channel);
     uint16_t specialFunctions =
@@ -123,8 +141,6 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToUnset,
                                                  status);
   }
-
-  digitalChannelHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
 }
 
 HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
