@@ -13,7 +13,7 @@
 #include "SetPivotSetpoint.h"
 
 LowGoal::LowGoal() {
-	AddSequential(new SetPivotSetpoint(Pivot::kLowGoal));
-	AddSequential(new SetCollectionSpeed(Collector::kReverse));
-	AddSequential(new ExtendShooter());
+  AddSequential(new SetPivotSetpoint(Pivot::kLowGoal));
+  AddSequential(new SetCollectionSpeed(Collector::kReverse));
+  AddSequential(new ExtendShooter());
 }

@@ -7,11 +7,12 @@
 
 #include "CvSourceImpl.h"
 
+#include <wpi/STLExtras.h>
+#include <wpi/timestamp.h>
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <wpi/STLExtras.h>
-#include <wpi/timestamp.h>
 
 #include "Handle.h"
 #include "Log.h"

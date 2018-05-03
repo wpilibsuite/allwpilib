@@ -8,12 +8,6 @@ cppSrcFileInclude {
   \.cpp$
 }
 
-generatedFileExclude {
-  gmock/
-  src/arm-linux-jni/
-  src/main/native/cpp/jni/CameraServerJNI\.cpp$
-}
-
 licenseUpdateExclude {
   src/main/native/cpp/default_init_allocator\.h$
 }

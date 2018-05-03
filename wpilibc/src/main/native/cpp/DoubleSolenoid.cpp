@@ -42,9 +42,8 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
       m_forwardChannel(forwardChannel),
       m_reverseChannel(reverseChannel) {
   if (!SensorBase::CheckSolenoidModule(m_moduleNumber)) {
-    wpi_setWPIErrorWithContext(
-        ModuleIndexOutOfRange,
-        "Solenoid Module " + wpi::Twine(m_moduleNumber));
+    wpi_setWPIErrorWithContext(ModuleIndexOutOfRange,
+                               "Solenoid Module " + wpi::Twine(m_moduleNumber));
     return;
   }
   if (!SensorBase::CheckSolenoidChannel(m_forwardChannel)) {

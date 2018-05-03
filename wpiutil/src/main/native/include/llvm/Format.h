@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/Format.h is deprecated; include wpi/Format.h instead"
+#pragma message \
+    "warning: llvm/Format.h is deprecated; include wpi/Format.h instead"
 #else
 #warning "llvm/Format.h is deprecated; include wpi/Format.h instead"
 #endif

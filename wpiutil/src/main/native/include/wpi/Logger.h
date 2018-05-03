@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_LOGGER_H_
-#define WPIUTIL_SUPPORT_LOGGER_H_
+#ifndef ALLWPILIB_WPI_LOGGER_H_
+#define ALLWPILIB_WPI_LOGGER_H_
 
 #include <functional>
 
@@ -97,4 +97,4 @@ class Logger {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_LOGGER_H_
+#endif  // ALLWPILIB_WPI_LOGGER_H_

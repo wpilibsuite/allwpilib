@@ -17,46 +17,45 @@
  * (field-oriented controls).
  */
 class Robot : public frc::IterativeRobot {
-public:
-	void RobotInit() override {
-		// invert the left side motors
-		// you may need to change or remove this to match your robot
-		m_frontLeft.SetInverted(true);
-		m_rearLeft.SetInverted(true);
+ public:
+  void RobotInit() override {
+    // invert the left side motors
+    // you may need to change or remove this to match your robot
+    m_frontLeft.SetInverted(true);
+    m_rearLeft.SetInverted(true);
 
-		m_gyro.SetSensitivity(kVoltsPerDegreePerSecond);
-	}
+    m_gyro.SetSensitivity(kVoltsPerDegreePerSecond);
+  }
 
-	/**
-	 * Mecanum drive is used with the gyro angle as an input.
-	 */
-	void TeleopPeriodic() override {
-		m_robotDrive.DriveCartesian(m_joystick.GetX(),
-				m_joystick.GetY(), m_joystick.GetZ(),
-				m_gyro.GetAngle());
-	}
+  /**
+   * Mecanum drive is used with the gyro angle as an input.
+   */
+  void TeleopPeriodic() override {
+    m_robotDrive.DriveCartesian(m_joystick.GetX(), m_joystick.GetY(),
+                                m_joystick.GetZ(), m_gyro.GetAngle());
+  }
 
-private:
-	// Gyro calibration constant, may need to be adjusted
-	// Gyro value of 360 is set to correspond to one full revolution
-	static constexpr double kVoltsPerDegreePerSecond = 0.0128;
+ private:
+  // Gyro calibration constant, may need to be adjusted
+  // Gyro value of 360 is set to correspond to one full revolution
+  static constexpr double kVoltsPerDegreePerSecond = 0.0128;
 
-	static constexpr int kFrontLeftMotorPort = 0;
-	static constexpr int kRearLeftMotorPort = 1;
-	static constexpr int kFrontRightMotorPort = 2;
-	static constexpr int kRearRightMotorPort = 3;
-	static constexpr int kGyroPort = 0;
-	static constexpr int kJoystickPort = 0;
+  static constexpr int kFrontLeftMotorPort = 0;
+  static constexpr int kRearLeftMotorPort = 1;
+  static constexpr int kFrontRightMotorPort = 2;
+  static constexpr int kRearRightMotorPort = 3;
+  static constexpr int kGyroPort = 0;
+  static constexpr int kJoystickPort = 0;
 
-	frc::Spark m_frontLeft{kFrontLeftMotorPort};
-	frc::Spark m_rearLeft{kRearLeftMotorPort};
-	frc::Spark m_frontRight{kFrontRightMotorPort};
-	frc::Spark m_rearRight{kRearRightMotorPort};
-	frc::MecanumDrive m_robotDrive{
-			m_frontLeft, m_rearLeft, m_frontRight, m_rearRight};
+  frc::Spark m_frontLeft{kFrontLeftMotorPort};
+  frc::Spark m_rearLeft{kRearLeftMotorPort};
+  frc::Spark m_frontRight{kFrontRightMotorPort};
+  frc::Spark m_rearRight{kRearRightMotorPort};
+  frc::MecanumDrive m_robotDrive{m_frontLeft, m_rearLeft, m_frontRight,
+                                 m_rearRight};
 
-	frc::AnalogGyro m_gyro{kGyroPort};
-	frc::Joystick m_joystick{kJoystickPort};
+  frc::AnalogGyro m_gyro{kGyroPort};
+  frc::Joystick m_joystick{kJoystickPort};
 };
 
 START_ROBOT_CLASS(Robot)

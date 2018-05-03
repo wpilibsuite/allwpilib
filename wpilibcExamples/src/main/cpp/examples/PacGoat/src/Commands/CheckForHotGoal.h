@@ -16,7 +16,7 @@
  * the hot goal is detected or until it is timed out.
  */
 class CheckForHotGoal : public frc::Command {
-public:
-	explicit CheckForHotGoal(double time);
-	bool IsFinished() override;
+ public:
+  explicit CheckForHotGoal(double time);
+  bool IsFinished() override;
 };

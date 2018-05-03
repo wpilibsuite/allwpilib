@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/MathExtras.h is deprecated; include wpi/MathExtras.h instead"
+#pragma message \
+    "warning: llvm/MathExtras.h is deprecated; include wpi/MathExtras.h instead"
 #else
 #warning "llvm/MathExtras.h is deprecated; include wpi/MathExtras.h instead"
 #endif

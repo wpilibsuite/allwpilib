@@ -1,17 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2017-2018. All Rights Reserved.                        */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NTCORE_TABLES_ITABLELISTENER_H_
-#define NTCORE_TABLES_ITABLELISTENER_H_
-
-#include <memory>
+#ifndef ALLWPILIB_TABLES_ITABLELISTENER_H_
+#define ALLWPILIB_TABLES_ITABLELISTENER_H_
 
 #include <wpi/StringRef.h>
 #include <wpi/deprecated.h>
+
+#include <memory>
 
 #include "networktables/NetworkTableValue.h"
 
@@ -60,4 +60,4 @@ class WPI_DEPRECATED(
 #pragma GCC diagnostic pop
 #endif
 
-#endif  // NTCORE_TABLES_ITABLELISTENER_H_
+#endif  // ALLWPILIB_TABLES_ITABLELISTENER_H_

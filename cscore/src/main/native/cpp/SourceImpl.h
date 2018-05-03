@@ -5,20 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_SOURCEIMPL_H_
-#define CSCORE_SOURCEIMPL_H_
-
-#include <atomic>
-#include <cstddef>
-#include <memory>
-#include <string>
-#include <vector>
+#ifndef ALLWPILIB_SOURCEIMPL_H_
+#define ALLWPILIB_SOURCEIMPL_H_
 
 #include <wpi/ArrayRef.h>
 #include <wpi/StringMap.h>
 #include <wpi/StringRef.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+
+#include <atomic>
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "Frame.h"
 #include "Image.h"
@@ -94,8 +94,7 @@ class SourceImpl {
   wpi::ArrayRef<int> EnumerateProperties(wpi::SmallVectorImpl<int>& vec,
                                          CS_Status* status) const;
   CS_PropertyKind GetPropertyKind(int property) const;
-  wpi::StringRef GetPropertyName(int property,
-                                 wpi::SmallVectorImpl<char>& buf,
+  wpi::StringRef GetPropertyName(int property, wpi::SmallVectorImpl<char>& buf,
                                  CS_Status* status) const;
   int GetProperty(int property, CS_Status* status) const;
   virtual void SetProperty(int property, int value, CS_Status* status) = 0;
@@ -220,4 +219,4 @@ class SourceImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_SOURCEIMPL_H_
+#endif  // ALLWPILIB_SOURCEIMPL_H_

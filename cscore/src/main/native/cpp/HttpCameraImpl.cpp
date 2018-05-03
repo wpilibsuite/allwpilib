@@ -493,8 +493,7 @@ CS_Source CreateHttpCamera(wpi::StringRef name, wpi::StringRef url,
   return handle;
 }
 
-CS_Source CreateHttpCamera(wpi::StringRef name,
-                           wpi::ArrayRef<std::string> urls,
+CS_Source CreateHttpCamera(wpi::StringRef name, wpi::ArrayRef<std::string> urls,
                            CS_HttpCameraKind kind, CS_Status* status) {
   if (urls.empty()) {
     *status = CS_EMPTY_VALUE;

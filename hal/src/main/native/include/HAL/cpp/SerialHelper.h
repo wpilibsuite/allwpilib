@@ -8,13 +8,12 @@
 #pragma once
 
 #include <stdint.h>
-
-#include <string>
-#include <vector>
-
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
+
+#include <string>
+#include <vector>
 
 #include "HAL/SerialPort.h"
 

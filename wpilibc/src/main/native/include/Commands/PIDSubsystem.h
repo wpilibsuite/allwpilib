@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <memory>
-
 #include <wpi/Twine.h>
+
+#include <memory>
 
 #include "Commands/Subsystem.h"
 #include "PIDController.h"

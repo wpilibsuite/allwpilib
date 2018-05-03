@@ -15,11 +15,11 @@
  * Other commands using the pivot should make sure they disable PID!
  */
 class SetPivotSetpoint : public frc::Command {
-public:
-	explicit SetPivotSetpoint(double setpoint);
-	void Initialize() override;
-	bool IsFinished() override;
+ public:
+  explicit SetPivotSetpoint(double setpoint);
+  void Initialize() override;
+  bool IsFinished() override;
 
-private:
-	double m_setpoint;
+ private:
+  double m_setpoint;
 };

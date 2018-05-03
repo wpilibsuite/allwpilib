@@ -7,10 +7,11 @@
 
 #include "IterativeRobotBase.h"
 
+#include <wpi/raw_ostream.h>
+
 #include <cstdio>
 
 #include <HAL/HAL.h>
-#include <wpi/raw_ostream.h>
 
 #include "Commands/Scheduler.h"
 #include "LiveWindow/LiveWindow.h"

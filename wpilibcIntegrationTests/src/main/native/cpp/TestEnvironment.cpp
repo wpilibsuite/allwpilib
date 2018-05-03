@@ -5,10 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <wpi/raw_ostream.h>
+
 #include <cstdlib>
 
 #include <HAL/HAL.h>
-#include <wpi/raw_ostream.h>
 
 #include "DriverStation.h"
 #include "LiveWindow/LiveWindow.h"

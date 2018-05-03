@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 //===- llvm/Support/Path.h - Path Operating System Concept ------*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
@@ -13,13 +20,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_SUPPORT_PATH_H
-#define LLVM_SUPPORT_PATH_H
-
-#include "wpi/Twine.h"
-#include <iterator>
+#ifndef ALLWPILIB_WPI_PATH_H_
+#define ALLWPILIB_WPI_PATH_H_
 
 #include <stdint.h>
+
+#include <iterator>
+
+#include "wpi/Twine.h"
 
 namespace wpi {
 namespace sys {
@@ -49,23 +57,23 @@ namespace path {
 /// @endcode
 class const_iterator
     : public std::iterator<std::input_iterator_tag, const StringRef> {
-  StringRef Path;      ///< The entire path.
-  StringRef Component; ///< The current component. Not necessarily in Path.
-  size_t    Position;  ///< The iterators current position within Path.
+  StringRef Path;       ///< The entire path.
+  StringRef Component;  ///< The current component. Not necessarily in Path.
+  size_t Position;      ///< The iterators current position within Path.
 
   // An end iterator has Position = Path.size() + 1.
   friend const_iterator begin(StringRef path);
   friend const_iterator end(StringRef path);
 
-public:
+ public:
   reference operator*() const { return Component; }
-  pointer   operator->() const { return &Component; }
-  const_iterator &operator++();    // preincrement
-  bool operator==(const const_iterator &RHS) const;
-  bool operator!=(const const_iterator &RHS) const { return !(*this == RHS); }
+  pointer operator->() const { return &Component; }
+  const_iterator& operator++();  // preincrement
+  bool operator==(const const_iterator& RHS) const;
+  bool operator!=(const const_iterator& RHS) const { return !(*this == RHS); }
 
   /// @brief Difference in bytes between this and RHS.
-  ptrdiff_t operator-(const const_iterator &RHS) const;
+  std::ptrdiff_t operator-(const const_iterator& RHS) const;
 };
 
 /// @brief Reverse path iterator.
@@ -75,22 +83,22 @@ public:
 /// of \a const_iterator
 class reverse_iterator
     : public std::iterator<std::input_iterator_tag, const StringRef> {
-  StringRef Path;      ///< The entire path.
-  StringRef Component; ///< The current component. Not necessarily in Path.
-  size_t    Position;  ///< The iterators current position within Path.
+  StringRef Path;       ///< The entire path.
+  StringRef Component;  ///< The current component. Not necessarily in Path.
+  size_t Position;      ///< The iterators current position within Path.
 
   friend reverse_iterator rbegin(StringRef path);
   friend reverse_iterator rend(StringRef path);
 
-public:
+ public:
   reference operator*() const { return Component; }
-  pointer   operator->() const { return &Component; }
-  reverse_iterator &operator++();    // preincrement
-  bool operator==(const reverse_iterator &RHS) const;
-  bool operator!=(const reverse_iterator &RHS) const { return !(*this == RHS); }
+  pointer operator->() const { return &Component; }
+  reverse_iterator& operator++();  // preincrement
+  bool operator==(const reverse_iterator& RHS) const;
+  bool operator!=(const reverse_iterator& RHS) const { return !(*this == RHS); }
 
   /// @brief Difference in bytes between this and RHS.
-  ptrdiff_t operator-(const reverse_iterator &RHS) const;
+  std::ptrdiff_t operator-(const reverse_iterator& RHS) const;
 };
 
 /// @brief Get begin iterator over \a path.
@@ -127,7 +135,7 @@ reverse_iterator rend(StringRef path);
 /// @endcode
 ///
 /// @param path A path that is modified to not have a file component.
-void remove_filename(SmallVectorImpl<char> &path);
+void remove_filename(SmallVectorImpl<char>& path);
 
 /// @brief Replace the file extension of \a path with \a extension.
 ///
@@ -141,7 +149,7 @@ void remove_filename(SmallVectorImpl<char> &path);
 /// @param extension The extension to be added. It may be empty. It may also
 ///                  optionally start with a '.', if it does not, one will be
 ///                  prepended.
-void replace_extension(SmallVectorImpl<char> &path, const Twine &extension);
+void replace_extension(SmallVectorImpl<char>& path, const Twine& extension);
 
 /// @brief Replace matching path prefix with another path.
 ///
@@ -156,9 +164,9 @@ void replace_extension(SmallVectorImpl<char> &path, const Twine &extension);
 ///        start with \a NewPrefix.
 /// @param OldPrefix The path prefix to strip from \a Path.
 /// @param NewPrefix The path prefix to replace \a NewPrefix with.
-void replace_path_prefix(SmallVectorImpl<char> &Path,
-                         const StringRef &OldPrefix,
-                         const StringRef &NewPrefix);
+void replace_path_prefix(SmallVectorImpl<char>& Path,
+                         const StringRef& OldPrefix,
+                         const StringRef& NewPrefix);
 
 /// @brief Append to path.
 ///
@@ -170,10 +178,8 @@ void replace_path_prefix(SmallVectorImpl<char> &Path,
 ///
 /// @param path Set to \a path + \a component.
 /// @param a The component to be appended to \a path.
-void append(SmallVectorImpl<char> &path, const Twine &a,
-                                         const Twine &b = "",
-                                         const Twine &c = "",
-                                         const Twine &d = "");
+void append(SmallVectorImpl<char>& path, const Twine& a, const Twine& b = "",
+            const Twine& c = "", const Twine& d = "");
 
 /// @brief Append to path.
 ///
@@ -186,8 +192,8 @@ void append(SmallVectorImpl<char> &path, const Twine &a,
 /// @param path Set to \a path + [\a begin, \a end).
 /// @param begin Start of components to append.
 /// @param end One past the end of components to append.
-void append(SmallVectorImpl<char> &path,
-            const_iterator begin, const_iterator end);
+void append(SmallVectorImpl<char>& path, const_iterator begin,
+            const_iterator end);
 
 /// @}
 /// @name Transforms (or some other better name)
@@ -199,14 +205,14 @@ void append(SmallVectorImpl<char> &path,
 ///
 /// @param path A path that is transformed to native format.
 /// @param result Holds the result of the transformation.
-void native(const Twine &path, SmallVectorImpl<char> &result);
+void native(const Twine& path, SmallVectorImpl<char>& result);
 
 /// Convert path to the native form in place. This is used to give paths to
 /// users and operating system calls in the platform's normal way. For example,
 /// on Windows all '/' are converted to '\'.
 ///
 /// @param path A path that is transformed to native format.
-void native(SmallVectorImpl<char> &path);
+void native(SmallVectorImpl<char>& path);
 
 /// @}
 /// @name Lexical Observers
@@ -337,13 +343,13 @@ StringRef get_separator();
 /// (e.g., TEMP on Windows, TMPDIR on *nix) to specify a temporary directory.
 ///
 /// @param result Holds the resulting path name.
-void system_temp_directory(bool erasedOnReboot, SmallVectorImpl<char> &result);
+void system_temp_directory(bool erasedOnReboot, SmallVectorImpl<char>& result);
 
 /// @brief Get the user's home directory.
 ///
 /// @param result Holds the resulting path name.
 /// @result True if a home directory is set, false otherwise.
-bool home_directory(SmallVectorImpl<char> &result);
+bool home_directory(SmallVectorImpl<char>& result);
 
 /// @brief Get the user's cache directory.
 ///
@@ -358,8 +364,8 @@ bool home_directory(SmallVectorImpl<char> &result);
 /// @param Path2 Second additional path to be appended.
 /// @param Path3 Third additional path to be appended.
 /// @result True if a cache directory path is set, false otherwise.
-bool user_cache_directory(SmallVectorImpl<char> &Result, const Twine &Path1,
-                          const Twine &Path2 = "", const Twine &Path3 = "");
+bool user_cache_directory(SmallVectorImpl<char>& Result, const Twine& Path1,
+                          const Twine& Path2 = "", const Twine& Path3 = "");
 
 /// @brief Has root name?
 ///
@@ -367,7 +373,7 @@ bool user_cache_directory(SmallVectorImpl<char> &Result, const Twine &Path1,
 ///
 /// @param path Input path.
 /// @result True if the path has a root name, false otherwise.
-bool has_root_name(const Twine &path);
+bool has_root_name(const Twine& path);
 
 /// @brief Has root directory?
 ///
@@ -375,7 +381,7 @@ bool has_root_name(const Twine &path);
 ///
 /// @param path Input path.
 /// @result True if the path has a root directory, false otherwise.
-bool has_root_directory(const Twine &path);
+bool has_root_directory(const Twine& path);
 
 /// @brief Has root path?
 ///
@@ -383,7 +389,7 @@ bool has_root_directory(const Twine &path);
 ///
 /// @param path Input path.
 /// @result True if the path has a root path, false otherwise.
-bool has_root_path(const Twine &path);
+bool has_root_path(const Twine& path);
 
 /// @brief Has relative path?
 ///
@@ -391,7 +397,7 @@ bool has_root_path(const Twine &path);
 ///
 /// @param path Input path.
 /// @result True if the path has a relative path, false otherwise.
-bool has_relative_path(const Twine &path);
+bool has_relative_path(const Twine& path);
 
 /// @brief Has parent path?
 ///
@@ -399,7 +405,7 @@ bool has_relative_path(const Twine &path);
 ///
 /// @param path Input path.
 /// @result True if the path has a parent path, false otherwise.
-bool has_parent_path(const Twine &path);
+bool has_parent_path(const Twine& path);
 
 /// @brief Has filename?
 ///
@@ -407,7 +413,7 @@ bool has_parent_path(const Twine &path);
 ///
 /// @param path Input path.
 /// @result True if the path has a filename, false otherwise.
-bool has_filename(const Twine &path);
+bool has_filename(const Twine& path);
 
 /// @brief Has stem?
 ///
@@ -415,7 +421,7 @@ bool has_filename(const Twine &path);
 ///
 /// @param path Input path.
 /// @result True if the path has a stem, false otherwise.
-bool has_stem(const Twine &path);
+bool has_stem(const Twine& path);
 
 /// @brief Has extension?
 ///
@@ -423,19 +429,19 @@ bool has_stem(const Twine &path);
 ///
 /// @param path Input path.
 /// @result True if the path has a extension, false otherwise.
-bool has_extension(const Twine &path);
+bool has_extension(const Twine& path);
 
 /// @brief Is path absolute?
 ///
 /// @param path Input path.
 /// @result True if the path is absolute, false if it is not.
-bool is_absolute(const Twine &path);
+bool is_absolute(const Twine& path);
 
 /// @brief Is path relative?
 ///
 /// @param path Input path.
 /// @result True if the path is relative, false if it is not.
-bool is_relative(const Twine &path);
+bool is_relative(const Twine& path);
 
 /// @brief Remove redundant leading "./" pieces and consecutive separators.
 ///
@@ -448,10 +454,10 @@ StringRef remove_leading_dotslash(StringRef path);
 /// @param path processed path
 /// @param remove_dot_dot specify if '../' should be removed
 /// @result True if path was changed
-bool remove_dots(SmallVectorImpl<char> &path, bool remove_dot_dot = false);
+bool remove_dots(SmallVectorImpl<char>& path, bool remove_dot_dot = false);
 
-} // end namespace path
-} // end namespace sys
-} // end namespace wpi
+}  // end namespace path
+}  // namespace sys
+}  // namespace wpi
 
-#endif
+#endif  // ALLWPILIB_WPI_PATH_H_

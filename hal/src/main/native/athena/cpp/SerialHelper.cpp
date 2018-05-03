@@ -7,12 +7,12 @@
 
 #include "HAL/cpp/SerialHelper.h"
 
+#include <wpi/FileSystem.h>
+#include <wpi/StringRef.h>
+
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
-
-#include <wpi/FileSystem.h>
-#include <wpi/StringRef.h>
 
 #include "../visa/visa.h"
 #include "HAL/Errors.h"
@@ -151,7 +151,7 @@ void SerialHelper::CoiteratedSort(
   for (auto& str : m_sortedHubPath) {
     for (size_t i = 0; i < m_unsortedHubPath.size(); i++) {
       if (wpi::StringRef{m_unsortedHubPath[i].begin(),
-                          m_unsortedHubPath[i].size()}
+                         m_unsortedHubPath[i].size()}
               .equals(wpi::StringRef{str.begin(), str.size()})) {
         sortedVec.push_back(vec[i]);
         break;

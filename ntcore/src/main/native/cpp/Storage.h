@@ -1,14 +1,19 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015-2018. All Rights Reserved.                        */
+/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NTCORE_STORAGE_H_
-#define NTCORE_STORAGE_H_
+#ifndef ALLWPILIB_STORAGE_H_
+#define ALLWPILIB_STORAGE_H_
 
 #include <stdint.h>
+#include <wpi/DenseMap.h>
+#include <wpi/SmallSet.h>
+#include <wpi/StringMap.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
 
 #include <atomic>
 #include <cstddef>
@@ -17,12 +22,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <wpi/DenseMap.h>
-#include <wpi/SmallSet.h>
-#include <wpi/StringMap.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
 
 #include "IStorage.h"
 #include "Message.h"
@@ -259,4 +258,4 @@ class Storage : public IStorage {
 
 }  // namespace nt
 
-#endif  // NTCORE_STORAGE_H_
+#endif  // ALLWPILIB_STORAGE_H_

@@ -8,9 +8,11 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/IntrusiveRefCntPtr.h is deprecated; include wpi/IntrusiveRefCntPtr.h instead"
+#pragma message \
+    "warning: llvm/IntrusiveRefCntPtr.h is deprecated; include wpi/IntrusiveRefCntPtr.h instead"
 #else
-#warning "llvm/IntrusiveRefCntPtr.h is deprecated; include wpi/IntrusiveRefCntPtr.h instead"
+#warning \
+    "llvm/IntrusiveRefCntPtr.h is deprecated; include wpi/IntrusiveRefCntPtr.h instead"
 #endif
 
 #include "wpi/IntrusiveRefCntPtr.h"

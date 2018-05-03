@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/SmallSet.h is deprecated; include wpi/SmallSet.h instead"
+#pragma message \
+    "warning: llvm/SmallSet.h is deprecated; include wpi/SmallSet.h instead"
 #else
 #warning "llvm/SmallSet.h is deprecated; include wpi/SmallSet.h instead"
 #endif

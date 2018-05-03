@@ -8,9 +8,11 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: tcpsockets/NetworkStream.h is deprecated; include wpi/NetworkStream.h instead"
+#pragma message \
+    "warning: tcpsockets/NetworkStream.h is deprecated; include wpi/NetworkStream.h instead"
 #else
-#warning "tcpsockets/NetworkStream.h is deprecated; include wpi/NetworkStream.h instead"
+#warning \
+    "tcpsockets/NetworkStream.h is deprecated; include wpi/NetworkStream.h instead"
 #endif
 
 #include "wpi/NetworkStream.h"

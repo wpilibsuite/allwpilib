@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_RAW_SOCKET_OSTREAM_H_
-#define WPIUTIL_SUPPORT_RAW_SOCKET_OSTREAM_H_
+#ifndef ALLWPILIB_WPI_RAW_SOCKET_OSTREAM_H_
+#define ALLWPILIB_WPI_RAW_SOCKET_OSTREAM_H_
 
 #include "wpi/raw_ostream.h"
 
@@ -39,4 +39,4 @@ class raw_socket_ostream : public raw_ostream {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_RAW_SOCKET_OSTREAM_H_
+#endif  // ALLWPILIB_WPI_RAW_SOCKET_OSTREAM_H_

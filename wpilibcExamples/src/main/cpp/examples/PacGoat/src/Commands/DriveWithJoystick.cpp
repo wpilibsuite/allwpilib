@@ -9,22 +9,16 @@
 
 #include "../Robot.h"
 
-DriveWithJoystick::DriveWithJoystick() {
-	Requires(&Robot::drivetrain);
-}
+DriveWithJoystick::DriveWithJoystick() { Requires(&Robot::drivetrain); }
 
 // Called repeatedly when this Command is scheduled to run
 void DriveWithJoystick::Execute() {
-	auto& joystick = Robot::oi.GetJoystick();
-	Robot::drivetrain.TankDrive(joystick.GetY(), joystick.GetRawAxis(4));
+  auto& joystick = Robot::oi.GetJoystick();
+  Robot::drivetrain.TankDrive(joystick.GetY(), joystick.GetRawAxis(4));
 }
 
 // Make this return true when this Command no longer needs to run execute()
-bool DriveWithJoystick::IsFinished() {
-	return false;
-}
+bool DriveWithJoystick::IsFinished() { return false; }
 
 // Called once after isFinished returns true
-void DriveWithJoystick::End() {
-	Robot::drivetrain.Stop();
-}
+void DriveWithJoystick::End() { Robot::drivetrain.Stop(); }

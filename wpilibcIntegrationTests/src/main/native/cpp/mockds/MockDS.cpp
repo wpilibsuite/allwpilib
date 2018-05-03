@@ -8,13 +8,13 @@
 #include "MockDS.h"
 
 #include <stdint.h>
-
-#include <HAL/cpp/fpga_clock.h>
 #include <wpi/Logger.h>
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
 #include <wpi/UDPClient.h>
 #include <wpi/raw_ostream.h>
+
+#include <HAL/cpp/fpga_clock.h>
 
 static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
                        const char* msg) {

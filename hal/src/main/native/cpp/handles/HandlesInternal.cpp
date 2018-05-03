@@ -7,10 +7,10 @@
 
 #include "HAL/handles/HandlesInternal.h"
 
-#include <algorithm>
-
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
+
+#include <algorithm>
 
 namespace hal {
 static wpi::SmallVector<HandleBase*, 32>* globalHandles = nullptr;

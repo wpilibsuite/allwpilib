@@ -8,11 +8,10 @@
 #pragma once
 
 #include <stdint.h>
+#include <wpi/mutex.h>
 
 #include <array>
 #include <memory>
-
-#include <wpi/mutex.h>
 
 #include "HAL/Types.h"
 #include "HAL/handles/HandlesInternal.h"

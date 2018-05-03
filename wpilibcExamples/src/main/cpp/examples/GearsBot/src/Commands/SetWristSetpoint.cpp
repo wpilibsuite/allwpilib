@@ -11,17 +11,15 @@
 
 SetWristSetpoint::SetWristSetpoint(double setpoint)
     : frc::Command("SetWristSetpoint") {
-	m_setpoint = setpoint;
-	Requires(&Robot::wrist);
+  m_setpoint = setpoint;
+  Requires(&Robot::wrist);
 }
 
 // Called just before this Command runs the first time
 void SetWristSetpoint::Initialize() {
-	Robot::wrist.SetSetpoint(m_setpoint);
-	Robot::wrist.Enable();
+  Robot::wrist.SetSetpoint(m_setpoint);
+  Robot::wrist.Enable();
 }
 
 // Make this return true when this Command no longer needs to run execute()
-bool SetWristSetpoint::IsFinished() {
-	return Robot::wrist.OnTarget();
-}
+bool SetWristSetpoint::IsFinished() { return Robot::wrist.OnTarget(); }

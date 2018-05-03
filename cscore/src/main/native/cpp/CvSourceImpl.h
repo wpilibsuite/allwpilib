@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_CVSOURCEIMPL_H_
-#define CSCORE_CVSOURCEIMPL_H_
+#ifndef ALLWPILIB_CVSOURCEIMPL_H_
+#define ALLWPILIB_CVSOURCEIMPL_H_
 
 #include <atomic>
 #include <functional>
@@ -86,4 +86,4 @@ class CvSourceImpl : public SourceImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_CVSOURCEIMPL_H_
+#endif  // ALLWPILIB_CVSOURCEIMPL_H_

@@ -7,6 +7,10 @@
 
 #pragma once
 
+#include <wpi/ArrayRef.h>
+#include <wpi/SmallVector.h>
+#include <wpi/Twine.h>
+
 #include <functional>
 #include <memory>
 #include <string>
@@ -14,9 +18,6 @@
 
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
-#include <wpi/ArrayRef.h>
-#include <wpi/SmallVector.h>
-#include <wpi/Twine.h>
 
 namespace frc {
 
@@ -144,8 +145,7 @@ class SendableBuilder {
    * @param setter  setter function (sets new value)
    */
   virtual void AddValueProperty(
-      const wpi::Twine& key,
-      std::function<std::shared_ptr<nt::Value>()> getter,
+      const wpi::Twine& key, std::function<std::shared_ptr<nt::Value>()> getter,
       std::function<void(std::shared_ptr<nt::Value>)> setter) = 0;
 
   /**
@@ -169,8 +169,7 @@ class SendableBuilder {
    */
   virtual void AddSmallBooleanArrayProperty(
       const wpi::Twine& key,
-      std::function<wpi::ArrayRef<int>(wpi::SmallVectorImpl<int>& buf)>
-          getter,
+      std::function<wpi::ArrayRef<int>(wpi::SmallVectorImpl<int>& buf)> getter,
       std::function<void(wpi::ArrayRef<int>)> setter) = 0;
 
   /**

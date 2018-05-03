@@ -5,9 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <wpi/raw_ostream.h>
+
 #include <CameraServer.h>
 #include <IterativeRobot.h>
-#include <wpi/raw_ostream.h>
 
 /**
  * Uses the CameraServer class to automatically capture video from a USB webcam
@@ -17,15 +18,15 @@
  * RobotInit() method in your program.
  */
 class Robot : public frc::IterativeRobot {
-public:
-	void RobotInit() override {
+ public:
+  void RobotInit() override {
 #if defined(__linux__)
-		CameraServer::GetInstance()->StartAutomaticCapture();
+    CameraServer::GetInstance()->StartAutomaticCapture();
 #else
-		wpi::errs() << "Vision only available on Linux.\n";
-		wpi::errs().flush();
+    wpi::errs() << "Vision only available on Linux.\n";
+    wpi::errs().flush();
 #endif
-	}
+  }
 };
 
 START_ROBOT_CLASS(Robot)

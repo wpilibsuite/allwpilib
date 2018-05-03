@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/Compiler.h is deprecated; include wpi/Compiler.h instead"
+#pragma message \
+    "warning: llvm/Compiler.h is deprecated; include wpi/Compiler.h instead"
 #else
 #warning "llvm/Compiler.h is deprecated; include wpi/Compiler.h instead"
 #endif

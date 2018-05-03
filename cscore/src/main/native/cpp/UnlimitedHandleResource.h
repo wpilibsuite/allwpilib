@@ -5,16 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_UNLIMITEDHANDLERESOURCE_H_
-#define CSCORE_UNLIMITEDHANDLERESOURCE_H_
-
-#include <memory>
-#include <utility>
-#include <vector>
+#ifndef ALLWPILIB_UNLIMITEDHANDLERESOURCE_H_
+#define ALLWPILIB_UNLIMITEDHANDLERESOURCE_H_
 
 #include <wpi/ArrayRef.h>
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
+
+#include <memory>
+#include <utility>
+#include <vector>
 
 namespace cs {
 
@@ -179,4 +179,4 @@ class StaticUnlimitedHandleResource
 
 }  // namespace cs
 
-#endif  // CSCORE_UNLIMITEDHANDLERESOURCE_H_
+#endif  // ALLWPILIB_UNLIMITEDHANDLERESOURCE_H_

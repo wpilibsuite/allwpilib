@@ -153,4 +153,5 @@ TEST_P(MotorInvertingTest, InvertingSwitchingNegToPos) {
 }
 
 INSTANTIATE_TEST_CASE_P(Test, MotorInvertingTest,
-                        testing::Values(TEST_VICTOR, TEST_JAGUAR, TEST_TALON),);
+                        testing::Values(TEST_VICTOR, TEST_JAGUAR,
+                                        TEST_TALON), );

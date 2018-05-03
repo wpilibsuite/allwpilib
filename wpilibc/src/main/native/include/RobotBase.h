@@ -7,10 +7,11 @@
 
 #pragma once
 
+#include <wpi/raw_ostream.h>
+
 #include <thread>
 
 #include <HAL/HAL.h>
-#include <wpi/raw_ostream.h>
 
 #include "Base.h"
 

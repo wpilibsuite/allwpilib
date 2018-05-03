@@ -8,9 +8,11 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/ConcurrentQueue.h is deprecated; include wpi/ConcurrentQueue.h instead"
+#pragma message \
+    "warning: support/ConcurrentQueue.h is deprecated; include wpi/ConcurrentQueue.h instead"
 #else
-#warning "support/ConcurrentQueue.h is deprecated; include wpi/ConcurrentQueue.h instead"
+#warning \
+    "support/ConcurrentQueue.h is deprecated; include wpi/ConcurrentQueue.h instead"
 #endif
 
 #include "wpi/ConcurrentQueue.h"

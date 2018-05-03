@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/UidVector.h is deprecated; include wpi/UidVector.h instead"
+#pragma message \
+    "warning: support/UidVector.h is deprecated; include wpi/UidVector.h instead"
 #else
 #warning "support/UidVector.h is deprecated; include wpi/UidVector.h instead"
 #endif

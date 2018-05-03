@@ -8,9 +8,11 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/priority_mutex.h is deprecated; include wpi/priority_mutex.h instead"
+#pragma message \
+    "warning: support/priority_mutex.h is deprecated; include wpi/priority_mutex.h instead"
 #else
-#warning "support/priority_mutex.h is deprecated; include wpi/priority_mutex.h instead"
+#warning \
+    "support/priority_mutex.h is deprecated; include wpi/priority_mutex.h instead"
 #endif
 
 #include "wpi/priority_mutex.h"

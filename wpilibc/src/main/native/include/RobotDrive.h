@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <memory>
-
 #include <wpi/deprecated.h>
 #include <wpi/raw_ostream.h>
+
+#include <memory>
 
 #include "ErrorBase.h"
 #include "MotorSafety.h"

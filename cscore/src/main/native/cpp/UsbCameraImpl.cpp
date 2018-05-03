@@ -7,6 +7,10 @@
 
 #include "UsbCameraImpl.h"
 
+#include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
+#include <wpi/timestamp.h>
+
 #ifdef __linux__
 #include <dirent.h>
 #include <fcntl.h>
@@ -26,10 +30,6 @@
 #endif
 
 #include <algorithm>
-
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
-#include <wpi/timestamp.h>
 
 #include "Handle.h"
 #include "Log.h"
@@ -388,7 +388,7 @@ void UsbCameraImpl::CameraThreadMain() {
         DeviceStreamOff();
         DeviceDisconnect();
         notified = true;  // device wasn't deleted, just error'ed
-        continue;  // will reconnect
+        continue;         // will reconnect
       }
 
       if ((buf.flags & V4L2_BUF_FLAG_ERROR) == 0) {
@@ -414,7 +414,7 @@ void UsbCameraImpl::CameraThreadMain() {
         DeviceStreamOff();
         DeviceDisconnect();
         notified = true;  // device wasn't deleted, just error'ed
-        continue;  // will reconnect
+        continue;         // will reconnect
       }
     }
   }

@@ -7,11 +7,11 @@
 
 #include "Telemetry.h"
 
-#include <chrono>
-#include <limits>
-
 #include <wpi/DenseMap.h>
 #include <wpi/timestamp.h>
+
+#include <chrono>
+#include <limits>
 
 #include "Handle.h"
 #include "Notifier.h"

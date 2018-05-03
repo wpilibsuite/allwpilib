@@ -8,10 +8,9 @@
 #pragma once
 
 #include <stdint.h>
+#include <wpi/mutex.h>
 
 #include <array>
-
-#include <wpi/mutex.h>
 
 #include "DigitalSource.h"
 #include "SensorBase.h"

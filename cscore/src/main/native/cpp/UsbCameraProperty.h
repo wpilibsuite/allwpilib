@@ -5,16 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_USBCAMERAPROPERTY_H_
-#define CSCORE_USBCAMERAPROPERTY_H_
+#ifndef ALLWPILIB_USBCAMERAPROPERTY_H_
+#define ALLWPILIB_USBCAMERAPROPERTY_H_
+
+#include <wpi/mutex.h>
 
 #ifdef __linux__
 #include <linux/videodev2.h>
 #endif
 
 #include <memory>
-
-#include <wpi/mutex.h>
 
 #include "PropertyImpl.h"
 
@@ -62,9 +62,9 @@ class UsbCameraProperty : public PropertyImpl {
   int propPair{0};
 
   unsigned id{0};  // implementation-level id
-  int type{0};  // implementation type, not CS_PropertyKind!
+  int type{0};     // implementation type, not CS_PropertyKind!
 };
 
 }  // namespace cs
 
-#endif  // CSCORE_USBCAMERAPROPERTY_H_
+#endif  // ALLWPILIB_USBCAMERAPROPERTY_H_

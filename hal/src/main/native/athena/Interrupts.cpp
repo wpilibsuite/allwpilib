@@ -7,9 +7,9 @@
 
 #include "HAL/Interrupts.h"
 
-#include <memory>
-
 #include <wpi/SafeThread.h>
+
+#include <memory>
 
 #include "DigitalInternal.h"
 #include "HAL/ChipObject.h"

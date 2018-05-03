@@ -8,9 +8,11 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/iterator_range.h is deprecated; include wpi/iterator_range.h instead"
+#pragma message \
+    "warning: llvm/iterator_range.h is deprecated; include wpi/iterator_range.h instead"
 #else
-#warning "llvm/iterator_range.h is deprecated; include wpi/iterator_range.h instead"
+#warning \
+    "llvm/iterator_range.h is deprecated; include wpi/iterator_range.h instead"
 #endif
 
 #include "wpi/iterator_range.h"

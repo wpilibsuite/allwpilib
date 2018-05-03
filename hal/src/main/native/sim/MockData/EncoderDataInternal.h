@@ -7,11 +7,11 @@
 
 #pragma once
 
+#include <wpi/mutex.h>
+
 #include <atomic>
 #include <limits>
 #include <memory>
-
-#include <wpi/mutex.h>
 
 #include "MockData/EncoderData.h"
 #include "MockData/NotifyListenerVector.h"

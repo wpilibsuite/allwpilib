@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/SafeThread.h is deprecated; include wpi/SafeThread.h instead"
+#pragma message \
+    "warning: support/SafeThread.h is deprecated; include wpi/SafeThread.h instead"
 #else
 #warning "support/SafeThread.h is deprecated; include wpi/SafeThread.h instead"
 #endif

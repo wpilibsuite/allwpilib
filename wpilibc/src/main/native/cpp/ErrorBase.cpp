@@ -7,14 +7,15 @@
 
 #include "ErrorBase.h"
 
+#include <wpi/Format.h>
+#include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
+
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
 
 #include <HAL/HAL.h>
-#include <wpi/Format.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
 
 #define WPI_ERRORS_DEFINE_STRINGS
 #include "WPIErrors.h"
@@ -50,8 +51,8 @@ void ErrorBase::ClearError() const { m_error.Clear(); }
  * @param lineNumber     Line number of the error source
  */
 void ErrorBase::SetErrnoError(const wpi::Twine& contextMessage,
-                              wpi::StringRef filename,
-                              wpi::StringRef function, int lineNumber) const {
+                              wpi::StringRef filename, wpi::StringRef function,
+                              int lineNumber) const {
   wpi::SmallString<128> buf;
   wpi::raw_svector_ostream err(buf);
   int errNo = errno;
@@ -141,8 +142,8 @@ void ErrorBase::SetError(Error::Code code, const wpi::Twine& contextMessage,
 void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
                               int32_t maxRange, int32_t requestedValue,
                               const wpi::Twine& contextMessage,
-                              wpi::StringRef filename,
-                              wpi::StringRef function, int lineNumber) const {
+                              wpi::StringRef filename, wpi::StringRef function,
+                              int lineNumber) const {
   //  If there was an error
   if (code != 0) {
     //  Set the current error information for this object.
@@ -197,8 +198,8 @@ bool ErrorBase::StatusIsFatal() const { return m_error.GetCode() < 0; }
 
 void ErrorBase::SetGlobalError(Error::Code code,
                                const wpi::Twine& contextMessage,
-                               wpi::StringRef filename,
-                               wpi::StringRef function, int lineNumber) {
+                               wpi::StringRef filename, wpi::StringRef function,
+                               int lineNumber) {
   // If there was an error
   if (code != 0) {
     std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);

@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/Optional.h is deprecated; include wpi/Optional.h instead"
+#pragma message \
+    "warning: llvm/Optional.h is deprecated; include wpi/Optional.h instead"
 #else
 #warning "llvm/Optional.h is deprecated; include wpi/Optional.h instead"
 #endif

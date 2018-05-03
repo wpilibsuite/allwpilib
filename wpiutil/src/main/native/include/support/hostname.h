@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/hostname.h is deprecated; include wpi/hostname.h instead"
+#pragma message \
+    "warning: support/hostname.h is deprecated; include wpi/hostname.h instead"
 #else
 #warning "support/hostname.h is deprecated; include wpi/hostname.h instead"
 #endif

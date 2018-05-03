@@ -103,8 +103,7 @@ class ErrorBase {
   virtual void CloneError(const ErrorBase& rhs) const;
   virtual void ClearError() const;
   virtual bool StatusIsFatal() const;
-  static void SetGlobalError(Error::Code code,
-                             const wpi::Twine& contextMessage,
+  static void SetGlobalError(Error::Code code, const wpi::Twine& contextMessage,
                              wpi::StringRef filename, wpi::StringRef function,
                              int lineNumber);
   static void SetGlobalWPIError(const wpi::Twine& errorMessage,

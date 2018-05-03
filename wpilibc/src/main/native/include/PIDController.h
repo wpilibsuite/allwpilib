@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
+
+#include <memory>
+#include <string>
 
 #include "Base.h"
 #include "Controller.h"

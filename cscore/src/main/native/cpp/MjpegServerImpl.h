@@ -5,14 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_MJPEGSERVERIMPL_H_
-#define CSCORE_MJPEGSERVERIMPL_H_
-
-#include <atomic>
-#include <memory>
-#include <string>
-#include <thread>
-#include <vector>
+#ifndef ALLWPILIB_MJPEGSERVERIMPL_H_
+#define ALLWPILIB_MJPEGSERVERIMPL_H_
 
 #include <wpi/NetworkAcceptor.h>
 #include <wpi/NetworkStream.h>
@@ -22,6 +16,12 @@
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/raw_socket_ostream.h>
+
+#include <atomic>
+#include <memory>
+#include <string>
+#include <thread>
+#include <vector>
 
 #include "SinkImpl.h"
 
@@ -59,4 +59,4 @@ class MjpegServerImpl : public SinkImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_MJPEGSERVERIMPL_H_
+#endif  // ALLWPILIB_MJPEGSERVERIMPL_H_

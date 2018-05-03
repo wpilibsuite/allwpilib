@@ -5,8 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_USBCAMERAIMPL_H_
-#define CSCORE_USBCAMERAIMPL_H_
+#ifndef ALLWPILIB_USBCAMERAIMPL_H_
+#define ALLWPILIB_USBCAMERAIMPL_H_
+
+#include <wpi/STLExtras.h>
+#include <wpi/SmallVector.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_istream.h>
+#include <wpi/raw_ostream.h>
 
 #ifdef __linux__
 #include <linux/videodev2.h>
@@ -18,13 +25,6 @@
 #include <thread>
 #include <utility>
 #include <vector>
-
-#include <wpi/STLExtras.h>
-#include <wpi/SmallVector.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
-#include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
 
 #include "SourceImpl.h"
 #include "UsbCameraBuffer.h"
@@ -75,7 +75,7 @@ class UsbCameraImpl : public SourceImpl {
       kCmdSetFPS,
       kCmdSetProperty,
       kCmdSetPropertyStr,
-      kNumSinksChanged,  // no response
+      kNumSinksChanged,         // no response
       kNumSinksEnabledChanged,  // no response
       // Responses
       kOk,
@@ -180,4 +180,4 @@ class UsbCameraImpl : public SourceImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_USBCAMERAIMPL_H_
+#endif  // ALLWPILIB_USBCAMERAIMPL_H_

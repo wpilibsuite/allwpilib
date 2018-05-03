@@ -7,6 +7,9 @@
 
 #include "HAL/DriverStation.h"
 
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
+
 #ifdef __APPLE__
 #include <pthread.h>
 #endif
@@ -15,9 +18,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
-
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
 
 #include "MockData/DriverStationDataInternal.h"
 #include "MockData/MockHooks.h"

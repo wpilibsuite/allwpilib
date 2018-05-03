@@ -7,11 +7,12 @@
 
 #include "DigitalInternal.h"
 
+#include <wpi/mutex.h>
+
 #include <atomic>
 #include <thread>
 
 #include <FRC_NetworkCommunication/LoadOut.h>
-#include <wpi/mutex.h>
 
 #include "ConstantsInternal.h"
 #include "HAL/AnalogTrigger.h"

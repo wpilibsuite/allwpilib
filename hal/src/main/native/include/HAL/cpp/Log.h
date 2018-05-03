@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <chrono>
-#include <string>
-
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
+
+#include <chrono>
+#include <string>
 
 inline std::string NowTime();
 

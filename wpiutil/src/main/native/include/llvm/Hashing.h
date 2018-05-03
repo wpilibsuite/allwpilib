@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/Hashing.h is deprecated; include wpi/Hashing.h instead"
+#pragma message \
+    "warning: llvm/Hashing.h is deprecated; include wpi/Hashing.h instead"
 #else
 #warning "llvm/Hashing.h is deprecated; include wpi/Hashing.h instead"
 #endif

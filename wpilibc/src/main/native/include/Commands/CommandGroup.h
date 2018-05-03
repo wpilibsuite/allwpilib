@@ -7,10 +7,10 @@
 
 #pragma once
 
+#include <wpi/Twine.h>
+
 #include <list>
 #include <vector>
-
-#include <wpi/Twine.h>
 
 #include "Commands/Command.h"
 #include "Commands/CommandGroupEntry.h"

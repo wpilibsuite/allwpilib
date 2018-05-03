@@ -7,11 +7,11 @@
 
 #pragma once
 
+#include <wpi/Twine.h>
+
 #include <memory>
 #include <set>
 #include <string>
-
-#include <wpi/Twine.h>
 
 #include "ErrorBase.h"
 #include "SmartDashboard/SendableBase.h"

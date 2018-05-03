@@ -14,6 +14,6 @@
  * it will wait briefly.
  */
 class DriveAndShootAutonomous : public frc::CommandGroup {
-public:
-	DriveAndShootAutonomous();
+ public:
+  DriveAndShootAutonomous();
 };

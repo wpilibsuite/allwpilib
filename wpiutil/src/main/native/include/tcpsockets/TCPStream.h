@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: tcpsockets/TCPStream.h is deprecated; include wpi/TCPStream.h instead"
+#pragma message \
+    "warning: tcpsockets/TCPStream.h is deprecated; include wpi/TCPStream.h instead"
 #else
 #warning "tcpsockets/TCPStream.h is deprecated; include wpi/TCPStream.h instead"
 #endif

@@ -7,11 +7,12 @@
 
 #include "cscore_c.h"
 
+#include <wpi/SmallString.h>
+
 #include <cstddef>
 #include <cstdlib>
 
 #include <opencv2/core/core.hpp>
-#include <wpi/SmallString.h>
 
 #include "c_util.h"
 #include "cscore_cpp.h"

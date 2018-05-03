@@ -8,10 +8,9 @@
 #pragma once
 
 #include <stdint.h>
+#include <wpi/ArrayRef.h>
 
 #include <memory>
-
-#include <wpi/ArrayRef.h>
 
 #include "ErrorBase.h"
 

@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/json.h is deprecated; include wpi/json.h instead"
+#pragma message \
+    "warning: support/json.h is deprecated; include wpi/json.h instead"
 #else
 #warning "support/json.h is deprecated; include wpi/json.h instead"
 #endif

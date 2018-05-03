@@ -3,26 +3,26 @@
 
 #define MAX_STRING_LEN 64
 
-#define SUPPORT_UNIQUE_ID	(1) /* depends entirely on old vs new build */
-#define USE_NTH_ORDER		(0) /* zero to user deviceId */
-#define SUPPORT_MOTOR_CONTROLLER_PROFILE	(1)
+#define SUPPORT_UNIQUE_ID  (1) /* depends entirely on old vs new build */
+#define USE_NTH_ORDER    (0) /* zero to user deviceId */
+#define SUPPORT_MOTOR_CONTROLLER_PROFILE  (1)
 namespace CANDeviceInterface1
 {
 
 struct PIDSlot
 {
-	// Proportional gain
-	float pGain;
-	// Integral gain
-	float iGain;
-	// Differential gain
-	float dGain;
-	// Feed-forward gain
-	float fGain;
-	// Integral zone
-	float iZone;
-	// Closed-loop ramp rate
-	float clRampRate;
+  // Proportional gain
+  float pGain;
+  // Integral gain
+  float iGain;
+  // Differential gain
+  float dGain;
+  // Feed-forward gain
+  float fGain;
+  // Integral zone
+  float iZone;
+  // Closed-loop ramp rate
+  float clRampRate;
 };
 
 struct DeviceDescriptor
@@ -59,33 +59,33 @@ struct DeviceDescriptor
    char softwareStatus[MAX_STRING_LEN];
    // Is the LED currently on?
    bool led;
-	// Reserved fields for future use by CTRE.  Not touched by frccansae
+  // Reserved fields for future use by CTRE.  Not touched by frccansae
    unsigned int dynFlags;
-   unsigned int flags; 		/* bitfield */
+   unsigned int flags;     /* bitfield */
    unsigned int ptrToString;
    //unsigned int reserved0;
    //unsigned int reserved1;
    //unsigned int reserved2;
 #if SUPPORT_MOTOR_CONTROLLER_PROFILE != 0
-	// Motor controller properties (ignored if SupportsMotorControllerProperties is false or unset for this model)
-	unsigned int brakeMode; // 0=Coast, 1=Brake
-	unsigned int limitSwitchFwdMode; // 0=disabled, 1=Normally Closed, 2=Normally Open
-	unsigned int limitSwitchRevMode; // 0=disabled, 1=Normally Closed, 2=Normally Open
-	// Limit-switch soft limits
-	bool bFwdSoftLimitEnable;
-	bool bRevSoftLimitEnable;
-	float softLimitFwd;
-	float softLimitRev;
-	// PID constants for slot 0
-	struct PIDSlot slot0;
-	// PID constants for slot 1
-	struct PIDSlot slot1;
+  // Motor controller properties (ignored if SupportsMotorControllerProperties is false or unset for this model)
+  unsigned int brakeMode; // 0=Coast, 1=Brake
+  unsigned int limitSwitchFwdMode; // 0=disabled, 1=Normally Closed, 2=Normally Open
+  unsigned int limitSwitchRevMode; // 0=disabled, 1=Normally Closed, 2=Normally Open
+  // Limit-switch soft limits
+  bool bFwdSoftLimitEnable;
+  bool bRevSoftLimitEnable;
+  float softLimitFwd;
+  float softLimitRev;
+  // PID constants for slot 0
+  struct PIDSlot slot0;
+  // PID constants for slot 1
+  struct PIDSlot slot1;
 #endif
 };
 
-#define kLimitSwitchMode_Disabled		(0)
-#define kLimitSwitchMode_NormallyClosed	(1)
-#define kLimitSwitchMode_NormallyOpen	(2)
+#define kLimitSwitchMode_Disabled    (0)
+#define kLimitSwitchMode_NormallyClosed  (1)
+#define kLimitSwitchMode_NormallyOpen  (2)
 
 // Interface functions that must be implemented by the CAN Firmware Update Library
 

@@ -5,13 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_IMAGE_H_
-#define CSCORE_IMAGE_H_
+#ifndef ALLWPILIB_IMAGE_H_
+#define ALLWPILIB_IMAGE_H_
+
+#include <wpi/StringRef.h>
 
 #include <vector>
 
 #include <opencv2/core/core.hpp>
-#include <wpi/StringRef.h>
 
 #include "cscore_cpp.h"
 #include "default_init_allocator.h"
@@ -99,4 +100,4 @@ class Image {
 
 }  // namespace cs
 
-#endif  // CSCORE_IMAGE_H_
+#endif  // ALLWPILIB_IMAGE_H_

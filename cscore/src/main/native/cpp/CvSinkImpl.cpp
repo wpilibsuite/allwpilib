@@ -7,10 +7,11 @@
 
 #include "CvSinkImpl.h"
 
+#include <wpi/SmallString.h>
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <wpi/SmallString.h>
 
 #include "Handle.h"
 #include "Log.h"
@@ -173,7 +174,7 @@ std::string GetSinkError(CS_Sink sink, CS_Status* status) {
 }
 
 wpi::StringRef GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
-                             CS_Status* status) {
+                            CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
   if (!data || data->kind != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;

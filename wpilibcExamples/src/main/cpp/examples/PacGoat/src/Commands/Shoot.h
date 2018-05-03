@@ -13,6 +13,6 @@
  * Shoot the ball at the current angle.
  */
 class Shoot : public frc::CommandGroup {
-public:
-	Shoot();
+ public:
+  Shoot();
 };

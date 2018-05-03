@@ -21,21 +21,21 @@
 #include "Subsystems/Wrist.h"
 
 class Robot : public frc::IterativeRobot {
-public:
-	static DriveTrain drivetrain;
-	static Elevator elevator;
-	static Wrist wrist;
-	static Claw claw;
-	static OI oi;
+ public:
+  static DriveTrain drivetrain;
+  static Elevator elevator;
+  static Wrist wrist;
+  static Claw claw;
+  static OI oi;
 
-private:
-	Autonomous m_autonomousCommand;
-	frc::LiveWindow& m_lw = *frc::LiveWindow::GetInstance();
+ private:
+  Autonomous m_autonomousCommand;
+  frc::LiveWindow& m_lw = *frc::LiveWindow::GetInstance();
 
-	void RobotInit() override;
-	void AutonomousInit() override;
-	void AutonomousPeriodic() override;
-	void TeleopInit() override;
-	void TeleopPeriodic() override;
-	void TestPeriodic() override;
+  void RobotInit() override;
+  void AutonomousInit() override;
+  void AutonomousPeriodic() override;
+  void TeleopInit() override;
+  void TeleopPeriodic() override;
+  void TestPeriodic() override;
 };

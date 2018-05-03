@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/sha1.h is deprecated; include wpi/sha1.h instead"
+#pragma message \
+    "warning: support/sha1.h is deprecated; include wpi/sha1.h instead"
 #else
 #warning "support/sha1.h is deprecated; include wpi/sha1.h instead"
 #endif

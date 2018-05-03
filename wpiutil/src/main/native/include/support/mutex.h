@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/mutex.h is deprecated; include wpi/mutex.h instead"
+#pragma message \
+    "warning: support/mutex.h is deprecated; include wpi/mutex.h instead"
 #else
 #warning "support/mutex.h is deprecated; include wpi/mutex.h instead"
 #endif

@@ -27,41 +27,41 @@
  *   single solenoids only take a single channel.
  */
 class Robot : public frc::IterativeRobot {
-public:
-	void TeleopPeriodic() override {
-		/* The output of GetRawButton is true/false depending on whether
-		 * the button is pressed; Set takes a boolean for for whether to
-		 * use the default (false) channel or the other (true).
-		 */
-		m_solenoid.Set(m_stick.GetRawButton(kSolenoidButton));
+ public:
+  void TeleopPeriodic() override {
+    /* The output of GetRawButton is true/false depending on whether
+     * the button is pressed; Set takes a boolean for for whether to
+     * use the default (false) channel or the other (true).
+     */
+    m_solenoid.Set(m_stick.GetRawButton(kSolenoidButton));
 
-		/* In order to set the double solenoid, we will say that if
-		 * neither
-		 * button is pressed, it is off, if just one button is pressed,
-		 * set the solenoid to correspond to that button, and if both
-		 * are pressed, set the solenoid to Forwards.
-		 */
-		if (m_stick.GetRawButton(kDoubleSolenoidForward)) {
-			m_doubleSolenoid.Set(frc::DoubleSolenoid::kForward);
-		} else if (m_stick.GetRawButton(kDoubleSolenoidReverse)) {
-			m_doubleSolenoid.Set(frc::DoubleSolenoid::kReverse);
-		} else {
-			m_doubleSolenoid.Set(frc::DoubleSolenoid::kOff);
-		}
-	}
+    /* In order to set the double solenoid, we will say that if
+     * neither
+     * button is pressed, it is off, if just one button is pressed,
+     * set the solenoid to correspond to that button, and if both
+     * are pressed, set the solenoid to Forwards.
+     */
+    if (m_stick.GetRawButton(kDoubleSolenoidForward)) {
+      m_doubleSolenoid.Set(frc::DoubleSolenoid::kForward);
+    } else if (m_stick.GetRawButton(kDoubleSolenoidReverse)) {
+      m_doubleSolenoid.Set(frc::DoubleSolenoid::kReverse);
+    } else {
+      m_doubleSolenoid.Set(frc::DoubleSolenoid::kOff);
+    }
+  }
 
-private:
-	frc::Joystick m_stick{0};
+ private:
+  frc::Joystick m_stick{0};
 
-	// Solenoid corresponds to a single solenoid.
-	frc::Solenoid m_solenoid{0};
+  // Solenoid corresponds to a single solenoid.
+  frc::Solenoid m_solenoid{0};
 
-	// DoubleSolenoid corresponds to a double solenoid.
-	frc::DoubleSolenoid m_doubleSolenoid{1, 2};
+  // DoubleSolenoid corresponds to a double solenoid.
+  frc::DoubleSolenoid m_doubleSolenoid{1, 2};
 
-	static constexpr int kSolenoidButton = 1;
-	static constexpr int kDoubleSolenoidForward = 2;
-	static constexpr int kDoubleSolenoidReverse = 3;
+  static constexpr int kSolenoidButton = 1;
+  static constexpr int kDoubleSolenoidForward = 2;
+  static constexpr int kDoubleSolenoidReverse = 3;
 };
 
 START_ROBOT_CLASS(Robot)

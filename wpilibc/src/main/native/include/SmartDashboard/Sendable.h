@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <string>
-
 #include <wpi/Twine.h>
+
+#include <string>
 
 namespace frc {
 

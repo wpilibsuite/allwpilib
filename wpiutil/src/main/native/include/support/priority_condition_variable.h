@@ -8,9 +8,11 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/priority_condition_variable.h is deprecated; include wpi/priority_condition_variable.h instead"
+#pragma message \
+    "warning: support/priority_condition_variable.h is deprecated; include wpi/priority_condition_variable.h instead"
 #else
-#warning "support/priority_condition_variable.h is deprecated; include wpi/priority_condition_variable.h instead"
+#warning \
+    "support/priority_condition_variable.h is deprecated; include wpi/priority_condition_variable.h instead"
 #endif
 
 #include "wpi/priority_condition_variable.h"

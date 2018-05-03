@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_HANDLE_H_
-#define CSCORE_HANDLE_H_
+#ifndef ALLWPILIB_HANDLE_H_
+#define ALLWPILIB_HANDLE_H_
+
+#include <wpi/StringRef.h>
 
 #include <atomic>
 #include <memory>
 #include <utility>
-
-#include <wpi/StringRef.h>
 
 #include "UnlimitedHandleResource.h"
 #include "cscore_c.h"
@@ -121,4 +121,4 @@ class Sinks : public UnlimitedHandleResource<Handle, SinkData, Handle::kSink> {
 
 }  // namespace cs
 
-#endif  // CSCORE_HANDLE_H_
+#endif  // ALLWPILIB_HANDLE_H_

@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <string>
-
 #include <wpi/deprecated.h>
+
+#include <string>
 
 #include "SmartDashboard/Sendable.h"
 

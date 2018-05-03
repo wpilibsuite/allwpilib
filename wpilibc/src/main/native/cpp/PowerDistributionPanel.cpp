@@ -7,11 +7,12 @@
 
 #include "PowerDistributionPanel.h"
 
+#include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
+
 #include <HAL/HAL.h>
 #include <HAL/PDP.h>
 #include <HAL/Ports.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
 
 #include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"

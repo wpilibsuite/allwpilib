@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_JPEGUTIL_H_
-#define CSCORE_JPEGUTIL_H_
-
-#include <string>
+#ifndef ALLWPILIB_JPEGUTIL_H_
+#define ALLWPILIB_JPEGUTIL_H_
 
 #include <wpi/StringRef.h>
+
+#include <string>
 
 namespace wpi {
 class raw_istream;
@@ -30,4 +30,4 @@ bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width, int* height);
 
 }  // namespace cs
 
-#endif  // CSCORE_JPEGUTIL_H_
+#endif  // ALLWPILIB_JPEGUTIL_H_

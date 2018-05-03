@@ -7,11 +7,11 @@
 
 #include "HAL/Notifier.h"
 
-#include <chrono>
-
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
+
+#include <chrono>
 
 #include "HAL/HAL.h"
 #include "HAL/cpp/fpga_clock.h"

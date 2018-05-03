@@ -7,12 +7,12 @@
 
 #include "HAL/Notifier.h"
 
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
+
 #include <atomic>
 #include <cstdlib>  // For std::atexit()
 #include <memory>
-
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
 
 #include "HAL/ChipObject.h"
 #include "HAL/Errors.h"

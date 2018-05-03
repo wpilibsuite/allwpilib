@@ -7,13 +7,14 @@
 
 #pragma once
 
+#include <wpi/mutex.h>
+
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
 
 #include <networktables/NetworkTableEntry.h>
-#include <wpi/mutex.h>
 
 #include "Commands/Command.h"
 #include "ErrorBase.h"
