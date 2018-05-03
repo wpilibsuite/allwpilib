@@ -9,9 +9,6 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
-  gtest/
-  ni-libraries/include/
-  ni-libraries/lib/
   hal/src/main/native/athena/ctre/
   hal/src/main/native/athena/frccansae/
   hal/src/main/native/athena/visa/
@@ -20,11 +17,14 @@ generatedFileExclude {
 }
 
 modifiableFileExclude {
-  src/main/native/cpp/jni/
   \.patch$
   \.png$
   \.py$
   \.so$
+}
+
+repoRootNameOverride {
+  hal
 }
 
 includeOtherLibs {
@@ -35,6 +35,7 @@ includeOtherLibs {
   ^opencv2/
   ^spilib/
   ^support/
+  ^wpi/
 }
 
 includeProject {

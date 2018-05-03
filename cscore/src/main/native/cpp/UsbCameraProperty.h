@@ -62,7 +62,7 @@ class UsbCameraProperty : public PropertyImpl {
   int propPair{0};
 
   unsigned id{0};  // implementation-level id
-  int type{0};  // implementation type, not CS_PropertyKind!
+  int type{0};     // implementation type, not CS_PropertyKind!
 };
 
 }  // namespace cs

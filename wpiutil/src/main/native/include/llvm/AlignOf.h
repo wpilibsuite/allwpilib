@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/AlignOf.h is deprecated; include wpi/AlignOf.h instead"
 #else
 #warning "llvm/AlignOf.h is deprecated; include wpi/AlignOf.h instead"
 #endif
+// clang-format on
 
 #include "wpi/AlignOf.h"
 

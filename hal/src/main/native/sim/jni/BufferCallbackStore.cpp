@@ -8,6 +8,7 @@
 #include "BufferCallbackStore.h"
 
 #include <jni.h>
+
 #include <wpi/jni_util.h>
 
 #include "HAL/Types.h"

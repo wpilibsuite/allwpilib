@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/SmallString.h is deprecated; include wpi/SmallString.h instead"
 #else
 #warning "llvm/SmallString.h is deprecated; include wpi/SmallString.h instead"
 #endif
+// clang-format on
 
 #include "wpi/SmallString.h"
 

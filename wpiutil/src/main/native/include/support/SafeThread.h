@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: support/SafeThread.h is deprecated; include wpi/SafeThread.h instead"
 #else
 #warning "support/SafeThread.h is deprecated; include wpi/SafeThread.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/SafeThread.h"

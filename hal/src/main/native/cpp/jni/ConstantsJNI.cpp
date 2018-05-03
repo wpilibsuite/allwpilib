@@ -1,18 +1,18 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <assert.h>
 #include <jni.h>
-#include "HAL/cpp/Log.h"
 
-#include "edu_wpi_first_wpilibj_hal_ConstantsJNI.h"
+#include <cassert>
 
 #include "HAL/Constants.h"
+#include "HAL/cpp/Log.h"
 #include "HALUtil.h"
+#include "edu_wpi_first_wpilibj_hal_ConstantsJNI.h"
 
 using namespace frc;
 
@@ -21,9 +21,9 @@ TLogLevel constantsJNILogLevel = logWARNING;
 
 #define CONSTANTSJNI_LOG(level)     \
   if (level > constantsJNILogLevel) \
-    ;                         \
-  else                        \
-  Log().Get(level)
+    ;                               \
+  else                              \
+    Log().Get(level)
 
 extern "C" {
 /*
@@ -32,11 +32,13 @@ extern "C" {
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_ConstantsJNI_getSystemClockTicksPerMicrosecond(
-    JNIEnv *env, jclass) {
-  CONSTANTSJNI_LOG(logDEBUG) << "Calling ConstantsJNI getSystemClockTicksPerMicrosecond";
+Java_edu_wpi_first_wpilibj_hal_ConstantsJNI_getSystemClockTicksPerMicrosecond
+  (JNIEnv* env, jclass)
+{
+  CONSTANTSJNI_LOG(logDEBUG)
+      << "Calling ConstantsJNI getSystemClockTicksPerMicrosecond";
   jint value = HAL_GetSystemClockTicksPerMicrosecond();
   CONSTANTSJNI_LOG(logDEBUG) << "Value = " << value;
   return value;
 }
-}
+}  // extern "C"

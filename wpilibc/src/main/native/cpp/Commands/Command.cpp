@@ -50,8 +50,7 @@ Command::Command(double timeout) : Command("", timeout) {}
  * @param timeout the time (in seconds) before this command "times out"
  * @see IsTimedOut()
  */
-Command::Command(const wpi::Twine& name, double timeout)
-    : SendableBase(false) {
+Command::Command(const wpi::Twine& name, double timeout) : SendableBase(false) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0.0 && timeout != -1.0)
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");

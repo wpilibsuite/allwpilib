@@ -25,60 +25,60 @@ class Joystick;
  * and a gyro.
  */
 class DriveTrain : public frc::Subsystem {
-public:
-	DriveTrain();
+ public:
+  DriveTrain();
 
-	/**
-	 * When no other command is running let the operator drive around
-	 * using the PS3 joystick.
-	 */
-	void InitDefaultCommand() override;
+  /**
+   * When no other command is running let the operator drive around
+   * using the PS3 joystick.
+   */
+  void InitDefaultCommand() override;
 
-	/**
-	 * The log method puts interesting information to the SmartDashboard.
-	 */
-	void Log();
+  /**
+   * The log method puts interesting information to the SmartDashboard.
+   */
+  void Log();
 
-	/**
-	 * Tank style driving for the DriveTrain.
-	 * @param left Speed in range [-1,1]
-	 * @param right Speed in range [-1,1]
-	 */
-	void Drive(double left, double right);
+  /**
+   * Tank style driving for the DriveTrain.
+   * @param left Speed in range [-1,1]
+   * @param right Speed in range [-1,1]
+   */
+  void Drive(double left, double right);
 
-	/**
-	 * @return The robots heading in degrees.
-	 */
-	double GetHeading();
+  /**
+   * @return The robots heading in degrees.
+   */
+  double GetHeading();
 
-	/**
-	 * Reset the robots sensors to the zero states.
-	 */
-	void Reset();
+  /**
+   * Reset the robots sensors to the zero states.
+   */
+  void Reset();
 
-	/**
-	 * @return The distance driven (average of left and right encoders).
-	 */
-	double GetDistance();
+  /**
+   * @return The distance driven (average of left and right encoders).
+   */
+  double GetDistance();
 
-	/**
-	 * @return The distance to the obstacle detected by the rangefinder.
-	 */
-	double GetDistanceToObstacle();
+  /**
+   * @return The distance to the obstacle detected by the rangefinder.
+   */
+  double GetDistanceToObstacle();
 
-private:
-	frc::Spark m_frontLeft{1};
-	frc::Spark m_rearLeft{2};
-	frc::SpeedControllerGroup m_left{m_frontLeft, m_rearLeft};
+ private:
+  frc::Spark m_frontLeft{1};
+  frc::Spark m_rearLeft{2};
+  frc::SpeedControllerGroup m_left{m_frontLeft, m_rearLeft};
 
-	frc::Spark m_frontRight{3};
-	frc::Spark m_rearRight{4};
-	frc::SpeedControllerGroup m_right{m_frontRight, m_rearRight};
+  frc::Spark m_frontRight{3};
+  frc::Spark m_rearRight{4};
+  frc::SpeedControllerGroup m_right{m_frontRight, m_rearRight};
 
-	frc::DifferentialDrive m_robotDrive{m_left, m_right};
+  frc::DifferentialDrive m_robotDrive{m_left, m_right};
 
-	frc::Encoder m_leftEncoder{1, 2};
-	frc::Encoder m_rightEncoder{3, 4};
-	frc::AnalogInput m_rangefinder{6};
-	frc::AnalogGyro m_gyro{1};
+  frc::Encoder m_leftEncoder{1, 2};
+  frc::Encoder m_rightEncoder{3, 4};
+  frc::AnalogInput m_rangefinder{6};
+  frc::AnalogGyro m_gyro{1};
 };

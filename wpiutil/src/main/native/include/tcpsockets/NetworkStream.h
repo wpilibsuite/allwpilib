@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: tcpsockets/NetworkStream.h is deprecated; include wpi/NetworkStream.h instead"
 #else
 #warning "tcpsockets/NetworkStream.h is deprecated; include wpi/NetworkStream.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/NetworkStream.h"

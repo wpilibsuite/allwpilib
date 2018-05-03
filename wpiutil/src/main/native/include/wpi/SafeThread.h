@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_SAFETHREAD_H_
-#define WPIUTIL_SUPPORT_SAFETHREAD_H_
+#ifndef WPIUTIL_WPI_SAFETHREAD_H_
+#define WPIUTIL_WPI_SAFETHREAD_H_
 
 #include <atomic>
 #include <thread>
@@ -130,4 +130,4 @@ class SafeThreadOwner : public detail::SafeThreadOwnerBase {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_SAFETHREAD_H_
+#endif  // WPIUTIL_WPI_SAFETHREAD_H_

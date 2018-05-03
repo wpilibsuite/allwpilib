@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_TCPSOCKETS_NETWORKACCEPTOR_H_
-#define WPIUTIL_TCPSOCKETS_NETWORKACCEPTOR_H_
+#ifndef WPIUTIL_WPI_NETWORKACCEPTOR_H_
+#define WPIUTIL_WPI_NETWORKACCEPTOR_H_
 
 #include <memory>
 
@@ -29,4 +29,4 @@ class NetworkAcceptor {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_TCPSOCKETS_NETWORKACCEPTOR_H_
+#endif  // WPIUTIL_WPI_NETWORKACCEPTOR_H_

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <jni.h>
+
 #include <wpi/jni_util.h>
 
 #include "HAL/Types.h"

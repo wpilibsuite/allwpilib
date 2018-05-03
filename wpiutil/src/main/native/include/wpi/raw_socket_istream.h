@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_RAW_SOCKET_ISTREAM_H_
-#define WPIUTIL_SUPPORT_RAW_SOCKET_ISTREAM_H_
+#ifndef WPIUTIL_WPI_RAW_SOCKET_ISTREAM_H_
+#define WPIUTIL_WPI_RAW_SOCKET_ISTREAM_H_
 
 #include "wpi/raw_istream.h"
 
@@ -31,4 +31,4 @@ class raw_socket_istream : public raw_istream {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_RAW_SOCKET_ISTREAM_H_
+#endif  // WPIUTIL_WPI_RAW_SOCKET_ISTREAM_H_

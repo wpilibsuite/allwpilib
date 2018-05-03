@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: support/atomic_static.h is deprecated; include wpi/atomic_static.h instead"
 #else
 #warning "support/atomic_static.h is deprecated; include wpi/atomic_static.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/atomic_static.h"

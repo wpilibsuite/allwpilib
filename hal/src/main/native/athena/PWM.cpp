@@ -7,10 +7,10 @@
 
 #include "HAL/PWM.h"
 
-#include <wpi/raw_ostream.h>
-
 #include <cmath>
 #include <thread>
+
+#include <wpi/raw_ostream.h>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"

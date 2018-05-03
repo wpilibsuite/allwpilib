@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_TCPSOCKETS_NETWORKSTREAM_H_
-#define WPIUTIL_TCPSOCKETS_NETWORKSTREAM_H_
+#ifndef WPIUTIL_WPI_NETWORKSTREAM_H_
+#define WPIUTIL_WPI_NETWORKSTREAM_H_
 
 #include <cstddef>
 
@@ -45,4 +45,4 @@ class NetworkStream {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_TCPSOCKETS_NETWORKSTREAM_H_
+#endif  // WPIUTIL_WPI_NETWORKSTREAM_H_

@@ -17,11 +17,11 @@
  * commands using the elevator should make sure they disable PID!
  */
 class SetElevatorSetpoint : public frc::Command {
-public:
-	explicit SetElevatorSetpoint(double setpoint);
-	void Initialize() override;
-	bool IsFinished() override;
+ public:
+  explicit SetElevatorSetpoint(double setpoint);
+  void Initialize() override;
+  bool IsFinished() override;
 
-private:
-	double m_setpoint;
+ private:
+  double m_setpoint;
 };

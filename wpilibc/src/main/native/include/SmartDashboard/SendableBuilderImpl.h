@@ -105,8 +105,7 @@ class SendableBuilderImpl : public SendableBuilder {
                       std::function<void(wpi::StringRef)> setter) override;
 
   void AddValueProperty(
-      const wpi::Twine& key,
-      std::function<std::shared_ptr<nt::Value>()> getter,
+      const wpi::Twine& key, std::function<std::shared_ptr<nt::Value>()> getter,
       std::function<void(std::shared_ptr<nt::Value>)> setter) override;
 
   void AddSmallStringProperty(
@@ -116,8 +115,7 @@ class SendableBuilderImpl : public SendableBuilder {
 
   void AddSmallBooleanArrayProperty(
       const wpi::Twine& key,
-      std::function<wpi::ArrayRef<int>(wpi::SmallVectorImpl<int>& buf)>
-          getter,
+      std::function<wpi::ArrayRef<int>(wpi::SmallVectorImpl<int>& buf)> getter,
       std::function<void(wpi::ArrayRef<int>)> setter) override;
 
   void AddSmallDoubleArrayProperty(

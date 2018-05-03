@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/StringRef.h is deprecated; include wpi/StringRef.h instead"
 #else
 #warning "llvm/StringRef.h is deprecated; include wpi/StringRef.h instead"
 #endif
+// clang-format on
 
 #include "wpi/StringRef.h"
 

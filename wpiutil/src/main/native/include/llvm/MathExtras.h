@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/MathExtras.h is deprecated; include wpi/MathExtras.h instead"
 #else
 #warning "llvm/MathExtras.h is deprecated; include wpi/MathExtras.h instead"
 #endif
+// clang-format on
 
 #include "wpi/MathExtras.h"
 

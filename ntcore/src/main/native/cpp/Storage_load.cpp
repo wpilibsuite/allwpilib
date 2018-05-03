@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015-2018. All Rights Reserved.                        */
+/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -99,7 +99,7 @@ static int fromxdigit(char ch) {
 }
 
 static wpi::StringRef UnescapeString(wpi::StringRef source,
-                                      wpi::SmallVectorImpl<char>& buf) {
+                                     wpi::SmallVectorImpl<char>& buf) {
   assert(source.size() >= 2 && source.front() == '"' && source.back() == '"');
   buf.clear();
   buf.reserve(source.size() - 2);

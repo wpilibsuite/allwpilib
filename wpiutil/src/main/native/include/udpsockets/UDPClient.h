@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: udpsockets/UDPClient.h is deprecated; include wpi/UDPClient.h instead"
 #else
 #warning "udpsockets/UDPClient.h is deprecated; include wpi/UDPClient.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/UDPClient.h"

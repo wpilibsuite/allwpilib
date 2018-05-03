@@ -26,8 +26,7 @@ void SinkImpl::SetDescription(wpi::StringRef description) {
   m_description = description;
 }
 
-wpi::StringRef SinkImpl::GetDescription(
-    wpi::SmallVectorImpl<char>& buf) const {
+wpi::StringRef SinkImpl::GetDescription(wpi::SmallVectorImpl<char>& buf) const {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
   return wpi::StringRef{buf.data(), buf.size()};

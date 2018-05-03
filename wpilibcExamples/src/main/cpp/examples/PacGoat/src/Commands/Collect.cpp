@@ -14,8 +14,8 @@
 #include "WaitForBall.h"
 
 Collect::Collect() {
-	AddSequential(new SetCollectionSpeed(Collector::kForward));
-	AddParallel(new CloseClaw());
-	AddSequential(new SetPivotSetpoint(Pivot::kCollect));
-	AddSequential(new WaitForBall());
+  AddSequential(new SetCollectionSpeed(Collector::kForward));
+  AddParallel(new CloseClaw());
+  AddSequential(new SetPivotSetpoint(Pivot::kCollect));
+  AddSequential(new WaitForBall());
 }

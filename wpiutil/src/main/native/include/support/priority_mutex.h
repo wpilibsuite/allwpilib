@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: support/priority_mutex.h is deprecated; include wpi/priority_mutex.h instead"
 #else
 #warning "support/priority_mutex.h is deprecated; include wpi/priority_mutex.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/priority_mutex.h"

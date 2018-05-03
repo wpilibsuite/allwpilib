@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/StringExtras.h is deprecated; include wpi/StringExtras.h instead"
 #else
 #warning "llvm/StringExtras.h is deprecated; include wpi/StringExtras.h instead"
 #endif
+// clang-format on
 
 #include "wpi/StringExtras.h"
 

@@ -1,0 +1,31 @@
+cHeaderFileInclude {
+  _c\.h$
+}
+
+cppHeaderFileInclude {
+  (?<!_c)\.h$
+  \.inc$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  ntcore/doc/
+}
+
+repoRootNameOverride {
+  ntcore
+}
+
+includeGuardRoots {
+  ntcore/src/main/native/cpp/
+  ntcore/src/main/native/include/
+  ntcore/src/test/native/cpp/
+}
+
+includeOtherLibs {
+  ^support/
+  ^wpi/
+}

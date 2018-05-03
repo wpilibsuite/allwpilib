@@ -80,8 +80,7 @@ class CameraServer {
    * @param name The name to give the camera
    * @param path The device path (e.g. "/dev/video0") of the camera
    */
-  cs::UsbCamera StartAutomaticCapture(wpi::StringRef name,
-                                      wpi::StringRef path);
+  cs::UsbCamera StartAutomaticCapture(wpi::StringRef name, wpi::StringRef path);
 #endif
 
   /**

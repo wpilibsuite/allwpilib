@@ -7,10 +7,12 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: support/HttpUtil.inl is deprecated; include wpi/HttpUtil.inl instead"
 #else
 #warning "support/HttpUtil.inl is deprecated; include wpi/HttpUtil.inl instead"
 #endif
+// clang-format on
 
 #include "wpi/HttpUtil.inl"

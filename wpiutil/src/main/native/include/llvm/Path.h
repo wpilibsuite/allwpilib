@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/Path.h is deprecated; include wpi/Path.h instead"
 #else
 #warning "llvm/Path.h is deprecated; include wpi/Path.h instead"
 #endif
+// clang-format on
 
 #include "wpi/Path.h"
 

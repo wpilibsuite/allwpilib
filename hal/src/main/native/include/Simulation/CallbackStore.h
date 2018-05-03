@@ -9,9 +9,9 @@
 
 #ifndef __FRC_ROBORIO__
 
-#include <wpi/StringRef.h>
-
 #include <functional>
+
+#include <wpi/StringRef.h>
 
 #include "MockData/HAL_Value.h"
 

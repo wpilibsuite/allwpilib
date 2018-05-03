@@ -1,17 +1,15 @@
+cHeaderFileInclude {
+  _c\.h$
+}
+
 cppHeaderFileInclude {
-  \.h$
+  (?<!_c)\.h$
   \.hpp$
   \.inc$
 }
 
 cppSrcFileInclude {
   \.cpp$
-}
-
-generatedFileExclude {
-  gmock/
-  src/arm-linux-jni/
-  src/main/native/cpp/jni/CameraServerJNI\.cpp$
 }
 
 licenseUpdateExclude {
@@ -21,11 +19,16 @@ licenseUpdateExclude {
 includeGuardRoots {
   cscore/src/main/native/cpp/
   cscore/src/main/native/include/
+  cscore/src/main/test/native/cpp/
+}
+
+repoRootNameOverride {
+  cscore
 }
 
 includeOtherLibs {
-  ^llvm/
   ^opencv2/
   ^support/
   ^tcpsockets/
+  ^wpi/
 }

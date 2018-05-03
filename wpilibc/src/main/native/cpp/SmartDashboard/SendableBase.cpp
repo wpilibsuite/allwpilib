@@ -71,8 +71,7 @@ void SendableBase::AddChild(void* child) {
  * @param channel    The channel number the device is plugged into
  */
 void SendableBase::SetName(const wpi::Twine& moduleType, int channel) {
-  SetName(moduleType + wpi::Twine('[') + wpi::Twine(channel) +
-          wpi::Twine(']'));
+  SetName(moduleType + wpi::Twine('[') + wpi::Twine(channel) + wpi::Twine(']'));
 }
 
 /**

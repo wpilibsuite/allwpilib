@@ -75,7 +75,7 @@ class UsbCameraImpl : public SourceImpl {
       kCmdSetFPS,
       kCmdSetProperty,
       kCmdSetPropertyStr,
-      kNumSinksChanged,  // no response
+      kNumSinksChanged,         // no response
       kNumSinksEnabledChanged,  // no response
       // Responses
       kOk,

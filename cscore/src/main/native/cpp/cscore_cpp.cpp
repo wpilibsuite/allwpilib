@@ -171,8 +171,7 @@ std::string GetSourceName(CS_Source source, CS_Status* status) {
   return data->source->GetName();
 }
 
-wpi::StringRef GetSourceName(CS_Source source,
-                             wpi::SmallVectorImpl<char>& buf,
+wpi::StringRef GetSourceName(CS_Source source, wpi::SmallVectorImpl<char>& buf,
                              CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data) {
@@ -309,8 +308,9 @@ std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
   return data->source->EnumerateVideoModes(status);
 }
 
-wpi::ArrayRef<CS_Sink> EnumerateSourceSinks(
-    CS_Source source, wpi::SmallVectorImpl<CS_Sink>& vec, CS_Status* status) {
+wpi::ArrayRef<CS_Sink> EnumerateSourceSinks(CS_Source source,
+                                            wpi::SmallVectorImpl<CS_Sink>& vec,
+                                            CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
@@ -468,8 +468,7 @@ std::string GetSinkDescription(CS_Sink sink, CS_Status* status) {
   return data->sink->GetDescription(buf);
 }
 
-wpi::StringRef GetSinkDescription(CS_Sink sink,
-                                  wpi::SmallVectorImpl<char>& buf,
+wpi::StringRef GetSinkDescription(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                                   CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
   if (!data) {
@@ -630,8 +629,8 @@ wpi::ArrayRef<CS_Source> EnumerateSourceHandles(
   return Sources::GetInstance().GetAll(vec);
 }
 
-wpi::ArrayRef<CS_Sink> EnumerateSinkHandles(
-    wpi::SmallVectorImpl<CS_Sink>& vec, CS_Status* status) {
+wpi::ArrayRef<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
+                                            CS_Status* status) {
   return Sinks::GetInstance().GetAll(vec);
 }
 
@@ -642,7 +641,7 @@ std::string GetHostname() {
   name[255] = '\0';  // Per POSIX, may not be null terminated if too long
   return name;
 #else
-  return "";  // TODO
+  return "";                          // TODO
 #endif
 }
 
@@ -654,7 +653,7 @@ std::vector<std::string> GetNetworkInterfaces() {
   std::vector<std::string> rv;
   char buf[256];
   for (struct ifaddrs* i = ifa; i; i = i->ifa_next) {
-    if (!i->ifa_addr) continue;  // no address
+    if (!i->ifa_addr) continue;                       // no address
     if (i->ifa_addr->sa_family != AF_INET) continue;  // only return IPv4
     struct sockaddr_in* addr_in = reinterpret_cast<sockaddr_in*>(i->ifa_addr);
     const char* addr =

@@ -193,8 +193,7 @@ static std::vector<std::string> GetSourceModeValues(int source) {
   return rv;
 }
 
-static inline wpi::StringRef Concatenate(wpi::StringRef lhs,
-                                         wpi::StringRef rhs,
+static inline wpi::StringRef Concatenate(wpi::StringRef lhs, wpi::StringRef rhs,
                                          wpi::SmallVectorImpl<char>& buf) {
   buf.clear();
   wpi::raw_svector_ostream oss{buf};

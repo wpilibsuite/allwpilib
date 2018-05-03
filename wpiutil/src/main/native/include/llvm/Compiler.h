@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/Compiler.h is deprecated; include wpi/Compiler.h instead"
 #else
 #warning "llvm/Compiler.h is deprecated; include wpi/Compiler.h instead"
 #endif
+// clang-format on
 
 #include "wpi/Compiler.h"
 

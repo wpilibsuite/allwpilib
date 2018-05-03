@@ -94,8 +94,7 @@ class SourceImpl {
   wpi::ArrayRef<int> EnumerateProperties(wpi::SmallVectorImpl<int>& vec,
                                          CS_Status* status) const;
   CS_PropertyKind GetPropertyKind(int property) const;
-  wpi::StringRef GetPropertyName(int property,
-                                 wpi::SmallVectorImpl<char>& buf,
+  wpi::StringRef GetPropertyName(int property, wpi::SmallVectorImpl<char>& buf,
                                  CS_Status* status) const;
   int GetProperty(int property, CS_Status* status) const;
   virtual void SetProperty(int property, int value, CS_Status* status) = 0;

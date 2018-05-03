@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: support/jni_util.h is deprecated; include wpi/jni_util.h instead"
 #else
 #warning "support/jni_util.h is deprecated; include wpi/jni_util.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/jni_util.h"

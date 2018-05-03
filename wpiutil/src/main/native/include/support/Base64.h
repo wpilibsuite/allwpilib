@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: support/Base64.h is deprecated; include wpi/Base64.h instead"
 #else
 #warning "support/Base64.h is deprecated; include wpi/Base64.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/Base64.h"

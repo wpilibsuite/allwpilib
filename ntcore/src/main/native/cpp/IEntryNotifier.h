@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2017-2018. All Rights Reserved.                        */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -29,8 +29,7 @@ class IEntryNotifier {
   virtual unsigned int Add(
       std::function<void(const EntryNotification& event)> callback,
       unsigned int local_id, unsigned int flags) = 0;
-  virtual unsigned int AddPolled(unsigned int poller_uid,
-                                 wpi::StringRef prefix,
+  virtual unsigned int AddPolled(unsigned int poller_uid, wpi::StringRef prefix,
                                  unsigned int flags) = 0;
   virtual unsigned int AddPolled(unsigned int poller_uid, unsigned int local_id,
                                  unsigned int flags) = 0;

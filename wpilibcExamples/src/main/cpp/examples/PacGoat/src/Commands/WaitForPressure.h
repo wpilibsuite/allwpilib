@@ -14,7 +14,7 @@
  * and is intended to be used in command groups to wait for this condition.
  */
 class WaitForPressure : public frc::Command {
-public:
-	WaitForPressure();
-	bool IsFinished() override;
+ public:
+  WaitForPressure();
+  bool IsFinished() override;
 };

@@ -47,9 +47,8 @@ bool wpi_assertEqual_impl(int valueA, int valueB,
 bool wpi_assertNotEqual_impl(int valueA, int valueB,
                              const wpi::Twine& valueAString,
                              const wpi::Twine& valueBString,
-                             const wpi::Twine& message,
-                             wpi::StringRef fileName, int lineNumber,
-                             wpi::StringRef funcName);
+                             const wpi::Twine& message, wpi::StringRef fileName,
+                             int lineNumber, wpi::StringRef funcName);
 
 void wpi_suspendOnAssertEnabled(bool enabled);
 

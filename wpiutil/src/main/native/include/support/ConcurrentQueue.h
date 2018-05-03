@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: support/ConcurrentQueue.h is deprecated; include wpi/ConcurrentQueue.h instead"
 #else
 #warning "support/ConcurrentQueue.h is deprecated; include wpi/ConcurrentQueue.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/ConcurrentQueue.h"

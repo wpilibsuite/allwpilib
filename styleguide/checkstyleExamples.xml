@@ -20,17 +20,23 @@
 
     <property name="severity" value="error"/>
 
+    <module name="SuppressionFilter">
+        <property name="file" value="styleguide/suppressions.xml" />
+    </module>
+
     <property name="fileExtensions" value="java, properties, xml"/>
+    <!-- Checks for whitespace                               -->
+    <!-- See http://checkstyle.sf.net/config_whitespace.html -->
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+    </module>
+    <module name="NewlineAtEndOfFile">
+        <property name="lineSeparator" value="lf"/>
+    </module>
 
     <module name="SuppressWarningsFilter" />
 
     <module name="TreeWalker">
-        <property name="tabWidth" value="2"/>
-        <module name="RegexpSinglelineJava">
-            <property name="format" value="^\t* "/>
-            <property name="message" value="Indent must use tab characters"/>
-            <property name="ignoreComments" value="true"/>
-        </module>
         <module name="SuppressWarningsHolder" />
         <module name="OuterTypeFilename"/>
         <module name="IllegalTokenText">
@@ -44,7 +50,7 @@
             <property name="allowNonPrintableEscapes" value="true"/>
         </module>
         <module name="LineLength">
-            <property name="max" value="80"/>
+            <property name="max" value="100"/>
             <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
         </module>
         <module name="AvoidStarImport"/>
@@ -58,7 +64,7 @@
         </module>
         <module name="NeedBraces"/>
         <module name="LeftCurly">
-            <property name="maxLineLength" value="80"/>
+            <property name="maxLineLength" value="100"/>
         </module>
         <module name="RightCurly"/>
         <module name="RightCurly">
@@ -81,8 +87,13 @@
         <module name="ArrayTypeStyle"/>
         <module name="MissingSwitchDefault"/>
         <module name="FallThrough"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="StringLiteralEquality"/>
+        <module name="UnnecessaryParentheses"/>
         <module name="UpperEll"/>
         <module name="ModifierOrder"/>
+        <module name="RedundantModifier"/>
         <module name="EmptyLineSeparator">
             <property name="allowNoEmptyLineBetweenFields" value="true"/>
         </module>
@@ -191,6 +202,7 @@
             <property name="target" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF, VARIABLE_DEF"/>
         </module>
         <module name="JavadocMethod">
+            <property name="scope" value="public"/>
             <property name="allowMissingParamTags" value="true"/>
             <property name="allowMissingThrowsTags" value="true"/>
             <property name="allowMissingReturnTag" value="true"/>

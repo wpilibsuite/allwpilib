@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_UDPSOCKETS_UDPCLIENT_H_
-#define WPIUTIL_UDPSOCKETS_UDPCLIENT_H_
+#ifndef WPIUTIL_WPI_UDPCLIENT_H_
+#define WPIUTIL_WPI_UDPCLIENT_H_
 
 #include <string>
 
@@ -42,4 +42,4 @@ class UDPClient {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_UDPSOCKETS_UDPCLIENT_H_
+#endif  // WPIUTIL_WPI_UDPCLIENT_H_

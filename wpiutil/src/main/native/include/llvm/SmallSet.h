@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/SmallSet.h is deprecated; include wpi/SmallSet.h instead"
 #else
 #warning "llvm/SmallSet.h is deprecated; include wpi/SmallSet.h instead"
 #endif
+// clang-format on
 
 #include "wpi/SmallSet.h"
 

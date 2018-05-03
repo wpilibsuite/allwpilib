@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/WindowsError.h is deprecated; include wpi/WindowsError.h instead"
 #else
 #warning "llvm/WindowsError.h is deprecated; include wpi/WindowsError.h instead"
 #endif
+// clang-format on
 
 #include "wpi/WindowsError.h"
 

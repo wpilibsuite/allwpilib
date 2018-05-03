@@ -21,28 +21,28 @@
 #include "Subsystems/Shooter.h"
 
 class Robot : public IterativeRobot {
-public:
-	static DriveTrain drivetrain;
-	static Pivot pivot;
-	static Collector collector;
-	static Shooter shooter;
-	static Pneumatics pneumatics;
-	static OI oi;
+ public:
+  static DriveTrain drivetrain;
+  static Pivot pivot;
+  static Collector collector;
+  static Shooter shooter;
+  static Pneumatics pneumatics;
+  static OI oi;
 
-private:
-	frc::Command* m_autonomousCommand = nullptr;
-	DriveAndShootAutonomous m_driveAndShootAuto;
-	DriveForward m_driveForwardAuto;
-	SendableChooser<frc::Command*> m_autoChooser;
+ private:
+  frc::Command* m_autonomousCommand = nullptr;
+  DriveAndShootAutonomous m_driveAndShootAuto;
+  DriveForward m_driveForwardAuto;
+  SendableChooser<frc::Command*> m_autoChooser;
 
-	void RobotInit() override;
-	void AutonomousInit() override;
-	void AutonomousPeriodic() override;
-	void TeleopInit() override;
-	void TeleopPeriodic() override;
-	void TestPeriodic() override;
-	void DisabledInit() override;
-	void DisabledPeriodic() override;
+  void RobotInit() override;
+  void AutonomousInit() override;
+  void AutonomousPeriodic() override;
+  void TeleopInit() override;
+  void TeleopPeriodic() override;
+  void TestPeriodic() override;
+  void DisabledInit() override;
+  void DisabledPeriodic() override;
 
-	void Log();
+  void Log();
 };

@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_JNI_UTIL_H_
-#define WPIUTIL_SUPPORT_JNI_UTIL_H_
+#ifndef WPIUTIL_WPI_JNI_UTIL_H_
+#define WPIUTIL_WPI_JNI_UTIL_H_
 
 #include <jni.h>
 
@@ -44,8 +44,6 @@ std::string GetJavaStackTrace(JNIEnv* env, std::string* func) {
       excludeFuncPrefix == nullptr ? StringRef() : excludeFuncPrefix);
 }
 
-
-
 // Finds a class and keep it as a global reference.
 // Use with caution, as the destructor does NOT call DeleteGlobalRef due
 // to potential shutdown issues with doing so.
@@ -73,7 +71,7 @@ class JClass {
   jclass m_cls = nullptr;
 };
 
-template<typename T>
+template <typename T>
 class JGlobal {
  public:
   JGlobal() = default;
@@ -393,7 +391,7 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<bool> arr) {
   return jarr;
 }
 
-// Other MakeJ*Array conversions.
+  // Other MakeJ*Array conversions.
 
 #define WPI_JNI_MAKEJARRAY(T, F)                                  \
   inline T##Array MakeJ##F##Array(JNIEnv* env, ArrayRef<T> arr) { \
@@ -623,4 +621,4 @@ class JException : public JClass {
 }  // namespace java
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_JNI_UTIL_H_
+#endif  // WPIUTIL_WPI_JNI_UTIL_H_
