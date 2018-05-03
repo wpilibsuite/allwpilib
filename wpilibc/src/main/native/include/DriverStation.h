@@ -7,6 +7,11 @@
 
 #pragma once
 
+#include <wpi/Twine.h>
+#include <wpi/condition_variable.h>
+#include <wpi/deprecated.h>
+#include <wpi/mutex.h>
+
 #include <array>
 #include <atomic>
 #include <memory>
@@ -14,10 +19,6 @@
 #include <thread>
 
 #include <HAL/DriverStation.h>
-#include <wpi/Twine.h>
-#include <wpi/condition_variable.h>
-#include <wpi/deprecated.h>
-#include <wpi/mutex.h>
 
 #include "ErrorBase.h"
 #include "RobotState.h"
@@ -41,8 +42,7 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
   static void ReportError(const wpi::Twine& error);
   static void ReportWarning(const wpi::Twine& error);
   static void ReportError(bool isError, int code, const wpi::Twine& error,
-                          const wpi::Twine& location,
-                          const wpi::Twine& stack);
+                          const wpi::Twine& location, const wpi::Twine& stack);
 
   static constexpr int kJoystickPorts = 6;
 

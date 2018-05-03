@@ -7,10 +7,10 @@
 
 #pragma once
 
+#include <wpi/mutex.h>
+
 #include <atomic>
 #include <memory>
-
-#include <wpi/mutex.h>
 
 #include "../PortsInternal.h"
 #include "MockData/NotifyListenerVector.h"

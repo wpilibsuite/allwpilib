@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015-2018. All Rights Reserved.                        */
+/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,13 +8,12 @@
 #include "WireEncoder.h"
 
 #include <stdint.h>
+#include <wpi/MathExtras.h>
+#include <wpi/leb128.h>
 
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
-
-#include <wpi/MathExtras.h>
-#include <wpi/leb128.h>
 
 using namespace nt;
 

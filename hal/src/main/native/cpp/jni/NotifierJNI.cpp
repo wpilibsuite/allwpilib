@@ -1,16 +1,18 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Notifier.h"
-#include <assert.h>
 #include <jni.h>
-#include <stdio.h>
-#include "HALUtil.h"
+
+#include <cassert>
+#include <cstdio>
+
+#include "HAL/Notifier.h"
 #include "HAL/cpp/Log.h"
+#include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_NotifierJNI.h"
 
 using namespace frc;
@@ -22,7 +24,7 @@ TLogLevel notifierJNILogLevel = logWARNING;
   if (level > notifierJNILogLevel) \
     ;                              \
   else                             \
-  Log().Get(level)
+    Log().Get(level)
 
 extern "C" {
 
@@ -32,8 +34,8 @@ extern "C" {
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier(
-    JNIEnv *env, jclass) {
+Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier(JNIEnv* env,
+                                                              jclass) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI initializeNotifier";
 
   int32_t status = 0;
@@ -43,7 +45,7 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier(
   NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
 
   if (notifierHandle <= 0 || !CheckStatusForceThrow(env, status)) {
-    return 0; // something went wrong in HAL
+    return 0;  // something went wrong in HAL
   }
 
   return (jint)notifierHandle;
@@ -54,9 +56,8 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier(
  * Method:    stopNotifier
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_NotifierJNI_stopNotifier(
-    JNIEnv *env, jclass cls, jint notifierHandle) {
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_stopNotifier(
+    JNIEnv* env, jclass cls, jint notifierHandle) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI stopNotifier";
 
   NOTIFIERJNI_LOG(logDEBUG) << "Notifier Handle = " << notifierHandle;
@@ -73,7 +74,7 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_stopNotifier(
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier(
-    JNIEnv *env, jclass, jint notifierHandle) {
+    JNIEnv* env, jclass, jint notifierHandle) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI cleanNotifier";
 
   NOTIFIERJNI_LOG(logDEBUG) << "Notifier Handle = " << notifierHandle;
@@ -91,7 +92,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifierAlarm(
-    JNIEnv *env, jclass cls, jint notifierHandle, jlong triggerTime) {
+    JNIEnv* env, jclass cls, jint notifierHandle, jlong triggerTime) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI updateNotifierAlarm";
 
   NOTIFIERJNI_LOG(logDEBUG) << "Notifier Handle = " << notifierHandle;
@@ -99,7 +100,8 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifierAlarm(
   NOTIFIERJNI_LOG(logDEBUG) << "triggerTime = " << triggerTime;
 
   int32_t status = 0;
-  HAL_UpdateNotifierAlarm((HAL_NotifierHandle)notifierHandle, (uint64_t)triggerTime, &status);
+  HAL_UpdateNotifierAlarm((HAL_NotifierHandle)notifierHandle,
+                          static_cast<uint64_t>(triggerTime), &status);
   NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -111,7 +113,7 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifierAlarm(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cancelNotifierAlarm(
-    JNIEnv *env, jclass cls, jint notifierHandle) {
+    JNIEnv* env, jclass cls, jint notifierHandle) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI cancelNotifierAlarm";
 
   NOTIFIERJNI_LOG(logDEBUG) << "Notifier Handle = " << notifierHandle;
@@ -129,7 +131,7 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cancelNotifierAlarm(
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_wpilibj_hal_NotifierJNI_waitForNotifierAlarm(
-    JNIEnv *env, jclass cls, jint notifierHandle) {
+    JNIEnv* env, jclass cls, jint notifierHandle) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI waitForNotifierAlarm";
 
   NOTIFIERJNI_LOG(logDEBUG) << "Notifier Handle = " << notifierHandle;

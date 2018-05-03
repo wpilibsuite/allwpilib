@@ -1,14 +1,18 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015-2018. All Rights Reserved.                        */
+/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NTCORE_NTCORE_CPP_H_
-#define NTCORE_NTCORE_CPP_H_
+#ifndef ALLWPILIB_NTCORE_CPP_H_
+#define ALLWPILIB_NTCORE_CPP_H_
 
 #include <stdint.h>
+#include <wpi/ArrayRef.h>
+#include <wpi/StringRef.h>
+#include <wpi/Twine.h>
+#include <wpi/deprecated.h>
 
 #include <cassert>
 #include <functional>
@@ -16,11 +20,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <wpi/ArrayRef.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
-#include <wpi/deprecated.h>
 
 #include "networktables/NetworkTableValue.h"
 
@@ -1486,4 +1485,4 @@ inline void RpcAnswer::PostResponse(StringRef result) const {
 
 }  // namespace nt
 
-#endif  // NTCORE_NTCORE_CPP_H_
+#endif  // ALLWPILIB_NTCORE_CPP_H_

@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/raw_ostream.h is deprecated; include wpi/raw_ostream.h instead"
+#pragma message \
+    "warning: llvm/raw_ostream.h is deprecated; include wpi/raw_ostream.h instead"
 #else
 #warning "llvm/raw_ostream.h is deprecated; include wpi/raw_ostream.h instead"
 #endif

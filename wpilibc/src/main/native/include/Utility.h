@@ -12,12 +12,11 @@
  */
 
 #include <stdint.h>
-
-#include <string>
-
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
 #include <wpi/deprecated.h>
+
+#include <string>
 
 #define wpi_assert(condition) \
   wpi_assert_impl(condition, #condition, "", __FILE__, __LINE__, __FUNCTION__)
@@ -47,9 +46,8 @@ bool wpi_assertEqual_impl(int valueA, int valueB,
 bool wpi_assertNotEqual_impl(int valueA, int valueB,
                              const wpi::Twine& valueAString,
                              const wpi::Twine& valueBString,
-                             const wpi::Twine& message,
-                             wpi::StringRef fileName, int lineNumber,
-                             wpi::StringRef funcName);
+                             const wpi::Twine& message, wpi::StringRef fileName,
+                             int lineNumber, wpi::StringRef funcName);
 
 void wpi_suspendOnAssertEnabled(bool enabled);
 

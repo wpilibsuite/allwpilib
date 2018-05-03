@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/StringRef.h is deprecated; include wpi/StringRef.h instead"
+#pragma message \
+    "warning: llvm/StringRef.h is deprecated; include wpi/StringRef.h instead"
 #else
 #warning "llvm/StringRef.h is deprecated; include wpi/StringRef.h instead"
 #endif

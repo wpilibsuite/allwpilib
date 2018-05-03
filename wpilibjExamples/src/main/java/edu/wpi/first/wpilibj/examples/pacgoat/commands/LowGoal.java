@@ -17,9 +17,9 @@ import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Pivot;
  * it.
  */
 public class LowGoal extends CommandGroup {
-	public LowGoal() {
-		addSequential(new SetPivotSetpoint(Pivot.kLowGoal));
-		addSequential(new SetCollectionSpeed(Collector.kReverse));
-		addSequential(new ExtendShooter());
-	}
+  public LowGoal() {
+    addSequential(new SetPivotSetpoint(Pivot.kLowGoal));
+    addSequential(new SetCollectionSpeed(Collector.kReverse));
+    addSequential(new ExtendShooter());
+  }
 }

@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <memory>
-
 #include <wpi/StringMap.h>
 #include <wpi/StringRef.h>
+
+#include <memory>
 
 #include "SmartDashboard/SendableChooserBase.h"
 

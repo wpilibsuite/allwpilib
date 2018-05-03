@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_TELEMETRY_H_
-#define CSCORE_TELEMETRY_H_
+#ifndef ALLWPILIB_TELEMETRY_H_
+#define ALLWPILIB_TELEMETRY_H_
 
 #include <wpi/SafeThread.h>
 
@@ -49,4 +49,4 @@ class Telemetry {
 
 }  // namespace cs
 
-#endif  // CSCORE_TELEMETRY_H_
+#endif  // ALLWPILIB_TELEMETRY_H_

@@ -11,13 +11,12 @@
 #include <linux/spi/spidev.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
 
 #include <array>
 #include <atomic>
 #include <cstring>
-
-#include <wpi/raw_ostream.h>
-#include <wpi/mutex.h>
 
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"

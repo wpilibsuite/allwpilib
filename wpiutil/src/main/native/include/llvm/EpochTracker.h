@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/EpochTracker.h is deprecated; include wpi/EpochTracker.h instead"
+#pragma message \
+    "warning: llvm/EpochTracker.h is deprecated; include wpi/EpochTracker.h instead"
 #else
 #warning "llvm/EpochTracker.h is deprecated; include wpi/EpochTracker.h instead"
 #endif

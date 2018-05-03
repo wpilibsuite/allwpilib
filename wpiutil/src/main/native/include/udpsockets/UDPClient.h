@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: udpsockets/UDPClient.h is deprecated; include wpi/UDPClient.h instead"
+#pragma message \
+    "warning: udpsockets/UDPClient.h is deprecated; include wpi/UDPClient.h instead"
 #else
 #warning "udpsockets/UDPClient.h is deprecated; include wpi/UDPClient.h instead"
 #endif

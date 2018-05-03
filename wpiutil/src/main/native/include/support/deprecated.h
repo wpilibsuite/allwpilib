@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/deprecated.h is deprecated; include wpi/deprecated.h instead"
+#pragma message \
+    "warning: support/deprecated.h is deprecated; include wpi/deprecated.h instead"
 #else
 #warning "support/deprecated.h is deprecated; include wpi/deprecated.h instead"
 #endif

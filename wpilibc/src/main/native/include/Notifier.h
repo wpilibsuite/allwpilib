@@ -8,6 +8,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <wpi/mutex.h>
 
 #include <atomic>
 #include <functional>
@@ -15,7 +16,6 @@
 #include <utility>
 
 #include <HAL/Notifier.h>
-#include <wpi/mutex.h>
 
 #include "ErrorBase.h"
 

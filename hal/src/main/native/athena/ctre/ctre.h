@@ -24,32 +24,32 @@
 #define BIT15 0x8000
 
 //Signed
-typedef	signed char	INT8;
-typedef	signed short	INT16;
-typedef	signed int	INT32;
-typedef	signed long long INT64;
+typedef  signed char  INT8;
+typedef  signed short  INT16;
+typedef  signed int  INT32;
+typedef  signed long long INT64;
 
 //Unsigned
-typedef	unsigned char	UINT8;
-typedef	unsigned short	UINT16;
-typedef	unsigned int	UINT32;
-typedef	unsigned long long UINT64;
+typedef  unsigned char  UINT8;
+typedef  unsigned short  UINT16;
+typedef  unsigned int  UINT32;
+typedef  unsigned long long UINT64;
 
 //Other
-typedef	unsigned char	UCHAR;
-typedef unsigned short	USHORT;
-typedef	unsigned int	UINT;
-typedef unsigned long	ULONG;
+typedef  unsigned char  UCHAR;
+typedef unsigned short  USHORT;
+typedef  unsigned int  UINT;
+typedef unsigned long  ULONG;
 
 typedef enum {
-		CTR_OKAY,				//!< No Error - Function executed as expected
-		CTR_RxTimeout,			//!< CAN frame has not been received within specified period of time.
-		CTR_TxTimeout,			//!< Not used.
-		CTR_InvalidParamValue, 	//!< Caller passed an invalid param
-		CTR_UnexpectedArbId,	//!< Specified CAN Id is invalid.
-		CTR_TxFailed,			//!< Could not transmit the CAN frame.
-		CTR_SigNotUpdated,		//!< Have not received an value response for signal.
-		CTR_BufferFull,			//!< Caller attempted to insert data into a buffer that is full.
+    CTR_OKAY,        //!< No Error - Function executed as expected
+    CTR_RxTimeout,      //!< CAN frame has not been received within specified period of time.
+    CTR_TxTimeout,      //!< Not used.
+    CTR_InvalidParamValue,   //!< Caller passed an invalid param
+    CTR_UnexpectedArbId,  //!< Specified CAN Id is invalid.
+    CTR_TxFailed,      //!< Could not transmit the CAN frame.
+    CTR_SigNotUpdated,    //!< Have not received an value response for signal.
+    CTR_BufferFull,      //!< Caller attempted to insert data into a buffer that is full.
 }CTR_Code;
 
 #endif /* CTRE_H */

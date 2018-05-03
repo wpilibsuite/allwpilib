@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <string>
-
 #include <wpi/StringRef.h>
 #include <wpi/deprecated.h>
+
+#include <string>
 
 #include "ErrorBase.h"
 

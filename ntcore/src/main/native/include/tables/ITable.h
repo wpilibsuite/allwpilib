@@ -1,20 +1,20 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015-2018. All Rights Reserved.                        */
+/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NTCORE_TABLES_ITABLE_H_
-#define NTCORE_TABLES_ITABLE_H_
-
-#include <memory>
-#include <string>
-#include <vector>
+#ifndef ALLWPILIB_TABLES_ITABLE_H_
+#define ALLWPILIB_TABLES_ITABLE_H_
 
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
 #include <wpi/deprecated.h>
+
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "networktables/NetworkTableValue.h"
 
@@ -453,4 +453,4 @@ class WPI_DEPRECATED("Use NetworkTable directly") ITable {
   virtual wpi::StringRef GetPath() const = 0;
 };
 
-#endif  // NTCORE_TABLES_ITABLE_H_
+#endif  // ALLWPILIB_TABLES_ITABLE_H_

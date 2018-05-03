@@ -7,11 +7,11 @@
 
 #include "SourceImpl.h"
 
-#include <algorithm>
-#include <cstring>
-
 #include <wpi/STLExtras.h>
 #include <wpi/timestamp.h>
+
+#include <algorithm>
+#include <cstring>
 
 #include "Log.h"
 #include "Notifier.h"
@@ -131,8 +131,7 @@ CS_PropertyKind SourceImpl::GetPropertyKind(int property) const {
 wpi::StringRef SourceImpl::GetPropertyName(int property,
                                            wpi::SmallVectorImpl<char>& buf,
                                            CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status))
-    return wpi::StringRef{};
+  if (!m_properties_cached && !CacheProperties(status)) return wpi::StringRef{};
   std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
@@ -206,8 +205,7 @@ int SourceImpl::GetPropertyDefault(int property, CS_Status* status) const {
 wpi::StringRef SourceImpl::GetStringProperty(int property,
                                              wpi::SmallVectorImpl<char>& buf,
                                              CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status))
-    return wpi::StringRef{};
+  if (!m_properties_cached && !CacheProperties(status)) return wpi::StringRef{};
   std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {

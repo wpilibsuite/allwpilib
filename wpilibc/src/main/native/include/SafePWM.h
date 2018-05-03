@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <memory>
-
 #include <wpi/raw_ostream.h>
+
+#include <memory>
 
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"

@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/FileSystem.h is deprecated; include wpi/FileSystem.h instead"
+#pragma message \
+    "warning: llvm/FileSystem.h is deprecated; include wpi/FileSystem.h instead"
 #else
 #warning "llvm/FileSystem.h is deprecated; include wpi/FileSystem.h instead"
 #endif

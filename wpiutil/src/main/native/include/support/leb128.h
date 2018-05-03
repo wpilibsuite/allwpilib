@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/leb128.h is deprecated; include wpi/leb128.h instead"
+#pragma message \
+    "warning: support/leb128.h is deprecated; include wpi/leb128.h instead"
 #else
 #warning "support/leb128.h is deprecated; include wpi/leb128.h instead"
 #endif

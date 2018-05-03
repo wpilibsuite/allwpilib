@@ -8,9 +8,11 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: tcpsockets/NetworkAcceptor.h is deprecated; include wpi/NetworkAcceptor.h instead"
+#pragma message \
+    "warning: tcpsockets/NetworkAcceptor.h is deprecated; include wpi/NetworkAcceptor.h instead"
 #else
-#warning "tcpsockets/NetworkAcceptor.h is deprecated; include wpi/NetworkAcceptor.h instead"
+#warning \
+    "tcpsockets/NetworkAcceptor.h is deprecated; include wpi/NetworkAcceptor.h instead"
 #endif
 
 #include "wpi/NetworkAcceptor.h"

@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_LOG_H_
-#define CSCORE_LOG_H_
+#ifndef ALLWPILIB_LOG_H_
+#define ALLWPILIB_LOG_H_
 
 #include <wpi/Logger.h>
 
@@ -51,4 +51,4 @@ class Logger : public wpi::Logger {
 
 }  // namespace cs
 
-#endif  // CSCORE_LOG_H_
+#endif  // ALLWPILIB_LOG_H_

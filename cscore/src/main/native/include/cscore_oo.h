@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_CSCORE_OO_H_
-#define CSCORE_CSCORE_OO_H_
+#ifndef ALLWPILIB_CSCORE_OO_H_
+#define ALLWPILIB_CSCORE_OO_H_
 
 #include <initializer_list>
 #include <string>
@@ -448,8 +448,7 @@ class CvSource : public VideoSource {
   /// @param defaultValue Default value
   /// @param value Current value
   /// @return Property
-  VideoProperty CreateStringProperty(wpi::StringRef name,
-                                     wpi::StringRef value);
+  VideoProperty CreateStringProperty(wpi::StringRef name, wpi::StringRef value);
 
   /// Configure enum property choices.
   /// @param property Property
@@ -658,4 +657,4 @@ class VideoListener {
 
 #include "cscore_oo.inl"
 
-#endif  // CSCORE_CSCORE_OO_H_
+#endif  // ALLWPILIB_CSCORE_OO_H_

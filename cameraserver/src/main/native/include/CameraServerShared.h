@@ -7,11 +7,11 @@
 
 #pragma once
 
+#include <wpi/StringRef.h>
+
 #include <memory>
 #include <thread>
 #include <utility>
-
-#include <wpi/StringRef.h>
 
 namespace frc {
 class CameraServerShared {

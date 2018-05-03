@@ -34,9 +34,8 @@ Solenoid::Solenoid(int channel)
 Solenoid::Solenoid(int moduleNumber, int channel)
     : SolenoidBase(moduleNumber), m_channel(channel) {
   if (!SensorBase::CheckSolenoidModule(m_moduleNumber)) {
-    wpi_setWPIErrorWithContext(
-        ModuleIndexOutOfRange,
-        "Solenoid Module " + wpi::Twine(m_moduleNumber));
+    wpi_setWPIErrorWithContext(ModuleIndexOutOfRange,
+                               "Solenoid Module " + wpi::Twine(m_moduleNumber));
     return;
   }
   if (!SensorBase::CheckSolenoidChannel(m_channel)) {

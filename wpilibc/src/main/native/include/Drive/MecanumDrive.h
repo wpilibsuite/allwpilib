@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <memory>
-
 #include <wpi/raw_ostream.h>
+
+#include <memory>
 
 #include "Drive/RobotDriveBase.h"
 

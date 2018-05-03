@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <set>
-
 #include <wpi/mutex.h>
+
+#include <set>
 
 #include "ErrorBase.h"
 

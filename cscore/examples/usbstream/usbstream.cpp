@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <cstdio>
-
 #include <wpi/raw_ostream.h>
+
+#include <cstdio>
 
 #include "cscore.h"
 

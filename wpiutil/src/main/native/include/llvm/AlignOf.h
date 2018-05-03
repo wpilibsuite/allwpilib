@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/AlignOf.h is deprecated; include wpi/AlignOf.h instead"
+#pragma message \
+    "warning: llvm/AlignOf.h is deprecated; include wpi/AlignOf.h instead"
 #else
 #warning "llvm/AlignOf.h is deprecated; include wpi/AlignOf.h instead"
 #endif

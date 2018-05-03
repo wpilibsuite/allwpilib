@@ -5,6 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
+
 #include <atomic>
 #include <chrono>
 #include <cstdlib>
@@ -13,9 +17,6 @@
 
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/NetCommRPCProxy_Occur.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 
 #include "HAL/DriverStation.h"
 

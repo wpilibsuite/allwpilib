@@ -8,10 +8,9 @@
 #pragma once
 
 #include <stdint.h>
+#include <wpi/mutex.h>
 
 #include <memory>
-
-#include <wpi/mutex.h>
 
 #include "HAL/AnalogTrigger.h"
 #include "HAL/ChipObject.h"

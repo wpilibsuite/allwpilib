@@ -8,16 +8,15 @@
 #include "UsbUtil.h"
 
 #include <fcntl.h>
+#include <wpi/Format.h>
+#include <wpi/SmallString.h>
+#include <wpi/raw_istream.h>
+#include <wpi/raw_ostream.h>
 
 #ifdef __linux__
 #include <libgen.h>
 #include <sys/ioctl.h>
 #endif
-
-#include <wpi/Format.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
 
 #include "Log.h"
 

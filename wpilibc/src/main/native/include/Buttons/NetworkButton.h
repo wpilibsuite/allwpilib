@@ -7,11 +7,12 @@
 
 #pragma once
 
+#include <wpi/Twine.h>
+
 #include <memory>
 
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
-#include <wpi/Twine.h>
 
 #include "Buttons/Button.h"
 

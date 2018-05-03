@@ -7,6 +7,9 @@
 
 #include "DriverStation.h"
 
+#include <wpi/SmallString.h>
+#include <wpi/StringRef.h>
+
 #include <chrono>
 
 #include <HAL/HAL.h>
@@ -15,8 +18,6 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringRef.h>
 
 #include "AnalogInput.h"
 #include "MotorSafetyHelper.h"

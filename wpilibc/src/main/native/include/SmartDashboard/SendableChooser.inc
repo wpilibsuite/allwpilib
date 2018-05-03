@@ -7,13 +7,13 @@
 
 #pragma once
 
+#include <wpi/StringRef.h>
+
 #include <algorithm>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <wpi/StringRef.h>
 
 #include "SendableBuilder.h"
 

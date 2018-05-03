@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <chrono>
-#include <thread>
-
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
+
+#include <chrono>
+#include <thread>
 
 #include "cscore.h"
 

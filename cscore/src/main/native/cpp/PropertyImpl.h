@@ -5,13 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_PROPERTYIMPL_H_
-#define CSCORE_PROPERTYIMPL_H_
+#ifndef ALLWPILIB_PROPERTYIMPL_H_
+#define ALLWPILIB_PROPERTYIMPL_H_
+
+#include <wpi/StringRef.h>
 
 #include <string>
 #include <vector>
-
-#include <wpi/StringRef.h>
 
 #include "cscore_c.h"
 
@@ -73,4 +73,4 @@ class PropertyImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_PROPERTYIMPL_H_
+#endif  // ALLWPILIB_PROPERTYIMPL_H_

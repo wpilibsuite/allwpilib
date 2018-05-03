@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <wpi/timestamp.h>
+
 #include <atomic>
 #include <chrono>
 #include <cstdio>
 #include <thread>
-
-#include <wpi/timestamp.h>
 
 #include "MockHooksInternal.h"
 

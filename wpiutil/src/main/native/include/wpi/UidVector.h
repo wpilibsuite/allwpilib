@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_UIDVECTOR_H_
-#define WPIUTIL_SUPPORT_UIDVECTOR_H_
+#ifndef ALLWPILIB_WPI_UIDVECTOR_H_
+#define ALLWPILIB_WPI_UIDVECTOR_H_
 
 #include <utility>
 #include <vector>
@@ -64,4 +64,4 @@ class UidVector {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_UIDVECTOR_H_
+#endif  // ALLWPILIB_WPI_UIDVECTOR_H_

@@ -7,8 +7,9 @@
 
 #include "SampleRobot.h"
 
-#include <networktables/NetworkTable.h>
 #include <wpi/raw_ostream.h>
+
+#include <networktables/NetworkTable.h>
 
 #include "DriverStation.h"
 #include "LiveWindow/LiveWindow.h"

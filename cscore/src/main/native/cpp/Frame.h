@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_FRAME_H_
-#define CSCORE_FRAME_H_
+#ifndef ALLWPILIB_FRAME_H_
+#define ALLWPILIB_FRAME_H_
+
+#include <wpi/SmallVector.h>
+#include <wpi/mutex.h>
 
 #include <atomic>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <wpi/SmallVector.h>
-#include <wpi/mutex.h>
 
 #include "Image.h"
 #include "cscore_cpp.h"
@@ -159,4 +159,4 @@ class Frame {
 
 }  // namespace cs
 
-#endif  // CSCORE_FRAME_H_
+#endif  // ALLWPILIB_FRAME_H_

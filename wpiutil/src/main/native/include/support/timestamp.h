@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/timestamp.h is deprecated; include wpi/timestamp.h instead"
+#pragma message \
+    "warning: support/timestamp.h is deprecated; include wpi/timestamp.h instead"
 #else
 #warning "support/timestamp.h is deprecated; include wpi/timestamp.h instead"
 #endif

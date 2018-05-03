@@ -8,6 +8,10 @@
 #pragma once
 
 #include <stdint.h>
+#include <wpi/DenseMap.h>
+#include <wpi/StringMap.h>
+#include <wpi/StringRef.h>
+#include <wpi/mutex.h>
 
 #include <atomic>
 #include <memory>
@@ -15,10 +19,6 @@
 #include <vector>
 
 #include <networktables/NetworkTable.h>
-#include <wpi/DenseMap.h>
-#include <wpi/StringMap.h>
-#include <wpi/StringRef.h>
-#include <wpi/mutex.h>
 
 #include "cscore.h"
 
@@ -80,8 +80,7 @@ class CameraServer {
    * @param name The name to give the camera
    * @param path The device path (e.g. "/dev/video0") of the camera
    */
-  cs::UsbCamera StartAutomaticCapture(wpi::StringRef name,
-                                      wpi::StringRef path);
+  cs::UsbCamera StartAutomaticCapture(wpi::StringRef name, wpi::StringRef path);
 #endif
 
   /**

@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <memory>
-
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
+
+#include <memory>
 
 #include "ErrorBase.h"
 #include "SmartDashboard/Sendable.h"

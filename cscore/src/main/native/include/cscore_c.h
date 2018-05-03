@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_CSCORE_C_H_
-#define CSCORE_CSCORE_C_H_
+#ifndef ALLWPILIB_CSCORE_C_H_
+#define ALLWPILIB_CSCORE_C_H_
 
 #include <stdint.h>
 
@@ -400,4 +400,4 @@ void CS_FreeNetworkInterfaces(char** interfaces, int count);
 }  // extern "C"
 #endif
 
-#endif  // CSCORE_CSCORE_C_H_
+#endif  // ALLWPILIB_CSCORE_C_H_

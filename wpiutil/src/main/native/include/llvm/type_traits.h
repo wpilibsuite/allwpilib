@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/type_traits.h is deprecated; include wpi/type_traits.h instead"
+#pragma message \
+    "warning: llvm/type_traits.h is deprecated; include wpi/type_traits.h instead"
 #else
 #warning "llvm/type_traits.h is deprecated; include wpi/type_traits.h instead"
 #endif

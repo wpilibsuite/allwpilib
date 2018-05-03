@@ -5,11 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_USBUTIL_H_
-#define CSCORE_USBUTIL_H_
+#ifndef ALLWPILIB_USBUTIL_H_
+#define ALLWPILIB_USBUTIL_H_
 
 #include <stdint.h>
-
 #include <wpi/SmallVector.h>
 #include <wpi/StringRef.h>
 
@@ -32,4 +31,4 @@ int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
 
 }  // namespace cs
 
-#endif  // CSCORE_USBUTIL_H_
+#endif  // ALLWPILIB_USBUTIL_H_

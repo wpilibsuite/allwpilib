@@ -5,13 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_CVSINKIMPL_H_
-#define CSCORE_CVSINKIMPL_H_
-
-#include <atomic>
-#include <memory>
-#include <thread>
-#include <vector>
+#ifndef ALLWPILIB_CVSINKIMPL_H_
+#define ALLWPILIB_CVSINKIMPL_H_
 
 #include <wpi/NetworkAcceptor.h>
 #include <wpi/NetworkStream.h>
@@ -20,6 +15,11 @@
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/raw_socket_ostream.h>
+
+#include <atomic>
+#include <memory>
+#include <thread>
+#include <vector>
 
 #include "SinkImpl.h"
 
@@ -49,4 +49,4 @@ class CvSinkImpl : public SinkImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_CVSINKIMPL_H_
+#endif  // ALLWPILIB_CVSINKIMPL_H_

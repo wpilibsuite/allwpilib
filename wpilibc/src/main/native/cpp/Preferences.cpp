@@ -7,11 +7,12 @@
 
 #include "Preferences.h"
 
+#include <wpi/StringRef.h>
+
 #include <algorithm>
 
 #include <HAL/HAL.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/StringRef.h>
 
 #include "WPIErrors.h"
 

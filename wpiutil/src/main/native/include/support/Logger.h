@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/Logger.h is deprecated; include wpi/Logger.h instead"
+#pragma message \
+    "warning: support/Logger.h is deprecated; include wpi/Logger.h instead"
 #else
 #warning "support/Logger.h is deprecated; include wpi/Logger.h instead"
 #endif

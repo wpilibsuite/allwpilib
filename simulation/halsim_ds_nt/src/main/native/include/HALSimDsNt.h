@@ -7,13 +7,14 @@
 
 #pragma once
 
+#include <wpi/mutex.h>
+
 #include <atomic>
 #include <memory>
 #include <thread>
 
 #include <MockData/DriverStationData.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/mutex.h>
 
 enum HALSimDSNT_Mode { teleop, auton, test };
 

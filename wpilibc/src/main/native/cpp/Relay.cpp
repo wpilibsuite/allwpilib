@@ -7,10 +7,11 @@
 
 #include "Relay.h"
 
+#include <wpi/raw_ostream.h>
+
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
 #include <HAL/Relay.h>
-#include <wpi/raw_ostream.h>
 
 #include "MotorSafetyHelper.h"
 #include "SensorBase.h"

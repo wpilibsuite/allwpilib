@@ -7,11 +7,11 @@
 
 #pragma once
 
+#include <wpi/mutex.h>
+
 #include <array>
 #include <atomic>
 #include <memory>
-
-#include <wpi/mutex.h>
 
 #include "MockData/DriverStationData.h"
 #include "MockData/NotifyListenerVector.h"

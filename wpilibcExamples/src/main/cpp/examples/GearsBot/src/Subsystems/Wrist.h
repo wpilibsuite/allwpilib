@@ -16,40 +16,40 @@
  * of a linear joint.
  */
 class Wrist : public PIDSubsystem {
-public:
-	Wrist();
+ public:
+  Wrist();
 
-	void InitDefaultCommand() override;
+  void InitDefaultCommand() override;
 
-	/**
-	 * The log method puts interesting information to the SmartDashboard.
-	 */
-	void Log();
+  /**
+   * The log method puts interesting information to the SmartDashboard.
+   */
+  void Log();
 
-	/**
-	 * Use the potentiometer as the PID sensor. This method is automatically
-	 * called by the subsystem.
-	 */
-	double ReturnPIDInput() override;
+  /**
+   * Use the potentiometer as the PID sensor. This method is automatically
+   * called by the subsystem.
+   */
+  double ReturnPIDInput() override;
 
-	/**
-	 * Use the motor as the PID output. This method is automatically called
-	 * by
-	 * the subsystem.
-	 */
-	void UsePIDOutput(double d) override;
+  /**
+   * Use the motor as the PID output. This method is automatically called
+   * by
+   * the subsystem.
+   */
+  void UsePIDOutput(double d) override;
 
-private:
-	frc::Spark m_motor{6};
+ private:
+  frc::Spark m_motor{6};
 
 // Conversion value of potentiometer varies between the real world and
 // simulation
 #ifndef SIMULATION
-	frc::AnalogPotentiometer m_pot{3, -270.0 / 5};
+  frc::AnalogPotentiometer m_pot{3, -270.0 / 5};
 #else
-	frc::AnalogPotentiometer m_pot{3};  // Defaults to degrees
+  frc::AnalogPotentiometer m_pot{3};  // Defaults to degrees
 #endif
 
-	static constexpr double kP_real = 1;
-	static constexpr double kP_simulation = 0.05;
+  static constexpr double kP_real = 1;
+  static constexpr double kP_simulation = 0.05;
 };

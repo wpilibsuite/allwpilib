@@ -9,9 +9,8 @@
 
 #include <SmartDashboard/SmartDashboard.h>
 
-Pneumatics::Pneumatics()
-    : frc::Subsystem("Pneumatics") {
-	AddChild("Pressure Sensor", m_pressureSensor);
+Pneumatics::Pneumatics() : frc::Subsystem("Pneumatics") {
+  AddChild("Pressure Sensor", m_pressureSensor);
 }
 
 /**
@@ -25,7 +24,7 @@ void Pneumatics::InitDefaultCommand() {}
  */
 void Pneumatics::Start() {
 #ifndef SIMULATION
-	m_compressor.Start();
+  m_compressor.Start();
 #endif
 }
 
@@ -34,9 +33,9 @@ void Pneumatics::Start() {
  */
 bool Pneumatics::IsPressurized() {
 #ifndef SIMULATION
-	return kMaxPressure <= m_pressureSensor.GetVoltage();
+  return kMaxPressure <= m_pressureSensor.GetVoltage();
 #else
-	return true;  // NOTE: Simulation always has full pressure
+  return true;  // NOTE: Simulation always has full pressure
 #endif
 }
 
@@ -44,6 +43,5 @@ bool Pneumatics::IsPressurized() {
  * Puts the pressure on the SmartDashboard.
  */
 void Pneumatics::WritePressure() {
-	frc::SmartDashboard::PutNumber(
-			"Pressure", m_pressureSensor.GetVoltage());
+  frc::SmartDashboard::PutNumber("Pressure", m_pressureSensor.GetVoltage());
 }

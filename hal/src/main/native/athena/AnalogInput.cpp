@@ -7,8 +7,9 @@
 
 #include "HAL/AnalogInput.h"
 
-#include <FRC_NetworkCommunication/AICalibration.h>
 #include <wpi/mutex.h>
+
+#include <FRC_NetworkCommunication/AICalibration.h>
 
 #include "AnalogInternal.h"
 #include "HAL/AnalogAccumulator.h"

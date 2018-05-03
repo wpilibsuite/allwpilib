@@ -1,12 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Accelerometer.h"
 #include <jni.h>
+
+#include "HAL/Accelerometer.h"
 #include "edu_wpi_first_wpilibj_hal_AccelerometerJNI.h"
 
 extern "C" {
@@ -18,7 +19,7 @@ extern "C" {
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccelerometerActive(
-    JNIEnv *, jclass, jboolean active) {
+    JNIEnv*, jclass, jboolean active) {
   HAL_SetAccelerometerActive(active);
 }
 
@@ -29,7 +30,7 @@ Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccelerometerActive(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccelerometerRange(
-    JNIEnv *, jclass, jint range) {
+    JNIEnv*, jclass, jint range) {
   HAL_SetAccelerometerRange((HAL_AccelerometerRange)range);
 }
 
@@ -39,8 +40,8 @@ Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccelerometerRange(
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerX(
-    JNIEnv *, jclass) {
+Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerX(JNIEnv*,
+                                                                  jclass) {
   return HAL_GetAccelerometerX();
 }
 
@@ -50,8 +51,8 @@ Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerX(
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerY(
-    JNIEnv *, jclass) {
+Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerY(JNIEnv*,
+                                                                  jclass) {
   return HAL_GetAccelerometerY();
 }
 
@@ -61,8 +62,8 @@ Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerY(
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerZ(
-    JNIEnv *, jclass) {
+Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerZ(JNIEnv*,
+                                                                  jclass) {
   return HAL_GetAccelerometerZ();
 }
 

@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <memory>
-
 #include <wpi/Twine.h>
 #include <wpi/deprecated.h>
+
+#include <memory>
 
 #include "SmartDashboard/Sendable.h"
 

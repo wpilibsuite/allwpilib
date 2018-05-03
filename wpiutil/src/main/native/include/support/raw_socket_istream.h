@@ -8,9 +8,11 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: support/raw_socket_istream.h is deprecated; include wpi/raw_socket_istream.h instead"
+#pragma message \
+    "warning: support/raw_socket_istream.h is deprecated; include wpi/raw_socket_istream.h instead"
 #else
-#warning "support/raw_socket_istream.h is deprecated; include wpi/raw_socket_istream.h instead"
+#warning \
+    "support/raw_socket_istream.h is deprecated; include wpi/raw_socket_istream.h instead"
 #endif
 
 #include "wpi/raw_socket_istream.h"

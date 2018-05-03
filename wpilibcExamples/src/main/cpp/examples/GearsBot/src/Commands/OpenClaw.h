@@ -14,9 +14,9 @@
  * motors is BAD!
  */
 class OpenClaw : public frc::Command {
-public:
-	OpenClaw();
-	void Initialize() override;
-	bool IsFinished() override;
-	void End() override;
+ public:
+  OpenClaw();
+  void Initialize() override;
+  bool IsFinished() override;
+  void End() override;
 };

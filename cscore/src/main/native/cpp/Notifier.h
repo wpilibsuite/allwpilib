@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_NOTIFIER_H_
-#define CSCORE_NOTIFIER_H_
-
-#include <functional>
+#ifndef ALLWPILIB_NOTIFIER_H_
+#define ALLWPILIB_NOTIFIER_H_
 
 #include <wpi/SafeThread.h>
+
+#include <functional>
 
 #include "cscore_cpp.h"
 
@@ -69,4 +69,4 @@ class Notifier {
 
 }  // namespace cs
 
-#endif  // CSCORE_NOTIFIER_H_
+#endif  // ALLWPILIB_NOTIFIER_H_

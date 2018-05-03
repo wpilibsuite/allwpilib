@@ -7,9 +7,9 @@
 
 #include "AnalogInternal.h"
 
-#include <atomic>
-
 #include <wpi/mutex.h>
+
+#include <atomic>
 
 #include "HAL/AnalogInput.h"
 #include "HAL/ChipObject.h"

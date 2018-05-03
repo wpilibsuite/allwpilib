@@ -8,7 +8,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/DenseMapInfo.h is deprecated; include wpi/DenseMapInfo.h instead"
+#pragma message \
+    "warning: llvm/DenseMapInfo.h is deprecated; include wpi/DenseMapInfo.h instead"
 #else
 #warning "llvm/DenseMapInfo.h is deprecated; include wpi/DenseMapInfo.h instead"
 #endif

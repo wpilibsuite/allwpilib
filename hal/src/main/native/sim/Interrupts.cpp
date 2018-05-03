@@ -7,9 +7,9 @@
 
 #include "HAL/Interrupts.h"
 
-#include <memory>
-
 #include <wpi/condition_variable.h>
+
+#include <memory>
 
 #include "AnalogInternal.h"
 #include "DigitalInternal.h"

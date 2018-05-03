@@ -21,20 +21,20 @@ import edu.wpi.first.wpilibj.Spark;
  * range from -1 to 1 making it easy to work together.
  */
 public class Robot extends IterativeRobot {
-	private static final int kMotorPort = 0;
-	private static final int kJoystickPort = 0;
+  private static final int kMotorPort = 0;
+  private static final int kJoystickPort = 0;
 
-	private SpeedController m_motor;
-	private Joystick m_joystick;
+  private SpeedController m_motor;
+  private Joystick m_joystick;
 
-	@Override
-	public void robotInit() {
-		m_motor = new Spark(kMotorPort);
-		m_joystick = new Joystick(kJoystickPort);
-	}
+  @Override
+  public void robotInit() {
+    m_motor = new Spark(kMotorPort);
+    m_joystick = new Joystick(kJoystickPort);
+  }
 
-	@Override
-	public void teleopPeriodic() {
-		m_motor.set(m_joystick.getY());
-	}
+  @Override
+  public void teleopPeriodic() {
+    m_motor.set(m_joystick.getY());
+  }
 }

@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <array>
-
 #include <wpi/deprecated.h>
+
+#include <array>
 
 #include "GenericHID.h"
 

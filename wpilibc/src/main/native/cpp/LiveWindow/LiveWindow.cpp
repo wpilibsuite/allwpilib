@@ -7,15 +7,16 @@
 
 #include "LiveWindow/LiveWindow.h"
 
+#include <wpi/DenseMap.h>
+#include <wpi/SmallString.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
+
 #include <algorithm>
 
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/DenseMap.h>
-#include <wpi/SmallString.h>
-#include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 
 #include "Commands/Scheduler.h"
 #include "SmartDashboard/SendableBuilderImpl.h"
@@ -115,8 +116,7 @@ void LiveWindow::SetEnabled(bool enabled) {
  * @brief Use a STL smart pointer to share ownership of component.
  * @deprecated Use Sendable::SetName() instead.
  */
-void LiveWindow::AddSensor(const wpi::Twine& subsystem,
-                           const wpi::Twine& name,
+void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
                            std::shared_ptr<Sendable> component) {
   Add(component);
   component->SetName(subsystem, name);
@@ -126,8 +126,8 @@ void LiveWindow::AddSensor(const wpi::Twine& subsystem,
  * @brief Pass a reference to LiveWindow and retain ownership of the component.
  * @deprecated Use Sendable::SetName() instead.
  */
-void LiveWindow::AddSensor(const wpi::Twine& subsystem,
-                           const wpi::Twine& name, Sendable& component) {
+void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
+                           Sendable& component) {
   Add(&component);
   component.SetName(subsystem, name);
 }
@@ -136,8 +136,8 @@ void LiveWindow::AddSensor(const wpi::Twine& subsystem,
  * @brief Use a raw pointer to the LiveWindow.
  * @deprecated Use Sendable::SetName() instead.
  */
-void LiveWindow::AddSensor(const wpi::Twine& subsystem,
-                           const wpi::Twine& name, Sendable* component) {
+void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
+                           Sendable* component) {
   Add(component);
   component->SetName(subsystem, name);
 }

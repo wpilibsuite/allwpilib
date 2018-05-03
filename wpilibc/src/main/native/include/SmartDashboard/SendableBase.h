@@ -7,10 +7,10 @@
 
 #pragma once
 
+#include <wpi/mutex.h>
+
 #include <memory>
 #include <string>
-
-#include <wpi/mutex.h>
 
 #include "Sendable.h"
 

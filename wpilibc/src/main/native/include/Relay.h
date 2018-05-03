@@ -7,10 +7,11 @@
 
 #pragma once
 
+#include <wpi/raw_ostream.h>
+
 #include <memory>
 
 #include <HAL/Types.h>
-#include <wpi/raw_ostream.h>
 
 #include "ErrorBase.h"
 #include "MotorSafety.h"

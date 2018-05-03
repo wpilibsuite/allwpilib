@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_TIMESTAMP_H_
-#define WPIUTIL_SUPPORT_TIMESTAMP_H_
+#ifndef ALLWPILIB_WPI_TIMESTAMP_H_
+#define ALLWPILIB_WPI_TIMESTAMP_H_
 
 #include <stdint.h>
 
@@ -68,4 +68,4 @@ uint64_t Now(void);
 }  // namespace wpi
 #endif
 
-#endif  // WPIUTIL_SUPPORT_TIMESTAMP_H_
+#endif  // ALLWPILIB_WPI_TIMESTAMP_H_

@@ -8,9 +8,11 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma message "warning: llvm/PointerLikeTypeTraits.h is deprecated; include wpi/PointerLikeTypeTraits.h instead"
+#pragma message \
+    "warning: llvm/PointerLikeTypeTraits.h is deprecated; include wpi/PointerLikeTypeTraits.h instead"
 #else
-#warning "llvm/PointerLikeTypeTraits.h is deprecated; include wpi/PointerLikeTypeTraits.h instead"
+#warning \
+    "llvm/PointerLikeTypeTraits.h is deprecated; include wpi/PointerLikeTypeTraits.h instead"
 #endif
 
 #include "wpi/PointerLikeTypeTraits.h"

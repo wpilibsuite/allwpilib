@@ -1,21 +1,20 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015-2018. All Rights Reserved.                        */
+/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NTCORE_WIREDECODER_H_
-#define NTCORE_WIREDECODER_H_
+#ifndef ALLWPILIB_WIREDECODER_H_
+#define ALLWPILIB_WIREDECODER_H_
 
 #include <stdint.h>
+#include <wpi/leb128.h>
+#include <wpi/raw_istream.h>
 
 #include <cstddef>
 #include <memory>
 #include <string>
-
-#include <wpi/leb128.h>
-#include <wpi/raw_istream.h>
 
 #include "Log.h"
 #include "networktables/NetworkTableValue.h"
@@ -155,4 +154,4 @@ class WireDecoder {
 
 }  // namespace nt
 
-#endif  // NTCORE_WIREDECODER_H_
+#endif  // ALLWPILIB_WIREDECODER_H_
