@@ -7,15 +7,15 @@
 
 #include <cstdio>
 
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "cscore.h"
 
 int main() {
-  llvm::outs() << "hostname: " << cs::GetHostname() << '\n';
-  llvm::outs() << "IPv4 network addresses:\n";
+  wpi::outs() << "hostname: " << cs::GetHostname() << '\n';
+  wpi::outs() << "IPv4 network addresses:\n";
   for (const auto& addr : cs::GetNetworkInterfaces())
-    llvm::outs() << "  " << addr << '\n';
+    wpi::outs() << "  " << addr << '\n';
   cs::UsbCamera camera{"usbcam", 0};
   camera.SetVideoMode(cs::VideoMode::kMJPEG, 320, 240, 30);
   cs::MjpegServer mjpegServer{"httpserver", 8081};
@@ -24,9 +24,9 @@ int main() {
   CS_Status status = 0;
   cs::AddListener(
       [&](const cs::RawEvent& event) {
-        llvm::outs() << "FPS=" << camera.GetActualFPS()
-                     << " MBPS=" << (camera.GetActualDataRate() / 1000000.0)
-                     << '\n';
+        wpi::outs() << "FPS=" << camera.GetActualFPS()
+                    << " MBPS=" << (camera.GetActualDataRate() / 1000000.0)
+                    << '\n';
       },
       cs::RawEvent::kTelemetryUpdated, false, &status);
   cs::SetTelemetryPeriod(1.0);
