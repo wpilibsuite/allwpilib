@@ -10,9 +10,9 @@
 
 namespace nt {
 
-inline NetworkTableInstance::NetworkTableInstance() NT_NOEXCEPT : m_handle{0} {}
+inline NetworkTableInstance::NetworkTableInstance() noexcept : m_handle{0} {}
 
-inline NetworkTableInstance::NetworkTableInstance(NT_Inst handle) NT_NOEXCEPT
+inline NetworkTableInstance::NetworkTableInstance(NT_Inst handle) noexcept
     : m_handle{handle} {}
 
 inline NetworkTableInstance NetworkTableInstance::GetDefault() {
