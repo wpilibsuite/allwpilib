@@ -48,7 +48,9 @@ public final class EntryBuilder extends BuilderBase implements TabAdder {
 
   private NetworkTableEntry generateEntry() {
     NetworkTableEntry entry = NetworkTableInstance.getDefault().getEntry(generateKey());
-    entry.setDefaultValue(m_defaultEntryValues.get(m_type));
+    if (!entry.setDefaultValue(m_defaultEntryValues.get(m_type))) {
+      entry.forceSetValue(m_defaultEntryValues.get(m_type));
+    }
     return entry;
   }
 
