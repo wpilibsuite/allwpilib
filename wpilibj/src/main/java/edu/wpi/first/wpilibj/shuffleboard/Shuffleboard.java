@@ -114,12 +114,11 @@ public final class Shuffleboard {
   public static void update() {
     NetworkTable baseTable = getBaseTable();
     // Update tabs
-    NetworkTable tabsTable = baseTable.getSubTable(".tabs");
     m_builders.stream()
         .map(b -> b.getTab().getName())
         .sorted()
         .forEach(tabName -> {
-          NetworkTable subTable = tabsTable.getSubTable(tabName);
+          NetworkTable subTable = getBaseTable().getSubTable(".tabs").getSubTable(tabName);
           subTable.getEntry("Name").setString(tabName);
           subTable.getEntry("AutopopulatePrefix").setString("/Shuffleboard/" + tabName + "/");
         });
