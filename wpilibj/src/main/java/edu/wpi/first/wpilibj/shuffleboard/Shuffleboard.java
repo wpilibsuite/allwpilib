@@ -59,6 +59,7 @@ public final class Shuffleboard {
   // Package-private and not final to allow tests to have fresh instances
   static NetworkTableInstance instance = NetworkTableInstance.getDefault();
 
+  private static boolean m_dirtyMetadata = false;
   private static List<BuilderBase> m_builders = new ArrayList<>();
   private static List<SendableData> m_sendables = new ArrayList<>();
 
@@ -114,25 +115,27 @@ public final class Shuffleboard {
   public static void update() {
     NetworkTable baseTable = getBaseTable();
     // Update tabs
-    m_builders.stream()
-        .map(b -> b.getTab().getName())
-        .sorted()
-        .forEach(tabName -> {
-          NetworkTable subTable = getBaseTable().getSubTable(".tabs").getSubTable(tabName);
-          subTable.getEntry("Name").setString(tabName);
-          subTable.getEntry("AutopopulatePrefix").setString("/Shuffleboard/" + tabName + "/");
-        });
+    if (m_dirtyMetadata) {
+      m_builders.stream()
+          .map(b -> b.getTab().getName())
+          .sorted()
+          .forEach(tabName -> {
+            NetworkTable subTable = getBaseTable().getSubTable(".tabs").getSubTable(tabName);
+            subTable.getEntry("Name").setString(tabName);
+            subTable.getEntry("AutopopulatePrefix").setString("/Shuffleboard/" + tabName + "/");
+          });
 
-    // Update layout and widget metadata
-    NetworkTable metadata = baseTable.getSubTable(".metadata");
-    for (BuilderBase builder : m_builders) {
-      NetworkTable tabTable = metadata.getSubTable(builder.getTab().getName());
+      // Update layout and widget metadata
+      NetworkTable metadata = baseTable.getSubTable(".metadata");
+      for (BuilderBase builder : m_builders) {
+        NetworkTable tabTable = metadata.getSubTable(builder.getTab().getName());
 
-      // Add layout metadata (type, title, properties)
-      NetworkTable parent = updateLayoutMetadata(builder, tabTable);
+        // Add layout metadata (type, title, properties)
+        NetworkTable parent = updateLayoutMetadata(builder, tabTable);
 
-      // Add widget metadata (type, properties)
-      updateWidgetMetadata(builder, parent);
+        // Add widget metadata (type, properties)
+        updateWidgetMetadata(builder, parent);
+      }
     }
 
     // Update sendables
@@ -142,6 +145,8 @@ public final class Shuffleboard {
       data.initialize();
       data.update();
     });
+
+    m_dirtyMetadata = false;
   }
 
   private static NetworkTable updateLayoutMetadata(BuilderBase builder, NetworkTable parent) {
@@ -213,6 +218,7 @@ public final class Shuffleboard {
     }
     EntryBuilder entry = new EntryBuilder(entryName, entryType);
     m_builders.add(entry);
+    m_dirtyMetadata = true;
     return entry;
   }
 
@@ -250,6 +256,7 @@ public final class Shuffleboard {
     m_builders.add(builder);
     SendableBuilderImpl sendableBuilder = new SendableBuilderImpl();
     m_sendables.add(new SendableData(builder, sendableBuilder));
+    m_dirtyMetadata = true;
     return builder;
   }
 
