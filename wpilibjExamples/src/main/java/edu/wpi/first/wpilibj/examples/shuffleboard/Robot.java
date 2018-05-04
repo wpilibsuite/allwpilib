@@ -52,12 +52,7 @@ public class Robot extends IterativeRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {
-    Shuffleboard.update();
-  }
-
-  @Override
-  public void teleopPeriodic() {
+  public void robotPeriodic() {
     Shuffleboard.update();
   }
 
