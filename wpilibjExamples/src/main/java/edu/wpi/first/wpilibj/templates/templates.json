@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Iterative Robot",
+    "description": "Iterative style",
+    "tags": [
+      "Iterative"
+    ],
+    "foldername": "iterative"
+  },
+  {
+    "name": "Timed Robot",
+    "description": "Timed style",
+    "tags": [
+      "Timed"
+    ],
+    "foldername": "timed"
+  },
+  {
+    "name": "Command Robot",
+    "description": "Command style",
+    "tags": [
+      "Command"
+    ],
+    "foldername": "commandbased"
+  },
+  {
+    "name": "Sample Robot",
+    "description": "Sample style",
+    "tags": [
+      "Sample"
+    ],
+    "foldername": "sample"
+  }
+]
