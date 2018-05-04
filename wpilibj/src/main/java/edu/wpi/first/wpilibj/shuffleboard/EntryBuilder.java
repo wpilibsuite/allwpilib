@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableType;
 
 import java.util.EnumMap;
@@ -47,7 +46,7 @@ public final class EntryBuilder extends BuilderBase implements TabAdder {
   }
 
   private NetworkTableEntry generateEntry() {
-    NetworkTableEntry entry = NetworkTableInstance.getDefault().getEntry(generateKey());
+    NetworkTableEntry entry = Shuffleboard.getNtInstance().getEntry(generateKey());
     if (!entry.setDefaultValue(m_defaultEntryValues.get(m_type))) {
       entry.forceSetValue(m_defaultEntryValues.get(m_type));
     }

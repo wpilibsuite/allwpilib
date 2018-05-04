@@ -56,8 +56,8 @@ public final class Shuffleboard {
 
   public static final String BASE_TABLE_NAME = "/Shuffleboard";
 
-  // Package-private and not final to allow tests to have fresh instances
-  static NetworkTableInstance instance = NetworkTableInstance.getDefault();
+  // Not final to allow tests to have fresh instances
+  private static NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
 
   private static boolean m_dirtyMetadata = false;
   private static List<BuilderBase> m_builders = new ArrayList<>();
@@ -84,7 +84,7 @@ public final class Shuffleboard {
      */
     public void initialize() {
       if (!m_initialized) {
-        m_builder.setTable(instance.getTable(m_sendable.generateKey()));
+        m_builder.setTable(ntInstance.getTable(m_sendable.generateKey()));
         m_sendable.getSendable().initSendable(m_builder);
         m_builder.startListeners();
         m_initialized = true;
@@ -100,12 +100,29 @@ public final class Shuffleboard {
   }
 
   /**
+   * Gets the NetworkTable instance that Shuffleboard is currently using. For internal use only.
+   */
+  static NetworkTableInstance getNtInstance() {
+    return ntInstance;
+  }
+
+  /**
+   * Sets the NetworkTable instance for Shuffleboard to use. This should only be used in tests to
+   * make sure each test has a fresh instance. For internal use only.
+   *
+   * @param newInstance the new instance
+   */
+  static void setNtInstance(NetworkTableInstance newInstance) {
+    ntInstance = newInstance;
+  }
+
+  /**
    * Gets the base Shuffleboard table in the current NetworkTables instance. This is a method
    * instead of stored as a field because the instance can change during tests, and a field would
    * still reference the original instance.
    */
   private static NetworkTable getBaseTable() {
-    return instance.getTable(BASE_TABLE_NAME);
+    return ntInstance.getTable(BASE_TABLE_NAME);
   }
 
   /**

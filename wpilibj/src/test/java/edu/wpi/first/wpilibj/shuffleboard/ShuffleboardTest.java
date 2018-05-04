@@ -46,12 +46,12 @@ public class ShuffleboardTest {
   @Before
   public void setUp() {
     instance = NetworkTableInstance.create();
-    Shuffleboard.instance = instance;
+    Shuffleboard.setNtInstance(instance);
   }
 
   @AfterClass
   public static void tearDown() {
-    Shuffleboard.instance = NetworkTableInstance.getDefault();
+    Shuffleboard.setNtInstance(NetworkTableInstance.getDefault());
   }
 
   @Test
@@ -161,6 +161,20 @@ public class ShuffleboardTest {
     NetworkTable properties = metadata.getSubTable("WidgetProperties");
     assertEquals(setOf("Property Title"), properties.getKeys());
     assertEquals("foo", properties.getEntry("Property Title").getString(null));
+  }
+
+  @Test
+  public void testEntryWithWrongExistingType() {
+    NetworkTableEntry entry = instance.getEntry("/Shuffleboard/Tab Name/Entry Name");
+    entry.setString("A string");
+    NetworkTableEntry addedEntry = add("Entry Name", kDouble)
+        .toTab("Tab Name")
+        .getEntry();
+    assertEquals("Generated entry name was unexpected", entry.getName(), addedEntry.getName());
+    assertEquals(kDouble, addedEntry.getType());
+    assertEquals(0.0, addedEntry.getDouble(Double.MAX_VALUE), 0);
+    assertEquals(kDouble, entry.getType());
+    assertEquals(0.0, entry.getDouble(Double.MAX_VALUE), 0);
   }
 
   @Test
