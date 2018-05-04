@@ -1,0 +1,64 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#ifndef WPIUTIL_SUPPORT_MEMORY_H_
+#define WPIUTIL_SUPPORT_MEMORY_H_
+
+#include <cstdlib>
+#include <exception>
+
+#include "wpi/raw_ostream.h"
+
+namespace wpi {
+
+/**
+ * Wrapper around std::calloc that calls std::terminate on out of memory.
+ * @param num number of objects to allocate
+ * @param size number of bytes per object to allocate
+ * @return Pointer to beginning of newly allocated memory.
+ */
+inline void* CheckedCalloc(size_t num, size_t size) {
+  void* p = std::calloc(num, size);
+  if (!p) {
+    errs() << "FATAL: failed to allocate " << (num * size) << " bytes\n";
+    std::terminate();
+  }
+  return p;
+}
+
+/**
+ * Wrapper around std::malloc that calls std::terminate on out of memory.
+ * @param size number of bytes to allocate
+ * @return Pointer to beginning of newly allocated memory.
+ */
+inline void* CheckedMalloc(size_t size) {
+  void* p = std::malloc(size == 0 ? 1 : size);
+  if (!p) {
+    errs() << "FATAL: failed to allocate " << size << " bytes\n";
+    std::terminate();
+  }
+  return p;
+}
+
+/**
+ * Wrapper around std::realloc that calls std::terminate on out of memory.
+ * @param ptr memory previously allocated
+ * @param size number of bytes to allocate
+ * @return Pointer to beginning of newly allocated memory.
+ */
+inline void* CheckedRealloc(void* ptr, size_t size) {
+  void* p = std::realloc(ptr, size == 0 ? 1 : size);
+  if (!p) {
+    errs() << "FATAL: failed to allocate " << size << " bytes\n";
+    std::terminate();
+  }
+  return p;
+}
+
+}  // namespace wpi
+
+#endif  // WPIUTIL_SUPPORT_MEMORY_H_

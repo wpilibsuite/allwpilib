@@ -29,6 +29,7 @@
 
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/memory.h>
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
@@ -1315,7 +1316,7 @@ char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status) {
 CS_UsbCameraInfo* CS_EnumerateUsbCameras(int* count, CS_Status* status) {
   auto cameras = cs::EnumerateUsbCameras(status);
   CS_UsbCameraInfo* out = static_cast<CS_UsbCameraInfo*>(
-      std::malloc(cameras.size() * sizeof(CS_UsbCameraInfo)));
+      wpi::CheckedMalloc(cameras.size() * sizeof(CS_UsbCameraInfo)));
   *count = cameras.size();
   for (size_t i = 0; i < cameras.size(); ++i) {
     out[i].dev = cameras[i].dev;
