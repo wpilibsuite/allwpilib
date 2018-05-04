@@ -22,7 +22,6 @@
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
-#include "wpi/atomic_static.h"
 #include "wpi/deprecated.h"
 #include "wpi/mutex.h"
 #include "wpi/raw_ostream.h"
@@ -441,9 +440,6 @@ inline jobjectArray MakeJStringArray(JNIEnv* env, ArrayRef<std::string> arr) {
 //  static JavaVM* GetJVM();
 //  static const char* GetName();
 //  void CallJava(JNIEnv *env, jobject func, jmethodID mid);
-//
-// When creating this, ATOMIC_STATIC_INIT() needs to be performed on the
-// templated class as well.
 template <typename T>
 class JCallbackThread : public SafeThread {
  public:
@@ -522,12 +518,9 @@ template <typename T>
 class JSingletonCallbackManager : public JCallbackManager<T> {
  public:
   static JSingletonCallbackManager<T>& GetInstance() {
-    ATOMIC_STATIC(JSingletonCallbackManager<T>, instance);
+    static JSingletonCallbackManager<T> instance;
     return instance;
   }
-
- private:
-  ATOMIC_STATIC_DECL(JSingletonCallbackManager<T>)
 };
 
 inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
