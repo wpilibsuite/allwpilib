@@ -15,6 +15,19 @@ ext {
     useCpp = true
 }
 
+def examplesMap = [:];
+
+File examplesTree = file("$projectDir/src/main/cpp/examples")
+examplesTree.list(new FilenameFilter() {
+    @Override
+    public boolean accept(File current, String name) {
+        return new File(current, name).isDirectory();
+    }
+}).each {
+    sharedCvConfigs.put(it, [])
+    examplesMap.put(it, [])
+}
+
 apply from: "${rootDir}/shared/opencv.gradle"
 
 model {
@@ -51,6 +64,24 @@ model {
                     }
                 }
                 return retList
+            }
+        }
+    }
+    components {
+        examplesMap.each { key, value ->
+            "${key}"(NativeExecutableSpec) {
+                binaries.all {
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib library: 'cscore', linkage: 'shared'
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'examples/' + "${key}"
+                            include '**/*.cpp'
+                        }
+                    }
+                }
             }
         }
     }
