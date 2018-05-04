@@ -5,6 +5,10 @@ ext {
     devMain = 'edu.wpi.cscore.DevMain'
 }
 
+if (OperatingSystem.current().isMacOsX()) {
+    apply plugin: 'objective-cpp'
+}
+
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 ext {
@@ -15,6 +19,21 @@ ext {
     staticCvConfigs = [cscoreJNI: []]
     useJava = true
     useCpp = true
+    splitSetup = {
+        if (it.targetPlatform.operatingSystem.name == 'osx') {
+            it.sources {
+                macObjCpp(ObjectiveCppSourceSet) {
+                    source {
+                        srcDirs = ['src/main/native/objcpp']
+                        include '**/*.mm'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                    }
+                }
+            }
+        }
+    }
 }
 
 def examplesMap = [:];

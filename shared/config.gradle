@@ -21,8 +21,10 @@ def macCompilerArgs = ['-std=c++14', '-Wall', '-Wextra', '-Werror', '-pedantic-e
                        '-Wno-unused-const-variable', '-pthread']
 def macCCompilerArgs = ['-Wall', '-Wextra', '-Werror', '-pedantic-errors', '-fPIC', '-g',
                         '-Wno-unused-parameter', '-Wno-missing-field-initializers', '-Wno-unused-private-field']
+def macObjCLinkerArgs = ['-std=c++14', '-stdlib=libc++','-fobjc-arc', '-g', '-fPIC', '-Wall', '-Wextra', '-Werror']
 def macReleaseCompilerArgs = ['-O2']
 def macDebugCompilerArgs = ['-O0']
+def macLinkerArgs = ['-framework', 'CoreFoundation', '-framework', 'AVFoundation', '-framework', 'Foundation', '-framework', 'CoreMedia', '-framework', 'CoreVideo']
 def mac32BitArg = '-m32'
 
 def buildAll = project.hasProperty('buildAll')
@@ -193,6 +195,8 @@ if (!project.hasProperty('onlyAthena')) {
                 CCompilerArgs = macCCompilerArgs
                 debugCompilerArgs = macDebugCompilerArgs
                 releaseCompilerArgs = macReleaseCompilerArgs
+                objCppCompilerArgs = macObjCLinkerArgs
+                linkerArgs = macLinkerArgs
                 releaseStripBinaries = true
                 compilerFamily = 'Clang'
                 detectPlatform = mac64PlatformDetect
