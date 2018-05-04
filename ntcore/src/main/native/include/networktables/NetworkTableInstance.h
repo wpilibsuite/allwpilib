@@ -23,18 +23,6 @@
 #include "ntcore_c.h"
 #include "ntcore_cpp.h"
 
-#ifndef NT_NOEXCEPT
-#ifdef _MSC_VER
-#if _MSC_VER >= 1900
-#define NT_NOEXCEPT noexcept
-#else
-#define NT_NOEXCEPT throw()
-#endif
-#else
-#define NT_NOEXCEPT noexcept
-#endif
-#endif
-
 namespace nt {
 
 using wpi::ArrayRef;
@@ -96,13 +84,13 @@ class NetworkTableInstance final {
   /**
    * Construct invalid instance.
    */
-  NetworkTableInstance() NT_NOEXCEPT;
+  NetworkTableInstance() noexcept;
 
   /**
    * Construct from native handle.
    * @param handle Native handle
    */
-  explicit NetworkTableInstance(NT_Inst inst) NT_NOEXCEPT;
+  explicit NetworkTableInstance(NT_Inst inst) noexcept;
 
   /**
    * Determines if the native handle is valid.
