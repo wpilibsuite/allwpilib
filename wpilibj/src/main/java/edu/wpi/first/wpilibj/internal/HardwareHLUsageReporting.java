@@ -27,4 +27,9 @@ public class HardwareHLUsageReporting implements HLUsageReporting.Interface {
   public void reportSmartDashboard() {
     HAL.report(tResourceType.kResourceType_SmartDashboard, 0);
   }
+
+  @Override
+  public void reportShuffleboard() {
+    HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
+  }
 }

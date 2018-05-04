@@ -11,13 +11,14 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableType;
-import edu.wpi.first.wpilibj.HLUsageReporting;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.UnitTestUtility;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -37,8 +38,9 @@ public class ShuffleboardTest {
 
   private static NetworkTableInstance instance;
 
-  static {
-    HLUsageReporting.SetImplementation(new HLUsageReporting.Null());
+  @BeforeClass
+  public static void setUpClass() {
+    UnitTestUtility.setupMockBase();
   }
 
   @Before

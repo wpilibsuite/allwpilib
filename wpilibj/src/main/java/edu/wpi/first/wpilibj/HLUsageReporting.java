@@ -45,12 +45,22 @@ public class HLUsageReporting {
     }
   }
 
+  public static void reportShuffleboard() {
+    if (impl != null) {
+      impl.reportShuffleboard();
+    } else {
+      throw new BaseSystemNotInitializedException(Interface.class, HLUsageReporting.class);
+    }
+  }
+
   public interface Interface {
     void reportScheduler();
 
     void reportPIDController(int num);
 
     void reportSmartDashboard();
+
+    void reportShuffleboard();
   }
 
   public static class Null implements Interface {
@@ -62,6 +72,9 @@ public class HLUsageReporting {
     }
 
     public void reportSmartDashboard() {
+    }
+
+    public void reportShuffleboard() {
     }
   }
 }

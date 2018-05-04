@@ -64,7 +64,7 @@ public final class Shuffleboard {
   private static List<SendableData> m_sendables = new ArrayList<>();
 
   static {
-    HLUsageReporting.reportSmartDashboard(); // TODO use a unique ID for shuffleboard?
+    HLUsageReporting.reportShuffleboard();
   }
 
   private static final class SendableData {
