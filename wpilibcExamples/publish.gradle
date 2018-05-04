@@ -31,10 +31,6 @@ task cppExamplesZip(type: Zip) {
     from('src/main/cpp/examples') {
         into 'examples'
     }
-
-    from('examples.xml') {
-        into 'examples'
-    }
 }
 
 task cppTemplatesZip(type: Zip) {
