@@ -27,26 +27,31 @@ public final class LogMessage {
   /**
    * The logger that generated the message.
    */
+  @SuppressWarnings("MemberName")
   public final int logger;
 
   /**
    * Log level of the message.
    */
+  @SuppressWarnings("MemberName")
   public final int level;
 
   /**
    * The filename of the source file that generated the message.
    */
+  @SuppressWarnings("MemberName")
   public final String filename;
 
   /**
    * The line number in the source file that generated the message.
    */
+  @SuppressWarnings("MemberName")
   public final int line;
 
   /**
    * The message.
    */
+  @SuppressWarnings("MemberName")
   public final String message;
 
   /** Constructor.
@@ -58,8 +63,9 @@ public final class LogMessage {
    * @param line Line number
    * @param message Message
    */
-  public LogMessage(NetworkTableInstance inst, int logger, int level, String filename, int line, String message) {
-    this.inst = inst;
+  public LogMessage(NetworkTableInstance inst, int logger, int level, String filename, int line,
+                    String message) {
+    this.m_inst = inst;
     this.logger = logger;
     this.level = level;
     this.filename = filename;
@@ -67,9 +73,9 @@ public final class LogMessage {
     this.message = message;
   }
 
-  private final NetworkTableInstance inst;
+  private final NetworkTableInstance m_inst;
 
   NetworkTableInstance getInstance() {
-    return inst;
+    return m_inst;
   }
 }

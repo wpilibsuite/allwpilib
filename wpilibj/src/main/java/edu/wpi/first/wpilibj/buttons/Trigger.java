@@ -183,11 +183,7 @@ public abstract class Trigger extends SendableBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Button");
-    builder.setSafeState(() -> {
-      m_sendablePressed = false;
-    });
-    builder.addBooleanProperty("pressed", this::grab, (value) -> {
-      m_sendablePressed = value;
-    });
+    builder.setSafeState(() -> m_sendablePressed = false);
+    builder.addBooleanProperty("pressed", this::grab, value -> m_sendablePressed = value);
   }
 }

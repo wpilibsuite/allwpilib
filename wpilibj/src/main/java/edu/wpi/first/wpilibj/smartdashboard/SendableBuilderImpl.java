@@ -185,10 +185,10 @@ public class SendableBuilderImpl implements SendableBuilder {
   public void addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
-      property.m_update = (entry) -> entry.setBoolean(getter.getAsBoolean());
+      property.m_update = entry -> entry.setBoolean(getter.getAsBoolean());
     }
     if (setter != null) {
-      property.m_createListener = (entry) -> entry.addListener((event) -> {
+      property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isBoolean()) {
           setter.accept(event.value.getBoolean());
         }
@@ -208,10 +208,10 @@ public class SendableBuilderImpl implements SendableBuilder {
   public void addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
-      property.m_update = (entry) -> entry.setDouble(getter.getAsDouble());
+      property.m_update = entry -> entry.setDouble(getter.getAsDouble());
     }
     if (setter != null) {
-      property.m_createListener = (entry) -> entry.addListener((event) -> {
+      property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isDouble()) {
           setter.accept(event.value.getDouble());
         }
@@ -231,10 +231,10 @@ public class SendableBuilderImpl implements SendableBuilder {
   public void addStringProperty(String key, Supplier<String> getter, Consumer<String> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
-      property.m_update = (entry) -> entry.setString(getter.get());
+      property.m_update = entry -> entry.setString(getter.get());
     }
     if (setter != null) {
-      property.m_createListener = (entry) -> entry.addListener((event) -> {
+      property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isString()) {
           setter.accept(event.value.getString());
         }
@@ -255,10 +255,10 @@ public class SendableBuilderImpl implements SendableBuilder {
                                       Consumer<boolean[]> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
-      property.m_update = (entry) -> entry.setBooleanArray(getter.get());
+      property.m_update = entry -> entry.setBooleanArray(getter.get());
     }
     if (setter != null) {
-      property.m_createListener = (entry) -> entry.addListener((event) -> {
+      property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isBooleanArray()) {
           setter.accept(event.value.getBooleanArray());
         }
@@ -279,10 +279,10 @@ public class SendableBuilderImpl implements SendableBuilder {
                                      Consumer<double[]> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
-      property.m_update = (entry) -> entry.setDoubleArray(getter.get());
+      property.m_update = entry -> entry.setDoubleArray(getter.get());
     }
     if (setter != null) {
-      property.m_createListener = (entry) -> entry.addListener((event) -> {
+      property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isDoubleArray()) {
           setter.accept(event.value.getDoubleArray());
         }
@@ -303,10 +303,10 @@ public class SendableBuilderImpl implements SendableBuilder {
                                      Consumer<String[]> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
-      property.m_update = (entry) -> entry.setStringArray(getter.get());
+      property.m_update = entry -> entry.setStringArray(getter.get());
     }
     if (setter != null) {
-      property.m_createListener = (entry) -> entry.addListener((event) -> {
+      property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isStringArray()) {
           setter.accept(event.value.getStringArray());
         }
@@ -326,10 +326,10 @@ public class SendableBuilderImpl implements SendableBuilder {
   public void addRawProperty(String key, Supplier<byte[]> getter, Consumer<byte[]> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
-      property.m_update = (entry) -> entry.setRaw(getter.get());
+      property.m_update = entry -> entry.setRaw(getter.get());
     }
     if (setter != null) {
-      property.m_createListener = (entry) -> entry.addListener((event) -> {
+      property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isRaw()) {
           setter.accept(event.value.getRaw());
         }
@@ -350,10 +350,10 @@ public class SendableBuilderImpl implements SendableBuilder {
                                Consumer<NetworkTableValue> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
-      property.m_update = (entry) -> entry.setValue(getter.get());
+      property.m_update = entry -> entry.setValue(getter.get());
     }
     if (setter != null) {
-      property.m_createListener = (entry) -> entry.addListener((event) -> {
+      property.m_createListener = entry -> entry.addListener(event -> {
         setter.accept(event.value);
       }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
     }

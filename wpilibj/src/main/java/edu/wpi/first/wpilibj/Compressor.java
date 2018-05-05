@@ -193,7 +193,7 @@ public class Compressor extends SendableBase implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Compressor");
-    builder.addBooleanProperty("Enabled", this::enabled, (value) -> {
+    builder.addBooleanProperty("Enabled", this::enabled, value -> {
       if (value) {
         start();
       } else {

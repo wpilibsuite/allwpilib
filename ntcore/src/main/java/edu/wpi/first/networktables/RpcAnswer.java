@@ -12,18 +12,23 @@ package edu.wpi.first.networktables;
  */
 public final class RpcAnswer implements AutoCloseable {
   /** Entry handle. */
+  @SuppressWarnings("MemberName")
   public final int entry;
 
   /** Call handle. */
+  @SuppressWarnings("MemberName")
   public int call;
 
   /** Entry name. */
+  @SuppressWarnings("MemberName")
   public final String name;
 
   /** Call raw parameters. */
+  @SuppressWarnings("MemberName")
   public final String params;
 
   /** Connection that called the RPC. */
+  @SuppressWarnings("MemberName")
   public final ConnectionInfo conn;
 
   /** Constructor.
@@ -35,8 +40,9 @@ public final class RpcAnswer implements AutoCloseable {
    * @param params Call raw parameters
    * @param conn Connection info
    */
-  public RpcAnswer(NetworkTableInstance inst, int entry, int call, String name, String params, ConnectionInfo conn) {
-    this.inst = inst;
+  public RpcAnswer(NetworkTableInstance inst, int entry, int call, String name, String params,
+                   ConnectionInfo conn) {
+    this.m_inst = inst;
     this.entry = entry;
     this.call = call;
     this.name = name;
@@ -79,19 +85,19 @@ public final class RpcAnswer implements AutoCloseable {
   }
 
   /* Network table instance. */
-  private final NetworkTableInstance inst;
+  private final NetworkTableInstance m_inst;
 
   /* Cached entry object. */
-  NetworkTableEntry entryObject;
+  NetworkTableEntry m_entryObject;
 
   /**
    * Get the entry as an object.
    * @return NetworkTableEntry for the RPC.
    */
   NetworkTableEntry getEntry() {
-    if (entryObject == null) {
-      entryObject = new NetworkTableEntry(inst, entry);
+    if (m_entryObject == null) {
+      m_entryObject = new NetworkTableEntry(m_inst, entry);
     }
-    return entryObject;
+    return m_entryObject;
   }
 }

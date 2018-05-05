@@ -14,27 +14,32 @@ public final class EntryNotification {
   /**
    * Listener that was triggered.
    */
+  @SuppressWarnings("MemberName")
   public final int listener;
 
   /**
    * Entry handle.
    */
+  @SuppressWarnings("MemberName")
   public final int entry;
 
   /**
    * Entry name.
    */
+  @SuppressWarnings("MemberName")
   public final String name;
 
   /**
    * The new value.
    */
+  @SuppressWarnings("MemberName")
   public final NetworkTableValue value;
 
   /**
    * Update flags.  For example, {@link EntryListenerFlags#kNew} if the key did
    * not previously exist.
    */
+  @SuppressWarnings("MemberName")
   public final int flags;
 
   /** Constructor.
@@ -46,8 +51,9 @@ public final class EntryNotification {
    * @param value The new value
    * @param flags Update flags
    */
-  public EntryNotification(NetworkTableInstance inst, int listener, int entry, String name, NetworkTableValue value, int flags) {
-    this.inst = inst;
+  public EntryNotification(NetworkTableInstance inst, int listener, int entry, String name,
+                           NetworkTableValue value, int flags) {
+    this.m_inst = inst;
     this.listener = listener;
     this.entry = entry;
     this.name = name;
@@ -56,19 +62,19 @@ public final class EntryNotification {
   }
 
   /* Network table instance. */
-  private final NetworkTableInstance inst;
+  private final NetworkTableInstance m_inst;
 
   /* Cached entry object. */
-  NetworkTableEntry entryObject;
+  NetworkTableEntry m_entryObject;
 
   /**
    * Get the entry as an object.
    * @return NetworkTableEntry for this entry.
    */
   public NetworkTableEntry getEntry() {
-    if (entryObject == null) {
-      entryObject = new NetworkTableEntry(inst, entry);
+    if (m_entryObject == null) {
+      m_entryObject = new NetworkTableEntry(m_inst, entry);
     }
-    return entryObject;
+    return m_entryObject;
   }
 }

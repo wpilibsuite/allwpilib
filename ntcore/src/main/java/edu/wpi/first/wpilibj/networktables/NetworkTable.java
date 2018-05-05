@@ -37,6 +37,7 @@ import java.util.function.Consumer;
  * @deprecated Use {@link edu.wpi.first.networktables.NetworkTable} instead.
  */
 @Deprecated
+@SuppressWarnings("checkstyle:all")
 public class NetworkTable implements ITable, IRemote {
   /**
    * The path separator for sub-tables and keys

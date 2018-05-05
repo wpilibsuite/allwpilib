@@ -556,7 +556,7 @@ public abstract class Command extends SendableBase implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Command");
     builder.addStringProperty(".name", this::getName, null);
-    builder.addBooleanProperty("running", this::isRunning, (value) -> {
+    builder.addBooleanProperty("running", this::isRunning, value -> {
       if (value) {
         if (!isRunning()) {
           start();

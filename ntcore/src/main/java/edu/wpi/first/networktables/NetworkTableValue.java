@@ -133,98 +133,98 @@ public final class NetworkTableValue {
 
   /**
    * Get the entry's boolean value.
-   * @throws ClassCastException if the entry value is not of boolean type.
    * @return The boolean value.
+   * @throws ClassCastException if the entry value is not of boolean type.
    */
   public boolean getBoolean() {
     if (m_type != NetworkTableType.kBoolean) {
       throw new ClassCastException("cannot convert " + m_type + " to boolean");
     }
-    return ((Boolean)m_value).booleanValue();
+    return ((Boolean) m_value).booleanValue();
   }
 
   /**
    * Get the entry's double value.
-   * @throws ClassCastException if the entry value is not of double type.
    * @return The double value.
+   * @throws ClassCastException if the entry value is not of double type.
    */
   public double getDouble() {
     if (m_type != NetworkTableType.kDouble) {
       throw new ClassCastException("cannot convert " + m_type + " to double");
     }
-    return ((Number)m_value).doubleValue();
+    return ((Number) m_value).doubleValue();
   }
 
   /**
    * Get the entry's string value.
-   * @throws ClassCastException if the entry value is not of string type.
    * @return The string value.
+   * @throws ClassCastException if the entry value is not of string type.
    */
   public String getString() {
     if (m_type != NetworkTableType.kString) {
       throw new ClassCastException("cannot convert " + m_type + " to string");
     }
-    return (String)m_value;
+    return (String) m_value;
   }
 
   /**
    * Get the entry's raw value.
-   * @throws ClassCastException if the entry value is not of raw type.
    * @return The raw value.
+   * @throws ClassCastException if the entry value is not of raw type.
    */
   public byte[] getRaw() {
     if (m_type != NetworkTableType.kRaw) {
       throw new ClassCastException("cannot convert " + m_type + " to raw");
     }
-    return (byte[])m_value;
+    return (byte[]) m_value;
   }
 
   /**
    * Get the entry's rpc definition value.
-   * @throws ClassCastException if the entry value is not of rpc definition type.
    * @return The rpc definition value.
+   * @throws ClassCastException if the entry value is not of rpc definition type.
    */
   public byte[] getRpc() {
     if (m_type != NetworkTableType.kRpc) {
       throw new ClassCastException("cannot convert " + m_type + " to rpc");
     }
-    return (byte[])m_value;
+    return (byte[]) m_value;
   }
 
   /**
    * Get the entry's boolean array value.
-   * @throws ClassCastException if the entry value is not of boolean array type.
    * @return The boolean array value.
+   * @throws ClassCastException if the entry value is not of boolean array type.
    */
   public boolean[] getBooleanArray() {
     if (m_type != NetworkTableType.kBooleanArray) {
       throw new ClassCastException("cannot convert " + m_type + " to boolean array");
     }
-    return (boolean[])m_value;
+    return (boolean[]) m_value;
   }
 
   /**
    * Get the entry's double array value.
-   * @throws ClassCastException if the entry value is not of double array type.
    * @return The double array value.
+   * @throws ClassCastException if the entry value is not of double array type.
    */
   public double[] getDoubleArray() {
     if (m_type != NetworkTableType.kDoubleArray) {
       throw new ClassCastException("cannot convert " + m_type + " to double array");
     }
-    return (double[])m_value;
+    return (double[]) m_value;
   }
 
   /**
    * Get the entry's string array value.
-   * @throws ClassCastException if the entry value is not of string array type.
    * @return The string array value.
+   * @throws ClassCastException if the entry value is not of string array type.
    */
   public String[] getStringArray() {
     if (m_type != NetworkTableType.kStringArray) {
       throw new ClassCastException("cannot convert " + m_type + " to string array");
     }
-    return (String[])m_value;
+    return (String[]) m_value;
   }
 
   /*
@@ -422,15 +422,15 @@ public final class NetworkTableValue {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (o == this) {
+  public boolean equals(Object other) {
+    if (other == this) {
       return true;
     }
-    if (!(o instanceof NetworkTableValue)) {
+    if (!(other instanceof NetworkTableValue)) {
       return false;
     }
-    NetworkTableValue other = (NetworkTableValue) o;
-    return m_type == other.m_type && m_value.equals(other.m_value);
+    NetworkTableValue ntOther = (NetworkTableValue) other;
+    return m_type == ntOther.m_type && m_value.equals(ntOther.m_value);
   }
 
   @Override
@@ -440,29 +440,33 @@ public final class NetworkTableValue {
 
   static boolean[] toNative(Boolean[] arr) {
     boolean[] out = new boolean[arr.length];
-    for (int i = 0; i < arr.length; i++)
+    for (int i = 0; i < arr.length; i++) {
       out[i] = arr[i];
+    }
     return out;
   }
 
   static double[] toNative(Number[] arr) {
     double[] out = new double[arr.length];
-    for (int i = 0; i < arr.length; i++)
+    for (int i = 0; i < arr.length; i++) {
       out[i] = arr[i].doubleValue();
+    }
     return out;
   }
 
   static Boolean[] fromNative(boolean[] arr) {
     Boolean[] out = new Boolean[arr.length];
-    for (int i = 0; i < arr.length; i++)
+    for (int i = 0; i < arr.length; i++) {
       out[i] = arr[i];
+    }
     return out;
   }
 
   static Double[] fromNative(double[] arr) {
     Double[] out = new Double[arr.length];
-    for (int i = 0; i < arr.length; i++)
+    for (int i = 0; i < arr.length; i++) {
       out[i] = arr[i];
+    }
     return out;
   }
 

@@ -169,7 +169,7 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Double Solenoid");
     builder.setSafeState(() -> set(Value.kOff));
-    builder.addStringProperty("Value", () -> get().name().substring(1), (value) -> {
+    builder.addStringProperty("Value", () -> get().name().substring(1), value -> {
       if ("Forward".equals(value)) {
         set(Value.kForward);
       } else if ("Reverse".equals(value)) {
