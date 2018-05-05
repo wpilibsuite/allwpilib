@@ -450,10 +450,23 @@ public:
     StringMapConstIterator tmp = *this; ++*this; return tmp;
   }
 
+  inline StringMapConstIterator& operator--() {   // Predecrement
+    --Ptr;
+    ReversePastEmptyBuckets();
+    return *this;
+  }
+  StringMapConstIterator operator--(int) {        // Postdecrement
+    StringMapConstIterator tmp = *this; --*this; return tmp;
+  }
+
 private:
   void AdvancePastEmptyBuckets() {
     while (*Ptr == nullptr || *Ptr == StringMapImpl::getTombstoneVal())
       ++Ptr;
+  }
+  void ReversePastEmptyBuckets() {
+    while (*Ptr == nullptr || *Ptr == StringMapImpl::getTombstoneVal())
+      --Ptr;
   }
 };
 
