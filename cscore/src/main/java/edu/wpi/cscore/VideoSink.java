@@ -15,9 +15,11 @@ package edu.wpi.cscore;
 public class VideoSink implements AutoCloseable {
   public enum Kind {
     kUnknown(0), kMjpeg(2), kCv(4);
+
+    @SuppressWarnings("MemberName")
     private int value;
 
-    private Kind(int value) {
+    Kind(int value) {
       this.value = value;
     }
 
@@ -26,6 +28,12 @@ public class VideoSink implements AutoCloseable {
     }
   }
 
+  /**
+   * Convert from the numerical representation of kind to an enum type.
+   *
+   * @param kind The numerical representation of kind
+   * @return The kind
+   */
   public static Kind getKindFromInt(int kind) {
     switch (kind) {
       case 2: return Kind.kMjpeg;
@@ -59,6 +67,7 @@ public class VideoSink implements AutoCloseable {
     return m_handle;
   }
 
+  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;
@@ -73,6 +82,7 @@ public class VideoSink implements AutoCloseable {
     return m_handle == sink.m_handle;
   }
 
+  @Override
   public int hashCode() {
     return m_handle;
   }
@@ -141,7 +151,7 @@ public class VideoSink implements AutoCloseable {
   public static VideoSink[] enumerateSinks() {
     int[] handles = CameraServerJNI.enumerateSinks();
     VideoSink[] rv = new VideoSink[handles.length];
-    for (int i=0; i<handles.length; i++) {
+    for (int i = 0; i < handles.length; i++) {
       rv[i] = new VideoSink(handles[i]);
     }
     return rv;

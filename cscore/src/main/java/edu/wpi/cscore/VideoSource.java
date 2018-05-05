@@ -15,9 +15,11 @@ package edu.wpi.cscore;
 public class VideoSource implements AutoCloseable {
   public enum Kind {
     kUnknown(0), kUsb(1), kHttp(2), kCv(4);
-    private int value;
 
-    private Kind(int value) {
+    @SuppressWarnings("MemberName")
+    private final int value;
+
+    Kind(int value) {
       this.value = value;
     }
 
@@ -26,6 +28,12 @@ public class VideoSource implements AutoCloseable {
     }
   }
 
+  /**
+   * Convert from the numerical representation of kind to an enum type.
+   *
+   * @param kind The numerical representation of kind
+   * @return The kind
+   */
   public static Kind getKindFromInt(int kind) {
     switch (kind) {
       case 1: return Kind.kUsb;
@@ -60,6 +68,7 @@ public class VideoSource implements AutoCloseable {
     return m_handle;
   }
 
+  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;
@@ -74,6 +83,7 @@ public class VideoSource implements AutoCloseable {
     return m_handle == source.m_handle;
   }
 
+  @Override
   public int hashCode() {
     return m_handle;
   }
@@ -109,7 +119,7 @@ public class VideoSource implements AutoCloseable {
   }
 
   /**
-   * Is the source currently connected to whatever is providing the images?
+   * Returns if the source currently connected to whatever is providing the images.
    */
   public boolean isConnected() {
     return CameraServerJNI.isSourceConnected(m_handle);
@@ -131,7 +141,7 @@ public class VideoSource implements AutoCloseable {
   public VideoProperty[] enumerateProperties() {
     int[] handles = CameraServerJNI.enumerateSourceProperties(m_handle);
     VideoProperty[] rv = new VideoProperty[handles.length];
-    for (int i=0; i<handles.length; i++) {
+    for (int i = 0; i < handles.length; i++) {
       rv[i] = new VideoProperty(handles[i]);
     }
     return rv;
@@ -149,7 +159,11 @@ public class VideoSource implements AutoCloseable {
    * @param mode Video mode
    */
   public boolean setVideoMode(VideoMode mode) {
-    return CameraServerJNI.setSourceVideoMode(m_handle, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps);
+    return CameraServerJNI.setSourceVideoMode(m_handle,
+        mode.pixelFormat.getValue(),
+        mode.width,
+        mode.height,
+        mode.fps);
   }
 
   /**
@@ -199,7 +213,8 @@ public class VideoSource implements AutoCloseable {
    * @return Actual FPS averaged over the telemetry period.
    */
   public double getActualFPS() {
-    return CameraServerJNI.getTelemetryAverageValue(m_handle, CameraServerJNI.TelemetryKind.kSourceFramesReceived);
+    return CameraServerJNI.getTelemetryAverageValue(m_handle,
+        CameraServerJNI.TelemetryKind.kSourceFramesReceived);
   }
 
   /**
@@ -209,7 +224,8 @@ public class VideoSource implements AutoCloseable {
    * @return Data rate averaged over the telemetry period.
    */
   public double getActualDataRate() {
-    return CameraServerJNI.getTelemetryAverageValue(m_handle, CameraServerJNI.TelemetryKind.kSourceBytesReceived);
+    return CameraServerJNI.getTelemetryAverageValue(m_handle,
+        CameraServerJNI.TelemetryKind.kSourceBytesReceived);
   }
 
   /**
@@ -226,7 +242,7 @@ public class VideoSource implements AutoCloseable {
   public VideoSink[] enumerateSinks() {
     int[] handles = CameraServerJNI.enumerateSourceSinks(m_handle);
     VideoSink[] rv = new VideoSink[handles.length];
-    for (int i=0; i<handles.length; i++) {
+    for (int i = 0; i < handles.length; i++) {
       rv[i] = new VideoSink(handles[i]);
     }
     return rv;
@@ -239,7 +255,7 @@ public class VideoSource implements AutoCloseable {
   public static VideoSource[] enumerateSources() {
     int[] handles = CameraServerJNI.enumerateSources();
     VideoSource[] rv = new VideoSource[handles.length];
-    for (int i=0; i<handles.length; i++) {
+    for (int i = 0; i < handles.length; i++) {
       rv[i] = new VideoSource(handles[i]);
     }
     return rv;

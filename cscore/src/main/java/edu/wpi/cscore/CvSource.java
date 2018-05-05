@@ -19,7 +19,11 @@ public class CvSource extends VideoSource {
    * @param mode Video mode being generated
    */
   public CvSource(String name, VideoMode mode) {
-    super(CameraServerJNI.createCvSource(name, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
+    super(CameraServerJNI.createCvSource(name,
+        mode.pixelFormat.getValue(),
+        mode.width,
+        mode.height,
+        mode.fps));
   }
 
   /**
@@ -80,66 +84,108 @@ public class CvSource extends VideoSource {
    * @param value Current value
    * @return Property
    */
-  public VideoProperty createProperty(String name, VideoProperty.Kind kind, int minimum, int maximum, int step, int defaultValue, int value) {
+  public VideoProperty createProperty(String name,
+                                      VideoProperty.Kind kind,
+                                      int minimum,
+                                      int maximum,
+                                      int step,
+                                      int defaultValue,
+                                      int value) {
     return new VideoProperty(
-        CameraServerJNI.createSourceProperty(m_handle, name, kind.getValue(), minimum, maximum, step, defaultValue, value));
+        CameraServerJNI.createSourceProperty(m_handle,
+            name,
+            kind.getValue(),
+            minimum,
+            maximum,
+            step,
+            defaultValue,
+            value));
   }
 
-  /// Create an integer property.
-  /// @param name Property name
-  /// @param minimum Minimum value
-  /// @param maximum Maximum value
-  /// @param step Step value
-  /// @param defaultValue Default value
-  /// @param value Current value
-  /// @return Property
-  public VideoProperty createIntegerProperty(String name, int minimum, int maximum, int step, int defaultValue, int value) {
+  /**
+   * Create an integer property.
+   * @param name Property name
+   * @param minimum Minimum value
+   * @param maximum Maximum value
+   * @param step Step value
+   * @param defaultValue Default value
+   * @param value Current value
+   * @return Property
+   */
+  public VideoProperty createIntegerProperty(String name,
+                                             int minimum,
+                                             int maximum,
+                                             int step,
+                                             int defaultValue,
+                                             int value) {
     return new VideoProperty(
-        CameraServerJNI.createSourceProperty(m_handle, name, VideoProperty.Kind.kInteger.getValue(), minimum, maximum, step, defaultValue, value));
+        CameraServerJNI.createSourceProperty(m_handle,
+            name,
+            VideoProperty.Kind.kInteger.getValue(),
+            minimum,
+            maximum,
+            step,
+            defaultValue,
+            value));
   }
 
-  /// Create a boolean property.
-  /// @param name Property name
-  /// @param defaultValue Default value
-  /// @param value Current value
-  /// @return Property
+  /**
+   * Create a boolean property.
+   * @param name Property name
+   * @param defaultValue Default value
+   * @param value Current value
+   * @return Property
+   */
   public VideoProperty createBooleanProperty(String name, boolean defaultValue, boolean value) {
     return new VideoProperty(
-        CameraServerJNI.createSourceProperty(m_handle, name, VideoProperty.Kind.kBoolean.getValue(), 0, 1, 1, defaultValue ? 1 : 0, value ? 1 : 0));
+        CameraServerJNI.createSourceProperty(m_handle,
+            name,
+            VideoProperty.Kind.kBoolean.getValue(),
+            0,
+            1,
+            1,
+            defaultValue ? 1 : 0,
+            value ? 1 : 0));
   }
 
-  /// Create a string property.
-  /// @param name Property name
-  /// @param value Current value
-  /// @return Property
+  /**
+   * Create a string property.
+   * @param name Property name
+   * @param value Current value
+   * @return Property
+   */
   public VideoProperty createStringProperty(String name, String value) {
     VideoProperty prop = new VideoProperty(
-        CameraServerJNI.createSourceProperty(m_handle, name, VideoProperty.Kind.kString.getValue(), 0, 0, 0, 0, 0));
+        CameraServerJNI.createSourceProperty(m_handle,
+            name,
+            VideoProperty.Kind.kString.getValue(),
+            0,
+            0,
+            0,
+            0,
+            0));
     prop.setString(value);
     return prop;
   }
-
-  /// Create a property with a change callback.
-  /// @param name Property name
-  /// @param kind Property kind
-  /// @param minimum Minimum value
-  /// @param maximum Maximum value
-  /// @param step Step value
-  /// @param defaultValue Default value
-  /// @param value Current value
-  /// @param onChange Callback to call when the property value changes
-  /// @return Property
-  //public VideoProperty createProperty(
-  //    String name, VideoProperty.Kind kind, int minimum, int maximum, int step, int defaultValue, int value,
-  //    std::function<void(VideoProperty property)>
-  //        onChange);
 
   /**
    * Configure enum property choices.
    * @param property Property
    * @param choices Choices
    */
-  public void SetEnumPropertyChoices(VideoProperty property, String[] choices) {
+  public void setEnumPropertyChoices(VideoProperty property, String[] choices) {
     CameraServerJNI.setSourceEnumPropertyChoices(m_handle, property.m_handle, choices);
+  }
+
+  /**
+   * Configure enum property choices.
+   * @param property Property
+   * @param choices Choices
+   * @deprecated Use {@code setEnumPropertyChoices} instead.
+   */
+  @Deprecated
+  @SuppressWarnings("MethodName")
+  public void SetEnumPropertyChoices(VideoProperty property, String[] choices) {
+    setEnumPropertyChoices(property, choices);
   }
 }

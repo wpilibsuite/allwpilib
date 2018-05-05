@@ -420,7 +420,7 @@ public class CameraServer {
     // synchronization issues, so just update to current setting if someone
     // else tries to change it.
     m_tableListener = NetworkTableInstance.getDefault().addEntryListener(kPublishName + "/",
-      (event) -> {
+      event -> {
         String relativeKey = event.name.substring(kPublishName.length() + 1);
 
         // get source (sourceName/...)
