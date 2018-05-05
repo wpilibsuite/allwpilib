@@ -10,6 +10,7 @@
 #include <cassert>
 #include <cstdlib>
 
+#include <wpi/memory.h>
 #include <wpi/timestamp.h>
 
 #include "Value_internal.h"
@@ -20,7 +21,7 @@ using namespace nt;
 // Conversion helpers
 
 static void ConvertToC(wpi::StringRef in, char** out) {
-  *out = static_cast<char*>(std::malloc(in.size() + 1));
+  *out = static_cast<char*>(wpi::CheckedMalloc(in.size() + 1));
   std::memmove(*out, in.data(), in.size());
   (*out)[in.size()] = '\0';
 }
@@ -57,13 +58,13 @@ static void ConvertToC(const RpcDefinition& in, NT_RpcDefinition* out) {
 
   out->num_params = in.params.size();
   out->params = static_cast<NT_RpcParamDef*>(
-      std::malloc(in.params.size() * sizeof(NT_RpcParamDef)));
+      wpi::CheckedMalloc(in.params.size() * sizeof(NT_RpcParamDef)));
   for (size_t i = 0; i < in.params.size(); ++i)
     ConvertToC(in.params[i], &out->params[i]);
 
   out->num_results = in.results.size();
   out->results = static_cast<NT_RpcResultDef*>(
-      std::malloc(in.results.size() * sizeof(NT_RpcResultDef)));
+      wpi::CheckedMalloc(in.results.size() * sizeof(NT_RpcResultDef)));
   for (size_t i = 0; i < in.results.size(); ++i)
     ConvertToC(in.results[i], &out->results[i]);
 }
@@ -107,9 +108,9 @@ static void ConvertToC(const std::vector<I>& in, O** out, size_t* out_len) {
     *out = nullptr;
     return;
   }
-  *out = static_cast<O*>(std::malloc(sizeof(O*) * in.size()));
+  *out = static_cast<O*>(wpi::CheckedMalloc(sizeof(O*) * in.size()));
   for (size_t i = 0; i < in.size(); ++i) {
-    out[i] = static_cast<O*>(std::malloc(sizeof(O)));
+    out[i] = static_cast<O*>(wpi::CheckedMalloc(sizeof(O)));
     ConvertToC(in[i], out[i]);
   }
 }
@@ -191,8 +192,8 @@ NT_Entry* NT_GetEntries(NT_Inst inst, const char* prefix, size_t prefix_len,
   if (info_v.size() == 0) return nullptr;
 
   // create array and copy into it
-  NT_Entry* info =
-      static_cast<NT_Entry*>(std::malloc(info_v.size() * sizeof(NT_Entry)));
+  NT_Entry* info = static_cast<NT_Entry*>(
+      wpi::CheckedMalloc(info_v.size() * sizeof(NT_Entry)));
   std::memcpy(info, info_v.data(), info_v.size() * sizeof(NT_Entry));
   return info;
 }
@@ -251,7 +252,7 @@ struct NT_EntryInfo* NT_GetEntryInfo(NT_Inst inst, const char* prefix,
 
   // create array and copy into it
   NT_EntryInfo* info = static_cast<NT_EntryInfo*>(
-      std::malloc(info_v.size() * sizeof(NT_EntryInfo)));
+      wpi::CheckedMalloc(info_v.size() * sizeof(NT_EntryInfo)));
   for (size_t i = 0; i < info_v.size(); ++i) ConvertToC(info_v[i], &info[i]);
   return info;
 }
@@ -541,10 +542,10 @@ NT_Value** NT_UnpackRpcValues(const char* packed, size_t packed_len,
   if (values_v.size() == 0) return nullptr;
 
   // create array and copy into it
-  NT_Value** values =
-      static_cast<NT_Value**>(std::malloc(values_v.size() * sizeof(NT_Value*)));
+  NT_Value** values = static_cast<NT_Value**>(
+      wpi::CheckedMalloc(values_v.size() * sizeof(NT_Value*)));
   for (size_t i = 0; i < values_v.size(); ++i) {
-    values[i] = static_cast<NT_Value*>(std::malloc(sizeof(NT_Value)));
+    values[i] = static_cast<NT_Value*>(wpi::CheckedMalloc(sizeof(NT_Value)));
     ConvertToC(*values_v[i], values[i]);
   }
   return values;
@@ -628,7 +629,7 @@ struct NT_ConnectionInfo* NT_GetConnections(NT_Inst inst, size_t* count) {
 
   // create array and copy into it
   NT_ConnectionInfo* conn = static_cast<NT_ConnectionInfo*>(
-      std::malloc(conn_v.size() * sizeof(NT_ConnectionInfo)));
+      wpi::CheckedMalloc(conn_v.size() * sizeof(NT_ConnectionInfo)));
   for (size_t i = 0; i < conn_v.size(); ++i) ConvertToC(conn_v[i], &conn[i]);
   return conn;
 }
@@ -836,26 +837,27 @@ void NT_DisposeRpcAnswer(NT_RpcAnswer* call_info) {
 
 /* Allocates a char array of the specified size.*/
 char* NT_AllocateCharArray(size_t size) {
-  char* retVal = static_cast<char*>(std::malloc(size * sizeof(char)));
+  char* retVal = static_cast<char*>(wpi::CheckedMalloc(size * sizeof(char)));
   return retVal;
 }
 
 /* Allocates an integer or boolean array of the specified size. */
 int* NT_AllocateBooleanArray(size_t size) {
-  int* retVal = static_cast<int*>(std::malloc(size * sizeof(int)));
+  int* retVal = static_cast<int*>(wpi::CheckedMalloc(size * sizeof(int)));
   return retVal;
 }
 
 /* Allocates a double array of the specified size. */
 double* NT_AllocateDoubleArray(size_t size) {
-  double* retVal = static_cast<double*>(std::malloc(size * sizeof(double)));
+  double* retVal =
+      static_cast<double*>(wpi::CheckedMalloc(size * sizeof(double)));
   return retVal;
 }
 
 /* Allocates an NT_String array of the specified size. */
 struct NT_String* NT_AllocateStringArray(size_t size) {
   NT_String* retVal =
-      static_cast<NT_String*>(std::malloc(size * sizeof(NT_String)));
+      static_cast<NT_String*>(wpi::CheckedMalloc(size * sizeof(NT_String)));
   return retVal;
 }
 
@@ -976,7 +978,8 @@ char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
   if (!value || value->type != NT_Type::NT_STRING) return nullptr;
   *last_change = value->last_change;
   *str_len = value->data.v_string.len;
-  char* str = static_cast<char*>(std::malloc(value->data.v_string.len + 1));
+  char* str =
+      static_cast<char*>(wpi::CheckedMalloc(value->data.v_string.len + 1));
   std::memcpy(str, value->data.v_string.str, value->data.v_string.len + 1);
   return str;
 }
@@ -986,7 +989,8 @@ char* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
   if (!value || value->type != NT_Type::NT_RAW) return nullptr;
   *last_change = value->last_change;
   *raw_len = value->data.v_string.len;
-  char* raw = static_cast<char*>(std::malloc(value->data.v_string.len + 1));
+  char* raw =
+      static_cast<char*>(wpi::CheckedMalloc(value->data.v_string.len + 1));
   std::memcpy(raw, value->data.v_string.str, value->data.v_string.len + 1);
   return raw;
 }
@@ -997,7 +1001,7 @@ NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
   *last_change = value->last_change;
   *arr_size = value->data.arr_boolean.size;
   NT_Bool* arr = static_cast<int*>(
-      std::malloc(value->data.arr_boolean.size * sizeof(NT_Bool)));
+      wpi::CheckedMalloc(value->data.arr_boolean.size * sizeof(NT_Bool)));
   std::memcpy(arr, value->data.arr_boolean.arr,
               value->data.arr_boolean.size * sizeof(NT_Bool));
   return arr;
@@ -1009,7 +1013,7 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
   *last_change = value->last_change;
   *arr_size = value->data.arr_double.size;
   double* arr = static_cast<double*>(
-      std::malloc(value->data.arr_double.size * sizeof(double)));
+      wpi::CheckedMalloc(value->data.arr_double.size * sizeof(double)));
   std::memcpy(arr, value->data.arr_double.arr,
               value->data.arr_double.size * sizeof(double));
   return arr;
@@ -1021,11 +1025,11 @@ NT_String* NT_GetValueStringArray(const struct NT_Value* value,
   *last_change = value->last_change;
   *arr_size = value->data.arr_string.size;
   NT_String* arr = static_cast<NT_String*>(
-      std::malloc(value->data.arr_string.size * sizeof(NT_String)));
+      wpi::CheckedMalloc(value->data.arr_string.size * sizeof(NT_String)));
   for (size_t i = 0; i < value->data.arr_string.size; ++i) {
     size_t len = value->data.arr_string.arr[i].len;
     arr[i].len = len;
-    arr[i].str = static_cast<char*>(std::malloc(len + 1));
+    arr[i].str = static_cast<char*>(wpi::CheckedMalloc(len + 1));
     std::memcpy(arr[i].str, value->data.arr_string.arr[i].str, len + 1);
   }
   return arr;
@@ -1129,7 +1133,8 @@ NT_Bool* NT_GetEntryBooleanArray(NT_Entry entry, uint64_t* last_change,
   if (!v || !v->IsBooleanArray()) return nullptr;
   *last_change = v->last_change();
   auto vArr = v->GetBooleanArray();
-  NT_Bool* arr = static_cast<int*>(std::malloc(vArr.size() * sizeof(NT_Bool)));
+  NT_Bool* arr =
+      static_cast<int*>(wpi::CheckedMalloc(vArr.size() * sizeof(NT_Bool)));
   *arr_size = vArr.size();
   std::copy(vArr.begin(), vArr.end(), arr);
   return arr;
@@ -1141,7 +1146,8 @@ double* NT_GetEntryDoubleArray(NT_Entry entry, uint64_t* last_change,
   if (!v || !v->IsDoubleArray()) return nullptr;
   *last_change = v->last_change();
   auto vArr = v->GetDoubleArray();
-  double* arr = static_cast<double*>(std::malloc(vArr.size() * sizeof(double)));
+  double* arr =
+      static_cast<double*>(wpi::CheckedMalloc(vArr.size() * sizeof(double)));
   *arr_size = vArr.size();
   std::copy(vArr.begin(), vArr.end(), arr);
   return arr;
@@ -1153,8 +1159,8 @@ NT_String* NT_GetEntryStringArray(NT_Entry entry, uint64_t* last_change,
   if (!v || !v->IsStringArray()) return nullptr;
   *last_change = v->last_change();
   auto vArr = v->GetStringArray();
-  NT_String* arr =
-      static_cast<NT_String*>(std::malloc(vArr.size() * sizeof(NT_String)));
+  NT_String* arr = static_cast<NT_String*>(
+      wpi::CheckedMalloc(vArr.size() * sizeof(NT_String)));
   for (size_t i = 0; i < vArr.size(); ++i) {
     ConvertToC(vArr[i], &arr[i]);
   }

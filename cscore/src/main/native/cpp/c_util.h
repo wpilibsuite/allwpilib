@@ -12,11 +12,12 @@
 #include <cstring>
 
 #include <wpi/StringRef.h>
+#include <wpi/memory.h>
 
 namespace cs {
 
 inline char* ConvertToC(wpi::StringRef in) {
-  char* out = static_cast<char*>(std::malloc(in.size() + 1));
+  char* out = static_cast<char*>(wpi::CheckedMalloc(in.size() + 1));
   std::memmove(out, in.data(), in.size());
   out[in.size()] = '\0';
   return out;
