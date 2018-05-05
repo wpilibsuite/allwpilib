@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 ext {
     nativeName = 'cscore'
     devMain = 'edu.wpi.cscore.DevMain'
@@ -17,15 +19,17 @@ ext {
 
 def examplesMap = [:];
 
-File examplesTree = file("$projectDir/src/main/cpp/examples")
-examplesTree.list(new FilenameFilter() {
-    @Override
-    public boolean accept(File current, String name) {
-        return new File(current, name).isDirectory();
+if (OperatingSystem.current().isLinux()) {
+    File examplesTree = file("$projectDir/examples")
+    examplesTree.list(new FilenameFilter() {
+        @Override
+        public boolean accept(File current, String name) {
+            return new File(current, name).isDirectory();
+        }
+    }).each {
+        sharedCvConfigs.put(it, [])
+        examplesMap.put(it, [])
     }
-}).each {
-    sharedCvConfigs.put(it, [])
-    examplesMap.put(it, [])
 }
 
 apply from: "${rootDir}/shared/opencv.gradle"
