@@ -10,9 +10,6 @@ package edu.wpi.first.wpilibj.examples.pacgoat;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveAndShootAutonomous;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveForward;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Collector;
@@ -20,6 +17,8 @@ import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Pivot;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Pneumatics;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Shooter;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This is the main class for running the PacGoat code.

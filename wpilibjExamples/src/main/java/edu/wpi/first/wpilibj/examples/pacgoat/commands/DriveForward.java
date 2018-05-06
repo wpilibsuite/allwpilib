@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
 /**
@@ -30,6 +29,11 @@ public class DriveForward extends Command {
     this(dist, 0.5);
   }
 
+  /**
+   * Create a new drive forward command.
+   * @param dist The distance to drive
+   * @param maxSpeed The maximum speed to drive at
+   */
   public DriveForward(double dist, double maxSpeed) {
     requires(Robot.drivetrain);
     m_distance = dist;

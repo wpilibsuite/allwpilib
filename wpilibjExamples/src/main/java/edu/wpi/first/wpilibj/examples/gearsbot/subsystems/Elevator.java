@@ -27,6 +27,9 @@ public class Elevator extends PIDSubsystem {
   private static final double kP_simulation = 18;
   private static final double kI_simulation = 0.2;
 
+  /**
+   * Create a new elevator subsystem.
+   */
   public Elevator() {
     super(kP_real, kI_real, 0);
     if (Robot.isSimulation()) { // Check for simulation and update PID values

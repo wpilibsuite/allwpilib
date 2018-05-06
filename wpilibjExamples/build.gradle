@@ -21,10 +21,6 @@ dependencies {
     compile project(':cameraserver')
 }
 
-checkstyle {
-    configFile = new File(rootDir, "styleguide/checkstyleExamples.xml")
-}
-
 pmd {
     consoleOutput = true
     reportsDir = file("$project.buildDir/reports/pmd")

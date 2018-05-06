@@ -12,9 +12,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
-import edu.wpi.first.wpilibj.interfaces.Potentiometer;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
+import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 
 /**
  * The Pivot subsystem contains the Van-door motor and the pot for PID control
@@ -38,6 +37,9 @@ public class Pivot extends PIDSubsystem {
   // Motor to move the pivot.
   private SpeedController m_motor = new Victor(5);
 
+  /**
+   * Create a new pivot subsystem.
+   */
   public Pivot() {
     super("Pivot", 7.0, 0.0, 8.0);
     setAbsoluteTolerance(0.005);

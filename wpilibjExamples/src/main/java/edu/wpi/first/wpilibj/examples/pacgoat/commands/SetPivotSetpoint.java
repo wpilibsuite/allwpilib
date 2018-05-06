@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
 /**

@@ -9,8 +9,8 @@ package edu.wpi.first.wpilibj.examples.motorcontrol;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.SpeedController;
 
 /**
  * This sample program shows how to control a motor using a joystick. In the

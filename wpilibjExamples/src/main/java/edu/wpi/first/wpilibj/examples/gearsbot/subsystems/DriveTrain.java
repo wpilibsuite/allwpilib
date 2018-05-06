@@ -39,6 +39,9 @@ public class DriveTrain extends Subsystem {
   private AnalogInput m_rangefinder = new AnalogInput(6);
   private AnalogGyro m_gyro = new AnalogGyro(1);
 
+  /**
+   * Create a new drive train subsystem.
+   */
   public DriveTrain() {
     super();
 
@@ -87,10 +90,8 @@ public class DriveTrain extends Subsystem {
   /**
    * Tank style driving for the DriveTrain.
    *
-   * @param left
-   *            Speed in range [-1,1]
-   * @param right
-   *            Speed in range [-1,1]
+   * @param left Speed in range [-1,1]
+   * @param right Speed in range [-1,1]
    */
   public void drive(double left, double right) {
     m_drive.tankDrive(left, right);

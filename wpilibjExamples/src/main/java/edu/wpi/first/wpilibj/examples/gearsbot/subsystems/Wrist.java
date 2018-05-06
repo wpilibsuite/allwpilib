@@ -24,6 +24,9 @@ public class Wrist extends PIDSubsystem {
   private static final double kP_real = 1;
   private static final double kP_simulation = 0.05;
 
+  /**
+   * Create a new wrist subsystem.
+   */
   public Wrist() {
     super(kP_real, 0, 0);
     if (Robot.isSimulation()) { // Check for simulation and update PID values

@@ -13,6 +13,9 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
  * Place a held soda can onto the platform.
  */
 public class Place extends CommandGroup {
+  /**
+   * Create a new place command.
+   */
   public Place() {
     addSequential(new SetElevatorSetpoint(0.25));
     addSequential(new SetWristSetpoint(0));

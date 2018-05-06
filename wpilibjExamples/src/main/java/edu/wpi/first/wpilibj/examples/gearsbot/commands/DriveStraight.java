@@ -22,6 +22,10 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 public class DriveStraight extends Command {
   private PIDController m_pid;
 
+  /**
+   * Create a new DriveStraight command.
+   * @param distance The distance to drive
+   */
   public DriveStraight(double distance) {
     requires(Robot.m_drivetrain);
     m_pid = new PIDController(4, 0, 0, new PIDSource() {

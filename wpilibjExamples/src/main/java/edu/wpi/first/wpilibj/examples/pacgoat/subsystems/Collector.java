@@ -30,6 +30,9 @@ public class Collector extends Subsystem {
   private DigitalInput m_openDetector = new DigitalInput(6);
   private Solenoid m_piston = new Solenoid(1, 1);
 
+  /**
+   * Create a new collector subsystem.
+   */
   public Collector() {
     // Put everything to the LiveWindow for testing.
     addChild("Roller Motor", (Victor) m_rollerMotor);

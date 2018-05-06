@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
 /**
@@ -16,6 +15,9 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * it will wait briefly.
  */
 public class DriveAndShootAutonomous extends CommandGroup {
+  /**
+   * Create a new drive and shoot autonomous.
+   */
   public DriveAndShootAutonomous() {
     addSequential(new CloseClaw());
     addSequential(new WaitForPressure(), 2);
