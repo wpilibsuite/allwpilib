@@ -14,10 +14,12 @@
 #ifndef LLVM_SUPPORT_RAW_OSTREAM_H
 #define LLVM_SUPPORT_RAW_OSTREAM_H
 
+#include "wpi/ArrayRef.h"
 #include "wpi/FileSystem.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
 #include <cstdint>
+#include <vector>
 #include <system_error>
 
 namespace wpi {
@@ -152,6 +154,21 @@ public:
     return *this;
   }
 
+  raw_ostream &operator<<(ArrayRef<uint8_t> Arr) {
+    // Inline fast path, particularly for arrays with a known length.
+    size_t Size = Arr.size();
+
+    // Make sure we can use the fast path.
+    if (Size > (size_t)(OutBufEnd - OutBufCur))
+      return write(Arr.data(), Size);
+
+    if (Size) {
+      memcpy(OutBufCur, Arr.data(), Size);
+      OutBufCur += Size;
+    }
+    return *this;
+  }
+
   raw_ostream &operator<<(StringRef Str) {
     // Inline fast path, particularly for strings with a known length.
     size_t Size = Str.size();
@@ -183,6 +200,15 @@ public:
     return write(Str.data(), Str.size());
   }
 
+  raw_ostream &operator<<(const std::vector<uint8_t> &Arr) {
+    // Avoid the fast path, it would only increase code size for a marginal win.
+    return write(Arr.data(), Arr.size());
+  }
+
+  raw_ostream &operator<<(const wpi::SmallVectorImpl<uint8_t> &Arr) {
+    return write(Arr.data(), Arr.size());
+  }
+
   raw_ostream &operator<<(unsigned long N);
   raw_ostream &operator<<(long N);
   raw_ostream &operator<<(unsigned long long N);
@@ -207,6 +233,9 @@ public:
 
   raw_ostream &write(unsigned char C);
   raw_ostream &write(const char *Ptr, size_t Size);
+  raw_ostream &write(const uint8_t *Ptr, size_t Size) {
+    return write(reinterpret_cast<const char *>(Ptr), Size);
+  }
 
   // Formatted output, see the format() function in Support/Format.h.
   raw_ostream &operator<<(const format_object_base &Fmt);
@@ -485,6 +514,103 @@ public:
   /// Return a StringRef for the vector contents.
   StringRef str() { return StringRef(OS.data(), OS.size()); }
 };
+
+/// A raw_ostream that writes to a vector.  This is a
+/// simple adaptor class. This class does not encounter output errors.
+/// raw_vector_ostream operates without a buffer, delegating all memory
+/// management to the vector. Thus the vector is always up-to-date,
+/// may be used directly and there is no need to call flush().
+class raw_vector_ostream : public raw_pwrite_stream {
+  std::vector<char> &OS;
+
+  /// See raw_ostream::write_impl.
+  void write_impl(const char *Ptr, size_t Size) override;
+
+  void pwrite_impl(const char *Ptr, size_t Size, uint64_t Offset) override;
+
+  /// Return the current position within the stream.
+  uint64_t current_pos() const override;
+
+public:
+  /// Construct a new raw_svector_ostream.
+  ///
+  /// \param O The vector to write to; this should generally have at least 128
+  /// bytes free to avoid any extraneous memory overhead.
+  explicit raw_vector_ostream(std::vector<char> &O) : OS(O) {
+    SetUnbuffered();
+  }
+  ~raw_vector_ostream() override {}
+
+  void flush() = delete;
+
+  /// Return a StringRef for the vector contents.
+  StringRef str() { return StringRef(OS.data(), OS.size()); }
+};
+
+/// A raw_ostream that writes to an SmallVector or SmallString.  This is a
+/// simple adaptor class. This class does not encounter output errors.
+/// raw_svector_ostream operates without a buffer, delegating all memory
+/// management to the SmallString. Thus the SmallString is always up-to-date,
+/// may be used directly and there is no need to call flush().
+class raw_usvector_ostream : public raw_pwrite_stream {
+  SmallVectorImpl<uint8_t> &OS;
+
+  /// See raw_ostream::write_impl.
+  void write_impl(const char *Ptr, size_t Size) override;
+
+  void pwrite_impl(const char *Ptr, size_t Size, uint64_t Offset) override;
+
+  /// Return the current position within the stream.
+  uint64_t current_pos() const override;
+
+public:
+  /// Construct a new raw_svector_ostream.
+  ///
+  /// \param O The vector to write to; this should generally have at least 128
+  /// bytes free to avoid any extraneous memory overhead.
+  explicit raw_usvector_ostream(SmallVectorImpl<uint8_t> &O) : OS(O) {
+    SetUnbuffered();
+  }
+  ~raw_usvector_ostream() override {}
+
+  void flush() = delete;
+
+  /// Return an ArrayRef for the vector contents.
+  ArrayRef<uint8_t> array() { return ArrayRef<uint8_t>(OS.data(), OS.size()); }
+};
+
+/// A raw_ostream that writes to a vector.  This is a
+/// simple adaptor class. This class does not encounter output errors.
+/// raw_vector_ostream operates without a buffer, delegating all memory
+/// management to the vector. Thus the vector is always up-to-date,
+/// may be used directly and there is no need to call flush().
+class raw_uvector_ostream : public raw_pwrite_stream {
+  std::vector<uint8_t> &OS;
+
+  /// See raw_ostream::write_impl.
+  void write_impl(const char *Ptr, size_t Size) override;
+
+  void pwrite_impl(const char *Ptr, size_t Size, uint64_t Offset) override;
+
+  /// Return the current position within the stream.
+  uint64_t current_pos() const override;
+
+public:
+  /// Construct a new raw_svector_ostream.
+  ///
+  /// \param O The vector to write to; this should generally have at least 128
+  /// bytes free to avoid any extraneous memory overhead.
+  explicit raw_uvector_ostream(std::vector<uint8_t> &O) : OS(O) {
+    SetUnbuffered();
+  }
+  ~raw_uvector_ostream() override {}
+
+  void flush() = delete;
+
+  /// Return a StringRef for the vector contents.
+  ArrayRef<uint8_t> array() { return ArrayRef<uint8_t>(OS.data(), OS.size()); }
+};
+
 
 /// A raw_ostream that discards all output.
 class raw_null_ostream : public raw_pwrite_stream {
