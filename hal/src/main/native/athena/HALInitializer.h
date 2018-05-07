@@ -26,6 +26,7 @@ extern void InitializeAnalogInternal();
 extern void InitializeAnalogOutput();
 extern void InitializeAnalogTrigger();
 extern void InitializeCAN();
+extern void InitializeCANAPI();
 extern void InitializeCompressor();
 extern void InitializeConstants();
 extern void InitializeCounter();

@@ -43,4 +43,6 @@ typedef HAL_Handle HAL_RelayHandle;
 
 typedef HAL_Handle HAL_SolenoidHandle;
 
+typedef HAL_Handle HAL_CANHandle;
+
 typedef int32_t HAL_Bool;

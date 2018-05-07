@@ -10,6 +10,9 @@
 #include <signal.h>  // linux for kill
 #include <sys/prctl.h>
 #include <unistd.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
+#include <wpi/timestamp.h>
 
 #include <atomic>
 #include <cstdlib>
@@ -18,9 +21,6 @@
 
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/LoadOut.h>
-#include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
-#include <wpi/timestamp.h>
 
 #include "HAL/ChipObject.h"
 #include "HAL/DriverStation.h"
@@ -49,6 +49,7 @@ void InitializeHAL() {
   InitializeAnalogOutput();
   InitializeAnalogTrigger();
   InitializeCAN();
+  InitializeCANAPI();
   InitializeCompressor();
   InitializeConstants();
   InitializeCounter();
@@ -207,6 +208,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_SERIAL_PORT_OPEN_ERROR_MESSAGE;
     case HAL_SERIAL_PORT_ERROR:
       return HAL_SERIAL_PORT_ERROR_MESSAGE;
+    case HAL_CAN_TIMEOUT:
+      return HAL_CAN_TIMEOUT_MESSAGE;
     default:
       return "Unknown error status";
   }

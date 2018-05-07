@@ -103,6 +103,9 @@
 #define HAL_THREAD_PRIORITY_RANGE_ERROR_MESSAGE \
   "HAL: The priority requested to be set is invalid"
 
+#define HAL_CAN_TIMEOUT -1154
+#define HAL_CAN_TIMEOUT_MESSAGE "HAL: CAN Receive has Timed Out"
+
 #define VI_ERROR_SYSTEM_ERROR_MESSAGE "HAL - VISA: System Error";
 #define VI_ERROR_INV_OBJECT_MESSAGE "HAL - VISA: Invalid Object"
 #define VI_ERROR_RSRC_LOCKED_MESSAGE "HAL - VISA: Resource Locked"
