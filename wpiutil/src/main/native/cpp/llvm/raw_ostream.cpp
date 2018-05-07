@@ -711,6 +711,53 @@ void raw_svector_ostream::pwrite_impl(const char *Ptr, size_t Size,
 }
 
 //===----------------------------------------------------------------------===//
+//  raw_vector_ostream
+//===----------------------------------------------------------------------===//
+
+uint64_t raw_vector_ostream::current_pos() const { return OS.size(); }
+
+void raw_vector_ostream::write_impl(const char *Ptr, size_t Size) {
+  OS.insert(OS.end(), Ptr, Ptr + Size);
+}
+
+void raw_vector_ostream::pwrite_impl(const char *Ptr, size_t Size,
+                                     uint64_t Offset) {
+  memcpy(OS.data() + Offset, Ptr, Size);
+}
+
+//===----------------------------------------------------------------------===//
+//  raw_usvector_ostream
+//===----------------------------------------------------------------------===//
+
+uint64_t raw_usvector_ostream::current_pos() const { return OS.size(); }
+
+void raw_usvector_ostream::write_impl(const char *Ptr, size_t Size) {
+  OS.append(reinterpret_cast<const uint8_t *>(Ptr),
+            reinterpret_cast<const uint8_t *>(Ptr) + Size);
+}
+
+void raw_usvector_ostream::pwrite_impl(const char *Ptr, size_t Size,
+                                       uint64_t Offset) {
+  memcpy(OS.data() + Offset, Ptr, Size);
+}
+
+//===----------------------------------------------------------------------===//
+//  raw_uvector_ostream
+//===----------------------------------------------------------------------===//
+
+uint64_t raw_uvector_ostream::current_pos() const { return OS.size(); }
+
+void raw_uvector_ostream::write_impl(const char *Ptr, size_t Size) {
+  OS.insert(OS.end(), reinterpret_cast<const uint8_t *>(Ptr),
+            reinterpret_cast<const uint8_t *>(Ptr) + Size);
+}
+
+void raw_uvector_ostream::pwrite_impl(const char *Ptr, size_t Size,
+                                      uint64_t Offset) {
+  memcpy(OS.data() + Offset, Ptr, Size);
+}
+
+//===----------------------------------------------------------------------===//
 //  raw_null_ostream
 //===----------------------------------------------------------------------===//
 
