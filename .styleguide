@@ -21,7 +21,6 @@ generatedFileExclude {
 
 modifiableFileExclude {
   wpilibj/src/arm-linux-jni/
-  wpilibj/src/main/native/cpp/
   \.patch$
   \.png$
   \.py$

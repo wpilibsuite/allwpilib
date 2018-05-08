@@ -36,9 +36,20 @@ extern "C" {
  * Method:    FRCNetCommCANSessionMuxSendMessage
  * Signature: (I[BI)V
  */
+/*
+ * Class:     edu_wpi_first_wpilibj_can_CANJNI
+ * Method:    FRCNetCommCANSessionMuxSendMessage
+ * Signature: (I?I)V
+ */
+/*
+ * Class:     edu_wpi_first_wpilibj_can_CANJNI
+ * Method:    FRCNetCommCANSessionMuxSendMessage
+ * Signature: (I?I)V
+ */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
-    JNIEnv *env, jclass, jint messageID, jbyteArray data, jint periodMs) {
+Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage
+  (JNIEnv *env, jclass, jint messageID, jbyteArray data, jint periodMs)
+{
 
   CANJNI_LOG(logDEBUG)
       << "Calling CANJNI FRCNetCommCANSessionMuxSendMessage";
@@ -80,10 +91,21 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
  * Method:    FRCNetCommCANSessionMuxReceiveMessage
  * Signature: (Ljava/nio/IntBuffer;ILjava/nio/ByteBuffer;)[B
  */
+/*
+ * Class:     edu_wpi_first_wpilibj_can_CANJNI
+ * Method:    FRCNetCommCANSessionMuxReceiveMessage
+ * Signature: (Ljava/lang/Object;ILjava/lang/Object;)?
+ */
+/*
+ * Class:     edu_wpi_first_wpilibj_can_CANJNI
+ * Method:    FRCNetCommCANSessionMuxReceiveMessage
+ * Signature: (Ljava/lang/Object;ILjava/lang/Object;)?
+ */
 JNIEXPORT jbyteArray JNICALL
-Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
-    JNIEnv *env, jclass, jobject messageID, jint messageIDMask,
-    jobject timeStamp) {
+Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage
+  (JNIEnv *env, jclass, jobject messageID, jint messageIDMask,
+   jobject timeStamp)
+{
 
   CANJNI_LOG(logDEBUG)
       << "Calling CANJNI FRCNetCommCANSessionMuxReceiveMessage";
@@ -130,8 +152,20 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
  * Method:    GetCANStatus
  * Signature: (Ledu/wpi/first/wpilibj/can/CANStatus;)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_can_CANJNI_GetCANStatus
-(JNIEnv *env, jclass, jobject canStatus) {
+/*
+ * Class:     edu_wpi_first_wpilibj_can_CANJNI
+ * Method:    GetCANStatus
+ * Signature: (Ljava/lang/Object;)V
+ */
+/*
+ * Class:     edu_wpi_first_wpilibj_can_CANJNI
+ * Method:    GetCANStatus
+ * Signature: (Ljava/lang/Object;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_can_CANJNI_GetCANStatus
+  (JNIEnv *env, jclass, jobject canStatus)
+{
   CANJNI_LOG(logDEBUG)
   << "Calling CANJNI HAL_CAN_GetCANStatus";
 

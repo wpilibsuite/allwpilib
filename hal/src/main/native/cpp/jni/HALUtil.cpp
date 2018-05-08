@@ -345,7 +345,9 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
  * Signature: ()S
  */
 JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAVersion(JNIEnv *env, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAVersion
+  (JNIEnv *env, jclass)
+{
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGAVersion";
   int32_t status = 0;
   jshort returnValue = HAL_GetFPGAVersion(&status);
@@ -361,7 +363,9 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAVersion(JNIEnv *env, jclass) {
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGARevision(JNIEnv *env, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGARevision
+  (JNIEnv *env, jclass)
+{
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGARevision";
   int32_t status = 0;
   jint returnValue = HAL_GetFPGARevision(&status);
@@ -377,7 +381,9 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGARevision(JNIEnv *env, jclass) {
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime(JNIEnv *env, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime
+  (JNIEnv *env, jclass)
+{
   // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
   int32_t status = 0;
   jlong returnValue = HAL_GetFPGATime(&status);
@@ -393,7 +399,9 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime(JNIEnv *env, jclass) {
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALRuntimeType(JNIEnv *env, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALRuntimeType
+  (JNIEnv *env, jclass)
+{
   // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALRuntimeType";
   jint returnValue = HAL_GetRuntimeType();
   // HALUTIL_LOG(logDEBUG) << "RuntimeType = " << returnValue;
@@ -403,10 +411,12 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALRuntimeType(JNIEnv *env, jclass) {
 /*
  * Class:     edu_wpi_first_wpilibj_hal_HALUtil
  * Method:    getFPGAButton
- * Signature: ()I
+ * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton(JNIEnv *env, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton
+  (JNIEnv *env, jclass)
+{
   // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
   int32_t status = 0;
   jboolean returnValue = HAL_GetFPGAButton(&status);
@@ -421,9 +431,20 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton(JNIEnv *env, jclass) {
  * Method:    getHALErrorMessage
  * Signature: (I)Ljava/lang/String;
  */
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Method:    getHALErrorMessage
+ * Signature: (I)Ljava/lang/String;
+ */
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Method:    getHALErrorMessage
+ * Signature: (I)Ljava/lang/String;
+ */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage(
-    JNIEnv *paramEnv, jclass, jint paramId) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage
+  (JNIEnv *paramEnv, jclass, jint paramId)
+{
   const char *msg = HAL_GetErrorMessage(paramId);
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil HAL_GetErrorMessage id=" << paramId
                         << " msg=" << msg;
@@ -436,7 +457,9 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage(
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrno(JNIEnv *, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrno
+  (JNIEnv *, jclass)
+{
   return errno;
 }
 
@@ -445,8 +468,20 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrno(JNIEnv *, jclass) {
  * Method:    getHALstrerror
  * Signature: (I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALstrerror(
-    JNIEnv *env, jclass, jint errorCode) {
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Method:    getHALstrerror
+ * Signature: (I)Ljava/lang/String;
+ */
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Method:    getHALstrerror
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALstrerror
+  (JNIEnv *env, jclass, jint errorCode)
+{
   const char *msg = strerror(errno);
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALstrerror errorCode="
                         << errorCode << " msg=" << msg;
