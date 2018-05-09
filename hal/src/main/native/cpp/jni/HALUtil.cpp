@@ -217,7 +217,7 @@ void SetCanStatusObject(JNIEnv *env, jobject canStatus,
                         uint32_t transmitErrorCount) {
   static jmethodID func = env->GetMethodID(canStatusCls, "setStatus",
                                            "(DIIII)V");
-  env->CallObjectMethod(canStatus, func, (jdouble)percentBusUtilization,
+  env->CallVoidMethod(canStatus, func, (jdouble)percentBusUtilization,
                         (jint)busOffCount, (jint)txFullCount,
                         (jint)receiveErrorCount, (jint)transmitErrorCount);
 }
@@ -227,7 +227,7 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
   static jmethodID func = env->GetMethodID(matchInfoDataCls, "setData",
       "(Ljava/lang/String;Ljava/lang/String;III)V");
 
-  env->CallObjectMethod(matchStatus, func,
+  env->CallVoidMethod(matchStatus, func,
       MakeJString(env, matchInfo.eventName),
       MakeJString(env, matchInfo.gameSpecificMessage),
       (jint)matchInfo.matchNumber,
@@ -240,7 +240,7 @@ void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
   static jmethodID func = env->GetMethodID(accumulatorResultCls, "set",
       "(JJ)V");
 
-  env->CallObjectMethod(accumulatorResult, func, (jlong)value, (jlong)count);
+  env->CallVoidMethod(accumulatorResult, func, (jlong)value, (jlong)count);
 }
 
 JavaVM* GetJVM() {
@@ -336,6 +336,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   pwmConfigDataResultCls.free(env);
   canStatusCls.free(env);
   matchInfoDataCls.free(env);
+  accumulatorResultCls.free(env);
   jvm = nullptr;
 }
 
