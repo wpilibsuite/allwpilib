@@ -62,6 +62,9 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
 void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
                                 int64_t value, int64_t count);
 
+jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
+                            uint64_t timestamp);
+
 JavaVM* GetJVM();
 
 }  // namespace frc
