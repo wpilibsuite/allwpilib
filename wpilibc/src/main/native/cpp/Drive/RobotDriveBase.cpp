@@ -40,6 +40,13 @@ void RobotDriveBase::SetDeadband(double deadband) { m_deadband = deadband; }
  */
 void RobotDriveBase::SetMaxOutput(double maxOutput) { m_maxOutput = maxOutput; }
 
+/**
+ * Feed the motor safety object. Resets the timer that will stop the motors if it completes.
+ *
+ * @see MotorSafetyHelper::Feed()
+ */
+void RobotDriveBase::FeedWatchdog() { m_safetyHelper.Feed(); }
+
 void RobotDriveBase::SetExpiration(double timeout) {
   m_safetyHelper.SetExpiration(timeout);
 }
