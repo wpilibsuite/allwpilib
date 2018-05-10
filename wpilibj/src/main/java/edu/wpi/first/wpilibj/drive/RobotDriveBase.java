@@ -67,6 +67,15 @@ public abstract class RobotDriveBase extends SendableBase implements MotorSafety
     m_maxOutput = maxOutput;
   }
 
+  /**
+   * Feed the motor safety object. Resets the timer that will stop the motors if it completes.
+   *
+   * @see MotorSafetyHelper#feed()
+   */
+  public void feedWatchdog() {
+    m_safetyHelper.feed();
+  }
+
   @Override
   public void setExpiration(double timeout) {
     m_safetyHelper.setExpiration(timeout);

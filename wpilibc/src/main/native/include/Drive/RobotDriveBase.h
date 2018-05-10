@@ -47,6 +47,8 @@ class RobotDriveBase : public MotorSafety, public SendableBase {
   void SetDeadband(double deadband);
   void SetMaxOutput(double maxOutput);
 
+  void FeedWatchdog();
+
   void SetExpiration(double timeout) override;
   double GetExpiration() const override;
   bool IsAlive() const override;
