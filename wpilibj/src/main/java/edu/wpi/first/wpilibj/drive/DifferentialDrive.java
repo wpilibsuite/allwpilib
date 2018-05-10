@@ -103,6 +103,7 @@ public class DifferentialDrive extends RobotDriveBase {
   private double m_quickStopThreshold = kDefaultQuickStopThreshold;
   private double m_quickStopAlpha = kDefaultQuickStopAlpha;
   private double m_quickStopAccumulator = 0.0;
+  private boolean m_rightSideInverted = true;
   private boolean m_reported = false;
 
   /**
@@ -187,7 +188,7 @@ public class DifferentialDrive extends RobotDriveBase {
     }
 
     m_leftMotor.set(limit(leftMotorOutput) * m_maxOutput);
-    m_rightMotor.set(-limit(rightMotorOutput) * m_maxOutput);
+    m_rightMotor.set(limit(rightMotorOutput) * m_maxOutput * (m_rightSideInverted ? -1 : 1));
 
     m_safetyHelper.feed();
   }
@@ -270,7 +271,7 @@ public class DifferentialDrive extends RobotDriveBase {
     }
 
     m_leftMotor.set(leftMotorOutput * m_maxOutput);
-    m_rightMotor.set(-rightMotorOutput * m_maxOutput);
+    m_rightMotor.set(rightMotorOutput * m_maxOutput * (m_rightSideInverted ? -1 : 1));
 
     m_safetyHelper.feed();
   }
@@ -317,7 +318,7 @@ public class DifferentialDrive extends RobotDriveBase {
     }
 
     m_leftMotor.set(leftSpeed * m_maxOutput);
-    m_rightMotor.set(-rightSpeed * m_maxOutput);
+    m_rightMotor.set(rightSpeed * m_maxOutput * (m_rightSideInverted ? -1 : 1));
 
     m_safetyHelper.feed();
   }
@@ -351,6 +352,24 @@ public class DifferentialDrive extends RobotDriveBase {
    */
   public void setQuickStopAlpha(double alpha) {
     m_quickStopAlpha = alpha;
+  }
+
+  /**
+   * Gets if the power sent to the right side of the drivetrain is multipled by -1.
+   *
+   * @return true if the right side is inverted
+   */
+  public boolean isRightSideInverted() {
+    return m_rightSideInverted;
+  }
+
+  /**
+   * Sets if the power sent to the right side of the drivetrain should be multipled by -1.
+   *
+   * @param rightSideInverted true if right side power should be multipled by -1
+   */
+  public void setRightSideInverted(boolean rightSideInverted) {
+    m_rightSideInverted = rightSideInverted;
   }
 
   @Override

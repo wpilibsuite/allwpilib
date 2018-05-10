@@ -64,6 +64,7 @@ public class MecanumDrive extends RobotDriveBase {
   private SpeedController m_frontRightMotor;
   private SpeedController m_rearRightMotor;
 
+  private boolean m_rightSideInverted = true;
   private boolean m_reported = false;
 
   /**
@@ -134,9 +135,11 @@ public class MecanumDrive extends RobotDriveBase {
 
     double[] wheelSpeeds = new double[4];
     wheelSpeeds[MotorType.kFrontLeft.value] = input.x + input.y + zRotation;
-    wheelSpeeds[MotorType.kFrontRight.value] = input.x - input.y + zRotation;
+    wheelSpeeds[MotorType.kFrontRight.value] = input.x + input.y * (m_rightSideInverted ? -1 : 1)
+        + zRotation;
     wheelSpeeds[MotorType.kRearLeft.value] = -input.x + input.y + zRotation;
-    wheelSpeeds[MotorType.kRearRight.value] = -input.x - input.y + zRotation;
+    wheelSpeeds[MotorType.kRearRight.value] = -input.x + input.y * (m_rightSideInverted ? -1 : 1)
+        + zRotation;
 
     normalize(wheelSpeeds);
 
@@ -168,6 +171,24 @@ public class MecanumDrive extends RobotDriveBase {
 
     driveCartesian(magnitude * Math.sin(angle * (Math.PI / 180.0)),
                    magnitude * Math.cos(angle * (Math.PI / 180.0)), zRotation, 0.0);
+  }
+
+  /**
+   * Gets if the power sent to the right side of the drivetrain is multipled by -1.
+   *
+   * @return true if the right side is inverted
+   */
+  public boolean isRightSideInverted() {
+    return m_rightSideInverted;
+  }
+
+  /**
+   * Sets if the power sent to the right side of the drivetrain should be multipled by -1.
+   *
+   * @param rightSideInverted true if right side power should be multipled by -1
+   */
+  public void setRightSideInverted(boolean rightSideInverted) {
+    m_rightSideInverted = rightSideInverted;
   }
 
   @Override
