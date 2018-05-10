@@ -75,7 +75,14 @@ void InitializeCANAPI() {
 }  // namespace init
 }  // namespace hal
 
-static int32_t CreateCANId(CANStorage* storage, int32_t id) { return 0; }
+static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
+  int32_t createdId = 0;
+  createdId |= (static_cast<int32_t>(storage->deviceType) & 0x1F) << 24;
+  createdId |= (static_cast<int32_t>(storage->manufacturer) & 0xFF) << 16;
+  createdId |= (apiId & 0x3FF) << 6;
+  createdId |= (storage->deviceId & 0x3F);
+  return createdId;
+}
 
 HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
                                 int32_t deviceId, HAL_CANDeviceType deviceType,

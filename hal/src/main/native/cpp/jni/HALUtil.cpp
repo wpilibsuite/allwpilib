@@ -350,11 +350,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   pwmConfigDataResultCls.free(env);
   canStatusCls.free(env);
   matchInfoDataCls.free(env);
-<<<<<<< HEAD
   accumulatorResultCls.free(env);
-=======
   canDataCls.free(env);
->>>>>>> Work on JNI
   jvm = nullptr;
 }
 

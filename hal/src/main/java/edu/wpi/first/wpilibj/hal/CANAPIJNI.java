@@ -22,13 +22,13 @@ public class CANAPIJNI extends JNIWrapper {
 
   public static native void stopCANPacketRepeating(int handle, int apiId);
 
-  public static native void readCANPacketNew(int handle, int apiId, CANData data);
+  public static native boolean readCANPacketNew(int handle, int apiId, CANData data);
 
-  public static native void readCANPacketLatest(int handle, int apiId, CANData data);
+  public static native boolean readCANPacketLatest(int handle, int apiId, CANData data);
 
-  public static native void readCANPacketTimeout(int handle, int apiId, int timeoutMs,
+  public static native boolean readCANPacketTimeout(int handle, int apiId, int timeoutMs,
                                                  CANData data);
 
-  public static native void readCANPeriodicPacket(int handle, int apiId, int timeoutMs,
+  public static native boolean readCANPeriodicPacket(int handle, int apiId, int timeoutMs,
                                                   int periodMs, CANData data);
 }
