@@ -64,7 +64,7 @@ public class MecanumDrive extends RobotDriveBase {
   private SpeedController m_frontRightMotor;
   private SpeedController m_rearRightMotor;
 
-  private boolean m_rightSideInverted = true;
+  private double m_rightSideInvertMultiplier = -1.0;
   private boolean m_reported = false;
 
   /**
@@ -135,10 +135,10 @@ public class MecanumDrive extends RobotDriveBase {
 
     double[] wheelSpeeds = new double[4];
     wheelSpeeds[MotorType.kFrontLeft.value] = input.x + input.y + zRotation;
-    wheelSpeeds[MotorType.kFrontRight.value] = input.x + input.y * (m_rightSideInverted ? -1 : 1)
+    wheelSpeeds[MotorType.kFrontRight.value] = input.x + input.y * m_rightSideInvertMultiplier
         + zRotation;
     wheelSpeeds[MotorType.kRearLeft.value] = -input.x + input.y + zRotation;
-    wheelSpeeds[MotorType.kRearRight.value] = -input.x + input.y * (m_rightSideInverted ? -1 : 1)
+    wheelSpeeds[MotorType.kRearRight.value] = -input.x + input.y * m_rightSideInvertMultiplier
         + zRotation;
 
     normalize(wheelSpeeds);
@@ -179,7 +179,7 @@ public class MecanumDrive extends RobotDriveBase {
    * @return true if the right side is inverted
    */
   public boolean isRightSideInverted() {
-    return m_rightSideInverted;
+    return m_rightSideInvertMultiplier == -1.0;
   }
 
   /**
@@ -188,7 +188,7 @@ public class MecanumDrive extends RobotDriveBase {
    * @param rightSideInverted true if right side power should be multipled by -1
    */
   public void setRightSideInverted(boolean rightSideInverted) {
-    m_rightSideInverted = rightSideInverted;
+    m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;
   }
 
   @Override
@@ -208,13 +208,17 @@ public class MecanumDrive extends RobotDriveBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("MecanumDrive");
-    builder.addDoubleProperty("Front Left Motor Speed", m_frontLeftMotor::get,
+    builder.addDoubleProperty("Front Left Motor Speed",
+        m_frontLeftMotor::get,
         m_frontLeftMotor::set);
-    builder.addDoubleProperty("Front Right Motor Speed", () -> -m_frontRightMotor.get(),
-        value -> m_frontRightMotor.set(-value));
-    builder.addDoubleProperty("Rear Left Motor Speed", m_rearLeftMotor::get,
+    builder.addDoubleProperty("Front Right Motor Speed",
+        () -> m_frontRightMotor.get() * m_rightSideInvertMultiplier,
+        value -> m_frontRightMotor.set(value * m_rightSideInvertMultiplier));
+    builder.addDoubleProperty("Rear Left Motor Speed",
+        m_rearLeftMotor::get,
         m_rearLeftMotor::set);
-    builder.addDoubleProperty("Rear Right Motor Speed", () -> -m_rearRightMotor.get(),
-        value -> m_rearRightMotor.set(-value));
+    builder.addDoubleProperty("Rear Right Motor Speed",
+        () -> m_rearRightMotor.get() * m_rightSideInvertMultiplier,
+        value -> m_rearRightMotor.set(value * m_rightSideInvertMultiplier));
   }
 }
