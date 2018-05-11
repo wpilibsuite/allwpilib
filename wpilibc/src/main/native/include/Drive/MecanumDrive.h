@@ -76,7 +76,7 @@ class MecanumDrive : public RobotDriveBase {
                       double gyroAngle = 0.0);
   void DrivePolar(double magnitude, double angle, double zRotation);
 
-  bool IsRightSideInverted();
+  bool IsRightSideInverted() const;
   void SetRightSideInverted(bool rightSideInverted);
 
   void StopMotor() override;

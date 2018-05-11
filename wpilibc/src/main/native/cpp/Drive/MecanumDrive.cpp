@@ -121,7 +121,7 @@ void MecanumDrive::DrivePolar(double magnitude, double angle,
  *
  * @return true if the right side is inverted
  */
-bool MecanumDrive::IsRightSideInverted() { return m_rightSideInvertMultiplier == -1.0; }
+bool MecanumDrive::IsRightSideInverted() const { return m_rightSideInvertMultiplier == -1.0; }
 
 /**
  * Sets if the power sent to the right side of the drivetrain should be multipled by -1.

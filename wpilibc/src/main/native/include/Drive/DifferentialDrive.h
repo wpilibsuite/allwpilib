@@ -115,7 +115,7 @@ class DifferentialDrive : public RobotDriveBase {
   void SetQuickStopThreshold(double threshold);
   void SetQuickStopAlpha(double alpha);
 
-  bool IsRightSideInverted();
+  bool IsRightSideInverted() const;
   void SetRightSideInverted(bool rightSideInverted);
 
   void StopMotor() override;

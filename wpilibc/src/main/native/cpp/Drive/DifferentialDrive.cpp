@@ -261,7 +261,7 @@ void DifferentialDrive::SetQuickStopAlpha(double alpha) {
  *
  * @return true if the right side is inverted
  */
-bool DifferentialDrive::IsRightSideInverted() { return m_rightSideInvertMultiplier == -1.0; }
+bool DifferentialDrive::IsRightSideInverted() const { return m_rightSideInvertMultiplier == -1.0; }
 
 /**
  * Sets if the power sent to the right side of the drivetrain should be multipled by -1.
