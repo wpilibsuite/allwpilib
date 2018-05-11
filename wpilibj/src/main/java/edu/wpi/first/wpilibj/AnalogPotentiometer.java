@@ -158,10 +158,10 @@ public class AnalogPotentiometer extends SensorBase implements Potentiometer, Se
    * Frees this resource.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_initAnalogInput) {
-      m_analogInput.free();
+      m_analogInput.close();
       m_analogInput = null;
       m_initAnalogInput = false;
     }

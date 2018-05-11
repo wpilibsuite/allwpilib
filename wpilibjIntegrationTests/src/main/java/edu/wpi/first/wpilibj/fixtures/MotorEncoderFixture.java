@@ -181,37 +181,37 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
     if (!m_tornDown) {
       boolean wasNull = false;
       if (m_motor instanceof PWM && m_motor != null) {
-        ((PWM) m_motor).free();
+        ((PWM) m_motor).close();
         m_motor = null;
       } else if (m_motor == null) {
         wasNull = true;
       }
       if (m_encoder != null) {
-        m_encoder.free();
+        m_encoder.close();
         m_encoder = null;
       } else {
         wasNull = true;
       }
       if (m_counters[0] != null) {
-        m_counters[0].free();
+        m_counters[0].close();
         m_counters[0] = null;
       } else {
         wasNull = true;
       }
       if (m_counters[1] != null) {
-        m_counters[1].free();
+        m_counters[1].close();
         m_counters[1] = null;
       } else {
         wasNull = true;
       }
       if (m_alphaSource != null) {
-        m_alphaSource.free();
+        m_alphaSource.close();
         m_alphaSource = null;
       } else {
         wasNull = true;
       }
       if (m_betaSource != null) {
-        m_betaSource.free();
+        m_betaSource.close();
         m_betaSource = null;
       } else {
         wasNull = true;

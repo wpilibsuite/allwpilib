@@ -180,8 +180,8 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
   }
 
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     setUpdateWhenEmpty(true);
 
     clearUpSource();
@@ -222,7 +222,7 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
    */
   public void setUpSource(DigitalSource source) {
     if (m_upSource != null && m_allocatedUpSource) {
-      m_upSource.free();
+      m_upSource.close();
       m_allocatedUpSource = false;
     }
     m_upSource = source;
@@ -263,7 +263,7 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
    */
   public void clearUpSource() {
     if (m_upSource != null && m_allocatedUpSource) {
-      m_upSource.free();
+      m_upSource.close();
       m_allocatedUpSource = false;
     }
     m_upSource = null;
@@ -292,7 +292,7 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
     requireNonNull(source, "The Digital Source given was null");
 
     if (m_downSource != null && m_allocatedDownSource) {
-      m_downSource.free();
+      m_downSource.close();
       m_allocatedDownSource = false;
     }
     CounterJNI.setCounterDownSource(m_counter, source.getPortHandleForRouting(),
@@ -332,7 +332,7 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
    */
   public void clearDownSource() {
     if (m_downSource != null && m_allocatedDownSource) {
-      m_downSource.free();
+      m_downSource.close();
       m_allocatedDownSource = false;
     }
     m_downSource = null;

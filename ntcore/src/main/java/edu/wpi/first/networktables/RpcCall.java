@@ -10,7 +10,7 @@ package edu.wpi.first.networktables;
 /**
  * NetworkTables Remote Procedure Call.
  */
-public final class RpcCall {
+public final class RpcCall implements AutoCloseable{
   /** Constructor.
    * This should generally only be used internally to NetworkTables.
    * @param entry Entry
@@ -21,10 +21,16 @@ public final class RpcCall {
     m_call = call;
   }
 
+  @Deprecated
+  public void free() {
+    close();
+  }
+
   /**
    * Cancels the result if no other action taken.
    */
-  public synchronized void free() {
+  @Override
+  public synchronized void close() {
     if (m_call != 0) {
       cancelResult();
     }

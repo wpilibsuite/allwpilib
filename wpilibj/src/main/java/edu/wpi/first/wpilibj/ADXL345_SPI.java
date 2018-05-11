@@ -79,9 +79,9 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, Sendable {
   }
 
   @Override
-  public void free() {
-    super.free();
-    m_spi.free();
+  public void close() {
+    super.close();
+    m_spi.close();
   }
 
   /**

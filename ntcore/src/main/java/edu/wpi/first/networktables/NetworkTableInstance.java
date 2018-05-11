@@ -34,7 +34,7 @@ import java.util.function.Consumer;
  * A reference must be kept to the NetworkTableInstance returned by this
  * function to keep it from being garbage collected.
  */
-public final class NetworkTableInstance {
+public final class NetworkTableInstance implements AutoCloseable {
   /**
    * Client/server mode flag values (as returned by {@link #getNetworkMode()}).
    * This is a bitmask.
@@ -59,10 +59,16 @@ public final class NetworkTableInstance {
     m_handle = handle;
   }
 
+  @Deprecated
+  public void free() {
+    close();
+  }
+
   /**
    * Destroys the instance (if created by {@link #create()}).
    */
-  public synchronized void free() {
+  @Override
+  public synchronized void close() {
     if (m_owned && m_handle != 0) {
       NetworkTablesJNI.destroyInstance(m_handle);
     }

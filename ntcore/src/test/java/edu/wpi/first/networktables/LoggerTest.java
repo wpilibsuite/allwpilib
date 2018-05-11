@@ -21,7 +21,7 @@ public class LoggerTest extends TestCase {
 
   @Override
   protected void tearDown() throws Exception {
-    clientInst.free();
+    clientInst.close();
   }
 
   public void testLogger() {

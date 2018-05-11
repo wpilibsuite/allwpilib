@@ -69,14 +69,14 @@ public class DigitalGlitchFilterTest extends AbstractComsSetup {
     filter3.remove(encoder5);
     filter3.remove(counter7);
 
-    input1.free();
-    input2.free();
-    input3.free();
-    input4.free();
-    encoder5.free();
-    counter7.free();
-    filter1.free();
-    filter2.free();
-    filter3.free();
+    input1.close();
+    input2.close();
+    input3.close();
+    input4.close();
+    encoder5.close();
+    counter7.close();
+    filter1.close();
+    filter2.close();
+    filter3.close();
   }
 }

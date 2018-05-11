@@ -43,8 +43,8 @@ public class DigitalGlitchFilter extends SensorBase {
   /**
    * Free the resources used by this object.
    */
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_channelIndex >= 0) {
       synchronized (m_mutex) {
         m_filterAllocated[m_channelIndex] = false;

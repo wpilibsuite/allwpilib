@@ -44,8 +44,8 @@ public class DigitalOutput extends SendableBase implements Sendable {
    * Free the resources associated with a digital output.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     // disable the pwm only if we have allocated it
     if (m_pwmGenerator != invalidPwmGenerator) {
       disablePWM();

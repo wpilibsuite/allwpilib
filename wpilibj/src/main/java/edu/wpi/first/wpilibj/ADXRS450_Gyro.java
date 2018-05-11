@@ -64,7 +64,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
     // Validate the part ID
     if ((readRegister(kPIDRegister) & 0xff00) != 0x5200) {
-      m_spi.free();
+      m_spi.close();
       m_spi = null;
       DriverStation.reportError("could not find ADXRS450 gyro on SPI port " + port.value,
           false);
@@ -141,10 +141,10 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
    * Delete (free) the spi port used for the gyro and stop accumulating.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_spi != null) {
-      m_spi.free();
+      m_spi.close();
       m_spi = null;
     }
   }

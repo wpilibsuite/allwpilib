@@ -86,11 +86,10 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable {
    * Destructor.
    */
   @Override
-  public synchronized void free() {
-    super.free();
+  public synchronized void close() {
+    super.close();
     SolenoidJNI.freeSolenoidPort(m_forwardHandle);
     SolenoidJNI.freeSolenoidPort(m_reverseHandle);
-    super.free();
   }
 
   /**

@@ -197,7 +197,7 @@ public class SerialPort {
   /**
    * Destructor.
    */
-  public void free() {
+  public void close() {
     SerialPortJNI.serialClose(m_port);
   }
 

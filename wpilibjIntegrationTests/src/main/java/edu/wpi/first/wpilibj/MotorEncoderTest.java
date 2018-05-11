@@ -189,7 +189,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
         "PID loop did not reach setpoint within 10 seconds. The current error was" + pid
             .getError(), pid.onTarget());
 
-    pid.free();
+    pid.close();
   }
 
   @Test
@@ -210,7 +210,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
         "PID loop did not reach setpoint within 10 seconds. The error was: " + pid.getError(),
         pid.onTarget());
 
-    pid.free();
+    pid.close();
   }
 
   /**

@@ -92,8 +92,8 @@ public class PIDController extends PIDBase implements Controller {
    * Free the PID object.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     m_controlLoop.stop();
     m_thisMutex.lock();
     try {

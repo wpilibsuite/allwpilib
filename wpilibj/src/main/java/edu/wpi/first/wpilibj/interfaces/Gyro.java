@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.interfaces;
 /**
  * Interface for yaw rate gyros.
  */
-public interface Gyro {
+public interface Gyro extends AutoCloseable {
   /**
    * Calibrate the gyro by running for a number of samples and computing the center value. Then use
    * the center value as the Accumulator center value for subsequent measurements. It's important to
@@ -52,5 +52,12 @@ public interface Gyro {
   /**
    * Free the resources used by the gyro.
    */
+  @Deprecated
   void free();
+
+  /**
+   * Free the resources used by the gyro.
+   */
+  @Override
+  void close();
 }

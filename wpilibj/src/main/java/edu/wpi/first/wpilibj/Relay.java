@@ -141,8 +141,8 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
   }
 
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     freeRelay();
   }
 

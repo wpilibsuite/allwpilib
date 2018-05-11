@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.hal.SPIJNI;
 /**
  * Represents a SPI bus port.
  */
-public class SPI {
+public class SPI implements AutoCloseable {
   public enum Port {
     kOnboardCS0(0), kOnboardCS1(1), kOnboardCS2(2), kOnboardCS3(3), kMXP(4);
 
@@ -49,12 +49,19 @@ public class SPI {
     HAL.report(tResourceType.kResourceType_SPI, devices);
   }
 
+
+  @Deprecated
+  public void free() {
+    close();
+  }
+
   /**
    * Free the resources used by this object.
    */
-  public void free() {
+  @Override
+  public void close() {
     if (m_accum != null) {
-      m_accum.free();
+      m_accum.close();
       m_accum = null;
     }
     SPIJNI.spiClose(m_port);
@@ -416,7 +423,7 @@ public class SPI {
 
   private static final int kAccumulateDepth = 2048;
 
-  private static class Accumulator {
+  private static class Accumulator implements AutoCloseable {
     Accumulator(int port, int xferSize, int validMask, int validValue, int dataShift,
                 int dataSize, boolean isSigned, boolean bigEndian) {
       m_notifier = new Notifier(this::update);
@@ -432,7 +439,8 @@ public class SPI {
       m_port = port;
     }
 
-    void free() {
+    @Override
+    public void close() {
       m_notifier.stop();
     }
 
@@ -570,7 +578,7 @@ public class SPI {
    */
   public void freeAccumulator() {
     if (m_accum != null) {
-      m_accum.free();
+      m_accum.close();
       m_accum = null;
     }
     freeAuto();

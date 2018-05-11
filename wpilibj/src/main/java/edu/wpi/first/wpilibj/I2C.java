@@ -22,7 +22,7 @@ import static java.util.Objects.requireNonNull;
  * <p>This class is intended to be used by sensor (and other I2C device) drivers. It probably should
  * not be used directly.
  */
-public class I2C {
+public class I2C implements AutoCloseable {
   public enum Port {
     kOnboard(0), kMXP(1);
 
@@ -52,10 +52,16 @@ public class I2C {
     HAL.report(tResourceType.kResourceType_I2C, deviceAddress);
   }
 
+  @Deprecated
+  public void free() {
+    close();
+  }
+
   /**
    * Destructor.
    */
-  public void free() {
+  @Override
+  public void close() {
     I2CJNI.i2CClose(m_port);
   }
 

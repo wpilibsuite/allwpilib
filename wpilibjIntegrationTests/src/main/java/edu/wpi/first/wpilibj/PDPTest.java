@@ -47,7 +47,7 @@ public class PDPTest extends AbstractComsSetup {
 
   @AfterClass
   public static void tearDownAfterClass() throws Exception {
-    pdp.free();
+    pdp.close();
     pdp = null;
     me.teardown();
     me = null;

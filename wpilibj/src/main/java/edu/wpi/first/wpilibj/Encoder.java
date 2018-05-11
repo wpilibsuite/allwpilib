@@ -294,18 +294,18 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
    * Free the resources used by this object.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_aSource != null && m_allocatedA) {
-      m_aSource.free();
+      m_aSource.close();
       m_allocatedA = false;
     }
     if (m_bSource != null && m_allocatedB) {
-      m_bSource.free();
+      m_bSource.close();
       m_allocatedB = false;
     }
     if (m_indexSource != null && m_allocatedI) {
-      m_indexSource.free();
+      m_indexSource.close();
       m_allocatedI = false;
     }
 

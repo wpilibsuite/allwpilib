@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.Timer;
 /**
  * Simulates an encoder for testing purposes.
  */
-public class FakeCounterSource {
+public class FakeCounterSource implements AutoCloseable {
   private Thread m_task;
   private int m_count;
   private int m_milliSec;
@@ -70,10 +70,10 @@ public class FakeCounterSource {
   /**
    * Destroy Object with minimum memory leak.
    */
-  public void free() {
+  public void close() {
     m_task = null;
     if (m_allocated) {
-      m_output.free();
+      m_output.close();
       m_output = null;
       m_allocated = false;
     }
