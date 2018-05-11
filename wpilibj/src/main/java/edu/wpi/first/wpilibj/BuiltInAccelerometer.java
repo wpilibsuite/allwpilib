@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.hal.AccelerometerJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
+import edu.wpi.first.wpilibj.sim.AccelerometerSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -96,5 +97,9 @@ public class BuiltInAccelerometer extends SensorBase implements Accelerometer, S
     builder.addDoubleProperty("X", this::getX, null);
     builder.addDoubleProperty("Y", this::getY, null);
     builder.addDoubleProperty("Z", this::getZ, null);
+  }
+
+  public AccelerometerSim getSimObject() {
+    return new AccelerometerSim();
   }
 }
