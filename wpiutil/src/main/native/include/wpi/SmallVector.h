@@ -14,6 +14,14 @@
 #ifndef LLVM_ADT_SMALLVECTOR_H
 #define LLVM_ADT_SMALLVECTOR_H
 
+// This file uses std::memcpy() to copy std::pair<unsigned int, unsigned int>.
+// That type is POD, but the standard doesn't guarantee that. GCC doesn't treat
+// the type as POD so it throws a warning. We want to consider this a warning
+// instead of an error.
+#if __GNUC__ >= 8
+#pragma GCC diagnostic warning "-Wclass-memaccess"
+#endif
+
 #include "wpi/iterator_range.h"
 #include "wpi/AlignOf.h"
 #include "wpi/Compiler.h"

@@ -70,7 +70,7 @@ using wpi::json;
 
     try {
         json::parse(json_string);
-    } catch (json::parse_error) {
+    } catch (json::parse_error&) {
         if (success_expected)
         {
             basemsg = "parse_error";
