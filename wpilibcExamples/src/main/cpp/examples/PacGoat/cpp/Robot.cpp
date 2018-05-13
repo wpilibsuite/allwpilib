@@ -80,4 +80,4 @@ void Robot::Log() {
                                  drivetrain.GetRightEncoder().GetDistance());
 }
 
-START_ROBOT_CLASS(Robot)
+int main() { return frc::StartRobot<Robot>(); }

@@ -26,4 +26,4 @@ class Robot : public frc::IterativeRobot {
   frc::Spark m_motor{0};
 };
 
-START_ROBOT_CLASS(Robot)
+int main() { return frc::StartRobot<Robot>(); }

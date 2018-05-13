@@ -72,4 +72,4 @@ class Robot : public frc::IterativeRobot {
   }
 };
 
-START_ROBOT_CLASS(Robot)
+int main() { return frc::StartRobot<Robot>(); }

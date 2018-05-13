@@ -67,4 +67,4 @@ class Robot : public frc::IterativeRobot {
   static constexpr int kDoubleSolenoidReverse = 3;
 };
 
-START_ROBOT_CLASS(Robot)
+int main() { return frc::StartRobot<Robot>(); }

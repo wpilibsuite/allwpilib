@@ -80,4 +80,4 @@ class Robot : public frc::IterativeRobot {
   frc::Encoder m_encoder{1, 2, false, Encoder::k4X};
 };
 
-START_ROBOT_CLASS(Robot)
+int main() { return frc::StartRobot<Robot>(); }

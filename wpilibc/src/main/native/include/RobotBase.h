@@ -18,18 +18,27 @@ namespace frc {
 
 class DriverStation;
 
-#define START_ROBOT_CLASS(_ClassName_)                                 \
-  int main() {                                                         \
-    if (!HAL_Initialize(500, 0)) {                                     \
-      wpi::errs() << "FATAL ERROR: HAL could not be initialized\n";    \
-      return -1;                                                       \
-    }                                                                  \
-    HAL_Report(HALUsageReporting::kResourceType_Language,              \
-               HALUsageReporting::kLanguage_CPlusPlus);                \
-    wpi::outs() << "\n********** Robot program starting **********\n"; \
-    static _ClassName_ robot;                                          \
-    robot.StartCompetition();                                          \
+template <class Robot>
+int StartRobot() {
+  if (!HAL_Initialize(500, 0)) {
+    wpi::errs() << "FATAL ERROR: HAL could not be initialized\n";
+    return -1;
   }
+  HAL_Report(HALUsageReporting::kResourceType_Language,
+             HALUsageReporting::kLanguage_CPlusPlus);
+  wpi::outs() << "\n********** Robot program starting **********\n";
+  static Robot robot;
+  robot.StartCompetition();
+
+  return 0;
+}
+
+#define START_ROBOT_CLASS(_ClassName_)                                 \
+  WPI_DEPRECATED("Call frc::StartRobot<" #_ClassName_                  \
+                 ">() in your own main() instead of using the "        \
+                 "START_ROBOT_CLASS(" #_ClassName_ ") macro.")         \
+  int StartRobotClassImpl() { return frc::StartRobot<_ClassName_>(); } \
+  int main() { return StartRobotClassImpl(); }
 
 /**
  * Implement a Robot Program framework.

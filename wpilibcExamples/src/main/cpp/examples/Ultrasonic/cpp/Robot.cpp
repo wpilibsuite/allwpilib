@@ -50,4 +50,4 @@ class Robot : public frc::IterativeRobot {
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
 };
 
-START_ROBOT_CLASS(Robot)
+int main() { return frc::StartRobot<Robot>(); }

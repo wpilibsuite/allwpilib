@@ -55,4 +55,4 @@ class Robot : public frc::IterativeRobot {
   static constexpr int kRelayReverseButton = 2;
 };
 
-START_ROBOT_CLASS(Robot)
+int main() { return frc::StartRobot<Robot>(); }

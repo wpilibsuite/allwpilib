@@ -73,4 +73,4 @@ class Robot : public frc::IterativeRobot {
 
 constexpr std::array<double, 3> Robot::kSetPoints;
 
-START_ROBOT_CLASS(Robot)
+int main() { return frc::StartRobot<Robot>(); }
