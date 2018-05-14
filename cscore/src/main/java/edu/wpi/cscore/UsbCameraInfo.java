@@ -11,7 +11,6 @@ package edu.wpi.cscore;
  * USB camera information.
  */
 public class UsbCameraInfo {
-
   /**
    * Create a new set of UsbCameraInfo.
    * @param dev Device number (e.g. N in '/dev/videoN' on Linux)
