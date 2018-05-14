@@ -10,16 +10,16 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+#include <cstddef>
+#else
+#include <stddef.h>
+#endif
+
 #include <wpi/deprecated.h>
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifdef __cplusplus
-#include <cstddef>
-#else
-#include <cstddef>
 #endif
 
 /** Typedefs */
