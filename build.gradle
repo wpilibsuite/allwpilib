@@ -3,12 +3,24 @@ plugins {
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.0'
     id 'edu.wpi.first.NativeUtils' version '1.6.2'
     id "edu.wpi.first.GradleJni" version "0.1.0" apply false
+    id "com.diffplug.gradle.spotless" version "3.10.0"
     id 'idea'
     id 'com.gradle.build-scan' version '1.13.1'
 }
 
 repositories {
     mavenCentral()
+}
+
+spotless {
+    format 'misc', {
+        target '**/*.gradle', '**/*.md', '**/.gitignore', '**/*.xml', '**/*.yml', '**/*.sh'
+        lineEndings 'UNIX'
+
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
 }
 
 buildScan {
@@ -54,15 +66,14 @@ task outputVersions() {
     }
 }
 
-task build() {}
-
 task libraryBuild() {}
 
 build.dependsOn outputVersions
 
-task clean(type: Delete) {
+task cleanBuildDir(type: Delete) {
     delete buildDir
 }
+clean.dependsOn cleanBuildDir
 
 task copyAllOutputs(type: Copy) {
     destinationDir outputsFolder

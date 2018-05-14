@@ -17,14 +17,14 @@ flock -x 200 || exit 1
 # Ensure the teststand is dead
 SSH_STOP_TESTSTAND="ssh -t ${ROBOT_ADDRESS} sh -c '/etc/init.d/teststand stop; sleep 1'"
 if [ $(which sshpass) ]; then
-	sshpass -p "" ${SSH_STOP_TESTSTAND}
+    sshpass -p "" ${SSH_STOP_TESTSTAND}
 else
-	eval ${SSH_STOP_TESTSTAND}
+    eval ${SSH_STOP_TESTSTAND}
 fi
 
 # If there are already test results in the repository then remove them
 if [[ -e ${DEFAULT_LOCAL_TEST_RESULTS_DIR} ]]; then
-	rm -R ${DEFAULT_LOCAL_TEST_RESULTS_DIR}
+    rm -R ${DEFAULT_LOCAL_TEST_RESULTS_DIR}
 fi
 
 # Make the directory where the tests should live
@@ -33,9 +33,9 @@ mkdir ${DEFAULT_LOCAL_TEST_RESULTS_DIR} 2>/dev/null
 # Remove the preivous test results from the the robot
 SSH_REMOVE_OLD_TEST_RESULTS="ssh -t ${ROBOT_ADDRESS} rm -R ${DEFAULT_DESTINATION_TEST_RESULTS_DIR}; mkdir ${DEFAULT_DESTINATION_TEST_RESULTS_DIR}"
 if [ $(which sshpass) ]; then
-	sshpass -p "" ${SSH_REMOVE_OLD_TEST_RESULTS}
+    sshpass -p "" ${SSH_REMOVE_OLD_TEST_RESULTS}
 else
-	eval ${SSH_REMOVE_OLD_TEST_RESULTS}
+    eval ${SSH_REMOVE_OLD_TEST_RESULTS}
 fi
 
 printf "Running cpp test\n"
@@ -46,9 +46,9 @@ printf "Running cpp test\n"
 # Retrive the C++ Test Results
 SCP_GET_CPP_TEST_RESULT="scp ${ROBOT_ADDRESS}:${DEFAULT_DESTINATION_CPP_TEST_RESULTS} ${DEFAULT_LOCAL_CPP_TEST_RESULT}"
 if [ $(which sshpass) ]; then
-	sshpass -p "" ${SCP_GET_CPP_TEST_RESULT}
+    sshpass -p "" ${SCP_GET_CPP_TEST_RESULT}
 else
-	eval ${SCP_GET_CPP_TEST_RESULT}
+    eval ${SCP_GET_CPP_TEST_RESULT}
 fi
 
 sleep 10
@@ -59,9 +59,9 @@ sleep 10
 # Retrive the Java Test Results
 SCP_GET_JAVA_TEST_RESULT="scp ${ROBOT_ADDRESS}:${DEFAULT_DESTINATION_JAVA_TEST_RESULTS} ${DEFAULT_LOCAL_JAVA_TEST_RESULT}"
 if [ $(which sshpass) ]; then
-	sshpass -p "" ${SCP_GET_JAVA_TEST_RESULT}
+    sshpass -p "" ${SCP_GET_JAVA_TEST_RESULT}
 else
-	eval ${SCP_GET_JAVA_TEST_RESULT}
+    eval ${SCP_GET_JAVA_TEST_RESULT}
 fi
 
 # Make sure that we got test results back.
