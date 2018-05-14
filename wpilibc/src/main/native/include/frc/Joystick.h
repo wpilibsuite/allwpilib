@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -100,15 +100,6 @@ class Joystick : public GenericHID {
   void SetThrottleChannel(int channel);
 
   /**
-   * Set the channel associated with a specified axis.
-   *
-   * @param axis    The axis to set the channel for.
-   * @param channel The channel to set the axis to.
-   */
-  WPI_DEPRECATED("Use the more specific axis channel setter functions.")
-  void SetAxisChannel(AxisType axis, int channel);
-
-  /**
    * Get the channel currently associated with the X axis.
    *
    * @return The channel for the axis.
@@ -185,19 +176,6 @@ class Joystick : public GenericHID {
   double GetThrottle() const;
 
   /**
-   * For the current joystick, return the axis determined by the argument.
-   *
-   * This is for cases where the joystick axis is returned programatically,
-   * otherwise one of the previous functions would be preferable (for example
-   * GetX()).
-   *
-   * @param axis The axis to read.
-   * @return The value of the axis.
-   */
-  WPI_DEPRECATED("Use the more specific axis channel getter functions.")
-  double GetAxis(AxisType axis) const;
-
-  /**
    * Read the state of the trigger on the joystick.
    *
    * Look up which button has been assigned to the trigger and read its state.
@@ -242,20 +220,6 @@ class Joystick : public GenericHID {
    * @return Whether the button was released since the last check.
    */
   bool GetTopReleased();
-
-  WPI_DEPRECATED("Use Joystick instances instead.")
-  static Joystick* GetStickForPort(int port);
-
-  /**
-   * Get buttons based on an enumerated type.
-   *
-   * The button type will be looked up in the list of buttons and then read.
-   *
-   * @param button The type of button to read.
-   * @return The state of the button.
-   */
-  WPI_DEPRECATED("Use the more specific button getter functions.")
-  bool GetButton(ButtonType button) const;
 
   /**
    * Get the magnitude of the direction vector formed by the joystick's

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,10 +19,10 @@ import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests the eqivilance of RobotDrive and DifferentialDrive/MecanumDrive.
+ * Tests DifferentialDrive and MecanumDrive.
  */
-public class RobotDriveTest extends AbstractComsSetup {
-  private static final Logger logger = Logger.getLogger(RobotDriveTest.class.getName());
+public class DriveTest extends AbstractComsSetup {
+  private static final Logger logger = Logger.getLogger(DriveTest.class.getName());
 
   private static MockSpeedController m_rdFrontLeft = new MockSpeedController();
   private static MockSpeedController m_rdRearLeft = new MockSpeedController();
