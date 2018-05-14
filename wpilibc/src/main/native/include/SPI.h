@@ -12,6 +12,7 @@
 #include <memory>
 
 #include <wpi/ArrayRef.h>
+#include <wpi/deprecated.h>
 
 #include "ErrorBase.h"
 
@@ -43,7 +44,12 @@ class SPI : public ErrorBase {
   void SetMSBFirst();
   void SetLSBFirst();
 
+  void SetSampleDataOnLeadingEdge();
+  void SetSampleDataOnTrailingEdge();
+
+  WPI_DEPRECATED("Use SetSampleDataOnTrailingEdge in most cases.")
   void SetSampleDataOnFalling();
+  WPI_DEPRECATED("Use SetSampleDataOnLeadingEdge in most cases")
   void SetSampleDataOnRising();
 
   void SetClockActiveLow();

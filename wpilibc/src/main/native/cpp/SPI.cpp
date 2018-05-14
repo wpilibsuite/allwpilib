@@ -175,6 +175,24 @@ void SPI::SetLSBFirst() {
 }
 
 /**
+ * Configure that the data is stable on the leading edge and the data
+ * changes on the trailing edge.
+ */
+void SPI::SetSampleDataOnLeadingEdge() {
+  m_sampleOnTrailing = false;
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+}
+
+/**
+ * Configure that the data is stable on the trailing edge and the data
+ * changes on the leading edge.
+ */
+void SPI::SetSampleDataOnTrailingEdge() {
+  m_sampleOnTrailing = true;
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+}
+
+/**
  * Configure that the data is stable on the falling edge and the data
  * changes on the rising edge.
  */

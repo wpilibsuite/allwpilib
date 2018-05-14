@@ -83,7 +83,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, Sendable {
 
     m_spi.setClockRate(3000000);
     m_spi.setMSBFirst();
-    m_spi.setSampleDataOnFalling();
+    m_spi.setSampleDataOnTrailingEdge();
     m_spi.setClockActiveLow();
     m_spi.setChipSelectActiveLow();
 

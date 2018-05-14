@@ -107,8 +107,29 @@ public class SPI {
   }
 
   /**
-   * Configure that the data is stable on the falling edge and the data changes on the rising edge.
+   * Configure that the data is stable on the leading edge and the data changes on the trailing
+   * edge.
    */
+  public final void setSampleDataOnLeadingEdge() {
+    m_dataOnTrailing = 0;
+    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+  }
+
+  /**
+   * Configure that the data is stable on the trailing edge and the data changes on the leading
+   * edge.
+   */
+  public final void setSampleDataOnTrailingEdge() {
+    m_dataOnTrailing = 1;
+    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+  }
+
+  /**
+   * Configure that the data is stable on the falling edge and the data changes on the rising edge.
+   * Note this gets reversed is setClockActiveLow is set.
+   * @deprecated use {@link #setSampleDataOnTrailingEdge()} in most cases.
+   */
+  @Deprecated
   public final void setSampleDataOnFalling() {
     m_dataOnTrailing = 1;
     SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
@@ -116,11 +137,16 @@ public class SPI {
 
   /**
    * Configure that the data is stable on the rising edge and the data changes on the falling edge.
+   * Note this gets reversed is setClockActiveLow is set.
+   * @deprecated use {@link #setSampleDataOnLeadingEdge()} in most cases.
    */
+  @Deprecated
   public final void setSampleDataOnRising() {
     m_dataOnTrailing = 0;
     SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
   }
+
+
 
   /**
    * Configure the chip select line to be active high.
