@@ -47,9 +47,6 @@ StringRef raw_istream::getline(SmallVectorImpl<char>& buf, int maxLen) {
   return StringRef{buf.data(), buf.size()};
 }
 
-raw_mem_istream::raw_mem_istream(StringRef mem)
-    : raw_mem_istream(mem.data(), mem.size()) {}
-
 void raw_mem_istream::close() {}
 
 size_t raw_mem_istream::in_avail() const { return m_left; }
@@ -57,11 +54,12 @@ size_t raw_mem_istream::in_avail() const { return m_left; }
 void raw_mem_istream::read_impl(void* data, size_t len) {
   if (len > m_left) {
     error_detected();
-    return;
+    len = m_left;
   }
   std::memcpy(data, m_cur, len);
   m_cur += len;
   m_left -= len;
+  set_read_count(len);
 }
 
 static int getFD(const Twine& Filename, std::error_code& EC) {
@@ -106,8 +104,9 @@ void raw_fd_istream::close() {
 size_t raw_fd_istream::in_avail() const { return m_end - m_cur; }
 
 void raw_fd_istream::read_impl(void* data, size_t len) {
-  size_t left = m_end - m_cur;
-  if (left < len) {
+  char* cdata = static_cast<char*>(data);
+  size_t pos = 0;
+  while (static_cast<size_t>(m_end - m_cur) < len) {
     // not enough data
     if (m_cur == m_end) {
 #ifdef _WIN32
@@ -117,17 +116,23 @@ void raw_fd_istream::read_impl(void* data, size_t len) {
 #endif
       if (count <= 0) {
         error_detected();
+        set_read_count(pos);
         return;
       }
       m_cur = m_buf;
       m_end = m_buf + count;
-      return read_impl(data, len);
+      continue;
     }
 
-    std::memcpy(data, m_cur, left);
-    return read_impl(static_cast<char*>(data) + left, len - left);
+    size_t left = m_end - m_cur;
+    std::memcpy(&cdata[pos], m_cur, left);
+    m_cur += left;
+    pos += left;
+    len -= left;
   }
 
-  std::memcpy(data, m_cur, len);
+  std::memcpy(&cdata[pos], m_cur, len);
   m_cur += len;
+  pos += len;
+  set_read_count(pos);
 }

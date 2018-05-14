@@ -20,10 +20,11 @@ void raw_socket_istream::read_impl(void* data, size_t len) {
     size_t count = m_stream.receive(&cdata[pos], len - pos, &err, m_timeout);
     if (count == 0) {
       error_detected();
-      return;
+      break;
     }
     pos += count;
   }
+  set_read_count(pos);
 }
 
 void raw_socket_istream::close() { m_stream.close(); }
