@@ -34,6 +34,7 @@ namespace wpi {
     typedef const T *iterator;
     typedef const T *const_iterator;
     typedef size_t size_type;
+    typedef T value_type;
 
     typedef std::reverse_iterator<iterator> reverse_iterator;
 
