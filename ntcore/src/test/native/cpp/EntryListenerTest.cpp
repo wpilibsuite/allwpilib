@@ -83,7 +83,7 @@ TEST_F(EntryListenerTest, EntryNewLocal) {
   ASSERT_EQ(events[0].flags, (unsigned int)(NT_NOTIFY_NEW | NT_NOTIFY_LOCAL));
 }
 
-TEST_F(EntryListenerTest, EntryNewRemote) {
+TEST_F(EntryListenerTest, DISABLED_EntryNewRemote) {
   Connect();
   if (HasFatalFailure()) return;
   std::vector<nt::EntryNotification> events;
@@ -135,7 +135,7 @@ TEST_F(EntryListenerTest, PrefixNewLocal) {
   ASSERT_EQ(events[0].flags, (unsigned int)(NT_NOTIFY_NEW | NT_NOTIFY_LOCAL));
 }
 
-TEST_F(EntryListenerTest, PrefixNewRemote) {
+TEST_F(EntryListenerTest, DISABLED_PrefixNewRemote) {
   Connect();
   if (HasFatalFailure()) return;
   std::vector<nt::EntryNotification> events;
