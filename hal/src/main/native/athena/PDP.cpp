@@ -11,6 +11,7 @@
 
 #include "HAL/Errors.h"
 #include "HAL/Ports.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 #include "ctre/PDP.h"
 
@@ -43,6 +44,7 @@ void InitializePDP() {
 extern "C" {
 
 void HAL_InitializePDP(int32_t module, int32_t* status) {
+  hal::init::CheckInit();
   if (!HAL_CheckPDPModule(module)) {
     *status = RESOURCE_OUT_OF_RANGE;
     return;

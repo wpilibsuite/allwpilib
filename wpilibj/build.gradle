@@ -48,30 +48,10 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
     }
 }
 
-sourceSets {
-    generated {
-        java.srcDir "${buildDir}/generated/java/"
-    }
-}
-
-compileGeneratedJava {
-    dependsOn generateJavaVersion
-    classpath = configurations.compile
-}
+sourceSets.main.java.srcDir "${buildDir}/generated/java/"
 
 compileJava {
-    dependsOn compileGeneratedJava
-    source += sourceSets.generated.java
-}
-
-classes.dependsOn generateJavaVersion
-
-sourcesJar {
-    from sourceSets.generated.allSource
-}
-
-outputSourcesJar {
-    from sourceSets.generated.allSource
+    dependsOn generateJavaVersion
 }
 
 dependencies {

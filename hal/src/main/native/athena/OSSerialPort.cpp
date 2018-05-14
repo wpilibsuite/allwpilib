@@ -18,6 +18,7 @@
 
 #include "HAL/Errors.h"
 #include "HAL/cpp/SerialHelper.h"
+#include "HALInitializer.h"
 
 static int portHandles[4]{-1, -1, -1, -1};
 static std::chrono::milliseconds portTimeouts[4]{
@@ -38,6 +39,7 @@ void InitializeOSSerialPort() {
 extern "C" {
 
 void HAL_InitializeOSSerialPort(HAL_SerialPort port, int32_t* status) {
+  hal::init::CheckInit();
   std::string portName;
 
   hal::SerialHelper serialHelper;

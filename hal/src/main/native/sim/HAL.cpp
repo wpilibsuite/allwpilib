@@ -263,6 +263,8 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   hal::init::InitializeHAL();
 
+  hal::init::HAL_IsInitialized.store(true);
+
   wpi::outs().SetUnbuffered();
   if (HAL_LoadExtensions() < 0) return false;
   hal::RestartTiming();

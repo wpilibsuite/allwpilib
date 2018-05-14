@@ -19,6 +19,7 @@
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"
 #include "HAL/cpp/UnsafeDIO.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 namespace hal {
@@ -70,6 +71,7 @@ int32_t ComputeDigitalMask(HAL_DigitalHandle handle, int32_t* status) {
  * Initialize the digital system.
  */
 void initializeDigital(int32_t* status) {
+  hal::init::CheckInit();
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished

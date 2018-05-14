@@ -9,6 +9,7 @@
 
 #include "HAL/Errors.h"
 #include "HAL/Solenoid.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 namespace hal {
@@ -24,6 +25,7 @@ void InitializePCMInternal() {
 }  // namespace init
 
 void initializePCM(int32_t module, int32_t* status) {
+  hal::init::CheckInit();
   if (!HAL_CheckSolenoidModule(module)) {
     *status = RESOURCE_OUT_OF_RANGE;
     return;

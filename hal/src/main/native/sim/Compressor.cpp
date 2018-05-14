@@ -9,6 +9,7 @@
 
 #include "HAL/Errors.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "MockData/PCMDataInternal.h"
 #include "PortsInternal.h"
 
@@ -23,6 +24,7 @@ void InitializeCompressor() {}
 extern "C" {
 
 HAL_CompressorHandle HAL_InitializeCompressor(int32_t module, int32_t* status) {
+  hal::init::CheckInit();
   // As compressors can have unlimited objects, just create a
   // handle with the module number as the index.
 

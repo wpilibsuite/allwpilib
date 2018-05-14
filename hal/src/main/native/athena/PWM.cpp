@@ -16,6 +16,7 @@
 #include "DigitalInternal.h"
 #include "HAL/cpp/fpga_clock.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 using namespace hal;
@@ -70,6 +71,7 @@ extern "C" {
 
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
                                         int32_t* status) {
+  hal::init::CheckInit();
   initializeDigital(status);
 
   if (*status != 0) return HAL_kInvalidHandle;

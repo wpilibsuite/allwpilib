@@ -12,6 +12,7 @@
 #include "DigitalInternal.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
+#include "HALInitializer.h"
 #include "MockData/DIODataInternal.h"
 #include "MockData/DigitalPWMDataInternal.h"
 #include "PortsInternal.h"
@@ -41,6 +42,7 @@ extern "C" {
  */
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
                                         HAL_Bool input, int32_t* status) {
+  hal::init::CheckInit();
   if (*status != 0) return HAL_kInvalidHandle;
 
   int16_t channel = getPortHandleChannel(portHandle);

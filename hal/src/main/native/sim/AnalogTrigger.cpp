@@ -12,6 +12,7 @@
 #include "HAL/Errors.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
+#include "HALInitializer.h"
 #include "MockData/AnalogInDataInternal.h"
 #include "MockData/AnalogTriggerDataInternal.h"
 #include "PortsInternal.h"
@@ -63,6 +64,7 @@ extern "C" {
 
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
     HAL_AnalogInputHandle portHandle, int32_t* index, int32_t* status) {
+  hal::init::CheckInit();
   // ensure we are given a valid and active AnalogInput handle
   auto analog_port = analogInputHandles->Get(portHandle);
   if (analog_port == nullptr) {

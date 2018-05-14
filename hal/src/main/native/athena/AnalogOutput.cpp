@@ -11,6 +11,7 @@
 #include "HAL/Errors.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/IndexedHandleResource.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 using namespace hal;
@@ -45,6 +46,7 @@ extern "C" {
  */
 HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
                                                       int32_t* status) {
+  hal::init::CheckInit();
   initializeAnalog(status);
 
   if (*status != 0) return HAL_kInvalidHandle;

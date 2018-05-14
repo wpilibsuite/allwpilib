@@ -32,11 +32,13 @@ import org.gradle.nativeplatform.toolchain.internal.ToolType;
 import org.gradle.nativeplatform.toolchain.internal.gcc.AbstractGccCompatibleToolChain;
 import org.gradle.nativeplatform.toolchain.internal.msvcpp.VisualCppToolChain;
 import org.gradle.nativeplatform.toolchain.internal.tools.ToolRegistry;
+import org.gradle.nativeplatform.test.googletest.GoogleTestTestSuiteBinarySpec;
 import org.gradle.platform.base.BinarySpec;
 import org.gradle.platform.base.ComponentSpec;
 import org.gradle.platform.base.ComponentSpecContainer;
 import org.gradle.platform.base.ComponentType;
 import org.gradle.platform.base.TypeBuilder;
+import org.gradle.nativeplatform.test.tasks.RunTestExecutable;
 import org.gradle.platform.base.BinaryContainer;
 import groovy.transform.CompileStatic;
 
@@ -66,6 +68,21 @@ class ExtraTasks implements Plugin<Project> {
             }
         }
 
-
+        @Mutate
+        @CompileStatic
+        void createNativeTestTask(ModelMap<Task> tasks, BinaryContainer binaries) {
+            tasks.create('testCpp', Task) { oTask ->
+                def task = (Task) oTask
+                task.group = 'build'
+                task.description = 'Uber task to run all native tests for project'
+                binaries.each { binary ->
+                    if (binary instanceof GoogleTestTestSuiteBinarySpec && binary.buildable) {
+                        binary.tasks.withType(RunTestExecutable) { testTask ->
+                            task.dependsOn testTask
+                        }
+                    }
+                }
+            }
+        }
     }
 }

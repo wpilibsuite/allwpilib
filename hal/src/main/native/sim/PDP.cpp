@@ -7,6 +7,7 @@
 
 #include "HAL/PDP.h"
 
+#include "HALInitializer.h"
 #include "MockData/PDPDataInternal.h"
 #include "PortsInternal.h"
 
@@ -20,6 +21,7 @@ void InitializePDP() {}
 
 extern "C" {
 void HAL_InitializePDP(int32_t module, int32_t* status) {
+  hal::init::CheckInit();
   SimPDPData[module].SetInitialized(true);
 }
 HAL_Bool HAL_CheckPDPModule(int32_t module) {

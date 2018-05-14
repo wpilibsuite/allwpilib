@@ -19,6 +19,7 @@
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
+#include "HALInitializer.h"
 #include "MockData/DriverStationDataInternal.h"
 #include "MockData/MockHooks.h"
 
@@ -289,6 +290,7 @@ static int32_t newDataOccur(uint32_t refNum) {
  * that interfaces with LabVIEW.
  */
 void HAL_InitializeDriverStation(void) {
+  hal::init::CheckInit();
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished

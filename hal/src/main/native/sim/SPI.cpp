@@ -7,6 +7,7 @@
 
 #include "HAL/SPI.h"
 
+#include "HALInitializer.h"
 #include "MockData/SPIDataInternal.h"
 
 using namespace hal;
@@ -18,6 +19,7 @@ void InitializeSPI() {}
 }  // namespace hal
 
 void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
+  hal::init::CheckInit();
   SimSPIData[port].SetInitialized(true);
 }
 int32_t HAL_TransactionSPI(HAL_SPIPort port, const uint8_t* dataToSend,
