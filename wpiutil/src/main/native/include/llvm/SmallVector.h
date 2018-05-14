@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/SmallVector.h is deprecated; include wpi/SmallVector.h instead"
 #else
 #warning "llvm/SmallVector.h is deprecated; include wpi/SmallVector.h instead"
 #endif
+// clang-format on
 
 #include "wpi/SmallVector.h"
 

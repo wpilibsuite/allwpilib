@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/raw_ostream.h is deprecated; include wpi/raw_ostream.h instead"
 #else
 #warning "llvm/raw_ostream.h is deprecated; include wpi/raw_ostream.h instead"
 #endif
+// clang-format on
 
 #include "wpi/raw_ostream.h"
 

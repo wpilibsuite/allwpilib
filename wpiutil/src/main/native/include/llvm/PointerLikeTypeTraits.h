@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/PointerLikeTypeTraits.h is deprecated; include wpi/PointerLikeTypeTraits.h instead"
 #else
 #warning "llvm/PointerLikeTypeTraits.h is deprecated; include wpi/PointerLikeTypeTraits.h instead"
 #endif
+// clang-format on
 
 #include "wpi/PointerLikeTypeTraits.h"
 

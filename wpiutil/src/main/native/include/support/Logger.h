@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: support/Logger.h is deprecated; include wpi/Logger.h instead"
 #else
 #warning "support/Logger.h is deprecated; include wpi/Logger.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/Logger.h"

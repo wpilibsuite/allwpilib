@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/DenseMapInfo.h is deprecated; include wpi/DenseMapInfo.h instead"
 #else
 #warning "llvm/DenseMapInfo.h is deprecated; include wpi/DenseMapInfo.h instead"
 #endif
+// clang-format on
 
 #include "wpi/DenseMapInfo.h"
 

@@ -15,11 +15,11 @@
  * Other commands using the wrist should make sure they disable PID!
  */
 class SetWristSetpoint : public frc::Command {
-public:
-	explicit SetWristSetpoint(double setpoint);
-	void Initialize() override;
-	bool IsFinished() override;
+ public:
+  explicit SetWristSetpoint(double setpoint);
+  void Initialize() override;
+  bool IsFinished() override;
 
-private:
-	double m_setpoint;
+ private:
+  double m_setpoint;
 };

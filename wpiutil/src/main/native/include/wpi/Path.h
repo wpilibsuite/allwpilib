@@ -13,13 +13,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_SUPPORT_PATH_H
-#define LLVM_SUPPORT_PATH_H
-
-#include "wpi/Twine.h"
-#include <iterator>
+#ifndef WPIUTIL_WPI_PATH_H_
+#define WPIUTIL_WPI_PATH_H_
 
 #include <stdint.h>
+
+#include <iterator>
+
+#include "wpi/Twine.h"
 
 namespace wpi {
 namespace sys {
@@ -51,7 +52,7 @@ class const_iterator
     : public std::iterator<std::input_iterator_tag, const StringRef> {
   StringRef Path;      ///< The entire path.
   StringRef Component; ///< The current component. Not necessarily in Path.
-  size_t    Position;  ///< The iterators current position within Path.
+  size_t Position;     ///< The iterators current position within Path.
 
   // An end iterator has Position = Path.size() + 1.
   friend const_iterator begin(StringRef path);
@@ -60,7 +61,7 @@ class const_iterator
 public:
   reference operator*() const { return Component; }
   pointer   operator->() const { return &Component; }
-  const_iterator &operator++();    // preincrement
+  const_iterator& operator++();    // preincrement
   bool operator==(const const_iterator &RHS) const;
   bool operator!=(const const_iterator &RHS) const { return !(*this == RHS); }
 
@@ -77,7 +78,7 @@ class reverse_iterator
     : public std::iterator<std::input_iterator_tag, const StringRef> {
   StringRef Path;      ///< The entire path.
   StringRef Component; ///< The current component. Not necessarily in Path.
-  size_t    Position;  ///< The iterators current position within Path.
+  size_t Position;     ///< The iterators current position within Path.
 
   friend reverse_iterator rbegin(StringRef path);
   friend reverse_iterator rend(StringRef path);
@@ -85,7 +86,7 @@ class reverse_iterator
 public:
   reference operator*() const { return Component; }
   pointer   operator->() const { return &Component; }
-  reverse_iterator &operator++();    // preincrement
+  reverse_iterator& operator++();    // preincrement
   bool operator==(const reverse_iterator &RHS) const;
   bool operator!=(const reverse_iterator &RHS) const { return !(*this == RHS); }
 
@@ -450,8 +451,8 @@ StringRef remove_leading_dotslash(StringRef path);
 /// @result True if path was changed
 bool remove_dots(SmallVectorImpl<char> &path, bool remove_dot_dot = false);
 
-} // end namespace path
-} // end namespace sys
-} // end namespace wpi
+}  // namespace path
+}  // namespace sys
+}  // namespace wpi
 
-#endif
+#endif  // WPIUTIL_WPI_PATH_H_

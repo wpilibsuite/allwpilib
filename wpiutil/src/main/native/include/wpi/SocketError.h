@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_TCPSOCKETS_SOCKETERROR_H_
-#define WPIUTIL_TCPSOCKETS_SOCKETERROR_H_
+#ifndef WPIUTIL_WPI_SOCKETERROR_H_
+#define WPIUTIL_WPI_SOCKETERROR_H_
 
 #include <string>
 
@@ -22,4 +22,4 @@ static inline std::string SocketStrerror() {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_TCPSOCKETS_SOCKETERROR_H_
+#endif  // WPIUTIL_WPI_SOCKETERROR_H_

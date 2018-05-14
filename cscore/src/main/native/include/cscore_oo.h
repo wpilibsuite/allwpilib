@@ -448,8 +448,7 @@ class CvSource : public VideoSource {
   /// @param defaultValue Default value
   /// @param value Current value
   /// @return Property
-  VideoProperty CreateStringProperty(wpi::StringRef name,
-                                     wpi::StringRef value);
+  VideoProperty CreateStringProperty(wpi::StringRef name, wpi::StringRef value);
 
   /// Configure enum property choices.
   /// @param property Property

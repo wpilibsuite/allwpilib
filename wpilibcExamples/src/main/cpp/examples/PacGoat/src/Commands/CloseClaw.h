@@ -16,7 +16,7 @@
  * detect that.
  */
 class CloseClaw : public frc::InstantCommand {
-public:
-	CloseClaw();
-	void Initialize() override;
+ public:
+  CloseClaw();
+  void Initialize() override;
 };

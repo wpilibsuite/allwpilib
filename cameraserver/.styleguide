@@ -1,6 +1,5 @@
 cppHeaderFileInclude {
   \.h$
-  \.hpp$
   \.inc$
 }
 
@@ -8,20 +7,12 @@ cppSrcFileInclude {
   \.cpp$
 }
 
-generatedFileExclude {
-  gtest/
-  ni-libraries/include/
-  ni-libraries/lib/
-}
-
 modifiableFileExclude {
-  shared/arm-linux-jni/
-  \.py$
   \.so$
 }
 
 repoRootNameOverride {
-  wpilib
+  cameraserver
 }
 
 includeOtherLibs {
@@ -30,4 +21,8 @@ includeOtherLibs {
   ^opencv2/
   ^support/
   ^wpi/
+}
+
+includeGuardRoots {
+  cameraserver/src/main/native/include/
 }

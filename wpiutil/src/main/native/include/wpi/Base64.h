@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_BASE64_H_
-#define WPIUTIL_SUPPORT_BASE64_H_
+#ifndef WPIUTIL_WPI_BASE64_H_
+#define WPIUTIL_WPI_BASE64_H_
 
 #include <cstddef>
 #include <string>
@@ -33,4 +33,4 @@ StringRef Base64Encode(StringRef plain, SmallVectorImpl<char>& buf);
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_BASE64_H_
+#endif  // WPIUTIL_WPI_BASE64_H_

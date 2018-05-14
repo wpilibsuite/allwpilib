@@ -8,6 +8,6 @@
 #pragma once
 
 class OI {
-public:
-	OI();
+ public:
+  OI();
 };

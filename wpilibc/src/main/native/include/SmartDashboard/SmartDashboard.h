@@ -50,8 +50,7 @@ class SmartDashboard : public SensorBase {
   static double GetNumber(wpi::StringRef keyName, double defaultValue);
 
   static bool PutString(wpi::StringRef keyName, wpi::StringRef value);
-  static bool SetDefaultString(wpi::StringRef key,
-                               wpi::StringRef defaultValue);
+  static bool SetDefaultString(wpi::StringRef key, wpi::StringRef defaultValue);
   static std::string GetString(wpi::StringRef keyName,
                                wpi::StringRef defaultValue);
 
@@ -64,8 +63,8 @@ class SmartDashboard : public SensorBase {
   static bool PutNumberArray(wpi::StringRef key, wpi::ArrayRef<double> value);
   static bool SetDefaultNumberArray(wpi::StringRef key,
                                     wpi::ArrayRef<double> defaultValue);
-  static std::vector<double> GetNumberArray(
-      wpi::StringRef key, wpi::ArrayRef<double> defaultValue);
+  static std::vector<double> GetNumberArray(wpi::StringRef key,
+                                            wpi::ArrayRef<double> defaultValue);
 
   static bool PutStringArray(wpi::StringRef key,
                              wpi::ArrayRef<std::string> value);

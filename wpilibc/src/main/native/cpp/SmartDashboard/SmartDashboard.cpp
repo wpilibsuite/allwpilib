@@ -304,8 +304,7 @@ bool SmartDashboard::PutNumber(wpi::StringRef keyName, double value) {
  * @param defaultValue The default value to set if key doesn't exist.
  * @returns False if the table key exists with a different type
  */
-bool SmartDashboard::SetDefaultNumber(wpi::StringRef key,
-                                      double defaultValue) {
+bool SmartDashboard::SetDefaultNumber(wpi::StringRef key, double defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultDouble(
       defaultValue);
 }
@@ -435,8 +434,8 @@ bool SmartDashboard::PutNumberArray(wpi::StringRef key,
  * @param defaultValue The default value to set if key doesn't exist.
  * @returns False if the table key exists with a different type
  */
-bool SmartDashboard::SetDefaultNumberArray(
-    wpi::StringRef key, wpi::ArrayRef<double> defaultValue) {
+bool SmartDashboard::SetDefaultNumberArray(wpi::StringRef key,
+                                           wpi::ArrayRef<double> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultDoubleArray(
       defaultValue);
 }

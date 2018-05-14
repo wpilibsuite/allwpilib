@@ -15,29 +15,26 @@
  * through the SmartDashboard.
  */
 class Robot : public frc::IterativeRobot {
-public:
-	void TeleopPeriodic() override {
-		/* Get the current going through channel 7, in Amperes. The PDP
-		 * returns the current in increments of 0.125A. At low currents
-		 * the
-		 * current readings tend to be less accurate.
-		 */
-		frc::SmartDashboard::PutNumber(
-				"Current Channel 7", m_pdp.GetCurrent(7));
+ public:
+  void TeleopPeriodic() override {
+    /* Get the current going through channel 7, in Amperes. The PDP returns the
+     * current in increments of 0.125A. At low currents the current readings
+     * tend to be less accurate.
+     */
+    frc::SmartDashboard::PutNumber("Current Channel 7", m_pdp.GetCurrent(7));
 
-		/* Get the voltage going into the PDP, in Volts.
-		 * The PDP returns the voltage in increments of 0.05 Volts.
-		 */
-		frc::SmartDashboard::PutNumber("Voltage", m_pdp.GetVoltage());
+    /* Get the voltage going into the PDP, in Volts. The PDP returns the voltage
+     * in increments of 0.05 Volts.
+     */
+    frc::SmartDashboard::PutNumber("Voltage", m_pdp.GetVoltage());
 
-		// Retrieves the temperature of the PDP, in degrees Celsius.
-		frc::SmartDashboard::PutNumber(
-				"Temperature", m_pdp.GetTemperature());
-	}
+    // Retrieves the temperature of the PDP, in degrees Celsius.
+    frc::SmartDashboard::PutNumber("Temperature", m_pdp.GetTemperature());
+  }
 
-private:
-	// Object for dealing with the Power Distribution Panel (PDP).
-	frc::PowerDistributionPanel m_pdp;
+ private:
+  // Object for dealing with the Power Distribution Panel (PDP).
+  frc::PowerDistributionPanel m_pdp;
 };
 
 START_ROBOT_CLASS(Robot)

@@ -22,7 +22,7 @@ dependencies {
 }
 
 checkstyle {
-    configFile = new File(rootDir, "styleguide/checkstyleEclipse.xml")
+    configFile = new File(rootDir, "styleguide/checkstyleExamples.xml")
 }
 
 pmd {

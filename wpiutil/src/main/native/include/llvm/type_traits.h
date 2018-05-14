@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/type_traits.h is deprecated; include wpi/type_traits.h instead"
 #else
 #warning "llvm/type_traits.h is deprecated; include wpi/type_traits.h instead"
 #endif
+// clang-format on
 
 #include "wpi/type_traits.h"
 

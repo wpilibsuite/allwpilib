@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: support/timestamp.h is deprecated; include wpi/timestamp.h instead"
 #else
 #warning "support/timestamp.h is deprecated; include wpi/timestamp.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/timestamp.h"

@@ -4,8 +4,8 @@
 // - see < http://opensource.org/licenses/BSD-2-Clause>
 //
 
-#ifndef WPIUTIL_SUPPORT_CONCURRENTQUEUE_H_
-#define WPIUTIL_SUPPORT_CONCURRENTQUEUE_H_
+#ifndef WPIUTIL_WPI_CONCURRENTQUEUE_H_
+#define WPIUTIL_WPI_CONCURRENTQUEUE_H_
 
 #include <queue>
 #include <thread>
@@ -82,4 +82,4 @@ class ConcurrentQueue {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_CONCURRENTQUEUE_H_
+#endif  // WPIUTIL_WPI_CONCURRENTQUEUE_H_

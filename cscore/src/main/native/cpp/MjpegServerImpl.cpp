@@ -124,8 +124,8 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
 // A browser should connect for each file and not serve files from its cache.
 // Using cached pictures would lead to showing old/outdated pictures.
 // Many browsers seem to ignore, or at least not always obey, those headers.
-static void SendHeader(wpi::raw_ostream& os, int code,
-                       wpi::StringRef codeText, wpi::StringRef contentType,
+static void SendHeader(wpi::raw_ostream& os, int code, wpi::StringRef codeText,
+                       wpi::StringRef contentType,
                        wpi::StringRef extra = wpi::StringRef{}) {
   os << "HTTP/1.0 " << code << ' ' << codeText << "\r\n";
   os << "Connection: close\r\n"
@@ -143,8 +143,7 @@ static void SendHeader(wpi::raw_ostream& os, int code,
 // Send error header and message
 // @param code HTTP error code (e.g. 404)
 // @param message Additional message text
-static void SendError(wpi::raw_ostream& os, int code,
-                      wpi::StringRef message) {
+static void SendError(wpi::raw_ostream& os, int code, wpi::StringRef message) {
   wpi::StringRef codeText, extra, baseMessage;
   switch (code) {
     case 401:
@@ -733,8 +732,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   } else if (req.find("GET /output") != wpi::StringRef::npos &&
              req.find(".json") != wpi::StringRef::npos) {
     kind = kGetSettings;
-  } else if ((pos = req.find("GET /?action=command")) !=
-             wpi::StringRef::npos) {
+  } else if ((pos = req.find("GET /?action=command")) != wpi::StringRef::npos) {
     kind = kCommand;
     parameters = req.substr(req.find('&', pos + 20)).substr(1);
   } else if (req.find("GET / ") != wpi::StringRef::npos || req == "GET /\n") {

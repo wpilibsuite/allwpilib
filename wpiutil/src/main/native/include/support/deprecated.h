@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: support/deprecated.h is deprecated; include wpi/deprecated.h instead"
 #else
 #warning "support/deprecated.h is deprecated; include wpi/deprecated.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/deprecated.h"

@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: tcpsockets/SocketError.h is deprecated; include wpi/SocketError.h instead"
 #else
 #warning "tcpsockets/SocketError.h is deprecated; include wpi/SocketError.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/SocketError.h"

@@ -16,8 +16,8 @@
 #include <atomic>
 #include <cstring>
 
-#include <wpi/raw_ostream.h>
 #include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
 
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"

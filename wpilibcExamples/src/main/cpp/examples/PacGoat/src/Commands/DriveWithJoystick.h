@@ -14,9 +14,9 @@
  * except when interrupted by another command.
  */
 class DriveWithJoystick : public frc::Command {
-public:
-	DriveWithJoystick();
-	void Execute() override;
-	bool IsFinished() override;
-	void End() override;
+ public:
+  DriveWithJoystick();
+  void Execute() override;
+  bool IsFinished() override;
+  void End() override;
 };

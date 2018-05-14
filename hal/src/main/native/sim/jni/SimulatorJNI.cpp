@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "SimulatorJNI.h"
+
 #include "BufferCallbackStore.h"
 #include "CallbackStore.h"
 #include "ConstBufferCallbackStore.h"
@@ -12,7 +14,6 @@
 #include "HAL/cpp/Log.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "MockData/MockHooks.h"
-#include "SimulatorJNI.h"
 #include "SpiReadAutoReceiveBufferCallbackStore.h"
 #include "edu_wpi_first_hal_sim_mockdata_SimulatorJNI.h"
 
@@ -112,8 +113,9 @@ extern "C" {
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_waitForProgramStart(JNIEnv*,
-                                                                     jclass) {
+Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_waitForProgramStart
+  (JNIEnv*, jclass)
+{
   HALSIM_WaitForProgramStart();
 }
 
@@ -123,8 +125,9 @@ Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_waitForProgramStart(JNIEnv*,
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_setProgramStarted(JNIEnv*,
-                                                                   jclass) {
+Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_setProgramStarted
+  (JNIEnv*, jclass)
+{
   HALSIM_SetProgramStarted();
 }
 
@@ -134,8 +137,9 @@ Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_setProgramStarted(JNIEnv*,
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_restartTiming(JNIEnv*,
-                                                               jclass) {
+Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_restartTiming
+  (JNIEnv*, jclass)
+{
   HALSIM_RestartTiming();
 }
 
@@ -145,7 +149,9 @@ Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_restartTiming(JNIEnv*,
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_resetHandles(JNIEnv*, jclass) {
+Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_resetHandles
+  (JNIEnv*, jclass)
+{
   hal::HandleBase::ResetGlobalHandles();
 }
 }  // extern "C"

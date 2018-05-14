@@ -41,8 +41,7 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
   static void ReportError(const wpi::Twine& error);
   static void ReportWarning(const wpi::Twine& error);
   static void ReportError(bool isError, int code, const wpi::Twine& error,
-                          const wpi::Twine& location,
-                          const wpi::Twine& stack);
+                          const wpi::Twine& location, const wpi::Twine& stack);
 
   static constexpr int kJoystickPorts = 6;
 

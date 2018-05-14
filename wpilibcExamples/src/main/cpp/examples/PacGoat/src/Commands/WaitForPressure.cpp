@@ -9,11 +9,7 @@
 
 #include "../Robot.h"
 
-WaitForPressure::WaitForPressure() {
-	Requires(&Robot::pneumatics);
-}
+WaitForPressure::WaitForPressure() { Requires(&Robot::pneumatics); }
 
 // Make this return true when this Command no longer needs to run execute()
-bool WaitForPressure::IsFinished() {
-	return Robot::pneumatics.IsPressurized();
-}
+bool WaitForPressure::IsFinished() { return Robot::pneumatics.IsPressurized(); }

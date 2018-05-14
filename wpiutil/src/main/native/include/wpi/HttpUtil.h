@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_HTTPUTIL_H_
-#define WPIUTIL_SUPPORT_HTTPUTIL_H_
+#ifndef WPIUTIL_WPI_HTTPUTIL_H_
+#define WPIUTIL_WPI_HTTPUTIL_H_
 
 #include <memory>
 #include <string>
@@ -145,4 +145,4 @@ class HttpConnection {
 
 #include "HttpUtil.inl"
 
-#endif  // WPIUTIL_SUPPORT_HTTPUTIL_H_
+#endif  // WPIUTIL_WPI_HTTPUTIL_H_

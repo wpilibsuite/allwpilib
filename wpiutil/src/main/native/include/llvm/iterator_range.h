@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/iterator_range.h is deprecated; include wpi/iterator_range.h instead"
 #else
 #warning "llvm/iterator_range.h is deprecated; include wpi/iterator_range.h instead"
 #endif
+// clang-format on
 
 #include "wpi/iterator_range.h"
 

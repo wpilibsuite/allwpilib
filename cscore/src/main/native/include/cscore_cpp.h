@@ -164,8 +164,7 @@ CS_Source CreateUsbCameraPath(wpi::StringRef name, wpi::StringRef path,
                               CS_Status* status);
 CS_Source CreateHttpCamera(wpi::StringRef name, wpi::StringRef url,
                            CS_HttpCameraKind kind, CS_Status* status);
-CS_Source CreateHttpCamera(wpi::StringRef name,
-                           wpi::ArrayRef<std::string> urls,
+CS_Source CreateHttpCamera(wpi::StringRef name, wpi::ArrayRef<std::string> urls,
                            CS_HttpCameraKind kind, CS_Status* status);
 CS_Source CreateCvSource(wpi::StringRef name, const VideoMode& mode,
                          CS_Status* status);
@@ -175,8 +174,7 @@ CS_Source CreateCvSource(wpi::StringRef name, const VideoMode& mode,
 //
 CS_SourceKind GetSourceKind(CS_Source source, CS_Status* status);
 std::string GetSourceName(CS_Source source, CS_Status* status);
-wpi::StringRef GetSourceName(CS_Source source,
-                             wpi::SmallVectorImpl<char>& buf,
+wpi::StringRef GetSourceName(CS_Source source, wpi::SmallVectorImpl<char>& buf,
                              CS_Status* status);
 std::string GetSourceDescription(CS_Source source, CS_Status* status);
 wpi::StringRef GetSourceDescription(CS_Source source,
@@ -199,8 +197,9 @@ bool SetSourceResolution(CS_Source source, int width, int height,
 bool SetSourceFPS(CS_Source source, int fps, CS_Status* status);
 std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
                                                  CS_Status* status);
-wpi::ArrayRef<CS_Sink> EnumerateSourceSinks(
-    CS_Source source, wpi::SmallVectorImpl<CS_Sink>& vec, CS_Status* status);
+wpi::ArrayRef<CS_Sink> EnumerateSourceSinks(CS_Source source,
+                                            wpi::SmallVectorImpl<CS_Sink>& vec,
+                                            CS_Status* status);
 CS_Source CopySource(CS_Source source, CS_Status* status);
 void ReleaseSource(CS_Source source, CS_Status* status);
 
@@ -234,8 +233,7 @@ std::vector<std::string> GetHttpCameraUrls(CS_Source source, CS_Status* status);
 // OpenCV Source Functions
 //
 void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status);
-void NotifySourceError(CS_Source source, wpi::StringRef msg,
-                       CS_Status* status);
+void NotifySourceError(CS_Source source, wpi::StringRef msg, CS_Status* status);
 void SetSourceConnected(CS_Source source, bool connected, CS_Status* status);
 void SetSourceDescription(CS_Source source, wpi::StringRef description,
                           CS_Status* status);
@@ -265,8 +263,7 @@ std::string GetSinkName(CS_Sink sink, CS_Status* status);
 wpi::StringRef GetSinkName(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                            CS_Status* status);
 std::string GetSinkDescription(CS_Sink sink, CS_Status* status);
-wpi::StringRef GetSinkDescription(CS_Sink sink,
-                                  wpi::SmallVectorImpl<char>& buf,
+wpi::StringRef GetSinkDescription(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                                   CS_Status* status);
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
 CS_Property GetSinkSourceProperty(CS_Sink sink, wpi::StringRef name,
@@ -333,8 +330,8 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status);
 
 wpi::ArrayRef<CS_Source> EnumerateSourceHandles(
     wpi::SmallVectorImpl<CS_Source>& vec, CS_Status* status);
-wpi::ArrayRef<CS_Sink> EnumerateSinkHandles(
-    wpi::SmallVectorImpl<CS_Sink>& vec, CS_Status* status);
+wpi::ArrayRef<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
+                                            CS_Status* status);
 
 std::string GetHostname();
 

@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/Format.h is deprecated; include wpi/Format.h instead"
 #else
 #warning "llvm/Format.h is deprecated; include wpi/Format.h instead"
 #endif
+// clang-format on
 
 #include "wpi/Format.h"
 

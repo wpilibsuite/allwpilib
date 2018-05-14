@@ -8,8 +8,8 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
-  gmock/
   src/main/native/cpp/llvm/
+  src/main/native/include/llvm/
   src/main/native/include/wpi/AlignOf\.h$
   src/main/native/include/wpi/ArrayRef\.h$
   src/main/native/include/wpi/Compiler\.h$
@@ -24,7 +24,7 @@ generatedFileExclude {
   src/main/native/include/wpi/MathExtras\.h$
   src/main/native/include/wpi/None\.h$
   src/main/native/include/wpi/Optional\.h$
-  src/main/native/include/wpi/Path\.h $
+  src/main/native/include/wpi/Path\.h$
   src/main/native/include/wpi/PointerLikeTypeTraits\.h$
   src/main/native/include/wpi/STLExtras\.h$
   src/main/native/include/wpi/SmallPtrSet\.h$
@@ -52,10 +52,15 @@ licenseUpdateExclude {
   src/main/native/cpp/TCPConnector\.cpp$
   src/main/native/cpp/TCPStream\.cpp$
   src/main/native/include/wpi/ConcurrentQueue\.h$
+  src/main/native/include/wpi/Path\.h$
   src/main/native/include/wpi/sha1\.h$
   src/main/native/include/wpi/TCPAcceptor\.h$
   src/main/native/include/wpi/TCPConnector\.h$
   src/main/native/include/wpi/TCPStream\.h$
+}
+
+repoRootNameOverride {
+  wpiutil
 }
 
 includeGuardRoots {

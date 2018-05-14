@@ -15,7 +15,7 @@
  * condition.
  */
 class WaitForBall : public frc::Command {
-public:
-	WaitForBall();
-	bool IsFinished() override;
+ public:
+  WaitForBall();
+  bool IsFinished() override;
 };

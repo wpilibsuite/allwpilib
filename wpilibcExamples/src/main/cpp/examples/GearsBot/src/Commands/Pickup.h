@@ -14,6 +14,6 @@
  * get it in a safe state to drive around.
  */
 class Pickup : public frc::CommandGroup {
-public:
-	Pickup();
+ public:
+  Pickup();
 };

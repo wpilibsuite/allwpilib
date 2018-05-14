@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_HOSTNAME_H_
-#define WPIUTIL_SUPPORT_HOSTNAME_H_
+#ifndef WPIUTIL_WPI_HOSTNAME_H_
+#define WPIUTIL_WPI_HOSTNAME_H_
 
 #include <string>
 
@@ -20,4 +20,4 @@ std::string GetHostname();
 StringRef GetHostname(SmallVectorImpl<char>& name);
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_HOSTNAME_H_
+#endif  // WPIUTIL_WPI_HOSTNAME_H_

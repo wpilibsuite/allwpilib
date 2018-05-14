@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015-2018. All Rights Reserved.                        */
+/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,16 +10,16 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-#include <cstddef>
-#else
-#include <stddef.h>
-#endif
-
 #include <wpi/deprecated.h>
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifdef __cplusplus
+#include <cstddef>
+#else
+#include <cstddef>
 #endif
 
 /** Typedefs */
@@ -488,8 +488,8 @@ NT_Bool NT_GetEntryInfoHandle(NT_Entry entry, struct NT_EntryInfo* info);
  * @param data            data pointer provided to callback creation function
  * @param event           event information
  */
-typedef void (*NT_EntryListenerCallback)(void* data,
-                                         const struct NT_EntryNotification* event);
+typedef void (*NT_EntryListenerCallback)(
+    void* data, const struct NT_EntryNotification* event);
 
 /**
  * Add a listener for all entries starting with a certain prefix.
@@ -938,7 +938,8 @@ char* NT_PackRpcValues(const struct NT_Value** values, size_t values_len,
  * @return Array of NT_Value's.
  */
 struct NT_Value** NT_UnpackRpcValues(const char* packed, size_t packed_len,
-                                     const enum NT_Type* types, size_t types_len);
+                                     const enum NT_Type* types,
+                                     size_t types_len);
 
 /** @} */
 
@@ -1628,7 +1629,8 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
  * function will free all the NT_Strings.
  */
 struct NT_String* NT_GetValueStringArray(const struct NT_Value* value,
-                                         uint64_t* last_change, size_t* arr_size);
+                                         uint64_t* last_change,
+                                         size_t* arr_size);
 
 /**
  * Returns the boolean currently assigned to the entry name.

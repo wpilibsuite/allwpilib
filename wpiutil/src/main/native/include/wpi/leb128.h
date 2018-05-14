@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_LEB128_H_
-#define WPIUTIL_SUPPORT_LEB128_H_
+#ifndef WPIUTIL_WPI_LEB128_H_
+#define WPIUTIL_WPI_LEB128_H_
 
 #include <cstddef>
 
@@ -23,4 +23,4 @@ bool ReadUleb128(raw_istream& is, uint64_t* ret);
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_LEB128_H_
+#endif  // WPIUTIL_WPI_LEB128_H_

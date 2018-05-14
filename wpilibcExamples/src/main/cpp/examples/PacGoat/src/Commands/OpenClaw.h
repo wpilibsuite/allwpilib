@@ -13,8 +13,8 @@
  * Opens the claw
  */
 class OpenClaw : public frc::Command {
-public:
-	OpenClaw();
-	void Initialize() override;
-	bool IsFinished() override;
+ public:
+  OpenClaw();
+  void Initialize() override;
+  bool IsFinished() override;
 };

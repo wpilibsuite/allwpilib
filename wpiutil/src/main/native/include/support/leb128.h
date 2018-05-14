@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: support/leb128.h is deprecated; include wpi/leb128.h instead"
 #else
 #warning "support/leb128.h is deprecated; include wpi/leb128.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/leb128.h"

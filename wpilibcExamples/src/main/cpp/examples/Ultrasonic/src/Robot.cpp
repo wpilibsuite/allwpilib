@@ -15,40 +15,39 @@
  * proportional control to maintain a set distance from an object.
  */
 class Robot : public frc::IterativeRobot {
-public:
-	/**
-	 * Tells the robot to drive to a set distance (in inches) from an object
-	 * using proportional control.
-	 */
-	void TeleopPeriodic() override {
-		// sensor returns a value from 0-4095 that is scaled to inches
-		double currentDistance =
-				m_ultrasonic.GetValue() * kValueToInches;
-		// convert distance error to a motor speed
-		double currentSpeed = (kHoldDistance - currentDistance) * kP;
-		// drive robot
-		m_robotDrive.ArcadeDrive(currentSpeed, 0);
-	}
+ public:
+  /**
+   * Tells the robot to drive to a set distance (in inches) from an object using
+   * proportional control.
+   */
+  void TeleopPeriodic() override {
+    // Sensor returns a value from 0-4095 that is scaled to inches
+    double currentDistance = m_ultrasonic.GetValue() * kValueToInches;
+    // Convert distance error to a motor speed
+    double currentSpeed = (kHoldDistance - currentDistance) * kP;
+    // Drive robot
+    m_robotDrive.ArcadeDrive(currentSpeed, 0);
+  }
 
-private:
-	// Distance in inches the robot wants to stay from an object
-	static constexpr int kHoldDistance = 12;
+ private:
+  // Distance in inches the robot wants to stay from an object
+  static constexpr int kHoldDistance = 12;
 
-	// Factor to convert sensor values to a distance in inches
-	static constexpr double kValueToInches = 0.125;
+  // Factor to convert sensor values to a distance in inches
+  static constexpr double kValueToInches = 0.125;
 
-	// Proportional speed constant
-	static constexpr double kP = 0.05;
+  // Proportional speed constant
+  static constexpr double kP = 0.05;
 
-	static constexpr int kLeftMotorPort = 0;
-	static constexpr int kRightMotorPort = 1;
-	static constexpr int kUltrasonicPort = 0;
+  static constexpr int kLeftMotorPort = 0;
+  static constexpr int kRightMotorPort = 1;
+  static constexpr int kUltrasonicPort = 0;
 
-	frc::AnalogInput m_ultrasonic{kUltrasonicPort};
+  frc::AnalogInput m_ultrasonic{kUltrasonicPort};
 
-	frc::Spark m_left{kLeftMotorPort};
-	frc::Spark m_right{kRightMotorPort};
-	frc::DifferentialDrive m_robotDrive{m_left, m_right};
+  frc::Spark m_left{kLeftMotorPort};
+  frc::Spark m_right{kRightMotorPort};
+  frc::DifferentialDrive m_robotDrive{m_left, m_right};
 };
 
 START_ROBOT_CLASS(Robot)

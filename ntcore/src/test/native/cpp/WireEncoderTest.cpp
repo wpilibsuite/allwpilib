@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015-2018. All Rights Reserved.                        */
+/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -224,8 +224,7 @@ TEST_F(WireEncoderTest, WriteBooleanValue2) {
   e.WriteValue(*v_false);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(2u, e.size());
-  ASSERT_EQ(wpi::StringRef("\x01\x00", 2),
-            wpi::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x01\x00", 2), wpi::StringRef(e.data(), e.size()));
 }
 
 TEST_F(WireEncoderTest, WriteDoubleValue2) {
@@ -336,8 +335,7 @@ TEST_F(WireEncoderTest, WriteBooleanValue3) {
   e.WriteValue(*v_false);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(2u, e.size());
-  ASSERT_EQ(wpi::StringRef("\x01\x00", 2),
-            wpi::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x01\x00", 2), wpi::StringRef(e.data(), e.size()));
 }
 
 TEST_F(WireEncoderTest, WriteDoubleValue3) {
@@ -354,8 +352,7 @@ TEST_F(WireEncoderTest, WriteStringValue3) {
   e.WriteValue(*v_string);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(6u, e.size());
-  ASSERT_EQ(wpi::StringRef("\x05hello", 6),
-            wpi::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x05hello", 6), wpi::StringRef(e.data(), e.size()));
 }
 
 TEST_F(WireEncoderTest, WriteRawValue3) {
@@ -363,8 +360,7 @@ TEST_F(WireEncoderTest, WriteRawValue3) {
   e.WriteValue(*v_raw);
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(6u, e.size());
-  ASSERT_EQ(wpi::StringRef("\x05hello", 6),
-            wpi::StringRef(e.data(), e.size()));
+  ASSERT_EQ(wpi::StringRef("\x05hello", 6), wpi::StringRef(e.data(), e.size()));
 }
 
 TEST_F(WireEncoderTest, WriteBooleanArrayValue3) {
@@ -472,8 +468,7 @@ TEST_F(WireEncoderTest, WriteString3) {
   e.WriteString(s_normal);
   EXPECT_EQ(nullptr, e.error());
   EXPECT_EQ(6u, e.size());
-  EXPECT_EQ(wpi::StringRef("\x05hello", 6),
-            wpi::StringRef(e.data(), e.size()));
+  EXPECT_EQ(wpi::StringRef("\x05hello", 6), wpi::StringRef(e.data(), e.size()));
 
   e.Reset();
   e.WriteString(s_long);

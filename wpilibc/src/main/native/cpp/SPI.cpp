@@ -311,8 +311,7 @@ void SPI::FreeAuto() {
  * @param dataToSend data to send (maximum 16 bytes)
  * @param zeroSize number of zeros to send after the data
  */
-void SPI::SetAutoTransmitData(wpi::ArrayRef<uint8_t> dataToSend,
-                              int zeroSize) {
+void SPI::SetAutoTransmitData(wpi::ArrayRef<uint8_t> dataToSend, int zeroSize) {
   int32_t status = 0;
   HAL_SetSPIAutoTransmitData(m_port, dataToSend.data(), dataToSend.size(),
                              zeroSize, &status);

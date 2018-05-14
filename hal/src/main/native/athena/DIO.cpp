@@ -7,10 +7,10 @@
 
 #include "HAL/DIO.h"
 
-#include <wpi/raw_ostream.h>
-
 #include <cmath>
 #include <thread>
+
+#include <wpi/raw_ostream.h>
 
 #include "DigitalInternal.h"
 #include "HAL/cpp/fpga_clock.h"

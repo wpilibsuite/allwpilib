@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/StringMap.h is deprecated; include wpi/StringMap.h instead"
 #else
 #warning "llvm/StringMap.h is deprecated; include wpi/StringMap.h instead"
 #endif
+// clang-format on
 
 #include "wpi/StringMap.h"
 

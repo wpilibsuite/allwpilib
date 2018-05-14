@@ -15,10 +15,10 @@
  * the spinners may still be adjusting their speed.
  */
 class SetCollectionSpeed : public frc::InstantCommand {
-public:
-	explicit SetCollectionSpeed(double speed);
-	void Initialize() override;
+ public:
+  explicit SetCollectionSpeed(double speed);
+  void Initialize() override;
 
-private:
-	double m_speed;
+ private:
+  double m_speed;
 };

@@ -7,10 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: tcpsockets/NetworkAcceptor.h is deprecated; include wpi/NetworkAcceptor.h instead"
 #else
 #warning "tcpsockets/NetworkAcceptor.h is deprecated; include wpi/NetworkAcceptor.h instead"
 #endif
+
+// clang-format on
 
 #include "wpi/NetworkAcceptor.h"

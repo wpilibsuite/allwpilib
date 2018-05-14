@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/ConvertUTF.h is deprecated; include wpi/ConvertUTF.h instead"
 #else
 #warning "llvm/ConvertUTF.h is deprecated; include wpi/ConvertUTF.h instead"
 #endif
+// clang-format on
 
 #include "wpi/ConvertUTF.h"
 

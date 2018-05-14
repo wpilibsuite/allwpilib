@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/Twine.h is deprecated; include wpi/Twine.h instead"
 #else
 #warning "llvm/Twine.h is deprecated; include wpi/Twine.h instead"
 #endif
+// clang-format on
 
 #include "wpi/Twine.h"
 

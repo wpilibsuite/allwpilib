@@ -7,11 +7,13 @@
 
 #pragma once
 
+// clang-format off
 #ifdef _MSC_VER
 #pragma message "warning: llvm/ArrayRef.h is deprecated; include wpi/ArrayRef.h instead"
 #else
 #warning "llvm/ArrayRef.h is deprecated; include wpi/ArrayRef.h instead"
 #endif
+// clang-format on
 
 #include "wpi/ArrayRef.h"
 

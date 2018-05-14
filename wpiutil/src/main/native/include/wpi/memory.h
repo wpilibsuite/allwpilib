@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_MEMORY_H_
-#define WPIUTIL_SUPPORT_MEMORY_H_
+#ifndef WPIUTIL_WPI_MEMORY_H_
+#define WPIUTIL_WPI_MEMORY_H_
 
 #include <cstdlib>
 #include <exception>
@@ -61,4 +61,4 @@ inline void* CheckedRealloc(void* ptr, size_t size) {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_MEMORY_H_
+#endif  // WPIUTIL_WPI_MEMORY_H_
