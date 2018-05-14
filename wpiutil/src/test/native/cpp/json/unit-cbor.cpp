@@ -1568,16 +1568,16 @@ TEST(CborFirstBytesTest, Unsupported)
 }
 
 // examples from RFC 7049 Appendix A
-namespace {
+namespace internal {
 struct CborRoundtripTestParam {
   const char* plain;
   wpi::StringRef encoded;
   bool test_encode;
 };
-}  // anonymous namespace
+}  // namespace internal
 
 class CborRoundtripTest
-    : public ::testing::TestWithParam<CborRoundtripTestParam> {
+    : public ::testing::TestWithParam<internal::CborRoundtripTestParam> {
 };
 TEST_P(CborRoundtripTest, Case)
 {
@@ -1588,7 +1588,7 @@ TEST_P(CborRoundtripTest, Case)
     EXPECT_EQ(json::parse(GetParam().plain), json::from_cbor(GetParam().encoded));
 }
 
-static const CborRoundtripTestParam rfc7049_appendix_a_numbers[] = {
+static const internal::CborRoundtripTestParam rfc7049_appendix_a_numbers[] = {
     {"0", wpi::StringRef("\x00", 1), true},
     {"1", "\x01", true},
     {"10", "\x0a", true},
@@ -1635,7 +1635,7 @@ static const CborRoundtripTestParam rfc7049_appendix_a_numbers[] = {
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixANumberTests, CborRoundtripTest,
                         ::testing::ValuesIn(rfc7049_appendix_a_numbers), );
 
-static const CborRoundtripTestParam rfc7049_appendix_a_simple_values[] = {
+static const internal::CborRoundtripTestParam rfc7049_appendix_a_simple_values[] = {
     {"false", "\xf4", true},
     {"true", "\xf5", true},
 };
@@ -1643,7 +1643,7 @@ static const CborRoundtripTestParam rfc7049_appendix_a_simple_values[] = {
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixASimpleValueTests, CborRoundtripTest,
                         ::testing::ValuesIn(rfc7049_appendix_a_simple_values), );
 
-static const CborRoundtripTestParam rfc7049_appendix_a_strings[] = {
+static const internal::CborRoundtripTestParam rfc7049_appendix_a_strings[] = {
     {"\"\"", "\x60", true},
     {"\"a\"", "\x61\x61", true},
     {"\"IETF\"", "\x64\x49\x45\x54\x46", true},
@@ -1657,7 +1657,7 @@ static const CborRoundtripTestParam rfc7049_appendix_a_strings[] = {
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixAStringTests, CborRoundtripTest,
                         ::testing::ValuesIn(rfc7049_appendix_a_strings), );
 
-static const CborRoundtripTestParam rfc7049_appendix_a_arrays[] = {
+static const internal::CborRoundtripTestParam rfc7049_appendix_a_arrays[] = {
     {"[]", "\x80", true},
     {"[1, 2, 3]", "\x83\x01\x02\x03", true},
     {"[1, [2, 3], [4, 5]]", "\x83\x01\x82\x02\x03\x82\x04\x05", true},
@@ -1674,7 +1674,7 @@ static const CborRoundtripTestParam rfc7049_appendix_a_arrays[] = {
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixAArrayTests, CborRoundtripTest,
                         ::testing::ValuesIn(rfc7049_appendix_a_arrays), );
 
-static const CborRoundtripTestParam rfc7049_appendix_a_objects[] = {
+static const internal::CborRoundtripTestParam rfc7049_appendix_a_objects[] = {
     {"{}", "\xa0", true},
     {"{\"a\": 1, \"b\": [2, 3]}", "\xa2\x61\x61\x01\x61\x62\x82\x02\x03", true},
     {"[\"a\", {\"b\": \"c\"}]", "\x82\x61\x61\xa1\x61\x62\x61\x63", true},
