@@ -29,8 +29,9 @@ templatesTree.list(new FilenameFilter() {
     templatesMap.put(it, [])
 }
 
+
 ext {
-    sharedCvConfigs = examplesMap + templatesMap
+    sharedCvConfigs = examplesMap + templatesMap + [commands: []]
     staticCvConfigs = [:]
     useJava = false
     useCpp = true
@@ -40,6 +41,34 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 model {
     components {
+        commands(NativeLibrarySpec) {
+            binaries.all { binary ->
+                if (binary in StaticLibraryBinarySpec) {
+                    binary.buildable = false
+                    return
+                }
+                lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                lib project: ':hal', library: 'hal', linkage: 'shared'
+                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                project(':ni-libraries').addNiLibrariesToLinker(binary)
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src/main/cpp/commands']
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/cpp/commands'
+                        include '**/*.h'
+                    }
+                }
+            }
+        }
+
         examplesMap.each { key, value ->
             "${key}"(NativeExecutableSpec) {
                 binaries.all { binary ->

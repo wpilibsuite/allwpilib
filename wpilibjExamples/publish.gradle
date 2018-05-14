@@ -16,6 +16,7 @@ if (project.hasProperty("publishVersion")) {
 
 def baseExamplesArtifactId = 'examples'
 def baseTemplatesArtifactId = 'templates'
+def baseCommandsArtifactId = 'commands'
 def artifactGroupId = 'edu.wpi.first.wpilibj'
 
 def outputsFolder = file("$project.buildDir/outputs")
@@ -46,8 +47,22 @@ task javaTemplatesZip(type: Zip) {
     }
 }
 
+task javaCommandsZip(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = 'wpilibj-commands'
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/java/edu/wpi/first/wpilibj/commands') {
+        into 'commands'
+    }
+}
+
 build.dependsOn javaTemplatesZip
 build.dependsOn javaExamplesZip
+build.dependsOn javaCommandsZip
 
 publishing {
     publications {
@@ -63,6 +78,14 @@ publishing {
             artifact javaTemplatesZip
 
             artifactId = baseTemplatesArtifactId
+            groupId artifactGroupId
+            version pubVersion
+        }
+
+        commands(MavenPublication) {
+            artifact javaCommandsZip
+
+            artifactId = baseCommandsArtifactId
             groupId artifactGroupId
             version pubVersion
         }
