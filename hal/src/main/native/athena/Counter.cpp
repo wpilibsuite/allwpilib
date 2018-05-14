@@ -11,6 +11,7 @@
 #include "DigitalInternal.h"
 #include "HAL/HAL.h"
 #include "HAL/handles/LimitedHandleResource.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 using namespace hal;
@@ -42,6 +43,7 @@ extern "C" {
 
 HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
                                         int32_t* status) {
+  hal::init::CheckInit();
   auto handle = counterHandles->Allocate();
   if (handle == HAL_kInvalidHandle) {  // out of resources
     *status = NO_AVAILABLE_RESOURCES;

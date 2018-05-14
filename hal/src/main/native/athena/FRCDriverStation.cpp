@@ -18,6 +18,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "HAL/DriverStation.h"
+#include "HALInitializer.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");
@@ -380,6 +381,7 @@ static void newDataOccur(uint32_t refNum) {
  * that interfaces with LabVIEW.
  */
 void HAL_InitializeDriverStation(void) {
+  hal::init::CheckInit();
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished

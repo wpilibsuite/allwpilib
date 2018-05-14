@@ -11,6 +11,7 @@
 #include "HAL/Errors.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 namespace hal {
@@ -33,6 +34,7 @@ void InitializeCounter() {
 extern "C" {
 HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
                                         int32_t* status) {
+  hal::init::CheckInit();
   return 0;
 }
 void HAL_FreeCounter(HAL_CounterHandle counterHandle, int32_t* status) {}

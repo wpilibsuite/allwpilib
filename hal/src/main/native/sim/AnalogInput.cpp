@@ -9,6 +9,7 @@
 
 #include "AnalogInternal.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "MockData/AnalogInDataInternal.h"
 #include "PortsInternal.h"
 
@@ -23,6 +24,7 @@ void InitializeAnalogInput() {}
 extern "C" {
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
                                                     int32_t* status) {
+  hal::init::CheckInit();
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;

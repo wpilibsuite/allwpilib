@@ -13,6 +13,7 @@
 #include "HAL/Counter.h"
 #include "HAL/Errors.h"
 #include "HAL/handles/LimitedClassedHandleResource.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 using namespace hal;
@@ -243,6 +244,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(
     HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
     HAL_Bool reverseDirection, HAL_EncoderEncodingType encodingType,
     int32_t* status) {
+  hal::init::CheckInit();
   auto encoder = std::make_shared<Encoder>(
       digitalSourceHandleA, analogTriggerTypeA, digitalSourceHandleB,
       analogTriggerTypeB, reverseDirection, encodingType, status);

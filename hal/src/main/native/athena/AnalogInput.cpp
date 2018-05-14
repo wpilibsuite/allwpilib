@@ -14,6 +14,7 @@
 #include "HAL/AnalogAccumulator.h"
 #include "HAL/HAL.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 namespace hal {
@@ -33,6 +34,7 @@ extern "C" {
  */
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
                                                     int32_t* status) {
+  hal::init::CheckInit();
   initializeAnalog(status);
 
   if (*status != 0) return HAL_kInvalidHandle;

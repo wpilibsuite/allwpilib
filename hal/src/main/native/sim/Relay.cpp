@@ -8,6 +8,7 @@
 #include "HAL/Relay.h"
 
 #include "HAL/handles/IndexedHandleResource.h"
+#include "HALInitializer.h"
 #include "MockData/RelayDataInternal.h"
 #include "PortsInternal.h"
 
@@ -37,6 +38,7 @@ void InitializeRelay() {
 extern "C" {
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
                                         int32_t* status) {
+  hal::init::CheckInit();
   if (*status != 0) return HAL_kInvalidHandle;
 
   int16_t channel = getPortHandleChannel(portHandle);

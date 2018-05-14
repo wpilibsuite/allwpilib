@@ -13,6 +13,7 @@
 #include "HAL/AnalogAccumulator.h"
 #include "HAL/AnalogInput.h"
 #include "HAL/handles/IndexedHandleResource.h"
+#include "HALInitializer.h"
 
 namespace {
 
@@ -56,6 +57,7 @@ extern "C" {
 
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
                                         int32_t* status) {
+  hal::init::CheckInit();
   if (!HAL_IsAccumulatorChannel(analogHandle, status)) {
     if (*status == 0) {
       *status = HAL_INVALID_ACCUMULATOR_CHANNEL;

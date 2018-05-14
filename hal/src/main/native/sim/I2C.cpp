@@ -7,6 +7,7 @@
 
 #include "HAL/I2C.h"
 
+#include "HALInitializer.h"
 #include "MockData/I2CDataInternal.h"
 
 using namespace hal;
@@ -19,6 +20,7 @@ void InitializeI2C() {}
 
 extern "C" {
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
+  hal::init::CheckInit();
   SimI2CData[port].SetInitialized(true);
 }
 int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,

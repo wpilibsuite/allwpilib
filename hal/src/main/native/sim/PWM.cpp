@@ -10,6 +10,7 @@
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "MockData/PWMDataInternal.h"
 #include "PortsInternal.h"
 
@@ -25,6 +26,7 @@ extern "C" {
 
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
                                         int32_t* status) {
+  hal::init::CheckInit();
   if (*status != 0) return HAL_kInvalidHandle;
 
   int16_t channel = getPortHandleChannel(portHandle);

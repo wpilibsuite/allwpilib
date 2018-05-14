@@ -23,6 +23,7 @@
 #include "HAL/DIO.h"
 #include "HAL/HAL.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 
 using namespace hal;
 
@@ -105,6 +106,7 @@ static void CommonSPIPortFree(void) {
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS3, 4 for MXP
  */
 void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
+  hal::init::CheckInit();
   if (port < 0 || port >= kSpiMaxHandles) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;

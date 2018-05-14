@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HAL/SerialPort.h"
+#include "HALInitializer.h"
 
 namespace hal {
 namespace init {
@@ -14,7 +15,9 @@ void InitializeOSSerialPort() {}
 }  // namespace hal
 
 extern "C" {
-void HAL_InitializeOSSerialPort(HAL_SerialPort port, int32_t* status) {}
+void HAL_InitializeOSSerialPort(HAL_SerialPort port, int32_t* status) {
+  hal::init::CheckInit();
+}
 void HAL_SetOSSerialBaudRate(HAL_SerialPort port, int32_t baud,
                              int32_t* status) {}
 void HAL_SetOSSerialDataBits(HAL_SerialPort port, int32_t bits,

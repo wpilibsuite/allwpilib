@@ -16,6 +16,7 @@
 #include "HAL/HAL.h"
 #include "HAL/cpp/fpga_clock.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
+#include "HALInitializer.h"
 
 namespace {
 struct Notifier {
@@ -60,6 +61,7 @@ void InitializeNotifier() {
 extern "C" {
 
 HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
+  hal::init::CheckInit();
   std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
   HAL_NotifierHandle handle = notifierHandles->Allocate(notifier);
   if (handle == HAL_kInvalidHandle) {
