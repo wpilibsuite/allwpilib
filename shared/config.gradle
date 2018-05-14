@@ -139,24 +139,6 @@ if (!project.hasProperty('onlyAthena')) {
                 compilerFamily = 'VisualCpp'
                 detectPlatform = windows64PlatformDetect
             }
-            /* Disable 32 bit linux until we can figure out jenkins
-            linuxX86(BuildConfig) {
-                architecture = 'x86'
-                operatingSystem = 'linux'
-                compilerArgs = linuxCompilerArgs
-                compilerArgs << linux32BitArg
-                CCompilerArgs = linuxCCompilerArgs
-                CCompilerArgs << linux32BitArg
-                linkerArgs = linuxLinkerArgs
-                linkerArgs << linux32BitArg
-                debugCompilerArgs = linuxDebugCompilerArgs
-                releaseCompilerArgs = linuxReleaseCompilerArgs
-                releaseStripBinaries = true
-                compilerFamily = 'Gcc'
-                detectPlatform = linux32IntelPlatformDetect
-                exclude << 'halAthena'
-            }
-            */
             linuxX64(BuildConfig) {
                 architecture = 'x86-64'
                 operatingSystem = 'linux'
@@ -169,23 +151,6 @@ if (!project.hasProperty('onlyAthena')) {
                 compilerFamily = 'Gcc'
                 detectPlatform = linux64IntelPlatformDetect
             }
-            /* 32 bit Mac OS X not supported by OpenCV.
-             * If support is ever added, will add this back in
-            macX86(BuildConfig) {
-                architecture = 'x86'
-                operatingSystem = 'osx'
-                compilerArgs = macCompilerArgs
-                compilerArgs << mac32BitArg
-                CCompilerArgs = macCCompilerArgs
-                CCompilerArgs << mac32BitArg
-                linkerArgs << mac32BitArg
-                debugCompilerArgs = macDebugCompilerArgs
-                releaseCompilerArgs = macReleaseCompilerArgs
-                releaseStripBinaries = true
-                compilerFamily = 'Clang'
-                detectPlatform = mac32PlatformDetect
-            }
-            */
             macX64(BuildConfig) {
                 architecture = 'x86-64'
                 operatingSystem = 'osx'
