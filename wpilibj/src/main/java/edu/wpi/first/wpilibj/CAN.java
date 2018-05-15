@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.hal.CANAPIJNI;
  * No packets that can be sent gets blocked by the RoboRIO, so all methods
  * work identically in all robot modes.
  *
- * All methods are thread save, however the CANData object passed into the
+ * All methods are thread safe, however the CANData object passed into the
  * read methods and the byte[] passed into the write methods need to not
  * be modified for the duration of their respective calls.
  */
@@ -56,7 +56,7 @@ public class CAN implements Closeable {
     CANAPIJNI.writeCANPacket(m_handle, data, apiId);
   }
 
-    /**
+  /**
    * Write a repeating packet to the CAN device with a specific ID. This ID is 10 bits.
    * The RoboRIO will automatically repeat the packet at the specified interval
    *
