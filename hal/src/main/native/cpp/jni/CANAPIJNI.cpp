@@ -5,18 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <assert.h>
 #include <jni.h>
 
-#include "HAL/cpp/Log.h"
-#include "HAL/CANAPI.h"
+#include <cassert>
+
+#include <wpi/SmallString.h>
+#include <wpi/jni_util.h>
+#include <wpi/raw_ostream.h>
+
 #include "HAL/CAN.h"
+#include "HAL/CANAPI.h"
 #include "HAL/Errors.h"
+#include "HAL/cpp/Log.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_CANAPIJNI.h"
-#include "wpi/SmallString.h"
-#include "wpi/jni_util.h"
-#include "wpi/raw_ostream.h"
 
 using namespace frc;
 using namespace wpi::java;
@@ -27,12 +29,15 @@ extern "C" {
  * Method:    initializeCAN
  * Signature: (III)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_initializeCAN
-  (JNIEnv *env, jclass, jint manufacturer, jint deviceId, jint deviceType) {
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_initializeCAN
+  (JNIEnv* env, jclass, jint manufacturer, jint deviceId, jint deviceType)
+{
   int32_t status = 0;
-  auto handle = HAL_InitializeCAN(static_cast<HAL_CANManufacturer>(manufacturer),
-                    static_cast<int32_t>(deviceId),
-                    static_cast<HAL_CANDeviceType>(deviceType), &status);
+  auto handle =
+      HAL_InitializeCAN(static_cast<HAL_CANManufacturer>(manufacturer),
+                        static_cast<int32_t>(deviceId),
+                        static_cast<HAL_CANDeviceType>(deviceType), &status);
 
   CheckStatusForceThrow(env, status);
   return handle;
@@ -43,8 +48,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_initializeCAN
  * Method:    cleanCAN
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_cleanCAN
-  (JNIEnv *env, jclass, jint handle) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_cleanCAN
+  (JNIEnv* env, jclass, jint handle)
+{
   HAL_CleanCAN(static_cast<HAL_CANHandle>(handle));
 }
 
@@ -53,13 +60,16 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_cleanCAN
  * Method:    writeCANPacket
  * Signature: (I[BI)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_writeCANPacket
-  (JNIEnv *env, jclass, jint handle, jbyteArray data, jint apiId) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_writeCANPacket
+  (JNIEnv* env, jclass, jint handle, jbyteArray data, jint apiId)
+{
   auto halHandle = static_cast<HAL_CANHandle>(handle);
   JByteArrayRef arr{env, data};
   auto arrRef = arr.array();
   int32_t status = 0;
-  HAL_WriteCANPacket(halHandle, reinterpret_cast<const uint8_t*>(arrRef.data()), arrRef.size(), apiId, &status);
+  HAL_WriteCANPacket(halHandle, reinterpret_cast<const uint8_t*>(arrRef.data()),
+                     arrRef.size(), apiId, &status);
   CheckStatus(env, status);
 }
 
@@ -68,13 +78,18 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_writeCANPacket
  * Method:    writeCANPacketRepeating
  * Signature: (I[BII)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_writeCANPacketRepeating
-  (JNIEnv *env, jclass, jint handle, jbyteArray data, jint apiId, jint timeoutMs) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_writeCANPacketRepeating
+  (JNIEnv* env, jclass, jint handle, jbyteArray data, jint apiId,
+   jint timeoutMs)
+{
   auto halHandle = static_cast<HAL_CANHandle>(handle);
   JByteArrayRef arr{env, data};
   auto arrRef = arr.array();
   int32_t status = 0;
-  HAL_WriteCANPacketRepeating(halHandle, reinterpret_cast<const uint8_t*>(arrRef.data()), arrRef.size(), apiId, timeoutMs, &status);
+  HAL_WriteCANPacketRepeating(halHandle,
+                              reinterpret_cast<const uint8_t*>(arrRef.data()),
+                              arrRef.size(), apiId, timeoutMs, &status);
   CheckStatus(env, status);
 }
 
@@ -83,8 +98,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_writeCANPacketRe
  * Method:    stopCANPacketRepeating
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_stopCANPacketRepeating
-  (JNIEnv *env, jclass, jint handle, jint apiId) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_stopCANPacketRepeating
+  (JNIEnv* env, jclass, jint handle, jint apiId)
+{
   auto halHandle = static_cast<HAL_CANHandle>(handle);
   int32_t status = 0;
   HAL_StopCANPacketRepeating(halHandle, apiId, &status);
@@ -94,17 +111,20 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_stopCANPacketRep
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CANAPIJNI
  * Method:    readCANPacketNew
- * Signature: (IILedu/wpi/first/wpilibj/CANData;)Z
+ * Signature: (IILjava/lang/Object;)Z
  */
-JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacketNew
-  (JNIEnv *env, jclass, jint handle, jint apiId, jobject data) {
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacketNew
+  (JNIEnv* env, jclass, jint handle, jint apiId, jobject data)
+{
   auto halHandle = static_cast<HAL_CANHandle>(handle);
   uint8_t dataTemp[8];
   int32_t dataLength = 0;
   uint64_t timestamp = 0;
   int32_t status = 0;
-  HAL_ReadCANPacketNew(halHandle, apiId, dataTemp, &dataLength, &timestamp, &status);
-  if(status == HAL_ERR_CANSessionMux_MessageNotFound) {
+  HAL_ReadCANPacketNew(halHandle, apiId, dataTemp, &dataLength, &timestamp,
+                       &status);
+  if (status == HAL_ERR_CANSessionMux_MessageNotFound) {
     return false;
   }
   if (!CheckStatus(env, status)) {
@@ -115,24 +135,28 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacke
   jbyteArray toSetArray = SetCANDataObject(env, data, dataLength, timestamp);
   auto javaLen = env->GetArrayLength(toSetArray);
   if (javaLen < dataLength) dataLength = javaLen;
-  env->SetByteArrayRegion(toSetArray, 0, dataLength, reinterpret_cast<jbyte*>(dataTemp));
+  env->SetByteArrayRegion(toSetArray, 0, dataLength,
+                          reinterpret_cast<jbyte*>(dataTemp));
   return true;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CANAPIJNI
  * Method:    readCANPacketLatest
- * Signature: (IILedu/wpi/first/wpilibj/CANData;)Z
+ * Signature: (IILjava/lang/Object;)Z
  */
-JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacketLatest
-  (JNIEnv *env, jclass, jint handle, jint apiId, jobject data) {
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacketLatest
+  (JNIEnv* env, jclass, jint handle, jint apiId, jobject data)
+{
   auto halHandle = static_cast<HAL_CANHandle>(handle);
-    uint8_t dataTemp[8];
+  uint8_t dataTemp[8];
   int32_t dataLength = 0;
   uint64_t timestamp = 0;
   int32_t status = 0;
-  HAL_ReadCANPacketLatest(halHandle, apiId, dataTemp, &dataLength, &timestamp, &status);
-  if(status == HAL_ERR_CANSessionMux_MessageNotFound) {
+  HAL_ReadCANPacketLatest(halHandle, apiId, dataTemp, &dataLength, &timestamp,
+                          &status);
+  if (status == HAL_ERR_CANSessionMux_MessageNotFound) {
     return false;
   }
   if (!CheckStatus(env, status)) {
@@ -143,24 +167,29 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacke
   jbyteArray toSetArray = SetCANDataObject(env, data, dataLength, timestamp);
   auto javaLen = env->GetArrayLength(toSetArray);
   if (javaLen < dataLength) dataLength = javaLen;
-  env->SetByteArrayRegion(toSetArray, 0, dataLength, reinterpret_cast<jbyte*>(dataTemp));
+  env->SetByteArrayRegion(toSetArray, 0, dataLength,
+                          reinterpret_cast<jbyte*>(dataTemp));
   return true;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CANAPIJNI
  * Method:    readCANPacketTimeout
- * Signature: (IIILedu/wpi/first/wpilibj/CANData;)Z
+ * Signature: (IIILjava/lang/Object;)Z
  */
-JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacketTimeout
-  (JNIEnv *env, jclass, jint handle, jint apiId, jint timeoutMs, jobject data) {
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacketTimeout
+  (JNIEnv* env, jclass, jint handle, jint apiId, jint timeoutMs, jobject data)
+{
   auto halHandle = static_cast<HAL_CANHandle>(handle);
   uint8_t dataTemp[8];
   int32_t dataLength = 0;
   uint64_t timestamp = 0;
   int32_t status = 0;
-  HAL_ReadCANPacketTimeout(halHandle, apiId, dataTemp, &dataLength, &timestamp, timeoutMs, &status);
-  if (status == HAL_CAN_TIMEOUT || status == HAL_ERR_CANSessionMux_MessageNotFound) {
+  HAL_ReadCANPacketTimeout(halHandle, apiId, dataTemp, &dataLength, &timestamp,
+                           timeoutMs, &status);
+  if (status == HAL_CAN_TIMEOUT ||
+      status == HAL_ERR_CANSessionMux_MessageNotFound) {
     return false;
   }
   if (!CheckStatus(env, status)) {
@@ -171,24 +200,30 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacke
   jbyteArray toSetArray = SetCANDataObject(env, data, dataLength, timestamp);
   auto javaLen = env->GetArrayLength(toSetArray);
   if (javaLen < dataLength) dataLength = javaLen;
-  env->SetByteArrayRegion(toSetArray, 0, dataLength, reinterpret_cast<jbyte*>(dataTemp));
+  env->SetByteArrayRegion(toSetArray, 0, dataLength,
+                          reinterpret_cast<jbyte*>(dataTemp));
   return true;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CANAPIJNI
  * Method:    readCANPeriodicPacket
- * Signature: (IIIILedu/wpi/first/wpilibj/CANData;)Z
+ * Signature: (IIIILjava/lang/Object;)Z
  */
-JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPeriodicPacket
-  (JNIEnv *env, jclass, jint handle, jint apiId, jint timeoutMs, jint periodMs, jobject data) {
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPeriodicPacket
+  (JNIEnv* env, jclass, jint handle, jint apiId, jint timeoutMs, jint periodMs,
+   jobject data)
+{
   auto halHandle = static_cast<HAL_CANHandle>(handle);
-    uint8_t dataTemp[8];
+  uint8_t dataTemp[8];
   int32_t dataLength = 0;
   uint64_t timestamp = 0;
   int32_t status = 0;
-  HAL_ReadCANPeriodicPacket(halHandle, apiId, dataTemp, &dataLength, &timestamp, timeoutMs, periodMs, &status);
-  if (status == HAL_CAN_TIMEOUT || status == HAL_ERR_CANSessionMux_MessageNotFound) {
+  HAL_ReadCANPeriodicPacket(halHandle, apiId, dataTemp, &dataLength, &timestamp,
+                            timeoutMs, periodMs, &status);
+  if (status == HAL_CAN_TIMEOUT ||
+      status == HAL_ERR_CANSessionMux_MessageNotFound) {
     return false;
   }
   if (!CheckStatus(env, status)) {
@@ -199,7 +234,8 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPerio
   jbyteArray toSetArray = SetCANDataObject(env, data, dataLength, timestamp);
   auto javaLen = env->GetArrayLength(toSetArray);
   if (javaLen < dataLength) dataLength = javaLen;
-  env->SetByteArrayRegion(toSetArray, 0, dataLength, reinterpret_cast<jbyte*>(dataTemp));
+  env->SetByteArrayRegion(toSetArray, 0, dataLength,
+                          reinterpret_cast<jbyte*>(dataTemp));
   return true;
 }
-}
+}  // extern "C"

@@ -7,10 +7,10 @@
 
 #include "HAL/CANAPI.h"
 
-#include <wpi/DenseMap.h>
-
 #include <atomic>
 #include <ctime>
+
+#include <wpi/DenseMap.h>
 
 #include "HAL/CAN.h"
 #include "HAL/Errors.h"
