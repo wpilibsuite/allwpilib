@@ -58,7 +58,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
     m_spi.setClockRate(3000000);
     m_spi.setMSBFirst();
-    m_spi.setSampleDataOnRising();
+    m_spi.setSampleDataOnLeadingEdge();
     m_spi.setClockActiveHigh();
     m_spi.setChipSelectActiveLow();
 

@@ -23,7 +23,7 @@ ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
     : m_spi(port) {
   m_spi.SetClockRate(500000);
   m_spi.SetMSBFirst();
-  m_spi.SetSampleDataOnFalling();
+  m_spi.SetSampleDataOnTrailingEdge();
   m_spi.SetClockActiveLow();
   m_spi.SetChipSelectActiveHigh();
 

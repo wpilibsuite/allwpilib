@@ -92,7 +92,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, Sendable {
   private void init(Range range) {
     m_spi.setClockRate(500000);
     m_spi.setMSBFirst();
-    m_spi.setSampleDataOnFalling();
+    m_spi.setSampleDataOnTrailingEdge();
     m_spi.setClockActiveLow();
     m_spi.setChipSelectActiveHigh();
 
