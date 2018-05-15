@@ -20,25 +20,25 @@ using namespace wpi;
 const size_t StringRef::npos;
 #endif
 
-static char ascii_tolower(char x) {
+static char ascii_tolower(char x) noexcept {
   if (x >= 'A' && x <= 'Z')
     return x - 'A' + 'a';
   return x;
 }
 
-static char ascii_toupper(char x) {
+static char ascii_toupper(char x) noexcept {
   if (x >= 'a' && x <= 'z')
     return x - 'a' + 'A';
   return x;
 }
 
-static bool ascii_isdigit(char x) {
+static bool ascii_isdigit(char x) noexcept {
   return x >= '0' && x <= '9';
 }
 
 // strncasecmp() is not available on non-POSIX systems, so define an
 // alternative function here.
-static int ascii_strncasecmp(const char *LHS, const char *RHS, size_t Length) {
+static int ascii_strncasecmp(const char *LHS, const char *RHS, size_t Length) noexcept {
   for (size_t I = 0; I < Length; ++I) {
     unsigned char LHC = ascii_tolower(LHS[I]);
     unsigned char RHC = ascii_tolower(RHS[I]);
@@ -49,7 +49,7 @@ static int ascii_strncasecmp(const char *LHS, const char *RHS, size_t Length) {
 }
 
 /// compare_lower - Compare strings, ignoring case.
-int StringRef::compare_lower(StringRef RHS) const {
+int StringRef::compare_lower(StringRef RHS) const noexcept {
   if (int Res = ascii_strncasecmp(Data, RHS.Data, std::min(size(), RHS.size())))
     return Res;
   if (size() == RHS.size())
@@ -58,19 +58,19 @@ int StringRef::compare_lower(StringRef RHS) const {
 }
 
 /// Check if this string starts with the given \p Prefix, ignoring case.
-bool StringRef::startswith_lower(StringRef Prefix) const {
+bool StringRef::startswith_lower(StringRef Prefix) const noexcept {
   return size() >= Prefix.size() &&
       ascii_strncasecmp(Data, Prefix.Data, Prefix.size()) == 0;
 }
 
 /// Check if this string ends with the given \p Suffix, ignoring case.
-bool StringRef::endswith_lower(StringRef Suffix) const {
+bool StringRef::endswith_lower(StringRef Suffix) const noexcept {
   return size() >= Suffix.size() &&
       ascii_strncasecmp(end() - Suffix.size(), Suffix.Data, Suffix.size()) == 0;
 }
 
 /// compare_numeric - Compare strings, handle embedded numbers.
-int StringRef::compare_numeric(StringRef RHS) const {
+int StringRef::compare_numeric(StringRef RHS) const noexcept {
   for (size_t I = 0, E = std::min(size(), RHS.size()); I != E; ++I) {
     // Check for sequences of digits.
     if (ascii_isdigit(Data[I]) && ascii_isdigit(RHS.Data[I])) {
@@ -143,7 +143,7 @@ const char *StringRef::c_str(wpi::SmallVectorImpl<char>& buf) const {
 ///
 /// \return - The index of the first occurrence of \arg Str, or npos if not
 /// found.
-size_t StringRef::find(StringRef Str, size_t From) const {
+size_t StringRef::find(StringRef Str, size_t From) const noexcept {
   if (From > size())
     return npos;
 
@@ -190,7 +190,7 @@ size_t StringRef::find(StringRef Str, size_t From) const {
 ///
 /// \return - The index of the last occurrence of \arg Str, or npos if not
 /// found.
-size_t StringRef::rfind(StringRef Str) const {
+size_t StringRef::rfind(StringRef Str) const noexcept {
   size_t N = Str.size();
   if (N > size())
     return npos;
@@ -207,7 +207,7 @@ size_t StringRef::rfind(StringRef Str) const {
 ///
 /// Note: O(size() + Chars.size())
 StringRef::size_type StringRef::find_first_of(StringRef Chars,
-                                              size_t From) const {
+                                              size_t From) const noexcept {
   std::bitset<1 << CHAR_BIT> CharBits;
   for (size_type i = 0; i != Chars.size(); ++i)
     CharBits.set((unsigned char)Chars[i]);
@@ -220,7 +220,7 @@ StringRef::size_type StringRef::find_first_of(StringRef Chars,
 
 /// find_first_not_of - Find the first character in the string that is not
 /// \arg C or npos if not found.
-StringRef::size_type StringRef::find_first_not_of(char C, size_t From) const {
+StringRef::size_type StringRef::find_first_not_of(char C, size_t From) const noexcept {
   for (size_type i = std::min(From, size()), e = size(); i != e; ++i)
     if (Data[i] != C)
       return i;
@@ -232,7 +232,7 @@ StringRef::size_type StringRef::find_first_not_of(char C, size_t From) const {
 ///
 /// Note: O(size() + Chars.size())
 StringRef::size_type StringRef::find_first_not_of(StringRef Chars,
-                                                  size_t From) const {
+                                                  size_t From) const noexcept {
   std::bitset<1 << CHAR_BIT> CharBits;
   for (size_type i = 0; i != Chars.size(); ++i)
     CharBits.set((unsigned char)Chars[i]);
@@ -248,7 +248,7 @@ StringRef::size_type StringRef::find_first_not_of(StringRef Chars,
 ///
 /// Note: O(size() + Chars.size())
 StringRef::size_type StringRef::find_last_of(StringRef Chars,
-                                             size_t From) const {
+                                             size_t From) const noexcept {
   std::bitset<1 << CHAR_BIT> CharBits;
   for (size_type i = 0; i != Chars.size(); ++i)
     CharBits.set((unsigned char)Chars[i]);
@@ -261,7 +261,7 @@ StringRef::size_type StringRef::find_last_of(StringRef Chars,
 
 /// find_last_not_of - Find the last character in the string that is not
 /// \arg C, or npos if not found.
-StringRef::size_type StringRef::find_last_not_of(char C, size_t From) const {
+StringRef::size_type StringRef::find_last_not_of(char C, size_t From) const noexcept {
   for (size_type i = std::min(From, size()) - 1, e = -1; i != e; --i)
     if (Data[i] != C)
       return i;
@@ -273,7 +273,7 @@ StringRef::size_type StringRef::find_last_not_of(char C, size_t From) const {
 ///
 /// Note: O(size() + Chars.size())
 StringRef::size_type StringRef::find_last_not_of(StringRef Chars,
-                                                 size_t From) const {
+                                                 size_t From) const noexcept {
   std::bitset<1 << CHAR_BIT> CharBits;
   for (size_type i = 0, e = Chars.size(); i != e; ++i)
     CharBits.set((unsigned char)Chars[i]);
@@ -343,7 +343,7 @@ void StringRef::split(SmallVectorImpl<StringRef> &A, char Separator,
 
 /// count - Return the number of non-overlapped occurrences of \arg Str in
 /// the string.
-size_t StringRef::count(StringRef Str) const {
+size_t StringRef::count(StringRef Str) const noexcept {
   size_t Count = 0;
   size_t N = Str.size();
   if (N > size())
@@ -354,7 +354,7 @@ size_t StringRef::count(StringRef Str) const {
   return Count;
 }
 
-static unsigned GetAutoSenseRadix(StringRef &Str) {
+static unsigned GetAutoSenseRadix(StringRef &Str) noexcept {
   if (Str.startswith("0x") || Str.startswith("0X")) {
     Str = Str.substr(2);
     return 16;
@@ -380,7 +380,7 @@ static unsigned GetAutoSenseRadix(StringRef &Str) {
 /// GetAsUnsignedInteger - Workhorse method that converts a integer character
 /// sequence of radix up to 36 to an unsigned long long value.
 bool wpi::getAsUnsignedInteger(StringRef Str, unsigned Radix,
-                                unsigned long long &Result) {
+                                unsigned long long &Result) noexcept {
   // Autosense radix if not specified.
   if (Radix == 0)
     Radix = GetAutoSenseRadix(Str);
@@ -421,7 +421,7 @@ bool wpi::getAsUnsignedInteger(StringRef Str, unsigned Radix,
 }
 
 bool wpi::getAsSignedInteger(StringRef Str, unsigned Radix,
-                              long long &Result) {
+                              long long &Result) noexcept {
   unsigned long long ULLVal;
 
   // Handle positive strings first.
