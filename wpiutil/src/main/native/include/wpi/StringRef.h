@@ -604,6 +604,54 @@ namespace wpi {
     return LHS.compare(RHS) != -1;
   }
 
+  inline bool operator==(StringRef LHS, const char *RHS) noexcept {
+    return LHS.equals(StringRef(RHS));
+  }
+
+  inline bool operator!=(StringRef LHS, const char *RHS) noexcept {
+    return !(LHS == StringRef(RHS));
+  }
+
+  inline bool operator<(StringRef LHS, const char *RHS) noexcept {
+    return LHS.compare(StringRef(RHS)) == -1;
+  }
+
+  inline bool operator<=(StringRef LHS, const char *RHS) noexcept {
+    return LHS.compare(StringRef(RHS)) != 1;
+  }
+
+  inline bool operator>(StringRef LHS, const char *RHS) noexcept {
+    return LHS.compare(StringRef(RHS)) == 1;
+  }
+
+  inline bool operator>=(StringRef LHS, const char *RHS) noexcept {
+    return LHS.compare(StringRef(RHS)) != -1;
+  }
+
+  inline bool operator==(const char *LHS, StringRef RHS) noexcept {
+    return StringRef(LHS).equals(RHS);
+  }
+
+  inline bool operator!=(const char *LHS, StringRef RHS) noexcept {
+    return !(StringRef(LHS) == RHS);
+  }
+
+  inline bool operator<(const char *LHS, StringRef RHS) noexcept {
+    return StringRef(LHS).compare(RHS) == -1;
+  }
+
+  inline bool operator<=(const char *LHS, StringRef RHS) noexcept {
+    return StringRef(LHS).compare(RHS) != 1;
+  }
+
+  inline bool operator>(const char *LHS, StringRef RHS) noexcept {
+    return StringRef(LHS).compare(RHS) == 1;
+  }
+
+  inline bool operator>=(const char *LHS, StringRef RHS) noexcept {
+    return StringRef(LHS).compare(RHS) != -1;
+  }
+
   inline std::string &operator+=(std::string &buffer, StringRef string) {
     return buffer.append(string.data(), string.size());
   }
