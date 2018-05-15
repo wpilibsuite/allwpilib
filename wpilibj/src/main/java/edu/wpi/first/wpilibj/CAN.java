@@ -15,16 +15,16 @@ import edu.wpi.first.wpilibj.hal.CANAPIJNI;
  * High level class for interfacing with CAN devices conforming to
  * the standard CAN spec.
  *
- * No packets that can be sent gets blocked by the RoboRIO, so all methods
+ * <p>No packets that can be sent gets blocked by the RoboRIO, so all methods
  * work identically in all robot modes.
  *
- * All methods are thread safe, however the CANData object passed into the
+ * <p>All methods are thread safe, however the CANData object passed into the
  * read methods and the byte[] passed into the write methods need to not
  * be modified for the duration of their respective calls.
  */
 public class CAN implements Closeable {
-  public static final int TeamManufacturer = 8;
-  public static final int TeamDeviceType = 10;
+  public static final int kTeamManufacturer = 8;
+  public static final int kTeamDeviceType = 10;
 
   private int m_handle;
 
@@ -33,7 +33,7 @@ public class CAN implements Closeable {
    * The device ID is 6 bits (0-63)
    */
   public CAN(int deviceId) {
-    m_handle = CANAPIJNI.initializeCAN(TeamManufacturer, deviceId, TeamDeviceType);
+    m_handle = CANAPIJNI.initializeCAN(kTeamManufacturer, deviceId, kTeamDeviceType);
   }
 
   /**

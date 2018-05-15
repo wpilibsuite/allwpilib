@@ -18,7 +18,7 @@ using namespace frc;
 CAN::CAN(int deviceId) {
   int32_t status = 0;
   m_handle =
-      HAL_InitializeCAN(TeamManufacturer, deviceId, TeamDeviceType, &status);
+      HAL_InitializeCAN(kTeamManufacturer, deviceId, kTeamDeviceType, &status);
   if (status != 0) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
     m_handle = HAL_kInvalidHandle;

@@ -45,8 +45,8 @@ class CAN : public ErrorBase {
   bool ReadPeriodicPacket(int apiId, int timeoutMs, int periodMs,
                           CANData* data);
 
-  static constexpr HAL_CANManufacturer TeamManufacturer = HAL_CAN_Man_kTeamUse;
-  static constexpr HAL_CANDeviceType TeamDeviceType =
+  static constexpr HAL_CANManufacturer kTeamManufacturer = HAL_CAN_Man_kTeamUse;
+  static constexpr HAL_CANDeviceType kTeamDeviceType =
       HAL_CAN_Dev_kMiscellaneous;
 
  private:
