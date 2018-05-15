@@ -57,10 +57,10 @@ class JsonGetObjectTest : public ::testing::Test {
 
 typedef ::testing::Types<
       json::object_t
-    , std::map<json::string_t, json>
-    , std::multimap<json::string_t, json>
-    , std::unordered_map<json::string_t, json>
-    , std::unordered_multimap<json::string_t, json>
+    , std::map<std::string, json>
+    , std::multimap<std::string, json>
+    , std::unordered_map<std::string, json>
+    , std::unordered_multimap<std::string, json>
     > JsonGetObjectTestTypes;
 TYPED_TEST_CASE(JsonGetObjectTest, JsonGetObjectTestTypes);
 
@@ -195,11 +195,11 @@ class JsonGetStringTest : public ::testing::Test {
     JsonGetStringTest() : j(s_reference) {}
 
  protected:
-    json::string_t s_reference {"Hello world"};
+    std::string s_reference {"Hello world"};
     json j;
 };
 
-typedef ::testing::Types<json::string_t, std::string> JsonGetStringTestTypes;
+typedef ::testing::Types<std::string, std::string> JsonGetStringTestTypes;
 TYPED_TEST_CASE(JsonGetStringTest, JsonGetStringTestTypes);
 
 TYPED_TEST(JsonGetStringTest, Explicit)
@@ -217,19 +217,19 @@ TYPED_TEST(JsonGetStringTest, Implicit)
 // exception in case of a non-string type
 TEST(JsonGetStringExceptionTest, TypeError)
 {
-    EXPECT_THROW_MSG(json(json::value_t::null).get<json::string_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::null).get<std::string>(), json::type_error,
                      "[json.exception.type_error.302] type must be string, but is null");
-    EXPECT_THROW_MSG(json(json::value_t::object).get<json::string_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::object).get<std::string>(), json::type_error,
                      "[json.exception.type_error.302] type must be string, but is object");
-    EXPECT_THROW_MSG(json(json::value_t::array).get<json::string_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::array).get<std::string>(), json::type_error,
                      "[json.exception.type_error.302] type must be string, but is array");
-    EXPECT_THROW_MSG(json(json::value_t::boolean).get<json::string_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::boolean).get<std::string>(), json::type_error,
                      "[json.exception.type_error.302] type must be string, but is boolean");
-    EXPECT_THROW_MSG(json(json::value_t::number_integer).get<json::string_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::number_integer).get<std::string>(), json::type_error,
                      "[json.exception.type_error.302] type must be string, but is number");
-    EXPECT_THROW_MSG(json(json::value_t::number_unsigned).get<json::string_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::number_unsigned).get<std::string>(), json::type_error,
                      "[json.exception.type_error.302] type must be string, but is number");
-    EXPECT_THROW_MSG(json(json::value_t::number_float).get<json::string_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::number_float).get<std::string>(), json::type_error,
                      "[json.exception.type_error.302] type must be string, but is number");
 }
 
@@ -239,11 +239,11 @@ class JsonGetBooleanTest : public ::testing::Test {
     JsonGetBooleanTest() : j(b_reference) {}
 
  protected:
-    json::boolean_t b_reference {true};
+    bool b_reference {true};
     json j;
 };
 
-typedef ::testing::Types<json::boolean_t, bool> JsonGetBooleanTestTypes;
+typedef ::testing::Types<bool, bool> JsonGetBooleanTestTypes;
 TYPED_TEST_CASE(JsonGetBooleanTest, JsonGetBooleanTestTypes);
 
 TYPED_TEST(JsonGetBooleanTest, Explicit)
@@ -261,19 +261,19 @@ TYPED_TEST(JsonGetBooleanTest, Implicit)
 // exception in case of a non-string type
 TEST(JsonGetBooleanExceptionTest, TypeError)
 {
-    EXPECT_THROW_MSG(json(json::value_t::null).get<json::boolean_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::null).get<bool>(), json::type_error,
                      "[json.exception.type_error.302] type must be boolean, but is null");
-    EXPECT_THROW_MSG(json(json::value_t::object).get<json::boolean_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::object).get<bool>(), json::type_error,
                      "[json.exception.type_error.302] type must be boolean, but is object");
-    EXPECT_THROW_MSG(json(json::value_t::array).get<json::boolean_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::array).get<bool>(), json::type_error,
                      "[json.exception.type_error.302] type must be boolean, but is array");
-    EXPECT_THROW_MSG(json(json::value_t::string).get<json::boolean_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::string).get<bool>(), json::type_error,
                      "[json.exception.type_error.302] type must be boolean, but is string");
-    EXPECT_THROW_MSG(json(json::value_t::number_integer).get<json::boolean_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::number_integer).get<bool>(), json::type_error,
                      "[json.exception.type_error.302] type must be boolean, but is number");
-    EXPECT_THROW_MSG(json(json::value_t::number_unsigned).get<json::boolean_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::number_unsigned).get<bool>(), json::type_error,
                      "[json.exception.type_error.302] type must be boolean, but is number");
-    EXPECT_THROW_MSG(json(json::value_t::number_float).get<json::boolean_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::number_float).get<bool>(), json::type_error,
                      "[json.exception.type_error.302] type must be boolean, but is number");
 }
 
@@ -283,9 +283,9 @@ class JsonGetIntegerTest : public ::testing::Test {
     JsonGetIntegerTest() : j(n_reference), j_unsigned(n_unsigned_reference) {}
 
  protected:
-    json::number_integer_t n_reference {42};
+    int64_t n_reference {42};
     json j;
-    json::number_unsigned_t n_unsigned_reference {42u};
+    uint64_t n_unsigned_reference {42u};
     json j_unsigned;
 };
 
@@ -353,19 +353,19 @@ TYPED_TEST(JsonGetIntegerTest, Implicit)
 // exception in case of a non-number type
 TEST(JsonGetIntegerExceptionTest, TypeError)
 {
-    EXPECT_THROW_MSG(json(json::value_t::null).get<json::number_integer_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::null).get<int64_t>(), json::type_error,
                      "[json.exception.type_error.302] type must be number, but is null");
-    EXPECT_THROW_MSG(json(json::value_t::object).get<json::number_integer_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::object).get<int64_t>(), json::type_error,
                      "[json.exception.type_error.302] type must be number, but is object");
-    EXPECT_THROW_MSG(json(json::value_t::array).get<json::number_integer_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::array).get<int64_t>(), json::type_error,
                      "[json.exception.type_error.302] type must be number, but is array");
-    EXPECT_THROW_MSG(json(json::value_t::string).get<json::number_integer_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::string).get<int64_t>(), json::type_error,
                      "[json.exception.type_error.302] type must be number, but is string");
-    EXPECT_THROW_MSG(json(json::value_t::boolean).get<json::number_integer_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::boolean).get<int64_t>(), json::type_error,
                      "[json.exception.type_error.302] type must be number, but is boolean");
 
-    EXPECT_NO_THROW(json(json::value_t::number_float).get<json::number_integer_t>());
-    EXPECT_NO_THROW(json(json::value_t::number_float).get<json::number_unsigned_t>());
+    EXPECT_NO_THROW(json(json::value_t::number_float).get<int64_t>());
+    EXPECT_NO_THROW(json(json::value_t::number_float).get<uint64_t>());
 }
 
 template <typename T>
@@ -374,11 +374,11 @@ class JsonGetFloatTest : public ::testing::Test {
     JsonGetFloatTest() : j(n_reference) {}
 
  protected:
-    json::number_float_t n_reference {42.23};
+    double n_reference {42.23};
     json j;
 };
 
-typedef ::testing::Types<json::number_float_t, float, double>
+typedef ::testing::Types<double, float, double>
     JsonGetFloatTestTypes;
 
 TYPED_TEST_CASE(JsonGetFloatTest, JsonGetFloatTestTypes);
@@ -400,19 +400,19 @@ TYPED_TEST(JsonGetFloatTest, Implicit)
 // exception in case of a non-string type
 TEST(JsonGetFloatExceptionTest, TypeError)
 {
-    EXPECT_THROW_MSG(json(json::value_t::null).get<json::number_float_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::null).get<double>(), json::type_error,
                      "[json.exception.type_error.302] type must be number, but is null");
-    EXPECT_THROW_MSG(json(json::value_t::object).get<json::number_float_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::object).get<double>(), json::type_error,
                      "[json.exception.type_error.302] type must be number, but is object");
-    EXPECT_THROW_MSG(json(json::value_t::array).get<json::number_float_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::array).get<double>(), json::type_error,
                      "[json.exception.type_error.302] type must be number, but is array");
-    EXPECT_THROW_MSG(json(json::value_t::string).get<json::number_float_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::string).get<double>(), json::type_error,
                      "[json.exception.type_error.302] type must be number, but is string");
-    EXPECT_THROW_MSG(json(json::value_t::boolean).get<json::number_float_t>(), json::type_error,
+    EXPECT_THROW_MSG(json(json::value_t::boolean).get<double>(), json::type_error,
                      "[json.exception.type_error.302] type must be number, but is boolean");
 
-    EXPECT_NO_THROW(json(json::value_t::number_integer).get<json::number_float_t>());
-    EXPECT_NO_THROW(json(json::value_t::number_unsigned).get<json::number_float_t>());
+    EXPECT_NO_THROW(json(json::value_t::number_integer).get<double>());
+    EXPECT_NO_THROW(json(json::value_t::number_unsigned).get<double>());
 }
 
 TEST(JsonGetEnumTest, Case)

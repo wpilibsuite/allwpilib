@@ -42,13 +42,13 @@ TEST(JsonVersionTest, Meta)
     json j = json::meta();
 
     EXPECT_EQ(j["name"], "WPI version of JSON for Modern C++");
-    EXPECT_EQ(j["copyright"], "(C) 2013-2017 Niels Lohmann, (C) 2017 FIRST");
-    EXPECT_EQ(j["url"], "https://github.com/wpilibsuite/wpiutil");
+    EXPECT_EQ(j["copyright"], "(C) 2013-2017 Niels Lohmann, (C) 2017-2018 FIRST");
+    EXPECT_EQ(j["url"], "https://github.com/wpilibsuite/allwpilib");
     EXPECT_EQ(j["version"], json(
     {
-        {"string", "2.1.1"},
-        {"major", 2},
+        {"string", "3.1.2"},
+        {"major", 3},
         {"minor", 1},
-        {"patch", 1}
+        {"patch", 2}
     }));
 }

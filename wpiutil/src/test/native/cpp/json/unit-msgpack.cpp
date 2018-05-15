@@ -50,7 +50,7 @@ TEST(MessagePackDiscardedTest, Case)
 TEST(MessagePackNullTest, Case)
 {
     json j = nullptr;
-    std::string expected = "\xc0";
+    std::vector<uint8_t> expected = {0xc0};
     const auto result = json::to_msgpack(j);
     EXPECT_EQ(result, expected);
 
@@ -61,7 +61,7 @@ TEST(MessagePackNullTest, Case)
 TEST(MessagePackBooleanTest, True)
 {
     json j = true;
-    std::string expected = "\xc3";
+    std::vector<uint8_t> expected = {0xc3};
     const auto result = json::to_msgpack(j);
     EXPECT_EQ(result, expected);
 
@@ -72,7 +72,7 @@ TEST(MessagePackBooleanTest, True)
 TEST(MessagePackBooleanTest, False)
 {
     json j = false;
-    std::string expected = "\xc2";
+    std::vector<uint8_t> expected = {0xc2};
     const auto result = json::to_msgpack(j);
     EXPECT_EQ(result, expected);
 
@@ -94,8 +94,8 @@ TEST(MessagePackSignedTest, Neg0)
         EXPECT_TRUE(j.is_number_integer());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(i));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(i));
 
         // compare result + size
         const auto result = json::to_msgpack(j);
@@ -119,14 +119,14 @@ TEST(MessagePackSignedTest, Pos0)
 
         // create JSON value with integer number
         json j = -1;
-        j.get_ref<json::number_integer_t&>() = static_cast<json::number_integer_t>(i);
+        j.get_ref<int64_t&>() = static_cast<int64_t>(i);
 
         // check type
         EXPECT_TRUE(j.is_number_integer());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(i));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(i));
 
         // compare result + size
         const auto result = json::to_msgpack(j);
@@ -134,7 +134,7 @@ TEST(MessagePackSignedTest, Pos0)
         EXPECT_EQ(result.size(), 1u);
 
         // check individual bytes
-        EXPECT_EQ(result[0], static_cast<char>(i));
+        EXPECT_EQ(result[0], static_cast<uint8_t>(i));
 
         // roundtrip
         EXPECT_EQ(json::from_msgpack(result), j);
@@ -150,15 +150,15 @@ TEST(MessagePackSignedTest, Pos1)
 
         // create JSON value with integer number
         json j = -1;
-        j.get_ref<json::number_integer_t&>() = static_cast<json::number_integer_t>(i);
+        j.get_ref<int64_t&>() = static_cast<int64_t>(i);
 
         // check type
         EXPECT_TRUE(j.is_number_integer());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(0xcc));
-        expected.push_back(static_cast<char>(i));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0xcc));
+        expected.push_back(static_cast<uint8_t>(i));
 
         // compare result + size
         const auto result = json::to_msgpack(j);
@@ -166,7 +166,7 @@ TEST(MessagePackSignedTest, Pos1)
         EXPECT_EQ(result.size(), 2u);
 
         // check individual bytes
-        EXPECT_EQ(result[0], static_cast<char>(0xcc));
+        EXPECT_EQ(result[0], static_cast<uint8_t>(0xcc));
         uint8_t restored = static_cast<uint8_t>(result[1]);
         EXPECT_EQ(restored, i);
 
@@ -184,16 +184,16 @@ TEST(MessagePackSignedTest, Pos2)
 
         // create JSON value with integer number
         json j = -1;
-        j.get_ref<json::number_integer_t&>() = static_cast<json::number_integer_t>(i);
+        j.get_ref<int64_t&>() = static_cast<int64_t>(i);
 
         // check type
         EXPECT_TRUE(j.is_number_integer());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(0xcd));
-        expected.push_back(static_cast<char>((i >> 8) & 0xff));
-        expected.push_back(static_cast<char>(i & 0xff));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0xcd));
+        expected.push_back(static_cast<uint8_t>((i >> 8) & 0xff));
+        expected.push_back(static_cast<uint8_t>(i & 0xff));
 
         // compare result + size
         const auto result = json::to_msgpack(j);
@@ -201,7 +201,7 @@ TEST(MessagePackSignedTest, Pos2)
         EXPECT_EQ(result.size(), 3u);
 
         // check individual bytes
-        EXPECT_EQ(result[0], static_cast<char>(0xcd));
+        EXPECT_EQ(result[0], static_cast<uint8_t>(0xcd));
         uint16_t restored = static_cast<uint16_t>(static_cast<uint8_t>(result[1]) * 256 + static_cast<uint8_t>(result[2]));
         EXPECT_EQ(restored, i);
 
@@ -216,18 +216,18 @@ TEST_P(MessagePackSignedPos4Test, Case)
 {
     // create JSON value with integer number
     json j = -1;
-    j.get_ref<json::number_integer_t&>() = static_cast<json::number_integer_t>(GetParam());
+    j.get_ref<int64_t&>() = static_cast<int64_t>(GetParam());
 
     // check type
     EXPECT_TRUE(j.is_number_integer());
 
     // create expected byte vector
-    std::string expected;
-    expected.push_back(static_cast<char>(0xce));
-    expected.push_back(static_cast<char>((GetParam() >> 24) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 16) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 8) & 0xff));
-    expected.push_back(static_cast<char>(GetParam() & 0xff));
+    std::vector<uint8_t> expected;
+    expected.push_back(static_cast<uint8_t>(0xce));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 24) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 16) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 8) & 0xff));
+    expected.push_back(static_cast<uint8_t>(GetParam() & 0xff));
 
     // compare result + size
     const auto result = json::to_msgpack(j);
@@ -235,7 +235,7 @@ TEST_P(MessagePackSignedPos4Test, Case)
     EXPECT_EQ(result.size(), 5u);
 
     // check individual bytes
-    EXPECT_EQ(result[0], static_cast<char>(0xce));
+    EXPECT_EQ(result[0], static_cast<uint8_t>(0xce));
     uint32_t restored = (static_cast<uint32_t>(static_cast<uint8_t>(result[1])) << 030) +
                         (static_cast<uint32_t>(static_cast<uint8_t>(result[2])) << 020) +
                         (static_cast<uint32_t>(static_cast<uint8_t>(result[3])) << 010) +
@@ -262,22 +262,22 @@ TEST_P(MessagePackSignedPos8Test, Case)
 {
     // create JSON value with integer number
     json j = -1;
-    j.get_ref<json::number_integer_t&>() =
-        static_cast<json::number_integer_t>(GetParam());
+    j.get_ref<int64_t&>() =
+        static_cast<int64_t>(GetParam());
 
     // check type
     EXPECT_TRUE(j.is_number_integer());
 
     // create expected byte vector
-    std::string expected;
-    expected.push_back(static_cast<char>(0xcf));
-    expected.push_back(static_cast<char>((GetParam() >> 070) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 060) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 050) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 040) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 030) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 020) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 010) & 0xff));
+    std::vector<uint8_t> expected;
+    expected.push_back(static_cast<uint8_t>(0xcf));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 070) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 060) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 050) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 040) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 030) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 020) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 010) & 0xff));
     expected.push_back(static_cast<char>(GetParam() & 0xff));
 
     // compare result + size
@@ -286,7 +286,7 @@ TEST_P(MessagePackSignedPos8Test, Case)
     EXPECT_EQ(result.size(), 9u);
 
     // check individual bytes
-    EXPECT_EQ(result[0], static_cast<char>(0xcf));
+    EXPECT_EQ(result[0], static_cast<uint8_t>(0xcf));
     uint64_t restored = (static_cast<uint64_t>(static_cast<uint8_t>(result[1])) << 070) +
                         (static_cast<uint64_t>(static_cast<uint8_t>(result[2])) << 060) +
                         (static_cast<uint64_t>(static_cast<uint8_t>(result[3])) << 050) +
@@ -323,9 +323,9 @@ TEST(MessagePackSignedTest, Neg1)
         EXPECT_TRUE(j.is_number_integer());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(0xd0));
-        expected.push_back(static_cast<char>(i));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0xd0));
+        expected.push_back(static_cast<uint8_t>(i));
 
         // compare result + size
         const auto result = json::to_msgpack(j);
@@ -333,7 +333,7 @@ TEST(MessagePackSignedTest, Neg1)
         EXPECT_EQ(result.size(), 2u);
 
         // check individual bytes
-        EXPECT_EQ(result[0], static_cast<char>(0xd0));
+        EXPECT_EQ(result[0], static_cast<uint8_t>(0xd0));
         EXPECT_EQ(static_cast<int8_t>(result[1]), i);
 
         // roundtrip
@@ -355,10 +355,10 @@ TEST(MessagePackSignedTest, Neg2)
         EXPECT_TRUE(j.is_number_integer());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(0xd1));
-        expected.push_back(static_cast<char>((i >> 8) & 0xff));
-        expected.push_back(static_cast<char>(i & 0xff));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0xd1));
+        expected.push_back(static_cast<uint8_t>((i >> 8) & 0xff));
+        expected.push_back(static_cast<uint8_t>(i & 0xff));
 
         // compare result + size
         const auto result = json::to_msgpack(j);
@@ -366,7 +366,7 @@ TEST(MessagePackSignedTest, Neg2)
         EXPECT_EQ(result.size(), 3u);
 
         // check individual bytes
-        EXPECT_EQ(result[0], static_cast<char>(0xd1));
+        EXPECT_EQ(result[0], static_cast<uint8_t>(0xd1));
         int16_t restored = static_cast<int16_t>((static_cast<uint8_t>(result[1]) << 8) +
                                                 static_cast<uint8_t>(result[2]));
         EXPECT_EQ(restored, i);
@@ -387,12 +387,12 @@ TEST_P(MessagePackSignedNeg4Test, Case)
     EXPECT_TRUE(j.is_number_integer());
 
     // create expected byte vector
-    std::string expected;
-    expected.push_back(static_cast<char>(0xd2));
-    expected.push_back(static_cast<char>((GetParam() >> 24) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 16) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 8) & 0xff));
-    expected.push_back(static_cast<char>(GetParam() & 0xff));
+    std::vector<uint8_t> expected;
+    expected.push_back(static_cast<uint8_t>(0xd2));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 24) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 16) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 8) & 0xff));
+    expected.push_back(static_cast<uint8_t>(GetParam() & 0xff));
 
     // compare result + size
     const auto result = json::to_msgpack(j);
@@ -400,7 +400,7 @@ TEST_P(MessagePackSignedNeg4Test, Case)
     EXPECT_EQ(result.size(), 5u);
 
     // check individual bytes
-    EXPECT_EQ(result[0], static_cast<char>(0xd2));
+    EXPECT_EQ(result[0], static_cast<uint8_t>(0xd2));
     uint32_t restored = (static_cast<uint32_t>(static_cast<uint8_t>(result[1])) << 030) +
                         (static_cast<uint32_t>(static_cast<uint8_t>(result[2])) << 020) +
                         (static_cast<uint32_t>(static_cast<uint8_t>(result[3])) << 010) +
@@ -433,16 +433,16 @@ TEST_P(MessagePackSignedNeg8Test, Case)
     EXPECT_TRUE(j.is_number_integer());
 
     // create expected byte vector
-    std::string expected;
-    expected.push_back(static_cast<char>(0xd3));
-    expected.push_back(static_cast<char>((GetParam() >> 070) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 060) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 050) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 040) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 030) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 020) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 010) & 0xff));
-    expected.push_back(static_cast<char>(GetParam() & 0xff));
+    std::vector<uint8_t> expected;
+    expected.push_back(static_cast<uint8_t>(0xd3));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 070) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 060) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 050) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 040) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 030) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 020) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 010) & 0xff));
+    expected.push_back(static_cast<uint8_t>(GetParam() & 0xff));
 
     // compare result + size
     const auto result = json::to_msgpack(j);
@@ -450,7 +450,7 @@ TEST_P(MessagePackSignedNeg8Test, Case)
     EXPECT_EQ(result.size(), 9u);
 
     // check individual bytes
-    EXPECT_EQ(result[0], static_cast<char>(0xd3));
+    EXPECT_EQ(result[0], static_cast<uint8_t>(0xd3));
     int64_t restored = (static_cast<int64_t>(static_cast<uint8_t>(result[1])) << 070) +
                        (static_cast<int64_t>(static_cast<uint8_t>(result[2])) << 060) +
                        (static_cast<int64_t>(static_cast<uint8_t>(result[3])) << 050) +
@@ -487,8 +487,8 @@ TEST(MessagePackUnsignedTest, Pos0)
         EXPECT_TRUE(j.is_number_unsigned());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(i));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(i));
 
         // compare result + size
         const auto result = json::to_msgpack(j);
@@ -496,7 +496,7 @@ TEST(MessagePackUnsignedTest, Pos0)
         EXPECT_EQ(result.size(), 1u);
 
         // check individual bytes
-        EXPECT_EQ(result[0], static_cast<char>(i));
+        EXPECT_EQ(result[0], static_cast<uint8_t>(i));
 
         // roundtrip
         EXPECT_EQ(json::from_msgpack(result), j);
@@ -517,9 +517,9 @@ TEST(MessagePackUnsignedTest, Pos1)
         EXPECT_TRUE(j.is_number_unsigned());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(0xcc));
-        expected.push_back(static_cast<char>(i));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0xcc));
+        expected.push_back(static_cast<uint8_t>(i));
 
         // compare result + size
         const auto result = json::to_msgpack(j);
@@ -527,7 +527,7 @@ TEST(MessagePackUnsignedTest, Pos1)
         EXPECT_EQ(result.size(), 2u);
 
         // check individual bytes
-        EXPECT_EQ(result[0], static_cast<char>(0xcc));
+        EXPECT_EQ(result[0], static_cast<uint8_t>(0xcc));
         uint8_t restored = static_cast<uint8_t>(result[1]);
         EXPECT_EQ(restored, i);
 
@@ -550,10 +550,10 @@ TEST(MessagePackUnsignedTest, Pos2)
         EXPECT_TRUE(j.is_number_unsigned());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(0xcd));
-        expected.push_back(static_cast<char>((i >> 8) & 0xff));
-        expected.push_back(static_cast<char>(i & 0xff));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0xcd));
+        expected.push_back(static_cast<uint8_t>((i >> 8) & 0xff));
+        expected.push_back(static_cast<uint8_t>(i & 0xff));
 
         // compare result + size
         const auto result = json::to_msgpack(j);
@@ -561,7 +561,7 @@ TEST(MessagePackUnsignedTest, Pos2)
         EXPECT_EQ(result.size(), 3u);
 
         // check individual bytes
-        EXPECT_EQ(result[0], static_cast<char>(0xcd));
+        EXPECT_EQ(result[0], static_cast<uint8_t>(0xcd));
         uint16_t restored = static_cast<uint16_t>(static_cast<uint8_t>(result[1]) * 256 + static_cast<uint8_t>(result[2]));
         EXPECT_EQ(restored, i);
 
@@ -581,12 +581,12 @@ TEST_P(MessagePackUnsignedPos4Test, Case)
     EXPECT_TRUE(j.is_number_unsigned());
 
     // create expected byte vector
-    std::string expected;
-    expected.push_back(static_cast<char>(0xce));
-    expected.push_back(static_cast<char>((GetParam() >> 24) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 16) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 8) & 0xff));
-    expected.push_back(static_cast<char>(GetParam() & 0xff));
+    std::vector<uint8_t> expected;
+    expected.push_back(static_cast<uint8_t>(0xce));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 24) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 16) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 8) & 0xff));
+    expected.push_back(static_cast<uint8_t>(GetParam() & 0xff));
 
     // compare result + size
     const auto result = json::to_msgpack(j);
@@ -594,7 +594,7 @@ TEST_P(MessagePackUnsignedPos4Test, Case)
     EXPECT_EQ(result.size(), 5u);
 
     // check individual bytes
-    EXPECT_EQ(result[0], static_cast<char>(0xce));
+    EXPECT_EQ(result[0], static_cast<uint8_t>(0xce));
     uint32_t restored = (static_cast<uint32_t>(static_cast<uint8_t>(result[1])) << 030) +
                         (static_cast<uint32_t>(static_cast<uint8_t>(result[2])) << 020) +
                         (static_cast<uint32_t>(static_cast<uint8_t>(result[3])) << 010) +
@@ -620,16 +620,16 @@ TEST_P(MessagePackUnsignedPos8Test, Case)
     EXPECT_TRUE(j.is_number_unsigned());
 
     // create expected byte vector
-    std::string expected;
-    expected.push_back(static_cast<char>(0xcf));
-    expected.push_back(static_cast<char>((GetParam() >> 070) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 060) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 050) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 040) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 030) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 020) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 010) & 0xff));
-    expected.push_back(static_cast<char>(GetParam() & 0xff));
+    std::vector<uint8_t> expected;
+    expected.push_back(static_cast<uint8_t>(0xcf));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 070) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 060) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 050) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 040) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 030) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 020) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 010) & 0xff));
+    expected.push_back(static_cast<uint8_t>(GetParam() & 0xff));
 
     // compare result + size
     const auto result = json::to_msgpack(j);
@@ -637,7 +637,7 @@ TEST_P(MessagePackUnsignedPos8Test, Case)
     EXPECT_EQ(result.size(), 9u);
 
     // check individual bytes
-    EXPECT_EQ(result[0], static_cast<char>(0xcf));
+    EXPECT_EQ(result[0], static_cast<uint8_t>(0xcf));
     uint64_t restored = (static_cast<uint64_t>(static_cast<uint8_t>(result[1])) << 070) +
                         (static_cast<uint64_t>(static_cast<uint8_t>(result[2])) << 060) +
                         (static_cast<uint64_t>(static_cast<uint8_t>(result[3])) << 050) +
@@ -661,7 +661,7 @@ TEST(MessagePackFloatTest, Number)
 {
     double v = 3.1415925;
     json j = v;
-    std::string expected = "\xcb\x40\x09\x21\xfb\x3f\xa6\xde\xfc";
+    std::vector<uint8_t> expected = {0xcb,0x40,0x09,0x21,0xfb,0x3f,0xa6,0xde,0xfc};
     const auto result = json::to_msgpack(j);
     EXPECT_EQ(result, expected);
 
@@ -691,12 +691,15 @@ TEST(MessagePackStringTest, String1)
         json j = s;
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(first_bytes[N]));
-        expected.append(s);
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(first_bytes[N]));
+        for (size_t i = 0; i < N; ++i)
+        {
+            expected.push_back('x');
+        }
 
         // check first byte
-        EXPECT_EQ((first_bytes[N] & 0x1f), static_cast<char>(N));
+        EXPECT_EQ((first_bytes[N] & 0x1f), static_cast<uint8_t>(N));
 
         // compare result + size
         const auto result = json::to_msgpack(j);
@@ -725,10 +728,13 @@ TEST(MessagePackStringTest, String2)
         json j = s;
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(0xd9));
-        expected.push_back(static_cast<char>(N));
-        expected.append(s);
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0xd9));
+        expected.push_back(static_cast<uint8_t>(N));
+        for (size_t i = 0; i < N; ++i)
+        {
+            expected.push_back('x');
+        }
 
         // compare result + size
         const auto result = json::to_msgpack(j);
@@ -751,11 +757,14 @@ TEST_P(MessagePackString3Test, Case)
     json j = s;
 
     // create expected byte vector (hack: create string first)
-    std::string expected;
-    expected.push_back(static_cast<char>(0xda));
-    expected.push_back(static_cast<char>((GetParam() >> 8) & 0xff));
-    expected.push_back(static_cast<char>(GetParam() & 0xff));
-    expected.append(s);
+    std::vector<uint8_t> expected;
+    expected.push_back(static_cast<uint8_t>(0xda));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 8) & 0xff));
+    expected.push_back(static_cast<uint8_t>(GetParam() & 0xff));
+    for (size_t i = 0; i < GetParam(); ++i)
+    {
+        expected.push_back('x');
+    }
 
     // compare result + size
     const auto result = json::to_msgpack(j);
@@ -790,13 +799,16 @@ TEST_P(MessagePackString5Test, Case)
     json j = s;
 
     // create expected byte vector (hack: create string first)
-    std::string expected;
-    expected.push_back(static_cast<char>(0xdb));
-    expected.push_back(static_cast<char>((GetParam() >> 24) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 16) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 8) & 0xff));
-    expected.push_back(static_cast<char>(GetParam() & 0xff));
-    expected.append(s);
+    std::vector<uint8_t> expected;
+    expected.push_back(static_cast<uint8_t>(0xdb));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 24) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 16) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 8) & 0xff));
+    expected.push_back(static_cast<uint8_t>(GetParam() & 0xff));
+    for (size_t i = 0; i < GetParam(); ++i)
+    {
+        expected.push_back('x');
+    }
 
     // compare result + size
     const auto result = json::to_msgpack(j);
@@ -821,7 +833,7 @@ INSTANTIATE_TEST_CASE_P(MessagePackString5Tests, MessagePackString5Test,
 TEST(MessagePackArrayTest, Empty)
 {
     json j = json::array();
-    std::string expected = "\x90";
+    std::vector<uint8_t> expected = {0x90};
     const auto result = json::to_msgpack(j);
     EXPECT_EQ(result, expected);
 
@@ -833,7 +845,7 @@ TEST(MessagePackArrayTest, Empty)
 TEST(MessagePackArrayTest, Null)
 {
     json j = {nullptr};
-    std::string expected = "\x91\xc0";
+    std::vector<uint8_t> expected = {0x91,0xc0};
     const auto result = json::to_msgpack(j);
     EXPECT_EQ(result, expected);
 
@@ -845,7 +857,7 @@ TEST(MessagePackArrayTest, Null)
 TEST(MessagePackArrayTest, Simple)
 {
     json j = json::parse("[1,2,3,4,5]");
-    std::string expected = "\x95\x01\x02\x03\x04\x05";
+    std::vector<uint8_t> expected = {0x95,0x01,0x02,0x03,0x04,0x05};
     const auto result = json::to_msgpack(j);
     EXPECT_EQ(result, expected);
 
@@ -857,7 +869,7 @@ TEST(MessagePackArrayTest, Simple)
 TEST(MessagePackArrayTest, NestEmpty)
 {
     json j = json::parse("[[[[]]]]");
-    std::string expected = "\x91\x91\x91\x90";
+    std::vector<uint8_t> expected = {0x91,0x91,0x91,0x90};
     const auto result = json::to_msgpack(j);
     EXPECT_EQ(result, expected);
 
@@ -869,8 +881,8 @@ TEST(MessagePackArrayTest, NestEmpty)
 TEST(MessagePackArrayTest, UInt16)
 {
     json j(16, nullptr);
-    std::string expected(j.size() + 3, static_cast<char>(0xc0)); // all null
-    expected[0] = static_cast<char>(0xdc); // array 16
+    std::vector<uint8_t> expected(j.size() + 3, static_cast<uint8_t>(0xc0)); // all null
+    expected[0] = static_cast<uint8_t>(0xdc); // array 16
     expected[1] = 0x00; // size (0x0010), byte 0
     expected[2] = 0x10; // size (0x0010), byte 1
     const auto result = json::to_msgpack(j);
@@ -884,8 +896,8 @@ TEST(MessagePackArrayTest, UInt16)
 TEST(MessagePackArrayTest, UInt32)
 {
     json j(65536, nullptr);
-    std::string expected(j.size() + 5, static_cast<char>(0xc0)); // all null
-    expected[0] = static_cast<char>(0xdd); // array 32
+    std::vector<uint8_t> expected(j.size() + 5, static_cast<uint8_t>(0xc0)); // all null
+    expected[0] = static_cast<uint8_t>(0xdd); // array 32
     expected[1] = 0x00; // size (0x00100000), byte 0
     expected[2] = 0x01; // size (0x00100000), byte 1
     expected[3] = 0x00; // size (0x00100000), byte 2
@@ -907,7 +919,7 @@ TEST(MessagePackArrayTest, UInt32)
 TEST(MessagePackObjectTest, Empty)
 {
     json j = json::object();
-    std::string expected = "\x80";
+    std::vector<uint8_t> expected = {0x80};
     const auto result = json::to_msgpack(j);
     EXPECT_EQ(result, expected);
 
@@ -919,7 +931,7 @@ TEST(MessagePackObjectTest, Empty)
 TEST(MessagePackObjectTest, EmptyKey)
 {
     json j = {{"", nullptr}};
-    std::string expected = "\x81\xa0\xc0";
+    std::vector<uint8_t> expected = {0x81,0xa0,0xc0};
     const auto result = json::to_msgpack(j);
     EXPECT_EQ(result, expected);
 
@@ -931,7 +943,7 @@ TEST(MessagePackObjectTest, EmptyKey)
 TEST(MessagePackObjectTest, NestedEmpty)
 {
     json j = json::parse("{\"a\": {\"b\": {\"c\": {}}}}");
-    std::string expected = "\x81\xa1\x61\x81\xa1\x62\x81\xa1\x63\x80";
+    std::vector<uint8_t> expected = {0x81,0xa1,0x61,0x81,0xa1,0x62,0x81,0xa1,0x63,0x80};
     const auto result = json::to_msgpack(j);
     EXPECT_EQ(result, expected);
 
@@ -955,7 +967,7 @@ TEST(MessagePackObjectTest, UInt16)
     // size and the overall size. The rest is then handled in the
     // roundtrip check.
     EXPECT_EQ(result.size(), 67u); // 1 type, 2 size, 16*4 content
-    EXPECT_EQ(result[0], static_cast<char>(0xde)); // map 16
+    EXPECT_EQ(result[0], static_cast<uint8_t>(0xde)); // map 16
     EXPECT_EQ(result[1], 0x00); // byte 0 of size (0x0010)
     EXPECT_EQ(result[2], 0x10); // byte 1 of size (0x0010)
 
@@ -984,7 +996,7 @@ TEST(MessagePackObjectTest, UInt32)
     // size and the overall size. The rest is then handled in the
     // roundtrip check.
     EXPECT_EQ(result.size(), 458757u); // 1 type, 4 size, 65536*7 content
-    EXPECT_EQ(result[0], static_cast<char>(0xdf)); // map 32
+    EXPECT_EQ(result[0], static_cast<uint8_t>(0xdf)); // map 32
     EXPECT_EQ(result[1], 0x00); // byte 0 of size (0x00010000)
     EXPECT_EQ(result[2], 0x01); // byte 1 of size (0x00010000)
     EXPECT_EQ(result[3], 0x00); // byte 2 of size (0x00010000)
@@ -997,50 +1009,50 @@ TEST(MessagePackObjectTest, UInt32)
 // from float32
 TEST(MessagePackFloat32Test, Case)
 {
-    auto given = std::string("\xca\x41\xc8\x00\x01", 5);
+    auto given = std::vector<uint8_t>({0xca,0x41,0xc8,0x00,0x01});
     json j = json::from_msgpack(given);
     EXPECT_LT(std::fabs(j.get<double>() - 25), 0.001);
 }
 
 TEST(MessagePackErrorTest, TooShortByteVector)
 {
-    EXPECT_THROW_MSG(json::from_msgpack("\xcc"), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xcc})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack("\xcd"), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xcd})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcd\x00", 2)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xcd,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 3: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack("\xce"), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xce})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xce\x00", 2)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xce,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 3: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xce\x00\x00", 3)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xce,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 4: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xce\x00\x00\x00", 4)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xce,0x00,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 5: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack("\xcf"), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xcf})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00", 2)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xcf,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 3: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00\x00", 3)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xcf,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 4: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00\x00\x00", 4)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xcf,0x00,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 5: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00\x00\x00\x00", 5)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xcf,0x00,0x00,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 6: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00\x00\x00\x00\x00", 6)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xcf,0x00,0x00,0x00,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 7: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00\x00\x00\x00\x00\x00", 7)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xcf,0x00,0x00,0x00,0x00,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 8: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_msgpack(wpi::StringRef("\xcf\x00\x00\x00\x00\x00\x00\x00", 8)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xcf,0x00,0x00,0x00,0x00,0x00,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 9: unexpected end of input");
 }
 
 TEST(MessagePackErrorTest, UnsupportedBytesConcrete)
 {
-    EXPECT_THROW_MSG(json::from_msgpack("\xc1"), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xc1})), json::parse_error,
                      "[json.exception.parse_error.112] parse error at 1: error reading MessagePack; last byte: 0xc1");
-    EXPECT_THROW_MSG(json::from_msgpack("\xc6"), json::parse_error,
+    EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xc6})), json::parse_error,
                      "[json.exception.parse_error.112] parse error at 1: error reading MessagePack; last byte: 0xc6");
 }
 
@@ -1058,7 +1070,7 @@ TEST(MessagePackErrorTest, UnsupportedBytesAll)
                 0xd4, 0xd5, 0xd6, 0xd7, 0xd8
             })
     {
-        EXPECT_THROW(json::from_msgpack(std::string(1, static_cast<char>(byte))), json::parse_error);
+        EXPECT_THROW(json::from_msgpack(std::vector<uint8_t>({static_cast<uint8_t>(byte)})), json::parse_error);
     }
 }
 #if 0

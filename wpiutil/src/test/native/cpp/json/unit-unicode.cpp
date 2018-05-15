@@ -39,6 +39,7 @@ using wpi::json;
 
 #include "wpi/Format.h"
 #include "wpi/StringExtras.h"
+#include "wpi/raw_ostream.h"
 
 #include <fstream>
 

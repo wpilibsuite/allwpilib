@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Modifications Copyright (c) FIRST 2017. All Rights Reserved.               */
+/* Modifications Copyright (c) 2017-2018 FIRST. All Rights Reserved.          */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,11 +7,11 @@
 /*
     __ _____ _____ _____
  __|  |   __|     |   | |  JSON for Modern C++
-|  |  |__   |  |  | | | |  version 2.1.1
+|  |  |__   |  |  | | | |  version 3.1.2
 |_____|_____|_____|_|___|  https://github.com/nlohmann/json
 
 Licensed under the MIT License <http://opensource.org/licenses/MIT>.
-Copyright (c) 2013-2017 Niels Lohmann <http://nlohmann.me>.
+Copyright (c) 2013-2018 Niels Lohmann <http://nlohmann.me>.
 
 Permission is hereby  granted, free of charge, to any  person obtaining a copy
 of this software and associated  documentation files (the "Software"), to deal
@@ -34,58 +34,54 @@ SOFTWARE.
 #define WPI_JSON_IMPLEMENTATION
 #include "wpi/json.h"
 
-#include <array>
-#include <clocale> // lconv, localeconv
-#include <locale> // locale
+#include <clocale>
+#include <cmath>
+#include <cstdlib>
 
 #include "wpi/Format.h"
-#include "wpi/SmallString.h"
 #include "wpi/raw_istream.h"
 #include "wpi/raw_ostream.h"
 
-using namespace wpi;
-
-namespace {
-
-//////////////////////
-// lexer and parser //
-//////////////////////
+namespace wpi {
 
 /*!
 @brief lexical analysis
 
 This class organizes the lexical analysis during JSON deserialization.
 */
-class lexer
+class json::lexer
 {
   public:
     /// token types for the parser
     enum class token_type
     {
-        uninitialized,   ///< indicating the scanner is uninitialized
-        literal_true,    ///< the `true` literal
-        literal_false,   ///< the `false` literal
-        literal_null,    ///< the `null` literal
-        value_string,    ///< a string -- use get_string() for actual value
-        value_unsigned,  ///< an unsigned integer -- use get_number_unsigned() for actual value
-        value_integer,   ///< a signed integer -- use get_number_integer() for actual value
-        value_float,     ///< an floating point number -- use get_number_float() for actual value
-        begin_array,     ///< the character for array begin `[`
-        begin_object,    ///< the character for object begin `{`
-        end_array,       ///< the character for array end `]`
-        end_object,      ///< the character for object end `}`
-        name_separator,  ///< the name separator `:`
-        value_separator, ///< the value separator `,`
-        parse_error,     ///< indicating a parse error
-        end_of_input     ///< indicating the end of the input buffer
+        uninitialized,    ///< indicating the scanner is uninitialized
+        literal_true,     ///< the `true` literal
+        literal_false,    ///< the `false` literal
+        literal_null,     ///< the `null` literal
+        value_string,     ///< a string -- use get_string() for actual value
+        value_unsigned,   ///< an unsigned integer -- use get_number_unsigned() for actual value
+        value_integer,    ///< a signed integer -- use get_number_integer() for actual value
+        value_float,      ///< an floating point number -- use get_number_float() for actual value
+        begin_array,      ///< the character for array begin `[`
+        begin_object,     ///< the character for object begin `{`
+        end_array,        ///< the character for array end `]`
+        end_object,       ///< the character for object end `}`
+        name_separator,   ///< the name separator `:`
+        value_separator,  ///< the value separator `,`
+        parse_error,      ///< indicating a parse error
+        end_of_input,     ///< indicating the end of the input buffer
+        literal_or_value  ///< a literal or the begin of a value (only for diagnostics)
     };
 
     /// return name of values of type token_type (only used for errors)
     static const char* token_type_name(const token_type t) noexcept;
 
-    explicit lexer(wpi::raw_istream& s)
-        : is(s), decimal_point_char(get_decimal_point())
-    {}
+    explicit lexer(raw_istream& s);
+
+    // delete because of pointer members
+    lexer(const lexer&) = delete;
+    lexer& operator=(lexer&) = delete;
 
   private:
     /////////////////////
@@ -97,7 +93,7 @@ class lexer
     {
         const auto loc = localeconv();
         assert(loc != nullptr);
-        return (loc->decimal_point == nullptr) ? '.' : loc->decimal_point[0];
+        return (loc->decimal_point == nullptr) ? '.' : *(loc->decimal_point);
     }
 
     /////////////////////
@@ -107,26 +103,68 @@ class lexer
     /*!
     @brief get codepoint from 4 hex characters following `\u`
 
-    @return codepoint or -1 in case of an error (e.g. EOF or non-hex
-            character)
+    For input "\u c1 c2 c3 c4" the codepoint is:
+      (c1 * 0x1000) + (c2 * 0x0100) + (c3 * 0x0010) + c4
+    = (c1 << 12) + (c2 << 8) + (c3 << 4) + (c4 << 0)
+
+    Furthermore, the possible characters '0'..'9', 'A'..'F', and 'a'..'f'
+    must be converted to the integers 0x0..0x9, 0xA..0xF, 0xA..0xF, resp. The
+    conversion is done by subtracting the offset (0x30, 0x37, and 0x57)
+    between the ASCII value of the character and the desired integer value.
+
+    @return codepoint (0x0000..0xFFFF) or -1 in case of an error (e.g. EOF or
+            non-hex character)
     */
     int get_codepoint();
 
     /*!
-    @brief create diagnostic representation of a codepoint
-    @return string "U+XXXX" for codepoint XXXX
+    @brief check if the next byte(s) are inside a given range
+
+    Adds the current byte and, for each passed range, reads a new byte and
+    checks if it is inside the range. If a violation was detected, set up an
+    error message and return false. Otherwise, return true.
+
+    @param[in] ranges  list of integers; interpreted as list of pairs of
+                       inclusive lower and upper bound, respectively
+
+    @pre The passed list @a ranges must have 2, 4, or 6 elements; that is,
+         1, 2, or 3 pairs. This precondition is enforced by an assertion.
+
+    @return true if and only if no range violation was detected
     */
-    static std::string codepoint_to_string(int codepoint);
+    bool next_byte_in_range(std::initializer_list<int> ranges)
+    {
+        assert(ranges.size() == 2 or ranges.size() == 4 or ranges.size() == 6);
+        add(current);
+
+        for (auto range = ranges.begin(); range != ranges.end(); ++range)
+        {
+            get();
+            if (JSON_LIKELY(*range <= current and current <= *(++range)))
+            {
+                add(current);
+            }
+            else
+            {
+                error_message = "invalid string: ill-formed UTF-8 byte";
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /*!
     @brief scan a string literal
 
     This function scans a string according to Sect. 7 of RFC 7159. While
-    scanning, bytes are escaped and copied into buffer yytext. Then the
-    function returns successfully.
+    scanning, bytes are escaped and copied into buffer token_buffer. Then the
+    function returns successfully, token_buffer is *not* null-terminated (as it
+    may contain \0 bytes), and token_buffer.size() is the number of bytes in the
+    string.
 
-    @return token_type::value_string if string could be successfully
-            scanned, token_type::parse_error otherwise
+    @return token_type::value_string if string could be successfully scanned,
+            token_type::parse_error otherwise
 
     @note In case of errors, variable error_message contains a textual
           description.
@@ -153,12 +191,11 @@ class lexer
 
     This function scans a string according to Sect. 6 of RFC 7159.
 
-    The function is realized with a deterministic finite state machine
-    derived from the grammar described in RFC 7159. Starting in state
-    "init", the input is read and used to determined the next state. Only
-    state "done" accepts the number. State "error" is a trap state to model
-    errors. In the table below, "anything" means any character but the ones
-    listed before.
+    The function is realized with a deterministic finite state machine derived
+    from the grammar described in RFC 7159. Starting in state "init", the
+    input is read and used to determined the next state. Only state "done"
+    accepts the number. State "error" is a trap state to model errors. In the
+    table below, "anything" means any character but the ones listed before.
 
     state    | 0        | 1-9      | e E      | +       | -       | .        | anything
     ---------|----------|----------|----------|---------|---------|----------|-----------
@@ -177,7 +214,7 @@ class lexer
     contains cycles, but any cycle can be left when EOF is read. Therefore,
     the function is guaranteed to terminate.
 
-    During scanning, the read bytes are stored in yytext. This string is
+    During scanning, the read bytes are stored in token_buffer. This string is
     then converted to a signed integer, an unsigned integer, or a
     floating-point number.
 
@@ -191,48 +228,87 @@ class lexer
     */
     token_type scan_number();
 
-    token_type scan_true();
-    token_type scan_false();
-    token_type scan_null();
+    /*!
+    @param[in] literal_text  the literal text to expect
+    @param[in] length        the length of the passed literal text
+    @param[in] return_type   the token type to return on success
+    */
+    token_type scan_literal(const char* literal_text, const std::size_t length,
+                            token_type return_type);
 
     /////////////////////
     // input management
     /////////////////////
 
-    /// reset yytext
+    /// reset token_buffer; current character is beginning of token
     void reset() noexcept
     {
-        token_string.resize(0);
-        yytext.resize(0);
+        token_buffer.clear();
+        token_string.clear();
+        token_string.push_back(std::char_traits<char>::to_char_type(current));
     }
 
-    /// get a character from the input
-    int get()
+    /*
+    @brief get next character from the input
+
+    This function provides the interface to the used input adapter. It does
+    not throw in case the input reached EOF, but returns a
+    `std::char_traits<char>::eof()` in that case.  Stores the scanned characters
+    for use in error messages.
+
+    @return character read from the input
+    */
+    std::char_traits<char>::int_type get()
     {
         ++chars_read;
-        if (next_unget)
+        if (JSON_UNLIKELY(!unget_chars.empty()))
         {
-            next_unget = false;
+            current = unget_chars.back();
+            unget_chars.pop_back();
+            token_string.push_back(current);
             return current;
         }
         char c;
         is.read(c);
-        if (is.has_error())
+        if (JSON_UNLIKELY(is.has_error()))
         {
             current = std::char_traits<char>::eof();
         }
         else
         {
-            current = static_cast<uint8_t>(c);
+            current = std::char_traits<char>::to_int_type(c);
             token_string.push_back(c);
         }
         return current;
     }
 
-    /// add a character to yytext
+    /// unget current character (return it again on next get)
+    void unget()
+    {
+        --chars_read;
+        if (JSON_LIKELY(current != std::char_traits<char>::eof()))
+        {
+            unget_chars.emplace_back(current);
+            assert(token_string.size() != 0);
+            token_string.pop_back();
+            if (!token_string.empty())
+            {
+                current = token_string.back();
+            }
+        }
+    }
+
+    /// put back character (returned on next get)
+    void putback(std::char_traits<char>::int_type c)
+    {
+        --chars_read;
+        unget_chars.emplace_back(c);
+    }
+
+    /// add a character to token_buffer
     void add(int c)
     {
-        yytext.push_back(static_cast<char>(c));
+        token_buffer.push_back(std::char_traits<char>::to_char_type(c));
     }
 
   public:
@@ -241,13 +317,13 @@ class lexer
     /////////////////////
 
     /// return integer value
-    std::int64_t get_number_integer() const noexcept
+    int64_t get_number_integer() const noexcept
     {
         return value_integer;
     }
 
     /// return unsigned integer value
-    std::uint64_t get_number_unsigned() const noexcept
+    uint64_t get_number_unsigned() const noexcept
     {
         return value_unsigned;
     }
@@ -258,10 +334,10 @@ class lexer
         return value_float;
     }
 
-    /// return string value
+    /// return current string value
     StringRef get_string()
     {
-        return yytext.str();
+        return token_buffer;
     }
 
     /////////////////////
@@ -269,16 +345,18 @@ class lexer
     /////////////////////
 
     /// return position of last read token
-    size_t get_position() const noexcept
+    std::size_t get_position() const noexcept
     {
         return chars_read;
     }
 
-    /// return the last read token (for errors only)
+    /// return the last read token (for errors only).  Will never contain EOF
+    /// (an arbitrary value that is not a valid char value, often -1), because
+    /// 255 may legitimately occur.  May contain NUL, which should be escaped.
     std::string get_token_string() const;
 
     /// return syntax error message
-    const std::string& get_error_message() const noexcept
+    const char* get_error_message() const noexcept
     {
         return error_message;
     }
@@ -291,38 +369,158 @@ class lexer
 
   private:
     /// input adapter
-    wpi::raw_istream& is;
+    raw_istream& is;
 
     /// the current character
-    int current = std::char_traits<char>::eof();
+    std::char_traits<char>::int_type current = std::char_traits<char>::eof();
 
-    /// whether get() should return the last character again
-    bool next_unget = false;
+    /// unget characters
+    SmallVector<std::char_traits<char>::int_type, 4> unget_chars;
 
     /// the number of characters read
-    size_t chars_read = 0;
+    std::size_t chars_read = 0;
 
-    /// buffer for raw byte sequence of the current token
-    SmallString<128> token_string;
+    /// raw input token string (for error messages)
+    SmallString<128> token_string {};
 
     /// buffer for variable-length tokens (numbers, strings)
-    SmallString<128> yytext;
+    SmallString<128> token_buffer {};
 
     /// a description of occurred lexer errors
-    std::string error_message = "";
+    const char* error_message = "";
 
     // number values
-    std::int64_t value_integer = 0;
-    std::uint64_t value_unsigned = 0;
+    int64_t value_integer = 0;
+    uint64_t value_unsigned = 0;
     double value_float = 0;
 
     /// the decimal point
     const char decimal_point_char = '.';
 };
 
-}  // anonymous namespace
+////////////
+// parser //
+////////////
 
-const char* lexer::token_type_name(const token_type t) noexcept
+/*!
+@brief syntax analysis
+
+This class implements a recursive decent parser.
+*/
+class json::parser
+{
+    using lexer_t = json::lexer;
+    using token_type = typename lexer_t::token_type;
+
+  public:
+    /// a parser reading from an input adapter
+    explicit parser(raw_istream& s,
+                    const parser_callback_t cb = nullptr,
+                    const bool allow_exceptions_ = true)
+        : callback(cb), m_lexer(s), allow_exceptions(allow_exceptions_)
+    {}
+
+    /*!
+    @brief public parser interface
+
+    @param[in] strict      whether to expect the last token to be EOF
+    @param[in,out] result  parsed JSON value
+
+    @throw parse_error.101 in case of an unexpected token
+    @throw parse_error.102 if to_unicode fails or surrogate error
+    @throw parse_error.103 if to_unicode fails
+    */
+    void parse(const bool strict, json& result);
+
+    /*!
+    @brief public accept interface
+
+    @param[in] strict  whether to expect the last token to be EOF
+    @return whether the input is a proper JSON text
+    */
+    bool accept(const bool strict = true)
+    {
+        // read first token
+        get_token();
+
+        if (not accept_internal())
+        {
+            return false;
+        }
+
+        // strict => last token must be EOF
+        return not strict or (get_token() == token_type::end_of_input);
+    }
+
+  private:
+    /*!
+    @brief the actual parser
+    @throw parse_error.101 in case of an unexpected token
+    @throw parse_error.102 if to_unicode fails or surrogate error
+    @throw parse_error.103 if to_unicode fails
+    */
+    void parse_internal(bool keep, json& result);
+
+    /*!
+    @brief the actual acceptor
+
+    @invariant 1. The last token is not yet processed. Therefore, the caller
+                  of this function must make sure a token has been read.
+               2. When this function returns, the last token is processed.
+                  That is, the last read character was already considered.
+
+    This invariant makes sure that no token needs to be "unput".
+    */
+    bool accept_internal();
+
+    /// get next token from lexer
+    token_type get_token()
+    {
+        return (last_token = m_lexer.scan());
+    }
+
+    /*!
+    @throw parse_error.101 if expected token did not occur
+    */
+    bool expect(token_type t)
+    {
+        if (JSON_UNLIKELY(t != last_token))
+        {
+            errored = true;
+            expected = t;
+            if (allow_exceptions)
+            {
+                throw_exception();
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    [[noreturn]] void throw_exception() const;
+
+  private:
+    /// current level of recursion
+    int depth = 0;
+    /// callback function
+    const parser_callback_t callback = nullptr;
+    /// the type of the last read token
+    token_type last_token = token_type::uninitialized;
+    /// the lexer
+    lexer_t m_lexer;
+    /// whether a syntax error occurred
+    bool errored = false;
+    /// possible reason for the syntax error
+    token_type expected = token_type::uninitialized;
+    /// whether to throw exceptions in case of errors
+    const bool allow_exceptions = true;
+};
+
+const char* json::lexer::token_type_name(const token_type t) noexcept
 {
     switch (t)
     {
@@ -356,274 +554,78 @@ const char* lexer::token_type_name(const token_type t) noexcept
             return "<parse error>";
         case token_type::end_of_input:
             return "end of input";
-        default:
-        {
-            // catch non-enum values
+        case token_type::literal_or_value:
+            return "'[', '{', or a literal";
+        default: // catch non-enum values
             return "unknown token"; // LCOV_EXCL_LINE
-        }
     }
 }
 
-int lexer::get_codepoint()
+json::lexer::lexer(raw_istream& s)
+    : is(s), decimal_point_char(get_decimal_point())
+{
+    // skip byte order mark
+    std::char_traits<char>::int_type c;
+    if ((c = get()) == 0xEF)
+    {
+        if ((c = get()) == 0xBB)
+        {
+            if ((c = get()) == 0xBF)
+            {
+                chars_read = 0;
+                return; // Ignore BOM
+            }
+            else if (c != std::char_traits<char>::eof())
+            {
+                unget();
+            }
+            putback('\xBB');
+        }
+        else if (c != std::char_traits<char>::eof())
+        {
+            unget();
+        }
+        putback('\xEF');
+    }
+    unget(); // no byte order mark; process as usual
+}
+
+int json::lexer::get_codepoint()
 {
     // this function only makes sense after reading `\u`
     assert(current == 'u');
     int codepoint = 0;
 
-    // byte 1: \uXxxx
-    switch (get())
+    const auto factors = { 12, 8, 4, 0 };
+    for (const auto factor : factors)
     {
-        case '0':
-            break;
-        case '1':
-            codepoint += 0x1000;
-            break;
-        case '2':
-            codepoint += 0x2000;
-            break;
-        case '3':
-            codepoint += 0x3000;
-            break;
-        case '4':
-            codepoint += 0x4000;
-            break;
-        case '5':
-            codepoint += 0x5000;
-            break;
-        case '6':
-            codepoint += 0x6000;
-            break;
-        case '7':
-            codepoint += 0x7000;
-            break;
-        case '8':
-            codepoint += 0x8000;
-            break;
-        case '9':
-            codepoint += 0x9000;
-            break;
-        case 'A':
-        case 'a':
-            codepoint += 0xa000;
-            break;
-        case 'B':
-        case 'b':
-            codepoint += 0xb000;
-            break;
-        case 'C':
-        case 'c':
-            codepoint += 0xc000;
-            break;
-        case 'D':
-        case 'd':
-            codepoint += 0xd000;
-            break;
-        case 'E':
-        case 'e':
-            codepoint += 0xe000;
-            break;
-        case 'F':
-        case 'f':
-            codepoint += 0xf000;
-            break;
-        default:
+        get();
+
+        if (current >= '0' and current <= '9')
+        {
+            codepoint += ((current - 0x30) << factor);
+        }
+        else if (current >= 'A' and current <= 'F')
+        {
+            codepoint += ((current - 0x37) << factor);
+        }
+        else if (current >= 'a' and current <= 'f')
+        {
+            codepoint += ((current - 0x57) << factor);
+        }
+        else
+        {
             return -1;
+        }
     }
 
-    // byte 2: \uxXxx
-    switch (get())
-    {
-        case '0':
-            break;
-        case '1':
-            codepoint += 0x0100;
-            break;
-        case '2':
-            codepoint += 0x0200;
-            break;
-        case '3':
-            codepoint += 0x0300;
-            break;
-        case '4':
-            codepoint += 0x0400;
-            break;
-        case '5':
-            codepoint += 0x0500;
-            break;
-        case '6':
-            codepoint += 0x0600;
-            break;
-        case '7':
-            codepoint += 0x0700;
-            break;
-        case '8':
-            codepoint += 0x0800;
-            break;
-        case '9':
-            codepoint += 0x0900;
-            break;
-        case 'A':
-        case 'a':
-            codepoint += 0x0a00;
-            break;
-        case 'B':
-        case 'b':
-            codepoint += 0x0b00;
-            break;
-        case 'C':
-        case 'c':
-            codepoint += 0x0c00;
-            break;
-        case 'D':
-        case 'd':
-            codepoint += 0x0d00;
-            break;
-        case 'E':
-        case 'e':
-            codepoint += 0x0e00;
-            break;
-        case 'F':
-        case 'f':
-            codepoint += 0x0f00;
-            break;
-        default:
-            return -1;
-    }
-
-    // byte 3: \uxxXx
-    switch (get())
-    {
-        case '0':
-            break;
-        case '1':
-            codepoint += 0x0010;
-            break;
-        case '2':
-            codepoint += 0x0020;
-            break;
-        case '3':
-            codepoint += 0x0030;
-            break;
-        case '4':
-            codepoint += 0x0040;
-            break;
-        case '5':
-            codepoint += 0x0050;
-            break;
-        case '6':
-            codepoint += 0x0060;
-            break;
-        case '7':
-            codepoint += 0x0070;
-            break;
-        case '8':
-            codepoint += 0x0080;
-            break;
-        case '9':
-            codepoint += 0x0090;
-            break;
-        case 'A':
-        case 'a':
-            codepoint += 0x00a0;
-            break;
-        case 'B':
-        case 'b':
-            codepoint += 0x00b0;
-            break;
-        case 'C':
-        case 'c':
-            codepoint += 0x00c0;
-            break;
-        case 'D':
-        case 'd':
-            codepoint += 0x00d0;
-            break;
-        case 'E':
-        case 'e':
-            codepoint += 0x00e0;
-            break;
-        case 'F':
-        case 'f':
-            codepoint += 0x00f0;
-            break;
-        default:
-            return -1;
-    }
-
-    // byte 4: \uxxxX
-    switch (get())
-    {
-        case '0':
-            break;
-        case '1':
-            codepoint += 0x0001;
-            break;
-        case '2':
-            codepoint += 0x0002;
-            break;
-        case '3':
-            codepoint += 0x0003;
-            break;
-        case '4':
-            codepoint += 0x0004;
-            break;
-        case '5':
-            codepoint += 0x0005;
-            break;
-        case '6':
-            codepoint += 0x0006;
-            break;
-        case '7':
-            codepoint += 0x0007;
-            break;
-        case '8':
-            codepoint += 0x0008;
-            break;
-        case '9':
-            codepoint += 0x0009;
-            break;
-        case 'A':
-        case 'a':
-            codepoint += 0x000a;
-            break;
-        case 'B':
-        case 'b':
-            codepoint += 0x000b;
-            break;
-        case 'C':
-        case 'c':
-            codepoint += 0x000c;
-            break;
-        case 'D':
-        case 'd':
-            codepoint += 0x000d;
-            break;
-        case 'E':
-        case 'e':
-            codepoint += 0x000e;
-            break;
-        case 'F':
-        case 'f':
-            codepoint += 0x000f;
-            break;
-        default:
-            return -1;
-    }
-
+    assert(0x0000 <= codepoint and codepoint <= 0xFFFF);
     return codepoint;
 }
 
-std::string lexer::codepoint_to_string(int codepoint)
+json::lexer::token_type json::lexer::scan_string()
 {
-    std::string s;
-    raw_string_ostream ss(s);
-    ss << "U+" << format_hex_no_prefix(codepoint, 4, true);
-    return ss.str();
-}
-
-lexer::token_type lexer::scan_string()
-{
-    // reset yytext (ignore opening quote)
+    // reset token_buffer (ignore opening quote)
     reset();
 
     // we entered the function by reading an open quote
@@ -632,9 +634,7 @@ lexer::token_type lexer::scan_string()
     while (true)
     {
         // get next character
-        get();
-
-        switch (current)
+        switch (get())
         {
             // end of file while parsing string
             case std::char_traits<char>::eof():
@@ -646,7 +646,6 @@ lexer::token_type lexer::scan_string()
             // closing quote
             case '\"':
             {
-                // terminate yytext
                 return token_type::value_string;
             }
 
@@ -691,8 +690,8 @@ lexer::token_type lexer::scan_string()
                     // unicode escapes
                     case 'u':
                     {
-                        int codepoint;
-                        int codepoint1 = get_codepoint();
+                        const int codepoint1 = get_codepoint();
+                        int codepoint = codepoint1; // start with codepoint1
 
                         if (JSON_UNLIKELY(codepoint1 == -1))
                         {
@@ -701,10 +700,10 @@ lexer::token_type lexer::scan_string()
                         }
 
                         // check if code point is a high surrogate
-                        if (0xD800 <= codepoint1 && codepoint1 <= 0xDBFF)
+                        if (0xD800 <= codepoint1 and codepoint1 <= 0xDBFF)
                         {
                             // expect next \uxxxx entry
-                            if (JSON_LIKELY(get() == '\\' && get() == 'u'))
+                            if (JSON_LIKELY(get() == '\\' and get() == 'u'))
                             {
                                 const int codepoint2 = get_codepoint();
 
@@ -715,8 +714,9 @@ lexer::token_type lexer::scan_string()
                                 }
 
                                 // check if codepoint2 is a low surrogate
-                                if (JSON_LIKELY(0xDC00 <= codepoint2 && codepoint2 <= 0xDFFF))
+                                if (JSON_LIKELY(0xDC00 <= codepoint2 and codepoint2 <= 0xDFFF))
                                 {
+                                    // overwrite codepoint
                                     codepoint =
                                         // high surrogate occupies the most significant 22 bits
                                         (codepoint1 << 10)
@@ -729,44 +729,41 @@ lexer::token_type lexer::scan_string()
                                 }
                                 else
                                 {
-                                    error_message = "invalid string: surrogate " + codepoint_to_string(codepoint1) + " must be followed by U+DC00..U+DFFF instead of " + codepoint_to_string(codepoint2);
+                                    error_message = "invalid string: surrogate U+DC00..U+DFFF must be followed by U+DC00..U+DFFF";
                                     return token_type::parse_error;
                                 }
                             }
                             else
                             {
-                                error_message = "invalid string: surrogate " + codepoint_to_string(codepoint1) + " must be followed by U+DC00..U+DFFF";
+                                error_message = "invalid string: surrogate U+DC00..U+DFFF must be followed by U+DC00..U+DFFF";
                                 return token_type::parse_error;
                             }
                         }
                         else
                         {
-                            if (JSON_UNLIKELY(0xDC00 <= codepoint1 && codepoint1 <= 0xDFFF))
+                            if (JSON_UNLIKELY(0xDC00 <= codepoint1 and codepoint1 <= 0xDFFF))
                             {
-                                error_message = "invalid string: surrogate " + codepoint_to_string(codepoint1) + " must follow U+D800..U+DBFF";
+                                error_message = "invalid string: surrogate U+DC00..U+DFFF must follow U+D800..U+DBFF";
                                 return token_type::parse_error;
                             }
-
-                            // only work with first code point
-                            codepoint = codepoint1;
                         }
 
                         // result of the above calculation yields a proper codepoint
-                        assert(0x00 <= codepoint && codepoint <= 0x10FFFF);
+                        assert(0x00 <= codepoint and codepoint <= 0x10FFFF);
 
-                        // translate code point to bytes
+                        // translate codepoint into bytes
                         if (codepoint < 0x80)
                         {
                             // 1-byte characters: 0xxxxxxx (ASCII)
                             add(codepoint);
                         }
-                        else if (codepoint <= 0x7ff)
+                        else if (codepoint <= 0x7FF)
                         {
                             // 2-byte characters: 110xxxxx 10xxxxxx
                             add(0xC0 | (codepoint >> 6));
                             add(0x80 | (codepoint & 0x3F));
                         }
-                        else if (codepoint <= 0xffff)
+                        else if (codepoint <= 0xFFFF)
                         {
                             // 3-byte characters: 1110xxxx 10xxxxxx 10xxxxxx
                             add(0xE0 | (codepoint >> 12));
@@ -805,12 +802,12 @@ lexer::token_type lexer::scan_string()
             case 0x07:
             case 0x08:
             case 0x09:
-            case 0x0a:
-            case 0x0b:
-            case 0x0c:
-            case 0x0d:
-            case 0x0e:
-            case 0x0f:
+            case 0x0A:
+            case 0x0B:
+            case 0x0C:
+            case 0x0D:
+            case 0x0E:
+            case 0x0F:
             case 0x10:
             case 0x11:
             case 0x12:
@@ -821,14 +818,14 @@ lexer::token_type lexer::scan_string()
             case 0x17:
             case 0x18:
             case 0x19:
-            case 0x1a:
-            case 0x1b:
-            case 0x1c:
-            case 0x1d:
-            case 0x1e:
-            case 0x1f:
+            case 0x1A:
+            case 0x1B:
+            case 0x1C:
+            case 0x1D:
+            case 0x1E:
+            case 0x1F:
             {
-                error_message = "invalid string: control character " + codepoint_to_string(current) + " must be escaped";
+                error_message = "invalid string: control character must be escaped";
                 return token_type::parse_error;
             }
 
@@ -842,12 +839,12 @@ lexer::token_type lexer::scan_string()
             case 0x27:
             case 0x28:
             case 0x29:
-            case 0x2a:
-            case 0x2b:
-            case 0x2c:
-            case 0x2d:
-            case 0x2e:
-            case 0x2f:
+            case 0x2A:
+            case 0x2B:
+            case 0x2C:
+            case 0x2D:
+            case 0x2E:
+            case 0x2F:
             case 0x30:
             case 0x31:
             case 0x32:
@@ -858,12 +855,12 @@ lexer::token_type lexer::scan_string()
             case 0x37:
             case 0x38:
             case 0x39:
-            case 0x3a:
-            case 0x3b:
-            case 0x3c:
-            case 0x3d:
-            case 0x3e:
-            case 0x3f:
+            case 0x3A:
+            case 0x3B:
+            case 0x3C:
+            case 0x3D:
+            case 0x3E:
+            case 0x3F:
             case 0x40:
             case 0x41:
             case 0x42:
@@ -874,12 +871,12 @@ lexer::token_type lexer::scan_string()
             case 0x47:
             case 0x48:
             case 0x49:
-            case 0x4a:
-            case 0x4b:
-            case 0x4c:
-            case 0x4d:
-            case 0x4e:
-            case 0x4f:
+            case 0x4A:
+            case 0x4B:
+            case 0x4C:
+            case 0x4D:
+            case 0x4E:
+            case 0x4F:
             case 0x50:
             case 0x51:
             case 0x52:
@@ -890,11 +887,11 @@ lexer::token_type lexer::scan_string()
             case 0x57:
             case 0x58:
             case 0x59:
-            case 0x5a:
-            case 0x5b:
-            case 0x5d:
-            case 0x5e:
-            case 0x5f:
+            case 0x5A:
+            case 0x5B:
+            case 0x5D:
+            case 0x5E:
+            case 0x5F:
             case 0x60:
             case 0x61:
             case 0x62:
@@ -905,12 +902,12 @@ lexer::token_type lexer::scan_string()
             case 0x67:
             case 0x68:
             case 0x69:
-            case 0x6a:
-            case 0x6b:
-            case 0x6c:
-            case 0x6d:
-            case 0x6e:
-            case 0x6f:
+            case 0x6A:
+            case 0x6B:
+            case 0x6C:
+            case 0x6D:
+            case 0x6E:
+            case 0x6F:
             case 0x70:
             case 0x71:
             case 0x72:
@@ -921,210 +918,130 @@ lexer::token_type lexer::scan_string()
             case 0x77:
             case 0x78:
             case 0x79:
-            case 0x7a:
-            case 0x7b:
-            case 0x7c:
-            case 0x7d:
-            case 0x7e:
-            case 0x7f:
+            case 0x7A:
+            case 0x7B:
+            case 0x7C:
+            case 0x7D:
+            case 0x7E:
+            case 0x7F:
             {
                 add(current);
                 break;
             }
 
             // U+0080..U+07FF: bytes C2..DF 80..BF
-            case 0xc2:
-            case 0xc3:
-            case 0xc4:
-            case 0xc5:
-            case 0xc6:
-            case 0xc7:
-            case 0xc8:
-            case 0xc9:
-            case 0xca:
-            case 0xcb:
-            case 0xcc:
-            case 0xcd:
-            case 0xce:
-            case 0xcf:
-            case 0xd0:
-            case 0xd1:
-            case 0xd2:
-            case 0xd3:
-            case 0xd4:
-            case 0xd5:
-            case 0xd6:
-            case 0xd7:
-            case 0xd8:
-            case 0xd9:
-            case 0xda:
-            case 0xdb:
-            case 0xdc:
-            case 0xdd:
-            case 0xde:
-            case 0xdf:
+            case 0xC2:
+            case 0xC3:
+            case 0xC4:
+            case 0xC5:
+            case 0xC6:
+            case 0xC7:
+            case 0xC8:
+            case 0xC9:
+            case 0xCA:
+            case 0xCB:
+            case 0xCC:
+            case 0xCD:
+            case 0xCE:
+            case 0xCF:
+            case 0xD0:
+            case 0xD1:
+            case 0xD2:
+            case 0xD3:
+            case 0xD4:
+            case 0xD5:
+            case 0xD6:
+            case 0xD7:
+            case 0xD8:
+            case 0xD9:
+            case 0xDA:
+            case 0xDB:
+            case 0xDC:
+            case 0xDD:
+            case 0xDE:
+            case 0xDF:
             {
-                add(current);
-                get();
-                if (JSON_LIKELY(0x80 <= current && current <= 0xbf))
+                if (JSON_UNLIKELY(not next_byte_in_range({0x80, 0xBF})))
                 {
-                    add(current);
-                    continue;
+                    return token_type::parse_error;
                 }
-
-                error_message = "invalid string: ill-formed UTF-8 byte";
-                return token_type::parse_error;
+                break;
             }
 
             // U+0800..U+0FFF: bytes E0 A0..BF 80..BF
-            case 0xe0:
+            case 0xE0:
             {
-                add(current);
-                get();
-                if (JSON_LIKELY(0xa0 <= current && current <= 0xbf))
+                if (JSON_UNLIKELY(not (next_byte_in_range({0xA0, 0xBF, 0x80, 0xBF}))))
                 {
-                    add(current);
-                    get();
-                    if (JSON_LIKELY(0x80 <= current && current <= 0xbf))
-                    {
-                        add(current);
-                        continue;
-                    }
+                    return token_type::parse_error;
                 }
-
-                error_message = "invalid string: ill-formed UTF-8 byte";
-                return token_type::parse_error;
+                break;
             }
 
             // U+1000..U+CFFF: bytes E1..EC 80..BF 80..BF
             // U+E000..U+FFFF: bytes EE..EF 80..BF 80..BF
-            case 0xe1:
-            case 0xe2:
-            case 0xe3:
-            case 0xe4:
-            case 0xe5:
-            case 0xe6:
-            case 0xe7:
-            case 0xe8:
-            case 0xe9:
-            case 0xea:
-            case 0xeb:
-            case 0xec:
-            case 0xee:
-            case 0xef:
+            case 0xE1:
+            case 0xE2:
+            case 0xE3:
+            case 0xE4:
+            case 0xE5:
+            case 0xE6:
+            case 0xE7:
+            case 0xE8:
+            case 0xE9:
+            case 0xEA:
+            case 0xEB:
+            case 0xEC:
+            case 0xEE:
+            case 0xEF:
             {
-                add(current);
-                get();
-                if (JSON_LIKELY(0x80 <= current && current <= 0xbf))
+                if (JSON_UNLIKELY(not (next_byte_in_range({0x80, 0xBF, 0x80, 0xBF}))))
                 {
-                    add(current);
-                    get();
-                    if (JSON_LIKELY(0x80 <= current && current <= 0xbf))
-                    {
-                        add(current);
-                        continue;
-                    }
+                    return token_type::parse_error;
                 }
-
-                error_message = "invalid string: ill-formed UTF-8 byte";
-                return token_type::parse_error;
+                break;
             }
 
             // U+D000..U+D7FF: bytes ED 80..9F 80..BF
-            case 0xed:
+            case 0xED:
             {
-                add(current);
-                get();
-                if (JSON_LIKELY(0x80 <= current && current <= 0x9f))
+                if (JSON_UNLIKELY(not (next_byte_in_range({0x80, 0x9F, 0x80, 0xBF}))))
                 {
-                    add(current);
-                    get();
-                    if (JSON_LIKELY(0x80 <= current && current <= 0xbf))
-                    {
-                        add(current);
-                        continue;
-                    }
+                    return token_type::parse_error;
                 }
-
-                error_message = "invalid string: ill-formed UTF-8 byte";
-                return token_type::parse_error;
+                break;
             }
 
             // U+10000..U+3FFFF F0 90..BF 80..BF 80..BF
-            case 0xf0:
+            case 0xF0:
             {
-                add(current);
-                get();
-                if (JSON_LIKELY(0x90 <= current && current <= 0xbf))
+                if (JSON_UNLIKELY(not (next_byte_in_range({0x90, 0xBF, 0x80, 0xBF, 0x80, 0xBF}))))
                 {
-                    add(current);
-                    get();
-                    if (JSON_LIKELY(0x80 <= current && current <= 0xbf))
-                    {
-                        add(current);
-                        get();
-                        if (JSON_LIKELY(0x80 <= current && current <= 0xbf))
-                        {
-                            add(current);
-                            continue;
-                        }
-                    }
+                    return token_type::parse_error;
                 }
-
-                error_message = "invalid string: ill-formed UTF-8 byte";
-                return token_type::parse_error;
+                break;
             }
 
             // U+40000..U+FFFFF F1..F3 80..BF 80..BF 80..BF
-            case 0xf1:
-            case 0xf2:
-            case 0xf3:
+            case 0xF1:
+            case 0xF2:
+            case 0xF3:
             {
-                add(current);
-                get();
-                if (JSON_LIKELY(0x80 <= current && current <= 0xbf))
+                if (JSON_UNLIKELY(not (next_byte_in_range({0x80, 0xBF, 0x80, 0xBF, 0x80, 0xBF}))))
                 {
-                    add(current);
-                    get();
-                    if (JSON_LIKELY(0x80 <= current && current <= 0xbf))
-                    {
-                        add(current);
-                        get();
-                        if (JSON_LIKELY(0x80 <= current && current <= 0xbf))
-                        {
-                            add(current);
-                            continue;
-                        }
-                    }
+                    return token_type::parse_error;
                 }
-
-                error_message = "invalid string: ill-formed UTF-8 byte";
-                return token_type::parse_error;
+                break;
             }
 
             // U+100000..U+10FFFF F4 80..8F 80..BF 80..BF
-            case 0xf4:
+            case 0xF4:
             {
-                add(current);
-                get();
-                if (JSON_LIKELY(0x80 <= current && current <= 0x8f))
+                if (JSON_UNLIKELY(not (next_byte_in_range({0x80, 0x8F, 0x80, 0xBF, 0x80, 0xBF}))))
                 {
-                    add(current);
-                    get();
-                    if (JSON_LIKELY(0x80 <= current && current <= 0xbf))
-                    {
-                        add(current);
-                        get();
-                        if (JSON_LIKELY(0x80 <= current && current <= 0xbf))
-                        {
-                            add(current);
-                            continue;
-                        }
-                    }
+                    return token_type::parse_error;
                 }
-
-                error_message = "invalid string: ill-formed UTF-8 byte";
-                return token_type::parse_error;
+                break;
             }
 
             // remaining bytes (80..C1 and F5..FF) are ill-formed
@@ -1137,9 +1054,9 @@ lexer::token_type lexer::scan_string()
     }
 }
 
-lexer::token_type lexer::scan_number()
+json::lexer::token_type json::lexer::scan_number()
 {
-    // reset yytext to store the number's bytes
+    // reset token_buffer to store the number's bytes
     reset();
 
     // the type of the parsed number; initially set to unsigned; will be
@@ -1178,7 +1095,7 @@ lexer::token_type lexer::scan_number()
         default:
         {
             // all other characters are rejected outside scan_number()
-            assert(false);  // LCOV_EXCL_LINE
+            assert(false); // LCOV_EXCL_LINE
         }
     }
 
@@ -1232,9 +1149,7 @@ scan_number_zero:
         }
 
         default:
-        {
             goto scan_number_done;
-        }
     }
 
 scan_number_any1:
@@ -1270,9 +1185,7 @@ scan_number_any1:
         }
 
         default:
-        {
             goto scan_number_done;
-        }
     }
 
 scan_number_decimal1:
@@ -1329,9 +1242,7 @@ scan_number_decimal2:
         }
 
         default:
-        {
             goto scan_number_done;
-        }
     }
 
 scan_number_exponent:
@@ -1363,7 +1274,8 @@ scan_number_exponent:
 
         default:
         {
-            error_message = "invalid number; expected '+', '-', or digit after exponent";
+            error_message =
+                "invalid number; expected '+', '-', or digit after exponent";
             return token_type::parse_error;
         }
     }
@@ -1414,30 +1326,28 @@ scan_number_any2:
         }
 
         default:
-        {
             goto scan_number_done;
-        }
     }
 
 scan_number_done:
-    // unget the character after the number (we only read it to know
-    // that we are done scanning a number)
-    --chars_read;
-    next_unget = true;
+    // unget the character after the number (we only read it to know that
+    // we are done scanning a number)
+    unget();
+
+    char* endptr = nullptr;
+    errno = 0;
 
     // try to parse integers first and fall back to floats
     if (number_type == token_type::value_unsigned)
     {
-        char* endptr = nullptr;
-        errno = 0;
-        const auto x = std::strtoull(yytext.c_str(), &endptr, 10);
+        const auto x = std::strtoull(token_buffer.c_str(), &endptr, 10);
 
         // we checked the number format before
-        assert(endptr == yytext.data() + yytext.size());
+        assert(endptr == token_buffer.data() + token_buffer.size());
 
         if (errno == 0)
         {
-            value_unsigned = static_cast<std::uint64_t>(x);
+            value_unsigned = static_cast<uint64_t>(x);
             if (value_unsigned == x)
             {
                 return token_type::value_unsigned;
@@ -1446,16 +1356,14 @@ scan_number_done:
     }
     else if (number_type == token_type::value_integer)
     {
-        char* endptr = nullptr;
-        errno = 0;
-        const auto x = std::strtoll(yytext.c_str(), &endptr, 10);
+        const auto x = std::strtoll(token_buffer.c_str(), &endptr, 10);
 
         // we checked the number format before
-        assert(endptr == yytext.data() + yytext.size());
+        assert(endptr == token_buffer.data() + token_buffer.size());
 
         if (errno == 0)
         {
-            value_integer = static_cast<std::int64_t>(x);
+            value_integer = static_cast<int64_t>(x);
             if (value_integer == x)
             {
                 return token_type::value_integer;
@@ -1463,82 +1371,62 @@ scan_number_done:
         }
     }
 
-    // this code is reached if we parse a floating-point number or if
-    // an integer conversion above failed
-    strtof(value_float, yytext.c_str(), nullptr);
+    // this code is reached if we parse a floating-point number or if an
+    // integer conversion above failed
+    strtof(value_float, token_buffer.c_str(), &endptr);
+
+    // we checked the number format before
+    assert(endptr == token_buffer.data() + token_buffer.size());
+
     return token_type::value_float;
 }
 
-lexer::token_type lexer::scan_true()
+json::lexer::token_type json::lexer::scan_literal(const char* literal_text, const std::size_t length,
+                        token_type return_type)
 {
-    assert(current == 't');
-    if (JSON_LIKELY((get() == 'r' && get() == 'u' && get() == 'e')))
+    assert(current == literal_text[0]);
+    for (std::size_t i = 1; i < length; ++i)
     {
-        return token_type::literal_true;
+        if (JSON_UNLIKELY(get() != literal_text[i]))
+        {
+            error_message = "invalid literal";
+            return token_type::parse_error;
+        }
     }
-
-    error_message = "invalid literal; expected 'true'";
-    return token_type::parse_error;
+    return return_type;
 }
 
-lexer::token_type lexer::scan_false()
-{
-    assert(current == 'f');
-    if (JSON_LIKELY((get() == 'a' && get() == 'l' && get() == 's' && get() == 'e')))
-    {
-        return token_type::literal_false;
-    }
-
-    error_message = "invalid literal; expected 'false'";
-    return token_type::parse_error;
-}
-
-lexer::token_type lexer::scan_null()
-{
-    assert(current == 'n');
-    if (JSON_LIKELY((get() == 'u' && get() == 'l' && get() == 'l')))
-    {
-        return token_type::literal_null;
-    }
-
-    error_message = "invalid literal; expected 'null'";
-    return token_type::parse_error;
-}
-
-std::string lexer::get_token_string() const
+std::string json::lexer::get_token_string() const
 {
     // escape control characters
     std::string result;
-    for (auto c : token_string)
+    raw_string_ostream ss(result);
+    for (const unsigned char c : token_string)
     {
-        if (c == '\0' || c == std::char_traits<char>::eof())
-        {
-            // ignore EOF
-            continue;
-        }
-        else if ('\x00' <= c && c <= '\x1f')
+        if (c <= '\x1F')
         {
             // escape control characters
-            result += "<" + codepoint_to_string(c) + ">";
+            ss << "<U+" << format_hex_no_prefix(c, 4, true) << '>';
         }
         else
         {
             // add character as is
-            result.append(1, c);
+            ss << c;
         }
     }
 
+    ss.flush();
     return result;
 }
 
-lexer::token_type lexer::scan()
+json::lexer::token_type json::lexer::scan()
 {
     // read next character and ignore whitespace
     do
     {
         get();
     }
-    while (current == ' ' || current == '\t' || current == '\n' || current == '\r');
+    while (current == ' ' or current == '\t' or current == '\n' or current == '\r');
 
     switch (current)
     {
@@ -1558,11 +1446,11 @@ lexer::token_type lexer::scan()
 
         // literals
         case 't':
-            return scan_true();
+            return scan_literal("true", 4, token_type::literal_true);
         case 'f':
-            return scan_false();
+            return scan_literal("false", 5, token_type::literal_false);
         case 'n':
-            return scan_null();
+            return scan_literal("null", 4, token_type::literal_null);
 
         // string
         case '\"':
@@ -1595,164 +1483,92 @@ lexer::token_type lexer::scan()
     }
 }
 
-/*!
-@brief syntax analysis
-
-This class implements a recursive decent parser.
-*/
-class json::parser
-{
-    using value_t = json::value_t;
-
-  public:
-    /// a parser reading from an input adapter
-    explicit parser(wpi::raw_istream& s,
-                    const parser_callback_t cb = nullptr)
-        : callback(cb), m_lexer(s)
-    {}
-
-    /*!
-    @brief public parser interface
-
-    @param[in] strict  whether to expect the last token to be EOF
-    @return parsed JSON value
-
-    @throw parse_error.101 in case of an unexpected token
-    @throw parse_error.102 if to_unicode fails or surrogate error
-    @throw parse_error.103 if to_unicode fails
-    */
-    json parse(bool strict = true);
-
-    /*!
-    @brief public accept interface
-
-    @param[in] strict  whether to expect the last token to be EOF
-    @return whether the input is a proper JSON text
-    */
-    bool accept(bool strict = true);
-
-  private:
-    /*!
-    @brief the actual parser
-    @throw parse_error.101 in case of an unexpected token
-    @throw parse_error.102 if to_unicode fails or surrogate error
-    @throw parse_error.103 if to_unicode fails
-    */
-    json parse_internal(bool keep);
-
-    /*!
-    @brief the acutal acceptor
-
-    @invariant 1. The last token is not yet processed. Therefore, the
-                  caller of this function must make sure a token has
-                  been read.
-               2. When this function returns, the last token is processed.
-                  That is, the last read character was already considered.
-
-    This invariant makes sure that no token needs to be "unput".
-    */
-    bool accept_internal();
-
-    /// get next token from lexer
-    lexer::token_type get_token()
-    {
-        last_token = m_lexer.scan();
-        return last_token;
-    }
-
-    /*!
-    @throw parse_error.101 if expected token did not occur
-    */
-    void expect(lexer::token_type t) const;
-
-    /*!
-    @throw parse_error.101 if unexpected token occurred
-    */
-    void unexpect(lexer::token_type t) const;
-
-  private:
-    /// current level of recursion
-    int depth = 0;
-    /// callback function
-    const parser_callback_t callback = nullptr;
-    /// the type of the last read token
-    lexer::token_type last_token = lexer::token_type::uninitialized;
-    /// the lexer
-    lexer m_lexer;
-};
-
-json json::parser::parse(bool strict)
+void json::parser::parse(const bool strict, json& result)
 {
     // read first token
     get_token();
 
-    json result = parse_internal(true);
+    parse_internal(true, result);
     result.assert_invariant();
 
+    // in strict mode, input must be completely read
     if (strict)
     {
         get_token();
-        expect(lexer::token_type::end_of_input);
+        expect(token_type::end_of_input);
     }
 
-    // return parser result and replace it with null in case the
-    // top-level value was discarded by the callback function
-    return result.is_discarded() ? json() : std::move(result);
+    // in case of an error, return discarded value
+    if (errored)
+    {
+        result = value_t::discarded;
+        return;
+    }
+
+    // set top-level value to null if it was discarded by the callback
+    // function
+    if (result.is_discarded())
+    {
+        result = nullptr;
+    }
 }
 
-bool json::parser::accept(bool strict)
+void json::parser::parse_internal(bool keep, json& result)
 {
-    // read first token
-    get_token();
+    // never parse after a parse error was detected
+    assert(not errored);
 
-    if (!accept_internal())
+    // start with a discarded value
+    if (not result.is_discarded())
     {
-        return false;
+        result.m_value.destroy(result.m_type);
+        result.m_type = value_t::discarded;
     }
-
-    if (strict && get_token() != lexer::token_type::end_of_input)
-    {
-        return false;
-    }
-
-    return true;
-}
-
-json json::parser::parse_internal(bool keep)
-{
-    auto result = json(value_t::discarded);
 
     switch (last_token)
     {
-        case lexer::token_type::begin_object:
+        case token_type::begin_object:
         {
-            if (keep && (!callback
-                          || ((keep = callback(depth++, parse_event_t::object_start, result)) != 0)))
+            if (keep)
             {
-                // explicitly set result to object to cope with {}
-                result.m_type = value_t::object;
-                result.m_value = value_t::object;
+                if (callback)
+                {
+                    keep = callback(depth++, parse_event_t::object_start, result);
+                }
+
+                if (not callback or keep)
+                {
+                    // explicitly set result to object to cope with {}
+                    result.m_type = value_t::object;
+                    result.m_value = value_t::object;
+                }
             }
 
             // read next token
             get_token();
 
             // closing } -> we are done
-            if (last_token == lexer::token_type::end_object)
+            if (last_token == token_type::end_object)
             {
-                if (keep && callback && !callback(--depth, parse_event_t::object_end, result))
+                if (keep and callback and not callback(--depth, parse_event_t::object_end, result))
                 {
-                    result = json(value_t::discarded);
+                    result.m_value.destroy(result.m_type);
+                    result.m_type = value_t::discarded;
                 }
-                return result;
+                break;
             }
 
             // parse values
+            SmallString<128> key;
+            json value;
             while (true)
             {
                 // store key
-                expect(lexer::token_type::value_string);
-                std::string key = m_lexer.get_string();
+                if (not expect(token_type::value_string))
+                {
+                    return;
+                }
+                key = m_lexer.get_string();
 
                 bool keep_tag = false;
                 if (keep)
@@ -1770,170 +1586,223 @@ json json::parser::parse_internal(bool keep)
 
                 // parse separator (:)
                 get_token();
-                expect(lexer::token_type::name_separator);
+                if (not expect(token_type::name_separator))
+                {
+                    return;
+                }
 
                 // parse and add value
                 get_token();
-                auto value = parse_internal(keep);
-                if (keep && keep_tag && !value.is_discarded())
+                value.m_value.destroy(value.m_type);
+                value.m_type = value_t::discarded;
+                parse_internal(keep, value);
+
+                if (JSON_UNLIKELY(errored))
                 {
-                    result[key] = std::move(value);
+                    return;
+                }
+
+                if (keep and keep_tag and not value.is_discarded())
+                {
+                    result.m_value.object->emplace_second(StringRef(key.data(), key.size()), std::move(value));
                 }
 
                 // comma -> next value
                 get_token();
-                if (last_token == lexer::token_type::value_separator)
+                if (last_token == token_type::value_separator)
                 {
                     get_token();
                     continue;
                 }
 
                 // closing }
-                expect(lexer::token_type::end_object);
+                if (not expect(token_type::end_object))
+                {
+                    return;
+                }
                 break;
             }
 
-            if (keep && callback && !callback(--depth, parse_event_t::object_end, result))
+            if (keep and callback and not callback(--depth, parse_event_t::object_end, result))
             {
-                result = json(value_t::discarded);
+                result.m_value.destroy(result.m_type);
+                result.m_type = value_t::discarded;
             }
-
-            return result;
+            break;
         }
 
-        case lexer::token_type::begin_array:
+        case token_type::begin_array:
         {
-            if (keep && (!callback
-                          || ((keep = callback(depth++, parse_event_t::array_start, result)) != 0)))
+            if (keep)
             {
-                // explicitly set result to object to cope with []
-                result.m_type = value_t::array;
-                result.m_value = value_t::array;
+                if (callback)
+                {
+                    keep = callback(depth++, parse_event_t::array_start, result);
+                }
+
+                if (not callback or keep)
+                {
+                    // explicitly set result to array to cope with []
+                    result.m_type = value_t::array;
+                    result.m_value = value_t::array;
+                }
             }
 
             // read next token
             get_token();
 
             // closing ] -> we are done
-            if (last_token == lexer::token_type::end_array)
+            if (last_token == token_type::end_array)
             {
-                if (callback && !callback(--depth, parse_event_t::array_end, result))
+                if (callback and not callback(--depth, parse_event_t::array_end, result))
                 {
-                    result = json(value_t::discarded);
+                    result.m_value.destroy(result.m_type);
+                    result.m_type = value_t::discarded;
                 }
-                return result;
+                break;
             }
 
             // parse values
+            json value;
             while (true)
             {
                 // parse value
-                auto value = parse_internal(keep);
-                if (keep && !value.is_discarded())
+                value.m_value.destroy(value.m_type);
+                value.m_type = value_t::discarded;
+                parse_internal(keep, value);
+
+                if (JSON_UNLIKELY(errored))
                 {
-                    result.push_back(std::move(value));
+                    return;
+                }
+
+                if (keep and not value.is_discarded())
+                {
+                    result.m_value.array->push_back(std::move(value));
                 }
 
                 // comma -> next value
                 get_token();
-                if (last_token == lexer::token_type::value_separator)
+                if (last_token == token_type::value_separator)
                 {
                     get_token();
                     continue;
                 }
 
                 // closing ]
-                expect(lexer::token_type::end_array);
+                if (not expect(token_type::end_array))
+                {
+                    return;
+                }
                 break;
             }
 
-            if (keep && callback && !callback(--depth, parse_event_t::array_end, result))
+            if (keep and callback and not callback(--depth, parse_event_t::array_end, result))
             {
-                result = json(value_t::discarded);
+                result.m_value.destroy(result.m_type);
+                result.m_type = value_t::discarded;
             }
-
-            return result;
+            break;
         }
 
-        case lexer::token_type::literal_null:
+        case token_type::literal_null:
         {
             result.m_type = value_t::null;
             break;
         }
 
-        case lexer::token_type::value_string:
+        case token_type::value_string:
         {
-            result = json(m_lexer.get_string());
+            result.m_type = value_t::string;
+            result.m_value = m_lexer.get_string();
             break;
         }
 
-        case lexer::token_type::literal_true:
+        case token_type::literal_true:
         {
             result.m_type = value_t::boolean;
             result.m_value = true;
             break;
         }
 
-        case lexer::token_type::literal_false:
+        case token_type::literal_false:
         {
             result.m_type = value_t::boolean;
             result.m_value = false;
             break;
         }
 
-        case lexer::token_type::value_unsigned:
+        case token_type::value_unsigned:
         {
             result.m_type = value_t::number_unsigned;
             result.m_value = m_lexer.get_number_unsigned();
             break;
         }
 
-        case lexer::token_type::value_integer:
+        case token_type::value_integer:
         {
             result.m_type = value_t::number_integer;
             result.m_value = m_lexer.get_number_integer();
             break;
         }
 
-        case lexer::token_type::value_float:
+        case token_type::value_float:
         {
             result.m_type = value_t::number_float;
             result.m_value = m_lexer.get_number_float();
 
             // throw in case of infinity or NAN
-            if (JSON_UNLIKELY(!std::isfinite(result.m_value.number_float)))
+            if (JSON_UNLIKELY(not std::isfinite(result.m_value.number_float)))
             {
-                JSON_THROW(json::out_of_range::create(406, "number overflow parsing '" + m_lexer.get_token_string() + "'"));
+                if (allow_exceptions)
+                {
+                    JSON_THROW(out_of_range::create(406, "number overflow parsing '" +
+                                                    Twine(m_lexer.get_token_string()) + "'"));
+                }
+                expect(token_type::uninitialized);
             }
-
             break;
+        }
+
+        case token_type::parse_error:
+        {
+            // using "uninitialized" to avoid "expected" message
+            if (not expect(token_type::uninitialized))
+            {
+                return;
+            }
+            break; // LCOV_EXCL_LINE
         }
 
         default:
         {
-            // the last token was unexpected
-            unexpect(last_token);
+            // the last token was unexpected; we expected a value
+            if (not expect(token_type::literal_or_value))
+            {
+                return;
+            }
+            break; // LCOV_EXCL_LINE
         }
     }
 
-    if (keep && callback && !callback(depth, parse_event_t::value, result))
+    if (keep and callback and not callback(depth, parse_event_t::value, result))
     {
-        result = json(value_t::discarded);
+        result.m_value.destroy(result.m_type);
+        result.m_type = value_t::discarded;
     }
-    return result;
 }
 
 bool json::parser::accept_internal()
 {
     switch (last_token)
     {
-        case lexer::token_type::begin_object:
+        case token_type::begin_object:
         {
             // read next token
             get_token();
 
             // closing } -> we are done
-            if (last_token == lexer::token_type::end_object)
+            if (last_token == token_type::end_object)
             {
                 return true;
             }
@@ -1942,50 +1811,45 @@ bool json::parser::accept_internal()
             while (true)
             {
                 // parse key
-                if (last_token != lexer::token_type::value_string)
+                if (last_token != token_type::value_string)
                 {
                     return false;
                 }
 
                 // parse separator (:)
                 get_token();
-                if (last_token != lexer::token_type::name_separator)
+                if (last_token != token_type::name_separator)
                 {
                     return false;
                 }
 
                 // parse value
                 get_token();
-                if (!accept_internal())
+                if (not accept_internal())
                 {
                     return false;
                 }
 
                 // comma -> next value
                 get_token();
-                if (last_token == lexer::token_type::value_separator)
+                if (last_token == token_type::value_separator)
                 {
                     get_token();
                     continue;
                 }
 
                 // closing }
-                if (last_token != lexer::token_type::end_object)
-                {
-                    return false;
-                }
-
-                return true;
+                return (last_token == token_type::end_object);
             }
         }
 
-        case lexer::token_type::begin_array:
+        case token_type::begin_array:
         {
             // read next token
             get_token();
 
             // closing ] -> we are done
-            if (last_token == lexer::token_type::end_array)
+            if (last_token == token_type::end_array)
             {
                 return true;
             }
@@ -1994,101 +1858,109 @@ bool json::parser::accept_internal()
             while (true)
             {
                 // parse value
-                if (!accept_internal())
+                if (not accept_internal())
                 {
                     return false;
                 }
 
                 // comma -> next value
                 get_token();
-                if (last_token == lexer::token_type::value_separator)
+                if (last_token == token_type::value_separator)
                 {
                     get_token();
                     continue;
                 }
 
                 // closing ]
-                if (last_token != lexer::token_type::end_array)
-                {
-                    return false;
-                }
-
-                return true;
+                return (last_token == token_type::end_array);
             }
         }
 
-        case lexer::token_type::literal_false:
-        case lexer::token_type::literal_null:
-        case lexer::token_type::literal_true:
-        case lexer::token_type::value_float:
-        case lexer::token_type::value_integer:
-        case lexer::token_type::value_string:
-        case lexer::token_type::value_unsigned:
+        case token_type::value_float:
         {
+            // reject infinity or NAN
+            return std::isfinite(m_lexer.get_number_float());
+        }
+
+        case token_type::literal_false:
+        case token_type::literal_null:
+        case token_type::literal_true:
+        case token_type::value_integer:
+        case token_type::value_string:
+        case token_type::value_unsigned:
             return true;
-        }
 
-        default:
-        {
-            // the last token was unexpected
+        default: // the last token was unexpected
             return false;
-        }
     }
 }
 
-void json::parser::expect(lexer::token_type t) const
+void json::parser::throw_exception() const
 {
-    if (JSON_UNLIKELY(t != last_token))
+    std::string error_msg = "syntax error - ";
+    if (last_token == token_type::parse_error)
     {
-        std::string error_msg = "syntax error - ";
-        if (last_token == lexer::token_type::parse_error)
-        {
-            error_msg += m_lexer.get_error_message() + "; last read: '" + m_lexer.get_token_string() + "'";
-        }
-        else
-        {
-            error_msg += "unexpected " + std::string(lexer::token_type_name(last_token));
-        }
-
-        error_msg += "; expected " + std::string(lexer::token_type_name(t));
-        JSON_THROW(json::parse_error::create(101, m_lexer.get_position(), error_msg));
+        error_msg += std::string(m_lexer.get_error_message()) + "; last read: '" +
+                     m_lexer.get_token_string() + "'";
     }
-}
-
-void json::parser::unexpect(lexer::token_type t) const
-{
-    if (JSON_UNLIKELY(t == last_token))
+    else
     {
-        std::string error_msg = "syntax error - ";
-        if (last_token == lexer::token_type::parse_error)
-        {
-            error_msg += m_lexer.get_error_message() + "; last read '" + m_lexer.get_token_string() + "'";
-        }
-        else
-        {
-            error_msg += "unexpected " + std::string(lexer::token_type_name(last_token));
-        }
-
-        JSON_THROW(json::parse_error::create(101, m_lexer.get_position(), error_msg));
+        error_msg += "unexpected " + std::string(lexer_t::token_type_name(last_token));
     }
+
+    if (expected != token_type::uninitialized)
+    {
+        error_msg += "; expected " + std::string(lexer_t::token_type_name(expected));
+    }
+
+    JSON_THROW(parse_error::create(101, m_lexer.get_position(), error_msg));
 }
 
-json json::parse(StringRef s, const parser_callback_t cb)
+json json::parse(StringRef s,
+                        const parser_callback_t cb,
+                        const bool allow_exceptions)
 {
-    wpi::raw_mem_istream is(s.data(), s.size());
-    return parser(is, cb).parse(true);
+    raw_mem_istream is(makeArrayRef(s.data(), s.size()));
+    return parse(is, cb, allow_exceptions);
 }
 
-json json::parse(wpi::raw_istream& i, const parser_callback_t cb)
+json json::parse(ArrayRef<uint8_t> arr,
+                        const parser_callback_t cb,
+                        const bool allow_exceptions)
 {
-    return parser(i, cb).parse(true);
+    raw_mem_istream is(arr);
+    return parse(is, cb, allow_exceptions);
 }
 
-namespace wpi {
-
-wpi::raw_istream& operator>>(wpi::raw_istream& i, json& j)
+json json::parse(raw_istream& i,
+                        const parser_callback_t cb,
+                        const bool allow_exceptions)
 {
-    j = json::parser(i).parse(false);
+    json result;
+    parser(i, cb, allow_exceptions).parse(true, result);
+    return result;
+}
+
+bool json::accept(StringRef s)
+{
+    raw_mem_istream is(makeArrayRef(s.data(), s.size()));
+    return parser(is).accept(true);
+}
+
+bool json::accept(ArrayRef<uint8_t> arr)
+{
+    raw_mem_istream is(arr);
+    return parser(is).accept(true);
+}
+
+bool json::accept(raw_istream& i)
+{
+    return parser(i).accept(true);
+}
+
+raw_istream& operator>>(raw_istream& i, json& j)
+{
+    json::parser(i).parse(false, j);
     return i;
 }
 
