@@ -829,7 +829,7 @@ TEST_F(JsonIteratorObjectTest, ConstCRBeginEnd)
     EXPECT_EQ(it, it_end);
 }
 #endif
-/* Disabled for ADL reasons
+
 TEST_F(JsonIteratorObjectTest, KeyValue)
 {
     auto it = j.begin();
@@ -839,7 +839,6 @@ TEST_F(JsonIteratorObjectTest, KeyValue)
     EXPECT_EQ(cit.key(), "A");
     EXPECT_EQ(cit.value(), json(1));
 }
-*/
 
 class JsonIteratorIntegerTest : public ::testing::Test {
  public:
