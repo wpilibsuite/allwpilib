@@ -718,7 +718,7 @@ TEST(JsonSwapTest, NonObjectT)
 TEST(JsonSwapTest, StringT)
 {
     json j = "Hello world";
-    json::string_t s = "Hallo Welt";
+    std::string s = "Hallo Welt";
 
     j.swap(s);
 
@@ -732,7 +732,7 @@ TEST(JsonSwapTest, StringT)
 TEST(JsonSwapTest, NonStringT)
 {
     json j = 17;
-    json::string_t s = "Hallo Welt";
+    std::string s = "Hallo Welt";
 
     EXPECT_THROW_MSG(j.swap(s), json::type_error,
                      "[json.exception.type_error.310] cannot use swap() with number");

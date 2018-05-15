@@ -78,11 +78,11 @@ TEST(JsonPointerTest, ObjectT)
     // check if null pointers are returned correctly
     EXPECT_NE(value.get_ptr<json::object_t*>(), nullptr);
     EXPECT_EQ(value.get_ptr<json::array_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::string_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::boolean_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_integer_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_unsigned_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_float_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<std::string*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<bool*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<int64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<uint64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<double*>(), nullptr);
 }
 
 // pointer access to const object_t
@@ -107,11 +107,11 @@ TEST(JsonPointerTest, ConstObjectT)
     // check if null pointers are returned correctly
     EXPECT_NE(value.get_ptr<const json::object_t*>(), nullptr);
     EXPECT_EQ(value.get_ptr<const json::array_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::string_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::boolean_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_integer_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_unsigned_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_float_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const std::string*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const bool*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const int64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const uint64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const double*>(), nullptr);
 }
 
 // pointer access to array_t
@@ -136,11 +136,11 @@ TEST(JsonPointerTest, ArrayT)
     // check if null pointers are returned correctly
     EXPECT_EQ(value.get_ptr<json::object_t*>(), nullptr);
     EXPECT_NE(value.get_ptr<json::array_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::string_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::boolean_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_integer_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_unsigned_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_float_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<std::string*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<bool*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<int64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<uint64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<double*>(), nullptr);
 }
 
 // pointer access to const array_t
@@ -165,17 +165,17 @@ TEST(JsonPointerTest, ConstArrayT)
     // check if null pointers are returned correctly
     EXPECT_EQ(value.get_ptr<const json::object_t*>(), nullptr);
     EXPECT_NE(value.get_ptr<const json::array_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::string_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::boolean_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_integer_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_unsigned_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_float_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const std::string*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const bool*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const int64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const uint64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const double*>(), nullptr);
 }
 
 // pointer access to string_t
 TEST(JsonPointerTest, StringT)
 {
-    using test_type = json::string_t;
+    using test_type = std::string;
     json value = "hello";
 
     // check if pointers are returned correctly
@@ -194,17 +194,17 @@ TEST(JsonPointerTest, StringT)
     // check if null pointers are returned correctly
     EXPECT_EQ(value.get_ptr<json::object_t*>(), nullptr);
     EXPECT_EQ(value.get_ptr<json::array_t*>(), nullptr);
-    EXPECT_NE(value.get_ptr<json::string_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::boolean_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_integer_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_unsigned_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_float_t*>(), nullptr);
+    EXPECT_NE(value.get_ptr<std::string*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<bool*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<int64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<uint64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<double*>(), nullptr);
 }
 
 // pointer access to const string_t
 TEST(JsonPointerTest, ConstStringT)
 {
-    using test_type = const json::string_t;
+    using test_type = const std::string;
     const json value = "hello";
 
     // check if pointers are returned correctly
@@ -223,17 +223,17 @@ TEST(JsonPointerTest, ConstStringT)
     // check if null pointers are returned correctly
     EXPECT_EQ(value.get_ptr<const json::object_t*>(), nullptr);
     EXPECT_EQ(value.get_ptr<const json::array_t*>(), nullptr);
-    EXPECT_NE(value.get_ptr<const json::string_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::boolean_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_integer_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_unsigned_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_float_t*>(), nullptr);
+    EXPECT_NE(value.get_ptr<const std::string*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const bool*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const int64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const uint64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const double*>(), nullptr);
 }
 
 // pointer access to boolean_t
 TEST(JsonPointerTest, BooleanT)
 {
-    using test_type = json::boolean_t;
+    using test_type = bool;
     json value = false;
 
     // check if pointers are returned correctly
@@ -252,17 +252,17 @@ TEST(JsonPointerTest, BooleanT)
     // check if null pointers are returned correctly
     EXPECT_EQ(value.get_ptr<json::object_t*>(), nullptr);
     EXPECT_EQ(value.get_ptr<json::array_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::string_t*>(), nullptr);
-    EXPECT_NE(value.get_ptr<json::boolean_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_integer_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_unsigned_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_float_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<std::string*>(), nullptr);
+    EXPECT_NE(value.get_ptr<bool*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<int64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<uint64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<double*>(), nullptr);
 }
 
 // pointer access to const boolean_t
 TEST(JsonPointerTest, ConstBooleanT)
 {
-    using test_type = const json::boolean_t;
+    using test_type = const bool;
     const json value = false;
 
     // check if pointers are returned correctly
@@ -281,17 +281,17 @@ TEST(JsonPointerTest, ConstBooleanT)
     // check if null pointers are returned correctly
     EXPECT_EQ(value.get_ptr<const json::object_t*>(), nullptr);
     EXPECT_EQ(value.get_ptr<const json::array_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::string_t*>(), nullptr);
-    EXPECT_NE(value.get_ptr<const json::boolean_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_integer_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_unsigned_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_float_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const std::string*>(), nullptr);
+    EXPECT_NE(value.get_ptr<const bool*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const int64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const uint64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const double*>(), nullptr);
 }
 
 // pointer access to number_integer_t
 TEST(JsonPointerTest, IntegerT)
 {
-    using test_type = json::number_integer_t;
+    using test_type = int64_t;
     json value = 23;
 
     // check if pointers are returned correctly
@@ -310,17 +310,17 @@ TEST(JsonPointerTest, IntegerT)
     // check if null pointers are returned correctly
     EXPECT_EQ(value.get_ptr<json::object_t*>(), nullptr);
     EXPECT_EQ(value.get_ptr<json::array_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::string_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::boolean_t*>(), nullptr);
-    EXPECT_NE(value.get_ptr<json::number_integer_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_unsigned_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_float_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<std::string*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<bool*>(), nullptr);
+    EXPECT_NE(value.get_ptr<int64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<uint64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<double*>(), nullptr);
 }
 
 // pointer access to const number_integer_t
 TEST(JsonPointerTest, ConstIntegerT)
 {
-    using test_type = const json::number_integer_t;
+    using test_type = const int64_t;
     const json value = 23;
 
     // check if pointers are returned correctly
@@ -339,17 +339,17 @@ TEST(JsonPointerTest, ConstIntegerT)
     // check if null pointers are returned correctly
     EXPECT_EQ(value.get_ptr<const json::object_t*>(), nullptr);
     EXPECT_EQ(value.get_ptr<const json::array_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::string_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::boolean_t*>(), nullptr);
-    EXPECT_NE(value.get_ptr<const json::number_integer_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_unsigned_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_float_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const std::string*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const bool*>(), nullptr);
+    EXPECT_NE(value.get_ptr<const int64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const uint64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const double*>(), nullptr);
 }
 
 // pointer access to number_unsigned_t
 TEST(JsonPointerTest, UnsignedT)
 {
-    using test_type = json::number_unsigned_t;
+    using test_type = uint64_t;
     json value = 23u;
 
     // check if pointers are returned correctly
@@ -368,17 +368,17 @@ TEST(JsonPointerTest, UnsignedT)
     // check if null pointers are returned correctly
     EXPECT_EQ(value.get_ptr<json::object_t*>(), nullptr);
     EXPECT_EQ(value.get_ptr<json::array_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::string_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::boolean_t*>(), nullptr);
-    EXPECT_NE(value.get_ptr<json::number_integer_t*>(), nullptr);
-    EXPECT_NE(value.get_ptr<json::number_unsigned_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_float_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<std::string*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<bool*>(), nullptr);
+    EXPECT_NE(value.get_ptr<int64_t*>(), nullptr);
+    EXPECT_NE(value.get_ptr<uint64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<double*>(), nullptr);
 }
 
 // pointer access to const number_unsigned_t
 TEST(JsonPointerTest, ConstUnsignedT)
 {
-    using test_type = const json::number_unsigned_t;
+    using test_type = const uint64_t;
     const json value = 23u;
 
     // check if pointers are returned correctly
@@ -397,17 +397,17 @@ TEST(JsonPointerTest, ConstUnsignedT)
     // check if null pointers are returned correctly
     EXPECT_EQ(value.get_ptr<const json::object_t*>(), nullptr);
     EXPECT_EQ(value.get_ptr<const json::array_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::string_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::boolean_t*>(), nullptr);
-    EXPECT_NE(value.get_ptr<const json::number_integer_t*>(), nullptr);
-    EXPECT_NE(value.get_ptr<const json::number_unsigned_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_float_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const std::string*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const bool*>(), nullptr);
+    EXPECT_NE(value.get_ptr<const int64_t*>(), nullptr);
+    EXPECT_NE(value.get_ptr<const uint64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const double*>(), nullptr);
 }
 
 // pointer access to number_float_t
 TEST(JsonPointerTest, FloatT)
 {
-    using test_type = json::number_float_t;
+    using test_type = double;
     json value = 42.23;
 
     // check if pointers are returned correctly
@@ -426,17 +426,17 @@ TEST(JsonPointerTest, FloatT)
     // check if null pointers are returned correctly
     EXPECT_EQ(value.get_ptr<json::object_t*>(), nullptr);
     EXPECT_EQ(value.get_ptr<json::array_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::string_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::boolean_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_integer_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<json::number_unsigned_t*>(), nullptr);
-    EXPECT_NE(value.get_ptr<json::number_float_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<std::string*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<bool*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<int64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<uint64_t*>(), nullptr);
+    EXPECT_NE(value.get_ptr<double*>(), nullptr);
 }
 
 // pointer access to const number_float_t
 TEST(JsonPointerTest, ConstFloatT)
 {
-    using test_type = const json::number_float_t;
+    using test_type = const double;
     const json value = 42.23;
 
     // check if pointers are returned correctly
@@ -455,9 +455,9 @@ TEST(JsonPointerTest, ConstFloatT)
     // check if null pointers are returned correctly
     EXPECT_EQ(value.get_ptr<const json::object_t*>(), nullptr);
     EXPECT_EQ(value.get_ptr<const json::array_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::string_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::boolean_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_integer_t*>(), nullptr);
-    EXPECT_EQ(value.get_ptr<const json::number_unsigned_t*>(), nullptr);
-    EXPECT_NE(value.get_ptr<const json::number_float_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const std::string*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const bool*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const int64_t*>(), nullptr);
+    EXPECT_EQ(value.get_ptr<const uint64_t*>(), nullptr);
+    EXPECT_NE(value.get_ptr<const double*>(), nullptr);
 }

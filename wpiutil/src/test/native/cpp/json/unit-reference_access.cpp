@@ -55,10 +55,10 @@ TEST(JsonReferenceTest, ObjectT)
     // check if mismatching references throw correctly
     EXPECT_NO_THROW(value.get_ref<json::object_t&>());
     EXPECT_ANY_THROW(value.get_ref<json::array_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::string_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::boolean_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::number_integer_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::number_float_t&>());
+    EXPECT_ANY_THROW(value.get_ref<std::string&>());
+    EXPECT_ANY_THROW(value.get_ref<bool&>());
+    EXPECT_ANY_THROW(value.get_ref<int64_t&>());
+    EXPECT_ANY_THROW(value.get_ref<double&>());
 }
 
 // const reference access to const object_t
@@ -94,16 +94,16 @@ TEST(JsonReferenceTest, ArrayT)
     // check if mismatching references throw correctly
     EXPECT_ANY_THROW(value.get_ref<json::object_t&>());
     EXPECT_NO_THROW(value.get_ref<json::array_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::string_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::boolean_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::number_integer_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::number_float_t&>());
+    EXPECT_ANY_THROW(value.get_ref<std::string&>());
+    EXPECT_ANY_THROW(value.get_ref<bool&>());
+    EXPECT_ANY_THROW(value.get_ref<int64_t&>());
+    EXPECT_ANY_THROW(value.get_ref<double&>());
 }
 
 // reference access to string_t
 TEST(JsonReferenceTest, StringT)
 {
-    using test_type = json::string_t;
+    using test_type = std::string;
     json value = "hello";
 
     // check if references are returned correctly
@@ -118,16 +118,16 @@ TEST(JsonReferenceTest, StringT)
     // check if mismatching references throw correctly
     EXPECT_ANY_THROW(value.get_ref<json::object_t&>());
     EXPECT_ANY_THROW(value.get_ref<json::array_t&>());
-    EXPECT_NO_THROW(value.get_ref<json::string_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::boolean_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::number_integer_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::number_float_t&>());
+    EXPECT_NO_THROW(value.get_ref<std::string&>());
+    EXPECT_ANY_THROW(value.get_ref<bool&>());
+    EXPECT_ANY_THROW(value.get_ref<int64_t&>());
+    EXPECT_ANY_THROW(value.get_ref<double&>());
 }
 
 // reference access to boolean_t
 TEST(JsonReferenceTest, BooleanT)
 {
-    using test_type = json::boolean_t;
+    using test_type = bool;
     json value = false;
 
     // check if references are returned correctly
@@ -142,16 +142,16 @@ TEST(JsonReferenceTest, BooleanT)
     // check if mismatching references throw correctly
     EXPECT_ANY_THROW(value.get_ref<json::object_t&>());
     EXPECT_ANY_THROW(value.get_ref<json::array_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::string_t&>());
-    EXPECT_NO_THROW(value.get_ref<json::boolean_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::number_integer_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::number_float_t&>());
+    EXPECT_ANY_THROW(value.get_ref<std::string&>());
+    EXPECT_NO_THROW(value.get_ref<bool&>());
+    EXPECT_ANY_THROW(value.get_ref<int64_t&>());
+    EXPECT_ANY_THROW(value.get_ref<double&>());
 }
 
 // reference access to number_integer_t
 TEST(JsonReferenceTest, IntegerT)
 {
-    using test_type = json::number_integer_t;
+    using test_type = int64_t;
     json value = 23;
 
     // check if references are returned correctly
@@ -166,16 +166,16 @@ TEST(JsonReferenceTest, IntegerT)
     // check if mismatching references throw correctly
     EXPECT_ANY_THROW(value.get_ref<json::object_t&>());
     EXPECT_ANY_THROW(value.get_ref<json::array_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::string_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::boolean_t&>());
-    EXPECT_NO_THROW(value.get_ref<json::number_integer_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::number_float_t&>());
+    EXPECT_ANY_THROW(value.get_ref<std::string&>());
+    EXPECT_ANY_THROW(value.get_ref<bool&>());
+    EXPECT_NO_THROW(value.get_ref<int64_t&>());
+    EXPECT_ANY_THROW(value.get_ref<double&>());
 }
 
 // reference access to number_float_t
 TEST(JsonReferenceTest, FloatT)
 {
-    using test_type = json::number_float_t;
+    using test_type = double;
     json value = 42.23;
 
     // check if references are returned correctly
@@ -190,8 +190,8 @@ TEST(JsonReferenceTest, FloatT)
     // check if mismatching references throw correctly
     EXPECT_ANY_THROW(value.get_ref<json::object_t&>());
     EXPECT_ANY_THROW(value.get_ref<json::array_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::string_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::boolean_t&>());
-    EXPECT_ANY_THROW(value.get_ref<json::number_integer_t&>());
-    EXPECT_NO_THROW(value.get_ref<json::number_float_t&>());
+    EXPECT_ANY_THROW(value.get_ref<std::string&>());
+    EXPECT_ANY_THROW(value.get_ref<bool&>());
+    EXPECT_ANY_THROW(value.get_ref<int64_t&>());
+    EXPECT_NO_THROW(value.get_ref<double&>());
 }

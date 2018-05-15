@@ -45,6 +45,8 @@ using wpi::json;
 #include <unordered_map>
 #include <unordered_set>
 
+#include "wpi/raw_ostream.h"
+
 TEST(JsonReadmeTest, Basic)
 {
     // create an empty structure (null)

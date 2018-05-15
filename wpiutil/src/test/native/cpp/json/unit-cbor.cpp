@@ -50,7 +50,7 @@ TEST(CborDiscardedTest, Case)
 TEST(CborNullTest, Case)
 {
     json j = nullptr;
-    std::string expected = "\xf6";
+    std::vector<uint8_t> expected = {0xf6};
     const auto result = json::to_cbor(j);
     EXPECT_EQ(result, expected);
 
@@ -61,7 +61,7 @@ TEST(CborNullTest, Case)
 TEST(CborBooleanTest, True)
 {
     json j = true;
-    std::string expected = "\xf5";
+    std::vector<uint8_t> expected = {0xf5};
     const auto result = json::to_cbor(j);
     EXPECT_EQ(result, expected);
 
@@ -72,7 +72,7 @@ TEST(CborBooleanTest, True)
 TEST(CborBooleanTest, False)
 {
     json j = false;
-    std::string expected = "\xf4";
+    std::vector<uint8_t> expected = {0xf4};
     const auto result = json::to_cbor(j);
     EXPECT_EQ(result, expected);
 
@@ -91,17 +91,17 @@ TEST_P(CborSignedNeg8Test, Case)
     ASSERT_TRUE(j.is_number_integer());
 
     // create expected byte vector
-    std::string expected;
-    expected.push_back(static_cast<char>(0x3b));
+    std::vector<uint8_t> expected;
+    expected.push_back(static_cast<uint8_t>(0x3b));
     uint64_t positive = static_cast<uint64_t>(-1 - GetParam());
-    expected.push_back(static_cast<char>((positive >> 56) & 0xff));
-    expected.push_back(static_cast<char>((positive >> 48) & 0xff));
-    expected.push_back(static_cast<char>((positive >> 40) & 0xff));
-    expected.push_back(static_cast<char>((positive >> 32) & 0xff));
-    expected.push_back(static_cast<char>((positive >> 24) & 0xff));
-    expected.push_back(static_cast<char>((positive >> 16) & 0xff));
-    expected.push_back(static_cast<char>((positive >> 8) & 0xff));
-    expected.push_back(static_cast<char>(positive & 0xff));
+    expected.push_back(static_cast<uint8_t>((positive >> 56) & 0xff));
+    expected.push_back(static_cast<uint8_t>((positive >> 48) & 0xff));
+    expected.push_back(static_cast<uint8_t>((positive >> 40) & 0xff));
+    expected.push_back(static_cast<uint8_t>((positive >> 32) & 0xff));
+    expected.push_back(static_cast<uint8_t>((positive >> 24) & 0xff));
+    expected.push_back(static_cast<uint8_t>((positive >> 16) & 0xff));
+    expected.push_back(static_cast<uint8_t>((positive >> 8) & 0xff));
+    expected.push_back(static_cast<uint8_t>(positive & 0xff));
 
     // compare result + size
     const auto result = json::to_cbor(j);
@@ -153,13 +153,13 @@ TEST_P(CborSignedNeg4Test, Case)
     ASSERT_TRUE(j.is_number_integer());
 
     // create expected byte vector
-    std::string expected;
-    expected.push_back(static_cast<char>(0x3a));
+    std::vector<uint8_t> expected;
+    expected.push_back(static_cast<uint8_t>(0x3a));
     uint32_t positive = static_cast<uint32_t>(static_cast<uint64_t>(-1 - GetParam()) & 0x00000000ffffffff);
-    expected.push_back(static_cast<char>((positive >> 24) & 0xff));
-    expected.push_back(static_cast<char>((positive >> 16) & 0xff));
-    expected.push_back(static_cast<char>((positive >> 8) & 0xff));
-    expected.push_back(static_cast<char>(positive & 0xff));
+    expected.push_back(static_cast<uint8_t>((positive >> 24) & 0xff));
+    expected.push_back(static_cast<uint8_t>((positive >> 16) & 0xff));
+    expected.push_back(static_cast<uint8_t>((positive >> 8) & 0xff));
+    expected.push_back(static_cast<uint8_t>(positive & 0xff));
 
     // compare result + size
     const auto result = json::to_cbor(j);
@@ -205,11 +205,11 @@ TEST(CborSignedTest, Neg2)
         ASSERT_TRUE(j.is_number_integer());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(0x39));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0x39));
         uint16_t positive = static_cast<uint16_t>(-1 - i);
-        expected.push_back(static_cast<char>((positive >> 8) & 0xff));
-        expected.push_back(static_cast<char>(positive & 0xff));
+        expected.push_back(static_cast<uint8_t>((positive >> 8) & 0xff));
+        expected.push_back(static_cast<uint8_t>(positive & 0xff));
 
         // compare result + size
         const auto result = json::to_cbor(j);
@@ -231,7 +231,7 @@ TEST(CborSignedTest, Neg2)
 TEST(CborSignedTest, NegInt16)
 {
     json j = -9263;
-    std::string expected = "\x39\x24\x2e";
+    std::vector<uint8_t> expected = {0x39,0x24,0x2e};
 
     const auto result = json::to_cbor(j);
     ASSERT_EQ(result, expected);
@@ -257,9 +257,9 @@ TEST(CborSignedTest, Neg1)
         ASSERT_TRUE(j.is_number_integer());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(0x38);
-        expected.push_back(static_cast<char>(-1 - i));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0x38));
+        expected.push_back(static_cast<uint8_t>(-1 - i));
 
         // compare result + size
         const auto result = json::to_cbor(j);
@@ -289,8 +289,8 @@ TEST(CborSignedTest, Neg0)
         ASSERT_TRUE(j.is_number_integer());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(0x20 - 1 - static_cast<uint8_t>(i)));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0x20 - 1 - static_cast<uint8_t>(i)));
 
         // compare result + size
         const auto result = json::to_cbor(j);
@@ -314,14 +314,14 @@ TEST(CborSignedTest, Pos0)
 
         // create JSON value with integer number
         json j = -1;
-        j.get_ref<json::number_integer_t&>() = static_cast<json::number_integer_t>(i);
+        j.get_ref<int64_t&>() = static_cast<int64_t>(i);
 
         // check type
         ASSERT_TRUE(j.is_number_integer());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(i));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(i));
 
         // compare result + size
         const auto result = json::to_cbor(j);
@@ -329,7 +329,7 @@ TEST(CborSignedTest, Pos0)
         ASSERT_EQ(result.size(), 1u);
 
         // check individual bytes
-        EXPECT_EQ(result[0], static_cast<char>(i));
+        EXPECT_EQ(result[0], static_cast<uint8_t>(i));
 
         // roundtrip
         EXPECT_EQ(json::from_cbor(result), j);
@@ -345,15 +345,15 @@ TEST(CborSignedTest, Pos1)
 
         // create JSON value with integer number
         json j = -1;
-        j.get_ref<json::number_integer_t&>() = static_cast<json::number_integer_t>(i);
+        j.get_ref<int64_t&>() = static_cast<int64_t>(i);
 
         // check type
         ASSERT_TRUE(j.is_number_integer());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(0x18));
-        expected.push_back(static_cast<char>(i));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0x18));
+        expected.push_back(static_cast<uint8_t>(i));
 
         // compare result + size
         const auto result = json::to_cbor(j);
@@ -362,7 +362,7 @@ TEST(CborSignedTest, Pos1)
 
         // check individual bytes
         EXPECT_EQ(result[0], 0x18);
-        EXPECT_EQ(result[1], static_cast<char>(i));
+        EXPECT_EQ(result[1], static_cast<uint8_t>(i));
 
         // roundtrip
         EXPECT_EQ(json::from_cbor(result), j);
@@ -378,16 +378,16 @@ TEST(CborSignedTest, Pos2)
 
         // create JSON value with integer number
         json j = -1;
-        j.get_ref<json::number_integer_t&>() = static_cast<json::number_integer_t>(i);
+        j.get_ref<int64_t&>() = static_cast<int64_t>(i);
 
         // check type
         ASSERT_TRUE(j.is_number_integer());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(0x19));
-        expected.push_back(static_cast<char>((i >> 8) & 0xff));
-        expected.push_back(static_cast<char>(i & 0xff));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0x19));
+        expected.push_back(static_cast<uint8_t>((i >> 8) & 0xff));
+        expected.push_back(static_cast<uint8_t>(i & 0xff));
 
         // compare result + size
         const auto result = json::to_cbor(j);
@@ -410,19 +410,19 @@ TEST_P(CborSignedPos4Test, Case)
 {
     // create JSON value with integer number
     json j = -1;
-    j.get_ref<json::number_integer_t&>() =
-        static_cast<json::number_integer_t>(GetParam());
+    j.get_ref<int64_t&>() =
+        static_cast<int64_t>(GetParam());
 
     // check type
     ASSERT_TRUE(j.is_number_integer());
 
     // create expected byte vector
-    std::string expected;
+    std::vector<uint8_t> expected;
     expected.push_back(0x1a);
-    expected.push_back(static_cast<char>((GetParam() >> 24) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 16) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 8) & 0xff));
-    expected.push_back(static_cast<char>(GetParam() & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 24) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 16) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 8) & 0xff));
+    expected.push_back(static_cast<uint8_t>(GetParam() & 0xff));
 
     // compare result + size
     const auto result = json::to_cbor(j);
@@ -456,23 +456,23 @@ TEST_P(CborSignedPos8Test, Case)
 {
     // create JSON value with integer number
     json j = -1;
-    j.get_ref<json::number_integer_t&>() =
-        static_cast<json::number_integer_t>(GetParam());
+    j.get_ref<int64_t&>() =
+        static_cast<int64_t>(GetParam());
 
     // check type
     ASSERT_TRUE(j.is_number_integer());
 
     // create expected byte vector
-    std::string expected;
+    std::vector<uint8_t> expected;
     expected.push_back(0x1b);
-    expected.push_back(static_cast<char>((GetParam() >> 070) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 060) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 050) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 040) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 030) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 020) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 010) & 0xff));
-    expected.push_back(static_cast<char>(GetParam() & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 070) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 060) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 050) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 040) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 030) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 020) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 010) & 0xff));
+    expected.push_back(static_cast<uint8_t>(GetParam() & 0xff));
 
     // compare result + size
     const auto result = json::to_cbor(j);
@@ -517,10 +517,10 @@ INSTANTIATE_TEST_CASE_P(CborSignedPos8Tests, CborSignedPos8Test,
         ASSERT_TRUE(j.is_number_integer());
 
         // create expected byte vector
-        std::string expected;
+        std::vector<uint8_t> expected;
         expected.push_back(0xd1);
-        expected.push_back(static_cast<char>((i >> 8) & 0xff));
-        expected.push_back(static_cast<char>(i & 0xff));
+        expected.push_back(static_cast<uint8_t>((i >> 8) & 0xff));
+        expected.push_back(static_cast<uint8_t>(i & 0xff));
 
         // compare result + size
         const auto result = json::to_msgpack(j);
@@ -552,8 +552,8 @@ TEST(CborUnsignedTest, Pos0)
         ASSERT_TRUE(j.is_number_unsigned());
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(i));
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(i));
 
         // compare result + size
         const auto result = json::to_cbor(j);
@@ -561,7 +561,7 @@ TEST(CborUnsignedTest, Pos0)
         ASSERT_EQ(result.size(), 1u);
 
         // check individual bytes
-        EXPECT_EQ(result[0], static_cast<char>(i));
+        EXPECT_EQ(result[0], static_cast<uint8_t>(i));
 
         // roundtrip
         EXPECT_EQ(json::from_cbor(result), j);
@@ -582,9 +582,9 @@ TEST(CborUnsignedTest, Pos1)
         ASSERT_TRUE(j.is_number_unsigned());
 
         // create expected byte vector
-        std::string expected;
+        std::vector<uint8_t> expected;
         expected.push_back(0x18);
-        expected.push_back(static_cast<char>(i));
+        expected.push_back(static_cast<uint8_t>(i));
 
         // compare result + size
         const auto result = json::to_cbor(j);
@@ -615,10 +615,10 @@ TEST(CborUnsignedTest, Pos2)
         ASSERT_TRUE(j.is_number_unsigned());
 
         // create expected byte vector
-        std::string expected;
+        std::vector<uint8_t> expected;
         expected.push_back(0x19);
-        expected.push_back(static_cast<char>((i >> 8) & 0xff));
-        expected.push_back(static_cast<char>(i & 0xff));
+        expected.push_back(static_cast<uint8_t>((i >> 8) & 0xff));
+        expected.push_back(static_cast<uint8_t>(i & 0xff));
 
         // compare result + size
         const auto result = json::to_cbor(j);
@@ -646,12 +646,12 @@ TEST_P(CborUnsignedPos4Test, Case)
     ASSERT_TRUE(j.is_number_unsigned());
 
     // create expected byte vector
-    std::string expected;
+    std::vector<uint8_t> expected;
     expected.push_back(0x1a);
-    expected.push_back(static_cast<char>((GetParam() >> 24) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 16) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 8) & 0xff));
-    expected.push_back(static_cast<char>(GetParam() & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 24) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 16) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 8) & 0xff));
+    expected.push_back(static_cast<uint8_t>(GetParam() & 0xff));
 
     // compare result + size
     const auto result = json::to_cbor(j);
@@ -684,16 +684,16 @@ TEST_P(CborUnsignedPos8Test, Case)
     ASSERT_TRUE(j.is_number_unsigned());
 
     // create expected byte vector
-    std::string expected;
+    std::vector<uint8_t> expected;
     expected.push_back(0x1b);
-    expected.push_back(static_cast<char>((GetParam() >> 070) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 060) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 050) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 040) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 030) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 020) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 010) & 0xff));
-    expected.push_back(static_cast<char>(GetParam() & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 070) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 060) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 050) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 040) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 030) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 020) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 010) & 0xff));
+    expected.push_back(static_cast<uint8_t>(GetParam() & 0xff));
 
     // compare result + size
     const auto result = json::to_cbor(j);
@@ -724,7 +724,7 @@ TEST(CborFloatTest, Number)
 {
     double v = 3.1415925;
     json j = v;
-    std::string expected = "\xfb\x40\x09\x21\xfb\x3f\xa6\xde\xfc";
+    std::vector<uint8_t> expected = {0xfb,0x40,0x09,0x21,0xfb,0x3f,0xa6,0xde,0xfc};
     const auto result = json::to_cbor(j);
     EXPECT_EQ(result, expected);
 
@@ -735,16 +735,16 @@ TEST(CborFloatTest, Number)
 
 TEST(CborFloatTest, HalfInfinity)
 {
-    json j = json::from_cbor(wpi::StringRef("\xf9\x7c\x00", 3));
-    json::number_float_t d = j;
+    json j = json::from_cbor(std::vector<uint8_t>({0xf9,0x7c,0x00}));
+    double d = j;
     EXPECT_FALSE(std::isfinite(d));
     EXPECT_EQ(j.dump(), "null");
 }
 
 TEST(CborFloatTest, HalfNaN)
 {
-    json j = json::from_cbor("\xf9\x7c\x01");
-    json::number_float_t d = j;
+    json j = json::from_cbor(std::vector<uint8_t>({0xf9,0x7c,0x01}));
+    double d = j;
     EXPECT_TRUE(std::isnan(d));
     EXPECT_EQ(j.dump(), "null");
 }
@@ -761,9 +761,12 @@ TEST(CborStringTest, String1)
         json j = s;
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(static_cast<char>(0x60 + N));
-        expected.append(s);
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0x60 + N));
+        for (size_t i = 0; i < N; ++i)
+        {
+            expected.push_back('x');
+        }
 
         // compare result + size
         const auto result = json::to_cbor(j);
@@ -792,10 +795,13 @@ TEST(CborStringTest, String2)
         json j = s;
 
         // create expected byte vector
-        std::string expected;
-        expected.push_back(0x78);
-        expected.push_back(static_cast<char>(N));
-        expected.append(s);
+        std::vector<uint8_t> expected;
+        expected.push_back(static_cast<uint8_t>(0x78));
+        expected.push_back(static_cast<uint8_t>(N));
+        for (size_t i = 0; i < N; ++i)
+        {
+            expected.push_back('x');
+        }
 
         // compare result + size
         const auto result = json::to_cbor(j);
@@ -818,11 +824,14 @@ TEST_P(CborString3Test, Case)
     json j = s;
 
     // create expected byte vector
-    std::string expected;
+    std::vector<uint8_t> expected;
     expected.push_back(0x79);
-    expected.push_back(static_cast<char>((GetParam() >> 8) & 0xff));
-    expected.push_back(static_cast<char>(GetParam() & 0xff));
-    expected.append(s);
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 8) & 0xff));
+    expected.push_back(static_cast<uint8_t>(GetParam() & 0xff));
+    for (size_t i = 0; i < GetParam(); ++i)
+    {
+        expected.push_back('x');
+    }
 
     // compare result + size
     const auto result = json::to_cbor(j);
@@ -856,13 +865,16 @@ TEST_P(CborString5Test, Case)
     json j = s;
 
     // create expected byte vector
-    std::string expected;
+    std::vector<uint8_t> expected;
     expected.push_back(0x7a);
-    expected.push_back(static_cast<char>((GetParam() >> 24) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 16) & 0xff));
-    expected.push_back(static_cast<char>((GetParam() >> 8) & 0xff));
-    expected.push_back(static_cast<char>(GetParam() & 0xff));
-    expected.append(s);
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 24) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 16) & 0xff));
+    expected.push_back(static_cast<uint8_t>((GetParam() >> 8) & 0xff));
+    expected.push_back(static_cast<uint8_t>(GetParam() & 0xff));
+    for (size_t i = 0; i < GetParam(); ++i)
+    {
+        expected.push_back('x');
+    }
 
     // compare result + size
     const auto result = json::to_cbor(j);
@@ -887,7 +899,7 @@ INSTANTIATE_TEST_CASE_P(CborString5Tests, CborString5Test,
 TEST(CborArrayTest, Empty)
 {
     json j = json::array();
-    std::string expected = "\x80";
+    std::vector<uint8_t> expected = {0x80};
     const auto result = json::to_cbor(j);
     EXPECT_EQ(result, expected);
 
@@ -899,7 +911,7 @@ TEST(CborArrayTest, Empty)
 TEST(CborArrayTest, Null)
 {
     json j = {nullptr};
-    std::string expected = "\x81\xf6";
+    std::vector<uint8_t> expected = {0x81,0xf6};
     const auto result = json::to_cbor(j);
     EXPECT_EQ(result, expected);
 
@@ -911,7 +923,7 @@ TEST(CborArrayTest, Null)
 TEST(CborArrayTest, Simple)
 {
     json j = json::parse("[1,2,3,4,5]");
-    std::string expected = "\x85\x01\x02\x03\x04\x05";
+    std::vector<uint8_t> expected = {0x85,0x01,0x02,0x03,0x04,0x05};
     const auto result = json::to_cbor(j);
     EXPECT_EQ(result, expected);
 
@@ -923,7 +935,7 @@ TEST(CborArrayTest, Simple)
 TEST(CborArrayTest, NestEmpty)
 {
     json j = json::parse("[[[[]]]]");
-    std::string expected = "\x81\x81\x81\x80";
+    std::vector<uint8_t> expected = {0x81,0x81,0x81,0x80};
     const auto result = json::to_cbor(j);
     EXPECT_EQ(result, expected);
 
@@ -935,7 +947,7 @@ TEST(CborArrayTest, NestEmpty)
 TEST(CborArrayTest, UInt16)
 {
     json j(257, nullptr);
-    std::string expected(j.size() + 3, static_cast<char>(0xf6)); // all null
+    std::vector<uint8_t> expected(j.size() + 3, 0xf6); // all null
     expected[0] = static_cast<char>(0x99); // array 16 bit
     expected[1] = 0x01; // size (0x0101), byte 0
     expected[2] = 0x01; // size (0x0101), byte 1
@@ -950,7 +962,7 @@ TEST(CborArrayTest, UInt16)
 TEST(CborArrayTest, UInt32)
 {
     json j(65793, nullptr);
-    std::string expected(j.size() + 5, static_cast<char>(0xf6)); // all null
+    std::vector<uint8_t> expected(j.size() + 5, 0xf6); // all null
     expected[0] = static_cast<char>(0x9a); // array 32 bit
     expected[1] = 0x00; // size (0x00010101), byte 0
     expected[2] = 0x01; // size (0x00010101), byte 1
@@ -968,7 +980,7 @@ TEST(CborArrayTest, UInt32)
 TEST(CborArrayTest, UInt64)
 {
     json j(4294967296, nullptr);
-    std::string expected(j.size() + 9, static_cast<char>(0xf6)); // all null
+    std::vector<uint8_t> expected(j.size() + 9, 0xf6); // all null
     expected[0] = 0x9b; // array 64 bit
     expected[1] = 0x00; // size (0x0000000100000000), byte 0
     expected[2] = 0x00; // size (0x0000000100000000), byte 1
@@ -989,7 +1001,7 @@ TEST(CborArrayTest, UInt64)
 TEST(CborObjectTest, Empty)
 {
     json j = json::object();
-    std::string expected = "\xa0";
+    std::vector<uint8_t> expected = {0xa0};
     const auto result = json::to_cbor(j);
     EXPECT_EQ(result, expected);
 
@@ -1001,7 +1013,7 @@ TEST(CborObjectTest, Empty)
 TEST(CborObjectTest, EmptyKey)
 {
     json j = {{"", nullptr}};
-    std::string expected = "\xa1\x60\xf6";
+    std::vector<uint8_t> expected = {0xa1,0x60,0xf6};
     const auto result = json::to_cbor(j);
     EXPECT_EQ(result, expected);
 
@@ -1013,7 +1025,7 @@ TEST(CborObjectTest, EmptyKey)
 TEST(CborObjectTest, NestedEmpty)
 {
     json j = json::parse("{\"a\": {\"b\": {\"c\": {}}}}");
-    std::string expected = "\xa1\x61\x61\xa1\x61\x62\xa1\x61\x63\xa0";
+    std::vector<uint8_t> expected = {0xa1,0x61,0x61,0xa1,0x61,0x62,0xa1,0x61,0x63,0xa0};
     const auto result = json::to_cbor(j);
     EXPECT_EQ(result, expected);
 
@@ -1042,8 +1054,8 @@ TEST(CborObjectTest, UInt8)
     // size and the overall size. The rest is then handled in the
     // roundtrip check.
     ASSERT_EQ(result.size(), 1787u); // 1 type, 1 size, 255*7 content
-    EXPECT_EQ(result[0], static_cast<char>(0xb8)); // map 8 bit
-    EXPECT_EQ(result[1], static_cast<char>(0xff)); // size byte (0xff)
+    EXPECT_EQ(result[0], static_cast<uint8_t>(0xb8)); // map 8 bit
+    EXPECT_EQ(result[1], static_cast<uint8_t>(0xff)); // size byte (0xff)
     // roundtrip
     EXPECT_EQ(json::from_cbor(result), j);
 }
@@ -1069,7 +1081,7 @@ TEST(CborObjectTest, UInt16)
     // size and the overall size. The rest is then handled in the
     // roundtrip check.
     ASSERT_EQ(result.size(), 1795u); // 1 type, 2 size, 256*7 content
-    EXPECT_EQ(result[0], static_cast<char>(0xb9)); // map 16 bit
+    EXPECT_EQ(result[0], static_cast<uint8_t>(0xb9)); // map 16 bit
     EXPECT_EQ(result[1], 0x01); // byte 0 of size (0x0100)
     EXPECT_EQ(result[2], 0x00); // byte 1 of size (0x0100)
 
@@ -1098,7 +1110,7 @@ TEST(CborObjectTest, UInt32)
     // size and the overall size. The rest is then handled in the
     // roundtrip check.
     ASSERT_EQ(result.size(), 458757u); // 1 type, 4 size, 65536*7 content
-    EXPECT_EQ(result[0], static_cast<char>(0xba)); // map 32 bit
+    EXPECT_EQ(result[0], static_cast<uint8_t>(0xba)); // map 32 bit
     EXPECT_EQ(result[1], 0x00); // byte 0 of size (0x00010000)
     EXPECT_EQ(result[2], 0x01); // byte 1 of size (0x00010000)
     EXPECT_EQ(result[3], 0x00); // byte 2 of size (0x00010000)
@@ -1111,7 +1123,7 @@ TEST(CborObjectTest, UInt32)
 // 0x7b (string)
 TEST(CborAdditionalDeserializationTest, Case7b)
 {
-    std::string given("\x7b\x00\x00\x00\x00\x00\x00\x00\x01\x61", 10);
+    std::vector<uint8_t> given{0x7b,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x61};
     json j = json::from_cbor(given);
     EXPECT_EQ(j, "a");
 }
@@ -1119,7 +1131,7 @@ TEST(CborAdditionalDeserializationTest, Case7b)
 // 0x9b (array)
 TEST(CborAdditionalDeserializationTest, Case9b)
 {
-    std::string given("\x9b\x00\x00\x00\x00\x00\x00\x00\x01\xf4", 10);
+    std::vector<uint8_t> given{0x9b,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0xf4};
     json j = json::from_cbor(given);
     EXPECT_EQ(j, json::parse("[false]"));
 }
@@ -1127,101 +1139,101 @@ TEST(CborAdditionalDeserializationTest, Case9b)
 // 0xbb (map)
 TEST(CborAdditionalDeserializationTest, Casebb)
 {
-    std::string given("\xbb\x00\x00\x00\x00\x00\x00\x00\x01\x60\xf4", 11);
+    std::vector<uint8_t> given{0xbb,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x60,0xf4};
     json j = json::from_cbor(given);
     EXPECT_EQ(j, json::parse("{\"\": false}"));
 }
 
 TEST(CborErrorTest, TooShortByteVector)
 {
-    EXPECT_THROW_MSG(json::from_cbor("\x18"), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x18})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor("\x19"), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x19})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x19\x00", 2)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x19,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 3: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor("\x1a"), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1a})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1a\x00", 2)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1a,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 3: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1a\x00\x00", 3)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1a,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 4: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1a\x00\x00\x00", 4)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1a,0x00,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 5: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor("\x1b"), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1b})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 2: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00", 2)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1b,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 3: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00\x00", 3)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1b,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 4: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00\x00\x00", 4)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1b,0x00,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 5: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00\x00\x00\x00", 5)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1b,0x00,0x00,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 6: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00\x00\x00\x00\x00", 6)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1b,0x00,0x00,0x00,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 7: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00\x00\x00\x00\x00\x00", 7)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1b,0x00,0x00,0x00,0x00,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 8: unexpected end of input");
-    EXPECT_THROW_MSG(json::from_cbor(wpi::StringRef("\x1b\x00\x00\x00\x00\x00\x00\x00", 8)), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1b,0x00,0x00,0x00,0x00,0x00,0x00,0x00})), json::parse_error,
                      "[json.exception.parse_error.110] parse error at 9: unexpected end of input");
 }
 
 TEST(CborErrorTest, UnsupportedBytesConcrete)
 {
-    EXPECT_THROW_MSG(json::from_cbor("\x1c"), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1c})), json::parse_error,
                      "[json.exception.parse_error.112] parse error at 1: error reading CBOR; last byte: 0x1c");
-    EXPECT_THROW_MSG(json::from_cbor("\xf8"), json::parse_error,
+    EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0xf8})), json::parse_error,
                      "[json.exception.parse_error.112] parse error at 1: error reading CBOR; last byte: 0xf8");
 }
 
-class CborUnsupportedBytesTest : public ::testing::TestWithParam<const char*> {
+class CborUnsupportedBytesTest : public ::testing::TestWithParam<uint8_t> {
 };
 TEST_P(CborUnsupportedBytesTest, Case)
 {
-    EXPECT_THROW(json::from_cbor(GetParam()), json::parse_error);
+    EXPECT_THROW(json::from_cbor(std::vector<uint8_t>({GetParam()})), json::parse_error);
 }
 
-static const char* unsupported_bytes_cases[] = {
+static const uint8_t unsupported_bytes_cases[] = {
     // ?
-    "\x1c\x1d\x1e\x1f",
+    0x1c, 0x1d, 0x1e, 0x1f,
     // ?
-    "\x3c\x3d\x3e\x3f",
+    0x3c, 0x3d, 0x3e, 0x3f,
     // byte strings
-    "\x40\x41\x42\x43\x44\x45\x46\x47\x48\x49\x50\x51\x52\x53\x54\x55\x56\x57",
+    0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57,
     // byte strings
-    "\x58\x59\x5a\x5b",
+    0x58, 0x59, 0x5a, 0x5b,
     // ?
-    "\x5c\x5d\x5e",
+    0x5c, 0x5d, 0x5e,
     // byte string
-    "\x5f",
+    0x5f,
     // ?
-    "\x7c\x7d\x7e",
+    0x7c, 0x7d, 0x7e,
     // ?
-    "\x9c\x9d\x9e",
+    0x9c, 0x9d, 0x9e,
     // ?
-    "\xbc\xbd\xbe",
+    0xbc, 0xbd, 0xbe,
     // date/time
-    "\xc0\xc1",
+    0xc0, 0xc1,
     // bignum
-    "\xc2\xc3",
+    0xc2, 0xc3,
     // fraction
-    "\xc4",
+    0xc4,
     // bigfloat
-    "\xc5",
+    0xc5,
     // tagged item
-    "\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4",
+    0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2, 0xd3, 0xd4,
     // expected conversion
-    "\xd5\xd6\xd7",
+    0xd5, 0xd6, 0xd7,
     // more tagged items
-    "\xd8\xd9\xda\xdb",
+    0xd8, 0xd9, 0xda, 0xdb,
     // ?
-    "\xdc\xdd\xde\xdf",
+    0xdc, 0xdd, 0xde, 0xdf,
     // (simple value)
-    "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3",
+    0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef, 0xf0, 0xf1, 0xf2, 0xf3,
     // undefined
-    "\xf7",
+    0xf7,
     // simple value
-    "\xf8",
+    0xf8,
 };
 
 INSTANTIATE_TEST_CASE_P(CborUnsupportedBytesTests, CborUnsupportedBytesTest,
@@ -1543,11 +1555,11 @@ TEST(CborFirstBytesTest, Unsupported)
 
     for (auto i = 0; i < 256; ++i)
     {
-        const auto byte = static_cast<char>(i);
+        const auto byte = static_cast<uint8_t>(i);
 
         try
         {
-            json::from_cbor(wpi::StringRef(&byte, 1));
+            json::from_cbor(std::vector<uint8_t>(1, byte));
         }
         catch (const json::parse_error& e)
         {
@@ -1571,7 +1583,7 @@ TEST(CborFirstBytesTest, Unsupported)
 namespace internal {
 struct CborRoundtripTestParam {
   const char* plain;
-  wpi::StringRef encoded;
+  std::vector<uint8_t> encoded;
   bool test_encode;
 };
 }  // namespace internal
@@ -1589,100 +1601,100 @@ TEST_P(CborRoundtripTest, Case)
 }
 
 static const internal::CborRoundtripTestParam rfc7049_appendix_a_numbers[] = {
-    {"0", wpi::StringRef("\x00", 1), true},
-    {"1", "\x01", true},
-    {"10", "\x0a", true},
-    {"23", "\x17", true},
-    {"24", "\x18\x18", true},
-    {"25", "\x18\x19", true},
-    {"100", "\x18\x64", true},
-    {"1000", "\x19\x03\xe8", true},
-    {"1000000", wpi::StringRef("\x1a\x00\x0f\x42\x40", 5), true},
-    {"1000000000000", wpi::StringRef("\x1b\x00\x00\x00\xe8\xd4\xa5\x10\x00", 9), true},
-    {"18446744073709551615", "\x1b\xff\xff\xff\xff\xff\xff\xff\xff", true},
+    {"0", {0x00}, true},
+    {"1", {0x01}, true},
+    {"10", {0x0a}, true},
+    {"23", {0x17}, true},
+    {"24", {0x18,0x18}, true},
+    {"25", {0x18,0x19}, true},
+    {"100", {0x18,0x64}, true},
+    {"1000", {0x19,0x03,0xe8}, true},
+    {"1000000", {0x1a,0x00,0x0f,0x42,0x40}, true},
+    {"1000000000000", {0x1b,0x00,0x00,0x00,0xe8,0xd4,0xa5,0x10,0x00}, true},
+    {"18446744073709551615", {0x1b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff}, true},
     // positive bignum is not supported
-    //{"18446744073709551616", wpi::StringRef("\xc2\x49\x01\x00\x00\x00\x00\x00\x00\x00\x00", 11), true},
-    //{"-18446744073709551616", "\x3b\xff\xff\xff\xff\xff\xff\xff\xff", true},
+    //{"18446744073709551616", {0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00", 11), true},
+    //{"-18446744073709551616", {0x3b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff}, true},
     // negative bignum is not supported
-    //{"-18446744073709551617", wpi::StringRef("\xc3\x49\x01\x00\x00\x00\x00\x00\x00\x00\x00", 11), true},
-    {"-1", "\x20", true},
-    {"-10", "\x29", true},
-    {"-100", "\x38\x63", true},
-    {"-1000", "\x39\x03\xe7", true},
+    //{"-18446744073709551617", {0xc3,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}, true},
+    {"-1", {0x20}, true},
+    {"-10", {0x29}, true},
+    {"-100", {0x38,0x63}, true},
+    {"-1000", {0x39,0x03,0xe7}, true},
     // half-precision float
-    {"0.0", wpi::StringRef("\xf9\x00\x00", 3), false},
+    {"0.0", {0xf9,0x00,0x00}, false},
     // half-precision float
-    {"-0.0", wpi::StringRef("\xf9\x80\x00", 3), false},
+    {"-0.0", {0xf9,0x80,0x00}, false},
     // half-precision float
-    {"1.0", wpi::StringRef("\xf9\x3c\x00", 3), false},
-    {"1.1", "\xfb\x3f\xf1\x99\x99\x99\x99\x99\x9a", true},
+    {"1.0", {0xf9,0x3c,0x00}, false},
+    {"1.1", {0xfb,0x3f,0xf1,0x99,0x99,0x99,0x99,0x99,0x9a}, true},
     // half-precision float
-    {"1.5", wpi::StringRef("\xf9\x3e\x00", 3), false},
+    {"1.5", {0xf9,0x3e,0x00}, false},
     // half-precision float
-    {"65504.0", "\xf9\x7b\xff", false},
-    {"100000.0", wpi::StringRef("\xfa\x47\xc3\x50\x00", 5), false},
-    {"3.4028234663852886e+38", "\xfa\x7f\x7f\xff\xff", false},
-    {"1.0e+300", wpi::StringRef("\xfb\x7e\x37\xe4\x3c\x88\x00\x75\x9c", 9), true},
+    {"65504.0", {0xf9,0x7b,0xff}, false},
+    {"100000.0", {0xfa,0x47,0xc3,0x50,0x00}, false},
+    {"3.4028234663852886e+38", {0xfa,0x7f,0x7f,0xff,0xff}, false},
+    {"1.0e+300", {0xfb,0x7e,0x37,0xe4,0x3c,0x88,0x00,0x75,0x9c}, true},
     // half-precision float
-    {"5.960464477539063e-8", wpi::StringRef("\xf9\x00\x01", 3), false},
+    {"5.960464477539063e-8", {0xf9,0x00,0x01}, false},
     // half-precision float
-    {"0.00006103515625", wpi::StringRef("\xf9\x04\x00", 3), false},
+    {"0.00006103515625", {0xf9,0x04,0x00}, false},
     // half-precision float
-    {"-4.0", wpi::StringRef("\xf9\xc4\x00", 3), false},
-    {"-4.1", "\xfb\xc0\x10\x66\x66\x66\x66\x66\x66", true},
+    {"-4.0", {0xf9,0xc4,0x00}, false},
+    {"-4.1", {0xfb,0xc0,0x10,0x66,0x66,0x66,0x66,0x66,0x66}, true},
 };
 
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixANumberTests, CborRoundtripTest,
                         ::testing::ValuesIn(rfc7049_appendix_a_numbers), );
 
 static const internal::CborRoundtripTestParam rfc7049_appendix_a_simple_values[] = {
-    {"false", "\xf4", true},
-    {"true", "\xf5", true},
+    {"false", {0xf4}, true},
+    {"true", {0xf5}, true},
 };
 
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixASimpleValueTests, CborRoundtripTest,
                         ::testing::ValuesIn(rfc7049_appendix_a_simple_values), );
 
 static const internal::CborRoundtripTestParam rfc7049_appendix_a_strings[] = {
-    {"\"\"", "\x60", true},
-    {"\"a\"", "\x61\x61", true},
-    {"\"IETF\"", "\x64\x49\x45\x54\x46", true},
-    {"\"\\u00fc\"", "\x62\xc3\xbc", true},
-    {"\"\\u6c34\"", "\x63\xe6\xb0\xb4", true},
-    {"\"\\ud800\\udd51\"", "\x64\xf0\x90\x85\x91", true},
+    {"\"\"", {0x60}, true},
+    {"\"a\"", {0x61,0x61}, true},
+    {"\"IETF\"", {0x64,0x49,0x45,0x54,0x46}, true},
+    {"\"\\u00fc\"", {0x62,0xc3,0xbc}, true},
+    {"\"\\u6c34\"", {0x63,0xe6,0xb0,0xb4}, true},
+    {"\"\\ud800\\udd51\"", {0x64,0xf0,0x90,0x85,0x91}, true},
     // indefinite length strings
-    {"\"streaming\"", "\x7f\x73\x74\x72\x65\x61\x6d\x69\x6e\x67\xff", false},
+    {"\"streaming\"", {0x7f,0x65,0x73,0x74,0x72,0x65,0x61,0x64,0x6d,0x69,0x6e,0x67,0xff}, false},
 };
 
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixAStringTests, CborRoundtripTest,
                         ::testing::ValuesIn(rfc7049_appendix_a_strings), );
 
 static const internal::CborRoundtripTestParam rfc7049_appendix_a_arrays[] = {
-    {"[]", "\x80", true},
-    {"[1, 2, 3]", "\x83\x01\x02\x03", true},
-    {"[1, [2, 3], [4, 5]]", "\x83\x01\x82\x02\x03\x82\x04\x05", true},
-    {"[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]", "\x98\x19\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x18\x18\x19", true},
+    {"[]", {0x80}, true},
+    {"[1, 2, 3]", {0x83,0x01,0x02,0x03}, true},
+    {"[1, [2, 3], [4, 5]]", {0x83,0x01,0x82,0x02,0x03,0x82,0x04,0x05}, true},
+    {"[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]", {0x98,0x19,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x18,0x18,0x19}, true},
     // indefinite length arrays
-    {"[]", "\x9f\xff", false},
-    {"[1, [2, 3], [4, 5]] ", "\x9f\x01\x82\x02\x03\x9f\x04\x05\xff\xff", false},
-    {"[1, [2, 3], [4, 5]]", "\x9f\x01\x82\x02\x03\x82\x04\x05\xff", false},
-    {"[1, [2, 3], [4, 5]]", "\x83\x01\x82\x02\x03\x9f\x04\x05\xff", false},
-    {"[1, [2, 3], [4, 5]]", "\x83\x01\x9f\x02\x03\xff\x82\x04\x05", false},
-    {"[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]", "\x9f\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x18\x18\x19\xff", false},
+    {"[]", {0x9f,0xff}, false},
+    {"[1, [2, 3], [4, 5]] ", {0x9f,0x01,0x82,0x02,0x03,0x9f,0x04,0x05,0xff,0xff}, false},
+    {"[1, [2, 3], [4, 5]]", {0x9f,0x01,0x82,0x02,0x03,0x82,0x04,0x05,0xff}, false},
+    {"[1, [2, 3], [4, 5]]", {0x83,0x01,0x82,0x02,0x03,0x9f,0x04,0x05,0xff}, false},
+    {"[1, [2, 3], [4, 5]]", {0x83,0x01,0x9f,0x02,0x03,0xff,0x82,0x04,0x05}, false},
+    {"[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]", {0x9f,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x18,0x18,0x19,0xff}, false},
 };
 
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixAArrayTests, CborRoundtripTest,
                         ::testing::ValuesIn(rfc7049_appendix_a_arrays), );
 
 static const internal::CborRoundtripTestParam rfc7049_appendix_a_objects[] = {
-    {"{}", "\xa0", true},
-    {"{\"a\": 1, \"b\": [2, 3]}", "\xa2\x61\x61\x01\x61\x62\x82\x02\x03", true},
-    {"[\"a\", {\"b\": \"c\"}]", "\x82\x61\x61\xa1\x61\x62\x61\x63", true},
-    {"{\"a\": \"A\", \"b\": \"B\", \"c\": \"C\", \"d\": \"D\", \"e\": \"E\"}", "\xa5\x61\x61\x61\x41\x61\x62\x61\x42\x61\x63\x61\x43\x61\x64\x61\x44\x61\x65\x61\x45", true},
+    {"{}", {0xa0}, true},
+    {"{\"a\": 1, \"b\": [2, 3]}", {0xa2,0x61,0x61,0x01,0x61,0x62,0x82,0x02,0x03}, true},
+    {"[\"a\", {\"b\": \"c\"}]", {0x82,0x61,0x61,0xa1,0x61,0x62,0x61,0x63}, true},
+    {"{\"a\": \"A\", \"b\": \"B\", \"c\": \"C\", \"d\": \"D\", \"e\": \"E\"}", {0xa5,0x61,0x61,0x61,0x41,0x61,0x62,0x61,0x42,0x61,0x63,0x61,0x43,0x61,0x64,0x61,0x44,0x61,0x65,0x61,0x45}, true},
     // indefinite length objects
-    {"{\"a\": 1, \"b\": [2, 3]}", "\xbf\x61\x61\x01\x61\x62\x9f\x02\x03\xff\xff", false},
-    {"[\"a\", {\"b\": \"c\"}]", "\x82\x61\x61\xbf\x61\x62\x61\x63\xff", false},
-    {"{\"Fun\": true, \"Amt\": -2}", "\xbf\x63\x46\x75\x6e\xf5\x63\x41\x6d\x74\x21\xff", false},
+    {"{\"a\": 1, \"b\": [2, 3]}", {0xbf,0x61,0x61,0x01,0x61,0x62,0x9f,0x02,0x03,0xff,0xff}, false},
+    {"[\"a\", {\"b\": \"c\"}]", {0x82,0x61,0x61,0xbf,0x61,0x62,0x61,0x63,0xff}, false},
+    {"{\"Fun\": true, \"Amt\": -2}", {0xbf,0x63,0x46,0x75,0x6e,0xf5,0x63,0x41,0x6d,0x74,0x21,0xff}, false},
 };
 
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixAObjectTests, CborRoundtripTest,

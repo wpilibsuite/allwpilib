@@ -106,10 +106,10 @@ class JsonConstructObjectImplicitTest : public ::testing::Test {
     json j_reference;
 };
 
-// std::map<json::string_t, json>
+// std::map<std::string, json>
 TEST_F(JsonConstructObjectImplicitTest, StdMapStringJson)
 {
-    std::map<json::string_t, json> o {{"a", json(1)}, {"b", json(1u)}, {"c", json(2.2)}, {"d", json(false)}, {"e", json("string")}, {"f", json()}};
+    std::map<std::string, json> o {{"a", json(1)}, {"b", json(1u)}, {"c", json(2.2)}, {"d", json(false)}, {"e", json("string")}, {"f", json()}};
     json j(o);
     EXPECT_EQ(j.type(), json::value_t::object);
     EXPECT_EQ(j, j_reference);
@@ -151,28 +151,28 @@ TEST_F(JsonConstructObjectImplicitTest, StdMapCharPointerJson)
     EXPECT_EQ(j, j_reference);
 }
 
-// std::multimap<json::string_t, json>
+// std::multimap<std::string, json>
 TEST_F(JsonConstructObjectImplicitTest, StdMultiMapStringJson)
 {
-    std::multimap<json::string_t, json> o {{"a", json(1)}, {"b", json(1u)}, {"c", json(2.2)}, {"d", json(false)}, {"e", json("string")}, {"f", json()}};
+    std::multimap<std::string, json> o {{"a", json(1)}, {"b", json(1u)}, {"c", json(2.2)}, {"d", json(false)}, {"e", json("string")}, {"f", json()}};
     json j(o);
     EXPECT_EQ(j.type(), json::value_t::object);
     EXPECT_EQ(j, j_reference);
 }
 
-// std::unordered_map<json::string_t, json>
+// std::unordered_map<std::string, json>
 TEST_F(JsonConstructObjectImplicitTest, StdUnorderedMapStringJson)
 {
-    std::unordered_map<json::string_t, json> o {{"a", json(1)}, {"b", json(1u)}, {"c", json(2.2)}, {"d", json(false)}, {"e", json("string")}, {"f", json()}};
+    std::unordered_map<std::string, json> o {{"a", json(1)}, {"b", json(1u)}, {"c", json(2.2)}, {"d", json(false)}, {"e", json("string")}, {"f", json()}};
     json j(o);
     EXPECT_EQ(j.type(), json::value_t::object);
     EXPECT_EQ(j, j_reference);
 }
 
-// std::unordered_multimap<json::string_t, json>
+// std::unordered_multimap<std::string, json>
 TEST_F(JsonConstructObjectImplicitTest, StdUnorderedMultiMapStringJson)
 {
-    std::unordered_multimap<json::string_t, json> o {{"a", json(1)}, {"b", json(1u)}, {"c", json(2.2)}, {"d", json(false)}, {"e", json("string")}, {"f", json()}};
+    std::unordered_multimap<std::string, json> o {{"a", json(1)}, {"b", json(1u)}, {"c", json(2.2)}, {"d", json(false)}, {"e", json("string")}, {"f", json()}};
     json j(o);
     EXPECT_EQ(j.type(), json::value_t::object);
     EXPECT_EQ(j, j_reference);
@@ -264,14 +264,14 @@ TEST(JsonConstructArrayContainerTest, Case)
 
 TEST(JsonConstructStringExplicitTest, Empty)
 {
-    json::string_t s;
+    std::string s;
     json j(s);
     EXPECT_EQ(j.type(), json::value_t::string);
 }
 
 TEST(JsonConstructStringExplicitTest, Filled)
 {
-    json::string_t s {"Hello world"};
+    std::string s {"Hello world"};
     json j(s);
     EXPECT_EQ(j.type(), json::value_t::string);
 }
@@ -281,7 +281,7 @@ class JsonConstructStringTest : public ::testing::Test {
     JsonConstructStringTest() : j_reference(s_reference) {}
 
  protected:
-    json::string_t s_reference {"Hello world"};
+    std::string s_reference {"Hello world"};
     json j_reference;
 };
 
@@ -322,7 +322,7 @@ TEST_F(JsonConstructStringTest, StringLiteral)
 
 TEST(JsonConstructBooleanExplicitTest, Empty)
 {
-    json::boolean_t b{};
+    bool b{};
     json j(b);
     EXPECT_EQ(j.type(), json::value_t::boolean);
 }
@@ -341,14 +341,14 @@ TEST(JsonConstructBooleanExplicitTest, False)
 
 TEST(JsonConstructIntegerExplicitTest, Uninitialized)
 {
-    json::number_integer_t n{};
+    int64_t n{};
     json j(n);
     EXPECT_EQ(j.type(), json::value_t::number_integer);
 }
 
 TEST(JsonConstructIntegerExplicitTest, Initialized)
 {
-    json::number_integer_t n(42);
+    int64_t n(42);
     json j(n);
     EXPECT_EQ(j.type(), json::value_t::number_integer);
 }
@@ -360,9 +360,9 @@ class JsonConstructIntegerTest : public ::testing::Test {
         : j_reference(n_reference), j_unsigned_reference(n_unsigned_reference) {}
 
  protected:
-    json::number_integer_t n_reference = 42;
+    int64_t n_reference = 42;
     json j_reference;
-    json::number_unsigned_t n_unsigned_reference = 42u;
+    uint64_t n_unsigned_reference = 42u;
     json j_unsigned_reference;
 };
 
@@ -429,9 +429,9 @@ class JsonConstructIntegerLiteralTest : public ::testing::Test {
         : j_reference(n_reference), j_unsigned_reference(n_unsigned_reference) {}
 
  protected:
-    json::number_integer_t n_reference = 42;
+    int64_t n_reference = 42;
     json j_reference;
-    json::number_unsigned_t n_unsigned_reference = 42u;
+    uint64_t n_unsigned_reference = 42u;
     json j_unsigned_reference;
 };
 
@@ -479,14 +479,14 @@ TEST_F(JsonConstructIntegerLiteralTest, ULL)
 
 TEST(JsonConstructFloatExplicitTest, Uninitialized)
 {
-    json::number_float_t n{};
+    double n{};
     json j(n);
     EXPECT_EQ(j.type(), json::value_t::number_float);
 }
 
 TEST(JsonConstructFloatExplicitTest, Initialized)
 {
-    json::number_float_t n(42.23);
+    double n(42.23);
     json j(n);
     EXPECT_EQ(j.type(), json::value_t::number_float);
 }
@@ -494,12 +494,12 @@ TEST(JsonConstructFloatExplicitTest, Initialized)
 TEST(JsonConstructFloatExplicitTest, Infinity)
 {
     // infinity is stored properly, but serialized to null
-    json::number_float_t n(std::numeric_limits<json::number_float_t>::infinity());
+    double n(std::numeric_limits<double>::infinity());
     json j(n);
     EXPECT_EQ(j.type(), json::value_t::number_float);
 
     // check round trip of infinity
-    json::number_float_t d = j;
+    double d = j;
     EXPECT_EQ(d, n);
 
     // check that inf is serialized to null
@@ -512,7 +512,7 @@ class JsonConstructFloatTest : public ::testing::Test {
     JsonConstructFloatTest() : j_reference(n_reference) {}
 
  protected:
-    json::number_float_t n_reference {42.23};
+    double n_reference {42.23};
     json j_reference;
 };
 
@@ -540,7 +540,7 @@ class JsonConstructFloatLiteralTest : public ::testing::Test {
     JsonConstructFloatLiteralTest() : j_reference(n_reference) {}
 
  protected:
-    json::number_float_t n_reference {42.23};
+    double n_reference {42.23};
     json j_reference;
 };
 
@@ -575,8 +575,7 @@ TEST_F(JsonConstructFloatLiteralTest, L)
 
 TEST(JsonConstructInitializerEmptyTest, Explicit)
 {
-    std::initializer_list<json> l;
-    json j(l);
+    json j(json::initializer_list_t{});
     EXPECT_EQ(j.type(), json::value_t::object);
 }
 
@@ -725,17 +724,15 @@ TEST(JsonConstructInitializerExplicitTest, ObjectError)
 TEST(JsonConstructInitializerPairErrorTest, WrongFieldNumber)
 {
     json j{{"too", "much"}, {"string", "fields"}};
-    EXPECT_THROW_MSG((j.get<std::pair<std::string, std::string>>()), json::other_error,
-                     "[json.exception.other_error.502] conversion "
-                     "to std::pair requires the object to have "
-                     "exactly one field, but it has 2");
+    EXPECT_THROW_MSG((j.get<std::pair<std::string, std::string>>()), json::type_error,
+                     "[json.exception.type_error.304] cannot use at() with object");
 }
 
 TEST(JsonConstructInitializerPairErrorTest, WrongJsonType)
 {
     json j(42);
     EXPECT_THROW_MSG((j.get<std::pair<std::string, std::string>>()), json::type_error,
-                     "[json.exception.type_error.302] type must be object, but is number");
+                     "[json.exception.type_error.304] cannot use at() with number");
 }
 
 TEST(JsonConstructInitializerTest, EmptyArray)
