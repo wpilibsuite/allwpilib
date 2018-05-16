@@ -33,6 +33,5 @@ public class QuickTest extends AbstractComsSetup {
 
   @Test
   public void test() {
-
   }
 }

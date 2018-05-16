@@ -52,7 +52,6 @@ public abstract class Trigger extends SendableBase {
    */
   public void whenActive(final Command command) {
     new ButtonScheduler() {
-
       private boolean m_pressedLast = grab();
 
       @Override
@@ -79,7 +78,6 @@ public abstract class Trigger extends SendableBase {
    */
   public void whileActive(final Command command) {
     new ButtonScheduler() {
-
       private boolean m_pressedLast = grab();
 
       @Override
@@ -104,7 +102,6 @@ public abstract class Trigger extends SendableBase {
    */
   public void whenInactive(final Command command) {
     new ButtonScheduler() {
-
       private boolean m_pressedLast = grab();
 
       @Override
@@ -128,7 +125,6 @@ public abstract class Trigger extends SendableBase {
    */
   public void toggleWhenActive(final Command command) {
     new ButtonScheduler() {
-
       private boolean m_pressedLast = grab();
 
       @Override
@@ -156,7 +152,6 @@ public abstract class Trigger extends SendableBase {
    */
   public void cancelWhenActive(final Command command) {
     new ButtonScheduler() {
-
       private boolean m_pressedLast = grab();
 
       @Override

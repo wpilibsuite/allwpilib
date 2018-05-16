@@ -222,7 +222,6 @@ public class CommandGroup extends Command {
     }
 
     while (m_currentCommandIndex < m_commands.size()) {
-
       if (cmd != null) {
         if (entry.isTimedOut()) {
           cmd._cancel();

@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.test.TestBench;
  * of a test, and ensuring that future tests will not be affected by the results of a test.
  */
 public interface ITestFixture {
-
   /**
    * Performs any required setup for this fixture, ensuring that all fixture elements are ready for
    * testing.

@@ -273,7 +273,6 @@ public class RobotDrive implements MotorSafety {
    * @param squaredInputs Setting this parameter to true decreases the sensitivity at lower speeds
    */
   public void tankDrive(double leftValue, double rightValue, boolean squaredInputs) {
-
     if (!kTank_Reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
           tInstances.kRobotDrive_Tank);

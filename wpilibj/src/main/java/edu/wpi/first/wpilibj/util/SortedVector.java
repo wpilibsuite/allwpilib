@@ -17,7 +17,6 @@ public class SortedVector<E> extends Vector<E> {
    * Interface used to determine the order to place sorted objects.
    */
   public interface Comparator {
-
     /**
      * Compare the given two objects.
      *

@@ -96,7 +96,6 @@ public class PDPTest extends AbstractComsSetup {
    */
   @Test
   public void checkRunningCurrentForSpeedController() throws CANMessageNotFoundException {
-
     /* Set the motor to full forward */
     me.getMotor().set(1.0);
     Timer.delay(2);

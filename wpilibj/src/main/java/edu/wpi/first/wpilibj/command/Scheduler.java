@@ -144,7 +144,6 @@ public class Scheduler extends SendableBase implements Sendable {
 
     // Only add if not already in
     if (!m_commandTable.containsKey(command)) {
-
       // Check that the requirements can be had
       Enumeration requirements = command.getRequirements();
       while (requirements.hasMoreElements()) {
@@ -192,7 +191,6 @@ public class Scheduler extends SendableBase implements Sendable {
    * SmartDashboard</li> <li>Add Commands</li> <li>Add Defaults</li> </ol>
    */
   public void run() {
-
     m_runningCommandsChanged = false;
 
     if (m_disabled) {
