@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,10 +8,15 @@
 #include "HAL/PWM.h"
 
 #include <cmath>
+#include <thread>
+
+#include <wpi/raw_ostream.h>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
+#include "HAL/cpp/fpga_clock.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 using namespace hal;
@@ -66,6 +71,7 @@ extern "C" {
 
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
                                         int32_t* status) {
+  hal::init::CheckInit();
   initializeDigital(status);
 
   if (*status != 0) return HAL_kInvalidHandle;
@@ -104,6 +110,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
   digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet,
                                                status);
 
+  // Defaults to allow an always valid config.
+  HAL_SetPWMConfig(handle, 2.0, 1.501, 1.5, 1.499, 1.0, status);
+
   return handle;
 }
 void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
@@ -113,6 +122,20 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return;
   }
 
+  digitalChannelHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
+
+  // Wait for no other object to hold this handle.
+  auto start = hal::fpga_clock::now();
+  while (port.use_count() != 1) {
+    auto current = hal::fpga_clock::now();
+    if (start + std::chrono::seconds(1) < current) {
+      wpi::outs() << "PWM handle free timeout\n";
+      wpi::outs().flush();
+      break;
+    }
+    std::this_thread::yield();
+  }
+
   if (port->channel > tPWM::kNumHdrRegisters - 1) {
     int32_t bitToUnset = 1 << remapMXPPWMChannel(port->channel);
     uint16_t specialFunctions =
@@ -120,8 +143,6 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToUnset,
                                                  status);
   }
-
-  digitalChannelHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
 }
 
 HAL_Bool HAL_CheckPWMChannel(int32_t channel) {

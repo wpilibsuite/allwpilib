@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,7 +11,7 @@
 #include <thread>
 
 #include <FRC_NetworkCommunication/LoadOut.h>
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "ConstantsInternal.h"
 #include "HAL/AnalogTrigger.h"
@@ -19,6 +19,7 @@
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"
 #include "HAL/cpp/UnsafeDIO.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 namespace hal {
@@ -70,6 +71,7 @@ int32_t ComputeDigitalMask(HAL_DigitalHandle handle, int32_t* status) {
  * Initialize the digital system.
  */
 void initializeDigital(int32_t* status) {
+  hal::init::CheckInit();
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished

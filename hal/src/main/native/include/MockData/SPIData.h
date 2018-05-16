@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,12 @@
 
 #include "HAL/HAL.h"
 #include "NotifyListener.h"
+
+typedef void (*HAL_SpiReadAutoReceiveBufferCallback)(const char* name,
+                                                     void* param,
+                                                     unsigned char* buffer,
+                                                     int32_t numToRead,
+                                                     int32_t* outputCount);
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,18 +42,9 @@ int32_t HALSIM_RegisterSPIWriteCallback(int32_t index,
                                         void* param);
 void HALSIM_CancelSPIWriteCallback(int32_t index, int32_t uid);
 
-int32_t HALSIM_RegisterSPIResetAccumulatorCallback(int32_t index,
-                                                   HAL_NotifyCallback callback,
-                                                   void* param,
-                                                   HAL_Bool initialNotify);
-void HALSIM_CancelSPIResetAccumulatorCallback(int32_t index, int32_t uid);
-
-int32_t HALSIM_RegisterSPISetAccumulatorCallback(int32_t index,
-                                                 HAL_BufferCallback callback,
-                                                 void* param);
-void HALSIM_CancelSPISetAccumulatorCallback(int32_t index, int32_t uid);
-void HALSIM_SetSPISetAccumulatorValue(int32_t index, int64_t value);
-int64_t HALSIM_GetSPIGetAccumulatorValue(int32_t index);
+int32_t HALSIM_RegisterSPIReadAutoReceivedDataCallback(
+    int32_t index, HAL_SpiReadAutoReceiveBufferCallback callback, void* param);
+void HALSIM_CancelSPIReadAutoReceivedDataCallback(int32_t index, int32_t uid);
 
 #ifdef __cplusplus
 }  // extern "C"

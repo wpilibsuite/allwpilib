@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -83,7 +83,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, Sendable {
 
     m_spi.setClockRate(3000000);
     m_spi.setMSBFirst();
-    m_spi.setSampleDataOnFalling();
+    m_spi.setSampleDataOnTrailingEdge();
     m_spi.setClockActiveLow();
     m_spi.setChipSelectActiveLow();
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,7 +9,8 @@
 
 #include <string>
 
-#include <llvm/StringRef.h>
+#include <wpi/StringRef.h>
+#include <wpi/deprecated.h>
 
 #include "ErrorBase.h"
 
@@ -56,6 +57,10 @@ class SerialPort : public ErrorBase {
 
   SerialPort(int baudRate, Port port = kOnboard, int dataBits = 8,
              Parity parity = kParity_None, StopBits stopBits = kStopBits_One);
+  WPI_DEPRECATED("Will be removed for 2019")
+  SerialPort(int baudRate, wpi::StringRef portName, Port port = kOnboard,
+             int dataBits = 8, Parity parity = kParity_None,
+             StopBits stopBits = kStopBits_One);
   ~SerialPort();
 
   SerialPort(const SerialPort&) = delete;
@@ -67,7 +72,7 @@ class SerialPort : public ErrorBase {
   int GetBytesReceived();
   int Read(char* buffer, int count);
   int Write(const char* buffer, int count);
-  int Write(llvm::StringRef buffer);
+  int Write(wpi::StringRef buffer);
   void SetTimeout(double timeout);
   void SetReadBufferSize(int size);
   void SetWriteBufferSize(int size);

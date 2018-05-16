@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include <support/condition_variable.h>
+#include <wpi/condition_variable.h>
 
 #include "AnalogInternal.h"
 #include "DigitalInternal.h"
@@ -19,6 +19,7 @@
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
+#include "HALInitializer.h"
 #include "MockData/AnalogInDataInternal.h"
 #include "MockData/DIODataInternal.h"
 #include "MockData/HAL_Value.h"
@@ -85,6 +86,7 @@ void InitializeInterrupts() {
 extern "C" {
 HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
                                              int32_t* status) {
+  hal::init::CheckInit();
   HAL_InterruptHandle handle = interruptHandles->Allocate();
   if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;

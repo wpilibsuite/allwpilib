@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -20,7 +20,7 @@ using namespace frc;
  *
  * @param name the name of the subsystem
  */
-Subsystem::Subsystem(const llvm::Twine& name) {
+Subsystem::Subsystem(const wpi::Twine& name) {
   SetName(name, name);
   Scheduler::GetInstance()->RegisterSubsystem(this);
 }
@@ -87,12 +87,12 @@ Command* Subsystem::GetDefaultCommand() {
  *
  * @return the default command name
  */
-llvm::StringRef Subsystem::GetDefaultCommandName() {
+wpi::StringRef Subsystem::GetDefaultCommandName() {
   Command* defaultCommand = GetDefaultCommand();
   if (defaultCommand) {
     return defaultCommand->GetName();
   } else {
-    return llvm::StringRef();
+    return wpi::StringRef();
   }
 }
 
@@ -118,12 +118,12 @@ Command* Subsystem::GetCurrentCommand() const { return m_currentCommand; }
  *
  * @return the current command name
  */
-llvm::StringRef Subsystem::GetCurrentCommandName() const {
+wpi::StringRef Subsystem::GetCurrentCommandName() const {
   Command* currentCommand = GetCurrentCommand();
   if (currentCommand) {
     return currentCommand->GetName();
   } else {
-    return llvm::StringRef();
+    return wpi::StringRef();
   }
 }
 
@@ -151,7 +151,7 @@ void Subsystem::ConfirmCommand() {
  * @param name name to give child
  * @param child sendable
  */
-void Subsystem::AddChild(const llvm::Twine& name,
+void Subsystem::AddChild(const wpi::Twine& name,
                          std::shared_ptr<Sendable> child) {
   AddChild(name, *child);
 }
@@ -163,7 +163,7 @@ void Subsystem::AddChild(const llvm::Twine& name,
  * @param name name to give child
  * @param child sendable
  */
-void Subsystem::AddChild(const llvm::Twine& name, Sendable* child) {
+void Subsystem::AddChild(const wpi::Twine& name, Sendable* child) {
   AddChild(name, *child);
 }
 
@@ -174,7 +174,7 @@ void Subsystem::AddChild(const llvm::Twine& name, Sendable* child) {
  * @param name name to give child
  * @param child sendable
  */
-void Subsystem::AddChild(const llvm::Twine& name, Sendable& child) {
+void Subsystem::AddChild(const wpi::Twine& name, Sendable& child) {
   child.SetName(GetSubsystem(), name);
   LiveWindow::GetInstance()->Add(&child);
 }
@@ -207,12 +207,12 @@ void Subsystem::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Subsystem");
 
   builder.AddBooleanProperty(
-      "hasDefault", [=]() { return m_defaultCommand != nullptr; }, nullptr);
-  builder.AddStringProperty("default",
+      ".hasDefault", [=]() { return m_defaultCommand != nullptr; }, nullptr);
+  builder.AddStringProperty(".default",
                             [=]() { return GetDefaultCommandName(); }, nullptr);
 
   builder.AddBooleanProperty(
-      "hasCommand", [=]() { return m_currentCommand != nullptr; }, nullptr);
-  builder.AddStringProperty("command",
+      ".hasCommand", [=]() { return m_currentCommand != nullptr; }, nullptr);
+  builder.AddStringProperty(".command",
                             [=]() { return GetCurrentCommandName(); }, nullptr);
 }

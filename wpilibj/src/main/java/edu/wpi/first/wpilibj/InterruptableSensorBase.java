@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.util.AllocationException;
  * Base for sensors to be used with interrupts.
  */
 public abstract class InterruptableSensorBase extends SensorBase {
-
   @SuppressWarnings("JavadocMethod")
   public enum WaitResult {
     kTimeout(0x0), kRisingEdge(0x1), kFallingEdge(0x100), kBoth(0x101);

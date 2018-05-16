@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,10 +8,15 @@
 #include "HAL/DIO.h"
 
 #include <cmath>
+#include <thread>
+
+#include <wpi/raw_ostream.h>
 
 #include "DigitalInternal.h"
+#include "HAL/cpp/fpga_clock.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 using namespace hal;
@@ -42,6 +47,7 @@ extern "C" {
  */
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
                                         HAL_Bool input, int32_t* status) {
+  hal::init::CheckInit();
   initializeDigital(status);
 
   if (*status != 0) return HAL_kInvalidHandle;
@@ -124,8 +130,21 @@ HAL_Bool HAL_CheckDIOChannel(int32_t channel) {
 void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   // no status, so no need to check for a proper free.
-  digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) return;
+  digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
+
+  // Wait for no other object to hold this handle.
+  auto start = hal::fpga_clock::now();
+  while (port.use_count() != 1) {
+    auto current = hal::fpga_clock::now();
+    if (start + std::chrono::seconds(1) < current) {
+      wpi::outs() << "DIO handle free timeout\n";
+      wpi::outs().flush();
+      break;
+    }
+    std::this_thread::yield();
+  }
+
   int32_t status = 0;
   std::lock_guard<wpi::mutex> lock(digitalDIOMutex);
   if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {

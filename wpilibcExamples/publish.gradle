@@ -16,6 +16,7 @@ if (project.hasProperty("publishVersion")) {
 
 def baseExamplesArtifactId = 'examples'
 def baseTemplatesArtifactId = 'templates'
+def baseCommandsArtifactId = 'commands'
 def artifactGroupId = 'edu.wpi.first.wpilibc'
 
 def outputsFolder = file("$project.buildDir/outputs")
@@ -29,10 +30,6 @@ task cppExamplesZip(type: Zip) {
     }
 
     from('src/main/cpp/examples') {
-        into 'examples'
-    }
-
-    from ('examples.xml') {
         into 'examples'
     }
 }
@@ -50,8 +47,22 @@ task cppTemplatesZip(type: Zip) {
     }
 }
 
+task cppCommandsZip(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = 'wpilibc-commands'
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/cpp/commands') {
+        into 'commands'
+    }
+}
+
 build.dependsOn cppTemplatesZip
 build.dependsOn cppExamplesZip
+build.dependsOn cppCommandsZip
 
 publishing {
     publications {
@@ -67,6 +78,14 @@ publishing {
             artifact cppTemplatesZip
 
             artifactId = baseTemplatesArtifactId
+            groupId artifactGroupId
+            version pubVersion
+        }
+
+        commands(MavenPublication) {
+            artifact cppCommandsZip
+
+            artifactId = baseCommandsArtifactId
             groupId artifactGroupId
             version pubVersion
         }

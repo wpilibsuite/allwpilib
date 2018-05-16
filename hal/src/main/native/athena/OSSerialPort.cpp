@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,6 +18,7 @@
 
 #include "HAL/Errors.h"
 #include "HAL/cpp/SerialHelper.h"
+#include "HALInitializer.h"
 
 static int portHandles[4]{-1, -1, -1, -1};
 static std::chrono::milliseconds portTimeouts[4]{
@@ -38,6 +39,7 @@ void InitializeOSSerialPort() {
 extern "C" {
 
 void HAL_InitializeOSSerialPort(HAL_SerialPort port, int32_t* status) {
+  hal::init::CheckInit();
   std::string portName;
 
   hal::SerialHelper serialHelper;
@@ -217,9 +219,9 @@ int32_t HAL_ReadOSSerial(HAL_SerialPort port, char* buffer, int32_t count,
     std::memcpy(&buffer[bytesRead], buf, rx);
     bytesRead += rx;
     if (bytesRead >= count) break;
-    llvm::StringRef tmp(buffer, bytesRead);
+    wpi::StringRef tmp(buffer, bytesRead);
     auto loc = tmp.find('\n');
-    if (loc != llvm::StringRef::npos) {
+    if (loc != wpi::StringRef::npos) {
       bytesRead = loc;
       break;
     }

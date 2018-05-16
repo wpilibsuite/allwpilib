@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,14 +16,14 @@
 #include <atomic>
 #include <cstring>
 
-#include <llvm/raw_ostream.h>
-#include <support/mutex.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
 
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"
 #include "HAL/HAL.h"
-#include "HAL/cpp/make_unique.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 
 using namespace hal;
 
@@ -106,6 +106,7 @@ static void CommonSPIPortFree(void) {
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS3, 4 for MXP
  */
 void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
+  hal::init::CheckInit();
   if (port < 0 || port >= kSpiMaxHandles) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
@@ -196,20 +197,20 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       if ((digitalHandles[5] = HAL_InitializeDIOPort(createPortHandleForSPI(14),
                                                      false, status)) ==
           HAL_kInvalidHandle) {
-        llvm::outs() << "Failed to allocate DIO 14\n";
+        wpi::outs() << "Failed to allocate DIO 14\n";
         return;
       }
       if ((digitalHandles[6] = HAL_InitializeDIOPort(createPortHandleForSPI(15),
                                                      false, status)) ==
           HAL_kInvalidHandle) {
-        llvm::outs() << "Failed to allocate DIO 15\n";
+        wpi::outs() << "Failed to allocate DIO 15\n";
         HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
         return;
       }
       if ((digitalHandles[7] = HAL_InitializeDIOPort(createPortHandleForSPI(16),
                                                      false, status)) ==
           HAL_kInvalidHandle) {
-        llvm::outs() << "Failed to allocate DIO 16\n";
+        wpi::outs() << "Failed to allocate DIO 16\n";
         HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
         HAL_FreeDIOPort(digitalHandles[6]);  // free the second port allocated
         return;
@@ -217,7 +218,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       if ((digitalHandles[8] = HAL_InitializeDIOPort(createPortHandleForSPI(17),
                                                      false, status)) ==
           HAL_kInvalidHandle) {
-        llvm::outs() << "Failed to allocate DIO 17\n";
+        wpi::outs() << "Failed to allocate DIO 17\n";
         HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
         HAL_FreeDIOPort(digitalHandles[6]);  // free the second port allocated
         HAL_FreeDIOPort(digitalHandles[7]);  // free the third port allocated

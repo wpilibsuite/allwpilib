@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "Drive/RobotDriveBase.h"
 
@@ -28,12 +28,12 @@ class SpeedController;
  * @code{.cpp}
  * class Robot {
  *  public:
- *   frc::Talon m_frontLeft{1};
- *   frc::Talon m_rearLeft{2};
+ *   frc::Spark m_frontLeft{1};
+ *   frc::Spark m_rearLeft{2};
  *   frc::SpeedControllerGroup m_left{m_frontLeft, m_rearLeft};
  *
- *   frc::Talon m_frontRight{3};
- *   frc::Talon m_rearRight{4};
+ *   frc::Spark m_frontRight{3};
+ *   frc::Spark m_rearRight{4};
  *   frc::SpeedControllerGroup m_right{m_frontRight, m_rearRight};
  *
  *   frc::DifferentialDrive m_drive{m_left, m_right};
@@ -44,14 +44,14 @@ class SpeedController;
  * @code{.cpp}
  * class Robot {
  *  public:
- *   frc::Talon m_frontLeft{1};
- *   frc::Talon m_midLeft{2};
- *   frc::Talon m_rearLeft{3};
+ *   frc::Spark m_frontLeft{1};
+ *   frc::Spark m_midLeft{2};
+ *   frc::Spark m_rearLeft{3};
  *   frc::SpeedControllerGroup m_left{m_frontLeft, m_midLeft, m_rearLeft};
  *
- *   frc::Talon m_frontRight{4};
- *   frc::Talon m_midRight{5};
- *   frc::Talon m_rearRight{6};
+ *   frc::Spark m_frontRight{4};
+ *   frc::Spark m_midRight{5};
+ *   frc::Spark m_rearRight{6};
  *   frc::SpeedControllerGroup m_right{m_frontRight, m_midRight, m_rearRight};
  *
  *   frc::DifferentialDrive m_drive{m_left, m_right};
@@ -116,7 +116,7 @@ class DifferentialDrive : public RobotDriveBase {
   void SetQuickStopAlpha(double alpha);
 
   void StopMotor() override;
-  void GetDescription(llvm::raw_ostream& desc) const override;
+  void GetDescription(wpi::raw_ostream& desc) const override;
 
   void InitSendable(SendableBuilder& builder) override;
 

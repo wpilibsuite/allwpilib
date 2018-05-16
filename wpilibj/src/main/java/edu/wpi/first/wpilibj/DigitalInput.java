@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -31,7 +31,7 @@ public class DigitalInput extends DigitalSource implements Sendable {
     checkDigitalChannel(channel);
     m_channel = channel;
 
-    m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte) channel), true);
+    m_handle = DIOJNI.initializeDIOPort(HAL.getPort((byte) channel), true);
 
     HAL.report(tResourceType.kResourceType_DigitalInput, channel);
     setName("DigitalInput", channel);

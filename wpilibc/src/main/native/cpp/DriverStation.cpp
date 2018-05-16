@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,7 +12,11 @@
 #include <HAL/HAL.h>
 #include <HAL/Power.h>
 #include <HAL/cpp/Log.h>
-#include <llvm/SmallString.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableInstance.h>
+#include <wpi/SmallString.h>
+#include <wpi/StringRef.h>
 
 #include "AnalogInput.h"
 #include "MotorSafetyHelper.h"
@@ -27,6 +31,42 @@ struct MatchInfoData {
   int matchNumber = 0;
   int replayNumber = 0;
   DriverStation::MatchType matchType = DriverStation::MatchType::kNone;
+};
+
+class MatchDataSender {
+ public:
+  std::shared_ptr<nt::NetworkTable> table;
+  nt::NetworkTableEntry typeMetadata;
+  nt::NetworkTableEntry gameSpecificMessage;
+  nt::NetworkTableEntry eventName;
+  nt::NetworkTableEntry matchNumber;
+  nt::NetworkTableEntry replayNumber;
+  nt::NetworkTableEntry matchType;
+  nt::NetworkTableEntry alliance;
+  nt::NetworkTableEntry station;
+  nt::NetworkTableEntry controlWord;
+
+  MatchDataSender() {
+    table = nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo");
+    typeMetadata = table->GetEntry(".type");
+    typeMetadata.ForceSetString("FMSInfo");
+    gameSpecificMessage = table->GetEntry("GameSpecificMessage");
+    gameSpecificMessage.ForceSetString("");
+    eventName = table->GetEntry("EventName");
+    eventName.ForceSetString("");
+    matchNumber = table->GetEntry("MatchNumber");
+    matchNumber.ForceSetDouble(0);
+    replayNumber = table->GetEntry("ReplayNumber");
+    replayNumber.ForceSetDouble(0);
+    matchType = table->GetEntry("MatchType");
+    matchType.ForceSetDouble(0);
+    alliance = table->GetEntry("IsRedAlliance");
+    alliance.ForceSetBoolean(true);
+    station = table->GetEntry("StationNumber");
+    station.ForceSetDouble(1);
+    controlWord = table->GetEntry("FMSControlData");
+    controlWord.ForceSetDouble(0);
+  }
 };
 }  // namespace frc
 
@@ -56,8 +96,8 @@ DriverStation& DriverStation::GetInstance() {
  *
  * The error is also printed to the program console.
  */
-void DriverStation::ReportError(const llvm::Twine& error) {
-  llvm::SmallString<128> temp;
+void DriverStation::ReportError(const wpi::Twine& error) {
+  wpi::SmallString<128> temp;
   HAL_SendError(1, 1, 0, error.toNullTerminatedStringRef(temp).data(), "", "",
                 1);
 }
@@ -67,8 +107,8 @@ void DriverStation::ReportError(const llvm::Twine& error) {
  *
  * The warning is also printed to the program console.
  */
-void DriverStation::ReportWarning(const llvm::Twine& error) {
-  llvm::SmallString<128> temp;
+void DriverStation::ReportWarning(const wpi::Twine& error) {
+  wpi::SmallString<128> temp;
   HAL_SendError(0, 1, 0, error.toNullTerminatedStringRef(temp).data(), "", "",
                 1);
 }
@@ -79,12 +119,12 @@ void DriverStation::ReportWarning(const llvm::Twine& error) {
  * The error is also printed to the program console.
  */
 void DriverStation::ReportError(bool isError, int32_t code,
-                                const llvm::Twine& error,
-                                const llvm::Twine& location,
-                                const llvm::Twine& stack) {
-  llvm::SmallString<128> errorTemp;
-  llvm::SmallString<128> locationTemp;
-  llvm::SmallString<128> stackTemp;
+                                const wpi::Twine& error,
+                                const wpi::Twine& location,
+                                const wpi::Twine& stack) {
+  wpi::SmallString<128> errorTemp;
+  wpi::SmallString<128> locationTemp;
+  wpi::SmallString<128> stackTemp;
   HAL_SendError(isError, code, 0,
                 error.toNullTerminatedStringRef(errorTemp).data(),
                 location.toNullTerminatedStringRef(locationTemp).data(),
@@ -99,22 +139,22 @@ void DriverStation::ReportError(bool isError, int32_t code,
  * @return The state of the joystick button.
  */
 bool DriverStation::GetStickButton(int stick, int button) {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return false;
   }
-  if (button == 0) {
+  if (button <= 0) {
     ReportJoystickUnpluggedError(
         "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
   }
+
   std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (button > m_joystickButtons[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
     ReportJoystickUnpluggedWarning(
-        "Joystick Button missing, check if all controllers are "
-        "plugged in");
+        "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
 
@@ -130,22 +170,22 @@ bool DriverStation::GetStickButton(int stick, int button) {
  * @return Whether the joystick button was pressed since the last check.
  */
 bool DriverStation::GetStickButtonPressed(int stick, int button) {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return false;
   }
-  if (button == 0) {
+  if (button <= 0) {
     ReportJoystickUnpluggedError(
         "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
   }
+
   std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (button > m_joystickButtons[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
     ReportJoystickUnpluggedWarning(
-        "Joystick Button missing, check if all controllers are "
-        "plugged in");
+        "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
 
@@ -167,7 +207,7 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
  * @return Whether the joystick button was released since the last check.
  */
 bool DriverStation::GetStickButtonReleased(int stick, int button) {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return false;
   }
@@ -176,13 +216,13 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
         "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
   }
+
   std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (button > m_joystickButtons[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
     ReportJoystickUnpluggedWarning(
-        "Joystick Button missing, check if all controllers are "
-        "plugged in");
+        "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
 
@@ -205,20 +245,21 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
  * @return The value of the axis on the joystick.
  */
 double DriverStation::GetStickAxis(int stick, int axis) {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
-    return 0;
+    return 0.0;
   }
+  if (axis >= HAL_kMaxJoystickAxes) {
+    wpi_setWPIError(BadJoystickAxis);
+    return 0.0;
+  }
+
   std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (axis >= m_joystickAxes[stick].count) {
     // Unlock early so error printing isn't locked.
-    m_cacheDataMutex.unlock();
-    lock.release();
-    if (axis >= HAL_kMaxJoystickAxes)
-      wpi_setWPIError(BadJoystickAxis);
-    else
-      ReportJoystickUnpluggedWarning(
-          "Joystick Axis missing, check if all controllers are plugged in");
+    lock.unlock();
+    ReportJoystickUnpluggedWarning(
+        "Joystick Axis missing, check if all controllers are plugged in");
     return 0.0;
   }
 
@@ -231,19 +272,21 @@ double DriverStation::GetStickAxis(int stick, int axis) {
  * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
  */
 int DriverStation::GetStickPOV(int stick, int pov) {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
   }
+  if (pov >= HAL_kMaxJoystickPOVs) {
+    wpi_setWPIError(BadJoystickAxis);
+    return -1;
+  }
+
   std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (pov >= m_joystickPOVs[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
-    if (pov >= HAL_kMaxJoystickPOVs)
-      wpi_setWPIError(BadJoystickAxis);
-    else
-      ReportJoystickUnpluggedWarning(
-          "Joystick POV missing, check if all controllers are plugged in");
+    ReportJoystickUnpluggedWarning(
+        "Joystick POV missing, check if all controllers are plugged in");
     return -1;
   }
 
@@ -257,10 +300,11 @@ int DriverStation::GetStickPOV(int stick, int pov) {
  * @return The state of the buttons on the joystick.
  */
 int DriverStation::GetStickButtons(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickButtons[stick].buttons;
 }
@@ -272,10 +316,11 @@ int DriverStation::GetStickButtons(int stick) const {
  * @return The number of axes on the indicated joystick
  */
 int DriverStation::GetStickAxisCount(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickAxes[stick].count;
 }
@@ -287,10 +332,11 @@ int DriverStation::GetStickAxisCount(int stick) const {
  * @return The number of POVs on the indicated joystick
  */
 int DriverStation::GetStickPOVCount(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickPOVs[stick].count;
 }
@@ -302,10 +348,11 @@ int DriverStation::GetStickPOVCount(int stick) const {
  * @return The number of buttons on the indicated joystick
  */
 int DriverStation::GetStickButtonCount(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickButtons[stick].count;
 }
@@ -317,10 +364,11 @@ int DriverStation::GetStickButtonCount(int stick) const {
  * @return A boolean that is true if the controller is an xbox controller.
  */
 bool DriverStation::GetJoystickIsXbox(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return false;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return static_cast<bool>(m_joystickDescriptor[stick].isXbox);
 }
@@ -332,10 +380,11 @@ bool DriverStation::GetJoystickIsXbox(int stick) const {
  * @return The HID type of joystick at the given port
  */
 int DriverStation::GetJoystickType(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return static_cast<int>(m_joystickDescriptor[stick].type);
 }
@@ -347,12 +396,12 @@ int DriverStation::GetJoystickType(int stick) const {
  * @return The name of the joystick at the given port
  */
 std::string DriverStation::GetJoystickName(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
-  std::string retVal(m_joystickDescriptor[stick].name);
-  return retVal;
+  return m_joystickDescriptor[stick].name;
 }
 
 /**
@@ -362,10 +411,11 @@ std::string DriverStation::GetJoystickName(int stick) const {
  * @return What type of axis the axis is reporting to be
  */
 int DriverStation::GetJoystickAxisType(int stick, int axis) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickDescriptor[stick].axisTypes[axis];
 }
@@ -589,7 +639,22 @@ void DriverStation::WaitForData() { WaitForData(0); }
  * @return true if new data, otherwise false
  */
 bool DriverStation::WaitForData(double timeout) {
-  return static_cast<bool>(HAL_WaitForDSDataTimeout(timeout));
+  auto timeoutTime =
+      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
+
+  std::unique_lock<wpi::mutex> lock(m_waitForDataMutex);
+  int currentCount = m_waitForDataCounter;
+  while (m_waitForDataCounter == currentCount) {
+    if (timeout > 0) {
+      auto timedOut = m_waitForDataCond.wait_until(lock, timeoutTime);
+      if (timedOut == std::cv_status::timeout) {
+        return false;
+      }
+    } else {
+      m_waitForDataCond.wait(lock);
+    }
+  }
+  return true;
 }
 
 /**
@@ -625,6 +690,65 @@ double DriverStation::GetBatteryVoltage() const {
   return voltage;
 }
 
+void DriverStation::SendMatchData() {
+  int32_t status = 0;
+  HAL_AllianceStationID alliance = HAL_GetAllianceStation(&status);
+  bool isRedAlliance = false;
+  int stationNumber = 1;
+  switch (alliance) {
+    case HAL_AllianceStationID::HAL_AllianceStationID_kBlue1:
+      isRedAlliance = false;
+      stationNumber = 1;
+      break;
+    case HAL_AllianceStationID::HAL_AllianceStationID_kBlue2:
+      isRedAlliance = false;
+      stationNumber = 2;
+      break;
+    case HAL_AllianceStationID::HAL_AllianceStationID_kBlue3:
+      isRedAlliance = false;
+      stationNumber = 3;
+      break;
+    case HAL_AllianceStationID::HAL_AllianceStationID_kRed1:
+      isRedAlliance = true;
+      stationNumber = 1;
+      break;
+    case HAL_AllianceStationID::HAL_AllianceStationID_kRed2:
+      isRedAlliance = true;
+      stationNumber = 2;
+      break;
+    default:
+      isRedAlliance = true;
+      stationNumber = 3;
+      break;
+  }
+
+  MatchInfoData tmpDataStore;
+  {
+    std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
+    tmpDataStore = *m_matchInfo;
+  }
+
+  m_matchDataSender->alliance.SetBoolean(isRedAlliance);
+  m_matchDataSender->station.SetDouble(stationNumber);
+  m_matchDataSender->eventName.SetString(tmpDataStore.eventName);
+  m_matchDataSender->gameSpecificMessage.SetString(
+      tmpDataStore.gameSpecificMessage);
+  m_matchDataSender->matchNumber.SetDouble(tmpDataStore.matchNumber);
+  m_matchDataSender->replayNumber.SetDouble(tmpDataStore.replayNumber);
+  m_matchDataSender->matchType.SetDouble(
+      static_cast<int>(tmpDataStore.matchType));
+
+  HAL_ControlWord ctlWord;
+  {
+    // Valid, as in other places we guarentee ctlWord >= int32
+    std::lock_guard<wpi::mutex> lock(m_controlWordMutex);
+    ctlWord = m_controlWordCache;
+  }
+  int32_t wordInt = 0;
+  std::memcpy(&wordInt, &ctlWord, sizeof(wordInt));
+  m_matchDataSender->controlWord.SetDouble(wordInt);
+}
+
 /**
  * Copy data from the DS task for the user.
  *
@@ -655,25 +779,37 @@ void DriverStation::GetData() {
   // Force a control word update, to make sure the data is the newest.
   HAL_ControlWord controlWord;
   UpdateControlWord(true, controlWord);
-  // Obtain a write lock on the data, swap the cached data into the
-  // main data arrays
-  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
 
-  for (int32_t i = 0; i < kJoystickPorts; i++) {
-    // If buttons weren't pressed and are now, set flags in m_buttonsPressed
-    m_joystickButtonsPressed[i] |=
-        ~m_joystickButtons[i].buttons & m_joystickButtonsCache[i].buttons;
+  {
+    // Obtain a write lock on the data, swap the cached data into the
+    // main data arrays
+    std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
 
-    // If buttons were pressed and aren't now, set flags in m_buttonsReleased
-    m_joystickButtonsReleased[i] |=
-        m_joystickButtons[i].buttons & ~m_joystickButtonsCache[i].buttons;
+    for (int32_t i = 0; i < kJoystickPorts; i++) {
+      // If buttons weren't pressed and are now, set flags in m_buttonsPressed
+      m_joystickButtonsPressed[i] |=
+          ~m_joystickButtons[i].buttons & m_joystickButtonsCache[i].buttons;
+
+      // If buttons were pressed and aren't now, set flags in m_buttonsReleased
+      m_joystickButtonsReleased[i] |=
+          m_joystickButtons[i].buttons & ~m_joystickButtonsCache[i].buttons;
+    }
+
+    m_joystickAxes.swap(m_joystickAxesCache);
+    m_joystickPOVs.swap(m_joystickPOVsCache);
+    m_joystickButtons.swap(m_joystickButtonsCache);
+    m_joystickDescriptor.swap(m_joystickDescriptorCache);
+    m_matchInfo.swap(m_matchInfoCache);
   }
 
-  m_joystickAxes.swap(m_joystickAxesCache);
-  m_joystickPOVs.swap(m_joystickPOVsCache);
-  m_joystickButtons.swap(m_joystickButtonsCache);
-  m_joystickDescriptor.swap(m_joystickDescriptorCache);
-  m_matchInfo.swap(m_matchInfoCache);
+  {
+    std::lock_guard<wpi::mutex> waitLock(m_waitForDataMutex);
+    // Nofify all threads
+    m_waitForDataCounter++;
+    m_waitForDataCond.notify_all();
+  }
+
+  SendMatchData();
 }
 
 /**
@@ -682,6 +818,7 @@ void DriverStation::GetData() {
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation() {
+  m_waitForDataCounter = 0;
   m_joystickAxes = std::make_unique<HAL_JoystickAxes[]>(kJoystickPorts);
   m_joystickPOVs = std::make_unique<HAL_JoystickPOVs[]>(kJoystickPorts);
   m_joystickButtons = std::make_unique<HAL_JoystickButtons[]>(kJoystickPorts);
@@ -695,6 +832,8 @@ DriverStation::DriverStation() {
   m_joystickDescriptorCache =
       std::make_unique<HAL_JoystickDescriptor[]>(kJoystickPorts);
   m_matchInfoCache = std::make_unique<MatchInfoData>();
+
+  m_matchDataSender = std::make_unique<MatchDataSender>();
 
   // All joysticks should default to having zero axes, povs and buttons, so
   // uninitialized memory doesn't get sent to speed controllers.
@@ -724,7 +863,7 @@ DriverStation::DriverStation() {
  * Reports errors related to unplugged joysticks
  * Throttles the errors so that they don't overwhelm the DS
  */
-void DriverStation::ReportJoystickUnpluggedError(const llvm::Twine& message) {
+void DriverStation::ReportJoystickUnpluggedError(const wpi::Twine& message) {
   double currentTime = Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
     ReportError(message);
@@ -737,7 +876,7 @@ void DriverStation::ReportJoystickUnpluggedError(const llvm::Twine& message) {
  *
  * Throttles the errors so that they don't overwhelm the DS.
  */
-void DriverStation::ReportJoystickUnpluggedWarning(const llvm::Twine& message) {
+void DriverStation::ReportJoystickUnpluggedWarning(const wpi::Twine& message) {
   double currentTime = Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
     ReportWarning(message);

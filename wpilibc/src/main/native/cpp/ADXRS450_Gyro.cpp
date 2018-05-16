@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -64,7 +64,7 @@ ADXRS450_Gyro::ADXRS450_Gyro() : ADXRS450_Gyro(SPI::kOnboardCS0) {}
 ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port) : m_spi(port) {
   m_spi.SetClockRate(3000000);
   m_spi.SetMSBFirst();
-  m_spi.SetSampleDataOnRising();
+  m_spi.SetSampleDataOnLeadingEdge();
   m_spi.SetClockActiveHigh();
   m_spi.SetChipSelectActiveLow();
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2012-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2012-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include <support/deprecated.h>
+#include <wpi/deprecated.h>
 
 #include "SmartDashboard/Sendable.h"
 
@@ -39,9 +39,9 @@ class WPI_DEPRECATED("use Sendable directly instead") LiveWindowSendable
   virtual void StopLiveWindowMode() = 0;
 
   std::string GetName() const override;
-  void SetName(const llvm::Twine& name) override;
+  void SetName(const wpi::Twine& name) override;
   std::string GetSubsystem() const override;
-  void SetSubsystem(const llvm::Twine& subsystem) override;
+  void SetSubsystem(const wpi::Twine& subsystem) override;
   void InitSendable(SendableBuilder& builder) override;
 };
 

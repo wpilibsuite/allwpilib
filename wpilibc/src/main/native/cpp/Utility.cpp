@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,13 +16,13 @@
 #include <cstdlib>
 #include <cstring>
 
-#include <llvm/Path.h>
+#include <wpi/Path.h>
+#include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
 
 #include "ErrorBase.h"
 #include "HAL/DriverStation.h"
 #include "HAL/HAL.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -32,17 +32,17 @@ using namespace frc;
  * This allows breakpoints to be set on an assert. The users don't call this,
  * but instead use the wpi_assert macros in Utility.h.
  */
-bool wpi_assert_impl(bool conditionValue, const llvm::Twine& conditionText,
-                     const llvm::Twine& message, llvm::StringRef fileName,
-                     int lineNumber, llvm::StringRef funcName) {
+bool wpi_assert_impl(bool conditionValue, const wpi::Twine& conditionText,
+                     const wpi::Twine& message, wpi::StringRef fileName,
+                     int lineNumber, wpi::StringRef funcName) {
   if (!conditionValue) {
-    llvm::SmallString<128> locBuf;
-    llvm::raw_svector_ostream locStream(locBuf);
-    locStream << funcName << " [" << llvm::sys::path::filename(fileName) << ":"
+    wpi::SmallString<128> locBuf;
+    wpi::raw_svector_ostream locStream(locBuf);
+    locStream << funcName << " [" << wpi::sys::path::filename(fileName) << ":"
               << lineNumber << "]";
 
-    llvm::SmallString<128> errorBuf;
-    llvm::raw_svector_ostream errorStream(errorBuf);
+    wpi::SmallString<128> errorBuf;
+    wpi::raw_svector_ostream errorStream(errorBuf);
 
     errorStream << "Assertion \"" << conditionText << "\" ";
 
@@ -68,19 +68,19 @@ bool wpi_assert_impl(bool conditionValue, const llvm::Twine& conditionText,
  * This should not be called directly; it should only be used by
  * wpi_assertEqual_impl and wpi_assertNotEqual_impl.
  */
-void wpi_assertEqual_common_impl(const llvm::Twine& valueA,
-                                 const llvm::Twine& valueB,
-                                 const llvm::Twine& equalityType,
-                                 const llvm::Twine& message,
-                                 llvm::StringRef fileName, int lineNumber,
-                                 llvm::StringRef funcName) {
-  llvm::SmallString<128> locBuf;
-  llvm::raw_svector_ostream locStream(locBuf);
-  locStream << funcName << " [" << llvm::sys::path::filename(fileName) << ":"
+void wpi_assertEqual_common_impl(const wpi::Twine& valueA,
+                                 const wpi::Twine& valueB,
+                                 const wpi::Twine& equalityType,
+                                 const wpi::Twine& message,
+                                 wpi::StringRef fileName, int lineNumber,
+                                 wpi::StringRef funcName) {
+  wpi::SmallString<128> locBuf;
+  wpi::raw_svector_ostream locStream(locBuf);
+  locStream << funcName << " [" << wpi::sys::path::filename(fileName) << ":"
             << lineNumber << "]";
 
-  llvm::SmallString<128> errorBuf;
-  llvm::raw_svector_ostream errorStream(errorBuf);
+  wpi::SmallString<128> errorBuf;
+  wpi::raw_svector_ostream errorStream(errorBuf);
 
   errorStream << "Assertion \"" << valueA << " " << equalityType << " "
               << valueB << "\" ";
@@ -106,10 +106,10 @@ void wpi_assertEqual_common_impl(const llvm::Twine& valueA,
  * call this, but instead use the wpi_assertEqual macros in Utility.h.
  */
 bool wpi_assertEqual_impl(int valueA, int valueB,
-                          const llvm::Twine& valueAString,
-                          const llvm::Twine& valueBString,
-                          const llvm::Twine& message, llvm::StringRef fileName,
-                          int lineNumber, llvm::StringRef funcName) {
+                          const wpi::Twine& valueAString,
+                          const wpi::Twine& valueBString,
+                          const wpi::Twine& message, wpi::StringRef fileName,
+                          int lineNumber, wpi::StringRef funcName) {
   if (!(valueA == valueB)) {
     wpi_assertEqual_common_impl(valueAString, valueBString, "==", message,
                                 fileName, lineNumber, funcName);
@@ -125,11 +125,10 @@ bool wpi_assertEqual_impl(int valueA, int valueB,
  * this, but instead use the wpi_assertNotEqual macros in Utility.h.
  */
 bool wpi_assertNotEqual_impl(int valueA, int valueB,
-                             const llvm::Twine& valueAString,
-                             const llvm::Twine& valueBString,
-                             const llvm::Twine& message,
-                             llvm::StringRef fileName, int lineNumber,
-                             llvm::StringRef funcName) {
+                             const wpi::Twine& valueAString,
+                             const wpi::Twine& valueBString,
+                             const wpi::Twine& message, wpi::StringRef fileName,
+                             int lineNumber, wpi::StringRef funcName) {
   if (!(valueA != valueB)) {
     wpi_assertEqual_common_impl(valueAString, valueBString, "!=", message,
                                 fileName, lineNumber, funcName);
@@ -234,8 +233,8 @@ std::string GetStackTrace(int offset) {
   void* stackTrace[128];
   int stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
-  llvm::SmallString<1024> buf;
-  llvm::raw_svector_ostream trace(buf);
+  wpi::SmallString<1024> buf;
+  wpi::raw_svector_ostream trace(buf);
 
   for (int i = offset; i < stackSize; i++) {
     // Only print recursive functions once in a row.

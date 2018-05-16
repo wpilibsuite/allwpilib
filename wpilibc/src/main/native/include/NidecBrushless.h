@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -49,7 +49,7 @@ class NidecBrushless : public ErrorBase,
   bool IsAlive() const override;
   void SetSafetyEnabled(bool enabled) override;
   bool IsSafetyEnabled() const override;
-  void GetDescription(llvm::raw_ostream& desc) const override;
+  void GetDescription(wpi::raw_ostream& desc) const override;
 
   int GetChannel() const;
 

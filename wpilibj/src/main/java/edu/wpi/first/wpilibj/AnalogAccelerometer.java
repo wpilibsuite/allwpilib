@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,7 +19,6 @@ import static java.util.Objects.requireNonNull;
  * is calibrated by finding the center value over a period of time.
  */
 public class AnalogAccelerometer extends SensorBase implements PIDSource, Sendable {
-
   private AnalogInput m_analogChannel;
   private double m_voltsPerG = 1.0;
   private double m_zeroGVoltage = 2.5;

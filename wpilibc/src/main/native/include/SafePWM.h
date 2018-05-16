@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
@@ -36,7 +36,7 @@ class SafePWM : public PWM, public MotorSafety {
   void StopMotor();
   bool IsSafetyEnabled() const;
   void SetSafetyEnabled(bool enabled);
-  void GetDescription(llvm::raw_ostream& desc) const;
+  void GetDescription(wpi::raw_ostream& desc) const;
 
   virtual void SetSpeed(double speed);
 

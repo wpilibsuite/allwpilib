@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
  * TestBench}.
  */
 public final class TestBench {
-
   /**
    * The time that it takes to have a motor go from rotating at full speed to completely stopped.
    */
@@ -96,7 +95,6 @@ public final class TestBench {
    * @return a freshly allocated Talon, Encoder pair
    */
   public MotorEncoderFixture<Talon> getTalonPair() {
-
     MotorEncoderFixture<Talon> talonPair = new MotorEncoderFixture<Talon>() {
       @Override
       protected Talon giveSpeedController() {
@@ -128,7 +126,6 @@ public final class TestBench {
    * @return a freshly allocated Victor, Encoder pair
    */
   public MotorEncoderFixture<Victor> getVictorPair() {
-
     MotorEncoderFixture<Victor> vicPair = new MotorEncoderFixture<Victor>() {
       @Override
       protected Victor giveSpeedController() {
@@ -263,7 +260,6 @@ public final class TestBench {
   @SuppressWarnings("JavadocMethod")
   public static RelayCrossConnectFixture getRelayCrossConnectFixture() {
     RelayCrossConnectFixture relay = new RelayCrossConnectFixture() {
-
       @Override
       protected Relay giveRelay() {
         return new Relay(0);

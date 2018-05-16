@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,9 +16,10 @@
 #include <cstring>
 #include <string>
 
-#include <support/condition_variable.h>
-#include <support/mutex.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
 
+#include "HALInitializer.h"
 #include "MockData/DriverStationDataInternal.h"
 #include "MockData/MockHooks.h"
 
@@ -289,6 +290,7 @@ static int32_t newDataOccur(uint32_t refNum) {
  * that interfaces with LabVIEW.
  */
 void HAL_InitializeDriverStation(void) {
+  hal::init::CheckInit();
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished

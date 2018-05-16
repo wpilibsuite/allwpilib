@@ -18,14 +18,14 @@ def baseArtifactId = 'ni-libraries'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
 
 publishing {
-  publications {
-    nilibraries(MavenPublication) {
-      artifact libZip
-      artifact headersZip
+    publications {
+        nilibraries(MavenPublication) {
+            artifact libZip
+            artifact headersZip
 
-      artifactId = "${baseArtifactId}"
-      groupId artifactGroupId
-      version pubVersion
+            artifactId = "${baseArtifactId}"
+            groupId artifactGroupId
+            version pubVersion
+        }
     }
-  }
 }

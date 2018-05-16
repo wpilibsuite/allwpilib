@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -34,14 +34,13 @@ Solenoid::Solenoid(int channel)
 Solenoid::Solenoid(int moduleNumber, int channel)
     : SolenoidBase(moduleNumber), m_channel(channel) {
   if (!SensorBase::CheckSolenoidModule(m_moduleNumber)) {
-    wpi_setWPIErrorWithContext(
-        ModuleIndexOutOfRange,
-        "Solenoid Module " + llvm::Twine(m_moduleNumber));
+    wpi_setWPIErrorWithContext(ModuleIndexOutOfRange,
+                               "Solenoid Module " + wpi::Twine(m_moduleNumber));
     return;
   }
   if (!SensorBase::CheckSolenoidChannel(m_channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "Solenoid Channel " + llvm::Twine(m_channel));
+                               "Solenoid Channel " + wpi::Twine(m_channel));
     return;
   }
 

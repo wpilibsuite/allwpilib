@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,8 +7,8 @@
 
 #include "MotorSafetyHelper.h"
 
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
+#include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
 
 #include "DriverStation.h"
 #include "MotorSafety.h"
@@ -109,8 +109,8 @@ void MotorSafetyHelper::Check() {
   if (!enabled || ds.IsDisabled() || ds.IsTest()) return;
 
   if (stopTime < Timer::GetFPGATimestamp()) {
-    llvm::SmallString<128> buf;
-    llvm::raw_svector_ostream desc(buf);
+    wpi::SmallString<128> buf;
+    wpi::raw_svector_ostream desc(buf);
     m_safeObject->GetDescription(desc);
     desc << "... Output not updated often enough.";
     wpi_setWPIErrorWithContext(Timeout, desc.str());

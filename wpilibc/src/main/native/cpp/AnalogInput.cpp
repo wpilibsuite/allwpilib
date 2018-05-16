@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,7 +27,7 @@ using namespace frc;
 AnalogInput::AnalogInput(int channel) {
   if (!SensorBase::CheckAnalogInputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "Analog Input " + llvm::Twine(channel));
+                               "Analog Input " + wpi::Twine(channel));
     return;
   }
 

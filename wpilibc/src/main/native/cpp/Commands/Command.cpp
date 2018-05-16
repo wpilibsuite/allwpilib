@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -33,7 +33,7 @@ Command::Command() : Command("", -1.0) {}
  *
  * @param name the name for this command
  */
-Command::Command(const llvm::Twine& name) : Command(name, -1.0) {}
+Command::Command(const wpi::Twine& name) : Command(name, -1.0) {}
 
 /**
  * Creates a new command with the given timeout and a default name.
@@ -50,8 +50,7 @@ Command::Command(double timeout) : Command("", timeout) {}
  * @param timeout the time (in seconds) before this command "times out"
  * @see IsTimedOut()
  */
-Command::Command(const llvm::Twine& name, double timeout)
-    : SendableBase(false) {
+Command::Command(const wpi::Twine& name, double timeout) : SendableBase(false) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0.0 && timeout != -1.0)
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
@@ -61,7 +60,7 @@ Command::Command(const llvm::Twine& name, double timeout)
   // If name contains an empty string
   if (name.isTriviallyEmpty() ||
       (name.isSingleStringRef() && name.getSingleStringRef().empty())) {
-    SetName("Command_" + llvm::Twine(typeid(*this).name()));
+    SetName("Command_" + wpi::Twine(typeid(*this).name()));
   } else {
     SetName(name);
   }
@@ -140,6 +139,7 @@ void Command::Removed() {
   m_initialized = false;
   m_canceled = false;
   m_running = false;
+  m_completed = true;
 }
 
 /**
@@ -156,6 +156,7 @@ void Command::Start() {
         CommandIllegalUse,
         "Can not start a command that is part of a command group");
 
+  m_completed = false;
   Scheduler::GetInstance()->AddCommand(this);
 }
 
@@ -211,13 +212,13 @@ void Command::End() {}
  */
 void Command::Interrupted() { End(); }
 
-void Command::_Initialize() {}
+void Command::_Initialize() { m_completed = false; }
 
-void Command::_Interrupted() {}
+void Command::_Interrupted() { m_completed = true; }
 
 void Command::_Execute() {}
 
-void Command::_End() {}
+void Command::_End() { m_completed = true; }
 
 /**
  * Called to indicate that the timer should start.
@@ -318,6 +319,7 @@ void Command::ClearRequirements() { m_requirements.clear(); }
 void Command::StartRunning() {
   m_running = true;
   m_startTime = -1;
+  m_completed = false;
 }
 
 /**
@@ -329,6 +331,20 @@ void Command::StartRunning() {
  * @return whether or not the command is running
  */
 bool Command::IsRunning() const { return m_running; }
+
+/**
+ * Returns whether or not the command has been initialized.
+ *
+ * @return whether or not the command has been initialized.
+ */
+bool Command::IsInitialized() const { return m_initialized; }
+
+/**
+ * Returns whether or not the command has completed running.
+ *
+ * @return whether or not the command has completed running.
+ */
+bool Command::IsCompleted() const { return m_completed; }
 
 /**
  * This will cancel the current command.

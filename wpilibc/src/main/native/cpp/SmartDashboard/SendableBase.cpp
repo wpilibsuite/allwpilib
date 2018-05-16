@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -30,7 +30,7 @@ std::string SendableBase::GetName() const {
   return m_name;
 }
 
-void SendableBase::SetName(const llvm::Twine& name) {
+void SendableBase::SetName(const wpi::Twine& name) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   m_name = name.str();
 }
@@ -40,7 +40,7 @@ std::string SendableBase::GetSubsystem() const {
   return m_subsystem;
 }
 
-void SendableBase::SetSubsystem(const llvm::Twine& subsystem) {
+void SendableBase::SetSubsystem(const wpi::Twine& subsystem) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   m_subsystem = subsystem.str();
 }
@@ -70,9 +70,8 @@ void SendableBase::AddChild(void* child) {
  *                   value
  * @param channel    The channel number the device is plugged into
  */
-void SendableBase::SetName(const llvm::Twine& moduleType, int channel) {
-  SetName(moduleType + llvm::Twine('[') + llvm::Twine(channel) +
-          llvm::Twine(']'));
+void SendableBase::SetName(const wpi::Twine& moduleType, int channel) {
+  SetName(moduleType + wpi::Twine('[') + wpi::Twine(channel) + wpi::Twine(']'));
 }
 
 /**
@@ -84,8 +83,8 @@ void SendableBase::SetName(const llvm::Twine& moduleType, int channel) {
  * @param channel      The channel number the device is plugged into (usually
  * PWM)
  */
-void SendableBase::SetName(const llvm::Twine& moduleType, int moduleNumber,
+void SendableBase::SetName(const wpi::Twine& moduleType, int moduleNumber,
                            int channel) {
-  SetName(moduleType + llvm::Twine('[') + llvm::Twine(moduleNumber) +
-          llvm::Twine(',') + llvm::Twine(channel) + llvm::Twine(']'));
+  SetName(moduleType + wpi::Twine('[') + wpi::Twine(moduleNumber) +
+          wpi::Twine(',') + wpi::Twine(channel) + wpi::Twine(']'));
 }

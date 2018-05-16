@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -43,9 +43,11 @@ public abstract class RobotDriveBase extends SendableBase implements MotorSafety
   }
 
   /**
-   * Change the default value for deadband scaling. The default value is
-   * {@value #kDefaultDeadband}. Values smaller then the deadband are set to 0, while values
-   * larger then the deadband are scaled from 0.0 to 1.0. See {@link #applyDeadband}.
+   * Sets the deadband applied to the drive inputs (e.g., joystick values).
+   *
+   * <p>The default value is {@value #kDefaultDeadband}. Inputs smaller than the deadband are set to
+   * 0.0 while inputs larger than the deadband are scaled from 0.0 to 1.0. See
+   * {@link #applyDeadband}.
    *
    * @param deadband The deadband to set.
    */
@@ -63,6 +65,15 @@ public abstract class RobotDriveBase extends SendableBase implements MotorSafety
    */
   public void setMaxOutput(double maxOutput) {
     m_maxOutput = maxOutput;
+  }
+
+  /**
+   * Feed the motor safety object. Resets the timer that will stop the motors if it completes.
+   *
+   * @see MotorSafetyHelper#feed()
+   */
+  public void feedWatchdog() {
+    m_safetyHelper.feed();
   }
 
   @Override

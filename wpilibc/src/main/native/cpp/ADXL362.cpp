@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -47,7 +47,7 @@ ADXL362::ADXL362(Range range) : ADXL362(SPI::Port::kOnboardCS1, range) {}
 ADXL362::ADXL362(SPI::Port port, Range range) : m_spi(port) {
   m_spi.SetClockRate(3000000);
   m_spi.SetMSBFirst();
-  m_spi.SetSampleDataOnFalling();
+  m_spi.SetSampleDataOnTrailingEdge();
   m_spi.SetClockActiveLow();
   m_spi.SetChipSelectActiveLow();
 

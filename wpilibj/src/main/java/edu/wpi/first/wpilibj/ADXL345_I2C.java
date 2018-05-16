@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
 public class ADXL345_I2C extends SensorBase implements Accelerometer, Sendable {
-
   private static final byte kAddress = 0x1D;
   private static final byte kPowerCtlRegister = 0x2D;
   private static final byte kDataFormatRegister = 0x31;
@@ -57,7 +56,6 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, Sendable {
 
   @SuppressWarnings("MemberName")
   public static class AllAxes {
-
     public double XAxis;
     public double YAxis;
     public double ZAxis;

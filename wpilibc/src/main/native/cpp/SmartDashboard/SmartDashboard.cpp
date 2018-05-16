@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,10 +7,10 @@
 
 #include "SmartDashboard/SmartDashboard.h"
 
-#include <llvm/StringMap.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
-#include <support/mutex.h>
+#include <wpi/StringMap.h>
+#include <wpi/mutex.h>
 
 #include "HLUsageReporting.h"
 #include "SmartDashboard/Sendable.h"
@@ -34,7 +34,7 @@ class Singleton {
   static Singleton& GetInstance();
 
   std::shared_ptr<nt::NetworkTable> table;
-  llvm::StringMap<SmartDashboardData> tablesToData;
+  wpi::StringMap<SmartDashboardData> tablesToData;
   wpi::mutex tablesToDataMutex;
 
  private:
@@ -61,7 +61,7 @@ void SmartDashboard::init() { Singleton::GetInstance(); }
  * @param key the key to search for
  * @return true if the table as a value assigned to the given key
  */
-bool SmartDashboard::ContainsKey(llvm::StringRef key) {
+bool SmartDashboard::ContainsKey(wpi::StringRef key) {
   return Singleton::GetInstance().table->ContainsKey(key);
 }
 
@@ -78,7 +78,7 @@ std::vector<std::string> SmartDashboard::GetKeys(int types) {
  *
  * @param key the key to make persistent
  */
-void SmartDashboard::SetPersistent(llvm::StringRef key) {
+void SmartDashboard::SetPersistent(wpi::StringRef key) {
   Singleton::GetInstance().table->GetEntry(key).SetPersistent();
 }
 
@@ -88,7 +88,7 @@ void SmartDashboard::SetPersistent(llvm::StringRef key) {
  *
  * @param key the key name
  */
-void SmartDashboard::ClearPersistent(llvm::StringRef key) {
+void SmartDashboard::ClearPersistent(wpi::StringRef key) {
   Singleton::GetInstance().table->GetEntry(key).ClearPersistent();
 }
 
@@ -98,7 +98,7 @@ void SmartDashboard::ClearPersistent(llvm::StringRef key) {
  *
  * @param key the key name
  */
-bool SmartDashboard::IsPersistent(llvm::StringRef key) {
+bool SmartDashboard::IsPersistent(wpi::StringRef key) {
   return Singleton::GetInstance().table->GetEntry(key).IsPersistent();
 }
 
@@ -109,7 +109,7 @@ bool SmartDashboard::IsPersistent(llvm::StringRef key) {
  * @param key the key name
  * @param flags the flags to set (bitmask)
  */
-void SmartDashboard::SetFlags(llvm::StringRef key, unsigned int flags) {
+void SmartDashboard::SetFlags(wpi::StringRef key, unsigned int flags) {
   Singleton::GetInstance().table->GetEntry(key).SetFlags(flags);
 }
 
@@ -120,7 +120,7 @@ void SmartDashboard::SetFlags(llvm::StringRef key, unsigned int flags) {
  * @param key the key name
  * @param flags the flags to clear (bitmask)
  */
-void SmartDashboard::ClearFlags(llvm::StringRef key, unsigned int flags) {
+void SmartDashboard::ClearFlags(wpi::StringRef key, unsigned int flags) {
   Singleton::GetInstance().table->GetEntry(key).ClearFlags(flags);
 }
 
@@ -130,7 +130,7 @@ void SmartDashboard::ClearFlags(llvm::StringRef key, unsigned int flags) {
  * @param key the key name
  * @return the flags, or 0 if the key is not defined
  */
-unsigned int SmartDashboard::GetFlags(llvm::StringRef key) {
+unsigned int SmartDashboard::GetFlags(wpi::StringRef key) {
   return Singleton::GetInstance().table->GetEntry(key).GetFlags();
 }
 
@@ -139,7 +139,7 @@ unsigned int SmartDashboard::GetFlags(llvm::StringRef key) {
  *
  * @param key the key name
  */
-void SmartDashboard::Delete(llvm::StringRef key) {
+void SmartDashboard::Delete(wpi::StringRef key) {
   Singleton::GetInstance().table->Delete(key);
 }
 
@@ -152,7 +152,7 @@ void SmartDashboard::Delete(llvm::StringRef key) {
  * @param keyName the key
  * @param value   the value
  */
-void SmartDashboard::PutData(llvm::StringRef key, Sendable* data) {
+void SmartDashboard::PutData(wpi::StringRef key, Sendable* data) {
   if (data == nullptr) {
     wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
     return;
@@ -162,10 +162,12 @@ void SmartDashboard::PutData(llvm::StringRef key, Sendable* data) {
   auto& sddata = inst.tablesToData[key];
   if (!sddata.sendable || sddata.sendable != data) {
     sddata = SmartDashboardData(data);
-    sddata.builder.SetTable(inst.table->GetSubTable(key));
+    auto dataTable = inst.table->GetSubTable(key);
+    sddata.builder.SetTable(dataTable);
     data->InitSendable(sddata.builder);
     sddata.builder.UpdateTable();
     sddata.builder.StartListeners();
+    dataTable->GetEntry(".name").SetString(key);
   }
 }
 
@@ -192,7 +194,7 @@ void SmartDashboard::PutData(Sendable* value) {
  * @param keyName the key
  * @return the value
  */
-Sendable* SmartDashboard::GetData(llvm::StringRef key) {
+Sendable* SmartDashboard::GetData(wpi::StringRef key) {
   auto& inst = Singleton::GetInstance();
   std::lock_guard<wpi::mutex> lock(inst.tablesToDataMutex);
   auto data = inst.tablesToData.find(key);
@@ -214,7 +216,7 @@ Sendable* SmartDashboard::GetData(llvm::StringRef key) {
  * @param value   the value
  * @return        False if the table key already exists with a different type
  */
-bool SmartDashboard::PutValue(llvm::StringRef keyName,
+bool SmartDashboard::PutValue(wpi::StringRef keyName,
                               std::shared_ptr<nt::Value> value) {
   return Singleton::GetInstance().table->GetEntry(keyName).SetValue(value);
 }
@@ -226,7 +228,7 @@ bool SmartDashboard::PutValue(llvm::StringRef keyName,
  * @param defaultValue The default value to set if key doesn't exist.
  * @returns False if the table key exists with a different type
  */
-bool SmartDashboard::SetDefaultValue(llvm::StringRef key,
+bool SmartDashboard::SetDefaultValue(wpi::StringRef key,
                                      std::shared_ptr<nt::Value> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultValue(
       defaultValue);
@@ -239,7 +241,7 @@ bool SmartDashboard::SetDefaultValue(llvm::StringRef key,
  * @param keyName the key
  * @param value   the object to retrieve the value into
  */
-std::shared_ptr<nt::Value> SmartDashboard::GetValue(llvm::StringRef keyName) {
+std::shared_ptr<nt::Value> SmartDashboard::GetValue(wpi::StringRef keyName) {
   return Singleton::GetInstance().table->GetEntry(keyName).GetValue();
 }
 
@@ -253,7 +255,7 @@ std::shared_ptr<nt::Value> SmartDashboard::GetValue(llvm::StringRef keyName) {
  * @param value   the value
  * @return        False if the table key already exists with a different type
  */
-bool SmartDashboard::PutBoolean(llvm::StringRef keyName, bool value) {
+bool SmartDashboard::PutBoolean(wpi::StringRef keyName, bool value) {
   return Singleton::GetInstance().table->GetEntry(keyName).SetBoolean(value);
 }
 
@@ -263,7 +265,7 @@ bool SmartDashboard::PutBoolean(llvm::StringRef keyName, bool value) {
  * @param defaultValue the default value to set if key doesn't exist.
  * @returns False if the table key exists with a different type
  */
-bool SmartDashboard::SetDefaultBoolean(llvm::StringRef key, bool defaultValue) {
+bool SmartDashboard::SetDefaultBoolean(wpi::StringRef key, bool defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultBoolean(
       defaultValue);
 }
@@ -276,7 +278,7 @@ bool SmartDashboard::SetDefaultBoolean(llvm::StringRef key, bool defaultValue) {
  * @param keyName the key
  * @return the value
  */
-bool SmartDashboard::GetBoolean(llvm::StringRef keyName, bool defaultValue) {
+bool SmartDashboard::GetBoolean(wpi::StringRef keyName, bool defaultValue) {
   return Singleton::GetInstance().table->GetEntry(keyName).GetBoolean(
       defaultValue);
 }
@@ -291,7 +293,7 @@ bool SmartDashboard::GetBoolean(llvm::StringRef keyName, bool defaultValue) {
  * @param value   the value
  * @return        False if the table key already exists with a different type
  */
-bool SmartDashboard::PutNumber(llvm::StringRef keyName, double value) {
+bool SmartDashboard::PutNumber(wpi::StringRef keyName, double value) {
   return Singleton::GetInstance().table->GetEntry(keyName).SetDouble(value);
 }
 
@@ -302,8 +304,7 @@ bool SmartDashboard::PutNumber(llvm::StringRef keyName, double value) {
  * @param defaultValue The default value to set if key doesn't exist.
  * @returns False if the table key exists with a different type
  */
-bool SmartDashboard::SetDefaultNumber(llvm::StringRef key,
-                                      double defaultValue) {
+bool SmartDashboard::SetDefaultNumber(wpi::StringRef key, double defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultDouble(
       defaultValue);
 }
@@ -316,7 +317,7 @@ bool SmartDashboard::SetDefaultNumber(llvm::StringRef key,
  * @param keyName the key
  * @return the value
  */
-double SmartDashboard::GetNumber(llvm::StringRef keyName, double defaultValue) {
+double SmartDashboard::GetNumber(wpi::StringRef keyName, double defaultValue) {
   return Singleton::GetInstance().table->GetEntry(keyName).GetDouble(
       defaultValue);
 }
@@ -331,7 +332,7 @@ double SmartDashboard::GetNumber(llvm::StringRef keyName, double defaultValue) {
  * @param value   the value
  * @return        False if the table key already exists with a different type
  */
-bool SmartDashboard::PutString(llvm::StringRef keyName, llvm::StringRef value) {
+bool SmartDashboard::PutString(wpi::StringRef keyName, wpi::StringRef value) {
   return Singleton::GetInstance().table->GetEntry(keyName).SetString(value);
 }
 
@@ -341,8 +342,8 @@ bool SmartDashboard::PutString(llvm::StringRef keyName, llvm::StringRef value) {
  * @param defaultValue the default value to set if key doesn't exist.
  * @returns False if the table key exists with a different type
  */
-bool SmartDashboard::SetDefaultString(llvm::StringRef key,
-                                      llvm::StringRef defaultValue) {
+bool SmartDashboard::SetDefaultString(wpi::StringRef key,
+                                      wpi::StringRef defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultString(
       defaultValue);
 }
@@ -355,8 +356,8 @@ bool SmartDashboard::SetDefaultString(llvm::StringRef key,
  * @param keyName the key
  * @return the value
  */
-std::string SmartDashboard::GetString(llvm::StringRef keyName,
-                                      llvm::StringRef defaultValue) {
+std::string SmartDashboard::GetString(wpi::StringRef keyName,
+                                      wpi::StringRef defaultValue) {
   return Singleton::GetInstance().table->GetEntry(keyName).GetString(
       defaultValue);
 }
@@ -372,8 +373,8 @@ std::string SmartDashboard::GetString(llvm::StringRef keyName,
  *       std::vector<bool> is special-cased in C++. 0 is false, any
  *       non-zero value is true.
  */
-bool SmartDashboard::PutBooleanArray(llvm::StringRef key,
-                                     llvm::ArrayRef<int> value) {
+bool SmartDashboard::PutBooleanArray(wpi::StringRef key,
+                                     wpi::ArrayRef<int> value) {
   return Singleton::GetInstance().table->GetEntry(key).SetBooleanArray(value);
 }
 
@@ -384,8 +385,8 @@ bool SmartDashboard::PutBooleanArray(llvm::StringRef key,
  * @param defaultValue the default value to set if key doesn't exist.
  * @returns False if the table key exists with a different type
  */
-bool SmartDashboard::SetDefaultBooleanArray(llvm::StringRef key,
-                                            llvm::ArrayRef<int> defaultValue) {
+bool SmartDashboard::SetDefaultBooleanArray(wpi::StringRef key,
+                                            wpi::ArrayRef<int> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultBooleanArray(
       defaultValue);
 }
@@ -409,7 +410,7 @@ bool SmartDashboard::SetDefaultBooleanArray(llvm::StringRef key,
  *       non-zero value is true.
  */
 std::vector<int> SmartDashboard::GetBooleanArray(
-    llvm::StringRef key, llvm::ArrayRef<int> defaultValue) {
+    wpi::StringRef key, wpi::ArrayRef<int> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).GetBooleanArray(
       defaultValue);
 }
@@ -421,8 +422,8 @@ std::vector<int> SmartDashboard::GetBooleanArray(
  * @param value The value that will be assigned.
  * @return False if the table key already exists with a different type
  */
-bool SmartDashboard::PutNumberArray(llvm::StringRef key,
-                                    llvm::ArrayRef<double> value) {
+bool SmartDashboard::PutNumberArray(wpi::StringRef key,
+                                    wpi::ArrayRef<double> value) {
   return Singleton::GetInstance().table->GetEntry(key).SetDoubleArray(value);
 }
 
@@ -433,8 +434,8 @@ bool SmartDashboard::PutNumberArray(llvm::StringRef key,
  * @param defaultValue The default value to set if key doesn't exist.
  * @returns False if the table key exists with a different type
  */
-bool SmartDashboard::SetDefaultNumberArray(
-    llvm::StringRef key, llvm::ArrayRef<double> defaultValue) {
+bool SmartDashboard::SetDefaultNumberArray(wpi::StringRef key,
+                                           wpi::ArrayRef<double> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultDoubleArray(
       defaultValue);
 }
@@ -454,7 +455,7 @@ bool SmartDashboard::SetDefaultNumberArray(
  *       use GetValue() instead.
  */
 std::vector<double> SmartDashboard::GetNumberArray(
-    llvm::StringRef key, llvm::ArrayRef<double> defaultValue) {
+    wpi::StringRef key, wpi::ArrayRef<double> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).GetDoubleArray(
       defaultValue);
 }
@@ -466,8 +467,8 @@ std::vector<double> SmartDashboard::GetNumberArray(
  * @param value The value that will be assigned.
  * @return False if the table key already exists with a different type
  */
-bool SmartDashboard::PutStringArray(llvm::StringRef key,
-                                    llvm::ArrayRef<std::string> value) {
+bool SmartDashboard::PutStringArray(wpi::StringRef key,
+                                    wpi::ArrayRef<std::string> value) {
   return Singleton::GetInstance().table->GetEntry(key).SetStringArray(value);
 }
 
@@ -479,7 +480,7 @@ bool SmartDashboard::PutStringArray(llvm::StringRef key,
  * @returns False if the table key exists with a different type
  */
 bool SmartDashboard::SetDefaultStringArray(
-    llvm::StringRef key, llvm::ArrayRef<std::string> defaultValue) {
+    wpi::StringRef key, wpi::ArrayRef<std::string> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultStringArray(
       defaultValue);
 }
@@ -499,7 +500,7 @@ bool SmartDashboard::SetDefaultStringArray(
  *       use GetValue() instead.
  */
 std::vector<std::string> SmartDashboard::GetStringArray(
-    llvm::StringRef key, llvm::ArrayRef<std::string> defaultValue) {
+    wpi::StringRef key, wpi::ArrayRef<std::string> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).GetStringArray(
       defaultValue);
 }
@@ -511,7 +512,7 @@ std::vector<std::string> SmartDashboard::GetStringArray(
  * @param value The value that will be assigned.
  * @return False if the table key already exists with a different type
  */
-bool SmartDashboard::PutRaw(llvm::StringRef key, llvm::StringRef value) {
+bool SmartDashboard::PutRaw(wpi::StringRef key, wpi::StringRef value) {
   return Singleton::GetInstance().table->GetEntry(key).SetRaw(value);
 }
 
@@ -522,8 +523,8 @@ bool SmartDashboard::PutRaw(llvm::StringRef key, llvm::StringRef value) {
  * @param defaultValue The default value to set if key doesn't exist.
  * @returns False if the table key exists with a different type
  */
-bool SmartDashboard::SetDefaultRaw(llvm::StringRef key,
-                                   llvm::StringRef defaultValue) {
+bool SmartDashboard::SetDefaultRaw(wpi::StringRef key,
+                                   wpi::StringRef defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultRaw(
       defaultValue);
 }
@@ -542,8 +543,8 @@ bool SmartDashboard::SetDefaultRaw(llvm::StringRef key,
  * @note This makes a copy of the raw contents. If the overhead of this is a
  *       concern, use GetValue() instead.
  */
-std::string SmartDashboard::GetRaw(llvm::StringRef key,
-                                   llvm::StringRef defaultValue) {
+std::string SmartDashboard::GetRaw(wpi::StringRef key,
+                                   wpi::StringRef defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).GetRaw(defaultValue);
 }
 

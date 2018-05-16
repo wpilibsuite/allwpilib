@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -20,8 +20,8 @@ using namespace frc;
  * @param fbGains The "feed back" or IIR gains
  */
 LinearDigitalFilter::LinearDigitalFilter(PIDSource& source,
-                                         llvm::ArrayRef<double> ffGains,
-                                         llvm::ArrayRef<double> fbGains)
+                                         wpi::ArrayRef<double> ffGains,
+                                         wpi::ArrayRef<double> fbGains)
     : Filter(source),
       m_inputs(ffGains.size()),
       m_outputs(fbGains.size()),
@@ -36,8 +36,8 @@ LinearDigitalFilter::LinearDigitalFilter(PIDSource& source,
  * @param fbGains The "feed back" or IIR gains
  */
 LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                                         llvm::ArrayRef<double> ffGains,
-                                         llvm::ArrayRef<double> fbGains)
+                                         wpi::ArrayRef<double> ffGains,
+                                         wpi::ArrayRef<double> fbGains)
     : Filter(source),
       m_inputs(ffGains.size()),
       m_outputs(fbGains.size()),

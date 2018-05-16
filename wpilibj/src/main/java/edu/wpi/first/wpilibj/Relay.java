@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -34,7 +34,6 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
    * which the relay is set.
    */
   public class InvalidValueException extends RuntimeException {
-
     /**
      * Create a new exception with the given message.
      *
@@ -103,7 +102,7 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
   private void initRelay() {
     SensorBase.checkRelayChannel(m_channel);
 
-    int portHandle = RelayJNI.getPort((byte) m_channel);
+    int portHandle = HAL.getPort((byte) m_channel);
     if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
       m_forwardHandle = RelayJNI.initializeRelayPort(portHandle, true);
       HAL.report(tResourceType.kResourceType_Relay, m_channel);

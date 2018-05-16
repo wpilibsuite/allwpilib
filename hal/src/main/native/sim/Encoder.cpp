@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,7 @@
 #include "HAL/Errors.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
+#include "HALInitializer.h"
 #include "MockData/EncoderDataInternal.h"
 #include "PortsInternal.h"
 
@@ -56,6 +57,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(
     HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
     HAL_Bool reverseDirection, HAL_EncoderEncodingType encodingType,
     int32_t* status) {
+  hal::init::CheckInit();
   HAL_Handle nativeHandle = HAL_kInvalidHandle;
   if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
     // k4x, allocate encoder
@@ -254,6 +256,7 @@ void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
     return;
   }
   encoder->distancePerPulse = distancePerPulse;
+  SimEncoderData[encoder->index].SetDistancePerPulse(distancePerPulse);
 }
 void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoderHandle,
                                     HAL_Bool reverseDirection,

@@ -1,0 +1,28 @@
+cppHeaderFileInclude {
+  \.h$
+  \.inc$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+modifiableFileExclude {
+  \.so$
+}
+
+repoRootNameOverride {
+  cameraserver
+}
+
+includeOtherLibs {
+  ^HAL/
+  ^networktables/
+  ^opencv2/
+  ^support/
+  ^wpi/
+}
+
+includeGuardRoots {
+  cameraserver/src/main/native/include/
+}

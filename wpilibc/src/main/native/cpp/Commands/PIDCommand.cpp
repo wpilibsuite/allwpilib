@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,7 +11,7 @@
 
 using namespace frc;
 
-PIDCommand::PIDCommand(const llvm::Twine& name, double p, double i, double d,
+PIDCommand::PIDCommand(const wpi::Twine& name, double p, double i, double d,
                        double f, double period)
     : Command(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this, period);
@@ -22,12 +22,12 @@ PIDCommand::PIDCommand(double p, double i, double d, double f, double period) {
       std::make_shared<PIDController>(p, i, d, f, this, this, period);
 }
 
-PIDCommand::PIDCommand(const llvm::Twine& name, double p, double i, double d)
+PIDCommand::PIDCommand(const wpi::Twine& name, double p, double i, double d)
     : Command(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this);
 }
 
-PIDCommand::PIDCommand(const llvm::Twine& name, double p, double i, double d,
+PIDCommand::PIDCommand(const wpi::Twine& name, double p, double i, double d,
                        double period)
     : Command(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this, period);

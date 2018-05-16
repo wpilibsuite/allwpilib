@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,11 +13,12 @@
 
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/NetCommRPCProxy_Occur.h>
-#include <llvm/raw_ostream.h>
-#include <support/condition_variable.h>
-#include <support/mutex.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
 
 #include "HAL/DriverStation.h"
+#include "HALInitializer.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");
@@ -73,12 +74,12 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                                                 details, location, callStack);
     if (printMsg) {
       if (location && location[0] != '\0') {
-        llvm::errs() << (isError ? "Error" : "Warning") << " at " << location
-                     << ": ";
+        wpi::errs() << (isError ? "Error" : "Warning") << " at " << location
+                    << ": ";
       }
-      llvm::errs() << details << "\n";
+      wpi::errs() << details << "\n";
       if (callStack && callStack[0] != '\0') {
-        llvm::errs() << callStack << "\n";
+        wpi::errs() << callStack << "\n";
       }
     }
     if (i == KEEP_MSGS) {
@@ -380,6 +381,7 @@ static void newDataOccur(uint32_t refNum) {
  * that interfaces with LabVIEW.
  */
 void HAL_InitializeDriverStation(void) {
+  hal::init::CheckInit();
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished

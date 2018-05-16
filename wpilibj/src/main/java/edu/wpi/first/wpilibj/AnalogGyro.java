@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,7 +24,6 @@ import static java.util.Objects.requireNonNull;
  * <p>This class is for gyro sensors that connect to an analog input.
  */
 public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable {
-
   private static final double kDefaultVoltsPerDegreePerSecond = 0.007;
   protected AnalogInput m_analog;
   private boolean m_channelAllocated = false;

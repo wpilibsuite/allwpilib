@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -38,20 +38,20 @@ class Preferences : public ErrorBase {
   static Preferences* GetInstance();
 
   std::vector<std::string> GetKeys();
-  std::string GetString(llvm::StringRef key, llvm::StringRef defaultValue = "");
-  int GetInt(llvm::StringRef key, int defaultValue = 0);
-  double GetDouble(llvm::StringRef key, double defaultValue = 0.0);
-  float GetFloat(llvm::StringRef key, float defaultValue = 0.0);
-  bool GetBoolean(llvm::StringRef key, bool defaultValue = false);
-  int64_t GetLong(llvm::StringRef key, int64_t defaultValue = 0);
-  void PutString(llvm::StringRef key, llvm::StringRef value);
-  void PutInt(llvm::StringRef key, int value);
-  void PutDouble(llvm::StringRef key, double value);
-  void PutFloat(llvm::StringRef key, float value);
-  void PutBoolean(llvm::StringRef key, bool value);
-  void PutLong(llvm::StringRef key, int64_t value);
-  bool ContainsKey(llvm::StringRef key);
-  void Remove(llvm::StringRef key);
+  std::string GetString(wpi::StringRef key, wpi::StringRef defaultValue = "");
+  int GetInt(wpi::StringRef key, int defaultValue = 0);
+  double GetDouble(wpi::StringRef key, double defaultValue = 0.0);
+  float GetFloat(wpi::StringRef key, float defaultValue = 0.0);
+  bool GetBoolean(wpi::StringRef key, bool defaultValue = false);
+  int64_t GetLong(wpi::StringRef key, int64_t defaultValue = 0);
+  void PutString(wpi::StringRef key, wpi::StringRef value);
+  void PutInt(wpi::StringRef key, int value);
+  void PutDouble(wpi::StringRef key, double value);
+  void PutFloat(wpi::StringRef key, float value);
+  void PutBoolean(wpi::StringRef key, bool value);
+  void PutLong(wpi::StringRef key, int64_t value);
+  bool ContainsKey(wpi::StringRef key);
+  void Remove(wpi::StringRef key);
 
  protected:
   Preferences();

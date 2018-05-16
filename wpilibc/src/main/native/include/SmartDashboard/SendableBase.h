@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,7 @@
 #include <memory>
 #include <string>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "Sendable.h"
 
@@ -24,16 +24,16 @@ class SendableBase : public Sendable {
   using Sendable::SetName;
 
   std::string GetName() const final;
-  void SetName(const llvm::Twine& name) final;
+  void SetName(const wpi::Twine& name) final;
   std::string GetSubsystem() const final;
-  void SetSubsystem(const llvm::Twine& subsystem) final;
+  void SetSubsystem(const wpi::Twine& subsystem) final;
 
  protected:
   void AddChild(std::shared_ptr<Sendable> child);
   void AddChild(void* child);
 
-  void SetName(const llvm::Twine& moduleType, int channel);
-  void SetName(const llvm::Twine& moduleType, int moduleNumber, int channel);
+  void SetName(const wpi::Twine& moduleType, int channel);
+  void SetName(const wpi::Twine& moduleType, int moduleNumber, int channel);
 
  private:
   mutable wpi::mutex m_mutex;

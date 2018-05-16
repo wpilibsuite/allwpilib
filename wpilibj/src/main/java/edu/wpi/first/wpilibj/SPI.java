@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.hal.SPIJNI;
  * Represents a SPI bus port.
  */
 public class SPI {
-
   public enum Port {
     kOnboardCS0(0), kOnboardCS1(1), kOnboardCS2(2), kOnboardCS3(3), kMXP(4);
 
@@ -108,8 +107,29 @@ public class SPI {
   }
 
   /**
-   * Configure that the data is stable on the falling edge and the data changes on the rising edge.
+   * Configure that the data is stable on the leading edge and the data changes on the trailing
+   * edge.
    */
+  public final void setSampleDataOnLeadingEdge() {
+    m_dataOnTrailing = 0;
+    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+  }
+
+  /**
+   * Configure that the data is stable on the trailing edge and the data changes on the leading
+   * edge.
+   */
+  public final void setSampleDataOnTrailingEdge() {
+    m_dataOnTrailing = 1;
+    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+  }
+
+  /**
+   * Configure that the data is stable on the falling edge and the data changes on the rising edge.
+   * Note this gets reversed is setClockActiveLow is set.
+   * @deprecated use {@link #setSampleDataOnTrailingEdge()} in most cases.
+   */
+  @Deprecated
   public final void setSampleDataOnFalling() {
     m_dataOnTrailing = 1;
     SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
@@ -117,11 +137,16 @@ public class SPI {
 
   /**
    * Configure that the data is stable on the rising edge and the data changes on the falling edge.
+   * Note this gets reversed is setClockActiveLow is set.
+   * @deprecated use {@link #setSampleDataOnLeadingEdge()} in most cases.
    */
+  @Deprecated
   public final void setSampleDataOnRising() {
     m_dataOnTrailing = 0;
     SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
   }
+
+
 
   /**
    * Configure the chip select line to be active high.

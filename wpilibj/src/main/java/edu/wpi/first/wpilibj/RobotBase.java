@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -34,15 +34,42 @@ import edu.wpi.first.wpilibj.util.WPILibVersion;
  */
 public abstract class RobotBase {
   /**
-   * The VxWorks priority that robot code should work at (so Java code should run at).
-   */
-  public static final int ROBOT_TASK_PRIORITY = 101;
-
-  /**
    * The ID of the main Java thread.
    */
   // This is usually 1, but it is best to make sure
   public static final long MAIN_THREAD_ID = Thread.currentThread().getId();
+
+  private static void setupCameraServerShared() {
+    CameraServerShared shared = new CameraServerShared() {
+
+      @Override
+      public void reportVideoServer(int id) {
+        HAL.report(tResourceType.kResourceType_PCVideoServer, id);
+      }
+
+      @Override
+      public void reportUsbCamera(int id) {
+        HAL.report(tResourceType.kResourceType_PCVideoServer, id);
+      }
+
+      @Override
+      public void reportDriverStationError(String error) {
+        DriverStation.reportError(error, true);
+      }
+
+      @Override
+      public void reportAxisCamera(int id) {
+        HAL.report(tResourceType.kResourceType_AxisCamera, id);
+      }
+
+      @Override
+      public Long getRobotMainThreadId() {
+        return MAIN_THREAD_ID;
+      }
+    };
+
+    CameraServerSharedStore.setCameraServerShared(shared);
+  }
 
   protected final DriverStation m_ds;
 
@@ -57,6 +84,7 @@ public abstract class RobotBase {
    */
   protected RobotBase() {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    setupCameraServerShared();
     inst.setNetworkIdentity("Robot");
     inst.startServer("/home/lvuser/networktables.ini");
     m_ds = DriverStation.getInstance();

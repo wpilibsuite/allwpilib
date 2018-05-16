@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,6 +7,7 @@
 
 #include "Drive/DifferentialDrive.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include <HAL/HAL.h>
@@ -171,6 +172,14 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
     }
   }
 
+  // Normalize the wheel speeds
+  double maxMagnitude =
+      std::max(std::abs(leftMotorOutput), std::abs(rightMotorOutput));
+  if (maxMagnitude > 1.0) {
+    leftMotorOutput /= maxMagnitude;
+    rightMotorOutput /= maxMagnitude;
+  }
+
   m_leftMotor.Set(leftMotorOutput * m_maxOutput);
   m_rightMotor.Set(-rightMotorOutput * m_maxOutput);
 
@@ -253,7 +262,7 @@ void DifferentialDrive::StopMotor() {
   m_safetyHelper.Feed();
 }
 
-void DifferentialDrive::GetDescription(llvm::raw_ostream& desc) const {
+void DifferentialDrive::GetDescription(wpi::raw_ostream& desc) const {
   desc << "DifferentialDrive";
 }
 
@@ -263,6 +272,6 @@ void DifferentialDrive::InitSendable(SendableBuilder& builder) {
                             [=]() { return m_leftMotor.Get(); },
                             [=](double value) { m_leftMotor.Set(value); });
   builder.AddDoubleProperty("Right Motor Speed",
-                            [=]() { return m_rightMotor.Get(); },
-                            [=](double value) { m_rightMotor.Set(value); });
+                            [=]() { return -m_rightMotor.Get(); },
+                            [=](double value) { m_rightMotor.Set(-value); });
 }

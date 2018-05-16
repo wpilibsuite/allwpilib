@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,6 +10,7 @@
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "MockData/PWMDataInternal.h"
 #include "PortsInternal.h"
 
@@ -25,6 +26,7 @@ extern "C" {
 
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
                                         int32_t* status) {
+  hal::init::CheckInit();
   if (*status != 0) return HAL_kInvalidHandle;
 
   int16_t channel = getPortHandleChannel(portHandle);
@@ -56,6 +58,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
   port->channel = origChannel;
 
   SimPWMData[origChannel].SetInitialized(true);
+
+  // Defaults to allow an always valid config.
+  HAL_SetPWMConfig(handle, 2.0, 1.501, 1.5, 1.499, 1.0, status);
 
   return handle;
 }

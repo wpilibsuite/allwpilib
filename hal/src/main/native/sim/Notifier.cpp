@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,14 +9,14 @@
 
 #include <chrono>
 
-#include <support/condition_variable.h>
-#include <support/mutex.h>
-#include <support/timestamp.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
+#include <wpi/timestamp.h>
 
 #include "HAL/HAL.h"
 #include "HAL/cpp/fpga_clock.h"
-#include "HAL/cpp/make_unique.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
+#include "HALInitializer.h"
 
 namespace {
 struct Notifier {
@@ -61,6 +61,7 @@ void InitializeNotifier() {
 extern "C" {
 
 HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
+  hal::init::CheckInit();
   std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
   HAL_NotifierHandle handle = notifierHandles->Allocate(notifier);
   if (handle == HAL_kInvalidHandle) {
@@ -136,6 +137,9 @@ uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
     } else {
       waitTime = notifier->waitTime * 1e-6;
     }
+
+    // Don't wait twice
+    notifier->updatedAlarm = false;
 
     auto timeoutTime =
         hal::fpga_clock::epoch() + std::chrono::duration<double>(waitTime);

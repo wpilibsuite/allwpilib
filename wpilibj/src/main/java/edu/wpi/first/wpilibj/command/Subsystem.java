@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @see Command
  */
 public abstract class Subsystem extends SendableBase implements Sendable {
-
   /**
    * Whether or not getDefaultCommand() was called.
    */
@@ -213,9 +212,9 @@ public abstract class Subsystem extends SendableBase implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Subsystem");
 
-    builder.addBooleanProperty("hasDefault", () -> m_defaultCommand != null, null);
-    builder.addStringProperty("default", this::getDefaultCommandName, null);
-    builder.addBooleanProperty("hasCommand", () -> m_currentCommand != null, null);
-    builder.addStringProperty("command", this::getCurrentCommandName, null);
+    builder.addBooleanProperty(".hasDefault", () -> m_defaultCommand != null, null);
+    builder.addStringProperty(".default", this::getDefaultCommandName, null);
+    builder.addBooleanProperty(".hasCommand", () -> m_currentCommand != null, null);
+    builder.addStringProperty(".command", this::getCurrentCommandName, null);
   }
 }

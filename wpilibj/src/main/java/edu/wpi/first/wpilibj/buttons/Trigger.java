@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * the full functionality of the Trigger class.
  */
 public abstract class Trigger extends SendableBase {
-
   private volatile boolean m_sendablePressed = false;
 
   /**
@@ -53,7 +52,6 @@ public abstract class Trigger extends SendableBase {
    */
   public void whenActive(final Command command) {
     new ButtonScheduler() {
-
       private boolean m_pressedLast = grab();
 
       @Override
@@ -80,7 +78,6 @@ public abstract class Trigger extends SendableBase {
    */
   public void whileActive(final Command command) {
     new ButtonScheduler() {
-
       private boolean m_pressedLast = grab();
 
       @Override
@@ -105,7 +102,6 @@ public abstract class Trigger extends SendableBase {
    */
   public void whenInactive(final Command command) {
     new ButtonScheduler() {
-
       private boolean m_pressedLast = grab();
 
       @Override
@@ -129,7 +125,6 @@ public abstract class Trigger extends SendableBase {
    */
   public void toggleWhenActive(final Command command) {
     new ButtonScheduler() {
-
       private boolean m_pressedLast = grab();
 
       @Override
@@ -157,7 +152,6 @@ public abstract class Trigger extends SendableBase {
    */
   public void cancelWhenActive(final Command command) {
     new ButtonScheduler() {
-
       private boolean m_pressedLast = grab();
 
       @Override

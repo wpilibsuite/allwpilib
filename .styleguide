@@ -9,33 +9,25 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
-  gmock/
+  gtest/
   ni-libraries/include/
   ni-libraries/lib/
-  hal/src/main/native/athena/ctre/
-  hal/src/main/native/athena/frccansae/
-  hal/src/main/native/athena/visa/
-  hal/src/main/native/include/ctre/
-  UsageReporting\.h$
 }
 
 modifiableFileExclude {
-  wpilibj/src/arm-linux-jni/
-  wpilibj/src/main/native/cpp/
-  \.patch$
-  \.png$
+  shared/arm-linux-jni/
   \.py$
   \.so$
 }
 
+repoRootNameOverride {
+  wpilib
+}
+
 includeOtherLibs {
   ^HAL/
-  ^llvm/
   ^networktables/
   ^opencv2/
   ^support/
-}
-
-includeProject {
-  ^ctre/
+  ^wpi/
 }

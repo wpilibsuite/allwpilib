@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2012-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2012-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,20 +9,20 @@
 
 #include <algorithm>
 
-#include <llvm/DenseMap.h>
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
-#include <support/mutex.h>
+#include <wpi/DenseMap.h>
+#include <wpi/SmallString.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
 
 #include "Commands/Scheduler.h"
 #include "SmartDashboard/SendableBuilderImpl.h"
 
 using namespace frc;
 
-using llvm::Twine;
+using wpi::Twine;
 
 struct LiveWindow::Impl {
   Impl();
@@ -37,7 +37,7 @@ struct LiveWindow::Impl {
 
   wpi::mutex mutex;
 
-  llvm::DenseMap<void*, Component> components;
+  wpi::DenseMap<void*, Component> components;
 
   std::shared_ptr<nt::NetworkTable> liveWindowTable;
   std::shared_ptr<nt::NetworkTable> statusTable;
@@ -115,8 +115,7 @@ void LiveWindow::SetEnabled(bool enabled) {
  * @brief Use a STL smart pointer to share ownership of component.
  * @deprecated Use Sendable::SetName() instead.
  */
-void LiveWindow::AddSensor(const llvm::Twine& subsystem,
-                           const llvm::Twine& name,
+void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
                            std::shared_ptr<Sendable> component) {
   Add(component);
   component->SetName(subsystem, name);
@@ -126,8 +125,8 @@ void LiveWindow::AddSensor(const llvm::Twine& subsystem,
  * @brief Pass a reference to LiveWindow and retain ownership of the component.
  * @deprecated Use Sendable::SetName() instead.
  */
-void LiveWindow::AddSensor(const llvm::Twine& subsystem,
-                           const llvm::Twine& name, Sendable& component) {
+void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
+                           Sendable& component) {
   Add(&component);
   component.SetName(subsystem, name);
 }
@@ -136,8 +135,8 @@ void LiveWindow::AddSensor(const llvm::Twine& subsystem,
  * @brief Use a raw pointer to the LiveWindow.
  * @deprecated Use Sendable::SetName() instead.
  */
-void LiveWindow::AddSensor(const llvm::Twine& subsystem,
-                           const llvm::Twine& name, Sendable* component) {
+void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
+                           Sendable* component) {
   Add(component);
   component->SetName(subsystem, name);
 }
@@ -157,8 +156,8 @@ void LiveWindow::AddSensor(const llvm::Twine& subsystem,
 /**
  * @brief Use a STL smart pointer to share ownership of component.
  */
-void LiveWindow::AddActuator(const llvm::Twine& subsystem,
-                             const llvm::Twine& name,
+void LiveWindow::AddActuator(const wpi::Twine& subsystem,
+                             const wpi::Twine& name,
                              std::shared_ptr<Sendable> component) {
   Add(component);
   component->SetName(subsystem, name);
@@ -168,8 +167,8 @@ void LiveWindow::AddActuator(const llvm::Twine& subsystem,
  * @brief Pass a reference to LiveWindow and retain ownership of the component.
  * @deprecated Use Sendable::SetName() instead.
  */
-void LiveWindow::AddActuator(const llvm::Twine& subsystem,
-                             const llvm::Twine& name, Sendable& component) {
+void LiveWindow::AddActuator(const wpi::Twine& subsystem,
+                             const wpi::Twine& name, Sendable& component) {
   Add(&component);
   component.SetName(subsystem, name);
 }
@@ -178,8 +177,8 @@ void LiveWindow::AddActuator(const llvm::Twine& subsystem,
  * @brief Use a raw pointer to the LiveWindow.
  * @deprecated Use Sendable::SetName() instead.
  */
-void LiveWindow::AddActuator(const llvm::Twine& subsystem,
-                             const llvm::Twine& name, Sendable* component) {
+void LiveWindow::AddActuator(const wpi::Twine& subsystem,
+                             const wpi::Twine& name, Sendable* component) {
   Add(component);
   component->SetName(subsystem, name);
 }
@@ -189,7 +188,7 @@ void LiveWindow::AddActuator(const llvm::Twine& subsystem,
  * Meant for internal use in other WPILib classes.
  * @deprecated Use SensorBase::SetName() instead.
  */
-void LiveWindow::AddSensor(const llvm::Twine& type, int channel,
+void LiveWindow::AddSensor(const wpi::Twine& type, int channel,
                            Sendable* component) {
   Add(component);
   component->SetName("Ungrouped",
@@ -200,7 +199,7 @@ void LiveWindow::AddSensor(const llvm::Twine& type, int channel,
  * Meant for internal use in other WPILib classes.
  * @deprecated Use SensorBase::SetName() instead.
  */
-void LiveWindow::AddActuator(const llvm::Twine& type, int channel,
+void LiveWindow::AddActuator(const wpi::Twine& type, int channel,
                              Sendable* component) {
   Add(component);
   component->SetName("Ungrouped",
@@ -211,7 +210,7 @@ void LiveWindow::AddActuator(const llvm::Twine& type, int channel,
  * Meant for internal use in other WPILib classes.
  * @deprecated Use SensorBase::SetName() instead.
  */
-void LiveWindow::AddActuator(const llvm::Twine& type, int module, int channel,
+void LiveWindow::AddActuator(const wpi::Twine& type, int module, int channel,
                              Sendable* component) {
   Add(component);
   component->SetName("Ungrouped", type + Twine('[') + Twine(module) +

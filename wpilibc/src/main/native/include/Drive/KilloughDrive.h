@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "Drive/RobotDriveBase.h"
 #include "Drive/Vector2d.h"
@@ -65,7 +65,7 @@ class KilloughDrive : public RobotDriveBase {
   void DrivePolar(double magnitude, double angle, double zRotation);
 
   void StopMotor() override;
-  void GetDescription(llvm::raw_ostream& desc) const override;
+  void GetDescription(wpi::raw_ostream& desc) const override;
 
   void InitSendable(SendableBuilder& builder) override;
 

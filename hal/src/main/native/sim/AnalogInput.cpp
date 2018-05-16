@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,6 +9,7 @@
 
 #include "AnalogInternal.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "MockData/AnalogInDataInternal.h"
 #include "PortsInternal.h"
 
@@ -23,6 +24,7 @@ void InitializeAnalogInput() {}
 extern "C" {
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
                                                     int32_t* status) {
+  hal::init::CheckInit();
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;

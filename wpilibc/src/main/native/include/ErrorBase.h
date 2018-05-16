@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <llvm/StringRef.h>
-#include <llvm/Twine.h>
-#include <support/mutex.h>
+#include <wpi/StringRef.h>
+#include <wpi/Twine.h>
+#include <wpi/mutex.h>
 
 #include "Base.h"
 #include "Error.h"
@@ -82,35 +82,34 @@ class ErrorBase {
 
   virtual Error& GetError();
   virtual const Error& GetError() const;
-  virtual void SetErrnoError(const llvm::Twine& contextMessage,
-                             llvm::StringRef filename, llvm::StringRef function,
+  virtual void SetErrnoError(const wpi::Twine& contextMessage,
+                             wpi::StringRef filename, wpi::StringRef function,
                              int lineNumber) const;
-  virtual void SetImaqError(int success, const llvm::Twine& contextMessage,
-                            llvm::StringRef filename, llvm::StringRef function,
+  virtual void SetImaqError(int success, const wpi::Twine& contextMessage,
+                            wpi::StringRef filename, wpi::StringRef function,
                             int lineNumber) const;
-  virtual void SetError(Error::Code code, const llvm::Twine& contextMessage,
-                        llvm::StringRef filename, llvm::StringRef function,
+  virtual void SetError(Error::Code code, const wpi::Twine& contextMessage,
+                        wpi::StringRef filename, wpi::StringRef function,
                         int lineNumber) const;
   virtual void SetErrorRange(Error::Code code, int32_t minRange,
                              int32_t maxRange, int32_t requestedValue,
-                             const llvm::Twine& contextMessage,
-                             llvm::StringRef filename, llvm::StringRef function,
+                             const wpi::Twine& contextMessage,
+                             wpi::StringRef filename, wpi::StringRef function,
                              int lineNumber) const;
-  virtual void SetWPIError(const llvm::Twine& errorMessage, Error::Code code,
-                           const llvm::Twine& contextMessage,
-                           llvm::StringRef filename, llvm::StringRef function,
+  virtual void SetWPIError(const wpi::Twine& errorMessage, Error::Code code,
+                           const wpi::Twine& contextMessage,
+                           wpi::StringRef filename, wpi::StringRef function,
                            int lineNumber) const;
   virtual void CloneError(const ErrorBase& rhs) const;
   virtual void ClearError() const;
   virtual bool StatusIsFatal() const;
-  static void SetGlobalError(Error::Code code,
-                             const llvm::Twine& contextMessage,
-                             llvm::StringRef filename, llvm::StringRef function,
+  static void SetGlobalError(Error::Code code, const wpi::Twine& contextMessage,
+                             wpi::StringRef filename, wpi::StringRef function,
                              int lineNumber);
-  static void SetGlobalWPIError(const llvm::Twine& errorMessage,
-                                const llvm::Twine& contextMessage,
-                                llvm::StringRef filename,
-                                llvm::StringRef function, int lineNumber);
+  static void SetGlobalWPIError(const wpi::Twine& errorMessage,
+                                const wpi::Twine& contextMessage,
+                                wpi::StringRef filename,
+                                wpi::StringRef function, int lineNumber);
   static Error& GetGlobalError();
 
  protected:

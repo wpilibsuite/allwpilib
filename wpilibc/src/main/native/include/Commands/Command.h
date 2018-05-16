@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,7 +11,7 @@
 #include <set>
 #include <string>
 
-#include <llvm/Twine.h>
+#include <wpi/Twine.h>
 
 #include "ErrorBase.h"
 #include "SmartDashboard/SendableBase.h"
@@ -51,9 +51,9 @@ class Command : public ErrorBase, public SendableBase {
 
  public:
   Command();
-  explicit Command(const llvm::Twine& name);
+  explicit Command(const wpi::Twine& name);
   explicit Command(double timeout);
-  Command(const llvm::Twine& name, double timeout);
+  Command(const wpi::Twine& name, double timeout);
   ~Command() override = default;
   double TimeSinceInitialized() const;
   void Requires(Subsystem* s);
@@ -62,6 +62,8 @@ class Command : public ErrorBase, public SendableBase {
   bool Run();
   void Cancel();
   bool IsRunning() const;
+  bool IsInitialized() const;
+  bool IsCompleted() const;
   bool IsInterruptible() const;
   void SetInterruptible(bool interruptible);
   bool DoesRequire(Subsystem* subsystem) const;
@@ -147,6 +149,9 @@ class Command : public ErrorBase, public SendableBase {
 
   // The CommandGroup this is in
   CommandGroup* m_parent = nullptr;
+
+  // Whether or not this command has completed running
+  bool m_completed = false;
 
   int m_commandID = m_commandCounter++;
   static int m_commandCounter;

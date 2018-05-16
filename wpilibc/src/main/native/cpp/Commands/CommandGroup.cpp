@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,7 +16,7 @@ using namespace frc;
  *
  * @param name The name for this command group
  */
-CommandGroup::CommandGroup(const llvm::Twine& name) : Command(name) {}
+CommandGroup::CommandGroup(const wpi::Twine& name) : Command(name) {}
 
 /**
  * Adds a new Command to the group. The Command will be started after all the

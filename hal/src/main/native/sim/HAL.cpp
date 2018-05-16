@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,7 +7,7 @@
 
 #include "HAL/HAL.h"
 
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "ErrorsInternal.h"
 #include "HAL/DriverStation.h"
@@ -23,7 +23,6 @@ using namespace hal;
 namespace hal {
 namespace init {
 void InitializeHAL() {
-  InitializeHandlesInternal();
   InitializeAccelerometerData();
   InitializeAnalogGyroData();
   InitializeAnalogInData();
@@ -55,6 +54,7 @@ void InitializeHAL() {
   InitializeDigitalInternal();
   InitializeDIO();
   InitializeDriverStation();
+  InitializeEncoder();
   InitializeExtensions();
   InitializeI2C();
   InitializeInterrupts();
@@ -263,7 +263,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   hal::init::InitializeHAL();
 
-  llvm::outs().SetUnbuffered();
+  hal::init::HAL_IsInitialized.store(true);
+
+  wpi::outs().SetUnbuffered();
   if (HAL_LoadExtensions() < 0) return false;
   hal::RestartTiming();
   HAL_InitializeDriverStation();

@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 package edu.wpi.first.wpilibj;
+
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Common base class for all PWM Speed Controllers.
@@ -65,5 +67,12 @@ public abstract class PWMSpeedController extends SafePWM implements SpeedControl
   @Override
   public void pidWrite(double output) {
     set(output);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Speed Controller");
+    builder.setSafeState(this::setDisabled);
+    builder.addDoubleProperty("Value", this::getSpeed, this::setSpeed);
   }
 }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -58,7 +58,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
     m_spi.setClockRate(3000000);
     m_spi.setMSBFirst();
-    m_spi.setSampleDataOnRising();
+    m_spi.setSampleDataOnLeadingEdge();
     m_spi.setClockActiveHigh();
     m_spi.setChipSelectActiveLow();
 
@@ -78,6 +78,10 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
     HAL.report(tResourceType.kResourceType_ADXRS450, port.value);
     setName("ADXRS450_Gyro", port.value);
+  }
+
+  public boolean isConnected() {
+    return m_spi != null;
   }
 
   @Override
@@ -128,7 +132,9 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
   @Override
   public void reset() {
-    m_spi.resetAccumulator();
+    if (m_spi != null) {
+      m_spi.resetAccumulator();
+    }
   }
 
   /**

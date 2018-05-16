@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -464,7 +464,8 @@ double Encoder::PIDGet() {
  */
 void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
   // Force digital input if just given an index
-  m_indexSource = std::make_unique<DigitalInput>(channel);
+  m_indexSource = std::make_shared<DigitalInput>(channel);
+  AddChild(m_indexSource);
   SetIndexSource(*m_indexSource.get(), type);
 }
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,7 +11,7 @@
 #include <limits>
 #include <memory>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "MockData/EncoderData.h"
 #include "MockData/NotifyListenerVector.h"
@@ -75,6 +75,13 @@ class EncoderData {
   int32_t GetSamplesToAverage();
   void SetSamplesToAverage(int32_t samplesToAverage);
 
+  int32_t RegisterDistancePerPulseCallback(HAL_NotifyCallback callback,
+                                           void* param, HAL_Bool initialNotify);
+  void CancelDistancePerPulseCallback(int32_t uid);
+  void InvokeDistancePerPulseCallback(HAL_Value value);
+  double GetDistancePerPulse();
+  void SetDistancePerPulse(double distancePerPulse);
+
   virtual void ResetData();
 
  private:
@@ -95,6 +102,8 @@ class EncoderData {
   std::shared_ptr<NotifyListenerVector> m_reverseDirectionCallbacks = nullptr;
   std::atomic<int32_t> m_samplesToAverage{0};
   std::shared_ptr<NotifyListenerVector> m_samplesToAverageCallbacks = nullptr;
+  std::atomic<double> m_distancePerPulse{0};
+  std::shared_ptr<NotifyListenerVector> m_distancePerPulseCallbacks = nullptr;
 };
 extern EncoderData* SimEncoderData;
 }  // namespace hal

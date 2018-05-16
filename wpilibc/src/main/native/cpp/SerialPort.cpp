@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -34,6 +34,57 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
   m_port = port;
 
   HAL_InitializeSerialPort(static_cast<HAL_SerialPort>(port), &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  // Don't continue if initialization failed
+  if (status < 0) return;
+  HAL_SetSerialBaudRate(static_cast<HAL_SerialPort>(port), baudRate, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  HAL_SetSerialDataBits(static_cast<HAL_SerialPort>(port), dataBits, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  HAL_SetSerialParity(static_cast<HAL_SerialPort>(port), parity, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  HAL_SetSerialStopBits(static_cast<HAL_SerialPort>(port), stopBits, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+
+  // Set the default timeout to 5 seconds.
+  SetTimeout(5.0);
+
+  // Don't wait until the buffer is full to transmit.
+  SetWriteBufferMode(kFlushOnAccess);
+
+  EnableTermination();
+
+  // viInstallHandler(m_portHandle, VI_EVENT_IO_COMPLETION, ioCompleteHandler,
+  // this);
+  // viEnableEvent(m_portHandle, VI_EVENT_IO_COMPLETION, VI_HNDLR, VI_NULL);
+
+  HAL_Report(HALUsageReporting::kResourceType_SerialPort, 0);
+}
+
+/**
+ * Create an instance of a Serial Port class.
+ *
+ * @param baudRate The baud rate to configure the serial port.
+ * @param port     The physical port to use
+ * @param portName The direct port name to use
+ * @param dataBits The number of data bits per transfer.  Valid values are
+ *                 between 5 and 8 bits.
+ * @param parity   Select the type of parity checking to use.
+ * @param stopBits The number of stop bits to use as defined by the enum
+ *                 StopBits.
+ */
+SerialPort::SerialPort(int baudRate, wpi::StringRef portName, Port port,
+                       int dataBits, SerialPort::Parity parity,
+                       SerialPort::StopBits stopBits) {
+  int32_t status = 0;
+
+  m_port = port;
+
+  wpi::SmallVector<char, 64> buf;
+  const char* portNameC = portName.c_str(buf);
+
+  HAL_InitializeSerialPortDirect(static_cast<HAL_SerialPort>(port), portNameC,
+                                 &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   // Don't continue if initialization failed
   if (status < 0) return;
@@ -143,7 +194,7 @@ int SerialPort::Read(char* buffer, int count) {
  * @return The number of bytes actually written into the port.
  */
 int SerialPort::Write(const char* buffer, int count) {
-  return Write(llvm::StringRef(buffer, static_cast<size_t>(count)));
+  return Write(wpi::StringRef(buffer, static_cast<size_t>(count)));
 }
 
 /**
@@ -155,7 +206,7 @@ int SerialPort::Write(const char* buffer, int count) {
  * @param buffer StringRef to the buffer to read the bytes from.
  * @return The number of bytes actually written into the port.
  */
-int SerialPort::Write(llvm::StringRef buffer) {
+int SerialPort::Write(wpi::StringRef buffer) {
   int32_t status = 0;
   int retVal = HAL_WriteSerial(static_cast<HAL_SerialPort>(m_port),
                                buffer.data(), buffer.size(), &status);

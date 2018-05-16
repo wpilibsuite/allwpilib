@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,6 +10,7 @@
 #include <memory>
 
 #include "HAL/ChipObject.h"
+#include "HALInitializer.h"
 
 using namespace hal;
 
@@ -18,6 +19,7 @@ namespace hal {
 static std::unique_ptr<tPower> power{nullptr};
 
 static void initializePower(int32_t* status) {
+  hal::init::CheckInit();
   if (power == nullptr) {
     power.reset(tPower::create(status));
   }

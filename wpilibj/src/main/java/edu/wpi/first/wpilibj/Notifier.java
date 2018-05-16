@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,7 +13,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import edu.wpi.first.wpilibj.hal.NotifierJNI;
 
 public class Notifier {
-
   // The thread waiting on the HAL alarm.
   private final Thread m_thread;
   // The lock for the process information.
@@ -100,6 +99,16 @@ public class Notifier {
       }
     });
     m_thread.setDaemon(true);
+    m_thread.setUncaughtExceptionHandler((thread, error) -> {
+      Throwable cause = error.getCause();
+      if (cause != null) {
+        error = cause;
+      }
+      DriverStation.reportError("Unhandled exception: " + error.toString(), error.getStackTrace());
+      DriverStation.reportError(
+          "The loopFunc() method (or methods called by it) should have handled "
+              + "the exception above.", false);
+    });
     m_thread.start();
   }
 

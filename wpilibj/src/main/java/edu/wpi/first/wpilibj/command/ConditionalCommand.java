@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -143,6 +143,7 @@ public abstract class ConditionalCommand extends Command {
 
       m_chosenCommand.start();
     }
+    super._initialize();
   }
 
   @Override
@@ -156,16 +157,19 @@ public abstract class ConditionalCommand extends Command {
 
   @Override
   protected boolean isFinished() {
-    return m_chosenCommand != null && m_chosenCommand.isRunning()
-        && m_chosenCommand.isFinished();
+    if (m_chosenCommand != null) {
+      return m_chosenCommand.isCompleted();
+    } else {
+      return true;
+    }
   }
 
   @Override
-  protected void interrupted() {
+  protected void _interrupted() {
     if (m_chosenCommand != null && m_chosenCommand.isRunning()) {
       m_chosenCommand.cancel();
     }
 
-    super.interrupted();
+    super._interrupted();
   }
 }

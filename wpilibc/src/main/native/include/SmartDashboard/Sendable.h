@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include <llvm/Twine.h>
+#include <wpi/Twine.h>
 
 namespace frc {
 
@@ -31,7 +31,7 @@ class Sendable {
    *
    * @param name name
    */
-  virtual void SetName(const llvm::Twine& name) = 0;
+  virtual void SetName(const wpi::Twine& name) = 0;
 
   /**
    * Sets both the subsystem name and device name of this Sendable object.
@@ -39,7 +39,7 @@ class Sendable {
    * @param subsystem subsystem name
    * @param name device name
    */
-  void SetName(const llvm::Twine& subsystem, const llvm::Twine& name) {
+  void SetName(const wpi::Twine& subsystem, const wpi::Twine& name) {
     SetSubsystem(subsystem);
     SetName(name);
   }
@@ -56,7 +56,7 @@ class Sendable {
    *
    * @param subsystem subsystem name
    */
-  virtual void SetSubsystem(const llvm::Twine& subsystem) = 0;
+  virtual void SetSubsystem(const wpi::Twine& subsystem) = 0;
 
   /**
    * Initializes this Sendable object.

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,8 +10,8 @@
 #ifndef __FRC_ROBORIO__
 
 #include <memory>
-#include <queue>
-#include <vector>
+
+#include <wpi/SmallVector.h>
 
 #include "NotifyListener.h"
 
@@ -24,8 +24,8 @@ class HalCallbackListenerVectorImpl {
   struct private_init {};
 
  public:
-  typedef typename std::vector<HalCallbackListener<ListenerType>>::size_type
-      size_type;
+  typedef typename wpi::SmallVectorImpl<
+      HalCallbackListener<ListenerType>>::size_type size_type;
 
   // Constructor for creating copies of the vector
   HalCallbackListenerVectorImpl(const HalCallbackListenerVectorImpl* copyFrom,
@@ -64,8 +64,8 @@ class HalCallbackListenerVectorImpl {
       unsigned int uid);
 
  private:
-  std::vector<HalCallbackListener<ListenerType>> m_vector;
-  std::vector<unsigned int> m_free;
+  wpi::SmallVector<HalCallbackListener<ListenerType>, 4> m_vector;
+  wpi::SmallVector<unsigned int, 4> m_free;
 
   // Add a new NotifyListener to the vector.  If there are elements on the
   // freelist,

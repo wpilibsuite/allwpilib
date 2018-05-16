@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #include "Commands/ConditionalCommand.h"
+
+#include <iostream>
 
 #include "Commands/Scheduler.h"
 
@@ -42,7 +44,7 @@ ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
  * @param onTrue  The Command to execute if Condition() returns true
  * @param onFalse The Command to execute if Condition() returns false
  */
-ConditionalCommand::ConditionalCommand(const llvm::Twine& name, Command* onTrue,
+ConditionalCommand::ConditionalCommand(const wpi::Twine& name, Command* onTrue,
                                        Command* onFalse)
     : Command(name) {
   m_onTrue = onTrue;
@@ -65,6 +67,7 @@ void ConditionalCommand::_Initialize() {
 
     m_chosenCommand->Start();
   }
+  Command::_Initialize();
 }
 
 void ConditionalCommand::_Cancel() {
@@ -76,14 +79,17 @@ void ConditionalCommand::_Cancel() {
 }
 
 bool ConditionalCommand::IsFinished() {
-  return m_chosenCommand != nullptr && m_chosenCommand->IsRunning() &&
-         m_chosenCommand->IsFinished();
+  if (m_chosenCommand != nullptr) {
+    return m_chosenCommand->IsCompleted();
+  } else {
+    return true;
+  }
 }
 
-void ConditionalCommand::Interrupted() {
+void ConditionalCommand::_Interrupted() {
   if (m_chosenCommand != nullptr && m_chosenCommand->IsRunning()) {
     m_chosenCommand->Cancel();
   }
 
-  Command::Interrupted();
+  Command::_Interrupted();
 }

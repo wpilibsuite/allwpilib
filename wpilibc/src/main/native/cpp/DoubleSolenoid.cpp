@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -42,21 +42,20 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
       m_forwardChannel(forwardChannel),
       m_reverseChannel(reverseChannel) {
   if (!SensorBase::CheckSolenoidModule(m_moduleNumber)) {
-    wpi_setWPIErrorWithContext(
-        ModuleIndexOutOfRange,
-        "Solenoid Module " + llvm::Twine(m_moduleNumber));
+    wpi_setWPIErrorWithContext(ModuleIndexOutOfRange,
+                               "Solenoid Module " + wpi::Twine(m_moduleNumber));
     return;
   }
   if (!SensorBase::CheckSolenoidChannel(m_forwardChannel)) {
     wpi_setWPIErrorWithContext(
         ChannelIndexOutOfRange,
-        "Solenoid Channel " + llvm::Twine(m_forwardChannel));
+        "Solenoid Channel " + wpi::Twine(m_forwardChannel));
     return;
   }
   if (!SensorBase::CheckSolenoidChannel(m_reverseChannel)) {
     wpi_setWPIErrorWithContext(
         ChannelIndexOutOfRange,
-        "Solenoid Channel " + llvm::Twine(m_reverseChannel));
+        "Solenoid Channel " + wpi::Twine(m_reverseChannel));
     return;
   }
   int32_t status = 0;
@@ -186,7 +185,7 @@ void DoubleSolenoid::InitSendable(SendableBuilder& builder) {
   builder.SetSafeState([=]() { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",
-      [=](llvm::SmallVectorImpl<char>& buf) -> llvm::StringRef {
+      [=](wpi::SmallVectorImpl<char>& buf) -> wpi::StringRef {
         switch (Get()) {
           case kForward:
             return "Forward";
@@ -196,7 +195,7 @@ void DoubleSolenoid::InitSendable(SendableBuilder& builder) {
             return "Off";
         }
       },
-      [=](llvm::StringRef value) {
+      [=](wpi::StringRef value) {
         Value lvalue = kOff;
         if (value == "Forward")
           lvalue = kForward;

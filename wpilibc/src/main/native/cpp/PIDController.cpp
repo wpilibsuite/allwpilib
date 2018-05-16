@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -367,8 +367,8 @@ double PIDController::Get() const {
 /**
  * Set the PID controller to consider the input to be continuous,
  *
- * Rather then using the max and min in as constraints, it considers them to
- * be the same point and automatically calculates the shortest route to
+ * Rather then using the max and min input range as constraints, it considers
+ * them to be the same point and automatically calculates the shortest route to
  * the setpoint.
  *
  * @param continuous true turns on continuous, false turns off continuous
@@ -652,7 +652,7 @@ void PIDController::InitSendable(SendableBuilder& builder) {
  * @return Error for continuous inputs.
  */
 double PIDController::GetContinuousError(double error) const {
-  if (m_continuous) {
+  if (m_continuous && m_inputRange != 0) {
     error = std::fmod(error, m_inputRange);
     if (std::fabs(error) > m_inputRange / 2) {
       if (error > 0) {

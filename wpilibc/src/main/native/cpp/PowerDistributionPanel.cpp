@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,8 +10,8 @@
 #include <HAL/HAL.h>
 #include <HAL/PDP.h>
 #include <HAL/Ports.h>
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
+#include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
 
 #include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
@@ -78,8 +78,8 @@ double PowerDistributionPanel::GetCurrent(int channel) const {
   int32_t status = 0;
 
   if (!CheckPDPChannel(channel)) {
-    llvm::SmallString<32> str;
-    llvm::raw_svector_ostream buf(str);
+    wpi::SmallString<32> str;
+    wpi::raw_svector_ostream buf(str);
     buf << "PDP Channel " << channel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
   }
@@ -175,7 +175,7 @@ void PowerDistributionPanel::ClearStickyFaults() {
 void PowerDistributionPanel::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistributionPanel");
   for (int i = 0; i < kPDPChannels; ++i) {
-    builder.AddDoubleProperty("Chan" + llvm::Twine(i),
+    builder.AddDoubleProperty("Chan" + wpi::Twine(i),
                               [=]() { return GetCurrent(i); }, nullptr);
   }
   builder.AddDoubleProperty("Voltage", [=]() { return GetVoltage(); }, nullptr);

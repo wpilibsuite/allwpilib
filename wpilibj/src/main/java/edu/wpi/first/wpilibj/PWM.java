@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.DIOJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.PWMJNI;
@@ -56,7 +55,7 @@ public class PWM extends SendableBase implements Sendable {
     SensorBase.checkPWMChannel(channel);
     m_channel = channel;
 
-    m_handle = PWMJNI.initializePWMPort(DIOJNI.getPort((byte) channel));
+    m_handle = PWMJNI.initializePWMPort(HAL.getPort((byte) channel));
 
     setDisabled();
 
@@ -244,8 +243,8 @@ public class PWM extends SendableBase implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Speed Controller");
+    builder.setSmartDashboardType("PWM");
     builder.setSafeState(this::setDisabled);
-    builder.addDoubleProperty("Value", this::getSpeed, this::setSpeed);
+    builder.addDoubleProperty("Value", this::getRaw, value -> setRaw((int) value));
   }
 }

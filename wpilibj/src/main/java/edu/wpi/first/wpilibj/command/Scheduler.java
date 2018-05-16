@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @see Command
  */
 public class Scheduler extends SendableBase implements Sendable {
-
   /**
    * The Singleton Instance.
    */
@@ -145,7 +144,6 @@ public class Scheduler extends SendableBase implements Sendable {
 
     // Only add if not already in
     if (!m_commandTable.containsKey(command)) {
-
       // Check that the requirements can be had
       Enumeration requirements = command.getRequirements();
       while (requirements.hasMoreElements()) {
@@ -193,7 +191,6 @@ public class Scheduler extends SendableBase implements Sendable {
    * SmartDashboard</li> <li>Add Commands</li> <li>Add Defaults</li> </ol>
    */
   public void run() {
-
     m_runningCommandsChanged = false;
 
     if (m_disabled) {

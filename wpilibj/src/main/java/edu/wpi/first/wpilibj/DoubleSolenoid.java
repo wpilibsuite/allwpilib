@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * controlled by two separate channels.
  */
 public class DoubleSolenoid extends SolenoidBase implements Sendable {
-
   /**
    * Possible values for a DoubleSolenoid.
    */
@@ -59,11 +58,11 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable {
     SensorBase.checkSolenoidChannel(forwardChannel);
     SensorBase.checkSolenoidChannel(reverseChannel);
 
-    int portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) forwardChannel);
+    int portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) forwardChannel);
     m_forwardHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
 
     try {
-      portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) reverseChannel);
+      portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) reverseChannel);
       m_reverseHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
     } catch (RuntimeException ex) {
       // free the forward handle on exception, then rethrow

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,7 @@
 #include "HAL/Errors.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 
 using namespace hal;
@@ -46,6 +47,7 @@ extern "C" {
 
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
     HAL_AnalogInputHandle portHandle, int32_t* index, int32_t* status) {
+  hal::init::CheckInit();
   // ensure we are given a valid and active AnalogInput handle
   auto analog_port = analogInputHandles->Get(portHandle);
   if (analog_port == nullptr) {

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,7 @@
 #include <thread>
 
 #include <HAL/HAL.h>
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "Base.h"
 
@@ -18,17 +18,17 @@ namespace frc {
 
 class DriverStation;
 
-#define START_ROBOT_CLASS(_ClassName_)                                  \
-  int main() {                                                          \
-    if (!HAL_Initialize(500, 0)) {                                      \
-      llvm::errs() << "FATAL ERROR: HAL could not be initialized\n";    \
-      return -1;                                                        \
-    }                                                                   \
-    HAL_Report(HALUsageReporting::kResourceType_Language,               \
-               HALUsageReporting::kLanguage_CPlusPlus);                 \
-    llvm::outs() << "\n********** Robot program starting **********\n"; \
-    static _ClassName_ robot;                                           \
-    robot.StartCompetition();                                           \
+#define START_ROBOT_CLASS(_ClassName_)                                 \
+  int main() {                                                         \
+    if (!HAL_Initialize(500, 0)) {                                     \
+      wpi::errs() << "FATAL ERROR: HAL could not be initialized\n";    \
+      return -1;                                                       \
+    }                                                                  \
+    HAL_Report(HALUsageReporting::kResourceType_Language,              \
+               HALUsageReporting::kLanguage_CPlusPlus);                \
+    wpi::outs() << "\n********** Robot program starting **********\n"; \
+    static _ClassName_ robot;                                          \
+    robot.StartCompetition();                                          \
   }
 
 /**

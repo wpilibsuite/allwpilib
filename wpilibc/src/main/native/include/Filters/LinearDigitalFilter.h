@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,7 @@
 #include <memory>
 #include <vector>
 
-#include <llvm/ArrayRef.h>
+#include <wpi/ArrayRef.h>
 
 #include "Filter.h"
 #include "circular_buffer.h"
@@ -23,16 +23,16 @@ namespace frc {
  * used types of filters.
  *
  * Filters are of the form:<br>
- *  y[n] = (b0 * x[n] + b1 * x[n-1] + … + bP * x[n-P]) -
- *         (a0 * y[n-1] + a2 * y[n-2] + … + aQ * y[n-Q])
+ *  y[n] = (b0 * x[n] + b1 * x[n-1] + â€¦ + bP * x[n-P]) -
+ *         (a0 * y[n-1] + a2 * y[n-2] + â€¦ + aQ * y[n-Q])
  *
  * Where:<br>
  *  y[n] is the output at time "n"<br>
  *  x[n] is the input at time "n"<br>
  *  y[n-1] is the output from the LAST time step ("n-1")<br>
  *  x[n-1] is the input from the LAST time step ("n-1")<br>
- *  b0 … bP are the "feedforward" (FIR) gains<br>
- *  a0 … aQ are the "feedback" (IIR) gains<br>
+ *  b0 â€¦ bP are the "feedforward" (FIR) gains<br>
+ *  a0 â€¦ aQ are the "feedback" (IIR) gains<br>
  * IMPORTANT! Note the "-" sign in front of the feedback term! This is a common
  *            convention in signal processing.
  *
@@ -69,11 +69,11 @@ namespace frc {
  */
 class LinearDigitalFilter : public Filter {
  public:
-  LinearDigitalFilter(PIDSource& source, llvm::ArrayRef<double> ffGains,
-                      llvm::ArrayRef<double> fbGains);
+  LinearDigitalFilter(PIDSource& source, wpi::ArrayRef<double> ffGains,
+                      wpi::ArrayRef<double> fbGains);
   LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                      llvm::ArrayRef<double> ffGains,
-                      llvm::ArrayRef<double> fbGains);
+                      wpi::ArrayRef<double> ffGains,
+                      wpi::ArrayRef<double> fbGains);
 
   // Static methods to create commonly used filters
   static LinearDigitalFilter SinglePoleIIR(PIDSource& source,

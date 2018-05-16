@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,8 +19,7 @@ using namespace frc;
  * @param i    the integral value
  * @param d    the derivative value
  */
-PIDSubsystem::PIDSubsystem(const llvm::Twine& name, double p, double i,
-                           double d)
+PIDSubsystem::PIDSubsystem(const wpi::Twine& name, double p, double i, double d)
     : Subsystem(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this);
   AddChild("PIDController", m_controller);
@@ -35,8 +34,8 @@ PIDSubsystem::PIDSubsystem(const llvm::Twine& name, double p, double i,
  * @param d    the derivative value
  * @param f    the feedforward value
  */
-PIDSubsystem::PIDSubsystem(const llvm::Twine& name, double p, double i,
-                           double d, double f)
+PIDSubsystem::PIDSubsystem(const wpi::Twine& name, double p, double i, double d,
+                           double f)
     : Subsystem(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, f, this, this);
   AddChild("PIDController", m_controller);
@@ -55,8 +54,8 @@ PIDSubsystem::PIDSubsystem(const llvm::Twine& name, double p, double i,
  * @param f      the feedfoward value
  * @param period the time (in seconds) between calculations
  */
-PIDSubsystem::PIDSubsystem(const llvm::Twine& name, double p, double i,
-                           double d, double f, double period)
+PIDSubsystem::PIDSubsystem(const wpi::Twine& name, double p, double i, double d,
+                           double f, double period)
     : Subsystem(name) {
   m_controller =
       std::make_shared<PIDController>(p, i, d, f, this, this, period);

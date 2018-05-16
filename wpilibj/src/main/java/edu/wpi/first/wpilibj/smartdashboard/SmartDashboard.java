@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -67,10 +67,12 @@ public class SmartDashboard {
       }
       sddata = new Data(data);
       tablesToData.put(key, sddata);
-      sddata.m_builder.setTable(table.getSubTable(key));
+      NetworkTable dataTable = table.getSubTable(key);
+      sddata.m_builder.setTable(dataTable);
       data.initSendable(sddata.m_builder);
       sddata.m_builder.updateTable();
       sddata.m_builder.startListeners();
+      dataTable.getEntry(".name").setString(key);
     }
   }
 

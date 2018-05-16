@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,8 +16,6 @@ static_assert(0,
 #if defined(_MSC_VER) && _MSC_VER < 1900
 static_assert(0, "Visual Studio 2015 or greater required.");
 #endif
-
-#include <HAL/cpp/make_unique.h>
 
 #define DEFAULT_MOVE_CONSTRUCTOR(ClassName) ClassName(ClassName&&) = default
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.sim.AnalogInSim;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.util.AllocationException;
@@ -26,7 +27,6 @@ import edu.wpi.first.wpilibj.util.AllocationException;
  * number of samples to retain the resolution, but get more stable values.
  */
 public class AnalogInput extends SensorBase implements PIDSource, Sendable {
-
   private static final int kAccumulatorSlot = 1;
   int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;
@@ -43,7 +43,7 @@ public class AnalogInput extends SensorBase implements PIDSource, Sendable {
     checkAnalogInputChannel(channel);
     m_channel = channel;
 
-    final int portHandle = AnalogJNI.getPort((byte) channel);
+    final int portHandle = HAL.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogInputPort(portHandle);
 
     HAL.report(tResourceType.kResourceType_AnalogChannel, channel);
@@ -350,5 +350,9 @@ public class AnalogInput extends SensorBase implements PIDSource, Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Analog Input");
     builder.addDoubleProperty("Value", this::getAverageVoltage, null);
+  }
+
+  public AnalogInSim getSimObject() {
+    return new AnalogInSim(m_channel);
   }
 }

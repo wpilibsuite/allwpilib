@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.drive;
 
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
@@ -25,12 +26,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>Four motor drivetrain:
  * <pre><code>
  * public class Robot {
- *   Talon m_frontLeft = new Talon(1);
- *   Talon m_rearLeft = new Talon(2);
+ *   Spark m_frontLeft = new Spark(1);
+ *   Spark m_rearLeft = new Spark(2);
  *   SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_rearLeft);
  *
- *   Talon m_frontRight = new Talon(3);
- *   Talon m_rearRight = new Talon(4);
+ *   Spark m_frontRight = new Spark(3);
+ *   Spark m_rearRight = new Spark(4);
  *   SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_rearRight);
  *
  *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
@@ -40,14 +41,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>Six motor drivetrain:
  * <pre><code>
  * public class Robot {
- *   Talon m_frontLeft = new Talon(1);
- *   Talon m_midLeft = new Talon(2);
- *   Talon m_rearLeft = new Talon(3);
+ *   Spark m_frontLeft = new Spark(1);
+ *   Spark m_midLeft = new Spark(2);
+ *   Spark m_rearLeft = new Spark(3);
  *   SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_midLeft, m_rearLeft);
  *
- *   Talon m_frontRight = new Talon(4);
- *   Talon m_midRight = new Talon(5);
- *   Talon m_rearRight = new Talon(6);
+ *   Spark m_frontRight = new Spark(4);
+ *   Spark m_midRight = new Spark(5);
+ *   Spark m_rearRight = new Spark(6);
  *   SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_midRight, m_rearRight);
  *
  *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
@@ -261,6 +262,13 @@ public class DifferentialDrive extends RobotDriveBase {
       }
     }
 
+    // Normalize the wheel speeds
+    double maxMagnitude = Math.max(Math.abs(leftMotorOutput), Math.abs(rightMotorOutput));
+    if (maxMagnitude > 1.0) {
+      leftMotorOutput /= maxMagnitude;
+      rightMotorOutput /= maxMagnitude;
+    }
+
     m_leftMotor.set(leftMotorOutput * m_maxOutput);
     m_rightMotor.set(-rightMotorOutput * m_maxOutput);
 
@@ -361,6 +369,9 @@ public class DifferentialDrive extends RobotDriveBase {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("DifferentialDrive");
     builder.addDoubleProperty("Left Motor Speed", m_leftMotor::get, m_leftMotor::set);
-    builder.addDoubleProperty("Right Motor Speed", m_rightMotor::get, m_rightMotor::set);
+    builder.addDoubleProperty(
+        "Right Motor Speed",
+        () -> -m_rightMotor.get(),
+        x -> m_rightMotor.set(-x));
   }
 }

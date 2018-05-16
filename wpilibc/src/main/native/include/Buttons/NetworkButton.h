@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,9 +9,9 @@
 
 #include <memory>
 
-#include <llvm/Twine.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
+#include <wpi/Twine.h>
 
 #include "Buttons/Button.h"
 
@@ -19,9 +19,9 @@ namespace frc {
 
 class NetworkButton : public Button {
  public:
-  NetworkButton(const llvm::Twine& tableName, const llvm::Twine& field);
+  NetworkButton(const wpi::Twine& tableName, const wpi::Twine& field);
   NetworkButton(std::shared_ptr<nt::NetworkTable> table,
-                const llvm::Twine& field);
+                const wpi::Twine& field);
   virtual ~NetworkButton() = default;
 
   virtual bool Get();

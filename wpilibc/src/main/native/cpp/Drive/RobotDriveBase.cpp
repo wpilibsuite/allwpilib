@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -21,9 +21,11 @@ using namespace frc;
 RobotDriveBase::RobotDriveBase() { m_safetyHelper.SetSafetyEnabled(true); }
 
 /**
- * Change the default value for deadband scaling. The default value is
- * 0.02. Values smaller then the deadband are set to 0, while values
- * larger then the deadband are scaled from 0.0 to 1.0. See ApplyDeadband().
+ * Sets the deadband applied to the drive inputs (e.g., joystick values).
+ *
+ * The default value is 0.02. Inputs smaller than the deadband are set to 0.0
+ * while inputs larger than the deadband are scaled from 0.0 to 1.0. See
+ * ApplyDeadband().
  *
  * @param deadband The deadband to set.
  */
@@ -37,6 +39,14 @@ void RobotDriveBase::SetDeadband(double deadband) { m_deadband = deadband; }
  *                  functions.
  */
 void RobotDriveBase::SetMaxOutput(double maxOutput) { m_maxOutput = maxOutput; }
+
+/**
+ * Feed the motor safety object. Resets the timer that will stop the motors if
+ * it completes.
+ *
+ * @see MotorSafetyHelper::Feed()
+ */
+void RobotDriveBase::FeedWatchdog() { m_safetyHelper.Feed(); }
 
 void RobotDriveBase::SetExpiration(double timeout) {
   m_safetyHelper.SetExpiration(timeout);
@@ -91,7 +101,7 @@ double RobotDriveBase::ApplyDeadband(double value, double deadband) {
 /**
  * Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0.
  */
-void RobotDriveBase::Normalize(llvm::MutableArrayRef<double> wheelSpeeds) {
+void RobotDriveBase::Normalize(wpi::MutableArrayRef<double> wheelSpeeds) {
   double maxMagnitude = std::abs(wheelSpeeds[0]);
   for (size_t i = 1; i < wheelSpeeds.size(); i++) {
     double temp = std::abs(wheelSpeeds[i]);

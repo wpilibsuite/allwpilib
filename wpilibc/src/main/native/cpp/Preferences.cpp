@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,21 +10,21 @@
 #include <algorithm>
 
 #include <HAL/HAL.h>
-#include <llvm/StringRef.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/StringRef.h>
 
 #include "WPIErrors.h"
 
 using namespace frc;
 
 // The Preferences table name
-static llvm::StringRef kTableName{"Preferences"};
+static wpi::StringRef kTableName{"Preferences"};
 
 Preferences::Preferences()
     : m_table(nt::NetworkTableInstance::GetDefault().GetTable(kTableName)) {
   m_table->GetEntry(".type").SetString("RobotPreferences");
   m_listener = m_table->AddEntryListener(
-      [=](nt::NetworkTable* table, llvm::StringRef name,
+      [=](nt::NetworkTable* table, wpi::StringRef name,
           nt::NetworkTableEntry entry, std::shared_ptr<nt::Value> value,
           int flags) { entry.SetPersistent(); },
       NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE);
@@ -56,8 +56,8 @@ std::vector<std::string> Preferences::GetKeys() { return m_table->GetKeys(); }
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-std::string Preferences::GetString(llvm::StringRef key,
-                                   llvm::StringRef defaultValue) {
+std::string Preferences::GetString(wpi::StringRef key,
+                                   wpi::StringRef defaultValue) {
   return m_table->GetString(key, defaultValue);
 }
 
@@ -69,7 +69,7 @@ std::string Preferences::GetString(llvm::StringRef key,
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-int Preferences::GetInt(llvm::StringRef key, int defaultValue) {
+int Preferences::GetInt(wpi::StringRef key, int defaultValue) {
   return static_cast<int>(m_table->GetNumber(key, defaultValue));
 }
 
@@ -81,7 +81,7 @@ int Preferences::GetInt(llvm::StringRef key, int defaultValue) {
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-double Preferences::GetDouble(llvm::StringRef key, double defaultValue) {
+double Preferences::GetDouble(wpi::StringRef key, double defaultValue) {
   return m_table->GetNumber(key, defaultValue);
 }
 
@@ -93,7 +93,7 @@ double Preferences::GetDouble(llvm::StringRef key, double defaultValue) {
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-float Preferences::GetFloat(llvm::StringRef key, float defaultValue) {
+float Preferences::GetFloat(wpi::StringRef key, float defaultValue) {
   return m_table->GetNumber(key, defaultValue);
 }
 
@@ -105,7 +105,7 @@ float Preferences::GetFloat(llvm::StringRef key, float defaultValue) {
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-bool Preferences::GetBoolean(llvm::StringRef key, bool defaultValue) {
+bool Preferences::GetBoolean(wpi::StringRef key, bool defaultValue) {
   return m_table->GetBoolean(key, defaultValue);
 }
 
@@ -117,7 +117,7 @@ bool Preferences::GetBoolean(llvm::StringRef key, bool defaultValue) {
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-int64_t Preferences::GetLong(llvm::StringRef key, int64_t defaultValue) {
+int64_t Preferences::GetLong(wpi::StringRef key, int64_t defaultValue) {
   return static_cast<int64_t>(m_table->GetNumber(key, defaultValue));
 }
 
@@ -130,7 +130,7 @@ int64_t Preferences::GetLong(llvm::StringRef key, int64_t defaultValue) {
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutString(llvm::StringRef key, llvm::StringRef value) {
+void Preferences::PutString(wpi::StringRef key, wpi::StringRef value) {
   auto entry = m_table->GetEntry(key);
   entry.SetString(value);
   entry.SetPersistent();
@@ -144,7 +144,7 @@ void Preferences::PutString(llvm::StringRef key, llvm::StringRef value) {
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutInt(llvm::StringRef key, int value) {
+void Preferences::PutInt(wpi::StringRef key, int value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
@@ -158,7 +158,7 @@ void Preferences::PutInt(llvm::StringRef key, int value) {
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutDouble(llvm::StringRef key, double value) {
+void Preferences::PutDouble(wpi::StringRef key, double value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
@@ -172,7 +172,7 @@ void Preferences::PutDouble(llvm::StringRef key, double value) {
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutFloat(llvm::StringRef key, float value) {
+void Preferences::PutFloat(wpi::StringRef key, float value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
@@ -186,7 +186,7 @@ void Preferences::PutFloat(llvm::StringRef key, float value) {
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutBoolean(llvm::StringRef key, bool value) {
+void Preferences::PutBoolean(wpi::StringRef key, bool value) {
   auto entry = m_table->GetEntry(key);
   entry.SetBoolean(value);
   entry.SetPersistent();
@@ -200,7 +200,7 @@ void Preferences::PutBoolean(llvm::StringRef key, bool value) {
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutLong(llvm::StringRef key, int64_t value) {
+void Preferences::PutLong(wpi::StringRef key, int64_t value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
@@ -212,7 +212,7 @@ void Preferences::PutLong(llvm::StringRef key, int64_t value) {
  * @param key the key
  * @return if there is a value at the given key
  */
-bool Preferences::ContainsKey(llvm::StringRef key) {
+bool Preferences::ContainsKey(wpi::StringRef key) {
   return m_table->ContainsKey(key);
 }
 
@@ -221,4 +221,4 @@ bool Preferences::ContainsKey(llvm::StringRef key) {
  *
  * @param key the key
  */
-void Preferences::Remove(llvm::StringRef key) { m_table->Delete(key); }
+void Preferences::Remove(wpi::StringRef key) { m_table->Delete(key); }

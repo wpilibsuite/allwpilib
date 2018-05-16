@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -56,7 +56,8 @@ enum class HAL_HandleEnum {
   Compressor = 14,
   Solenoid = 15,
   AnalogGyro = 16,
-  Vendor = 17
+  Vendor = 17,
+  SimulationJni = 18
 };
 
 static inline int16_t getHandleIndex(HAL_Handle handle) {

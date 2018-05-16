@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -21,11 +21,11 @@ import static java.util.Objects.requireNonNull;
  * function (intended for hand created drive code, such as autonomous) or with the Tank/Arcade
  * functions intended to be used for Operator Control driving.
  *
- * @deprecated Use DifferentialDrive or MecanumDrive classes instead.
+ * @deprecated Use {@link edu.wpi.first.wpilibj.drive.DifferentialDrive}
+ *             or {@link edu.wpi.first.wpilibj.drive.MecanumDrive} classes instead.
  */
 @Deprecated
 public class RobotDrive implements MotorSafety {
-
   protected MotorSafetyHelper m_safetyHelper;
 
   /**
@@ -273,7 +273,6 @@ public class RobotDrive implements MotorSafety {
    * @param squaredInputs Setting this parameter to true decreases the sensitivity at lower speeds
    */
   public void tankDrive(double leftValue, double rightValue, boolean squaredInputs) {
-
     if (!kTank_Reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
           tInstances.kRobotDrive_Tank);

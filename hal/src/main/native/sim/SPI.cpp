@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,6 +7,7 @@
 
 #include "HAL/SPI.h"
 
+#include "HALInitializer.h"
 #include "MockData/SPIDataInternal.h"
 
 using namespace hal;
@@ -18,6 +19,7 @@ void InitializeSPI() {}
 }  // namespace hal
 
 void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
+  hal::init::CheckInit();
   SimSPIData[port].SetInitialized(true);
 }
 int32_t HAL_TransactionSPI(HAL_SPIPort port, const uint8_t* dataToSend,
@@ -55,7 +57,8 @@ void HAL_ForceSPIAutoRead(HAL_SPIPort port, int32_t* status) {}
 int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint8_t* buffer,
                                     int32_t numToRead, double timeout,
                                     int32_t* status) {
-  return 0;
+  return SimSPIData[port].ReadAutoReceivedData(buffer, numToRead, timeout,
+                                               status);
 }
 int32_t HAL_GetSPIAutoDroppedCount(HAL_SPIPort port, int32_t* status) {
   return 0;

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,8 +7,8 @@
 
 #include "SampleRobot.h"
 
-#include <llvm/raw_ostream.h>
 #include <networktables/NetworkTable.h>
+#include <wpi/raw_ostream.h>
 
 #include "DriverStation.h"
 #include "LiveWindow/LiveWindow.h"
@@ -78,7 +78,7 @@ void SampleRobot::StartCompetition() {
  * ready, causing the robot to be bypassed in a match.
  */
 void SampleRobot::RobotInit() {
-  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**
@@ -88,7 +88,7 @@ void SampleRobot::RobotInit() {
  * field is disabled.
  */
 void SampleRobot::Disabled() {
-  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**
@@ -99,7 +99,7 @@ void SampleRobot::Disabled() {
  * robot enters the autonomous state.
  */
 void SampleRobot::Autonomous() {
-  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**
@@ -110,7 +110,7 @@ void SampleRobot::Autonomous() {
  * each time the robot enters the teleop state.
  */
 void SampleRobot::OperatorControl() {
-  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**
@@ -121,7 +121,7 @@ void SampleRobot::OperatorControl() {
  * test mode
  */
 void SampleRobot::Test() {
-  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**

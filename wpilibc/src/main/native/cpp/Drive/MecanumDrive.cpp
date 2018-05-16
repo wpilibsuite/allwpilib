@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -124,7 +124,7 @@ void MecanumDrive::StopMotor() {
   m_safetyHelper.Feed();
 }
 
-void MecanumDrive::GetDescription(llvm::raw_ostream& desc) const {
+void MecanumDrive::GetDescription(wpi::raw_ostream& desc) const {
   desc << "MecanumDrive";
 }
 
@@ -134,12 +134,12 @@ void MecanumDrive::InitSendable(SendableBuilder& builder) {
                             [=]() { return m_frontLeftMotor.Get(); },
                             [=](double value) { m_frontLeftMotor.Set(value); });
   builder.AddDoubleProperty(
-      "Front Right Motor Speed", [=]() { return m_frontRightMotor.Get(); },
-      [=](double value) { m_frontRightMotor.Set(value); });
+      "Front Right Motor Speed", [=]() { return -m_frontRightMotor.Get(); },
+      [=](double value) { m_frontRightMotor.Set(-value); });
   builder.AddDoubleProperty("Rear Left Motor Speed",
                             [=]() { return m_rearLeftMotor.Get(); },
                             [=](double value) { m_rearLeftMotor.Set(value); });
-  builder.AddDoubleProperty("Rear Right Motor Speed",
-                            [=]() { return m_rearRightMotor.Get(); },
-                            [=](double value) { m_rearRightMotor.Set(value); });
+  builder.AddDoubleProperty(
+      "Rear Right Motor Speed", [=]() { return -m_rearRightMotor.Get(); },
+      [=](double value) { m_rearRightMotor.Set(-value); });
 }

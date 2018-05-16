@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,6 +18,7 @@
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"
 #include "HAL/HAL.h"
+#include "HALInitializer.h"
 
 using namespace hal;
 
@@ -46,6 +47,7 @@ extern "C" {
  * @param port The port to open, 0 for the on-board, 1 for the MXP.
  */
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
+  hal::init::CheckInit();
   initializeDigital(status);
   if (*status != 0) return;
 

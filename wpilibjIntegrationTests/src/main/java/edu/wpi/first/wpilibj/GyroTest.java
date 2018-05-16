@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -23,7 +23,6 @@ import static org.junit.Assert.assertEquals;
  * Tests that the {@link TiltPanCameraFixture}.
  */
 public class GyroTest extends AbstractComsSetup {
-
   private static final Logger logger = Logger.getLogger(GyroTest.class.getName());
 
   public static final double TEST_ANGLE = 90.0;

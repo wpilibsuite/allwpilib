@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,14 +11,14 @@
 #include <cstdlib>  // For std::atexit()
 #include <memory>
 
-#include <support/condition_variable.h>
-#include <support/mutex.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
 
 #include "HAL/ChipObject.h"
 #include "HAL/Errors.h"
 #include "HAL/HAL.h"
-#include "HAL/cpp/make_unique.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
+#include "HALInitializer.h"
 
 using namespace hal;
 
@@ -114,6 +114,7 @@ void InitializeNotifier() {
 extern "C" {
 
 HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
+  hal::init::CheckInit();
   if (!notifierAtexitRegistered.test_and_set())
     std::atexit(cleanupNotifierAtExit);
 
@@ -169,13 +170,17 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
     // the notifier can call back into our callback, so don't hold the lock
     // here (the atomic fetch_sub will prevent multiple parallel entries
     // into this function)
-    if (notifierAlarm) notifierAlarm->writeEnable(false, status);
-    if (notifierManager) notifierManager->disable(status);
 
-    std::lock_guard<wpi::mutex> lock(notifierMutex);
-    notifierAlarm = nullptr;
-    notifierManager = nullptr;
-    closestTrigger = UINT64_MAX;
+    // Cleaning up the manager takes up to a second to complete, so don't do
+    // that here. Fix it more permanently in 2019...
+
+    // if (notifierAlarm) notifierAlarm->writeEnable(false, status);
+    // if (notifierManager) notifierManager->disable(status);
+
+    // std::lock_guard<wpi::mutex> lock(notifierMutex);
+    // notifierAlarm = nullptr;
+    // notifierManager = nullptr;
+    // closestTrigger = UINT64_MAX;
   }
 }
 

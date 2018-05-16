@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -32,7 +32,6 @@ import static java.util.Objects.requireNonNull;
  * @see IllegalUseOfCommandException
  */
 public class CommandGroup extends Command {
-
   /**
    * The commands in this group (stored in entries).
    */
@@ -223,7 +222,6 @@ public class CommandGroup extends Command {
     }
 
     while (m_currentCommandIndex < m_commands.size()) {
-
       if (cmd != null) {
         if (entry.isTimedOut()) {
           cmd._cancel();
@@ -380,7 +378,6 @@ public class CommandGroup extends Command {
   }
 
   private static class Entry {
-
     private static final int IN_SEQUENCE = 0;
     private static final int BRANCH_PEER = 1;
     private static final int BRANCH_CHILD = 2;

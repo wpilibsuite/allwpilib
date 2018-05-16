@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -96,7 +96,6 @@ public class PDPTest extends AbstractComsSetup {
    */
   @Test
   public void checkRunningCurrentForSpeedController() throws CANMessageNotFoundException {
-
     /* Set the motor to full forward */
     me.getMotor().set(1.0);
     Timer.delay(2);

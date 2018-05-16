@@ -1,0 +1,115 @@
+import org.gradle.internal.os.OperatingSystem
+
+ext {
+    nativeName = 'cscore'
+    devMain = 'edu.wpi.cscore.DevMain'
+}
+
+if (OperatingSystem.current().isMacOsX()) {
+    apply plugin: 'objective-cpp'
+}
+
+apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+
+ext {
+    sharedCvConfigs = [cscore    : [],
+                       cscoreBase: [],
+                       cscoreDev : [],
+                       cscoreTest: []]
+    staticCvConfigs = [cscoreJNI: []]
+    useJava = true
+    useCpp = true
+    splitSetup = {
+        if (it.targetPlatform.operatingSystem.name == 'osx') {
+            it.sources {
+                macObjCpp(ObjectiveCppSourceSet) {
+                    source {
+                        srcDirs = ['src/main/native/objcpp']
+                        include '**/*.mm'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                    }
+                }
+            }
+        }
+    }
+}
+
+def examplesMap = [:];
+
+if (OperatingSystem.current().isLinux()) {
+    File examplesTree = file("$projectDir/examples")
+    examplesTree.list(new FilenameFilter() {
+        @Override
+        public boolean accept(File current, String name) {
+            return new File(current, name).isDirectory();
+        }
+    }).each {
+        sharedCvConfigs.put(it, [])
+        examplesMap.put(it, [])
+    }
+}
+
+apply from: "${rootDir}/shared/opencv.gradle"
+
+model {
+    // Exports config is a utility to enable exporting all symbols in a C++ library on windows to a DLL.
+    // This removes the need for DllExport on a library. However, the gradle C++ builder has a bug
+    // where some extra symbols are added that cannot be resolved at link time. This configuration
+    // lets you specify specific symbols to exlude from exporting.
+    exportsConfigs {
+        cscore(ExportsConfig) {
+            x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                 '_CT??_R0?AVbad_cast',
+                                 '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                 '_TI5?AVfailure']
+            x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                 '_CT??_R0?AVbad_cast',
+                                 '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                 '_TI5?AVfailure']
+        }
+        cscoreJNI(ExportsConfig) {
+            x86SymbolFilter = { symbols ->
+                def retList = []
+                symbols.each { symbol ->
+                    if (symbol.startsWith('CS_') || symbol.startsWith('Java_') || symbol.startsWith('JNI_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+            x64SymbolFilter = { symbols ->
+                def retList = []
+                symbols.each { symbol ->
+                    if (symbol.startsWith('CS_') || symbol.startsWith('Java_') || symbol.startsWith('JNI_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+        }
+    }
+    components {
+        examplesMap.each { key, value ->
+            "${key}"(NativeExecutableSpec) {
+                binaries.all {
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib library: 'cscore', linkage: 'shared'
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'examples/' + "${key}"
+                            include '**/*.cpp'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+checkstyle {
+    sourceSets = []
+}

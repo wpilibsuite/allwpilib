@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,9 +14,10 @@
 #include <thread>
 
 #include <HAL/DriverStation.h>
-#include <llvm/Twine.h>
-#include <support/deprecated.h>
-#include <support/mutex.h>
+#include <wpi/Twine.h>
+#include <wpi/condition_variable.h>
+#include <wpi/deprecated.h>
+#include <wpi/mutex.h>
 
 #include "ErrorBase.h"
 #include "RobotState.h"
@@ -24,6 +25,7 @@
 namespace frc {
 
 struct MatchInfoData;
+class MatchDataSender;
 
 /**
  * Provide access to the network communication data to / from the Driver
@@ -36,11 +38,10 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
 
   ~DriverStation() override;
   static DriverStation& GetInstance();
-  static void ReportError(const llvm::Twine& error);
-  static void ReportWarning(const llvm::Twine& error);
-  static void ReportError(bool isError, int code, const llvm::Twine& error,
-                          const llvm::Twine& location,
-                          const llvm::Twine& stack);
+  static void ReportError(const wpi::Twine& error);
+  static void ReportWarning(const wpi::Twine& error);
+  static void ReportError(bool isError, int code, const wpi::Twine& error,
+                          const wpi::Twine& location, const wpi::Twine& stack);
 
   static constexpr int kJoystickPorts = 6;
 
@@ -128,10 +129,11 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
  private:
   DriverStation();
 
-  void ReportJoystickUnpluggedError(const llvm::Twine& message);
-  void ReportJoystickUnpluggedWarning(const llvm::Twine& message);
+  void ReportJoystickUnpluggedError(const wpi::Twine& message);
+  void ReportJoystickUnpluggedWarning(const wpi::Twine& message);
   void Run();
   void UpdateControlWord(bool force, HAL_ControlWord& controlWord) const;
+  void SendMatchData();
 
   // Joystick User Data
   std::unique_ptr<HAL_JoystickAxes[]> m_joystickAxes;
@@ -147,6 +149,8 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
   std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptorCache;
   std::unique_ptr<MatchInfoData> m_matchInfoCache;
 
+  std::unique_ptr<MatchDataSender> m_matchDataSender;
+
   // Joystick button rising/falling edge flags
   std::array<uint32_t, kJoystickPorts> m_joystickButtonsPressed;
   std::array<uint32_t, kJoystickPorts> m_joystickButtonsReleased;
@@ -154,6 +158,10 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
   // Internal Driver Station thread
   std::thread m_dsThread;
   std::atomic<bool> m_isRunning{false};
+
+  wpi::mutex m_waitForDataMutex;
+  wpi::condition_variable m_waitForDataCond;
+  int m_waitForDataCounter;
 
   mutable wpi::mutex m_cacheDataMutex;
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,7 @@
 #include <cstdio>
 
 #include <HAL/HAL.h>
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "Commands/Scheduler.h"
 #include "LiveWindow/LiveWindow.h"
@@ -31,7 +31,7 @@ using namespace frc;
  * ready, causing the robot to be bypassed in a match.
  */
 void IterativeRobotBase::RobotInit() {
-  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**
@@ -42,7 +42,7 @@ void IterativeRobotBase::RobotInit() {
  * the robot enters disabled mode.
  */
 void IterativeRobotBase::DisabledInit() {
-  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**
@@ -52,7 +52,7 @@ void IterativeRobotBase::DisabledInit() {
  * called each time the robot enters autonomous mode.
  */
 void IterativeRobotBase::AutonomousInit() {
-  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**
@@ -62,7 +62,7 @@ void IterativeRobotBase::AutonomousInit() {
  * called each time the robot enters teleop mode.
  */
 void IterativeRobotBase::TeleopInit() {
-  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**
@@ -72,7 +72,7 @@ void IterativeRobotBase::TeleopInit() {
  * called each time the robot enters test mode.
  */
 void IterativeRobotBase::TestInit() {
-  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**
@@ -84,7 +84,7 @@ void IterativeRobotBase::TestInit() {
 void IterativeRobotBase::RobotPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+    wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
     firstRun = false;
   }
 }
@@ -99,7 +99,7 @@ void IterativeRobotBase::RobotPeriodic() {
 void IterativeRobotBase::DisabledPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+    wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
     firstRun = false;
   }
 }
@@ -114,7 +114,7 @@ void IterativeRobotBase::DisabledPeriodic() {
 void IterativeRobotBase::AutonomousPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+    wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
     firstRun = false;
   }
 }
@@ -129,7 +129,7 @@ void IterativeRobotBase::AutonomousPeriodic() {
 void IterativeRobotBase::TeleopPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+    wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
     firstRun = false;
   }
 }
@@ -143,7 +143,7 @@ void IterativeRobotBase::TeleopPeriodic() {
 void IterativeRobotBase::TestPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+    wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
     firstRun = false;
   }
 }

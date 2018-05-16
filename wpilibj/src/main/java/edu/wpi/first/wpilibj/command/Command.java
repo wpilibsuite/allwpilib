@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -85,6 +85,11 @@ public abstract class Command extends SendableBase implements Sendable {
    * Whether this command should run when the robot is disabled.
    */
   private boolean m_runWhenDisabled = false;
+
+  /**
+   * Whether or not this command has completed running.
+   */
+  private boolean m_completed = false;
 
   /**
    * The {@link CommandGroup} this is in.
@@ -208,6 +213,7 @@ public abstract class Command extends SendableBase implements Sendable {
     m_initialized = false;
     m_canceled = false;
     m_running = false;
+    m_completed = true;
   }
 
   /**
@@ -375,7 +381,7 @@ public abstract class Command extends SendableBase implements Sendable {
   /**
    * Returns whether the command has a parent.
    *
-   * @param True if the command has a parent.
+   * @return true if the command has a parent.
    */
   synchronized boolean isParented() {
     return m_parent != null;
@@ -404,6 +410,7 @@ public abstract class Command extends SendableBase implements Sendable {
           "Can not start a command that is a part of a command group");
     }
     Scheduler.getInstance().add(this);
+    m_completed = false;
   }
 
   /**
@@ -465,6 +472,15 @@ public abstract class Command extends SendableBase implements Sendable {
    */
   public synchronized boolean isCanceled() {
     return m_canceled;
+  }
+
+  /**
+   * Whether or not this command has completed running.
+   *
+   * @return whether or not this command has completed running.
+   */
+  public synchronized boolean isCompleted() {
+    return m_completed;
   }
 
   /**

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,7 +7,7 @@
 
 #include "Error.h"
 
-#include <llvm/Path.h>
+#include <wpi/Path.h>
 
 #include "DriverStation.h"
 #include "Timer.h"
@@ -41,8 +41,8 @@ const ErrorBase* Error::GetOriginatingObject() const {
 
 double Error::GetTimestamp() const { return m_timestamp; }
 
-void Error::Set(Code code, const llvm::Twine& contextMessage,
-                llvm::StringRef filename, llvm::StringRef function,
+void Error::Set(Code code, const wpi::Twine& contextMessage,
+                wpi::StringRef filename, wpi::StringRef function,
                 int lineNumber, const ErrorBase* originatingObject) {
   bool report = true;
 
@@ -66,8 +66,8 @@ void Error::Set(Code code, const llvm::Twine& contextMessage,
 void Error::Report() {
   DriverStation::ReportError(
       true, m_code, m_message,
-      m_function + llvm::Twine(" [") + llvm::sys::path::filename(m_filename) +
-          llvm::Twine(':') + llvm::Twine(m_lineNumber) + llvm::Twine(']'),
+      m_function + wpi::Twine(" [") + wpi::sys::path::filename(m_filename) +
+          wpi::Twine(':') + wpi::Twine(m_lineNumber) + wpi::Twine(']'),
       GetStackTrace(4));
 }
 
