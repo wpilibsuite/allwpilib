@@ -7,18 +7,18 @@
 
 package edu.wpi.first.wpilibj.sim;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.hal.HAL;
 
+import static org.junit.Assert.assertEquals;
+
 public class AnalogInputSimTest {
   static class DoubleStore {
-    public boolean wasTriggered = false;
-    public boolean wasCorrectType = false;
-    public double setValue = 0;
+    public boolean m_wasTriggered = false;
+    public boolean m_wasCorrectType = false;
+    public double m_setValue = 0;
   }
 
   @Test
@@ -30,7 +30,7 @@ public class AnalogInputSimTest {
 
     AnalogInSim inputSim = input.getSimObject();
 
-    for (double i = 0; i < 5.0; i+=0.1) {
+    for (double i = 0; i < 5.0; i += 0.1) {
       inputSim.setVoltage(0);
 
       assertEquals(input.getVoltage(), 0, 0.001);

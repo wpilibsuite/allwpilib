@@ -9,34 +9,38 @@ package edu.wpi.first.networktables;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import junit.framework.TestCase;
 
 public class ConnectionListenerTest extends TestCase {
-  NetworkTableInstance serverInst;
-  NetworkTableInstance clientInst;
+  NetworkTableInstance m_serverInst;
+  NetworkTableInstance m_clientInst;
 
   @Override
   protected void setUp() throws Exception {
-    serverInst = NetworkTableInstance.create();
-    serverInst.setNetworkIdentity("server");
+    m_serverInst = NetworkTableInstance.create();
+    m_serverInst.setNetworkIdentity("server");
 
-    clientInst = NetworkTableInstance.create();
-    clientInst.setNetworkIdentity("client");
+    m_clientInst = NetworkTableInstance.create();
+    m_clientInst.setNetworkIdentity("client");
   }
 
   @Override
   protected void tearDown() throws Exception {
-    clientInst.close();
-    serverInst.close();
+    m_clientInst.close();
+    m_serverInst.close();
   }
 
+  /**
+   * Connect to the server.
+   */
   private void connect() {
-    serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
-    clientInst.startClient("127.0.0.1", 10000);
+    m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
+    m_clientInst.startClient("127.0.0.1", 10000);
 
     // wait for client to report it's started, then wait another 0.1 sec
     try {
-      while ((clientInst.getNetworkMode() & NetworkTableInstance.kNetModeStarting) != 0) {
+      while ((m_clientInst.getNetworkMode() & NetworkTableInstance.kNetModeStarting) != 0) {
         Thread.sleep(100);
       }
       Thread.sleep(100);
@@ -45,9 +49,12 @@ public class ConnectionListenerTest extends TestCase {
     }
   }
 
+  /**
+   * Test the JNI.
+   */
   public void testJNI() {
     // set up the poller
-    int poller = NetworkTablesJNI.createConnectionListenerPoller(serverInst.getHandle());
+    int poller = NetworkTablesJNI.createConnectionListenerPoller(m_serverInst.getHandle());
     assertTrue("bad poller handle", poller != 0);
     int handle = NetworkTablesJNI.addPolledConnectionListener(poller, false);
     assertTrue("bad listener handle", handle != 0);
@@ -56,10 +63,10 @@ public class ConnectionListenerTest extends TestCase {
     connect();
 
     // get the event
-    assertTrue(serverInst.waitForConnectionListenerQueue(1.0));
+    assertTrue(m_serverInst.waitForConnectionListenerQueue(1.0));
     ConnectionNotification[] events = null;
     try {
-      events = NetworkTablesJNI.pollConnectionListenerTimeout(serverInst, poller, 0.0);
+      events = NetworkTablesJNI.pollConnectionListenerTimeout(m_serverInst, poller, 0.0);
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
       fail("unexpected interrupted exception" + ex);
@@ -71,7 +78,7 @@ public class ConnectionListenerTest extends TestCase {
     assertTrue(events[0].connected);
 
     // trigger a disconnect event
-    clientInst.stopClient();
+    m_clientInst.stopClient();
     try {
       Thread.sleep(100);
     } catch (InterruptedException ex) {
@@ -79,9 +86,9 @@ public class ConnectionListenerTest extends TestCase {
     }
 
     // get the event
-    assertTrue(serverInst.waitForConnectionListenerQueue(1.0));
+    assertTrue(m_serverInst.waitForConnectionListenerQueue(1.0));
     try {
-      events = NetworkTablesJNI.pollConnectionListenerTimeout(serverInst, poller, 0.0);
+      events = NetworkTablesJNI.pollConnectionListenerTimeout(m_serverInst, poller, 0.0);
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
       fail("unexpected interrupted exception" + ex);
@@ -94,24 +101,27 @@ public class ConnectionListenerTest extends TestCase {
 
   }
 
+  /**
+   * Test threaded behavior.
+   */
   public void testThreaded() {
-    serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
+    m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
     List<ConnectionNotification> events = new ArrayList<>();
-    int handle = serverInst.addConnectionListener((event) -> events.add(event), false);
+    final int handle = m_serverInst.addConnectionListener(events::add, false);
 
     // trigger a connect event
-    clientInst.startClient("127.0.0.1", 10000);
+    m_clientInst.startClient("127.0.0.1", 10000);
 
     // wait for client to report it's started, then wait another 0.1 sec
     try {
-      while ((clientInst.getNetworkMode() & NetworkTableInstance.kNetModeStarting) != 0) {
+      while ((m_clientInst.getNetworkMode() & NetworkTableInstance.kNetModeStarting) != 0) {
         Thread.sleep(100);
       }
       Thread.sleep(100);
     } catch (InterruptedException ex) {
       fail("interrupted while waiting for client to start");
     }
-    assertTrue(serverInst.waitForConnectionListenerQueue(1.0));
+    assertTrue(m_serverInst.waitForConnectionListenerQueue(1.0));
 
     // get the event
     assertEquals(events.size(), 1);
@@ -120,7 +130,7 @@ public class ConnectionListenerTest extends TestCase {
     events.clear();
 
     // trigger a disconnect event
-    clientInst.stopClient();
+    m_clientInst.stopClient();
     try {
       Thread.sleep(100);
     } catch (InterruptedException ex) {
@@ -128,7 +138,7 @@ public class ConnectionListenerTest extends TestCase {
     }
 
     // get the event
-    assertTrue(serverInst.waitForConnectionListenerQueue(1.0));
+    assertTrue(m_serverInst.waitForConnectionListenerQueue(1.0));
     assertEquals(events.size(), 1);
     assertEquals(handle, events.get(0).listener);
     assertFalse(events.get(0).connected);

@@ -9,36 +9,37 @@ package edu.wpi.first.networktables;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import junit.framework.TestCase;
 
 public class EntryListenerTest extends TestCase {
-  NetworkTableInstance serverInst;
-  NetworkTableInstance clientInst;
+  NetworkTableInstance m_serverInst;
+  NetworkTableInstance m_clientInst;
 
   @Override
   protected void setUp() throws Exception {
-    serverInst = NetworkTableInstance.create();
-    serverInst.setNetworkIdentity("server");
+    m_serverInst = NetworkTableInstance.create();
+    m_serverInst.setNetworkIdentity("server");
 
-    clientInst = NetworkTableInstance.create();
-    clientInst.setNetworkIdentity("client");
+    m_clientInst = NetworkTableInstance.create();
+    m_clientInst.setNetworkIdentity("client");
   }
 
   @Override
   protected void tearDown() throws Exception {
-    clientInst.close();
-    serverInst.close();
+    m_clientInst.close();
+    m_serverInst.close();
   }
 
   private void connect() {
-    serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
-    clientInst.startClient("127.0.0.1", 10000);
+    m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
+    m_clientInst.startClient("127.0.0.1", 10000);
 
     // Use connection listener to ensure we've connected
-    int poller = NetworkTablesJNI.createConnectionListenerPoller(clientInst.getHandle());
+    int poller = NetworkTablesJNI.createConnectionListenerPoller(m_clientInst.getHandle());
     NetworkTablesJNI.addPolledConnectionListener(poller, false);
     try {
-      if (NetworkTablesJNI.pollConnectionListenerTimeout(clientInst, poller, 1.0).length == 0) {
+      if (NetworkTablesJNI.pollConnectionListenerTimeout(m_clientInst, poller, 1.0).length == 0) {
         fail("client didn't connect to server");
       }
     } catch (InterruptedException ex) {
@@ -47,28 +48,31 @@ public class EntryListenerTest extends TestCase {
     }
   }
 
+  /**
+   * Test prefix with a new remote.
+   */
   public void testPrefixNewRemote() {
     connect();
     List<EntryNotification> events = new ArrayList<>();
-    int handle = serverInst.addEntryListener("/foo", (event) -> events.add(event),
+    final int handle = m_serverInst.addEntryListener("/foo", events::add,
         EntryListenerFlags.kNew);
 
     // Trigger an event
-    clientInst.getEntry("/foo/bar").setDouble(1.0);
-    clientInst.getEntry("/baz").setDouble(1.0);
-    clientInst.flush();
+    m_clientInst.getEntry("/foo/bar").setDouble(1.0);
+    m_clientInst.getEntry("/baz").setDouble(1.0);
+    m_clientInst.flush();
     try {
       Thread.sleep(100);
     } catch (InterruptedException ex) {
       fail("interrupted while waiting for entries to update");
     }
 
-    assertTrue(serverInst.waitForEntryListenerQueue(1.0));
+    assertTrue(m_serverInst.waitForEntryListenerQueue(1.0));
 
     // Check the event
     assertEquals(events.size(), 1);
     assertEquals(events.get(0).listener, handle);
-    assertEquals(events.get(0).getEntry(), serverInst.getEntry("/foo/bar"));
+    assertEquals(events.get(0).getEntry(), m_serverInst.getEntry("/foo/bar"));
     assertEquals(events.get(0).name, "/foo/bar");
     assertEquals(events.get(0).value, NetworkTableValue.makeDouble(1.0));
     assertEquals(events.get(0).flags, EntryListenerFlags.kNew);

@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import org.junit.Test;
-
 import java.util.logging.Logger;
+
+import org.junit.Test;
 
 /**
  * Ported from the old CrioTest Classes.
