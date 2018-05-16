@@ -139,22 +139,22 @@ void DriverStation::ReportError(bool isError, int32_t code,
  * @return The state of the joystick button.
  */
 bool DriverStation::GetStickButton(int stick, int button) {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return false;
   }
-  if (button == 0) {
+  if (button <= 0) {
     ReportJoystickUnpluggedError(
         "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
   }
+
   std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (button > m_joystickButtons[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
     ReportJoystickUnpluggedWarning(
-        "Joystick Button missing, check if all controllers are "
-        "plugged in");
+        "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
 
@@ -170,22 +170,22 @@ bool DriverStation::GetStickButton(int stick, int button) {
  * @return Whether the joystick button was pressed since the last check.
  */
 bool DriverStation::GetStickButtonPressed(int stick, int button) {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return false;
   }
-  if (button == 0) {
+  if (button <= 0) {
     ReportJoystickUnpluggedError(
         "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
   }
+
   std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (button > m_joystickButtons[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
     ReportJoystickUnpluggedWarning(
-        "Joystick Button missing, check if all controllers are "
-        "plugged in");
+        "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
 
@@ -207,7 +207,7 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
  * @return Whether the joystick button was released since the last check.
  */
 bool DriverStation::GetStickButtonReleased(int stick, int button) {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return false;
   }
@@ -216,13 +216,13 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
         "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
   }
+
   std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (button > m_joystickButtons[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
     ReportJoystickUnpluggedWarning(
-        "Joystick Button missing, check if all controllers are "
-        "plugged in");
+        "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
 
@@ -245,20 +245,21 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
  * @return The value of the axis on the joystick.
  */
 double DriverStation::GetStickAxis(int stick, int axis) {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
-    return 0;
+    return 0.0;
   }
+  if (axis >= HAL_kMaxJoystickAxes) {
+    wpi_setWPIError(BadJoystickAxis);
+    return 0.0;
+  }
+
   std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (axis >= m_joystickAxes[stick].count) {
     // Unlock early so error printing isn't locked.
-    m_cacheDataMutex.unlock();
-    lock.release();
-    if (axis >= HAL_kMaxJoystickAxes)
-      wpi_setWPIError(BadJoystickAxis);
-    else
-      ReportJoystickUnpluggedWarning(
-          "Joystick Axis missing, check if all controllers are plugged in");
+    lock.unlock();
+    ReportJoystickUnpluggedWarning(
+        "Joystick Axis missing, check if all controllers are plugged in");
     return 0.0;
   }
 
@@ -271,19 +272,21 @@ double DriverStation::GetStickAxis(int stick, int axis) {
  * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
  */
 int DriverStation::GetStickPOV(int stick, int pov) {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
   }
+  if (pov >= HAL_kMaxJoystickPOVs) {
+    wpi_setWPIError(BadJoystickAxis);
+    return -1;
+  }
+
   std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (pov >= m_joystickPOVs[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
-    if (pov >= HAL_kMaxJoystickPOVs)
-      wpi_setWPIError(BadJoystickAxis);
-    else
-      ReportJoystickUnpluggedWarning(
-          "Joystick POV missing, check if all controllers are plugged in");
+    ReportJoystickUnpluggedWarning(
+        "Joystick POV missing, check if all controllers are plugged in");
     return -1;
   }
 
@@ -297,10 +300,11 @@ int DriverStation::GetStickPOV(int stick, int pov) {
  * @return The state of the buttons on the joystick.
  */
 int DriverStation::GetStickButtons(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickButtons[stick].buttons;
 }
@@ -312,10 +316,11 @@ int DriverStation::GetStickButtons(int stick) const {
  * @return The number of axes on the indicated joystick
  */
 int DriverStation::GetStickAxisCount(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickAxes[stick].count;
 }
@@ -327,10 +332,11 @@ int DriverStation::GetStickAxisCount(int stick) const {
  * @return The number of POVs on the indicated joystick
  */
 int DriverStation::GetStickPOVCount(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickPOVs[stick].count;
 }
@@ -342,10 +348,11 @@ int DriverStation::GetStickPOVCount(int stick) const {
  * @return The number of buttons on the indicated joystick
  */
 int DriverStation::GetStickButtonCount(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickButtons[stick].count;
 }
@@ -357,10 +364,11 @@ int DriverStation::GetStickButtonCount(int stick) const {
  * @return A boolean that is true if the controller is an xbox controller.
  */
 bool DriverStation::GetJoystickIsXbox(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return false;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return static_cast<bool>(m_joystickDescriptor[stick].isXbox);
 }
@@ -372,10 +380,11 @@ bool DriverStation::GetJoystickIsXbox(int stick) const {
  * @return The HID type of joystick at the given port
  */
 int DriverStation::GetJoystickType(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return static_cast<int>(m_joystickDescriptor[stick].type);
 }
@@ -387,12 +396,12 @@ int DriverStation::GetJoystickType(int stick) const {
  * @return The name of the joystick at the given port
  */
 std::string DriverStation::GetJoystickName(int stick) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
-  std::string retVal(m_joystickDescriptor[stick].name);
-  return retVal;
+  return m_joystickDescriptor[stick].name;
 }
 
 /**
@@ -402,10 +411,11 @@ std::string DriverStation::GetJoystickName(int stick) const {
  * @return What type of axis the axis is reporting to be
  */
 int DriverStation::GetJoystickAxisType(int stick, int axis) const {
-  if (stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
   }
+
   std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickDescriptor[stick].axisTypes[axis];
 }
