@@ -23,7 +23,3 @@ model {
         }
     }
 }
-
-checkstyle {
-    sourceSets = []
-}
