@@ -14,7 +14,7 @@ repositories {
 
 spotless {
     format 'misc', {
-        target '**/*.gradle', '**/*.md', '**/.gitignore', '**/*.xml', '**/*.yml', '**/*.sh'
+        target '**/*.gradle', '**/*.md', '**/.gitignore', '**/*.yml', '**/*.sh', 'styleguide/*.xml'
         lineEndings 'UNIX'
 
         trimTrailingWhitespace()
