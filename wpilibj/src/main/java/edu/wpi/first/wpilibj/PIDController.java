@@ -57,7 +57,6 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
   private double m_result = 0.0;
   private double m_period = kDefaultPeriod;
 
-  PIDSource m_origSource;
   LinearDigitalFilter m_filter;
 
   ReentrantLock m_thisMutex = new ReentrantLock();
@@ -144,12 +143,10 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
     m_D = Kd;
     m_F = Kf;
 
-    // Save original source
-    m_origSource = source;
+    m_pidInput = source;
 
     // Create LinearDigitalFilter with original source as its source argument
-    m_filter = LinearDigitalFilter.movingAverage(m_origSource, 1);
-    m_pidInput = m_filter;
+    m_filter = LinearDigitalFilter.movingAverage(m_pidInput, 1);
 
     m_pidOutput = output;
     m_period = period;
@@ -232,7 +229,7 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
    */
   @SuppressWarnings("LocalVariableName")
   protected void calculate() {
-    if (m_origSource == null || m_pidOutput == null) {
+    if (m_pidInput == null || m_pidOutput == null) {
       return;
     }
 
@@ -678,7 +675,7 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
   public double getAvgError() {
     m_thisMutex.lock();
     try {
-      return getError();
+      return m_filter.pidGet();
     } finally {
       m_thisMutex.unlock();
     }
@@ -760,8 +757,7 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
   public void setToleranceBuffer(int bufLength) {
     m_thisMutex.lock();
     try {
-      m_filter = LinearDigitalFilter.movingAverage(m_origSource, bufLength);
-      m_pidInput = m_filter;
+      m_filter = LinearDigitalFilter.movingAverage(m_pidInput, bufLength);
     } finally {
       m_thisMutex.unlock();
     }
