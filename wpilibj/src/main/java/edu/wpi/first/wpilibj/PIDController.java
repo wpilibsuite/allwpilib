@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
@@ -69,8 +68,9 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
 
   protected PIDSource m_pidInput;
   protected PIDOutput m_pidOutput;
-  java.util.Timer m_controlLoop;
-  Timer m_setpointTimer;
+
+  Notifier m_controlLoop = new Notifier(this::calculate);
+  Timer m_setpointTimer = new Timer();
 
   /**
    * Tolerance is the type of tolerance used to specify if the PID controller is on target.
@@ -118,21 +118,6 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
     }
   }
 
-  private class PIDTask extends TimerTask {
-    private PIDController m_controller;
-
-    PIDTask(PIDController controller) {
-      requireNonNull(controller, "Given PIDController was null");
-
-      m_controller = controller;
-    }
-
-    @Override
-    public void run() {
-      m_controller.calculate();
-    }
-  }
-
   /**
    * Allocate a PID object with the given constants for P, I, D, and F.
    *
@@ -152,8 +137,6 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
     requireNonNull(source, "Null PIDSource was given");
     requireNonNull(output, "Null PIDOutput was given");
 
-    m_controlLoop = new java.util.Timer();
-    m_setpointTimer = new Timer();
     m_setpointTimer.start();
 
     m_P = Kp;
@@ -171,7 +154,7 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
     m_pidOutput = output;
     m_period = period;
 
-    m_controlLoop.schedule(new PIDTask(this), 0L, (long) (m_period * 1000));
+    m_controlLoop.startPeriodic(m_period);
 
     instances++;
     HLUsageReporting.reportPIDController(instances);
@@ -232,7 +215,7 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
   @Override
   public void free() {
     super.free();
-    m_controlLoop.cancel();
+    m_controlLoop.stop();
     m_thisMutex.lock();
     try {
       m_pidOutput = null;
@@ -245,7 +228,7 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
 
   /**
    * Read the input, calculate the output accordingly, and write to the output. This should only be
-   * called by the PIDTask and is created during initialization.
+   * called by the Notifier and is created during initialization.
    */
   @SuppressWarnings("LocalVariableName")
   protected void calculate() {
