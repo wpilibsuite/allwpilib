@@ -7,15 +7,14 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.logging.Logger;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
-
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 

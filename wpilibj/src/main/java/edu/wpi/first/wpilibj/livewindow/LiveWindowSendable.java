@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj.livewindow;
 
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Live Window Sendable is a special type of object sendable to the live window.

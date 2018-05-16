@@ -7,13 +7,13 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.RelayJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-
-import java.util.Arrays;
-import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 

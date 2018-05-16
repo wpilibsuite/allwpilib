@@ -7,6 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import edu.wpi.cscore.AxisCamera;
 import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.cscore.CvSink;
@@ -21,16 +25,10 @@ import edu.wpi.cscore.VideoMode.PixelFormat;
 import edu.wpi.cscore.VideoProperty;
 import edu.wpi.cscore.VideoSink;
 import edu.wpi.cscore.VideoSource;
-//import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-//import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.ArrayList;
-import java.util.Hashtable;
 
 /**
  * Singleton class for creating and keeping camera servers.

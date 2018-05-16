@@ -7,14 +7,14 @@
 
 package edu.wpi.first.wpilibj.test;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.model.MultipleFailureException;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.MockDS;

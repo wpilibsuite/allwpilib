@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
+
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Collector;
 
 /**
