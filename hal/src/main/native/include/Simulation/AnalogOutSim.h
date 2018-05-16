@@ -27,7 +27,7 @@ class AnalogOutSim {
         m_index, -1, callback, &HALSIM_CancelAnalogOutVoltageCallback);
     store->SetUid(HALSIM_RegisterAnalogOutVoltageCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   double GetVoltage() { return HALSIM_GetAnalogOutVoltage(m_index); }
   void SetVoltage(double voltage) {
@@ -40,7 +40,7 @@ class AnalogOutSim {
         m_index, -1, callback, &HALSIM_CancelAnalogOutInitializedCallback);
     store->SetUid(HALSIM_RegisterAnalogOutInitializedCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetInitialized() { return HALSIM_GetAnalogOutInitialized(m_index); }
   void SetInitialized(bool initialized) {

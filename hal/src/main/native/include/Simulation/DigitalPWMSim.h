@@ -27,7 +27,7 @@ class DigitalPWMSim {
         m_index, -1, callback, &HALSIM_CancelDigitalPWMInitializedCallback);
     store->SetUid(HALSIM_RegisterDigitalPWMInitializedCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetInitialized() { return HALSIM_GetDigitalPWMInitialized(m_index); }
   void SetInitialized(bool initialized) {
@@ -40,7 +40,7 @@ class DigitalPWMSim {
         m_index, -1, callback, &HALSIM_CancelDigitalPWMDutyCycleCallback);
     store->SetUid(HALSIM_RegisterDigitalPWMDutyCycleCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   double GetDutyCycle() { return HALSIM_GetDigitalPWMDutyCycle(m_index); }
   void SetDutyCycle(double dutyCycle) {
@@ -53,7 +53,7 @@ class DigitalPWMSim {
         m_index, -1, callback, &HALSIM_CancelDigitalPWMPinCallback);
     store->SetUid(HALSIM_RegisterDigitalPWMPinCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   int GetPin() { return HALSIM_GetDigitalPWMPin(m_index); }
   void SetPin(int pin) { HALSIM_SetDigitalPWMPin(m_index, pin); }

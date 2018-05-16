@@ -27,7 +27,7 @@ class SPIAccelerometerSim {
         m_index, -1, callback, &HALSIM_CancelSPIAccelerometerActiveCallback);
     store->SetUid(HALSIM_RegisterSPIAccelerometerActiveCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetActive() { return HALSIM_GetSPIAccelerometerActive(m_index); }
   void SetActive(bool active) {
@@ -40,7 +40,7 @@ class SPIAccelerometerSim {
         m_index, -1, callback, &HALSIM_CancelSPIAccelerometerRangeCallback);
     store->SetUid(HALSIM_RegisterSPIAccelerometerRangeCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   int GetRange() { return HALSIM_GetSPIAccelerometerRange(m_index); }
   void SetRange(int range) { HALSIM_SetSPIAccelerometerRange(m_index, range); }
@@ -51,7 +51,7 @@ class SPIAccelerometerSim {
         m_index, -1, callback, &HALSIM_CancelSPIAccelerometerXCallback);
     store->SetUid(HALSIM_RegisterSPIAccelerometerXCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   double GetX() { return HALSIM_GetSPIAccelerometerX(m_index); }
   void SetX(double x) { HALSIM_SetSPIAccelerometerX(m_index, x); }
@@ -62,7 +62,7 @@ class SPIAccelerometerSim {
         m_index, -1, callback, &HALSIM_CancelSPIAccelerometerYCallback);
     store->SetUid(HALSIM_RegisterSPIAccelerometerYCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   double GetY() { return HALSIM_GetSPIAccelerometerY(m_index); }
   void SetY(double y) { HALSIM_SetSPIAccelerometerY(m_index, y); }
@@ -73,7 +73,7 @@ class SPIAccelerometerSim {
         m_index, -1, callback, &HALSIM_CancelSPIAccelerometerZCallback);
     store->SetUid(HALSIM_RegisterSPIAccelerometerZCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   double GetZ() { return HALSIM_GetSPIAccelerometerZ(m_index); }
   void SetZ(double z) { HALSIM_SetSPIAccelerometerZ(m_index, z); }
