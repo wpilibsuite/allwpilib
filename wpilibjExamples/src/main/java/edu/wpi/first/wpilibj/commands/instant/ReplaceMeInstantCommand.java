@@ -13,6 +13,9 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
  * Add your docs here.
  */
 public class ReplaceMeInstantCommand extends InstantCommand {
+  /**
+   * Add your docs here.
+   */
   public ReplaceMeInstantCommand() {
     super();
     // Use requires() here to declare subsystem dependencies

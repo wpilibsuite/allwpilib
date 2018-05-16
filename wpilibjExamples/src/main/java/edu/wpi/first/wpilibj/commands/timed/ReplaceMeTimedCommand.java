@@ -13,6 +13,9 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
  * Add your docs here.
  */
 public class ReplaceMeTimedCommand extends TimedCommand {
+  /**
+   * Add your docs here.
+   */
   public ReplaceMeTimedCommand(double timeout) {
     super(timeout);
     // Use requires() here to declare subsystem dependencies
