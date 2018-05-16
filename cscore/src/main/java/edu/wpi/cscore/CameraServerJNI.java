@@ -242,9 +242,10 @@ public class CameraServerJNI {
     kSourceBytesReceived(1),
     kSourceFramesReceived(2);
 
+    @SuppressWarnings("MemberName")
     private int value;
 
-    private TelemetryKind(int value) {
+    TelemetryKind(int value) {
       this.value = value;
     }
 
