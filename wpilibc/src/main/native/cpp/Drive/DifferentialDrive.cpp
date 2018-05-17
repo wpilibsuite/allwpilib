@@ -94,7 +94,8 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
   }
 
   m_leftMotor.Set(Limit(leftMotorOutput) * m_maxOutput);
-  m_rightMotor.Set(Limit(rightMotorOutput) * m_maxOutput * m_rightSideInvertMultiplier);
+  m_rightMotor.Set(Limit(rightMotorOutput) * m_maxOutput *
+                   m_rightSideInvertMultiplier);
 
   m_safetyHelper.Feed();
 }
@@ -181,7 +182,8 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
   }
 
   m_leftMotor.Set(leftMotorOutput * m_maxOutput);
-  m_rightMotor.Set(rightMotorOutput * m_maxOutput * m_rightSideInvertMultiplier);
+  m_rightMotor.Set(rightMotorOutput * m_maxOutput *
+                   m_rightSideInvertMultiplier);
 
   m_safetyHelper.Feed();
 }
@@ -257,14 +259,18 @@ void DifferentialDrive::SetQuickStopAlpha(double alpha) {
 }
 
 /**
- * Gets if the power sent to the right side of the drivetrain is multipled by -1.
+ * Gets if the power sent to the right side of the drivetrain is multipled by
+ * -1.
  *
  * @return true if the right side is inverted
  */
-bool DifferentialDrive::IsRightSideInverted() const { return m_rightSideInvertMultiplier == -1.0; }
+bool DifferentialDrive::IsRightSideInverted() const {
+  return m_rightSideInvertMultiplier == -1.0;
+}
 
 /**
- * Sets if the power sent to the right side of the drivetrain should be multipled by -1.
+ * Sets if the power sent to the right side of the drivetrain should be
+ * multipled by -1.
  *
  * @param rightSideInverted true if right side power should be multipled by -1
  */
@@ -287,7 +293,10 @@ void DifferentialDrive::InitSendable(SendableBuilder& builder) {
   builder.AddDoubleProperty("Left Motor Speed",
                             [=]() { return m_leftMotor.Get(); },
                             [=](double value) { m_leftMotor.Set(value); });
-  builder.AddDoubleProperty("Right Motor Speed",
-                            [=]() { return m_rightMotor.Get() * m_rightSideInvertMultiplier; },
-                            [=](double value) { m_rightMotor.Set(value * m_rightSideInvertMultiplier); });
+  builder.AddDoubleProperty(
+      "Right Motor Speed",
+      [=]() { return m_rightMotor.Get() * m_rightSideInvertMultiplier; },
+      [=](double value) {
+        m_rightMotor.Set(value * m_rightSideInvertMultiplier);
+      });
 }
