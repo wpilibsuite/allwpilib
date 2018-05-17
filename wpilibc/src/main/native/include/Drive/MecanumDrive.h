@@ -72,9 +72,9 @@ class MecanumDrive : public RobotDriveBase {
   MecanumDrive(const MecanumDrive&) = delete;
   MecanumDrive& operator=(const MecanumDrive&) = delete;
 
-  void DriveCartesian(double x, double y, double rotation,
+  void DriveCartesian(double ySpeed, double xSpeed, double zRotation,
                       double gyroAngle = 0.0);
-  void DrivePolar(double magnitude, double angle, double rotation);
+  void DrivePolar(double magnitude, double angle, double zRotation);
 
   void StopMotor() override;
   void GetDescription(wpi::raw_ostream& desc) const override;
