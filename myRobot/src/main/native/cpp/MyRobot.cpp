@@ -45,4 +45,4 @@ class MyRobot : public frc::IterativeRobot {
   void RobotPeriodic() override {}
 };
 
-START_ROBOT_CLASS(MyRobot)
+int main() { return frc::StartRobot<MyRobot>(); }

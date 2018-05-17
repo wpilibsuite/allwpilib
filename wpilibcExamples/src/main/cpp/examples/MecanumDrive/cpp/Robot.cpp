@@ -48,4 +48,4 @@ class Robot : public frc::IterativeRobot {
   frc::Joystick m_stick{kJoystickChannel};
 };
 
-START_ROBOT_CLASS(Robot)
+int main() { return frc::StartRobot<Robot>(); }

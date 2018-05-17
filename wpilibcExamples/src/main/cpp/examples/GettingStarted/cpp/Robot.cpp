@@ -55,4 +55,4 @@ class Robot : public frc::IterativeRobot {
   frc::Timer m_timer;
 };
 
-START_ROBOT_CLASS(Robot)
+int main() { return frc::StartRobot<Robot>(); }

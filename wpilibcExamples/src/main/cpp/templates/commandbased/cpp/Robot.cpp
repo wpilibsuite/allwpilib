@@ -72,4 +72,4 @@ void Robot::TeleopPeriodic() { frc::Scheduler::GetInstance()->Run(); }
 
 void Robot::TestPeriodic() {}
 
-START_ROBOT_CLASS(Robot)
+int main() { return frc::StartRobot<Robot>(); }

@@ -80,4 +80,4 @@ class Robot : public frc::IterativeRobot {
   frc::PIDController m_pidController{kP, kI, kD, m_ultrasonic, m_pidOutput};
 };
 
-START_ROBOT_CLASS(Robot)
+int main() { return frc::StartRobot<Robot>(); }
