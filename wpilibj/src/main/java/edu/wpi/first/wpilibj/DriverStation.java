@@ -140,8 +140,8 @@ public class DriverStation implements RobotState.Interface {
   private MatchInfoData m_matchInfoCache = new MatchInfoData();
 
   // Joystick button rising/falling edge flags
-  HALJoystickButtons[] m_joystickButtonsPressed = new HALJoystickButtons[kJoystickPorts];
-  HALJoystickButtons[] m_joystickButtonsReleased = new HALJoystickButtons[kJoystickPorts];
+  private int[] m_joystickButtonsPressed = new int[kJoystickPorts];
+  private int[] m_joystickButtonsReleased = new int[kJoystickPorts];
 
   // preallocated byte buffer for button count
   private ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1);
@@ -197,9 +197,6 @@ public class DriverStation implements RobotState.Interface {
       m_joystickButtonsCache[i] = new HALJoystickButtons();
       m_joystickAxesCache[i] = new HALJoystickAxes(HAL.kMaxJoystickAxes);
       m_joystickPOVsCache[i] = new HALJoystickPOVs(HAL.kMaxJoystickPOVs);
-
-      m_joystickButtonsPressed[i] = new HALJoystickButtons();
-      m_joystickButtonsReleased[i] = new HALJoystickButtons();
     }
 
     m_controlWordMutex = new Object();
@@ -342,14 +339,27 @@ public class DriverStation implements RobotState.Interface {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-3");
     }
-
-    // If button was pressed, clear flag and return true
-    if ((m_joystickButtonsPressed[stick].m_buttons & 1 << (button - 1)) != 0) {
-      m_joystickButtonsPressed[stick].m_buttons &= ~(1 << (button - 1));
-      return true;
-    } else {
-      return false;
+    boolean error = false;
+    boolean retVal = false;
+    synchronized (m_cacheDataMutex) {
+      if (button > m_joystickButtons[stick].m_count) {
+        error = true;
+        retVal = false;
+      } else {
+        // If button was pressed, clear flag and return true
+        if ((m_joystickButtonsPressed[stick] & 1 << (button - 1)) != 0) {
+          m_joystickButtonsPressed[stick] &= ~(1 << (button - 1));
+          retVal = true;
+        } else {
+          retVal = false;
+        }
+      }
     }
+    if (error) {
+      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+          + " not available, check if controller is plugged in");
+    }
+    return retVal;
   }
 
   /**
@@ -368,14 +378,27 @@ public class DriverStation implements RobotState.Interface {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-3");
     }
-
-    // If button was released, clear flag and return true
-    if ((m_joystickButtonsReleased[stick].m_buttons & 1 << (button - 1)) != 0) {
-      m_joystickButtonsReleased[stick].m_buttons &= ~(1 << (button - 1));
-      return true;
-    } else {
-      return false;
+    boolean error = false;
+    boolean retVal = false;
+    synchronized (m_cacheDataMutex) {
+      if (button > m_joystickButtons[stick].m_count) {
+        error = true;
+        retVal = false;
+      } else {
+        // If button was released, clear flag and return true
+        if ((m_joystickButtonsReleased[stick] & 1 << (button - 1)) != 0) {
+          m_joystickButtonsReleased[stick] &= ~(1 << (button - 1));
+          retVal = true;
+        } else {
+          retVal = false;
+        }
+      }
     }
+    if (error) {
+      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+          + " not available, check if controller is plugged in");
+    }
+    return retVal;
   }
 
   /**
@@ -1042,11 +1065,11 @@ public class DriverStation implements RobotState.Interface {
     try {
       for (int i = 0; i < kJoystickPorts; i++) {
         // If buttons weren't pressed and are now, set flags in m_buttonsPressed
-        m_joystickButtonsPressed[i].m_buttons |=
+        m_joystickButtonsPressed[i] |=
             ~m_joystickButtons[i].m_buttons & m_joystickButtonsCache[i].m_buttons;
 
         // If buttons were pressed and aren't now, set flags in m_buttonsReleased
-        m_joystickButtonsReleased[i].m_buttons |=
+        m_joystickButtonsReleased[i] |=
             m_joystickButtons[i].m_buttons & ~m_joystickButtonsCache[i].m_buttons;
       }
 
