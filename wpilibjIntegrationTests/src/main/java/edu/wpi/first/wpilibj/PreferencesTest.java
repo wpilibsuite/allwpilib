@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -86,6 +87,25 @@ public class PreferencesTest extends AbstractComsSetup {
     m_pref.putInt("checkedValueInt", 1);
     m_pref.putFloat("checkedValueFloat", 1);
     m_pref.putBoolean("checkedValueBoolean", true);
+  }
+
+  /**
+   * Just checking to make sure our helper method works.
+   */
+  @Test
+  public void testRemove() {
+    remove();
+    assertEquals("Preferences was not empty!  Preferences in table: "
+        + Arrays.toString(m_pref.getKeys().toArray()),
+        1, m_pref.getKeys().size());
+  }
+
+  @Test
+  public void testRemoveAll() {
+    m_pref.removeAll();
+    assertEquals("Preferences was not empty!  Preferences in table: "
+        + Arrays.toString(m_pref.getKeys().toArray()),
+        1, m_pref.getKeys().size());
   }
 
   @Test

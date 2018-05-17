@@ -174,6 +174,17 @@ public class Preferences {
   }
 
   /**
+   * Remove all preferences.
+   */
+  public void removeAll() {
+    for (String key : m_table.getKeys()) {
+      if (!".type".equals(key)) {
+        remove(key);
+      }
+    }
+  }
+
+  /**
    * Returns the string at the given key. If this table does not have a value for that position,
    * then the given backup value will be returned.
    *
