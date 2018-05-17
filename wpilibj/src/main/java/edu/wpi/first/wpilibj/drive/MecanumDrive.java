@@ -135,18 +135,18 @@ public class MecanumDrive extends RobotDriveBase {
 
     double[] wheelSpeeds = new double[4];
     wheelSpeeds[MotorType.kFrontLeft.value] = input.x + input.y + zRotation;
-    wheelSpeeds[MotorType.kFrontRight.value] = input.x + input.y * m_rightSideInvertMultiplier
-        + zRotation;
+    wheelSpeeds[MotorType.kFrontRight.value] = -input.x + input.y - zRotation;
     wheelSpeeds[MotorType.kRearLeft.value] = -input.x + input.y + zRotation;
-    wheelSpeeds[MotorType.kRearRight.value] = -input.x + input.y * m_rightSideInvertMultiplier
-        + zRotation;
+    wheelSpeeds[MotorType.kRearRight.value] = input.x + input.y - zRotation;
 
     normalize(wheelSpeeds);
 
     m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft.value] * m_maxOutput);
-    m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight.value] * m_maxOutput);
+    m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight.value] * m_maxOutput
+        * m_rightSideInvertMultiplier);
     m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft.value] * m_maxOutput);
-    m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight.value] * m_maxOutput);
+    m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight.value] * m_maxOutput
+        * m_rightSideInvertMultiplier);
 
     m_safetyHelper.feed();
   }

@@ -77,16 +77,16 @@ void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
 
   double wheelSpeeds[4];
   wheelSpeeds[kFrontLeft] = input.x + input.y + zRotation;
-  wheelSpeeds[kFrontRight] = input.x + input.y * m_rightSideInvertMultiplier + zRotation;
+  wheelSpeeds[kFrontRight] = -input.x + input.y - zRotation;
   wheelSpeeds[kRearLeft] = -input.x + input.y + zRotation;
-  wheelSpeeds[kRearRight] = -input.x + input.y * m_rightSideInvertMultiplier + zRotation;
+  wheelSpeeds[kRearRight] = input.x + input.y - zRotation;
 
   Normalize(wheelSpeeds);
 
   m_frontLeftMotor.Set(wheelSpeeds[kFrontLeft] * m_maxOutput);
-  m_frontRightMotor.Set(wheelSpeeds[kFrontRight] * m_maxOutput);
+  m_frontRightMotor.Set(wheelSpeeds[kFrontRight] * m_maxOutput * m_rightSideInvertMultiplier);
   m_rearLeftMotor.Set(wheelSpeeds[kRearLeft] * m_maxOutput);
-  m_rearRightMotor.Set(wheelSpeeds[kRearRight] * m_maxOutput);
+  m_rearRightMotor.Set(wheelSpeeds[kRearRight] * m_maxOutput * m_rightSideInvertMultiplier);
 
   m_safetyHelper.Feed();
 }
