@@ -27,11 +27,11 @@ constexpr double kPi = 3.14159265358979323846;
  *             (0-5).
  */
 Joystick::Joystick(int port) : GenericHID(port) {
-  m_axes[Axis::kX] = kDefaultXAxis;
-  m_axes[Axis::kY] = kDefaultYAxis;
-  m_axes[Axis::kZ] = kDefaultZAxis;
-  m_axes[Axis::kTwist] = kDefaultTwistAxis;
-  m_axes[Axis::kThrottle] = kDefaultThrottleAxis;
+  m_axes[Axis::kX] = kDefaultXChannel;
+  m_axes[Axis::kY] = kDefaultYChannel;
+  m_axes[Axis::kZ] = kDefaultZChannel;
+  m_axes[Axis::kTwist] = kDefaultTwistChannel;
+  m_axes[Axis::kThrottle] = kDefaultThrottleChannel;
 
   HAL_Report(HALUsageReporting::kResourceType_Joystick, port);
 }

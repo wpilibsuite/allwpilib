@@ -18,10 +18,21 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
 public class Joystick extends GenericHID {
+  static final byte kDefaultXChannel = 0;
+  static final byte kDefaultYChannel = 1;
+  static final byte kDefaultZChannel = 2;
+  static final byte kDefaultTwistChannel = 2;
+  static final byte kDefaultThrottleChannel = 3;
+
+  @Deprecated
   static final byte kDefaultXAxis = 0;
+  @Deprecated
   static final byte kDefaultYAxis = 1;
+  @Deprecated
   static final byte kDefaultZAxis = 2;
+  @Deprecated
   static final byte kDefaultTwistAxis = 2;
+  @Deprecated
   static final byte kDefaultThrottleAxis = 3;
 
   /**
@@ -91,11 +102,11 @@ public class Joystick extends GenericHID {
   public Joystick(final int port) {
     super(port);
 
-    m_axes[Axis.kX.value] = kDefaultXAxis;
-    m_axes[Axis.kY.value] = kDefaultYAxis;
-    m_axes[Axis.kZ.value] = kDefaultZAxis;
-    m_axes[Axis.kTwist.value] = kDefaultTwistAxis;
-    m_axes[Axis.kThrottle.value] = kDefaultThrottleAxis;
+    m_axes[Axis.kX.value] = kDefaultXChannel;
+    m_axes[Axis.kY.value] = kDefaultYChannel;
+    m_axes[Axis.kZ.value] = kDefaultZChannel;
+    m_axes[Axis.kTwist.value] = kDefaultTwistChannel;
+    m_axes[Axis.kThrottle.value] = kDefaultThrottleChannel;
 
     HAL.report(tResourceType.kResourceType_Joystick, port);
   }

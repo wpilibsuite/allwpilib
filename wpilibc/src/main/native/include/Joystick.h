@@ -25,10 +25,21 @@ namespace frc {
  */
 class Joystick : public GenericHID {
  public:
+  static constexpr int kDefaultXChannel = 0;
+  static constexpr int kDefaultYChannel = 1;
+  static constexpr int kDefaultZChannel = 2;
+  static constexpr int kDefaultTwistChannel = 2;
+  static constexpr int kDefaultThrottleChannel = 3;
+
+  WPI_DEPRECATED("Use kDefaultXChannel instead.")
   static constexpr int kDefaultXAxis = 0;
+  WPI_DEPRECATED("Use kDefaultYChannel instead.")
   static constexpr int kDefaultYAxis = 1;
+  WPI_DEPRECATED("Use kDefaultZChannel instead.")
   static constexpr int kDefaultZAxis = 2;
+  WPI_DEPRECATED("Use kDefaultTwistChannel instead.")
   static constexpr int kDefaultTwistAxis = 2;
+  WPI_DEPRECATED("Use kDefaultThrottleChannel instead.")
   static constexpr int kDefaultThrottleAxis = 3;
 
   enum AxisType { kXAxis, kYAxis, kZAxis, kTwistAxis, kThrottleAxis };
