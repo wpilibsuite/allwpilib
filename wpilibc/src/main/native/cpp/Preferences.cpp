@@ -228,6 +228,8 @@ void Preferences::Remove(wpi::StringRef key) { m_table->Delete(key); }
  */
 void Preferences::RemoveAll() {
   for (auto preference : GetKeys()) {
-    Remove(preference);
+    if (preference != ".type") {
+      Remove(preference);
+    }
   }
 }

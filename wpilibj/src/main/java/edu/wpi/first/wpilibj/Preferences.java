@@ -177,7 +177,11 @@ public class Preferences {
    * Remove all preferences.
    */
   public void removeAll() {
-    m_table.getKeys().forEach(this::remove);
+    for (String key : m_table.getKeys()) {
+      if (!".type".equals(key)) {
+        remove(key);
+      }
+    }
   }
 
   /**
