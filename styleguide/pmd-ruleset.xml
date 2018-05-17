@@ -48,11 +48,11 @@
     <example>
 <![CDATA[
                 public class Example {
-                        public Example(Object example) {
-                                if (example == null) {
-                                        throw new NullPointerException();
-                                }
+                    public Example(Object example) {
+                        if (example == null) {
+                            throw new NullPointerException();
                         }
+                    }
                 }
             ]]>
     </example>

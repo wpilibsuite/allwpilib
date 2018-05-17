@@ -37,28 +37,28 @@ TEST_RUN_ARGS=""
 PARAM_ARGS=${@:2}
 
 if [[ "$1" = java ]]; then
-	LANGUAGE=$1
-	LOCAL_TEST_FILE=$DEFAULT_LOCAL_JAVA_TEST_FILE
-	DESTINATION_TEST_FILE=$DEFAULT_DESTINATION_JAVA_TEST_FILE
+    LANGUAGE=$1
+    LOCAL_TEST_FILE=$DEFAULT_LOCAL_JAVA_TEST_FILE
+    DESTINATION_TEST_FILE=$DEFAULT_DESTINATION_JAVA_TEST_FILE
 elif [[ "$1" = cpp ]]; then
-	LANGUAGE=$1
-	LOCAL_TEST_FILE=$DEFAULT_LOCAL_CPP_TEST_FILE
-	DESTINATION_TEST_FILE=$DEFAULT_DESTINATION_CPP_TEST_FILE
+    LANGUAGE=$1
+    LOCAL_TEST_FILE=$DEFAULT_LOCAL_CPP_TEST_FILE
+    DESTINATION_TEST_FILE=$DEFAULT_DESTINATION_CPP_TEST_FILE
 elif [[ "$1" = "-h" ]]; then
-	printf "Usage:\n"
-	echo "$usage"
-	exit
+    printf "Usage:\n"
+    echo "$usage"
+    exit
 else
-	printf "Invalid language selection: %s\n\n" "$1" >&2
-	echo "$usage" >&2
-	exit 1
+    printf "Invalid language selection: %s\n\n" "$1" >&2
+    echo "$usage" >&2
+    exit 1
 fi
 
 # Check if the test file to upload exists
 if [[ ! -e ${LOCAL_TEST_FILE} ]]; then
-	printf "The test file does not exist: %s\nAre you sure that you compiled the tests??\n\n" "${LOCAL_TEST_FILE}" >&2
-	echo "$usage" >&2
-	exit 1
+    printf "The test file does not exist: %s\nAre you sure that you compiled the tests??\n\n" "${LOCAL_TEST_FILE}" >&2
+    echo "$usage" >&2
+    exit 1
 fi
 
 TEST_RUN_ARGS="${@:2}"
@@ -73,17 +73,17 @@ SCP_NATIVE_LIBRARIES="scp ${DEFAULT_LIBRARY_NATIVE_FILES}/* ${ROBOT_ADDRESS}:${D
 CONFIG_NATIVE_LIBRARIES="ssh -t ${ADMIN_ROBOT_ADDRESS} ldconfig"
 
 if [ $(which sshpass) ]; then
-	sshpass -p "" ${SCP_NATIVE_LIBRARIES}
-	sshpass -p "" ${CONFIG_NATIVE_LIBRARIES}
-	sshpass -p "" ${SCP_TEST_SCRIPT}
-	sshpass -p "" ${SSH_CHMOD_AND_MAKE_TEMP_TEST_DIR}
-	sshpass -p "" ${SCP_TEST_PROGRAM}
-	sshpass -p "" ${SSH_RUN_TESTS}
+    sshpass -p "" ${SCP_NATIVE_LIBRARIES}
+    sshpass -p "" ${CONFIG_NATIVE_LIBRARIES}
+    sshpass -p "" ${SCP_TEST_SCRIPT}
+    sshpass -p "" ${SSH_CHMOD_AND_MAKE_TEMP_TEST_DIR}
+    sshpass -p "" ${SCP_TEST_PROGRAM}
+    sshpass -p "" ${SSH_RUN_TESTS}
 else
-	eval ${SCP_NATIVE_LIBRARIES}
-	eval ${CONFIG_NATIVE_LIBRARIES}
-	eval ${SCP_TEST_SCRIPT}
-	eval ${SSH_CHMOD_AND_MAKE_TEMP_TEST_DIR}
-	eval ${SCP_TEST_PROGRAM}
-	eval ${SSH_RUN_TESTS}
+    eval ${SCP_NATIVE_LIBRARIES}
+    eval ${CONFIG_NATIVE_LIBRARIES}
+    eval ${SCP_TEST_SCRIPT}
+    eval ${SSH_CHMOD_AND_MAKE_TEMP_TEST_DIR}
+    eval ${SCP_TEST_PROGRAM}
+    eval ${SSH_RUN_TESTS}
 fi
