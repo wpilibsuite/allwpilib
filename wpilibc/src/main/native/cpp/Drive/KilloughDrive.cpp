@@ -132,7 +132,7 @@ void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
  *                  Clockwise is positive.
  */
 void KilloughDrive::DrivePolar(double magnitude, double angle,
-                               double rotation) {
+                               double zRotation) {
   if (!reported) {
     // HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 3,
     //            HALUsageReporting::kRobotDrive_KilloughPolar);
@@ -140,7 +140,7 @@ void KilloughDrive::DrivePolar(double magnitude, double angle,
   }
 
   DriveCartesian(magnitude * std::sin(angle * (kPi / 180.0)),
-                 magnitude * std::cos(angle * (kPi / 180.0)), rotation, 0.0);
+                 magnitude * std::cos(angle * (kPi / 180.0)), zRotation, 0.0);
 }
 
 void KilloughDrive::StopMotor() {
