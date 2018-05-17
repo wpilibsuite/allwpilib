@@ -27,7 +27,7 @@ class AnalogTriggerSim {
         m_index, -1, callback, &HALSIM_CancelAnalogTriggerInitializedCallback);
     store->SetUid(HALSIM_RegisterAnalogTriggerInitializedCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetInitialized() { return HALSIM_GetAnalogTriggerInitialized(m_index); }
   void SetInitialized(bool initialized) {
@@ -41,7 +41,7 @@ class AnalogTriggerSim {
         &HALSIM_CancelAnalogTriggerTriggerLowerBoundCallback);
     store->SetUid(HALSIM_RegisterAnalogTriggerTriggerLowerBoundCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   double GetTriggerLowerBound() {
     return HALSIM_GetAnalogTriggerTriggerLowerBound(m_index);
@@ -57,7 +57,7 @@ class AnalogTriggerSim {
         &HALSIM_CancelAnalogTriggerTriggerUpperBoundCallback);
     store->SetUid(HALSIM_RegisterAnalogTriggerTriggerUpperBoundCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   double GetTriggerUpperBound() {
     return HALSIM_GetAnalogTriggerTriggerUpperBound(m_index);

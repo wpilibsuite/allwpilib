@@ -27,7 +27,7 @@ class PDPSim {
         m_index, -1, callback, &HALSIM_CancelPDPInitializedCallback);
     store->SetUid(HALSIM_RegisterPDPInitializedCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetInitialized() { return HALSIM_GetPDPInitialized(m_index); }
   void SetInitialized(bool initialized) {
@@ -40,7 +40,7 @@ class PDPSim {
         m_index, -1, callback, &HALSIM_CancelPDPTemperatureCallback);
     store->SetUid(HALSIM_RegisterPDPTemperatureCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   double GetTemperature() { return HALSIM_GetPDPTemperature(m_index); }
   void SetTemperature(double temperature) {
@@ -53,7 +53,7 @@ class PDPSim {
         m_index, -1, callback, &HALSIM_CancelPDPVoltageCallback);
     store->SetUid(HALSIM_RegisterPDPVoltageCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   double GetVoltage() { return HALSIM_GetPDPVoltage(m_index); }
   void SetVoltage(double voltage) { HALSIM_SetPDPVoltage(m_index, voltage); }
@@ -64,7 +64,7 @@ class PDPSim {
         m_index, channel, -1, callback, &HALSIM_CancelPDPCurrentCallback);
     store->SetUid(HALSIM_RegisterPDPCurrentCallback(
         m_index, channel, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   double GetCurrent(int channel) {
     return HALSIM_GetPDPCurrent(m_index, channel);

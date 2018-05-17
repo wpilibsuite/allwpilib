@@ -28,7 +28,7 @@ class PCMSim {
         &HALSIM_CancelPCMSolenoidInitializedCallback);
     store->SetUid(HALSIM_RegisterPCMSolenoidInitializedCallback(
         m_index, channel, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetSolenoidInitialized(int channel) {
     return HALSIM_GetPCMSolenoidInitialized(m_index, channel);
@@ -44,7 +44,7 @@ class PCMSim {
         &HALSIM_CancelPCMSolenoidOutputCallback);
     store->SetUid(HALSIM_RegisterPCMSolenoidOutputCallback(
         m_index, channel, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetSolenoidOutput(int channel) {
     return HALSIM_GetPCMSolenoidOutput(m_index, channel);
@@ -59,7 +59,7 @@ class PCMSim {
         m_index, -1, callback, &HALSIM_CancelPCMCompressorInitializedCallback);
     store->SetUid(HALSIM_RegisterPCMCompressorInitializedCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetCompressorInitialized() {
     return HALSIM_GetPCMCompressorInitialized(m_index);
@@ -74,7 +74,7 @@ class PCMSim {
         m_index, -1, callback, &HALSIM_CancelPCMCompressorOnCallback);
     store->SetUid(HALSIM_RegisterPCMCompressorOnCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetCompressorOn() { return HALSIM_GetPCMCompressorOn(m_index); }
   void SetCompressorOn(bool compressorOn) {
@@ -87,7 +87,7 @@ class PCMSim {
         m_index, -1, callback, &HALSIM_CancelPCMClosedLoopEnabledCallback);
     store->SetUid(HALSIM_RegisterPCMClosedLoopEnabledCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetClosedLoopEnabled() {
     return HALSIM_GetPCMClosedLoopEnabled(m_index);
@@ -102,7 +102,7 @@ class PCMSim {
         m_index, -1, callback, &HALSIM_CancelPCMPressureSwitchCallback);
     store->SetUid(HALSIM_RegisterPCMPressureSwitchCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetPressureSwitch() { return HALSIM_GetPCMPressureSwitch(m_index); }
   void SetPressureSwitch(bool pressureSwitch) {
@@ -115,7 +115,7 @@ class PCMSim {
         m_index, -1, callback, &HALSIM_CancelPCMCompressorCurrentCallback);
     store->SetUid(HALSIM_RegisterPCMCompressorCurrentCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   double GetCompressorCurrent() {
     return HALSIM_GetPCMCompressorCurrent(m_index);

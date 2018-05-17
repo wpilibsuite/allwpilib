@@ -27,7 +27,7 @@ class DIOSim {
         m_index, -1, callback, &HALSIM_CancelDIOInitializedCallback);
     store->SetUid(HALSIM_RegisterDIOInitializedCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetInitialized() { return HALSIM_GetDIOInitialized(m_index); }
   void SetInitialized(bool initialized) {
@@ -40,7 +40,7 @@ class DIOSim {
         m_index, -1, callback, &HALSIM_CancelDIOValueCallback);
     store->SetUid(HALSIM_RegisterDIOValueCallback(m_index, &CallbackStoreThunk,
                                                   store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetValue() { return HALSIM_GetDIOValue(m_index); }
   void SetValue(bool value) { HALSIM_SetDIOValue(m_index, value); }
@@ -51,7 +51,7 @@ class DIOSim {
         m_index, -1, callback, &HALSIM_CancelDIOPulseLengthCallback);
     store->SetUid(HALSIM_RegisterDIOPulseLengthCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   double GetPulseLength() { return HALSIM_GetDIOPulseLength(m_index); }
   void SetPulseLength(double pulseLength) {
@@ -64,7 +64,7 @@ class DIOSim {
         m_index, -1, callback, &HALSIM_CancelDIOIsInputCallback);
     store->SetUid(HALSIM_RegisterDIOIsInputCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetIsInput() { return HALSIM_GetDIOIsInput(m_index); }
   void SetIsInput(bool isInput) { HALSIM_SetDIOIsInput(m_index, isInput); }
@@ -75,7 +75,7 @@ class DIOSim {
         m_index, -1, callback, &HALSIM_CancelDIOFilterIndexCallback);
     store->SetUid(HALSIM_RegisterDIOFilterIndexCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   int GetFilterIndex() { return HALSIM_GetDIOFilterIndex(m_index); }
   void SetFilterIndex(int filterIndex) {

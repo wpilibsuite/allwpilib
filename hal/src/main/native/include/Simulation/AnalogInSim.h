@@ -27,7 +27,7 @@ class AnalogInSim {
         m_index, -1, callback, &HALSIM_CancelAnalogInInitializedCallback);
     store->SetUid(HALSIM_RegisterAnalogInInitializedCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetInitialized() { return HALSIM_GetAnalogInInitialized(m_index); }
   void SetInitialized(bool initialized) {
@@ -40,7 +40,7 @@ class AnalogInSim {
         m_index, -1, callback, &HALSIM_CancelAnalogInAverageBitsCallback);
     store->SetUid(HALSIM_RegisterAnalogInAverageBitsCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   int GetAverageBits() { return HALSIM_GetAnalogInAverageBits(m_index); }
   void SetAverageBits(int averageBits) {
@@ -53,7 +53,7 @@ class AnalogInSim {
         m_index, -1, callback, &HALSIM_CancelAnalogInOversampleBitsCallback);
     store->SetUid(HALSIM_RegisterAnalogInOversampleBitsCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   int GetOversampleBits() { return HALSIM_GetAnalogInOversampleBits(m_index); }
   void SetOversampleBits(int oversampleBits) {
@@ -66,7 +66,7 @@ class AnalogInSim {
         m_index, -1, callback, &HALSIM_CancelAnalogInVoltageCallback);
     store->SetUid(HALSIM_RegisterAnalogInVoltageCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   double GetVoltage() { return HALSIM_GetAnalogInVoltage(m_index); }
   void SetVoltage(double voltage) {
@@ -80,7 +80,7 @@ class AnalogInSim {
         &HALSIM_CancelAnalogInAccumulatorInitializedCallback);
     store->SetUid(HALSIM_RegisterAnalogInAccumulatorInitializedCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetAccumulatorInitialized() {
     return HALSIM_GetAnalogInAccumulatorInitialized(m_index);
@@ -95,7 +95,7 @@ class AnalogInSim {
         m_index, -1, callback, &HALSIM_CancelAnalogInAccumulatorValueCallback);
     store->SetUid(HALSIM_RegisterAnalogInAccumulatorValueCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   int64_t GetAccumulatorValue() {
     return HALSIM_GetAnalogInAccumulatorValue(m_index);
@@ -110,7 +110,7 @@ class AnalogInSim {
         m_index, -1, callback, &HALSIM_CancelAnalogInAccumulatorCountCallback);
     store->SetUid(HALSIM_RegisterAnalogInAccumulatorCountCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   int64_t GetAccumulatorCount() {
     return HALSIM_GetAnalogInAccumulatorCount(m_index);
@@ -125,7 +125,7 @@ class AnalogInSim {
         m_index, -1, callback, &HALSIM_CancelAnalogInAccumulatorCenterCallback);
     store->SetUid(HALSIM_RegisterAnalogInAccumulatorCenterCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   int GetAccumulatorCenter() {
     return HALSIM_GetAnalogInAccumulatorCenter(m_index);
@@ -141,7 +141,7 @@ class AnalogInSim {
         &HALSIM_CancelAnalogInAccumulatorDeadbandCallback);
     store->SetUid(HALSIM_RegisterAnalogInAccumulatorDeadbandCallback(
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   int GetAccumulatorDeadband() {
     return HALSIM_GetAnalogInAccumulatorDeadband(m_index);

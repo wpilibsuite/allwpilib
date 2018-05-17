@@ -25,7 +25,7 @@ class DriverStationSim {
         -1, callback, &HALSIM_CancelDriverStationEnabledCallback);
     store->SetUid(HALSIM_RegisterDriverStationEnabledCallback(
         &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetEnabled() { return HALSIM_GetDriverStationEnabled(); }
   void SetEnabled(bool enabled) { HALSIM_SetDriverStationEnabled(enabled); }
@@ -36,7 +36,7 @@ class DriverStationSim {
         -1, callback, &HALSIM_CancelDriverStationAutonomousCallback);
     store->SetUid(HALSIM_RegisterDriverStationAutonomousCallback(
         &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetAutonomous() { return HALSIM_GetDriverStationAutonomous(); }
   void SetAutonomous(bool autonomous) {
@@ -49,7 +49,7 @@ class DriverStationSim {
         -1, callback, &HALSIM_CancelDriverStationTestCallback);
     store->SetUid(HALSIM_RegisterDriverStationTestCallback(
         &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetTest() { return HALSIM_GetDriverStationTest(); }
   void SetTest(bool test) { HALSIM_SetDriverStationTest(test); }
@@ -60,7 +60,7 @@ class DriverStationSim {
         -1, callback, &HALSIM_CancelDriverStationEStopCallback);
     store->SetUid(HALSIM_RegisterDriverStationEStopCallback(
         &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetEStop() { return HALSIM_GetDriverStationEStop(); }
   void SetEStop(bool eStop) { HALSIM_SetDriverStationEStop(eStop); }
@@ -71,7 +71,7 @@ class DriverStationSim {
         -1, callback, &HALSIM_CancelDriverStationFmsAttachedCallback);
     store->SetUid(HALSIM_RegisterDriverStationFmsAttachedCallback(
         &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetFmsAttached() { return HALSIM_GetDriverStationFmsAttached(); }
   void SetFmsAttached(bool fmsAttached) {
@@ -84,7 +84,7 @@ class DriverStationSim {
         -1, callback, &HALSIM_CancelDriverStationDsAttachedCallback);
     store->SetUid(HALSIM_RegisterDriverStationDsAttachedCallback(
         &CallbackStoreThunk, store.get(), initialNotify));
-    return std::move(store);
+    return store;
   }
   bool GetDsAttached() { return HALSIM_GetDriverStationDsAttached(); }
   void SetDsAttached(bool dsAttached) {
