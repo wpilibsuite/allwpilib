@@ -21,10 +21,13 @@ public class SynchronousPID extends PIDBase {
    * @param Kd     the derivative coefficient
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output percentage
+   * @param period The loop time for doing calculations. This particularly affects calculations of
+   *               the integral and differential terms. The default is 50ms.
    */
   @SuppressWarnings("ParameterName")
-  public SynchronousPID(double Kp, double Ki, double Kd, PIDSource source, PIDOutput output) {
-    this(Kp, Ki, Kd, 0.0, source, output);
+  public SynchronousPID(double Kp, double Ki, double Kd, PIDSource source, PIDOutput output,
+                        double period) {
+    this(Kp, Ki, Kd, 0.0, source, output, period);
   }
 
   /**
@@ -36,11 +39,13 @@ public class SynchronousPID extends PIDBase {
    * @param Kf     the feed forward term
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output percentage
+   * @param period The loop time for doing calculations. This particularly affects calculations of
+   *               the integral and differential terms. The default is 50ms.
    */
   @SuppressWarnings("ParameterName")
   public SynchronousPID(double Kp, double Ki, double Kd, double Kf, PIDSource source,
-                        PIDOutput output) {
-    super(Kp, Ki, Kd, Kf, source, output);
+                        PIDOutput output, double period) {
+    super(Kp, Ki, Kd, Kf, source, output, period);
 
     m_enabled = true;
   }

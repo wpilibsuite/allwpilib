@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <limits>
 #include <memory>
 #include <string>
 
@@ -19,7 +20,6 @@
 #include "PIDOutput.h"
 #include "PIDSource.h"
 #include "SmartDashboard/SendableBase.h"
-#include "Timer.h"
 
 namespace frc {
 
@@ -35,9 +35,10 @@ namespace frc {
  */
 class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
  public:
-  PIDBase(double p, double i, double d, PIDSource& source, PIDOutput& output);
+  PIDBase(double p, double i, double d, PIDSource& source, PIDOutput& output,
+          double period);
   PIDBase(double p, double i, double d, double f, PIDSource& source,
-          PIDOutput& output);
+          PIDOutput& output, double period);
   ~PIDBase() override = default;
 
   PIDBase(const PIDBase&) = delete;
@@ -63,6 +64,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
   double GetDeltaSetpoint() const;
 
   virtual double GetError() const;
+  double GetDeltaError() const;
 
   WPI_DEPRECATED("Use a LinearDigitalFilter as the input and GetError().")
   virtual double GetAvgError() const;
@@ -71,9 +73,15 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
   virtual PIDSourceType GetPIDSourceType() const;
 
   WPI_DEPRECATED("Use SetPercentTolerance() instead.")
-  virtual void SetTolerance(double percent);
-  virtual void SetAbsoluteTolerance(double absValue);
-  virtual void SetPercentTolerance(double percentValue);
+  virtual void SetTolerance(
+      double tolerance,
+      double deltaTolerance = std::numeric_limits<double>::infinity());
+  virtual void SetAbsoluteTolerance(
+      double tolerance,
+      double deltaTolerance = std::numeric_limits<double>::infinity());
+  virtual void SetPercentTolerance(
+      double tolerance,
+      double deltaTolerance = std::numeric_limits<double>::infinity());
 
   WPI_DEPRECATED("Use a LinearDigitalFilter as the input.")
   virtual void SetToleranceBuffer(int buf = 1);
@@ -98,7 +106,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
 
   PIDSource* m_pidInput;
   PIDOutput* m_pidOutput;
-  Timer m_setpointTimer;
+  double m_period;
 
   virtual void Calculate();
   virtual double CalculateFeedForward();
@@ -149,6 +157,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
 
   // The percetage or absolute error that is considered on target.
   double m_tolerance = 0.05;
+  double m_deltaTolerance = std::numeric_limits<double>::infinity();
 
   double m_setpoint = 0;
   double m_prevSetpoint = 0;
