@@ -115,6 +115,9 @@ class DifferentialDrive : public RobotDriveBase {
   void SetQuickStopThreshold(double threshold);
   void SetQuickStopAlpha(double alpha);
 
+  bool IsRightSideInverted() const;
+  void SetRightSideInverted(bool rightSideInverted);
+
   void StopMotor() override;
   void GetDescription(wpi::raw_ostream& desc) const override;
 
@@ -127,6 +130,7 @@ class DifferentialDrive : public RobotDriveBase {
   double m_quickStopThreshold = kDefaultQuickStopThreshold;
   double m_quickStopAlpha = kDefaultQuickStopAlpha;
   double m_quickStopAccumulator = 0.0;
+  double m_rightSideInvertMultiplier = -1.0;
 };
 
 }  // namespace frc

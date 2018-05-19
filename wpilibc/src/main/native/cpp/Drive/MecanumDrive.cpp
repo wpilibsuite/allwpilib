@@ -77,16 +77,18 @@ void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
 
   double wheelSpeeds[4];
   wheelSpeeds[kFrontLeft] = input.x + input.y + zRotation;
-  wheelSpeeds[kFrontRight] = input.x - input.y + zRotation;
+  wheelSpeeds[kFrontRight] = -input.x + input.y - zRotation;
   wheelSpeeds[kRearLeft] = -input.x + input.y + zRotation;
-  wheelSpeeds[kRearRight] = -input.x - input.y + zRotation;
+  wheelSpeeds[kRearRight] = input.x + input.y - zRotation;
 
   Normalize(wheelSpeeds);
 
   m_frontLeftMotor.Set(wheelSpeeds[kFrontLeft] * m_maxOutput);
-  m_frontRightMotor.Set(wheelSpeeds[kFrontRight] * m_maxOutput);
+  m_frontRightMotor.Set(wheelSpeeds[kFrontRight] * m_maxOutput *
+                        m_rightSideInvertMultiplier);
   m_rearLeftMotor.Set(wheelSpeeds[kRearLeft] * m_maxOutput);
-  m_rearRightMotor.Set(wheelSpeeds[kRearRight] * m_maxOutput);
+  m_rearRightMotor.Set(wheelSpeeds[kRearRight] * m_maxOutput *
+                       m_rightSideInvertMultiplier);
 
   m_safetyHelper.Feed();
 }
@@ -116,6 +118,26 @@ void MecanumDrive::DrivePolar(double magnitude, double angle,
                  magnitude * std::cos(angle * (kPi / 180.0)), zRotation, 0.0);
 }
 
+/**
+ * Gets if the power sent to the right side of the drivetrain is multipled by
+ * -1.
+ *
+ * @return true if the right side is inverted
+ */
+bool MecanumDrive::IsRightSideInverted() const {
+  return m_rightSideInvertMultiplier == -1.0;
+}
+
+/**
+ * Sets if the power sent to the right side of the drivetrain should be
+ * multipled by -1.
+ *
+ * @param rightSideInverted true if right side power should be multipled by -1
+ */
+void MecanumDrive::SetRightSideInverted(bool rightSideInverted) {
+  m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;
+}
+
 void MecanumDrive::StopMotor() {
   m_frontLeftMotor.StopMotor();
   m_frontRightMotor.StopMotor();
@@ -134,12 +156,18 @@ void MecanumDrive::InitSendable(SendableBuilder& builder) {
                             [=]() { return m_frontLeftMotor.Get(); },
                             [=](double value) { m_frontLeftMotor.Set(value); });
   builder.AddDoubleProperty(
-      "Front Right Motor Speed", [=]() { return -m_frontRightMotor.Get(); },
-      [=](double value) { m_frontRightMotor.Set(-value); });
+      "Front Right Motor Speed",
+      [=]() { return m_frontRightMotor.Get() * m_rightSideInvertMultiplier; },
+      [=](double value) {
+        m_frontRightMotor.Set(value * m_rightSideInvertMultiplier);
+      });
   builder.AddDoubleProperty("Rear Left Motor Speed",
                             [=]() { return m_rearLeftMotor.Get(); },
                             [=](double value) { m_rearLeftMotor.Set(value); });
   builder.AddDoubleProperty(
-      "Rear Right Motor Speed", [=]() { return -m_rearRightMotor.Get(); },
-      [=](double value) { m_rearRightMotor.Set(-value); });
+      "Rear Right Motor Speed",
+      [=]() { return m_rearRightMotor.Get() * m_rightSideInvertMultiplier; },
+      [=](double value) {
+        m_rearRightMotor.Set(value * m_rightSideInvertMultiplier);
+      });
 }

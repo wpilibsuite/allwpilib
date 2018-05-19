@@ -64,6 +64,7 @@ public class MecanumDrive extends RobotDriveBase {
   private SpeedController m_frontRightMotor;
   private SpeedController m_rearRightMotor;
 
+  private double m_rightSideInvertMultiplier = -1.0;
   private boolean m_reported = false;
 
   /**
@@ -134,16 +135,18 @@ public class MecanumDrive extends RobotDriveBase {
 
     double[] wheelSpeeds = new double[4];
     wheelSpeeds[MotorType.kFrontLeft.value] = input.x + input.y + zRotation;
-    wheelSpeeds[MotorType.kFrontRight.value] = input.x - input.y + zRotation;
+    wheelSpeeds[MotorType.kFrontRight.value] = -input.x + input.y - zRotation;
     wheelSpeeds[MotorType.kRearLeft.value] = -input.x + input.y + zRotation;
-    wheelSpeeds[MotorType.kRearRight.value] = -input.x - input.y + zRotation;
+    wheelSpeeds[MotorType.kRearRight.value] = input.x + input.y - zRotation;
 
     normalize(wheelSpeeds);
 
     m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft.value] * m_maxOutput);
-    m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight.value] * m_maxOutput);
+    m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight.value] * m_maxOutput
+        * m_rightSideInvertMultiplier);
     m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft.value] * m_maxOutput);
-    m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight.value] * m_maxOutput);
+    m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight.value] * m_maxOutput
+        * m_rightSideInvertMultiplier);
 
     m_safetyHelper.feed();
   }
@@ -170,6 +173,24 @@ public class MecanumDrive extends RobotDriveBase {
                    magnitude * Math.cos(angle * (Math.PI / 180.0)), zRotation, 0.0);
   }
 
+  /**
+   * Gets if the power sent to the right side of the drivetrain is multipled by -1.
+   *
+   * @return true if the right side is inverted
+   */
+  public boolean isRightSideInverted() {
+    return m_rightSideInvertMultiplier == -1.0;
+  }
+
+  /**
+   * Sets if the power sent to the right side of the drivetrain should be multipled by -1.
+   *
+   * @param rightSideInverted true if right side power should be multipled by -1
+   */
+  public void setRightSideInverted(boolean rightSideInverted) {
+    m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;
+  }
+
   @Override
   public void stopMotor() {
     m_frontLeftMotor.stopMotor();
@@ -187,13 +208,17 @@ public class MecanumDrive extends RobotDriveBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("MecanumDrive");
-    builder.addDoubleProperty("Front Left Motor Speed", m_frontLeftMotor::get,
+    builder.addDoubleProperty("Front Left Motor Speed",
+        m_frontLeftMotor::get,
         m_frontLeftMotor::set);
-    builder.addDoubleProperty("Front Right Motor Speed", () -> -m_frontRightMotor.get(),
-        value -> m_frontRightMotor.set(-value));
-    builder.addDoubleProperty("Rear Left Motor Speed", m_rearLeftMotor::get,
+    builder.addDoubleProperty("Front Right Motor Speed",
+        () -> m_frontRightMotor.get() * m_rightSideInvertMultiplier,
+        value -> m_frontRightMotor.set(value * m_rightSideInvertMultiplier));
+    builder.addDoubleProperty("Rear Left Motor Speed",
+        m_rearLeftMotor::get,
         m_rearLeftMotor::set);
-    builder.addDoubleProperty("Rear Right Motor Speed", () -> -m_rearRightMotor.get(),
-        value -> m_rearRightMotor.set(-value));
+    builder.addDoubleProperty("Rear Right Motor Speed",
+        () -> m_rearRightMotor.get() * m_rightSideInvertMultiplier,
+        value -> m_rearRightMotor.set(value * m_rightSideInvertMultiplier));
   }
 }

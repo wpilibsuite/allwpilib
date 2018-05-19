@@ -103,6 +103,7 @@ public class DifferentialDrive extends RobotDriveBase {
   private double m_quickStopThreshold = kDefaultQuickStopThreshold;
   private double m_quickStopAlpha = kDefaultQuickStopAlpha;
   private double m_quickStopAccumulator = 0.0;
+  private double m_rightSideInvertMultiplier = -1.0;
   private boolean m_reported = false;
 
   /**
@@ -187,7 +188,7 @@ public class DifferentialDrive extends RobotDriveBase {
     }
 
     m_leftMotor.set(limit(leftMotorOutput) * m_maxOutput);
-    m_rightMotor.set(-limit(rightMotorOutput) * m_maxOutput);
+    m_rightMotor.set(limit(rightMotorOutput) * m_maxOutput * m_rightSideInvertMultiplier);
 
     m_safetyHelper.feed();
   }
@@ -270,7 +271,7 @@ public class DifferentialDrive extends RobotDriveBase {
     }
 
     m_leftMotor.set(leftMotorOutput * m_maxOutput);
-    m_rightMotor.set(-rightMotorOutput * m_maxOutput);
+    m_rightMotor.set(rightMotorOutput * m_maxOutput * m_rightSideInvertMultiplier);
 
     m_safetyHelper.feed();
   }
@@ -317,7 +318,7 @@ public class DifferentialDrive extends RobotDriveBase {
     }
 
     m_leftMotor.set(leftSpeed * m_maxOutput);
-    m_rightMotor.set(-rightSpeed * m_maxOutput);
+    m_rightMotor.set(rightSpeed * m_maxOutput * m_rightSideInvertMultiplier);
 
     m_safetyHelper.feed();
   }
@@ -353,6 +354,24 @@ public class DifferentialDrive extends RobotDriveBase {
     m_quickStopAlpha = alpha;
   }
 
+  /**
+   * Gets if the power sent to the right side of the drivetrain is multipled by -1.
+   *
+   * @return true if the right side is inverted
+   */
+  public boolean isRightSideInverted() {
+    return m_rightSideInvertMultiplier == -1.0;
+  }
+
+  /**
+   * Sets if the power sent to the right side of the drivetrain should be multipled by -1.
+   *
+   * @param rightSideInverted true if right side power should be multipled by -1
+   */
+  public void setRightSideInverted(boolean rightSideInverted) {
+    m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;
+  }
+
   @Override
   public void stopMotor() {
     m_leftMotor.stopMotor();
@@ -371,7 +390,7 @@ public class DifferentialDrive extends RobotDriveBase {
     builder.addDoubleProperty("Left Motor Speed", m_leftMotor::get, m_leftMotor::set);
     builder.addDoubleProperty(
         "Right Motor Speed",
-        () -> -m_rightMotor.get(),
-        x -> m_rightMotor.set(-x));
+        () -> m_rightMotor.get() * m_rightSideInvertMultiplier,
+        x -> m_rightMotor.set(x * m_rightSideInvertMultiplier));
   }
 }

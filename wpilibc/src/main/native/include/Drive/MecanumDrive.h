@@ -76,6 +76,9 @@ class MecanumDrive : public RobotDriveBase {
                       double gyroAngle = 0.0);
   void DrivePolar(double magnitude, double angle, double zRotation);
 
+  bool IsRightSideInverted() const;
+  void SetRightSideInverted(bool rightSideInverted);
+
   void StopMotor() override;
   void GetDescription(wpi::raw_ostream& desc) const override;
 
@@ -86,6 +89,8 @@ class MecanumDrive : public RobotDriveBase {
   SpeedController& m_rearLeftMotor;
   SpeedController& m_frontRightMotor;
   SpeedController& m_rearRightMotor;
+
+  double m_rightSideInvertMultiplier = -1.0;
 
   bool reported = false;
 };
