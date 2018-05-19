@@ -29,7 +29,7 @@ model {
                 baseName = setBaseName
             }
             javaCompileTasks << compileJava
-            jniCrossCompileOptions << JniCrossCompileOptions('linux', 'athena', ["${rootDir}/shared/arm-linux-jni".toString(), "${rootDir}/shared/arm-linux-jni/linux".toString()])
+            jniCrossCompileOptions << JniCrossCompileOptions('athena')
             sources {
                 cpp {
                     source {
@@ -61,7 +61,7 @@ model {
             }
             enableCheckTask true
             javaCompileTasks << compileJava
-            jniCrossCompileOptions << JniCrossCompileOptions('linux', 'athena', ["${rootDir}/shared/arm-linux-jni".toString(), "${rootDir}/shared/arm-linux-jni/linux".toString()])
+            jniCrossCompileOptions << JniCrossCompileOptions('athena')
             sources {
                 cpp {
                     source {
@@ -88,7 +88,7 @@ model {
             }
             enableCheckTask true
             javaCompileTasks << compileJava
-            jniCrossCompileOptions << JniCrossCompileOptions('linux', 'athena', ["${rootDir}/shared/arm-linux-jni".toString(), "${rootDir}/shared/arm-linux-jni/linux".toString()])
+            jniCrossCompileOptions << JniCrossCompileOptions('athena')
             sources {
                 cpp {
                     source {
