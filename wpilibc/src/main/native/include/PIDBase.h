@@ -16,13 +16,12 @@
 #include "Base.h"
 #include "Filters/LinearDigitalFilter.h"
 #include "PIDInterface.h"
+#include "PIDOutput.h"
 #include "PIDSource.h"
 #include "SmartDashboard/SendableBase.h"
 #include "Timer.h"
 
 namespace frc {
-
-class PIDOutput;
 
 /**
  * Class implements a PID Control Loop.
@@ -34,7 +33,7 @@ class PIDOutput;
  * in the integral and derivative calculations. Therefore, the sample rate
  * affects the controller's behavior for a given set of PID constants.
  */
-class PIDBase : public SendableBase, public PIDInterface {
+class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
  public:
   PIDBase(double p, double i, double d, PIDSource& source, PIDOutput& output);
   PIDBase(double p, double i, double d, double f, PIDSource& source,
@@ -82,6 +81,8 @@ class PIDBase : public SendableBase, public PIDInterface {
   virtual bool OnTarget() const;
 
   void Reset() override;
+
+  void PIDWrite(double output) override;
 
   void InitSendable(SendableBuilder& builder) override;
 

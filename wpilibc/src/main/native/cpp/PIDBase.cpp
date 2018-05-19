@@ -528,6 +528,18 @@ void PIDBase::Reset() {
   m_result = 0;
 }
 
+/**
+ * Passes the output directly to SetSetpoint().
+ *
+ * PIDControllers can be nested by passing a PIDController as another
+ * PIDController's output. In that case, the output of the parent controller
+ * becomes the input (i.e., the reference) of the child.
+ *
+ * It is the caller's responsibility to put the data into a valid form for
+ * SetSetpoint().
+ */
+void PIDBase::PIDWrite(double output) { SetSetpoint(output); }
+
 void PIDBase::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDBase");
   builder.SetSafeState([=]() { Reset(); });

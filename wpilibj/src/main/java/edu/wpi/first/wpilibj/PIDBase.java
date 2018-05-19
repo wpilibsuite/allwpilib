@@ -25,7 +25,7 @@ import static java.util.Objects.requireNonNull;
  * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
  * given set of PID constants.
  */
-public class PIDBase extends SendableBase implements PIDInterface {
+public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
   public static final double kDefaultPeriod = 0.05;
   private static int instances = 0;
 
@@ -763,6 +763,20 @@ public class PIDBase extends SendableBase implements PIDInterface {
     } finally {
       m_thisMutex.unlock();
     }
+  }
+
+  /**
+   * Passes the output directly to setSetpoint().
+   *
+   * <p>PIDControllers can be nested by passing a PIDController as another PIDController's output.
+   * In that case, the output of the parent controller becomes the input (i.e., the reference) of
+   * the child.
+   *
+   * <p>It is the caller's responsibility to put the data into a valid form for setSetpoint().
+   */
+  @Override
+  public void pidWrite(double output) {
+    setSetpoint(output);
   }
 
   @Override
