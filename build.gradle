@@ -1,7 +1,7 @@
 plugins {
     id 'net.ltgt.errorprone' version '0.0.13'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.0'
-    id 'edu.wpi.first.NativeUtils' version '1.6.2'
+    id 'edu.wpi.first.NativeUtils' version '1.6.4'
     id "edu.wpi.first.GradleJni" version "0.1.4"
     id "com.diffplug.gradle.spotless" version "3.10.0"
     id 'idea'
