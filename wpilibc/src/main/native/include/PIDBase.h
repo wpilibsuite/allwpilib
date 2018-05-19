@@ -70,7 +70,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
    *
    * @return the latest calculated output
    */
-  virtual double Get() const;
+  double Get() const;
 
   /**
    * Set the PID controller to consider the input to be continuous,
@@ -81,7 +81,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
    *
    * @param continuous true turns on continuous, false turns off continuous
    */
-  virtual void SetContinuous(bool continuous = true);
+  void SetContinuous(bool continuous = true);
 
   /**
    * Sets the maximum and minimum values expected from the input.
@@ -89,7 +89,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
    * @param minimumInput the minimum value expected from the input
    * @param maximumInput the maximum value expected from the output
    */
-  virtual void SetInputRange(double minimumInput, double maximumInput);
+  void SetInputRange(double minimumInput, double maximumInput);
 
   /**
    * Sets the minimum and maximum values to write.
@@ -97,7 +97,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
    * @param minimumOutput the minimum value to write to the output
    * @param maximumOutput the maximum value to write to the output
    */
-  virtual void SetOutputRange(double minimumOutput, double maximumOutput);
+  void SetOutputRange(double minimumOutput, double maximumOutput);
 
   /**
    * Set the PID Controller gain parameters.
@@ -120,7 +120,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
    * @param d Differential coefficient
    * @param f Feed forward coefficient
    */
-  virtual void SetPID(double p, double i, double d, double f);
+  void SetPID(double p, double i, double d, double f);
 
   /**
    * Set the Proportional coefficient of the PID controller gain.
@@ -176,7 +176,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
    *
    * @return Feed forward coefficient
    */
-  virtual double GetF() const;
+  double GetF() const;
 
   /**
    * Set the setpoint for the PIDBase.
@@ -204,7 +204,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
    *
    * @return the current error
    */
-  virtual double GetError() const;
+  double GetError() const;
 
   /**
    * Returns the current average of the error over the past few iterations.
@@ -216,19 +216,19 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
    * @return the average error
    */
   WPI_DEPRECATED("Use a LinearDigitalFilter as the input and GetError().")
-  virtual double GetAvgError() const;
+  double GetAvgError() const;
 
   /**
    * Sets what type of input the PID controller will use.
    */
-  virtual void SetPIDSourceType(PIDSourceType pidSource);
+  void SetPIDSourceType(PIDSourceType pidSource);
 
   /**
    * Returns the type of input the PID controller is using.
    *
    * @return the PID controller input type
    */
-  virtual PIDSourceType GetPIDSourceType() const;
+  PIDSourceType GetPIDSourceType() const;
 
   /**
    * Set the percentage error which is considered tolerable for use with
@@ -237,7 +237,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
    * @param percentage error which is tolerable
    */
   WPI_DEPRECATED("Use SetPercentTolerance() instead.")
-  virtual void SetTolerance(double percent);
+  void SetTolerance(double percent);
 
   /**
    * Set the absolute error which is considered tolerable for use with
@@ -245,7 +245,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
    *
    * @param percentage error which is tolerable
    */
-  virtual void SetAbsoluteTolerance(double absValue);
+  void SetAbsoluteTolerance(double absValue);
 
   /**
    * Set the percentage error which is considered tolerable for use with
@@ -253,7 +253,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
    *
    * @param percentage error which is tolerable
    */
-  virtual void SetPercentTolerance(double percentValue);
+  void SetPercentTolerance(double percentValue);
 
   /**
    * Set the number of previous error samples to average for tolerancing. When
@@ -266,7 +266,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
    * @param bufLength Number of previous cycles to average. Defaults to 1.
    */
   WPI_DEPRECATED("Use a LinearDigitalFilter as the input.")
-  virtual void SetToleranceBuffer(int buf = 1);
+  void SetToleranceBuffer(int buf = 1);
 
   /**
    * Return true if the error is within the percentage of the total input range,
@@ -279,7 +279,7 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
    *
    * This will return false until at least one input value has been computed.
    */
-  virtual bool OnTarget() const;
+  bool OnTarget() const;
 
   /**
    * Reset the previous error, the integral term, and disable the controller.
