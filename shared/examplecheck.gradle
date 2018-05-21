@@ -1,0 +1,47 @@
+def fileCheck = { file, folder ->
+    def folderNames = new groovy.json.JsonSlurper().parseText(file.text).collect { it.foldername }
+    def folders = []
+    folder.eachDir {
+        folders << it.name
+    }
+    def disjunct = (folders + folderNames) - folders.intersect(folderNames)
+    def missingFromFolders = folderNames.intersect(disjunct)
+    def missingFromJson = folders.intersect(disjunct)
+
+    if (!missingFromFolders.empty || !missingFromJson.empty) {
+        StringBuilder missingString = new StringBuilder();
+        missingString.append("Missing From Folders\n")
+        for (String symbol : missingFromFolders) {
+            missingString.append(symbol);
+            missingString.append('\n');
+        }
+        missingString.append("\nMissing from JSON\n")
+        for (String symbol : missingFromJson) {
+            missingString.append(symbol);
+            missingString.append('\n');
+        }
+        throw new GradleException("Found missing items\n" + missingString.toString());
+    }
+}
+
+task checkTemplates(type: Task) {
+    doLast {
+        fileCheck(templateFile, templateDirectory)
+    }
+}
+
+task checkExamples(type: Task) {
+    doLast {
+        fileCheck(exampleFile, exampleDirectory)
+    }
+}
+
+task checkCommands(type: Task) {
+    doLast {
+        fileCheck(commandFile, commandDirectory)
+    }
+}
+
+check.dependsOn checkTemplates
+check.dependsOn checkExamples
+check.dependsOn checkCommands

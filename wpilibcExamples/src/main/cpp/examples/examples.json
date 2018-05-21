@@ -7,7 +7,9 @@
       "Actuators",
       "Joystick",
       "Complete List"
-    ]
+    ],
+    "foldername": "MotorControl",
+    "gradlebase": "cpp"
   },
   {
     "name": "Motor Control With Encoder",
@@ -19,7 +21,9 @@
       "Actuators",
       "Joystick",
       "Complete List"
-    ]
+    ],
+    "foldername": "MotorControlEncoder",
+    "gradlebase": "cpp"
   },
   {
     "name": "Relay",
@@ -28,7 +32,9 @@
       "Actuators",
       "Joystick",
       "Complete List"
-    ]
+    ],
+    "foldername": "Relay",
+    "gradlebase": "cpp"
   },
   {
     "name": "PDP CAN Monitoring",
@@ -37,7 +43,9 @@
       "Complete List",
       "CAN",
       "Sensors"
-    ]
+    ],
+    "foldername": "CANPDP",
+    "gradlebase": "cpp"
   },
   {
     "name": "Solenoids",
@@ -47,7 +55,9 @@
       "Joystick",
       "Pneumatics",
       "Complete List"
-    ]
+    ],
+    "foldername": "Solenoid",
+    "gradlebase": "cpp"
   },
   {
     "name": "Encoder",
@@ -56,7 +66,9 @@
       "Complete List",
       "Digital",
       "Sensors"
-    ]
+    ],
+    "foldername": "Encoder",
+    "gradlebase": "cpp"
   },
   {
     "name": "Arcade Drive",
@@ -66,7 +78,9 @@
       "Robot and Motor",
       "Joystick",
       "Complete List"
-    ]
+    ],
+    "foldername": "ArcadeDrive",
+    "gradlebase": "cpp"
   },
   {
     "name": "Mecanum Drive",
@@ -76,7 +90,9 @@
       "Robot and Motor",
       "Joystick",
       "Complete List"
-    ]
+    ],
+    "foldername": "MecanumDrive",
+    "gradlebase": "cpp"
   },
   {
     "name": "Ultrasonic",
@@ -86,7 +102,9 @@
       "Complete List",
       "Sensors",
       "Analog"
-    ]
+    ],
+    "foldername": "Ultrasonic",
+    "gradlebase": "cpp"
   },
   {
     "name": "UltrasonicPID",
@@ -96,7 +114,9 @@
       "Complete List",
       "Sensors",
       "Analog"
-    ]
+    ],
+    "foldername": "UltrasonicPID",
+    "gradlebase": "cpp"
   },
   {
     "name": "Gyro",
@@ -107,7 +127,9 @@
       "Sensors",
       "Analog",
       "Joystick"
-    ]
+    ],
+    "foldername": "Gyro",
+    "gradlebase": "cpp"
   },
   {
     "name": "Gyro Mecanum",
@@ -118,7 +140,9 @@
       "Sensors",
       "Analog",
       "Joysitck"
-    ]
+    ],
+    "foldername": "GyroMecanum",
+    "gradlebase": "cpp"
   },
   {
     "name": "PotentiometerPID",
@@ -129,7 +153,9 @@
       "Complete List",
       "Sensors",
       "Analog"
-    ]
+    ],
+    "foldername": "PotentiometerPID",
+    "gradlebase": "cpp"
   },
   {
     "name": "Getting Started",
@@ -137,7 +163,9 @@
     "tags": [
       "Getting Started with C++",
       "Complete List"
-    ]
+    ],
+    "foldername": "GettingStarted",
+    "gradlebase": "cpp"
   },
   {
     "name": "Simple Vision",
@@ -145,7 +173,9 @@
     "tags": [
       "Vision",
       "Complete List"
-    ]
+    ],
+    "foldername": "QuickVision",
+    "gradlebase": "cpp"
   },
   {
     "name": "Intermediate Vision",
@@ -153,7 +183,9 @@
     "tags": [
       "Vision",
       "Complete List"
-    ]
+    ],
+    "foldername": "IntermediateVision",
+    "gradlebase": "cpp"
   },
   {
     "name": "Axis Camera Sample",
@@ -161,7 +193,9 @@
     "tags": [
       "Vision",
       "Complete List"
-    ]
+    ],
+    "foldername": "AxisCameraSample",
+    "gradlebase": "cpp"
   },
   {
     "name": "GearsBot",
@@ -169,7 +203,9 @@
     "tags": [
       "CommandBased Robot",
       "Complete List"
-    ]
+    ],
+    "foldername": "GearsBot",
+    "gradlebase": "cpp"
   },
   {
     "name": "PacGoat",
@@ -177,6 +213,8 @@
     "tags": [
       "CommandBased Robot",
       "Complete List"
-    ]
+    ],
+    "foldername": "PacGoat",
+    "gradlebase": "cpp"
   }
 ]

@@ -5,7 +5,8 @@
     "tags": [
       "Iterative"
     ],
-    "foldername": "iterative"
+    "foldername": "iterative",
+    "gradlebase": "cpp"
   },
   {
     "name": "Timed Robot",
@@ -13,7 +14,8 @@
     "tags": [
       "Timed"
     ],
-    "foldername": "timed"
+    "foldername": "timed",
+    "gradlebase": "cpp"
   },
   {
     "name": "Command Robot",
@@ -21,7 +23,8 @@
     "tags": [
       "Command"
     ],
-    "foldername": "commandbased"
+    "foldername": "commandbased",
+    "gradlebase": "cpp"
   },
   {
     "name": "Sample Robot",
@@ -29,6 +32,7 @@
     "tags": [
       "Sample"
     ],
-    "foldername": "sample"
+    "foldername": "sample",
+    "gradlebase": "cpp"
   }
 ]

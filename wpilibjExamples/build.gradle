@@ -39,3 +39,14 @@ gradle.projectsEvaluated {
 }
 
 apply from: 'publish.gradle'
+
+ext {
+    templateDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/templates/")
+    templateFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/templates/templates.json")
+    exampleDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/examples/")
+    exampleFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/examples/examples.json")
+    commandDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/")
+    commandFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/commands.json")
+}
+
+apply from: "${rootDir}/shared/examplecheck.gradle"

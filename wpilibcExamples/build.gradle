@@ -193,3 +193,14 @@ model {
     }
 }
 apply from: 'publish.gradle'
+
+ext {
+    templateDirectory = new File("$projectDir/src/main/cpp/templates/")
+    templateFile = new File("$projectDir/src/main/cpp/templates/templates.json")
+    exampleDirectory = new File("$projectDir/src/main/cpp/examples/")
+    exampleFile = new File("$projectDir/src/main/cpp/examples/examples.json")
+    commandDirectory = new File("$projectDir/src/main/cpp/commands/")
+    commandFile = new File("$projectDir/src/main/cpp/commands/commands.json")
+}
+
+apply from: "${rootDir}/shared/examplecheck.gradle"
