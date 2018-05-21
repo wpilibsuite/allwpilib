@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <HAL/CANAPI.h>
 #include <wpi/ArrayRef.h>
 

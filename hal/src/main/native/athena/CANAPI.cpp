@@ -107,7 +107,7 @@ HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
 void HAL_CleanCAN(HAL_CANHandle handle) {
   auto data = canHandles->Free(handle);
 
-  std::unique_lock<wpi::mutex> lock(data->mapMutex);
+  std::lock_guard<wpi::mutex> lock(data->mapMutex);
 
   for (auto&& i : data->periodicSends) {
     int32_t s = 0;
@@ -131,7 +131,7 @@ void HAL_WriteCANPacket(HAL_CANHandle handle, const uint8_t* data,
   if (*status != 0) {
     return;
   }
-  std::unique_lock<wpi::mutex> lock(can->mapMutex);
+  std::lock_guard<wpi::mutex> lock(can->mapMutex);
   can->periodicSends[apiId] = -1;
 }
 
@@ -150,7 +150,7 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, const uint8_t* data,
   if (*status != 0) {
     return;
   }
-  std::unique_lock<wpi::mutex> lock(can->mapMutex);
+  std::lock_guard<wpi::mutex> lock(can->mapMutex);
   can->periodicSends[apiId] = repeatMs;
 }
 
@@ -169,7 +169,7 @@ void HAL_StopCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
   if (*status != 0) {
     return;
   }
-  std::unique_lock<wpi::mutex> lock(can->mapMutex);
+  std::lock_guard<wpi::mutex> lock(can->mapMutex);
   can->periodicSends[apiId] = -1;
 }
 
@@ -191,7 +191,7 @@ void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
   uint64_t timestamp = ConvertToFPGATime(ts);
 
   if (*status == 0) {
-    std::unique_lock<wpi::mutex> lock(can->mapMutex);
+    std::lock_guard<wpi::mutex> lock(can->mapMutex);
     auto& msg = can->receives[id];
     msg.length = dataSize;
     msg.lastTimeStamp = timestamp;
@@ -218,7 +218,7 @@ void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
 
   uint64_t timestamp = ConvertToFPGATime(ts);
 
-  std::unique_lock<wpi::mutex> lock(can->mapMutex);
+  std::lock_guard<wpi::mutex> lock(can->mapMutex);
   if (*status == 0) {
     // fresh update
     auto& msg = can->receives[id];
@@ -256,7 +256,7 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
 
   uint64_t timestamp = ConvertToFPGATime(ts);
 
-  std::unique_lock<wpi::mutex> lock(can->mapMutex);
+  std::lock_guard<wpi::mutex> lock(can->mapMutex);
   if (*status == 0) {
     // fresh update
     auto& msg = can->receives[id];
@@ -296,7 +296,7 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
   auto id = CreateCANId(can.get(), apiId);
 
   {
-    std::unique_lock<wpi::mutex> lock(can->mapMutex);
+    std::lock_guard<wpi::mutex> lock(can->mapMutex);
     auto i = can->receives.find(id);
     if (i != can->receives.end()) {
       uint64_t now = HAL_GetFPGATime(status);
@@ -318,7 +318,7 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
 
   uint64_t timestamp = ConvertToFPGATime(ts);
 
-  std::unique_lock<wpi::mutex> lock(can->mapMutex);
+  std::lock_guard<wpi::mutex> lock(can->mapMutex);
   if (*status == 0) {
     // fresh update
     auto& msg = can->receives[id];
