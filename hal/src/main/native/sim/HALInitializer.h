@@ -24,6 +24,7 @@ extern void InitializeAnalogInData();
 extern void InitializeAnalogOutData();
 extern void InitializeAnalogTriggerData();
 extern void InitializeCanData();
+extern void InitializeCANAPI();
 extern void InitializeDigitalPWMData();
 extern void InitializeDIOData();
 extern void InitializeDriverStationData();

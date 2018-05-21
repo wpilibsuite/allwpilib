@@ -59,6 +59,7 @@ static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
 static JClass matchInfoDataCls;
 static JClass accumulatorResultCls;
+static JClass canDataCls;
 
 namespace frc {
 
@@ -237,6 +238,15 @@ void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
   env->CallVoidMethod(accumulatorResult, func, (jlong)value, (jlong)count);
 }
 
+jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
+                            uint64_t timestamp) {
+  static jmethodID func = env->GetMethodID(canDataCls, "setData", "(IJ)[B");
+
+  jbyteArray retVal = static_cast<jbyteArray>(
+      env->CallObjectMethod(canData, func, (jint)length, (jlong)timestamp));
+  return retVal;
+}
+
 JavaVM* GetJVM() { return jvm; }
 
 }  // namespace frc
@@ -314,6 +324,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   accumulatorResultCls = JClass(env, "edu/wpi/first/wpilibj/AccumulatorResult");
   if (!accumulatorResultCls) return JNI_ERR;
 
+  canDataCls = JClass(env, "edu/wpi/first/wpilibj/CANData");
+  if (!canDataCls) return JNI_ERR;
+
   return sim::SimOnLoad(vm, reserved);
 }
 
@@ -338,6 +351,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   canStatusCls.free(env);
   matchInfoDataCls.free(env);
   accumulatorResultCls.free(env);
+  canDataCls.free(env);
   jvm = nullptr;
 }
 

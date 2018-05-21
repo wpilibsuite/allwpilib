@@ -57,7 +57,8 @@ enum class HAL_HandleEnum {
   Solenoid = 15,
   AnalogGyro = 16,
   Vendor = 17,
-  SimulationJni = 18
+  SimulationJni = 18,
+  CAN = 19,
 };
 
 static inline int16_t getHandleIndex(HAL_Handle handle) {

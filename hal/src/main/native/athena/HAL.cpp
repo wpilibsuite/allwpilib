@@ -49,6 +49,7 @@ void InitializeHAL() {
   InitializeAnalogOutput();
   InitializeAnalogTrigger();
   InitializeCAN();
+  InitializeCANAPI();
   InitializeCompressor();
   InitializeConstants();
   InitializeCounter();
@@ -207,6 +208,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_SERIAL_PORT_OPEN_ERROR_MESSAGE;
     case HAL_SERIAL_PORT_ERROR:
       return HAL_SERIAL_PORT_ERROR_MESSAGE;
+    case HAL_CAN_TIMEOUT:
+      return HAL_CAN_TIMEOUT_MESSAGE;
     default:
       return "Unknown error status";
   }
