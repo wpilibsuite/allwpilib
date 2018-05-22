@@ -241,6 +241,7 @@ TEST_F(ValueTest, StringArray) {
   NT_DisposeValue(&cv);
 }
 
+#ifndef _WIN32
 TEST_F(ValueDeathTest, GetAssertions) {
   Value v;
   ASSERT_DEATH(v.GetBoolean(), "type == NT_BOOLEAN");
@@ -251,6 +252,7 @@ TEST_F(ValueDeathTest, GetAssertions) {
   ASSERT_DEATH(v.GetDoubleArray(), "type == NT_DOUBLE_ARRAY");
   ASSERT_DEATH(v.GetStringArray(), "type == NT_STRING_ARRAY");
 }
+#endif
 
 TEST_F(ValueTest, UnassignedComparison) {
   Value v1, v2;

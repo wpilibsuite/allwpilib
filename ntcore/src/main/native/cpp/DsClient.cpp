@@ -46,7 +46,6 @@ void DsClient::Stop() {
     // Close the stream so the read (if any) terminates.
     auto thr = m_owner.GetThread();
     if (thr) {
-      thr->m_active = false;
       if (thr->m_stream) thr->m_stream->close();
     }
   }
