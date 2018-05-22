@@ -39,6 +39,7 @@ SOFTWARE.
 #include <cstdlib>
 
 #include "wpi/Format.h"
+#include "wpi/SmallString.h"
 #include "wpi/raw_istream.h"
 #include "wpi/raw_ostream.h"
 
@@ -1604,7 +1605,7 @@ void json::parser::parse_internal(bool keep, json& result)
 
                 if (keep and keep_tag and not value.is_discarded())
                 {
-                    result.m_value.object->emplace_second(StringRef(key.data(), key.size()), std::move(value));
+                    result.m_value.object->try_emplace(StringRef(key.data(), key.size()), std::move(value));
                 }
 
                 // comma -> next value

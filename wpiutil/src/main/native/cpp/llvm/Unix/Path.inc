@@ -145,21 +145,20 @@ static std::error_code fillStatus(int StatRet, const struct stat &Status,
   else if (S_ISLNK(Status.st_mode))
     Type = file_type::symlink_file;
 
-  perms Perms = static_cast<perms>(Status.st_mode);
-  Result =
-      file_status(Type, Perms, Status.st_dev, Status.st_ino, Status.st_atime,
-                  Status.st_mtime, Status.st_uid, Status.st_gid,
-                  Status.st_size);
+  perms Perms = static_cast<perms>(Status.st_mode) & all_perms;
+  Result = file_status(Type, Perms, Status.st_dev, Status.st_nlink,
+                       Status.st_ino, Status.st_atime, Status.st_mtime,
+                       Status.st_uid, Status.st_gid, Status.st_size);
 
   return std::error_code();
 }
 
-std::error_code status(const Twine &Path, file_status &Result) {
+std::error_code status(const Twine &Path, file_status &Result, bool Follow) {
   SmallString<128> PathStorage;
   StringRef P = Path.toNullTerminatedStringRef(PathStorage);
 
   struct stat Status;
-  int StatRet = ::lstat(P.begin(), &Status);
+  int StatRet = (Follow ? ::stat : ::lstat)(P.begin(), &Status);
   return fillStatus(StatRet, Status, Result);
 }
 
@@ -170,7 +169,8 @@ std::error_code status(int FD, file_status &Result) {
 }
 
 std::error_code detail::directory_iterator_construct(detail::DirIterState &it,
-                                                StringRef path){
+                                                     StringRef path,
+                                                     bool follow_symlinks) {
   SmallString<128> path_null(path);
   DIR *directory = ::opendir(path_null.c_str());
   if (!directory)
@@ -179,7 +179,7 @@ std::error_code detail::directory_iterator_construct(detail::DirIterState &it,
   it.IterationHandle = reinterpret_cast<intptr_t>(directory);
   // Add something for replace_filename to replace.
   path::append(path_null, ".");
-  it.CurrentEntry = directory_entry(path_null.str());
+  it.CurrentEntry = directory_entry(path_null.str(), follow_symlinks);
   return directory_iterator_increment(it);
 }
 
@@ -206,6 +206,13 @@ std::error_code detail::directory_iterator_increment(detail::DirIterState &it) {
     return directory_iterator_destruct(it);
 
   return std::error_code();
+}
+
+ErrorOr<basic_file_status> directory_entry::status() const {
+  file_status s;
+  if (auto EC = fs::status(Path, s, FollowSymlinks))
+    return EC;
+  return s;
 }
 
 #if !defined(F_GETPATH)
@@ -260,6 +267,10 @@ std::error_code openFileForWrite(const Twine &Name, int &ResultFD,
 
   int OpenFlags = O_CREAT;
 
+#ifdef O_CLOEXEC
+  OpenFlags |= O_CLOEXEC;
+#endif
+
   if (Flags & F_RW)
     OpenFlags |= O_RDWR;
   else
@@ -267,7 +278,7 @@ std::error_code openFileForWrite(const Twine &Name, int &ResultFD,
 
   if (Flags & F_Append)
     OpenFlags |= O_APPEND;
-  else
+  else if (!(Flags & F_NoTrunc))
     OpenFlags |= O_TRUNC;
 
   if (Flags & F_Excl)

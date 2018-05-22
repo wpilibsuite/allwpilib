@@ -25,8 +25,8 @@ using namespace wpi;
 
 UDPClient::UDPClient(Logger& logger) : UDPClient("", logger) {}
 
-UDPClient::UDPClient(StringRef address, Logger& logger)
-    : m_lsd(0), m_address(address), m_logger(logger) {}
+UDPClient::UDPClient(const Twine& address, Logger& logger)
+    : m_lsd(0), m_address(address.str()), m_logger(logger) {}
 
 UDPClient::UDPClient(UDPClient&& other)
     : m_lsd(other.m_lsd),
@@ -109,25 +109,25 @@ void UDPClient::shutdown() {
   }
 }
 
-int UDPClient::send(ArrayRef<uint8_t> data, StringRef server, int port) {
+int UDPClient::send(ArrayRef<uint8_t> data, const Twine& server, int port) {
   // server must be a resolvable IP address
   struct sockaddr_in addr;
   std::memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
-  if (server.size() > 0) {
-    SmallVector<char, 128> addr_store;
-    auto remoteAddr = server.c_str(addr_store);
-#ifdef _WIN32
-    int res = InetPton(AF_INET, remoteAddr, &(addr.sin_addr));
-#else
-    int res = inet_pton(AF_INET, remoteAddr, &(addr.sin_addr));
-#endif
-    if (res != 1) {
-      WPI_ERROR(m_logger, "could not resolve " << server << " address");
-      return -1;
-    }
-  } else {
+  SmallVector<char, 128> addr_store;
+  StringRef remoteAddr = server.toNullTerminatedStringRef(addr_store);
+  if (remoteAddr.empty()) {
     WPI_ERROR(m_logger, "server must be passed");
+    return -1;
+  }
+
+#ifdef _WIN32
+  int res = InetPton(AF_INET, remoteAddr.data(), &(addr.sin_addr));
+#else
+  int res = inet_pton(AF_INET, remoteAddr.data(), &(addr.sin_addr));
+#endif
+  if (res != 1) {
+    WPI_ERROR(m_logger, "could not resolve " << server << " address");
     return -1;
   }
   addr.sin_port = htons(port);
@@ -139,25 +139,25 @@ int UDPClient::send(ArrayRef<uint8_t> data, StringRef server, int port) {
   return result;
 }
 
-int UDPClient::send(StringRef data, StringRef server, int port) {
+int UDPClient::send(StringRef data, const Twine& server, int port) {
   // server must be a resolvable IP address
   struct sockaddr_in addr;
   std::memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
-  if (server.size() > 0) {
-    SmallVector<char, 128> addr_store;
-    auto remoteAddr = server.c_str(addr_store);
-#ifdef _WIN32
-    int res = InetPton(AF_INET, remoteAddr, &(addr.sin_addr));
-#else
-    int res = inet_pton(AF_INET, remoteAddr, &(addr.sin_addr));
-#endif
-    if (res != 1) {
-      WPI_ERROR(m_logger, "could not resolve " << server << " address");
-      return -1;
-    }
-  } else {
+  SmallVector<char, 128> addr_store;
+  StringRef remoteAddr = server.toNullTerminatedStringRef(addr_store);
+  if (remoteAddr.empty()) {
     WPI_ERROR(m_logger, "server must be passed");
+    return -1;
+  }
+
+#ifdef _WIN32
+  int res = InetPton(AF_INET, remoteAddr.data(), &(addr.sin_addr));
+#else
+  int res = inet_pton(AF_INET, remoteAddr.data(), &(addr.sin_addr));
+#endif
+  if (res != 1) {
+    WPI_ERROR(m_logger, "could not resolve " << server << " address");
     return -1;
   }
   addr.sin_port = htons(port);

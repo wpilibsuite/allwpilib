@@ -952,7 +952,7 @@ void from_json(const BasicJsonType& j, typename BasicJsonType::object_t& obj)
 
     auto inner_object = j.template get_ptr<const typename BasicJsonType::object_t*>();
     for (const auto& i : *inner_object) {
-        obj.emplace_second(i.first(), i.second);
+        obj.try_emplace(i.first(), i.second);
     }
 }
 
@@ -1247,7 +1247,7 @@ struct external_constructor<value_t::object>
         j.m_value = value_t::object;
         for (const auto& x : obj)
         {
-            j.m_value.object->emplace_second(x.first, x.second);
+            j.m_value.object->try_emplace(x.first, x.second);
         }
         j.assert_invariant();
     }
@@ -6188,7 +6188,7 @@ class json
         }
 
         // add element to array
-        m_value.object->emplace_second(val.first, std::move(val.second));
+        m_value.object->try_emplace(val.first, std::move(val.second));
     }
 
     /*!
@@ -6326,7 +6326,7 @@ class json
         }
 
         // add element to array (perfect forwarding)
-        auto res = m_value.object->emplace_second(key, std::forward<Args>(args)...);
+        auto res = m_value.object->try_emplace(key, std::forward<Args>(args)...);
         // create result iterator and set iterator to the result of emplace
         auto it = begin();
         it.m_it.object_iterator = res.first;

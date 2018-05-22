@@ -12,10 +12,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/StringMap.h"
-#include "wpi/MathExtras.h"
 #include "wpi/StringExtras.h"
 #include "wpi/Compiler.h"
+#include "wpi/MathExtras.h"
+#include "wpi/memory.h"
 #include <cassert>
+
 using namespace wpi;
 
 /// Returns the number of buckets to allocate to ensure that the DenseMap can
@@ -51,19 +53,22 @@ StringMapImpl::StringMapImpl(unsigned InitSize, unsigned itemSize) {
 void StringMapImpl::init(unsigned InitSize) {
   assert((InitSize & (InitSize-1)) == 0 &&
          "Init Size must be a power of 2 or zero!");
-  NumBuckets = InitSize ? InitSize : 16;
+
+  unsigned NewNumBuckets = InitSize ? InitSize : 16;
   NumItems = 0;
   NumTombstones = 0;
 
-  TheTable = (StringMapEntryBase **)calloc(NumBuckets+1,
-                                           sizeof(StringMapEntryBase **) +
-                                           sizeof(unsigned));
+  TheTable = static_cast<StringMapEntryBase **>(
+      CheckedCalloc(NewNumBuckets+1,
+                  sizeof(StringMapEntryBase **) + sizeof(unsigned)));
+
+  // Set the member only if TheTable was successfully allocated
+  NumBuckets = NewNumBuckets;
 
   // Allocate one extra bucket, set it to look filled so the iterators stop at
   // end.
   TheTable[NumBuckets] = (StringMapEntryBase*)2;
 }
-
 
 /// LookupBucketFor - Look up the bucket that the specified string should end
 /// up in.  If it already exists as a key in the map, the Item pointer for the
@@ -82,7 +87,7 @@ unsigned StringMapImpl::LookupBucketFor(StringRef Name) {
 
   unsigned ProbeAmt = 1;
   int FirstTombstone = -1;
-  while (1) {
+  while (true) {
     StringMapEntryBase *BucketItem = TheTable[BucketNo];
     // If we found an empty bucket, this key isn't in the table yet, return it.
     if (LLVM_LIKELY(!BucketItem)) {
@@ -136,7 +141,7 @@ int StringMapImpl::FindKey(StringRef Key) const {
   unsigned *HashTable = (unsigned *)(TheTable + NumBuckets + 1);
 
   unsigned ProbeAmt = 1;
-  while (1) {
+  while (true) {
     StringMapEntryBase *BucketItem = TheTable[BucketNo];
     // If we found an empty bucket, this key isn't in the table yet, return.
     if (LLVM_LIKELY(!BucketItem))
@@ -192,8 +197,6 @@ StringMapEntryBase *StringMapImpl::RemoveKey(StringRef Key) {
   return Result;
 }
 
-
-
 /// RehashTable - Grow the table, redistributing values into the buckets with
 /// the appropriate mod-of-hashtable-size.
 unsigned StringMapImpl::RehashTable(unsigned BucketNo) {
@@ -215,9 +218,9 @@ unsigned StringMapImpl::RehashTable(unsigned BucketNo) {
   unsigned NewBucketNo = BucketNo;
   // Allocate one extra bucket which will always be non-empty.  This allows the
   // iterators to stop at end.
-  StringMapEntryBase **NewTableArray =
-    (StringMapEntryBase **)calloc(NewSize+1, sizeof(StringMapEntryBase *) +
-                                             sizeof(unsigned));
+  auto NewTableArray = static_cast<StringMapEntryBase **>(
+      CheckedCalloc(NewSize+1, sizeof(StringMapEntryBase *) + sizeof(unsigned)));
+
   unsigned *NewHashArray = (unsigned *)(NewTableArray + NewSize + 1);
   NewTableArray[NewSize] = (StringMapEntryBase*)2;
 

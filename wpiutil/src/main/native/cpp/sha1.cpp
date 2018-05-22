@@ -100,8 +100,8 @@ static void R4(uint32_t block[BLOCK_INTS], const uint32_t v, uint32_t& w,
  * Hash a single 512-bit block. This is the core of the algorithm.
  */
 
-static void transform(uint32_t digest[], uint32_t block[BLOCK_INTS],
-                      uint64_t& transforms) {
+static void do_transform(uint32_t digest[], uint32_t block[BLOCK_INTS],
+                         uint64_t& transforms) {
   /* Copy digest[] to working vars */
   uint32_t a = digest[0];
   uint32_t b = digest[1];
@@ -227,7 +227,7 @@ void SHA1::Update(raw_istream& is) {
     }
     uint32_t block[BLOCK_INTS];
     buffer_to_block(buffer, block);
-    transform(digest, block, transforms);
+    do_transform(digest, block, transforms);
     buf_size = 0;
   }
 }
@@ -251,7 +251,7 @@ static void finalize(uint32_t digest[], unsigned char* buffer, size_t& buf_size,
   buffer_to_block(buffer, block);
 
   if (buf_size > BLOCK_BYTES - 8) {
-    transform(digest, block, transforms);
+    do_transform(digest, block, transforms);
     for (size_t i = 0; i < BLOCK_INTS - 2; i++) {
       block[i] = 0;
     }
@@ -260,7 +260,7 @@ static void finalize(uint32_t digest[], unsigned char* buffer, size_t& buf_size,
   /* Append total_bits, split this uint64_t into two uint32_t */
   block[BLOCK_INTS - 1] = total_bits;
   block[BLOCK_INTS - 2] = (total_bits >> 32);
-  transform(digest, block, transforms);
+  do_transform(digest, block, transforms);
 
   /* Hex string */
   static const char* const LUT = "0123456789abcdef";

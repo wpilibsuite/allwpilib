@@ -73,7 +73,7 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
  * @param stopBits The number of stop bits to use as defined by the enum
  *                 StopBits.
  */
-SerialPort::SerialPort(int baudRate, wpi::StringRef portName, Port port,
+SerialPort::SerialPort(int baudRate, const wpi::Twine& portName, Port port,
                        int dataBits, SerialPort::Parity parity,
                        SerialPort::StopBits stopBits) {
   int32_t status = 0;
@@ -81,7 +81,7 @@ SerialPort::SerialPort(int baudRate, wpi::StringRef portName, Port port,
   m_port = port;
 
   wpi::SmallVector<char, 64> buf;
-  const char* portNameC = portName.c_str(buf);
+  const char* portNameC = portName.toNullTerminatedStringRef(buf).data();
 
   HAL_InitializeSerialPortDirect(static_cast<HAL_SerialPort>(port), portNameC,
                                  &status);

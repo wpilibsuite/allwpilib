@@ -11,8 +11,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_SUPPORT_RAW_OS_OSTREAM_H
-#define LLVM_SUPPORT_RAW_OS_OSTREAM_H
+#ifndef WPIUTIL_WPI_RAW_OS_OSTREAM_H
+#define WPIUTIL_WPI_RAW_OS_OSTREAM_H
 
 #include "wpi/raw_ostream.h"
 #include <iosfwd>

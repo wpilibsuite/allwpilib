@@ -11,11 +11,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_ADT_SMALLSTRING_H
-#define LLVM_ADT_SMALLSTRING_H
+#ifndef WPIUTIL_WPI_SMALLSTRING_H
+#define WPIUTIL_WPI_SMALLSTRING_H
 
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
+#include <cstddef>
 
 namespace wpi {
 
@@ -25,7 +26,7 @@ template<unsigned InternalLen>
 class SmallString : public SmallVector<char, InternalLen> {
 public:
   /// Default ctor - Initialize to empty.
-  SmallString() {}
+  SmallString() = default;
 
   /// Initialize from a StringRef.
   SmallString(StringRef S) : SmallVector<char, InternalLen>(S.begin(), S.end()) {}
@@ -78,7 +79,6 @@ public:
   void append(size_t NumInputs, char Elt) {
     SmallVectorImpl<char>::append(NumInputs, Elt);
   }
-
 
   /// Append from a StringRef.
   void append(StringRef RHS) {
@@ -292,6 +292,6 @@ public:
   }
 };
 
-}
+} // end namespace wpi
 
-#endif
+#endif // LLVM_ADT_SMALLSTRING_H

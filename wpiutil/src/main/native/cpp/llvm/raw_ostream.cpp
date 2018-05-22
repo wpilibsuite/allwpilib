@@ -12,15 +12,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/raw_ostream.h"
+#include "wpi/STLExtras.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
 #include "wpi/Compiler.h"
+#include "wpi/FileSystem.h"
 #include "wpi/Format.h"
 #include "wpi/MathExtras.h"
+#include "wpi/NativeFormatting.h"
 #include "wpi/WindowsError.h"
+#include <algorithm>
 #include <cctype>
 #include <cerrno>
+#include <cstdio>
+#include <iterator>
 #include <sys/stat.h>
 #include <system_error>
 
@@ -49,7 +55,7 @@
 #endif
 #endif
 
-#if defined(_WIN32)
+#ifdef _WIN32
 #include "Windows/WindowsSupport.h"
 #endif
 
@@ -102,73 +108,28 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
 }
 
 raw_ostream &raw_ostream::operator<<(unsigned long N) {
-  // Zero is a special case.
-  if (N == 0)
-    return *this << '0';
-
-  char NumberBuffer[20];
-  char *EndPtr = NumberBuffer+sizeof(NumberBuffer);
-  char *CurPtr = EndPtr;
-
-  while (N) {
-    *--CurPtr = '0' + char(N % 10);
-    N /= 10;
-  }
-  return write(CurPtr, EndPtr-CurPtr);
+  write_integer(*this, static_cast<uint64_t>(N), 0, IntegerStyle::Integer);
+  return *this;
 }
 
 raw_ostream &raw_ostream::operator<<(long N) {
-  if (N <  0) {
-    *this << '-';
-    // Avoid undefined behavior on LONG_MIN with a cast.
-    N = -(unsigned long)N;
-  }
-
-  return this->operator<<(static_cast<unsigned long>(N));
+  write_integer(*this, static_cast<int64_t>(N), 0, IntegerStyle::Integer);
+  return *this;
 }
 
 raw_ostream &raw_ostream::operator<<(unsigned long long N) {
-  // Output using 32-bit div/mod when possible.
-  if (N == static_cast<unsigned long>(N))
-    return this->operator<<(static_cast<unsigned long>(N));
-
-  char NumberBuffer[20];
-  char *EndPtr = std::end(NumberBuffer);
-  char *CurPtr = EndPtr;
-
-  while (N) {
-    *--CurPtr = '0' + char(N % 10);
-    N /= 10;
-  }
-  return write(CurPtr, EndPtr-CurPtr);
+  write_integer(*this, static_cast<uint64_t>(N), 0, IntegerStyle::Integer);
+  return *this;
 }
 
 raw_ostream &raw_ostream::operator<<(long long N) {
-  if (N < 0) {
-    *this << '-';
-    // Avoid undefined behavior on INT64_MIN with a cast.
-    N = -(unsigned long long)N;
-  }
-
-  return this->operator<<(static_cast<unsigned long long>(N));
+  write_integer(*this, static_cast<int64_t>(N), 0, IntegerStyle::Integer);
+  return *this;
 }
 
 raw_ostream &raw_ostream::write_hex(unsigned long long N) {
-  // Zero is a special case.
-  if (N == 0)
-    return *this << '0';
-
-  char NumberBuffer[16];
-  char *EndPtr = std::end(NumberBuffer);
-  char *CurPtr = EndPtr;
-
-  while (N) {
-    unsigned char x = static_cast<unsigned char>(N) % 16;
-    *--CurPtr = hexdigit(x, /*LowerCase*/true);
-    N /= 16;
-  }
-
-  return write(CurPtr, EndPtr-CurPtr);
+  wpi::write_hex(*this, N, HexPrintStyle::Lower);
+  return *this;
 }
 
 raw_ostream &raw_ostream::write_escaped(StringRef Str,
@@ -212,53 +173,14 @@ raw_ostream &raw_ostream::write_escaped(StringRef Str,
 }
 
 raw_ostream &raw_ostream::operator<<(const void *P) {
-  *this << '0' << 'x';
-
-  return write_hex((uintptr_t) P);
+  wpi::write_hex(*this, (uintptr_t)P, HexPrintStyle::PrefixLower);
+  return *this;
 }
 
 raw_ostream &raw_ostream::operator<<(double N) {
-#ifdef _WIN32
-  // On MSVCRT and compatible, output of %e is incompatible to Posix
-  // by default. Number of exponent digits should be at least 2. "%+03d"
-  // FIXME: Implement our formatter to here or Support/Format.h!
-#if defined(__MINGW32__)
-  // FIXME: It should be generic to C++11.
-  if (N == 0.0 && std::signbit(N))
-    return *this << "-0.000000e+00";
-#else
-  int fpcl = _fpclass(N);
-
-  // negative zero
-  if (fpcl == _FPCLASS_NZ)
-    return *this << "-0.000000e+00";
-#endif
-
-  char buf[16];
-  unsigned len;
-  len = format("%e", N).snprint(buf, sizeof(buf));
-  if (len <= sizeof(buf) - 2) {
-    if (len >= 5 && buf[len - 5] == 'e' && buf[len - 3] == '0') {
-      int cs = buf[len - 4];
-      if (cs == '+' || cs == '-') {
-        int c1 = buf[len - 2];
-        int c0 = buf[len - 1];
-        if (isdigit(static_cast<unsigned char>(c1)) &&
-            isdigit(static_cast<unsigned char>(c0))) {
-          // Trim leading '0': "...e+012" -> "...e+12\0"
-          buf[len - 3] = c1;
-          buf[len - 2] = c0;
-          buf[--len] = 0;
-        }
-      }
-    }
-    return this->operator<<(buf);
-  }
-#endif
-  return this->operator<<(format("%e", N));
+  wpi::write_double(*this, N, FloatStyle::Exponent);
+  return *this;
 }
-
-
 
 void raw_ostream::flush_nonempty() {
   assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
@@ -336,10 +258,10 @@ void raw_ostream::copy_to_buffer(const char *Ptr, size_t Size) {
   // Handle short strings specially, memcpy isn't very good at very short
   // strings.
   switch (Size) {
-  case 4: OutBufCur[3] = Ptr[3]; // FALL THROUGH
-  case 3: OutBufCur[2] = Ptr[2]; // FALL THROUGH
-  case 2: OutBufCur[1] = Ptr[1]; // FALL THROUGH
-  case 1: OutBufCur[0] = Ptr[0]; // FALL THROUGH
+  case 4: OutBufCur[3] = Ptr[3]; LLVM_FALLTHROUGH;
+  case 3: OutBufCur[2] = Ptr[2]; LLVM_FALLTHROUGH;
+  case 2: OutBufCur[1] = Ptr[1]; LLVM_FALLTHROUGH;
+  case 1: OutBufCur[0] = Ptr[0]; LLVM_FALLTHROUGH;
   case 0: break;
   default:
     memcpy(OutBufCur, Ptr, Size);
@@ -374,7 +296,7 @@ raw_ostream &raw_ostream::operator<<(const format_object_base &Fmt) {
   // space.  Iterate until we win.
   SmallVector<char, 128> V;
 
-  while (1) {
+  while (true) {
     V.resize(NextBufferSize);
 
     // Try formatting into the SmallVector.
@@ -391,82 +313,160 @@ raw_ostream &raw_ostream::operator<<(const format_object_base &Fmt) {
 }
 
 raw_ostream &raw_ostream::operator<<(const FormattedString &FS) {
-  unsigned Len = FS.Str.size(); 
-  int PadAmount = FS.Width - Len;
-  if (FS.RightJustify && (PadAmount > 0))
+  if (FS.Str.size() >= FS.Width || FS.Justify == FormattedString::JustifyNone) {
+    this->operator<<(FS.Str);
+    return *this;
+  }
+  const size_t Difference = FS.Width - FS.Str.size();
+  switch (FS.Justify) {
+  case FormattedString::JustifyLeft:
+    this->operator<<(FS.Str);
+    this->indent(Difference);
+    break;
+  case FormattedString::JustifyRight:
+    this->indent(Difference);
+    this->operator<<(FS.Str);
+    break;
+  case FormattedString::JustifyCenter: {
+    int PadAmount = Difference / 2;
     this->indent(PadAmount);
-  this->operator<<(FS.Str);
-  if (!FS.RightJustify && (PadAmount > 0))
-    this->indent(PadAmount);
+    this->operator<<(FS.Str);
+    this->indent(Difference - PadAmount);
+    break;
+  }
+  default:
+    assert(false && "Bad Justification");
+  }
   return *this;
 }
 
 raw_ostream &raw_ostream::operator<<(const FormattedNumber &FN) {
   if (FN.Hex) {
-    unsigned Nibbles = (64 - countLeadingZeros(FN.HexValue)+3)/4;
-    unsigned PrefixChars = FN.HexPrefix ? 2 : 0;
-    unsigned Width = std::max(FN.Width, Nibbles + PrefixChars);
-
-    char NumberBuffer[20] = "0x0000000000000000";
-    if (!FN.HexPrefix)
-      NumberBuffer[1] = '0';
-    char *EndPtr = NumberBuffer+Width;
-    char *CurPtr = EndPtr;
-    unsigned long long N = FN.HexValue;
-    while (N) {
-      unsigned char x = static_cast<unsigned char>(N) % 16;
-      *--CurPtr = hexdigit(x, !FN.Upper);
-      N /= 16;
-    }
-
-    return write(NumberBuffer, Width);
+    HexPrintStyle Style;
+    if (FN.Upper && FN.HexPrefix)
+      Style = HexPrintStyle::PrefixUpper;
+    else if (FN.Upper && !FN.HexPrefix)
+      Style = HexPrintStyle::Upper;
+    else if (!FN.Upper && FN.HexPrefix)
+      Style = HexPrintStyle::PrefixLower;
+    else
+      Style = HexPrintStyle::Lower;
+    wpi::write_hex(*this, FN.HexValue, Style, FN.Width);
   } else {
-    // Zero is a special case.
-    if (FN.DecValue == 0) {
-      this->indent(FN.Width-1);
-      return *this << '0';
-    }
-    char NumberBuffer[32];
-    char *EndPtr = NumberBuffer+sizeof(NumberBuffer);
-    char *CurPtr = EndPtr;
-    bool Neg = (FN.DecValue < 0);
-    uint64_t N = Neg ? -static_cast<uint64_t>(FN.DecValue) : FN.DecValue;
-    while (N) {
-      *--CurPtr = '0' + char(N % 10);
-      N /= 10;
-    }
-    int Len = EndPtr - CurPtr;
-    int Pad = FN.Width - Len;
-    if (Neg) 
-      --Pad;
-    if (Pad > 0)
-      this->indent(Pad);
-    if (Neg)
-      *this << '-';
-    return write(CurPtr, Len);
-  }
-}
-
-
-/// indent - Insert 'NumSpaces' spaces.
-raw_ostream &raw_ostream::indent(unsigned NumSpaces) {
-  static const char Spaces[] = "                                "
-                               "                                "
-                               "                ";
-
-  // Usually the indentation is small, handle it with a fastpath.
-  if (NumSpaces < array_lengthof(Spaces))
-    return write(Spaces, NumSpaces);
-
-  while (NumSpaces) {
-    unsigned NumToWrite = std::min(NumSpaces,
-                                   (unsigned)array_lengthof(Spaces)-1);
-    write(Spaces, NumToWrite);
-    NumSpaces -= NumToWrite;
+    wpi::SmallString<16> Buffer;
+    wpi::raw_svector_ostream Stream(Buffer);
+    wpi::write_integer(Stream, FN.DecValue, 0, IntegerStyle::Integer);
+    if (Buffer.size() < FN.Width)
+      indent(FN.Width - Buffer.size());
+    (*this) << Buffer;
   }
   return *this;
 }
 
+raw_ostream &raw_ostream::operator<<(const FormattedBytes &FB) {
+  if (FB.Bytes.empty())
+    return *this;
+
+  size_t LineIndex = 0;
+  auto Bytes = FB.Bytes;
+  const size_t Size = Bytes.size();
+  HexPrintStyle HPS = FB.Upper ? HexPrintStyle::Upper : HexPrintStyle::Lower;
+  uint64_t OffsetWidth = 0;
+  if (FB.FirstByteOffset.hasValue()) {
+    // Figure out how many nibbles are needed to print the largest offset
+    // represented by this data set, so that we can align the offset field
+    // to the right width.
+    size_t Lines = Size / FB.NumPerLine;
+    uint64_t MaxOffset = *FB.FirstByteOffset + Lines * FB.NumPerLine;
+    unsigned Power = 0;
+    if (MaxOffset > 0)
+      Power = wpi::Log2_64_Ceil(MaxOffset);
+    OffsetWidth = std::max<uint64_t>(4, wpi::alignTo(Power, 4) / 4);
+  }
+
+  // The width of a block of data including all spaces for group separators.
+  unsigned NumByteGroups =
+      alignTo(FB.NumPerLine, FB.ByteGroupSize) / FB.ByteGroupSize;
+  unsigned BlockCharWidth = FB.NumPerLine * 2 + NumByteGroups - 1;
+
+  while (!Bytes.empty()) {
+    indent(FB.IndentLevel);
+
+    if (FB.FirstByteOffset.hasValue()) {
+      uint64_t Offset = FB.FirstByteOffset.getValue();
+      wpi::write_hex(*this, Offset + LineIndex, HPS, OffsetWidth);
+      *this << ": ";
+    }
+
+    auto Line = Bytes.take_front(FB.NumPerLine);
+
+    size_t CharsPrinted = 0;
+    // Print the hex bytes for this line in groups
+    for (size_t I = 0; I < Line.size(); ++I, CharsPrinted += 2) {
+      if (I && (I % FB.ByteGroupSize) == 0) {
+        ++CharsPrinted;
+        *this << " ";
+      }
+      wpi::write_hex(*this, Line[I], HPS, 2);
+    }
+
+    if (FB.ASCII) {
+      // Print any spaces needed for any bytes that we didn't print on this
+      // line so that the ASCII bytes are correctly aligned.
+      assert(BlockCharWidth >= CharsPrinted);
+      indent(BlockCharWidth - CharsPrinted + 2);
+      *this << "|";
+
+      // Print the ASCII char values for each byte on this line
+      for (uint8_t Byte : Line) {
+        if (isprint(Byte))
+          *this << static_cast<char>(Byte);
+        else
+          *this << '.';
+      }
+      *this << '|';
+    }
+
+    Bytes = Bytes.drop_front(Line.size());
+    LineIndex += Line.size();
+    if (LineIndex < Size)
+      *this << '\n';
+  }
+  return *this;
+}
+
+template <char C>
+static raw_ostream &write_padding(raw_ostream &OS, unsigned NumChars) {
+  static const char Chars[] = {C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C,
+                               C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C,
+                               C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C,
+                               C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C,
+                               C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C};
+
+  // Usually the indentation is small, handle it with a fastpath.
+  if (NumChars < array_lengthof(Chars))
+    return OS.write(Chars, NumChars);
+
+  while (NumChars) {
+    unsigned NumToWrite = std::min(NumChars,
+                                   (unsigned)array_lengthof(Chars)-1);
+    OS.write(Chars, NumToWrite);
+    NumChars -= NumToWrite;
+  }
+  return OS;
+}
+
+/// indent - Insert 'NumSpaces' spaces.
+raw_ostream &raw_ostream::indent(unsigned NumSpaces) {
+  return write_padding<' '>(*this, NumSpaces);
+}
+
+/// write_zeros - Insert 'NumZeros' nulls.
+raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
+  return write_padding<'\0'>(*this, NumZeros);
+}
+
+void raw_ostream::anchor() {}
 
 //===----------------------------------------------------------------------===//
 //  Formatted Output
@@ -483,8 +483,7 @@ void format_object_base::home() {
 static int getFD(StringRef Filename, std::error_code &EC,
                  sys::fs::OpenFlags Flags) {
   // Handle "-" as stdout. Note that when we do this, we consider ourself
-  // the owner of stdout. This means that we can do things like close the
-  // file descriptor when we're done and set the "binary" flag globally.
+  // the owner of stdout and may set the "binary" flag globally based on Flags.
   if (Filename == "-") {
     EC = std::error_code();
     // If user requested binary then put stdout into binary mode if
@@ -498,12 +497,10 @@ static int getFD(StringRef Filename, std::error_code &EC,
   }
 
   int FD;
-
   EC = sys::fs::openFileForWrite(Filename, FD, Flags);
   if (EC)
     return -1;
 
-  EC = std::error_code();
   return FD;
 }
 
@@ -514,12 +511,20 @@ raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC,
 /// FD is the file descriptor that this writes to.  If ShouldClose is true, this
 /// closes the file when the stream is destroyed.
 raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered)
-    : raw_pwrite_stream(unbuffered), FD(fd), ShouldClose(shouldClose),
-      Error(false) {
+    : raw_pwrite_stream(unbuffered), FD(fd), ShouldClose(shouldClose) {
   if (FD < 0 ) {
     ShouldClose = false;
     return;
   }
+
+  // Do not attempt to close stdout or stderr. We used to try to maintain the
+  // property that tools that support writing file to stdout should not also
+  // write informational output to stdout, but in practice we were never able to
+  // maintain this invariant. Many features have been added to LLVM and clang
+  // (-fdump-record-layouts, optimization remarks, etc) that print to stdout, so
+  // users must simply be aware that mixed output and remarks is a possibility.
+  if (FD <= STDERR_FILENO)
+    ShouldClose = false;
 
   // Get the starting position.
   off_t loc = ::lseek(FD, 0, SEEK_CUR);
@@ -539,7 +544,7 @@ raw_fd_ostream::~raw_fd_ostream() {
   if (FD >= 0) {
     flush();
     if (ShouldClose && ::close(FD) < 0)
-      error_detected();
+      error_detected(std::error_code(errno, std::generic_category()));
   }
 
 #ifdef __MINGW32__
@@ -551,25 +556,29 @@ raw_fd_ostream::~raw_fd_ostream() {
 #endif
 }
 
-
 void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
   assert(FD >= 0 && "File already closed.");
   pos += Size;
 
-#ifndef _WIN32
-  bool ShouldWriteInChunks = false;
-#else
+  // The maximum write size is limited to SSIZE_MAX because a write
+  // greater than SSIZE_MAX is implementation-defined in POSIX.
+  // Since SSIZE_MAX is not portable, we use SIZE_MAX >> 1 instead.
+  size_t MaxWriteSize = SIZE_MAX >> 1;
+
+#if defined(__linux__)
+  // It is observed that Linux returns EINVAL for a very large write (>2G).
+  // Make it a reasonably small value.
+  MaxWriteSize = 1024 * 1024 * 1024;
+#elif defined(_WIN32)
   // Writing a large size of output to Windows console returns ENOMEM. It seems
   // that, prior to Windows 8, WriteFile() is redirecting to WriteConsole(), and
   // the latter has a size limit (66000 bytes or less, depending on heap usage).
-  bool ShouldWriteInChunks = !!::_isatty(FD) && !RunningWindows8OrGreater();
+  if (::_isatty(FD) && !RunningWindows8OrGreater())
+    MaxWriteSize = 32767;
 #endif
 
   do {
-    size_t ChunkSize = Size;
-    if (ChunkSize > 32767 && ShouldWriteInChunks)
-        ChunkSize = 32767;
-
+    size_t ChunkSize = std::min(Size, MaxWriteSize);
 #ifdef _WIN32
     int ret = ::_write(FD, Ptr, ChunkSize);
 #else
@@ -593,7 +602,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
         continue;
 
       // Otherwise it's a non-recoverable error. Note it and quit.
-      error_detected();
+      error_detected(std::error_code(errno, std::generic_category()));
       break;
     }
 
@@ -610,16 +619,20 @@ void raw_fd_ostream::close() {
   ShouldClose = false;
   flush();
   if (::close(FD) < 0)
-    error_detected();
+    error_detected(std::error_code(errno, std::generic_category()));
   FD = -1;
 }
 
 uint64_t raw_fd_ostream::seek(uint64_t off) {
   assert(SupportsSeeking && "Stream does not support seeking!");
   flush();
+#ifdef _WIN32
+  pos = ::_lseeki64(FD, off, SEEK_SET);
+#else
   pos = ::lseek(FD, off, SEEK_SET);
+#endif
   if (pos == (uint64_t)-1)
-    error_detected();
+    error_detected(std::error_code(errno, std::generic_category()));
   return pos;
 }
 
@@ -651,6 +664,8 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
 #endif
 }
 
+void raw_fd_ostream::anchor() {}
+
 //===----------------------------------------------------------------------===//
 //  outs(), errs(), nulls()
 //===----------------------------------------------------------------------===//
@@ -658,10 +673,7 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
 /// outs() - This returns a reference to a raw_ostream for standard output.
 /// Use it like: outs() << "foo" << "bar";
 raw_ostream &wpi::outs() {
-  // Set buffer settings to model stdout behavior.  Delete the file descriptor
-  // when the program exits, forcing error detection.  This means that if you
-  // ever call outs(), you can't open another raw_fd_ostream on stdout, as we'll
-  // close stdout twice and print an error the second time.
+  // Set buffer settings to model stdout behavior.
   std::error_code EC;
   static raw_fd_ostream S("-", EC, sys::fs::F_None);
   assert(!EC);
@@ -681,7 +693,6 @@ raw_ostream &wpi::nulls() {
   static raw_null_ostream S;
   return S;
 }
-
 
 //===----------------------------------------------------------------------===//
 //  raw_string_ostream
@@ -778,3 +789,5 @@ uint64_t raw_null_ostream::current_pos() const {
 
 void raw_null_ostream::pwrite_impl(const char * /*Ptr*/, size_t /*Size*/,
                                    uint64_t /*Offset*/) {}
+
+void raw_pwrite_stream::anchor() {}

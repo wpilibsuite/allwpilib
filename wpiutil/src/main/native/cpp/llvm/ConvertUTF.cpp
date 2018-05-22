@@ -46,12 +46,41 @@
 
 ------------------------------------------------------------------------ */
 
-
 #include "wpi/ConvertUTF.h"
 #ifdef CVTUTF_DEBUG
 #include <stdio.h>
 #endif
 #include <assert.h>
+
+/*
+ * This code extensively uses fall-through switches.
+ * Keep the compiler from warning about that.
+ */
+#if defined(__clang__) && defined(__has_warning)
+# if __has_warning("-Wimplicit-fallthrough")
+#  define ConvertUTF_DISABLE_WARNINGS \
+    _Pragma("clang diagnostic push")  \
+    _Pragma("clang diagnostic ignored \"-Wimplicit-fallthrough\"")
+#  define ConvertUTF_RESTORE_WARNINGS \
+    _Pragma("clang diagnostic pop")
+# endif
+#elif defined(__GNUC__) && __GNUC__ > 6
+# define ConvertUTF_DISABLE_WARNINGS \
+   _Pragma("GCC diagnostic push")    \
+   _Pragma("GCC diagnostic ignored \"-Wimplicit-fallthrough\"")
+# define ConvertUTF_RESTORE_WARNINGS \
+   _Pragma("GCC diagnostic pop")
+#endif
+#ifndef ConvertUTF_DISABLE_WARNINGS
+# define ConvertUTF_DISABLE_WARNINGS
+#endif
+#ifndef ConvertUTF_RESTORE_WARNINGS
+# define ConvertUTF_RESTORE_WARNINGS
+#endif
+
+ConvertUTF_DISABLE_WARNINGS
+
+namespace wpi {
 
 static const int halfShift  = 10; /* used for shifting by 10 bits */
 
@@ -110,7 +139,7 @@ static const UTF8 firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC 
  * into an inline function.
  */
 
-extern "C" {
+
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF32toUTF16 (
@@ -272,9 +301,9 @@ ConversionResult ConvertUTF16toUTF8 (
             target -= bytesToWrite; result = targetExhausted; break;
         }
         switch (bytesToWrite) { /* note: everything falls through. */
-            case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6; /* FALLTHRU */
-            case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6; /* FALLTHRU */
-            case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6; /* FALLTHRU */
+            case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
+            case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
+            case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
             case 1: *--target =  (UTF8)(ch | firstByteMark[bytesToWrite]);
         }
         target += bytesToWrite;
@@ -325,9 +354,9 @@ ConversionResult ConvertUTF32toUTF8 (
             target -= bytesToWrite; result = targetExhausted; break;
         }
         switch (bytesToWrite) { /* note: everything falls through. */
-            case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6; /* FALLTHRU */
-            case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6; /* FALLTHRU */
-            case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6; /* FALLTHRU */
+            case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
+            case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
+            case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
             case 1: *--target = (UTF8) (ch | firstByteMark[bytesToWrite]);
         }
         target += bytesToWrite;
@@ -356,8 +385,8 @@ static Boolean isLegalUTF8(const UTF8 *source, int length) {
     switch (length) {
     default: return false;
         /* Everything else falls through when "true"... */
-    case 4: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false; /* FALLTHRU */
-    case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false; /* FALLTHRU */
+    case 4: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
+    case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
     case 2: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
 
         switch (*source) {
@@ -368,7 +397,6 @@ static Boolean isLegalUTF8(const UTF8 *source, int length) {
             case 0xF4: if (a > 0x8F) return false; break;
             default:   if (a < 0x80) return false;
         }
-        /* FALLTHRU */
 
     case 1: if (*source >= 0x80 && *source < 0xC2) return false;
     }
@@ -532,11 +560,11 @@ ConversionResult ConvertUTF8toUTF16 (
          * The cases all fall through. See "Note A" below.
          */
         switch (extraBytesToRead) {
-            case 5: ch += *source++; ch <<= 6; /* FALLTHRU */ /* remember, illegal UTF-8 */
-            case 4: ch += *source++; ch <<= 6; /* FALLTHRU */ /* remember, illegal UTF-8 */
-            case 3: ch += *source++; ch <<= 6; /* FALLTHRU */
-            case 2: ch += *source++; ch <<= 6; /* FALLTHRU */
-            case 1: ch += *source++; ch <<= 6; /* FALLTHRU */
+            case 5: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
+            case 4: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
+            case 3: ch += *source++; ch <<= 6;
+            case 2: ch += *source++; ch <<= 6;
+            case 1: ch += *source++; ch <<= 6;
             case 0: ch += *source++;
         }
         ch -= offsetsFromUTF8[extraBytesToRead];
@@ -636,11 +664,11 @@ static ConversionResult ConvertUTF8toUTF32Impl(
          * The cases all fall through. See "Note A" below.
          */
         switch (extraBytesToRead) {
-            case 5: ch += *source++; ch <<= 6; /* FALLTHRU */
-            case 4: ch += *source++; ch <<= 6; /* FALLTHRU */
-            case 3: ch += *source++; ch <<= 6; /* FALLTHRU */
-            case 2: ch += *source++; ch <<= 6; /* FALLTHRU */
-            case 1: ch += *source++; ch <<= 6; /* FALLTHRU */
+            case 5: ch += *source++; ch <<= 6;
+            case 4: ch += *source++; ch <<= 6;
+            case 3: ch += *source++; ch <<= 6;
+            case 2: ch += *source++; ch <<= 6;
+            case 1: ch += *source++; ch <<= 6;
             case 0: ch += *source++;
         }
         ch -= offsetsFromUTF8[extraBytesToRead];
@@ -687,8 +715,6 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
                                 flags, /*InputIsPartial=*/false);
 }
 
-}
-
 /* ---------------------------------------------------------------------
 
     Note A.
@@ -707,3 +733,7 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
     similarly unrolled loops.
 
    --------------------------------------------------------------------- */
+
+} // namespace llvm
+
+ConvertUTF_RESTORE_WARNINGS

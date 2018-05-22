@@ -7,8 +7,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_SUPPORT_WINDOWSERROR_H
-#define LLVM_SUPPORT_WINDOWSERROR_H
+#ifndef WPIUTIL_WPI_WINDOWSERROR_H
+#define WPIUTIL_WPI_WINDOWSERROR_H
 
 #include <system_error>
 

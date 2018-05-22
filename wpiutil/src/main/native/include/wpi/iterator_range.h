@@ -16,15 +16,15 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_ADT_ITERATOR_RANGE_H
-#define LLVM_ADT_ITERATOR_RANGE_H
+#ifndef WPIUTIL_WPI_ITERATOR_RANGE_H
+#define WPIUTIL_WPI_ITERATOR_RANGE_H
 
-#include <utility>
 #include <iterator>
+#include <utility>
 
 namespace wpi {
 
-/// \brief A range adaptor for a pair of iterators.
+/// A range adaptor for a pair of iterators.
 ///
 /// This just wraps two iterators into a range-compatible interface. Nothing
 /// fancy at all.
@@ -47,7 +47,7 @@ public:
   IteratorT end() const { return end_iterator; }
 };
 
-/// \brief Convenience function for iterating over sub-ranges.
+/// Convenience function for iterating over sub-ranges.
 ///
 /// This provides a bit of syntactic sugar to make using sub-ranges
 /// in for loops a bit easier. Analogous to std::make_pair().

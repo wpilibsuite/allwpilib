@@ -11,22 +11,32 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_SUPPORT_RAW_OSTREAM_H
-#define LLVM_SUPPORT_RAW_OSTREAM_H
+#ifndef WPIUTIL_WPI_RAW_OSTREAM_H
+#define WPIUTIL_WPI_RAW_OSTREAM_H
 
 #include "wpi/ArrayRef.h"
-#include "wpi/FileSystem.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
+#include <cassert>
+#include <cstddef>
 #include <cstdint>
+#include <cstring>
+#include <string>
 #include <vector>
 #include <system_error>
 
 namespace wpi {
+
 class format_object_base;
 class FormattedString;
 class FormattedNumber;
-template <typename T> class SmallVectorImpl;
+class FormattedBytes;
+
+namespace sys {
+namespace fs {
+enum OpenFlags : unsigned;
+} // end namespace fs
+} // end namespace sys
 
 /// This class implements an extremely fast bulk output stream that can *only*
 /// output to a stream.  It does not support seeking, reopening, rewinding, line
@@ -34,9 +44,6 @@ template <typename T> class SmallVectorImpl;
 /// a chunk at a time.
 class raw_ostream {
 private:
-  void operator=(const raw_ostream &) = delete;
-  raw_ostream(const raw_ostream &) = delete;
-
   /// The buffer is handled in such a way that the buffer is
   /// uninitialized, unbuffered, or out of space when OutBufCur >=
   /// OutBufEnd. Thus a single comparison suffices to determine if we
@@ -66,7 +73,7 @@ private:
 public:
   // color order matches ANSI escape sequence, don't change
   enum Colors {
-    BLACK=0,
+    BLACK = 0,
     RED,
     GREEN,
     YELLOW,
@@ -82,6 +89,9 @@ public:
     // Start out ready to flush.
     OutBufStart = OutBufEnd = OutBufCur = nullptr;
   }
+
+  raw_ostream(const raw_ostream &) = delete;
+  void operator=(const raw_ostream &) = delete;
 
   virtual ~raw_ostream();
 
@@ -196,7 +206,7 @@ public:
     return write(Str.data(), Str.length());
   }
 
-  raw_ostream &operator<<(const wpi::SmallVectorImpl<char> &Str) {
+  raw_ostream &operator<<(const SmallVectorImpl<char> &Str) {
     return write(Str.data(), Str.size());
   }
 
@@ -205,7 +215,7 @@ public:
     return write(Arr.data(), Arr.size());
   }
 
-  raw_ostream &operator<<(const wpi::SmallVectorImpl<uint8_t> &Arr) {
+  raw_ostream &operator<<(const SmallVectorImpl<uint8_t> &Arr) {
     return write(Arr.data(), Arr.size());
   }
 
@@ -214,6 +224,7 @@ public:
   raw_ostream &operator<<(unsigned long long N);
   raw_ostream &operator<<(long long N);
   raw_ostream &operator<<(const void *P);
+
   raw_ostream &operator<<(unsigned int N) {
     return this->operator<<(static_cast<unsigned long>(N));
   }
@@ -246,8 +257,14 @@ public:
   // Formatted output, see the formatHex() function in Support/Format.h.
   raw_ostream &operator<<(const FormattedNumber &);
 
+  // Formatted output, see the format_bytes() function in Support/Format.h.
+  raw_ostream &operator<<(const FormattedBytes &);
+
   /// indent - Insert 'NumSpaces' spaces.
   raw_ostream &indent(unsigned NumSpaces);
+
+  /// write_zeros - Insert 'NumZeros' nulls.
+  raw_ostream &write_zeros(unsigned NumZeros);
 
   /// Changes the foreground color of text that will be output from this point
   /// forward.
@@ -336,6 +353,8 @@ private:
   /// Copy data into the buffer. Size must not be greater than the number of
   /// unused bytes in the buffer.
   void copy_to_buffer(const char *Ptr, size_t Size);
+
+  virtual void anchor();
 };
 
 /// An abstract base class for streams implementations that also support a
@@ -343,6 +362,7 @@ private:
 /// but needs to patch in a header that needs to know the output size.
 class raw_pwrite_stream : public raw_ostream {
   virtual void pwrite_impl(const char *Ptr, size_t Size, uint64_t Offset) = 0;
+  void anchor() override;
 
 public:
   explicit raw_pwrite_stream(bool Unbuffered = false)
@@ -369,9 +389,7 @@ class raw_fd_ostream : public raw_pwrite_stream {
   int FD;
   bool ShouldClose;
 
-  /// Error This flag is true if an error of any kind has been detected.
-  ///
-  bool Error;
+  std::error_code EC;
 
   uint64_t pos;
 
@@ -390,7 +408,9 @@ class raw_fd_ostream : public raw_pwrite_stream {
   size_t preferred_buffer_size() const override;
 
   /// Set the flag indicating that an output error has been encountered.
-  void error_detected() { Error = true; }
+  void error_detected(std::error_code EC) { this->EC = EC; }
+
+  void anchor() override;
 
 public:
   /// Open the specified file for writing. If an error occurs, information
@@ -422,13 +442,13 @@ public:
   /// to the offset specified from the beginning of the file.
   uint64_t seek(uint64_t off);
 
+  std::error_code error() const { return EC; }
+
   /// Return the value of the flag in this raw_fd_ostream indicating whether an
   /// output error has been encountered.
   /// This doesn't implicitly flush any pending output.  Also, it doesn't
   /// guarantee to detect all errors unless the stream has been closed.
-  bool has_error() const {
-    return Error;
-  }
+  bool has_error() const { return bool(EC); }
 
   /// Set the flag read by has_error() to false. If the error flag is set at the
   /// time when this raw_ostream's destructor is called, report_fatal_error is
@@ -439,9 +459,7 @@ public:
   ///    Unless explicitly silenced."
   ///      - from The Zen of Python, by Tim Peters
   ///
-  void clear_error() {
-    Error = false;
-  }
+  void clear_error() { EC = std::error_code(); }
 };
 
 /// This returns a reference to a raw_ostream for standard output. Use it like:
@@ -507,7 +525,8 @@ public:
   explicit raw_svector_ostream(SmallVectorImpl<char> &O) : OS(O) {
     SetUnbuffered();
   }
-  ~raw_svector_ostream() override {}
+
+  ~raw_svector_ostream() override = default;
 
   void flush() = delete;
 
@@ -539,7 +558,8 @@ public:
   explicit raw_vector_ostream(std::vector<char> &O) : OS(O) {
     SetUnbuffered();
   }
-  ~raw_vector_ostream() override {}
+
+  ~raw_vector_ostream() override = default;
 
   void flush() = delete;
 
@@ -571,7 +591,8 @@ public:
   explicit raw_usvector_ostream(SmallVectorImpl<uint8_t> &O) : OS(O) {
     SetUnbuffered();
   }
-  ~raw_usvector_ostream() override {}
+
+  ~raw_usvector_ostream() override = default;
 
   void flush() = delete;
 
@@ -603,7 +624,8 @@ public:
   explicit raw_uvector_ostream(std::vector<uint8_t> &O) : OS(O) {
     SetUnbuffered();
   }
-  ~raw_uvector_ostream() override {}
+
+  ~raw_uvector_ostream() override = default;
 
   void flush() = delete;
 
@@ -623,7 +645,7 @@ class raw_null_ostream : public raw_pwrite_stream {
   uint64_t current_pos() const override;
 
 public:
-  explicit raw_null_ostream() {}
+  explicit raw_null_ostream() = default;
   ~raw_null_ostream() override;
 };
 
@@ -636,6 +658,6 @@ public:
   ~buffer_ostream() override { OS << str(); }
 };
 
-} // end wpi namespace
+} // end namespace wpi
 
 #endif // LLVM_SUPPORT_RAW_OSTREAM_H

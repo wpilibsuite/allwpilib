@@ -26,6 +26,7 @@
 // These two headers must be included last, and make sure shlobj is required
 // after Windows.h to make sure it picks up our definition of _WIN32_WINNT
 #include "WindowsSupport.h"
+#include <shellapi.h>
 #include <shlobj.h>
 
 #undef max
@@ -38,6 +39,7 @@
 using namespace wpi;
 
 using wpi::sys::windows::UTF8ToUTF16;
+using wpi::sys::windows::CurCPToUTF16;
 using wpi::sys::windows::UTF16ToUTF8;
 using wpi::sys::path::widenPath;
 
@@ -87,13 +89,16 @@ std::error_code widenPath(const Twine &Path8,
         return EC;
       FullPath.append(CurPath);
     }
-    // Traverse the requested path, canonicalizing . and .. as we go (because
-    // the \\?\ prefix is documented to treat them as real components).
-    // The iterators don't report separators and append() always attaches
-    // preferred_separator so we don't need to call native() on the result.
+    // Traverse the requested path, canonicalizing . and .. (because the \\?\
+    // prefix is documented to treat them as real components).  Ignore
+    // separators, which can be returned from the iterator if the path has a
+    // drive name.  We don't need to call native() on the result since append()
+    // always attaches preferred_separator.
     for (wpi::sys::path::const_iterator I = wpi::sys::path::begin(Path8Str),
                                          E = wpi::sys::path::end(Path8Str);
                                          I != E; ++I) {
+      if (I->size() == 1 && is_separator((*I)[0]))
+        continue;
       if (I->size() == 1 && *I == ".")
         continue;
       if (I->size() == 2 && *I == "..")
@@ -157,11 +162,11 @@ std::error_code access(const Twine &Path, AccessMode Mode) {
     if (LastError != ERROR_FILE_NOT_FOUND &&
         LastError != ERROR_PATH_NOT_FOUND)
       return mapWindowsError(LastError);
-    return std::make_error_code(std::errc::no_such_file_or_directory);
+    return std::errc::no_such_file_or_directory;
   }
 
   if (Mode == AccessMode::Write && (Attributes & FILE_ATTRIBUTE_READONLY))
-    return std::make_error_code(std::errc::permission_denied);
+    return std::errc::permission_denied;
 
   return std::error_code();
 }
@@ -214,6 +219,15 @@ static bool isReservedName(StringRef path) {
   return false;
 }
 
+static file_type file_type_from_attrs(DWORD Attrs) {
+  return (Attrs & FILE_ATTRIBUTE_DIRECTORY) ? file_type::directory_file
+                                            : file_type::regular_file;
+}
+
+static perms perms_from_attrs(DWORD Attrs) {
+  return (Attrs & FILE_ATTRIBUTE_READONLY) ? (all_read | all_exe) : all_all;
+}
+
 static std::error_code getStatus(HANDLE FileHandle, file_status &Result) {
   if (FileHandle == INVALID_HANDLE_VALUE)
     goto handle_status_error;
@@ -243,19 +257,14 @@ static std::error_code getStatus(HANDLE FileHandle, file_status &Result) {
   if (!::GetFileInformationByHandle(FileHandle, &Info))
     goto handle_status_error;
 
-  {
-    file_type Type = (Info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                         ? file_type::directory_file
-                         : file_type::regular_file;
-    Result =
-        file_status(Type, Info.ftLastAccessTime.dwHighDateTime,
-                    Info.ftLastAccessTime.dwLowDateTime,
-                    Info.ftLastWriteTime.dwHighDateTime,
-                    Info.ftLastWriteTime.dwLowDateTime,
-                    Info.dwVolumeSerialNumber, Info.nFileSizeHigh,
-                    Info.nFileSizeLow, Info.nFileIndexHigh, Info.nFileIndexLow);
-    return std::error_code();
-  }
+  Result = file_status(
+      file_type_from_attrs(Info.dwFileAttributes),
+      perms_from_attrs(Info.dwFileAttributes), Info.nNumberOfLinks,
+      Info.ftLastAccessTime.dwHighDateTime, Info.ftLastAccessTime.dwLowDateTime,
+      Info.ftLastWriteTime.dwHighDateTime, Info.ftLastWriteTime.dwLowDateTime,
+      Info.dwVolumeSerialNumber, Info.nFileSizeHigh, Info.nFileSizeLow,
+      Info.nFileIndexHigh, Info.nFileIndexLow);
+  return std::error_code();
 
 handle_status_error:
   DWORD LastError = ::GetLastError();
@@ -269,7 +278,7 @@ handle_status_error:
   return mapWindowsError(LastError);
 }
 
-std::error_code status(const Twine &path, file_status &result) {
+std::error_code status(const Twine &path, file_status &result, bool Follow) {
   SmallString<128> path_storage;
   SmallVector<wchar_t, 128> path_utf16;
 
@@ -287,27 +296,17 @@ std::error_code status(const Twine &path, file_status &result) {
     return getStatus(INVALID_HANDLE_VALUE, result);
 
   // Handle reparse points.
-  if (attr & FILE_ATTRIBUTE_REPARSE_POINT) {
-    ScopedFileHandle h(
-      ::CreateFileW(path_utf16.begin(),
-                    0, // Attributes only.
-                    FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
-                    NULL,
-                    OPEN_EXISTING,
-                    FILE_FLAG_BACKUP_SEMANTICS,
-                    0));
-    if (!h)
-      return getStatus(INVALID_HANDLE_VALUE, result);
-  }
+  if (!Follow && (attr & FILE_ATTRIBUTE_REPARSE_POINT))
+    Flags |= FILE_FLAG_OPEN_REPARSE_POINT;
 
   ScopedFileHandle h(
       ::CreateFileW(path_utf16.begin(), 0, // Attributes only.
                     FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
-                    NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0));
-    if (!h)
-      return getStatus(INVALID_HANDLE_VALUE, result);
+                    NULL, OPEN_EXISTING, Flags, 0));
+  if (!h)
+    return getStatus(INVALID_HANDLE_VALUE, result);
 
-    return getStatus(h, result);
+  return getStatus(h, result);
 }
 
 std::error_code status(int FD, file_status &Result) {
@@ -315,8 +314,19 @@ std::error_code status(int FD, file_status &Result) {
   return getStatus(FileHandle, Result);
 }
 
+static basic_file_status status_from_find_data(WIN32_FIND_DATAW *FindData) {
+  return basic_file_status(file_type_from_attrs(FindData->dwFileAttributes),
+                           perms_from_attrs(FindData->dwFileAttributes),
+                           FindData->ftLastAccessTime.dwHighDateTime,
+                           FindData->ftLastAccessTime.dwLowDateTime,
+                           FindData->ftLastWriteTime.dwHighDateTime,
+                           FindData->ftLastWriteTime.dwLowDateTime,
+                           FindData->nFileSizeHigh, FindData->nFileSizeLow);
+}
+
 std::error_code detail::directory_iterator_construct(detail::DirIterState &it,
-                                                StringRef path){
+                                                     StringRef path,
+                                                     bool follow_symlinks) {
   SmallVector<wchar_t, 128> path_utf16;
 
   if (std::error_code ec = widenPath(path, path_utf16))
@@ -334,7 +344,9 @@ std::error_code detail::directory_iterator_construct(detail::DirIterState &it,
 
   //  Get the first directory entry.
   WIN32_FIND_DATAW FirstFind;
-  ScopedFindHandle FindHandle(::FindFirstFileW(c_str(path_utf16), &FirstFind));
+  ScopedFindHandle FindHandle(::FindFirstFileExW(
+      c_str(path_utf16), FindExInfoBasic, &FirstFind, FindExSearchNameMatch,
+      NULL, FIND_FIRST_EX_LARGE_FETCH));
   if (!FindHandle)
     return mapWindowsError(::GetLastError());
 
@@ -361,7 +373,8 @@ std::error_code detail::directory_iterator_construct(detail::DirIterState &it,
   it.IterationHandle = intptr_t(FindHandle.take());
   SmallString<128> directory_entry_path(path);
   path::append(directory_entry_path, directory_entry_name_utf8);
-  it.CurrentEntry = directory_entry(directory_entry_path);
+  it.CurrentEntry = directory_entry(directory_entry_path, follow_symlinks,
+                                    status_from_find_data(&FirstFind));
 
   return std::error_code();
 }
@@ -397,12 +410,18 @@ std::error_code detail::directory_iterator_increment(detail::DirIterState &it) {
                       directory_entry_path_utf8))
     return ec;
 
-  it.CurrentEntry.replace_filename(Twine(directory_entry_path_utf8));
+  it.CurrentEntry.replace_filename(Twine(directory_entry_path_utf8),
+                                   status_from_find_data(&FindData));
   return std::error_code();
+}
+
+ErrorOr<basic_file_status> directory_entry::status() const {
+  return Status;
 }
 
 std::error_code openFileForRead(const Twine &Name, int &ResultFD,
                                 SmallVectorImpl<char> *RealPath) {
+  ResultFD = -1;
   SmallVector<wchar_t, 128> PathUTF16;
 
   if (std::error_code EC = widenPath(Name, PathUTF16))
@@ -425,8 +444,8 @@ std::error_code openFileForRead(const Twine &Name, int &ResultFD,
     return EC;
   }
 
-  int FD = ::_open_osfhandle(intptr_t(H), 0);
-  if (FD == -1) {
+  ResultFD = ::_open_osfhandle(intptr_t(H), 0);
+  if (ResultFD == -1) {
     ::CloseHandle(H);
     return mapWindowsError(ERROR_INVALID_HANDLE);
   }
@@ -457,6 +476,7 @@ std::error_code openFileForWrite(const Twine &Name, int &ResultFD,
   assert((!(Flags & F_Excl) || !(Flags & F_Append)) &&
          "Cannot specify both 'excl' and 'append' file creation flags!");
 
+  ResultFD = -1;
   SmallVector<wchar_t, 128> PathUTF16;
 
   if (std::error_code EC = widenPath(Name, PathUTF16))
@@ -465,18 +485,24 @@ std::error_code openFileForWrite(const Twine &Name, int &ResultFD,
   DWORD CreationDisposition;
   if (Flags & F_Excl)
     CreationDisposition = CREATE_NEW;
-  else if (Flags & F_Append)
+  else if ((Flags & F_Append) || (Flags & F_NoTrunc))
     CreationDisposition = OPEN_ALWAYS;
   else
     CreationDisposition = CREATE_ALWAYS;
 
   DWORD Access = GENERIC_WRITE;
+  DWORD Attributes = FILE_ATTRIBUTE_NORMAL;
   if (Flags & F_RW)
     Access |= GENERIC_READ;
+  if (Flags & F_Delete) {
+    Access |= DELETE;
+    Attributes |= FILE_FLAG_DELETE_ON_CLOSE;
+  }
 
-  HANDLE H = ::CreateFileW(PathUTF16.begin(), Access,
-                           FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                           CreationDisposition, FILE_ATTRIBUTE_NORMAL, NULL);
+  HANDLE H =
+      ::CreateFileW(PathUTF16.data(), Access,
+                    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                    NULL, CreationDisposition, Attributes, NULL);
 
   if (H == INVALID_HANDLE_VALUE) {
     DWORD LastError = ::GetLastError();
@@ -498,13 +524,12 @@ std::error_code openFileForWrite(const Twine &Name, int &ResultFD,
   if (Flags & F_Text)
     OpenFlags |= _O_TEXT;
 
-  int FD = ::_open_osfhandle(intptr_t(H), OpenFlags);
-  if (FD == -1) {
+  ResultFD = ::_open_osfhandle(intptr_t(H), OpenFlags);
+  if (ResultFD == -1) {
     ::CloseHandle(H);
     return mapWindowsError(ERROR_INVALID_HANDLE);
   }
 
-  ResultFD = FD;
   return std::error_code();
 }
 
@@ -577,23 +602,26 @@ void system_temp_directory(bool ErasedOnReboot, SmallVectorImpl<char> &Result) {
 } // end namespace path
 
 namespace windows {
-std::error_code UTF8ToUTF16(wpi::StringRef utf8,
-                            wpi::SmallVectorImpl<wchar_t> &utf16) {
-  if (!utf8.empty()) {
-    int len = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8.begin(),
-                                    utf8.size(), utf16.begin(), 0);
+std::error_code CodePageToUTF16(unsigned codepage,
+                                wpi::StringRef original,
+                                wpi::SmallVectorImpl<wchar_t> &utf16) {
+  if (!original.empty()) {
+    int len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.begin(),
+                                    original.size(), utf16.begin(), 0);
 
-    if (len == 0)
+    if (len == 0) {
       return mapWindowsError(::GetLastError());
+    }
 
     utf16.reserve(len + 1);
     utf16.set_size(len);
 
-    len = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8.begin(),
-                                utf8.size(), utf16.begin(), utf16.size());
+    len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.begin(),
+                                original.size(), utf16.begin(), utf16.size());
 
-    if (len == 0)
+    if (len == 0) {
       return mapWindowsError(::GetLastError());
+    }
   }
 
   // Make utf16 null terminated.
@@ -603,32 +631,44 @@ std::error_code UTF8ToUTF16(wpi::StringRef utf8,
   return std::error_code();
 }
 
+std::error_code UTF8ToUTF16(wpi::StringRef utf8,
+                            wpi::SmallVectorImpl<wchar_t> &utf16) {
+  return CodePageToUTF16(CP_UTF8, utf8, utf16);
+}
+
+std::error_code CurCPToUTF16(wpi::StringRef curcp,
+                            wpi::SmallVectorImpl<wchar_t> &utf16) {
+  return CodePageToUTF16(CP_ACP, curcp, utf16);
+}
+
 static
 std::error_code UTF16ToCodePage(unsigned codepage, const wchar_t *utf16,
                                 size_t utf16_len,
-                                wpi::SmallVectorImpl<char> &utf8) {
+                                wpi::SmallVectorImpl<char> &converted) {
   if (utf16_len) {
     // Get length.
-    int len = ::WideCharToMultiByte(codepage, 0, utf16, utf16_len, utf8.begin(),
+    int len = ::WideCharToMultiByte(codepage, 0, utf16, utf16_len, converted.begin(),
                                     0, NULL, NULL);
 
-    if (len == 0)
+    if (len == 0) {
       return mapWindowsError(::GetLastError());
+    }
 
-    utf8.reserve(len);
-    utf8.set_size(len);
+    converted.reserve(len);
+    converted.set_size(len);
 
     // Now do the actual conversion.
-    len = ::WideCharToMultiByte(codepage, 0, utf16, utf16_len, utf8.data(),
-                                utf8.size(), NULL, NULL);
+    len = ::WideCharToMultiByte(codepage, 0, utf16, utf16_len, converted.data(),
+                                converted.size(), NULL, NULL);
 
-    if (len == 0)
+    if (len == 0) {
       return mapWindowsError(::GetLastError());
+    }
   }
 
-  // Make utf8 null terminated.
-  utf8.push_back(0);
-  utf8.pop_back();
+  // Make the new string null terminated.
+  converted.push_back(0);
+  converted.pop_back();
 
   return std::error_code();
 }
@@ -639,8 +679,8 @@ std::error_code UTF16ToUTF8(const wchar_t *utf16, size_t utf16_len,
 }
 
 std::error_code UTF16ToCurCP(const wchar_t *utf16, size_t utf16_len,
-                             wpi::SmallVectorImpl<char> &utf8) {
-  return UTF16ToCodePage(CP_ACP, utf16, utf16_len, utf8);
+                             wpi::SmallVectorImpl<char> &curcp) {
+  return UTF16ToCodePage(CP_ACP, utf16, utf16_len, curcp);
 }
 
 } // end namespace windows
