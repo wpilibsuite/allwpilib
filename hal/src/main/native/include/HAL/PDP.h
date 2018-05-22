@@ -15,18 +15,19 @@
 extern "C" {
 #endif
 
-void HAL_InitializePDP(int32_t module, int32_t* status);
+HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status);
+void HAL_CleanPDP(HAL_PDPHandle handle);
 HAL_Bool HAL_CheckPDPChannel(int32_t channel);
 HAL_Bool HAL_CheckPDPModule(int32_t module);
-double HAL_GetPDPTemperature(int32_t module, int32_t* status);
-double HAL_GetPDPVoltage(int32_t module, int32_t* status);
-double HAL_GetPDPChannelCurrent(int32_t module, int32_t channel,
+double HAL_GetPDPTemperature(HAL_PDPHandle handle, int32_t* status);
+double HAL_GetPDPVoltage(HAL_PDPHandle handle, int32_t* status);
+double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
                                 int32_t* status);
-double HAL_GetPDPTotalCurrent(int32_t module, int32_t* status);
-double HAL_GetPDPTotalPower(int32_t module, int32_t* status);
-double HAL_GetPDPTotalEnergy(int32_t module, int32_t* status);
-void HAL_ResetPDPTotalEnergy(int32_t module, int32_t* status);
-void HAL_ClearPDPStickyFaults(int32_t module, int32_t* status);
+double HAL_GetPDPTotalCurrent(HAL_PDPHandle handle, int32_t* status);
+double HAL_GetPDPTotalPower(HAL_PDPHandle handle, int32_t* status);
+double HAL_GetPDPTotalEnergy(HAL_PDPHandle handle, int32_t* status);
+void HAL_ResetPDPTotalEnergy(HAL_PDPHandle handle, int32_t* status);
+void HAL_ClearPDPStickyFaults(HAL_PDPHandle handle, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
