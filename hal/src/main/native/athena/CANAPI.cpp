@@ -16,6 +16,7 @@
 #include "HAL/Errors.h"
 #include "HAL/HAL.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
+#include "HALInitializer.h"
 
 using namespace hal;
 
@@ -87,6 +88,7 @@ static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
 HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
                                 int32_t deviceId, HAL_CANDeviceType deviceType,
                                 int32_t* status) {
+  hal::init::CheckInit();
   CheckDeltaTime();
   auto can = std::make_shared<CANStorage>();
 
