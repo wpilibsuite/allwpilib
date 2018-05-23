@@ -23,6 +23,7 @@
 
 #include "wpi/TCPStream.h"
 
+#include <errno.h>
 #include <fcntl.h>
 
 #ifdef _WIN32
