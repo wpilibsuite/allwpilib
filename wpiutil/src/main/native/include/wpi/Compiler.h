@@ -192,7 +192,7 @@
 /// errors, just use it in GCC 4.0 and later.
 #ifndef LLVM_ATTRIBUTE_ALWAYS_INLINE
 #if __has_attribute(always_inline) || LLVM_GNUC_PREREQ(4, 0, 0)
-#define LLVM_ATTRIBUTE_ALWAYS_INLINE __attribute__((always_inline))
+#define LLVM_ATTRIBUTE_ALWAYS_INLINE __attribute__((always_inline)) inline
 #elif defined(_MSC_VER)
 #define LLVM_ATTRIBUTE_ALWAYS_INLINE __forceinline
 #else
