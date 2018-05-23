@@ -247,9 +247,9 @@ TEST_F(ValueDeathTest, GetAssertions) {
   ASSERT_DEATH(v.GetDouble(), "type == NT_DOUBLE");
   ASSERT_DEATH(v.GetString(), "type == NT_STRING");
   ASSERT_DEATH(v.GetRaw(), "type == NT_RAW");
-  ASSERT_DEATH(v.GetBooleanArray(), "type == NT_BOOLEAN_ARRAY");
-  ASSERT_DEATH(v.GetDoubleArray(), "type == NT_DOUBLE_ARRAY");
-  ASSERT_DEATH(v.GetStringArray(), "type == NT_STRING_ARRAY");
+  ASSERT_DEATH((void)v.GetBooleanArray(), "type == NT_BOOLEAN_ARRAY");
+  ASSERT_DEATH((void)v.GetDoubleArray(), "type == NT_DOUBLE_ARRAY");
+  ASSERT_DEATH((void)v.GetStringArray(), "type == NT_STRING_ARRAY");
 }
 
 TEST_F(ValueTest, UnassignedComparison) {
