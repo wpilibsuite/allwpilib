@@ -133,6 +133,7 @@ public:
 /// subset of the information returned by a regular sys::fs::status() call, and
 /// represents the information provided by Windows FileFirstFile/FindNextFile.
 class basic_file_status {
+protected:
   #ifndef _WIN32
   time_t fs_st_atime = 0;
   time_t fs_st_mtime = 0;

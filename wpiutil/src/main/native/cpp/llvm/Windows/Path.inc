@@ -162,11 +162,11 @@ std::error_code access(const Twine &Path, AccessMode Mode) {
     if (LastError != ERROR_FILE_NOT_FOUND &&
         LastError != ERROR_PATH_NOT_FOUND)
       return mapWindowsError(LastError);
-    return std::errc::no_such_file_or_directory;
+    return std::make_error_code(std::errc::no_such_file_or_directory);
   }
 
   if (Mode == AccessMode::Write && (Attributes & FILE_ATTRIBUTE_READONLY))
-    return std::errc::permission_denied;
+    return std::make_error_code(std::errc::permission_denied);
 
   return std::error_code();
 }
@@ -295,6 +295,7 @@ std::error_code status(const Twine &path, file_status &result, bool Follow) {
   if (attr == INVALID_FILE_ATTRIBUTES)
     return getStatus(INVALID_HANDLE_VALUE, result);
 
+  DWORD Flags = FILE_FLAG_BACKUP_SEMANTICS;
   // Handle reparse points.
   if (!Follow && (attr & FILE_ATTRIBUTE_REPARSE_POINT))
     Flags |= FILE_FLAG_OPEN_REPARSE_POINT;
@@ -466,7 +467,6 @@ std::error_code openFileForRead(const Twine &Name, int &ResultFD,
     }
   }
 
-  ResultFD = FD;
   return std::error_code();
 }
 
