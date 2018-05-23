@@ -15,7 +15,9 @@
 #include "wpi/SmallPtrSet.h"
 #include "wpi/DenseMapInfo.h"
 #include "wpi/MathExtras.h"
+#include "wpi/memory.h"
 #include <algorithm>
+#include <cassert>
 #include <cstdlib>
 
 using namespace wpi;
@@ -30,8 +32,7 @@ void SmallPtrSetImplBase::shrink_and_clear() {
   NumNonEmpty = NumTombstones = 0;
 
   // Install the new array.  Clear all the buckets to empty.
-  CurArray = (const void**)malloc(sizeof(void*) * CurArraySize);
-  assert(CurArray && "Failed to allocate memory?");
+  CurArray = (const void**)CheckedMalloc(sizeof(void*) * CurArraySize);
   memset(CurArray, -1, CurArraySize*sizeof(void*));
 }
 
@@ -60,38 +61,13 @@ SmallPtrSetImplBase::insert_imp_big(const void *Ptr) {
   return std::make_pair(Bucket, true);
 }
 
-bool SmallPtrSetImplBase::erase_imp(const void * Ptr) {
-  if (isSmall()) {
-    // Check to see if it is in the set.
-    for (const void **APtr = CurArray, **E = CurArray + NumNonEmpty; APtr != E;
-         ++APtr)
-      if (*APtr == Ptr) {
-        // If it is in the set, replace this element.
-        *APtr = getTombstoneMarker();
-        ++NumTombstones;
-        return true;
-      }
-
-    return false;
-  }
-
-  // Okay, we know we have space.  Find a hash bucket.
-  void **Bucket = const_cast<void**>(FindBucketFor(Ptr));
-  if (*Bucket != Ptr) return false;  // Not in the set?
-
-  // Set this as a tombstone.
-  *Bucket = getTombstoneMarker();
-  ++NumTombstones;
-  return true;
-}
-
 const void * const *SmallPtrSetImplBase::FindBucketFor(const void *Ptr) const {
   unsigned Bucket = DenseMapInfo<void *>::getHashValue(Ptr) & (CurArraySize-1);
   unsigned ArraySize = CurArraySize;
   unsigned ProbeAmt = 1;
   const void *const *Array = CurArray;
   const void *const *Tombstone = nullptr;
-  while (1) {
+  while (true) {
     // If we found an empty bucket, the pointer doesn't exist in the set.
     // Return a tombstone if we've seen one so far, or the empty bucket if
     // not.
@@ -120,8 +96,7 @@ void SmallPtrSetImplBase::Grow(unsigned NewSize) {
   bool WasSmall = isSmall();
 
   // Install the new array.  Clear all the buckets to empty.
-  CurArray = (const void**)malloc(sizeof(void*) * NewSize);
-  assert(CurArray && "Failed to allocate memory?");
+  CurArray = (const void**) CheckedMalloc(sizeof(void*) * NewSize);
   CurArraySize = NewSize;
   memset(CurArray, -1, NewSize*sizeof(void*));
 
@@ -148,8 +123,7 @@ SmallPtrSetImplBase::SmallPtrSetImplBase(const void **SmallStorage,
     CurArray = SmallArray;
   // Otherwise, allocate new heap space (unless we were the same size)
   } else {
-    CurArray = (const void**)malloc(sizeof(void*) * that.CurArraySize);
-    assert(CurArray && "Failed to allocate memory?");
+    CurArray = (const void**)CheckedMalloc(sizeof(void*) * that.CurArraySize);
   }
 
   // Copy over the that array.

@@ -9,9 +9,6 @@
 #define WPIUTIL_WPI_MEMORY_H_
 
 #include <cstdlib>
-#include <exception>
-
-#include "wpi/raw_ostream.h"
 
 namespace wpi {
 
@@ -21,28 +18,14 @@ namespace wpi {
  * @param size number of bytes per object to allocate
  * @return Pointer to beginning of newly allocated memory.
  */
-inline void* CheckedCalloc(size_t num, size_t size) {
-  void* p = std::calloc(num, size);
-  if (!p) {
-    errs() << "FATAL: failed to allocate " << (num * size) << " bytes\n";
-    std::terminate();
-  }
-  return p;
-}
+void* CheckedCalloc(size_t num, size_t size);
 
 /**
  * Wrapper around std::malloc that calls std::terminate on out of memory.
  * @param size number of bytes to allocate
  * @return Pointer to beginning of newly allocated memory.
  */
-inline void* CheckedMalloc(size_t size) {
-  void* p = std::malloc(size == 0 ? 1 : size);
-  if (!p) {
-    errs() << "FATAL: failed to allocate " << size << " bytes\n";
-    std::terminate();
-  }
-  return p;
-}
+void* CheckedMalloc(size_t size);
 
 /**
  * Wrapper around std::realloc that calls std::terminate on out of memory.
@@ -50,14 +33,7 @@ inline void* CheckedMalloc(size_t size) {
  * @param size number of bytes to allocate
  * @return Pointer to beginning of newly allocated memory.
  */
-inline void* CheckedRealloc(void* ptr, size_t size) {
-  void* p = std::realloc(ptr, size == 0 ? 1 : size);
-  if (!p) {
-    errs() << "FATAL: failed to allocate " << size << " bytes\n";
-    std::terminate();
-  }
-  return p;
-}
+void* CheckedRealloc(void* ptr, size_t size);
 
 }  // namespace wpi
 

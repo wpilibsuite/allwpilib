@@ -620,7 +620,7 @@ cs::MjpegServer CameraServer::AddServer(wpi::StringRef name, int port) {
 
 void CameraServer::AddServer(const cs::VideoSink& server) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  m_sinks.emplace_second(server.GetName(), server);
+  m_sinks.try_emplace(server.GetName(), server);
 }
 
 void CameraServer::RemoveServer(wpi::StringRef name) {
@@ -661,7 +661,7 @@ void CameraServer::AddCamera(const cs::VideoSource& camera) {
   std::string name = camera.GetName();
   std::lock_guard<wpi::mutex> lock(m_mutex);
   if (m_primarySourceName.empty()) m_primarySourceName = name;
-  m_sources.emplace_second(name, camera);
+  m_sources.try_emplace(name, camera);
 }
 
 void CameraServer::RemoveCamera(wpi::StringRef name) {

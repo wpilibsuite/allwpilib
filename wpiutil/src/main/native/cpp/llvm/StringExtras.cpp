@@ -13,6 +13,7 @@
 
 #include "wpi/StringExtras.h"
 #include "wpi/SmallVector.h"
+#include "wpi/raw_ostream.h"
 using namespace wpi;
 
 /// StrInStrNoCase - Portable version of strcasestr.  Locates the first
@@ -55,4 +56,19 @@ void wpi::SplitString(StringRef Source,
     OutFragments.push_back(S.first);
     S = getToken(S.second, Delimiters);
   }
+}
+
+void wpi::PrintEscapedString(StringRef Name, raw_ostream &Out) {
+  for (unsigned i = 0, e = Name.size(); i != e; ++i) {
+    unsigned char C = Name[i];
+    if (isprint(C) && C != '\\' && C != '"')
+      Out << C;
+    else
+      Out << '\\' << hexdigit(C >> 4) << hexdigit(C & 0x0F);
+  }
+}
+
+void wpi::printLowerCase(StringRef String, raw_ostream &Out) {
+  for (const char C : String)
+    Out << toLower(C);
 }

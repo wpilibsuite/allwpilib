@@ -12,6 +12,7 @@
 
 #include "wpi/ArrayRef.h"
 #include "wpi/StringRef.h"
+#include "wpi/Twine.h"
 #include "wpi/mutex.h"
 
 namespace wpi {
@@ -25,7 +26,7 @@ class UDPClient {
 
  public:
   explicit UDPClient(Logger& logger);
-  UDPClient(StringRef address, Logger& logger);
+  UDPClient(const Twine& address, Logger& logger);
   UDPClient(const UDPClient& other) = delete;
   UDPClient(UDPClient&& other);
   ~UDPClient();
@@ -36,8 +37,8 @@ class UDPClient {
   int start();
   void shutdown();
   // The passed in address MUST be a resolved IP address.
-  int send(ArrayRef<uint8_t> data, StringRef server, int port);
-  int send(StringRef data, StringRef server, int port);
+  int send(ArrayRef<uint8_t> data, const Twine& server, int port);
+  int send(StringRef data, const Twine& server, int port);
 };
 
 }  // namespace wpi

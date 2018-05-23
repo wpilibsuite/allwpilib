@@ -30,16 +30,29 @@ using namespace wpi;
 namespace {
   using wpi::StringRef;
   using wpi::sys::path::is_separator;
+  using wpi::sys::path::Style;
 
+  inline Style real_style(Style style) {
 #ifdef _WIN32
-  const char *separators = "\\/";
-  const char preferred_separator = '\\';
+    return (style == Style::posix) ? Style::posix : Style::windows;
 #else
-  const char  separators = '/';
-  const char preferred_separator = '/';
+    return (style == Style::windows) ? Style::windows : Style::posix;
 #endif
+  }
 
-  StringRef find_first_component(StringRef path) {
+  inline const char *separators(Style style) {
+    if (real_style(style) == Style::windows)
+      return "\\/";
+    return "/";
+  }
+
+  inline char preferred_separator(Style style) {
+    if (real_style(style) == Style::windows)
+      return '\\';
+    return '/';
+  }
+
+  StringRef find_first_component(StringRef path, Style style) {
     // Look for this first component in the following order.
     // * empty (in this case we return an empty string)
     // * either C: or {//,\\}net.
@@ -49,101 +62,94 @@ namespace {
     if (path.empty())
       return path;
 
-#ifdef _WIN32
-    // C:
-    if (path.size() >= 2 && std::isalpha(static_cast<unsigned char>(path[0])) &&
-        path[1] == ':')
-      return path.substr(0, 2);
-#endif
+    if (real_style(style) == Style::windows) {
+      // C:
+      if (path.size() >= 2 &&
+          std::isalpha(static_cast<unsigned char>(path[0])) && path[1] == ':')
+        return path.substr(0, 2);
+    }
 
     // //net
-    if ((path.size() > 2) &&
-        is_separator(path[0]) &&
-        path[0] == path[1] &&
-        !is_separator(path[2])) {
+    if ((path.size() > 2) && is_separator(path[0], style) &&
+        path[0] == path[1] && !is_separator(path[2], style)) {
       // Find the next directory separator.
-      size_t end = path.find_first_of(separators, 2);
+      size_t end = path.find_first_of(separators(style), 2);
       return path.substr(0, end);
     }
 
     // {/,\}
-    if (is_separator(path[0]))
+    if (is_separator(path[0], style))
       return path.substr(0, 1);
 
     // * {file,directory}name
-    size_t end = path.find_first_of(separators);
+    size_t end = path.find_first_of(separators(style));
     return path.substr(0, end);
   }
 
-  size_t filename_pos(StringRef str) {
-    if (str.size() == 2 &&
-        is_separator(str[0]) &&
-        str[0] == str[1])
-      return 0;
-
-    if (str.size() > 0 && is_separator(str[str.size() - 1]))
+  // Returns the first character of the filename in str. For paths ending in
+  // '/', it returns the position of the '/'.
+  size_t filename_pos(StringRef str, Style style) {
+    if (str.size() > 0 && is_separator(str[str.size() - 1], style))
       return str.size() - 1;
 
-    size_t pos = str.find_last_of(separators, str.size() - 1);
+    size_t pos = str.find_last_of(separators(style), str.size() - 1);
 
-#ifdef _WIN32
-    if (pos == StringRef::npos)
-      pos = str.find_last_of(':', str.size() - 2);
-#endif
+    if (real_style(style) == Style::windows) {
+      if (pos == StringRef::npos)
+        pos = str.find_last_of(':', str.size() - 2);
+    }
 
-    if (pos == StringRef::npos ||
-        (pos == 1 && is_separator(str[0])))
+    if (pos == StringRef::npos || (pos == 1 && is_separator(str[0], style)))
       return 0;
 
     return pos + 1;
   }
 
-  size_t root_dir_start(StringRef str) {
+  // Returns the position of the root directory in str. If there is no root
+  // directory in str, it returns StringRef::npos.
+  size_t root_dir_start(StringRef str, Style style) {
     // case "c:/"
-#ifdef _WIN32
-    if (str.size() > 2 &&
-        str[1] == ':' &&
-        is_separator(str[2]))
-      return 2;
-#endif
-
-    // case "//"
-    if (str.size() == 2 &&
-        is_separator(str[0]) &&
-        str[0] == str[1])
-      return StringRef::npos;
+    if (real_style(style) == Style::windows) {
+      if (str.size() > 2 && str[1] == ':' && is_separator(str[2], style))
+        return 2;
+    }
 
     // case "//net"
-    if (str.size() > 3 &&
-        is_separator(str[0]) &&
-        str[0] == str[1] &&
-        !is_separator(str[2])) {
-      return str.find_first_of(separators, 2);
+    if (str.size() > 3 && is_separator(str[0], style) && str[0] == str[1] &&
+        !is_separator(str[2], style)) {
+      return str.find_first_of(separators(style), 2);
     }
 
     // case "/"
-    if (str.size() > 0 && is_separator(str[0]))
+    if (str.size() > 0 && is_separator(str[0], style))
       return 0;
 
     return StringRef::npos;
   }
 
-  size_t parent_path_end(StringRef path) {
-    size_t end_pos = filename_pos(path);
+  // Returns the position past the end of the "parent path" of path. The parent
+  // path will not end in '/', unless the parent is the root directory. If the
+  // path has no parent, 0 is returned.
+  size_t parent_path_end(StringRef path, Style style) {
+    size_t end_pos = filename_pos(path, style);
 
-    bool filename_was_sep = path.size() > 0 && is_separator(path[end_pos]);
+    bool filename_was_sep =
+        path.size() > 0 && is_separator(path[end_pos], style);
 
-    // Skip separators except for root dir.
-    size_t root_dir_pos = root_dir_start(path.substr(0, end_pos));
-
-    while(end_pos > 0 &&
-          (end_pos - 1) != root_dir_pos &&
-          is_separator(path[end_pos - 1]))
+    // Skip separators until we reach root dir (or the start of the string).
+    size_t root_dir_pos = root_dir_start(path, style);
+    while (end_pos > 0 &&
+           (root_dir_pos == StringRef::npos || end_pos > root_dir_pos) &&
+           is_separator(path[end_pos - 1], style))
       --end_pos;
 
-    if (end_pos == 1 && root_dir_pos == 0 && filename_was_sep)
-      return StringRef::npos;
+    if (end_pos == root_dir_pos && !filename_was_sep) {
+      // We've reached the root dir and the input path was *not* ending in a
+      // sequence of slashes. Include the root dir in the parent path.
+      return root_dir_pos + 1;
+    }
 
+    // Otherwise, just include before the last slash.
     return end_pos;
   }
 } // end unnamed namespace
@@ -152,11 +158,12 @@ namespace wpi {
 namespace sys  {
 namespace path {
 
-const_iterator begin(StringRef path) {
+const_iterator begin(StringRef path, Style style) {
   const_iterator i;
   i.Path      = path;
-  i.Component = find_first_component(path);
+  i.Component = find_first_component(path, style);
   i.Position  = 0;
+  i.S = style;
   return i;
 }
 
@@ -181,32 +188,26 @@ const_iterator &const_iterator::operator++() {
 
   // Both POSIX and Windows treat paths that begin with exactly two separators
   // specially.
-  bool was_net = Component.size() > 2 &&
-    is_separator(Component[0]) &&
-    Component[1] == Component[0] &&
-    !is_separator(Component[2]);
+  bool was_net = Component.size() > 2 && is_separator(Component[0], S) &&
+                 Component[1] == Component[0] && !is_separator(Component[2], S);
 
   // Handle separators.
-  if (is_separator(Path[Position])) {
+  if (is_separator(Path[Position], S)) {
     // Root dir.
-    if (was_net
-#ifdef _WIN32
+    if (was_net ||
         // c:/
-        || Component.endswith(":")
-#endif
-        ) {
+        (real_style(S) == Style::windows && Component.endswith(":"))) {
       Component = Path.substr(Position, 1);
       return *this;
     }
 
     // Skip extra separators.
-    while (Position != Path.size() &&
-           is_separator(Path[Position])) {
+    while (Position != Path.size() && is_separator(Path[Position], S)) {
       ++Position;
     }
 
-    // Treat trailing '/' as a '.'.
-    if (Position == Path.size()) {
+    // Treat trailing '/' as a '.', unless it is the root dir.
+    if (Position == Path.size() && Component != "/") {
       --Position;
       Component = ".";
       return *this;
@@ -214,7 +215,7 @@ const_iterator &const_iterator::operator++() {
   }
 
   // Find next component.
-  size_t end_pos = Path.find_first_of(separators, Position);
+  size_t end_pos = Path.find_first_of(separators(S), Position);
   Component = Path.slice(Position, end_pos);
 
   return *this;
@@ -228,10 +229,11 @@ ptrdiff_t const_iterator::operator-(const const_iterator &RHS) const {
   return Position - RHS.Position;
 }
 
-reverse_iterator rbegin(StringRef Path) {
+reverse_iterator rbegin(StringRef Path, Style style) {
   reverse_iterator I;
   I.Path = Path;
   I.Position = Path.size();
+  I.S = style;
   return ++I;
 }
 
@@ -244,27 +246,25 @@ reverse_iterator rend(StringRef Path) {
 }
 
 reverse_iterator &reverse_iterator::operator++() {
-  // If we're at the end and the previous char was a '/', return '.' unless
-  // we are the root path.
-  size_t root_dir_pos = root_dir_start(Path);
-  if (Position == Path.size() &&
-      Path.size() > root_dir_pos + 1 &&
-      is_separator(Path[Position - 1])) {
+  size_t root_dir_pos = root_dir_start(Path, S);
+
+  // Skip separators unless it's the root directory.
+  size_t end_pos = Position;
+  while (end_pos > 0 && (end_pos - 1) != root_dir_pos &&
+         is_separator(Path[end_pos - 1], S))
+    --end_pos;
+
+  // Treat trailing '/' as a '.', unless it is the root dir.
+  if (Position == Path.size() && !Path.empty() &&
+      is_separator(Path.back(), S) &&
+      (root_dir_pos == StringRef::npos || end_pos - 1 > root_dir_pos)) {
     --Position;
     Component = ".";
     return *this;
   }
 
-  // Skip separators unless it's the root directory.
-  size_t end_pos = Position;
-
-  while(end_pos > 0 &&
-        (end_pos - 1) != root_dir_pos &&
-        is_separator(Path[end_pos - 1]))
-    --end_pos;
-
   // Find next separator.
-  size_t start_pos = filename_pos(Path.substr(0, end_pos));
+  size_t start_pos = filename_pos(Path.substr(0, end_pos), S);
   Component = Path.slice(start_pos, end_pos);
   Position = start_pos;
   return *this;
@@ -279,21 +279,15 @@ ptrdiff_t reverse_iterator::operator-(const reverse_iterator &RHS) const {
   return Position - RHS.Position;
 }
 
-StringRef root_path(StringRef path) {
-  const_iterator b = begin(path),
-                 pos = b,
-                 e = end(path);
+StringRef root_path(StringRef path, Style style) {
+  const_iterator b = begin(path, style), pos = b, e = end(path);
   if (b != e) {
-    bool has_net = b->size() > 2 && is_separator((*b)[0]) && (*b)[1] == (*b)[0];
-    bool has_drive =
-#ifdef _WIN32
-      b->endswith(":");
-#else
-      false;
-#endif
+    bool has_net =
+        b->size() > 2 && is_separator((*b)[0], style) && (*b)[1] == (*b)[0];
+    bool has_drive = (real_style(style) == Style::windows) && b->endswith(":");
 
     if (has_net || has_drive) {
-      if ((++pos != e) && is_separator((*pos)[0])) {
+      if ((++pos != e) && is_separator((*pos)[0], style)) {
         // {C:/,//net/}, so get the first two components.
         return path.substr(0, b->size() + pos->size());
       } else {
@@ -303,7 +297,7 @@ StringRef root_path(StringRef path) {
     }
 
     // POSIX style root directory.
-    if (is_separator((*b)[0])) {
+    if (is_separator((*b)[0], style)) {
       return *b;
     }
   }
@@ -311,17 +305,12 @@ StringRef root_path(StringRef path) {
   return StringRef();
 }
 
-StringRef root_name(StringRef path) {
-  const_iterator b = begin(path),
-                 e = end(path);
+StringRef root_name(StringRef path, Style style) {
+  const_iterator b = begin(path, style), e = end(path);
   if (b != e) {
-    bool has_net = b->size() > 2 && is_separator((*b)[0]) && (*b)[1] == (*b)[0];
-    bool has_drive =
-#ifdef _WIN32
-      b->endswith(":");
-#else
-      false;
-#endif
+    bool has_net =
+        b->size() > 2 && is_separator((*b)[0], style) && (*b)[1] == (*b)[0];
+    bool has_drive = (real_style(style) == Style::windows) && b->endswith(":");
 
     if (has_net || has_drive) {
       // just {C:,//net}, return the first component.
@@ -333,27 +322,21 @@ StringRef root_name(StringRef path) {
   return StringRef();
 }
 
-StringRef root_directory(StringRef path) {
-  const_iterator b = begin(path),
-                 pos = b,
-                 e = end(path);
+StringRef root_directory(StringRef path, Style style) {
+  const_iterator b = begin(path, style), pos = b, e = end(path);
   if (b != e) {
-    bool has_net = b->size() > 2 && is_separator((*b)[0]) && (*b)[1] == (*b)[0];
-    bool has_drive =
-#ifdef _WIN32
-      b->endswith(":");
-#else
-      false;
-#endif
+    bool has_net =
+        b->size() > 2 && is_separator((*b)[0], style) && (*b)[1] == (*b)[0];
+    bool has_drive = (real_style(style) == Style::windows) && b->endswith(":");
 
     if ((has_net || has_drive) &&
         // {C:,//net}, skip to the next component.
-        (++pos != e) && is_separator((*pos)[0])) {
+        (++pos != e) && is_separator((*pos)[0], style)) {
       return *pos;
     }
 
     // POSIX style root directory.
-    if (!has_net && is_separator((*b)[0])) {
+    if (!has_net && is_separator((*b)[0], style)) {
       return *b;
     }
   }
@@ -362,15 +345,13 @@ StringRef root_directory(StringRef path) {
   return StringRef();
 }
 
-StringRef relative_path(StringRef path) {
-  StringRef root = root_path(path);
+StringRef relative_path(StringRef path, Style style) {
+  StringRef root = root_path(path, style);
   return path.substr(root.size());
 }
 
-void append(SmallVectorImpl<char> &path, const Twine &a,
-                                         const Twine &b,
-                                         const Twine &c,
-                                         const Twine &d) {
+void append(SmallVectorImpl<char> &path, Style style, const Twine &a,
+            const Twine &b, const Twine &c, const Twine &d) {
   SmallString<32> a_storage;
   SmallString<32> b_storage;
   SmallString<32> c_storage;
@@ -383,13 +364,11 @@ void append(SmallVectorImpl<char> &path, const Twine &a,
   if (!d.isTriviallyEmpty()) components.push_back(d.toStringRef(d_storage));
 
   for (auto &component : components) {
-    bool path_has_sep = !path.empty() && is_separator(path[path.size() - 1]);
-    bool component_has_sep = !component.empty() && is_separator(component[0]);
-    bool is_root_name = has_root_name(component);
-
+    bool path_has_sep =
+        !path.empty() && is_separator(path[path.size() - 1], style);
     if (path_has_sep) {
       // Strip separators from beginning of component.
-      size_t loc = component.find_first_not_of(separators);
+      size_t loc = component.find_first_not_of(separators(style));
       StringRef c = component.substr(loc);
 
       // Append it.
@@ -397,43 +376,52 @@ void append(SmallVectorImpl<char> &path, const Twine &a,
       continue;
     }
 
-    if (!component_has_sep && !(path.empty() || is_root_name)) {
+    bool component_has_sep =
+        !component.empty() && is_separator(component[0], style);
+    if (!component_has_sep &&
+        !(path.empty() || has_root_name(component, style))) {
       // Add a separator.
-      path.push_back(preferred_separator);
+      path.push_back(preferred_separator(style));
     }
 
     path.append(component.begin(), component.end());
   }
 }
 
-void append(SmallVectorImpl<char> &path,
-            const_iterator begin, const_iterator end) {
-  for (; begin != end; ++begin)
-    path::append(path, *begin);
+void append(SmallVectorImpl<char> &path, const Twine &a, const Twine &b,
+            const Twine &c, const Twine &d) {
+  append(path, Style::native, a, b, c, d);
 }
 
-StringRef parent_path(StringRef path) {
-  size_t end_pos = parent_path_end(path);
+void append(SmallVectorImpl<char> &path, const_iterator begin,
+            const_iterator end, Style style) {
+  for (; begin != end; ++begin)
+    path::append(path, style, *begin);
+}
+
+StringRef parent_path(StringRef path, Style style) {
+  size_t end_pos = parent_path_end(path, style);
   if (end_pos == StringRef::npos)
     return StringRef();
   else
     return path.substr(0, end_pos);
 }
 
-void remove_filename(SmallVectorImpl<char> &path) {
-  size_t end_pos = parent_path_end(StringRef(path.begin(), path.size()));
+void remove_filename(SmallVectorImpl<char> &path, Style style) {
+  size_t end_pos = parent_path_end(StringRef(path.begin(), path.size()), style);
   if (end_pos != StringRef::npos)
     path.set_size(end_pos);
 }
 
-void replace_extension(SmallVectorImpl<char> &path, const Twine &extension) {
+void replace_extension(SmallVectorImpl<char> &path, const Twine &extension,
+                       Style style) {
   StringRef p(path.begin(), path.size());
   SmallString<32> ext_storage;
   StringRef ext = extension.toStringRef(ext_storage);
 
   // Erase existing extension.
   size_t pos = p.find_last_of('.');
-  if (pos != StringRef::npos && pos >= filename_pos(p))
+  if (pos != StringRef::npos && pos >= filename_pos(p, style))
     path.set_size(pos);
 
   // Append '.' if needed.
@@ -445,8 +433,8 @@ void replace_extension(SmallVectorImpl<char> &path, const Twine &extension) {
 }
 
 void replace_path_prefix(SmallVectorImpl<char> &Path,
-                         const StringRef &OldPrefix,
-                         const StringRef &NewPrefix) {
+                         const StringRef &OldPrefix, const StringRef &NewPrefix,
+                         Style style) {
   if (OldPrefix.empty() && NewPrefix.empty())
     return;
 
@@ -462,43 +450,58 @@ void replace_path_prefix(SmallVectorImpl<char> &Path,
 
   StringRef RelPath = OrigPath.substr(OldPrefix.size());
   SmallString<256> NewPath;
-  path::append(NewPath, NewPrefix);
-  path::append(NewPath, RelPath);
+  path::append(NewPath, style, NewPrefix);
+  path::append(NewPath, style, RelPath);
   Path.swap(NewPath);
 }
 
-void native(const Twine &path, SmallVectorImpl<char> &result) {
+void native(const Twine &path, SmallVectorImpl<char> &result, Style style) {
   assert((!path.isSingleStringRef() ||
           path.getSingleStringRef().data() != result.data()) &&
          "path and result are not allowed to overlap!");
   // Clear result.
   result.clear();
   path.toVector(result);
-  native(result);
+  native(result, style);
 }
 
-void native(SmallVectorImpl<char> &Path) {
-#ifdef _WIN32
-  std::replace(Path.begin(), Path.end(), '/', '\\');
-#else
-  for (auto PI = Path.begin(), PE = Path.end(); PI < PE; ++PI) {
-    if (*PI == '\\') {
-      auto PN = PI + 1;
-      if (PN < PE && *PN == '\\')
-        ++PI; // increment once, the for loop will move over the escaped slash
-      else
-        *PI = '/';
+void native(SmallVectorImpl<char> &Path, Style style) {
+  if (Path.empty())
+    return;
+  if (real_style(style) == Style::windows) {
+    std::replace(Path.begin(), Path.end(), '/', '\\');
+    if (Path[0] == '~' && (Path.size() == 1 || is_separator(Path[1], style))) {
+      SmallString<128> PathHome;
+      home_directory(PathHome);
+      PathHome.append(Path.begin() + 1, Path.end());
+      Path = PathHome;
+    }
+  } else {
+    for (auto PI = Path.begin(), PE = Path.end(); PI < PE; ++PI) {
+      if (*PI == '\\') {
+        auto PN = PI + 1;
+        if (PN < PE && *PN == '\\')
+          ++PI; // increment once, the for loop will move over the escaped slash
+        else
+          *PI = '/';
+      }
     }
   }
-#endif
 }
 
-StringRef filename(StringRef path) {
-  return *rbegin(path);
+std::string convert_to_slash(StringRef path, Style style) {
+  if (real_style(style) != Style::windows)
+    return path;
+
+  std::string s = path.str();
+  std::replace(s.begin(), s.end(), '\\', '/');
+  return s;
 }
 
-StringRef stem(StringRef path) {
-  StringRef fname = filename(path);
+StringRef filename(StringRef path, Style style) { return *rbegin(path, style); }
+
+StringRef stem(StringRef path, Style style) {
+  StringRef fname = filename(path, style);
   size_t pos = fname.find_last_of('.');
   if (pos == StringRef::npos)
     return fname;
@@ -510,8 +513,8 @@ StringRef stem(StringRef path) {
       return fname.substr(0, pos);
 }
 
-StringRef extension(StringRef path) {
-  StringRef fname = filename(path);
+StringRef extension(StringRef path, Style style) {
+  StringRef fname = filename(path, style);
   size_t pos = fname.find_last_of('.');
   if (pos == StringRef::npos)
     return StringRef();
@@ -523,132 +526,134 @@ StringRef extension(StringRef path) {
       return fname.substr(pos);
 }
 
-bool is_separator(char value) {
-  switch(value) {
-#ifdef _WIN32
-    case '\\': // fall through
-#endif
-    case '/': return true;
-    default: return false;
-  }
+bool is_separator(char value, Style style) {
+  if (value == '/')
+    return true;
+  if (real_style(style) == Style::windows)
+    return value == '\\';
+  return false;
 }
 
-static const char preferred_separator_string[] = { preferred_separator, '\0' };
-
-StringRef get_separator() {
-  return preferred_separator_string;
+StringRef get_separator(Style style) {
+  if (real_style(style) == Style::windows)
+    return "\\";
+  return "/";
 }
 
-bool has_root_name(const Twine &path) {
+bool has_root_name(const Twine &path, Style style) {
   SmallString<128> path_storage;
   StringRef p = path.toStringRef(path_storage);
 
-  return !root_name(p).empty();
+  return !root_name(p, style).empty();
 }
 
-bool has_root_directory(const Twine &path) {
+bool has_root_directory(const Twine &path, Style style) {
   SmallString<128> path_storage;
   StringRef p = path.toStringRef(path_storage);
 
-  return !root_directory(p).empty();
+  return !root_directory(p, style).empty();
 }
 
-bool has_root_path(const Twine &path) {
+bool has_root_path(const Twine &path, Style style) {
   SmallString<128> path_storage;
   StringRef p = path.toStringRef(path_storage);
 
-  return !root_path(p).empty();
+  return !root_path(p, style).empty();
 }
 
-bool has_relative_path(const Twine &path) {
+bool has_relative_path(const Twine &path, Style style) {
   SmallString<128> path_storage;
   StringRef p = path.toStringRef(path_storage);
 
-  return !relative_path(p).empty();
+  return !relative_path(p, style).empty();
 }
 
-bool has_filename(const Twine &path) {
+bool has_filename(const Twine &path, Style style) {
   SmallString<128> path_storage;
   StringRef p = path.toStringRef(path_storage);
 
-  return !filename(p).empty();
+  return !filename(p, style).empty();
 }
 
-bool has_parent_path(const Twine &path) {
+bool has_parent_path(const Twine &path, Style style) {
   SmallString<128> path_storage;
   StringRef p = path.toStringRef(path_storage);
 
-  return !parent_path(p).empty();
+  return !parent_path(p, style).empty();
 }
 
-bool has_stem(const Twine &path) {
+bool has_stem(const Twine &path, Style style) {
   SmallString<128> path_storage;
   StringRef p = path.toStringRef(path_storage);
 
-  return !stem(p).empty();
+  return !stem(p, style).empty();
 }
 
-bool has_extension(const Twine &path) {
+bool has_extension(const Twine &path, Style style) {
   SmallString<128> path_storage;
   StringRef p = path.toStringRef(path_storage);
 
-  return !extension(p).empty();
+  return !extension(p, style).empty();
 }
 
-bool is_absolute(const Twine &path) {
+bool is_absolute(const Twine &path, Style style) {
   SmallString<128> path_storage;
   StringRef p = path.toStringRef(path_storage);
 
-  bool rootDir = has_root_directory(p),
-#ifdef _WIN32
-       rootName = has_root_name(p);
-#else
-       rootName = true;
-#endif
+  bool rootDir = has_root_directory(p, style);
+  bool rootName =
+      (real_style(style) != Style::windows) || has_root_name(p, style);
 
   return rootDir && rootName;
 }
 
-bool is_relative(const Twine &path) { return !is_absolute(path); }
+bool is_relative(const Twine &path, Style style) {
+  return !is_absolute(path, style);
+}
 
-StringRef remove_leading_dotslash(StringRef Path) {
+StringRef remove_leading_dotslash(StringRef Path, Style style) {
   // Remove leading "./" (or ".//" or "././" etc.)
-  while (Path.size() > 2 && Path[0] == '.' && is_separator(Path[1])) {
+  while (Path.size() > 2 && Path[0] == '.' && is_separator(Path[1], style)) {
     Path = Path.substr(2);
-    while (Path.size() > 0 && is_separator(Path[0]))
+    while (Path.size() > 0 && is_separator(Path[0], style))
       Path = Path.substr(1);
   }
   return Path;
 }
 
-static SmallString<256> remove_dots(StringRef path, bool remove_dot_dot) {
+static SmallString<256> remove_dots(StringRef path, bool remove_dot_dot,
+                                    Style style) {
   SmallVector<StringRef, 16> components;
 
   // Skip the root path, then look for traversal in the components.
-  StringRef rel = path::relative_path(path);
-  for (StringRef C : wpi::make_range(path::begin(rel), path::end(rel))) {
+  StringRef rel = path::relative_path(path, style);
+  for (StringRef C :
+       wpi::make_range(path::begin(rel, style), path::end(rel))) {
     if (C == ".")
       continue;
-    if (remove_dot_dot) {
-      if (C == "..") {
-        if (!components.empty())
-          components.pop_back();
+    // Leading ".." will remain in the path unless it's at the root.
+    if (remove_dot_dot && C == "..") {
+      if (!components.empty() && components.back() != "..") {
+        components.pop_back();
         continue;
       }
+      if (path::is_absolute(path, style))
+        continue;
     }
     components.push_back(C);
   }
 
-  SmallString<256> buffer = path::root_path(path);
+  SmallString<256> buffer = path::root_path(path, style);
   for (StringRef C : components)
-    path::append(buffer, C);
+    path::append(buffer, style, C);
   return buffer;
 }
 
-bool remove_dots(SmallVectorImpl<char> &path, bool remove_dot_dot) {
+bool remove_dots(SmallVectorImpl<char> &path, bool remove_dot_dot,
+                 Style style) {
   StringRef p(path.data(), path.size());
 
-  SmallString<256> result = remove_dots(p, remove_dot_dot);
+  SmallString<256> result = remove_dots(p, remove_dot_dot, style);
   if (result == path)
     return false;
 
@@ -674,12 +679,9 @@ static std::error_code make_absolute(const Twine &current_directory,
                                      bool use_current_directory) {
   StringRef p(path.data(), path.size());
 
-  bool rootDirectory = path::has_root_directory(p),
-#ifdef _WIN32
-       rootName = path::has_root_name(p);
-#else
-       rootName = true;
-#endif
+  bool rootDirectory = path::has_root_directory(p);
+  bool rootName =
+      (real_style(Style::native) != Style::windows) || path::has_root_name(p);
 
   // Already absolute.
   if (rootName && rootDirectory)
@@ -736,15 +738,22 @@ std::error_code make_absolute(SmallVectorImpl<char> &path) {
   return make_absolute(Twine(), path, false);
 }
 
-bool exists(file_status status) {
+bool exists(const basic_file_status &status) {
   return status_known(status) && status.type() != file_type::file_not_found;
 }
 
-bool status_known(file_status s) {
+bool status_known(const basic_file_status &s) {
   return s.type() != file_type::status_error;
 }
 
-bool is_directory(file_status status) {
+file_type get_file_type(const Twine &Path, bool Follow) {
+  file_status st;
+  if (status(Path, st, Follow))
+    return file_type::status_error;
+  return st.type();
+}
+
+bool is_directory(const basic_file_status &status) {
   return status.type() == file_type::directory_file;
 }
 
@@ -756,7 +765,7 @@ std::error_code is_directory(const Twine &path, bool &result) {
   return std::error_code();
 }
 
-bool is_regular_file(file_status status) {
+bool is_regular_file(const basic_file_status &status) {
   return status.type() == file_type::regular_file;
 }
 
@@ -768,7 +777,19 @@ std::error_code is_regular_file(const Twine &path, bool &result) {
   return std::error_code();
 }
 
-bool is_other(file_status status) {
+bool is_symlink_file(const basic_file_status &status) {
+  return status.type() == file_type::symlink_file;
+}
+
+std::error_code is_symlink_file(const Twine &path, bool &result) {
+  file_status st;
+  if (std::error_code ec = status(path, st, false))
+    return ec;
+  result = is_symlink_file(st);
+  return std::error_code();
+}
+
+bool is_other(const basic_file_status &status) {
   return exists(status) &&
          !is_regular_file(status) &&
          !is_directory(status);
@@ -782,15 +803,20 @@ std::error_code is_other(const Twine &Path, bool &Result) {
   return std::error_code();
 }
 
-void directory_entry::replace_filename(const Twine &filename, file_status st) {
+void directory_entry::replace_filename(const Twine &filename,
+                                       basic_file_status st) {
   SmallString<128> path = path::parent_path(Path);
   path::append(path, filename);
   Path = path.str();
   Status = st;
 }
 
-std::error_code directory_entry::status(file_status &result) const {
-  return fs::status(Path, result);
+ErrorOr<perms> getPermissions(const Twine &Path) {
+  file_status Status;
+  if (std::error_code EC = status(Path, Status))
+    return EC;
+
+  return Status.permissions();
 }
 
 } // end namespace fs

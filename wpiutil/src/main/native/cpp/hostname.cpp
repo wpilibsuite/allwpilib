@@ -60,6 +60,6 @@ StringRef GetHostname(SmallVectorImpl<char>& name) {
   name.clear();
   name.append(tmpName, tmpName + std::strlen(tmpName) + 1);
 
-  return StringRef{name.data(), name.size(), true};
+  return StringRef{name.data(), name.size()};
 }
 }  // namespace wpi

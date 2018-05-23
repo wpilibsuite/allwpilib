@@ -262,9 +262,9 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadBooleanValue() {
 
 std::shared_ptr<Value> LoadPersistentImpl::ReadDoubleValue() {
   // need to convert to null-terminated string for std::strtod()
-  wpi::SmallString<64> buf;
+  wpi::SmallString<64> buf = m_line;
   char* end;
-  double v = std::strtod(m_line.c_str(buf), &end);
+  double v = std::strtod(buf.c_str(), &end);
   if (*end != '\0') {
     Warn("invalid double value");
     return nullptr;
@@ -318,9 +318,9 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadDoubleArrayValue() {
     std::tie(tok, m_line) = m_line.split(',');
     tok = tok.trim(" \t");
     // need to convert to null-terminated string for std::strtod()
-    wpi::SmallString<64> buf;
+    wpi::SmallString<64> buf = tok;
     char* end;
-    double v = std::strtod(tok.c_str(buf), &end);
+    double v = std::strtod(buf.c_str(), &end);
     if (*end != '\0') {
       Warn("invalid double value");
       return nullptr;

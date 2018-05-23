@@ -90,6 +90,17 @@
 #ifndef LLVM_SUPPORT_CONVERTUTF_H
 #define LLVM_SUPPORT_CONVERTUTF_H
 
+#include "wpi/ArrayRef.h"
+#include "wpi/StringRef.h"
+
+#include <cstddef>
+#include <string>
+
+// Wrap everything in namespace wpi so that programs can link with wpiutil and
+// their own version of the unicode libraries.
+
+namespace wpi {
+
 /* ---------------------------------------------------------------------
     The following 4 definitions are compiler-specific.
     The C standard does not guarantee that wchar_t has at least
@@ -126,11 +137,6 @@ typedef enum {
   strictConversion = 0,
   lenientConversion
 } ConversionFlags;
-
-/* This is for C++ and does no harm in C */
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 ConversionResult ConvertUTF8toUTF16 (
   const UTF8** sourceStart, const UTF8* sourceEnd,
@@ -174,16 +180,9 @@ Boolean isLegalUTF8String(const UTF8 **source, const UTF8 *sourceEnd);
 
 unsigned getNumBytesForUTF8(UTF8 firstByte);
 
-#ifdef __cplusplus
-}
-
 /*************************************************************************/
 /* Below are LLVM-specific wrappers of the functions above. */
 
-#include "wpi/ArrayRef.h"
-#include "wpi/StringRef.h"
-
-namespace wpi {
 
 /**
  * Convert an Unicode code point to UTF8 sequence.
@@ -247,9 +246,5 @@ bool convertUTF8ToUTF16String(StringRef SrcUTF8,
                               SmallVectorImpl<UTF16> &DstUTF16);
 
 } /* end namespace wpi */
-
-#endif
-
-/* --------------------------------------------------------------------- */
 
 #endif

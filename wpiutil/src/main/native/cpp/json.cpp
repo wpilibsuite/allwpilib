@@ -207,7 +207,7 @@ json::json(initializer_list_t init,
         std::for_each(init.begin(), init.end(), [this](const detail::json_ref<json>& element_ref)
         {
             auto element = element_ref.moved_or_copied();
-            m_value.object->emplace_second(
+            m_value.object->try_emplace(
                 *((*element.m_value.array)[0].m_value.string),
                 std::move((*element.m_value.array)[1]));
         });

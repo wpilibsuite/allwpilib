@@ -9,6 +9,7 @@
 #include <string>
 
 #include <wpi/Base64.h>
+#include <wpi/FileSystem.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>

@@ -160,10 +160,10 @@ void Twine::printRepr(raw_ostream &OS) const {
   OS << ")";
 }
 
-void Twine::dump() const {
+LLVM_DUMP_METHOD void Twine::dump() const {
   print(errs());
 }
 
-void Twine::dumpRepr() const {
+LLVM_DUMP_METHOD void Twine::dumpRepr() const {
   printRepr(errs());
 }
