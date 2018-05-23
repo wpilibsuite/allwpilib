@@ -83,6 +83,7 @@ public abstract class RobotBase implements AutoCloseable {
    * to put this code into it's own task that loads on boot so ensure that it runs.
    */
   protected RobotBase() {
+    initializeHardwareConfiguration();
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     setupCameraServerShared();
     inst.setNetworkIdentity("Robot");
@@ -222,7 +223,9 @@ public abstract class RobotBase implements AutoCloseable {
    */
   @SuppressWarnings("PMD.UnusedFormalParameter")
   public static void main(String... args) {
-    initializeHardwareConfiguration();
+    if (!HAL.initialize(500, 0)) {
+      throw new IllegalStateException("Failed to initialize. Terminating");
+    }
 
     HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
 

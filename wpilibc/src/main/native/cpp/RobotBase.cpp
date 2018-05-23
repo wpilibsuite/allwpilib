@@ -70,6 +70,11 @@ static void SetupCameraServerShared() {
  * boot so ensure that it runs.
  */
 RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
+  if (!HAL_Initialize(500, 0)) {
+    wpi::errs() << "FATAL ERROR: HAL could not be initialized\n";
+    wpi::errs().flush();
+    std::terminate();
+  }
   m_threadId = std::this_thread::get_id();
 
   RobotState::SetImplementation(DriverStation::GetInstance());
