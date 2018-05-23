@@ -71,8 +71,8 @@ public class PWM extends SendableBase implements Sendable {
    * <p>Free the resource associated with the PWM channel and set the value to 0.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_handle == 0) {
       return;
     }

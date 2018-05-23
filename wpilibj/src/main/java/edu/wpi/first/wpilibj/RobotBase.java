@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj.util.WPILibVersion;
  * run to completion before the OperatorControl code could start. In the future the Autonomous code
  * might be spawned as a task, then killed at the end of the Autonomous period.
  */
-public abstract class RobotBase {
+public abstract class RobotBase implements AutoCloseable {
   /**
    * The ID of the main Java thread.
    */
@@ -93,10 +93,15 @@ public abstract class RobotBase {
     LiveWindow.setEnabled(false);
   }
 
+  @Deprecated
+  public void free() {
+  }
+
   /**
    * Free the resources for a RobotBase class.
    */
-  public void free() {
+  @Override
+  public void close() {
   }
 
   /**

@@ -93,9 +93,9 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, Sendable {
   }
 
   @Override
-  public void free() {
-    super.free();
-    m_i2c.free();
+  public void close() {
+    super.close();
+    m_i2c.close();
   }
 
   @Override

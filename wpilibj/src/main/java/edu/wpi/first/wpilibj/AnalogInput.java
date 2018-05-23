@@ -54,8 +54,8 @@ public class AnalogInput extends SensorBase implements PIDSource, Sendable {
    * Channel destructor.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     AnalogJNI.freeAnalogInputPort(m_port);
     m_port = 0;
     m_channel = 0;

@@ -53,10 +53,10 @@ public class NidecBrushless extends SendableBase implements SpeedController, Mot
    * Free the resources used by this object.
    */
   @Override
-  public void free() {
-    super.free();
-    m_dio.free();
-    m_pwm.free();
+  public void close() {
+    super.close();
+    m_dio.close();
+    m_pwm.close();
   }
 
   /**

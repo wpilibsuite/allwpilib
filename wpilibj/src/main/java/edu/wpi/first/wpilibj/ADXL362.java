@@ -93,7 +93,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, Sendable {
     transferBuffer.put(1, kPartIdRegister);
     m_spi.transaction(transferBuffer, transferBuffer, 3);
     if (transferBuffer.get(2) != (byte) 0xF2) {
-      m_spi.free();
+      m_spi.close();
       m_spi = null;
       DriverStation.reportError("could not find ADXL362 on SPI port " + port.value, false);
       return;
@@ -112,10 +112,10 @@ public class ADXL362 extends SensorBase implements Accelerometer, Sendable {
   }
 
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_spi != null) {
-      m_spi.free();
+      m_spi.close();
       m_spi = null;
     }
   }

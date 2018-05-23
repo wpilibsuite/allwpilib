@@ -119,10 +119,10 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable {
    * Delete (free) the accumulator and the analog components used for the gyro.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_analog != null && m_channelAllocated) {
-      m_analog.free();
+      m_analog.close();
     }
     m_analog = null;
     AnalogGyroJNI.freeAnalogGyro(m_gyroHandle);

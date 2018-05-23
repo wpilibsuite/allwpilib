@@ -7,9 +7,7 @@
 
 package edu.wpi.first.wpilibj.sim;
 
-import java.io.Closeable;
-
-public class CallbackStore implements Closeable {
+public class CallbackStore implements AutoCloseable {
   interface CancelCallbackFunc {
     void cancel(int index, int uid);
   }

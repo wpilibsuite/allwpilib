@@ -78,12 +78,12 @@ public class AnalogTrigger extends SensorBase implements Sendable {
    * Release the resources used by this object.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     AnalogJNI.cleanAnalogTrigger(m_port);
     m_port = 0;
     if (m_ownsAnalog && m_analogInput != null) {
-      m_analogInput.free();
+      m_analogInput.close();
     }
   }
 

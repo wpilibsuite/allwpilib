@@ -40,8 +40,8 @@ public class AnalogOutput extends SendableBase implements Sendable {
    * Channel destructor.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     AnalogJNI.freeAnalogOutputPort(m_port);
     m_port = 0;
     m_channel = 0;

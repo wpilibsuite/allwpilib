@@ -67,10 +67,10 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, Sendab
    * Delete the analog components used for the accelerometer.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_analogChannel != null && m_allocatedChannel) {
-      m_analogChannel.free();
+      m_analogChannel.close();
     }
     m_analogChannel = null;
   }

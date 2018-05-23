@@ -55,8 +55,8 @@ public class Solenoid extends SolenoidBase implements Sendable {
    * Destructor.
    */
   @Override
-  public synchronized void free() {
-    super.free();
+  public synchronized void close() {
+    super.close();
     SolenoidJNI.freeSolenoidPort(m_solenoidHandle);
     m_solenoidHandle = 0;
   }

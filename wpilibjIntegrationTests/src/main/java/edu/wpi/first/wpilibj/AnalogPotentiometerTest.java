@@ -42,7 +42,7 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
   @After
   public void tearDown() throws Exception {
     m_potSource.reset();
-    m_pot.free();
+    m_pot.close();
     m_analogIO.teardown();
   }
 

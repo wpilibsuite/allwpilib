@@ -48,8 +48,8 @@ public abstract class InterruptableSensorBase extends SensorBase {
    * Frees the resources for this output.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_interrupt != 0) {
       cancelInterrupts();
     }

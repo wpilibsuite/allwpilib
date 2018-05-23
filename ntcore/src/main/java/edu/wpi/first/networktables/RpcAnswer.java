@@ -10,7 +10,7 @@ package edu.wpi.first.networktables;
 /**
  * NetworkTables Remote Procedure Call (Server Side).
  */
-public final class RpcAnswer {
+public final class RpcAnswer implements AutoCloseable {
   /** Entry handle. */
   public final int entry;
 
@@ -46,10 +46,16 @@ public final class RpcAnswer {
 
   static final byte[] emptyResponse = new byte[] {};
 
+  @Deprecated
+  public void free() {
+    close();
+  }
+
   /**
    * Posts an empty response if one was not previously sent.
    */
-  public synchronized void free() {
+  @Override
+  public synchronized void close() {
     if (call != 0) {
       postResponse(emptyResponse);
     }

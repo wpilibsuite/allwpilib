@@ -12,7 +12,7 @@ package edu.wpi.cscore;
  * consist of multiple images (e.g. from a stereo or depth camera); these
  * are called channels.
  */
-public class VideoSource {
+public class VideoSource implements AutoCloseable {
   public enum Kind {
     kUnknown(0), kUsb(1), kHttp(2), kCv(4);
     private int value;
@@ -39,7 +39,13 @@ public class VideoSource {
     m_handle = handle;
   }
 
-  public synchronized void free() {
+  @Deprecated
+  public void free() {
+    close();
+  }
+
+  @Override
+  public synchronized void close() {
     if (m_handle != 0) {
       CameraServerJNI.releaseSource(m_handle);
     }

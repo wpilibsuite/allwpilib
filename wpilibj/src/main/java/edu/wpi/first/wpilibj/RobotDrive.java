@@ -25,7 +25,7 @@ import static java.util.Objects.requireNonNull;
  *             or {@link edu.wpi.first.wpilibj.drive.MecanumDrive} classes instead.
  */
 @Deprecated
-public class RobotDrive implements MotorSafety {
+public class RobotDrive implements MotorSafety, AutoCloseable {
   protected MotorSafetyHelper m_safetyHelper;
 
   /**
@@ -662,22 +662,28 @@ public class RobotDrive implements MotorSafety {
     m_maxOutput = maxOutput;
   }
 
+  @Deprecated
+  public void free() {
+    close();
+  }
+
   /**
    * Free the speed controllers if they were allocated locally.
    */
-  public void free() {
+  @Override
+  public void close() {
     if (m_allocatedSpeedControllers) {
       if (m_frontLeftMotor != null) {
-        ((PWM) m_frontLeftMotor).free();
+        ((PWM) m_frontLeftMotor).close();
       }
       if (m_frontRightMotor != null) {
-        ((PWM) m_frontRightMotor).free();
+        ((PWM) m_frontRightMotor).close();
       }
       if (m_rearLeftMotor != null) {
-        ((PWM) m_rearLeftMotor).free();
+        ((PWM) m_rearLeftMotor).close();
       }
       if (m_rearRightMotor != null) {
-        ((PWM) m_rearRightMotor).free();
+        ((PWM) m_rearRightMotor).close();
       }
     }
   }

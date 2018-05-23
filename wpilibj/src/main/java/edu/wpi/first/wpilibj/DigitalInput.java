@@ -40,8 +40,8 @@ public class DigitalInput extends DigitalSource implements Sendable {
   /**
    * Frees the resources for this output.
    */
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_interrupt != 0) {
       cancelInterrupts();
     }

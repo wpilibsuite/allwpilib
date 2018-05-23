@@ -66,7 +66,7 @@ public class PIDToleranceTest {
 
   @After
   public void tearDown() throws Exception {
-    m_pid.free();
+    m_pid.close();
     m_pid = null;
   }
 

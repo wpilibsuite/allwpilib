@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  * Base class for all sensors. Stores most recent status information as well as containing utility
  * functions for checking channels and error processing.
  */
-public abstract class SendableBase implements Sendable {
+public abstract class SendableBase implements Sendable, AutoCloseable {
   private String m_name = "";
   private String m_subsystem = "Ungrouped";
 
@@ -35,10 +35,16 @@ public abstract class SendableBase implements Sendable {
     }
   }
 
+  @Deprecated
+  public void free() {
+    close();
+  }
+
   /**
    * Free the resources used by this object.
    */
-  public void free() {
+  @Override
+  public void close() {
     LiveWindow.remove(this);
   }
 

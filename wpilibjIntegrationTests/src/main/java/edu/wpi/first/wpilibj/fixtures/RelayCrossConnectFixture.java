@@ -84,9 +84,9 @@ public abstract class RelayCrossConnectFixture implements ITestFixture {
   @Override
   public boolean teardown() {
     if (!m_freed) {
-      m_relay.free();
-      m_inputOne.free();
-      m_inputTwo.free();
+      m_relay.close();
+      m_inputOne.close();
+      m_inputTwo.close();
       m_freed = true;
     } else {
       throw new RuntimeException("You attempted to free the "

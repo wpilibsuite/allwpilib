@@ -191,21 +191,21 @@ public class Ultrasonic extends SensorBase implements PIDSource, Sendable {
    * sensor).
    */
   @Override
-  public synchronized void free() {
-    super.free();
+  public synchronized void close() {
+    super.close();
     final boolean wasAutomaticMode = m_automaticEnabled;
     setAutomaticMode(false);
     if (m_allocatedChannels) {
       if (m_pingChannel != null) {
-        m_pingChannel.free();
+        m_pingChannel.close();
       }
       if (m_echoChannel != null) {
-        m_echoChannel.free();
+        m_echoChannel.close();
       }
     }
 
     if (m_counter != null) {
-      m_counter.free();
+      m_counter.close();
       m_counter = null;
     }
 

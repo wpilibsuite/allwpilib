@@ -26,8 +26,8 @@ public class ConnectionListenerTest extends TestCase {
 
   @Override
   protected void tearDown() throws Exception {
-    clientInst.free();
-    serverInst.free();
+    clientInst.close();
+    serverInst.close();
   }
 
   private void connect() {
