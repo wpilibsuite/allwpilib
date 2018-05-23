@@ -841,12 +841,12 @@ namespace wpi {
   /// @{
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE
-  inline bool operator==(StringRef LHS, StringRef RHS) noexcept {
+  bool operator==(StringRef LHS, StringRef RHS) noexcept {
     return LHS.equals(RHS);
   }
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE
-  inline bool operator!=(StringRef LHS, StringRef RHS) noexcept {
+  bool operator!=(StringRef LHS, StringRef RHS) noexcept {
     return !(LHS == RHS);
   }
 

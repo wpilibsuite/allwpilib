@@ -196,7 +196,7 @@
 #elif defined(_MSC_VER)
 #define LLVM_ATTRIBUTE_ALWAYS_INLINE __forceinline
 #else
-#define LLVM_ATTRIBUTE_ALWAYS_INLINE
+#define LLVM_ATTRIBUTE_ALWAYS_INLINE inline
 #endif
 #endif
 
