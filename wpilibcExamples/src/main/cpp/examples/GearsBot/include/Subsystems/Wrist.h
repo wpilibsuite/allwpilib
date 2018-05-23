@@ -15,7 +15,7 @@
  * The wrist subsystem is like the elevator, but with a rotational joint instead
  * of a linear joint.
  */
-class Wrist : public PIDSubsystem {
+class Wrist : public frc::PIDSubsystem {
  public:
   Wrist();
 

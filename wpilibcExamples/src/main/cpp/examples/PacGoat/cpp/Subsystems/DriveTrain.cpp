@@ -28,8 +28,8 @@ DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
   m_rightCIMs.SetInverted(true);
 
   // Configure encoders
-  m_rightEncoder.SetPIDSourceType(PIDSourceType::kDisplacement);
-  m_leftEncoder.SetPIDSourceType(PIDSourceType::kDisplacement);
+  m_rightEncoder.SetPIDSourceType(frc::PIDSourceType::kDisplacement);
+  m_leftEncoder.SetPIDSourceType(frc::PIDSourceType::kDisplacement);
 
 #ifndef SIMULATION
   // Converts to feet
@@ -63,8 +63,8 @@ void DriveTrain::TankDrive(double leftAxis, double rightAxis) {
 
 void DriveTrain::Stop() { m_robotDrive.TankDrive(0.0, 0.0); }
 
-Encoder& DriveTrain::GetLeftEncoder() { return m_leftEncoder; }
+frc::Encoder& DriveTrain::GetLeftEncoder() { return m_leftEncoder; }
 
-Encoder& DriveTrain::GetRightEncoder() { return m_rightEncoder; }
+frc::Encoder& DriveTrain::GetRightEncoder() { return m_rightEncoder; }
 
 double DriveTrain::GetAngle() { return m_gyro.GetAngle(); }

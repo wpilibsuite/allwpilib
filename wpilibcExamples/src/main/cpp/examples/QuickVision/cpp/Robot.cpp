@@ -19,7 +19,7 @@ class Robot : public frc::IterativeRobot {
  public:
   void RobotInit() override {
 #if defined(__linux__)
-    CameraServer::GetInstance()->StartAutomaticCapture();
+    frc::CameraServer::GetInstance()->StartAutomaticCapture();
 #else
     wpi::errs() << "Vision only available on Linux.\n";
     wpi::errs().flush();

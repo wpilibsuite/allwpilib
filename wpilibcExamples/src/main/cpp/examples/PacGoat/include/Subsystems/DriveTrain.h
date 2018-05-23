@@ -48,13 +48,13 @@ class DriveTrain : public frc::Subsystem {
    * @return The encoder getting the distance and speed of left side of
    * the drivetrain.
    */
-  Encoder& GetLeftEncoder();
+  frc::Encoder& GetLeftEncoder();
 
   /**
    * @return The encoder getting the distance and speed of right side of
    * the drivetrain.
    */
-  Encoder& GetRightEncoder();
+  frc::Encoder& GetRightEncoder();
 
   /**
    * @return The current angle of the drivetrain.
@@ -73,7 +73,7 @@ class DriveTrain : public frc::Subsystem {
 
   frc::DifferentialDrive m_robotDrive{m_leftCIMs, m_rightCIMs};
 
-  frc::Encoder m_rightEncoder{1, 2, true, Encoder::k4X};
-  frc::Encoder m_leftEncoder{3, 4, false, Encoder::k4X};
+  frc::Encoder m_rightEncoder{1, 2, true, frc::Encoder::k4X};
+  frc::Encoder m_leftEncoder{3, 4, false, frc::Encoder::k4X};
   frc::AnalogGyro m_gyro{0};
 };

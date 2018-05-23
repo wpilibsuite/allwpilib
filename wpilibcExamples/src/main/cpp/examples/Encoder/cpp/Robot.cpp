@@ -77,7 +77,7 @@ class Robot : public frc::IterativeRobot {
    * and defaults to k4X. Faster (k4X) encoding gives greater positional
    * precision but more noise in the rate.
    */
-  frc::Encoder m_encoder{1, 2, false, Encoder::k4X};
+  frc::Encoder m_encoder{1, 2, false, frc::Encoder::k4X};
 };
 
 int main() { return frc::StartRobot<Robot>(); }
