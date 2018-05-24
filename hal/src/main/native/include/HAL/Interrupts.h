@@ -20,7 +20,7 @@ typedef void (*HAL_InterruptHandlerFunction)(uint32_t interruptAssertedMask,
                                              void* param);
 
 HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher, int32_t* status);
-void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status);
+void* HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status);
 
 int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
                              double timeout, HAL_Bool ignorePrevious,

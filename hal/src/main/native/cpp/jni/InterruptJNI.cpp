@@ -156,7 +156,11 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_cleanInterrupts
       << "Interrupt Handle = " << (HAL_InterruptHandle)interruptHandle;
 
   int32_t status = 0;
-  HAL_CleanInterrupts((HAL_InterruptHandle)interruptHandle, &status);
+  auto param =
+      HAL_CleanInterrupts((HAL_InterruptHandle)interruptHandle, &status);
+  if (param) {
+    delete static_cast<InterruptJNI*>(param);
+  }
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
 

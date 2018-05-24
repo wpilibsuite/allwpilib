@@ -105,10 +105,15 @@ HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
 
   return handle;
 }
-void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status) {
+void* HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle,
+                          int32_t* status) {
   HAL_DisableInterrupts(interruptHandle, status);
-  auto interrupt = interruptHandles->Get(interruptHandle);
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
   interruptHandles->Free(interruptHandle);
+  if (anInterrupt == nullptr) {
+    return nullptr;
+  }
+  return anInterrupt->callbackParam;
 }
 
 static void ProcessInterruptDigitalSynchronous(const char* name, void* param,
