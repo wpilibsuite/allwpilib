@@ -12,7 +12,7 @@
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
 
-#include "SensorBase.h"
+#include "SensorUtil.h"
 #include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
@@ -26,7 +26,7 @@ using namespace frc;
  * @param channel The channel number on the roboRIO to represent.
  */
 AnalogOutput::AnalogOutput(int channel) {
-  if (!SensorBase::CheckAnalogOutputChannel(channel)) {
+  if (!SensorUtil::CheckAnalogOutputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
                                "analog output " + wpi::Twine(channel));
     m_channel = std::numeric_limits<int>::max();

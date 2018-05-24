@@ -12,6 +12,7 @@
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
 
+#include "SensorUtil.h"
 #include "SmartDashboard/SendableBuilder.h"
 #include "Timer.h"
 #include "WPIErrors.h"
@@ -25,7 +26,7 @@ using namespace frc;
  *                on-board 4-7 are on the MXP port.
  */
 AnalogInput::AnalogInput(int channel) {
-  if (!SensorBase::CheckAnalogInputChannel(channel)) {
+  if (!SensorUtil::CheckAnalogInputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
                                "Analog Input " + wpi::Twine(channel));
     return;

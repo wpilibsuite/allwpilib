@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj.command;
 import java.util.Enumeration;
 
 import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -40,7 +39,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @see CommandGroup
  * @see IllegalUseOfCommandException
  */
-public abstract class Command extends SendableBase implements Sendable {
+public abstract class Command extends SendableBase {
   /**
    * The time since this command was initialized.
    */

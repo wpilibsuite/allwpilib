@@ -10,7 +10,7 @@
 #include <HAL/Types.h>
 
 #include "ErrorBase.h"
-#include "SensorBase.h"
+#include "SensorUtil.h"
 #include "SmartDashboard/SendableBase.h"
 
 namespace frc {
@@ -33,7 +33,7 @@ namespace frc {
 class Compressor : public ErrorBase, public SendableBase {
  public:
   // Default PCM ID is 0
-  explicit Compressor(int pcmID = SensorBase::GetDefaultSolenoidModule());
+  explicit Compressor(int pcmID = SensorUtil::GetDefaultSolenoidModule());
   ~Compressor() override = default;
 
   void Start();

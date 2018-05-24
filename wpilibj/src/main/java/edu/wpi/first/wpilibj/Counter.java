@@ -28,7 +28,7 @@ import static java.util.Objects.requireNonNull;
  * <p>All counters will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Counter extends SensorBase implements CounterBase, Sendable, PIDSource {
+public class Counter extends SendableBase implements CounterBase, PIDSource {
   /**
    * Mode determines how and what the counter counts.
    */

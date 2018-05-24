@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * ADXL345 I2C Accelerometer.
  */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_I2C extends SensorBase implements Accelerometer, Sendable {
+public class ADXL345_I2C extends SendableBase implements Accelerometer {
   private static final byte kAddress = 0x1D;
   private static final byte kPowerCtlRegister = 0x2D;
   private static final byte kDataFormatRegister = 0x31;

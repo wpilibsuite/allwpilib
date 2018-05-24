@@ -14,7 +14,8 @@
 
 #include "AnalogTrigger.h"
 #include "CounterBase.h"
-#include "SensorBase.h"
+#include "ErrorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -30,7 +31,7 @@ class DigitalGlitchFilter;
  * All counters will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Counter : public SensorBase, public CounterBase {
+class Counter : public ErrorBase, public SendableBase, public CounterBase {
  public:
   enum Mode {
     kTwoPulse = 0,

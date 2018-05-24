@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj.util.AllocationException;
  * accumulated effectively increasing the resolution, while the averaged samples are divided by the
  * number of samples to retain the resolution, but get more stable values.
  */
-public class AnalogInput extends SensorBase implements PIDSource, Sendable {
+public class AnalogInput extends SendableBase implements PIDSource {
   private static final int kAccumulatorSlot = 1;
   int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;
@@ -40,7 +40,7 @@ public class AnalogInput extends SensorBase implements PIDSource, Sendable {
    * @param channel The channel number to represent. 0-3 are on-board 4-7 are on the MXP port.
    */
   public AnalogInput(final int channel) {
-    checkAnalogInputChannel(channel);
+    AnalogJNI.checkAnalogInputChannel(channel);
     m_channel = channel;
 
     final int portHandle = HAL.getPort((byte) channel);
@@ -50,9 +50,6 @@ public class AnalogInput extends SensorBase implements PIDSource, Sendable {
     setName("AnalogInput", channel);
   }
 
-  /**
-   * Channel destructor.
-   */
   @Override
   public void close() {
     super.close();

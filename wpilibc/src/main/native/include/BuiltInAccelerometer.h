@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "SensorBase.h"
+#include "ErrorBase.h"
+#include "SmartDashboard/SendableBase.h"
 #include "interfaces/Accelerometer.h"
 
 namespace frc {
@@ -17,7 +18,9 @@ namespace frc {
  *
  * This class allows access to the roboRIO's internal accelerometer.
  */
-class BuiltInAccelerometer : public SensorBase, public Accelerometer {
+class BuiltInAccelerometer : public ErrorBase,
+                             public SendableBase,
+                             public Accelerometer {
  public:
   explicit BuiltInAccelerometer(Range range = kRange_8G);
 

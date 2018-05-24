@@ -13,8 +13,9 @@
 
 #include "Counter.h"
 #include "CounterBase.h"
+#include "ErrorBase.h"
 #include "PIDSource.h"
-#include "SensorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -36,7 +37,10 @@ class DigitalGlitchFilter;
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Encoder : public SensorBase, public CounterBase, public PIDSource {
+class Encoder : public ErrorBase,
+                public SendableBase,
+                public CounterBase,
+                public PIDSource {
  public:
   enum IndexingType {
     kResetWhileHigh,

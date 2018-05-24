@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * the safety provided by using the pressure switch and closed loop control. You can only turn off
  * closed loop control, thereby stopping the compressor from operating.
  */
-public class Compressor extends SendableBase implements Sendable {
+public class Compressor extends SendableBase {
   private int m_compressorHandle;
   private byte m_module;
 
@@ -49,7 +49,7 @@ public class Compressor extends SendableBase implements Sendable {
    * specifying the CAN ID.}
    */
   public Compressor() {
-    this(SensorBase.getDefaultSolenoidModule());
+    this(SensorUtil.getDefaultSolenoidModule());
   }
 
   /**

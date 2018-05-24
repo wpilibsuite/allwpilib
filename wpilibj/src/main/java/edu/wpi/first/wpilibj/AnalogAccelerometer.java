@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
  * through the sensor. Many sensors have multiple axis and can be treated as multiple devices. Each
  * is calibrated by finding the center value over a period of time.
  */
-public class AnalogAccelerometer extends SensorBase implements PIDSource, Sendable {
+public class AnalogAccelerometer extends SendableBase implements PIDSource {
   private AnalogInput m_analogChannel;
   private double m_voltsPerG = 1.0;
   private double m_zeroGVoltage = 2.5;

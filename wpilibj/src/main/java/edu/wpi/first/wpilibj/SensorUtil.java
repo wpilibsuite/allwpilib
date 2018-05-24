@@ -17,63 +17,60 @@ import edu.wpi.first.wpilibj.hal.RelayJNI;
 import edu.wpi.first.wpilibj.hal.SolenoidJNI;
 
 /**
- * Base class for all sensors. Stores most recent status information as well as containing utility
- * functions for checking channels and error processing.
+ * Stores most recent status information as well as containing utility functions for checking
+ * channels and error processing.
  */
-public abstract class SensorBase extends SendableBase {
+public final class SensorUtil {
   /**
    * Ticks per microsecond.
    */
-  public static final int kSystemClockTicksPerMicrosecond =
-      ConstantsJNI.getSystemClockTicksPerMicrosecond();
+  public static final int kSystemClockTicksPerMicrosecond
+      = ConstantsJNI.getSystemClockTicksPerMicrosecond();
+
   /**
    * Number of digital channels per roboRIO.
    */
   public static final int kDigitalChannels = PortsJNI.getNumDigitalChannels();
+
   /**
    * Number of analog input channels per roboRIO.
    */
   public static final int kAnalogInputChannels = PortsJNI.getNumAnalogInputs();
+
   /**
    * Number of analog output channels per roboRIO.
    */
   public static final int kAnalogOutputChannels = PortsJNI.getNumAnalogOutputs();
+
   /**
    * Number of solenoid channels per module.
    */
   public static final int kSolenoidChannels = PortsJNI.getNumSolenoidChannels();
+
   /**
    * Number of PWM channels per roboRIO.
    */
   public static final int kPwmChannels = PortsJNI.getNumPWMChannels();
+
   /**
    * Number of relay channels per roboRIO.
    */
   public static final int kRelayChannels = PortsJNI.getNumRelayHeaders();
+
   /**
    * Number of power distribution channels per PDP.
    */
   public static final int kPDPChannels = PortsJNI.getNumPDPChannels();
+
   /**
    * Number of power distribution modules per PDP.
    */
   public static final int kPDPModules = PortsJNI.getNumPDPModules();
+
   /**
    * Number of PCM Modules.
    */
   public static final int kPCMModules = PortsJNI.getNumPCMModules();
-
-  private static int m_defaultSolenoidModule = 0;
-
-  /**
-   * Set the default location for the Solenoid module.
-   *
-   * @param moduleNumber The number of the solenoid module to use.
-   */
-  public static void setDefaultSolenoidModule(final int moduleNumber) {
-    checkSolenoidModule(moduleNumber);
-    SensorBase.m_defaultSolenoidModule = moduleNumber;
-  }
 
   /**
    * Verify that the solenoid module is correct.
@@ -231,6 +228,9 @@ public abstract class SensorBase extends SendableBase {
    * @return The number of the default solenoid module.
    */
   public static int getDefaultSolenoidModule() {
-    return SensorBase.m_defaultSolenoidModule;
+    return 0;
+  }
+
+  private SensorUtil() {
   }
 }

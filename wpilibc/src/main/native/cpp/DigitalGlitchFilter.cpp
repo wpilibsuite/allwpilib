@@ -16,6 +16,7 @@
 
 #include "Counter.h"
 #include "Encoder.h"
+#include "SensorUtil.h"
 #include "Utility.h"
 #include "WPIErrors.h"
 

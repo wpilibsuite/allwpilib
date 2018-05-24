@@ -11,8 +11,9 @@
 
 #include <HAL/Types.h>
 
+#include "ErrorBase.h"
 #include "PIDSource.h"
-#include "SensorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -28,7 +29,7 @@ namespace frc {
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-class AnalogInput : public SensorBase, public PIDSource {
+class AnalogInput : public ErrorBase, public SendableBase, public PIDSource {
   friend class AnalogTrigger;
   friend class AnalogGyro;
 

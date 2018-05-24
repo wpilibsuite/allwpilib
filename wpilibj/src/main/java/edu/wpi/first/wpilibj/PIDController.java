@@ -88,9 +88,6 @@ public class PIDController extends PIDBase implements Controller {
     this(Kp, Ki, Kd, Kf, source, output, kDefaultPeriod);
   }
 
-  /**
-   * Free the PID object.
-   */
   @Override
   public void close() {
     super.close();

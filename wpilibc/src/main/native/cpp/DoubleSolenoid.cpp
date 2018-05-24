@@ -11,7 +11,7 @@
 #include <HAL/Ports.h>
 #include <HAL/Solenoid.h>
 
-#include "SensorBase.h"
+#include "SensorUtil.h"
 #include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
@@ -26,7 +26,7 @@ using namespace frc;
  * @param reverseChannel The reverse channel number on the PCM (0..7).
  */
 DoubleSolenoid::DoubleSolenoid(int forwardChannel, int reverseChannel)
-    : DoubleSolenoid(SensorBase::GetDefaultSolenoidModule(), forwardChannel,
+    : DoubleSolenoid(SensorUtil::GetDefaultSolenoidModule(), forwardChannel,
                      reverseChannel) {}
 
 /**
@@ -41,18 +41,18 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
     : SolenoidBase(moduleNumber),
       m_forwardChannel(forwardChannel),
       m_reverseChannel(reverseChannel) {
-  if (!SensorBase::CheckSolenoidModule(m_moduleNumber)) {
+  if (!SensorUtil::CheckSolenoidModule(m_moduleNumber)) {
     wpi_setWPIErrorWithContext(ModuleIndexOutOfRange,
                                "Solenoid Module " + wpi::Twine(m_moduleNumber));
     return;
   }
-  if (!SensorBase::CheckSolenoidChannel(m_forwardChannel)) {
+  if (!SensorUtil::CheckSolenoidChannel(m_forwardChannel)) {
     wpi_setWPIErrorWithContext(
         ChannelIndexOutOfRange,
         "Solenoid Channel " + wpi::Twine(m_forwardChannel));
     return;
   }
-  if (!SensorBase::CheckSolenoidChannel(m_reverseChannel)) {
+  if (!SensorUtil::CheckSolenoidChannel(m_reverseChannel)) {
     wpi_setWPIErrorWithContext(
         ChannelIndexOutOfRange,
         "Solenoid Channel " + wpi::Twine(m_reverseChannel));

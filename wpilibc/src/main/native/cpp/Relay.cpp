@@ -13,7 +13,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "MotorSafetyHelper.h"
-#include "SensorBase.h"
+#include "SensorUtil.h"
 #include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
@@ -30,7 +30,7 @@ using namespace frc;
  */
 Relay::Relay(int channel, Relay::Direction direction)
     : m_channel(channel), m_direction(direction) {
-  if (!SensorBase::CheckRelayChannel(m_channel)) {
+  if (!SensorUtil::CheckRelayChannel(m_channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
                                "Relay Channel " + wpi::Twine(m_channel));
     return;

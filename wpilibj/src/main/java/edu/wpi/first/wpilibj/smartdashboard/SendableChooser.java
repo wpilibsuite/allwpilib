@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj.smartdashboard;
 import java.util.LinkedHashMap;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -28,7 +27,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @param <V> The type of the values to be stored
  */
-public class SendableChooser<V> extends SendableBase implements Sendable {
+public class SendableChooser<V> extends SendableBase {
   /**
    * The key for the default value.
    */

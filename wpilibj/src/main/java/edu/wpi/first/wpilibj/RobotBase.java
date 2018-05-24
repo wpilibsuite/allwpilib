@@ -97,9 +97,6 @@ public abstract class RobotBase implements AutoCloseable {
   public void free() {
   }
 
-  /**
-   * Free the resources for a RobotBase class.
-   */
   @Override
   public void close() {
   }

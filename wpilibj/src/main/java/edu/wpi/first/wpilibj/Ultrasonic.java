@@ -22,7 +22,7 @@ import static java.util.Objects.requireNonNull;
  * echo is received. The time that the line is high determines the round trip distance (time of
  * flight).
  */
-public class Ultrasonic extends SensorBase implements PIDSource, Sendable {
+public class Ultrasonic extends SendableBase implements PIDSource {
   /**
    * The units to return when PIDGet is called.
    */

@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * ADXL345 SPI Accelerometer.
  */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_SPI extends SensorBase implements Accelerometer, Sendable {
+public class ADXL345_SPI extends SendableBase implements Accelerometer {
   private static final int kPowerCtlRegister = 0x2D;
   private static final int kDataFormatRegister = 0x31;
   private static final int kDataRegister = 0x32;

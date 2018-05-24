@@ -26,7 +26,7 @@ import static java.util.Objects.requireNonNull;
  * channels (forward and reverse) to be used independently for something that does not care about
  * voltage polarity (like a solenoid).
  */
-public class Relay extends SendableBase implements MotorSafety, Sendable {
+public class Relay extends SendableBase implements MotorSafety {
   private MotorSafetyHelper m_safetyHelper;
 
   /**
@@ -100,7 +100,7 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
    * set to both lines at 0v.
    */
   private void initRelay() {
-    SensorBase.checkRelayChannel(m_channel);
+    SensorUtil.checkRelayChannel(m_channel);
 
     int portHandle = HAL.getPort((byte) m_channel);
     if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {

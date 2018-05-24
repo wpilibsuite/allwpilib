@@ -13,6 +13,7 @@
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
+#include "SensorUtil.h"
 #include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
@@ -77,7 +78,7 @@ double PowerDistributionPanel::GetTemperature() const {
 double PowerDistributionPanel::GetCurrent(int channel) const {
   int32_t status = 0;
 
-  if (!CheckPDPChannel(channel)) {
+  if (!SensorUtil::CheckPDPChannel(channel)) {
     wpi::SmallString<32> str;
     wpi::raw_svector_ostream buf(str);
     buf << "PDP Channel " << channel;
@@ -174,7 +175,7 @@ void PowerDistributionPanel::ClearStickyFaults() {
 
 void PowerDistributionPanel::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistributionPanel");
-  for (int i = 0; i < kPDPChannels; ++i) {
+  for (int i = 0; i < SensorUtil::kPDPChannels; ++i) {
     builder.AddDoubleProperty("Chan" + wpi::Twine(i),
                               [=]() { return GetCurrent(i); }, nullptr);
   }

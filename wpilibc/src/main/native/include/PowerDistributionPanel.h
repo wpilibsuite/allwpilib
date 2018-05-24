@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "SensorBase.h"
+#include "ErrorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -15,7 +16,7 @@ namespace frc {
  * Class for getting voltage, current, temperature, power and energy from the
  * CAN PDP.
  */
-class PowerDistributionPanel : public SensorBase {
+class PowerDistributionPanel : public ErrorBase, public SendableBase {
  public:
   PowerDistributionPanel();
   explicit PowerDistributionPanel(int module);

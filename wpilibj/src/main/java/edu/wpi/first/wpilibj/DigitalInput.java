@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * elsewhere will automatically allocate digital inputs and outputs as required. This class is only
  * for devices like switches etc. that aren't implemented anywhere else.
  */
-public class DigitalInput extends DigitalSource implements Sendable {
+public class DigitalInput extends DigitalSource {
   private int m_channel = 0;
   private int m_handle = 0;
 
@@ -28,7 +28,7 @@ public class DigitalInput extends DigitalSource implements Sendable {
    * @param channel the DIO channel for the digital input 0-9 are on-board, 10-25 are on the MXP
    */
   public DigitalInput(int channel) {
-    checkDigitalChannel(channel);
+    SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
 
     m_handle = DIOJNI.initializeDIOPort(HAL.getPort((byte) channel), true);
@@ -37,9 +37,7 @@ public class DigitalInput extends DigitalSource implements Sendable {
     setName("DigitalInput", channel);
   }
 
-  /**
-   * Frees the resources for this output.
-   */
+  @Override
   public void close() {
     super.close();
     if (m_interrupt != 0) {

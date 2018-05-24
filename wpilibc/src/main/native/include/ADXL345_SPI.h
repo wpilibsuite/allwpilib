@@ -7,8 +7,9 @@
 
 #pragma once
 
+#include "ErrorBase.h"
 #include "SPI.h"
-#include "SensorBase.h"
+#include "SmartDashboard/SendableBase.h"
 #include "interfaces/Accelerometer.h"
 
 namespace frc {
@@ -19,7 +20,9 @@ namespace frc {
  * This class allows access to an Analog Devices ADXL345 3-axis accelerometer
  * via SPI. This class assumes the sensor is wired in 4-wire SPI mode.
  */
-class ADXL345_SPI : public SensorBase, public Accelerometer {
+class ADXL345_SPI : public ErrorBase,
+                    public SendableBase,
+                    public Accelerometer {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 

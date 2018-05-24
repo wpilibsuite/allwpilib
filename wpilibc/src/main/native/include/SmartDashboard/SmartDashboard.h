@@ -13,13 +13,14 @@
 
 #include <networktables/NetworkTableValue.h>
 
-#include "SensorBase.h"
+#include "ErrorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
 class Sendable;
 
-class SmartDashboard : public SensorBase {
+class SmartDashboard : public ErrorBase, public SendableBase {
  public:
   static void init();
 
