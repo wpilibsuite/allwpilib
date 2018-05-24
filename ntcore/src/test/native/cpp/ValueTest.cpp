@@ -243,10 +243,10 @@ TEST_F(ValueTest, StringArray) {
 
 TEST_F(ValueDeathTest, GetAssertions) {
   Value v;
-  ASSERT_DEATH(v.GetBoolean(), "type == NT_BOOLEAN");
-  ASSERT_DEATH(v.GetDouble(), "type == NT_DOUBLE");
-  ASSERT_DEATH(v.GetString(), "type == NT_STRING");
-  ASSERT_DEATH(v.GetRaw(), "type == NT_RAW");
+  ASSERT_DEATH((void)v.GetBoolean(), "type == NT_BOOLEAN");
+  ASSERT_DEATH((void)v.GetDouble(), "type == NT_DOUBLE");
+  ASSERT_DEATH((void)v.GetString(), "type == NT_STRING");
+  ASSERT_DEATH((void)v.GetRaw(), "type == NT_RAW");
   ASSERT_DEATH((void)v.GetBooleanArray(), "type == NT_BOOLEAN_ARRAY");
   ASSERT_DEATH((void)v.GetDoubleArray(), "type == NT_DOUBLE_ARRAY");
   ASSERT_DEATH((void)v.GetStringArray(), "type == NT_STRING_ARRAY");
