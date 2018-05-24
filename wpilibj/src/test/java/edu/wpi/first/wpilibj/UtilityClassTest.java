@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -23,6 +24,11 @@ import static org.junit.Assert.fail;
 
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class UtilityClassTest {
+  @Before
+  public void setup() {
+    UnitTestUtility.setupMockBase();
+  }
+
   private final Class m_clazz;
 
   protected UtilityClassTest(Class clazz) {
