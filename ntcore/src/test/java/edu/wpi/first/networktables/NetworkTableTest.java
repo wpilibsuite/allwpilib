@@ -9,6 +9,7 @@ package edu.wpi.first.networktables;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import junit.framework.TestCase;
 
 public class NetworkTableTest extends TestCase {

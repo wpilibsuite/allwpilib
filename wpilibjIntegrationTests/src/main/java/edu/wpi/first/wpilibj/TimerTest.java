@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import org.junit.Test;
-
 import java.util.logging.Logger;
+
+import org.junit.Test;
 
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 

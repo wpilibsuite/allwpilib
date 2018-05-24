@@ -82,7 +82,7 @@ subprojects {
     }
 
     checkstyle {
-        toolVersion = "8.1"
+        toolVersion = "8.10"
         configFile = new File(rootDir, "styleguide/checkstyle.xml")
     }
 

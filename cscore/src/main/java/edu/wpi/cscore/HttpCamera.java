@@ -13,9 +13,11 @@ package edu.wpi.cscore;
 public class HttpCamera extends VideoCamera {
   public enum HttpCameraKind {
     kUnknown(0), kMJPGStreamer(1), kCSCore(2), kAxis(3);
+
+    @SuppressWarnings("MemberName")
     private int value;
 
-    private HttpCameraKind(int value) {
+    HttpCameraKind(int value) {
       this.value = value;
     }
 
@@ -24,6 +26,12 @@ public class HttpCamera extends VideoCamera {
     }
   }
 
+  /**
+   * Convert from the numerical representation of kind to an enum type.
+   *
+   * @param kind The numerical representation of kind
+   * @return The kind
+   */
   public static HttpCameraKind getHttpCameraKindFromInt(int kind) {
     switch (kind) {
       case 1: return HttpCameraKind.kMJPGStreamer;

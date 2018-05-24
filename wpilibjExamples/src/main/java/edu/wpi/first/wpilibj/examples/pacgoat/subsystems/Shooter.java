@@ -32,6 +32,9 @@ public class Shooter extends Subsystem {
   //NOTE: currently ignored in simulation
   DigitalInput m_hotGoalSensor = new DigitalInput(3);
 
+  /**
+   * Create a new shooter subsystem.
+   */
   public Shooter() {
     // Put everything to the LiveWindow for testing.
     addChild("Hot Goal Sensor", m_hotGoalSensor);

@@ -8,32 +8,35 @@
 package edu.wpi.first.networktables;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
+
 import edu.wpi.first.wpiutil.RuntimeDetector;
 
 public final class NetworkTablesJNI {
   static boolean libraryLoaded = false;
   static File jniLibrary = null;
+
   static {
     if (!libraryLoaded) {
       try {
         System.loadLibrary("ntcore");
-      } catch (UnsatisfiedLinkError e) {
+      } catch (UnsatisfiedLinkError linkError) {
         try {
           String resname = RuntimeDetector.getLibraryResource("ntcore");
           InputStream is = NetworkTablesJNI.class.getResourceAsStream(resname);
           if (is != null) {
             // create temporary file
-            if (System.getProperty("os.name").startsWith("Windows"))
+            if (System.getProperty("os.name").startsWith("Windows")) {
               jniLibrary = File.createTempFile("NetworkTablesJNI", ".dll");
-            else if (System.getProperty("os.name").startsWith("Mac"))
+            } else if (System.getProperty("os.name").startsWith("Mac")) {
               jniLibrary = File.createTempFile("libNetworkTablesJNI", ".dylib");
-            else
+            } else {
               jniLibrary = File.createTempFile("libNetworkTablesJNI", ".so");
+            }
             // flag for delete on exit
             jniLibrary.deleteOnExit();
             OutputStream os = new FileOutputStream(jniLibrary);

@@ -8,7 +8,7 @@
 package edu.wpi.cscore;
 
 /**
- * Video event
+ * Video event.
  */
 public class VideoEvent {
   public enum Kind {
@@ -30,9 +30,10 @@ public class VideoEvent {
     kNetworkInterfacesChanged(0x4000),
     kTelemetryUpdated(0x8000);
 
+    @SuppressWarnings("MemberName")
     private int value;
 
-    private Kind(int value) {
+    Kind(int value) {
       this.value = value;
     }
 
@@ -41,6 +42,12 @@ public class VideoEvent {
     }
   }
 
+  /**
+   * Convert from the numerical representation of kind to an enum type.
+   *
+   * @param kind The numerical representation of kind
+   * @return The kind
+   */
   public static Kind getKindFromInt(int kind) {
     switch (kind) {
       case 0x0001: return Kind.kSourceCreated;
@@ -76,22 +83,31 @@ public class VideoEvent {
     this.valueStr = valueStr;
   }
 
+  @SuppressWarnings("MemberName")
   public Kind kind;
 
   // Valid for kSource* and kSink* respectively
+  @SuppressWarnings("MemberName")
   public int sourceHandle;
+  @SuppressWarnings("MemberName")
   public int sinkHandle;
 
   // Source/sink/property name
+  @SuppressWarnings("MemberName")
   public String name;
 
   // Fields for kSourceVideoModeChanged event
+  @SuppressWarnings("MemberName")
   public VideoMode mode;
 
   // Fields for kSourceProperty* events
+  @SuppressWarnings("MemberName")
   public int propertyHandle;
+  @SuppressWarnings("MemberName")
   public VideoProperty.Kind propertyKind;
+  @SuppressWarnings("MemberName")
   public int value;
+  @SuppressWarnings("MemberName")
   public String valueStr;
 
   public VideoSource getSource() {

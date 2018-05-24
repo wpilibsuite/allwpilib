@@ -7,13 +7,13 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.RelayJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-
-import java.util.Arrays;
-import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -334,6 +334,6 @@ public class Relay extends SendableBase implements MotorSafety {
     builder.setSmartDashboardType("Relay");
     builder.setSafeState(() -> set(Value.kOff));
     builder.addStringProperty("Value", () -> get().getPrettyValue(),
-        (value) -> set(Value.getValueOf(value).orElse(Value.kOff)));
+        value -> set(Value.getValueOf(value).orElse(Value.kOff)));
   }
 }

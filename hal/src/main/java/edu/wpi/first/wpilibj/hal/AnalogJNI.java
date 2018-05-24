@@ -7,8 +7,9 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-import edu.wpi.first.wpilibj.AccumulatorResult;
 import java.nio.IntBuffer;
+
+import edu.wpi.first.wpilibj.AccumulatorResult;
 
 public class AnalogJNI extends JNIWrapper {
   /**

@@ -7,6 +7,10 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat;
 
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.Collect;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveForward;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.LowGoal;
@@ -17,10 +21,6 @@ import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Collector;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Pivot;
 import edu.wpi.first.wpilibj.examples.pacgoat.triggers.DoubleButton;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.buttons.JoystickButton;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 /**
  * The operator interface of the robot, it has been simplified from the real
  * robot to allow control with a single PS3 joystick. As a result, not all
@@ -29,6 +29,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class OI {
   public Joystick m_joystick = new Joystick(0);
 
+  /**
+   * Create a new OI and all of the buttons on it.
+   */
   public OI() {
     new JoystickButton(m_joystick, 12).whenPressed(new LowGoal());
     new JoystickButton(m_joystick, 10).whenPressed(new Collect());

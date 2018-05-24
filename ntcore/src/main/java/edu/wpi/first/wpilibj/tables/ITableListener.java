@@ -8,13 +8,14 @@
 package edu.wpi.first.wpilibj.tables;
 
 /**
- * A listener that listens to changes in values in a {@link ITable}
+ * A listener that listens to changes in values in a {@link ITable}.
  * @deprecated Use Consumer&lt;{@link edu.wpi.first.networktables.EntryNotification}&gt;,
  * {@link edu.wpi.first.networktables.TableEntryListener}, or
  * {@link edu.wpi.first.networktables.TableListener} as appropriate.
  */
 @FunctionalInterface
 @Deprecated
+@SuppressWarnings("checkstyle:all")
 public interface ITableListener {
     /**
      * Called when a key-value pair is changed in a {@link ITable}

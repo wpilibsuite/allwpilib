@@ -10,9 +10,11 @@ package edu.wpi.cscore;
 public class VideoProperty {
   public enum Kind {
     kNone(0), kBoolean(1), kInteger(2), kString(4), kEnum(8);
+
+    @SuppressWarnings("MemberName")
     private int value;
 
-    private Kind(int value) {
+    Kind(int value) {
       this.value = value;
     }
 
@@ -21,6 +23,12 @@ public class VideoProperty {
     }
   }
 
+  /**
+   * Convert from the numerical representation of kind to an enum type.
+   *
+   * @param kind The numerical representation of kind
+   * @return The kind
+   */
   public static Kind getKindFromInt(int kind) {
     switch (kind) {
       case 1: return Kind.kBoolean;

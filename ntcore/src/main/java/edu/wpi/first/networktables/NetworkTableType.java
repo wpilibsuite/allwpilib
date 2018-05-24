@@ -21,9 +21,10 @@ public enum NetworkTableType {
   kStringArray(0x40),
   kRpc(0x80);
 
+  @SuppressWarnings("MemberName")
   private final int value;
 
-  private NetworkTableType(int value) {
+  NetworkTableType(int value) {
     this.value = value;
   }
 
@@ -31,6 +32,12 @@ public enum NetworkTableType {
     return value;
   }
 
+  /**
+   * Convert from the numerical representation of type to an enum type.
+   *
+   * @param value The numerical representation of kind
+   * @return The kind
+   */
   public static NetworkTableType getFromInt(int value) {
     switch (value) {
       case 0x01: return kBoolean;

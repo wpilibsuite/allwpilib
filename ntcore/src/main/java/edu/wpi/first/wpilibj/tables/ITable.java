@@ -12,10 +12,11 @@ import java.util.Set;
 
 
 /**
- * A table whose values can be read and written to
+ * A table whose values can be read and written to.
  * @deprecated Use {@link edu.wpi.first.networktables.NetworkTable}.
  */
 @Deprecated
+@SuppressWarnings("checkstyle:all")
 public interface ITable {
 
   /**

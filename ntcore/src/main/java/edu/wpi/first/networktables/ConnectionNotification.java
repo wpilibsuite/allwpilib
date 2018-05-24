@@ -14,16 +14,19 @@ public final class ConnectionNotification {
   /**
    *  Listener that was triggered.
    */
+  @SuppressWarnings("MemberName")
   public final int listener;
 
   /**
    * True if event is due to connection being established.
    */
+  @SuppressWarnings("MemberName")
   public final boolean connected;
 
   /**
    * Connection information.
    */
+  @SuppressWarnings("MemberName")
   public final ConnectionInfo conn;
 
   /** Constructor.
@@ -33,16 +36,17 @@ public final class ConnectionNotification {
    * @param connected Connected if true
    * @param conn Connection information
    */
-  public ConnectionNotification(NetworkTableInstance inst, int listener, boolean connected, ConnectionInfo conn) {
-    this.inst = inst;
+  public ConnectionNotification(NetworkTableInstance inst, int listener, boolean connected,
+                                ConnectionInfo conn) {
+    this.m_inst = inst;
     this.listener = listener;
     this.connected = connected;
     this.conn = conn;
   }
 
-  private final NetworkTableInstance inst;
+  private final NetworkTableInstance m_inst;
 
   public NetworkTableInstance getInstance() {
-    return inst;
+    return m_inst;
   }
 }

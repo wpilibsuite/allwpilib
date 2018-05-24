@@ -38,6 +38,9 @@ public class Pivot extends PIDSubsystem {
   // Motor to move the pivot.
   private SpeedController m_motor = new Victor(5);
 
+  /**
+   * Create a new pivot subsystem.
+   */
   public Pivot() {
     super("Pivot", 7.0, 0.0, 8.0);
     setAbsoluteTolerance(0.005);

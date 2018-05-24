@@ -21,14 +21,14 @@ import java.util.function.Consumer;
  */
 public final class NetworkTable {
   /**
-   * The path separator for sub-tables and keys
+   * The path separator for sub-tables and keys.
    *
    */
   public static final char PATH_SEPARATOR = '/';
 
-  private final String path;
-  private final String pathWithSep;
-  private final NetworkTableInstance inst;
+  private final String m_path;
+  private final String m_pathWithSep;
+  private final NetworkTableInstance m_inst;
 
   /**
    * Gets the "base name" of a key. For example, "/foo/bar" becomes "bar".
@@ -121,31 +121,35 @@ public final class NetworkTable {
    * Constructor.  Use NetworkTableInstance.getTable() or getSubTable() instead.
    */
   NetworkTable(NetworkTableInstance inst, String path) {
-    this.path = path;
-    this.pathWithSep = path + PATH_SEPARATOR;
-    this.inst = inst;
+    m_path = path;
+    m_pathWithSep = path + PATH_SEPARATOR;
+    m_inst = inst;
   }
 
   /**
    * Gets the instance for the table.
    * @return Instance
    */
-  public NetworkTableInstance getInstance() { return inst; }
+  public NetworkTableInstance getInstance() {
+    return m_inst;
+  }
 
-  public String toString() { return "NetworkTable: " + path; }
+  public String toString() {
+    return "NetworkTable: " + m_path;
+  }
 
-  private final ConcurrentMap<String, NetworkTableEntry> entries = new ConcurrentHashMap<String, NetworkTableEntry>();
+  private final ConcurrentMap<String, NetworkTableEntry> m_entries = new ConcurrentHashMap<>();
 
   /**
-   * Gets the entry for a subkey.
+   * Gets the entry for a sub key.
    * @param key the key name
    * @return Network table entry.
    */
   public NetworkTableEntry getEntry(String key) {
-    NetworkTableEntry entry = entries.get(key);
+    NetworkTableEntry entry = m_entries.get(key);
     if (entry == null) {
-      entry = inst.getEntry(pathWithSep + key);
-      entries.putIfAbsent(key, entry);
+      entry = m_inst.getEntry(m_pathWithSep + key);
+      m_entries.putIfAbsent(key, entry);
     }
     return entry;
   }
@@ -157,11 +161,13 @@ public final class NetworkTable {
    * @return Listener handle
    */
   public int addEntryListener(TableEntryListener listener, int flags) {
-    final int prefixLen = path.length() + 1;
-    return inst.addEntryListener(pathWithSep, (event) -> {
+    final int prefixLen = m_path.length() + 1;
+    return m_inst.addEntryListener(m_pathWithSep, event -> {
       String relativeKey = event.name.substring(prefixLen);
-      if (relativeKey.indexOf(PATH_SEPARATOR) != -1)  // part of a subtable
+      if (relativeKey.indexOf(PATH_SEPARATOR) != -1) {
+        // part of a sub table
         return;
+      }
       listener.valueChanged(this, relativeKey, event.getEntry(), event.value, event.flags);
     }, flags);
   }
@@ -175,9 +181,8 @@ public final class NetworkTable {
    */
   public int addEntryListener(String key, TableEntryListener listener, int flags) {
     final NetworkTableEntry entry = getEntry(key);
-    return inst.addEntryListener(entry, (event) -> {
-      listener.valueChanged(this, key, entry, event.value, event.flags);
-    }, flags);
+    return m_inst.addEntryListener(entry,
+        event -> listener.valueChanged(this, key, entry, event.value, event.flags), flags);
   }
 
   /**
@@ -185,7 +190,7 @@ public final class NetworkTable {
    * @param listener    listener handle
    */
   public void removeEntryListener(int listener) {
-    inst.removeEntryListener(listener);
+    m_inst.removeEntryListener(listener);
   }
 
   /**
@@ -198,25 +203,28 @@ public final class NetworkTable {
    */
   public int addSubTableListener(TableListener listener, boolean localNotify) {
     int flags = EntryListenerFlags.kNew | EntryListenerFlags.kImmediate;
-    if (localNotify)
+    if (localNotify) {
       flags |= EntryListenerFlags.kLocal;
+    }
 
-    final int prefixLen = path.length() + 1;
+    final int prefixLen = m_path.length() + 1;
     final NetworkTable parent = this;
 
-    return inst.addEntryListener(pathWithSep, new Consumer<EntryNotification>() {
-      final Set<String> notifiedTables = new HashSet<String>();
+    return m_inst.addEntryListener(m_pathWithSep, new Consumer<EntryNotification>() {
+      final Set<String> m_notifiedTables = new HashSet<>();
 
       @Override
       public void accept(EntryNotification event) {
         String relativeKey = event.name.substring(prefixLen);
         int endSubTable = relativeKey.indexOf(PATH_SEPARATOR);
-        if (endSubTable == -1)
+        if (endSubTable == -1) {
           return;
+        }
         String subTableKey = relativeKey.substring(0, endSubTable);
-        if (notifiedTables.contains(subTableKey))
+        if (m_notifiedTables.contains(subTableKey)) {
           return;
-        notifiedTables.add(subTableKey);
+        }
+        m_notifiedTables.add(subTableKey);
         listener.tableCreated(parent, subTableKey, parent.getSubTable(subTableKey));
       }
     }, flags);
@@ -227,7 +235,7 @@ public final class NetworkTable {
    * @param listener    listener handle
    */
   public void removeTableListener(int listener) {
-    inst.removeEntryListener(listener);
+    m_inst.removeEntryListener(listener);
   }
 
   /**
@@ -238,11 +246,11 @@ public final class NetworkTable {
    * @return a sub table relative to this one
    */
   public NetworkTable getSubTable(String key) {
-    return new NetworkTable(inst, pathWithSep + key);
+    return new NetworkTable(m_inst, m_pathWithSep + key);
   }
 
   /**
-   * Checks the table and tells if it contains the specified key
+   * Checks the table and tells if it contains the specified key.
    *
    * @param key the key to search for
    * @return true if the table as a value assigned to the given key
@@ -252,12 +260,15 @@ public final class NetworkTable {
   }
 
   /**
+   * Checks the table and tells if it contains the specified sub table.
+   *
    * @param key the key to search for
-   * @return true if there is a subtable with the key which contains at least
-   * one key/subtable of its own
+   * @return true if there is a subtable with the key which contains at least one key/subtable of
+   *     its own
    */
   public boolean containsSubTable(String key) {
-    int[] handles = NetworkTablesJNI.getEntries(inst.getHandle(), pathWithSep + key + PATH_SEPARATOR, 0);
+    int[] handles = NetworkTablesJNI.getEntries(m_inst.getHandle(),
+        m_pathWithSep + key + PATH_SEPARATOR, 0);
     return handles.length != 0;
   }
 
@@ -267,16 +278,17 @@ public final class NetworkTable {
    * @return keys currently in the table
    */
   public Set<String> getKeys(int types) {
-    Set<String> keys = new HashSet<String>();
-    int prefixLen = path.length() + 1;
-    for (EntryInfo info : inst.getEntryInfo(pathWithSep, types)) {
+    Set<String> keys = new HashSet<>();
+    int prefixLen = m_path.length() + 1;
+    for (EntryInfo info : m_inst.getEntryInfo(m_pathWithSep, types)) {
       String relativeKey = info.name.substring(prefixLen);
-      if (relativeKey.indexOf(PATH_SEPARATOR) != -1)
+      if (relativeKey.indexOf(PATH_SEPARATOR) != -1) {
         continue;
+      }
       keys.add(relativeKey);
       // populate entries as we go
-      if (entries.get(relativeKey) == null) {
-        entries.putIfAbsent(relativeKey, new NetworkTableEntry(inst, info.entry));
+      if (m_entries.get(relativeKey) == null) {
+        m_entries.putIfAbsent(relativeKey, new NetworkTableEntry(m_inst, info.entry));
       }
     }
     return keys;
@@ -295,13 +307,14 @@ public final class NetworkTable {
    * @return subtables currently in the table
    */
   public Set<String> getSubTables() {
-    Set<String> keys = new HashSet<String>();
-    int prefixLen = path.length() + 1;
-    for (EntryInfo info : inst.getEntryInfo(pathWithSep, 0)) {
+    Set<String> keys = new HashSet<>();
+    int prefixLen = m_path.length() + 1;
+    for (EntryInfo info : m_inst.getEntryInfo(m_pathWithSep, 0)) {
       String relativeKey = info.name.substring(prefixLen);
       int endSubTable = relativeKey.indexOf(PATH_SEPARATOR);
-      if (endSubTable == -1)
+      if (endSubTable == -1) {
         continue;
+      }
       keys.add(relativeKey.substring(0, endSubTable));
     }
     return keys;
@@ -318,7 +331,7 @@ public final class NetworkTable {
   }
 
   /**
-   * Put a value in the table
+   * Put a value in the table.
    *
    * @param key the key to be assigned to
    * @param value the value that will be assigned
@@ -339,21 +352,20 @@ public final class NetworkTable {
   }
 
   /**
-   * Gets the value associated with a key as an object
+   * Gets the value associated with a key as an object.
    *
    * @param key the key of the value to look up
-   * @return the value associated with the given key, or nullptr if the key
-   * does not exist
+   * @return the value associated with the given key, or nullptr if the key does not exist
    */
   NetworkTableValue getValue(String key) {
     return getEntry(key).getValue();
   }
 
   /**
-   * {@inheritDoc}
+   * Get the path of the NetworkTable.
    */
   public String getPath() {
-    return path;
+    return m_path;
   }
 
   /**
@@ -363,7 +375,7 @@ public final class NetworkTable {
    * @throws PersistentException if error saving file
    */
   public void saveEntries(String filename) throws PersistentException {
-    inst.saveEntries(filename, pathWithSep);
+    m_inst.saveEntries(filename, m_pathWithSep);
   }
 
   /**
@@ -374,23 +386,23 @@ public final class NetworkTable {
    * @throws PersistentException if error saving file
    */
   public String[] loadEntries(String filename) throws PersistentException {
-    return inst.loadEntries(filename, pathWithSep);
+    return m_inst.loadEntries(filename, m_pathWithSep);
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (o == this) {
+  public boolean equals(Object other) {
+    if (other == this) {
       return true;
     }
-    if (!(o instanceof NetworkTable)) {
+    if (!(other instanceof NetworkTable)) {
       return false;
     }
-    NetworkTable other = (NetworkTable) o;
-    return inst.equals(other.inst) && path.equals(other.path);
+    NetworkTable ntOther = (NetworkTable) other;
+    return m_inst.equals(ntOther.m_inst) && m_path.equals(ntOther.m_path);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(inst, path);
+    return Objects.hash(m_inst, m_path);
   }
 }

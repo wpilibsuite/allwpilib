@@ -9,10 +9,11 @@ package edu.wpi.first.wpilibj.tables;
 
 
 /**
- * Represents an object that has a remote connection
+ * Represents an object that has a remote connection.
  * @deprecated Use {@link edu.wpi.first.networktables.NetworkTableInstance}.
  */
 @Deprecated
+@SuppressWarnings("checkstyle:all")
 public interface IRemote {
   /**
    * Register an object to listen for connection and disconnection events

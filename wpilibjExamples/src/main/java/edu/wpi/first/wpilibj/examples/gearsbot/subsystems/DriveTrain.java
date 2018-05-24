@@ -16,9 +16,10 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.TankDriveWithJoystick;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The DriveTrain subsystem incorporates the sensors and actuators attached to
@@ -39,6 +40,9 @@ public class DriveTrain extends Subsystem {
   private AnalogInput m_rangefinder = new AnalogInput(6);
   private AnalogGyro m_gyro = new AnalogGyro(1);
 
+  /**
+   * Create a new drive train subsystem.
+   */
   public DriveTrain() {
     super();
 
@@ -87,10 +91,8 @@ public class DriveTrain extends Subsystem {
   /**
    * Tank style driving for the DriveTrain.
    *
-   * @param left
-   *            Speed in range [-1,1]
-   * @param right
-   *            Speed in range [-1,1]
+   * @param left Speed in range [-1,1]
+   * @param right Speed in range [-1,1]
    */
   public void drive(double left, double right) {
     m_drive.tankDrive(left, right);

@@ -19,18 +19,18 @@ import java.util.function.Consumer;
 /**
  * NetworkTables Instance.
  *
- * Instances are completely independent from each other.  Table operations on
+ * <p>Instances are completely independent from each other.  Table operations on
  * one instance will not be visible to other instances unless the instances are
  * connected via the network.  The main limitation on instances is that you
  * cannot have two servers on the same network port.  The main utility of
  * instances is for unit testing, but they can also enable one program to
  * connect to two different NetworkTables networks.
  *
- * The global "default" instance (as returned by {@link #getDefault()}) is
+ * <p>The global "default" instance (as returned by {@link #getDefault()}) is
  * always available, and is intended for the common case when there is only
  * a single NetworkTables instance being used in the program.
  *
- * Additional instances can be created with the {@link #create()} function.
+ * <p>Additional instances can be created with the {@link #create()} function.
  * A reference must be kept to the NetworkTableInstance returned by this
  * function to keep it from being garbage collected.
  */
@@ -89,7 +89,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * Get global default instance.
    * @return Global default instance
    */
-  public synchronized static NetworkTableInstance getDefault() {
+  public static synchronized NetworkTableInstance getDefault() {
     if (s_defaultInstance == null) {
       s_defaultInstance = new NetworkTableInstance(NetworkTablesJNI.getDefaultInstance());
     }
@@ -131,7 +131,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * only return a subset of all entries.
    *
    * @param prefix entry name required prefix; only entries whose name
-   * starts with this string are returned
+   *     starts with this string are returned
    * @param types bitmask of types; 0 is treated as a "don't care"
    * @return Array of entries.
    */
@@ -150,7 +150,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * only return a subset of all entries.
    *
    * @param prefix entry name required prefix; only entries whose name
-   * starts with this string are returned
+   *     starts with this string are returned
    * @param types bitmask of types; 0 is treated as a "don't care"
    * @return Array of entry information.
    */
@@ -203,12 +203,12 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
 
   private static class EntryConsumer<T> {
-    final NetworkTableEntry entry;
-    final Consumer<T> consumer;
+    final NetworkTableEntry m_entry;
+    final Consumer<T> m_consumer;
 
     EntryConsumer(NetworkTableEntry entry, Consumer<T> consumer) {
-      this.entry = entry;
-      this.consumer = consumer;
+      m_entry = entry;
+      m_consumer = consumer;
     }
   }
 
@@ -238,7 +238,8 @@ public final class NetworkTableInstance implements AutoCloseable {
             m_entryListenerLock.unlock();
           }
           Thread.currentThread().interrupt();
-          wasInterrupted = true; // don't try to destroy poller, as its handle is likely no longer valid
+          // don't try to destroy poller, as its handle is likely no longer valid
+          wasInterrupted = true;
           break;
         }
         for (EntryNotification event : events) {
@@ -250,11 +251,12 @@ public final class NetworkTableInstance implements AutoCloseable {
             m_entryListenerLock.unlock();
           }
           if (listener != null) {
-            event.entryObject = listener.entry;
+            event.m_entryObject = listener.m_entry;
             try {
-              listener.consumer.accept(event);
+              listener.m_consumer.accept(event);
             } catch (Throwable throwable) {
-              System.err.println("Unhandled exception during entry listener callback: " + throwable.toString());
+              System.err.println("Unhandled exception during entry listener callback: "
+                  + throwable.toString());
               throwable.printStackTrace();
             }
           }
@@ -305,7 +307,9 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param flags             {@link EntryListenerFlags} bitmask
    * @return Listener handle
    */
-  public int addEntryListener(NetworkTableEntry entry, Consumer<EntryNotification> listener, int flags) {
+  public int addEntryListener(NetworkTableEntry entry,
+                              Consumer<EntryNotification> listener,
+                              int flags) {
     if (!equals(entry.getInstance())) {
       throw new IllegalArgumentException("entry does not belong to this instance");
     }
@@ -315,7 +319,8 @@ public final class NetworkTableInstance implements AutoCloseable {
         m_entryListenerPoller = NetworkTablesJNI.createEntryListenerPoller(m_handle);
         startEntryListenerThread();
       }
-      int handle = NetworkTablesJNI.addPolledEntryListener(m_entryListenerPoller, entry.getHandle(), flags);
+      int handle = NetworkTablesJNI.addPolledEntryListener(m_entryListenerPoller, entry.getHandle(),
+          flags);
       m_entryListeners.put(handle, new EntryConsumer<>(entry, listener));
       return handle;
     } finally {
@@ -354,7 +359,8 @@ public final class NetworkTableInstance implements AutoCloseable {
             if (timeout < 0) {
               m_entryListenerWaitQueueCond.await();
             } else {
-              return m_entryListenerWaitQueueCond.await((long) (timeout * 1e9), TimeUnit.NANOSECONDS);
+              return m_entryListenerWaitQueueCond.await((long) (timeout * 1e9),
+                  TimeUnit.NANOSECONDS);
             }
           } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
@@ -369,11 +375,13 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   private final ReentrantLock m_connectionListenerLock = new ReentrantLock();
-  private final Map<Integer, Consumer<ConnectionNotification>> m_connectionListeners = new HashMap<>();
+  private final Map<Integer, Consumer<ConnectionNotification>> m_connectionListeners
+      = new HashMap<>();
   private Thread m_connectionListenerThread;
   private int m_connectionListenerPoller;
   private boolean m_connectionListenerWaitQueue;
-  private final Condition m_connectionListenerWaitQueueCond = m_connectionListenerLock.newCondition();
+  private final Condition m_connectionListenerWaitQueueCond
+      = m_connectionListenerLock.newCondition();
 
   private void startConnectionListenerThread() {
     m_connectionListenerThread = new Thread(() -> {
@@ -394,7 +402,8 @@ public final class NetworkTableInstance implements AutoCloseable {
             m_connectionListenerLock.unlock();
           }
           Thread.currentThread().interrupt();
-          wasInterrupted = true; // don't try to destroy poller, as its handle is likely no longer valid
+          // don't try to destroy poller, as its handle is likely no longer valid
+          wasInterrupted = true;
           break;
         }
         for (ConnectionNotification event : events) {
@@ -409,7 +418,8 @@ public final class NetworkTableInstance implements AutoCloseable {
             try {
               listener.accept(event);
             } catch (Throwable throwable) {
-              System.err.println("Unhandled exception during connection listener callback: " + throwable.toString());
+              System.err.println("Unhandled exception during connection listener callback: "
+                  + throwable.toString());
               throwable.printStackTrace();
             }
           }
@@ -436,14 +446,16 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param immediateNotify Notify listener of all existing connections
    * @return Listener handle
    */
-  public int addConnectionListener(Consumer<ConnectionNotification> listener, boolean immediateNotify) {
+  public int addConnectionListener(Consumer<ConnectionNotification> listener,
+                                   boolean immediateNotify) {
     m_connectionListenerLock.lock();
     try {
       if (m_connectionListenerPoller == 0) {
         m_connectionListenerPoller = NetworkTablesJNI.createConnectionListenerPoller(m_handle);
         startConnectionListenerThread();
       }
-      int handle = NetworkTablesJNI.addPolledConnectionListener(m_connectionListenerPoller, immediateNotify);
+      int handle = NetworkTablesJNI.addPolledConnectionListener(m_connectionListenerPoller,
+          immediateNotify);
       m_connectionListeners.put(handle, listener);
       return handle;
     } finally {
@@ -488,7 +500,8 @@ public final class NetworkTableInstance implements AutoCloseable {
             if (timeout < 0) {
               m_connectionListenerWaitQueueCond.await();
             } else {
-              return m_connectionListenerWaitQueueCond.await((long) (timeout * 1e9), TimeUnit.NANOSECONDS);
+              return m_connectionListenerWaitQueueCond.await((long) (timeout * 1e9),
+                  TimeUnit.NANOSECONDS);
             }
           } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
@@ -532,7 +545,8 @@ public final class NetworkTableInstance implements AutoCloseable {
             m_rpcCallLock.unlock();
           }
           Thread.currentThread().interrupt();
-          wasInterrupted = true; // don't try to destroy poller, as its handle is likely no longer valid
+          // don't try to destroy poller, as its handle is likely no longer valid
+          wasInterrupted = true;
           break;
         }
         for (RpcAnswer event : events) {
@@ -544,11 +558,12 @@ public final class NetworkTableInstance implements AutoCloseable {
             m_rpcCallLock.unlock();
           }
           if (listener != null) {
-            event.entryObject = listener.entry;
+            event.m_entryObject = listener.m_entry;
             try {
-              listener.consumer.accept(event);
+              listener.m_consumer.accept(event);
             } catch (Throwable throwable) {
-              System.err.println("Unhandled exception during RPC callback: " + throwable.toString());
+              System.err.println("Unhandled exception during RPC callback: "
+                  + throwable.toString());
               throwable.printStackTrace();
             }
           }
@@ -707,7 +722,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /**
-   * Starts a client using the specified server and the default port
+   * Starts a client using the specified server and the default port.
    *
    * @param serverName  server name
    */
@@ -716,7 +731,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /**
-   * Starts a client using the specified server and port
+   * Starts a client using the specified server and port.
    *
    * @param serverName  server name
    * @param port        port to communicate over
@@ -992,7 +1007,8 @@ public final class NetworkTableInstance implements AutoCloseable {
           events = NetworkTablesJNI.pollLogger(this, m_loggerPoller);
         } catch (InterruptedException ex) {
           Thread.currentThread().interrupt();
-          wasInterrupted = true; // don't try to destroy poller, as its handle is likely no longer valid
+          // don't try to destroy poller, as its handle is likely no longer valid
+          wasInterrupted = true;
           break;
         }
         for (LogMessage event : events) {
@@ -1007,7 +1023,8 @@ public final class NetworkTableInstance implements AutoCloseable {
             try {
               logger.accept(event);
             } catch (Throwable throwable) {
-              System.err.println("Unhandled exception during logger callback: " + throwable.toString());
+              System.err.println("Unhandled exception during logger callback: "
+                  + throwable.toString());
               throwable.printStackTrace();
             }
           }
@@ -1106,15 +1123,15 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (o == this) {
+  public boolean equals(Object other) {
+    if (other == this) {
       return true;
     }
-    if (!(o instanceof NetworkTableInstance)) {
+    if (!(other instanceof NetworkTableInstance)) {
       return false;
     }
-    NetworkTableInstance other = (NetworkTableInstance) o;
-    return m_handle == other.m_handle;
+
+    return m_handle == ((NetworkTableInstance) other).m_handle;
   }
 
   @Override

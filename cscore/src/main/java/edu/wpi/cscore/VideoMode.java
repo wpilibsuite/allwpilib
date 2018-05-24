@@ -8,14 +8,16 @@
 package edu.wpi.cscore;
 
 /**
- * Video mode
+ * Video mode.
  */
 public class VideoMode {
   public enum PixelFormat {
     kUnknown(0), kMJPEG(1), kYUYV(2), kRGB565(3), kBGR(4), kGray(5);
+
+    @SuppressWarnings("MemberName")
     private int value;
 
-    private PixelFormat(int value) {
+    PixelFormat(int value) {
       this.value = value;
     }
 
@@ -23,12 +25,16 @@ public class VideoMode {
       return value;
     }
   }
+
   private static final PixelFormat[] m_pixelFormatValues = PixelFormat.values();
 
   public static PixelFormat getPixelFormatFromInt(int pixelFormat) {
     return m_pixelFormatValues[pixelFormat];
   }
 
+  /**
+   * Create a new video mode.
+   */
   public VideoMode(int pixelFormat, int width, int height, int fps) {
     this.pixelFormat = getPixelFormatFromInt(pixelFormat);
     this.width = width;
@@ -36,6 +42,9 @@ public class VideoMode {
     this.fps = fps;
   }
 
+  /**
+   * Create a new video mode.
+   */
   public VideoMode(PixelFormat pixelFormat, int width, int height, int fps) {
     this.pixelFormat = pixelFormat;
     this.width = width;
@@ -44,22 +53,26 @@ public class VideoMode {
   }
 
   /**
-   * Pixel format
+   * Pixel format.
    */
+  @SuppressWarnings("MemberName")
   public PixelFormat pixelFormat;
 
   /**
-   * Width in pixels
+   * Width in pixels.
    */
+  @SuppressWarnings("MemberName")
   public int width;
 
   /**
-   * Height in pixels
+   * Height in pixels.
    */
+  @SuppressWarnings("MemberName")
   public int height;
 
   /**
-   * Frames per second
+   * Frames per second.
    */
+  @SuppressWarnings("MemberName")
   public int fps;
 }

@@ -15,43 +15,49 @@ public final class ConnectionInfo {
    * The remote identifier (as set on the remote node by
    * {@link NetworkTableInstance#setNetworkIdentity(String)}).
    */
+  @SuppressWarnings("MemberName")
   public final String remote_id;
 
   /**
    * The IP address of the remote node.
    */
+  @SuppressWarnings("MemberName")
   public final String remote_ip;
 
   /**
    * The port number of the remote node.
    */
+  @SuppressWarnings("MemberName")
   public final int remote_port;
 
   /**
    * The last time any update was received from the remote node (same scale as
    * returned by {@link NetworkTablesJNI#now()}).
    */
+  @SuppressWarnings("MemberName")
   public final long last_update;
 
   /**
    * The protocol version being used for this connection.  This is in protocol
    * layer format, so 0x0200 = 2.0, 0x0300 = 3.0).
    */
+  @SuppressWarnings("MemberName")
   public final int protocol_version;
 
   /** Constructor.
    * This should generally only be used internally to NetworkTables.
-   * @param remote_id Remote identifier
-   * @param remote_ip Remote IP address
-   * @param remote_port Remote port number
-   * @param last_update Last time an update was received
-   * @param protocol_version The protocol version used for the connection
+   * @param remoteId Remote identifier
+   * @param remoteIp Remote IP address
+   * @param remotePort Remote port number
+   * @param lastUpdate Last time an update was received
+   * @param protocolVersion The protocol version used for the connection
    */
-  public ConnectionInfo(String remote_id, String remote_ip, int remote_port, long last_update, int protocol_version) {
-    this.remote_id = remote_id;
-    this.remote_ip = remote_ip;
-    this.remote_port = remote_port;
-    this.last_update = last_update;
-    this.protocol_version = protocol_version;
+  public ConnectionInfo(String remoteId, String remoteIp, int remotePort, long lastUpdate,
+                        int protocolVersion) {
+    remote_id = remoteId;
+    remote_ip = remoteIp;
+    remote_port = remotePort;
+    last_update = lastUpdate;
+    protocol_version = protocolVersion;
   }
 }

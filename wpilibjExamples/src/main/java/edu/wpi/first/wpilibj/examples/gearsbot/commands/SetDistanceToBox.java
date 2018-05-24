@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.command.Command;
+
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
 /**
@@ -22,6 +23,10 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 public class SetDistanceToBox extends Command {
   private PIDController m_pid;
 
+  /**
+   * Create a new set distance to box command.
+   * @param distance The distance away from the box to drive to
+   */
   public SetDistanceToBox(double distance) {
     requires(Robot.m_drivetrain);
     m_pid = new PIDController(-2, 0, 0, new PIDSource() {

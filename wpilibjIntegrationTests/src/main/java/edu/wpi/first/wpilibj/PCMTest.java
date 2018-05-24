@@ -7,12 +7,12 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.logging.Logger;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 

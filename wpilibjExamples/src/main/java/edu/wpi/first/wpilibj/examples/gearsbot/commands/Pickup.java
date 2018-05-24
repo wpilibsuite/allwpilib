@@ -14,6 +14,9 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
  * state to drive around.
  */
 public class Pickup extends CommandGroup {
+  /**
+   * Create a new pickup command.
+   */
   public Pickup() {
     addSequential(new CloseClaw());
     addParallel(new SetWristSetpoint(-45));

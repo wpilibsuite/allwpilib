@@ -10,10 +10,11 @@ package edu.wpi.first.wpilibj.tables;
 import edu.wpi.first.networktables.ConnectionInfo;
 
 /**
- * A listener that listens for connection changes in a {@link IRemote} object
+ * A listener that listens for connection changes in a {@link IRemote} object.
  * @deprecated Use Consumer&lt;{@link edu.wpi.first.networktables.ConnectionNotification}&gt;.
  */
 @Deprecated
+@SuppressWarnings("checkstyle:all")
 public interface IRemoteConnectionListener {
   /**
    * Called when an IRemote is connected

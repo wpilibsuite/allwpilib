@@ -10,6 +10,9 @@ package edu.wpi.first.wpilibj.commands.commandgroup;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
 public class ReplaceMeCommandGroup extends CommandGroup {
+  /**
+   * Add your docs here.
+   */
   public ReplaceMeCommandGroup() {
     // Add Commands here:
     // e.g. addSequential(new Command1());

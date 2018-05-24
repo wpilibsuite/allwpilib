@@ -56,24 +56,36 @@ public class RuntimeDetector {
     }
   }
 
+  /**
+   * Get the file prefix for the current system.
+   */
   public static synchronized String getFilePrefix() {
     computePlatform();
 
     return filePrefix;
   }
 
+  /**
+   * Get the file extension for the current system.
+   */
   public static synchronized String getFileExtension() {
     computePlatform();
 
     return fileExtension;
   }
 
+  /**
+   * Get the platform path for the current system.
+   */
   public static synchronized String getPlatformPath() {
     computePlatform();
 
     return filePath;
   }
 
+  /**
+   * Get the path to the requested resource.
+   */
   public static synchronized String getLibraryResource(String libName) {
     computePlatform();
 

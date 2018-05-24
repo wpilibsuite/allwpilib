@@ -7,13 +7,13 @@
 
 package edu.wpi.first.wpilibj.test;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 /**
  * This JUnit Rule allows you to apply this rule to any test to allow it to run multiple times. This

@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj.examples.pacgoat.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PIDSourceType;
@@ -17,6 +16,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveWithJoystick;
@@ -40,6 +40,9 @@ public class DriveTrain extends Subsystem {
   private Encoder m_leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
   private AnalogGyro m_gyro = new AnalogGyro(2);
 
+  /**
+   * Create a new drive train subsystem.
+   */
   public DriveTrain() {
     // Configure drive motors
     addChild("Front Left CIM", (Victor) m_frontLeftCIM);
