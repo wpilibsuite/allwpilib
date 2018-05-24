@@ -49,9 +49,6 @@ public class NidecBrushless extends SendableBase implements SpeedController, Mot
     setName("Nidec Brushless", pwmChannel);
   }
 
-  /**
-   * Free the resources used by this object.
-   */
   @Override
   public void close() {
     super.close();

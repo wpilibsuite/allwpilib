@@ -7,8 +7,9 @@
 
 #pragma once
 
+#include "ErrorBase.h"
 #include "PIDSource.h"
-#include "SensorBase.h"
+#include "SmartDashboard/SendableBase.h"
 #include "interfaces/Gyro.h"
 
 namespace frc {
@@ -17,7 +18,10 @@ namespace frc {
  * GyroBase is the common base class for Gyro implementations such as
  * AnalogGyro.
  */
-class GyroBase : public Gyro, public SensorBase, public PIDSource {
+class GyroBase : public Gyro,
+                 public ErrorBase,
+                 public SendableBase,
+                 public PIDSource {
  public:
   // PIDSource interface
   double PIDGet() override;

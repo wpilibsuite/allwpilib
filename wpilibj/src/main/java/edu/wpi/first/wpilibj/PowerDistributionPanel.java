@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * Class for getting voltage, current, temperature, power and energy from the Power Distribution
  * Panel over CAN.
  */
-public class PowerDistributionPanel extends SensorBase implements Sendable {
+public class PowerDistributionPanel extends SendableBase {
   private final int m_module;
 
   /**
@@ -24,7 +24,7 @@ public class PowerDistributionPanel extends SensorBase implements Sendable {
    */
   public PowerDistributionPanel(int module) {
     m_module = module;
-    checkPDPModule(module);
+    SensorUtil.checkPDPModule(module);
     PDPJNI.initializePDP(module);
     setName("PowerDistributionPanel", module);
   }
@@ -62,7 +62,7 @@ public class PowerDistributionPanel extends SensorBase implements Sendable {
   public double getCurrent(int channel) {
     double current = PDPJNI.getPDPChannelCurrent((byte) channel, m_module);
 
-    checkPDPChannel(channel);
+    SensorUtil.checkPDPChannel(channel);
 
     return current;
   }
@@ -111,7 +111,7 @@ public class PowerDistributionPanel extends SensorBase implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("PowerDistributionPanel");
-    for (int i = 0; i < kPDPChannels; ++i) {
+    for (int i = 0; i < SensorUtil.kPDPChannels; ++i) {
       final int chan = i;
       builder.addDoubleProperty("Chan" + i, () -> getCurrent(chan), null);
     }

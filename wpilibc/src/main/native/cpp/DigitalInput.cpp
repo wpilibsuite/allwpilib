@@ -13,6 +13,7 @@
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
 
+#include "SensorUtil.h"
 #include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
@@ -26,7 +27,7 @@ using namespace frc;
  * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
  */
 DigitalInput::DigitalInput(int channel) {
-  if (!CheckDigitalChannel(channel)) {
+  if (!SensorUtil::CheckDigitalChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
                                "Digital Channel " + wpi::Twine(channel));
     m_channel = std::numeric_limits<int>::max();

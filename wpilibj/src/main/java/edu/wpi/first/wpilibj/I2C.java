@@ -57,9 +57,6 @@ public class I2C implements AutoCloseable {
     close();
   }
 
-  /**
-   * Destructor.
-   */
   @Override
   public void close() {
     I2CJNI.i2CClose(m_port);

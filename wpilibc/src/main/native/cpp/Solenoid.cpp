@@ -11,7 +11,7 @@
 #include <HAL/Ports.h>
 #include <HAL/Solenoid.h>
 
-#include "SensorBase.h"
+#include "SensorUtil.h"
 #include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
@@ -23,7 +23,7 @@ using namespace frc;
  * @param channel The channel on the PCM to control (0..7).
  */
 Solenoid::Solenoid(int channel)
-    : Solenoid(SensorBase::GetDefaultSolenoidModule(), channel) {}
+    : Solenoid(SensorUtil::GetDefaultSolenoidModule(), channel) {}
 
 /**
  * Constructor.
@@ -33,12 +33,12 @@ Solenoid::Solenoid(int channel)
  */
 Solenoid::Solenoid(int moduleNumber, int channel)
     : SolenoidBase(moduleNumber), m_channel(channel) {
-  if (!SensorBase::CheckSolenoidModule(m_moduleNumber)) {
+  if (!SensorUtil::CheckSolenoidModule(m_moduleNumber)) {
     wpi_setWPIErrorWithContext(ModuleIndexOutOfRange,
                                "Solenoid Module " + wpi::Twine(m_moduleNumber));
     return;
   }
-  if (!SensorBase::CheckSolenoidChannel(m_channel)) {
+  if (!SensorUtil::CheckSolenoidChannel(m_channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
                                "Solenoid Channel " + wpi::Twine(m_channel));
     return;

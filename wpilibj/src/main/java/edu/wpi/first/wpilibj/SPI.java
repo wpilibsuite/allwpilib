@@ -55,9 +55,6 @@ public class SPI implements AutoCloseable {
     close();
   }
 
-  /**
-   * Free the resources used by this object.
-   */
   @Override
   public void close() {
     if (m_accum != null) {

@@ -107,7 +107,7 @@ public class LiveWindow {
    * @param moduleType A string indicating the type of the module used in the naming (above)
    * @param channel    The channel number the device is connected to
    * @param component  A reference to the object being added
-   * @deprecated Use {@link edu.wpi.first.wpilibj.SensorBase#setName(String, int)} instead.
+   * @deprecated Use {@link edu.wpi.first.wpilibj.SendableBase#setName(String, int)} instead.
    */
   @Deprecated
   public static void addSensor(String moduleType, int channel, Sendable component) {
@@ -136,7 +136,7 @@ public class LiveWindow {
    * @param moduleType A string that defines the module name in the label for the value
    * @param channel    The channel number the device is plugged into (usually PWM)
    * @param component  The reference to the object being added
-   * @deprecated Use {@link edu.wpi.first.wpilibj.SensorBase#setName(String, int)} instead.
+   * @deprecated Use {@link edu.wpi.first.wpilibj.SendableBase#setName(String, int)} instead.
    */
   @Deprecated
   public static void addActuator(String moduleType, int channel, Sendable component) {
@@ -152,7 +152,7 @@ public class LiveWindow {
    * @param moduleNumber The number of the particular module type
    * @param channel      The channel number the device is plugged into (usually PWM)
    * @param component    The reference to the object being added
-   * @deprecated Use {@link edu.wpi.first.wpilibj.SensorBase#setName(String, int, int)} instead.
+   * @deprecated Use {@link edu.wpi.first.wpilibj.SendableBase#setName(String, int, int)} instead.
    */
   @Deprecated
   public static void addActuator(String moduleType, int moduleNumber, int channel,

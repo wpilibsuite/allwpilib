@@ -7,28 +7,14 @@
 
 #pragma once
 
-#include <memory>
-
-#include "Base.h"
-#include "ErrorBase.h"
-#include "SmartDashboard/Sendable.h"
-#include "SmartDashboard/SendableBase.h"
-
 namespace frc {
 
 /**
- * Base class for all sensors.
- *
  * Stores most recent status information as well as containing utility functions
  * for checking channels and error processing.
  */
-class SensorBase : public ErrorBase, public SendableBase {
+class SensorUtil final {
  public:
-  SensorBase() = default;
-
-  SensorBase(const SensorBase&) = delete;
-  SensorBase& operator=(const SensorBase&) = delete;
-
   static int GetDefaultSolenoidModule() { return 0; }
 
   static bool CheckSolenoidModule(int moduleNumber);
@@ -48,6 +34,9 @@ class SensorBase : public ErrorBase, public SendableBase {
   static const int kPwmChannels;
   static const int kRelayChannels;
   static const int kPDPChannels;
+
+ private:
+  SensorUtil() = default;
 };
 
 }  // namespace frc

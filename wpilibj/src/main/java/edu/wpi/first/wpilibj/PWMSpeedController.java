@@ -25,6 +25,11 @@ public abstract class PWMSpeedController extends SafePWM implements SpeedControl
     super(channel);
   }
 
+  @Override
+  public String getDescription() {
+    return "PWM " + getChannel();
+  }
+
   /**
    * Set the PWM value.
    *

@@ -7,8 +7,9 @@
 
 #pragma once
 
+#include "ErrorBase.h"
 #include "SPI.h"
-#include "SensorBase.h"
+#include "SmartDashboard/SendableBase.h"
 #include "interfaces/Accelerometer.h"
 
 namespace frc {
@@ -18,7 +19,7 @@ namespace frc {
  *
  * This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
-class ADXL362 : public SensorBase, public Accelerometer {
+class ADXL362 : public ErrorBase, public SendableBase, public Accelerometer {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
   struct AllAxes {
