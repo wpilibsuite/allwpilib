@@ -94,7 +94,7 @@ public class PIDController extends PIDBase implements Controller {
   @Override
   public void close() {
     super.close();
-    m_controlLoop.stop();
+    m_controlLoop.close();
     m_thisMutex.lock();
     try {
       m_pidOutput = null;

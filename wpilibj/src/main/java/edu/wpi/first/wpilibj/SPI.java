@@ -441,7 +441,7 @@ public class SPI implements AutoCloseable {
 
     @Override
     public void close() {
-      m_notifier.stop();
+      m_notifier.close();
     }
 
     final Notifier m_notifier;
