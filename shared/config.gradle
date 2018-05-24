@@ -163,7 +163,6 @@ if (!project.hasProperty('onlyAthena')) {
                 releaseCompilerArgs = macReleaseCompilerArgs
                 objCppCompilerArgs = macObjCLinkerArgs
                 linkerArgs = macLinkerArgs
-                releaseStripBinaries = true
                 compilerFamily = 'Clang'
                 detectPlatform = mac64PlatformDetect
             }
@@ -292,6 +291,12 @@ ext.includeStandardZipFormat = { task, value ->
             if (binary instanceof SharedLibraryBinarySpec) {
                 task.dependsOn binary.buildTask
                 task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
+                    into getPlatformPath(binary) + '/shared'
+                }
+                def sharedPath = binary.sharedLibraryFile.absolutePath
+                sharedPath = sharedPath.substring(0, sharedPath.length() - 4)
+
+                task.from(new File(sharedPath + '.pdb')) {
                     into getPlatformPath(binary) + '/shared'
                 }
                 task.from(binary.sharedLibraryFile) {
