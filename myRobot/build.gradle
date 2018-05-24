@@ -112,6 +112,7 @@ model {
                                 run.systemProperty 'java.library.path', filePath
                                 run.environment 'LD_LIBRARY_PATH', filePath
                                 run.workingDir filePath
+                                run.args << 'MyRobot'
 
                                 found = true
                             }
