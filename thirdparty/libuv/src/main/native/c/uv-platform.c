@@ -25,7 +25,6 @@
 #ifdef __APPLE__
 #include "unix/bsd-ifaddrs.c"
 #include "unix/darwin.c"
-#include "unix/darwin-proctitle.c"
 #include "unix/fsevents.c"
 #include "unix/kqueue.c"
 #include "unix/proctitle.c"
@@ -49,7 +48,6 @@
 #include "win/getnameinfo.c"
 #include "win/handle.c"
 #include "win/loop-watcher.c"
-#include "win/pipe.c"
 #include "win/poll.c"
 #include "win/process.c"
 #include "win/process-stdio.c"
@@ -60,7 +58,6 @@
 #include "win/thread.c"
 #include "win/timer.c"
 #include "win/tty.c"
-#include "win/udp.c"
 #include "win/util.c"
 #include "win/winapi.c"
 #include "win/winsock.c"

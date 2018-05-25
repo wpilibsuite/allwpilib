@@ -20,9 +20,9 @@
  */
 
 #include "uv.h"
-#include "tree.h"
+#include "uv/tree.h"
 #include "internal.h"
-#include "heap-inl.h"
+#include "../heap-inl.h"
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>

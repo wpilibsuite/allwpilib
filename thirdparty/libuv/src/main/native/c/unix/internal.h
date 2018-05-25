@@ -22,7 +22,7 @@
 #ifndef UV_UNIX_INTERNAL_H_
 #define UV_UNIX_INTERNAL_H_
 
-#include "uv-common.h"
+#include "../uv-common.h"
 
 #include <assert.h>
 #include <stdlib.h> /* abort */

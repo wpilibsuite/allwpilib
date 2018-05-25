@@ -20,7 +20,7 @@
 
 #include "uv.h"
 #include "internal.h"
-#include "heap-inl.h"
+#include "../heap-inl.h"
 
 #include <assert.h>
 #include <limits.h>
