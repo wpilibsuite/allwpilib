@@ -5,7 +5,8 @@
     "tags": [
       "Getting Started with Java"
     ],
-    "foldername": "gettingstarted"
+    "foldername": "gettingstarted",
+    "gradlebase": "java"
   },
   {
     "name": "Tank Drive",
@@ -16,7 +17,8 @@
       "Robot and Motor",
       "Safety"
     ],
-    "foldername": "tankdrive"
+    "foldername": "tankdrive",
+    "gradlebase": "java"
   },
   {
     "name": "Mecanum Drive",
@@ -27,7 +29,8 @@
       "Robot and Motor",
       "Safety"
     ],
-    "foldername": "mecanumdrive"
+    "foldername": "mecanumdrive",
+    "gradlebase": "java"
   },
   {
     "name": "Ultrasonic",
@@ -37,7 +40,8 @@
       "Robot and Motor",
       "Analog"
     ],
-    "foldername": "ultrasonic"
+    "foldername": "ultrasonic",
+    "gradlebase": "java"
   },
   {
     "name": "Ultrasonic PID",
@@ -47,7 +51,8 @@
       "Robot and Motor",
       "Analog"
     ],
-    "foldername": "ultrasonicpid"
+    "foldername": "ultrasonicpid",
+    "gradlebase": "java"
   },
   {
     "name": "Potentiometer PID",
@@ -58,7 +63,8 @@
       "Analog",
       "Joystick"
     ],
-    "foldername": "potentiometerpid"
+    "foldername": "potentiometerpid",
+    "gradlebase": "java"
   },
   {
     "name": "Gyro",
@@ -69,7 +75,8 @@
       "Analog",
       "Joystick"
     ],
-    "foldername": "gyro"
+    "foldername": "gyro",
+    "gradlebase": "java"
   },
   {
     "name": "Gyro Mecanum",
@@ -80,7 +87,8 @@
       "Analog",
       "Joystick"
     ],
-    "foldername": "gyromecanum"
+    "foldername": "gyromecanum",
+    "gradlebase": "java"
   },
   {
     "name": "Motor Controller",
@@ -90,7 +98,22 @@
       "Joystick",
       "Robot and Motor"
     ],
-    "foldername": "motorcontrol"
+    "foldername": "motorcontrol",
+    "gradlebase": "java"
+  },
+  {
+    "name": "Motor Control With Encoder",
+    "description": "Demonstrate controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.",
+    "tags": [
+      "Robot and Motor",
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick",
+      "Complete List"
+    ],
+    "foldername": "motorcontrolencoder",
+    "gradlebase": "java"
   },
   {
     "name": "GearsBot",
@@ -98,7 +121,8 @@
     "tags": [
       "Complete Robot"
     ],
-    "foldername": "gearsbot"
+    "foldername": "gearsbot",
+    "gradlebase": "java"
   },
   {
     "name": "PacGoat",
@@ -106,7 +130,8 @@
     "tags": [
       "Complete Robot"
     ],
-    "foldername": "pacgoat"
+    "foldername": "pacgoat",
+    "gradlebase": "java"
   },
   {
     "name": "Simple Vision",
@@ -115,7 +140,8 @@
       "Vision",
       "Complete List"
     ],
-    "foldername": "simplevision"
+    "foldername": "quickvision",
+    "gradlebase": "java"
   },
   {
     "name": "Intermediate Vision",
@@ -124,7 +150,8 @@
       "Vision",
       "Complete List"
     ],
-    "foldername": "intermediatevision"
+    "foldername": "intermediatevision",
+    "gradlebase": "java"
   },
   {
     "name": "Axis Camera Sample",
@@ -132,6 +159,7 @@
     "tags": [
       "Vision"
     ],
-    "foldername": "axiscamera"
+    "foldername": "axiscamera",
+    "gradlebase": "java"
   }
 ]
