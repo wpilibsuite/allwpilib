@@ -818,6 +818,7 @@ void DriverStation::GetData() {
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation() {
+  HAL_Initialize(500, 0);
   m_waitForDataCounter = 0;
   m_joystickAxes = std::make_unique<HAL_JoystickAxes[]>(kJoystickPorts);
   m_joystickPOVs = std::make_unique<HAL_JoystickPOVs[]>(kJoystickPorts);

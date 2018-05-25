@@ -185,6 +185,7 @@ public class DriverStation implements RobotState.Interface {
    * variable.
    */
   private DriverStation() {
+    HAL.initialize(500, 0);
     m_waitForDataCount = 0;
     m_waitForDataMutex = new ReentrantLock();
     m_waitForDataCond = m_waitForDataMutex.newCondition();
