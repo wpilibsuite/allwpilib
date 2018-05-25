@@ -227,18 +227,22 @@ public abstract class RobotBase implements AutoCloseable {
     HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
 
     String robotName = "";
-    Enumeration<URL> resources = null;
-    try {
-      resources = RobotBase.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
-    } catch (IOException ex) {
-      ex.printStackTrace();
-    }
-    while (resources != null && resources.hasMoreElements()) {
+    if (args.length > 0) {
+      robotName = args[0];
+    } else {
+      Enumeration<URL> resources = null;
       try {
-        Manifest manifest = new Manifest(resources.nextElement().openStream());
-        robotName = manifest.getMainAttributes().getValue("Robot-Class");
+        resources = RobotBase.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
       } catch (IOException ex) {
         ex.printStackTrace();
+      }
+      while (resources != null && resources.hasMoreElements()) {
+        try {
+          Manifest manifest = new Manifest(resources.nextElement().openStream());
+          robotName = manifest.getMainAttributes().getValue("Robot-Class");
+        } catch (IOException ex) {
+          ex.printStackTrace();
+        }
       }
     }
 
