@@ -12,7 +12,7 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
 
 ## General Contribution Rules
 
-- Everything in the library must work for the 3000+ teams that will be using it.
+- Everything in the library must work for the 4000+ teams that will be using it.
 - We need to be able to maintain submitted changes, even if you are no longer working on the project.
 - Tool suite changes must be generally useful to a broad range of teams
 - Excluding bug fixes, changes in one language generally need to have corresponding changes in other languages.
