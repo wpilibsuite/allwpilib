@@ -45,6 +45,10 @@ public class LiveWindow {
   private static boolean liveWindowEnabled = false;
   private static boolean telemetryEnabled = true;
 
+  private LiveWindow() {
+    throw new UnsupportedOperationException("This is a utility class!");
+  }
+
   public static synchronized boolean isEnabled() {
     return liveWindowEnabled;
   }

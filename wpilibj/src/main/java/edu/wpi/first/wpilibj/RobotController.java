@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.hal.PowerJNI;
  */
 public final class RobotController {
   private RobotController() {
+    throw new UnsupportedOperationException("This is a utility class!");
   }
 
   /**
