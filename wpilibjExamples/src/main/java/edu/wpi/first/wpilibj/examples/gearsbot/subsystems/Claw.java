@@ -48,6 +48,7 @@ public class Claw extends Subsystem {
   /**
    * Set the claw motor to move in the close direction.
    */
+  @Override
   public void close() {
     m_motor.set(1);
   }

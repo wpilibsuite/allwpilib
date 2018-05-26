@@ -62,8 +62,8 @@ public class LinearDigitalFilter extends Filter {
    * @param ffGains The "feed forward" or FIR gains
    * @param fbGains The "feed back" or IIR gains
    */
-  public LinearDigitalFilter(PIDSource source, double[] ffGains,
-                             double[] fbGains) {
+  public LinearDigitalFilter(PIDSource source, double[] ffGains, //NOPMD - PR1105 will fix this
+                             double[] fbGains) { //NOPMD - PR1105 will fix this
     super(source);
     m_inputs = new CircularBuffer(ffGains.length);
     m_outputs = new CircularBuffer(fbGains.length);

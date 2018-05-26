@@ -352,12 +352,11 @@ public class I2C implements AutoCloseable {
     byte[] dataToSend = new byte[1];
 
     byte[] deviceData = new byte[4];
-    for (int i = 0, curRegisterAddress = registerAddress;
-         i < count; i += 4, curRegisterAddress += 4) {
+    for (int i = 0; i < count; i += 4) {
       int toRead = count - i < 4 ? count - i : 4;
       // Read the chunk of data. Return false if the sensor does not
       // respond.
-      dataToSend[0] = (byte) curRegisterAddress;
+      dataToSend[0] = (byte) (registerAddress + i);
       if (transaction(dataToSend, 1, deviceData, toRead)) {
         return false;
       }

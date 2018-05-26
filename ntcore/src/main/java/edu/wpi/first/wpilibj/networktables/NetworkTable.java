@@ -298,6 +298,7 @@ public class NetworkTable implements ITable, IRemote {
     this.inst = inst;
   }
 
+  @Override
   public String toString() { return "NetworkTable: " + path; }
 
   private final ConcurrentMap<String, NetworkTableEntry> entries = new ConcurrentHashMap<String, NetworkTableEntry>();
@@ -331,6 +332,7 @@ public class NetworkTable implements ITable, IRemote {
    * @return True if connected, false if not connected.
    * @deprecated Use {@link NetworkTableInstance#isConnected()} instead.
    */
+  @Override
   @Deprecated
   public boolean isConnected() {
     return inst.isConnected();
@@ -341,6 +343,7 @@ public class NetworkTable implements ITable, IRemote {
    * @return True if operating as a server, false otherwise.
    * @deprecated Use {@link NetworkTableInstance#getNetworkMode()} instead.
    */
+  @Override
   @Deprecated
   public boolean isServer() {
     return (inst.getNetworkMode() & NetworkTableInstance.kNetModeServer) != 0;
@@ -369,16 +372,20 @@ public class NetworkTable implements ITable, IRemote {
   private static final HashMap<IRemoteConnectionListener,ConnectionListenerAdapter> globalConnectionListenerMap = new HashMap<IRemoteConnectionListener,ConnectionListenerAdapter>();
 
   private static IRemote staticRemote = new IRemote() {
+    @Override
     public void addConnectionListener(IRemoteConnectionListener listener, boolean immediateNotify) {
       NetworkTable.addGlobalConnectionListener(listener, immediateNotify);
     }
+    @Override
     public void removeConnectionListener(IRemoteConnectionListener listener) {
       NetworkTable.removeGlobalConnectionListener(listener);
     }
+    @Override
     public boolean isConnected() {
       ConnectionInfo[] conns = NetworkTableInstance.getDefault().getConnections();
       return conns.length > 0;
     }
+    @Override
     public boolean isServer() {
       return (NetworkTableInstance.getDefault().getNetworkMode() & NetworkTableInstance.kNetModeServer) != 0;
     }
@@ -420,6 +427,7 @@ public class NetworkTable implements ITable, IRemote {
    * @param immediateNotify call listener immediately for all existing connections
    * @deprecated Use {@link NetworkTableInstance#addConnectionListener(Consumer, boolean)} instead.
    */
+  @Override
   @Deprecated
   public synchronized void addConnectionListener(IRemoteConnectionListener listener,
                                                  boolean immediateNotify) {
@@ -435,6 +443,7 @@ public class NetworkTable implements ITable, IRemote {
    * @param listener connection listener
    * @deprecated Use {@link NetworkTableInstance#removeConnectionListener(int)} instead.
    */
+  @Override
   @Deprecated
   public synchronized void removeConnectionListener(IRemoteConnectionListener listener) {
     ConnectionListenerAdapter adapter = connectionListenerMap.get(listener);
@@ -657,6 +666,7 @@ public class NetworkTable implements ITable, IRemote {
     return getEntry(key).exists();
   }
 
+  @Override
   public boolean containsSubTable(String key) {
     int[] handles = NetworkTablesJNI.getEntries(inst.getHandle(), pathWithSep + key + PATH_SEPARATOR, 0);
     return handles.length != 0;
@@ -666,6 +676,7 @@ public class NetworkTable implements ITable, IRemote {
    * @param types bitmask of types; 0 is treated as a "don't care".
    * @return keys currently in the table
    */
+  @Override
   public Set<String> getKeys(int types) {
     Set<String> keys = new HashSet<String>();
     int prefixLen = path.length() + 1;
@@ -718,6 +729,7 @@ public class NetworkTable implements ITable, IRemote {
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean setDefaultNumber(String key, double defaultValue) {
     return getEntry(key).setDefaultDouble(defaultValue);
   }
@@ -741,6 +753,7 @@ public class NetworkTable implements ITable, IRemote {
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean setDefaultString(String key, String defaultValue) {
     return getEntry(key).setDefaultString(defaultValue);
   }
@@ -764,6 +777,7 @@ public class NetworkTable implements ITable, IRemote {
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean setDefaultBoolean(String key, boolean defaultValue) {
     return getEntry(key).setDefaultBoolean(defaultValue);
   }
@@ -795,6 +809,7 @@ public class NetworkTable implements ITable, IRemote {
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean setDefaultBooleanArray(String key, boolean[] defaultValue) {
     return getEntry(key).setDefaultBooleanArray(defaultValue);
   }
@@ -802,6 +817,7 @@ public class NetworkTable implements ITable, IRemote {
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean setDefaultBooleanArray(String key, Boolean[] defaultValue) {
     return getEntry(key).setDefaultBooleanArray(defaultValue);
   }
@@ -841,6 +857,7 @@ public class NetworkTable implements ITable, IRemote {
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean setDefaultNumberArray(String key, double[] defaultValue) {
     return getEntry(key).setDefaultDoubleArray(defaultValue);
   }
@@ -848,6 +865,7 @@ public class NetworkTable implements ITable, IRemote {
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean setDefaultNumberArray(String key, Double[] defaultValue) {
     return getEntry(key).setDefaultNumberArray(defaultValue);
   }
@@ -879,6 +897,7 @@ public class NetworkTable implements ITable, IRemote {
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean setDefaultStringArray(String key, String[] defaultValue) {
     return getEntry(key).setDefaultStringArray(defaultValue);
   }
@@ -902,6 +921,7 @@ public class NetworkTable implements ITable, IRemote {
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean setDefaultRaw(String key, byte[] defaultValue) {
     return getEntry(key).setDefaultRaw(defaultValue);
   }
@@ -957,6 +977,7 @@ public class NetworkTable implements ITable, IRemote {
    * instead, e.g. `NetworkTable.getEntry(key).setValue(NetworkTableEntry.makeBoolean(false));`
    * or `NetworkTable.getEntry(key).setValue(new Boolean(false));`
    */
+  @Override
   @Deprecated
   public boolean putValue(String key, Object value) throws IllegalArgumentException {
     if (value instanceof Boolean)

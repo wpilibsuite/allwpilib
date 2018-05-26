@@ -112,11 +112,11 @@ public class RuntimeDetector {
 
   public static boolean is32BitIntel() {
     String arch = System.getProperty("os.arch");
-    return arch.equals("x86") || arch.equals("i386");
+    return "x86".equals(arch) || "i386".equals(arch);
   }
 
   public static boolean is64BitIntel() {
     String arch = System.getProperty("os.arch");
-    return arch.equals("amd64") || arch.equals("x86_64");
+    return "amd64".equals(arch) || "x86_64".equals(arch);
   }
 }

@@ -40,6 +40,7 @@ public class Robot extends IterativeRobot {
    * Tells the robot to drive to a set distance (in inches) from an object
    * using proportional control.
    */
+  @Override
   public void teleopPeriodic() {
     // sensor returns a value from 0-4095 that is scaled to inches
     double currentDistance = m_ultrasonic.getValue() * kValueToInches;

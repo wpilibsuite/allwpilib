@@ -18,6 +18,7 @@ public class CANData {
   /**
    * API used from JNI to set the data.
    */
+  @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public byte[] setData(int length, long timestamp) {
     this.length = length;
     this.timestamp = timestamp;

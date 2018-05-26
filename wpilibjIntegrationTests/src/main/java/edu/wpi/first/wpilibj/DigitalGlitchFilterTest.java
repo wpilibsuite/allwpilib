@@ -22,6 +22,7 @@ public class DigitalGlitchFilterTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(
       DigitalGlitchFilterTest.class.getName());
 
+  @Override
   protected Logger getClassLogger() {
     return logger;
   }

@@ -28,6 +28,7 @@ public class PrintCommand extends InstantCommand {
     m_message = message;
   }
 
+  @Override
   protected void initialize() {
     System.out.println(m_message);
   }

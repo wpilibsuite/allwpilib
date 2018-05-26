@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.hal;
 /**
  * JNI wrapper for library <b>FRC_NetworkCommunication</b><br>.
  */
-@SuppressWarnings("MethodName")
+@SuppressWarnings("PMD.ConstantsInInterface")
 public class FRCNetComm extends JNIWrapper {
   /**
    * Module type from LoadOut.h

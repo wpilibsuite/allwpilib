@@ -25,6 +25,7 @@ public class NetworkButton extends Button {
     m_entry = table.getEntry(field);
   }
 
+  @Override
   public boolean get() {
     return m_entry.getInstance().isConnected() && m_entry.getBoolean(false);
   }
