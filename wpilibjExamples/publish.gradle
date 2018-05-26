@@ -1,11 +1,4 @@
 apply plugin: 'maven-publish'
-apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
-
-if (!hasProperty('releaseType')) {
-    WPILibVersion {
-        releaseType = 'dev'
-    }
-}
 
 def pubVersion
 if (project.hasProperty("publishVersion")) {
