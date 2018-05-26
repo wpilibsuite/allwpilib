@@ -28,23 +28,28 @@ public class MockCommand extends Command {
     super();
   }
 
+  @Override
   protected void initialize() {
     ++m_initializeCount;
   }
 
+  @Override
   protected void execute() {
     ++m_executeCount;
   }
 
+  @Override
   protected boolean isFinished() {
     ++m_isFinishedCount;
     return isHasFinished();
   }
 
+  @Override
   protected void end() {
     ++m_endCount;
   }
 
+  @Override
   protected void interrupted() {
     ++m_interruptedCount;
   }

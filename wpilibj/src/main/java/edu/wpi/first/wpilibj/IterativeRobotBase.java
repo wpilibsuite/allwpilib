@@ -54,6 +54,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Provide an alternate "main loop" via startCompetition().
    */
+  @Override
   public abstract void startCompetition();
 
   /* ----------- Overridable initialization code ----------------- */

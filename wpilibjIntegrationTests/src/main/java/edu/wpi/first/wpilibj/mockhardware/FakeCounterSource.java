@@ -30,6 +30,7 @@ public class FakeCounterSource implements AutoCloseable {
       m_encoder = encode;
     }
 
+    @Override
     public void run() {
       m_encoder.m_output.set(false);
       try {
@@ -70,6 +71,7 @@ public class FakeCounterSource implements AutoCloseable {
   /**
    * Destroy Object with minimum memory leak.
    */
+  @Override
   public void close() {
     m_task = null;
     if (m_allocated) {

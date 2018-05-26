@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.wpi.cscore.AxisCamera;
@@ -59,9 +60,9 @@ public class CameraServer {
 
   private AtomicInteger m_defaultUsbDevice;
   private String m_primarySourceName;
-  private final Hashtable<String, VideoSource> m_sources;
-  private final Hashtable<String, VideoSink> m_sinks;
-  private final Hashtable<Integer, NetworkTable> m_tables;  // indexed by source handle
+  private final Map<String, VideoSource> m_sources;
+  private final Map<String, VideoSink> m_sinks;
+  private final Map<Integer, NetworkTable> m_tables;  // indexed by source handle
   private final NetworkTable m_publishTable;
   private final VideoListener m_videoListener; //NOPMD
   private final int m_tableListener; //NOPMD
@@ -115,7 +116,7 @@ public class CameraServer {
       // Otherwise generate for hostname and all interface addresses
       values.add(makeStreamValue(CameraServerJNI.getHostname() + ".local", port));
       for (String addr : m_addresses) {
-        if (addr.equals("127.0.0.1")) {
+        if ("127.0.0.1".equals(addr)) {
           continue;  // ignore localhost
         }
         values.add(makeStreamValue(addr, port));
@@ -437,7 +438,7 @@ public class CameraServer {
 
         // handle standard names
         String propName;
-        if (relativeKey.equals("mode")) {
+        if ("mode".equals(relativeKey)) {
           // reset to current mode
           event.getEntry().setString(videoModeToString(source.getVideoMode()));
           return;

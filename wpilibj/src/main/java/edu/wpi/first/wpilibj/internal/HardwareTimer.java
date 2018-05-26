@@ -80,6 +80,7 @@ public class HardwareTimer implements Timer.StaticInterface {
      *
      * @return Current time value for this timer in seconds
      */
+    @Override
     public synchronized double get() {
       if (m_running) {
         return ((getMsClock() - m_startTime) + m_accumulatedTime) / 1000.0;
@@ -92,6 +93,7 @@ public class HardwareTimer implements Timer.StaticInterface {
      * Reset the timer by setting the time to 0. Make the timer start time the current time so new
      * requests will be relative now
      */
+    @Override
     public synchronized void reset() {
       m_accumulatedTime = 0;
       m_startTime = getMsClock();
@@ -101,6 +103,7 @@ public class HardwareTimer implements Timer.StaticInterface {
      * Start the timer running. Just set the running flag to true indicating that all time
      * requests should be relative to the system clock.
      */
+    @Override
     public synchronized void start() {
       m_startTime = getMsClock();
       m_running = true;
@@ -111,6 +114,7 @@ public class HardwareTimer implements Timer.StaticInterface {
      * subsequent time requests to be read from the accumulated time rather than looking at the
      * system clock.
      */
+    @Override
     public synchronized void stop() {
       final double temp = get();
       m_accumulatedTime = temp;
@@ -125,6 +129,7 @@ public class HardwareTimer implements Timer.StaticInterface {
      * @param period The period to check for (in seconds).
      * @return If the period has passed.
      */
+    @Override
     public synchronized boolean hasPeriodPassed(double period) {
       if (get() > period) {
         // Advance the start time by the period.

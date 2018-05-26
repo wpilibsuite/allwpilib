@@ -134,6 +134,7 @@ public final class NetworkTable {
     return m_inst;
   }
 
+  @Override
   public String toString() {
     return "NetworkTable: " + m_path;
   }

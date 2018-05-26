@@ -47,6 +47,7 @@ public class SortedVector<E> extends Vector<E> {
    *
    * @param element The element to add to the Vector
    */
+  @Override
   public void addElement(E element) {
     int highBound = size();
     int lowBound = 0;

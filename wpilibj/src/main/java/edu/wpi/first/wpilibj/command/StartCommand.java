@@ -28,6 +28,7 @@ public class StartCommand extends InstantCommand {
     m_commandToFork = commandToStart;
   }
 
+  @Override
   protected void initialize() {
     m_commandToFork.start();
   }

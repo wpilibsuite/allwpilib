@@ -528,6 +528,7 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
    *
    * @param pidSource An enum to select the parameter.
    */
+  @Override
   public void setPIDSourceType(PIDSourceType pidSource) {
     requireNonNull(pidSource, "PID Source Parameter given was null");
     if (pidSource != PIDSourceType.kDisplacement && pidSource != PIDSourceType.kRate) {
@@ -537,6 +538,7 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
     m_pidSource = pidSource;
   }
 
+  @Override
   public PIDSourceType getPIDSourceType() {
     return m_pidSource;
   }

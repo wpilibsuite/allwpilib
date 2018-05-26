@@ -28,6 +28,7 @@ public abstract class AbstractCommandTest {
   public class ASubsystem extends Subsystem {
     Command m_command;
 
+    @Override
     protected void initDefaultCommand() {
       if (m_command != null) {
         setDefaultCommand(m_command);

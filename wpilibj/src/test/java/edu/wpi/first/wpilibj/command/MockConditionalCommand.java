@@ -28,23 +28,28 @@ public class MockConditionalCommand extends ConditionalCommand {
     this.m_condition = condition;
   }
 
+  @Override
   protected void initialize() {
     ++m_initializeCount;
   }
 
+  @Override
   protected void execute() {
     ++m_executeCount;
   }
 
+  @Override
   protected boolean isFinished() {
     ++m_isFinishedCount;
     return super.isFinished();
   }
 
+  @Override
   protected void end() {
     ++m_endCount;
   }
 
+  @Override
   protected void interrupted() {
     ++m_interruptedCount;
   }

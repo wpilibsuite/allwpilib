@@ -89,6 +89,7 @@ public class Collector extends Subsystem {
   /**
    * Close the claw (For collecting and driving).
    */
+  @Override
   public void close() {
     m_piston.set(false);
   }

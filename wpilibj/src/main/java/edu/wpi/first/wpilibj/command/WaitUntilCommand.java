@@ -24,6 +24,7 @@ public class WaitUntilCommand extends Command {
   /**
    * Check if we've reached the actual finish time.
    */
+  @Override
   public boolean isFinished() {
     return Timer.getMatchTime() >= m_time;
   }

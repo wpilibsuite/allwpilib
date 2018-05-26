@@ -54,13 +54,16 @@ public class HLUsageReporting {
   }
 
   public static class Null implements Interface {
+    @Override
     public void reportScheduler() {
     }
 
+    @Override
     @SuppressWarnings("PMD.UnusedFormalParameter")
     public void reportPIDController(int num) {
     }
 
+    @Override
     public void reportSmartDashboard() {
     }
   }

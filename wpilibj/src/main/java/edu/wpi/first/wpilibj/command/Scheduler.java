@@ -50,6 +50,7 @@ public class Scheduler extends SendableBase {
   /**
    * A hashtable of active {@link Command Commands} to their {@link LinkedListElement}.
    */
+  @SuppressWarnings("PMD.LooseCoupling")
   private Hashtable<Command, LinkedListElement> m_commandTable = new Hashtable<>();
   /**
    * The {@link Set} of all {@link Subsystem Subsystems}.
@@ -74,6 +75,7 @@ public class Scheduler extends SendableBase {
   /**
    * A list of all {@link Command Commands} which need to be added.
    */
+  @SuppressWarnings("PMD.LooseCoupling")
   private Vector<Command> m_additions = new Vector<>();
   private NetworkTableEntry m_namesEntry;
   private NetworkTableEntry m_idsEntry;
@@ -82,6 +84,7 @@ public class Scheduler extends SendableBase {
    * A list of all {@link edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler Buttons}. It is
    * created lazily.
    */
+  @SuppressWarnings("PMD.LooseCoupling")
   private Vector<ButtonScheduler> m_buttons;
   private boolean m_runningCommandsChanged;
 

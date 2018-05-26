@@ -334,6 +334,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    * @param i Integral coefficient
    * @param d Differential coefficient
    */
+  @Override
   @SuppressWarnings("ParameterName")
   public void setPID(double p, double i, double d) {
     m_thisMutex.lock();
@@ -433,6 +434,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @return proportional coefficient
    */
+  @Override
   public double getP() {
     m_thisMutex.lock();
     try {
@@ -447,6 +449,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @return integral coefficient
    */
+  @Override
   public double getI() {
     m_thisMutex.lock();
     try {
@@ -461,6 +464,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @return differential coefficient
    */
+  @Override
   public double getD() {
     m_thisMutex.lock();
     try {
@@ -573,6 +577,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @param setpoint the desired setpoint
    */
+  @Override
   public void setSetpoint(double setpoint) {
     m_thisMutex.lock();
     try {
@@ -597,6 +602,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @return the current setpoint
    */
+  @Override
   public double getSetpoint() {
     m_thisMutex.lock();
     try {
@@ -625,6 +631,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @return the current error
    */
+  @Override
   public double getError() {
     m_thisMutex.lock();
     try {
