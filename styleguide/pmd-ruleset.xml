@@ -6,6 +6,7 @@
 
   <description>PMD Ruleset for WPILib</description>
 
+  <!--
   <rule ref="rulesets/java/basic.xml" />
   <rule ref="rulesets/java/braces.xml" />
   <rule ref="rulesets/java/empty.xml" />
@@ -30,6 +31,8 @@
                 value="true" />
     </properties>
   </rule>
+  -->
+
   <!-- Custom Rules -->
   <rule name="UseRequireNonNull"
         message="Use Objects.requireNonNull() instead of throwing a NullPointerException yourself."
