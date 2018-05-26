@@ -1,0 +1,82 @@
+apply plugin: 'maven-publish'
+apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
+
+if (!hasProperty('releaseType')) {
+    WPILibVersion {
+        releaseType = 'dev'
+    }
+}
+
+def pubVersion = ''
+if (project.hasProperty("publishVersion")) {
+    pubVersion = project.publishVersion
+} else {
+    pubVersion = WPILibVersion.version
+}
+
+def baseArtifactId = 'libuv'
+def artifactGroupId = 'edu.wpi.first.libuv'
+def zipBaseName = '_GROUP_edu_wpi_first_libuv_ID_libuv_CLS'
+
+def outputsFolder = file("$project.buildDir/outputs")
+
+task cSourcesZip(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = zipBaseName
+    classifier = "sources"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/c') {
+        into '/'
+    }
+}
+
+task cHeadersZip(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = zipBaseName
+    classifier = "headers"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/include') {
+        into '/'
+    }
+}
+
+build.dependsOn cHeadersZip
+build.dependsOn cSourcesZip
+
+addTaskToCopyAllOutputs(cHeadersZip)
+addTaskToCopyAllOutputs(cSourcesZip)
+
+model {
+    publishing {
+        def UvTaskList = createComponentZipTasks($.components, 'libuv', zipBaseName, Zip, project, includeStandardZipFormat)
+        def allTask
+        if (!project.hasProperty('jenkinsBuild')) {
+            allTask = createAllCombined(UvTaskList, 'libuv', zipBaseName, Zip, project)
+        }
+
+        publications {
+            c(MavenPublication) {
+                UvTaskList.each {
+                    artifact it
+                }
+                if (!project.hasProperty('jenkinsBuild')) {
+                    artifact allTask
+                }
+                artifact cHeadersZip
+                artifact cSourcesZip
+
+                artifactId = baseArtifactId
+                groupId artifactGroupId
+                version pubVersion
+            }
+        }
+    }
+}

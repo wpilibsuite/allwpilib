@@ -70,6 +70,7 @@ else()
     set (wpilib_config_dir share/wpilib)
 endif()
 
+add_subdirectory(thirdparty)
 add_subdirectory(wpiutil)
 add_subdirectory(ntcore)
 
