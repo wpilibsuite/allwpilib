@@ -6,6 +6,8 @@
 
   <description>PMD Ruleset for WPILib</description>
 
+  <rule ref="category/java/bestpractices.xml" />
+
   <!--
   <rule ref="rulesets/java/basic.xml" />
   <rule ref="rulesets/java/braces.xml" />
