@@ -1,0 +1,82 @@
+apply plugin: 'c'
+apply plugin: 'cpp'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: SingleNativeBuild
+apply plugin: ExtraTasks
+
+ext {
+    nativeName = 'uv'
+}
+
+apply from: "${rootDir}/shared/config.gradle"
+
+project(':').libraryBuild.dependsOn build
+
+model {
+    components {
+        "${nativeName}Base"(NativeLibrarySpec) {
+            sources {
+                c {
+                    source {
+                        srcDirs 'src/main/native/c'
+                        include '*.c'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                    }
+                }
+            }
+            binaries.all {
+                if (it instanceof SharedLibraryBinarySpec) {
+                    it.buildable = false
+                    return
+                }
+            }
+        }
+        "${nativeName}"(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs "${rootDir}/shared/singlelib"
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                    }
+                }
+            }
+        }
+        uvTest(NativeExecutableSpec) {
+            sources {
+                c {
+                    source {
+                        srcDirs 'src/uvtest/native/c'
+                        include '**/*.c'
+                    }
+                }
+            }
+            binaries.all {
+                lib library: 'uv', linkage: 'shared'
+            }
+        }
+        uvBench(NativeExecutableSpec) {
+            sources {
+                c {
+                    source {
+                        srcDirs 'src/uvbench/native/c', 'src/uvtest/native/c'
+                        include 'benchmark-*.c', 'run-benchmarks.c', 'runner.c', 'runner-platform.c', 'echo-server.c', 'blackhole-server.c'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/uvtest/native/c'
+                    }
+                }
+            }
+            binaries.all {
+                lib library: 'uv', linkage: 'shared'
+            }
+        }
+    }
+}
+
+apply from: 'publish.gradle'
