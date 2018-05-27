@@ -30,6 +30,12 @@
     <exclude name="DoNotUseThreads" />
   </rule>
 
+  <rule name="UnnecessaryCastRule"
+        language="java"
+        message="Avoid unnecessary casts"
+        class="net.sourceforge.pmd.lang.java.rule.migrating.UnnecessaryCastRule"
+        externalInfoUrl="https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/migrating/UnnecessaryCastRule.java" />
+
   <!--
   <rule ref="rulesets/java/basic.xml" />
   <rule ref="rulesets/java/braces.xml" />
