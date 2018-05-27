@@ -38,7 +38,7 @@ void EncoderData::ResetData() {
   m_reverseDirectionCallbacks = nullptr;
   m_samplesToAverage = 0;
   m_samplesToAverageCallbacks = nullptr;
-  m_distancePerPulse = 0;
+  m_distancePerPulse = 1;
   m_distancePerPulseCallbacks = nullptr;
 }
 
@@ -531,6 +531,26 @@ int32_t HALSIM_GetEncoderSamplesToAverage(int32_t index) {
 void HALSIM_SetEncoderSamplesToAverage(int32_t index,
                                        int32_t samplesToAverage) {
   SimEncoderData[index].SetSamplesToAverage(samplesToAverage);
+}
+
+int32_t HALSIM_RegisterEncoderDistancePerPulseCallback(
+    int32_t index, HAL_NotifyCallback callback, void* param,
+    HAL_Bool initialNotify) {
+  return SimEncoderData[index].RegisterDistancePerPulseCallback(callback, param,
+                                                                initialNotify);
+}
+
+void HALSIM_CancelEncoderDistancePerPulseCallback(int32_t index, int32_t uid) {
+  SimEncoderData[index].CancelDistancePerPulseCallback(uid);
+}
+
+double HALSIM_GetEncoderDistancePerPulse(int32_t index) {
+  return SimEncoderData[index].GetDistancePerPulse();
+}
+
+void HALSIM_SetEncoderDistancePerPulse(int32_t index,
+                                       double distancePerPulse) {
+  SimEncoderData[index].SetDistancePerPulse(distancePerPulse);
 }
 
 void HALSIM_RegisterEncoderAllCallbacks(int32_t index,
