@@ -279,7 +279,7 @@ public class DriverStation implements RobotState.Interface {
     } else {
       locString = "";
     }
-    StringBuffer traceString = new StringBuffer("");
+    StringBuilder traceString = new StringBuilder("");
     if (printTrace) {
       boolean haveLoc = false;
       for (int i = stackTraceFirst; i < stackTrace.length; i++) {
