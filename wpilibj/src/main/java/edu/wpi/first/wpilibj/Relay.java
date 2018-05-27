@@ -90,8 +90,8 @@ public class Relay extends SendableBase implements MotorSafety {
 
   private final int m_channel;
 
-  private int m_forwardHandle = 0;
-  private int m_reverseHandle = 0;
+  private int m_forwardHandle;
+  private int m_reverseHandle;
 
   private Direction m_direction;
 

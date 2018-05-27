@@ -42,8 +42,8 @@ public class LiveWindow {
       NetworkTableInstance.getDefault().getTable("LiveWindow");
   private static final NetworkTable statusTable = liveWindowTable.getSubTable(".status");
   private static final NetworkTableEntry enabledEntry = statusTable.getEntry("LW Enabled");
-  private static boolean startLiveWindow = false;
-  private static boolean liveWindowEnabled = false;
+  private static boolean startLiveWindow;
+  private static boolean liveWindowEnabled;
   private static boolean telemetryEnabled = true;
 
   private LiveWindow() {

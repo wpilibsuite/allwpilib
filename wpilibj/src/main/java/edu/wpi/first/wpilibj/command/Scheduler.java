@@ -67,15 +67,15 @@ public class Scheduler extends SendableBase {
   /**
    * Whether or not we are currently adding a command.
    */
-  private boolean m_adding = false;
+  private boolean m_adding;
   /**
    * Whether or not we are currently disabled.
    */
-  private boolean m_disabled = false;
+  private boolean m_disabled;
   /**
    * A list of all {@link Command Commands} which need to be added.
    */
-  @SuppressWarnings("PMD.LooseCoupling")
+  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
   private Vector<Command> m_additions = new Vector<>();
   private NetworkTableEntry m_namesEntry;
   private NetworkTableEntry m_idsEntry;
@@ -118,6 +118,7 @@ public class Scheduler extends SendableBase {
    *
    * @param button the button to add
    */
+  @SuppressWarnings("PMD.UseArrayListInsteadOfVector")
   public void addButton(ButtonScheduler button) {
     if (m_buttons == null) {
       m_buttons = new Vector<>();

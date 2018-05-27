@@ -41,19 +41,19 @@ public class Ultrasonic extends SendableBase implements PIDSource {
   private static final double kPingTime = 10 * 1e-6;
   private static final double kSpeedOfSoundInchesPerSec = 1130.0 * 12.0;
   // head of the ultrasonic sensor list
-  private static Ultrasonic m_firstSensor = null;
+  private static Ultrasonic m_firstSensor;
   // automatic round robin mode
-  private static boolean m_automaticEnabled = false;
+  private static boolean m_automaticEnabled;
   private DigitalInput m_echoChannel;
-  private DigitalOutput m_pingChannel = null;
+  private DigitalOutput m_pingChannel;
   private boolean m_allocatedChannels;
-  private boolean m_enabled = false;
-  private Counter m_counter = null;
-  private Ultrasonic m_nextSensor = null;
+  private boolean m_enabled;
+  private Counter m_counter;
+  private Ultrasonic m_nextSensor;
   // task doing the round-robin automatic sensing
-  private static Thread m_task = null;
+  private static Thread m_task;
   private Unit m_units;
-  private static int m_instances = 0;
+  private static int m_instances;
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**

@@ -45,7 +45,7 @@ public abstract class ConditionalCommand extends Command {
   /**
    * Stores command chosen by condition.
    */
-  private Command m_chosenCommand = null;
+  private Command m_chosenCommand;
 
   private void requireAll() {
     if (m_onTrue != null) {

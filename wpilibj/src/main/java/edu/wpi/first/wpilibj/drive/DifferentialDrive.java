@@ -95,16 +95,16 @@ public class DifferentialDrive extends RobotDriveBase {
   public static final double kDefaultQuickStopThreshold = 0.2;
   public static final double kDefaultQuickStopAlpha = 0.1;
 
-  private static int instances = 0;
+  private static int instances;
 
   private SpeedController m_leftMotor;
   private SpeedController m_rightMotor;
 
   private double m_quickStopThreshold = kDefaultQuickStopThreshold;
   private double m_quickStopAlpha = kDefaultQuickStopAlpha;
-  private double m_quickStopAccumulator = 0.0;
+  private double m_quickStopAccumulator;
   private double m_rightSideInvertMultiplier = -1.0;
-  private boolean m_reported = false;
+  private boolean m_reported;
 
   /**
    * Construct a DifferentialDrive.

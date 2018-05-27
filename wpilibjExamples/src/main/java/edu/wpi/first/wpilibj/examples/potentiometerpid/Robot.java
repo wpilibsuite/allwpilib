@@ -40,8 +40,8 @@ public class Robot extends IterativeRobot {
   private SpeedController m_elevatorMotor;
   private Joystick m_joystick;
 
-  private int m_index = 0;
-  private boolean m_previousButtonValue = false;
+  private int m_index;
+  private boolean m_previousButtonValue;
 
   @Override
   public void robotInit() {

@@ -57,7 +57,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * deadband of 0 is used.
  */
 public class MecanumDrive extends RobotDriveBase {
-  private static int instances = 0;
+  private static int instances;
 
   private SpeedController m_frontLeftMotor;
   private SpeedController m_rearLeftMotor;
@@ -65,7 +65,7 @@ public class MecanumDrive extends RobotDriveBase {
   private SpeedController m_rearRightMotor;
 
   private double m_rightSideInvertMultiplier = -1.0;
-  private boolean m_reported = false;
+  private boolean m_reported;
 
   /**
    * Construct a MecanumDrive.

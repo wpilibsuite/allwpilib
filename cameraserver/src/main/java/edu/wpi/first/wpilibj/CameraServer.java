@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -146,11 +147,8 @@ public class CameraServer {
       int sinkSource = CameraServerJNI.getSinkSource(sink);
       if (source == sinkSource
           && VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) == VideoSink.Kind.kMjpeg) {
-        // Add USB-only passthrough
-        String[] finalValues = new String[values.length + 1];
-        for (int j = 0; j < values.length; j++) {
-          finalValues[j] = values[j];
-        }
+        // Add USB-only passthrough  
+        String[] finalValues = Arrays.copyOf(values, values.length + 1);
         int port = CameraServerJNI.getMjpegServerPort(sink);
         finalValues[values.length] = makeStreamValue("172.22.11.2", port);
         return finalValues;

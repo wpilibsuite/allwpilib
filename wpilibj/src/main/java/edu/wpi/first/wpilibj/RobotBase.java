@@ -8,9 +8,10 @@
 package edu.wpi.first.wpilibj;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Enumeration;
 import java.util.jar.Manifest;
 
@@ -218,7 +219,7 @@ public abstract class RobotBase implements AutoCloseable {
   /**
    * Starting point for the applications.
    */
-  @SuppressWarnings("PMD.UnusedFormalParameter")
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public static void main(String... args) {
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");
@@ -273,7 +274,7 @@ public abstract class RobotBase implements AutoCloseable {
 
       file.createNewFile();
 
-      try (FileOutputStream output = new FileOutputStream(file)) {
+      try (OutputStream output = Files.newOutputStream(file.toPath())) {
         output.write("Java ".getBytes());
         output.write(WPILibVersion.Version.getBytes());
       }
