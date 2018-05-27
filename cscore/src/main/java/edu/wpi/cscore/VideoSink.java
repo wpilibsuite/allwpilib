@@ -148,6 +148,7 @@ public class VideoSink implements AutoCloseable {
    * Enumerate all existing sinks.
    * @return Vector of sinks.
    */
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public static VideoSink[] enumerateSinks() {
     int[] handles = CameraServerJNI.enumerateSinks();
     VideoSink[] rv = new VideoSink[handles.length];

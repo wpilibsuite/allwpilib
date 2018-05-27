@@ -75,7 +75,7 @@ public class Preferences {
    * Gets the vector of keys.
    * @return a vector of the keys
    */
-  @SuppressWarnings("PMD.LooseCoupling")
+  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
   public Vector<String> getKeys() {
     return new Vector<>(m_table.getKeys());
   }

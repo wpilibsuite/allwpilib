@@ -35,7 +35,7 @@ public class CommandGroup extends Command {
   /**
    * The commands in this group (stored in entries).
    */
-  @SuppressWarnings("PMD.LooseCoupling")
+  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
   private final Vector<Entry> m_commands = new Vector<>();
   /*
    * Intentionally package private
@@ -43,7 +43,7 @@ public class CommandGroup extends Command {
   /**
    * The active children in this group (stored in entries).
    */
-  @SuppressWarnings("PMD.LooseCoupling")
+  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
   final Vector<Entry> m_children = new Vector<>();
   /**
    * The current command, -1 signifies that none have been run.

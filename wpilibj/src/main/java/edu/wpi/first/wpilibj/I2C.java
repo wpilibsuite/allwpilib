@@ -231,7 +231,7 @@ public class I2C implements AutoCloseable {
     return transaction(registerAddressArray, registerAddressArray.length, buffer, count);
   }
 
-  private ByteBuffer m_readDataToSendBuffer = null;
+  private ByteBuffer m_readDataToSendBuffer;
 
   /**
    * Execute a read transaction with the device.

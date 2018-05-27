@@ -66,7 +66,7 @@ public class DriverStation implements RobotState.Interface {
   }
 
   private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
-  private double m_nextMessageTime = 0.0;
+  private double m_nextMessageTime;
 
   private static class DriverStationTask implements Runnable {
     private DriverStation m_ds;
@@ -160,10 +160,10 @@ public class DriverStation implements RobotState.Interface {
   private int m_waitForDataCount;
 
   // Robot state status variables
-  private boolean m_userInDisabled = false;
-  private boolean m_userInAutonomous = false;
-  private boolean m_userInTeleop = false;
-  private boolean m_userInTest = false;
+  private boolean m_userInDisabled;
+  private boolean m_userInAutonomous;
+  private boolean m_userInTeleop;
+  private boolean m_userInTest;
 
   // Control word variables
   private final Object m_controlWordMutex;
@@ -185,6 +185,7 @@ public class DriverStation implements RobotState.Interface {
    * <p>The single DriverStation instance is created statically with the instance static member
    * variable.
    */
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   private DriverStation() {
     HAL.initialize(500, 0);
     m_waitForDataCount = 0;
@@ -278,12 +279,12 @@ public class DriverStation implements RobotState.Interface {
     } else {
       locString = "";
     }
-    String traceString = "";
+    StringBuffer traceString = new StringBuffer("");
     if (printTrace) {
       boolean haveLoc = false;
       for (int i = stackTraceFirst; i < stackTrace.length; i++) {
         String loc = stackTrace[i].toString();
-        traceString += "\tat " + loc + "\n";
+        traceString.append("\tat ").append(loc).append('\n');
         // get first user function
         if (!haveLoc && !loc.startsWith("edu.wpi.first")) {
           locString = loc;
@@ -291,7 +292,7 @@ public class DriverStation implements RobotState.Interface {
         }
       }
     }
-    HAL.sendError(isError, code, false, error, locString, traceString, true);
+    HAL.sendError(isError, code, false, error, locString, traceString.toString(), true);
   }
 
   /**

@@ -8,8 +8,8 @@
 package edu.wpi.first.wpilibj;
 
 public class MockSpeedController implements SpeedController {
-  private double m_speed = 0.0;
-  private boolean m_isInverted = false;
+  private double m_speed;
+  private boolean m_isInverted;
 
   @Override
   public void set(double speed) {

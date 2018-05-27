@@ -30,8 +30,8 @@ public class DoubleSolenoid extends SolenoidBase {
 
   private byte m_forwardMask; // The mask for the forward channel.
   private byte m_reverseMask; // The mask for the reverse channel.
-  private int m_forwardHandle = 0;
-  private int m_reverseHandle = 0;
+  private int m_forwardHandle;
+  private int m_reverseHandle;
 
   /**
    * Constructor. Uses the default PCM ID (defaults to 0).

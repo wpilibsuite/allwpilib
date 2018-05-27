@@ -27,7 +27,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
   public static final double kDefaultPeriod = 0.05;
-  private static int instances = 0;
+  private static int instances;
 
   // Factor for "proportional" control
   @SuppressWarnings("MemberName")
@@ -52,34 +52,34 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
   private double m_minimumOutput = -1.0;
 
   // Maximum input - limit setpoint to this
-  private double m_maximumInput = 0.0;
+  private double m_maximumInput;
 
   // Minimum input - limit setpoint to this
-  private double m_minimumInput = 0.0;
+  private double m_minimumInput;
 
   // Input range - difference between maximum and minimum
-  private double m_inputRange = 0.0;
+  private double m_inputRange;
 
   // Do the endpoints wrap around? (e.g., absolute encoder)
-  private boolean m_continuous = false;
+  private boolean m_continuous;
 
   // Is the PID controller enabled
-  protected boolean m_enabled = false;
+  protected boolean m_enabled;
 
   // The prior error (used to compute velocity)
-  private double m_prevError = 0.0;
+  private double m_prevError;
 
   // The sum of the errors for use in the integral calc
-  private double m_totalError = 0.0;
+  private double m_totalError;
 
   // The tolerance object used to check if on target
   private Tolerance m_tolerance;
 
-  private double m_setpoint = 0.0;
-  private double m_prevSetpoint = 0.0;
+  private double m_setpoint;
+  private double m_prevSetpoint;
   @SuppressWarnings("PMD.UnusedPrivateField")
-  private double m_error = 0.0;
-  private double m_result = 0.0;
+  private double m_error;
+  private double m_result;
 
   private PIDSource m_origSource;
   private LinearDigitalFilter m_filter;

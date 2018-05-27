@@ -53,7 +53,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
   /**
    * The index source.
    */
-  protected DigitalSource m_indexSource = null; // Index on some encoders
+  protected DigitalSource m_indexSource; // Index on some encoders
   private boolean m_allocatedA;
   private boolean m_allocatedB;
   private boolean m_allocatedI;

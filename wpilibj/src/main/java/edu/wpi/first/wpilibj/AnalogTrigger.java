@@ -41,8 +41,8 @@ public class AnalogTrigger extends SendableBase {
    */
   protected int m_port;
   protected int m_index;
-  protected AnalogInput m_analogInput = null;
-  protected boolean m_ownsAnalog = false;
+  protected AnalogInput m_analogInput;
+  protected boolean m_ownsAnalog;
 
   /**
    * Constructor for an analog trigger given a channel number.

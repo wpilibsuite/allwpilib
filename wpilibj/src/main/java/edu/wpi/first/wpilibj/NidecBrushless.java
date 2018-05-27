@@ -16,11 +16,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  */
 public class NidecBrushless extends SendableBase implements SpeedController, MotorSafety, Sendable {
   private final MotorSafetyHelper m_safetyHelper;
-  private boolean m_isInverted = false;
+  private boolean m_isInverted;
   private DigitalOutput m_dio;
   private PWM m_pwm;
-  private volatile double m_speed = 0.0;
-  private volatile boolean m_disabled = false;
+  private volatile double m_speed;
+  private volatile boolean m_disabled;
 
   /**
    * Constructor.

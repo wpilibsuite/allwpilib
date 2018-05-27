@@ -35,7 +35,7 @@ public abstract class InterruptableSensorBase extends SendableBase {
   /**
    * Flags if the interrupt being allocated is synchronous.
    */
-  protected boolean m_isSynchronousInterrupt = false;
+  protected boolean m_isSynchronousInterrupt;
 
   /**
    * Create a new InterrupatableSensorBase.

@@ -23,14 +23,14 @@ public class TimedRobot extends IterativeRobotBase {
   public static final double kDefaultPeriod = 0.02;
 
   // Prevents loop from starting if user calls setPeriod() in robotInit()
-  private boolean m_startLoop = false;
+  private boolean m_startLoop;
 
   // The C pointer to the notifier object. We don't use it directly, it is
   // just passed to the JNI bindings.
   private final int m_notifier = NotifierJNI.initializeNotifier();
 
   // The absolute expiration time
-  private double m_expirationTime = 0;
+  private double m_expirationTime;
 
   private double m_period = kDefaultPeriod;
 

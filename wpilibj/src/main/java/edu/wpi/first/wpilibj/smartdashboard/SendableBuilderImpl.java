@@ -47,7 +47,7 @@ public class SendableBuilderImpl implements SendableBuilder {
     }
 
     final NetworkTableEntry m_entry;
-    int m_listener = 0;
+    int m_listener;
     Consumer<NetworkTableEntry> m_update;
     Function<NetworkTableEntry, Integer> m_createListener;
   }

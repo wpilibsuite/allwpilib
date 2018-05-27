@@ -28,7 +28,7 @@ public class SPI implements AutoCloseable {
     }
   }
 
-  private static int devices = 0;
+  private static int devices;
 
   private int m_port;
   private int m_bitOrder;
@@ -527,7 +527,7 @@ public class SPI implements AutoCloseable {
     }
   }
 
-  private Accumulator m_accum = null;
+  private Accumulator m_accum;
 
   /**
    * Initialize the accumulator.
