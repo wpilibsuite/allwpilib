@@ -45,6 +45,7 @@ public class SmartDashboard {
    * A table linking tables in the SmartDashboard to the {@link Sendable} objects they
    * came from.
    */
+  @SuppressWarnings("PMD.UseConcurrentHashMap")
   private static final Map<String, Data> tablesToData = new HashMap<>();
 
   static {

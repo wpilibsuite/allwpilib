@@ -44,6 +44,7 @@ public abstract class GenericHID {
 
     @SuppressWarnings("MemberName")
     public final int value;
+    @SuppressWarnings("PMD.UseConcurrentHashMap")
     private static final Map<Integer, HIDType> map = new HashMap<>();
 
     HIDType(int value) {

@@ -36,6 +36,7 @@ public class LiveWindow {
     boolean m_telemetryEnabled = true;
   }
 
+  @SuppressWarnings("PMD.UseConcurrentHashMap")
   private static final Map<Object, Component> components = new HashMap<>();
   private static final NetworkTable liveWindowTable =
       NetworkTableInstance.getDefault().getTable("LiveWindow");
