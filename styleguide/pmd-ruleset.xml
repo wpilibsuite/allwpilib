@@ -30,6 +30,10 @@
     <exclude name="DoNotUseThreads" />
   </rule>
 
+  <rule ref="category/java/performance.xml">
+    <exclude name="AvoidUsingShortType" />
+  </rule>
+
   <rule name="UnnecessaryCastRule"
         language="java"
         message="Avoid unnecessary casts"
