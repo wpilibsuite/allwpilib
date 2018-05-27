@@ -9,14 +9,14 @@ if (!hasProperty('releaseType')) {
 
 def pubVersion = ''
 if (project.hasProperty("publishVersion")) {
-    pubVersion = project.publishVersion
+    pubVersion = "1.8.0-4e4df22-frc-$project.publishVersion"
 } else {
-    pubVersion = WPILibVersion.version
+    pubVersion = "1.8.0-4e4df22-frc-$WPILibVersion.version"
 }
 
-def baseArtifactId = 'gtest'
-def artifactGroupId = 'edu.wpi.first.gtest'
-def zipBaseName = '_GROUP_edu_wpi_first_gtest_ID_gtest_CLS'
+def baseArtifactId = 'gtest-cpp'
+def artifactGroupId = 'com.google'
+def zipBaseName = '_GROUP_com_gtest_ID_gtest-cpp_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
