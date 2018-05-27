@@ -58,7 +58,7 @@ public abstract class GenericHID {
     }
 
     public static HIDType of(int value) {
-      return (HIDType) map.get(value);
+      return map.get(value);
     }
   }
 
