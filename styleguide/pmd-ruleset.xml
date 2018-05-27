@@ -24,6 +24,10 @@
     <exclude name="UseVarargs" />
   </rule>
 
+  <rule ref="category/java/multithreading.xml">
+    <exclude name="DoNotUseThreads" />
+  </rule>
+
   <!--
   <rule ref="rulesets/java/basic.xml" />
   <rule ref="rulesets/java/braces.xml" />
