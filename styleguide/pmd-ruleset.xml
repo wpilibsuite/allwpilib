@@ -24,6 +24,18 @@
     <exclude name="UseVarargs" />
   </rule>
 
+  <rule ref="category/java/errorprone.xml">
+    <exclude name="AssignmentToNonFinalStatic" />
+    <exclude name="AvoidDuplicateLiterals" />
+    <exclude name="AvoidLiteralsInIfCondition" />
+    <exclude name="BeanMembersShouldSerialize" />
+    <exclude name="ConstructorCallsOverridableMethod" />
+    <exclude name="DataflowAnomalyAnalysis" />
+    <exclude name="DoNotCallSystemExit" />
+    <exclude name="FinalizeDoesNotCallSuperFinalize" />
+    <exclude name="NullAssignment" />
+  </rule>
+
   <rule ref="category/java/multithreading.xml">
     <exclude name="AvoidSynchronizedAtMethodLevel" />
     <exclude name="AvoidUsingVolatile" />
