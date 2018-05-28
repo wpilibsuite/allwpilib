@@ -24,12 +24,61 @@ class DoubleSolenoid : public SolenoidBase {
  public:
   enum Value { kOff, kForward, kReverse };
 
+  /**
+   * Constructor.
+   *
+   * Uses the default PCM ID of 0.
+   *
+   * @param forwardChannel The forward channel number on the PCM (0..7).
+   * @param reverseChannel The reverse channel number on the PCM (0..7).
+   */
   explicit DoubleSolenoid(int forwardChannel, int reverseChannel);
+
+  /**
+   * Constructor.
+   *
+   * @param moduleNumber   The CAN ID of the PCM.
+   * @param forwardChannel The forward channel on the PCM to control (0..7).
+   * @param reverseChannel The reverse channel on the PCM to control (0..7).
+   */
   DoubleSolenoid(int moduleNumber, int forwardChannel, int reverseChannel);
+
   ~DoubleSolenoid() override;
+
+  /**
+   * Set the value of a solenoid.
+   *
+   * @param value The value to set (Off, Forward or Reverse)
+   */
   virtual void Set(Value value);
+
+  /**
+   * Read the current value of the solenoid.
+   *
+   * @return The current value of the solenoid.
+   */
   virtual Value Get() const;
+
+  /**
+   * Check if the forward solenoid is blacklisted.
+   *
+   * If a solenoid is shorted, it is added to the blacklist and disabled until
+   * power cycle, or until faults are cleared.
+   *
+   * @see ClearAllPCMStickyFaults()
+   * @return If solenoid is disabled due to short.
+   */
   bool IsFwdSolenoidBlackListed() const;
+
+  /**
+   * Check if the reverse solenoid is blacklisted.
+   *
+   * If a solenoid is shorted, it is added to the blacklist and disabled until
+   * power cycle, or until faults are cleared.
+   *
+   * @see ClearAllPCMStickyFaults()
+   * @return If solenoid is disabled due to short.
+   */
   bool IsRevSolenoidBlackListed() const;
 
   void InitSendable(SendableBuilder& builder) override;

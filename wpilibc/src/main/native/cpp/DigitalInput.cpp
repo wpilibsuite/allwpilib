@@ -19,13 +19,6 @@
 
 using namespace frc;
 
-/**
- * Create an instance of a Digital Input class.
- *
- * Creates a digital input given a channel.
- *
- * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
- */
 DigitalInput::DigitalInput(int channel) {
   if (!SensorUtil::CheckDigitalChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
@@ -49,9 +42,6 @@ DigitalInput::DigitalInput(int channel) {
   SetName("DigitalInput", channel);
 }
 
-/**
- * Free resources associated with the Digital Input class.
- */
 DigitalInput::~DigitalInput() {
   if (StatusIsFatal()) return;
   if (m_interrupt != HAL_kInvalidHandle) {
@@ -64,11 +54,6 @@ DigitalInput::~DigitalInput() {
   HAL_FreeDIOPort(m_handle);
 }
 
-/**
- * Get the value from a digital input channel.
- *
- * Retrieve the value of a single digital input channel from the FPGA.
- */
 bool DigitalInput::Get() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
@@ -77,27 +62,15 @@ bool DigitalInput::Get() const {
   return value;
 }
 
-/**
- * @return The GPIO channel number that this object represents.
- */
-int DigitalInput::GetChannel() const { return m_channel; }
-
-/**
- * @return The HAL Handle to the specified source.
- */
 HAL_Handle DigitalInput::GetPortHandleForRouting() const { return m_handle; }
 
-/**
- * Is source an AnalogTrigger
- */
-bool DigitalInput::IsAnalogTrigger() const { return false; }
-
-/**
- * @return The type of analog trigger output to be used. 0 for Digitals
- */
 AnalogTriggerType DigitalInput::GetAnalogTriggerTypeForRouting() const {
   return (AnalogTriggerType)0;
 }
+
+bool DigitalInput::IsAnalogTrigger() const { return false; }
+
+int DigitalInput::GetChannel() const { return m_channel; }
 
 void DigitalInput::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Input");

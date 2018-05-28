@@ -11,14 +11,8 @@
 
 using namespace frc;
 
-/**
- * Constructor for a Digilent DMC 60.
- *
- * @param channel The PWM channel that the DMC 60 is attached to. 0-9 are
- *                on-board, 10-19 are on the MXP port
- */
 DMC60::DMC60(int channel) : PWMSpeedController(channel) {
-  /**
+  /*
    * Note that the DMC 60 uses the following bounds for PWM values. These
    * values should work reasonably well for most controllers, but if users
    * experience issues such as asymmetric behavior around the deadband or

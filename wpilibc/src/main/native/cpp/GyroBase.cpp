@@ -12,12 +12,6 @@
 
 using namespace frc;
 
-/**
- * Get the PIDOutput for the PIDSource base object. Can be set to return
- * angle or rate using SetPIDSourceType(). Defaults to angle.
- *
- * @return The PIDOutput (angle or rate, defaults to angle)
- */
 double GyroBase::PIDGet() {
   switch (GetPIDSourceType()) {
     case PIDSourceType::kRate:

@@ -27,17 +27,72 @@ namespace frc {
  */
 class SafePWM : public PWM, public MotorSafety {
  public:
+  /**
+   * Constructor for a SafePWM object taking a channel number.
+   *
+   * @param channel The PWM channel number 0-9 are on-board, 10-19 are on the
+   *                MXP port
+   */
   explicit SafePWM(int channel);
+
   virtual ~SafePWM() = default;
 
+  /**
+   * Set the expiration time for the PWM object.
+   *
+   * @param timeout The timeout (in seconds) for this motor object
+   */
   void SetExpiration(double timeout);
+
+  /**
+   * Return the expiration time for the PWM object.
+   *
+   * @returns The expiration time value.
+   */
   double GetExpiration() const;
+
+  /**
+   * Check if the PWM object is currently alive or stopped due to a timeout.
+   *
+   * @return a bool value that is true if the motor has NOT timed out and should
+   *         still be running.
+   */
   bool IsAlive() const;
+
+  /**
+   * Stop the motor associated with this PWM object.
+   *
+   * This is called by the MotorSafetyHelper object when it has a timeout for
+   * this PWM and needs to stop it from running.
+   */
   void StopMotor();
-  bool IsSafetyEnabled() const;
+
+  /**
+   * Enable/disable motor safety for this device.
+   *
+   * Turn on and off the motor safety option for this PWM object.
+   *
+   * @param enabled True if motor safety is enforced for this object
+   */
   void SetSafetyEnabled(bool enabled);
+
+  /**
+   * Check if motor safety is enabled for this object.
+   *
+   * @returns True if motor safety is enforced for this object
+   */
+  bool IsSafetyEnabled() const;
+
   void GetDescription(wpi::raw_ostream& desc) const;
 
+  /**
+   * Feed the MotorSafety timer when setting the speed.
+   *
+   * This method is called by the subclass motor whenever it updates its speed,
+   * thereby reseting the timeout value.
+   *
+   * @param speed Value to pass to the PWM class
+   */
   virtual void SetSpeed(double speed);
 
  private:

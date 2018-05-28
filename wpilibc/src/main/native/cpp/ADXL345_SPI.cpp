@@ -13,12 +13,6 @@
 
 using namespace frc;
 
-/**
- * Constructor.
- *
- * @param port  The SPI port the accelerometer is attached to
- * @param range The range (+ or -) that the accelerometer will measure
- */
 ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
     : m_spi(port) {
   m_spi.SetClockRate(500000);
@@ -56,12 +50,6 @@ double ADXL345_SPI::GetY() { return GetAcceleration(kAxis_Y); }
 
 double ADXL345_SPI::GetZ() { return GetAcceleration(kAxis_Z); }
 
-/**
- * Get the acceleration of one axis in Gs.
- *
- * @param axis The axis to read from.
- * @return Acceleration of the ADXL345 in Gs.
- */
 double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis) {
   uint8_t buffer[3];
   uint8_t command[3] = {0, 0, 0};
@@ -74,12 +62,6 @@ double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis) {
   return rawAccel * kGsPerLSB;
 }
 
-/**
- * Get the acceleration of all axes in Gs.
- *
- * @return An object containing the acceleration measured on each axis of the
- *         ADXL345 in Gs.
- */
 ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations() {
   AllAxes data = AllAxes();
   uint8_t dataBuffer[7] = {0, 0, 0, 0, 0, 0, 0};

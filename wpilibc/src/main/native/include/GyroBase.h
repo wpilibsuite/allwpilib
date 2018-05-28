@@ -24,6 +24,12 @@ class GyroBase : public Gyro,
                  public PIDSource {
  public:
   // PIDSource interface
+  /**
+   * Get the PIDOutput for the PIDSource base object. Can be set to return
+   * angle or rate using SetPIDSourceType(). Defaults to angle.
+   *
+   * @return The PIDOutput (angle or rate, defaults to angle)
+   */
   double PIDGet() override;
 
   void InitSendable(SendableBuilder& builder) override;

@@ -17,12 +17,6 @@
 
 using namespace frc;
 
-/**
- * Construct a DifferentialDrive.
- *
- * To pass multiple motors per side, use a SpeedControllerGroup. If a motor
- * needs to be inverted, do so before passing it in.
- */
 DifferentialDrive::DifferentialDrive(SpeedController& leftMotor,
                                      SpeedController& rightMotor)
     : m_leftMotor(leftMotor), m_rightMotor(rightMotor) {
@@ -33,18 +27,6 @@ DifferentialDrive::DifferentialDrive(SpeedController& leftMotor,
   SetName("DifferentialDrive", instances);
 }
 
-/**
- * Arcade drive method for differential drive platform.
- *
- * Note: Some drivers may prefer inverted rotation controls. This can be done by
- * negating the value passed for rotation.
- *
- * @param xSpeed        The speed at which the robot should drive along the X
- *                      axis [-1.0..1.0]. Forward is negative.
- * @param zRotation     The rotation rate of the robot around the Z axis
- *                      [-1.0..1.0]. Clockwise is positive.
- * @param squaredInputs If set, decreases the input sensitivity at low speeds.
- */
 void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
                                     bool squaredInputs) {
   static bool reported = false;
@@ -100,21 +82,6 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
   m_safetyHelper.Feed();
 }
 
-/**
- * Curvature drive method for differential drive platform.
- *
- * The rotation argument controls the curvature of the robot's path rather than
- * its rate of heading change. This makes the robot more controllable at high
- * speeds. Also handles the robot's quick turn functionality - "quick turn"
- * overrides constant-curvature turning for turn-in-place maneuvers.
- *
- * @param xSpeed      The robot's speed along the X axis [-1.0..1.0]. Forward is
- *                    positive.
- * @param zRotation   The robot's rotation rate around the Z axis [-1.0..1.0].
- *                    Clockwise is positive.
- * @param isQuickTurn If set, overrides constant-curvature turning for
- *                    turn-in-place maneuvers.
- */
 void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
                                        bool isQuickTurn) {
   static bool reported = false;
@@ -188,15 +155,6 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
   m_safetyHelper.Feed();
 }
 
-/**
- * Tank drive method for differential drive platform.
- *
- * @param leftSpeed     The robot left side's speed along the X axis
- *                      [-1.0..1.0]. Forward is positive.
- * @param rightSpeed    The robot right side's speed along the X axis
- *                      [-1.0..1.0]. Forward is positive.
- * @param squaredInputs If set, decreases the input sensitivity at low speeds.
- */
 void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
                                   bool squaredInputs) {
   static bool reported = false;
@@ -225,55 +183,18 @@ void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
   m_safetyHelper.Feed();
 }
 
-/**
- * Sets the QuickStop speed threshold in curvature drive.
- *
- * QuickStop compensates for the robot's moment of inertia when stopping after a
- * QuickTurn.
- *
- * While QuickTurn is enabled, the QuickStop accumulator takes on the rotation
- * rate value outputted by the low-pass filter when the robot's speed along the
- * X axis is below the threshold. When QuickTurn is disabled, the accumulator's
- * value is applied against the computed angular power request to slow the
- * robot's rotation.
- *
- * @param threshold X speed below which quick stop accumulator will receive
- *                  rotation rate values [0..1.0].
- */
 void DifferentialDrive::SetQuickStopThreshold(double threshold) {
   m_quickStopThreshold = threshold;
 }
 
-/**
- * Sets the low-pass filter gain for QuickStop in curvature drive.
- *
- * The low-pass filter filters incoming rotation rate commands to smooth out
- * high frequency changes.
- *
- * @param alpha Low-pass filter gain [0.0..2.0]. Smaller values result in slower
- *              output changes. Values between 1.0 and 2.0 result in output
- *              oscillation. Values below 0.0 and above 2.0 are unstable.
- */
 void DifferentialDrive::SetQuickStopAlpha(double alpha) {
   m_quickStopAlpha = alpha;
 }
 
-/**
- * Gets if the power sent to the right side of the drivetrain is multipled by
- * -1.
- *
- * @return true if the right side is inverted
- */
 bool DifferentialDrive::IsRightSideInverted() const {
   return m_rightSideInvertMultiplier == -1.0;
 }
 
-/**
- * Sets if the power sent to the right side of the drivetrain should be
- * multipled by -1.
- *
- * @param rightSideInverted true if right side power should be multipled by -1
- */
 void DifferentialDrive::SetRightSideInverted(bool rightSideInverted) {
   m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;
 }

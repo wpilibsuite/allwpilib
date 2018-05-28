@@ -13,24 +13,16 @@ Pneumatics::Pneumatics() : frc::Subsystem("Pneumatics") {
   AddChild("Pressure Sensor", m_pressureSensor);
 }
 
-/**
- * No default command
- */
-void Pneumatics::InitDefaultCommand() {}
+void Pneumatics::InitDefaultCommand() {
+  // No default command
+}
 
-/**
- * Start the compressor going. The compressor automatically starts and stops as
- * it goes above and below maximum pressure.
- */
 void Pneumatics::Start() {
 #ifndef SIMULATION
   m_compressor.Start();
 #endif
 }
 
-/**
- * @return Whether or not the system is fully pressurized.
- */
 bool Pneumatics::IsPressurized() {
 #ifndef SIMULATION
   return kMaxPressure <= m_pressureSensor.GetVoltage();
@@ -39,9 +31,6 @@ bool Pneumatics::IsPressurized() {
 #endif
 }
 
-/**
- * Puts the pressure on the SmartDashboard.
- */
 void Pneumatics::WritePressure() {
   frc::SmartDashboard::PutNumber("Pressure", m_pressureSensor.GetVoltage());
 }

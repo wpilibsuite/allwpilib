@@ -25,6 +25,12 @@ class IterativeRobot : public IterativeRobotBase {
   IterativeRobot();
   virtual ~IterativeRobot() = default;
 
+  /**
+   * Provide an alternate "main loop" via StartCompetition().
+   *
+   * This specific StartCompetition() implements "main loop" behaviour synced
+   * with the DS packets.
+   */
   void StartCompetition() override;
 };
 

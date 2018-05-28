@@ -19,6 +19,12 @@ namespace frc {
  */
 class Victor : public PWMSpeedController {
  public:
+  /**
+   * Constructor for a Victor.
+   *
+   * @param channel The PWM channel number that the Victor is attached to. 0-9
+   *                are on-board, 10-19 are on the MXP port
+   */
   explicit Victor(int channel);
 };
 

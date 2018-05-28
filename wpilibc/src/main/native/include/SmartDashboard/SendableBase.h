@@ -18,7 +18,13 @@ namespace frc {
 
 class SendableBase : public Sendable {
  public:
+  /**
+   * Creates an instance of the sensor base.
+   *
+   * @param addLiveWindow if true, add this Sendable to LiveWindow
+   */
   explicit SendableBase(bool addLiveWindow = true);
+
   ~SendableBase() override;
 
   using Sendable::SetName;
@@ -29,10 +35,38 @@ class SendableBase : public Sendable {
   void SetSubsystem(const wpi::Twine& subsystem) final;
 
  protected:
+  /**
+   * Add a child component.
+   *
+   * @param child child component
+   */
   void AddChild(std::shared_ptr<Sendable> child);
+
+  /**
+   * Add a child component.
+   *
+   * @param child child component
+   */
   void AddChild(void* child);
 
+  /**
+   * Sets the name of the sensor with a channel number.
+   *
+   * @param moduleType A string that defines the module name in the label for
+   *                   the value
+   * @param channel    The channel number the device is plugged into
+   */
   void SetName(const wpi::Twine& moduleType, int channel);
+
+  /**
+   * Sets the name of the sensor with a module and channel number.
+   *
+   * @param moduleType   A string that defines the module name in the label for
+   *                     the value
+   * @param moduleNumber The number of the particular module type
+   * @param channel      The channel number the device is plugged into (usually
+   * PWM)
+   */
   void SetName(const wpi::Twine& moduleType, int moduleNumber, int channel);
 
  private:

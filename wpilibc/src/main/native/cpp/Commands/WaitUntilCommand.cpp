@@ -11,13 +11,6 @@
 
 using namespace frc;
 
-/**
- * A WaitCommand will wait until a certain match time before finishing.
- *
- * This will wait until the game clock reaches some value, then continue to the
- * next command.
- * @see CommandGroup
- */
 WaitUntilCommand::WaitUntilCommand(double time)
     : Command("WaitUntilCommand", time) {
   m_time = time;
@@ -28,7 +21,4 @@ WaitUntilCommand::WaitUntilCommand(const wpi::Twine& name, double time)
   m_time = time;
 }
 
-/**
- * Check if we've reached the actual finish time.
- */
 bool WaitUntilCommand::IsFinished() { return Timer::GetMatchTime() >= m_time; }

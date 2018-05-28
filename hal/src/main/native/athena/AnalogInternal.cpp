@@ -41,9 +41,6 @@ void InitializeAnalogInternal() {
 }
 }  // namespace init
 
-/**
- * Initialize the analog System.
- */
 void initializeAnalog(int32_t* status) {
   hal::init::CheckInit();
   if (analogSystemInitialized) return;
@@ -56,41 +53,22 @@ void initializeAnalog(int32_t* status) {
   analogSystemInitialized = true;
 }
 
-/**
- * Return the number of channels on the module in use.
- *
- * @return Active channels.
- */
 int32_t getAnalogNumActiveChannels(int32_t* status) {
   int32_t scanSize = analogInputSystem->readConfig_ScanSize(status);
   if (scanSize == 0) return 8;
   return scanSize;
 }
 
-/**
- * Get the number of active channels.
- *
- * This is an internal function to allow the atomic update of both the
- * number of active channels and the sample rate.
- *
- * When the number of channels changes, use the new value.  Otherwise,
- * return the curent value.
- *
- * @return Value to write to the active channels field.
- */
+void setAnalogNumChannelsToActivate(int32_t channels) {
+  analogNumChannelsToActivate = channels;
+}
+
 int32_t getAnalogNumChannelsToActivate(int32_t* status) {
   if (analogNumChannelsToActivate == 0)
     return getAnalogNumActiveChannels(status);
   return analogNumChannelsToActivate;
 }
 
-/**
- * Set the sample rate.
- *
- * This is a global setting for the Athena and effects all channels.
- *
- * @param samplesPerSecond The number of samples per channel per second.
- */
 void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // TODO: This will change when variable size scan lists are implemented.
   // TODO: Need double comparison with epsilon.
@@ -117,19 +95,6 @@ void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
 
   // Indicate that the scan size has been commited to hardware.
   setAnalogNumChannelsToActivate(0);
-}
-
-/**
- * Set the number of active channels.
- *
- * Store the number of active channels to set.  Don't actually commit to
- * hardware
- * until SetSampleRate().
- *
- * @param channels Number of active channels.
- */
-void setAnalogNumChannelsToActivate(int32_t channels) {
-  analogNumChannelsToActivate = channels;
 }
 
 }  // namespace hal

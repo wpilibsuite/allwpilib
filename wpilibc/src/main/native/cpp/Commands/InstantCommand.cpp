@@ -9,11 +9,6 @@
 
 using namespace frc;
 
-/**
- * Creates a new InstantCommand with the given name.
- *
- * @param name The name for this command
- */
 InstantCommand::InstantCommand(const wpi::Twine& name) : Command(name) {}
 
 bool InstantCommand::IsFinished() { return true; }

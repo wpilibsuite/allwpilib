@@ -67,10 +67,6 @@ int HAL_LoadOneExtension(const char* library) {
   return rc;
 }
 
-/**
- * Load any extra halsim libraries provided in the HALSIM_EXTENSIONS
- * environment variable.
- */
 int HAL_LoadExtensions(void) {
   int rc = 1;
   wpi::SmallVector<wpi::StringRef, 2> libraries;

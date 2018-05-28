@@ -42,16 +42,95 @@ namespace frc {
  */
 class IterativeRobotBase : public RobotBase {
  public:
+  /**
+   * Robot-wide initialization code should go here.
+   *
+   * Users should override this method for default Robot-wide initialization
+   * which will be called when the robot is first powered on. It will be called
+   * exactly one time.
+   *
+   * Warning: the Driver Station "Robot Code" light and FMS "Robot Ready"
+   * indicators will be off until RobotInit() exits. Code in RobotInit() that
+   * waits for enable will cause the robot to never indicate that the code is
+   * ready, causing the robot to be bypassed in a match.
+   */
   virtual void RobotInit();
+
+  /**
+   * Initialization code for disabled mode should go here.
+   *
+   * Users should override this method for initialization code which will be
+   * called each time
+   * the robot enters disabled mode.
+   */
   virtual void DisabledInit();
+
+  /**
+   * Initialization code for autonomous mode should go here.
+   *
+   * Users should override this method for initialization code which will be
+   * called each time the robot enters autonomous mode.
+   */
   virtual void AutonomousInit();
+
+  /**
+   * Initialization code for teleop mode should go here.
+   *
+   * Users should override this method for initialization code which will be
+   * called each time the robot enters teleop mode.
+   */
   virtual void TeleopInit();
+
+  /**
+   * Initialization code for test mode should go here.
+   *
+   * Users should override this method for initialization code which will be
+   * called each time the robot enters test mode.
+   */
   virtual void TestInit();
 
+  /**
+   * Periodic code for all modes should go here.
+   *
+   * This function is called each time a new packet is received from the driver
+   * station.
+   */
   virtual void RobotPeriodic();
+
+  /**
+   * Periodic code for disabled mode should go here.
+   *
+   * Users should override this method for code which will be called each time a
+   * new packet is received from the driver station and the robot is in disabled
+   * mode.
+   */
   virtual void DisabledPeriodic();
+
+  /**
+   * Periodic code for autonomous mode should go here.
+   *
+   * Users should override this method for code which will be called each time a
+   * new packet is received from the driver station and the robot is in
+   * autonomous mode.
+   */
   virtual void AutonomousPeriodic();
+
+  /**
+   * Periodic code for teleop mode should go here.
+   *
+   * Users should override this method for code which will be called each time a
+   * new packet is received from the driver station and the robot is in teleop
+   * mode.
+   */
   virtual void TeleopPeriodic();
+
+  /**
+   * Periodic code for test mode should go here.
+   *
+   * Users should override this method for code which will be called each time a
+   * new packet is received from the driver station and the robot is in test
+   * mode.
+   */
   virtual void TestPeriodic();
 
  protected:

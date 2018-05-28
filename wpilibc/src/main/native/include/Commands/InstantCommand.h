@@ -20,7 +20,13 @@ namespace frc {
  */
 class InstantCommand : public Command {
  public:
+  /**
+   * Creates a new InstantCommand with the given name.
+   *
+   * @param name The name for this command
+   */
   explicit InstantCommand(const wpi::Twine& name);
+
   InstantCommand() = default;
   virtual ~InstantCommand() = default;
 

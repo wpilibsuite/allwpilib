@@ -18,11 +18,6 @@ Vector2d::Vector2d(double x, double y) {
   this->y = y;
 }
 
-/**
- * Rotate a vector in Cartesian space.
- *
- * @param angle angle in degrees by which to rotate vector counter-clockwise.
- */
 void Vector2d::Rotate(double angle) {
   double cosA = std::cos(angle * (kPi / 180.0));
   double sinA = std::sin(angle * (kPi / 180.0));
@@ -33,25 +28,12 @@ void Vector2d::Rotate(double angle) {
   y = out[1];
 }
 
-/**
- * Returns dot product of this vector with argument.
- *
- * @param vec Vector with which to perform dot product.
- */
 double Vector2d::Dot(const Vector2d& vec) const {
   return x * vec.x + y * vec.y;
 }
 
-/**
- * Returns magnitude of vector.
- */
 double Vector2d::Magnitude() const { return std::sqrt(x * x + y * y); }
 
-/**
- * Returns scalar projection of this vector onto argument.
- *
- * @param vec Vector onto which to project this vector.
- */
 double Vector2d::ScalarProject(const Vector2d& vec) const {
   return Dot(vec) / vec.Magnitude();
 }

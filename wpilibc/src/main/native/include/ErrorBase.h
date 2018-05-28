@@ -80,36 +80,119 @@ class ErrorBase {
   ErrorBase(const ErrorBase&) = delete;
   ErrorBase& operator=(const ErrorBase&) = delete;
 
+  /**
+   * @brief Retrieve the current error.
+   *
+   * Get the current error information associated with this sensor.
+   */
   virtual Error& GetError();
+
+  /**
+   * @brief Retrieve the current error.
+   *
+   * Get the current error information associated with this sensor.
+   */
   virtual const Error& GetError() const;
+
+  /**
+   * @brief Clear the current error information associated with this sensor.
+   */
+  virtual void ClearError() const;
+
+  /**
+   * @brief Set error information associated with a C library call that set an
+   *        error to the "errno" global variable.
+   *
+   * @param contextMessage A custom message from the code that set the error.
+   * @param filename       Filename of the error source
+   * @param function       Function of the error source
+   * @param lineNumber     Line number of the error source
+   */
   virtual void SetErrnoError(const wpi::Twine& contextMessage,
                              wpi::StringRef filename, wpi::StringRef function,
                              int lineNumber) const;
+
+  /**
+   * @brief Set the current error information associated from the nivision Imaq
+   *        API.
+   *
+   * @param success        The return from the function
+   * @param contextMessage A custom message from the code that set the error.
+   * @param filename       Filename of the error source
+   * @param function       Function of the error source
+   * @param lineNumber     Line number of the error source
+   */
   virtual void SetImaqError(int success, const wpi::Twine& contextMessage,
                             wpi::StringRef filename, wpi::StringRef function,
                             int lineNumber) const;
+
+  /**
+   * @brief Set the current error information associated with this sensor.
+   *
+   * @param code           The error code
+   * @param contextMessage A custom message from the code that set the error.
+   * @param filename       Filename of the error source
+   * @param function       Function of the error source
+   * @param lineNumber     Line number of the error source
+   */
   virtual void SetError(Error::Code code, const wpi::Twine& contextMessage,
                         wpi::StringRef filename, wpi::StringRef function,
                         int lineNumber) const;
+
+  /**
+   * @brief Set the current error information associated with this sensor.
+   * Range versions use for initialization code.
+   *
+   * @param code           The error code
+   * @param minRange       The minimum allowed allocation range
+   * @param maxRange       The maximum allowed allocation range
+   * @param requestedValue The requested value to allocate
+   * @param contextMessage A custom message from the code that set the error.
+   * @param filename       Filename of the error source
+   * @param function       Function of the error source
+   * @param lineNumber     Line number of the error source
+   */
   virtual void SetErrorRange(Error::Code code, int32_t minRange,
                              int32_t maxRange, int32_t requestedValue,
                              const wpi::Twine& contextMessage,
                              wpi::StringRef filename, wpi::StringRef function,
                              int lineNumber) const;
+
+  /**
+   * @brief Set the current error information associated with this sensor.
+   *
+   * @param errorMessage   The error message from WPIErrors.h
+   * @param contextMessage A custom message from the code that set the error.
+   * @param filename       Filename of the error source
+   * @param function       Function of the error source
+   * @param lineNumber     Line number of the error source
+   */
   virtual void SetWPIError(const wpi::Twine& errorMessage, Error::Code code,
                            const wpi::Twine& contextMessage,
                            wpi::StringRef filename, wpi::StringRef function,
                            int lineNumber) const;
+
   virtual void CloneError(const ErrorBase& rhs) const;
-  virtual void ClearError() const;
+
+  /**
+   * @brief Check if the current error code represents a fatal error.
+   *
+   * @return true if the current error is fatal.
+   */
   virtual bool StatusIsFatal() const;
+
   static void SetGlobalError(Error::Code code, const wpi::Twine& contextMessage,
                              wpi::StringRef filename, wpi::StringRef function,
                              int lineNumber);
+
   static void SetGlobalWPIError(const wpi::Twine& errorMessage,
                                 const wpi::Twine& contextMessage,
                                 wpi::StringRef filename,
                                 wpi::StringRef function, int lineNumber);
+
+  /**
+   * Retrieve the current global error.
+   */
   static Error& GetGlobalError();
 
  protected:
