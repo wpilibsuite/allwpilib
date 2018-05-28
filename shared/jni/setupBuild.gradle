@@ -22,6 +22,14 @@ dependencies {
 
 project(':').libraryBuild.dependsOn build
 
+ext {
+    staticGtestConfigs = [:]
+}
+
+staticGtestConfigs["${nativeName}Test"] = []
+
+apply from: "${rootDir}/shared/googletest.gradle"
+
 model {
     components {
         "${nativeName}Base"(JniNativeLibrarySpec) {
@@ -156,7 +164,6 @@ model {
     binaries {
         withType(GoogleTestTestSuiteBinarySpec) {
             if (!project.hasProperty('onlyAthena')) {
-                lib project: ':gtest', library: 'gtest', linkage: 'static'
                 lib library: nativeName, linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             } else {
