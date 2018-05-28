@@ -45,7 +45,6 @@ TLogLevel halUtilLogLevel = logWARNING;
 #define kRIOStatusResourceNotInitialized -52010
 
 static JavaVM* jvm = nullptr;
-static JException runtimeExCls;
 static JException illegalArgExCls;
 static JException boundaryExCls;
 static JException allocationExCls;
@@ -69,7 +68,6 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/wpilibj/CANData", &canDataCls}};
 
 static const JExceptionInit exceptions[] = {
-    {"java/lang/RuntimeException", &runtimeExCls},
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
     {"edu/wpi/first/wpilibj/util/BoundaryException", &boundaryExCls},
     {"edu/wpi/first/wpilibj/util/AllocationException", &allocationExCls},
@@ -85,6 +83,17 @@ static const JExceptionInit exceptions[] = {
     {"edu/wpi/first/wpilibj/util/UncleanStatusException", &uncleanStatusExCls}};
 
 namespace frc {
+
+void ThrowUncleanStatusException(JNIEnv* env, wpi::StringRef msg,
+                                 int32_t status) {
+  static jmethodID func =
+      env->GetMethodID(uncleanStatusExCls, "<init>", "(ILjava/lang/String;)V");
+
+  jobject exception =
+      env->NewObject(uncleanStatusExCls, func, static_cast<jint>(status),
+                     MakeJString(env, msg));
+  env->Throw(static_cast<jthrowable>(exception));
+}
 
 void ThrowAllocationException(JNIEnv* env, int32_t minRange, int32_t maxRange,
                               int32_t requestedValue, int32_t status) {
@@ -116,7 +125,7 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
     wpi::SmallString<1024> buf;
     wpi::raw_svector_ostream oss(buf);
     oss << " Code: " << status << ". " << message;
-    runtimeExCls.Throw(env, buf.c_str());
+    ThrowUncleanStatusException(env, buf.c_str(), status);
   } else {
     std::string func;
     auto stack = GetJavaStackTrace(env, &func, "edu.wpi.first.wpilibj");
@@ -138,7 +147,7 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
   wpi::SmallString<1024> buf;
   wpi::raw_svector_ostream oss(buf);
   oss << " Code: " << status << ". " << message;
-  runtimeExCls.Throw(env, buf.c_str());
+  ThrowUncleanStatusException(env, buf.c_str(), status);
 }
 
 void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
