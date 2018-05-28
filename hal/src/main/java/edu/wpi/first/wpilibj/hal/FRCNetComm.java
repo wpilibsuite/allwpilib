@@ -108,6 +108,14 @@ public class FRCNetComm extends JNIWrapper {
     int kResourceType_PCM = 60;
     int kResourceType_PigeonIMU = 61;
     int kResourceType_NidecBrushless = 62;
+    int kResourceType_CANifier = 63;
+    int kResourceType_CTRE_future0 = 64;
+    int kResourceType_CTRE_future1 = 65;
+    int kResourceType_CTRE_future2 = 66;
+    int kResourceType_CTRE_future3 = 67;
+    int kResourceType_CTRE_future4 = 68;
+    int kResourceType_CTRE_future5 = 69;
+    int kResourceType_CTRE_future6 = 70;
   }
 
   /**
@@ -119,6 +127,7 @@ public class FRCNetComm extends JNIWrapper {
     int kLanguage_CPlusPlus = 2;
     int kLanguage_Java = 3;
     int kLanguage_Python = 4;
+    int kLanguage_DotNet = 5;
 
     int kCANPlugin_BlackJagBridge = 1;
     int kCANPlugin_2CAN = 2;

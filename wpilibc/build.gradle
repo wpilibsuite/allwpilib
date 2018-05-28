@@ -60,7 +60,25 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
+ext {
+    sharedUvwConfigs = [wpilibc    : [],
+                        wpilibcBase: [],
+                        wpilibcDev : [],
+                        wpilibcTest: []]
+    staticUvwConfigs = [:]
+}
+
+apply from: "${rootDir}/shared/libuv.gradle"
+
 project(':').libraryBuild.dependsOn build
+
+ext {
+    staticGtestConfigs = [:]
+}
+
+staticGtestConfigs["${nativeName}Test"] = []
+
+apply from: "${rootDir}/shared/googletest.gradle"
 
 model {
     exportsConfigs {
@@ -176,7 +194,6 @@ model {
         }
         withType(GoogleTestTestSuiteBinarySpec) {
             if (!project.hasProperty('onlyAthena')) {
-                lib project: ':gtest', library: 'gtest', linkage: 'static'
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':hal', library: 'hal', linkage: 'shared'

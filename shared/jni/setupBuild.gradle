@@ -15,12 +15,33 @@ ext {
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"
 
+ext {
+    sharedUvwConfigs = [:]
+    staticUvwConfigs = [:]
+}
+
+sharedUvwConfigs["${nativeName}"] = []
+sharedUvwConfigs["${nativeName}Base"] = []
+sharedUvwConfigs["${nativeName}Dev"] = []
+sharedUvwConfigs["${nativeName}Test"] = []
+staticUvwConfigs["${nativeName}JNI"] = []
+
+apply from: "${rootDir}/shared/libuv.gradle"
+
 dependencies {
     compile project(':wpiutil')
     devCompile project(':wpiutil')
 }
 
 project(':').libraryBuild.dependsOn build
+
+ext {
+    staticGtestConfigs = [:]
+}
+
+staticGtestConfigs["${nativeName}Test"] = []
+
+apply from: "${rootDir}/shared/googletest.gradle"
 
 model {
     components {
@@ -156,7 +177,6 @@ model {
     binaries {
         withType(GoogleTestTestSuiteBinarySpec) {
             if (!project.hasProperty('onlyAthena')) {
-                lib project: ':gtest', library: 'gtest', linkage: 'static'
                 lib library: nativeName, linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             } else {

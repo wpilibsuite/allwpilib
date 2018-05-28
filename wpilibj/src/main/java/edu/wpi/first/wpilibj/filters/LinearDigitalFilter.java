@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.filters;
 
+import java.util.Arrays;
+
 import edu.wpi.first.wpilibj.CircularBuffer;
 import edu.wpi.first.wpilibj.PIDSource;
 
@@ -65,8 +67,8 @@ public class LinearDigitalFilter extends Filter {
     super(source);
     m_inputs = new CircularBuffer(ffGains.length);
     m_outputs = new CircularBuffer(fbGains.length);
-    m_inputGains = ffGains;
-    m_outputGains = fbGains;
+    m_inputGains = Arrays.copyOf(ffGains, ffGains.length);
+    m_outputGains = Arrays.copyOf(fbGains, fbGains.length);
   }
 
   /**

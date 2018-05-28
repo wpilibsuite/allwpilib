@@ -11,9 +11,19 @@ ext {
     staticCvConfigs = [:]
     useJava = false
     useCpp = true
+    staticGtestConfigs = [wpilibcIntegrationTests: []]
 }
 
 apply from: "${rootDir}/shared/opencv.gradle"
+
+apply from: "${rootDir}/shared/googletest.gradle"
+
+ext {
+    sharedUvwConfigs = [wpilibcIntegrationTests: []]
+    staticUvwConfigs = [:]
+}
+
+apply from: "${rootDir}/shared/libuv.gradle"
 
 model {
     components {
@@ -44,7 +54,6 @@ model {
                     lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-                    lib project: ':gtest', library: 'gtest', linkage: 'static'
                     project(':ni-libraries').addNiLibrariesToLinker(binary)
                 } else {
                     binary.sources {

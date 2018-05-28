@@ -5,7 +5,6 @@ pluginManagement {
     }
 }
 
-include 'gtest'
 include 'ni-libraries'
 include 'wpiutil'
 include 'ntcore'
