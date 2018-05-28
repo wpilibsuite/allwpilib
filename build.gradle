@@ -92,13 +92,8 @@ subprojects {
             options.addStringOption('Xdoclint:none', '-quiet')
         }
     }
-    ext.setupWpilibRepo = { publishing ->
-        publishing.repositories.maven {
-            url = WPILibVersion.mavenLocalUrl
-        }
-    }
 }
 
-task wrapper(type: Wrapper) {
+wrapper {
     gradleVersion = '4.7'
 }
