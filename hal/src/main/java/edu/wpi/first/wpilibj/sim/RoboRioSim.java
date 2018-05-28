@@ -9,8 +9,9 @@ package edu.wpi.first.wpilibj.sim;
 
 import edu.wpi.first.hal.sim.mockdata.RoboRioDataJNI;
 
+@SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.TooManyMethods"})
 public class RoboRioSim {
-  private int m_index;
+  private final int m_index;
 
   public RoboRioSim(int index) {
     m_index = index;

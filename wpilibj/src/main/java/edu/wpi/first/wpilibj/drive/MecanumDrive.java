@@ -59,10 +59,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 public class MecanumDrive extends RobotDriveBase {
   private static int instances;
 
-  private SpeedController m_frontLeftMotor;
-  private SpeedController m_rearLeftMotor;
-  private SpeedController m_frontRightMotor;
-  private SpeedController m_rearRightMotor;
+  private final SpeedController m_frontLeftMotor;
+  private final SpeedController m_rearLeftMotor;
+  private final SpeedController m_frontRightMotor;
+  private final SpeedController m_rearRightMotor;
 
   private double m_rightSideInvertMultiplier = -1.0;
   private boolean m_reported;

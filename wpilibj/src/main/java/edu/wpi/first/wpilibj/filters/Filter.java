@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.PIDSourceType;
  * Superclass for filters.
  */
 public abstract class Filter implements PIDSource {
-  private PIDSource m_source;
+  private final PIDSource m_source;
 
   public Filter(PIDSource source) {
     m_source = source;

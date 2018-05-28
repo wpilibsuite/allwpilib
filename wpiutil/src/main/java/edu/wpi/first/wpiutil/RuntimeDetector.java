@@ -9,11 +9,12 @@ package edu.wpi.first.wpiutil;
 
 import java.io.File;
 
-public class RuntimeDetector {
+public final class RuntimeDetector {
   private static String filePrefix;
   private static String fileExtension;
   private static String filePath;
 
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   private static synchronized void computePlatform() {
     if (fileExtension != null && filePath != null && filePrefix != null) {
       return;
@@ -52,7 +53,7 @@ public class RuntimeDetector {
         filePath = "/linux/nativearm/";
       }
     } else {
-      throw new RuntimeException("Failed to determine OS");
+      throw new IllegalStateException("Failed to determine OS");
     }
   }
 
@@ -118,5 +119,9 @@ public class RuntimeDetector {
   public static boolean is64BitIntel() {
     String arch = System.getProperty("os.arch");
     return "amd64".equals(arch) || "x86_64".equals(arch);
+  }
+
+  private RuntimeDetector() {
+
   }
 }

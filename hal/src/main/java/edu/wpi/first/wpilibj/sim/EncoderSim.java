@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.sim;
 import edu.wpi.first.hal.sim.mockdata.EncoderDataJNI;
 
 public class EncoderSim {
-  private int m_index;
+  private final int m_index;
 
   public EncoderSim(int index) {
     m_index = index;

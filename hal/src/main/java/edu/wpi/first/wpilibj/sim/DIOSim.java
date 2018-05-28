@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.sim;
 import edu.wpi.first.hal.sim.mockdata.DIODataJNI;
 
 public class DIOSim {
-  private int m_index;
+  private final int m_index;
 
   public DIOSim(int index) {
     m_index = index;

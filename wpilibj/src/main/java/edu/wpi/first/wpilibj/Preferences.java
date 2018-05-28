@@ -31,7 +31,7 @@ import static java.util.Objects.requireNonNull;
  * <p> This will also interact with {@link NetworkTable} by creating a table called "Preferences"
  * with all the key-value pairs. </p>
  */
-public class Preferences {
+public final class Preferences {
   /**
    * The Preferences table name.
    */

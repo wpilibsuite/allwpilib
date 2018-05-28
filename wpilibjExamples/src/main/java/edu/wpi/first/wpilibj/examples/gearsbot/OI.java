@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.examples.gearsbot.commands.SetWristSetpoint;
  * interface to the commands and command groups that allow control of the robot.
  */
 public class OI {
-  private Joystick m_joystick = new Joystick(0);
+  private final Joystick m_joystick = new Joystick(0);
 
   /**
    * Construct the OI and all of the buttons on it.

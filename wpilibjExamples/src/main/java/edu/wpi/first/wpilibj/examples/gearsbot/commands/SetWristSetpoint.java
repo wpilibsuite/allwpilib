@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * commands using the wrist should make sure they disable PID!
  */
 public class SetWristSetpoint extends Command {
-  private double m_setpoint;
+  private final double m_setpoint;
 
   public SetWristSetpoint(double setpoint) {
     m_setpoint = setpoint;

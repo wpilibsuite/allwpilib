@@ -48,6 +48,7 @@ public class VideoEvent {
    * @param kind The numerical representation of kind
    * @return The kind
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   public static Kind getKindFromInt(int kind) {
     switch (kind) {
       case 0x0001: return Kind.kSourceCreated;
@@ -69,6 +70,7 @@ public class VideoEvent {
     }
   }
 
+  @SuppressWarnings("PMD.ExcessiveParameterList")
   VideoEvent(int kind, int source, int sink, String name, int pixelFormat,
              int width, int height, int fps, int property, int propertyKind,
              int value, String valueStr) {

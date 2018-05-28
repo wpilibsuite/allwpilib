@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
 
 @SuppressWarnings("JavadocMethod")
-public class RobotState {
+public final class RobotState {
   private static Interface m_impl;
 
   @SuppressWarnings("MethodName")
@@ -68,5 +68,9 @@ public class RobotState {
     boolean isAutonomous();
 
     boolean isTest();
+  }
+
+  private RobotState() {
+    
   }
 }

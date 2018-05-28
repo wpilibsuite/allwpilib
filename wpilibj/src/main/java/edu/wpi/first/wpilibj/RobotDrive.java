@@ -25,6 +25,7 @@ import static java.util.Objects.requireNonNull;
  *             or {@link edu.wpi.first.wpilibj.drive.MecanumDrive} classes instead.
  */
 @Deprecated
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public class RobotDrive implements MotorSafety, AutoCloseable {
   protected MotorSafetyHelper m_safetyHelper;
 

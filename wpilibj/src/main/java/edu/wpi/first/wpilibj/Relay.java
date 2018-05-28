@@ -149,12 +149,12 @@ public class Relay extends SendableBase implements MotorSafety {
   private void freeRelay() {
     try {
       RelayJNI.setRelay(m_forwardHandle, false);
-    } catch (RuntimeException ignored) {
+    } catch (RuntimeException ignored) { //NOPMD
       // do nothing. Ignore
     }
     try {
       RelayJNI.setRelay(m_reverseHandle, false);
-    } catch (RuntimeException ignored) {
+    } catch (RuntimeException ignored) { //NOPMD
       // do nothing. Ignore
     }
 
@@ -178,6 +178,7 @@ public class Relay extends SendableBase implements MotorSafety {
    *
    * @param value The state to set the relay.
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   public void set(Value value) {
     switch (value) {
       case kOff:

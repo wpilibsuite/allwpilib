@@ -64,7 +64,7 @@ public class DoubleSolenoid extends SolenoidBase {
     try {
       portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) reverseChannel);
       m_reverseHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
-    } catch (RuntimeException ex) {
+    } catch (RuntimeException ex) { //NOPMD
       // free the forward handle on exception, then rethrow
       SolenoidJNI.freeSolenoidPort(m_forwardHandle);
       m_forwardHandle = 0;

@@ -16,7 +16,7 @@ public class PrintCommand extends InstantCommand {
   /**
    * The message to print out.
    */
-  private String m_message;
+  private final String m_message;
 
   /**
    * Instantiates a {@link PrintCommand} which will print the given message when it is run.

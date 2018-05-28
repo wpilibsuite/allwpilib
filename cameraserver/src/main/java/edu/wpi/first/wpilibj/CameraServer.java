@@ -36,7 +36,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  * Singleton class for creating and keeping camera servers.
  * Also publishes camera information to NetworkTables.
  */
-public class CameraServer {
+@SuppressWarnings("PMD.TooManyMethods")
+public final class CameraServer {
   public static final int kBasePort = 1181;
 
   @Deprecated
@@ -59,7 +60,7 @@ public class CameraServer {
     return server;
   }
 
-  private AtomicInteger m_defaultUsbDevice;
+  private final AtomicInteger m_defaultUsbDevice;
   private String m_primarySourceName;
   private final Map<String, VideoSource> m_sources;
   private final Map<String, VideoSink> m_sinks;
@@ -237,7 +238,7 @@ public class CameraServer {
     return modeStrings;
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings({"JavadocMethod", "PMD.CyclomaticComplexity"})
   private static void putSourcePropertyValue(NetworkTable table, VideoEvent event, boolean isNew) {
     String name;
     String infoName;
@@ -290,7 +291,8 @@ public class CameraServer {
     }
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.UnusedLocalVariable"})
+  @SuppressWarnings({"JavadocMethod", "PMD.UnusedLocalVariable", "PMD.ExcessiveMethodLength",
+      "PMD.NPathComplexity"})
   private CameraServer() {
     m_defaultUsbDevice = new AtomicInteger();
     m_sources = new Hashtable<>();

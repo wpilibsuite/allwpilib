@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.sim;
 import edu.wpi.first.hal.sim.mockdata.PDPDataJNI;
 
 public class PDPSim {
-  private int m_index;
+  private final int m_index;
 
   public PDPSim(int index) {
     m_index = index;

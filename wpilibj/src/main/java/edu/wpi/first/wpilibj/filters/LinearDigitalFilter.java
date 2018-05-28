@@ -50,10 +50,10 @@ import edu.wpi.first.wpilibj.PIDSource;
  * to make sure PIDGet() gets called at the desired, constant frequency!
  */
 public class LinearDigitalFilter extends Filter {
-  private CircularBuffer m_inputs;
-  private CircularBuffer m_outputs;
-  private double[] m_inputGains;
-  private double[] m_outputGains;
+  private final CircularBuffer m_inputs;
+  private final CircularBuffer m_outputs;
+  private final double[] m_inputGains;
+  private final double[] m_outputGains;
 
   /**
    * Create a linear FIR or IIR filter.

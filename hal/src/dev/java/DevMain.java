@@ -5,8 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-public class DevMain {
+public final class DevMain {
   public static void main(String[] args) {
+
+  }
+
+  private DevMain() {
 
   }
 }
