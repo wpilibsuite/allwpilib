@@ -16,19 +16,17 @@ namespace frc {
 namespace sim {
 namespace lowfi {
 
-class MotorEncoderSimulator
-{
-public:
-	MotorEncoderSimulator(
-			const std::shared_ptr<MotorSimulator>& motorController,
-			const std::shared_ptr<EncoderSimulator>& encoder);
-	~MotorEncoderSimulator();
+class MotorEncoderSimulator {
+ public:
+  MotorEncoderSimulator(const std::shared_ptr<MotorSimulator>& motorController,
+                        const std::shared_ptr<EncoderSimulator>& encoder);
+  ~MotorEncoderSimulator();
 
-	void Update();
+  void Update();
 
-protected:
-	std::shared_ptr<MotorSimulator> motorSimulator;
-	std::shared_ptr<EncoderSimulator> encoderSimulator;
+ protected:
+  std::shared_ptr<MotorSimulator> motorSimulator;
+  std::shared_ptr<EncoderSimulator> encoderSimulator;
 };
 
 }  // namespace lowfi

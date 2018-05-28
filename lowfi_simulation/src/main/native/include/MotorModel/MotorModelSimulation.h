@@ -11,16 +11,15 @@ namespace frc {
 namespace sim {
 namespace lowfi {
 
-class MotorModelSimulation
-{
-public:
-	virtual void Reset() = 0;
-	virtual void SetVoltage(double voltage) = 0;
-	virtual void Update(double elapsedTime) = 0;
+class MotorModelSimulation {
+ public:
+  virtual void Reset() = 0;
+  virtual void SetVoltage(double voltage) = 0;
+  virtual void Update(double elapsedTime) = 0;
 
-	virtual double GetPosition() = 0;
-	virtual double GetVelocity() = 0;
-	virtual double GetAcceleration() = 0;
+  virtual double GetPosition() = 0;
+  virtual double GetVelocity() = 0;
+  virtual double GetAcceleration() = 0;
 };
 
 }  // namespace lowfi

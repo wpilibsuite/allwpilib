@@ -11,40 +11,30 @@ namespace frc {
 namespace sim {
 namespace lowfi {
 
-WpiMotorSimulator::WpiMotorSimulator(int index) :
-		m_pwmSimulator(index)
-{
+WpiMotorSimulator::WpiMotorSimulator(int index) : m_pwmSimulator(index) {}
+
+WpiMotorSimulator::~WpiMotorSimulator() {}
+
+void WpiMotorSimulator::SetMotorModelSimulation(
+    const std::shared_ptr<MotorModelSimulation>& motorModelSimulator) {
+  m_motorModelSimulation = motorModelSimulator;
 }
 
-WpiMotorSimulator::~WpiMotorSimulator()
-{
+void WpiMotorSimulator::Update(double elapsedTime) {
+  m_motorModelSimulation->SetVoltage(m_pwmSimulator.GetSpeed() * 12);
+  m_motorModelSimulation->Update(elapsedTime);
 }
 
-
-void WpiMotorSimulator::SetMotorModelSimulation(const std::shared_ptr<MotorModelSimulation>& motorModelSimulator)
-{
-	m_motorModelSimulation = motorModelSimulator;
+double WpiMotorSimulator::GetPosition() {
+  return m_motorModelSimulation->GetPosition();
 }
 
-void WpiMotorSimulator::Update(double elapsedTime)
-{
-	m_motorModelSimulation->SetVoltage(m_pwmSimulator.GetSpeed() * 12);
-	m_motorModelSimulation->Update(elapsedTime);
+double WpiMotorSimulator::GetVelocity() {
+  return m_motorModelSimulation->GetPosition();
 }
 
-double WpiMotorSimulator::GetPosition()
-{
-	return m_motorModelSimulation->GetPosition();
-}
-
-double WpiMotorSimulator::GetVelocity()
-{
-	return m_motorModelSimulation->GetPosition();
-}
-
-double WpiMotorSimulator::GetAcceleration()
-{
-	return m_motorModelSimulation->GetAcceleration();
+double WpiMotorSimulator::GetAcceleration() {
+  return m_motorModelSimulation->GetAcceleration();
 }
 
 }  // namespace lowfi

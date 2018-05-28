@@ -548,8 +548,7 @@ double HALSIM_GetEncoderDistancePerPulse(int32_t index) {
   return SimEncoderData[index].GetDistancePerPulse();
 }
 
-void HALSIM_SetEncoderDistancePerPulse(int32_t index,
-                                       double distancePerPulse) {
+void HALSIM_SetEncoderDistancePerPulse(int32_t index, double distancePerPulse) {
   SimEncoderData[index].SetDistancePerPulse(distancePerPulse);
 }
 

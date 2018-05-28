@@ -9,25 +9,25 @@
 #include "gtest/gtest.h"
 
 TEST(LinearMotorModelSimulationTest, TestLinearModel) {
-	frc::sim::lowfi::LinearMotorModelSimulation motorModelSim(200);
+  frc::sim::lowfi::LinearMotorModelSimulation motorModelSim(200);
 
-	// Test forward voltage
-	motorModelSim.SetVoltage(6);
-	motorModelSim.Update(.5);
+  // Test forward voltage
+  motorModelSim.SetVoltage(6);
+  motorModelSim.Update(.5);
 
-	EXPECT_DOUBLE_EQ(50, motorModelSim.GetPosition());
-	EXPECT_DOUBLE_EQ(100, motorModelSim.GetVelocity());
+  EXPECT_DOUBLE_EQ(50, motorModelSim.GetPosition());
+  EXPECT_DOUBLE_EQ(100, motorModelSim.GetVelocity());
 
-	// Test Reset
-	motorModelSim.Reset();
-	EXPECT_DOUBLE_EQ(0, motorModelSim.GetPosition());
-	EXPECT_DOUBLE_EQ(0, motorModelSim.GetVelocity());
+  // Test Reset
+  motorModelSim.Reset();
+  EXPECT_DOUBLE_EQ(0, motorModelSim.GetPosition());
+  EXPECT_DOUBLE_EQ(0, motorModelSim.GetVelocity());
 
-	// Test negative voltage
-	motorModelSim.Reset();
-	motorModelSim.SetVoltage(-3);
-	motorModelSim.Update(.06);
+  // Test negative voltage
+  motorModelSim.Reset();
+  motorModelSim.SetVoltage(-3);
+  motorModelSim.Update(.06);
 
-	EXPECT_DOUBLE_EQ(-3, motorModelSim.GetPosition());
-	EXPECT_DOUBLE_EQ(-50, motorModelSim.GetVelocity());
+  EXPECT_DOUBLE_EQ(-3, motorModelSim.GetPosition());
+  EXPECT_DOUBLE_EQ(-50, motorModelSim.GetVelocity());
 }

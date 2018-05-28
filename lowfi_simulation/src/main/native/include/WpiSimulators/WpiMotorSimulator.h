@@ -16,22 +16,22 @@ namespace frc {
 namespace sim {
 namespace lowfi {
 
-class WpiMotorSimulator : public MotorSimulator
-{
-public:
-	explicit WpiMotorSimulator(int index);
-	~WpiMotorSimulator();
+class WpiMotorSimulator : public MotorSimulator {
+ public:
+  explicit WpiMotorSimulator(int index);
+  ~WpiMotorSimulator();
 
-	void SetMotorModelSimulation(const std::shared_ptr<MotorModelSimulation>& motorModelSimulator);
+  void SetMotorModelSimulation(
+      const std::shared_ptr<MotorModelSimulation>& motorModelSimulator);
 
-	void Update(double elapsedTime);
-	double GetPosition() override;
-	double GetVelocity() override;
-	double GetAcceleration() override;
+  void Update(double elapsedTime);
+  double GetPosition() override;
+  double GetVelocity() override;
+  double GetAcceleration() override;
 
-protected:
-	std::shared_ptr<MotorModelSimulation> m_motorModelSimulation;
-	frc::sim::PWMSim m_pwmSimulator;
+ protected:
+  std::shared_ptr<MotorModelSimulation> m_motorModelSimulation;
+  frc::sim::PWMSim m_pwmSimulator;
 };
 
 }  // namespace lowfi

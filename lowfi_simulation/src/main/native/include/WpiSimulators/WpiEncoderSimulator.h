@@ -16,16 +16,15 @@ namespace frc {
 namespace sim {
 namespace lowfi {
 
-class WpiEncoderSimulator : public EncoderSimulator
-{
-public:
-	explicit WpiEncoderSimulator(int index);
-	~WpiEncoderSimulator();
+class WpiEncoderSimulator : public EncoderSimulator {
+ public:
+  explicit WpiEncoderSimulator(int index);
+  ~WpiEncoderSimulator();
 
-	void SetPosition(double position) override;
+  void SetPosition(double position) override;
 
-protected:
-	frc::sim::EncoderSim m_encoderSimulator;
+ protected:
+  frc::sim::EncoderSim m_encoderSimulator;
 };
 
 }  // namespace lowfi

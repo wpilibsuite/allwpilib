@@ -11,18 +11,14 @@ namespace frc {
 namespace sim {
 namespace lowfi {
 
-WpiEncoderSimulator::WpiEncoderSimulator(int index) :
-m_encoderSimulator(index)
-{
-}
+WpiEncoderSimulator::WpiEncoderSimulator(int index)
+    : m_encoderSimulator(index) {}
 
-WpiEncoderSimulator::~WpiEncoderSimulator()
-{
-}
+WpiEncoderSimulator::~WpiEncoderSimulator() {}
 
-void WpiEncoderSimulator::SetPosition(double position)
-{
-	m_encoderSimulator.SetCount(static_cast<int>(position / m_encoderSimulator.GetDistancePerPulse()));
+void WpiEncoderSimulator::SetPosition(double position) {
+  m_encoderSimulator.SetCount(
+      static_cast<int>(position / m_encoderSimulator.GetDistancePerPulse()));
 }
 
 }  // namespace lowfi

@@ -17,10 +17,16 @@ ext {
     useJava = false
     useCpp = true
 }
-
 apply from: "${rootDir}/shared/opencv.gradle"
 
+ext {
+    staticGtestConfigs = [:]
+}
+staticGtestConfigs["${nativeName}Test"] = []
+apply from: "${rootDir}/shared/googletest.gradle"
+
 project(':').libraryBuild.dependsOn build
+
 
 model {
     exportsConfigs {
@@ -53,6 +59,10 @@ model {
                     it.buildable = false
                     return
                 }
+                if (it.targetPlatform.architecture.name == 'athena') {
+                    it.buildable = false
+                    return
+                }
                 lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 project(':ni-libraries').addNiLibrariesToLinker(it)
@@ -71,6 +81,10 @@ model {
                 }
             }
             binaries.all {
+                if (it.targetPlatform.architecture.name == 'athena') {
+                    it.buildable = false
+                    return
+                }
                 lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 project(':ni-libraries').addNiLibrariesToLinker(it)
@@ -92,6 +106,10 @@ model {
                 }
             }
             binaries.all {
+                if (it.targetPlatform.architecture.name == 'athena') {
+                    it.buildable = false
+                    return
+                }
                 lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 project(':ni-libraries').addNiLibrariesToLinker(it)
@@ -122,7 +140,6 @@ model {
     binaries {
         withType(GoogleTestTestSuiteBinarySpec) {
             if (!project.hasProperty('onlyAthena')) {
-                lib project: ':gtest', library: 'gtest', linkage: 'static'
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':hal', library: 'hal', linkage: 'shared'

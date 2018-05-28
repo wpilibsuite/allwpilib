@@ -15,14 +15,14 @@ namespace frc {
 namespace sim {
 namespace lowfi {
 
-class MotorSimulator
-{
-public:
-	virtual void SetMotorModelSimulation(const std::shared_ptr<MotorModelSimulation>& motorModelSimulator) = 0;
+class MotorSimulator {
+ public:
+  virtual void SetMotorModelSimulation(
+      const std::shared_ptr<MotorModelSimulation>& motorModelSimulator) = 0;
 
-	virtual double GetPosition() = 0;
-	virtual double GetVelocity() = 0;
-	virtual double GetAcceleration() = 0;
+  virtual double GetPosition() = 0;
+  virtual double GetVelocity() = 0;
+  virtual double GetAcceleration() = 0;
 };
 
 }  // namespace lowfi

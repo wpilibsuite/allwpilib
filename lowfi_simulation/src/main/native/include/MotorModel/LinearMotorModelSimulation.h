@@ -13,27 +13,26 @@ namespace frc {
 namespace sim {
 namespace lowfi {
 
-class LinearMotorModelSimulation : public MotorModelSimulation
-{
-public:
-	explicit LinearMotorModelSimulation(double maxSpeed);
-	~LinearMotorModelSimulation();
+class LinearMotorModelSimulation : public MotorModelSimulation {
+ public:
+  explicit LinearMotorModelSimulation(double maxSpeed);
+  ~LinearMotorModelSimulation();
 
-	virtual void Reset();
-	virtual void SetVoltage(double voltage);
-	virtual void Update(double elapsedTime);
+  virtual void Reset();
+  virtual void SetVoltage(double voltage);
+  virtual void Update(double elapsedTime);
 
-	virtual double GetPosition();
-	virtual double GetVelocity();
-	virtual double GetAcceleration();
+  virtual double GetPosition();
+  virtual double GetVelocity();
+  virtual double GetAcceleration();
 
-protected:
-	double m_voltagePercentage;
-	double m_maxSpeed;
-	double m_position;
-	double m_velocity;
+ protected:
+  double m_voltagePercentage;
+  double m_maxSpeed;
+  double m_position;
+  double m_velocity;
 
-	static const double MAX_EXPECTED_VOLTAGE;
+  static const double MAX_EXPECTED_VOLTAGE;
 };
 
 }  // namespace lowfi

@@ -14,42 +14,48 @@
 #include "gtest/gtest.h"
 
 TEST(MotorEncoderSimulatorTest, TestWithoutDistancePerPulse) {
-	frc::Talon talon{3};
-	frc::Encoder encoder{3, 1};
-	std::shared_ptr<frc::sim::lowfi::WpiMotorSimulator> motorSim(new frc::sim::lowfi::WpiMotorSimulator(3));
-	std::shared_ptr<frc::sim::lowfi::WpiEncoderSimulator> encoderSim(new frc::sim::lowfi::WpiEncoderSimulator(0));
-	std::shared_ptr<frc::sim::lowfi::LinearMotorModelSimulation> motorModelSim(new frc::sim::lowfi::LinearMotorModelSimulation(6000));
+  frc::Talon talon{3};
+  frc::Encoder encoder{3, 1};
+  std::shared_ptr<frc::sim::lowfi::WpiMotorSimulator> motorSim(
+      new frc::sim::lowfi::WpiMotorSimulator(3));
+  std::shared_ptr<frc::sim::lowfi::WpiEncoderSimulator> encoderSim(
+      new frc::sim::lowfi::WpiEncoderSimulator(0));
+  std::shared_ptr<frc::sim::lowfi::LinearMotorModelSimulation> motorModelSim(
+      new frc::sim::lowfi::LinearMotorModelSimulation(6000));
 
-	motorSim->SetMotorModelSimulation(motorModelSim);
+  motorSim->SetMotorModelSimulation(motorModelSim);
 
-	frc::sim::lowfi::MotorEncoderSimulator connector(motorSim, encoderSim);
+  frc::sim::lowfi::MotorEncoderSimulator connector(motorSim, encoderSim);
 
-	talon.Set(0.5);
+  talon.Set(0.5);
 
-	motorSim->Update(.02);
-	connector.Update();
+  motorSim->Update(.02);
+  connector.Update();
 
-	EXPECT_EQ(60, encoder.Get());
-	EXPECT_DOUBLE_EQ(60, encoder.GetDistance());
+  EXPECT_EQ(60, encoder.Get());
+  EXPECT_DOUBLE_EQ(60, encoder.GetDistance());
 }
 
 TEST(MotorEncoderSimulatorTest, TestWithDistancePerPulse) {
-	frc::Talon talon{3};
-	frc::Encoder encoder{3, 1};
-	encoder.SetDistancePerPulse(.001);
-	std::shared_ptr<frc::sim::lowfi::WpiMotorSimulator> motorSim(new frc::sim::lowfi::WpiMotorSimulator(3));
-	std::shared_ptr<frc::sim::lowfi::WpiEncoderSimulator> encoderSim(new frc::sim::lowfi::WpiEncoderSimulator(0));
-	std::shared_ptr<frc::sim::lowfi::LinearMotorModelSimulation> motorModelSim(new frc::sim::lowfi::LinearMotorModelSimulation(6000));
+  frc::Talon talon{3};
+  frc::Encoder encoder{3, 1};
+  encoder.SetDistancePerPulse(.001);
+  std::shared_ptr<frc::sim::lowfi::WpiMotorSimulator> motorSim(
+      new frc::sim::lowfi::WpiMotorSimulator(3));
+  std::shared_ptr<frc::sim::lowfi::WpiEncoderSimulator> encoderSim(
+      new frc::sim::lowfi::WpiEncoderSimulator(0));
+  std::shared_ptr<frc::sim::lowfi::LinearMotorModelSimulation> motorModelSim(
+      new frc::sim::lowfi::LinearMotorModelSimulation(6000));
 
-	motorSim->SetMotorModelSimulation(motorModelSim);
+  motorSim->SetMotorModelSimulation(motorModelSim);
 
-	frc::sim::lowfi::MotorEncoderSimulator connector(motorSim, encoderSim);
+  frc::sim::lowfi::MotorEncoderSimulator connector(motorSim, encoderSim);
 
-	talon.Set(0.5);
+  talon.Set(0.5);
 
-	motorSim->Update(.02);
-	connector.Update();
+  motorSim->Update(.02);
+  connector.Update();
 
-	EXPECT_EQ(60000, encoder.Get());
-	EXPECT_DOUBLE_EQ(60, encoder.GetDistance());
+  EXPECT_EQ(60000, encoder.Get());
+  EXPECT_DOUBLE_EQ(60, encoder.GetDistance());
 }

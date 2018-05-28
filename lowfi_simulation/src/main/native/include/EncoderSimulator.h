@@ -11,10 +11,9 @@ namespace frc {
 namespace sim {
 namespace lowfi {
 
-class EncoderSimulator
-{
-public:
-	virtual void SetPosition(double position) = 0;
+class EncoderSimulator {
+ public:
+  virtual void SetPosition(double position) = 0;
 };
 
 }  // namespace lowfi
