@@ -285,7 +285,7 @@ public class CameraServer {
         default:
           break;
       }
-    } catch (VideoException ex) {
+    } catch (VideoException ignored) {
       // ignore
     }
   }
@@ -328,7 +328,7 @@ public class CameraServer {
             VideoMode mode = CameraServerJNI.getSourceVideoMode(event.sourceHandle);
             table.getEntry("mode").setDefaultString(videoModeToString(mode));
             table.getEntry("modes").setStringArray(getSourceModeValues(event.sourceHandle));
-          } catch (VideoException ex) {
+          } catch (VideoException ignored) {
             // Do nothing. Let the other event handlers update this if there is an error.
           }
           break;
@@ -393,7 +393,7 @@ public class CameraServer {
             try {
               String[] choices = CameraServerJNI.getEnumPropertyChoices(event.propertyHandle);
               table.getEntry("PropertyInfo/" + event.name + "/choices").setStringArray(choices);
-            } catch (VideoException ex) {
+            } catch (VideoException ignored) {
               // ignore
             }
           }

@@ -29,7 +29,7 @@ public class SendableBuilderImpl implements SendableBuilder {
 
     @Override
     @SuppressWarnings("NoFinalizer")
-    public synchronized void finalize() {
+    protected synchronized void finalize() {
       stopListener();
     }
 
