@@ -87,6 +87,13 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
+ext {
+    sharedUvwConfigs = [wpilibjDev: []]
+    staticUvwConfigs = [:]
+}
+
+apply from: "${rootDir}/shared/libuv.gradle"
+
 model {
     components {
         wpilibjDev(NativeExecutableSpec) {

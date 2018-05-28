@@ -15,6 +15,19 @@ ext {
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"
 
+ext {
+    sharedUvwConfigs = [:]
+    staticUvwConfigs = [:]
+}
+
+sharedUvwConfigs["${nativeName}"] = []
+sharedUvwConfigs["${nativeName}Base"] = []
+sharedUvwConfigs["${nativeName}Dev"] = []
+sharedUvwConfigs["${nativeName}Test"] = []
+staticUvwConfigs["${nativeName}JNI"] = []
+
+apply from: "${rootDir}/shared/libuv.gradle"
+
 dependencies {
     compile project(':wpiutil')
     devCompile project(':wpiutil')
