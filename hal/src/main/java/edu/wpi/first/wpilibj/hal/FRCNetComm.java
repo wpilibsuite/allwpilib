@@ -10,12 +10,12 @@ package edu.wpi.first.wpilibj.hal;
 /**
  * JNI wrapper for library <b>FRC_NetworkCommunication</b><br>.
  */
-@SuppressWarnings("PMD.ConstantsInInterface")
+@SuppressWarnings("MethodName")
 public class FRCNetComm extends JNIWrapper {
   /**
    * Module type from LoadOut.h
    */
-  @SuppressWarnings("TypeName")
+  @SuppressWarnings({"TypeName", "PMD.ConstantsInInterface"})
   public interface tModuleType {
     int kModuleType_Unknown = 0x00;
     int kModuleType_Analog = 0x01;
@@ -26,7 +26,7 @@ public class FRCNetComm extends JNIWrapper {
   /**
    * Target class from LoadOut.h
    */
-  @SuppressWarnings("TypeName")
+  @SuppressWarnings({"TypeName", "PMD.ConstantsInInterface"})
   public interface tTargetClass {
     int kTargetClass_Unknown = 0x00;
     int kTargetClass_FRC1 = 0x10;
@@ -43,7 +43,7 @@ public class FRCNetComm extends JNIWrapper {
   /**
    * Resource type from UsageReporting.h
    */
-  @SuppressWarnings("TypeName")
+  @SuppressWarnings({"TypeName", "PMD.ConstantsInInterface"})
   public interface tResourceType {
     int kResourceType_Controller = 0;
     int kResourceType_Module = 1;
@@ -121,7 +121,7 @@ public class FRCNetComm extends JNIWrapper {
   /**
    * Instances from UsageReporting.h
    */
-  @SuppressWarnings("TypeName")
+  @SuppressWarnings({"TypeName", "PMD.ConstantsInInterface"})
   public interface tInstances {
     int kLanguage_LabVIEW = 1;
     int kLanguage_CPlusPlus = 2;

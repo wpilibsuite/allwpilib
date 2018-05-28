@@ -71,6 +71,5 @@ public final class RobotState {
   }
 
   private RobotState() {
-    
   }
 }

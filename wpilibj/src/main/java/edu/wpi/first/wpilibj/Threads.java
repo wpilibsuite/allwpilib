@@ -41,6 +41,5 @@ public final class Threads {
   }
 
   private Threads() {
-    
   }
 }
