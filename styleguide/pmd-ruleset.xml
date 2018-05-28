@@ -24,6 +24,15 @@
     <exclude name="UseVarargs" />
   </rule>
 
+  <rule ref="category/java/design.xml">
+    <exclude name="DataClass" />
+    <exclude name="LawOfDemeter" />
+    <exclude name="LoosePackageCoupling" />
+    <exclude name="NcssConstructorCount" />
+    <exclude name="NcssCount" />
+    <exclude name="NcssMethodCount" />
+  </rule>
+
   <rule ref="category/java/errorprone.xml">
     <exclude name="AssignmentToNonFinalStatic" />
     <exclude name="AvoidDuplicateLiterals" />
