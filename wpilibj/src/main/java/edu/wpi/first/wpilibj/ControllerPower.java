@@ -159,6 +159,5 @@ public final class ControllerPower {
   }
 
   private ControllerPower() {
-    
   }
 }

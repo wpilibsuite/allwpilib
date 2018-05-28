@@ -69,6 +69,5 @@ public final class HLUsageReporting {
   }
 
   private HLUsageReporting() {
-    
   }
 }

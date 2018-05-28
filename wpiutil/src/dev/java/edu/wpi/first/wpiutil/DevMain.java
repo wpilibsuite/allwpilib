@@ -17,6 +17,5 @@ public final class DevMain {
   }
 
   private DevMain() {
-    
   }
 }
