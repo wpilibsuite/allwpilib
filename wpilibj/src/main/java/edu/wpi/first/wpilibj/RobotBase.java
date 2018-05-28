@@ -219,7 +219,7 @@ public abstract class RobotBase implements AutoCloseable {
   /**
    * Starting point for the applications.
    */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+  @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.AvoidCatchingThrowable"})
   public static void main(String... args) {
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");
@@ -233,7 +233,8 @@ public abstract class RobotBase implements AutoCloseable {
     } else {
       Enumeration<URL> resources = null;
       try {
-        resources = RobotBase.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+        resources = Thread.currentThread()
+            .getContextClassLoader().getResources("META-INF/MANIFEST.MF");
       } catch (IOException ex) {
         ex.printStackTrace();
       }

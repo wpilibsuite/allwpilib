@@ -149,12 +149,12 @@ public class Relay extends SendableBase implements MotorSafety {
   private void freeRelay() {
     try {
       RelayJNI.setRelay(m_forwardHandle, false);
-    } catch (RuntimeException ex) {
+    } catch (RuntimeException ignored) {
       // do nothing. Ignore
     }
     try {
       RelayJNI.setRelay(m_reverseHandle, false);
-    } catch (RuntimeException ex) {
+    } catch (RuntimeException ignored) {
       // do nothing. Ignore
     }
 
