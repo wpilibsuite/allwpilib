@@ -12,11 +12,11 @@ generatedFileExclude {
   gtest/
   ni-libraries/include/
   ni-libraries/lib/
+  FRCNetComm\.java$
 }
 
 modifiableFileExclude {
   shared/arm-linux-jni/
-  \.py$
   \.so$
 }
 

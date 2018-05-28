@@ -10,14 +10,15 @@ import os
 import re
 import subprocess
 
+
 # Check that the current directory is part of a Git repository
-def inGitRepo(directory):
-    ret = subprocess.run(["git", "rev-parse"], stderr = subprocess.DEVNULL)
-    return ret.returncode == 0
+def in_git_repo(directory):
+    return subprocess.run(["git", "rev-parse"]).returncode == 0
+
 
 def main():
-    if not inGitRepo("."):
-        print("Error: not invoked within a Git repository", file = sys.stderr)
+    if not in_git_repo("."):
+        print("Error: not invoked within a Git repository", file=sys.stderr)
         sys.exit(1)
 
     # Handle running in either the root or gen directories
@@ -26,7 +27,7 @@ def main():
         configPath = ".."
 
     outputName = configPath + \
-        "/wpilibj/src/athena/java/edu/wpi/first/wpilibj/hal/FRCNetComm.java"
+        "/hal/src/main/java/edu/wpi/first/wpilibj/hal/FRCNetComm.java"
 
     # Set initial copyright year and get current year
     year = "2016"
@@ -41,12 +42,12 @@ def main():
         temp.write("*/\n")
 
         # Write second line of comment
-        temp.write("/* Copyright (c) FIRST ")
+        temp.write("/* Copyright (c) ")
         if year != currentYear:
             temp.write(year)
             temp.write("-")
         temp.write(currentYear)
-        temp.write(". All Rights Reserved.")
+        temp.write(" FIRST. All Rights Reserved.")
         for i in range(0, 24):
             temp.write(" ")
         if year == currentYear:
@@ -68,8 +69,6 @@ def main():
         temp.write("""
 package edu.wpi.first.wpilibj.hal;
 
-import edu.wpi.first.wpilibj.hal.JNIWrapper;
-
 /**
  * JNI wrapper for library <b>FRC_NetworkCommunication</b><br>.
  */
@@ -79,14 +78,17 @@ public class FRCNetComm extends JNIWrapper {
 
         # Read enums from C++ source files
         firstEnum = True
-        for fileName in ["LoadOut.h", "UsageReporting.h"]:
-            with open(configPath + "/hal/include/FRC_NetworkCommunication/" + \
-                      fileName, "r") as cppSource:
+        files = [
+            "/ni-libraries/include/FRC_NetworkCommunication/LoadOut.h",
+            "/hal/src/main/native/include/HAL/UsageReporting.h"
+        ]
+        for fileName in files:
+            with open(configPath + fileName, "r") as cppSource:
                 while True:
                     # Read until an enum is encountered
                     line = ""
                     pos = -1
-                    while line.find("enum") == -1:
+                    while "enum" not in line:
                         line = cppSource.readline()
                         if line == "":
                             break
@@ -95,22 +97,22 @@ public class FRCNetComm extends JNIWrapper {
                         break
 
                     # If "{" is on next line, read next line
-                    if line.find("{") == -1:
+                    if "{" not in line:
                         line = cppSource.readline()
 
                     # Write enum to output file as interface
                     values = []
                     line = cppSource.readline()
-                    while line.find("}") == -1:
+                    while "}" not in line:
                         if line == "\n":
                             values.append("")
-                        else:
-                            if line[0] != "#":
-                                line = line.strip()
-                                if line[len(line) - 1] == ",":
-                                    values.append(line[0:len(line) - 1])
-                                else:
-                                    values.append(line)
+                        elif line[0] != "#":
+                            try:
+                                values.append(
+                                    re.search("[^,]+", line.strip()).group())
+                            except AttributeError:
+                                # Ignore lines that don't match value regex
+                                pass
                         line = cppSource.readline()
 
                     # Extract enum name
@@ -127,8 +129,7 @@ public class FRCNetComm extends JNIWrapper {
                         firstEnum = False
                     else:
                         temp.write("\n")
-                    temp.write("  /**\n"
-                               "   * ")
+                    temp.write("  /**\n   * ")
 
                     # Splits camelcase string into words
                     enumCamel = re.findall(r'[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))',
@@ -137,7 +138,7 @@ public class FRCNetComm extends JNIWrapper {
                     for i in range(1, len(enumCamel)):
                         temp.write(enumCamel[i][0].lower() + \
                             enumCamel[i][1:len(enumCamel[i])] + " ")
-                    temp.write("from " + fileName + "\n"
+                    temp.write("from " + os.path.basename(fileName) + "\n"
                                "   */\n"
                                "  @SuppressWarnings(\"TypeName\")\n"
                                "  public interface " + enumName + " {\n")
@@ -150,13 +151,12 @@ public class FRCNetComm extends JNIWrapper {
                             temp.write("\n")
                             continue
 
-                        if value.find("=") == -1:
+                        if "=" not in value:
                             value = value + " = " + str(count)
                             count += 1
 
                         # Add scoping for values from a different enum
-                        if enumName != "tModuleType" and \
-                                value.find("kModuleType") != -1:
+                        if enumName != "tModuleType" and "kModuleType" in value:
                             value = value.replace("kModuleType",
                                                   "tModuleType.kModuleType")
                         temp.write("    int " + value[0:len(value)] + ";\n")
@@ -173,6 +173,7 @@ public class FRCNetComm extends JNIWrapper {
     except OSError:
         pass
     os.rename(outputName + ".tmp", outputName)
+
 
 if __name__ == "__main__":
     main()
