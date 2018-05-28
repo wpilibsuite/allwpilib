@@ -219,7 +219,8 @@ public abstract class RobotBase implements AutoCloseable {
   /**
    * Starting point for the applications.
    */
-  @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.AvoidCatchingThrowable"})
+  @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.AvoidCatchingThrowable",
+                     "PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   public static void main(String... args) {
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");

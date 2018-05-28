@@ -22,6 +22,7 @@ import static java.util.Objects.requireNonNull;
  * <p>This class is intended to be used by sensor (and other I2C device) drivers. It probably should
  * not be used directly.
  */
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public class I2C implements AutoCloseable {
   public enum Port {
     kOnboard(0), kMXP(1);
@@ -99,6 +100,7 @@ public class I2C implements AutoCloseable {
    * @param receiveSize  Number of bytes to read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   public synchronized boolean transaction(ByteBuffer dataToSend, int sendSize,
                                           ByteBuffer dataReceived, int receiveSize) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {

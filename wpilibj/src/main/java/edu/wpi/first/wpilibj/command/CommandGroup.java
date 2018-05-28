@@ -31,6 +31,7 @@ import static java.util.Objects.requireNonNull;
  * @see Subsystem
  * @see IllegalUseOfCommandException
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class CommandGroup extends Command {
   /**
    * The commands in this group (stored in entries).
@@ -215,7 +216,7 @@ public class CommandGroup extends Command {
   }
 
   @Override
-  @SuppressWarnings("MethodName")
+  @SuppressWarnings({"MethodName", "PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   void _execute() {
     Entry entry = null;
     Command cmd = null;

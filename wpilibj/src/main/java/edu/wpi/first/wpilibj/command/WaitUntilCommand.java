@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.Timer;
  * some value, then continue to the next command.
  */
 public class WaitUntilCommand extends Command {
-  private double m_time;
+  private final double m_time;
 
   public WaitUntilCommand(double time) {
     super("WaitUntil(" + time + ")");

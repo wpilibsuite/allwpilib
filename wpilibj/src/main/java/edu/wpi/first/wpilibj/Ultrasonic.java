@@ -190,6 +190,7 @@ public class Ultrasonic extends SendableBase implements PIDSource {
    * stopped, then started again after this sensor is removed (provided this wasn't the last
    * sensor).
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   @Override
   public synchronized void close() {
     super.close();

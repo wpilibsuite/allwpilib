@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.sim;
 import edu.wpi.first.hal.sim.mockdata.AnalogTriggerDataJNI;
 
 public class AnalogTriggerSim {
-  private int m_index;
+  private final int m_index;
 
   public AnalogTriggerSim(int index) {
     m_index = index;

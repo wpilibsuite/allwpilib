@@ -20,7 +20,7 @@ public class DigitalOutput extends SendableBase {
   private static final int invalidPwmGenerator = 0;
   private int m_pwmGenerator = invalidPwmGenerator;
 
-  private int m_channel;
+  private final int m_channel;
   private int m_handle;
 
   /**

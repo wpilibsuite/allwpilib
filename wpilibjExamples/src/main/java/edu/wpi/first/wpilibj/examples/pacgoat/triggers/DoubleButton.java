@@ -15,9 +15,9 @@ import edu.wpi.first.wpilibj.buttons.Trigger;
  * simultaneously pressed.
  */
 public class DoubleButton extends Trigger {
-  private Joystick m_joy;
-  private int m_button1;
-  private int m_button2;
+  private final Joystick m_joy;
+  private final int m_button1;
+  private final int m_button2;
 
   /**
    * Create a new double button trigger.

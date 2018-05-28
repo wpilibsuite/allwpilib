@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-public class CameraServerSharedStore {
+public final class CameraServerSharedStore {
   private static CameraServerShared cameraServerShared;
 
   private CameraServerSharedStore() {

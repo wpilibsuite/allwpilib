@@ -12,8 +12,8 @@ import java.nio.ByteBuffer;
 /**
  * JNI Wrapper for HAL<br>.
  */
-@SuppressWarnings({"AbbreviationAsWordInName", "MethodName"})
-public class HAL extends JNIWrapper {
+@SuppressWarnings({"AbbreviationAsWordInName", "MethodName", "PMD.TooManyMethods"})
+public final class HAL extends JNIWrapper {
   public static native void waitForDSData();
 
   public static native boolean initialize(int timeout, int mode);
@@ -127,4 +127,8 @@ public class HAL extends JNIWrapper {
   public static native int getPortWithModule(byte module, byte channel);
 
   public static native int getPort(byte channel);
+
+  private HAL() {
+
+  }
 }

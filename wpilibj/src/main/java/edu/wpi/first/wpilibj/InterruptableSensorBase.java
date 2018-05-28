@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.util.AllocationException;
 /**
  * Base for sensors to be used with interrupts.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public abstract class InterruptableSensorBase extends SendableBase {
   @SuppressWarnings("JavadocMethod")
   public enum WaitResult {

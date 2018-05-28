@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
  * Support for high level usage reporting.
  */
 @SuppressWarnings("JavadocMethod")
-public class HLUsageReporting {
+public final class HLUsageReporting {
   private static Interface impl;
 
   @SuppressWarnings("MethodName")
@@ -66,5 +66,9 @@ public class HLUsageReporting {
     @Override
     public void reportSmartDashboard() {
     }
+  }
+
+  private HLUsageReporting() {
+    
   }
 }

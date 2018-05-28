@@ -25,6 +25,7 @@ import static java.util.Objects.requireNonNull;
  * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
  * given set of PID constants.
  */
+@SuppressWarnings("PMD.TooManyFields")
 public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
   public static final double kDefaultPeriod = 0.05;
   private static int instances;
@@ -110,7 +111,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
   public class NullTolerance implements Tolerance {
     @Override
     public boolean onTarget() {
-      throw new RuntimeException("No tolerance value set when calling onTarget().");
+      throw new IllegalStateException("No tolerance value set when calling onTarget().");
     }
   }
 
@@ -198,7 +199,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    * Read the input, calculate the output accordingly, and write to the output. This should only be
    * called by the PIDTask and is created during initialization.
    */
-  @SuppressWarnings("LocalVariableName")
+  @SuppressWarnings({"LocalVariableName", "PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
   protected void calculate() {
     if (m_origSource == null || m_pidOutput == null) {
       return;
@@ -512,7 +513,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    */
   public void setContinuous(boolean continuous) {
     if (continuous && m_inputRange <= 0) {
-      throw new RuntimeException("No input range set when calling setContinuous().");
+      throw new IllegalStateException("No input range set when calling setContinuous().");
     }
     m_thisMutex.lock();
     try {

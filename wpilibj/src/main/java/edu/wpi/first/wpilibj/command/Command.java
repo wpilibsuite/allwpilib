@@ -39,6 +39,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @see CommandGroup
  * @see IllegalUseOfCommandException
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public abstract class Command extends SendableBase {
   /**
    * The time since this command was initialized.
