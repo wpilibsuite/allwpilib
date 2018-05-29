@@ -7,6 +7,9 @@
 
 package edu.wpi.first.networktables;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
