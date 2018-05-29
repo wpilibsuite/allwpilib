@@ -14,7 +14,7 @@
 #include "HAL/OSSerialPort.h"
 #include "HAL/cpp/Log.h"
 #include "HALUtil.h"
-#include "edu_wpi_first_wpilibj_hal_OSSerialPortJNI.h"
+#include "edu_wpi_first_hal_OSSerialPortJNI.h"
 
 using namespace frc;
 using namespace wpi::java;
@@ -31,12 +31,12 @@ TLogLevel osserialJNILogLevel = logWARNING;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialInitializePort
  * Signature: (B)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialInitializePort
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialInitializePort
   (JNIEnv* env, jclass, jbyte port)
 {
   SERIALJNI_LOG(logDEBUG) << "Calling Serial Initialize";
@@ -48,12 +48,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialInitializePort
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialSetBaudRate
  * Signature: (BI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetBaudRate
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialSetBaudRate
   (JNIEnv* env, jclass, jbyte port, jint rate)
 {
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Baud Rate";
@@ -65,12 +65,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetBaudRate
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialSetDataBits
  * Signature: (BB)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetDataBits
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialSetDataBits
   (JNIEnv* env, jclass, jbyte port, jbyte bits)
 {
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Data Bits";
@@ -82,12 +82,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetDataBits
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialSetParity
  * Signature: (BB)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetParity
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialSetParity
   (JNIEnv* env, jclass, jbyte port, jbyte parity)
 {
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Parity";
@@ -99,12 +99,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetParity
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialSetStopBits
  * Signature: (BB)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetStopBits
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialSetStopBits
   (JNIEnv* env, jclass, jbyte port, jbyte bits)
 {
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Stop Bits";
@@ -116,12 +116,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetStopBits
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialSetWriteMode
  * Signature: (BB)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetWriteMode
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialSetWriteMode
   (JNIEnv* env, jclass, jbyte port, jbyte mode)
 {
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Write Mode";
@@ -133,12 +133,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetWriteMode
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialSetFlowControl
  * Signature: (BB)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetFlowControl
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialSetFlowControl
   (JNIEnv* env, jclass, jbyte port, jbyte flow)
 {
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Flow Control";
@@ -150,12 +150,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetFlowControl
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialSetTimeout
  * Signature: (BD)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetTimeout
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialSetTimeout
   (JNIEnv* env, jclass, jbyte port, jdouble timeout)
 {
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Timeout";
@@ -167,12 +167,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetTimeout
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialEnableTermination
  * Signature: (BC)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialEnableTermination
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialEnableTermination
   (JNIEnv* env, jclass, jbyte port, jchar terminator)
 {
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Enable Termination";
@@ -185,12 +185,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialEnableTermination
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialDisableTermination
  * Signature: (B)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialDisableTermination
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialDisableTermination
   (JNIEnv* env, jclass, jbyte port)
 {
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Disable termination";
@@ -201,12 +201,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialDisableTermination
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialSetReadBufferSize
  * Signature: (BI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetReadBufferSize
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialSetReadBufferSize
   (JNIEnv* env, jclass, jbyte port, jint size)
 {
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Read Buffer Size";
@@ -219,12 +219,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetReadBufferSize
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialSetWriteBufferSize
  * Signature: (BI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetWriteBufferSize
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialSetWriteBufferSize
   (JNIEnv* env, jclass, jbyte port, jint size)
 {
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Write Buffer Size";
@@ -237,12 +237,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetWriteBufferSize
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialGetBytesReceived
  * Signature: (B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialGetBytesReceived
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialGetBytesReceived
   (JNIEnv* env, jclass, jbyte port)
 {
   SERIALJNI_LOG(logDEBUG) << "Serial Get Bytes Received";
@@ -255,12 +255,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialGetBytesReceived
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialRead
  * Signature: (B[BI)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialRead
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialRead
   (JNIEnv* env, jclass, jbyte port, jbyteArray dataReceived, jint size)
 {
   SERIALJNI_LOG(logDEBUG) << "Serial Read";
@@ -278,12 +278,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialRead
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialWrite
  * Signature: (B[BI)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialWrite
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialWrite
   (JNIEnv* env, jclass, jbyte port, jbyteArray dataToSend, jint size)
 {
   SERIALJNI_LOG(logDEBUG) << "Serial Write";
@@ -300,12 +300,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialWrite
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialFlush
  * Signature: (B)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialFlush
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialFlush
   (JNIEnv* env, jclass, jbyte port)
 {
   SERIALJNI_LOG(logDEBUG) << "Serial Flush";
@@ -316,12 +316,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialFlush
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialClear
  * Signature: (B)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialClear
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialClear
   (JNIEnv* env, jclass, jbyte port)
 {
   SERIALJNI_LOG(logDEBUG) << "Serial Clear";
@@ -332,12 +332,12 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialClear
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_OSSerialPortJNI
+ * Class:     edu_wpi_first_hal_OSSerialPortJNI
  * Method:    serialClose
  * Signature: (B)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialClose
+Java_edu_wpi_first_hal_OSSerialPortJNI_serialClose
   (JNIEnv* env, jclass, jbyte port)
 {
   SERIALJNI_LOG(logDEBUG) << "Serial Close";

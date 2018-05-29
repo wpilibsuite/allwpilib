@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Stopwatch;
 
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
 
 /**

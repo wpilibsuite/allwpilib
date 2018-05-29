@@ -7,10 +7,10 @@
 
 package edu.wpi.first.hal.sim.mockdata;
 
-import edu.wpi.first.wpilibj.sim.BufferCallback;
-import edu.wpi.first.wpilibj.sim.ConstBufferCallback;
-import edu.wpi.first.wpilibj.sim.NotifyCallback;
-import edu.wpi.first.wpilibj.hal.JNIWrapper;
+import edu.wpi.first.hal.sim.BufferCallback;
+import edu.wpi.first.hal.sim.ConstBufferCallback;
+import edu.wpi.first.hal.sim.NotifyCallback;
+import edu.wpi.first.hal.JNIWrapper;
 
 public class I2CDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(int index, NotifyCallback callback, boolean initialNotify);

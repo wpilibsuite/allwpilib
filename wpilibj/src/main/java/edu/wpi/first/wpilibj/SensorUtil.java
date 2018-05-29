@@ -7,14 +7,14 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.AnalogJNI;
-import edu.wpi.first.wpilibj.hal.ConstantsJNI;
-import edu.wpi.first.wpilibj.hal.DIOJNI;
-import edu.wpi.first.wpilibj.hal.PDPJNI;
-import edu.wpi.first.wpilibj.hal.PWMJNI;
-import edu.wpi.first.wpilibj.hal.PortsJNI;
-import edu.wpi.first.wpilibj.hal.RelayJNI;
-import edu.wpi.first.wpilibj.hal.SolenoidJNI;
+import edu.wpi.first.hal.AnalogJNI;
+import edu.wpi.first.hal.ConstantsJNI;
+import edu.wpi.first.hal.DIOJNI;
+import edu.wpi.first.hal.PDPJNI;
+import edu.wpi.first.hal.PWMJNI;
+import edu.wpi.first.hal.PortsJNI;
+import edu.wpi.first.hal.RelayJNI;
+import edu.wpi.first.hal.SolenoidJNI;
 
 /**
  * Stores most recent status information as well as containing utility functions for checking
