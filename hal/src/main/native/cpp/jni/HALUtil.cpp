@@ -61,6 +61,29 @@ static JClass matchInfoDataCls;
 static JClass accumulatorResultCls;
 static JClass canDataCls;
 
+static const JClassInit classes[] = {
+    {"edu/wpi/first/wpilibj/PWMConfigDataResult", &pwmConfigDataResultCls},
+    {"edu/wpi/first/wpilibj/can/CANStatus", &canStatusCls},
+    {"edu/wpi/first/wpilibj/hal/MatchInfoData", &matchInfoDataCls},
+    {"edu/wpi/first/wpilibj/AccumulatorResult", &accumulatorResultCls},
+    {"edu/wpi/first/wpilibj/CANData", &canDataCls}};
+
+static const JExceptionInit exceptions[] = {
+    {"java/lang/RuntimeException", &runtimeExCls},
+    {"java/lang/IllegalArgumentException", &illegalArgExCls},
+    {"edu/wpi/first/wpilibj/util/BoundaryException", &boundaryExCls},
+    {"edu/wpi/first/wpilibj/util/AllocationException", &allocationExCls},
+    {"edu/wpi/first/wpilibj/util/HalHandleException", &halHandleExCls},
+    {"edu/wpi/first/wpilibj/can/CANInvalidBufferException",
+     &canInvalidBufferExCls},
+    {"edu/wpi/first/wpilibj/can/CANMessageNotFoundException",
+     &canMessageNotFoundExCls},
+    {"edu/wpi/first/wpilibj/can/CANMessageNotAllowedException",
+     &canMessageNotAllowedExCls},
+    {"edu/wpi/first/wpilibj/can/CANNotInitializedException",
+     &canNotInitializedExCls},
+    {"edu/wpi/first/wpilibj/util/UncleanStatusException", &uncleanStatusExCls}};
+
 namespace frc {
 
 void ThrowAllocationException(JNIEnv* env, int32_t minRange, int32_t maxRange,
@@ -273,59 +296,15 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
     return JNI_ERR;
 
-  runtimeExCls = JException(env, "java/lang/RuntimeException");
-  if (!runtimeExCls) return JNI_ERR;
+  for (auto& c : classes) {
+    *c.cls = JClass(env, c.name);
+    if (!*c.cls) return JNI_ERR;
+  }
 
-  illegalArgExCls = JException(env, "java/lang/IllegalArgumentException");
-  if (!illegalArgExCls) return JNI_ERR;
-
-  boundaryExCls =
-      JException(env, "edu/wpi/first/wpilibj/util/BoundaryException");
-  if (!boundaryExCls) return JNI_ERR;
-
-  allocationExCls =
-      JException(env, "edu/wpi/first/wpilibj/util/AllocationException");
-  if (!allocationExCls) return JNI_ERR;
-
-  halHandleExCls =
-      JException(env, "edu/wpi/first/wpilibj/util/HalHandleException");
-  if (!halHandleExCls) return JNI_ERR;
-
-  canInvalidBufferExCls =
-      JException(env, "edu/wpi/first/wpilibj/can/CANInvalidBufferException");
-  if (!canInvalidBufferExCls) return JNI_ERR;
-
-  canMessageNotFoundExCls =
-      JException(env, "edu/wpi/first/wpilibj/can/CANMessageNotFoundException");
-  if (!canMessageNotFoundExCls) return JNI_ERR;
-
-  canMessageNotAllowedExCls = JException(
-      env, "edu/wpi/first/wpilibj/can/CANMessageNotAllowedException");
-  if (!canMessageNotAllowedExCls) return JNI_ERR;
-
-  canNotInitializedExCls =
-      JException(env, "edu/wpi/first/wpilibj/can/CANNotInitializedException");
-  if (!canNotInitializedExCls) return JNI_ERR;
-
-  uncleanStatusExCls =
-      JException(env, "edu/wpi/first/wpilibj/util/UncleanStatusException");
-  if (!uncleanStatusExCls) return JNI_ERR;
-
-  pwmConfigDataResultCls =
-      JClass(env, "edu/wpi/first/wpilibj/PWMConfigDataResult");
-  if (!pwmConfigDataResultCls) return JNI_ERR;
-
-  canStatusCls = JClass(env, "edu/wpi/first/wpilibj/can/CANStatus");
-  if (!canStatusCls) return JNI_ERR;
-
-  matchInfoDataCls = JClass(env, "edu/wpi/first/wpilibj/hal/MatchInfoData");
-  if (!matchInfoDataCls) return JNI_ERR;
-
-  accumulatorResultCls = JClass(env, "edu/wpi/first/wpilibj/AccumulatorResult");
-  if (!accumulatorResultCls) return JNI_ERR;
-
-  canDataCls = JClass(env, "edu/wpi/first/wpilibj/CANData");
-  if (!canDataCls) return JNI_ERR;
+  for (auto& c : exceptions) {
+    *c.cls = JException(env, c.name);
+    if (!*c.cls) return JNI_ERR;
+  }
 
   return sim::SimOnLoad(vm, reserved);
 }
@@ -337,21 +316,13 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
     return;
   // Delete global references
-  runtimeExCls.free(env);
-  illegalArgExCls.free(env);
-  boundaryExCls.free(env);
-  allocationExCls.free(env);
-  halHandleExCls.free(env);
-  canInvalidBufferExCls.free(env);
-  canMessageNotFoundExCls.free(env);
-  canMessageNotAllowedExCls.free(env);
-  canNotInitializedExCls.free(env);
-  uncleanStatusExCls.free(env);
-  pwmConfigDataResultCls.free(env);
-  canStatusCls.free(env);
-  matchInfoDataCls.free(env);
-  accumulatorResultCls.free(env);
-  canDataCls.free(env);
+
+  for (auto& c : classes) {
+    c.cls->free(env);
+  }
+  for (auto& c : exceptions) {
+    c.cls->free(env);
+  }
   jvm = nullptr;
 }
 

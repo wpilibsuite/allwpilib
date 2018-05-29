@@ -71,6 +71,11 @@ class JClass {
   jclass m_cls = nullptr;
 };
 
+struct JClassInit {
+  const char* name;
+  JClass* cls;
+};
+
 template <typename T>
 class JGlobal {
  public:
@@ -616,6 +621,11 @@ class JException : public JClass {
 
  private:
   jmethodID m_constructor = nullptr;
+};
+
+struct JExceptionInit {
+  const char* name;
+  JException* cls;
 };
 
 }  // namespace java
