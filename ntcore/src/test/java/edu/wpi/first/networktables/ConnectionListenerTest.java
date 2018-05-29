@@ -14,6 +14,7 @@ import org.junit.Ignore;
 
 import junit.framework.TestCase;
 
+@Ignore
 public class ConnectionListenerTest extends TestCase {
   NetworkTableInstance m_serverInst;
   NetworkTableInstance m_clientInst;
@@ -54,7 +55,6 @@ public class ConnectionListenerTest extends TestCase {
   /**
    * Test the JNI.
    */
-  @Ignore
   public void testJNI() {
     // set up the poller
     int poller = NetworkTablesJNI.createConnectionListenerPoller(m_serverInst.getHandle());
@@ -107,7 +107,6 @@ public class ConnectionListenerTest extends TestCase {
   /**
    * Test threaded behavior.
    */
-  @Ignore
   public void testThreaded() {
     m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
     List<ConnectionNotification> events = new ArrayList<>();
