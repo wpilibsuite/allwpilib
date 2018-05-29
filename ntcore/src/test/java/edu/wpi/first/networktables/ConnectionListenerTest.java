@@ -12,11 +12,12 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-public class ConnectionListenerTest extends TestCase {
+//public class ConnectionListenerTest extends TestCase {
+public class ConnectionListenerTest {
   NetworkTableInstance m_serverInst;
   NetworkTableInstance m_clientInst;
 
-  @Override
+  //@Override
   protected void setUp() throws Exception {
     m_serverInst = NetworkTableInstance.create();
     m_serverInst.setNetworkIdentity("server");
@@ -25,7 +26,7 @@ public class ConnectionListenerTest extends TestCase {
     m_clientInst.setNetworkIdentity("client");
   }
 
-  @Override
+  //@Override
   protected void tearDown() throws Exception {
     m_clientInst.close();
     m_serverInst.close();
@@ -52,7 +53,7 @@ public class ConnectionListenerTest extends TestCase {
   /**
    * Test the JNI.
    */
-  public void ignoreJNI() {
+  public void testJNI() {
     // set up the poller
     int poller = NetworkTablesJNI.createConnectionListenerPoller(m_serverInst.getHandle());
     assertTrue("bad poller handle", poller != 0);
@@ -104,7 +105,7 @@ public class ConnectionListenerTest extends TestCase {
   /**
    * Test threaded behavior.
    */
-  public void ignoreThreaded() {
+  public void testThreaded() {
     m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
     List<ConnectionNotification> events = new ArrayList<>();
     final int handle = m_serverInst.addConnectionListener(events::add, false);
