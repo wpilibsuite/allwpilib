@@ -9,9 +9,7 @@ package edu.wpi.first.wpilibj.shuffleboard;
 
 import edu.wpi.first.wpilibj.Sendable;
 
-import java.util.Map;
-
-public final class SendableBuilder extends BuilderBase implements TabAdder {
+public final class SendableBuilder extends BuilderBase {
 
   private final Sendable m_sendable;
 
@@ -21,7 +19,7 @@ public final class SendableBuilder extends BuilderBase implements TabAdder {
   }
 
   @Override
-  public TabBuilder toTab(String tabName) {
+  public Tab toTab(String tabName) {
     return new TabBuilder(tabName);
   }
 
@@ -29,7 +27,7 @@ public final class SendableBuilder extends BuilderBase implements TabAdder {
     return m_sendable;
   }
 
-  public final class TabBuilder extends Tab {
+  private final class TabBuilder extends Tab {
 
     TabBuilder(String tabName) {
       super(tabName);
@@ -37,12 +35,12 @@ public final class SendableBuilder extends BuilderBase implements TabAdder {
     }
 
     @Override
-    public LayoutBuilder toLayout(String layoutType, String layoutTitle) {
+    public Layout toLayout(String layoutType, String layoutTitle) {
       return new LayoutBuilder(layoutType, layoutTitle);
     }
 
     @Override
-    public WidgetBuilder withWidget(String widgetType) {
+    public Widget withWidget(String widgetType) {
       return new WidgetBuilder(widgetType);
     }
   }
@@ -55,29 +53,19 @@ public final class SendableBuilder extends BuilderBase implements TabAdder {
     }
 
     @Override
-    public WidgetBuilder withWidget(String widgetType) {
+    public Widget withWidget(String widgetType) {
       return new WidgetBuilder(widgetType);
     }
 
-    @Override
-    public LayoutBuilder withProperties(Map<String, Object> properties) {
-      super.withProperties(properties);
-      return this;
-    }
   }
 
-  public final class WidgetBuilder extends Widget {
+  private final class WidgetBuilder extends Widget {
 
     WidgetBuilder(String widgetType) {
       super(widgetType);
       setWidget(this);
     }
 
-    @Override
-    public WidgetBuilder withProperties(Map<String, Object> properties) {
-      super.withProperties(properties);
-      return this;
-    }
   }
 
 }

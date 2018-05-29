@@ -14,7 +14,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
 
-public final class EntryBuilder extends BuilderBase implements TabAdder {
+public final class EntryBuilder extends BuilderBase {
 
   /**
    * The default values to use for each network table type. Booleans default to false,

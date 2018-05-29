@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
-class BuilderBase {
+abstract class BuilderBase {
 
   private final String m_name;
   private Tab m_tab = null;
@@ -45,6 +45,8 @@ class BuilderBase {
   final void setWidget(Widget widget) {
     m_widget = widget;
   }
+
+  public abstract Tab toTab(String tabName);
 
   final String generateKey() {
     String tab = Shuffleboard.BASE_TABLE_NAME + "/" + m_tab.getName() + "/";

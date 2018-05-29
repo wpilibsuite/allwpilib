@@ -51,6 +51,8 @@ import java.util.Objects;
  *   .getEntry();
  * }</pre>
  * </p>
+ * 
+ * <p>Teams are encouraged to set up shuffleboard layouts at the start of the robot program.</p>
  */
 public final class Shuffleboard {
 
@@ -60,8 +62,8 @@ public final class Shuffleboard {
   private static NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
 
   private static boolean m_dirtyMetadata = false;
-  private static List<BuilderBase> m_builders = new ArrayList<>();
-  private static List<SendableData> m_sendables = new ArrayList<>();
+  private static final List<BuilderBase> m_builders = new ArrayList<>();
+  private static final List<SendableData> m_sendables = new ArrayList<>();
 
   static {
     HLUsageReporting.reportShuffleboard();
