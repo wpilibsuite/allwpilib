@@ -44,9 +44,7 @@ class ConnectionListenerTest {
   /**
    * Connect to the server.
    */
-  @Test
-  @DisabledOnOs(OS.WINDOWS)
-  void connect() {
+  private void connect() {
     m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
     m_clientInst.startClient("127.0.0.1", 10000);
 
@@ -113,6 +111,7 @@ class ConnectionListenerTest {
   }
 
   @Test
+  @DisabledOnOs(OS.WINDOWS)
   void testThreaded() {
     m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
     List<ConnectionNotification> events = new ArrayList<>();
