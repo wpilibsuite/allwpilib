@@ -16,23 +16,23 @@ namespace lowfi {
 class LinearMotorModelSimulation : public MotorModelSimulation {
  public:
   explicit LinearMotorModelSimulation(double maxSpeed);
-  ~LinearMotorModelSimulation();
 
-  virtual void Reset();
-  virtual void SetVoltage(double voltage);
-  virtual void Update(double elapsedTime);
+  void Reset() override;
+  void SetVoltage(double voltage) override;
+  void Update(double elapsedTime) override;
 
-  virtual double GetPosition();
-  virtual double GetVelocity();
-  virtual double GetAcceleration();
+  double GetPosition() const override;
+  double GetVelocity() const override;
+  double GetAcceleration() const override;
+  double GetCurrent() const override;
 
  protected:
-  double m_voltagePercentage;
   double m_maxSpeed;
-  double m_position;
-  double m_velocity;
+  double m_voltagePercentage{0};
+  double m_position{0};
+  double m_velocity{0};
 
-  static const double MAX_EXPECTED_VOLTAGE;
+  static constexpr double kMaxExpectedVoltage = 12;
 };
 
 }  // namespace lowfi

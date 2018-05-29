@@ -20,11 +20,10 @@ class MotorEncoderSimulator {
  public:
   MotorEncoderSimulator(const std::shared_ptr<MotorSimulator>& motorController,
                         const std::shared_ptr<EncoderSimulator>& encoder);
-  ~MotorEncoderSimulator();
 
   void Update();
 
- protected:
+ private:
   std::shared_ptr<MotorSimulator> motorSimulator;
   std::shared_ptr<EncoderSimulator> encoderSimulator;
 };

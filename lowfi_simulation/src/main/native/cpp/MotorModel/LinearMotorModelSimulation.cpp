@@ -11,15 +11,8 @@ namespace frc {
 namespace sim {
 namespace lowfi {
 
-const double LinearMotorModelSimulation::MAX_EXPECTED_VOLTAGE = 12.0;
-
 LinearMotorModelSimulation::LinearMotorModelSimulation(double maxSpeed)
-    : m_voltagePercentage(0),
-      m_maxSpeed(maxSpeed),
-      m_position(0),
-      m_velocity(0) {}
-
-LinearMotorModelSimulation::~LinearMotorModelSimulation() {}
+    : m_maxSpeed(maxSpeed) {}
 
 void LinearMotorModelSimulation::Reset() {
   m_position = 0;
@@ -27,7 +20,7 @@ void LinearMotorModelSimulation::Reset() {
 }
 
 void LinearMotorModelSimulation::SetVoltage(double voltage) {
-  m_voltagePercentage = voltage / MAX_EXPECTED_VOLTAGE;
+  m_voltagePercentage = voltage / kMaxExpectedVoltage;
 }
 
 void LinearMotorModelSimulation::Update(double elapsedTime) {
@@ -35,11 +28,13 @@ void LinearMotorModelSimulation::Update(double elapsedTime) {
   m_position += m_velocity * elapsedTime;
 }
 
-double LinearMotorModelSimulation::GetPosition() { return m_position; }
+double LinearMotorModelSimulation::GetPosition() const { return m_position; }
 
-double LinearMotorModelSimulation::GetVelocity() { return m_velocity; }
+double LinearMotorModelSimulation::GetVelocity() const { return m_velocity; }
 
-double LinearMotorModelSimulation::GetAcceleration() { return 0; }
+double LinearMotorModelSimulation::GetAcceleration() const { return 0; }
+
+double LinearMotorModelSimulation::GetCurrent() const { return 0; }
 
 }  // namespace lowfi
 }  // namespace sim

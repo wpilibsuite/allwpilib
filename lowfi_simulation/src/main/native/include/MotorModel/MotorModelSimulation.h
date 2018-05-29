@@ -17,9 +17,10 @@ class MotorModelSimulation {
   virtual void SetVoltage(double voltage) = 0;
   virtual void Update(double elapsedTime) = 0;
 
-  virtual double GetPosition() = 0;
-  virtual double GetVelocity() = 0;
-  virtual double GetAcceleration() = 0;
+  virtual double GetPosition() const = 0;
+  virtual double GetVelocity() const = 0;
+  virtual double GetAcceleration() const = 0;
+  virtual double GetCurrent() const = 0;
 };
 
 }  // namespace lowfi

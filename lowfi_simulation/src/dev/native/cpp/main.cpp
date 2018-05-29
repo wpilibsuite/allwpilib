@@ -5,11 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <iostream>
-
 #include <HAL/HAL.h>
 
-int main() {
-  std::cout << "Hello World" << std::endl;
-  return 0;
-}
+int main() { return 0; }

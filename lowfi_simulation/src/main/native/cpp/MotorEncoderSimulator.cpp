@@ -16,8 +16,6 @@ MotorEncoderSimulator::MotorEncoderSimulator(
     const std::shared_ptr<EncoderSimulator>& encoder)
     : motorSimulator(motorController), encoderSimulator(encoder) {}
 
-MotorEncoderSimulator::~MotorEncoderSimulator() {}
-
 void MotorEncoderSimulator::Update() {
   encoderSimulator->SetPosition(motorSimulator->GetPosition());
   encoderSimulator->SetVelocity(motorSimulator->GetVelocity());

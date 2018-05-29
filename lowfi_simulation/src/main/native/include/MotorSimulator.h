@@ -20,9 +20,9 @@ class MotorSimulator {
   virtual void SetMotorModelSimulation(
       const std::shared_ptr<MotorModelSimulation>& motorModelSimulator) = 0;
 
-  virtual double GetPosition() = 0;
-  virtual double GetVelocity() = 0;
-  virtual double GetAcceleration() = 0;
+  virtual double GetPosition() const = 0;
+  virtual double GetVelocity() const = 0;
+  virtual double GetAcceleration() const = 0;
 };
 
 }  // namespace lowfi

@@ -25,15 +25,15 @@ class WpiMotorSimulator : public MotorSimulator {
       const std::shared_ptr<MotorModelSimulation>& motorModelSimulator);
 
   void Update(double elapsedTime);
-  double GetPosition() override;
-  double GetVelocity() override;
-  double GetAcceleration() override;
+  double GetPosition() const override;
+  double GetVelocity() const override;
+  double GetAcceleration() const override;
 
- protected:
+ private:
   std::shared_ptr<MotorModelSimulation> m_motorModelSimulation;
   frc::sim::PWMSim m_pwmSimulator;
 
-  static const double DEFAULT_VOLTAGE;
+  static constexpr double kDefaultVoltage = 12.0;
 };
 
 }  // namespace lowfi
