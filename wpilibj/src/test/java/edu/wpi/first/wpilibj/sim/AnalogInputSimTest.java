@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.sim;
 import org.junit.Test;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.HAL;
 
 import static org.junit.Assert.assertEquals;
 

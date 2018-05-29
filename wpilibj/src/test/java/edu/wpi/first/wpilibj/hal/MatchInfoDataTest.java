@@ -9,6 +9,9 @@ package edu.wpi.first.wpilibj.hal;
 
 import org.junit.Test;
 
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.MatchInfoData;
+
 public class MatchInfoDataTest {
   @Test
   public void matchInfoDataDoesNotThrow() {

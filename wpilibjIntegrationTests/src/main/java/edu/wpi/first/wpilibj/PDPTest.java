@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -19,7 +20,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
+import edu.wpi.first.hal.can.CANMessageNotFoundException;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;

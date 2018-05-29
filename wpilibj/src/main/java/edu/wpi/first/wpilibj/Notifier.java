@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
-import edu.wpi.first.wpilibj.hal.NotifierJNI;
+import edu.wpi.first.hal.NotifierJNI;
 
 public class Notifier implements AutoCloseable {
   // The thread waiting on the HAL alarm.

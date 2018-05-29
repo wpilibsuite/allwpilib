@@ -9,7 +9,8 @@ package edu.wpi.first.wpilibj;
 
 import java.io.Closeable;
 
-import edu.wpi.first.wpilibj.hal.CANAPIJNI;
+import edu.wpi.first.hal.CANAPIJNI;
+import edu.wpi.first.hal.CANData;
 
 /**
  * High level class for interfacing with CAN devices conforming to

@@ -7,8 +7,8 @@
 
 package edu.wpi.first.hal.sim.mockdata;
 
-import edu.wpi.first.wpilibj.sim.NotifyCallback;
-import edu.wpi.first.wpilibj.hal.JNIWrapper;
+import edu.wpi.first.hal.sim.NotifyCallback;
+import edu.wpi.first.hal.JNIWrapper;
 
 public class AnalogTriggerDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(int index, NotifyCallback callback, boolean initialNotify);

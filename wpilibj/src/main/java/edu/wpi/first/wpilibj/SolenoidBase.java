@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.SolenoidJNI;
+import edu.wpi.first.hal.SolenoidJNI;
 
 /**
  * SolenoidBase class is the common base class for the {@link Solenoid} and {@link DoubleSolenoid}
