@@ -10,11 +10,8 @@ package edu.wpi.first.networktables;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Ignore;
-
 import junit.framework.TestCase;
 
-@Ignore
 public class ConnectionListenerTest extends TestCase {
   NetworkTableInstance m_serverInst;
   NetworkTableInstance m_clientInst;
@@ -55,7 +52,7 @@ public class ConnectionListenerTest extends TestCase {
   /**
    * Test the JNI.
    */
-  public void testJNI() {
+  public void ignoreJNI() {
     // set up the poller
     int poller = NetworkTablesJNI.createConnectionListenerPoller(m_serverInst.getHandle());
     assertTrue("bad poller handle", poller != 0);
@@ -107,7 +104,7 @@ public class ConnectionListenerTest extends TestCase {
   /**
    * Test threaded behavior.
    */
-  public void testThreaded() {
+  public void ignoreThreaded() {
     m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
     List<ConnectionNotification> events = new ArrayList<>();
     final int handle = m_serverInst.addConnectionListener(events::add, false);
