@@ -20,6 +20,7 @@ MotorEncoderSimulator::~MotorEncoderSimulator() {}
 
 void MotorEncoderSimulator::Update() {
   encoderSimulator->SetPosition(motorSimulator->GetPosition());
+  encoderSimulator->SetVelocity(motorSimulator->GetVelocity());
 }
 
 }  // namespace lowfi

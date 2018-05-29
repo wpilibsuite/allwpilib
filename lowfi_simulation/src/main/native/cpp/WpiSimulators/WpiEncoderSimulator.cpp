@@ -21,6 +21,10 @@ void WpiEncoderSimulator::SetPosition(double position) {
       static_cast<int>(position / m_encoderSimulator.GetDistancePerPulse()));
 }
 
+void WpiEncoderSimulator::SetVelocity(double velocity) {
+  m_encoderSimulator.SetPeriod(1.0 / velocity);
+}
+
 }  // namespace lowfi
 }  // namespace sim
 }  // namespace frc

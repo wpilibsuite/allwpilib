@@ -32,6 +32,8 @@ class WpiMotorSimulator : public MotorSimulator {
  protected:
   std::shared_ptr<MotorModelSimulation> m_motorModelSimulation;
   frc::sim::PWMSim m_pwmSimulator;
+
+  static const double DEFAULT_VOLTAGE;
 };
 
 }  // namespace lowfi

@@ -11,6 +11,8 @@ namespace frc {
 namespace sim {
 namespace lowfi {
 
+const double WpiMotorSimulator::DEFAULT_VOLTAGE = 12;
+
 WpiMotorSimulator::WpiMotorSimulator(int index) : m_pwmSimulator(index) {}
 
 WpiMotorSimulator::~WpiMotorSimulator() {}
@@ -21,7 +23,8 @@ void WpiMotorSimulator::SetMotorModelSimulation(
 }
 
 void WpiMotorSimulator::Update(double elapsedTime) {
-  m_motorModelSimulation->SetVoltage(m_pwmSimulator.GetSpeed() * 12);
+  m_motorModelSimulation->SetVoltage(m_pwmSimulator.GetSpeed() *
+                                     DEFAULT_VOLTAGE);
   m_motorModelSimulation->Update(elapsedTime);
 }
 
@@ -30,7 +33,7 @@ double WpiMotorSimulator::GetPosition() {
 }
 
 double WpiMotorSimulator::GetVelocity() {
-  return m_motorModelSimulation->GetPosition();
+  return m_motorModelSimulation->GetVelocity();
 }
 
 double WpiMotorSimulator::GetAcceleration() {

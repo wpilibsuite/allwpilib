@@ -22,6 +22,7 @@ class WpiEncoderSimulator : public EncoderSimulator {
   ~WpiEncoderSimulator();
 
   void SetPosition(double position) override;
+  void SetVelocity(double velocity) override;
 
  protected:
   frc::sim::EncoderSim m_encoderSimulator;

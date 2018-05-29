@@ -14,6 +14,7 @@ namespace lowfi {
 class EncoderSimulator {
  public:
   virtual void SetPosition(double position) = 0;
+  virtual void SetVelocity(double velocity) = 0;
 };
 
 }  // namespace lowfi
