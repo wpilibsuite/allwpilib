@@ -87,6 +87,7 @@ publishing {
 }
 
 test {
+    useJUnitPlatform()
     testLogging {
         events "failed"
         exceptionFormat "full"
@@ -123,7 +124,11 @@ compileJava {
 }
 
 dependencies {
-    testCompile 'junit:junit:4.12'
+    testCompileOnly 'junit:junit:4.12'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.2.0'
+
     devCompile sourceSets.main.output
 }
 
