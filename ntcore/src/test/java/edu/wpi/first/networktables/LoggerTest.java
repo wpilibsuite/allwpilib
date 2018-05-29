@@ -7,28 +7,31 @@
 
 package edu.wpi.first.networktables;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class LoggerTest extends TestCase {
-  NetworkTableInstance m_clientInst;
+class LoggerTest {
+  private NetworkTableInstance m_clientInst;
 
-  @Override
-  protected void setUp() throws Exception {
+  @BeforeEach
+  protected void setUp() {
     m_clientInst = NetworkTableInstance.create();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @AfterEach
+  protected void tearDown() {
     m_clientInst.close();
   }
 
-  /**
-   * Test the logger.
-   */
-  public void testLogger() {
+  @Test
+  void addMessageTest() {
     List<LogMessage> msgs = new ArrayList<>();
     m_clientInst.addLogger(msgs::add, LogMessage.kInfo, 100);
 
