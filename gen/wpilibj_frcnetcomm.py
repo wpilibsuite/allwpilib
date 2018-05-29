@@ -74,7 +74,7 @@ package edu.wpi.first.wpilibj.hal;
 /**
  * JNI wrapper for library <b>FRC_NetworkCommunication</b><br>.
  */
-@SuppressWarnings(\"MethodName\")
+@SuppressWarnings({\"MethodName\", \"LineLength\"})
 public class FRCNetComm extends JNIWrapper {
 """)
 
@@ -143,7 +143,9 @@ public class FRCNetComm extends JNIWrapper {
                     temp.write("from " + os.path.basename(fileName) + "\n"
                                "   */\n"
                                "  @SuppressWarnings(\"TypeName\")\n"
-                               "  public interface " + enumName + " {\n")
+                               "  public static final class " + enumName +
+                               " {\n"
+                               "    private " + enumName + "() {\n    }\n\n")
 
                     # Write enum values
                     count = 0
@@ -161,7 +163,8 @@ public class FRCNetComm extends JNIWrapper {
                         if enumName != "tModuleType" and "kModuleType" in value:
                             value = value.replace("kModuleType",
                                                   "tModuleType.kModuleType")
-                        temp.write("    int " + value[0:len(value)] + ";\n")
+                        temp.write("    public static final int " +
+                                   value[0:len(value)] + ";\n")
 
                     # Write end of enum
                     temp.write("  }\n")
