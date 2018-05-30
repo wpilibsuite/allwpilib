@@ -16,8 +16,10 @@
 
 #define kUsageReporting_version 1
 
+#ifdef __cplusplus
 namespace nUsageReporting
 {
+#endif
     typedef enum
     {
         kResourceType_Controller,
@@ -138,7 +140,7 @@ namespace nUsageReporting
 
         kSmartDashboard_Instance = 1,
     } tInstances;
-
+#ifdef __cplusplus // No FFI code should call this, use HAL_Report instead
     /**
      * Report the usage of a resource of interest.
      *
@@ -149,6 +151,7 @@ namespace nUsageReporting
      */
     uint32_t EXPORT_FUNC report(tResourceType resource, uint8_t instanceNumber, uint8_t context = 0, const char *feature = NULL);
 }
+#endif
 
 #ifdef __cplusplus
 extern "C" {

@@ -9,11 +9,12 @@
 
 #include "HAL/Types.h"
 
-enum HAL_AccelerometerRange : int32_t {
+HAL_ENUM_I32_START(HAL_AccelerometerRange) {
   HAL_AccelerometerRange_k2G = 0,
   HAL_AccelerometerRange_k4G = 1,
   HAL_AccelerometerRange_k8G = 2,
-};
+}
+HAL_ENUM_I32_END(HAL_AccelerometerRange)
 
 #ifdef __cplusplus
 extern "C" {
