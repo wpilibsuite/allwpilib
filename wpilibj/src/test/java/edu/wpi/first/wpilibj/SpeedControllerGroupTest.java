@@ -33,7 +33,7 @@ class SpeedControllerGroupTest {
 
   @ParameterizedTest
   @MethodSource("speedControllerArguments")
-  void testSet(final SpeedControllerGroup group, final SpeedController[] speedControllers) {
+  void setTest(final SpeedControllerGroup group, final SpeedController[] speedControllers) {
     group.set(1.0);
 
     assertArrayEquals(DoubleStream.generate(() -> 1.0).limit(speedControllers.length).toArray(),
@@ -43,7 +43,7 @@ class SpeedControllerGroupTest {
 
   @ParameterizedTest
   @MethodSource("speedControllerArguments")
-  void testGetInverted(final SpeedControllerGroup group,
+  void getInvertedTest(final SpeedControllerGroup group,
                        final SpeedController[] speedControllers) {
     group.setInverted(true);
 
@@ -52,7 +52,7 @@ class SpeedControllerGroupTest {
 
   @ParameterizedTest
   @MethodSource("speedControllerArguments")
-  void testSetInvertedDoesNotModifySpeedControllers(final SpeedControllerGroup group,
+  void setInvertedDoesNotModifySpeedControllersTest(final SpeedControllerGroup group,
                                                     final SpeedController[] speedControllers) {
     group.setInverted(true);
 
@@ -62,7 +62,7 @@ class SpeedControllerGroupTest {
 
   @ParameterizedTest
   @MethodSource("speedControllerArguments")
-  void testSetInvertedDoesInvert(final SpeedControllerGroup group,
+  void setInvertedDoesInvertTest(final SpeedControllerGroup group,
                                  final SpeedController[] speedControllers) {
     group.setInverted(true);
     group.set(1.0);
@@ -74,7 +74,7 @@ class SpeedControllerGroupTest {
 
   @ParameterizedTest
   @MethodSource("speedControllerArguments")
-  void testDisable(final SpeedControllerGroup group,
+  void disableTest(final SpeedControllerGroup group,
                    final SpeedController[] speedControllers) {
     group.set(1.0);
     group.disable();
@@ -86,7 +86,7 @@ class SpeedControllerGroupTest {
 
   @ParameterizedTest
   @MethodSource("speedControllerArguments")
-  void testStopMotor(final SpeedControllerGroup group,
+  void stopMotorTest(final SpeedControllerGroup group,
                      final SpeedController[] speedControllers) {
     group.set(1.0);
     group.stopMotor();
@@ -98,7 +98,7 @@ class SpeedControllerGroupTest {
 
   @ParameterizedTest
   @MethodSource("speedControllerArguments")
-  void testPidWrite(final SpeedControllerGroup group,
+  void pidWriteTest(final SpeedControllerGroup group,
                     final SpeedController[] speedControllers) {
     group.pidWrite(1.0);
 

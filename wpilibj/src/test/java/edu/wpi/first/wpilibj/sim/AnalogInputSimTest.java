@@ -7,14 +7,14 @@
 
 package edu.wpi.first.wpilibj.sim;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.hal.HAL;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AnalogInputSimTest {
+class AnalogInputSimTest {
   static class DoubleStore {
     public boolean m_wasTriggered = false;
     public boolean m_wasCorrectType = false;
@@ -22,12 +22,10 @@ public class AnalogInputSimTest {
   }
 
   @Test
-  public void testSetCallback() {
+  void setCallbackTest() {
     HAL.initialize(500, 0);
 
-
     AnalogInput input = new AnalogInput(5);
-
     AnalogInSim inputSim = input.getSimObject();
 
     for (double i = 0; i < 5.0; i += 0.1) {
