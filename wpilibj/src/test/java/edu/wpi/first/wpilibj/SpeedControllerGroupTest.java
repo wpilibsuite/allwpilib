@@ -7,9 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.Arrays;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
@@ -19,15 +16,18 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 class SpeedControllerGroupTest {
   private static Stream<Arguments> speedControllerArguments() {
     return IntStream.of(1, 2, 3).mapToObj(number -> {
-        SpeedController[] speedControllers = Stream.generate(MockSpeedController::new)
-            .limit(number)
-            .toArray(SpeedController[]::new);
-        SpeedControllerGroup group = new SpeedControllerGroup(speedControllers[0],
-            Arrays.copyOfRange(speedControllers, 1, speedControllers.length));
-        return Arguments.of(group, speedControllers);
+      SpeedController[] speedControllers = Stream.generate(MockSpeedController::new)
+          .limit(number)
+          .toArray(SpeedController[]::new);
+      SpeedControllerGroup group = new SpeedControllerGroup(speedControllers[0],
+          Arrays.copyOfRange(speedControllers, 1, speedControllers.length));
+      return Arguments.of(group, speedControllers);
     });
   }
 

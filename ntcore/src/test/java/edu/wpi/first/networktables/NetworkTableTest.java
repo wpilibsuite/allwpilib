@@ -18,7 +18,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class NetworkTableTest {
-
   private static Stream<Arguments> basenameKeyArguments() {
     return Stream.of(
         Arguments.of("simple", "simple"),

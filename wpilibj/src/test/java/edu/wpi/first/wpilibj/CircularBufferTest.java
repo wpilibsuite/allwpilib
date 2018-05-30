@@ -7,10 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CircularBufferTest {
   private double[] m_values = {751.848, 766.366, 342.657, 234.252, 716.126,

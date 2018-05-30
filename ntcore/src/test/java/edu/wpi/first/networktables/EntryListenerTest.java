@@ -7,23 +7,23 @@
 
 package edu.wpi.first.networktables;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 class EntryListenerTest {
   private NetworkTableInstance m_serverInst;
   private NetworkTableInstance m_clientInst;
 
-  @BeforeAll
+  @BeforeEach
   void setUp() {
     m_serverInst = NetworkTableInstance.create();
     m_serverInst.setNetworkIdentity("server");
@@ -32,7 +32,7 @@ class EntryListenerTest {
     m_clientInst.setNetworkIdentity("client");
   }
 
-  @AfterAll
+  @AfterEach
   void tearDown() {
     m_clientInst.close();
     m_serverInst.close();

@@ -7,13 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -24,6 +17,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class UtilityClassTest {
@@ -63,6 +62,6 @@ public abstract class UtilityClassTest {
     return Arrays.stream(m_clazz.getDeclaredMethods())
         .filter(method -> Modifier.isPublic(method.getModifiers()))
         .map(method -> dynamicTest(method.getName(),
-                       () -> assertTrue(Modifier.isStatic(method.getModifiers()))));
+            () -> assertTrue(Modifier.isStatic(method.getModifiers()))));
   }
 }
