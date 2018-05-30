@@ -7,25 +7,28 @@
 
 package edu.wpi.first.wpilibj;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.stream.Stream;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class UtilityClassTest {
-  @Before
-  public void setup() {
+  @BeforeAll
+  static void setup() {
     UnitTestUtility.setupMockBase();
   }
 
@@ -36,38 +39,30 @@ public abstract class UtilityClassTest {
   }
 
   @Test
-  public void testSingleConstructor() {
-    assertEquals("More than one constructor defined", 1,
-        m_clazz.getDeclaredConstructors().length);
+  public void singleConstructorTest() {
+    assertEquals(1, m_clazz.getDeclaredConstructors().length,
+        "More than one constructor defined");
   }
 
   @Test
-  public void testConstructorPrivate() {
+  public void constructorPrivateTest() {
     Constructor constructor = m_clazz.getDeclaredConstructors()[0];
 
-    assertFalse("Constructor is not private", constructor.isAccessible());
+    assertFalse(constructor.isAccessible(), "Constructor is not private");
   }
 
-  @Test(expected = InvocationTargetException.class)
-  public void testConstructorReflection() throws Throwable {
+  @Test
+  public void constructorReflectionTest() {
     Constructor constructor = m_clazz.getDeclaredConstructors()[0];
     constructor.setAccessible(true);
-    constructor.newInstance();
+    assertThrows(InvocationTargetException.class, () -> constructor.newInstance());
   }
 
-  @Test
-  public void testPublicMethodsStatic() {
-    List<String> failures = new ArrayList<>();
-    for (Method method : m_clazz.getDeclaredMethods()) {
-      int modifiers = method.getModifiers();
-      if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)) {
-        failures.add(method.toString());
-      }
-    }
-
-    if (!failures.isEmpty()) {
-      fail("Found public methods that are not static: "
-          + Arrays.toString(failures.toArray()));
-    }
+  @TestFactory
+  Stream<DynamicTest> publicMethodsStaticTestFactory() {
+    return Arrays.stream(m_clazz.getDeclaredMethods())
+        .filter(method -> Modifier.isPublic(method.getModifiers()))
+        .map(method -> dynamicTest(method.getName(),
+                       () -> assertTrue(Modifier.isStatic(method.getModifiers()))));
   }
 }
