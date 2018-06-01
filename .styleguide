@@ -16,7 +16,6 @@ generatedFileExclude {
 }
 
 modifiableFileExclude {
-  shared/arm-linux-jni/
   \.so$
 }
 
