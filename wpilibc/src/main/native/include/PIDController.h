@@ -37,14 +37,18 @@ class PIDOutput;
  */
 class PIDController : public PIDBase, public Controller {
  public:
-  PIDController(double p, double i, double d, PIDSource* source,
+  PIDController(double Kp, double Ki, double Kd, PIDSource* source,
                 PIDOutput* output, double period = 0.05);
-  PIDController(double p, double i, double d, double f, PIDSource* source,
+  PIDController(double Kp, double Ki, double Kd, double Kv, PIDSource* source,
                 PIDOutput* output, double period = 0.05);
-  PIDController(double p, double i, double d, PIDSource& source,
+  PIDController(double Kp, double Ki, double Kd, double Kv, double Ka,
+                PIDSource* source, PIDOutput* output, double period = 0.05);
+  PIDController(double Kp, double Ki, double Kd, PIDSource& source,
                 PIDOutput& output, double period = 0.05);
-  PIDController(double p, double i, double d, double f, PIDSource& source,
+  PIDController(double Kp, double Ki, double Kd, double Kv, PIDSource& source,
                 PIDOutput& output, double period = 0.05);
+  PIDController(double Kp, double Ki, double Kd, double Kv, double Ka,
+                PIDSource& source, PIDOutput& output, double period = 0.05);
   ~PIDController() override;
 
   PIDController(const PIDController&) = delete;
@@ -55,12 +59,15 @@ class PIDController : public PIDBase, public Controller {
   void SetEnabled(bool enable);
   bool IsEnabled() const;
 
+  double CalculateFeedForward() override;
+
   void Reset() override;
 
   void InitSendable(SendableBuilder& builder) override;
 
  private:
   std::unique_ptr<Notifier> m_controlLoop;
+  double m_period;
 };
 
 }  // namespace frc

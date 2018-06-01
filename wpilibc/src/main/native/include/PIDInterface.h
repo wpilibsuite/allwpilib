@@ -10,7 +10,7 @@
 namespace frc {
 
 class PIDInterface {
-  virtual void SetPID(double p, double i, double d) = 0;
+  virtual void SetPID(double Kp, double Ki, double Kd) = 0;
   virtual double GetP() const = 0;
   virtual double GetI() const = 0;
   virtual double GetD() const = 0;
