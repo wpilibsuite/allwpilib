@@ -17,6 +17,12 @@ namespace frc {
  */
 class PWMTalonSRX : public PWMSpeedController {
  public:
+  /**
+   * Construct a PWMTalonSRX connected via PWM.
+   *
+   * @param channel The PWM channel that the PWMTalonSRX is attached to. 0-9 are
+   *                on-board, 10-19 are on the MXP port
+   */
   explicit PWMTalonSRX(int channel);
 };
 

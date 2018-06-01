@@ -25,6 +25,12 @@ typedef std::function<void()> TimerEventHandler;
 
 class Notifier : public ErrorBase {
  public:
+  /**
+   * Create a Notifier for timer event notification.
+   *
+   * @param handler The handler is called at the notification time which is set
+   *                using StartSingle or StartPeriodic.
+   */
   explicit Notifier(TimerEventHandler handler);
 
   template <typename Callable, typename Arg, typename... Args>
@@ -32,23 +38,65 @@ class Notifier : public ErrorBase {
       : Notifier(std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
                            std::forward<Args>(args)...)) {}
 
+  /**
+   * Free the resources for a timer event.
+   */
   virtual ~Notifier();
 
   Notifier(const Notifier&) = delete;
   Notifier& operator=(const Notifier&) = delete;
 
+  /**
+   * Change the handler function.
+   *
+   * @param handler Handler
+   */
   void SetHandler(TimerEventHandler handler);
+
+  /**
+   * Register for single event notification.
+   *
+   * A timer event is queued for a single event after the specified delay.
+   *
+   * @param delay Seconds to wait before the handler is called.
+   */
   void StartSingle(double delay);
+
+  /**
+   * Register for periodic event notification.
+   *
+   * A timer event is queued for periodic event notification. Each time the
+   * interrupt occurs, the event will be immediately requeued for the same time
+   * interval.
+   *
+   * @param period Period in seconds to call the handler starting one period
+   *               after the call to this method.
+   */
   void StartPeriodic(double period);
+
+  /**
+   * Stop timer events from occuring.
+   *
+   * Stop any repeating timer events from occuring. This will also remove any
+   * single notification events from the queue.
+   *
+   * If a timer-based call to the registered handler is in progress, this
+   * function will block until the handler call is complete.
+   */
   void Stop();
 
  private:
-  // update the HAL alarm
+  /**
+   * Update the HAL alarm time.
+   */
   void UpdateAlarm();
-  // the thread waiting on the HAL alarm
+
+  // The thread waiting on the HAL alarm
   std::thread m_thread;
-  // held while updating process information
+
+  // Held while updating process information
   wpi::mutex m_processMutex;
+
   // HAL handle, atomic for proper destruction
   std::atomic<HAL_NotifierHandle> m_notifier{0};
 

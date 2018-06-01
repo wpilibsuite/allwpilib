@@ -64,19 +64,67 @@ class SpeedController;
  */
 class MecanumDrive : public RobotDriveBase {
  public:
+  /**
+   * Construct a MecanumDrive.
+   *
+   * If a motor needs to be inverted, do so before passing it in.
+   */
   MecanumDrive(SpeedController& frontLeftMotor, SpeedController& rearLeftMotor,
                SpeedController& frontRightMotor,
                SpeedController& rearRightMotor);
+
   ~MecanumDrive() override = default;
 
   MecanumDrive(const MecanumDrive&) = delete;
   MecanumDrive& operator=(const MecanumDrive&) = delete;
 
+  /**
+   * Drive method for Mecanum platform.
+   *
+   * Angles are measured clockwise from the positive X axis. The robot's speed
+   * is independent from its angle or rotation rate.
+   *
+   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is
+   *                  positive.
+   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
+   *                  positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
+   *                  Clockwise is positive.
+   * @param gyroAngle The current angle reading from the gyro in degrees around
+   *                  the Z axis. Use this to implement field-oriented controls.
+   */
   void DriveCartesian(double ySpeed, double xSpeed, double zRotation,
                       double gyroAngle = 0.0);
+
+  /**
+   * Drive method for Mecanum platform.
+   *
+   * Angles are measured clockwise from the positive X axis. The robot's speed
+   * is independent from its angle or rotation rate.
+   *
+   * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is
+   *                  positive.
+   * @param angle     The angle around the Z axis at which the robot drives in
+   *                  degrees [-180..180].
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
+   *                  Clockwise is positive.
+   */
   void DrivePolar(double magnitude, double angle, double zRotation);
 
+  /**
+   * Gets if the power sent to the right side of the drivetrain is multipled by
+   * -1.
+   *
+   * @return true if the right side is inverted
+   */
   bool IsRightSideInverted() const;
+
+  /**
+   * Sets if the power sent to the right side of the drivetrain should be
+   * multipled by -1.
+   *
+   * @param rightSideInverted true if right side power should be multipled by -1
+   */
   void SetRightSideInverted(bool rightSideInverted);
 
   void StopMotor() override;

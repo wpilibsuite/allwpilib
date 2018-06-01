@@ -11,25 +11,8 @@
 
 using namespace frc;
 
-/**
- * Creates a new CommandGroup with the given name.
- *
- * @param name The name for this command group
- */
 CommandGroup::CommandGroup(const wpi::Twine& name) : Command(name) {}
 
-/**
- * Adds a new Command to the group. The Command will be started after all the
- * previously added Commands.
- *
- * Note that any requirements the given Command has will be added to the group.
- * For this reason, a Command's requirements can not be changed after being
- * added to a group.
- *
- * It is recommended that this method be called in the constructor.
- *
- * @param command The Command to be added
- */
 void CommandGroup::AddSequential(Command* command) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
@@ -48,23 +31,6 @@ void CommandGroup::AddSequential(Command* command) {
     Requires(*iter);
 }
 
-/**
- * Adds a new Command to the group with a given timeout. The Command will be
- * started after all the previously added commands.
- *
- * Once the Command is started, it will be run until it finishes or the time
- * expires, whichever is sooner.  Note that the given Command will have no
- * knowledge that it is on a timer.
- *
- * Note that any requirements the given Command has will be added to the group.
- * For this reason, a Command's requirements can not be changed after being
- * added to a group.
- *
- * It is recommended that this method be called in the constructor.
- *
- * @param command The Command to be added
- * @param timeout The timeout (in seconds)
- */
 void CommandGroup::AddSequential(Command* command, double timeout) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
@@ -87,24 +53,6 @@ void CommandGroup::AddSequential(Command* command, double timeout) {
     Requires(*iter);
 }
 
-/**
- * Adds a new child Command to the group. The Command will be started after all
- * the previously added Commands.
- *
- * Instead of waiting for the child to finish, a CommandGroup will have it run
- * at the same time as the subsequent Commands. The child will run until either
- * it finishes, a new child with conflicting requirements is started, or the
- * main sequence runs a Command with conflicting requirements. In the latter two
- * cases, the child will be canceled even if it says it can't be interrupted.
- *
- * Note that any requirements the given Command has will be added to the group.
- * For this reason, a Command's requirements can not be changed after being
- * added to a group.
- *
- * It is recommended that this method be called in the constructor.
- *
- * @param command The command to be added
- */
 void CommandGroup::AddParallel(Command* command) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
@@ -123,30 +71,6 @@ void CommandGroup::AddParallel(Command* command) {
     Requires(*iter);
 }
 
-/**
- * Adds a new child Command to the group with the given timeout. The Command
- * will be started after all the previously added Commands.
- *
- * Once the Command is started, it will run until it finishes, is interrupted,
- * or the time expires, whichever is sooner. Note that the given Command will
- * have no knowledge that it is on a timer.
- *
- * Instead of waiting for the child to finish, a CommandGroup will have it run
- * at the same time as the subsequent Commands. The child will run until either
- * it finishes, the timeout expires, a new child with conflicting requirements
- * is started, or the main sequence runs a Command with conflicting
- * requirements. In the latter two cases, the child will be canceled even if it
- * says it can't be interrupted.
- *
- * Note that any requirements the given Command has will be added to the group.
- * For this reason, a Command's requirements can not be changed after being
- * added to a group.
- *
- * It is recommended that this method be called in the constructor.
- *
- * @param command The command to be added
- * @param timeout The timeout (in seconds)
- */
 void CommandGroup::AddParallel(Command* command, double timeout) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
@@ -168,6 +92,37 @@ void CommandGroup::AddParallel(Command* command, double timeout) {
   for (auto iter = requirements.begin(); iter != requirements.end(); iter++)
     Requires(*iter);
 }
+
+bool CommandGroup::IsInterruptible() const {
+  if (!Command::IsInterruptible()) return false;
+
+  if (m_currentCommandIndex != -1 &&
+      static_cast<size_t>(m_currentCommandIndex) < m_commands.size()) {
+    Command* cmd = m_commands[m_currentCommandIndex].m_command;
+    if (!cmd->IsInterruptible()) return false;
+  }
+
+  for (auto iter = m_children.cbegin(); iter != m_children.cend(); iter++) {
+    if (!iter->m_command->IsInterruptible()) return false;
+  }
+
+  return true;
+}
+
+int CommandGroup::GetSize() const { return m_children.size(); }
+
+void CommandGroup::Initialize() {}
+
+void CommandGroup::Execute() {}
+
+bool CommandGroup::IsFinished() {
+  return static_cast<size_t>(m_currentCommandIndex) >= m_commands.size() &&
+         m_children.empty();
+}
+
+void CommandGroup::End() {}
+
+void CommandGroup::Interrupted() {}
 
 void CommandGroup::_Initialize() { m_currentCommandIndex = -1; }
 
@@ -258,39 +213,6 @@ void CommandGroup::_End() {
 
 void CommandGroup::_Interrupted() { _End(); }
 
-// Can be overwritten by teams
-void CommandGroup::Initialize() {}
-
-// Can be overwritten by teams
-void CommandGroup::Execute() {}
-
-// Can be overwritten by teams
-void CommandGroup::End() {}
-
-// Can be overwritten by teams
-void CommandGroup::Interrupted() {}
-
-bool CommandGroup::IsFinished() {
-  return static_cast<size_t>(m_currentCommandIndex) >= m_commands.size() &&
-         m_children.empty();
-}
-
-bool CommandGroup::IsInterruptible() const {
-  if (!Command::IsInterruptible()) return false;
-
-  if (m_currentCommandIndex != -1 &&
-      static_cast<size_t>(m_currentCommandIndex) < m_commands.size()) {
-    Command* cmd = m_commands[m_currentCommandIndex].m_command;
-    if (!cmd->IsInterruptible()) return false;
-  }
-
-  for (auto iter = m_children.cbegin(); iter != m_children.cend(); iter++) {
-    if (!iter->m_command->IsInterruptible()) return false;
-  }
-
-  return true;
-}
-
 void CommandGroup::CancelConflicts(Command* command) {
   for (auto childIter = m_children.begin(); childIter != m_children.end();) {
     Command* child = childIter->m_command;
@@ -310,5 +232,3 @@ void CommandGroup::CancelConflicts(Command* command) {
     if (!erased) childIter++;
   }
 }
-
-int CommandGroup::GetSize() const { return m_children.size(); }

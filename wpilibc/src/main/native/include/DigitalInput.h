@@ -24,15 +24,44 @@ class DigitalGlitchFilter;
  */
 class DigitalInput : public DigitalSource {
  public:
+  /**
+   * Create an instance of a Digital Input class.
+   *
+   * Creates a digital input given a channel.
+   *
+   * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
+   */
   explicit DigitalInput(int channel);
+
   ~DigitalInput() override;
+
+  /**
+   * Get the value from a digital input channel.
+   *
+   * Retrieve the value of a single digital input channel from the FPGA.
+   */
   bool Get() const;
-  int GetChannel() const override;
 
   // Digital Source Interface
+  /**
+   * @return The HAL Handle to the specified source.
+   */
   HAL_Handle GetPortHandleForRouting() const override;
+
+  /**
+   * @return The type of analog trigger output to be used. 0 for Digitals
+   */
   AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
+
+  /**
+   * Is source an AnalogTrigger
+   */
   bool IsAnalogTrigger() const override;
+
+  /**
+   * @return The GPIO channel number that this object represents.
+   */
+  int GetChannel() const override;
 
   void InitSendable(SendableBuilder& builder) override;
 

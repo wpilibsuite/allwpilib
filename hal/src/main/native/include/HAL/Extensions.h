@@ -21,5 +21,10 @@ typedef int halsim_extension_init_func_t(void);
 
 extern "C" {
 int HAL_LoadOneExtension(const char* library);
+
+/**
+ * Load any extra halsim libraries provided in the HALSIM_EXTENSIONS
+ * environment variable.
+ */
 int HAL_LoadExtensions(void);
 }  // extern "C"

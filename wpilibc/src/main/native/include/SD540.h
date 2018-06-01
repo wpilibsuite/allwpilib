@@ -16,6 +16,12 @@ namespace frc {
  */
 class SD540 : public PWMSpeedController {
  public:
+  /**
+   * Constructor for a SD540.
+   *
+   * @param channel The PWM channel that the SD540 is attached to. 0-9 are
+   *                on-board, 10-19 are on the MXP port
+   */
   explicit SD540(int channel);
 };
 

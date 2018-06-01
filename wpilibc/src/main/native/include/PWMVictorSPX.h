@@ -17,6 +17,12 @@ namespace frc {
  */
 class PWMVictorSPX : public PWMSpeedController {
  public:
+  /**
+   * Construct a PWMVictorSPX connected via PWM.
+   *
+   * @param channel The PWM channel that the PWMVictorSPX is attached to. 0-9
+   *                are on-board, 10-19 are on the MXP port
+   */
   explicit PWMVictorSPX(int channel);
 };
 

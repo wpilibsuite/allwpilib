@@ -146,17 +146,7 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
   return FRC_NetworkCommunication_getJoystickButtons(
       joystickNum, &buttons->buttons, &buttons->count);
 }
-/**
- * Retrieve the Joystick Descriptor for particular slot
- * @param desc [out] descriptor (data transfer object) to fill in.  desc is
- * filled in regardless of success. In other words, if descriptor is not
- * available, desc is filled in with default values matching the init-values in
- * Java and C++ Driverstation for when caller requests a too-large joystick
- * index.
- *
- * @return error code reported from Network Comm back-end.  Zero is good,
- * nonzero is bad.
- */
+
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc) {
   desc->isXbox = 0;
@@ -333,16 +323,8 @@ bool HAL_IsNewControlData(void) {
   return true;
 }
 
-/**
- * Waits for the newest DS packet to arrive. Note that this is a blocking call.
- */
 void HAL_WaitForDSData(void) { HAL_WaitForDSDataTimeout(0); }
 
-/**
- * Waits for the newest DS packet to arrive. If timeout is <= 0, this will wait
- * forever. Otherwise, it will wait until either a new packet, or the timeout
- * time has passed. Returns true on new data, false on timeout.
- */
 HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
@@ -375,11 +357,6 @@ static void newDataOccur(uint32_t refNum) {
   newDSDataAvailableCond->notify_all();
 }
 
-/*
- * Call this to initialize the driver station communication. This will properly
- * handle multiple calls. However note that this CANNOT be called from a library
- * that interfaces with LabVIEW.
- */
 void HAL_InitializeDriverStation(void) {
   hal::init::CheckInit();
   static std::atomic_bool initialized{false};
@@ -399,10 +376,6 @@ void HAL_InitializeDriverStation(void) {
   initialized = true;
 }
 
-/*
- * Releases the DS Mutex to allow proper shutdown of any threads that are
- * waiting on it.
- */
 void HAL_ReleaseDSMutex(void) { newDataOccur(refNumber); }
 
 }  // extern "C"

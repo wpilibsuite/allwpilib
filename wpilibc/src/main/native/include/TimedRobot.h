@@ -27,9 +27,25 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
  public:
   static constexpr double kDefaultPeriod = 0.02;
 
+  /**
+   * Provide an alternate "main loop" via StartCompetition().
+   */
   void StartCompetition() override;
 
+  /**
+   * Set time period between calls to Periodic() functions.
+   *
+   * A timer event is queued for periodic event notification. Each time the
+   * interrupt occurs, the event will be immediately requeued for the same time
+   * interval.
+   *
+   * @param period Period in seconds.
+   */
   void SetPeriod(double seconds);
+
+  /**
+   * Get time period between calls to Periodic() functions.
+   */
   double GetPeriod() const;
 
  protected:
@@ -48,6 +64,9 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
   // The relative time
   double m_period = kDefaultPeriod;
 
+  /**
+   * Update the HAL alarm time.
+   */
   void UpdateAlarm();
 };
 

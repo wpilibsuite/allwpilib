@@ -67,9 +67,6 @@ int32_t ComputeDigitalMask(HAL_DigitalHandle handle, int32_t* status) {
 }
 }  // namespace detail
 
-/**
- * Initialize the digital system.
- */
 void initializeDigital(int32_t* status) {
   hal::init::CheckInit();
   static std::atomic_bool initialized{false};
@@ -135,32 +132,6 @@ void initializeDigital(int32_t* status) {
   initialized = true;
 }
 
-/**
- * Map SPI channel numbers from their physical number (27 to 31) to their
- * position in the bit field.
- */
-int32_t remapSPIChannel(int32_t channel) { return channel - 26; }
-
-/**
- * Map DIO channel numbers from their physical number (10 to 26) to their
- * position in the bit field.
- */
-int32_t remapMXPChannel(int32_t channel) { return channel - 10; }
-
-int32_t remapMXPPWMChannel(int32_t channel) {
-  if (channel < 14) {
-    return channel - 10;  // first block of 4 pwms (MXP 0-3)
-  } else {
-    return channel - 6;  // block of PWMs after SPI
-  }
-}
-
-/**
- * remap the digital source channel and set the module.
- * If it's an analog trigger, determine the module from the high order routing
- * channel else do normal digital input remapping based on channel number
- * (MXP)
- */
 bool remapDigitalSource(HAL_Handle digitalSourceHandle,
                         HAL_AnalogTriggerType analogTriggerType,
                         uint8_t& channel, uint8_t& module,
@@ -191,6 +162,18 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
     return false;
   }
 }
+
+int32_t remapMXPChannel(int32_t channel) { return channel - 10; }
+
+int32_t remapMXPPWMChannel(int32_t channel) {
+  if (channel < 14) {
+    return channel - 10;  // first block of 4 pwms (MXP 0-3)
+  } else {
+    return channel - 6;  // block of PWMs after SPI
+  }
+}
+
+int32_t remapSPIChannel(int32_t channel) { return channel - 26; }
 
 }  // namespace hal
 

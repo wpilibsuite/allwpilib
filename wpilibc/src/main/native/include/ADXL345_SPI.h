@@ -32,7 +32,14 @@ class ADXL345_SPI : public ErrorBase,
     double ZAxis;
   };
 
+  /**
+   * Constructor.
+   *
+   * @param port  The SPI port the accelerometer is attached to
+   * @param range The range (+ or -) that the accelerometer will measure
+   */
   explicit ADXL345_SPI(SPI::Port port, Range range = kRange_2G);
+
   ~ADXL345_SPI() override = default;
 
   ADXL345_SPI(const ADXL345_SPI&) = delete;
@@ -44,7 +51,20 @@ class ADXL345_SPI : public ErrorBase,
   double GetY() override;
   double GetZ() override;
 
+  /**
+   * Get the acceleration of one axis in Gs.
+   *
+   * @param axis The axis to read from.
+   * @return Acceleration of the ADXL345 in Gs.
+   */
   virtual double GetAcceleration(Axes axis);
+
+  /**
+   * Get the acceleration of all axes in Gs.
+   *
+   * @return An object containing the acceleration measured on each axis of the
+   *         ADXL345 in Gs.
+   */
   virtual AllAxes GetAccelerations();
 
   void InitSendable(SendableBuilder& builder) override;

@@ -18,69 +18,26 @@
 
 using namespace frc;
 
-/**
- * Robot-wide initialization code should go here.
- *
- * Users should override this method for default Robot-wide initialization which
- * will be called when the robot is first powered on. It will be called exactly
- * one time.
- *
- * Warning: the Driver Station "Robot Code" light and FMS "Robot Ready"
- * indicators will be off until RobotInit() exits. Code in RobotInit() that
- * waits for enable will cause the robot to never indicate that the code is
- * ready, causing the robot to be bypassed in a match.
- */
 void IterativeRobotBase::RobotInit() {
   wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
-/**
- * Initialization code for disabled mode should go here.
- *
- * Users should override this method for initialization code which will be
- * called each time
- * the robot enters disabled mode.
- */
 void IterativeRobotBase::DisabledInit() {
   wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
-/**
- * Initialization code for autonomous mode should go here.
- *
- * Users should override this method for initialization code which will be
- * called each time the robot enters autonomous mode.
- */
 void IterativeRobotBase::AutonomousInit() {
   wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
-/**
- * Initialization code for teleop mode should go here.
- *
- * Users should override this method for initialization code which will be
- * called each time the robot enters teleop mode.
- */
 void IterativeRobotBase::TeleopInit() {
   wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
-/**
- * Initialization code for test mode should go here.
- *
- * Users should override this method for initialization code which will be
- * called each time the robot enters test mode.
- */
 void IterativeRobotBase::TestInit() {
   wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
-/**
- * Periodic code for all modes should go here.
- *
- * This function is called each time a new packet is received from the driver
- * station.
- */
 void IterativeRobotBase::RobotPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
@@ -89,13 +46,6 @@ void IterativeRobotBase::RobotPeriodic() {
   }
 }
 
-/**
- * Periodic code for disabled mode should go here.
- *
- * Users should override this method for code which will be called each time a
- * new packet is received from the driver station and the robot is in disabled
- * mode.
- */
 void IterativeRobotBase::DisabledPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
@@ -104,13 +54,6 @@ void IterativeRobotBase::DisabledPeriodic() {
   }
 }
 
-/**
- * Periodic code for autonomous mode should go here.
- *
- * Users should override this method for code which will be called each time a
- * new packet is received from the driver station and the robot is in autonomous
- * mode.
- */
 void IterativeRobotBase::AutonomousPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
@@ -119,13 +62,6 @@ void IterativeRobotBase::AutonomousPeriodic() {
   }
 }
 
-/**
- * Periodic code for teleop mode should go here.
- *
- * Users should override this method for code which will be called each time a
- * new packet is received from the driver station and the robot is in teleop
- * mode.
- */
 void IterativeRobotBase::TeleopPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
@@ -134,12 +70,6 @@ void IterativeRobotBase::TeleopPeriodic() {
   }
 }
 
-/**
- * Periodic code for test mode should go here.
- *
- * Users should override this method for code which will be called each time a
- * new packet is received from the driver station and the robot is in test mode.
- */
 void IterativeRobotBase::TestPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
