@@ -5,23 +5,22 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "WpiSimulators/WpiEncoderSimulator.h"
+#include "LowFiSim/WpiSimulators/WpiEncoderSim.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-WpiEncoderSimulator::WpiEncoderSimulator(int index)
-    : m_encoderSimulator(index) {}
+WpiEncoderSim::WpiEncoderSim(int index) : m_encoderSimulator(index) {}
 
-WpiEncoderSimulator::~WpiEncoderSimulator() {}
+WpiEncoderSim::~WpiEncoderSim() {}
 
-void WpiEncoderSimulator::SetPosition(double position) {
+void WpiEncoderSim::SetPosition(double position) {
   m_encoderSimulator.SetCount(
       static_cast<int>(position / m_encoderSimulator.GetDistancePerPulse()));
 }
 
-void WpiEncoderSimulator::SetVelocity(double velocity) {
+void WpiEncoderSim::SetVelocity(double velocity) {
   m_encoderSimulator.SetPeriod(1.0 / velocity);
 }
 

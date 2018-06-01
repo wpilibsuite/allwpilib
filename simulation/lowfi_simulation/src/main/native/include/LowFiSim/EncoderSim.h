@@ -7,25 +7,14 @@
 
 #pragma once
 
-#include <memory>
-
-#include "EncoderSimulator.h"
-#include "MotorSimulator.h"
-
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class MotorEncoderSimulator {
+class EncoderSim {
  public:
-  MotorEncoderSimulator(const std::shared_ptr<MotorSimulator>& motorController,
-                        const std::shared_ptr<EncoderSimulator>& encoder);
-
-  void Update();
-
- private:
-  std::shared_ptr<MotorSimulator> motorSimulator;
-  std::shared_ptr<EncoderSimulator> encoderSimulator;
+  virtual void SetPosition(double position) = 0;
+  virtual void SetVelocity(double velocity) = 0;
 };
 
 }  // namespace lowfi

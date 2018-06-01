@@ -7,14 +7,24 @@
 
 #pragma once
 
+#include <memory>
+
+#include "EncoderSim.h"
+#include "MotorSim.h"
+
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class EncoderSimulator {
+class MotorEncoderConnector {
  public:
-  virtual void SetPosition(double position) = 0;
-  virtual void SetVelocity(double velocity) = 0;
+  MotorEncoderConnector(MotorSim& motorController, EncoderSim& encoder);
+
+  void Update();
+
+ private:
+  MotorSim& motorSimulator;
+  EncoderSim& encoderSimulator;
 };
 
 }  // namespace lowfi

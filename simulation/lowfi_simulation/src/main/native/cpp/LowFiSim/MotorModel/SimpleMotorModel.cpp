@@ -5,36 +5,35 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "MotorModel/LinearMotorModelSimulation.h"
+#include "LowFiSim/MotorModel/SimpleMotorModel.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-LinearMotorModelSimulation::LinearMotorModelSimulation(double maxSpeed)
-    : m_maxSpeed(maxSpeed) {}
+SimpleMotorModel::SimpleMotorModel(double maxSpeed) : m_maxSpeed(maxSpeed) {}
 
-void LinearMotorModelSimulation::Reset() {
+void SimpleMotorModel::Reset() {
   m_position = 0;
   m_velocity = 0;
 }
 
-void LinearMotorModelSimulation::SetVoltage(double voltage) {
+void SimpleMotorModel::SetVoltage(double voltage) {
   m_voltagePercentage = voltage / kMaxExpectedVoltage;
 }
 
-void LinearMotorModelSimulation::Update(double elapsedTime) {
+void SimpleMotorModel::Update(double elapsedTime) {
   m_velocity = m_maxSpeed * m_voltagePercentage;
   m_position += m_velocity * elapsedTime;
 }
 
-double LinearMotorModelSimulation::GetPosition() const { return m_position; }
+double SimpleMotorModel::GetPosition() const { return m_position; }
 
-double LinearMotorModelSimulation::GetVelocity() const { return m_velocity; }
+double SimpleMotorModel::GetVelocity() const { return m_velocity; }
 
-double LinearMotorModelSimulation::GetAcceleration() const { return 0; }
+double SimpleMotorModel::GetAcceleration() const { return 0; }
 
-double LinearMotorModelSimulation::GetCurrent() const { return 0; }
+double SimpleMotorModel::GetCurrent() const { return 0; }
 
 }  // namespace lowfi
 }  // namespace sim

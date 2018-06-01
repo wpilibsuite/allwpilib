@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "MotorModel/LinearMotorModelSimulation.h"
+#include "LowFiSim/MotorModel/SimpleMotorModel.h"
 #include "gtest/gtest.h"
 
-TEST(LinearMotorModelSimulationTest, TestLinearModel) {
-  frc::sim::lowfi::LinearMotorModelSimulation motorModelSim(200);
+TEST(SimpleMotorModelSimulationTest, TestSimpleModel) {
+  frc::sim::lowfi::SimpleMotorModel motorModelSim(200);
 
   // Test forward voltage
   motorModelSim.SetVoltage(6);

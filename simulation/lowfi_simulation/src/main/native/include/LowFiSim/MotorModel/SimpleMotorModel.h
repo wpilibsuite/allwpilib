@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,33 +7,32 @@
 
 #pragma once
 
-#include <memory>
-
-#include "MotorSimulator.h"
-#include "Simulation/PWMSim.h"
+#include "LowFiSim/MotorModel/MotorModel.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class WpiMotorSimulator : public MotorSimulator {
+class SimpleMotorModel : public MotorModel {
  public:
-  explicit WpiMotorSimulator(int index);
-  ~WpiMotorSimulator();
+  explicit SimpleMotorModel(double maxSpeed);
 
-  void SetMotorModelSimulation(
-      const std::shared_ptr<MotorModelSimulation>& motorModelSimulator);
+  void Reset() override;
+  void SetVoltage(double voltage) override;
+  void Update(double elapsedTime) override;
 
-  void Update(double elapsedTime);
   double GetPosition() const override;
   double GetVelocity() const override;
   double GetAcceleration() const override;
+  double GetCurrent() const override;
 
- private:
-  std::shared_ptr<MotorModelSimulation> m_motorModelSimulation;
-  frc::sim::PWMSim m_pwmSimulator;
+ protected:
+  double m_maxSpeed;
+  double m_voltagePercentage{0};
+  double m_position{0};
+  double m_velocity{0};
 
-  static constexpr double kDefaultVoltage = 12.0;
+  static constexpr double kMaxExpectedVoltage = 12;
 };
 
 }  // namespace lowfi

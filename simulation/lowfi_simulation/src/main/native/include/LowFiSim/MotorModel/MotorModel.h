@@ -7,32 +7,20 @@
 
 #pragma once
 
-#include "MotorModel/MotorModelSimulation.h"
-
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class LinearMotorModelSimulation : public MotorModelSimulation {
+class MotorModel {
  public:
-  explicit LinearMotorModelSimulation(double maxSpeed);
+  virtual void Reset() = 0;
+  virtual void SetVoltage(double voltage) = 0;
+  virtual void Update(double elapsedTime) = 0;
 
-  void Reset() override;
-  void SetVoltage(double voltage) override;
-  void Update(double elapsedTime) override;
-
-  double GetPosition() const override;
-  double GetVelocity() const override;
-  double GetAcceleration() const override;
-  double GetCurrent() const override;
-
- protected:
-  double m_maxSpeed;
-  double m_voltagePercentage{0};
-  double m_position{0};
-  double m_velocity{0};
-
-  static constexpr double kMaxExpectedVoltage = 12;
+  virtual double GetPosition() const = 0;
+  virtual double GetVelocity() const = 0;
+  virtual double GetAcceleration() const = 0;
+  virtual double GetCurrent() const = 0;
 };
 
 }  // namespace lowfi

@@ -5,21 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "MotorEncoderSimulator.h"
+#pragma once
+
+#include <memory>
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-MotorEncoderSimulator::MotorEncoderSimulator(
-    const std::shared_ptr<MotorSimulator>& motorController,
-    const std::shared_ptr<EncoderSimulator>& encoder)
-    : motorSimulator(motorController), encoderSimulator(encoder) {}
-
-void MotorEncoderSimulator::Update() {
-  encoderSimulator->SetPosition(motorSimulator->GetPosition());
-  encoderSimulator->SetVelocity(motorSimulator->GetVelocity());
-}
+class MotorSim {
+ public:
+  virtual double GetPosition() const = 0;
+  virtual double GetVelocity() const = 0;
+  virtual double GetAcceleration() const = 0;
+};
 
 }  // namespace lowfi
 }  // namespace sim
