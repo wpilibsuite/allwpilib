@@ -29,6 +29,16 @@ static JException unsupportedEx;
 // Thread-attached environment for listener callbacks.
 static JNIEnv* listenerEnv = nullptr;
 
+static const JClassInit classes[] = {
+    {"edu/wpi/cscore/UsbCameraInfo", &usbCameraInfoCls},
+    {"edu/wpi/cscore/VideoMode", &videoModeCls},
+    {"edu/wpi/cscore/VideoEvent", &videoEventCls}};
+
+static const JExceptionInit exceptions[] = {
+    {"edu/wpi/cscore/VideoException", &videoEx},
+    {"java/lang/NullPointerException", &nullPointerEx},
+    {"java/lang/UnsupportedOperationException", &unsupportedEx}};
+
 static void ListenerOnStart() {
   if (!jvm) return;
   JNIEnv* env;
@@ -59,23 +69,15 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
 
   // Cache references to classes
-  usbCameraInfoCls = JClass{env, "edu/wpi/cscore/UsbCameraInfo"};
-  if (!usbCameraInfoCls) return JNI_ERR;
+  for (auto& c : classes) {
+    *c.cls = JClass(env, c.name);
+    if (!*c.cls) return JNI_ERR;
+  }
 
-  videoModeCls = JClass{env, "edu/wpi/cscore/VideoMode"};
-  if (!videoModeCls) return JNI_ERR;
-
-  videoEventCls = JClass{env, "edu/wpi/cscore/VideoEvent"};
-  if (!videoEventCls) return JNI_ERR;
-
-  videoEx = JException{env, "edu/wpi/cscore/VideoException"};
-  if (!videoEx) return JNI_ERR;
-
-  nullPointerEx = JException(env, "java/lang/NullPointerException");
-  if (!nullPointerEx) return JNI_ERR;
-
-  unsupportedEx = JException(env, "java/lang/UnsupportedOperationException");
-  if (!unsupportedEx) return JNI_ERR;
+  for (auto& c : exceptions) {
+    *c.cls = JException(env, c.name);
+    if (!*c.cls) return JNI_ERR;
+  }
 
   // Initial configuration of listener start/exit
   cs::SetListenerOnStart(ListenerOnStart);
@@ -89,12 +91,12 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
     return;
   // Delete global references
-  usbCameraInfoCls.free(env);
-  videoModeCls.free(env);
-  videoEventCls.free(env);
-  videoEx.free(env);
-  nullPointerEx.free(env);
-  unsupportedEx.free(env);
+  for (auto& c : classes) {
+    c.cls->free(env);
+  }
+  for (auto& c : exceptions) {
+    c.cls->free(env);
+  }
   jvm = nullptr;
 }
 

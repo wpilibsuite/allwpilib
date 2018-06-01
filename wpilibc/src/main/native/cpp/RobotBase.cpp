@@ -58,17 +58,20 @@ static void SetupCameraServerShared() {
   SetCameraServerShared(std::make_unique<WPILibCameraServerShared>());
 }
 
-/**
- * Constructor for a generic robot program.
- *
- * User code should be placed in the constructor that runs before the Autonomous
- * or Operator Control period starts. The constructor will run to completion
- * before Autonomous is entered.
- *
- * This must be used to ensure that the communications code starts. In the
- * future it would be nice to put this code into it's own task that loads on
- * boot so ensure that it runs.
- */
+bool RobotBase::IsEnabled() const { return m_ds.IsEnabled(); }
+
+bool RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
+
+bool RobotBase::IsAutonomous() const { return m_ds.IsAutonomous(); }
+
+bool RobotBase::IsOperatorControl() const { return m_ds.IsOperatorControl(); }
+
+bool RobotBase::IsTest() const { return m_ds.IsTest(); }
+
+bool RobotBase::IsNewDataAvailable() const { return m_ds.IsNewControlData(); }
+
+std::thread::id RobotBase::GetThreadId() { return m_threadId; }
+
 RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   if (!HAL_Initialize(500, 0)) {
     wpi::errs() << "FATAL ERROR: HAL could not be initialized\n";
@@ -105,54 +108,3 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
   LiveWindow::GetInstance()->SetEnabled(false);
 }
-
-/**
- * Determine if the Robot is currently enabled.
- *
- * @return True if the Robot is currently enabled by the field controls.
- */
-bool RobotBase::IsEnabled() const { return m_ds.IsEnabled(); }
-
-/**
- * Determine if the Robot is currently disabled.
- *
- * @return True if the Robot is currently disabled by the field controls.
- */
-bool RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
-
-/**
- * Determine if the robot is currently in Autonomous mode.
- *
- * @return True if the robot is currently operating Autonomously as determined
- *         by the field controls.
- */
-bool RobotBase::IsAutonomous() const { return m_ds.IsAutonomous(); }
-
-/**
- * Determine if the robot is currently in Operator Control mode.
- *
- * @return True if the robot is currently operating in Tele-Op mode as
- *         determined by the field controls.
- */
-bool RobotBase::IsOperatorControl() const { return m_ds.IsOperatorControl(); }
-
-/**
- * Determine if the robot is currently in Test mode.
- *
- * @return True if the robot is currently running tests as determined by the
- *         field controls.
- */
-bool RobotBase::IsTest() const { return m_ds.IsTest(); }
-
-/**
- * Indicates if new data is available from the driver station.
- *
- * @return Has new data arrived over the network since the last time this
- *         function was called?
- */
-bool RobotBase::IsNewDataAvailable() const { return m_ds.IsNewControlData(); }
-
-/**
- * Gets the ID of the main robot thread.
- */
-std::thread::id RobotBase::GetThreadId() { return m_threadId; }

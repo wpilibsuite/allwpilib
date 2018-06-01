@@ -26,29 +26,12 @@ Error ErrorBase::_globalError;
 
 ErrorBase::ErrorBase() { HAL_Initialize(500, 0); }
 
-/**
- * @brief Retrieve the current error.
- *
- * Get the current error information associated with this sensor.
- */
 Error& ErrorBase::GetError() { return m_error; }
 
 const Error& ErrorBase::GetError() const { return m_error; }
 
-/**
- * @brief Clear the current error information associated with this sensor.
- */
 void ErrorBase::ClearError() const { m_error.Clear(); }
 
-/**
- * @brief Set error information associated with a C library call that set an
- *        error to the "errno" global variable.
- *
- * @param contextMessage A custom message from the code that set the error.
- * @param filename       Filename of the error source
- * @param function       Function of the error source
- * @param lineNumber     Line number of the error source
- */
 void ErrorBase::SetErrnoError(const wpi::Twine& contextMessage,
                               wpi::StringRef filename, wpi::StringRef function,
                               int lineNumber) const {
@@ -73,16 +56,6 @@ void ErrorBase::SetErrnoError(const wpi::Twine& contextMessage,
   }
 }
 
-/**
- * @brief Set the current error information associated from the nivision Imaq
- *        API.
- *
- * @param success        The return from the function
- * @param contextMessage A custom message from the code that set the error.
- * @param filename       Filename of the error source
- * @param function       Function of the error source
- * @param lineNumber     Line number of the error source
- */
 void ErrorBase::SetImaqError(int success, const wpi::Twine& contextMessage,
                              wpi::StringRef filename, wpi::StringRef function,
                              int lineNumber) const {
@@ -100,15 +73,6 @@ void ErrorBase::SetImaqError(int success, const wpi::Twine& contextMessage,
   }
 }
 
-/**
- * @brief Set the current error information associated with this sensor.
- *
- * @param code           The error code
- * @param contextMessage A custom message from the code that set the error.
- * @param filename       Filename of the error source
- * @param function       Function of the error source
- * @param lineNumber     Line number of the error source
- */
 void ErrorBase::SetError(Error::Code code, const wpi::Twine& contextMessage,
                          wpi::StringRef filename, wpi::StringRef function,
                          int lineNumber) const {
@@ -125,19 +89,6 @@ void ErrorBase::SetError(Error::Code code, const wpi::Twine& contextMessage,
   }
 }
 
-/**
- * @brief Set the current error information associated with this sensor.
- * Range versions use for initialization code.
- *
- * @param code           The error code
- * @param minRange       The minimum allowed allocation range
- * @param maxRange       The maximum allowed allocation range
- * @param requestedValue The requested value to allocate
- * @param contextMessage A custom message from the code that set the error.
- * @param filename       Filename of the error source
- * @param function       Function of the error source
- * @param lineNumber     Line number of the error source
- */
 void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
                               int32_t maxRange, int32_t requestedValue,
                               const wpi::Twine& contextMessage,
@@ -160,15 +111,6 @@ void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
   }
 }
 
-/**
- * @brief Set the current error information associated with this sensor.
- *
- * @param errorMessage   The error message from WPIErrors.h
- * @param contextMessage A custom message from the code that set the error.
- * @param filename       Filename of the error source
- * @param function       Function of the error source
- * @param lineNumber     Line number of the error source
- */
 void ErrorBase::SetWPIError(const wpi::Twine& errorMessage, Error::Code code,
                             const wpi::Twine& contextMessage,
                             wpi::StringRef filename, wpi::StringRef function,
@@ -188,11 +130,6 @@ void ErrorBase::CloneError(const ErrorBase& rhs) const {
   m_error.Clone(rhs.GetError());
 }
 
-/**
- * @brief Check if the current error code represents a fatal error.
- *
- * @return true if the current error is fatal.
- */
 bool ErrorBase::StatusIsFatal() const { return m_error.GetCode() < 0; }
 
 void ErrorBase::SetGlobalError(Error::Code code,
@@ -221,9 +158,6 @@ void ErrorBase::SetGlobalWPIError(const wpi::Twine& errorMessage,
                    lineNumber, nullptr);
 }
 
-/**
- * Retrieve the current global error.
- */
 Error& ErrorBase::GetGlobalError() {
   std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
   return _globalError;

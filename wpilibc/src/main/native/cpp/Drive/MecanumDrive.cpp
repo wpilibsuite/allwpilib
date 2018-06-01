@@ -20,11 +20,6 @@ using namespace frc;
 
 constexpr double kPi = 3.14159265358979323846;
 
-/**
- * Construct a MecanumDrive.
- *
- * If a motor needs to be inverted, do so before passing it in.
- */
 MecanumDrive::MecanumDrive(SpeedController& frontLeftMotor,
                            SpeedController& rearLeftMotor,
                            SpeedController& frontRightMotor,
@@ -42,21 +37,6 @@ MecanumDrive::MecanumDrive(SpeedController& frontLeftMotor,
   SetName("MecanumDrive", instances);
 }
 
-/**
- * Drive method for Mecanum platform.
- *
- * Angles are measured clockwise from the positive X axis. The robot's speed is
- * independent from its angle or rotation rate.
- *
- * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is
- *                  positive.
- * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
- *                  positive.
- * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
- *                  Clockwise is positive.
- * @param gyroAngle The current angle reading from the gyro in degrees around
- *                  the Z axis. Use this to implement field-oriented controls.
- */
 void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
                                   double zRotation, double gyroAngle) {
   if (!reported) {
@@ -93,19 +73,6 @@ void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
   m_safetyHelper.Feed();
 }
 
-/**
- * Drive method for Mecanum platform.
- *
- * Angles are measured clockwise from the positive X axis. The robot's speed is
- * independent from its angle or rotation rate.
- *
- * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is
- *                  positive.
- * @param angle     The angle around the Z axis at which the robot drives in
- *                  degrees [-180..180].
- * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
- *                  Clockwise is positive.
- */
 void MecanumDrive::DrivePolar(double magnitude, double angle,
                               double zRotation) {
   if (!reported) {
@@ -118,22 +85,10 @@ void MecanumDrive::DrivePolar(double magnitude, double angle,
                  magnitude * std::cos(angle * (kPi / 180.0)), zRotation, 0.0);
 }
 
-/**
- * Gets if the power sent to the right side of the drivetrain is multipled by
- * -1.
- *
- * @return true if the right side is inverted
- */
 bool MecanumDrive::IsRightSideInverted() const {
   return m_rightSideInvertMultiplier == -1.0;
 }
 
-/**
- * Sets if the power sent to the right side of the drivetrain should be
- * multipled by -1.
- *
- * @param rightSideInverted true if right side power should be multipled by -1
- */
 void MecanumDrive::SetRightSideInverted(bool rightSideInverted) {
   m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;
 }

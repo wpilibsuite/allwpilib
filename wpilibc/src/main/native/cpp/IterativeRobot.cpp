@@ -18,12 +18,6 @@ IterativeRobot::IterativeRobot() {
              HALUsageReporting::kFramework_Iterative);
 }
 
-/**
- * Provide an alternate "main loop" via StartCompetition().
- *
- * This specific StartCompetition() implements "main loop" behaviour synced with
- * the DS packets.
- */
 void IterativeRobot::StartCompetition() {
   RobotInit();
 

@@ -93,10 +93,6 @@ HAL_Bool HAL_CheckRelayChannel(int32_t channel) {
   return channel < kNumRelayHeaders && channel >= 0;
 }
 
-/**
- * Set the state of a relay.
- * Set the state of a relay output.
- */
 void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
                   int32_t* status) {
   auto port = relayHandles->Get(relayPortHandle);
@@ -127,9 +123,6 @@ void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
   }
 }
 
-/**
- * Get the current state of the relay channel
- */
 HAL_Bool HAL_GetRelay(HAL_RelayHandle relayPortHandle, int32_t* status) {
   auto port = relayHandles->Get(relayPortHandle);
   if (port == nullptr) {

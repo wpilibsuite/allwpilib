@@ -29,8 +29,21 @@ class ADXL362 : public ErrorBase, public SendableBase, public Accelerometer {
   };
 
  public:
+  /**
+   * Constructor.  Uses the onboard CS1.
+   *
+   * @param range The range (+ or -) that the accelerometer will measure.
+   */
   explicit ADXL362(Range range = kRange_2G);
+
+  /**
+   * Constructor.
+   *
+   * @param port  The SPI port the accelerometer is attached to
+   * @param range The range (+ or -) that the accelerometer will measure.
+   */
   explicit ADXL362(SPI::Port port, Range range = kRange_2G);
+
   virtual ~ADXL362() = default;
 
   ADXL362(const ADXL362&) = delete;
@@ -42,7 +55,20 @@ class ADXL362 : public ErrorBase, public SendableBase, public Accelerometer {
   double GetY() override;
   double GetZ() override;
 
+  /**
+   * Get the acceleration of one axis in Gs.
+   *
+   * @param axis The axis to read from.
+   * @return Acceleration of the ADXL362 in Gs.
+   */
   virtual double GetAcceleration(Axes axis);
+
+  /**
+   * Get the acceleration of all axes in Gs.
+   *
+   * @return An object containing the acceleration measured on each axis of the
+   *         ADXL362 in Gs.
+   */
   virtual AllAxes GetAccelerations();
 
   void InitSendable(SendableBuilder& builder) override;

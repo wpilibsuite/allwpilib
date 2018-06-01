@@ -15,11 +15,24 @@ namespace frc {
 
 class WaitUntilCommand : public Command {
  public:
+  /**
+   * A WaitCommand will wait until a certain match time before finishing.
+   *
+   * This will wait until the game clock reaches some value, then continue to
+   * the next command.
+   *
+   * @see CommandGroup
+   */
   explicit WaitUntilCommand(double time);
+
   WaitUntilCommand(const wpi::Twine& name, double time);
+
   virtual ~WaitUntilCommand() = default;
 
  protected:
+  /**
+   * Check if we've reached the actual finish time.
+   */
   virtual bool IsFinished();
 
  private:

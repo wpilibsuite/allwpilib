@@ -36,11 +36,53 @@ class Resource : public ErrorBase {
   Resource(const Resource&) = delete;
   Resource& operator=(const Resource&) = delete;
 
+  /**
+   * Factory method to create a Resource allocation-tracker *if* needed.
+   *
+   * @param r        address of the caller's Resource pointer. If *r == nullptr,
+   *                 this will construct a Resource and make *r point to it. If
+   *                 *r != nullptr, i.e. the caller already has a Resource
+   *                 instance, this won't do anything.
+   * @param elements the number of elements for this Resource allocator to
+   *                 track, that is, it will allocate resource numbers in the
+   *                 range [0 .. elements - 1].
+   */
   static void CreateResourceObject(std::unique_ptr<Resource>& r,
                                    uint32_t elements);
+
+  /**
+   * Allocate storage for a new instance of Resource.
+   *
+   * Allocate a bool array of values that will get initialized to indicate that
+   * no resources have been allocated yet. The indicies of the resources are
+   * [0 .. elements - 1].
+   */
   explicit Resource(uint32_t size);
+
+  /**
+   * Allocate a resource.
+   *
+   * When a resource is requested, mark it allocated. In this case, a free
+   * resource value within the range is located and returned after it is marked
+   * allocated.
+   */
   uint32_t Allocate(const std::string& resourceDesc);
+
+  /**
+   * Allocate a specific resource value.
+   *
+   * The user requests a specific resource value, i.e. channel number and it is
+   * verified unallocated, then returned.
+   */
   uint32_t Allocate(uint32_t index, const std::string& resourceDesc);
+
+  /**
+   * Free an allocated resource.
+   *
+   * After a resource is no longer needed, for example a destructor is called
+   * for a channel assignment class, Free will release the resource value so it
+   * can be reused somewhere else in the program.
+   */
   void Free(uint32_t index);
 
  private:

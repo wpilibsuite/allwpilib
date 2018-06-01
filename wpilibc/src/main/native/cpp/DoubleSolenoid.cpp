@@ -17,25 +17,10 @@
 
 using namespace frc;
 
-/**
- * Constructor.
- *
- * Uses the default PCM ID of 0.
- *
- * @param forwardChannel The forward channel number on the PCM (0..7).
- * @param reverseChannel The reverse channel number on the PCM (0..7).
- */
 DoubleSolenoid::DoubleSolenoid(int forwardChannel, int reverseChannel)
     : DoubleSolenoid(SensorUtil::GetDefaultSolenoidModule(), forwardChannel,
                      reverseChannel) {}
 
-/**
- * Constructor.
- *
- * @param moduleNumber   The CAN ID of the PCM.
- * @param forwardChannel The forward channel on the PCM to control (0..7).
- * @param reverseChannel The reverse channel on the PCM to control (0..7).
- */
 DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
                                int reverseChannel)
     : SolenoidBase(moduleNumber),
@@ -91,19 +76,11 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
   SetName("DoubleSolenoid", m_moduleNumber, m_forwardChannel);
 }
 
-/**
- * Destructor.
- */
 DoubleSolenoid::~DoubleSolenoid() {
   HAL_FreeSolenoidPort(m_forwardHandle);
   HAL_FreeSolenoidPort(m_reverseHandle);
 }
 
-/**
- * Set the value of a solenoid.
- *
- * @param value The value to set (Off, Forward or Reverse)
- */
 void DoubleSolenoid::Set(Value value) {
   if (StatusIsFatal()) return;
 
@@ -132,11 +109,6 @@ void DoubleSolenoid::Set(Value value) {
   wpi_setErrorWithContext(rstatus, HAL_GetErrorMessage(rstatus));
 }
 
-/**
- * Read the current value of the solenoid.
- *
- * @return The current value of the solenoid.
- */
 DoubleSolenoid::Value DoubleSolenoid::Get() const {
   if (StatusIsFatal()) return kOff;
   int fstatus = 0;
@@ -152,29 +124,11 @@ DoubleSolenoid::Value DoubleSolenoid::Get() const {
   return kOff;
 }
 
-/**
- * Check if the forward solenoid is blacklisted.
- *
- * If a solenoid is shorted, it is added to the blacklist and
- * disabled until power cycle, or until faults are cleared.
- * @see ClearAllPCMStickyFaults()
- *
- * @return If solenoid is disabled due to short.
- */
 bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {
   int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
   return (blackList & m_forwardMask) != 0;
 }
 
-/**
- * Check if the reverse solenoid is blacklisted.
- *
- * If a solenoid is shorted, it is added to the blacklist and
- * disabled until power cycle, or until faults are cleared.
- *
- * @see ClearAllPCMStickyFaults()
- * @return If solenoid is disabled due to short.
- */
 bool DoubleSolenoid::IsRevSolenoidBlackListed() const {
   int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
   return (blackList & m_reverseMask) != 0;
