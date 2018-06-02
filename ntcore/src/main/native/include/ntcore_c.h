@@ -851,9 +851,10 @@ NT_Bool NT_WaitForRpcCallQueue(NT_Inst inst, double timeout);
  * @param call        RPC call handle (from NT_RpcAnswer)
  * @param result      result raw data that will be provided to remote caller
  * @param result_len  length of result in bytes
+ * @return            true if the response was posted, otherwise false
  */
-void NT_PostRpcResponse(NT_Entry entry, NT_RpcCall call, const char* result,
-                        size_t result_len);
+NT_Bool NT_PostRpcResponse(NT_Entry entry, NT_RpcCall call, const char* result,
+                           size_t result_len);
 
 /**
  * Call a RPC function.  May be used on either the client or server.

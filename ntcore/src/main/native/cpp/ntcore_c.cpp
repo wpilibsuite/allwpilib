@@ -431,9 +431,9 @@ NT_Bool NT_WaitForRpcCallQueue(NT_Inst inst, double timeout) {
   return nt::WaitForRpcCallQueue(inst, timeout);
 }
 
-void NT_PostRpcResponse(NT_Entry entry, NT_RpcCall call, const char* result,
-                        size_t result_len) {
-  nt::PostRpcResponse(entry, call, StringRef(result, result_len));
+NT_Bool NT_PostRpcResponse(NT_Entry entry, NT_RpcCall call, const char* result,
+                           size_t result_len) {
+  return nt::PostRpcResponse(entry, call, StringRef(result, result_len));
 }
 
 NT_RpcCall NT_CallRpc(NT_Entry entry, const char* params, size_t params_len) {

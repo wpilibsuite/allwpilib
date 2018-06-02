@@ -14,6 +14,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -132,7 +133,7 @@ class RpcAnswer {
   NT_Entry entry;
 
   /** Call handle. */
-  NT_RpcCall call;
+  mutable NT_RpcCall call;
 
   /** Entry name. */
   std::string name;
@@ -152,8 +153,9 @@ class RpcAnswer {
   /**
    * Post RPC response (return value) for a polled RPC.
    * @param result  result raw data that will be provided to remote caller
+   * @return True if posting the response is valid, otherwise false
    */
-  void PostResponse(StringRef result) const;
+  bool PostResponse(StringRef result) const;
 
   friend void swap(RpcAnswer& first, RpcAnswer& second) {
     using std::swap;
@@ -936,8 +938,9 @@ bool WaitForRpcCallQueue(NT_Inst inst, double timeout);
  * @param entry       entry handle of RPC entry (from RpcAnswer)
  * @param call        RPC call handle (from RpcAnswer)
  * @param result      result raw data that will be provided to remote caller
+ * @return            true if the response was posted, otherwise false
  */
-void PostRpcResponse(NT_Entry entry, NT_RpcCall call, StringRef result);
+bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, StringRef result);
 
 /**
  * Call a RPC function.  May be used on either the client or server.
@@ -1480,8 +1483,10 @@ bool WaitForLoggerQueue(NT_Inst inst, double timeout);
 
 /** @} */
 
-inline void RpcAnswer::PostResponse(StringRef result) const {
-  PostRpcResponse(entry, call, result);
+inline bool RpcAnswer::PostResponse(StringRef result) const {
+  auto ret = PostRpcResponse(entry, call, result);
+  call = 0;
+  return ret;
 }
 
 }  // namespace nt

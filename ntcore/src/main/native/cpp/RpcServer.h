@@ -99,7 +99,7 @@ class RpcServer : public IRpcServer,
                   SendResponseFunc send_response,
                   unsigned int rpc_uid) override;
 
-  void PostRpcResponse(unsigned int local_id, unsigned int call_uid,
+  bool PostRpcResponse(unsigned int local_id, unsigned int call_uid,
                        wpi::StringRef result);
 
  private:
