@@ -380,7 +380,7 @@ void HALSIM_ResetEncoderData(int32_t index) {
   SimEncoderData[index].ResetData();
 }
 
-int16_t HALSIM_GetDigitalChannelA(int index) {
+int16_t HALSIM_GetDigitalChannelA(int32_t index) {
   return SimEncoderData[index].GetDigitalChannelA();
 }
 
