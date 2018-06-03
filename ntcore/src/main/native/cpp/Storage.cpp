@@ -1085,14 +1085,8 @@ bool Storage::GetRpcResult(unsigned int local_id, unsigned int call_uid,
   // only allow one blocking call per rpc call uid
   if (!m_rpc_blocking_calls.insert(call_pair).second) return false;
 
-#if defined(_MSC_VER) && _MSC_VER < 1900
-  auto timeout_time = std::chrono::steady_clock::now() +
-                      std::chrono::duration<int64_t, std::nano>(
-                          static_cast<int64_t>(timeout * 1e9));
-#else
   auto timeout_time =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
-#endif
   *timed_out = false;
   for (;;) {
     auto i = m_rpc_results.find(call_pair);
