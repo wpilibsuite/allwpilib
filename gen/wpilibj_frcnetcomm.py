@@ -140,12 +140,12 @@ public class FRCNetComm extends JNIWrapper {
                     for i in range(1, len(enumCamel)):
                         temp.write(enumCamel[i][0].lower() + \
                             enumCamel[i][1:len(enumCamel[i])] + " ")
-                    temp.write("from " + os.path.basename(fileName) + "\n"
-                               "   */\n"
-                               "  @SuppressWarnings({\"TypeName\", \"PMD.ConstantsInInterface\"})\n"
-                               "  public static final class " + enumName +
-                               " {\n"
-                               "    private " + enumName + "() {\n    }\n\n")
+                    temp.write(
+                        "from " + os.path.basename(fileName) + "\n"
+                        "   */\n"
+                        "  @SuppressWarnings({\"TypeName\", \"PMD.ConstantsInInterface\"})\n"
+                        "  public static final class " + enumName + " {\n"
+                        "    private " + enumName + "() {\n    }\n\n")
 
                     # Write enum values
                     count = 0
