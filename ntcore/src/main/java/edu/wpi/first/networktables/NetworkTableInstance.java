@@ -566,6 +566,7 @@ public final class NetworkTableInstance implements AutoCloseable {
                   + throwable.toString());
               throwable.printStackTrace();
             }
+            event.finish();
           }
         }
       }

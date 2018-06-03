@@ -139,7 +139,7 @@ public final class NetworkTablesJNI {
   public static native RpcAnswer[] pollRpcTimeout(NetworkTableInstance inst, int poller, double timeout) throws InterruptedException;
   public static native void cancelPollRpc(int poller);
   public static native boolean waitForRpcCallQueue(int inst, double timeout);
-  public static native void postRpcResponse(int entry, int call, byte[] result);
+  public static native boolean postRpcResponse(int entry, int call, byte[] result);
   public static native int callRpc(int entry, byte[] params);
   public static native byte[] getRpcResult(int entry, int call);
   public static native byte[] getRpcResult(int entry, int call, double timeout);
