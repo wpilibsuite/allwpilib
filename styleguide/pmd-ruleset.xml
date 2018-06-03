@@ -4,6 +4,64 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
 
+  <description>PMD Ruleset for WPILib</description>
+
+  <exclude-pattern>.*/*JNI.*</exclude-pattern>
+  <exclude-pattern>.*/*Test.*</exclude-pattern>
+
+  <rule ref="category/java/bestpractices.xml">
+    <exclude name="AccessorClassGeneration" />
+    <exclude name="AccessorMethodGeneration" />
+    <exclude name="AvoidPrintStackTrace" />
+    <exclude name="AvoidReassigningParameters" />
+    <exclude name="JUnitAssertionsShouldIncludeMessage" />
+    <exclude name="JUnitTestContainsTooManyAsserts" />
+    <exclude name="JUnit4TestShouldUseTestAnnotation" />
+    <exclude name="ReplaceHashtableWithMap" />
+    <exclude name="ReplaceVectorWithList" />
+    <exclude name="SwitchStmtsShouldHaveDefault" />
+    <exclude name="SystemPrintln" />
+    <exclude name="UseVarargs" />
+  </rule>
+
+  <rule ref="category/java/design.xml">
+    <exclude name="DataClass" />
+    <exclude name="LawOfDemeter" />
+    <exclude name="LoosePackageCoupling" />
+    <exclude name="NcssConstructorCount" />
+    <exclude name="NcssCount" />
+    <exclude name="NcssMethodCount" />
+  </rule>
+
+  <rule ref="category/java/errorprone.xml">
+    <exclude name="AssignmentToNonFinalStatic" />
+    <exclude name="AvoidDuplicateLiterals" />
+    <exclude name="AvoidLiteralsInIfCondition" />
+    <exclude name="BeanMembersShouldSerialize" />
+    <exclude name="ConstructorCallsOverridableMethod" />
+    <exclude name="DataflowAnomalyAnalysis" />
+    <exclude name="DoNotCallSystemExit" />
+    <exclude name="FinalizeDoesNotCallSuperFinalize" />
+    <exclude name="NullAssignment" />
+  </rule>
+
+  <rule ref="category/java/multithreading.xml">
+    <exclude name="AvoidSynchronizedAtMethodLevel" />
+    <exclude name="AvoidUsingVolatile" />
+    <exclude name="DoNotUseThreads" />
+  </rule>
+
+  <rule ref="category/java/performance.xml">
+    <exclude name="AvoidUsingShortType" />
+  </rule>
+
+  <rule name="UnnecessaryCastRule"
+        language="java"
+        message="Avoid unnecessary casts"
+        class="net.sourceforge.pmd.lang.java.rule.migrating.UnnecessaryCastRule"
+        externalInfoUrl="https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/migrating/UnnecessaryCastRule.java" />
+
+  <!--
   <rule ref="rulesets/java/basic.xml" />
   <rule ref="rulesets/java/braces.xml" />
   <rule ref="rulesets/java/empty.xml" />
@@ -28,6 +86,8 @@
                 value="true" />
     </properties>
   </rule>
+  -->
+
   <!-- Custom Rules -->
   <rule name="UseRequireNonNull"
         message="Use Objects.requireNonNull() instead of throwing a NullPointerException yourself."

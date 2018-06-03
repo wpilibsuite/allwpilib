@@ -75,15 +75,11 @@ ext.addTaskToCopyAllOutputs = { task ->
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
-    apply plugin: 'checkstyle'
+
+    apply from: "${rootDir}/shared/java/javastyle.gradle"
 
     repositories {
         mavenCentral()
-    }
-
-    checkstyle {
-        toolVersion = "8.10"
-        configFile = new File(rootDir, "styleguide/checkstyle.xml")
     }
 
     // Disables doclint in java 8.

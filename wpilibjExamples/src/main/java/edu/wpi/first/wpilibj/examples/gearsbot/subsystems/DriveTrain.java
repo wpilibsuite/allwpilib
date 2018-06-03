@@ -27,18 +27,18 @@ import edu.wpi.first.wpilibj.examples.gearsbot.commands.TankDriveWithJoystick;
  * and a gyro.
  */
 public class DriveTrain extends Subsystem {
-  private SpeedController m_leftMotor
+  private final SpeedController m_leftMotor
       = new SpeedControllerGroup(new Spark(0), new Spark(1));
-  private SpeedController m_rightMotor
+  private final SpeedController m_rightMotor
       = new SpeedControllerGroup(new Spark(2), new Spark(3));
 
-  private DifferentialDrive m_drive
+  private final DifferentialDrive m_drive
       = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
-  private Encoder m_leftEncoder = new Encoder(1, 2);
-  private Encoder m_rightEncoder = new Encoder(3, 4);
-  private AnalogInput m_rangefinder = new AnalogInput(6);
-  private AnalogGyro m_gyro = new AnalogGyro(1);
+  private final Encoder m_leftEncoder = new Encoder(1, 2);
+  private final Encoder m_rightEncoder = new Encoder(3, 4);
+  private final AnalogInput m_rangefinder = new AnalogInput(6);
+  private final AnalogGyro m_gyro = new AnalogGyro(1);
 
   /**
    * Create a new drive train subsystem.

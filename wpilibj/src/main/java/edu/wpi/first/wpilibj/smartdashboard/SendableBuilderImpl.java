@@ -21,6 +21,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableValue;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class SendableBuilderImpl implements SendableBuilder {
   private static class Property {
     Property(NetworkTable table, String key) {
@@ -29,7 +30,7 @@ public class SendableBuilderImpl implements SendableBuilder {
 
     @Override
     @SuppressWarnings("NoFinalizer")
-    public synchronized void finalize() {
+    protected synchronized void finalize() {
       stopListener();
     }
 
@@ -47,7 +48,7 @@ public class SendableBuilderImpl implements SendableBuilder {
     }
 
     final NetworkTableEntry m_entry;
-    int m_listener = 0;
+    int m_listener;
     Consumer<NetworkTableEntry> m_update;
     Function<NetworkTableEntry, Integer> m_createListener;
   }

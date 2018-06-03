@@ -170,6 +170,7 @@ public class DigitalGlitchFilter extends SendableBase {
         / (long) (SensorUtil.kSystemClockTicksPerMicrosecond / 4);
   }
 
+  @Override
   @SuppressWarnings("PMD.UnusedFormalParameter")
   public void initSendable(SendableBuilder builder) {
   }

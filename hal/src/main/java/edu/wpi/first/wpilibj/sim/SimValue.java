@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.sim;
 
-public class SimValue {
+public final class SimValue {
   private boolean v_boolean;
   private long v_long;
   private double v_double;

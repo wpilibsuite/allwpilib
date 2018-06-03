@@ -32,6 +32,7 @@ public class SafePWM extends PWM implements MotorSafety {
    *
    * @param timeout The timeout (in seconds) for this motor object
    */
+  @Override
   public void setExpiration(double timeout) {
     m_safetyHelper.setExpiration(timeout);
   }
@@ -41,6 +42,7 @@ public class SafePWM extends PWM implements MotorSafety {
    *
    * @return The expiration time value.
    */
+  @Override
   public double getExpiration() {
     return m_safetyHelper.getExpiration();
   }
@@ -50,6 +52,7 @@ public class SafePWM extends PWM implements MotorSafety {
    *
    * @return a bool value that is true if the motor has NOT timed out and should still be running.
    */
+  @Override
   public boolean isAlive() {
     return m_safetyHelper.isAlive();
   }
@@ -58,6 +61,7 @@ public class SafePWM extends PWM implements MotorSafety {
    * Stop the motor associated with this PWM object. This is called by the MotorSafetyHelper object
    * when it has a timeout for this PWM and needs to stop it from running.
    */
+  @Override
   public void stopMotor() {
     disable();
   }
@@ -67,6 +71,7 @@ public class SafePWM extends PWM implements MotorSafety {
    *
    * @return True if motor safety is enforced for this object
    */
+  @Override
   public boolean isSafetyEnabled() {
     return m_safetyHelper.isSafetyEnabled();
   }
@@ -91,10 +96,12 @@ public class SafePWM extends PWM implements MotorSafety {
     m_safetyHelper.feed();
   }
 
+  @Override
   public void setSafetyEnabled(boolean enabled) {
     m_safetyHelper.setSafetyEnabled(enabled);
   }
 
+  @Override
   public String getDescription() {
     return "PWM " + getChannel();
   }

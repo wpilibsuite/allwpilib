@@ -43,7 +43,7 @@ public class PWM extends SendableBase {
     k4X
   }
 
-  private int m_channel;
+  private final int m_channel;
   private int m_handle;
 
   /**

@@ -32,7 +32,7 @@ public abstract class Subsystem extends SendableBase {
   /**
    * Whether or not getDefaultCommand() was called.
    */
-  private boolean m_initializedDefaultCommand = false;
+  private boolean m_initializedDefaultCommand;
   /**
    * The current command.
    */

@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * Common base class for all PWM Speed Controllers.
  */
 public abstract class PWMSpeedController extends SafePWM implements SpeedController {
-  private boolean m_isInverted = false;
+  private boolean m_isInverted;
 
   /**
    * Constructor.

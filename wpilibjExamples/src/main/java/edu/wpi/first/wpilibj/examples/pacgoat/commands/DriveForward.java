@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * control This command will drive a given distance limiting to a maximum speed.
  */
 public class DriveForward extends Command {
-  private double m_driveForwardSpeed;
-  private double m_distance;
+  private final double m_driveForwardSpeed;
+  private final double m_distance;
   private double m_error;
   private static final double kTolerance = 0.1;
   private static final double kP = -1.0 / 5.0;

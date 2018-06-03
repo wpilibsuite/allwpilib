@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.sim;
 import edu.wpi.first.hal.sim.mockdata.AccelerometerDataJNI;
 
 public class AccelerometerSim {
-  private int m_index;
+  private final int m_index;
 
   public AccelerometerSim() {
     m_index = 0;

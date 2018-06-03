@@ -269,6 +269,7 @@ public class PCMTest extends AbstractComsSetup {
     solenoid2.close();
   }
 
+  @Override
   protected Logger getClassLogger() {
     return logger;
   }

@@ -10,14 +10,14 @@ package edu.wpi.first.wpilibj.can;
 import edu.wpi.first.wpilibj.communication.NIRioStatus;
 import edu.wpi.first.wpilibj.util.UncleanStatusException;
 
-public class CANExceptionFactory {
+public final class CANExceptionFactory {
   // FRC Error codes
   static final int ERR_CANSessionMux_InvalidBuffer = -44086;
   static final int ERR_CANSessionMux_MessageNotFound = -44087;
   static final int ERR_CANSessionMux_NotAllowed = -44088;
   static final int ERR_CANSessionMux_NotInitialized = -44089;
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings({"JavadocMethod", "PMD.CyclomaticComplexity"})
   public static void checkStatus(int status, int messageID) throws CANInvalidBufferException,
       CANMessageNotAllowedException, CANNotInitializedException, UncleanStatusException {
     switch (status) {
@@ -40,5 +40,9 @@ public class CANExceptionFactory {
         throw new UncleanStatusException("Fatal status code detected:  " + Integer.toString(
             status));
     }
+  }
+
+  private CANExceptionFactory() {
+
   }
 }

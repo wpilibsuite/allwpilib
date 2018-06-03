@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *   - teleopPeriodic()
  *   - testPeriodic()
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public abstract class IterativeRobotBase extends RobotBase {
   private enum Mode {
     kNone,
@@ -54,6 +55,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Provide an alternate "main loop" via startCompetition().
    */
+  @Override
   public abstract void startCompetition();
 
   /* ----------- Overridable initialization code ----------------- */

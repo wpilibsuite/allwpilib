@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * the spinners may still be adjusting their speed.
  */
 public class SetCollectionSpeed extends InstantCommand {
-  private double m_speed;
+  private final double m_speed;
 
   public SetCollectionSpeed(double speed) {
     requires(Robot.collector);

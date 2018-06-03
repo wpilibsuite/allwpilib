@@ -176,6 +176,7 @@ public class RobotDriveTest extends AbstractComsSetup {
     }
   }
 
+  @Override
   protected Logger getClassLogger() {
     return logger;
   }

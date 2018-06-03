@@ -42,7 +42,7 @@ public class KilloughDrive extends RobotDriveBase {
   public static final double kDefaultRightMotorAngle = 120.0;
   public static final double kDefaultBackMotorAngle = 270.0;
 
-  private static int instances = 0;
+  private static int instances;
 
   private SpeedController m_leftMotor;
   private SpeedController m_rightMotor;
@@ -52,7 +52,7 @@ public class KilloughDrive extends RobotDriveBase {
   private Vector2d m_rightVec;
   private Vector2d m_backVec;
 
-  private boolean m_reported = false;
+  private boolean m_reported;
 
   /**
    * Construct a Killough drive with the given motors and default motor angles.

@@ -43,7 +43,7 @@ public class CallbackStore implements AutoCloseable {
 
   private int index;
   private int channel;
-  private int uid;
+  private final int uid;
   private CancelCallbackFunc cancelCallback;
   private CancelCallbackChannelFunc cancelCallbackChannel;
   private CancelCallbackNoIndexFunc cancelCallbackNoIndex;

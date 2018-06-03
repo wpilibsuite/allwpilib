@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.hal.PowerJNI;
  * @deprecated Use RobotController class instead
  */
 @Deprecated
-public class ControllerPower {
+public final class ControllerPower {
   /**
    * Get the input voltage to the robot controller.
    *
@@ -156,5 +156,8 @@ public class ControllerPower {
   @Deprecated
   public static int getFaultCount6V() {
     return PowerJNI.getUserCurrentFaults6V();
+  }
+
+  private ControllerPower() {
   }
 }

@@ -36,12 +36,14 @@ public class Robot extends IterativeRobot {
   private static final double kD = -2.0;
 
   private PIDController m_pidController;
+  @SuppressWarnings("PMD.SingularField")
   private AnalogInput m_potentiometer;
+  @SuppressWarnings("PMD.SingularField")
   private SpeedController m_elevatorMotor;
   private Joystick m_joystick;
 
-  private int m_index = 0;
-  private boolean m_previousButtonValue = false;
+  private int m_index;
+  private boolean m_previousButtonValue;
 
   @Override
   public void robotInit() {
@@ -49,8 +51,7 @@ public class Robot extends IterativeRobot {
     m_elevatorMotor = new Spark(kMotorChannel);
     m_joystick = new Joystick(kJoystickChannel);
 
-    m_pidController
-        = new PIDController(kP, kI, kD, m_potentiometer, m_elevatorMotor);
+    m_pidController = new PIDController(kP, kI, kD, m_potentiometer, m_elevatorMotor);
     m_pidController.setInputRange(0, 5);
   }
 

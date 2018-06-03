@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
  * The LiveWindow class is the public interface for putting sensors and actuators on the
  * LiveWindow.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class LiveWindow {
   private static class Component {
     Component(Sendable sendable, Sendable parent) {
@@ -36,13 +37,14 @@ public class LiveWindow {
     boolean m_telemetryEnabled = true;
   }
 
+  @SuppressWarnings("PMD.UseConcurrentHashMap")
   private static final Map<Object, Component> components = new HashMap<>();
   private static final NetworkTable liveWindowTable =
       NetworkTableInstance.getDefault().getTable("LiveWindow");
   private static final NetworkTable statusTable = liveWindowTable.getSubTable(".status");
   private static final NetworkTableEntry enabledEntry = statusTable.getEntry("LW Enabled");
-  private static boolean startLiveWindow = false;
-  private static boolean liveWindowEnabled = false;
+  private static boolean startLiveWindow;
+  private static boolean liveWindowEnabled;
   private static boolean telemetryEnabled = true;
 
   private LiveWindow() {
@@ -245,6 +247,7 @@ public class LiveWindow {
    * <p>Actuators are handled through callbacks on their value changing from the
    * SmartDashboard widgets.
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   public static synchronized void updateValues() {
     // Only do this if either LiveWindow mode or telemetry is enabled.
     if (!liveWindowEnabled && !telemetryEnabled) {

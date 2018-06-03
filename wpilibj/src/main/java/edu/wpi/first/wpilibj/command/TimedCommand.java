@@ -34,6 +34,7 @@ public class TimedCommand extends Command {
   /**
   * Ends command when timed out.
   */
+  @Override
   protected boolean isFinished() {
     return isTimedOut();
   }

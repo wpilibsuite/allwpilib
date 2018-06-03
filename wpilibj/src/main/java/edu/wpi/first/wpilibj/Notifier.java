@@ -22,15 +22,15 @@ public class Notifier implements AutoCloseable {
   private final AtomicInteger m_notifier = new AtomicInteger();
   // The time, in microseconds, at which the corresponding handler should be
   // called. Has the same zero as Utility.getFPGATime().
-  private double m_expirationTime = 0;
+  private double m_expirationTime;
   // The handler passed in by the user which should be called at the
   // appropriate interval.
   private Runnable m_handler;
   // Whether we are calling the handler just once or periodically.
-  private boolean m_periodic = false;
+  private boolean m_periodic;
   // If periodic, the period of the calling; if just once, stores how long it
   // is until we call the handler.
-  private double m_period = 0;
+  private double m_period;
 
   @Override
   @SuppressWarnings("NoFinalizer")

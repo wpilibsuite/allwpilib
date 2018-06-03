@@ -21,6 +21,7 @@ public interface NamedSendable extends Sendable {
    *
    * @return the name of the subtable of SmartDashboard that the Sendable object will use.
    */
+  @Override
   String getName();
 
   @Override

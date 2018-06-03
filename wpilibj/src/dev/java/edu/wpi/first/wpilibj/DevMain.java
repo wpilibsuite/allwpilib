@@ -11,7 +11,7 @@ import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpiutil.RuntimeDetector;
 
-public class DevMain {
+public final class DevMain {
   /**
    * Main entry point.
    */
@@ -20,5 +20,8 @@ public class DevMain {
     System.out.println(RuntimeDetector.getPlatformPath());
     System.out.println(NetworkTablesJNI.now());
     System.out.println(HALUtil.getHALRuntimeType());
+  }
+
+  private DevMain() {
   }
 }

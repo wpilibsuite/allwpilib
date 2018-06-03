@@ -146,7 +146,7 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
     requireNonNull(downSource, "Down Source given was null");
 
     if (encodingType != EncodingType.k1X && encodingType != EncodingType.k2X) {
-      throw new RuntimeException("Counters only support 1X and 2X quadrature decoding!");
+      throw new IllegalArgumentException("Counters only support 1X and 2X quadrature decoding!");
     }
 
     setUpSource(upSource);
@@ -253,7 +253,7 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
    */
   public void setUpSourceEdge(boolean risingEdge, boolean fallingEdge) {
     if (m_upSource == null) {
-      throw new RuntimeException("Up Source must be set before setting the edge!");
+      throw new IllegalStateException("Up Source must be set before setting the edge!");
     }
     CounterJNI.setCounterUpSourceEdge(m_counter, risingEdge, fallingEdge);
   }
@@ -528,6 +528,7 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
    *
    * @param pidSource An enum to select the parameter.
    */
+  @Override
   public void setPIDSourceType(PIDSourceType pidSource) {
     requireNonNull(pidSource, "PID Source Parameter given was null");
     if (pidSource != PIDSourceType.kDisplacement && pidSource != PIDSourceType.kRate) {
@@ -537,6 +538,7 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
     m_pidSource = pidSource;
   }
 
+  @Override
   public PIDSourceType getPIDSourceType() {
     return m_pidSource;
   }
