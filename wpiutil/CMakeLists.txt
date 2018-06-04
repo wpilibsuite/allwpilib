@@ -20,6 +20,7 @@ endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
+find_package(thirdparty-uvw REQUIRED)
 
 file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp)
 
@@ -33,7 +34,7 @@ else()
     target_compile_options(wpiutil PUBLIC -DNOMINMAX)
 endif()
 
-target_link_libraries(wpiutil Threads::Threads)
+target_link_libraries(wpiutil uvw Threads::Threads)
 target_include_directories(wpiutil PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)

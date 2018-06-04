@@ -14,7 +14,12 @@ By default, all libraries except for the HAL and WPILib get built with a default
 
 ## Prerequisites
 
-The most common prerequisite is going to be OpenCV. OpenCV needs to be findable by cmake. On systems like the Jetson, this is installed by default. Otherwise, you will need to build cmake from source and install it.
+The WPILib build requires some third party libraries.
+
+A required prerequisite is `libuv` and `uvw`. We provide a CMake build properly set up for this library at https://github.com/wpilibsuite/thirdparty-uvw.
+Follow the instructions there for building and installing the dependency.
+
+Another prerequisite is OpenCV. OpenCV needs to be findable by cmake. On systems like the Jetson, this is installed by default. Otherwise, you will need to build cmake from source and install it.
 
 In addition, if you want JNI and Java, you will need a JDK of at least version 8 installed. In addition, you need a `JAVA_HOME` environment variable set properly and set to the jdk directory.
 
