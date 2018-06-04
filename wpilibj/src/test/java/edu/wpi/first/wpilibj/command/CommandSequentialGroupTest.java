@@ -9,19 +9,19 @@ package edu.wpi.first.wpilibj.command;
 
 import java.util.logging.Logger;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Ported from the old CrioTest Classes.
  */
-public class CommandSequentialGroupTest extends AbstractCommandTest {
+class CommandSequentialGroupTest extends AbstractCommandTest {
   private static Logger logger = Logger.getLogger(CommandSequentialGroupTest.class.getName());
 
   /**
    * Simple Command Group With 3 commands that all depend on a subsystem. Some commands have a
    * timeout.
    */
-  @Test(timeout = 20000)
+  @Test
   public void testThreeCommandOnSubSystem() {
     logger.fine("Begining Test");
     final ASubsystem subsystem = new ASubsystem();

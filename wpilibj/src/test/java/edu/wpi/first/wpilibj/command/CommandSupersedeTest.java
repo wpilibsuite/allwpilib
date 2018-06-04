@@ -7,22 +7,18 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import java.util.logging.Logger;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Ported from the old CrioTest Classes.
  */
-public class CommandSupersedeTest extends AbstractCommandTest {
-  private static final Logger logger = Logger.getLogger(CommandSupersedeTest.class.getName());
-
+class CommandSupersedeTest extends AbstractCommandTest {
 
   /**
    * Testing one command superseding another because of dependencies.
    */
   @Test
-  public void testOneCommandSupersedingAnotherBecauseOfDependencies() {
+  void oneCommandSupersedingAnotherBecauseOfDependenciesTest() {
     final ASubsystem subsystem = new ASubsystem();
 
     final MockCommand command1 = new MockCommand() {
@@ -76,7 +72,7 @@ public class CommandSupersedeTest extends AbstractCommandTest {
    * command cannot be interrupted.
    */
   @Test
-  public void testCommandFailingSupersedingBecauseFirstCanNotBeInterrupted() {
+  void commandFailingSupersedingBecauseFirstCanNotBeInterruptedTest() {
     final ASubsystem subsystem = new ASubsystem();
 
     final MockCommand command1 = new MockCommand() {
@@ -116,5 +112,4 @@ public class CommandSupersedeTest extends AbstractCommandTest {
     assertCommandState(command1, 1, 4, 4, 0, 0);
     assertCommandState(command2, 0, 0, 0, 0, 0);
   }
-
 }
