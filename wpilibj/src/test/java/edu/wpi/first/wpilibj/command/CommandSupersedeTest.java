@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
  * Ported from the old CrioTest Classes.
  */
 class CommandSupersedeTest extends AbstractCommandTest {
-
   /**
    * Testing one command superseding another because of dependencies.
    */
