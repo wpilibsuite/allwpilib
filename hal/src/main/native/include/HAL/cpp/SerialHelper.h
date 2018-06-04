@@ -20,7 +20,7 @@
 
 namespace hal {
 /**
- * A class for deterministically getting information about  Serial Ports.
+ * A class for deterministically getting information about Serial Ports.
  */
 class SerialHelper {
  public:
