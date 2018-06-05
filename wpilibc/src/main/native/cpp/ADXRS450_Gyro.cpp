@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ADXRS450_Gyro.h"
+#include "RobotBase.h"
 
 #include <HAL/HAL.h>
 
@@ -102,7 +103,10 @@ void ADXRS450_Gyro::Calibrate() {
   m_spi.SetAccumulatorCenter(0);
   m_spi.ResetAccumulator();
 
-  Wait(kCalibrationSampleTime);
+  if(RobotBase::IsReal())
+  {
+     Wait(kCalibrationSampleTime);
+  }
 
   m_spi.SetAccumulatorCenter(static_cast<int>(m_spi.GetAccumulatorAverage()));
   m_spi.ResetAccumulator();

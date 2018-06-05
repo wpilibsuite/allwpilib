@@ -6,6 +6,9 @@ ext {
 }
 
 apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
+ext {
+	publishZipFunction = includeStandardZipFormat
+}
 
 
 if (!project.hasProperty('onlyAthena')) {
@@ -23,4 +26,68 @@ if (!project.hasProperty('onlyAthena')) {
             }
         }
     }
+}
+
+
+
+apply plugin: 'google-test-test-suite'
+
+ext {
+	sharedCvConfigs = [halsim_adx_gyro_accelerometerTest: []]
+	staticCvConfigs = [:]
+	useJava = false
+	useCpp = true
+}
+apply from: "${rootDir}/shared/opencv.gradle"
+
+ext {
+	staticGtestConfigs = [:]
+}
+
+staticGtestConfigs["${pluginName}Test"] = []
+apply from: "${rootDir}/shared/googletest.gradle"
+
+model {
+	
+	testSuites {
+		"${pluginName}Test"(GoogleTestTestSuiteSpec) {
+		for(NativeComponentSpec c : $.components) {
+			if (c.name == pluginName) {
+				testing c
+				break
+			}
+		}
+			sources {
+				cpp {
+					source {
+						srcDirs 'src/test/native/cpp'
+						include '**/*.cpp'
+					}
+					exportedHeaders {
+						srcDirs 'src/test/native/include', 'src/main/native/cpp'
+					}
+				}
+			}
+		}
+	}
+	binaries {
+		withType(GoogleTestTestSuiteBinarySpec) {
+			if (!project.hasProperty('onlyAthena')) {
+				lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+				lib project: ':cscore', library: 'cscore', linkage: 'shared'
+				lib project: ':hal', library: 'hal', linkage: 'shared'
+				lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+				lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+				lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+				lib library: pluginName, linkage: 'shared'
+			} else {
+				it.buildable = false
+			}
+		}
+	}
+}
+
+tasks.withType(RunTestExecutable) {
+	args "--gtest_output=xml:test_detail.xml"
+	outputs.dir outputDir
 }

@@ -55,9 +55,8 @@ addTaskToCopyAllOutputs(cppSourcesZip)
 addTaskToCopyAllOutputs(cppHeadersZip)
 
 
-model {
-    publishing {
-        def pluginTaskList = createComponentZipTasks($.components, pluginName, zipBaseName, Zip, project, { task, value ->
+if (!project.hasProperty('publishZipFunction')) {
+	ext.publishZipFunction = { task, value ->
             value.each { binary ->
                 if (binary.buildable) {
                     if (binary instanceof SharedLibraryBinarySpec) {
@@ -68,7 +67,14 @@ model {
                     }
                 }
             }
-        })
+        }
+}
+
+
+
+model {
+    publishing {
+        def pluginTaskList = createComponentZipTasks($.components, pluginName, zipBaseName, Zip, project, publishZipFunction)
 
         def allTask
         if (!project.hasProperty('jenkinsBuild')) {
