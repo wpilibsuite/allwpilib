@@ -58,7 +58,8 @@ void HAL_SetCounterAverageSize(HAL_CounterHandle counterHandle, int32_t size,
  * @param counterHandle       the counter handle
  * @param digitalSourceHandle the digital source handle (either a
  * HAL_AnalogTriggerHandle of a HAL_DigitalHandle)
- * @param analogTriggerType   the analog trigger type
+ * @param analogTriggerType   the analog trigger type if the source is an analog
+ * trigger
  */
 void HAL_SetCounterUpSource(HAL_CounterHandle counterHandle,
                             HAL_Handle digitalSourceHandle,
@@ -91,7 +92,8 @@ void HAL_ClearCounterUpSource(HAL_CounterHandle counterHandle, int32_t* status);
  * @param counterHandle       the counter handle
  * @param digitalSourceHandle the digital source handle (either a
  * HAL_AnalogTriggerHandle of a HAL_DigitalHandle)
- * @param analogTriggerType   the analog trigger type
+ * @param analogTriggerType   the analog trigger type if the source is an analog
+ * trigger
  */
 void HAL_SetCounterDownSource(HAL_CounterHandle counterHandle,
                               HAL_Handle digitalSourceHandle,
@@ -221,8 +223,8 @@ double HAL_GetCounterPeriod(HAL_CounterHandle counterHandle, int32_t* status);
  * Set the maximum period where the device is still considered "moving".
  *
  * Sets the maximum period where the device is considered moving. This value is
- * used to determine the "stopped" state of the counter using the GetStopped
- * method.
+ * used to determine the "stopped" state of the counter using the
+ * HAL_GetCounterStopped method.
  *
  * @param counterHandle the counter handle
  * @param maxPeriod     the maximum period where the counted device is

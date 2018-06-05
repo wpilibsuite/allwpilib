@@ -226,7 +226,7 @@ double HAL_GetMatchTime(int32_t* status) {
   return matchTime;
 }
 
-int HAL_GetMatchInfo(HAL_MatchInfo* info) {
+int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
   uint16_t gameSpecificMessageSize = 0;
   int status = FRC_NetworkCommunication_getMatchInfo(
       nullptr, nullptr, nullptr, nullptr, nullptr, &gameSpecificMessageSize);

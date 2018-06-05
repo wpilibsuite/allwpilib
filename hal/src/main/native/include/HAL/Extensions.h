@@ -20,11 +20,21 @@
 typedef int halsim_extension_init_func_t(void);
 
 extern "C" {
+/**
+ * Loads a single extension from a direct path.
+ *
+ * Expected to be called internally, not by users.
+ *
+ * @param library the library path
+ * @return        the succes state of the initialization
+ */
 int HAL_LoadOneExtension(const char* library);
 
 /**
  * Load any extra halsim libraries provided in the HALSIM_EXTENSIONS
  * environment variable.
+ *
+ * @return        the succes state of the initialization
  */
 int HAL_LoadExtensions(void);
 }  // extern "C"
