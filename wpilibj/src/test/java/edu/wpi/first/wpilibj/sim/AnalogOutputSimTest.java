@@ -18,8 +18,8 @@ import org.junit.jupiter.api.Test;
 
 class AnalogOutputSimTest {
   static class DoubleStore {
-    public boolean m_wasTriggered = false;
-    public boolean m_wasCorrectType = false;
+    public boolean m_wasTriggered;
+    public boolean m_wasCorrectType;
     public double m_setValue = -1;
 
     public void reset() {

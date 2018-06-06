@@ -21,12 +21,7 @@ class CommandTimeoutTest extends AbstractCommandTest {
     final ASubsystem subsystem = new ASubsystem();
 
 
-    final MockCommand command = new MockCommand() {
-      {
-        requires(subsystem);
-        setTimeout(2);
-      }
-
+    final MockCommand command = new MockCommand(subsystem, 2) {
       @Override
       public boolean isFinished() {
         return super.isFinished() || isTimedOut();

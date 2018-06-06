@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 class MatchInfoDataTest {
   @Test
+  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   void matchInfoDataDoesNotThrow() {
     HAL.initialize(500, 0);
     MatchInfoData data = new MatchInfoData();

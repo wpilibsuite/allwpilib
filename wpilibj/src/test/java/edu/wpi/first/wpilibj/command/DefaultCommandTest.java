@@ -21,17 +21,9 @@ public class DefaultCommandTest extends AbstractCommandTest {
     final ASubsystem subsystem = new ASubsystem();
 
 
-    final MockCommand defaultCommand = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
+    final MockCommand defaultCommand = new MockCommand(subsystem);
 
-    final MockCommand anotherCommand = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
+    final MockCommand anotherCommand = new MockCommand(subsystem);
     assertCommandState(defaultCommand, 0, 0, 0, 0, 0);
     subsystem.init(defaultCommand);
 
@@ -76,18 +68,9 @@ public class DefaultCommandTest extends AbstractCommandTest {
   @Test
   void defaultCommandsInterruptingCommandCanceledTest() {
     final ASubsystem subsystem = new ASubsystem();
+    final MockCommand defaultCommand = new MockCommand(subsystem);
+    final MockCommand anotherCommand = new MockCommand(subsystem);
 
-    final MockCommand defaultCommand = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
-
-    final MockCommand anotherCommand = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
     assertCommandState(defaultCommand, 0, 0, 0, 0, 0);
     subsystem.init(defaultCommand);
     subsystem.initDefaultCommand();

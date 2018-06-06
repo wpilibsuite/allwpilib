@@ -16,9 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AnalogInputSimTest {
   static class DoubleStore {
-    public boolean m_wasTriggered = false;
-    public boolean m_wasCorrectType = false;
-    public double m_setValue = 0;
+    public boolean m_wasTriggered;
+    public boolean m_wasCorrectType;
+    public double m_setValue0;
   }
 
   @Test

@@ -17,9 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PIDToleranceTest {
   private PIDController m_pid;
-  private final double m_setPoint = 50.0;
-  private final double m_tolerance = 10.0;
-  private final double m_range = 200;
+  private static final double m_setPoint = 50.0;
+  private static final double m_tolerance = 10.0;
+  private static final double m_range = 200;
 
   @BeforeAll
   static void setupClass() {
@@ -49,7 +49,7 @@ class PIDToleranceTest {
   }
 
   private FakeInput m_inp;
-  private PIDOutput m_out = new PIDOutput() {
+  private final PIDOutput m_out = new PIDOutput() {
     @Override
     public void pidWrite(double out) {
     }

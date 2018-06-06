@@ -20,17 +20,9 @@ class CommandSupersedeTest extends AbstractCommandTest {
   void oneCommandSupersedingAnotherBecauseOfDependenciesTest() {
     final ASubsystem subsystem = new ASubsystem();
 
-    final MockCommand command1 = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
+    final MockCommand command1 = new MockCommand(subsystem);
 
-    final MockCommand command2 = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
+    final MockCommand command2 = new MockCommand(subsystem);
 
     assertCommandState(command1, 0, 0, 0, 0, 0);
     assertCommandState(command2, 0, 0, 0, 0, 0);
@@ -71,21 +63,17 @@ class CommandSupersedeTest extends AbstractCommandTest {
    * command cannot be interrupted.
    */
   @Test
+  @SuppressWarnings("PMD.NonStaticInitializer")
   void commandFailingSupersedingBecauseFirstCanNotBeInterruptedTest() {
     final ASubsystem subsystem = new ASubsystem();
 
-    final MockCommand command1 = new MockCommand() {
+    final MockCommand command1 = new MockCommand(subsystem) {
       {
-        requires(subsystem);
         setInterruptible(false);
       }
     };
 
-    final MockCommand command2 = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
+    final MockCommand command2 = new MockCommand(subsystem);
 
     assertCommandState(command1, 0, 0, 0, 0, 0);
     assertCommandState(command2, 0, 0, 0, 0, 0);

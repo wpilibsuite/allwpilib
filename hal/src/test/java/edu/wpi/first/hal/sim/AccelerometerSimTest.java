@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AccelerometerSimTest {
   static class TriggeredStore {
-    public boolean wasTriggered = false;
+    public boolean wasTriggered;
     public boolean setValue = true;
   }
 

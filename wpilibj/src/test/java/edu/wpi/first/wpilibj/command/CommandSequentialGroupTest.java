@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  * Ported from the old CrioTest Classes.
  */
 class CommandSequentialGroupTest extends AbstractCommandTest {
-  private static Logger logger = Logger.getLogger(CommandSequentialGroupTest.class.getName());
+  private static final Logger logger = Logger.getLogger(CommandSequentialGroupTest.class.getName());
 
   /**
    * Simple Command Group With 3 commands that all depend on a subsystem. Some commands have a
@@ -27,23 +27,11 @@ class CommandSequentialGroupTest extends AbstractCommandTest {
     final ASubsystem subsystem = new ASubsystem();
 
     logger.finest("Creating Mock Command1");
-    final MockCommand command1 = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
+    final MockCommand command1 = new MockCommand(subsystem);
     logger.finest("Creating Mock Command2");
-    final MockCommand command2 = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
+    final MockCommand command2 = new MockCommand(subsystem);
     logger.finest("Creating Mock Command3");
-    final MockCommand command3 = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
+    final MockCommand command3 = new MockCommand(subsystem);
 
     logger.finest("Creating Command Group");
     final CommandGroup commandGroup = new CommandGroup();

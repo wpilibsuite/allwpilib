@@ -52,7 +52,6 @@ public final class UnitTestUtility {
             Thread.sleep((long) (seconds * 1e3));
           } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Thread was interrupted", ex);
           }
         }
 

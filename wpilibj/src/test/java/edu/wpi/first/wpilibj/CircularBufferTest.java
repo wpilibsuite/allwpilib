@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CircularBufferTest {
-  private double[] m_values = {751.848, 766.366, 342.657, 234.252, 716.126,
+  private final double[] m_values = {751.848, 766.366, 342.657, 234.252, 716.126,
       132.344, 445.697, 22.727, 421.125, 799.913};
-  private double[] m_addFirstOut = {799.913, 421.125, 22.727, 445.697, 132.344,
+  private final double[] m_addFirstOut = {799.913, 421.125, 22.727, 445.697, 132.344,
       716.126, 234.252, 342.657};
-  private double[] m_addLastOut = {342.657, 234.252, 716.126, 132.344, 445.697,
+  private final double[] m_addLastOut = {342.657, 234.252, 716.126, 132.344, 445.697,
       22.727, 421.125, 799.913};
 
   @BeforeAll
@@ -111,6 +111,7 @@ class CircularBufferTest {
   }
 
   @Test
+  @SuppressWarnings("PMD.ExcessiveMethodLength")
   void resizeTest() {
     CircularBuffer queue = new CircularBuffer(5);
 

@@ -24,6 +24,11 @@ public class MockCommand extends Command {
     requires(subsys);
   }
 
+  public MockCommand(Subsystem subsys, double timeout) {
+    this(subsys);
+    setTimeout(timeout);
+  }
+
   public MockCommand() {
     super();
   }
