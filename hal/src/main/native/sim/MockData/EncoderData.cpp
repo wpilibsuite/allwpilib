@@ -47,7 +47,7 @@ void EncoderData::SetDigitalChannelA(int16_t channel) {
   m_digitalChannelA = channel;
 }
 
-int16_t EncoderData::GetDigitalChannelA() { return m_digitalChannelA; }
+int16_t EncoderData::GetDigitalChannelA() const { return m_digitalChannelA; }
 
 int32_t EncoderData::RegisterInitializedCallback(HAL_NotifyCallback callback,
                                                  void* param,

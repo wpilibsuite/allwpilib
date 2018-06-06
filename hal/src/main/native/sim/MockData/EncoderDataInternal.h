@@ -20,7 +20,7 @@ namespace hal {
 class EncoderData {
  public:
   void SetDigitalChannelA(int16_t channel);
-  int16_t GetDigitalChannelA();
+  int16_t GetDigitalChannelA() const;
 
   int32_t RegisterInitializedCallback(HAL_NotifyCallback callback, void* param,
                                       HAL_Bool initialNotify);
