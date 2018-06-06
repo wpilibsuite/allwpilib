@@ -183,18 +183,17 @@ void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  auto id = CreateCANId(can.get(), apiId);
 
-  uint32_t messageId = 0;
+  uint32_t messageId = CreateCANId(can.get(), apiId);
   uint8_t dataSize = 0;
   uint32_t ts = 0;
-  HAL_CAN_ReceiveMessage(&messageId, id, data, &dataSize, &ts, status);
+  HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
   uint64_t timestamp = ConvertToFPGATime(ts);
 
   if (*status == 0) {
     std::lock_guard<wpi::mutex> lock(can->mapMutex);
-    auto& msg = can->receives[id];
+    auto& msg = can->receives[messageId];
     msg.length = dataSize;
     msg.lastTimeStamp = timestamp;
     std::memcpy(msg.data, data, dataSize);
@@ -211,26 +210,25 @@ void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  auto id = CreateCANId(can.get(), apiId);
 
-  uint32_t messageId = 0;
+  uint32_t messageId = CreateCANId(can.get(), apiId);
   uint8_t dataSize = 0;
   uint32_t ts = 0;
-  HAL_CAN_ReceiveMessage(&messageId, id, data, &dataSize, &ts, status);
+  HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
   uint64_t timestamp = ConvertToFPGATime(ts);
 
   std::lock_guard<wpi::mutex> lock(can->mapMutex);
   if (*status == 0) {
     // fresh update
-    auto& msg = can->receives[id];
+    auto& msg = can->receives[messageId];
     msg.length = dataSize;
     *length = dataSize;
     msg.lastTimeStamp = timestamp;
     *receivedTimestamp = timestamp;
     std::memcpy(msg.data, data, dataSize);
   } else {
-    auto i = can->receives.find(id);
+    auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       std::memcpy(i->second.data, data, i->second.length);
       *length = i->second.length;
@@ -249,26 +247,25 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  auto id = CreateCANId(can.get(), apiId);
 
-  uint32_t messageId = 0;
+  uint32_t messageId = CreateCANId(can.get(), apiId);
   uint8_t dataSize = 0;
   uint32_t ts = 0;
-  HAL_CAN_ReceiveMessage(&messageId, id, data, &dataSize, &ts, status);
+  HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
   uint64_t timestamp = ConvertToFPGATime(ts);
 
   std::lock_guard<wpi::mutex> lock(can->mapMutex);
   if (*status == 0) {
     // fresh update
-    auto& msg = can->receives[id];
+    auto& msg = can->receives[messageId];
     msg.length = dataSize;
     *length = dataSize;
     msg.lastTimeStamp = timestamp;
     *receivedTimestamp = timestamp;
     std::memcpy(msg.data, data, dataSize);
   } else {
-    auto i = can->receives.find(id);
+    auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
       uint64_t now = HAL_GetFPGATime(status);
@@ -295,11 +292,12 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  auto id = CreateCANId(can.get(), apiId);
+
+  uint32_t messageId = CreateCANId(can.get(), apiId);
 
   {
     std::lock_guard<wpi::mutex> lock(can->mapMutex);
-    auto i = can->receives.find(id);
+    auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       uint64_t now = HAL_GetFPGATime(status);
       // Found, check if new enough
@@ -313,24 +311,23 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
     }
   }
 
-  uint32_t messageId = 0;
   uint8_t dataSize = 0;
   uint32_t ts = 0;
-  HAL_CAN_ReceiveMessage(&messageId, id, data, &dataSize, &ts, status);
+  HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
   uint64_t timestamp = ConvertToFPGATime(ts);
 
   std::lock_guard<wpi::mutex> lock(can->mapMutex);
   if (*status == 0) {
     // fresh update
-    auto& msg = can->receives[id];
+    auto& msg = can->receives[messageId];
     msg.length = dataSize;
     *length = dataSize;
     msg.lastTimeStamp = timestamp;
     *receivedTimestamp = timestamp;
     std::memcpy(msg.data, data, dataSize);
   } else {
-    auto i = can->receives.find(id);
+    auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
       uint64_t now = HAL_GetFPGATime(status);
