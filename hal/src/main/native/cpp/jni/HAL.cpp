@@ -407,7 +407,6 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getMatchInfo
   if (status == 0) {
     SetMatchInfoObject(env, info, matchInfo);
   }
-  HAL_FreeMatchInfo(&matchInfo);
   return status;
 }
 

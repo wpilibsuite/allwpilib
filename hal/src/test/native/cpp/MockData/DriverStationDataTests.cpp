@@ -117,8 +117,11 @@ TEST(DriverStationTests, EventInfoTest) {
   std::string eventName = "UnitTest";
   std::string gameData = "Insert game specific info here :D";
   HAL_MatchInfo info;
-  info.eventName = const_cast<char*>(eventName.c_str());
-  info.gameSpecificMessage = const_cast<char*>(gameData.c_str());
+  std::snprintf(info.eventName, sizeof(info.eventName), "%s",
+                eventName.c_str());
+  std::snprintf(reinterpret_cast<char*>(info.gameSpecificMessage),
+                sizeof(info.gameSpecificMessage), "%s", gameData.c_str());
+  info.gameSpecificMessageSize = gameData.size();
   info.matchNumber = 5;
   info.matchType = HAL_MatchType::HAL_kMatchType_qualification;
   info.replayNumber = 42;
@@ -127,13 +130,14 @@ TEST(DriverStationTests, EventInfoTest) {
   HAL_MatchInfo dataBack;
   HAL_GetMatchInfo(&dataBack);
 
+  std::string gsm{reinterpret_cast<char*>(dataBack.gameSpecificMessage),
+                  dataBack.gameSpecificMessageSize};
+
   EXPECT_STREQ(eventName.c_str(), dataBack.eventName);
-  EXPECT_STREQ(gameData.c_str(), dataBack.gameSpecificMessage);
+  EXPECT_EQ(gameData, gsm);
   EXPECT_EQ(5, dataBack.matchNumber);
   EXPECT_EQ(HAL_MatchType::HAL_kMatchType_qualification, dataBack.matchType);
   EXPECT_EQ(42, dataBack.replayNumber);
-
-  HAL_FreeMatchInfo(&dataBack);
 }
 
 }  // namespace hal

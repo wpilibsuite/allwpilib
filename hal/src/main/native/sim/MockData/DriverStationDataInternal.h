@@ -18,7 +18,6 @@
 
 namespace hal {
 struct JoystickOutputStore;
-struct MatchInfoDataStore;
 
 class DriverStationData {
  public:
@@ -133,7 +132,7 @@ class DriverStationData {
 
   std::unique_ptr<JoystickOutputStore[]> m_joystickOutputs;
   std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptor;
-  std::unique_ptr<MatchInfoDataStore> m_matchInfo;
+  std::unique_ptr<HAL_MatchInfo> m_matchInfo;
 };
 extern DriverStationData* SimDriverStationData;
 }  // namespace hal

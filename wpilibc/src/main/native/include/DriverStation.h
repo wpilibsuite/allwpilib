@@ -24,7 +24,6 @@
 
 namespace frc {
 
-struct MatchInfoData;
 class MatchDataSender;
 
 /**
@@ -408,36 +407,13 @@ class DriverStation : public ErrorBase {
 
   void Run();
 
-  /**
-   * Gets ControlWord data from the cache. If 50ms has passed, or the force
-   * parameter is set, the cached data is updated. Otherwise the data is just
-   * copied from the cache.
-   *
-   * @param force True to force an update to the cache, otherwise update if 50ms
-   *              have passed.
-   * @param controlWord Structure to put the return control word data into.
-   */
-  void UpdateControlWord(bool force, HAL_ControlWord& controlWord) const;
-
   void SendMatchData();
-
-  // Joystick User Data
-  std::unique_ptr<HAL_JoystickAxes[]> m_joystickAxes;
-  std::unique_ptr<HAL_JoystickPOVs[]> m_joystickPOVs;
-  std::unique_ptr<HAL_JoystickButtons[]> m_joystickButtons;
-  std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptor;
-  std::unique_ptr<MatchInfoData> m_matchInfo;
-
-  // Joystick Cached Data
-  std::unique_ptr<HAL_JoystickAxes[]> m_joystickAxesCache;
-  std::unique_ptr<HAL_JoystickPOVs[]> m_joystickPOVsCache;
-  std::unique_ptr<HAL_JoystickButtons[]> m_joystickButtonsCache;
-  std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptorCache;
-  std::unique_ptr<MatchInfoData> m_matchInfoCache;
 
   std::unique_ptr<MatchDataSender> m_matchDataSender;
 
   // Joystick button rising/falling edge flags
+  wpi::mutex m_buttonEdgeMutex;
+  std::array<HAL_JoystickButtons, kJoystickPorts> m_previousButtonStates;
   std::array<uint32_t, kJoystickPorts> m_joystickButtonsPressed;
   std::array<uint32_t, kJoystickPorts> m_joystickButtonsReleased;
 
@@ -449,18 +425,11 @@ class DriverStation : public ErrorBase {
   wpi::condition_variable m_waitForDataCond;
   int m_waitForDataCounter;
 
-  mutable wpi::mutex m_cacheDataMutex;
-
   // Robot state status variables
   bool m_userInDisabled = false;
   bool m_userInAutonomous = false;
   bool m_userInTeleop = false;
   bool m_userInTest = false;
-
-  // Control word variables
-  mutable HAL_ControlWord m_controlWordCache;
-  mutable std::chrono::steady_clock::time_point m_lastControlWordUpdate;
-  mutable wpi::mutex m_controlWordMutex;
 
   double m_nextMessageTime = 0;
 };
