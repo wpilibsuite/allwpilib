@@ -6,11 +6,11 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ADXRS450_Gyro.h"
-#include "RobotBase.h"
 
 #include <HAL/HAL.h>
 
 #include "DriverStation.h"
+#include "RobotBase.h"
 #include "Timer.h"
 
 using namespace frc;
@@ -103,9 +103,8 @@ void ADXRS450_Gyro::Calibrate() {
   m_spi.SetAccumulatorCenter(0);
   m_spi.ResetAccumulator();
 
-  if(RobotBase::IsReal())
-  {
-     Wait(kCalibrationSampleTime);
+  if (RobotBase::IsReal()) {
+    Wait(kCalibrationSampleTime);
   }
 
   m_spi.SetAccumulatorCenter(static_cast<int>(m_spi.GetAccumulatorAverage()));

@@ -48,7 +48,7 @@ staticGtestConfigs["${pluginName}Test"] = []
 apply from: "${rootDir}/shared/googletest.gradle"
 
 model {
-	
+
 	testSuites {
 		"${pluginName}Test"(GoogleTestTestSuiteSpec) {
 		for(NativeComponentSpec c : $.components) {
