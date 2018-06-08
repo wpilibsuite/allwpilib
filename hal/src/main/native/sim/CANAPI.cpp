@@ -12,6 +12,7 @@
 
 #include <wpi/DenseMap.h>
 
+#include "CANAPIInternal.h"
 #include "HAL/CAN.h"
 #include "HAL/Errors.h"
 #include "HAL/HAL.h"
@@ -57,6 +58,16 @@ void InitializeCANAPI() {
   canHandles = &cH;
 }
 }  // namespace init
+namespace can {
+int32_t GetCANModuleFromHandle(HAL_CANHandle handle, int32_t* status) {
+  auto can = canHandles->Get(handle);
+  if (!can) {
+    *status = HAL_HANDLE_ERROR;
+    return -1;
+  }
+  return can->deviceId;
+}
+}  // namespace can
 }  // namespace hal
 
 static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
