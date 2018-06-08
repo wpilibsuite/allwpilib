@@ -61,7 +61,6 @@ void InitializeHAL() {
   InitializeI2C();
   InitialzeInterrupts();
   InitializeNotifier();
-  InitializeOSSerialPort();
   InitializePCMInternal();
   InitializePDP();
   InitializePorts();
