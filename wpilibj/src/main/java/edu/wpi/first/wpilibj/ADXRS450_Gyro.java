@@ -95,9 +95,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
     m_spi.setAccumulatorCenter(0);
     m_spi.resetAccumulator();
 
-    if (RobotBase.isReal()) {
-      Timer.delay(kCalibrationSampleTime);
-    }
+    Timer.delay(kCalibrationSampleTime);
 
     m_spi.setAccumulatorCenter((int) m_spi.getAccumulatorAverage());
     m_spi.resetAccumulator();
