@@ -10,10 +10,8 @@ package edu.wpi.first.wpilibj;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
 import java.nio.file.Files;
-import java.util.Enumeration;
-import java.util.jar.Manifest;
+import java.util.function.Supplier;
 
 import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -200,7 +198,7 @@ public abstract class RobotBase implements AutoCloseable {
    */
   @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.AvoidCatchingThrowable",
                      "PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
-  public static void main(String... args) {
+  public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");
     }
@@ -211,39 +209,23 @@ public abstract class RobotBase implements AutoCloseable {
 
     HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
 
-    String robotName = "";
-    if (args.length > 0) {
-      robotName = args[0];
-    } else {
-      Enumeration<URL> resources = null;
-      try {
-        resources = Thread.currentThread()
-            .getContextClassLoader().getResources("META-INF/MANIFEST.MF");
-      } catch (IOException ex) {
-        ex.printStackTrace();
-      }
-      while (resources != null && resources.hasMoreElements()) {
-        try {
-          Manifest manifest = new Manifest(resources.nextElement().openStream());
-          robotName = manifest.getMainAttributes().getValue("Robot-Class");
-        } catch (IOException ex) {
-          ex.printStackTrace();
-        }
-      }
-    }
-
     System.out.println("********** Robot program starting **********");
 
-    RobotBase robot;
+    T robot;
     try {
-      robot = (RobotBase) Class.forName(robotName).newInstance();
+      robot = robotSupplier.get();
     } catch (Throwable throwable) {
       Throwable cause = throwable.getCause();
       if (cause != null) {
         throwable = cause;
       }
+      String robotName = "Unknown";
+      StackTraceElement[] elements = throwable.getStackTrace();
+      if (elements.length > 0) {
+        robotName = elements[0].getClassName();
+      }
       DriverStation.reportError("Unhandled exception instantiating robot " + robotName + " "
-          + throwable.toString(), throwable.getStackTrace());
+          + throwable.toString(), elements);
       DriverStation.reportWarning("Robots should not quit, but yours did!", false);
       DriverStation.reportError("Could not instantiate robot " + robotName + "!", false);
       System.exit(1);
