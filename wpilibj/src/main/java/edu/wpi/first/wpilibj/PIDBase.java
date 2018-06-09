@@ -25,9 +25,10 @@ import static java.util.Objects.requireNonNull;
  * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
  * given set of PID constants.
  */
+@SuppressWarnings("PMD.TooManyFields")
 public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
   public static final double kDefaultPeriod = 0.05;
-  private static int instances = 0;
+  private static int instances;
 
   // Factor for "proportional" control
   @SuppressWarnings("MemberName")
@@ -52,34 +53,34 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
   private double m_minimumOutput = -1.0;
 
   // Maximum input - limit setpoint to this
-  private double m_maximumInput = 0.0;
+  private double m_maximumInput;
 
   // Minimum input - limit setpoint to this
-  private double m_minimumInput = 0.0;
+  private double m_minimumInput;
 
   // Input range - difference between maximum and minimum
-  private double m_inputRange = 0.0;
+  private double m_inputRange;
 
   // Do the endpoints wrap around? (e.g., absolute encoder)
-  private boolean m_continuous = false;
+  private boolean m_continuous;
 
   // Is the PID controller enabled
-  protected boolean m_enabled = false;
+  protected boolean m_enabled;
 
   // The prior error (used to compute velocity)
-  private double m_prevError = 0.0;
+  private double m_prevError;
 
   // The sum of the errors for use in the integral calc
-  private double m_totalError = 0.0;
+  private double m_totalError;
 
   // The tolerance object used to check if on target
   private Tolerance m_tolerance;
 
-  private double m_setpoint = 0.0;
-  private double m_prevSetpoint = 0.0;
+  private double m_setpoint;
+  private double m_prevSetpoint;
   @SuppressWarnings("PMD.UnusedPrivateField")
-  private double m_error = 0.0;
-  private double m_result = 0.0;
+  private double m_error;
+  private double m_result;
 
   private PIDSource m_origSource;
   private LinearDigitalFilter m_filter;
@@ -110,7 +111,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
   public class NullTolerance implements Tolerance {
     @Override
     public boolean onTarget() {
-      throw new RuntimeException("No tolerance value set when calling onTarget().");
+      throw new IllegalStateException("No tolerance value set when calling onTarget().");
     }
   }
 
@@ -198,7 +199,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    * Read the input, calculate the output accordingly, and write to the output. This should only be
    * called by the PIDTask and is created during initialization.
    */
-  @SuppressWarnings("LocalVariableName")
+  @SuppressWarnings({"LocalVariableName", "PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
   protected void calculate() {
     if (m_origSource == null || m_pidOutput == null) {
       return;
@@ -334,6 +335,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    * @param i Integral coefficient
    * @param d Differential coefficient
    */
+  @Override
   @SuppressWarnings("ParameterName")
   public void setPID(double p, double i, double d) {
     m_thisMutex.lock();
@@ -433,6 +435,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @return proportional coefficient
    */
+  @Override
   public double getP() {
     m_thisMutex.lock();
     try {
@@ -447,6 +450,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @return integral coefficient
    */
+  @Override
   public double getI() {
     m_thisMutex.lock();
     try {
@@ -461,6 +465,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @return differential coefficient
    */
+  @Override
   public double getD() {
     m_thisMutex.lock();
     try {
@@ -508,7 +513,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    */
   public void setContinuous(boolean continuous) {
     if (continuous && m_inputRange <= 0) {
-      throw new RuntimeException("No input range set when calling setContinuous().");
+      throw new IllegalStateException("No input range set when calling setContinuous().");
     }
     m_thisMutex.lock();
     try {
@@ -573,6 +578,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @param setpoint the desired setpoint
    */
+  @Override
   public void setSetpoint(double setpoint) {
     m_thisMutex.lock();
     try {
@@ -597,6 +603,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @return the current setpoint
    */
+  @Override
   public double getSetpoint() {
     m_thisMutex.lock();
     try {
@@ -625,6 +632,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @return the current error
    */
+  @Override
   public double getError() {
     m_thisMutex.lock();
     try {

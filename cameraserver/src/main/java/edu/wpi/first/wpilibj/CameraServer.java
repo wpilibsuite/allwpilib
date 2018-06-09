@@ -8,7 +8,9 @@
 package edu.wpi.first.wpilibj;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.wpi.cscore.AxisCamera;
@@ -34,7 +36,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  * Singleton class for creating and keeping camera servers.
  * Also publishes camera information to NetworkTables.
  */
-public class CameraServer {
+@SuppressWarnings("PMD.TooManyMethods")
+public final class CameraServer {
   public static final int kBasePort = 1181;
 
   @Deprecated
@@ -57,11 +60,11 @@ public class CameraServer {
     return server;
   }
 
-  private AtomicInteger m_defaultUsbDevice;
+  private final AtomicInteger m_defaultUsbDevice;
   private String m_primarySourceName;
-  private final Hashtable<String, VideoSource> m_sources;
-  private final Hashtable<String, VideoSink> m_sinks;
-  private final Hashtable<Integer, NetworkTable> m_tables;  // indexed by source handle
+  private final Map<String, VideoSource> m_sources;
+  private final Map<String, VideoSink> m_sinks;
+  private final Map<Integer, NetworkTable> m_tables;  // indexed by source handle
   private final NetworkTable m_publishTable;
   private final VideoListener m_videoListener; //NOPMD
   private final int m_tableListener; //NOPMD
@@ -115,7 +118,7 @@ public class CameraServer {
       // Otherwise generate for hostname and all interface addresses
       values.add(makeStreamValue(CameraServerJNI.getHostname() + ".local", port));
       for (String addr : m_addresses) {
-        if (addr.equals("127.0.0.1")) {
+        if ("127.0.0.1".equals(addr)) {
           continue;  // ignore localhost
         }
         values.add(makeStreamValue(addr, port));
@@ -146,10 +149,7 @@ public class CameraServer {
       if (source == sinkSource
           && VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) == VideoSink.Kind.kMjpeg) {
         // Add USB-only passthrough
-        String[] finalValues = new String[values.length + 1];
-        for (int j = 0; j < values.length; j++) {
-          finalValues[j] = values[j];
-        }
+        String[] finalValues = Arrays.copyOf(values, values.length + 1);
         int port = CameraServerJNI.getMjpegServerPort(sink);
         finalValues[values.length] = makeStreamValue("172.22.11.2", port);
         return finalValues;
@@ -238,7 +238,7 @@ public class CameraServer {
     return modeStrings;
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings({"JavadocMethod", "PMD.CyclomaticComplexity"})
   private static void putSourcePropertyValue(NetworkTable table, VideoEvent event, boolean isNew) {
     String name;
     String infoName;
@@ -286,12 +286,13 @@ public class CameraServer {
         default:
           break;
       }
-    } catch (VideoException ex) {
+    } catch (VideoException ignored) {
       // ignore
     }
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.UnusedLocalVariable"})
+  @SuppressWarnings({"JavadocMethod", "PMD.UnusedLocalVariable", "PMD.ExcessiveMethodLength",
+      "PMD.NPathComplexity"})
   private CameraServer() {
     m_defaultUsbDevice = new AtomicInteger();
     m_sources = new Hashtable<>();
@@ -329,7 +330,7 @@ public class CameraServer {
             VideoMode mode = CameraServerJNI.getSourceVideoMode(event.sourceHandle);
             table.getEntry("mode").setDefaultString(videoModeToString(mode));
             table.getEntry("modes").setStringArray(getSourceModeValues(event.sourceHandle));
-          } catch (VideoException ex) {
+          } catch (VideoException ignored) {
             // Do nothing. Let the other event handlers update this if there is an error.
           }
           break;
@@ -394,7 +395,7 @@ public class CameraServer {
             try {
               String[] choices = CameraServerJNI.getEnumPropertyChoices(event.propertyHandle);
               table.getEntry("PropertyInfo/" + event.name + "/choices").setStringArray(choices);
-            } catch (VideoException ex) {
+            } catch (VideoException ignored) {
               // ignore
             }
           }
@@ -437,7 +438,7 @@ public class CameraServer {
 
         // handle standard names
         String propName;
-        if (relativeKey.equals("mode")) {
+        if ("mode".equals(relativeKey)) {
           // reset to current mode
           event.getEntry().setString(videoModeToString(source.getVideoMode()));
           return;

@@ -30,6 +30,7 @@ public class SampleTest extends AbstractComsSetup {
 
   static SampleFixture fixture = new SampleFixture();
 
+  @Override
   protected Logger getClassLogger() {
     return logger;
   }

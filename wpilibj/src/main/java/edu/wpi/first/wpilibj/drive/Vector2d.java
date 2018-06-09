@@ -12,8 +12,8 @@ package edu.wpi.first.wpilibj.drive;
  */
 @SuppressWarnings("MemberName")
 public class Vector2d {
-  public double x = 0.0;
-  public double y = 0.0;
+  public double x;
+  public double y;
 
   public Vector2d() {}
 

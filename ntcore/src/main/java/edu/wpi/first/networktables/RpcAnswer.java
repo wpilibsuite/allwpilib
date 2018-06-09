@@ -10,7 +10,7 @@ package edu.wpi.first.networktables;
 /**
  * NetworkTables Remote Procedure Call (Server Side).
  */
-public final class RpcAnswer implements AutoCloseable {
+public final class RpcAnswer {
   /** Entry handle. */
   @SuppressWarnings("MemberName")
   public final int entry;
@@ -52,18 +52,14 @@ public final class RpcAnswer implements AutoCloseable {
 
   static final byte[] emptyResponse = new byte[] {};
 
-  @Deprecated
-  public void free() {
-    close();
-  }
-
-  /**
-   * Posts an empty response if one was not previously sent.
+  /*
+   * Finishes an RPC answer by replying empty if the user did not respond.
+   * Called internally by the callback thread.
    */
-  @Override
-  public synchronized void close() {
+  void finish() {
     if (call != 0) {
-      postResponse(emptyResponse);
+      NetworkTablesJNI.postRpcResponse(entry, call, emptyResponse);
+      call = 0;
     }
   }
 
@@ -78,10 +74,12 @@ public final class RpcAnswer implements AutoCloseable {
   /**
    * Post RPC response (return value) for a polled RPC.
    * @param result  result raw data that will be provided to remote caller
+   * @return        true if the response was posted, otherwise false
    */
-  public void postResponse(byte[] result) {
-    NetworkTablesJNI.postRpcResponse(entry, call, result);
+  public boolean postResponse(byte[] result) {
+    boolean ret = NetworkTablesJNI.postRpcResponse(entry, call, result);
     call = 0;
+    return ret;
   }
 
   /* Network table instance. */

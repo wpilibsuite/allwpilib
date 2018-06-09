@@ -53,7 +53,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
   /**
    * The index source.
    */
-  protected DigitalSource m_indexSource = null; // Index on some encoders
+  protected DigitalSource m_indexSource; // Index on some encoders
   private boolean m_allocatedA;
   private boolean m_allocatedB;
   private boolean m_allocatedI;
@@ -329,6 +329,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
    *
    * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale factor.
    */
+  @Override
   public int get() {
     return EncoderJNI.getEncoder(m_encoder);
   }
@@ -336,6 +337,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
   /**
    * Reset the Encoder distance to zero. Resets the current count to zero on the encoder.
    */
+  @Override
   public void reset() {
     EncoderJNI.resetEncoder(m_encoder);
   }
@@ -350,6 +352,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
    * @return Period in seconds of the most recent pulse.
    * @deprecated Use getRate() in favor of this method.
    */
+  @Override
   @Deprecated
   public double getPeriod() {
     return EncoderJNI.getEncoderPeriod(m_encoder);
@@ -364,6 +367,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
    * @param maxPeriod The maximum time between rising and falling edges before the FPGA will report
    *                  the device stopped. This is expressed in seconds.
    */
+  @Override
   public void setMaxPeriod(double maxPeriod) {
     EncoderJNI.setEncoderMaxPeriod(m_encoder, maxPeriod);
   }
@@ -375,6 +379,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
    *
    * @return True if the encoder is considered stopped.
    */
+  @Override
   public boolean getStopped() {
     return EncoderJNI.getEncoderStopped(m_encoder);
   }
@@ -384,6 +389,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
    *
    * @return The last direction the encoder value changed.
    */
+  @Override
   public boolean getDirection() {
     return EncoderJNI.getEncoderDirection(m_encoder);
   }
@@ -478,6 +484,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
    *
    * @param pidSource An enum to select the parameter.
    */
+  @Override
   public void setPIDSourceType(PIDSourceType pidSource) {
     m_pidSource = pidSource;
   }
@@ -492,6 +499,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
    *
    * @return The current value of the selected source parameter.
    */
+  @Override
   public double pidGet() {
     switch (m_pidSource) {
       case kDisplacement:

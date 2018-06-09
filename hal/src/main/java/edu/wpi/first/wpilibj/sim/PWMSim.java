@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.sim;
 import edu.wpi.first.hal.sim.mockdata.PWMDataJNI;
 
 public class PWMSim {
-  private int m_index;
+  private final int m_index;
 
   public PWMSim(int index) {
     m_index = index;

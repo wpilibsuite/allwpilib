@@ -25,6 +25,7 @@ import static java.util.Objects.requireNonNull;
  *             or {@link edu.wpi.first.wpilibj.drive.MecanumDrive} classes instead.
  */
 @Deprecated
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public class RobotDrive implements MotorSafety, AutoCloseable {
   protected MotorSafetyHelper m_safetyHelper;
 
@@ -53,11 +54,11 @@ public class RobotDrive implements MotorSafety, AutoCloseable {
   protected SpeedController m_rearLeftMotor;
   protected SpeedController m_rearRightMotor;
   protected boolean m_allocatedSpeedControllers;
-  protected static boolean kArcadeRatioCurve_Reported = false;
-  protected static boolean kTank_Reported = false;
-  protected static boolean kArcadeStandard_Reported = false;
-  protected static boolean kMecanumCartesian_Reported = false;
-  protected static boolean kMecanumPolar_Reported = false;
+  protected static boolean kArcadeRatioCurve_Reported;
+  protected static boolean kTank_Reported;
+  protected static boolean kArcadeStandard_Reported;
+  protected static boolean kMecanumCartesian_Reported;
+  protected static boolean kMecanumPolar_Reported;
 
   /**
    * Constructor for RobotDrive with 2 motors specified with channel numbers. Set up parameters for

@@ -2,7 +2,6 @@ apply plugin: 'maven-publish'
 apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
 apply plugin: 'java'
 apply plugin: 'net.ltgt.errorprone'
-apply plugin: 'pmd'
 
 if (!hasProperty('releaseType')) {
     WPILibVersion {
@@ -96,14 +95,6 @@ test {
 
 if (project.hasProperty('onlyAthena')) {
     test.enabled = false
-}
-
-pmd {
-    sourceSets = [sourceSets.main]
-    consoleOutput = true
-    reportsDir = file("$project.buildDir/reports/pmd")
-    ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
-    ruleSets = []
 }
 
 repositories {

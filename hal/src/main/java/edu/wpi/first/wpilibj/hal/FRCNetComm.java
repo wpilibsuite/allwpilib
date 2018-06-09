@@ -17,7 +17,7 @@ public class FRCNetComm extends JNIWrapper {
   /**
    * Module type from LoadOut.h
    */
-  @SuppressWarnings("TypeName")
+  @SuppressWarnings({"TypeName", "PMD.ConstantsInInterface"})
   public static final class tModuleType {
     private tModuleType() {
     }
@@ -31,7 +31,7 @@ public class FRCNetComm extends JNIWrapper {
   /**
    * Target class from LoadOut.h
    */
-  @SuppressWarnings("TypeName")
+  @SuppressWarnings({"TypeName", "PMD.ConstantsInInterface"})
   public static final class tTargetClass {
     private tTargetClass() {
     }
@@ -51,7 +51,7 @@ public class FRCNetComm extends JNIWrapper {
   /**
    * Resource type from UsageReporting.h
    */
-  @SuppressWarnings("TypeName")
+  @SuppressWarnings({"TypeName", "PMD.ConstantsInInterface"})
   public static final class tResourceType {
     private tResourceType() {
     }
@@ -132,7 +132,7 @@ public class FRCNetComm extends JNIWrapper {
   /**
    * Instances from UsageReporting.h
    */
-  @SuppressWarnings("TypeName")
+  @SuppressWarnings({"TypeName", "PMD.ConstantsInInterface"})
   public static final class tInstances {
     private tInstances() {
     }

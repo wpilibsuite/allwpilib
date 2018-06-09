@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj.sim;
 
 import edu.wpi.first.hal.sim.mockdata.SimulatorJNI;
 
-public class SimHooks {
+public final class SimHooks {
   private SimHooks() {
   }
 

@@ -20,8 +20,8 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * world do to minor differences.
  */
 public class Elevator extends PIDSubsystem {
-  private Victor m_motor;
-  private AnalogPotentiometer m_pot;
+  private final Victor m_motor;
+  private final AnalogPotentiometer m_pot;
 
   private static final double kP_real = 4;
   private static final double kI_real = 0.07;

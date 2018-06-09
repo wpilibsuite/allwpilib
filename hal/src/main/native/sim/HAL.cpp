@@ -61,7 +61,6 @@ void InitializeHAL() {
   InitializeInterrupts();
   InitializeMockHooks();
   InitializeNotifier();
-  InitializeOSSerialPort();
   InitializePDP();
   InitializePorts();
   InitializePower();

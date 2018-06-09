@@ -31,11 +31,11 @@ public class Robot extends IterativeRobot {
   private static final int kGyroPort = 0;
   private static final int kJoystickPort = 0;
 
-  private DifferentialDrive m_myRobot
+  private final DifferentialDrive m_myRobot
       = new DifferentialDrive(new Spark(kLeftMotorPort),
       new Spark(kRightMotorPort));
-  private AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
-  private Joystick m_joystick = new Joystick(kJoystickPort);
+  private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
+  private final Joystick m_joystick = new Joystick(kJoystickPort);
 
   @Override
   public void robotInit() {

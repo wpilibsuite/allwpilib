@@ -31,8 +31,8 @@ public class Robot extends IterativeRobot {
   private static final int kJoystickPort = 0;
 
   private MecanumDrive m_robotDrive;
-  private AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
-  private Joystick m_joystick = new Joystick(kJoystickPort);
+  private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
+  private final Joystick m_joystick = new Joystick(kJoystickPort);
 
   @Override
   public void robotInit() {

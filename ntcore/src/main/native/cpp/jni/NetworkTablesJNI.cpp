@@ -1255,17 +1255,17 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_waitForRpcCallQueue
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    postRpcResponse
- * Signature: (II[B)V
+ * Signature: (II[B)Z
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_postRpcResponse
   (JNIEnv* env, jclass, jint entry, jint call, jbyteArray result)
 {
   if (!result) {
     nullPointerEx.Throw(env, "result cannot be null");
-    return;
+    return false;
   }
-  nt::PostRpcResponse(entry, call, JByteArrayRef{env, result});
+  return nt::PostRpcResponse(entry, call, JByteArrayRef{env, result});
 }
 
 /*

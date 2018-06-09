@@ -26,7 +26,7 @@ public class CAN implements Closeable {
   public static final int kTeamManufacturer = 8;
   public static final int kTeamDeviceType = 10;
 
-  private int m_handle;
+  private final int m_handle;
 
   /**
    * Create a new CAN communication interface with the specific device ID.

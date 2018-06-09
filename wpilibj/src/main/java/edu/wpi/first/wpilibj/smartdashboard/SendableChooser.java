@@ -43,6 +43,7 @@ public class SendableChooser<V> extends SendableBase {
   /**
    * A map linking strings to the objects the represent.
    */
+  @SuppressWarnings("PMD.LooseCoupling")
   private final LinkedHashMap<String, V> m_map = new LinkedHashMap<>();
   private String m_defaultChoice = "";
 

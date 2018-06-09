@@ -33,6 +33,7 @@ public class JoystickButton extends Button {
    *
    * @return The value of the joystick button
    */
+  @Override
   public boolean get() {
     return m_joystick.getRawButton(m_buttonNumber);
   }

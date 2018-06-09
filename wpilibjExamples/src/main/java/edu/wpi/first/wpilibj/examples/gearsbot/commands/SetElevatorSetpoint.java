@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * PID!
  */
 public class SetElevatorSetpoint extends Command {
-  private double m_setpoint;
+  private final double m_setpoint;
 
   public SetElevatorSetpoint(double setpoint) {
     m_setpoint = setpoint;

@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * commands using the pivot should make sure they disable PID!
  */
 public class SetPivotSetpoint extends Command {
-  private double m_setpoint;
+  private final double m_setpoint;
 
   public SetPivotSetpoint(double setpoint) {
     this.m_setpoint = setpoint;

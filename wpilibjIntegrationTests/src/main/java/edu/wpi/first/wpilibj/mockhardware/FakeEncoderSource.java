@@ -32,6 +32,7 @@ public class FakeEncoderSource implements AutoCloseable {
       m_encoder = encode;
     }
 
+    @Override
     public void run() {
       final DigitalOutput lead;
       final DigitalOutput lag;
@@ -93,6 +94,7 @@ public class FakeEncoderSource implements AutoCloseable {
   /**
    * Frees the resource.
    */
+  @Override
   public void close() {
     m_task = null;
     if (m_allocatedOutputs) {

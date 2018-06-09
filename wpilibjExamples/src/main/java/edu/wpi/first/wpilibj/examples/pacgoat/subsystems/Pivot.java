@@ -28,15 +28,15 @@ public class Pivot extends PIDSubsystem {
   public static final double kShootNear = 30;
 
   // Sensors for measuring the position of the pivot.
-  private DigitalInput m_upperLimitSwitch = new DigitalInput(13);
-  private DigitalInput m_lowerLimitSwitch = new DigitalInput(12);
+  private final DigitalInput m_upperLimitSwitch = new DigitalInput(13);
+  private final DigitalInput m_lowerLimitSwitch = new DigitalInput(12);
 
   // 0 degrees is vertical facing up.
   // Angle increases the more forward the pivot goes.
-  private Potentiometer m_pot = new AnalogPotentiometer(1);
+  private final Potentiometer m_pot = new AnalogPotentiometer(1);
 
   // Motor to move the pivot.
-  private SpeedController m_motor = new Victor(5);
+  private final SpeedController m_motor = new Victor(5);
 
   /**
    * Create a new pivot subsystem.

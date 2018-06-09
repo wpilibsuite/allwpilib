@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.sim;
 import edu.wpi.first.hal.sim.mockdata.I2CDataJNI;
 
 public class I2CSim {
-  private int m_index;
+  private final int m_index;
 
   public I2CSim(int index) {
     m_index = index;

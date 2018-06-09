@@ -18,6 +18,7 @@ public abstract class GamepadBase extends GenericHID {
     super(port);
   }
 
+  @Override
   public abstract double getRawAxis(int axis);
 
   /**
@@ -43,19 +44,27 @@ public abstract class GamepadBase extends GenericHID {
     return getStickButton(Hand.kRight);
   }
 
+  @Override
   public abstract boolean getRawButton(int button);
 
+  @Override
   public abstract int getPOV(int pov);
 
+  @Override
   public abstract int getPOVCount();
 
+  @Override
   public abstract HIDType getType();
 
+  @Override
   public abstract String getName();
 
+  @Override
   public abstract void setOutput(int outputNumber, boolean value);
 
+  @Override
   public abstract void setOutputs(int value);
 
+  @Override
   public abstract void setRumble(RumbleType type, double value);
 }

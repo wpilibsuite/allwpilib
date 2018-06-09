@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 public class ConstantsPortsTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(ConstantsPortsTest.class.getName());
 
+  @Override
   protected Logger getClassLogger() {
     return logger;
   }

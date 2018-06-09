@@ -33,7 +33,7 @@ public class XboxController extends GenericHID {
     kBack(7),
     kStart(8);
 
-    @SuppressWarnings("MemberName")
+    @SuppressWarnings({"MemberName", "PMD.SingularField"})
     private int value;
 
     Button(int value) {

@@ -25,6 +25,9 @@ import edu.wpi.first.wpilibj.hal.PowerJNI;
 /**
  * Provide access to the network communication data to / from the Driver Station.
  */
+@SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveClassLength",
+                   "PMD.ExcessivePublicCount", "PMD.GodClass", "PMD.TooManyFields",
+                   "PMD.TooManyMethods"})
 public class DriverStation implements RobotState.Interface {
   /**
    * Number of Joystick Ports.
@@ -66,15 +69,16 @@ public class DriverStation implements RobotState.Interface {
   }
 
   private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
-  private double m_nextMessageTime = 0.0;
+  private double m_nextMessageTime;
 
   private static class DriverStationTask implements Runnable {
-    private DriverStation m_ds;
+    private final DriverStation m_ds;
 
     DriverStationTask(DriverStation ds) {
       m_ds = ds;
     }
 
+    @Override
     public void run() {
       m_ds.run();
     }
@@ -144,12 +148,13 @@ public class DriverStation implements RobotState.Interface {
   private int[] m_joystickButtonsReleased = new int[kJoystickPorts];
 
   // preallocated byte buffer for button count
-  private ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1);
+  private final ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1);
 
-  private MatchDataSender m_matchDataSender;
+  private final MatchDataSender m_matchDataSender;
 
   // Internal Driver Station thread
-  private Thread m_thread;
+  @SuppressWarnings("PMD.SingularField")
+  private final Thread m_thread;
   private volatile boolean m_threadKeepAlive = true;
 
   private final ReentrantLock m_cacheDataMutex = new ReentrantLock();
@@ -159,14 +164,14 @@ public class DriverStation implements RobotState.Interface {
   private int m_waitForDataCount;
 
   // Robot state status variables
-  private boolean m_userInDisabled = false;
-  private boolean m_userInAutonomous = false;
-  private boolean m_userInTeleop = false;
-  private boolean m_userInTest = false;
+  private boolean m_userInDisabled;
+  private boolean m_userInAutonomous;
+  private boolean m_userInTeleop;
+  private boolean m_userInTest;
 
   // Control word variables
   private final Object m_controlWordMutex;
-  private ControlWord m_controlWordCache;
+  private final ControlWord m_controlWordCache;
   private long m_lastControlWordUpdate;
 
   /**
@@ -184,6 +189,7 @@ public class DriverStation implements RobotState.Interface {
    * <p>The single DriverStation instance is created statically with the instance static member
    * variable.
    */
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   private DriverStation() {
     HAL.initialize(500, 0);
     m_waitForDataCount = 0;
@@ -277,12 +283,12 @@ public class DriverStation implements RobotState.Interface {
     } else {
       locString = "";
     }
-    String traceString = "";
+    StringBuilder traceString = new StringBuilder("");
     if (printTrace) {
       boolean haveLoc = false;
       for (int i = stackTraceFirst; i < stackTrace.length; i++) {
         String loc = stackTrace[i].toString();
-        traceString += "\tat " + loc + "\n";
+        traceString.append("\tat ").append(loc).append('\n');
         // get first user function
         if (!haveLoc && !loc.startsWith("edu.wpi.first")) {
           locString = loc;
@@ -290,7 +296,7 @@ public class DriverStation implements RobotState.Interface {
         }
       }
     }
-    HAL.sendError(isError, code, false, error, locString, traceString, true);
+    HAL.sendError(isError, code, false, error, locString, traceString.toString(), true);
   }
 
   /**
@@ -302,7 +308,7 @@ public class DriverStation implements RobotState.Interface {
    */
   public boolean getStickButton(final int stick, final int button) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
     if (button <= 0) {
       reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
@@ -338,7 +344,7 @@ public class DriverStation implements RobotState.Interface {
       return false;
     }
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
     boolean error = false;
     boolean retVal = false;
@@ -377,7 +383,7 @@ public class DriverStation implements RobotState.Interface {
       return false;
     }
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
     boolean error = false;
     boolean retVal = false;
@@ -412,10 +418,10 @@ public class DriverStation implements RobotState.Interface {
    */
   public double getStickAxis(int stick, int axis) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
     if (axis >= HAL.kMaxJoystickAxes) {
-      throw new RuntimeException("Joystick axis is out of range");
+      throw new IllegalArgumentException("Joystick axis is out of range");
     }
 
     m_cacheDataMutex.lock();
@@ -443,10 +449,10 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getStickPOV(int stick, int pov) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
     if (pov >= HAL.kMaxJoystickPOVs) {
-      throw new RuntimeException("Joystick POV is out of range");
+      throw new IllegalArgumentException("Joystick POV is out of range");
     }
 
     m_cacheDataMutex.lock();
@@ -474,7 +480,7 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getStickButtons(final int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
 
     m_cacheDataMutex.lock();
@@ -493,7 +499,7 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getStickAxisCount(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
@@ -512,7 +518,7 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getStickPOVCount(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
@@ -531,7 +537,7 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getStickButtonCount(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
@@ -550,7 +556,7 @@ public class DriverStation implements RobotState.Interface {
    */
   public boolean getJoystickIsXbox(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
@@ -569,7 +575,7 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getJoystickType(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
@@ -588,7 +594,7 @@ public class DriverStation implements RobotState.Interface {
    */
   public String getJoystickName(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
@@ -608,7 +614,7 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getJoystickAxisType(int stick, int axis) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
@@ -624,6 +630,7 @@ public class DriverStation implements RobotState.Interface {
    *
    * @return True if the robot is enabled, false otherwise.
    */
+  @Override
   public boolean isEnabled() {
     synchronized (m_controlWordMutex) {
       updateControlWord(false);
@@ -636,6 +643,7 @@ public class DriverStation implements RobotState.Interface {
    *
    * @return True if the robot should be disabled, false otherwise.
    */
+  @Override
   public boolean isDisabled() {
     return !isEnabled();
   }
@@ -646,6 +654,7 @@ public class DriverStation implements RobotState.Interface {
    *
    * @return True if autonomous mode should be enabled, false otherwise.
    */
+  @Override
   public boolean isAutonomous() {
     synchronized (m_controlWordMutex) {
       updateControlWord(false);
@@ -659,6 +668,7 @@ public class DriverStation implements RobotState.Interface {
    *
    * @return True if operator-controlled mode should be enabled, false otherwise.
    */
+  @Override
   public boolean isOperatorControl() {
     return !(isAutonomous() || isTest());
   }
@@ -669,6 +679,7 @@ public class DriverStation implements RobotState.Interface {
    *
    * @return True if test mode should be enabled, false otherwise.
    */
+  @Override
   public boolean isTest() {
     synchronized (m_controlWordMutex) {
       updateControlWord(false);
@@ -1139,7 +1150,8 @@ public class DriverStation implements RobotState.Interface {
         safetyCounter = 0;
       }
 
-      if (++safetyCounter >= 4) {
+      safetyCounter++;
+      if (safetyCounter >= 4) {
         MotorSafetyHelper.checkMotors();
         safetyCounter = 0;
       }

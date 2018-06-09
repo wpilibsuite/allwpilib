@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.hal.SPIJNI;
 /**
  * Represents a SPI bus port.
  */
+@SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.TooManyMethods"})
 public class SPI implements AutoCloseable {
   public enum Port {
     kOnboardCS0(0), kOnboardCS1(1), kOnboardCS2(2), kOnboardCS3(3), kMXP(4);
@@ -28,7 +29,7 @@ public class SPI implements AutoCloseable {
     }
   }
 
-  private static int devices = 0;
+  private static int devices;
 
   private int m_port;
   private int m_bitOrder;
@@ -268,6 +269,7 @@ public class SPI implements AutoCloseable {
    * @param dataReceived Buffer to receive data from the device.
    * @param size         The length of the transaction, in bytes
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, int size) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {
       return transaction(dataToSend.array(), dataReceived.array(), size);
@@ -420,6 +422,7 @@ public class SPI implements AutoCloseable {
 
   private static final int kAccumulateDepth = 2048;
 
+  @SuppressWarnings("PMD.TooManyFields")
   private static class Accumulator implements AutoCloseable {
     Accumulator(int port, int xferSize, int validMask, int validValue, int dataShift,
                 int dataSize, boolean isSigned, boolean bigEndian) {
@@ -462,6 +465,7 @@ public class SPI implements AutoCloseable {
     final boolean m_bigEndian;  // is response big endian?
     final int m_port;
 
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     void update() {
       synchronized (m_mutex) {
         boolean done = false;
@@ -527,7 +531,7 @@ public class SPI implements AutoCloseable {
     }
   }
 
-  private Accumulator m_accum = null;
+  private Accumulator m_accum;
 
   /**
    * Initialize the accumulator.

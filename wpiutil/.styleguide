@@ -22,6 +22,7 @@ generatedFileExclude {
   src/main/native/include/wpi/Format\.h$
   src/main/native/include/wpi/Hashing\.h$
   src/main/native/include/wpi/IntrusiveRefCntPtr\.h$
+  src/main/native/include/wpi/MapVector\.h$
   src/main/native/include/wpi/MathExtras\.h$
   src/main/native/include/wpi/NativeFormatting\.h$
   src/main/native/include/wpi/None\.h$

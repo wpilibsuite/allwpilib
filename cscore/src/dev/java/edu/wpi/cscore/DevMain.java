@@ -9,7 +9,7 @@ package edu.wpi.cscore;
 
 import edu.wpi.first.wpiutil.RuntimeDetector;
 
-public class DevMain {
+public final class DevMain {
   /**
    * Main method.
    */
@@ -17,5 +17,8 @@ public class DevMain {
     System.out.println("Hello World!");
     System.out.println(RuntimeDetector.getPlatformPath());
     System.out.println(CameraServerJNI.getHostname());
+  }
+
+  private DevMain() {
   }
 }

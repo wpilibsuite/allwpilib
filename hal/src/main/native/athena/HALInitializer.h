@@ -39,7 +39,6 @@ extern void InitializeHAL();
 extern void InitializeI2C();
 extern void InitialzeInterrupts();
 extern void InitializeNotifier();
-extern void InitializeOSSerialPort();
 extern void InitializePCMInternal();
 extern void InitializePDP();
 extern void InitializePorts();

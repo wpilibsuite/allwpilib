@@ -24,6 +24,7 @@ public class SmartDashboardTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(SmartDashboardTest.class.getName());
   private static final NetworkTable table = NetworkTable.getTable("SmartDashboard");
 
+  @Override
   protected Logger getClassLogger() {
     return logger;
   }

@@ -21,13 +21,15 @@ using namespace frc;
 
 PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
 
-PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
+/**
+ * Initialize the PDP.
+ */
+PowerDistributionPanel::PowerDistributionPanel(int module) {
   int32_t status = 0;
-  HAL_InitializePDP(m_module, &status);
+  m_handle = HAL_InitializePDP(module, &status);
   if (status != 0) {
     wpi_setErrorWithContextRange(status, 0, HAL_GetNumPDPModules(), module,
                                  HAL_GetErrorMessage(status));
-    m_module = -1;
     return;
   }
   SetName("PowerDistributionPanel", module);
@@ -36,7 +38,7 @@ PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
 double PowerDistributionPanel::GetVoltage() const {
   int32_t status = 0;
 
-  double voltage = HAL_GetPDPVoltage(m_module, &status);
+  double voltage = HAL_GetPDPVoltage(m_handle, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -48,7 +50,7 @@ double PowerDistributionPanel::GetVoltage() const {
 double PowerDistributionPanel::GetTemperature() const {
   int32_t status = 0;
 
-  double temperature = HAL_GetPDPTemperature(m_module, &status);
+  double temperature = HAL_GetPDPTemperature(m_handle, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -67,7 +69,7 @@ double PowerDistributionPanel::GetCurrent(int channel) const {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
   }
 
-  double current = HAL_GetPDPChannelCurrent(m_module, channel, &status);
+  double current = HAL_GetPDPChannelCurrent(m_handle, channel, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -79,7 +81,7 @@ double PowerDistributionPanel::GetCurrent(int channel) const {
 double PowerDistributionPanel::GetTotalCurrent() const {
   int32_t status = 0;
 
-  double current = HAL_GetPDPTotalCurrent(m_module, &status);
+  double current = HAL_GetPDPTotalCurrent(m_handle, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -91,7 +93,7 @@ double PowerDistributionPanel::GetTotalCurrent() const {
 double PowerDistributionPanel::GetTotalPower() const {
   int32_t status = 0;
 
-  double power = HAL_GetPDPTotalPower(m_module, &status);
+  double power = HAL_GetPDPTotalPower(m_handle, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -103,7 +105,7 @@ double PowerDistributionPanel::GetTotalPower() const {
 double PowerDistributionPanel::GetTotalEnergy() const {
   int32_t status = 0;
 
-  double energy = HAL_GetPDPTotalEnergy(m_module, &status);
+  double energy = HAL_GetPDPTotalEnergy(m_handle, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -115,7 +117,7 @@ double PowerDistributionPanel::GetTotalEnergy() const {
 void PowerDistributionPanel::ResetTotalEnergy() {
   int32_t status = 0;
 
-  HAL_ResetPDPTotalEnergy(m_module, &status);
+  HAL_ResetPDPTotalEnergy(m_handle, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -125,7 +127,7 @@ void PowerDistributionPanel::ResetTotalEnergy() {
 void PowerDistributionPanel::ClearStickyFaults() {
   int32_t status = 0;
 
-  HAL_ClearPDPStickyFaults(m_module, &status);
+  HAL_ClearPDPStickyFaults(m_handle, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");

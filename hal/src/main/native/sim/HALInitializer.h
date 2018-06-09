@@ -57,7 +57,6 @@ extern void InitializeI2C();
 extern void InitializeInterrupts();
 extern void InitializeMockHooks();
 extern void InitializeNotifier();
-extern void InitializeOSSerialPort();
 extern void InitializePDP();
 extern void InitializePorts();
 extern void InitializePower();

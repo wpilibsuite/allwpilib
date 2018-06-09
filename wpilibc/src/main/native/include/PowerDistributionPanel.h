@@ -78,7 +78,7 @@ class PowerDistributionPanel : public ErrorBase, public SendableBase {
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  int m_module;
+  int m_handle;
 };
 
 }  // namespace frc

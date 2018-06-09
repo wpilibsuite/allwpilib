@@ -22,6 +22,7 @@ import static java.util.Objects.requireNonNull;
  * <p>This class is intended to be used by sensor (and other I2C device) drivers. It probably should
  * not be used directly.
  */
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public class I2C implements AutoCloseable {
   public enum Port {
     kOnboard(0), kMXP(1);
@@ -99,6 +100,7 @@ public class I2C implements AutoCloseable {
    * @param receiveSize  Number of bytes to read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   public synchronized boolean transaction(ByteBuffer dataToSend, int sendSize,
                                           ByteBuffer dataReceived, int receiveSize) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {
@@ -231,7 +233,7 @@ public class I2C implements AutoCloseable {
     return transaction(registerAddressArray, registerAddressArray.length, buffer, count);
   }
 
-  private ByteBuffer m_readDataToSendBuffer = null;
+  private ByteBuffer m_readDataToSendBuffer;
 
   /**
    * Execute a read transaction with the device.
@@ -352,12 +354,11 @@ public class I2C implements AutoCloseable {
     byte[] dataToSend = new byte[1];
 
     byte[] deviceData = new byte[4];
-    for (int i = 0, curRegisterAddress = registerAddress;
-         i < count; i += 4, curRegisterAddress += 4) {
+    for (int i = 0; i < count; i += 4) {
       int toRead = count - i < 4 ? count - i : 4;
       // Read the chunk of data. Return false if the sensor does not
       // respond.
-      dataToSend[0] = (byte) curRegisterAddress;
+      dataToSend[0] = (byte) (registerAddress + i);
       if (transaction(dataToSend, 1, deviceData, toRead)) {
         return false;
       }

@@ -207,14 +207,8 @@ class CallbackManager {
     if (!thr) return true;
 
     auto& lock = thr.GetLock();
-#if defined(_MSC_VER) && _MSC_VER < 1900
-    auto timeout_time = std::chrono::steady_clock::now() +
-                        std::chrono::duration<int64_t, std::nano>(
-                            static_cast<int64_t>(timeout * 1e9));
-#else
     auto timeout_time = std::chrono::steady_clock::now() +
                         std::chrono::duration<double>(timeout);
-#endif
     while (!thr->m_queue.empty()) {
       if (!thr->m_active) return true;
       if (timeout == 0) return false;
@@ -247,14 +241,8 @@ class CallbackManager {
     }
 
     std::unique_lock<wpi::mutex> lock(poller->poll_mutex);
-#if defined(_MSC_VER) && _MSC_VER < 1900
-    auto timeout_time = std::chrono::steady_clock::now() +
-                        std::chrono::duration<int64_t, std::nano>(
-                            static_cast<int64_t>(timeout * 1e9));
-#else
     auto timeout_time = std::chrono::steady_clock::now() +
                         std::chrono::duration<double>(timeout);
-#endif
     *timed_out = false;
     while (poller->poll_queue.empty()) {
       if (poller->terminating) return infos;
