@@ -7,9 +7,11 @@
 
 #pragma once
 
+#include <atomic>
 #include <thread>
 
 #include <HAL/HAL.h>
+#include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
 
 #include "Base.h"
@@ -18,8 +20,25 @@ namespace frc {
 
 class DriverStation;
 
+namespace detail {
 template <class Robot>
-int StartRobot() {
+Robot& GetRobotImpl() {
+  static Robot robot;
+  return robot;
+}
+}  // namespace detail
+
+template <class Robot>
+Robot& GetRobot() {
+  static std::atomic_bool initialized{false};
+  static wpi::mutex initializeMutex;
+  // Initial check, as if it's true initialization has finished
+  if (initialized) return detail::GetRobotImpl<Robot>();
+
+  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  // Second check in case another thread was waiting
+  if (initialized) return detail::GetRobotImpl<Robot>();
+
   if (!HAL_Initialize(500, 0)) {
     wpi::errs() << "FATAL ERROR: HAL could not be initialized\n";
     return -1;
@@ -27,9 +46,15 @@ int StartRobot() {
   HAL_Report(HALUsageReporting::kResourceType_Language,
              HALUsageReporting::kLanguage_CPlusPlus);
   wpi::outs() << "\n********** Robot program starting **********\n";
-  static Robot robot;
-  robot.StartCompetition();
 
+  auto& robot = detail::GetRobotImpl<Robot>();
+  initialized = true;
+  return robot;
+}
+
+template <class Robot>
+int StartRobot() {
+  GetRobot<Robot>().StartCompetition();
   return 0;
 }
 
