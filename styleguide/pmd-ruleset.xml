@@ -7,7 +7,7 @@
   <description>PMD Ruleset for WPILib</description>
 
   <exclude-pattern>.*/*JNI.*</exclude-pattern>
-  <exclude-pattern>.*/*Test.*</exclude-pattern>
+  <exclude-pattern>.*/*IntegrationTests.*</exclude-pattern>
 
   <rule ref="category/java/bestpractices.xml">
     <exclude name="AccessorClassGeneration" />
@@ -16,12 +16,20 @@
     <exclude name="AvoidReassigningParameters" />
     <exclude name="JUnitAssertionsShouldIncludeMessage" />
     <exclude name="JUnitTestContainsTooManyAsserts" />
+    <exclude name="JUnit4TestShouldUseAfterAnnotation" />
+    <exclude name="JUnit4TestShouldUseBeforeAnnotation" />
     <exclude name="JUnit4TestShouldUseTestAnnotation" />
     <exclude name="ReplaceHashtableWithMap" />
     <exclude name="ReplaceVectorWithList" />
     <exclude name="SwitchStmtsShouldHaveDefault" />
     <exclude name="SystemPrintln" />
     <exclude name="UseVarargs" />
+  </rule>
+  <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod">
+    <properties>
+      <property name="violationSuppressRegex"
+                value=".*'.*Arguments\(\)'.*" />
+    </properties>
   </rule>
 
   <rule ref="category/java/design.xml">
@@ -61,33 +69,6 @@
         class="net.sourceforge.pmd.lang.java.rule.migrating.UnnecessaryCastRule"
         externalInfoUrl="https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/migrating/UnnecessaryCastRule.java" />
 
-  <!--
-  <rule ref="rulesets/java/basic.xml" />
-  <rule ref="rulesets/java/braces.xml" />
-  <rule ref="rulesets/java/empty.xml" />
-  <rule ref="rulesets/java/empty.xml/EmptyCatchBlock">
-    <properties>
-      <property name="allowCommentedBlocks"
-                value="true" />
-    </properties>
-  </rule>
-  <rule ref="rulesets/java/imports.xml" />
-  <rule ref="rulesets/java/junit.xml">
-    <exclude name="JUnitTestContainsTooManyAsserts" />
-  </rule>
-  <rule ref="rulesets/java/strings.xml">
-    <exclude name="AvoidDuplicateLiterals" />
-  </rule>
-  <rule ref="rulesets/java/unnecessary.xml" />
-  <rule ref="rulesets/java/unusedcode.xml" />
-  <rule ref="rulesets/java/unusedcode.xml/UnusedFormalParameter">
-    <properties>
-      <property name="checkAll"
-                value="true" />
-    </properties>
-  </rule>
-  -->
-
   <!-- Custom Rules -->
   <rule name="UseRequireNonNull"
         message="Use Objects.requireNonNull() instead of throwing a NullPointerException yourself."
@@ -98,9 +79,9 @@
     <properties>
       <property name="xpath">
         <value>
-<![CDATA[
-                        //IfStatement[child::Expression//NullLiteral]/Statement//ThrowStatement/Expression/PrimaryExpression/PrimaryPrefix/AllocationExpression/ClassOrInterfaceType[@Image='NullPointerException']
-                    ]]>
+          <![CDATA[
+            //IfStatement[child::Expression//NullLiteral]/Statement//ThrowStatement/Expression/PrimaryExpression/PrimaryPrefix/AllocationExpression/ClassOrInterfaceType[@Image='NullPointerException']
+          ]]>
         </value>
       </property>
     </properties>

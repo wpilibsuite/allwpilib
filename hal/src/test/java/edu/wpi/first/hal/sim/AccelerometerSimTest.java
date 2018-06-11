@@ -7,25 +7,24 @@
 
 package edu.wpi.first.hal.sim;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.hal.AccelerometerJNI;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.sim.AccelerometerSim;
 import edu.wpi.first.wpilibj.sim.CallbackStore;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AccelerometerSimTest {
+class AccelerometerSimTest {
   static class TriggeredStore {
-    public boolean wasTriggered = false;
+    public boolean wasTriggered;
     public boolean setValue = true;
   }
 
   @Test
-  public void testCallbacks() {
+  void testCallbacks() {
     HAL.initialize(500, 0);
     AccelerometerSim sim = new AccelerometerSim();
     sim.resetData();

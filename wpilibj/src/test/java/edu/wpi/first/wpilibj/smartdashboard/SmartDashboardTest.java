@@ -9,8 +9,8 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import edu.wpi.first.wpilibj.UtilityClassTest;
 
-public class SmartDashboardTest extends UtilityClassTest {
-  public SmartDashboardTest() {
+class SmartDashboardTest extends UtilityClassTest {
+  SmartDashboardTest() {
     super(SmartDashboard.class);
   }
 }
