@@ -62,10 +62,4 @@ public interface Gyro extends AutoCloseable {
    */
   @Deprecated
   void free();
-
-  /**
-   * Free the resources used by the gyro.
-   */
-  @Override
-  void close();
 }
