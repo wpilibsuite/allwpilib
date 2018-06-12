@@ -11,21 +11,15 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Stopwatch;
 
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
 
-/**
- * Utility class for configuring unit tests.
- */
-public final class UnitTestUtility {
-  private UnitTestUtility() {
-        /* no-op */
-  }
-
-  /**
-   * Sets up the base system WPILib so that it does not rely on hardware.
-   */
-  public static void setupMockBase() {
+public final class MockHardwareExtension implements BeforeAllCallback {
+  @Override
+  public void beforeAll(ExtensionContext context) throws Exception {
     HAL.initialize(500, 0);
     try {
       // Check to see if this has been setup

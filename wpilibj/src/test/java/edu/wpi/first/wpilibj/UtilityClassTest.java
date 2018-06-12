@@ -13,7 +13,6 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -26,11 +25,6 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class UtilityClassTest {
-  @BeforeAll
-  static void setup() {
-    UnitTestUtility.setupMockBase();
-  }
-
   private final Class m_clazz;
 
   protected UtilityClassTest(Class clazz) {

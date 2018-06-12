@@ -7,8 +7,12 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import edu.wpi.first.wpilibj.MockHardwareExtension;
 import edu.wpi.first.wpilibj.UtilityClassTest;
 
+@ExtendWith(MockHardwareExtension.class)
 class SmartDashboardTest extends UtilityClassTest {
   SmartDashboardTest() {
     super(SmartDashboard.class);

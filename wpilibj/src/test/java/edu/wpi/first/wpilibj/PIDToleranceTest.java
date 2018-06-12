@@ -8,23 +8,19 @@
 package edu.wpi.first.wpilibj;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(MockHardwareExtension.class)
 class PIDToleranceTest {
   private PIDController m_pid;
   private static final double m_setPoint = 50.0;
   private static final double m_tolerance = 10.0;
   private static final double m_range = 200;
-
-  @BeforeAll
-  static void setupClass() {
-    UnitTestUtility.setupMockBase();
-  }
 
   private class FakeInput implements PIDSource {
     public double m_val;

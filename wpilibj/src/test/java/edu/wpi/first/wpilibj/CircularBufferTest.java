@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,11 +18,6 @@ class CircularBufferTest {
       716.126, 234.252, 342.657};
   private final double[] m_addLastOut = {342.657, 234.252, 716.126, 132.344, 445.697,
       22.727, 421.125, 799.913};
-
-  @BeforeAll
-  static void before() {
-    UnitTestUtility.setupMockBase();
-  }
 
   @Test
   void addFirstTest() {
