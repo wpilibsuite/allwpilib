@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.sim;
 import edu.wpi.first.hal.sim.mockdata.RelayDataJNI;
 
 public class RelaySim {
-  private int m_index;
+  private final int m_index;
 
   public RelaySim(int index) {
     m_index = index;

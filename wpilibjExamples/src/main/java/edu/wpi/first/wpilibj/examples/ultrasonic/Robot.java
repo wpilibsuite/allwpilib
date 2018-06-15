@@ -31,8 +31,8 @@ public class Robot extends IterativeRobot {
   private static final int kRightMotorPort = 1;
   private static final int kUltrasonicPort = 0;
 
-  private AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
-  private DifferentialDrive m_robotDrive
+  private final AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
+  private final DifferentialDrive m_robotDrive
       = new DifferentialDrive(new Spark(kLeftMotorPort),
       new Spark(kRightMotorPort));
 
@@ -40,6 +40,7 @@ public class Robot extends IterativeRobot {
    * Tells the robot to drive to a set distance (in inches) from an object
    * using proportional control.
    */
+  @Override
   public void teleopPeriodic() {
     // sensor returns a value from 0-4095 that is scaled to inches
     double currentDistance = m_ultrasonic.getValue() * kValueToInches;

@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj.hal;
 
 @SuppressWarnings("AbbreviationAsWordInName")
-public class HALUtil extends JNIWrapper {
+public final class HALUtil extends JNIWrapper {
   public static final int NULL_PARAMETER = -1005;
   public static final int SAMPLE_RATE_TOO_HIGH = 1001;
   public static final int VOLTAGE_OUT_OF_RANGE = 1002;
@@ -36,5 +36,9 @@ public class HALUtil extends JNIWrapper {
 
   public static String getHALstrerror() {
     return getHALstrerror(getHALErrno());
+  }
+
+  private HALUtil() {
+
   }
 }

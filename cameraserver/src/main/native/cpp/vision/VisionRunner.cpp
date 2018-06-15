@@ -15,12 +15,6 @@
 
 using namespace frc;
 
-/**
- * Creates a new vision runner. It will take images from the {@code
- * videoSource}, and call the virtual DoProcess() method.
- *
- * @param videoSource the video source to use to supply images for the pipeline
- */
 VisionRunnerBase::VisionRunnerBase(cs::VideoSource videoSource)
     : m_image(std::make_unique<cv::Mat>()),
       m_cvSink("VisionRunner CvSink"),
@@ -31,19 +25,6 @@ VisionRunnerBase::VisionRunnerBase(cs::VideoSource videoSource)
 // Located here and not in header due to cv::Mat forward declaration.
 VisionRunnerBase::~VisionRunnerBase() {}
 
-/**
- * Runs the pipeline one time, giving it the next image from the video source
- * specified in the constructor. This will block until the source either has an
- * image or throws an error. If the source successfully supplied a frame, the
- * pipeline's image input will be set, the pipeline will run, and the listener
- * specified in the constructor will be called to notify it that the pipeline
- * ran. This must be run in a dedicated thread, and cannot be used in the main
- * robot thread because it will freeze the robot program.
- *
- * <p>This method is exposed to allow teams to add additional functionality or
- * have their own ways to run the pipeline. Most teams, however, should just
- * use {@link #runForever} in its own thread using a std::thread.</p>
- */
 void VisionRunnerBase::RunOnce() {
   auto csShared = frc::GetCameraServerShared();
   auto res = csShared->GetRobotMainThreadId();
@@ -61,13 +42,6 @@ void VisionRunnerBase::RunOnce() {
   }
 }
 
-/**
- * A convenience method that calls {@link #runOnce()} in an infinite loop. This
- * must be run in a dedicated thread, and cannot be used in the main robot
- * thread because it will freeze the robot program.
- *
- * <strong>Do not call this method directly from the main thread.</strong>
- */
 void VisionRunnerBase::RunForever() {
   auto csShared = frc::GetCameraServerShared();
   auto res = csShared->GetRobotMainThreadId();
@@ -82,7 +56,4 @@ void VisionRunnerBase::RunForever() {
   }
 }
 
-/**
- * Stop a RunForever() loop.
- */
 void VisionRunnerBase::Stop() { m_enabled = false; }

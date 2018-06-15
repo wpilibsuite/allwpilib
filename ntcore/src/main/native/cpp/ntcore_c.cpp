@@ -100,19 +100,14 @@ static void ConvertToC(const LogMessage& in, NT_LogMessage* out) {
   ConvertToC(in.message, &out->message);
 }
 
-template <typename I, typename O>
-static void ConvertToC(const std::vector<I>& in, O** out, size_t* out_len) {
-  if (!out || !out_len) return;
+template <typename O, typename I>
+static O* ConvertToC(const std::vector<I>& in, size_t* out_len) {
+  if (!out_len) return nullptr;
   *out_len = in.size();
-  if (in.empty()) {
-    *out = nullptr;
-    return;
-  }
-  *out = static_cast<O*>(wpi::CheckedMalloc(sizeof(O*) * in.size()));
-  for (size_t i = 0; i < in.size(); ++i) {
-    out[i] = static_cast<O*>(wpi::CheckedMalloc(sizeof(O)));
-    ConvertToC(in[i], out[i]);
-  }
+  if (in.empty()) return nullptr;
+  O* out = static_cast<O*>(wpi::CheckedMalloc(sizeof(O) * in.size()));
+  for (size_t i = 0; i < in.size(); ++i) ConvertToC(in[i], &out[i]);
+  return out;
 }
 
 static void DisposeConnectionInfo(NT_ConnectionInfo* info) {
@@ -247,14 +242,7 @@ struct NT_EntryInfo* NT_GetEntryInfo(NT_Inst inst, const char* prefix,
                                      size_t prefix_len, unsigned int types,
                                      size_t* count) {
   auto info_v = nt::GetEntryInfo(inst, StringRef(prefix, prefix_len), types);
-  *count = info_v.size();
-  if (info_v.size() == 0) return nullptr;
-
-  // create array and copy into it
-  NT_EntryInfo* info = static_cast<NT_EntryInfo*>(
-      wpi::CheckedMalloc(info_v.size() * sizeof(NT_EntryInfo)));
-  for (size_t i = 0; i < info_v.size(); ++i) ConvertToC(info_v[i], &info[i]);
-  return info;
+  return ConvertToC<NT_EntryInfo>(info_v, count);
 }
 
 NT_Bool NT_GetEntryInfoHandle(NT_Entry entry, struct NT_EntryInfo* info) {
@@ -320,9 +308,7 @@ NT_EntryListener NT_AddPolledEntryListenerSingle(NT_EntryListenerPoller poller,
 struct NT_EntryNotification* NT_PollEntryListener(NT_EntryListenerPoller poller,
                                                   size_t* len) {
   auto arr_cpp = nt::PollEntryListener(poller);
-  NT_EntryNotification* arr;
-  ConvertToC(arr_cpp, &arr, len);
-  return arr;
+  return ConvertToC<NT_EntryNotification>(arr_cpp, len);
 }
 
 struct NT_EntryNotification* NT_PollEntryListenerTimeout(
@@ -331,9 +317,7 @@ struct NT_EntryNotification* NT_PollEntryListenerTimeout(
   bool cpp_timed_out = false;
   auto arr_cpp = nt::PollEntryListener(poller, timeout, &cpp_timed_out);
   *timed_out = cpp_timed_out;
-  NT_EntryNotification* arr;
-  ConvertToC(arr_cpp, &arr, len);
-  return arr;
+  return ConvertToC<NT_EntryNotification>(arr_cpp, len);
 }
 
 void NT_CancelPollEntryListener(NT_EntryListenerPoller poller) {
@@ -377,9 +361,7 @@ NT_ConnectionListener NT_AddPolledConnectionListener(
 struct NT_ConnectionNotification* NT_PollConnectionListener(
     NT_ConnectionListenerPoller poller, size_t* len) {
   auto arr_cpp = nt::PollConnectionListener(poller);
-  NT_ConnectionNotification* arr;
-  ConvertToC(arr_cpp, &arr, len);
-  return arr;
+  return ConvertToC<NT_ConnectionNotification>(arr_cpp, len);
 }
 
 struct NT_ConnectionNotification* NT_PollConnectionListenerTimeout(
@@ -388,9 +370,7 @@ struct NT_ConnectionNotification* NT_PollConnectionListenerTimeout(
   bool cpp_timed_out = false;
   auto arr_cpp = nt::PollConnectionListener(poller, timeout, &cpp_timed_out);
   *timed_out = cpp_timed_out;
-  NT_ConnectionNotification* arr;
-  ConvertToC(arr_cpp, &arr, len);
-  return arr;
+  return ConvertToC<NT_ConnectionNotification>(arr_cpp, len);
 }
 
 void NT_CancelPollConnectionListener(NT_ConnectionListenerPoller poller) {
@@ -434,9 +414,7 @@ void NT_CreatePolledRpc(NT_Entry entry, const char* def, size_t def_len,
 
 NT_RpcAnswer* NT_PollRpc(NT_RpcCallPoller poller, size_t* len) {
   auto arr_cpp = nt::PollRpc(poller);
-  NT_RpcAnswer* arr;
-  ConvertToC(arr_cpp, &arr, len);
-  return arr;
+  return ConvertToC<NT_RpcAnswer>(arr_cpp, len);
 }
 
 NT_RpcAnswer* NT_PollRpcTimeout(NT_RpcCallPoller poller, size_t* len,
@@ -444,9 +422,7 @@ NT_RpcAnswer* NT_PollRpcTimeout(NT_RpcCallPoller poller, size_t* len,
   bool cpp_timed_out = false;
   auto arr_cpp = nt::PollRpc(poller, timeout, &cpp_timed_out);
   *timed_out = cpp_timed_out;
-  NT_RpcAnswer* arr;
-  ConvertToC(arr_cpp, &arr, len);
-  return arr;
+  return ConvertToC<NT_RpcAnswer>(arr_cpp, len);
 }
 
 void NT_CancelPollRpc(NT_RpcCallPoller poller) { nt::CancelPollRpc(poller); }
@@ -455,9 +431,9 @@ NT_Bool NT_WaitForRpcCallQueue(NT_Inst inst, double timeout) {
   return nt::WaitForRpcCallQueue(inst, timeout);
 }
 
-void NT_PostRpcResponse(NT_Entry entry, NT_RpcCall call, const char* result,
-                        size_t result_len) {
-  nt::PostRpcResponse(entry, call, StringRef(result, result_len));
+NT_Bool NT_PostRpcResponse(NT_Entry entry, NT_RpcCall call, const char* result,
+                           size_t result_len) {
+  return nt::PostRpcResponse(entry, call, StringRef(result, result_len));
 }
 
 NT_RpcCall NT_CallRpc(NT_Entry entry, const char* params, size_t params_len) {
@@ -624,14 +600,7 @@ NT_Bool NT_IsConnected(NT_Inst inst) { return nt::IsConnected(inst); }
 
 struct NT_ConnectionInfo* NT_GetConnections(NT_Inst inst, size_t* count) {
   auto conn_v = nt::GetConnections(inst);
-  *count = conn_v.size();
-  if (conn_v.size() == 0) return nullptr;
-
-  // create array and copy into it
-  NT_ConnectionInfo* conn = static_cast<NT_ConnectionInfo*>(
-      wpi::CheckedMalloc(conn_v.size() * sizeof(NT_ConnectionInfo)));
-  for (size_t i = 0; i < conn_v.size(); ++i) ConvertToC(conn_v[i], &conn[i]);
-  return conn;
+  return ConvertToC<NT_ConnectionInfo>(conn_v, count);
 }
 
 /*
@@ -691,9 +660,7 @@ NT_Logger NT_AddPolledLogger(NT_LoggerPoller poller, unsigned int min_level,
 
 struct NT_LogMessage* NT_PollLogger(NT_LoggerPoller poller, size_t* len) {
   auto arr_cpp = nt::PollLogger(poller);
-  NT_LogMessage* arr;
-  ConvertToC(arr_cpp, &arr, len);
-  return arr;
+  return ConvertToC<NT_LogMessage>(arr_cpp, len);
 }
 
 struct NT_LogMessage* NT_PollLoggerTimeout(NT_LoggerPoller poller, size_t* len,
@@ -701,9 +668,7 @@ struct NT_LogMessage* NT_PollLoggerTimeout(NT_LoggerPoller poller, size_t* len,
   bool cpp_timed_out = false;
   auto arr_cpp = nt::PollLogger(poller, timeout, &cpp_timed_out);
   *timed_out = cpp_timed_out;
-  NT_LogMessage* arr;
-  ConvertToC(arr_cpp, &arr, len);
-  return arr;
+  return ConvertToC<NT_LogMessage>(arr_cpp, len);
 }
 
 void NT_CancelPollLogger(NT_LoggerPoller poller) {

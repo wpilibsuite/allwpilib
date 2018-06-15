@@ -15,8 +15,21 @@ namespace frc {
 
 class WaitCommand : public TimedCommand {
  public:
+  /**
+   * Creates a new WaitCommand with the given name and timeout.
+   *
+   * @param name    the name of the command
+   * @param timeout the time (in seconds) before this command "times out"
+   */
   explicit WaitCommand(double timeout);
+
+  /**
+   * Creates a new WaitCommand with the given timeout.
+   *
+   * @param timeout the time (in seconds) before this command "times out"
+   */
   WaitCommand(const wpi::Twine& name, double timeout);
+
   virtual ~WaitCommand() = default;
 };
 

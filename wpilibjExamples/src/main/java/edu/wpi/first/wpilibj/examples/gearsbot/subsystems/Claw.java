@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * don't stall.
  */
 public class Claw extends Subsystem {
-  private Victor m_motor = new Victor(7);
-  private DigitalInput m_contact = new DigitalInput(5);
+  private final Victor m_motor = new Victor(7);
+  private final DigitalInput m_contact = new DigitalInput(5);
 
   /**
    * Create a new claw subsystem.
@@ -48,6 +48,7 @@ public class Claw extends Subsystem {
   /**
    * Set the claw motor to move in the close direction.
    */
+  @Override
   public void close() {
     m_motor.set(1);
   }

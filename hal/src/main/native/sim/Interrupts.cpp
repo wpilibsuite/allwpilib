@@ -215,14 +215,8 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
 
   wpi::mutex waitMutex;
 
-#if defined(_MSC_VER) && _MSC_VER < 1900
-  auto timeoutTime = std::chrono::steady_clock::now() +
-                     std::chrono::duration<int64_t, std::nano>(
-                         static_cast<int64_t>(timeout * 1e9));
-#else
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
-#endif
 
   {
     std::unique_lock<wpi::mutex> lock(waitMutex);
@@ -285,14 +279,8 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
 
   wpi::mutex waitMutex;
 
-#if defined(_MSC_VER) && _MSC_VER < 1900
-  auto timeoutTime = std::chrono::steady_clock::now() +
-                     std::chrono::duration<int64_t, std::nano>(
-                         static_cast<int64_t>(timeout * 1e9));
-#else
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
-#endif
 
   {
     std::unique_lock<wpi::mutex> lock(waitMutex);

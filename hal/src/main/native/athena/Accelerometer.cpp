@@ -198,10 +198,6 @@ static double unpackAxis(int16_t raw) {
 
 extern "C" {
 
-/**
- * Set the accelerometer to active or standby mode.  It must be in standby
- * mode to change any configuration.
- */
 void HAL_SetAccelerometerActive(HAL_Bool active) {
   initializeAccelerometer();
 
@@ -210,10 +206,6 @@ void HAL_SetAccelerometerActive(HAL_Bool active) {
   writeRegister(kReg_CtrlReg1, ctrlReg1 | (active ? 1 : 0));
 }
 
-/**
- * Set the range of values that can be measured (either 2, 4, or 8 g-forces).
- * The accelerometer should be in standby mode when this is called.
- */
 void HAL_SetAccelerometerRange(HAL_AccelerometerRange range) {
   initializeAccelerometer();
 
@@ -224,11 +216,6 @@ void HAL_SetAccelerometerRange(HAL_AccelerometerRange range) {
   writeRegister(kReg_XYZDataCfg, xyzDataCfg | range);
 }
 
-/**
- * Get the x-axis acceleration
- *
- * This is a floating point value in units of 1 g-force
- */
 double HAL_GetAccelerometerX(void) {
   initializeAccelerometer();
 
@@ -237,11 +224,6 @@ double HAL_GetAccelerometerX(void) {
   return unpackAxis(raw);
 }
 
-/**
- * Get the y-axis acceleration
- *
- * This is a floating point value in units of 1 g-force
- */
 double HAL_GetAccelerometerY(void) {
   initializeAccelerometer();
 
@@ -250,11 +232,6 @@ double HAL_GetAccelerometerY(void) {
   return unpackAxis(raw);
 }
 
-/**
- * Get the z-axis acceleration
- *
- * This is a floating point value in units of 1 g-force
- */
 double HAL_GetAccelerometerZ(void) {
   initializeAccelerometer();
 

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.RelayJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.util.UncleanStatusException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -89,8 +90,8 @@ public class Relay extends SendableBase implements MotorSafety {
 
   private final int m_channel;
 
-  private int m_forwardHandle = 0;
-  private int m_reverseHandle = 0;
+  private int m_forwardHandle;
+  private int m_reverseHandle;
 
   private Direction m_direction;
 
@@ -149,12 +150,12 @@ public class Relay extends SendableBase implements MotorSafety {
   private void freeRelay() {
     try {
       RelayJNI.setRelay(m_forwardHandle, false);
-    } catch (RuntimeException ex) {
+    } catch (UncleanStatusException ignored) {
       // do nothing. Ignore
     }
     try {
       RelayJNI.setRelay(m_reverseHandle, false);
-    } catch (RuntimeException ex) {
+    } catch (UncleanStatusException ignored) {
       // do nothing. Ignore
     }
 
@@ -178,6 +179,7 @@ public class Relay extends SendableBase implements MotorSafety {
    *
    * @param value The state to set the relay.
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   public void set(Value value) {
     switch (value) {
       case kOff:

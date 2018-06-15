@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.sim;
 import edu.wpi.first.hal.sim.mockdata.SPIAccelerometerDataJNI;
 
 public class SPIAccelerometerSim {
-  private int m_index;
+  private final int m_index;
 
   public SPIAccelerometerSim(int index) {
     m_index = index;

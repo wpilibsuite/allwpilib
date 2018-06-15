@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * <p>NOTE: Simulation currently approximates this as as single pneumatic
  * cylinder and ignores the latch.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class Shooter extends Subsystem {
   // Devices
   DoubleSolenoid m_piston1 = new DoubleSolenoid(1, 3, 4);

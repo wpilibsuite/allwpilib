@@ -12,10 +12,8 @@
 #include "HALSimPrint.h"
 #include "PrintPWM.h"
 
-/**
- * Currently, robots never terminate, so we keep a single static object
- * and it is never properly released or cleaned up.
- */
+// Currently, robots never terminate, so we keep a single static object and it
+// is never properly released or cleaned up.
 static HALSimPrint halsim;
 
 extern "C" {

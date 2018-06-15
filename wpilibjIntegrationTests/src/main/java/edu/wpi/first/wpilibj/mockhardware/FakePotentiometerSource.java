@@ -83,6 +83,7 @@ public class FakePotentiometerSource implements AutoCloseable {
   /**
    * Frees the resouce.
    */
+  @Override
   public void close() {
     if (m_initOutput) {
       m_output.close();

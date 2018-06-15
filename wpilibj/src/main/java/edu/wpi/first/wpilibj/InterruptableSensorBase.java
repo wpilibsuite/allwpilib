@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.util.AllocationException;
 /**
  * Base for sensors to be used with interrupts.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public abstract class InterruptableSensorBase extends SendableBase {
   @SuppressWarnings("JavadocMethod")
   public enum WaitResult {
@@ -35,7 +36,7 @@ public abstract class InterruptableSensorBase extends SendableBase {
   /**
    * Flags if the interrupt being allocated is synchronous.
    */
-  protected boolean m_isSynchronousInterrupt = false;
+  protected boolean m_isSynchronousInterrupt;
 
   /**
    * Create a new InterrupatableSensorBase.

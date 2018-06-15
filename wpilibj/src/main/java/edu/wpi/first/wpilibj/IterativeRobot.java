@@ -27,6 +27,7 @@ public class IterativeRobot extends IterativeRobotBase {
   /**
    * Provide an alternate "main loop" via startCompetition().
    */
+  @Override
   public void startCompetition() {
     robotInit();
 

@@ -18,13 +18,6 @@
 
 using namespace frc;
 
-/**
- * Construct an analog output on the given channel.
- *
- * All analog outputs are located on the MXP port.
- *
- * @param channel The channel number on the roboRIO to represent.
- */
 AnalogOutput::AnalogOutput(int channel) {
   if (!SensorUtil::CheckAnalogOutputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
@@ -51,23 +44,8 @@ AnalogOutput::AnalogOutput(int channel) {
   SetName("AnalogOutput", m_channel);
 }
 
-/**
- * Destructor.
- *
- * Frees analog output resource.
- */
 AnalogOutput::~AnalogOutput() { HAL_FreeAnalogOutputPort(m_port); }
 
-/**
- * Get the channel of this AnalogOutput.
- */
-int AnalogOutput::GetChannel() { return m_channel; }
-
-/**
- * Set the value of the analog output.
- *
- * @param voltage The output value in Volts, from 0.0 to +5.0
- */
 void AnalogOutput::SetVoltage(double voltage) {
   int32_t status = 0;
   HAL_SetAnalogOutput(m_port, voltage, &status);
@@ -75,11 +53,6 @@ void AnalogOutput::SetVoltage(double voltage) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-/**
- * Get the voltage of the analog output
- *
- * @return The value in Volts, from 0.0 to +5.0
- */
 double AnalogOutput::GetVoltage() const {
   int32_t status = 0;
   double voltage = HAL_GetAnalogOutput(m_port, &status);
@@ -88,6 +61,8 @@ double AnalogOutput::GetVoltage() const {
 
   return voltage;
 }
+
+int AnalogOutput::GetChannel() { return m_channel; }
 
 void AnalogOutput::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Output");

@@ -22,28 +22,10 @@ constexpr const T& clamp(const T& value, const T& low, const T& high) {
   return std::max(low, std::min(value, high));
 }
 
-/**
- * Allocate a PID object with the given constants for P, I, D.
- *
- * @param Kp     the proportional coefficient
- * @param Ki     the integral coefficient
- * @param Kd     the derivative coefficient
- * @param source The PIDSource object that is used to get values
- * @param output The PIDOutput object that is set to the output value
- */
 PIDBase::PIDBase(double Kp, double Ki, double Kd, PIDSource& source,
                  PIDOutput& output)
     : PIDBase(Kp, Ki, Kd, 0.0, source, output) {}
 
-/**
- * Allocate a PID object with the given constants for P, I, D.
- *
- * @param Kp     the proportional coefficient
- * @param Ki     the integral coefficient
- * @param Kd     the derivative coefficient
- * @param source The PIDSource object that is used to get values
- * @param output The PIDOutput object that is set to the output value
- */
 PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
                  PIDOutput& output)
     : SendableBase(false) {
@@ -69,10 +51,203 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
   SetName("PIDController", instances);
 }
 
-/**
- * Read the input, calculate the output accordingly, and write to the output.
- * This should only be called by the Notifier.
- */
+double PIDBase::Get() const {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  return m_result;
+}
+
+void PIDBase::SetContinuous(bool continuous) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_continuous = continuous;
+}
+
+void PIDBase::SetInputRange(double minimumInput, double maximumInput) {
+  {
+    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+    m_minimumInput = minimumInput;
+    m_maximumInput = maximumInput;
+    m_inputRange = maximumInput - minimumInput;
+  }
+
+  SetSetpoint(m_setpoint);
+}
+
+void PIDBase::SetOutputRange(double minimumOutput, double maximumOutput) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_minimumOutput = minimumOutput;
+  m_maximumOutput = maximumOutput;
+}
+
+void PIDBase::SetPID(double p, double i, double d) {
+  {
+    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+    m_P = p;
+    m_I = i;
+    m_D = d;
+  }
+}
+
+void PIDBase::SetPID(double p, double i, double d, double f) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_P = p;
+  m_I = i;
+  m_D = d;
+  m_F = f;
+}
+
+void PIDBase::SetP(double p) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_P = p;
+}
+
+void PIDBase::SetI(double i) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_I = i;
+}
+
+void PIDBase::SetD(double d) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_D = d;
+}
+
+void PIDBase::SetF(double f) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_F = f;
+}
+
+double PIDBase::GetP() const {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  return m_P;
+}
+
+double PIDBase::GetI() const {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  return m_I;
+}
+
+double PIDBase::GetD() const {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  return m_D;
+}
+
+double PIDBase::GetF() const {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  return m_F;
+}
+
+void PIDBase::SetSetpoint(double setpoint) {
+  {
+    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+
+    if (m_maximumInput > m_minimumInput) {
+      if (setpoint > m_maximumInput)
+        m_setpoint = m_maximumInput;
+      else if (setpoint < m_minimumInput)
+        m_setpoint = m_minimumInput;
+      else
+        m_setpoint = setpoint;
+    } else {
+      m_setpoint = setpoint;
+    }
+  }
+}
+
+double PIDBase::GetSetpoint() const {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  return m_setpoint;
+}
+
+double PIDBase::GetDeltaSetpoint() const {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  return (m_setpoint - m_prevSetpoint) / m_setpointTimer.Get();
+}
+
+double PIDBase::GetError() const {
+  double setpoint = GetSetpoint();
+  {
+    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+    return GetContinuousError(setpoint - m_pidInput->PIDGet());
+  }
+}
+
+double PIDBase::GetAvgError() const { return GetError(); }
+
+void PIDBase::SetPIDSourceType(PIDSourceType pidSource) {
+  m_pidInput->SetPIDSourceType(pidSource);
+}
+
+PIDSourceType PIDBase::GetPIDSourceType() const {
+  return m_pidInput->GetPIDSourceType();
+}
+
+void PIDBase::SetTolerance(double percent) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_toleranceType = kPercentTolerance;
+  m_tolerance = percent;
+}
+
+void PIDBase::SetAbsoluteTolerance(double absTolerance) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_toleranceType = kAbsoluteTolerance;
+  m_tolerance = absTolerance;
+}
+
+void PIDBase::SetPercentTolerance(double percent) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_toleranceType = kPercentTolerance;
+  m_tolerance = percent;
+}
+
+void PIDBase::SetToleranceBuffer(int bufLength) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+
+  // Create LinearDigitalFilter with original source as its source argument
+  m_filter = LinearDigitalFilter::MovingAverage(m_origSource, bufLength);
+  m_pidInput = &m_filter;
+}
+
+bool PIDBase::OnTarget() const {
+  double error = GetError();
+
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  switch (m_toleranceType) {
+    case kPercentTolerance:
+      return std::fabs(error) < m_tolerance / 100 * m_inputRange;
+      break;
+    case kAbsoluteTolerance:
+      return std::fabs(error) < m_tolerance;
+      break;
+    case kNoTolerance:
+      // TODO: this case needs an error
+      return false;
+  }
+  return false;
+}
+
+void PIDBase::Reset() {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_prevError = 0;
+  m_totalError = 0;
+  m_result = 0;
+}
+
+void PIDBase::PIDWrite(double output) { SetSetpoint(output); }
+
+void PIDBase::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("PIDBase");
+  builder.SetSafeState([=]() { Reset(); });
+  builder.AddDoubleProperty("p", [=]() { return GetP(); },
+                            [=](double value) { SetP(value); });
+  builder.AddDoubleProperty("i", [=]() { return GetI(); },
+                            [=](double value) { SetI(value); });
+  builder.AddDoubleProperty("d", [=]() { return GetD(); },
+                            [=](double value) { SetD(value); });
+  builder.AddDoubleProperty("f", [=]() { return GetF(); },
+                            [=](double value) { SetF(value); });
+  builder.AddDoubleProperty("setpoint", [=]() { return GetSetpoint(); },
+                            [=](double value) { SetSetpoint(value); });
+}
+
 void PIDBase::Calculate() {
   if (m_origSource == nullptr || m_pidOutput == nullptr) return;
 
@@ -158,21 +333,6 @@ void PIDBase::Calculate() {
   }
 }
 
-/**
- * Calculate the feed forward term.
- *
- * Both of the provided feed forward calculations are velocity feed forwards.
- * If a different feed forward calculation is desired, the user can override
- * this function and provide his or her own. This function does no
- * synchronization because the PIDBase class only calls it in synchronized
- * code, so be careful if calling it oneself.
- *
- * If a velocity PID controller is being used, the F term should be set to 1
- * over the maximum setpoint for the output. If a position PID controller is
- * being used, the F term should be set to 1 over the maximum speed for the
- * output measured in setpoint units per this controller's update period (see
- * the default period in this class's constructor).
- */
 double PIDBase::CalculateFeedForward() {
   if (m_pidInput->GetPIDSourceType() == PIDSourceType::kRate) {
     return m_F * GetSetpoint();
@@ -184,384 +344,6 @@ double PIDBase::CalculateFeedForward() {
   }
 }
 
-/**
- * Set the PID Controller gain parameters.
- *
- * Set the proportional, integral, and differential coefficients.
- *
- * @param p Proportional coefficient
- * @param i Integral coefficient
- * @param d Differential coefficient
- */
-void PIDBase::SetPID(double p, double i, double d) {
-  {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
-    m_P = p;
-    m_I = i;
-    m_D = d;
-  }
-}
-
-/**
- * Set the PID Controller gain parameters.
- *
- * Set the proportional, integral, and differential coefficients.
- *
- * @param p Proportional coefficient
- * @param i Integral coefficient
- * @param d Differential coefficient
- * @param f Feed forward coefficient
- */
-void PIDBase::SetPID(double p, double i, double d, double f) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_P = p;
-  m_I = i;
-  m_D = d;
-  m_F = f;
-}
-
-/**
- * Set the Proportional coefficient of the PID controller gain.
- *
- * @param p proportional coefficient
- */
-void PIDBase::SetP(double p) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_P = p;
-}
-
-/**
- * Set the Integral coefficient of the PID controller gain.
- *
- * @param i integral coefficient
- */
-void PIDBase::SetI(double i) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_I = i;
-}
-
-/**
- * Set the Differential coefficient of the PID controller gain.
- *
- * @param d differential coefficient
- */
-void PIDBase::SetD(double d) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_D = d;
-}
-
-/**
- * Get the Feed forward coefficient of the PID controller gain.
- *
- * @param f Feed forward coefficient
- */
-void PIDBase::SetF(double f) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_F = f;
-}
-
-/**
- * Get the Proportional coefficient.
- *
- * @return proportional coefficient
- */
-double PIDBase::GetP() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  return m_P;
-}
-
-/**
- * Get the Integral coefficient.
- *
- * @return integral coefficient
- */
-double PIDBase::GetI() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  return m_I;
-}
-
-/**
- * Get the Differential coefficient.
- *
- * @return differential coefficient
- */
-double PIDBase::GetD() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  return m_D;
-}
-
-/**
- * Get the Feed forward coefficient.
- *
- * @return Feed forward coefficient
- */
-double PIDBase::GetF() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  return m_F;
-}
-
-/**
- * Return the current PID result.
- *
- * This is always centered on zero and constrained the the max and min outs.
- *
- * @return the latest calculated output
- */
-double PIDBase::Get() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  return m_result;
-}
-
-/**
- * Set the PID controller to consider the input to be continuous,
- *
- * Rather then using the max and min input range as constraints, it considers
- * them to be the same point and automatically calculates the shortest route to
- * the setpoint.
- *
- * @param continuous true turns on continuous, false turns off continuous
- */
-void PIDBase::SetContinuous(bool continuous) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_continuous = continuous;
-}
-
-/**
- * Sets the maximum and minimum values expected from the input.
- *
- * @param minimumInput the minimum value expected from the input
- * @param maximumInput the maximum value expected from the output
- */
-void PIDBase::SetInputRange(double minimumInput, double maximumInput) {
-  {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
-    m_minimumInput = minimumInput;
-    m_maximumInput = maximumInput;
-    m_inputRange = maximumInput - minimumInput;
-  }
-
-  SetSetpoint(m_setpoint);
-}
-
-/**
- * Sets the minimum and maximum values to write.
- *
- * @param minimumOutput the minimum value to write to the output
- * @param maximumOutput the maximum value to write to the output
- */
-void PIDBase::SetOutputRange(double minimumOutput, double maximumOutput) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_minimumOutput = minimumOutput;
-  m_maximumOutput = maximumOutput;
-}
-
-/**
- * Set the setpoint for the PIDBase.
- *
- * @param setpoint the desired setpoint
- */
-void PIDBase::SetSetpoint(double setpoint) {
-  {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
-
-    if (m_maximumInput > m_minimumInput) {
-      if (setpoint > m_maximumInput)
-        m_setpoint = m_maximumInput;
-      else if (setpoint < m_minimumInput)
-        m_setpoint = m_minimumInput;
-      else
-        m_setpoint = setpoint;
-    } else {
-      m_setpoint = setpoint;
-    }
-  }
-}
-
-/**
- * Returns the current setpoint of the PIDBase.
- *
- * @return the current setpoint
- */
-double PIDBase::GetSetpoint() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  return m_setpoint;
-}
-
-/**
- * Returns the change in setpoint over time of the PIDBase.
- *
- * @return the change in setpoint over time
- */
-double PIDBase::GetDeltaSetpoint() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  return (m_setpoint - m_prevSetpoint) / m_setpointTimer.Get();
-}
-
-/**
- * Returns the current difference of the input from the setpoint.
- *
- * @return the current error
- */
-double PIDBase::GetError() const {
-  double setpoint = GetSetpoint();
-  {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
-    return GetContinuousError(setpoint - m_pidInput->PIDGet());
-  }
-}
-
-/**
- * Returns the current average of the error over the past few iterations.
- *
- * You can specify the number of iterations to average with SetToleranceBuffer()
- * (defaults to 1). This is the same value that is used for OnTarget().
- *
- * @return the average error
- */
-double PIDBase::GetAvgError() const { return GetError(); }
-
-/**
- * Sets what type of input the PID controller will use.
- */
-void PIDBase::SetPIDSourceType(PIDSourceType pidSource) {
-  m_pidInput->SetPIDSourceType(pidSource);
-}
-/**
- * Returns the type of input the PID controller is using.
- *
- * @return the PID controller input type
- */
-PIDSourceType PIDBase::GetPIDSourceType() const {
-  return m_pidInput->GetPIDSourceType();
-}
-
-/*
- * Set the percentage error which is considered tolerable for use with
- * OnTarget.
- *
- * @param percentage error which is tolerable
- */
-void PIDBase::SetTolerance(double percent) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_toleranceType = kPercentTolerance;
-  m_tolerance = percent;
-}
-
-/*
- * Set the absolute error which is considered tolerable for use with
- * OnTarget.
- *
- * @param percentage error which is tolerable
- */
-void PIDBase::SetAbsoluteTolerance(double absTolerance) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_toleranceType = kAbsoluteTolerance;
-  m_tolerance = absTolerance;
-}
-
-/*
- * Set the percentage error which is considered tolerable for use with
- * OnTarget.
- *
- * @param percentage error which is tolerable
- */
-void PIDBase::SetPercentTolerance(double percent) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_toleranceType = kPercentTolerance;
-  m_tolerance = percent;
-}
-
-/*
- * Set the number of previous error samples to average for tolerancing. When
- * determining whether a mechanism is on target, the user may want to use a
- * rolling average of previous measurements instead of a precise position or
- * velocity. This is useful for noisy sensors which return a few erroneous
- * measurements when the mechanism is on target. However, the mechanism will
- * not register as on target for at least the specified bufLength cycles.
- *
- * @param bufLength Number of previous cycles to average. Defaults to 1.
- */
-void PIDBase::SetToleranceBuffer(int bufLength) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-
-  // Create LinearDigitalFilter with original source as its source argument
-  m_filter = LinearDigitalFilter::MovingAverage(m_origSource, bufLength);
-  m_pidInput = &m_filter;
-}
-
-/*
- * Return true if the error is within the percentage of the total input range,
- * determined by SetTolerance. This asssumes that the maximum and minimum input
- * were set using SetInput.
- *
- * Currently this just reports on target as the actual value passes through the
- * setpoint. Ideally it should be based on being within the tolerance for some
- * period of time.
- *
- * This will return false until at least one input value has been computed.
- */
-bool PIDBase::OnTarget() const {
-  double error = GetError();
-
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  switch (m_toleranceType) {
-    case kPercentTolerance:
-      return std::fabs(error) < m_tolerance / 100 * m_inputRange;
-      break;
-    case kAbsoluteTolerance:
-      return std::fabs(error) < m_tolerance;
-      break;
-    case kNoTolerance:
-      // TODO: this case needs an error
-      return false;
-  }
-  return false;
-}
-
-/**
- * Reset the previous error, the integral term, and disable the controller.
- */
-void PIDBase::Reset() {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_prevError = 0;
-  m_totalError = 0;
-  m_result = 0;
-}
-
-/**
- * Passes the output directly to SetSetpoint().
- *
- * PIDControllers can be nested by passing a PIDController as another
- * PIDController's output. In that case, the output of the parent controller
- * becomes the input (i.e., the reference) of the child.
- *
- * It is the caller's responsibility to put the data into a valid form for
- * SetSetpoint().
- */
-void PIDBase::PIDWrite(double output) { SetSetpoint(output); }
-
-void PIDBase::InitSendable(SendableBuilder& builder) {
-  builder.SetSmartDashboardType("PIDBase");
-  builder.SetSafeState([=]() { Reset(); });
-  builder.AddDoubleProperty("p", [=]() { return GetP(); },
-                            [=](double value) { SetP(value); });
-  builder.AddDoubleProperty("i", [=]() { return GetI(); },
-                            [=](double value) { SetI(value); });
-  builder.AddDoubleProperty("d", [=]() { return GetD(); },
-                            [=](double value) { SetD(value); });
-  builder.AddDoubleProperty("f", [=]() { return GetF(); },
-                            [=](double value) { SetF(value); });
-  builder.AddDoubleProperty("setpoint", [=]() { return GetSetpoint(); },
-                            [=](double value) { SetSetpoint(value); });
-}
-
-/**
- * Wraps error around for continuous inputs. The original error is returned if
- * continuous mode is disabled. This is an unsynchronized function.
- *
- * @param error The current error of the PID controller.
- * @return Error for continuous inputs.
- */
 double PIDBase::GetContinuousError(double error) const {
   if (m_continuous && m_inputRange != 0) {
     error = std::fmod(error, m_inputRange);

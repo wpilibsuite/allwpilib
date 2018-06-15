@@ -19,8 +19,8 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * of a linear joint.
  */
 public class Wrist extends PIDSubsystem {
-  private Victor m_motor;
-  private AnalogPotentiometer m_pot;
+  private final Victor m_motor;
+  private final AnalogPotentiometer m_pot;
 
   private static final double kP_real = 1;
   private static final double kP_simulation = 0.05;

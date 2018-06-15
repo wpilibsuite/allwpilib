@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * encoders.
  */
 public class DriveStraight extends Command {
-  private PIDController m_pid;
+  private final PIDController m_pid;
 
   /**
    * Create a new DriveStraight command.

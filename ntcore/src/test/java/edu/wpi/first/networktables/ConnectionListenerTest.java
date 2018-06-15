@@ -10,14 +10,24 @@ package edu.wpi.first.networktables;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
-public class ConnectionListenerTest extends TestCase {
-  NetworkTableInstance m_serverInst;
-  NetworkTableInstance m_clientInst;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
-  @Override
-  protected void setUp() throws Exception {
+class ConnectionListenerTest {
+  private NetworkTableInstance m_serverInst;
+  private NetworkTableInstance m_clientInst;
+
+  @BeforeEach
+  void setUp() {
     m_serverInst = NetworkTableInstance.create();
     m_serverInst.setNetworkIdentity("server");
 
@@ -25,8 +35,8 @@ public class ConnectionListenerTest extends TestCase {
     m_clientInst.setNetworkIdentity("client");
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @AfterEach
+  void tearDown() {
     m_clientInst.close();
     m_serverInst.close();
   }
@@ -34,6 +44,7 @@ public class ConnectionListenerTest extends TestCase {
   /**
    * Connect to the server.
    */
+  @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
   private void connect() {
     m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
     m_clientInst.startClient("127.0.0.1", 10000);
@@ -49,15 +60,14 @@ public class ConnectionListenerTest extends TestCase {
     }
   }
 
-  /**
-   * Test the JNI.
-   */
-  public void testJNI() {
+  @Test
+  @DisabledOnOs(OS.WINDOWS)
+  void testJNI() {
     // set up the poller
     int poller = NetworkTablesJNI.createConnectionListenerPoller(m_serverInst.getHandle());
-    assertTrue("bad poller handle", poller != 0);
+    assertTrue(poller != 0, "bad poller handle");
     int handle = NetworkTablesJNI.addPolledConnectionListener(poller, false);
-    assertTrue("bad listener handle", handle != 0);
+    assertTrue(handle != 0, "bad listener handle");
 
     // trigger a connect event
     connect();
@@ -73,7 +83,7 @@ public class ConnectionListenerTest extends TestCase {
     }
 
     assertNotNull(events);
-    assertEquals(events.length, 1);
+    assertEquals(1, events.length);
     assertEquals(handle, events[0].listener);
     assertTrue(events[0].connected);
 
@@ -95,16 +105,16 @@ public class ConnectionListenerTest extends TestCase {
     }
 
     assertNotNull(events);
-    assertEquals(events.length, 1);
+    assertEquals(1, events.length);
     assertEquals(handle, events[0].listener);
     assertFalse(events[0].connected);
 
   }
 
-  /**
-   * Test threaded behavior.
-   */
-  public void testThreaded() {
+  @Test
+  @DisabledOnOs(OS.WINDOWS)
+  @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
+  void testThreaded() {
     m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
     List<ConnectionNotification> events = new ArrayList<>();
     final int handle = m_serverInst.addConnectionListener(events::add, false);
@@ -124,7 +134,7 @@ public class ConnectionListenerTest extends TestCase {
     assertTrue(m_serverInst.waitForConnectionListenerQueue(1.0));
 
     // get the event
-    assertEquals(events.size(), 1);
+    assertEquals(1, events.size());
     assertEquals(handle, events.get(0).listener);
     assertTrue(events.get(0).connected);
     events.clear();
@@ -139,7 +149,7 @@ public class ConnectionListenerTest extends TestCase {
 
     // get the event
     assertTrue(m_serverInst.waitForConnectionListenerQueue(1.0));
-    assertEquals(events.size(), 1);
+    assertEquals(1, events.size());
     assertEquals(handle, events.get(0).listener);
     assertFalse(events.get(0).connected);
   }

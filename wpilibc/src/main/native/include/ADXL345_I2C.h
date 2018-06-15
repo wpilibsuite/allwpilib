@@ -33,6 +33,13 @@ class ADXL345_I2C : public ErrorBase,
     double ZAxis;
   };
 
+  /**
+   * Constructs the ADXL345 Accelerometer over I2C.
+   *
+   * @param port          The I2C port the accelerometer is attached to
+   * @param range         The range (+ or -) that the accelerometer will measure
+   * @param deviceAddress The I2C address of the accelerometer (0x1D or 0x53)
+   */
   explicit ADXL345_I2C(I2C::Port port, Range range = kRange_2G,
                        int deviceAddress = kAddress);
   ~ADXL345_I2C() override = default;
@@ -46,7 +53,20 @@ class ADXL345_I2C : public ErrorBase,
   double GetY() override;
   double GetZ() override;
 
+  /**
+   * Get the acceleration of one axis in Gs.
+   *
+   * @param axis The axis to read from.
+   * @return Acceleration of the ADXL345 in Gs.
+   */
   virtual double GetAcceleration(Axes axis);
+
+  /**
+   * Get the acceleration of all axes in Gs.
+   *
+   * @return An object containing the acceleration measured on each axis of the
+   *         ADXL345 in Gs.
+   */
   virtual AllAxes GetAccelerations();
 
   void InitSendable(SendableBuilder& builder) override;

@@ -16,6 +16,12 @@ namespace frc {
  */
 class DMC60 : public PWMSpeedController {
  public:
+  /**
+   * Constructor for a Digilent DMC 60.
+   *
+   * @param channel The PWM channel that the DMC 60 is attached to. 0-9 are
+   *                on-board, 10-19 are on the MXP port
+   */
   explicit DMC60(int channel);
 };
 

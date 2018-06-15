@@ -42,6 +42,10 @@ class Gyro {
    * allows algorithms that wouldn't want to see a discontinuity in the gyro
    * output as it sweeps past from 360 to 0 on the second time around.
    *
+   * The angle is expected to increase as the gyro turns clockwise when looked
+   * at from the top. It needs to follow NED axis conventions in order to work
+   * properly with dependent control loops.
+   *
    * @return the current heading of the robot in degrees. This heading is based
    *         on integration of the returned rate from the gyro.
    */
@@ -51,6 +55,10 @@ class Gyro {
    * Return the rate of rotation of the gyro.
    *
    * The rate is based on the most recent reading of the gyro analog value.
+   *
+   * The rate is expected to be positive as the gyro turns clockwise when looked
+   * at from the top. It needs to follow NED axis conventions in order to work
+   * properly with dependent control loops.
    *
    * @return the current rate in degrees per second
    */

@@ -61,7 +61,6 @@ void InitializeHAL() {
   InitializeI2C();
   InitialzeInterrupts();
   InitializeNotifier();
-  InitializeOSSerialPort();
   InitializePCMInternal();
   InitializePDP();
   InitializePorts();
@@ -84,9 +83,6 @@ HAL_PortHandle HAL_GetPort(int32_t channel) {
   return createPortHandle(channel, 1);
 }
 
-/**
- * @deprecated Uses module numbers
- */
 HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel) {
   // Dont allow a number that wouldn't fit in a uint8_t
   if (channel < 0 || channel >= 255) return HAL_kInvalidHandle;
@@ -215,16 +211,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
   }
 }
 
-/**
- * Returns the runtime type of this HAL
- */
 HAL_RuntimeType HAL_GetRuntimeType(void) { return HAL_Athena; }
 
-/**
- * Return the FPGA Version number.
- * For now, expect this to be competition year.
- * @return FPGA Version number.
- */
 int32_t HAL_GetFPGAVersion(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
@@ -233,14 +221,6 @@ int32_t HAL_GetFPGAVersion(int32_t* status) {
   return global->readVersion(status);
 }
 
-/**
- * Return the FPGA Revision number.
- * The format of the revision is 3 numbers.
- * The 12 most significant bits are the Major Revision.
- * the next 8 bits are the Minor Revision.
- * The 12 least significant bits are the Build Number.
- * @return FPGA Revision number.
- */
 int64_t HAL_GetFPGARevision(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
@@ -249,12 +229,6 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
   return global->readRevision(status);
 }
 
-/**
- * Read the microsecond-resolution timer on the FPGA.
- *
- * @return The current time in microseconds according to the FPGA (since FPGA
- * reset).
- */
 uint64_t HAL_GetFPGATime(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
@@ -273,10 +247,6 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
   return (upper2 << 32) + lower;
 }
 
-/**
- * Get the state of the "USER" button on the roboRIO
- * @return true if the button is currently pressed down
- */
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
@@ -360,9 +330,6 @@ static bool killExistingProgram(int timeout, int mode) {
   return true;
 }
 
-/**
- * Call this to start up HAL. This is required for robot programs.
- */
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;

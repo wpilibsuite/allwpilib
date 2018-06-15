@@ -114,6 +114,8 @@ public class SampleRobot extends RobotBase {
    * state to change, either the other mode starts or the robot is disabled. Then go back and wait
    * for the robot to be enabled again.
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
+  @Override
   public void startCompetition() {
     robotInit();
 

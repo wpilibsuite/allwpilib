@@ -36,10 +36,10 @@ public class Robot extends SampleRobot {
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
 
-  private DifferentialDrive m_robotDrive
+  private final DifferentialDrive m_robotDrive
       = new DifferentialDrive(new Spark(0), new Spark(1));
-  private Joystick m_stick = new Joystick(0);
-  private SendableChooser<String> m_chooser = new SendableChooser<>();
+  private final Joystick m_stick = new Joystick(0);
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   public Robot() {
     m_robotDrive.setExpiration(0.1);

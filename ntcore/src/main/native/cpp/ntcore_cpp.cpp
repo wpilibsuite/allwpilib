@@ -560,18 +560,18 @@ bool WaitForRpcCallQueue(NT_Inst inst, double timeout) {
   return ii->rpc_server.WaitForQueue(timeout);
 }
 
-void PostRpcResponse(NT_Entry entry, NT_RpcCall call, StringRef result) {
+bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, StringRef result) {
   Handle handle{entry};
   int id = handle.GetTypedIndex(Handle::kEntry);
   auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) return;
+  if (id < 0 || !ii) return false;
 
   Handle chandle{call};
   int call_uid = chandle.GetTypedIndex(Handle::kRpcCall);
-  if (call_uid < 0) return;
-  if (handle.GetInst() != chandle.GetInst()) return;
+  if (call_uid < 0) return false;
+  if (handle.GetInst() != chandle.GetInst()) return false;
 
-  ii->rpc_server.PostRpcResponse(id, call_uid, result);
+  return ii->rpc_server.PostRpcResponse(id, call_uid, result);
 }
 
 NT_RpcCall CallRpc(NT_Entry entry, StringRef params) {

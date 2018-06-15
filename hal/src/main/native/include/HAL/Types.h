@@ -45,4 +45,6 @@ typedef HAL_Handle HAL_SolenoidHandle;
 
 typedef HAL_Handle HAL_CANHandle;
 
+typedef HAL_CANHandle HAL_PDPHandle;
+
 typedef int32_t HAL_Bool;

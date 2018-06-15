@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.SolenoidJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.util.UncleanStatusException;
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the PCM.
@@ -30,8 +31,8 @@ public class DoubleSolenoid extends SolenoidBase {
 
   private byte m_forwardMask; // The mask for the forward channel.
   private byte m_reverseMask; // The mask for the reverse channel.
-  private int m_forwardHandle = 0;
-  private int m_reverseHandle = 0;
+  private int m_forwardHandle;
+  private int m_reverseHandle;
 
   /**
    * Constructor. Uses the default PCM ID (defaults to 0).
@@ -64,7 +65,7 @@ public class DoubleSolenoid extends SolenoidBase {
     try {
       portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) reverseChannel);
       m_reverseHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
-    } catch (RuntimeException ex) {
+    } catch (UncleanStatusException ex) {
       // free the forward handle on exception, then rethrow
       SolenoidJNI.freeSolenoidPort(m_forwardHandle);
       m_forwardHandle = 0;

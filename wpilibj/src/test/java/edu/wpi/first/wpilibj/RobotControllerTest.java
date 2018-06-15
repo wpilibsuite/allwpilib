@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-public class RobotControllerTest extends UtilityClassTest {
-  public RobotControllerTest() {
+class RobotControllerTest extends UtilityClassTest {
+  RobotControllerTest() {
     super(RobotController.class);
   }
 }

@@ -39,6 +39,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @see CommandGroup
  * @see IllegalUseOfCommandException
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public abstract class Command extends SendableBase {
   /**
    * The time since this command was initialized.
@@ -53,7 +54,7 @@ public abstract class Command extends SendableBase {
   /**
    * Whether or not this command has been initialized.
    */
-  private boolean m_initialized = false;
+  private boolean m_initialized;
 
   /**
    * The required subsystems.
@@ -63,7 +64,7 @@ public abstract class Command extends SendableBase {
   /**
    * Whether or not it is running.
    */
-  private boolean m_running = false;
+  private boolean m_running;
 
   /**
    * Whether or not it is interruptible.
@@ -73,22 +74,22 @@ public abstract class Command extends SendableBase {
   /**
    * Whether or not it has been canceled.
    */
-  private boolean m_canceled = false;
+  private boolean m_canceled;
 
   /**
    * Whether or not it has been locked.
    */
-  private boolean m_locked = false;
+  private boolean m_locked;
 
   /**
    * Whether this command should run when the robot is disabled.
    */
-  private boolean m_runWhenDisabled = false;
+  private boolean m_runWhenDisabled;
 
   /**
    * Whether or not this command has completed running.
    */
-  private boolean m_completed = false;
+  private boolean m_completed;
 
   /**
    * The {@link CommandGroup} this is in.

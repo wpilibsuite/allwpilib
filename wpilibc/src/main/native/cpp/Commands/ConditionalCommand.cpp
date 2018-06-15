@@ -24,12 +24,6 @@ static void RequireAll(Command& command, Command* onTrue, Command* onFalse) {
   }
 }
 
-/**
- * Creates a new ConditionalCommand with given onTrue and onFalse Commands.
- *
- * @param onTrue  The Command to execute if Condition() returns true
- * @param onFalse The Command to execute if Condition() returns false
- */
 ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
   m_onTrue = onTrue;
   m_onFalse = onFalse;
@@ -37,13 +31,6 @@ ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
   RequireAll(*this, onTrue, onFalse);
 }
 
-/**
- * Creates a new ConditionalCommand with given onTrue and onFalse Commands.
- *
- * @param name    The name for this command group
- * @param onTrue  The Command to execute if Condition() returns true
- * @param onFalse The Command to execute if Condition() returns false
- */
 ConditionalCommand::ConditionalCommand(const wpi::Twine& name, Command* onTrue,
                                        Command* onFalse)
     : Command(name) {

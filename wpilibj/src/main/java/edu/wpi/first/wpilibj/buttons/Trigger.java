@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * the full functionality of the Trigger class.
  */
 public abstract class Trigger extends SendableBase {
-  private volatile boolean m_sendablePressed = false;
+  private volatile boolean m_sendablePressed;
 
   /**
    * Returns whether or not the trigger is active.

@@ -20,11 +20,27 @@ namespace frc {
  */
 class TimedCommand : public Command {
  public:
+  /**
+   * Creates a new TimedCommand with the given name and timeout.
+   *
+   * @param name    the name of the command
+   * @param timeout the time (in seconds) before this command "times out"
+   */
   TimedCommand(const wpi::Twine& name, double timeout);
+
+  /**
+   * Creates a new WaitCommand with the given timeout.
+   *
+   * @param timeout the time (in seconds) before this command "times out"
+   */
   explicit TimedCommand(double timeout);
+
   virtual ~TimedCommand() = default;
 
  protected:
+  /**
+   * Ends command when timed out.
+   */
   bool IsFinished() override;
 };
 

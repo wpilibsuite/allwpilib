@@ -18,31 +18,11 @@
 
 using namespace frc;
 
-Scheduler::Scheduler() {
-  HLUsageReporting::ReportScheduler();
-  SetName("Scheduler");
-}
-
-/**
- * Returns the Scheduler, creating it if one does not exist.
- *
- * @return the Scheduler
- */
 Scheduler* Scheduler::GetInstance() {
   static Scheduler instance;
   return &instance;
 }
 
-void Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }
-
-/**
- * Add a command to be scheduled later.
- *
- * In any pass through the scheduler, all commands are added to the additions
- * list, then at the end of the pass, they are all scheduled.
- *
- * @param command The command to be scheduled
- */
 void Scheduler::AddCommand(Command* command) {
   std::lock_guard<wpi::mutex> lock(m_additionsMutex);
   if (std::find(m_additions.begin(), m_additions.end(), command) !=
@@ -56,63 +36,14 @@ void Scheduler::AddButton(ButtonScheduler* button) {
   m_buttons.push_back(button);
 }
 
-void Scheduler::ProcessCommandAddition(Command* command) {
-  if (command == nullptr) return;
-
-  // Check to make sure no adding during adding
-  if (m_adding) {
-    wpi_setWPIErrorWithContext(IncompatibleState,
-                               "Can not start command from cancel method");
+void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
+  if (subsystem == nullptr) {
+    wpi_setWPIErrorWithContext(NullParameter, "subsystem");
     return;
   }
-
-  // Only add if not already in
-  auto found = m_commands.find(command);
-  if (found == m_commands.end()) {
-    // Check that the requirements can be had
-    Command::SubsystemSet requirements = command->GetRequirements();
-    for (Command::SubsystemSet::iterator iter = requirements.begin();
-         iter != requirements.end(); iter++) {
-      Subsystem* lock = *iter;
-      if (lock->GetCurrentCommand() != nullptr &&
-          !lock->GetCurrentCommand()->IsInterruptible())
-        return;
-    }
-
-    // Give it the requirements
-    m_adding = true;
-    for (Command::SubsystemSet::iterator iter = requirements.begin();
-         iter != requirements.end(); iter++) {
-      Subsystem* lock = *iter;
-      if (lock->GetCurrentCommand() != nullptr) {
-        lock->GetCurrentCommand()->Cancel();
-        Remove(lock->GetCurrentCommand());
-      }
-      lock->SetCurrentCommand(command);
-    }
-    m_adding = false;
-
-    m_commands.insert(command);
-
-    command->StartRunning();
-    m_runningCommandsChanged = true;
-  }
+  m_subsystems.insert(subsystem);
 }
 
-/**
- * Runs a single iteration of the loop.
- *
- * This method should be called often in order to have a functioning
- * Command system. The loop has five stages:
- *
- * <ol>
- *   <li>Poll the Buttons</li>
- *   <li>Execute/Remove the Commands</li>
- *   <li>Send values to SmartDashboard</li>
- *   <li>Add Commands</li>
- *   <li>Add Defaults</li>
- * </ol>
- */
 void Scheduler::Run() {
   // Get button input (going backwards preserves button priority)
   {
@@ -167,27 +98,6 @@ void Scheduler::Run() {
   }
 }
 
-/**
- * Registers a Subsystem to this Scheduler, so that the Scheduler might know if
- * a default Command needs to be run.
- *
- * All Subsystems should call this.
- *
- * @param system the system
- */
-void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
-  if (subsystem == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "subsystem");
-    return;
-  }
-  m_subsystems.insert(subsystem);
-}
-
-/**
- * Removes the Command from the Scheduler.
- *
- * @param command the command to remove
- */
 void Scheduler::Remove(Command* command) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
@@ -211,9 +121,6 @@ void Scheduler::RemoveAll() {
   }
 }
 
-/**
- * Completely resets the scheduler. Undefined behavior if running.
- */
 void Scheduler::ResetAll() {
   RemoveAll();
   m_subsystems.clear();
@@ -224,6 +131,8 @@ void Scheduler::ResetAll() {
   m_idsEntry = nt::NetworkTableEntry();
   m_cancelEntry = nt::NetworkTableEntry();
 }
+
+void Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }
 
 void Scheduler::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Scheduler");
@@ -267,4 +176,52 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
       m_idsEntry.SetDoubleArray(ids);
     }
   });
+}
+
+Scheduler::Scheduler() {
+  HLUsageReporting::ReportScheduler();
+  SetName("Scheduler");
+}
+
+void Scheduler::ProcessCommandAddition(Command* command) {
+  if (command == nullptr) return;
+
+  // Check to make sure no adding during adding
+  if (m_adding) {
+    wpi_setWPIErrorWithContext(IncompatibleState,
+                               "Can not start command from cancel method");
+    return;
+  }
+
+  // Only add if not already in
+  auto found = m_commands.find(command);
+  if (found == m_commands.end()) {
+    // Check that the requirements can be had
+    Command::SubsystemSet requirements = command->GetRequirements();
+    for (Command::SubsystemSet::iterator iter = requirements.begin();
+         iter != requirements.end(); iter++) {
+      Subsystem* lock = *iter;
+      if (lock->GetCurrentCommand() != nullptr &&
+          !lock->GetCurrentCommand()->IsInterruptible())
+        return;
+    }
+
+    // Give it the requirements
+    m_adding = true;
+    for (Command::SubsystemSet::iterator iter = requirements.begin();
+         iter != requirements.end(); iter++) {
+      Subsystem* lock = *iter;
+      if (lock->GetCurrentCommand() != nullptr) {
+        lock->GetCurrentCommand()->Cancel();
+        Remove(lock->GetCurrentCommand());
+      }
+      lock->SetCurrentCommand(command);
+    }
+    m_adding = false;
+
+    m_commands.insert(command);
+
+    command->StartRunning();
+    m_runningCommandsChanged = true;
+  }
 }

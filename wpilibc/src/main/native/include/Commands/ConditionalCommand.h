@@ -34,9 +34,24 @@ namespace frc {
  */
 class ConditionalCommand : public Command {
  public:
+  /**
+   * Creates a new ConditionalCommand with given onTrue and onFalse Commands.
+   *
+   * @param onTrue  The Command to execute if Condition() returns true
+   * @param onFalse The Command to execute if Condition() returns false
+   */
   explicit ConditionalCommand(Command* onTrue, Command* onFalse = nullptr);
+
+  /**
+   * Creates a new ConditionalCommand with given onTrue and onFalse Commands.
+   *
+   * @param name    The name for this command group
+   * @param onTrue  The Command to execute if Condition() returns true
+   * @param onFalse The Command to execute if Condition() returns false
+   */
   ConditionalCommand(const wpi::Twine& name, Command* onTrue,
                      Command* onFalse = nullptr);
+
   virtual ~ConditionalCommand() = default;
 
  protected:

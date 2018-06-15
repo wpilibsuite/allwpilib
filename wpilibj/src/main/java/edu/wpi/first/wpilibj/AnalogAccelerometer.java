@@ -22,7 +22,7 @@ public class AnalogAccelerometer extends SendableBase implements PIDSource {
   private AnalogInput m_analogChannel;
   private double m_voltsPerG = 1.0;
   private double m_zeroGVoltage = 2.5;
-  private boolean m_allocatedChannel;
+  private final boolean m_allocatedChannel;
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**
@@ -42,8 +42,7 @@ public class AnalogAccelerometer extends SendableBase implements PIDSource {
    * @param channel The channel number for the analog input the accelerometer is connected to
    */
   public AnalogAccelerometer(final int channel) {
-    this(new AnalogInput(channel));
-    m_allocatedChannel = true;
+    this(new AnalogInput(channel), true);
     addChild(m_analogChannel);
   }
 
@@ -55,10 +54,13 @@ public class AnalogAccelerometer extends SendableBase implements PIDSource {
    * @param channel The existing AnalogInput object for the analog input the accelerometer is
    *                connected to
    */
-  public AnalogAccelerometer(AnalogInput channel) {
-    requireNonNull(channel, "Analog Channel given was null");
+  public AnalogAccelerometer(final AnalogInput channel) {
+    this(channel, false);
+  }
 
-    m_allocatedChannel = false;
+  private AnalogAccelerometer(final AnalogInput channel, final boolean allocatedChannel) {
+    requireNonNull(channel, "Analog Channel given was null");
+    m_allocatedChannel = allocatedChannel;
     m_analogChannel = channel;
     initAccelerometer();
   }

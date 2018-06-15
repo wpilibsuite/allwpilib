@@ -20,32 +20,10 @@ using namespace frc;
 
 RobotDriveBase::RobotDriveBase() { m_safetyHelper.SetSafetyEnabled(true); }
 
-/**
- * Sets the deadband applied to the drive inputs (e.g., joystick values).
- *
- * The default value is 0.02. Inputs smaller than the deadband are set to 0.0
- * while inputs larger than the deadband are scaled from 0.0 to 1.0. See
- * ApplyDeadband().
- *
- * @param deadband The deadband to set.
- */
 void RobotDriveBase::SetDeadband(double deadband) { m_deadband = deadband; }
 
-/**
- * Configure the scaling factor for using RobotDrive with motor controllers in a
- * mode other than PercentVbus or to limit the maximum output.
- *
- * @param maxOutput Multiplied with the output percentage computed by the drive
- *                  functions.
- */
 void RobotDriveBase::SetMaxOutput(double maxOutput) { m_maxOutput = maxOutput; }
 
-/**
- * Feed the motor safety object. Resets the timer that will stop the motors if
- * it completes.
- *
- * @see MotorSafetyHelper::Feed()
- */
 void RobotDriveBase::FeedWatchdog() { m_safetyHelper.Feed(); }
 
 void RobotDriveBase::SetExpiration(double timeout) {
@@ -66,9 +44,6 @@ void RobotDriveBase::SetSafetyEnabled(bool enabled) {
   m_safetyHelper.SetSafetyEnabled(enabled);
 }
 
-/**
- * Limit motor values to the -1.0 to +1.0 range.
- */
 double RobotDriveBase::Limit(double value) {
   if (value > 1.0) {
     return 1.0;
@@ -79,13 +54,6 @@ double RobotDriveBase::Limit(double value) {
   return value;
 }
 
-/**
- * Returns 0.0 if the given value is within the specified range around zero. The
- * remaining range between the deadband and 1.0 is scaled from 0.0 to 1.0.
- *
- * @param value    value to clip
- * @param deadband range around zero
- */
 double RobotDriveBase::ApplyDeadband(double value, double deadband) {
   if (std::abs(value) > deadband) {
     if (value > 0.0) {
@@ -98,9 +66,6 @@ double RobotDriveBase::ApplyDeadband(double value, double deadband) {
   }
 }
 
-/**
- * Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0.
- */
 void RobotDriveBase::Normalize(wpi::MutableArrayRef<double> wheelSpeeds) {
   double maxMagnitude = std::abs(wheelSpeeds[0]);
   for (size_t i = 1; i < wheelSpeeds.size(); i++) {

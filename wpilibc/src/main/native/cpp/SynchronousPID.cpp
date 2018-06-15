@@ -9,36 +9,14 @@
 
 using namespace frc;
 
-/**
- * Allocate a PID object with the given constants for P, I, and D.
- *
- * @param Kp     the proportional coefficient
- * @param Ki     the integral coefficient
- * @param Kd     the derivative coefficient
- * @param source The PIDSource object that is used to get values
- * @param output The PIDOutput object that is set to the output percentage
- */
 SynchronousPID::SynchronousPID(double Kp, double Ki, double Kd,
                                PIDSource& source, PIDOutput& output)
     : SynchronousPID(Kp, Ki, Kd, 0.0, source, output) {}
 
-/**
- * Allocate a PID object with the given constants for P, I, and D.
- *
- * @param Kp     the proportional coefficient
- * @param Ki     the integral coefficient
- * @param Kd     the derivative coefficient
- * @param Kf     the feed forward term
- * @param source The PIDSource object that is used to get values
- * @param output The PIDOutput object that is set to the output percentage
- */
 SynchronousPID::SynchronousPID(double Kp, double Ki, double Kd, double Kf,
                                PIDSource& source, PIDOutput& output)
     : PIDBase(Kp, Ki, Kd, Kf, source, output) {
   m_enabled = true;
 }
 
-/**
- * Read the input, calculate the output accordingly, and write to the output.
- */
 void SynchronousPID::Calculate() { PIDBase::Calculate(); }

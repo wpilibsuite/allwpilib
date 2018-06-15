@@ -33,13 +33,16 @@ public abstract class PIDCommand extends Command {
    * A source which calls {@link PIDCommand#returnPIDInput()}.
    */
   private final PIDSource m_source = new PIDSource() {
+    @Override
     public void setPIDSourceType(PIDSourceType pidSource) {
     }
 
+    @Override
     public PIDSourceType getPIDSourceType() {
       return PIDSourceType.kDisplacement;
     }
 
+    @Override
     public double pidGet() {
       return returnPIDInput();
     }

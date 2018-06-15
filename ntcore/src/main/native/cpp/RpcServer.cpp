@@ -35,14 +35,15 @@ void RpcServer::ProcessRpc(unsigned int local_id, unsigned int call_uid,
        send_response);
 }
 
-void RpcServer::PostRpcResponse(unsigned int local_id, unsigned int call_uid,
+bool RpcServer::PostRpcResponse(unsigned int local_id, unsigned int call_uid,
                                 wpi::StringRef result) {
   auto thr = GetThread();
   auto i = thr->m_response_map.find(impl::RpcIdPair{local_id, call_uid});
   if (i == thr->m_response_map.end()) {
     WARNING("posting RPC response to nonexistent call (or duplicate response)");
-    return;
+    return false;
   }
   (i->getSecond())(result);
   thr->m_response_map.erase(i);
+  return true;
 }

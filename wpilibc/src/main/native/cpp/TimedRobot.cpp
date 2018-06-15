@@ -17,9 +17,6 @@
 
 using namespace frc;
 
-/**
- * Provide an alternate "main loop" via StartCompetition().
- */
 void TimedRobot::StartCompetition() {
   RobotInit();
 
@@ -46,15 +43,6 @@ void TimedRobot::StartCompetition() {
   }
 }
 
-/**
- * Set time period between calls to Periodic() functions.
- *
- * A timer event is queued for periodic event notification. Each time the
- * interrupt occurs, the event will be immediately requeued for the same time
- * interval.
- *
- * @param period Period in seconds.
- */
 void TimedRobot::SetPeriod(double period) {
   m_period = period;
 
@@ -64,9 +52,6 @@ void TimedRobot::SetPeriod(double period) {
   }
 }
 
-/**
- * Get time period between calls to Periodic() functions.
- */
 double TimedRobot::GetPeriod() const { return m_period; }
 
 TimedRobot::TimedRobot() {
@@ -89,9 +74,6 @@ TimedRobot::~TimedRobot() {
   HAL_CleanNotifier(m_notifier, &status);
 }
 
-/**
- * Update the HAL alarm time.
- */
 void TimedRobot::UpdateAlarm() {
   int32_t status = 0;
   HAL_UpdateNotifierAlarm(

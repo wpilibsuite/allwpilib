@@ -8,12 +8,12 @@
 package edu.wpi.first.wpilibj.command;
 
 public class MockConditionalCommand extends ConditionalCommand {
-  private boolean m_condition = false;
-  private int m_initializeCount = 0;
-  private int m_executeCount = 0;
-  private int m_isFinishedCount = 0;
-  private int m_endCount = 0;
-  private int m_interruptedCount = 0;
+  private boolean m_condition;
+  private int m_initializeCount;
+  private int m_executeCount;
+  private int m_isFinishedCount;
+  private int m_endCount;
+  private int m_interruptedCount;
 
   public MockConditionalCommand(MockCommand onTrue, MockCommand onFalse) {
     super(onTrue, onFalse);
@@ -28,23 +28,28 @@ public class MockConditionalCommand extends ConditionalCommand {
     this.m_condition = condition;
   }
 
+  @Override
   protected void initialize() {
     ++m_initializeCount;
   }
 
+  @Override
   protected void execute() {
     ++m_executeCount;
   }
 
+  @Override
   protected boolean isFinished() {
     ++m_isFinishedCount;
     return super.isFinished();
   }
 
+  @Override
   protected void end() {
     ++m_endCount;
   }
 
+  @Override
   protected void interrupted() {
     ++m_interruptedCount;
   }

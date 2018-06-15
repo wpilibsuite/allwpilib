@@ -12,39 +12,49 @@ package edu.wpi.first.wpilibj.command;
  * called.
  */
 public class MockCommand extends Command {
-  private int m_initializeCount = 0;
-  private int m_executeCount = 0;
-  private int m_isFinishedCount = 0;
-  private boolean m_hasFinished = false;
-  private int m_endCount = 0;
-  private int m_interruptedCount = 0;
+  private int m_initializeCount;
+  private int m_executeCount;
+  private int m_isFinishedCount;
+  private boolean m_hasFinished;
+  private int m_endCount;
+  private int m_interruptedCount;
 
   public MockCommand(Subsystem subsys) {
     super();
     requires(subsys);
   }
 
+  public MockCommand(Subsystem subsys, double timeout) {
+    this(subsys);
+    setTimeout(timeout);
+  }
+
   public MockCommand() {
     super();
   }
 
+  @Override
   protected void initialize() {
     ++m_initializeCount;
   }
 
+  @Override
   protected void execute() {
     ++m_executeCount;
   }
 
+  @Override
   protected boolean isFinished() {
     ++m_isFinishedCount;
     return isHasFinished();
   }
 
+  @Override
   protected void end() {
     ++m_endCount;
   }
 
+  @Override
   protected void interrupted() {
     ++m_interruptedCount;
   }

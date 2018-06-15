@@ -26,9 +26,9 @@ import static java.util.Objects.requireNonNull;
 public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable {
   private static final double kDefaultVoltsPerDegreePerSecond = 0.007;
   protected AnalogInput m_analog;
-  private boolean m_channelAllocated = false;
+  private boolean m_channelAllocated;
 
-  private int m_gyroHandle = 0;
+  private int m_gyroHandle;
 
   /**
    * Initialize the gyro. Calibration is handled by calibrate().

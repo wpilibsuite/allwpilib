@@ -9,8 +9,8 @@ package edu.wpi.first.wpilibj.livewindow;
 
 import edu.wpi.first.wpilibj.UtilityClassTest;
 
-public class LiveWindowTest extends UtilityClassTest {
-  public LiveWindowTest() {
+class LiveWindowTest extends UtilityClassTest {
+  LiveWindowTest() {
     super(LiveWindow.class);
   }
 }

@@ -12,7 +12,7 @@ package edu.wpi.first.wpilibj;
  * and there variants, but this includes anything that is controlling an actuator in a separate
  * thread.
  */
-interface Controller {
+public interface Controller {
   /**
    * Allows the control loop to run.
    */

@@ -52,13 +52,57 @@ int StartRobot() {
  */
 class RobotBase {
  public:
+  /**
+   * Determine if the Robot is currently enabled.
+   *
+   * @return True if the Robot is currently enabled by the field controls.
+   */
   bool IsEnabled() const;
+
+  /**
+   * Determine if the Robot is currently disabled.
+   *
+   * @return True if the Robot is currently disabled by the field controls.
+   */
   bool IsDisabled() const;
+
+  /**
+   * Determine if the robot is currently in Autonomous mode.
+   *
+   * @return True if the robot is currently operating Autonomously as determined
+   *         by the field controls.
+   */
   bool IsAutonomous() const;
+
+  /**
+   * Determine if the robot is currently in Operator Control mode.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode as
+   *         determined by the field controls.
+   */
   bool IsOperatorControl() const;
+
+  /**
+   * Determine if the robot is currently in Test mode.
+   *
+   * @return True if the robot is currently running tests as determined by the
+   *         field controls.
+   */
   bool IsTest() const;
+
+  /**
+   * Indicates if new data is available from the driver station.
+   *
+   * @return Has new data arrived over the network since the last time this
+   *         function was called?
+   */
   bool IsNewDataAvailable() const;
+
+  /**
+   * Gets the ID of the main robot thread.
+   */
   static std::thread::id GetThreadId();
+
   virtual void StartCompetition() = 0;
 
   static constexpr bool IsReal() {
@@ -72,7 +116,19 @@ class RobotBase {
   static constexpr bool IsSimulation() { return !IsReal(); }
 
  protected:
+  /**
+   * Constructor for a generic robot program.
+   *
+   * User code should be placed in the constructor that runs before the
+   * Autonomous or Operator Control period starts. The constructor will run to
+   * completion before Autonomous is entered.
+   *
+   * This must be used to ensure that the communications code starts. In the
+   * future it would be nice to put this code into it's own task that loads on
+   * boot so ensure that it runs.
+   */
   RobotBase();
+
   virtual ~RobotBase() = default;
 
   RobotBase(const RobotBase&) = delete;

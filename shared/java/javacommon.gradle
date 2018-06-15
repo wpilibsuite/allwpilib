@@ -2,7 +2,6 @@ apply plugin: 'maven-publish'
 apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
 apply plugin: 'java'
 apply plugin: 'net.ltgt.errorprone'
-apply plugin: 'pmd'
 
 if (!hasProperty('releaseType')) {
     WPILibVersion {
@@ -87,6 +86,7 @@ publishing {
 }
 
 test {
+    useJUnitPlatform()
     testLogging {
         events "failed"
         exceptionFormat "full"
@@ -95,14 +95,6 @@ test {
 
 if (project.hasProperty('onlyAthena')) {
     test.enabled = false
-}
-
-pmd {
-    sourceSets = [sourceSets.main]
-    consoleOutput = true
-    reportsDir = file("$project.buildDir/reports/pmd")
-    ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
-    ruleSets = []
 }
 
 repositories {
@@ -123,7 +115,10 @@ compileJava {
 }
 
 dependencies {
-    testCompile 'junit:junit:4.12'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.2.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+
     devCompile sourceSets.main.output
 }
 

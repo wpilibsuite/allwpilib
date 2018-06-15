@@ -25,10 +25,10 @@ public class Collector extends Subsystem {
   public static final double kReverse = -1;
 
   // Subsystem devices
-  private SpeedController m_rollerMotor = new Victor(6);
-  private DigitalInput m_ballDetector = new DigitalInput(10);
-  private DigitalInput m_openDetector = new DigitalInput(6);
-  private Solenoid m_piston = new Solenoid(1, 1);
+  private final SpeedController m_rollerMotor = new Victor(6);
+  private final DigitalInput m_ballDetector = new DigitalInput(10);
+  private final DigitalInput m_openDetector = new DigitalInput(6);
+  private final Solenoid m_piston = new Solenoid(1, 1);
 
   /**
    * Create a new collector subsystem.
@@ -89,6 +89,7 @@ public class Collector extends Subsystem {
   /**
    * Close the claw (For collecting and driving).
    */
+  @Override
   public void close() {
     m_piston.set(false);
   }

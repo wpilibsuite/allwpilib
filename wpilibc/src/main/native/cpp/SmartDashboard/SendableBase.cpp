@@ -11,18 +11,10 @@
 
 using namespace frc;
 
-/**
- * Creates an instance of the sensor base.
- *
- * @param addLiveWindow if true, add this Sendable to LiveWindow
- */
 SendableBase::SendableBase(bool addLiveWindow) {
   if (addLiveWindow) LiveWindow::GetInstance()->Add(this);
 }
 
-/**
- * Free the resources used by this object.
- */
 SendableBase::~SendableBase() { LiveWindow::GetInstance()->Remove(this); }
 
 std::string SendableBase::GetName() const {
@@ -45,44 +37,18 @@ void SendableBase::SetSubsystem(const wpi::Twine& subsystem) {
   m_subsystem = subsystem.str();
 }
 
-/**
- * Add a child component.
- *
- * @param child child component
- */
 void SendableBase::AddChild(std::shared_ptr<Sendable> child) {
   LiveWindow::GetInstance()->AddChild(this, child);
 }
 
-/**
- * Add a child component.
- *
- * @param child child component
- */
 void SendableBase::AddChild(void* child) {
   LiveWindow::GetInstance()->AddChild(this, child);
 }
 
-/**
- * Sets the name of the sensor with a channel number.
- *
- * @param moduleType A string that defines the module name in the label for the
- *                   value
- * @param channel    The channel number the device is plugged into
- */
 void SendableBase::SetName(const wpi::Twine& moduleType, int channel) {
   SetName(moduleType + wpi::Twine('[') + wpi::Twine(channel) + wpi::Twine(']'));
 }
 
-/**
- * Sets the name of the sensor with a module and channel number.
- *
- * @param moduleType   A string that defines the module name in the label for
- *                     the value
- * @param moduleNumber The number of the particular module type
- * @param channel      The channel number the device is plugged into (usually
- * PWM)
- */
 void SendableBase::SetName(const wpi::Twine& moduleType, int moduleNumber,
                            int channel) {
   SetName(moduleType + wpi::Twine('[') + wpi::Twine(moduleNumber) +

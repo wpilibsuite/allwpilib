@@ -27,18 +27,18 @@ import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveWithJoystick;
  */
 public class DriveTrain extends Subsystem {
   // Subsystem devices
-  private SpeedController m_frontLeftCIM = new Victor(1);
-  private SpeedController m_frontRightCIM = new Victor(2);
-  private SpeedController m_rearLeftCIM = new Victor(3);
-  private SpeedController m_rearRightCIM = new Victor(4);
-  private SpeedControllerGroup m_leftCIMs = new SpeedControllerGroup(
+  private final SpeedController m_frontLeftCIM = new Victor(1);
+  private final SpeedController m_frontRightCIM = new Victor(2);
+  private final SpeedController m_rearLeftCIM = new Victor(3);
+  private final SpeedController m_rearRightCIM = new Victor(4);
+  private final SpeedControllerGroup m_leftCIMs = new SpeedControllerGroup(
       m_frontLeftCIM, m_rearLeftCIM);
-  private SpeedControllerGroup m_rightCIMs = new SpeedControllerGroup(
+  private final SpeedControllerGroup m_rightCIMs = new SpeedControllerGroup(
       m_frontRightCIM, m_rearRightCIM);
-  private DifferentialDrive m_drive;
-  private Encoder m_rightEncoder = new Encoder(1, 2, true, EncodingType.k4X);
-  private Encoder m_leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
-  private AnalogGyro m_gyro = new AnalogGyro(2);
+  private final DifferentialDrive m_drive;
+  private final Encoder m_rightEncoder = new Encoder(1, 2, true, EncodingType.k4X);
+  private final Encoder m_leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
+  private final AnalogGyro m_gyro = new AnalogGyro(2);
 
   /**
    * Create a new drive train subsystem.

@@ -40,17 +40,10 @@ DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
   AddChild("Gyro", m_gyro);
 }
 
-/**
- * When no other command is running let the operator drive around
- * using the PS3 joystick.
- */
 void DriveTrain::InitDefaultCommand() {
   SetDefaultCommand(new TankDriveWithJoystick());
 }
 
-/**
- * The log method puts interesting information to the SmartDashboard.
- */
 void DriveTrain::Log() {
   frc::SmartDashboard::PutNumber("Left Distance", m_leftEncoder.GetDistance());
   frc::SmartDashboard::PutNumber("Right Distance",

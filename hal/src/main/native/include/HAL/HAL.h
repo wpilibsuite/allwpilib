@@ -51,10 +51,29 @@ extern "C" {
 
 const char* HAL_GetErrorMessage(int32_t code);
 
+/**
+ * Return the FPGA Version number.
+ * For now, expect this to be competition year.
+ * @return FPGA Version number.
+ */
 int32_t HAL_GetFPGAVersion(int32_t* status);
+
+/**
+ * Return the FPGA Revision number.
+ * The format of the revision is 3 numbers.
+ * The 12 most significant bits are the Major Revision.
+ * the next 8 bits are the Minor Revision.
+ * The 12 least significant bits are the Build Number.
+ * @return FPGA Revision number.
+ */
 int64_t HAL_GetFPGARevision(int32_t* status);
 
 HAL_RuntimeType HAL_GetRuntimeType(void);
+
+/**
+ * Get the state of the "USER" button on the roboRIO
+ * @return true if the button is currently pressed down
+ */
 HAL_Bool HAL_GetFPGAButton(int32_t* status);
 
 HAL_Bool HAL_GetSystemActive(int32_t* status);
@@ -65,10 +84,23 @@ void HAL_BaseInitialize(int32_t* status);
 #ifndef HAL_USE_LABVIEW
 
 HAL_PortHandle HAL_GetPort(int32_t channel);
+
+/**
+ * @deprecated Uses module numbers
+ */
 HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel);
 
+/**
+ * Read the microsecond-resolution timer on the FPGA.
+ *
+ * @return The current time in microseconds according to the FPGA (since FPGA
+ * reset).
+ */
 uint64_t HAL_GetFPGATime(int32_t* status);
 
+/**
+ * Call this to start up HAL. This is required for robot programs.
+ */
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode);
 
 // ifdef's definition is to allow for default parameters in C++.

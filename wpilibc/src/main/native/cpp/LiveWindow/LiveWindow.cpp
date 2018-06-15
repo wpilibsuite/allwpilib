@@ -55,34 +55,122 @@ LiveWindow::Impl::Impl()
   enabledEntry = statusTable->GetEntry("LW Enabled");
 }
 
-/**
- * Get an instance of the LiveWindow main class.
- *
- * This is a singleton to guarantee that there is only a single instance
- * regardless of how many times GetInstance is called.
- */
 LiveWindow* LiveWindow::GetInstance() {
   static LiveWindow instance;
   return &instance;
 }
 
-/**
- * LiveWindow constructor.
- *
- * Allocate the necessary tables.
- */
-LiveWindow::LiveWindow() : m_impl(new Impl) {}
+void LiveWindow::Run() { UpdateValues(); }
+
+void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
+                           Sendable* component) {
+  Add(component);
+  component->SetName(subsystem, name);
+}
+
+void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
+                           Sendable& component) {
+  Add(&component);
+  component.SetName(subsystem, name);
+}
+
+void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
+                           std::shared_ptr<Sendable> component) {
+  Add(component);
+  component->SetName(subsystem, name);
+}
+
+void LiveWindow::AddActuator(const wpi::Twine& subsystem,
+                             const wpi::Twine& name, Sendable* component) {
+  Add(component);
+  component->SetName(subsystem, name);
+}
+
+void LiveWindow::AddActuator(const wpi::Twine& subsystem,
+                             const wpi::Twine& name, Sendable& component) {
+  Add(&component);
+  component.SetName(subsystem, name);
+}
+
+void LiveWindow::AddActuator(const wpi::Twine& subsystem,
+                             const wpi::Twine& name,
+                             std::shared_ptr<Sendable> component) {
+  Add(component);
+  component->SetName(subsystem, name);
+}
+
+void LiveWindow::AddSensor(const wpi::Twine& type, int channel,
+                           Sendable* component) {
+  Add(component);
+  component->SetName("Ungrouped",
+                     type + Twine('[') + Twine(channel) + Twine(']'));
+}
+
+void LiveWindow::AddActuator(const wpi::Twine& type, int channel,
+                             Sendable* component) {
+  Add(component);
+  component->SetName("Ungrouped",
+                     type + Twine('[') + Twine(channel) + Twine(']'));
+}
+
+void LiveWindow::AddActuator(const wpi::Twine& type, int module, int channel,
+                             Sendable* component) {
+  Add(component);
+  component->SetName("Ungrouped", type + Twine('[') + Twine(module) +
+                                      Twine(',') + Twine(channel) + Twine(']'));
+}
+
+void LiveWindow::Add(std::shared_ptr<Sendable> sendable) {
+  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  auto& comp = m_impl->components[sendable.get()];
+  comp.sendable = sendable;
+}
+
+void LiveWindow::Add(Sendable* sendable) {
+  Add(std::shared_ptr<Sendable>(sendable, NullDeleter<Sendable>()));
+}
+
+void LiveWindow::AddChild(Sendable* parent, std::shared_ptr<Sendable> child) {
+  AddChild(parent, child.get());
+}
+
+void LiveWindow::AddChild(Sendable* parent, void* child) {
+  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  auto& comp = m_impl->components[child];
+  comp.parent = parent;
+  comp.telemetryEnabled = false;
+}
+
+void LiveWindow::Remove(Sendable* sendable) {
+  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  m_impl->components.erase(sendable);
+}
+
+void LiveWindow::EnableTelemetry(Sendable* sendable) {
+  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  // Re-enable global setting in case DisableAllTelemetry() was called.
+  m_impl->telemetryEnabled = true;
+  auto i = m_impl->components.find(sendable);
+  if (i != m_impl->components.end()) i->getSecond().telemetryEnabled = true;
+}
+
+void LiveWindow::DisableTelemetry(Sendable* sendable) {
+  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  auto i = m_impl->components.find(sendable);
+  if (i != m_impl->components.end()) i->getSecond().telemetryEnabled = false;
+}
+
+void LiveWindow::DisableAllTelemetry() {
+  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  m_impl->telemetryEnabled = false;
+  for (auto& i : m_impl->components) i.getSecond().telemetryEnabled = false;
+}
 
 bool LiveWindow::IsEnabled() const {
   std::lock_guard<wpi::mutex> lock(m_impl->mutex);
   return m_impl->liveWindowEnabled;
 }
 
-/**
- * Change the enabled status of LiveWindow.
- *
- * If it changes to enabled, start livewindow running otherwise stop it
- */
 void LiveWindow::SetEnabled(bool enabled) {
   std::lock_guard<wpi::mutex> lock(m_impl->mutex);
   if (m_impl->liveWindowEnabled == enabled) return;
@@ -101,214 +189,6 @@ void LiveWindow::SetEnabled(bool enabled) {
   m_impl->enabledEntry.SetBoolean(enabled);
 }
 
-/**
- * @name AddSensor(subsystem, name, component)
- *
- * Add a Sensor associated with the subsystem and call it by the given name.
- *
- * @param subsystem The subsystem this component is part of.
- * @param name      The name of this component.
- * @param component A Sendable component that represents a sensor.
- */
-//@{
-/**
- * @brief Use a STL smart pointer to share ownership of component.
- * @deprecated Use Sendable::SetName() instead.
- */
-void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
-                           std::shared_ptr<Sendable> component) {
-  Add(component);
-  component->SetName(subsystem, name);
-}
-
-/**
- * @brief Pass a reference to LiveWindow and retain ownership of the component.
- * @deprecated Use Sendable::SetName() instead.
- */
-void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
-                           Sendable& component) {
-  Add(&component);
-  component.SetName(subsystem, name);
-}
-
-/**
- * @brief Use a raw pointer to the LiveWindow.
- * @deprecated Use Sendable::SetName() instead.
- */
-void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
-                           Sendable* component) {
-  Add(component);
-  component->SetName(subsystem, name);
-}
-//@}
-
-/**
- * @name AddActuator(subsystem, name, component)
- *
- * Add an Actuator associated with the subsystem and call it by the given name.
- * @deprecated Use Sendable::SetName() instead.
- *
- * @param subsystem The subsystem this component is part of.
- * @param name      The name of this component.
- * @param component A Sendable component that represents a actuator.
- */
-//@{
-/**
- * @brief Use a STL smart pointer to share ownership of component.
- */
-void LiveWindow::AddActuator(const wpi::Twine& subsystem,
-                             const wpi::Twine& name,
-                             std::shared_ptr<Sendable> component) {
-  Add(component);
-  component->SetName(subsystem, name);
-}
-
-/**
- * @brief Pass a reference to LiveWindow and retain ownership of the component.
- * @deprecated Use Sendable::SetName() instead.
- */
-void LiveWindow::AddActuator(const wpi::Twine& subsystem,
-                             const wpi::Twine& name, Sendable& component) {
-  Add(&component);
-  component.SetName(subsystem, name);
-}
-
-/**
- * @brief Use a raw pointer to the LiveWindow.
- * @deprecated Use Sendable::SetName() instead.
- */
-void LiveWindow::AddActuator(const wpi::Twine& subsystem,
-                             const wpi::Twine& name, Sendable* component) {
-  Add(component);
-  component->SetName(subsystem, name);
-}
-//@}
-
-/**
- * Meant for internal use in other WPILib classes.
- * @deprecated Use SendableBase::SetName() instead.
- */
-void LiveWindow::AddSensor(const wpi::Twine& type, int channel,
-                           Sendable* component) {
-  Add(component);
-  component->SetName("Ungrouped",
-                     type + Twine('[') + Twine(channel) + Twine(']'));
-}
-
-/**
- * Meant for internal use in other WPILib classes.
- * @deprecated Use SendableBase::SetName() instead.
- */
-void LiveWindow::AddActuator(const wpi::Twine& type, int channel,
-                             Sendable* component) {
-  Add(component);
-  component->SetName("Ungrouped",
-                     type + Twine('[') + Twine(channel) + Twine(']'));
-}
-
-/**
- * Meant for internal use in other WPILib classes.
- * @deprecated Use SendableBase::SetName() instead.
- */
-void LiveWindow::AddActuator(const wpi::Twine& type, int module, int channel,
-                             Sendable* component) {
-  Add(component);
-  component->SetName("Ungrouped", type + Twine('[') + Twine(module) +
-                                      Twine(',') + Twine(channel) + Twine(']'));
-}
-
-/**
- * Add a component to the LiveWindow.
- *
- * @param sendable component to add
- */
-void LiveWindow::Add(std::shared_ptr<Sendable> sendable) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
-  auto& comp = m_impl->components[sendable.get()];
-  comp.sendable = sendable;
-}
-
-/**
- * Add a component to the LiveWindow.
- *
- * @param sendable component to add
- */
-void LiveWindow::Add(Sendable* sendable) {
-  Add(std::shared_ptr<Sendable>(sendable, NullDeleter<Sendable>()));
-}
-
-/**
- * Add a child component to a component.
- *
- * @param parent parent component
- * @param child child component
- */
-void LiveWindow::AddChild(Sendable* parent, std::shared_ptr<Sendable> child) {
-  AddChild(parent, child.get());
-}
-
-/**
- * Add a child component to a component.
- *
- * @param parent parent component
- * @param child child component
- */
-void LiveWindow::AddChild(Sendable* parent, void* child) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
-  auto& comp = m_impl->components[child];
-  comp.parent = parent;
-  comp.telemetryEnabled = false;
-}
-
-/**
- * Remove the component from the LiveWindow.
- *
- * @param sendable component to remove
- */
-void LiveWindow::Remove(Sendable* sendable) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
-  m_impl->components.erase(sendable);
-}
-
-/**
- * Enable telemetry for a single component.
- *
- * @param sendable component
- */
-void LiveWindow::EnableTelemetry(Sendable* sendable) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
-  // Re-enable global setting in case DisableAllTelemetry() was called.
-  m_impl->telemetryEnabled = true;
-  auto i = m_impl->components.find(sendable);
-  if (i != m_impl->components.end()) i->getSecond().telemetryEnabled = true;
-}
-
-/**
- * Disable telemetry for a single component.
- *
- * @param sendable component
- */
-void LiveWindow::DisableTelemetry(Sendable* sendable) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
-  auto i = m_impl->components.find(sendable);
-  if (i != m_impl->components.end()) i->getSecond().telemetryEnabled = false;
-}
-
-/**
- * Disable ALL telemetry.
- */
-void LiveWindow::DisableAllTelemetry() {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
-  m_impl->telemetryEnabled = false;
-  for (auto& i : m_impl->components) i.getSecond().telemetryEnabled = false;
-}
-
-/**
- * Tell all the sensors to update (send) their values.
- *
- * Actuators are handled through callbacks on their value changing from the
- * SmartDashboard widgets.
- */
 void LiveWindow::UpdateValues() {
   std::lock_guard<wpi::mutex> lock(m_impl->mutex);
   // Only do this if either LiveWindow mode or telemetry is enabled.
@@ -348,3 +228,5 @@ void LiveWindow::UpdateValues() {
 
   m_impl->startLiveWindow = false;
 }
+
+LiveWindow::LiveWindow() : m_impl(new Impl) {}

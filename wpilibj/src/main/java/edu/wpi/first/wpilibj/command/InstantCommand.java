@@ -25,6 +25,7 @@ public class InstantCommand extends Command {
     super(name);
   }
 
+  @Override
   protected boolean isFinished() {
     return true;
   }

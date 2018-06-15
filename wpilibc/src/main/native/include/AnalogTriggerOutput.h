@@ -51,17 +51,49 @@ class AnalogTriggerOutput : public DigitalSource {
 
  public:
   ~AnalogTriggerOutput() override;
+
+  /**
+   * Get the state of the analog trigger output.
+   *
+   * @return The state of the analog trigger output.
+   */
   bool Get() const;
 
   // DigitalSource interface
+  /**
+   * @return The HAL Handle to the specified source.
+   */
   HAL_Handle GetPortHandleForRouting() const override;
+
+  /**
+   * @return The type of analog trigger output to be used.
+   */
   AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
+
+  /**
+   * Is source an AnalogTrigger
+   */
   bool IsAnalogTrigger() const override;
+
+  /**
+   * @return The channel of the source.
+   */
   int GetChannel() const override;
 
   void InitSendable(SendableBuilder& builder) override;
 
  protected:
+  /**
+   * Create an object that represents one of the four outputs from an analog
+   * trigger.
+   *
+   * Because this class derives from DigitalSource, it can be passed into
+   * routing functions for Counter, Encoder, etc.
+   *
+   * @param trigger    A pointer to the trigger for which this is an output.
+   * @param outputType An enum that specifies the output on the trigger to
+   *                   represent.
+   */
   AnalogTriggerOutput(const AnalogTrigger& trigger,
                       AnalogTriggerType outputType);
 

@@ -43,6 +43,24 @@ static JException interruptedEx;
 static JException nullPointerEx;
 static JException persistentEx;
 
+static const JClassInit classes[] = {
+    {"java/lang/Boolean", &booleanCls},
+    {"edu/wpi/first/networktables/ConnectionInfo", &connectionInfoCls},
+    {"edu/wpi/first/networktables/ConnectionNotification",
+     &connectionNotificationCls},
+    {"java/lang/Double", &doubleCls},
+    {"edu/wpi/first/networktables/EntryInfo", &entryInfoCls},
+    {"edu/wpi/first/networktables/EntryNotification", &entryNotificationCls},
+    {"edu/wpi/first/networktables/LogMessage", &logMessageCls},
+    {"edu/wpi/first/networktables/RpcAnswer", &rpcAnswerCls},
+    {"edu/wpi/first/networktables/NetworkTableValue", &valueCls}};
+
+static const JExceptionInit exceptions[] = {
+    {"java/lang/IllegalArgumentException", &illegalArgEx},
+    {"java/lang/InterruptedException", &interruptedEx},
+    {"java/lang/NullPointerException", &nullPointerEx},
+    {"edu/wpi/first/networktables/PersistentException", &persistentEx}};
+
 extern "C" {
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -53,47 +71,15 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
 
   // Cache references to classes
-  booleanCls = JClass(env, "java/lang/Boolean");
-  if (!booleanCls) return JNI_ERR;
+  for (auto& c : classes) {
+    *c.cls = JClass(env, c.name);
+    if (!*c.cls) return JNI_ERR;
+  }
 
-  connectionInfoCls = JClass(env, "edu/wpi/first/networktables/ConnectionInfo");
-  if (!connectionInfoCls) return JNI_ERR;
-
-  connectionNotificationCls =
-      JClass(env, "edu/wpi/first/networktables/ConnectionNotification");
-  if (!connectionNotificationCls) return JNI_ERR;
-
-  doubleCls = JClass(env, "java/lang/Double");
-  if (!doubleCls) return JNI_ERR;
-
-  entryInfoCls = JClass(env, "edu/wpi/first/networktables/EntryInfo");
-  if (!entryInfoCls) return JNI_ERR;
-
-  entryNotificationCls =
-      JClass(env, "edu/wpi/first/networktables/EntryNotification");
-  if (!entryNotificationCls) return JNI_ERR;
-
-  logMessageCls = JClass(env, "edu/wpi/first/networktables/LogMessage");
-  if (!logMessageCls) return JNI_ERR;
-
-  rpcAnswerCls = JClass(env, "edu/wpi/first/networktables/RpcAnswer");
-  if (!rpcAnswerCls) return JNI_ERR;
-
-  valueCls = JClass(env, "edu/wpi/first/networktables/NetworkTableValue");
-  if (!valueCls) return JNI_ERR;
-
-  illegalArgEx = JException(env, "java/lang/IllegalArgumentException");
-  if (!illegalArgEx) return JNI_ERR;
-
-  interruptedEx = JException(env, "java/lang/InterruptedException");
-  if (!interruptedEx) return JNI_ERR;
-
-  nullPointerEx = JException(env, "java/lang/NullPointerException");
-  if (!nullPointerEx) return JNI_ERR;
-
-  persistentEx =
-      JException(env, "edu/wpi/first/networktables/PersistentException");
-  if (!persistentEx) return JNI_ERR;
+  for (auto& c : exceptions) {
+    *c.cls = JException(env, c.name);
+    if (!*c.cls) return JNI_ERR;
+  }
 
   return JNI_VERSION_1_6;
 }
@@ -103,19 +89,12 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
     return;
   // Delete global references
-  booleanCls.free(env);
-  connectionInfoCls.free(env);
-  connectionNotificationCls.free(env);
-  doubleCls.free(env);
-  entryInfoCls.free(env);
-  entryNotificationCls.free(env);
-  logMessageCls.free(env);
-  rpcAnswerCls.free(env);
-  valueCls.free(env);
-  illegalArgEx.free(env);
-  interruptedEx.free(env);
-  nullPointerEx.free(env);
-  persistentEx.free(env);
+  for (auto& c : classes) {
+    c.cls->free(env);
+  }
+  for (auto& c : exceptions) {
+    c.cls->free(env);
+  }
   jvm = nullptr;
 }
 
@@ -1276,17 +1255,17 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_waitForRpcCallQueue
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    postRpcResponse
- * Signature: (II[B)V
+ * Signature: (II[B)Z
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_postRpcResponse
   (JNIEnv* env, jclass, jint entry, jint call, jbyteArray result)
 {
   if (!result) {
     nullPointerEx.Throw(env, "result cannot be null");
-    return;
+    return false;
   }
-  nt::PostRpcResponse(entry, call, JByteArrayRef{env, result});
+  return nt::PostRpcResponse(entry, call, JByteArrayRef{env, result});
 }
 
 /*
