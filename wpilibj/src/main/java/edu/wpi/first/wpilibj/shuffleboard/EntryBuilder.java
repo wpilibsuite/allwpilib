@@ -7,12 +7,12 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableType;
-
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
+
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableType;
 
 public final class EntryBuilder extends BuilderBase {
 
@@ -20,7 +20,7 @@ public final class EntryBuilder extends BuilderBase {
    * The default values to use for each network table type. Booleans default to false,
    * numbers default to 0.0, and string and arrays are all empty.
    */
-  private static final Map<NetworkTableType, Object> m_defaultEntryValues =
+  private static final EnumMap<NetworkTableType, Object> m_defaultEntryValues =
       new EnumMap<>(NetworkTableType.class);
 
   static {

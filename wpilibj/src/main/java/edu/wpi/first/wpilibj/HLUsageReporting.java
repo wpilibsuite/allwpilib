@@ -77,6 +77,7 @@ public final class HLUsageReporting {
     public void reportSmartDashboard() {
     }
 
+    @Override
     public void reportShuffleboard() {
     }
   }

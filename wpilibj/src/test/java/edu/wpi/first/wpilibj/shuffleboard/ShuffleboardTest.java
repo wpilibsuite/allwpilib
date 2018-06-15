@@ -7,6 +7,17 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -14,63 +25,61 @@ import edu.wpi.first.networktables.NetworkTableType;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.UnitTestUtility;
+import edu.wpi.first.wpilibj.UtilityClassTest;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static edu.wpi.first.networktables.NetworkTableType.kBoolean;
 import static edu.wpi.first.networktables.NetworkTableType.kDouble;
 import static edu.wpi.first.networktables.NetworkTableType.kString;
 import static edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.add;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
-public class ShuffleboardTest {
+@SuppressWarnings("PMD.TooManyMethods")
+public class ShuffleboardTest extends UtilityClassTest {
 
   private static NetworkTableInstance instance;
 
-  @BeforeClass
+  public ShuffleboardTest() {
+    super(Shuffleboard.class);
+  }
+
+  @BeforeAll
   public static void setUpClass() {
     UnitTestUtility.setupMockBase();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     instance = NetworkTableInstance.create();
     Shuffleboard.setNtInstance(instance);
   }
 
-  @AfterClass
+  @AfterAll
   public static void tearDown() {
     Shuffleboard.setNtInstance(NetworkTableInstance.getDefault());
   }
 
   @Test
   public void testInvalidInputsToAddEntry() {
-    assertThrows(NullPointerException.class, () -> add(null, kDouble));
-    assertThrows(NullPointerException.class, () -> add("foo", (NetworkTableType) null));
-    assertThrows(IllegalArgumentException.class, () -> add("", kDouble));
-    assertThrows(IllegalArgumentException.class, () -> add("a/b", kDouble));
+    assertAll(
+        () -> assertThrows(NullPointerException.class, () -> add(null, kDouble)),
+        () -> assertThrows(NullPointerException.class, () -> add("foo", (NetworkTableType) null)),
+        () -> assertThrows(IllegalArgumentException.class, () -> add("", kDouble)),
+        () -> assertThrows(IllegalArgumentException.class, () -> add("a/b", kDouble)));
   }
 
   @Test
   public void testInvalidInputsToAddSendable() {
-    assertThrows(NullPointerException.class, () -> add(null, new MockSendable()));
-    assertThrows(NullPointerException.class, () -> add("foo", (Sendable) null));
-    assertThrows(IllegalArgumentException.class, () -> add("", new MockSendable()));
-    assertThrows(IllegalArgumentException.class, () -> add("a/b", new MockSendable()));
-    assertThrows(IllegalArgumentException.class, () -> add(new MockSendable()));
-    assertThrows(NullPointerException.class, () -> add(new MockSendable(null)));
-    assertThrows(IllegalArgumentException.class, () -> add(new MockSendable("a/b")));
+    assertAll(
+        () -> assertThrows(NullPointerException.class, () -> add(null, new MockSendable())),
+        () -> assertThrows(NullPointerException.class, () -> add("foo", (Sendable) null)),
+        () -> assertThrows(IllegalArgumentException.class, () -> add("", new MockSendable())),
+        () -> assertThrows(IllegalArgumentException.class, () -> add("a/b", new MockSendable())),
+        () -> assertThrows(IllegalArgumentException.class, () -> add(new MockSendable())),
+        () -> assertThrows(NullPointerException.class, () -> add(new MockSendable(null))),
+        () -> assertThrows(IllegalArgumentException.class, () -> add(new MockSendable("a/b"))));
   }
 
   @Test
@@ -170,11 +179,11 @@ public class ShuffleboardTest {
     NetworkTableEntry addedEntry = add("Entry Name", kDouble)
         .toTab("Tab Name")
         .getEntry();
-    assertEquals("Generated entry name was unexpected", entry.getName(), addedEntry.getName());
+    assertEquals(entry.getName(), addedEntry.getName(), "Generated entry name was unexpected");
     assertEquals(kDouble, addedEntry.getType());
-    assertEquals(0.0, addedEntry.getDouble(Double.MAX_VALUE), 0);
+    assertEquals(0.0, addedEntry.getDouble(Double.MAX_VALUE));
     assertEquals(kDouble, entry.getType());
-    assertEquals(0.0, entry.getDouble(Double.MAX_VALUE), 0);
+    assertEquals(0.0, entry.getDouble(Double.MAX_VALUE));
   }
 
   @Test
@@ -224,7 +233,7 @@ public class ShuffleboardTest {
 
     NetworkTable properties = metadata.getSubTable("LayoutProperties");
     assertEquals(setOf("Property 1", "Property 2"), properties.getKeys());
-    assertEquals(Math.PI, properties.getEntry("Property 1").getDouble(0), 0);
+    assertEquals(Math.PI, properties.getEntry("Property 1").getDouble(0));
     assertEquals("bar", properties.getEntry("Property 2").getString(null));
 
     NetworkTable sendableTable = instance.getTable(
@@ -319,22 +328,10 @@ public class ShuffleboardTest {
    * Stub for Java 9 {@code Map.of(K, V, K, V)}.
    */
   private static <K, V> Map<K, V> mapOf(K key1, V value1, K key2, V value2) {
-    Map<K, V> map = new HashMap<>();
+    Map<K, V> map = new HashMap<>(); // NOPMD use ConcurrentHashMap
     map.put(key1, value1);
     map.put(key2, value2);
     return map;
-  }
-
-  /**
-   * Stub for JUnit 5 {@code assertThrows}.
-   */
-  private static void assertThrows(Class<? extends Throwable> exceptionClass, Runnable action) {
-    try {
-      action.run();
-      fail("Expected a " + exceptionClass.getName() + ", but nothing was thrown");
-    } catch (Throwable throwable) {
-      assertEquals(exceptionClass, throwable.getClass());
-    }
   }
 
 }

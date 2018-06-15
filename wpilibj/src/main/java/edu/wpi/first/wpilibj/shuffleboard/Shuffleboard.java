@@ -7,16 +7,16 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableType;
 import edu.wpi.first.wpilibj.HLUsageReporting;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * The Shuffleboard class provides a mechanism with which data can be added and laid out in the
@@ -61,7 +61,7 @@ public final class Shuffleboard {
   // Not final to allow tests to have fresh instances
   private static NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
 
-  private static boolean m_dirtyMetadata = false;
+  private static boolean m_dirtyMetadata = false; // NOPMD redundant field initializer
   private static final List<BuilderBase> m_builders = new ArrayList<>();
   private static final List<SendableData> m_sendables = new ArrayList<>();
 
@@ -69,11 +69,15 @@ public final class Shuffleboard {
     HLUsageReporting.reportShuffleboard();
   }
 
+  private Shuffleboard() {
+    throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+  }
+
   private static final class SendableData {
 
     private final SendableBuilder m_sendable;
     private final SendableBuilderImpl m_builder;
-    private boolean m_initialized = false;
+    private boolean m_initialized = false; // NOPMD redundant field initializer
 
     SendableData(SendableBuilder sendable, SendableBuilderImpl builder) {
       this.m_sendable = sendable;

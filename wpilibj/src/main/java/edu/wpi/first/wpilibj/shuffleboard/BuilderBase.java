@@ -10,8 +10,8 @@ package edu.wpi.first.wpilibj.shuffleboard;
 abstract class BuilderBase {
 
   private final String m_name;
-  private Tab m_tab = null;
-  private Layout m_layout = null;
+  private Tab m_tab;
+  private Layout m_layout;
   private Widget m_widget;
 
   BuilderBase(String name) {
