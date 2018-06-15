@@ -30,6 +30,7 @@ generatedFileExclude {
   src/main/native/include/wpi/Path\.h$
   src/main/native/include/wpi/PointerLikeTypeTraits\.h$
   src/main/native/include/wpi/STLExtras\.h$
+  src/main/native/include/wpi/Signal\.h$
   src/main/native/include/wpi/SmallPtrSet\.h$
   src/main/native/include/wpi/SmallSet\.h$
   src/main/native/include/wpi/SmallString\.h$
