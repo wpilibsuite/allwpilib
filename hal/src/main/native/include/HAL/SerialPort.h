@@ -43,7 +43,7 @@ void HAL_InitializeSerialPortDirect(HAL_SerialPort port, const char* portName,
                                     int32_t* status);
 
 /**
- * Set the baud rate of a serial port.
+ * Sets the baud rate of a serial port.
  *
  * Any value between 0 and 0xFFFFFFFF may be used. Default is 9600.
  *
@@ -53,7 +53,7 @@ void HAL_InitializeSerialPortDirect(HAL_SerialPort port, const char* portName,
 void HAL_SetSerialBaudRate(HAL_SerialPort port, int32_t baud, int32_t* status);
 
 /**
- * Set the number of data bits on a serial port.
+ * Sets the number of data bits on a serial port.
  *
  * Defaults to 8.
  *
@@ -63,7 +63,7 @@ void HAL_SetSerialBaudRate(HAL_SerialPort port, int32_t baud, int32_t* status);
 void HAL_SetSerialDataBits(HAL_SerialPort port, int32_t bits, int32_t* status);
 
 /**
- * Set the number of parity bits on a serial port.
+ * Sets the number of parity bits on a serial port.
  *
  * Valid values are:
  *   0: None (default)
@@ -78,7 +78,7 @@ void HAL_SetSerialDataBits(HAL_SerialPort port, int32_t bits, int32_t* status);
 void HAL_SetSerialParity(HAL_SerialPort port, int32_t parity, int32_t* status);
 
 /**
- * Set the number of stop bits on a serial port.
+ * Sets the number of stop bits on a serial port.
  *
  * Valid values are:
  *   10: One stop bit (default)
@@ -145,7 +145,7 @@ void HAL_EnableSerialTermination(HAL_SerialPort port, char terminator,
 void HAL_DisableSerialTermination(HAL_SerialPort port, int32_t* status);
 
 /**
- * Set the size of the read buffer.
+ * Sets the size of the read buffer.
  *
  * @param port the serial port
  * @param size the read buffer size
@@ -154,7 +154,7 @@ void HAL_SetSerialReadBufferSize(HAL_SerialPort port, int32_t size,
                                  int32_t* status);
 
 /**
- * Set the size of the write buffer.
+ * Sets the size of the write buffer.
  *
  * @param port the serial port
  * @param size the write buffer size
@@ -163,7 +163,7 @@ void HAL_SetSerialWriteBufferSize(HAL_SerialPort port, int32_t size,
                                   int32_t* status);
 
 /**
- * Get the number of bytes currently in the read buffer
+ * Gets the number of bytes currently in the read buffer.
  *
  * @param port the serial port
  * @return     the number of bytes in the read buffer
@@ -171,7 +171,7 @@ void HAL_SetSerialWriteBufferSize(HAL_SerialPort port, int32_t size,
 int32_t HAL_GetSerialBytesReceived(HAL_SerialPort port, int32_t* status);
 
 /**
- * Read data from the serial port.
+ * Reads data from the serial port.
  *
  * Will wait for either timeout (if set), the termination char (if set), or the
  * count to be full. Whichever one comes first.
@@ -184,7 +184,7 @@ int32_t HAL_ReadSerial(HAL_SerialPort port, char* buffer, int32_t count,
                        int32_t* status);
 
 /**
- * Write data to the serial port.
+ * Writes data to the serial port.
  *
  * @param port   the serial port
  * @param buffer the buffer to write
@@ -195,21 +195,21 @@ int32_t HAL_WriteSerial(HAL_SerialPort port, const char* buffer, int32_t count,
                         int32_t* status);
 
 /**
- * Flush the serial write buffer out to the port.
+ * Flushes the serial write buffer out to the port.
  *
  * @param port the serial port
  */
 void HAL_FlushSerial(HAL_SerialPort port, int32_t* status);
 
 /**
- * Clear the receive buffer of the serial port.
+ * Clears the receive buffer of the serial port.
  *
  * @param port the serial port
  */
 void HAL_ClearSerial(HAL_SerialPort port, int32_t* status);
 
 /**
- * Close a serial port
+ * Closes a serial port.
  *
  * @param port the serial port to close
  */

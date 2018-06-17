@@ -32,7 +32,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status);
 
 /**
- * Check if a pwm channel is valid.
+ * Checks if a pwm channel is valid.
  *
  * @param channel the channel to check
  * @return        true if the channel is valid, otherwise false
@@ -76,7 +76,7 @@ void HAL_SetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t maxPwm,
                          int32_t* status);
 
 /**
- * Gets the raw pwm configuration settings for the PWM channel
+ * Gets the raw pwm configuration settings for the PWM channel.
  *
  * Values are in raw FPGA units. These units have the potential to change for
  * any FPGA release.
@@ -113,7 +113,7 @@ HAL_Bool HAL_GetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
                                      int32_t* status);
 
 /**
- * Set a PWM channel to the desired value.
+ * Sets a PWM channel to the desired value.
  *
  * The values are in raw FPGA units, and have the potential to change with any
  * FPGA release.
@@ -125,7 +125,7 @@ void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value,
                    int32_t* status);
 
 /**
- * Set a PWM channel to the desired scaled value.
+ * Sets a PWM channel to the desired scaled value.
  *
  * The values range from -1 to 1 and the period is controlled by the PWM Period
  * and MinHigh registers.
@@ -137,7 +137,7 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
                      int32_t* status);
 
 /**
- * Set a PWM channel to the desired position value.
+ * Sets a PWM channel to the desired position value.
  *
  * The values range from 0 to 1 and the period is controlled by the PWM Period
  * and MinHigh registers.
@@ -160,7 +160,7 @@ void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double position,
 void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status);
 
 /**
- * Get a value from a PWM channel.
+ * Gets a value from a PWM channel.
  *
  * The values are in raw FPGA units, and have the potential to change with any
  * FPGA release.
@@ -171,7 +171,7 @@ void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status);
 int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status);
 
 /**
- * Get a scaled value from a PWM channel.
+ * Gets a scaled value from a PWM channel.
  *
  * The values range from -1 to 1.
  *
@@ -181,7 +181,7 @@ int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status);
 double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status);
 
 /**
- * Get a position value from a PWM channel.
+ * Gets a position value from a PWM channel.
  *
  * The values range from 0 to 1.
  *
@@ -198,7 +198,7 @@ double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status);
 void HAL_LatchPWMZero(HAL_DigitalHandle pwmPortHandle, int32_t* status);
 
 /**
- * Set how how often the PWM signal is squelched, thus scaling the period.
+ * Sets how how often the PWM signal is squelched, thus scaling the period.
  *
  * @param pwmPortHandle the PWM handle.
  * @param squelchMask   the 2-bit mask of outputs to squelch
@@ -207,14 +207,14 @@ void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
                            int32_t* status);
 
 /**
- * Get the loop timing of the PWM system.
+ * Gets the loop timing of the PWM system.
  *
  * @return the loop time
  */
 int32_t HAL_GetPWMLoopTiming(int32_t* status);
 
 /**
- * Get the pwm starting cycle time.
+ * Gets the pwm starting cycle time.
  *
  * This time is relative to the FPGA time.
  *

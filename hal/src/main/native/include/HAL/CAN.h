@@ -68,7 +68,7 @@ void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
                             uint32_t* timeStamp, int32_t* status);
 
 /**
- * Open a CAN stream.
+ * Opens a CAN stream.
  *
  * @param sessionHandle output for the session handle
  * @param messageID     the message ID to read
@@ -80,14 +80,14 @@ void HAL_CAN_OpenStreamSession(uint32_t* sessionHandle, uint32_t messageID,
                                int32_t* status);
 
 /**
- * Close a CAN stream.
+ * Closes a CAN stream.
  *
  * @param sessionHandle the session to close
  */
 void HAL_CAN_CloseStreamSession(uint32_t sessionHandle);
 
 /**
- * Read a CAN stream message.
+ * Reads a CAN stream message.
  *
  * @param sessionHandle  the session handle
  * @param messages       array of messages
@@ -100,7 +100,7 @@ void HAL_CAN_ReadStreamSession(uint32_t sessionHandle,
                                int32_t* status);
 
 /**
- * Get CAN status information.
+ * Gets CAN status information.
  *
  * @param percentBusUtilization the bus utilization
  * @param busOffCount           the number of bus off errors

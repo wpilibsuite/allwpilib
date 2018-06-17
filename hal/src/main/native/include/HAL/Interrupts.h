@@ -37,7 +37,7 @@ HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher, int32_t* status);
 void* HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status);
 
 /**
- * In synchronous mode, wait for the defined interrupt to occur.
+ * In synchronous mode, waits for the defined interrupt to occur.
  *
  * @param interruptHandle the interrupt handle
  * @param timeout        timeout in seconds
@@ -50,7 +50,7 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
                              int32_t* status);
 
 /**
- * Enable interrupts to occur on this input.
+ * Enables interrupts to occur on this input.
  *
  * Interrupts are disabled when the RequestInterrupt call is made. This gives
  * time to do the setup of the other options before starting to field
@@ -61,7 +61,7 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
 void HAL_EnableInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status);
 
 /**
- * Disable Interrupts without without deallocating structures.
+ * Disables interrupts without without deallocating structures.
  *
  * @param interruptHandle the interrupt handle
  */
@@ -69,7 +69,7 @@ void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
                            int32_t* status);
 
 /**
- * Return the timestamp for the rising interrupt that occurred most recently.
+ * Returns the timestamp for the rising interrupt that occurred most recently.
  *
  * This is in the same time domain as HAL_GetFPGATime().
  *
@@ -80,7 +80,7 @@ double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
                                         int32_t* status);
 
 /**
- * Return the timestamp for the falling interrupt that occurred most recently.
+ * Returns the timestamp for the falling interrupt that occurred most recently.
  *
  * This is in the same time domain as HAL_GetFPGATime().
  *
@@ -91,7 +91,7 @@ double HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
                                          int32_t* status);
 
 /**
- * Request interrupts on a specific digital source.
+ * Requests interrupts on a specific digital source.
  *
  * @param interruptHandle     the interrupt handle
  * @param digitalSourceHandle the digital source handle (either a
@@ -132,7 +132,7 @@ void HAL_AttachInterruptHandlerThreaded(HAL_InterruptHandle interruptHandle,
                                         void* param, int32_t* status);
 
 /**
- * Set the edges to trigger the interrupt on.
+ * Sets the edges to trigger the interrupt on.
  *
  * Note that both edges triggered is a valid configuration.
  *

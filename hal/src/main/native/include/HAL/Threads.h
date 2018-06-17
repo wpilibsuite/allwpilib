@@ -19,7 +19,7 @@
 
 extern "C" {
 /**
- * Get the thread priority for the specified thread.
+ * Gets the thread priority for the specified thread.
  *
  * @param handle     Native handle pointer to the thread to get the priority for
  * @param isRealTime Set to true if thread is realtime, otherwise false
@@ -31,7 +31,7 @@ int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,
                               int32_t* status);
 
 /**
- * Get the thread priority for the current thread.
+ * Gets the thread priority for the current thread.
  *
  * @param handle     Native handle pointer to the thread to get the priority for
  * @param isRealTime Set to true if thread is realtime, otherwise false

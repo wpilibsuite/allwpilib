@@ -65,7 +65,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(
 void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status);
 
 /**
- * Get the current counts of the encoder after encoding type scaling.
+ * Gets the current counts of the encoder after encoding type scaling.
  *
  * This is scaled by the value passed duing initialization to encodingType.
  *
@@ -85,7 +85,7 @@ int32_t HAL_GetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status);
 int32_t HAL_GetEncoderRaw(HAL_EncoderHandle encoderHandle, int32_t* status);
 
 /**
- * Get the encoder scale value.
+ * Gets the encoder scale value.
  *
  * This is set by the value passed during initialization to encodingType.
  *
@@ -96,7 +96,7 @@ int32_t HAL_GetEncoderEncodingScale(HAL_EncoderHandle encoderHandle,
                                     int32_t* status);
 
 /**
- * Read the current encoder value.
+ * Reads the current encoder value.
  *
  * Read the value at this instant. It may still be running, so it reflects the
  * current value. Next time it is read, it might have a different value.
@@ -107,7 +107,7 @@ int32_t HAL_GetEncoderEncodingScale(HAL_EncoderHandle encoderHandle,
 void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status);
 
 /*
- * Get the Period of the most recent count.
+ * Gets the Period of the most recent count.
  *
  * Returns the time interval of the most recent count. This can be used for
  * velocity calculations to determine shaft speed.
@@ -118,7 +118,7 @@ void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status);
 double HAL_GetEncoderPeriod(HAL_EncoderHandle encoderHandle, int32_t* status);
 
 /**
- * Set the maximum period where the device is still considered "moving".
+ * Sets the maximum period where the device is still considered "moving".
  *
  * Sets the maximum period where the device is considered moving. This value is
  * used to determine the "stopped" state of the encoder using the
@@ -132,9 +132,9 @@ void HAL_SetEncoderMaxPeriod(HAL_EncoderHandle encoderHandle, double maxPeriod,
                              int32_t* status);
 
 /**
- * Determine if the clock is stopped.
+ * Determines if the clock is stopped.
  *
- * Determine if the clocked input is stopped based on the MaxPeriod value set
+ * Determines if the clocked input is stopped based on the MaxPeriod value set
  * using the SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the
  * device (and encoder) are assumed to be stopped and it returns true.
  *
@@ -146,7 +146,7 @@ HAL_Bool HAL_GetEncoderStopped(HAL_EncoderHandle encoderHandle,
                                int32_t* status);
 
 /**
- * The last direction the encoder value changed.
+ * Gets the last direction the encoder value changed.
  *
  * @param encoderHandle the encoder handle
  * @return              the last direction the encoder value changed
@@ -155,7 +155,7 @@ HAL_Bool HAL_GetEncoderDirection(HAL_EncoderHandle encoderHandle,
                                  int32_t* status);
 
 /**
- * Get the current distance traveled by the encoder.
+ * Gets the current distance traveled by the encoder.
  *
  * This is the encoder count scaled by the distance per pulse set for the
  * encoder.
@@ -167,7 +167,7 @@ HAL_Bool HAL_GetEncoderDirection(HAL_EncoderHandle encoderHandle,
 double HAL_GetEncoderDistance(HAL_EncoderHandle encoderHandle, int32_t* status);
 
 /**
- * Get the current rate of the encoder.
+ * Gets the current rate of the encoder.
  *
  * This is the encoder period scaled by the distance per pulse set for the
  * encoder.
@@ -215,7 +215,7 @@ void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoderHandle,
                                     HAL_Bool reverseDirection, int32_t* status);
 
 /**
- * Set the number of encoder samples to average when calculating encoder rate.
+ * Sets the number of encoder samples to average when calculating encoder rate.
  *
  * @param encoderHandle    the encoder handle
  * @param samplesToAverage the number of samples to average
@@ -224,7 +224,7 @@ void HAL_SetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
                                     int32_t samplesToAverage, int32_t* status);
 
 /**
- * Get the current samples to average value.
+ * Gets the current samples to average value.
  *
  * @param encoderHandle the encoder handle
  * @return              the current samples to average value
@@ -251,7 +251,7 @@ void HAL_SetEncoderIndexSource(HAL_EncoderHandle encoderHandle,
                                HAL_EncoderIndexingType type, int32_t* status);
 
 /**
- * Get the FPGA index of the encoder.
+ * Gets the FPGA index of the encoder.
  *
  * @param encoderHandle the encoder handle
  * @return              the FPGA index of the encoder
@@ -260,7 +260,7 @@ int32_t HAL_GetEncoderFPGAIndex(HAL_EncoderHandle encoderHandle,
                                 int32_t* status);
 
 /**
- * Get the decoding scale factor of the encoder.
+ * Gets the decoding scale factor of the encoder.
  *
  * This is used to perform the scaling from raw to type scaled values.
  *
@@ -271,7 +271,7 @@ double HAL_GetEncoderDecodingScaleFactor(HAL_EncoderHandle encoderHandle,
                                          int32_t* status);
 
 /**
- * Get the user set distance per pulse of the encoder.
+ * Gets the user set distance per pulse of the encoder.
  *
  * @param encoderHandle the encoder handle
  * @return              the set distance per pulse
@@ -280,7 +280,7 @@ double HAL_GetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
                                       int32_t* status);
 
 /**
- * Get the encoding type of the encoder.
+ * Gets the encoding type of the encoder.
  *
  * @param encoderHandle the encoder handle
  * @return              the encoding type

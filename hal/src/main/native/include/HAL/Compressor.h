@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 /**
- * Initialize a compressor on the given PCM module.
+ * Initializes a compressor on the given PCM module.
  *
  * @param module the module number
  * @return       the created handle
@@ -24,7 +24,7 @@ extern "C" {
 HAL_CompressorHandle HAL_InitializeCompressor(int32_t module, int32_t* status);
 
 /**
- * Get if a compressor module is valid.
+ * Gets if a compressor module is valid.
  *
  * @param module the module number
  * @return       true if the module is valid, otherwise false
@@ -32,7 +32,7 @@ HAL_CompressorHandle HAL_InitializeCompressor(int32_t module, int32_t* status);
 HAL_Bool HAL_CheckCompressorModule(int32_t module);
 
 /**
- * Get the compressor state (on or off).
+ * Gets the compressor state (on or off).
  *
  * @param compressorHandle the compressor handle
  * @return                 true if the compressor is on, otherwise false
@@ -41,7 +41,7 @@ HAL_Bool HAL_GetCompressor(HAL_CompressorHandle compressorHandle,
                            int32_t* status);
 
 /**
- * Set the compressor to closed loop mode.
+ * Sets the compressor to closed loop mode.
  *
  * @param compressorHandle the compressor handle
  * @param value            true for closed loop mode, false for off
@@ -50,7 +50,7 @@ void HAL_SetCompressorClosedLoopControl(HAL_CompressorHandle compressorHandle,
                                         HAL_Bool value, int32_t* status);
 
 /**
- * Get if the compressor is in closed loop mode.
+ * Gets if the compressor is in closed loop mode.
  *
  * @param compressorHandle the compressor handle
  * @return                 true if the compressor is in closed loop mode,
@@ -60,7 +60,7 @@ HAL_Bool HAL_GetCompressorClosedLoopControl(
     HAL_CompressorHandle compressorHandle, int32_t* status);
 
 /**
- * Get the compressor pressure switch state.
+ * Gets the compressor pressure switch state.
  *
  * @param compressorHandle the compressor handle
  * @return                 true if the pressure switch is triggered, otherwise
@@ -70,7 +70,7 @@ HAL_Bool HAL_GetCompressorPressureSwitch(HAL_CompressorHandle compressorHandle,
                                          int32_t* status);
 
 /**
- * Get the compressor current.
+ * Gets the compressor current.
  *
  * @param compressorHandle the compressor handle
  * @return                 the compressor current in amps
@@ -79,7 +79,7 @@ double HAL_GetCompressorCurrent(HAL_CompressorHandle compressorHandle,
                                 int32_t* status);
 
 /**
- * Get if the compressor is faulted because of too high of current.
+ * Gets if the compressor is faulted because of too high of current.
  *
  * @param compressorHandle the compressor handle
  * @return                 true if falted, otherwise false
@@ -88,7 +88,7 @@ HAL_Bool HAL_GetCompressorCurrentTooHighFault(
     HAL_CompressorHandle compressorHandle, int32_t* status);
 
 /**
- * Get if a sticky fauly is triggered because of too high of current.
+ * Gets if a sticky fauly is triggered because of too high of current.
  *
  * @param compressorHandle the compressor handle
  * @return                 true if falted, otherwise false
@@ -97,7 +97,7 @@ HAL_Bool HAL_GetCompressorCurrentTooHighStickyFault(
     HAL_CompressorHandle compressorHandle, int32_t* status);
 
 /**
- * Get if a sticky fauly is triggered because of a short.
+ * Gets if a sticky fauly is triggered because of a short.
  *
  * @param compressorHandle the compressor handle
  * @return                 true if falted, otherwise false
@@ -106,7 +106,7 @@ HAL_Bool HAL_GetCompressorShortedStickyFault(
     HAL_CompressorHandle compressorHandle, int32_t* status);
 
 /**
- * Get if the compressor is faulted because of a short.
+ * Gets if the compressor is faulted because of a short.
  *
  * @param compressorHandle the compressor handle
  * @return                 true if shorted, otherwise false
@@ -115,7 +115,7 @@ HAL_Bool HAL_GetCompressorShortedFault(HAL_CompressorHandle compressorHandle,
                                        int32_t* status);
 
 /**
- * Get if a sticky fault is triggered of the compressor not connected.
+ * Gets if a sticky fault is triggered of the compressor not connected.
  *
  * @param compressorHandle the compressor handle
  * @return                 true if falted, otherwise false
@@ -124,7 +124,7 @@ HAL_Bool HAL_GetCompressorNotConnectedStickyFault(
     HAL_CompressorHandle compressorHandle, int32_t* status);
 
 /**
- * Get if the compressor is not connected.
+ * Gets if the compressor is not connected.
  *
  * @param compressorHandle the compressor handle
  * @return                 true if not connected, otherwise false

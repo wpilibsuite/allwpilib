@@ -14,7 +14,7 @@ extern "C" {
 #endif
 
 /**
- * Get the number of FPGA system clock ticks per microsecond.
+ * Gets the number of FPGA system clock ticks per microsecond.
  *
  * @return the number of clock ticks per microsecond
  */

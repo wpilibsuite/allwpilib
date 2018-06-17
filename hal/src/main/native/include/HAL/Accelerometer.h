@@ -22,7 +22,7 @@ enum HAL_AccelerometerRange : int32_t {
 extern "C" {
 #endif
 /**
- * Set the accelerometer to active or standby mode.
+ * Sets the accelerometer to active or standby mode.
  *
  * It must be in standby mode to change any configuration.
  *
@@ -31,7 +31,7 @@ extern "C" {
 void HAL_SetAccelerometerActive(HAL_Bool active);
 
 /**
- * Set the range of values that can be measured (either 2, 4, or 8 g-forces).
+ * Sets the range of values that can be measured (either 2, 4, or 8 g-forces).
  *
  * The accelerometer should be in standby mode when this is called.
  *
@@ -40,7 +40,7 @@ void HAL_SetAccelerometerActive(HAL_Bool active);
 void HAL_SetAccelerometerRange(HAL_AccelerometerRange range);
 
 /**
- * Get the x-axis acceleration.
+ * Gets the x-axis acceleration.
  *
  * This is a floating point value in units of 1 g-force.
  *
@@ -49,7 +49,7 @@ void HAL_SetAccelerometerRange(HAL_AccelerometerRange range);
 double HAL_GetAccelerometerX(void);
 
 /**
- * Get the y-axis acceleration.
+ * Gets the y-axis acceleration.
  *
  * This is a floating point value in units of 1 g-force.
  *
@@ -58,7 +58,7 @@ double HAL_GetAccelerometerX(void);
 double HAL_GetAccelerometerY(void);
 
 /**
- * Get the z-axis acceleration.
+ * Gets the z-axis acceleration.
  *
  * This is a floating point value in units of 1 g-force.
  *

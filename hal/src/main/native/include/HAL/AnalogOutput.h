@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 /**
- * Initialize the analog output port using the given port object.
+ * Initializes the analog output port using the given port object.
  *
  * @param handle handle to the port
  * @return       the created analog output handle
@@ -50,9 +50,9 @@ double HAL_GetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
                            int32_t* status);
 
 /**
- * Check that the analog output channel number is value.
+ * Checks that the analog output channel number is value.
  *
- * Verify that the analog channel number is one of the legal channel numbers.
+ * Verifies that the analog channel number is one of the legal channel numbers.
  * Channel numbers are 0-based.
  *
  * @return Analog channel is valid

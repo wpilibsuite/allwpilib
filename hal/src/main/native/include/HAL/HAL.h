@@ -50,7 +50,7 @@ extern "C" {
 #endif
 
 /**
- * Get the error message for a specific status code.
+ * Gets the error message for a specific status code.
  *
  * @param code the status code
  * @return     the error message for the code. This does not need to be freed.
@@ -58,7 +58,7 @@ extern "C" {
 const char* HAL_GetErrorMessage(int32_t code);
 
 /**
- * Return the FPGA Version number.
+ * Returns the FPGA Version number.
  *
  * For now, expect this to be competition year.
  *
@@ -67,7 +67,7 @@ const char* HAL_GetErrorMessage(int32_t code);
 int32_t HAL_GetFPGAVersion(int32_t* status);
 
 /**
- * Return the FPGA Revision number.
+ * Returns the FPGA Revision number.
  *
  * The format of the revision is 3 numbers.
  * The 12 most significant bits are the Major Revision.
@@ -81,7 +81,7 @@ int64_t HAL_GetFPGARevision(int32_t* status);
 HAL_RuntimeType HAL_GetRuntimeType(void);
 
 /**
- * Get the state of the "USER" button on the roboRIO.
+ * Gets the state of the "USER" button on the roboRIO.
  *
  * @return true if the button is currently pressed down
  */
@@ -114,7 +114,7 @@ void HAL_BaseInitialize(int32_t* status);
 #ifndef HAL_USE_LABVIEW
 
 /**
- * Get a port handle for a specific channel.
+ * Gets a port handle for a specific channel.
  *
  * The created handle does not need to be freed.
  *
@@ -124,7 +124,7 @@ void HAL_BaseInitialize(int32_t* status);
 HAL_PortHandle HAL_GetPort(int32_t channel);
 
 /**
- * Get a port handle for a specific channel and module.
+ * Gets a port handle for a specific channel and module.
  *
  * This is expected to be used for PCMs, as the roboRIO does not work with
  * modules anymore.
@@ -138,7 +138,7 @@ HAL_PortHandle HAL_GetPort(int32_t channel);
 HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel);
 
 /**
- * Read the microsecond-resolution timer on the FPGA.
+ * Reads the microsecond-resolution timer on the FPGA.
  *
  * @return The current time in microseconds according to the FPGA (since FPGA
  * reset).
@@ -174,7 +174,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode);
 // ifdef's definition is to allow for default parameters in C++.
 #ifdef __cplusplus
 /**
- * Report a hardware usage to the HAL.
+ * Reports a hardware usage to the HAL.
  *
  * @param resource       the used resource
  * @param instanceNumber the instance of the resource
@@ -187,7 +187,7 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber,
 #else
 
 /**
- * Report a hardware usage to the HAL.
+ * Reports a hardware usage to the HAL.
  *
  * @param resource       the used resource
  * @param instanceNumber the instance of the resource

@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 /**
- * Create a new instance of a digital port.
+ * Creates a new instance of a digital port.
  *
  * @param portHandle the port handle to create from
  * @param input      true for input, false for output
@@ -36,21 +36,21 @@ HAL_Bool HAL_CheckDIOChannel(int32_t channel);
 void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle);
 
 /**
- * Allocate a DO PWM Generator.
+ * Allocates a DO PWM Generator.
  *
  * @return the allocated digital PWM handle
  */
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status);
 
 /**
- * Free the resource associated with a DO PWM generator.
+ * Frees the resource associated with a DO PWM generator.
  *
  * @param pwmGenerator the digital PWM handle
  */
 void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status);
 
 /**
- * Change the frequency of the DO PWM generator.
+ * Changes the frequency of the DO PWM generator.
  *
  * The valid range is from 0.6 Hz to 19 kHz.
  *
@@ -61,7 +61,7 @@ void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status);
 void HAL_SetDigitalPWMRate(double rate, int32_t* status);
 
 /**
- * Configure the duty-cycle of the PWM generator.
+ * Configures the duty-cycle of the PWM generator.
  *
  * @param pwmGenerator the digital PWM handle
  * @param dutyCycle    the percent duty cycle to output [0..1]
@@ -70,7 +70,7 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
                                 double dutyCycle, int32_t* status);
 
 /**
- * Configure which DO channel the PWM signal is output on.
+ * Configures which DO channel the PWM signal is output on.
  *
  * @param pwmGenerator the digital PWM handle
  * @param channel      the channel to output on
@@ -79,7 +79,7 @@ void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
                                     int32_t channel, int32_t* status);
 
 /**
- * Write a digital value to a DIO channel.
+ * Writes a digital value to a DIO channel.
  *
  * @param dioPortHandle the digital port handle
  * @param value         the state to set the digital channel (if it is
@@ -89,7 +89,7 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
                 int32_t* status);
 
 /**
- * Set the direction of a DIO channel.
+ * Sets the direction of a DIO channel.
  *
  * @param dioPortHandle the digital port handle
  * @param input         true to set input, false for output
@@ -98,7 +98,7 @@ void HAL_SetDIODirection(HAL_DigitalHandle dioPortHandle, HAL_Bool input,
                          int32_t* status);
 
 /**
- * Read a digital value from a DIO channel.
+ * Reads a digital value from a DIO channel.
  *
  * @param dioPortHandle the digital port handle
  * @return              the state of the specified channel
@@ -106,7 +106,7 @@ void HAL_SetDIODirection(HAL_DigitalHandle dioPortHandle, HAL_Bool input,
 HAL_Bool HAL_GetDIO(HAL_DigitalHandle dioPortHandle, int32_t* status);
 
 /**
- * Read the direction of a DIO channel.
+ * Reads the direction of a DIO channel.
  *
  * @param dioPortHandle the digital port handle
  * @return              true for input, false for output
@@ -114,7 +114,7 @@ HAL_Bool HAL_GetDIO(HAL_DigitalHandle dioPortHandle, int32_t* status);
 HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status);
 
 /**
- * Generate a single digital pulse.
+ * Generates a single digital pulse.
  *
  * Write a pulse to the specified digital output channel. There can only be a
  * single pulse going at any time.
@@ -126,21 +126,21 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
                int32_t* status);
 
 /**
- * Check a DIO line to see if it is currently generating a pulse.
+ * Checks a DIO line to see if it is currently generating a pulse.
  *
  * @return true if a pulse is in progress, otherwise false
  */
 HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status);
 
 /**
- * Check if any DIO line is currently generating a pulse.
+ * Checks if any DIO line is currently generating a pulse.
  *
  * @return true if a pulse on some line is in progress
  */
 HAL_Bool HAL_IsAnyPulsing(int32_t* status);
 
 /**
- * Write the filter index from the FPGA.
+ * Writes the filter index from the FPGA.
  *
  * Set the filter index used to filter out short pulses.
  *
@@ -152,9 +152,9 @@ void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
                          int32_t* status);
 
 /**
- * Read the filter index from the FPGA.
+ * Reads the filter index from the FPGA.
  *
- * Get the filter index used to filter out short pulses.
+ * Gets the filter index used to filter out short pulses.
  *
  * @param dioPortHandle the digital port handle
  * @return filterIndex  the filter index (Must be in the range 0 - 3,
@@ -163,9 +163,9 @@ void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
 int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status);
 
 /**
- * Set the filter period for the specified filter index.
+ * Sets the filter period for the specified filter index.
  *
- * Set the filter period in FPGA cycles.  Even though there are 2 different
+ * Sets the filter period in FPGA cycles.  Even though there are 2 different
  * filter index domains (MXP vs HDR), ignore that distinction for now since it
  * compilicates the interface.  That can be changed later.
  *
@@ -176,9 +176,9 @@ int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status);
 void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status);
 
 /**
- * Get the filter period for the specified filter index.
+ * Gets the filter period for the specified filter index.
  *
- * Get the filter period in FPGA cycles.  Even though there are 2 different
+ * Gets the filter period in FPGA cycles.  Even though there are 2 different
  * filter index domains (MXP vs HDR), ignore that distinction for now since it
  * compilicates the interface.  Set status to NiFpga_Status_SoftwareFault if the
  * filter values miss-match.

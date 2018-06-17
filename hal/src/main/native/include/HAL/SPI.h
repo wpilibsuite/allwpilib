@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 /**
- * Initialize the spi port. Opens the port if necessary and saves the handle.
+ * Initializes the SPI port. Opens the port if necessary and saves the handle.
  *
  * If opening the MXP port, also sets up the channel functions appropriately.
  *
@@ -50,9 +50,9 @@ int32_t HAL_TransactionSPI(HAL_SPIPort port, const uint8_t* dataToSend,
                            uint8_t* dataReceived, int32_t size);
 
 /**
- * Execute a write transaction with the device.
+ * Executes a write transaction with the device.
  *
- * Write to a device and wait until the transaction is complete.
+ * Writes to a device and wait until the transaction is complete.
  *
  * @param port      The number of the port to use. 0-3 for Onboard CS0-CS2, 4
  * for MXP
@@ -64,7 +64,7 @@ int32_t HAL_WriteSPI(HAL_SPIPort port, const uint8_t* dataToSend,
                      int32_t sendSize);
 
 /**
- * Execute a read from the device.
+ * Executes a read from the device.
  *
  * This method does not write any data out to the device.
  *
@@ -81,14 +81,14 @@ int32_t HAL_WriteSPI(HAL_SPIPort port, const uint8_t* dataToSend,
 int32_t HAL_ReadSPI(HAL_SPIPort port, uint8_t* buffer, int32_t count);
 
 /**
- * Close the SPI port
+ * Closes the SPI port.
  *
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  */
 void HAL_CloseSPI(HAL_SPIPort port);
 
 /**
- * Set the clock speed for the SPI bus.
+ * Sets the clock speed for the SPI bus.
  *
  * @param port  The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for
  * MXP
@@ -97,7 +97,7 @@ void HAL_CloseSPI(HAL_SPIPort port);
 void HAL_SetSPISpeed(HAL_SPIPort port, int32_t speed);
 
 /**
- * Set the SPI options
+ * Sets the SPI options.
  *
  * @param port             The number of the port to use. 0-3 for Onboard
  * CS0-CS2, 4 for MXP
@@ -111,21 +111,21 @@ void HAL_SetSPIOpts(HAL_SPIPort port, HAL_Bool msbFirst,
                     HAL_Bool sampleOnTrailing, HAL_Bool clkIdleHigh);
 
 /**
- * Set the CS Active high for a SPI port
+ * Sets the CS Active high for a SPI port.
  *
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  */
 void HAL_SetSPIChipSelectActiveHigh(HAL_SPIPort port, int32_t* status);
 
 /**
- * Set the CS Active low for a SPI port
+ * Sets the CS Active low for a SPI port.
  *
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  */
 void HAL_SetSPIChipSelectActiveLow(HAL_SPIPort port, int32_t* status);
 
 /**
- * Get the stored handle for a SPI port
+ * Gets the stored handle for a SPI port.
  *
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  * @return     The stored handle for the SPI port. 0 represents no stored
@@ -134,7 +134,7 @@ void HAL_SetSPIChipSelectActiveLow(HAL_SPIPort port, int32_t* status);
 int32_t HAL_GetSPIHandle(HAL_SPIPort port);
 
 /**
- * Set the stored handle for a SPI port
+ * Sets the stored handle for a SPI port.
  *
  * @param port   The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for
  * MXP.
@@ -189,7 +189,7 @@ void HAL_StartSPIAutoTrigger(HAL_SPIPort port, HAL_Handle digitalSourceHandle,
                              int32_t* status);
 
 /**
- * Stop an automatic SPI accumlation.
+ * Stops an automatic SPI accumlation.
  *
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for
  * MXP.
@@ -211,7 +211,7 @@ void HAL_SetSPIAutoTransmitData(HAL_SPIPort port, const uint8_t* dataToSend,
                                 int32_t* status);
 
 /**
- * Immediately force an SPI read to happen.
+ * Immediately forces an SPI read to happen.
  *
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for
  * MXP.
@@ -219,7 +219,7 @@ void HAL_SetSPIAutoTransmitData(HAL_SPIPort port, const uint8_t* dataToSend,
 void HAL_ForceSPIAutoRead(HAL_SPIPort port, int32_t* status);
 
 /**
- * Read data received by the SPI accumulator.
+ * Reads data received by the SPI accumulator.
  *
  * @param port      The number of the port to use. 0-3 for Onboard CS0-CS2, 4
  * for MXP.
@@ -233,7 +233,7 @@ int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint8_t* buffer,
                                     int32_t* status);
 
 /**
- * Get the count of how many SPI accumulations have been missed.
+ * Gets the count of how many SPI accumulations have been missed.
  *
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for
  * MXP.

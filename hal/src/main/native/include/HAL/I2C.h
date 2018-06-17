@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 /**
- * Initialize the I2C port.
+ * Initializes the I2C port.
  *
  * Opens the port if necessary and saves the handle.
  * If opening the MXP port, also sets up the channel functions appropriately.
@@ -43,9 +43,9 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
                            uint8_t* dataReceived, int32_t receiveSize);
 
 /**
- * Execute a write transaction with the device.
+ * Executes a write transaction with the device.
  *
- * Write a single byte to a register on a device and wait until the
+ * Writes a single byte to a register on a device and wait until the
  *   transaction is complete.
  *
  * @param port The I2C port, 0 for the on-board, 1 for the MXP.
@@ -58,9 +58,9 @@ int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
                      const uint8_t* dataToSend, int32_t sendSize);
 
 /**
- * Execute a read transaction with the device.
+ * Executes a read transaction with the device.
  *
- * Read bytes from a device.
+ * Reads bytes from a device.
  * Most I2C devices will auto-increment the register pointer internally allowing
  *   you to read consecutive registers on a device in a single transaction.
  *

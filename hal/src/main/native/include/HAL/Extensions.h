@@ -31,7 +31,7 @@ extern "C" {
 int HAL_LoadOneExtension(const char* library);
 
 /**
- * Load any extra halsim libraries provided in the HALSIM_EXTENSIONS
+ * Loads any extra halsim libraries provided in the HALSIM_EXTENSIONS
  * environment variable.
  *
  * @return        the succes state of the initialization

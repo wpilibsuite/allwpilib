@@ -13,7 +13,7 @@
 #include "HAL/Types.h"
 
 /**
- * The counter mode
+ * The counter mode.
  */
 enum HAL_Counter_Mode : int32_t {
   HAL_Counter_kTwoPulse = 0,
@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /**
- * Initialize a counter.
+ * Initializes a counter.
  *
  * @param mode  the counter mode
  * @param index the compressor index (output)
@@ -53,7 +53,7 @@ void HAL_SetCounterAverageSize(HAL_CounterHandle counterHandle, int32_t size,
                                int32_t* status);
 
 /**
- * Set the source object that causes the counter to count up.
+ * Sets the source object that causes the counter to count up.
  *
  * @param counterHandle       the counter handle
  * @param digitalSourceHandle the digital source handle (either a
@@ -67,7 +67,7 @@ void HAL_SetCounterUpSource(HAL_CounterHandle counterHandle,
                             int32_t* status);
 
 /**
- * Set the up source to either detect rising edges or falling edges.
+ * Sets the up source to either detect rising edges or falling edges.
  *
  * Note that both are allowed to be set true at the same time without issues.
  *
@@ -80,14 +80,14 @@ void HAL_SetCounterUpSourceEdge(HAL_CounterHandle counterHandle,
                                 int32_t* status);
 
 /**
- * Disable the up counting source to the counter.
+ * Disables the up counting source to the counter.
  *
  * @param counterHandle the counter handle
  */
 void HAL_ClearCounterUpSource(HAL_CounterHandle counterHandle, int32_t* status);
 
 /**
- * Set the source object that causes the counter to count down.
+ * Sets the source object that causes the counter to count down.
  *
  * @param counterHandle       the counter handle
  * @param digitalSourceHandle the digital source handle (either a
@@ -101,7 +101,7 @@ void HAL_SetCounterDownSource(HAL_CounterHandle counterHandle,
                               int32_t* status);
 
 /**
- * Set the down source to either detect rising edges or falling edges.
+ * Sets the down source to either detect rising edges or falling edges.
  * Note that both are allowed to be set true at the same time without issues.
  *
  * @param counterHandle the counter handle
@@ -113,7 +113,7 @@ void HAL_SetCounterDownSourceEdge(HAL_CounterHandle counterHandle,
                                   int32_t* status);
 
 /**
- * Disable the down counting source to the counter.
+ * Disables the down counting source to the counter.
  *
  * @param counterHandle the counter handle
  */
@@ -121,7 +121,7 @@ void HAL_ClearCounterDownSource(HAL_CounterHandle counterHandle,
                                 int32_t* status);
 
 /**
- * Set standard up / down counting mode on this counter.
+ * Sets standard up / down counting mode on this counter.
  *
  * Up and down counts are sourced independently from two inputs.
  *
@@ -130,7 +130,7 @@ void HAL_ClearCounterDownSource(HAL_CounterHandle counterHandle,
 void HAL_SetCounterUpDownMode(HAL_CounterHandle counterHandle, int32_t* status);
 
 /**
- * Set directional counting mode on this counter.
+ * Sets directional counting mode on this counter.
  *
  * The direction is determined by the B input, with counting happening with the
  * A input.
@@ -141,7 +141,7 @@ void HAL_SetCounterExternalDirectionMode(HAL_CounterHandle counterHandle,
                                          int32_t* status);
 
 /**
- * Set Semi-period mode on this counter.
+ * Sets Semi-period mode on this counter.
  *
  * The counter counts up based on the time the input is triggered. High or Low
  * depends on the highSemiPeriod parameter.
@@ -153,7 +153,7 @@ void HAL_SetCounterSemiPeriodMode(HAL_CounterHandle counterHandle,
                                   HAL_Bool highSemiPeriod, int32_t* status);
 
 /**
- * Configure the counter to count in up or down based on the length of the input
+ * Configures the counter to count in up or down based on the length of the input
  * pulse.
  *
  * This mode is most useful for direction sensitive gear tooth sensors.
@@ -166,7 +166,7 @@ void HAL_SetCounterPulseLengthMode(HAL_CounterHandle counterHandle,
                                    double threshold, int32_t* status);
 
 /**
- * Get the Samples to Average which specifies the number of samples of the timer
+ * Gets the Samples to Average which specifies the number of samples of the timer
  * to average when calculating the period. Perform averaging to account for
  * mechanical imperfections or as oversampling to increase resolution.
  *
@@ -177,7 +177,7 @@ int32_t HAL_GetCounterSamplesToAverage(HAL_CounterHandle counterHandle,
                                        int32_t* status);
 
 /**
- * Set the Samples to Average which specifies the number of samples of the timer
+ * Sets the Samples to Average which specifies the number of samples of the timer
  * to average when calculating the period. Perform averaging to account for
  * mechanical imperfections or as oversampling to increase resolution.
  *
@@ -188,9 +188,9 @@ void HAL_SetCounterSamplesToAverage(HAL_CounterHandle counterHandle,
                                     int32_t samplesToAverage, int32_t* status);
 
 /**
- * Reset the Counter to zero.
+ * Resets the Counter to zero.
  *
- * Set the counter value to zero. This doesn't effect the running state of the
+ * Sets the counter value to zero. This does not effect the running state of the
  * counter, just sets the current value to zero.
  *
  * @param counterHandle the counter handle
@@ -198,9 +198,9 @@ void HAL_SetCounterSamplesToAverage(HAL_CounterHandle counterHandle,
 void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status);
 
 /**
- * Read the current counter value.
+ * Reads the current counter value.
  *
- * Read the value at this instant. It may still be running, so it reflects the
+ * Reads the value at this instant. It may still be running, so it reflects the
  * current value. Next time it is read, it might have a different value.
  *
  * @param counterHandle the counter handle
@@ -209,7 +209,7 @@ void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status);
 int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status);
 
 /*
- * Get the Period of the most recent count.
+ * Gets the Period of the most recent count.
  *
  * Returns the time interval of the most recent count. This can be used for
  * velocity calculations to determine shaft speed.
@@ -220,7 +220,7 @@ int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status);
 double HAL_GetCounterPeriod(HAL_CounterHandle counterHandle, int32_t* status);
 
 /**
- * Set the maximum period where the device is still considered "moving".
+ * Sets the maximum period where the device is still considered "moving".
  *
  * Sets the maximum period where the device is considered moving. This value is
  * used to determine the "stopped" state of the counter using the
@@ -234,7 +234,7 @@ void HAL_SetCounterMaxPeriod(HAL_CounterHandle counterHandle, double maxPeriod,
                              int32_t* status);
 
 /**
- * Select whether you want to continue updating the event timer output when
+ * Selects whether you want to continue updating the event timer output when
  * there are no samples captured.
  *
  * The output of the event timer has a buffer of periods that are averaged and
@@ -260,7 +260,7 @@ void HAL_SetCounterUpdateWhenEmpty(HAL_CounterHandle counterHandle,
                                    HAL_Bool enabled, int32_t* status);
 
 /**
- * Determine if the clock is stopped.
+ * Determines if the clock is stopped.
  *
  * Determine if the clocked input is stopped based on the MaxPeriod value set
  * using the SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the
@@ -274,7 +274,7 @@ HAL_Bool HAL_GetCounterStopped(HAL_CounterHandle counterHandle,
                                int32_t* status);
 
 /**
- * The last direction the counter value changed.
+ * Gets the last direction the counter value changed.
  *
  * @param counterHandle the counter handle
  * @return              the last direction the counter value changed
@@ -283,7 +283,7 @@ HAL_Bool HAL_GetCounterDirection(HAL_CounterHandle counterHandle,
                                  int32_t* status);
 
 /**
- * Set the Counter to return reversed sensing on the direction.
+ * Sets the Counter to return reversed sensing on the direction.
  *
  * This allows counters to change the direction they are counting in the case of
  * 1X and 2X quadrature encoding only. Any other counter mode isn't supported.

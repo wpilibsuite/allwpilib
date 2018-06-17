@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 /**
- * Initialize a notifier.
+ * Initializes a notifier.
  *
  * A notifier is an FPGA controller timer that triggers at requested intervals
  * based on the FPGA time. This can be used to make precise control loops.
@@ -26,7 +26,7 @@ extern "C" {
 HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status);
 
 /**
- * Stop a notifier from running.
+ * Stops a notifier from running.
  *
  * This will cause any call into HAL_WaitForNotifierAlarm to return.
  *

@@ -25,7 +25,7 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle handle,
                                         int32_t* status);
 
 /**
- * Setups an analog gryo with the proper offsets and settings for the KOP analog
+ * Sets up an analog gyro with the proper offsets and settings for the KOP analog
  * gyro.
  *
  * @param handle the gyro handle
@@ -92,7 +92,7 @@ void HAL_SetAnalogGyroDeadband(HAL_GyroHandle handle, double volts,
                                int32_t* status);
 
 /**
- * Get the gyro angle in degrees.
+ * Gets the gyro angle in degrees.
  *
  * @param handle the gyro handle
  * @return the gyro angle in degrees
@@ -100,7 +100,7 @@ void HAL_SetAnalogGyroDeadband(HAL_GyroHandle handle, double volts,
 double HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status);
 
 /**
- * Get the gyro rate in degrees/second.
+ * Gets the gyro rate in degrees/second.
  *
  * @param handle the gyro handle
  * @return the gyro rate in degrees/second
@@ -108,7 +108,7 @@ double HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status);
 double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status);
 
 /**
- * Get the calibrated gyro offset.
+ * Gets the calibrated gyro offset.
  *
  * Can be used to not repeat a calibration but reconstruct the gyro object.
  *
@@ -118,7 +118,7 @@ double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status);
 double HAL_GetAnalogGyroOffset(HAL_GyroHandle handle, int32_t* status);
 
 /**
- * Get the calibrated gyro center.
+ * Gets the calibrated gyro center.
  *
  * Can be used to not repeat a calibration but reconstruct the gyro object.
  *

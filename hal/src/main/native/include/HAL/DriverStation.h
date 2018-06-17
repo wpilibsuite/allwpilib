@@ -99,7 +99,7 @@ extern "C" {
 #endif
 
 /**
- * Send an error to the driver station.
+ * Sends an error to the driver station.
  *
  * @param isError   true for error, false for warning
  * @param errorCode the error code
@@ -133,7 +133,7 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord);
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status);
 
 /**
- * Get the axes of a specific joystick.
+ * Gets the axes of a specific joystick.
  *
  * @param joystickNum the joystick number
  * @param axes        the axes values (output)
@@ -142,7 +142,7 @@ HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status);
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes);
 
 /**
- * Get the POVs of a specific joystick.
+ * Gets the POVs of a specific joystick.
  *
  * @param joystickNum the joystick number
  * @param povs        the POV values (output)
@@ -151,7 +151,7 @@ int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes);
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs);
 
 /**
- * Get the buttons of a specific joystick.
+ * Gets the buttons of a specific joystick.
  *
  * @param joystickNum the joystick number
  * @param buttons     the button values (output)
@@ -161,7 +161,7 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons);
 
 /**
- * Retrieve the Joystick Descriptor for particular slot.
+ * Retrieves the Joystick Descriptor for particular slot.
  *
  * @param desc [out] descriptor (data transfer object) to fill in.  desc is
  * filled in regardless of success. In other words, if descriptor is not
@@ -176,7 +176,7 @@ int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc);
 
 /**
- * Get is a specific joystick is considered to be an XBox controller.
+ * Gets is a specific joystick is considered to be an XBox controller.
  *
  * @param joystickNum the joystick number
  * @return            true if xbox, false otherwise
@@ -184,7 +184,7 @@ int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
 HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum);
 
 /**
- * Get the type of joystick connected.
+ * Gets the type of joystick connected.
  *
  * This is device specific, and different depending on what system input type
  * the joystick uses.
@@ -195,7 +195,7 @@ HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum);
 int32_t HAL_GetJoystickType(int32_t joystickNum);
 
 /**
- * Get the name of a joystick.
+ * Gets the name of a joystick.
  *
  * The returned array must be freed with HAL_FreeJoystickName.
  *
@@ -214,7 +214,7 @@ char* HAL_GetJoystickName(int32_t joystickNum);
 void HAL_FreeJoystickName(char* name);
 
 /**
- * Get the type of a specific joystick axis.
+ * Gets the type of a specific joystick axis.
  *
  * This is device specific, and different depending on what system input type
  * the joystick uses.
@@ -238,7 +238,7 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble);
 
 /**
- * Return the approximate match time.
+ * Returns the approximate match time.
  *
  * The FMS does not send an official match time to the robots, but does send
  * an approximate match time. The value will count down the time remaining in
@@ -256,7 +256,7 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
 double HAL_GetMatchTime(int32_t* status);
 
 /**
- * Get info about a specific match.
+ * Gets info about a specific match.
  *
  * Note that the match info must be freed with HAL_FreeMatchInfo
  *
@@ -304,7 +304,7 @@ void HAL_WaitForDSData(void);
 HAL_Bool HAL_WaitForDSDataTimeout(double timeout);
 
 /**
- * Call this to initialize the driver station communication. This will properly
+ * Initializes the driver station communication. This will properly
  * handle multiple calls. However note that this CANNOT be called from a library
  * that interfaces with LabVIEW.
  */

@@ -36,7 +36,7 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
 void HAL_FreeRelayPort(HAL_RelayHandle relayPortHandle);
 
 /**
- * Check if a relay channel is valid.
+ * Checks if a relay channel is valid.
  *
  * @param channel the channel to check
  * @return        true if the channel is valid, otherwise false
@@ -44,7 +44,7 @@ void HAL_FreeRelayPort(HAL_RelayHandle relayPortHandle);
 HAL_Bool HAL_CheckRelayChannel(int32_t channel);
 
 /**
- * Set the state of a relay output.
+ * Sets the state of a relay output.
  *
  * @param relayPortHandle the relay handle
  * @param on              true for on, false for off
@@ -53,7 +53,7 @@ void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
                   int32_t* status);
 
 /**
- * Get the current state of the relay channel.
+ * Gets the current state of the relay channel.
  *
  * @param relayPortHandle the relay handle
  * @return                true for on, false for off

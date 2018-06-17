@@ -51,7 +51,7 @@ extern "C" {
 #endif
 
 /**
- * Initialize a CAN device.
+ * Initializes a CAN device.
  *
  * These follow the FIRST standard CAN layout. Link TBD
  *
@@ -72,7 +72,7 @@ HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
 void HAL_CleanCAN(HAL_CANHandle handle);
 
 /**
- * Write a packet to the CAN device with a specific ID.
+ * Writes a packet to the CAN device with a specific ID.
  *
  * This ID is 10 bits.
  *
@@ -85,7 +85,7 @@ void HAL_WriteCANPacket(HAL_CANHandle handle, const uint8_t* data,
                         int32_t length, int32_t apiId, int32_t* status);
 
 /**
- * Write a repeating packet to the CAN device with a specific ID.
+ * Writes a repeating packet to the CAN device with a specific ID.
  *
  * This ID is 10 bits.
  *
@@ -102,7 +102,7 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, const uint8_t* data,
                                  int32_t repeatMs, int32_t* status);
 
 /**
- * Stop a repeating packet with a specific ID.
+ * Stops a repeating packet with a specific ID.
  *
  * This ID is 10 bits.
  *
@@ -113,7 +113,7 @@ void HAL_StopCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
                                 int32_t* status);
 
 /**
- * Read a new CAN packet.
+ * Reads a new CAN packet.
  *
  * This will only return properly once per packet received. Multiple calls
  * without receiving another packet will return an error code.
@@ -130,7 +130,7 @@ void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
                           int32_t* status);
 
 /**
- * Read a CAN packet. The will continuously return the last packet received,
+ * Reads a CAN packet. The will continuously return the last packet received,
  * without accounting for packet age.
  *
  * @param handle            the CAN handle
@@ -145,7 +145,7 @@ void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
                              int32_t* status);
 
 /**
- * Read a CAN packet. The will return the last packet received until the
+ * Reads a CAN packet. The will return the last packet received until the
  * packet is older then the requested timeout. Then it will return an error
  * code.
  *
@@ -163,7 +163,7 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
                               int32_t* status);
 
 /**
- * Read a CAN packet. The will return the last packet received until the
+ * Reads a CAN packet. The will return the last packet received until the
  * packet is older then the requested timeout. Then it will return an error
  * code. The period parameter is used when you know the packet is sent at
  * specific intervals, so calls will not attempt to read a new packet from the
