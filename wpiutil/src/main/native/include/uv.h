@@ -23,9 +23,6 @@
 
 #ifndef UV_H
 #define UV_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifdef _WIN32
   /* Windows - set up dll import/export decorators. */
@@ -679,15 +676,9 @@ UV_EXTERN int uv_tty_set_mode(uv_tty_t*, uv_tty_mode_t mode);
 UV_EXTERN int uv_tty_reset_mode(void);
 UV_EXTERN int uv_tty_get_winsize(uv_tty_t*, int* width, int* height);
 
-#ifdef __cplusplus
-extern "C++" {
-
 inline int uv_tty_set_mode(uv_tty_t* handle, int mode) {
   return uv_tty_set_mode(handle, static_cast<uv_tty_mode_t>(mode));
 }
-
-}
-#endif
 
 UV_EXTERN uv_handle_type uv_guess_handle(uv_file file);
 
@@ -1587,7 +1578,4 @@ UV_EXTERN void uv_loop_set_data(uv_loop_t*, void* data);
 #undef UV_LOOP_PRIVATE_PLATFORM_FIELDS
 #undef UV__ERR
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* UV_H */
