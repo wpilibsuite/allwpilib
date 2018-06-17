@@ -5,16 +5,6 @@ if (!project.hasProperty('onlyAthena')) {
     ext.skipAthena = true
     apply from: "${rootDir}/shared/config.gradle"
 
-    ext {
-        sharedUvwConfigs = [:]
-        staticUvwConfigs = [:]
-    }
-
-    sharedUvwConfigs["${pluginName}"] = []
-    sharedUvwConfigs["${pluginName}Dev"] = []
-
-    apply from: "${rootDir}/shared/libuv.gradle"
-
     model {
         components {
             "${pluginName}"(NativeLibrarySpec) {

@@ -33,13 +33,9 @@ templatesTree.list(new FilenameFilter() {
 ext {
     sharedCvConfigs = examplesMap + templatesMap + [commands: []]
     staticCvConfigs = [:]
-    sharedUvwConfigs = examplesMap + templatesMap + [commands: []]
-    staticUvwConfigs = [:]
     useJava = false
     useCpp = true
 }
-
-apply from: "${rootDir}/shared/libuv.gradle"
 
 apply from: "${rootDir}/shared/opencv.gradle"
 

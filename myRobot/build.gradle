@@ -20,14 +20,6 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-ext {
-    sharedUvwConfigs = [myRobotCpp      : [],
-                        myRobotCppStatic: []]
-    staticUvwConfigs = [:]
-}
-
-apply from: "${rootDir}/shared/libuv.gradle"
-
 mainClassName = 'edu.wpi.first.wpilibj.RobotBase'
 
 apply plugin: 'com.github.johnrengelman.shadow'
