@@ -46,14 +46,8 @@
 
 #if defined(__linux__)
 # include "uv/linux.h"
-#elif defined (__MVS__)
-# include "uv/os390.h"
 #elif defined(__PASE__)
 # include "uv/posix.h"
-#elif defined(_AIX)
-# include "uv/aix.h"
-#elif defined(__sun)
-# include "uv/sunos.h"
 #elif defined(__APPLE__)
 # include "uv/darwin.h"
 #elif defined(__DragonFly__)       || \
