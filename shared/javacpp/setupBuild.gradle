@@ -43,6 +43,9 @@ model {
                     it.buildable = false
                     return
                 }
+                if (project.hasProperty('extraSetup')) {
+                    extraSetup(it)
+                }
             }
         }
         "${nativeName}"(NativeLibrarySpec) {
