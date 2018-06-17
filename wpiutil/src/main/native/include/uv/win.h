@@ -52,11 +52,7 @@ typedef struct pollfd {
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#if defined(_MSC_VER) && _MSC_VER < 1600
-# include "uv/stdint-msvc2008.h"
-#else
-# include <stdint.h>
-#endif
+#include <stdint.h>
 
 #include "uv/tree.h"
 #include "uv/threadpool.h"

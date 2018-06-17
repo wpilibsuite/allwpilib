@@ -50,11 +50,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdio.h>
 
-#if defined(_MSC_VER) && _MSC_VER < 1600
-# include "uv/stdint-msvc2008.h"
-#else
-# include <stdint.h>
-#endif
+#include <stdint.h>
 
 #if defined(_WIN32)
 # include "uv/win.h"
