@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "LowFiSim/MotorModel/MotorModel.h"
 #include "LowFiSim/MotorSim.h"
 #include "Simulation/PWMSim.h"

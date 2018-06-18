@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <memory>
-
 namespace frc {
 namespace sim {
 namespace lowfi {

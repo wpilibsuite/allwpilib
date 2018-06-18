@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "EncoderSim.h"
 #include "MotorSim.h"
 

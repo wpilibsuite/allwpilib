@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "LowFiSim/EncoderSim.h"
 #include "Simulation/EncoderSim.h"
 
