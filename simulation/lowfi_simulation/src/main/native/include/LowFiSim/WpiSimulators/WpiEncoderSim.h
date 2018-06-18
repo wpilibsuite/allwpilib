@@ -19,7 +19,6 @@ namespace lowfi {
 class WpiEncoderSim : public EncoderSim {
  public:
   explicit WpiEncoderSim(int index);
-  ~WpiEncoderSim();
 
   void SetPosition(double position) override;
   void SetVelocity(double velocity) override;

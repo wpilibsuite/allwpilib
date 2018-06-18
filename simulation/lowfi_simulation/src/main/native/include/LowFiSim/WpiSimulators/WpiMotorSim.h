@@ -20,7 +20,6 @@ namespace lowfi {
 class WpiMotorSim : public MotorSim {
  public:
   explicit WpiMotorSim(int index, MotorModel& motorModelSimulator);
-  ~WpiMotorSim();
 
   void Update(double elapsedTime);
   double GetPosition() const override;

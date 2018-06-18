@@ -5,6 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <iostream>
+
 #include <HAL/HAL.h>
 
-int main() { return 0; }
+int main() {
+  std::cout << "Hello World" << std::endl;
+  std::cout << HAL_GetRuntimeType() << std::endl;
+}
