@@ -7,12 +7,12 @@
 
 package edu.wpi.cscore;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class JNITest {
+class JNITest {
   @Test
-  public void jniLinkTest() {
+  void jniLinkTest() {
     // Test to verify that the JNI test link works correctly.
-    edu.wpi.cscore.CameraServerJNI.getHostname();
+    CameraServerJNI.getHostname();
   }
 }

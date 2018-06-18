@@ -7,68 +7,74 @@
 
 package edu.wpi.first.networktables;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class NetworkTableTest extends TestCase {
-  public void testBasenameKey() {
-    assertEquals("simple", NetworkTable.basenameKey("simple"));
-    assertEquals("simple", NetworkTable.basenameKey("one/two/many/simple"));
-    assertEquals("simple",
-                 NetworkTable.basenameKey("//////an/////awful/key////simple"));
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class NetworkTableTest {
+  private static Stream<Arguments> basenameKeyArguments() {
+    return Stream.of(
+        Arguments.of("simple", "simple"),
+        Arguments.of("simple", "one/two/many/simple"),
+        Arguments.of("simple", "//////an/////awful/key////simple")
+    );
   }
 
-  public void testNormalizeKeySlash() {
-    assertEquals("/", NetworkTable.normalizeKey("///"));
-    assertEquals("/no/normal/req", NetworkTable.normalizeKey("/no/normal/req"));
-    assertEquals("/no/leading/slash",
-                 NetworkTable.normalizeKey("no/leading/slash"));
-    assertEquals(
-        "/what/an/awful/key/",
-        NetworkTable.normalizeKey("//////what////an/awful/////key///"));
+  @ParameterizedTest
+  @MethodSource("basenameKeyArguments")
+  void basenameKeyTest(final String expected, final String testString) {
+    assertEquals(expected, NetworkTable.basenameKey(testString));
   }
 
-  public void testNormalizeKeyNoSlash() {
-    assertEquals("a", NetworkTable.normalizeKey("a", false));
-    assertEquals("a", NetworkTable.normalizeKey("///a", false));
-    assertEquals("leading/slash",
-                 NetworkTable.normalizeKey("/leading/slash", false));
-    assertEquals("no/leading/slash",
-                 NetworkTable.normalizeKey("no/leading/slash", false));
-    assertEquals(
-        "what/an/awful/key/",
-        NetworkTable.normalizeKey("//////what////an/awful/////key///", false));
+  private static Stream<Arguments> normalizeKeySlashArguments() {
+    return Stream.of(
+        Arguments.of("/", "///"),
+        Arguments.of("/no/normal/req", "/no/normal/req"),
+        Arguments.of("/no/leading/slash", "no/leading/slash"),
+        Arguments.of("/what/an/awful/key/", "//////what////an/awful/////key///")
+    );
   }
 
-  public void testGetHierarchyEmpty() {
-    List<String> expected = new ArrayList<>();
-    expected.add("/");
-    assertEquals(expected, NetworkTable.getHierarchy(""));
+  @ParameterizedTest
+  @MethodSource("normalizeKeySlashArguments")
+  void normalizeKeySlashTest(final String expected, final String testString) {
+    assertEquals(expected, NetworkTable.normalizeKey(testString));
   }
 
-  public void testGetHierarchyRoot() {
-    List<String> expected = new ArrayList<>();
-    expected.add("/");
-    assertEquals(expected, NetworkTable.getHierarchy("/"));
+  private static Stream<Arguments> normalizeKeyNoSlashArguments() {
+    return Stream.of(
+        Arguments.of("a", "a"),
+        Arguments.of("a", "///a"),
+        Arguments.of("leading/slash", "/leading/slash"),
+        Arguments.of("no/leading/slash", "no/leading/slash"),
+        Arguments.of("what/an/awful/key/", "//////what////an/awful/////key///")
+    );
   }
 
-  public void testGetHierarchyNormal() {
-    List<String> expected = new ArrayList<>();
-    expected.add("/");
-    expected.add("/foo");
-    expected.add("/foo/bar");
-    expected.add("/foo/bar/baz");
-    assertEquals(expected, NetworkTable.getHierarchy("/foo/bar/baz"));
+  @ParameterizedTest
+  @MethodSource("normalizeKeyNoSlashArguments")
+  void normalizeKeyNoSlashTest(final String expected, final String testString) {
+    assertEquals(expected, NetworkTable.normalizeKey(testString, false));
   }
 
-  public void testGetHierarchyTrailingSlash() {
-    List<String> expected = new ArrayList<>();
-    expected.add("/");
-    expected.add("/foo");
-    expected.add("/foo/bar");
-    expected.add("/foo/bar/");
-    assertEquals(expected, NetworkTable.getHierarchy("/foo/bar/"));
+  private static Stream<Arguments> getHierarchyArguments() {
+    return Stream.of(
+        Arguments.of(Arrays.asList("/"), ""),
+        Arguments.of(Arrays.asList("/"), "/"),
+        Arguments.of(Arrays.asList("/", "/foo", "/foo/bar", "/foo/bar/baz"), "/foo/bar/baz"),
+        Arguments.of(Arrays.asList("/", "/foo", "/foo/bar", "/foo/bar/"), "/foo/bar/")
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("getHierarchyArguments")
+  void getHierarchyTest(final List<String> expected, final String testString) {
+    assertEquals(expected, NetworkTable.getHierarchy(testString));
   }
 }

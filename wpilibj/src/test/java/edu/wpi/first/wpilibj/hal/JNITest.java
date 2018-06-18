@@ -7,19 +7,19 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.networktables.NetworkTablesJNI;
 
-public class JNITest {
+class JNITest {
   @Test
-  public void jniNtcoreLinkTest() {
+  void jniNtcoreLinkTest() {
     // Test to verify that the JNI test link works correctly.
     NetworkTablesJNI.flush(NetworkTablesJNI.getDefaultInstance());
   }
 
   @Test
-  public void jniHalLinkTest() {
+  void jniHalLinkTest() {
     HAL.initialize(500, 0);
     // Test to verify that the JNI test link works correctly.
     HALUtil.getHALRuntimeType();

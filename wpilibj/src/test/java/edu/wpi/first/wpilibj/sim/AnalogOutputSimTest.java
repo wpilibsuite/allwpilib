@@ -7,19 +7,19 @@
 
 package edu.wpi.first.wpilibj.sim;
 
-import org.junit.Test;
-
 import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.hal.HAL;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AnalogOutputSimTest {
+import org.junit.jupiter.api.Test;
+
+class AnalogOutputSimTest {
   static class DoubleStore {
-    public boolean m_wasTriggered = false;
-    public boolean m_wasCorrectType = false;
+    public boolean m_wasTriggered;
+    public boolean m_wasCorrectType;
     public double m_setValue = -1;
 
     public void reset() {
@@ -30,7 +30,7 @@ public class AnalogOutputSimTest {
   }
 
   @Test
-  public void testSetCallback() {
+  void setCallbackTest() {
     HAL.initialize(500, 0);
 
 

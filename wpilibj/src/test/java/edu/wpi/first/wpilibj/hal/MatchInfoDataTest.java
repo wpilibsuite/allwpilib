@@ -7,11 +7,12 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class MatchInfoDataTest {
+class MatchInfoDataTest {
   @Test
-  public void matchInfoDataDoesNotThrow() {
+  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+  void matchInfoDataDoesNotThrow() {
     HAL.initialize(500, 0);
     MatchInfoData data = new MatchInfoData();
     HAL.getMatchInfo(data);

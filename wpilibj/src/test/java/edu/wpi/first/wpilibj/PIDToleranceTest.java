@@ -7,22 +7,22 @@
 
 package edu.wpi.first.wpilibj;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PIDToleranceTest {
+class PIDToleranceTest {
   private PIDController m_pid;
-  private final double m_setPoint = 50.0;
-  private final double m_tolerance = 10.0;
-  private final double m_range = 200;
+  private static final double m_setPoint = 50.0;
+  private static final double m_tolerance = 10.0;
+  private static final double m_range = 200;
 
-  @BeforeClass
-  public static void setupClass() {
+  @BeforeAll
+  static void setupClass() {
     UnitTestUtility.setupMockBase();
   }
 
@@ -49,7 +49,7 @@ public class PIDToleranceTest {
   }
 
   private FakeInput m_inp;
-  private PIDOutput m_out = new PIDOutput() {
+  private final PIDOutput m_out = new PIDOutput() {
     @Override
     public void pidWrite(double out) {
     }
@@ -57,53 +57,53 @@ public class PIDToleranceTest {
   };
 
 
-  @Before
-  public void setUp() throws Exception {
+  @BeforeEach
+  void setUp() {
     m_inp = new FakeInput();
     m_pid = new PIDController(0.05, 0.0, 0.0, m_inp, m_out);
     m_pid.setInputRange(-m_range / 2, m_range / 2);
   }
 
-  @After
-  public void tearDown() throws Exception {
+  @AfterEach
+  void tearDown() {
     m_pid.close();
     m_pid = null;
   }
 
   @Test
-  public void testAbsoluteTolerance() {
+  void absoluteToleranceTest() {
     m_pid.setAbsoluteTolerance(m_tolerance);
     m_pid.setSetpoint(m_setPoint);
     m_pid.enable();
     Timer.delay(1);
-    assertFalse("Error was in tolerance when it should not have been. Error was "
-        + m_pid.getError(), m_pid.onTarget());
+    assertFalse(m_pid.onTarget(), "Error was in tolerance when it should not have been. Error was "
+        + m_pid.getError());
     m_inp.m_val = m_setPoint + m_tolerance / 2;
     Timer.delay(1.0);
-    assertTrue("Error was not in tolerance when it should have been. Error was "
-        + m_pid.getError(), m_pid.onTarget());
+    assertTrue(m_pid.onTarget(), "Error was not in tolerance when it should have been. Error was "
+        + m_pid.getError());
     m_inp.m_val = m_setPoint + 10 * m_tolerance;
     Timer.delay(1.0);
-    assertFalse("Error was in tolerance when it should not have been. Error was "
-        + m_pid.getError(), m_pid.onTarget());
+    assertFalse(m_pid.onTarget(), "Error was in tolerance when it should not have been. Error was "
+        + m_pid.getError());
   }
 
   @Test
-  public void testPercentTolerance() {
+  void percentToleranceTest() {
     m_pid.setPercentTolerance(m_tolerance);
     m_pid.setSetpoint(m_setPoint);
     m_pid.enable();
-    assertFalse("Error was in tolerance when it should not have been. Error was "
-        + m_pid.getError(), m_pid.onTarget());
+    assertFalse(m_pid.onTarget(), "Error was in tolerance when it should not have been. Error was "
+        + m_pid.getError());
     //half of percent tolerance away from setPoint
     m_inp.m_val = m_setPoint + m_tolerance / 200 * m_range;
     Timer.delay(1.0);
-    assertTrue("Error was not in tolerance when it should have been. Error was "
-        + m_pid.getError(), m_pid.onTarget());
+    assertTrue(m_pid.onTarget(), "Error was not in tolerance when it should have been. Error was "
+        + m_pid.getError());
     //double percent tolerance away from setPoint
     m_inp.m_val = m_setPoint + m_tolerance / 50 * m_range;
     Timer.delay(1.0);
-    assertFalse("Error was in tolerance when it should not have been. Error was "
-        + m_pid.getError(), m_pid.onTarget());
+    assertFalse(m_pid.onTarget(), "Error was in tolerance when it should not have been. Error was "
+        + m_pid.getError());
   }
 }
