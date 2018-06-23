@@ -179,11 +179,6 @@ namespace wpi {
       assert(isValid() && "Invalid twine!");
     }
 
-    /// Check for the null twine.
-    bool isNull() const {
-      return getLHSKind() == NullKind;
-    }
-
     /// Check for the empty twine.
     bool isEmpty() const {
       return getLHSKind() == EmptyKind;
@@ -379,6 +374,11 @@ namespace wpi {
     /// @}
     /// @name Predicate Operations
     /// @{
+
+    /// Check for the null twine.
+    bool isNull() const {
+      return getLHSKind() == NullKind;
+    }
 
     /// Check if this twine is trivially empty; a false return value does not
     /// necessarily mean the twine is empty.
