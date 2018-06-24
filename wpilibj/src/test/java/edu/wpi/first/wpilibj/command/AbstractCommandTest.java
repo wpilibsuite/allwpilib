@@ -9,8 +9,6 @@ package edu.wpi.first.wpilibj.command;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import edu.wpi.first.wpilibj.UnitTestUtility;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public abstract class AbstractCommandTest {
   @BeforeEach
   void commandSetup() {
-    UnitTestUtility.setupMockBase();
     Scheduler.getInstance().removeAll();
     Scheduler.getInstance().enable();
   }
