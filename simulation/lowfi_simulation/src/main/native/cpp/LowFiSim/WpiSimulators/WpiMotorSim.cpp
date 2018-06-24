@@ -12,7 +12,7 @@ namespace sim {
 namespace lowfi {
 
 WpiMotorSim::WpiMotorSim(int index, MotorModel& motorModelSimulator)
-    : m_pwmSimulator(index), m_motorModelSimulation(motorModelSimulator) {}
+    : m_motorModelSimulation(motorModelSimulator), m_pwmSimulator(index) {}
 
 void WpiMotorSim::Update(double elapsedTime) {
   m_motorModelSimulation.SetVoltage(m_pwmSimulator.GetSpeed() *
