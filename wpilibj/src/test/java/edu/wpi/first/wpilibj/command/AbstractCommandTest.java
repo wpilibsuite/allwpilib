@@ -8,9 +8,6 @@
 package edu.wpi.first.wpilibj.command;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import edu.wpi.first.wpilibj.MockHardwareExtension;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -19,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * The basic test for all {@link Command} tests.
  */
-@ExtendWith(MockHardwareExtension.class)
 public abstract class AbstractCommandTest {
   @BeforeEach
   void commandSetup() {
