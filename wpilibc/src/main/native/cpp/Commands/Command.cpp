@@ -114,7 +114,7 @@ bool Command::DoesRequire(Subsystem* system) const {
   return m_requirements.count(system) > 0;
 }
 
-Command::SubsystemSet Command::GetRequirements() const {
+const Command::SubsystemSet& Command::GetRequirements() const {
   return m_requirements;
 }
 
