@@ -18,13 +18,6 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 apply from: "${rootDir}/shared/googletest.gradle"
 
-ext {
-    sharedUvwConfigs = [wpilibcIntegrationTests: []]
-    staticUvwConfigs = [:]
-}
-
-apply from: "${rootDir}/shared/libuv.gradle"
-
 model {
     components {
         wpilibcIntegrationTests(NativeExecutableSpec) {

@@ -33,7 +33,7 @@ void Scheduler::AddCommand(Command* command) {
 
 void Scheduler::AddButton(ButtonScheduler* button) {
   std::lock_guard<wpi::mutex> lock(m_buttonsMutex);
-  m_buttons.push_back(button);
+  m_buttons.emplace_back(button);
 }
 
 void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
@@ -50,27 +50,23 @@ void Scheduler::Run() {
     if (!m_enabled) return;
 
     std::lock_guard<wpi::mutex> lock(m_buttonsMutex);
-    for (auto rButtonIter = m_buttons.rbegin(); rButtonIter != m_buttons.rend();
-         rButtonIter++) {
-      (*rButtonIter)->Execute();
+    for (auto& button : m_buttons) {
+      button->Execute();
     }
   }
 
   // Call every subsystem's periodic method
-  for (auto subsystemIter = m_subsystems.begin();
-       subsystemIter != m_subsystems.end(); subsystemIter++) {
-    Subsystem* subsystem = *subsystemIter;
+  for (auto& subsystem : m_subsystems) {
     subsystem->Periodic();
   }
 
   m_runningCommandsChanged = false;
 
   // Loop through the commands
-  for (auto commandIter = m_commands.begin();
-       commandIter != m_commands.end();) {
-    Command* command = *commandIter;
+  for (auto cmdIter = m_commands.begin(); cmdIter != m_commands.end();) {
+    Command* command = *cmdIter;
     // Increment before potentially removing to keep the iterator valid
-    ++commandIter;
+    ++cmdIter;
     if (!command->Run()) {
       Remove(command);
       m_runningCommandsChanged = true;
@@ -80,21 +76,18 @@ void Scheduler::Run() {
   // Add the new things
   {
     std::lock_guard<wpi::mutex> lock(m_additionsMutex);
-    for (auto additionsIter = m_additions.begin();
-         additionsIter != m_additions.end(); additionsIter++) {
-      ProcessCommandAddition(*additionsIter);
+    for (auto& addition : m_additions) {
+      ProcessCommandAddition(addition);
     }
     m_additions.clear();
   }
 
   // Add in the defaults
-  for (auto subsystemIter = m_subsystems.begin();
-       subsystemIter != m_subsystems.end(); subsystemIter++) {
-    Subsystem* lock = *subsystemIter;
-    if (lock->GetCurrentCommand() == nullptr) {
-      ProcessCommandAddition(lock->GetDefaultCommand());
+  for (auto& subsystem : m_subsystems) {
+    if (subsystem->GetCurrentCommand() == nullptr) {
+      ProcessCommandAddition(subsystem->GetDefaultCommand());
     }
-    lock->ConfirmCommand();
+    subsystem->ConfirmCommand();
   }
 }
 
@@ -106,10 +99,8 @@ void Scheduler::Remove(Command* command) {
 
   if (!m_commands.erase(command)) return;
 
-  Command::SubsystemSet requirements = command->GetRequirements();
-  for (auto iter = requirements.begin(); iter != requirements.end(); iter++) {
-    Subsystem* lock = *iter;
-    lock->SetCurrentCommand(nullptr);
+  for (auto& requirement : command->GetRequirements()) {
+    requirement->SetCurrentCommand(nullptr);
   }
 
   command->Removed();
@@ -149,12 +140,10 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
 
     // Cancel commands whose cancel buttons were pressed on the SmartDashboard
     if (!toCancel.empty()) {
-      for (auto commandIter = m_commands.begin();
-           commandIter != m_commands.end(); ++commandIter) {
-        for (size_t i = 0; i < toCancel.size(); i++) {
-          Command* c = *commandIter;
-          if (c->GetID() == toCancel[i]) {
-            c->Cancel();
+      for (auto& command : m_commands) {
+        for (const auto& cancelled : toCancel) {
+          if (command->GetID() == cancelled) {
+            command->Cancel();
           }
         }
       }
@@ -166,11 +155,9 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
     if (m_runningCommandsChanged) {
       commands.resize(0);
       ids.resize(0);
-      for (auto commandIter = m_commands.begin();
-           commandIter != m_commands.end(); ++commandIter) {
-        Command* c = *commandIter;
-        commands.push_back(c->GetName());
-        ids.push_back(c->GetID());
+      for (const auto& command : m_commands) {
+        commands.emplace_back(command->GetName());
+        ids.emplace_back(command->GetID());
       }
       m_namesEntry.SetStringArray(commands);
       m_idsEntry.SetDoubleArray(ids);
@@ -198,24 +185,20 @@ void Scheduler::ProcessCommandAddition(Command* command) {
   if (found == m_commands.end()) {
     // Check that the requirements can be had
     Command::SubsystemSet requirements = command->GetRequirements();
-    for (Command::SubsystemSet::iterator iter = requirements.begin();
-         iter != requirements.end(); iter++) {
-      Subsystem* lock = *iter;
-      if (lock->GetCurrentCommand() != nullptr &&
-          !lock->GetCurrentCommand()->IsInterruptible())
+    for (const auto& requirement : requirements) {
+      if (requirement->GetCurrentCommand() != nullptr &&
+          !requirement->GetCurrentCommand()->IsInterruptible())
         return;
     }
 
     // Give it the requirements
     m_adding = true;
-    for (Command::SubsystemSet::iterator iter = requirements.begin();
-         iter != requirements.end(); iter++) {
-      Subsystem* lock = *iter;
-      if (lock->GetCurrentCommand() != nullptr) {
-        lock->GetCurrentCommand()->Cancel();
-        Remove(lock->GetCurrentCommand());
+    for (auto& requirement : requirements) {
+      if (requirement->GetCurrentCommand() != nullptr) {
+        requirement->GetCurrentCommand()->Cancel();
+        Remove(requirement->GetCurrentCommand());
       }
-      lock->SetCurrentCommand(command);
+      requirement->SetCurrentCommand(command);
     }
     m_adding = false;
 

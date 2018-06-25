@@ -34,11 +34,12 @@ class Error {
   typedef int Code;
 
   Error() = default;
+  Error(Code code, const wpi::Twine& contextMessage, wpi::StringRef filename,
+        wpi::StringRef function, int lineNumber,
+        const ErrorBase* originatingObject);
 
-  Error(const Error&) = delete;
-  Error& operator=(const Error&) = delete;
+  bool operator<(const Error& rhs) const;
 
-  void Clone(const Error& error);
   Code GetCode() const;
   std::string GetMessage() const;
   std::string GetFilename() const;

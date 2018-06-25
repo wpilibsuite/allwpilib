@@ -20,7 +20,14 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * the driver station.
  */
 public class IterativeRobot extends IterativeRobotBase {
+  private static final double kPacketPeriod = 0.02;
+
+  /**
+   * Create a new IterativeRobot.
+   */
   public IterativeRobot() {
+    super(kPacketPeriod);
+
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Iterative);
   }
 

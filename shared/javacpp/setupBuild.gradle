@@ -24,18 +24,6 @@ staticGtestConfigs["${nativeName}Test"] = []
 
 apply from: "${rootDir}/shared/googletest.gradle"
 
-ext {
-    sharedUvwConfigs = [:]
-    staticUvwConfigs = [:]
-}
-
-sharedUvwConfigs["${nativeName}"] = []
-sharedUvwConfigs["${nativeName}Base"] = []
-sharedUvwConfigs["${nativeName}Dev"] = []
-sharedUvwConfigs["${nativeName}Test"] = []
-
-apply from: "${rootDir}/shared/libuv.gradle"
-
 model {
     components {
         "${nativeName}Base"(NativeLibrarySpec) {
@@ -54,6 +42,9 @@ model {
                 if (it instanceof SharedLibraryBinarySpec) {
                     it.buildable = false
                     return
+                }
+                if (project.hasProperty('extraSetup')) {
+                    extraSetup(it)
                 }
             }
         }

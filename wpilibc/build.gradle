@@ -60,16 +60,6 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-ext {
-    sharedUvwConfigs = [wpilibc    : [],
-                        wpilibcBase: [],
-                        wpilibcDev : [],
-                        wpilibcTest: []]
-    staticUvwConfigs = [:]
-}
-
-apply from: "${rootDir}/shared/libuv.gradle"
-
 project(':').libraryBuild.dependsOn build
 
 ext {

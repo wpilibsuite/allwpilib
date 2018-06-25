@@ -10,6 +10,7 @@
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
+#include <set>
 
 #include <HAL/HAL.h>
 #include <wpi/Format.h>
@@ -21,8 +22,8 @@
 
 using namespace frc;
 
-wpi::mutex ErrorBase::_globalErrorMutex;
-Error ErrorBase::_globalError;
+static wpi::mutex globalErrorsMutex;
+static std::set<Error> globalErrors;
 
 ErrorBase::ErrorBase() { HAL_Initialize(500, 0); }
 
@@ -50,10 +51,8 @@ void ErrorBase::SetErrnoError(const wpi::Twine& contextMessage,
               this);
 
   // Update the global error if there is not one already set.
-  std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
-  if (_globalError.GetCode() == 0) {
-    _globalError.Clone(m_error);
-  }
+  std::lock_guard<wpi::mutex> mutex(globalErrorsMutex);
+  globalErrors.insert(m_error);
 }
 
 void ErrorBase::SetImaqError(int success, const wpi::Twine& contextMessage,
@@ -66,10 +65,8 @@ void ErrorBase::SetImaqError(int success, const wpi::Twine& contextMessage,
                 function, lineNumber, this);
 
     // Update the global error if there is not one already set.
-    std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
-    if (_globalError.GetCode() == 0) {
-      _globalError.Clone(m_error);
-    }
+    std::lock_guard<wpi::mutex> mutex(globalErrorsMutex);
+    globalErrors.insert(m_error);
   }
 }
 
@@ -82,10 +79,8 @@ void ErrorBase::SetError(Error::Code code, const wpi::Twine& contextMessage,
     m_error.Set(code, contextMessage, filename, function, lineNumber, this);
 
     // Update the global error if there is not one already set.
-    std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
-    if (_globalError.GetCode() == 0) {
-      _globalError.Clone(m_error);
-    }
+    std::lock_guard<wpi::mutex> mutex(globalErrorsMutex);
+    globalErrors.insert(m_error);
   }
 }
 
@@ -104,10 +99,8 @@ void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
                 filename, function, lineNumber, this);
 
     // Update the global error if there is not one already set.
-    std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
-    if (_globalError.GetCode() == 0) {
-      _globalError.Clone(m_error);
-    }
+    std::lock_guard<wpi::mutex> mutex(globalErrorsMutex);
+    globalErrors.insert(m_error);
   }
 }
 
@@ -120,14 +113,12 @@ void ErrorBase::SetWPIError(const wpi::Twine& errorMessage, Error::Code code,
               lineNumber, this);
 
   // Update the global error if there is not one already set.
-  std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
-  if (_globalError.GetCode() == 0) {
-    _globalError.Clone(m_error);
-  }
+  std::lock_guard<wpi::mutex> mutex(globalErrorsMutex);
+  globalErrors.insert(m_error);
 }
 
 void ErrorBase::CloneError(const ErrorBase& rhs) const {
-  m_error.Clone(rhs.GetError());
+  m_error = rhs.GetError();
 }
 
 bool ErrorBase::StatusIsFatal() const { return m_error.GetCode() < 0; }
@@ -138,11 +129,11 @@ void ErrorBase::SetGlobalError(Error::Code code,
                                int lineNumber) {
   // If there was an error
   if (code != 0) {
-    std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
+    std::lock_guard<wpi::mutex> mutex(globalErrorsMutex);
 
     // Set the current error information for this object.
-    _globalError.Set(code, contextMessage, filename, function, lineNumber,
-                     nullptr);
+    globalErrors.emplace(code, contextMessage, filename, function, lineNumber,
+                         nullptr);
   }
 }
 
@@ -150,15 +141,12 @@ void ErrorBase::SetGlobalWPIError(const wpi::Twine& errorMessage,
                                   const wpi::Twine& contextMessage,
                                   wpi::StringRef filename,
                                   wpi::StringRef function, int lineNumber) {
-  std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
-  if (_globalError.GetCode() != 0) {
-    _globalError.Clear();
-  }
-  _globalError.Set(-1, errorMessage + ": " + contextMessage, filename, function,
-                   lineNumber, nullptr);
+  std::lock_guard<wpi::mutex> mutex(globalErrorsMutex);
+  globalErrors.emplace(-1, errorMessage + ": " + contextMessage, filename,
+                       function, lineNumber, nullptr);
 }
 
-Error& ErrorBase::GetGlobalError() {
-  std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
-  return _globalError;
+const Error& ErrorBase::GetGlobalError() {
+  std::lock_guard<wpi::mutex> mutex(globalErrorsMutex);
+  return *globalErrors.begin();
 }
