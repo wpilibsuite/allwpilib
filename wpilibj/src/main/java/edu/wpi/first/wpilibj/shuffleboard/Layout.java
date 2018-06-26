@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public abstract class Layout implements Configurable, WidgetAdder {
-
   private final String m_type;
   private final String m_title;
   private Map<String, Object> m_properties = Collections.emptyMap();

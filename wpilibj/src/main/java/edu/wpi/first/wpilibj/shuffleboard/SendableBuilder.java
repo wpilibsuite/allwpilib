@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj.shuffleboard;
 import edu.wpi.first.wpilibj.Sendable;
 
 public final class SendableBuilder extends BuilderBase {
-
   private final Sendable m_sendable;
 
   SendableBuilder(String sendableName, Sendable sendable) {
@@ -28,7 +27,6 @@ public final class SendableBuilder extends BuilderBase {
   }
 
   private final class TabBuilder extends Tab {
-
     TabBuilder(String tabName) {
       super(tabName);
       setTab(this);
@@ -46,7 +44,6 @@ public final class SendableBuilder extends BuilderBase {
   }
 
   public final class LayoutBuilder extends Layout {
-
     LayoutBuilder(String layoutType, String layoutTitle) {
       super(layoutType, layoutTitle);
       setLayout(this);
@@ -60,7 +57,6 @@ public final class SendableBuilder extends BuilderBase {
   }
 
   private final class WidgetBuilder extends Widget {
-
     WidgetBuilder(String widgetType) {
       super(widgetType);
       setWidget(this);

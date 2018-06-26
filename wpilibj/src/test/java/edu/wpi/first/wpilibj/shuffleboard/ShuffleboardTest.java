@@ -36,7 +36,6 @@ import static edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.add;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class ShuffleboardTest extends UtilityClassTest {
-
   private static NetworkTableInstance instance;
 
   public ShuffleboardTest() {
@@ -286,7 +285,6 @@ public class ShuffleboardTest extends UtilityClassTest {
   }
 
   private static final class MockSendable extends SendableBase {
-
     MockSendable() {
     }
 

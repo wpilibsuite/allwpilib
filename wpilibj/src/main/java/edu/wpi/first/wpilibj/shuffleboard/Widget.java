@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Widget implements Configurable {
-
   private final String m_type;
   private Map<String, Object> m_properties = Collections.emptyMap();
 

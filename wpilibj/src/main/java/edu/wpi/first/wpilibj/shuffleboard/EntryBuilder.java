@@ -15,7 +15,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableType;
 
 public final class EntryBuilder extends BuilderBase {
-
   /**
    * The default values to use for each network table type. Booleans default to false,
    * numbers default to 0.0, and string and arrays are all empty.
@@ -54,7 +53,6 @@ public final class EntryBuilder extends BuilderBase {
   }
 
   public final class TabBuilder extends Tab implements TerminalEntryBuilder {
-
     TabBuilder(String tabName) {
       super(tabName);
       setTab(this);
@@ -80,7 +78,6 @@ public final class EntryBuilder extends BuilderBase {
   }
 
   public final class WidgetBuilder extends Widget implements TerminalEntryBuilder {
-
     WidgetBuilder(String widgetType) {
       super(widgetType);
       setWidget(this);
@@ -99,7 +96,6 @@ public final class EntryBuilder extends BuilderBase {
   }
 
   public final class LayoutBuilder extends Layout implements TerminalEntryBuilder {
-
     LayoutBuilder(String layoutType, String layoutTitle) {
       super(layoutType, layoutTitle);
       setLayout(this);

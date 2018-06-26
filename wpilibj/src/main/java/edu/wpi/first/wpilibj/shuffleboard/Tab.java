@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 public abstract class Tab implements LayoutAdder, WidgetAdder {
-
   private final String m_name;
 
   Tab(String name) {

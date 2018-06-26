@@ -51,11 +51,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
  *   .getEntry();
  * }</pre>
  * </p>
- * 
+ *
  * <p>Teams are encouraged to set up shuffleboard layouts at the start of the robot program.</p>
  */
 public final class Shuffleboard {
-
   public static final String BASE_TABLE_NAME = "/Shuffleboard";
 
   // Not final to allow tests to have fresh instances
@@ -74,7 +73,6 @@ public final class Shuffleboard {
   }
 
   private static final class SendableData {
-
     private final SendableBuilder m_sendable;
     private final SendableBuilderImpl m_builder;
     private boolean m_initialized = false; // NOPMD redundant field initializer
