@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -255,6 +256,7 @@ public abstract class IterativeRobotBase extends RobotBase {
     SmartDashboard.updateValues();
 
     LiveWindow.updateValues();
+    Shuffleboard.update();
 
     // Warn on loop time overruns
     if (m_watchdog.isExpired()) {

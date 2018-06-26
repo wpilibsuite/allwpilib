@@ -132,8 +132,9 @@ public final class Shuffleboard {
   }
 
   /**
-   * Updates all the values in Shuffleboard. This should be called repeatedly in a loop (for
-   * example, in an iterative or timed robot's autonomousPeriodic and teleopPeriodic methods).
+   * Updates all the values in Shuffleboard. Iterative and timed robots are pre-configured to call
+   * this method in the main robot loop; teams using custom robot base classes, or subclass
+   * SampleRobot, should make sure to call this repeatedly to keep data on the dashboard up to date.
    */
   public static void update() {
     NetworkTable baseTable = getBaseTable();
