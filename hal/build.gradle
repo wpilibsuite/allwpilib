@@ -90,18 +90,4 @@ model {
     }
 }
 
-task generateFRCNetComm(type: Copy) {
-    description = 'Generates the FRCNetComm class.'
-    group = 'WPILib'
-
-    from file("src/generate/FRCNetComm.java.in")
-    into file("$buildDir/generated/java/edu/wpi/first/hal")
-
-    rename('.in', '')
-}
-
-sourceSets.main.java.srcDir "${buildDir}/generated/java/"
-
-compileJava {
-    dependsOn generateFRCNetComm
-}
+sourceSets.main.java.srcDir "src/generated/java/"

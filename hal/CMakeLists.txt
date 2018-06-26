@@ -12,9 +12,9 @@ if (NOT WITHOUT_JAVA)
         hal_shared_jni_src src/main/native/cpp/jni/*.cpp
         hal_sim_jni_src src/main/native/sim/jni/*.cpp)
 
-    configure_file(src/generate/FRCNetComm.java.in FRCNetComm.java)
-
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+    file(GLOB_RECURSE JAVA_SOURCES
+        src/generated/java/*.java
+        src/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
 
     if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
