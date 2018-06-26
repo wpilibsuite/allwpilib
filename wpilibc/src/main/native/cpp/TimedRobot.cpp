@@ -23,8 +23,6 @@ void TimedRobot::StartCompetition() {
   // Tell the DS that the robot is ready to be enabled
   HAL_ObserveUserProgramStarting();
 
-  m_startLoop = true;
-
   m_expirationTime = Timer::GetFPGATimestamp() + m_period;
   UpdateAlarm();
 
@@ -43,18 +41,9 @@ void TimedRobot::StartCompetition() {
   }
 }
 
-void TimedRobot::SetPeriod(double period) {
-  m_period = period;
-
-  if (m_startLoop) {
-    m_expirationTime = Timer::GetFPGATimestamp() + period;
-    UpdateAlarm();
-  }
-}
-
 double TimedRobot::GetPeriod() const { return m_period; }
 
-TimedRobot::TimedRobot() {
+TimedRobot::TimedRobot(double period) : IterativeRobotBase(period) {
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));

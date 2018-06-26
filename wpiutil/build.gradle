@@ -1,6 +1,109 @@
 ext {
     nativeName = 'wpiutil'
     devMain = 'edu.wpi.first.wpiutil.DevMain'
+    extraSetup = {
+        it.sources {
+            libuvCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/libuv'
+                    include '*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include', 'src/main/native/include/uv-private', 'src/main/native/libuv'
+                }
+            }
+        }
+        if (it.targetPlatform.operatingSystem.name != 'windows') {
+            it.cppCompiler.define '_LARGEFILE_SOURCE'
+            it.cppCompiler.define '_FILE_OFFSET_BITS=64'
+            it.cppCompiler.define '_GNU_SOURCE'
+            it.sources {
+                libuvUnixCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/libuv/unix'
+                        includes = [
+                            'async.cpp',
+                            'core.cpp',
+                            'dl.cpp',
+                            'fs.cpp',
+                            'getaddrinfo.cpp',
+                            'getnameinfo.cpp',
+                            'loop-watcher.cpp',
+                            'loop.cpp',
+                            'pipe.cpp',
+                            'poll.cpp',
+                            'process.cpp',
+                            'signal.cpp',
+                            'stream.cpp',
+                            'tcp.cpp',
+                            'thread.cpp',
+                            'timer.cpp',
+                            'tty.cpp',
+                            'udp.cpp',
+                        ]
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/include/uv-private', 'src/main/native/libuv'
+                    }
+                }
+            }
+        }
+        if (it.targetPlatform.operatingSystem.name == 'windows') {
+            if (it in SharedLibraryBinarySpec) {
+                it.cppCompiler.define 'BUILDING_UV_SHARED'
+            }
+            it.sources {
+                libuvWindowsCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/libuv/win'
+                        include '*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/include/uv-private', 'src/main/native/libuv'
+                    }
+                }
+            }
+        } else if (it.targetPlatform.operatingSystem.name == 'osx') {
+            it.sources {
+                libuvMacCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/libuv/unix'
+                        includes = [
+                            'bsd-ifaddrs.cpp',
+                            'darwin.cpp',
+                            'darwin-proctitle.cpp',
+                            'fsevents.cpp',
+                            'kqueue.cpp',
+                            'proctitle.cpp'
+                        ]
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/include/uv-private', 'src/main/native/libuv'
+                    }
+                }
+            }
+        } else {
+            it.sources {
+                libuvLinuxCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/libuv/unix'
+                        includes = [
+                            'linux-core.cpp',
+                            'linux-inotify.cpp',
+                            'linux-syscalls.cpp',
+                            'procfs-exepath.cpp',
+                            'proctitle.cpp',
+                            'sysinfo-loadavg.cpp',
+                            'sysinfo-memory.cpp',
+                        ]
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/include/uv-private', 'src/main/native/libuv'
+                    }
+                }
+            }
+        }
+    }
 }
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"

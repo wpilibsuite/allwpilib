@@ -24,16 +24,8 @@ void Subsystem::SetDefaultCommand(Command* command) {
   if (command == nullptr) {
     m_defaultCommand = nullptr;
   } else {
-    bool found = false;
-    Command::SubsystemSet requirements = command->GetRequirements();
-    for (auto iter = requirements.begin(); iter != requirements.end(); iter++) {
-      if (*iter == this) {
-        found = true;
-        break;
-      }
-    }
-
-    if (!found) {
+    const auto& reqs = command->GetRequirements();
+    if (std::find(reqs.begin(), reqs.end(), this) == reqs.end()) {
       wpi_setWPIErrorWithContext(
           CommandIllegalUse, "A default command must require the subsystem");
       return;

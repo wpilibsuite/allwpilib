@@ -47,6 +47,9 @@ generatedFileExclude {
   src/main/native/cpp/json
   src/main/native/include/wpi/json
   src/test/native/cpp/json/
+  src/main/native/include/uv\.h$
+  src/main/native/include/uv/
+  src/main/native/libuv/
 }
 
 licenseUpdateExclude {

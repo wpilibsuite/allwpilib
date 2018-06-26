@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +23,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableType;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
-import edu.wpi.first.wpilibj.UnitTestUtility;
 import edu.wpi.first.wpilibj.UtilityClassTest;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
@@ -43,11 +41,6 @@ public class ShuffleboardTest extends UtilityClassTest {
 
   public ShuffleboardTest() {
     super(Shuffleboard.class);
-  }
-
-  @BeforeAll
-  public static void setUpClass() {
-    UnitTestUtility.setupMockBase();
   }
 
   @BeforeEach

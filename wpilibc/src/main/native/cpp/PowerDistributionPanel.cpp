@@ -32,6 +32,8 @@ PowerDistributionPanel::PowerDistributionPanel(int module) {
                                  HAL_GetErrorMessage(status));
     return;
   }
+
+  HAL_Report(HALUsageReporting::kResourceType_PDP, module);
   SetName("PowerDistributionPanel", module);
 }
 

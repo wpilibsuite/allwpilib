@@ -1,13 +1,6 @@
 apply plugin: 'maven-publish'
-apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
 apply plugin: 'java'
 apply plugin: 'net.ltgt.errorprone'
-
-if (!hasProperty('releaseType')) {
-    WPILibVersion {
-        releaseType = 'dev'
-    }
-}
 
 def pubVersion
 if (project.hasProperty("publishVersion")) {
@@ -87,6 +80,7 @@ publishing {
 
 test {
     useJUnitPlatform()
+    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
     testLogging {
         events "failed"
         exceptionFormat "full"

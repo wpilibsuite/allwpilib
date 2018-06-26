@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import java.util.Enumeration;
+import java.util.Collections;
 
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
@@ -93,17 +93,7 @@ public abstract class Subsystem extends SendableBase {
     if (command == null) {
       m_defaultCommand = null;
     } else {
-      boolean found = false;
-      Enumeration requirements = command.getRequirements();
-      while (requirements.hasMoreElements()) {
-        if (requirements.nextElement().equals(this)) {
-          found = true;
-          // } else {
-          // throw new
-          // IllegalUseOfCommandException("A default command cannot require multiple subsystems");
-        }
-      }
-      if (!found) {
+      if (!Collections.list(command.getRequirements()).contains(this)) {
         throw new IllegalUseOfCommandException("A default command must require the subsystem");
       }
       m_defaultCommand = command;

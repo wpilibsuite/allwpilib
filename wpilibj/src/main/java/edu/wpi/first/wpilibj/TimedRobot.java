@@ -22,9 +22,6 @@ import edu.wpi.first.wpilibj.hal.NotifierJNI;
 public class TimedRobot extends IterativeRobotBase {
   public static final double kDefaultPeriod = 0.02;
 
-  // Prevents loop from starting if user calls setPeriod() in robotInit()
-  private boolean m_startLoop;
-
   // The C pointer to the notifier object. We don't use it directly, it is
   // just passed to the JNI bindings.
   private final int m_notifier = NotifierJNI.initializeNotifier();
@@ -32,9 +29,23 @@ public class TimedRobot extends IterativeRobotBase {
   // The absolute expiration time
   private double m_expirationTime;
 
-  private double m_period = kDefaultPeriod;
+  private double m_period;
 
-  public TimedRobot() {
+  /**
+   * Constructor for TimedRobot.
+   */
+  protected TimedRobot() {
+    this(kDefaultPeriod);
+  }
+
+  /**
+   * Constructor for TimedRobot.
+   *
+   * @param period Period in seconds.
+   */
+  protected TimedRobot(double period) {
+    super(period);
+
     // HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Periodic);
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Iterative);
   }
@@ -56,8 +67,6 @@ public class TimedRobot extends IterativeRobotBase {
     // Tell the DS that the robot is ready to be enabled
     HAL.observeUserProgramStarting();
 
-    m_startLoop = true;
-
     m_expirationTime = RobotController.getFPGATime() * 1e-6 + m_period;
     updateAlarm();
 
@@ -72,20 +81,6 @@ public class TimedRobot extends IterativeRobotBase {
       updateAlarm();
 
       loopFunc();
-    }
-  }
-
-  /**
-   * Set time period between calls to Periodic() functions.
-   *
-   * @param period Period in seconds.
-   */
-  public void setPeriod(double period) {
-    m_period = period;
-
-    if (m_startLoop) {
-      m_expirationTime = RobotController.getFPGATime() * 1e-6 + period;
-      updateAlarm();
     }
   }
 
