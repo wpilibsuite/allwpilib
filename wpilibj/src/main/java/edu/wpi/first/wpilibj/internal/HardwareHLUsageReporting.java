@@ -30,6 +30,6 @@ public class HardwareHLUsageReporting implements HLUsageReporting.Interface {
 
   @Override
   public void reportShuffleboard() {
-    HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
+    // NOP until Shuffleboard usage reporting is added upstream by NI
   }
 }

@@ -127,7 +127,6 @@ public class FRCNetComm extends JNIWrapper {
     public static final int kResourceType_CTRE_future4 = 68;
     public static final int kResourceType_CTRE_future5 = 69;
     public static final int kResourceType_CTRE_future6 = 70;
-    public static final int kResourceType_Shuffleboard = 71;
   }
 
   /**
