@@ -199,7 +199,7 @@ int uv_thread_create(uv_thread_t *tid, void (*entry)(void *arg), void *arg) {
       abort();
   }
 
-  err = pthread_create(tid, attr, (void*(*)(void*)) entry, arg);
+  err = pthread_create(tid, attr, (void*(*)(void*)) (void(*)(void)) entry, arg);
 
   if (attr != NULL)
     pthread_attr_destroy(attr);
