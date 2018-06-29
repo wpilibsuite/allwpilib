@@ -14,7 +14,7 @@
 #include "MockData/NotifyListener.h"
 
 static void init_callback(const char* name, void* param,
-                                  const struct HAL_Value* value) {
+                          const struct HAL_Value* value) {
   GazeboDIO* dio = static_cast<GazeboDIO*>(param);
   dio->SetInitialized(value->data.v_boolean);
   if (dio->IsInitialized()) {
@@ -26,15 +26,14 @@ GazeboDIO::GazeboDIO(int index, HALSimGazebo* halsim) {
   m_index = index;
   m_halsim = halsim;
   m_sub = NULL;
-  HALSIM_RegisterDIOInitializedCallback(index, init_callback,
-                                            this, true);
+  HALSIM_RegisterDIOInitializedCallback(index, init_callback, this, true);
 }
 
 void GazeboDIO::Listen() {
   if (!m_sub)
     m_sub = m_halsim->node.Subscribe<gazebo::msgs::Bool>(
-        "~/simulator/dio/" + std::to_string(m_index),
-        &GazeboDIO::Callback, this);
+        "~/simulator/dio/" + std::to_string(m_index), &GazeboDIO::Callback,
+        this);
 }
 
 void GazeboDIO::Callback(const gazebo::msgs::ConstBoolPtr& msg) {

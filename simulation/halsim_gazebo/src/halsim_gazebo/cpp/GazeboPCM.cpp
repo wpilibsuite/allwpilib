@@ -15,13 +15,13 @@
 #include "simulation/gz_msgs/msgs.h"
 
 static void init_callback(const char* name, void* param,
-                         const struct HAL_Value* value) {
+                          const struct HAL_Value* value) {
   GazeboPCM* pcm = static_cast<GazeboPCM*>(param);
   pcm->SetInitialized(value->data.v_boolean);
 }
 
 static void output_callback(const char* name, void* param,
-                         const struct HAL_Value* value) {
+                            const struct HAL_Value* value) {
   GazeboPCM* pcm = static_cast<GazeboPCM*>(param);
   if (pcm->IsInitialized()) pcm->Publish(value->data.v_boolean);
 }
@@ -32,9 +32,9 @@ GazeboPCM::GazeboPCM(int index, int channel, HALSimGazebo* halsim) {
   m_halsim = halsim;
   m_pub = NULL;
   HALSIM_RegisterPCMSolenoidInitializedCallback(index, channel, init_callback,
-                                            this, true);
-  HALSIM_RegisterPCMSolenoidOutputCallback(index, channel, output_callback, this,
-                                           true);
+                                                this, true);
+  HALSIM_RegisterPCMSolenoidOutputCallback(index, channel, output_callback,
+                                           this, true);
 }
 
 void GazeboPCM::Publish(bool value) {

@@ -27,6 +27,6 @@ class HALSimGazebo {
   GazeboPWM* pwms[kPWMCount];
   GazeboPCM* pcms[kPCMCount];
   GazeboEncoder* encoders[kEncoderCount];
-  std::vector<GazeboAnalogIn *> analog_inputs;
+  std::vector<GazeboAnalogIn*> analog_inputs;
   std::vector<GazeboDIO*> dios;
 };

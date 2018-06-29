@@ -16,7 +16,7 @@
 #include "MockData/NotifyListener.h"
 
 static void init_callback(const char* name, void* param,
-                                  const struct HAL_Value* value) {
+                          const struct HAL_Value* value) {
   GazeboAnalogIn* ain = static_cast<GazeboAnalogIn*>(param);
   ain->SetInitialized(value->data.v_boolean);
   if (ain->IsInitialized()) {
@@ -28,8 +28,7 @@ GazeboAnalogIn::GazeboAnalogIn(int index, HALSimGazebo* halsim) {
   m_index = index;
   m_halsim = halsim;
   m_sub = NULL;
-  HALSIM_RegisterAnalogInInitializedCallback(index, init_callback,
-                                            this, true);
+  HALSIM_RegisterAnalogInInitializedCallback(index, init_callback, this, true);
 }
 
 void GazeboAnalogIn::Listen() {

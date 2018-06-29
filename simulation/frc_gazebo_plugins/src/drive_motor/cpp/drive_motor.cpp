@@ -70,9 +70,9 @@ void DriveMotor::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
     dz = 0;
   }
 
-  gzmsg << "Initializing drive motor: " << topic << " parent=" << parent->GetName()
-        << " directions=" << dx << " " << dy << " " << dz
-        << " multiplier=" << multiplier <<  std::endl;
+  gzmsg << "Initializing drive motor: " << topic
+        << " parent=" << parent->GetName() << " directions=" << dx << " " << dy
+        << " " << dz << " multiplier=" << multiplier << std::endl;
 
   // Connect to Gazebo transport for messaging
   std::string scoped_name =
@@ -93,8 +93,7 @@ static double computeForce(double input, double velocity, double max) {
   if (max == 0.0) return output;
   if (std::fabs(velocity) >= max) {
     output = 0;
-  }
-  else {
+  } else {
     double reduce = (max - std::fabs(velocity)) / max;
     output *= reduce;
   }
@@ -108,8 +107,7 @@ void DriveMotor::Update(const gazebo::common::UpdateInfo& info) {
   ignition::math::Vector3d velocity = parent->GetRelativeLinearVel().Ign();
 #endif
 
-  if (signal == 0)
-    return;
+  if (signal == 0) return;
 
   double x = computeForce(signal * dx * multiplier, velocity.X(),
                           std::fabs(maxSpeed * dx));

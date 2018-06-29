@@ -36,8 +36,7 @@ void Encoder::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
     multiplier = sdf->Get<double>("multiplier");
 
   gzmsg << "Initializing encoder: " << topic << " joint=" << joint->GetName()
-        << " radians=" << radians
-        << " multiplier=" << multiplier << std::endl;
+        << " radians=" << radians << " multiplier=" << multiplier << std::endl;
 
   // Connect to Gazebo transport for messaging
   std::string scoped_name =

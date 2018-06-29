@@ -15,13 +15,13 @@
 #include "simulation/gz_msgs/msgs.h"
 
 static void init_callback(const char* name, void* param,
-                         const struct HAL_Value* value) {
+                          const struct HAL_Value* value) {
   GazeboPWM* pwm = static_cast<GazeboPWM*>(param);
   pwm->SetInitialized(value->data.v_boolean);
 }
 
 static void speed_callback(const char* name, void* param,
-                         const struct HAL_Value* value) {
+                           const struct HAL_Value* value) {
   GazeboPWM* pwm = static_cast<GazeboPWM*>(param);
   if (pwm->IsInitialized()) pwm->Publish(value->data.v_double);
 }
