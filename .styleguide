@@ -14,7 +14,7 @@ generatedFileExclude {
   ni-libraries/lib/
   FRCNetComm\.java$
   simulation/frc_gazebo_plugins/frcgazebo
-  simulation/gz_msgs/src/include/simulation/gz_msgs/msgs.h
+  simulation/gz_msgs/src/include/simulation/gz_msgs/msgs\.h
 }
 
 modifiableFileExclude {
