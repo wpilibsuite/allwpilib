@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "GazeboNode.h"
 
 class GazeboPWM;
