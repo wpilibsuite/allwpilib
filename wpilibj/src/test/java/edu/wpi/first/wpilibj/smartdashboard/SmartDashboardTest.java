@@ -96,7 +96,7 @@ class SmartDashboardTest extends UtilityClassTest {
   }
 
   @Test
-  public void testReplaceString() {
+  void testReplaceString() {
     final String key = "testReplaceString";
     final String valueNew = "newValue";
 
