@@ -35,6 +35,7 @@ SOFTWARE.
  */
 #pragma once
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -495,6 +496,38 @@ class SignalBase {
     using lock_type = std::unique_lock<Lockable>;
     using SlotPtr = detail::SlotPtr<T...>;
 
+    struct CallSlots {
+        SlotPtr m_slots;
+        SignalBase& m_base;
+
+        CallSlots(SignalBase& base) : m_base(base) {}
+
+        template <typename... A>
+        void operator()(A && ... a) {
+            SlotPtr *prev = nullptr;
+            SlotPtr *curr = m_slots ? &m_slots : nullptr;
+
+            while (curr) {
+                // call non blocked, non connected slots
+                if ((*curr)->connected()) {
+                    if (!m_base.m_block && !(*curr)->blocked())
+                        (*curr)->operator()(std::forward<A>(a)...);
+                    prev = curr;
+                    curr = (*curr)->next ? &((*curr)->next) : nullptr;
+                }
+                // remove slots marked as disconnected
+                else {
+                    if (prev) {
+                        (*prev)->next = (*curr)->next;
+                        curr = (*prev)->next ? &((*prev)->next) : nullptr;
+                    }
+                    else
+                        curr = (*curr)->next ? &((*curr)->next) : nullptr;
+                }
+            }
+        }
+    };
+
 public:
     using arg_list = trait::typelist<T...>;
     using ext_arg_list = trait::typelist<Connection&, T...>;
@@ -511,7 +544,7 @@ public:
         : m_block{o.m_block.load()}
     {
         lock_type lock(o.m_mutex);
-        std::swap(m_slots, o.m_slots);
+        std::swap(m_func, o.m_func);
     }
 
     SignalBase & operator=(SignalBase && o) {
@@ -519,7 +552,7 @@ public:
         lock_type lock2(o.m_mutex, std::defer_lock);
         std::lock(lock1, lock2);
 
-        std::swap(m_slots, o.m_slots);
+        std::swap(m_func, o.m_func);
         m_block.store(o.m_block.exchange(m_block.load()));
         return *this;
     }
@@ -539,27 +572,7 @@ public:
     template <typename... A>
     void operator()(A && ... a) {
         lock_type lock(m_mutex);
-        SlotPtr *prev = nullptr;
-        SlotPtr *curr = m_slots ? &m_slots : nullptr;
-
-        while (curr) {
-            // call non blocked, non connected slots
-            if ((*curr)->connected()) {
-                if (!m_block && !(*curr)->blocked())
-                    (*curr)->operator()(std::forward<A>(a)...);
-                prev = curr;
-                curr = (*curr)->next ? &((*curr)->next) : nullptr;
-            }
-            // remove slots marked as disconnected
-            else {
-                if (prev) {
-                    (*prev)->next = (*curr)->next;
-                    curr = (*prev)->next ? &((*prev)->next) : nullptr;
-                }
-                else
-                    curr = (*curr)->next ? &((*curr)->next) : nullptr;
-            }
-        }
+        if (!m_block && m_func) m_func(std::forward<A>(a)...);
     }
 
     /**
@@ -573,8 +586,29 @@ public:
      * @return a Connection object that can be used to interact with the slot
      */
     template <typename Callable>
+    void connect(Callable && c) {
+        if (!m_func) {
+          m_func = std::forward<Callable>(c);
+        } else {
+          using slot_t = detail::Slot<Callable, arg_list>;
+          auto s = std::make_shared<slot_t>(std::forward<Callable>(c));
+          add_slot(s);
+        }
+    }
+
+    /**
+     * Connect a callable of compatible arguments, returning a Connection
+     *
+     * Effect: Creates and stores a new slot responsible for executing the
+     *         supplied callable for every subsequent signal emission.
+     * Safety: Thread-safety depends on locking policy.
+     *
+     * @param c a callable
+     * @return a Connection object that can be used to interact with the slot
+     */
+    template <typename Callable>
     std::enable_if_t<trait::is_callable_v<arg_list, Callable>, Connection>
-    connect(Callable && c) {
+    connect_connection(Callable && c) {
         using slot_t = detail::Slot<Callable, arg_list>;
         auto s = std::make_shared<slot_t>(std::forward<Callable>(c));
         add_slot(s);
@@ -697,7 +731,7 @@ public:
      */
     template <typename... CallArgs>
     ScopedConnection connect_scoped(CallArgs && ...args) {
-        return connect(std::forward<CallArgs>(args)...);
+        return connect_connection(std::forward<CallArgs>(args)...);
     }
 
     /**
@@ -736,16 +770,35 @@ private:
     template <typename S>
     void add_slot(S &s) {
         lock_type lock(m_mutex);
-        s->next = m_slots;
-        m_slots = s;
+        if (!m_func) {
+          // nothing stored
+          m_func = CallSlots(*this);
+          auto slots = m_func.template target<CallSlots>();
+          s->next = slots->m_slots;
+          slots->m_slots = s;
+        } else if (auto call_slots = m_func.template target<CallSlots>()) {
+          // already CallSlots
+          s->next = call_slots->m_slots;
+          call_slots->m_slots = s;
+        } else {
+          // was normal std::function, need to move it into a call slot
+          using slot_t = detail::Slot<std::function<void(T...)>, arg_list>;
+          auto s2 = std::make_shared<slot_t>(
+              std::forward<std::function<void(T...)>>(m_func));
+          m_func = CallSlots(*this);
+          auto slots = m_func.template target<CallSlots>();
+          s2->next = slots->m_slots;
+          s->next = s2;
+          slots->m_slots = s;
+        }
     }
 
     void clear() {
-        m_slots.reset();
+        m_func = nullptr;
     }
 
 private:
-    SlotPtr m_slots;
+    std::function<void(T...)> m_func;
     Lockable m_mutex;
     std::atomic<bool> m_block;
 };

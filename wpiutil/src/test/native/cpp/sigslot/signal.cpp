@@ -49,7 +49,7 @@ namespace {
 int sum = 0;
 
 void f1(int i) { sum += i; }
-void f2(int i) noexcept { sum += 2 * i; }
+void f2(int i) /*noexcept*/ { sum += 2 * i; }
 
 struct s {
   static void s1(int i) { sum += i; }
@@ -103,7 +103,7 @@ TEST(Signal, FreeConnection) {
   sum = 0;
   Signal<int> sig;
 
-  auto c1 = sig.connect(f1);
+  auto c1 = sig.connect_connection(f1);
   sig(1);
   ASSERT_EQ(sum, 1);
 
@@ -232,7 +232,7 @@ TEST(Signal, LvalueEmission) {
   sum = 0;
   Signal<int> sig;
 
-  auto c1 = sig.connect(f1);
+  auto c1 = sig.connect_connection(f1);
   int v = 1;
   sig(v);
   ASSERT_EQ(sum, 1);
@@ -281,7 +281,7 @@ TEST(Signal, Disconnection) {
     sum = 0;
     Signal<int> sig;
 
-    auto sc = sig.connect(f1);
+    auto sc = sig.connect_connection(f1);
     sig(1);
     ASSERT_EQ(sum, 1);
 
@@ -295,7 +295,7 @@ TEST(Signal, Disconnection) {
     sum = 0;
     Signal<int> sig;
 
-    auto sc = sig.connect(f1);
+    auto sc = sig.connect_connection(f1);
     sig(1);
     ASSERT_EQ(sum, 1);
 
@@ -317,7 +317,7 @@ TEST(Signal, Disconnection) {
     sig(1);
     ASSERT_EQ(sum, 1);
 
-    auto sc = sig.connect(f2);
+    auto sc = sig.connect_connection(f2);
     sig(1);
     ASSERT_EQ(sum, 4);
 
@@ -347,11 +347,11 @@ TEST(Signal, ScopedConnection) {
   sum = 0;
 
   {
-    ScopedConnection sc1 = sig.connect(f1);
+    ScopedConnection sc1 = sig.connect_connection(f1);
     sig(1);
     ASSERT_EQ(sum, 1);
 
-    ScopedConnection sc2 = sig.connect(f2);
+    ScopedConnection sc2 = sig.connect_connection(f2);
     sig(1);
     ASSERT_EQ(sum, 4);
   }
@@ -364,7 +364,7 @@ TEST(Signal, ConnectionBlocking) {
   sum = 0;
   Signal<int> sig;
 
-  auto c1 = sig.connect(f1);
+  auto c1 = sig.connect_connection(f1);
   sig.connect(f2);
   sig(1);
   ASSERT_EQ(sum, 3);
@@ -382,7 +382,7 @@ TEST(Signal, ConnectionBlocker) {
   sum = 0;
   Signal<int> sig;
 
-  auto c1 = sig.connect(f1);
+  auto c1 = sig.connect_connection(f1);
   sig.connect(f2);
   sig(1);
   ASSERT_EQ(sum, 3);
@@ -433,8 +433,8 @@ TEST(Signal, ConnectionCopyingMoving) {
   sum = 0;
   Signal<int> sig;
 
-  auto sc1 = sig.connect(f1);
-  auto sc2 = sig.connect(f2);
+  auto sc1 = sig.connect_connection(f1);
+  auto sc2 = sig.connect_connection(f2);
 
   auto sc3 = sc1;
   auto sc4{sc2};
