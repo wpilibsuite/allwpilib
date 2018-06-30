@@ -1,0 +1,50 @@
+description = "A shared object library that will interface between a robot and the Gazebo plugins."
+
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'cpp'
+
+ext.skipAthena = true
+
+
+/* If gz_msgs or gazebo is not available, do not attempt a build */
+def gazebo_version = ""
+def gazebo_cppflags = ""
+def gazebo_linker_args = ""
+
+try {
+    gazebo_version = "pkg-config --modversion gazebo".execute().text.trim()
+    println "Gazebo version is [${gazebo_version}]"
+    gazebo_cppflags = "pkg-config --cflags gazebo".execute().text.split()
+    gazebo_linker_args = "pkg-config --libs gazebo protobuf".execute().text.split()
+} catch(Exception ex) { }
+
+if (!gazebo_version?.trim()) {
+    println "Gazebo development files are not available. (pkg-config --modversion gazebo failed)"
+    if (project.hasProperty("makeSim")) {
+        /* Force the build even though we did not find protobuf. */
+        println "makeSim set. Forcing build - failure likely."
+    }
+    else {
+        ext.skip_frc_plugins = true
+        println "Skipping FRC Plugins."
+    }
+}
+
+evaluationDependsOn(":simulation:gz_msgs")
+def gz_msgs_project = project(":simulation:gz_msgs")
+
+tasks.whenTaskAdded { task ->
+    task.onlyIf { !gz_msgs_project.hasProperty('skip_gz_msgs') && !project.hasProperty('skip_frc_plugins') }
+}
+
+model {
+    binaries {
+        all {
+            linker.args gazebo_linker_args
+            cppCompiler.args gazebo_cppflags
+            lib project: ":simulation:gz_msgs", library: "gz_msgs", linkage: "static"
+        }
+    }
+}
+
+/* TODO: Publish this library */
