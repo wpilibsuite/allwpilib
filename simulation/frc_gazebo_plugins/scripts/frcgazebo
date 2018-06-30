@@ -22,6 +22,15 @@ sharedir=/usr/share/frcgazebo
 if [ -d "$fulldir/../share" ] ; then
     sharedir=`(cd "$fulldir/../share/frcgazebo"; pwd)`
 fi
+
+# While we wait for the frc gazebo models to have a proper
+#  home, we require the user to make them accessible
+if [ ! -d "$sharedir" ] ; then
+    cravedir=`(cd "$fulldir/../"; pwd)`
+    echo Error: you must manually place the models and world into $cravedir/share/frcgazebo
+    exit 2
+fi
+
 libsdir=/invalid/directory
 if [ -d "$fulldir/../libs" ] ; then
     libsdir=`(cd "$fulldir/../libs"; pwd)`

@@ -108,12 +108,6 @@ task copyScript(type: Copy, group: "FRC Gazebo", description: "Copy the frcgazeb
     fileMode 0755
 }
 
-task copyGazeboResources(type: Copy, group: "FRC Gazebo", description: "Copy the frcgazebo models and worlds to the output directory.") {
-    from "frcgazebo"
-    into "$project.buildDir/share/frcgazebo"
-    fileMode 0644
-}
 build.dependsOn copyScript
-build.dependsOn copyGazeboResources
 
 /* TODO:  Publish this library */

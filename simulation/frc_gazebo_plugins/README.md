@@ -17,18 +17,19 @@ This command:
 
 will force it to attempt to build.
 
+TODO:  The meshes for the models are large, and are not hosted in
+the main allwpilib repository.  An alternate method of hosting
+and using is being built at the time of this commit. You must
+manually locate and copy the the models and world from that
+either into /usr/share/frcgazebo or into build/share/frcgazebo
+in order to use this facility.
+
 Once you have built it, then a command like this:
 
   `simulation/frc_gazebo_plugins/build/bin/frcgazebo PacGoat2014.world`
 
 should run the Gazebo simulation using our plugins against the
 2014 model, with the PacGoat robot on the field.
-
-TODO:  The meshes for the models are large, and are not hosted in
-the main allwpilib repository.  An alternate method of hosting
-and using is being built at the time of this commit. As of this writing, if
-you launch the frcgazebo script, you do not get a robot; you get
-a blank world.
 
 The halsim_gazebo simulation library will provide a method for
 running robot code to control a simulated robot.
