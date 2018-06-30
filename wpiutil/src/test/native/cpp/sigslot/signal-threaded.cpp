@@ -50,11 +50,11 @@ std::atomic<int> sum{0};
 
 void f(int i) { sum += i; }
 
-void emit_many(Signal<int>& sig) {
+void emit_many(Signal_mt<int>& sig) {
   for (int i = 0; i < 10000; ++i) sig(1);
 }
 
-void connect_emit(Signal<int>& sig) {
+void connect_emit(Signal_mt<int>& sig) {
   for (int i = 0; i < 100; ++i) {
     auto s = sig.connect_scoped(f);
     for (int j = 0; j < 100; ++j) sig(1);
@@ -68,7 +68,7 @@ namespace wpi {
 TEST(Signal, ThreadedMix) {
   sum = 0;
 
-  Signal<int> sig;
+  Signal_mt<int> sig;
 
   std::array<std::thread, 10> threads;
   for (auto& t : threads) t = std::thread(connect_emit, std::ref(sig));
@@ -79,7 +79,7 @@ TEST(Signal, ThreadedMix) {
 TEST(Signal, ThreadedEmission) {
   sum = 0;
 
-  Signal<int> sig;
+  Signal_mt<int> sig;
   sig.connect(f);
 
   std::array<std::thread, 10> threads;

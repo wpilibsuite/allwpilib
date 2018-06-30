@@ -806,11 +806,10 @@ private:
 /**
  * Specialization of SignalBase to be used in single threaded contexts.
  * Slot connection, disconnection and signal emission are not thread-safe.
- * The performance improvement over the thread-safe variant is not impressive,
- * so this is not very useful.
+ * This is significantly smaller than the thread-safe variant.
  */
 template <typename... T>
-using Signal_st = SignalBase<detail::NullMutex, T...>;
+using Signal = SignalBase<detail::NullMutex, T...>;
 
 /**
  * Specialization of SignalBase to be used in multi-threaded contexts.
@@ -822,7 +821,7 @@ using Signal_st = SignalBase<detail::NullMutex, T...>;
  * instead for that use case.
  */
 template <typename... T>
-using Signal = SignalBase<mutex, T...>;
+using Signal_mt = SignalBase<mutex, T...>;
 
 /**
  * Specialization of SignalBase to be used in multi-threaded contexts, allowing
