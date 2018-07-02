@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SmartDashboardTest extends UtilityClassTest {
-
   private final NetworkTable m_table = NetworkTableInstance.getDefault().getTable("SmartDashboard");
 
   SmartDashboardTest() {
@@ -41,7 +40,7 @@ class SmartDashboardTest extends UtilityClassTest {
     final String value = "thisIsAValue";
 
     SmartDashboard.putString(key, value);
-    
+
     assertEquals(value, m_table.getEntry(key).getString(""));
   }
 
@@ -71,7 +70,7 @@ class SmartDashboardTest extends UtilityClassTest {
     final int value = 2147483647;
 
     m_table.getEntry(key).setNumber(value);
-    
+
     assertEquals(value, SmartDashboard.getNumber(key, 0), 0.01);
   }
 
