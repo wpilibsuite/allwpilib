@@ -16,7 +16,11 @@
 
 namespace wpi {
 
-#ifdef __linux__
+#if defined(__FRC_ROBORIO__) && !defined(WPI_USE_PRIORITY_MUTEX)
+#define WPI_USE_PRIORITY_MUTEX
+#endif
+
+#if defined(WPI_USE_PRIORITY_MUTEX) && defined(__linux__)
 
 #define WPI_HAVE_PRIORITY_MUTEX 1
 
@@ -79,6 +83,6 @@ class priority_mutex {
 #endif
 };
 
-#endif  // __linux__
+#endif  // defined(WPI_USE_PRIORITY_MUTEX) && defined(__linux__)
 
 }  // namespace wpi
