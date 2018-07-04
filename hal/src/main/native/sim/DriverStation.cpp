@@ -168,7 +168,7 @@ double HAL_GetMatchTime(int32_t* status) {
   return SimDriverStationData->GetMatchTime();
 }
 
-int HAL_GetMatchInfo(HAL_MatchInfo* info) {
+int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
   SimDriverStationData->GetMatchInfo(info);
   return 0;
 }

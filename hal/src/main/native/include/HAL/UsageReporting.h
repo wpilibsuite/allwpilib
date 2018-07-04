@@ -140,7 +140,7 @@ namespace nUsageReporting
     } tInstances;
 
     /**
-     * Report the usage of a resource of interest.
+     * Reports the usage of a resource of interest.
      *
      * @param resource one of the values in the tResourceType above (max value 51).
      * @param instanceNumber an index that identifies the resource instance.

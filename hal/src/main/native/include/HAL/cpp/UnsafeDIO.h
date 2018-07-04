@@ -13,6 +13,13 @@
 #include "HAL/Types.h"
 
 namespace hal {
+
+/**
+ * Proxy class for directly manipulating the DIO pins.
+ *
+ * This class is not copyable or movable, and should never be used
+ * outside of the UnsafeManipulateDIO callback.
+ */
 struct DIOSetProxy {
   DIOSetProxy(const DIOSetProxy&) = delete;
   DIOSetProxy(DIOSetProxy&&) = delete;
@@ -54,6 +61,9 @@ int32_t ComputeDigitalMask(HAL_DigitalHandle handle, int32_t* status);
  * functions on the Proxy object passed as a parameter can deadlock your
  * program.
  *
+ * @param handle the HAL digital handle of the pin to toggle.
+ * @param status status check
+ * @param func   A functor taking a ref to a DIOSetProxy object.
  */
 template <typename Functor>
 void UnsafeManipulateDIO(HAL_DigitalHandle handle, int32_t* status,
