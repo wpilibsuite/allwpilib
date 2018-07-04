@@ -153,8 +153,8 @@ void HAL_SetCounterSemiPeriodMode(HAL_CounterHandle counterHandle,
                                   HAL_Bool highSemiPeriod, int32_t* status);
 
 /**
- * Configures the counter to count in up or down based on the length of the input
- * pulse.
+ * Configures the counter to count in up or down based on the length of the
+ * input pulse.
  *
  * This mode is most useful for direction sensitive gear tooth sensors.
  *
@@ -166,9 +166,9 @@ void HAL_SetCounterPulseLengthMode(HAL_CounterHandle counterHandle,
                                    double threshold, int32_t* status);
 
 /**
- * Gets the Samples to Average which specifies the number of samples of the timer
- * to average when calculating the period. Perform averaging to account for
- * mechanical imperfections or as oversampling to increase resolution.
+ * Gets the Samples to Average which specifies the number of samples of the
+ * timer to average when calculating the period. Perform averaging to account
+ * for mechanical imperfections or as oversampling to increase resolution.
  *
  * @param counterHandle the counter handle
  * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
@@ -177,9 +177,9 @@ int32_t HAL_GetCounterSamplesToAverage(HAL_CounterHandle counterHandle,
                                        int32_t* status);
 
 /**
- * Sets the Samples to Average which specifies the number of samples of the timer
- * to average when calculating the period. Perform averaging to account for
- * mechanical imperfections or as oversampling to increase resolution.
+ * Sets the Samples to Average which specifies the number of samples of the
+ * timer to average when calculating the period. Perform averaging to account
+ * for mechanical imperfections or as oversampling to increase resolution.
  *
  * @param counterHandle    the counter handle
  * @param samplesToAverage The number of samples to average from 1 to 127

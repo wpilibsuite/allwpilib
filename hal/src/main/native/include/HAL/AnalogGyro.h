@@ -25,8 +25,8 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle handle,
                                         int32_t* status);
 
 /**
- * Sets up an analog gyro with the proper offsets and settings for the KOP analog
- * gyro.
+ * Sets up an analog gyro with the proper offsets and settings for the KOP
+ * analog gyro.
  *
  * @param handle the gyro handle
  */
