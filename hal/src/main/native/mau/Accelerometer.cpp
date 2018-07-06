@@ -16,26 +16,28 @@ namespace hal {
     }
 }
 
-void HAL_SetAccelerometerActive(HAL_Bool active) {
-    if(active) {
-        // TODO: Add Start, after stopping, functionality to VMX-pi HAL [Issue: #93]
-    } else {
-        vmxIMU->Stop();
+extern "C" {
+    void HAL_SetAccelerometerActive(HAL_Bool active) {
+        if (active) {
+            // TODO: Add Start, after stopping, functionality to VMX-pi HAL [Issue: #93]
+        } else {
+            vmxIMU->Stop();
+        }
     }
-}
 
-void HAL_SetAccelerometerRange(HAL_AccelerometerRange range) {
-    // TODO: Add SetAccelerometerRange functionality to VMX-pi HAL [Issue: #93]
-}
+    void HAL_SetAccelerometerRange(HAL_AccelerometerRange range) {
+        // TODO: Add SetAccelerometerRange functionality to VMX-pi HAL [Issue: #93]
+    }
 
-double HAL_GetAccelerometerX(void) {
-    return (double) vmxIMU->GetWorldLinearAccelX();
-}
+    double HAL_GetAccelerometerX(void) {
+        return (double) vmxIMU->GetWorldLinearAccelX();
+    }
 
-double HAL_GetAccelerometerY(void) {
-    return (double) vmxIMU->GetWorldLinearAccelY();
-}
+    double HAL_GetAccelerometerY(void) {
+        return (double) vmxIMU->GetWorldLinearAccelY();
+    }
 
-double HAL_GetAccelerometerZ(void) {
-    return (double) vmxIMU->GetWorldLinearAccelZ();
+    double HAL_GetAccelerometerZ(void) {
+        return (double) vmxIMU->GetWorldLinearAccelZ();
+    }
 }

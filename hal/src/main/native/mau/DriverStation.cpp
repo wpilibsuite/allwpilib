@@ -20,8 +20,6 @@
 #include <wpi/mutex.h>
 
 #include "HALInitializer.h"
-#include "MockData/DriverStationDataInternal.h"
-#include "MockData/MockHooks.h"
 
 static wpi::mutex msgMutex;
 static wpi::condition_variable* newDSDataAvailableCond;
@@ -95,33 +93,33 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
-  controlWord->enabled = SimDriverStationData->GetEnabled();
-  controlWord->autonomous = SimDriverStationData->GetAutonomous();
-  controlWord->test = SimDriverStationData->GetTest();
-  controlWord->eStop = SimDriverStationData->GetEStop();
-  controlWord->fmsAttached = SimDriverStationData->GetFmsAttached();
-  controlWord->dsAttached = SimDriverStationData->GetDsAttached();
+  // controlWord->enabled = SimDriverStationData->GetEnabled();
+  // controlWord->autonomous = SimDriverStationData->GetAutonomous();
+  // controlWord->test = SimDriverStationData->GetTest();
+  // controlWord->eStop = SimDriverStationData->GetEStop();
+  // controlWord->fmsAttached = SimDriverStationData->GetFmsAttached();
+  // controlWord->dsAttached = SimDriverStationData->GetDsAttached();
   return 0;
 }
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   *status = 0;
-  return SimDriverStationData->GetAllianceStationId();
+  // return SimDriverStationData->GetAllianceStationId();
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
-  SimDriverStationData->GetJoystickAxes(joystickNum, axes);
+  // SimDriverStationData->GetJoystickAxes(joystickNum, axes);
   return 0;
 }
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
-  SimDriverStationData->GetJoystickPOVs(joystickNum, povs);
+  // SimDriverStationData->GetJoystickPOVs(joystickNum, povs);
   return 0;
 }
 
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
-  SimDriverStationData->GetJoystickButtons(joystickNum, buttons);
+  // SimDriverStationData->GetJoystickButtons(joystickNum, buttons);
   return 0;
 }
 /**
@@ -137,25 +135,25 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
  */
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc) {
-  SimDriverStationData->GetJoystickDescriptor(joystickNum, desc);
+  // SimDriverStationData->GetJoystickDescriptor(joystickNum, desc);
   return 0;
 }
 
 HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) {
   HAL_JoystickDescriptor desc;
-  SimDriverStationData->GetJoystickDescriptor(joystickNum, &desc);
+  // SimDriverStationData->GetJoystickDescriptor(joystickNum, &desc);
   return desc.isXbox;
 }
 
 int32_t HAL_GetJoystickType(int32_t joystickNum) {
   HAL_JoystickDescriptor desc;
-  SimDriverStationData->GetJoystickDescriptor(joystickNum, &desc);
+  // SimDriverStationData->GetJoystickDescriptor(joystickNum, &desc);
   return desc.type;
 }
 
 char* HAL_GetJoystickName(int32_t joystickNum) {
   HAL_JoystickDescriptor desc;
-  SimDriverStationData->GetJoystickDescriptor(joystickNum, &desc);
+  // SimDriverStationData->GetJoystickDescriptor(joystickNum, &desc);
   size_t len = std::strlen(desc.name);
   char* name = static_cast<char*>(std::malloc(len + 1));
   std::strncpy(name, desc.name, len);
@@ -169,25 +167,27 @@ int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) { return 0; }
 
 int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble) {
-  SimDriverStationData->SetJoystickOutputs(joystickNum, outputs, leftRumble,
+  // SimDriverStationData->SetJoystickOutputs(joystickNum, outputs, leftRumble,
                                            rightRumble);
   return 0;
 }
 
 double HAL_GetMatchTime(int32_t* status) {
-  return SimDriverStationData->GetMatchTime();
+  // return SimDriverStationData->GetMatchTime();
 }
 
 int HAL_GetMatchInfo(HAL_MatchInfo* info) {
-  SimDriverStationData->GetMatchInfo(info);
+  // SimDriverStationData->GetMatchInfo(info);
   return 0;
 }
 
 void HAL_FreeMatchInfo(HAL_MatchInfo* info) {
-  SimDriverStationData->FreeMatchInfo(info);
+  // SimDriverStationData->FreeMatchInfo(info);
 }
 
-void HAL_ObserveUserProgramStarting(void) { HALSIM_SetProgramStarted(); }
+void HAL_ObserveUserProgramStarting(void) { 
+  // HALSIM_SetProgramStarted(); 
+}
 
 void HAL_ObserveUserProgramDisabled(void) {
   // TODO
@@ -300,7 +300,7 @@ void HAL_InitializeDriverStation(void) {
   // Second check in case another thread was waiting
   if (initialized) return;
 
-  SimDriverStationData->ResetData();
+  // SimDriverStationData->ResetData();
 
   initialized = true;
 }

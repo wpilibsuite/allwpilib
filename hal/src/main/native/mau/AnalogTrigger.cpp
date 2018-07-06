@@ -13,8 +13,6 @@
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
 #include "HALInitializer.h"
-#include "MockData/AnalogInDataInternal.h"
-#include "MockData/AnalogTriggerDataInternal.h"
 #include "PortsInternal.h"
 
 namespace {
@@ -85,7 +83,7 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
   trigger->index = static_cast<uint8_t>(getHandleIndex(handle));
   *index = trigger->index;
 
-  SimAnalogTriggerData[trigger->index].SetInitialized(true);
+  // SimAnalogTriggerData[trigger->index].SetInitialized(true);
 
   trigger->trigState = false;
 
@@ -97,7 +95,7 @@ void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle,
   auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
   analogTriggerHandles->Free(analogTriggerHandle);
   if (trigger == nullptr) return;
-  SimAnalogTriggerData[trigger->index].SetInitialized(false);
+  // SimAnalogTriggerData[trigger->index].SetInitialized(false);
   // caller owns the analog input handle.
 }
 
@@ -130,8 +128,8 @@ void HAL_SetAnalogTriggerLimitsRaw(HAL_AnalogTriggerHandle analogTriggerHandle,
       GetAnalogValueToVoltage(trigger->analogHandle, upper, status);
   if (status != 0) return;
 
-  SimAnalogTriggerData[trigger->index].SetTriggerUpperBound(trigUpper);
-  SimAnalogTriggerData[trigger->index].SetTriggerLowerBound(trigLower);
+  // SimAnalogTriggerData[trigger->index].SetTriggerUpperBound(trigUpper);
+  // SimAnalogTriggerData[trigger->index].SetTriggerLowerBound(trigLower);
 }
 void HAL_SetAnalogTriggerLimitsVoltage(
     HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper,
@@ -145,8 +143,8 @@ void HAL_SetAnalogTriggerLimitsVoltage(
     *status = ANALOG_TRIGGER_LIMIT_ORDER_ERROR;
   }
 
-  SimAnalogTriggerData[trigger->index].SetTriggerUpperBound(upper);
-  SimAnalogTriggerData[trigger->index].SetTriggerLowerBound(lower);
+  // SimAnalogTriggerData[trigger->index].SetTriggerUpperBound(upper);
+  // SimAnalogTriggerData[trigger->index].SetTriggerLowerBound(lower);
 }
 void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analogTriggerHandle,
                                   HAL_Bool useAveragedValue, int32_t* status) {
@@ -156,16 +154,16 @@ void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analogTriggerHandle,
     return;
   }
 
-  AnalogTriggerData* triggerData = &SimAnalogTriggerData[trigger->index];
+  // AnalogTriggerData* triggerData = &SimAnalogTriggerData[trigger->index];
 
-  if (triggerData->GetTriggerMode() == HALSIM_AnalogTriggerFiltered) {
-    *status = INCOMPATIBLE_STATE;
-    return;
-  }
+  // if (triggerData->GetTriggerMode() == HALSIM_AnalogTriggerFiltered) {
+  //   *status = INCOMPATIBLE_STATE;
+  //   return;
+  // }
 
-  auto setVal = useAveragedValue ? HALSIM_AnalogTriggerAveraged
-                                 : HALSIM_AnalogTriggerUnassigned;
-  triggerData->SetTriggerMode(setVal);
+  // auto setVal = useAveragedValue ? HALSIM_AnalogTriggerAveraged
+  //                                : HALSIM_AnalogTriggerUnassigned;
+  // triggerData->SetTriggerMode(setVal);
 }
 void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analogTriggerHandle,
                                   HAL_Bool useFilteredValue, int32_t* status) {
@@ -175,16 +173,16 @@ void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analogTriggerHandle,
     return;
   }
 
-  AnalogTriggerData* triggerData = &SimAnalogTriggerData[trigger->index];
+  // AnalogTriggerData* triggerData = &SimAnalogTriggerData[trigger->index];
 
-  if (triggerData->GetTriggerMode() == HALSIM_AnalogTriggerAveraged) {
-    *status = INCOMPATIBLE_STATE;
-    return;
-  }
+  // if (triggerData->GetTriggerMode() == HALSIM_AnalogTriggerAveraged) {
+  //   *status = INCOMPATIBLE_STATE;
+  //   return;
+  // }
 
-  auto setVal = useFilteredValue ? HALSIM_AnalogTriggerAveraged
-                                 : HALSIM_AnalogTriggerUnassigned;
-  triggerData->SetTriggerMode(setVal);
+  // auto setVal = useFilteredValue ? HALSIM_AnalogTriggerAveraged
+  //                                : HALSIM_AnalogTriggerUnassigned;
+  // triggerData->SetTriggerMode(setVal);
 }
 
 static double GetTriggerValue(AnalogTrigger* trigger, int32_t* status) {
@@ -195,7 +193,7 @@ static double GetTriggerValue(AnalogTrigger* trigger, int32_t* status) {
     return 0.0;
   }
 
-  return SimAnalogInData[analogIn->channel].GetVoltage();
+  // return SimAnalogInData[analogIn->channel].GetVoltage();
 }
 
 HAL_Bool HAL_GetAnalogTriggerInWindow(
@@ -213,10 +211,10 @@ HAL_Bool HAL_GetAnalogTriggerInWindow(
     return false;
   }
 
-  auto trigUpper = SimAnalogTriggerData[trigger->index].GetTriggerUpperBound();
-  auto trigLower = SimAnalogTriggerData[trigger->index].GetTriggerLowerBound();
+  // auto trigUpper = SimAnalogTriggerData[trigger->index].GetTriggerUpperBound();
+  // auto trigLower = SimAnalogTriggerData[trigger->index].GetTriggerLowerBound();
 
-  return voltage >= trigLower && voltage <= trigUpper;
+  // return voltage >= trigLower && voltage <= trigUpper;
 }
 HAL_Bool HAL_GetAnalogTriggerTriggerState(
     HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status) {
@@ -233,18 +231,18 @@ HAL_Bool HAL_GetAnalogTriggerTriggerState(
     return false;
   }
 
-  auto trigUpper = SimAnalogTriggerData[trigger->index].GetTriggerUpperBound();
-  auto trigLower = SimAnalogTriggerData[trigger->index].GetTriggerLowerBound();
+  // auto trigUpper = SimAnalogTriggerData[trigger->index].GetTriggerUpperBound();
+  // auto trigLower = SimAnalogTriggerData[trigger->index].GetTriggerLowerBound();
 
-  if (voltage < trigLower) {
-    trigger->trigState = false;
-    return false;
-  }
-  if (voltage > trigUpper) {
-    trigger->trigState = true;
-    return true;
-  }
-  return trigger->trigState;
+  // if (voltage < trigLower) {
+  //   trigger->trigState = false;
+  //   return false;
+  // }
+  // if (voltage > trigUpper) {
+  //   trigger->trigState = true;
+  //   return true;
+  // }
+  // return trigger->trigState;
 }
 HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
                                     HAL_AnalogTriggerType type,

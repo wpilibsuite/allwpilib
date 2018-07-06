@@ -233,7 +233,7 @@ uint64_t HAL_GetFPGATime(int32_t* status) { return hal::GetFPGATime(); }
  * @return true if the button is currently pressed down
  */
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
-    return SimRoboRioData[0].GetFPGAButton();
+    // return SimRoboRioData[0].GetFPGAButton();
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
