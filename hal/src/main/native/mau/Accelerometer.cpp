@@ -5,27 +5,37 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <AHRS.h>
+#include "HALInitializer.h"
 #include "HAL/Accelerometer.h"
-
-#include "MockData/AccelerometerDataInternal.h"
-
-using namespace hal;
+#include "VMXPointers.h"
 
 namespace hal {
-namespace init {
-void InitializeAccelerometer() {}
-}  // namespace init
-}  // namespace hal
+    namespace init {
+        void InitializeAccelerometer() {}
+    }
+}
 
-extern "C" {
 void HAL_SetAccelerometerActive(HAL_Bool active) {
-  SimAccelerometerData[0].SetActive(active);
+    if(active) {
+        // TODO: Add Start, after stopping, functionality to VMX-pi HAL [Issue: #93]
+    } else {
+        vmxIMU->Stop();
+    }
 }
 
 void HAL_SetAccelerometerRange(HAL_AccelerometerRange range) {
-  SimAccelerometerData[0].SetRange(range);
+    // TODO: Add SetAccelerometerRange functionality to VMX-pi HAL [Issue: #93]
 }
-double HAL_GetAccelerometerX(void) { return SimAccelerometerData[0].GetX(); }
-double HAL_GetAccelerometerY(void) { return SimAccelerometerData[0].GetY(); }
-double HAL_GetAccelerometerZ(void) { return SimAccelerometerData[0].GetZ(); }
-}  // extern "C"
+
+double HAL_GetAccelerometerX(void) {
+    return (double) vmxIMU->GetWorldLinearAccelX();
+}
+
+double HAL_GetAccelerometerY(void) {
+    return (double) vmxIMU->GetWorldLinearAccelY();
+}
+
+double HAL_GetAccelerometerZ(void) {
+    return (double) vmxIMU->GetWorldLinearAccelZ();
+}

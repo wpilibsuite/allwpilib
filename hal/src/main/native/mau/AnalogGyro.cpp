@@ -9,139 +9,134 @@
 
 #include <chrono>
 #include <thread>
+#include <AHRS.h>
 
 #include "AnalogInternal.h"
 #include "HAL/AnalogAccumulator.h"
 #include "HAL/AnalogInput.h"
 #include "HAL/handles/IndexedHandleResource.h"
 #include "HALInitializer.h"
-#include "MockData/AnalogGyroDataInternal.h"
-
-namespace {
-struct AnalogGyro {
-  HAL_AnalogInputHandle handle;
-  uint8_t index;
-};
-}  // namespace
+#include "VMXPointers.h"
+#include <AHRS.h>
 
 using namespace hal;
 
-static IndexedHandleResource<HAL_GyroHandle, AnalogGyro, kNumAccumulators,
-                             HAL_HandleEnum::AnalogGyro>* analogGyroHandles;
-
 namespace hal {
-namespace init {
-void InitializeAnalogGyro() {
-  static IndexedHandleResource<HAL_GyroHandle, AnalogGyro, kNumAccumulators,
-                               HAL_HandleEnum::AnalogGyro>
-      agH;
-  analogGyroHandles = &agH;
-}
-}  // namespace init
-}  // namespace hal
+    struct AnalogGyro {
+        HAL_AnalogInputHandle handle;
+        uint8_t index;
+    };
 
-extern "C" {
-HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
-                                        int32_t* status) {
-  hal::init::CheckInit();
-  if (!HAL_IsAccumulatorChannel(analogHandle, status)) {
-    if (*status == 0) {
-      *status = HAL_INVALID_ACCUMULATOR_CHANNEL;
+    static IndexedHandleResource<HAL_GyroHandle, AnalogGyro, kNumAccumulators,
+            HAL_HandleEnum::AnalogGyro>* analogGyroHandles;
+
+    namespace init {
+        void InitializeAnalogGyro() {
+            static IndexedHandleResource<HAL_GyroHandle, AnalogGyro, kNumAccumulators,
+                    HAL_HandleEnum::AnalogGyro> agH;
+            analogGyroHandles = &agH;
+        }
     }
-    return HAL_kInvalidHandle;
-  }
+}
 
-  // handle known to be correct, so no need to type check
-  int16_t channel = getHandleIndex(analogHandle);
+HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle, int32_t* status) {
+    hal::init::CheckInit();
+    if (!HAL_IsAccumulatorChannel(analogHandle, status)) {
+        if (*status == 0) {
+            *status = HAL_INVALID_ACCUMULATOR_CHANNEL;
+        }
+        return HAL_kInvalidHandle;
+    }
 
-  auto handle = analogGyroHandles->Allocate(channel, status);
+    // handle known to be correct, so no need to type check
+    int16_t channel = getHandleIndex(analogHandle);
 
-  if (*status != 0)
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    auto handle = analogGyroHandles->Allocate(channel, status);
 
-  // Initialize port structure
-  auto gyro = analogGyroHandles->Get(handle);
-  if (gyro == nullptr) {  // would only error on thread issue
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
-  }
+    if (*status != 0)
+        return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
 
-  gyro->handle = analogHandle;
-  gyro->index = channel;
+    // Initialize port structure
+    auto gyro = analogGyroHandles->Get(handle);
+    if (gyro == nullptr) {  // would only error on thread issue
+        *status = HAL_HANDLE_ERROR;
+        return HAL_kInvalidHandle;
+    }
 
-  SimAnalogGyroData[channel].SetInitialized(true);
+    gyro->handle = analogHandle;
+    gyro->index = channel;
 
-  return handle;
+//    SimAnalogGyroData[channel].SetInitialized(true);
+
+    return handle;
 }
 
 void HAL_SetupAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
-  // No op
+    // No op
 }
 
 void HAL_FreeAnalogGyro(HAL_GyroHandle handle) {
-  auto gyro = analogGyroHandles->Get(handle);
-  analogGyroHandles->Free(handle);
-  if (gyro == nullptr) return;
-  SimAnalogGyroData[gyro->index].SetInitialized(false);
+    auto gyro = analogGyroHandles->Get(handle);
+    analogGyroHandles->Free(handle);
+    if (gyro == nullptr) return;
+//    SimAnalogGyroData[gyro->index].SetInitialized(false);
 }
 
-void HAL_SetAnalogGyroParameters(HAL_GyroHandle handle,
-                                 double voltsPerDegreePerSecond, double offset,
+void HAL_SetAnalogGyroParameters(HAL_GyroHandle handle, double voltsPerDegreePerSecond, double offset,
                                  int32_t center, int32_t* status) {
-  // No op
+    // No op
 }
 
-void HAL_SetAnalogGyroVoltsPerDegreePerSecond(HAL_GyroHandle handle,
-                                              double voltsPerDegreePerSecond,
+void HAL_SetAnalogGyroVoltsPerDegreePerSecond(HAL_GyroHandle handle, double voltsPerDegreePerSecond,
                                               int32_t* status) {
-  // No op
+    // No op
 }
 
 void HAL_ResetAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
-  auto gyro = analogGyroHandles->Get(handle);
-  if (gyro == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
+    auto gyro = analogGyroHandles->Get(handle);
+    if (gyro == nullptr) {
+        *status = HAL_HANDLE_ERROR;
+        return;
+    }
 
-  SimAnalogGyroData[gyro->index].SetAngle(0.0);
+//    vmxIMU->ZeroYaw();
 }
 
 void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
-  // Just do a reset
-  HAL_ResetAnalogGyro(handle, status);
+    // TODO: Add CalibrateAnalogGyro functionality to VMX-pi HAL [Issue: #93]
 }
 
-void HAL_SetAnalogGyroDeadband(HAL_GyroHandle handle, double volts,
-                               int32_t* status) {
-  // No op
+void HAL_SetAnalogGyroDeadband(HAL_GyroHandle handle, double volts, int32_t* status) {
+    // TODO: Add SetAnalogGyroDeadband functionality to VMX-pi HAL [Issue: #93]
 }
 
 double HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status) {
-  auto gyro = analogGyroHandles->Get(handle);
-  if (gyro == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
+    auto gyro = analogGyroHandles->Get(handle);
+    if (gyro == nullptr) {
+        *status = HAL_HANDLE_ERROR;
+        return 0;
+    }
 
-  return SimAnalogGyroData[gyro->index].GetAngle();
+    return vmxIMU->GetYaw();
 }
 
 double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status) {
-  auto gyro = analogGyroHandles->Get(handle);
-  if (gyro == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
+    auto gyro = analogGyroHandles->Get(handle);
+    if (gyro == nullptr) {
+        *status = HAL_HANDLE_ERROR;
+        return 0;
+    }
 
-  return SimAnalogGyroData[gyro->index].GetRate();
+    return vmxIMU->GetRate();
 }
 
 double HAL_GetAnalogGyroOffset(HAL_GyroHandle handle, int32_t* status) {
-  return 0.0;
+    // TODO: Add GetAnalogGyroOffset functionality to VMX-pi HAL [Issue: #93]
+    return 0.0;
 }
 
 int32_t HAL_GetAnalogGyroCenter(HAL_GyroHandle handle, int32_t* status) {
-  return 0;
+    // TODO: GetAnalogGyroCenter functionality to VMX-pi HAL [Issue: #93]
+    return 0;
 }
-}  // extern "C"
+
