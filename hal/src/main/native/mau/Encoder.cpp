@@ -144,7 +144,7 @@ int32_t HAL_GetEncoderRaw(HAL_EncoderHandle encoderHandle, int32_t* status) {
   }
 
   // return SimEncoderData[encoder->index].GetCount() /
-         DecodingScaleFactor(encoder.get());
+//         DecodingScaleFactor(encoder.get());
 }
 int32_t HAL_GetEncoderEncodingScale(HAL_EncoderHandle encoderHandle,
                                     int32_t* status) {
@@ -154,7 +154,7 @@ int32_t HAL_GetEncoderEncodingScale(HAL_EncoderHandle encoderHandle,
     return 0;
   }
 
-  return EncodingScaleFactor(encoder.get());
+//  return EncodingScaleFactor(encoder.get());
 }
 void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);
@@ -240,7 +240,7 @@ void HAL_SetEncoderMinRate(HAL_EncoderHandle encoderHandle, double minRate,
   }
 
   // SimEncoderData[encoder->index].SetMaxPeriod(encoder->distancePerPulse /
-                                              minRate);
+//                                              minRate);
 }
 void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
                                     double distancePerPulse, int32_t* status) {
@@ -315,7 +315,7 @@ double HAL_GetEncoderDecodingScaleFactor(HAL_EncoderHandle encoderHandle,
     return 0.0;
   }
 
-  return DecodingScaleFactor(encoder.get());
+//  return DecodingScaleFactor(encoder.get());
 }
 
 double HAL_GetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
