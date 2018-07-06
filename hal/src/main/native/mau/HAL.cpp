@@ -7,7 +7,6 @@
 
 #include "HAL/HAL.h"
 
-#include <VMXPi.h>
 #include <wpi/raw_ostream.h>
 
 #include "ErrorsInternal.h"
@@ -17,6 +16,8 @@
 #include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
+#include "VMXPointers.h"
+#include <VMXPi.h>
 
 using namespace hal;
 
@@ -26,36 +27,42 @@ namespace hal {
             bool realtime = false;
             uint8_t hertz = 50;
             VMXPi vmx(realtime, hertz);
+            vmxIMU = &vmx.ahrs;
+            vmxIO = &vmx.io;
+            vmxCAN = &vmx.can;
+            vmxTime = &vmx.time;
+            vmxPower = &vmx.power;
+            vmxThread = &vmx.thread;
 
-            InitializeAccelerometer(&vmx.ahrs);
-            InitializeAnalogAccumulator(&vmx.io);
-            InitializeAnalogGyro(&vmx.ahrs);
-            InitializeAnalogInput(&vmx.io);
+            InitializeAccelerometer();
+            InitializeAnalogAccumulator();
+            InitializeAnalogGyro();
+            InitializeAnalogInput();
             InitializeAnalogInternal();
             InitializeAnalogOutput();
-            InitializeCAN(&vmx.can);
-            InitializeCompressor(&vmx.can);
+            InitializeCAN();
+            InitializeCompressor();
             InitializeConstants();
-            InitializeCounter(&vmx.time);
-            InitializeDigitalInternal(&vmx.io);
-            InitializeDIO(&vmx.io);
+            InitializeCounter();
+            InitializeDigitalInternal();
+            InitializeDIO();
             InitializeDriverStation();
-            InitializeEncoder(&vmx.io);
+            InitializeEncoder();
             InitializeExtensions();
-            InitializeI2C(&vmx.io);
-            InitializeInterrupts(&vmx.io);
+            InitializeI2C();
+            InitializeInterrupts();
             InitializeMockHooks();
-            InitializeNotifier(&vmx.time);
-            InitializeOSSerialPort(&vmx.can);
-            InitializePDP(&vmx.can);
+            InitializeNotifier();
+            InitializeOSSerialPort();
+            InitializePDP();
             InitializePorts();
-            InitializePower(&vmx.power);
-            InitializePWM(&vmx.io);
-            InitializeRelay(&vmx.io);
-            InitializeSerialPort(&vmx.ahrs);
+            InitializePower();
+            InitializePWM();
+            InitializeRelay();
+            InitializeSerialPort();
             InitializeSolenoid();
-            InitializeSPI(&vmx.io);
-            InitializeThreads(&vmx.thread);
+            InitializeSPI();
+            InitializeThreads();
         }
     }  // namespace init
 }  // namespace hal

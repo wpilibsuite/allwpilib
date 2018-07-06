@@ -8,13 +8,6 @@
 #pragma once
 
 #include <atomic>
-#include <AHRS.h>
-#include <VMXTime.h>
-#include <VMXIO.h>
-#include <VMXCAN.h>
-#include <VMXPower.h>
-#include <VMXVersion.h>
-#include <VMXThread.h>
 
 namespace hal {
     namespace init {
@@ -27,36 +20,36 @@ namespace hal {
             RunInitialize();
         }
 
-        extern void InitializeAccelerometer(AHRS* ahrs);
-        extern void InitializeAnalogAccumulator(VMXIO* io);
-        extern void InitializeAnalogGyro(AHRS* ahrs);
-        extern void InitializeAnalogInput(VMXIO* io);
+        extern void InitializeAccelerometer();
+        extern void InitializeAnalogAccumulator();
+        extern void InitializeAnalogGyro();
+        extern void InitializeAnalogInput();
         extern void InitializeAnalogInternal();
         extern void InitializeAnalogOutput();  //DNE
-        extern void InitializeCAN(VMXCAN* can);
-        extern void InitializeCompressor(VMXCAN* can);
+        extern void InitializeCAN();
+        extern void InitializeCompressor();
         extern void InitializeConstants();
-        extern void InitializeCounter(VMXTime* time);
-        extern void InitializeDigitalInternal(VMXIO* io);
-        extern void InitializeDIO(VMXIO* io);
+        extern void InitializeCounter();
+        extern void InitializeDigitalInternal();
+        extern void InitializeDIO();
         extern void InitializeDriverStation();  //DNE
-        extern void InitializeEncoder(VMXIO* io);
+        extern void InitializeEncoder();
         extern void InitializeExtensions();
         extern void InitializeHAL();
-        extern void InitializeI2C(VMXIO* io);
-        extern void InitializeInterrupts(VMXIO* io);
+        extern void InitializeI2C();
+        extern void InitializeInterrupts();
         extern void InitializeMockHooks();
-        extern void InitializeNotifier(VMXTime* time);
-        extern void InitializeOSSerialPort(VMXCAN* can);
-        extern void InitializePDP(VMXCAN* can);
+        extern void InitializeNotifier();
+        extern void InitializeOSSerialPort();
+        extern void InitializePDP();
         extern void InitializePorts();
-        extern void InitializePower(VMXPower* power);
-        extern void InitializePWM(VMXIO* io);
-        extern void InitializeRelay(VMXIO* io);
-        extern void InitializeSerialPort(AHRS* ahrs);
+        extern void InitializePower();
+        extern void InitializePWM();
+        extern void InitializeRelay();
+        extern void InitializeSerialPort();
         extern void InitializeSolenoid();
-        extern void InitializeSPI(VMXIO* io);
-        extern void InitializeThreads(VMXThread* thread);
+        extern void InitializeSPI();
+        extern void InitializeThreads();
 
     }  // namespace init
 }  // namespace hal
