@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj.hal.PowerJNI;
 @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveClassLength",
                    "PMD.ExcessivePublicCount", "PMD.GodClass", "PMD.TooManyFields",
                    "PMD.TooManyMethods"})
-public class DriverStation implements RobotState.Interface {
+public class DriverStation {
   /**
    * Number of Joystick Ports.
    */
@@ -630,7 +630,6 @@ public class DriverStation implements RobotState.Interface {
    *
    * @return True if the robot is enabled, false otherwise.
    */
-  @Override
   public boolean isEnabled() {
     synchronized (m_controlWordMutex) {
       updateControlWord(false);
@@ -643,7 +642,6 @@ public class DriverStation implements RobotState.Interface {
    *
    * @return True if the robot should be disabled, false otherwise.
    */
-  @Override
   public boolean isDisabled() {
     return !isEnabled();
   }
@@ -654,7 +652,6 @@ public class DriverStation implements RobotState.Interface {
    *
    * @return True if autonomous mode should be enabled, false otherwise.
    */
-  @Override
   public boolean isAutonomous() {
     synchronized (m_controlWordMutex) {
       updateControlWord(false);
@@ -668,7 +665,6 @@ public class DriverStation implements RobotState.Interface {
    *
    * @return True if operator-controlled mode should be enabled, false otherwise.
    */
-  @Override
   public boolean isOperatorControl() {
     return !(isAutonomous() || isTest());
   }
@@ -679,7 +675,6 @@ public class DriverStation implements RobotState.Interface {
    *
    * @return True if test mode should be enabled, false otherwise.
    */
-  @Override
   public boolean isTest() {
     synchronized (m_controlWordMutex) {
       updateControlWord(false);

@@ -15,8 +15,10 @@ import java.util.Set;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.HLUsageReporting;
+import edu.wpi.first.wpilibj.NamedSendable;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 
 /**
  * The {@link SmartDashboard} class is the bridge between robot programs and the SmartDashboard on
@@ -50,7 +52,7 @@ public class SmartDashboard {
   private static final Map<String, Data> tablesToData = new HashMap<>();
 
   static {
-    HLUsageReporting.reportSmartDashboard();
+    HAL.report(tResourceType.kResourceType_SmartDashboard, 0);
   }
 
   private SmartDashboard() {

@@ -7,12 +7,12 @@
 
 #include "SmartDashboard/SmartDashboard.h"
 
+#include <HAL/HAL.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
 
-#include "HLUsageReporting.h"
 #include "SmartDashboard/Sendable.h"
 #include "SmartDashboard/SendableBuilderImpl.h"
 #include "WPIErrors.h"
@@ -40,7 +40,7 @@ class Singleton {
  private:
   Singleton() {
     table = nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard");
-    HLUsageReporting::ReportSmartDashboard();
+    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
   }
   Singleton(const Singleton&) = delete;
   Singleton& operator=(const Singleton&) = delete;
