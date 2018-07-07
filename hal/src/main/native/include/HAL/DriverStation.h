@@ -9,8 +9,6 @@
 
 #include <stdint.h>
 
-#include <cstddef>
-
 #include "HAL/Types.h"
 
 #define HAL_IO_CONFIG_DATA_SIZE 32
