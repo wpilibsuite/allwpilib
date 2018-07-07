@@ -12,7 +12,7 @@
 #include "HAL/AnalogTrigger.h"
 #include "HAL/Types.h"
 
-enum HAL_SPIPort : int32_t {
+HAL_ENUM(HAL_SPIPort) {
   HAL_SPI_kOnboardCS0 = 0,
   HAL_SPI_kOnboardCS1,
   HAL_SPI_kOnboardCS2,

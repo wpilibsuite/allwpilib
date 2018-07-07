@@ -9,7 +9,9 @@
 
 #include <stdint.h>
 
-enum HAL_SerialPort : int32_t {
+#include "HAL/Types.h"
+
+HAL_ENUM(HAL_SerialPort) {
   HAL_SerialPort_Onboard = 0,
   HAL_SerialPort_MXP = 1,
   HAL_SerialPort_USB1 = 2,

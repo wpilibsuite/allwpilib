@@ -12,7 +12,7 @@
 /**
  * The acceptable accelerometer ranges.
  */
-enum HAL_AccelerometerRange : int32_t {
+HAL_ENUM(HAL_AccelerometerRange) {
   HAL_AccelerometerRange_k2G = 0,
   HAL_AccelerometerRange_k4G = 1,
   HAL_AccelerometerRange_k8G = 2,

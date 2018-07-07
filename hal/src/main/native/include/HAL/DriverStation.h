@@ -36,7 +36,7 @@ struct HAL_ControlWord {
   uint32_t control_reserved : 26;
 };
 
-enum HAL_AllianceStationID : int32_t {
+HAL_ENUM(HAL_AllianceStationID) {
   HAL_AllianceStationID_kRed1,
   HAL_AllianceStationID_kRed2,
   HAL_AllianceStationID_kRed3,
@@ -45,7 +45,7 @@ enum HAL_AllianceStationID : int32_t {
   HAL_AllianceStationID_kBlue3,
 };
 
-enum HAL_MatchType {
+HAL_ENUM(HAL_MatchType) {
   HAL_kMatchType_none,
   HAL_kMatchType_practice,
   HAL_kMatchType_qualification,

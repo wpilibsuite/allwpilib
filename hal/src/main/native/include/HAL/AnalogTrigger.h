@@ -14,7 +14,7 @@
 /**
  * The type of analog trigger to trigger on.
  */
-enum HAL_AnalogTriggerType : int32_t {
+HAL_ENUM(HAL_AnalogTriggerType) {
   HAL_Trigger_kInWindow = 0,
   HAL_Trigger_kState = 1,
   HAL_Trigger_kRisingPulse = 2,

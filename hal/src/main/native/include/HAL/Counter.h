@@ -15,7 +15,7 @@
 /**
  * The counter mode.
  */
-enum HAL_Counter_Mode : int32_t {
+HAL_ENUM(HAL_Counter_Mode) {
   HAL_Counter_kTwoPulse = 0,
   HAL_Counter_kSemiperiod = 1,
   HAL_Counter_kPulseLength = 2,
