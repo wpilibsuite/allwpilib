@@ -46,7 +46,9 @@
 namespace HALUsageReporting = nUsageReporting;
 #endif
 
+// clang-format off
 HAL_ENUM(HAL_RuntimeType) { HAL_Athena, HAL_Mock };
+// clang-format on
 
 #ifdef __cplusplus
 extern "C" {

@@ -11,6 +11,7 @@
 
 #include "HAL/Types.h"
 
+// clang-format off
 /**
  * The CAN device type.
  *
@@ -45,6 +46,7 @@ HAL_ENUM(HAL_CANManufacturer) {
   HAL_CAN_Man_kMS = 7,
   HAL_CAN_Man_kTeamUse = 8,
 };
+// clang-format on
 
 #ifdef __cplusplus
 extern "C" {

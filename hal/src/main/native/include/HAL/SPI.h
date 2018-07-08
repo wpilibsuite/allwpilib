@@ -12,6 +12,7 @@
 #include "HAL/AnalogTrigger.h"
 #include "HAL/Types.h"
 
+// clang-format off
 HAL_ENUM(HAL_SPIPort) {
   HAL_SPI_kOnboardCS0 = 0,
   HAL_SPI_kOnboardCS1,
@@ -19,6 +20,7 @@ HAL_ENUM(HAL_SPIPort) {
   HAL_SPI_kOnboardCS3,
   HAL_SPI_kMXP
 };
+// clang-format on
 
 #ifdef __cplusplus
 extern "C" {

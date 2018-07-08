@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+// clang-format off
 HAL_ENUM(HAL_I2CPort) { HAL_I2C_kOnboard = 0, HAL_I2C_kMXP };
+// clang-format on
 
 #ifdef __cplusplus
 extern "C" {
