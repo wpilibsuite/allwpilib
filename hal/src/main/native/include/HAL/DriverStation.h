@@ -290,7 +290,7 @@ void HAL_ReleaseDSMutex(void);
  *
  * @return true if the control data has been updated since the last call
  */
-bool HAL_IsNewControlData(void);
+HAL_Bool HAL_IsNewControlData(void);
 
 /**
  * Waits for the newest DS packet to arrive. Note that this is a blocking call.

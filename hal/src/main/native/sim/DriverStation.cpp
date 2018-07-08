@@ -204,7 +204,7 @@ static void InitLastCountKey(void) {
 }
 #endif
 
-bool HAL_IsNewControlData(void) {
+HAL_Bool HAL_IsNewControlData(void) {
 #ifdef __APPLE__
   pthread_once(&lastCountKeyOnce, InitLastCountKey);
   int* lastCountPtr = static_cast<int*>(pthread_getspecific(lastCountKey));
