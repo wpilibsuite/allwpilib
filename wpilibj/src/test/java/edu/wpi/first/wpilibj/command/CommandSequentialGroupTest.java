@@ -56,7 +56,7 @@ class CommandSequentialGroupTest extends AbstractCommandTest {
     assertCommandState(command1, 1, 1, 1, 0, 0);
     assertCommandState(command2, 0, 0, 0, 0, 0);
     assertCommandState(command3, 0, 0, 0, 0, 0);
-    sleep(1000); // command 1 timeout
+    sleep(1250); // command 1 timeout
     Scheduler.getInstance().run();
     assertCommandState(command1, 1, 1, 1, 0, 1);
     assertCommandState(command2, 1, 1, 1, 0, 0);
@@ -66,7 +66,7 @@ class CommandSequentialGroupTest extends AbstractCommandTest {
     assertCommandState(command1, 1, 1, 1, 0, 1);
     assertCommandState(command2, 1, 2, 2, 0, 0);
     assertCommandState(command3, 0, 0, 0, 0, 0);
-    sleep(2000); // command 2 timeout
+    sleep(2500); // command 2 timeout
     Scheduler.getInstance().run();
     assertCommandState(command1, 1, 1, 1, 0, 1);
     assertCommandState(command2, 1, 2, 2, 0, 1);
