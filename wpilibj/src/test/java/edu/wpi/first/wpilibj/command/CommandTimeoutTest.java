@@ -38,7 +38,7 @@ class CommandTimeoutTest extends AbstractCommandTest {
     assertCommandState(command, 1, 2, 2, 0, 0);
     Scheduler.getInstance().run();
     assertCommandState(command, 1, 3, 3, 0, 0);
-    sleep(2000);
+    sleep(2500);
     Scheduler.getInstance().run();
     assertCommandState(command, 1, 4, 4, 1, 0);
     Scheduler.getInstance().run();
