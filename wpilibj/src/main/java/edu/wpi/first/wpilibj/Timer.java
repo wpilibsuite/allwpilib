@@ -7,16 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
-
 public class Timer {
-  private static StaticInterface impl;
-
-  @SuppressWarnings("MethodName")
-  public static void SetImplementation(StaticInterface ti) {
-    impl = ti;
-  }
-
   /**
    * Return the system clock time in seconds. Return the time from the FPGA hardware clock in
    * seconds since the FPGA started.
@@ -25,11 +16,7 @@ public class Timer {
    */
   @SuppressWarnings("AbbreviationAsWordInName")
   public static double getFPGATimestamp() {
-    if (impl != null) {
-      return impl.getFPGATimestamp();
-    } else {
-      throw new BaseSystemNotInitializedException(StaticInterface.class, Timer.class);
-    }
+    return RobotController.getFPGATime() / 1000000.0;
   }
 
   /**
@@ -42,11 +29,7 @@ public class Timer {
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
   public static double getMatchTime() {
-    if (impl != null) {
-      return impl.getMatchTime();
-    } else {
-      throw new BaseSystemNotInitializedException(StaticInterface.class, Timer.class);
-    }
+    return DriverStation.getInstance().getMatchTime();
   }
 
   /**
@@ -58,34 +41,24 @@ public class Timer {
    * @param seconds Length of time to pause
    */
   public static void delay(final double seconds) {
-    if (impl != null) {
-      impl.delay(seconds);
-    } else {
-      throw new BaseSystemNotInitializedException(StaticInterface.class, Timer.class);
+    try {
+      Thread.sleep((long) (seconds * 1e3));
+    } catch (final InterruptedException ex) {
+      Thread.currentThread().interrupt();
     }
   }
 
-  public interface StaticInterface {
-    @SuppressWarnings("AbbreviationAsWordInName")
-    double getFPGATimestamp();
-
-    double getMatchTime();
-
-    void delay(double seconds);
-
-    @SuppressWarnings("JavadocMethod")
-    Interface newTimer();
-  }
-
-  private final Interface m_timer;
+  private double m_startTime;
+  private double m_accumulatedTime;
+  private boolean m_running;
 
   @SuppressWarnings("JavadocMethod")
   public Timer() {
-    if (impl != null) {
-      m_timer = impl.newTimer();
-    } else {
-      throw new BaseSystemNotInitializedException(StaticInterface.class, Timer.class);
-    }
+    reset();
+  }
+
+  private double getMsClock() {
+    return RobotController.getFPGATime() / 1000.0;
   }
 
   /**
@@ -95,24 +68,30 @@ public class Timer {
    *
    * @return Current time value for this timer in seconds
    */
-  public double get() {
-    return m_timer.get();
+  public synchronized double get() {
+    if (m_running) {
+      return ((getMsClock() - m_startTime) + m_accumulatedTime) / 1000.0;
+    } else {
+      return m_accumulatedTime;
+    }
   }
 
   /**
    * Reset the timer by setting the time to 0. Make the timer startTime the current time so new
    * requests will be relative now
    */
-  public void reset() {
-    m_timer.reset();
+  public synchronized void reset() {
+    m_accumulatedTime = 0;
+    m_startTime = getMsClock();
   }
 
   /**
    * Start the timer running. Just set the running flag to true indicating that all time requests
    * should be relative to the system clock.
    */
-  public void start() {
-    m_timer.start();
+  public synchronized void start() {
+    m_startTime = getMsClock();
+    m_running = true;
   }
 
   /**
@@ -120,8 +99,10 @@ public class Timer {
    * subsequent time requests to be read from the accumulated time rather than looking at the system
    * clock.
    */
-  public void stop() {
-    m_timer.stop();
+  public synchronized void stop() {
+    final double temp = get();
+    m_accumulatedTime = temp;
+    m_running = false;
   }
 
   /**
@@ -132,48 +113,13 @@ public class Timer {
    * @param period The period to check for (in seconds).
    * @return If the period has passed.
    */
-  public boolean hasPeriodPassed(double period) {
-    return m_timer.hasPeriodPassed(period);
-  }
-
-  public interface Interface {
-    /**
-     * Get the current time from the timer. If the clock is running it is derived from the current
-     * system clock the start time stored in the timer class. If the clock is not running, then
-     * return the time when it was last stopped.
-     *
-     * @return Current time value for this timer in seconds
-     */
-    double get();
-
-    /**
-     * Reset the timer by setting the time to 0. Make the timer startTime the current time so new
-     * requests will be relative now
-     */
-    void reset();
-
-    /**
-     * Start the timer running. Just set the running flag to true indicating that all time requests
-     * should be relative to the system clock.
-     */
-    void start();
-
-    /**
-     * Stop the timer. This computes the time as of now and clears the running flag, causing all
-     * subsequent time requests to be read from the accumulated time rather than looking at the
-     * system clock.
-     */
-    void stop();
-
-
-    /**
-     * Check if the period specified has passed and if it has, advance the start time by that
-     * period. This is useful to decide if it's time to do periodic work without drifting later by
-     * the time it took to get around to checking.
-     *
-     * @param period The period to check for (in seconds).
-     * @return If the period has passed.
-     */
-    boolean hasPeriodPassed(double period);
+  public synchronized boolean hasPeriodPassed(double period) {
+    if (get() > period) {
+      // Advance the start time by the period.
+      // Don't set it to the current time... we want to avoid drift.
+      m_startTime += period * 1000;
+      return true;
+    }
+    return false;
   }
 }

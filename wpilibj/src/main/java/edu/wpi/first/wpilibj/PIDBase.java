@@ -10,6 +10,8 @@ package edu.wpi.first.wpilibj;
 import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
@@ -176,7 +178,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
     m_pidOutput = output;
 
     instances++;
-    HLUsageReporting.reportPIDController(instances);
+    HAL.report(tResourceType.kResourceType_PIDController, instances);
     m_tolerance = new NullTolerance();
     setName("PIDController", instances);
   }
