@@ -39,11 +39,16 @@
 #endif  // HAL_USE_LABVIEW
 
 #include "HAL/Types.h"
+
+#ifdef __cplusplus
 #include "UsageReporting.h"
 
 namespace HALUsageReporting = nUsageReporting;
+#endif
 
-enum HAL_RuntimeType : int32_t { HAL_Athena, HAL_Mock };
+// clang-format off
+HAL_ENUM(HAL_RuntimeType) { HAL_Athena, HAL_Mock };
+// clang-format on
 
 #ifdef __cplusplus
 extern "C" {

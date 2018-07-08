@@ -9,12 +9,16 @@
 
 #include <stdint.h>
 
-enum HAL_SerialPort : int32_t {
+#include "HAL/Types.h"
+
+// clang-format off
+HAL_ENUM(HAL_SerialPort) {
   HAL_SerialPort_Onboard = 0,
   HAL_SerialPort_MXP = 1,
   HAL_SerialPort_USB1 = 2,
   HAL_SerialPort_USB2 = 3
 };
+// clang-format on
 
 #ifdef __cplusplus
 extern "C" {

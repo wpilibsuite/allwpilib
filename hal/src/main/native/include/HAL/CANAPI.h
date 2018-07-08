@@ -11,12 +11,13 @@
 
 #include "HAL/Types.h"
 
+// clang-format off
 /**
  * The CAN device type.
  *
  * Teams should use HAL_CAN_Dev_kMiscellaneous
  */
-enum HAL_CANDeviceType : int32_t {
+HAL_ENUM(HAL_CANDeviceType) {
   HAL_CAN_Dev_kBroadcast = 0,
   HAL_CAN_Dev_kRobotController = 1,
   HAL_CAN_Dev_kMotorController = 2,
@@ -36,7 +37,7 @@ enum HAL_CANDeviceType : int32_t {
  *
  * Teams should use HAL_CAN_Man_kTeamUse.
  */
-enum HAL_CANManufacturer : int32_t {
+HAL_ENUM(HAL_CANManufacturer) {
   HAL_CAN_Man_kBroadcast = 0,
   HAL_CAN_Man_kNI = 1,
   HAL_CAN_Man_kLM = 2,
@@ -45,6 +46,7 @@ enum HAL_CANManufacturer : int32_t {
   HAL_CAN_Man_kMS = 7,
   HAL_CAN_Man_kTeamUse = 8,
 };
+// clang-format on
 
 #ifdef __cplusplus
 extern "C" {

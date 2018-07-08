@@ -9,8 +9,6 @@
 
 #include <stdint.h>
 
-#include <cstddef>
-
 #include "HAL/Types.h"
 
 #define HAL_IO_CONFIG_DATA_SIZE 32
@@ -37,8 +35,10 @@ struct HAL_ControlWord {
   uint32_t dsAttached : 1;
   uint32_t control_reserved : 26;
 };
+typedef struct HAL_ControlWord HAL_ControlWord;
 
-enum HAL_AllianceStationID : int32_t {
+// clang-format off
+HAL_ENUM(HAL_AllianceStationID) {
   HAL_AllianceStationID_kRed1,
   HAL_AllianceStationID_kRed2,
   HAL_AllianceStationID_kRed3,
@@ -47,12 +47,13 @@ enum HAL_AllianceStationID : int32_t {
   HAL_AllianceStationID_kBlue3,
 };
 
-enum HAL_MatchType {
+HAL_ENUM(HAL_MatchType) {
   HAL_kMatchType_none,
   HAL_kMatchType_practice,
   HAL_kMatchType_qualification,
   HAL_kMatchType_elimination,
 };
+// clang-format on
 
 /* The maximum number of axes that will be stored in a single HALJoystickAxes
  * struct. This is used for allocating buffers, not bounds checking, since
@@ -65,16 +66,19 @@ struct HAL_JoystickAxes {
   int16_t count;
   float axes[HAL_kMaxJoystickAxes];
 };
+typedef struct HAL_JoystickAxes HAL_JoystickAxes;
 
 struct HAL_JoystickPOVs {
   int16_t count;
   int16_t povs[HAL_kMaxJoystickPOVs];
 };
+typedef struct HAL_JoystickPOVs HAL_JoystickPOVs;
 
 struct HAL_JoystickButtons {
   uint32_t buttons;
   uint8_t count;
 };
+typedef struct HAL_JoystickButtons HAL_JoystickButtons;
 
 struct HAL_JoystickDescriptor {
   uint8_t isXbox;
@@ -85,6 +89,7 @@ struct HAL_JoystickDescriptor {
   uint8_t buttonCount;
   uint8_t povCount;
 };
+typedef struct HAL_JoystickDescriptor HAL_JoystickDescriptor;
 
 struct HAL_MatchInfo {
   char* eventName;
@@ -93,6 +98,7 @@ struct HAL_MatchInfo {
   uint8_t replayNumber;
   char* gameSpecificMessage;
 };
+typedef struct HAL_MatchInfo HAL_MatchInfo;
 
 #ifdef __cplusplus
 extern "C" {
@@ -286,7 +292,7 @@ void HAL_ReleaseDSMutex(void);
  *
  * @return true if the control data has been updated since the last call
  */
-bool HAL_IsNewControlData(void);
+HAL_Bool HAL_IsNewControlData(void);
 
 /**
  * Waits for the newest DS packet to arrive. Note that this is a blocking call.
