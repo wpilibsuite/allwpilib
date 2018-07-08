@@ -40,9 +40,11 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 #include "UsageReporting.h"
 
 namespace HALUsageReporting = nUsageReporting;
+#endif
 
 HAL_ENUM(HAL_RuntimeType) { HAL_Athena, HAL_Mock };
 
