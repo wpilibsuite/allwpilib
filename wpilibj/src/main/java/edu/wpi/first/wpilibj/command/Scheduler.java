@@ -12,9 +12,11 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.HLUsageReporting;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -92,7 +94,7 @@ public final class Scheduler extends SendableBase {
    * Instantiates a {@link Scheduler}.
    */
   private Scheduler() {
-    HLUsageReporting.reportScheduler();
+    HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
     setName("Scheduler");
   }
 

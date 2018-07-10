@@ -14,8 +14,6 @@
 
 #include "CameraServerShared.h"
 #include "DriverStation.h"
-#include "HLUsageReporting.h"
-#include "Internal/HardwareHLReporting.h"
 #include "LiveWindow/LiveWindow.h"
 #include "RobotState.h"
 #include "SmartDashboard/SmartDashboard.h"
@@ -79,9 +77,6 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
     std::terminate();
   }
   m_threadId = std::this_thread::get_id();
-
-  RobotState::SetImplementation(DriverStation::GetInstance());
-  HLUsageReporting::SetImplementation(new HardwareHLReporting());
 
   SetupCameraServerShared();
 

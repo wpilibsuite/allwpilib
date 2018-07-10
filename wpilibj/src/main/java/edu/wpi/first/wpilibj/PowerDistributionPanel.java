@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.PDPJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
@@ -25,6 +27,8 @@ public class PowerDistributionPanel extends SendableBase  {
   public PowerDistributionPanel(int module) {
     SensorUtil.checkPDPModule(module);
     m_handle = PDPJNI.initializePDP(module);
+
+    HAL.report(tResourceType.kResourceType_PDP, module);
     setName("PowerDistributionPanel", module);
   }
 

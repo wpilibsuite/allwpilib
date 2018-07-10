@@ -18,10 +18,7 @@ using namespace frc;
 
 class CommandTest : public testing::Test {
  protected:
-  void SetUp() override {
-    RobotState::SetImplementation(DriverStation::GetInstance());
-    Scheduler::GetInstance()->SetEnabled(true);
-  }
+  void SetUp() override { Scheduler::GetInstance()->SetEnabled(true); }
 
   /**
    * Tears Down the Scheduler at the end of each test.

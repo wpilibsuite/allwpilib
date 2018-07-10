@@ -27,7 +27,7 @@ def main():
         configPath = ".."
 
     outputName = configPath + \
-        "/hal/src/main/java/edu/wpi/first/wpilibj/hal/FRCNetComm.java"
+        "/hal/src/generated/java/edu/wpi/first/wpilibj/hal/FRCNetComm.java"
 
     # Set initial copyright year and get current year
     year = "2016"

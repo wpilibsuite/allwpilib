@@ -12,6 +12,9 @@
 
 namespace hal {
 
+/**
+ * A std::chrono compatible wrapper around the FPGA Timer.
+ */
 class fpga_clock {
  public:
   typedef std::chrono::microseconds::rep rep;

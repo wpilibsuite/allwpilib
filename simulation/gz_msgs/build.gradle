@@ -1,0 +1,105 @@
+description = "A C++ and Java library to pass FRC Simulation Messages in and out of Gazebo."
+
+apply plugin: 'cpp'
+apply plugin: 'java'
+apply plugin: 'com.google.protobuf'
+apply plugin: 'edu.wpi.first.NativeUtils'
+
+/* The simulation does not run on real hardware; so we always skip Athena */
+ext.skipAthena = true
+
+repositories {
+      mavenCentral()
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:+'
+    }
+}
+
+
+/* Use a sort of poor man's autoconf to find the protobuf development
+   files; on Debian, those are supplied by libprotobuf-dev.
+
+   This should get skipped on Windows.
+
+   TODO:  Add Windows support for the simulation code */
+
+def protobuf_version = ""
+try {
+    protobuf_version = "pkg-config --modversion protobuf".execute().text.trim()
+    println "Protobuf version is [${protobuf_version}]"
+} catch(Exception ex) {
+}
+
+if (!protobuf_version?.trim()) {
+    println "Protobuf is not available. (pkg-config --modversion protobuf failed)"
+    protobuf_version = "+"
+    if (project.hasProperty("makeSim")) {
+        /* Force the build even though we did not find protobuf. */
+        println "makeSim set. Forcing build - failure likely."
+    }
+    else {
+        ext.skip_gz_msgs = true
+        println "Skipping gz_msgs."
+    }
+}
+
+tasks.whenTaskAdded { task ->
+    task.onlyIf { !project.hasProperty('skip_gz_msgs') }
+}
+
+dependencies {
+      compile "com.google.protobuf:protobuf-java:${protobuf_version}"
+      compile "com.google.protobuf:protoc:${protobuf_version}"
+}
+
+/* There is a nice gradle plugin for protobuf, and the protoc tool
+   is included; using it simplifies our build process.
+   The trick is that we have to use the same version as the system
+   copy of libprotobuf-dev */
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protobuf_version}"
+    }
+
+    generatedFilesBaseDir = "$buildDir/generated"
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                cpp {
+                    outputSubDir = 'simulation/gz_msgs'
+                }
+            }
+        }
+    }
+}
+
+model {
+    components {
+        gz_msgs(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDir "$buildDir/generated/main/simulation/gz_msgs"
+                        builtBy tasks.generateProto
+                    }
+                    exportedHeaders {
+                        srcDir "src/include"
+                        srcDir "$buildDir/generated/main"
+                    }
+                }
+            }
+            /* We must compile with -fPIC to link the static library into an so */
+            binaries {
+                all {
+                    cppCompiler.args "-fPIC"
+                }
+            }
+        }
+    }
+}

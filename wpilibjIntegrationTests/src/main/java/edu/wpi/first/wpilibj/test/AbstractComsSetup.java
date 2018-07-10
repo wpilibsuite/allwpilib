@@ -18,7 +18,6 @@ import org.junit.runners.model.MultipleFailureException;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.MockDS;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -48,7 +47,7 @@ public abstract class AbstractComsSetup {
     if (!initialized) {
       try {
         // Set some implementations so that the static methods work properly
-        RobotBase.initializeHardwareConfiguration();
+        HAL.initialize(500, 0);
         HAL.observeUserProgramStarting();
         DriverStation.getInstance().getAlliance();
 

@@ -169,7 +169,7 @@ enum CS_TelemetryKind {
 // Listener event
 //
 struct CS_Event {
-  CS_EventKind kind;
+  enum CS_EventKind kind;
 
   // Valid for CS_SOURCE_* and CS_SINK_* respectively
   CS_Source source;
@@ -183,7 +183,7 @@ struct CS_Event {
 
   // Fields for CS_SOURCE_PROPERTY_* events
   CS_Property property;
-  CS_PropertyKind propertyKind;
+  enum CS_PropertyKind propertyKind;
   int value;
   const char* valueStr;
 };
@@ -223,7 +223,7 @@ CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
 //
 // Source Functions
 //
-CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status);
+enum CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status);
 char* CS_GetSourceName(CS_Source source, CS_Status* status);
 char* CS_GetSourceDescription(CS_Source source, CS_Status* status);
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status);
@@ -275,7 +275,8 @@ char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status);
 //
 // HttpCamera Source Functions
 //
-CS_HttpCameraKind CS_GetHttpCameraKind(CS_Source source, CS_Status* status);
+enum CS_HttpCameraKind CS_GetHttpCameraKind(CS_Source source,
+                                            CS_Status* status);
 void CS_SetHttpCameraUrls(CS_Source source, const char** urls, int count,
                           CS_Status* status);
 char** CS_GetHttpCameraUrls(CS_Source source, int* count, CS_Status* status);
@@ -311,7 +312,7 @@ CS_Sink CS_CreateCvSinkCallback(const char* name, void* data,
 //
 // Sink Functions
 //
-CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status);
+enum CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status);
 char* CS_GetSinkName(CS_Sink sink, CS_Status* status);
 char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status);
 void CS_SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
@@ -343,10 +344,9 @@ void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status);
 //
 void CS_SetListenerOnStart(void (*onStart)(void* data), void* data);
 void CS_SetListenerOnExit(void (*onExit)(void* data), void* data);
-CS_Listener CS_AddListener(void* data,
-                           void (*callback)(void* data, const CS_Event* event),
-                           int eventMask, int immediateNotify,
-                           CS_Status* status);
+CS_Listener CS_AddListener(
+    void* data, void (*callback)(void* data, const struct CS_Event* event),
+    int eventMask, int immediateNotify, CS_Status* status);
 
 void CS_RemoveListener(CS_Listener handle, CS_Status* status);
 
@@ -357,9 +357,9 @@ int CS_NotifierDestroyed(void);
 //
 void CS_SetTelemetryPeriod(double seconds);
 double CS_GetTelemetryElapsedTime(void);
-int64_t CS_GetTelemetryValue(CS_Handle handle, CS_TelemetryKind kind,
+int64_t CS_GetTelemetryValue(CS_Handle handle, enum CS_TelemetryKind kind,
                              CS_Status* status);
-double CS_GetTelemetryAverageValue(CS_Handle handle, CS_TelemetryKind kind,
+double CS_GetTelemetryAverageValue(CS_Handle handle, enum CS_TelemetryKind kind,
                                    CS_Status* status);
 
 //

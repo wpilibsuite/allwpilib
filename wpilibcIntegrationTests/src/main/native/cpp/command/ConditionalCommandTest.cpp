@@ -27,7 +27,6 @@ class ConditionalCommandTest : public testing::Test {
 
  protected:
   void SetUp() override {
-    RobotState::SetImplementation(DriverStation::GetInstance());
     Scheduler::GetInstance()->SetEnabled(true);
 
     m_subsystem = new Subsystem("MockSubsystem");

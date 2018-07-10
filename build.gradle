@@ -19,7 +19,7 @@ buildScan {
     publishAlways()
 }
 
-ext.licenseFile = file("$rootDir/LICENSE.txt")
+ext.licenseFile = files("$rootDir/LICENSE.txt", "$rootDir/ThirdPartyNotices.txt")
 
 // Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
 // already specified on the command line
@@ -91,5 +91,5 @@ subprojects {
 }
 
 wrapper {
-    gradleVersion = '4.8'
+    gradleVersion = '4.8.1'
 }
