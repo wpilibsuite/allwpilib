@@ -80,6 +80,7 @@ void DriverStationComms::start() {
 
 //		mtx.lock();
 		server_running = true;
+		printf("Server Running...\n");
 //		mtx.unlock();
 		
 		udp_thread = std::thread(udp_thread_func);
@@ -312,5 +313,6 @@ void DriverStationComms::periodic_update() {
 
 //	MTX_LOCK(shared_mutex()->power, 0);
 //	bat_voltage = shared()->power()->get_pdp_voltage();
+	bat_voltage = 12;
 //	MTX_UNLOCK(shared_mutex()->power, 0);
 }
