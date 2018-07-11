@@ -6,13 +6,13 @@ apply plugin: SingleNativeBuild
 apply plugin: ExtraTasks
 
 
+ext {
+    nativeName = 'lowfi_sim'
+}
+
+apply from: "${rootDir}/shared/config.gradle"
+
 if (!project.hasProperty('onlyAthena')) {
-
-    ext {
-        nativeName = 'lowfi_sim'
-    }
-
-    apply from: "${rootDir}/shared/config.gradle"
 
     ext {
         sharedCvConfigs = [lowfi_simTest: []]
@@ -121,46 +121,46 @@ if (!project.hasProperty('onlyAthena')) {
         }
         binaries {
             withType(GoogleTestTestSuiteBinarySpec) {
-                if (!project.hasProperty('onlyAthena')) {
-                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
-                    lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
-                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
-                    project(':ni-libraries').addNiLibrariesToLinker(it)
-                    lib library: nativeName, linkage: 'shared'
-                } else {
-                    it.buildable = false
-                }
+                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                lib project: ':hal', library: 'hal', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                project(':ni-libraries').addNiLibrariesToLinker(it)
+                lib library: nativeName, linkage: 'shared'
             }
         }
     }
+
+    apply from: "publish.gradle"
 }
 
 model {
 
-	testSuites {
-	    "${nativeName}Test"(GoogleTestTestSuiteSpec) {
-	        for(NativeComponentSpec c : $.components) {
-	            if (c.name == nativeName) {
-	                testing c
-	                break
-	            }
-	        }
-	        sources {
-	            cpp {
-	                source {
-	                    srcDirs 'src/test/native/cpp'
-	                    include '**/*.cpp'
-	                }
-	                exportedHeaders {
-	                    srcDirs 'src/test/native/include', 'src/main/native/cpp'
-	                }
-	            }
-	        }
-	    }
-	}
+    testSuites {
+        if (!project.hasProperty('onlyAthena')) {
+            "${nativeName}Test"(GoogleTestTestSuiteSpec) {
+                for(NativeComponentSpec c : $.components) {
+                    if (c.name == nativeName) {
+                        testing c
+                        break
+                    }
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'src/test/native/cpp'
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/test/native/include', 'src/main/native/cpp'
+                        }
+                    }
+                }
+            }
+        }
+    }
     tasks {
         def c = $.components
         project.tasks.create('runCpp', Exec) {
@@ -182,8 +182,8 @@ model {
         }
     }
 }
-//
-//tasks.withType(RunTestExecutable) {
-//    args "--gtest_output=xml:test_detail.xml"
-//    outputs.dir outputDir
-//}
+
+tasks.withType(RunTestExecutable) {
+    args "--gtest_output=xml:test_detail.xml"
+    outputs.dir outputDir
+}
