@@ -8,15 +8,16 @@
 package edu.wpi.first.wpilibj.examples.shuffleboard;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableType;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
-//import java.util.Map;
+//import java.util.Map; // for Map.of(), introduced in Java 9
 
 @SuppressWarnings({"MemberName", "LineLength", "RegexpSinglelinejava"})
 public class Robot extends IterativeRobot {
@@ -31,29 +32,24 @@ public class Robot extends IterativeRobot {
   @Override
   public void robotInit() {
     // Add a 'max speed' widget to a tab named 'Configuration', using a number slider
-    maxSpeed = Shuffleboard.add("Max Speed", NetworkTableType.kDouble)
-        .toTab("Configuration")
-        .withWidget("Number Slider")
-        //.withProperties(Map.of("min", 0, "max", 1)) // Map.of introduced in Java 9
-        .getEntry();
+    maxSpeed = Shuffleboard.getTab("Configuration")
+                           .add("Max Speed", 1)
+                           .withWidget("Number Slider")
+                           //.withProperties(Map.of("min", 0, "max", 1)) // Map.of introduced in Java 9
+                           .getEntry();
 
     // Add the tank drive and encoders to a 'Drivebase' tab
-    Shuffleboard.add("Tank Drive", tankDrive)
-        .toTab("Drivebase");
+    ShuffleboardTab driveBaseTab = Shuffleboard.getTab("Drivebase");
+    driveBaseTab.add("Tank Drive", tankDrive);
     // Put both encoders in a list layout
-    Shuffleboard.add("Left Encoder", leftEncoder)
-        .toTab("Drivebase")
-        .toLayout("List", "Encoders");
-    Shuffleboard.add("Right Encoder", rightEncoder)
-        .toTab("Drivebase")
-        .toLayout("List", "Encoders");
+    ShuffleboardLayout encoders = driveBaseTab.getLayout("List", "Encoders");
+    encoders.add("Left Encoder", leftEncoder);
+    encoders.add("Right Encoder", rightEncoder);
 
     // Add the elevator motor and potentiometer to an 'Elevator' tab
-    Shuffleboard.add("Motor", elevatorMotor)
-        .toTab("Elevator");
-    Shuffleboard.add("Potentiometer", elevatorPot)
-        .toTab("Elevator")
-        .withWidget("Voltage View");
+    ShuffleboardTab elevatorTab = Shuffleboard.getTab("Elevator");
+    elevatorTab.add("Motor", elevatorMotor);
+    elevatorTab.add("Potentiometer", elevatorPot);
   }
 
   @Override
