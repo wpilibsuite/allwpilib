@@ -1,0 +1,21 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface DriverStation
+/// \brief A message for DriverStation data
+/// \verbatim
+
+option java_outer_classname = "GzDriverStation";
+
+message DriverStation
+{
+  required bool enabled = 1;
+  enum State {
+    AUTO = 0;
+    TELEOP = 1;
+    TEST = 2;
+  }
+  required State state = 2;
+}
+
+/// \endverbatim

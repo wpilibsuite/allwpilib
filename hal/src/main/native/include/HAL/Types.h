@@ -48,3 +48,11 @@ typedef HAL_Handle HAL_CANHandle;
 typedef HAL_CANHandle HAL_PDPHandle;
 
 typedef int32_t HAL_Bool;
+
+#ifdef __cplusplus
+#define HAL_ENUM(name) enum name : int32_t
+#else
+#define HAL_ENUM(name)  \
+  typedef int32_t name; \
+  enum name
+#endif

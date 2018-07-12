@@ -31,7 +31,7 @@ class MatchDataSender;
  * Provide access to the network communication data to / from the Driver
  * Station.
  */
-class DriverStation : public ErrorBase, public RobotStateInterface {
+class DriverStation : public ErrorBase {
  public:
   enum Alliance { kRed, kBlue, kInvalid };
   enum MatchType { kNone, kPractice, kQualification, kElimination };
@@ -186,35 +186,35 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
    *
    * @return True if the robot is enabled and the DS is connected
    */
-  bool IsEnabled() const override;
+  bool IsEnabled() const;
 
   /**
    * Check if the robot is disabled.
    *
    * @return True if the robot is explicitly disabled or the DS is not connected
    */
-  bool IsDisabled() const override;
+  bool IsDisabled() const;
 
   /**
    * Check if the DS is commanding autonomous mode.
    *
    * @return True if the robot is being commanded to be in autonomous mode
    */
-  bool IsAutonomous() const override;
+  bool IsAutonomous() const;
 
   /**
    * Check if the DS is commanding teleop mode.
    *
    * @return True if the robot is being commanded to be in teleop mode
    */
-  bool IsOperatorControl() const override;
+  bool IsOperatorControl() const;
 
   /**
    * Check if the DS is commanding test mode.
    *
    * @return True if the robot is being commanded to be in test mode
    */
-  bool IsTest() const override;
+  bool IsTest() const;
 
   /**
    * Check if the DS is attached.

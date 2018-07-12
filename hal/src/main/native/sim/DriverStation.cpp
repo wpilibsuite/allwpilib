@@ -168,7 +168,7 @@ double HAL_GetMatchTime(int32_t* status) {
   return SimDriverStationData->GetMatchTime();
 }
 
-int HAL_GetMatchInfo(HAL_MatchInfo* info) {
+int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
   SimDriverStationData->GetMatchInfo(info);
   return 0;
 }
@@ -204,7 +204,7 @@ static void InitLastCountKey(void) {
 }
 #endif
 
-bool HAL_IsNewControlData(void) {
+HAL_Bool HAL_IsNewControlData(void) {
 #ifdef __APPLE__
   pthread_once(&lastCountKeyOnce, InitLastCountKey);
   int* lastCountPtr = static_cast<int*>(pthread_getspecific(lastCountKey));

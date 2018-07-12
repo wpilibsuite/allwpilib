@@ -10,9 +10,10 @@
 #include <algorithm>
 #include <set>
 
+#include <HAL/HAL.h>
+
 #include "Buttons/ButtonScheduler.h"
 #include "Commands/Subsystem.h"
-#include "HLUsageReporting.h"
 #include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
@@ -166,7 +167,8 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
 }
 
 Scheduler::Scheduler() {
-  HLUsageReporting::ReportScheduler();
+  HAL_Report(HALUsageReporting::kResourceType_Command,
+             HALUsageReporting::kCommand_Scheduler);
   SetName("Scheduler");
 }
 

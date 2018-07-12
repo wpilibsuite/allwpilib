@@ -7,67 +7,26 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
-
 @SuppressWarnings("JavadocMethod")
 public final class RobotState {
-  private static Interface m_impl;
-
-  @SuppressWarnings("MethodName")
-  public static void SetImplementation(Interface implementation) {
-    m_impl = implementation;
-  }
-
   public static boolean isDisabled() {
-    if (m_impl != null) {
-      return m_impl.isDisabled();
-    } else {
-      throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
-    }
+    return DriverStation.getInstance().isDisabled();
   }
 
   public static boolean isEnabled() {
-    if (m_impl != null) {
-      return m_impl.isEnabled();
-    } else {
-      throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
-    }
+    return DriverStation.getInstance().isEnabled();
   }
 
   public static boolean isOperatorControl() {
-    if (m_impl != null) {
-      return m_impl.isOperatorControl();
-    } else {
-      throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
-    }
+    return DriverStation.getInstance().isOperatorControl();
   }
 
   public static boolean isAutonomous() {
-    if (m_impl != null) {
-      return m_impl.isAutonomous();
-    } else {
-      throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
-    }
+    return DriverStation.getInstance().isAutonomous();
   }
 
   public static boolean isTest() {
-    if (m_impl != null) {
-      return m_impl.isTest();
-    } else {
-      throw new BaseSystemNotInitializedException(Interface.class, RobotState.class);
-    }
-  }
-
-  interface Interface {
-    boolean isDisabled();
-
-    boolean isEnabled();
-
-    boolean isOperatorControl();
-
-    boolean isAutonomous();
-
-    boolean isTest();
+    return DriverStation.getInstance().isTest();
   }
 
   private RobotState() {

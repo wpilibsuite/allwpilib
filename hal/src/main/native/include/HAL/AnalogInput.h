@@ -16,20 +16,23 @@ extern "C" {
 #endif
 
 /**
- * Initialize the analog input port using the given port object.
+ * Initializes the analog input port using the given port object.
  *
  * @param portHandle Handle to the port to initialize.
+ * @return           the created analog input handle
  */
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
                                                     int32_t* status);
 
 /**
+ * Frees an analog input port.
+ *
  * @param analogPortHandle Handle to the analog port.
  */
 void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle);
 
 /**
- * Check that the analog module number is valid.
+ * Checks that the analog module number is valid.
  *
  * @param module The analog module number.
  * @return Analog module is valid and present
@@ -37,8 +40,8 @@ void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle);
 HAL_Bool HAL_CheckAnalogModule(int32_t module);
 
 /**
- * Check that the analog output channel number is value.
- * Verify that the analog channel number is one of the legal channel numbers.
+ * Checks that the analog output channel number is value.
+ * Verifies that the analog channel number is one of the legal channel numbers.
  * Channel numbers are 0-based.
  *
  * @param channel The analog output channel number.
@@ -47,7 +50,7 @@ HAL_Bool HAL_CheckAnalogModule(int32_t module);
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel);
 
 /**
- * Set the sample rate.
+ * Sets the sample rate.
  *
  * This is a global setting for the Athena and effects all channels.
  *
@@ -56,7 +59,7 @@ HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel);
 void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status);
 
 /**
- * Get the current sample rate.
+ * Gets the current sample rate.
  *
  * This assumes one entry in the scan list.
  * This is a global setting for the Athena and effects all channels.
@@ -66,7 +69,7 @@ void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status);
 double HAL_GetAnalogSampleRate(int32_t* status);
 
 /**
- * Set the number of averaging bits.
+ * Sets the number of averaging bits.
  *
  * This sets the number of averaging bits. The actual number of averaged samples
  * is 2**bits. Use averaging to improve the stability of your measurement at the
@@ -79,7 +82,7 @@ void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
                               int32_t bits, int32_t* status);
 
 /**
- * Get the number of averaging bits.
+ * Gets the number of averaging bits.
  *
  * This gets the number of averaging bits from the FPGA. The actual number of
  * averaged samples is 2**bits. The averaging is done automatically in the FPGA.
@@ -91,7 +94,7 @@ int32_t HAL_GetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
                                  int32_t* status);
 
 /**
- * Set the number of oversample bits.
+ * Sets the number of oversample bits.
  *
  * This sets the number of oversample bits. The actual number of oversampled
  * values is 2**bits. Use oversampling to improve the resolution of your
@@ -105,7 +108,7 @@ void HAL_SetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
                                  int32_t bits, int32_t* status);
 
 /**
- * Get the number of oversample bits.
+ * Gets the number of oversample bits.
  *
  * This gets the number of oversample bits from the FPGA. The actual number of
  * oversampled values is 2**bits. The oversampling is done automatically in the
@@ -118,7 +121,7 @@ int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
                                     int32_t* status);
 
 /**
- * Get a sample straight from the channel on this module.
+ * Gets a sample straight from the channel on this module.
  *
  * The sample is a 12-bit value representing the 0V to 5V range of the A/D
  * converter in the module. The units are in A/D converter codes.  Use
@@ -131,7 +134,7 @@ int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
                            int32_t* status);
 
 /**
- * Get a sample from the output of the oversample and average engine for the
+ * Gets a sample from the output of the oversample and average engine for the
  * channel.
  *
  * The sample is 12-bit + the value configured in SetOversampleBits().
@@ -148,7 +151,7 @@ int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analogPortHandle,
                                   int32_t* status);
 
 /**
- * Convert a voltage to a raw value for a specified channel.
+ * Converts a voltage to a raw value for a specified channel.
  *
  * This process depends on the calibration of each channel, so the channel must
  * be specified.
@@ -163,7 +166,7 @@ int32_t HAL_GetAnalogVoltsToValue(HAL_AnalogInputHandle analogPortHandle,
                                   double voltage, int32_t* status);
 
 /**
- * Get a scaled sample straight from the channel on this module.
+ * Gets a scaled sample straight from the channel on this module.
  *
  * The value is scaled to units of Volts using the calibrated scaling data from
  * GetLSBWeight() and GetOffset().
@@ -175,7 +178,7 @@ double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status);
 
 /**
- * Get a scaled sample from the output of the oversample and average engine for
+ * Gets a scaled sample from the output of the oversample and average engine for
  * the channel.
  *
  * The value is scaled to units of Volts using the calibrated scaling data from
@@ -191,7 +194,7 @@ double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
                                    int32_t* status);
 
 /**
- * Get the factory scaling least significant bit weight constant.
+ * Gets the factory scaling least significant bit weight constant.
  * The least significant bit weight constant for the channel that was calibrated
  * in manufacturing and stored in an eeprom in the module.
  *
@@ -204,7 +207,7 @@ int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
                                int32_t* status);
 
 /**
- * Get the factory scaling offset constant.
+ * Gets the factory scaling offset constant.
  * The offset constant for the channel that was calibrated in manufacturing and
  * stored in an eeprom in the module.
  *

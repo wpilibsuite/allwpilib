@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.HLUsageReporting;
 
 /**
  * The Shuffleboard class provides a mechanism with which data can be added and laid out in the
@@ -56,9 +55,7 @@ public final class Shuffleboard {
   private static final ShuffleboardRoot root =
       new ShuffleboardInstance(NetworkTableInstance.getDefault());
 
-  static {
-    HLUsageReporting.reportShuffleboard();
-  }
+  // TODO usage reporting
 
   private Shuffleboard() {
     throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");

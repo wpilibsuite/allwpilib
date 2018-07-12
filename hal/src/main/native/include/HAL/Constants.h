@@ -13,6 +13,11 @@
 extern "C" {
 #endif
 
+/**
+ * Gets the number of FPGA system clock ticks per microsecond.
+ *
+ * @return the number of clock ticks per microsecond
+ */
 int32_t HAL_GetSystemClockTicksPerMicrosecond(void);
 #ifdef __cplusplus
 }  // extern "C"
