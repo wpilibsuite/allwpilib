@@ -7,8 +7,6 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
-import edu.wpi.first.networktables.NetworkTable;
-
 /**
  * Abstract superclass for widgets.
  *
@@ -19,19 +17,6 @@ public abstract class ShuffleboardWidget<W extends ShuffleboardWidget<W>>
 
   ShuffleboardWidget(ShuffleboardContainer parent, String title) {
     super(parent, title);
-  }
-
-  protected final void buildMetadata(NetworkTable metaTable) {
-    metaTable.getEntry("Title").forceSetString(getTitle());
-    if (getType() == null) {
-      metaTable.getEntry("Type").delete();
-    } else {
-      metaTable.getEntry("Type").forceSetString(getType());
-    }
-    if (getProperties() != null) {
-      NetworkTable propTable = metaTable.getSubTable("Properties");
-      getProperties().forEach((name, value) -> propTable.getEntry(name).setValue(value));
-    }
   }
 
   /**

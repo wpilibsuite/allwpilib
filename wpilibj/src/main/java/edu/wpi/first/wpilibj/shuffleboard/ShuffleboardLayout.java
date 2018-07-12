@@ -51,8 +51,7 @@ public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout
 
   @Override
   public void buildInto(NetworkTable parentTable, NetworkTable metaTable) {
-    metaTable.getEntry("Title").forceSetString(getTitle());
-    metaTable.getEntry("Type").forceSetString(getType());
+    buildMetadata(metaTable);
     NetworkTable table = parentTable.getSubTable(getTitle());
     for (ShuffleboardComponent<?> component : getComponents()) {
       component.buildInto(table, metaTable.getSubTable(component.getTitle()));

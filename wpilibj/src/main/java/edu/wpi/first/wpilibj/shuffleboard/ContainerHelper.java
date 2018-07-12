@@ -55,7 +55,7 @@ final class ContainerHelper {
 
   ComplexWidget add(String title, Sendable sendable) {
     checkTitle(title);
-    ComplexWidget widget = new ComplexWidget(m_container, title);
+    ComplexWidget widget = new ComplexWidget(m_container, title, sendable);
     m_components.add(widget);
     return widget;
   }

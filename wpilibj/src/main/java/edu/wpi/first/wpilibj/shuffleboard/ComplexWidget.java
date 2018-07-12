@@ -8,15 +8,29 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 
 public final class ComplexWidget extends ShuffleboardWidget<ComplexWidget> {
-  ComplexWidget(ShuffleboardContainer parent, String title) {
+
+  private final Sendable m_sendable;
+  private SendableBuilderImpl m_builder;
+
+  ComplexWidget(ShuffleboardContainer parent, String title, Sendable sendable) {
     super(parent, title);
+    m_sendable = sendable;
   }
 
   @Override
   public void buildInto(NetworkTable parentTable, NetworkTable metaTable) {
     buildMetadata(metaTable);
+    if (m_builder == null) {
+      m_builder = new SendableBuilderImpl();
+      m_builder.setTable(parentTable.getSubTable(getTitle()));
+      m_sendable.initSendable(m_builder);
+      m_builder.startListeners();
+    }
+    m_builder.updateTable();
   }
 
 }

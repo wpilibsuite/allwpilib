@@ -10,6 +10,8 @@ package edu.wpi.first.wpilibj.shuffleboard;
 import java.util.Map;
 import java.util.Objects;
 
+import edu.wpi.first.networktables.NetworkTable;
+
 /**
  * A generic component in Shuffleboard.
  *
@@ -21,6 +23,7 @@ public abstract class ShuffleboardComponent<C extends ShuffleboardComponent<C>>
   private final String m_title;
   private String m_type;
   private Map<String, Object> m_properties;
+  private boolean m_metadataDirty = false; // NOPMD redundant field initializer
 
   protected ShuffleboardComponent(ShuffleboardContainer parent, String title, String type) {
     m_parent = Objects.requireNonNull(parent, "Parent cannot be null");
@@ -38,6 +41,7 @@ public abstract class ShuffleboardComponent<C extends ShuffleboardComponent<C>>
 
   protected final void setType(String type) {
     m_type = type;
+    m_metadataDirty = true;
   }
 
   public final String getType() {
@@ -65,7 +69,24 @@ public abstract class ShuffleboardComponent<C extends ShuffleboardComponent<C>>
    */
   public final C withProperties(Map<String, Object> properties) {
     m_properties = properties;
+    m_metadataDirty = true;
     return (C) this;
+  }
+
+  protected final void buildMetadata(NetworkTable metaTable) {
+    if (!m_metadataDirty) {
+      return;
+    }
+    if (getType() == null) {
+      metaTable.getEntry("PreferredComponent").delete();
+    } else {
+      metaTable.getEntry("PreferredComponent").forceSetString(getType());
+    }
+    if (getProperties() != null) {
+      NetworkTable propTable = metaTable.getSubTable("Properties");
+      getProperties().forEach((name, value) -> propTable.getEntry(name).setValue(value));
+    }
+    m_metadataDirty = false;
   }
 
 }

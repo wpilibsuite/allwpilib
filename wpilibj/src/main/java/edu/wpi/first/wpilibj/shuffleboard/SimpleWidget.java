@@ -31,7 +31,9 @@ public final class SimpleWidget extends ShuffleboardWidget<SimpleWidget> {
    * Gets the NetworkTable entry that contains the data for this widget.
    */
   public NetworkTableEntry getEntry() {
-    forceGenerate();
+    if (m_entry == null) {
+      forceGenerate();
+    }
     return m_entry;
   }
 
@@ -45,9 +47,6 @@ public final class SimpleWidget extends ShuffleboardWidget<SimpleWidget> {
   }
 
   private void forceGenerate() {
-    if (m_entry != null) {
-      return;
-    }
     ShuffleboardContainer parent = getParent();
     while (parent instanceof ShuffleboardLayout) {
       parent = ((ShuffleboardLayout) parent).getParent();
