@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 
 public final class ComplexWidget extends ShuffleboardWidget<ComplexWidget> {
-
   private final Sendable m_sendable;
   private SendableBuilderImpl m_builder;
 
