@@ -18,10 +18,6 @@ task javaExamplesZip(type: Zip) {
     destinationDir = outputsFolder
     baseName = 'wpilibj-examples'
 
-    from(licenseFile) {
-        into '/'
-    }
-
     from('src/main/java/edu/wpi/first/wpilibj/examples') {
         into 'examples'
     }
@@ -31,10 +27,6 @@ task javaTemplatesZip(type: Zip) {
     destinationDir = outputsFolder
     baseName = 'wpilibj-templates'
 
-    from(licenseFile) {
-        into '/'
-    }
-
     from('src/main/java/edu/wpi/first/wpilibj/templates') {
         into 'templates'
     }
@@ -43,10 +35,6 @@ task javaTemplatesZip(type: Zip) {
 task javaCommandsZip(type: Zip) {
     destinationDir = outputsFolder
     baseName = 'wpilibj-commands'
-
-    from(licenseFile) {
-        into '/'
-    }
 
     from('src/main/java/edu/wpi/first/wpilibj/commands') {
         into 'commands'
