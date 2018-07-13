@@ -49,7 +49,7 @@ if (!project.hasProperty('onlyAthena')) {
                 sources {
                     cpp {
                         source {
-                            srcDirs = ['src/main/native/cpp', "$buildDir/generated/cpp"]
+                            srcDirs = ['src/main/native/cpp']
                             include '**/*.cpp'
                         }
                         exportedHeaders {
@@ -68,7 +68,7 @@ if (!project.hasProperty('onlyAthena')) {
                     }
                     lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    project(':ni-libraries').addNiLibrariesToLinker(it)
+                    lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
                 }
             }
             "${nativeName}"(NativeLibrarySpec) {
@@ -90,7 +90,7 @@ if (!project.hasProperty('onlyAthena')) {
                     }
                     lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    project(':ni-libraries').addNiLibrariesToLinker(it)
+                    lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
                 }
             }
             // By default, a development executable will be generated. This is to help the case of
@@ -101,7 +101,7 @@ if (!project.hasProperty('onlyAthena')) {
                         source {
                             srcDirs 'src/dev/native/cpp'
                             include '**/*.cpp'
-                            lib library: 'lowfi_sim'
+                            lib library: "${nativeName}"
                         }
                         exportedHeaders {
                             srcDirs 'src/dev/native/include'
@@ -115,7 +115,6 @@ if (!project.hasProperty('onlyAthena')) {
                     }
                     lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    project(':ni-libraries').addNiLibrariesToLinker(it)
                 }
             }
         }
@@ -127,7 +126,7 @@ if (!project.hasProperty('onlyAthena')) {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
-                project(':ni-libraries').addNiLibrariesToLinker(it)
+                lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
                 lib library: nativeName, linkage: 'shared'
             }
         }
@@ -172,6 +171,7 @@ model {
                             def arch = it.targetPlatform.architecture.name
                             if (arch == 'x86-64' || arch == 'x86') {
                                 dependsOn it.tasks.install
+								commandLine it.tasks.install.runScriptFile.get().asFile.toString()
 
                                 found = true
                             }
