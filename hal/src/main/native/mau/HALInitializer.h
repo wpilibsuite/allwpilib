@@ -51,5 +51,5 @@ namespace hal {
         extern void InitializeSPI();
         extern void InitializeThreads();
 
-    }  // namespace init
-}  // namespace hal
+    }
+}

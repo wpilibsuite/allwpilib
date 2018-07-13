@@ -16,7 +16,7 @@
 #include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
-#include "VMXPointers.h"
+#include "VMXHandler.h"
 #include <VMXPi.h>
 
 using namespace hal;
@@ -27,6 +27,7 @@ namespace hal {
             bool realtime = false;
             uint8_t hertz = 50;
             VMXPi vmx(realtime, hertz);
+
             vmxIMU = &vmx.ahrs;
             vmxIO = &vmx.io;
             vmxCAN = &vmx.can;

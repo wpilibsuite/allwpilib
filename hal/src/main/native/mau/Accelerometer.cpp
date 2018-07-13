@@ -8,7 +8,7 @@
 #include <AHRS.h>
 #include "HALInitializer.h"
 #include "HAL/Accelerometer.h"
-#include "VMXPointers.h"
+#include "VMXHandler.h"
 
 namespace hal {
     namespace init {
@@ -18,26 +18,22 @@ namespace hal {
 
 extern "C" {
     void HAL_SetAccelerometerActive(HAL_Bool active) {
-        if (active) {
-            // TODO: Add Start, after stopping, functionality to VMX-pi HAL [Issue: #93]
-        } else {
-            vmxIMU->Stop();
-        }
+        // Always active: no-op
     }
 
     void HAL_SetAccelerometerRange(HAL_AccelerometerRange range) {
-        // TODO: Add SetAccelerometerRange functionality to VMX-pi HAL [Issue: #93]
+        // VMX-pi's Accelerometer range is fixed: no-op
     }
 
     double HAL_GetAccelerometerX(void) {
-        return (double) vmxIMU->GetWorldLinearAccelX();
+        return (double) vmxIMU->GetRawAccelX();
     }
 
     double HAL_GetAccelerometerY(void) {
-        return (double) vmxIMU->GetWorldLinearAccelY();
+        return (double) vmxIMU->GetRawAccelY();
     }
 
     double HAL_GetAccelerometerZ(void) {
-        return (double) vmxIMU->GetWorldLinearAccelZ();
+        return (double) vmxIMU->GetRawAccelZ();
     }
 }

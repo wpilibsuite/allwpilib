@@ -11,17 +11,17 @@
 #include "PortsInternal.h"
 
 namespace hal {
-IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
-                      HAL_HandleEnum::AnalogInput>* analogInputHandles;
-}  // namespace hal
+    IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
+            HAL_HandleEnum::AnalogInput> *analogInputHandles;
+}
 
 namespace hal {
-namespace init {
-void InitializeAnalogInternal() {
-  static IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
-                               kNumAnalogInputs, HAL_HandleEnum::AnalogInput>
-      aiH;
-  analogInputHandles = &aiH;
+    namespace init {
+        void InitializeAnalogInternal() {
+            static IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
+                    kNumAnalogInputs, HAL_HandleEnum::AnalogInput>
+                    aiH;
+            analogInputHandles = &aiH;
+        }
+    }
 }
-}  // namespace init
-}  // namespace hal

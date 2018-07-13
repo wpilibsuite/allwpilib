@@ -8,10 +8,11 @@
 #include "HAL/AnalogAccumulator.h"
 
 #include "AnalogInternal.h"
+#include "HAL/handles/HandlesInternal.h"
 #include <VMXIO.h>
 #include <VMXErrors.h>
 #include <VMXResource.h>
-#include "VMXPointers.h"
+#include "VMXHandler.h"
 
 using namespace hal;
 
@@ -46,7 +47,23 @@ extern "C" {
             return;
         }
 
-        //  SimAnalogInData[port->channel].SetAccumulatorInitialized(true);
+        VMXErrorCode vmxerr;
+        int16_t index = getHandleIndex(analogPortHandle);
+
+        VMXChannelIndex first;
+        VMXResourceHandle accHandles[4];
+
+        for ( uint8_t inCount = first; inCount < first + kNumAnalogInputs; inCount++) {
+            VMXResourceIndex currentIndex = inCount - first;
+            AccumulatorConfig config;
+            VMXChannelInfo info = VMXChannelInfo(inCount, VMXChannelCapability::AccumulatorInput);
+
+            if (!vmxIO->ActivateSinglechannelResource(info, &config, accHandles[currentIndex], &vmxerr)) {
+                // Log error
+            } else {
+                // Log success
+            }
+        }
     }
 
     void HAL_ResetAccumulator(HAL_AnalogInputHandle analogPortHandle, int32_t* status) {
@@ -56,10 +73,8 @@ extern "C" {
             return;
         }
 
-        // TODO: Add ResetAccumulator functionality to VMX-pi HAL [Issue: #93]
-        //  SimAnalogInData[port->channel].SetAccumulatorCenter(0);
-        //  SimAnalogInData[port->channel].SetAccumulatorCount(0);
-        //  SimAnalogInData[port->channel].SetAccumulatorValue(0);
+        // no-op
+        // TODO: Add ResetAccumulator functionality to VMX-pi HAL [Issue: #98]
     }
 
     void HAL_SetAccumulatorCenter(HAL_AnalogInputHandle analogPortHandle, int32_t center, int32_t* status) {
@@ -69,7 +84,8 @@ extern "C" {
             return;
         }
 
-        // TODO: Add SetAccumulatorCenter functionality to VMX-pi HAL [Issue: #93]
+        // no-op
+        // TODO: Add SetAccumulatorCenter functionality to VMX-pi HAL [Issue: #98]
     }
 
     void HAL_SetAccumulatorDeadband(HAL_AnalogInputHandle analogPortHandle, int32_t deadband, int32_t* status) {
@@ -79,8 +95,8 @@ extern "C" {
             return;
         }
 
-        // TODO: Add SetAccumulatorDeadband functionality to VMX-pi HAL [Issue: #93]
-        //  SimAnalogInData[port->channel].SetAccumulatorDeadband(deadband);
+        // no-op
+        // TODO: Add SetAccumulatorDeadband functionality to VMX-pi HAL [Issue: #98]
     }
 
     int64_t HAL_GetAccumulatorValue(HAL_AnalogInputHandle analogPortHandle, int32_t* status) {
@@ -115,7 +131,9 @@ extern "C" {
             return;
         }
 
-        //  *count = SimAnalogInData[port->channel].GetAccumulatorCount();
-        //  *value = SimAnalogInData[port->channel].GetAccumulatorValue();
+        // no-op
+        // TODO: Add GetAccumulatorOutput functionality to VMX-pi HAL [Issue: #98]
+        *value = 0;
+        *count = 0;
     }
 }

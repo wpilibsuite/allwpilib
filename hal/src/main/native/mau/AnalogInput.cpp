@@ -11,18 +11,14 @@
 #include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
-#include "VMXPointers.h"
+#include "VMXHandler.h"
 #include <VMXIO.h>
 
 using namespace hal;
 
-static VMXIO* vmxIO;
-
 namespace hal {
     namespace init {
-        void InitializeAnalogInput(VMXIO* io) {
-            vmxIO = io;
-        }
+        void InitializeAnalogInput() {}
     }
 }
 

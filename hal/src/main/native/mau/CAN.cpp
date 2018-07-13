@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HAL/CAN.h"
-#include "VMXPointers.h"
+#include "VMXHandler.h"
 #include <VMXCAN.h>
 
 namespace hal {

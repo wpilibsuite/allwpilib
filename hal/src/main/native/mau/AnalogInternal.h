@@ -16,21 +16,20 @@
 #include "PortsInternal.h"
 
 namespace hal {
-constexpr int32_t kTimebase = 40000000;  ///< 40 MHz clock
-constexpr int32_t kDefaultOversampleBits = 0;
-constexpr int32_t kDefaultAverageBits = 7;
-constexpr double kDefaultSampleRate = 50000.0;
-static constexpr uint32_t kAccumulatorChannels[] = {0, 1};
+    constexpr int32_t kTimebase = 40000000;  ///< 40 MHz clock
+    constexpr int32_t kDefaultOversampleBits = 0;
+    constexpr int32_t kDefaultAverageBits = 7;
+    constexpr double kDefaultSampleRate = 50000.0;
+    static constexpr uint32_t kAccumulatorChannels[] = {0, 1};
 
-struct AnalogPort {
-  uint8_t channel;
-  bool isAccumulator;
-};
+    struct AnalogPort {
+        uint8_t channel;
+        bool isAccumulator;
+    };
 
-extern IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
-                             kNumAnalogInputs, HAL_HandleEnum::AnalogInput>*
-    analogInputHandles;
+    extern IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
+            kNumAnalogInputs, HAL_HandleEnum::AnalogInput> *
+            analogInputHandles;
 
-int32_t GetAnalogTriggerInputIndex(HAL_AnalogTriggerHandle handle,
-                                   int32_t* status);
-}  // namespace hal
+    int32_t GetAnalogTriggerInputIndex(HAL_AnalogTriggerHandle handle, int32_t *status);
+}

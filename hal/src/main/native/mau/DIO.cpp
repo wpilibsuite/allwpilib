@@ -14,6 +14,9 @@
 #include "HAL/handles/LimitedHandleResource.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "VMXHandler.h"
+#include <VMXIO.h>
+#include <VMXResource.h>
 
 using namespace hal;
 
@@ -31,13 +34,15 @@ namespace hal {
     }
 }
 
-extern "C" {
+VMXResourceHandle HAL_DIOToVMXHandle(HAL_DigitalHandle dioPortHandle) {
+    return HAL_WPIToVMXHandle(dioPortHandle, VMXResourceType::DigitalIO);
+}
 
+extern "C" {
     /**
      * Create a new instance of a digital port.
      */
-    HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
-                                            HAL_Bool input, int32_t* status) {
+    HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle, HAL_Bool input, int32_t* status) {
         hal::init::CheckInit();
         if (*status != 0) return HAL_kInvalidHandle;
 
@@ -61,9 +66,9 @@ extern "C" {
 
         port->channel = static_cast<uint8_t>(channel);
 
-//        SimDIOData[channel].SetInitialized(true);
+        SimDIOData[channel].SetInitialized(true);
 //
-//        SimDIOData[channel].SetIsInput(input);
+        SimDIOData[channel].SetIsInput(input);
 
         return handle;
     }
@@ -77,7 +82,7 @@ extern "C" {
         // no status, so no need to check for a proper free.
         digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
         if (port == nullptr) return;
-//        SimDIOData[port->channel].SetInitialized(true);
+        SimDIOData[port->channel].SetInitialized(true);
     }
 
     /**
@@ -100,7 +105,7 @@ extern "C" {
         }
         *id = static_cast<uint8_t>(getHandleIndex(handle));
 
-//        SimDigitalPWMData[*id].SetInitialized(true);
+        SimDigitalPWMData[*id].SetInitialized(true);
 
         return handle;
     }
@@ -116,7 +121,7 @@ extern "C" {
         digitalPWMHandles->Free(pwmGenerator);
         if (port == nullptr) return;
         int32_t id = *port;
-//        SimDigitalPWMData[id].SetInitialized(false);
+        SimDigitalPWMData[id].SetInitialized(false);
     }
 
     /**
@@ -145,8 +150,7 @@ extern "C" {
      * @param pwmGenerator The generator index reserved by allocateDigitalPWM()
      * @param dutyCycle The percent duty cycle to output [0..1].
      */
-    void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
-                                    double dutyCycle, int32_t* status) {
+    void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle, int32_t* status) {
         auto port = digitalPWMHandles->Get(pwmGenerator);
         if (port == nullptr) {
             *status = HAL_HANDLE_ERROR;
@@ -155,7 +159,7 @@ extern "C" {
         int32_t id = *port;
         if (dutyCycle > 1.0) dutyCycle = 1.0;
         if (dutyCycle < 0.0) dutyCycle = 0.0;
-//        SimDigitalPWMData[id].SetDutyCycle(dutyCycle);
+        SimDigitalPWMData[id].SetDutyCycle(dutyCycle);
     }
 
     /**
@@ -164,15 +168,14 @@ extern "C" {
      * @param pwmGenerator The generator index reserved by allocateDigitalPWM()
      * @param channel The Digital Output channel to output on
      */
-    void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
-                                        int32_t channel, int32_t* status) {
+    void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator, int32_t channel, int32_t* status) {
         auto port = digitalPWMHandles->Get(pwmGenerator);
         if (port == nullptr) {
             *status = HAL_HANDLE_ERROR;
             return;
         }
         int32_t id = *port;
-//        SimDigitalPWMData[id].SetPin(channel);
+        SimDigitalPWMData[id].SetPin(channel);
     }
 
     /**
@@ -183,8 +186,7 @@ extern "C" {
      * @param value The state to set the digital channel (if it is configured as an
      * output)
      */
-    void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
-                    int32_t* status) {
+    void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value, int32_t* status) {
         auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
         if (port == nullptr) {
             *status = HAL_HANDLE_ERROR;
@@ -193,7 +195,9 @@ extern "C" {
         if (value != 0 && value != 1) {
             if (value != 0) value = 1;
         }
-//        SimDIOData[port->channel].SetValue(value);
+
+        VMXResourceHandle handle = HAL_DIOToVMXHandle(dioPortHandle);
+        vmxIO->DIO_Set(handle, (bool)value, &vmxError);
     }
 
     /**
@@ -202,15 +206,14 @@ extern "C" {
      * @param channel The Digital I/O channel
      * @param input true to set input, false for output
      */
-    void HAL_SetDIODirection(HAL_DigitalHandle dioPortHandle, HAL_Bool input,
-                             int32_t* status) {
+    void HAL_SetDIODirection(HAL_DigitalHandle dioPortHandle, HAL_Bool input, int32_t* status) {
         auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
         if (port == nullptr) {
             *status = HAL_HANDLE_ERROR;
             return;
         }
 
-//        SimDIOData[port->channel].SetIsInput(input);
+        SimDIOData[port->channel].SetIsInput(input);
     }
 
     /**
@@ -226,10 +229,10 @@ extern "C" {
             *status = HAL_HANDLE_ERROR;
             return false;
         }
-//        HAL_Bool value = SimDIOData[port->channel].GetValue();
-//        if (value > 1) value = 1;
-//        if (value < 0) value = 0;
-//        return value;
+
+        bool value;
+        VMXResourceHandle handle = HAL_DIOToVMXHandle(dioPortHandle);
+        return vmxIO->DIO_Get(handle, value, &vmxError);
     }
 
     /**
@@ -245,7 +248,10 @@ extern "C" {
             *status = HAL_HANDLE_ERROR;
             return false;
         }
-//        HAL_Bool value = SimDIOData[port->channel].GetIsInput();
+
+        vmxIO
+
+        HAL_Bool value = SimDIOData[port->channel].GetIsInput();
 //        if (value > 1) value = 1;
 //        if (value < 0) value = 0;
 //        return value;
@@ -301,8 +307,7 @@ extern "C" {
      * @param filterIndex The filter index.  Must be in the range 0 - 3, where 0
      *                    means "none" and 1 - 3 means filter # filterIndex - 1.
      */
-    void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
-                             int32_t* status) {
+    void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex, int32_t* status) {
         auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
         if (port == nullptr) {
             *status = HAL_HANDLE_ERROR;

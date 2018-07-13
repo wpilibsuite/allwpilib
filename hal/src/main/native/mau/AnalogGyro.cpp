@@ -16,7 +16,7 @@
 #include "HAL/AnalogInput.h"
 #include "HAL/handles/IndexedHandleResource.h"
 #include "HALInitializer.h"
-#include "VMXPointers.h"
+#include "VMXHandler.h"
 #include <AHRS.h>
 
 using namespace hal;
@@ -100,15 +100,15 @@ extern "C" {
             return;
         }
 
-    //    vmxIMU->ZeroYaw();
+        vmxIMU->ZeroYaw();
     }
 
     void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
-        // TODO: Add CalibrateAnalogGyro functionality to VMX-pi HAL [Issue: #93]
+        // Calibration occurs automatically: no-op
     }
 
     void HAL_SetAnalogGyroDeadband(HAL_GyroHandle handle, double volts, int32_t* status) {
-        // TODO: Add SetAnalogGyroDeadband functionality to VMX-pi HAL [Issue: #93]
+        // no-op
     }
 
     double HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status) {
@@ -132,11 +132,13 @@ extern "C" {
     }
 
     double HAL_GetAnalogGyroOffset(HAL_GyroHandle handle, int32_t* status) {
+        // no-op
         // TODO: Add GetAnalogGyroOffset functionality to VMX-pi HAL [Issue: #93]
         return 0.0;
     }
 
     int32_t HAL_GetAnalogGyroCenter(HAL_GyroHandle handle, int32_t* status) {
+        // no-op
         // TODO: GetAnalogGyroCenter functionality to VMX-pi HAL [Issue: #93]
         return 0;
     }
