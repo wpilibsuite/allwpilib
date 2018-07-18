@@ -32,17 +32,22 @@ public class Robot extends IterativeRobot {
   @Override
   public void robotInit() {
     // Add a 'max speed' widget to a tab named 'Configuration', using a number slider
+    // The widget will be placed in the second column and row and will be two columns wide
     maxSpeed = Shuffleboard.getTab("Configuration")
                            .add("Max Speed", 1)
                            .withWidget("Number Slider")
                            //.withProperties(Map.of("min", 0, "max", 1)) // Map.of introduced in Java 9
+                           .withPosition(1, 1)
+                           .withSize(2, 1)
                            .getEntry();
 
     // Add the tank drive and encoders to a 'Drivebase' tab
     ShuffleboardTab driveBaseTab = Shuffleboard.getTab("Drivebase");
     driveBaseTab.add("Tank Drive", tankDrive);
     // Put both encoders in a list layout
-    ShuffleboardLayout encoders = driveBaseTab.getLayout("List", "Encoders");
+    ShuffleboardLayout encoders = driveBaseTab.getLayout("List", "Encoders")
+                                              .withPosition(0, 0)
+                                              .withSize(2, 2);
     encoders.add("Left Encoder", leftEncoder);
     encoders.add("Right Encoder", rightEncoder);
 
