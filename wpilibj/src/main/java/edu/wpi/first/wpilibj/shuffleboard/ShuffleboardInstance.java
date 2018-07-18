@@ -34,6 +34,11 @@ public final class ShuffleboardInstance implements ShuffleboardRoot {
 
   @Override
   public void update() {
+    String[] tabTitles = m_tabs.values()
+                               .stream()
+                               .map(ShuffleboardTab::getTitle)
+                               .toArray(String[]::new);
+    m_rootMetaTable.getEntry("Tabs").forceSetStringArray(tabTitles);
     for (ShuffleboardTab tab : m_tabs.values()) {
       String title = tab.getTitle();
       tab.buildInto(m_rootTable, m_rootMetaTable.getSubTable(title));
