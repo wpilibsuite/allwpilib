@@ -83,6 +83,7 @@ public final class ShuffleboardTab implements ShuffleboardContainer {
       metaTable.getEntry("Autopopulate").forceSetString(m_autopopulatePrefix);
     }
     NetworkTable tabTable = parentTable.getSubTable(m_title);
+    tabTable.getEntry(".type").setString("ShuffleboardTab");
     for (ShuffleboardComponent<?> component : m_helper.getComponents()) {
       component.buildInto(tabTable, metaTable.getSubTable(component.getTitle()));
     }
