@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HAL/CAN.h"
-#include "VMXHandler.h"
+#include "Translator/VMXHandler.h"
 #include <VMXCAN.h>
 
 namespace hal {

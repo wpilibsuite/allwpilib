@@ -8,7 +8,7 @@
 #include "HAL/Ports.h"
 
 #include "PortsInternal.h"
-#include "VMXHandler.h"
+#include "Translator/VMXHandler.h"
 #include <VMXIO.h>
 #include <VMXChannel.h>
 

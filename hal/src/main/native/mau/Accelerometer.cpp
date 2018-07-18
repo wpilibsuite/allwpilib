@@ -8,7 +8,7 @@
 #include <AHRS.h>
 #include "HALInitializer.h"
 #include "HAL/Accelerometer.h"
-#include "VMXHandler.h"
+#include "Translator/VMXHandler.h"
 
 namespace hal {
     namespace init {

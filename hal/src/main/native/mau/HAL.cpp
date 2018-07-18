@@ -16,7 +16,7 @@
 #include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
-#include "VMXHandler.h"
+#include "Translator/VMXHandler.h"
 #include <VMXPi.h>
 
 using namespace hal;

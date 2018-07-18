@@ -11,7 +11,7 @@
 #include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
-#include "VMXHandler.h"
+#include "Translator/VMXHandler.h"
 #include <VMXIO.h>
 
 using namespace hal;

@@ -9,10 +9,10 @@
 
 #include "AnalogInternal.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "Translator/VMXHandler.h"
 #include <VMXIO.h>
 #include <VMXErrors.h>
 #include <VMXResource.h>
-#include "VMXHandler.h"
 
 using namespace hal;
 

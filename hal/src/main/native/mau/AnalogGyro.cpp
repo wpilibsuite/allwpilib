@@ -16,7 +16,7 @@
 #include "HAL/AnalogInput.h"
 #include "HAL/handles/IndexedHandleResource.h"
 #include "HALInitializer.h"
-#include "VMXHandler.h"
+#include "Translator/VMXHandler.h"
 #include <AHRS.h>
 
 using namespace hal;
