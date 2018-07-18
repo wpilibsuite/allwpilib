@@ -7,9 +7,13 @@
 
 #include <jni.h>
 
+#include <wpi/jni_util.h>
+
 #include "CallbackStore.h"
 #include "MockData/DriverStationData.h"
 #include "edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI.h"
+
+using namespace wpi::java;
 
 extern "C" {
 
@@ -393,7 +397,33 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setJoystickButtons
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setMatchInfo
   (JNIEnv* env, jclass, jobject info)
-{}
+{
+  jstring eventNameRaw = (jstring)env->GetObjectField(
+      info, env->GetFieldID(env->GetObjectClass(info), "eventName",
+                            "Ljava/lang/String;"));
+  jstring gameSpecificMessageRaw = (jstring)env->GetObjectField(
+      info, env->GetFieldID(env->GetObjectClass(info), "gameSpecificMessage",
+                            "Ljava/lang/String;"));
+  int matchNumber = env->GetIntField(
+      info, env->GetFieldID(env->GetObjectClass(info), "matchNumber", "I"));
+  int replayNumber = env->GetIntField(
+      info, env->GetFieldID(env->GetObjectClass(info), "replayNumber", "I"));
+  int matchType = env->GetIntField(
+      info, env->GetFieldID(env->GetObjectClass(info), "matchType", "I"));
+
+  JStringRef eventName{env, eventNameRaw};
+  JStringRef gameSpecificMessage{env, gameSpecificMessageRaw};
+
+  HAL_MatchInfo halMatchInfo;
+  halMatchInfo.eventName = const_cast<char*>(eventName.c_str());
+  halMatchInfo.gameSpecificMessage =
+      const_cast<char*>(gameSpecificMessage.c_str());
+  halMatchInfo.matchType = (HAL_MatchType)matchType;
+  halMatchInfo.matchNumber = matchNumber;
+  halMatchInfo.replayNumber = replayNumber;
+
+  HALSIM_SetMatchInfo(&halMatchInfo);
+}
 
 /*
  * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
