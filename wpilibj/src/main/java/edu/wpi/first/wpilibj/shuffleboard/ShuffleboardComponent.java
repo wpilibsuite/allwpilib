@@ -123,7 +123,7 @@ public abstract class ShuffleboardComponent<C extends ShuffleboardComponent<C>>
     }
 
     // Tile size
-    if (m_width < 0 || m_height < 0) {
+    if (m_width <= 0 || m_height <= 0) {
       metaTable.getEntry("Size").delete();
     } else {
       metaTable.getEntry("Size").setDoubleArray(new double[]{m_width, m_height});
