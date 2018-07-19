@@ -4,7 +4,7 @@ apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: 'cpp'
 
 ext.skipAthena = true
-
+ext.pluginName = 'halsim_gazebo'
 
 /* If gz_msgs or gazebo is not available, do not attempt a build */
 def gazebo_version = ""
@@ -37,9 +37,15 @@ tasks.whenTaskAdded { task ->
     task.onlyIf { !gz_msgs_project.hasProperty('skip_gz_msgs') && !project.hasProperty('skip_frc_plugins') }
 }
 
+apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
+
 model {
     binaries {
         all {
+            if (it instanceof StaticLibraryBinarySpec) {
+                it.buildable = false
+                return
+            }
             linker.args gazebo_linker_args
             cppCompiler.args gazebo_cppflags
             lib project: ":simulation:gz_msgs", library: "gz_msgs", linkage: "static"
