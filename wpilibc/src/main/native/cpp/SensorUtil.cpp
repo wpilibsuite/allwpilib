@@ -58,5 +58,9 @@ bool SensorUtil::CheckSolenoidChannel(int channel) {
 }
 
 bool SensorUtil::CheckPDPChannel(int channel) {
-  return HAL_CheckPDPModule(channel);
+  return HAL_CheckPDPChannel(channel);
+}
+
+bool SensorUtil::CheckPDPModule(int module) {
+  return HAL_CheckPDPModule(module);
 }

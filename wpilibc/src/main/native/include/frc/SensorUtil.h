@@ -15,10 +15,15 @@ namespace frc {
  */
 class SensorUtil final {
  public:
+  /**
+   * Get the number of the default solenoid module.
+   *
+   * @return The number of the default solenoid module.
+   */
   static int GetDefaultSolenoidModule();
 
   /**
-   * Check that the solenoid module number is valid.
+   * Check that the solenoid module number is valid. module numbers are 0-based
    *
    * @return Solenoid module is valid and present
    */
@@ -28,7 +33,7 @@ class SensorUtil final {
    * Check that the digital channel number is valid.
    *
    * Verify that the channel number is one of the legal channel numbers. Channel
-   * numbers are 1-based.
+   * numbers are 0-based.
    *
    * @return Digital channel is valid
    */
@@ -48,7 +53,7 @@ class SensorUtil final {
    * Check that the digital channel number is valid.
    *
    * Verify that the channel number is one of the legal channel numbers. Channel
-   * numbers are 1-based.
+   * numbers are 0-based.
    *
    * @return PWM channel is valid
    */
@@ -87,6 +92,13 @@ class SensorUtil final {
    * @return PDP channel is valid
    */
   static bool CheckPDPChannel(int channel);
+
+  /**
+   * Verify that the PDP module number is within limits. module numbers are 0-based
+   *
+   * @return PDP module is valid
+   */
+  static bool CheckPDPModule(int module);
 
   static const int kDigitalChannels;
   static const int kAnalogInputs;
