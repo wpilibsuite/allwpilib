@@ -333,4 +333,78 @@ bool HttpConnection::Handshake(const HttpRequest& request,
   return true;
 }
 
+void HttpMultipartScanner::SetBoundary(StringRef boundary) {
+  m_boundaryWith = "\n--";
+  m_boundaryWith += boundary;
+  m_boundaryWithout = "\n";
+  m_boundaryWithout += boundary;
+  m_dashes = kUnknown;
+}
+
+void HttpMultipartScanner::Reset(bool saveSkipped) {
+  m_saveSkipped = saveSkipped;
+  m_state = kBoundary;
+  m_posWith = 0;
+  m_posWithout = 0;
+  m_buf.resize(0);
+}
+
+StringRef HttpMultipartScanner::Execute(StringRef in) {
+  if (m_state == kDone) Reset(m_saveSkipped);
+  if (m_saveSkipped) m_buf += in;
+
+  size_t pos = 0;
+  if (m_state == kBoundary) {
+    for (char ch : in) {
+      ++pos;
+      if (m_dashes != kWithout) {
+        if (ch == m_boundaryWith[m_posWith]) {
+          ++m_posWith;
+          if (m_posWith == m_boundaryWith.size()) {
+            // Found the boundary; transition to padding
+            m_state = kPadding;
+            m_dashes = kWith;  // no longer accept plain 'boundary'
+            break;
+          }
+        } else if (ch == m_boundaryWith[0]) {
+          m_posWith = 1;
+        } else {
+          m_posWith = 0;
+        }
+      }
+
+      if (m_dashes != kWith) {
+        if (ch == m_boundaryWithout[m_posWithout]) {
+          ++m_posWithout;
+          if (m_posWithout == m_boundaryWithout.size()) {
+            // Found the boundary; transition to padding
+            m_state = kPadding;
+            m_dashes = kWithout;  // no longer accept '--boundary'
+            break;
+          }
+        } else if (ch == m_boundaryWithout[0]) {
+          m_posWithout = 1;
+        } else {
+          m_posWithout = 0;
+        }
+      }
+    }
+  }
+
+  if (m_state == kPadding) {
+    for (char ch : in.drop_front(pos)) {
+      ++pos;
+      if (ch == '\n') {
+        // Found the LF; return remaining input buffer (following it)
+        m_state = kDone;
+        if (m_saveSkipped) m_buf.resize(m_buf.size() - in.size() + pos);
+        return in.drop_front(pos);
+      }
+    }
+  }
+
+  // We consumed the entire input
+  return StringRef{};
+}
+
 }  // namespace wpi
