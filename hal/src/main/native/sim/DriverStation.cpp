@@ -174,10 +174,6 @@ int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
   return 0;
 }
 
-void HAL_FreeMatchInfo(HAL_MatchInfo* info) {
-  SimDriverStationData->FreeMatchInfo(info);
-}
-
 void HAL_ObserveUserProgramStarting(void) { HALSIM_SetProgramStarted(); }
 
 void HAL_ObserveUserProgramDisabled(void) {

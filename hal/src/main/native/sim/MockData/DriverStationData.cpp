@@ -18,13 +18,6 @@ struct JoystickOutputStore {
   int32_t leftRumble = 0;
   int32_t rightRumble = 0;
 };
-struct MatchInfoDataStore {
-  std::string eventName;
-  std::string gameSpecificMessage;
-  int32_t replayNumber = 0;
-  int32_t matchNumber = 0;
-  HAL_MatchType matchType = HAL_MatchType::HAL_kMatchType_none;
-};
 }  // namespace hal
 
 using namespace hal;
@@ -76,7 +69,7 @@ void DriverStationData::ResetData() {
   {
     std::lock_guard<wpi::mutex> lock(m_matchInfoMutex);
 
-    m_matchInfo = std::make_unique<MatchInfoDataStore>();
+    m_matchInfo = std::make_unique<HAL_MatchInfo>();
   }
 }
 
@@ -402,22 +395,7 @@ void DriverStationData::GetJoystickOutputs(int32_t joystickNum,
 }
 void DriverStationData::GetMatchInfo(HAL_MatchInfo* info) {
   std::lock_guard<wpi::mutex> lock(m_matchInfoMutex);
-  auto eventLen = m_matchInfo->eventName.size();
-  info->eventName = static_cast<char*>(std::malloc(eventLen + 1));
-  std::memcpy(info->eventName, m_matchInfo->eventName.c_str(), eventLen);
-  auto gameLen = m_matchInfo->gameSpecificMessage.size();
-  info->gameSpecificMessage = static_cast<char*>(std::malloc(gameLen + 1));
-  std::memcpy(info->gameSpecificMessage,
-              m_matchInfo->gameSpecificMessage.c_str(), gameLen);
-  info->gameSpecificMessage[gameLen] = '\0';
-  info->eventName[eventLen] = '\0';
-  info->matchNumber = m_matchInfo->matchNumber;
-  info->replayNumber = m_matchInfo->replayNumber;
-  info->matchType = m_matchInfo->matchType;
-}
-void DriverStationData::FreeMatchInfo(const HAL_MatchInfo* info) {
-  std::free(info->eventName);
-  std::free(info->gameSpecificMessage);
+  *info = *m_matchInfo;
 }
 
 void DriverStationData::SetJoystickAxes(int32_t joystickNum,
@@ -453,11 +431,8 @@ void DriverStationData::SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
 
 void DriverStationData::SetMatchInfo(const HAL_MatchInfo* info) {
   std::lock_guard<wpi::mutex> lock(m_matchInfoMutex);
-  m_matchInfo->eventName = info->eventName;
-  m_matchInfo->gameSpecificMessage = info->gameSpecificMessage;
-  m_matchInfo->matchNumber = info->matchNumber;
-  m_matchInfo->matchType = info->matchType;
-  m_matchInfo->replayNumber = info->replayNumber;
+  *m_matchInfo = *info;
+  *(std::end(m_matchInfo->eventName) - 1) = '\0';
 }
 
 void DriverStationData::NotifyNewData() { HAL_ReleaseDSMutex(); }
