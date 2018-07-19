@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MatchInfoDataTest {
   @Test
-  void matchInfoDataDoesNotThrow() {
+  void testSetMatchInfo() {
 
     MatchInfoData inMatchInfo = new MatchInfoData();
     inMatchInfo.eventName = "Event Name";
@@ -31,11 +31,11 @@ class MatchInfoDataTest {
     HAL.getMatchInfo(outMatchInfo);
 
     assertAll(
-      () -> assertEquals("Event Name", outMatchInfo.eventName),
-      () -> assertEquals(MatchType.Qualification.ordinal(), outMatchInfo.matchType),
-      () -> assertEquals(174, outMatchInfo.matchNumber),
-      () -> assertEquals(191, outMatchInfo.replayNumber),
-      () -> assertEquals("Game Message", outMatchInfo.gameSpecificMessage)
+        () -> assertEquals("Event Name", outMatchInfo.eventName),
+        () -> assertEquals(MatchType.Qualification.ordinal(), outMatchInfo.matchType),
+        () -> assertEquals(174, outMatchInfo.matchNumber),
+        () -> assertEquals(191, outMatchInfo.replayNumber),
+        () -> assertEquals("Game Message", outMatchInfo.gameSpecificMessage)
     );
   }
 }
