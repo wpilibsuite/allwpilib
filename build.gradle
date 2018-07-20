@@ -1,10 +1,10 @@
 plugins {
-    id 'net.ltgt.errorprone' version '0.0.13'
+    id 'net.ltgt.errorprone' version '0.0.15'
     id 'base'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.1'
     id 'edu.wpi.first.NativeUtils' version '1.7.1'
-    id 'edu.wpi.first.GradleJni' version '0.2.2'
-    id 'edu.wpi.first.GradleVsCode' version '0.3.0'
+    id 'edu.wpi.first.GradleJni' version '0.3.0'
+    id 'edu.wpi.first.GradleVsCode' version '0.4.1'
     id 'idea'
     id 'com.gradle.build-scan' version '1.15.1'
 }
