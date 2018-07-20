@@ -106,7 +106,7 @@ class EncoderData {
   std::shared_ptr<NotifyListenerVector> m_reverseDirectionCallbacks = nullptr;
   std::atomic<int32_t> m_samplesToAverage{0};
   std::shared_ptr<NotifyListenerVector> m_samplesToAverageCallbacks = nullptr;
-  std::atomic<double> m_distancePerPulse{0};
+  std::atomic<double> m_distancePerPulse{1};
   std::shared_ptr<NotifyListenerVector> m_distancePerPulseCallbacks = nullptr;
 };
 extern EncoderData* SimEncoderData;

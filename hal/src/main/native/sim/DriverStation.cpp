@@ -27,6 +27,7 @@ static wpi::mutex msgMutex;
 static wpi::condition_variable* newDSDataAvailableCond;
 static wpi::mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
+static std::atomic_bool isFinalized{false};
 
 namespace hal {
 namespace init {
@@ -173,10 +174,6 @@ int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
   return 0;
 }
 
-void HAL_FreeMatchInfo(HAL_MatchInfo* info) {
-  SimDriverStationData->FreeMatchInfo(info);
-}
-
 void HAL_ObserveUserProgramStarting(void) { HALSIM_SetProgramStarted(); }
 
 void HAL_ObserveUserProgramDisabled(void) {
@@ -234,6 +231,9 @@ HAL_Bool HAL_IsNewControlData(void) {
 void HAL_WaitForDSData(void) { HAL_WaitForDSDataTimeout(0); }
 
 HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
+  if (isFinalized.load()) {
+    return false;
+  }
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
@@ -278,6 +278,11 @@ void HAL_InitializeDriverStation(void) {
   if (initialized) return;
 
   SimDriverStationData->ResetData();
+
+  std::atexit([]() {
+    isFinalized.store(true);
+    HAL_ReleaseDSMutex();
+  });
 
   initialized = true;
 }

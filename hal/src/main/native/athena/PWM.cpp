@@ -104,11 +104,13 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 
   port->channel = origChannel;
 
-  int32_t bitToSet = 1 << remapMXPPWMChannel(port->channel);
-  uint16_t specialFunctions =
-      digitalSystem->readEnableMXPSpecialFunction(status);
-  digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet,
-                                               status);
+  if (port->channel > tPWM::kNumHdrRegisters - 1) {
+    int32_t bitToSet = 1 << remapMXPPWMChannel(port->channel);
+    uint16_t specialFunctions =
+        digitalSystem->readEnableMXPSpecialFunction(status);
+    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet,
+                                                 status);
+  }
 
   // Defaults to allow an always valid config.
   HAL_SetPWMConfig(handle, 2.0, 1.501, 1.5, 1.499, 1.0, status);

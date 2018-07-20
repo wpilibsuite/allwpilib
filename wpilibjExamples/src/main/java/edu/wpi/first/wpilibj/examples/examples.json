@@ -6,7 +6,8 @@
       "Getting Started with Java"
     ],
     "foldername": "gettingstarted",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Tank Drive",
@@ -18,7 +19,8 @@
       "Safety"
     ],
     "foldername": "tankdrive",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Mecanum Drive",
@@ -30,7 +32,8 @@
       "Safety"
     ],
     "foldername": "mecanumdrive",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Ultrasonic",
@@ -41,7 +44,8 @@
       "Analog"
     ],
     "foldername": "ultrasonic",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Ultrasonic PID",
@@ -52,7 +56,8 @@
       "Analog"
     ],
     "foldername": "ultrasonicpid",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Potentiometer PID",
@@ -64,7 +69,8 @@
       "Joystick"
     ],
     "foldername": "potentiometerpid",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Gyro",
@@ -76,7 +82,8 @@
       "Joystick"
     ],
     "foldername": "gyro",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Gyro Mecanum",
@@ -88,7 +95,8 @@
       "Joystick"
     ],
     "foldername": "gyromecanum",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Motor Controller",
@@ -99,7 +107,8 @@
       "Robot and Motor"
     ],
     "foldername": "motorcontrol",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Motor Control With Encoder",
@@ -114,6 +123,7 @@
     ],
     "foldername": "motorcontrolencoder",
     "gradlebase": "java"
+    ,"mainclass": "Main"
   },
   {
     "name": "GearsBot",
@@ -122,7 +132,8 @@
       "Complete Robot"
     ],
     "foldername": "gearsbot",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "PacGoat",
@@ -131,7 +142,8 @@
       "Complete Robot"
     ],
     "foldername": "pacgoat",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Simple Vision",
@@ -141,7 +153,8 @@
       "Complete List"
     ],
     "foldername": "quickvision",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Intermediate Vision",
@@ -151,7 +164,8 @@
       "Complete List"
     ],
     "foldername": "intermediatevision",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Axis Camera Sample",
@@ -160,7 +174,8 @@
       "Vision"
     ],
     "foldername": "axiscamera",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Shuffleboard Sample",
@@ -170,6 +185,7 @@
       "Dashboards"
     ],
     "foldername": "shuffleboard",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]

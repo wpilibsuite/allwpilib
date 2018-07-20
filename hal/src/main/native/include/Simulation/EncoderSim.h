@@ -123,6 +123,21 @@ class EncoderSim {
     HALSIM_SetEncoderSamplesToAverage(m_index, samplesToAverage);
   }
 
+  std::unique_ptr<CallbackStore> RegisterDistancePerPulseCallback(
+      NotifyCallback callback, bool initialNotify) {
+    auto store = std::make_unique<CallbackStore>(
+        m_index, -1, callback, &HALSIM_CancelEncoderDistancePerPulseCallback);
+    store->SetUid(HALSIM_RegisterEncoderDistancePerPulseCallback(
+        m_index, &CallbackStoreThunk, store.get(), initialNotify));
+    return store;
+  }
+  double GetDistancePerPulse() {
+    return HALSIM_GetEncoderDistancePerPulse(m_index);
+  }
+  void SetDistancePerPulse(double distancePerPulse) {
+    HALSIM_SetEncoderDistancePerPulse(m_index, distancePerPulse);
+  }
+
   void ResetData() { HALSIM_ResetEncoderData(m_index); }
 
  private:
