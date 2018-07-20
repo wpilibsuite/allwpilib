@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <IterativeRobot.h>
-#include <Joystick.h>
-#include <Spark.h>
+#include <frc/IterativeRobot.h>
+#include <frc/Joystick.h>
+#include <frc/Spark.h>
 
 /**
  * This sample program shows how to control a motor using a joystick. In the

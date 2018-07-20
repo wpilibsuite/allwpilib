@@ -5,13 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "BuiltInAccelerometer.h"
+#include "frc/BuiltInAccelerometer.h"
 
-#include <HAL/Accelerometer.h>
-#include <HAL/HAL.h>
+#include <hal/Accelerometer.h>
+#include <hal/HAL.h>
 
-#include "SmartDashboard/SendableBuilder.h"
-#include "WPIErrors.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

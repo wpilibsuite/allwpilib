@@ -10,8 +10,8 @@
 #include "BufferCallbackStore.h"
 #include "CallbackStore.h"
 #include "ConstBufferCallbackStore.h"
-#include "MockData/I2CData.h"
 #include "edu_wpi_first_hal_sim_mockdata_I2CDataJNI.h"
+#include "mockdata/I2CData.h"
 
 extern "C" {
 

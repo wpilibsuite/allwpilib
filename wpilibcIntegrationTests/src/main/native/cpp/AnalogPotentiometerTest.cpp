@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "AnalogPotentiometer.h"  // NOLINT(build/include_order)
+#include "frc/AnalogPotentiometer.h"  // NOLINT(build/include_order)
 
-#include "AnalogOutput.h"
-#include "RobotController.h"
 #include "TestBench.h"
-#include "Timer.h"
+#include "frc/AnalogOutput.h"
+#include "frc/RobotController.h"
+#include "frc/Timer.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

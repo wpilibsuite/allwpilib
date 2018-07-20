@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Counter.h"
+#include "hal/Counter.h"
 
 #include "CounterInternal.h"
-#include "HAL/Errors.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "HAL/handles/LimitedHandleResource.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/Errors.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/LimitedHandleResource.h"
 
 namespace hal {
 

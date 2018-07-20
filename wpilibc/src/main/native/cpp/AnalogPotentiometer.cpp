@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "AnalogPotentiometer.h"
+#include "frc/AnalogPotentiometer.h"
 
-#include "RobotController.h"
-#include "SmartDashboard/SendableBuilder.h"
+#include "frc/RobotController.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

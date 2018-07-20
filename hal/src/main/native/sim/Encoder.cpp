@@ -5,16 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Encoder.h"
+#include "hal/Encoder.h"
 
 #include "CounterInternal.h"
-#include "HAL/Counter.h"
-#include "HAL/Errors.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "HAL/handles/LimitedHandleResource.h"
 #include "HALInitializer.h"
-#include "MockData/EncoderDataInternal.h"
 #include "PortsInternal.h"
+#include "hal/Counter.h"
+#include "hal/Errors.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/LimitedHandleResource.h"
+#include "mockdata/EncoderDataInternal.h"
 
 using namespace hal;
 

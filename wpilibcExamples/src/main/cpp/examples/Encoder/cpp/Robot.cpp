@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <Encoder.h>
-#include <IterativeRobot.h>
-#include <SmartDashboard/SmartDashboard.h>
+#include <frc/Encoder.h>
+#include <frc/IterativeRobot.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 /**
  * Sample program displaying the value of a quadrature encoder on the

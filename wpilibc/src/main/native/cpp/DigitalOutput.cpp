@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DigitalOutput.h"
+#include "frc/DigitalOutput.h"
 
 #include <limits>
 
-#include <HAL/DIO.h>
-#include <HAL/HAL.h>
-#include <HAL/Ports.h>
+#include <hal/DIO.h>
+#include <hal/HAL.h>
+#include <hal/Ports.h>
 
-#include "SensorUtil.h"
-#include "SmartDashboard/SendableBuilder.h"
-#include "WPIErrors.h"
+#include "frc/SensorUtil.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

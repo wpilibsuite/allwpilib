@@ -82,7 +82,7 @@ public class FRCNetComm extends JNIWrapper {
         first_enum = True
         files = [
             "/ni-libraries/include/FRC_NetworkCommunication/LoadOut.h",
-            "/hal/src/main/native/include/HAL/UsageReporting.h"
+            "/hal/src/main/native/include/hal/UsageReporting.h"
         ]
         for file_name in files:
             with open(config_path + file_name, "r") as cpp_source:

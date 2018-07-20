@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "SynchronousPID.h"
+#include "frc/SynchronousPID.h"
 
 using namespace frc;
 

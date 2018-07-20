@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include <HAL/Ports.h>
+#include <hal/Ports.h>
 
 #include "HALSimPrint.h"
 #include "PrintPWM.h"

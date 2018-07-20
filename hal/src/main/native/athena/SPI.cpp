@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/SPI.h"
+#include "hal/SPI.h"
 
 #include <fcntl.h>
 #include <linux/spi/spidev.h>
@@ -20,10 +20,10 @@
 #include <wpi/raw_ostream.h>
 
 #include "DigitalInternal.h"
-#include "HAL/DIO.h"
-#include "HAL/HAL.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
+#include "hal/DIO.h"
+#include "hal/HAL.h"
+#include "hal/handles/HandlesInternal.h"
 
 using namespace hal;
 

@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "HAL/Encoder.h"
+#include "hal/Encoder.h"
 
 namespace hal {
 

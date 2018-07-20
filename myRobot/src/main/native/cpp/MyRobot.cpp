@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "IterativeRobot.h"
+#include <frc/IterativeRobot.h>
 
 class MyRobot : public frc::IterativeRobot {
   /**

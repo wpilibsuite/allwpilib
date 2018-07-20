@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Commands/InstantCommand.h"
+#include <frc/commands/InstantCommand.h>
 
 class ReplaceMeInstantCommand : public frc::InstantCommand {
  public:

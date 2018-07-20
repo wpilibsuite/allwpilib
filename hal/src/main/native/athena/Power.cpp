@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Power.h"
+#include "hal/Power.h"
 
 #include <memory>
 
-#include "HAL/ChipObject.h"
 #include "HALInitializer.h"
+#include "hal/ChipObject.h"
 
 using namespace hal;
 

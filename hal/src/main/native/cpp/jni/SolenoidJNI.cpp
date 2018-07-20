@@ -7,12 +7,12 @@
 
 #include <jni.h>
 
-#include "HAL/Ports.h"
-#include "HAL/Solenoid.h"
-#include "HAL/cpp/Log.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_SolenoidJNI.h"
+#include "hal/Ports.h"
+#include "hal/Solenoid.h"
+#include "hal/cpp/Log.h"
+#include "hal/handles/HandlesInternal.h"
 
 using namespace frc;
 

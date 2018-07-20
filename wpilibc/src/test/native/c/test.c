@@ -5,7 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <HAL/HAL.h>
-
-#include "cscore.h"
-#include "ntcore.h"
+#include <cscore.h>
+#include <hal/HAL.h>
+#include <ntcore.h>

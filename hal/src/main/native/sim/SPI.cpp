@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/SPI.h"
+#include "hal/SPI.h"
 
 #include "HALInitializer.h"
-#include "MockData/SPIDataInternal.h"
+#include "mockdata/SPIDataInternal.h"
 
 using namespace hal;
 

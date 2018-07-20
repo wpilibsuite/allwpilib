@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Spark.h"
+#include "frc/Spark.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
 using namespace frc;
 

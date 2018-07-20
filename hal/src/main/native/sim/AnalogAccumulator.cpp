@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/AnalogAccumulator.h"
+#include "hal/AnalogAccumulator.h"
 
 #include "AnalogInternal.h"
-#include "MockData/AnalogInDataInternal.h"
+#include "mockdata/AnalogInDataInternal.h"
 
 using namespace hal;
 

@@ -5,18 +5,18 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "SPI.h"
+#include "frc/SPI.h"
 
 #include <cstring>
 
-#include <HAL/HAL.h>
-#include <HAL/SPI.h>
+#include <hal/HAL.h>
+#include <hal/SPI.h>
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
 
-#include "DigitalSource.h"
-#include "Notifier.h"
-#include "WPIErrors.h"
+#include "frc/DigitalSource.h"
+#include "frc/Notifier.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

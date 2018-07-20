@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "circular_buffer.h"  // NOLINT(build/include_order)
+#include "frc/circular_buffer.h"  // NOLINT(build/include_order)
 
 #include <array>
 

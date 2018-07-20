@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/PDP.h"
+#include "hal/PDP.h"
 
 #include "CANAPIInternal.h"
-#include "HAL/CANAPI.h"
-#include "HAL/handles/IndexedHandleResource.h"
 #include "HALInitializer.h"
-#include "MockData/PDPDataInternal.h"
 #include "PortsInternal.h"
+#include "hal/CANAPI.h"
+#include "hal/handles/IndexedHandleResource.h"
+#include "mockdata/PDPDataInternal.h"
 
 using namespace hal;
 

@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "GenericHID.h"
+#include "frc/GenericHID.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "DriverStation.h"
-#include "WPIErrors.h"
+#include "frc/DriverStation.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

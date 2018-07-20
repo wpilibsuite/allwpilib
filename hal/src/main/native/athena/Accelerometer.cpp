@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Accelerometer.h"
+#include "hal/Accelerometer.h"
 
 #include <stdint.h>
 
@@ -13,9 +13,9 @@
 #include <cstdio>
 #include <memory>
 
-#include "HAL/ChipObject.h"
-#include "HAL/HAL.h"
 #include "HALInitializer.h"
+#include "hal/ChipObject.h"
+#include "hal/HAL.h"
 
 using namespace hal;
 

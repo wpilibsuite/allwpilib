@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "HAL/Types.h"
+#include "hal/Types.h"
 
 namespace hal {
 namespace can {

@@ -5,20 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DigitalGlitchFilter.h"
+#include "frc/DigitalGlitchFilter.h"
 
 #include <algorithm>
 #include <array>
 
-#include <HAL/Constants.h>
-#include <HAL/DIO.h>
-#include <HAL/HAL.h>
+#include <hal/Constants.h>
+#include <hal/DIO.h>
+#include <hal/HAL.h>
 
-#include "Counter.h"
-#include "Encoder.h"
-#include "SensorUtil.h"
-#include "Utility.h"
-#include "WPIErrors.h"
+#include "frc/Counter.h"
+#include "frc/Encoder.h"
+#include "frc/SensorUtil.h"
+#include "frc/Utility.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

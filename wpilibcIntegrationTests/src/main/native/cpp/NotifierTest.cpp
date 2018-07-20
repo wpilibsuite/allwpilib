@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Notifier.h"  // NOLINT(build/include_order)
+#include "frc/Notifier.h"  // NOLINT(build/include_order)
 
 #include <wpi/raw_ostream.h>
 
 #include "TestBench.h"
-#include "Timer.h"
+#include "frc/Timer.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

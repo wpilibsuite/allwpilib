@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Filters/LinearDigitalFilter.h"  // NOLINT(build/include_order)
+#include "frc/filters/LinearDigitalFilter.h"  // NOLINT(build/include_order)
 
 #include <cmath>
 #include <functional>
@@ -13,8 +13,8 @@
 #include <random>
 #include <thread>
 
-#include "Base.h"
 #include "TestBench.h"
+#include "frc/Base.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
