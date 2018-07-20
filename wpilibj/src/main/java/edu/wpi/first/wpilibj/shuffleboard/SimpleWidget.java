@@ -9,22 +9,15 @@ package edu.wpi.first.wpilibj.shuffleboard;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableType;
 
+/**
+ * A Shuffleboard widget that handles a single data point such as a number or string.
+ */
 public final class SimpleWidget extends ShuffleboardWidget<SimpleWidget> {
-  private final NetworkTableType m_dataType;
   private NetworkTableEntry m_entry;
 
-  SimpleWidget(ShuffleboardContainer parent, String title, NetworkTableType dataType) {
+  SimpleWidget(ShuffleboardContainer parent, String title) {
     super(parent, title);
-    m_dataType = dataType;
-  }
-
-  /**
-   * Gets the data type for the data in this widget.
-   */
-  public NetworkTableType getDataType() {
-    return m_dataType;
   }
 
   /**
@@ -40,7 +33,6 @@ public final class SimpleWidget extends ShuffleboardWidget<SimpleWidget> {
   @Override
   public void buildInto(NetworkTable parentTable, NetworkTable metaTable) {
     buildMetadata(metaTable);
-    metaTable.getEntry("data_type").setString(m_dataType.name());
     if (m_entry == null) {
       m_entry = parentTable.getEntry(getTitle());
     }
@@ -52,7 +44,7 @@ public final class SimpleWidget extends ShuffleboardWidget<SimpleWidget> {
       parent = ((ShuffleboardLayout) parent).getParent();
     }
     ShuffleboardTab tab = (ShuffleboardTab) parent;
-    tab.getShuffleboardInstance().update();
+    tab.getRoot().update();
   }
 
 }

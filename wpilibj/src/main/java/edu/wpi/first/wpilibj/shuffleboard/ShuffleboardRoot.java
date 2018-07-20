@@ -7,6 +7,10 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+/**
+ * The root of the data placed in Shuffleboard. It contains the tabs, but no data is placed
+ * directly in the root.
+ */
 public interface ShuffleboardRoot {
 
   /**

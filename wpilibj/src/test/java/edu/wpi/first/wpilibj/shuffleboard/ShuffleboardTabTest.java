@@ -131,17 +131,6 @@ public class ShuffleboardTabTest {
     assertThrows(IllegalArgumentException.class, () -> tab.add("foo", "baz"));
   }
 
-  @Test
-  public void testAutopopulate() {
-    String prefix = "network_table:///SmartDashboard/";
-    tab.autopopulate(prefix);
-    instance.update();
-
-    assertEquals(prefix,
-                 ntInstance.getEntry("/Shuffleboard/.metadata/Tab/Autopopulate").getString(null),
-                 "Autopopulate metadata not set");
-  }
-
   /**
    * Stub for Java 9 {@code Map.of()}.
    */

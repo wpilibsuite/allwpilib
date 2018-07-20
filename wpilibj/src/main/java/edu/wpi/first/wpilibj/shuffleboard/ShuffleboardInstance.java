@@ -14,7 +14,7 @@ import java.util.Objects;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-public final class ShuffleboardInstance implements ShuffleboardRoot {
+final class ShuffleboardInstance implements ShuffleboardRoot {
   private final Map<String, ShuffleboardTab> m_tabs = new LinkedHashMap<>(); // NOPMD
 
   private final NetworkTable m_rootTable;

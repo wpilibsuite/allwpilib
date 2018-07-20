@@ -20,12 +20,11 @@ import edu.wpi.first.wpilibj.Sendable;
  */
 public final class ShuffleboardTab implements ShuffleboardContainer {
   private final ContainerHelper m_helper = new ContainerHelper(this);
-  private final ShuffleboardInstance m_instance;
+  private final ShuffleboardRoot m_root;
   private final String m_title;
-  private String m_autopopulatePrefix;
 
-  ShuffleboardTab(ShuffleboardInstance instance, String title) {
-    m_instance = instance;
+  ShuffleboardTab(ShuffleboardRoot root, String title) {
+    m_root = root;
     m_title = title;
   }
 
@@ -34,22 +33,8 @@ public final class ShuffleboardTab implements ShuffleboardContainer {
     return m_title;
   }
 
-  ShuffleboardInstance getShuffleboardInstance() {
-    return m_instance;
-  }
-
-  public String getAutopopulatePrefix() {
-    return m_autopopulatePrefix;
-  }
-
-  /**
-   * Sets this tab to autopopulate with data whose names begin with the given string.
-   *
-   * @return this tab
-   */
-  public ShuffleboardTab autopopulate(String sourcePrefix) {
-    m_autopopulatePrefix = sourcePrefix;
-    return this;
+  ShuffleboardRoot getRoot() {
+    return m_root;
   }
 
   @Override
@@ -79,9 +64,6 @@ public final class ShuffleboardTab implements ShuffleboardContainer {
 
   @Override
   public void buildInto(NetworkTable parentTable, NetworkTable metaTable) {
-    if (m_autopopulatePrefix != null) {
-      metaTable.getEntry("Autopopulate").forceSetString(m_autopopulatePrefix);
-    }
     NetworkTable tabTable = parentTable.getSubTable(m_title);
     tabTable.getEntry(".type").setString("ShuffleboardTab");
     for (ShuffleboardComponent<?> component : m_helper.getComponents()) {

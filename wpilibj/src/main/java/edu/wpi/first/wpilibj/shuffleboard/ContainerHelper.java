@@ -15,16 +15,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import edu.wpi.first.networktables.NetworkTableType;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
-
-import static edu.wpi.first.networktables.NetworkTableType.kBoolean;
-import static edu.wpi.first.networktables.NetworkTableType.kBooleanArray;
-import static edu.wpi.first.networktables.NetworkTableType.kDouble;
-import static edu.wpi.first.networktables.NetworkTableType.kDoubleArray;
-import static edu.wpi.first.networktables.NetworkTableType.kRaw;
-import static edu.wpi.first.networktables.NetworkTableType.kString;
-import static edu.wpi.first.networktables.NetworkTableType.kStringArray;
 
 /**
  * A helper class for Shuffleboard containers to handle common child operations.
@@ -71,37 +63,19 @@ final class ContainerHelper {
     Objects.requireNonNull(title, "Title cannot be null");
     Objects.requireNonNull(data, "Data cannot be null");
     checkTitle(title);
+    checkNtType(data);
 
-    NetworkTableType type = getNtTypeFor(data);
-
-    SimpleWidget widget = new SimpleWidget(m_container, title, type);
+    SimpleWidget widget = new SimpleWidget(m_container, title);
     m_components.add(widget);
     widget.getEntry().forceSetValue(data);
     return widget;
   }
 
-  @SuppressWarnings("PMD")
-  private static NetworkTableType getNtTypeFor(Object data) {
-    NetworkTableType type;
-    if (data instanceof Number) {
-      type = kDouble;
-    } else if (data instanceof Boolean) {
-      type = kBoolean;
-    } else if (data instanceof String) {
-      type = kString;
-    } else if (data instanceof double[] || data instanceof Double[] || data instanceof Number[]) {
-      type = kDoubleArray;
-    } else if (data instanceof boolean[] || data instanceof Boolean[]) {
-      type = kBooleanArray;
-    } else if (data instanceof String[]) {
-      type = kStringArray;
-    } else if (data instanceof byte[] || data instanceof Byte[]) {
-      type = kRaw;
-    } else {
+  private static void checkNtType(Object data) {
+    if (!NetworkTableEntry.isValidDataType(data)) {
       throw new IllegalArgumentException(
           "Cannot add data of type " + data.getClass().getName() + " to Shuffleboard");
     }
-    return type;
   }
 
   private void checkTitle(String title) {
