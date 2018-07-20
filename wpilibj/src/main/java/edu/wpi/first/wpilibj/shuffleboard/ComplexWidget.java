@@ -41,7 +41,7 @@ public final class ComplexWidget extends ShuffleboardWidget<ComplexWidget> {
    * package-private to prevent users from enabling control themselves.
    */
   void enableUserControl() {
-    m_builder.stopLiveWindowMode();
+    m_builder.startLiveWindowMode();
   }
 
   /**
@@ -49,7 +49,7 @@ public final class ComplexWidget extends ShuffleboardWidget<ComplexWidget> {
    * package-private to prevent users from enabling control themselves.
    */
   void disableUserControl() {
-    m_builder.startLiveWindowMode();
+    m_builder.stopLiveWindowMode();
   }
 
 }
