@@ -11,6 +11,10 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 
+/**
+ * A Shuffleboard widget that handles a {@link Sendable} object such as a speed controller or
+ * sensor.
+ */
 public final class ComplexWidget extends ShuffleboardWidget<ComplexWidget> {
   private final Sendable m_sendable;
   private SendableBuilderImpl m_builder;
@@ -30,6 +34,22 @@ public final class ComplexWidget extends ShuffleboardWidget<ComplexWidget> {
       m_builder.startListeners();
     }
     m_builder.updateTable();
+  }
+
+  /**
+   * Enables user control of this widget in the Shuffleboard application. This method is
+   * package-private to prevent users from enabling control themselves.
+   */
+  void enableUserControl() {
+    m_builder.stopLiveWindowMode();
+  }
+
+  /**
+   * Disables user control of this widget in the Shuffleboard application. This method is
+   * package-private to prevent users from enabling control themselves.
+   */
+  void disableUserControl() {
+    m_builder.startLiveWindowMode();
   }
 
 }

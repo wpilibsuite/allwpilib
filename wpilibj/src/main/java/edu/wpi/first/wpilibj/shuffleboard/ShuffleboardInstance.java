@@ -45,4 +45,27 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
     }
   }
 
+  @Override
+  public void enableActuatorWidgets() {
+    for (ShuffleboardTab tab : m_tabs.values()) {
+      for (ShuffleboardComponent<?> component : tab.getComponents()) {
+        if (component instanceof ComplexWidget) {
+          ComplexWidget complexWidget = (ComplexWidget) component;
+          complexWidget.enableUserControl();
+        }
+      }
+    }
+  }
+
+  @Override
+  public void disableActuatorWidgets() {
+    for (ShuffleboardTab tab : m_tabs.values()) {
+      for (ShuffleboardComponent<?> component : tab.getComponents()) {
+        if (component instanceof ComplexWidget) {
+          ComplexWidget complexWidget = (ComplexWidget) component;
+          complexWidget.disableUserControl();
+        }
+      }
+    }
+  }
 }

@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj.shuffleboard;
 
 import edu.wpi.first.networktables.NetworkTable;
 
-public interface ShuffleboardValue {
+interface ShuffleboardValue {
 
   /**
    * Gets the title of this Shuffleboard value.

@@ -10,9 +10,11 @@ package edu.wpi.first.wpilibj.shuffleboard;
 /**
  * Abstract superclass for widgets.
  *
+ * <p>This class is package-private to minimize API surface area.
+ *
  * @param <W> the self type
  */
-public abstract class ShuffleboardWidget<W extends ShuffleboardWidget<W>>
+abstract class ShuffleboardWidget<W extends ShuffleboardWidget<W>>
     extends ShuffleboardComponent<W> {
 
   ShuffleboardWidget(ShuffleboardContainer parent, String title) {

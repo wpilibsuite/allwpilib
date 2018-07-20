@@ -80,4 +80,24 @@ public final class Shuffleboard {
     return root.getTab(title);
   }
 
+  /**
+   * Enables user control of widgets containing actuators: speed controllers, relays, etc. This
+   * should only be used when the robot is in test mode. IterativeRobotBase and SampleRobot are
+   * both configured to call this method when entering test mode; most users should not need to use
+   * this method directly.
+   */
+  public static void enableActuatorWidgets() {
+    root.enableActuatorWidgets();
+  }
+
+  /**
+   * Disables user control of widgets containing actuators. For safety reasons, actuators should
+   * only be controlled while in test mode. IterativeRobotBase and SampleRobot are both configured
+   * to call this method when exiting in test mode; most users should not need to use
+   * this method directly.
+   */
+  public static void disableActuatorWidgets() {
+    root.disableActuatorWidgets();
+  }
+
 }
