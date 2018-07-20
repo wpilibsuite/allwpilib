@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "GamepadBase.h"
+#include "frc/GamepadBase.h"
 
 using namespace frc;
 

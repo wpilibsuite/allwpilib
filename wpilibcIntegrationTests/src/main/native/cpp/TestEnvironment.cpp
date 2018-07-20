@@ -7,12 +7,12 @@
 
 #include <cstdlib>
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 #include <wpi/raw_ostream.h>
 
-#include "DriverStation.h"
-#include "LiveWindow/LiveWindow.h"
-#include "Timer.h"
+#include "frc/DriverStation.h"
+#include "frc/Timer.h"
+#include "frc/livewindow/LiveWindow.h"
 #include "gtest/gtest.h"
 #include "mockds/MockDS.h"
 

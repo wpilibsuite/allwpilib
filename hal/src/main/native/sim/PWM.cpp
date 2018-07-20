@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/PWM.h"
+#include "hal/PWM.h"
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
-#include "MockData/PWMDataInternal.h"
 #include "PortsInternal.h"
+#include "hal/handles/HandlesInternal.h"
+#include "mockdata/PWMDataInternal.h"
 
 using namespace hal;
 

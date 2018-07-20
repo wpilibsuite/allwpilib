@@ -5,15 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Preferences.h"
+#include "frc/Preferences.h"
 
 #include <algorithm>
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/StringRef.h>
 
-#include "WPIErrors.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

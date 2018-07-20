@@ -9,11 +9,10 @@
 
 #include <string>
 
-#include <HAL/Power.h>
-
-#include "MockData/AnalogInData.h"
-#include "MockData/HAL_Value.h"
-#include "MockData/NotifyListener.h"
+#include <hal/Power.h>
+#include <mockdata/AnalogInData.h>
+#include <mockdata/HAL_Value.h>
+#include <mockdata/NotifyListener.h>
 
 static void init_callback(const char* name, void* param,
                           const struct HAL_Value* value) {

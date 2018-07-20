@@ -5,16 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PWM.h"
+#include "frc/PWM.h"
 
-#include <HAL/HAL.h>
-#include <HAL/PWM.h>
-#include <HAL/Ports.h>
+#include <hal/HAL.h>
+#include <hal/PWM.h>
+#include <hal/Ports.h>
 
-#include "SensorUtil.h"
-#include "SmartDashboard/SendableBuilder.h"
-#include "Utility.h"
-#include "WPIErrors.h"
+#include "frc/SensorUtil.h"
+#include "frc/Utility.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

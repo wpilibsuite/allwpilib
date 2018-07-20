@@ -10,9 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <mockdata/NotifyListenerVector.h>
 #include <wpi/mutex.h>
-
-#include "MockData/NotifyListenerVector.h"
 
 namespace hal {
 class ADXRS450_SpiGyroWrapper {

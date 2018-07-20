@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "AnalogInput.h"
+#include "frc/AnalogInput.h"
 
-#include <HAL/AnalogAccumulator.h>
-#include <HAL/AnalogInput.h>
-#include <HAL/HAL.h>
-#include <HAL/Ports.h>
+#include <hal/AnalogAccumulator.h>
+#include <hal/AnalogInput.h>
+#include <hal/HAL.h>
+#include <hal/Ports.h>
 
-#include "SensorUtil.h"
-#include "SmartDashboard/SendableBuilder.h"
-#include "Timer.h"
-#include "WPIErrors.h"
+#include "frc/SensorUtil.h"
+#include "frc/Timer.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

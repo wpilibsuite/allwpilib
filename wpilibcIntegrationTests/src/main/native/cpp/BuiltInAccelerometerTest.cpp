@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "BuiltInAccelerometer.h"  // NOLINT(build/include_order)
+#include "frc/BuiltInAccelerometer.h"  // NOLINT(build/include_order)
 
-#include "Timer.h"
+#include "frc/Timer.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

@@ -9,9 +9,9 @@
 
 #include <string>
 
-#include "MockData/EncoderData.h"
-#include "MockData/HAL_Value.h"
-#include "MockData/NotifyListener.h"
+#include <mockdata/EncoderData.h>
+#include <mockdata/HAL_Value.h>
+#include <mockdata/NotifyListener.h>
 
 static void encoder_init_callback(const char* name, void* param,
                                   const struct HAL_Value* value) {

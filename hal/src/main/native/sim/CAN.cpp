@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/CAN.h"
+#include "hal/CAN.h"
 
-#include "MockData/CanDataInternal.h"
+#include "mockdata/CanDataInternal.h"
 
 using namespace hal;
 

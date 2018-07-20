@@ -5,19 +5,19 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "IterativeRobotBase.h"
+#include "frc/IterativeRobotBase.h"
 
 #include <cstdio>
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
-#include "Commands/Scheduler.h"
-#include "DriverStation.h"
-#include "LiveWindow/LiveWindow.h"
-#include "SmartDashboard/SmartDashboard.h"
-#include "Timer.h"
+#include "frc/DriverStation.h"
+#include "frc/Timer.h"
+#include "frc/commands/Scheduler.h"
+#include "frc/livewindow/LiveWindow.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 
 using namespace frc;
 

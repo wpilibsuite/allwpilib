@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Drive/DifferentialDrive.h"
-#include "Drive/MecanumDrive.h"
 #include "MockSpeedController.h"
-#include "RobotDrive.h"
 #include "TestBench.h"
+#include "frc/RobotDrive.h"
+#include "frc/drive/DifferentialDrive.h"
+#include "frc/drive/MecanumDrive.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

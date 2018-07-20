@@ -7,15 +7,15 @@
 
 #include "OI.h"
 
-#include <SmartDashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
-#include "Commands/Autonomous.h"
-#include "Commands/CloseClaw.h"
-#include "Commands/OpenClaw.h"
-#include "Commands/Pickup.h"
-#include "Commands/Place.h"
-#include "Commands/PrepareToPickup.h"
-#include "Commands/SetElevatorSetpoint.h"
+#include "commands/Autonomous.h"
+#include "commands/CloseClaw.h"
+#include "commands/OpenClaw.h"
+#include "commands/Pickup.h"
+#include "commands/Place.h"
+#include "commands/PrepareToPickup.h"
+#include "commands/SetElevatorSetpoint.h"
 
 OI::OI() {
   frc::SmartDashboard::PutData("Open Claw", new OpenClaw());

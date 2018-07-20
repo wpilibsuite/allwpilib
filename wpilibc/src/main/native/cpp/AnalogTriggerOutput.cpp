@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "AnalogTriggerOutput.h"
+#include "frc/AnalogTriggerOutput.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "AnalogTrigger.h"
-#include "WPIErrors.h"
+#include "frc/AnalogTrigger.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

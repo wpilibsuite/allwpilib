@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "RobotController.h"
+#include "frc/RobotController.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "ErrorBase.h"
+#include "frc/ErrorBase.h"
 
 using namespace frc;
 

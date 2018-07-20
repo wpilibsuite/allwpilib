@@ -9,13 +9,13 @@
 
 #include <cassert>
 
-#include "HAL/DIO.h"
-#include "HAL/PWM.h"
-#include "HAL/Ports.h"
-#include "HAL/cpp/Log.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_DIOJNI.h"
+#include "hal/DIO.h"
+#include "hal/PWM.h"
+#include "hal/Ports.h"
+#include "hal/cpp/Log.h"
+#include "hal/handles/HandlesInternal.h"
 
 using namespace frc;
 

@@ -9,11 +9,11 @@
 
 #include <string>
 
-#include <Drive/DifferentialDrive.h>
-#include <Joystick.h>
-#include <SampleRobot.h>
-#include <SmartDashboard/SendableChooser.h>
-#include <Spark.h>
+#include <frc/Joystick.h>
+#include <frc/SampleRobot.h>
+#include <frc/Spark.h>
+#include <frc/drive/DifferentialDrive.h>
+#include <frc/smartdashboard/SendableChooser.h>
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class. The

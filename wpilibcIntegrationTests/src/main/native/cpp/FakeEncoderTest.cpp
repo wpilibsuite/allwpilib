@@ -5,13 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Encoder.h"  // NOLINT(build/include_order)
+#include "frc/Encoder.h"  // NOLINT(build/include_order)
 
-#include "AnalogOutput.h"
-#include "AnalogTrigger.h"
-#include "DigitalOutput.h"
 #include "TestBench.h"
-#include "Timer.h"
+#include "frc/AnalogOutput.h"
+#include "frc/AnalogTrigger.h"
+#include "frc/DigitalOutput.h"
+#include "frc/Timer.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

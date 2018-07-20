@@ -10,10 +10,10 @@
 #include <cassert>
 #include <cstdio>
 
-#include "HAL/Notifier.h"
-#include "HAL/cpp/Log.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_NotifierJNI.h"
+#include "hal/Notifier.h"
+#include "hal/cpp/Log.h"
 
 using namespace frc;
 

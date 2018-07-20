@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/HAL.h"
-#include "HAL/handles/IndexedClassedHandleResource.h"
 #include "gtest/gtest.h"
+#include "hal/HAL.h"
+#include "hal/handles/IndexedClassedHandleResource.h"
 
 #define HAL_TestHandle HAL_Handle
 

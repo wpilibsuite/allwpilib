@@ -8,8 +8,8 @@
 #include <jni.h>
 
 #include "CallbackStore.h"
-#include "MockData/PDPData.h"
 #include "edu_wpi_first_hal_sim_mockdata_PDPDataJNI.h"
+#include "mockdata/PDPData.h"
 
 extern "C" {
 

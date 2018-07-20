@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "GyroBase.h"
+#include "frc/GyroBase.h"
 
-#include "SmartDashboard/SendableBuilder.h"
-#include "WPIErrors.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

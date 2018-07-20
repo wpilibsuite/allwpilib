@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "SensorUtil.h"
+#include "frc/SensorUtil.h"
 
-#include <HAL/AnalogInput.h>
-#include <HAL/AnalogOutput.h>
-#include <HAL/DIO.h>
-#include <HAL/HAL.h>
-#include <HAL/PDP.h>
-#include <HAL/PWM.h>
-#include <HAL/Ports.h>
-#include <HAL/Relay.h>
-#include <HAL/Solenoid.h>
+#include <hal/AnalogInput.h>
+#include <hal/AnalogOutput.h>
+#include <hal/DIO.h>
+#include <hal/HAL.h>
+#include <hal/PDP.h>
+#include <hal/PWM.h>
+#include <hal/Ports.h>
+#include <hal/Relay.h>
+#include <hal/Solenoid.h>
 
 using namespace frc;
 

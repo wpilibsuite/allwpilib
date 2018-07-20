@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <Buttons/JoystickButton.h>
-#include <Joystick.h>
+#include <frc/Joystick.h>
+#include <frc/buttons/JoystickButton.h>
 
-#include "Triggers/DoubleButton.h"
+#include "triggers/DoubleButton.h"
 
 class OI {
  public:

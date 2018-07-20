@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Relay.h"
+#include "frc/Relay.h"
 
-#include <HAL/HAL.h>
-#include <HAL/Ports.h>
-#include <HAL/Relay.h>
+#include <hal/HAL.h>
+#include <hal/Ports.h>
+#include <hal/Relay.h>
 #include <wpi/raw_ostream.h>
 
-#include "MotorSafetyHelper.h"
-#include "SensorUtil.h"
-#include "SmartDashboard/SendableBuilder.h"
-#include "WPIErrors.h"
+#include "frc/MotorSafetyHelper.h"
+#include "frc/SensorUtil.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

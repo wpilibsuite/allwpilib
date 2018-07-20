@@ -9,9 +9,10 @@
 
 #include <string>
 
-#include "MockData/HAL_Value.h"
-#include "MockData/NotifyListener.h"
-#include "MockData/PCMData.h"
+#include <mockdata/HAL_Value.h>
+#include <mockdata/NotifyListener.h>
+#include <mockdata/PCMData.h>
+
 #include "simulation/gz_msgs/msgs.h"
 
 static void init_callback(const char* name, void* param,

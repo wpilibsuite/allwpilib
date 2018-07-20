@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Accelerometer.h"
+#include "hal/Accelerometer.h"
 
-#include "MockData/AccelerometerDataInternal.h"
+#include "mockdata/AccelerometerDataInternal.h"
 
 using namespace hal;
 

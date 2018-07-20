@@ -7,8 +7,8 @@
 
 #include "NTProvider_dPWM.h"
 
-#include <HAL/Ports.h>
-#include <MockData/DigitalPWMData.h>
+#include <hal/Ports.h>
+#include <mockdata/DigitalPWMData.h>
 
 void HALSimNTProviderDigitalPWM::Initialize() {
   InitializeDefault(HAL_GetNumDigitalPWMOutputs(),

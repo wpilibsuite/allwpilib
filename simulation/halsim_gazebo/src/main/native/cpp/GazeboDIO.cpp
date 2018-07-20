@@ -9,9 +9,9 @@
 
 #include <string>
 
-#include "MockData/DIOData.h"
-#include "MockData/HAL_Value.h"
-#include "MockData/NotifyListener.h"
+#include <mockdata/DIOData.h>
+#include <mockdata/HAL_Value.h>
+#include <mockdata/NotifyListener.h>
 
 static void init_callback(const char* name, void* param,
                           const struct HAL_Value* value) {

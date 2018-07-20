@@ -15,7 +15,7 @@
 
 #include <DSCommJoystickPacket.h>
 #include <FRCComm.h>
-#include <MockData/DriverStationData.h>
+#include <mockdata/DriverStationData.h>
 
 class DSCommPacket {
  public:

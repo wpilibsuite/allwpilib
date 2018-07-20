@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ADXL362.h"
+#include "frc/ADXL362.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "DriverStation.h"
-#include "SmartDashboard/SendableBuilder.h"
+#include "frc/DriverStation.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

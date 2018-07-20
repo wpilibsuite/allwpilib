@@ -7,8 +7,8 @@
 
 #include "ReplaceMePIDSubsystem.h"
 
-#include <LiveWindow/LiveWindow.h>
-#include <SmartDashboard/SmartDashboard.h>
+#include <frc/livewindow/LiveWindow.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 ReplaceMePIDSubsystem::ReplaceMePIDSubsystem()
     : PIDSubsystem("ReplaceMePIDSubsystem", 1.0, 0.0, 0.0) {

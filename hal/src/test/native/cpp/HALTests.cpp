@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/HAL.h"
-#include "HAL/Solenoid.h"
 #include "gtest/gtest.h"
+#include "hal/HAL.h"
+#include "hal/Solenoid.h"
 
 namespace hal {
 TEST(HALTests, RuntimeType) {

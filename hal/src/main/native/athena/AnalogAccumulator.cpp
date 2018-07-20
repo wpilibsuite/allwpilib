@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/AnalogAccumulator.h"
+#include "hal/AnalogAccumulator.h"
 
 #include "AnalogInternal.h"
-#include "HAL/HAL.h"
+#include "hal/HAL.h"
 
 using namespace hal;
 

@@ -11,7 +11,7 @@
 #include <memory>
 #include <thread>
 
-#include <MockData/DriverStationData.h>
+#include <mockdata/DriverStationData.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/mutex.h>
 
