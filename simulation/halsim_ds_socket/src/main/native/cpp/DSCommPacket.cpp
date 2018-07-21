@@ -14,7 +14,7 @@
 #include <thread>
 #include <vector>
 
-#include <FRC_NetworkCommunication/FRCComm.h>
+#include <FRCComm.h>
 #include <MockData/DriverStationData.h>
 
 /*----------------------------------------------------------------------------

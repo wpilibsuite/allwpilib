@@ -14,7 +14,7 @@
 #include <vector>
 
 #include <DSCommJoystickPacket.h>
-#include <FRC_NetworkCommunication/FRCComm.h>
+#include <FRCComm.h>
 #include <MockData/DriverStationData.h>
 
 class DSCommPacket {

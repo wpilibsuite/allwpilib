@@ -21,6 +21,7 @@
 
 #if defined(Win32) || defined(_WIN32)
 #include <windows.h>
+#pragma comment(lib, "Ws2_32.lib")
 #else
 #include <arpa/inet.h>
 #include <sys/socket.h>
