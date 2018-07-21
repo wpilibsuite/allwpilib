@@ -7,6 +7,8 @@
 
 #include <jni.h>
 
+#include <cstring>
+
 #include <wpi/jni_util.h>
 
 #include "CallbackStore.h"
@@ -403,13 +405,15 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setMatchInfo
   JStringRef gameSpecificMessageRef{env, gameSpecificMessage};
 
   HAL_MatchInfo halMatchInfo;
-  halMatchInfo.eventName = const_cast<char*>(eventNameRef.c_str());
-  halMatchInfo.gameSpecificMessage =
-      const_cast<char*>(gameSpecificMessageRef.c_str());
+  std::snprintf(halMatchInfo.eventName, sizeof(halMatchInfo.eventName), "%s",
+                eventNameRef.c_str());
+  std::snprintf(reinterpret_cast<char*>(halMatchInfo.gameSpecificMessage),
+                sizeof(halMatchInfo.gameSpecificMessage), "%s",
+                gameSpecificMessageRef.c_str());
+  halMatchInfo.gameSpecificMessageSize = gameSpecificMessageRef.size();
   halMatchInfo.matchType = (HAL_MatchType)matchType;
   halMatchInfo.matchNumber = matchNumber;
   halMatchInfo.replayNumber = replayNumber;
-
   HALSIM_SetMatchInfo(&halMatchInfo);
 }
 
