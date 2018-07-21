@@ -92,11 +92,12 @@ struct HAL_JoystickDescriptor {
 typedef struct HAL_JoystickDescriptor HAL_JoystickDescriptor;
 
 struct HAL_MatchInfo {
-  char* eventName;
+  char eventName[64];
   HAL_MatchType matchType;
   uint16_t matchNumber;
   uint8_t replayNumber;
-  char* gameSpecificMessage;
+  uint8_t gameSpecificMessage[64];
+  uint16_t gameSpecificMessageSize;
 };
 typedef struct HAL_MatchInfo HAL_MatchInfo;
 
@@ -264,19 +265,10 @@ double HAL_GetMatchTime(int32_t* status);
 /**
  * Gets info about a specific match.
  *
- * Note that the match info must be freed with HAL_FreeMatchInfo
- *
  * @param info the match info (output)
  * @return     the error code, or 0 for success
  */
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info);
-
-/**
- * Frees a match info structure allocated with HAL_GetMatchInfo.
- *
- * @param info the match info
- */
-void HAL_FreeMatchInfo(HAL_MatchInfo* info);
 
 #ifndef HAL_USE_LABVIEW
 

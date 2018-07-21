@@ -40,7 +40,7 @@ void Encoder::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 
   // Connect to Gazebo transport for messaging
   std::string scoped_name =
-      model->GetWorld()->GetName() + "::" + model->GetScopedName();
+      model->GetWorld()->Name() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init(scoped_name);
@@ -87,9 +87,9 @@ void Encoder::Callback(const gazebo::msgs::ConstStringPtr& msg) {
 
 double Encoder::GetAngle() {
   if (radians) {
-    return joint->GetAngle(0).Radian();
+    return joint->Position(0);
   } else {
-    return joint->GetAngle(0).Degree();
+    return joint->Position(0) * (180.0 / M_PI);
   }
 }
 

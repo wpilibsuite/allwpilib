@@ -7,6 +7,7 @@ apply plugin: 'edu.wpi.first.NativeUtils'
 
 /* The simulation does not run on real hardware; so we always skip Athena */
 ext.skipAthena = true
+apply from: "${rootDir}/shared/config.gradle"
 
 repositories {
       mavenCentral()

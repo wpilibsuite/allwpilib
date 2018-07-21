@@ -46,7 +46,7 @@ void Potentiometer::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 
   // Connect to Gazebo transport for messaging
   std::string scoped_name =
-      model->GetWorld()->GetName() + "::" + model->GetScopedName();
+      model->GetWorld()->Name() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init(scoped_name);
@@ -59,12 +59,11 @@ void Potentiometer::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 }
 
 void Potentiometer::Update(const gazebo::common::UpdateInfo& info) {
-  joint->GetAngle(0).Normalize();
   gazebo::msgs::Float64 msg;
   if (radians) {
-    msg.set_data(joint->GetAngle(0).Radian() * multiplier);
+    msg.set_data(joint->Position(0) * multiplier);
   } else {
-    msg.set_data(joint->GetAngle(0).Degree() * multiplier);
+    msg.set_data(joint->Position(0) * (180.0 / M_PI) * multiplier);
   }
   pub->Publish(msg);
 }

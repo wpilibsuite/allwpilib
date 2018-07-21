@@ -56,7 +56,7 @@ void PneumaticPiston::Load(gazebo::physics::ModelPtr model,
 
   // Connect to Gazebo transport for messaging
   std::string scoped_name =
-      model->GetWorld()->GetName() + "::" + model->GetScopedName();
+      model->GetWorld()->Name() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init(scoped_name);

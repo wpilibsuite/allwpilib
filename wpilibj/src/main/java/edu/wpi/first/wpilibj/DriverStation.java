@@ -559,12 +559,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    m_cacheDataMutex.lock();
-    try {
-      return HAL.getJoystickIsXbox((byte) stick) == 1;
-    } finally {
-      m_cacheDataMutex.unlock();
-    }
+    return HAL.getJoystickIsXbox((byte) stick) == 1;
   }
 
   /**
@@ -578,12 +573,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    m_cacheDataMutex.lock();
-    try {
-      return HAL.getJoystickType((byte) stick);
-    } finally {
-      m_cacheDataMutex.unlock();
-    }
+    return HAL.getJoystickType((byte) stick);
   }
 
   /**
@@ -597,12 +587,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    m_cacheDataMutex.lock();
-    try {
-      return HAL.getJoystickName((byte) stick);
-    } finally {
-      m_cacheDataMutex.unlock();
-    }
+    return HAL.getJoystickName((byte) stick);
   }
 
   /**
@@ -617,12 +602,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    m_cacheDataMutex.lock();
-    try {
-      return HAL.getJoystickAxisType((byte) stick, (byte) axis);
-    } finally {
-      m_cacheDataMutex.unlock();
-    }
+    return HAL.getJoystickAxisType((byte) stick, (byte) axis);
   }
 
   /**

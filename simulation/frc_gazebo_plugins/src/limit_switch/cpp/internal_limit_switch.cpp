@@ -28,11 +28,10 @@ InternalLimitSwitch::InternalLimitSwitch(gazebo::physics::ModelPtr model,
 
 bool InternalLimitSwitch::Get() {
   double value;
-  joint->GetAngle(0).Normalize();
   if (radians) {
-    value = joint->GetAngle(0).Radian();
+    value = joint->Position(0);
   } else {
-    value = joint->GetAngle(0).Degree();
+    value = joint->Position(0) * (180.0 / M_PI);
   }
   return value >= min && value <= max;
 }

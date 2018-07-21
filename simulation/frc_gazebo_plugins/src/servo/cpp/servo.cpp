@@ -42,7 +42,7 @@ void Servo::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 
   // Connect to Gazebo transport for messaging
   std::string scoped_name =
-      model->GetWorld()->GetName() + "::" + model->GetScopedName();
+      model->GetWorld()->Name() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init(scoped_name);
@@ -57,9 +57,9 @@ void Servo::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 void Servo::Update(const gazebo::common::UpdateInfo& info) {
   // torque is in kg*cm
   // joint->SetAngle(0,signal*180);
-  if (joint->GetAngle(0) < signal) {
+  if (joint->Position(0) < signal) {
     joint->SetForce(0, torque);
-  } else if (joint->GetAngle(0) > signal) {
+  } else if (joint->Position(0) > signal) {
     joint->SetForce(0, torque);
   }
   joint->SetForce(0, 0);

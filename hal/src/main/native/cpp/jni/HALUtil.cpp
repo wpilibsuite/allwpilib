@@ -256,10 +256,13 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
       env->GetMethodID(matchInfoDataCls, "setData",
                        "(Ljava/lang/String;Ljava/lang/String;III)V");
 
-  env->CallVoidMethod(matchStatus, func, MakeJString(env, matchInfo.eventName),
-                      MakeJString(env, matchInfo.gameSpecificMessage),
-                      (jint)matchInfo.matchNumber, (jint)matchInfo.replayNumber,
-                      (jint)matchInfo.matchType);
+  env->CallVoidMethod(
+      matchStatus, func, MakeJString(env, matchInfo.eventName),
+      MakeJString(env, wpi::StringRef{reinterpret_cast<const char*>(
+                                          matchInfo.gameSpecificMessage),
+                                      matchInfo.gameSpecificMessageSize}),
+      (jint)matchInfo.matchNumber, (jint)matchInfo.replayNumber,
+      (jint)matchInfo.matchType);
 }
 
 void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
