@@ -19,20 +19,15 @@ class MatchInfoDataTest {
   @Test
   void testSetMatchInfo() {
 
-    MatchInfoData inMatchInfo = new MatchInfoData();
-    inMatchInfo.eventName = "Event Name";
-    inMatchInfo.gameSpecificMessage = "Game Message";
-    inMatchInfo.matchNumber = 174;
-    inMatchInfo.matchType = MatchType.Qualification.ordinal();
-    inMatchInfo.replayNumber = 191;
-    DriverStationDataJNI.setMatchInfo(inMatchInfo);
+    MatchType matchType = MatchType.Qualification;
+    DriverStationDataJNI.setMatchInfo("Event Name", "Game Message", 174, 191, matchType.ordinal());
 
     MatchInfoData outMatchInfo = new MatchInfoData();
     HAL.getMatchInfo(outMatchInfo);
 
     assertAll(
         () -> assertEquals("Event Name", outMatchInfo.eventName),
-        () -> assertEquals(MatchType.Qualification.ordinal(), outMatchInfo.matchType),
+        () -> assertEquals(matchType.ordinal(), outMatchInfo.matchType),
         () -> assertEquals(174, outMatchInfo.matchNumber),
         () -> assertEquals(191, outMatchInfo.replayNumber),
         () -> assertEquals("Game Message", outMatchInfo.gameSpecificMessage)
