@@ -63,7 +63,7 @@ class DSCommPacket {
   static const uint8_t kMaxJoysticks = 6;
 
  private:
-  std::string m_game_data;
+  uint8_t m_game_data[64];
   uint8_t m_hi;
   uint8_t m_lo;
   uint8_t m_control_sent;

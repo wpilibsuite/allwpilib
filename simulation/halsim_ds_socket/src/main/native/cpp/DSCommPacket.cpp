@@ -107,8 +107,11 @@ int DSCommPacket::DecodeTCP(uint8_t* packet, int len) {
 
   Lock();
   if (packet_type == kGameDataType) {
-    m_game_data =
-        std::string(reinterpret_cast<char*>(packet + 3), packet_len - 1);
+    std::copy(
+        packet + 3,
+        packet + 3 +
+            std::min(static_cast<int>(sizeof(m_game_data)), packet_len - 1),
+        m_game_data);
   } else if (packet_type == kJoystickNameType && len >= 7) {
     int joystick = static_cast<int>(packet[3]);
     if (joystick < kMaxJoysticks) {
@@ -210,14 +213,15 @@ void DSCommPacket::SendJoysticks(void) {
 void DSCommPacket::SendTCPToHALSim(void) {
   struct HAL_MatchInfo info;
   Lock();
-  info.eventName = strdup("Simulation");
+  std::strncpy(info.eventName, "Simulation", sizeof(info.eventName));
   info.matchType = HAL_MatchType::HAL_kMatchType_none;
   info.matchNumber = 1;
   info.replayNumber = 0;
-  info.gameSpecificMessage = strdup(m_game_data.c_str());
+  std::copy(info.gameSpecificMessage,
+            info.gameSpecificMessage +
+                std::min(sizeof(info.gameSpecificMessage), sizeof(m_game_data)),
+            m_game_data);
   HALSIM_SetMatchInfo(&info);
-  std::free(info.gameSpecificMessage);
-  std::free(info.eventName);
   Unlock();
 }
 
