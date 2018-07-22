@@ -154,6 +154,14 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
     Invoke(&uv_tcp_bind, GetRaw(), &addr, flags);
   }
 
+  void Bind(const sockaddr_in& addr, unsigned int flags = 0) {
+    Bind(reinterpret_cast<const sockaddr&>(addr), flags);
+  }
+
+  void Bind(const sockaddr_in6& addr, unsigned int flags = 0) {
+    Bind(reinterpret_cast<const sockaddr&>(addr), flags);
+  }
+
   /**
    * Bind the handle to an IPv4 address and port.
    *
@@ -215,6 +223,16 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
    */
   void Connect(const sockaddr& addr, const std::shared_ptr<TcpConnectReq>& req);
 
+  void Connect(const sockaddr_in& addr,
+               const std::shared_ptr<TcpConnectReq>& req) {
+    Connect(reinterpret_cast<const sockaddr&>(addr), req);
+  }
+
+  void Connect(const sockaddr_in6& addr,
+               const std::shared_ptr<TcpConnectReq>& req) {
+    Connect(reinterpret_cast<const sockaddr&>(addr), req);
+  }
+
   /**
    * Establish an IPv4 or IPv6 TCP connection.
    *
@@ -229,6 +247,14 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
    * @param callback Callback function to call when connection established
    */
   void Connect(const sockaddr& addr, std::function<void()> callback);
+
+  void Connect(const sockaddr_in& addr, std::function<void()> callback) {
+    Connect(reinterpret_cast<const sockaddr&>(addr), callback);
+  }
+
+  void Connect(const sockaddr_in6& addr, std::function<void()> callback) {
+    Connect(reinterpret_cast<const sockaddr&>(addr), callback);
+  }
 
   /**
    * Establish an IPv4 TCP connection.
