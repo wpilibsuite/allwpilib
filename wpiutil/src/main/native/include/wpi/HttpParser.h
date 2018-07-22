@@ -48,10 +48,11 @@ class HttpParser {
   /**
    * Executes the parser.  An empty input is treated as EOF.
    * @param in input data
-   * @return Number of parsed bytes.
+   * @return Trailing input data after the parse.
    */
-  size_t Execute(StringRef in) {
-    return http_parser_execute(&m_parser, &m_settings, in.data(), in.size());
+  StringRef Execute(StringRef in) {
+    return in.drop_front(
+        http_parser_execute(&m_parser, &m_settings, in.data(), in.size()));
   }
 
   /**
