@@ -1,0 +1,8 @@
+description = "A plugin that listens on a socket so that you can use the real Driver Station software to connect to the simulation"
+
+ext {
+    includeWpiutil = true
+    pluginName = 'halsim_ds_socket'
+}
+
+apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
