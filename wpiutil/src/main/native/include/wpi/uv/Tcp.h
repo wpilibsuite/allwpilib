@@ -205,9 +205,9 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
    * (`0.0.0.0` or `::`) it will be changed to point to localhost. This is
    * done to match the behavior of Linux systems.
    *
-   * HandleConnected() is called on the request when the connection has been
+   * The connected signal is emitted on the request when the connection has been
    * established.
-   * HandleError() is called on the request in case of errors during the
+   * The error signal is emitted on the request in case of errors during the
    * connection.
    *
    * @param addr Initialized `sockaddr_in` or `sockaddr_in6` data structure.
@@ -237,9 +237,9 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
    * (`0.0.0.0` or `::`) it will be changed to point to localhost. This is
    * done to match the behavior of Linux systems.
    *
-   * HandleConnected() is called on the request when the connection has been
+   * The connected signal is emitted on the request when the connection has been
    * established.
-   * HandleError() is called on the request in case of errors during the
+   * The error signal is emitted on the request in case of errors during the
    * connection.
    *
    * @param ip The address to which to connect to.
@@ -273,9 +273,9 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
    * (`0.0.0.0` or `::`) it will be changed to point to localhost. This is
    * done to match the behavior of Linux systems.
    *
-   * HandleConnected() is called on the request when the connection has been
+   * The connected signal is emitted on the request when the connection has been
    * established.
-   * HandleError() is called on the request in case of errors during the
+   * The error signal is emitted on the request in case of errors during the
    * connection.
    *
    * @param ip The address to which to connect to.
