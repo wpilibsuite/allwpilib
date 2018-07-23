@@ -17,8 +17,8 @@ namespace lowfi {
 
 class SimpleAccelerometerSim : public AccelerometerSim {
  public:
-  SimpleAccelerometerSim(std::function<void(double)>& setterFunction,
-                         std::function<double(void)>& getterFunction)
+  SimpleAccelerometerSim(const std::function<void(double)>& setterFunction,
+                         const std::function<double(void)>& getterFunction)
       : m_setAccelerationFunction(setterFunction),
         m_getAccelerationFunction(getterFunction) {}
   double GetAcceleration() override { return m_getAccelerationFunction(); }

@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ADXL345_I2C.h"
 #include "ADXL345_I2CAccelerometerData.h"
 #include "LowFiSim/WpiSimulators/ADXLThreeAxisAccelerometerSim.h"
+#include "frc/ADXL345_I2C.h"
 #include "gtest/gtest.h"
 
 TEST(AccelerometerTests, TestADXL345_I2CAccelerometerWrapper) {

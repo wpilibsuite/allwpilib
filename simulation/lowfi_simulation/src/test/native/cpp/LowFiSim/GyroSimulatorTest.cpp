@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ADXRS450_Gyro.h"
 #include "ADXRS450_SpiGyroWrapperData.h"
-#include "AnalogGyro.h"
 #include "LowFiSim/WpiSimulators/ADXRS450_SpiGyroSim.h"
 #include "LowFiSim/WpiSimulators/WpiAnalogGyroSim.h"
+#include "frc/ADXRS450_Gyro.h"
+#include "frc/AnalogGyro.h"
 #include "gtest/gtest.h"
 
 void TestGyro(frc::sim::lowfi::GyroSim& sim, frc::Gyro& gyro) {

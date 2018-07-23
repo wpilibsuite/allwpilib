@@ -8,7 +8,7 @@
 #pragma once
 
 #include "LowFiSim/GyroSim.h"
-#include "Simulation/AnalogGyroSim.h"
+#include "simulation/AnalogGyroSim.h"
 
 namespace frc {
 namespace sim {
