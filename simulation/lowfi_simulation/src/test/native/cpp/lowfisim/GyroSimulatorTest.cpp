@@ -6,11 +6,11 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ADXRS450_SpiGyroWrapperData.h"
-#include "lowfisim/wpisimulators/ADXRS450_SpiGyroSim.h"
-#include "lowfisim/wpisimulators/WpiAnalogGyroSim.h"
 #include "frc/ADXRS450_Gyro.h"
 #include "frc/AnalogGyro.h"
 #include "gtest/gtest.h"
+#include "lowfisim/wpisimulators/ADXRS450_SpiGyroSim.h"
+#include "lowfisim/wpisimulators/WpiAnalogGyroSim.h"
 
 void TestGyro(frc::sim::lowfi::GyroSim& sim, frc::Gyro& gyro) {
   const double EPSILON = .00001;

@@ -6,9 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ADXL345_I2CAccelerometerData.h"
-#include "lowfisim/wpisimulators/ADXLThreeAxisAccelerometerSim.h"
 #include "frc/ADXL345_I2C.h"
 #include "gtest/gtest.h"
+#include "lowfisim/wpisimulators/ADXLThreeAxisAccelerometerSim.h"
 
 TEST(AccelerometerTests, TestADXL345_I2CAccelerometerWrapper) {
   const double EPSILON = 1 / 256.0;

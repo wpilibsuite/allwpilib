@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "lowfisim/SimpleAccelerometerSim.h"
 #include "ThreeAxisAccelerometerData.h"
+#include "lowfisim/SimpleAccelerometerSim.h"
 
 namespace frc {
 namespace sim {
