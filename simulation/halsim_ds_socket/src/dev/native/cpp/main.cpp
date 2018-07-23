@@ -5,16 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#pragma once
-#include <vector>
+#include <thread>
 
-namespace halsim {
+#include <hal/HAL.h>
+#include <wpi/raw_ostream.h>
 
-typedef struct {
-  std::vector<int16_t> axes;
-  uint8_t button_count;
-  uint32_t buttons;
-  std::vector<int16_t> povs;
-} DSCommJoystickPacket;
+extern "C" int HALSIM_InitExtension(void);
 
-}  // namespace halsim
+int main() {
+  HAL_Initialize(500, 0);
+  HALSIM_InitExtension();
+}
