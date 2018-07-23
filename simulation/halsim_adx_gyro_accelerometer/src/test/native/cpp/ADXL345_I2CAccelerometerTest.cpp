@@ -43,4 +43,5 @@ TEST_P(ADXL345_I2CAccelerometerTest, TestAccelerometer) {
 
 INSTANTIATE_TEST_CASE_P(ADXL345_I2CAccelerometerTest,
                         ADXL345_I2CAccelerometerTest,
-                        ::testing::Values(frc::I2C::kOnboard, frc::I2C::kMXP),);
+                        ::testing::Values(frc::I2C::kOnboard,
+                                          frc::I2C::kMXP), );
