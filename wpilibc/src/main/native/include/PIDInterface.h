@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,18 +7,13 @@
 
 #pragma once
 
-namespace frc {
+// clang-format off
+#ifdef _MSC_VER
+#pragma message "warning: PIDInterface.h is deprecated; include frc/PIDInterface.h instead"
+#else
+#warning "PIDInterface.h is deprecated; include frc/PIDInterface.h instead"
+#endif
 
-class PIDInterface {
-  virtual void SetPID(double p, double i, double d) = 0;
-  virtual double GetP() const = 0;
-  virtual double GetI() const = 0;
-  virtual double GetD() const = 0;
+// clang-format on
 
-  virtual void SetSetpoint(double setpoint) = 0;
-  virtual double GetSetpoint() const = 0;
-
-  virtual void Reset() = 0;
-};
-
-}  // namespace frc
+#include "frc/PIDInterface.h"

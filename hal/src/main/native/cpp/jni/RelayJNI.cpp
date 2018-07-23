@@ -9,12 +9,12 @@
 
 #include <cassert>
 
-#include "HAL/Ports.h"
-#include "HAL/Relay.h"
-#include "HAL/cpp/Log.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_RelayJNI.h"
+#include "hal/Ports.h"
+#include "hal/Relay.h"
+#include "hal/cpp/Log.h"
+#include "hal/handles/HandlesInternal.h"
 
 using namespace frc;
 

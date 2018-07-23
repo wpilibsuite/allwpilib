@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/SerialPort.h"
+#include "hal/SerialPort.h"
 
 #include <string>
 
-#include "HAL/cpp/SerialHelper.h"
 #include "HALInitializer.h"
+#include "hal/cpp/SerialHelper.h"
 #include "visa/visa.h"
 
 static int32_t resourceManagerHandle{0};

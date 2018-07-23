@@ -10,9 +10,9 @@
 #include "BufferCallbackStore.h"
 #include "CallbackStore.h"
 #include "ConstBufferCallbackStore.h"
-#include "MockData/SPIData.h"
 #include "SpiReadAutoReceiveBufferCallbackStore.h"
 #include "edu_wpi_first_hal_sim_mockdata_SPIDataJNI.h"
+#include "mockdata/SPIData.h"
 
 extern "C" {
 

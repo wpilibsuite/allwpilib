@@ -8,8 +8,8 @@
 #include <jni.h>
 
 #include "CallbackStore.h"
-#include "MockData/DigitalPWMData.h"
 #include "edu_wpi_first_hal_sim_mockdata_DigitalPWMDataJNI.h"
+#include "mockdata/DigitalPWMData.h"
 
 extern "C" {
 

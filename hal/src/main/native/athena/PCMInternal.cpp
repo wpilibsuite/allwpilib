@@ -7,10 +7,10 @@
 
 #include "PCMInternal.h"
 
-#include "HAL/Errors.h"
-#include "HAL/Solenoid.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/Errors.h"
+#include "hal/Solenoid.h"
 
 namespace hal {
 

@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/DIO.h"
+#include "hal/DIO.h"
 
 #include <cmath>
 #include <thread>
@@ -13,11 +13,11 @@
 #include <wpi/raw_ostream.h>
 
 #include "DigitalInternal.h"
-#include "HAL/cpp/fpga_clock.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "HAL/handles/LimitedHandleResource.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/cpp/fpga_clock.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/LimitedHandleResource.h"
 
 using namespace hal;
 

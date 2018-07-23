@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ADXRS450_Gyro.h"
+#include "frc/ADXRS450_Gyro.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "DriverStation.h"
-#include "Timer.h"
+#include "frc/DriverStation.h"
+#include "frc/Timer.h"
 
 using namespace frc;
 

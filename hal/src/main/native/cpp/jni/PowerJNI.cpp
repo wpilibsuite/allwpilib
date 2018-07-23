@@ -7,9 +7,9 @@
 
 #include <jni.h>
 
-#include "HAL/Power.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_PowerJNI.h"
+#include "hal/Power.h"
 
 using namespace frc;
 

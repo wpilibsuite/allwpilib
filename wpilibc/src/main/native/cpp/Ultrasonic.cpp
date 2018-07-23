@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Ultrasonic.h"
+#include "frc/Ultrasonic.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "Counter.h"
-#include "DigitalInput.h"
-#include "DigitalOutput.h"
-#include "SmartDashboard/SendableBuilder.h"
-#include "Timer.h"
-#include "Utility.h"
-#include "WPIErrors.h"
+#include "frc/Counter.h"
+#include "frc/DigitalInput.h"
+#include "frc/DigitalOutput.h"
+#include "frc/Timer.h"
+#include "frc/Utility.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

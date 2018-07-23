@@ -13,10 +13,10 @@
 #include <wpi/jni_util.h>
 #include <wpi/raw_ostream.h>
 
-#include "HAL/CAN.h"
-#include "HAL/cpp/Log.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_can_CANJNI.h"
+#include "hal/CAN.h"
+#include "hal/cpp/Log.h"
 
 using namespace frc;
 using namespace wpi::java;

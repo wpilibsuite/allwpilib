@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Watchdog.h"
+#include "frc/Watchdog.h"
 
 #include <wpi/raw_ostream.h>
 
-#include "Timer.h"
+#include "frc/Timer.h"
 
 using namespace frc;
 

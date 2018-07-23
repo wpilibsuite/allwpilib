@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <CameraServer.h>
-#include <IterativeRobot.h>
+#include <cameraserver/CameraServer.h>
+#include <frc/IterativeRobot.h>
 #include <wpi/raw_ostream.h>
 
 /**

@@ -5,13 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Commands/CommandGroup.h"
-#include "Commands/Scheduler.h"
-#include "Commands/Subsystem.h"
-#include "DriverStation.h"
-#include "RobotState.h"
-#include "Timer.h"
 #include "command/MockCommand.h"
+#include "frc/DriverStation.h"
+#include "frc/RobotState.h"
+#include "frc/Timer.h"
+#include "frc/commands/CommandGroup.h"
+#include "frc/commands/Scheduler.h"
+#include "frc/commands/Subsystem.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

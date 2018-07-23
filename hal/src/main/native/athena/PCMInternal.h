@@ -11,11 +11,11 @@
 
 #include <memory>
 
-#include "HAL/Errors.h"
-#include "HAL/Ports.h"
-#include "HAL/Solenoid.h"
 #include "PortsInternal.h"
 #include "ctre/PCM.h"
+#include "hal/Errors.h"
+#include "hal/Ports.h"
+#include "hal/Solenoid.h"
 
 namespace hal {
 

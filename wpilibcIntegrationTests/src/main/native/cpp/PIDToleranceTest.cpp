@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PIDController.h"
-#include "PIDOutput.h"
-#include "PIDSource.h"
 #include "TestBench.h"
-#include "Timer.h"
+#include "frc/PIDController.h"
+#include "frc/PIDOutput.h"
+#include "frc/PIDSource.h"
+#include "frc/Timer.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

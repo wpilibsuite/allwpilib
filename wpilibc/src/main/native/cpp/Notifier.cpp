@@ -5,13 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Notifier.h"
+#include "frc/Notifier.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "Timer.h"
-#include "Utility.h"
-#include "WPIErrors.h"
+#include "frc/Timer.h"
+#include "frc/Utility.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

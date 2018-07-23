@@ -9,8 +9,8 @@
 
 #include <iostream>
 
-#include <SmartDashboard/SmartDashboard.h>
-#include <Timer.h>
+#include <frc/Timer.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 Robot::Robot() {
   // Note SmartDashboard is not initialized here, wait until RobotInit() to make

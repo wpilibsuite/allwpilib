@@ -9,10 +9,10 @@
 
 #include <cassert>
 
-#include "HAL/Constants.h"
-#include "HAL/cpp/Log.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_ConstantsJNI.h"
+#include "hal/Constants.h"
+#include "hal/cpp/Log.h"
 
 using namespace frc;
 

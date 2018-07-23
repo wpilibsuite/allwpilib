@@ -40,4 +40,5 @@ includeOtherLibs {
 
 includeProject {
   ^ctre/
+  ^mockdata/
 }

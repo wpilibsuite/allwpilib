@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Relay.h"  // NOLINT(build/include_order)
+#include "frc/Relay.h"  // NOLINT(build/include_order)
 
-#include "DigitalInput.h"
 #include "TestBench.h"
-#include "Timer.h"
+#include "frc/DigitalInput.h"
+#include "frc/Timer.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

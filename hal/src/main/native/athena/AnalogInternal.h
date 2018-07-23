@@ -13,10 +13,10 @@
 
 #include <wpi/mutex.h>
 
-#include "HAL/ChipObject.h"
-#include "HAL/Ports.h"
-#include "HAL/handles/IndexedHandleResource.h"
 #include "PortsInternal.h"
+#include "hal/ChipObject.h"
+#include "hal/Ports.h"
+#include "hal/handles/IndexedHandleResource.h"
 
 namespace hal {
 

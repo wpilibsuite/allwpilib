@@ -39,7 +39,7 @@ void Gyro::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 
   // Connect to Gazebo transport for messaging
   std::string scoped_name =
-      model->GetWorld()->GetName() + "::" + model->GetScopedName();
+      model->GetWorld()->Name() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init(scoped_name);
@@ -73,17 +73,17 @@ void Gyro::Callback(const gazebo::msgs::ConstStringPtr& msg) {
 
 double Gyro::GetAngle() {
   if (radians) {
-    return link->GetWorldCoGPose().rot.GetAsEuler()[axis];
+    return link->WorldCoGPose().Rot().Euler()[axis];
   } else {
-    return link->GetWorldCoGPose().rot.GetAsEuler()[axis] * (180.0 / M_PI);
+    return link->WorldCoGPose().Rot().Euler()[axis] * (180.0 / M_PI);
   }
 }
 
 double Gyro::GetVelocity() {
   if (radians) {
-    return link->GetRelativeAngularVel()[axis];
+    return link->RelativeAngularVel()[axis];
   } else {
-    return link->GetRelativeAngularVel()[axis] * (180.0 / M_PI);
+    return link->RelativeAngularVel()[axis] * (180.0 / M_PI);
   }
 }
 

@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Threads.h"
+#include "hal/Threads.h"
 
 #include <pthread.h>
 #include <sched.h>
 
-#include "HAL/Errors.h"
+#include "hal/Errors.h"
 
 namespace hal {
 namespace init {

@@ -6,7 +6,8 @@
       "Iterative"
     ],
     "foldername": "iterative",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Timed Robot",
@@ -15,7 +16,8 @@
       "Timed"
     ],
     "foldername": "timed",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Command Robot",
@@ -24,7 +26,8 @@
       "Command"
     ],
     "foldername": "commandbased",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   },
   {
     "name": "Sample Robot",
@@ -33,6 +36,7 @@
       "Sample"
     ],
     "foldername": "sample",
-    "gradlebase": "java"
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]

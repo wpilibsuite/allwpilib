@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/AnalogTrigger.h"
+#include "hal/AnalogTrigger.h"
 
 #include "AnalogInternal.h"
-#include "HAL/AnalogInput.h"
-#include "HAL/Errors.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "HAL/handles/LimitedHandleResource.h"
 #include "HALInitializer.h"
-#include "MockData/AnalogInDataInternal.h"
-#include "MockData/AnalogTriggerDataInternal.h"
 #include "PortsInternal.h"
+#include "hal/AnalogInput.h"
+#include "hal/Errors.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/LimitedHandleResource.h"
+#include "mockdata/AnalogInDataInternal.h"
+#include "mockdata/AnalogTriggerDataInternal.h"
 
 namespace {
 struct AnalogTrigger {

@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Resource.h"
+#include "frc/Resource.h"
 
-#include "ErrorBase.h"
-#include "WPIErrors.h"
+#include "frc/ErrorBase.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

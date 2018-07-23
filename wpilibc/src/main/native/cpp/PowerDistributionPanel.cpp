@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PowerDistributionPanel.h"
+#include "frc/PowerDistributionPanel.h"
 
-#include <HAL/HAL.h>
-#include <HAL/PDP.h>
-#include <HAL/Ports.h>
+#include <hal/HAL.h>
+#include <hal/PDP.h>
+#include <hal/Ports.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
-#include "SensorUtil.h"
-#include "SmartDashboard/SendableBuilder.h"
-#include "WPIErrors.h"
+#include "frc/SensorUtil.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

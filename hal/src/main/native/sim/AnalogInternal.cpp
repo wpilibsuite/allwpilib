@@ -7,8 +7,8 @@
 
 #include "AnalogInternal.h"
 
-#include "HAL/AnalogInput.h"
 #include "PortsInternal.h"
+#include "hal/AnalogInput.h"
 
 namespace hal {
 IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,

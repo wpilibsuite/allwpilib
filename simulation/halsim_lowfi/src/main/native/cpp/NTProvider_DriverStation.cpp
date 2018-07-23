@@ -7,8 +7,8 @@
 
 #include "NTProvider_DriverStation.h"
 
-#include <HAL/Ports.h>
-#include <MockData/DriverStationData.h>
+#include <hal/Ports.h>
+#include <mockdata/DriverStationData.h>
 
 void HALSimNTProviderDriverStation::Initialize() {
   InitializeDefaultSingle(HALSIM_RegisterDriverStationAllCallbacks);

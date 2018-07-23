@@ -6,6 +6,7 @@ apply plugin: "google-test"
 
 ext.skipAthena = true
 
+apply from: "${rootDir}/shared/config.gradle"
 
 /* If gz_msgs or gazebo is not available, do not attempt a build */
 def gazebo_version = ""

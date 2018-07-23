@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Counter.h"
+#include "frc/Counter.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "AnalogTrigger.h"
-#include "DigitalInput.h"
-#include "SmartDashboard/SendableBuilder.h"
-#include "WPIErrors.h"
+#include "frc/AnalogTrigger.h"
+#include "frc/DigitalInput.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

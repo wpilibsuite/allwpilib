@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "SpeedController.h"
+#include "frc/SpeedController.h"
 
 namespace frc {
 

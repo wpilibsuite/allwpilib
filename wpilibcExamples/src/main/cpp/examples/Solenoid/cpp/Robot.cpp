@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <DoubleSolenoid.h>
-#include <IterativeRobot.h>
-#include <Joystick.h>
-#include <Solenoid.h>
+#include <frc/DoubleSolenoid.h>
+#include <frc/IterativeRobot.h>
+#include <frc/Joystick.h>
+#include <frc/Solenoid.h>
 
 /**
  * This is a sample program showing the use of the solenoid classes during

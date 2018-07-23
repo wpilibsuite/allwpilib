@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,30 +7,13 @@
 
 #pragma once
 
-#include <wpi/Twine.h>
+// clang-format off
+#ifdef _MSC_VER
+#pragma message "warning: Commands/WaitCommand.h is deprecated; include frc/commands/WaitCommand.h instead"
+#else
+#warning "Commands/WaitCommand.h is deprecated; include frc/commands/WaitCommand.h instead"
+#endif
 
-#include "Commands/TimedCommand.h"
+// clang-format on
 
-namespace frc {
-
-class WaitCommand : public TimedCommand {
- public:
-  /**
-   * Creates a new WaitCommand with the given name and timeout.
-   *
-   * @param name    the name of the command
-   * @param timeout the time (in seconds) before this command "times out"
-   */
-  explicit WaitCommand(double timeout);
-
-  /**
-   * Creates a new WaitCommand with the given timeout.
-   *
-   * @param timeout the time (in seconds) before this command "times out"
-   */
-  WaitCommand(const wpi::Twine& name, double timeout);
-
-  virtual ~WaitCommand() = default;
-};
-
-}  // namespace frc
+#include "frc/commands/WaitCommand.h"

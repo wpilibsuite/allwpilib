@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/HAL.h"
+#include "hal/HAL.h"
 
 #include <jni.h>
 
@@ -14,10 +14,10 @@
 
 #include <wpi/jni_util.h>
 
-#include "HAL/DriverStation.h"
-#include "HAL/cpp/Log.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_HAL.h"
+#include "hal/DriverStation.h"
+#include "hal/cpp/Log.h"
 
 using namespace frc;
 using namespace wpi::java;
@@ -407,7 +407,6 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getMatchInfo
   if (status == 0) {
     SetMatchInfoObject(env, info, matchInfo);
   }
-  HAL_FreeMatchInfo(&matchInfo);
   return status;
 }
 

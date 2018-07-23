@@ -7,15 +7,16 @@
 
 #include "OI.h"
 
-#include "Commands/Collect.h"
-#include "Commands/DriveForward.h"
-#include "Commands/LowGoal.h"
-#include "Commands/SetCollectionSpeed.h"
-#include "Commands/SetPivotSetpoint.h"
-#include "Commands/Shoot.h"
-#include "SmartDashboard/SmartDashboard.h"
-#include "Subsystems/Collector.h"
-#include "Subsystems/Pivot.h"
+#include <frc/smartdashboard/SmartDashboard.h>
+
+#include "commands/Collect.h"
+#include "commands/DriveForward.h"
+#include "commands/LowGoal.h"
+#include "commands/SetCollectionSpeed.h"
+#include "commands/SetPivotSetpoint.h"
+#include "commands/Shoot.h"
+#include "subsystems/Collector.h"
+#include "subsystems/Pivot.h"
 
 OI::OI() {
   m_r1.WhenPressed(new LowGoal());

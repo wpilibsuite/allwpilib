@@ -11,10 +11,10 @@
 
 #include <wpi/jni_util.h>
 
-#include "HAL/I2C.h"
-#include "HAL/cpp/Log.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_I2CJNI.h"
+#include "hal/I2C.h"
+#include "hal/cpp/Log.h"
 
 using namespace frc;
 using namespace wpi::java;

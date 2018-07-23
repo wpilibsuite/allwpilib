@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
 #include "WPILibVersion.h"
 

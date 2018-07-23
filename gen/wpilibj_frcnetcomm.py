@@ -22,38 +22,38 @@ def main():
         sys.exit(1)
 
     # Handle running in either the root or gen directories
-    configPath = "."
+    config_path = "."
     if os.getcwd().rpartition(os.sep)[2] == "gen":
-        configPath = ".."
+        config_path = ".."
 
-    outputName = configPath + \
+    output_name = config_path + \
         "/hal/src/generated/java/edu/wpi/first/wpilibj/hal/FRCNetComm.java"
 
     # Set initial copyright year and get current year
     year = "2016"
-    currentYear = str(date.today().year)
+    current_year = str(date.today().year)
 
     # Start writing output file
-    with open(outputName + ".tmp", "w") as temp:
+    with open(output_name + ".tmp", "w") as temp:
         # Write first line of comment
         temp.write("/*")
         for i in range(0, 76):
             temp.write("-")
-        temp.write("*/\n")
+        print("*/", file=temp)
 
         # Write second line of comment
         temp.write("/* Copyright (c) ")
-        if year != currentYear:
+        if year != current_year:
             temp.write(year)
             temp.write("-")
-        temp.write(currentYear)
+        temp.write(current_year)
         temp.write(" FIRST. All Rights Reserved.")
         for i in range(0, 24):
             temp.write(" ")
-        if year == currentYear:
+        if year == current_year:
             for i in range(0, 5):
                 temp.write(" ")
-        temp.write("*/\n")
+        print("*/", file=temp)
 
         # Write rest of lines of comment
         temp.write("""\
@@ -63,7 +63,7 @@ def main():
 /*""")
         for i in range(0, 76):
             temp.write("-")
-        temp.write("*/\n")
+        print("*/", file=temp)
 
         # Write preamble
         temp.write("""
@@ -79,19 +79,19 @@ public class FRCNetComm extends JNIWrapper {
 """)
 
         # Read enums from C++ source files
-        firstEnum = True
+        first_enum = True
         files = [
             "/ni-libraries/include/FRC_NetworkCommunication/LoadOut.h",
-            "/hal/src/main/native/include/HAL/UsageReporting.h"
+            "/hal/src/main/native/include/hal/UsageReporting.h"
         ]
-        for fileName in files:
-            with open(configPath + fileName, "r") as cppSource:
+        for file_name in files:
+            with open(config_path + file_name, "r") as cpp_source:
                 while True:
                     # Read until an enum is encountered
                     line = ""
                     pos = -1
                     while "enum" not in line:
-                        line = cppSource.readline()
+                        line = cpp_source.readline()
                         if line == "":
                             break
 
@@ -100,13 +100,13 @@ public class FRCNetComm extends JNIWrapper {
 
                     # If "{" is on next line, read next line
                     if "{" not in line:
-                        line = cppSource.readline()
+                        line = cpp_source.readline()
 
                     # Write enum to output file as interface
                     values = []
-                    line = cppSource.readline()
+                    line = cpp_source.readline()
                     while "}" not in line:
-                        if line == "\n":
+                        if line == os.linesep:
                             values.append("")
                         elif line[0] != "#":
                             try:
@@ -115,44 +115,44 @@ public class FRCNetComm extends JNIWrapper {
                             except AttributeError:
                                 # Ignore lines that don't match value regex
                                 pass
-                        line = cppSource.readline()
+                        line = cpp_source.readline()
 
                     # Extract enum name
-                    nameStart = 0
+                    name_start = 0
                     for i, c in enumerate(line):
                         if c != " " and c != "}":
-                            nameStart = i
+                            name_start = i
                             break
-                    enumName = line[nameStart:len(line) - 2]
+                    enum_name = line[name_start:len(line) - 2]
 
                     # Write comment for interface name
                     # Only add newline if not the first enum
-                    if firstEnum == True:
-                        firstEnum = False
+                    if first_enum == True:
+                        first_enum = False
                     else:
-                        temp.write("\n")
-                    temp.write("  /**\n   * ")
+                        temp.write(os.linesep)
+                    temp.write("  /**" + os.linesep + "   * ")
 
                     # Splits camelcase string into words
-                    enumCamel = re.findall(r'[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))',
-                                           enumName)
-                    temp.write(enumCamel[0] + " ")
-                    for i in range(1, len(enumCamel)):
-                        temp.write(enumCamel[i][0].lower() + \
-                            enumCamel[i][1:len(enumCamel[i])] + " ")
+                    enum_camel = re.findall(
+                        r'[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))', enum_name)
+                    temp.write(enum_camel[0] + " ")
+                    for i in range(1, len(enum_camel)):
+                        temp.write(enum_camel[i][0].lower() + \
+                            enum_camel[i][1:len(enum_camel[i])] + " ")
                     temp.write(
-                        "from " + os.path.basename(fileName) + "\n"
-                        "   */\n"
-                        "  @SuppressWarnings({\"TypeName\", \"PMD.ConstantsInInterface\"})\n"
-                        "  public static final class " + enumName + " {\n"
-                        "    private " + enumName + "() {\n    }\n\n")
+                        "from " + os.path.basename(file_name) + os.linesep +
+                        "   */" + os.linesep +
+                        "  @SuppressWarnings({\"TypeName\", \"PMD.ConstantsInInterface\"})" + os.linesep + \
+                        "  public static final class " + enum_name + " {" + os.linesep + \
+                        "    private " + enum_name + "() {" + os.linesep + "    }" + os.linesep + os.linesep)
 
                     # Write enum values
                     count = 0
                     for value in values:
                         # Pass through empty lines
                         if value == "":
-                            temp.write("\n")
+                            temp.write(os.linesep)
                             continue
 
                         if "=" not in value:
@@ -160,24 +160,24 @@ public class FRCNetComm extends JNIWrapper {
                             count += 1
 
                         # Add scoping for values from a different enum
-                        if enumName != "tModuleType" and "kModuleType" in value:
+                        if enum_name != "tModuleType" and "kModuleType" in value:
                             value = value.replace("kModuleType",
                                                   "tModuleType.kModuleType")
                         temp.write("    public static final int " +
-                                   value[0:len(value)] + ";\n")
+                                   value[0:len(value)] + ";" + os.linesep)
 
                     # Write end of enum
-                    temp.write("  }\n")
+                    print("  }", file=temp)
 
         # Write closing brace for file
-        temp.write("}\n")
+        print("}", file=temp)
 
     # Replace old output file
     try:
-        os.remove(outputName)
+        os.remove(output_name)
     except OSError:
         pass
-    os.rename(outputName + ".tmp", outputName)
+    os.rename(output_name + ".tmp", output_name)
 
 
 if __name__ == "__main__":
