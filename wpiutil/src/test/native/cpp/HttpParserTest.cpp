@@ -190,4 +190,20 @@ TEST(HttpParserTest, HeadersCompleteUpgrade) {
   ASSERT_FALSE(p.HasError());
 }
 
+TEST(HttpParserTest, Reset) {
+  HttpParser p{HttpParser::kRequest};
+  int callbacks = 0;
+  p.headersComplete.connect([&](bool) { ++callbacks; });
+  p.Execute("GET / HTTP/1.1\r\n");
+  ASSERT_EQ(callbacks, 0);
+  p.Execute("\r\n");
+  ASSERT_EQ(callbacks, 1);
+  p.Reset(HttpParser::kRequest);
+  p.Execute("GET / HTTP/1.1\r\n");
+  ASSERT_EQ(callbacks, 1);
+  p.Execute("\r\n");
+  ASSERT_EQ(callbacks, 2);
+  ASSERT_FALSE(p.HasError());
+}
+
 }  // namespace wpi

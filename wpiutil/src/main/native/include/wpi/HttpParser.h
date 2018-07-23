@@ -36,7 +36,18 @@ class HttpParser {
    */
   static uint32_t GetParserVersion();
 
+  /**
+   * Constructor.
+   * @param type Type of parser (request or response or both)
+   */
   explicit HttpParser(Type type);
+
+  /**
+   * Reset the parser to initial state.
+   * This allows reusing the same parser object from request to request.
+   * @param type Type of parser (request or response or both)
+   */
+  void Reset(Type type);
 
   /**
    * Set the maximum accepted length for URLs, field names, and field values.
