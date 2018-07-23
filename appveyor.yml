@@ -7,7 +7,6 @@ branches:
   only:
   - master
 platform:
-- x86
 - x64
 shallow_clone: true
 init:
@@ -40,8 +39,3 @@ build_script:
 
     ./gradlew --stop
 test: off
-artifacts:
-- path: '**/allOutputs/*'
-  name: AllOutputs
-- path: '**/test-results/**/*'
-  name: TestResults
