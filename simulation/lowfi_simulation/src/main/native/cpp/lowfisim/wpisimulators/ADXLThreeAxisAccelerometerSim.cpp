@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "LowFiSim/WpiSimulators/ADXLThreeAxisAccelerometerSim.h"
+#include "lowfisim/wpisimulators/ADXLThreeAxisAccelerometerSim.h"
 
 namespace frc {
 namespace sim {

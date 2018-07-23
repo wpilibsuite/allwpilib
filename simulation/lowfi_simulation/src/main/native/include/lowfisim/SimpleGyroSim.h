@@ -9,7 +9,7 @@
 
 #include <functional>
 
-#include "LowFiSim/GyroSim.h"
+#include "lowfisim/GyroSim.h"
 
 namespace frc {
 namespace sim {

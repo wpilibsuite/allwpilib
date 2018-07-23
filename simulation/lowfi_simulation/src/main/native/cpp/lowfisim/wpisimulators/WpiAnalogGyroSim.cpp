@@ -5,30 +5,19 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#pragma once
-
-#include "LowFiSim/SimpleAccelerometerSim.h"
-#include "ThreeAxisAccelerometerData.h"
+#include "lowfisim/wpisimulators/WpiAnalogGyroSim.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class ADXLThreeAxisAccelerometerSim {
- public:
-  ADXLThreeAxisAccelerometerSim(
-      hal::ThreeAxisAccelerometerData& accelerometerWrapper);
+WpiAnalogGyroSim::WpiAnalogGyroSim(int index) : m_gyroSimulator(index) {}
 
-  AccelerometerSim& GetXWrapper();
-  AccelerometerSim& GetYWrapper();
-  AccelerometerSim& GetZWrapper();
+void WpiAnalogGyroSim::SetAngle(double angle) {
+  m_gyroSimulator.SetAngle(angle);
+}
 
- protected:
-  hal::ThreeAxisAccelerometerData& m_accelerometerWrapper;
-  SimpleAccelerometerSim m_xWrapper;
-  SimpleAccelerometerSim m_yWrapper;
-  SimpleAccelerometerSim m_zWrapper;
-};
+double WpiAnalogGyroSim::GetAngle() { return m_gyroSimulator.GetAngle(); }
 
 }  // namespace lowfi
 }  // namespace sim

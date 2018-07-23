@@ -7,22 +7,27 @@
 
 #pragma once
 
-#include "ADXRS450_SpiGyroWrapperData.h"
-#include "LowFiSim/GyroSim.h"
+#include "lowfisim/SimpleAccelerometerSim.h"
+#include "ThreeAxisAccelerometerData.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class ADXRS450_SpiGyroSim : public GyroSim {
+class ADXLThreeAxisAccelerometerSim {
  public:
-  explicit ADXRS450_SpiGyroSim(int spiPort);
+  ADXLThreeAxisAccelerometerSim(
+      hal::ThreeAxisAccelerometerData& accelerometerWrapper);
 
-  void SetAngle(double angle) override;
-  double GetAngle() override;
+  AccelerometerSim& GetXWrapper();
+  AccelerometerSim& GetYWrapper();
+  AccelerometerSim& GetZWrapper();
 
  protected:
-  hal::ADXRS450_SpiGyroWrapper m_gyroWrapper;
+  hal::ThreeAxisAccelerometerData& m_accelerometerWrapper;
+  SimpleAccelerometerSim m_xWrapper;
+  SimpleAccelerometerSim m_yWrapper;
+  SimpleAccelerometerSim m_zWrapper;
 };
 
 }  // namespace lowfi

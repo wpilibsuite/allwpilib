@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ADXL345_I2CAccelerometerData.h"
-#include "LowFiSim/WpiSimulators/ADXLThreeAxisAccelerometerSim.h"
+#include "lowfisim/wpisimulators/ADXLThreeAxisAccelerometerSim.h"
 #include "frc/ADXL345_I2C.h"
 #include "gtest/gtest.h"
 

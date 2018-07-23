@@ -9,7 +9,7 @@
 
 #include <functional>
 
-#include "LowFiSim/AccelerometerSim.h"
+#include "lowfisim/AccelerometerSim.h"
 
 namespace frc {
 namespace sim {

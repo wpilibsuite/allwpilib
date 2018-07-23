@@ -5,20 +5,25 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "LowFiSim/WpiSimulators/ADXRS450_SpiGyroSim.h"
+#pragma once
+
+#include "lowfisim/GyroSim.h"
+#include "simulation/AnalogGyroSim.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-ADXRS450_SpiGyroSim::ADXRS450_SpiGyroSim(int spiPort)
-    : m_gyroWrapper(spiPort) {}
+class WpiAnalogGyroSim : public GyroSim {
+ public:
+  explicit WpiAnalogGyroSim(int index);
 
-void ADXRS450_SpiGyroSim::SetAngle(double angle) {
-  m_gyroWrapper.SetAngle(angle);
-}
+  void SetAngle(double angle) override;
+  double GetAngle() override;
 
-double ADXRS450_SpiGyroSim::GetAngle() { return m_gyroWrapper.GetAngle(); }
+ protected:
+  frc::sim::AnalogGyroSim m_gyroSimulator;
+};
 
 }  // namespace lowfi
 }  // namespace sim
