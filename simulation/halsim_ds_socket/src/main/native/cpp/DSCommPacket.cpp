@@ -17,6 +17,8 @@
 #include <FRCComm.h>
 #include <mockdata/DriverStationData.h>
 
+using namespace halsim;
+
 /*----------------------------------------------------------------------------
 **  The following methods help parse and hold information about the
 **   driver station and it's joysticks.

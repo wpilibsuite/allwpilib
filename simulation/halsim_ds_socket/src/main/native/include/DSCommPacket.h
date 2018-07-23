@@ -16,10 +16,16 @@
 #include <DSCommJoystickPacket.h>
 #include <FRCComm.h>
 #include <mockdata/DriverStationData.h>
+#include <wpi/uv/Buffer.h>
+
+namespace halsim {
 
 class DSCommPacket {
  public:
-  DSCommPacket(void) { std::fill_n(m_joystick_types, kMaxJoysticks, -1); }
+  DSCommPacket(void) {
+    std::fill_n(m_joystick_types, kMaxJoysticks, -1);
+    sendDataBuffer = wpi::uv::Buffer::Allocate(8);
+  }
   void Lock() { m_mutex.lock(); }
   void Unlock() { m_mutex.unlock(); }
   void SetIndex(uint8_t hi, uint8_t lo);
@@ -36,6 +42,7 @@ class DSCommPacket {
   void SendTCPToHALSim(void);
   void SendUDPToHALSim(void);
   void SendJoysticks(void);
+  wpi::uv::Buffer& GetSendBuffer(void) { return sendDataBuffer; }
 
   /* TCP (FMS) types */
   static const uint8_t kGameDataType = 0x0e;
@@ -76,4 +83,7 @@ class DSCommPacket {
   int m_udp_packets;
   std::chrono::high_resolution_clock::time_point m_packet_time;
   double m_match_time;
+  wpi::uv::Buffer sendDataBuffer;
 };
+
+}  // namespace halsim

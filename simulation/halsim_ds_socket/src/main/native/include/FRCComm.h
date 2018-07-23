@@ -15,13 +15,7 @@
 #ifndef WPILIB_SIMULATION_HALSIM_DS_SOCKET_SRC_MAIN_NATIVE_INCLUDE_FRCCOMM_H_
 #define WPILIB_SIMULATION_HALSIM_DS_SOCKET_SRC_MAIN_NATIVE_INCLUDE_FRCCOMM_H_
 
-#ifdef _WIN32
-#include <windows.h>
-#elif defined(__vxworks)
-#include <vxWorks.h>
-#elif defined(__linux)
 #include <stdint.h>
-#endif
 
 #define ERR_FRCSystem_NetCommNotResponding -44049
 #define ERR_FRCSystem_NoDSConnection -44018
