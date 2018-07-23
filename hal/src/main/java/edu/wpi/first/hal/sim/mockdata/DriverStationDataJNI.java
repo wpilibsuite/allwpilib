@@ -46,7 +46,7 @@ public class DriverStationDataJNI extends JNIWrapper {
   public static native void setJoystickPOVs(byte joystickNum, short[] povsArray);
   public static native void setJoystickButtons(byte joystickNum, int buttons, int count);
 
-  public static native void setMatchInfo(MatchInfoData info);
+  public static native void setMatchInfo(String eventName, String gameSpecificMessage, int matchNumber, int replayNumber, int matchType);
   public static native void registerAllCallbacks(NotifyCallback callback, boolean initialNotify);
   public static native void notifyNewData();
 
