@@ -59,41 +59,44 @@ void DSCommPacket::ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData) {
   m_match_time = matchTime;
 }
 
-int DSCommPacket::AddDSCommJoystickPacket(wpi::ArrayRef<uint8_t> dataInput) {
-  auto data = dataInput.data();
-  auto len = dataInput.size();
+void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput) {
   DSCommJoystickPacket stick;
-  if (len > 0) {
-    int axis_count = *data++;
-    len--;
-    if (axis_count > len) return -1;
-    len -= axis_count;
-    for (; axis_count > 0; axis_count--) {
-      stick.axes.push_back(*data++);
-    }
+
+  if (dataInput.size() == 3) {
+     m_joystick_packets.push_back(stick);
+     return;
   }
 
-  if (len > 2) {
-    stick.button_count = *data++;
-    stick.buttons = (*data++) << 8;
-    stick.buttons |= *data++;
-    len -= 3;
+  dataInput = dataInput.slice(2);
+
+  // Read axes
+  int axesLength = dataInput[0];
+  for (int i = 0; i < axesLength; i++) {
+    stick.axes.push_back(dataInput[1 + i]);
   }
 
-  if (len > 0) {
-    int pov_count = *data++;
-    len--;
-    if (pov_count * 2 > len) return -1;
-    len -= pov_count * 2;
-    for (; pov_count > 0; pov_count--) {
-      stick.povs.push_back((data[0] << 8) | data[1]);
-      data += 2;
-    }
+  dataInput = dataInput.slice(1 + axesLength);
+
+  // Read Buttons
+  int buttonCount = dataInput[0];
+  int numBytes = (buttonCount - 1) / 8 + 1;
+  stick.buttons = 0;
+  for (int i = 0; i < numBytes; i++) {
+    stick.buttons |= dataInput[1 + i] << (8 * (i));
   }
+  stick.button_count = buttonCount;
+
+  dataInput = dataInput.slice(1 + numBytes);
+
+  int povsLength = dataInput[0];
+  for (int i = 0; i < povsLength * 2; i+= 2) {
+    stick.povs.push_back((dataInput[1 + i] << 8) | dataInput[2 + i]);
+  }
+
 
   m_joystick_packets.push_back(stick);
 
-  return len;
+  return;
 }
 
 void DSCommPacket::GetControlWord(struct ControlWord_t* control_word) {
@@ -167,15 +170,72 @@ void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
 
     switch (packet[1]) {
       case kTagDsCommJoystick:
-        AddDSCommJoystickPacket(packet.slice(2, tagLength - 1));
+        ReadJoystickTag(tagPacket);
         break;
       case kMatchTimeTag:
-        ReadMatchtimeTag(packet.slice(0, tagLength + 1));
+        ReadMatchtimeTag(tagPacket);
         break;
     }
     packet = packet.slice(tagLength + 1);
   }
 }
+
+  void DSCommPacket::ReadOldMatchInfoTag(wpi::ArrayRef<uint8_t> data) {
+    // Size 2 bytes, tag 1 byte
+    if (data.size() <= 3) return;
+
+    int nameLength = data[3];
+    wpi::SmallVector<char, 128> eventName;
+    eventName.reserve(nameLength + 1);
+    for (int i = 0; i < nameLength; i++) {
+      eventName.emplace_back(data[4 + i]);
+    }
+    eventName.emplace_back('\0');
+
+    data = data.slice(4 + nameLength);
+
+    if (data.size() < 2) return;
+
+    char matchType = data[0]; // 'P', 'Q', 'E' or '0'
+    int matchNumber = data[1];
+  }
+
+  void DSCommPacket::ReadNewMatchInfoTag(wpi::ArrayRef<uint8_t> data) {
+    // Size 2 bytes, tag 1 byte
+    if (data.size() <= 3) return;
+
+    int nameLength = data[3];
+    wpi::SmallVector<char, 128> eventName;
+    eventName.reserve(nameLength + 1);
+    for (int i = 0; i < nameLength; i++) {
+      eventName.emplace_back(data[4 + i]);
+    }
+
+    eventName.emplace_back('\0');
+
+    data = data.slice(4 + nameLength);
+
+    if (data.size() < 4) return;
+
+    int matchType = data[0]; // None, Practice, Qualification, Elimination, Test
+    int matchNumber = (data[1] << 8) | data[2];
+    int replayNumber = data[3];
+  }
+
+  void DSCommPacket::ReadGameSpecificMessageTag(wpi::ArrayRef<uint8_t> data) {
+    // Size 2 bytes, tag 1 byte
+    if (data.size() <= 3) return;
+
+    wpi::SmallVector<char, 128> gameMessage;
+    int length = data[3];
+    gameMessage.reserve(length);
+    for (int i = 0; i < length; i++) {
+      gameMessage.emplace_back(data[4 + i]);
+    }
+  }
+  void DSCommPacket::ReadJoystickDescriptionTag(wpi::ArrayRef<uint8_t> data) {
+
+  }
 
 void DSCommPacket::SendJoysticks(void) {
   unsigned int i;

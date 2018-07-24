@@ -34,7 +34,6 @@ class DSCommPacket {
   void SetIndex(uint8_t hi, uint8_t lo);
   void SetControl(uint8_t control, uint8_t request);
   void SetAlliance(uint8_t station_code);
-  int AddDSCommJoystickPacket(wpi::ArrayRef<uint8_t> data);
   void GetControlWord(struct ControlWord_t* control_word);
   void GetAllianceStation(enum AllianceStationID_t* allianceStation);
   int DecodeTCP(wpi::ArrayRef<uint8_t> packet);
@@ -65,14 +64,17 @@ class DSCommPacket {
   static const uint8_t kTagDsCommJoystick = 0x0c;
 
   /* Joystick max count */
-  /* TODO(jwhite@codeweavers.com) This is a magic number in the HAL; fix it
-   * there */
   static const uint8_t kMaxJoysticks = HAL_kMaxJoysticks;
 
  private:
   void SetupSendHeader(wpi::raw_uv_ostream& buf);
   void SetupJoystickTag(wpi::raw_uv_ostream& buf);
   void ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData);
+  void ReadJoystickTag(wpi::ArrayRef<uint8_t> data);
+  void ReadOldMatchInfoTag(wpi::ArrayRef<uint8_t> data);
+  void ReadNewMatchInfoTag(wpi::ArrayRef<uint8_t> data);
+  void ReadGameSpecificMessageTag(wpi::ArrayRef<uint8_t> data);
+  void ReadJoystickDescriptionTag(wpi::ArrayRef<uint8_t> data);
 
   std::array<uint8_t, 64> m_game_data;
   uint8_t m_hi;
