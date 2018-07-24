@@ -36,7 +36,9 @@ int64_t GetFPGATime() {
 double GetFPGATimestamp() { return GetFPGATime() * 1.0e-6; }
 
 void SetProgramStarted() { programStarted = true; }
+bool GetProgramStarted() { return programStarted; }
 }  // namespace hal
+
 
 using namespace hal;
 
@@ -51,6 +53,8 @@ void HALSIM_WaitForProgramStart(void) {
 }
 
 void HALSIM_SetProgramStarted(void) { SetProgramStarted(); }
+
+HAL_Bool HALSIM_GetProgramStarted(void) { return GetProgramStarted(); }
 
 void HALSIM_RestartTiming(void) { RestartTiming(); }
 }  // extern "C"

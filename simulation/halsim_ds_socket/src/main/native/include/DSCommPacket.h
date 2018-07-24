@@ -24,30 +24,25 @@
 
 namespace halsim {
 
-int& GetOrResetBufferCount(bool reset);
-
 class DSCommPacket {
  public:
   DSCommPacket(void) {
     m_joystick_types.fill(-1);
     m_packet_time = wpi::Now();
+    m_bufferCount = 0;
   }
   void SetIndex(uint8_t hi, uint8_t lo);
-  void GetIndex(uint8_t* hi, uint8_t* lo);
   void SetControl(uint8_t control, uint8_t request);
-  void GetControl(uint8_t* control);
-  void GetStatus(uint8_t* status);
   void SetAlliance(uint8_t station_code);
   int AddDSCommJoystickPacket(wpi::ArrayRef<uint8_t> data);
   void GetControlWord(struct ControlWord_t* control_word);
   void GetAllianceStation(enum AllianceStationID_t* allianceStation);
-  void GetJoystickOutputs(int64_t* outputs, int32_t* leftRumble, int32_t* rightRumble);
   int DecodeTCP(wpi::ArrayRef<uint8_t> packet);
   void DecodeUDP(wpi::ArrayRef<uint8_t> packet);
   void SendTCPToHALSim(void);
   void SendUDPToHALSim(void);
   void SendJoysticks(void);
-  void SetupSendBuffer(wpi::SmallVectorImpl<wpi::uv::Buffer>& buf);
+  void SetupSendBuffer(wpi::raw_uv_ostream& buf);
 
   /* TCP (FMS) types */
   static const uint8_t kGameDataType = 0x0e;
@@ -75,6 +70,10 @@ class DSCommPacket {
   static const uint8_t kMaxJoysticks = HAL_kMaxJoysticks;
 
  private:
+  void SetupSendHeader(wpi::raw_uv_ostream& buf);
+  void SetupJoystickTag(wpi::raw_uv_ostream& buf);
+  void ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData);
+
   std::array<uint8_t, 64> m_game_data;
   uint8_t m_hi;
   uint8_t m_lo;
@@ -88,6 +87,8 @@ class DSCommPacket {
   int m_udp_packets;
   uint64_t m_packet_time;
   double m_match_time;
+  int m_bufferCount;
+  wpi::SmallVector<wpi::uv::Buffer, 4> m_bufferStore;
 };
 
 }  // namespace halsim
