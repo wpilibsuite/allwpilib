@@ -7,20 +7,20 @@
 
 #pragma once
 
+#include <array>
 #include <chrono>
 #include <string>
 #include <thread>
-#include <array>
-#include <wpi/SmallVector.h>
 
 #include <DSCommJoystickPacket.h>
 #include <FRCComm.h>
 #include <mockdata/DriverStationData.h>
-#include <wpi/uv/Buffer.h>
-#include <wpi/mutex.h>
 #include <wpi/ArrayRef.h>
-#include <wpi/timestamp.h>
+#include <wpi/SmallVector.h>
+#include <wpi/mutex.h>
 #include <wpi/raw_uv_ostream.h>
+#include <wpi/timestamp.h>
+#include <wpi/uv/Buffer.h>
 
 namespace halsim {
 

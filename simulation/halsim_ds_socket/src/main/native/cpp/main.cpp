@@ -23,11 +23,11 @@
 #include <wpi/EventLoopRunner.h>
 #include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/raw_uv_ostream.h>
 #include <wpi/uv/Tcp.h>
 #include <wpi/uv/Timer.h>
 #include <wpi/uv/Udp.h>
 #include <wpi/uv/util.h>
-#include <wpi/raw_uv_ostream.h>
 
 #if defined(Win32) || defined(_WIN32)
 #pragma comment(lib, "Ws2_32.lib")
@@ -118,7 +118,7 @@ class SimpleBufferPool {
  private:
   wpi::SmallVector<wpi::uv::Buffer, 4> m_pool;
 };
-}
+}  // namespace
 
 static void SetupUdp(wpi::uv::Loop& loop) {
   auto udp = wpi::uv::Udp::Create(loop);
@@ -143,7 +143,8 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   udp->received.connect([udpLocal = udp.get()](
       Buffer & buf, size_t len, const sockaddr& recSock, unsigned int port) {
     auto ds = udpLocal->GetLoop()->GetData<halsim::DSCommPacket>();
-    ds->DecodeUDP(wpi::ArrayRef<uint8_t>{reinterpret_cast<uint8_t*>(buf.base), len});
+    ds->DecodeUDP(
+        wpi::ArrayRef<uint8_t>{reinterpret_cast<uint8_t*>(buf.base), len});
 
     struct sockaddr_in outAddr;
     std::memcpy(&outAddr, &recSock, sizeof(sockaddr_in));
@@ -154,14 +155,13 @@ static void SetupUdp(wpi::uv::Loop& loop) {
     wpi::raw_uv_ostream stream{sendBufs, SimpleBufferPool::GetInstance()};
     ds->SetupSendBuffer(stream);
 
-    udpLocal->Send(outAddr, sendBufs,
-                   [](auto bufs, Error err) {
-                     SimpleBufferPool::GetInstance().Release(bufs);
-                     if (err) {
-                       wpi::errs() << err.str() << "\n";
-                       wpi::errs().flush();
-                     }
-                   });
+    udpLocal->Send(outAddr, sendBufs, [](auto bufs, Error err) {
+      SimpleBufferPool::GetInstance().Release(bufs);
+      if (err) {
+        wpi::errs() << err.str() << "\n";
+        wpi::errs().flush();
+      }
+    });
     ds->SendUDPToHALSim();
   });
 

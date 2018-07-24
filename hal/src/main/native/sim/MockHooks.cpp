@@ -39,7 +39,6 @@ void SetProgramStarted() { programStarted = true; }
 bool GetProgramStarted() { return programStarted; }
 }  // namespace hal
 
-
 using namespace hal;
 
 extern "C" {

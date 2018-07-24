@@ -17,8 +17,8 @@
 #include <FRCComm.h>
 #include <mockdata/DriverStationData.h>
 #include <mockdata/MockHooks.h>
-#include "wpi/ArrayRef.h"
-#include "wpi/Format.h"
+#include <wpi/ArrayRef.h>
+#include <wpi/Format.h>
 
 using namespace halsim;
 
@@ -157,14 +157,14 @@ void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
   // Return if packet finished
   if (packet.size() == 6) return;
 
-  //Else, handle tagged data
+  // Else, handle tagged data
   packet = packet.slice(6);
 
   // Loop to handle multiple tags
   while (!packet.empty()) {
     auto tagLength = packet[0];
 
-    switch(packet[1]) {
+    switch (packet[1]) {
       case kTagDsCommJoystick:
         AddDSCommJoystickPacket(packet.slice(2, tagLength - 1));
         break;
@@ -223,7 +223,6 @@ void DSCommPacket::SendJoysticks(void) {
     HALSIM_SetJoystickButtons(i, &buttons);
     HALSIM_SetJoystickDescriptor(i, &descriptor);
   }
-
 }
 
 void DSCommPacket::SetupSendBuffer(wpi::raw_uv_ostream& buf) {
@@ -237,13 +236,14 @@ void DSCommPacket::SetupSendHeader(wpi::raw_uv_ostream& buf) {
   buf << m_hi << m_lo << kCommVersion;
 
   // Control word and status check
-  buf << m_control_sent << (uint8_t)(HALSIM_GetProgramStarted() ? kRobotHasCode : (uint8_t)0);
+  buf << m_control_sent
+      << static_cast<uint8_t>(HALSIM_GetProgramStarted() ? kRobotHasCode : 0);
 
   // Battery voltage high and low
-  buf << (uint8_t)12 << (uint8_t)0;
+  buf << static_cast<uint8_t>(12) << static_cast<uint8_t>(0);
 
   // Request (Always 0)
-  buf << (uint8_t)0;
+  buf << static_cast<uint8_t>(0);
 }
 
 void DSCommPacket::SetupJoystickTag(wpi::raw_uv_ostream& buf) {
@@ -251,13 +251,14 @@ void DSCommPacket::SetupJoystickTag(wpi::raw_uv_ostream& buf) {
 
   // Setup hid tags
   // Length is 8 * num joysticks connected
-  buf << kHIDTag << (uint8_t)(8 * m_joystick_packets.size());
+  buf << kHIDTag << static_cast<uint8_t>(8 * m_joystick_packets.size());
   int64_t outputs;
   int32_t rightRumble;
   int32_t leftRumble;
   for (int i = 0; i < m_joystick_packets.size(); i++) {
     HALSIM_GetJoystickOutputs(i, &outputs, &leftRumble, &rightRumble);
-    buf << static_cast<uint32_t>(outputs) << static_cast<uint16_t>(leftRumble) << static_cast<uint16_t>(rightRumble);
+    buf << static_cast<uint32_t>(outputs) << static_cast<uint16_t>(leftRumble)
+        << static_cast<uint16_t>(rightRumble);
   }
 }
 
