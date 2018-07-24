@@ -61,6 +61,7 @@ HAL_ENUM(HAL_MatchType) {
  */
 #define HAL_kMaxJoystickAxes 12
 #define HAL_kMaxJoystickPOVs 12
+#define HAL_kMaxJoysticks    6
 
 struct HAL_JoystickAxes {
   int16_t count;

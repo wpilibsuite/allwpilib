@@ -27,6 +27,7 @@
 #include <wpi/uv/Timer.h>
 #include <wpi/uv/Udp.h>
 #include <wpi/uv/util.h>
+#include <wpi/raw_uv_ostream.h>
 
 #if defined(Win32) || defined(_WIN32)
 #pragma comment(lib, "Ws2_32.lib")
@@ -38,7 +39,7 @@ static std::unique_ptr<Buffer> singleByte;
 
 namespace {
 struct DataStore {
-  wpi::SmallVector<char, 128> m_frame;
+  wpi::SmallVector<uint8_t, 128> m_frame;
   size_t m_frameSize = std::numeric_limits<size_t>::max();
   halsim::DSCommPacket* dsPacket;
 };
@@ -65,8 +66,7 @@ static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
       need -= toCopy;
       if (need == 0) {
         auto ds = store.dsPacket;
-        ds->DecodeTCP(reinterpret_cast<uint8_t*>(store.m_frame.data()),
-                      store.m_frame.size());
+        ds->DecodeTCP(store.m_frame);
         ds->SendTCPToHALSim();
         store.m_frame.clear();
         store.m_frameSize = std::numeric_limits<size_t>::max();
@@ -93,25 +93,6 @@ static void SetupTcp(wpi::uv::Loop& loop) {
   });
 }
 
-/*----------------------------------------------------------------------------
-**  Send a reply packet back to the DS
-**--------------------------------------------------------------------------*/
-static void SetupReplyPacket(halsim::DSCommPacket* ds) {
-  static const uint8_t kTagGeneral = 0x01;
-
-  uint8_t* data = reinterpret_cast<uint8_t*>(ds->GetSendBuffer().base);
-
-  ds->GetIndex(data[0], data[1]);
-
-  data[2] = kTagGeneral;
-  ds->GetControl(data[3]);
-  ds->GetStatus(data[4]);
-
-  data[5] = 12;  // Voltage upper
-  data[6] = 0;   // Voltage lower
-  data[7] = 0;   // Request
-}
-
 static void SetupUdp(wpi::uv::Loop& loop) {
   auto udp = wpi::uv::Udp::Create(loop);
   udp->Bind("0.0.0.0", 1110);
@@ -135,16 +116,19 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   udp->received.connect([udpLocal = udp.get()](
       Buffer & buf, size_t len, const sockaddr& recSock, unsigned int port) {
     auto ds = udpLocal->GetLoop()->GetData<halsim::DSCommPacket>();
-    ds->DecodeUDP(reinterpret_cast<uint8_t*>(buf.base), len);
-    SetupReplyPacket(ds.get());
+    ds->DecodeUDP(wpi::ArrayRef<uint8_t>{reinterpret_cast<uint8_t*>(buf.base), len});
 
     struct sockaddr_in outAddr;
     std::memcpy(&outAddr, &recSock, sizeof(sockaddr_in));
     outAddr.sin_family = PF_INET;
     outAddr.sin_port = htons(1150);
 
-    udpLocal->Send(outAddr, wpi::ArrayRef<Buffer>{&ds->GetSendBuffer(), 1},
+    wpi::SmallVector<wpi::uv::Buffer, 4> sendBuf;
+    ds->SetupSendBuffer(sendBuf);
+
+    udpLocal->Send(outAddr, sendBuf,
                    [](auto buf, Error err) {
+                     halsim::GetOrResetBufferCount(true);
                      if (err) {
                        wpi::errs() << err.str() << "\n";
                        wpi::errs().flush();
