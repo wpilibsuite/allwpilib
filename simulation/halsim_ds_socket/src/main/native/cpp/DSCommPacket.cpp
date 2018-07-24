@@ -117,7 +117,7 @@ int DSCommPacket::DecodeTCP(wpi::ArrayRef<uint8_t> packetInput) {
   if (packet_len + 2 > len) return 0;
   int packet_type = static_cast<int>(packet[2]);
 
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (packet_type == kGameDataType) {
     std::copy(
         packet + 3,
@@ -146,7 +146,7 @@ void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
   static constexpr uint8_t kMatchTimeTag = 0x07;
   if (packet.size() < 6) return;
   m_udp_packets++;
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   // Decode fixed header
   m_joystick_packets.clear();
   SetIndex(packet[0], packet[1]);
@@ -163,6 +163,7 @@ void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
   // Loop to handle multiple tags
   while (!packet.empty()) {
     auto tagLength = packet[0];
+    auto tagPacket = packet.slice(0, tagLength + 1);
 
     switch (packet[1]) {
       case kTagDsCommJoystick:
@@ -232,6 +233,7 @@ void DSCommPacket::SetupSendBuffer(wpi::raw_uv_ostream& buf) {
 
 void DSCommPacket::SetupSendHeader(wpi::raw_uv_ostream& buf) {
   static constexpr uint8_t kCommVersion = 0x01;
+
   // High low packet index, comm version
   buf << m_hi << m_lo << kCommVersion;
 
@@ -249,22 +251,31 @@ void DSCommPacket::SetupSendHeader(wpi::raw_uv_ostream& buf) {
 void DSCommPacket::SetupJoystickTag(wpi::raw_uv_ostream& buf) {
   static constexpr uint8_t kHIDTag = 0x01;
 
-  // Setup hid tags
-  // Length is 8 * num joysticks connected
-  buf << kHIDTag << static_cast<uint8_t>(8 * m_joystick_packets.size());
+  // HID tags are sent 1 per device
   int64_t outputs;
   int32_t rightRumble;
   int32_t leftRumble;
   for (int i = 0; i < m_joystick_packets.size(); i++) {
+    // Length is 9, 1 tag and 8 data.
+    buf << static_cast<uint8_t>(9) << kHIDTag;
     HALSIM_GetJoystickOutputs(i, &outputs, &leftRumble, &rightRumble);
-    buf << static_cast<uint32_t>(outputs) << static_cast<uint16_t>(leftRumble)
-        << static_cast<uint16_t>(rightRumble);
+    auto op = static_cast<uint32_t>(outputs);
+    auto rr = static_cast<uint16_t>(rightRumble);
+    auto lr = static_cast<uint16_t>(leftRumble);
+    buf.write((op >> 24 & 0xFF));
+    buf.write((op >> 16 & 0xFF));
+    buf.write((op >> 8 & 0xFF));
+    buf.write((op & 0xFF));
+    buf.write((rr >> 8 & 0xFF));
+    buf.write((rr & 0xFF));
+    buf.write((lr >> 8 & 0xFF));
+    buf.write((lr & 0xFF));
   }
 }
 
 void DSCommPacket::SendTCPToHALSim(void) {
   struct HAL_MatchInfo info;
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   std::strncpy(info.eventName, "Simulation", sizeof(info.eventName));
   info.matchType = HAL_MatchType::HAL_kMatchType_none;
   info.matchNumber = 1;
@@ -280,7 +291,7 @@ void DSCommPacket::SendUDPToHALSim(void) {
   struct ControlWord_t control_word;
   AllianceStationID_t alliance_station;
 
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   GetControlWord(&control_word);
   GetAllianceStation(&alliance_station);
   SendJoysticks();

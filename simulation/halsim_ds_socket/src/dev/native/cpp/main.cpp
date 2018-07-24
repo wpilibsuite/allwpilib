@@ -24,5 +24,7 @@ int main() {
 
   while (true) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    HAL_GetJoystickAxes(1, &axes);
+    HAL_SetJoystickOutputs(1, 0, 0, (int)((axes.axes[1] + 1.0f) * 65535 / 2));
   }
 }
