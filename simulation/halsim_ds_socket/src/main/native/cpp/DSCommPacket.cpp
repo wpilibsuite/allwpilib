@@ -59,11 +59,34 @@ void DSCommPacket::ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData) {
   m_match_time = matchTime;
 }
 
+static int GetBytesForBits(int bits) {
+  if (bits == 0) {
+    return 0;
+  } else if (bits <= 8) {
+    return 1;
+  } else if (bits <= 16) {
+    return 2;
+  } else if (bits <= 24) {
+    return 3;
+  } else if (bits <= 32) {
+    return 4;
+  } else if (bits <= 40) {
+    return 5;
+  } else if (bits <= 48) {
+    return 6;
+  } else if (bits <= 56) {
+    return 7;
+  } else {
+    return 8;
+  }
+
+}
+
 void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput, int index) {
   DSCommJoystickPacket& stick = m_joystick_packets[index];
   stick.ResetUdp();
 
-  if (dataInput.size() == 3) {
+  if (dataInput.size() == 2) {
      return;
   }
 
@@ -85,7 +108,7 @@ void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput, int index) 
 
   // Read Buttons
   int buttonCount = dataInput[0];
-  int numBytes = (buttonCount - 1) / 8 + 1;
+  int numBytes = GetBytesForBits(buttonCount);
   stick.buttons.buttons = 0;
   for (int i = 0; i < numBytes; i++) {
     stick.buttons.buttons |= dataInput[1 + i] << (8 * (i));
@@ -179,61 +202,46 @@ void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
   }
 }
 
-  void DSCommPacket::ReadOldMatchInfoTag(wpi::ArrayRef<uint8_t> data) {
-    // Size 2 bytes, tag 1 byte
-    if (data.size() <= 3) return;
-
-    int nameLength = data[3];
-    wpi::SmallVector<char, 128> eventName;
-    eventName.reserve(nameLength + 1);
-    for (int i = 0; i < nameLength; i++) {
-      eventName.emplace_back(data[4 + i]);
-    }
-    eventName.emplace_back('\0');
-
-    data = data.slice(4 + nameLength);
-
-    if (data.size() < 2) return;
-
-    char matchType = data[0]; // 'P', 'Q', 'E' or '0'
-    int matchNumber = data[1];
-  }
-
   void DSCommPacket::ReadNewMatchInfoTag(wpi::ArrayRef<uint8_t> data) {
     // Size 2 bytes, tag 1 byte
     if (data.size() <= 3) return;
 
-    int nameLength = data[3];
-    wpi::SmallVector<char, 128> eventName;
-    eventName.reserve(nameLength + 1);
+    int nameLength = std::min<size_t>(data[3], sizeof(matchInfo.eventName) - 1);
+
     for (int i = 0; i < nameLength; i++) {
-      eventName.emplace_back(data[4 + i]);
+      matchInfo.eventName[i] = data[4 + i];
     }
 
-    eventName.emplace_back('\0');
+    matchInfo.eventName[nameLength] = '\0';
 
     data = data.slice(4 + nameLength);
 
     if (data.size() < 4) return;
 
-    int matchType = data[0]; // None, Practice, Qualification, Elimination, Test
-    int matchNumber = (data[1] << 8) | data[2];
-    int replayNumber = data[3];
+    matchInfo.matchType = static_cast<HAL_MatchType>(data[0]); // None, Practice, Qualification, Elimination, Test
+    matchInfo.matchNumber = (data[1] << 8) | data[2];
+    matchInfo.replayNumber = data[3];
+
+    HALSIM_SetMatchInfo(&matchInfo);
   }
 
   void DSCommPacket::ReadGameSpecificMessageTag(wpi::ArrayRef<uint8_t> data) {
     // Size 2 bytes, tag 1 byte
     if (data.size() <= 3) return;
 
-    wpi::SmallVector<char, 128> gameMessage;
-    int length = ((data[0] << 8) | data[1]) - 1;
-    gameMessage.reserve(length);
+    int length = std::min<size_t>(((data[0] << 8) | data[1]) - 1, sizeof(matchInfo.gameSpecificMessage));
     for (int i = 0; i < length; i++) {
-      gameMessage.emplace_back(data[3 + i]);
+      matchInfo.gameSpecificMessage[i] = data[3 + i];
     }
+
+    matchInfo.gameSpecificMessageSize = length;
+
+    HALSIM_SetMatchInfo(&matchInfo);
   }
   void DSCommPacket::ReadJoystickDescriptionTag(wpi::ArrayRef<uint8_t> data) {
     if (data.size() < 3) return;
+    wpi::outs() << (int)data.size() << '\n';
+    wpi::outs().flush();
     data = data.slice(3);
     int joystickNum = data[0];
     DSCommJoystickPacket& packet = m_joystick_packets[joystickNum];
@@ -312,17 +320,6 @@ void DSCommPacket::SetupJoystickTag(wpi::raw_uv_ostream& buf) {
     buf.write((lr >> 8 & 0xFF));
     buf.write((lr & 0xFF));
   }
-}
-
-void DSCommPacket::SendTCPToHALSim(void) {
-  struct HAL_MatchInfo info;
-  std::strncpy(info.eventName, "Simulation", sizeof(info.eventName));
-  info.matchType = HAL_MatchType::HAL_kMatchType_none;
-  info.matchNumber = 1;
-  info.replayNumber = 0;
-    std::copy(m_game_data.begin(), m_game_data.end() , info.gameSpecificMessage);
-    info.gameSpecificMessageSize = 64;
-  HALSIM_SetMatchInfo(&info);
 }
 
 void DSCommPacket::SendUDPToHALSim(void) {

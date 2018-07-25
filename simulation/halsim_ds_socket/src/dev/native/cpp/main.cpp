@@ -22,12 +22,24 @@ int main() {
   HAL_JoystickAxes axes;
   HAL_JoystickButtons buttons;
   HAL_JoystickPOVs povs;
+  HAL_JoystickDescriptor descriptor;
+  HAL_MatchInfo matchInfo;
 
   while (true) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     HAL_GetJoystickAxes(0, &axes);
     HAL_GetJoystickButtons(0, &buttons);
     HAL_GetJoystickPOVs(0, &povs);
+    HAL_GetJoystickDescriptor(0, &descriptor);
+    HAL_GetMatchInfo(&matchInfo);
+
+    wpi::outs() << descriptor.name << " " << (int)descriptor.isXbox << " ";
+    wpi::outs() << matchInfo.eventName << " ";
+    for (int i = 0; i < matchInfo.gameSpecificMessageSize; i++) {
+      wpi::outs() << matchInfo.gameSpecificMessage[i];
+    }
+    wpi::outs() << "\n";
+    wpi::outs().flush();
 
     //wpi::outs() << wpi::format("%1.5f", axes.axes[0]) << " " << buttons.buttons << " " << (int)povs.povs[0] << "\n";
     //wpi::outs().flush();

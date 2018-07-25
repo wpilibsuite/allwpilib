@@ -67,7 +67,6 @@ static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
       if (need == 0) {
         auto ds = store.dsPacket;
         ds->DecodeTCP(store.m_frame);
-        ds->SendTCPToHALSim();
         store.m_frame.clear();
         store.m_frameSize = std::numeric_limits<size_t>::max();
       }
