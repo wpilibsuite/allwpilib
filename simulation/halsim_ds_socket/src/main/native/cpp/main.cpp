@@ -45,6 +45,11 @@ struct DataStore {
 };
 }  // namespace
 
+static SimpleBufferPool<4>& GetBufferPool() {
+  static SimpleBufferPool<4> bufferPool;
+  return bufferPool;
+}
+
 static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
   wpi::StringRef data{buf.base, size};
   while (!data.empty()) {
@@ -96,33 +101,6 @@ static void SetupTcp(wpi::uv::Loop& loop) {
   });
 }
 
-namespace {
-class SimpleBufferPool {
- public:
-  static constexpr size_t kSize = 4096;
-
-  static SimpleBufferPool& GetInstance() {
-    static SimpleBufferPool inst;
-    return inst;
-  }
-
-  wpi::uv::Buffer operator()() {
-    if (m_pool.empty()) return wpi::uv::Buffer::Allocate(kSize);
-    auto buf = m_pool.back();
-    m_pool.pop_back();
-    buf.len = kSize;
-    return buf;
-  }
-
-  void Release(wpi::MutableArrayRef<wpi::uv::Buffer> bufs) {
-    for (auto& buf : bufs) m_pool.emplace_back(buf.Move());
-  }
-
- private:
-  wpi::SmallVector<wpi::uv::Buffer, 4> m_pool;
-};
-}  // namespace
-
 static void SetupUdp(wpi::uv::Loop& loop) {
   auto udp = wpi::uv::Udp::Create(loop);
   udp->Bind("0.0.0.0", 1110);
@@ -155,11 +133,11 @@ static void SetupUdp(wpi::uv::Loop& loop) {
     outAddr.sin_port = htons(1150);
 
     wpi::SmallVector<wpi::uv::Buffer, 4> sendBufs;
-    wpi::raw_uv_ostream stream{sendBufs, SimpleBufferPool::GetInstance()};
+    wpi::raw_uv_ostream stream{sendBufs, GetBufferPool()};
     ds->SetupSendBuffer(stream);
 
     udpLocal->Send(outAddr, sendBufs, [](auto bufs, Error err) {
-      SimpleBufferPool::GetInstance().Release(bufs);
+      GetBufferPool().Release(bufs);
       if (err) {
         wpi::errs() << err.str() << "\n";
         wpi::errs().flush();
