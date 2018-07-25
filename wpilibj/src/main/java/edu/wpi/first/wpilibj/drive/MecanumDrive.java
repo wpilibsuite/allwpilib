@@ -119,7 +119,7 @@ public class MecanumDrive extends RobotDriveBase {
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
     if (!m_reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, 4,
-                 tInstances.kRobotDrive_MecanumCartesian);
+                 tInstances.kRobotDrive2_MecanumCartesian);
       m_reported = true;
     }
 
@@ -165,7 +165,7 @@ public class MecanumDrive extends RobotDriveBase {
   @SuppressWarnings("ParameterName")
   public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 4, tInstances.kRobotDrive_MecanumPolar);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 4, tInstances.kRobotDrive2_MecanumPolar);
       m_reported = true;
     }
 

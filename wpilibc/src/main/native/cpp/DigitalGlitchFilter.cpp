@@ -35,7 +35,8 @@ DigitalGlitchFilter::DigitalGlitchFilter() {
   m_channelIndex = std::distance(m_filterAllocated.begin(), index);
   *index = true;
 
-  HAL_Report(HALUsageReporting::kResourceType_DigitalFilter, m_channelIndex);
+  HAL_Report(HALUsageReporting::kResourceType_DigitalGlitchFilter,
+             m_channelIndex);
   SetName("DigitalGlitchFilter", m_channelIndex);
 }
 

@@ -21,7 +21,7 @@ CAN::CAN(int deviceId) {
     return;
   }
 
-  // HAL_Report(HALUsageReporting::kResourceType_CAN, deviceId);
+  HAL_Report(HALUsageReporting::kResourceType_CAN, deviceId);
 }
 
 CAN::~CAN() {

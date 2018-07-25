@@ -41,7 +41,7 @@ void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
                                   double zRotation, double gyroAngle) {
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 4,
-               HALUsageReporting::kRobotDrive_MecanumCartesian);
+               HALUsageReporting::kRobotDrive2_MecanumCartesian);
     reported = true;
   }
 
@@ -77,7 +77,7 @@ void MecanumDrive::DrivePolar(double magnitude, double angle,
                               double zRotation) {
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 4,
-               HALUsageReporting::kRobotDrive_MecanumPolar);
+               HALUsageReporting::kRobotDrive2_MecanumPolar);
     reported = true;
   }
 

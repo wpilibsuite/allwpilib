@@ -10,6 +10,8 @@
 #include <cassert>
 #include <cmath>
 
+#include <hal/HAL.h>
+
 using namespace frc;
 
 LinearDigitalFilter::LinearDigitalFilter(PIDSource& source,
@@ -19,7 +21,11 @@ LinearDigitalFilter::LinearDigitalFilter(PIDSource& source,
       m_inputs(ffGains.size()),
       m_outputs(fbGains.size()),
       m_inputGains(ffGains),
-      m_outputGains(fbGains) {}
+      m_outputGains(fbGains) {
+  static int instances = 0;
+  instances++;
+  HAL_Report(HALUsageReporting::kResourceType_LinearFilter, instances);
+}
 
 LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
                                          wpi::ArrayRef<double> ffGains,
@@ -28,7 +34,11 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
       m_inputs(ffGains.size()),
       m_outputs(fbGains.size()),
       m_inputGains(ffGains),
-      m_outputGains(fbGains) {}
+      m_outputGains(fbGains) {
+  static int instances = 0;
+  instances++;
+  HAL_Report(HALUsageReporting::kResourceType_LinearFilter, instances);
+}
 
 LinearDigitalFilter LinearDigitalFilter::SinglePoleIIR(PIDSource& source,
                                                        double timeConstant,

@@ -47,8 +47,8 @@ KilloughDrive::KilloughDrive(SpeedController& leftMotor,
 void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
                                    double zRotation, double gyroAngle) {
   if (!reported) {
-    // HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 3,
-    //            HALUsageReporting::kRobotDrive_KilloughCartesian);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 3,
+               HALUsageReporting::kRobotDrive2_KilloughCartesian);
     reported = true;
   }
 
@@ -79,8 +79,8 @@ void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
 void KilloughDrive::DrivePolar(double magnitude, double angle,
                                double zRotation) {
   if (!reported) {
-    // HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 3,
-    //            HALUsageReporting::kRobotDrive_KilloughPolar);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 3,
+               HALUsageReporting::kRobotDrive2_KilloughPolar);
     reported = true;
   }
 
