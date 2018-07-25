@@ -67,7 +67,7 @@ TEST_F(DSCommPacketTest, MainJoystickTag) {
       // Size, Tag
       16, 12,
       // Axes
-      4, -100, -50, 0, 75,
+      4, 0x9C, 0xCE, 0, 75,
       // Buttons
       12, 0xFF, 0x0F,
       // POVs
