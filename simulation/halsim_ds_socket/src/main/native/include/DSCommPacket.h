@@ -8,47 +8,30 @@
 #pragma once
 
 #include <array>
-#include <chrono>
-#include <string>
-#include <thread>
 
 #include <DSCommJoystickPacket.h>
-#include <FRCComm.h>
 #include <mockdata/DriverStationData.h>
 #include <wpi/ArrayRef.h>
-#include <wpi/SmallVector.h>
-#include <wpi/mutex.h>
 #include <wpi/raw_uv_ostream.h>
-#include <wpi/timestamp.h>
-#include <wpi/uv/Buffer.h>
 
 namespace halsim {
 
 class DSCommPacket {
  public:
-  DSCommPacket(void) {
-    for (auto& i : m_joystick_packets) {
-      i.ResetTcp();
-      i.ResetUdp();
-    }
-    m_game_data.fill(0);
-    m_packet_time = wpi::Now();
-    m_bufferCount = 0;
-  }
-  void SetIndex(uint8_t hi, uint8_t lo);
-  void SetControl(uint8_t control, uint8_t request);
-  void SetAlliance(uint8_t station_code);
-  void GetControlWord(struct ControlWord_t* control_word);
-  void GetAllianceStation(enum AllianceStationID_t* allianceStation);
+  DSCommPacket(void);
   void DecodeTCP(wpi::ArrayRef<uint8_t> packet);
   void DecodeUDP(wpi::ArrayRef<uint8_t> packet);
   void SendUDPToHALSim(void);
-  void SendJoysticks(void);
   void SetupSendBuffer(wpi::raw_uv_ostream& buf);
 
-  /* TCP (FMS) types */
-  static const uint8_t kGameDataType = 0x0e;
-  static const uint8_t kJoystickNameType = 0x02;
+  /* TCP Tags */
+  static const uint8_t kGameDataTag = 0x0e;
+  static const uint8_t kJoystickNameTag = 0x02;
+  static const uint8_t kMatchInfoTag = 0x07;
+
+  /* UDP Tags*/
+  static const uint8_t kJoystickDataTag = 0x0c;
+  static const uint8_t kMatchTimeTag = 0x07;
 
   /* Control word bits */
   static const uint8_t kTest = 0x01;
@@ -63,13 +46,10 @@ class DSCommPacket {
   /* Status bits */
   static const uint8_t kRobotHasCode = 0x20;
 
-  /* Joystick tag bits */
-  static const uint8_t kTagDsCommJoystick = 0x0c;
-
-  /* Joystick max count */
-  static const uint8_t kMaxJoysticks = HAL_kMaxJoysticks;
-
  private:
+  void SendJoysticks(void);
+  void SetControl(uint8_t control, uint8_t request);
+  void SetAlliance(uint8_t station_code);
   void SetupSendHeader(wpi::raw_uv_ostream& buf);
   void SetupJoystickTag(wpi::raw_uv_ostream& buf);
   void ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData);
@@ -78,20 +58,14 @@ class DSCommPacket {
   void ReadGameSpecificMessageTag(wpi::ArrayRef<uint8_t> data);
   void ReadJoystickDescriptionTag(wpi::ArrayRef<uint8_t> data);
 
-  std::array<uint8_t, 64> m_game_data;
   uint8_t m_hi;
   uint8_t m_lo;
   uint8_t m_control_sent;
-  struct ControlWord_t m_control_word;
-  enum AllianceStationID_t m_alliance_station;
+  HAL_ControlWord m_control_word;
+  HAL_AllianceStationID m_alliance_station;
   HAL_MatchInfo matchInfo;
-  std::array<DSCommJoystickPacket, kMaxJoysticks> m_joystick_packets;
-  wpi::mutex m_mutex;
-  int m_udp_packets;
-  uint64_t m_packet_time;
+  std::array<DSCommJoystickPacket, HAL_kMaxJoysticks> m_joystick_packets;
   double m_match_time;
-  int m_bufferCount;
-  wpi::SmallVector<wpi::uv::Buffer, 4> m_bufferStore;
 };
 
 }  // namespace halsim

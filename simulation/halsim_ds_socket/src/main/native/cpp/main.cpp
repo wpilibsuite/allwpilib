@@ -92,9 +92,7 @@ static void SetupTcp(wpi::uv::Loop& loop) {
       HandleTcpDataStream(buf, len, *t->GetData<DataStore>());
     });
     client->StartRead();
-    client->end.connect([c = client.get()]{
-      c->Close();
-    });
+    client->end.connect([c = client.get()] { c->Close(); });
   });
 }
 

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "hal/DriverStation.h"
+#include <hal/DriverStation.h>
 
 namespace halsim {
 
@@ -23,9 +23,7 @@ typedef struct {
     std::memset(&povs, 0, sizeof(povs));
   }
 
-  void ResetTcp() {
-    std::memset(&descriptor, 0, sizeof(descriptor));
-  }
+  void ResetTcp() { std::memset(&descriptor, 0, sizeof(descriptor)); }
 } DSCommJoystickPacket;
 
 }  // namespace halsim
