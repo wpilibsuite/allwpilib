@@ -27,7 +27,11 @@ namespace halsim {
 class DSCommPacket {
  public:
   DSCommPacket(void) {
-    m_joystick_types.fill(-1);
+    for (auto& i : m_joystick_packets) {
+      i.ResetTcp();
+      i.ResetUdp();
+    }
+    m_game_data.fill(0);
     m_packet_time = wpi::Now();
     m_bufferCount = 0;
   }
@@ -36,7 +40,7 @@ class DSCommPacket {
   void SetAlliance(uint8_t station_code);
   void GetControlWord(struct ControlWord_t* control_word);
   void GetAllianceStation(enum AllianceStationID_t* allianceStation);
-  int DecodeTCP(wpi::ArrayRef<uint8_t> packet);
+  void DecodeTCP(wpi::ArrayRef<uint8_t> packet);
   void DecodeUDP(wpi::ArrayRef<uint8_t> packet);
   void SendTCPToHALSim(void);
   void SendUDPToHALSim(void);
@@ -70,7 +74,7 @@ class DSCommPacket {
   void SetupSendHeader(wpi::raw_uv_ostream& buf);
   void SetupJoystickTag(wpi::raw_uv_ostream& buf);
   void ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData);
-  void ReadJoystickTag(wpi::ArrayRef<uint8_t> data);
+  void ReadJoystickTag(wpi::ArrayRef<uint8_t> data, int index);
   void ReadOldMatchInfoTag(wpi::ArrayRef<uint8_t> data);
   void ReadNewMatchInfoTag(wpi::ArrayRef<uint8_t> data);
   void ReadGameSpecificMessageTag(wpi::ArrayRef<uint8_t> data);
@@ -82,9 +86,7 @@ class DSCommPacket {
   uint8_t m_control_sent;
   struct ControlWord_t m_control_word;
   enum AllianceStationID_t m_alliance_station;
-  wpi::SmallVector<DSCommJoystickPacket, 6> m_joystick_packets;
-  std::array<std::string, kMaxJoysticks> m_joystick_names;
-  std::array<int, kMaxJoysticks> m_joystick_types;
+  std::array<DSCommJoystickPacket, kMaxJoysticks> m_joystick_packets;
   wpi::mutex m_mutex;
   int m_udp_packets;
   uint64_t m_packet_time;

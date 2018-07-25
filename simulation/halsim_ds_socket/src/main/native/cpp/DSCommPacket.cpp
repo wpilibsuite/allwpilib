@@ -59,11 +59,11 @@ void DSCommPacket::ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData) {
   m_match_time = matchTime;
 }
 
-void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput) {
-  DSCommJoystickPacket stick;
+void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput, int index) {
+  DSCommJoystickPacket& stick = m_joystick_packets[index];
+  stick.ResetUdp();
 
   if (dataInput.size() == 3) {
-     m_joystick_packets.push_back(stick);
      return;
   }
 
@@ -72,29 +72,34 @@ void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput) {
   // Read axes
   int axesLength = dataInput[0];
   for (int i = 0; i < axesLength; i++) {
-    stick.axes.push_back(dataInput[1 + i]);
+    int8_t value = dataInput[1 + i];
+    if (value < 0) {
+      stick.axes.axes[i] = value / 128.0;
+    } else {
+      stick.axes.axes[i] = value / 127.0;
+    }
   }
+  stick.axes.count = axesLength;
 
   dataInput = dataInput.slice(1 + axesLength);
 
   // Read Buttons
   int buttonCount = dataInput[0];
   int numBytes = (buttonCount - 1) / 8 + 1;
-  stick.buttons = 0;
+  stick.buttons.buttons = 0;
   for (int i = 0; i < numBytes; i++) {
-    stick.buttons |= dataInput[1 + i] << (8 * (i));
+    stick.buttons.buttons |= dataInput[1 + i] << (8 * (i));
   }
-  stick.button_count = buttonCount;
+  stick.buttons.count = buttonCount;
 
   dataInput = dataInput.slice(1 + numBytes);
 
   int povsLength = dataInput[0];
   for (int i = 0; i < povsLength * 2; i+= 2) {
-    stick.povs.push_back((dataInput[1 + i] << 8) | dataInput[2 + i]);
+    stick.povs.povs[i] = (dataInput[1 + i] << 8) | dataInput[2 + i];
   }
 
-
-  m_joystick_packets.push_back(stick);
+  stick.povs.count = povsLength;
 
   return;
 }
@@ -111,38 +116,30 @@ void DSCommPacket::GetAllianceStation(
 /*----------------------------------------------------------------------------
 **  Communication methods
 **--------------------------------------------------------------------------*/
-int DSCommPacket::DecodeTCP(wpi::ArrayRef<uint8_t> packetInput) {
-  auto packet = packetInput.data();
-  auto len = packetInput.size();
-  if (len < 2) return 0;
-  if (packet[0] == 0 && packet[1] == 0) return 2;
-  int packet_len = packet[1];
-  if (packet_len + 2 > len) return 0;
-  int packet_type = static_cast<int>(packet[2]);
+void DSCommPacket::DecodeTCP(wpi::ArrayRef<uint8_t> packet) {
 
-  std::unique_lock<wpi::mutex> lock(m_mutex);
-  if (packet_type == kGameDataType) {
-    std::copy(
-        packet + 3,
-        packet + 3 +
-            std::min(static_cast<int>(m_game_data.size()), packet_len - 1),
-        m_game_data.begin());
-  } else if (packet_type == kJoystickNameType && len >= 7) {
-    int joystick = static_cast<int>(packet[3]);
-    if (joystick < kMaxJoysticks) {
-      m_joystick_types[joystick] = static_cast<int>(packet[5]);
-      int namelen = static_cast<int>(packet[6]);
-      m_joystick_names[joystick] =
-          std::string(reinterpret_cast<const char*>(packet + 7), namelen);
+  // No header
+  while (!packet.empty()) {
+    int tagLength = packet[0] << 8 | packet[1];
+    auto tagPacket = packet.slice(0, tagLength + 2);
+
+    if (tagLength == 0) {
+      return;
     }
-  } else {
-    std::cerr << "TCP packet type " << packet_type << " unimplemented"
-              << std::endl;
-    for (int i = 0; i < packet_len + 2; i++)
-      std::fprintf(stderr, "%02x ", packet[i]);
-    std::fprintf(stderr, "\n");
+
+    switch (packet[2]) {
+      case kJoystickNameType:
+        ReadJoystickDescriptionTag(tagPacket);
+        break;
+      case kGameDataType:
+        ReadGameSpecificMessageTag(tagPacket);
+        break;
+      case 0x07:
+        ReadNewMatchInfoTag(tagPacket);
+        break;
+    }
+    packet = packet.slice(tagLength + 2);
   }
-  return packet_len + 2;
 }
 
 void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
@@ -151,7 +148,6 @@ void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
   m_udp_packets++;
   std::unique_lock<wpi::mutex> lock(m_mutex);
   // Decode fixed header
-  m_joystick_packets.clear();
   SetIndex(packet[0], packet[1]);
   // Comm Version is packet 2, ignore
   SetControl(packet[3], packet[4]);
@@ -163,6 +159,8 @@ void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
   // Else, handle tagged data
   packet = packet.slice(6);
 
+  int joystickNum = 0;
+
   // Loop to handle multiple tags
   while (!packet.empty()) {
     auto tagLength = packet[0];
@@ -170,7 +168,8 @@ void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
 
     switch (packet[1]) {
       case kTagDsCommJoystick:
-        ReadJoystickTag(tagPacket);
+        ReadJoystickTag(tagPacket, joystickNum);
+        joystickNum++;
         break;
       case kMatchTimeTag:
         ReadMatchtimeTag(tagPacket);
@@ -227,62 +226,44 @@ void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
     if (data.size() <= 3) return;
 
     wpi::SmallVector<char, 128> gameMessage;
-    int length = data[3];
+    int length = ((data[0] << 8) | data[1]) - 1;
     gameMessage.reserve(length);
     for (int i = 0; i < length; i++) {
-      gameMessage.emplace_back(data[4 + i]);
+      gameMessage.emplace_back(data[3 + i]);
     }
   }
   void DSCommPacket::ReadJoystickDescriptionTag(wpi::ArrayRef<uint8_t> data) {
+    if (data.size() < 3) return;
+    data = data.slice(3);
+    int joystickNum = data[0];
+    DSCommJoystickPacket& packet = m_joystick_packets[joystickNum];
+    packet.ResetTcp();
+    packet.descriptor.isXbox = data[1] != 0 ? 1 : 0;
+    packet.descriptor.type = data[2];
+    int nameLength = std::min((int)data[3], (int)(sizeof(packet.descriptor.name) - 1));
+    for (int i = 0; i < nameLength; i++) {
+      packet.descriptor.name[i] = data[4 + i];
+    }
+    data = data.slice(4 + nameLength);
+    packet.descriptor.name[nameLength] = '\0';
+    int axesCount = data[0];
+    packet.descriptor.axisCount = axesCount;
+    for (int i = 0; i < axesCount; i++) {
+      packet.descriptor.axisTypes[i] = data[1 + i];
+    }
+    data = data.slice(1 + axesCount);
 
+    packet.descriptor.buttonCount = data[0];
+    packet.descriptor.povCount = data[1];
   }
 
 void DSCommPacket::SendJoysticks(void) {
-  unsigned int i;
-
-  for (i = 0; i < kMaxJoysticks; i++) {
-    struct HAL_JoystickAxes axes;
-    struct HAL_JoystickPOVs povs;
-    struct HAL_JoystickButtons buttons;
-    struct HAL_JoystickDescriptor descriptor;
-    int j;
-
-    std::memset(&axes, 0, sizeof(axes));
-    std::memset(&povs, 0, sizeof(povs));
-    std::memset(&buttons, 0, sizeof(buttons));
-    std::memset(&descriptor, 0, sizeof(descriptor));
-
-    if (i < m_joystick_packets.size()) {
-      axes.count = std::min(static_cast<int>(m_joystick_packets[i].axes.size()),
-                            HAL_kMaxJoystickAxes);
-      for (j = 0; j < axes.count; j++) {
-        int8_t value = m_joystick_packets[i].axes[j];
-        if (value < 0) {
-          axes.axes[j] = value / 128.0;
-        } else {
-          axes.axes[j] = value / 127.0;
-        }
-      }
-
-      povs.count = std::min(static_cast<int>(m_joystick_packets[i].povs.size()),
-                            HAL_kMaxJoystickPOVs);
-      for (j = 0; j < povs.count; j++)
-        povs.povs[j] = m_joystick_packets[i].povs[j];
-
-      buttons.count = m_joystick_packets[i].button_count;
-      buttons.buttons = m_joystick_packets[i].buttons;
-
-      descriptor.axisCount = axes.count;
-      descriptor.povCount = povs.count;
-      descriptor.buttonCount = buttons.count;
-    }
-    descriptor.type = m_joystick_types[i];
-    m_joystick_names[i].copy(descriptor.name, sizeof(descriptor.name) - 1, 0);
-
-    HALSIM_SetJoystickAxes(i, &axes);
-    HALSIM_SetJoystickPOVs(i, &povs);
-    HALSIM_SetJoystickButtons(i, &buttons);
-    HALSIM_SetJoystickDescriptor(i, &descriptor);
+  for (int i = 0; i < kMaxJoysticks; i++) {
+    DSCommJoystickPacket& packet = m_joystick_packets[i];
+    HALSIM_SetJoystickAxes(i, &packet.axes);
+    HALSIM_SetJoystickPOVs(i, &packet.povs);
+    HALSIM_SetJoystickButtons(i, &packet.buttons);
+    HALSIM_SetJoystickDescriptor(i, &packet.descriptor);
   }
 }
 
@@ -335,15 +316,12 @@ void DSCommPacket::SetupJoystickTag(wpi::raw_uv_ostream& buf) {
 
 void DSCommPacket::SendTCPToHALSim(void) {
   struct HAL_MatchInfo info;
-  std::unique_lock<wpi::mutex> lock(m_mutex);
   std::strncpy(info.eventName, "Simulation", sizeof(info.eventName));
   info.matchType = HAL_MatchType::HAL_kMatchType_none;
   info.matchNumber = 1;
   info.replayNumber = 0;
-  std::copy(info.gameSpecificMessage,
-            info.gameSpecificMessage +
-                std::min(sizeof(info.gameSpecificMessage), m_game_data.size()),
-            m_game_data.begin());
+    std::copy(m_game_data.begin(), m_game_data.end() , info.gameSpecificMessage);
+    info.gameSpecificMessageSize = 64;
   HALSIM_SetMatchInfo(&info);
 }
 

@@ -6,15 +6,26 @@
 /*----------------------------------------------------------------------------*/
 
 #pragma once
-#include <vector>
+
+#include "hal/DriverStation.h"
 
 namespace halsim {
 
 typedef struct {
-  std::vector<int16_t> axes;
-  uint8_t button_count;
-  uint32_t buttons;
-  std::vector<int16_t> povs;
+  HAL_JoystickAxes axes;
+  HAL_JoystickButtons buttons;
+  HAL_JoystickPOVs povs;
+  HAL_JoystickDescriptor descriptor;
+
+  void ResetUdp() {
+    std::memset(&axes, 0, sizeof(axes));
+    std::memset(&buttons, 0, sizeof(buttons));
+    std::memset(&povs, 0, sizeof(povs));
+  }
+
+  void ResetTcp() {
+    std::memset(&descriptor, 0, sizeof(descriptor));
+  }
 } DSCommJoystickPacket;
 
 }  // namespace halsim

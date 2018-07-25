@@ -48,7 +48,7 @@ struct DataStore {
 static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
   wpi::StringRef data{buf.base, size};
   while (!data.empty()) {
-    if (store.m_frameSize != std::numeric_limits<size_t>::max()) {
+    if (store.m_frameSize == std::numeric_limits<size_t>::max()) {
       if (store.m_frame.size() < 2u) {
         size_t toCopy = std::min(2u - store.m_frame.size(), data.size());
         store.m_frame.append(data.bytes_begin(), data.bytes_begin() + toCopy);
@@ -58,7 +58,7 @@ static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
       store.m_frameSize = (static_cast<uint16_t>(store.m_frame[0]) << 8) |
                           static_cast<uint16_t>(store.m_frame[1]);
     }
-    if (store.m_frameSize != 0) {
+    if (store.m_frameSize != std::numeric_limits<size_t>::max()) {
       size_t need = store.m_frameSize - (store.m_frame.size() - 2);
       size_t toCopy = std::min(need, data.size());
       store.m_frame.append(data.bytes_begin(), data.bytes_begin() + toCopy);
@@ -80,6 +80,7 @@ static void SetupTcp(wpi::uv::Loop& loop) {
   auto tcpWaitTimer = Timer::Create(loop);
 
   auto recStore = std::make_shared<DataStore>();
+  recStore->dsPacket = loop.GetData<halsim::DSCommPacket>().get();
 
   tcp->SetData(recStore);
 
@@ -87,8 +88,13 @@ static void SetupTcp(wpi::uv::Loop& loop) {
 
   tcp->Listen([t = tcp.get()] {
     auto client = t->Accept();
-    t->data.connect([t](Buffer& buf, size_t len) {
+
+    client->data.connect([t](Buffer& buf, size_t len) {
       HandleTcpDataStream(buf, len, *t->GetData<DataStore>());
+    });
+    client->StartRead();
+    client->end.connect([c = client.get()]{
+      c->Close();
     });
   });
 }

@@ -30,8 +30,8 @@ int main() {
     HAL_GetJoystickButtons(0, &buttons);
     HAL_GetJoystickPOVs(0, &povs);
 
-    wpi::outs() << wpi::format("%1.5f", axes.axes[0]) << " " << buttons.buttons << " " << (int)povs.povs[0] << "\n";
-    wpi::outs().flush();
+    //wpi::outs() << wpi::format("%1.5f", axes.axes[0]) << " " << buttons.buttons << " " << (int)povs.povs[0] << "\n";
+    //wpi::outs().flush();
     //HAL_SetJoystickOutputs(1, 0, 0, (int)((axes.axes[1] + 1.0f) * 65535 / 2));
   }
 }
