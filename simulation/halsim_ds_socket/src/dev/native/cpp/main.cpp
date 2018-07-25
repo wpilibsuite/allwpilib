@@ -22,7 +22,6 @@ int main() {
   HAL_JoystickAxes axes;
   HAL_JoystickButtons buttons;
   HAL_JoystickPOVs povs;
-  int32_t status = 0;
 
   while (true) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
