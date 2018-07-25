@@ -10,6 +10,8 @@
 #include <string>
 
 #include <networktables/NetworkTableEntry.h>
+#include <wpi/SmallVector.h>
+#include <wpi/mutex.h>
 
 #include "frc/smartdashboard/SendableBase.h"
 
@@ -30,9 +32,13 @@ class SendableChooserBase : public SendableBase {
   static constexpr const char* kDefault = "default";
   static constexpr const char* kOptions = "options";
   static constexpr const char* kSelected = "selected";
+  static constexpr const char* kActive = "active";
 
   std::string m_defaultChoice;
-  nt::NetworkTableEntry m_selectedEntry;
+  std::string m_selected;
+  bool m_haveSelected = false;
+  wpi::SmallVector<nt::NetworkTableEntry, 2> m_activeEntries;
+  wpi::mutex m_mutex;
 };
 
 }  // namespace frc
