@@ -15,6 +15,7 @@
 #include <utility>
 
 #include "wpi/ArrayRef.h"
+#include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
 
 namespace wpi {
@@ -84,6 +85,65 @@ class Buffer : public uv_buf_t {
     swap(a.base, b.base);
     swap(a.len, b.len);
   }
+};
+
+/**
+ * A simple pool allocator for Buffers.
+ * Buffers are allocated individually but are reused rather than returned
+ * to the heap.
+ * @tparam DEPTH depth of pool
+ */
+template <size_t DEPTH = 4>
+class SimpleBufferPool {
+ public:
+  /**
+   * Constructor.
+   * @param size Size of each buffer to allocate.
+   */
+  explicit SimpleBufferPool(size_t size = 4096) : m_size{size} {}
+
+  /**
+   * Allocate a buffer.
+   */
+  Buffer Allocate() {
+    if (m_pool.empty()) return Buffer::Allocate(m_size);
+    auto buf = m_pool.back();
+    m_pool.pop_back();
+    buf.len = m_size;
+    return buf;
+  }
+
+  /**
+   * Allocate a buffer.
+   */
+  Buffer operator()() { return Allocate(); }
+
+  /**
+   * Release allocated buffers back into the pool.
+   * This is NOT safe to use with arbitrary buffers unless they were
+   * allocated with the same size as the buffer pool allocation size.
+   */
+  void Release(MutableArrayRef<Buffer> bufs) {
+    for (auto& buf : bufs) m_pool.emplace_back(buf.Move());
+  }
+
+  /**
+   * Clear the pool, releasing all buffers.
+   */
+  void Clear() {
+    for (auto& buf : m_pool) buf.Deallocate();
+    m_pool.clear();
+  }
+
+  /**
+   * Get number of buffers left in the pool before a new buffer will be
+   * allocated from the heap.
+   */
+  size_t Remaining() const { return m_pool.size(); }
+
+ private:
+  SmallVector<Buffer, DEPTH> m_pool;
+  size_t m_size;
 };
 
 }  // namespace uv
