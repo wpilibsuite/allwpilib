@@ -61,28 +61,6 @@ void DSCommPacket::ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData) {
   m_match_time = matchTime;
 }
 
-static int GetBytesForBits(int bits) {
-  if (bits == 0) {
-    return 0;
-  } else if (bits <= 8) {
-    return 1;
-  } else if (bits <= 16) {
-    return 2;
-  } else if (bits <= 24) {
-    return 3;
-  } else if (bits <= 32) {
-    return 4;
-  } else if (bits <= 40) {
-    return 5;
-  } else if (bits <= 48) {
-    return 6;
-  } else if (bits <= 56) {
-    return 7;
-  } else {
-    return 8;
-  }
-}
-
 void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput,
                                    int index) {
   DSCommJoystickPacket& stick = m_joystick_packets[index];
@@ -110,7 +88,7 @@ void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput,
 
   // Read Buttons
   int buttonCount = dataInput[0];
-  int numBytes = GetBytesForBits(buttonCount);
+  int numBytes = (buttonCount + 7) / 8;
   stick.buttons.buttons = 0;
   for (int i = 0; i < numBytes; i++) {
     stick.buttons.buttons |= dataInput[1 + i] << (8 * (i));

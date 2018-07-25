@@ -14,9 +14,12 @@
 #include <wpi/ArrayRef.h>
 #include <wpi/raw_uv_ostream.h>
 
+class DSCommPacketTest;
+
 namespace halsim {
 
 class DSCommPacket {
+  friend class ::DSCommPacketTest;
  public:
   DSCommPacket(void);
   void DecodeTCP(wpi::ArrayRef<uint8_t> packet);
