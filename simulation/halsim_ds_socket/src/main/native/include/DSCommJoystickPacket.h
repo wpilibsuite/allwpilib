@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hal/DriverStation.h>
+#include <cstring>
 
 namespace halsim {
 

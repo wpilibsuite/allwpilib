@@ -273,7 +273,7 @@ void DSCommPacket::SetupJoystickTag(wpi::raw_uv_ostream& buf) {
   int64_t outputs;
   int32_t rightRumble;
   int32_t leftRumble;
-  for (int i = 0; i < m_joystick_packets.size(); i++) {
+  for (size_t i = 0; i < m_joystick_packets.size(); i++) {
     // Length is 9, 1 tag and 8 data.
     buf << static_cast<uint8_t>(9) << kHIDTag;
     HALSIM_GetJoystickOutputs(i, &outputs, &leftRumble, &rightRumble);
