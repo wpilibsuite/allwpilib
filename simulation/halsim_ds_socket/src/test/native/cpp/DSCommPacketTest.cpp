@@ -87,7 +87,7 @@ TEST_F(DSCommPacketTest, DescriptorTag) {
       // Size (2), tag
       0, 0, 7,
       // Joystick index, Is Xbox, Type
-      i, 1, 0,
+      static_cast<uint8_t>(i), 1, 0,
       // NameLen, Name (Not null terminated)
       11, 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd',
       // Axes count, Axes types
