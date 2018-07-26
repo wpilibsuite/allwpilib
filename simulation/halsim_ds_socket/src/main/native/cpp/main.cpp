@@ -23,6 +23,7 @@
 #include <wpi/EventLoopRunner.h>
 #include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/raw_uv_ostream.h>
 #include <wpi/uv/Tcp.h>
 #include <wpi/uv/Timer.h>
 #include <wpi/uv/Udp.h>
@@ -38,16 +39,21 @@ static std::unique_ptr<Buffer> singleByte;
 
 namespace {
 struct DataStore {
-  wpi::SmallVector<char, 128> m_frame;
+  wpi::SmallVector<uint8_t, 128> m_frame;
   size_t m_frameSize = std::numeric_limits<size_t>::max();
   halsim::DSCommPacket* dsPacket;
 };
 }  // namespace
 
+static SimpleBufferPool<4>& GetBufferPool() {
+  static SimpleBufferPool<4> bufferPool;
+  return bufferPool;
+}
+
 static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
   wpi::StringRef data{buf.base, size};
   while (!data.empty()) {
-    if (store.m_frameSize != std::numeric_limits<size_t>::max()) {
+    if (store.m_frameSize == std::numeric_limits<size_t>::max()) {
       if (store.m_frame.size() < 2u) {
         size_t toCopy = std::min(2u - store.m_frame.size(), data.size());
         store.m_frame.append(data.bytes_begin(), data.bytes_begin() + toCopy);
@@ -57,7 +63,7 @@ static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
       store.m_frameSize = (static_cast<uint16_t>(store.m_frame[0]) << 8) |
                           static_cast<uint16_t>(store.m_frame[1]);
     }
-    if (store.m_frameSize != 0) {
+    if (store.m_frameSize != std::numeric_limits<size_t>::max()) {
       size_t need = store.m_frameSize - (store.m_frame.size() - 2);
       size_t toCopy = std::min(need, data.size());
       store.m_frame.append(data.bytes_begin(), data.bytes_begin() + toCopy);
@@ -65,9 +71,7 @@ static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
       need -= toCopy;
       if (need == 0) {
         auto ds = store.dsPacket;
-        ds->DecodeTCP(reinterpret_cast<uint8_t*>(store.m_frame.data()),
-                      store.m_frame.size());
-        ds->SendTCPToHALSim();
+        ds->DecodeTCP(store.m_frame);
         store.m_frame.clear();
         store.m_frameSize = std::numeric_limits<size_t>::max();
       }
@@ -80,6 +84,7 @@ static void SetupTcp(wpi::uv::Loop& loop) {
   auto tcpWaitTimer = Timer::Create(loop);
 
   auto recStore = std::make_shared<DataStore>();
+  recStore->dsPacket = loop.GetData<halsim::DSCommPacket>().get();
 
   tcp->SetData(recStore);
 
@@ -87,29 +92,13 @@ static void SetupTcp(wpi::uv::Loop& loop) {
 
   tcp->Listen([t = tcp.get()] {
     auto client = t->Accept();
-    t->data.connect([t](Buffer& buf, size_t len) {
+
+    client->data.connect([t](Buffer& buf, size_t len) {
       HandleTcpDataStream(buf, len, *t->GetData<DataStore>());
     });
+    client->StartRead();
+    client->end.connect([c = client.get()] { c->Close(); });
   });
-}
-
-/*----------------------------------------------------------------------------
-**  Send a reply packet back to the DS
-**--------------------------------------------------------------------------*/
-static void SetupReplyPacket(halsim::DSCommPacket* ds) {
-  static const uint8_t kTagGeneral = 0x01;
-
-  uint8_t* data = reinterpret_cast<uint8_t*>(ds->GetSendBuffer().base);
-
-  ds->GetIndex(data[0], data[1]);
-
-  data[2] = kTagGeneral;
-  ds->GetControl(data[3]);
-  ds->GetStatus(data[4]);
-
-  data[5] = 12;  // Voltage upper
-  data[6] = 0;   // Voltage lower
-  data[7] = 0;   // Request
 }
 
 static void SetupUdp(wpi::uv::Loop& loop) {
@@ -135,21 +124,25 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   udp->received.connect([udpLocal = udp.get()](
       Buffer & buf, size_t len, const sockaddr& recSock, unsigned int port) {
     auto ds = udpLocal->GetLoop()->GetData<halsim::DSCommPacket>();
-    ds->DecodeUDP(reinterpret_cast<uint8_t*>(buf.base), len);
-    SetupReplyPacket(ds.get());
+    ds->DecodeUDP(
+        wpi::ArrayRef<uint8_t>{reinterpret_cast<uint8_t*>(buf.base), len});
 
     struct sockaddr_in outAddr;
     std::memcpy(&outAddr, &recSock, sizeof(sockaddr_in));
     outAddr.sin_family = PF_INET;
     outAddr.sin_port = htons(1150);
 
-    udpLocal->Send(outAddr, wpi::ArrayRef<Buffer>{&ds->GetSendBuffer(), 1},
-                   [](auto buf, Error err) {
-                     if (err) {
-                       wpi::errs() << err.str() << "\n";
-                       wpi::errs().flush();
-                     }
-                   });
+    wpi::SmallVector<wpi::uv::Buffer, 4> sendBufs;
+    wpi::raw_uv_ostream stream{sendBufs, GetBufferPool()};
+    ds->SetupSendBuffer(stream);
+
+    udpLocal->Send(outAddr, sendBufs, [](auto bufs, Error err) {
+      GetBufferPool().Release(bufs);
+      if (err) {
+        wpi::errs() << err.str() << "\n";
+        wpi::errs().flush();
+      }
+    });
     ds->SendUDPToHALSim();
   });
 

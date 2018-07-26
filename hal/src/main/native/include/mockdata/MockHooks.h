@@ -9,9 +9,12 @@
 
 #ifndef __FRC_ROBORIO__
 
+#include "hal/Types.h"
+
 extern "C" {
 void HALSIM_WaitForProgramStart(void);
 void HALSIM_SetProgramStarted(void);
+HAL_Bool HALSIM_GetProgramStarted(void);
 void HALSIM_RestartTiming(void);
 }  // extern "C"
 

@@ -14,24 +14,24 @@
 #include <thread>
 #include <vector>
 
-#include <FRCComm.h>
 #include <mockdata/DriverStationData.h>
+#include <mockdata/MockHooks.h>
+#include <wpi/ArrayRef.h>
+#include <wpi/Format.h>
 
 using namespace halsim;
+
+DSCommPacket::DSCommPacket() {
+  for (auto& i : m_joystick_packets) {
+    i.ResetTcp();
+    i.ResetUdp();
+  }
+}
 
 /*----------------------------------------------------------------------------
 **  The following methods help parse and hold information about the
 **   driver station and it's joysticks.
 **--------------------------------------------------------------------------*/
-void DSCommPacket::SetIndex(uint8_t hi, uint8_t lo) {
-  m_hi = hi;
-  m_lo = lo;
-}
-
-void DSCommPacket::GetIndex(uint8_t& hi, uint8_t& lo) {
-  hi = m_hi;
-  lo = m_lo;
-}
 
 void DSCommPacket::SetControl(uint8_t control, uint8_t request) {
   std::memset(&m_control_word, 0, sizeof(m_control_word));
@@ -45,215 +45,263 @@ void DSCommPacket::SetControl(uint8_t control, uint8_t request) {
   m_control_sent = control;
 }
 
-void DSCommPacket::GetControl(uint8_t& control) { control = m_control_sent; }
-
-void DSCommPacket::GetStatus(uint8_t& status) { status = kRobotHasCode; }
-
 void DSCommPacket::SetAlliance(uint8_t station_code) {
-  m_alliance_station = static_cast<enum AllianceStationID_t>(station_code);
+  m_alliance_station = static_cast<HAL_AllianceStationID>(station_code);
 }
 
-int DSCommPacket::AddDSCommJoystickPacket(uint8_t* data, int len) {
-  DSCommJoystickPacket stick;
-  if (len > 0) {
-    int axis_count = *data++;
-    len--;
-    if (axis_count > len) return -1;
-    len -= axis_count;
-    for (; axis_count > 0; axis_count--) {
-      stick.axes.push_back(*data++);
+void DSCommPacket::ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData) {
+  if (tagData.size() < 6) return;
+
+  uint32_t store = tagData[2] << 24;
+  store |= tagData[3] << 16;
+  store |= tagData[4] << 8;
+  store |= tagData[5];
+
+  float matchTime = *reinterpret_cast<float*>(&store);
+  m_match_time = matchTime;
+}
+
+void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput,
+                                   int index) {
+  DSCommJoystickPacket& stick = m_joystick_packets[index];
+  stick.ResetUdp();
+
+  if (dataInput.size() == 2) {
+    return;
+  }
+
+  dataInput = dataInput.slice(2);
+
+  // Read axes
+  int axesLength = dataInput[0];
+  for (int i = 0; i < axesLength; i++) {
+    int8_t value = dataInput[1 + i];
+    if (value < 0) {
+      stick.axes.axes[i] = value / 128.0;
+    } else {
+      stick.axes.axes[i] = value / 127.0;
     }
   }
+  stick.axes.count = axesLength;
 
-  if (len > 2) {
-    stick.button_count = *data++;
-    stick.buttons = (*data++) << 8;
-    stick.buttons |= *data++;
-    len -= 3;
+  dataInput = dataInput.slice(1 + axesLength);
+
+  // Read Buttons
+  int buttonCount = dataInput[0];
+  int numBytes = (buttonCount + 7) / 8;
+  stick.buttons.buttons = 0;
+  for (int i = 0; i < numBytes; i++) {
+    stick.buttons.buttons |= dataInput[1 + i] << (8 * (i));
+  }
+  stick.buttons.count = buttonCount;
+
+  dataInput = dataInput.slice(1 + numBytes);
+
+  int povsLength = dataInput[0];
+  for (int i = 0; i < povsLength * 2; i += 2) {
+    stick.povs.povs[i] = (dataInput[1 + i] << 8) | dataInput[2 + i];
   }
 
-  if (len > 0) {
-    int pov_count = *data++;
-    len--;
-    if (pov_count * 2 > len) return -1;
-    len -= pov_count * 2;
-    for (; pov_count > 0; pov_count--) {
-      stick.povs.push_back((data[0] << 8) | data[1]);
-      data += 2;
-    }
-  }
+  stick.povs.count = povsLength;
 
-  m_joystick_packets.push_back(stick);
-
-  return len;
-}
-
-void DSCommPacket::GetControlWord(struct ControlWord_t& control_word) {
-  control_word = m_control_word;
-}
-
-void DSCommPacket::GetAllianceStation(
-    enum AllianceStationID_t& alliance_station) {
-  alliance_station = m_alliance_station;
+  return;
 }
 
 /*----------------------------------------------------------------------------
 **  Communication methods
 **--------------------------------------------------------------------------*/
-int DSCommPacket::DecodeTCP(uint8_t* packet, int len) {
-  if (len < 2) return 0;
-  if (packet[0] == 0 && packet[1] == 0) return 2;
-  int packet_len = packet[1];
-  if (packet_len + 2 > len) return 0;
-  int packet_type = static_cast<int>(packet[2]);
+void DSCommPacket::DecodeTCP(wpi::ArrayRef<uint8_t> packet) {
+  // No header
+  while (!packet.empty()) {
+    int tagLength = packet[0] << 8 | packet[1];
+    auto tagPacket = packet.slice(0, tagLength + 2);
 
-  Lock();
-  if (packet_type == kGameDataType) {
-    std::copy(
-        packet + 3,
-        packet + 3 +
-            std::min(static_cast<int>(sizeof(m_game_data)), packet_len - 1),
-        m_game_data);
-  } else if (packet_type == kJoystickNameType && len >= 7) {
-    int joystick = static_cast<int>(packet[3]);
-    if (joystick < kMaxJoysticks) {
-      m_joystick_types[joystick] = static_cast<int>(packet[5]);
-      int namelen = static_cast<int>(packet[6]);
-      m_joystick_names[joystick] =
-          std::string(reinterpret_cast<char*>(packet + 7), namelen);
+    if (tagLength == 0) {
+      return;
     }
-  } else {
-    std::cerr << "TCP packet type " << packet_type << " unimplemented"
-              << std::endl;
-    for (int i = 0; i < packet_len + 2; i++)
-      std::fprintf(stderr, "%02x ", packet[i]);
-    std::fprintf(stderr, "\n");
+
+    switch (packet[2]) {
+      case kJoystickNameTag:
+        ReadJoystickDescriptionTag(tagPacket);
+        break;
+      case kGameDataTag:
+        ReadGameSpecificMessageTag(tagPacket);
+        break;
+      case kMatchInfoTag:
+        ReadNewMatchInfoTag(tagPacket);
+        break;
+    }
+    packet = packet.slice(tagLength + 2);
   }
-  Unlock();
-  return packet_len + 2;
 }
 
-void DSCommPacket::DecodeUDP(uint8_t* packet, int len) {
-  if (len < 3) return;
+void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
+  if (packet.size() < 6) return;
+  // Decode fixed header
+  m_hi = packet[0];
+  m_lo = packet[1];
+  // Comm Version is packet 2, ignore
+  SetControl(packet[3], packet[4]);
+  SetAlliance(packet[5]);
 
-  Lock();
-  m_joystick_packets.clear();
-  SetIndex(packet[0], packet[1]);
-  if (packet[2] != 0) {
-    if (len >= 6) {
-      SetControl(packet[3], packet[4]);
-      SetAlliance(packet[5]);
-      packet += 6;
-      len -= 6;
-      while (len > 0) {
-        int packet_len = *packet++;
-        if (packet_len > len) break;
-        if (*packet == kTagDsCommJoystick) {
-          if (AddDSCommJoystickPacket(packet + 1, packet_len - 1) < 0) break;
-        }
-        packet += packet_len;
-        len -= packet_len;
-      }
+  // Return if packet finished
+  if (packet.size() == 6) return;
+
+  // Else, handle tagged data
+  packet = packet.slice(6);
+
+  int joystickNum = 0;
+
+  // Loop to handle multiple tags
+  while (!packet.empty()) {
+    auto tagLength = packet[0];
+    auto tagPacket = packet.slice(0, tagLength + 1);
+
+    switch (packet[1]) {
+      case kJoystickDataTag:
+        ReadJoystickTag(tagPacket, joystickNum);
+        joystickNum++;
+        break;
+      case kMatchTimeTag:
+        ReadMatchtimeTag(tagPacket);
+        break;
     }
+    packet = packet.slice(tagLength + 1);
   }
-  m_udp_packets++;
-  Unlock();
+}
+
+void DSCommPacket::ReadNewMatchInfoTag(wpi::ArrayRef<uint8_t> data) {
+  // Size 2 bytes, tag 1 byte
+  if (data.size() <= 3) return;
+
+  int nameLength = std::min<size_t>(data[3], sizeof(matchInfo.eventName) - 1);
+
+  for (int i = 0; i < nameLength; i++) {
+    matchInfo.eventName[i] = data[4 + i];
+  }
+
+  matchInfo.eventName[nameLength] = '\0';
+
+  data = data.slice(4 + nameLength);
+
+  if (data.size() < 4) return;
+
+  matchInfo.matchType = static_cast<HAL_MatchType>(
+      data[0]);  // None, Practice, Qualification, Elimination, Test
+  matchInfo.matchNumber = (data[1] << 8) | data[2];
+  matchInfo.replayNumber = data[3];
+
+  HALSIM_SetMatchInfo(&matchInfo);
+}
+
+void DSCommPacket::ReadGameSpecificMessageTag(wpi::ArrayRef<uint8_t> data) {
+  // Size 2 bytes, tag 1 byte
+  if (data.size() <= 3) return;
+
+  int length = std::min<size_t>(((data[0] << 8) | data[1]) - 1,
+                                sizeof(matchInfo.gameSpecificMessage));
+  for (int i = 0; i < length; i++) {
+    matchInfo.gameSpecificMessage[i] = data[3 + i];
+  }
+
+  matchInfo.gameSpecificMessageSize = length;
+
+  HALSIM_SetMatchInfo(&matchInfo);
+}
+void DSCommPacket::ReadJoystickDescriptionTag(wpi::ArrayRef<uint8_t> data) {
+  if (data.size() < 3) return;
+  data = data.slice(3);
+  int joystickNum = data[0];
+  DSCommJoystickPacket& packet = m_joystick_packets[joystickNum];
+  packet.ResetTcp();
+  packet.descriptor.isXbox = data[1] != 0 ? 1 : 0;
+  packet.descriptor.type = data[2];
+  int nameLength =
+      std::min<size_t>(data[3], (sizeof(packet.descriptor.name) - 1));
+  for (int i = 0; i < nameLength; i++) {
+    packet.descriptor.name[i] = data[4 + i];
+  }
+  data = data.slice(4 + nameLength);
+  packet.descriptor.name[nameLength] = '\0';
+  int axesCount = data[0];
+  packet.descriptor.axisCount = axesCount;
+  for (int i = 0; i < axesCount; i++) {
+    packet.descriptor.axisTypes[i] = data[1 + i];
+  }
+  data = data.slice(1 + axesCount);
+
+  packet.descriptor.buttonCount = data[0];
+  packet.descriptor.povCount = data[1];
 }
 
 void DSCommPacket::SendJoysticks(void) {
-  unsigned int i;
-
-  for (i = 0; i < kMaxJoysticks; i++) {
-    struct HAL_JoystickAxes axes;
-    struct HAL_JoystickPOVs povs;
-    struct HAL_JoystickButtons buttons;
-    struct HAL_JoystickDescriptor descriptor;
-    int j;
-
-    std::memset(&axes, 0, sizeof(axes));
-    std::memset(&povs, 0, sizeof(povs));
-    std::memset(&buttons, 0, sizeof(buttons));
-    std::memset(&descriptor, 0, sizeof(descriptor));
-
-    if (i < m_joystick_packets.size()) {
-      axes.count = std::min(static_cast<int>(m_joystick_packets[i].axes.size()),
-                            HAL_kMaxJoystickAxes);
-      for (j = 0; j < axes.count; j++) {
-        int8_t value = m_joystick_packets[i].axes[j];
-        if (value < 0) {
-          axes.axes[j] = value / 128.0;
-        } else {
-          axes.axes[j] = value / 127.0;
-        }
-      }
-
-      povs.count = std::min(static_cast<int>(m_joystick_packets[i].povs.size()),
-                            HAL_kMaxJoystickPOVs);
-      for (j = 0; j < povs.count; j++)
-        povs.povs[j] = m_joystick_packets[i].povs[j];
-
-      buttons.count = m_joystick_packets[i].button_count;
-      buttons.buttons = m_joystick_packets[i].buttons;
-
-      descriptor.axisCount = axes.count;
-      descriptor.povCount = povs.count;
-      descriptor.buttonCount = buttons.count;
-    }
-    descriptor.type = m_joystick_types[i];
-    m_joystick_names[i].copy(descriptor.name, sizeof(descriptor.name) - 1, 0);
-
-    HALSIM_SetJoystickAxes(i, &axes);
-    HALSIM_SetJoystickPOVs(i, &povs);
-    HALSIM_SetJoystickButtons(i, &buttons);
-    HALSIM_SetJoystickDescriptor(i, &descriptor);
-
-    /* TODO(jwhite@codeweavers.com):  If we want to support rumble, etc,
-            implement SetJoyStickOutputs, although that would be a callback  */
+  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+    DSCommJoystickPacket& packet = m_joystick_packets[i];
+    HALSIM_SetJoystickAxes(i, &packet.axes);
+    HALSIM_SetJoystickPOVs(i, &packet.povs);
+    HALSIM_SetJoystickButtons(i, &packet.buttons);
+    HALSIM_SetJoystickDescriptor(i, &packet.descriptor);
   }
 }
 
-void DSCommPacket::SendTCPToHALSim(void) {
-  struct HAL_MatchInfo info;
-  Lock();
-  std::strncpy(info.eventName, "Simulation", sizeof(info.eventName));
-  info.matchType = HAL_MatchType::HAL_kMatchType_none;
-  info.matchNumber = 1;
-  info.replayNumber = 0;
-  std::copy(info.gameSpecificMessage,
-            info.gameSpecificMessage +
-                std::min(sizeof(info.gameSpecificMessage), sizeof(m_game_data)),
-            m_game_data);
-  HALSIM_SetMatchInfo(&info);
-  Unlock();
+void DSCommPacket::SetupSendBuffer(wpi::raw_uv_ostream& buf) {
+  SetupSendHeader(buf);
+  SetupJoystickTag(buf);
+}
+
+void DSCommPacket::SetupSendHeader(wpi::raw_uv_ostream& buf) {
+  static constexpr uint8_t kCommVersion = 0x01;
+
+  // High low packet index, comm version
+  buf << m_hi << m_lo << kCommVersion;
+
+  // Control word and status check
+  buf << m_control_sent
+      << static_cast<uint8_t>(HALSIM_GetProgramStarted() ? kRobotHasCode : 0);
+
+  // Battery voltage high and low
+  buf << static_cast<uint8_t>(12) << static_cast<uint8_t>(0);
+
+  // Request (Always 0)
+  buf << static_cast<uint8_t>(0);
+}
+
+void DSCommPacket::SetupJoystickTag(wpi::raw_uv_ostream& buf) {
+  static constexpr uint8_t kHIDTag = 0x01;
+
+  // HID tags are sent 1 per device
+  int64_t outputs;
+  int32_t rightRumble;
+  int32_t leftRumble;
+  for (size_t i = 0; i < m_joystick_packets.size(); i++) {
+    // Length is 9, 1 tag and 8 data.
+    buf << static_cast<uint8_t>(9) << kHIDTag;
+    HALSIM_GetJoystickOutputs(i, &outputs, &leftRumble, &rightRumble);
+    auto op = static_cast<uint32_t>(outputs);
+    auto rr = static_cast<uint16_t>(rightRumble);
+    auto lr = static_cast<uint16_t>(leftRumble);
+    buf.write((op >> 24 & 0xFF));
+    buf.write((op >> 16 & 0xFF));
+    buf.write((op >> 8 & 0xFF));
+    buf.write((op & 0xFF));
+    buf.write((rr >> 8 & 0xFF));
+    buf.write((rr & 0xFF));
+    buf.write((lr >> 8 & 0xFF));
+    buf.write((lr & 0xFF));
+  }
 }
 
 void DSCommPacket::SendUDPToHALSim(void) {
-  struct ControlWord_t control_word;
-  AllianceStationID_t alliance_station;
-
-  Lock();
-  GetControlWord(control_word);
-  GetAllianceStation(alliance_station);
-  auto now = std::chrono::high_resolution_clock::now();
-  if (m_udp_packets == 1) {
-    m_match_time = 0.0;
-  } else if (control_word.enabled) {
-    std::chrono::duration<double> delta = (now - m_packet_time);
-    m_match_time += delta.count();
-  }
-  m_packet_time = now;
   SendJoysticks();
-  Unlock();
 
   HALSIM_SetDriverStationMatchTime(m_match_time);
-  HALSIM_SetDriverStationEnabled(control_word.enabled);
-  HALSIM_SetDriverStationAutonomous(control_word.autonomous);
-  HALSIM_SetDriverStationTest(control_word.test);
-  HALSIM_SetDriverStationEStop(control_word.eStop);
-  HALSIM_SetDriverStationFmsAttached(control_word.fmsAttached);
-  HALSIM_SetDriverStationDsAttached(control_word.dsAttached);
-  HALSIM_SetDriverStationAllianceStationId(
-      static_cast<HAL_AllianceStationID>(alliance_station));
+  HALSIM_SetDriverStationEnabled(m_control_word.enabled);
+  HALSIM_SetDriverStationAutonomous(m_control_word.autonomous);
+  HALSIM_SetDriverStationTest(m_control_word.test);
+  HALSIM_SetDriverStationEStop(m_control_word.eStop);
+  HALSIM_SetDriverStationFmsAttached(m_control_word.fmsAttached);
+  HALSIM_SetDriverStationDsAttached(m_control_word.dsAttached);
+  HALSIM_SetDriverStationAllianceStationId(m_alliance_station);
 
   HALSIM_NotifyDriverStationNewData();
 }

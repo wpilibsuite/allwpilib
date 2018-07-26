@@ -8,6 +8,7 @@
 #include <thread>
 
 #include <hal/HAL.h>
+#include <wpi/Format.h>
 #include <wpi/raw_ostream.h>
 
 extern "C" int HALSIM_InitExtension(void);
@@ -15,4 +16,10 @@ extern "C" int HALSIM_InitExtension(void);
 int main() {
   HAL_Initialize(500, 0);
   HALSIM_InitExtension();
+
+  HAL_ObserveUserProgramStarting();
+
+  while (true) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
 }
