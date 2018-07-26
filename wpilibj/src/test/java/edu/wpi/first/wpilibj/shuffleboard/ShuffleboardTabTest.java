@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj.shuffleboard;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +36,11 @@ public class ShuffleboardTabTest {
     m_ntInstance = NetworkTableInstance.create();
     m_instance = new ShuffleboardInstance(m_ntInstance);
     m_tab = m_instance.getTab("Tab");
+  }
+
+  @AfterEach
+  void tearDown() {
+    m_ntInstance.close();
   }
 
   @Test

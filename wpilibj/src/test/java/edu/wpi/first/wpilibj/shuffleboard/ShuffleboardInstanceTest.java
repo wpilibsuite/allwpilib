@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,13 +18,18 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ShuffleboardInstanceTest {
-  private NetworkTableInstance m_ntInstance; // NOPMD could be local variable
+  private NetworkTableInstance m_ntInstance;
   private ShuffleboardInstance m_shuffleboardInstance;
 
   @BeforeEach
   void setupInstance() {
     m_ntInstance = NetworkTableInstance.create();
     m_shuffleboardInstance = new ShuffleboardInstance(m_ntInstance);
+  }
+
+  @AfterEach
+  void tearDownInstance() {
+    m_ntInstance.close();
   }
 
   @Test
