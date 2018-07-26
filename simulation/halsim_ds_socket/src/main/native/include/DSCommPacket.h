@@ -20,6 +20,7 @@ namespace halsim {
 
 class DSCommPacket {
   friend class ::DSCommPacketTest;
+
  public:
   DSCommPacket(void);
   void DecodeTCP(wpi::ArrayRef<uint8_t> packet);

@@ -56,5 +56,3 @@ tasks.withType(RunTestExecutable) {
     args "--gtest_output=xml:test_detail.xml"
     outputs.dir outputDir
 }
-
-

@@ -1,17 +1,21 @@
-#include "gtest/gtest.h"
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
 
 #include "DSCommPacket.h"
+#include "gtest/gtest.h"
 
 class DSCommPacketTest : public ::testing::Test {
  public:
-  DSCommPacketTest() {
-  }
+  DSCommPacketTest() {}
 
-  void SendJoysticks() {
-    commPacket.SendJoysticks();
-  }
+  void SendJoysticks() { commPacket.SendJoysticks(); }
 
-  halsim::DSCommJoystickPacket& ReadJoystickTag(wpi::ArrayRef<uint8_t> data, int index) {
+  halsim::DSCommJoystickPacket& ReadJoystickTag(wpi::ArrayRef<uint8_t> data,
+                                                int index) {
     commPacket.ReadJoystickTag(data, index);
     return commPacket.m_joystick_packets[index];
   }
@@ -26,7 +30,7 @@ class DSCommPacketTest : public ::testing::Test {
     return commPacket.matchInfo;
   }
 
-    HAL_MatchInfo& ReadGameSpecificTag(wpi::ArrayRef<uint8_t> data) {
+  HAL_MatchInfo& ReadGameSpecificTag(wpi::ArrayRef<uint8_t> data) {
     commPacket.ReadGameSpecificMessageTag(data);
     return commPacket.matchInfo;
   }
@@ -38,7 +42,7 @@ class DSCommPacketTest : public ::testing::Test {
 TEST_F(DSCommPacketTest, EmptyJoystickTag) {
   for (int i = 0; i < HAL_kMaxJoysticks; i++) {
     uint8_t arr[2];
-    auto& data = ReadJoystickTag(arr,0);
+    auto& data = ReadJoystickTag(arr, 0);
     ASSERT_EQ(data.axes.count, 0);
     ASSERT_EQ(data.povs.count, 0);
     ASSERT_EQ(data.buttons.count, 0);
@@ -53,7 +57,7 @@ TEST_F(DSCommPacketTest, BlankJoystickTag) {
     arr[2] = 0;
     arr[3] = 0;
     arr[4] = 0;
-    auto& data = ReadJoystickTag(arr,0);
+    auto& data = ReadJoystickTag(arr, 0);
     ASSERT_EQ(data.axes.count, 0);
     ASSERT_EQ(data.povs.count, 0);
     ASSERT_EQ(data.buttons.count, 0);
@@ -63,18 +67,16 @@ TEST_F(DSCommPacketTest, BlankJoystickTag) {
 TEST_F(DSCommPacketTest, MainJoystickTag) {
   for (int i = 0; i < HAL_kMaxJoysticks; i++) {
     // 5 for base, 4 joystick, 12 buttons (2 bytes) 3 povs
-    uint8_t arr[5 + 4 + 2 + 6] = {
-      // Size, Tag
-      16, 12,
-      // Axes
-      4, 0x9C, 0xCE, 0, 75,
-      // Buttons
-      12, 0xFF, 0x0F,
-      // POVs
-      3, 0, 50, 0, 100, 0x0F, 0x00
-    };
+    uint8_t arr[5 + 4 + 2 + 6] = {// Size, Tag
+                                  16, 12,
+                                  // Axes
+                                  4, 0x9C, 0xCE, 0, 75,
+                                  // Buttons
+                                  12, 0xFF, 0x0F,
+                                  // POVs
+                                  3, 0, 50, 0, 100, 0x0F, 0x00};
 
-    auto& data = ReadJoystickTag(arr,0);
+    auto& data = ReadJoystickTag(arr, 0);
     ASSERT_EQ(data.axes.count, 4);
     ASSERT_EQ(data.povs.count, 3);
     ASSERT_EQ(data.buttons.count, 12);
@@ -83,18 +85,16 @@ TEST_F(DSCommPacketTest, MainJoystickTag) {
 
 TEST_F(DSCommPacketTest, DescriptorTag) {
   for (int i = 0; i < HAL_kMaxJoysticks; i++) {
-    uint8_t arr[] = {
-      // Size (2), tag
-      0, 0, 7,
-      // Joystick index, Is Xbox, Type
-      static_cast<uint8_t>(i), 1, 0,
-      // NameLen, Name (Not null terminated)
-      11, 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd',
-      // Axes count, Axes types
-      4, 1, 2, 3, 4,
-      // Button count, pov count,
-      12, 3
-    };
+    uint8_t arr[] = {// Size (2), tag
+                     0, 0, 7,
+                     // Joystick index, Is Xbox, Type
+                     static_cast<uint8_t>(i), 1, 0,
+                     // NameLen, Name (Not null terminated)
+                     11, 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd',
+                     // Axes count, Axes types
+                     4, 1, 2, 3, 4,
+                     // Button count, pov count,
+                     12, 3};
     arr[1] = sizeof(arr) - 2;
     auto& data = ReadDescriptorTag(arr);
     ASSERT_EQ(data.descriptor.isXbox, 1);
@@ -110,14 +110,12 @@ TEST_F(DSCommPacketTest, DescriptorTag) {
 }
 
 TEST_F(DSCommPacketTest, MatchInfoTag) {
-  uint8_t arr[] {
-    // Size (2), tag
-    0, 0, 8,
-    // Event Name Len, Event Name
-    4, 'W', 'C', 'B', 'C',
-    // Match type, Match num (2), replay num
-    2, 0, 18, 1
-  };
+  uint8_t arr[]{// Size (2), tag
+                0, 0, 8,
+                // Event Name Len, Event Name
+                4, 'W', 'C', 'B', 'C',
+                // Match type, Match num (2), replay num
+                2, 0, 18, 1};
   arr[1] = sizeof(arr) - 2;
   auto& matchInfo = ReadNewMatchInfoTag(arr);
   ASSERT_STREQ(matchInfo.eventName, "WCBC");
@@ -127,11 +125,16 @@ TEST_F(DSCommPacketTest, MatchInfoTag) {
 }
 
 TEST_F(DSCommPacketTest, GameDataTag) {
-  uint8_t arr[] {
-    // Size (2), tag
-    0, 0, 17,
-    // Match data (length is taglength - 1)
-    'W', 'C', 'B', 'C',
+  uint8_t arr[]{
+      // Size (2), tag
+      0,
+      0,
+      17,
+      // Match data (length is taglength - 1)
+      'W',
+      'C',
+      'B',
+      'C',
   };
   arr[1] = sizeof(arr) - 2;
   auto& matchInfo = ReadGameSpecificTag(arr);
