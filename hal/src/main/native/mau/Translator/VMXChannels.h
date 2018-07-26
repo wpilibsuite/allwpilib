@@ -4,21 +4,21 @@
 #include "FileHandler.h"
 #include <VMXChannel.h>
 
-struct VMXSingleChannel {
+struct VMX_SingleChannel {
     bool used;
     VMXChannelIndex index;
     VMXChannelType type;
     VMXChannelCapability capability;
 };
 
-struct VMXChannels {
-    friend static VMXChannels createVMXChannels();
+struct VMX_Channels {
+    friend static VMX_Channels createVMXChannels();
 
-    VMXSingleChannel getChannel(int index) {
+    VMX_SingleChannel getChannel(int index) {
         return channels[index];
     }
 private:
-    VMXSingleChannel channels[64];
+    VMX_SingleChannel channels[64];
 };
 
 #endif //NATIVE_VMXCHANNELS_H

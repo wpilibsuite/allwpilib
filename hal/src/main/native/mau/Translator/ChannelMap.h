@@ -6,21 +6,25 @@
 #include "FileHandler.h"
 #include <map>
 
-struct WPISingleChannel {
+struct Mau_SingleChannel {
     int index;
     bool unsupported;
 
     bool isRef;
-    WPISingleChannel* channelRef;
+    Mau_SingleChannel* channelRef;
 
     bool isMXP;
-    VMXSingleChannel* vmxChannel;
+    VMX_SingleChannel* vmxChannel;
 };
 
-struct ChannelMap {
-    friend static ChannelMap createChannelMap(VMXChannels vmxChannels);
+class Mau_ChannelMap {
+    Mau_SingleChannel channels [];
+    int onBoardCount;
+    int mxpCount;
+public:
+    friend static Mau_ChannelMap createChannelMap(VMX_Channels vmxChannels);
 
-    WPISingleChannel getChannel(int index) {
+    Mau_SingleChannel getChannel(int index) {
         return channels[index];
     }
     int getChannelCount() {
@@ -32,10 +36,6 @@ struct ChannelMap {
     int getMXPCount() {
         return mxpCount;
     }
-private:
-    WPISingleChannel channels [];
-    int onBoardCount;
-    int mxpCount;
 };
 
 #endif //NATIVE_CHANNELMAP_H

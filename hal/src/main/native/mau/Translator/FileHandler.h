@@ -14,7 +14,7 @@ static VMXChannels createVMXChannels() {
     return NULL;
 }
 
-static ChannelMap createChannelMap(VMXChannels vmxChannels) {
+static Mau_ChannelMap createChannelMap(VMX_Channels vmxChannels) {
     CHANNEL_MAP_JSON;
     return NULL;
 }
