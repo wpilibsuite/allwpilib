@@ -29,7 +29,7 @@ namespace {
 class WPILibCameraServerShared : public frc::CameraServerShared {
  public:
   void ReportUsbCamera(int id) override {
-    HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, id);
+    HAL_Report(HALUsageReporting::kResourceType_UsbCamera, id);
   }
   void ReportAxisCamera(int id) override {
     HAL_Report(HALUsageReporting::kResourceType_AxisCamera, id);

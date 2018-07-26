@@ -8,10 +8,10 @@
 package edu.wpi.first.wpilibj.drive;
 
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-// import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
-// import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-// import edu.wpi.first.wpilibj.hal.HAL;
 
 /**
  * A class for driving Killough drive platforms.
@@ -136,8 +136,8 @@ public class KilloughDrive extends RobotDriveBase {
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation,
                              double gyroAngle) {
     if (!m_reported) {
-      // HAL.report(tResourceType.kResourceType_RobotDrive, 3,
-      //            tInstances.kRobotDrive_KilloughCartesian);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 3,
+                 tInstances.kRobotDrive2_KilloughCartesian);
       m_reported = true;
     }
 
@@ -179,8 +179,8 @@ public class KilloughDrive extends RobotDriveBase {
   @SuppressWarnings("ParameterName")
   public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
-      // HAL.report(tResourceType.kResourceType_RobotDrive, 3,
-      //            tInstances.kRobotDrive_KilloughPolar);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 3,
+                 tInstances.kRobotDrive2_KilloughPolar);
       m_reported = true;
     }
 

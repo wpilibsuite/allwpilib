@@ -1,4 +1,3 @@
-
 #ifndef __UsageReporting_h__
 #define __UsageReporting_h__
 
@@ -77,7 +76,7 @@ namespace nUsageReporting
         kResourceType_ADXRS450,
         kResourceType_RevSPARK,
         kResourceType_MindsensorsSD540,
-        kResourceType_DigitalFilter,
+        kResourceType_DigitalGlitchFilter,
         kResourceType_ADIS16448,
         kResourceType_PDP,
         kResourceType_PCM, // 60
@@ -91,6 +90,17 @@ namespace nUsageReporting
         kResourceType_CTRE_future4,
         kResourceType_CTRE_future5,
         kResourceType_CTRE_future6, // 70
+        kResourceType_LinearFilter,
+        kResourceType_XboxController,
+        kResourceType_UsbCamera,
+        kResourceType_NavX,
+        kResourceType_Pixy,
+        kResourceType_Pixy2,
+        kResourceType_ScanseSweep,
+        kResourceType_Shuffleboard,
+        kResourceType_CAN,
+        kResourceType_DigilentDMC60, // 80
+        kResourceType_PWMVictorSPX,
     } tResourceType;
 
     typedef enum
@@ -107,6 +117,9 @@ namespace nUsageReporting
         kFramework_Iterative = 1,
         kFramework_Simple = 2,
         kFramework_CommandControl = 3,
+        kFramework_Timed = 4,
+        kFramework_ROS = 5,
+        kFramework_RobotBuilder = 6,
 
         kRobotDrive_ArcadeStandard = 1,
         kRobotDrive_ArcadeButtonSpin = 2,
@@ -114,6 +127,13 @@ namespace nUsageReporting
         kRobotDrive_Tank = 4,
         kRobotDrive_MecanumPolar = 5,
         kRobotDrive_MecanumCartesian = 6,
+        kRobotDrive2_DifferentialArcade = 7,
+        kRobotDrive2_DifferentialTank = 8,
+        kRobotDrive2_DifferentialCurvature = 9,
+        kRobotDrive2_MecanumCartesian = 10,
+        kRobotDrive2_MecanumPolar = 11,
+        kRobotDrive2_KilloughCartesian = 12,
+        kRobotDrive2_KilloughPolar = 13,
 
         kDriverStationCIO_Analog = 1,
         kDriverStationCIO_DigitalIn = 2,
@@ -140,8 +160,8 @@ namespace nUsageReporting
     } tInstances;
 
     /**
-     * Reports the usage of a resource of interest.
-     *
+     * Report the usage of a resource of interest.
+     * 
      * @param resource one of the values in the tResourceType above (max value 51).
      * @param instanceNumber an index that identifies the resource instance.
      * @param context an optional additional context number for some cases (such as module number).  Set to 0 to omit.

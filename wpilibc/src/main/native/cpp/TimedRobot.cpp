@@ -48,10 +48,8 @@ TimedRobot::TimedRobot(double period) : IterativeRobotBase(period) {
   m_notifier = HAL_InitializeNotifier(&status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  // HAL_Report(HALUsageReporting::kResourceType_Framework,
-  //            HALUsageReporting::kFramework_Periodic);
   HAL_Report(HALUsageReporting::kResourceType_Framework,
-             HALUsageReporting::kFramework_Iterative);
+             HALUsageReporting::kFramework_Timed);
 }
 
 TimedRobot::~TimedRobot() {

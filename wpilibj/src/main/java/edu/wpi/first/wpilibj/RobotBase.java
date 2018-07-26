@@ -46,7 +46,7 @@ public abstract class RobotBase implements AutoCloseable {
 
       @Override
       public void reportUsbCamera(int id) {
-        HAL.report(tResourceType.kResourceType_PCVideoServer, id);
+        HAL.report(tResourceType.kResourceType_UsbCamera, id);
       }
 
       @Override

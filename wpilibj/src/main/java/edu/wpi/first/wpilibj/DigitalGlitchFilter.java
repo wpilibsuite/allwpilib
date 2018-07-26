@@ -33,7 +33,7 @@ public class DigitalGlitchFilter extends SendableBase {
       if (index != m_filterAllocated.length) {
         m_channelIndex = index;
         m_filterAllocated[index] = true;
-        HAL.report(tResourceType.kResourceType_DigitalFilter,
+        HAL.report(tResourceType.kResourceType_DigitalGlitchFilter,
             m_channelIndex, 0);
         setName("DigitalGlitchFilter", index);
       }
