@@ -21,7 +21,7 @@ public class ShuffleboardTest extends UtilityClassTest {
   // Most relevant tests are in ShuffleboardTabTest
 
   @Test
-  public void testTabObjectsCached() {
+  void testTabObjectsCached() {
     ShuffleboardTab tab1 = Shuffleboard.getTab("testTabObjectsCached");
     ShuffleboardTab tab2 = Shuffleboard.getTab("testTabObjectsCached");
     assertSame(tab1, tab2, "Tab objects were not cached");
