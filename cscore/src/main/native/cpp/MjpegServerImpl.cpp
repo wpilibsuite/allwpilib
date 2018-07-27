@@ -114,7 +114,7 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
 
   int m_width{0};
   int m_height{0};
-  int m_compression{80};
+  int m_compression{-1};
   int m_fps{0};
 };
 
@@ -635,8 +635,8 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
 
     int width = m_width != 0 ? m_width : frame.GetOriginalWidth();
     int height = m_height != 0 ? m_height : frame.GetOriginalHeight();
-    Image* image =
-        frame.GetImage(width, height, VideoMode::kMJPEG, m_compression);
+    Image* image = frame.GetImageMJPEG(
+        width, height, m_compression, m_compression == -1 ? 80 : m_compression);
     if (!image) {
       // Shouldn't happen, but just in case...
       std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -695,7 +695,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   // Reset per-request settings
   m_width = 0;
   m_height = 0;
-  m_compression = 80;
+  m_compression = -1;
   m_fps = 0;
 
   // Read the request string from the stream
