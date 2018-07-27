@@ -1,15 +1,22 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpiutil;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
 public final class RuntimeLoader<T> {
-  private static String defaultExtractionRoot = null;
+  private static String defaultExtractionRoot;
   public synchronized static String getDefaultExtractionRoot() {
     if (defaultExtractionRoot != null) {
       return defaultExtractionRoot;
@@ -19,10 +26,10 @@ public final class RuntimeLoader<T> {
     return defaultExtractionRoot;
   }
 
-  private File jniLibrary = null;
-  private String libraryName;
-  private Class<T> loadClass;
-  private String extractionRoot;
+  private File jniLibrary; // NOPMD
+  private final String libraryName;
+  private final Class<T> loadClass;
+  private final String extractionRoot;
 
 
 
@@ -43,7 +50,7 @@ public final class RuntimeLoader<T> {
       String resname = RuntimeDetector.getLibraryResource(libraryName);
       try (InputStream hashIs = loadClass.getResourceAsStream(hashName)) {
         if (hashIs == null) {
-          throw new IOException(hashName + " Resource not found");
+          throw new IOException(hashName + " Resource not found"); // NOPMD
         }
         try (Scanner scanner = new Scanner(hashIs)) {
           String hash = scanner.nextLine();
@@ -55,13 +62,14 @@ public final class RuntimeLoader<T> {
             // If extraction failed, extract
             try (InputStream resIs = loadClass.getResourceAsStream(resname)) {
               if (resIs == null) {
-                throw new IOException(resname + " Resource not found");
+                throw new IOException(resname + " Resource not found"); // NOPMD
               }
               jniLibrary.getParentFile().mkdirs();
-              try (OutputStream os = new FileOutputStream(jniLibrary)) {
+              Files.newOutputStream(jniLibrary.toPath());
+              try (OutputStream os = Files.newOutputStream(jniLibrary.toPath())) {
                 byte[] buffer = new byte[1024];
                 int readBytes;
-                while ((readBytes = resIs.read(buffer)) != -1) {
+                while ((readBytes = resIs.read(buffer)) != -1) { // NOPMD
                   os.write(buffer, 0, readBytes);
                 }
               }
