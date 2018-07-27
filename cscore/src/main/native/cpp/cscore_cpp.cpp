@@ -20,28 +20,39 @@
 #include "Log.h"
 #include "NetworkListener.h"
 #include "Notifier.h"
+#include "PropertyContainer.h"
 #include "SinkImpl.h"
 #include "SourceImpl.h"
 #include "Telemetry.h"
 
 using namespace cs;
 
-static std::shared_ptr<SourceImpl> GetPropertySource(CS_Property propertyHandle,
-                                                     int* propertyIndex,
-                                                     CS_Status* status) {
+static std::shared_ptr<PropertyContainer> GetPropertyContainer(
+    CS_Property propertyHandle, int* propertyIndex, CS_Status* status) {
+  std::shared_ptr<PropertyContainer> container;
   Handle handle{propertyHandle};
-  int i = handle.GetParentIndex();
-  if (i < 0) {
-    *status = CS_INVALID_HANDLE;
-    return nullptr;
-  }
-  auto data = Sources::GetInstance().Get(Handle{i, Handle::kSource});
-  if (!data) {
+  if (handle.IsType(Handle::kProperty)) {
+    int i = handle.GetParentIndex();
+    auto data = Sources::GetInstance().Get(Handle{i, Handle::kSource});
+    if (!data) {
+      *status = CS_INVALID_HANDLE;
+      return nullptr;
+    }
+    container = data->source;
+  } else if (handle.IsType(Handle::kSinkProperty)) {
+    int i = handle.GetParentIndex();
+    auto data = Sinks::GetInstance().Get(Handle{i, Handle::kSink});
+    if (!data) {
+      *status = CS_INVALID_HANDLE;
+      return nullptr;
+    }
+    container = data->sink;
+  } else {
     *status = CS_INVALID_HANDLE;
     return nullptr;
   }
   *propertyIndex = handle.GetIndex();
-  return data->source;
+  return container;
 }
 
 namespace cs {
@@ -52,101 +63,101 @@ namespace cs {
 
 CS_PropertyKind GetPropertyKind(CS_Property property, CS_Status* status) {
   int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return CS_PROP_NONE;
-  return source->GetPropertyKind(propertyIndex);
+  auto container = GetPropertyContainer(property, &propertyIndex, status);
+  if (!container) return CS_PROP_NONE;
+  return container->GetPropertyKind(propertyIndex);
 }
 
 std::string GetPropertyName(CS_Property property, CS_Status* status) {
   wpi::SmallString<128> buf;
   int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return std::string{};
-  return source->GetPropertyName(propertyIndex, buf, status);
+  auto container = GetPropertyContainer(property, &propertyIndex, status);
+  if (!container) return std::string{};
+  return container->GetPropertyName(propertyIndex, buf, status);
 }
 
 wpi::StringRef GetPropertyName(CS_Property property,
                                wpi::SmallVectorImpl<char>& buf,
                                CS_Status* status) {
   int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return wpi::StringRef{};
-  return source->GetPropertyName(propertyIndex, buf, status);
+  auto container = GetPropertyContainer(property, &propertyIndex, status);
+  if (!container) return wpi::StringRef{};
+  return container->GetPropertyName(propertyIndex, buf, status);
 }
 
 int GetProperty(CS_Property property, CS_Status* status) {
   int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return false;
-  return source->GetProperty(propertyIndex, status);
+  auto container = GetPropertyContainer(property, &propertyIndex, status);
+  if (!container) return false;
+  return container->GetProperty(propertyIndex, status);
 }
 
 void SetProperty(CS_Property property, int value, CS_Status* status) {
   int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return;
-  source->SetProperty(propertyIndex, value, status);
+  auto container = GetPropertyContainer(property, &propertyIndex, status);
+  if (!container) return;
+  container->SetProperty(propertyIndex, value, status);
 }
 
 int GetPropertyMin(CS_Property property, CS_Status* status) {
   int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return 0.0;
-  return source->GetPropertyMin(propertyIndex, status);
+  auto container = GetPropertyContainer(property, &propertyIndex, status);
+  if (!container) return 0.0;
+  return container->GetPropertyMin(propertyIndex, status);
 }
 
 int GetPropertyMax(CS_Property property, CS_Status* status) {
   int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return 0.0;
-  return source->GetPropertyMax(propertyIndex, status);
+  auto container = GetPropertyContainer(property, &propertyIndex, status);
+  if (!container) return 0.0;
+  return container->GetPropertyMax(propertyIndex, status);
 }
 
 int GetPropertyStep(CS_Property property, CS_Status* status) {
   int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return 0.0;
-  return source->GetPropertyStep(propertyIndex, status);
+  auto container = GetPropertyContainer(property, &propertyIndex, status);
+  if (!container) return 0.0;
+  return container->GetPropertyStep(propertyIndex, status);
 }
 
 int GetPropertyDefault(CS_Property property, CS_Status* status) {
   int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return 0.0;
-  return source->GetPropertyDefault(propertyIndex, status);
+  auto container = GetPropertyContainer(property, &propertyIndex, status);
+  if (!container) return 0.0;
+  return container->GetPropertyDefault(propertyIndex, status);
 }
 
 std::string GetStringProperty(CS_Property property, CS_Status* status) {
   wpi::SmallString<128> buf;
   int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return std::string{};
-  return source->GetStringProperty(propertyIndex, buf, status);
+  auto container = GetPropertyContainer(property, &propertyIndex, status);
+  if (!container) return std::string{};
+  return container->GetStringProperty(propertyIndex, buf, status);
 }
 
 wpi::StringRef GetStringProperty(CS_Property property,
                                  wpi::SmallVectorImpl<char>& buf,
                                  CS_Status* status) {
   int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return wpi::StringRef{};
-  return source->GetStringProperty(propertyIndex, buf, status);
+  auto container = GetPropertyContainer(property, &propertyIndex, status);
+  if (!container) return wpi::StringRef{};
+  return container->GetStringProperty(propertyIndex, buf, status);
 }
 
 void SetStringProperty(CS_Property property, wpi::StringRef value,
                        CS_Status* status) {
   int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return;
-  source->SetStringProperty(propertyIndex, value, status);
+  auto container = GetPropertyContainer(property, &propertyIndex, status);
+  if (!container) return;
+  container->SetStringProperty(propertyIndex, value, status);
 }
 
 std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
                                                 CS_Status* status) {
   int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return std::vector<std::string>{};
-  return source->GetEnumPropertyChoices(propertyIndex, status);
+  auto container = GetPropertyContainer(property, &propertyIndex, status);
+  if (!container) return std::vector<std::string>{};
+  return container->GetEnumPropertyChoices(propertyIndex, status);
 }
 
 //
@@ -476,6 +487,34 @@ wpi::StringRef GetSinkDescription(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
     return wpi::StringRef{};
   }
   return data->sink->GetDescription(buf);
+}
+
+CS_Property GetSinkProperty(CS_Sink sink, wpi::StringRef name,
+                            CS_Status* status) {
+  auto data = Sinks::GetInstance().Get(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  int property = data->sink->GetPropertyIndex(name);
+  if (property < 0) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  return Handle{sink, property, Handle::kSinkProperty};
+}
+
+wpi::ArrayRef<CS_Property> EnumerateSinkProperties(
+    CS_Sink sink, wpi::SmallVectorImpl<CS_Property>& vec, CS_Status* status) {
+  auto data = Sinks::GetInstance().Get(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  wpi::SmallVector<int, 32> properties_buf;
+  for (auto property : data->sink->EnumerateProperties(properties_buf, status))
+    vec.push_back(Handle{sink, property, Handle::kSinkProperty});
+  return vec;
 }
 
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {

@@ -206,6 +206,8 @@ public class CameraServerJNI {
   public static native int getSinkKind(int sink);
   public static native String getSinkName(int sink);
   public static native String getSinkDescription(int sink);
+  public static native int getSinkProperty(int sink, String name);
+  public static native int[] enumerateSinkProperties(int sink);
   public static native void setSinkSource(int sink, int source);
   public static native int getSinkSourceProperty(int sink, String name);
   public static native int getSinkSource(int sink);

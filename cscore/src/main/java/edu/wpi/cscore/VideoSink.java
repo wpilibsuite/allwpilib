@@ -110,6 +110,29 @@ public class VideoSink implements AutoCloseable {
   }
 
   /**
+   * Get a property of the sink.
+   * @param name Property name
+   * @return Property (kind Property::kNone if no property with
+   *         the given name exists)
+   */
+  public VideoProperty getProperty(String name) {
+    return new VideoProperty(CameraServerJNI.getSinkProperty(m_handle, name));
+  }
+
+  /**
+   * Enumerate all properties of this sink.
+   */
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+  public VideoProperty[] enumerateProperties() {
+    int[] handles = CameraServerJNI.enumerateSinkProperties(m_handle);
+    VideoProperty[] rv = new VideoProperty[handles.length];
+    for (int i = 0; i < handles.length; i++) {
+      rv[i] = new VideoProperty(handles[i]);
+    }
+    return rv;
+  }
+
+  /**
    * Configure which source should provide frames to this sink.  Each sink
    * can accept frames from only a single source, but a single source can
    * provide frames to multiple clients.

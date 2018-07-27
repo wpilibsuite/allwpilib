@@ -85,7 +85,10 @@ struct RawEvent {
     kSinkEnabled = CS_SINK_ENABLED,
     kSinkDisabled = CS_SINK_DISABLED,
     kNetworkInterfacesChanged = CS_NETWORK_INTERFACES_CHANGED,
-    kTelemetryUpdated = CS_TELEMETRY_UPDATED
+    kTelemetryUpdated = CS_TELEMETRY_UPDATED,
+    kSinkPropertyCreated = CS_SINK_PROPERTY_CREATED,
+    kSinkPropertyValueUpdated = CS_SINK_PROPERTY_VALUE_UPDATED,
+    kSinkPropertyChoicesUpdated = CS_SINK_PROPERTY_CHOICES_UPDATED
   };
 
   RawEvent() = default;
@@ -265,6 +268,10 @@ wpi::StringRef GetSinkName(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
 std::string GetSinkDescription(CS_Sink sink, CS_Status* status);
 wpi::StringRef GetSinkDescription(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                                   CS_Status* status);
+CS_Property GetSinkProperty(CS_Sink sink, wpi::StringRef name,
+                            CS_Status* status);
+wpi::ArrayRef<CS_Property> EnumerateSinkProperties(
+    CS_Sink sink, wpi::SmallVectorImpl<CS_Property>& vec, CS_Status* status);
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
 CS_Property GetSinkSourceProperty(CS_Sink sink, wpi::StringRef name,
                                   CS_Status* status);

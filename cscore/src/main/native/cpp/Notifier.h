@@ -53,6 +53,10 @@ class Notifier {
   void NotifySink(const SinkImpl& sink, CS_EventKind kind);
   void NotifySinkSourceChanged(wpi::StringRef name, CS_Sink sink,
                                CS_Source source);
+  void NotifySinkProperty(const SinkImpl& sink, CS_EventKind kind,
+                          wpi::StringRef propertyName, int property,
+                          CS_PropertyKind propertyKind, int value,
+                          wpi::StringRef valueStr);
   void NotifyNetworkInterfacesChanged();
   void NotifyTelemetryUpdated();
 

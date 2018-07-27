@@ -96,4 +96,33 @@ wpi::StringRef SinkImpl::GetError(wpi::SmallVectorImpl<char>& buf) const {
   return wpi::StringRef{buf.data(), buf.size()};
 }
 
+void SinkImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
+  auto& notifier = Notifier::GetInstance();
+  notifier.NotifySinkProperty(*this, CS_SINK_PROPERTY_CREATED, prop.name,
+                              propIndex, prop.propKind, prop.value,
+                              prop.valueStr);
+  // also notify choices updated event for enum types
+  if (prop.propKind == CS_PROP_ENUM)
+    notifier.NotifySinkProperty(*this, CS_SINK_PROPERTY_CHOICES_UPDATED,
+                                prop.name, propIndex, prop.propKind, prop.value,
+                                wpi::StringRef{});
+}
+
+void SinkImpl::UpdatePropertyValue(int property, bool setString, int value,
+                                   wpi::StringRef valueStr) {
+  auto prop = GetProperty(property);
+  if (!prop) return;
+
+  if (setString)
+    prop->SetValue(valueStr);
+  else
+    prop->SetValue(value);
+
+  // Only notify updates after we've notified created
+  if (m_properties_cached)
+    Notifier::GetInstance().NotifySinkProperty(
+        *this, CS_SINK_PROPERTY_VALUE_UPDATED, prop->name, property,
+        prop->propKind, prop->value, prop->valueStr);
+}
+
 void SinkImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {}
