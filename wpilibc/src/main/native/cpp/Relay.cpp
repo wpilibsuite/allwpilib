@@ -201,6 +201,7 @@ void Relay::GetDescription(wpi::raw_ostream& desc) const {
 
 void Relay::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Relay");
+  builder.SetActuator(true);
   builder.SetSafeState([=]() { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",

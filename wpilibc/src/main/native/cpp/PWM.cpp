@@ -184,6 +184,7 @@ int PWM::GetChannel() const { return m_channel; }
 
 void PWM::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PWM");
+  builder.SetActuator(true);
   builder.SetSafeState([=]() { SetDisabled(); });
   builder.AddDoubleProperty("Value", [=]() { return GetRaw(); },
                             [=](double value) { SetRaw(value); });

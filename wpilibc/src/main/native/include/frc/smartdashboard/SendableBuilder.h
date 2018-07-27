@@ -33,6 +33,14 @@ class SendableBuilder {
   virtual void SetSmartDashboardType(const wpi::Twine& type) = 0;
 
   /**
+   * Set a flag indicating if this sendable should be treated as an actuator.
+   * By default this flag is false.
+   *
+   * @param value   true if actuator, false if not
+   */
+  virtual void SetActuator(bool value) = 0;
+
+  /**
    * Set the function that should be called to set the Sendable into a safe
    * state.  This is called when entering and exiting Live Window mode.
    *
