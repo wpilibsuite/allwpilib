@@ -61,7 +61,7 @@ public final class RuntimeLoader<T> {
               try (OutputStream os = new FileOutputStream(jniLibrary)) {
                 byte[] buffer = new byte[1024];
                 int readBytes;
-                while ((readBytes = resIs.read(buffer)) != 1) {
+                while ((readBytes = resIs.read(buffer)) != -1) {
                   os.write(buffer, 0, readBytes);
                 }
               }
