@@ -94,6 +94,13 @@ public final class RuntimeDetector {
     return toReturn;
   }
 
+  public static synchronized String getHashLibraryResource(String libName) {
+    computePlatform();
+
+    String toReturn = filePath + libName + ".hash";
+    return toReturn;
+  }
+
   public static boolean isAthena() {
     File runRobotFile = new File("/usr/local/frc/bin/frcRunRobot.sh");
     return runRobotFile.exists();

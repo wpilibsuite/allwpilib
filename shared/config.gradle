@@ -268,9 +268,7 @@ ext.createAllCombined = { list, name, base, type, project ->
         duplicatesStrategy = 'exclude'
 
         list.each {
-            it.outputs.files.each {
-                from project.zipTree(it)
-            }
+            from project.zipTree(it.archivePath)
             dependsOn it
         }
     }
