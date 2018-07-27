@@ -33,6 +33,7 @@
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
+#include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
 #include "Telemetry.h"
@@ -400,12 +401,21 @@ void UsbCameraImpl::CameraThreadMain() {
           continue;
         }
 
-        PutFrame(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat),
-                 m_mode.width, m_mode.height,
-                 wpi::StringRef(
-                     static_cast<const char*>(m_buffers[buf.index].m_data),
-                     static_cast<size_t>(buf.bytesused)),
-                 wpi::Now());  // TODO: time
+        wpi::StringRef image{
+            static_cast<const char*>(m_buffers[buf.index].m_data),
+            static_cast<size_t>(buf.bytesused)};
+        int width = m_mode.width;
+        int height = m_mode.height;
+        bool good = true;
+        if (m_mode.pixelFormat == VideoMode::kMJPEG &&
+            !GetJpegSize(image, &width, &height)) {
+          SWARNING("invalid JPEG image received from camera");
+          good = false;
+        }
+        if (good) {
+          PutFrame(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat),
+                   width, height, image, wpi::Now());  // TODO: time
+        }
       }
 
       // Requeue buffer
