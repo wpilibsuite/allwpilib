@@ -57,6 +57,7 @@ public final class RuntimeLoader<T> {
               if (resIs == null) {
                 throw new IOException(resname + " Resource not found");
               }
+              jniLibrary.getParentFile().mkdirs();
               try (OutputStream os = new FileOutputStream(jniLibrary)) {
                 byte[] buffer = new byte[1024];
                 int readBytes;
