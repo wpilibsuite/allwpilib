@@ -80,6 +80,7 @@ TEST(UvGetAddrInfo, Basic) {
   ASSERT_EQ(getaddrinfo_cbs, 1);
 }
 
+#ifndef _WIN32
 TEST(UvGetAddrInfo, Concurrent) {
   int getaddrinfo_cbs = 0;
   int callback_counts[CONCURRENT_COUNT];
@@ -103,6 +104,7 @@ TEST(UvGetAddrInfo, Concurrent) {
     ASSERT_EQ(callback_counts[i], 1);
   }
 }
+#endif
 
 }  // namespace uv
 }  // namespace wpi
