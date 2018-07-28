@@ -498,6 +498,30 @@ inline int MjpegServer::GetPort() const {
   return cs::GetMjpegServerPort(m_handle, &m_status);
 }
 
+inline void MjpegServer::SetResolution(int width, int height) {
+  m_status = 0;
+  SetProperty(GetSinkProperty(m_handle, "width", &m_status), width, &m_status);
+  SetProperty(GetSinkProperty(m_handle, "height", &m_status), height,
+              &m_status);
+}
+
+inline void MjpegServer::SetFPS(int fps) {
+  m_status = 0;
+  SetProperty(GetSinkProperty(m_handle, "fps", &m_status), fps, &m_status);
+}
+
+inline void MjpegServer::SetCompression(int quality) {
+  m_status = 0;
+  SetProperty(GetSinkProperty(m_handle, "compression", &m_status), quality,
+              &m_status);
+}
+
+inline void MjpegServer::SetDefaultCompression(int quality) {
+  m_status = 0;
+  SetProperty(GetSinkProperty(m_handle, "default_compression", &m_status),
+              quality, &m_status);
+}
+
 inline CvSink::CvSink(wpi::StringRef name) {
   m_handle = CreateCvSink(name, &m_status);
 }

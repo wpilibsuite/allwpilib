@@ -567,6 +567,43 @@ class MjpegServer : public VideoSink {
 
   /// Get the port number of the server.
   int GetPort() const;
+
+  /// Set the stream resolution for clients that don't specify it.
+  ///
+  /// It is not necessary to set this if it is the same as the source
+  /// resolution.
+  ///
+  /// Setting this different than the source resolution will result in
+  /// increased CPU usage, particularly for MJPEG source cameras, as it will
+  /// decompress, resize, and recompress the image, instead of using the
+  /// camera's MJPEG image directly.
+  ///
+  /// @param width width, 0 for unspecified
+  /// @param height height, 0 for unspecified
+  void SetResolution(int width, int height);
+
+  /// Set the stream frames per second (FPS) for clients that don't specify it.
+  ///
+  /// It is not necessary to set this if it is the same as the source FPS.
+  ///
+  /// @param fps FPS, 0 for unspecified
+  void SetFPS(int fps);
+
+  /// Set the compression for clients that don't specify it.
+  ///
+  /// Setting this will result in increased CPU usage for MJPEG source cameras
+  /// as it will decompress and recompress the image instead of using the
+  /// camera's MJPEG image directly.
+  ///
+  /// @param quality JPEG compression quality (0-100), -1 for unspecified
+  void SetCompression(int quality);
+
+  /// Set the default compression used for non-MJPEG sources.  If not set,
+  /// 80 is used.  This function has no effect on MJPEG source cameras; use
+  /// SetCompression() instead to force recompression of MJPEG source images.
+  ///
+  /// @param quality JPEG compression quality (0-100)
+  void SetDefaultCompression(int quality);
 };
 
 /// A sink for user code to accept video frames as OpenCV images.

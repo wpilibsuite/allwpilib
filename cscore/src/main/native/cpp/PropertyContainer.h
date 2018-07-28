@@ -78,6 +78,10 @@ class PropertyContainer {
     }
     return ndx;
   }
+  template <typename NewFunc>
+  int CreateProperty(wpi::StringRef name, NewFunc newFunc) {
+    return CreateOrUpdateProperty(name, newFunc, [](PropertyImpl&) {});
+  }
 
   // Create an "empty" property.  This is called by GetPropertyIndex to create
   // properties that don't exist (as GetPropertyIndex can't fail).
