@@ -21,6 +21,8 @@ std::shared_ptr<nt::NetworkTable> SendableBuilderImpl::GetTable() {
   return m_table;
 }
 
+bool SendableBuilderImpl::IsActuator() const { return m_actuator; }
+
 void SendableBuilderImpl::UpdateTable() {
   uint64_t time = nt::Now();
   for (auto& property : m_properties) {
@@ -51,6 +53,11 @@ void SendableBuilderImpl::StopLiveWindowMode() {
 
 void SendableBuilderImpl::SetSmartDashboardType(const wpi::Twine& type) {
   m_table->GetEntry(".type").SetString(type);
+}
+
+void SendableBuilderImpl::SetActuator(bool value) {
+  m_table->GetEntry(".actuator").SetBoolean(value);
+  m_actuator = value;
 }
 
 void SendableBuilderImpl::SetSafeState(std::function<void()> func) {

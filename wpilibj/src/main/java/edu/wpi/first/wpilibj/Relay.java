@@ -334,6 +334,7 @@ public class Relay extends SendableBase implements MotorSafety {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Relay");
+    builder.setActuator(true);
     builder.setSafeState(() -> set(Value.kOff));
     builder.addStringProperty("Value", () -> get().getPrettyValue(),
         value -> set(Value.getValueOf(value).orElse(Value.kOff)));

@@ -58,6 +58,7 @@ public class SendableBuilderImpl implements SendableBuilder {
   private Runnable m_updateTable;
   private NetworkTable m_table;
   private NetworkTableEntry m_controllableEntry;
+  private boolean m_actuator;
 
   /**
    * Set the network table.  Must be called prior to any Add* functions being
@@ -75,6 +76,14 @@ public class SendableBuilderImpl implements SendableBuilder {
    */
   public NetworkTable getTable() {
     return m_table;
+  }
+
+  /**
+   * Return whether this sendable should be treated as an actuator.
+   * @return True if actuator, false if not.
+   */
+  public boolean isActuator() {
+    return m_actuator;
   }
 
   /**
@@ -142,6 +151,18 @@ public class SendableBuilderImpl implements SendableBuilder {
   @Override
   public void setSmartDashboardType(String type) {
     m_table.getEntry(".type").setString(type);
+  }
+
+  /**
+   * Set a flag indicating if this sendable should be treated as an actuator.
+   * By default this flag is false.
+   *
+   * @param value   true if actuator, false if not
+   */
+  @Override
+  public void setActuator(boolean value) {
+    m_table.getEntry(".actuator").setBoolean(value);
+    m_actuator = value;
   }
 
   /**

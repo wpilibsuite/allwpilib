@@ -136,6 +136,7 @@ bool DoubleSolenoid::IsRevSolenoidBlackListed() const {
 
 void DoubleSolenoid::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Double Solenoid");
+  builder.SetActuator(true);
   builder.SetSafeState([=]() { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",

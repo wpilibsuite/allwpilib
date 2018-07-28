@@ -47,6 +47,12 @@ class SendableBuilderImpl : public SendableBuilder {
   std::shared_ptr<nt::NetworkTable> GetTable();
 
   /**
+   * Return whether this sendable should be treated as an actuator.
+   * @return True if actuator, false if not.
+   */
+  bool IsActuator() const;
+
+  /**
    * Update the network table values by calling the getters for all properties.
    */
   void UpdateTable();
@@ -74,6 +80,7 @@ class SendableBuilderImpl : public SendableBuilder {
   void StopLiveWindowMode();
 
   void SetSmartDashboardType(const wpi::Twine& type) override;
+  void SetActuator(bool value) override;
   void SetSafeState(std::function<void()> func) override;
   void SetUpdateTable(std::function<void()> func) override;
   nt::NetworkTableEntry GetEntry(const wpi::Twine& key) override;
@@ -188,6 +195,7 @@ class SendableBuilderImpl : public SendableBuilder {
   std::function<void()> m_updateTable;
   std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_controllableEntry;
+  bool m_actuator = false;
 };
 
 }  // namespace frc

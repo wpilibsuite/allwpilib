@@ -87,6 +87,7 @@ void Solenoid::StartPulse() {
 
 void Solenoid::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Solenoid");
+  builder.SetActuator(true);
   builder.SetSafeState([=]() { Set(false); });
   builder.AddBooleanProperty("Value", [=]() { return Get(); },
                              [=](bool value) { Set(value); });
