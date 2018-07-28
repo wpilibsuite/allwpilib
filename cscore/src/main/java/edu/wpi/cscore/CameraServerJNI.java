@@ -7,18 +7,11 @@
 
 package edu.wpi.cscore;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
 import java.util.function.Consumer;
 
 import org.opencv.core.Core;
 
-import edu.wpi.first.wpiutil.RuntimeDetector;
 import edu.wpi.first.wpiutil.RuntimeLoader;
 
 public class CameraServerJNI {
