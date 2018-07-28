@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <string>
 
 #include <networktables/NetworkTableEntry.h>
@@ -33,12 +34,15 @@ class SendableChooserBase : public SendableBase {
   static constexpr const char* kOptions = "options";
   static constexpr const char* kSelected = "selected";
   static constexpr const char* kActive = "active";
+  static constexpr const char* kInstance = ".instance";
 
   std::string m_defaultChoice;
   std::string m_selected;
   bool m_haveSelected = false;
   wpi::SmallVector<nt::NetworkTableEntry, 2> m_activeEntries;
   wpi::mutex m_mutex;
+  int m_instance;
+  static std::atomic_int s_instances;
 };
 
 }  // namespace frc

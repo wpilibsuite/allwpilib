@@ -75,6 +75,7 @@ auto SendableChooser<T>::GetSelected()
 template <class T>
 void SendableChooser<T>::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("String Chooser");
+  builder.GetEntry(kInstance).SetDouble(m_instance);
   builder.AddStringArrayProperty(kOptions,
                                  [=]() {
                                    std::vector<std::string> keys;

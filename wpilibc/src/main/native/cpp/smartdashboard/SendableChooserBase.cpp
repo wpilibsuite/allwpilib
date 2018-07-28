@@ -9,4 +9,7 @@
 
 using namespace frc;
 
-SendableChooserBase::SendableChooserBase() : SendableBase(false) {}
+std::atomic_int SendableChooserBase::s_instances{0};
+
+SendableChooserBase::SendableChooserBase()
+    : SendableBase(false), m_instance{s_instances++} {}

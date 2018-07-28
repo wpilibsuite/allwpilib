@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj.smartdashboard;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -48,17 +49,24 @@ public class SendableChooser<V> extends SendableBase {
    */
   private static final String OPTIONS = "options";
   /**
+   * The key for the instance number.
+   */
+  private static final String INSTANCE = ".instance";
+  /**
    * A map linking strings to the objects the represent.
    */
   @SuppressWarnings("PMD.LooseCoupling")
   private final LinkedHashMap<String, V> m_map = new LinkedHashMap<>();
   private String m_defaultChoice = "";
+  private final int m_instance;
+  private static final AtomicInteger s_instances = new AtomicInteger();
 
   /**
    * Instantiates a {@link SendableChooser}.
    */
   public SendableChooser() {
     super(false);
+    m_instance = s_instances.getAndIncrement();
   }
 
   /**
@@ -113,6 +121,7 @@ public class SendableChooser<V> extends SendableBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("String Chooser");
+    builder.getEntry(INSTANCE).setDouble(m_instance);
     builder.addStringProperty(DEFAULT, () -> {
       return m_defaultChoice;
     }, null);
