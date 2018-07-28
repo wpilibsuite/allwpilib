@@ -94,6 +94,39 @@ void SourceImpl::Wakeup() {
   m_frameCv.notify_all();
 }
 
+void SourceImpl::SetBrightness(int brightness, CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
+}
+
+int SourceImpl::GetBrightness(CS_Status* status) const {
+  *status = CS_INVALID_HANDLE;
+  return 0;
+}
+
+void SourceImpl::SetWhiteBalanceAuto(CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
+}
+
+void SourceImpl::SetWhiteBalanceHoldCurrent(CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
+}
+
+void SourceImpl::SetWhiteBalanceManual(int value, CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
+}
+
+void SourceImpl::SetExposureAuto(CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
+}
+
+void SourceImpl::SetExposureHoldCurrent(CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
+}
+
+void SourceImpl::SetExposureManual(int value, CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
+}
+
 VideoMode SourceImpl::GetVideoMode(CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return VideoMode{};
   std::lock_guard<wpi::mutex> lock(m_mutex);
