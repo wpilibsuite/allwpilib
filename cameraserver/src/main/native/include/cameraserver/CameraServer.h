@@ -9,16 +9,11 @@
 
 #include <stdint.h>
 
-#include <atomic>
 #include <memory>
 #include <string>
-#include <vector>
 
-#include <networktables/NetworkTable.h>
-#include <wpi/DenseMap.h>
-#include <wpi/StringMap.h>
+#include <wpi/ArrayRef.h>
 #include <wpi/StringRef.h>
-#include <wpi/mutex.h>
 
 #include "cscore.h"
 
@@ -285,25 +280,10 @@ class CameraServer {
 
  private:
   CameraServer();
+  ~CameraServer();
 
-  std::shared_ptr<nt::NetworkTable> GetSourceTable(CS_Source source);
-  std::vector<std::string> GetSinkStreamValues(CS_Sink sink);
-  std::vector<std::string> GetSourceStreamValues(CS_Source source);
-  void UpdateStreamValues();
-
-  static constexpr char const* kPublishName = "/CameraPublisher";
-
-  wpi::mutex m_mutex;
-  std::atomic<int> m_defaultUsbDevice;
-  std::string m_primarySourceName;
-  wpi::StringMap<cs::VideoSource> m_sources;
-  wpi::StringMap<cs::VideoSink> m_sinks;
-  wpi::DenseMap<CS_Source, std::shared_ptr<nt::NetworkTable>> m_tables;
-  std::shared_ptr<nt::NetworkTable> m_publishTable;
-  cs::VideoListener m_videoListener;
-  int m_tableListener;
-  int m_nextPort;
-  std::vector<std::string> m_addresses;
+  struct Impl;
+  std::unique_ptr<Impl> m_impl;
 };
 
 }  // namespace frc
