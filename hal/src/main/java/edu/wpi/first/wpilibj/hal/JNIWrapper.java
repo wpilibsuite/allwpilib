@@ -22,7 +22,7 @@ public class JNIWrapper {
     if (!libraryLoaded) {
       try {
         loader = new RuntimeLoader<>("wpiHal", RuntimeLoader.getDefaultExtractionRoot(), JNIWrapper.class);
-        loader.LoadLibrary();
+        loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();
         System.exit(1);

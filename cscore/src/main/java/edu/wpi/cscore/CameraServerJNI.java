@@ -30,7 +30,7 @@ public class CameraServerJNI {
     if (!libraryLoaded) {
       try {
         loader = new RuntimeLoader<>("cscore", RuntimeLoader.getDefaultExtractionRoot(), CameraServerJNI.class);
-        loader.LoadLibrary();
+        loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();
         System.exit(1);

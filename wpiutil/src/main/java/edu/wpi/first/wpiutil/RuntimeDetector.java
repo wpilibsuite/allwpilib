@@ -94,6 +94,9 @@ public final class RuntimeDetector {
     return toReturn;
   }
 
+  /**
+   * Get the path to the hash to the requested resource.
+   */
   public static synchronized String getHashLibraryResource(String libName) {
     computePlatform();
 
