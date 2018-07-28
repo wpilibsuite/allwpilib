@@ -26,7 +26,7 @@ void CommandGroup::AddSequential(Command* command) {
 
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
-  for (auto& requirement : command->GetRequirements()) Requires(requirement);
+  for (auto&& requirement : command->GetRequirements()) Requires(requirement);
 }
 
 void CommandGroup::AddSequential(Command* command, double timeout) {
@@ -47,7 +47,7 @@ void CommandGroup::AddSequential(Command* command, double timeout) {
 
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
-  for (auto& requirement : command->GetRequirements()) Requires(requirement);
+  for (auto&& requirement : command->GetRequirements()) Requires(requirement);
 }
 
 void CommandGroup::AddParallel(Command* command) {
@@ -63,7 +63,7 @@ void CommandGroup::AddParallel(Command* command) {
 
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
-  for (auto& requirement : command->GetRequirements()) Requires(requirement);
+  for (auto&& requirement : command->GetRequirements()) Requires(requirement);
 }
 
 void CommandGroup::AddParallel(Command* command, double timeout) {
@@ -84,7 +84,7 @@ void CommandGroup::AddParallel(Command* command, double timeout) {
 
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
-  for (auto& requirement : command->GetRequirements()) Requires(requirement);
+  for (auto&& requirement : command->GetRequirements()) Requires(requirement);
 }
 
 bool CommandGroup::IsInterruptible() const {
@@ -229,7 +229,7 @@ void CommandGroup::CancelConflicts(Command* command) {
     Command* child = (*childIter)->m_command;
     bool erased = false;
 
-    for (auto& requirement : command->GetRequirements()) {
+    for (auto&& requirement : command->GetRequirements()) {
       if (child->DoesRequire(requirement)) {
         child->_Cancel();
         child->Removed();

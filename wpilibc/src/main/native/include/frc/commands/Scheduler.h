@@ -95,7 +95,8 @@ class Scheduler : public ErrorBase, public SendableBase {
 
   void ProcessCommandAddition(Command* command);
 
-  Command::SubsystemSet m_subsystems;
+  typedef std::set<Subsystem*> SubsystemSet;
+  SubsystemSet m_subsystems;
   wpi::mutex m_buttonsMutex;
   typedef std::vector<std::unique_ptr<ButtonScheduler>> ButtonVector;
   ButtonVector m_buttons;
