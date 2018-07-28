@@ -268,6 +268,10 @@ class UsbCamera : public VideoCamera {
 
   /// Get the path to the device.
   std::string GetPath() const;
+
+  /// Set how verbose the camera connection messages are.
+  /// @param level 0=don't display Connecting message, 1=do display message
+  void SetConnectVerbose(int level);
 };
 
 /// A source that represents a MJPEG-over-HTTP (IP) camera.
