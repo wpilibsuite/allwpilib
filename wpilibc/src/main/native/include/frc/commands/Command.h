@@ -8,18 +8,18 @@
 #pragma once
 
 #include <memory>
-#include <set>
 #include <string>
 
+#include <wpi/SmallPtrSet.h>
 #include <wpi/Twine.h>
 
 #include "frc/ErrorBase.h"
+#include "frc/commands/Subsystem.h"
 #include "frc/smartdashboard/SendableBase.h"
 
 namespace frc {
 
 class CommandGroup;
-class Subsystem;
 
 /**
  * The Command class is at the very core of the entire command framework.
@@ -186,7 +186,7 @@ class Command : public ErrorBase, public SendableBase {
    */
   bool DoesRequire(Subsystem* subsystem) const;
 
-  typedef std::set<Subsystem*> SubsystemSet;
+  typedef wpi::SmallPtrSetImpl<Subsystem*> SubsystemSet;
 
   /**
    * Returns the requirements (as an std::set of Subsystem pointers) of this
@@ -393,7 +393,7 @@ class Command : public ErrorBase, public SendableBase {
   bool m_initialized = false;
 
   // The requirements (or null if no requirements)
-  SubsystemSet m_requirements;
+  wpi::SmallPtrSet<Subsystem*, 4> m_requirements;
 
   // Whether or not it is running
   bool m_running = false;

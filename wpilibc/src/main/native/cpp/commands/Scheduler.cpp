@@ -8,7 +8,6 @@
 #include "frc/commands/Scheduler.h"
 
 #include <algorithm>
-#include <set>
 
 #include <hal/HAL.h>
 
@@ -100,7 +99,7 @@ void Scheduler::Remove(Command* command) {
 
   if (!m_commands.erase(command)) return;
 
-  for (auto& requirement : command->GetRequirements()) {
+  for (auto&& requirement : command->GetRequirements()) {
     requirement->SetCurrentCommand(nullptr);
   }
 
@@ -186,7 +185,7 @@ void Scheduler::ProcessCommandAddition(Command* command) {
   auto found = m_commands.find(command);
   if (found == m_commands.end()) {
     // Check that the requirements can be had
-    Command::SubsystemSet requirements = command->GetRequirements();
+    const auto& requirements = command->GetRequirements();
     for (const auto& requirement : requirements) {
       if (requirement->GetCurrentCommand() != nullptr &&
           !requirement->GetCurrentCommand()->IsInterruptible())
@@ -195,7 +194,7 @@ void Scheduler::ProcessCommandAddition(Command* command) {
 
     // Give it the requirements
     m_adding = true;
-    for (auto& requirement : requirements) {
+    for (auto&& requirement : requirements) {
       if (requirement->GetCurrentCommand() != nullptr) {
         requirement->GetCurrentCommand()->Cancel();
         Remove(requirement->GetCurrentCommand());
