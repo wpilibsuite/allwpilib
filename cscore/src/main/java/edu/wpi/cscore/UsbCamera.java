@@ -43,4 +43,13 @@ public class UsbCamera extends VideoCamera {
   public String getPath() {
     return CameraServerJNI.getUsbCameraPath(m_handle);
   }
+
+  /**
+   * Set how verbose the camera connection messages are.
+   * @param level 0=don't display Connecting message, 1=do display message
+   */
+  void setConnectVerbose(int level) {
+    CameraServerJNI.setProperty(CameraServerJNI.getSourceProperty(m_handle, "connect_verbose"),
+                                level);
+  }
 }

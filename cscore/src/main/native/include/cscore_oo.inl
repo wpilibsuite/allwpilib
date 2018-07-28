@@ -233,6 +233,12 @@ inline std::string UsbCamera::GetPath() const {
   return ::cs::GetUsbCameraPath(m_handle, &m_status);
 }
 
+inline void UsbCamera::SetConnectVerbose(int level) {
+  m_status = 0;
+  SetProperty(GetSourceProperty(m_handle, "connect_verbose", &m_status), level,
+              &m_status);
+}
+
 inline HttpCamera::HttpCamera(wpi::StringRef name, wpi::StringRef url,
                               HttpCameraKind kind) {
   m_handle = CreateHttpCamera(

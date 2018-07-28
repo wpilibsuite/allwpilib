@@ -143,6 +143,7 @@ class UsbCameraImpl : public SourceImpl {
   bool m_modeSetPixelFormat{false};
   bool m_modeSetResolution{false};
   bool m_modeSetFPS{false};
+  int m_connectVerbose{1};
 #ifdef __linux__
   unsigned m_capabilities = 0;
 #endif
