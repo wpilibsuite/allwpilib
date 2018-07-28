@@ -12,6 +12,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
 import java.util.function.Consumer;
 
 import org.opencv.core.Core;
@@ -22,9 +24,9 @@ import edu.wpi.first.wpiutil.RuntimeLoader;
 public class CameraServerJNI {
   static boolean libraryLoaded = false;
   static boolean cvLibraryLoaded = false;
-  static File cvJniLibrary = null;
 
   static RuntimeLoader<CameraServerJNI> loader = null;
+  static RuntimeLoader<Core> cvLoader = null;
 
   static {
     if (!libraryLoaded) {
@@ -41,43 +43,11 @@ public class CameraServerJNI {
     String opencvName = Core.NATIVE_LIBRARY_NAME;
     if (!cvLibraryLoaded) {
       try {
-
-        System.loadLibrary(opencvName);
-      } catch (UnsatisfiedLinkError linkError) {
-        try {
-          String resname = RuntimeDetector.getLibraryResource(opencvName);
-          InputStream is = CameraServerJNI.class.getResourceAsStream(resname);
-          if (is != null) {
-            // create temporary file
-            if (System.getProperty("os.name").startsWith("Windows")) {
-              cvJniLibrary = File.createTempFile("OpenCVJNI", ".dll");
-            } else if (System.getProperty("os.name").startsWith("Mac")) {
-              cvJniLibrary = File.createTempFile("libOpenCVJNI", ".dylib");
-            } else {
-              cvJniLibrary = File.createTempFile("libOpenCVJNI", ".so");
-            }
-            // flag for delete on exit
-            cvJniLibrary.deleteOnExit();
-            OutputStream os = new FileOutputStream(cvJniLibrary);
-
-            byte[] buffer = new byte[1024];
-            int readBytes;
-            try {
-              while ((readBytes = is.read(buffer)) != -1) {
-                os.write(buffer, 0, readBytes);
-              }
-            } finally {
-              os.close();
-              is.close();
-            }
-            System.load(cvJniLibrary.getAbsolutePath());
-          } else {
-            System.loadLibrary(opencvName);
-          }
-        } catch (IOException ex) {
-          ex.printStackTrace();
-          System.exit(1);
-        }
+        cvLoader = new RuntimeLoader<>(opencvName, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
+        cvLoader.loadLibraryHashed();
+      } catch (IOException ex) {
+        ex.printStackTrace();
+        System.exit(1);
       }
       cvLibraryLoaded = true;
     }
