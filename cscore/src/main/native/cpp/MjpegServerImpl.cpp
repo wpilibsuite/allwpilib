@@ -293,7 +293,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
       case CS_PROP_BOOLEAN:
       case CS_PROP_INTEGER:
       case CS_PROP_ENUM: {
-        int val;
+        int val = 0;
         if (value.getAsInteger(10, val)) {
           response << param << ": \"invalid integer\"\r\n";
           SWARNING("HTTP parameter \"" << param << "\" value \"" << value
