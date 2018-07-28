@@ -89,14 +89,14 @@ class SourceImpl : public PropertyContainer {
   void Wakeup();
 
   // Standard common camera properties
-  virtual void SetBrightness(int brightness, CS_Status* status) = 0;
-  virtual int GetBrightness(CS_Status* status) const = 0;
-  virtual void SetWhiteBalanceAuto(CS_Status* status) = 0;
-  virtual void SetWhiteBalanceHoldCurrent(CS_Status* status) = 0;
-  virtual void SetWhiteBalanceManual(int value, CS_Status* status) = 0;
-  virtual void SetExposureAuto(CS_Status* status) = 0;
-  virtual void SetExposureHoldCurrent(CS_Status* status) = 0;
-  virtual void SetExposureManual(int value, CS_Status* status) = 0;
+  virtual void SetBrightness(int brightness, CS_Status* status);
+  virtual int GetBrightness(CS_Status* status) const;
+  virtual void SetWhiteBalanceAuto(CS_Status* status);
+  virtual void SetWhiteBalanceHoldCurrent(CS_Status* status);
+  virtual void SetWhiteBalanceManual(int value, CS_Status* status);
+  virtual void SetExposureAuto(CS_Status* status);
+  virtual void SetExposureHoldCurrent(CS_Status* status);
+  virtual void SetExposureManual(int value, CS_Status* status);
 
   // Video mode functions
   VideoMode GetVideoMode(CS_Status* status) const;

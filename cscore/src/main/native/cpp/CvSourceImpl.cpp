@@ -31,41 +31,6 @@ CvSourceImpl::~CvSourceImpl() {}
 
 void CvSourceImpl::Start() {}
 
-// These are only valid for cameras (should never get called)
-
-void CvSourceImpl::SetBrightness(int brightness, CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
-int CvSourceImpl::GetBrightness(CS_Status* status) const {
-  *status = CS_INVALID_HANDLE;
-  return 0;
-}
-
-void CvSourceImpl::SetWhiteBalanceAuto(CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
-void CvSourceImpl::SetWhiteBalanceHoldCurrent(CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
-void CvSourceImpl::SetWhiteBalanceManual(int value, CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
-void CvSourceImpl::SetExposureAuto(CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
-void CvSourceImpl::SetExposureHoldCurrent(CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
-void CvSourceImpl::SetExposureManual(int value, CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
 bool CvSourceImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   {
     std::lock_guard<wpi::mutex> lock(m_mutex);
