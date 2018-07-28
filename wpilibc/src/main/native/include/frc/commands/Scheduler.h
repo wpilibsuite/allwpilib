@@ -8,20 +8,14 @@
 #pragma once
 
 #include <memory>
-#include <set>
-#include <string>
-#include <vector>
-
-#include <networktables/NetworkTableEntry.h>
-#include <wpi/mutex.h>
 
 #include "frc/ErrorBase.h"
-#include "frc/commands/Command.h"
 #include "frc/smartdashboard/SendableBase.h"
 
 namespace frc {
 
 class ButtonScheduler;
+class Command;
 class Subsystem;
 
 class Scheduler : public ErrorBase, public SendableBase {
@@ -91,29 +85,10 @@ class Scheduler : public ErrorBase, public SendableBase {
 
  private:
   Scheduler();
-  ~Scheduler() override = default;
+  ~Scheduler() override;
 
-  void ProcessCommandAddition(Command* command);
-
-  typedef std::set<Subsystem*> SubsystemSet;
-  SubsystemSet m_subsystems;
-  wpi::mutex m_buttonsMutex;
-  typedef std::vector<std::unique_ptr<ButtonScheduler>> ButtonVector;
-  ButtonVector m_buttons;
-  typedef std::vector<Command*> CommandVector;
-  wpi::mutex m_additionsMutex;
-  CommandVector m_additions;
-  typedef std::set<Command*> CommandSet;
-  CommandSet m_commands;
-  bool m_adding = false;
-  bool m_enabled = true;
-  std::vector<std::string> commands;
-  std::vector<double> ids;
-  std::vector<double> toCancel;
-  nt::NetworkTableEntry m_namesEntry;
-  nt::NetworkTableEntry m_idsEntry;
-  nt::NetworkTableEntry m_cancelEntry;
-  bool m_runningCommandsChanged = false;
+  struct Impl;
+  std::unique_ptr<Impl> m_impl;
 };
 
 }  // namespace frc

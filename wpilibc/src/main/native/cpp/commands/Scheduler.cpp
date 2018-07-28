@@ -8,15 +8,42 @@
 #include "frc/commands/Scheduler.h"
 
 #include <algorithm>
+#include <set>
+#include <string>
+#include <vector>
 
 #include <hal/HAL.h>
+#include <networktables/NetworkTableEntry.h>
+#include <wpi/mutex.h>
 
 #include "frc/WPIErrors.h"
 #include "frc/buttons/ButtonScheduler.h"
+#include "frc/commands/Command.h"
 #include "frc/commands/Subsystem.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
+
+struct Scheduler::Impl {
+  void Remove(Command* command);
+  void ProcessCommandAddition(Command* command);
+
+  typedef std::set<Subsystem*> SubsystemSet;
+  SubsystemSet subsystems;
+  wpi::mutex buttonsMutex;
+  typedef std::vector<std::unique_ptr<ButtonScheduler>> ButtonVector;
+  ButtonVector buttons;
+  typedef std::vector<Command*> CommandVector;
+  wpi::mutex additionsMutex;
+  CommandVector additions;
+  typedef std::set<Command*> CommandSet;
+  CommandSet commands;
+  bool adding = false;
+  bool enabled = true;
+  std::vector<std::string> commandsBuf;
+  std::vector<double> idsBuf;
+  bool runningCommandsChanged = false;
+};
 
 Scheduler* Scheduler::GetInstance() {
   static Scheduler instance;
@@ -24,16 +51,16 @@ Scheduler* Scheduler::GetInstance() {
 }
 
 void Scheduler::AddCommand(Command* command) {
-  std::lock_guard<wpi::mutex> lock(m_additionsMutex);
-  if (std::find(m_additions.begin(), m_additions.end(), command) !=
-      m_additions.end())
+  std::lock_guard<wpi::mutex> lock(m_impl->additionsMutex);
+  if (std::find(m_impl->additions.begin(), m_impl->additions.end(), command) !=
+      m_impl->additions.end())
     return;
-  m_additions.push_back(command);
+  m_impl->additions.push_back(command);
 }
 
 void Scheduler::AddButton(ButtonScheduler* button) {
-  std::lock_guard<wpi::mutex> lock(m_buttonsMutex);
-  m_buttons.emplace_back(button);
+  std::lock_guard<wpi::mutex> lock(m_impl->buttonsMutex);
+  m_impl->buttons.emplace_back(button);
 }
 
 void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
@@ -41,51 +68,63 @@ void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
     wpi_setWPIErrorWithContext(NullParameter, "subsystem");
     return;
   }
-  m_subsystems.insert(subsystem);
+  m_impl->subsystems.insert(subsystem);
 }
 
 void Scheduler::Run() {
   // Get button input (going backwards preserves button priority)
   {
-    if (!m_enabled) return;
+    if (!m_impl->enabled) return;
 
-    std::lock_guard<wpi::mutex> lock(m_buttonsMutex);
-    for (auto& button : m_buttons) {
+    std::lock_guard<wpi::mutex> lock(m_impl->buttonsMutex);
+    for (auto& button : m_impl->buttons) {
       button->Execute();
     }
   }
 
   // Call every subsystem's periodic method
-  for (auto& subsystem : m_subsystems) {
+  for (auto& subsystem : m_impl->subsystems) {
     subsystem->Periodic();
   }
 
-  m_runningCommandsChanged = false;
+  m_impl->runningCommandsChanged = false;
 
   // Loop through the commands
-  for (auto cmdIter = m_commands.begin(); cmdIter != m_commands.end();) {
+  for (auto cmdIter = m_impl->commands.begin();
+       cmdIter != m_impl->commands.end();) {
     Command* command = *cmdIter;
     // Increment before potentially removing to keep the iterator valid
     ++cmdIter;
     if (!command->Run()) {
       Remove(command);
-      m_runningCommandsChanged = true;
+      m_impl->runningCommandsChanged = true;
     }
   }
 
   // Add the new things
   {
-    std::lock_guard<wpi::mutex> lock(m_additionsMutex);
-    for (auto& addition : m_additions) {
-      ProcessCommandAddition(addition);
+    std::lock_guard<wpi::mutex> lock(m_impl->additionsMutex);
+    for (auto& addition : m_impl->additions) {
+      // Check to make sure no adding during adding
+      if (m_impl->adding) {
+        wpi_setWPIErrorWithContext(IncompatibleState,
+                                   "Can not start command from cancel method");
+      } else {
+        m_impl->ProcessCommandAddition(addition);
+      }
     }
-    m_additions.clear();
+    m_impl->additions.clear();
   }
 
   // Add in the defaults
-  for (auto& subsystem : m_subsystems) {
+  for (auto& subsystem : m_impl->subsystems) {
     if (subsystem->GetCurrentCommand() == nullptr) {
-      ProcessCommandAddition(subsystem->GetDefaultCommand());
+      if (m_impl->adding) {
+        wpi_setWPIErrorWithContext(IncompatibleState,
+                                   "Can not start command from cancel method");
+      } else {
+        m_impl->ProcessCommandAddition(subsystem->GetDefaultCommand());
+      }
     }
     subsystem->ConfirmCommand();
   }
@@ -97,7 +136,72 @@ void Scheduler::Remove(Command* command) {
     return;
   }
 
-  if (!m_commands.erase(command)) return;
+  m_impl->Remove(command);
+}
+
+void Scheduler::RemoveAll() {
+  while (m_impl->commands.size() > 0) {
+    Remove(*m_impl->commands.begin());
+  }
+}
+
+void Scheduler::ResetAll() {
+  RemoveAll();
+  m_impl->subsystems.clear();
+  m_impl->buttons.clear();
+  m_impl->additions.clear();
+  m_impl->commands.clear();
+}
+
+void Scheduler::SetEnabled(bool enabled) { m_impl->enabled = enabled; }
+
+void Scheduler::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Scheduler");
+  auto namesEntry = builder.GetEntry("Names");
+  auto idsEntry = builder.GetEntry("Ids");
+  auto cancelEntry = builder.GetEntry("Cancel");
+  builder.SetUpdateTable([=]() {
+    // Get the list of possible commands to cancel
+    auto new_toCancel = cancelEntry.GetValue();
+    wpi::ArrayRef<double> toCancel;
+    if (new_toCancel) toCancel = new_toCancel->GetDoubleArray();
+
+    // Cancel commands whose cancel buttons were pressed on the SmartDashboard
+    if (!toCancel.empty()) {
+      for (auto& command : m_impl->commands) {
+        for (const auto& cancelled : toCancel) {
+          if (command->GetID() == cancelled) {
+            command->Cancel();
+          }
+        }
+      }
+      nt::NetworkTableEntry(cancelEntry).SetDoubleArray({});
+    }
+
+    // Set the running commands
+    if (m_impl->runningCommandsChanged) {
+      m_impl->commandsBuf.resize(0);
+      m_impl->idsBuf.resize(0);
+      for (const auto& command : m_impl->commands) {
+        m_impl->commandsBuf.emplace_back(command->GetName());
+        m_impl->idsBuf.emplace_back(command->GetID());
+      }
+      nt::NetworkTableEntry(namesEntry).SetStringArray(m_impl->commandsBuf);
+      nt::NetworkTableEntry(idsEntry).SetDoubleArray(m_impl->idsBuf);
+    }
+  });
+}
+
+Scheduler::Scheduler() : m_impl(new Impl) {
+  HAL_Report(HALUsageReporting::kResourceType_Command,
+             HALUsageReporting::kCommand_Scheduler);
+  SetName("Scheduler");
+}
+
+Scheduler::~Scheduler() {}
+
+void Scheduler::Impl::Remove(Command* command) {
+  if (!commands.erase(command)) return;
 
   for (auto&& requirement : command->GetRequirements()) {
     requirement->SetCurrentCommand(nullptr);
@@ -106,84 +210,12 @@ void Scheduler::Remove(Command* command) {
   command->Removed();
 }
 
-void Scheduler::RemoveAll() {
-  while (m_commands.size() > 0) {
-    Remove(*m_commands.begin());
-  }
-}
-
-void Scheduler::ResetAll() {
-  RemoveAll();
-  m_subsystems.clear();
-  m_buttons.clear();
-  m_additions.clear();
-  m_commands.clear();
-  m_namesEntry = nt::NetworkTableEntry();
-  m_idsEntry = nt::NetworkTableEntry();
-  m_cancelEntry = nt::NetworkTableEntry();
-}
-
-void Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }
-
-void Scheduler::InitSendable(SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Scheduler");
-  m_namesEntry = builder.GetEntry("Names");
-  m_idsEntry = builder.GetEntry("Ids");
-  m_cancelEntry = builder.GetEntry("Cancel");
-  builder.SetUpdateTable([=]() {
-    // Get the list of possible commands to cancel
-    auto new_toCancel = m_cancelEntry.GetValue();
-    if (new_toCancel)
-      toCancel = new_toCancel->GetDoubleArray();
-    else
-      toCancel.resize(0);
-
-    // Cancel commands whose cancel buttons were pressed on the SmartDashboard
-    if (!toCancel.empty()) {
-      for (auto& command : m_commands) {
-        for (const auto& cancelled : toCancel) {
-          if (command->GetID() == cancelled) {
-            command->Cancel();
-          }
-        }
-      }
-      toCancel.resize(0);
-      m_cancelEntry.SetDoubleArray(toCancel);
-    }
-
-    // Set the running commands
-    if (m_runningCommandsChanged) {
-      commands.resize(0);
-      ids.resize(0);
-      for (const auto& command : m_commands) {
-        commands.emplace_back(command->GetName());
-        ids.emplace_back(command->GetID());
-      }
-      m_namesEntry.SetStringArray(commands);
-      m_idsEntry.SetDoubleArray(ids);
-    }
-  });
-}
-
-Scheduler::Scheduler() {
-  HAL_Report(HALUsageReporting::kResourceType_Command,
-             HALUsageReporting::kCommand_Scheduler);
-  SetName("Scheduler");
-}
-
-void Scheduler::ProcessCommandAddition(Command* command) {
+void Scheduler::Impl::ProcessCommandAddition(Command* command) {
   if (command == nullptr) return;
 
-  // Check to make sure no adding during adding
-  if (m_adding) {
-    wpi_setWPIErrorWithContext(IncompatibleState,
-                               "Can not start command from cancel method");
-    return;
-  }
-
   // Only add if not already in
-  auto found = m_commands.find(command);
-  if (found == m_commands.end()) {
+  auto found = commands.find(command);
+  if (found == commands.end()) {
     // Check that the requirements can be had
     const auto& requirements = command->GetRequirements();
     for (const auto& requirement : requirements) {
@@ -193,7 +225,7 @@ void Scheduler::ProcessCommandAddition(Command* command) {
     }
 
     // Give it the requirements
-    m_adding = true;
+    adding = true;
     for (auto&& requirement : requirements) {
       if (requirement->GetCurrentCommand() != nullptr) {
         requirement->GetCurrentCommand()->Cancel();
@@ -201,11 +233,11 @@ void Scheduler::ProcessCommandAddition(Command* command) {
       }
       requirement->SetCurrentCommand(command);
     }
-    m_adding = false;
+    adding = false;
 
-    m_commands.insert(command);
+    commands.insert(command);
 
     command->StartRunning();
-    m_runningCommandsChanged = true;
+    runningCommandsChanged = true;
   }
 }
