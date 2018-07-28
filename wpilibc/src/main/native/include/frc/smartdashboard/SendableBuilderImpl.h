@@ -187,6 +187,7 @@ class SendableBuilderImpl : public SendableBuilder {
   std::function<void()> m_safeState;
   std::function<void()> m_updateTable;
   std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_controllableEntry;
 };
 
 }  // namespace frc

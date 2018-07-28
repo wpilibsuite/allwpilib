@@ -57,6 +57,7 @@ public class SendableBuilderImpl implements SendableBuilder {
   private Runnable m_safeState;
   private Runnable m_updateTable;
   private NetworkTable m_table;
+  private NetworkTableEntry m_controllableEntry;
 
   /**
    * Set the network table.  Must be called prior to any Add* functions being
@@ -65,6 +66,7 @@ public class SendableBuilderImpl implements SendableBuilder {
    */
   public void setTable(NetworkTable table) {
     m_table = table;
+    m_controllableEntry = table.getEntry(".controllable");
   }
 
   /**
@@ -96,6 +98,7 @@ public class SendableBuilderImpl implements SendableBuilder {
     for (Property property : m_properties) {
       property.startListener();
     }
+    m_controllableEntry.setBoolean(true);
   }
 
   /**
@@ -105,6 +108,7 @@ public class SendableBuilderImpl implements SendableBuilder {
     for (Property property : m_properties) {
       property.stopListener();
     }
+    m_controllableEntry.setBoolean(false);
   }
 
   /**

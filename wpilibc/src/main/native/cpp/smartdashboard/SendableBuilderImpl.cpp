@@ -14,6 +14,7 @@ using namespace frc;
 
 void SendableBuilderImpl::SetTable(std::shared_ptr<nt::NetworkTable> table) {
   m_table = table;
+  m_controllableEntry = table->GetEntry(".controllable");
 }
 
 std::shared_ptr<nt::NetworkTable> SendableBuilderImpl::GetTable() {
@@ -30,10 +31,12 @@ void SendableBuilderImpl::UpdateTable() {
 
 void SendableBuilderImpl::StartListeners() {
   for (auto& property : m_properties) property.StartListener();
+  m_controllableEntry.SetBoolean(true);
 }
 
 void SendableBuilderImpl::StopListeners() {
   for (auto& property : m_properties) property.StopListener();
+  m_controllableEntry.SetBoolean(false);
 }
 
 void SendableBuilderImpl::StartLiveWindowMode() {
