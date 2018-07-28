@@ -1194,6 +1194,41 @@ Java_edu_wpi_cscore_CameraServerJNI_getSinkDescription
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    getSinkProperty
+ * Signature: (ILjava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_getSinkProperty
+  (JNIEnv* env, jclass, jint sink, jstring name)
+{
+  if (!name) {
+    nullPointerEx.Throw(env, "name cannot be null");
+    return 0;
+  }
+  CS_Status status = 0;
+  auto val = cs::GetSinkProperty(sink, JStringRef{env, name}, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    enumerateSinkProperties
+ * Signature: (I)[I
+ */
+JNIEXPORT jintArray JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_enumerateSinkProperties
+  (JNIEnv* env, jclass, jint source)
+{
+  CS_Status status = 0;
+  wpi::SmallVector<CS_Property, 32> buf;
+  auto arr = cs::EnumerateSinkProperties(source, buf, &status);
+  if (!CheckStatus(env, status)) return nullptr;
+  return MakeJIntArray(env, arr);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    setSinkSource
  * Signature: (II)V
  */

@@ -459,6 +459,11 @@ inline std::string VideoSink::GetDescription() const {
   return GetSinkDescription(m_handle, &m_status);
 }
 
+inline VideoProperty VideoSink::GetProperty(wpi::StringRef name) {
+  m_status = 0;
+  return VideoProperty{GetSinkProperty(m_handle, name, &m_status)};
+}
+
 inline void VideoSink::SetSource(VideoSource source) {
   m_status = 0;
   if (!source)

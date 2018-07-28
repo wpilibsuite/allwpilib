@@ -28,7 +28,10 @@ public class VideoEvent {
     kSinkEnabled(0x1000),
     kSinkDisabled(0x2000),
     kNetworkInterfacesChanged(0x4000),
-    kTelemetryUpdated(0x8000);
+    kTelemetryUpdated(0x8000),
+    kSinkPropertyCreated(0x10000),
+    kSinkPropertyValueUpdated(0x20000),
+    kSinkPropertyChoicesUpdated(0x40000);
 
     @SuppressWarnings("MemberName")
     private int value;
@@ -66,6 +69,9 @@ public class VideoEvent {
       case 0x1000: return Kind.kSinkEnabled;
       case 0x2000: return Kind.kSinkDisabled;
       case 0x4000: return Kind.kNetworkInterfacesChanged;
+      case 0x10000: return Kind.kSinkPropertyCreated;
+      case 0x20000: return Kind.kSinkPropertyValueUpdated;
+      case 0x40000: return Kind.kSinkPropertyChoicesUpdated;
       default: return Kind.kUnknown;
     }
   }

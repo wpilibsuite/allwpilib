@@ -502,6 +502,15 @@ class VideoSink {
   /// Get the sink description.  This is sink-kind specific.
   std::string GetDescription() const;
 
+  /// Get a property of the sink.
+  /// @param name Property name
+  /// @return Property (kind Property::kNone if no property with
+  ///         the given name exists)
+  VideoProperty GetProperty(wpi::StringRef name);
+
+  /// Enumerate all properties of this sink.
+  std::vector<VideoProperty> EnumerateProperties() const;
+
   /// Configure which source should provide frames to this sink.  Each sink
   /// can accept frames from only a single source, but a single source can
   /// provide frames to multiple clients.

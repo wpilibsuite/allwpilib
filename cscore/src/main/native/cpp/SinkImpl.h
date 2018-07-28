@@ -20,7 +20,7 @@ namespace cs {
 
 class Frame;
 
-class SinkImpl {
+class SinkImpl : public PropertyContainer {
  public:
   explicit SinkImpl(wpi::StringRef name);
   virtual ~SinkImpl();
@@ -47,9 +47,12 @@ class SinkImpl {
   wpi::StringRef GetError(wpi::SmallVectorImpl<char>& buf) const;
 
  protected:
-  virtual void SetSourceImpl(std::shared_ptr<SourceImpl> source);
+  // PropertyContainer implementation
+  void NotifyPropertyCreated(int propIndex, PropertyImpl& prop) override;
+  void UpdatePropertyValue(int property, bool setString, int value,
+                           wpi::StringRef valueStr) override;
 
-  mutable wpi::mutex m_mutex;
+  virtual void SetSourceImpl(std::shared_ptr<SourceImpl> source);
 
  private:
   std::string m_name;
