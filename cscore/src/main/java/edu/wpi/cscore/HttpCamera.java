@@ -43,6 +43,7 @@ public class HttpCamera extends VideoCamera {
 
   /**
    * Create a source for a MJPEG-over-HTTP (IP) camera.
+   *
    * @param name Source name (arbitrary unique identifier)
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
    */
@@ -52,6 +53,7 @@ public class HttpCamera extends VideoCamera {
 
   /**
    * Create a source for a MJPEG-over-HTTP (IP) camera.
+   *
    * @param name Source name (arbitrary unique identifier)
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
    * @param kind Camera kind (e.g. kAxis)
@@ -62,6 +64,7 @@ public class HttpCamera extends VideoCamera {
 
   /**
    * Create a source for a MJPEG-over-HTTP (IP) camera.
+   *
    * @param name Source name (arbitrary unique identifier)
    * @param urls Array of Camera URLs
    */
@@ -71,6 +74,7 @@ public class HttpCamera extends VideoCamera {
 
   /**
    * Create a source for a MJPEG-over-HTTP (IP) camera.
+   *
    * @param name Source name (arbitrary unique identifier)
    * @param urls Array of Camera URLs
    * @param kind Camera kind (e.g. kAxis)
@@ -81,7 +85,8 @@ public class HttpCamera extends VideoCamera {
 
   /**
    * Get the kind of HTTP camera.
-   * Autodetection can result in returning a different value than the camera
+   *
+   * <p>Autodetection can result in returning a different value than the camera
    * was created with.
    */
   public HttpCameraKind getHttpCameraKind() {

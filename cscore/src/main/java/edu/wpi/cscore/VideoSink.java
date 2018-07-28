@@ -111,6 +111,7 @@ public class VideoSink implements AutoCloseable {
 
   /**
    * Get a property of the sink.
+   *
    * @param name Property name
    * @return Property (kind Property::kNone if no property with
    *         the given name exists)
@@ -136,6 +137,7 @@ public class VideoSink implements AutoCloseable {
    * Configure which source should provide frames to this sink.  Each sink
    * can accept frames from only a single source, but a single source can
    * provide frames to multiple clients.
+   *
    * @param source Source
    */
   public void setSource(VideoSource source) {
@@ -148,6 +150,7 @@ public class VideoSink implements AutoCloseable {
 
   /**
    * Get the connected source.
+   *
    * @return Connected source; nullptr if no source connected.
    */
   public VideoSource getSource() {
@@ -158,6 +161,7 @@ public class VideoSink implements AutoCloseable {
 
   /**
    * Get a property of the associated source.
+   *
    * @param name Property name
    * @return Property (kind Property::kNone if no property with
    *         the given name exists or no source connected)
@@ -169,6 +173,7 @@ public class VideoSink implements AutoCloseable {
 
   /**
    * Enumerate all existing sinks.
+   *
    * @return Vector of sinks.
    */
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")

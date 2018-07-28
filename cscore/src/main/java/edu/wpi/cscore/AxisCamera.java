@@ -25,6 +25,7 @@ public class AxisCamera extends HttpCamera {
 
   /**
    * Create a source for an Axis IP camera.
+   *
    * @param name Source name (arbitrary unique identifier)
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
@@ -34,6 +35,7 @@ public class AxisCamera extends HttpCamera {
 
   /**
    * Create a source for an Axis IP camera.
+   *
    * @param name Source name (arbitrary unique identifier)
    * @param hosts Array of Camera host IPs/DNS names
    */

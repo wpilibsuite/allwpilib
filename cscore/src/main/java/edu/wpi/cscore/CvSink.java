@@ -17,6 +17,7 @@ public class CvSink extends VideoSink {
    * Create a sink for accepting OpenCV images.
    * WaitForFrame() must be called on the created sink to get each new
    * image.
+   *
    * @param name Source name (arbitrary unique identifier)
    */
   public CvSink(String name) {
@@ -38,6 +39,7 @@ public class CvSink extends VideoSink {
 
   /**
    * Set sink description.
+   *
    * @param description Description
    */
   public void setDescription(String description) {
@@ -48,6 +50,7 @@ public class CvSink extends VideoSink {
    * Wait for the next frame and get the image.
    * Times out (returning 0) after 0.225 seconds.
    * The provided image will have three 3-bit channels stored in BGR order.
+   *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message)
    */
@@ -59,6 +62,7 @@ public class CvSink extends VideoSink {
    * Wait for the next frame and get the image.
    * Times out (returning 0) after timeout seconds.
    * The provided image will have three 3-bit channels stored in BGR order.
+   *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in 1 us increments.
    */
@@ -69,6 +73,7 @@ public class CvSink extends VideoSink {
   /**
    * Wait for the next frame and get the image.  May block forever.
    * The provided image will have three 3-bit channels stored in BGR order.
+   *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in 1 us increments.
    */
