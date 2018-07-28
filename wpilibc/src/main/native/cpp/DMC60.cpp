@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DMC60.h"
+#include "frc/DMC60.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
 using namespace frc;
 
@@ -31,6 +31,6 @@ DMC60::DMC60(int channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  // HAL_Report(HALUsageReporting::kResourceType_VictorSP, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_DigilentDMC60, GetChannel());
   SetName("DMC60", GetChannel());
 }

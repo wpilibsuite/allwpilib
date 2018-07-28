@@ -242,6 +242,22 @@ char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status) {
   return cs::ConvertToC(str);
 }
 
+CS_Property CS_GetSinkProperty(CS_Sink sink, const char* name,
+                               CS_Status* status) {
+  return cs::GetSinkProperty(sink, name, status);
+}
+
+CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
+                                        CS_Status* status) {
+  wpi::SmallVector<CS_Property, 32> buf;
+  auto vec = cs::EnumerateSinkProperties(sink, buf, status);
+  CS_Property* out = static_cast<CS_Property*>(
+      wpi::CheckedMalloc(vec.size() * sizeof(CS_Property)));
+  *count = vec.size();
+  std::copy(vec.begin(), vec.end(), out);
+  return out;
+}
+
 void CS_SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
   return cs::SetSinkSource(sink, source, status);
 }

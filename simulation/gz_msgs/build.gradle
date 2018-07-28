@@ -1,26 +1,15 @@
-description = "A C++ and Java library to pass FRC Simulation Messages in and out of Gazebo."
+plugins {
+    id 'cpp'
+    id 'java'
+    id 'com.google.protobuf' version '0.8.6'
+    id 'edu.wpi.first.NativeUtils'
+}
 
-apply plugin: 'cpp'
-apply plugin: 'java'
-apply plugin: 'com.google.protobuf'
-apply plugin: 'edu.wpi.first.NativeUtils'
+description = "A C++ and Java library to pass FRC Simulation Messages in and out of Gazebo."
 
 /* The simulation does not run on real hardware; so we always skip Athena */
 ext.skipAthena = true
-
-repositories {
-      mavenCentral()
-}
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:+'
-    }
-}
-
+apply from: "${rootDir}/shared/config.gradle"
 
 /* Use a sort of poor man's autoconf to find the protobuf development
    files; on Debian, those are supplied by libprotobuf-dev.

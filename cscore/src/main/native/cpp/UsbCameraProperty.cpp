@@ -289,7 +289,7 @@ bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
 bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd,
                                   int newValue,
                                   wpi::StringRef newValueStr) const {
-  if (fd < 0) return true;
+  if (!device || fd < 0) return true;
   unsigned idCopy = id;
   int rv = 0;
 

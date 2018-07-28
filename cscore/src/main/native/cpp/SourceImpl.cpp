@@ -94,148 +94,37 @@ void SourceImpl::Wakeup() {
   m_frameCv.notify_all();
 }
 
-int SourceImpl::GetPropertyIndex(wpi::StringRef name) const {
-  // We can't fail, so instead we create a new index if caching fails.
-  CS_Status status = 0;
-  if (!m_properties_cached) CacheProperties(&status);
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  int& ndx = m_properties[name];
-  if (ndx == 0) {
-    // create a new index
-    ndx = m_propertyData.size() + 1;
-    m_propertyData.emplace_back(CreateEmptyProperty(name));
-  }
-  return ndx;
+void SourceImpl::SetBrightness(int brightness, CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
 }
 
-wpi::ArrayRef<int> SourceImpl::EnumerateProperties(
-    wpi::SmallVectorImpl<int>& vec, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status))
-    return wpi::ArrayRef<int>{};
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  for (int i = 0; i < static_cast<int>(m_propertyData.size()); ++i) {
-    if (m_propertyData[i]) vec.push_back(i + 1);
-  }
-  return vec;
+int SourceImpl::GetBrightness(CS_Status* status) const {
+  *status = CS_INVALID_HANDLE;
+  return 0;
 }
 
-CS_PropertyKind SourceImpl::GetPropertyKind(int property) const {
-  CS_Status status = 0;
-  if (!m_properties_cached && !CacheProperties(&status)) return CS_PROP_NONE;
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) return CS_PROP_NONE;
-  return prop->propKind;
+void SourceImpl::SetWhiteBalanceAuto(CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
 }
 
-wpi::StringRef SourceImpl::GetPropertyName(int property,
-                                           wpi::SmallVectorImpl<char>& buf,
-                                           CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return wpi::StringRef{};
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return wpi::StringRef{};
-  }
-  // safe to not copy because we never modify it after caching
-  return prop->name;
+void SourceImpl::SetWhiteBalanceHoldCurrent(CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
 }
 
-int SourceImpl::GetProperty(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return 0;
-  }
-  if ((prop->propKind & (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) ==
-      0) {
-    *status = CS_WRONG_PROPERTY_TYPE;
-    return 0;
-  }
-  return prop->value;
+void SourceImpl::SetWhiteBalanceManual(int value, CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
 }
 
-int SourceImpl::GetPropertyMin(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return 0;
-  }
-  return prop->minimum;
+void SourceImpl::SetExposureAuto(CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
 }
 
-int SourceImpl::GetPropertyMax(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return 0;
-  }
-  return prop->maximum;
+void SourceImpl::SetExposureHoldCurrent(CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
 }
 
-int SourceImpl::GetPropertyStep(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return 0;
-  }
-  return prop->step;
-}
-
-int SourceImpl::GetPropertyDefault(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return 0;
-  }
-  return prop->defaultValue;
-}
-
-wpi::StringRef SourceImpl::GetStringProperty(int property,
-                                             wpi::SmallVectorImpl<char>& buf,
-                                             CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return wpi::StringRef{};
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return wpi::StringRef{};
-  }
-  if (prop->propKind != CS_PROP_STRING) {
-    *status = CS_WRONG_PROPERTY_TYPE;
-    return wpi::StringRef{};
-  }
-  buf.clear();
-  buf.append(prop->valueStr.begin(), prop->valueStr.end());
-  return wpi::StringRef(buf.data(), buf.size());
-}
-
-std::vector<std::string> SourceImpl::GetEnumPropertyChoices(
-    int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status))
-    return std::vector<std::string>{};
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return std::vector<std::string>{};
-  }
-  if (prop->propKind != CS_PROP_ENUM) {
-    *status = CS_WRONG_PROPERTY_TYPE;
-    return std::vector<std::string>{};
-  }
-  return prop->enumChoices;
+void SourceImpl::SetExposureManual(int value, CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
 }
 
 VideoMode SourceImpl::GetVideoMode(CS_Status* status) const {

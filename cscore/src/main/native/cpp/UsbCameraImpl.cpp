@@ -33,6 +33,7 @@
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
+#include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
 #include "Telemetry.h"
@@ -49,6 +50,8 @@ static constexpr char const* kPropWbValue = "white_balance_temperature";
 static constexpr char const* kPropExAuto = "exposure_auto";
 static constexpr char const* kPropExValue = "exposure_absolute";
 static constexpr char const* kPropBrValue = "brightness";
+static constexpr char const* kPropConnectVerbose = "connect_verbose";
+static constexpr unsigned kPropConnectVerboseId = 0;
 
 // Conversions v4l2_fract time per frame from/to frames per second (fps)
 static inline int FractToFPS(const struct v4l2_fract& timeperframe) {
@@ -220,6 +223,11 @@ UsbCameraImpl::UsbCameraImpl(wpi::StringRef name, wpi::StringRef path)
       m_active{true} {
   SetDescription(GetDescriptionImpl(m_path.c_str()));
   SetQuirks();
+  CreateProperty(kPropConnectVerbose, [] {
+    return std::make_unique<UsbCameraProperty>(kPropConnectVerbose,
+                                               kPropConnectVerboseId,
+                                               CS_PROP_INTEGER, 0, 1, 1, 1, 1);
+  });
 }
 
 UsbCameraImpl::~UsbCameraImpl() {
@@ -400,12 +408,21 @@ void UsbCameraImpl::CameraThreadMain() {
           continue;
         }
 
-        PutFrame(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat),
-                 m_mode.width, m_mode.height,
-                 wpi::StringRef(
-                     static_cast<const char*>(m_buffers[buf.index].m_data),
-                     static_cast<size_t>(buf.bytesused)),
-                 wpi::Now());  // TODO: time
+        wpi::StringRef image{
+            static_cast<const char*>(m_buffers[buf.index].m_data),
+            static_cast<size_t>(buf.bytesused)};
+        int width = m_mode.width;
+        int height = m_mode.height;
+        bool good = true;
+        if (m_mode.pixelFormat == VideoMode::kMJPEG &&
+            !GetJpegSize(image, &width, &height)) {
+          SWARNING("invalid JPEG image received from camera");
+          good = false;
+        }
+        if (good) {
+          PutFrame(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat),
+                   width, height, image, wpi::Now());  // TODO: time
+        }
       }
 
       // Requeue buffer
@@ -443,7 +460,7 @@ void UsbCameraImpl::DeviceDisconnect() {
 void UsbCameraImpl::DeviceConnect() {
   if (m_fd >= 0) return;
 
-  SINFO("Connecting to USB camera on " << m_path);
+  if (m_connectVerbose) SINFO("Connecting to USB camera on " << m_path);
 
   // Try to open the device
   SDEBUG3("opening device");
@@ -479,7 +496,8 @@ void UsbCameraImpl::DeviceConnect() {
     for (size_t i = 0; i < m_propertyData.size(); ++i) {
       const auto prop =
           static_cast<const UsbCameraProperty*>(m_propertyData[i].get());
-      if (!prop || !prop->valueSet || prop->percentage) continue;
+      if (!prop || !prop->valueSet || !prop->device || prop->percentage)
+        continue;
       if (!prop->DeviceSet(lock2, m_fd))
         SWARNING("failed to set property " << prop->name);
     }
@@ -684,8 +702,12 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
   }
 
   // Actually set the new value on the device (if possible)
-  if (!prop->DeviceSet(lock, m_fd, value, valueStr))
-    return CS_PROPERTY_WRITE_FAILED;
+  if (!prop->device) {
+    if (prop->id == kPropConnectVerboseId) m_connectVerbose = value;
+  } else {
+    if (!prop->DeviceSet(lock, m_fd, value, valueStr))
+      return CS_PROPERTY_WRITE_FAILED;
+  }
 
   // Cache the set values
   UpdatePropertyValue(property, setString, value, valueStr);

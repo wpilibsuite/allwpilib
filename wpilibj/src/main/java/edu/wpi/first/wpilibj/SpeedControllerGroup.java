@@ -83,6 +83,7 @@ public class SpeedControllerGroup extends SendableBase implements SpeedControlle
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Speed Controller");
+    builder.setActuator(true);
     builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Value", this::get, this::set);
   }

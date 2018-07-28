@@ -5,15 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "MotorSafetyHelper.h"
+#include "frc/MotorSafetyHelper.h"
 
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
-#include "DriverStation.h"
-#include "MotorSafety.h"
-#include "Timer.h"
-#include "WPIErrors.h"
+#include "frc/DriverStation.h"
+#include "frc/MotorSafety.h"
+#include "frc/Timer.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

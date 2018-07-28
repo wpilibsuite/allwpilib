@@ -89,6 +89,11 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
   std::shared_ptr<SourceImpl> m_source;
   bool m_streaming = false;
   bool m_noStreaming = false;
+  int m_width = 0;
+  int m_height = 0;
+  int m_compression = -1;
+  int m_defaultCompression = 80;
+  int m_fps = 0;
 
  private:
   std::string m_name;
@@ -111,11 +116,6 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
     m_source->DisableSink();
     m_streaming = false;
   }
-
-  int m_width{0};
-  int m_height{0};
-  int m_compression{80};
-  int m_fps{0};
 };
 
 // Standard header to send along with other header information like mimetype.
@@ -293,7 +293,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
       case CS_PROP_BOOLEAN:
       case CS_PROP_INTEGER:
       case CS_PROP_ENUM: {
-        int val;
+        int val = 0;
         if (value.getAsInteger(10, val)) {
           response << param << ": \"invalid integer\"\r\n";
           SWARNING("HTTP parameter \"" << param << "\" value \"" << value
@@ -558,6 +558,25 @@ MjpegServerImpl::MjpegServerImpl(wpi::StringRef name,
   desc << "HTTP Server on port " << port;
   SetDescription(desc.str());
 
+  // Create properties
+  m_widthProp = CreateProperty("width", [] {
+    return std::make_unique<PropertyImpl>("width", CS_PROP_INTEGER, 1, 0, 0);
+  });
+  m_heightProp = CreateProperty("height", [] {
+    return std::make_unique<PropertyImpl>("height", CS_PROP_INTEGER, 1, 0, 0);
+  });
+  m_compressionProp = CreateProperty("compression", [] {
+    return std::make_unique<PropertyImpl>("compression", CS_PROP_INTEGER, -1,
+                                          100, 1, -1, -1);
+  });
+  m_defaultCompressionProp = CreateProperty("default_compression", [] {
+    return std::make_unique<PropertyImpl>("default_compression",
+                                          CS_PROP_INTEGER, 0, 100, 1, 80, 80);
+  });
+  m_fpsProp = CreateProperty("fps", [] {
+    return std::make_unique<PropertyImpl>("fps", CS_PROP_INTEGER, 1, 0, 0);
+  });
+
   m_serverThread = std::thread(&MjpegServerImpl::ServerThreadMain, this);
 }
 
@@ -635,8 +654,9 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
 
     int width = m_width != 0 ? m_width : frame.GetOriginalWidth();
     int height = m_height != 0 ? m_height : frame.GetOriginalHeight();
-    Image* image =
-        frame.GetImage(width, height, VideoMode::kMJPEG, m_compression);
+    Image* image = frame.GetImageMJPEG(
+        width, height, m_compression,
+        m_compression == -1 ? m_defaultCompression : m_compression);
     if (!image) {
       // Shouldn't happen, but just in case...
       std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -691,12 +711,6 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
 void MjpegServerImpl::ConnThread::ProcessRequest() {
   wpi::raw_socket_istream is{*m_stream};
   wpi::raw_socket_ostream os{*m_stream, true};
-
-  // Reset per-request settings
-  m_width = 0;
-  m_height = 0;
-  m_compression = 80;
-  m_fps = 0;
 
   // Read the request string from the stream
   wpi::SmallString<128> reqBuf;
@@ -864,6 +878,11 @@ void MjpegServerImpl::ServerThreadMain() {
     thr->m_stream = std::move(stream);
     thr->m_source = source;
     thr->m_noStreaming = nstreams >= 10;
+    thr->m_width = GetProperty(m_widthProp)->value;
+    thr->m_height = GetProperty(m_heightProp)->value;
+    thr->m_compression = GetProperty(m_compressionProp)->value;
+    thr->m_defaultCompression = GetProperty(m_defaultCompressionProp)->value;
+    thr->m_fps = GetProperty(m_fpsProp)->value;
     thr->m_cond.notify_one();
   }
 

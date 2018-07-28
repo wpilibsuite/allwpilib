@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,17 +7,13 @@
 
 #pragma once
 
-#include <memory>
+// clang-format off
+#ifdef _MSC_VER
+#pragma message "warning: RobotState.h is deprecated; include frc/RobotState.h instead"
+#else
+#warning "RobotState.h is deprecated; include frc/RobotState.h instead"
+#endif
 
-namespace frc {
+// clang-format on
 
-class RobotState {
- public:
-  static bool IsDisabled();
-  static bool IsEnabled();
-  static bool IsOperatorControl();
-  static bool IsAutonomous();
-  static bool IsTest();
-};
-
-}  // namespace frc
+#include "frc/RobotState.h"

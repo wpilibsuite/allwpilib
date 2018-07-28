@@ -11,8 +11,8 @@
 #include <cmath>
 #include <cstring>
 
-#include "MockData/NotifyCallbackHelpers.h"
-#include "MockData/SPIData.h"
+#include <mockdata/NotifyCallbackHelpers.h>
+#include <mockdata/SPIData.h>
 
 #ifdef _WIN32
 #include "Winsock2.h"

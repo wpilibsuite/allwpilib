@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "NidecBrushless.h"
+#include "frc/NidecBrushless.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "SmartDashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -84,6 +84,7 @@ int NidecBrushless::GetChannel() const { return m_pwm.GetChannel(); }
 
 void NidecBrushless::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Nidec Brushless");
+  builder.SetActuator(true);
   builder.SetSafeState([=]() { StopMotor(); });
   builder.AddDoubleProperty("Value", [=]() { return Get(); },
                             [=](double value) { Set(value); });

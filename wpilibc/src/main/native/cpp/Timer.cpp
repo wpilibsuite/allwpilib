@@ -5,15 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Timer.h"
+#include "frc/Timer.h"
 
 #include <chrono>
 #include <thread>
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "DriverStation.h"
-#include "RobotController.h"
+#include "frc/DriverStation.h"
+#include "frc/RobotController.h"
 
 namespace frc {
 

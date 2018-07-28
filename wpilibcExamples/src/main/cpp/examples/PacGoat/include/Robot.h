@@ -7,18 +7,18 @@
 
 #pragma once
 
-#include <Commands/Command.h>
-#include <IterativeRobot.h>
-#include <SmartDashboard/SendableChooser.h>
+#include <frc/IterativeRobot.h>
+#include <frc/commands/Command.h>
+#include <frc/smartdashboard/SendableChooser.h>
 
-#include "Commands/DriveAndShootAutonomous.h"
-#include "Commands/DriveForward.h"
 #include "OI.h"
-#include "Subsystems/Collector.h"
-#include "Subsystems/DriveTrain.h"
-#include "Subsystems/Pivot.h"
-#include "Subsystems/Pneumatics.h"
-#include "Subsystems/Shooter.h"
+#include "commands/DriveAndShootAutonomous.h"
+#include "commands/DriveForward.h"
+#include "subsystems/Collector.h"
+#include "subsystems/DriveTrain.h"
+#include "subsystems/Pivot.h"
+#include "subsystems/Pneumatics.h"
+#include "subsystems/Shooter.h"
 
 class Robot : public frc::IterativeRobot {
  public:

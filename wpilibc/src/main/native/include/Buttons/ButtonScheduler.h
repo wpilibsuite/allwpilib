@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,22 +7,13 @@
 
 #pragma once
 
-namespace frc {
+// clang-format off
+#ifdef _MSC_VER
+#pragma message "warning: buttons/ButtonScheduler.h is deprecated; include frc/buttons/ButtonScheduler.h instead"
+#else
+#warning "buttons/ButtonScheduler.h is deprecated; include frc/buttons/ButtonScheduler.h instead"
+#endif
 
-class Trigger;
-class Command;
+// clang-format on
 
-class ButtonScheduler {
- public:
-  ButtonScheduler(bool last, Trigger* button, Command* orders);
-  virtual ~ButtonScheduler() = default;
-  virtual void Execute() = 0;
-  void Start();
-
- protected:
-  bool m_pressedLast;
-  Trigger* m_button;
-  Command* m_command;
-};
-
-}  // namespace frc
+#include "frc/buttons/ButtonScheduler.h"

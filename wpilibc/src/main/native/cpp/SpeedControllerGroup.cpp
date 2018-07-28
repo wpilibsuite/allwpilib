@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "SpeedControllerGroup.h"
+#include "frc/SpeedControllerGroup.h"
 
-#include "SmartDashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -46,6 +46,7 @@ void SpeedControllerGroup::PIDWrite(double output) { Set(output); }
 
 void SpeedControllerGroup::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Speed Controller");
+  builder.SetActuator(true);
   builder.SetSafeState([=]() { StopMotor(); });
   builder.AddDoubleProperty("Value", [=]() { return Get(); },
                             [=](double value) { Set(value); });

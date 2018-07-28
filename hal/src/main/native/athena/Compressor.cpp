@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Compressor.h"
+#include "hal/Compressor.h"
 
-#include "HAL/Errors.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
 #include "PCMInternal.h"
 #include "PortsInternal.h"
 #include "ctre/PCM.h"
+#include "hal/Errors.h"
+#include "hal/handles/HandlesInternal.h"
 
 using namespace hal;
 

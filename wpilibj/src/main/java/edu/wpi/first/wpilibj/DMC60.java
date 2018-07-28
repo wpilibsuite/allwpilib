@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-//import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-//import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 
 /**
  * Digilent DMC 60 Speed Controller.
@@ -38,7 +38,7 @@ public class DMC60 extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    //HAL.report(tResourceType.kResourceType_VictorSP, getChannel());
+    HAL.report(tResourceType.kResourceType_DigilentDMC60, getChannel());
     setName("DMC60", getChannel());
   }
 }

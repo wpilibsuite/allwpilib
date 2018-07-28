@@ -14,13 +14,13 @@
 #include <wpi/mutex.h>
 
 #include "ConstantsInternal.h"
-#include "HAL/AnalogTrigger.h"
-#include "HAL/ChipObject.h"
-#include "HAL/HAL.h"
-#include "HAL/Ports.h"
-#include "HAL/cpp/UnsafeDIO.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/AnalogTrigger.h"
+#include "hal/ChipObject.h"
+#include "hal/HAL.h"
+#include "hal/Ports.h"
+#include "hal/cpp/UnsafeDIO.h"
 
 namespace hal {
 

@@ -9,9 +9,9 @@
 
 #include <iostream>
 
-#include "MockData/HAL_Value.h"
-#include "MockData/NotifyListener.h"
-#include "MockData/PWMData.h"
+#include <mockdata/HAL_Value.h>
+#include <mockdata/NotifyListener.h>
+#include <mockdata/PWMData.h>
 
 static void PWMCallback(const char* name, void* param,
                         const struct HAL_Value* value) {

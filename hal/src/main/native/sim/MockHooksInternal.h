@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "MockData/MockHooks.h"
+#include "mockdata/MockHooks.h"
 
 namespace hal {
 void RestartTiming();

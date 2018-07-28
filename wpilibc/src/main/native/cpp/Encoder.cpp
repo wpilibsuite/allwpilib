@@ -5,13 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Encoder.h"
+#include "frc/Encoder.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "DigitalInput.h"
-#include "SmartDashboard/SendableBuilder.h"
-#include "WPIErrors.h"
+#include "frc/DigitalInput.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

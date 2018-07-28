@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "HAL/ChipObject.h"
+#include "hal/ChipObject.h"
 
 namespace hal {
 

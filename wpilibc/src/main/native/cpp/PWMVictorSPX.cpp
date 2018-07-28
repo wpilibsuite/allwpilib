@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PWMVictorSPX.h"
+#include "frc/PWMVictorSPX.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
 using namespace frc;
 
@@ -29,6 +29,6 @@ PWMVictorSPX::PWMVictorSPX(int channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  // HAL_Report(HALUsageReporting::kResourceType_PWMVictorSPX, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_PWMVictorSPX, GetChannel());
   SetName("PWMVictorSPX", GetChannel());
 }

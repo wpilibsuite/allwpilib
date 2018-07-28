@@ -7,7 +7,11 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.SendableBase;
@@ -37,21 +41,32 @@ public class SendableChooser<V> extends SendableBase {
    */
   private static final String SELECTED = "selected";
   /**
+   * The key for the active option.
+   */
+  private static final String ACTIVE = "active";
+  /**
    * The key for the option array.
    */
   private static final String OPTIONS = "options";
+  /**
+   * The key for the instance number.
+   */
+  private static final String INSTANCE = ".instance";
   /**
    * A map linking strings to the objects the represent.
    */
   @SuppressWarnings("PMD.LooseCoupling")
   private final LinkedHashMap<String, V> m_map = new LinkedHashMap<>();
   private String m_defaultChoice = "";
+  private final int m_instance;
+  private static final AtomicInteger s_instances = new AtomicInteger();
 
   /**
    * Instantiates a {@link SendableChooser}.
    */
   public SendableChooser() {
     super(false);
+    m_instance = s_instances.getAndIncrement();
   }
 
   /**
@@ -87,24 +102,60 @@ public class SendableChooser<V> extends SendableBase {
    * @return the option selected
    */
   public V getSelected() {
-    String selected = m_defaultChoice;
-    if (m_tableSelected != null) {
-      selected = m_tableSelected.getString(m_defaultChoice);
+    m_mutex.lock();
+    try {
+      if (m_selected != null) {
+        return m_map.get(m_selected);
+      } else {
+        return m_map.get(m_defaultChoice);
+      }
+    } finally {
+      m_mutex.unlock();
     }
-    return m_map.get(selected);
   }
 
-  private NetworkTableEntry m_tableSelected;
+  private String m_selected;
+  private final List<NetworkTableEntry> m_activeEntries = new ArrayList<>();
+  private final ReentrantLock m_mutex = new ReentrantLock();
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("String Chooser");
+    builder.getEntry(INSTANCE).setDouble(m_instance);
     builder.addStringProperty(DEFAULT, () -> {
       return m_defaultChoice;
     }, null);
     builder.addStringArrayProperty(OPTIONS, () -> {
       return m_map.keySet().toArray(new String[0]);
     }, null);
-    m_tableSelected = builder.getEntry(SELECTED);
+    builder.addStringProperty(ACTIVE, () -> {
+      m_mutex.lock();
+      try {
+        if (m_selected != null) {
+          return m_selected;
+        } else {
+          return m_defaultChoice;
+        }
+      } finally {
+        m_mutex.unlock();
+      }
+    }, null);
+    m_mutex.lock();
+    try {
+      m_activeEntries.add(builder.getEntry(ACTIVE));
+    } finally {
+      m_mutex.unlock();
+    }
+    builder.addStringProperty(SELECTED, null, val -> {
+      m_mutex.lock();
+      try {
+        m_selected = val;
+        for (NetworkTableEntry entry : m_activeEntries) {
+          entry.setString(val);
+        }
+      } finally {
+        m_mutex.unlock();
+      }
+    });
   }
 }

@@ -162,3 +162,15 @@ HttpParser::HttpParser(Type type) {
     return self.m_aborted;
   };
 }
+
+void HttpParser::Reset(Type type) {
+  http_parser_init(&m_parser,
+                   static_cast<http_parser_type>(static_cast<int>(type)));
+  m_parser.data = this;
+  m_maxLength = 1024;
+  m_state = kStart;
+  m_urlBuf.clear();
+  m_fieldBuf.clear();
+  m_valueBuf.clear();
+  m_aborted = false;
+}

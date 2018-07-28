@@ -5,21 +5,21 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "RobotBase.h"
+#include "frc/RobotBase.h"
 
 #include <cstdio>
 
-#include <HAL/HAL.h>
+#include <cameraserver/CameraServerShared.h>
+#include <hal/HAL.h>
 #include <networktables/NetworkTableInstance.h>
 
-#include "CameraServerShared.h"
-#include "DriverStation.h"
-#include "LiveWindow/LiveWindow.h"
-#include "RobotState.h"
-#include "SmartDashboard/SmartDashboard.h"
-#include "Utility.h"
-#include "WPIErrors.h"
 #include "WPILibVersion.h"
+#include "frc/DriverStation.h"
+#include "frc/RobotState.h"
+#include "frc/Utility.h"
+#include "frc/WPIErrors.h"
+#include "frc/livewindow/LiveWindow.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 
 using namespace frc;
 
@@ -29,7 +29,7 @@ namespace {
 class WPILibCameraServerShared : public frc::CameraServerShared {
  public:
   void ReportUsbCamera(int id) override {
-    HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, id);
+    HAL_Report(HALUsageReporting::kResourceType_UsbCamera, id);
   }
   void ReportAxisCamera(int id) override {
     HAL_Report(HALUsageReporting::kResourceType_AxisCamera, id);

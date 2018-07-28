@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "CAN.h"
+#include "frc/CAN.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
 using namespace frc;
 
@@ -21,7 +21,7 @@ CAN::CAN(int deviceId) {
     return;
   }
 
-  // HAL_Report(HALUsageReporting::kResourceType_CAN, deviceId);
+  HAL_Report(HALUsageReporting::kResourceType_CAN, deviceId);
 }
 
 CAN::~CAN() {

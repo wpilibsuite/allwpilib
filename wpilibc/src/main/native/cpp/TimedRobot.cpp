@@ -5,15 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "TimedRobot.h"
+#include "frc/TimedRobot.h"
 
 #include <stdint.h>
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "Timer.h"
-#include "Utility.h"
-#include "WPIErrors.h"
+#include "frc/Timer.h"
+#include "frc/Utility.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 
@@ -48,10 +48,8 @@ TimedRobot::TimedRobot(double period) : IterativeRobotBase(period) {
   m_notifier = HAL_InitializeNotifier(&status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  // HAL_Report(HALUsageReporting::kResourceType_Framework,
-  //            HALUsageReporting::kFramework_Periodic);
   HAL_Report(HALUsageReporting::kResourceType_Framework,
-             HALUsageReporting::kFramework_Iterative);
+             HALUsageReporting::kFramework_Timed);
 }
 
 TimedRobot::~TimedRobot() {

@@ -154,7 +154,10 @@ enum CS_EventKind {
   CS_SINK_ENABLED = 0x1000,
   CS_SINK_DISABLED = 0x2000,
   CS_NETWORK_INTERFACES_CHANGED = 0x4000,
-  CS_TELEMETRY_UPDATED = 0x8000
+  CS_TELEMETRY_UPDATED = 0x8000,
+  CS_SINK_PROPERTY_CREATED = 0x10000,
+  CS_SINK_PROPERTY_VALUE_UPDATED = 0x20000,
+  CS_SINK_PROPERTY_CHOICES_UPDATED = 0x40000
 };
 
 //
@@ -315,6 +318,10 @@ CS_Sink CS_CreateCvSinkCallback(const char* name, void* data,
 enum CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status);
 char* CS_GetSinkName(CS_Sink sink, CS_Status* status);
 char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status);
+CS_Property CS_GetSinkProperty(CS_Sink sink, const char* name,
+                               CS_Status* status);
+CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
+                                        CS_Status* status);
 void CS_SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
 CS_Property CS_GetSinkSourceProperty(CS_Sink sink, const char* name,
                                      CS_Status* status);

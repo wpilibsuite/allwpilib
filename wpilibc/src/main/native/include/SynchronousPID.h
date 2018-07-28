@@ -7,50 +7,13 @@
 
 #pragma once
 
-#include "PIDBase.h"
+// clang-format off
+#ifdef _MSC_VER
+#pragma message "warning: SynchronousPID.h is deprecated; include frc/SynchronousPID.h instead"
+#else
+#warning "SynchronousPID.h is deprecated; include frc/SynchronousPID.h instead"
+#endif
 
-namespace frc {
+// clang-format on
 
-/**
- * Class implements a synchronous PID control loop.
- *
- * Provides a calculate method for the user to call at their desired update
- * rate.
- */
-class SynchronousPID : public PIDBase {
- public:
-  /**
-   * Allocate a PID object with the given constants for P, I, and D.
-   *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
-   * @param source The PIDSource object that is used to get values
-   * @param output The PIDOutput object that is set to the output percentage
-   */
-  SynchronousPID(double Kp, double Ki, double Kd, PIDSource& source,
-                 PIDOutput& output);
-
-  /**
-   * Allocate a PID object with the given constants for P, I, and D.
-   *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
-   * @param Kf     the feed forward term
-   * @param source The PIDSource object that is used to get values
-   * @param output The PIDOutput object that is set to the output percentage
-   */
-  SynchronousPID(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
-                 PIDOutput& output);
-
-  SynchronousPID(const SynchronousPID&) = delete;
-  SynchronousPID& operator=(const SynchronousPID) = delete;
-
-  /**
-   * Read the input, calculate the output accordingly, and write to the output.
-   */
-  void Calculate() override;
-};
-
-}  // namespace frc
+#include "frc/SynchronousPID.h"

@@ -5,13 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Counter.h"  // NOLINT(build/include_order)
+#include "frc/Counter.h"  // NOLINT(build/include_order)
 
-#include "Jaguar.h"
-#include "Talon.h"
 #include "TestBench.h"
-#include "Timer.h"
-#include "Victor.h"
+#include "frc/Jaguar.h"
+#include "frc/Talon.h"
+#include "frc/Timer.h"
+#include "frc/Victor.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

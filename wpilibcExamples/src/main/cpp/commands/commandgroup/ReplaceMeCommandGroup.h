@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <Commands/CommandGroup.h>
+#include <frc/commands/CommandGroup.h>
 
 class ReplaceMeCommandGroup : public frc::CommandGroup {
  public:

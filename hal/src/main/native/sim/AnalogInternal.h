@@ -11,9 +11,9 @@
 
 #include <memory>
 
-#include "HAL/Ports.h"
-#include "HAL/handles/IndexedHandleResource.h"
 #include "PortsInternal.h"
+#include "hal/Ports.h"
+#include "hal/handles/IndexedHandleResource.h"
 
 namespace hal {
 constexpr int32_t kTimebase = 40000000;  ///< 40 MHz clock

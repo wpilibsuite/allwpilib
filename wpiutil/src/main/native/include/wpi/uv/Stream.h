@@ -97,6 +97,8 @@ class Stream : public Handle {
   /**
    * Start reading data from an incoming stream.
    *
+   * This will only succeed after a connection has been established.
+   *
    * A data signal will be emitted several times until there is no more
    * data to read or `StopRead()` is called.
    * An end signal will be emitted when there is no more data to read.
@@ -119,9 +121,9 @@ class Stream : public Handle {
    * the data and use either its Complete() function or destructor to free the
    * data.
    *
-   * HandleWriteComplete() will be called on the request object when the data
-   * has been written.  HandleWriteComplete() is called even if an error occurs.
-   * HandleError() will be called on the request object in case of errors.
+   * The finish signal will be emitted on the request object when the data
+   * has been written (or if an error occurs).
+   * The error signal will be emitted on the request object in case of errors.
    *
    * @param bufs The buffers to be written to the stream.
    * @param req write request
@@ -135,8 +137,8 @@ class Stream : public Handle {
    * the `bufs` parameter must exceed the lifetime of the write request.
    * The callback can be used to free data after the request completes.
    *
-   * The callback will be called when the data has been written.  Errors will
-   * be reported to the stream error handler.
+   * The callback will be called when the data has been written (even if an
+   * error occurred).  Errors will be reported to the stream error handler.
    *
    * @param bufs The buffers to be written to the stream.
    * @param callback Callback function to call when the write completes

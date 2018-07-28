@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,22 +7,13 @@
 
 #pragma once
 
-#include "PWMSpeedController.h"
+// clang-format off
+#ifdef _MSC_VER
+#pragma message "warning: SD540.h is deprecated; include frc/SD540.h instead"
+#else
+#warning "SD540.h is deprecated; include frc/SD540.h instead"
+#endif
 
-namespace frc {
+// clang-format on
 
-/**
- * Mindsensors SD540 Speed Controller.
- */
-class SD540 : public PWMSpeedController {
- public:
-  /**
-   * Constructor for a SD540.
-   *
-   * @param channel The PWM channel that the SD540 is attached to. 0-9 are
-   *                on-board, 10-19 are on the MXP port
-   */
-  explicit SD540(int channel);
-};
-
-}  // namespace frc
+#include "frc/SD540.h"

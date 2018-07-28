@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "SerialPort.h"
+#include "frc/SerialPort.h"
 
-#include <HAL/HAL.h>
-#include <HAL/SerialPort.h>
+#include <hal/HAL.h>
+#include <hal/SerialPort.h>
 
 // static ViStatus _VI_FUNCH ioCompleteHandler (ViSession vi, ViEventType
 // eventType, ViEvent event, ViAddr userHandle);
