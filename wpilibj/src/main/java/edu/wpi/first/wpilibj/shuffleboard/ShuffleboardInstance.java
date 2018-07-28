@@ -51,7 +51,7 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
       for (ShuffleboardComponent<?> component : tab.getComponents()) {
         if (component instanceof ComplexWidget) {
           ComplexWidget complexWidget = (ComplexWidget) component;
-          complexWidget.enableUserControl();
+          complexWidget.enableIfActuator();
         }
       }
     }
@@ -63,7 +63,7 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
       for (ShuffleboardComponent<?> component : tab.getComponents()) {
         if (component instanceof ComplexWidget) {
           ComplexWidget complexWidget = (ComplexWidget) component;
-          complexWidget.disableUserControl();
+          complexWidget.disableIfActuator();
         }
       }
     }

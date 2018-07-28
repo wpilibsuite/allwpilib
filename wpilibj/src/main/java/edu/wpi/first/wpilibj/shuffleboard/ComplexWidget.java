@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj.shuffleboard;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 
 /**
@@ -38,18 +39,24 @@ public final class ComplexWidget extends ShuffleboardWidget<ComplexWidget> {
 
   /**
    * Enables user control of this widget in the Shuffleboard application. This method is
-   * package-private to prevent users from enabling control themselves.
+   * package-private to prevent users from enabling control themselves. Has no effect if the
+   * sendable is not marked as an actuator with {@link SendableBuilder#setActuator}.
    */
-  void enableUserControl() {
-    m_builder.startLiveWindowMode();
+  void enableIfActuator() {
+    if (m_builder.isActuator()) {
+      m_builder.startLiveWindowMode();
+    }
   }
 
   /**
    * Disables user control of this widget in the Shuffleboard application. This method is
-   * package-private to prevent users from enabling control themselves.
+   * package-private to prevent users from enabling control themselves. Has no effect if the
+   * sendable is not marked as an actuator with {@link SendableBuilder#setActuator}.
    */
-  void disableUserControl() {
-    m_builder.stopLiveWindowMode();
+  void disableIfActuator() {
+    if (m_builder.isActuator()) {
+      m_builder.stopLiveWindowMode();
+    }
   }
 
 }
