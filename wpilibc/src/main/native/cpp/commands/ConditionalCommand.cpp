@@ -7,8 +7,6 @@
 
 #include "frc/commands/ConditionalCommand.h"
 
-#include <iostream>
-
 #include "frc/commands/Scheduler.h"
 
 using namespace frc;
