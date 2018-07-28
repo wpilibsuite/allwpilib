@@ -204,6 +204,8 @@ public class KilloughDrive extends RobotDriveBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("KilloughDrive");
+    builder.setActuator(true);
+    builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Left Motor Speed", m_leftMotor::get, m_leftMotor::set);
     builder.addDoubleProperty("Right Motor Speed", m_rightMotor::get, m_rightMotor::set);
     builder.addDoubleProperty("Back Motor Speed", m_backMotor::get, m_backMotor::set);

@@ -101,6 +101,8 @@ void KilloughDrive::GetDescription(wpi::raw_ostream& desc) const {
 
 void KilloughDrive::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("KilloughDrive");
+  builder.SetActuator(true);
+  builder.SetSafeState([=] { StopMotor(); });
   builder.AddDoubleProperty("Left Motor Speed",
                             [=]() { return m_leftMotor.Get(); },
                             [=](double value) { m_leftMotor.Set(value); });

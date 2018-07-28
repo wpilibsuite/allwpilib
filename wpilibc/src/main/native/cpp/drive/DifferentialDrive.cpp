@@ -211,6 +211,8 @@ void DifferentialDrive::GetDescription(wpi::raw_ostream& desc) const {
 
 void DifferentialDrive::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("DifferentialDrive");
+  builder.SetActuator(true);
+  builder.SetSafeState([=] { StopMotor(); });
   builder.AddDoubleProperty("Left Motor Speed",
                             [=]() { return m_leftMotor.Get(); },
                             [=](double value) { m_leftMotor.Set(value); });

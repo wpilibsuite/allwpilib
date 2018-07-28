@@ -208,6 +208,8 @@ public class MecanumDrive extends RobotDriveBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("MecanumDrive");
+    builder.setActuator(true);
+    builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Front Left Motor Speed",
         m_frontLeftMotor::get,
         m_frontLeftMotor::set);

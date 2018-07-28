@@ -107,6 +107,8 @@ void MecanumDrive::GetDescription(wpi::raw_ostream& desc) const {
 
 void MecanumDrive::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("MecanumDrive");
+  builder.SetActuator(true);
+  builder.SetSafeState([=] { StopMotor(); });
   builder.AddDoubleProperty("Front Left Motor Speed",
                             [=]() { return m_frontLeftMotor.Get(); },
                             [=](double value) { m_frontLeftMotor.Set(value); });
