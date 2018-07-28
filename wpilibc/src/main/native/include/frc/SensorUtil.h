@@ -94,7 +94,8 @@ class SensorUtil final {
   static bool CheckPDPChannel(int channel);
 
   /**
-   * Verify that the PDP module number is within limits. module numbers are 0-based
+   * Verify that the PDP module number is within limits. module numbers are
+   * 0-based
    *
    * @return PDP module is valid
    */
