@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <set>
-
 #include <wpi/mutex.h>
 
 #include "frc/ErrorBase.h"
@@ -114,12 +112,6 @@ class MotorSafetyHelper : public ErrorBase {
 
   // The object that is using the helper
   MotorSafety* m_safeObject;
-
-  // List of all existing MotorSafetyHelper objects.
-  static std::set<MotorSafetyHelper*> m_helperList;
-
-  // Protect accesses to the list of helpers
-  static wpi::mutex m_listMutex;
 };
 
 }  // namespace frc
