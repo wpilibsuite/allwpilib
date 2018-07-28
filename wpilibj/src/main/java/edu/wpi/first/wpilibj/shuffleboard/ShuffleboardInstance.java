@@ -17,6 +17,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 final class ShuffleboardInstance implements ShuffleboardRoot {
   private final Map<String, ShuffleboardTab> m_tabs = new LinkedHashMap<>(); // NOPMD
 
+  private boolean m_tabsChanged = false; // NOPMD redundant field initializer
   private final NetworkTable m_rootTable;
   private final NetworkTable m_rootMetaTable;
 
@@ -29,16 +30,23 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
   @Override
   public ShuffleboardTab getTab(String title) {
     Objects.requireNonNull(title, "Tab title cannot be null");
-    return m_tabs.computeIfAbsent(title, t -> new ShuffleboardTab(this, t));
+    if (!m_tabs.containsKey(title)) {
+      m_tabs.put(title, new ShuffleboardTab(this, title));
+      m_tabsChanged = true;
+    }
+    return m_tabs.get(title);
   }
 
   @Override
   public void update() {
-    String[] tabTitles = m_tabs.values()
-                               .stream()
-                               .map(ShuffleboardTab::getTitle)
-                               .toArray(String[]::new);
-    m_rootMetaTable.getEntry("Tabs").forceSetStringArray(tabTitles);
+    if (m_tabsChanged) {
+      String[] tabTitles = m_tabs.values()
+          .stream()
+          .map(ShuffleboardTab::getTitle)
+          .toArray(String[]::new);
+      m_rootMetaTable.getEntry("Tabs").forceSetStringArray(tabTitles);
+      m_tabsChanged = false;
+    }
     for (ShuffleboardTab tab : m_tabs.values()) {
       String title = tab.getTitle();
       tab.buildInto(m_rootTable, m_rootMetaTable.getSubTable(title));
