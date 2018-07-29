@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_power Power Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -115,3 +121,4 @@ int32_t HAL_GetUserCurrentFaults3V3(int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

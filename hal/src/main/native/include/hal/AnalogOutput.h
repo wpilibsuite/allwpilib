@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_analogoutput Analog Output Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -61,3 +67,4 @@ HAL_Bool HAL_CheckAnalogOutputChannel(int32_t channel);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

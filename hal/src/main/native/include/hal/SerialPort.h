@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_serialport Serial Port Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 // clang-format off
 HAL_ENUM(HAL_SerialPort) {
   HAL_SerialPort_Onboard = 0,
@@ -221,3 +227,4 @@ void HAL_CloseSerial(HAL_SerialPort port, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

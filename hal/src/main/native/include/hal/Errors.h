@@ -7,6 +7,12 @@
 
 #pragma once
 
+/**
+ * @defgroup hal_errors Error Defines
+ * @ingroup hal_capi
+ * @{
+ */
+
 #define CTR_RxTimeout_MESSAGE "CTRE CAN Receive Timeout"
 #define CTR_TxTimeout_MESSAGE "CTRE CAN Transmit Timeout"
 #define CTR_InvalidParamValue_MESSAGE "CTRE CAN Invalid Parameter"
@@ -118,3 +124,4 @@
 #define VI_ERROR_ASRL_OVERRUN_MESSAGE "HAL - VISA: Buffer Overrun Error"
 #define VI_ERROR_RSRC_BUSY_MESSAGE "HAL - VISA: Resource Busy"
 #define VI_ERROR_INV_PARAMETER_MESSAGE "HAL - VISA: Invalid Parameter"
+/** @} */

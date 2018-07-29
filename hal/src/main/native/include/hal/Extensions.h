@@ -8,14 +8,18 @@
 #pragma once
 
 /**
- * HAL Simulator Extensions are libraries that provide additional simulator
- * functionality, such as a Gazebo interface, or a more light weight simulation.
+ * @defgroup hal_extensions Simulator Extensions
+ * @ingroup hal_capi
+ * HAL Simulator Extensions.  These are libraries that provide additional
+ * simulator functionality, such as a Gazebo interface, or a more light weight
+ * simulation.
  *
  * An extension must expose the HALSIM_InitExtension entry point which is
  * invoked after the library is loaded.
  *
  * The entry point is expected to return < 0 for errors that should stop
  * the HAL completely, 0 for success, and > 0 for a non fatal error.
+ * @{
  */
 typedef int halsim_extension_init_func_t(void);
 
@@ -38,3 +42,4 @@ int HAL_LoadOneExtension(const char* library);
  */
 int HAL_LoadExtensions(void);
 }  // extern "C"
+/** @} */

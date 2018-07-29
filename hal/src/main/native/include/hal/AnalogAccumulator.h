@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_analogaccumulator Analog Accumulator Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -106,3 +112,4 @@ void HAL_GetAccumulatorOutput(HAL_AnalogInputHandle analogPortHandle,
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */
