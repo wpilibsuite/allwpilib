@@ -44,7 +44,7 @@ public class AnalogTriggerOutput extends DigitalSource {
   /**
    * Exceptions dealing with improper operation of the Analog trigger output.
    */
-  public class AnalogTriggerOutputException extends RuntimeException {
+  public static class AnalogTriggerOutputException extends RuntimeException {
     /**
      * Create a new exception with the given message.
      *

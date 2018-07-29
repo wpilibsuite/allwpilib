@@ -24,7 +24,7 @@ public class AnalogTrigger extends SendableBase {
   /**
    * Exceptions dealing with improper operation of the Analog trigger.
    */
-  public class AnalogTriggerException extends RuntimeException {
+  public static class AnalogTriggerException extends RuntimeException {
     /**
      * Create a new exception with the given message.
      *

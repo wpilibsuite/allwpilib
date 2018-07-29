@@ -11,7 +11,7 @@ package edu.wpi.cscore;
  * A source that represents a video camera.
  */
 public class VideoCamera extends VideoSource {
-  public class WhiteBalance {
+  public static class WhiteBalance {
     public static final int kFixedIndoor = 3000;
     public static final int kFixedOutdoor1 = 4000;
     public static final int kFixedOutdoor2 = 5000;

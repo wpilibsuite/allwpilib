@@ -147,7 +147,7 @@ public abstract class ConditionalCommand extends Command {
   }
 
   @Override
-  protected void _cancel() {
+  protected synchronized void _cancel() {
     if (m_chosenCommand != null && m_chosenCommand.isRunning()) {
       m_chosenCommand.cancel();
     }

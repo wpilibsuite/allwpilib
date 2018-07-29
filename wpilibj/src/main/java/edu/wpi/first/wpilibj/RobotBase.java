@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.function.Supplier;
 
@@ -242,12 +243,13 @@ public abstract class RobotBase implements AutoCloseable {
       file.createNewFile();
 
       try (OutputStream output = Files.newOutputStream(file.toPath())) {
-        output.write("Java ".getBytes());
-        output.write(WPILibVersion.Version.getBytes());
+        output.write("Java ".getBytes(StandardCharsets.UTF_8));
+        output.write(WPILibVersion.Version.getBytes(StandardCharsets.UTF_8));
       }
 
     } catch (IOException ex) {
-      ex.printStackTrace();
+      DriverStation.reportError("Could not write FRC_Lib_Version.ini: " + ex.toString(),
+          ex.getStackTrace());
     }
 
     boolean errorOnExit = false;

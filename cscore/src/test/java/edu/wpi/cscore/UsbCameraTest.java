@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class UsbCameraTest {
   @Nested
   @EnabledOnOs(OS.LINUX)
-  class ConnectVerbose {
+  static class ConnectVerbose {
     @Test
     void setConnectVerboseEnabledTest() {
       try (UsbCamera camera = new UsbCamera("Nonexistant Camera", getNonexistentCameraDev())) {

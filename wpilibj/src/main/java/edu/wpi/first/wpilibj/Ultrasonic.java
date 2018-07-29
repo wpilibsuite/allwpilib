@@ -65,7 +65,7 @@ public class Ultrasonic extends SendableBase implements PIDSource {
    * certainly break. Make sure to disable automatic mode before changing anything with the
    * sensors!!
    */
-  private class UltrasonicChecker extends Thread {
+  private static class UltrasonicChecker extends Thread {
     @Override
     public synchronized void run() {
       Ultrasonic ultrasonic = null;

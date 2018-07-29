@@ -52,9 +52,6 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
   // The absolute expiration time
   double m_expirationTime = 0;
 
-  // The relative time
-  double m_period;
-
   /**
    * Update the HAL alarm time.
    */

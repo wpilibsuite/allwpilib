@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
@@ -32,7 +33,7 @@ public class SerialPort implements AutoCloseable {
     kOnboard(0), kMXP(1), kUSB(2), kUSB1(2), kUSB2(3);
 
     @SuppressWarnings("MemberName")
-    public int value;
+    public final int value;
 
     Port(int value) {
       this.value = value;
@@ -316,7 +317,7 @@ public class SerialPort implements AutoCloseable {
    * @return The number of bytes actually written into the port.
    */
   public int writeString(String data) {
-    return write(data.getBytes(), data.length());
+    return write(data.getBytes(StandardCharsets.UTF_8), data.length());
   }
 
   /**
