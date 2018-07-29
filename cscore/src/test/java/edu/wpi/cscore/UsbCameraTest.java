@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c)      2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -30,12 +30,12 @@ class UsbCameraTest {
     void setConnectVerboseEnabledTest() {
       try (UsbCamera camera = new UsbCamera("Nonexistant Camera", getNonexistentCameraDev())) {
         camera.setConnectVerbose(1);
-  
+
         CompletableFuture<String> result = new CompletableFuture<>();
         CameraServerJNI.setLogger((level, file, line, message) -> {
           result.complete(message);
         }, 20);
-    
+
         assertTimeoutPreemptively(Duration.ofSeconds(5),
             () -> assertTrue(result.get().contains("Connecting to USB camera on ")));
       }
@@ -45,7 +45,7 @@ class UsbCameraTest {
     void setConnectVerboseDisabledTest() {
       try (UsbCamera camera = new UsbCamera("Nonexistant Camera", getNonexistentCameraDev())) {
         camera.setConnectVerbose(0);
-  
+
         CompletableFuture<String> result = new CompletableFuture<>();
         CameraServerJNI.setLogger((level, file, line, message) -> {
           result.complete(message);
