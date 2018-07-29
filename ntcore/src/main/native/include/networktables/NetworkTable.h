@@ -39,7 +39,14 @@ class NetworkTableInstance;
 #endif
 
 /**
+ * @defgroup ntcore_cpp_api ntcore C++ object-oriented API
+ *
+ * Recommended interface for C++, identical to Java API.
+ */
+
+/**
  * A network table that knows its subtable path.
+ * @ingroup ntcore_cpp_api
  */
 class NetworkTable final : public ITable {
  private:
@@ -64,6 +71,7 @@ class NetworkTable final : public ITable {
   /**
    * Gets the "base name" of a key. For example, "/foo/bar" becomes "bar".
    * If the key has a trailing slash, returns an empty string.
+   *
    * @param key key
    * @return base name
    */
@@ -96,6 +104,7 @@ class NetworkTable final : public ITable {
    * Gets a list of the names of all the super tables of a given key. For
    * example, the key "/foo/bar/baz" has a hierarchy of "/", "/foo",
    * "/foo/bar", and "/foo/bar/baz".
+   *
    * @param key the key
    * @return List of super tables
    */
@@ -110,6 +119,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Gets the instance for the table.
+   *
    * @return Instance
    */
   NetworkTableInstance GetInstance() const;
@@ -153,6 +163,7 @@ class NetworkTable final : public ITable {
    * set the team the robot is configured for (this will set the mdns address
    * that network tables will connect to in client mode)
    * This must be called before initialize or GetTable
+   *
    * @param team the team number
    */
   WPI_DEPRECATED(
@@ -181,6 +192,7 @@ class NetworkTable final : public ITable {
   /**
    * Set the port number that network tables will connect to in client
    * mode or listen to in server mode.
+   *
    * @param port the port number
    */
   WPI_DEPRECATED(
@@ -192,6 +204,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Enable requesting the server address from the Driver Station.
+   *
    * @param enabled whether to enable the connection to the local DS
    */
   WPI_DEPRECATED(
@@ -201,6 +214,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Sets the persistent filename.
+   *
    * @param filename the filename that the network tables server uses for
    * automatic loading and saving of persistent values
    */
@@ -212,6 +226,7 @@ class NetworkTable final : public ITable {
   /**
    * Sets the network identity.
    * This is provided in the connection info on the remote end.
+   *
    * @param name identity
    */
   WPI_DEPRECATED("use NetworkTableInstance::SetNetworkIdentity() instead")
@@ -278,6 +293,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Gets the entry for a subkey.
+   *
    * @param key the key name
    * @return Network table entry.
    */
@@ -285,6 +301,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Listen to keys only within this table.
+   *
    * @param listener    listener to add
    * @param flags       EntryListenerFlags bitmask
    * @return Listener handle
@@ -294,6 +311,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Listen to a single key.
+   *
    * @param key         the key name
    * @param listener    listener to add
    * @param flags       EntryListenerFlags bitmask
@@ -305,6 +323,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Remove an entry listener.
+   *
    * @param listener    listener handle
    */
   void RemoveEntryListener(NT_EntryListener listener) const;
@@ -313,6 +332,7 @@ class NetworkTable final : public ITable {
    * Listen for sub-table creation.
    * This calls the listener once for each newly created sub-table.
    * It immediately calls the listener for any existing sub-tables.
+   *
    * @param listener        listener to add
    * @param localNotify     notify local changes as well as remote
    * @return Listener handle
@@ -322,6 +342,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Remove a sub-table listener.
+   *
    * @param listener    listener handle
    */
   void RemoveTableListener(NT_EntryListener listener) const;
@@ -387,6 +408,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Gets all keys in the table (not including sub-tables).
+   *
    * @param types bitmask of types; 0 is treated as a "don't care".
    * @return keys currently in the table
    */
@@ -394,6 +416,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Gets the names of all subtables in the table.
+   *
    * @return subtables currently in the table
    */
   std::vector<std::string> GetSubTables() const override;
@@ -465,6 +488,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
+   *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
@@ -492,6 +516,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
+   *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
@@ -520,6 +545,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
+   *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
@@ -539,6 +565,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Put a boolean array in the table
+   *
    * @param key the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
@@ -551,9 +578,10 @@ class NetworkTable final : public ITable {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
+   *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists with a different type
+   * @return False if the table key exists with a different type
    */
   bool SetDefaultBooleanArray(StringRef key,
                               ArrayRef<int> defaultValue) override;
@@ -561,6 +589,7 @@ class NetworkTable final : public ITable {
   /**
    * Returns the boolean array the key maps to. If the key does not exist or is
    * of different type, it will return the default value.
+   *
    * @param key the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
@@ -578,6 +607,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Put a number array in the table
+   *
    * @param key the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
@@ -586,6 +616,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
+   *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
@@ -596,6 +627,7 @@ class NetworkTable final : public ITable {
   /**
    * Returns the number array the key maps to. If the key does not exist or is
    * of different type, it will return the default value.
+   *
    * @param key the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
@@ -609,6 +641,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Put a string array in the table
+   *
    * @param key the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
@@ -617,6 +650,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
+   *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
@@ -627,6 +661,7 @@ class NetworkTable final : public ITable {
   /**
    * Returns the string array the key maps to. If the key does not exist or is
    * of different type, it will return the default value.
+   *
    * @param key the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
@@ -640,6 +675,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Put a raw value (byte array) in the table
+   *
    * @param key the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
@@ -648,15 +684,17 @@ class NetworkTable final : public ITable {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
+   *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists with a different type
+   * @return False if the table key exists with a different type
    */
   bool SetDefaultRaw(StringRef key, StringRef defaultValue) override;
 
   /**
    * Returns the raw value (byte array) the key maps to. If the key does not
    * exist or is of different type, it will return the default value.
+   *
    * @param key the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
@@ -678,9 +716,10 @@ class NetworkTable final : public ITable {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
+   *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists with a different type
+   * @return False if the table key exists with a different type
    */
   bool SetDefaultValue(const Twine& key,
                        std::shared_ptr<Value> defaultValue) override;
@@ -696,6 +735,7 @@ class NetworkTable final : public ITable {
 
   /**
    * Gets the full path of this table.  Does not include the trailing "/".
+   *
    * @return The path (e.g "", "/foo").
    */
   StringRef GetPath() const override;
@@ -703,6 +743,7 @@ class NetworkTable final : public ITable {
   /**
    * Save table values to a file.  The file format used is identical to
    * that used for SavePersistent.
+   *
    * @param filename  filename
    * @return error string, or nullptr if successful
    */
@@ -711,6 +752,7 @@ class NetworkTable final : public ITable {
   /**
    * Load table values from a file.  The file format used is identical to
    * that used for SavePersistent / LoadPersistent.
+   *
    * @param filename  filename
    * @param warn      callback function for warnings
    * @return error string, or nullptr if successful

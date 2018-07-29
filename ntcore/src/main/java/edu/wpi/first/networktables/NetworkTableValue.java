@@ -29,6 +29,7 @@ public final class NetworkTableValue {
 
   /**
    * Get the data type.
+   *
    * @return The type.
    */
   public NetworkTableType getType() {
@@ -37,6 +38,7 @@ public final class NetworkTableValue {
 
   /**
    * Get the data value stored.
+   *
    * @return The type.
    */
   public Object getValue() {
@@ -45,6 +47,7 @@ public final class NetworkTableValue {
 
   /**
    * Get the creation time of the value.
+   *
    * @return The time, in the units returned by NetworkTablesJNI.now().
    */
   public long getTime() {
@@ -57,6 +60,7 @@ public final class NetworkTableValue {
 
   /**
    * Determine if entry value contains a value or is unassigned.
+   *
    * @return True if the entry value contains a value.
    */
   public boolean isValid() {
@@ -65,6 +69,7 @@ public final class NetworkTableValue {
 
   /**
    * Determine if entry value contains a boolean.
+   *
    * @return True if the entry value is of boolean type.
    */
   public boolean isBoolean() {
@@ -73,6 +78,7 @@ public final class NetworkTableValue {
 
   /**
    * Determine if entry value contains a double.
+   *
    * @return True if the entry value is of double type.
    */
   public boolean isDouble() {
@@ -81,6 +87,7 @@ public final class NetworkTableValue {
 
   /**
    * Determine if entry value contains a string.
+   *
    * @return True if the entry value is of string type.
    */
   public boolean isString() {
@@ -89,6 +96,7 @@ public final class NetworkTableValue {
 
   /**
    * Determine if entry value contains a raw.
+   *
    * @return True if the entry value is of raw type.
    */
   public boolean isRaw() {
@@ -97,6 +105,7 @@ public final class NetworkTableValue {
 
   /**
    * Determine if entry value contains a rpc definition.
+   *
    * @return True if the entry value is of rpc definition type.
    */
   public boolean isRpc() {
@@ -105,6 +114,7 @@ public final class NetworkTableValue {
 
   /**
    * Determine if entry value contains a boolean array.
+   *
    * @return True if the entry value is of boolean array type.
    */
   public boolean isBooleanArray() {
@@ -113,6 +123,7 @@ public final class NetworkTableValue {
 
   /**
    * Determine if entry value contains a double array.
+   *
    * @return True if the entry value is of double array type.
    */
   public boolean isDoubleArray() {
@@ -121,6 +132,7 @@ public final class NetworkTableValue {
 
   /**
    * Determine if entry value contains a string array.
+   *
    * @return True if the entry value is of string array type.
    */
   public boolean isStringArray() {
@@ -133,6 +145,7 @@ public final class NetworkTableValue {
 
   /**
    * Get the entry's boolean value.
+   *
    * @return The boolean value.
    * @throws ClassCastException if the entry value is not of boolean type.
    */
@@ -145,6 +158,7 @@ public final class NetworkTableValue {
 
   /**
    * Get the entry's double value.
+   *
    * @return The double value.
    * @throws ClassCastException if the entry value is not of double type.
    */
@@ -157,6 +171,7 @@ public final class NetworkTableValue {
 
   /**
    * Get the entry's string value.
+   *
    * @return The string value.
    * @throws ClassCastException if the entry value is not of string type.
    */
@@ -169,6 +184,7 @@ public final class NetworkTableValue {
 
   /**
    * Get the entry's raw value.
+   *
    * @return The raw value.
    * @throws ClassCastException if the entry value is not of raw type.
    */
@@ -181,6 +197,7 @@ public final class NetworkTableValue {
 
   /**
    * Get the entry's rpc definition value.
+   *
    * @return The rpc definition value.
    * @throws ClassCastException if the entry value is not of rpc definition type.
    */
@@ -193,6 +210,7 @@ public final class NetworkTableValue {
 
   /**
    * Get the entry's boolean array value.
+   *
    * @return The boolean array value.
    * @throws ClassCastException if the entry value is not of boolean array type.
    */
@@ -205,6 +223,7 @@ public final class NetworkTableValue {
 
   /**
    * Get the entry's double array value.
+   *
    * @return The double array value.
    * @throws ClassCastException if the entry value is not of double array type.
    */
@@ -217,6 +236,7 @@ public final class NetworkTableValue {
 
   /**
    * Get the entry's string array value.
+   *
    * @return The string array value.
    * @throws ClassCastException if the entry value is not of string array type.
    */
@@ -233,6 +253,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a boolean entry value.
+   *
    * @param value the value
    * @return The entry value
    */
@@ -242,6 +263,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a boolean entry value.
+   *
    * @param value the value
    * @param time the creation time to use (instead of the current time)
    * @return The entry value
@@ -252,6 +274,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a double entry value.
+   *
    * @param value the value
    * @return The entry value
    */
@@ -261,6 +284,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a double entry value.
+   *
    * @param value the value
    * @param time the creation time to use (instead of the current time)
    * @return The entry value
@@ -271,6 +295,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a string entry value.
+   *
    * @param value the value
    * @return The entry value
    */
@@ -280,6 +305,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a string entry value.
+   *
    * @param value the value
    * @param time the creation time to use (instead of the current time)
    * @return The entry value
@@ -290,6 +316,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a raw entry value.
+   *
    * @param value the value
    * @return The entry value
    */
@@ -299,6 +326,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a raw entry value.
+   *
    * @param value the value
    * @param time the creation time to use (instead of the current time)
    * @return The entry value
@@ -309,6 +337,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a rpc entry value.
+   *
    * @param value the value
    * @return The entry value
    */
@@ -318,6 +347,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a rpc entry value.
+   *
    * @param value the value
    * @param time the creation time to use (instead of the current time)
    * @return The entry value
@@ -328,6 +358,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a boolean array entry value.
+   *
    * @param value the value
    * @return The entry value
    */
@@ -337,6 +368,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a boolean array entry value.
+   *
    * @param value the value
    * @param time the creation time to use (instead of the current time)
    * @return The entry value
@@ -347,6 +379,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a boolean array entry value.
+   *
    * @param value the value
    * @return The entry value
    */
@@ -356,6 +389,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a boolean array entry value.
+   *
    * @param value the value
    * @param time the creation time to use (instead of the current time)
    * @return The entry value
@@ -366,6 +400,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a double array entry value.
+   *
    * @param value the value
    * @return The entry value
    */
@@ -375,6 +410,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a double array entry value.
+   *
    * @param value the value
    * @param time the creation time to use (instead of the current time)
    * @return The entry value
@@ -385,6 +421,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a double array entry value.
+   *
    * @param value the value
    * @return The entry value
    */
@@ -394,6 +431,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a double array entry value.
+   *
    * @param value the value
    * @param time the creation time to use (instead of the current time)
    * @return The entry value
@@ -404,6 +442,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a string array entry value.
+   *
    * @param value the value
    * @return The entry value
    */
@@ -413,6 +452,7 @@ public final class NetworkTableValue {
 
   /**
    * Creates a string array entry value.
+   *
    * @param value the value
    * @param time the creation time to use (instead of the current time)
    * @return The entry value

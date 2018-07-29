@@ -31,11 +31,14 @@ using wpi::Twine;
 
 class NetworkTableInstance;
 
-/** NetworkTables Entry */
+/**
+ * NetworkTables Entry
+ * @ingroup ntcore_cpp_api
+ */
 class NetworkTableEntry final {
  public:
   /**
-   * Flag values (as returned by {@link #getFlags()}).
+   * Flag values (as returned by GetFlags()).
    */
   enum Flags { kPersistent = NT_PERSISTENT };
 
@@ -46,60 +49,70 @@ class NetworkTableEntry final {
 
   /**
    * Construct from native handle.
+   *
    * @param handle Native handle
    */
   explicit NetworkTableEntry(NT_Entry handle);
 
   /**
    * Determines if the native handle is valid.
+   *
    * @return True if the native handle is valid, false otherwise.
    */
   explicit operator bool() const { return m_handle != 0; }
 
   /**
    * Gets the native handle for the entry.
+   *
    * @return Native handle
    */
   NT_Entry GetHandle() const;
 
   /**
    * Gets the instance for the entry.
+   *
    * @return Instance
    */
   NetworkTableInstance GetInstance() const;
 
   /**
    * Determines if the entry currently exists.
+   *
    * @return True if the entry exists, false otherwise.
    */
   bool Exists() const;
 
   /**
    * Gets the name of the entry (the key).
+   *
    * @return the entry's name
    */
   std::string GetName() const;
 
   /**
    * Gets the type of the entry.
+   *
    * @return the entry's type
    */
   NetworkTableType GetType() const;
 
   /**
    * Returns the flags.
+   *
    * @return the flags (bitmask)
    */
   unsigned int GetFlags() const;
 
   /**
    * Gets the last time the entry's value was changed.
+   *
    * @return Entry last change time
    */
   uint64_t GetLastChange() const;
 
   /**
    * Gets combined information about the entry.
+   *
    * @return Entry information
    */
   EntryInfo GetInfo() const;
@@ -150,6 +163,7 @@ class NetworkTableEntry final {
   /**
    * Gets the entry's value as a boolean array. If the entry does not exist
    * or is of different type, it will return the default value.
+   *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    *
@@ -165,6 +179,7 @@ class NetworkTableEntry final {
   /**
    * Gets the entry's value as a double array. If the entry does not exist
    * or is of different type, it will return the default value.
+   *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    *
@@ -176,6 +191,7 @@ class NetworkTableEntry final {
   /**
    * Gets the entry's value as a string array. If the entry does not exist
    * or is of different type, it will return the default value.
+   *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    *
@@ -187,6 +203,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value if it does not exist.
+   *
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
@@ -194,6 +211,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value if it does not exist.
+   *
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
@@ -201,6 +219,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value if it does not exist.
+   *
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
@@ -208,6 +227,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value if it does not exist.
+   *
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
@@ -215,6 +235,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value if it does not exist.
+   *
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
@@ -222,6 +243,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value if it does not exist.
+   *
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
@@ -229,6 +251,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value if it does not exist.
+   *
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
@@ -236,6 +259,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value if it does not exist.
+   *
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
@@ -243,6 +267,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value.
+   *
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
@@ -250,6 +275,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value.
+   *
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
@@ -257,6 +283,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value.
+   *
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
@@ -264,6 +291,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value.
+   *
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
@@ -271,6 +299,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value.
+   *
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
@@ -278,6 +307,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value.
+   *
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
@@ -285,6 +315,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value.
+   *
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
@@ -292,6 +323,7 @@ class NetworkTableEntry final {
 
   /**
    * Sets the entry's value.
+   *
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
@@ -300,6 +332,7 @@ class NetworkTableEntry final {
   /**
    * Sets the entry's value.  If the value is of different type, the type is
    * changed to match the new value.
+   *
    * @param value the value to set
    */
   void ForceSetValue(std::shared_ptr<Value> value);
@@ -307,6 +340,7 @@ class NetworkTableEntry final {
   /**
    * Sets the entry's value.  If the value is of different type, the type is
    * changed to match the new value.
+   *
    * @param value the value to set
    */
   void ForceSetBoolean(bool value);
@@ -314,6 +348,7 @@ class NetworkTableEntry final {
   /**
    * Sets the entry's value.  If the value is of different type, the type is
    * changed to match the new value.
+   *
    * @param value the value to set
    */
   void ForceSetDouble(double value);
@@ -321,6 +356,7 @@ class NetworkTableEntry final {
   /**
    * Sets the entry's value.  If the value is of different type, the type is
    * changed to match the new value.
+   *
    * @param value the value to set
    */
   void ForceSetString(const Twine& value);
@@ -328,6 +364,7 @@ class NetworkTableEntry final {
   /**
    * Sets the entry's value.  If the value is of different type, the type is
    * changed to match the new value.
+   *
    * @param value the value to set
    */
   void ForceSetRaw(StringRef value);
@@ -335,6 +372,7 @@ class NetworkTableEntry final {
   /**
    * Sets the entry's value.  If the value is of different type, the type is
    * changed to match the new value.
+   *
    * @param value the value to set
    */
   void ForceSetBooleanArray(ArrayRef<int> value);
@@ -342,6 +380,7 @@ class NetworkTableEntry final {
   /**
    * Sets the entry's value.  If the value is of different type, the type is
    * changed to match the new value.
+   *
    * @param value the value to set
    */
   void ForceSetDoubleArray(ArrayRef<double> value);
@@ -349,18 +388,21 @@ class NetworkTableEntry final {
   /**
    * Sets the entry's value.  If the value is of different type, the type is
    * changed to match the new value.
+   *
    * @param value the value to set
    */
   void ForceSetStringArray(ArrayRef<std::string> value);
 
   /**
    * Sets flags.
+   *
    * @param flags the flags to set (bitmask)
    */
   void SetFlags(unsigned int flags);
 
   /**
    * Clears flags.
+   *
    * @param flags the flags to clear (bitmask)
    */
   void ClearFlags(unsigned int flags);
@@ -377,6 +419,7 @@ class NetworkTableEntry final {
 
   /**
    * Returns whether the value is persistent through program restarts.
+   *
    * @return True if the value is persistent.
    */
   bool IsPersistent() const;
@@ -390,6 +433,7 @@ class NetworkTableEntry final {
    * Create a callback-based RPC entry point.  Only valid to use on the server.
    * The callback function will be called when the RPC is called.
    * This function creates RPC version 0 definitions (raw data in and out).
+   *
    * @param callback  callback function
    */
   void CreateRpc(std::function<void(const RpcAnswer& answer)> callback);
@@ -407,6 +451,7 @@ class NetworkTableEntry final {
    * This function is non-blocking.  Either RpcCall::GetResult() or
    * RpcCall::CancelResult() must be called on the return value to either
    * get or ignore the result of the call.
+   *
    * @param params      parameter
    * @return RPC call object.
    */
@@ -425,6 +470,7 @@ class NetworkTableEntry final {
 
   /**
    * Remove an entry listener.
+   *
    * @param entry_listener Listener handle to remove
    */
   void RemoveListener(NT_EntryListener entry_listener);

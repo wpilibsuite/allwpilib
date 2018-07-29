@@ -31,6 +31,7 @@ public final class ConnectionNotification {
 
   /** Constructor.
    * This should generally only be used internally to NetworkTables.
+   *
    * @param inst Instance
    * @param listener Listener that was triggered
    * @param connected Connected if true

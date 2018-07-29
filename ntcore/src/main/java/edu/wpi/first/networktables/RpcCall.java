@@ -13,6 +13,7 @@ package edu.wpi.first.networktables;
 public final class RpcCall implements AutoCloseable {
   /** Constructor.
    * This should generally only be used internally to NetworkTables.
+   *
    * @param entry Entry
    * @param call Call handle
    */
@@ -38,6 +39,7 @@ public final class RpcCall implements AutoCloseable {
 
   /**
    * Determines if the native handle is valid.
+   *
    * @return True if the native handle is valid, false otherwise.
    */
   public boolean isValid() {
@@ -46,6 +48,7 @@ public final class RpcCall implements AutoCloseable {
 
   /**
    * Get the RPC entry.
+   *
    * @return NetworkTableEntry for the RPC.
    */
   public NetworkTableEntry getEntry() {
@@ -54,6 +57,7 @@ public final class RpcCall implements AutoCloseable {
 
   /**
    * Get the call native handle.
+   *
    * @return Native handle.
    */
   public int getCall() {
@@ -63,6 +67,7 @@ public final class RpcCall implements AutoCloseable {
   /**
    * Get the result (return value).  This function blocks until
    * the result is received.
+   *
    * @return Received result (output)
    */
   public byte[] getResult() {
@@ -76,6 +81,7 @@ public final class RpcCall implements AutoCloseable {
   /**
    * Get the result (return value).  This function blocks until
    * the result is received or it times out.
+   *
    * @param timeout     timeout, in seconds
    * @return Received result (output)
    */

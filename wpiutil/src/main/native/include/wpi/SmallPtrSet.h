@@ -383,7 +383,7 @@ public:
 private:
   /// Create an iterator that dereferences to same place as the given pointer.
   iterator makeIterator(const void *const *P) const {
-    return iterator(P, EndPointer(), *this);
+    return iterator(P, EndPointer());
   }
 };
 
