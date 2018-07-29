@@ -24,6 +24,7 @@ namespace cv {
 class Mat;
 }  // namespace cv
 
+/** CameraServer (cscore) namespace */
 namespace cs {
 
 /**

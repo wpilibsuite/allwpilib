@@ -10,6 +10,7 @@
 #include <chrono>
 #include <limits>
 
+/** WPILib Hardware Abstraction Layer (HAL) namespace */
 namespace hal {
 
 /**

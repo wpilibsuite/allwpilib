@@ -25,6 +25,7 @@
 
 #include "networktables/NetworkTableValue.h"
 
+/** NetworkTables (ntcore) namespace */
 namespace nt {
 
 /**
