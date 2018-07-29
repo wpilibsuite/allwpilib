@@ -17,7 +17,7 @@ public class VideoSink implements AutoCloseable {
     kUnknown(0), kMjpeg(2), kCv(4);
 
     @SuppressWarnings("MemberName")
-    private int value;
+    private final int value;
 
     Kind(int value) {
       this.value = value;

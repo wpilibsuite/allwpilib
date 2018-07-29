@@ -110,7 +110,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
   /**
    * Used internally for when Tolerance hasn't been set.
    */
-  public class NullTolerance implements Tolerance {
+  public static class NullTolerance implements Tolerance {
     @Override
     public boolean onTarget() {
       throw new IllegalStateException("No tolerance value set when calling onTarget().");

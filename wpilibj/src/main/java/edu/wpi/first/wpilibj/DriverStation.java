@@ -34,12 +34,12 @@ public class DriverStation {
    */
   public static final int kJoystickPorts = 6;
 
-  private class HALJoystickButtons {
+  private static class HALJoystickButtons {
     public int m_buttons;
     public byte m_count;
   }
 
-  private class HALJoystickAxes {
+  private static class HALJoystickAxes {
     public float[] m_axes;
     public short m_count;
 
@@ -48,7 +48,7 @@ public class DriverStation {
     }
   }
 
-  private class HALJoystickPOVs {
+  private static class HALJoystickPOVs {
     public short[] m_povs;
     public short m_count;
 

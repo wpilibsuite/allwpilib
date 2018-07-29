@@ -54,7 +54,7 @@ public class PDPSim {
     return new CallbackStore(m_index, channel, uid, PDPDataJNI::cancelCurrentCallback);
   }
   public double getCurrent(int channel) {
-    return PDPDataJNI.getCurrent(channel, m_index);
+    return PDPDataJNI.getCurrent(m_index, channel);
   }
   public void setCurrent(int channel, double current) {
     PDPDataJNI.setCurrent(m_index, channel, current);

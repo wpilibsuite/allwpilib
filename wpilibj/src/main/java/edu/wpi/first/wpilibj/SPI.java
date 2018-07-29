@@ -22,7 +22,7 @@ public class SPI implements AutoCloseable {
     kOnboardCS0(0), kOnboardCS1(1), kOnboardCS2(2), kOnboardCS3(3), kMXP(4);
 
     @SuppressWarnings("MemberName")
-    public int value;
+    public final int value;
 
     Port(int value) {
       this.value = value;
@@ -188,6 +188,7 @@ public class SPI implements AutoCloseable {
    *
    * @param dataToSend The buffer containing the data to send.
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public int write(ByteBuffer dataToSend, int size) {
     if (dataToSend.hasArray()) {
       return write(dataToSend.array(), size);
@@ -232,6 +233,7 @@ public class SPI implements AutoCloseable {
    * @param dataReceived The buffer to be filled with the received data.
    * @param size         The length of the transaction, in bytes
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public int read(boolean initiate, ByteBuffer dataReceived, int size) {
     if (dataReceived.hasArray()) {
       return read(initiate, dataReceived.array(), size);
@@ -269,7 +271,7 @@ public class SPI implements AutoCloseable {
    * @param dataReceived Buffer to receive data from the device.
    * @param size         The length of the transaction, in bytes
    */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "ByteBufferBackingArray"})
   public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, int size) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {
       return transaction(dataToSend.array(), dataReceived.array(), size);
@@ -376,6 +378,7 @@ public class SPI implements AutoCloseable {
    * @param timeout timeout in seconds (ms resolution)
    * @return Number of bytes remaining to be read
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public int readAutoReceivedData(ByteBuffer buffer, int numToRead, double timeout) {
     if (buffer.hasArray()) {
       return readAutoReceivedData(buffer.array(), numToRead, timeout);

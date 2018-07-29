@@ -483,7 +483,7 @@ public class NetworkTable implements ITable, IRemote {
     public int uid;
   }
 
-  private class OldTableListenerAdapter extends ListenerBase implements Consumer<EntryNotification> {
+  private static class OldTableListenerAdapter extends ListenerBase implements Consumer<EntryNotification> {
     private final int prefixLen;
     private final ITable targetSource;
     private final ITableListener targetListener;
@@ -539,7 +539,7 @@ public class NetworkTable implements ITable, IRemote {
     addTableListenerEx(key, listener, flags);
   }
 
-  private class OldKeyListenerAdapter extends ListenerBase implements Consumer<EntryNotification> {
+  private static class OldKeyListenerAdapter extends ListenerBase implements Consumer<EntryNotification> {
     private final String relativeKey;
     private final ITable targetSource;
     private final ITableListener targetListener;
@@ -587,7 +587,7 @@ public class NetworkTable implements ITable, IRemote {
     addSubTableListener(listener, false);
   }
 
-  private class OldSubListenerAdapter extends ListenerBase implements Consumer<EntryNotification> {
+  private static class OldSubListenerAdapter extends ListenerBase implements Consumer<EntryNotification> {
     private final int prefixLen;
     private final ITable targetSource;
     private final ITableListener targetListener;

@@ -34,7 +34,7 @@ public class Relay extends SendableBase implements MotorSafety {
    * This class represents errors in trying to set relay values contradictory to the direction to
    * which the relay is set.
    */
-  public class InvalidValueException extends RuntimeException {
+  public static class InvalidValueException extends RuntimeException {
     /**
      * Create a new exception with the given message.
      *

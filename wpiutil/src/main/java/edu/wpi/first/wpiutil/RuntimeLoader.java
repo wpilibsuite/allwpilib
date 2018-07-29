@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.DigestInputStream;
@@ -67,7 +68,7 @@ public final class RuntimeLoader<T> {
         if (hashIs == null) {
           throw new IOException(hashName + " Resource not found");
         }
-        try (Scanner scanner = new Scanner(hashIs)) {
+        try (Scanner scanner = new Scanner(hashIs, StandardCharsets.UTF_8.name())) {
           String hash = scanner.nextLine();
           File jniLibrary = new File(m_extractionRoot, resname + "." + hash);
           try {
