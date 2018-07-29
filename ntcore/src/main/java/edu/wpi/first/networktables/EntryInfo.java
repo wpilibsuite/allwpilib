@@ -33,6 +33,7 @@ public final class EntryInfo {
 
   /** Constructor.
    * This should generally only be used internally to NetworkTables.
+   *
    * @param inst Instance
    * @param entry Entry handle
    * @param name Name
@@ -58,6 +59,7 @@ public final class EntryInfo {
 
   /**
    * Get the entry as an object.
+   *
    * @return NetworkTableEntry for this entry.
    */
   NetworkTableEntry getEntry() {

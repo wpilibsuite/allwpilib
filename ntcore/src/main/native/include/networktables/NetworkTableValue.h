@@ -31,6 +31,7 @@ using wpi::Twine;
 
 /**
  * A network table entry value.
+ * @ingroup ntcore_cpp_api
  */
 class Value final {
   struct private_init {};
@@ -42,83 +43,96 @@ class Value final {
 
   /**
    * Get the data type.
+   *
    * @return The type.
    */
   NT_Type type() const { return m_val.type; }
 
   /**
    * Get the data value stored.
+   *
    * @return The type.
    */
   const NT_Value& value() const { return m_val; }
 
   /**
    * Get the creation time of the value.
+   *
    * @return The time, in the units returned by nt::Now().
    */
   uint64_t last_change() const { return m_val.last_change; }
 
   /**
    * Get the creation time of the value.
+   *
    * @return The time, in the units returned by nt::Now().
    */
   uint64_t time() const { return m_val.last_change; }
 
   /**
-   * @defgroup TypeCheckers Type Checkers
    * @{
+   * @name Type Checkers
    */
 
   /**
    * Determine if entry value contains a value or is unassigned.
+   *
    * @return True if the entry value contains a value.
    */
   bool IsValid() const { return m_val.type != NT_UNASSIGNED; }
 
   /**
    * Determine if entry value contains a boolean.
+   *
    * @return True if the entry value is of boolean type.
    */
   bool IsBoolean() const { return m_val.type == NT_BOOLEAN; }
 
   /**
    * Determine if entry value contains a double.
+   *
    * @return True if the entry value is of double type.
    */
   bool IsDouble() const { return m_val.type == NT_DOUBLE; }
 
   /**
    * Determine if entry value contains a string.
+   *
    * @return True if the entry value is of string type.
    */
   bool IsString() const { return m_val.type == NT_STRING; }
 
   /**
    * Determine if entry value contains a raw.
+   *
    * @return True if the entry value is of raw type.
    */
   bool IsRaw() const { return m_val.type == NT_RAW; }
 
   /**
    * Determine if entry value contains a rpc definition.
+   *
    * @return True if the entry value is of rpc definition type.
    */
   bool IsRpc() const { return m_val.type == NT_RPC; }
 
   /**
    * Determine if entry value contains a boolean array.
+   *
    * @return True if the entry value is of boolean array type.
    */
   bool IsBooleanArray() const { return m_val.type == NT_BOOLEAN_ARRAY; }
 
   /**
    * Determine if entry value contains a double array.
+   *
    * @return True if the entry value is of double array type.
    */
   bool IsDoubleArray() const { return m_val.type == NT_DOUBLE_ARRAY; }
 
   /**
    * Determine if entry value contains a string array.
+   *
    * @return True if the entry value is of string array type.
    */
   bool IsStringArray() const { return m_val.type == NT_STRING_ARRAY; }
@@ -126,12 +140,13 @@ class Value final {
   /** @} */
 
   /**
-   * @defgroup TypeSafeGetters Type-Safe Getters
    * @{
+   * @name Type-Safe Getters
    */
 
   /**
    * Get the entry's boolean value.
+   *
    * @return The boolean value.
    */
   bool GetBoolean() const {
@@ -141,6 +156,7 @@ class Value final {
 
   /**
    * Get the entry's double value.
+   *
    * @return The double value.
    */
   double GetDouble() const {
@@ -150,6 +166,7 @@ class Value final {
 
   /**
    * Get the entry's string value.
+   *
    * @return The string value.
    */
   StringRef GetString() const {
@@ -159,6 +176,7 @@ class Value final {
 
   /**
    * Get the entry's raw value.
+   *
    * @return The raw value.
    */
   StringRef GetRaw() const {
@@ -168,6 +186,7 @@ class Value final {
 
   /**
    * Get the entry's rpc definition value.
+   *
    * @return The rpc definition value.
    */
   StringRef GetRpc() const {
@@ -177,6 +196,7 @@ class Value final {
 
   /**
    * Get the entry's boolean array value.
+   *
    * @return The boolean array value.
    */
   ArrayRef<int> GetBooleanArray() const {
@@ -187,6 +207,7 @@ class Value final {
 
   /**
    * Get the entry's double array value.
+   *
    * @return The double array value.
    */
   ArrayRef<double> GetDoubleArray() const {
@@ -197,6 +218,7 @@ class Value final {
 
   /**
    * Get the entry's string array value.
+   *
    * @return The string array value.
    */
   ArrayRef<std::string> GetStringArray() const {
@@ -207,12 +229,13 @@ class Value final {
   /** @} */
 
   /**
-   * @defgroup Factories Factory functions
    * @{
+   * @name Factory functions
    */
 
   /**
    * Creates a boolean entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
@@ -226,6 +249,7 @@ class Value final {
 
   /**
    * Creates a double entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
@@ -239,6 +263,7 @@ class Value final {
 
   /**
    * Creates a string entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
@@ -255,6 +280,7 @@ class Value final {
 
 /**
  * Creates a string entry value.
+ *
  * @param value the value
  * @param time if nonzero, the creation time to use (instead of the current
  *             time)
@@ -277,6 +303,7 @@ class Value final {
 
   /**
    * Creates a raw entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
@@ -292,6 +319,7 @@ class Value final {
 
 /**
  * Creates a raw entry value.
+ *
  * @param value the value
  * @param time if nonzero, the creation time to use (instead of the current
  *             time)
@@ -314,6 +342,7 @@ class Value final {
 
   /**
    * Creates a rpc entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
@@ -329,6 +358,7 @@ class Value final {
 
   /**
    * Creates a rpc entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
@@ -345,6 +375,7 @@ class Value final {
 
   /**
    * Creates a boolean array entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
@@ -355,6 +386,7 @@ class Value final {
 
   /**
    * Creates a double array entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
@@ -365,6 +397,7 @@ class Value final {
 
   /**
    * Creates a string array entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
@@ -373,7 +406,16 @@ class Value final {
   static std::shared_ptr<Value> MakeStringArray(ArrayRef<std::string> value,
                                                 uint64_t time = 0);
 
-  // Note: This function moves the values out of the vector.
+  /**
+   * Creates a string array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   *
+   * @note This function moves the values out of the vector.
+   */
   static std::shared_ptr<Value> MakeStringArray(
       std::vector<std::string>&& value, uint64_t time = 0);
 
@@ -394,7 +436,10 @@ inline bool operator!=(const Value& lhs, const Value& rhs) {
   return !(lhs == rhs);
 }
 
-/** NetworkTable Value alias for similarity with Java. */
+/**
+ * NetworkTable Value alias for similarity with Java.
+ * @ingroup ntcore_cpp_api
+ */
 typedef Value NetworkTableValue;
 
 }  // namespace nt

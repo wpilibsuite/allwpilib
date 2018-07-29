@@ -52,6 +52,7 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Construct from native handle.
+   *
    * @param handle Native handle
    */
   private NetworkTableInstance(int handle) {
@@ -76,6 +77,7 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Determines if the native handle is valid.
+   *
    * @return True if the native handle is valid, false otherwise.
    */
   public boolean isValid() {
@@ -87,6 +89,7 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Get global default instance.
+   *
    * @return Global default instance
    */
   public static synchronized NetworkTableInstance getDefault() {
@@ -100,6 +103,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * Create an instance.
    * Note: A reference to the returned instance must be retained to ensure the
    * instance is not garbage collected.
+   *
    * @return Newly created instance
    */
   public static NetworkTableInstance create() {
@@ -110,6 +114,7 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Gets the native handle for the entry.
+   *
    * @return Native handle
    */
   public int getHandle() {
@@ -118,6 +123,7 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Gets the entry for a key.
+   *
    * @param name Key
    * @return Network table entry.
    */
@@ -330,6 +336,7 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Remove an entry listener.
+   *
    * @param listener Listener handle to remove
    */
   public void removeEntryListener(int listener) {
@@ -341,6 +348,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * for deterministic testing.  This blocks until either the entry listener
    * queue is empty (e.g. there are no more events that need to be passed along
    * to callbacks or poll queues) or the timeout expires.
+   *
    * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
    *                  or a negative value to block indefinitely
    * @return False if timed out, otherwise true.
@@ -465,6 +473,7 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Remove a connection listener.
+   *
    * @param listener Listener handle to remove
    */
   public void removeConnectionListener(int listener) {
@@ -482,6 +491,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * for deterministic testing.  This blocks until either the connection listener
    * queue is empty (e.g. there are no more events that need to be passed along
    * to callbacks or poll queues) or the timeout expires.
+   *
    * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
    *                  or a negative value to block indefinitely
    * @return False if timed out, otherwise true.
@@ -590,6 +600,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * Create a callback-based RPC entry point.  Only valid to use on the server.
    * The callback function will be called when the RPC is called.
    * This function creates RPC version 0 definitions (raw data in and out).
+   *
    * @param entry     the entry
    * @param callback  callback function
    */
@@ -612,6 +623,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * for deterministic testing.  This blocks until either the RPC call
    * queue is empty (e.g. there are no more events that need to be passed along
    * to callbacks or poll queues) or the timeout expires.
+   *
    * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
    *                  or a negative value to block indefinitely
    * @return False if timed out, otherwise true.
@@ -652,6 +664,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * Set the network identity of this node.
    * This is the name used during the initial connection handshake, and is
    * visible through ConnectionInfo on the remote node.
+   *
    * @param name      identity to advertise
    */
   public void setNetworkIdentity(String name) {
@@ -660,6 +673,7 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Get the current network mode.
+   *
    * @return Bitmask of NetworkMode.
    */
   public int getNetworkMode() {
@@ -934,6 +948,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   /**
    * Gets information on the currently established network connections.
    * If operating as a client, this will return either zero or one values.
+   *
    * @return array of connection information
    */
   public ConnectionInfo[] getConnections() {
@@ -942,6 +957,7 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Return whether or not the instance is connected to another node.
+   *
    * @return True if connected.
    */
   public boolean isConnected() {
@@ -972,6 +988,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   /**
    * Save table values to a file.  The file format used is identical to
    * that used for SavePersistent.
+   *
    * @param filename  filename
    * @param prefix    save only keys starting with this prefix
    * @throws PersistentException if error saving file
@@ -983,6 +1000,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   /**
    * Load table values from a file.  The file format used is identical to
    * that used for SavePersistent / LoadPersistent.
+   *
    * @param filename  filename
    * @param prefix    load only keys starting with this prefix
    * @return List of warnings (errors result in an exception instead)
@@ -1074,6 +1092,7 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   /**
    * Remove a logger.
+   *
    * @param logger Logger handle to remove
    */
   public void removeLogger(int logger) {
@@ -1091,6 +1110,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * for deterministic testing.  This blocks until either the log event
    * queue is empty (e.g. there are no more events that need to be passed along
    * to callbacks or poll queues) or the timeout expires.
+   *
    * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
    *                  or a negative value to block indefinitely
    * @return False if timed out, otherwise true.

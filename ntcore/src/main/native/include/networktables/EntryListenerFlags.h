@@ -12,6 +12,7 @@
 
 namespace nt {
 
+/** Entry listener flags */
 namespace EntryListenerFlags {
 
 /**
@@ -26,15 +27,19 @@ namespace EntryListenerFlags {
  * By default, notifications are only generated for remote changes occurring
  * after the listener is created.  The constants kImmediate and kLocal are
  * modifiers that cause notifications to be generated at other times.
+ *
+ * @ingroup ntcore_cpp_api
  */
 enum {
-  /** Initial listener addition.
+  /**
+   * Initial listener addition.
    * Set this flag to receive immediate notification of entries matching the
    * flag criteria (generally only useful when combined with kNew).
    */
   kImmediate = NT_NOTIFY_IMMEDIATE,
 
-  /** Changed locally.
+  /**
+   * Changed locally.
    * Set this flag to receive notification of both local changes and changes
    * coming from remote nodes.  By default, notifications are only generated
    * for remote changes.  Must be combined with some combination of kNew,
@@ -43,23 +48,27 @@ enum {
    */
   kLocal = NT_NOTIFY_LOCAL,
 
-  /** Newly created entry.
+  /**
+   * Newly created entry.
    * Set this flag to receive a notification when an entry is created.
    */
   kNew = NT_NOTIFY_NEW,
 
-  /** Entry was deleted.
+  /**
+   * Entry was deleted.
    * Set this flag to receive a notification when an entry is deleted.
    */
   kDelete = NT_NOTIFY_DELETE,
 
-  /** Entry's value changed.
+  /**
+   * Entry's value changed.
    * Set this flag to receive a notification when an entry's value (or type)
    * changes.
    */
   kUpdate = NT_NOTIFY_UPDATE,
 
-  /** Entry's flags changed.
+  /**
+   * Entry's flags changed.
    * Set this flag to receive a notification when an entry's flags value
    * changes.
    */

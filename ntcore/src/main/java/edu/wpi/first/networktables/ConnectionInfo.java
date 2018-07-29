@@ -46,6 +46,7 @@ public final class ConnectionInfo {
 
   /** Constructor.
    * This should generally only be used internally to NetworkTables.
+   *
    * @param remoteId Remote identifier
    * @param remoteIp Remote IP address
    * @param remotePort Remote port number
