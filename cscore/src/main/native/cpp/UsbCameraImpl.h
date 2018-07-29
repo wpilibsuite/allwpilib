@@ -21,6 +21,7 @@
 
 #include <wpi/STLExtras.h>
 #include <wpi/SmallVector.h>
+#include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/raw_istream.h>
@@ -34,14 +35,14 @@ namespace cs {
 
 class UsbCameraImpl : public SourceImpl {
  public:
-  UsbCameraImpl(wpi::StringRef name, wpi::StringRef path);
+  UsbCameraImpl(const wpi::Twine& name, const wpi::Twine& path);
   ~UsbCameraImpl() override;
 
   void Start();
 
   // Property functions
   void SetProperty(int property, int value, CS_Status* status) override;
-  void SetStringProperty(int property, wpi::StringRef value,
+  void SetStringProperty(int property, const wpi::Twine& value,
                          CS_Status* status) override;
 
   // Standard common camera properties
@@ -93,7 +94,7 @@ class UsbCameraImpl : public SourceImpl {
 
  protected:
   std::unique_ptr<PropertyImpl> CreateEmptyProperty(
-      wpi::StringRef name) const override;
+      const wpi::Twine& name) const override;
 
   // Cache properties.  Immediately successful if properties are already cached.
   // If they are not, tries to connect to the camera to do so; returns false and

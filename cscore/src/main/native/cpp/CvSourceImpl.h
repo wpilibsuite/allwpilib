@@ -20,7 +20,7 @@ namespace cs {
 
 class CvSourceImpl : public SourceImpl {
  public:
-  CvSourceImpl(wpi::StringRef name, const VideoMode& mode);
+  CvSourceImpl(const wpi::Twine& name, const VideoMode& mode);
   ~CvSourceImpl() override;
 
   void Start();
@@ -32,10 +32,10 @@ class CvSourceImpl : public SourceImpl {
 
   // OpenCV-specific functions
   void PutFrame(cv::Mat& image);
-  void NotifyError(wpi::StringRef msg);
-  int CreateProperty(wpi::StringRef name, CS_PropertyKind kind, int minimum,
+  void NotifyError(const wpi::Twine& msg);
+  int CreateProperty(const wpi::Twine& name, CS_PropertyKind kind, int minimum,
                      int maximum, int step, int defaultValue, int value);
-  int CreateProperty(wpi::StringRef name, CS_PropertyKind kind, int minimum,
+  int CreateProperty(const wpi::Twine& name, CS_PropertyKind kind, int minimum,
                      int maximum, int step, int defaultValue, int value,
                      std::function<void(CS_Property property)> onChange);
   void SetEnumPropertyChoices(int property, wpi::ArrayRef<std::string> choices,

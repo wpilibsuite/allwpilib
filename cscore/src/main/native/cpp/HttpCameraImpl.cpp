@@ -21,7 +21,7 @@
 
 using namespace cs;
 
-HttpCameraImpl::HttpCameraImpl(wpi::StringRef name, CS_HttpCameraKind kind)
+HttpCameraImpl::HttpCameraImpl(const wpi::Twine& name, CS_HttpCameraKind kind)
     : SourceImpl{name}, m_kind{kind} {}
 
 HttpCameraImpl::~HttpCameraImpl() {
@@ -332,11 +332,11 @@ std::vector<std::string> HttpCameraImpl::GetUrls() const {
   return urls;
 }
 
-void HttpCameraImpl::CreateProperty(wpi::StringRef name,
-                                    wpi::StringRef httpParam, bool viaSettings,
-                                    CS_PropertyKind kind, int minimum,
-                                    int maximum, int step, int defaultValue,
-                                    int value) const {
+void HttpCameraImpl::CreateProperty(const wpi::Twine& name,
+                                    const wpi::Twine& httpParam,
+                                    bool viaSettings, CS_PropertyKind kind,
+                                    int minimum, int maximum, int step,
+                                    int defaultValue, int value) const {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   m_propertyData.emplace_back(wpi::make_unique<PropertyData>(
       name, httpParam, viaSettings, kind, minimum, maximum, step, defaultValue,
@@ -344,12 +344,12 @@ void HttpCameraImpl::CreateProperty(wpi::StringRef name,
 
   Notifier::GetInstance().NotifySourceProperty(
       *this, CS_SOURCE_PROPERTY_CREATED, name, m_propertyData.size() + 1, kind,
-      value, wpi::StringRef{});
+      value, wpi::Twine{});
 }
 
 template <typename T>
 void HttpCameraImpl::CreateEnumProperty(
-    wpi::StringRef name, wpi::StringRef httpParam, bool viaSettings,
+    const wpi::Twine& name, const wpi::Twine& httpParam, bool viaSettings,
     int defaultValue, int value, std::initializer_list<T> choices) const {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   m_propertyData.emplace_back(wpi::make_unique<PropertyData>(
@@ -362,14 +362,14 @@ void HttpCameraImpl::CreateEnumProperty(
 
   Notifier::GetInstance().NotifySourceProperty(
       *this, CS_SOURCE_PROPERTY_CREATED, name, m_propertyData.size() + 1,
-      CS_PROP_ENUM, value, wpi::StringRef{});
+      CS_PROP_ENUM, value, wpi::Twine{});
   Notifier::GetInstance().NotifySourceProperty(
       *this, CS_SOURCE_PROPERTY_CHOICES_UPDATED, name,
-      m_propertyData.size() + 1, CS_PROP_ENUM, value, wpi::StringRef{});
+      m_propertyData.size() + 1, CS_PROP_ENUM, value, wpi::Twine{});
 }
 
 std::unique_ptr<PropertyImpl> HttpCameraImpl::CreateEmptyProperty(
-    wpi::StringRef name) const {
+    const wpi::Twine& name) const {
   return wpi::make_unique<PropertyData>(name);
 }
 
@@ -390,7 +390,7 @@ void HttpCameraImpl::SetProperty(int property, int value, CS_Status* status) {
   // TODO
 }
 
-void HttpCameraImpl::SetStringProperty(int property, wpi::StringRef value,
+void HttpCameraImpl::SetStringProperty(int property, const wpi::Twine& value,
                                        CS_Status* status) {
   // TODO
 }
@@ -474,7 +474,7 @@ bool AxisCameraImpl::CacheProperties(CS_Status* status) const {
 
 namespace cs {
 
-CS_Source CreateHttpCamera(wpi::StringRef name, wpi::StringRef url,
+CS_Source CreateHttpCamera(const wpi::Twine& name, const wpi::Twine& url,
                            CS_HttpCameraKind kind, CS_Status* status) {
   std::shared_ptr<HttpCameraImpl> source;
   switch (kind) {
@@ -485,8 +485,7 @@ CS_Source CreateHttpCamera(wpi::StringRef name, wpi::StringRef url,
       source = std::make_shared<HttpCameraImpl>(name, kind);
       break;
   }
-  std::string urlCopy{url};
-  if (!source->SetUrls(urlCopy, status)) return 0;
+  if (!source->SetUrls(url.str(), status)) return 0;
   auto handle = Sources::GetInstance().Allocate(CS_SOURCE_HTTP, source);
   auto& notifier = Notifier::GetInstance();
   notifier.NotifySource(name, handle, CS_SOURCE_CREATED);
@@ -494,7 +493,8 @@ CS_Source CreateHttpCamera(wpi::StringRef name, wpi::StringRef url,
   return handle;
 }
 
-CS_Source CreateHttpCamera(wpi::StringRef name, wpi::ArrayRef<std::string> urls,
+CS_Source CreateHttpCamera(const wpi::Twine& name,
+                           wpi::ArrayRef<std::string> urls,
                            CS_HttpCameraKind kind, CS_Status* status) {
   if (urls.empty()) {
     *status = CS_EMPTY_VALUE;

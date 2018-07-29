@@ -21,7 +21,7 @@
 
 using namespace cs;
 
-CvSourceImpl::CvSourceImpl(wpi::StringRef name, const VideoMode& mode)
+CvSourceImpl::CvSourceImpl(const wpi::Twine& name, const VideoMode& mode)
     : SourceImpl{name} {
   m_mode = mode;
   m_videoModes.push_back(m_mode);
@@ -82,11 +82,11 @@ void CvSourceImpl::PutFrame(cv::Mat& image) {
   SourceImpl::PutFrame(std::move(dest), wpi::Now());
 }
 
-void CvSourceImpl::NotifyError(wpi::StringRef msg) {
+void CvSourceImpl::NotifyError(const wpi::Twine& msg) {
   PutError(msg, wpi::Now());
 }
 
-int CvSourceImpl::CreateProperty(wpi::StringRef name, CS_PropertyKind kind,
+int CvSourceImpl::CreateProperty(const wpi::Twine& name, CS_PropertyKind kind,
                                  int minimum, int maximum, int step,
                                  int defaultValue, int value) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
@@ -106,13 +106,12 @@ int CvSourceImpl::CreateProperty(wpi::StringRef name, CS_PropertyKind kind,
                                      value = prop.value;
                                    });
   Notifier::GetInstance().NotifySourceProperty(
-      *this, CS_SOURCE_PROPERTY_CREATED, name, ndx, kind, value,
-      wpi::StringRef{});
+      *this, CS_SOURCE_PROPERTY_CREATED, name, ndx, kind, value, wpi::Twine{});
   return ndx;
 }
 
 int CvSourceImpl::CreateProperty(
-    wpi::StringRef name, CS_PropertyKind kind, int minimum, int maximum,
+    const wpi::Twine& name, CS_PropertyKind kind, int minimum, int maximum,
     int step, int defaultValue, int value,
     std::function<void(CS_Property property)> onChange) {
   // TODO
@@ -135,12 +134,12 @@ void CvSourceImpl::SetEnumPropertyChoices(int property,
   prop->enumChoices = choices;
   Notifier::GetInstance().NotifySourceProperty(
       *this, CS_SOURCE_PROPERTY_CHOICES_UPDATED, prop->name, property,
-      CS_PROP_ENUM, prop->value, wpi::StringRef{});
+      CS_PROP_ENUM, prop->value, wpi::Twine{});
 }
 
 namespace cs {
 
-CS_Source CreateCvSource(wpi::StringRef name, const VideoMode& mode,
+CS_Source CreateCvSource(const wpi::Twine& name, const VideoMode& mode,
                          CS_Status* status) {
   auto source = std::make_shared<CvSourceImpl>(name, mode);
   auto handle = Sources::GetInstance().Allocate(CS_SOURCE_CV, source);
@@ -163,7 +162,7 @@ void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status) {
   static_cast<CvSourceImpl&>(*data->source).PutFrame(image);
 }
 
-void NotifySourceError(CS_Source source, wpi::StringRef msg,
+void NotifySourceError(CS_Source source, const wpi::Twine& msg,
                        CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data || data->kind != CS_SOURCE_CV) {
@@ -182,7 +181,7 @@ void SetSourceConnected(CS_Source source, bool connected, CS_Status* status) {
   static_cast<CvSourceImpl&>(*data->source).SetConnected(connected);
 }
 
-void SetSourceDescription(CS_Source source, wpi::StringRef description,
+void SetSourceDescription(CS_Source source, const wpi::Twine& description,
                           CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data || data->kind != CS_SOURCE_CV) {
@@ -192,7 +191,7 @@ void SetSourceDescription(CS_Source source, wpi::StringRef description,
   static_cast<CvSourceImpl&>(*data->source).SetDescription(description);
 }
 
-CS_Property CreateSourceProperty(CS_Source source, wpi::StringRef name,
+CS_Property CreateSourceProperty(CS_Source source, const wpi::Twine& name,
                                  CS_PropertyKind kind, int minimum, int maximum,
                                  int step, int defaultValue, int value,
                                  CS_Status* status) {
@@ -208,7 +207,7 @@ CS_Property CreateSourceProperty(CS_Source source, wpi::StringRef name,
 }
 
 CS_Property CreateSourcePropertyCallback(
-    CS_Source source, wpi::StringRef name, CS_PropertyKind kind, int minimum,
+    CS_Source source, const wpi::Twine& name, CS_PropertyKind kind, int minimum,
     int maximum, int step, int defaultValue, int value,
     std::function<void(CS_Property property)> onChange, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);

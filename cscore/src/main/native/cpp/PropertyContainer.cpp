@@ -9,12 +9,13 @@
 
 using namespace cs;
 
-int PropertyContainer::GetPropertyIndex(wpi::StringRef name) const {
+int PropertyContainer::GetPropertyIndex(const wpi::Twine& name) const {
   // We can't fail, so instead we create a new index if caching fails.
   CS_Status status = 0;
   if (!m_properties_cached) CacheProperties(&status);
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  int& ndx = m_properties[name];
+  wpi::SmallVector<char, 64> nameBuf;
+  int& ndx = m_properties[name.toStringRef(nameBuf)];
   if (ndx == 0) {
     // create a new index
     ndx = m_propertyData.size() + 1;
@@ -90,7 +91,7 @@ void PropertyContainer::SetProperty(int property, int value,
     return;
   }
 
-  UpdatePropertyValue(property, false, value, wpi::StringRef{});
+  UpdatePropertyValue(property, false, value, wpi::Twine{});
 }
 
 int PropertyContainer::GetPropertyMin(int property, CS_Status* status) const {
@@ -156,7 +157,7 @@ wpi::StringRef PropertyContainer::GetStringProperty(
   return wpi::StringRef(buf.data(), buf.size());
 }
 
-void PropertyContainer::SetStringProperty(int property, wpi::StringRef value,
+void PropertyContainer::SetStringProperty(int property, const wpi::Twine& value,
                                           CS_Status* status) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
@@ -194,7 +195,7 @@ std::vector<std::string> PropertyContainer::GetEnumPropertyChoices(
 }
 
 std::unique_ptr<PropertyImpl> PropertyContainer::CreateEmptyProperty(
-    wpi::StringRef name) const {
+    const wpi::Twine& name) const {
   return wpi::make_unique<PropertyImpl>(name);
 }
 

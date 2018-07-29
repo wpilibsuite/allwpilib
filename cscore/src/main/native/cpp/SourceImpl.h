@@ -16,6 +16,7 @@
 
 #include <wpi/ArrayRef.h>
 #include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
@@ -30,14 +31,14 @@ class SourceImpl : public PropertyContainer {
   friend class Frame;
 
  public:
-  explicit SourceImpl(wpi::StringRef name);
+  explicit SourceImpl(const wpi::Twine& name);
   virtual ~SourceImpl();
   SourceImpl(const SourceImpl& oth) = delete;
   SourceImpl& operator=(const SourceImpl& oth) = delete;
 
   wpi::StringRef GetName() const { return m_name; }
 
-  void SetDescription(wpi::StringRef description);
+  void SetDescription(const wpi::Twine& description);
   wpi::StringRef GetDescription(wpi::SmallVectorImpl<char>& buf) const;
 
   void SetConnected(bool connected);
@@ -117,12 +118,12 @@ class SourceImpl : public PropertyContainer {
  protected:
   void NotifyPropertyCreated(int propIndex, PropertyImpl& prop) override;
   void UpdatePropertyValue(int property, bool setString, int value,
-                           wpi::StringRef valueStr) override;
+                           const wpi::Twine& valueStr) override;
 
   void PutFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
                 wpi::StringRef data, Frame::Time time);
   void PutFrame(std::unique_ptr<Image> image, Frame::Time time);
-  void PutError(wpi::StringRef msg, Frame::Time time);
+  void PutError(const wpi::Twine& msg, Frame::Time time);
 
   // Notification functions for corresponding atomics
   virtual void NumSinksChanged() = 0;

@@ -18,7 +18,7 @@
 #include <wpi/NetworkStream.h>
 #include <wpi/SafeThread.h>
 #include <wpi/SmallVector.h>
-#include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/raw_socket_ostream.h>
@@ -31,8 +31,8 @@ class SourceImpl;
 
 class MjpegServerImpl : public SinkImpl {
  public:
-  MjpegServerImpl(wpi::StringRef name, wpi::StringRef listenAddress, int port,
-                  std::unique_ptr<wpi::NetworkAcceptor> acceptor);
+  MjpegServerImpl(const wpi::Twine& name, const wpi::Twine& listenAddress,
+                  int port, std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   ~MjpegServerImpl() override;
 
   void Stop();

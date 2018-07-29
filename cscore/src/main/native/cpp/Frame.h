@@ -15,6 +15,7 @@
 #include <vector>
 
 #include <wpi/SmallVector.h>
+#include <wpi/Twine.h>
 #include <wpi/mutex.h>
 
 #include "Image.h"
@@ -46,7 +47,7 @@ class Frame {
  public:
   Frame() noexcept : m_impl{nullptr} {}
 
-  Frame(SourceImpl& source, wpi::StringRef error, Time time);
+  Frame(SourceImpl& source, const wpi::Twine& error, Time time);
 
   Frame(SourceImpl& source, std::unique_ptr<Image> image, Time time);
 

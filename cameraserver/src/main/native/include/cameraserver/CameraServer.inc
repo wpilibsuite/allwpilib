@@ -20,7 +20,7 @@ inline cs::AxisCamera CameraServer::AddAxisCamera(
 
 template <typename T>
 inline cs::AxisCamera CameraServer::AddAxisCamera(
-    wpi::StringRef name, std::initializer_list<T> hosts) {
+    const wpi::Twine& name, std::initializer_list<T> hosts) {
   std::vector<std::string> vec;
   vec.reserve(hosts.size());
   for (const auto& host : hosts) vec.emplace_back(host);

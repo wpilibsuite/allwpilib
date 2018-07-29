@@ -9,18 +9,18 @@
 
 using namespace cs;
 
-PropertyImpl::PropertyImpl(wpi::StringRef name_) : name{name_} {}
-PropertyImpl::PropertyImpl(wpi::StringRef name_, CS_PropertyKind kind_,
+PropertyImpl::PropertyImpl(const wpi::Twine& name_) : name{name_.str()} {}
+PropertyImpl::PropertyImpl(const wpi::Twine& name_, CS_PropertyKind kind_,
                            int step_, int defaultValue_, int value_)
-    : name{name_},
+    : name{name_.str()},
       propKind{kind_},
       step{step_},
       defaultValue{defaultValue_},
       value{value_} {}
-PropertyImpl::PropertyImpl(wpi::StringRef name_, CS_PropertyKind kind_,
+PropertyImpl::PropertyImpl(const wpi::Twine& name_, CS_PropertyKind kind_,
                            int minimum_, int maximum_, int step_,
                            int defaultValue_, int value_)
-    : name{name_},
+    : name{name_.str()},
       propKind{kind_},
       hasMinimum{true},
       hasMaximum{true},
@@ -43,10 +43,11 @@ void PropertyImpl::SetValue(int v) {
   if (!wasValueSet || value != oldValue) changed();
 }
 
-void PropertyImpl::SetValue(wpi::StringRef v) {
+void PropertyImpl::SetValue(const wpi::Twine& v) {
   bool valueChanged = false;
-  if (valueStr != v) {
-    valueStr = v;
+  std::string vStr = v.str();
+  if (valueStr != vStr) {
+    valueStr = vStr;
     valueChanged = true;
   }
   bool wasValueSet = valueSet;

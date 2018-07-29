@@ -11,7 +11,7 @@
 #include <thread>
 #include <utility>
 
-#include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 
 namespace frc {
 class CameraServerShared {
@@ -19,9 +19,9 @@ class CameraServerShared {
   virtual void ReportUsbCamera(int id) = 0;
   virtual void ReportAxisCamera(int id) = 0;
   virtual void ReportVideoServer(int id) = 0;
-  virtual void SetCameraServerError(wpi::StringRef error) = 0;
-  virtual void SetVisionRunnerError(wpi::StringRef error) = 0;
-  virtual void ReportDriverStationError(wpi::StringRef error) = 0;
+  virtual void SetCameraServerError(const wpi::Twine& error) = 0;
+  virtual void SetVisionRunnerError(const wpi::Twine& error) = 0;
+  virtual void ReportDriverStationError(const wpi::Twine& error) = 0;
   virtual std::pair<std::thread::id, bool> GetRobotMainThreadId() const = 0;
 };
 
