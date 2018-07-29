@@ -13,6 +13,7 @@ package edu.wpi.cscore;
 public class UsbCameraInfo {
   /**
    * Create a new set of UsbCameraInfo.
+   *
    * @param dev Device number (e.g. N in '/dev/videoN' on Linux)
    * @param path Path to device if available (e.g. '/dev/video0' on Linux)
    * @param name Vendor/model name of the camera as provided by the USB driver

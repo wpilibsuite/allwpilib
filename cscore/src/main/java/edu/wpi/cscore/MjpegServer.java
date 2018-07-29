@@ -13,6 +13,7 @@ package edu.wpi.cscore;
 public class MjpegServer extends VideoSink {
   /**
    * Create a MJPEG-over-HTTP server sink.
+   *
    * @param name Sink name (arbitrary unique identifier)
    * @param listenAddress TCP listen address (empty string for all addresses)
    * @param port TCP port number
@@ -23,6 +24,7 @@ public class MjpegServer extends VideoSink {
 
   /**
    * Create a MJPEG-over-HTTP server sink.
+   *
    * @param name Sink name (arbitrary unique identifier)
    * @param port TCP port number
    */
