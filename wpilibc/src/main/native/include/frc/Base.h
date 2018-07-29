@@ -19,6 +19,7 @@ static_assert(0, "Visual Studio 2015 or greater required.");
 
 #define DEFAULT_MOVE_CONSTRUCTOR(ClassName) ClassName(ClassName&&) = default
 
+/** WPILib FRC namespace */
 namespace frc {
 
 // A struct to use as a deleter when a std::shared_ptr must wrap a raw pointer

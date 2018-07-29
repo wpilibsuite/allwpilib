@@ -1080,9 +1080,9 @@ struct from_json_fn
 };
 }
 
-/// namespace to hold default `from_json` function
-/// to see why this is required:
-/// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4381.html
+// namespace to hold default `from_json` function
+// to see why this is required:
+// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4381.html
 namespace
 {
 constexpr const auto& from_json = detail::static_const<detail::from_json_fn>::value;
@@ -1400,7 +1400,7 @@ struct to_json_fn
 };
 }
 
-/// namespace to hold default `to_json` function
+// namespace to hold default `to_json` function
 namespace
 {
 constexpr const auto& to_json = detail::static_const<detail::to_json_fn>::value;
