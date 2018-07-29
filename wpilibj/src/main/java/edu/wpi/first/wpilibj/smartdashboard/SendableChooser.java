@@ -76,23 +76,49 @@ public class SendableChooser<V> extends SendableBase {
    * @param name   the name of the option
    * @param object the option
    */
-  public void addObject(String name, V object) {
+  public void addOption(String name, V object) {
     m_map.put(name, object);
   }
 
   /**
-   * Add the given object to the list of options and marks it as the default. Functionally, this is
-   * very close to {@link #addObject(String, Object)} except that it will use this as the default
+   * Adds the given object to the list of options.
+   *
+   * @deprecated Use {@link #addOption(String, Object)} instead.
+   *
+   * @param name   the name of the option
+   * @param object the option
+   */
+  @Deprecated
+  public void addObject(String name, V object) {
+    addOption(name, object);
+  }
+
+  /**
+   * Adds the given object to the list of options and marks it as the default. Functionally, this is
+   * very close to {@link #addOption(String, Object)} except that it will use this as the default
    * option if none other is explicitly selected.
    *
    * @param name   the name of the option
    * @param object the option
    */
-  public void addDefault(String name, V object) {
+  public void setDefaultOption(String name, V object) {
     requireNonNull(name, "Provided name was null");
 
     m_defaultChoice = name;
-    addObject(name, object);
+    addOption(name, object);
+  }
+
+  /**
+   * Adds the given object to the list of options and marks it as the default.
+   *
+   * @deprecated Use {@link #setDefaultOption(String, Object)} instead.
+   *
+   * @param name   the name of the option
+   * @param object the option
+   */
+  @Deprecated
+  public void addDefault(String name, V object) {
+    setDefaultOption(name, object);
   }
 
   /**
