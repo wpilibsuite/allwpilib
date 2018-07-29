@@ -96,9 +96,9 @@ ext {
 apply from: "${rootDir}/shared/opencv.gradle"
 
 task generateJavaDocs(type: Javadoc) {
-    javadoc.options.links("http://docs.oracle.com/javase/8/docs/api/")
+    options.links("https://docs.oracle.com/javase/8/docs/api/")
     options.addStringOption "tag", "pre:a:Pre-Condition"
-    options.addStringOption('Xdoclint:accessibility,syntax,html', '-quiet')
+    options.addStringOption('Xdoclint:accessibility,html,missing,reference,syntax')
     dependsOn project(':wpilibj').generateJavaVersion
     source project(':hal').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
