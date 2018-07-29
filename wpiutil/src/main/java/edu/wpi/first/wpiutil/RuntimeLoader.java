@@ -23,7 +23,7 @@ public final class RuntimeLoader<T> {
   private static String defaultExtractionRoot;
 
   /**
-   * Get the default extration root location (~/.wpilib/nativecache)
+   * Gets the default extration root location (~/.wpilib/nativecache).
    */
   public static synchronized String getDefaultExtractionRoot() {
     if (defaultExtractionRoot != null) {
@@ -39,7 +39,7 @@ public final class RuntimeLoader<T> {
   private final String m_extractionRoot;
 
   /**
-   * Create a new library loader.
+   * Creates a new library loader.
    *
    * <p>Resources loaded on disk from extractionRoot, and from classpath from the
    * passed in class. Library name is the passed in name.
@@ -51,7 +51,7 @@ public final class RuntimeLoader<T> {
   }
 
   /**
-   * Load a native library.
+   * Loads a native library.
    */
   @SuppressWarnings("PMD.PreserveStackTrace")
   public void loadLibrary() throws IOException {
