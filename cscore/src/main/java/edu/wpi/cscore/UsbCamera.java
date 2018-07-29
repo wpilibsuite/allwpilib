@@ -52,7 +52,7 @@ public class UsbCamera extends VideoCamera {
    *
    * @param level 0=don't display Connecting message, 1=do display message
    */
-  void setConnectVerbose(int level) {
+  public void setConnectVerbose(int level) {
     CameraServerJNI.setProperty(CameraServerJNI.getSourceProperty(m_handle, "connect_verbose"),
                                 level);
   }
