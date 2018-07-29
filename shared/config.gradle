@@ -268,9 +268,7 @@ ext.createAllCombined = { list, name, base, type, project ->
         duplicatesStrategy = 'exclude'
 
         list.each {
-            it.outputs.files.each {
-                from project.zipTree(it)
-            }
+            from project.zipTree(it.archivePath)
             dependsOn it
         }
     }
@@ -289,7 +287,7 @@ ext.includeStandardZipFormat = { task, value ->
     value.each { binary ->
         if (binary.buildable) {
             if (binary instanceof SharedLibraryBinarySpec) {
-                task.dependsOn binary.buildTask
+                task.dependsOn binary.tasks.link
                 task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
                     into getPlatformPath(binary) + '/shared'
                 }
@@ -306,7 +304,7 @@ ext.includeStandardZipFormat = { task, value ->
                     into getPlatformPath(binary) + '/shared'
                 }
             } else if (binary instanceof StaticLibraryBinarySpec) {
-                task.dependsOn binary.buildTask
+                task.dependsOn binary.tasks.createStaticLib
                 task.from(binary.staticLibraryFile) {
                     into getPlatformPath(binary) + '/static'
                 }
