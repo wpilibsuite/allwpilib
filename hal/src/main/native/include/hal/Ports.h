@@ -9,6 +9,12 @@
 
 #include <stdint.h>
 
+/**
+ * @defgroup hal_ports Ports Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -141,3 +147,4 @@ int32_t HAL_GetNumPDPChannels(void);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

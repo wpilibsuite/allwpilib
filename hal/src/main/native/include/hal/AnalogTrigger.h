@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_analogtrigger Analog Trigger Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 // clang-format off
 /**
  * The type of analog trigger to trigger on.
@@ -134,3 +140,4 @@ HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

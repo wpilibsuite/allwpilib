@@ -12,6 +12,12 @@
 #include "hal/AnalogTrigger.h"
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_encoder Encoder Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 // clang-format off
 /**
  * The type of index pulse for the encoder.
@@ -292,3 +298,4 @@ HAL_EncoderEncodingType HAL_GetEncoderEncodingType(
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

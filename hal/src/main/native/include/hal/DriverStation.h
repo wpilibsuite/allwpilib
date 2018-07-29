@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_driverstation Driver Station Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #define HAL_IO_CONFIG_DATA_SIZE 32
 #define HAL_SYS_STATUS_DATA_SIZE 44
 #define HAL_USER_STATUS_DATA_SIZE \
@@ -357,3 +363,4 @@ void HAL_ObserveUserProgramTest(void);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

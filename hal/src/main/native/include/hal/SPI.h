@@ -12,6 +12,12 @@
 #include "hal/AnalogTrigger.h"
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_spi SPI Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 // clang-format off
 HAL_ENUM(HAL_SPIPort) {
   HAL_SPI_kOnboardCS0 = 0,
@@ -246,3 +252,4 @@ int32_t HAL_GetSPIAutoDroppedCount(HAL_SPIPort port, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */
