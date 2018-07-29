@@ -222,6 +222,17 @@ uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
   return data->source->GetCurFrameTime();
 }
 
+void SetSourceConnectionStrategy(CS_Source source,
+                                 CS_ConnectionStrategy strategy,
+                                 CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->source->SetConnectionStrategy(strategy);
+}
+
 bool IsSourceConnected(CS_Source source, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data) {
@@ -229,6 +240,15 @@ bool IsSourceConnected(CS_Source source, CS_Status* status) {
     return false;
   }
   return data->source->IsConnected();
+}
+
+bool IsSourceEnabled(CS_Source source, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return false;
+  }
+  return data->source->IsEnabled();
 }
 
 CS_Property GetSourceProperty(CS_Source source, const wpi::Twine& name,

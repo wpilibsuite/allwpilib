@@ -203,7 +203,11 @@ wpi::StringRef GetSourceDescription(CS_Source source,
                                     wpi::SmallVectorImpl<char>& buf,
                                     CS_Status* status);
 uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status);
+void SetSourceConnectionStrategy(CS_Source source,
+                                 CS_ConnectionStrategy strategy,
+                                 CS_Status* status);
 bool IsSourceConnected(CS_Source source, CS_Status* status);
+bool IsSourceEnabled(CS_Source source, CS_Status* status);
 CS_Property GetSourceProperty(CS_Source source, const wpi::Twine& name,
                               CS_Status* status);
 wpi::ArrayRef<CS_Property> EnumerateSourceProperties(

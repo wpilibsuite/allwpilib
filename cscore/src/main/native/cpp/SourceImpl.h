@@ -41,6 +41,15 @@ class SourceImpl : public PropertyContainer {
   void SetDescription(const wpi::Twine& description);
   wpi::StringRef GetDescription(wpi::SmallVectorImpl<char>& buf) const;
 
+  void SetConnectionStrategy(CS_ConnectionStrategy strategy) {
+    m_strategy = static_cast<int>(strategy);
+  }
+  bool IsEnabled() const {
+    return m_strategy == CS_CONNECTION_KEEP_OPEN ||
+           (m_strategy == CS_CONNECTION_AUTO_MANAGE && m_numSinksEnabled > 0);
+  }
+
+  // User-visible connection status
   void SetConnected(bool connected);
   bool IsConnected() const { return m_connected; }
 
@@ -130,7 +139,6 @@ class SourceImpl : public PropertyContainer {
   virtual void NumSinksEnabledChanged() = 0;
 
   std::atomic_int m_numSinks{0};
-  std::atomic_int m_numSinksEnabled{0};
 
  protected:
   // Cached video modes (protected with m_mutex)
@@ -145,6 +153,9 @@ class SourceImpl : public PropertyContainer {
 
   std::string m_name;
   std::string m_description;
+
+  std::atomic_int m_strategy{CS_CONNECTION_AUTO_MANAGE};
+  std::atomic_int m_numSinksEnabled{0};
 
   wpi::mutex m_frameMutex;
   wpi::condition_variable m_frameCv;

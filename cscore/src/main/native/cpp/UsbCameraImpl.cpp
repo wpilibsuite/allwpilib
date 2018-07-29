@@ -309,10 +309,10 @@ void UsbCameraImpl::CameraThreadMain() {
       }
     }
 
-    // Turn off streaming if no one is listening, and turn it on if there is.
-    if (m_streaming && m_numSinksEnabled == 0) {
+    // Turn off streaming if not enabled, and turn it on if enabled
+    if (m_streaming && !IsEnabled()) {
       DeviceStreamOff();
-    } else if (!m_streaming && m_numSinksEnabled > 0) {
+    } else if (!m_streaming && IsEnabled()) {
       DeviceStreamOn();
     }
 

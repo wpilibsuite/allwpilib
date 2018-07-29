@@ -116,9 +116,21 @@ inline uint64_t VideoSource::GetLastFrameTime() const {
   return GetSourceLastFrameTime(m_handle, &m_status);
 }
 
+inline void VideoSource::SetConnectionStrategy(ConnectionStrategy strategy) {
+  m_status = 0;
+  SetSourceConnectionStrategy(
+      m_handle, static_cast<CS_ConnectionStrategy>(static_cast<int>(strategy)),
+      &m_status);
+}
+
 inline bool VideoSource::IsConnected() const {
   m_status = 0;
   return IsSourceConnected(m_handle, &m_status);
+}
+
+inline bool VideoSource::IsEnabled() const {
+  m_status = 0;
+  return IsSourceEnabled(m_handle, &m_status);
 }
 
 inline VideoProperty VideoSource::GetProperty(const wpi::Twine& name) {

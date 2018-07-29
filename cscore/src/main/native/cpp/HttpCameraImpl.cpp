@@ -69,13 +69,12 @@ void HttpCameraImpl::StreamThreadMain() {
     // sleep between retries
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
-    // disconnect if no one is listening
-    if (m_numSinksEnabled == 0) {
+    // disconnect if not enabled
+    if (!IsEnabled()) {
       std::unique_lock<wpi::mutex> lock(m_mutex);
       if (m_streamConn) m_streamConn->stream->close();
-      // Wait for a sink to enable
-      m_sinkEnabledCond.wait(
-          lock, [=] { return !m_active || m_numSinksEnabled != 0; });
+      // Wait for enable
+      m_sinkEnabledCond.wait(lock, [=] { return !m_active || IsEnabled(); });
       if (!m_active) return;
     }
 
@@ -185,8 +184,8 @@ void HttpCameraImpl::DeviceStream(wpi::raw_istream& is,
   int numErrors = 0;
 
   // streaming loop
-  while (m_active && !is.has_error() && m_numSinksEnabled > 0 &&
-         numErrors < 3 && !m_streamSettingsUpdated) {
+  while (m_active && !is.has_error() && IsEnabled() && numErrors < 3 &&
+         !m_streamSettingsUpdated) {
     if (!FindMultipartBoundary(is, boundary, nullptr)) break;
 
     // Read the next two characters after the boundary (normally \r\n)
