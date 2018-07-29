@@ -27,6 +27,14 @@
 
 namespace nt {
 
+/**
+ * @defgroup ntcore_cpp_handle_api ntcore C++ API
+ *
+ * Handle-based interface for C++.
+ *
+ * @{
+ */
+
 using wpi::ArrayRef;
 using wpi::StringRef;
 using wpi::Twine;
@@ -272,19 +280,21 @@ class LogMessage {
 };
 
 /**
- * @defgroup InstanceFunctions Instance Functions
+ * @defgroup ntcore_instance_func Instance Functions
  * @{
  */
 
 /**
  * Get default instance.
  * This is the instance used by non-handle-taking functions.
+ *
  * @return Instance handle
  */
 NT_Inst GetDefaultInstance();
 
 /**
  * Create an instance.
+ *
  * @return Instance handle
  */
 NT_Inst CreateInstance();
@@ -292,12 +302,14 @@ NT_Inst CreateInstance();
 /**
  * Destroy an instance.
  * The default instance cannot be destroyed.
+ *
  * @param inst Instance handle
  */
 void DestroyInstance(NT_Inst inst);
 
 /**
  * Get instance handle from another handle.
+ *
  * @param handle    entry/instance/etc. handle
  * @return Instance handle
  */
@@ -306,12 +318,13 @@ NT_Inst GetInstanceFromHandle(NT_Handle handle);
 /** @} */
 
 /**
- * @defgroup TableFunctions Table Functions
+ * @defgroup ntcore_table_func Table Functions
  * @{
  */
 
 /**
  * Get Entry Handle.
+ *
  * @param inst      instance handle
  * @param name      entry name (UTF-8 string)
  * @return entry handle
@@ -320,6 +333,7 @@ NT_Entry GetEntry(NT_Inst inst, const Twine& name);
 
 /**
  * Get Entry Handles.
+ *
  * Returns an array of entry handles.  The results are optionally
  * filtered by string prefix and entry type to only return a subset of all
  * entries.
@@ -337,6 +351,7 @@ std::vector<NT_Entry> GetEntries(NT_Inst inst, const Twine& prefix,
 /**
  * Gets the name of the specified entry.
  * Returns an empty string if the handle is invalid.
+ *
  * @param entry   entry handle
  * @return Entry name
  */
@@ -344,6 +359,7 @@ std::string GetEntryName(NT_Entry entry);
 
 /**
  * Gets the type for the specified entry, or unassigned if non existent.
+ *
  * @param entry   entry handle
  * @return Entry type
  */
@@ -352,6 +368,7 @@ NT_Type GetEntryType(NT_Entry entry);
 /**
  * Gets the last time the entry was changed.
  * Returns 0 if the handle is invalid.
+ *
  * @param entry   entry handle
  * @return Entry last change time
  */
@@ -359,6 +376,7 @@ uint64_t GetEntryLastChange(NT_Entry entry);
 
 /**
  * Get Entry Value.
+ *
  * Returns copy of current entry value.
  * Note that one of the type options is "unassigned".
  *
@@ -370,6 +388,7 @@ std::shared_ptr<Value> GetEntryValue(StringRef name);
 
 /**
  * Get Entry Value.
+ *
  * Returns copy of current entry value.
  * Note that one of the type options is "unassigned".
  *
@@ -380,6 +399,7 @@ std::shared_ptr<Value> GetEntryValue(NT_Entry entry);
 
 /**
  * Set Default Entry Value
+ *
  * Returns copy of current entry value if it exists.
  * Otherwise, sets passed in value, and returns set value.
  * Note that one of the type options is "unassigned".
@@ -393,6 +413,7 @@ bool SetDefaultEntryValue(StringRef name, std::shared_ptr<Value> value);
 
 /**
  * Set Default Entry Value
+ *
  * Returns copy of current entry value if it exists.
  * Otherwise, sets passed in value, and returns set value.
  * Note that one of the type options is "unassigned".
@@ -405,6 +426,7 @@ bool SetDefaultEntryValue(NT_Entry entry, std::shared_ptr<Value> value);
 
 /**
  * Set Entry Value.
+ *
  * Sets new entry value.  If type of new value differs from the type of the
  * currently stored entry, returns error and does not update value.
  *
@@ -417,6 +439,7 @@ bool SetEntryValue(StringRef name, std::shared_ptr<Value> value);
 
 /**
  * Set Entry Value.
+ *
  * Sets new entry value.  If type of new value differs from the type of the
  * currently stored entry, returns error and does not update value.
  *
@@ -428,6 +451,7 @@ bool SetEntryValue(NT_Entry entry, std::shared_ptr<Value> value);
 
 /**
  * Set Entry Type and Value.
+ *
  * Sets new entry value.  If type of new value differs from the type of the
  * currently stored entry, the currently stored entry type is overridden
  * (generally this will generate an Entry Assignment message).
@@ -443,6 +467,7 @@ void SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value);
 
 /**
  * Set Entry Type and Value.
+ *
  * Sets new entry value.  If type of new value differs from the type of the
  * currently stored entry, the currently stored entry type is overridden
  * (generally this will generate an Entry Assignment message).
@@ -457,6 +482,7 @@ void SetEntryTypeValue(NT_Entry entry, std::shared_ptr<Value> value);
 
 /**
  * Set Entry Flags.
+ *
  * @param name      entry name (UTF-8 string)
  * @param flags     flags value (bitmask of NT_EntryFlags)
  */
@@ -465,6 +491,7 @@ void SetEntryFlags(StringRef name, unsigned int flags);
 
 /**
  * Set Entry Flags.
+ *
  * @param entry     entry handle
  * @param flags     flags value (bitmask of NT_EntryFlags)
  */
@@ -472,6 +499,7 @@ void SetEntryFlags(NT_Entry entry, unsigned int flags);
 
 /**
  * Get Entry Flags.
+ *
  * @param name      entry name (UTF-8 string)
  * @return Flags value (bitmask of NT_EntryFlags)
  */
@@ -480,6 +508,7 @@ unsigned int GetEntryFlags(StringRef name);
 
 /**
  * Get Entry Flags.
+ *
  * @param entry     entry handle
  * @return Flags value (bitmask of NT_EntryFlags)
  */
@@ -487,6 +516,7 @@ unsigned int GetEntryFlags(NT_Entry entry);
 
 /**
  * Delete Entry.
+ *
  * Deletes an entry.  This is a new feature in version 3.0 of the protocol,
  * so this may not have an effect if any other node in the network is not
  * version 3.0 or newer.
@@ -502,6 +532,7 @@ void DeleteEntry(StringRef name);
 
 /**
  * Delete Entry.
+ *
  * Deletes an entry.  This is a new feature in version 3.0 of the protocol,
  * so this may not have an effect if any other node in the network is not
  * version 3.0 or newer.
@@ -516,6 +547,7 @@ void DeleteEntry(NT_Entry entry);
 
 /**
  * Delete All Entries.
+ *
  * Deletes ALL table entries.  This is a new feature in version 3.0 of the
  * so this may not have an effect if any other node in the network is not
  * version 3.0 or newer.
@@ -536,6 +568,7 @@ void DeleteAllEntries(NT_Inst inst);
 
 /**
  * Get Entry Information.
+ *
  * Returns an array of entry information (name, entry type,
  * and timestamp of last change to type/value).  The results are optionally
  * filtered by string prefix and entry type to only return a subset of all
@@ -560,6 +593,7 @@ std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, const Twine& prefix,
 
 /**
  * Get Entry Information.
+ *
  * Returns information about an entry (name, entry type,
  * and timestamp of last change to type/value).
  *
@@ -571,7 +605,7 @@ EntryInfo GetEntryInfo(NT_Entry entry);
 /** @} */
 
 /**
- * @defgroup EntryListenerFunctions Entry Listener Functions
+ * @defgroup ntcore_entrylistener_func Entry Listener Functions
  * @{
  */
 
@@ -605,6 +639,7 @@ NT_EntryListener AddEntryListener(StringRef prefix,
 
 /**
  * @copydoc AddEntryListener(StringRef, EntryListenerCallback, unsigned int)
+ *
  * @param inst              instance handle
  */
 NT_EntryListener AddEntryListener(
@@ -627,10 +662,12 @@ NT_EntryListener AddEntryListener(
 
 /**
  * Create a entry listener poller.
+ *
  * A poller provides a single queue of poll events.  Events linked to this
  * poller (using AddPolledEntryListener()) will be stored in the queue and
  * must be collected by calling PollEntryListener().
  * The returned handle must be destroyed with DestroyEntryListenerPoller().
+ *
  * @param inst      instance handle
  * @return poller handle
  */
@@ -639,6 +676,7 @@ NT_EntryListenerPoller CreateEntryListenerPoller(NT_Inst inst);
 /**
  * Destroy a entry listener poller.  This will abort any blocked polling
  * call and prevent additional events from being generated for this poller.
+ *
  * @param poller    poller handle
  */
 void DestroyEntryListenerPoller(NT_EntryListenerPoller poller);
@@ -646,6 +684,7 @@ void DestroyEntryListenerPoller(NT_EntryListenerPoller poller);
 /**
  * Create a polled entry listener.
  * The caller is responsible for calling PollEntryListener() to poll.
+ *
  * @param poller            poller handle
  * @param prefix            UTF-8 string prefix
  * @param flags             NotifyKind bitmask
@@ -658,6 +697,7 @@ NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
 /**
  * Create a polled entry listener.
  * The caller is responsible for calling PollEntryListener() to poll.
+ *
  * @param poller            poller handle
  * @param prefix            UTF-8 string prefix
  * @param flags             NotifyKind bitmask
@@ -670,6 +710,7 @@ NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
  * Get the next entry listener event.  This blocks until the next event occurs.
  * This is intended to be used with AddPolledEntryListener(); entry listeners
  * created using AddEntryListener() will not be serviced through this function.
+ *
  * @param poller    poller handle
  * @return Information on the entry listener events.  Only returns empty if an
  *         error occurred (e.g. the instance was invalid or is shutting down).
@@ -681,6 +722,7 @@ std::vector<EntryNotification> PollEntryListener(NT_EntryListenerPoller poller);
  * or it times out.  This is intended to be used with AddPolledEntryListener();
  * entry listeners created using AddEntryListener() will not be serviced
  * through this function.
+ *
  * @param poller      poller handle
  * @param timeout     timeout, in seconds
  * @param timed_out   true if the timeout period elapsed (output)
@@ -696,12 +738,14 @@ std::vector<EntryNotification> PollEntryListener(NT_EntryListenerPoller poller,
  * Cancel a PollEntryListener call.  This wakes up a call to
  * PollEntryListener for this poller and causes it to immediately return
  * an empty array.
+ *
  * @param poller  poller handle
  */
 void CancelPollEntryListener(NT_EntryListenerPoller poller);
 
 /**
  * Remove an entry listener.
+ *
  * @param entry_listener Listener handle to remove
  */
 void RemoveEntryListener(NT_EntryListener entry_listener);
@@ -711,6 +755,7 @@ void RemoveEntryListener(NT_EntryListener entry_listener);
  * for deterministic testing.  This blocks until either the entry listener
  * queue is empty (e.g. there are no more events that need to be passed along
  * to callbacks or poll queues) or the timeout expires.
+ *
  * @param inst      instance handle
  * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
  *                  or a negative value to block indefinitely
@@ -721,7 +766,7 @@ bool WaitForEntryListenerQueue(NT_Inst inst, double timeout);
 /** @} */
 
 /**
- * @defgroup ConnectionListenerFunctions Connection Listener Functions
+ * @defgroup ntcore_connectionlistener_func Connection Listener Functions
  * @{
  */
 
@@ -751,6 +796,7 @@ NT_ConnectionListener AddConnectionListener(ConnectionListenerCallback callback,
 
 /**
  * @copydoc AddConnectionListener(ConnectionListenerCallback, bool)
+ *
  * @param inst              instance handle
  */
 NT_ConnectionListener AddConnectionListener(
@@ -760,10 +806,12 @@ NT_ConnectionListener AddConnectionListener(
 
 /**
  * Create a connection listener poller.
+ *
  * A poller provides a single queue of poll events.  Events linked to this
  * poller (using AddPolledConnectionListener()) will be stored in the queue and
  * must be collected by calling PollConnectionListener().
  * The returned handle must be destroyed with DestroyConnectionListenerPoller().
+ *
  * @param inst      instance handle
  * @return poller handle
  */
@@ -772,6 +820,7 @@ NT_ConnectionListenerPoller CreateConnectionListenerPoller(NT_Inst inst);
 /**
  * Destroy a connection listener poller.  This will abort any blocked polling
  * call and prevent additional events from being generated for this poller.
+ *
  * @param poller    poller handle
  */
 void DestroyConnectionListenerPoller(NT_ConnectionListenerPoller poller);
@@ -779,6 +828,7 @@ void DestroyConnectionListenerPoller(NT_ConnectionListenerPoller poller);
 /**
  * Create a polled connection listener.
  * The caller is responsible for calling PollConnectionListener() to poll.
+ *
  * @param poller            poller handle
  * @param immediate_notify  notify listener of all existing connections
  */
@@ -790,6 +840,7 @@ NT_ConnectionListener AddPolledConnectionListener(
  * disconnect occurs.  This is intended to be used with
  * AddPolledConnectionListener(); connection listeners created using
  * AddConnectionListener() will not be serviced through this function.
+ *
  * @param poller    poller handle
  * @return Information on the connection events.  Only returns empty if an
  *         error occurred (e.g. the instance was invalid or is shutting down).
@@ -802,6 +853,7 @@ std::vector<ConnectionNotification> PollConnectionListener(
  * disconnect occurs or it times out.  This is intended to be used with
  * AddPolledConnectionListener(); connection listeners created using
  * AddConnectionListener() will not be serviced through this function.
+ *
  * @param poller      poller handle
  * @param timeout     timeout, in seconds
  * @param timed_out   true if the timeout period elapsed (output)
@@ -816,12 +868,14 @@ std::vector<ConnectionNotification> PollConnectionListener(
  * Cancel a PollConnectionListener call.  This wakes up a call to
  * PollConnectionListener for this poller and causes it to immediately return
  * an empty array.
+ *
  * @param poller  poller handle
  */
 void CancelPollConnectionListener(NT_ConnectionListenerPoller poller);
 
 /**
  * Remove a connection listener.
+ *
  * @param conn_listener Listener handle to remove
  */
 void RemoveConnectionListener(NT_ConnectionListener conn_listener);
@@ -831,6 +885,7 @@ void RemoveConnectionListener(NT_ConnectionListener conn_listener);
  * for deterministic testing.  This blocks until either the connection listener
  * queue is empty (e.g. there are no more events that need to be passed along
  * to callbacks or poll queues) or the timeout expires.
+ *
  * @param inst      instance handle
  * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
  *                  or a negative value to block indefinitely
@@ -841,13 +896,14 @@ bool WaitForConnectionListenerQueue(NT_Inst inst, double timeout);
 /** @} */
 
 /**
- * @defgroup RpcFunctions Remote Procedure Call Functions
+ * @defgroup ntcore_rpc_func Remote Procedure Call Functions
  * @{
  */
 
 /**
  * Create a callback-based RPC entry point.  Only valid to use on the server.
  * The callback function will be called when the RPC is called.
+ *
  * @param entry     entry handle of RPC entry
  * @param def       RPC definition
  * @param callback  callback function; note the callback function must call
@@ -858,10 +914,12 @@ void CreateRpc(NT_Entry entry, StringRef def,
 
 /**
  * Create a RPC call poller.  Only valid to use on the server.
+ *
  * A poller provides a single queue of poll events.  Events linked to this
  * poller (using CreatePolledRpc()) will be stored in the queue and must be
  * collected by calling PollRpc().
  * The returned handle must be destroyed with DestroyRpcCallPoller().
+ *
  * @param inst      instance handle
  * @return poller handle
  */
@@ -870,6 +928,7 @@ NT_RpcCallPoller CreateRpcCallPoller(NT_Inst inst);
 /**
  * Destroy a RPC call poller.  This will abort any blocked polling call and
  * prevent additional events from being generated for this poller.
+ *
  * @param poller    poller handle
  */
 void DestroyRpcCallPoller(NT_RpcCallPoller poller);
@@ -878,6 +937,7 @@ void DestroyRpcCallPoller(NT_RpcCallPoller poller);
  * Create a polled RPC entry point.  Only valid to use on the server.
  * The caller is responsible for calling PollRpc() to poll for servicing
  * incoming RPC calls.
+ *
  * @param entry     entry handle of RPC entry
  * @param def       RPC definition
  * @param poller    poller handle
@@ -890,6 +950,7 @@ void CreatePolledRpc(NT_Entry entry, StringRef def, NT_RpcCallPoller poller);
  * RPC calls created using CreateRpc() will not be serviced through this
  * function.  Upon successful return, PostRpcResponse() must be called to
  * send the return value to the caller.
+ *
  * @param poller      poller handle
  * @return Information on the next RPC calls.  Only returns empty if an error
  *         occurred (e.g. the instance was invalid or is shutting down).
@@ -902,6 +963,7 @@ std::vector<RpcAnswer> PollRpc(NT_RpcCallPoller poller);
  * CreatePolledRpc(); RPC calls created using CreateRpc() will not be
  * serviced through this function.  Upon successful return,
  * PostRpcResponse() must be called to send the return value to the caller.
+ *
  * @param poller      poller handle
  * @param timeout     timeout, in seconds
  * @param timed_out   true if the timeout period elapsed (output)
@@ -915,6 +977,7 @@ std::vector<RpcAnswer> PollRpc(NT_RpcCallPoller poller, double timeout,
 /**
  * Cancel a PollRpc call.  This wakes up a call to PollRpc for this poller
  * and causes it to immediately return an empty array.
+ *
  * @param poller  poller handle
  */
 void CancelPollRpc(NT_RpcCallPoller poller);
@@ -924,6 +987,7 @@ void CancelPollRpc(NT_RpcCallPoller poller);
  * for deterministic testing.  This blocks until either the RPC call
  * queue is empty (e.g. there are no more events that need to be passed along
  * to callbacks or poll queues) or the timeout expires.
+ *
  * @param inst      instance handle
  * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
  *                  or a negative value to block indefinitely
@@ -935,6 +999,7 @@ bool WaitForRpcCallQueue(NT_Inst inst, double timeout);
  * Post RPC response (return value) for a polled RPC.
  * The rpc and call parameters should come from the RpcAnswer returned
  * by PollRpc().
+ *
  * @param entry       entry handle of RPC entry (from RpcAnswer)
  * @param call        RPC call handle (from RpcAnswer)
  * @param result      result raw data that will be provided to remote caller
@@ -947,6 +1012,7 @@ bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, StringRef result);
  * This function is non-blocking.  Either GetRpcResult() or
  * CancelRpcResult() must be called to either get or ignore the result of
  * the call.
+ *
  * @param entry       entry handle of RPC entry
  * @param params      parameter
  * @return RPC call handle (for use with GetRpcResult() or
@@ -957,6 +1023,7 @@ NT_RpcCall CallRpc(NT_Entry entry, StringRef params);
 /**
  * Get the result (return value) of a RPC call.  This function blocks until
  * the result is received.
+ *
  * @param entry       entry handle of RPC entry
  * @param call        RPC call handle returned by CallRpc()
  * @param result      received result (output)
@@ -967,6 +1034,7 @@ bool GetRpcResult(NT_Entry entry, NT_RpcCall call, std::string* result);
 /**
  * Get the result (return value) of a RPC call.  This function blocks until
  * the result is received or it times out.
+ *
  * @param entry       entry handle of RPC entry
  * @param call        RPC call handle returned by CallRpc()
  * @param result      received result (output)
@@ -979,6 +1047,7 @@ bool GetRpcResult(NT_Entry entry, NT_RpcCall call, std::string* result,
 
 /**
  * Ignore the result of a RPC call.  This function is non-blocking.
+ *
  * @param entry       entry handle of RPC entry
  * @param call        RPC call handle returned by CallRpc()
  */
@@ -986,6 +1055,7 @@ void CancelRpcResult(NT_Entry entry, NT_RpcCall call);
 
 /**
  * Pack a RPC version 1 definition.
+ *
  * @param def         RPC version 1 definition
  * @return Raw packed bytes.
  */
@@ -994,6 +1064,7 @@ std::string PackRpcDefinition(const RpcDefinition& def);
 /**
  * Unpack a RPC version 1 definition.  This can be used for introspection or
  * validation.
+ *
  * @param packed      raw packed bytes
  * @param def         RPC version 1 definition (output)
  * @return True if successfully unpacked, false otherwise.
@@ -1002,6 +1073,7 @@ bool UnpackRpcDefinition(StringRef packed, RpcDefinition* def);
 
 /**
  * Pack RPC values as required for RPC version 1 definition messages.
+ *
  * @param values      array of values to pack
  * @return Raw packed bytes.
  */
@@ -1009,6 +1081,7 @@ std::string PackRpcValues(ArrayRef<std::shared_ptr<Value>> values);
 
 /**
  * Unpack RPC values as required for RPC version 1 definition messages.
+ *
  * @param packed      raw packed bytes
  * @param types       array of data types (as provided in the RPC definition)
  * @return Array of values.
@@ -1019,7 +1092,7 @@ std::vector<std::shared_ptr<Value>> UnpackRpcValues(StringRef packed,
 /** @} */
 
 /**
- * @defgroup NetworkFunctions Client/Server Functions
+ * @defgroup ntcore_network_func Client/Server Functions
  * @{
  */
 
@@ -1027,6 +1100,7 @@ std::vector<std::shared_ptr<Value>> UnpackRpcValues(StringRef packed,
  * Set the network identity of this node.
  * This is the name used during the initial connection handshake, and is
  * visible through ConnectionInfo on the remote node.
+ *
  * @param name      identity to advertise
  */
 WPI_DEPRECATED("use NT_Inst function instead")
@@ -1034,12 +1108,14 @@ void SetNetworkIdentity(StringRef name);
 
 /**
  * @copydoc SetNetworkIdentity(StringRef)
+ *
  * @param inst      instance handle
  */
 void SetNetworkIdentity(NT_Inst inst, const Twine& name);
 
 /**
  * Get the current network mode.
+ *
  * @return Bitmask of NT_NetworkMode.
  */
 WPI_DEPRECATED("use NT_Inst function instead")
@@ -1047,6 +1123,7 @@ unsigned int GetNetworkMode();
 
 /**
  * Get the current network mode.
+ *
  * @param inst  instance handle
  * @return Bitmask of NT_NetworkMode.
  */
@@ -1067,6 +1144,7 @@ void StartServer(StringRef persist_filename, const char* listen_address,
 
 /**
  * @copydoc StartServer(StringRef, const char*, unsigned int)
+ *
  * @param inst              instance handle
  */
 void StartServer(NT_Inst inst, const Twine& persist_filename,
@@ -1080,6 +1158,7 @@ void StopServer();
 
 /**
  * @copydoc StopServer()
+ *
  * @param inst  instance handle
  */
 void StopServer(NT_Inst inst);
@@ -1110,18 +1189,21 @@ void StartClient(ArrayRef<std::pair<StringRef, unsigned int>> servers);
 
 /**
  * @copydoc StartClient()
+ *
  * @param inst  instance handle
  */
 void StartClient(NT_Inst inst);
 
 /**
  * @copydoc StartClient(const char*, unsigned int)
+ *
  * @param inst        instance handle
  */
 void StartClient(NT_Inst inst, const char* server_name, unsigned int port);
 
 /**
  * @copydoc StartClient(ArrayRef<std::pair<StringRef, unsigned int>>)
+ *
  * @param inst      instance handle
  */
 void StartClient(NT_Inst inst,
@@ -1169,12 +1251,14 @@ void SetServer(ArrayRef<std::pair<StringRef, unsigned int>> servers);
 
 /**
  * @copydoc SetServer(const char*, unsigned int)
+ *
  * @param inst        instance handle
  */
 void SetServer(NT_Inst inst, const char* server_name, unsigned int port);
 
 /**
  * @copydoc SetServer(ArrayRef<std::pair<StringRef, unsigned int>>)
+ *
  * @param inst      instance handle
  */
 void SetServer(NT_Inst inst,
@@ -1212,6 +1296,7 @@ void StopDSClient();
 
 /**
  * @copydoc StopDSClient()
+ *
  * @param inst  instance handle
  */
 void StopDSClient(NT_Inst inst);
@@ -1231,12 +1316,14 @@ void SetUpdateRate(double interval);
 
 /**
  * @copydoc SetUpdateRate(double)
+ *
  * @param inst      instance handle
  */
 void SetUpdateRate(NT_Inst inst, double interval);
 
 /**
  * Flush Entries.
+ *
  * Forces an immediate flush of all local entry changes to network.
  * Normally this is done on a regularly scheduled interval (see
  * SetUpdateRate()).
@@ -1266,12 +1353,14 @@ std::vector<ConnectionInfo> GetConnections();
 
 /**
  * @copydoc GetConnections()
+ *
  * @param inst  instance handle
  */
 std::vector<ConnectionInfo> GetConnections(NT_Inst inst);
 
 /**
  * Return whether or not the instance is connected to another node.
+ *
  * @param inst  instance handle
  * @return True if connected.
  */
@@ -1280,7 +1369,7 @@ bool IsConnected(NT_Inst inst);
 /** @} */
 
 /**
- * @defgroup FileFunctions File Save/Load Functions
+ * @defgroup ntcore_file_func File Save/Load Functions
  * @{
  */
 
@@ -1288,6 +1377,7 @@ bool IsConnected(NT_Inst inst);
  * Save persistent values to a file.  The server automatically does this,
  * but this function provides a way to save persistent values in the same
  * format to a file on either a client or a server.
+ *
  * @param filename  filename
  * @return error string, or nullptr if successful
  */
@@ -1304,6 +1394,7 @@ const char* SavePersistent(NT_Inst inst, const Twine& filename);
  * Load persistent values from a file.  The server automatically does this
  * at startup, but this function provides a way to restore persistent values
  * in the same format from a file at any time on either a client or a server.
+ *
  * @param filename  filename
  * @param warn      callback function for warnings
  * @return error string, or nullptr if successful
@@ -1315,6 +1406,7 @@ const char* LoadPersistent(
 /**
  * @copydoc LoadPersistent(StringRef, std::function<void(size_t, const
  * char*)>)
+ *
  * @param inst      instance handle
  */
 const char* LoadPersistent(
@@ -1324,6 +1416,7 @@ const char* LoadPersistent(
 /**
  * Save table values to a file.  The file format used is identical to
  * that used for SavePersistent.
+ *
  * @param inst      instance handle
  * @param filename  filename
  * @param prefix    save only keys starting with this prefix
@@ -1335,6 +1428,7 @@ const char* SaveEntries(NT_Inst inst, const Twine& filename,
 /**
  * Load table values from a file.  The file format used is identical to
  * that used for SavePersistent / LoadPersistent.
+ *
  * @param inst      instance handle
  * @param filename  filename
  * @param prefix    load only keys starting with this prefix
@@ -1348,7 +1442,7 @@ const char* LoadEntries(NT_Inst inst, const Twine& filename,
 /** @} */
 
 /**
- * @defgroup UtilityFunctions Utility Functions
+ * @defgroup ntcore_utility_func Utility Functions
  * @{
  */
 
@@ -1356,6 +1450,7 @@ const char* LoadEntries(NT_Inst inst, const Twine& filename,
  * Returns monotonic current time in 1 us increments.
  * This is the same time base used for entry and connection timestamps.
  * This function is a compatibility wrapper around wpi::Now().
+ *
  * @return Timestamp
  */
 uint64_t Now();
@@ -1363,12 +1458,13 @@ uint64_t Now();
 /** @} */
 
 /**
- * @defgroup LoggerFunctions Logger Functions
+ * @defgroup ntcore_logger_func Logger Functions
  * @{
  */
 
 /**
  * Log function.
+ *
  * @param level   log level of the message (see NT_LogLevel)
  * @param file    origin source filename
  * @param line    origin source line number
@@ -1411,6 +1507,7 @@ NT_Logger AddLogger(NT_Inst inst,
 /**
  * Create a log poller.  A poller provides a single queue of poll events.
  * The returned handle must be destroyed with DestroyLoggerPoller().
+ *
  * @param inst      instance handle
  * @return poller handle
  */
@@ -1419,6 +1516,7 @@ NT_LoggerPoller CreateLoggerPoller(NT_Inst inst);
 /**
  * Destroy a log poller.  This will abort any blocked polling call and prevent
  * additional events from being generated for this poller.
+ *
  * @param poller    poller handle
  */
 void DestroyLoggerPoller(NT_LoggerPoller poller);
@@ -1427,6 +1525,7 @@ void DestroyLoggerPoller(NT_LoggerPoller poller);
  * Set the log level for a log poller.  Events will only be generated for
  * log messages with level greater than or equal to min_level and less than or
  * equal to max_level; messages outside this range will be silently ignored.
+ *
  * @param poller        poller handle
  * @param min_level     minimum log level
  * @param max_level     maximum log level
@@ -1437,6 +1536,7 @@ NT_Logger AddPolledLogger(NT_LoggerPoller poller, unsigned int min_level,
 
 /**
  * Get the next log event.  This blocks until the next log occurs.
+ *
  * @param poller    poller handle
  * @return Information on the log events.  Only returns empty if an error
  *         occurred (e.g. the instance was invalid or is shutting down).
@@ -1446,6 +1546,7 @@ std::vector<LogMessage> PollLogger(NT_LoggerPoller poller);
 /**
  * Get the next log event.  This blocks until the next log occurs or it times
  * out.
+ *
  * @param poller      poller handle
  * @param timeout     timeout, in seconds
  * @param timed_out   true if the timeout period elapsed (output)
@@ -1459,12 +1560,14 @@ std::vector<LogMessage> PollLogger(NT_LoggerPoller poller, double timeout,
 /**
  * Cancel a PollLogger call.  This wakes up a call to PollLogger for this
  * poller and causes it to immediately return an empty array.
+ *
  * @param poller  poller handle
  */
 void CancelPollLogger(NT_LoggerPoller poller);
 
 /**
  * Remove a logger.
+ *
  * @param logger Logger handle to remove
  */
 void RemoveLogger(NT_Logger logger);
@@ -1474,6 +1577,7 @@ void RemoveLogger(NT_Logger logger);
  * for deterministic testing.  This blocks until either the log event
  * queue is empty (e.g. there are no more events that need to be passed along
  * to callbacks or poll queues) or the timeout expires.
+ *
  * @param inst      instance handle
  * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
  *                  or a negative value to block indefinitely
@@ -1481,6 +1585,7 @@ void RemoveLogger(NT_Logger logger);
  */
 bool WaitForLoggerQueue(NT_Inst inst, double timeout);
 
+/** @} */
 /** @} */
 
 inline bool RpcAnswer::PostResponse(StringRef result) const {

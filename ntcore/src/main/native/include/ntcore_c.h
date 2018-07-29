@@ -22,6 +22,14 @@
 extern "C" {
 #endif
 
+/**
+ * @defgroup ntcore_c_api ntcore C API
+ *
+ * Handle-based interface for C.
+ *
+ * @{
+ */
+
 /** Typedefs */
 typedef int NT_Bool;
 
@@ -262,19 +270,21 @@ struct NT_LogMessage {
 };
 
 /**
- * @defgroup InstanceFunctions Instance Functions
+ * @defgroup ntcore_instance_cfunc Instance Functions
  * @{
  */
 
 /**
  * Get default instance.
  * This is the instance used by non-handle-taking functions.
+ *
  * @return Instance handle
  */
 NT_Inst NT_GetDefaultInstance(void);
 
 /**
  * Create an instance.
+ *
  * @return Instance handle
  */
 NT_Inst NT_CreateInstance(void);
@@ -282,12 +292,14 @@ NT_Inst NT_CreateInstance(void);
 /**
  * Destroy an instance.
  * The default instance cannot be destroyed.
+ *
  * @param inst Instance handle
  */
 void NT_DestroyInstance(NT_Inst inst);
 
 /**
  * Get instance handle from another handle.
+ *
  * @param handle    handle
  * @return Instance handle
  */
@@ -296,12 +308,13 @@ NT_Inst NT_GetInstanceFromHandle(NT_Handle handle);
 /** @} */
 
 /**
- * @defgroup TableFunctions Table Functions
+ * @defgroup ntcore_table_cfunc Table Functions
  * @{
  */
 
 /**
  * Get Entry Handle.
+ *
  * @param inst      instance handle
  * @param name      entry name (UTF-8 string)
  * @param name_len  length of name in bytes
@@ -311,6 +324,7 @@ NT_Entry NT_GetEntry(NT_Inst inst, const char* name, size_t name_len);
 
 /**
  * Get Entry Handles.
+ *
  * Returns an array of entry handles.  The results are optionally
  * filtered by string prefix and entry type to only return a subset of all
  * entries.
@@ -328,6 +342,7 @@ NT_Entry* NT_GetEntries(NT_Inst inst, const char* prefix, size_t prefix_len,
 /**
  * Gets the name of the specified entry.
  * Returns an empty string if the handle is invalid.
+ *
  * @param entry     entry handle
  * @param name_len  length of the returned string (output parameter)
  * @return Entry name
@@ -336,6 +351,7 @@ char* NT_GetEntryName(NT_Entry entry, size_t* name_len);
 
 /**
  * Gets the type for the specified key, or unassigned if non existent.
+ *
  * @param entry   entry handle
  * @return Entry type
  */
@@ -344,6 +360,7 @@ enum NT_Type NT_GetEntryType(NT_Entry entry);
 /**
  * Gets the last time the entry was changed.
  * Returns 0 if the handle is invalid.
+ *
  * @param entry   entry handle
  * @return Entry last change time
  */
@@ -351,6 +368,7 @@ uint64_t NT_GetEntryLastChange(NT_Entry entry);
 
 /**
  * Get Entry Value.
+ *
  * Returns copy of current entry value.
  * Note that one of the type options is "unassigned".
  *
@@ -365,6 +383,7 @@ void NT_GetEntryValue(NT_Entry entry, struct NT_Value* value);
 
 /**
  * Set Default Entry Value.
+ *
  * Returns copy of current entry value if it exists.
  * Otherwise, sets passed in value, and returns set value.
  * Note that one of the type options is "unassigned".
@@ -378,6 +397,7 @@ NT_Bool NT_SetDefaultEntryValue(NT_Entry entry,
 
 /**
  * Set Entry Value.
+ *
  * Sets new entry value.  If type of new value differs from the type of the
  * currently stored entry, returns error and does not update value.
  *
@@ -389,6 +409,7 @@ NT_Bool NT_SetEntryValue(NT_Entry entry, const struct NT_Value* value);
 
 /**
  * Set Entry Type and Value.
+ *
  * Sets new entry value.  If type of new value differs from the type of the
  * currently stored entry, the currently stored entry type is overridden
  * (generally this will generate an Entry Assignment message).
@@ -403,6 +424,7 @@ void NT_SetEntryTypeValue(NT_Entry entry, const struct NT_Value* value);
 
 /**
  * Set Entry Flags.
+ *
  * @param entry     entry handle
  * @param flags     flags value (bitmask of NT_EntryFlags)
  */
@@ -410,6 +432,7 @@ void NT_SetEntryFlags(NT_Entry entry, unsigned int flags);
 
 /**
  * Get Entry Flags.
+ *
  * @param entry     entry handle
  * @return Flags value (bitmask of NT_EntryFlags)
  */
@@ -417,6 +440,7 @@ unsigned int NT_GetEntryFlags(NT_Entry entry);
 
 /**
  * Delete Entry.
+ *
  * Deletes an entry.  This is a new feature in version 3.0 of the protocol,
  * so this may not have an effect if any other node in the network is not
  * version 3.0 or newer.
@@ -431,6 +455,7 @@ void NT_DeleteEntry(NT_Entry entry);
 
 /**
  * Delete All Entries.
+ *
  * Deletes ALL table entries.  This is a new feature in version 3.0 of the
  * so this may not have an effect if any other node in the network is not
  * version 3.0 or newer.
@@ -445,6 +470,7 @@ void NT_DeleteAllEntries(NT_Inst inst);
 
 /**
  * Get Entry Information.
+ *
  * Returns an array of entry information (entry handle, name, entry type,
  * and timestamp of last change to type/value).  The results are optionally
  * filtered by string prefix and entry type to only return a subset of all
@@ -465,6 +491,7 @@ struct NT_EntryInfo* NT_GetEntryInfo(NT_Inst inst, const char* prefix,
 
 /**
  * Get Entry Information.
+ *
  * Returns information about an entry (name, entry type,
  * and timestamp of last change to type/value).
  *
@@ -477,7 +504,7 @@ NT_Bool NT_GetEntryInfoHandle(NT_Entry entry, struct NT_EntryInfo* info);
 /** @} */
 
 /**
- * @defgroup EntryListenerFunctions Entry Listener Functions
+ * @defgroup ntcore_entrylistener_cfunc Entry Listener Functions
  * @{
  */
 
@@ -522,10 +549,12 @@ NT_EntryListener NT_AddEntryListenerSingle(NT_Entry entry, void* data,
 
 /**
  * Create a entry listener poller.
+ *
  * A poller provides a single queue of poll events.  Events linked to this
  * poller (using NT_AddPolledEntryListener()) will be stored in the queue and
  * must be collected by calling NT_PollEntryListener().
  * The returned handle must be destroyed with NT_DestroyEntryListenerPoller().
+ *
  * @param inst      instance handle
  * @return poller handle
  */
@@ -534,6 +563,7 @@ NT_EntryListenerPoller NT_CreateEntryListenerPoller(NT_Inst inst);
 /**
  * Destroy a entry listener poller.  This will abort any blocked polling
  * call and prevent additional events from being generated for this poller.
+ *
  * @param poller    poller handle
  */
 void NT_DestroyEntryListenerPoller(NT_EntryListenerPoller poller);
@@ -541,6 +571,7 @@ void NT_DestroyEntryListenerPoller(NT_EntryListenerPoller poller);
 /**
  * Create a polled entry listener.
  * The caller is responsible for calling NT_PollEntryListener() to poll.
+ *
  * @param poller            poller handle
  * @param prefix            UTF-8 string prefix
  * @param flags             NT_NotifyKind bitmask
@@ -554,6 +585,7 @@ NT_EntryListener NT_AddPolledEntryListener(NT_EntryListenerPoller poller,
 /**
  * Create a polled entry listener.
  * The caller is responsible for calling NT_PollEntryListener() to poll.
+ *
  * @param poller            poller handle
  * @param prefix            UTF-8 string prefix
  * @param flags             NT_NotifyKind bitmask
@@ -565,9 +597,11 @@ NT_EntryListener NT_AddPolledEntryListenerSingle(NT_EntryListenerPoller poller,
 
 /**
  * Get the next entry listener event.  This blocks until the next event occurs.
+ *
  * This is intended to be used with NT_AddPolledEntryListener(void); entry
  * listeners created using NT_AddEntryListener() will not be serviced through
  * this function.
+ *
  * @param poller    poller handle
  * @param len       length of returned array (output)
  * @return Array of information on the entry listener events.  Returns NULL if
@@ -581,6 +615,7 @@ struct NT_EntryNotification* NT_PollEntryListener(NT_EntryListenerPoller poller,
  * or it times out.  This is intended to be used with
  * NT_AddPolledEntryListener(); entry listeners created using
  * NT_AddEntryListener() will not be serviced through this function.
+ *
  * @param poller      poller handle
  * @param len         length of returned array (output)
  * @param timeout     timeout, in seconds
@@ -597,12 +632,14 @@ struct NT_EntryNotification* NT_PollEntryListenerTimeout(
  * Cancel a PollEntryListener call.  This wakes up a call to
  * PollEntryListener for this poller and causes it to immediately return
  * an empty array.
+ *
  * @param poller  poller handle
  */
 void NT_CancelPollEntryListener(NT_EntryListenerPoller poller);
 
 /**
  * Remove an entry listener.
+ *
  * @param entry_listener Listener handle to remove
  */
 void NT_RemoveEntryListener(NT_EntryListener entry_listener);
@@ -612,6 +649,7 @@ void NT_RemoveEntryListener(NT_EntryListener entry_listener);
  * for deterministic testing.  This blocks until either the entry listener
  * queue is empty (e.g. there are no more events that need to be passed along
  * to callbacks or poll queues) or the timeout expires.
+ *
  * @param inst      instance handle
  * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
  *                  or a negative value to block indefinitely
@@ -622,7 +660,7 @@ NT_Bool NT_WaitForEntryListenerQueue(NT_Inst inst, double timeout);
 /** @} */
 
 /**
- * @defgroup ConnectionListenerFunctions Connection Listener Functions
+ * @defgroup ntcore_connectionlistener_cfunc Connection Listener Functions
  * @{
  */
 
@@ -656,6 +694,7 @@ NT_ConnectionListener NT_AddConnectionListener(
  * and must be collected by calling NT_PollConnectionListener().
  * The returned handle must be destroyed with
  * NT_DestroyConnectionListenerPoller().
+ *
  * @param inst      instance handle
  * @return poller handle
  */
@@ -664,6 +703,7 @@ NT_ConnectionListenerPoller NT_CreateConnectionListenerPoller(NT_Inst inst);
 /**
  * Destroy a connection listener poller.  This will abort any blocked polling
  * call and prevent additional events from being generated for this poller.
+ *
  * @param poller    poller handle
  */
 void NT_DestroyConnectionListenerPoller(NT_ConnectionListenerPoller poller);
@@ -671,6 +711,7 @@ void NT_DestroyConnectionListenerPoller(NT_ConnectionListenerPoller poller);
 /**
  * Create a polled connection listener.
  * The caller is responsible for calling NT_PollConnectionListener() to poll.
+ *
  * @param poller            poller handle
  * @param immediate_notify  notify listener of all existing connections
  */
@@ -682,6 +723,7 @@ NT_ConnectionListener NT_AddPolledConnectionListener(
  * disconnect occurs.  This is intended to be used with
  * NT_AddPolledConnectionListener(); connection listeners created using
  * NT_AddConnectionListener() will not be serviced through this function.
+ *
  * @param poller    poller handle
  * @param len       length of returned array (output)
  * @return Array of information on the connection events.  Only returns NULL
@@ -696,6 +738,7 @@ struct NT_ConnectionNotification* NT_PollConnectionListener(
  * disconnect occurs or it times out.  This is intended to be used with
  * NT_AddPolledConnectionListener(); connection listeners created using
  * NT_AddConnectionListener() will not be serviced through this function.
+ *
  * @param poller      poller handle
  * @param len         length of returned array (output)
  * @param timeout     timeout, in seconds
@@ -712,12 +755,14 @@ struct NT_ConnectionNotification* NT_PollConnectionListenerTimeout(
  * Cancel a PollConnectionListener call.  This wakes up a call to
  * PollConnectionListener for this poller and causes it to immediately return
  * an empty array.
+ *
  * @param poller  poller handle
  */
 void NT_CancelPollConnectionListener(NT_ConnectionListenerPoller poller);
 
 /**
  * Remove a connection listener.
+ *
  * @param conn_listener Listener handle to remove
  */
 void NT_RemoveConnectionListener(NT_ConnectionListener conn_listener);
@@ -727,6 +772,7 @@ void NT_RemoveConnectionListener(NT_ConnectionListener conn_listener);
  * for deterministic testing.  This blocks until either the connection listener
  * queue is empty (e.g. there are no more events that need to be passed along
  * to callbacks or poll queues) or the timeout expires.
+ *
  * @param inst      instance handle
  * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
  *                  or a negative value to block indefinitely
@@ -737,14 +783,16 @@ NT_Bool NT_WaitForConnectionListenerQueue(NT_Inst inst, double timeout);
 /** @} */
 
 /**
- * @defgroup RpcFunctions Remote Procedure Call Functions
+ * @defgroup ntcore_rpc_cfunc Remote Procedure Call Functions
  * @{
  */
 
 /**
  * Remote Procedure Call (RPC) callback function.
+ *
  * @param data        data pointer provided to NT_CreateRpc()
  * @param call        call information
+ *
  * Note: NT_PostRpcResponse() must be called by the callback to provide a
  * response to the call.
  */
@@ -753,6 +801,7 @@ typedef void (*NT_RpcCallback)(void* data, const struct NT_RpcAnswer* call);
 /**
  * Create a callback-based RPC entry point.  Only valid to use on the server.
  * The callback function will be called when the RPC is called.
+ *
  * @param entry     entry handle of RPC entry
  * @param def       RPC definition
  * @param def_len   length of def in bytes
@@ -764,10 +813,12 @@ void NT_CreateRpc(NT_Entry entry, const char* def, size_t def_len, void* data,
 
 /**
  * Create a RPC call poller.  Only valid to use on the server.
+ *
  * A poller provides a single queue of poll events.  Events linked to this
  * poller (using NT_CreatePolledRpc()) will be stored in the queue and must be
  * collected by calling NT_PollRpc() or NT_PollRpcTimeout().
  * The returned handle must be destroyed with NT_DestroyRpcCallPoller().
+ *
  * @param inst      instance handle
  * @return poller handle
  */
@@ -776,14 +827,17 @@ NT_RpcCallPoller NT_CreateRpcCallPoller(NT_Inst inst);
 /**
  * Destroy a RPC call poller.  This will abort any blocked polling call and
  * prevent additional events from being generated for this poller.
+ *
  * @param poller    poller handle
  */
 void NT_DestroyRpcCallPoller(NT_RpcCallPoller poller);
 
 /**
  * Create a polled RPC entry point.  Only valid to use on the server.
+ *
  * The caller is responsible for calling NT_PollRpc() or NT_PollRpcTimeout()
  * to poll for servicing incoming RPC calls.
+ *
  * @param entry     entry handle of RPC entry
  * @param def       RPC definition
  * @param def_len   length of def in bytes
@@ -799,6 +853,7 @@ void NT_CreatePolledRpc(NT_Entry entry, const char* def, size_t def_len,
  * function.  Upon successful return, NT_PostRpcResponse() must be called to
  * send the return value to the caller.  The returned array must be freed
  * using NT_DisposeRpcAnswerArray().
+ *
  * @param poller      poller handle
  * @param len         length of returned array (output)
  * @return Array of RPC call information.  Only returns NULL if an error
@@ -813,6 +868,7 @@ struct NT_RpcAnswer* NT_PollRpc(NT_RpcCallPoller poller, size_t* len);
  * serviced through this function.  Upon successful return,
  * NT_PostRpcResponse() must be called to send the return value to the caller.
  * The returned array must be freed using NT_DisposeRpcAnswerArray().
+ *
  * @param poller      poller handle
  * @param len         length of returned array (output)
  * @param timeout     timeout, in seconds
@@ -827,6 +883,7 @@ struct NT_RpcAnswer* NT_PollRpcTimeout(NT_RpcCallPoller poller, size_t* len,
 /**
  * Cancel a PollRpc call.  This wakes up a call to PollRpc for this poller
  * and causes it to immediately return an empty array.
+ *
  * @param poller  poller handle
  */
 void NT_CancelPollRpc(NT_RpcCallPoller poller);
@@ -836,6 +893,7 @@ void NT_CancelPollRpc(NT_RpcCallPoller poller);
  * for deterministic testing.  This blocks until either the RPC call
  * queue is empty (e.g. there are no more events that need to be passed along
  * to callbacks or poll queues) or the timeout expires.
+ *
  * @param inst      instance handle
  * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
  *                  or a negative value to block indefinitely
@@ -845,8 +903,10 @@ NT_Bool NT_WaitForRpcCallQueue(NT_Inst inst, double timeout);
 
 /**
  * Post RPC response (return value) for a polled RPC.
+ *
  * The rpc and call parameters should come from the NT_RpcAnswer returned
  * by NT_PollRpc().
+ *
  * @param entry       entry handle of RPC entry (from NT_RpcAnswer)
  * @param call        RPC call handle (from NT_RpcAnswer)
  * @param result      result raw data that will be provided to remote caller
@@ -858,9 +918,11 @@ NT_Bool NT_PostRpcResponse(NT_Entry entry, NT_RpcCall call, const char* result,
 
 /**
  * Call a RPC function.  May be used on either the client or server.
+ *
  * This function is non-blocking.  Either NT_GetRpcResult() or
  * NT_CancelRpcResult() must be called to either get or ignore the result of
  * the call.
+ *
  * @param entry       entry handle of RPC entry
  * @param params      parameter
  * @param params_len  length of param in bytes
@@ -872,6 +934,7 @@ NT_RpcCall NT_CallRpc(NT_Entry entry, const char* params, size_t params_len);
 /**
  * Get the result (return value) of a RPC call.  This function blocks until
  * the result is received.
+ *
  * @param entry       entry handle of RPC entry
  * @param call        RPC call handle returned by NT_CallRpc()
  * @param result_len  length of returned result in bytes
@@ -882,6 +945,7 @@ char* NT_GetRpcResult(NT_Entry entry, NT_RpcCall call, size_t* result_len);
 /**
  * Get the result (return value) of a RPC call.  This function blocks until
  * the result is received or it times out.
+ *
  * @param entry       entry handle of RPC entry
  * @param call        RPC call handle returned by NT_CallRpc()
  * @param result_len  length of returned result in bytes
@@ -895,6 +959,7 @@ char* NT_GetRpcResultTimeout(NT_Entry entry, NT_RpcCall call,
 
 /**
  * Ignore the result of a RPC call.  This function is non-blocking.
+ *
  * @param entry       entry handle of RPC entry
  * @param call        RPC call handle returned by NT_CallRpc()
  */
@@ -902,6 +967,7 @@ void NT_CancelRpcResult(NT_Entry entry, NT_RpcCall call);
 
 /**
  * Pack a RPC version 1 definition.
+ *
  * @param def         RPC version 1 definition
  * @param packed_len  length of return value in bytes
  * @return Raw packed bytes.  Use C standard library std::free() to release.
@@ -912,6 +978,7 @@ char* NT_PackRpcDefinition(const struct NT_RpcDefinition* def,
 /**
  * Unpack a RPC version 1 definition.  This can be used for introspection or
  * validation.
+ *
  * @param packed      raw packed bytes
  * @param packed_len  length of packed in bytes
  * @param def         RPC version 1 definition (output)
@@ -922,6 +989,7 @@ NT_Bool NT_UnpackRpcDefinition(const char* packed, size_t packed_len,
 
 /**
  * Pack RPC values as required for RPC version 1 definition messages.
+ *
  * @param values      array of values to pack
  * @param values_len  length of values
  * @param packed_len  length of return value in bytes
@@ -932,6 +1000,7 @@ char* NT_PackRpcValues(const struct NT_Value** values, size_t values_len,
 
 /**
  * Unpack RPC values as required for RPC version 1 definition messages.
+ *
  * @param packed      raw packed bytes
  * @param packed_len  length of packed in bytes
  * @param types       array of data types (as provided in the RPC definition)
@@ -945,7 +1014,7 @@ struct NT_Value** NT_UnpackRpcValues(const char* packed, size_t packed_len,
 /** @} */
 
 /**
- * @defgroup NetworkFunctions Client/Server Functions
+ * @defgroup ntcore_network_cfunc Client/Server Functions
  * @{
  */
 
@@ -953,6 +1022,7 @@ struct NT_Value** NT_UnpackRpcValues(const char* packed, size_t packed_len,
  * Set the network identity of this node.
  * This is the name used during the initial connection handshake, and is
  * visible through NT_ConnectionInfo on the remote node.
+ *
  * @param inst      instance handle
  * @param name      identity to advertise
  * @param name_len  length of name in bytes
@@ -961,6 +1031,7 @@ void NT_SetNetworkIdentity(NT_Inst inst, const char* name, size_t name_len);
 
 /**
  * Get the current network mode.
+ *
  * @param inst  instance handle
  * @return Bitmask of NT_NetworkMode.
  */
@@ -981,12 +1052,14 @@ void NT_StartServer(NT_Inst inst, const char* persist_filename,
 
 /**
  * Stops the server if it is running.
+ *
  * @param inst  instance handle
  */
 void NT_StopServer(NT_Inst inst);
 
 /**
  * Starts a client.  Use NT_SetServer to set the server name and port.
+ *
  * @param inst  instance handle
  */
 void NT_StartClientNone(NT_Inst inst);
@@ -1024,6 +1097,7 @@ void NT_StartClientTeam(NT_Inst inst, unsigned int team, unsigned int port);
 
 /**
  * Stops the client if it is running.
+ *
  * @param inst  instance handle
  */
 void NT_StopClient(NT_Inst inst);
@@ -1072,6 +1146,7 @@ void NT_StartDSClient(NT_Inst inst, unsigned int port);
 
 /**
  * Stops requesting server address from Driver Station.
+ *
  * @param inst  instance handle
  */
 void NT_StopDSClient(NT_Inst inst);
@@ -1087,6 +1162,7 @@ void NT_SetUpdateRate(NT_Inst inst, double interval);
 
 /**
  * Flush Entries.
+ *
  * Forces an immediate flush of all local entry changes to network.
  * Normally this is done on a regularly scheduled interval (see
  * NT_SetUpdateRate()).
@@ -1114,6 +1190,7 @@ struct NT_ConnectionInfo* NT_GetConnections(NT_Inst inst, size_t* count);
 
 /**
  * Return whether or not the instance is connected to another node.
+ *
  * @param inst  instance handle
  * @return True if connected.
  */
@@ -1122,7 +1199,7 @@ NT_Bool NT_IsConnected(NT_Inst inst);
 /** @} */
 
 /**
- * @defgroup FileFunctions File Save/Load Functions
+ * @defgroup ntcore_file_cfunc File Save/Load Functions
  * @{
  */
 
@@ -1130,6 +1207,7 @@ NT_Bool NT_IsConnected(NT_Inst inst);
  * Save persistent values to a file.  The server automatically does this,
  * but this function provides a way to save persistent values in the same
  * format to a file on either a client or a server.
+ *
  * @param inst      instance handle
  * @param filename  filename
  * @return error string, or NULL if successful
@@ -1140,6 +1218,7 @@ const char* NT_SavePersistent(NT_Inst inst, const char* filename);
  * Load persistent values from a file.  The server automatically does this
  * at startup, but this function provides a way to restore persistent values
  * in the same format from a file at any time on either a client or a server.
+ *
  * @param inst      instance handle
  * @param filename  filename
  * @param warn      callback function for warnings
@@ -1151,6 +1230,7 @@ const char* NT_LoadPersistent(NT_Inst inst, const char* filename,
 /**
  * Save table values to a file.  The file format used is identical to
  * that used for SavePersistent.
+ *
  * @param inst        instance handle
  * @param filename    filename
  * @param prefix      save only keys starting with this prefix
@@ -1163,6 +1243,7 @@ const char* NT_SaveEntries(NT_Inst inst, const char* filename,
 /**
  * Load table values from a file.  The file format used is identical to
  * that used for SavePersistent / LoadPersistent.
+ *
  * @param inst        instance handle
  * @param filename    filename
  * @param prefix      load only keys starting with this prefix
@@ -1177,12 +1258,13 @@ const char* NT_LoadEntries(NT_Inst inst, const char* filename,
 /** @} */
 
 /**
- * @defgroup UtilityFunctions Utility Functions
+ * @defgroup ntcore_utility_cfunc Utility Functions
  * @{
  */
 
 /**
  * Frees value memory.
+ *
  * @param value   value to free
  */
 void NT_DisposeValue(struct NT_Value* value);
@@ -1190,12 +1272,14 @@ void NT_DisposeValue(struct NT_Value* value);
 /**
  * Initializes a NT_Value.
  * Sets type to NT_UNASSIGNED and clears rest of struct.
+ *
  * @param value value to initialize
  */
 void NT_InitValue(struct NT_Value* value);
 
 /**
  * Frees string memory.
+ *
  * @param str   string to free
  */
 void NT_DisposeString(struct NT_String* str);
@@ -1203,12 +1287,14 @@ void NT_DisposeString(struct NT_String* str);
 /**
  * Initializes a NT_String.
  * Sets length to zero and pointer to null.
+ *
  * @param str   string to initialize
  */
 void NT_InitString(struct NT_String* str);
 
 /**
  * Disposes an entry handle array.
+ *
  * @param arr   pointer to the array to dispose
  * @param count number of elements in the array
  */
@@ -1216,6 +1302,7 @@ void NT_DisposeEntryArray(NT_Entry* arr, size_t count);
 
 /**
  * Disposes a connection info array.
+ *
  * @param arr   pointer to the array to dispose
  * @param count number of elements in the array
  */
@@ -1223,6 +1310,7 @@ void NT_DisposeConnectionInfoArray(struct NT_ConnectionInfo* arr, size_t count);
 
 /**
  * Disposes an entry info array.
+ *
  * @param arr   pointer to the array to dispose
  * @param count number of elements in the array
  */
@@ -1230,18 +1318,21 @@ void NT_DisposeEntryInfoArray(struct NT_EntryInfo* arr, size_t count);
 
 /**
  * Disposes a single entry info (as returned by NT_GetEntryInfoHandle).
+ *
  * @param info  pointer to the info to dispose
  */
 void NT_DisposeEntryInfo(struct NT_EntryInfo* info);
 
 /**
  * Disposes a Rpc Definition structure.
+ *
  * @param def  pointer to the struct to dispose
  */
 void NT_DisposeRpcDefinition(struct NT_RpcDefinition* def);
 
 /**
  * Disposes a Rpc Answer array.
+ *
  * @param arr   pointer to the array to dispose
  * @param count number of elements in the array
  */
@@ -1249,12 +1340,14 @@ void NT_DisposeRpcAnswerArray(struct NT_RpcAnswer* arr, size_t count);
 
 /**
  * Disposes a Rpc Answer structure.
+ *
  * @param answer     pointer to the struct to dispose
  */
 void NT_DisposeRpcAnswer(struct NT_RpcAnswer* answer);
 
 /**
  * Disposes an entry notification array.
+ *
  * @param arr   pointer to the array to dispose
  * @param count number of elements in the array
  */
@@ -1263,12 +1356,14 @@ void NT_DisposeEntryNotificationArray(struct NT_EntryNotification* arr,
 
 /**
  * Disposes a single entry notification.
+ *
  * @param info  pointer to the info to dispose
  */
 void NT_DisposeEntryNotification(struct NT_EntryNotification* info);
 
 /**
  * Disposes a connection notification array.
+ *
  * @param arr   pointer to the array to dispose
  * @param count number of elements in the array
  */
@@ -1277,12 +1372,14 @@ void NT_DisposeConnectionNotificationArray(
 
 /**
  * Disposes a single connection notification.
+ *
  * @param info  pointer to the info to dispose
  */
 void NT_DisposeConnectionNotification(struct NT_ConnectionNotification* info);
 
 /**
  * Disposes a log message array.
+ *
  * @param arr   pointer to the array to dispose
  * @param count number of elements in the array
  */
@@ -1290,6 +1387,7 @@ void NT_DisposeLogMessageArray(struct NT_LogMessage* arr, size_t count);
 
 /**
  * Disposes a single log message.
+ *
  * @param info  pointer to the info to dispose
  */
 void NT_DisposeLogMessage(struct NT_LogMessage* info);
@@ -1298,6 +1396,7 @@ void NT_DisposeLogMessage(struct NT_LogMessage* info);
  * Returns monotonic current time in 1 us increments.
  * This is the same time base used for entry and connection timestamps.
  * This function is a compatibility wrapper around WPI_Now().
+ *
  * @return Timestamp
  */
 uint64_t NT_Now(void);
@@ -1305,12 +1404,13 @@ uint64_t NT_Now(void);
 /** @} */
 
 /**
- * @defgroup LoggerFunctions Logger Functions
+ * @defgroup ntcore_logger_cfunc Logger Functions
  * @{
  */
 
 /**
  * Log function.
+ *
  * @param data    data pointer passed to NT_AddLogger()
  * @param msg     message information
  */
@@ -1336,6 +1436,7 @@ NT_Logger NT_AddLogger(NT_Inst inst, void* data, NT_LogFunc func,
 /**
  * Create a log poller.  A poller provides a single queue of poll events.
  * The returned handle must be destroyed with NT_DestroyLoggerPoller().
+ *
  * @param inst      instance handle
  * @return poller handle
  */
@@ -1344,6 +1445,7 @@ NT_LoggerPoller NT_CreateLoggerPoller(NT_Inst inst);
 /**
  * Destroy a log poller.  This will abort any blocked polling call and prevent
  * additional events from being generated for this poller.
+ *
  * @param poller    poller handle
  */
 void NT_DestroyLoggerPoller(NT_LoggerPoller poller);
@@ -1352,6 +1454,7 @@ void NT_DestroyLoggerPoller(NT_LoggerPoller poller);
  * Set the log level for a log poller.  Events will only be generated for
  * log messages with level greater than or equal to min_level and less than or
  * equal to max_level; messages outside this range will be silently ignored.
+ *
  * @param poller        poller handle
  * @param min_level     minimum log level
  * @param max_level     maximum log level
@@ -1362,6 +1465,7 @@ NT_Logger NT_AddPolledLogger(NT_LoggerPoller poller, unsigned int min_level,
 
 /**
  * Get the next log event.  This blocks until the next log occurs.
+ *
  * @param poller    poller handle
  * @param len       length of returned array (output)
  * @return Array of information on the log events.  Only returns NULL if an
@@ -1372,6 +1476,7 @@ struct NT_LogMessage* NT_PollLogger(NT_LoggerPoller poller, size_t* len);
 /**
  * Get the next log event.  This blocks until the next log occurs or it times
  * out.
+ *
  * @param poller      poller handle
  * @param len         length of returned array (output)
  * @param timeout     timeout, in seconds
@@ -1386,12 +1491,14 @@ struct NT_LogMessage* NT_PollLoggerTimeout(NT_LoggerPoller poller, size_t* len,
 /**
  * Cancel a PollLogger call.  This wakes up a call to PollLogger for this
  * poller and causes it to immediately return an empty array.
+ *
  * @param poller  poller handle
  */
 void NT_CancelPollLogger(NT_LoggerPoller poller);
 
 /**
  * Remove a logger.
+ *
  * @param logger Logger handle to remove
  */
 void NT_RemoveLogger(NT_Logger logger);
@@ -1401,6 +1508,7 @@ void NT_RemoveLogger(NT_Logger logger);
  * for deterministic testing.  This blocks until either the log event
  * queue is empty (e.g. there are no more events that need to be passed along
  * to callbacks or poll queues) or the timeout expires.
+ *
  * @param inst      instance handle
  * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
  *                  or a negative value to block indefinitely
@@ -1411,12 +1519,12 @@ NT_Bool NT_WaitForLoggerQueue(NT_Inst inst, double timeout);
 /** @} */
 
 /**
- * @defgroup InteropFunctions Interop Utility Functions
+ * @defgroup ntcore_interop_cfunc Interop Utility Functions
  * @{
  */
 
 /**
- * @defgroup MemoryAllocators Memory Allocators
+ * @defgroup ntcore_memoryallocators_cfunc Memory Allocators
  * @{
  */
 
@@ -1508,7 +1616,7 @@ void NT_FreeStringArray(struct NT_String* v_string, size_t arr_size);
 /** @} */
 
 /**
- * @defgroup TypedGetters Typed Getters
+ * @defgroup ntcore_typedgetters_cfunc Typed Getters
  * @{
  */
 
@@ -1745,7 +1853,7 @@ struct NT_String* NT_GetEntryStringArray(NT_Entry entry, uint64_t* last_change,
 /** @} */
 
 /**
- * @defgroup SetDefault Set Default Values
+ * @defgroup ntcore_setdefault_cfunc Set Default Values
  * @{
  */
 
@@ -1851,7 +1959,7 @@ NT_Bool NT_SetDefaultEntryStringArray(NT_Entry entry, uint64_t time,
 /** @} */
 
 /**
- * @defgroup ValueSetters Entry Value Setters
+ * @defgroup ntcore_valuesetters_cfunc Entry Value Setters
  * @{
  */
 
@@ -1952,6 +2060,7 @@ NT_Bool NT_SetEntryStringArray(NT_Entry entry, uint64_t time,
                                const struct NT_String* arr, size_t size,
                                NT_Bool force);
 
+/** @} */
 /** @} */
 /** @} */
 
