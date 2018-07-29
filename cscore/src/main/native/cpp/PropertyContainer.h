@@ -18,6 +18,7 @@
 #include <wpi/SmallVector.h>
 #include <wpi/StringMap.h>
 #include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 #include <wpi/mutex.h>
 
 #include "PropertyImpl.h"
@@ -29,7 +30,7 @@ class PropertyContainer {
  public:
   virtual ~PropertyContainer() = default;
 
-  int GetPropertyIndex(wpi::StringRef name) const;
+  int GetPropertyIndex(const wpi::Twine& name) const;
   wpi::ArrayRef<int> EnumerateProperties(wpi::SmallVectorImpl<int>& vec,
                                          CS_Status* status) const;
   CS_PropertyKind GetPropertyKind(int property) const;
@@ -44,7 +45,7 @@ class PropertyContainer {
   wpi::StringRef GetStringProperty(int property,
                                    wpi::SmallVectorImpl<char>& buf,
                                    CS_Status* status) const;
-  virtual void SetStringProperty(int property, wpi::StringRef value,
+  virtual void SetStringProperty(int property, const wpi::Twine& value,
                                  CS_Status* status);
   std::vector<std::string> GetEnumPropertyChoices(int property,
                                                   CS_Status* status) const;
@@ -65,9 +66,10 @@ class PropertyContainer {
   // @tparam NewFunc functor that returns a std::unique_ptr<PropertyImpl>
   // @tparam UpdateFunc functor that takes a PropertyImpl&.
   template <typename NewFunc, typename UpdateFunc>
-  int CreateOrUpdateProperty(wpi::StringRef name, NewFunc newFunc,
+  int CreateOrUpdateProperty(const wpi::Twine& name, NewFunc newFunc,
                              UpdateFunc updateFunc) {
-    int& ndx = m_properties[name];
+    wpi::SmallVector<char, 64> nameBuf;
+    int& ndx = m_properties[name.toStringRef(nameBuf)];
     if (ndx == 0) {
       // create a new index
       ndx = m_propertyData.size() + 1;
@@ -79,7 +81,7 @@ class PropertyContainer {
     return ndx;
   }
   template <typename NewFunc>
-  int CreateProperty(wpi::StringRef name, NewFunc newFunc) {
+  int CreateProperty(const wpi::Twine& name, NewFunc newFunc) {
     return CreateOrUpdateProperty(name, newFunc, [](PropertyImpl&) {});
   }
 
@@ -88,7 +90,7 @@ class PropertyContainer {
   // Note: called with m_mutex held.
   // The default implementation simply creates a PropertyImpl object.
   virtual std::unique_ptr<PropertyImpl> CreateEmptyProperty(
-      wpi::StringRef name) const;
+      const wpi::Twine& name) const;
 
   // Cache properties.  Implementations must return false and set status to
   // CS_SOURCE_IS_DISCONNECTED if not possible to cache.
@@ -99,7 +101,7 @@ class PropertyContainer {
 
   // Update property value; must be called with m_mutex held.
   virtual void UpdatePropertyValue(int property, bool setString, int value,
-                                   wpi::StringRef valueStr) = 0;
+                                   const wpi::Twine& valueStr) = 0;
 
   // Whether CacheProperties() has been successful at least once (and thus
   // should not be called again)

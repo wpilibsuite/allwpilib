@@ -73,7 +73,7 @@ static const char* endRootPage = "</div></body></html>";
 
 class MjpegServerImpl::ConnThread : public wpi::SafeThread {
  public:
-  explicit ConnThread(wpi::StringRef name) : m_name(name) {}
+  explicit ConnThread(const wpi::Twine& name) : m_name(name.str()) {}
 
   void Main();
 
@@ -124,9 +124,10 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
 // A browser should connect for each file and not serve files from its cache.
 // Using cached pictures would lead to showing old/outdated pictures.
 // Many browsers seem to ignore, or at least not always obey, those headers.
-static void SendHeader(wpi::raw_ostream& os, int code, wpi::StringRef codeText,
-                       wpi::StringRef contentType,
-                       wpi::StringRef extra = wpi::StringRef{}) {
+static void SendHeader(wpi::raw_ostream& os, int code,
+                       const wpi::Twine& codeText,
+                       const wpi::Twine& contentType,
+                       const wpi::Twine& extra = wpi::Twine{}) {
   os << "HTTP/1.0 " << code << ' ' << codeText << "\r\n";
   os << "Connection: close\r\n"
         "Server: CameraServer/1.0\r\n"
@@ -136,14 +137,17 @@ static void SendHeader(wpi::raw_ostream& os, int code, wpi::StringRef codeText,
         "Expires: Mon, 3 Jan 2000 12:34:56 GMT\r\n";
   os << "Content-Type: " << contentType << "\r\n";
   os << "Access-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\n";
-  if (!extra.empty()) os << extra << "\r\n";
+  wpi::SmallString<128> extraBuf;
+  wpi::StringRef extraStr = extra.toStringRef(extraBuf);
+  if (!extraStr.empty()) os << extraStr << "\r\n";
   os << "\r\n";  // header ends with a blank line
 }
 
 // Send error header and message
 // @param code HTTP error code (e.g. 404)
 // @param message Additional message text
-static void SendError(wpi::raw_ostream& os, int code, wpi::StringRef message) {
+static void SendError(wpi::raw_ostream& os, int code,
+                      const wpi::Twine& message) {
   wpi::StringRef codeText, extra, baseMessage;
   switch (code) {
     case 401:
@@ -544,11 +548,11 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
   os.flush();
 }
 
-MjpegServerImpl::MjpegServerImpl(wpi::StringRef name,
-                                 wpi::StringRef listenAddress, int port,
+MjpegServerImpl::MjpegServerImpl(const wpi::Twine& name,
+                                 const wpi::Twine& listenAddress, int port,
                                  std::unique_ptr<wpi::NetworkAcceptor> acceptor)
     : SinkImpl{name},
-      m_listenAddress(listenAddress),
+      m_listenAddress(listenAddress.str()),
       m_port(port),
       m_acceptor{std::move(acceptor)} {
   m_active = true;
@@ -905,13 +909,16 @@ void MjpegServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {
 
 namespace cs {
 
-CS_Sink CreateMjpegServer(wpi::StringRef name, wpi::StringRef listenAddress,
-                          int port, CS_Status* status) {
-  wpi::SmallString<128> str{listenAddress};
+CS_Sink CreateMjpegServer(const wpi::Twine& name,
+                          const wpi::Twine& listenAddress, int port,
+                          CS_Status* status) {
+  wpi::SmallString<128> listenAddressBuf;
   auto sink = std::make_shared<MjpegServerImpl>(
       name, listenAddress, port,
-      std::unique_ptr<wpi::NetworkAcceptor>(
-          new wpi::TCPAcceptor(port, str.c_str(), Logger::GetInstance())));
+      std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
+          port,
+          listenAddress.toNullTerminatedStringRef(listenAddressBuf).data(),
+          Logger::GetInstance())));
   auto handle = Sinks::GetInstance().Allocate(CS_SINK_MJPEG, sink);
   Notifier::GetInstance().NotifySink(name, handle, CS_SINK_CREATED);
   return handle;
