@@ -64,6 +64,7 @@ doxygen {
     warn_logfile false
     warn_if_undocumented false
     generate_latex false
+    use_mathjax true
     html_timestamp true
     generate_treeview true
 }
