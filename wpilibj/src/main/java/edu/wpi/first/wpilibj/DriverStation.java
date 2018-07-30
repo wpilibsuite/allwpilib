@@ -174,6 +174,8 @@ public class DriverStation {
   private final ControlWord m_controlWordCache;
   private long m_lastControlWordUpdate;
 
+  private static boolean m_silenceJoystickWarnings = false;
+
   /**
    * Gets an instance of the DriverStation.
    *
@@ -277,6 +279,9 @@ public class DriverStation {
 
   private static void reportErrorImpl(boolean isError, int code, String error,
       boolean printTrace, StackTraceElement[] stackTrace, int stackTraceFirst) {
+    if(m_silenceJoystickWarnings) {
+      return;
+    }
     String locString;
     if (stackTrace.length >= stackTraceFirst + 1) {
       locString = stackTrace[stackTraceFirst].toString();
@@ -1106,10 +1111,33 @@ public class DriverStation {
    */
   private void reportJoystickUnpluggedWarning(String message) {
     double currentTime = Timer.getFPGATimestamp();
-    if (currentTime > m_nextMessageTime) {
+    if (!m_silenceJoystickWarnings && currentTime > m_nextMessageTime ) {
       reportWarning(message, false);
       m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
     }
+  }
+
+  /**
+   * Sets whether to silence the DriverStation warning prints when a Joystick is unplugged.
+   * @param silenced true to enable, false to disable silencing.
+   */
+  public void silenceJoystickUnplugged(boolean silenced) {
+    m_silenceJoystickWarnings = silenced;
+  }
+
+  /**
+   * Silence the DriverStation warning prints when a Joystick is unplugged.
+   */
+  public void silenceJoystickUnplugged() {
+    m_silenceJoystickWarnings = true;
+  }
+
+  /**
+   * Get whether the Joystick warnings are silenced.
+   * @return true for silenced, false for printing.
+   */
+  public boolean getJoystickWarnings() {
+    return m_silenceJoystickWarnings;
   }
 
   /**
