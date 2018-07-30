@@ -175,7 +175,7 @@ public abstract class Trigger extends SendableBase {
   public abstract static class ButtonScheduler {
     public abstract void execute();
 
-    protected void start() {
+    public void start() {
       Scheduler.getInstance().addButton(this);
     }
   }
