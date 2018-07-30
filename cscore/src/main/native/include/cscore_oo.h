@@ -168,7 +168,7 @@ class VideoSource {
   uint64_t GetLastFrameTime() const;
 
   /**
-   * Set the connection strategy.  By default, the source will automatically
+   * Sets the connection strategy.  By default, the source will automatically
    * connect or disconnect based on whether any sinks are connected.
    *
    * <p>This function is non-blocking; look for either a connection open or
@@ -184,7 +184,7 @@ class VideoSource {
   bool IsConnected() const;
 
   /**
-   * Get source enable status.  This is determined with a combination of
+   * Gets source enable status.  This is determined with a combination of
    * connection strategy and the number of sinks connected.
    *
    * @return True if enabled, false otherwise.

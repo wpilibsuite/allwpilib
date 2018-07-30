@@ -153,11 +153,12 @@ public class VideoSource implements AutoCloseable {
   }
 
   /**
-   * Set the connection strategy.  By default, the source will automatically
+   * Sets the connection strategy.  By default, the source will automatically
    * connect or disconnect based on whether any sinks are connected.
    *
    * <p>This function is non-blocking; look for either a connection open or
-   * close event or call IsConnected() to determine the connection state.
+   * close event or call {@link #isConnected()} to determine the connection
+   * state.
    *
    * @param strategy connection strategy (auto, keep open, or force close)
    */
@@ -173,7 +174,7 @@ public class VideoSource implements AutoCloseable {
   }
 
   /**
-   * Get source enable status.  This is determined with a combination of
+   * Gets source enable status.  This is determined with a combination of
    * connection strategy and the number of sinks connected.
    *
    * @return True if enabled, false otherwise.
