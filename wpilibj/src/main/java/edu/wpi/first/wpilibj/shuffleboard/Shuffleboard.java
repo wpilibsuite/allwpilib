@@ -97,6 +97,7 @@ public final class Shuffleboard {
    * this method directly.
    */
   public static void disableActuatorWidgets() {
+    update(); // Need to update to make sure the sendable builders are initialized
     root.disableActuatorWidgets();
   }
 
