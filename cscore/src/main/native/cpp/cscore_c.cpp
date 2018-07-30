@@ -99,8 +99,18 @@ uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
   return cs::GetSourceLastFrameTime(source, status);
 }
 
+void CS_SetSourceConnectionStrategy(CS_Source source,
+                                    CS_ConnectionStrategy strategy,
+                                    CS_Status* status) {
+  cs::SetSourceConnectionStrategy(source, strategy, status);
+}
+
 CS_Bool CS_IsSourceConnected(CS_Source source, CS_Status* status) {
   return cs::IsSourceConnected(source, status);
+}
+
+CS_Bool CS_IsSourceEnabled(CS_Source source, CS_Status* status) {
+  return cs::IsSourceEnabled(source, status);
 }
 
 CS_Property CS_GetSourceProperty(CS_Source source, const char* name,

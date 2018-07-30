@@ -601,6 +601,21 @@ Java_edu_wpi_cscore_CameraServerJNI_getSourceLastFrameTime
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    setSourceConnectionStrategy
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_setSourceConnectionStrategy
+  (JNIEnv* env, jclass, jint source, jint strategy)
+{
+  CS_Status status = 0;
+  cs::SetSourceConnectionStrategy(
+      source, static_cast<CS_ConnectionStrategy>(strategy), &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    isSourceConnected
  * Signature: (I)Z
  */
@@ -610,6 +625,21 @@ Java_edu_wpi_cscore_CameraServerJNI_isSourceConnected
 {
   CS_Status status = 0;
   auto val = cs::IsSourceConnected(source, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    isSourceEnabled
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_isSourceEnabled
+  (JNIEnv* env, jclass, jint source)
+{
+  CS_Status status = 0;
+  auto val = cs::IsSourceEnabled(source, &status);
   CheckStatus(env, status);
   return val;
 }

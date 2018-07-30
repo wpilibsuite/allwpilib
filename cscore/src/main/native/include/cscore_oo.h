@@ -106,6 +106,27 @@ class VideoSource {
     kCv = CS_SOURCE_CV
   };
 
+  /** Connection strategy.  Used for SetConnectionStrategy(). */
+  enum ConnectionStrategy {
+    /**
+     * Automatically connect or disconnect based on whether any sinks are
+     * connected to this source.  This is the default behavior.
+     */
+    kConnectionAutoManage = CS_CONNECTION_AUTO_MANAGE,
+
+    /**
+     * Try to keep the connection open regardless of whether any sinks are
+     * connected.
+     */
+    kConnectionKeepOpen = CS_CONNECTION_KEEP_OPEN,
+
+    /**
+     * Never open the connection.  If this is set when the connection is open,
+     * close the connection.
+     */
+    kConnectionForceClose = CS_CONNECTION_FORCE_CLOSE
+  };
+
   VideoSource() noexcept : m_handle(0) {}
   VideoSource(const VideoSource& source);
   VideoSource(VideoSource&& other) noexcept;
@@ -147,9 +168,28 @@ class VideoSource {
   uint64_t GetLastFrameTime() const;
 
   /**
+   * Sets the connection strategy.  By default, the source will automatically
+   * connect or disconnect based on whether any sinks are connected.
+   *
+   * <p>This function is non-blocking; look for either a connection open or
+   * close event or call IsConnected() to determine the connection state.
+   *
+   * @param strategy connection strategy (auto, keep open, or force close)
+   */
+  void SetConnectionStrategy(ConnectionStrategy strategy);
+
+  /**
    * Is the source currently connected to whatever is providing the images?
    */
   bool IsConnected() const;
+
+  /**
+   * Gets source enable status.  This is determined with a combination of
+   * connection strategy and the number of sinks connected.
+   *
+   * @return True if enabled, false otherwise.
+   */
+  bool IsEnabled() const;
 
   /** Get a property.
    *

@@ -178,6 +178,27 @@ enum CS_TelemetryKind {
   CS_SOURCE_FRAMES_RECEIVED = 2
 };
 
+/** Connection strategy */
+enum CS_ConnectionStrategy {
+  /**
+   * Automatically connect or disconnect based on whether any sinks are
+   * connected to this source.  This is the default behavior.
+   */
+  CS_CONNECTION_AUTO_MANAGE = 0,
+
+  /**
+   * Try to keep the connection open regardless of whether any sinks are
+   * connected.
+   */
+  CS_CONNECTION_KEEP_OPEN,
+
+  /**
+   * Never open the connection.  If this is set when the connection is open,
+   * close the connection.
+   */
+  CS_CONNECTION_FORCE_CLOSE
+};
+
 /**
  * Listener event
  */
@@ -245,7 +266,11 @@ enum CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status);
 char* CS_GetSourceName(CS_Source source, CS_Status* status);
 char* CS_GetSourceDescription(CS_Source source, CS_Status* status);
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status);
+void CS_SetSourceConnectionStrategy(CS_Source source,
+                                    enum CS_ConnectionStrategy strategy,
+                                    CS_Status* status);
 CS_Bool CS_IsSourceConnected(CS_Source source, CS_Status* status);
+CS_Bool CS_IsSourceEnabled(CS_Source source, CS_Status* status);
 CS_Property CS_GetSourceProperty(CS_Source source, const char* name,
                                  CS_Status* status);
 CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
