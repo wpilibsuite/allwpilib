@@ -23,16 +23,16 @@ namespace frc {
  * used types of filters.
  *
  * Filters are of the form:<br>
- *  y[n] = (b0 * x[n] + b1 * x[n-1] + â€¦ + bP * x[n-P]) -
- *         (a0 * y[n-1] + a2 * y[n-2] + â€¦ + aQ * y[n-Q])
+ *  y[n] = (b0 * x[n] + b1 * x[n-1] + ... + bP * x[n-P]) -
+ *         (a0 * y[n-1] + a2 * y[n-2] + ... + aQ * y[n-Q])
  *
  * Where:<br>
  *  y[n] is the output at time "n"<br>
  *  x[n] is the input at time "n"<br>
  *  y[n-1] is the output from the LAST time step ("n-1")<br>
  *  x[n-1] is the input from the LAST time step ("n-1")<br>
- *  b0 â€¦ bP are the "feedforward" (FIR) gains<br>
- *  a0 â€¦ aQ are the "feedback" (IIR) gains<br>
+ *  b0...bP are the "feedforward" (FIR) gains<br>
+ *  a0...aQ are the "feedback" (IIR) gains<br>
  * IMPORTANT! Note the "-" sign in front of the feedback term! This is a common
  *            convention in signal processing.
  *
