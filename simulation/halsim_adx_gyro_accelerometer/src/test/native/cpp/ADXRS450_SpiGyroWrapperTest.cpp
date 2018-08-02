@@ -5,9 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ADXRS450_Gyro.h"
 #include "ADXRS450_SpiGyroWrapperData.h"
-#include "Talon.h"
+#include "frc/ADXRS450_Gyro.h"
 #include "gtest/gtest.h"
 
 class ADXRS450_SpiGyroWrapperTest
@@ -33,4 +32,4 @@ INSTANTIATE_TEST_CASE_P(
     ADXRS450_SpiGyroWrapperTest, ADXRS450_SpiGyroWrapperTest,
     ::testing::Values(frc::SPI::kOnboardCS0, frc::SPI::kOnboardCS1,
                       frc::SPI::kOnboardCS2, frc::SPI::kOnboardCS3,
-                      frc::SPI::kMXP));
+                      frc::SPI::kMXP), );

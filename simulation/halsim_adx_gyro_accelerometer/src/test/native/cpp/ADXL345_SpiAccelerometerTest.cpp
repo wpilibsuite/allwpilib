@@ -5,9 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ADXL345_SPI.h"
 #include "ADXL345_SpiAccelerometerData.h"
-#include "Talon.h"
+#include "frc/ADXL345_SPI.h"
 #include "gtest/gtest.h"
 
 class ADXL345_SpiAccelerometerTest
@@ -46,4 +45,4 @@ INSTANTIATE_TEST_CASE_P(
     ADXL345_SpiAccelerometerTest, ADXL345_SpiAccelerometerTest,
     ::testing::Values(frc::SPI::kOnboardCS0, frc::SPI::kOnboardCS1,
                       frc::SPI::kOnboardCS2, frc::SPI::kOnboardCS3,
-                      frc::SPI::kMXP));
+                      frc::SPI::kMXP), );
