@@ -311,20 +311,20 @@ void DriverStationComms::periodic_update() {
 //			j->set_pov(x, t->pov[x]);
 //		}
 
-		j->setAxisCount(i,t->axis_count);
-		j->setButtonCount(i, t->button_count);
-		j->setPovCount(i, t->pov_count);
-		j->setButtonMask(i, t->button_mask);
+		joystickPointer->setAxisCount(i,dataPointer->axis_count);
+		joystickPointer->setButtonCount(i, dataPointer->button_count);
+		joystickPointer->setPovCount(i, dataPointer->pov_count);
+		joystickPointer->setButtonMask(i, dataPointer->button_mask);
 
-		for (int x = 0; x < j->getAxisCount(i); x++) {
-			j->setAxis(i, x, t->axis[x]);
+		for (int x = 0; x < joystickPointer->getAxisCount(i); x++) {
+			joystickPointer->setAxis(i, x, dataPointer->axis[x]);
 		}
 
-		for (int x = 0; x < j->getPovCount(i); x++) {
-			j->setAxis(i, x, t->pov[x]);
+		for (int x = 0; x < joystickPointer->getPovCount(i); x++) {
+			joystickPointer->setAxis(i, x, dataPointer->pov[x]);
 		}
 
-		t->has_update = false;
+		dataPointer->has_update = false;
 	}
 
 //	MTX_LOCK(shared_mutex()->power, 0);
