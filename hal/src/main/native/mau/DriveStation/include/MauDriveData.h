@@ -15,21 +15,27 @@ class Mau_DriveData {
     Mau_SharedJoystick joysticks[6];
     HAL_ControlWord* prevControlWord;
     HAL_ControlWord* currControlWord;
-    bool wordUpdated;
+    bool wordUnread;
     HAL_AllianceStationID* allianceID;
     HAL_MatchInfo* matchInfo;
 
     Mau_SharedJoystick getJoystick(int joyNumber);
 public:
     Mau_DriveData(HAL_ControlWord* word, HAL_AllianceStationID* id, HAL_MatchInfo* info);
-    void HAL_writeJoystick(int joyNumber,
-                           HAL_JoystickAxes axes,
-                           HAL_JoystickPOVs povs,
-                           HAL_JoystickButtons buttons,
-                           HAL_JoystickDescriptor desc);
+    void writeJoystick(int joyNumber,
+                       HAL_JoystickAxes axes,
+                       HAL_JoystickPOVs povs,
+                       HAL_JoystickButtons buttons,
+                       HAL_JoystickDescriptor desc);
+
+    void updateControlWord(bool enabled, bool auton, bool test, bool estop, bool fms, bool ds);
+    void updateJoyAxis(int joyNumber, int axisIndex, float axis);
+    void updateJoyPOV(int joyNumber, int povIndex, int16_t pov);
+    void updateJoyButtons(int joyNumber, uint32_t buttons);
+
     HAL_ControlWord* readPreviousControl();
     HAL_ControlWord* readCurrentControl();
-    bool readControlUpdated();
+    bool readIfControlRead();
     HAL_AllianceStationID* readAllianceID();
     HAL_MatchInfo* readMatchInfo();
     HAL_MatchType* readMatchType();

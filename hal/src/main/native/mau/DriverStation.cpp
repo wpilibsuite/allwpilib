@@ -135,13 +135,12 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum, HAL_JoystickButtons* buttons
  * nonzero is bad.
  */
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum, HAL_JoystickDescriptor* desc) {
-    auto joyDescriptor = mau::sharedMemory->Bagel_getJoyDescriptor(joystickNum);
-     desc = &joyDescriptor;
-     return 0;
+    desc = mau::sharedMemory->readJoyDescriptor(joystickNum);
+    return 0;
 }
 
 HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) {
-    return mau::sharedMemory->Bagel_getJoyDescriptor(joystickNum).get_is_xbox();
+    return mau::sharedMemory->readJoyDescriptor(joystickNum).get_is_xbox();
 }
 
 int32_t HAL_GetJoystickType(int32_t joystickNum) {
