@@ -1,10 +1,11 @@
-#include "DriverStationInternal.h"
-#include "MauDriveData.h"
 #include "socket.hpp"
 #include "util.hpp"
 #include "fwi.hpp"
 #include "ds_comms.hpp"
 #include "state.hpp"
+#include "include/MauDriveData.h"
+#include "include/BagelDriveData.h"
+
 
 #include <thread>
 #include <iostream>
@@ -12,6 +13,13 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <string>
+
+//#include "thp/sim/sim_provider.hpp"
+//#include "toast/memory.hpp"
+//#include "toast/concurrent/mutex.hpp"
+//#include "toast/util.hpp"
+//#include "toast/crash.hpp"
+//#include "toast/logger.hpp"
 
 using namespace Sim;
 using namespace Toast::Memory;
@@ -22,7 +30,6 @@ static char tcp_buffer[1024];
 
 //static Toast::Concurrent::Mutex mtx;
 
-Mau_DriveData* sharedData;
 static bool server_running;
 
 static std::thread udp_thread, tcp_thread;
@@ -288,26 +295,52 @@ void DriverStationComms::periodic_update() {
 //	MTX_UNLOCK(shared_mutex()->ds, 0);
 
     for (int i = 0; i < 6; i++) {
-//		MTX_LOCK(shared_mutex()->joy, i);
 //		Shared::DS::Joystick *j = shared()->joystick(i);
-        _TempJoyData* t = &joys[i];
 
-//		j->set_num_axis(t->axis_count);
-//		j->set_num_button(t->button_count);
-//		j->set_num_pov(t->pov_count);
+//        Mau_SharedJoystick *sharedJoy = driveData->getJoystick(i);
 
-//		j->set_button_mask(t->button_mask);
+        _TempJoyData* dataPointer = &joys[i];
 
-//		for (int x = 0; x < j->get_num_axis(); x++) {
-//			j->set_axis(x, t->axis[x]);
-//		}
+//        typedef struct {
+//            uint8_t axis_count, pov_count, button_count;
+//            uint16_t pov[4];
+//            uint8_t axis[16];
+//            uint32_t button_mask;
+//            bool has_update;
+//        } _TempJoyData;
 
-//		for (int x = 0; x < j->get_num_pov(); x++) {
-//			j->set_pov(x, t->pov[x]);
-//		}
+////		j->set_num_axis(dataPointer->axis_count);
+////		j->set_num_button(dataPointer->button_count);
+////		j->set_num_pov(dataPointer->pov_count);
+////		j->set_button_mask(dataPointer->button_mask);
+//
+////		for (int x = 0; x < j->get_num_axis(); x++) {
+////			j->set_axis(x, dataPointer->axis[x]);
+////		}
+//
+////		for (int x = 0; x < j->get_num_pov(); x++) {
+////			j->set_pov(x, dataPointer->pov[x]);
+////		}
 
-        t->has_update = false;
-//		MTX_UNLOCK(shared_mutex()->joy, i);
+//        Bagel_updateJoystickAxes(i, std::vector<int8_t> axes)
+
+        static void Bagel_updateJoystickPOVs(int joyNumber, std::vector<int16_t> povs);
+
+//
+//        j->setAxisCount(i,dataPointer->axis_count);
+//        j->setButtonCount(i, dataPointer->button_count);
+//        j->setPovCount(i, dataPointer->pov_count);
+//        j->setButtonMask(i, dataPointer->button_mask);
+//
+//        for (int x = 0; x < j->getAxisCount(i); x++) {
+//            j->setAxis(i, x, dataPointer->axis[x]);
+//        }
+//
+//        for (int x = 0; x < j->getPovCount(i); x++) {
+//            j->setAxis(i, x, dataPointer->pov[x]);
+//        }
+
+        dataPointer->has_update = false;
     }
 
 //	MTX_LOCK(shared_mutex()->power, 0);

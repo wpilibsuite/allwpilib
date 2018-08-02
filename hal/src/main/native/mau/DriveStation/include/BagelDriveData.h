@@ -75,18 +75,16 @@ static void Bagel_updateRobotState(Toast::Memory::RobotState roboState, Toast::M
     mau::sharedMemory->updateControlWord(enabled, auton, test, estop, fms, ds);
 }
 
-static void Bagel_updateJoystickAxes(int joyNumber, std::vector<int8_t> axes) {
-    int index = 0;
-    for (int8_t axis : axes) {
-        mau::sharedMemory->updateJoyAxis(joyNumber, index, (float) axis);
+static void Bagel_updateJoystickAxes(int joyNumber, int axesNum, float* axes) {
+    for (int index = 0; index < axesNum; index++) {
+        mau::sharedMemory->updateJoyAxis(joyNumber, index, axes[index]);
         index++;
     }
 }
 
-static void Bagel_updateJoystickPOVs(int joyNumber, std::vector<int16_t> povs) {
-    int index = 0;
-    for (int16_t pov : povs) {
-        mau::sharedMemory->updateJoyPOV(joyNumber, index, pov);
+static void Bagel_updateJoystickPOVs(int joyNumber, int povsNum, int16_t* povs) {
+    for (int index = 0; index < povsNum; index++) {
+        mau::sharedMemory->updateJoyPOV(joyNumber, index, povs[index]);
         index++;
     }
 }
