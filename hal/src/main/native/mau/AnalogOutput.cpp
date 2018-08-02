@@ -97,5 +97,7 @@ double HAL_GetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
   }
 
   // return SimAnalogOutData[port->channel].GetVoltage();
+  // TODO: ALL DYLAN! ALL!!!!
+  return 0;
 }
 }  // extern "C"

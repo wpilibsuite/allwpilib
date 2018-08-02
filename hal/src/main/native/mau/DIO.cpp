@@ -14,11 +14,12 @@
 #include "HAL/handles/LimitedHandleResource.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
-#include "Translator/VMXHandler.h"
+#include "MauInternal.h"
 #include <VMXIO.h>
 #include <VMXResource.h>
 
 using namespace hal;
+using namespace mau;
 
 static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
         kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM>*
@@ -32,10 +33,6 @@ namespace hal {
             digitalPWMHandles = &dpH;
         }
     }
-}
-
-VMXResourceHandle HAL_DIOToVMXHandle(HAL_DigitalHandle dioPortHandle) {
-    return HAL_WPIToVMXHandle(dioPortHandle, VMXResourceType::DigitalIO);
 }
 
 extern "C" {
@@ -66,9 +63,9 @@ extern "C" {
 
         port->channel = static_cast<uint8_t>(channel);
 
-        SimDIOData[channel].SetInitialized(true);
-//
-        SimDIOData[channel].SetIsInput(input);
+//        SimDIOData[channel].SetInitialized(true);
+////
+//        SimDIOData[channel].SetIsInput(input);
 
         return handle;
     }
@@ -82,7 +79,7 @@ extern "C" {
         // no status, so no need to check for a proper free.
         digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
         if (port == nullptr) return;
-        SimDIOData[port->channel].SetInitialized(true);
+//        SimDIOData[port->channel].SetInitialized(true);
     }
 
     /**
@@ -105,7 +102,7 @@ extern "C" {
         }
         *id = static_cast<uint8_t>(getHandleIndex(handle));
 
-        SimDigitalPWMData[*id].SetInitialized(true);
+//        SimDigitalPWMData[*id].SetInitialized(true);
 
         return handle;
     }
@@ -121,7 +118,7 @@ extern "C" {
         digitalPWMHandles->Free(pwmGenerator);
         if (port == nullptr) return;
         int32_t id = *port;
-        SimDigitalPWMData[id].SetInitialized(false);
+//        SimDigitalPWMData[id].SetInitialized(false);
     }
 
     /**
@@ -159,7 +156,7 @@ extern "C" {
         int32_t id = *port;
         if (dutyCycle > 1.0) dutyCycle = 1.0;
         if (dutyCycle < 0.0) dutyCycle = 0.0;
-        SimDigitalPWMData[id].SetDutyCycle(dutyCycle);
+//        SimDigitalPWMData[id].SetDutyCycle(dutyCycle);
     }
 
     /**
@@ -175,7 +172,7 @@ extern "C" {
             return;
         }
         int32_t id = *port;
-        SimDigitalPWMData[id].SetPin(channel);
+//        SimDigitalPWMData[id].SetPin(channel);
     }
 
     /**
@@ -196,8 +193,8 @@ extern "C" {
             if (value != 0) value = 1;
         }
 
-        VMXResourceHandle handle = HAL_DIOToVMXHandle(dioPortHandle);
-        vmxIO->DIO_Set(handle, (bool)value, &vmxError);
+//        VMXResourceHandle handle = HAL_DIOToVMXHandle(dioPortHandle);
+//        vmxIO->DIO_Set(handle, (bool)value, vmxError);
     }
 
     /**
@@ -213,7 +210,7 @@ extern "C" {
             return;
         }
 
-        SimDIOData[port->channel].SetIsInput(input);
+//        SimDIOData[port->channel].SetIsInput(input);
     }
 
     /**
@@ -230,9 +227,10 @@ extern "C" {
             return false;
         }
 
-        bool value;
-        VMXResourceHandle handle = HAL_DIOToVMXHandle(dioPortHandle);
-        return vmxIO->DIO_Get(handle, value, &vmxError);
+//        bool value;
+//        VMXResourceHandle handle = HAL_DIOToVMXHandle(dioPortHandle);
+//        return mau::vmxIO->DIO_Get(handle, value, vmxError);
+        return true;
     }
 
     /**
@@ -249,12 +247,14 @@ extern "C" {
             return false;
         }
 
-        vmxIO
-
-        HAL_Bool value = SimDIOData[port->channel].GetIsInput();
+//        vmxIO
+//
+//        HAL_Bool value = SimDIOData[port->channel].GetIsInput();
 //        if (value > 1) value = 1;
 //        if (value < 0) value = 0;
 //        return value;
+        // TODO: ALL DYLAN! ALL!!!!
+        return 0;
     }
 
     /**

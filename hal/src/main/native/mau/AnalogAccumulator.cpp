@@ -9,12 +9,13 @@
 
 #include "AnalogInternal.h"
 #include "HAL/handles/HandlesInternal.h"
-#include "Translator/VMXHandler.h"
+#include "MauInternal.h"
 #include <VMXIO.h>
 #include <VMXErrors.h>
 #include <VMXResource.h>
 
 using namespace hal;
+using namespace mau;
 
 namespace hal {
     namespace init {
@@ -54,15 +55,7 @@ extern "C" {
         VMXResourceHandle accHandles[4];
 
         for ( uint8_t inCount = first; inCount < first + kNumAnalogInputs; inCount++) {
-            VMXResourceIndex currentIndex = inCount - first;
-            AccumulatorConfig config;
-            VMXChannelInfo info = VMXChannelInfo(inCount, VMXChannelCapability::AccumulatorInput);
-
-            if (!vmxIO->ActivateSinglechannelResource(info, &config, accHandles[currentIndex], &vmxerr)) {
-                // Log error
-            } else {
-                // Log success
-            }
+            // TODO: ALL DYLAN! ALL!!!!
         }
     }
 
@@ -105,12 +98,8 @@ extern "C" {
             *status = HAL_HANDLE_ERROR;
             return 0;
         }
-
-        VMXResourceHandle handle = CREATE_VMX_RESOURCE_HANDLE(VMXResourceType::Accumulator, port);
-        uint32_t output;
-        VMXErrorCode error;
-
-        return vmxIO->Accumulator_GetInstantaneousValue(handle, output, &error);
+        // TODO: ALL DYLAN! ALL!!!!
+        return 0;
     }
 
     int64_t HAL_GetAccumulatorCount(HAL_AnalogInputHandle analogPortHandle, int32_t* status) {
@@ -122,6 +111,7 @@ extern "C" {
 
         // TODO: Add GetAccumulatorCount functionality to VMX-pi HAL [Issue: #93]
         //  return SimAnalogInData[port->channel].GetAccumulatorCount();
+        return 0;
     }
 
     void HAL_GetAccumulatorOutput(HAL_AnalogInputHandle analogPortHandle, int64_t* value, int64_t* count, int32_t* status) {

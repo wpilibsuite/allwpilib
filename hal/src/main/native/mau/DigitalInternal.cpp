@@ -53,7 +53,7 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
                         uint8_t& channel, uint8_t& module,
                         bool& analogTrigger) {
   if (isHandleType(digitalSourceHandle, HAL_HandleEnum::AnalogTrigger)) {
-    // If handle passed, index is not negative
+    // If handle passed, wpiIndex is not negative
     int32_t index = getHandleIndex(digitalSourceHandle);
     channel = (index << 2) + analogTriggerType;
     module = channel >> 4;

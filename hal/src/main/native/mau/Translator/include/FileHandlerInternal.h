@@ -1,0 +1,11 @@
+#ifndef JSONTWO_FILEHANDLERINTERNAL_H
+#define JSONTWO_FILEHANDLERINTERNAL_H
+
+extern const char* CHANNEL_MAP_JSON;
+extern const char* VMX_CHANNELS_JSON;
+extern const char* VMX_ENUM_JSON;
+
+const int VMX_USED_CHANNELS = 33;
+const int VMX_CHANNEL_COUNT = 64;
+
+#endif //JSONTWO_FILEHANDLERINTERNAL_H

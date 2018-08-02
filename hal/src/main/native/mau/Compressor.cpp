@@ -24,7 +24,7 @@ extern "C" {
   HAL_CompressorHandle HAL_InitializeCompressor(int32_t module, int32_t* status) {
     hal::init::CheckInit();
     // As compressors can have unlimited objects, just create a
-    // handle with the module number as the index.
+    // handle with the module number as the wpiIndex.
 
     // SimPCMData[module].SetCompressorInitialized(true);
     return (HAL_CompressorHandle)createHandle(static_cast<int16_t>(module), HAL_HandleEnum::Compressor, 0);
@@ -43,7 +43,9 @@ extern "C" {
       return false;
     }
 
-    // return SimPCMData[index].GetCompressorOn();
+    // return SimPCMData[wpiIndex].GetCompressorOn();
+    // TODO: ALL DYLAN! ALL!!!!
+    return 0;
   }
 
   void HAL_SetCompressorClosedLoopControl(HAL_CompressorHandle compressorHandle,
@@ -55,7 +57,8 @@ extern "C" {
       return;
     }
 
-    // SimPCMData[index].SetClosedLoopEnabled(value);
+    // SimPCMData[wpiIndex].SetClosedLoopEnabled(value);
+    // TODO: ALL DYLAN! ALL!!!!
   }
 
   HAL_Bool HAL_GetCompressorClosedLoopControl(
@@ -67,7 +70,9 @@ extern "C" {
       return false;
     }
 
-    // return SimPCMData[index].GetClosedLoopEnabled();
+    // return SimPCMData[wpiIndex].GetClosedLoopEnabled();
+    // TODO: ALL DYLAN! ALL!!!!
+    return 0;
   }
 
   HAL_Bool HAL_GetCompressorPressureSwitch(HAL_CompressorHandle compressorHandle,
@@ -79,7 +84,9 @@ extern "C" {
       return false;
     }
 
-    // return SimPCMData[index].GetPressureSwitch();
+    // return SimPCMData[wpiIndex].GetPressureSwitch();
+    // TODO: ALL DYLAN! ALL!!!!
+    return 0;
   }
 
   double HAL_GetCompressorCurrent(HAL_CompressorHandle compressorHandle, int32_t* status) {
@@ -90,7 +97,9 @@ extern "C" {
       return 0;
     }
 
-    // return SimPCMData[index].GetCompressorCurrent();
+    // return SimPCMData[wpiIndex].GetCompressorCurrent();
+    // TODO: ALL DYLAN! ALL!!!!
+    return 0;
   }
 
   HAL_Bool HAL_GetCompressorCurrentTooHighFault(HAL_CompressorHandle compressorHandle, int32_t* status) {

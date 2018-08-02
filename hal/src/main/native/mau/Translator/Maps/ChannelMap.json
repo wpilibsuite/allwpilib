@@ -1,191 +1,178 @@
 {
-	"Handles": {
-		"DIO": {
-			"WPIEnum":1,
-			"WPICount":10,
-			"WPIChannel": {
-				"0": { "VMXChannel":0 },
-				"1": { "VMXChannel":1 },
-				"2": { "VMXChannel":2 },
-				"3": { "VMXChannel":3 },
-				"4": { "VMXChannel":4 },
-				"5": { "VMXChannel":5 },
-				"6": { "VMXChannel":6 },
-				"7": { "VMXChannel":7 },
-				"8": { "VMXChannel":8 },
-				"9": { "VMXChannel":9 }
-			},
-			"MXPCount":16,
-			"MXPChannel": {
-				"10": { "VMXChannel":-1 },
-				"11": { "VMXChannel":-1 },
-				"12": { "VMXChannel":-1 },
-				"13": { "VMXChannel":-1 },		
-				"14": { "VMXChannel":-1 },
-				"15": { "VMXChannel":-1 },
-				"16": { "VMXChannel":-1 },
-				"17": { "VMXChannel":-1 },
-				"18": { "VMXChannel":-1 },
-				"19": { "VMXChannel":-1 },
-				"20": { "VMXChannel":-1 },
-				"21": { "VMXChannel":-1 },
-				"22": { "VMXChannel":-1 },
-				"23": { "VMXChannel":-1 },
-				"24": { "VMXChannel":-1 },
-				"25": { "VMXChannel":-1 }
-			}
-		},
+  "DIO": {
+    "EnumValue":1,
+    "ReferenceTo":"VMXChannel",
+    "Count":26,
+    "FirstMXP":10,
+    "Channels": {
+      "0":0,
+      "1":1,
+      "2":2,
+      "3":3,
+      "4":4,
+      "5":5,
+      "6":6,
+      "7":7,
+      "8":8,
+      "9":9,
+      "10":-1,
+      "11":-1,
+      "12":-1,
+      "13":-1,
+      "14":-1,
+      "15":-1,
+      "16":-1,
+      "17":-1,
+      "18":-1,
+      "19":-1,
+      "20":-1,
+      "21":-1,
+      "22":-1,
+      "23":-1,
+      "24":-1,
+      "25":-1
+    }
+  },
 
-		"Interrupt": {
-			"WPIEnum":4,
-			"WPIChannel":"AnalogInput",
-			"MXPChannel":"AnalogInput"
-		},
+  "Interrupt": {
+    "EnumValue":4,
+    "Channels":"AnalogInput"
+  },
 
-		"AnalogOutput": {
-			"WPIEnum":5,
-			"MXPCount":2,
-			"MXPChannel": {
-				"0": { "VMXChannel":-1 },
-				"1": { "VMXChannel":-1 }
-			}
-		},
+  "AnalogOutput": {
+    "EnumValue":5,
+    "ReferenceTo":"VMXChannel",
+    "Count":2,
+    "FirstMXP":0,
+    "Channels": {
+      "0":-1,
+      "1":-1
+    }
+  },
 
-		"AnalogInput": {
-			"WPIEnum":6,
-			"WPICount":4,
-			"WPIChannel": {
-				"0": { "VMXChannel":22 },
-				"1": { "VMXChannel":23 },
-				"2": { "VMXChannel":24 },
-				"3": { "VMXChannel":25 }
-			},
+  "AnalogInput": {
+    "EnumValue":6,
+    "ReferenceTo":"VMXChannel",
+    "Count":8,
+    "FirstMXP":4,
+    "Channels": {
+      "0":22,
+      "1":23,
+      "2":24,
+      "3":25,
+      "4":-1,
+      "5":-1,
+      "6":-1,
+      "7":-1
+    }
+  },
 
-			"MXPCount":4,
-			"MXPChannel": {
-				"4": { "VMXChannel":-1 },
-				"5": { "VMXChannel":-1 },
-				"6": { "VMXChannel":-1 },
-				"7": { "VMXChannel":-1 }
-			}
-		},
+  "AnalogTrigger": {
+    "EnumValue":7,
+    "Channels":"AnalogInput"
+  },
 
-		"AnalogTrigger": {
-			"WPIEnum":7,
-			"WPIChannel":"AnalogInput",
-			"MXPChannel":"AnalogInput"
-		},
+  "Relay": {
+    "EnumValue":8,
+    "Channels":"PWM"
+  },
 
-		"Relay": {
-			"WPIEnum":8,
-			"WPIChannel":"PWM",
-			"MXPChannel":"PWM"
-		},
+  "PWM": {
+    "EnumValue":9,
+    "ReferenceTo":"VMXChannel",
+    "Count":20,
+    "FirstMXP":10,
+    "Channels": {
+      "0":12,
+      "1":13,
+      "2":14,
+      "3":15,
+      "4":16,
+      "5":17,
+      "6":18,
+      "7":19,
+      "8":20,
+      "9":21,
+      "10":-1,
+      "11":-1,
+      "12":-1,
+      "13":-1,
+      "14":-1,
+      "15":-1,
+      "16":-1,
+      "17":-1,
+      "18":-1,
+      "19":-1
+    }
+  },
 
-		"PWM": {
-			"WPIEnum":9,
-			"WPICount":10,
-			"WPIChannel": { 
-				"0": { "VMXChannel":12 },
-				"1": { "VMXChannel":13 },
-				"2": { "VMXChannel":14 },
-				"3": { "VMXChannel":15 },
-				"4": { "VMXChannel":16 },
-				"5": { "VMXChannel":17 },
-				"6": { "VMXChannel":18 },
-				"7": { "VMXChannel":19 },
-				"8": { "VMXChannel":20 },
-				"9": { "VMXChannel":21 }
-			},
-			"MXPCount":10,
-			"MXPChannel": {
-				"10": { "DIO":10 },
-				"11": { "DIO":11 },
-				"12": { "DIO":12 },
-				"13": { "DIO":13 },
-				"14": { "DIO":18 },
-				"15": { "DIO":19 },
-				"16": { "DIO":20 },
-				"17": { "DIO":21 },
-				"18": { "DIO":22 },
-				"19": { "DIO":23 }
-			}
-		},
+  "DigitalPWM": {
+    "EnumValue":10,
+    "Channels":"DIO"
+  },
 
-		"DigitalPWM ": {
-			"WPIEnum":10,
-			"WPIChannel":"DIO",
-			"MXPChannel":"DIO"
-		},
+  "Counter": {
+    "EnumValue":11,
+    "Channels":"DIO"
+  },
 
-		"Counter": {
-			"WPIEnum":11,
-			"WPIChannel":"DIO",
-			"MXPChannel":"DIO"
-		},
+  "FPGAEncoder": {
+    "EnumValue":13,
+    "Channels":"Encoder"
+  },
 
-		"FPGAEncoder": {
-			"WPIEnum":13,
-			"WPIChannel":"Encoder",
-			"MXPChannel":"Encoder"
-		},
+  "Encoder": {
+    "EnumValue":13,
+    "Count":10,
+    "Channels": {
+      "0": { "DIO":0, "Pair":1, "EncoderInput":"A" },
+      "1": { "DIO":1, "Pair":0, "EncoderInput":"B" },
+      "2": { "DIO":2, "Pair":3, "EncoderInput":"A" },
+      "3": { "DIO":3, "Pair":2, "EncoderInput":"B" },
+      "4": { "DIO":4, "Pair":5, "EncoderInput":"A" },
+      "5": { "DIO":5, "Pair":4, "EncoderInput":"B" },
+      "6": { "DIO":6, "Pair":7, "EncoderInput":"A" },
+      "7": { "DIO":7, "Pair":6, "EncoderInput":"B" },
+      "8": { "DIO":8, "Pair":9, "EncoderInput":"A" },
+      "9": { "DIO":9, "Pair":8, "EncoderInput":"B" }
+    }
+  },
 
-		"Encoder": {
-			"WPIEnum":13,
-			"WPICount":10,
-			"WPIChannel": { 
-				"0": { "DIO":0, "Pair":1, "EncoderInput":"A" },
-				"1": { "DIO":1, "Pair":0, "EncoderInput":"B" },
-				"2": { "DIO":2, "Pair":3, "EncoderInput":"A" },
-				"3": { "DIO":3, "Pair":2, "EncoderInput":"B" },
-				"4": { "DIO":4, "Pair":5, "EncoderInput":"A" },
-				"5": { "DIO":5, "Pair":4, "EncoderInput":"B" },
-				"6": { "DIO":6, "Pair":7, "EncoderInput":"A" },
-				"7": { "DIO":7, "Pair":6, "EncoderInput":"B" },
-				"8": { "DIO":8, "Pair":9, "EncoderInput":"A" },
-				"9": { "DIO":9, "Pair":8, "EncoderInput":"B" }
-			},
-			"MXPChannel":"DIO"
-		}
-	},
+  "SPI": {
+    "Count":4,
+    "WPIPort": {
+      "0":33,
+      "1":-1,
+      "2":-1,
+      "3":-1
+    },
+    "MXPCount":1,
+    "MXPPort": {
+      "4":-1
+    }
+  },
 
-	"Ports": {
-		"SPI": {
-			"WPICount":4,
-			"WPIPort": {
-				"0": { "VMXChannel":33 },
-				"1": { "VMXChannel":-1 },
-				"2": { "VMXChannel":-1 },
-				"3": { "VMXChannel":-1 }
-			},
-			"MXPCount":1,
-			"MXPPort": {
-				"4": { "VMXChannel":-1 }
-			}
-		},
+  "I2C": {
+    "Count":1,
+    "WPIPort": {
+      "0":[26,27]
+    },
+    "MXPCount":1,
+    "MXPPort": {
+      "1":-1
+    }
+  },
 
-		"I2C": {
-			"WPICount":1,
-			"WPIPort": {
-				"0": { "VMXChannel":[26,27] }
-			},
-			"MXPCount":1,
-			"MXPPort": {
-				"1": { "VMXChannel":-1 }
-			}
-		},
-
-		"Serial": {
-			"WPICount":3,
-			"WPIPort": {
-				"0": { "VMXChannel":-1 },
-				"2": { "VMXChannel":-1 },
-				"3": { "VMXChannel":-1 }
-			},
-			"MXPCount":1,
-			"MXPPort": {
-				"1": { "VMXChannel":[28,29] }
-			}
-		}
-	}
+  "Serial": {
+    "Count":3,
+    "WPIPort": {
+      "0":-1,
+      "2":-1,
+      "3":-1
+    },
+    "MXPCount":1,
+    "MXPPort": {
+      "1":[28,29]
+    }
+  }
 }

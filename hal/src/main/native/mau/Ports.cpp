@@ -8,37 +8,18 @@
 #include "HAL/Ports.h"
 
 #include "PortsInternal.h"
-#include "Translator/VMXHandler.h"
+#include "MauInternal.h"
 #include <VMXIO.h>
 #include <VMXChannel.h>
 
 using namespace hal;
+using namespace mau;
 
 // uint8_t VMXIO::GetNumResourcesByType(VMXResourceType resource_type)
 
 namespace hal {
     namespace init {
-        void InitializePorts() {
-            kNumAccumulators = 2;
-            kNumAnalogTriggers = 8;
-            kNumAnalogInputs = vmxIO->GetNumResourcesByType(VMXResourceType::);
-            kNumAnalogOutputs = 2;
-            kNumCounters = 8;
-            kNumDigitalHeaders = 10;
-            kNumPWMHeaders = 10;
-            kNumDigitalChannels = 26;
-            kNumPWMChannels = 20;
-            kNumDigitalPWMOutputs = 6;
-            kNumEncoders = 8;
-            kNumInterrupts = 8;
-            kNumRelayChannels = 8;
-            kNumRelayHeaders = kNumRelayChannels / 2;
-            kNumPCMModules = 63;
-            kNumSolenoidChannels = 8;
-            kNumPDPModules = 63;
-            kNumPDPChannels = 16;
-            kNumCanTalons = 63;
-        }
+        void InitializePorts() {}
     }
 }
 

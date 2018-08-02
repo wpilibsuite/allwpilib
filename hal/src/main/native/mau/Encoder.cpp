@@ -80,7 +80,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(
     return HAL_kInvalidHandle;
   }
   int16_t index = getHandleIndex(handle);
-  // SimEncoderData[index].SetInitialized(true);
+  // SimEncoderData[wpiIndex].SetInitialized(true);
   // TODO: Add encoding type to Sim data
   encoder->index = index;
   encoder->nativeHandle = nativeHandle;
@@ -98,7 +98,7 @@ void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   } else if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::Counter)) {
     counterHandles->Free(encoder->nativeHandle);
   }
-  // SimEncoderData[encoder->index].SetInitialized(false);
+  // SimEncoderData[encoder->wpiIndex].SetInitialized(false);
 }
 
 static inline int EncodingScaleFactor(Encoder* encoder) {
@@ -134,7 +134,9 @@ int32_t HAL_GetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
     return 0;
   }
 
-  // return SimEncoderData[encoder->index].GetCount();
+  // return SimEncoderData[encoder->wpiIndex].GetCount();
+  // TODO: ALL DYLAN! ALL!!!!
+  return 0;
 }
 int32_t HAL_GetEncoderRaw(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);
@@ -143,8 +145,10 @@ int32_t HAL_GetEncoderRaw(HAL_EncoderHandle encoderHandle, int32_t* status) {
     return 0;
   }
 
-  // return SimEncoderData[encoder->index].GetCount() /
+  // return SimEncoderData[encoder->wpiIndex].GetCount() /
 //         DecodingScaleFactor(encoder.get());
+  // TODO: ALL DYLAN! ALL!!!!
+  return 0;
 }
 int32_t HAL_GetEncoderEncodingScale(HAL_EncoderHandle encoderHandle,
                                     int32_t* status) {
@@ -155,6 +159,8 @@ int32_t HAL_GetEncoderEncodingScale(HAL_EncoderHandle encoderHandle,
   }
 
 //  return EncodingScaleFactor(encoder.get());
+  // TODO: ALL DYLAN! ALL!!!!
+  return 0;
 }
 void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);
@@ -163,9 +169,9 @@ void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
     return;
   }
 
-  // SimEncoderData[encoder->index].SetCount(0);
-  // SimEncoderData[encoder->index].SetPeriod(std::numeric_limits<double>::max());
-  // SimEncoderData[encoder->index].SetReset(true);
+  // SimEncoderData[encoder->wpiIndex].SetCount(0);
+  // SimEncoderData[encoder->wpiIndex].SetPeriod(std::numeric_limits<double>::max());
+  // SimEncoderData[encoder->wpiIndex].SetReset(true);
 }
 double HAL_GetEncoderPeriod(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);
@@ -174,7 +180,9 @@ double HAL_GetEncoderPeriod(HAL_EncoderHandle encoderHandle, int32_t* status) {
     return 0;
   }
 
-  // return SimEncoderData[encoder->index].GetPeriod();
+  // return SimEncoderData[encoder->wpiIndex].GetPeriod();
+  // TODO: ALL DYLAN! ALL!!!!
+  return 0;
 }
 void HAL_SetEncoderMaxPeriod(HAL_EncoderHandle encoderHandle, double maxPeriod,
                              int32_t* status) {
@@ -184,7 +192,7 @@ void HAL_SetEncoderMaxPeriod(HAL_EncoderHandle encoderHandle, double maxPeriod,
     return;
   }
 
-  // SimEncoderData[encoder->index].SetMaxPeriod(maxPeriod);
+  // SimEncoderData[encoder->wpiIndex].SetMaxPeriod(maxPeriod);
 }
 HAL_Bool HAL_GetEncoderStopped(HAL_EncoderHandle encoderHandle,
                                int32_t* status) {
@@ -194,8 +202,10 @@ HAL_Bool HAL_GetEncoderStopped(HAL_EncoderHandle encoderHandle,
     return 0;
   }
 
-  // return SimEncoderData[encoder->index].GetPeriod() >
-         // SimEncoderData[encoder->index].GetMaxPeriod();
+  // return SimEncoderData[encoder->wpiIndex].GetPeriod() >
+         // SimEncoderData[encoder->wpiIndex].GetMaxPeriod();
+  // TODO: ALL DYLAN! ALL!!!!
+  return 0;
 }
 HAL_Bool HAL_GetEncoderDirection(HAL_EncoderHandle encoderHandle,
                                  int32_t* status) {
@@ -205,7 +215,9 @@ HAL_Bool HAL_GetEncoderDirection(HAL_EncoderHandle encoderHandle,
     return 0;
   }
 
-  // return SimEncoderData[encoder->index].GetDirection();
+  // return SimEncoderData[encoder->wpiIndex].GetDirection();
+  // TODO: ALL DYLAN! ALL!!!!
+  return 0;
 }
 double HAL_GetEncoderDistance(HAL_EncoderHandle encoderHandle,
                               int32_t* status) {
@@ -215,7 +227,9 @@ double HAL_GetEncoderDistance(HAL_EncoderHandle encoderHandle,
     return 0;
   }
 
-  // return SimEncoderData[encoder->index].GetCount() * encoder->distancePerPulse;
+  // return SimEncoderData[encoder->wpiIndex].GetCount() * encoder->distancePerPulse;
+  // TODO: ALL DYLAN! ALL!!!!
+  return 0;
 }
 double HAL_GetEncoderRate(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);
@@ -224,7 +238,9 @@ double HAL_GetEncoderRate(HAL_EncoderHandle encoderHandle, int32_t* status) {
     return 0;
   }
 
-  // return encoder->distancePerPulse / SimEncoderData[encoder->index].GetPeriod();
+  // return encoder->distancePerPulse / SimEncoderData[encoder->wpiIndex].GetPeriod();
+  // TODO: ALL DYLAN! ALL!!!!
+  return 0;
 }
 void HAL_SetEncoderMinRate(HAL_EncoderHandle encoderHandle, double minRate,
                            int32_t* status) {
@@ -239,7 +255,7 @@ void HAL_SetEncoderMinRate(HAL_EncoderHandle encoderHandle, double minRate,
     return;
   }
 
-  // SimEncoderData[encoder->index].SetMaxPeriod(encoder->distancePerPulse /
+  // SimEncoderData[encoder->wpiIndex].SetMaxPeriod(encoder->distancePerPulse /
 //                                              minRate);
 }
 void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
@@ -255,7 +271,7 @@ void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
     return;
   }
   encoder->distancePerPulse = distancePerPulse;
-  // SimEncoderData[encoder->index].SetDistancePerPulse(distancePerPulse);
+  // SimEncoderData[encoder->wpiIndex].SetDistancePerPulse(distancePerPulse);
 }
 void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoderHandle,
                                     HAL_Bool reverseDirection,
@@ -266,7 +282,7 @@ void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoderHandle,
     return;
   }
 
-  // SimEncoderData[encoder->index].SetReverseDirection(reverseDirection);
+  // SimEncoderData[encoder->wpiIndex].SetReverseDirection(reverseDirection);
 }
 void HAL_SetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
                                     int32_t samplesToAverage, int32_t* status) {
@@ -276,7 +292,7 @@ void HAL_SetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
     return;
   }
 
-  // SimEncoderData[encoder->index].SetSamplesToAverage(samplesToAverage);
+  // SimEncoderData[encoder->wpiIndex].SetSamplesToAverage(samplesToAverage);
 }
 int32_t HAL_GetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
                                        int32_t* status) {
@@ -286,7 +302,9 @@ int32_t HAL_GetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
     return 0;
   }
 
-  // return SimEncoderData[encoder->index].GetSamplesToAverage();
+  // return SimEncoderData[encoder->wpiIndex].GetSamplesToAverage();
+  // TODO: ALL DYLAN! ALL!!!!
+  return 0;
 }
 
 void HAL_SetEncoderIndexSource(HAL_EncoderHandle encoderHandle,
@@ -316,6 +334,8 @@ double HAL_GetEncoderDecodingScaleFactor(HAL_EncoderHandle encoderHandle,
   }
 
 //  return DecodingScaleFactor(encoder.get());
+  // TODO: ALL DYLAN! ALL!!!!
+  return 0;
 }
 
 double HAL_GetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
