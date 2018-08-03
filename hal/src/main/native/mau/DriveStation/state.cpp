@@ -18,7 +18,7 @@ static State _TEST(RobotState::TEST);
 static RobotState _last_internal_state;
 
 void States::Internal::set_state(RobotState rs) {
-	RobotState last = Memory::shared()->get_state_current();
+//	RobotState last = Memory::shared()->get_state_current();
 	
 	//Memory::shared()->set_state_current(rs);
 	//Memory::shared()->set_state_last(last);
@@ -59,11 +59,11 @@ State States::from_robotstate(RobotState rs) {
 }
 
 RobotState States::current_robotstate() {
-	return 0; //Memory::shared()->get_state_current();
+	return mau::sharedMemory->Bagel_getCurrentState(); //Memory::shared()->get_state_current();
 }
 
 RobotState States::last_robotstate() {
-	return 0; //Memory::shared()->get_state_last();
+	return mau::sharedMemory->Bagel_getPreviousState(); //Memory::shared()->get_state_last();
 }
 
 State States::current_state() {
@@ -117,7 +117,7 @@ void States::_manual_trigger() {
 			it->testPeriodic();
 	}
 
-	sleep_ms(States::Internal::get_tick_timing());
+//	sleep_ms(States::Internal::get_tick_timing());
 	_last_internal_state = current_state;
 }
 

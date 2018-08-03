@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MauDriveData.h"
+#include "DriverStationInternal.h"
 #include "library.hpp"
 #include "shared.fwi.hpp"
 #include <string>

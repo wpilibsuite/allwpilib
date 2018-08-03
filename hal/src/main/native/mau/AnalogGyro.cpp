@@ -16,10 +16,11 @@
 #include "HAL/AnalogInput.h"
 #include "HAL/handles/IndexedHandleResource.h"
 #include "HALInitializer.h"
-#include "Translator/VMXHandler.h"
+#include "MauInternal.h"
 #include <AHRS.h>
 
 using namespace hal;
+using namespace mau;
 
 namespace hal {
     struct AnalogGyro {
@@ -80,7 +81,7 @@ extern "C" {
         auto gyro = analogGyroHandles->Get(handle);
         analogGyroHandles->Free(handle);
         if (gyro == nullptr) return;
-    //    SimAnalogGyroData[gyro->index].SetInitialized(false);
+    //    SimAnalogGyroData[gyro->wpiIndex].SetInitialized(false);
     }
 
     void HAL_SetAnalogGyroParameters(HAL_GyroHandle handle, double voltsPerDegreePerSecond, double offset,
@@ -100,7 +101,7 @@ extern "C" {
             return;
         }
 
-        vmxIMU->ZeroYaw();
+        // TODO: ALL DYLAN! ALL!!!!
     }
 
     void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
@@ -117,8 +118,8 @@ extern "C" {
             *status = HAL_HANDLE_ERROR;
             return 0;
         }
-
-        return vmxIMU->GetYaw();
+        // TODO: ALL DYLAN! ALL!!!!
+        return 0;
     }
 
     double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status) {
@@ -127,8 +128,8 @@ extern "C" {
             *status = HAL_HANDLE_ERROR;
             return 0;
         }
-
-        return vmxIMU->GetRate();
+        // TODO: ALL DYLAN! ALL!!!!
+        return 0;
     }
 
     double HAL_GetAnalogGyroOffset(HAL_GyroHandle handle, int32_t* status) {

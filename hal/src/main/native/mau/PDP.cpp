@@ -34,14 +34,20 @@ extern "C" {
 
     double HAL_GetPDPTemperature(int32_t module, int32_t* status) {
     //  return SimPDPData[module].GetTemperature();
+        // TODO: ALL DYLAN! ALL!!!!
+        return 0;
     }
 
     double HAL_GetPDPVoltage(int32_t module, int32_t* status) {
     //  return SimPDPData[module].GetVoltage();
+        // TODO: ALL DYLAN! ALL!!!!
+        return 0;
     }
 
     double HAL_GetPDPChannelCurrent(int32_t module, int32_t channel, int32_t* status) {
     //  return SimPDPData[module].GetCurrent(channel);
+        // TODO: ALL DYLAN! ALL!!!!
+        return 0;
     }
 
     double HAL_GetPDPTotalCurrent(int32_t module, int32_t* status) {

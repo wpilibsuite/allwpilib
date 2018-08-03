@@ -8,7 +8,7 @@
 #include <AHRS.h>
 #include "HALInitializer.h"
 #include "HAL/Accelerometer.h"
-#include "Translator/VMXHandler.h"
+#include "MauInternal.h"
 
 namespace hal {
     namespace init {
@@ -26,14 +26,17 @@ extern "C" {
     }
 
     double HAL_GetAccelerometerX(void) {
-        return (double) vmxIMU->GetRawAccelX();
+        // TODO: ALL DYLAN! ALL!!!!
+        return 0;
     }
 
     double HAL_GetAccelerometerY(void) {
-        return (double) vmxIMU->GetRawAccelY();
+        // TODO: ALL DYLAN! ALL!!!!
+        return 0;
     }
 
     double HAL_GetAccelerometerZ(void) {
-        return (double) vmxIMU->GetRawAccelZ();
+        // TODO: ALL DYLAN! ALL!!!!
+        return 0;
     }
 }

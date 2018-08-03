@@ -8,6 +8,7 @@
 #include "HAL/HAL.h"
 
 #include <wpi/raw_ostream.h>
+#include <wpi/mutex.h>
 
 #include "ErrorsInternal.h"
 #include "HAL/DriverStation.h"
@@ -16,24 +17,45 @@
 #include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
-#include "Translator/VMXHandler.h"
+#include "MauInternal.h"
+#include "Translator/include/FileHandler.h"
 #include <VMXPi.h>
 
 using namespace hal;
 
+AHRS* mau::vmxIMU;
+VMXIO* mau::vmxIO;
+VMXCAN* mau::vmxCAN;
+VMXTime* mau::vmxTime;
+VMXPower* mau::vmxPower;
+VMXThread* mau::vmxThread;
+
+VMXErrorCode* mau::vmxError;
+
+Mau_ChannelMap* mau::channelMap;
+Mau_EnumConverter* mau::enumConverter;
+
+
 namespace hal {
     namespace init {
         void InitializeHAL() {
+            Mau_FileHandler fileHandler = Mau_FileHandler();
+            Mau_EnumConverter enums = fileHandler.getEnumConverter();
+            Mau_ChannelMap maps = fileHandler.readChannelMap();
+
+            mau::enumConverter = &enums;
+            mau::channelMap = &maps;
+
             bool realtime = false;
             uint8_t hertz = 50;
-            VMXPi vmx(realtime, hertz);
+            VMXPi vmx = VMXPi(realtime, hertz);
 
-            vmxIMU = &vmx.ahrs;
-            vmxIO = &vmx.io;
-            vmxCAN = &vmx.can;
-            vmxTime = &vmx.time;
-            vmxPower = &vmx.power;
-            vmxThread = &vmx.thread;
+            mau::vmxIMU = &vmx.ahrs;
+            mau::vmxIO = &vmx.io;
+            mau::vmxCAN = &vmx.can;
+            mau::vmxTime = &vmx.time;
+            mau::vmxPower = &vmx.power;
+            mau::vmxThread = &vmx.thread;
 
             InitializeAccelerometer();
             InitializeAnalogAccumulator();
@@ -71,7 +93,7 @@ namespace hal {
 HAL_PortHandle HAL_GetPort(int32_t channel) {
     // Dont allow a number that wouldn't fit in a uint8_t
     if (channel < 0 || channel >= 255) return HAL_kInvalidHandle;
-    return createPortHandle(channel, 1);
+    return hal::createPortHandle(channel, 1);
 }
 
 /**
@@ -81,7 +103,7 @@ HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel) {
     // Dont allow a number that wouldn't fit in a uint8_t
     if (channel < 0 || channel >= 255) return HAL_kInvalidHandle;
     if (module < 0 || module >= 255) return HAL_kInvalidHandle;
-    return createPortHandle(channel, module);
+    return hal::createPortHandle(channel, module);
 }
 
 const char* HAL_GetErrorMessage(int32_t code) {
@@ -235,6 +257,8 @@ uint64_t HAL_GetFPGATime(int32_t* status) { return hal::GetFPGATime(); }
  */
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
     // return SimRoboRioData[0].GetFPGAButton();
+    // TODO: ALL DYLAN! ALL!!!!
+    return 0;
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {

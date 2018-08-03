@@ -14,7 +14,7 @@
 #include <wpi/timestamp.h>
 
 #include "HAL/HAL.h"
-#include "HAL/cpp/fpga_clock.h"
+//#include "HAL/cpp/fpga_clock.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
 #include "HALInitializer.h"
 
@@ -125,34 +125,34 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
 
 uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
                                   int32_t* status) {
-  auto notifier = notifierHandles->Get(notifierHandle);
-  if (!notifier) return 0;
-
-  std::unique_lock<wpi::mutex> lock(notifier->mutex);
-  while (notifier->active) {
-    double waitTime;
-    if (!notifier->running) {
-      waitTime = (HAL_GetFPGATime(status) * 1e-6) + 1000.0;
-      // If not running, wait 1000 seconds
-    } else {
-      waitTime = notifier->waitTime * 1e-6;
-    }
-
-    // Don't wait twice
-    notifier->updatedAlarm = false;
-
-    auto timeoutTime =
-        hal::fpga_clock::epoch() + std::chrono::duration<double>(waitTime);
-    notifier->cond.wait_until(lock, timeoutTime);
-    if (notifier->updatedAlarm) {
-      notifier->updatedAlarm = false;
-      continue;
-    }
-    if (!notifier->running) continue;
-    if (!notifier->active) break;
-    notifier->running = false;
-    return HAL_GetFPGATime(status);
-  }
+//  auto notifier = notifierHandles->Get(notifierHandle);
+//  if (!notifier) return 0;
+//
+//  std::unique_lock<wpi::mutex> lock(notifier->mutex);
+//  while (notifier->active) {
+//    double waitTime;
+//    if (!notifier->running) {
+//      waitTime = (HAL_GetFPGATime(status) * 1e-6) + 1000.0;
+//      // If not running, wait 1000 seconds
+//    } else {
+//      waitTime = notifier->waitTime * 1e-6;
+//    }
+//
+//    // Don't wait twice
+//    notifier->updatedAlarm = false;
+//
+//    auto timeoutTime =
+//        hal::fpga_clock::epoch() + std::chrono::duration<double>(waitTime);
+//    notifier->cond.wait_until(lock, timeoutTime);
+//    if (notifier->updatedAlarm) {
+//      notifier->updatedAlarm = false;
+//      continue;
+//    }
+//    if (!notifier->running) continue;
+//    if (!notifier->active) break;
+//    notifier->running = false;
+//    return HAL_GetFPGATime(status);
+//  }
   return 0;
 }
 

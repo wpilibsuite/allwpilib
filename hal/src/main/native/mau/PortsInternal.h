@@ -10,23 +10,23 @@
 #include <stdint.h>
 
 namespace hal {
-    extern int32_t kNumAccumulators;
-    extern int32_t kNumAnalogTriggers;
-    extern int32_t kNumAnalogInputs;
-    extern int32_t kNumAnalogOutputs;
-    extern int32_t kNumCounters;
-    extern int32_t kNumDigitalHeaders;
-    extern int32_t kNumPWMHeaders;
-    extern int32_t kNumDigitalChannels;
-    extern int32_t kNumPWMChannels;
-    extern int32_t kNumDigitalPWMOutputs;
-    extern int32_t kNumEncoders;
-    extern int32_t kNumInterrupts;
-    extern int32_t kNumRelayChannels;
-    extern int32_t kNumRelayHeaders;
-    extern int32_t kNumPCMModules;
-    extern int32_t kNumSolenoidChannels;
-    extern int32_t kNumPDPModules;
-    extern int32_t kNumPDPChannels;
-    extern int32_t kNumCanTalons;
+    constexpr int32_t kNumAccumulators = 2;
+    constexpr int32_t kNumAnalogTriggers = 8;
+    constexpr int32_t kNumAnalogInputs = 8;
+    constexpr int32_t kNumAnalogOutputs = 2;
+    constexpr int32_t kNumCounters = 8;
+    constexpr int32_t kNumDigitalHeaders = 10;
+    constexpr int32_t kNumPWMHeaders = 10;
+    constexpr int32_t kNumDigitalChannels = 26;
+    constexpr int32_t kNumPWMChannels = 20;
+    constexpr int32_t kNumDigitalPWMOutputs = 6;
+    constexpr int32_t kNumEncoders = 8;
+    constexpr int32_t kNumInterrupts = 8;
+    constexpr int32_t kNumRelayChannels = 8;
+    constexpr int32_t kNumRelayHeaders = kNumRelayChannels / 2;
+    constexpr int32_t kNumPCMModules = 63;
+    constexpr int32_t kNumSolenoidChannels = 8;
+    constexpr int32_t kNumPDPModules = 63;
+    constexpr int32_t kNumPDPChannels = 16;
+    constexpr int32_t kNumCanTalons = 63;
 }

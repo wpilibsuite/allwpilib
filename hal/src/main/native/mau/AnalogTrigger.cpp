@@ -81,7 +81,7 @@ extern "C" {
         trigger->index = static_cast<uint8_t>(getHandleIndex(handle));
         *index = trigger->index;
 
-    //    SimAnalogTriggerData[trigger->index].SetInitialized(true);
+    //    SimAnalogTriggerData[trigger->wpiIndex].SetInitialized(true);
 
         trigger->trigState = false;
 
@@ -92,7 +92,7 @@ extern "C" {
         auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
         analogTriggerHandles->Free(analogTriggerHandle);
         if (trigger == nullptr) return;
-    //    SimAnalogTriggerData[trigger->index].SetInitialized(false);
+    //    SimAnalogTriggerData[trigger->wpiIndex].SetInitialized(false);
         // caller owns the analog input handle.
     }
 
@@ -123,8 +123,8 @@ extern "C" {
                 GetAnalogValueToVoltage(trigger->analogHandle, upper, status);
         if (status != 0) return;
 
-    //    SimAnalogTriggerData[trigger->index].SetTriggerUpperBound(trigUpper);
-    //    SimAnalogTriggerData[trigger->index].SetTriggerLowerBound(trigLower);
+    //    SimAnalogTriggerData[trigger->wpiIndex].SetTriggerUpperBound(trigUpper);
+    //    SimAnalogTriggerData[trigger->wpiIndex].SetTriggerLowerBound(trigLower);
     }
 
     void HAL_SetAnalogTriggerLimitsVoltage(HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper,
@@ -138,8 +138,8 @@ extern "C" {
             *status = ANALOG_TRIGGER_LIMIT_ORDER_ERROR;
         }
 
-    //    SimAnalogTriggerData[trigger->index].SetTriggerUpperBound(upper);
-    //    SimAnalogTriggerData[trigger->index].SetTriggerLowerBound(lower);
+    //    SimAnalogTriggerData[trigger->wpiIndex].SetTriggerUpperBound(upper);
+    //    SimAnalogTriggerData[trigger->wpiIndex].SetTriggerLowerBound(lower);
     }
 
     void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analogTriggerHandle, HAL_Bool useAveragedValue,
@@ -150,7 +150,7 @@ extern "C" {
             return;
         }
 
-    //    AnalogTriggerData* triggerData = &SimAnalogTriggerData[trigger->index];
+    //    AnalogTriggerData* triggerData = &SimAnalogTriggerData[trigger->wpiIndex];
     //
     //    if (triggerData->GetTriggerMode() == HALSIM_AnalogTriggerFiltered) {
     //        *status = INCOMPATIBLE_STATE;
@@ -170,7 +170,7 @@ extern "C" {
             return;
         }
 
-    //    AnalogTriggerData* triggerData = &SimAnalogTriggerData[trigger->index];
+    //    AnalogTriggerData* triggerData = &SimAnalogTriggerData[trigger->wpiIndex];
     //
     //    if (triggerData->GetTriggerMode() == HALSIM_AnalogTriggerAveraged) {
     //        *status = INCOMPATIBLE_STATE;
@@ -191,6 +191,8 @@ extern "C" {
         }
 
     //    return SimAnalogInData[analogIn->channel].GetVoltage();
+        // TODO: ALL DYLAN! ALL!!!!
+        return 0;
     }
 
     HAL_Bool HAL_GetAnalogTriggerInWindow(HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status) {
@@ -207,10 +209,12 @@ extern "C" {
             return false;
         }
 
-    //    auto trigUpper = SimAnalogTriggerData[trigger->index].GetTriggerUpperBound();
-    //    auto trigLower = SimAnalogTriggerData[trigger->index].GetTriggerLowerBound();
+    //    auto trigUpper = SimAnalogTriggerData[trigger->wpiIndex].GetTriggerUpperBound();
+    //    auto trigLower = SimAnalogTriggerData[trigger->wpiIndex].GetTriggerLowerBound();
     //
     //    return voltage >= trigLower && voltage <= trigUpper;
+        // TODO: ALL DYLAN! ALL!!!!
+        return 0;
     }
 
     HAL_Bool HAL_GetAnalogTriggerTriggerState(HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status) {
@@ -227,8 +231,8 @@ extern "C" {
             return false;
         }
 
-    //    auto trigUpper = SimAnalogTriggerData[trigger->index].GetTriggerUpperBound();
-    //    auto trigLower = SimAnalogTriggerData[trigger->index].GetTriggerLowerBound();
+    //    auto trigUpper = SimAnalogTriggerData[trigger->wpiIndex].GetTriggerUpperBound();
+    //    auto trigLower = SimAnalogTriggerData[trigger->wpiIndex].GetTriggerLowerBound();
     //
     //    if (voltage < trigLower) {
     //        trigger->trigState = false;
@@ -239,6 +243,8 @@ extern "C" {
     //        return true;
     //    }
     //    return trigger->trigState;
+        // TODO: ALL DYLAN! ALL!!!!
+        return 0;
     }
 
     HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle, HAL_AnalogTriggerType type,
