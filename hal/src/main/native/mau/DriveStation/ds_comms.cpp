@@ -295,52 +295,13 @@ void DriverStationComms::periodic_update() {
 //	MTX_UNLOCK(shared_mutex()->ds, 0);
 
     for (int i = 0; i < 6; i++) {
-//		Shared::DS::Joystick *j = shared()->joystick(i);
+        _TempJoyData* tempJoy = &joys[i];
 
-//        Mau_SharedJoystick *sharedJoy = driveData->getJoystick(i);
+        Bagel_updateJoystickAxes(i, tempJoy->axis_count, tempJoy->axis);
+        Bagel_updateJoystickPOVs(i, tempJoy->pov_count, tempJoy->pov);
+        Bagel_updateJoystickButtons(i, tempJoy->button_mask);
 
-        _TempJoyData* dataPointer = &joys[i];
-
-//        typedef struct {
-//            uint8_t axis_count, pov_count, button_count;
-//            uint16_t pov[4];
-//            uint8_t axis[16];
-//            uint32_t button_mask;
-//            bool has_update;
-//        } _TempJoyData;
-
-////		j->set_num_axis(dataPointer->axis_count);
-////		j->set_num_button(dataPointer->button_count);
-////		j->set_num_pov(dataPointer->pov_count);
-////		j->set_button_mask(dataPointer->button_mask);
-//
-////		for (int x = 0; x < j->get_num_axis(); x++) {
-////			j->set_axis(x, dataPointer->axis[x]);
-////		}
-//
-////		for (int x = 0; x < j->get_num_pov(); x++) {
-////			j->set_pov(x, dataPointer->pov[x]);
-////		}
-
-//        Bagel_updateJoystickAxes(i, std::vector<int8_t> axes)
-
-        static void Bagel_updateJoystickPOVs(int joyNumber, std::vector<int16_t> povs);
-
-//
-//        j->setAxisCount(i,dataPointer->axis_count);
-//        j->setButtonCount(i, dataPointer->button_count);
-//        j->setPovCount(i, dataPointer->pov_count);
-//        j->setButtonMask(i, dataPointer->button_mask);
-//
-//        for (int x = 0; x < j->getAxisCount(i); x++) {
-//            j->setAxis(i, x, dataPointer->axis[x]);
-//        }
-//
-//        for (int x = 0; x < j->getPovCount(i); x++) {
-//            j->setAxis(i, x, dataPointer->pov[x]);
-//        }
-
-        dataPointer->has_update = false;
+        tempJoy->has_update = false;
     }
 
 //	MTX_LOCK(shared_mutex()->power, 0);

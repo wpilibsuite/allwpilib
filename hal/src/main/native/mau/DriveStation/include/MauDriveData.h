@@ -30,7 +30,7 @@ public:
 
     void updateControlWord(bool enabled, bool auton, bool test, bool estop, bool fms, bool ds);
     void updateJoyAxis(int joyNumber, int axisIndex, float axis);
-    void updateJoyPOV(int joyNumber, int povIndex, int16_t pov);
+    void updateJoyPOV(int joyNumber, int povIndex, uint16_t pov);
     void updateJoyButtons(int joyNumber, uint32_t buttons);
 
     HAL_ControlWord* readPreviousControl();

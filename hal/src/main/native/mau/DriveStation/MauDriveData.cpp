@@ -46,7 +46,7 @@ void Mau_DriveData::updateJoyAxis(int joyNumber, int axisIndex, float axis) {
     joysticks[joyNumber].joyAxes->axes[axisIndex] = axis;
 }
 
-void Mau_DriveData::updateJoyPOV(int joyNumber, int povIndex, int16_t pov) {
+void Mau_DriveData::updateJoyPOV(int joyNumber, int povIndex, uint16_t pov) {
     // Mutex.lock()
 
     joysticks[joyNumber].joyPOVs->povs[povIndex] = pov;

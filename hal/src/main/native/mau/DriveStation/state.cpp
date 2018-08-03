@@ -1,5 +1,6 @@
 #include "state.hpp"
 #include "util.hpp"
+#include "include/BagelDriveData.h"
 
 // #include "memory.hpp"
 
@@ -59,11 +60,11 @@ State States::from_robotstate(RobotState rs) {
 }
 
 RobotState States::current_robotstate() {
-	return mau::sharedMemory->Bagel_getCurrentState(); //Memory::shared()->get_state_current();
+	return Bagel_readCurrentState(); //Memory::shared()->get_state_current();
 }
 
 RobotState States::last_robotstate() {
-	return mau::sharedMemory->Bagel_getPreviousState(); //Memory::shared()->get_state_last();
+	return Bagel_readPreviousState(); //Memory::shared()->get_state_last();
 }
 
 State States::current_state() {

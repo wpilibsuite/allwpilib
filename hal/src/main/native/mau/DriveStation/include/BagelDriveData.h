@@ -47,7 +47,7 @@ static void Bagel_writeJoystick(int joyNumber, Toast::Memory::Shared::DS::Joysti
 }
 
 static void Bagel_writeAllJoysticks(int joyCount, Toast::Memory::Shared::DS::Joystick* newJoys) {
-    for(int index = 0; index < joyCount; index++) {
+    for (int index = 0; index < joyCount; index++) {
         Bagel_writeJoystick(index, &newJoys[index]);
     }
 }
@@ -58,13 +58,13 @@ static void Bagel_updateRobotState(Toast::Memory::RobotState roboState, Toast::M
     bool enabled = true;
     bool auton = false;
     bool test = false;
-    if(roboState == Toast::Memory::RobotState::DISABLED) {
+    if (roboState == Toast::Memory::RobotState::DISABLED) {
         enabled = false;
     } else {
-        if(roboState == Toast::Memory::RobotState::TEST) {
+        if (roboState == Toast::Memory::RobotState::TEST) {
             test = true;
         }
-        if(roboState == Toast::Memory::RobotState::AUTO) {
+        if (roboState == Toast::Memory::RobotState::AUTO) {
             auton = true;
         }
     }
@@ -75,14 +75,14 @@ static void Bagel_updateRobotState(Toast::Memory::RobotState roboState, Toast::M
     mau::sharedMemory->updateControlWord(enabled, auton, test, estop, fms, ds);
 }
 
-static void Bagel_updateJoystickAxes(int joyNumber, int axesNum, float* axes) {
+static void Bagel_updateJoystickAxes(int joyNumber, int axesNum, uint8_t* axes) {
     for (int index = 0; index < axesNum; index++) {
-        mau::sharedMemory->updateJoyAxis(joyNumber, index, axes[index]);
+        mau::sharedMemory->updateJoyAxis(joyNumber, index, (float) axes[index]);
         index++;
     }
 }
 
-static void Bagel_updateJoystickPOVs(int joyNumber, int povsNum, int16_t* povs) {
+static void Bagel_updateJoystickPOVs(int joyNumber, int povsNum, uint16_t* povs) {
     for (int index = 0; index < povsNum; index++) {
         mau::sharedMemory->updateJoyPOV(joyNumber, index, povs[index]);
         index++;
@@ -99,20 +99,28 @@ Toast::Memory::Shared::DS::JoystickDescriptor Bagel_readJoyDescriptor(int joyNum
 
 Toast::Memory::Shared::DS::Alliance Bagel_readAlliance() {
     HAL_AllianceStationID id = *mau::sharedMemory->readAllianceID();
+    Toast::Memory::Shared::DS::Alliance output;
     switch (id) {
         case HAL_AllianceStationID_kRed1:
-            return Toast::Memory::Shared::DS::Alliance::Red;
+            output = Toast::Memory::Shared::DS::Alliance::Red;
+            break;
         case HAL_AllianceStationID_kRed2:
-            return Toast::Memory::Shared::DS::Alliance::Red;
+            output = Toast::Memory::Shared::DS::Alliance::Red;
+            break;
         case HAL_AllianceStationID_kRed3:
-            return Toast::Memory::Shared::DS::Alliance::Red;
+            output = Toast::Memory::Shared::DS::Alliance::Red;
+            break;
         case HAL_AllianceStationID_kBlue1:
-            return Toast::Memory::Shared::DS::Alliance::Blue;
+            output = Toast::Memory::Shared::DS::Alliance::Blue;
+            break;
         case HAL_AllianceStationID_kBlue2:
-            return Toast::Memory::Shared::DS::Alliance::Blue;
+            output = Toast::Memory::Shared::DS::Alliance::Blue;
+            break;
         case HAL_AllianceStationID_kBlue3:
-            return Toast::Memory::Shared::DS::Alliance::Blue;
+            output = Toast::Memory::Shared::DS::Alliance::Blue;
+            break;
     }
+    return output;
 }
 
 Toast::Memory::Shared::DS::DSInfo Bagel_readDSInfo() {
