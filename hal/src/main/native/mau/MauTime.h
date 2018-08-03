@@ -6,7 +6,7 @@
 
 namespace mau {
     static uint64_t vmxGetTime() {
-        return vmxTime->GetCurrentMicrosecondsHighPortion();
+        return vmxTime->GetCurrentMicroseconds();
     }
 }
 
