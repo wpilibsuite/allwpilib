@@ -16,7 +16,7 @@
 #include "HAL/Extensions.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
-#include "MockHooksInternal.h"
+#include "MauClockInternal.h"
 #include "MauInternal.h"
 #include "Translator/include/FileHandler.h"
 #include <VMXPi.h>
@@ -74,7 +74,7 @@ namespace hal {
             InitializeExtensions();
             InitializeI2C();
             InitializeInterrupts();
-            InitializeMockHooks();
+            InitializeMauClock();
             InitializeNotifier();
             InitializeOSSerialPort();
             InitializePDP();
@@ -87,8 +87,8 @@ namespace hal {
             InitializeSPI();
             InitializeThreads();
         }
-    }  // namespace init
-}  // namespace hal
+    }
+}
 
 HAL_PortHandle HAL_GetPort(int32_t channel) {
     // Dont allow a number that wouldn't fit in a uint8_t
@@ -249,7 +249,9 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
  * @return The current time in microseconds according to the FPGA (since FPGA
  * reset).
  */
-uint64_t HAL_GetFPGATime(int32_t* status) { return hal::GetFPGATime(); }
+uint64_t HAL_GetFPGATime(int32_t* status) {
+    return Mau_getTime();
+}
 
 /**
  * Get the state of the "USER" button on the roboRIO
@@ -285,7 +287,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
     wpi::outs().SetUnbuffered();
     if (HAL_LoadExtensions() < 0) return false;
-    hal::RestartTiming();
+    Mau_restartTiming();
     HAL_InitializeDriverStation();
 
     initialized = true;

@@ -21,7 +21,7 @@
 #include "HAL/handles/UnlimitedHandleResource.h"
 #include "HALInitializer.h"
 #include "MockData/HAL_Value.h"
-#include "MockHooksInternal.h"
+#include "MauClockInternal.h"
 #include "PortsInternal.h"
 
 using namespace hal;
@@ -241,10 +241,10 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
     // True => false, Falling
     if (interrupt->previousState) {
         // Set our return value and our timestamps
-        interrupt->fallingTimestamp = hal::GetFPGATimestamp();
+        interrupt->fallingTimestamp = Mau_getTimestamp();
         return 1 << (8 + interrupt->index);
     } else {
-        interrupt->risingTimestamp = hal::GetFPGATimestamp();
+        interrupt->risingTimestamp = Mau_getTimestamp();
         return 1 << (interrupt->index);
     }
 }
@@ -311,10 +311,10 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
     // True => false, Falling
     if (interrupt->previousState) {
         // Set our return value and our timestamps
-        interrupt->fallingTimestamp = hal::GetFPGATimestamp();
+        interrupt->fallingTimestamp = Mau_getTimestamp();
         return 1 << (8 + interrupt->index);
     } else {
-        interrupt->risingTimestamp = hal::GetFPGATimestamp();
+        interrupt->risingTimestamp = Mau_getTimestamp();
         return 1 << (interrupt->index);
     }
 }
@@ -359,12 +359,12 @@ static void ProcessInterruptDigitalAsynchronous(const char* name, void* param,
     int32_t mask = 0;
     if (interrupt->previousState) {
         interrupt->previousState = retVal;
-        interrupt->fallingTimestamp = hal::GetFPGATimestamp();
+        interrupt->fallingTimestamp = Mau_getTimestamp();
         mask = 1 << (8 + interrupt->index);
         if (!interrupt->fireOnDown) return;
     } else {
         interrupt->previousState = retVal;
-        interrupt->risingTimestamp = hal::GetFPGATimestamp();
+        interrupt->risingTimestamp = Mau_getTimestamp();
         mask = 1 << (interrupt->index);
         if (!interrupt->fireOnUp) return;
     }
@@ -394,12 +394,12 @@ static void ProcessInterruptAnalogAsynchronous(const char* name, void* param,
     int mask = 0;
     if (interrupt->previousState) {
         interrupt->previousState = retVal;
-        interrupt->fallingTimestamp = hal::GetFPGATimestamp();
+        interrupt->fallingTimestamp = Mau_getTimestamp();
         if (!interrupt->fireOnDown) return;
         mask = 1 << (8 + interrupt->index);
     } else {
         interrupt->previousState = retVal;
-        interrupt->risingTimestamp = hal::GetFPGATimestamp();
+        interrupt->risingTimestamp = Mau_getTimestamp();
         if (!interrupt->fireOnUp) return;
         mask = 1 << (interrupt->index);
     }

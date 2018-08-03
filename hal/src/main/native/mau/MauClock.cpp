@@ -19,7 +19,7 @@ static std::atomic<uint64_t> programStartTime{0};
 
 namespace hal {
     namespace init {
-        void InitializeMockHooks() {}
+        void InitializeMauClock() {}
     }
 }
 

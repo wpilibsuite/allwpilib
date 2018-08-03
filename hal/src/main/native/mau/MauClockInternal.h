@@ -1,6 +1,5 @@
 #ifndef NATIVE_MAUTIMEINTERNAL_H
 
-#include "MockData/MockHooks.h"
 #include "MauInternal.h"
 #include <stdint.h>
 
