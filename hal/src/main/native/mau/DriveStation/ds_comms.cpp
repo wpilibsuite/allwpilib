@@ -5,6 +5,7 @@
 #include "state.hpp"
 #include "include/MauDriveData.h"
 #include "include/BagelDriveData.h"
+#include <wpi/priority_mutex.h>
 
 
 #include <thread>

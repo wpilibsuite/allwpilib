@@ -1,6 +1,7 @@
 #ifndef NATIVE_DRIVEDATA_H
 
 #include "DriverStation.h"
+#include <wpi/priority_mutex.h>
 
 #define NATIVE_DRIVEDATA_H
 
@@ -18,9 +19,12 @@ class Mau_DriveData {
     bool wordUnread;
     HAL_AllianceStationID* allianceID;
     HAL_MatchInfo* matchInfo;
+    wpi::priority_mutex* memLock;
 
+    void createMemoryMutex();
     Mau_SharedJoystick getJoystick(int joyNumber);
 public:
+    Mau_DriveData();
     Mau_DriveData(HAL_ControlWord* word, HAL_AllianceStationID* id, HAL_MatchInfo* info);
     void writeJoystick(int joyNumber,
                        HAL_JoystickAxes axes,

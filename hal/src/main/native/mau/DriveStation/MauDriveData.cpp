@@ -1,18 +1,29 @@
 #include "MauDriveData.h"
 
-// ----- HAL Data: Write ----- //
+// ----- HAL Data: Creator ----- //
+
+void Mau_DriveData::createMemoryMutex() {
+    wpi::priority_mutex newLock;
+    memLock = &newLock;
+}
+
+Mau_DriveData::Mau_DriveData() {
+    createMemoryMutex();
+}
 
 Mau_DriveData::Mau_DriveData(HAL_ControlWord* word, HAL_AllianceStationID* id, HAL_MatchInfo* info) {
-    // Mutex.lock()
+    createMemoryMutex();
     currControlWord = word;
     allianceID = id;
     matchInfo = info;
 }
 
-void Mau_DriveData::writeJoystick(int joyNumber, HAL_JoystickAxes axes, HAL_JoystickPOVs povs,
-                                  HAL_JoystickButtons buttons, HAL_JoystickDescriptor desc) {
-    // Mutex.lock()
+// ----- HAL Data: Write ----- //
 
+void
+Mau_DriveData::writeJoystick(int joyNumber, HAL_JoystickAxes axes, HAL_JoystickPOVs povs, HAL_JoystickButtons buttons,
+                             HAL_JoystickDescriptor desc) {
+    memLock->lock();
     Mau_SharedJoystick newJoy;
     newJoy.joyAxes = &axes;
     newJoy.joyPOVs = &povs;
@@ -20,13 +31,13 @@ void Mau_DriveData::writeJoystick(int joyNumber, HAL_JoystickAxes axes, HAL_Joys
     newJoy.joyDescriptor = &desc;
 
     joysticks[joyNumber] = newJoy;
+    memLock->unlock();
 }
 
 // ----- HAL Data: Update ----- //
 
 void Mau_DriveData::updateControlWord(bool enabled, bool auton, bool test, bool estop, bool fms, bool ds) {
-    // Mutex.lock()
-
+    memLock->lock();
     HAL_ControlWord newWord;
     newWord.enabled = enabled;
     newWord.autonomous = auton;
@@ -38,93 +49,82 @@ void Mau_DriveData::updateControlWord(bool enabled, bool auton, bool test, bool 
     prevControlWord = currControlWord;
     currControlWord = &newWord;
     wordUnread = true;
+    memLock->unlock();
 }
 
 void Mau_DriveData::updateJoyAxis(int joyNumber, int axisIndex, float axis) {
-    // Mutex.lock()
-
+    memLock->lock();
     joysticks[joyNumber].joyAxes->axes[axisIndex] = axis;
+    memLock->unlock();
 }
 
 void Mau_DriveData::updateJoyPOV(int joyNumber, int povIndex, uint16_t pov) {
-    // Mutex.lock()
-
+    memLock->lock();
     joysticks[joyNumber].joyPOVs->povs[povIndex] = pov;
+    memLock->unlock();
 }
 
 void Mau_DriveData::updateJoyButtons(int joyNumber, uint32_t buttons) {
-    // Mutex.lock()
-
+    memLock->lock();
     joysticks[joyNumber].joyButtons->buttons = buttons;
+    memLock->unlock();
 }
 
 // ----- HAL Data: Read ----- //
 
 Mau_SharedJoystick Mau_DriveData::getJoystick(int joyNumber) {
-    // Mutex.lock()
-
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
     return joysticks[joyNumber];
 }
 
 HAL_ControlWord* Mau_DriveData::readPreviousControl() {
-    // Mutex.lock()
-
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
     return prevControlWord;
 }
 
 HAL_ControlWord* Mau_DriveData::readCurrentControl() {
-    // Mutex.lock()
-
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
     wordUnread == false;
     return currControlWord;
 }
 
 bool Mau_DriveData::readIfControlRead() {
-    // Mutex.lock()
-
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
     return wordUnread;
 }
 
 HAL_AllianceStationID* Mau_DriveData::readAllianceID() {
-    // Mutex.lock()
-
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
     return allianceID;
 }
 
 HAL_MatchInfo* Mau_DriveData::readMatchInfo() {
-    // Mutex.lock()
-
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
     return matchInfo;
 }
 
 HAL_MatchType* Mau_DriveData::readMatchType() {
-    // Mutex.lock()
-
-    HAL_MatchType type = matchInfo->matchType;
-    return &type;
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
+    return &(matchInfo->matchType);
 }
 
 HAL_JoystickAxes* Mau_DriveData::readJoyAxes(int joyNumber) {
-    // Mutex.lock()
-
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
     return getJoystick(joyNumber).joyAxes;
 }
 
 HAL_JoystickPOVs* Mau_DriveData::readJoyPOVs(int joyNumber) {
-    // Mutex.lock()
-
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
     return getJoystick(joyNumber).joyPOVs;
 }
 
 HAL_JoystickButtons* Mau_DriveData::readJoyButtons(int joyNumber) {
-    // Mutex.lock()
-
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
     return getJoystick(joyNumber).joyButtons;
 }
 
 HAL_JoystickDescriptor* Mau_DriveData::readJoyDescriptor(int joyNumber) {
-    // Mutex.lock()
-
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
     return getJoystick(joyNumber).joyDescriptor;
 }
 
