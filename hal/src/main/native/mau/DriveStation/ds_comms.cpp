@@ -35,6 +35,8 @@ static bool server_running;
 
 static std::thread udp_thread, tcp_thread;
 
+Mau_DriveData driveData();
+
 static void tcp_thread_func() {
     Toast::Net::Socket::ServerSocket sock(1740);
     sock.open();
@@ -92,6 +94,8 @@ void DriverStationComms::start() {
 
         tcp_thread = std::thread(tcp_thread_func);
         tcp_thread.detach();
+
+		Mau_DriveData::writeJoystick(0);
     }
 }
 
@@ -227,6 +231,8 @@ void DriverStationComms::decode_ds_packet(char* data, int length) {
 //		MTX_UNLOCK(shared_mutex()->ds, 0);
 
         last_decode_time = current_time_millis();
+
+		DriverStationComms::periodic_update();
     }
 }
 
@@ -283,17 +289,13 @@ void DriverStationComms::decode_ds_tcp_packet(char* data, int length) {
 bool last = false;
 
 void DriverStationComms::periodic_update() {
-//	MTX_LOCK(shared_mutex()->ds, 0);
     if (current_time_millis() - last_decode_time > 1000) {
-        //printf("DS Disconnected \n\n");
         // DS Disconnected
 //		shared()->ds_info()->set_ds_attached(false);
     } else {
-        //printf("DS Connected \n\n");
         // DS Connected
 //		shared()->ds_info()->set_ds_attached(true);
     }
-//	MTX_UNLOCK(shared_mutex()->ds, 0);
 
     for (int i = 0; i < 6; i++) {
         _TempJoyData* tempJoy = &joys[i];

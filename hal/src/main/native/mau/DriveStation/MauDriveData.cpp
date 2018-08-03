@@ -20,8 +20,7 @@ Mau_DriveData::Mau_DriveData(HAL_ControlWord* word, HAL_AllianceStationID* id, H
 
 // ----- HAL Data: Write ----- //
 
-void
-Mau_DriveData::writeJoystick(int joyNumber, HAL_JoystickAxes axes, HAL_JoystickPOVs povs, HAL_JoystickButtons buttons,
+void Mau_DriveData::writeJoystick(int joyNumber, HAL_JoystickAxes axes, HAL_JoystickPOVs povs, HAL_JoystickButtons buttons,
                              HAL_JoystickDescriptor desc) {
     memLock->lock();
     Mau_SharedJoystick newJoy;
@@ -32,6 +31,15 @@ Mau_DriveData::writeJoystick(int joyNumber, HAL_JoystickAxes axes, HAL_JoystickP
 
     joysticks[joyNumber] = newJoy;
     memLock->unlock();
+}
+
+void Mau_DriveData::writeJoystick(int, joyNumber) {
+
+	memLock->lock();
+	Mau_SharedJoystick newJoy;
+	
+	joysticks[joyNumber] = newJoy;
+	memLock->unlock();
 }
 
 // ----- HAL Data: Update ----- //
@@ -127,6 +135,3 @@ HAL_JoystickDescriptor* Mau_DriveData::readJoyDescriptor(int joyNumber) {
     std::lock_guard<wpi::priority_mutex> lock(*memLock);
     return getJoystick(joyNumber).joyDescriptor;
 }
-
-
-
