@@ -83,11 +83,13 @@ static void udp_thread_func() {
 void DriverStationComms::start() {
     if (!server_running) {
         Toast::Net::Socket::socket_init();
+		
+		Mau_DriveData::createMemoryMutex();
 
-//		mtx.lock();
+		memLock->lock();
         server_running = true;
         printf("Server Running...\n");
-//		mtx.unlock();
+		memLock->unlock();
 
         udp_thread = std::thread(udp_thread_func);
         udp_thread.detach();
@@ -100,9 +102,9 @@ void DriverStationComms::start() {
 }
 
 void DriverStationComms::stop() {
-//	mtx.lock();
+	memLock->lock();
     server_running = false;
-//	mtx.unlock();
+	memLock->unlock();
 }
 
 typedef struct {
@@ -219,7 +221,6 @@ void DriverStationComms::decode_ds_packet(char* data, int length) {
         // Write it all to the shared pool
         // Toast::States::Internal::set_state(state);
 
-//		MTX_LOCK(shared_mutex()->ds, 0);
 //		shared()->ds_info()->set_alliance(alliance);
 //		shared()->ds_info()->set_alliance_station(alliance_position);
 //		shared()->ds_info()->set_fms_attached(fms);
@@ -227,12 +228,45 @@ void DriverStationComms::decode_ds_packet(char* data, int length) {
         //printf("SHARED_SIM: ");
 //		printf(alliance /n);
 
+		if (current_time_millis() - last_decode_time > 1000) {
+			// DS Disconnected
+//			shared()->ds_info()->set_ds_attached(false);
+		} else {
+			// DS Connected
+//			shared()->ds_info()->set_ds_attached(true);
+		}
 
-//		MTX_UNLOCK(shared_mutex()->ds, 0);
+//	MTX_LOCK(shared_mutex()->power, 0);
+//	bat_voltage = shared()->power()->get_pdp_voltage();
+    bat_voltage = 12;
+//	MTX_UNLOCK(shared_mutex()->power, 0);
+}
+
+		// Acquire Mutex
+
+		memLock->lock();
 
         last_decode_time = current_time_millis();
 
-		DriverStationComms::periodic_update();
+		for (int i = 0; i < 6; i++) {
+			_TempJoyData* tempJoy = &joys[i];
+
+		    Bagel_updateJoystickAxes(i, tempJoy->axis_count, tempJoy->axis);
+			Bagel_updateJoystickPOVs(i, tempJoy->pov_count, tempJoy->pov);
+			Bagel_updateJoystickButtons(i, tempJoy->button_mask);
+
+			tempJoy->has_update = false;
+		}
+		
+		// signal reader that data is ready
+
+		memSignal->notify_all();
+
+		// Release the mutex
+
+		memLock->unlock();
+
+
     }
 }
 
@@ -286,29 +320,4 @@ void DriverStationComms::decode_ds_tcp_packet(char* data, int length) {
     }
 }
 
-bool last = false;
-
-void DriverStationComms::periodic_update() {
-    if (current_time_millis() - last_decode_time > 1000) {
-        // DS Disconnected
-//		shared()->ds_info()->set_ds_attached(false);
-    } else {
-        // DS Connected
-//		shared()->ds_info()->set_ds_attached(true);
-    }
-
-    for (int i = 0; i < 6; i++) {
-        _TempJoyData* tempJoy = &joys[i];
-
-        Bagel_updateJoystickAxes(i, tempJoy->axis_count, tempJoy->axis);
-        Bagel_updateJoystickPOVs(i, tempJoy->pov_count, tempJoy->pov);
-        Bagel_updateJoystickButtons(i, tempJoy->button_mask);
-
-        tempJoy->has_update = false;
-    }
-
-//	MTX_LOCK(shared_mutex()->power, 0);
-//	bat_voltage = shared()->power()->get_pdp_voltage();
-    bat_voltage = 12;
-//	MTX_UNLOCK(shared_mutex()->power, 0);
-}
+// bool last = false;
