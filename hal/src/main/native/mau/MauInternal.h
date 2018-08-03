@@ -10,7 +10,6 @@
 #include "MauMap.h"
 #include "Translator/include/MauEnumConverter.h"
 
-
 namespace mau {
     extern AHRS* vmxIMU;
     extern VMXIO* vmxIO;
