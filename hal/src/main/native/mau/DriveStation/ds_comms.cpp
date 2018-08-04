@@ -15,13 +15,6 @@
 #include <sys/time.h>
 #include <string>
 
-//#include "thp/sim/sim_provider.hpp"
-//#include "toast/memory.hpp"
-//#include "toast/concurrent/mutex.hpp"
-//#include "toast/util.hpp"
-//#include "toast/crash.hpp"
-//#include "toast/logger.hpp"
-
 using namespace Sim;
 using namespace Toast::Memory;
 
@@ -281,7 +274,6 @@ void DriverStationComms::decode_ds_tcp_packet(char* data, int length) {
 }
 
 bool last = false;
-
 void DriverStationComms::periodic_update() {
 //	MTX_LOCK(shared_mutex()->ds, 0);
     if (current_time_millis() - last_decode_time > 1000) {
