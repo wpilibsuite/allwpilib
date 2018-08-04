@@ -96,6 +96,7 @@ extern "C" {
         }
 
     //    return HALSIM_GetPCMSolenoidOutput(port->module, port->channel);
+        return 0;
     }
 
     int32_t HAL_GetAllSolenoids(int32_t module, int32_t* status) {

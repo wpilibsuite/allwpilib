@@ -24,14 +24,17 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
 
 int32_t HAL_TransactionSPI(HAL_SPIPort port, const uint8_t* dataToSend, uint8_t* dataReceived, int32_t size) {
 //  return SimSPIData[port].Transaction(dataToSend, dataReceived, size);
+    return 0;
 }
 
 int32_t HAL_WriteSPI(HAL_SPIPort port, const uint8_t* dataToSend, int32_t sendSize) {
 //  return SimSPIData[port].Write(dataToSend, sendSize);
+    return 0;
 }
 
 int32_t HAL_ReadSPI(HAL_SPIPort port, uint8_t* buffer, int32_t count) {
 //  return SimSPIData[port].Read(buffer, count);
+    return 0;
 }
 
 void HAL_CloseSPI(HAL_SPIPort port) {
@@ -95,6 +98,7 @@ void HAL_ForceSPIAutoRead(HAL_SPIPort port, int32_t* status) {
 int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint8_t* buffer,  int32_t numToRead, double timeout,
                                     int32_t* status) {
 //    return SimSPIData[port].ReadAutoReceivedData(buffer, numToRead, timeout, status);
+    return 0;
 }
 
 int32_t HAL_GetSPIAutoDroppedCount(HAL_SPIPort port, int32_t* status) {

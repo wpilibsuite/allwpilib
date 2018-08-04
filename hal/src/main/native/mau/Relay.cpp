@@ -110,5 +110,6 @@ extern "C" {
 //            return SimRelayData[port->channel].GetForward();
 //        else
 //            return SimRelayData[port->channel].GetReverse();
+        return 0;
     }
 }
