@@ -34,36 +34,33 @@ file(GLOB
     hal_shared_native_src src/main/native/cpp/handles/*.cpp
     hal_mau_native_src src/main/native/mau/*.cpp
     hal_mau_native_src src/main/native/mau/Translator/*.cpp
-    hal_mau_native_src src/main/native/mau/DriverStation/*.cpp
-    hal_sim_native_src src/main/native/sim/*.cpp
-    hal_sim_native_src src/main/native/sim/MockData/*.cpp)
-add_library(hal ${hal_shared_native_src} ${hal_shared_jni_src})
+    hal_mau_native_src src/main/native/mau/DriverStation/*.cpp)
 add_library(hal_mau ${hal_shared_native_src} ${hal_shared_jni_src})
 
 if(USE_EXTERNAL_HAL)
     include(${EXTERNAL_HAL_FILE})
 else()
-    target_sources(hal PRIVATE ${hal_sim_native_src} ${hal_sim_jni_src})
     target_sources(hal_mau PRIVATE ${hal_mau_native_src})
 endif()
 
-set_target_properties(hal PROPERTIES OUTPUT_NAME "wpiHal")
 set_target_properties(hal_mau PROPERTIES OUTPUT_NAME "wpiHalMau")
 
-target_include_directories(hal PUBLIC
+target_include_directories(hal_mau PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/hal>)
-target_include_directories(hal_mau PUBLIC
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include/:/usr/local/include/vmxpi/>
-                            $<INSTALL_INTERFACE:${include_dest}/hal/>)
+target_include_directories(hal_mau PUBLIC /usr/local/include/vmxpi)
+target_include_directories(hal_mau PUBLIC 
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include/HAL/handles>)
+target_include_directories(hal_mau PUBLIC 
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include/HAL>)
+target_include_directories(hal_mau PUBLIC 
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/mau>)
 
 
-target_link_libraries(hal PUBLIC wpiutil)
 target_link_libraries(hal_mau PUBLIC wpiutil)
 
 
-set_property(TARGET hal PROPERTY FOLDER "libraries")
-set_property(TARGET hal_mau PROPERTY FOLDER "libraries")
+set_property(TARGET hal_mau PROPERTY FOLDER "librariesmau")
 
 if (NOT WITHOUT_JAVA)
     if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
@@ -75,9 +72,6 @@ if (NOT WITHOUT_JAVA)
     add_dependencies(hal hal_jar)
 endif()
 
-install(TARGETS hal EXPORT hal DESTINATION "${main_lib_dest}")
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
-
 install(TARGETS hal_mau EXPORT hal_mau DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "/usr/local/wpilib/include/hal_mau")
 
@@ -88,12 +82,9 @@ endif()
 if (MSVC)
     set (hal_config_dir ${wpilib_dest})
 else()
-    set (hal_config_dir share/hal)
 	set (hal_mau_config_dir share/hal_mau)
 endif()
 
-install(FILES hal-config.cmake DESTINATION ${hal_config_dir})
-install(EXPORT hal DESTINATION ${hal_config_dir})
 
 install(FILES hal_mau-config.cmake DESTINATION ${hal_mau_config_dir})
 install(EXPORT hal_mau DESTINATION ${hal_mau_config_dir})
