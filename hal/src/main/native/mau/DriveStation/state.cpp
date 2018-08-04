@@ -60,11 +60,12 @@ State States::from_robotstate(RobotState rs) {
 }
 
 RobotState States::current_robotstate() {
-	return Bagel_readCurrentState(); //Memory::shared()->get_state_current();
+	return Bagel_readRobotState(); //Memory::shared()->get_state_current();
 }
 
 RobotState States::last_robotstate() {
-	return Bagel_readPreviousState(); //Memory::shared()->get_state_last();
+	// no-op
+	return (RobotState)0;
 }
 
 State States::current_state() {

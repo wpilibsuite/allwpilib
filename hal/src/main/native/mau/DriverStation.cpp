@@ -90,12 +90,12 @@ extern "C" {
     }
 
     int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
-        // currControlWord->enabled = SimDriverStationData->GetEnabled();
-        // currControlWord->autonomous = SimDriverStationData->GetAutonomous();
-        // currControlWord->test = SimDriverStationData->GetTest();
-        // currControlWord->eStop = SimDriverStationData->GetEStop();
-        // currControlWord->fmsAttached = SimDriverStationData->GetFmsAttached();
-        // currControlWord->dsAttached = SimDriverStationData->GetDsAttached();
+        // controlWord->enabled = SimDriverStationData->GetEnabled();
+        // controlWord->autonomous = SimDriverStationData->GetAutonomous();
+        // controlWord->test = SimDriverStationData->GetTest();
+        // controlWord->eStop = SimDriverStationData->GetEStop();
+        // controlWord->fmsAttached = SimDriverStationData->GetFmsAttached();
+        // controlWord->dsAttached = SimDriverStationData->GetDsAttached();
         return 0;
     }
 
@@ -120,6 +120,7 @@ extern "C" {
         buttons = mau::sharedMemory->readJoyButtons(joystickNum);
         return buttons->count;
     }
+
     /**
      * Retrieve the Joystick Descriptor for particular slot
      * @param desc [out] descriptor (data transfer object) to fill in.  desc is
@@ -162,12 +163,10 @@ extern "C" {
     }
 
     double HAL_GetMatchTime(int32_t* status) {
-        // return SimDriverStationData->GetMatchTime();
         return 0;
     }
 
     int HAL_GetMatchInfo(HAL_MatchInfo* info) {
-        // SimDriverStationData->GetMatchInfo(info);
         info = mau::sharedMemory->readMatchInfo();
         return 0;
     }
@@ -178,6 +177,16 @@ extern "C" {
         info->eventName = nullptr;
         info->gameSpecificMessage = nullptr;
     }
+
+// ----- Driver Station:  ----- //
+
+void HAL_ReleaseDSMutex(void);
+bool HAL_IsNewControlData(void);
+void HAL_WaitForDSData(void);
+HAL_Bool HAL_WaitForDSDataTimeout(double timeout);
+void HAL_InitializeDriverStation(void);
+
+// ----- HAL Data: Read ----- //
 
     void HAL_ObserveUserProgramStarting(void) {
         // HALSIM_SetProgramStarted();

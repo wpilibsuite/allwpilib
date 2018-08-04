@@ -1,28 +1,16 @@
 #include "MauDriveData.h"
 
-// ----- HAL Data: Creator ----- //
+//// ----- HAL Data: Create ----- ////
 
-void Mau_DriveData::createMemoryMutex() {
+Mau_DriveData::Mau_DriveData() {
     wpi::priority_mutex newLock;
     memLock = &newLock;
 }
 
-Mau_DriveData::Mau_DriveData() {
-    createMemoryMutex();
-}
+//// ----- HAL Data: Write ----- ////
 
-Mau_DriveData::Mau_DriveData(HAL_ControlWord* word, HAL_AllianceStationID* id, HAL_MatchInfo* info) {
-    createMemoryMutex();
-    currControlWord = word;
-    allianceID = id;
-    matchInfo = info;
-}
-
-// ----- HAL Data: Write ----- //
-
-void
-Mau_DriveData::writeJoystick(int joyNumber, HAL_JoystickAxes axes, HAL_JoystickPOVs povs, HAL_JoystickButtons buttons,
-                             HAL_JoystickDescriptor desc) {
+void Mau_DriveData::writeJoystick(int joyNumber, HAL_JoystickAxes axes, HAL_JoystickPOVs povs,
+                                  HAL_JoystickButtons buttons, HAL_JoystickDescriptor desc) {
     memLock->lock();
     Mau_SharedJoystick newJoy;
     newJoy.joyAxes = &axes;
@@ -34,23 +22,74 @@ Mau_DriveData::writeJoystick(int joyNumber, HAL_JoystickAxes axes, HAL_JoystickP
     memLock->unlock();
 }
 
-// ----- HAL Data: Update ----- //
+//// ----- HAL Data: Update ----- ////
 
-void Mau_DriveData::updateControlWord(bool enabled, bool auton, bool test, bool estop, bool fms, bool ds) {
+void Mau_DriveData::updateAllianceID(HAL_AllianceStationID* id) {
     memLock->lock();
-    HAL_ControlWord newWord;
-    newWord.enabled = enabled;
-    newWord.autonomous = auton;
-    newWord.test = test;
-    newWord.eStop = estop;
-    newWord.fmsAttached = fms;
-    newWord.dsAttached = ds;
-
-    prevControlWord = currControlWord;
-    currControlWord = &newWord;
-    wordUnread = true;
+    allianceID = id;
     memLock->unlock();
 }
+
+void Mau_DriveData::updateMatchInfo(HAL_MatchInfo* info) {
+    memLock->lock();
+    matchInfo = info;
+    memLock->unlock();
+}
+
+void Mau_DriveData::updateMatchType(HAL_MatchType* type) {
+    memLock->lock();
+    matchInfo->matchType = *type;
+    memLock->unlock();
+}
+
+// --- Update: ControlWord --- //
+
+void Mau_DriveData::updateIsEnabled(bool enabled) {
+    memLock->lock();
+    controlWord->enabled = enabled;
+    memLock->unlock();
+}
+
+void Mau_DriveData::updateIsAutonomous(bool auton) {
+    memLock->lock();
+    controlWord->autonomous = auton;
+    memLock->unlock();
+}
+
+void Mau_DriveData::updateIsTest(bool test) {
+    memLock->lock();
+    controlWord->test = test;
+    memLock->unlock();
+}
+
+void Mau_DriveData::updateEStop(bool eStop) {
+    memLock->lock();
+    controlWord->eStop = eStop;
+    memLock->unlock();
+}
+
+void Mau_DriveData::updateIsFmsAttached(bool fms) {
+    memLock->lock();
+    controlWord->fmsAttached = fms;
+    memLock->unlock();
+}
+
+void Mau_DriveData::updateIsDsAttached(bool ds) {
+    memLock->lock();
+    controlWord->dsAttached = ds;
+    memLock->unlock();
+}
+
+void Mau_DriveData::updateControlWord(bool enabled, bool auton, bool test, bool estop, bool fms, bool ds) {
+    updateIsEnabled(enabled);
+    updateIsAutonomous(auton);
+    updateIsTest(test);
+    updateEStop(estop);
+    updateIsFmsAttached(fms);
+    updateIsDsAttached(ds);
+}
+
+// --- Update: Joystick --- //
 
 void Mau_DriveData::updateJoyAxis(int joyNumber, int axisIndex, float axis) {
     memLock->lock();
@@ -70,27 +109,17 @@ void Mau_DriveData::updateJoyButtons(int joyNumber, uint32_t buttons) {
     memLock->unlock();
 }
 
-// ----- HAL Data: Read ----- //
-
-Mau_SharedJoystick Mau_DriveData::getJoystick(int joyNumber) {
-    std::lock_guard<wpi::priority_mutex> lock(*memLock);
-    return joysticks[joyNumber];
+void Mau_DriveData::updateJoyDescriptor(int joyNumber, HAL_JoystickDescriptor* desc) {
+    memLock->lock();
+    joysticks[joyNumber].joyDescriptor = desc;
+    memLock->unlock();
 }
 
-HAL_ControlWord* Mau_DriveData::readPreviousControl() {
-    std::lock_guard<wpi::priority_mutex> lock(*memLock);
-    return prevControlWord;
-}
+//// ----- HAL Data: Read ----- ////
 
-HAL_ControlWord* Mau_DriveData::readCurrentControl() {
+HAL_ControlWord* Mau_DriveData::readControlWord() {
     std::lock_guard<wpi::priority_mutex> lock(*memLock);
-    wordUnread == false;
-    return currControlWord;
-}
-
-bool Mau_DriveData::readIfControlRead() {
-    std::lock_guard<wpi::priority_mutex> lock(*memLock);
-    return wordUnread;
+    return controlWord;
 }
 
 HAL_AllianceStationID* Mau_DriveData::readAllianceID() {
@@ -106,6 +135,45 @@ HAL_MatchInfo* Mau_DriveData::readMatchInfo() {
 HAL_MatchType* Mau_DriveData::readMatchType() {
     std::lock_guard<wpi::priority_mutex> lock(*memLock);
     return &(matchInfo->matchType);
+}
+
+// --- Read: ControlWord --- //
+
+bool Mau_DriveData::readIsEnabled() {
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
+    return controlWord->enabled;
+}
+
+bool Mau_DriveData::readIsAutonomous() {
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
+    return controlWord->autonomous;
+}
+
+bool Mau_DriveData::readIsTest() {
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
+    return controlWord->test;
+}
+
+bool Mau_DriveData::readEStop() {
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
+    return controlWord->eStop;
+}
+
+bool Mau_DriveData::readIsFmsAttached() {
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
+    return controlWord->fmsAttached;
+}
+
+bool Mau_DriveData::readIsDsAttached() {
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
+    return controlWord->dsAttached;
+}
+
+// --- Read: Joystick --- //
+
+Mau_SharedJoystick Mau_DriveData::getJoystick(int joyNumber) {
+    std::lock_guard<wpi::priority_mutex> lock(*memLock);
+    return joysticks[joyNumber];
 }
 
 HAL_JoystickAxes* Mau_DriveData::readJoyAxes(int joyNumber) {
@@ -127,6 +195,3 @@ HAL_JoystickDescriptor* Mau_DriveData::readJoyDescriptor(int joyNumber) {
     std::lock_guard<wpi::priority_mutex> lock(*memLock);
     return getJoystick(joyNumber).joyDescriptor;
 }
-
-
-
