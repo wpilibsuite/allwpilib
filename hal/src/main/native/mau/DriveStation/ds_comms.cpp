@@ -7,7 +7,6 @@
 #include "include/BagelDriveData.h"
 #include <wpi/priority_mutex.h>
 
-
 #include <thread>
 #include <iostream>
 #include <stdio.h>
@@ -147,7 +146,6 @@ void DriverStationComms::decode_ds_packet(char* data, int length) {
 
         if (reboot || restart) {
 //			logger << "NOTICE: Driver Station Requested Code Restart"; //TODO: Log to console
-//			Toast::Crash::shutdown();
             printf("NOTICE: Driver Station Requested Code Restart \n");
             Sim::DriverStationComms::stop();
             exit(0);
@@ -161,7 +159,7 @@ void DriverStationComms::decode_ds_packet(char* data, int length) {
 
 
         int alliance_position = data[5] % 3 + 1;
-//		Shared::DS::Alliance alliance = data[5] < 3 ? Shared::DS::Alliance::Red : Shared::DS::Alliance::Blue;
+		Shared::DS::Alliance alliance = data[5] < 3 ? Shared::DS::Alliance::Red : Shared::DS::Alliance::Blue;
 
         int i = 6;
         bool search = true;
@@ -205,19 +203,12 @@ void DriverStationComms::decode_ds_packet(char* data, int length) {
             i += struct_size + 1;
         }
 
-        // Write it all to the shared pool
-        // Toast::States::Internal::set_state(state);
-
-//		MTX_LOCK(shared_mutex()->ds, 0);
-//		shared()->ds_info()->set_alliance(alliance);
-//		shared()->ds_info()->set_alliance_station(alliance_position);
-//		shared()->ds_info()->set_fms_attached(fms);
+        Bagel_updateRobotState(state);
+        Bagel_updateAllianceID(alliance, alliance_position);
+        mau::sharedMemory->updateIsFmsAttached(fms);
 
         //printf("SHARED_SIM: ");
 //		printf(alliance /n);
-
-
-//		MTX_UNLOCK(shared_mutex()->ds, 0);
 
         last_decode_time = current_time_millis();
     }
@@ -242,6 +233,9 @@ void DriverStationComms::decode_ds_tcp_packet(char* data, int length) {
         // Joystick Descriptor
         int i = 3;
         while (i < length) {
+            Shared::DS::Joystick joy;
+            Shared::DS::JoystickDescriptor* joyDesc = joy.get_descriptor();
+
             uint8_t joyid = data[i++];
             bool xbox = data[i++] == 1;
             uint8_t type = data[i++];
@@ -249,25 +243,28 @@ void DriverStationComms::decode_ds_tcp_packet(char* data, int length) {
             int nb_i = i;
             i += name_length;
             uint8_t axis_count = data[i++];
-            uint8_t axis_types[16];
+//            uint8_t axis_types[16];
             int at_i = i;
             i += axis_count;
-            uint8_t button_count = data[i++];
-            uint8_t pov_count = data[i++];
+//            uint8_t button_count = data[i++];
+            joy.set_num_button(data[i++]);
+//            uint8_t pov_count = data[i++];
+            joy.set_num_pov(data[i++]);
 
             if (type != 255 && axis_count != 255) {
-//				MTX_LOCK(shared_mutex()->joy, joyid);
-//				Shared::DS::JoystickDescriptor *j = shared()->joystick(joyid)->get_descriptor();
-//				j->set_is_xbox(xbox);
-//				j->set_type((Shared::DS::JoystickType) type);
-//				if (name_length > 60) name_length = 60;
-//				j->set_name_length(name_length);
-//				memcpy(j->get_name(), &data[nb_i], name_length);
-//				j->set_axis_count(axis_count);
-//				for (int x = 0; x < axis_count; x++) {
-//					j->set_axis_type(x, (Shared::DS::JoystickAxisType) data[at_i + x]);
-//				}
-//				MTX_UNLOCK(shared_mutex()->joy, joyid);
+				joyDesc->set_is_xbox(xbox);
+				joyDesc->set_type((Shared::DS::JoystickType) type);
+				if (name_length > 60) {
+				    name_length = 60;
+				}
+				joyDesc->set_name_length(name_length);
+				memcpy(joyDesc->get_name(), &data[nb_i], name_length);
+				joyDesc->set_axis_count(axis_count);
+				for (int x = 0; x < axis_count; x++) {
+					joyDesc->set_axis_type(x, (Shared::DS::JoystickAxisType) data[at_i + x]);
+				}
+
+				Bagel_updateJoystickDescriptor(joyid, &joy);
             }
         }
     }
@@ -275,17 +272,15 @@ void DriverStationComms::decode_ds_tcp_packet(char* data, int length) {
 
 bool last = false;
 void DriverStationComms::periodic_update() {
-//	MTX_LOCK(shared_mutex()->ds, 0);
     if (current_time_millis() - last_decode_time > 1000) {
         //printf("DS Disconnected \n\n");
         // DS Disconnected
-//		shared()->ds_info()->set_ds_attached(false);
+        mau::sharedMemory->updateIsDsAttached(false);
     } else {
         //printf("DS Connected \n\n");
         // DS Connected
-//		shared()->ds_info()->set_ds_attached(true);
+        mau::sharedMemory->updateIsDsAttached(true);
     }
-//	MTX_UNLOCK(shared_mutex()->ds, 0);
 
     for (int i = 0; i < 6; i++) {
         _TempJoyData* tempJoy = &joys[i];
@@ -297,8 +292,6 @@ void DriverStationComms::periodic_update() {
         tempJoy->has_update = false;
     }
 
-//	MTX_LOCK(shared_mutex()->power, 0);
 //	bat_voltage = shared()->power()->get_pdp_voltage();
     bat_voltage = 12;
-//	MTX_UNLOCK(shared_mutex()->power, 0);
 }

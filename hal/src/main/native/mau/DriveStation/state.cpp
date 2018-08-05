@@ -19,10 +19,7 @@ static State _TEST(RobotState::TEST);
 static RobotState _last_internal_state;
 
 void States::Internal::set_state(RobotState rs) {
-//	RobotState last = Memory::shared()->get_state_current();
-	
-	//Memory::shared()->set_state_current(rs);
-	//Memory::shared()->set_state_last(last);
+	Bagel_updateRobotState(rs);
 }
 
 void States::Internal::set_tick_timing(int ms) {
@@ -65,7 +62,7 @@ RobotState States::current_robotstate() {
 
 RobotState States::last_robotstate() {
 	// no-op
-	return (RobotState)0;
+	return RobotState::DISABLED;
 }
 
 State States::current_state() {

@@ -94,17 +94,15 @@ static void Bagel_writeAllJoysticks(int joyCount, Toast::Memory::Shared::DS::Joy
 
 //// ----- Bagel Data: Update ----- ////
 
-static void Bagel_updateAllianceID(Toast::Memory::Shared::DS::DSInfo* info) {
+static void Bagel_updateAllianceID(Toast::Memory::Shared::DS::Alliance alliance, int pos) {
     HAL_AllianceStationID id;
-    
-    Toast::Memory::Shared::DS::Alliance alliance = info->get_alliance();
-    int station = info->get_alliance_station();
+
     switch (alliance) {
         case Toast::Memory::Shared::DS::Alliance::Red:
-            Bagel_getIDFromAlliance(&id, station, Bagel_HALRedIDs);
+            Bagel_getIDFromAlliance(&id, pos, Bagel_HALRedIDs);
             break;
         case Toast::Memory::Shared::DS::Alliance::Blue:
-            Bagel_getIDFromAlliance(&id, station, Bagel_HALBlueIDs);
+            Bagel_getIDFromAlliance(&id, pos, Bagel_HALBlueIDs);
             break;
     }
     
@@ -113,7 +111,7 @@ static void Bagel_updateAllianceID(Toast::Memory::Shared::DS::DSInfo* info) {
 
 // --- Update: Joystick --- //
 
-static void Bagel_updateRobotState(Toast::Memory::RobotState roboState, Toast::Memory::Shared::DS::DSInfo info) {
+static void Bagel_updateRobotState(Toast::Memory::RobotState roboState) {
     bool enabled = true;
     bool auton = false;
     bool test = false;
@@ -128,10 +126,9 @@ static void Bagel_updateRobotState(Toast::Memory::RobotState roboState, Toast::M
         }
     }
 
-    bool estop = false; // I have no idea what this is
-    bool fms = info.get_fms_attached();
-    bool ds = info.get_ds_attached();
-    mau::sharedMemory->updateControlWord(enabled, auton, test, estop, fms, ds);
+    mau::sharedMemory->updateIsEnabled(enabled);
+    mau::sharedMemory->updateIsAutonomous(auton);
+    mau::sharedMemory->updateIsTest(test);
 }
 
 static void Bagel_updateJoystickAxes(int joyNumber, int axesNum, uint8_t* axes) {
