@@ -51,7 +51,7 @@ TEST(UvAsync, Test) {
   std::thread theThread;
 
   auto loop = Loop::Create();
-  auto async = Async::Create(loop);
+  auto async = Async<>::Create(loop);
   auto prepare = Prepare::Create(loop);
 
   loop->error.connect([](Error) { FAIL(); });
@@ -97,6 +97,79 @@ TEST(UvAsync, Test) {
   ASSERT_GT(prepare_cb_called, 0);
   ASSERT_EQ(async_cb_called, 3);
   ASSERT_EQ(close_cb_called, 2);
+
+  if (theThread.joinable()) theThread.join();
+}
+
+TEST(UvAsync, Data) {
+  int prepare_cb_called = 0;
+  int async_cb_called[2] = {0, 0};
+  int close_cb_called = 0;
+
+  std::thread theThread;
+
+  auto loop = Loop::Create();
+  auto async = Async<int, std::function<void(int)>>::Create(loop);
+  auto prepare = Prepare::Create(loop);
+
+  loop->error.connect([](Error) { FAIL(); });
+
+  prepare->error.connect([](Error) { FAIL(); });
+  prepare->prepare.connect([&] {
+    if (prepare_cb_called++) return;
+    theThread = std::thread([&] {
+      async->Send(0, [&](int v) {
+        ASSERT_EQ(v, 0);
+        ++async_cb_called[0];
+      });
+      async->Send(1, [&](int v) {
+        ASSERT_EQ(v, 1);
+        ++async_cb_called[1];
+        async->Close();
+        prepare->Close();
+      });
+    });
+  });
+  prepare->Start();
+
+  async->error.connect([](Error) { FAIL(); });
+  async->closed.connect([&] { close_cb_called++; });
+  async->wakeup.connect([&](int v, std::function<void(int)> f) { f(v); });
+
+  loop->Run();
+
+  ASSERT_EQ(async_cb_called[0], 1);
+  ASSERT_EQ(async_cb_called[1], 1);
+  ASSERT_EQ(close_cb_called, 1);
+
+  if (theThread.joinable()) theThread.join();
+}
+
+TEST(UvAsync, DataRef) {
+  int prepare_cb_called = 0;
+  int val = 0;
+
+  std::thread theThread;
+
+  auto loop = Loop::Create();
+  auto async = Async<int, int&>::Create(loop);
+  auto prepare = Prepare::Create(loop);
+
+  prepare->prepare.connect([&] {
+    if (prepare_cb_called++) return;
+    theThread = std::thread([&] { async->Send(1, val); });
+  });
+  prepare->Start();
+
+  async->wakeup.connect([&](int v, int& r) {
+    r = v;
+    async->Close();
+    prepare->Close();
+  });
+
+  loop->Run();
+
+  ASSERT_EQ(val, 1);
 
   if (theThread.joinable()) theThread.join();
 }

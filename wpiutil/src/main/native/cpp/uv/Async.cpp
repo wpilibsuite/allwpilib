@@ -12,7 +12,7 @@
 namespace wpi {
 namespace uv {
 
-std::shared_ptr<Async> Async::Create(Loop& loop) {
+std::shared_ptr<Async<>> Async<>::Create(Loop& loop) {
   auto h = std::make_shared<Async>(private_init{});
   int err = uv_async_init(loop.GetRaw(), h->GetRaw(), [](uv_async_t* handle) {
     Async& h = *static_cast<Async*>(handle->data);
