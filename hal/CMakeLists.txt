@@ -36,7 +36,7 @@ file(GLOB
     hal_shared_native_src src/main/native/cpp/handles/*.cpp
     hal_sim_native_src src/main/native/mau/*.cpp
     hal_sim_native_src src/main/native/mau/Translator/*.cpp
-    hal_sim_native_src src/main/native/mau/DriverStation/*.cpp)
+    hal_sim_native_src src/main/native/mau/DriveStation/*.cpp)
 add_library(hal ${hal_shared_native_src} ${hal_shared_jni_src})
 
 if(USE_EXTERNAL_HAL)
@@ -57,6 +57,8 @@ target_include_directories(hal PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include/HAL>)
 target_include_directories(hal PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/mau>)
+target_include_directories(hal PUBLIC
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/mau/DriveStation/include>)
 
 target_link_libraries(hal PUBLIC wpiutil)
 
