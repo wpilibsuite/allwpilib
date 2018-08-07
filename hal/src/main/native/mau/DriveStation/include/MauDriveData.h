@@ -2,6 +2,7 @@
 
 #include "DriverStation.h"
 #include <wpi/priority_mutex.h>
+#include <wpi/priority_condition_variable.h>
 
 #define NATIVE_DRIVEDATA_H
 
@@ -10,16 +11,23 @@ struct Mau_SharedJoystick {
     HAL_JoystickPOVs* joyPOVs;
     HAL_JoystickButtons* joyButtons;
     HAL_JoystickDescriptor* joyDescriptor;
+
+    int32_t joystickNum;
+    int64_t outputs;
+    int32_t leftRumble;
+    int32_t rightRumble;
 };
 
 class Mau_DriveData {
     wpi::priority_mutex* memLock;
+    wpi::priority_condition_variable* memSignal;
 
     HAL_AllianceStationID* allianceID;
     HAL_MatchInfo* matchInfo;
     HAL_ControlWord* controlWord;
     Mau_SharedJoystick joysticks[6];
 
+    void unlockAndSignal();
     Mau_SharedJoystick getJoystick(int joyNumber);
 public:
     Mau_DriveData();
@@ -45,7 +53,7 @@ public:
     void updateJoyPOV(int joyNumber, int povIndex, uint16_t pov);
     void updateJoyButtons(int joyNumber, uint32_t buttons);
     void updateJoyDescriptor(int joyNumber, HAL_JoystickDescriptor* desc);
-
+    void updateJoyOutputs(int32_t joyNumber, int64_t outputs, int32_t leftRumble, int32_t rightRumble);
 
     HAL_AllianceStationID* readAllianceID();
     HAL_MatchInfo* readMatchInfo();
@@ -63,6 +71,9 @@ public:
     HAL_JoystickPOVs* readJoyPOVs(int joyNumber);
     HAL_JoystickButtons* readJoyButtons(int joyNumber);
     HAL_JoystickDescriptor* readJoyDescriptor(int joyNumber);
+
+    wpi::priority_mutex* getMutex();
+    wpi::priority_condition_variable* getDataSignal();
 };
 
 #endif //NATIVE_DRIVEDATA_H

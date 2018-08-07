@@ -1,6 +1,7 @@
 #ifndef NATIVE_DRIVERSTATIONINTERNAL_H
 
 #include "MauDriveData.h"
+#include "ds_comms.hpp"
 
 #define NATIVE_DRIVERSTATIONINTERNAL_H
 
