@@ -21,15 +21,13 @@
 using namespace hal;
 using namespace mau;
 
-static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
-        kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM>*
+static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t, kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM>*
         digitalPWMHandles;
 
 namespace hal {
     namespace init {
         void InitializeDIO() {
-            static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
-                    kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM> dpH;
+            static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t, kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM> dpH;
             digitalPWMHandles = &dpH;
         }
     }
