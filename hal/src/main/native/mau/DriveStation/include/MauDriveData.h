@@ -22,7 +22,7 @@ class Mau_DriveData {
     wpi::priority_mutex* memLock;
     wpi::priority_condition_variable* memSignal;
 
-    HAL_AllianceStationID* allianceID;
+    HAL_AllianceStationID allianceID;
     HAL_MatchInfo* matchInfo;
     HAL_ControlWord* controlWord;
     Mau_SharedJoystick joysticks[6];
@@ -37,7 +37,7 @@ public:
                        HAL_JoystickButtons buttons,
                        HAL_JoystickDescriptor desc);
 
-    void updateAllianceID(HAL_AllianceStationID* id);
+    void updateAllianceID(HAL_AllianceStationID id);
     void updateMatchInfo(HAL_MatchInfo* info);
     void updateMatchType(HAL_MatchType* type);
 
@@ -49,9 +49,9 @@ public:
     void updateIsDsAttached(bool ds);
     void updateControlWord(bool enabled, bool auton, bool test, bool estop, bool fms, bool ds);
 
-    void updateJoyAxis(int joyNumber, int axisIndex, float axis);
-    void updateJoyPOV(int joyNumber, int povIndex, uint16_t pov);
-    void updateJoyButtons(int joyNumber, uint32_t buttons);
+    void updateJoyAxis(int joyNumber, int16_t axisCount, uint8_t* axes);
+    void updateJoyPOV(int joyNumber, int povsCount, uint16_t* povs);
+    void updateJoyButtons(int joyNumber, uint8_t buttonCount, uint32_t buttons);
     void updateJoyDescriptor(int joyNumber, HAL_JoystickDescriptor* desc);
     void updateJoyOutputs(int32_t joyNumber, int64_t outputs, int32_t leftRumble, int32_t rightRumble);
 

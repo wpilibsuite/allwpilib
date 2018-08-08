@@ -6,7 +6,6 @@
 #include <VMXThread.h>
 #include <VMXErrors.h>
 #include <VMXChannel.h>
-#include <map>
 #include "MauMap.h"
 #include "Translator/include/MauEnumConverter.h"
 
@@ -14,7 +13,6 @@ namespace mau {
     extern AHRS* vmxIMU;
     extern VMXIO* vmxIO;
     extern VMXCAN* vmxCAN;
-    extern VMXTime* vmxTime;
     extern VMXPower* vmxPower;
     extern VMXThread* vmxThread;
 

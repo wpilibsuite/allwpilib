@@ -32,7 +32,7 @@ void Mau_DriveData::writeJoystick(int joyNumber, HAL_JoystickAxes axes, HAL_Joys
 
 //// ----- HAL Data: Update ----- ////
 
-void Mau_DriveData::updateAllianceID(HAL_AllianceStationID* id) {
+void Mau_DriveData::updateAllianceID(HAL_AllianceStationID id) {
     memLock->lock();
     allianceID = id;
     unlockAndSignal();
@@ -47,16 +47,6 @@ void Mau_DriveData::updateMatchInfo(HAL_MatchInfo* info) {
 void Mau_DriveData::updateMatchType(HAL_MatchType* type) {
     memLock->lock();
     matchInfo->matchType = *type;
-    unlockAndSignal();
-}
-
-
-void Mau_DriveData::updateJoyOutputs(int32_t joyNumber, int64_t outputs, int32_t leftRumble, int32_t rightRumble) {
-    memLock->lock();
-    Mau_SharedJoystick* joy = &joysticks[joyNumber];
-    joy->outputs = outputs;
-    joy->leftRumble = leftRumble;
-    joy->rightRumble = rightRumble;
     unlockAndSignal();
 }
 
@@ -109,20 +99,28 @@ void Mau_DriveData::updateControlWord(bool enabled, bool auton, bool test, bool 
 
 // --- Update: Joystick --- //
 
-void Mau_DriveData::updateJoyAxis(int joyNumber, int axisIndex, float axis) {
+void Mau_DriveData::updateJoyAxis(int joyNumber, int16_t axisCount, uint8_t* axes) {
     memLock->lock();
-    joysticks[joyNumber].joyAxes->axes[axisIndex] = axis;
+    joysticks[joyNumber].joyAxes->count = axisCount;
+    for (int index = 0; index < axisCount; index++) {
+        joysticks[joyNumber].joyAxes->axes[index] = (float) axes[index];
+    }
     unlockAndSignal();
 }
 
-void Mau_DriveData::updateJoyPOV(int joyNumber, int povIndex, uint16_t pov) {
+void Mau_DriveData::updateJoyPOV(int joyNumber, int povsCount, uint16_t* povs) {
     memLock->lock();
-    joysticks[joyNumber].joyPOVs->povs[povIndex] = pov;
+    joysticks[joyNumber].joyPOVs->count = povsCount;
+    for (int index = 0; index < povsCount; index++) {
+        joysticks[joyNumber].joyPOVs->povs[index] = povs[index];
+        index++;
+    }
     unlockAndSignal();
 }
 
-void Mau_DriveData::updateJoyButtons(int joyNumber, uint32_t buttons) {
+void Mau_DriveData::updateJoyButtons(int joyNumber, uint8_t buttonCount, uint32_t buttons) {
     memLock->lock();
+    joysticks[joyNumber].joyButtons->count = buttonCount;
     joysticks[joyNumber].joyButtons->buttons = buttons;
     unlockAndSignal();
 }
@@ -130,6 +128,15 @@ void Mau_DriveData::updateJoyButtons(int joyNumber, uint32_t buttons) {
 void Mau_DriveData::updateJoyDescriptor(int joyNumber, HAL_JoystickDescriptor* desc) {
     memLock->lock();
     joysticks[joyNumber].joyDescriptor = desc;
+    unlockAndSignal();
+}
+
+void Mau_DriveData::updateJoyOutputs(int32_t joyNumber, int64_t outputs, int32_t leftRumble, int32_t rightRumble) {
+    memLock->lock();
+    Mau_SharedJoystick* joy = &joysticks[joyNumber];
+    joy->outputs = outputs;
+    joy->leftRumble = leftRumble;
+    joy->rightRumble = rightRumble;
     unlockAndSignal();
 }
 
@@ -142,7 +149,7 @@ HAL_ControlWord* Mau_DriveData::readControlWord() {
 
 HAL_AllianceStationID* Mau_DriveData::readAllianceID() {
     std::lock_guard<wpi::priority_mutex> lock(*memLock);
-    return allianceID;
+    return &allianceID;
 }
 
 HAL_MatchInfo* Mau_DriveData::readMatchInfo() {

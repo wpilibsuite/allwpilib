@@ -19,6 +19,7 @@
 #include "MauClockInternal.h"
 #include "MauInternal.h"
 #include "Translator/include/FileHandler.h"
+#include "MauTime.h"
 #include <VMXPi.h>
 
 using namespace hal;
