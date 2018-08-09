@@ -3,9 +3,9 @@
 //const char* CHANNEL_MAP_JSON = "mau/Translator/Maps/ChannelMap.json";
 //const char* VMX_CHANNELS_JSON = "mau/Translator/Maps/VMXChannels.json";
 //const char* VMX_ENUM_JSON = "mau/Translator/Maps/EnumPairs.json";
-const char* CHANNEL_MAP_JSON = "Maps/ChannelMap.json";
-const char* VMX_CHANNELS_JSON = "Maps/VMXChannels.json";
-const char* VMX_ENUM_JSON = "Maps/EnumPairs.json";
+const char* CHANNEL_MAP_JSON = "/usr/local/wpilib/lib/Maps/ChannelMap.json";
+const char* VMX_CHANNELS_JSON = "/usr/local/wpilib/lib/Maps/VMXChannels.json";
+const char* VMX_ENUM_JSON = "/usr/local/wpilib/lib/Maps/EnumPairs.json";
 
 // -------- Generators -------- //
 
