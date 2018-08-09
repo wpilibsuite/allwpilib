@@ -29,6 +29,8 @@ static wpi::mutex msgMutex;
 static wpi::priority_mutex* mauDataMutex;
 static wpi::priority_condition_variable* mauDataSignal;
 
+Mau_DriveData* mau::sharedMemory;
+
 namespace hal {
     namespace init {
         void InitializeDriverStation() {
@@ -213,3 +215,9 @@ extern "C" {
         info->gameSpecificMessage = nullptr;
     }
 }
+
+void HAL_ObserveUserProgramStarting(void) {}
+void HAL_ObserveUserProgramDisabled(void) {}
+void HAL_ObserveUserProgramAutonomous(void) {}
+void HAL_ObserveUserProgramTeleop(void) {}
+void HAL_ObserveUserProgramTest(void) {}
