@@ -1,5 +1,4 @@
 plugins {
-    id 'net.ltgt.errorprone' version '0.0.15'
     id 'base'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.1'
     id 'edu.wpi.first.NativeUtils' version '1.7.1'

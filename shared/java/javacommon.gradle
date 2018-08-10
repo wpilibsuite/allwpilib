@@ -1,6 +1,5 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java'
-apply plugin: 'net.ltgt.errorprone'
 
 def pubVersion
 if (project.hasProperty("publishVersion")) {
@@ -104,14 +103,22 @@ compileJava {
     targetCompatibility = 1.8
 }
 
+configurations {
+    devCompileOnly.extendsFrom compileOnly
+    testCompileOnly.extendsFrom compileOnly
+}
+
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.2.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+    compileOnly 'com.google.errorprone:error_prone_core:2.3.1'
 
     devCompile sourceSets.main.output
+}
 
-    errorprone 'com.google.errorprone:error_prone_core:2.3.1'
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-Xplugin:ErrorProne' << '-XDcompilePolicy=byfile'
 }
 
 task run(type: JavaExec) {
