@@ -16,11 +16,19 @@
 
 namespace mau {
     namespace comms {
-        static char encode_buffer[8];
-        static char decode_buffer[1024];
-        static char tcp_buffer[1024];
+        extern char encode_buffer[8];
+        extern char decode_buffer[1024];
+        extern char tcp_buffer[1024];
+        
+        extern std::mutex runLock;
+        extern bool isRunning;
+        extern std::thread udpThread;
+		  extern std::thread tcpThread;
 
-        static void tcpProcess() {
+        void tcpProcess();
+        void udpProcess();
+
+        void tcpProcess() {
             Toast::Net::Socket::ServerSocket sock(1740);
             sock.open();
 
@@ -42,7 +50,7 @@ namespace mau {
             sock.close();
         }
 
-        static void udpProcess() {
+        void udpProcess() {
             Toast::Net::Socket::DatagramSocket sock(1110);
             sock.bind();
 

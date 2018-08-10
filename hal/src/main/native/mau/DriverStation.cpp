@@ -29,16 +29,12 @@ static wpi::mutex msgMutex;
 static wpi::priority_mutex* mauDataMutex;
 static wpi::priority_condition_variable* mauDataSignal;
 
-Mau_DriveData* mau::sharedMemory;
-
 namespace hal {
     namespace init {
         void InitializeDriverStation() {
-            Mau_DriveData driveData = Mau_DriveData();
-            mau::sharedMemory = &driveData;
-            wpi::priority_mutex newMutex;
-            mauDataMutex = &newMutex;
-            mauDataSignal = mau::sharedMemory->getDataSignal();
+            wpi::priority_mutex* newMutex = new wpi::priority_mutex();
+            mauDataMutex = newMutex;
+            mauDataSignal = Mau_DriveData::getDataSignal();
         }
     }
 }
@@ -134,27 +130,27 @@ extern "C" {
     }
 
     int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
-        controlWord = mau::sharedMemory->readControlWord();
+        controlWord = Mau_DriveData::readControlWord();
         return 0;
     }
 
     HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
         *status = 0;
-        return *mau::sharedMemory->readAllianceID();
+        return *Mau_DriveData::readAllianceID();
     }
 
     int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
-        axes = mau::sharedMemory->readJoyAxes(joystickNum);
+        axes = Mau_DriveData::readJoyAxes(joystickNum);
         return axes->count;
     }
 
     int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
-        povs = mau::sharedMemory->readJoyPOVs(joystickNum);
+        povs = Mau_DriveData::readJoyPOVs(joystickNum);
         return povs->count;
     }
 
     int32_t HAL_GetJoystickButtons(int32_t joystickNum, HAL_JoystickButtons* buttons) {
-        buttons = mau::sharedMemory->readJoyButtons(joystickNum);
+        buttons = Mau_DriveData::readJoyButtons(joystickNum);
         return 0;
     }
 
@@ -170,20 +166,20 @@ extern "C" {
      * nonzero is bad.
      */
     int32_t HAL_GetJoystickDescriptor(int32_t joystickNum, HAL_JoystickDescriptor* desc) {
-        desc = mau::sharedMemory->readJoyDescriptor(joystickNum);
+        desc = Mau_DriveData::readJoyDescriptor(joystickNum);
         return 0;
     }
 
     HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) {
-        return mau::sharedMemory->readJoyDescriptor(joystickNum)->isXbox;
+        return Mau_DriveData::readJoyDescriptor(joystickNum)->isXbox;
     }
 
     int32_t HAL_GetJoystickType(int32_t joystickNum) {
-        return mau::sharedMemory->readJoyDescriptor(joystickNum)->type;
+        return Mau_DriveData::readJoyDescriptor(joystickNum)->type;
     }
 
     char* HAL_GetJoystickName(int32_t joystickNum) {
-        return mau::sharedMemory->readJoyDescriptor(joystickNum)->name;
+        return Mau_DriveData::readJoyDescriptor(joystickNum)->name;
     }
 
     void HAL_FreeJoystickName(char* name) {
@@ -191,11 +187,11 @@ extern "C" {
     }
 
     int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
-        return mau::sharedMemory->readJoyDescriptor(joystickNum)->axisTypes[axis];
+        return Mau_DriveData::readJoyDescriptor(joystickNum)->axisTypes[axis];
     }
 
     int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs, int32_t leftRumble, int32_t rightRumble) {
-        mau::sharedMemory->updateJoyOutputs(joystickNum, outputs, leftRumble, rightRumble);
+        Mau_DriveData::updateJoyOutputs(joystickNum, outputs, leftRumble, rightRumble);
         return 0;
     }
 
@@ -204,7 +200,7 @@ extern "C" {
     }
 
     int HAL_GetMatchInfo(HAL_MatchInfo* info) {
-        info = mau::sharedMemory->readMatchInfo();
+        info = Mau_DriveData::readMatchInfo();
         return 0;
     }
 

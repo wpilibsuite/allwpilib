@@ -59,9 +59,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle, int32_t* stat
 
     // ---------------------------------------
 
-    int halIndex = getHandleIndex(handle);
+//    int halIndex = getHandleIndex(handle);
     std::string vmxLabel = mau::enumConverter->getHandleLabel(HAL_HandleEnum::PWM);
-    Mau_Channel* mauChannel = mau::channelMap->getChannel(vmxLabel, halIndex);
+    Mau_Channel* mauChannel = mau::channelMap->getChannel(vmxLabel, origChannel);
 
     mauChannel->vmxAbility = VMXChannelCapability::PWMGeneratorOutput;
     VMXResourceHandle vmxResHandle;

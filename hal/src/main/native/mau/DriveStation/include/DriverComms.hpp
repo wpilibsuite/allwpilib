@@ -13,9 +13,15 @@ namespace mau {
             uint32_t button_mask;
             bool has_update;
         } _TempJoyData;
-
-        static std::mutex runLock;
-        static bool isRunning;
+        
+       extern uint8_t sq_1;
+ 		 extern uint8_t sq_2;
+  		 extern uint8_t control;
+		 extern uint8_t req;
+		
+		 extern _TempJoyData joys[6];
+		 extern long long lastDecodeTime;
+ 		 extern double voltage;
 
         void start();
         void stop();

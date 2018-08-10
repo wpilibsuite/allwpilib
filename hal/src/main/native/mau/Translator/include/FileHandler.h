@@ -16,7 +16,8 @@
 #define NATIVE_FILEHANDLER_H
 
 class Mau_FileHandler {
-    Mau_EnumConverter enums;
+    Mau_EnumConverter* enums;
+//    Mau_VMXChannel channelArray[VMX_CHANNEL_COUNT];
 
     static Mau_Channel* genGroupChannels(Mau_ChannelMap* mauMap, const char* labelVal, rapidjson::Document* doc);
     static void genHandleGroup(Mau_ChannelMap* mauMap, std::string label, rapidjson::Document* doc);
@@ -25,8 +26,8 @@ class Mau_FileHandler {
     static void genI2CChannel(Mau_ChannelMap* mauMap, std::string label, rapidjson::Document* doc);
     static void genSerialChannel(Mau_ChannelMap* mauMap, std::string label, rapidjson::Document* doc);
 
-    Mau_EnumConverter readEnums();
-    Mau_VMXChannelRef readVMXChannels();
+    Mau_EnumConverter* readEnums();
+//    Mau_VMXChannelRef* readVMXChannels();
 
     typedef void(* genFuncs)(Mau_ChannelMap* mauMap, std::string label, rapidjson::Document* doc);
     const std::map<std::string, genFuncs> allGenerators = {
@@ -47,9 +48,11 @@ class Mau_FileHandler {
     };
 
 public:
-    Mau_ChannelMap readChannelMap();
-    Mau_EnumConverter getEnumConverter();
+    Mau_ChannelMap* readChannelMap();
+    Mau_EnumConverter* getEnumConverter();
     Mau_FileHandler();
+    ~Mau_FileHandler();
+
 
 };
 

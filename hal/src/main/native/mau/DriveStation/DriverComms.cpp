@@ -9,17 +9,24 @@
 #include <thread>
 #include "DriverInternal.h"
 
-static uint8_t sq_1 = 0;
-static uint8_t sq_2 = 0;
-static uint8_t control = 0;
-static uint8_t req = 0;
+ char mau::comms::encode_buffer[8];
+ char mau::comms::decode_buffer[1024];
+ char mau::comms::tcp_buffer[1024];
+        
+ std::mutex mau::comms::runLock;
+ bool mau::comms::isRunning;
+        
+ uint8_t mau::comms::sq_1 = 0;
+ uint8_t mau::comms::sq_2 = 0;
+ uint8_t mau::comms::control = 0;
+ uint8_t mau::comms::req = 0;
 
-static mau::comms::_TempJoyData joys[6];
-static long long lastDecodeTime;
-static double voltage;
+ mau::comms::_TempJoyData mau::comms::joys[6];
+ long long mau::comms::lastDecodeTime;
+ double mau::comms::voltage;
 
-static std::thread udpThread;
-static std::thread tcpThread;
+std::thread mau::comms::udpThread;
+std::thread mau::comms::tcpThread;
 
 void mau::comms::start() {
     if (!isRunning) {
@@ -65,17 +72,17 @@ bool last = false;
 void mau::comms::periodicUpdate() {
     if (mau::vmxGetTime() - lastDecodeTime > 1000) {
         // DS Disconnected
-        mau::sharedMemory->updateIsDsAttached(false);
+        Mau_DriveData::updateIsDsAttached(false);
     } else {
         // DS Connected
-        mau::sharedMemory->updateIsDsAttached(true);
+        Mau_DriveData::updateIsDsAttached(true);
     }
 
     for (int joyNum = 0; joyNum < 6; joyNum++) {
         _TempJoyData* tempJoy = &joys[joyNum];
-        mau::sharedMemory->updateJoyAxis(joyNum, tempJoy->axis_count, tempJoy->axis);
-        mau::sharedMemory->updateJoyPOV(joyNum, tempJoy->pov_count, tempJoy->pov);
-        mau::sharedMemory->updateJoyButtons(joyNum, tempJoy->button_count, tempJoy->button_mask);
+        Mau_DriveData::updateJoyAxis(joyNum, tempJoy->axis_count, tempJoy->axis);
+        Mau_DriveData::updateJoyPOV(joyNum, tempJoy->pov_count, tempJoy->pov);
+        Mau_DriveData::updateJoyButtons(joyNum, tempJoy->button_count, tempJoy->button_mask);
 
         tempJoy->has_update = false;
     }
@@ -116,7 +123,7 @@ void mau::comms::decodeTcpPacket(char* data, int length) {
                 for (int x = 0; x < axis_count; x++) {
                     desc.axisTypes[x] = data[at_i + x];
                 }
-                mau::sharedMemory->updateJoyDescriptor(joyid, &desc);
+                Mau_DriveData::updateJoyDescriptor(joyid, &desc);
             }
         }
     }
@@ -181,12 +188,12 @@ void mau::comms::decodePacket(char* data, int length) {
             joy_id++;
             i += struct_size + 1;
         }
-        mau::sharedMemory->updateAllianceID(alliance);
-        mau::sharedMemory->updateIsEnabled(enabled);
-        mau::sharedMemory->updateIsAutonomous(auton);
-        mau::sharedMemory->updateIsTest(test);
-        mau::sharedMemory->updateEStop(eStop);
-        mau::sharedMemory->updateIsFmsAttached(fms);
+        Mau_DriveData::updateAllianceID(alliance);
+        Mau_DriveData::updateIsEnabled(enabled);
+        Mau_DriveData::updateIsAutonomous(auton);
+        Mau_DriveData::updateIsTest(test);
+        Mau_DriveData::updateEStop(eStop);
+        Mau_DriveData::updateIsFmsAttached(fms);
         periodicUpdate();
 
         lastDecodeTime = mau::vmxGetTime();

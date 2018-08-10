@@ -1,8 +1,5 @@
 #include "Translator/include/FileHandler.h"
 
-//const char* CHANNEL_MAP_JSON = "mau/Translator/Maps/ChannelMap.json";
-//const char* VMX_CHANNELS_JSON = "mau/Translator/Maps/VMXChannels.json";
-//const char* VMX_ENUM_JSON = "mau/Translator/Maps/EnumPairs.json";
 const char* CHANNEL_MAP_JSON = "/usr/local/wpilib/lib/Maps/ChannelMap.json";
 const char* VMX_CHANNELS_JSON = "/usr/local/wpilib/lib/Maps/VMXChannels.json";
 const char* VMX_ENUM_JSON = "/usr/local/wpilib/lib/Maps/EnumPairs.json";
@@ -18,7 +15,7 @@ Mau_Channel* Mau_FileHandler::genGroupChannels(Mau_ChannelMap* mauMap, const cha
         return nullptr;
     } else {
         int chanCount = (*doc)[labelVal]["Count"].GetInt();
-        Mau_Channel newChannels[chanCount];
+        Mau_Channel* newChannels = new Mau_Channel[chanCount];
 
         int firstMXP = (*doc)[labelVal]["FirstMXP"].GetInt();
         std::string ref = (*doc)[labelVal]["ReferenceTo"].GetString();
@@ -36,17 +33,14 @@ Mau_Channel* Mau_FileHandler::genGroupChannels(Mau_ChannelMap* mauMap, const cha
 
             if (!curChannel.unsupported) {
                 if (ref == "VMXChannel") {
-                    Mau_VMXChannel vmxChan = mauMap->getVMXRef()->getChannel(refIndex);
-                    curChannel.vmxIndex = vmxChan.index;
-                    curChannel.vmxChannel = &vmxChan;
+                	curChannel.vmxIndex = refIndex;
                 }
             }
 
             newChannels[count] = curChannel;
         }
 
-        Mau_Channel* output = newChannels;
-        return output;
+        return newChannels;
     }
 }
 
@@ -56,9 +50,9 @@ void Mau_FileHandler::genHandleGroup(Mau_ChannelMap* mauMap, std::string label, 
     int handle = (*doc)[labelVal]["EnumValue"].GetInt();
 
     Mau_Channel* channels = genGroupChannels(mauMap, labelVal, doc);
-    Mau_HandledGroup group = Mau_HandledGroup(channels, handle);
+    Mau_HandledGroup* group = new Mau_HandledGroup(channels, handle);
 
-    mauMap->setGroup(label, &group);
+    mauMap->setGroup(label, group);
 }
 
 void Mau_FileHandler::genEncoderChannel(Mau_ChannelMap* mauMap, std::string label, rapidjson::Document* doc) {
@@ -79,8 +73,8 @@ void Mau_FileHandler::genSerialChannel(Mau_ChannelMap* mauMap, std::string label
 
 // -------- Readers -------- //
 
-Mau_EnumConverter Mau_FileHandler::Mau_FileHandler::readEnums() {
-    Mau_EnumConverter enums;
+Mau_EnumConverter* Mau_FileHandler::Mau_FileHandler::readEnums() {
+    Mau_EnumConverter* enums = new Mau_EnumConverter();
     FILE* vmxJSON = fopen(VMX_ENUM_JSON, "r");
 
     char readBuffer[65536];
@@ -97,7 +91,7 @@ Mau_EnumConverter Mau_FileHandler::Mau_FileHandler::readEnums() {
 
         std::string label = vmxDoc["HAL_HandleEnum"][value].GetString();
         hal::HAL_HandleEnum handle = (hal::HAL_HandleEnum) handleCount;
-        enums.setHandlePair(label, handle);
+        enums->setHandlePair(label, handle);
     }
 
     for (int typeCount = 0; typeCount <= 4; typeCount++) {
@@ -106,7 +100,7 @@ Mau_EnumConverter Mau_FileHandler::Mau_FileHandler::readEnums() {
 
         std::string label = vmxDoc["VMXChannelType"][value].GetString();
         VMXChannelType type = (VMXChannelType) typeCount;
-        enums.setTypePair(label, type);
+        enums->setTypePair(label, type);
     }
 
     for(int compCount = 0; compCount < 20; compCount++) {
@@ -122,60 +116,19 @@ Mau_EnumConverter Mau_FileHandler::Mau_FileHandler::readEnums() {
 
         std::string label = vmxDoc["VMXChannelCapability"][indexVal].GetString();
         VMXChannelCapability capability = (VMXChannelCapability) compValue;
-        enums.setCapabilityPair(label, capability);
+        enums->setCapabilityPair(label, capability);
     }
 
     fclose(vmxJSON);
     return enums;
 }
 
-Mau_VMXChannelRef Mau_FileHandler::readVMXChannels() {
-    Mau_VMXChannel channelArray[VMX_CHANNEL_COUNT];
-
-    FILE* vmxJSON = fopen(VMX_CHANNELS_JSON, "r");
-    char readBuffer[65536];
-
-    rapidjson::FileReadStream vmxStream(vmxJSON, readBuffer, sizeof(readBuffer));
-    rapidjson::Document vmxDoc;
-
-    vmxDoc.ParseStream(vmxStream);
-    assert(vmxDoc.IsObject());
-
-    for (int chanCount = 0; chanCount < VMX_USED_CHANNELS; chanCount++) {
-        Mau_VMXChannel currentChannel;
-
-        auto index = std::to_string(chanCount).c_str();
-        rapidjson::Value indexVal(index, vmxDoc.GetAllocator());
-
-        currentChannel.used = false;
-        currentChannel.label = vmxDoc[indexVal]["Label"].GetString();
-        currentChannel.index = (VMXChannelIndex) chanCount;
-        currentChannel.type = enums.getTypeValue(vmxDoc[indexVal]["Type"].GetString());
-
-        const rapidjson::Value& comps = vmxDoc[indexVal]["Capabilities"];
-        assert(comps.IsArray());
-
-        for (rapidjson::SizeType compCount = 0; compCount < comps.Size(); compCount++) {
-            std::string currentComp = comps[compCount].GetString();
-            currentChannel.capabilities.push_back(enums.getCapabilityValue(currentComp));
-        }
-
-        channelArray[chanCount] = currentChannel;
-    }
-    fclose(vmxJSON);
-
-
-    Mau_VMXChannelRef channels = Mau_VMXChannelRef(channelArray);
-    return channels;
-}
-
-Mau_EnumConverter Mau_FileHandler::getEnumConverter() {
+Mau_EnumConverter* Mau_FileHandler::getEnumConverter() {
     return enums;
 }
 
-Mau_ChannelMap Mau_FileHandler::readChannelMap() {
-    Mau_VMXChannelRef vmxInfo = readVMXChannels();
-    Mau_ChannelMap channelMap = Mau_ChannelMap(&vmxInfo);
+Mau_ChannelMap* Mau_FileHandler::readChannelMap() {
+	Mau_ChannelMap* channelMap = new Mau_ChannelMap();
     FILE* mauJson = fopen(CHANNEL_MAP_JSON, "r");
     char readBuffer[65536];
 
@@ -189,7 +142,7 @@ Mau_ChannelMap Mau_FileHandler::readChannelMap() {
         rapidjson::Value label(it->first.c_str(), mauDoc.GetAllocator());
 
         genFuncs creator = allGenerators.at(it->first);
-        creator(&channelMap, it->first, &mauDoc);
+        creator(channelMap, it->first, &mauDoc);
     }
 
     fclose(mauJson);
@@ -198,4 +151,8 @@ Mau_ChannelMap Mau_FileHandler::readChannelMap() {
 
 Mau_FileHandler::Mau_FileHandler() {
     enums = readEnums();
+}
+
+Mau_FileHandler::~Mau_FileHandler() {
+    delete enums;
 }

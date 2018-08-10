@@ -24,6 +24,9 @@
 
 using namespace hal;
 
+Mau_FileHandler* fileHandler;
+VMXPi* vmx;
+
 AHRS* mau::vmxIMU;
 VMXIO* mau::vmxIO;
 VMXCAN* mau::vmxCAN;
@@ -40,23 +43,23 @@ Mau_EnumConverter* mau::enumConverter;
 namespace hal {
     namespace init {
         void InitializeHAL() {
-            Mau_FileHandler fileHandler = Mau_FileHandler();
-            Mau_EnumConverter enums = fileHandler.getEnumConverter();
-            Mau_ChannelMap maps = fileHandler.readChannelMap();
+            fileHandler = new Mau_FileHandler();
+            Mau_EnumConverter* enums = fileHandler->getEnumConverter();
+            Mau_ChannelMap* maps = fileHandler->readChannelMap();
 
-            mau::enumConverter = &enums;
-            mau::channelMap = &maps;
+            mau::enumConverter = enums;
+            mau::channelMap = maps;
 
             bool realtime = false;
             uint8_t hertz = 50;
-            VMXPi vmx = VMXPi(realtime, hertz);
+            vmx = new VMXPi(realtime, hertz);
 
-            mau::vmxIMU = &vmx.ahrs;
-            mau::vmxIO = &vmx.io;
-            mau::vmxCAN = &vmx.can;
-            mau::vmxTime = &vmx.time;
-            mau::vmxPower = &vmx.power;
-            mau::vmxThread = &vmx.thread;
+            mau::vmxIMU = &vmx->ahrs;
+            mau::vmxIO = &vmx->io;
+            mau::vmxCAN = &vmx->can;
+            mau::vmxTime = &vmx->time;
+            mau::vmxPower = &vmx->power;
+            mau::vmxThread = &vmx->thread;
 
             InitializeAccelerometer();
             InitializeAnalogAccumulator();
