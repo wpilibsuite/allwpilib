@@ -1,5 +1,4 @@
 plugins {
-    id 'net.ltgt.errorprone' version '0.0.15'
     id 'base'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.1'
     id 'edu.wpi.first.NativeUtils' version '1.7.1'
@@ -7,6 +6,8 @@ plugins {
     id 'edu.wpi.first.GradleVsCode' version '0.4.1'
     id 'idea'
     id 'com.gradle.build-scan' version '1.15.1'
+    id 'net.ltgt.errorprone' version '0.0.15' apply false // For Java 8
+    id 'net.ltgt.errorprone-javacplugin' version '0.3' apply false // For Java 9+
 }
 
 repositories {

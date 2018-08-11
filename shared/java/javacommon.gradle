@@ -1,6 +1,11 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java'
-apply plugin: 'net.ltgt.errorprone'
+
+if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
+    apply plugin: 'net.ltgt.errorprone'
+} else {
+    apply plugin: 'net.ltgt.errorprone-javacplugin'
+}
 
 def pubVersion
 if (project.hasProperty("publishVersion")) {
