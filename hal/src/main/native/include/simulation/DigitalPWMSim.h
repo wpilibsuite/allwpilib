@@ -30,7 +30,9 @@ class DigitalPWMSim {
     return store;
   }
 
-  bool GetInitialized() const { return HALSIM_GetDigitalPWMInitialized(m_index); }
+  bool GetInitialized() const {
+    return HALSIM_GetDigitalPWMInitialized(m_index);
+  }
 
   void SetInitialized(bool initialized) {
     HALSIM_SetDigitalPWMInitialized(m_index, initialized);

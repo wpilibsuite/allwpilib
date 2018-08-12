@@ -56,7 +56,9 @@ class AnalogGyroSim {
     return store;
   }
 
-  bool GetInitialized() const { return HALSIM_GetAnalogGyroInitialized(m_index); }
+  bool GetInitialized() const {
+    return HALSIM_GetAnalogGyroInitialized(m_index);
+  }
 
   void SetInitialized(bool initialized) {
     HALSIM_SetAnalogGyroInitialized(m_index, initialized);

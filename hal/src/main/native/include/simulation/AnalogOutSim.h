@@ -45,7 +45,9 @@ class AnalogOutSim {
     return store;
   }
 
-  bool GetInitialized() const { return HALSIM_GetAnalogOutInitialized(m_index); }
+  bool GetInitialized() const {
+    return HALSIM_GetAnalogOutInitialized(m_index);
+  }
 
   void SetInitialized(bool initialized) {
     HALSIM_SetAnalogOutInitialized(m_index, initialized);

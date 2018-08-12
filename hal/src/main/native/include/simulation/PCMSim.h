@@ -115,7 +115,9 @@ class PCMSim {
     return store;
   }
 
-  bool GetPressureSwitch() const { return HALSIM_GetPCMPressureSwitch(m_index); }
+  bool GetPressureSwitch() const {
+    return HALSIM_GetPCMPressureSwitch(m_index);
+  }
 
   void SetPressureSwitch(bool pressureSwitch) {
     HALSIM_SetPCMPressureSwitch(m_index, pressureSwitch);

@@ -30,7 +30,9 @@ class AnalogTriggerSim {
     return store;
   }
 
-  bool GetInitialized() const { return HALSIM_GetAnalogTriggerInitialized(m_index); }
+  bool GetInitialized() const {
+    return HALSIM_GetAnalogTriggerInitialized(m_index);
+  }
 
   void SetInitialized(bool initialized) {
     HALSIM_SetAnalogTriggerInitialized(m_index, initialized);

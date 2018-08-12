@@ -60,7 +60,9 @@ class AnalogInSim {
     return store;
   }
 
-  int GetOversampleBits() const { return HALSIM_GetAnalogInOversampleBits(m_index); }
+  int GetOversampleBits() const {
+    return HALSIM_GetAnalogInOversampleBits(m_index);
+  }
 
   void SetOversampleBits(int oversampleBits) {
     HALSIM_SetAnalogInOversampleBits(m_index, oversampleBits);
