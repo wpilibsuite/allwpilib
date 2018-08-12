@@ -29,7 +29,9 @@ class SPIAccelerometerSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetActive() { return HALSIM_GetSPIAccelerometerActive(m_index); }
+
+  bool GetActive() const { return HALSIM_GetSPIAccelerometerActive(m_index); }
+
   void SetActive(bool active) {
     HALSIM_SetSPIAccelerometerActive(m_index, active);
   }
@@ -42,7 +44,9 @@ class SPIAccelerometerSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetRange() { return HALSIM_GetSPIAccelerometerRange(m_index); }
+
+  int GetRange() const { return HALSIM_GetSPIAccelerometerRange(m_index); }
+
   void SetRange(int range) { HALSIM_SetSPIAccelerometerRange(m_index, range); }
 
   std::unique_ptr<CallbackStore> RegisterXCallback(NotifyCallback callback,
@@ -53,7 +57,9 @@ class SPIAccelerometerSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetX() { return HALSIM_GetSPIAccelerometerX(m_index); }
+
+  double GetX() const { return HALSIM_GetSPIAccelerometerX(m_index); }
+
   void SetX(double x) { HALSIM_SetSPIAccelerometerX(m_index, x); }
 
   std::unique_ptr<CallbackStore> RegisterYCallback(NotifyCallback callback,
@@ -64,7 +70,9 @@ class SPIAccelerometerSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetY() { return HALSIM_GetSPIAccelerometerY(m_index); }
+
+  double GetY() const { return HALSIM_GetSPIAccelerometerY(m_index); }
+
   void SetY(double y) { HALSIM_SetSPIAccelerometerY(m_index, y); }
 
   std::unique_ptr<CallbackStore> RegisterZCallback(NotifyCallback callback,
@@ -75,7 +83,9 @@ class SPIAccelerometerSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetZ() { return HALSIM_GetSPIAccelerometerZ(m_index); }
+
+  double GetZ() const { return HALSIM_GetSPIAccelerometerZ(m_index); }
+
   void SetZ(double z) { HALSIM_SetSPIAccelerometerZ(m_index, z); }
 
   void ResetData() { HALSIM_ResetSPIAccelerometerData(m_index); }

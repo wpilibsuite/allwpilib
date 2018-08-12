@@ -29,7 +29,9 @@ class AccelerometerSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetActive() { return HALSIM_GetAccelerometerActive(m_index); }
+
+  bool GetActive() const { return HALSIM_GetAccelerometerActive(m_index); }
+
   void SetActive(bool active) {
     HALSIM_SetAccelerometerActive(m_index, active);
   }
@@ -42,9 +44,11 @@ class AccelerometerSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  HAL_AccelerometerRange GetRange() {
+
+  HAL_AccelerometerRange GetRange() const {
     return HALSIM_GetAccelerometerRange(m_index);
   }
+
   void SetRange(HAL_AccelerometerRange range) {
     HALSIM_SetAccelerometerRange(m_index, range);
   }
@@ -57,7 +61,9 @@ class AccelerometerSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetX() { return HALSIM_GetAccelerometerX(m_index); }
+
+  double GetX() const { return HALSIM_GetAccelerometerX(m_index); }
+
   void SetX(double x) { HALSIM_SetAccelerometerX(m_index, x); }
 
   std::unique_ptr<CallbackStore> RegisterYCallback(NotifyCallback callback,
@@ -68,7 +74,9 @@ class AccelerometerSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetY() { return HALSIM_GetAccelerometerY(m_index); }
+
+  double GetY() const { return HALSIM_GetAccelerometerY(m_index); }
+
   void SetY(double y) { HALSIM_SetAccelerometerY(m_index, y); }
 
   std::unique_ptr<CallbackStore> RegisterZCallback(NotifyCallback callback,
@@ -79,7 +87,9 @@ class AccelerometerSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetZ() { return HALSIM_GetAccelerometerZ(m_index); }
+
+  double GetZ() const { return HALSIM_GetAccelerometerZ(m_index); }
+
   void SetZ(double z) { HALSIM_SetAccelerometerZ(m_index, z); }
 
   void ResetData() { HALSIM_ResetAccelerometerData(m_index); }

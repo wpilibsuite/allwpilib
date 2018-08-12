@@ -29,7 +29,9 @@ class AnalogOutSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetVoltage() { return HALSIM_GetAnalogOutVoltage(m_index); }
+
+  double GetVoltage() const { return HALSIM_GetAnalogOutVoltage(m_index); }
+
   void SetVoltage(double voltage) {
     HALSIM_SetAnalogOutVoltage(m_index, voltage);
   }
@@ -42,7 +44,9 @@ class AnalogOutSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetInitialized() { return HALSIM_GetAnalogOutInitialized(m_index); }
+
+  bool GetInitialized() const { return HALSIM_GetAnalogOutInitialized(m_index); }
+
   void SetInitialized(bool initialized) {
     HALSIM_SetAnalogOutInitialized(m_index, initialized);
   }

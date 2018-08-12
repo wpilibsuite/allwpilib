@@ -29,9 +29,11 @@ class RelaySim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetInitializedForward() {
+
+  bool GetInitializedForward() const {
     return HALSIM_GetRelayInitializedForward(m_index);
   }
+
   void SetInitializedForward(bool initializedForward) {
     HALSIM_SetRelayInitializedForward(m_index, initializedForward);
   }
@@ -44,9 +46,11 @@ class RelaySim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetInitializedReverse() {
+
+  bool GetInitializedReverse() const {
     return HALSIM_GetRelayInitializedReverse(m_index);
   }
+
   void SetInitializedReverse(bool initializedReverse) {
     HALSIM_SetRelayInitializedReverse(m_index, initializedReverse);
   }
@@ -59,7 +63,9 @@ class RelaySim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetForward() { return HALSIM_GetRelayForward(m_index); }
+
+  bool GetForward() const { return HALSIM_GetRelayForward(m_index); }
+
   void SetForward(bool forward) { HALSIM_SetRelayForward(m_index, forward); }
 
   std::unique_ptr<CallbackStore> RegisterReverseCallback(
@@ -70,7 +76,9 @@ class RelaySim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetReverse() { return HALSIM_GetRelayReverse(m_index); }
+
+  bool GetReverse() const { return HALSIM_GetRelayReverse(m_index); }
+
   void SetReverse(bool reverse) { HALSIM_SetRelayReverse(m_index, reverse); }
 
   void ResetData() { HALSIM_ResetRelayData(m_index); }

@@ -29,7 +29,9 @@ class AnalogTriggerSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetInitialized() { return HALSIM_GetAnalogTriggerInitialized(m_index); }
+
+  bool GetInitialized() const { return HALSIM_GetAnalogTriggerInitialized(m_index); }
+
   void SetInitialized(bool initialized) {
     HALSIM_SetAnalogTriggerInitialized(m_index, initialized);
   }
@@ -43,9 +45,11 @@ class AnalogTriggerSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetTriggerLowerBound() {
+
+  double GetTriggerLowerBound() const {
     return HALSIM_GetAnalogTriggerTriggerLowerBound(m_index);
   }
+
   void SetTriggerLowerBound(double triggerLowerBound) {
     HALSIM_SetAnalogTriggerTriggerLowerBound(m_index, triggerLowerBound);
   }
@@ -59,9 +63,11 @@ class AnalogTriggerSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetTriggerUpperBound() {
+
+  double GetTriggerUpperBound() const {
     return HALSIM_GetAnalogTriggerTriggerUpperBound(m_index);
   }
+
   void SetTriggerUpperBound(double triggerUpperBound) {
     HALSIM_SetAnalogTriggerTriggerUpperBound(m_index, triggerUpperBound);
   }

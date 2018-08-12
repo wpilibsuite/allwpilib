@@ -34,6 +34,7 @@ class CallbackStore {
     this->ccnif = ccf;
     cancelType = NoIndex;
   }
+
   CallbackStore(int32_t i, int32_t u, NotifyCallback cb,
                 CancelCallbackFunc ccf) {
     index = i;
@@ -42,6 +43,7 @@ class CallbackStore {
     this->ccf = ccf;
     cancelType = Normal;
   }
+
   CallbackStore(int32_t i, int32_t c, int32_t u, NotifyCallback cb,
                 CancelCallbackChannelFunc ccf) {
     index = i;
@@ -51,6 +53,7 @@ class CallbackStore {
     this->cccf = ccf;
     cancelType = Channel;
   }
+
   ~CallbackStore() {
     switch (cancelType) {
       case Normal:

@@ -29,7 +29,9 @@ class AnalogGyroSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetAngle() { return HALSIM_GetAnalogGyroAngle(m_index); }
+
+  double GetAngle() const { return HALSIM_GetAnalogGyroAngle(m_index); }
+
   void SetAngle(double angle) { HALSIM_SetAnalogGyroAngle(m_index, angle); }
 
   std::unique_ptr<CallbackStore> RegisterRateCallback(NotifyCallback callback,
@@ -40,7 +42,9 @@ class AnalogGyroSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetRate() { return HALSIM_GetAnalogGyroRate(m_index); }
+
+  double GetRate() const { return HALSIM_GetAnalogGyroRate(m_index); }
+
   void SetRate(double rate) { HALSIM_SetAnalogGyroRate(m_index, rate); }
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
@@ -51,7 +55,9 @@ class AnalogGyroSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetInitialized() { return HALSIM_GetAnalogGyroInitialized(m_index); }
+
+  bool GetInitialized() const { return HALSIM_GetAnalogGyroInitialized(m_index); }
+
   void SetInitialized(bool initialized) {
     HALSIM_SetAnalogGyroInitialized(m_index, initialized);
   }

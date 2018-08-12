@@ -30,9 +30,11 @@ class PCMSim {
         m_index, channel, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
+
   bool GetSolenoidInitialized(int channel) {
     return HALSIM_GetPCMSolenoidInitialized(m_index, channel);
   }
+
   void SetSolenoidInitialized(int channel, bool solenoidInitialized) {
     HALSIM_SetPCMSolenoidInitialized(m_index, channel, solenoidInitialized);
   }
@@ -46,9 +48,11 @@ class PCMSim {
         m_index, channel, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
+
   bool GetSolenoidOutput(int channel) {
     return HALSIM_GetPCMSolenoidOutput(m_index, channel);
   }
+
   void SetSolenoidOutput(int channel, bool solenoidOutput) {
     HALSIM_SetPCMSolenoidOutput(m_index, channel, solenoidOutput);
   }
@@ -61,9 +65,11 @@ class PCMSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetCompressorInitialized() {
+
+  bool GetCompressorInitialized() const {
     return HALSIM_GetPCMCompressorInitialized(m_index);
   }
+
   void SetCompressorInitialized(bool compressorInitialized) {
     HALSIM_SetPCMCompressorInitialized(m_index, compressorInitialized);
   }
@@ -76,7 +82,9 @@ class PCMSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetCompressorOn() { return HALSIM_GetPCMCompressorOn(m_index); }
+
+  bool GetCompressorOn() const { return HALSIM_GetPCMCompressorOn(m_index); }
+
   void SetCompressorOn(bool compressorOn) {
     HALSIM_SetPCMCompressorOn(m_index, compressorOn);
   }
@@ -89,9 +97,11 @@ class PCMSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetClosedLoopEnabled() {
+
+  bool GetClosedLoopEnabled() const {
     return HALSIM_GetPCMClosedLoopEnabled(m_index);
   }
+
   void SetClosedLoopEnabled(bool closedLoopEnabled) {
     HALSIM_SetPCMClosedLoopEnabled(m_index, closedLoopEnabled);
   }
@@ -104,7 +114,9 @@ class PCMSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetPressureSwitch() { return HALSIM_GetPCMPressureSwitch(m_index); }
+
+  bool GetPressureSwitch() const { return HALSIM_GetPCMPressureSwitch(m_index); }
+
   void SetPressureSwitch(bool pressureSwitch) {
     HALSIM_SetPCMPressureSwitch(m_index, pressureSwitch);
   }
@@ -117,9 +129,11 @@ class PCMSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetCompressorCurrent() {
+
+  double GetCompressorCurrent() const {
     return HALSIM_GetPCMCompressorCurrent(m_index);
   }
+
   void SetCompressorCurrent(double compressorCurrent) {
     HALSIM_SetPCMCompressorCurrent(m_index, compressorCurrent);
   }
