@@ -5,25 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-/*
- * SimulatorComponentBase.cpp
- *
- *  Created on: Aug 12, 2018
- *      Author: PJ
- */
-
 #include "lowfisim/SimulatorComponentBase.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
-SimulatorComponentBase::SimulatorComponentBase() {
-  // TODO Auto-generated constructor stub
-}
+SimulatorComponentBase::SimulatorComponentBase() {}
 
-SimulatorComponentBase::~SimulatorComponentBase() {
-  // TODO Auto-generated destructor stub
-}
+SimulatorComponentBase::~SimulatorComponentBase() {}
 
 const std::string& SimulatorComponentBase::GetDisplayName() { return m_name; }
 

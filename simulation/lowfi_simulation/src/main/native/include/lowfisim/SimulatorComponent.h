@@ -5,13 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-/*
- * SimulatorComponent.h
- *
- *  Created on: Aug 12, 2018
- *      Author: PJ
- */
-
 #ifndef WPILIB_SIMULATION_LOWFI_SIMULATION_SRC_MAIN_NATIVE_INCLUDE_LOWFISIM_SIMULATORCOMPONENT_H_
 #define WPILIB_SIMULATION_LOWFI_SIMULATION_SRC_MAIN_NATIVE_INCLUDE_LOWFISIM_SIMULATORCOMPONENT_H_
 

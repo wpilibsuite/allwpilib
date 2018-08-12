@@ -61,8 +61,8 @@ class Robot : public frc::IterativeRobot {
 #endif
 
   void RobotInit() override {
-    // We need to run our vision program in a separate thread. If not, our robot
-    // program will not run.
+  // We need to run our vision program in a separate thread. If not, our robot
+  // program will not run.
 #if defined(__linux__)
     std::thread visionThread(VisionThread);
     visionThread.detach();

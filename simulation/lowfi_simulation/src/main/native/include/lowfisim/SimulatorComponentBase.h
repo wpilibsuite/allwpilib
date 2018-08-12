@@ -5,15 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-/*
- * SimulatorComponentBase.h
- *
- *  Created on: Aug 12, 2018
- *      Author: PJ
- */
-
-#ifndef WPILIB_SIMULATION_LOWFI_SIMULATION_SRC_MAIN_NATIVE_INCLUDE_LOWFISIM_SIMULATORCOMPONENTBASE_H_
-#define WPILIB_SIMULATION_LOWFI_SIMULATION_SRC_MAIN_NATIVE_INCLUDE_LOWFISIM_SIMULATORCOMPONENTBASE_H_
+#pragma once
 
 #include <string>
 
@@ -39,5 +31,3 @@ class SimulatorComponentBase : public virtual SimulatorComponent {
 }  // namespace lowfi
 }  // namespace sim
 }  // namespace frc
-
-#endif  // WPILIB_SIMULATION_LOWFI_SIMULATION_SRC_MAIN_NATIVE_INCLUDE_LOWFISIM_SIMULATORCOMPONENTBASE_H_
