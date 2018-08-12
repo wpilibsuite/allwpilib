@@ -40,7 +40,7 @@ ADXL345_I2CData::~ADXL345_I2CData() {
   HALSIM_CancelI2CWriteCallback(m_port, m_writeCallbackId);
 }
 
-bool ADXL345_I2CData::GetInitialized() {
+bool ADXL345_I2CData::GetInitialized() const {
   return HALSIM_GetI2CInitialized(m_port);
 }
 

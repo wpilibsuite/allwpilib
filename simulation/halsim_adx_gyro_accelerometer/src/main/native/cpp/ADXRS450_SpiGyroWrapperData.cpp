@@ -57,7 +57,7 @@ ADXRS450_SpiGyroWrapper::~ADXRS450_SpiGyroWrapper() {
   HALSIM_CancelSPIReadAutoReceivedDataCallback(m_port,
                                                m_autoReceiveReadCallbackId);
 }
-bool ADXRS450_SpiGyroWrapper::GetInitialized() {
+bool ADXRS450_SpiGyroWrapper::GetInitialized() const {
   return HALSIM_GetSPIInitialized(m_port);
 }
 

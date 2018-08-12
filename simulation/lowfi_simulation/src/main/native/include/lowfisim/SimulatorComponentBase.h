@@ -17,10 +17,10 @@ namespace lowfi {
 
 class SimulatorComponentBase : public virtual SimulatorComponent {
  public:
-  SimulatorComponentBase();
-  virtual ~SimulatorComponentBase();
+  SimulatorComponentBase() = default;
+  virtual ~SimulatorComponentBase() = default;
 
-  const std::string& GetDisplayName() override;
+  const std::string& GetDisplayName() const override;
 
   void SetDisplayName(const std::string& displayName) override;
 

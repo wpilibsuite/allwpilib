@@ -15,11 +15,11 @@ namespace lowfi {
 
 class SimulatorComponent {
  public:
-  virtual ~SimulatorComponent() {}
+  virtual ~SimulatorComponent() = default;
 
   virtual bool IsWrapperInitialized() = 0;
 
-  virtual const std::string& GetDisplayName() = 0;
+  virtual const std::string& GetDisplayName() const = 0;
 
   virtual void SetDisplayName(const std::string& displayName) = 0;
 };

@@ -39,7 +39,7 @@ ADXL362_SpiAccelerometer::~ADXL362_SpiAccelerometer() {
   HALSIM_CancelSPIReadCallback(m_port, m_readCallbackId);
   HALSIM_CancelSPIWriteCallback(m_port, m_writeCallbackId);
 }
-bool ADXL362_SpiAccelerometer::GetInitialized() {
+bool ADXL362_SpiAccelerometer::GetInitialized() const {
   return HALSIM_GetSPIInitialized(m_port);
 }
 

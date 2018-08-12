@@ -19,7 +19,7 @@ class ADXRS450_SpiGyroWrapper {
   explicit ADXRS450_SpiGyroWrapper(int port);
   virtual ~ADXRS450_SpiGyroWrapper();
 
-  bool GetInitialized();
+  bool GetInitialized() const;
 
   void HandleRead(uint8_t* buffer, uint32_t count);
   void HandleAutoReceiveData(uint8_t* buffer, int32_t numToRead,
