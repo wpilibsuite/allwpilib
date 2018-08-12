@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPILIB_SIMULATION_LOWFI_SIMULATION_SRC_MAIN_NATIVE_INCLUDE_LOWFISIM_SIMULATORCOMPONENT_H_
-#define WPILIB_SIMULATION_LOWFI_SIMULATION_SRC_MAIN_NATIVE_INCLUDE_LOWFISIM_SIMULATORCOMPONENT_H_
+#pragma once
 
 #include <string>
 
@@ -28,5 +27,3 @@ class SimulatorComponent {
 }  // namespace lowfi
 }  // namespace sim
 }  // namespace frc
-
-#endif  // WPILIB_SIMULATION_LOWFI_SIMULATION_SRC_MAIN_NATIVE_INCLUDE_LOWFISIM_SIMULATORCOMPONENT_H_
