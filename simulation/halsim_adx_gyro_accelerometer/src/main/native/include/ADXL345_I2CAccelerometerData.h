@@ -15,6 +15,8 @@ class ADXL345_I2CData : public ThreeAxisAccelerometerData {
   explicit ADXL345_I2CData(int port);
   virtual ~ADXL345_I2CData();
 
+  bool GetInitialized() override;
+
   void HandleWrite(const uint8_t* buffer, uint32_t count);
   void HandleRead(uint8_t* buffer, uint32_t count);
 

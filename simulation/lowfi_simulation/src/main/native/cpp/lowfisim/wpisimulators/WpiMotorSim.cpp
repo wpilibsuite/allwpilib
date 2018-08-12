@@ -20,6 +20,10 @@ void WpiMotorSim::Update(double elapsedTime) {
   m_motorModelSimulation.Update(elapsedTime);
 }
 
+bool WpiMotorSim::IsWrapperInitialized() {
+  return m_pwmSimulator.GetInitialized();
+}
+
 double WpiMotorSim::GetPosition() const {
   return m_motorModelSimulation.GetPosition();
 }

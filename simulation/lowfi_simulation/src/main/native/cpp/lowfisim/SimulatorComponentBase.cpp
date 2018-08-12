@@ -5,25 +5,30 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "lowfisim/wpisimulators/WpiEncoderSim.h"
+/*
+ * SimulatorComponentBase.cpp
+ *
+ *  Created on: Aug 12, 2018
+ *      Author: PJ
+ */
+
+#include "lowfisim/SimulatorComponentBase.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
-
-WpiEncoderSim::WpiEncoderSim(int index) : m_encoderSimulator(index) {}
-
-bool WpiEncoderSim::IsWrapperInitialized() {
-  return m_encoderSimulator.GetInitialized();
+SimulatorComponentBase::SimulatorComponentBase() {
+  // TODO Auto-generated constructor stub
 }
 
-void WpiEncoderSim::SetPosition(double position) {
-  m_encoderSimulator.SetCount(
-      static_cast<int>(position / m_encoderSimulator.GetDistancePerPulse()));
+SimulatorComponentBase::~SimulatorComponentBase() {
+  // TODO Auto-generated destructor stub
 }
 
-void WpiEncoderSim::SetVelocity(double velocity) {
-  m_encoderSimulator.SetPeriod(1.0 / velocity);
+const std::string& SimulatorComponentBase::GetDisplayName() { return m_name; }
+
+void SimulatorComponentBase::SetDisplayName(const std::string& displayName) {
+  m_name = displayName;
 }
 
 }  // namespace lowfi

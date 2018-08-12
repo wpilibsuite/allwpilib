@@ -419,7 +419,7 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<bool> arr) {
   return jarr;
 }
 
-  // Other MakeJ*Array conversions.
+// Other MakeJ*Array conversions.
 
 #define WPI_JNI_MAKEJARRAY(T, F)                                  \
   inline T##Array MakeJ##F##Array(JNIEnv* env, ArrayRef<T> arr) { \

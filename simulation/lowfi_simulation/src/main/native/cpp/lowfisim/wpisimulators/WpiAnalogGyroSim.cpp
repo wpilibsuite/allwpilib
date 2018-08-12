@@ -13,6 +13,10 @@ namespace lowfi {
 
 WpiAnalogGyroSim::WpiAnalogGyroSim(int index) : m_gyroSimulator(index) {}
 
+bool WpiAnalogGyroSim::IsWrapperInitialized() {
+  return m_gyroSimulator.GetInitialized();
+}
+
 void WpiAnalogGyroSim::SetAngle(double angle) {
   m_gyroSimulator.SetAngle(angle);
 }

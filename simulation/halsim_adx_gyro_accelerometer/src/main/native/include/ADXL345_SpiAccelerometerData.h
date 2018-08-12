@@ -15,6 +15,8 @@ class ADXL345_SpiAccelerometer : public ThreeAxisAccelerometerData {
   explicit ADXL345_SpiAccelerometer(int port);
   virtual ~ADXL345_SpiAccelerometer();
 
+  bool GetInitialized() override;
+
   void HandleWrite(const uint8_t* buffer, uint32_t count);
   void HandleRead(uint8_t* buffer, uint32_t count);
 

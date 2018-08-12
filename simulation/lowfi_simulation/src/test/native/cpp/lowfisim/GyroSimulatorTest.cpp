@@ -25,16 +25,23 @@ void TestGyro(frc::sim::lowfi::GyroSim& sim, frc::Gyro& gyro) {
 
 TEST(GyroSimulatorTests, TestAnalogGyro) {
   int port = 1;
-  frc::AnalogGyro gyro{port};
   frc::sim::lowfi::WpiAnalogGyroSim sim{port};
+  EXPECT_FALSE(sim.IsWrapperInitialized());
+
+  frc::AnalogGyro gyro{port};
+  EXPECT_TRUE(sim.IsWrapperInitialized());
 
   TestGyro(sim, gyro);
 }
 
 TEST(GyroSimulatorTests, TestSpiGyro) {
   frc::SPI::Port port = frc::SPI::kOnboardCS0;
+
   frc::sim::lowfi::ADXRS450_SpiGyroSim sim{port};
+  EXPECT_FALSE(sim.IsWrapperInitialized());
+
   frc::ADXRS450_Gyro gyro{port};
+  EXPECT_TRUE(sim.IsWrapperInitialized());
 
   TestGyro(sim, gyro);
 }

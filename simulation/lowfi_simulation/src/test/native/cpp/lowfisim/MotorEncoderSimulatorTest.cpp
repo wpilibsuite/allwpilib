@@ -14,13 +14,17 @@
 #include "lowfisim/wpisimulators/WpiMotorSim.h"
 
 TEST(MotorEncoderConnectorTest, TestWithoutDistancePerPulseFullSpeed) {
-  frc::Talon talon{3};
-  frc::Encoder encoder{3, 1};
-
   frc::sim::lowfi::SimpleMotorModel motorModelSim(6000);
   frc::sim::lowfi::WpiMotorSim motorSim(3, motorModelSim);
   frc::sim::lowfi::WpiEncoderSim encoderSim(0);
   frc::sim::lowfi::MotorEncoderConnector connector(motorSim, encoderSim);
+
+  EXPECT_FALSE(motorSim.IsWrapperInitialized());
+  EXPECT_FALSE(encoderSim.IsWrapperInitialized());
+  frc::Talon talon{3};
+  frc::Encoder encoder{3, 1};
+  EXPECT_TRUE(motorSim.IsWrapperInitialized());
+  EXPECT_TRUE(encoderSim.IsWrapperInitialized());
 
   talon.Set(-1);
   motorSim.Update(1);

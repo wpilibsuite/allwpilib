@@ -8,15 +8,18 @@
 #pragma once
 
 #include "lowfisim/GyroSim.h"
+#include "lowfisim/SimulatorComponentBase.h"
 #include "simulation/AnalogGyroSim.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class WpiAnalogGyroSim : public GyroSim {
+class WpiAnalogGyroSim : public SimulatorComponentBase, public GyroSim {
  public:
   explicit WpiAnalogGyroSim(int index);
+
+  bool IsWrapperInitialized() override;
 
   void SetAngle(double angle) override;
   double GetAngle() override;

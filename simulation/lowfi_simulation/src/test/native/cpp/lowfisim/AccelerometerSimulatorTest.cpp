@@ -15,17 +15,22 @@ TEST(AccelerometerTests, TestADXL345_I2CAccelerometerWrapper) {
 
   frc::I2C::Port port = frc::I2C::kOnboard;
 
-  frc::ADXL345_I2C accel{port};
-
-  EXPECT_NEAR(0, accel.GetX(), EPSILON);
-  EXPECT_NEAR(0, accel.GetY(), EPSILON);
-  EXPECT_NEAR(0, accel.GetZ(), EPSILON);
-
   hal::ADXL345_I2CData rawAdxSim(port);
   frc::sim::lowfi::ADXLThreeAxisAccelerometerSim accelerometerSim(rawAdxSim);
   frc::sim::lowfi::AccelerometerSim& xWrapper = accelerometerSim.GetXWrapper();
   frc::sim::lowfi::AccelerometerSim& yWrapper = accelerometerSim.GetYWrapper();
   frc::sim::lowfi::AccelerometerSim& zWrapper = accelerometerSim.GetZWrapper();
+  EXPECT_FALSE(xWrapper.IsWrapperInitialized());
+  EXPECT_FALSE(yWrapper.IsWrapperInitialized());
+  EXPECT_FALSE(zWrapper.IsWrapperInitialized());
+
+  frc::ADXL345_I2C accel{port};
+  EXPECT_NEAR(0, accel.GetX(), EPSILON);
+  EXPECT_NEAR(0, accel.GetY(), EPSILON);
+  EXPECT_NEAR(0, accel.GetZ(), EPSILON);
+  EXPECT_TRUE(xWrapper.IsWrapperInitialized());
+  EXPECT_TRUE(yWrapper.IsWrapperInitialized());
+  EXPECT_TRUE(zWrapper.IsWrapperInitialized());
 
   xWrapper.SetAcceleration(1.45);
   EXPECT_NEAR(1.45, accel.GetX(), EPSILON);
