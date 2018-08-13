@@ -73,7 +73,7 @@ class PDPSim {
     return store;
   }
 
-  double GetCurrent(int channel) {
+  double GetCurrent(int channel) const {
     return HALSIM_GetPDPCurrent(m_index, channel);
   }
 

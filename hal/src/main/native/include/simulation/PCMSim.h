@@ -31,7 +31,7 @@ class PCMSim {
     return store;
   }
 
-  bool GetSolenoidInitialized(int channel) {
+  bool GetSolenoidInitialized(int channel) const {
     return HALSIM_GetPCMSolenoidInitialized(m_index, channel);
   }
 
@@ -49,7 +49,7 @@ class PCMSim {
     return store;
   }
 
-  bool GetSolenoidOutput(int channel) {
+  bool GetSolenoidOutput(int channel) const {
     return HALSIM_GetPCMSolenoidOutput(m_index, channel);
   }
 
