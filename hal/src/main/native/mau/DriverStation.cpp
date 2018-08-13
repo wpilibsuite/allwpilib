@@ -21,7 +21,6 @@
 #include "HALInitializer.h"
 #include "DriveStation/include/socket.hpp"
 #include "DriveStation/include/DriverComms.hpp"
-#include "DriveStation/include/DriverInternal.h"
 #include "DriveStation/include/MauDriveData.h"
 #include "DriveStation/include/DriverComms.hpp"
 
@@ -130,27 +129,27 @@ extern "C" {
     }
 
     int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
-        controlWord = Mau_DriveData::readControlWord();
+        *controlWord = Mau_DriveData::readControlWord();
         return 0;
     }
 
     HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
         *status = 0;
-        return *Mau_DriveData::readAllianceID();
+        return Mau_DriveData::readAllianceID();
     }
 
     int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
-        axes = Mau_DriveData::readJoyAxes(joystickNum);
+        Mau_DriveData::scribeJoyAxes(joystickNum, axes);
         return axes->count;
     }
 
     int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
-        povs = Mau_DriveData::readJoyPOVs(joystickNum);
+        Mau_DriveData::scribeJoyPOVs(joystickNum, povs);
         return povs->count;
     }
 
     int32_t HAL_GetJoystickButtons(int32_t joystickNum, HAL_JoystickButtons* buttons) {
-        buttons = Mau_DriveData::readJoyButtons(joystickNum);
+        Mau_DriveData::scribeJoyButtons(joystickNum, buttons);
         return 0;
     }
 
@@ -166,20 +165,22 @@ extern "C" {
      * nonzero is bad.
      */
     int32_t HAL_GetJoystickDescriptor(int32_t joystickNum, HAL_JoystickDescriptor* desc) {
-        desc = Mau_DriveData::readJoyDescriptor(joystickNum);
+        Mau_DriveData::scribeJoyDescriptor(joystickNum, desc);
         return 0;
     }
 
     HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) {
-        return Mau_DriveData::readJoyDescriptor(joystickNum)->isXbox;
+        return Mau_DriveData::readJoyIsXbox(joystickNum);
     }
 
     int32_t HAL_GetJoystickType(int32_t joystickNum) {
-        return Mau_DriveData::readJoyDescriptor(joystickNum)->type;
+        return Mau_DriveData::readJoyType(joystickNum);
     }
 
     char* HAL_GetJoystickName(int32_t joystickNum) {
-        return Mau_DriveData::readJoyDescriptor(joystickNum)->name;
+        char* name = new char[250];
+        Mau_DriveData::scribeJoyName(joystickNum, name);
+        return name;
     }
 
     void HAL_FreeJoystickName(char* name) {
@@ -187,7 +188,7 @@ extern "C" {
     }
 
     int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
-        return Mau_DriveData::readJoyDescriptor(joystickNum)->axisTypes[axis];
+        return Mau_DriveData::readJoyAxisType(joystickNum, axis);
     }
 
     int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs, int32_t leftRumble, int32_t rightRumble) {
@@ -200,15 +201,15 @@ extern "C" {
     }
 
     int HAL_GetMatchInfo(HAL_MatchInfo* info) {
-        info = Mau_DriveData::readMatchInfo();
+        Mau_DriveData::scribeMatchInfo(info);
         return 0;
     }
 
     void HAL_FreeMatchInfo(HAL_MatchInfo* info) {
-        std::free(info->eventName);
-        std::free(info->gameSpecificMessage);
-        info->eventName = nullptr;
-        info->gameSpecificMessage = nullptr;
+//        std::free(info->eventName);
+//        std::free(info->gameSpecificMessage);
+//        info->eventName = nullptr;
+//        info->gameSpecificMessage = nullptr;
     }
 }
 

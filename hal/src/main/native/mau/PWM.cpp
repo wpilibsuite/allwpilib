@@ -59,18 +59,16 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle, int32_t* stat
 
     // ---------------------------------------
 
-//    int halIndex = getHandleIndex(handle);
     std::string vmxLabel = mau::enumConverter->getHandleLabel(HAL_HandleEnum::PWM);
     Mau_Channel* mauChannel = mau::channelMap->getChannel(vmxLabel, origChannel);
 
     mauChannel->vmxAbility = VMXChannelCapability::PWMGeneratorOutput;
-    VMXResourceHandle vmxResHandle;
-    mauChannel->vmxResHandle = &vmxResHandle;
 
     HAL_SetPWMConfig(handle, 2.0, 1.501, 1.5, 1.499, 1.0, status);
 
     PWMGeneratorConfig vmxConfig(200 /* Frequency in Hz */);
-    mau::vmxIO->ActivateSinglechannelResource(mauChannel->getInfo(), &vmxConfig, vmxResHandle, mau::vmxError);
+    mau::vmxIO->ActivateSinglechannelResource(mauChannel->getInfo(), &vmxConfig, mauChannel->vmxResHandle,
+                                              mau::vmxError);
 
     return handle;
 }
@@ -84,15 +82,15 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
 
     std::string vmxLabel = mau::enumConverter->getHandleLabel(HAL_HandleEnum::PWM);
     Mau_Channel* mauChannel = mau::channelMap->getChannel(vmxLabel, port->channel);
-    VMXResourceHandle vmxResource = *mauChannel->vmxResHandle;
+    VMXResourceHandle vmxResource = mauChannel->vmxResHandle;
     mau::vmxIO->UnrouteChannelFromResource(mauChannel->vmxIndex, vmxResource, mau::vmxError);
     bool isActive;
     mau::vmxIO->IsResourceActive(vmxResource, isActive, mau::vmxError);
-    if(isActive) {
+    if (isActive) {
         bool allocated;
         bool isShared;
         mau::vmxIO->IsResourceAllocated(vmxResource, allocated, isShared, mau::vmxError);
-        if(allocated) {
+        if (allocated) {
             mau::vmxIO->DeactivateResource(vmxResource, mau::vmxError);
         }
     }
@@ -104,7 +102,8 @@ HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
     return channel < kNumPWMChannels && channel >= 0;
 }
 
-void HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double max, double deadbandMax, double center, double deadbandMin,
+void
+HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double max, double deadbandMax, double center, double deadbandMin,
                  double min, int32_t* status) {
     auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
     if (port == nullptr) {
@@ -201,7 +200,7 @@ void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value, int32_t* stat
     Mau_Channel* mauChannel = mau::channelMap->getChannel(vmxLabel, port->channel);
     VMXResourceIndex vmxIndex = mauChannel->getResourceIndex();
 
-    mau::vmxIO->PWMGenerator_SetDutyCycle(*mauChannel->vmxResHandle, vmxIndex, value, mau::vmxError);
+    mau::vmxIO->PWMGenerator_SetDutyCycle(mauChannel->vmxResHandle, vmxIndex, value, mau::vmxError);
 }
 
 /**
@@ -247,7 +246,7 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed, int32_t* sta
     Mau_Channel* mauChannel = mau::channelMap->getChannel(vmxLabel, port->channel);
     VMXResourceIndex vmxIndex = mauChannel->getResourceIndex();
 
-    mau::vmxIO->PWMGenerator_SetDutyCycle(*mauChannel->vmxResHandle, vmxIndex, dutyCycle, mau::vmxError);
+    mau::vmxIO->PWMGenerator_SetDutyCycle(mauChannel->vmxResHandle, vmxIndex, dutyCycle, mau::vmxError);
 }
 
 /**
@@ -288,6 +287,10 @@ void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
 //    SimPWMData[port->channel].SetRawValue(0);
 //    SimPWMData[port->channel].SetPosition(0);
 //    SimPWMData[port->channel].SetSpeed(0);
+    std::string vmxLabel = mau::enumConverter->getHandleLabel(HAL_HandleEnum::PWM);
+    Mau_Channel* mauChannel = mau::channelMap->getChannel(vmxLabel, port->channel);
+    VMXResourceIndex vmxIndex = mauChannel->getResourceIndex();
+    mau::vmxIO->PWMGenerator_SetDutyCycle(mauChannel->vmxResHandle, vmxIndex, 0, mau::vmxError);
 }
 
 /**

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <cstdint>
 #include <mutex>
 
@@ -13,19 +14,19 @@ namespace mau {
             uint32_t button_mask;
             bool has_update;
         } _TempJoyData;
-        
-       extern uint8_t sq_1;
- 		 extern uint8_t sq_2;
-  		 extern uint8_t control;
-		 extern uint8_t req;
-		
-		 extern _TempJoyData joys[6];
-		 extern long long lastDecodeTime;
- 		 extern double voltage;
+
+        extern uint8_t sq_1;
+        extern uint8_t sq_2;
+        extern uint8_t control;
+        extern uint8_t req;
+
+        extern _TempJoyData joys[6];
+        extern long long lastDecodeTime;
+        extern double voltage;
 
         void start();
         void stop();
-        void decodePacket(char* data, int length);
+        void decodeUdpPacket(char* data, int length);
         void encodePacket(char* data);
         void decodeTcpPacket(char* data, int length);
         void periodicUpdate();

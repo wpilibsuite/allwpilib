@@ -8,6 +8,7 @@
 
 #include "DriverComms.hpp"
 #include "MauTime.h"
+#include "MauDriveData.h"
 #include <wpi/priority_mutex.h>
 
 #include <thread>
@@ -62,7 +63,7 @@ namespace mau {
                 runLock.unlock();
 
                 int len = sock.read(decode_buffer, 1024, &addr);
-                mau::comms::decodePacket(decode_buffer, len);
+                mau::comms::decodeUdpPacket(decode_buffer, len);
 
                 mau::comms::encodePacket(encode_buffer);
                 addr.set_port(1150);

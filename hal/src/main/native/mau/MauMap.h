@@ -9,21 +9,6 @@
 #include <string>
 #include <map>
 
-//struct Mau_VMXChannel {
-//    bool used;
-//    std::string label;
-//    VMXChannelIndex index;
-//    VMXChannelType type;
-//    std::vector<VMXChannelCapability> capabilities;
-//};
-//
-//class Mau_VMXChannelRef {
-//    Mau_VMXChannel* channels;
-//public:
-//    Mau_VMXChannelRef(Mau_VMXChannel* allChan);
-//    Mau_VMXChannel getChannel(int index);
-//};
-
 struct Mau_Channel {
     int wpiIndex;
     bool unsupported;
@@ -32,10 +17,8 @@ struct Mau_Channel {
     VMXChannelIndex vmxIndex;
     VMXChannelCapability vmxAbility;
 
-    VMXResourceHandle* vmxResHandle;
+    VMXResourceHandle vmxResHandle;
     VMXResourceConfig* vmxResConfig;
-
-//    Mau_VMXChannel* vmxChannel;
 
     VMXChannelInfo getInfo();
     VMXResourceIndex getResourceIndex();
@@ -58,17 +41,14 @@ public:
 
 class Mau_ChannelMap {
     std::map<std::string, Mau_ChannelGroup*> groups;
-//    Mau_VMXChannelRef* vmxInfo;
 
     friend class Mau_FileHandler;
     void setChannelAsReference(std::string target, std::string ref);
     void setGroup(std::string target, Mau_ChannelGroup* group);
 public:
-//    Mau_ChannelMap(Mau_VMXChannelRef* info);
     Mau_ChannelMap();
     Mau_Channel* getChannel(std::string label, int index);
     VMXChannelInfo getChannelInfo(std::string label, int index);
-//    Mau_VMXChannelRef* getVMXRef();
 
     void initializeChannel(std::string label, int index, VMXChannelCapability ability, VMXResourceConfig* config);
 };

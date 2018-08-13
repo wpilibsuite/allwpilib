@@ -7,7 +7,6 @@
 #include <wpi/priority_mutex.h>
 
 #include <thread>
-#include "DriverInternal.h"
 
  char mau::comms::encode_buffer[8];
  char mau::comms::decode_buffer[1024];
@@ -77,7 +76,6 @@ void mau::comms::periodicUpdate() {
         // DS Connected
         Mau_DriveData::updateIsDsAttached(true);
     }
-
     for (int joyNum = 0; joyNum < 6; joyNum++) {
         _TempJoyData* tempJoy = &joys[joyNum];
         Mau_DriveData::updateJoyAxis(joyNum, tempJoy->axis_count, tempJoy->axis);
@@ -115,8 +113,8 @@ void mau::comms::decodeTcpPacket(char* data, int length) {
                 desc.povCount = pov_count;
                 desc.isXbox = xbox;
                 desc.type = type;
-                if (name_length > 60) {
-                    name_length = 60;
+                if (name_length > Mau_kJoystickNameLength) {
+                    name_length = Mau_kJoystickNameLength;
                 }
                 memcpy(desc.name, &data[nb_i], name_length);
                 desc.axisCount = axis_count;
@@ -129,7 +127,7 @@ void mau::comms::decodeTcpPacket(char* data, int length) {
     }
 }
 
-void mau::comms::decodePacket(char* data, int length) {
+void mau::comms::decodeUdpPacket(char* data, int length) {
     sq_1 = data[0];
     sq_2 = data[1];
     if (data[2] != 0) {
