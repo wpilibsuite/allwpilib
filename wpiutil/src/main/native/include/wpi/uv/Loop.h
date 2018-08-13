@@ -209,6 +209,21 @@ class Loop final : public std::enable_shared_from_this<Loop> {
   uv_loop_t* GetRaw() const noexcept { return m_loop; }
 
   /**
+   * Gets user-defined data.
+   * @return User-defined data if any, nullptr otherwise.
+   */
+  template <typename T = void>
+  std::shared_ptr<T> GetData() const {
+    return std::static_pointer_cast<T>(m_data);
+  }
+
+  /**
+   * Sets user-defined data.
+   * @param data User-defined arbitrary data.
+   */
+  void SetData(std::shared_ptr<void> data) { m_data = std::move(data); }
+
+  /**
    * Error signal
    */
   sig::Signal<Error> error;
@@ -220,6 +235,7 @@ class Loop final : public std::enable_shared_from_this<Loop> {
   void ReportError(int err) { error(Error(err)); }
 
  private:
+  std::shared_ptr<void> m_data;
   uv_loop_t* m_loop;
   uv_loop_t m_loopStruct;
 };

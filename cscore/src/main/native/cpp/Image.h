@@ -79,6 +79,14 @@ class Image {
   bool Is(int width_, int height_, VideoMode::PixelFormat pixelFormat_) {
     return width == width_ && height == height_ && pixelFormat == pixelFormat_;
   }
+  bool Is(int width_, int height_, VideoMode::PixelFormat pixelFormat_,
+          int jpegQuality_) {
+    // Consider +/-5 on JPEG quality to be "close enough"
+    return width == width_ && height == height_ &&
+           pixelFormat == pixelFormat_ &&
+           (pixelFormat != VideoMode::kMJPEG || jpegQuality_ == -1 ||
+            (jpegQuality != -1 && std::abs(jpegQuality - jpegQuality_) <= 5));
+  }
   bool IsLarger(int width_, int height_) {
     return width >= width_ && height >= height_;
   }
@@ -95,6 +103,7 @@ class Image {
   VideoMode::PixelFormat pixelFormat{VideoMode::kUnknown};
   int width{0};
   int height{0};
+  int jpegQuality{-1};
 };
 
 }  // namespace cs

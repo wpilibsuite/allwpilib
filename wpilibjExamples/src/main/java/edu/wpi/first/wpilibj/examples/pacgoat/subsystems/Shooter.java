@@ -31,7 +31,7 @@ public class Shooter extends Subsystem {
   DigitalInput m_piston1ReedSwitchFront = new DigitalInput(9);
   DigitalInput m_piston1ReedSwitchBack = new DigitalInput(11);
   //NOTE: currently ignored in simulation
-  DigitalInput m_hotGoalSensor = new DigitalInput(3);
+  DigitalInput m_hotGoalSensor = new DigitalInput(7);
 
   /**
    * Create a new shooter subsystem.

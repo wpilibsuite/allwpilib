@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/AnalogGyro.h"
+#include "hal/AnalogGyro.h"
 
 #include <chrono>
 #include <thread>
 
 #include "AnalogInternal.h"
-#include "HAL/AnalogAccumulator.h"
-#include "HAL/AnalogInput.h"
-#include "HAL/handles/IndexedHandleResource.h"
 #include "HALInitializer.h"
-#include "MockData/AnalogGyroDataInternal.h"
+#include "hal/AnalogAccumulator.h"
+#include "hal/AnalogInput.h"
+#include "hal/handles/IndexedHandleResource.h"
+#include "mockdata/AnalogGyroDataInternal.h"
 
 namespace {
 struct AnalogGyro {

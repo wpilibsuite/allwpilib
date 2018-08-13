@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/I2C.h"
+#include "hal/I2C.h"
 
 #include "HALInitializer.h"
-#include "MockData/I2CDataInternal.h"
+#include "mockdata/I2CDataInternal.h"
 
 using namespace hal;
 

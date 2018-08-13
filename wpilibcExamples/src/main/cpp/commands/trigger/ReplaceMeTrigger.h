@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <Buttons/Trigger.h>
+#include <frc/buttons/Trigger.h>
 
 class ReplaceMeTrigger : public frc::Trigger {
  public:

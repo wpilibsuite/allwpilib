@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ADXL345_I2C.h"
+#include "frc/ADXL345_I2C.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "SmartDashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

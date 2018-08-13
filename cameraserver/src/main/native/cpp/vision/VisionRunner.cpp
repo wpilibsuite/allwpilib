@@ -11,7 +11,7 @@
 
 #include <opencv2/core/mat.hpp>
 
-#include "CameraServerShared.h"
+#include "cameraserver/CameraServerShared.h"
 
 using namespace frc;
 

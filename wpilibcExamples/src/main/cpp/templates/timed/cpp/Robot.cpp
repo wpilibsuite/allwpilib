@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include <SmartDashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {
   m_chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);

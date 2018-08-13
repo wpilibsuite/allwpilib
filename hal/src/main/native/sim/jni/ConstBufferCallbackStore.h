@@ -11,11 +11,11 @@
 
 #include <wpi/jni_util.h>
 
-#include "HAL/Types.h"
-#include "HAL/handles/UnlimitedHandleResource.h"
-#include "MockData/HAL_Value.h"
-#include "MockData/NotifyListener.h"
 #include "SimulatorJNI.h"
+#include "hal/Types.h"
+#include "hal/handles/UnlimitedHandleResource.h"
+#include "mockdata/HAL_Value.h"
+#include "mockdata/NotifyListener.h"
 
 namespace sim {
 class ConstBufferCallbackStore {

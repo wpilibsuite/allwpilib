@@ -9,13 +9,28 @@ package edu.wpi.first.wpilibj.hal;
 
 import org.junit.jupiter.api.Test;
 
+import edu.wpi.first.hal.sim.mockdata.DriverStationDataJNI;
+import edu.wpi.first.wpilibj.DriverStation.MatchType;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class MatchInfoDataTest {
   @Test
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-  void matchInfoDataDoesNotThrow() {
-    HAL.initialize(500, 0);
-    MatchInfoData data = new MatchInfoData();
-    HAL.getMatchInfo(data);
-    // Nothing we can assert, so just make sure it didn't throw.
+  void testSetMatchInfo() {
+
+    MatchType matchType = MatchType.Qualification;
+    DriverStationDataJNI.setMatchInfo("Event Name", "Game Message", 174, 191, matchType.ordinal());
+
+    MatchInfoData outMatchInfo = new MatchInfoData();
+    HAL.getMatchInfo(outMatchInfo);
+
+    assertAll(
+        () -> assertEquals("Event Name", outMatchInfo.eventName),
+        () -> assertEquals(matchType.ordinal(), outMatchInfo.matchType),
+        () -> assertEquals(174, outMatchInfo.matchNumber),
+        () -> assertEquals(191, outMatchInfo.replayNumber),
+        () -> assertEquals("Game Message", outMatchInfo.gameSpecificMessage)
+    );
   }
 }

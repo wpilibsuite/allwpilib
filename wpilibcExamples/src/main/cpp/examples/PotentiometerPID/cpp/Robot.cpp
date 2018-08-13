@@ -7,11 +7,11 @@
 
 #include <array>
 
-#include <AnalogInput.h>
-#include <IterativeRobot.h>
-#include <Joystick.h>
-#include <PIDController.h>
-#include <Spark.h>
+#include <frc/AnalogInput.h>
+#include <frc/IterativeRobot.h>
+#include <frc/Joystick.h>
+#include <frc/PIDController.h>
+#include <frc/Spark.h>
 
 /**
  * This is a sample program to demonstrate how to use a soft potentiometer and a

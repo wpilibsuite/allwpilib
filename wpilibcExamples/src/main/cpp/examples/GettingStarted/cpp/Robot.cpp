@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <Drive/DifferentialDrive.h>
-#include <IterativeRobot.h>
-#include <Joystick.h>
-#include <LiveWindow/LiveWindow.h>
-#include <Spark.h>
-#include <Timer.h>
+#include <frc/IterativeRobot.h>
+#include <frc/Joystick.h>
+#include <frc/Spark.h>
+#include <frc/Timer.h>
+#include <frc/drive/DifferentialDrive.h>
+#include <frc/livewindow/LiveWindow.h>
 
 class Robot : public frc::IterativeRobot {
  public:

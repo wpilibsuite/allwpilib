@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "InterruptableSensorBase.h"
+#include "frc/InterruptableSensorBase.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "Utility.h"
-#include "WPIErrors.h"
+#include "frc/Utility.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

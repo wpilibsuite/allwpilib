@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "GearTooth.h"
+#include "frc/GearTooth.h"
 
-#include "SmartDashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

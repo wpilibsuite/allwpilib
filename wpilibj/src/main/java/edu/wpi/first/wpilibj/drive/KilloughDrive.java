@@ -8,10 +8,10 @@
 package edu.wpi.first.wpilibj.drive;
 
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-// import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
-// import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-// import edu.wpi.first.wpilibj.hal.HAL;
 
 /**
  * A class for driving Killough drive platforms.
@@ -136,8 +136,8 @@ public class KilloughDrive extends RobotDriveBase {
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation,
                              double gyroAngle) {
     if (!m_reported) {
-      // HAL.report(tResourceType.kResourceType_RobotDrive, 3,
-      //            tInstances.kRobotDrive_KilloughCartesian);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 3,
+                 tInstances.kRobotDrive2_KilloughCartesian);
       m_reported = true;
     }
 
@@ -179,8 +179,8 @@ public class KilloughDrive extends RobotDriveBase {
   @SuppressWarnings("ParameterName")
   public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
-      // HAL.report(tResourceType.kResourceType_RobotDrive, 3,
-      //            tInstances.kRobotDrive_KilloughPolar);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 3,
+                 tInstances.kRobotDrive2_KilloughPolar);
       m_reported = true;
     }
 
@@ -204,6 +204,8 @@ public class KilloughDrive extends RobotDriveBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("KilloughDrive");
+    builder.setActuator(true);
+    builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Left Motor Speed", m_leftMotor::get, m_leftMotor::set);
     builder.addDoubleProperty("Right Motor Speed", m_rightMotor::get, m_rightMotor::set);
     builder.addDoubleProperty("Back Motor Speed", m_backMotor::get, m_backMotor::set);

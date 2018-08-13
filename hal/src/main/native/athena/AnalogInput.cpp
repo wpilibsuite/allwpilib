@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/AnalogInput.h"
+#include "hal/AnalogInput.h"
 
 #include <FRC_NetworkCommunication/AICalibration.h>
 #include <wpi/mutex.h>
 
 #include "AnalogInternal.h"
-#include "HAL/AnalogAccumulator.h"
-#include "HAL/HAL.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/AnalogAccumulator.h"
+#include "hal/HAL.h"
+#include "hal/handles/HandlesInternal.h"
 
 namespace hal {
 namespace init {

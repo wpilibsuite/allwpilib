@@ -5,18 +5,18 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/HAL.h"
+#include "hal/HAL.h"
 
 #include <wpi/raw_ostream.h>
 
 #include "ErrorsInternal.h"
-#include "HAL/DriverStation.h"
-#include "HAL/Errors.h"
-#include "HAL/Extensions.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
-#include "MockData/RoboRioDataInternal.h"
 #include "MockHooksInternal.h"
+#include "hal/DriverStation.h"
+#include "hal/Errors.h"
+#include "hal/Extensions.h"
+#include "hal/handles/HandlesInternal.h"
+#include "mockdata/RoboRioDataInternal.h"
 
 using namespace hal;
 

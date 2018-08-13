@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include <HAL/cpp/fpga_clock.h>
+#include <hal/cpp/fpga_clock.h>
 #include <wpi/Logger.h>
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>

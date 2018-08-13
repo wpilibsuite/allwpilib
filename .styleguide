@@ -26,9 +26,14 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
-  ^HAL/
+  ^cameraserver/
+  ^cscore
+  ^hal/
+  ^mockdata/
   ^networktables/
+  ^ntcore
   ^opencv2/
   ^support/
+  ^vision/
   ^wpi/
 }

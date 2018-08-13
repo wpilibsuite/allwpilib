@@ -5,16 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Encoder.h"
+#include "hal/Encoder.h"
 
 #include "EncoderInternal.h"
 #include "FPGAEncoder.h"
-#include "HAL/ChipObject.h"
-#include "HAL/Counter.h"
-#include "HAL/Errors.h"
-#include "HAL/handles/LimitedClassedHandleResource.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/ChipObject.h"
+#include "hal/Counter.h"
+#include "hal/Errors.h"
+#include "hal/handles/LimitedClassedHandleResource.h"
 
 using namespace hal;
 

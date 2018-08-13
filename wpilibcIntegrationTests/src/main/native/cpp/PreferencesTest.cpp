@@ -5,16 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Preferences.h"  // NOLINT(build/include_order)
+#include "frc/Preferences.h"  // NOLINT(build/include_order)
 
 #include <cstdio>
 #include <fstream>
 
 #include <networktables/NetworkTableInstance.h>
+#include <ntcore.h>
 
-#include "Timer.h"
+#include "frc/Timer.h"
 #include "gtest/gtest.h"
-#include "ntcore.h"
 
 using namespace frc;
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,27 +7,13 @@
 
 #pragma once
 
-#include <memory>
+// clang-format off
+#ifdef _MSC_VER
+#pragma message "warning: buttons/NetworkButton.h is deprecated; include frc/buttons/NetworkButton.h instead"
+#else
+#warning "buttons/NetworkButton.h is deprecated; include frc/buttons/NetworkButton.h instead"
+#endif
 
-#include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableEntry.h>
-#include <wpi/Twine.h>
+// clang-format on
 
-#include "Buttons/Button.h"
-
-namespace frc {
-
-class NetworkButton : public Button {
- public:
-  NetworkButton(const wpi::Twine& tableName, const wpi::Twine& field);
-  NetworkButton(std::shared_ptr<nt::NetworkTable> table,
-                const wpi::Twine& field);
-  virtual ~NetworkButton() = default;
-
-  virtual bool Get();
-
- private:
-  nt::NetworkTableEntry m_entry;
-};
-
-}  // namespace frc
+#include "frc/buttons/NetworkButton.h"

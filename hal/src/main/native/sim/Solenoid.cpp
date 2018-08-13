@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Solenoid.h"
+#include "hal/Solenoid.h"
 
-#include "HAL/Errors.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "HAL/handles/IndexedHandleResource.h"
 #include "HALInitializer.h"
-#include "MockData/PCMDataInternal.h"
 #include "PortsInternal.h"
+#include "hal/Errors.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/IndexedHandleResource.h"
+#include "mockdata/PCMDataInternal.h"
 
 namespace {
 struct Solenoid {

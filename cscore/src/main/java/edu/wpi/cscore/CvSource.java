@@ -15,6 +15,7 @@ import org.opencv.core.Mat;
 public class CvSource extends VideoSource {
   /**
    * Create an OpenCV source.
+   *
    * @param name Source name (arbitrary unique identifier)
    * @param mode Video mode being generated
    */
@@ -28,6 +29,7 @@ public class CvSource extends VideoSource {
 
   /**
    * Create an OpenCV source.
+   *
    * @param name Source name (arbitrary unique identifier)
    * @param pixelFormat Pixel format
    * @param width width
@@ -40,9 +42,11 @@ public class CvSource extends VideoSource {
 
   /**
    * Put an OpenCV image and notify sinks.
-   * Only 8-bit single-channel or 3-channel (with BGR channel order) images
+   *
+   * <p>Only 8-bit single-channel or 3-channel (with BGR channel order) images
    * are supported. If the format, depth or channel order is different, use
    * Mat.convertTo() and/or cvtColor() to convert it first.
+   *
    * @param image OpenCV image
    */
   public void putFrame(Mat image) {
@@ -59,6 +63,7 @@ public class CvSource extends VideoSource {
 
   /**
    * Set source connection status.  Defaults to true.
+   *
    * @param connected True for connected, false for disconnected
    */
   public void setConnected(boolean connected) {
@@ -67,6 +72,7 @@ public class CvSource extends VideoSource {
 
   /**
    * Set source description.
+   *
    * @param description Description
    */
   public void setDescription(String description) {
@@ -75,6 +81,7 @@ public class CvSource extends VideoSource {
 
   /**
    * Create a property.
+   *
    * @param name Property name
    * @param kind Property kind
    * @param minimum Minimum value
@@ -104,6 +111,7 @@ public class CvSource extends VideoSource {
 
   /**
    * Create an integer property.
+   *
    * @param name Property name
    * @param minimum Minimum value
    * @param maximum Maximum value
@@ -131,6 +139,7 @@ public class CvSource extends VideoSource {
 
   /**
    * Create a boolean property.
+   *
    * @param name Property name
    * @param defaultValue Default value
    * @param value Current value
@@ -150,6 +159,7 @@ public class CvSource extends VideoSource {
 
   /**
    * Create a string property.
+   *
    * @param name Property name
    * @param value Current value
    * @return Property
@@ -170,6 +180,7 @@ public class CvSource extends VideoSource {
 
   /**
    * Configure enum property choices.
+   *
    * @param property Property
    * @param choices Choices
    */
@@ -179,6 +190,7 @@ public class CvSource extends VideoSource {
 
   /**
    * Configure enum property choices.
+   *
    * @param property Property
    * @param choices Choices
    * @deprecated Use {@code setEnumPropertyChoices} instead.

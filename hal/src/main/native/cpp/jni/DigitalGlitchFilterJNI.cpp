@@ -7,9 +7,9 @@
 
 #include <jni.h>
 
-#include "HAL/DIO.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI.h"
+#include "hal/DIO.h"
 
 using namespace frc;
 

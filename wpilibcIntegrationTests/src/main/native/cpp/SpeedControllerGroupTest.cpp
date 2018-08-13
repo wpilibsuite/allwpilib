@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "SpeedControllerGroup.h"  // NOLINT(build/include_order)
+#include "frc/SpeedControllerGroup.h"  // NOLINT(build/include_order)
 
 #include <memory>
 #include <vector>

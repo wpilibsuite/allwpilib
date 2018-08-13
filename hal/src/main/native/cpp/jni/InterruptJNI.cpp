@@ -14,10 +14,10 @@
 #include <wpi/SafeThread.h>
 #include <wpi/mutex.h>
 
-#include "HAL/Interrupts.h"
-#include "HAL/cpp/Log.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_InterruptJNI.h"
+#include "hal/Interrupts.h"
+#include "hal/cpp/Log.h"
 
 using namespace frc;
 

@@ -13,6 +13,7 @@ package edu.wpi.cscore;
 public class MjpegServer extends VideoSink {
   /**
    * Create a MJPEG-over-HTTP server sink.
+   *
    * @param name Sink name (arbitrary unique identifier)
    * @param listenAddress TCP listen address (empty string for all addresses)
    * @param port TCP port number
@@ -23,6 +24,7 @@ public class MjpegServer extends VideoSink {
 
   /**
    * Create a MJPEG-over-HTTP server sink.
+   *
    * @param name Sink name (arbitrary unique identifier)
    * @param port TCP port number
    */
@@ -42,5 +44,61 @@ public class MjpegServer extends VideoSink {
    */
   public int getPort() {
     return CameraServerJNI.getMjpegServerPort(m_handle);
+  }
+
+  /**
+   * Set the stream resolution for clients that don't specify it.
+   *
+   * <p>It is not necessary to set this if it is the same as the source
+   * resolution.
+   *
+   * <p>Setting this different than the source resolution will result in
+   * increased CPU usage, particularly for MJPEG source cameras, as it will
+   * decompress, resize, and recompress the image, instead of using the
+   * camera's MJPEG image directly.
+   *
+   * @param width width, 0 for unspecified
+   * @param height height, 0 for unspecified
+   */
+  void setResolution(int width, int height) {
+    CameraServerJNI.setProperty(CameraServerJNI.getSinkProperty(m_handle, "width"), width);
+    CameraServerJNI.setProperty(CameraServerJNI.getSinkProperty(m_handle, "height"), height);
+  }
+
+  /**
+   * Set the stream frames per second (FPS) for clients that don't specify it.
+   *
+   * <p>It is not necessary to set this if it is the same as the source FPS.
+   *
+   * @param fps FPS, 0 for unspecified
+   */
+  void setFPS(int fps) {
+    CameraServerJNI.setProperty(CameraServerJNI.getSinkProperty(m_handle, "fps"), fps);
+  }
+
+  /**
+   * Set the compression for clients that don't specify it.
+   *
+   * <p>Setting this will result in increased CPU usage for MJPEG source cameras
+   * as it will decompress and recompress the image instead of using the
+   * camera's MJPEG image directly.
+   *
+   * @param quality JPEG compression quality (0-100), -1 for unspecified
+   */
+  void setCompression(int quality) {
+    CameraServerJNI.setProperty(CameraServerJNI.getSinkProperty(m_handle, "compression"),
+                                quality);
+  }
+
+  /**
+   * Set the default compression used for non-MJPEG sources.  If not set,
+   * 80 is used.  This function has no effect on MJPEG source cameras; use
+   * SetCompression() instead to force recompression of MJPEG source images.
+   *
+   * @param quality JPEG compression quality (0-100)
+   */
+  void setDefaultCompression(int quality) {
+    CameraServerJNI.setProperty(CameraServerJNI.getSinkProperty(m_handle, "default_compression"),
+                                quality);
   }
 }

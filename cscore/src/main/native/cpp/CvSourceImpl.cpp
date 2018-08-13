@@ -31,92 +31,6 @@ CvSourceImpl::~CvSourceImpl() {}
 
 void CvSourceImpl::Start() {}
 
-std::unique_ptr<PropertyImpl> CvSourceImpl::CreateEmptyProperty(
-    wpi::StringRef name) const {
-  return wpi::make_unique<PropertyData>(name);
-}
-
-bool CvSourceImpl::CacheProperties(CS_Status* status) const {
-  // Doesn't need to do anything.
-  m_properties_cached = true;
-  return true;
-}
-
-void CvSourceImpl::SetProperty(int property, int value, CS_Status* status) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  auto prop = static_cast<PropertyData*>(GetProperty(property));
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return;
-  }
-
-  // Guess it's integer if we've set before get
-  if (prop->propKind == CS_PROP_NONE) prop->propKind = CS_PROP_INTEGER;
-
-  if ((prop->propKind & (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) ==
-      0) {
-    *status = CS_WRONG_PROPERTY_TYPE;
-    return;
-  }
-
-  UpdatePropertyValue(property, false, value, wpi::StringRef{});
-}
-
-void CvSourceImpl::SetStringProperty(int property, wpi::StringRef value,
-                                     CS_Status* status) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  auto prop = static_cast<PropertyData*>(GetProperty(property));
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return;
-  }
-
-  // Guess it's string if we've set before get
-  if (prop->propKind == CS_PROP_NONE) prop->propKind = CS_PROP_STRING;
-
-  if (prop->propKind != CS_PROP_STRING) {
-    *status = CS_WRONG_PROPERTY_TYPE;
-    return;
-  }
-
-  UpdatePropertyValue(property, true, 0, value);
-}
-
-// These are only valid for cameras (should never get called)
-
-void CvSourceImpl::SetBrightness(int brightness, CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
-int CvSourceImpl::GetBrightness(CS_Status* status) const {
-  *status = CS_INVALID_HANDLE;
-  return 0;
-}
-
-void CvSourceImpl::SetWhiteBalanceAuto(CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
-void CvSourceImpl::SetWhiteBalanceHoldCurrent(CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
-void CvSourceImpl::SetWhiteBalanceManual(int value, CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
-void CvSourceImpl::SetExposureAuto(CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
-void CvSourceImpl::SetExposureHoldCurrent(CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
-void CvSourceImpl::SetExposureManual(int value, CS_Status* status) {
-  *status = CS_INVALID_HANDLE;
-}
-
 bool CvSourceImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   {
     std::lock_guard<wpi::mutex> lock(m_mutex);
@@ -176,22 +90,21 @@ int CvSourceImpl::CreateProperty(wpi::StringRef name, CS_PropertyKind kind,
                                  int minimum, int maximum, int step,
                                  int defaultValue, int value) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  int& ndx = m_properties[name];
-  if (ndx == 0) {
-    // create a new index
-    ndx = m_propertyData.size() + 1;
-    m_propertyData.emplace_back(wpi::make_unique<PropertyData>(
-        name, kind, minimum, maximum, step, defaultValue, value));
-  } else {
-    // update all but value
-    auto prop = GetProperty(ndx);
-    prop->propKind = kind;
-    prop->minimum = minimum;
-    prop->maximum = maximum;
-    prop->step = step;
-    prop->defaultValue = defaultValue;
-    value = prop->value;
-  }
+  int ndx = CreateOrUpdateProperty(name,
+                                   [=] {
+                                     return wpi::make_unique<PropertyImpl>(
+                                         name, kind, minimum, maximum, step,
+                                         defaultValue, value);
+                                   },
+                                   [&](PropertyImpl& prop) {
+                                     // update all but value
+                                     prop.propKind = kind;
+                                     prop.minimum = minimum;
+                                     prop.maximum = maximum;
+                                     prop.step = step;
+                                     prop.defaultValue = defaultValue;
+                                     value = prop.value;
+                                   });
   Notifier::GetInstance().NotifySourceProperty(
       *this, CS_SOURCE_PROPERTY_CREATED, name, ndx, kind, value,
       wpi::StringRef{});

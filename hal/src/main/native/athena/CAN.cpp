@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/CAN.h"
+#include "hal/CAN.h"
 
 #include <FRC_NetworkCommunication/CANSessionMux.h>
 

@@ -5,15 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "XboxController.h"
+#include "frc/XboxController.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
 using namespace frc;
 
 XboxController::XboxController(int port) : GenericHID(port) {
-  // HAL_Report(HALUsageReporting::kResourceType_XboxController, port);
-  HAL_Report(HALUsageReporting::kResourceType_Joystick, port);
+  HAL_Report(HALUsageReporting::kResourceType_XboxController, port);
 }
 
 double XboxController::GetX(JoystickHand hand) const {

@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Notifier.h"
+#include "hal/Notifier.h"
 
 #include <atomic>
 #include <cstdlib>  // For std::atexit()
@@ -14,11 +14,11 @@
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
-#include "HAL/ChipObject.h"
-#include "HAL/Errors.h"
-#include "HAL/HAL.h"
-#include "HAL/handles/UnlimitedHandleResource.h"
 #include "HALInitializer.h"
+#include "hal/ChipObject.h"
+#include "hal/Errors.h"
+#include "hal/HAL.h"
+#include "hal/handles/UnlimitedHandleResource.h"
 
 using namespace hal;
 

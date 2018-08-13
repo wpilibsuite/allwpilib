@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DigitalInput.h"  // NOLINT(build/include_order)
+#include "frc/DigitalInput.h"  // NOLINT(build/include_order)
 
-#include "DigitalOutput.h"  // NOLINT(build/include_order)
+#include "frc/DigitalOutput.h"  // NOLINT(build/include_order)
 
-#include "Counter.h"
-#include "InterruptableSensorBase.h"
 #include "TestBench.h"
-#include "Timer.h"
+#include "frc/Counter.h"
+#include "frc/InterruptableSensorBase.h"
+#include "frc/Timer.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

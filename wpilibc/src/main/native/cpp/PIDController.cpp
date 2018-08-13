@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PIDController.h"
+#include "frc/PIDController.h"
 
-#include "Notifier.h"
-#include "PIDOutput.h"
-#include "SmartDashboard/SendableBuilder.h"
+#include "frc/Notifier.h"
+#include "frc/PIDOutput.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <AnalogGyro.h>
-#include <Drive/MecanumDrive.h>
-#include <IterativeRobot.h>
-#include <Joystick.h>
-#include <Spark.h>
+#include <frc/AnalogGyro.h>
+#include <frc/IterativeRobot.h>
+#include <frc/Joystick.h>
+#include <frc/Spark.h>
+#include <frc/drive/MecanumDrive.h>
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to

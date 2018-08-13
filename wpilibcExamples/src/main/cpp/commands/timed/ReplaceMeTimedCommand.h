@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Commands/TimedCommand.h"
+#include <frc/commands/TimedCommand.h>
 
 class ReplaceMeTimedCommand : public frc::TimedCommand {
  public:

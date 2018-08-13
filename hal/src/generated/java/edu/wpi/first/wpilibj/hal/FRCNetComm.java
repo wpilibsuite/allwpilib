@@ -113,7 +113,7 @@ public class FRCNetComm extends JNIWrapper {
     public static final int kResourceType_ADXRS450 = 54;
     public static final int kResourceType_RevSPARK = 55;
     public static final int kResourceType_MindsensorsSD540 = 56;
-    public static final int kResourceType_DigitalFilter = 57;
+    public static final int kResourceType_DigitalGlitchFilter = 57;
     public static final int kResourceType_ADIS16448 = 58;
     public static final int kResourceType_PDP = 59;
     public static final int kResourceType_PCM = 60;
@@ -127,6 +127,17 @@ public class FRCNetComm extends JNIWrapper {
     public static final int kResourceType_CTRE_future4 = 68;
     public static final int kResourceType_CTRE_future5 = 69;
     public static final int kResourceType_CTRE_future6 = 70;
+    public static final int kResourceType_LinearFilter = 71;
+    public static final int kResourceType_XboxController = 72;
+    public static final int kResourceType_UsbCamera = 73;
+    public static final int kResourceType_NavX = 74;
+    public static final int kResourceType_Pixy = 75;
+    public static final int kResourceType_Pixy2 = 76;
+    public static final int kResourceType_ScanseSweep = 77;
+    public static final int kResourceType_Shuffleboard = 78;
+    public static final int kResourceType_CAN = 79;
+    public static final int kResourceType_DigilentDMC60 = 80;
+    public static final int kResourceType_PWMVictorSPX = 81;
   }
 
   /**
@@ -149,6 +160,9 @@ public class FRCNetComm extends JNIWrapper {
     public static final int kFramework_Iterative = 1;
     public static final int kFramework_Simple = 2;
     public static final int kFramework_CommandControl = 3;
+    public static final int kFramework_Timed = 4;
+    public static final int kFramework_ROS = 5;
+    public static final int kFramework_RobotBuilder = 6;
 
     public static final int kRobotDrive_ArcadeStandard = 1;
     public static final int kRobotDrive_ArcadeButtonSpin = 2;
@@ -156,6 +170,13 @@ public class FRCNetComm extends JNIWrapper {
     public static final int kRobotDrive_Tank = 4;
     public static final int kRobotDrive_MecanumPolar = 5;
     public static final int kRobotDrive_MecanumCartesian = 6;
+    public static final int kRobotDrive2_DifferentialArcade = 7;
+    public static final int kRobotDrive2_DifferentialTank = 8;
+    public static final int kRobotDrive2_DifferentialCurvature = 9;
+    public static final int kRobotDrive2_MecanumCartesian = 10;
+    public static final int kRobotDrive2_MecanumPolar = 11;
+    public static final int kRobotDrive2_KilloughCartesian = 12;
+    public static final int kRobotDrive2_KilloughPolar = 13;
 
     public static final int kDriverStationCIO_Analog = 1;
     public static final int kDriverStationCIO_DigitalIn = 2;

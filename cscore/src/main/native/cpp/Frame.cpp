@@ -7,6 +7,8 @@
 
 #include "Frame.h"
 
+#include <cstdlib>
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -54,7 +56,8 @@ Image* Frame::GetNearestImage(int width, int height) const {
 }
 
 Image* Frame::GetNearestImage(int width, int height,
-                              VideoMode::PixelFormat pixelFormat) const {
+                              VideoMode::PixelFormat pixelFormat,
+                              int jpegQuality) const {
   if (!m_impl) return nullptr;
   std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
   Image* found = nullptr;
@@ -67,9 +70,10 @@ Image* Frame::GetNearestImage(int width, int height,
   // image processing to come, so it's worth spending a little extra time
   // looking for the most efficient conversion.
 
-  // 1) Same width, height, and pixelFormat (e.g. exactly what we want)
+  // 1) Same width, height, pixelFormat, and (possibly) JPEG quality
+  //    (e.g. exactly what we want)
   for (auto i : m_impl->images) {
-    if (i->Is(width, height, pixelFormat)) return i;
+    if (i->Is(width, height, pixelFormat, jpegQuality)) return i;
   }
 
   // 2) Same width, height, different (but non-JPEG) pixelFormat (color conv)
@@ -120,10 +124,18 @@ Image* Frame::GetNearestImage(int width, int height,
   }
   if (found) return found;
 
-  // 5) Same width, height, JPEG pixelFormat (decompression)
+  // 5) Same width, height, JPEG pixelFormat (decompression).  As there may be
+  //    multiple JPEG images, find the highest quality one.
   for (auto i : m_impl->images) {
-    if (i->Is(width, height, VideoMode::kMJPEG)) return i;
+    if (i->Is(width, height, VideoMode::kMJPEG) &&
+        (!found || i->jpegQuality > found->jpegQuality)) {
+      found = i;
+      // consider one without a quality setting to be the highest quality
+      // (e.g. directly from the camera)
+      if (i->jpegQuality == -1) break;
+    }
   }
+  if (found) return found;
 
   // 6) Different width, height, JPEG pixelFormat (decompression)
   // 6a) Smallest image at least width/height in size
@@ -146,9 +158,11 @@ Image* Frame::GetNearestImage(int width, int height,
   return m_impl->images.empty() ? nullptr : m_impl->images[0];
 }
 
-Image* Frame::Convert(Image* image, VideoMode::PixelFormat pixelFormat,
-                      int jpegQuality) {
-  if (!image || image->pixelFormat == pixelFormat) return image;
+Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
+                          int requiredJpegQuality, int defaultJpegQuality) {
+  if (!image ||
+      image->Is(image->width, image->height, pixelFormat, requiredJpegQuality))
+    return image;
   Image* cur = image;
 
   // If the source image is a JPEG, we need to decode it before we can do
@@ -160,7 +174,7 @@ Image* Frame::Convert(Image* image, VideoMode::PixelFormat pixelFormat,
     if (pixelFormat == VideoMode::kBGR) return cur;
   }
 
-  // Color convert; if ultimate destination is JPEG, we need to convert to BGR
+  // Color convert
   switch (pixelFormat) {
     case VideoMode::kRGB565:
       // If source is YUYV or Gray, need to convert to BGR first
@@ -208,7 +222,7 @@ Image* Frame::Convert(Image* image, VideoMode::PixelFormat pixelFormat,
         if (pixelFormat == VideoMode::kBGR)
           return ConvertGrayToBGR(cur);
         else
-          return ConvertGrayToMJPEG(cur, jpegQuality);
+          return ConvertGrayToMJPEG(cur, defaultJpegQuality);
       }
       break;
     case VideoMode::kYUYV:
@@ -218,7 +232,7 @@ Image* Frame::Convert(Image* image, VideoMode::PixelFormat pixelFormat,
 
   // Compress if destination is JPEG
   if (pixelFormat == VideoMode::kMJPEG)
-    cur = ConvertBGRToMJPEG(cur, jpegQuality);
+    cur = ConvertBGRToMJPEG(cur, defaultJpegQuality);
 
   return cur;
 }
@@ -427,12 +441,14 @@ Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
   return rv;
 }
 
-Image* Frame::GetImage(int width, int height,
-                       VideoMode::PixelFormat pixelFormat, int jpegQuality) {
+Image* Frame::GetImageImpl(int width, int height,
+                           VideoMode::PixelFormat pixelFormat,
+                           int requiredJpegQuality, int defaultJpegQuality) {
   if (!m_impl) return nullptr;
   std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
-  Image* cur = GetNearestImage(width, height, pixelFormat);
-  if (!cur || cur->Is(width, height, pixelFormat)) return cur;
+  Image* cur = GetNearestImage(width, height, pixelFormat, requiredJpegQuality);
+  if (!cur || cur->Is(width, height, pixelFormat, requiredJpegQuality))
+    return cur;
 
   DEBUG4("converting image from "
          << cur->width << "x" << cur->height << " type " << cur->pixelFormat
@@ -440,8 +456,8 @@ Image* Frame::GetImage(int width, int height,
 
   // If the source image is a JPEG, we need to decode it before we can do
   // anything else with it.  Note that if the destination format is JPEG, we
-  // still need to do this (unless the width/height were the same, in which
-  // case we already returned the existing JPEG above).
+  // still need to do this (unless the width/height/compression were the same,
+  // in which case we already returned the existing JPEG above).
   if (cur->pixelFormat == VideoMode::kMJPEG) cur = ConvertMJPEGToBGR(cur);
 
   // Resize
@@ -461,7 +477,7 @@ Image* Frame::GetImage(int width, int height,
   }
 
   // Convert to output format
-  return Convert(cur, pixelFormat, jpegQuality);
+  return ConvertImpl(cur, pixelFormat, requiredJpegQuality, defaultJpegQuality);
 }
 
 bool Frame::GetCv(cv::Mat& image, int width, int height) {

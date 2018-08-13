@@ -5,19 +5,19 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Interrupts.h"
+#include "hal/Interrupts.h"
 
 #include <memory>
 
 #include <wpi/SafeThread.h>
 
 #include "DigitalInternal.h"
-#include "HAL/ChipObject.h"
-#include "HAL/Errors.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "HAL/handles/LimitedHandleResource.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/ChipObject.h"
+#include "hal/Errors.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/LimitedHandleResource.h"
 
 using namespace hal;
 

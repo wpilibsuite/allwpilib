@@ -7,11 +7,11 @@
 
 #include <cmath>
 
-#include "ADXL345_SPI.h"
-#include "AnalogGyro.h"
-#include "Servo.h"
 #include "TestBench.h"
-#include "Timer.h"
+#include "frc/ADXL345_SPI.h"
+#include "frc/AnalogGyro.h"
+#include "frc/Servo.h"
+#include "frc/Timer.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

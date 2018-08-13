@@ -22,7 +22,6 @@ import java.util.function.Consumer;
 public final class NetworkTable {
   /**
    * The path separator for sub-tables and keys.
-   *
    */
   public static final char PATH_SEPARATOR = '/';
 
@@ -33,6 +32,7 @@ public final class NetworkTable {
   /**
    * Gets the "base name" of a key. For example, "/foo/bar" becomes "bar".
    * If the key has a trailing slash, returns an empty string.
+   *
    * @param key key
    * @return base name
    */
@@ -95,6 +95,7 @@ public final class NetworkTable {
    * Gets a list of the names of all the super tables of a given key. For
    * example, the key "/foo/bar/baz" has a hierarchy of "/", "/foo",
    * "/foo/bar", and "/foo/bar/baz".
+   *
    * @param key the key
    * @return List of super tables
    */
@@ -128,6 +129,7 @@ public final class NetworkTable {
 
   /**
    * Gets the instance for the table.
+   *
    * @return Instance
    */
   public NetworkTableInstance getInstance() {
@@ -143,6 +145,7 @@ public final class NetworkTable {
 
   /**
    * Gets the entry for a sub key.
+   *
    * @param key the key name
    * @return Network table entry.
    */
@@ -157,6 +160,7 @@ public final class NetworkTable {
 
   /**
    * Listen to keys only within this table.
+   *
    * @param listener    listener to add
    * @param flags       {@link EntryListenerFlags} bitmask
    * @return Listener handle
@@ -175,6 +179,7 @@ public final class NetworkTable {
 
   /**
    * Listen to a single key.
+   *
    * @param key         the key name
    * @param listener    listener to add
    * @param flags       {@link EntryListenerFlags} bitmask
@@ -188,6 +193,7 @@ public final class NetworkTable {
 
   /**
    * Remove an entry listener.
+   *
    * @param listener    listener handle
    */
   public void removeEntryListener(int listener) {
@@ -198,6 +204,7 @@ public final class NetworkTable {
    * Listen for sub-table creation.
    * This calls the listener once for each newly created sub-table.
    * It immediately calls the listener for any existing sub-tables.
+   *
    * @param listener        listener to add
    * @param localNotify     notify local changes as well as remote
    * @return Listener handle
@@ -233,6 +240,7 @@ public final class NetworkTable {
 
   /**
    * Remove a sub-table listener.
+   *
    * @param listener    listener handle
    */
   public void removeTableListener(int listener) {
@@ -275,6 +283,7 @@ public final class NetworkTable {
 
   /**
    * Gets all keys in the table (not including sub-tables).
+   *
    * @param types bitmask of types; 0 is treated as a "don't care".
    * @return keys currently in the table
    */
@@ -297,6 +306,7 @@ public final class NetworkTable {
 
   /**
    * Gets all keys in the table (not including sub-tables).
+   *
    * @return keys currently in the table
    */
   public Set<String> getKeys() {
@@ -305,6 +315,7 @@ public final class NetworkTable {
 
   /**
    * Gets the names of all subtables in the table.
+   *
    * @return subtables currently in the table
    */
   public Set<String> getSubTables() {
@@ -344,6 +355,7 @@ public final class NetworkTable {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
+   *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
@@ -372,6 +384,7 @@ public final class NetworkTable {
   /**
    * Save table values to a file.  The file format used is identical to
    * that used for SavePersistent.
+   *
    * @param filename  filename
    * @throws PersistentException if error saving file
    */
@@ -382,6 +395,7 @@ public final class NetworkTable {
   /**
    * Load table values from a file.  The file format used is identical to
    * that used for SavePersistent / LoadPersistent.
+   *
    * @param filename  filename
    * @return List of warnings (errors result in an exception instead)
    * @throws PersistentException if error saving file

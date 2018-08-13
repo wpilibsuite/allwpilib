@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <IterativeRobot.h>
-#include <PowerDistributionPanel.h>
-#include <SmartDashboard/SmartDashboard.h>
+#include <frc/IterativeRobot.h>
+#include <frc/PowerDistributionPanel.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 /**
  * This is a sample program showing how to retrieve information from the Power

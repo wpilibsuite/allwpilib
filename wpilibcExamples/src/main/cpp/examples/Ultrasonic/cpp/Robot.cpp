@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <AnalogInput.h>
-#include <Drive/DifferentialDrive.h>
-#include <IterativeRobot.h>
-#include <Spark.h>
+#include <frc/AnalogInput.h>
+#include <frc/IterativeRobot.h>
+#include <frc/Spark.h>
+#include <frc/drive/DifferentialDrive.h>
 
 /**
  * This is a sample program demonstrating how to use an ultrasonic sensor and

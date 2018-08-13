@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Encoder.h"
-#include "Filters/LinearDigitalFilter.h"
-#include "Jaguar.h"
-#include "PIDController.h"
-#include "Talon.h"
 #include "TestBench.h"
-#include "Timer.h"
-#include "Victor.h"
+#include "frc/Encoder.h"
+#include "frc/Jaguar.h"
+#include "frc/PIDController.h"
+#include "frc/Talon.h"
+#include "frc/Timer.h"
+#include "frc/Victor.h"
+#include "frc/filters/LinearDigitalFilter.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

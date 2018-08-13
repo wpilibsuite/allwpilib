@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "SampleRobot.h"
+#include "frc/SampleRobot.h"
 
 #include <networktables/NetworkTable.h>
 #include <wpi/raw_ostream.h>
 
-#include "DriverStation.h"
-#include "LiveWindow/LiveWindow.h"
-#include "Timer.h"
+#include "frc/DriverStation.h"
+#include "frc/Timer.h"
+#include "frc/livewindow/LiveWindow.h"
 
 using namespace frc;
 

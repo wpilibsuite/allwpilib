@@ -56,6 +56,7 @@ public final class LogMessage {
 
   /** Constructor.
    * This should generally only be used internally to NetworkTables.
+   *
    * @param inst Instance
    * @param logger Logger
    * @param level Log level

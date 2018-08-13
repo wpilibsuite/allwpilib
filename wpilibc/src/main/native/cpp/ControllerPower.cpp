@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ControllerPower.h"
+#include "frc/ControllerPower.h"
 
 #include <stdint.h>
 
-#include <HAL/HAL.h>
-#include <HAL/Power.h>
+#include <hal/HAL.h>
+#include <hal/Power.h>
 
-#include "ErrorBase.h"
+#include "frc/ErrorBase.h"
 
 using namespace frc;
 

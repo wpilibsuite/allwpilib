@@ -7,9 +7,15 @@
 
 #include <jni.h>
 
+#include <cstring>
+
+#include <wpi/jni_util.h>
+
 #include "CallbackStore.h"
-#include "MockData/DriverStationData.h"
 #include "edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI.h"
+#include "mockdata/DriverStationData.h"
+
+using namespace wpi::java;
 
 extern "C" {
 
@@ -388,12 +394,28 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setJoystickButtons
 /*
  * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
  * Method:    setMatchInfo
- * Signature: (Ljava/lang/Object;)V
+ * Signature: (Ljava/lang/String;Ljava/lang/String;III)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setMatchInfo
-  (JNIEnv* env, jclass, jobject info)
-{}
+  (JNIEnv* env, jclass, jstring eventName, jstring gameSpecificMessage,
+   jint matchNumber, jint replayNumber, jint matchType)
+{
+  JStringRef eventNameRef{env, eventName};
+  JStringRef gameSpecificMessageRef{env, gameSpecificMessage};
+
+  HAL_MatchInfo halMatchInfo;
+  std::snprintf(halMatchInfo.eventName, sizeof(halMatchInfo.eventName), "%s",
+                eventNameRef.c_str());
+  std::snprintf(reinterpret_cast<char*>(halMatchInfo.gameSpecificMessage),
+                sizeof(halMatchInfo.gameSpecificMessage), "%s",
+                gameSpecificMessageRef.c_str());
+  halMatchInfo.gameSpecificMessageSize = gameSpecificMessageRef.size();
+  halMatchInfo.matchType = (HAL_MatchType)matchType;
+  halMatchInfo.matchNumber = matchNumber;
+  halMatchInfo.replayNumber = replayNumber;
+  HALSIM_SetMatchInfo(&halMatchInfo);
+}
 
 /*
  * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI

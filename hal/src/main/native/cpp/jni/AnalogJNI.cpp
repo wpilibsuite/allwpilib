@@ -9,15 +9,15 @@
 
 #include <cassert>
 
-#include "HAL/AnalogAccumulator.h"
-#include "HAL/AnalogInput.h"
-#include "HAL/AnalogOutput.h"
-#include "HAL/AnalogTrigger.h"
-#include "HAL/Ports.h"
-#include "HAL/cpp/Log.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_AnalogJNI.h"
+#include "hal/AnalogAccumulator.h"
+#include "hal/AnalogInput.h"
+#include "hal/AnalogOutput.h"
+#include "hal/AnalogTrigger.h"
+#include "hal/Ports.h"
+#include "hal/cpp/Log.h"
+#include "hal/handles/HandlesInternal.h"
 
 using namespace frc;
 

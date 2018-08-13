@@ -9,7 +9,7 @@
 
 #include <cstring>
 
-#include "MockData/I2CData.h"
+#include <mockdata/I2CData.h>
 
 using namespace hal;
 

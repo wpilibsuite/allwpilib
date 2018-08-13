@@ -33,6 +33,7 @@ public final class RpcAnswer {
 
   /** Constructor.
    * This should generally only be used internally to NetworkTables.
+   *
    * @param inst Instance
    * @param entry Entry handle
    * @param call Call handle
@@ -65,6 +66,7 @@ public final class RpcAnswer {
 
   /**
    * Determines if the native handle is valid.
+   *
    * @return True if the native handle is valid, false otherwise.
    */
   public boolean isValid() {
@@ -73,6 +75,7 @@ public final class RpcAnswer {
 
   /**
    * Post RPC response (return value) for a polled RPC.
+   *
    * @param result  result raw data that will be provided to remote caller
    * @return        true if the response was posted, otherwise false
    */
@@ -90,6 +93,7 @@ public final class RpcAnswer {
 
   /**
    * Get the entry as an object.
+   *
    * @return NetworkTableEntry for the RPC.
    */
   NetworkTableEntry getEntry() {

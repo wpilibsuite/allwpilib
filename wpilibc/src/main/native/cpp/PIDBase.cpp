@@ -5,15 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PIDBase.h"
+#include "frc/PIDBase.h"
 
 #include <algorithm>
 #include <cmath>
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "PIDOutput.h"
-#include "SmartDashboard/SendableBuilder.h"
+#include "frc/PIDOutput.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

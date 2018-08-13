@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/PDP.h"
-#include "HAL/Ports.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_PDPJNI.h"
+#include "hal/PDP.h"
+#include "hal/Ports.h"
 
 using namespace frc;
 

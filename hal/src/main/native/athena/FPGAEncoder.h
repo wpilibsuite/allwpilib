@@ -9,8 +9,8 @@
 
 #include <stdint.h>
 
-#include "HAL/AnalogTrigger.h"
-#include "HAL/Types.h"
+#include "hal/AnalogTrigger.h"
+#include "hal/Types.h"
 
 extern "C" {
 

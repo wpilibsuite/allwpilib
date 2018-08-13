@@ -89,6 +89,14 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
     Invoke(&uv_udp_bind, GetRaw(), &addr, flags);
   }
 
+  void Bind(const sockaddr_in& addr, unsigned int flags = 0) {
+    Bind(reinterpret_cast<const sockaddr&>(addr), flags);
+  }
+
+  void Bind(const sockaddr_in6& addr, unsigned int flags = 0) {
+    Bind(reinterpret_cast<const sockaddr&>(addr), flags);
+  }
+
   /**
    * Bind the handle to an IPv4 address and port.
    *
@@ -186,6 +194,16 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
   void Send(const sockaddr& addr, ArrayRef<Buffer> bufs,
             const std::shared_ptr<UdpSendReq>& req);
 
+  void Send(const sockaddr_in& addr, ArrayRef<Buffer> bufs,
+            const std::shared_ptr<UdpSendReq>& req) {
+    Send(reinterpret_cast<const sockaddr&>(addr), bufs, req);
+  }
+
+  void Send(const sockaddr_in6& addr, ArrayRef<Buffer> bufs,
+            const std::shared_ptr<UdpSendReq>& req) {
+    Send(reinterpret_cast<const sockaddr&>(addr), bufs, req);
+  }
+
   /**
    * Send data over the UDP socket.  If the socket has not previously been bound
    * with Bind() it will be bound to 0.0.0.0 (the "all interfaces" IPv4 address)
@@ -206,6 +224,16 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
   void Send(const sockaddr& addr, ArrayRef<Buffer> bufs,
             std::function<void(MutableArrayRef<Buffer>, Error)> callback);
 
+  void Send(const sockaddr_in& addr, ArrayRef<Buffer> bufs,
+            std::function<void(MutableArrayRef<Buffer>, Error)> callback) {
+    Send(reinterpret_cast<const sockaddr&>(addr), bufs, callback);
+  }
+
+  void Send(const sockaddr_in6& addr, ArrayRef<Buffer> bufs,
+            std::function<void(MutableArrayRef<Buffer>, Error)> callback) {
+    Send(reinterpret_cast<const sockaddr&>(addr), bufs, callback);
+  }
+
   /**
    * Same as Send(), but won't queue a send request if it can't be completed
    * immediately.
@@ -222,6 +250,14 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
       return 0;
     }
     return val;
+  }
+
+  int TrySend(const sockaddr_in& addr, ArrayRef<Buffer> bufs) {
+    return TrySend(reinterpret_cast<const sockaddr&>(addr), bufs);
+  }
+
+  int TrySend(const sockaddr_in6& addr, ArrayRef<Buffer> bufs) {
+    return TrySend(reinterpret_cast<const sockaddr&>(addr), bufs);
   }
 
   /**

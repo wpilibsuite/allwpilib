@@ -7,8 +7,8 @@
 
 #include "NTProvider_PWM.h"
 
-#include <HAL/Ports.h>
-#include <MockData/PWMData.h>
+#include <hal/Ports.h>
+#include <mockdata/PWMData.h>
 
 void HALSimNTProviderPWM::Initialize() {
   InitializeDefault(HAL_GetNumPWMChannels(), HALSIM_RegisterPWMAllCallbacks);

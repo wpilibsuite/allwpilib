@@ -29,7 +29,8 @@ using wpi::ArrayRef;
 using wpi::StringRef;
 using wpi::Twine;
 
-/** NetworkTables Instance.
+/**
+ * NetworkTables Instance.
  *
  * Instances are completely independent from each other.  Table operations on
  * one instance will not be visible to other instances unless the instances are
@@ -46,6 +47,8 @@ using wpi::Twine;
  * Additional instances can be created with the Create() function.
  * Instances are not reference counted or RAII.  Instead, they must be
  * explicitly destroyed (with Destroy()).
+ *
+ * @ingroup ntcore_cpp_api
  */
 class NetworkTableInstance final {
  public:
@@ -88,42 +91,49 @@ class NetworkTableInstance final {
 
   /**
    * Construct from native handle.
+   *
    * @param handle Native handle
    */
   explicit NetworkTableInstance(NT_Inst inst) noexcept;
 
   /**
    * Determines if the native handle is valid.
+   *
    * @return True if the native handle is valid, false otherwise.
    */
   explicit operator bool() const { return m_handle != 0; }
 
   /**
    * Get global default instance.
+   *
    * @return Global default instance
    */
   static NetworkTableInstance GetDefault();
 
   /**
    * Create an instance.
+   *
    * @return Newly created instance
    */
   static NetworkTableInstance Create();
 
   /**
    * Destroys an instance (note: this has global effect).
+   *
    * @param inst Instance
    */
   static void Destroy(NetworkTableInstance inst);
 
   /**
    * Gets the native handle for the entry.
+   *
    * @return Native handle
    */
   NT_Inst GetHandle() const;
 
   /**
    * Gets the entry for a key.
+   *
    * @param name Key
    * @return Network table entry.
    */
@@ -131,6 +141,7 @@ class NetworkTableInstance final {
 
   /**
    * Get entries starting with the given prefix.
+   *
    * The results are optionally filtered by string prefix and entry type to
    * only return a subset of all entries.
    *
@@ -144,6 +155,7 @@ class NetworkTableInstance final {
 
   /**
    * Get information about entries starting with the given prefix.
+   *
    * The results are optionally filtered by string prefix and entry type to
    * only return a subset of all entries.
    *
@@ -170,8 +182,8 @@ class NetworkTableInstance final {
   void DeleteAllEntries();
 
   /**
-   * @defgroup EntryListenerFunctions Entry Listener Functions
    * @{
+   * @name Entry Listener Functions
    */
 
   /**
@@ -189,6 +201,7 @@ class NetworkTableInstance final {
 
   /**
    * Remove an entry listener.
+   *
    * @param entry_listener Listener handle to remove
    */
   static void RemoveEntryListener(NT_EntryListener entry_listener);
@@ -198,6 +211,7 @@ class NetworkTableInstance final {
    * for deterministic testing.  This blocks until either the entry listener
    * queue is empty (e.g. there are no more events that need to be passed along
    * to callbacks or poll queues) or the timeout expires.
+   *
    * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
    *                  or a negative value to block indefinitely
    * @return False if timed out, otherwise true.
@@ -207,8 +221,8 @@ class NetworkTableInstance final {
   /** @} */
 
   /**
-   * @defgroup ConnectionListenerFunctions Connection Listener Functions
    * @{
+   * @name Connection Listener Functions
    */
 
   /**
@@ -224,17 +238,17 @@ class NetworkTableInstance final {
 
   /**
    * Remove a connection listener.
+   *
    * @param conn_listener Listener handle to remove
    */
   static void RemoveConnectionListener(NT_ConnectionListener conn_listener);
 
   /**
    * Wait for the connection listener queue to be empty.  This is primarily
-   * useful
-   * for deterministic testing.  This blocks until either the connection
-   * listener
-   * queue is empty (e.g. there are no more events that need to be passed along
-   * to callbacks or poll queues) or the timeout expires.
+   * useful for deterministic testing.  This blocks until either the connection
+   * listener queue is empty (e.g. there are no more events that need to be
+   * passed along to callbacks or poll queues) or the timeout expires.
+   *
    * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
    *                  or a negative value to block indefinitely
    * @return False if timed out, otherwise true.
@@ -244,8 +258,8 @@ class NetworkTableInstance final {
   /** @} */
 
   /**
-   * @defgroup RpcFunctions Remote Procedure Call Functions
    * @{
+   * @name Remote Procedure Call Functions
    */
 
   /**
@@ -253,6 +267,7 @@ class NetworkTableInstance final {
    * for deterministic testing.  This blocks until either the RPC call
    * queue is empty (e.g. there are no more events that need to be passed along
    * to callbacks or poll queues) or the timeout expires.
+   *
    * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
    *                  or a negative value to block indefinitely
    * @return False if timed out, otherwise true.
@@ -262,20 +277,23 @@ class NetworkTableInstance final {
   /** @} */
 
   /**
-   * @defgroup NetworkFunctions Client/Server Functions
    * @{
+   * @name Client/Server Functions
    */
 
   /**
    * Set the network identity of this node.
+   *
    * This is the name used during the initial connection handshake, and is
    * visible through ConnectionInfo on the remote node.
+   *
    * @param name      identity to advertise
    */
   void SetNetworkIdentity(const Twine& name);
 
   /**
    * Get the current network mode.
+   *
    * @return Bitmask of NetworkMode.
    */
   unsigned int GetNetworkMode() const;
@@ -410,12 +428,14 @@ class NetworkTableInstance final {
   /**
    * Get information on the currently established network connections.
    * If operating as a client, this will return either zero or one values.
+   *
    * @return array of connection information
    */
   std::vector<ConnectionInfo> GetConnections() const;
 
   /**
    * Return whether or not the instance is connected to another node.
+   *
    * @return True if connected.
    */
   bool IsConnected() const;
@@ -423,14 +443,15 @@ class NetworkTableInstance final {
   /** @} */
 
   /**
-   * @defgroup FileFunctions File Save/Load Functions
    * @{
+   * @name File Save/Load Functions
    */
 
   /**
    * Save persistent values to a file.  The server automatically does this,
    * but this function provides a way to save persistent values in the same
    * format to a file on either a client or a server.
+   *
    * @param filename  filename
    * @return error string, or nullptr if successful
    */
@@ -440,6 +461,7 @@ class NetworkTableInstance final {
    * Load persistent values from a file.  The server automatically does this
    * at startup, but this function provides a way to restore persistent values
    * in the same format from a file at any time on either a client or a server.
+   *
    * @param filename  filename
    * @param warn      callback function for warnings
    * @return error string, or nullptr if successful
@@ -451,6 +473,7 @@ class NetworkTableInstance final {
   /**
    * Save table values to a file.  The file format used is identical to
    * that used for SavePersistent.
+   *
    * @param filename  filename
    * @param prefix    save only keys starting with this prefix
    * @return error string, or nullptr if successful
@@ -460,6 +483,7 @@ class NetworkTableInstance final {
   /**
    * Load table values from a file.  The file format used is identical to
    * that used for SavePersistent / LoadPersistent.
+   *
    * @param filename  filename
    * @param prefix    load only keys starting with this prefix
    * @param warn      callback function for warnings
@@ -472,8 +496,8 @@ class NetworkTableInstance final {
   /** @} */
 
   /**
-   * @defgroup LoggerFunctions Logger Functions
    * @{
+   * @name Logger Functions
    */
 
   /**
@@ -493,16 +517,17 @@ class NetworkTableInstance final {
 
   /**
    * Remove a logger.
+   *
    * @param logger Logger handle to remove
    */
   static void RemoveLogger(NT_Logger logger);
 
   /**
    * Wait for the incoming log event queue to be empty.  This is primarily
-   * useful
-   * for deterministic testing.  This blocks until either the log event
+   * useful for deterministic testing.  This blocks until either the log event
    * queue is empty (e.g. there are no more events that need to be passed along
    * to callbacks or poll queues) or the timeout expires.
+   *
    * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
    *                  or a negative value to block indefinitely
    * @return False if timed out, otherwise true.

@@ -5,24 +5,24 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DriverStation.h"
+#include "frc/DriverStation.h"
 
 #include <chrono>
 
-#include <HAL/HAL.h>
-#include <HAL/Power.h>
-#include <HAL/cpp/Log.h>
+#include <hal/HAL.h>
+#include <hal/Power.h>
+#include <hal/cpp/Log.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
 
-#include "AnalogInput.h"
-#include "MotorSafetyHelper.h"
-#include "Timer.h"
-#include "Utility.h"
-#include "WPIErrors.h"
+#include "frc/AnalogInput.h"
+#include "frc/MotorSafetyHelper.h"
+#include "frc/Timer.h"
+#include "frc/Utility.h"
+#include "frc/WPIErrors.h"
 
 namespace frc {
 

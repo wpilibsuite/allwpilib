@@ -9,7 +9,7 @@
 
 #include <cstring>
 
-#include "MockData/SPIData.h"
+#include <mockdata/SPIData.h>
 
 using namespace hal;
 

@@ -7,8 +7,8 @@
 
 #include <thread>
 
-#include <CameraServer.h>
-#include <IterativeRobot.h>
+#include <cameraserver/CameraServer.h>
+#include <frc/IterativeRobot.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>

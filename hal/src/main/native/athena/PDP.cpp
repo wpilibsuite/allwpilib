@@ -5,16 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/PDP.h"
+#include "hal/PDP.h"
 
 #include <memory>
 
-#include "HAL/CANAPI.h"
-#include "HAL/Errors.h"
-#include "HAL/Ports.h"
-#include "HAL/handles/IndexedHandleResource.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/CANAPI.h"
+#include "hal/Errors.h"
+#include "hal/Ports.h"
+#include "hal/handles/IndexedHandleResource.h"
 
 using namespace hal;
 

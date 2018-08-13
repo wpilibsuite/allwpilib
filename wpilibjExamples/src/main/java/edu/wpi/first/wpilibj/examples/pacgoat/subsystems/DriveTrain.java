@@ -38,7 +38,7 @@ public class DriveTrain extends Subsystem {
   private final DifferentialDrive m_drive;
   private final Encoder m_rightEncoder = new Encoder(1, 2, true, EncodingType.k4X);
   private final Encoder m_leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
-  private final AnalogGyro m_gyro = new AnalogGyro(2);
+  private final AnalogGyro m_gyro = new AnalogGyro(0);
 
   /**
    * Create a new drive train subsystem.

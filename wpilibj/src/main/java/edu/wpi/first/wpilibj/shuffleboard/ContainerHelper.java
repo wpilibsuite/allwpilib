@@ -26,7 +26,7 @@ final class ContainerHelper {
   private final ShuffleboardContainer m_container;
   private final Set<String> m_usedTitles = new HashSet<>();
   private final List<ShuffleboardComponent<?>> m_components = new ArrayList<>();
-  private final Map<String, ShuffleboardLayout> m_layouts = new LinkedHashMap<>(); // NOPMD
+  private final Map<String, ShuffleboardLayout> m_layouts = new LinkedHashMap<>();
 
   ContainerHelper(ShuffleboardContainer container) {
     m_container = container;

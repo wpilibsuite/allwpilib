@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PWMSpeedController.h"
+#include "frc/PWMSpeedController.h"
 
-#include "SmartDashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -33,6 +33,7 @@ PWMSpeedController::PWMSpeedController(int channel) : SafePWM(channel) {}
 
 void PWMSpeedController::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Speed Controller");
+  builder.SetActuator(true);
   builder.SetSafeState([=]() { SetDisabled(); });
   builder.AddDoubleProperty("Value", [=]() { return GetSpeed(); },
                             [=](double value) { SetSpeed(value); });

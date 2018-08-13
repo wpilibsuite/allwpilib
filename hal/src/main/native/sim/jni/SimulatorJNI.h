@@ -9,9 +9,9 @@
 
 #include <wpi/jni_util.h>
 
-#include "HAL/Types.h"
-#include "MockData/HAL_Value.h"
+#include "hal/Types.h"
 #include "jni.h"
+#include "mockdata/HAL_Value.h"
 
 typedef HAL_Handle SIM_JniHandle;
 

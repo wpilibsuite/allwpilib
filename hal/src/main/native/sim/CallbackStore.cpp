@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Simulation/CallbackStore.h"
+#include "simulation/CallbackStore.h"
 
 void frc::sim::CallbackStoreThunk(const char* name, void* param,
                                   const HAL_Value* value) {

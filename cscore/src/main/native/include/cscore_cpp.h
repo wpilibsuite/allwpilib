@@ -26,23 +26,31 @@ class Mat;
 
 namespace cs {
 
-//
-// Handle-based interface for C++.  Users are encouraged to use the
-// object oriented interface instead; this interface is intended for use
-// in applications such as JNI which require handle-based access.
-//
+/**
+ * @defgroup cscore_cpp_api cscore C++ function API
+ *
+ * Handle-based interface for C++.  Users are encouraged to use the
+ * object oriented interface instead; this interface is intended for use
+ * in applications such as JNI which require handle-based access.
+ *
+ * @{
+ */
 
-/// USB camera information
+/**
+ * USB camera information
+ */
 struct UsbCameraInfo {
-  /// Device number (e.g. N in '/dev/videoN' on Linux)
+  /** Device number (e.g. N in '/dev/videoN' on Linux) */
   int dev;
-  /// Path to device if available (e.g. '/dev/video0' on Linux)
+  /** Path to device if available (e.g. '/dev/video0' on Linux) */
   std::string path;
-  /// Vendor/model name of the camera as provided by the USB driver
+  /** Vendor/model name of the camera as provided by the USB driver */
   std::string name;
 };
 
-/// Video mode
+/**
+ * Video mode
+ */
 struct VideoMode : public CS_VideoMode {
   enum PixelFormat {
     kUnknown = CS_PIXFMT_UNKNOWN,
@@ -67,7 +75,9 @@ struct VideoMode : public CS_VideoMode {
   explicit operator bool() const { return pixelFormat == kUnknown; }
 };
 
-/// Listener event
+/**
+ * Listener event
+ */
 struct RawEvent {
   enum Kind {
     kSourceCreated = CS_SOURCE_CREATED,
@@ -85,7 +95,10 @@ struct RawEvent {
     kSinkEnabled = CS_SINK_ENABLED,
     kSinkDisabled = CS_SINK_DISABLED,
     kNetworkInterfacesChanged = CS_NETWORK_INTERFACES_CHANGED,
-    kTelemetryUpdated = CS_TELEMETRY_UPDATED
+    kTelemetryUpdated = CS_TELEMETRY_UPDATED,
+    kSinkPropertyCreated = CS_SINK_PROPERTY_CREATED,
+    kSinkPropertyValueUpdated = CS_SINK_PROPERTY_VALUE_UPDATED,
+    kSinkPropertyChoicesUpdated = CS_SINK_PROPERTY_CHOICES_UPDATED
   };
 
   RawEvent() = default;
@@ -133,9 +146,10 @@ struct RawEvent {
   std::string valueStr;
 };
 
-//
-// Property Functions
-//
+/**
+ * @defgroup cscore_property_func Property Functions
+ * @{
+ */
 CS_PropertyKind GetPropertyKind(CS_Property property, CS_Status* status);
 std::string GetPropertyName(CS_Property property, CS_Status* status);
 wpi::StringRef GetPropertyName(CS_Property property,
@@ -155,10 +169,12 @@ void SetStringProperty(CS_Property property, wpi::StringRef value,
                        CS_Status* status);
 std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
                                                 CS_Status* status);
+/** @} */
 
-//
-// Source Creation Functions
-//
+/**
+ * @defgroup cscore_source_create_func Source Creation Functions
+ * @{
+ */
 CS_Source CreateUsbCameraDev(wpi::StringRef name, int dev, CS_Status* status);
 CS_Source CreateUsbCameraPath(wpi::StringRef name, wpi::StringRef path,
                               CS_Status* status);
@@ -168,10 +184,12 @@ CS_Source CreateHttpCamera(wpi::StringRef name, wpi::ArrayRef<std::string> urls,
                            CS_HttpCameraKind kind, CS_Status* status);
 CS_Source CreateCvSource(wpi::StringRef name, const VideoMode& mode,
                          CS_Status* status);
+/** @} */
 
-//
-// Source Functions
-//
+/**
+ * @defgroup cscore_source_func Source Functions
+ * @{
+ */
 CS_SourceKind GetSourceKind(CS_Source source, CS_Status* status);
 std::string GetSourceName(CS_Source source, CS_Status* status);
 wpi::StringRef GetSourceName(CS_Source source, wpi::SmallVectorImpl<char>& buf,
@@ -202,10 +220,12 @@ wpi::ArrayRef<CS_Sink> EnumerateSourceSinks(CS_Source source,
                                             CS_Status* status);
 CS_Source CopySource(CS_Source source, CS_Status* status);
 void ReleaseSource(CS_Source source, CS_Status* status);
+/** @} */
 
-//
-// Camera Source Common Property Fuctions
-//
+/**
+ * @defgroup cscore_camera_property_func Camera Source Common Property Fuctions
+ * @{
+ */
 void SetCameraBrightness(CS_Source source, int brightness, CS_Status* status);
 int GetCameraBrightness(CS_Source source, CS_Status* status);
 void SetCameraWhiteBalanceAuto(CS_Source source, CS_Status* status);
@@ -215,23 +235,29 @@ void SetCameraWhiteBalanceManual(CS_Source source, int value,
 void SetCameraExposureAuto(CS_Source source, CS_Status* status);
 void SetCameraExposureHoldCurrent(CS_Source source, CS_Status* status);
 void SetCameraExposureManual(CS_Source source, int value, CS_Status* status);
+/** @} */
 
-//
-// UsbCamera Source Functions
-//
+/**
+ * @defgroup cscore_usbcamera_func UsbCamera Source Functions
+ * @{
+ */
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status);
+/** @} */
 
-//
-// HttpCamera Source Functions
-//
+/**
+ * @defgroup cscore_httpcamera_func HttpCamera Source Functions
+ * @{
+ */
 CS_HttpCameraKind GetHttpCameraKind(CS_Source source, CS_Status* status);
 void SetHttpCameraUrls(CS_Source source, wpi::ArrayRef<std::string> urls,
                        CS_Status* status);
 std::vector<std::string> GetHttpCameraUrls(CS_Source source, CS_Status* status);
+/** @} */
 
-//
-// OpenCV Source Functions
-//
+/**
+ * @defgroup cscore_opencv_source_func OpenCV Source Functions
+ * @{
+ */
 void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status);
 void NotifySourceError(CS_Source source, wpi::StringRef msg, CS_Status* status);
 void SetSourceConnected(CS_Source source, bool connected, CS_Status* status);
@@ -244,20 +270,24 @@ CS_Property CreateSourceProperty(CS_Source source, wpi::StringRef name,
 void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
                                   wpi::ArrayRef<std::string> choices,
                                   CS_Status* status);
+/** @} */
 
-//
-// Sink Creation Functions
-//
+/**
+ * @defgroup cscore_sink_create_func Sink Creation Functions
+ * @{
+ */
 CS_Sink CreateMjpegServer(wpi::StringRef name, wpi::StringRef listenAddress,
                           int port, CS_Status* status);
 CS_Sink CreateCvSink(wpi::StringRef name, CS_Status* status);
 CS_Sink CreateCvSinkCallback(wpi::StringRef name,
                              std::function<void(uint64_t time)> processFrame,
                              CS_Status* status);
+/** @} */
 
-//
-// Sink Functions
-//
+/**
+ * @defgroup cscore_sink_func Sink Functions
+ * @{
+ */
 CS_SinkKind GetSinkKind(CS_Sink sink, CS_Status* status);
 std::string GetSinkName(CS_Sink sink, CS_Status* status);
 wpi::StringRef GetSinkName(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
@@ -265,22 +295,30 @@ wpi::StringRef GetSinkName(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
 std::string GetSinkDescription(CS_Sink sink, CS_Status* status);
 wpi::StringRef GetSinkDescription(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                                   CS_Status* status);
+CS_Property GetSinkProperty(CS_Sink sink, wpi::StringRef name,
+                            CS_Status* status);
+wpi::ArrayRef<CS_Property> EnumerateSinkProperties(
+    CS_Sink sink, wpi::SmallVectorImpl<CS_Property>& vec, CS_Status* status);
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
 CS_Property GetSinkSourceProperty(CS_Sink sink, wpi::StringRef name,
                                   CS_Status* status);
 CS_Source GetSinkSource(CS_Sink sink, CS_Status* status);
 CS_Sink CopySink(CS_Sink sink, CS_Status* status);
 void ReleaseSink(CS_Sink sink, CS_Status* status);
+/** @} */
 
-//
-// MjpegServer Sink Functions
-//
+/**
+ * @defgroup cscore_mjpegserver_func MjpegServer Sink Functions
+ * @{
+ */
 std::string GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status);
 int GetMjpegServerPort(CS_Sink sink, CS_Status* status);
+/** @} */
 
-//
-// OpenCV Sink Functions
-//
+/**
+ * @defgroup cscore_opencv_sink_func OpenCV Sink Functions
+ * @{
+ */
 void SetSinkDescription(CS_Sink sink, wpi::StringRef description,
                         CS_Status* status);
 uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status);
@@ -290,10 +328,12 @@ std::string GetSinkError(CS_Sink sink, CS_Status* status);
 wpi::StringRef GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                             CS_Status* status);
 void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status);
+/** @} */
 
-//
-// Listener Functions
-//
+/**
+ * @defgroup cscore_listener_func Listener Functions
+ * @{
+ */
 void SetListenerOnStart(std::function<void()> onStart);
 void SetListenerOnExit(std::function<void()> onExit);
 
@@ -301,31 +341,37 @@ CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
                         int eventMask, bool immediateNotify, CS_Status* status);
 
 void RemoveListener(CS_Listener handle, CS_Status* status);
+/** @} */
 
 bool NotifierDestroyed();
 
-//
-// Telemetry Functions
-//
+/**
+ * @defgroup cscore_telemetry_func Telemetry Functions
+ * @{
+ */
 void SetTelemetryPeriod(double seconds);
 double GetTelemetryElapsedTime();
 int64_t GetTelemetryValue(CS_Handle handle, CS_TelemetryKind kind,
                           CS_Status* status);
 double GetTelemetryAverageValue(CS_Handle handle, CS_TelemetryKind kind,
                                 CS_Status* status);
+/** @} */
 
-//
-// Logging Functions
-//
+/**
+ * @defgroup cscore_logging_func Logging Functions
+ * @{
+ */
 typedef std::function<void(unsigned int level, const char* file,
                            unsigned int line, const char* msg)>
     LogFunc;
 void SetLogger(LogFunc func, unsigned int min_level);
 void SetDefaultLogger(unsigned int min_level);
+/** @} */
 
-//
-// Utility Functions
-//
+/**
+ * @defgroup cscore_utility_func Utility Functions
+ * @{
+ */
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status);
 
 wpi::ArrayRef<CS_Source> EnumerateSourceHandles(
@@ -336,15 +382,24 @@ wpi::ArrayRef<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
 std::string GetHostname();
 
 std::vector<std::string> GetNetworkInterfaces();
+/** @} */
+
+/** @} */
 
 }  // namespace cs
 
-// C functions taking a cv::Mat* for specific interop implementations
+/**
+ * @defgroup cscore_cpp_opencv_special cscore C functions taking a cv::Mat*
+ *
+ * These are needed for specific interop implementations.
+ * @{
+ */
 extern "C" {
 uint64_t CS_GrabSinkFrameCpp(CS_Sink sink, cv::Mat* image, CS_Status* status);
 uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image,
                                     double timeout, CS_Status* status);
 void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, CS_Status* status);
 }  // extern "C"
+/** @} */
 
 #endif  // CSCORE_CSCORE_CPP_H_

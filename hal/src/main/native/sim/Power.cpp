@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Power.h"
+#include "hal/Power.h"
 
-#include "MockData/RoboRioDataInternal.h"
+#include "mockdata/RoboRioDataInternal.h"
 
 using namespace hal;
 

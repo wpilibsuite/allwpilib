@@ -98,6 +98,13 @@ class Frame {
     return m_impl->images[0]->pixelFormat;
   }
 
+  int GetOriginalJpegQuality() const {
+    if (!m_impl) return 0;
+    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    if (m_impl->images.empty()) return 0;
+    return m_impl->images[0]->jpegQuality;
+  }
+
   Image* GetExistingImage(size_t i = 0) const {
     if (!m_impl) return nullptr;
     std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
@@ -124,12 +131,31 @@ class Frame {
     return nullptr;
   }
 
+  Image* GetExistingImage(int width, int height,
+                          VideoMode::PixelFormat pixelFormat,
+                          int jpegQuality) const {
+    if (!m_impl) return nullptr;
+    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    for (auto i : m_impl->images) {
+      if (i->Is(width, height, pixelFormat, jpegQuality)) return i;
+    }
+    return nullptr;
+  }
+
   Image* GetNearestImage(int width, int height) const;
   Image* GetNearestImage(int width, int height,
-                         VideoMode::PixelFormat pixelFormat) const;
+                         VideoMode::PixelFormat pixelFormat,
+                         int jpegQuality = -1) const;
 
-  Image* Convert(Image* image, VideoMode::PixelFormat pixelFormat,
-                 int jpegQuality = 80);
+  Image* Convert(Image* image, VideoMode::PixelFormat pixelFormat) {
+    if (pixelFormat == VideoMode::kMJPEG) return nullptr;
+    return ConvertImpl(image, pixelFormat, -1, 80);
+  }
+  Image* ConvertToMJPEG(Image* image, int requiredQuality,
+                        int defaultQuality = 80) {
+    return ConvertImpl(image, VideoMode::kMJPEG, requiredQuality,
+                       defaultQuality);
+  }
   Image* ConvertMJPEGToBGR(Image* image);
   Image* ConvertMJPEGToGray(Image* image);
   Image* ConvertYUYVToBGR(Image* image);
@@ -140,8 +166,15 @@ class Frame {
   Image* ConvertBGRToMJPEG(Image* image, int quality);
   Image* ConvertGrayToMJPEG(Image* image, int quality);
 
-  Image* GetImage(int width, int height, VideoMode::PixelFormat pixelFormat,
-                  int jpegQuality = 80);
+  Image* GetImage(int width, int height, VideoMode::PixelFormat pixelFormat) {
+    if (pixelFormat == VideoMode::kMJPEG) return nullptr;
+    return GetImageImpl(width, height, pixelFormat, -1, 80);
+  }
+  Image* GetImageMJPEG(int width, int height, int requiredQuality,
+                       int defaultQuality = 80) {
+    return GetImageImpl(width, height, VideoMode::kMJPEG, requiredQuality,
+                        defaultQuality);
+  }
 
   bool GetCv(cv::Mat& image) {
     return GetCv(image, GetOriginalWidth(), GetOriginalHeight());
@@ -149,6 +182,10 @@ class Frame {
   bool GetCv(cv::Mat& image, int width, int height);
 
  private:
+  Image* ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
+                     int requiredJpegQuality, int defaultJpegQuality);
+  Image* GetImageImpl(int width, int height, VideoMode::PixelFormat pixelFormat,
+                      int requiredJpegQuality, int defaultJpegQuality);
   void DecRef() {
     if (m_impl && --(m_impl->refcount) == 0) ReleaseFrame();
   }

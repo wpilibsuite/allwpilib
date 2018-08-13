@@ -18,7 +18,7 @@
 #include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
 
-#include "HAL/DriverStation.h"
+#include "hal/DriverStation.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");

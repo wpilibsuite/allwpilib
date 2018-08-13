@@ -8,8 +8,8 @@
 #include <jni.h>
 
 #include "CallbackStore.h"
-#include "MockData/EncoderData.h"
 #include "edu_wpi_first_hal_sim_mockdata_EncoderDataJNI.h"
+#include "mockdata/EncoderData.h"
 
 extern "C" {
 

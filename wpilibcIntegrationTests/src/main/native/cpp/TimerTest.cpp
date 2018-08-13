@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Timer.h"  // NOLINT(build/include_order)
+#include "frc/Timer.h"  // NOLINT(build/include_order)
 
 #include "TestBench.h"
 #include "gtest/gtest.h"

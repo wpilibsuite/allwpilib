@@ -5,13 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/AnalogInput.h"
+#include "hal/AnalogInput.h"
 
 #include "AnalogInternal.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
-#include "MockData/AnalogInDataInternal.h"
 #include "PortsInternal.h"
+#include "hal/handles/HandlesInternal.h"
+#include "mockdata/AnalogInDataInternal.h"
 
 using namespace hal;
 

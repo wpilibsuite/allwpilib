@@ -127,6 +127,7 @@ public class VideoSource implements AutoCloseable {
 
   /**
    * Get a property.
+   *
    * @param name Property name
    * @return Property contents (of kind Property::kNone if no property with
    *         the given name exists)
@@ -169,6 +170,7 @@ public class VideoSource implements AutoCloseable {
 
   /**
    * Set the video mode.
+   *
    * @param pixelFormat desired pixel format
    * @param width desired width
    * @param height desired height
@@ -181,6 +183,7 @@ public class VideoSource implements AutoCloseable {
 
   /**
    * Set the pixel format.
+   *
    * @param pixelFormat desired pixel format
    * @return True if set successfully
    */
@@ -190,6 +193,7 @@ public class VideoSource implements AutoCloseable {
 
   /**
    * Set the resolution.
+   *
    * @param width desired width
    * @param height desired height
    * @return True if set successfully
@@ -200,6 +204,7 @@ public class VideoSource implements AutoCloseable {
 
   /**
    * Set the frames per second (FPS).
+   *
    * @param fps desired FPS
    * @return True if set successfully
    */
@@ -209,8 +214,10 @@ public class VideoSource implements AutoCloseable {
 
   /**
    * Get the actual FPS.
-   * CameraServerJNI#setTelemetryPeriod() must be called for this to be valid
+   *
+   * <p>CameraServerJNI#setTelemetryPeriod() must be called for this to be valid
    * (throws VisionException if telemetry is not enabled).
+   *
    * @return Actual FPS averaged over the telemetry period.
    */
   public double getActualFPS() {
@@ -220,8 +227,10 @@ public class VideoSource implements AutoCloseable {
 
   /**
    * Get the data rate (in bytes per second).
-   * CameraServerJNI#setTelemetryPeriod() must be called for this to be valid
+   *
+   * <p>CameraServerJNI#setTelemetryPeriod() must be called for this to be valid
    * (throws VisionException if telemetry is not enabled).
+   *
    * @return Data rate averaged over the telemetry period.
    */
   public double getActualDataRate() {
@@ -238,6 +247,7 @@ public class VideoSource implements AutoCloseable {
 
   /**
    * Enumerate all sinks connected to this source.
+   *
    * @return Vector of sinks.
    */
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
@@ -252,6 +262,7 @@ public class VideoSource implements AutoCloseable {
 
   /**
    * Enumerate all existing sources.
+   *
    * @return Vector of sources.
    */
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")

@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "interfaces/Potentiometer.h"
+#include "frc/interfaces/Potentiometer.h"
 
-#include <Utility.h>
+#include "frc/Utility.h"
 
 using namespace frc;
 

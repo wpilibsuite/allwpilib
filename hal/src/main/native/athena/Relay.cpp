@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Relay.h"
+#include "hal/Relay.h"
 
 #include "DigitalInternal.h"
-#include "HAL/handles/IndexedHandleResource.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/handles/IndexedHandleResource.h"
 
 using namespace hal;
 

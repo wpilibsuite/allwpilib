@@ -5,13 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Error.h"
+#include "frc/Error.h"
 
 #include <wpi/Path.h>
 
-#include "DriverStation.h"
-#include "Timer.h"
-#include "Utility.h"
+#include "frc/DriverStation.h"
+#include "frc/Timer.h"
+#include "frc/Utility.h"
 
 using namespace frc;
 

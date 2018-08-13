@@ -9,9 +9,9 @@
 
 #include <iostream>
 
-#include <Commands/Scheduler.h>
-#include <LiveWindow/LiveWindow.h>
-#include <SmartDashboard/SmartDashboard.h>
+#include <frc/commands/Scheduler.h>
+#include <frc/livewindow/LiveWindow.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 DriveTrain Robot::drivetrain;
 Pivot Robot::pivot;

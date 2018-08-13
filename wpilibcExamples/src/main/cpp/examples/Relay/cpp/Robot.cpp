@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <IterativeRobot.h>
-#include <Joystick.h>
-#include <Relay.h>
+#include <frc/IterativeRobot.h>
+#include <frc/Joystick.h>
+#include <frc/Relay.h>
 
 /**
  * This is a sample program which uses joystick buttons to control a relay.

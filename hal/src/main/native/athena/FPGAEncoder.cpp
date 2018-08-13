@@ -10,9 +10,9 @@
 #include <memory>
 
 #include "DigitalInternal.h"
-#include "HAL/handles/LimitedHandleResource.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/handles/LimitedHandleResource.h"
 
 using namespace hal;
 

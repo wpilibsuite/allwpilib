@@ -7,7 +7,7 @@
 
 #include "HALInitializer.h"
 
-#include "HAL/HAL.h"
+#include "hal/HAL.h"
 
 namespace hal {
 namespace init {

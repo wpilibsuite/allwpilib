@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Commands/Command.h"
+#include "frc/commands/Command.h"
 
 namespace frc {
 

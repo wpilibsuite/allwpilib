@@ -7,8 +7,8 @@
 
 #include <jni.h>
 
-#include "HAL/Accelerometer.h"
 #include "edu_wpi_first_wpilibj_hal_AccelerometerJNI.h"
+#include "hal/Accelerometer.h"
 
 extern "C" {
 

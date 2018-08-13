@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.CameraServerSharedStore;
  *
  * @see VisionPipeline
  * @see VisionThread
- * @see edu.wpi.first.wpilibj.vision
+ * @see <a href="package-summary.html">vision</a>
  */
 public class VisionRunner<P extends VisionPipeline> {
   private final CvSink m_cvSink = new CvSink("VisionRunner CvSink");

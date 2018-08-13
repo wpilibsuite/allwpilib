@@ -5,18 +5,18 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "RobotDrive.h"
+#include "frc/RobotDrive.h"
 
 #include <algorithm>
 #include <cmath>
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "GenericHID.h"
-#include "Joystick.h"
-#include "Talon.h"
-#include "Utility.h"
-#include "WPIErrors.h"
+#include "frc/GenericHID.h"
+#include "frc/Joystick.h"
+#include "frc/Talon.h"
+#include "frc/Utility.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

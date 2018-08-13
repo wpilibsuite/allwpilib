@@ -5,15 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Compressor.h"
+#include "frc/Compressor.h"
 
-#include <HAL/Compressor.h>
-#include <HAL/HAL.h>
-#include <HAL/Ports.h>
-#include <HAL/Solenoid.h>
+#include <hal/Compressor.h>
+#include <hal/HAL.h>
+#include <hal/Ports.h>
+#include <hal/Solenoid.h>
 
-#include "SmartDashboard/SendableBuilder.h"
-#include "WPIErrors.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 

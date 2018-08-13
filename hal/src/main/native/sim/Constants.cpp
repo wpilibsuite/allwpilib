@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Constants.h"
+#include "hal/Constants.h"
 
 #include "ConstantsInternal.h"
 

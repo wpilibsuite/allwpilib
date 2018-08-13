@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "AnalogGyro.h"
+#include "frc/AnalogGyro.h"
 
 #include <climits>
 
-#include <HAL/AnalogGyro.h>
-#include <HAL/Errors.h>
-#include <HAL/HAL.h>
+#include <hal/AnalogGyro.h>
+#include <hal/Errors.h>
+#include <hal/HAL.h>
 
-#include "AnalogInput.h"
-#include "Timer.h"
-#include "WPIErrors.h"
+#include "frc/AnalogInput.h"
+#include "frc/Timer.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

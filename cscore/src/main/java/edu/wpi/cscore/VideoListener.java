@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 public class VideoListener implements AutoCloseable {
   /**
    * Create an event listener.
+   *
    * @param listener Listener function
    * @param eventMask Bitmask of VideoEvent.Type values
    * @param immediateNotify Whether callback should be immediately called with

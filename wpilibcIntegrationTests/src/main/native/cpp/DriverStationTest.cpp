@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DriverStation.h"  // NOLINT(build/include_order)
+#include "frc/DriverStation.h"  // NOLINT(build/include_order)
 
-#include "RobotController.h"
 #include "TestBench.h"
+#include "frc/RobotController.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

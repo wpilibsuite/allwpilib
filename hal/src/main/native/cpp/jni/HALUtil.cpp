@@ -19,12 +19,12 @@
 #include <wpi/jni_util.h>
 #include <wpi/raw_ostream.h>
 
-#include "HAL/CAN.h"
-#include "HAL/DriverStation.h"
-#include "HAL/Errors.h"
-#include "HAL/HAL.h"
-#include "HAL/cpp/Log.h"
 #include "edu_wpi_first_wpilibj_hal_HALUtil.h"
+#include "hal/CAN.h"
+#include "hal/DriverStation.h"
+#include "hal/Errors.h"
+#include "hal/HAL.h"
+#include "hal/cpp/Log.h"
 
 using namespace wpi::java;
 

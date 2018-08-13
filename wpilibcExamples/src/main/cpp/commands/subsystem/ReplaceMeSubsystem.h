@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <Commands/Subsystem.h>
+#include <frc/commands/Subsystem.h>
 
 class ReplaceMeSubsystem : public frc::Subsystem {
  private:

@@ -7,8 +7,8 @@
 
 #include "NTProvider_Encoder.h"
 
-#include <HAL/Ports.h>
-#include <MockData/EncoderData.h>
+#include <hal/Ports.h>
+#include <mockdata/EncoderData.h>
 
 void HALSimNTProviderEncoder::Initialize() {
   InitializeDefault(HAL_GetNumEncoders(), HALSIM_RegisterEncoderAllCallbacks);

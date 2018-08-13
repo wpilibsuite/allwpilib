@@ -11,10 +11,10 @@
 
 #include <wpi/mutex.h>
 
-#include "HAL/AnalogInput.h"
-#include "HAL/ChipObject.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/AnalogInput.h"
+#include "hal/ChipObject.h"
 
 namespace hal {
 

@@ -217,6 +217,22 @@ void Notifier::NotifySinkSourceChanged(wpi::StringRef name, CS_Sink sink,
   thr->m_cond.notify_one();
 }
 
+void Notifier::NotifySinkProperty(const SinkImpl& sink, CS_EventKind kind,
+                                  wpi::StringRef propertyName, int property,
+                                  CS_PropertyKind propertyKind, int value,
+                                  wpi::StringRef valueStr) {
+  auto thr = m_owner.GetThread();
+  if (!thr) return;
+
+  auto handleData = Sinks::GetInstance().Find(sink);
+
+  thr->m_notifications.emplace(
+      propertyName, handleData.first, static_cast<RawEvent::Kind>(kind),
+      Handle{handleData.first, property, Handle::kSinkProperty}, propertyKind,
+      value, valueStr);
+  thr->m_cond.notify_one();
+}
+
 void Notifier::NotifyNetworkInterfacesChanged() {
   auto thr = m_owner.GetThread();
   if (!thr) return;

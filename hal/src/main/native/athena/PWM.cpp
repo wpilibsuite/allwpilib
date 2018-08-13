@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/PWM.h"
+#include "hal/PWM.h"
 
 #include <cmath>
 #include <thread>
@@ -14,10 +14,10 @@
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
-#include "HAL/cpp/fpga_clock.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/cpp/fpga_clock.h"
+#include "hal/handles/HandlesInternal.h"
 
 using namespace hal;
 

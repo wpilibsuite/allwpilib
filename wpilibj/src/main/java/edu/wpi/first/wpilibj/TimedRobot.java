@@ -46,8 +46,7 @@ public class TimedRobot extends IterativeRobotBase {
   protected TimedRobot(double period) {
     super(period);
 
-    // HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Periodic);
-    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Iterative);
+    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
   }
 
   @Override

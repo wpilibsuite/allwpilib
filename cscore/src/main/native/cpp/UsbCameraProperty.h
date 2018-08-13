@@ -26,6 +26,15 @@ class UsbCameraProperty : public PropertyImpl {
   UsbCameraProperty() = default;
   explicit UsbCameraProperty(wpi::StringRef name_) : PropertyImpl{name_} {}
 
+  // Software property constructor
+  UsbCameraProperty(wpi::StringRef name_, unsigned id_, CS_PropertyKind kind_,
+                    int minimum_, int maximum_, int step_, int defaultValue_,
+                    int value_)
+      : PropertyImpl(name_, kind_, minimum_, maximum_, step_, defaultValue_,
+                     value_),
+        device{false},
+        id{id_} {}
+
   // Normalized property constructor
   UsbCameraProperty(wpi::StringRef name_, int rawIndex_,
                     const UsbCameraProperty& rawProp, int defaultValue_,
@@ -54,6 +63,9 @@ class UsbCameraProperty : public PropertyImpl {
   bool DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd, int newValue,
                  wpi::StringRef newValueStr) const;
 #endif
+
+  // If this is a device (rather than software) property
+  bool device{true};
 
   // If this is a percentage (rather than raw) property
   bool percentage{false};

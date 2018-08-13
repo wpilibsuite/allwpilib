@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <Commands/PIDSubsystem.h>
+#include <frc/commands/PIDSubsystem.h>
 
 class ReplaceMePIDSubsystem : public frc::PIDSubsystem {
  public:

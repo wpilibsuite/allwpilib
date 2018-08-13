@@ -10,13 +10,4 @@ model {
             staticConfigs = project.staticGtestConfigs
         }
     }
-    binaries {
-        withType(GoogleTestTestSuiteBinarySpec) {
-            if (toolChain instanceof Clang) {
-                println "Clang Detected - Using ASAN"
-                cppCompiler.args << '-fsanitize=address'
-                linker.args << '-fsanitize=address'
-            }
-        }
-    }
 }

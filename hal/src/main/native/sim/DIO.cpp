@@ -5,17 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/DIO.h"
+#include "hal/DIO.h"
 
 #include <cmath>
 
 #include "DigitalInternal.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "HAL/handles/LimitedHandleResource.h"
 #include "HALInitializer.h"
-#include "MockData/DIODataInternal.h"
-#include "MockData/DigitalPWMDataInternal.h"
 #include "PortsInternal.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/LimitedHandleResource.h"
+#include "mockdata/DIODataInternal.h"
+#include "mockdata/DigitalPWMDataInternal.h"
 
 using namespace hal;
 

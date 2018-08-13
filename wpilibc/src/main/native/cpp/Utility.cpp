@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Utility.h"
+#include "frc/Utility.h"
 
 #ifndef _WIN32
 #include <cxxabi.h>
@@ -16,13 +16,13 @@
 #include <cstdlib>
 #include <cstring>
 
+#include <hal/DriverStation.h>
+#include <hal/HAL.h>
 #include <wpi/Path.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
-#include "ErrorBase.h"
-#include "HAL/DriverStation.h"
-#include "HAL/HAL.h"
+#include "frc/ErrorBase.h"
 
 using namespace frc;
 

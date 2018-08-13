@@ -17,9 +17,15 @@
 
 namespace cs {
 
-//
-// Object-oriented interface
-//
+/**
+ * @defgroup cscore_oo cscore C++ object-oriented API
+ *
+ * Recommended interface for C++, identical to Java API.
+ *
+ * <p>The classes are RAII and handle reference counting internally.
+ *
+ * @{
+ */
 
 // Forward declarations so friend declarations work correctly
 class CvSource;
@@ -27,6 +33,9 @@ class VideoEvent;
 class VideoSink;
 class VideoSource;
 
+/**
+ * A source or sink property.
+ */
 class VideoProperty {
   friend class CvSource;
   friend class VideoEvent;
@@ -82,7 +91,9 @@ class VideoProperty {
   Kind m_kind;
 };
 
-/// A source for video that provides a sequence of frames.
+/**
+ * A source for video that provides a sequence of frames.
+ */
 class VideoSource {
   friend class VideoEvent;
   friend class VideoSink;
@@ -111,86 +122,134 @@ class VideoSource {
 
   bool operator!=(const VideoSource& other) const { return !(*this == other); }
 
-  /// Get the kind of the source.
+  /**
+   * Get the kind of the source.
+   */
   Kind GetKind() const;
 
-  /// Get the name of the source.  The name is an arbitrary identifier
-  /// provided when the source is created, and should be unique.
+  /**
+   * Get the name of the source.  The name is an arbitrary identifier
+   * provided when the source is created, and should be unique.
+   */
   std::string GetName() const;
 
-  /// Get the source description.  This is source-kind specific.
+  /**
+   * Get the source description.  This is source-kind specific.
+   */
   std::string GetDescription() const;
 
-  /// Get the last time a frame was captured.
-  /// This uses the same time base as wpi::Now().
-  /// @return Time in 1 us increments.
+  /**
+   * Get the last time a frame was captured.
+   * This uses the same time base as wpi::Now().
+   *
+   * @return Time in 1 us increments.
+   */
   uint64_t GetLastFrameTime() const;
 
-  /// Is the source currently connected to whatever is providing the images?
+  /**
+   * Is the source currently connected to whatever is providing the images?
+   */
   bool IsConnected() const;
 
-  /// Get a property.
-  /// @param name Property name
-  /// @return Property contents (of kind Property::kNone if no property with
-  ///         the given name exists)
+  /** Get a property.
+   *
+   * @param name Property name
+   * @return Property contents (of kind Property::kNone if no property with
+   *         the given name exists)
+   */
   VideoProperty GetProperty(wpi::StringRef name);
 
-  /// Enumerate all properties of this source.
+  /**
+   * Enumerate all properties of this source.
+   */
   std::vector<VideoProperty> EnumerateProperties() const;
 
-  /// Get the current video mode.
+  /**
+   * Get the current video mode.
+   */
   VideoMode GetVideoMode() const;
 
-  /// Set the video mode.
-  /// @param mode Video mode
+  /**
+   * Set the video mode.
+   *
+   * @param mode Video mode
+   */
   bool SetVideoMode(const VideoMode& mode);
 
-  /// Set the video mode.
-  /// @param pixelFormat desired pixel format
-  /// @param width desired width
-  /// @param height desired height
-  /// @param fps desired FPS
-  /// @return True if set successfully
+  /**
+   * Set the video mode.
+   *
+   * @param pixelFormat desired pixel format
+   * @param width desired width
+   * @param height desired height
+   * @param fps desired FPS
+   * @return True if set successfully
+   */
   bool SetVideoMode(VideoMode::PixelFormat pixelFormat, int width, int height,
                     int fps);
 
-  /// Set the pixel format.
-  /// @param pixelFormat desired pixel format
-  /// @return True if set successfully
+  /**
+   * Set the pixel format.
+   *
+   * @param pixelFormat desired pixel format
+   * @return True if set successfully
+   */
   bool SetPixelFormat(VideoMode::PixelFormat pixelFormat);
 
-  /// Set the resolution.
-  /// @param width desired width
-  /// @param height desired height
-  /// @return True if set successfully
+  /**
+   * Set the resolution.
+   *
+   * @param width desired width
+   * @param height desired height
+   * @return True if set successfully
+   */
   bool SetResolution(int width, int height);
 
-  /// Set the frames per second (FPS).
-  /// @param fps desired FPS
-  /// @return True if set successfully
+  /**
+   * Set the frames per second (FPS).
+   *
+   * @param fps desired FPS
+   * @return True if set successfully
+   */
   bool SetFPS(int fps);
 
-  /// Get the actual FPS.
-  /// SetTelemetryPeriod() must be called for this to be valid.
-  /// @return Actual FPS averaged over the telemetry period.
+  /**
+   * Get the actual FPS.
+   *
+   * <p>SetTelemetryPeriod() must be called for this to be valid.
+   *
+   * @return Actual FPS averaged over the telemetry period.
+   */
   double GetActualFPS() const;
 
-  /// Get the data rate (in bytes per second).
-  /// SetTelemetryPeriod() must be called for this to be valid.
-  /// @return Data rate averaged over the telemetry period.
+  /**
+   * Get the data rate (in bytes per second).
+   *
+   * <p>SetTelemetryPeriod() must be called for this to be valid.
+   *
+   * @return Data rate averaged over the telemetry period.
+   */
   double GetActualDataRate() const;
 
-  /// Enumerate all known video modes for this source.
+  /**
+   * Enumerate all known video modes for this source.
+   */
   std::vector<VideoMode> EnumerateVideoModes() const;
 
   CS_Status GetLastStatus() const { return m_status; }
 
-  /// Enumerate all sinks connected to this source.
-  /// @return Vector of sinks.
+  /**
+   * Enumerate all sinks connected to this source.
+   *
+   * @return Vector of sinks.
+   */
   std::vector<VideoSink> EnumerateSinks();
 
-  /// Enumerate all existing sources.
-  /// @return Vector of sources.
+  /**
+   * Enumerate all existing sources.
+   *
+   * @return Vector of sources.
+   */
   static std::vector<VideoSource> EnumerateSources();
 
   friend void swap(VideoSource& first, VideoSource& second) noexcept {
@@ -206,7 +265,9 @@ class VideoSource {
   CS_Source m_handle;
 };
 
-/// A source that represents a video camera.
+/**
+ * A source that represents a video camera.
+ */
 class VideoCamera : public VideoSource {
  public:
   enum WhiteBalance {
@@ -219,58 +280,96 @@ class VideoCamera : public VideoSource {
 
   VideoCamera() = default;
 
-  /// Set the brightness, as a percentage (0-100).
+  /**
+   * Set the brightness, as a percentage (0-100).
+   */
   void SetBrightness(int brightness);
 
-  /// Get the brightness, as a percentage (0-100).
+  /**
+   * Get the brightness, as a percentage (0-100).
+   */
   int GetBrightness();
 
-  /// Set the white balance to auto.
+  /**
+   * Set the white balance to auto.
+   */
   void SetWhiteBalanceAuto();
 
-  /// Set the white balance to hold current.
+  /**
+   * Set the white balance to hold current.
+   */
   void SetWhiteBalanceHoldCurrent();
 
-  /// Set the white balance to manual, with specified color temperature.
+  /**
+   * Set the white balance to manual, with specified color temperature.
+   */
   void SetWhiteBalanceManual(int value);
 
-  /// Set the exposure to auto aperature.
+  /**
+   * Set the exposure to auto aperature.
+   */
   void SetExposureAuto();
 
-  /// Set the exposure to hold current.
+  /**
+   * Set the exposure to hold current.
+   */
   void SetExposureHoldCurrent();
 
-  /// Set the exposure to manual, as a percentage (0-100).
+  /**
+   * Set the exposure to manual, as a percentage (0-100).
+   */
   void SetExposureManual(int value);
 
  protected:
   explicit VideoCamera(CS_Source handle) : VideoSource(handle) {}
 };
 
-/// A source that represents a USB camera.
+/**
+ * A source that represents a USB camera.
+ */
 class UsbCamera : public VideoCamera {
  public:
   UsbCamera() = default;
 
-  /// Create a source for a USB camera based on device number.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param dev Device number (e.g. 0 for /dev/video0)
+  /**
+   * Create a source for a USB camera based on device number.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param dev Device number (e.g. 0 for /dev/video0)
+   */
   UsbCamera(wpi::StringRef name, int dev);
 
-  /// Create a source for a USB camera based on device path.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param path Path to device (e.g. "/dev/video0" on Linux)
+  /**
+   * Create a source for a USB camera based on device path.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param path Path to device (e.g. "/dev/video0" on Linux)
+   */
   UsbCamera(wpi::StringRef name, wpi::StringRef path);
 
-  /// Enumerate USB cameras on the local system.
-  /// @return Vector of USB camera information (one for each camera)
+  /**
+   * Enumerate USB cameras on the local system.
+   *
+   * @return Vector of USB camera information (one for each camera)
+   */
   static std::vector<UsbCameraInfo> EnumerateUsbCameras();
 
-  /// Get the path to the device.
+  /**
+   * Get the path to the device.
+   */
   std::string GetPath() const;
+
+  /**
+   * Set how verbose the camera connection messages are.
+   *
+   * @param level 0=don't display Connecting message, 1=do display message
+   */
+  void SetConnectVerbose(int level);
 };
 
-/// A source that represents a MJPEG-over-HTTP (IP) camera.
+/**
+ * A source that represents a MJPEG-over-HTTP (IP) camera.
+ */
 class HttpCamera : public VideoCamera {
  public:
   enum HttpCameraKind {
@@ -280,59 +379,85 @@ class HttpCamera : public VideoCamera {
     kAxis = CS_HTTP_AXIS
   };
 
-  /// Create a source for a MJPEG-over-HTTP (IP) camera.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-  /// @param kind Camera kind (e.g. kAxis)
+  /**
+   * Create a source for a MJPEG-over-HTTP (IP) camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
+   * @param kind Camera kind (e.g. kAxis)
+   */
   HttpCamera(wpi::StringRef name, wpi::StringRef url,
              HttpCameraKind kind = kUnknown);
 
-  /// Create a source for a MJPEG-over-HTTP (IP) camera.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-  /// @param kind Camera kind (e.g. kAxis)
+  /**
+   * Create a source for a MJPEG-over-HTTP (IP) camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
+   * @param kind Camera kind (e.g. kAxis)
+   */
   HttpCamera(wpi::StringRef name, const char* url,
              HttpCameraKind kind = kUnknown);
 
-  /// Create a source for a MJPEG-over-HTTP (IP) camera.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-  /// @param kind Camera kind (e.g. kAxis)
+  /**
+   * Create a source for a MJPEG-over-HTTP (IP) camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
+   * @param kind Camera kind (e.g. kAxis)
+   */
   HttpCamera(wpi::StringRef name, const std::string& url,
              HttpCameraKind kind = kUnknown);
 
-  /// Create a source for a MJPEG-over-HTTP (IP) camera.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param urls Array of Camera URLs
-  /// @param kind Camera kind (e.g. kAxis)
+  /**
+   * Create a source for a MJPEG-over-HTTP (IP) camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param urls Array of Camera URLs
+   * @param kind Camera kind (e.g. kAxis)
+   */
   HttpCamera(wpi::StringRef name, wpi::ArrayRef<std::string> urls,
              HttpCameraKind kind = kUnknown);
 
-  /// Create a source for a MJPEG-over-HTTP (IP) camera.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param urls Array of Camera URLs
-  /// @param kind Camera kind (e.g. kAxis)
+  /**
+   * Create a source for a MJPEG-over-HTTP (IP) camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param urls Array of Camera URLs
+   * @param kind Camera kind (e.g. kAxis)
+   */
   template <typename T>
   HttpCamera(wpi::StringRef name, std::initializer_list<T> urls,
              HttpCameraKind kind = kUnknown);
 
-  /// Get the kind of HTTP camera.
-  /// Autodetection can result in returning a different value than the camera
-  /// was created with.
+  /**
+   * Get the kind of HTTP camera.
+   *
+   * <p>Autodetection can result in returning a different value than the camera
+   * was created with.
+   */
   HttpCameraKind GetHttpCameraKind() const;
 
-  /// Change the URLs used to connect to the camera.
+  /**
+   * Change the URLs used to connect to the camera.
+   */
   void SetUrls(wpi::ArrayRef<std::string> urls);
 
-  /// Change the URLs used to connect to the camera.
+  /**
+   * Change the URLs used to connect to the camera.
+   */
   template <typename T>
   void SetUrls(std::initializer_list<T> urls);
 
-  /// Get the URLs used to connect to the camera.
+  /**
+   * Get the URLs used to connect to the camera.
+   */
   std::vector<std::string> GetUrls() const;
 };
 
-/// A source that represents an Axis IP camera.
+/**
+ * A source that represents an Axis IP camera.
+ */
 class AxisCamera : public HttpCamera {
   static std::string HostToUrl(wpi::StringRef host);
   static std::vector<std::string> HostToUrl(wpi::ArrayRef<std::string> hosts);
@@ -340,131 +465,186 @@ class AxisCamera : public HttpCamera {
   static std::vector<std::string> HostToUrl(std::initializer_list<T> hosts);
 
  public:
-  /// Create a source for an Axis IP camera.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-  /// @param kind Camera kind (e.g. kAxis)
+  /**
+   * Create a source for an Axis IP camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   * @param kind Camera kind (e.g. kAxis)
+   */
   AxisCamera(wpi::StringRef name, wpi::StringRef host);
 
-  /// Create a source for an Axis IP camera.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-  /// @param kind Camera kind (e.g. kAxis)
+  /**
+   * Create a source for an Axis IP camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   * @param kind Camera kind (e.g. kAxis)
+   */
   AxisCamera(wpi::StringRef name, const char* host);
 
-  /// Create a source for an Axis IP camera.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-  /// @param kind Camera kind (e.g. kAxis)
+  /**
+   * Create a source for an Axis IP camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   * @param kind Camera kind (e.g. kAxis)
+   */
   AxisCamera(wpi::StringRef name, const std::string& host);
 
-  /// Create a source for an Axis IP camera.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param hosts Array of Camera host IPs/DNS names
-  /// @param kind Camera kind (e.g. kAxis)
+  /**
+   * Create a source for an Axis IP camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param hosts Array of Camera host IPs/DNS names
+   * @param kind Camera kind (e.g. kAxis)
+   */
   AxisCamera(wpi::StringRef name, wpi::ArrayRef<std::string> hosts);
 
-  /// Create a source for an Axis IP camera.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param hosts Array of Camera host IPs/DNS names
-  /// @param kind Camera kind (e.g. kAxis)
+  /**
+   * Create a source for an Axis IP camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param hosts Array of Camera host IPs/DNS names
+   * @param kind Camera kind (e.g. kAxis)
+   */
   template <typename T>
   AxisCamera(wpi::StringRef name, std::initializer_list<T> hosts);
 };
 
-/// A source for user code to provide OpenCV images as video frames.
+/**
+ * A source for user code to provide OpenCV images as video frames.
+ */
 class CvSource : public VideoSource {
  public:
   CvSource() = default;
 
-  /// Create an OpenCV source.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param mode Video mode being generated
+  /**
+   * Create an OpenCV source.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param mode Video mode being generated
+   */
   CvSource(wpi::StringRef name, const VideoMode& mode);
 
-  /// Create an OpenCV source.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param pixelFormat Pixel format
-  /// @param width width
-  /// @param height height
-  /// @param fps fps
+  /**
+   * Create an OpenCV source.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param pixelFormat Pixel format
+   * @param width width
+   * @param height height
+   * @param fps fps
+   */
   CvSource(wpi::StringRef name, VideoMode::PixelFormat pixelFormat, int width,
            int height, int fps);
 
-  /// Put an OpenCV image and notify sinks.
-  /// Only 8-bit single-channel or 3-channel (with BGR channel order) images
-  /// are supported. If the format, depth or channel order is different, use
-  /// cv::Mat::convertTo() and/or cv::cvtColor() to convert it first.
-  /// @param image OpenCV image
+  /**
+   * Put an OpenCV image and notify sinks.
+   *
+   * <p>Only 8-bit single-channel or 3-channel (with BGR channel order) images
+   * are supported. If the format, depth or channel order is different, use
+   * cv::Mat::convertTo() and/or cv::cvtColor() to convert it first.
+   *
+   * @param image OpenCV image
+   */
   void PutFrame(cv::Mat& image);
 
-  /// Signal sinks that an error has occurred.  This should be called instead
-  /// of NotifyFrame when an error occurs.
+  /**
+   * Signal sinks that an error has occurred.  This should be called instead
+   * of NotifyFrame when an error occurs.
+   */
   void NotifyError(wpi::StringRef msg);
 
-  /// Set source connection status.  Defaults to true.
-  /// @param connected True for connected, false for disconnected
+  /**
+   * Set source connection status.  Defaults to true.
+   *
+   * @param connected True for connected, false for disconnected
+   */
   void SetConnected(bool connected);
 
-  /// Set source description.
-  /// @param description Description
+  /**
+   * Set source description.
+   *
+   * @param description Description
+   */
   void SetDescription(wpi::StringRef description);
 
-  /// Create a property.
-  /// @param name Property name
-  /// @param kind Property kind
-  /// @param minimum Minimum value
-  /// @param maximum Maximum value
-  /// @param step Step value
-  /// @param defaultValue Default value
-  /// @param value Current value
-  /// @return Property
+  /**
+   * Create a property.
+   *
+   * @param name Property name
+   * @param kind Property kind
+   * @param minimum Minimum value
+   * @param maximum Maximum value
+   * @param step Step value
+   * @param defaultValue Default value
+   * @param value Current value
+   * @return Property
+   */
   VideoProperty CreateProperty(wpi::StringRef name, VideoProperty::Kind kind,
                                int minimum, int maximum, int step,
                                int defaultValue, int value);
 
-  /// Create an integer property.
-  /// @param name Property name
-  /// @param minimum Minimum value
-  /// @param maximum Maximum value
-  /// @param step Step value
-  /// @param defaultValue Default value
-  /// @param value Current value
-  /// @return Property
+  /**
+   * Create an integer property.
+   *
+   * @param name Property name
+   * @param minimum Minimum value
+   * @param maximum Maximum value
+   * @param step Step value
+   * @param defaultValue Default value
+   * @param value Current value
+   * @return Property
+   */
   VideoProperty CreateIntegerProperty(wpi::StringRef name, int minimum,
                                       int maximum, int step, int defaultValue,
                                       int value);
 
-  /// Create a boolean property.
-  /// @param name Property name
-  /// @param defaultValue Default value
-  /// @param value Current value
-  /// @return Property
+  /**
+   * Create a boolean property.
+   *
+   * @param name Property name
+   * @param defaultValue Default value
+   * @param value Current value
+   * @return Property
+   */
   VideoProperty CreateBooleanProperty(wpi::StringRef name, bool defaultValue,
                                       bool value);
 
-  /// Create a string property.
-  /// @param name Property name
-  /// @param defaultValue Default value
-  /// @param value Current value
-  /// @return Property
+  /**
+   * Create a string property.
+   *
+   * @param name Property name
+   * @param defaultValue Default value
+   * @param value Current value
+   * @return Property
+   */
   VideoProperty CreateStringProperty(wpi::StringRef name, wpi::StringRef value);
 
-  /// Configure enum property choices.
-  /// @param property Property
-  /// @param choices Choices
+  /**
+   * Configure enum property choices.
+   *
+   * @param property Property
+   * @param choices Choices
+   */
   void SetEnumPropertyChoices(const VideoProperty& property,
                               wpi::ArrayRef<std::string> choices);
 
-  /// Configure enum property choices.
-  /// @param property Property
-  /// @param choices Choices
+  /**
+   * Configure enum property choices.
+   *
+   * @param property Property
+   * @param choices Choices
+   */
   template <typename T>
   void SetEnumPropertyChoices(const VideoProperty& property,
                               std::initializer_list<T> choices);
 };
 
-/// A sink for video that accepts a sequence of frames.
+/**
+ * A sink for video that accepts a sequence of frames.
+ */
 class VideoSink {
   friend class VideoEvent;
   friend class VideoSource;
@@ -492,36 +672,68 @@ class VideoSink {
 
   bool operator!=(const VideoSink& other) const { return !(*this == other); }
 
-  /// Get the kind of the sink.
+  /**
+   * Get the kind of the sink.
+   */
   Kind GetKind() const;
 
-  /// Get the name of the sink.  The name is an arbitrary identifier
-  /// provided when the sink is created, and should be unique.
+  /**
+   * Get the name of the sink.  The name is an arbitrary identifier
+   * provided when the sink is created, and should be unique.
+   */
   std::string GetName() const;
 
-  /// Get the sink description.  This is sink-kind specific.
+  /**
+   * Get the sink description.  This is sink-kind specific.
+   */
   std::string GetDescription() const;
 
-  /// Configure which source should provide frames to this sink.  Each sink
-  /// can accept frames from only a single source, but a single source can
-  /// provide frames to multiple clients.
-  /// @param source Source
+  /**
+   * Get a property of the sink.
+   *
+   * @param name Property name
+   * @return Property (kind Property::kNone if no property with
+   *         the given name exists)
+   */
+  VideoProperty GetProperty(wpi::StringRef name);
+
+  /**
+   * Enumerate all properties of this sink.
+   */
+  std::vector<VideoProperty> EnumerateProperties() const;
+
+  /**
+   * Configure which source should provide frames to this sink.  Each sink
+   * can accept frames from only a single source, but a single source can
+   * provide frames to multiple clients.
+   *
+   * @param source Source
+   */
   void SetSource(VideoSource source);
 
-  /// Get the connected source.
-  /// @return Connected source (empty if none connected).
+  /**
+   * Get the connected source.
+   *
+   * @return Connected source (empty if none connected).
+   */
   VideoSource GetSource() const;
 
-  /// Get a property of the associated source.
-  /// @param name Property name
-  /// @return Property (kind Property::kNone if no property with
-  ///         the given name exists or no source connected)
+  /**
+   * Get a property of the associated source.
+   *
+   * @param name Property name
+   * @return Property (kind Property::kNone if no property with
+   *         the given name exists or no source connected)
+   */
   VideoProperty GetSourceProperty(wpi::StringRef name);
 
   CS_Status GetLastStatus() const { return m_status; }
 
-  /// Enumerate all existing sinks.
-  /// @return Vector of sinks.
+  /**
+   * Enumerate all existing sinks.
+   *
+   * @return Vector of sinks.
+   */
   static std::vector<VideoSink> EnumerateSinks();
 
   friend void swap(VideoSink& first, VideoSink& second) noexcept {
@@ -537,104 +749,198 @@ class VideoSink {
   CS_Sink m_handle;
 };
 
-/// A sink that acts as a MJPEG-over-HTTP network server.
+/**
+ * A sink that acts as a MJPEG-over-HTTP network server.
+ */
 class MjpegServer : public VideoSink {
  public:
   MjpegServer() = default;
 
-  /// Create a MJPEG-over-HTTP server sink.
-  /// @param name Sink name (arbitrary unique identifier)
-  /// @param listenAddress TCP listen address (empty string for all addresses)
-  /// @param port TCP port number
+  /**
+   * Create a MJPEG-over-HTTP server sink.
+   *
+   * @param name Sink name (arbitrary unique identifier)
+   * @param listenAddress TCP listen address (empty string for all addresses)
+   * @param port TCP port number
+   */
   MjpegServer(wpi::StringRef name, wpi::StringRef listenAddress, int port);
 
-  /// Create a MJPEG-over-HTTP server sink.
-  /// @param name Sink name (arbitrary unique identifier)
-  /// @param port TCP port number
+  /**
+   * Create a MJPEG-over-HTTP server sink.
+   *
+   * @param name Sink name (arbitrary unique identifier)
+   * @param port TCP port number
+   */
   MjpegServer(wpi::StringRef name, int port) : MjpegServer(name, "", port) {}
 
-  /// Get the listen address of the server.
+  /**
+   * Get the listen address of the server.
+   */
   std::string GetListenAddress() const;
 
-  /// Get the port number of the server.
+  /**
+   * Get the port number of the server.
+   */
   int GetPort() const;
+
+  /**
+   * Set the stream resolution for clients that don't specify it.
+   *
+   * <p>It is not necessary to set this if it is the same as the source
+   * resolution.
+   *
+   * <p>Setting this different than the source resolution will result in
+   * increased CPU usage, particularly for MJPEG source cameras, as it will
+   * decompress, resize, and recompress the image, instead of using the
+   * camera's MJPEG image directly.
+   *
+   * @param width width, 0 for unspecified
+   * @param height height, 0 for unspecified
+   */
+  void SetResolution(int width, int height);
+
+  /**
+   * Set the stream frames per second (FPS) for clients that don't specify it.
+   *
+   * <p>It is not necessary to set this if it is the same as the source FPS.
+   *
+   * @param fps FPS, 0 for unspecified
+   */
+  void SetFPS(int fps);
+
+  /**
+   * Set the compression for clients that don't specify it.
+   *
+   * <p>Setting this will result in increased CPU usage for MJPEG source cameras
+   * as it will decompress and recompress the image instead of using the
+   * camera's MJPEG image directly.
+   *
+   * @param quality JPEG compression quality (0-100), -1 for unspecified
+   */
+  void SetCompression(int quality);
+
+  /**
+   * Set the default compression used for non-MJPEG sources.  If not set,
+   * 80 is used.  This function has no effect on MJPEG source cameras; use
+   * SetCompression() instead to force recompression of MJPEG source images.
+   *
+   * @param quality JPEG compression quality (0-100)
+   */
+  void SetDefaultCompression(int quality);
 };
 
-/// A sink for user code to accept video frames as OpenCV images.
+/**
+ * A sink for user code to accept video frames as OpenCV images.
+ */
 class CvSink : public VideoSink {
  public:
   CvSink() = default;
 
-  /// Create a sink for accepting OpenCV images.
-  /// WaitForFrame() must be called on the created sink to get each new
-  /// image.
-  /// @param name Source name (arbitrary unique identifier)
+  /**
+   * Create a sink for accepting OpenCV images.
+   *
+   * <p>WaitForFrame() must be called on the created sink to get each new
+   * image.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   */
   explicit CvSink(wpi::StringRef name);
 
-  /// Create a sink for accepting OpenCV images in a separate thread.
-  /// A thread will be created that calls WaitForFrame() and calls the
-  /// processFrame() callback each time a new frame arrives.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param processFrame Frame processing function; will be called with a
-  ///        time=0 if an error occurred.  processFrame should call GetImage()
-  ///        or GetError() as needed, but should not call (except in very
-  ///        unusual circumstances) WaitForImage().
+  /**
+   * Create a sink for accepting OpenCV images in a separate thread.
+   *
+   * <p>A thread will be created that calls WaitForFrame() and calls the
+   * processFrame() callback each time a new frame arrives.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param processFrame Frame processing function; will be called with a
+   *        time=0 if an error occurred.  processFrame should call GetImage()
+   *        or GetError() as needed, but should not call (except in very
+   *        unusual circumstances) WaitForImage().
+   */
   CvSink(wpi::StringRef name, std::function<void(uint64_t time)> processFrame);
 
-  /// Set sink description.
-  /// @param description Description
+  /**
+   * Set sink description.
+   *
+   * @param description Description
+   */
   void SetDescription(wpi::StringRef description);
 
-  /// Wait for the next frame and get the image.
-  /// Times out (returning 0) after timeout seconds.
-  /// The provided image will have three 8-bit channels stored in BGR order.
-  /// @return Frame time, or 0 on error (call GetError() to obtain the error
-  ///         message); the frame time is in the same time base as wpi::Now(),
-  ///         and is in 1 us increments.
+  /**
+   * Wait for the next frame and get the image.
+   * Times out (returning 0) after timeout seconds.
+   * The provided image will have three 8-bit channels stored in BGR order.
+   *
+   * @return Frame time, or 0 on error (call GetError() to obtain the error
+   *         message); the frame time is in the same time base as wpi::Now(),
+   *         and is in 1 us increments.
+   */
   uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225) const;
 
-  /// Wait for the next frame and get the image.  May block forever.
-  /// The provided image will have three 8-bit channels stored in BGR order.
-  /// @return Frame time, or 0 on error (call GetError() to obtain the error
-  ///         message); the frame time is in the same time base as wpi::Now(),
-  ///         and is in 1 us increments.
+  /**
+   * Wait for the next frame and get the image.  May block forever.
+   * The provided image will have three 8-bit channels stored in BGR order.
+   *
+   * @return Frame time, or 0 on error (call GetError() to obtain the error
+   *         message); the frame time is in the same time base as wpi::Now(),
+   *         and is in 1 us increments.
+   */
   uint64_t GrabFrameNoTimeout(cv::Mat& image) const;
 
-  /// Get error string.  Call this if WaitForFrame() returns 0 to determine
-  /// what the error is.
+  /**
+   * Get error string.  Call this if WaitForFrame() returns 0 to determine
+   * what the error is.
+   */
   std::string GetError() const;
 
-  /// Enable or disable getting new frames.
-  /// Disabling will cause processFrame (for callback-based CvSinks) to not
-  /// be called and WaitForFrame() to not return.  This can be used to save
-  /// processor resources when frames are not needed.
+  /**
+   * Enable or disable getting new frames.
+   *
+   * <p>Disabling will cause processFrame (for callback-based CvSinks) to not
+   * be called and WaitForFrame() to not return.  This can be used to save
+   * processor resources when frames are not needed.
+   */
   void SetEnabled(bool enabled);
 };
 
-/// An event generated by the library and provided to event listeners.
+/**
+ * An event generated by the library and provided to event listeners.
+ */
 class VideoEvent : public RawEvent {
  public:
-  /// Get the source associated with the event (if any).
+  /**
+   * Get the source associated with the event (if any).
+   */
   VideoSource GetSource() const;
 
-  /// Get the sink associated with the event (if any).
+  /**
+   * Get the sink associated with the event (if any).
+   */
   VideoSink GetSink() const;
 
-  /// Get the property associated with the event (if any).
+  /**
+   * Get the property associated with the event (if any).
+   */
   VideoProperty GetProperty() const;
 };
 
-/// An event listener.  This calls back to a desigated callback function when
-/// an event matching the specified mask is generated by the library.
+/**
+ * An event listener.  This calls back to a desigated callback function when
+ * an event matching the specified mask is generated by the library.
+ */
 class VideoListener {
  public:
   VideoListener() : m_handle(0) {}
 
-  /// Create an event listener.
-  /// @param callback Callback function
-  /// @param eventMask Bitmask of VideoEvent::Kind values
-  /// @param immediateNotify Whether callback should be immediately called with
-  ///        a representative set of events for the current library state.
+  /**
+   * Create an event listener.
+   *
+   * @param callback Callback function
+   * @param eventMask Bitmask of VideoEvent::Kind values
+   * @param immediateNotify Whether callback should be immediately called with
+   *        a representative set of events for the current library state.
+   */
   VideoListener(std::function<void(const VideoEvent& event)> callback,
                 int eventMask, bool immediateNotify);
 
@@ -652,6 +958,8 @@ class VideoListener {
  private:
   CS_Listener m_handle;
 };
+
+/** @} */
 
 }  // namespace cs
 

@@ -27,6 +27,8 @@ using wpi::StringRef;
  * @param parent the parent of the table
  * @param name the name of the new table
  * @param table the new table
+ *
+ * @ingroup ntcore_cpp_api
  */
 typedef std::function<void(NetworkTable* parent, StringRef name,
                            NetworkTable* table)>

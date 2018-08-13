@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Joystick.h"
+#include "frc/Joystick.h"
 
 #include <cmath>
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "DriverStation.h"
-#include "WPIErrors.h"
+#include "frc/DriverStation.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

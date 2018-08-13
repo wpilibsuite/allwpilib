@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "I2C.h"
+#include "frc/I2C.h"
 
-#include <HAL/HAL.h>
-#include <HAL/I2C.h>
+#include <hal/HAL.h>
+#include <hal/I2C.h>
 
-#include "WPIErrors.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

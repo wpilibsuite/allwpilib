@@ -15,19 +15,18 @@
 #include <vector>
 
 #include <wpi/ArrayRef.h>
-#include <wpi/StringMap.h>
 #include <wpi/StringRef.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
 #include "Frame.h"
 #include "Image.h"
-#include "PropertyImpl.h"
+#include "PropertyContainer.h"
 #include "cscore_cpp.h"
 
 namespace cs {
 
-class SourceImpl {
+class SourceImpl : public PropertyContainer {
   friend class Frame;
 
  public:
@@ -89,36 +88,15 @@ class SourceImpl {
   // Force a wakeup of all GetNextFrame() callers by sending an empty frame.
   void Wakeup();
 
-  // Property functions
-  int GetPropertyIndex(wpi::StringRef name) const;
-  wpi::ArrayRef<int> EnumerateProperties(wpi::SmallVectorImpl<int>& vec,
-                                         CS_Status* status) const;
-  CS_PropertyKind GetPropertyKind(int property) const;
-  wpi::StringRef GetPropertyName(int property, wpi::SmallVectorImpl<char>& buf,
-                                 CS_Status* status) const;
-  int GetProperty(int property, CS_Status* status) const;
-  virtual void SetProperty(int property, int value, CS_Status* status) = 0;
-  int GetPropertyMin(int property, CS_Status* status) const;
-  int GetPropertyMax(int property, CS_Status* status) const;
-  int GetPropertyStep(int property, CS_Status* status) const;
-  int GetPropertyDefault(int property, CS_Status* status) const;
-  wpi::StringRef GetStringProperty(int property,
-                                   wpi::SmallVectorImpl<char>& buf,
-                                   CS_Status* status) const;
-  virtual void SetStringProperty(int property, wpi::StringRef value,
-                                 CS_Status* status) = 0;
-  std::vector<std::string> GetEnumPropertyChoices(int property,
-                                                  CS_Status* status) const;
-
   // Standard common camera properties
-  virtual void SetBrightness(int brightness, CS_Status* status) = 0;
-  virtual int GetBrightness(CS_Status* status) const = 0;
-  virtual void SetWhiteBalanceAuto(CS_Status* status) = 0;
-  virtual void SetWhiteBalanceHoldCurrent(CS_Status* status) = 0;
-  virtual void SetWhiteBalanceManual(int value, CS_Status* status) = 0;
-  virtual void SetExposureAuto(CS_Status* status) = 0;
-  virtual void SetExposureHoldCurrent(CS_Status* status) = 0;
-  virtual void SetExposureManual(int value, CS_Status* status) = 0;
+  virtual void SetBrightness(int brightness, CS_Status* status);
+  virtual int GetBrightness(CS_Status* status) const;
+  virtual void SetWhiteBalanceAuto(CS_Status* status);
+  virtual void SetWhiteBalanceHoldCurrent(CS_Status* status);
+  virtual void SetWhiteBalanceManual(int value, CS_Status* status);
+  virtual void SetExposureAuto(CS_Status* status);
+  virtual void SetExposureHoldCurrent(CS_Status* status);
+  virtual void SetExposureManual(int value, CS_Status* status);
 
   // Video mode functions
   VideoMode GetVideoMode(CS_Status* status) const;
@@ -137,6 +115,10 @@ class SourceImpl {
                                     int width, int height, size_t size);
 
  protected:
+  void NotifyPropertyCreated(int propIndex, PropertyImpl& prop) override;
+  void UpdatePropertyValue(int property, bool setString, int value,
+                           wpi::StringRef valueStr) override;
+
   void PutFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
                 wpi::StringRef data, Frame::Time time);
   void PutFrame(std::unique_ptr<Image> image, Frame::Time time);
@@ -150,45 +132,10 @@ class SourceImpl {
   std::atomic_int m_numSinksEnabled{0};
 
  protected:
-  // Get a property; must be called with m_mutex held.
-  PropertyImpl* GetProperty(int property) {
-    if (property <= 0 || static_cast<size_t>(property) > m_propertyData.size())
-      return nullptr;
-    return m_propertyData[property - 1].get();
-  }
-  const PropertyImpl* GetProperty(int property) const {
-    if (property <= 0 || static_cast<size_t>(property) > m_propertyData.size())
-      return nullptr;
-    return m_propertyData[property - 1].get();
-  }
-
-  // Create an "empty" property.  This is called by GetPropertyIndex to create
-  // properties that don't exist (as GetPropertyIndex can't fail).
-  // Note: called with m_mutex held.
-  virtual std::unique_ptr<PropertyImpl> CreateEmptyProperty(
-      wpi::StringRef name) const = 0;
-
-  // Cache properties.  Implementations must return false and set status to
-  // CS_SOURCE_IS_DISCONNECTED if not possible to cache.
-  virtual bool CacheProperties(CS_Status* status) const = 0;
-
-  void NotifyPropertyCreated(int propIndex, PropertyImpl& prop);
-
-  // Update property value; must be called with m_mutex held.
-  void UpdatePropertyValue(int property, bool setString, int value,
-                           wpi::StringRef valueStr);
-
-  // Cached properties and video modes (protected with m_mutex)
-  mutable std::vector<std::unique_ptr<PropertyImpl>> m_propertyData;
-  mutable wpi::StringMap<int> m_properties;
+  // Cached video modes (protected with m_mutex)
   mutable std::vector<VideoMode> m_videoModes;
   // Current video mode
   mutable VideoMode m_mode;
-  // Whether CacheProperties() has been successful at least once (and thus
-  // should not be called again)
-  mutable std::atomic_bool m_properties_cached{false};
-
-  mutable wpi::mutex m_mutex;
 
  private:
   void ReleaseImage(std::unique_ptr<Image> image);

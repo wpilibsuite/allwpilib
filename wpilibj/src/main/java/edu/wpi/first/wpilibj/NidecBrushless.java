@@ -196,6 +196,7 @@ public class NidecBrushless extends SendableBase implements SpeedController, Mot
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Nidec Brushless");
+    builder.setActuator(true);
     builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Value", this::get, this::set);
   }

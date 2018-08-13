@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/I2C.h"
+#include "hal/I2C.h"
 
 #include <fcntl.h>
 #include <linux/i2c-dev.h>
@@ -16,9 +16,9 @@
 #include <cstring>
 
 #include "DigitalInternal.h"
-#include "HAL/DIO.h"
-#include "HAL/HAL.h"
 #include "HALInitializer.h"
+#include "hal/DIO.h"
+#include "hal/HAL.h"
 
 using namespace hal;
 

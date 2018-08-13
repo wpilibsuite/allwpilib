@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <Encoder.h>
-#include <IterativeRobot.h>
-#include <Joystick.h>
-#include <SmartDashboard/SmartDashboard.h>
-#include <Spark.h>
+#include <frc/Encoder.h>
+#include <frc/IterativeRobot.h>
+#include <frc/Joystick.h>
+#include <frc/Spark.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 constexpr double kPi = 3.14159265358979;
 

@@ -32,6 +32,8 @@ using wpi::StringRef;
  * @param value the new value
  * @param flags update flags; for example, EntryListenerFlags.kNew if the key
  * did not previously exist
+ *
+ * @ingroup ntcore_cpp_api
  */
 typedef std::function<void(NetworkTable* table, StringRef name,
                            NetworkTableEntry entry,

@@ -11,6 +11,7 @@
 #include <string>
 
 #include "wpi/ArrayRef.h"
+#include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
 #include "wpi/Twine.h"
 #include "wpi/mutex.h"
@@ -21,6 +22,7 @@ class Logger;
 
 class UDPClient {
   int m_lsd;
+  int m_port;
   std::string m_address;
   Logger& m_logger;
 
@@ -35,10 +37,15 @@ class UDPClient {
   UDPClient& operator=(UDPClient&& other);
 
   int start();
+  int start(int port);
   void shutdown();
   // The passed in address MUST be a resolved IP address.
   int send(ArrayRef<uint8_t> data, const Twine& server, int port);
   int send(StringRef data, const Twine& server, int port);
+  int receive(uint8_t* data_received, int receive_len);
+  int receive(uint8_t* data_received, int receive_len,
+              SmallVectorImpl<char>* addr_received, int* port_received);
+  int set_timeout(double timeout);
 };
 
 }  // namespace wpi

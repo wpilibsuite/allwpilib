@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "SolenoidBase.h"
+#include "frc/SolenoidBase.h"
 
-#include <HAL/HAL.h>
-#include <HAL/Solenoid.h>
+#include <hal/HAL.h>
+#include <hal/Solenoid.h>
 
 using namespace frc;
 

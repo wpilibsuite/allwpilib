@@ -8,7 +8,7 @@
 #include <chrono>
 #include <thread>
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
 int main() {
   HAL_Initialize(500, 0);

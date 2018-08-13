@@ -7,11 +7,11 @@
 
 #include <cmath>
 
-#include <AnalogGyro.h>
-#include <Drive/DifferentialDrive.h>
-#include <IterativeRobot.h>
-#include <Joystick.h>
-#include <Spark.h>
+#include <frc/AnalogGyro.h>
+#include <frc/IterativeRobot.h>
+#include <frc/Joystick.h>
+#include <frc/Spark.h>
+#include <frc/drive/DifferentialDrive.h>
 
 /**
  * This is a sample program to demonstrate how to use a gyro sensor to make a

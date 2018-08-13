@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj.shuffleboard;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,38 +25,43 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SuppressWarnings({"MemberName", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class ShuffleboardTabTest {
-  private NetworkTableInstance ntInstance;
-  private ShuffleboardTab tab;
-  private ShuffleboardInstance instance;
+  private NetworkTableInstance m_ntInstance;
+  private ShuffleboardTab m_tab;
+  private ShuffleboardInstance m_instance;
 
   @BeforeEach
-  public void setup() {
-    ntInstance = NetworkTableInstance.create();
-    instance = new ShuffleboardInstance(ntInstance);
-    tab = instance.getTab("Tab");
+  void setup() {
+    m_ntInstance = NetworkTableInstance.create();
+    m_instance = new ShuffleboardInstance(m_ntInstance);
+    m_tab = m_instance.getTab("Tab");
+  }
+
+  @AfterEach
+  void tearDown() {
+    m_ntInstance.close();
   }
 
   @Test
-  public void testAddDouble() {
-    NetworkTableEntry entry = tab.add("Double", 1.0).getEntry();
+  void testAddDouble() {
+    NetworkTableEntry entry = m_tab.add("Double", 1.0).getEntry();
     assertAll(
         () -> assertEquals("/Shuffleboard/Tab/Double", entry.getName()),
         () -> assertEquals(1.0, entry.getValue().getDouble()));
   }
 
   @Test
-  public void testAddInteger() {
-    NetworkTableEntry entry = tab.add("Int", 1).getEntry();
+  void testAddInteger() {
+    NetworkTableEntry entry = m_tab.add("Int", 1).getEntry();
     assertAll(
         () -> assertEquals("/Shuffleboard/Tab/Int", entry.getName()),
         () -> assertEquals(1.0, entry.getValue().getDouble()));
   }
 
   @Test
-  public void testAddLong() {
-    NetworkTableEntry entry = tab.add("Long", 1L).getEntry();
+  void testAddLong() {
+    NetworkTableEntry entry = m_tab.add("Long", 1L).getEntry();
     assertAll(
         () -> assertEquals("/Shuffleboard/Tab/Long", entry.getName()),
         () -> assertEquals(1.0, entry.getValue().getDouble()));
@@ -63,72 +69,72 @@ public class ShuffleboardTabTest {
 
 
   @Test
-  public void testAddBoolean() {
-    NetworkTableEntry entry = tab.add("Bool", false).getEntry();
+  void testAddBoolean() {
+    NetworkTableEntry entry = m_tab.add("Bool", false).getEntry();
     assertAll(
         () -> assertEquals("/Shuffleboard/Tab/Bool", entry.getName()),
         () -> assertFalse(entry.getValue().getBoolean()));
   }
 
   @Test
-  public void testAddString() {
-    NetworkTableEntry entry = tab.add("String", "foobar").getEntry();
+  void testAddString() {
+    NetworkTableEntry entry = m_tab.add("String", "foobar").getEntry();
     assertAll(
         () -> assertEquals("/Shuffleboard/Tab/String", entry.getName()),
         () -> assertEquals("foobar", entry.getValue().getString()));
   }
 
   @Test
-  public void testAddNamedSendableWithProperties() {
+  void testAddNamedSendableWithProperties() {
     Sendable sendable = new InstantCommand("Command");
     String widgetType = "Command Widget";
-    tab.add(sendable)
+    m_tab.add(sendable)
        .withWidget(widgetType)
        .withProperties(mapOf("foo", 1234, "bar", "baz"));
 
-    instance.update();
+    m_instance.update();
     String meta = "/Shuffleboard/.metadata/Tab/Command";
 
     assertAll(
         () -> assertEquals(1234,
-                           ntInstance.getEntry(meta + "/Properties/foo").getDouble(-1),
+                           m_ntInstance.getEntry(meta + "/Properties/foo").getDouble(-1),
                            "Property 'foo' not set correctly"),
         () -> assertEquals("baz",
-                           ntInstance.getEntry(meta + "/Properties/bar").getString(null),
+                           m_ntInstance.getEntry(meta + "/Properties/bar").getString(null),
                            "Property 'bar' not set correctly"),
         () -> assertEquals(widgetType,
-                           ntInstance.getEntry(meta + "/PreferredComponent").getString(null),
+                           m_ntInstance.getEntry(meta + "/PreferredComponent").getString(null),
                            "Preferred component not set correctly"));
   }
 
   @Test
-  public void testAddNumberArray() {
-    NetworkTableEntry entry = tab.add("DoubleArray", new double[]{1, 2, 3}).getEntry();
+  void testAddNumberArray() {
+    NetworkTableEntry entry = m_tab.add("DoubleArray", new double[]{1, 2, 3}).getEntry();
     assertAll(
         () -> assertEquals("/Shuffleboard/Tab/DoubleArray", entry.getName()),
         () -> assertArrayEquals(new double[]{1, 2, 3}, entry.getValue().getDoubleArray()));
   }
 
   @Test
-  public void testAddBooleanArray() {
-    NetworkTableEntry entry = tab.add("BoolArray", new boolean[]{true, false}).getEntry();
+  void testAddBooleanArray() {
+    NetworkTableEntry entry = m_tab.add("BoolArray", new boolean[]{true, false}).getEntry();
     assertAll(
         () -> assertEquals("/Shuffleboard/Tab/BoolArray", entry.getName()),
         () -> assertArrayEquals(new boolean[]{true, false}, entry.getValue().getBooleanArray()));
   }
 
   @Test
-  public void testAddStringArray() {
-    NetworkTableEntry entry = tab.add("StringArray", new String[]{"foo", "bar"}).getEntry();
+  void testAddStringArray() {
+    NetworkTableEntry entry = m_tab.add("StringArray", new String[]{"foo", "bar"}).getEntry();
     assertAll(
         () -> assertEquals("/Shuffleboard/Tab/StringArray", entry.getName()),
         () -> assertArrayEquals(new String[]{"foo", "bar"}, entry.getValue().getStringArray()));
   }
 
   @Test
-  public void testTitleDuplicates() {
-    tab.add("foo", "bar");
-    assertThrows(IllegalArgumentException.class, () -> tab.add("foo", "baz"));
+  void testTitleDuplicates() {
+    m_tab.add("foo", "bar");
+    assertThrows(IllegalArgumentException.class, () -> m_tab.add("foo", "baz"));
   }
 
   /**

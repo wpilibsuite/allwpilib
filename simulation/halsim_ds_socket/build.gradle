@@ -1,0 +1,58 @@
+description = "A plugin that listens on a socket so that you can use the real Driver Station software to connect to the simulation"
+
+ext {
+    includeWpiutil = true
+    pluginName = 'halsim_ds_socket'
+}
+
+apply plugin: 'google-test-test-suite'
+
+
+ext {
+    staticGtestConfigs = [:]
+}
+
+staticGtestConfigs["${pluginName}Test"] = []
+apply from: "${rootDir}/shared/googletest.gradle"
+
+apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
+
+
+model {
+    testSuites {
+        def comps = $.components
+        if (!project.hasProperty('onlyAthena')) {
+            "${pluginName}Test"(GoogleTestTestSuiteSpec) {
+                for(NativeComponentSpec c : comps) {
+                    if (c.name == pluginName) {
+                        testing c
+                        break
+                    }
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'src/test/native/cpp'
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/test/native/include', 'src/main/native/cpp'
+                        }
+                    }
+                }
+            }
+        }
+    }
+    binaries {
+        withType(GoogleTestTestSuiteBinarySpec) {
+            lib project: ':hal', library: 'hal', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib library: pluginName, linkage: 'shared'
+        }
+    }
+}
+
+tasks.withType(RunTestExecutable) {
+    args "--gtest_output=xml:test_detail.xml"
+    outputs.dir outputDir
+}

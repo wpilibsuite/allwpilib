@@ -44,6 +44,7 @@ public final class EntryNotification {
 
   /** Constructor.
    * This should generally only be used internally to NetworkTables.
+   *
    * @param inst Instance
    * @param listener Listener that was triggered
    * @param entry Entry handle
@@ -69,6 +70,7 @@ public final class EntryNotification {
 
   /**
    * Get the entry as an object.
+   *
    * @return NetworkTableEntry for this entry.
    */
   public NetworkTableEntry getEntry() {

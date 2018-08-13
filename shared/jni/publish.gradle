@@ -1,3 +1,4 @@
+import java.security.MessageDigest
 apply plugin: 'maven-publish'
 
 def pubVersion
@@ -81,7 +82,16 @@ model {
             value.each { binary ->
                 if (binary.buildable) {
                     if (binary instanceof SharedLibraryBinarySpec) {
-                        task.dependsOn binary.buildTask
+                        task.dependsOn binary.tasks.link
+                        def hashFile = new File(binary.sharedLibraryFile.parentFile.absolutePath, "${binary.component.baseName}.hash")
+                        task.outputs.file(hashFile)
+                        task.inputs.file(binary.sharedLibraryFile)
+                        task.from(hashFile) {
+                            into getPlatformPath(binary)
+                        }
+                        task.doFirst {
+                            hashFile.text = MessageDigest.getInstance("MD5").digest(binary.sharedLibraryFile.bytes).encodeHex().toString()
+                        }
                         task.from(binary.sharedLibraryFile) {
                             into getPlatformPath(binary)
                         }

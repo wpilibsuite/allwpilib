@@ -145,7 +145,8 @@ public class DifferentialDrive extends RobotDriveBase {
   @SuppressWarnings("ParameterName")
   public void arcadeDrive(double xSpeed, double zRotation, boolean squaredInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 2, tInstances.kRobotDrive_ArcadeStandard);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
+                 tInstances.kRobotDrive2_DifferentialArcade);
       m_reported = true;
     }
 
@@ -210,7 +211,8 @@ public class DifferentialDrive extends RobotDriveBase {
   @SuppressWarnings({"ParameterName", "PMD.CyclomaticComplexity"})
   public void curvatureDrive(double xSpeed, double zRotation, boolean isQuickTurn) {
     if (!m_reported) {
-      // HAL.report(tResourceType.kResourceType_RobotDrive, 2, tInstances.kRobotDrive_Curvature);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
+                 tInstances.kRobotDrive2_DifferentialCurvature);
       m_reported = true;
     }
 
@@ -300,7 +302,8 @@ public class DifferentialDrive extends RobotDriveBase {
    */
   public void tankDrive(double leftSpeed, double rightSpeed, boolean squaredInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 2, tInstances.kRobotDrive_Tank);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
+                 tInstances.kRobotDrive2_DifferentialTank);
       m_reported = true;
     }
 
@@ -387,6 +390,8 @@ public class DifferentialDrive extends RobotDriveBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("DifferentialDrive");
+    builder.setActuator(true);
+    builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Left Motor Speed", m_leftMotor::get, m_leftMotor::set);
     builder.addDoubleProperty(
         "Right Motor Speed",

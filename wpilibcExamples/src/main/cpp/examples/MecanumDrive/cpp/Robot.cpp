@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <Drive/MecanumDrive.h>
-#include <IterativeRobot.h>
-#include <Joystick.h>
-#include <Spark.h>
+#include <frc/IterativeRobot.h>
+#include <frc/Joystick.h>
+#include <frc/Spark.h>
+#include <frc/drive/MecanumDrive.h>
 
 /**
  * This is a demo program showing how to use Mecanum control with the

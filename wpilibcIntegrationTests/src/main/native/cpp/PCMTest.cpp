@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "AnalogInput.h"
-#include "Compressor.h"
-#include "DigitalInput.h"
-#include "DigitalOutput.h"
-#include "DoubleSolenoid.h"
-#include "Solenoid.h"
 #include "TestBench.h"
-#include "Timer.h"
+#include "frc/AnalogInput.h"
+#include "frc/Compressor.h"
+#include "frc/DigitalInput.h"
+#include "frc/DigitalOutput.h"
+#include "frc/DoubleSolenoid.h"
+#include "frc/Solenoid.h"
+#include "frc/Timer.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

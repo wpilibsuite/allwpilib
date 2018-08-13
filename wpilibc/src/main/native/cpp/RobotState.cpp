@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "RobotState.h"
+#include "frc/RobotState.h"
 
-#include "DriverStation.h"
+#include "frc/DriverStation.h"
 
 using namespace frc;
 

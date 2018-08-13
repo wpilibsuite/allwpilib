@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "JoystickBase.h"
+#include "frc/JoystickBase.h"
 
 using namespace frc;
 

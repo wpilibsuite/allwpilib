@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/cpp/SerialHelper.h"
+#include "hal/cpp/SerialHelper.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -15,7 +15,7 @@
 #include <wpi/StringRef.h>
 
 #include "../visa/visa.h"
-#include "HAL/Errors.h"
+#include "hal/Errors.h"
 
 constexpr const char* OnboardResourceVISA = "ASRL1::INSTR";
 constexpr const char* MxpResourceVISA = "ASRL2::INSTR";

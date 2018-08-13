@@ -55,6 +55,13 @@ class MjpegServerImpl : public SinkImpl {
   std::thread m_serverThread;
 
   std::vector<wpi::SafeThreadOwner<ConnThread>> m_connThreads;
+
+  // property indices
+  int m_widthProp;
+  int m_heightProp;
+  int m_compressionProp;
+  int m_defaultCompressionProp;
+  int m_fpsProp;
 };
 
 }  // namespace cs

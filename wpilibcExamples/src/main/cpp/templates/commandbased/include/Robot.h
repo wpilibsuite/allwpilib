@@ -7,14 +7,14 @@
 
 #pragma once
 
-#include <Commands/Command.h>
-#include <SmartDashboard/SendableChooser.h>
-#include <TimedRobot.h>
+#include <frc/TimedRobot.h>
+#include <frc/commands/Command.h>
+#include <frc/smartdashboard/SendableChooser.h>
 
-#include "Commands/ExampleCommand.h"
-#include "Commands/MyAutoCommand.h"
 #include "OI.h"
-#include "Subsystems/ExampleSubsystem.h"
+#include "commands/ExampleCommand.h"
+#include "commands/MyAutoCommand.h"
+#include "subsystems/ExampleSubsystem.h"
 
 class Robot : public frc::TimedRobot {
  public:

@@ -29,7 +29,14 @@ class SourceImpl;
 
 class Handle {
  public:
-  enum Type { kUndefined = 0, kProperty = 0x40, kSource, kSink, kListener };
+  enum Type {
+    kUndefined = 0,
+    kProperty = 0x40,
+    kSource,
+    kSink,
+    kListener,
+    kSinkProperty
+  };
   enum { kIndexMax = 0xffff };
 
   Handle(CS_Handle handle) : m_handle(handle) {}  // NOLINT
@@ -58,8 +65,9 @@ class Handle {
   bool IsType(Type type) const { return type == GetType(); }
   int GetTypedIndex(Type type) const { return IsType(type) ? GetIndex() : -1; }
   int GetParentIndex() const {
-    return IsType(Handle::kProperty) ? (static_cast<int>(m_handle) >> 16) & 0xff
-                                     : -1;
+    return (IsType(Handle::kProperty) || IsType(Handle::kSinkProperty))
+               ? (static_cast<int>(m_handle) >> 16) & 0xff
+               : -1;
   }
 
  private:

@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "AnalogInput.h"
-#include "AnalogOutput.h"
-#include "AnalogTrigger.h"
-#include "Counter.h"
 #include "TestBench.h"
-#include "Timer.h"
+#include "frc/AnalogInput.h"
+#include "frc/AnalogOutput.h"
+#include "frc/AnalogTrigger.h"
+#include "frc/Counter.h"
+#include "frc/Timer.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

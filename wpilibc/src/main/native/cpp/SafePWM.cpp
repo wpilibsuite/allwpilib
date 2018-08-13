@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "SafePWM.h"
+#include "frc/SafePWM.h"
 
 using namespace frc;
 

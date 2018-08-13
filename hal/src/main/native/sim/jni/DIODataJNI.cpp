@@ -8,8 +8,8 @@
 #include <jni.h>
 
 #include "CallbackStore.h"
-#include "MockData/DIOData.h"
 #include "edu_wpi_first_hal_sim_mockdata_DIODataJNI.h"
+#include "mockdata/DIOData.h"
 
 extern "C" {
 

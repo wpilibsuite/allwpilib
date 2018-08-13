@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/CANAPI.h"
-#include "HAL/HAL.h"
-#include "MockData/CanData.h"
 #include "gtest/gtest.h"
+#include "hal/CANAPI.h"
+#include "hal/HAL.h"
+#include "mockdata/CanData.h"
 
 namespace hal {
 struct CANTestStore {

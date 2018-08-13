@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,53 +7,13 @@
 
 #pragma once
 
-#include <HAL/AnalogOutput.h>
+// clang-format off
+#ifdef _MSC_VER
+#pragma message "warning: AnalogOutput.h is deprecated; include frc/AnalogOutput.h instead"
+#else
+#warning "AnalogOutput.h is deprecated; include frc/AnalogOutput.h instead"
+#endif
 
-#include "ErrorBase.h"
-#include "SmartDashboard/SendableBase.h"
+// clang-format on
 
-namespace frc {
-
-/**
- * MXP analog output class.
- */
-class AnalogOutput : public ErrorBase, public SendableBase {
- public:
-  /**
-   * Construct an analog output on the given channel.
-   *
-   * All analog outputs are located on the MXP port.
-   *
-   * @param channel The channel number on the roboRIO to represent.
-   */
-  explicit AnalogOutput(int channel);
-
-  ~AnalogOutput() override;
-
-  /**
-   * Set the value of the analog output.
-   *
-   * @param voltage The output value in Volts, from 0.0 to +5.0
-   */
-  void SetVoltage(double voltage);
-
-  /**
-   * Get the voltage of the analog output
-   *
-   * @return The value in Volts, from 0.0 to +5.0
-   */
-  double GetVoltage() const;
-
-  /**
-   * Get the channel of this AnalogOutput.
-   */
-  int GetChannel();
-
-  void InitSendable(SendableBuilder& builder) override;
-
- protected:
-  int m_channel;
-  HAL_AnalogOutputHandle m_port;
-};
-
-}  // namespace frc
+#include "frc/AnalogOutput.h"

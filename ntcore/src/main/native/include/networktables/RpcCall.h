@@ -17,7 +17,10 @@ namespace nt {
 
 class NetworkTableEntry;
 
-/** NetworkTables Remote Procedure Call */
+/**
+ * NetworkTables Remote Procedure Call
+ * @ingroup ntcore_cpp_api
+ */
 class RpcCall final {
  public:
   /**
@@ -27,6 +30,7 @@ class RpcCall final {
 
   /**
    * Construct from native handles.
+   *
    * @param entry Entry handle
    * @param call  Call handle
    */
@@ -43,18 +47,21 @@ class RpcCall final {
 
   /**
    * Determines if the native handle is valid.
+   *
    * @return True if the native handle is valid, false otherwise.
    */
   explicit operator bool() const { return m_call != 0; }
 
   /**
    * Get the RPC entry.
+   *
    * @return NetworkTableEntry for the RPC.
    */
   NetworkTableEntry GetEntry() const;
 
   /**
    * Get the call native handle.
+   *
    * @return Native handle.
    */
   NT_RpcCall GetCall() const { return m_call; }
@@ -62,6 +69,7 @@ class RpcCall final {
   /**
    * Get the result (return value).  This function blocks until
    * the result is received.
+   *
    * @param result      received result (output)
    * @return False on error, true otherwise.
    */
@@ -70,6 +78,7 @@ class RpcCall final {
   /**
    * Get the result (return value).  This function blocks until
    * the result is received or it times out.
+   *
    * @param result      received result (output)
    * @param timeout     timeout, in seconds
    * @param timed_out   true if the timeout period elapsed (output)

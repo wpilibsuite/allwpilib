@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/HAL.h"
+#include "hal/HAL.h"
 
 #include <signal.h>  // linux for kill
 #include <sys/prctl.h>
@@ -22,13 +22,13 @@
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
-#include "HAL/ChipObject.h"
-#include "HAL/DriverStation.h"
-#include "HAL/Errors.h"
-#include "HAL/Notifier.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
 #include "ctre/ctre.h"
+#include "hal/ChipObject.h"
+#include "hal/DriverStation.h"
+#include "hal/Errors.h"
+#include "hal/Notifier.h"
+#include "hal/handles/HandlesInternal.h"
 #include "visa/visa.h"
 
 using namespace hal;

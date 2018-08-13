@@ -5,20 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ErrorBase.h"
+#include "frc/ErrorBase.h"
 
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
 #include <set>
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
 #define WPI_ERRORS_DEFINE_STRINGS
-#include "WPIErrors.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 

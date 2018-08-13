@@ -9,10 +9,10 @@
 
 #include <cassert>
 
-#include "HAL/Ports.h"
-#include "HAL/cpp/Log.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_PortsJNI.h"
+#include "hal/Ports.h"
+#include "hal/cpp/Log.h"
 
 using namespace frc;
 

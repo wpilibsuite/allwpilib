@@ -8,8 +8,8 @@
 #include <jni.h>
 
 #include "CallbackStore.h"
-#include "MockData/AnalogTriggerData.h"
 #include "edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI.h"
+#include "mockdata/AnalogTriggerData.h"
 
 extern "C" {
 

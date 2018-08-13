@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,20 +17,24 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SuppressWarnings("MemberName")
 public class ShuffleboardInstanceTest {
-  private NetworkTableInstance ntInstance; // NOPMD
-  private ShuffleboardInstance shuffleboardInstance;
+  private NetworkTableInstance m_ntInstance;
+  private ShuffleboardInstance m_shuffleboardInstance;
 
   @BeforeEach
-  public void setupInstance() {
-    ntInstance = NetworkTableInstance.create();
-    shuffleboardInstance = new ShuffleboardInstance(ntInstance);
+  void setupInstance() {
+    m_ntInstance = NetworkTableInstance.create();
+    m_shuffleboardInstance = new ShuffleboardInstance(m_ntInstance);
+  }
+
+  @AfterEach
+  void tearDownInstance() {
+    m_ntInstance.close();
   }
 
   @Test
-  public void testPathFluent() {
-    NetworkTableEntry entry = shuffleboardInstance.getTab("Tab Title")
+  void testPathFluent() {
+    NetworkTableEntry entry = m_shuffleboardInstance.getTab("Tab Title")
                                                   .getLayout("List", "List Layout")
                                                   .add("Data", "string")
                                                   .withWidget("Text View")
@@ -42,8 +47,8 @@ public class ShuffleboardInstanceTest {
   }
 
   @Test
-  public void testNestedLayoutsFluent() {
-    NetworkTableEntry entry = shuffleboardInstance.getTab("Tab")
+  void testNestedLayoutsFluent() {
+    NetworkTableEntry entry = m_shuffleboardInstance.getTab("Tab")
                                                   .getLayout("List", "First")
                                                   .getLayout("List", "Second")
                                                   .getLayout("List", "Third")
@@ -58,8 +63,8 @@ public class ShuffleboardInstanceTest {
   }
 
   @Test
-  public void testNestedLayoutsOop() {
-    ShuffleboardTab tab = shuffleboardInstance.getTab("Tab");
+  void testNestedLayoutsOop() {
+    ShuffleboardTab tab = m_shuffleboardInstance.getTab("Tab");
     ShuffleboardLayout first = tab.getLayout("List", "First");
     ShuffleboardLayout second = first.getLayout("List", "Second");
     ShuffleboardLayout third = second.getLayout("List", "Third");

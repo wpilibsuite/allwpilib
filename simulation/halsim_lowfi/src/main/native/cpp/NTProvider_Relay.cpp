@@ -7,8 +7,8 @@
 
 #include "NTProvider_Relay.h"
 
-#include <HAL/Ports.h>
-#include <MockData/RelayData.h>
+#include <hal/Ports.h>
+#include <mockdata/RelayData.h>
 
 void HALSimNTProviderRelay::Initialize() {
   InitializeDefault(HAL_GetNumRelayHeaders(), HALSIM_RegisterRelayAllCallbacks);

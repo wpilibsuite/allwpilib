@@ -57,6 +57,18 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
   }
 
   /**
+   * Reuse this handle.  This closes the handle, and after the close completes,
+   * reinitializes it (identically to Create) and calls the provided callback.
+   * Unlike Close(), it does NOT emit the closed signal, however, IsClosing()
+   * will return true until the callback is called.  This does nothing if
+   * IsClosing() is true (e.g. if Close() was called).
+   *
+   * @param flags Flags
+   * @param callback Callback
+   */
+  void Reuse(std::function<void()> callback, unsigned int flags = AF_UNSPEC);
+
+  /**
    * Accept incoming connection.
    *
    * This call is used in conjunction with `Listen()` to accept incoming
@@ -154,6 +166,14 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
     Invoke(&uv_tcp_bind, GetRaw(), &addr, flags);
   }
 
+  void Bind(const sockaddr_in& addr, unsigned int flags = 0) {
+    Bind(reinterpret_cast<const sockaddr&>(addr), flags);
+  }
+
+  void Bind(const sockaddr_in6& addr, unsigned int flags = 0) {
+    Bind(reinterpret_cast<const sockaddr&>(addr), flags);
+  }
+
   /**
    * Bind the handle to an IPv4 address and port.
    *
@@ -205,15 +225,25 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
    * (`0.0.0.0` or `::`) it will be changed to point to localhost. This is
    * done to match the behavior of Linux systems.
    *
-   * HandleConnected() is called on the request when the connection has been
+   * The connected signal is emitted on the request when the connection has been
    * established.
-   * HandleError() is called on the request in case of errors during the
+   * The error signal is emitted on the request in case of errors during the
    * connection.
    *
    * @param addr Initialized `sockaddr_in` or `sockaddr_in6` data structure.
    * @param req connection request
    */
   void Connect(const sockaddr& addr, const std::shared_ptr<TcpConnectReq>& req);
+
+  void Connect(const sockaddr_in& addr,
+               const std::shared_ptr<TcpConnectReq>& req) {
+    Connect(reinterpret_cast<const sockaddr&>(addr), req);
+  }
+
+  void Connect(const sockaddr_in6& addr,
+               const std::shared_ptr<TcpConnectReq>& req) {
+    Connect(reinterpret_cast<const sockaddr&>(addr), req);
+  }
 
   /**
    * Establish an IPv4 or IPv6 TCP connection.
@@ -230,6 +260,14 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
    */
   void Connect(const sockaddr& addr, std::function<void()> callback);
 
+  void Connect(const sockaddr_in& addr, std::function<void()> callback) {
+    Connect(reinterpret_cast<const sockaddr&>(addr), callback);
+  }
+
+  void Connect(const sockaddr_in6& addr, std::function<void()> callback) {
+    Connect(reinterpret_cast<const sockaddr&>(addr), callback);
+  }
+
   /**
    * Establish an IPv4 TCP connection.
    *
@@ -237,9 +275,9 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
    * (`0.0.0.0` or `::`) it will be changed to point to localhost. This is
    * done to match the behavior of Linux systems.
    *
-   * HandleConnected() is called on the request when the connection has been
+   * The connected signal is emitted on the request when the connection has been
    * established.
-   * HandleError() is called on the request in case of errors during the
+   * The error signal is emitted on the request in case of errors during the
    * connection.
    *
    * @param ip The address to which to connect to.
@@ -273,9 +311,9 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
    * (`0.0.0.0` or `::`) it will be changed to point to localhost. This is
    * done to match the behavior of Linux systems.
    *
-   * HandleConnected() is called on the request when the connection has been
+   * The connected signal is emitted on the request when the connection has been
    * established.
-   * HandleError() is called on the request in case of errors during the
+   * The error signal is emitted on the request in case of errors during the
    * connection.
    *
    * @param ip The address to which to connect to.
@@ -304,6 +342,12 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
 
  private:
   Tcp* DoAccept() override;
+
+  struct ReuseData {
+    std::function<void()> callback;
+    unsigned int flags;
+  };
+  std::unique_ptr<ReuseData> m_reuseData;
 };
 
 /**

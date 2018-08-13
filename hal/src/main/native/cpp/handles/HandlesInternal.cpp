@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/handles/HandlesInternal.h"
+#include "hal/handles/HandlesInternal.h"
 
 #include <algorithm>
 

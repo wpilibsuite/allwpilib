@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DigitalGlitchFilter.h"  // NOLINT(build/include_order)
+#include "frc/DigitalGlitchFilter.h"  // NOLINT(build/include_order)
 
-#include "Counter.h"
-#include "DigitalInput.h"
-#include "Encoder.h"
+#include "frc/Counter.h"
+#include "frc/DigitalInput.h"
+#include "frc/Encoder.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

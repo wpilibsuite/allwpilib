@@ -8,8 +8,8 @@
 #include <jni.h>
 
 #include "CallbackStore.h"
-#include "MockData/RoboRioData.h"
 #include "edu_wpi_first_hal_sim_mockdata_RoboRioDataJNI.h"
+#include "mockdata/RoboRioData.h"
 
 extern "C" {
 

@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Threads.h"
+#include "frc/Threads.h"
 
-#include <HAL/HAL.h>
-#include <HAL/Threads.h>
+#include <hal/HAL.h>
+#include <hal/Threads.h>
 
-#include "ErrorBase.h"
+#include "frc/ErrorBase.h"
 
 using namespace frc;
 

@@ -7,6 +7,9 @@
 
 package edu.wpi.cscore;
 
+/**
+ * A source or sink property.
+ */
 public class VideoProperty {
   public enum Kind {
     kNone(0), kBoolean(1), kInteger(2), kString(4), kEnum(8);

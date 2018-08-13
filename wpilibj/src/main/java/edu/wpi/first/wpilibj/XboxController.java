@@ -50,8 +50,7 @@ public class XboxController extends GenericHID {
   public XboxController(final int port) {
     super(port);
 
-    // HAL.report(tResourceType.kResourceType_XboxController, port);
-    HAL.report(tResourceType.kResourceType_Joystick, port);
+    HAL.report(tResourceType.kResourceType_XboxController, port);
   }
 
   /**

@@ -5,15 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DoubleSolenoid.h"
+#include "frc/DoubleSolenoid.h"
 
-#include <HAL/HAL.h>
-#include <HAL/Ports.h>
-#include <HAL/Solenoid.h>
+#include <hal/HAL.h>
+#include <hal/Ports.h>
+#include <hal/Solenoid.h>
 
-#include "SensorUtil.h"
-#include "SmartDashboard/SendableBuilder.h"
-#include "WPIErrors.h"
+#include "frc/SensorUtil.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -136,6 +136,7 @@ bool DoubleSolenoid::IsRevSolenoidBlackListed() const {
 
 void DoubleSolenoid::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Double Solenoid");
+  builder.SetActuator(true);
   builder.SetSafeState([=]() { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",

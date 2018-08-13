@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Extensions.h"
+#include "hal/Extensions.h"
 
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
 
-#include "HAL/HAL.h"
+#include "hal/HAL.h"
 
 #if defined(WIN32) || defined(_WIN32)
 #include <windows.h>

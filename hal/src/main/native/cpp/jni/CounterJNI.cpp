@@ -9,11 +9,11 @@
 
 #include <cassert>
 
-#include "HAL/Counter.h"
-#include "HAL/Errors.h"
-#include "HAL/cpp/Log.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_CounterJNI.h"
+#include "hal/Counter.h"
+#include "hal/Errors.h"
+#include "hal/cpp/Log.h"
 
 using namespace frc;
 

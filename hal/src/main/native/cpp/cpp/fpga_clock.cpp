@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/cpp/fpga_clock.h"
+#include "hal/cpp/fpga_clock.h"
 
 #include <wpi/raw_ostream.h>
 
-#include "HAL/HAL.h"
+#include "hal/HAL.h"
 
 namespace hal {
 const fpga_clock::time_point fpga_clock::min_time =

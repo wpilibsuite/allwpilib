@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <Drive/DifferentialDrive.h>
-#include <IterativeRobot.h>
-#include <Joystick.h>
-#include <Spark.h>
+#include <frc/IterativeRobot.h>
+#include <frc/Joystick.h>
+#include <frc/Spark.h>
+#include <frc/drive/DifferentialDrive.h>
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class.

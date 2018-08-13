@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PIDSource.h"
+#include "frc/PIDSource.h"
 
 using namespace frc;
 

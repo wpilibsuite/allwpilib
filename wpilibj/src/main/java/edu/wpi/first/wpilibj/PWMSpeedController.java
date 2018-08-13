@@ -77,6 +77,7 @@ public abstract class PWMSpeedController extends SafePWM implements SpeedControl
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Speed Controller");
+    builder.setActuator(true);
     builder.setSafeState(this::setDisabled);
     builder.addDoubleProperty("Value", this::getSpeed, this::setSpeed);
   }

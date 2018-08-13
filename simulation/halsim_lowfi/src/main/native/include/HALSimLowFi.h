@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include <MockData/NotifyListener.h>
+#include <mockdata/NotifyListener.h>
 #include <networktables/NetworkTableInstance.h>
 
 class HALSimLowFi {

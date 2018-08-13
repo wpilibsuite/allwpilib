@@ -7,7 +7,7 @@
 
 #include "ThreeAxisAccelerometerData.h"
 
-#include "MockData/NotifyCallbackHelpers.h"
+#include <mockdata/NotifyCallbackHelpers.h>
 
 using namespace hal;
 

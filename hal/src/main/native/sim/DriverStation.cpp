@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/DriverStation.h"
+#include "hal/DriverStation.h"
 
 #ifdef __APPLE__
 #include <pthread.h>
@@ -20,8 +20,8 @@
 #include <wpi/mutex.h>
 
 #include "HALInitializer.h"
-#include "MockData/DriverStationDataInternal.h"
-#include "MockData/MockHooks.h"
+#include "mockdata/DriverStationDataInternal.h"
+#include "mockdata/MockHooks.h"
 
 static wpi::mutex msgMutex;
 static wpi::condition_variable* newDSDataAvailableCond;

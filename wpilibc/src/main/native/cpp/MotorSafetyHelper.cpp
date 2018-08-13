@@ -5,20 +5,21 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "MotorSafetyHelper.h"
+#include "frc/MotorSafetyHelper.h"
 
+#include <wpi/SmallPtrSet.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
-#include "DriverStation.h"
-#include "MotorSafety.h"
-#include "Timer.h"
-#include "WPIErrors.h"
+#include "frc/DriverStation.h"
+#include "frc/MotorSafety.h"
+#include "frc/Timer.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
 
-std::set<MotorSafetyHelper*> MotorSafetyHelper::m_helperList;
-wpi::mutex MotorSafetyHelper::m_listMutex;
+static wpi::SmallPtrSet<MotorSafetyHelper*, 32> helperList;
+static wpi::mutex listMutex;
 
 MotorSafetyHelper::MotorSafetyHelper(MotorSafety* safeObject)
     : m_safeObject(safeObject) {
@@ -26,13 +27,13 @@ MotorSafetyHelper::MotorSafetyHelper(MotorSafety* safeObject)
   m_expiration = DEFAULT_SAFETY_EXPIRATION;
   m_stopTime = Timer::GetFPGATimestamp();
 
-  std::lock_guard<wpi::mutex> lock(m_listMutex);
-  m_helperList.insert(this);
+  std::lock_guard<wpi::mutex> lock(listMutex);
+  helperList.insert(this);
 }
 
 MotorSafetyHelper::~MotorSafetyHelper() {
-  std::lock_guard<wpi::mutex> lock(m_listMutex);
-  m_helperList.erase(this);
+  std::lock_guard<wpi::mutex> lock(listMutex);
+  helperList.erase(this);
 }
 
 void MotorSafetyHelper::Feed() {
@@ -89,8 +90,8 @@ bool MotorSafetyHelper::IsSafetyEnabled() const {
 }
 
 void MotorSafetyHelper::CheckMotors() {
-  std::lock_guard<wpi::mutex> lock(m_listMutex);
-  for (auto elem : m_helperList) {
+  std::lock_guard<wpi::mutex> lock(listMutex);
+  for (auto elem : helperList) {
     elem->Check();
   }
 }

@@ -12,6 +12,10 @@
 
 namespace nt {
 
+/**
+ * NetworkTable entry type.
+ * @ingroup ntcore_cpp_api
+ */
 enum class NetworkTableType {
   kUnassigned = NT_UNASSIGNED,
   kBoolean = NT_BOOLEAN,
