@@ -69,7 +69,7 @@ void mau::comms::encodePacket(char* data) {
 
 bool last = false;
 void mau::comms::periodicUpdate() {
-    if (mau::vmxGetTime() - lastDecodeTime > 1000) {
+    if (mau::vmxGetTime() - lastDecodeTime > 1000000) {
         // DS Disconnected
         Mau_DriveData::updateIsDsAttached(false);
     } else {

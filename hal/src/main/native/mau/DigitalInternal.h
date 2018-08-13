@@ -24,7 +24,7 @@ namespace hal {
  */
 constexpr int32_t kMXPDigitalPWMOffset = 6;
 
-constexpr int32_t kExpectedLoopTiming = 40;
+constexpr int32_t kExpectedLoopTiming = 5000 / 256;
 
 /**
  * kDefaultPwmPeriod is in ms
@@ -52,7 +52,7 @@ constexpr float kDefaultPwmCenter = 1.5;
 /**
  * kDefaultPWMStepsDown is the number of PWM steps below the centerpoint
  */
-constexpr int32_t kDefaultPwmStepsDown = 1000;
+constexpr int32_t kDefaultPwmStepsDown = 128;
 constexpr int32_t kPwmDisabled = 0;
 
 struct DigitalPort {
