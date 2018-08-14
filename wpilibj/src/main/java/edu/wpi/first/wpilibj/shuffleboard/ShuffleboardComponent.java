@@ -23,7 +23,7 @@ public abstract class ShuffleboardComponent<C extends ShuffleboardComponent<C>>
   private final String m_title;
   private String m_type;
   private Map<String, Object> m_properties;
-  private boolean m_metadataDirty = false; // NOPMD redundant field initializer
+  private boolean m_metadataDirty = true;
   private int m_column = -1;
   private int m_row = -1;
   private int m_width = -1;

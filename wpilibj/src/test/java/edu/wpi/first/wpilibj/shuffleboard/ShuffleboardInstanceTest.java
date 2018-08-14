@@ -78,4 +78,15 @@ public class ShuffleboardInstanceTest {
                            "Entry path generated incorrectly"));
   }
 
+  @Test
+  void testLayoutTypeIsSet() {
+    String layoutType = "Type";
+    m_shuffleboardInstance.getTab("Tab")
+                          .getLayout(layoutType, "Title");
+    m_shuffleboardInstance.update();
+    NetworkTableEntry entry = m_ntInstance.getEntry(
+        "/Shuffleboard/.metadata/Tab/Title/PreferredComponent");
+    assertEquals(layoutType, entry.getString("Not Set"), "Layout type not set");
+  }
+
 }
