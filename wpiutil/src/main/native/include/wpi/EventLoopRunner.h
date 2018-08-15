@@ -20,6 +20,8 @@ namespace wpi {
  */
 class EventLoopRunner {
  public:
+  using LoopFunc = std::function<void(wpi::uv::Loop&)>;
+
   EventLoopRunner();
   virtual ~EventLoopRunner();
 
@@ -29,7 +31,7 @@ class EventLoopRunner {
    * provided function (it will deadlock).
    * @param func function to execute on the loop
    */
-  void ExecAsync(std::function<void(wpi::uv::Loop&)> func);
+  void ExecAsync(LoopFunc func);
 
   /**
    * Run a function synchronously (once) on the loop.
@@ -38,7 +40,7 @@ class EventLoopRunner {
    * This does not return until the function finishes executing.
    * @param func function to execute on the loop
    */
-  void ExecSync(std::function<void(wpi::uv::Loop&)> func);
+  void ExecSync(LoopFunc func);
 
  private:
   class Thread;
