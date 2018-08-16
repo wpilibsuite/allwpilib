@@ -213,7 +213,7 @@ namespace wpi {
       // The RHS cannot be non-empty if the LHS is empty.
       if (getRHSKind() != EmptyKind && getLHSKind() == EmptyKind)
         return false;
-
+#if 0 // causes spurious warnings
       // A twine child should always be binary.
       if (getLHSKind() == TwineKind &&
           !LHS.twine->isBinary())
@@ -221,7 +221,7 @@ namespace wpi {
       if (getRHSKind() == TwineKind &&
           !RHS.twine->isBinary())
         return false;
-
+#endif
       return true;
     }
 
