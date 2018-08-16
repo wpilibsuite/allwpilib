@@ -15,8 +15,6 @@
 #include "gtest/gtest.h"
 #include "wpi/mutex.h"
 
-using namespace std::chrono;
-
 static std::mutex std_mutex;
 static std::recursive_mutex std_recursive_mutex;
 static wpi::mutex wpi_mutex;
@@ -27,6 +25,8 @@ static wpi::recursive_spinlock2 recursive_spinlock2;
 static wpi::recursive_spinlock recursive_spinlock;
 
 TEST(SpinlockTest, Benchmark) {
+  using namespace std::chrono;
+
   // warmup
   std::thread thr([]() {
     int value = 0;
@@ -37,8 +37,8 @@ TEST(SpinlockTest, Benchmark) {
       ++value;
     }
     auto stop = high_resolution_clock::now();
-    (void) start;
-    (void) stop;
+    (void)start;
+    (void)stop;
   });
   thr.join();
 
