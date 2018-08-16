@@ -33,7 +33,9 @@ class SimpleAccelerometerSim : public SimulatorComponentBase,
     m_setAccelerationFunction(acceleration);
   }
 
-  bool IsWrapperInitialized() const override { return m_isInitializedFunction(); }
+  bool IsWrapperInitialized() const override {
+    return m_isInitializedFunction();
+  }
 
  private:
   std::function<bool(void)> m_isInitializedFunction;

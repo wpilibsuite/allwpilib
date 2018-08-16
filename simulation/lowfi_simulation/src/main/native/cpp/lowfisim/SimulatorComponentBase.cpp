@@ -11,7 +11,9 @@ namespace frc {
 namespace sim {
 namespace lowfi {
 
-const std::string& SimulatorComponentBase::GetDisplayName() const { return m_name; }
+const std::string& SimulatorComponentBase::GetDisplayName() const {
+  return m_name;
+}
 
 void SimulatorComponentBase::SetDisplayName(const std::string& displayName) {
   m_name = displayName;
