@@ -29,7 +29,9 @@ class AnalogInSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetInitialized() { return HALSIM_GetAnalogInInitialized(m_index); }
+
+  bool GetInitialized() const { return HALSIM_GetAnalogInInitialized(m_index); }
+
   void SetInitialized(bool initialized) {
     HALSIM_SetAnalogInInitialized(m_index, initialized);
   }
@@ -42,7 +44,9 @@ class AnalogInSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetAverageBits() { return HALSIM_GetAnalogInAverageBits(m_index); }
+
+  int GetAverageBits() const { return HALSIM_GetAnalogInAverageBits(m_index); }
+
   void SetAverageBits(int averageBits) {
     HALSIM_SetAnalogInAverageBits(m_index, averageBits);
   }
@@ -55,7 +59,11 @@ class AnalogInSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetOversampleBits() { return HALSIM_GetAnalogInOversampleBits(m_index); }
+
+  int GetOversampleBits() const {
+    return HALSIM_GetAnalogInOversampleBits(m_index);
+  }
+
   void SetOversampleBits(int oversampleBits) {
     HALSIM_SetAnalogInOversampleBits(m_index, oversampleBits);
   }
@@ -68,7 +76,9 @@ class AnalogInSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetVoltage() { return HALSIM_GetAnalogInVoltage(m_index); }
+
+  double GetVoltage() const { return HALSIM_GetAnalogInVoltage(m_index); }
+
   void SetVoltage(double voltage) {
     HALSIM_SetAnalogInVoltage(m_index, voltage);
   }
@@ -82,9 +92,11 @@ class AnalogInSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetAccumulatorInitialized() {
+
+  bool GetAccumulatorInitialized() const {
     return HALSIM_GetAnalogInAccumulatorInitialized(m_index);
   }
+
   void SetAccumulatorInitialized(bool accumulatorInitialized) {
     HALSIM_SetAnalogInAccumulatorInitialized(m_index, accumulatorInitialized);
   }
@@ -97,9 +109,11 @@ class AnalogInSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int64_t GetAccumulatorValue() {
+
+  int64_t GetAccumulatorValue() const {
     return HALSIM_GetAnalogInAccumulatorValue(m_index);
   }
+
   void SetAccumulatorValue(int64_t accumulatorValue) {
     HALSIM_SetAnalogInAccumulatorValue(m_index, accumulatorValue);
   }
@@ -112,9 +126,11 @@ class AnalogInSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int64_t GetAccumulatorCount() {
+
+  int64_t GetAccumulatorCount() const {
     return HALSIM_GetAnalogInAccumulatorCount(m_index);
   }
+
   void SetAccumulatorCount(int64_t accumulatorCount) {
     HALSIM_SetAnalogInAccumulatorCount(m_index, accumulatorCount);
   }
@@ -127,9 +143,11 @@ class AnalogInSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetAccumulatorCenter() {
+
+  int GetAccumulatorCenter() const {
     return HALSIM_GetAnalogInAccumulatorCenter(m_index);
   }
+
   void SetAccumulatorCenter(int accumulatorCenter) {
     HALSIM_SetAnalogInAccumulatorCenter(m_index, accumulatorCenter);
   }
@@ -143,9 +161,11 @@ class AnalogInSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetAccumulatorDeadband() {
+
+  int GetAccumulatorDeadband() const {
     return HALSIM_GetAnalogInAccumulatorDeadband(m_index);
   }
+
   void SetAccumulatorDeadband(int accumulatorDeadband) {
     HALSIM_SetAnalogInAccumulatorDeadband(m_index, accumulatorDeadband);
   }

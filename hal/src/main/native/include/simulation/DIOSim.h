@@ -29,7 +29,9 @@ class DIOSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetInitialized() { return HALSIM_GetDIOInitialized(m_index); }
+
+  bool GetInitialized() const { return HALSIM_GetDIOInitialized(m_index); }
+
   void SetInitialized(bool initialized) {
     HALSIM_SetDIOInitialized(m_index, initialized);
   }
@@ -42,7 +44,9 @@ class DIOSim {
                                                   store.get(), initialNotify));
     return store;
   }
-  bool GetValue() { return HALSIM_GetDIOValue(m_index); }
+
+  bool GetValue() const { return HALSIM_GetDIOValue(m_index); }
+
   void SetValue(bool value) { HALSIM_SetDIOValue(m_index, value); }
 
   std::unique_ptr<CallbackStore> RegisterPulseLengthCallback(
@@ -53,7 +57,9 @@ class DIOSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetPulseLength() { return HALSIM_GetDIOPulseLength(m_index); }
+
+  double GetPulseLength() const { return HALSIM_GetDIOPulseLength(m_index); }
+
   void SetPulseLength(double pulseLength) {
     HALSIM_SetDIOPulseLength(m_index, pulseLength);
   }
@@ -66,7 +72,9 @@ class DIOSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetIsInput() { return HALSIM_GetDIOIsInput(m_index); }
+
+  bool GetIsInput() const { return HALSIM_GetDIOIsInput(m_index); }
+
   void SetIsInput(bool isInput) { HALSIM_SetDIOIsInput(m_index, isInput); }
 
   std::unique_ptr<CallbackStore> RegisterFilterIndexCallback(
@@ -77,7 +85,9 @@ class DIOSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetFilterIndex() { return HALSIM_GetDIOFilterIndex(m_index); }
+
+  int GetFilterIndex() const { return HALSIM_GetDIOFilterIndex(m_index); }
+
   void SetFilterIndex(int filterIndex) {
     HALSIM_SetDIOFilterIndex(m_index, filterIndex);
   }

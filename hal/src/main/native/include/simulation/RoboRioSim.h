@@ -29,7 +29,9 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetFPGAButton() { return HALSIM_GetRoboRioFPGAButton(m_index); }
+
+  bool GetFPGAButton() const { return HALSIM_GetRoboRioFPGAButton(m_index); }
+
   void SetFPGAButton(bool fPGAButton) {
     HALSIM_SetRoboRioFPGAButton(m_index, fPGAButton);
   }
@@ -42,7 +44,9 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetVInVoltage() { return HALSIM_GetRoboRioVInVoltage(m_index); }
+
+  double GetVInVoltage() const { return HALSIM_GetRoboRioVInVoltage(m_index); }
+
   void SetVInVoltage(double vInVoltage) {
     HALSIM_SetRoboRioVInVoltage(m_index, vInVoltage);
   }
@@ -55,7 +59,9 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetVInCurrent() { return HALSIM_GetRoboRioVInCurrent(m_index); }
+
+  double GetVInCurrent() const { return HALSIM_GetRoboRioVInCurrent(m_index); }
+
   void SetVInCurrent(double vInCurrent) {
     HALSIM_SetRoboRioVInCurrent(m_index, vInCurrent);
   }
@@ -68,7 +74,11 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetUserVoltage6V() { return HALSIM_GetRoboRioUserVoltage6V(m_index); }
+
+  double GetUserVoltage6V() const {
+    return HALSIM_GetRoboRioUserVoltage6V(m_index);
+  }
+
   void SetUserVoltage6V(double userVoltage6V) {
     HALSIM_SetRoboRioUserVoltage6V(m_index, userVoltage6V);
   }
@@ -81,7 +91,11 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetUserCurrent6V() { return HALSIM_GetRoboRioUserCurrent6V(m_index); }
+
+  double GetUserCurrent6V() const {
+    return HALSIM_GetRoboRioUserCurrent6V(m_index);
+  }
+
   void SetUserCurrent6V(double userCurrent6V) {
     HALSIM_SetRoboRioUserCurrent6V(m_index, userCurrent6V);
   }
@@ -94,7 +108,11 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetUserActive6V() { return HALSIM_GetRoboRioUserActive6V(m_index); }
+
+  bool GetUserActive6V() const {
+    return HALSIM_GetRoboRioUserActive6V(m_index);
+  }
+
   void SetUserActive6V(bool userActive6V) {
     HALSIM_SetRoboRioUserActive6V(m_index, userActive6V);
   }
@@ -107,7 +125,11 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetUserVoltage5V() { return HALSIM_GetRoboRioUserVoltage5V(m_index); }
+
+  double GetUserVoltage5V() const {
+    return HALSIM_GetRoboRioUserVoltage5V(m_index);
+  }
+
   void SetUserVoltage5V(double userVoltage5V) {
     HALSIM_SetRoboRioUserVoltage5V(m_index, userVoltage5V);
   }
@@ -120,7 +142,11 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetUserCurrent5V() { return HALSIM_GetRoboRioUserCurrent5V(m_index); }
+
+  double GetUserCurrent5V() const {
+    return HALSIM_GetRoboRioUserCurrent5V(m_index);
+  }
+
   void SetUserCurrent5V(double userCurrent5V) {
     HALSIM_SetRoboRioUserCurrent5V(m_index, userCurrent5V);
   }
@@ -133,7 +159,11 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetUserActive5V() { return HALSIM_GetRoboRioUserActive5V(m_index); }
+
+  bool GetUserActive5V() const {
+    return HALSIM_GetRoboRioUserActive5V(m_index);
+  }
+
   void SetUserActive5V(bool userActive5V) {
     HALSIM_SetRoboRioUserActive5V(m_index, userActive5V);
   }
@@ -146,9 +176,11 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetUserVoltage3V3() {
+
+  double GetUserVoltage3V3() const {
     return HALSIM_GetRoboRioUserVoltage3V3(m_index);
   }
+
   void SetUserVoltage3V3(double userVoltage3V3) {
     HALSIM_SetRoboRioUserVoltage3V3(m_index, userVoltage3V3);
   }
@@ -161,9 +193,11 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetUserCurrent3V3() {
+
+  double GetUserCurrent3V3() const {
     return HALSIM_GetRoboRioUserCurrent3V3(m_index);
   }
+
   void SetUserCurrent3V3(double userCurrent3V3) {
     HALSIM_SetRoboRioUserCurrent3V3(m_index, userCurrent3V3);
   }
@@ -176,7 +210,11 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetUserActive3V3() { return HALSIM_GetRoboRioUserActive3V3(m_index); }
+
+  bool GetUserActive3V3() const {
+    return HALSIM_GetRoboRioUserActive3V3(m_index);
+  }
+
   void SetUserActive3V3(bool userActive3V3) {
     HALSIM_SetRoboRioUserActive3V3(m_index, userActive3V3);
   }
@@ -189,7 +227,9 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetUserFaults6V() { return HALSIM_GetRoboRioUserFaults6V(m_index); }
+
+  int GetUserFaults6V() const { return HALSIM_GetRoboRioUserFaults6V(m_index); }
+
   void SetUserFaults6V(int userFaults6V) {
     HALSIM_SetRoboRioUserFaults6V(m_index, userFaults6V);
   }
@@ -202,7 +242,9 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetUserFaults5V() { return HALSIM_GetRoboRioUserFaults5V(m_index); }
+
+  int GetUserFaults5V() const { return HALSIM_GetRoboRioUserFaults5V(m_index); }
+
   void SetUserFaults5V(int userFaults5V) {
     HALSIM_SetRoboRioUserFaults5V(m_index, userFaults5V);
   }
@@ -215,7 +257,11 @@ class RoboRioSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetUserFaults3V3() { return HALSIM_GetRoboRioUserFaults3V3(m_index); }
+
+  int GetUserFaults3V3() const {
+    return HALSIM_GetRoboRioUserFaults3V3(m_index);
+  }
+
   void SetUserFaults3V3(int userFaults3V3) {
     HALSIM_SetRoboRioUserFaults3V3(m_index, userFaults3V3);
   }

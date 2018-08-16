@@ -29,7 +29,9 @@ class EncoderSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetInitialized() { return HALSIM_GetEncoderInitialized(m_index); }
+
+  bool GetInitialized() const { return HALSIM_GetEncoderInitialized(m_index); }
+
   void SetInitialized(bool initialized) {
     HALSIM_SetEncoderInitialized(m_index, initialized);
   }
@@ -42,7 +44,9 @@ class EncoderSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetCount() { return HALSIM_GetEncoderCount(m_index); }
+
+  int GetCount() const { return HALSIM_GetEncoderCount(m_index); }
+
   void SetCount(int count) { HALSIM_SetEncoderCount(m_index, count); }
 
   std::unique_ptr<CallbackStore> RegisterPeriodCallback(NotifyCallback callback,
@@ -53,7 +57,9 @@ class EncoderSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetPeriod() { return HALSIM_GetEncoderPeriod(m_index); }
+
+  double GetPeriod() const { return HALSIM_GetEncoderPeriod(m_index); }
+
   void SetPeriod(double period) { HALSIM_SetEncoderPeriod(m_index, period); }
 
   std::unique_ptr<CallbackStore> RegisterResetCallback(NotifyCallback callback,
@@ -64,7 +70,9 @@ class EncoderSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetReset() { return HALSIM_GetEncoderReset(m_index); }
+
+  bool GetReset() const { return HALSIM_GetEncoderReset(m_index); }
+
   void SetReset(bool reset) { HALSIM_SetEncoderReset(m_index, reset); }
 
   std::unique_ptr<CallbackStore> RegisterMaxPeriodCallback(
@@ -75,7 +83,9 @@ class EncoderSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetMaxPeriod() { return HALSIM_GetEncoderMaxPeriod(m_index); }
+
+  double GetMaxPeriod() const { return HALSIM_GetEncoderMaxPeriod(m_index); }
+
   void SetMaxPeriod(double maxPeriod) {
     HALSIM_SetEncoderMaxPeriod(m_index, maxPeriod);
   }
@@ -88,7 +98,9 @@ class EncoderSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetDirection() { return HALSIM_GetEncoderDirection(m_index); }
+
+  bool GetDirection() const { return HALSIM_GetEncoderDirection(m_index); }
+
   void SetDirection(bool direction) {
     HALSIM_SetEncoderDirection(m_index, direction);
   }
@@ -101,9 +113,11 @@ class EncoderSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetReverseDirection() {
+
+  bool GetReverseDirection() const {
     return HALSIM_GetEncoderReverseDirection(m_index);
   }
+
   void SetReverseDirection(bool reverseDirection) {
     HALSIM_SetEncoderReverseDirection(m_index, reverseDirection);
   }
@@ -116,9 +130,11 @@ class EncoderSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetSamplesToAverage() {
+
+  int GetSamplesToAverage() const {
     return HALSIM_GetEncoderSamplesToAverage(m_index);
   }
+
   void SetSamplesToAverage(int samplesToAverage) {
     HALSIM_SetEncoderSamplesToAverage(m_index, samplesToAverage);
   }
@@ -131,9 +147,11 @@ class EncoderSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetDistancePerPulse() {
+
+  double GetDistancePerPulse() const {
     return HALSIM_GetEncoderDistancePerPulse(m_index);
   }
+
   void SetDistancePerPulse(double distancePerPulse) {
     HALSIM_SetEncoderDistancePerPulse(m_index, distancePerPulse);
   }
