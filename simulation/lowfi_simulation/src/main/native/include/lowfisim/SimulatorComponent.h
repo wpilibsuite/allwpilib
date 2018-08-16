@@ -17,7 +17,7 @@ class SimulatorComponent {
  public:
   virtual ~SimulatorComponent() = default;
 
-  virtual bool IsWrapperInitialized() = 0;
+  virtual bool IsWrapperInitialized() const = 0;
 
   virtual const std::string& GetDisplayName() const = 0;
 

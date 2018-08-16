@@ -19,7 +19,7 @@ namespace lowfi {
 class WpiMotorSim : public SimulatorComponentBase, public MotorSim {
  public:
   explicit WpiMotorSim(int index, MotorModel& motorModelSimulator);
-  bool IsWrapperInitialized() override;
+  bool IsWrapperInitialized() const override;
 
   void Update(double elapsedTime);
   double GetPosition() const override;

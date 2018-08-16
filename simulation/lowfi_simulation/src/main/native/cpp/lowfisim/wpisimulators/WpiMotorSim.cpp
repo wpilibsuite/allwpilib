@@ -20,7 +20,7 @@ void WpiMotorSim::Update(double elapsedTime) {
   m_motorModelSimulation.Update(elapsedTime);
 }
 
-bool WpiMotorSim::IsWrapperInitialized() {
+bool WpiMotorSim::IsWrapperInitialized() const {
   return m_pwmSimulator.GetInitialized();
 }
 

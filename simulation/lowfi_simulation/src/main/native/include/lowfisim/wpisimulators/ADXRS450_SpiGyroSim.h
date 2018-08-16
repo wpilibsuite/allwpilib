@@ -19,7 +19,7 @@ class ADXRS450_SpiGyroSim : public SimulatorComponentBase, public GyroSim {
  public:
   explicit ADXRS450_SpiGyroSim(int spiPort);
 
-  bool IsWrapperInitialized() override;
+  bool IsWrapperInitialized() const override;
 
   void SetAngle(double angle) override;
   double GetAngle() override;

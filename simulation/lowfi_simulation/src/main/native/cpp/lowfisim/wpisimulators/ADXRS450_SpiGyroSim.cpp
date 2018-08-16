@@ -14,7 +14,7 @@ namespace lowfi {
 ADXRS450_SpiGyroSim::ADXRS450_SpiGyroSim(int spiPort)
     : m_gyroWrapper(spiPort) {}
 
-bool ADXRS450_SpiGyroSim::IsWrapperInitialized() {
+bool ADXRS450_SpiGyroSim::IsWrapperInitialized() const {
   return m_gyroWrapper.GetInitialized();
 }
 

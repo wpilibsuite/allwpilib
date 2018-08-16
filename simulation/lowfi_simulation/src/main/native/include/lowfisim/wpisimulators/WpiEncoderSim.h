@@ -18,7 +18,7 @@ namespace lowfi {
 class WpiEncoderSim : public SimulatorComponentBase, public EncoderSim {
  public:
   explicit WpiEncoderSim(int index);
-  bool IsWrapperInitialized() override;
+  bool IsWrapperInitialized() const override;
 
   void SetPosition(double position) override;
   void SetVelocity(double velocity) override;

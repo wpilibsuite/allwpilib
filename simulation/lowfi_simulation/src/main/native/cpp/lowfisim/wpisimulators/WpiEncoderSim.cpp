@@ -13,7 +13,7 @@ namespace lowfi {
 
 WpiEncoderSim::WpiEncoderSim(int index) : m_encoderSimulator(index) {}
 
-bool WpiEncoderSim::IsWrapperInitialized() {
+bool WpiEncoderSim::IsWrapperInitialized() const {
   return m_encoderSimulator.GetInitialized();
 }
 

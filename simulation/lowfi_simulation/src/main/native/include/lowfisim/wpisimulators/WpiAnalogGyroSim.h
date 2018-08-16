@@ -19,7 +19,7 @@ class WpiAnalogGyroSim : public SimulatorComponentBase, public GyroSim {
  public:
   explicit WpiAnalogGyroSim(int index);
 
-  bool IsWrapperInitialized() override;
+  bool IsWrapperInitialized() const override;
 
   void SetAngle(double angle) override;
   double GetAngle() override;

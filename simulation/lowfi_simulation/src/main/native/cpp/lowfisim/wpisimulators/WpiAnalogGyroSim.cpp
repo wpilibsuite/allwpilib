@@ -13,7 +13,7 @@ namespace lowfi {
 
 WpiAnalogGyroSim::WpiAnalogGyroSim(int index) : m_gyroSimulator(index) {}
 
-bool WpiAnalogGyroSim::IsWrapperInitialized() {
+bool WpiAnalogGyroSim::IsWrapperInitialized() const {
   return m_gyroSimulator.GetInitialized();
 }
 
