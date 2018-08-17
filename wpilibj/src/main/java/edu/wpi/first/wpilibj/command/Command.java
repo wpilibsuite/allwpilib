@@ -136,6 +136,24 @@ public abstract class Command extends SendableBase {
   }
 
   /**
+   * Creates a new command with the given timeout and a default name. The default name is the name
+   * of the class.
+   *
+   * @param timeout     the time (in seconds) before this command "times out"
+   * @param requirement the subsystem that this command requires
+   * @throws IllegalArgumentException if given a negative timeout
+   * @see Command#isTimedOut() isTimedOut()
+   */
+  public Command(double timeout, Subsystem requirement) {
+    this();
+    if (timeout < 0) {
+      throw new IllegalArgumentException("Timeout must not be negative.  Given:" + timeout);
+    }
+    m_timeout = timeout;
+    requires(requirement);
+  }
+
+  /**
    * Creates a new command with the given name and timeout.
    *
    * @param name    the name of the command
@@ -149,6 +167,25 @@ public abstract class Command extends SendableBase {
       throw new IllegalArgumentException("Timeout must not be negative.  Given:" + timeout);
     }
     m_timeout = timeout;
+  }
+
+  /**
+   * Creates a new command with the given name and timeout.
+   *
+   * @param name    the name of the command
+   * @param timeout the time (in seconds) before this command "times out"
+   * @param requirement the subsystem that this command requires
+   * @throws IllegalArgumentException if given a negative timeout
+   * @throws IllegalArgumentException if given a negative timeout or name was null.
+   * @see Command#isTimedOut() isTimedOut()
+   */
+  public Command(String name, double timeout, Subsystem requirement) {
+    this(name);
+    if (timeout < 0) {
+      throw new IllegalArgumentException("Timeout must not be negative.  Given:" + timeout);
+    }
+    m_timeout = timeout;
+    requires(requirement);
   }
 
   /**
