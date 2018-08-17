@@ -27,6 +27,9 @@ public:
 	void TeleopInit() override {}
 
 	void TeleopPeriodic() override {
+		char joystickVal[10];
+		sprintf(joystickVal, "%0.2f", m_stick.GetX());
+		    wpi::outs() << "Joystick:  " << joystickVal << "\n";
 		m_motor.Set(m_stick.GetX());
 		Wait(0.005);
 	}

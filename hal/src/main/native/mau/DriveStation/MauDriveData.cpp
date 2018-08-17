@@ -6,6 +6,8 @@ wpi::priority_condition_variable Mau_DriveData::memSignal;
 
 HAL_AllianceStationID Mau_DriveData::allianceID;
 HAL_MatchInfo Mau_DriveData::matchInfo;
+char Mau_DriveData::infoEventName[Mau_kMatchNameLength];
+char Mau_DriveData::infoGameMessage[Mau_kMatchMessageLength];
 HAL_ControlWord Mau_DriveData::controlWord;
 Mau_SharedJoystick Mau_DriveData::joysticks[6];
 
@@ -13,6 +15,14 @@ void Mau_DriveData::unlockAndSignal() {
     memSignal.notify_all();
     memLock.unlock();
 }
+
+
+ void Mau_DriveData::initializeDriveData() {
+	infoEventName[0] = 0;
+	matchInfo.eventName = infoEventName;
+	infoGameMessage[0] = 0;
+	matchInfo.gameSpecificMessage = infoGameMessage;
+ }
 
 void Mau_DriveData::updateAllianceID(HAL_AllianceStationID id) {
     memLock.lock();
@@ -76,11 +86,11 @@ void Mau_DriveData::updateIsDsAttached(bool ds) {
 
 // --- Update: Joystick --- //
 
-void Mau_DriveData::updateJoyAxis(int joyNumber, int16_t axisCount, uint8_t* axes) {
+void Mau_DriveData::updateJoyAxis(int joyNumber, int16_t axisCount, int8_t* axes) {
     memLock.lock();
     joysticks[joyNumber].joyAxes.count = axisCount;
     for (int index = 0; index < axisCount; index++) {
-        joysticks[joyNumber].joyAxes.axes[index] = (float) axes[index];
+        joysticks[joyNumber].joyAxes.axes[index] = ((float)axes[index]) / 127;
     }
     unlockAndSignal();
 }

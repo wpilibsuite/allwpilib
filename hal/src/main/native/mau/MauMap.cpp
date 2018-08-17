@@ -7,7 +7,7 @@ VMXChannelInfo Mau_Channel::getInfo() {
 }
 
 VMXResourceIndex Mau_Channel::getResourceIndex() {
-    return EXTRACT_VMX_RESOURCE_INDEX(*vmxResHandle);
+    return EXTRACT_VMX_RESOURCE_INDEX(vmxResHandle);
 }
 
 // ----- Hal Channel Group ----- //

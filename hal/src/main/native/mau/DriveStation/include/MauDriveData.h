@@ -23,12 +23,16 @@ class Mau_DriveData {
     static wpi::priority_condition_variable memSignal;
 
     static HAL_AllianceStationID allianceID;
+    static char infoEventName[Mau_kMatchNameLength];
+    static char infoGameMessage[Mau_kMatchMessageLength];
 	static HAL_MatchInfo matchInfo;
     static HAL_ControlWord controlWord;
     static Mau_SharedJoystick joysticks[6];
 
     static void unlockAndSignal();
 public:
+    static void initializeDriveData();
+
     static void updateAllianceID(HAL_AllianceStationID id);
     static void updateMatchInfo(HAL_MatchInfo* info);
     static void updateMatchType(HAL_MatchType type);
@@ -40,7 +44,7 @@ public:
     static void updateIsFmsAttached(bool fms);
     static void updateIsDsAttached(bool ds);
 
-    static void updateJoyAxis(int joyNumber, int16_t axisCount, uint8_t* axes);
+    static void updateJoyAxis(int joyNumber, int16_t axisCount, int8_t* axes);
     static void updateJoyPOV(int joyNumber, int povsCount, uint16_t* povs);
     static void updateJoyButtons(int joyNumber, uint8_t buttonCount, uint32_t buttons);
     static void updateJoyDescriptor(int joyNumber, HAL_JoystickDescriptor* desc);

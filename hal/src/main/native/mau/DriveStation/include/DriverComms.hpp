@@ -10,7 +10,7 @@ namespace mau {
         typedef struct {
             uint8_t axis_count, pov_count, button_count;
             uint16_t pov[4];
-            uint8_t axis[16];
+            int8_t axis[16];
             uint32_t button_mask;
             bool has_update;
         } _TempJoyData;
@@ -32,4 +32,3 @@ namespace mau {
         void periodicUpdate();
     }
 }
-	

@@ -20,6 +20,7 @@
 #include "MauInternal.h"
 #include "Translator/include/FileHandler.h"
 #include "MauTime.h"
+#include "DriveStation/include/MauDriveData.h"
 #include <VMXPi.h>
 
 using namespace hal;
@@ -43,6 +44,8 @@ Mau_EnumConverter* mau::enumConverter;
 namespace hal {
     namespace init {
         void InitializeHAL() {
+        	Mau_DriveData::initializeDriveData();
+
             fileHandler = new Mau_FileHandler();
             Mau_EnumConverter* enums = fileHandler->getEnumConverter();
             Mau_ChannelMap* maps = fileHandler->readChannelMap();

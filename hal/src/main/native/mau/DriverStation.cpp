@@ -201,15 +201,19 @@ extern "C" {
     }
 
     int HAL_GetMatchInfo(HAL_MatchInfo* info) {
+    	info->eventName = new char[Mau_kMatchNameLength];
+    	info->eventName[0] = 0;
+    	info->gameSpecificMessage = new char[Mau_kMatchMessageLength];
+    	info->gameSpecificMessage[0] = 0;
         Mau_DriveData::scribeMatchInfo(info);
         return 0;
     }
 
     void HAL_FreeMatchInfo(HAL_MatchInfo* info) {
-//        std::free(info->eventName);
-//        std::free(info->gameSpecificMessage);
-//        info->eventName = nullptr;
-//        info->gameSpecificMessage = nullptr;
+        delete info->eventName;
+        delete info->gameSpecificMessage;
+        info->eventName = nullptr;
+        info->gameSpecificMessage = nullptr;
     }
 }
 
