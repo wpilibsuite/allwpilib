@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj.command;
 
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -391,10 +390,10 @@ public abstract class Command extends SendableBase {
   }
 
   /**
-   * Returns the requirements (as an {@link Enumeration Enumeration} of {@link Subsystem
+   * Returns the requirements (as a {@link Set Set} of {@link Subsystem
    * Subsystems}) of this command.
    *
-   * @return the requirements (as an {@link Enumeration Enumeration} of {@link Subsystem
+   * @return the requirements (as an {@link Set Set} of {@link Subsystem
    * Subsystems}) of this command
    */
   synchronized Set<Subsystem> getRequirements() {

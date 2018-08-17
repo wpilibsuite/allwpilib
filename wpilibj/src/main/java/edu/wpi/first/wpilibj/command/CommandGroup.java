@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import java.util.Enumeration;
 import java.util.Vector;
 
 import static java.util.Objects.requireNonNull;
@@ -294,9 +293,8 @@ public class CommandGroup extends Command {
       cmd.removed();
     }
 
-    Enumeration children = m_children.elements();
-    while (children.hasMoreElements()) {
-      Command cmd = ((Entry) children.nextElement()).m_command;
+    for (Entry child : m_children) {
+      Command cmd = child.m_command;
       cmd._cancel();
       cmd.removed();
     }
