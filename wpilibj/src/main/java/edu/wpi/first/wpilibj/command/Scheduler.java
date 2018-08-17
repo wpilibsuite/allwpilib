@@ -8,9 +8,10 @@
 package edu.wpi.first.wpilibj.command;
 
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -51,10 +52,11 @@ public final class Scheduler extends SendableBase {
   }
 
   /**
-   * A hashtable of active {@link Command Commands} to their {@link LinkedListElement}.
+   * A hashmap of active {@link Command Commands} to their {@link LinkedListElement}.
    */
   @SuppressWarnings("PMD.LooseCoupling")
-  private final Hashtable<Command, LinkedListElement> m_commandTable = new Hashtable<>();
+  private final Map<Command, LinkedListElement> m_commandTable =
+      new ConcurrentHashMap<Command, LinkedListElement>();
   /**
    * The set of all {@link Subsystem Subsystems}.
    */
