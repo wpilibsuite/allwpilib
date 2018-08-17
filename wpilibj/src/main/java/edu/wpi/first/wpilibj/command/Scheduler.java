@@ -7,8 +7,9 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 import java.util.Vector;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -55,9 +56,9 @@ public final class Scheduler extends SendableBase {
   @SuppressWarnings("PMD.LooseCoupling")
   private final Hashtable<Command, LinkedListElement> m_commandTable = new Hashtable<>();
   /**
-   * The {@link Set} of all {@link Subsystem Subsystems}.
+   * The set of all {@link Subsystem Subsystems}.
    */
-  private final Set m_subsystems = new Set();
+  private final Set<Subsystem> m_subsystems = new HashSet<Subsystem>();
   /**
    * The first {@link Command} in the list.
    */
@@ -150,9 +151,7 @@ public final class Scheduler extends SendableBase {
     // Only add if not already in
     if (!m_commandTable.containsKey(command)) {
       // Check that the requirements can be had
-      Enumeration requirements = command.getRequirements();
-      while (requirements.hasMoreElements()) {
-        Subsystem lock = (Subsystem) requirements.nextElement();
+      for (Subsystem lock : command.getRequirements()) {
         if (lock.getCurrentCommand() != null && !lock.getCurrentCommand().isInterruptible()) {
           return;
         }
@@ -160,9 +159,7 @@ public final class Scheduler extends SendableBase {
 
       // Give it the requirements
       m_adding = true;
-      requirements = command.getRequirements();
-      while (requirements.hasMoreElements()) {
-        Subsystem lock = (Subsystem) requirements.nextElement();
+      for (Subsystem lock : command.getRequirements()) {
         if (lock.getCurrentCommand() != null) {
           lock.getCurrentCommand().cancel();
           remove(lock.getCurrentCommand());
@@ -211,9 +208,8 @@ public final class Scheduler extends SendableBase {
     }
 
     // Call every subsystem's periodic method
-    Enumeration subsystems = m_subsystems.getElements();
-    while (subsystems.hasMoreElements()) {
-      ((Subsystem) subsystems.nextElement()).periodic();
+    for (Subsystem subsystem : m_subsystems) {
+      subsystem.periodic();
     }
 
     // Loop through the commands
@@ -234,9 +230,7 @@ public final class Scheduler extends SendableBase {
     m_additions.removeAllElements();
 
     // Add in the defaults
-    Enumeration locks = m_subsystems.getElements();
-    while (locks.hasMoreElements()) {
-      Subsystem lock = (Subsystem) locks.nextElement();
+    for (Subsystem lock : m_subsystems) {
       if (lock.getCurrentCommand() == null) {
         _add(lock.getDefaultCommand());
       }
@@ -277,9 +271,8 @@ public final class Scheduler extends SendableBase {
     }
     element.remove();
 
-    Enumeration requirements = command.getRequirements();
-    while (requirements.hasMoreElements()) {
-      ((Subsystem) requirements.nextElement()).setCurrentCommand(null);
+    for (Subsystem subsystem : command.getRequirements()) {
+      subsystem.setCurrentCommand(null);
     }
 
     command.removed();

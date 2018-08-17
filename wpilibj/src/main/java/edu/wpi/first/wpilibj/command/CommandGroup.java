@@ -92,8 +92,8 @@ public class CommandGroup extends Command {
     command.setParent(this);
 
     m_commands.addElement(new Entry(command, Entry.IN_SEQUENCE));
-    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
-      requires((Subsystem) e.nextElement());
+    for (Subsystem requirement : command.getRequirements()) {
+      requires(requirement);
     }
   }
 
@@ -130,8 +130,8 @@ public class CommandGroup extends Command {
     command.setParent(this);
 
     m_commands.addElement(new Entry(command, Entry.IN_SEQUENCE, timeout));
-    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
-      requires((Subsystem) e.nextElement());
+    for (Subsystem requirement : command.getRequirements()) {
+      requires(requirement);
     }
   }
 
@@ -163,8 +163,8 @@ public class CommandGroup extends Command {
     command.setParent(this);
 
     m_commands.addElement(new Entry(command, Entry.BRANCH_CHILD));
-    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
-      requires((Subsystem) e.nextElement());
+    for (Subsystem requirement : command.getRequirements()) {
+      requires(requirement);
     }
   }
 
@@ -204,8 +204,8 @@ public class CommandGroup extends Command {
     command.setParent(this);
 
     m_commands.addElement(new Entry(command, Entry.BRANCH_CHILD, timeout));
-    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
-      requires((Subsystem) e.nextElement());
+    for (Subsystem requirement : command.getRequirements()) {
+      requires(requirement);
     }
   }
 
@@ -376,11 +376,8 @@ public class CommandGroup extends Command {
     for (int i = 0; i < m_children.size(); i++) {
       Command child = m_children.elementAt(i).m_command;
 
-      Enumeration requirements = command.getRequirements();
-
-      while (requirements.hasMoreElements()) {
-        Object requirement = requirements.nextElement();
-        if (child.doesRequire((Subsystem) requirement)) {
+      for (Subsystem requirement : command.getRequirements()) {
+        if (child.doesRequire(requirement)) {
           child._cancel();
           child.removed();
           m_children.removeElementAt(i--);
