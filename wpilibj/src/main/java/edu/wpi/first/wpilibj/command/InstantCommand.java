@@ -30,7 +30,7 @@ public class InstantCommand extends Command {
    * @param requirement the subsystem this command requires
    */
   public InstantCommand(Subsystem requirement) {
-      super(requirement);
+    super(requirement);
   }
 
   /**

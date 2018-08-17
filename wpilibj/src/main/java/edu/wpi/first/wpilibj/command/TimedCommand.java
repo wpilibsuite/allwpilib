@@ -19,7 +19,7 @@ public class TimedCommand extends Command {
    * @param timeout the time the command takes to run (seconds)
    */
   public TimedCommand(String name, double timeout) {
-    super(name, timeout, requirement);
+    super(name, timeout);
   }
 
   /**
@@ -28,7 +28,7 @@ public class TimedCommand extends Command {
    * @param timeout the time the command takes to run (seconds)
    */
   public TimedCommand(double timeout) {
-    super(timeout, requirement);
+    super(timeout);
   }
 
   /**

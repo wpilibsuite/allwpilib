@@ -139,6 +139,35 @@ public abstract class Command extends SendableBase {
    * Creates a new command with the given timeout and a default name. The default name is the name
    * of the class.
    *
+   * @param requirement the subsystem that this command requires
+   * @throws IllegalArgumentException if given a negative timeout
+   * @see Command#isTimedOut() isTimedOut()
+   */
+  public Command(Subsystem requirement) {
+    this();
+    requires(requirement);
+  }
+
+  /**
+   * Creates a new command with the given name.
+   *
+   * @param name        the name for this command
+   * @param requirement the subsystem that this command requires
+   * @throws IllegalArgumentException if name is null
+   */
+  public Command(String name, Subsystem requirement) {
+    super(false);
+    if (name == null) {
+      throw new IllegalArgumentException("Name must not be null.");
+    }
+    setName(name);
+    requires(requirement);
+  }
+
+  /**
+   * Creates a new command with the given timeout and a default name. The default name is the name
+   * of the class.
+   *
    * @param timeout     the time (in seconds) before this command "times out"
    * @param requirement the subsystem that this command requires
    * @throws IllegalArgumentException if given a negative timeout

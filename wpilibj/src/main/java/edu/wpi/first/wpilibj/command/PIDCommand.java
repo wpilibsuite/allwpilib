@@ -133,7 +133,8 @@ public abstract class PIDCommand extends Command {
    * @param requirement the subsystem that this command requires
    */
   @SuppressWarnings("ParameterName")
-  public PIDCommand(String name, double p, double i, double d, double period, Subsystem requirement) {
+  public PIDCommand(String name, double p, double i, double d, double period,
+                    Subsystem requirement) {
     super(name, requirement);
     m_controller = new PIDController(p, i, d, m_source, m_output, period);
   }
