@@ -3,6 +3,9 @@
 dependency-reduced-pom.xml
 doxygen.log
 buildcmake/
+Makefile
+native.cbp
+CMakeLists.txt
 
 # Created by the jenkins test script
 test-reports

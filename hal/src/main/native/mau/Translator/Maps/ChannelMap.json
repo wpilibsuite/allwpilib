@@ -1,0 +1,178 @@
+{
+  "DIO": {
+    "EnumValue":1,
+    "ReferenceTo":"VMXChannel",
+    "Count":26,
+    "FirstMXP":10,
+    "Channels": {
+      "0":0,
+      "1":1,
+      "2":2,
+      "3":3,
+      "4":4,
+      "5":5,
+      "6":6,
+      "7":7,
+      "8":8,
+      "9":9,
+      "10":-1,
+      "11":-1,
+      "12":-1,
+      "13":-1,
+      "14":-1,
+      "15":-1,
+      "16":-1,
+      "17":-1,
+      "18":-1,
+      "19":-1,
+      "20":-1,
+      "21":-1,
+      "22":-1,
+      "23":-1,
+      "24":-1,
+      "25":-1
+    }
+  },
+
+  "Interrupt": {
+    "EnumValue":4,
+    "Channels":"AnalogInput"
+  },
+
+  "AnalogOutput": {
+    "EnumValue":5,
+    "ReferenceTo":"VMXChannel",
+    "Count":2,
+    "FirstMXP":0,
+    "Channels": {
+      "0":-1,
+      "1":-1
+    }
+  },
+
+  "AnalogInput": {
+    "EnumValue":6,
+    "ReferenceTo":"VMXChannel",
+    "Count":8,
+    "FirstMXP":4,
+    "Channels": {
+      "0":22,
+      "1":23,
+      "2":24,
+      "3":25,
+      "4":-1,
+      "5":-1,
+      "6":-1,
+      "7":-1
+    }
+  },
+
+  "AnalogTrigger": {
+    "EnumValue":7,
+    "Channels":"AnalogInput"
+  },
+
+  "Relay": {
+    "EnumValue":8,
+    "Channels":"PWM"
+  },
+
+  "PWM": {
+    "EnumValue":9,
+    "ReferenceTo":"VMXChannel",
+    "Count":20,
+    "FirstMXP":10,
+    "Channels": {
+      "0":12,
+      "1":13,
+      "2":14,
+      "3":15,
+      "4":16,
+      "5":17,
+      "6":18,
+      "7":19,
+      "8":20,
+      "9":21,
+      "10":-1,
+      "11":-1,
+      "12":-1,
+      "13":-1,
+      "14":-1,
+      "15":-1,
+      "16":-1,
+      "17":-1,
+      "18":-1,
+      "19":-1
+    }
+  },
+
+  "DigitalPWM": {
+    "EnumValue":10,
+    "Channels":"DIO"
+  },
+
+  "Counter": {
+    "EnumValue":11,
+    "Channels":"DIO"
+  },
+
+  "FPGAEncoder": {
+    "EnumValue":13,
+    "Channels":"Encoder"
+  },
+
+  "Encoder": {
+    "EnumValue":13,
+    "Count":10,
+    "Channels": {
+      "0": { "DIO":0, "Pair":1, "EncoderInput":"A" },
+      "1": { "DIO":1, "Pair":0, "EncoderInput":"B" },
+      "2": { "DIO":2, "Pair":3, "EncoderInput":"A" },
+      "3": { "DIO":3, "Pair":2, "EncoderInput":"B" },
+      "4": { "DIO":4, "Pair":5, "EncoderInput":"A" },
+      "5": { "DIO":5, "Pair":4, "EncoderInput":"B" },
+      "6": { "DIO":6, "Pair":7, "EncoderInput":"A" },
+      "7": { "DIO":7, "Pair":6, "EncoderInput":"B" },
+      "8": { "DIO":8, "Pair":9, "EncoderInput":"A" },
+      "9": { "DIO":9, "Pair":8, "EncoderInput":"B" }
+    }
+  },
+
+  "SPI": {
+    "Count":4,
+    "WPIPort": {
+      "0":33,
+      "1":-1,
+      "2":-1,
+      "3":-1
+    },
+    "MXPCount":1,
+    "MXPPort": {
+      "4":-1
+    }
+  },
+
+  "I2C": {
+    "Count":1,
+    "WPIPort": {
+      "0":[26,27]
+    },
+    "MXPCount":1,
+    "MXPPort": {
+      "1":-1
+    }
+  },
+
+  "Serial": {
+    "Count":3,
+    "WPIPort": {
+      "0":-1,
+      "2":-1,
+      "3":-1
+    },
+    "MXPCount":1,
+    "MXPPort": {
+      "1":[28,29]
+    }
+  }
+}

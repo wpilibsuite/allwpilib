@@ -1,0 +1,55 @@
+{
+	"HAL_HandleEnum": {
+		"0":"Undefined",
+		"1":"DIO",
+		"2":"Port",
+		"3":"Notifier",
+		"4":"Interrupt",
+		"5":"AnalogOutput",
+		"6":"AnalogInput",
+		"7":"AnalogTrigger",
+		"8":"Relay",
+		"9":"PWM",
+		"10":"DigitalPWM",
+		"11":"Counter",
+		"12":"FPGAEncoder",
+		"13":"Encoder",
+		"14":"Compressor",
+		"15":"Solenoid",
+		"16":"AnalogGyro",
+		"17":"Vendor",
+		"18":"SimulationJni",
+		"19":"CAN"
+	},
+	
+	"VMXChannelType": {
+		"0":"INVALID",
+		"1":"FlexDIO",
+		"2":"AnalogIn",
+		"3":"HiCurrDIO",
+		"4":"CommDIO"
+	},
+
+	"VMXChannelCapability": {
+		"0":"NoCapabilities",
+		"1":"DigitalInput",
+		"2":"DigitalOutput",
+		"3":"PWMGeneratorOutput",
+		"4":"PWMGeneratorOutput2",
+		"5":"PWMCaptureInput",
+		"6":"PWMCaptureInput2",
+		"7":"EncoderAInput",
+		"8":"EncoderBInput",
+		"9":"AccumulatorInput",
+		"10":"AnalogTriggerInput",
+		"11":"InterruptInput",
+		"12":"UART_TX",
+		"13":"UART_RX",
+		"14":"SPI_CLK",
+		"15":"SPI_MISO",
+		"16":"SPI_MOSI",
+		"17":"SPI_CS",
+		"18":"I2C_SDA",
+		"19":"I2C_SCL"
+	}
+}
