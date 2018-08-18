@@ -28,6 +28,17 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   PIDCommand(double p, double i, double d);
   PIDCommand(double p, double i, double d, double period);
   PIDCommand(double p, double i, double d, double f, double period);
+  PIDCommand(const wpi::Twine& name, double p, double i, double d,
+             Subsystem& requirement);
+  PIDCommand(const wpi::Twine& name, double p, double i, double d,
+             double period, Subsystem& requirement);
+  PIDCommand(const wpi::Twine& name, double p, double i, double d, double f,
+             double period, Subsystem& requirement);
+  PIDCommand(double p, double i, double d, Subsystem& requirement);
+  PIDCommand(double p, double i, double d, double period,
+             Subsystem& requirement);
+  PIDCommand(double p, double i, double d, double f, double period,
+             Subsystem& requirement);
   virtual ~PIDCommand() = default;
 
   void SetSetpointRelative(double deltaSetpoint);

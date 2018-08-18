@@ -27,6 +27,14 @@ class InstantCommand : public Command {
    */
   explicit InstantCommand(const wpi::Twine& name);
 
+  /**
+   * Creates a new InstantCommand with the given name.
+   *
+   * @param name        The name for this command
+   * @param requirement The subsystem that the command requires
+   */
+  InstantCommand(const wpi::Twine& name, Subsystem& requirement);
+
   InstantCommand() = default;
   virtual ~InstantCommand() = default;
 
