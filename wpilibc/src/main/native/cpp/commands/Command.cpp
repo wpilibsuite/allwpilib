@@ -28,7 +28,7 @@ Command::Command(const wpi::Twine& name) : Command(name, -1.0) {}
 Command::Command(double timeout) : Command("", timeout) {}
 
 Command::Command(Subsystem& requirement) : Command("", -1.0) {
-  Requires(requirement);
+  Requires(&requirement);
 }
 
 Command::Command(const wpi::Twine& name, double timeout) : SendableBase(false) {
@@ -49,17 +49,17 @@ Command::Command(const wpi::Twine& name, double timeout) : SendableBase(false) {
 
 Command::Command(const wpi::Twine& name, Subsystem& requirement)
     : Command(name, -1.0) {
-  Requires(requirement);
+  Requires(&requirement);
 }
 
 Command::Command(double timeout, Subsystem& requirement)
     : Command("", timeout) {
-  Requires(requirement);
+  Requires(&requirement);
 }
 
 Command::Command(const wpi::Twine& name, double timeout, Subsystem& requirement)
     : Command(name, timeout) {
-  Requires(requirement);
+  Requires(&requirement);
 }
 
 double Command::TimeSinceInitialized() const {
