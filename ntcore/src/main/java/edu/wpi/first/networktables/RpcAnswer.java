@@ -25,7 +25,7 @@ public final class RpcAnswer {
 
   /** Call raw parameters. */
   @SuppressWarnings("MemberName")
-  public final String params;
+  public final byte[] params;
 
   /** Connection that called the RPC. */
   @SuppressWarnings("MemberName")
@@ -41,7 +41,7 @@ public final class RpcAnswer {
    * @param params Call raw parameters
    * @param conn Connection info
    */
-  public RpcAnswer(NetworkTableInstance inst, int entry, int call, String name, String params,
+  public RpcAnswer(NetworkTableInstance inst, int entry, int call, String name, byte[] params,
                    ConnectionInfo conn) {
     this.m_inst = inst;
     this.entry = entry;
