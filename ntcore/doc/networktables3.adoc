@@ -748,12 +748,18 @@ the parameters defined in the corresponding RPC entry definition.
 |2 bytes, unsigned; incremented value for matching return values to call.
 
 |Parameter Value Length
-|N bytes, unsigned <<leb128>> encoded length of total number of bytes of
-parameter values in this message
+|N bytes, unsigned <<leb128>> encoded length of:
 
+RPC definition version 0: total number of raw bytes in this message
+
+RPC definition version 1: total number of bytes of parameter values in this
+message
 |Parameter Value(s)
-|Array of values; N bytes for each parameter (length dependent on the parameter
-type defined in the <<rpc-definition,RPC entry definition>>)
+|RPC definition version 0: N raw bytes.
+
+RPC definition version 1: Array of values; N bytes for each parameter (length
+dependent on the parameter type defined in the
+<<rpc-definition,RPC entry definition>>).
 |===
 
 [[msg-rpc-response]]
@@ -776,12 +782,18 @@ will respond.
 |2 bytes, unsigned; matching ID from <<msg-rpc-execute,RPC Execute>> message
 
 |Result Value Length
-|N bytes, unsigned <<leb128>> encoded length of total number of bytes of result
-values in this message
+|N bytes, unsigned <<leb128>> encoded length of:
 
+RPC definition version 0: total number of raw bytes in this message
+
+RPC definition version 1: total number of bytes of result values in this
+message
 |Result Value(s)
-|Array of values; N bytes for each result (length dependent on the result type
-defined in the <<rpc-definition,RPC entry definition>>)
+|RPC definition version 0: N raw bytes.
+
+RPC definition version 1: Array of values; N bytes for each result (length
+dependent on the result type defined in the
+<<rpc-definition,RPC entry definition>>).
 |===
 
 [[rpc-operation]]
@@ -802,7 +814,18 @@ Remote procedure calls cannot be persisted.
 [[rpc-definition]]
 === Remote Procedure Call Definition Data
 
-The data provided in the RPC definition entry consists of:
+There are currently two versions of RPC definitions: version 0 and version 1.
+Version 0 is the most straightforward: the data provided in the RPC
+definition entry consists of just a single 0 byte (indicating RPC
+definition version 0).  RPC version 0 execute and response messages do
+not contain discrete parameter and result values respectively; instead the
+entire parameter value or result value is treated as a raw byte sequence; the
+interpretation of the raw bytes is application specific--users are encouraged
+to consider using encodings such as CBOR or MessagePack for more complex
+self-describing data structures.
+
+The data provided in the RPC version 1 definition entry is more
+complex and consists of:
 
 [cols="1,3"]
 |===
