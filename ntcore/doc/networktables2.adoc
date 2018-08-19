@@ -1,4 +1,5 @@
 = Network Tables Protocol Specification, Version 2.0
+WPILib Developers <wpilib@wpi.edu>
 Protocol Revision 2.0 (0x0200), 1/8/2013
 :toc:
 :toc-placement: preamble
@@ -8,6 +9,7 @@ This document defines a network protocol for a key-value store that may be read
 from and written to by multiple remote clients. A central server, most often
 running on a FIRST FRC robot controller, is responsible for providing
 information consistency and for facilitating communication between clients.
+This document describes protocol revision 2.0 (0x0200).
 
 Information consistency is guaranteed through the use of a sequence number
 associated with each key-value pair. An update of a key-value pair increments
