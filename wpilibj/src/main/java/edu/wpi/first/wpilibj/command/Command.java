@@ -156,11 +156,7 @@ public abstract class Command extends SendableBase {
    * @throws IllegalArgumentException if name is null
    */
   public Command(String name, Subsystem requirement) {
-    super(false);
-    if (name == null) {
-      throw new IllegalArgumentException("Name must not be null.");
-    }
-    setName(name);
+    this(name);
     requires(requirement);
   }
 
@@ -174,11 +170,7 @@ public abstract class Command extends SendableBase {
    * @see Command#isTimedOut() isTimedOut()
    */
   public Command(double timeout, Subsystem requirement) {
-    this();
-    if (timeout < 0) {
-      throw new IllegalArgumentException("Timeout must not be negative.  Given:" + timeout);
-    }
-    m_timeout = timeout;
+    this(timeout);
     requires(requirement);
   }
 
@@ -201,19 +193,15 @@ public abstract class Command extends SendableBase {
   /**
    * Creates a new command with the given name and timeout.
    *
-   * @param name    the name of the command
-   * @param timeout the time (in seconds) before this command "times out"
+   * @param name        the name of the command
+   * @param timeout     the time (in seconds) before this command "times out"
    * @param requirement the subsystem that this command requires
    * @throws IllegalArgumentException if given a negative timeout
    * @throws IllegalArgumentException if given a negative timeout or name was null.
    * @see Command#isTimedOut() isTimedOut()
    */
   public Command(String name, double timeout, Subsystem requirement) {
-    this(name);
-    if (timeout < 0) {
-      throw new IllegalArgumentException("Timeout must not be negative.  Given:" + timeout);
-    }
-    m_timeout = timeout;
+    this(name, timeout);
     requires(requirement);
   }
 
