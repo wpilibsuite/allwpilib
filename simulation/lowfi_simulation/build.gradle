@@ -115,6 +115,8 @@ if (!project.hasProperty('onlyAthena')) {
                     }
                     lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
+                    lib library: nativeName, linkage: 'shared'
                 }
             }
         }

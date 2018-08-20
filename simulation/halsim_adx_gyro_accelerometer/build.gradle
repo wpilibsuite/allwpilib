@@ -110,6 +110,9 @@ if (!project.hasProperty('onlyAthena')) {
                         it.buildable = false
                         return
                     }
+                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib library: nativeName, linkage: 'shared'
                 }
             }
         }
