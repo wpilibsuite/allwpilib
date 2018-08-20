@@ -270,10 +270,10 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
   static jmethodID constructor =
       env->GetMethodID(rpcAnswerCls, "<init>",
                        "(Ledu/wpi/first/networktables/"
-                       "NetworkTableInstance;IILjava/lang/String;Ljava/lang/"
-                       "String;Ledu/wpi/first/networktables/ConnectionInfo;)V");
+                       "NetworkTableInstance;IILjava/lang/String;[B"
+                       "Ledu/wpi/first/networktables/ConnectionInfo;)V");
   JLocal<jstring> name{env, MakeJString(env, answer.name)};
-  JLocal<jstring> params{env, MakeJString(env, answer.params)};
+  JLocal<jbyteArray> params{env, MakeJByteArray(env, answer.params)};
   JLocal<jobject> conn{env, MakeJObject(env, answer.conn)};
   return env->NewObject(rpcAnswerCls, constructor, inst, (jint)answer.entry,
                         (jint)answer.call, name.obj(), params.obj(),
