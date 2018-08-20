@@ -25,7 +25,7 @@ if (NOT WITHOUT_JAVA)
 
 endif()
 
-file(GLOB
+file(GLOB_RECURSE
     cameraserver_native_src src/main/native/cpp/*.cpp)
 add_library(cameraserver ${cameraserver_native_src})
 target_include_directories(cameraserver PUBLIC
