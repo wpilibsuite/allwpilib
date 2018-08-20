@@ -91,7 +91,7 @@ else()
     endif()
 endif()
 
-target_link_libraries(wpiutil Threads::Threads)
+target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS})
 target_include_directories(wpiutil PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
