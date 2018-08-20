@@ -25,7 +25,9 @@ static wpi::recursive_spinlock2 recursive_spinlock2;
 static wpi::recursive_spinlock recursive_spinlock;
 
 TEST(SpinlockTest, Benchmark) {
-  using namespace std::chrono;
+  using std::chrono::duration_cast;
+  using std::chrono::high_resolution_clock;
+  using std::chrono::microseconds;
 
   // warmup
   std::thread thr([]() {
