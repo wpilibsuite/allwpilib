@@ -1,5 +1,7 @@
 project(cscore)
 
+include(SubDirList)
+
 find_package( OpenCV REQUIRED )
 
 # Java bindings
@@ -85,3 +87,12 @@ endif()
 
 install(FILES cscore-config.cmake DESTINATION ${cscore_config_dir})
 install(EXPORT cscore DESTINATION ${cscore_config_dir})
+
+SUBDIR_LIST(cscore_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+foreach(example ${cscore_examples})
+    file(GLOB cscore_example_src examples/${example}/*.cpp)
+    if(cscore_example_src)
+        add_executable(cscore_${example} ${cscore_example_src})
+        target_link_libraries(cscore_${example} cscore)
+    endif()
+endforeach()
