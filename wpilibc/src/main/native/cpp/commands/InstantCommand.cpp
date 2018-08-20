@@ -11,4 +11,7 @@ using namespace frc;
 
 InstantCommand::InstantCommand(const wpi::Twine& name) : Command(name) {}
 
+InstantCommand::InstantCommand(const wpi::Twine& name, Subsystem& subsystem)
+    : Command(name, subsystem) {}
+
 bool InstantCommand::IsFinished() { return true; }
