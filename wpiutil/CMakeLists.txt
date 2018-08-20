@@ -1,5 +1,7 @@
 project(wpiutil)
 
+include(SubDirList)
+
 # Java bindings
 if (NOT WITHOUT_JAVA)
   find_package(Java)
@@ -113,3 +115,12 @@ endif()
 
 install(FILES wpiutil-config.cmake DESTINATION ${wpiutil_config_dir})
 install(EXPORT wpiutil DESTINATION ${wpiutil_config_dir})
+
+SUBDIR_LIST(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+foreach(example ${wpiutil_examples})
+    file(GLOB wpiutil_example_src examples/${example}/*.cpp)
+    if(wpiutil_example_src)
+        add_executable(wpiutil_${example} ${wpiutil_example_src})
+        target_link_libraries(wpiutil_${example} wpiutil)
+    endif()
+endforeach()
