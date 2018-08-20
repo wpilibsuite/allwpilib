@@ -734,6 +734,10 @@ corresponding RPC entry definition.
 The server shall ignore any Execute RPC message whose decoding does not match
 the parameters defined in the corresponding RPC entry definition.
 
+Note that the parameter length is encoded the same way regardless of the RPC
+version and encapsulates the entirety of the parameters, so protocol layer
+decoders do not need to know the RPC details in order to process the message.
+
 [cols="1,3"]
 |===
 |Field Name |Field Type
@@ -767,6 +771,10 @@ dependent on the parameter type defined in the
 
 Return responses from a remote procedure call. Even calls with zero outputs
 will respond.
+
+Note that the result length is encoded the same way regardless of the RPC
+version and encapsulates the entirety of the result, so protocol layer decoders
+do not need to know the RPC details in order to process the message.
 
 [cols="1,3"]
 |===
@@ -815,7 +823,12 @@ Remote procedure calls cannot be persisted.
 === Remote Procedure Call Definition Data
 
 There are currently two versions of RPC definitions: version 0 and version 1.
-Version 0 is the most straightforward: the data provided in the RPC
+The first byte in the RPC definition entry determines the version.
+
+[[rpc-definition-v0]]
+==== Version 0
+
+RPC version 0 is the most straightforward: the data provided in the RPC
 definition entry consists of just a single 0 byte (indicating RPC
 definition version 0).  RPC version 0 execute and response messages do
 not contain discrete parameter and result values respectively; instead the
@@ -824,13 +837,22 @@ interpretation of the raw bytes is application specific--users are encouraged
 to consider using encodings such as CBOR or MessagePack for more complex
 self-describing data structures.
 
+[cols="1,3"]
+|===
+|RPC Definition Version
+|1 byte, unsigned; set to 0, indicating version 0
+|===
+
+[[rpc-definition-v1]]
+==== Version 1
+
 The data provided in the RPC version 1 definition entry is more
 complex and consists of:
 
 [cols="1,3"]
 |===
 |RPC Definition Version
-|1 byte, unsigned; always set to 1 for this version of the protocol.
+|1 byte, unsigned; set to 1, indicating version 1
 
 |Procedure (Entry) Name
 |<<entry-value-string,String>>
