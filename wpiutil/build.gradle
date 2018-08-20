@@ -106,6 +106,16 @@ ext {
     }
 }
 
+def examplesMap = [:];
+file("$projectDir/examples").list(new FilenameFilter() {
+    @Override
+    public boolean accept(File current, String name) {
+        return new File(current, name).isDirectory();
+    }
+}).each {
+    examplesMap.put(it, [])
+}
+
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
 model {
@@ -123,6 +133,23 @@ model {
                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
                                  '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
                                  '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+        }
+    }
+    components {
+        examplesMap.each { key, value ->
+            "${key}"(NativeExecutableSpec) {
+                binaries.all {
+                    lib library: 'wpiutil', linkage: 'shared'
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'examples/' + "${key}"
+                            include '**/*.cpp'
+                        }
+                    }
+                }
+            }
         }
     }
 }
