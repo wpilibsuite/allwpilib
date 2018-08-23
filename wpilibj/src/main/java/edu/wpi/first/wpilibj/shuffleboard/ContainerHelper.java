@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.Sendable;
  * A helper class for Shuffleboard containers to handle common child operations.
  */
 final class ContainerHelper {
+
   private final ShuffleboardContainer m_container;
   private final Set<String> m_usedTitles = new HashSet<>();
   private final List<ShuffleboardComponent<?>> m_components = new ArrayList<>();
@@ -66,7 +67,7 @@ final class ContainerHelper {
 
     SimpleWidget widget = new SimpleWidget(m_container, title);
     m_components.add(widget);
-    widget.getEntry().forceSetValue(data);
+    widget.getEntry().setDefaultValue(data);
     return widget;
   }
 
