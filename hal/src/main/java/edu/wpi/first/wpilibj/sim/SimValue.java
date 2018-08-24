@@ -8,20 +8,20 @@
 package edu.wpi.first.wpilibj.sim;
 
 public final class SimValue {
-  private boolean v_boolean;
-  private long v_long;
-  private double v_double;
+  private boolean m_boolean;
+  private long m_long;
+  private double m_double;
 
   private SimValue(boolean b) {
-    v_boolean = b;
+    m_boolean = b;
   }
 
   private SimValue(double v) {
-    v_double = v;
+    m_double = v;
   }
 
   private SimValue(long v) {
-    v_long = v;
+    m_long = v;
   }
 
   private SimValue() {
@@ -29,15 +29,15 @@ public final class SimValue {
   }
 
   public boolean getBoolean() {
-    return v_boolean;
+    return m_boolean;
   }
 
   public long getLong() {
-    return v_long;
+    return m_long;
   }
 
   public double getDouble() {
-    return v_double;
+    return m_double;
   }
 
   public static SimValue makeBoolean(boolean value) {
