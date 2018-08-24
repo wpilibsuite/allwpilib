@@ -20,7 +20,7 @@ void InitializeSPI() {}
 
 void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
   hal::init::CheckInit();
-  SimSPIData[port].SetInitialized(true);
+  SimSPIData[port].initialized = true;
 }
 int32_t HAL_TransactionSPI(HAL_SPIPort port, const uint8_t* dataToSend,
                            uint8_t* dataReceived, int32_t size) {
@@ -33,7 +33,7 @@ int32_t HAL_WriteSPI(HAL_SPIPort port, const uint8_t* dataToSend,
 int32_t HAL_ReadSPI(HAL_SPIPort port, uint8_t* buffer, int32_t count) {
   return SimSPIData[port].Read(buffer, count);
 }
-void HAL_CloseSPI(HAL_SPIPort port) { SimSPIData[port].SetInitialized(false); }
+void HAL_CloseSPI(HAL_SPIPort port) { SimSPIData[port].initialized = false; }
 void HAL_SetSPISpeed(HAL_SPIPort port, int32_t speed) {}
 void HAL_SetSPIOpts(HAL_SPIPort port, HAL_Bool msbFirst,
                     HAL_Bool sampleOnTrailing, HAL_Bool clkIdleHigh) {}

@@ -7,11 +7,7 @@
 
 #pragma once
 
-#include <atomic>
-#include <memory>
-
-#include <mockdata/NotifyListenerVector.h>
-#include <wpi/mutex.h>
+#include <mockdata/SimDataValue.h>
 
 namespace hal {
 class ThreeAxisAccelerometerData {
@@ -21,36 +17,23 @@ class ThreeAxisAccelerometerData {
 
   virtual bool GetInitialized() const = 0;
 
-  int32_t RegisterXCallback(HAL_NotifyCallback callback, void* param,
-                            HAL_Bool initialNotify);
-  void CancelXCallback(int32_t uid);
-  void InvokeXCallback(HAL_Value value);
-  double GetX();
-  void SetX(double x);
+  double GetX() { return x; }
+  void SetX(double x_) { x = x_; }
 
-  int32_t RegisterYCallback(HAL_NotifyCallback callback, void* param,
-                            HAL_Bool initialNotify);
-  void CancelYCallback(int32_t uid);
-  void InvokeYCallback(HAL_Value value);
-  double GetY();
-  void SetY(double y);
+  double GetY() { return y; }
+  void SetY(double y_) { y = y_; }
 
-  int32_t RegisterZCallback(HAL_NotifyCallback callback, void* param,
-                            HAL_Bool initialNotify);
-  void CancelZCallback(int32_t uid);
-  void InvokeZCallback(HAL_Value value);
-  double GetZ();
-  void SetZ(double z);
+  double GetZ() { return z; }
+  void SetZ(double z_) { z = z_; }
+
+  HAL_SIMDATAVALUE_DEFINE_NAME(X);
+  HAL_SIMDATAVALUE_DEFINE_NAME(Y);
+  HAL_SIMDATAVALUE_DEFINE_NAME(Z);
+
+  SimDataValue<double, MakeDouble, GetXName> x{0.0};
+  SimDataValue<double, MakeDouble, GetYName> y{0.0};
+  SimDataValue<double, MakeDouble, GetZName> z{0.0};
 
   virtual void ResetData();
-
- protected:
-  wpi::mutex m_registerMutex;
-  std::atomic<double> m_x{0.0};
-  std::shared_ptr<NotifyListenerVector> m_xCallbacks = nullptr;
-  std::atomic<double> m_y{0.0};
-  std::shared_ptr<NotifyListenerVector> m_yCallbacks = nullptr;
-  std::atomic<double> m_z{0.0};
-  std::shared_ptr<NotifyListenerVector> m_zCallbacks = nullptr;
 };
 }  // namespace hal

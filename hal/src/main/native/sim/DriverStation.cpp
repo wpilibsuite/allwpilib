@@ -96,18 +96,18 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
-  controlWord->enabled = SimDriverStationData->GetEnabled();
-  controlWord->autonomous = SimDriverStationData->GetAutonomous();
-  controlWord->test = SimDriverStationData->GetTest();
-  controlWord->eStop = SimDriverStationData->GetEStop();
-  controlWord->fmsAttached = SimDriverStationData->GetFmsAttached();
-  controlWord->dsAttached = SimDriverStationData->GetDsAttached();
+  controlWord->enabled = SimDriverStationData->enabled;
+  controlWord->autonomous = SimDriverStationData->autonomous;
+  controlWord->test = SimDriverStationData->test;
+  controlWord->eStop = SimDriverStationData->eStop;
+  controlWord->fmsAttached = SimDriverStationData->fmsAttached;
+  controlWord->dsAttached = SimDriverStationData->dsAttached;
   return 0;
 }
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   *status = 0;
-  return SimDriverStationData->GetAllianceStationId();
+  return SimDriverStationData->allianceStationId;
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
@@ -166,7 +166,7 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
 }
 
 double HAL_GetMatchTime(int32_t* status) {
-  return SimDriverStationData->GetMatchTime();
+  return SimDriverStationData->matchTime;
 }
 
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
