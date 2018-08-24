@@ -9,6 +9,7 @@
 
 #include <atomic>
 #include <cassert>
+#include <mutex>
 #include <thread>
 
 #include "Compiler.h"
