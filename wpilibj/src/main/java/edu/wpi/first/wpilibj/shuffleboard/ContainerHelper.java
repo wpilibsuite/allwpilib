@@ -59,15 +59,15 @@ final class ContainerHelper {
     return add(sendable.getName(), sendable);
   }
 
-  SimpleWidget add(String title, Object data) {
+  SimpleWidget add(String title, Object defaultValue) {
     Objects.requireNonNull(title, "Title cannot be null");
-    Objects.requireNonNull(data, "Data cannot be null");
+    Objects.requireNonNull(defaultValue, "Default value cannot be null");
     checkTitle(title);
-    checkNtType(data);
+    checkNtType(defaultValue);
 
     SimpleWidget widget = new SimpleWidget(m_container, title);
     m_components.add(widget);
-    widget.getEntry().setDefaultValue(data);
+    widget.getEntry().setDefaultValue(defaultValue);
     return widget;
   }
 

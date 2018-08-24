@@ -55,12 +55,32 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
   /**
    * Adds a widget to this container to display the given data.
    *
-   * @param title the title of the widget
-   * @param data  the data to add
+   * @param title        the title of the widget
+   * @param defaultValue the default value of the widget
    * @return a widget to display the sendable data
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *                                  title
+   * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget add(String title, Object data) throws IllegalArgumentException;
+  SimpleWidget add(String title, Object defaultValue) throws IllegalArgumentException;
+
+  /**
+   * Adds a widget to this container to display a simple piece of data. Unlike
+   * {@link #add(String, Object)}, the value in the widget will be saved on the robot and will be
+   * used when the robot program next starts rather than {@code defaultValue}.
+   *
+   * @param title the title of the widget
+   * @param defaultValue the default value of the widget
+   * @return a widget to display the sendable data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *                                  title
+   * @see #add(String, Object) add(String title, Object defaultValue)
+   */
+  default SimpleWidget addPersistent(String title, Object defaultValue)
+      throws IllegalArgumentException {
+    SimpleWidget widget = add(title, defaultValue);
+    widget.getEntry().setPersistent();
+    return widget;
+  }
 
 }
