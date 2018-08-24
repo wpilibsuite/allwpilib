@@ -19,6 +19,8 @@ class ThreeAxisAccelerometerData {
   ThreeAxisAccelerometerData();
   virtual ~ThreeAxisAccelerometerData();
 
+  virtual bool GetInitialized() const = 0;
+
   int32_t RegisterXCallback(HAL_NotifyCallback callback, void* param,
                             HAL_Bool initialNotify);
   void CancelXCallback(int32_t uid);

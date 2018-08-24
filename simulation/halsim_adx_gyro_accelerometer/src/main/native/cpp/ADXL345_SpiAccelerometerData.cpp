@@ -40,6 +40,10 @@ ADXL345_SpiAccelerometer::~ADXL345_SpiAccelerometer() {
   HALSIM_CancelSPIWriteCallback(m_port, m_writeCallbackId);
 }
 
+bool ADXL345_SpiAccelerometer::GetInitialized() const {
+  return HALSIM_GetSPIInitialized(m_port);
+}
+
 void ADXL345_SpiAccelerometer::HandleWrite(const uint8_t* buffer,
                                            uint32_t count) {
   m_lastWriteAddress = buffer[0] & 0xF;

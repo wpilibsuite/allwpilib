@@ -10,16 +10,22 @@
 #include <functional>
 
 #include "lowfisim/AccelerometerSim.h"
+#include "lowfisim/SimulatorComponentBase.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class SimpleAccelerometerSim : public AccelerometerSim {
+class SimpleAccelerometerSim : public SimulatorComponentBase,
+                               public AccelerometerSim {
  public:
-  SimpleAccelerometerSim(const std::function<void(double)>& setterFunction,
+  using SimulatorComponentBase::GetDisplayName;
+
+  SimpleAccelerometerSim(const std::function<bool(void)>& initializedFunction,
+                         const std::function<void(double)>& setterFunction,
                          const std::function<double(void)>& getterFunction)
-      : m_setAccelerationFunction(setterFunction),
+      : m_isInitializedFunction(initializedFunction),
+        m_setAccelerationFunction(setterFunction),
         m_getAccelerationFunction(getterFunction) {}
   double GetAcceleration() override { return m_getAccelerationFunction(); }
 
@@ -27,7 +33,12 @@ class SimpleAccelerometerSim : public AccelerometerSim {
     m_setAccelerationFunction(acceleration);
   }
 
+  bool IsWrapperInitialized() const override {
+    return m_isInitializedFunction();
+  }
+
  private:
+  std::function<bool(void)> m_isInitializedFunction;
   std::function<void(double)> m_setAccelerationFunction;
   std::function<double(void)> m_getAccelerationFunction;
 };

@@ -40,6 +40,10 @@ ADXL345_I2CData::~ADXL345_I2CData() {
   HALSIM_CancelI2CWriteCallback(m_port, m_writeCallbackId);
 }
 
+bool ADXL345_I2CData::GetInitialized() const {
+  return HALSIM_GetI2CInitialized(m_port);
+}
+
 void ADXL345_I2CData::ADXL345_I2CData::HandleWrite(const uint8_t* buffer,
                                                    uint32_t count) {
   m_lastWriteAddress = buffer[0];
