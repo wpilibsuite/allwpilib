@@ -21,61 +21,64 @@ public class CallbackStore implements AutoCloseable {
   }
 
   public CallbackStore(int index, int uid, CancelCallbackFunc ccf) {
-    this.cancelType = normalCancel;
-    this.index = index;
-    this.uid = uid;
-    this.cancelCallback = ccf;
+    this.m_cancelType = kNormalCancel;
+    this.m_index = index;
+    this.m_uid = uid;
+    this.m_cancelCallback = ccf;
   }
 
   public CallbackStore(int index, int channel, int uid, CancelCallbackChannelFunc ccf) {
-    this.cancelType = channelCancel;
-    this.index = index;
-    this.uid = uid;
-    this.channel = channel;
-    this.cancelCallbackChannel = ccf;
+    this.m_cancelType = kChannelCancel;
+    this.m_index = index;
+    this.m_uid = uid;
+    this.m_channel = channel;
+    this.m_cancelCallbackChannel = ccf;
   }
 
   public CallbackStore(int uid, CancelCallbackNoIndexFunc ccf) {
-    this.cancelType = noIndexCancel;
-    this.uid = uid;
-    this.cancelCallbackNoIndex = ccf;
+    this.m_cancelType = kNoIndexCancel;
+    this.m_uid = uid;
+    this.m_cancelCallbackNoIndex = ccf;
   }
 
-  private int index;
-  private int channel;
-  private final int uid;
-  private CancelCallbackFunc cancelCallback;
-  private CancelCallbackChannelFunc cancelCallbackChannel;
-  private CancelCallbackNoIndexFunc cancelCallbackNoIndex;
-  private static final int normalCancel = 0;
-  private static final int channelCancel = 1;
-  private static final int noIndexCancel = 2;
-  private int cancelType;
+  private int m_index;
+  private int m_channel;
+  private final int m_uid;
+  private CancelCallbackFunc m_cancelCallback;
+  private CancelCallbackChannelFunc m_cancelCallbackChannel;
+  private CancelCallbackNoIndexFunc m_cancelCallbackNoIndex;
+  private static final int kNormalCancel = 0;
+  private static final int kChannelCancel = 1;
+  private static final int kNoIndexCancel = 2;
+  private int m_cancelType;
 
   @Override
   public void close() {
-    switch (cancelType) {
-      case normalCancel:
-        cancelCallback.cancel(index, uid);
+    switch (m_cancelType) {
+      case kNormalCancel:
+        m_cancelCallback.cancel(m_index, m_uid);
         break;
-      case channelCancel:
-        cancelCallbackChannel.cancel(index, channel, uid);
+      case kChannelCancel:
+        m_cancelCallbackChannel.cancel(m_index, m_channel, m_uid);
         break;
-      case noIndexCancel:
-        cancelCallbackNoIndex.cancel(uid);
+      case kNoIndexCancel:
+        m_cancelCallbackNoIndex.cancel(m_uid);
+        break;
+      default:
+        assert false;
         break;
     }
-    cancelType = -1;
+    m_cancelType = -1;
   }
 
   @Override
   protected void finalize() throws Throwable {
     try {
-      if (cancelType >= 0) {
+      if (m_cancelType >= 0) {
         close();        // close open files
       }
     } finally {
-        super.finalize();
+      super.finalize();
     }
   }
 }
