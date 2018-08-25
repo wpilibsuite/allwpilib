@@ -15,7 +15,6 @@
 
 namespace hal {
 class EncoderData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(Count)
   HAL_SIMDATAVALUE_DEFINE_NAME(Period)
@@ -26,6 +25,7 @@ class EncoderData {
   HAL_SIMDATAVALUE_DEFINE_NAME(SamplesToAverage)
   HAL_SIMDATAVALUE_DEFINE_NAME(DistancePerPulse)
 
+ public:
   std::atomic<int16_t> digitalChannelA{0};
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
   SimDataValue<int32_t, MakeInt, GetCountName> count{0};

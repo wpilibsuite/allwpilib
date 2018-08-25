@@ -13,14 +13,14 @@
 
 namespace hal {
 class I2CData {
+  HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Read)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Write)
+
  public:
   void Write(int32_t deviceAddress, const uint8_t* dataToSend,
              int32_t sendSize);
   void Read(int32_t deviceAddress, uint8_t* buffer, int32_t count);
-
-  HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
-  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Read)
-  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Write)
 
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
   SimCallbackRegistry<HAL_BufferCallback, GetReadName> read;

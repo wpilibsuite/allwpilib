@@ -12,11 +12,11 @@
 
 namespace hal {
 class AnalogGyroData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(Angle)
   HAL_SIMDATAVALUE_DEFINE_NAME(Rate)
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
 
+ public:
   SimDataValue<double, MakeDouble, GetAngleName> angle{0.0};
   SimDataValue<double, MakeDouble, GetRateName> rate{0.0};
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};

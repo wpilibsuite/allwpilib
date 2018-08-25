@@ -12,7 +12,6 @@
 
 namespace hal {
 class AnalogInData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(AverageBits)
   HAL_SIMDATAVALUE_DEFINE_NAME(OversampleBits)
@@ -23,6 +22,7 @@ class AnalogInData {
   HAL_SIMDATAVALUE_DEFINE_NAME(AccumulatorCenter)
   HAL_SIMDATAVALUE_DEFINE_NAME(AccumulatorDeadband)
 
+ public:
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
   SimDataValue<int32_t, MakeInt, GetAverageBitsName> averageBits{7};
   SimDataValue<int32_t, MakeInt, GetOversampleBitsName> oversampleBits{0};

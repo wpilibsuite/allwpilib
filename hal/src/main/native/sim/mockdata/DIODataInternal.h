@@ -12,13 +12,13 @@
 
 namespace hal {
 class DIOData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(Value)
   HAL_SIMDATAVALUE_DEFINE_NAME(PulseLength)
   HAL_SIMDATAVALUE_DEFINE_NAME(IsInput)
   HAL_SIMDATAVALUE_DEFINE_NAME(FilterIndex)
 
+ public:
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
   SimDataValue<HAL_Bool, MakeBoolean, GetValueName> value{true};
   SimDataValue<double, MakeDouble, GetPulseLengthName> pulseLength{0.0};

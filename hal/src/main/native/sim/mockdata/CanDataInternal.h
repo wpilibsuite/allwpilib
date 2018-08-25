@@ -13,7 +13,6 @@
 namespace hal {
 
 class CanData {
- public:
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(SendMessage)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(ReceiveMessage)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(OpenStream)
@@ -21,6 +20,7 @@ class CanData {
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(ReadStream)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(GetCanStatus)
 
+ public:
   SimCallbackRegistry<HAL_CAN_SendMessageCallback, GetSendMessageName>
       sendMessage;
   SimCallbackRegistry<HAL_CAN_ReceiveMessageCallback, GetReceiveMessageName>

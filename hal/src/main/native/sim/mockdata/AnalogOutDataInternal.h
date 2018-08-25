@@ -12,10 +12,10 @@
 
 namespace hal {
 class AnalogOutData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(Voltage)
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
 
+ public:
   SimDataValue<double, MakeDouble, GetVoltageName> voltage{0.0};
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{0};
 

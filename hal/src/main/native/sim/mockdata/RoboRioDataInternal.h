@@ -12,7 +12,6 @@
 
 namespace hal {
 class RoboRioData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(FPGAButton)
   HAL_SIMDATAVALUE_DEFINE_NAME(VInVoltage)
   HAL_SIMDATAVALUE_DEFINE_NAME(VInCurrent)
@@ -29,6 +28,7 @@ class RoboRioData {
   HAL_SIMDATAVALUE_DEFINE_NAME(UserFaults5V)
   HAL_SIMDATAVALUE_DEFINE_NAME(UserFaults3V3)
 
+ public:
   SimDataValue<HAL_Bool, MakeBoolean, GetFPGAButtonName> fpgaButton{false};
   SimDataValue<double, MakeDouble, GetVInVoltageName> vInVoltage{0.0};
   SimDataValue<double, MakeDouble, GetVInCurrentName> vInCurrent{0.0};

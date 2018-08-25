@@ -94,8 +94,11 @@ class SimCallbackRegistry : public impl::SimCallbackRegistryBase {
  * This creates a function named GetNAMEName() that returns "NAME".
  * @param NAME the name to return
  */
-#define HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(NAME) \
-  static inline constexpr const char* Get##NAME##Name() { return #NAME; }
+#define HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(NAME)           \
+  static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr const char* \
+      Get##NAME##Name() {                                   \
+    return #NAME;                                           \
+  }
 
 /**
  * Define a standard C API for SimCallbackRegistry.

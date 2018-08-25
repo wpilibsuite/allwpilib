@@ -14,6 +14,11 @@
 namespace hal {
 
 class SPIData {
+  HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Read)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Write)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(AutoReceive)
+
  public:
   int32_t Read(uint8_t* buffer, int32_t count);
   int32_t Write(const uint8_t* dataToSend, int32_t sendSize);
@@ -21,11 +26,6 @@ class SPIData {
                       int32_t size);
   int32_t ReadAutoReceivedData(uint8_t* buffer, int32_t numToRead,
                                double timeout, int32_t* status);
-
-  HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
-  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Read)
-  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Write)
-  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(AutoReceive)
 
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
   SimCallbackRegistry<HAL_BufferCallback, GetReadName> read;

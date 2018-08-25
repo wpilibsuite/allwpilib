@@ -12,16 +12,17 @@
 
 namespace hal {
 class AnalogTriggerData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(TriggerLowerBound)
   HAL_SIMDATAVALUE_DEFINE_NAME(TriggerUpperBound)
   HAL_SIMDATAVALUE_DEFINE_NAME(TriggerMode)
 
-  static inline HAL_Value MakeTriggerModeValue(HALSIM_AnalogTriggerMode value) {
+  static LLVM_ATTRIBUTE_ALWAYS_INLINE HAL_Value
+  MakeTriggerModeValue(HALSIM_AnalogTriggerMode value) {
     return MakeEnum(value);
   }
 
+ public:
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{0};
   SimDataValue<double, MakeDouble, GetTriggerLowerBoundName> triggerLowerBound{
       0};

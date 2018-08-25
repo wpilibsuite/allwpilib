@@ -18,6 +18,20 @@ namespace hal {
 struct JoystickOutputStore;
 
 class DriverStationData {
+  HAL_SIMDATAVALUE_DEFINE_NAME(Enabled)
+  HAL_SIMDATAVALUE_DEFINE_NAME(Autonomous)
+  HAL_SIMDATAVALUE_DEFINE_NAME(Test)
+  HAL_SIMDATAVALUE_DEFINE_NAME(EStop)
+  HAL_SIMDATAVALUE_DEFINE_NAME(FmsAttached)
+  HAL_SIMDATAVALUE_DEFINE_NAME(DsAttached)
+  HAL_SIMDATAVALUE_DEFINE_NAME(AllianceStationId)
+  HAL_SIMDATAVALUE_DEFINE_NAME(MatchTime)
+
+  static LLVM_ATTRIBUTE_ALWAYS_INLINE HAL_Value MakeAllianceStationIdValue(
+      HAL_AllianceStationID value) {
+    return MakeEnum(value);
+  }
+
  public:
   DriverStationData();
   void ResetData();
@@ -43,20 +57,6 @@ class DriverStationData {
   void SetMatchInfo(const HAL_MatchInfo* info);
 
   void NotifyNewData();
-
-  HAL_SIMDATAVALUE_DEFINE_NAME(Enabled)
-  HAL_SIMDATAVALUE_DEFINE_NAME(Autonomous)
-  HAL_SIMDATAVALUE_DEFINE_NAME(Test)
-  HAL_SIMDATAVALUE_DEFINE_NAME(EStop)
-  HAL_SIMDATAVALUE_DEFINE_NAME(FmsAttached)
-  HAL_SIMDATAVALUE_DEFINE_NAME(DsAttached)
-  HAL_SIMDATAVALUE_DEFINE_NAME(AllianceStationId)
-  HAL_SIMDATAVALUE_DEFINE_NAME(MatchTime)
-
-  static inline HAL_Value MakeAllianceStationIdValue(
-      HAL_AllianceStationID value) {
-    return MakeEnum(value);
-  }
 
   SimDataValue<HAL_Bool, MakeBoolean, GetEnabledName> enabled{false};
   SimDataValue<HAL_Bool, MakeBoolean, GetAutonomousName> autonomous{false};

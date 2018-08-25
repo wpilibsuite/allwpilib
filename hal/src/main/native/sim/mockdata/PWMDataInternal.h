@@ -12,7 +12,6 @@
 
 namespace hal {
 class PWMData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(RawValue)
   HAL_SIMDATAVALUE_DEFINE_NAME(Speed)
@@ -20,6 +19,7 @@ class PWMData {
   HAL_SIMDATAVALUE_DEFINE_NAME(PeriodScale)
   HAL_SIMDATAVALUE_DEFINE_NAME(ZeroLatch)
 
+ public:
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
   SimDataValue<int32_t, MakeInt, GetRawValueName> rawValue{0};
   SimDataValue<double, MakeDouble, GetSpeedName> speed{0};

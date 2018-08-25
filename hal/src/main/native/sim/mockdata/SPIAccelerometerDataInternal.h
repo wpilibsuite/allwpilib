@@ -12,13 +12,13 @@
 
 namespace hal {
 class SPIAccelerometerData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(Active)
   HAL_SIMDATAVALUE_DEFINE_NAME(Range)
   HAL_SIMDATAVALUE_DEFINE_NAME(X)
   HAL_SIMDATAVALUE_DEFINE_NAME(Y)
   HAL_SIMDATAVALUE_DEFINE_NAME(Z)
 
+ public:
   SimDataValue<HAL_Bool, MakeBoolean, GetActiveName> active{false};
   SimDataValue<int32_t, MakeInt, GetRangeName> range{0};
   SimDataValue<double, MakeDouble, GetXName> x{0.0};

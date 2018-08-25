@@ -12,11 +12,11 @@
 
 namespace hal {
 class DigitalPWMData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(DutyCycle)
   HAL_SIMDATAVALUE_DEFINE_NAME(Pin)
 
+ public:
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
   SimDataValue<double, MakeDouble, GetDutyCycleName> dutyCycle{0.0};
   SimDataValue<int32_t, MakeInt, GetPinName> pin{0};

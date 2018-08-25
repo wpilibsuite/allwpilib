@@ -13,7 +13,6 @@
 
 namespace hal {
 class PCMData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(SolenoidInitialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(SolenoidOutput)
   HAL_SIMDATAVALUE_DEFINE_NAME(CompressorInitialized)
@@ -22,11 +21,16 @@ class PCMData {
   HAL_SIMDATAVALUE_DEFINE_NAME(PressureSwitch)
   HAL_SIMDATAVALUE_DEFINE_NAME(CompressorCurrent)
 
-  static inline constexpr HAL_Bool GetSolenoidInitializedDefault() {
+  static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr HAL_Bool
+  GetSolenoidInitializedDefault() {
     return false;
   }
-  static inline constexpr HAL_Bool GetSolenoidOutputDefault() { return false; }
+  static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr HAL_Bool
+  GetSolenoidOutputDefault() {
+    return false;
+  }
 
+ public:
   SimDataValue<HAL_Bool, MakeBoolean, GetSolenoidInitializedName,
                GetSolenoidInitializedDefault>
       solenoidInitialized[kNumSolenoidChannels];

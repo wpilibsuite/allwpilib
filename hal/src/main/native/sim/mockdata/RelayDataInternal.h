@@ -12,12 +12,12 @@
 
 namespace hal {
 class RelayData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(InitializedForward)
   HAL_SIMDATAVALUE_DEFINE_NAME(InitializedReverse)
   HAL_SIMDATAVALUE_DEFINE_NAME(Forward)
   HAL_SIMDATAVALUE_DEFINE_NAME(Reverse)
 
+ public:
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedForwardName>
       initializedForward{false};
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedReverseName>

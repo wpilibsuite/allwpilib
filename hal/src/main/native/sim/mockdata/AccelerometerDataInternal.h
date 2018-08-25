@@ -12,13 +12,13 @@
 
 namespace hal {
 class AccelerometerData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(Active)
   HAL_SIMDATAVALUE_DEFINE_NAME(Range)
   HAL_SIMDATAVALUE_DEFINE_NAME(X)
   HAL_SIMDATAVALUE_DEFINE_NAME(Y)
   HAL_SIMDATAVALUE_DEFINE_NAME(Z)
 
+ public:
   static inline HAL_Value MakeRangeValue(HAL_AccelerometerRange value) {
     return MakeEnum(value);
   }

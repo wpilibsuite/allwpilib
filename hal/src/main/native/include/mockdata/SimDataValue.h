@@ -113,8 +113,11 @@ class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
  * This creates a function named GetNAMEName() that returns "NAME".
  * @param NAME the name to return
  */
-#define HAL_SIMDATAVALUE_DEFINE_NAME(NAME) \
-  static inline constexpr const char* Get##NAME##Name() { return #NAME; }
+#define HAL_SIMDATAVALUE_DEFINE_NAME(NAME)                  \
+  static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr const char* \
+      Get##NAME##Name() {                                   \
+    return #NAME;                                           \
+  }
 
 /**
  * Define a standard C API for simulation data.

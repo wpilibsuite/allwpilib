@@ -13,14 +13,16 @@
 
 namespace hal {
 class PDPData {
- public:
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(Temperature)
   HAL_SIMDATAVALUE_DEFINE_NAME(Voltage)
   HAL_SIMDATAVALUE_DEFINE_NAME(Current)
 
-  static inline constexpr double GetCurrentDefault() { return 0.0; }
+  static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr double GetCurrentDefault() {
+    return 0.0;
+  }
 
+ public:
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
   SimDataValue<double, MakeDouble, GetTemperatureName> temperature{0.0};
   SimDataValue<double, MakeDouble, GetVoltageName> voltage{12.0};
