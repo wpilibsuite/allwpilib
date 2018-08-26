@@ -27,8 +27,8 @@ class DriverStationData {
   HAL_SIMDATAVALUE_DEFINE_NAME(AllianceStationId)
   HAL_SIMDATAVALUE_DEFINE_NAME(MatchTime)
 
-  static LLVM_ATTRIBUTE_ALWAYS_INLINE HAL_Value MakeAllianceStationIdValue(
-      HAL_AllianceStationID value) {
+  static LLVM_ATTRIBUTE_ALWAYS_INLINE HAL_Value
+  MakeAllianceStationIdValue(HAL_AllianceStationID value) {
     return MakeEnum(value);
   }
 
