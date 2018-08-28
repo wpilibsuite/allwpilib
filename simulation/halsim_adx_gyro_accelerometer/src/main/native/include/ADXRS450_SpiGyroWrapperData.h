@@ -29,14 +29,14 @@ class ADXRS450_SpiGyroWrapper {
   double GetAngle() { return m_angle; }
   void SetAngle(double angle);
 
-  HAL_SIMDATAVALUE_DEFINE_NAME(Angle)
-
   virtual void ResetData();
 
  private:
   int m_port;
   int m_readCallbackId;
   int m_autoReceiveReadCallbackId;
+
+  HAL_SIMDATAVALUE_DEFINE_NAME(Angle)
 
   SimDataValue<double, MakeDouble, GetAngleName> m_angle{0.0};
   double m_angleDiff = 0.0;

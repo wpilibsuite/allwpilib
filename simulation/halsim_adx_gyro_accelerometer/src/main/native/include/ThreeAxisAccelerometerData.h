@@ -11,6 +11,10 @@
 
 namespace hal {
 class ThreeAxisAccelerometerData {
+  HAL_SIMDATAVALUE_DEFINE_NAME(X);
+  HAL_SIMDATAVALUE_DEFINE_NAME(Y);
+  HAL_SIMDATAVALUE_DEFINE_NAME(Z);
+
  public:
   ThreeAxisAccelerometerData();
   virtual ~ThreeAxisAccelerometerData();
@@ -25,10 +29,6 @@ class ThreeAxisAccelerometerData {
 
   double GetZ() { return z; }
   void SetZ(double z_) { z = z_; }
-
-  HAL_SIMDATAVALUE_DEFINE_NAME(X);
-  HAL_SIMDATAVALUE_DEFINE_NAME(Y);
-  HAL_SIMDATAVALUE_DEFINE_NAME(Z);
 
   SimDataValue<double, MakeDouble, GetXName> x{0.0};
   SimDataValue<double, MakeDouble, GetYName> y{0.0};
