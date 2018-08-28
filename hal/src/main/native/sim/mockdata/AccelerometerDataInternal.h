@@ -18,11 +18,11 @@ class AccelerometerData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Y)
   HAL_SIMDATAVALUE_DEFINE_NAME(Z)
 
- public:
   static inline HAL_Value MakeRangeValue(HAL_AccelerometerRange value) {
     return MakeEnum(value);
   }
 
+ public:
   SimDataValue<HAL_Bool, MakeBoolean, GetActiveName> active{false};
   SimDataValue<HAL_AccelerometerRange, MakeRangeValue, GetRangeName> range{
       static_cast<HAL_AccelerometerRange>(0)};
