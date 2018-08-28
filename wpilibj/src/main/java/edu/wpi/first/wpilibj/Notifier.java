@@ -60,13 +60,22 @@ public class Notifier implements AutoCloseable {
 
   /**
    * Update the alarm hardware to reflect the next alarm.
+   *
+   * @param triggerTime the time at which the next alarm will be triggered
    */
-  private void updateAlarm() {
+  private void updateAlarm(long triggerTime) {
     int notifier = m_notifier.get();
     if (notifier == 0) {
       return;
     }
-    NotifierJNI.updateNotifierAlarm(notifier, (long) (m_expirationTime * 1e6));
+    NotifierJNI.updateNotifierAlarm(notifier, triggerTime);
+  }
+
+  /**
+   * Update the alarm hardware to reflect the next alarm.
+   */
+  private void updateAlarm() {
+    updateAlarm((long) (m_expirationTime * 1e6));
   }
 
   /**
@@ -97,6 +106,9 @@ public class Notifier implements AutoCloseable {
           if (m_periodic) {
             m_expirationTime += m_period;
             updateAlarm();
+          } else {
+            // need to update the alarm to cause it to wait again
+            updateAlarm((long) -1);
           }
         } finally {
           m_processLock.unlock();

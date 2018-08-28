@@ -38,6 +38,9 @@ Notifier::Notifier(TimerEventHandler handler) {
         if (m_periodic) {
           m_expirationTime += m_period;
           UpdateAlarm();
+        } else {
+          // need to update the alarm to cause it to wait again
+          UpdateAlarm(UINT64_MAX);
         }
       }
 
@@ -87,12 +90,15 @@ void Notifier::Stop() {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void Notifier::UpdateAlarm() {
+void Notifier::UpdateAlarm(uint64_t triggerTime) {
   int32_t status = 0;
   // Return if we are being destructed, or were not created successfully
   auto notifier = m_notifier.load();
   if (notifier == 0) return;
-  HAL_UpdateNotifierAlarm(
-      notifier, static_cast<uint64_t>(m_expirationTime * 1e6), &status);
+  HAL_UpdateNotifierAlarm(notifier, triggerTime, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+void Notifier::UpdateAlarm() {
+  UpdateAlarm(static_cast<uint64_t>(m_expirationTime * 1e6));
 }
