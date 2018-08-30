@@ -16,6 +16,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ShuffleboardInstanceTest {
   private NetworkTableInstance m_ntInstance;
@@ -87,6 +89,27 @@ public class ShuffleboardInstanceTest {
     NetworkTableEntry entry = m_ntInstance.getEntry(
         "/Shuffleboard/.metadata/Tab/Title/PreferredComponent");
     assertEquals(layoutType, entry.getString("Not Set"), "Layout type not set");
+  }
+
+  @Test
+  void testNestedActuatorWidgetsAreDisabled() {
+    m_shuffleboardInstance.getTab("Tab")
+                          .getLayout("Layout", "Title")
+                          .add(new MockActuatorSendable("Actuator"));
+    NetworkTableEntry controllableEntry =
+        m_ntInstance.getEntry("/Shuffleboard/Tab/Title/Actuator/.controllable");
+
+    m_shuffleboardInstance.update();
+
+    // Note: we use the unsafe `getBoolean()` method because if the value is NOT a boolean, or if it
+    // is not present, then something has clearly gone very, very wrong
+    boolean controllable = controllableEntry.getValue().getBoolean();
+
+    // Sanity check
+    assertTrue(controllable, "The nested actuator widget should be enabled by default");
+    m_shuffleboardInstance.disableActuatorWidgets();
+    controllable = controllableEntry.getValue().getBoolean();
+    assertFalse(controllable, "The nested actuator widget should have been disabled");
   }
 
 }

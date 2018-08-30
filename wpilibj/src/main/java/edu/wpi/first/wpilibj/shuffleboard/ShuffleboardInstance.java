@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj.shuffleboard;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -55,24 +56,37 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
 
   @Override
   public void enableActuatorWidgets() {
-    for (ShuffleboardTab tab : m_tabs.values()) {
-      for (ShuffleboardComponent<?> component : tab.getComponents()) {
-        if (component instanceof ComplexWidget) {
-          ComplexWidget complexWidget = (ComplexWidget) component;
-          complexWidget.enableIfActuator();
-        }
-      }
-    }
+    applyToAllComplexWidgets(ComplexWidget::enableIfActuator);
   }
 
   @Override
   public void disableActuatorWidgets() {
+    applyToAllComplexWidgets(ComplexWidget::disableIfActuator);
+  }
+
+  /**
+   * Applies the function {@code func} to all complex widgets in this root, regardless of how they
+   * are nested.
+   *
+   * @param func the function to apply to all complex widgets
+   */
+  private void applyToAllComplexWidgets(Consumer<ComplexWidget> func) {
     for (ShuffleboardTab tab : m_tabs.values()) {
-      for (ShuffleboardComponent<?> component : tab.getComponents()) {
-        if (component instanceof ComplexWidget) {
-          ComplexWidget complexWidget = (ComplexWidget) component;
-          complexWidget.disableIfActuator();
-        }
+      apply(tab, func);
+    }
+  }
+
+  /**
+   * Applies the function {@code func} to all complex widgets in {@code container}. Helper method
+   * for {@link #applyToAllComplexWidgets}.
+   */
+  private void apply(ShuffleboardContainer container, Consumer<ComplexWidget> func) {
+    for (ShuffleboardComponent<?> component : container.getComponents()) {
+      if (component instanceof ComplexWidget) {
+        func.accept((ComplexWidget) component);
+      }
+      if (component instanceof ShuffleboardContainer) {
+        apply((ShuffleboardContainer) component, func);
       }
     }
   }
