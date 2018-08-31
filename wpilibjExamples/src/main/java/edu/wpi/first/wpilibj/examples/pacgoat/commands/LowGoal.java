@@ -21,7 +21,7 @@ public class LowGoal extends CommandGroup {
    * Create a new low goal command.
    */
   public LowGoal() {
-    addSequential(new SetPivotSetpoint(Pivot.kLowGoal));
+    addSequential(new SetPivotReference(Pivot.kLowGoal));
     addSequential(new SetCollectionSpeed(Collector.kReverse));
     addSequential(new ExtendShooter());
   }

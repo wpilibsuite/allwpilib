@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.experimental.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
@@ -31,7 +31,7 @@ public class Wrist extends PIDSubsystem {
   public Wrist() {
     super(kP_real, 0, 0);
     if (Robot.isSimulation()) { // Check for simulation and update PID values
-      getPIDController().setPID(kP_simulation, 0, 0, 0);
+      getPIDController().setPID(kP_simulation, 0, 0);
     }
     setAbsoluteTolerance(2.5);
 
@@ -66,7 +66,7 @@ public class Wrist extends PIDSubsystem {
    * called by the subsystem.
    */
   @Override
-  protected double returnPIDInput() {
+  public double getMeasurement() {
     return m_pot.get();
   }
 
@@ -75,7 +75,7 @@ public class Wrist extends PIDSubsystem {
    * the subsystem.
    */
   @Override
-  protected void usePIDOutput(double power) {
-    m_motor.set(power);
+  public void setOutput(double output) {
+    m_motor.set(output);
   }
 }

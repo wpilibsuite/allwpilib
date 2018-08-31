@@ -8,11 +8,11 @@
 #include "commands/Pickup.h"
 
 #include "commands/CloseClaw.h"
-#include "commands/SetElevatorSetpoint.h"
-#include "commands/SetWristSetpoint.h"
+#include "commands/SetElevatorReference.h"
+#include "commands/SetWristReference.h"
 
 Pickup::Pickup() : frc::CommandGroup("Pickup") {
   AddSequential(new CloseClaw());
-  AddParallel(new SetWristSetpoint(-45));
-  AddSequential(new SetElevatorSetpoint(0.25));
+  AddParallel(new SetWristReference(-45));
+  AddSequential(new SetElevatorReference(0.25));
 }

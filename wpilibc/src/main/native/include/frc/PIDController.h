@@ -49,6 +49,7 @@ class PIDController : public PIDBase, public Controller {
    *               particularly affects calculations of the integral and
    *               differental terms. The default is 0.05 (50ms).
    */
+  WPI_DEPRECATED("Use controllers/PIDController class instead.")
   PIDController(double p, double i, double d, PIDSource* source,
                 PIDOutput* output, double period = 0.05);
 
@@ -64,6 +65,7 @@ class PIDController : public PIDBase, public Controller {
    *               particularly affects calculations of the integral and
    *               differental terms. The default is 0.05 (50ms).
    */
+  WPI_DEPRECATED("Use controllers/PIDController class instead.")
   PIDController(double p, double i, double d, double f, PIDSource* source,
                 PIDOutput* output, double period = 0.05);
 
@@ -79,6 +81,7 @@ class PIDController : public PIDBase, public Controller {
    *               particularly affects calculations of the integral and
    *               differental terms. The default is 0.05 (50ms).
    */
+  WPI_DEPRECATED("Use controllers/PIDController class instead.")
   PIDController(double p, double i, double d, PIDSource& source,
                 PIDOutput& output, double period = 0.05);
 
@@ -94,6 +97,7 @@ class PIDController : public PIDBase, public Controller {
    *               particularly affects calculations of the integral and
    *               differental terms. The default is 0.05 (50ms).
    */
+  WPI_DEPRECATED("Use controllers/PIDController class instead.")
   PIDController(double p, double i, double d, double f, PIDSource& source,
                 PIDOutput& output, double period = 0.05);
 

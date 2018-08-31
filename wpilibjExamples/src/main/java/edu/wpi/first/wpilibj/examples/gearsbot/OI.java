@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj.examples.gearsbot.commands.OpenClaw;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.Pickup;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.Place;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.PrepareToPickup;
-import edu.wpi.first.wpilibj.examples.gearsbot.commands.SetElevatorSetpoint;
-import edu.wpi.first.wpilibj.examples.gearsbot.commands.SetWristSetpoint;
+import edu.wpi.first.wpilibj.examples.gearsbot.commands.SetElevatorReference;
+import edu.wpi.first.wpilibj.examples.gearsbot.commands.SetWristReference;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -32,12 +32,12 @@ public class OI {
    */
   public OI() {
     // Put Some buttons on the SmartDashboard
-    SmartDashboard.putData("Elevator Bottom", new SetElevatorSetpoint(0));
-    SmartDashboard.putData("Elevator Platform", new SetElevatorSetpoint(0.2));
-    SmartDashboard.putData("Elevator Top", new SetElevatorSetpoint(0.3));
+    SmartDashboard.putData("Elevator Bottom", new SetElevatorReference(0));
+    SmartDashboard.putData("Elevator Platform", new SetElevatorReference(0.2));
+    SmartDashboard.putData("Elevator Top", new SetElevatorReference(0.3));
 
-    SmartDashboard.putData("Wrist Horizontal", new SetWristSetpoint(0));
-    SmartDashboard.putData("Raise Wrist", new SetWristSetpoint(-45));
+    SmartDashboard.putData("Wrist Horizontal", new SetWristReference(0));
+    SmartDashboard.putData("Raise Wrist", new SetWristReference(-45));
 
     SmartDashboard.putData("Open Claw", new OpenClaw());
     SmartDashboard.putData("Close Claw", new CloseClaw());
@@ -55,8 +55,8 @@ public class OI {
     final JoystickButton r1 = new JoystickButton(m_joystick, 12);
 
     // Connect the buttons to commands
-    dpadUp.whenPressed(new SetElevatorSetpoint(0.2));
-    dpadDown.whenPressed(new SetElevatorSetpoint(-0.2));
+    dpadUp.whenPressed(new SetElevatorReference(0.2));
+    dpadDown.whenPressed(new SetElevatorReference(-0.2));
     dpadRight.whenPressed(new CloseClaw());
     dpadLeft.whenPressed(new OpenClaw());
 

@@ -9,7 +9,10 @@ package edu.wpi.first.wpilibj;
 
 /**
  * This interface allows for PIDController to automatically read from this object.
+ *
+ * @deprecated Use DoubleSupplier and new PIDController class.
  */
+@Deprecated
 public interface PIDSource {
   /**
    * Set which parameter of the device you are using as a process control variable.

@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.examples.pacgoat.commands.Collect;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveForward;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.LowGoal;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.SetCollectionSpeed;
-import edu.wpi.first.wpilibj.examples.pacgoat.commands.SetPivotSetpoint;
+import edu.wpi.first.wpilibj.examples.pacgoat.commands.SetPivotReference;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.Shoot;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Collector;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Pivot;
@@ -37,9 +37,9 @@ public class OI {
     new JoystickButton(m_joystick, 10).whenPressed(new Collect());
 
     new JoystickButton(m_joystick, 11).whenPressed(
-        new SetPivotSetpoint(Pivot.kShoot));
+        new SetPivotReference(Pivot.kShoot));
     new JoystickButton(m_joystick, 9).whenPressed(
-        new SetPivotSetpoint(Pivot.kShootNear));
+        new SetPivotReference(Pivot.kShootNear));
 
     new DoubleButton(m_joystick, 2, 3).whenActive(new Shoot());
 

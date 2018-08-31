@@ -19,7 +19,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p> It provides some convenience methods to run an internal {@link PIDController} . It will also
  * start and stop said {@link PIDController} when the {@link PIDCommand} is first initialized and
  * ended/interrupted. </p>
+ *
+ * @deprecated Use PIDCommand class instead.
  */
+@Deprecated
 public abstract class PIDCommand extends Command {
   /**
    * The internal {@link PIDController}.
@@ -63,8 +66,8 @@ public abstract class PIDCommand extends Command {
   }
 
   /**
-   * Instantiates a {@link PIDCommand} that will use the given p, i and d values. It will also space
-   * the time between PID loop calculations to be equal to the given period.
+   * Instantiates a {@link PIDCommand} that will use the given p, i and d values. It will also
+   * space the time between PID loop calculations to be equal to the given period.
    *
    * @param name   the name
    * @param p      the proportional value
@@ -122,8 +125,8 @@ public abstract class PIDCommand extends Command {
   }
 
   /**
-   * Instantiates a {@link PIDCommand} that will use the given p, i and d values. It will also space
-   * the time between PID loop calculations to be equal to the given period.
+   * Instantiates a {@link PIDCommand} that will use the given p, i and d values. It will also
+   * space the time between PID loop calculations to be equal to the given period.
    *
    * @param name      the name
    * @param p         the proportional value
@@ -172,8 +175,8 @@ public abstract class PIDCommand extends Command {
   }
 
   /**
-   * Returns the {@link PIDController} used by this {@link PIDCommand}. Use this if you would like
-   * to fine tune the pid loop.
+   * Returns the {@link PIDController} used by this {@link PIDCommand}. Use this if you would
+   * like to fine tune the pid loop.
    *
    * @return the {@link PIDController} used by this {@link PIDCommand}
    */
@@ -183,19 +186,19 @@ public abstract class PIDCommand extends Command {
 
   @Override
   @SuppressWarnings("MethodName")
-  void _initialize() {
+  protected void _initialize() {
     m_controller.enable();
   }
 
   @Override
   @SuppressWarnings("MethodName")
-  void _end() {
+  protected void _end() {
     m_controller.disable();
   }
 
   @Override
   @SuppressWarnings("MethodName")
-  void _interrupted() {
+  protected void _interrupted() {
     _end();
   }
 

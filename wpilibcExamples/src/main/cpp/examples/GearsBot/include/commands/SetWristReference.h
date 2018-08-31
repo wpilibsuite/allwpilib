@@ -14,12 +14,12 @@
  * the tolerance, but leaves the PID loop running to maintain the position.
  * Other commands using the wrist should make sure they disable PID!
  */
-class SetWristSetpoint : public frc::Command {
+class SetWristReference : public frc::Command {
  public:
-  explicit SetWristSetpoint(double setpoint);
+  explicit SetWristReference(double reference);
   void Initialize() override;
   bool IsFinished() override;
 
  private:
-  double m_setpoint;
+  double m_reference;
 };

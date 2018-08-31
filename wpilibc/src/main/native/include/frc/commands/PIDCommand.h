@@ -10,6 +10,7 @@
 #include <memory>
 
 #include <wpi/Twine.h>
+#include <wpi/deprecated.h>
 
 #include "frc/PIDController.h"
 #include "frc/PIDOutput.h"
@@ -20,28 +21,37 @@ namespace frc {
 
 class PIDCommand : public Command, public PIDOutput, public PIDSource {
  public:
+  WPI_DEPRECATED("Use PIDCommand class instead.")
   PIDCommand(const wpi::Twine& name, double p, double i, double d);
+  WPI_DEPRECATED("Use PIDCommand class instead.")
   PIDCommand(const wpi::Twine& name, double p, double i, double d,
-             double period);
+             WPI_DEPRECATED("Use PIDCommand class instead.") double period);
+  WPI_DEPRECATED("Use PIDCommand class instead.")
   PIDCommand(const wpi::Twine& name, double p, double i, double d, double f,
              double period);
+  WPI_DEPRECATED("Use PIDCommand class instead.")
   PIDCommand(double p, double i, double d);
+  WPI_DEPRECATED("Use PIDCommand class instead.")
   PIDCommand(double p, double i, double d, double period);
+  WPI_DEPRECATED("Use PIDCommand class instead.")
   PIDCommand(double p, double i, double d, double f, double period);
+  WPI_DEPRECATED("Use PIDCommand class instead.")
   PIDCommand(const wpi::Twine& name, double p, double i, double d,
              Subsystem& subsystem);
+  WPI_DEPRECATED("Use PIDCommand class instead.")
   PIDCommand(const wpi::Twine& name, double p, double i, double d,
              double period, Subsystem& subsystem);
+  WPI_DEPRECATED("Use PIDCommand class instead.")
   PIDCommand(const wpi::Twine& name, double p, double i, double d, double f,
              double period, Subsystem& subsystem);
+  WPI_DEPRECATED("Use PIDCommand class instead.")
   PIDCommand(double p, double i, double d, Subsystem& subsystem);
+  WPI_DEPRECATED("Use PIDCommand class instead.")
   PIDCommand(double p, double i, double d, double period, Subsystem& subsystem);
+  WPI_DEPRECATED("Use PIDCommand class instead.")
   PIDCommand(double p, double i, double d, double f, double period,
              Subsystem& subsystem);
   virtual ~PIDCommand() = default;
-
-  PIDCommand(PIDCommand&&) = default;
-  PIDCommand& operator=(PIDCommand&&) = default;
 
   void SetSetpointRelative(double deltaSetpoint);
 

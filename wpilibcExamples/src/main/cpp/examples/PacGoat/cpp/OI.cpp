@@ -13,7 +13,7 @@
 #include "commands/DriveForward.h"
 #include "commands/LowGoal.h"
 #include "commands/SetCollectionSpeed.h"
-#include "commands/SetPivotSetpoint.h"
+#include "commands/SetPivotReference.h"
 #include "commands/Shoot.h"
 #include "subsystems/Collector.h"
 #include "subsystems/Pivot.h"
@@ -22,8 +22,8 @@ OI::OI() {
   m_r1.WhenPressed(new LowGoal());
   m_r2.WhenPressed(new Collect());
 
-  m_l1.WhenPressed(new SetPivotSetpoint(Pivot::kShoot));
-  m_l2.WhenPressed(new SetPivotSetpoint(Pivot::kShootNear));
+  m_l1.WhenPressed(new SetPivotReference(Pivot::kShoot));
+  m_l2.WhenPressed(new SetPivotReference(Pivot::kShootNear));
 
   m_sticks.WhenActive(new Shoot());
 

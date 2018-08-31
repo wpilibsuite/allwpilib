@@ -18,7 +18,7 @@ public class PrepareToPickup extends CommandGroup {
    */
   public PrepareToPickup() {
     addParallel(new OpenClaw());
-    addParallel(new SetWristSetpoint(0));
-    addSequential(new SetElevatorSetpoint(0));
+    addParallel(new SetWristReference(0));
+    addSequential(new SetElevatorReference(0));
   }
 }

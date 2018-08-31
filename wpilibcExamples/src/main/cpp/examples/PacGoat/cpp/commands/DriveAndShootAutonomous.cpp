@@ -11,7 +11,7 @@
 #include "commands/CheckForHotGoal.h"
 #include "commands/CloseClaw.h"
 #include "commands/DriveForward.h"
-#include "commands/SetPivotSetpoint.h"
+#include "commands/SetPivotReference.h"
 #include "commands/Shoot.h"
 #include "commands/WaitForPressure.h"
 
@@ -22,7 +22,7 @@ DriveAndShootAutonomous::DriveAndShootAutonomous() {
   // NOTE: Simulation doesn't currently have the concept of hot.
   AddSequential(new CheckForHotGoal(2));
 #endif
-  AddSequential(new SetPivotSetpoint(45));
+  AddSequential(new SetPivotReference(45));
   AddSequential(new DriveForward(8, 0.3));
   AddSequential(new Shoot());
 }

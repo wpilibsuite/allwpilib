@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include <frc/commands/PIDSubsystem.h>
+#include <frc/experimental/commands/PIDSubsystem.h>
 
-class ReplaceMePIDSubsystem : public frc::PIDSubsystem {
+class ReplaceMePIDSubsystem : public frc::experimental::PIDSubsystem {
  public:
   ReplaceMePIDSubsystem();
-  double ReturnPIDInput() override;
-  void UsePIDOutput(double output) override;
+  double GetMeasurement() const override;
+  void SetOutput(double output) override;
   void InitDefaultCommand() override;
 };
