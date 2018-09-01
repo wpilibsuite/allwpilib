@@ -19,9 +19,9 @@ if (NOT WITHOUT_JAVA)
 
     if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
         set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-        add_jar(hal_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpiHal)
+        add_jar(hal_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpiHalMau)
     else()
-        add_jar(hal_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpiHal GENERATE_NATIVE_HEADERS hal_jni_headers)
+        add_jar(hal_jar ${JAVA_SOURCES} INCLUDE_JARS wpiutil_jar OUTPUT_NAME wpiHalMau GENERATE_NATIVE_HEADERS hal_jni_headers)
     endif()
 
     get_property(HAL_JAR_FILE TARGET hal_jar PROPERTY JAR_FILE)
@@ -34,21 +34,32 @@ endif()
 file(GLOB
     hal_shared_native_src src/main/native/cpp/cpp/*.cpp
     hal_shared_native_src src/main/native/cpp/handles/*.cpp
-    hal_sim_native_src src/main/native/sim/*.cpp
-    hal_sim_native_src src/main/native/sim/MockData/*.cpp)
+    hal_sim_native_src src/main/native/mau/*.cpp
+    hal_sim_native_src src/main/native/mau/Translator/*.cpp
+    hal_sim_native_src src/main/native/mau/DriveStation/*.cpp)
 add_library(hal ${hal_shared_native_src} ${hal_shared_jni_src})
 
 if(USE_EXTERNAL_HAL)
     include(${EXTERNAL_HAL_FILE})
 else()
-    target_sources(hal PRIVATE ${hal_sim_native_src} ${hal_sim_jni_src})
+    target_sources(hal PRIVATE ${hal_sim_native_src})
 endif()
 
-set_target_properties(hal PROPERTIES OUTPUT_NAME "wpiHal")
+set_target_properties(hal PROPERTIES OUTPUT_NAME "wpiHalMau")
 
 target_include_directories(hal PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/hal>)
+target_include_directories(hal PUBLIC /usr/local/include/vmxpi)
+target_include_directories(hal PUBLIC
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include/HAL/handles>)
+target_include_directories(hal PUBLIC
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include/HAL>)
+target_include_directories(hal PUBLIC
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/mau>)
+target_include_directories(hal PUBLIC
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/mau/DriveStation/include>)
+
 target_link_libraries(hal PUBLIC wpiutil)
 
 set_property(TARGET hal PROPERTY FOLDER "libraries")

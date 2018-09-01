@@ -1,18 +1,18 @@
-def athenaSimJniOutputDir = file("$buildDir/generated/cpp")
-def athenaSimJniOutputFile = file("$athenaSimJniOutputDir/simjni.cpp")
+def mauSimJniOutputDir = file("$buildDir/generated/cpp")
+def mauSimJniOutputFile = file("$mauSimJniOutputDir/simjni.cpp")
 
-task generateAthenaSimFiles() {
+task generateMauSimFiles() {
     Set dirs = [];
 
     def createdTask = it
-    outputs.file athenaSimJniOutputFile
+    outputs.file mauSimJniOutputFile
 
     model {
         components {
             it.all { component ->
                 if (component in getJniSpecClass()) {
                     component.binaries.all { binary ->
-                        if (binary.targetPlatform.architecture.name == 'athena') {
+                        if (binary.targetPlatform.architecture.name == 'nativearm') {
                             binary.tasks.withType(CppCompile) {
                                 it.dependsOn createdTask
                             }
@@ -61,8 +61,8 @@ task generateAthenaSimFiles() {
                 }
             }
         }
-        athenaSimJniOutputDir.mkdirs()
-        athenaSimJniOutputFile.withWriter { out ->
+        mauSimJniOutputDir.mkdirs()
+        mauSimJniOutputFile.withWriter { out ->
             out.println '#include <jni.h>'
             out.println '''
 static JavaVM* jvm = nullptr;

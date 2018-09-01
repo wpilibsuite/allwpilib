@@ -1,0 +1,205 @@
+{
+	"0": {
+		"Label":"DIO/QuadEncoder1.A",
+		"Type":"FlexDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","PWMCaptureInput","InterruptInput","EncoderAInput"]
+	},
+
+	"1": {
+		"Label":"DIO/QuadEncoder1.B",
+		"Type":"FlexDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput2","PWMCaptureInput2","InterruptInput","EncoderBInput"]
+	},
+
+	"2": {
+		"Label":"DIO/QuadEncoder2.A",
+		"Type":"FlexDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","PWMCaptureInput","InterruptInput","EncoderAInput"]
+	},
+
+	"3": {
+		"Label":"DIO/QuadEncoder2.B",
+		"Type":"FlexDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput2","PWMCaptureInput2","InterruptInput","EncoderBInput"]
+	},
+
+	"4": {
+		"Label":"DIO/QuadEncoder3.A",
+		"Type":"FlexDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","PWMCaptureInput","InterruptInput","EncoderAInput"]
+	},
+
+	"5": {
+		"Label":"DIO/QuadEncoder3.B",
+		"Type":"FlexDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput2","PWMCaptureInput2","InterruptInput","EncoderBInput"]
+	},
+
+	"6": {
+		"Label":"DIO/QuadEncoder4.A",
+		"Type":"FlexDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","PWMCaptureInput","InterruptInput","EncoderAInput"]
+	},
+
+	"7": {
+		"Label":"DIO/QuadEncoder4.B",
+		"Type":"FlexDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput2","PWMCaptureInput2","InterruptInput","EncoderBInput"]
+	},
+
+	"8": {
+		"Label":"DIOHeader1",
+		"Type":"FlexDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","PWMCaptureInput","InterruptInput","EncoderAInput"]
+	},
+
+	"9": {
+		"Label":"DIOHeader2",
+		"Type":"FlexDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput2","PWMCaptureInput2","InterruptInput","EncoderBInput"]
+	},
+
+	"10": {
+		"Label":"DIOHeader3",
+		"Type":"FlexDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","PWMCaptureInput","InterruptInput"]
+	},
+
+	"11": {
+		"Label":"DIOHeader4",
+		"Type":"FlexDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput2","PWMCaptureInput2","InterruptInput"]
+	},
+
+	"12": {
+		"Label":"PWM.1",
+		"Type":"HiCurrDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","InterruptInput","IODirectionSelect"]
+	},
+
+	"13": {
+		"Label":"PWM.2",
+		"Type":"HiCurrDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","InterruptInput","IODirectionSelect"]
+	},
+
+	"14": {
+		"Label":"PWM.3",
+		"Type":"HiCurrDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","InterruptInput","IODirectionSelect"]
+	},
+
+	"15": {
+		"Label":"PWM.4",
+		"Type":"HiCurrDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","InterruptInput","IODirectionSelect"]
+	},
+
+	"16": {
+		"Label":"PWM.5",
+		"Type":"HiCurrDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","InterruptInput","IODirectionSelect"]
+	},
+
+	"17": {
+		"Label":"PWM.6",
+		"Type":"HiCurrDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","InterruptInput","IODirectionSelect"]
+	},
+
+	"18": {
+		"Label":"PWM.7",
+		"Type":"HiCurrDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","InterruptInput","IODirectionSelect"]
+	},
+
+	"19": {
+		"Label":"PWM.8",
+		"Type":"HiCurrDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","InterruptInput","IODirectionSelect"]
+	},
+
+	"20": {
+		"Label":"PWM.9",
+		"Type":"HiCurrDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","InterruptInput","IODirectionSelect"]
+	},
+
+	"21": {
+		"Label":"PWM.10",
+		"Type":"HiCurrDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","InterruptInput","IODirectionSelect"]
+	},
+
+	"22": {
+		"Label":"AnalogInput.1",
+		"Type":"AnalogIn",
+		"Capabilities":["AccumulatorInput","AnalogTriggerInput","InterruptInput"]
+	},
+
+	"23": {
+		"Label":"AnalogInput.2",
+		"Type":"AnalogIn",
+		"Capabilities":["AccumulatorInput","AnalogTriggerInput","InterruptInput"]
+	},
+
+	"24": {
+		"Label":"AnalogInput.3",
+		"Type":"AnalogIn",
+		"Capabilities":["AccumulatorInput","AnalogTriggerInput","InterruptInput"]
+	},
+
+	"25": {
+		"Label":"AnalogInput.4",
+		"Type":"AnalogIn",
+		"Capabilities":["AccumulatorInput","AnalogTriggerInput","InterruptInput"]
+	},
+
+	"26": {
+		"Label":"I2C.(SDA)",
+		"Type":"CommDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","PWMCaptureInput","InterruptInput","I2C_SDA"]
+	},
+
+	"27": {
+		"Label":"I2C.(SCL)",
+		"Type":"CommDIO",
+		"Capabilities":["DigitalInput","DigitalOutput","PWMGeneratorOutput","PWMCaptureInput","InterruptInput","I2C_SCL"]
+	},
+
+	"28": {
+		"Label":"UART.(TX)",
+		"Type":"CommDIO",
+		"Capabilities":["DigitalOutput","PWMGeneratorOutput","UART_TX"]
+	},
+
+	"29": {
+		"Label":"UART.(RX)",
+		"Type":"CommDIO",
+		"Capabilities":["DigitalInput","InterruptInput","UART_RX"]
+	},
+
+	"30": {
+		"Label":"SPI.(CLK)",
+		"Type":"CommDIO",
+		"Capabilities":["DigitalOutput","PWMGeneratorOutput","SPI_CLK"]
+	},
+
+	"31": {
+		"Label":"SPI.(MOSI)",
+		"Type":"CommDIO",
+		"Capabilities":["DigitalOutput","PWMGeneratorOutput","SPI_MOSI"]
+	},
+
+	"32": {
+		"Label":"SPI.(MISO)",
+		"Type":"CommDIO",
+		"Capabilities":["DigitalInput","InterruptInput","SPI_MISO"]
+	},
+
+	"33": {
+		"Label":"SPI.(CS)",
+		"Type":"CommDIO",
+		"Capabilities":["DigitalOutput","PWMGeneratorOutput","SPI_CS"]
+	}
+}
