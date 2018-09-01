@@ -53,7 +53,7 @@ namespace hal {
             mau::enumConverter = enums;
             mau::channelMap = maps;
 
-            bool realtime = false;
+            bool realtime = true;
             uint8_t hertz = 50;
             vmx = new VMXPi(realtime, hertz);
 

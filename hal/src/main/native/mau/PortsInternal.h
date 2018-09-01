@@ -18,7 +18,7 @@ namespace hal {
     constexpr int32_t kNumDigitalHeaders = 10;
     constexpr int32_t kNumPWMHeaders = 10;
     constexpr int32_t kNumDigitalChannels = 26;
-    constexpr int32_t kNumPWMChannels = 20;
+    constexpr int32_t kNumPWMChannels = 22;
     constexpr int32_t kNumDigitalPWMOutputs = 6;
     constexpr int32_t kNumEncoders = 8;
     constexpr int32_t kNumInterrupts = 8;
