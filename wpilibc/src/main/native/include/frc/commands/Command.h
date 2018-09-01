@@ -75,9 +75,9 @@ class Command : public ErrorBase, public SendableBase {
   /**
    * Creates a new command with the given timeout and a default name.
    *
-   * @param requirement the subsystem that the command requires
+   * @param subsystem the subsystem that the command requires
    */
-  explicit Command(Subsystem& requirement);
+  explicit Command(Subsystem& subsystem);
 
   /**
    * Creates a new command with the given name and timeout.
@@ -91,29 +91,27 @@ class Command : public ErrorBase, public SendableBase {
   /**
    * Creates a new command with the given name and timeout.
    *
-   * @param name        the name of the command
-   * @param requirement the subsystem that the command requires
+   * @param name      the name of the command
+   * @param subsystem the subsystem that the command requires
    */
-  Command(const wpi::Twine& name, Subsystem& requirement);
+  Command(const wpi::Twine& name, Subsystem& subsystem);
 
   /**
    * Creates a new command with the given name and timeout.
    *
-   * @param timeout     the time (in seconds) before this command "times out"
-   * @param requirement the subsystem that the command requires
-   * @see IsTimedOut()
+   * @param timeout   the time (in seconds) before this command "times out"
+   * @param subsystem the subsystem that the command requires @see IsTimedOut()
    */
-  Command(double timeout, Subsystem& requirement);
+  Command(double timeout, Subsystem& subsystem);
 
   /**
    * Creates a new command with the given name and timeout.
    *
-   * @param name        the name of the command
-   * @param timeout     the time (in seconds) before this command "times out"
-   * @param requirement the subsystem that the command requires
-   * @see IsTimedOut()
+   * @param name      the name of the command
+   * @param timeout   the time (in seconds) before this command "times out"
+   * @param subsystem the subsystem that the command requires @see IsTimedOut()
    */
-  Command(const wpi::Twine& name, double timeout, Subsystem& requirement);
+  Command(const wpi::Twine& name, double timeout, Subsystem& subsystem);
 
   ~Command() override = default;
 

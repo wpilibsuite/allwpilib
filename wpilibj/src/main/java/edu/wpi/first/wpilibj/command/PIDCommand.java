@@ -109,15 +109,15 @@ public abstract class PIDCommand extends Command {
   /**
    * Instantiates a {@link PIDCommand} that will use the given p, i and d values.
    *
-   * @param name        the name of the command
-   * @param p           the proportional value
-   * @param i           the integral value
-   * @param d           the derivative value
-   * @param requirement the subsystem that this command requires
+   * @param name      the name of the command
+   * @param p         the proportional value
+   * @param i         the integral value
+   * @param d         the derivative value
+   * @param subsystem the subsystem that this command requires
    */
   @SuppressWarnings("ParameterName")
-  public PIDCommand(String name, double p, double i, double d, Subsystem requirement) {
-    super(name, requirement);
+  public PIDCommand(String name, double p, double i, double d, Subsystem subsystem) {
+    super(name, subsystem);
     m_controller = new PIDController(p, i, d, m_source, m_output);
   }
 
@@ -125,17 +125,17 @@ public abstract class PIDCommand extends Command {
    * Instantiates a {@link PIDCommand} that will use the given p, i and d values. It will also space
    * the time between PID loop calculations to be equal to the given period.
    *
-   * @param name        the name
-   * @param p           the proportional value
-   * @param i           the integral value
-   * @param d           the derivative value
-   * @param period      the time (in seconds) between calculations
-   * @param requirement the subsystem that this command requires
+   * @param name      the name
+   * @param p         the proportional value
+   * @param i         the integral value
+   * @param d         the derivative value
+   * @param period    the time (in seconds) between calculations
+   * @param subsystem the subsystem that this command requires
    */
   @SuppressWarnings("ParameterName")
   public PIDCommand(String name, double p, double i, double d, double period,
-                    Subsystem requirement) {
-    super(name, requirement);
+                    Subsystem subsystem) {
+    super(name, subsystem);
     m_controller = new PIDController(p, i, d, m_source, m_output, period);
   }
 
@@ -143,14 +143,14 @@ public abstract class PIDCommand extends Command {
    * Instantiates a {@link PIDCommand} that will use the given p, i and d values. It will use the
    * class name as its name.
    *
-   * @param p           the proportional value
-   * @param i           the integral value
-   * @param d           the derivative value
-   * @param requirement the subsystem that this command requires
+   * @param p         the proportional value
+   * @param i         the integral value
+   * @param d         the derivative value
+   * @param subsystem the subsystem that this command requires
    */
   @SuppressWarnings("ParameterName")
-  public PIDCommand(double p, double i, double d, Subsystem requirement) {
-    super(requirement);
+  public PIDCommand(double p, double i, double d, Subsystem subsystem) {
+    super(subsystem);
     m_controller = new PIDController(p, i, d, m_source, m_output);
   }
 
@@ -159,15 +159,15 @@ public abstract class PIDCommand extends Command {
    * class name as its name. It will also space the time between PID loop calculations to be equal
    * to the given period.
    *
-   * @param p           the proportional value
-   * @param i           the integral value
-   * @param d           the derivative value
-   * @param period      the time (in seconds) between calculations
-   * @param requirement the subsystem that this command requires
+   * @param p         the proportional value
+   * @param i         the integral value
+   * @param d         the derivative value
+   * @param period    the time (in seconds) between calculations
+   * @param subsystem the subsystem that this command requires
    */
   @SuppressWarnings("ParameterName")
-  public PIDCommand(double p, double i, double d, double period, Subsystem requirement) {
-    super(requirement);
+  public PIDCommand(double p, double i, double d, double period, Subsystem subsystem) {
+    super(subsystem);
     m_controller = new PIDController(p, i, d, m_source, m_output, period);
   }
 

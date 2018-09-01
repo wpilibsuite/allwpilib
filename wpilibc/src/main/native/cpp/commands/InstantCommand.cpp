@@ -11,6 +11,8 @@ using namespace frc;
 
 InstantCommand::InstantCommand(const wpi::Twine& name) : Command(name) {}
 
+InstantCommand::InstantCommand(Subsystem& subsystem) : Command(subsystem) {}
+
 InstantCommand::InstantCommand(const wpi::Twine& name, Subsystem& subsystem)
     : Command(name, subsystem) {}
 

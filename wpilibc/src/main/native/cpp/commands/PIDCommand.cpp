@@ -42,35 +42,36 @@ PIDCommand::PIDCommand(double p, double i, double d, double period) {
 }
 
 PIDCommand::PIDCommand(const wpi::Twine& name, double p, double i, double d,
-                       double f, double period, Subsystem& requirement)
-    : Command(name, requirement) {
+                       double f, double period, Subsystem& subsystem)
+    : Command(name, subsystem) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this, period);
 }
 
 PIDCommand::PIDCommand(double p, double i, double d, double f, double period,
-                       Subsystem& requirement) {
+                       Subsystem& subsystem)
+    : Command(subsystem) {
   m_controller =
       std::make_shared<PIDController>(p, i, d, f, this, this, period);
 }
 
 PIDCommand::PIDCommand(const wpi::Twine& name, double p, double i, double d,
-                       Subsystem& requirement)
-    : Command(name) {
+                       Subsystem& subsystem)
+    : Command(name, subsystem) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this);
 }
 
 PIDCommand::PIDCommand(const wpi::Twine& name, double p, double i, double d,
-                       double period, Subsystem& requirement)
-    : Command(name) {
+                       double period, Subsystem& subsystem)
+    : Command(name, subsystem) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this, period);
 }
 
-PIDCommand::PIDCommand(double p, double i, double d, Subsystem& requirement) {
+PIDCommand::PIDCommand(double p, double i, double d, Subsystem& subsystem) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this);
 }
 
 PIDCommand::PIDCommand(double p, double i, double d, double period,
-                       Subsystem& requirement) {
+                       Subsystem& subsystem) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this, period);
 }
 
