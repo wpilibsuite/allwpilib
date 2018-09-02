@@ -34,22 +34,22 @@ public class TimedCommand extends Command {
   /**
    * Instantiates a TimedCommand with the given name and timeout.
    *
-   * @param name        the name of the command
-   * @param timeout     the time the command takes to run (seconds)
-   * @param requirement the subsystem that this command requires
+   * @param name      the name of the command
+   * @param timeout   the time the command takes to run (seconds)
+   * @param subsystem the subsystem that this command requires
    */
-  public TimedCommand(String name, double timeout, Subsystem requirement) {
-    super(name, timeout, requirement);
+  public TimedCommand(String name, double timeout, Subsystem subsystem) {
+    super(name, timeout, subsystem);
   }
 
   /**
    * Instantiates a TimedCommand with the given timeout.
    *
-   * @param timeout     the time the command takes to run (seconds)
-   * @param requirement the subsystem that this command requires
+   * @param timeout   the time the command takes to run (seconds)
+   * @param subsystem the subsystem that this command requires
    */
-  public TimedCommand(double timeout, Subsystem requirement) {
-    super(timeout, requirement);
+  public TimedCommand(double timeout, Subsystem subsystem) {
+    super(timeout, subsystem);
   }
 
   /**

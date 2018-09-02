@@ -27,19 +27,19 @@ public class InstantCommand extends Command {
 
   /**
    * Creates a new {@link InstantCommand InstantCommand} with the given requirement.
-   * @param requirement the subsystem this command requires
+   * @param subsystem the subsystem this command requires
    */
-  public InstantCommand(Subsystem requirement) {
-    super(requirement);
+  public InstantCommand(Subsystem subsystem) {
+    super(subsystem);
   }
 
   /**
    * Creates a new {@link InstantCommand InstantCommand} with the given name and requirement.
-   * @param name        the name for this command
-   * @param requirement the subsystem this command requires
+   * @param name      the name for this command
+   * @param subsystem the subsystem this command requires
    */
-  public InstantCommand(String name, Subsystem requirement) {
-    super(name, requirement);
+  public InstantCommand(String name, Subsystem subsystem) {
+    super(name, subsystem);
   }
 
   @Override
