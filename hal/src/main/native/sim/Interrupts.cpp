@@ -205,9 +205,9 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
 
   if (status != 0) return WaitResult::Timeout;
 
-  interrupt->previousState = SimDIOData[digitalIndex].GetValue();
+  interrupt->previousState = SimDIOData[digitalIndex].value;
 
-  int32_t uid = SimDIOData[digitalIndex].RegisterValueCallback(
+  int32_t uid = SimDIOData[digitalIndex].value.RegisterCallback(
       &ProcessInterruptDigitalSynchronous,
       reinterpret_cast<void*>(static_cast<uintptr_t>(dataHandle)), false);
 
@@ -230,7 +230,7 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
   }
 
   // Cancel our callback
-  SimDIOData[digitalIndex].CancelValueCallback(uid);
+  SimDIOData[digitalIndex].value.CancelCallback(uid);
   synchronousInterruptHandles->Free(dataHandle);
 
   // Check for what to return
@@ -271,7 +271,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
 
   if (status != 0) return WaitResult::Timeout;
 
-  int32_t uid = SimAnalogInData[analogIndex].RegisterVoltageCallback(
+  int32_t uid = SimAnalogInData[analogIndex].voltage.RegisterCallback(
       &ProcessInterruptAnalogSynchronous,
       reinterpret_cast<void*>(static_cast<uintptr_t>(dataHandle)), false);
 
@@ -294,7 +294,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
   }
 
   // Cancel our callback
-  SimAnalogInData[analogIndex].CancelVoltageCallback(uid);
+  SimAnalogInData[analogIndex].voltage.CancelCallback(uid);
   synchronousInterruptHandles->Free(dataHandle);
 
   // Check for what to return
@@ -407,9 +407,9 @@ static void EnableInterruptsDigital(HAL_InterruptHandle handle,
   int32_t digitalIndex = GetDigitalInputChannel(interrupt->portHandle, &status);
   if (status != 0) return;
 
-  interrupt->previousState = SimDIOData[digitalIndex].GetValue();
+  interrupt->previousState = SimDIOData[digitalIndex].value;
 
-  int32_t uid = SimDIOData[digitalIndex].RegisterValueCallback(
+  int32_t uid = SimDIOData[digitalIndex].value.RegisterCallback(
       &ProcessInterruptDigitalAsynchronous,
       reinterpret_cast<void*>(static_cast<uintptr_t>(handle)), false);
   interrupt->callbackId = uid;
@@ -427,7 +427,7 @@ static void EnableInterruptsAnalog(HAL_InterruptHandle handle,
       interrupt->portHandle, interrupt->trigType, &status);
   if (status != 0) return;
 
-  int32_t uid = SimAnalogInData[analogIndex].RegisterVoltageCallback(
+  int32_t uid = SimAnalogInData[analogIndex].voltage.RegisterCallback(
       &ProcessInterruptAnalogAsynchronous,
       reinterpret_cast<void*>(static_cast<uintptr_t>(handle)), false);
   interrupt->callbackId = uid;
@@ -476,13 +476,13 @@ void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
     int32_t analogIndex =
         GetAnalogTriggerInputIndex(interrupt->portHandle, &status);
     if (status != 0) return;
-    SimAnalogInData[analogIndex].CancelVoltageCallback(interrupt->callbackId);
+    SimAnalogInData[analogIndex].voltage.CancelCallback(interrupt->callbackId);
   } else {
     int32_t status = 0;
     int32_t digitalIndex =
         GetDigitalInputChannel(interrupt->portHandle, &status);
     if (status != 0) return;
-    SimDIOData[digitalIndex].CancelValueCallback(interrupt->callbackId);
+    SimDIOData[digitalIndex].value.CancelCallback(interrupt->callbackId);
   }
   interrupt->callbackId = -1;
 }

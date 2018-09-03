@@ -21,7 +21,7 @@ void InitializeI2C() {}
 extern "C" {
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   hal::init::CheckInit();
-  SimI2CData[port].SetInitialized(true);
+  SimI2CData[port].initialized = true;
 }
 int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
                            const uint8_t* dataToSend, int32_t sendSize,
@@ -40,5 +40,5 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
   SimI2CData[port].Read(deviceAddress, buffer, count);
   return 0;
 }
-void HAL_CloseI2C(HAL_I2CPort port) { SimI2CData[port].SetInitialized(false); }
+void HAL_CloseI2C(HAL_I2CPort port) { SimI2CData[port].initialized = false; }
 }  // extern "C"

@@ -7,47 +7,26 @@
 
 #pragma once
 
-#include <atomic>
-#include <limits>
-#include <memory>
-
-#include <wpi/mutex.h>
-
 #include "mockdata/I2CData.h"
-#include "mockdata/NotifyListenerVector.h"
+#include "mockdata/SimCallbackRegistry.h"
+#include "mockdata/SimDataValue.h"
 
 namespace hal {
 class I2CData {
+  HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Read)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Write)
+
  public:
-  I2CData();
-  ~I2CData();
-
-  int32_t RegisterInitializedCallback(HAL_NotifyCallback callback, void* param,
-                                      HAL_Bool initialNotify);
-  void CancelInitializedCallback(int32_t uid);
-  void InvokeInitializedCallback(HAL_Value value);
-  HAL_Bool GetInitialized();
-  void SetInitialized(HAL_Bool initialized);
-
-  int32_t RegisterReadCallback(HAL_BufferCallback callback, void* param);
-  void CancelReadCallback(int32_t uid);
-
-  int32_t RegisterWriteCallback(HAL_ConstBufferCallback callback, void* param);
-  void CancelWriteCallback(int32_t uid);
-
   void Write(int32_t deviceAddress, const uint8_t* dataToSend,
              int32_t sendSize);
   void Read(int32_t deviceAddress, uint8_t* buffer, int32_t count);
 
-  void ResetData();
+  SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
+  SimCallbackRegistry<HAL_BufferCallback, GetReadName> read;
+  SimCallbackRegistry<HAL_ConstBufferCallback, GetWriteName> write;
 
- private:
-  wpi::mutex m_registerMutex;
-  wpi::mutex m_dataMutex;
-  std::atomic<HAL_Bool> m_initialized{false};
-  std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
-  std::shared_ptr<BufferListenerVector> m_readCallbacks = nullptr;
-  std::shared_ptr<ConstBufferListenerVector> m_writeCallbacks = nullptr;
+  void ResetData();
 };
 extern I2CData* SimI2CData;
 }  // namespace hal

@@ -10,7 +10,6 @@
 #include <string>
 
 #include "DriverStationDataInternal.h"
-#include "mockdata/NotifyCallbackHelpers.h"
 
 namespace hal {
 struct JoystickOutputStore {
@@ -36,21 +35,17 @@ DriverStationData* hal::SimDriverStationData;
 DriverStationData::DriverStationData() { ResetData(); }
 
 void DriverStationData::ResetData() {
-  m_enabled = false;
-  m_enabledCallbacks = nullptr;
-  m_autonomous = false;
-  m_autonomousCallbacks = nullptr;
-  m_test = false;
-  m_testCallbacks = nullptr;
-  m_eStop = false;
-  m_eStopCallbacks = nullptr;
-  m_fmsAttached = false;
-  m_fmsAttachedCallbacks = nullptr;
-  m_dsAttached = false;
-  m_dsAttachedCallbacks = nullptr;
+  enabled.Reset(false);
+  autonomous.Reset(false);
+  test.Reset(false);
+  eStop.Reset(false);
+  fmsAttached.Reset(false);
+  dsAttached.Reset(false);
+  allianceStationId.Reset(static_cast<HAL_AllianceStationID>(0));
+  matchTime.Reset(0.0);
 
   {
-    std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
+    std::lock_guard<wpi::spinlock> lock(m_joystickDataMutex);
     m_joystickAxes = std::make_unique<HAL_JoystickAxes[]>(6);
     m_joystickPOVs = std::make_unique<HAL_JoystickPOVs[]>(6);
     m_joystickButtons = std::make_unique<HAL_JoystickButtons[]>(6);
@@ -67,319 +62,30 @@ void DriverStationData::ResetData() {
     }
   }
   {
-    std::lock_guard<wpi::mutex> lock(m_matchInfoMutex);
+    std::lock_guard<wpi::spinlock> lock(m_matchInfoMutex);
 
     m_matchInfo = std::make_unique<HAL_MatchInfo>();
   }
 }
 
-int32_t DriverStationData::RegisterEnabledCallback(HAL_NotifyCallback callback,
-                                                   void* param,
-                                                   HAL_Bool initialNotify) {
-  // Must return -1 on a null callback for error handling
-  if (callback == nullptr) return -1;
-  int32_t newUid = 0;
-  {
-    std::lock_guard<wpi::mutex> lock(m_registerMutex);
-    m_enabledCallbacks = RegisterCallback(m_enabledCallbacks, "Enabled",
-                                          callback, param, &newUid);
-  }
-  if (initialNotify) {
-    // We know that the callback is not null because of earlier null check
-    HAL_Value value = MakeBoolean(GetEnabled());
-    callback("Enabled", param, &value);
-  }
-  return newUid;
-}
-
-void DriverStationData::CancelEnabledCallback(int32_t uid) {
-  m_enabledCallbacks = CancelCallback(m_enabledCallbacks, uid);
-}
-
-void DriverStationData::InvokeEnabledCallback(HAL_Value value) {
-  InvokeCallback(m_enabledCallbacks, "Enabled", &value);
-}
-
-HAL_Bool DriverStationData::GetEnabled() { return m_enabled; }
-
-void DriverStationData::SetEnabled(HAL_Bool enabled) {
-  HAL_Bool oldValue = m_enabled.exchange(enabled);
-  if (oldValue != enabled) {
-    InvokeEnabledCallback(MakeBoolean(enabled));
-  }
-}
-
-int32_t DriverStationData::RegisterAutonomousCallback(
-    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  // Must return -1 on a null callback for error handling
-  if (callback == nullptr) return -1;
-  int32_t newUid = 0;
-  {
-    std::lock_guard<wpi::mutex> lock(m_registerMutex);
-    m_autonomousCallbacks = RegisterCallback(
-        m_autonomousCallbacks, "Autonomous", callback, param, &newUid);
-  }
-  if (initialNotify) {
-    // We know that the callback is not null because of earlier null check
-    HAL_Value value = MakeBoolean(GetAutonomous());
-    callback("Autonomous", param, &value);
-  }
-  return newUid;
-}
-
-void DriverStationData::CancelAutonomousCallback(int32_t uid) {
-  m_autonomousCallbacks = CancelCallback(m_autonomousCallbacks, uid);
-}
-
-void DriverStationData::InvokeAutonomousCallback(HAL_Value value) {
-  InvokeCallback(m_autonomousCallbacks, "Autonomous", &value);
-}
-
-HAL_Bool DriverStationData::GetAutonomous() { return m_autonomous; }
-
-void DriverStationData::SetAutonomous(HAL_Bool autonomous) {
-  HAL_Bool oldValue = m_autonomous.exchange(autonomous);
-  if (oldValue != autonomous) {
-    InvokeAutonomousCallback(MakeBoolean(autonomous));
-  }
-}
-
-int32_t DriverStationData::RegisterTestCallback(HAL_NotifyCallback callback,
-                                                void* param,
-                                                HAL_Bool initialNotify) {
-  // Must return -1 on a null callback for error handling
-  if (callback == nullptr) return -1;
-  int32_t newUid = 0;
-  {
-    std::lock_guard<wpi::mutex> lock(m_registerMutex);
-    m_testCallbacks =
-        RegisterCallback(m_testCallbacks, "Test", callback, param, &newUid);
-  }
-  if (initialNotify) {
-    // We know that the callback is not null because of earlier null check
-    HAL_Value value = MakeBoolean(GetTest());
-    callback("Test", param, &value);
-  }
-  return newUid;
-}
-
-void DriverStationData::CancelTestCallback(int32_t uid) {
-  m_testCallbacks = CancelCallback(m_testCallbacks, uid);
-}
-
-void DriverStationData::InvokeTestCallback(HAL_Value value) {
-  InvokeCallback(m_testCallbacks, "Test", &value);
-}
-
-HAL_Bool DriverStationData::GetTest() { return m_test; }
-
-void DriverStationData::SetTest(HAL_Bool test) {
-  HAL_Bool oldValue = m_test.exchange(test);
-  if (oldValue != test) {
-    InvokeTestCallback(MakeBoolean(test));
-  }
-}
-
-int32_t DriverStationData::RegisterEStopCallback(HAL_NotifyCallback callback,
-                                                 void* param,
-                                                 HAL_Bool initialNotify) {
-  // Must return -1 on a null callback for error handling
-  if (callback == nullptr) return -1;
-  int32_t newUid = 0;
-  {
-    std::lock_guard<wpi::mutex> lock(m_registerMutex);
-    m_eStopCallbacks =
-        RegisterCallback(m_eStopCallbacks, "EStop", callback, param, &newUid);
-  }
-  if (initialNotify) {
-    // We know that the callback is not null because of earlier null check
-    HAL_Value value = MakeBoolean(GetEStop());
-    callback("EStop", param, &value);
-  }
-  return newUid;
-}
-
-void DriverStationData::CancelEStopCallback(int32_t uid) {
-  m_eStopCallbacks = CancelCallback(m_eStopCallbacks, uid);
-}
-
-void DriverStationData::InvokeEStopCallback(HAL_Value value) {
-  InvokeCallback(m_eStopCallbacks, "EStop", &value);
-}
-
-HAL_Bool DriverStationData::GetEStop() { return m_eStop; }
-
-void DriverStationData::SetEStop(HAL_Bool eStop) {
-  HAL_Bool oldValue = m_eStop.exchange(eStop);
-  if (oldValue != eStop) {
-    InvokeEStopCallback(MakeBoolean(eStop));
-  }
-}
-
-int32_t DriverStationData::RegisterFmsAttachedCallback(
-    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  // Must return -1 on a null callback for error handling
-  if (callback == nullptr) return -1;
-  int32_t newUid = 0;
-  {
-    std::lock_guard<wpi::mutex> lock(m_registerMutex);
-    m_fmsAttachedCallbacks = RegisterCallback(
-        m_fmsAttachedCallbacks, "FmsAttached", callback, param, &newUid);
-  }
-  if (initialNotify) {
-    // We know that the callback is not null because of earlier null check
-    HAL_Value value = MakeBoolean(GetFmsAttached());
-    callback("FmsAttached", param, &value);
-  }
-  return newUid;
-}
-
-void DriverStationData::CancelFmsAttachedCallback(int32_t uid) {
-  m_fmsAttachedCallbacks = CancelCallback(m_fmsAttachedCallbacks, uid);
-}
-
-void DriverStationData::InvokeFmsAttachedCallback(HAL_Value value) {
-  InvokeCallback(m_fmsAttachedCallbacks, "FmsAttached", &value);
-}
-
-HAL_Bool DriverStationData::GetFmsAttached() { return m_fmsAttached; }
-
-void DriverStationData::SetFmsAttached(HAL_Bool fmsAttached) {
-  HAL_Bool oldValue = m_fmsAttached.exchange(fmsAttached);
-  if (oldValue != fmsAttached) {
-    InvokeFmsAttachedCallback(MakeBoolean(fmsAttached));
-  }
-}
-
-int32_t DriverStationData::RegisterDsAttachedCallback(
-    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  // Must return -1 on a null callback for error handling
-  if (callback == nullptr) return -1;
-  int32_t newUid = 0;
-  {
-    std::lock_guard<wpi::mutex> lock(m_registerMutex);
-    m_dsAttachedCallbacks = RegisterCallback(
-        m_dsAttachedCallbacks, "DsAttached", callback, param, &newUid);
-  }
-  if (initialNotify) {
-    // We know that the callback is not null because of earlier null check
-    HAL_Value value = MakeBoolean(GetDsAttached());
-    callback("DsAttached", param, &value);
-  }
-  return newUid;
-}
-
-void DriverStationData::CancelDsAttachedCallback(int32_t uid) {
-  m_dsAttachedCallbacks = CancelCallback(m_dsAttachedCallbacks, uid);
-}
-
-void DriverStationData::InvokeDsAttachedCallback(HAL_Value value) {
-  InvokeCallback(m_dsAttachedCallbacks, "DsAttached", &value);
-}
-
-HAL_Bool DriverStationData::GetDsAttached() { return m_dsAttached; }
-
-void DriverStationData::SetDsAttached(HAL_Bool dsAttached) {
-  HAL_Bool oldValue = m_dsAttached.exchange(dsAttached);
-  if (oldValue != dsAttached) {
-    InvokeDsAttachedCallback(MakeBoolean(dsAttached));
-  }
-}
-
-int32_t DriverStationData::RegisterAllianceStationIdCallback(
-    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  // Must return -1 on a null callback for error handling
-  if (callback == nullptr) return -1;
-  int32_t newUid = 0;
-  {
-    std::lock_guard<wpi::mutex> lock(m_registerMutex);
-    m_allianceStationIdCallbacks =
-        RegisterCallback(m_allianceStationIdCallbacks, "AllianceStationId",
-                         callback, param, &newUid);
-  }
-  if (initialNotify) {
-    // We know that the callback is not null because of earlier null check
-    HAL_Value value = MakeEnum(GetAllianceStationId());
-    callback("AllianceStationId", param, &value);
-  }
-  return newUid;
-}
-
-void DriverStationData::CancelAllianceStationIdCallback(int32_t uid) {
-  m_allianceStationIdCallbacks =
-      CancelCallback(m_allianceStationIdCallbacks, uid);
-}
-
-void DriverStationData::InvokeAllianceStationIdCallback(HAL_Value value) {
-  InvokeCallback(m_allianceStationIdCallbacks, "AllianceStationId", &value);
-}
-
-HAL_AllianceStationID DriverStationData::GetAllianceStationId() {
-  return m_allianceStationId;
-}
-
-void DriverStationData::SetAllianceStationId(
-    HAL_AllianceStationID allianceStationId) {
-  HAL_AllianceStationID oldValue =
-      m_allianceStationId.exchange(allianceStationId);
-  if (oldValue != allianceStationId) {
-    InvokeAllianceStationIdCallback(MakeEnum(allianceStationId));
-  }
-}
-
-int32_t DriverStationData::RegisterMatchTimeCallback(
-    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  // Must return -1 on a null callback for error handling
-  if (callback == nullptr) return -1;
-  int32_t newUid = 0;
-  {
-    std::lock_guard<wpi::mutex> lock(m_registerMutex);
-    m_matchTimeCallbacks = RegisterCallback(m_matchTimeCallbacks, "MatchTime",
-                                            callback, param, &newUid);
-  }
-  if (initialNotify) {
-    // We know that the callback is not null because of earlier null check
-    HAL_Value value = MakeDouble(GetMatchTime());
-    callback("MatchTime", param, &value);
-  }
-  return newUid;
-}
-
-void DriverStationData::CancelMatchTimeCallback(int32_t uid) {
-  m_matchTimeCallbacks = CancelCallback(m_matchTimeCallbacks, uid);
-}
-
-void DriverStationData::InvokeMatchTimeCallback(HAL_Value value) {
-  InvokeCallback(m_matchTimeCallbacks, "MatchTime", &value);
-}
-
-double DriverStationData::GetMatchTime() { return m_matchTime; }
-
-void DriverStationData::SetMatchTime(double matchTime) {
-  double oldValue = m_matchTime.exchange(matchTime);
-  if (oldValue != matchTime) {
-    InvokeMatchTimeCallback(MakeDouble(matchTime));
-  }
-}
-
 void DriverStationData::GetJoystickAxes(int32_t joystickNum,
                                         HAL_JoystickAxes* axes) {
-  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::spinlock> lock(m_joystickDataMutex);
   *axes = m_joystickAxes[joystickNum];
 }
 void DriverStationData::GetJoystickPOVs(int32_t joystickNum,
                                         HAL_JoystickPOVs* povs) {
-  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::spinlock> lock(m_joystickDataMutex);
   *povs = m_joystickPOVs[joystickNum];
 }
 void DriverStationData::GetJoystickButtons(int32_t joystickNum,
                                            HAL_JoystickButtons* buttons) {
-  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::spinlock> lock(m_joystickDataMutex);
   *buttons = m_joystickButtons[joystickNum];
 }
 void DriverStationData::GetJoystickDescriptor(
     int32_t joystickNum, HAL_JoystickDescriptor* descriptor) {
-  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::spinlock> lock(m_joystickDataMutex);
   *descriptor = m_joystickDescriptor[joystickNum];
   // Always ensure name is null terminated
   descriptor->name[255] = '\0';
@@ -388,49 +94,49 @@ void DriverStationData::GetJoystickOutputs(int32_t joystickNum,
                                            int64_t* outputs,
                                            int32_t* leftRumble,
                                            int32_t* rightRumble) {
-  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::spinlock> lock(m_joystickDataMutex);
   *leftRumble = m_joystickOutputs[joystickNum].leftRumble;
   *outputs = m_joystickOutputs[joystickNum].outputs;
   *rightRumble = m_joystickOutputs[joystickNum].rightRumble;
 }
 void DriverStationData::GetMatchInfo(HAL_MatchInfo* info) {
-  std::lock_guard<wpi::mutex> lock(m_matchInfoMutex);
+  std::lock_guard<wpi::spinlock> lock(m_matchInfoMutex);
   *info = *m_matchInfo;
 }
 
 void DriverStationData::SetJoystickAxes(int32_t joystickNum,
                                         const HAL_JoystickAxes* axes) {
-  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::spinlock> lock(m_joystickDataMutex);
   m_joystickAxes[joystickNum] = *axes;
 }
 void DriverStationData::SetJoystickPOVs(int32_t joystickNum,
                                         const HAL_JoystickPOVs* povs) {
-  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::spinlock> lock(m_joystickDataMutex);
   m_joystickPOVs[joystickNum] = *povs;
 }
 void DriverStationData::SetJoystickButtons(int32_t joystickNum,
                                            const HAL_JoystickButtons* buttons) {
-  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::spinlock> lock(m_joystickDataMutex);
   m_joystickButtons[joystickNum] = *buttons;
 }
 
 void DriverStationData::SetJoystickDescriptor(
     int32_t joystickNum, const HAL_JoystickDescriptor* descriptor) {
-  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::spinlock> lock(m_joystickDataMutex);
   m_joystickDescriptor[joystickNum] = *descriptor;
 }
 
 void DriverStationData::SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                            int32_t leftRumble,
                                            int32_t rightRumble) {
-  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::spinlock> lock(m_joystickDataMutex);
   m_joystickOutputs[joystickNum].leftRumble = leftRumble;
   m_joystickOutputs[joystickNum].outputs = outputs;
   m_joystickOutputs[joystickNum].rightRumble = rightRumble;
 }
 
 void DriverStationData::SetMatchInfo(const HAL_MatchInfo* info) {
-  std::lock_guard<wpi::mutex> lock(m_matchInfoMutex);
+  std::lock_guard<wpi::spinlock> lock(m_matchInfoMutex);
   *m_matchInfo = *info;
   *(std::end(m_matchInfo->eventName) - 1) = '\0';
 }
@@ -440,129 +146,18 @@ void DriverStationData::NotifyNewData() { HAL_ReleaseDSMutex(); }
 extern "C" {
 void HALSIM_ResetDriverStationData(void) { SimDriverStationData->ResetData(); }
 
-int32_t HALSIM_RegisterDriverStationEnabledCallback(HAL_NotifyCallback callback,
-                                                    void* param,
-                                                    HAL_Bool initialNotify) {
-  return SimDriverStationData->RegisterEnabledCallback(callback, param,
-                                                       initialNotify);
-}
-void HALSIM_CancelDriverStationEnabledCallback(int32_t uid) {
-  SimDriverStationData->CancelEnabledCallback(uid);
-}
-HAL_Bool HALSIM_GetDriverStationEnabled(void) {
-  return SimDriverStationData->GetEnabled();
-}
-void HALSIM_SetDriverStationEnabled(HAL_Bool enabled) {
-  SimDriverStationData->SetEnabled(enabled);
-}
+#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                                \
+  HAL_SIMDATAVALUE_DEFINE_CAPI_NOINDEX(TYPE, HALSIM, DriverStation##CAPINAME, \
+                                       SimDriverStationData, LOWERNAME)
 
-int32_t HALSIM_RegisterDriverStationAutonomousCallback(
-    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  return SimDriverStationData->RegisterAutonomousCallback(callback, param,
-                                                          initialNotify);
-}
-void HALSIM_CancelDriverStationAutonomousCallback(int32_t uid) {
-  SimDriverStationData->CancelAutonomousCallback(uid);
-}
-HAL_Bool HALSIM_GetDriverStationAutonomous(void) {
-  return SimDriverStationData->GetAutonomous();
-}
-void HALSIM_SetDriverStationAutonomous(HAL_Bool autonomous) {
-  SimDriverStationData->SetAutonomous(autonomous);
-}
-
-int32_t HALSIM_RegisterDriverStationTestCallback(HAL_NotifyCallback callback,
-                                                 void* param,
-                                                 HAL_Bool initialNotify) {
-  return SimDriverStationData->RegisterTestCallback(callback, param,
-                                                    initialNotify);
-}
-void HALSIM_CancelDriverStationTestCallback(int32_t uid) {
-  SimDriverStationData->CancelTestCallback(uid);
-}
-HAL_Bool HALSIM_GetDriverStationTest(void) {
-  return SimDriverStationData->GetTest();
-}
-void HALSIM_SetDriverStationTest(HAL_Bool test) {
-  SimDriverStationData->SetTest(test);
-}
-
-int32_t HALSIM_RegisterDriverStationEStopCallback(HAL_NotifyCallback callback,
-                                                  void* param,
-                                                  HAL_Bool initialNotify) {
-  return SimDriverStationData->RegisterEStopCallback(callback, param,
-                                                     initialNotify);
-}
-void HALSIM_CancelDriverStationEStopCallback(int32_t uid) {
-  SimDriverStationData->CancelEStopCallback(uid);
-}
-HAL_Bool HALSIM_GetDriverStationEStop(void) {
-  return SimDriverStationData->GetEStop();
-}
-void HALSIM_SetDriverStationEStop(HAL_Bool eStop) {
-  SimDriverStationData->SetEStop(eStop);
-}
-
-int32_t HALSIM_RegisterDriverStationFmsAttachedCallback(
-    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  return SimDriverStationData->RegisterFmsAttachedCallback(callback, param,
-                                                           initialNotify);
-}
-void HALSIM_CancelDriverStationFmsAttachedCallback(int32_t uid) {
-  SimDriverStationData->CancelFmsAttachedCallback(uid);
-}
-HAL_Bool HALSIM_GetDriverStationFmsAttached(void) {
-  return SimDriverStationData->GetFmsAttached();
-}
-void HALSIM_SetDriverStationFmsAttached(HAL_Bool fmsAttached) {
-  SimDriverStationData->SetFmsAttached(fmsAttached);
-}
-
-int32_t HALSIM_RegisterDriverStationDsAttachedCallback(
-    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  return SimDriverStationData->RegisterDsAttachedCallback(callback, param,
-                                                          initialNotify);
-}
-void HALSIM_CancelDriverStationDsAttachedCallback(int32_t uid) {
-  SimDriverStationData->CancelDsAttachedCallback(uid);
-}
-HAL_Bool HALSIM_GetDriverStationDsAttached(void) {
-  return SimDriverStationData->GetDsAttached();
-}
-void HALSIM_SetDriverStationDsAttached(HAL_Bool dsAttached) {
-  SimDriverStationData->SetDsAttached(dsAttached);
-}
-
-int32_t HALSIM_RegisterDriverStationAllianceStationIdCallback(
-    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  return SimDriverStationData->RegisterAllianceStationIdCallback(
-      callback, param, initialNotify);
-}
-void HALSIM_CancelDriverStationAllianceStationIdCallback(int32_t uid) {
-  SimDriverStationData->CancelAllianceStationIdCallback(uid);
-}
-HAL_AllianceStationID HALSIM_GetDriverStationAllianceStationId(void) {
-  return SimDriverStationData->GetAllianceStationId();
-}
-void HALSIM_SetDriverStationAllianceStationId(
-    HAL_AllianceStationID allianceStationId) {
-  SimDriverStationData->SetAllianceStationId(allianceStationId);
-}
-
-int32_t HALSIM_RegisterDriverStationMatchTimeCallback(
-    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  return SimDriverStationData->RegisterMatchTimeCallback(callback, param,
-                                                         initialNotify);
-}
-void HALSIM_CancelDriverStationMatchTimeCallback(int32_t uid) {
-  SimDriverStationData->CancelMatchTimeCallback(uid);
-}
-double HALSIM_GetDriverStationMatchTime(void) {
-  return SimDriverStationData->GetMatchTime();
-}
-void HALSIM_SetDriverStationMatchTime(double matchTime) {
-  SimDriverStationData->SetMatchTime(matchTime);
-}
+DEFINE_CAPI(HAL_Bool, Enabled, enabled)
+DEFINE_CAPI(HAL_Bool, Autonomous, autonomous)
+DEFINE_CAPI(HAL_Bool, Test, test)
+DEFINE_CAPI(HAL_Bool, EStop, eStop)
+DEFINE_CAPI(HAL_Bool, FmsAttached, fmsAttached)
+DEFINE_CAPI(HAL_Bool, DsAttached, dsAttached)
+DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId, allianceStationId)
+DEFINE_CAPI(double, MatchTime, matchTime)
 
 void HALSIM_SetJoystickAxes(int32_t joystickNum, const HAL_JoystickAxes* axes) {
   SimDriverStationData->SetJoystickAxes(joystickNum, axes);
@@ -595,21 +190,19 @@ void HALSIM_NotifyDriverStationNewData(void) {
   SimDriverStationData->NotifyNewData();
 }
 
+#define REGISTER(NAME) \
+  SimDriverStationData->NAME.RegisterCallback(callback, param, initialNotify)
+
 void HALSIM_RegisterDriverStationAllCallbacks(HAL_NotifyCallback callback,
                                               void* param,
                                               HAL_Bool initialNotify) {
-  SimDriverStationData->RegisterEnabledCallback(callback, param, initialNotify);
-  SimDriverStationData->RegisterAutonomousCallback(callback, param,
-                                                   initialNotify);
-  SimDriverStationData->RegisterTestCallback(callback, param, initialNotify);
-  SimDriverStationData->RegisterEStopCallback(callback, param, initialNotify);
-  SimDriverStationData->RegisterFmsAttachedCallback(callback, param,
-                                                    initialNotify);
-  SimDriverStationData->RegisterDsAttachedCallback(callback, param,
-                                                   initialNotify);
-  SimDriverStationData->RegisterAllianceStationIdCallback(callback, param,
-                                                          initialNotify);
-  SimDriverStationData->RegisterMatchTimeCallback(callback, param,
-                                                  initialNotify);
+  REGISTER(enabled);
+  REGISTER(autonomous);
+  REGISTER(test);
+  REGISTER(eStop);
+  REGISTER(fmsAttached);
+  REGISTER(dsAttached);
+  REGISTER(allianceStationId);
+  REGISTER(matchTime);
 }
 }  // extern "C"

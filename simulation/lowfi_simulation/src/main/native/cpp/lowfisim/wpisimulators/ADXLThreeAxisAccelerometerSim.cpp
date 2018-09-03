@@ -14,35 +14,20 @@ namespace lowfi {
 ADXLThreeAxisAccelerometerSim::ADXLThreeAxisAccelerometerSim(
     hal::ThreeAxisAccelerometerData& accelerometerWrapper)
     : m_accelerometerWrapper(accelerometerWrapper),
-      m_xWrapper(std::function<bool(void)>(
-                     std::bind(&hal::ThreeAxisAccelerometerData::GetInitialized,
-                               &m_accelerometerWrapper)),
-                 std::function<void(double)>(
-                     std::bind(&hal::ThreeAxisAccelerometerData::SetX,
-                               &m_accelerometerWrapper, std::placeholders::_1)),
-                 std::function<double(void)>(
-                     std::bind(&hal::ThreeAxisAccelerometerData::GetX,
-                               &m_accelerometerWrapper))),
+      m_xWrapper(
+          [data = &m_accelerometerWrapper] { return data->GetInitialized(); },
+          [data = &m_accelerometerWrapper](double x) { data->x = x; },
+          [data = &m_accelerometerWrapper] { return data->GetX(); }),
 
-      m_yWrapper(std::function<bool(void)>(
-                     std::bind(&hal::ThreeAxisAccelerometerData::GetInitialized,
-                               &m_accelerometerWrapper)),
-                 std::function<void(double)>(
-                     std::bind(&hal::ThreeAxisAccelerometerData::SetY,
-                               &m_accelerometerWrapper, std::placeholders::_1)),
-                 std::function<double(void)>(
-                     std::bind(&hal::ThreeAxisAccelerometerData::GetY,
-                               &m_accelerometerWrapper))),
+      m_yWrapper(
+          [data = &m_accelerometerWrapper] { return data->GetInitialized(); },
+          [data = &m_accelerometerWrapper](double y) { data->y = y; },
+          [data = &m_accelerometerWrapper] { return data->GetY(); }),
 
-      m_zWrapper(std::function<bool(void)>(
-                     std::bind(&hal::ThreeAxisAccelerometerData::GetInitialized,
-                               &m_accelerometerWrapper)),
-                 std::function<void(double)>(
-                     std::bind(&hal::ThreeAxisAccelerometerData::SetZ,
-                               &m_accelerometerWrapper, std::placeholders::_1)),
-                 std::function<double(void)>(
-                     std::bind(&hal::ThreeAxisAccelerometerData::GetZ,
-                               &m_accelerometerWrapper))) {}
+      m_zWrapper(
+          [data = &m_accelerometerWrapper] { return data->GetInitialized(); },
+          [data = &m_accelerometerWrapper](double z) { data->z = z; },
+          [data = &m_accelerometerWrapper] { return data->GetZ(); }) {}
 
 AccelerometerSim& ADXLThreeAxisAccelerometerSim::GetXWrapper() {
   return m_xWrapper;

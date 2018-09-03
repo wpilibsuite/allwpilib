@@ -35,7 +35,7 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status) {
     return HAL_kInvalidHandle;
   }
   hal::init::CheckInit();
-  SimPDPData[module].SetInitialized(true);
+  SimPDPData[module].initialized = true;
   auto handle = HAL_InitializeCAN(manufacturer, module, deviceType, status);
 
   if (*status != 0) {
@@ -61,14 +61,14 @@ double HAL_GetPDPTemperature(HAL_PDPHandle handle, int32_t* status) {
   if (*status != 0) {
     return 0.0;
   }
-  return SimPDPData[module].GetTemperature();
+  return SimPDPData[module].temperature;
 }
 double HAL_GetPDPVoltage(HAL_PDPHandle handle, int32_t* status) {
   auto module = hal::can::GetCANModuleFromHandle(handle, status);
   if (*status != 0) {
     return 0.0;
   }
-  return SimPDPData[module].GetVoltage();
+  return SimPDPData[module].voltage;
 }
 double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
                                 int32_t* status) {
@@ -76,7 +76,7 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
   if (*status != 0) {
     return 0.0;
   }
-  return SimPDPData[module].GetCurrent(channel);
+  return SimPDPData[module].current[channel];
 }
 double HAL_GetPDPTotalCurrent(HAL_PDPHandle handle, int32_t* status) {
   return 0.0;

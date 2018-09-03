@@ -62,9 +62,9 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
 
   port->channel = static_cast<uint8_t>(channel);
 
-  SimDIOData[channel].SetInitialized(true);
+  SimDIOData[channel].initialized = true;
 
-  SimDIOData[channel].SetIsInput(input);
+  SimDIOData[channel].isInput = input;
 
   return handle;
 }
@@ -78,7 +78,7 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   // no status, so no need to check for a proper free.
   digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) return;
-  SimDIOData[port->channel].SetInitialized(true);
+  SimDIOData[port->channel].initialized = true;
 }
 
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
@@ -95,7 +95,7 @@ HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
   }
   *id = static_cast<uint8_t>(getHandleIndex(handle));
 
-  SimDigitalPWMData[*id].SetInitialized(true);
+  SimDigitalPWMData[*id].initialized = true;
 
   return handle;
 }
@@ -105,7 +105,7 @@ void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status) {
   digitalPWMHandles->Free(pwmGenerator);
   if (port == nullptr) return;
   int32_t id = *port;
-  SimDigitalPWMData[id].SetInitialized(false);
+  SimDigitalPWMData[id].initialized = false;
 }
 
 void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
@@ -130,7 +130,7 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
   int32_t id = *port;
   if (dutyCycle > 1.0) dutyCycle = 1.0;
   if (dutyCycle < 0.0) dutyCycle = 0.0;
-  SimDigitalPWMData[id].SetDutyCycle(dutyCycle);
+  SimDigitalPWMData[id].dutyCycle = dutyCycle;
 }
 
 void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
@@ -141,7 +141,7 @@ void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
     return;
   }
   int32_t id = *port;
-  SimDigitalPWMData[id].SetPin(channel);
+  SimDigitalPWMData[id].pin = channel;
 }
 
 void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
@@ -154,7 +154,7 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
   if (value != 0 && value != 1) {
     if (value != 0) value = 1;
   }
-  SimDIOData[port->channel].SetValue(value);
+  SimDIOData[port->channel].value = value;
 }
 
 void HAL_SetDIODirection(HAL_DigitalHandle dioPortHandle, HAL_Bool input,
@@ -165,7 +165,7 @@ void HAL_SetDIODirection(HAL_DigitalHandle dioPortHandle, HAL_Bool input,
     return;
   }
 
-  SimDIOData[port->channel].SetIsInput(input);
+  SimDIOData[port->channel].isInput = input;
 }
 
 HAL_Bool HAL_GetDIO(HAL_DigitalHandle dioPortHandle, int32_t* status) {
@@ -174,7 +174,7 @@ HAL_Bool HAL_GetDIO(HAL_DigitalHandle dioPortHandle, int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  HAL_Bool value = SimDIOData[port->channel].GetValue();
+  HAL_Bool value = SimDIOData[port->channel].value;
   if (value > 1) value = 1;
   if (value < 0) value = 0;
   return value;
@@ -186,7 +186,7 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  HAL_Bool value = SimDIOData[port->channel].GetIsInput();
+  HAL_Bool value = SimDIOData[port->channel].isInput;
   if (value > 1) value = 1;
   if (value < 0) value = 0;
   return value;

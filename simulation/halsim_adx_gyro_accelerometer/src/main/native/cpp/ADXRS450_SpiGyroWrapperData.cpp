@@ -11,7 +11,6 @@
 #include <cmath>
 #include <cstring>
 
-#include <mockdata/NotifyCallbackHelpers.h>
 #include <mockdata/SPIData.h>
 
 #ifdef _WIN32
@@ -62,10 +61,9 @@ bool ADXRS450_SpiGyroWrapper::GetInitialized() const {
 }
 
 void ADXRS450_SpiGyroWrapper::ResetData() {
-  std::lock_guard<wpi::mutex> lock(m_dataMutex);
-  m_angle = 0;
+  std::lock_guard<wpi::recursive_spinlock> lock(m_angle.GetMutex());
+  m_angle.Reset(0.0);
   m_angleDiff = 0;
-  m_angleCallbacks = nullptr;
 }
 
 void ADXRS450_SpiGyroWrapper::HandleRead(uint8_t* buffer, uint32_t count) {
@@ -76,7 +74,7 @@ void ADXRS450_SpiGyroWrapper::HandleRead(uint8_t* buffer, uint32_t count) {
 void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
                                                     int32_t numToRead,
                                                     int32_t& outputCount) {
-  std::lock_guard<wpi::mutex> lock(m_dataMutex);
+  std::lock_guard<wpi::recursive_spinlock> lock(m_angle.GetMutex());
   int32_t messagesToSend = std::abs(
       m_angleDiff > 0 ? std::ceil(m_angleDiff / kMaxAngleDeltaPerMessage)
                       : std::floor(m_angleDiff / kMaxAngleDeltaPerMessage));
@@ -110,42 +108,9 @@ void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
   }
 }
 
-int32_t ADXRS450_SpiGyroWrapper::RegisterAngleCallback(
-    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  // Must return -1 on a null callback for error handling
-  if (callback == nullptr) return -1;
-  int32_t newUid = 0;
-  {
-    std::lock_guard<wpi::mutex> lock(m_registerMutex);
-    m_angleCallbacks =
-        RegisterCallback(m_angleCallbacks, "Angle", callback, param, &newUid);
-  }
-  if (initialNotify) {
-    // We know that the callback is not null because of earlier null check
-    HAL_Value value = MakeDouble(GetAngle());
-    callback("Angle", param, &value);
-  }
-  return newUid;
-}
-
-void ADXRS450_SpiGyroWrapper::CancelAngleCallback(int32_t uid) {
-  m_angleCallbacks = CancelCallback(m_angleCallbacks, uid);
-}
-
-void ADXRS450_SpiGyroWrapper::InvokeAngleCallback(HAL_Value value) {
-  InvokeCallback(m_angleCallbacks, "Angle", &value);
-}
-
-double ADXRS450_SpiGyroWrapper::GetAngle() {
-  std::lock_guard<wpi::mutex> lock(m_dataMutex);
-  return m_angle;
-}
-
 void ADXRS450_SpiGyroWrapper::SetAngle(double angle) {
-  std::lock_guard<wpi::mutex> lock(m_dataMutex);
+  std::lock_guard<wpi::recursive_spinlock> lock(m_angle.GetMutex());
   if (m_angle != angle) {
-    InvokeAngleCallback(MakeDouble(angle));
-
     m_angleDiff += angle - m_angle;
     m_angle = angle;
   }
