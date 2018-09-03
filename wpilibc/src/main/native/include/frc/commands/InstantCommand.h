@@ -7,9 +7,12 @@
 
 #pragma once
 
+#include <functional>
+
 #include <wpi/Twine.h>
 
 #include "frc/commands/Command.h"
+#include "frc/commands/Subsystem.h"
 
 namespace frc {
 
@@ -42,10 +45,45 @@ class InstantCommand : public Command {
    */
   InstantCommand(const wpi::Twine& name, Subsystem& subsystem);
 
+  /**
+   * Create a command that calls the given function when run.
+   *
+   * @param func The function to run when Initialize() is run.
+   */
+  explicit InstantCommand(std::function<void()> func);
+
+  /**
+   * Create a command that calls the given function when run.
+   *
+   * @param subsystem The subsystems that this command runs on.
+   * @param func      The function to run when Initialize() is run.
+   */
+  InstantCommand(Subsystem& subsystem, std::function<void()> func);
+
+  /**
+   * Create a command that calls the given function when run.
+   *
+   * @param name   The name of the command.
+   * @param func   The function to run when Initialize() is run.
+   */
+  InstantCommand(const wpi::Twine& name, std::function<void()> func);
+
+  /**
+   * Create a command that calls the given function when run.
+   *
+   * @param name      The name of the command.
+   * @param subsystem The subsystems that this command runs on.
+   * @param func      The function to run when Initialize() is run.
+   */
+  InstantCommand(const wpi::Twine& name, Subsystem& subsystem,
+                 std::function<void()> func);
+
   InstantCommand() = default;
   virtual ~InstantCommand() = default;
 
  protected:
+  std::function<void()> m_func = nullptr;
+  void _Initialize() override;
   bool IsFinished() override;
 };
 
