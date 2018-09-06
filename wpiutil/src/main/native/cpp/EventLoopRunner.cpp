@@ -25,7 +25,10 @@ class EventLoopRunner::Thread : public SafeThread {
 
     // run function
     m_doExec = UvExecFunc::Create(
-        m_loop, [loop = m_loop.get()](LoopFunc func) { func(*loop); });
+        m_loop, [loop = m_loop.get()](auto out, LoopFunc func) {
+          func(*loop);
+          out.set_value();
+        });
   }
 
   void Main() {
@@ -51,7 +54,7 @@ EventLoopRunner::~EventLoopRunner() {
 void EventLoopRunner::ExecAsync(LoopFunc func) {
   if (auto thr = m_owner.GetThread()) {
     if (auto doExec = thr->m_doExec.lock()) {
-      doExec->Send(func);
+      doExec->Call(func);
     }
   }
 }
