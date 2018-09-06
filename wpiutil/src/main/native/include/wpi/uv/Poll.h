@@ -69,6 +69,30 @@ class Poll final : public HandleImpl<Poll, uv_poll_t> {
   }
 
   /**
+   * Reuse this handle.  This closes the handle, and after the close completes,
+   * reinitializes it (identically to Create) and calls the provided callback.
+   * Unlike Close(), it does NOT emit the closed signal, however, IsClosing()
+   * will return true until the callback is called.  This does nothing if
+   * IsClosing() is true (e.g. if Close() was called).
+   *
+   * @param fd File descriptor
+   * @param callback Callback
+   */
+  void Reuse(int fd, std::function<void()> callback);
+
+  /**
+   * Reuse this handle.  This closes the handle, and after the close completes,
+   * reinitializes it (identically to CreateSocket) and calls the provided
+   * callback.  Unlike Close(), it does NOT emit the closed signal, however,
+   * IsClosing() will return true until the callback is called.  This does
+   * nothing if IsClosing() is true (e.g. if Close() was called).
+   *
+   * @param sock Socket descriptor.
+   * @param callback Callback
+   */
+  void ReuseSocket(uv_os_sock_t sock, std::function<void()> callback);
+
+  /**
    * Start polling the file descriptor.
    *
    * @param events Bitmask of events (UV_READABLE, UV_WRITEABLE, UV_PRIORITIZED,
@@ -85,6 +109,15 @@ class Poll final : public HandleImpl<Poll, uv_poll_t> {
    * Signal generated when a poll event occurs.
    */
   sig::Signal<int> pollEvent;
+
+ private:
+  struct ReuseData {
+    std::function<void()> callback;
+    bool isSocket;
+    int fd;
+    uv_os_sock_t sock;
+  };
+  std::unique_ptr<ReuseData> m_reuseData;
 };
 
 }  // namespace uv
