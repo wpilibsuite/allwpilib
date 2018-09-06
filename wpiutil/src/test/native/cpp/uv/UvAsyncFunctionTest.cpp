@@ -34,21 +34,23 @@ TEST(UvAsyncFunction, Test) {
   prepare->prepare.connect([&] {
     if (prepare_cb_called++) return;
     theThread = std::thread([&] {
-      ASSERT_EQ(async->Call(0), 1);
-      ASSERT_EQ(async->Call(1), 2);
+      auto call0 = async->Call(0);
+      auto call1 = async->Call(1);
+      ASSERT_EQ(call0.get(), 1);
+      ASSERT_EQ(call1.get(), 2);
     });
   });
   prepare->Start();
 
   async->error.connect([](Error) { FAIL(); });
   async->closed.connect([&] { close_cb_called++; });
-  async->wakeup = [&](int v) {
+  async->wakeup = [&](promise<int> out, int v) {
     ++async_cb_called[v];
     if (v == 1) {
       async->Close();
       prepare->Close();
     }
-    return v + 1;
+    out.set_value(v + 1);
   };
 
   loop->Run();
@@ -72,15 +74,15 @@ TEST(UvAsyncFunction, Ref) {
 
   prepare->prepare.connect([&] {
     if (prepare_cb_called++) return;
-    theThread = std::thread([&] { ASSERT_EQ(async->Call(1, val), 2); });
+    theThread = std::thread([&] { ASSERT_EQ(async->Call(1, val).get(), 2); });
   });
   prepare->Start();
 
-  async->wakeup = [&](int v, int& r) {
+  async->wakeup = [&](promise<int> out, int v, int& r) {
     r = v;
     async->Close();
     prepare->Close();
-    return v + 1;
+    out.set_value(v + 1);
   };
 
   loop->Run();
@@ -104,17 +106,18 @@ TEST(UvAsyncFunction, Movable) {
     if (prepare_cb_called++) return;
     theThread = std::thread([&] {
       auto val = std::make_unique<int>(1);
-      auto val2 = async->Call(std::move(val));
+      auto val2 = async->Call(std::move(val)).get();
       ASSERT_NE(val2, nullptr);
       ASSERT_EQ(*val2, 1);
     });
   });
   prepare->Start();
 
-  async->wakeup = [&](std::unique_ptr<int> v) {
+  async->wakeup = [&](promise<std::unique_ptr<int>> out,
+                      std::unique_ptr<int> v) {
     async->Close();
     prepare->Close();
-    return v;
+    out.set_value(std::move(v));
   };
 
   loop->Run();
@@ -122,7 +125,7 @@ TEST(UvAsyncFunction, Movable) {
   if (theThread.joinable()) theThread.join();
 }
 
-TEST(UvAsyncFunction, Send) {
+TEST(UvAsyncFunction, CallIgnoreResult) {
   int prepare_cb_called = 0;
 
   std::thread theThread;
@@ -134,14 +137,15 @@ TEST(UvAsyncFunction, Send) {
 
   prepare->prepare.connect([&] {
     if (prepare_cb_called++) return;
-    theThread = std::thread([&] { async->Send(std::make_unique<int>(1)); });
+    theThread = std::thread([&] { async->Call(std::make_unique<int>(1)); });
   });
   prepare->Start();
 
-  async->wakeup = [&](std::unique_ptr<int> v) {
+  async->wakeup = [&](promise<std::unique_ptr<int>> out,
+                      std::unique_ptr<int> v) {
     async->Close();
     prepare->Close();
-    return v;
+    out.set_value(std::move(v));
   };
 
   loop->Run();
@@ -164,9 +168,68 @@ TEST(UvAsyncFunction, VoidCall) {
   });
   prepare->Start();
 
-  async->wakeup = [&]() {
+  async->wakeup = [&](promise<void> out) {
     async->Close();
     prepare->Close();
+    out.set_value();
+  };
+
+  loop->Run();
+
+  if (theThread.joinable()) theThread.join();
+}
+
+TEST(UvAsyncFunction, WaitFor) {
+  int prepare_cb_called = 0;
+
+  std::thread theThread;
+
+  auto loop = Loop::Create();
+  auto async = AsyncFunction<int()>::Create(loop);
+  auto prepare = Prepare::Create(loop);
+
+  prepare->prepare.connect([&] {
+    if (prepare_cb_called++) return;
+    theThread = std::thread([&] {
+      ASSERT_FALSE(async->Call().wait_for(std::chrono::milliseconds(10)));
+    });
+  });
+  prepare->Start();
+
+  async->wakeup = [&](promise<int> out) {
+    async->Close();
+    prepare->Close();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    out.set_value(1);
+  };
+
+  loop->Run();
+
+  if (theThread.joinable()) theThread.join();
+}
+
+TEST(UvAsyncFunction, VoidWaitFor) {
+  int prepare_cb_called = 0;
+
+  std::thread theThread;
+
+  auto loop = Loop::Create();
+  auto async = AsyncFunction<void()>::Create(loop);
+  auto prepare = Prepare::Create(loop);
+
+  prepare->prepare.connect([&] {
+    if (prepare_cb_called++) return;
+    theThread = std::thread([&] {
+      ASSERT_FALSE(async->Call().wait_for(std::chrono::milliseconds(10)));
+    });
+  });
+  prepare->Start();
+
+  async->wakeup = [&](promise<void> out) {
+    async->Close();
+    prepare->Close();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    out.set_value();
   };
 
   loop->Run();
