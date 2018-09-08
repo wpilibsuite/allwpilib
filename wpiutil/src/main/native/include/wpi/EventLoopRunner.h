@@ -20,7 +20,7 @@ namespace wpi {
  */
 class EventLoopRunner {
  public:
-  using LoopFunc = std::function<void(wpi::uv::Loop&)>;
+  using LoopFunc = std::function<void(uv::Loop&)>;
 
   EventLoopRunner();
   virtual ~EventLoopRunner();
@@ -44,7 +44,7 @@ class EventLoopRunner {
 
  private:
   class Thread;
-  wpi::SafeThreadOwner<Thread> m_owner;
+  SafeThreadOwner<Thread> m_owner;
 };
 
 }  // namespace wpi
