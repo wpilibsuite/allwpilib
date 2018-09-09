@@ -796,7 +796,7 @@ public final class NetworkTableEntry {
    *
    * @param callback  callback function
    */
-  void createRpc(Consumer<RpcAnswer> callback) {
+  public void createRpc(Consumer<RpcAnswer> callback) {
     m_inst.createRpc(this, callback);
   }
 
@@ -809,7 +809,7 @@ public final class NetworkTableEntry {
    * @param params      parameter
    * @return RPC call object.
    */
-  RpcCall callRpc(byte[] params) {
+  public RpcCall callRpc(byte[] params) {
     return new RpcCall(this, NetworkTablesJNI.callRpc(m_handle, params));
   }
 
