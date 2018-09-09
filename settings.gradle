@@ -6,7 +6,6 @@ pluginManagement {
 }
 enableFeaturePreview('STABLE_PUBLISHING')
 
-include 'ni-libraries'
 include 'wpiutil'
 include 'ntcore'
 include 'hal'

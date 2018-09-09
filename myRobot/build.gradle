@@ -18,6 +18,16 @@ ext {
     skipDev = true
 }
 
+ext {
+    chipObjectConfigs = [myRobotCpp: ['linux:athena'],
+                         myRobotCppStatic: ['linux:athena']]
+    netcommConfigs = [myRobotCpp: [],
+                      myRobotCppStatic: []]
+    useNiJava = true
+}
+
+apply from: "${rootDir}/shared/nilibraries.gradle"
+
 apply from: "${rootDir}/shared/opencv.gradle"
 
 mainClassName = 'Main'
@@ -64,7 +74,6 @@ model {
                     lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-                    project(':ni-libraries').addNiLibrariesToLinker(binary)
             }
         }
         myRobotCppStatic(NativeExecutableSpec) {
@@ -88,7 +97,6 @@ model {
                     lib project: ':hal', library: 'hal', linkage: 'static'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
-                    project(':ni-libraries').addNiLibrariesToLinker(binary)
             }
         }
     }

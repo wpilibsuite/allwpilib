@@ -30,6 +30,21 @@ if (!project.hasProperty('onlyAthena')) {
 
     project(':').libraryBuild.dependsOn build
 
+    ext {
+        chipObjectConfigs = [:]
+        chipObjectConfigs["${nativeName}".toString()] = ['linux:athena']
+        chipObjectConfigs["${nativeName}Dev".toString()] = ['linux:athena']
+        chipObjectConfigs["${nativeName}Base".toString()] = ['linux:athena']
+        chipObjectConfigs["${nativeName}Test".toString()] = ['linux:athena']
+        netcommConfigs = [:]
+        netcommConfigs["${nativeName}".toString()] = []
+        netcommConfigs["${nativeName}Dev".toString()] = []
+        netcommConfigs["${nativeName}Base".toString()] = []
+        netcommConfigs["${nativeName}Test".toString()] = []
+        useNiJava = false
+    }
+
+    apply from: "${rootDir}/shared/nilibraries.gradle"
 
     model {
         exportsConfigs {

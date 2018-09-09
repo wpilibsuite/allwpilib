@@ -83,6 +83,14 @@ ext {
     useCpp = true
 }
 
+ext {
+    chipObjectConfigs = [wpilibjDev: ['linux:athena']]
+    netcommConfigs = [wpilibjDev: []]
+    useNiJava = true
+}
+
+apply from: "${rootDir}/shared/nilibraries.gradle"
+
 apply from: "${rootDir}/shared/opencv.gradle"
 
 model {
@@ -103,9 +111,6 @@ model {
                         srcDirs 'src/dev/native/include'
                     }
                 }
-            }
-            binaries.all {
-                project(':ni-libraries').addNiLibrariesToLinker(it)
             }
         }
     }

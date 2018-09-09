@@ -1,0 +1,30 @@
+model {
+  dependencyConfigs {
+    chipobject(DependencyConfig) {
+      groupId = 'edu.wpi.first.ni-libraries'
+      artifactId = 'chipobject'
+      headerClassifier = 'headers'
+      ext = 'zip'
+      version = '2018.17.0'
+      sharedConfigs = project.chipObjectConfigs
+      staticConfigs = [:]
+    }
+    netcomm(DependencyConfig) {
+      groupId = 'edu.wpi.first.ni-libraries'
+      artifactId = 'netcomm'
+      headerClassifier = 'headers'
+      ext = 'zip'
+      version = '2018.17.0'
+      headerOnly = true
+      headerOnlyConfigs = project.netcommConfigs
+      sharedConfigs = [:]
+      staticConfigs = [:]
+    }
+  }
+}
+
+if (project.hasProperty('useNiJava') && project.useNiJava) {
+  dependencies {
+    compile 'edu.wpi.first.ni-libraries:netcomm:2018.17.0'
+  }
+}

@@ -30,6 +30,26 @@ staticGtestConfigs["${nativeName}Test"] = []
 
 apply from: "${rootDir}/shared/googletest.gradle"
 
+if (project.hasProperty('niLibraries')) {
+    ext {
+        chipObjectConfigs = [:]
+        chipObjectConfigs["$nativeName".toString()] = ['linux:athena']
+        chipObjectConfigs["${nativeName}Dev".toString()] = ['linux:athena']
+        chipObjectConfigs["${nativeName}Base".toString()] = ['linux:athena']
+        chipObjectConfigs["${nativeName}JNI".toString()] = ['linux:athena']
+        chipObjectConfigs["${nativeName}Test".toString()] = ['linux:athena']
+        netcommConfigs = [:]
+        netcommConfigs["$nativeName".toString()] = []
+        netcommConfigs["${nativeName}Dev".toString()] = []
+        netcommConfigs["${nativeName}Base".toString()] = []
+        netcommConfigs["${nativeName}JNI".toString()] = []
+        netcommConfigs["${nativeName}Test".toString()] = []
+        useNiJava = true
+    }
+
+    apply from: "${rootDir}/shared/nilibraries.gradle"
+}
+
 model {
     components {
         "${nativeName}Base"(JniNativeLibrarySpec) {
@@ -58,9 +78,6 @@ model {
                 if (project.hasProperty('splitSetup')) {
                     splitSetup(it)
                 }
-                if (project.hasProperty('niLibraries')) {
-                    project(':ni-libraries').addNiLibrariesToLinker(it)
-                }
             }
         }
         "${nativeName}"(JniNativeLibrarySpec) {
@@ -83,9 +100,6 @@ model {
             }
             binaries.all {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                if (project.hasProperty('niLibraries')) {
-                    project(':ni-libraries').addNiLibrariesToLinker(it)
-                }
             }
         }
         "${nativeName}JNI"(JniNativeLibrarySpec) {
@@ -132,9 +146,6 @@ model {
                 }
             }
             binaries.all {
-                if (project.hasProperty('niLibraries')) {
-                    project(':ni-libraries').addNiLibrariesToLinker(it)
-                }
                 lib library: nativeName, linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }

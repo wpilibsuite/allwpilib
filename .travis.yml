@@ -38,7 +38,6 @@ cache:
 
 script:
   - python3.5 -m wpiformat -y 2018 -clang 5.0
-  - python3.5 gen/wpilibj_frcnetcomm.py
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
   - ./gradlew --no-daemon --console=plain -PskipAthena :hal:halSharedLibrary :hal:halJNISharedLibrary :wpilibc:wpilibcSharedLibrary :wpilibj:jar
   - mkdir cmake-build && cd cmake-build && env CXX=g++-6 CC=gcc-6 cmake -DWITHOUT_ALLWPILIB=OFF .. && make

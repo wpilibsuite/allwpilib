@@ -29,6 +29,19 @@ if (!project.hasProperty('onlyAthena')) {
 
     project(':').libraryBuild.dependsOn build
 
+    ext {
+        chipObjectConfigs = [:]
+        chipObjectConfigs["${nativeName}".toString()] = ['linux:athena']
+        chipObjectConfigs["${nativeName}Base".toString()] = ['linux:athena']
+        chipObjectConfigs["${nativeName}Test".toString()] = ['linux:athena']
+        netcommConfigs = [:]
+        netcommConfigs["${nativeName}".toString()] = []
+        netcommConfigs["${nativeName}Base".toString()] = []
+        netcommConfigs["${nativeName}Test".toString()] = []
+        useNiJava = false
+    }
+
+    apply from: "${rootDir}/shared/nilibraries.gradle"
 
     model {
         exportsConfigs {
@@ -124,7 +137,6 @@ if (!project.hasProperty('onlyAthena')) {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
-                project(':ni-libraries').addNiLibrariesToLinker(it)
                 lib library: nativeName, linkage: 'shared'
             }
         }

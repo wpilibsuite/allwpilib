@@ -89,5 +89,3 @@ model {
         }
     }
 }
-
-sourceSets.main.java.srcDir "$projectDir/src/generated/java/"

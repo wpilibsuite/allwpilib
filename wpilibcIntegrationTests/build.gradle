@@ -19,6 +19,14 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 apply from: "${rootDir}/shared/googletest.gradle"
 
+ext {
+    chipObjectConfigs = [wpilibcIntegrationTests: ['linux:athena']]
+    netcommConfigs = [wpilibcIntegrationTests: []]
+    useNiJava = false
+}
+
+apply from: "${rootDir}/shared/nilibraries.gradle"
+
 model {
     components {
         wpilibcIntegrationTests(NativeExecutableSpec) {
@@ -48,7 +56,6 @@ model {
                     lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-                    project(':ni-libraries').addNiLibrariesToLinker(binary)
                 } else {
                     binary.sources {
                         simCpp(CppSourceSet) {

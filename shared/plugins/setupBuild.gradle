@@ -2,6 +2,20 @@ apply plugin: 'cpp'
 apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: ExtraTasks
 
+ext {
+    chipObjectConfigs = [:]
+    chipObjectConfigs["${pluginName}".toString()] = ['linux:athena']
+    chipObjectConfigs["${pluginName}Dev".toString()] = ['linux:athena']
+    chipObjectConfigs["${pluginName}Test".toString()] = ['linux:athena']
+    netcommConfigs = [:]
+    netcommConfigs["${pluginName}".toString()] = []
+    netcommConfigs["${pluginName}Dev".toString()] = []
+    netcommConfigs["${pluginName}Test".toString()] = []
+    useNiJava = false
+}
+
+apply from: "${rootDir}/shared/nilibraries.gradle"
+
 if (!project.hasProperty('onlyAthena')) {
     ext.skipAthena = true
     apply from: "${rootDir}/shared/config.gradle"

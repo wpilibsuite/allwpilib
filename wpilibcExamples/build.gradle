@@ -9,6 +9,8 @@ apply from: '../shared/config.gradle'
 
 ext.examplesMap = [:]
 ext.templatesMap = [:]
+ext.examplesAthenaMap = [:]
+ext.templatesAthenaMap = [:]
 
 File examplesTree = file("$projectDir/src/main/cpp/examples")
 examplesTree.list(new FilenameFilter() {
@@ -18,6 +20,7 @@ examplesTree.list(new FilenameFilter() {
     }
 }).each {
     examplesMap.put(it, [])
+    examplesAthenaMap.put(it, ['linux:athena'])
 }
 File templatesTree = file("$projectDir/src/main/cpp/templates")
 templatesTree.list(new FilenameFilter() {
@@ -27,6 +30,7 @@ templatesTree.list(new FilenameFilter() {
     }
 }).each {
     templatesMap.put(it, [])
+    templatesAthenaMap.put(it, ['linux:athena'])
 }
 
 
@@ -38,6 +42,13 @@ ext {
 }
 
 apply from: "${rootDir}/shared/opencv.gradle"
+
+ext {
+    chipObjectConfigs = examplesAthenaMap + templatesAthenaMap + [commands: ['linux:athena']]
+    netcommConfigs = examplesMap + templatesMap + [commands: []]
+}
+
+apply from: "${rootDir}/shared/nilibraries.gradle"
 
 model {
     components {
@@ -53,7 +64,6 @@ model {
                 lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                project(':ni-libraries').addNiLibrariesToLinker(binary)
             }
             sources {
                 cpp {
@@ -78,7 +88,6 @@ model {
                     lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    project(':ni-libraries').addNiLibrariesToLinker(binary)
                     if (binary.targetPlatform.architecture.name != 'athena') {
                         lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
                         lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
@@ -114,7 +123,6 @@ model {
                             cppCompiler.args "-Wno-error=deprecated-declarations"
                         }
                     }
-                    project(':ni-libraries').addNiLibrariesToLinker(binary)
                     if (binary.targetPlatform.architecture.name != 'athena') {
                         lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
                         lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
