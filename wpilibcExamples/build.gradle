@@ -9,8 +9,6 @@ apply from: '../shared/config.gradle'
 
 ext.examplesMap = [:]
 ext.templatesMap = [:]
-ext.examplesAthenaMap = [:]
-ext.templatesAthenaMap = [:]
 
 File examplesTree = file("$projectDir/src/main/cpp/examples")
 examplesTree.list(new FilenameFilter() {
@@ -20,7 +18,6 @@ examplesTree.list(new FilenameFilter() {
     }
 }).each {
     examplesMap.put(it, [])
-    examplesAthenaMap.put(it, ['linux:athena'])
 }
 File templatesTree = file("$projectDir/src/main/cpp/templates")
 templatesTree.list(new FilenameFilter() {
@@ -30,7 +27,6 @@ templatesTree.list(new FilenameFilter() {
     }
 }).each {
     templatesMap.put(it, [])
-    templatesAthenaMap.put(it, ['linux:athena'])
 }
 
 
@@ -44,8 +40,16 @@ ext {
 apply from: "${rootDir}/shared/opencv.gradle"
 
 ext {
-    chipObjectConfigs = examplesAthenaMap + templatesAthenaMap + [commands: ['linux:athena']]
-    netcommConfigs = examplesMap + templatesMap + [commands: []]
+    chipObjectComponents = ['commands']
+    netCommComponents = ['commands']
+    examplesMap.each { key, value ->
+        chipObjectComponents << key.toString()
+        netCommComponents << key.toString()
+    }
+    templatesMap.each { key, value ->
+        chipObjectComponents << key.toString()
+        netCommComponents << key.toString()
+    }
 }
 
 apply from: "${rootDir}/shared/nilibraries.gradle"

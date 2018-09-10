@@ -19,10 +19,8 @@ ext {
 }
 
 ext {
-    chipObjectConfigs = [myRobotCpp: ['linux:athena'],
-                         myRobotCppStatic: ['linux:athena']]
-    netcommConfigs = [myRobotCpp: [],
-                      myRobotCppStatic: []]
+    chipObjectComponents = ['myRobotCpp', 'myRobotCppStatic']
+    netCommComponents = ['myRobotCpp', 'myRobotCppStatic']
     useNiJava = true
 }
 

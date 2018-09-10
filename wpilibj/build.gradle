@@ -84,8 +84,8 @@ ext {
 }
 
 ext {
-    chipObjectConfigs = [wpilibjDev: ['linux:athena']]
-    netcommConfigs = [wpilibjDev: []]
+    chipObjectComponents = ['wpilibjDev']
+    netCommComponents = ['wpilibjDev']
     useNiJava = true
 }
 

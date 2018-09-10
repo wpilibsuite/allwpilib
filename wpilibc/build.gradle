@@ -72,16 +72,10 @@ staticGtestConfigs["${nativeName}Test"] = []
 apply from: "${rootDir}/shared/googletest.gradle"
 
 ext {
-    chipObjectConfigs = [:]
-    chipObjectConfigs["$nativeName".toString()] = ['linux:athena']
-    chipObjectConfigs["${nativeName}Dev".toString()] = ['linux:athena']
-    chipObjectConfigs["${nativeName}Base".toString()] = ['linux:athena']
-    chipObjectConfigs["${nativeName}Test".toString()] = ['linux:athena']
-    netcommConfigs = [:]
-    netcommConfigs["$nativeName".toString()] = []
-    netcommConfigs["${nativeName}Dev".toString()] = []
-    netcommConfigs["${nativeName}Base".toString()] = []
-    netcommConfigs["${nativeName}Test".toString()] = []
+    chipObjectComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
+                            "${nativeName}Test".toString()]
+    netCommComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
+                            "${nativeName}Test".toString()]
     useNiJava = false
 }
 

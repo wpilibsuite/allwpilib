@@ -1,3 +1,16 @@
+def netCommHeaderConfigs = [:]
+def netCommLibConfigs = [:];
+def chipObjectConfigs = [:];
+
+project.chipObjectComponents.each { String s->
+  chipObjectConfigs[s] = ['linux:athena']
+}
+
+project.netCommComponents.each { String s->
+  netCommHeaderConfigs[s] = []
+  netCommLibConfigs[s] = ['linux:athena']
+}
+
 model {
   dependencyConfigs {
     chipobject(DependencyConfig) {
@@ -6,18 +19,17 @@ model {
       headerClassifier = 'headers'
       ext = 'zip'
       version = '2018.17.0'
-      sharedConfigs = project.chipObjectConfigs
+      sharedConfigs = chipObjectConfigs
       staticConfigs = [:]
     }
     netcomm(DependencyConfig) {
       groupId = 'edu.wpi.first.ni-libraries'
-      artifactId = 'netcomm'
+      artifactId = 'netcomm-cpp'
       headerClassifier = 'headers'
       ext = 'zip'
       version = '2018.17.0'
-      headerOnly = true
-      headerOnlyConfigs = project.netcommConfigs
-      sharedConfigs = [:]
+      headerOnlyConfigs = netCommHeaderConfigs
+      sharedConfigs = netCommLibConfigs
       staticConfigs = [:]
     }
   }
@@ -25,6 +37,6 @@ model {
 
 if (project.hasProperty('useNiJava') && project.useNiJava) {
   dependencies {
-    compile 'edu.wpi.first.ni-libraries:netcomm:2018.17.0'
+    compile 'edu.wpi.first.ni-libraries:netcomm-java:2018.17.0'
   }
 }

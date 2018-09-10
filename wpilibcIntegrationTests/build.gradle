@@ -20,8 +20,8 @@ apply from: "${rootDir}/shared/opencv.gradle"
 apply from: "${rootDir}/shared/googletest.gradle"
 
 ext {
-    chipObjectConfigs = [wpilibcIntegrationTests: ['linux:athena']]
-    netcommConfigs = [wpilibcIntegrationTests: []]
+    chipObjectComponents = ['wpilibcIntegrationTests']
+    netCommComponents = ['wpilibcIntegrationTests']
     useNiJava = false
 }
 
