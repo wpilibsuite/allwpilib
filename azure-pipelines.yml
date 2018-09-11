@@ -9,7 +9,7 @@ resources:
     image: ubuntu:18.04
 
 jobs:
- - job: Linux Arm
+ - job: Linux_Arm
    pool:
      vmImage: 'Ubuntu 16.04'
  
@@ -50,7 +50,7 @@ jobs:
         tasks: 'build'
         options: '-PskipAthena'
 
- - job: Windows 64 Bit
+ - job: Windows_64_Bit
    pool:
      vmImage: 'vs2017-win2017'
    steps:
@@ -66,7 +66,7 @@ jobs:
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
         
- - job: Windows 32 Bit
+ - job: Windows_32_Bit
    pool:
      vmImage: 'vs2017-win2017'
    steps:
