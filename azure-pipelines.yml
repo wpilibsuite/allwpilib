@@ -66,7 +66,7 @@ jobs:
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
         
-  - job: Windows 32 Bit
+ - job: Windows 32 Bit
    pool:
      vmImage: 'vs2017-win2017'
    steps:
