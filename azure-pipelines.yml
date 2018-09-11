@@ -14,11 +14,11 @@ jobs:
      vmImage: 'Ubuntu 16.04'
  
    steps:
-    -script: |
+    - script: |
         sudo add-apt-repository ppa:wpilib/toolchain
         sudo apt-get update
         sudo apt-get install frc-toolchain
-        
+      displayName: 'Install Toolchain'
     - task: Gradle@2
       inputs:
         workingDirectory: ''
