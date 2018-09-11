@@ -11,10 +11,14 @@ resources:
 jobs:
  - job: Linux Arm
    pool:
-     container: ubuntu18
      vmImage: 'Ubuntu 16.04'
  
    steps:
+    -script: |
+        sudo add-apt-repository ppa:wpilib/toolchain
+        sudo apt-get update
+        sudo apt-get install frc-toolchain
+        
     - task: Gradle@2
       inputs:
         workingDirectory: ''
@@ -26,10 +30,10 @@ jobs:
         publishJUnitResults: false
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
+        options: '-PonlyAthena'
        
  - job: Linux
    pool:
-     container: ubuntu18
      vmImage: 'Ubuntu 16.04'
  
    steps:
@@ -44,6 +48,7 @@ jobs:
         publishJUnitResults: false
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
+        options: '-PskipAthena'
 
  - job: Windows 64 Bit
    pool:
