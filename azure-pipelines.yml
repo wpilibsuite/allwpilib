@@ -3,13 +3,13 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/vsts/pipelines/languages/java
 
+resources:
+  containers:
+  - container: ubuntu18
+    image: ubuntu:18.04
+
 jobs:
  - job: Linux Arm
-   resources:
-     containers:
-     - container: ubuntu18
-       image: ubuntu:18.04
-
    pool:
      container: ubuntu18
      vmImage: 'Ubuntu 16.04'
@@ -28,11 +28,6 @@ jobs:
         tasks: 'build'
        
  - job: Linux
-   resources:
-     containers:
-     - container: ubuntu18
-       image: ubuntu:18.04
-
    pool:
      container: ubuntu18
      vmImage: 'Ubuntu 16.04'
