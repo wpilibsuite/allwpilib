@@ -3,10 +3,44 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/vsts/pipelines/languages/java
 
+resources:
+ containers:
+ - container: 
+
 jobs:
- - job: Linux
+ - job: Linux Arm
+   resources:
+     containers:
+     - container: ubuntu18
+       image: ubuntu:18.04
+
    pool:
-     vmImage: 'ubuntu-16.04'
+     container: ubuntu18
+     vmImage: 'Ubuntu 16.04'
+ 
+   steps:
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.8'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: false
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'build'
+       
+ - job: Linux
+   resources:
+     containers:
+     - container: ubuntu18
+       image: ubuntu:18.04
+
+   pool:
+     container: ubuntu18
+     vmImage: 'Ubuntu 16.04'
+ 
    steps:
     - task: Gradle@2
       inputs:
@@ -20,7 +54,7 @@ jobs:
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
 
- - job: Windows
+ - job: Windows 64 Bit
    pool:
      vmImage: 'vs2017-win2017'
    steps:
@@ -32,6 +66,22 @@ jobs:
         javaHomeOption: 'JDKVersion'
         jdkVersionOption: '1.8'
         jdkArchitectureOption: 'x64'
+        publishJUnitResults: false
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'build'
+        
+  - job: Windows 32 Bit
+   pool:
+     vmImage: 'vs2017-win2017'
+   steps:
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.8'
+        jdkArchitectureOption: 'x86'
         publishJUnitResults: false
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
