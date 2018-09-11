@@ -15,9 +15,9 @@ jobs:
  
    steps:
     - script: |
-        sudo add-apt-repository ppa:wpilib/toolchain
-        sudo apt-get update
-        sudo apt-get install frc-toolchain
+        sudo add-apt-repository ppa:wpilib/toolchain -y
+        sudo apt-get update -y
+        sudo apt-get install frc-toolchain -y
       displayName: 'Install Toolchain'
     - task: Gradle@2
       inputs:
