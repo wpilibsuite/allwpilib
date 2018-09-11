@@ -46,7 +46,7 @@ class PIDController : public PIDBase, public Controller {
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
-   *               particularly effects calculations of the integral and
+   *               particularly affects calculations of the integral and
    *               differental terms. The default is 0.05 (50ms).
    */
   PIDController(double p, double i, double d, PIDSource* source,
@@ -61,7 +61,7 @@ class PIDController : public PIDBase, public Controller {
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
-   *               particularly effects calculations of the integral and
+   *               particularly affects calculations of the integral and
    *               differental terms. The default is 0.05 (50ms).
    */
   PIDController(double p, double i, double d, double f, PIDSource* source,
@@ -76,7 +76,7 @@ class PIDController : public PIDBase, public Controller {
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
-   *               particularly effects calculations of the integral and
+   *               particularly affects calculations of the integral and
    *               differental terms. The default is 0.05 (50ms).
    */
   PIDController(double p, double i, double d, PIDSource& source,
@@ -91,7 +91,7 @@ class PIDController : public PIDBase, public Controller {
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
-   *               particularly effects calculations of the integral and
+   *               particularly affects calculations of the integral and
    *               differental terms. The default is 0.05 (50ms).
    */
   PIDController(double p, double i, double d, double f, PIDSource& source,
