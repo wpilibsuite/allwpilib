@@ -30,8 +30,8 @@ if (!project.hasProperty('onlyAthena')) {
     project(':').libraryBuild.dependsOn build
 
     ext {
-        chipObjectComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Test".toString()]
-        netCommComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Test".toString()]
+        chipObjectComponents = ["$nativeName".toString(), "${nativeName}Base".toString(), "${nativeName}Dev".toString(), "${nativeName}Test".toString()]
+        netCommComponents = ["$nativeName".toString(), "${nativeName}Base".toString(), "${nativeName}Dev".toString(), "${nativeName}Test".toString()]
         useNiJava = false
     }
 
