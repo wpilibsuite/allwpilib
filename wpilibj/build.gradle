@@ -104,13 +104,15 @@ model {
                         lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                         lib project: ':cscore', library: 'cscore', linkage: 'shared'
                         lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                        lib project: ':hal', library: 'hal', linkage: 'shared'
                         lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     }
                     exportedHeaders {
                         srcDirs 'src/dev/native/include'
                     }
                 }
+            }
+            binaries.all {
+                project(':hal').addHalDependency(it, 'shared')
             }
         }
     }

@@ -43,8 +43,14 @@ def generateUsageReporting = tasks.register('generateUsageReporting') {
     }
 }
 
-
 ext {
+    addHalDependency = { binary, shared->
+        binary.tasks.withType(AbstractNativeSourceCompileTask) {
+            it.dependsOn generateUsageReporting
+        }
+        binary.lib project: ':hal', library: 'hal', linkage: shared
+    }
+
     nativeName = 'hal'
     setBaseName = 'wpiHal'
     devMain = 'DevMain'

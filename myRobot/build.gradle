@@ -69,7 +69,7 @@ model {
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
             }
@@ -92,7 +92,7 @@ model {
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'static'
                     lib project: ':cscore', library: 'cscore', linkage: 'static'
-                    lib project: ':hal', library: 'hal', linkage: 'static'
+                    project(':hal').addHalDependency(binary, 'static')
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
             }

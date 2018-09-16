@@ -33,7 +33,7 @@ if (!project.hasProperty('onlyAthena')) {
                         it.buildable = false
                         return
                     }
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(it, 'shared')
                     if (project.hasProperty('includeNtCore')) {
                         lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     }
@@ -55,7 +55,7 @@ if (!project.hasProperty('onlyAthena')) {
                     }
                 }
                 binaries.all {
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(it, 'shared')
                     lib library: pluginName
                     if (project.hasProperty('includeNtCore')) {
                         lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
