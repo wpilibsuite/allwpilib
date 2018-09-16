@@ -12,12 +12,12 @@ SET(usage_reporting_instances "")
 foreach(ITEM ${RAW_INSTANCES})
     list(APPEND usage_reporting_instances_cpp "${ITEM},")
     list(APPEND usage_reporting_instances "public static final int ${ITEM};")
-end_foreach()
+endforeach()
 
 foreach(ITEM ${RAW_RESOURCE_TYPES})
     list(APPEND usage_reporting_types_cpp "${ITEM},")
     list(APPEND usage_reporting_types "public static final int ${ITEM};")
-end_foreach()
+endforeach()
 
 
 # Java bindings

@@ -89,7 +89,10 @@ model {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDir 'src/main/native/include'
+                        if (project.hasProperty('generatedHeaders')) {
+                            srcDir generatedHeaders
+                        }
                     }
                 }
             }
@@ -113,7 +116,10 @@ model {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDir 'src/main/native/include'
+                        if (project.hasProperty('generatedHeaders')) {
+                            srcDir generatedHeaders
+                        }
                     }
                 }
             }
@@ -136,7 +142,10 @@ model {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/dev/native/include'
+                        srcDir 'src/main/native/include'
+                        if (project.hasProperty('generatedHeaders')) {
+                            srcDir generatedHeaders
+                        }
                     }
                 }
             }
@@ -162,6 +171,9 @@ model {
                     }
                     exportedHeaders {
                         srcDirs 'src/test/native/include', 'src/main/native/cpp'
+                        if (project.hasProperty('generatedHeaders')) {
+                            srcDir generatedHeaders
+                        }
                     }
                 }
             }
