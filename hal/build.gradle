@@ -39,7 +39,7 @@ def generateUsageReporting = tasks.register('generateUsageReporting') {
         }.join('\n')
 
         javaResourceFile.text = javaBase.text.replace('${usage_reporting_types}', resourceTextJava).replace('${usage_reporting_instances}', instanceTextJava)
-        cppResourceFile.text = cppBase.text.replace('${usage_reporting_types}', resourceTextCpp).replace('${usage_reporting_instances}', instanceTextCpp)
+        cppResourceFile.text = cppBase.text.replace('${usage_reporting_types_cpp}', resourceTextCpp).replace('${usage_reporting_instances_cpp}', instanceTextCpp)
     }
 }
 

@@ -1,6 +1,25 @@
 project(hal)
 
 
+file(STRINGS src/generate/Instances.txt RAW_INSTANCES)
+file(STRINGS src/generate/ResourceType.txt RAW_RESOURCE_TYPES)
+
+SET(usage_reporting_types_cpp "")
+SET(usage_reporting_instances_cpp "")
+SET(usage_reporting_types "")
+SET(usage_reporting_instances "")
+
+foreach(ITEM ${RAW_INSTANCES})
+    list(APPEND usage_reporting_instances_cpp "${ITEM},")
+    list(APPEND usage_reporting_instances "public static final int ${ITEM};")
+end_foreach()
+
+foreach(ITEM ${RAW_RESOURCE_TYPES})
+    list(APPEND usage_reporting_types_cpp "${ITEM},")
+    list(APPEND usage_reporting_types "public static final int ${ITEM};")
+end_foreach()
+
+
 # Java bindings
 if (NOT WITHOUT_JAVA)
     find_package(Java REQUIRED)

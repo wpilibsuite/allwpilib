@@ -6,9 +6,9 @@
 
 namespace HALUsageReporting {
   typedef enum {
-${usage_reporting_types}
+${usage_reporting_types_cpp}
   } tResourceType;
   typedef enum {
-${usage_reporting_instances}
+${usage_reporting_instances_cpp}
   } tInstances;
 }
