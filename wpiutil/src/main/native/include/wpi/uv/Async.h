@@ -40,8 +40,14 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
   struct private_init {};
 
  public:
-  explicit Async(const private_init&) {}
-  ~Async() noexcept override = default;
+  Async(const std::shared_ptr<Loop>& loop, const private_init&)
+      : m_loop{loop} {}
+  ~Async() noexcept override {
+    if (auto loop = m_loop.lock())
+      this->Close();
+    else
+      this->ForceClosed();
+  }
 
   /**
    * Create an async handle.
@@ -49,19 +55,7 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
    * @param loop Loop object where this handle runs.
    */
   static std::shared_ptr<Async> Create(Loop& loop) {
-    auto h = std::make_shared<Async>(private_init{});
-    int err = uv_async_init(loop.GetRaw(), h->GetRaw(), [](uv_async_t* handle) {
-      auto& h = *static_cast<Async*>(handle->data);
-      std::lock_guard<wpi::mutex> lock(h.m_mutex);
-      for (auto&& v : h.m_data) apply_tuple(h.wakeup, v);
-      h.m_data.clear();
-    });
-    if (err < 0) {
-      loop.ReportError(err);
-      return nullptr;
-    }
-    h->Keep();
-    return h;
+    return Create(loop.shared_from_this());
   }
 
   /**
@@ -70,7 +64,20 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
    * @param loop Loop object where this handle runs.
    */
   static std::shared_ptr<Async> Create(const std::shared_ptr<Loop>& loop) {
-    return Create(*loop);
+    auto h = std::make_shared<Async>(loop, private_init{});
+    int err =
+        uv_async_init(loop->GetRaw(), h->GetRaw(), [](uv_async_t* handle) {
+          auto& h = *static_cast<Async*>(handle->data);
+          std::lock_guard<wpi::mutex> lock(h.m_mutex);
+          for (auto&& v : h.m_data) apply_tuple(h.wakeup, v);
+          h.m_data.clear();
+        });
+    if (err < 0) {
+      loop->ReportError(err);
+      return nullptr;
+    }
+    h->Keep();
+    return h;
   }
 
   /**
@@ -85,7 +92,7 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
       std::lock_guard<wpi::mutex> lock(m_mutex);
       m_data.emplace_back(std::forward_as_tuple(std::forward<U>(u)...));
     }
-    this->Invoke(&uv_async_send, this->GetRaw());
+    if (auto loop = m_loop.lock()) this->Invoke(&uv_async_send, this->GetRaw());
   }
 
   /**
@@ -96,6 +103,7 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
  private:
   wpi::mutex m_mutex;
   std::vector<std::tuple<T...>> m_data;
+  std::weak_ptr<Loop> m_loop;
 };
 
 /**
@@ -107,24 +115,25 @@ class Async<> final : public HandleImpl<Async<>, uv_async_t> {
   struct private_init {};
 
  public:
-  explicit Async(const private_init&) {}
-  ~Async() noexcept override = default;
+  Async(const std::shared_ptr<Loop>& loop, const private_init&)
+      : m_loop(loop) {}
+  ~Async() noexcept override;
 
   /**
    * Create an async handle.
    *
    * @param loop Loop object where this handle runs.
    */
-  static std::shared_ptr<Async> Create(Loop& loop);
-
-  /**
-   * Create an async handle.
-   *
-   * @param loop Loop object where this handle runs.
-   */
-  static std::shared_ptr<Async> Create(const std::shared_ptr<Loop>& loop) {
-    return Create(*loop);
+  static std::shared_ptr<Async> Create(Loop& loop) {
+    return Create(loop.shared_from_this());
   }
+
+  /**
+   * Create an async handle.
+   *
+   * @param loop Loop object where this handle runs.
+   */
+  static std::shared_ptr<Async> Create(const std::shared_ptr<Loop>& loop);
 
   /**
    * Wakeup the event loop and emit the event.
@@ -132,12 +141,17 @@ class Async<> final : public HandleImpl<Async<>, uv_async_t> {
    * It’s safe to call this function from any thread.
    * An async event will be emitted on the loop thread.
    */
-  void Send() { Invoke(&uv_async_send, GetRaw()); }
+  void Send() {
+    if (auto loop = m_loop.lock()) Invoke(&uv_async_send, GetRaw());
+  }
 
   /**
    * Signal generated (on event loop thread) when the async event occurs.
    */
   sig::Signal<> wakeup;
+
+ private:
+  std::weak_ptr<Loop> m_loop;
 };
 
 }  // namespace uv
