@@ -75,7 +75,7 @@ public class ShuffleboardInstanceTest {
     NetworkTableEntry entry = widget.getEntry();
 
     assertAll(
-        () -> assertEquals("string", entry.getString(null)),
+        () -> assertEquals("string", entry.getString(null), "Wrong entry value"),
         () -> assertEquals("/Shuffleboard/Tab/First/Second/Third/Fourth/Value", entry.getName(),
                            "Entry path generated incorrectly"));
   }

@@ -50,7 +50,7 @@ public final class Shuffleboard {
   /**
    * The name of the base NetworkTable into which all Shuffleboard data will be added.
    */
-  public static final String BASE_TABLE_NAME = "/Shuffleboard";
+  public static final String kBaseTableName = "/Shuffleboard";
 
   private static final ShuffleboardRoot root =
       new ShuffleboardInstance(NetworkTableInstance.getDefault());

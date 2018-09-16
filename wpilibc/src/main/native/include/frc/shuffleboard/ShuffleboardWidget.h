@@ -1,0 +1,46 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
+
+#include <wpi/Twine.h>
+
+#include "frc/shuffleboard/ShuffleboardComponent.h"
+
+namespace frc {
+
+class ShuffleboardContainer;
+
+/**
+ * Abstract superclass for widgets.
+ *
+ * <p>This class is package-private to minimize API surface area.
+ *
+ * @tparam Derived the self type
+ */
+template <typename Derived>
+class ShuffleboardWidget
+    : public ShuffleboardComponent<ShuffleboardWidget<Derived>> {
+ public:
+  ShuffleboardWidget(ShuffleboardContainer& parent, const wpi::Twine& title)
+      : ShuffleboardValue(title),
+        ShuffleboardComponent<ShuffleboardWidget<Derived>>(parent, title) {}
+
+  /**
+   * Sets the type of widget used to display the data. If not set, the default
+   * widget type will be used.
+   *
+   * @param widgetType the type of the widget used to display the data
+   * @return this widget object
+   */
+  Derived& WithWidget(const wpi::Twine& widgetType) {
+    this->SetType(widgetType);
+    return *static_cast<Derived*>(this);
+  }
+};
+
+}  // namespace frc

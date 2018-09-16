@@ -24,7 +24,7 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
 
   ShuffleboardInstance(NetworkTableInstance ntInstance) {
     Objects.requireNonNull(ntInstance, "NetworkTable instance cannot be null");
-    m_rootTable = ntInstance.getTable(Shuffleboard.BASE_TABLE_NAME);
+    m_rootTable = ntInstance.getTable(Shuffleboard.kBaseTableName);
     m_rootMetaTable = m_rootTable.getSubTable(".metadata");
   }
 
