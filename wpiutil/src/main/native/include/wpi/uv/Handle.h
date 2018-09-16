@@ -104,7 +104,9 @@ class Handle : public std::enable_shared_from_this<Handle> {
    *
    * @return True if the handle is closing or closed, false otherwise.
    */
-  bool IsClosing() const noexcept { return uv_is_closing(m_uv_handle) != 0; }
+  bool IsClosing() const noexcept {
+    return m_closed || uv_is_closing(m_uv_handle) != 0;
+  }
 
   /**
    * Request handle to be closed.
@@ -219,6 +221,7 @@ class Handle : public std::enable_shared_from_this<Handle> {
 
   void Keep() noexcept { m_self = shared_from_this(); }
   void Release() noexcept { m_self.reset(); }
+  void ForceClosed() noexcept { m_closed = true; }
 
   static void AllocBuf(uv_handle_t* handle, size_t size, uv_buf_t* buf);
   static void DefaultFreeBuf(Buffer& buf);
