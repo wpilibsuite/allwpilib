@@ -11,12 +11,12 @@ SET(usage_reporting_instances "")
 
 foreach(ITEM ${RAW_INSTANCES})
     list(APPEND usage_reporting_instances_cpp "    ${ITEM},")
-    list(APPEND usage_reporting_instances "\n    public static final int ${ITEM}")
+    list(APPEND usage_reporting_instances "\n    public static final int ${ITEM};")
 endforeach()
 
 foreach(ITEM ${RAW_RESOURCE_TYPES})
     list(APPEND usage_reporting_types_cpp "    ${ITEM},")
-    list(APPEND usage_reporting_types "\n    public static final int ${ITEM}")
+    list(APPEND usage_reporting_types "\n    public static final int ${ITEM};")
 endforeach()
 
 string(REPLACE ";" "\n" usage_reporting_types_cpp "${usage_reporting_types_cpp}")
