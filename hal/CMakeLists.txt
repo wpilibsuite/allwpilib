@@ -8,12 +8,14 @@ if (NOT WITHOUT_JAVA)
     include(UseJava)
     set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
 
+    configure_file(src/generate/FRCNetComm.java.in FRCNetComm.java)
+
     file(GLOB
         hal_shared_jni_src src/main/native/cpp/jni/*.cpp
         hal_sim_jni_src src/main/native/sim/jni/*.cpp)
 
     file(GLOB_RECURSE JAVA_SOURCES
-        src/generated/java/*.java
+        ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java
         src/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
 
@@ -44,10 +46,16 @@ else()
     target_sources(hal PRIVATE ${hal_sim_native_src} ${hal_sim_jni_src})
 endif()
 
+configure_file(src/generate/FRCUsageReporting.h.in gen/hal/FRCUsageReporting.h)
+
 set_target_properties(hal PROPERTIES OUTPUT_NAME "wpiHal")
 
 target_include_directories(hal PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+                            $<INSTALL_INTERFACE:${include_dest}/hal>)
+
+target_include_directories(hal PUBLIC
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/gen>
                             $<INSTALL_INTERFACE:${include_dest}/hal>)
 target_link_libraries(hal PUBLIC wpiutil)
 
@@ -65,6 +73,7 @@ endif()
 
 install(TARGETS hal EXPORT hal DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gen DESTINATION "${include_dest}/hal")
 
 if (NOT WITHOUT_JAVA AND MSVC)
     install(TARGETS hal RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)

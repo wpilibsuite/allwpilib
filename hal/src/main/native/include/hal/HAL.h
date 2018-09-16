@@ -41,9 +41,7 @@
 #include "hal/Types.h"
 
 #ifdef __cplusplus
-#include "FRC_NetworkCommunication/UsageReporting.h"
-
-namespace HALUsageReporting = nUsageReporting;
+#include "hal/FRCUsageReporting.h"
 #endif
 
 /**

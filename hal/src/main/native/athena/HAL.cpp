@@ -18,6 +18,7 @@
 
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/LoadOut.h>
+#include <FRC_NetworkCommunication/UsageReporting.h>
 #include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
