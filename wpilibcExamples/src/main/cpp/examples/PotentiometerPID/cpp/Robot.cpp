@@ -8,17 +8,17 @@
 #include <array>
 
 #include <frc/AnalogInput.h>
-#include <frc/IterativeRobot.h>
 #include <frc/Joystick.h>
 #include <frc/PIDController.h>
 #include <frc/Spark.h>
+#include <frc/TimedRobot.h>
 
 /**
  * This is a sample program to demonstrate how to use a soft potentiometer and a
  * PID Controller to reach and maintain position setpoints on an elevator
  * mechanism.
  */
-class Robot : public frc::IterativeRobot {
+class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override { m_pidController.SetInputRange(0, 5); }
 

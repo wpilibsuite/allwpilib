@@ -8,17 +8,17 @@
 package edu.wpi.first.wpilibj.examples.ultrasonicpid;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
  * This is a sample program to demonstrate the use of a PIDController with an
  * ultrasonic sensor to reach and maintain a set distance from an object.
  */
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
   // distance in inches the robot wants to stay from an object
   private static final double kHoldDistance = 12.0;
 

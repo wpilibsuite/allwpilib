@@ -8,18 +8,18 @@
 package edu.wpi.first.wpilibj.examples.potentiometerpid;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
  * This is a sample program to demonstrate how to use a soft potentiometer and a
  * PID controller to reach and maintain position setpoints on an elevator
  * mechanism.
  */
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
   private static final int kPotChannel = 1;
   private static final int kMotorChannel = 7;
   private static final int kJoystickChannel = 0;

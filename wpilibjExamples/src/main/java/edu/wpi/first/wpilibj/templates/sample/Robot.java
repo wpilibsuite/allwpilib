@@ -29,7 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *
  * <p>WARNING: While it may look like a good choice to use for your code if
  * you're inexperienced, don't. Unless you know what you are doing, complex code
- * will be much more difficult under this system. Use IterativeRobot or
+ * will be much more difficult under this system. Use TimedRobot or
  * Command-Based instead if you're new.
  */
 public class Robot extends SampleRobot {
@@ -63,7 +63,7 @@ public class Robot extends SampleRobot {
    * the if-else structure below with additional strings. If using the
    * SendableChooser make sure to add them to the chooser code above as well.
    *
-   * <p>If you wanted to run a similar autonomous mode with an IterativeRobot
+   * <p>If you wanted to run a similar autonomous mode with an TimedRobot
    * you would write:
    *
    * <blockquote><pre>{@code
@@ -124,7 +124,7 @@ public class Robot extends SampleRobot {
   /**
    * Runs the motors with arcade steering.
    *
-   * <p>If you wanted to run a similar teleoperated mode with an IterativeRobot
+   * <p>If you wanted to run a similar teleoperated mode with an TimedRobot
    * you would write:
    *
    * <blockquote><pre>{@code

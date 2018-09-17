@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <cameraserver/CameraServer.h>
-#include <frc/IterativeRobot.h>
+#include <frc/TimedRobot.h>
 #include <wpi/raw_ostream.h>
 
 /**
@@ -15,7 +15,7 @@
  * the easiest way to get camera images to the dashboard. Just add this to the
  * RobotInit() method in your program.
  */
-class Robot : public frc::IterativeRobot {
+class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
 #if defined(__linux__)

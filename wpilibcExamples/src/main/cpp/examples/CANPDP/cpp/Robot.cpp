@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <frc/IterativeRobot.h>
 #include <frc/PowerDistributionPanel.h>
+#include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 /**
@@ -14,7 +14,7 @@
  * Distribution Panel via CAN. The information will be displayed under variables
  * through the SmartDashboard.
  */
-class Robot : public frc::IterativeRobot {
+class Robot : public frc::TimedRobot {
  public:
   void TeleopPeriodic() override {
     /* Get the current going through channel 7, in Amperes. The PDP returns the

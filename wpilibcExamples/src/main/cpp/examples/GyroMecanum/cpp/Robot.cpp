@@ -6,9 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/AnalogGyro.h>
-#include <frc/IterativeRobot.h>
 #include <frc/Joystick.h>
 #include <frc/Spark.h>
+#include <frc/TimedRobot.h>
 #include <frc/drive/MecanumDrive.h>
 
 /**
@@ -16,7 +16,7 @@
  * maintian rotation vectorsin relation to the starting orientation of the robot
  * (field-oriented controls).
  */
-class Robot : public frc::IterativeRobot {
+class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
     // Invert the left side motors. You may need to change or remove this to

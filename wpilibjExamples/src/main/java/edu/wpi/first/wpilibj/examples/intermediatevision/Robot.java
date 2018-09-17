@@ -16,7 +16,7 @@ import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
  * This is a demo program showing the use of OpenCV to do vision processing. The
@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
  * and sent to the dashboard. OpenCV has many methods for different types of
  * processing.
  */
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
   Thread m_visionThread;
 
   @Override

@@ -6,9 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/DoubleSolenoid.h>
-#include <frc/IterativeRobot.h>
 #include <frc/Joystick.h>
 #include <frc/Solenoid.h>
+#include <frc/TimedRobot.h>
 
 /**
  * This is a sample program showing the use of the solenoid classes during
@@ -30,7 +30,7 @@
  * Additionally, double solenoids take up two channels on your PCM whereas
  * single solenoids only take a single channel.
  */
-class Robot : public frc::IterativeRobot {
+class Robot : public frc::TimedRobot {
  public:
   void TeleopPeriodic() override {
     /* The output of GetRawButton is true/false depending on whether the button
