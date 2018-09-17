@@ -36,6 +36,20 @@ class XboxController : public GenericHID {
 
   XboxController(const XboxController&) = delete;
   XboxController& operator=(const XboxController&) = delete;
+  
+  /**
+   * Get a raw axis readint after checking if it is in the deadzone or not.
+   *
+   * @param axis id to check
+   */
+  double GetAxisAfterDeadzone(int axis);
+  
+  /**
+   * Set controller's joystick deadzone.
+   *
+   * @param Deadzone amount as bool
+   */
+  void SetDeadzone(bool deadzone);
 
   /**
    * Get the X axis value of the controller.
@@ -233,6 +247,9 @@ class XboxController : public GenericHID {
   bool GetStartButtonReleased();
 
  private:
+  // The deadzone of the two joysticks
+  double deadzone = 0.00;
+
   enum class Button {
     kBumperLeft = 5,
     kBumperRight = 6,
