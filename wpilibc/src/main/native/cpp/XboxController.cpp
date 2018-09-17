@@ -21,6 +21,7 @@ double XboxController::GetAxisAfterDeadzone(int axis){
   } else {
     return 0.00;
   }
+}
 
 void XboxController::SetDeadzone(bool deadzone){
   this->deadzone = deadzone;
