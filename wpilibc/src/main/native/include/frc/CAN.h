@@ -35,9 +35,23 @@ class CAN : public ErrorBase {
  public:
   /**
    * Create a new CAN communication interface with the specific device ID.
+   * This uses the team manufacturer and device types.
    * The device ID is 6 bits (0-63)
+   *
+   * @param deviceId The device id
    */
   explicit CAN(int deviceId);
+
+  /**
+   * Create a new CAN communication interface with a specific device ID,
+   * manufacturer and device type. The device ID is 6 bits, the
+   * manufacturer is 8 bits, and the device type is 5 bits.
+   *
+   * @param deviceId           The device ID
+   * @param deviceManufacturer The device manufacturer
+   * @param deviceType         The device type
+   */
+  CAN(int deviceId, int deviceManufacturer, int deviceType);
 
   /**
    * Closes the CAN communication.

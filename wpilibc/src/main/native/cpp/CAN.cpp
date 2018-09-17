@@ -24,6 +24,20 @@ CAN::CAN(int deviceId) {
   HAL_Report(HALUsageReporting::kResourceType_CAN, deviceId);
 }
 
+CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
+  int32_t status = 0;
+  m_handle = HAL_InitializeCAN(
+      static_cast<HAL_CANManufacturer>(deviceManufacturer), deviceId,
+      static_cast<HAL_CANDeviceType>(deviceType), &status);
+  if (status != 0) {
+    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    m_handle = HAL_kInvalidHandle;
+    return;
+  }
+
+  HAL_Report(HALUsageReporting::kResourceType_CAN, deviceId);
+}
+
 CAN::~CAN() {
   if (StatusIsFatal()) return;
   if (m_handle != HAL_kInvalidHandle) {
