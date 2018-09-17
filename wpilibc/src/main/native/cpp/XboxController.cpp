@@ -15,19 +15,30 @@ XboxController::XboxController(int port) : GenericHID(port) {
   HAL_Report(HALUsageReporting::kResourceType_XboxController, port);
 }
 
+double XboxController::GetAxisAfterDeadzone(int axis){
+  if(GetRawAxis(axis) > this->deadzone || GetRawAxis(axis) < (this->deadzone * -1)){
+    return GetRawAxis(axis);
+  } else {
+    return 0.00;
+  }
+
+void XboxController::SetDeadzone(bool deadzone){
+  this->deadzone = deadzone;
+}
+
 double XboxController::GetX(JoystickHand hand) const {
   if (hand == kLeftHand) {
-    return GetRawAxis(0);
+    return GetAxisAfterDeadzone(0);
   } else {
-    return GetRawAxis(4);
+    return GetAxisAfterDeadzone(4);
   }
 }
 
 double XboxController::GetY(JoystickHand hand) const {
   if (hand == kLeftHand) {
-    return GetRawAxis(1);
+    return GetAxisAfterDeadzone(1);
   } else {
-    return GetRawAxis(5);
+    return GetAxisAfterDeadzone(5);
   }
 }
 
