@@ -24,6 +24,9 @@ class PWMTalonSRX : public PWMSpeedController {
    *                on-board, 10-19 are on the MXP port
    */
   explicit PWMTalonSRX(int channel);
+
+  PWMTalonSRX(PWMTalonSRX&&) = default;
+  PWMTalonSRX& operator=(PWMTalonSRX&&) = default;
 };
 
 }  // namespace frc

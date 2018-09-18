@@ -22,6 +22,9 @@ class Filter : public PIDSource {
   explicit Filter(std::shared_ptr<PIDSource> source);
   virtual ~Filter() = default;
 
+  Filter(Filter&&) = default;
+  Filter& operator=(Filter&&) = default;
+
   // PIDSource interface
   void SetPIDSourceType(PIDSourceType pidSource) override;
   PIDSourceType GetPIDSourceType() const override;

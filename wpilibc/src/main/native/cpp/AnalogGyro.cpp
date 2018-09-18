@@ -8,6 +8,7 @@
 #include "frc/AnalogGyro.h"
 
 #include <climits>
+#include <utility>
 
 #include <hal/AnalogGyro.h>
 #include <hal/Errors.h>
@@ -63,6 +64,20 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
 }
 
 AnalogGyro::~AnalogGyro() { HAL_FreeAnalogGyro(m_gyroHandle); }
+
+AnalogGyro::AnalogGyro(AnalogGyro&& rhs)
+    : GyroBase(std::move(rhs)), m_analog(std::move(rhs.m_analog)) {
+  std::swap(m_gyroHandle, rhs.m_gyroHandle);
+}
+
+AnalogGyro& AnalogGyro::operator=(AnalogGyro&& rhs) {
+  GyroBase::operator=(std::move(rhs));
+
+  m_analog = std::move(rhs.m_analog);
+  std::swap(m_gyroHandle, rhs.m_gyroHandle);
+
+  return *this;
+}
 
 double AnalogGyro::GetAngle() const {
   if (StatusIsFatal()) return 0.0;

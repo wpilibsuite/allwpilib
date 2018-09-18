@@ -25,6 +25,10 @@ namespace frc {
  */
 class Button : public Trigger {
  public:
+  Button() = default;
+  Button(Button&&) = default;
+  Button& operator=(Button&&) = default;
+
   /**
    * Specifies the command to run when a button is first pressed.
    *

@@ -37,6 +37,9 @@ class DriverStation : public ErrorBase {
 
   ~DriverStation() override;
 
+  DriverStation(const DriverStation&) = delete;
+  DriverStation& operator=(const DriverStation&) = delete;
+
   /**
    * Return a reference to the singleton DriverStation.
    *

@@ -102,6 +102,9 @@ class AnalogGyro : public GyroBase {
 
   virtual ~AnalogGyro();
 
+  AnalogGyro(AnalogGyro&& rhs);
+  AnalogGyro& operator=(AnalogGyro&& rhs);
+
   /**
    * Return the actual angle in degrees that the robot is currently facing.
    *

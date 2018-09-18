@@ -119,7 +119,9 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
     // m_task.SetPriority(kPriority);
   } else {
     // Wait for background task to stop running
-    m_thread.join();
+    if (m_thread.joinable()) {
+      m_thread.join();
+    }
 
     // Clear all the counters (data now invalid) since automatic mode is
     // disabled. No synchronization is needed because the background task is

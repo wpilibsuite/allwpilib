@@ -35,6 +35,9 @@ class DigitalOutput : public ErrorBase, public SendableBase {
 
   ~DigitalOutput() override;
 
+  DigitalOutput(DigitalOutput&& rhs);
+  DigitalOutput& operator=(DigitalOutput&& rhs);
+
   /**
    * Set the value of a digital output.
    *
@@ -121,8 +124,8 @@ class DigitalOutput : public ErrorBase, public SendableBase {
 
  private:
   int m_channel;
-  HAL_DigitalHandle m_handle;
-  HAL_DigitalPWMHandle m_pwmGenerator;
+  HAL_DigitalHandle m_handle = HAL_kInvalidHandle;
+  HAL_DigitalPWMHandle m_pwmGenerator = HAL_kInvalidHandle;
 };
 
 }  // namespace frc

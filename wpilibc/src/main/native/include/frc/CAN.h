@@ -58,6 +58,9 @@ class CAN : public ErrorBase {
    */
   ~CAN() override;
 
+  CAN(CAN&& rhs);
+  CAN& operator=(CAN&& rhs);
+
   /**
    * Write a packet to the CAN device with a specific ID. This ID is 10 bits.
    *
@@ -141,6 +144,6 @@ class CAN : public ErrorBase {
       HAL_CAN_Dev_kMiscellaneous;
 
  private:
-  HAL_CANHandle m_handle{HAL_kInvalidHandle};
+  HAL_CANHandle m_handle = HAL_kInvalidHandle;
 };
 }  // namespace frc

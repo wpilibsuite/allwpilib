@@ -46,6 +46,9 @@ class CommandGroup : public Command {
 
   virtual ~CommandGroup() = default;
 
+  CommandGroup(CommandGroup&&) = default;
+  CommandGroup& operator=(CommandGroup&&) = default;
+
   /**
    * Adds a new Command to the group. The Command will be started after all the
    * previously added Commands.

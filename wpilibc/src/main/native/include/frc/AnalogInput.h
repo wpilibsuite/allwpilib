@@ -48,6 +48,9 @@ class AnalogInput : public ErrorBase, public SendableBase, public PIDSource {
 
   ~AnalogInput() override;
 
+  AnalogInput(AnalogInput&& rhs);
+  AnalogInput& operator=(AnalogInput&& rhs);
+
   /**
    * Get a sample straight from this channel.
    *
@@ -281,8 +284,7 @@ class AnalogInput : public ErrorBase, public SendableBase, public PIDSource {
 
  private:
   int m_channel;
-  // TODO: Adjust HAL to avoid use of raw pointers.
-  HAL_AnalogInputHandle m_port;
+  HAL_AnalogInputHandle m_port = HAL_kInvalidHandle;
   int64_t m_accumulatorOffset;
 };
 

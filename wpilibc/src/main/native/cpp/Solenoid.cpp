@@ -7,6 +7,8 @@
 
 #include "frc/Solenoid.h"
 
+#include <utility>
+
 #include <hal/HAL.h>
 #include <hal/Ports.h>
 #include <hal/Solenoid.h>
@@ -49,6 +51,20 @@ Solenoid::Solenoid(int moduleNumber, int channel)
 }
 
 Solenoid::~Solenoid() { HAL_FreeSolenoidPort(m_solenoidHandle); }
+
+Solenoid::Solenoid(Solenoid&& rhs)
+    : SolenoidBase(std::move(rhs)), m_channel(std::move(rhs.m_channel)) {
+  std::swap(m_solenoidHandle, rhs.m_solenoidHandle);
+}
+
+Solenoid& Solenoid::operator=(Solenoid&& rhs) {
+  SolenoidBase::operator=(std::move(rhs));
+
+  std::swap(m_solenoidHandle, rhs.m_solenoidHandle);
+  m_channel = std::move(rhs.m_channel);
+
+  return *this;
+}
 
 void Solenoid::Set(bool on) {
   if (StatusIsFatal()) return;

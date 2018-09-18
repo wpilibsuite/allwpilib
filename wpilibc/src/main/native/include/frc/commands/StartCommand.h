@@ -16,6 +16,9 @@ class StartCommand : public InstantCommand {
   explicit StartCommand(Command* commandToStart);
   virtual ~StartCommand() = default;
 
+  StartCommand(StartCommand&&) = default;
+  StartCommand& operator=(StartCommand&&) = default;
+
  protected:
   virtual void Initialize();
 

@@ -133,6 +133,9 @@ class Encoder : public ErrorBase,
 
   ~Encoder() override;
 
+  Encoder(Encoder&& rhs);
+  Encoder& operator=(Encoder&& rhs);
+
   // CounterBase interface
   /**
    * Gets the current count.

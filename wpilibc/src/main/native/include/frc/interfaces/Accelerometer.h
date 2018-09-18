@@ -14,7 +14,11 @@ namespace frc {
  */
 class Accelerometer {
  public:
+  Accelerometer() = default;
   virtual ~Accelerometer() = default;
+
+  Accelerometer(Accelerometer&&) = default;
+  Accelerometer& operator=(Accelerometer&&) = default;
 
   enum Range { kRange_2G = 0, kRange_4G = 1, kRange_8G = 2, kRange_16G = 3 };
 

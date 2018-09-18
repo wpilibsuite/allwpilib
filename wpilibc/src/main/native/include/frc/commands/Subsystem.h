@@ -31,6 +31,9 @@ class Subsystem : public ErrorBase, public SendableBase {
    */
   explicit Subsystem(const wpi::Twine& name);
 
+  Subsystem(Subsystem&&) = default;
+  Subsystem& operator=(Subsystem&&) = default;
+
   /**
    * Sets the default command. If this is not called or is called with null,
    * then there will be no default command for the subsystem.

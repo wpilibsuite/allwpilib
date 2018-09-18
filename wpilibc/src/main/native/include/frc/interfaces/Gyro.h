@@ -14,7 +14,11 @@ namespace frc {
  */
 class Gyro {
  public:
+  Gyro() = default;
   virtual ~Gyro() = default;
+
+  Gyro(Gyro&&) = default;
+  Gyro& operator=(Gyro&&) = default;
 
   /**
    * Calibrate the gyro by running for a number of samples and computing the

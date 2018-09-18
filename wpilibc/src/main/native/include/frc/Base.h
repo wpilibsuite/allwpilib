@@ -17,8 +17,6 @@ static_assert(0,
 static_assert(0, "Visual Studio 2015 or greater required.");
 #endif
 
-#define DEFAULT_MOVE_CONSTRUCTOR(ClassName) ClassName(ClassName&&) = default
-
 /** WPILib FRC namespace */
 namespace frc {
 
@@ -27,27 +25,6 @@ namespace frc {
 template <class T>
 struct NullDeleter {
   void operator()(T*) const noexcept {};
-};
-
-}  // namespace frc
-
-#include <atomic>
-
-namespace frc {
-
-// Use this for determining whether the default move constructor has been
-// called on a containing object. This serves the purpose of allowing us to
-// use the default move constructor of an object for moving all the data around
-// while being able to use this to, for instance, chose not to de-allocate
-// a PWM port in a destructor.
-struct HasBeenMoved {
-  HasBeenMoved(HasBeenMoved&& other) {
-    other.moved = true;
-    moved = false;
-  }
-  HasBeenMoved() = default;
-  std::atomic<bool> moved{false};
-  operator bool() const { return moved; }
 };
 
 }  // namespace frc

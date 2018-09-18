@@ -27,11 +27,10 @@ namespace frc {
 class SendableBuilderImpl : public SendableBuilder {
  public:
   SendableBuilderImpl() = default;
-  SendableBuilderImpl(const SendableBuilderImpl&) = delete;
-  SendableBuilderImpl(SendableBuilderImpl&& other) = default;
-  SendableBuilderImpl& operator=(const SendableBuilderImpl&) = delete;
-  SendableBuilderImpl& operator=(SendableBuilderImpl&& other) = default;
   ~SendableBuilderImpl() override = default;
+
+  SendableBuilderImpl(SendableBuilderImpl&&) = default;
+  SendableBuilderImpl& operator=(SendableBuilderImpl&&) = default;
 
   /**
    * Set the network table.  Must be called prior to any Add* functions being

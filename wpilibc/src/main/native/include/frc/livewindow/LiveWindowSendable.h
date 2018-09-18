@@ -22,6 +22,10 @@ namespace frc {
 class WPI_DEPRECATED("use Sendable directly instead") LiveWindowSendable
     : public Sendable {
  public:
+  LiveWindowSendable() = default;
+  LiveWindowSendable(LiveWindowSendable&&) = default;
+  LiveWindowSendable& operator=(LiveWindowSendable&&) = default;
+
   /**
    * Update the table for this sendable object with the latest values.
    */

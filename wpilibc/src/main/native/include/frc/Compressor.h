@@ -41,6 +41,9 @@ class Compressor : public ErrorBase, public SendableBase {
 
   ~Compressor() override = default;
 
+  Compressor(Compressor&&) = default;
+  Compressor& operator=(Compressor&&) = default;
+
   /**
    * Starts closed-loop control. Note that closed loop control is enabled by
    * default.
@@ -166,7 +169,7 @@ class Compressor : public ErrorBase, public SendableBase {
   void InitSendable(SendableBuilder& builder) override;
 
  protected:
-  HAL_CompressorHandle m_compressorHandle;
+  HAL_CompressorHandle m_compressorHandle = HAL_kInvalidHandle;
 
  private:
   void SetCompressor(bool on);

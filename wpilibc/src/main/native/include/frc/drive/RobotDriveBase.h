@@ -41,8 +41,8 @@ class RobotDriveBase : public MotorSafety, public SendableBase {
   RobotDriveBase();
   ~RobotDriveBase() override = default;
 
-  RobotDriveBase(const RobotDriveBase&) = delete;
-  RobotDriveBase& operator=(const RobotDriveBase&) = delete;
+  RobotDriveBase(RobotDriveBase&&) = default;
+  RobotDriveBase& operator=(RobotDriveBase&&) = default;
 
   /**
    * Sets the deadband applied to the drive inputs (e.g., joystick values).

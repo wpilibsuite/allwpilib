@@ -43,8 +43,8 @@ class Notifier : public ErrorBase {
    */
   virtual ~Notifier();
 
-  Notifier(const Notifier&) = delete;
-  Notifier& operator=(const Notifier&) = delete;
+  Notifier(Notifier&& rhs);
+  Notifier& operator=(Notifier&& rhs);
 
   /**
    * Change the handler function.

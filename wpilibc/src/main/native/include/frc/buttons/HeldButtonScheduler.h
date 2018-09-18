@@ -18,6 +18,10 @@ class HeldButtonScheduler : public ButtonScheduler {
  public:
   HeldButtonScheduler(bool last, Trigger* button, Command* orders);
   virtual ~HeldButtonScheduler() = default;
+
+  HeldButtonScheduler(HeldButtonScheduler&&) = default;
+  HeldButtonScheduler& operator=(HeldButtonScheduler&&) = default;
+
   virtual void Execute();
 };
 

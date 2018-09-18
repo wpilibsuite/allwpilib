@@ -20,6 +20,9 @@ class PrintCommand : public InstantCommand {
   explicit PrintCommand(const wpi::Twine& message);
   virtual ~PrintCommand() = default;
 
+  PrintCommand(PrintCommand&&) = default;
+  PrintCommand& operator=(PrintCommand&&) = default;
+
  protected:
   virtual void Initialize();
 

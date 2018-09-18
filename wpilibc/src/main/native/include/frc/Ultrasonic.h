@@ -94,6 +94,9 @@ class Ultrasonic : public ErrorBase, public SendableBase, public PIDSource {
 
   ~Ultrasonic() override;
 
+  Ultrasonic(Ultrasonic&&) = default;
+  Ultrasonic& operator=(Ultrasonic&&) = default;
+
   /**
    * Single ping to ultrasonic sensor.
    *

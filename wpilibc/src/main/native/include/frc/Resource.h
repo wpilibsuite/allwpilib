@@ -33,8 +33,8 @@ class Resource : public ErrorBase {
  public:
   virtual ~Resource() = default;
 
-  Resource(const Resource&) = delete;
-  Resource& operator=(const Resource&) = delete;
+  Resource(Resource&&) = default;
+  Resource& operator=(Resource&&) = default;
 
   /**
    * Factory method to create a Resource allocation-tracker *if* needed.

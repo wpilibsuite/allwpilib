@@ -103,3 +103,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
   LiveWindow::GetInstance()->SetEnabled(false);
 }
+
+RobotBase::RobotBase(RobotBase&&) : m_ds(DriverStation::GetInstance()) {}
+
+RobotBase& RobotBase::operator=(RobotBase&&) { return *this; }

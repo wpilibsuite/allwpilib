@@ -54,6 +54,9 @@ class TimedCommand : public Command {
 
   virtual ~TimedCommand() = default;
 
+  TimedCommand(TimedCommand&&) = default;
+  TimedCommand& operator=(TimedCommand&&) = default;
+
  protected:
   /**
    * Ends command when timed out.

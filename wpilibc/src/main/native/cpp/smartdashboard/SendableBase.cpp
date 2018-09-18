@@ -7,6 +7,8 @@
 
 #include "frc/smartdashboard/SendableBase.h"
 
+#include <utility>
+
 #include "frc/livewindow/LiveWindow.h"
 
 using namespace frc;
@@ -16,6 +18,20 @@ SendableBase::SendableBase(bool addLiveWindow) {
 }
 
 SendableBase::~SendableBase() { LiveWindow::GetInstance()->Remove(this); }
+
+SendableBase::SendableBase(SendableBase&& rhs) {
+  m_name = std::move(rhs.m_name);
+  m_subsystem = std::move(rhs.m_subsystem);
+}
+
+SendableBase& SendableBase::operator=(SendableBase&& rhs) {
+  Sendable::operator=(std::move(rhs));
+
+  m_name = std::move(rhs.m_name);
+  m_subsystem = std::move(rhs.m_subsystem);
+
+  return *this;
+}
 
 std::string SendableBase::GetName() const {
   std::lock_guard<wpi::mutex> lock(m_mutex);

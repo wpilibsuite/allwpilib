@@ -23,6 +23,10 @@ class GyroBase : public Gyro,
                  public SendableBase,
                  public PIDSource {
  public:
+  GyroBase() = default;
+  GyroBase(GyroBase&&) = default;
+  GyroBase& operator=(GyroBase&&) = default;
+
   // PIDSource interface
   /**
    * Get the PIDOutput for the PIDSource base object. Can be set to return

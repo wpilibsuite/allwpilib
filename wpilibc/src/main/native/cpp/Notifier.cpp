@@ -7,6 +7,8 @@
 
 #include "frc/Notifier.h"
 
+#include <utility>
+
 #include <hal/HAL.h>
 
 #include "frc/Timer.h"
@@ -61,6 +63,31 @@ Notifier::~Notifier() {
   if (m_thread.joinable()) m_thread.join();
 
   HAL_CleanNotifier(handle, &status);
+}
+
+Notifier::Notifier(Notifier&& rhs)
+    : ErrorBase(std::move(rhs)),
+      m_thread(std::move(rhs.m_thread)),
+      m_notifier(rhs.m_notifier.load()),
+      m_handler(std::move(rhs.m_handler)),
+      m_expirationTime(std::move(rhs.m_expirationTime)),
+      m_period(std::move(rhs.m_period)),
+      m_periodic(std::move(rhs.m_periodic)) {
+  rhs.m_notifier = HAL_kInvalidHandle;
+}
+
+Notifier& Notifier::operator=(Notifier&& rhs) {
+  ErrorBase::operator=(std::move(rhs));
+
+  m_thread = std::move(rhs.m_thread);
+  m_notifier = rhs.m_notifier.load();
+  rhs.m_notifier = HAL_kInvalidHandle;
+  m_handler = std::move(rhs.m_handler);
+  m_expirationTime = std::move(rhs.m_expirationTime);
+  m_period = std::move(rhs.m_period);
+  m_periodic = std::move(rhs.m_periodic);
+
+  return *this;
 }
 
 void Notifier::SetHandler(TimerEventHandler handler) {

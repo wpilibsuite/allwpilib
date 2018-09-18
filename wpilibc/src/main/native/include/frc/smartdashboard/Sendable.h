@@ -17,7 +17,11 @@ class SendableBuilder;
 
 class Sendable {
  public:
+  Sendable() = default;
   virtual ~Sendable() = default;
+
+  Sendable(Sendable&&) = default;
+  Sendable& operator=(Sendable&&) = default;
 
   /**
    * Gets the name of this Sendable object.

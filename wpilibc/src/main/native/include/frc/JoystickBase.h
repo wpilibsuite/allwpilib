@@ -22,6 +22,9 @@ class WPI_DEPRECATED("Inherit directly from GenericHID instead.") JoystickBase
   explicit JoystickBase(int port);
   virtual ~JoystickBase() = default;
 
+  JoystickBase(JoystickBase&&) = default;
+  JoystickBase& operator=(JoystickBase&&) = default;
+
   virtual double GetZ(JoystickHand hand = kRightHand) const = 0;
   virtual double GetTwist() const = 0;
   virtual double GetThrottle() const = 0;

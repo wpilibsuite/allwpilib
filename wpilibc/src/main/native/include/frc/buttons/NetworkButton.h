@@ -24,6 +24,9 @@ class NetworkButton : public Button {
                 const wpi::Twine& field);
   virtual ~NetworkButton() = default;
 
+  NetworkButton(NetworkButton&&) = default;
+  NetworkButton& operator=(NetworkButton&&) = default;
+
   virtual bool Get();
 
  private:

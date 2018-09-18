@@ -61,6 +61,9 @@ class GearTooth : public Counter {
   explicit GearTooth(std::shared_ptr<DigitalSource> source,
                      bool directionSensitive = false);
 
+  GearTooth(GearTooth&&) = default;
+  GearTooth& operator=(GearTooth&&) = default;
+
   /**
    * Common code called by the constructors.
    */

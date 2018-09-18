@@ -77,8 +77,8 @@ class ErrorBase {
   ErrorBase();
   virtual ~ErrorBase() = default;
 
-  ErrorBase(const ErrorBase&) = delete;
-  ErrorBase& operator=(const ErrorBase&) = delete;
+  ErrorBase(ErrorBase&&) = default;
+  ErrorBase& operator=(ErrorBase&&) = default;
 
   /**
    * @brief Retrieve the current error.

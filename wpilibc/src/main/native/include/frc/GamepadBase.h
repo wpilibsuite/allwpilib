@@ -22,6 +22,9 @@ class WPI_DEPRECATED("Inherit directly from GenericHID instead.") GamepadBase
   explicit GamepadBase(int port);
   virtual ~GamepadBase() = default;
 
+  GamepadBase(GamepadBase&&) = default;
+  GamepadBase& operator=(GamepadBase&&) = default;
+
   virtual bool GetBumper(JoystickHand hand = kRightHand) const = 0;
   virtual bool GetStickButton(JoystickHand hand) const = 0;
 };

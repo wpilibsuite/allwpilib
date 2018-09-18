@@ -30,6 +30,9 @@ class AnalogOutput : public ErrorBase, public SendableBase {
 
   ~AnalogOutput() override;
 
+  AnalogOutput(AnalogOutput&& rhs);
+  AnalogOutput& operator=(AnalogOutput&& rhs);
+
   /**
    * Set the value of the analog output.
    *
@@ -53,7 +56,7 @@ class AnalogOutput : public ErrorBase, public SendableBase {
 
  protected:
   int m_channel;
-  HAL_AnalogOutputHandle m_port;
+  HAL_AnalogOutputHandle m_port = HAL_kInvalidHandle;
 };
 
 }  // namespace frc

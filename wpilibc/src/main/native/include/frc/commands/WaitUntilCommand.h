@@ -29,6 +29,9 @@ class WaitUntilCommand : public Command {
 
   virtual ~WaitUntilCommand() = default;
 
+  WaitUntilCommand(WaitUntilCommand&&) = default;
+  WaitUntilCommand& operator=(WaitUntilCommand&&) = default;
+
  protected:
   /**
    * Check if we've reached the actual finish time.

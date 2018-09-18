@@ -115,6 +115,9 @@ class Command : public ErrorBase, public SendableBase {
 
   ~Command() override = default;
 
+  Command(Command&&) = default;
+  Command& operator=(Command&&) = default;
+
   /**
    * Returns the time since this command was initialized (in seconds).
    *

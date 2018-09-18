@@ -41,8 +41,8 @@ class SPI : public ErrorBase {
 
   ~SPI() override;
 
-  SPI(const SPI&) = delete;
-  SPI& operator=(const SPI&) = delete;
+  SPI(SPI&& rhs);
+  SPI& operator=(SPI&& rhs);
 
   /**
    * Configure the rate of the generated clock signal.

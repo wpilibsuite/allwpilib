@@ -46,6 +46,9 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
 
   ~TimedRobot() override;
 
+  TimedRobot(TimedRobot&& rhs);
+  TimedRobot& operator=(TimedRobot&& rhs);
+
  private:
   HAL_NotifierHandle m_notifier{0};
 

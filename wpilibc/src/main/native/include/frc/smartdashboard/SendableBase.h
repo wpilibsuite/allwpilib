@@ -27,6 +27,9 @@ class SendableBase : public Sendable {
 
   ~SendableBase() override;
 
+  SendableBase(SendableBase&& rhs);
+  SendableBase& operator=(SendableBase&& rhs);
+
   using Sendable::SetName;
 
   std::string GetName() const final;

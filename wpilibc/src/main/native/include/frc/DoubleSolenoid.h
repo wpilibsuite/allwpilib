@@ -45,6 +45,9 @@ class DoubleSolenoid : public SolenoidBase {
 
   ~DoubleSolenoid() override;
 
+  DoubleSolenoid(DoubleSolenoid&& rhs);
+  DoubleSolenoid& operator=(DoubleSolenoid&& rhs);
+
   /**
    * Set the value of a solenoid.
    *

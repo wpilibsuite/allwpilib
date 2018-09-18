@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <array>
+#include <utility>
 
 #include <hal/Constants.h>
 #include <hal/DIO.h>
@@ -45,6 +46,20 @@ DigitalGlitchFilter::~DigitalGlitchFilter() {
     std::lock_guard<wpi::mutex> lock(m_mutex);
     m_filterAllocated[m_channelIndex] = false;
   }
+}
+
+DigitalGlitchFilter::DigitalGlitchFilter(DigitalGlitchFilter&& rhs)
+    : ErrorBase(std::move(rhs)), SendableBase(std::move(rhs)) {
+  std::swap(m_channelIndex, rhs.m_channelIndex);
+}
+
+DigitalGlitchFilter& DigitalGlitchFilter::operator=(DigitalGlitchFilter&& rhs) {
+  ErrorBase::operator=(std::move(rhs));
+  SendableBase::operator=(std::move(rhs));
+
+  std::swap(m_channelIndex, rhs.m_channelIndex);
+
+  return *this;
 }
 
 void DigitalGlitchFilter::Add(DigitalSource* input) {

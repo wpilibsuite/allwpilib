@@ -44,8 +44,8 @@ class ADXL345_I2C : public ErrorBase,
                        int deviceAddress = kAddress);
   ~ADXL345_I2C() override = default;
 
-  ADXL345_I2C(const ADXL345_I2C&) = delete;
-  ADXL345_I2C& operator=(const ADXL345_I2C&) = delete;
+  ADXL345_I2C(ADXL345_I2C&&) = default;
+  ADXL345_I2C& operator=(ADXL345_I2C&&) = default;
 
   // Accelerometer interface
   void SetRange(Range range) override;

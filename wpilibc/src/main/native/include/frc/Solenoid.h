@@ -38,6 +38,9 @@ class Solenoid : public SolenoidBase {
 
   ~Solenoid() override;
 
+  Solenoid(Solenoid&& rhs);
+  Solenoid& operator=(Solenoid&& rhs);
+
   /**
    * Set the value of a solenoid.
    *
