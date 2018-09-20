@@ -29,6 +29,13 @@ if (!project.hasProperty('onlyAthena')) {
 
     project(':').libraryBuild.dependsOn build
 
+    ext {
+        chipObjectComponents = ["$nativeName".toString(), "${nativeName}Base".toString(), "${nativeName}Dev".toString(), "${nativeName}Test".toString()]
+        netCommComponents = ["$nativeName".toString(), "${nativeName}Base".toString(), "${nativeName}Dev".toString(), "${nativeName}Test".toString()]
+        useNiJava = false
+    }
+
+    apply from: "${rootDir}/shared/nilibraries.gradle"
 
     model {
         exportsConfigs {
@@ -65,7 +72,7 @@ if (!project.hasProperty('onlyAthena')) {
                         it.buildable = false
                         return
                     }
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(it, 'shared')
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 }
             }
@@ -86,7 +93,7 @@ if (!project.hasProperty('onlyAthena')) {
                         it.buildable = false
                         return
                     }
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(it, 'shared')
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 }
             }
@@ -110,7 +117,7 @@ if (!project.hasProperty('onlyAthena')) {
                         it.buildable = false
                         return
                     }
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(it, 'shared')
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib library: nativeName, linkage: 'shared'
                 }
@@ -120,11 +127,10 @@ if (!project.hasProperty('onlyAthena')) {
             withType(GoogleTestTestSuiteBinarySpec) {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                lib project: ':hal', library: 'hal', linkage: 'shared'
+                project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
-                project(':ni-libraries').addNiLibrariesToLinker(it)
                 lib library: nativeName, linkage: 'shared'
             }
         }

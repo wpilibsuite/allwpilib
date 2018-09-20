@@ -19,6 +19,14 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 apply from: "${rootDir}/shared/googletest.gradle"
 
+ext {
+    chipObjectComponents = ['wpilibcIntegrationTests']
+    netCommComponents = ['wpilibcIntegrationTests']
+    useNiJava = false
+}
+
+apply from: "${rootDir}/shared/nilibraries.gradle"
+
 model {
     components {
         wpilibcIntegrationTests(NativeExecutableSpec) {
@@ -45,10 +53,9 @@ model {
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-                    project(':ni-libraries').addNiLibrariesToLinker(binary)
                 } else {
                     binary.sources {
                         simCpp(CppSourceSet) {

@@ -30,6 +30,18 @@ staticGtestConfigs["${nativeName}Test"] = []
 
 apply from: "${rootDir}/shared/googletest.gradle"
 
+if (project.hasProperty('niLibraries')) {
+    ext {
+        chipObjectComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
+                                "${nativeName}JNI".toString(), "${nativeName}Test".toString()]
+        netCommComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
+                             "${nativeName}JNI".toString(), "${nativeName}Test".toString()]
+        useNiJava = true
+    }
+
+    apply from: "${rootDir}/shared/nilibraries.gradle"
+}
+
 model {
     components {
         "${nativeName}Base"(JniNativeLibrarySpec) {
@@ -45,7 +57,10 @@ model {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDir 'src/main/native/include'
+                        if (project.hasProperty('generatedHeaders')) {
+                            srcDir generatedHeaders
+                        }
                     }
                 }
             }
@@ -57,9 +72,6 @@ model {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 if (project.hasProperty('splitSetup')) {
                     splitSetup(it)
-                }
-                if (project.hasProperty('niLibraries')) {
-                    project(':ni-libraries').addNiLibrariesToLinker(it)
                 }
             }
         }
@@ -77,15 +89,15 @@ model {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDir 'src/main/native/include'
+                        if (project.hasProperty('generatedHeaders')) {
+                            srcDir generatedHeaders
+                        }
                     }
                 }
             }
             binaries.all {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                if (project.hasProperty('niLibraries')) {
-                    project(':ni-libraries').addNiLibrariesToLinker(it)
-                }
             }
         }
         "${nativeName}JNI"(JniNativeLibrarySpec) {
@@ -104,7 +116,10 @@ model {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDir 'src/main/native/include'
+                        if (project.hasProperty('generatedHeaders')) {
+                            srcDir generatedHeaders
+                        }
                     }
                 }
             }
@@ -127,14 +142,14 @@ model {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/dev/native/include'
+                        srcDir 'src/main/native/include'
+                        if (project.hasProperty('generatedHeaders')) {
+                            srcDir generatedHeaders
+                        }
                     }
                 }
             }
             binaries.all {
-                if (project.hasProperty('niLibraries')) {
-                    project(':ni-libraries').addNiLibrariesToLinker(it)
-                }
                 lib library: nativeName, linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
@@ -156,6 +171,9 @@ model {
                     }
                     exportedHeaders {
                         srcDirs 'src/test/native/include', 'src/main/native/cpp'
+                        if (project.hasProperty('generatedHeaders')) {
+                            srcDir generatedHeaders
+                        }
                     }
                 }
             }

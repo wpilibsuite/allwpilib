@@ -18,6 +18,14 @@ ext {
     skipDev = true
 }
 
+ext {
+    chipObjectComponents = ['myRobotCpp', 'myRobotCppStatic']
+    netCommComponents = ['myRobotCpp', 'myRobotCppStatic']
+    useNiJava = true
+}
+
+apply from: "${rootDir}/shared/nilibraries.gradle"
+
 apply from: "${rootDir}/shared/opencv.gradle"
 
 mainClassName = 'Main'
@@ -61,10 +69,9 @@ model {
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-                    project(':ni-libraries').addNiLibrariesToLinker(binary)
             }
         }
         myRobotCppStatic(NativeExecutableSpec) {
@@ -85,10 +92,9 @@ model {
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'static'
                     lib project: ':cscore', library: 'cscore', linkage: 'static'
-                    lib project: ':hal', library: 'hal', linkage: 'static'
+                    project(':hal').addHalDependency(binary, 'static')
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
-                    project(':ni-libraries').addNiLibrariesToLinker(binary)
             }
         }
     }
