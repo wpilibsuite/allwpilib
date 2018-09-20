@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <frc/IterativeRobot.h>
+#include <frc/TimedRobot.h>
 #include <frc/commands/Command.h>
 #include <frc/smartdashboard/SendableChooser.h>
 
@@ -20,7 +20,7 @@
 #include "subsystems/Pneumatics.h"
 #include "subsystems/Shooter.h"
 
-class Robot : public frc::IterativeRobot {
+class Robot : public frc::TimedRobot {
  public:
   static DriveTrain drivetrain;
   static Pivot pivot;

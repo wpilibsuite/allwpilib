@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/Encoder.h>
-#include <frc/IterativeRobot.h>
+#include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 /**
@@ -28,7 +28,7 @@
  * distance that the robot drives can be precisely controlled during the
  * autonomous mode.
  */
-class Robot : public frc::IterativeRobot {
+class Robot : public frc::TimedRobot {
  public:
   Robot() {
     /* Defines the number of samples to average when determining the rate.

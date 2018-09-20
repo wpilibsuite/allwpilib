@@ -7,16 +7,16 @@
 
 package edu.wpi.first.wpilibj.examples.mecanumdrive;
 
-import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 /**
  * This is a demo program showing how to use Mecanum control with the RobotDrive
  * class.
  */
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
   private static final int kFrontLeftChannel = 2;
   private static final int kRearLeftChannel = 3;
   private static final int kFrontRightChannel = 1;

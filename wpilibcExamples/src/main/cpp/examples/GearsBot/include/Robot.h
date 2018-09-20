@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <frc/IterativeRobot.h>
+#include <frc/TimedRobot.h>
 #include <frc/commands/Command.h>
 #include <frc/commands/Scheduler.h>
 #include <frc/livewindow/LiveWindow.h>
@@ -20,7 +20,7 @@
 #include "subsystems/Elevator.h"
 #include "subsystems/Wrist.h"
 
-class Robot : public frc::IterativeRobot {
+class Robot : public frc::TimedRobot {
  public:
   static DriveTrain drivetrain;
   static Elevator elevator;

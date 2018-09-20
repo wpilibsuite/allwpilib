@@ -6,9 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/Encoder.h>
-#include <frc/IterativeRobot.h>
 #include <frc/Joystick.h>
 #include <frc/Spark.h>
+#include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 constexpr double kPi = 3.14159265358979;
@@ -24,7 +24,7 @@ constexpr double kPi = 3.14159265358979;
  * In addition, the encoder value of an encoder connected to ports 0 and 1 is
  * consistently sent to the Dashboard.
  */
-class Robot : public frc::IterativeRobot {
+class Robot : public frc::TimedRobot {
  public:
   void TeleopPeriodic() override { m_motor.Set(m_stick.GetY()); }
 
