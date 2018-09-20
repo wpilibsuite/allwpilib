@@ -1,4 +1,4 @@
-def javaResourceFile = file("$buildDir/generated/java/edu/wpi/first/wpilibj/hal/FRCNetComm.java")
+def javaResourceFile = file("$buildDir/generated/java/edu/wpi/first/hal/FRCNetComm.java")
 def cppResourceFile = file("$buildDir/generated/headers/hal/FRCUsageReporting.h")
 
 def generateUsageReporting = tasks.register('generateUsageReporting') {

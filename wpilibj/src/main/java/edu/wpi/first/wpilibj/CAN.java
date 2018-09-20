@@ -9,9 +9,10 @@ package edu.wpi.first.wpilibj;
 
 import java.io.Closeable;
 
-import edu.wpi.first.wpilibj.hal.CANAPIJNI;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.CANAPIJNI;
+import edu.wpi.first.hal.CANData;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 
 /**
  * High level class for interfacing with CAN devices conforming to

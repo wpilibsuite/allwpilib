@@ -12,7 +12,7 @@
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_wpilibj_hal_SPIJNI.h"
+#include "edu_wpi_first_hal_SPIJNI.h"
 #include "hal/SPI.h"
 #include "hal/cpp/Log.h"
 
@@ -31,12 +31,12 @@ TLogLevel spiJNILogLevel = logWARNING;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiInitialize
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitialize
+Java_edu_wpi_first_hal_SPIJNI_spiInitialize
   (JNIEnv* env, jclass, jint port)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiInitialize";
@@ -48,12 +48,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitialize
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiTransaction
  * Signature: (ILjava/lang/Object;Ljava/lang/Object;B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiTransaction
+Java_edu_wpi_first_hal_SPIJNI_spiTransaction
   (JNIEnv* env, jclass, jint port, jobject dataToSend, jobject dataReceived,
    jbyte size)
 {
@@ -76,12 +76,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiTransaction
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiTransactionB
  * Signature: (I[B[BB)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiTransactionB
+Java_edu_wpi_first_hal_SPIJNI_spiTransactionB
   (JNIEnv* env, jclass, jint port, jbyteArray dataToSend,
    jbyteArray dataReceived, jbyte size)
 {
@@ -102,12 +102,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiTransactionB
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiWrite
  * Signature: (ILjava/lang/Object;B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiWrite
+Java_edu_wpi_first_hal_SPIJNI_spiWrite
   (JNIEnv* env, jclass, jint port, jobject dataToSend, jbyte size)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiWrite";
@@ -126,12 +126,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiWrite
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiWriteB
  * Signature: (I[BB)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiWriteB
+Java_edu_wpi_first_hal_SPIJNI_spiWriteB
   (JNIEnv* env, jclass, jint port, jbyteArray dataToSend, jbyte size)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiWriteB";
@@ -146,12 +146,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiWriteB
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiRead
  * Signature: (IZLjava/lang/Object;B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiRead
+Java_edu_wpi_first_hal_SPIJNI_spiRead
   (JNIEnv* env, jclass, jint port, jboolean initiate, jobject dataReceived,
    jbyte size)
 {
@@ -177,12 +177,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiRead
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiReadB
  * Signature: (IZ[BB)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiReadB
+Java_edu_wpi_first_hal_SPIJNI_spiReadB
   (JNIEnv* env, jclass, jint port, jboolean initiate, jbyteArray dataReceived,
    jbyte size)
 {
@@ -208,12 +208,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiReadB
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiClose
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiClose
+Java_edu_wpi_first_hal_SPIJNI_spiClose
   (JNIEnv*, jclass, jint port)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiClose";
@@ -222,12 +222,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiClose
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiSetSpeed
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetSpeed
+Java_edu_wpi_first_hal_SPIJNI_spiSetSpeed
   (JNIEnv*, jclass, jint port, jint speed)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetSpeed";
@@ -237,12 +237,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetSpeed
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiSetOpts
  * Signature: (IIII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetOpts
+Java_edu_wpi_first_hal_SPIJNI_spiSetOpts
   (JNIEnv*, jclass, jint port, jint msb_first, jint sample_on_trailing,
    jint clk_idle_high)
 {
@@ -256,12 +256,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetOpts
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiSetChipSelectActiveHigh
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveHigh
+Java_edu_wpi_first_hal_SPIJNI_spiSetChipSelectActiveHigh
   (JNIEnv* env, jclass, jint port)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveHigh";
@@ -273,12 +273,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveHigh
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiSetChipSelectActiveLow
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveLow
+Java_edu_wpi_first_hal_SPIJNI_spiSetChipSelectActiveLow
   (JNIEnv* env, jclass, jint port)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveLow";
@@ -290,12 +290,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveLow
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiInitAuto
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitAuto
+Java_edu_wpi_first_hal_SPIJNI_spiInitAuto
   (JNIEnv* env, jclass, jint port, jint bufferSize)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiInitAuto";
@@ -308,12 +308,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitAuto
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiFreeAuto
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiFreeAuto
+Java_edu_wpi_first_hal_SPIJNI_spiFreeAuto
   (JNIEnv* env, jclass, jint port)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiFreeAuto";
@@ -325,12 +325,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiFreeAuto
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiStartAutoRate
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiStartAutoRate
+Java_edu_wpi_first_hal_SPIJNI_spiStartAutoRate
   (JNIEnv* env, jclass, jint port, jdouble period)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiStartAutoRate";
@@ -343,12 +343,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiStartAutoRate
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiStartAutoTrigger
  * Signature: (IIIZZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiStartAutoTrigger
+Java_edu_wpi_first_hal_SPIJNI_spiStartAutoTrigger
   (JNIEnv* env, jclass, jint port, jint digitalSourceHandle,
    jint analogTriggerType, jboolean triggerRising, jboolean triggerFalling)
 {
@@ -367,12 +367,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiStartAutoTrigger
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiStopAuto
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiStopAuto
+Java_edu_wpi_first_hal_SPIJNI_spiStopAuto
   (JNIEnv* env, jclass, jint port)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiStopAuto";
@@ -384,12 +384,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiStopAuto
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiSetAutoTransmitData
  * Signature: (I[BI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAutoTransmitData
+Java_edu_wpi_first_hal_SPIJNI_spiSetAutoTransmitData
   (JNIEnv* env, jclass, jint port, jbyteArray dataToSend, jint zeroSize)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetAutoTransmitData";
@@ -406,12 +406,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAutoTransmitData
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiForceAutoRead
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiForceAutoRead
+Java_edu_wpi_first_hal_SPIJNI_spiForceAutoRead
   (JNIEnv* env, jclass, jint port)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiForceAutoRead";
@@ -423,12 +423,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiForceAutoRead
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiReadAutoReceivedData
  * Signature: (ILjava/lang/Object;ID)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiReadAutoReceivedData__ILjava_nio_ByteBuffer_2ID
+Java_edu_wpi_first_hal_SPIJNI_spiReadAutoReceivedData__ILjava_nio_ByteBuffer_2ID
   (JNIEnv* env, jclass, jint port, jobject buffer, jint numToRead,
    jdouble timeout)
 {
@@ -448,12 +448,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiReadAutoReceivedData__ILjava_nio_ByteBu
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiReadAutoReceivedData
  * Signature: (I[BID)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiReadAutoReceivedData__I_3BID
+Java_edu_wpi_first_hal_SPIJNI_spiReadAutoReceivedData__I_3BID
   (JNIEnv* env, jclass, jint port, jbyteArray buffer, jint numToRead,
    jdouble timeout)
 {
@@ -478,12 +478,12 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiReadAutoReceivedData__I_3BID
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiGetAutoDroppedCount
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAutoDroppedCount
+Java_edu_wpi_first_hal_SPIJNI_spiGetAutoDroppedCount
   (JNIEnv* env, jclass, jint port)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAutoDroppedCount";

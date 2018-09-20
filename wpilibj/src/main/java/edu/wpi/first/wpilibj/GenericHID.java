@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.HAL;
 
 /**
  * GenericHID Interface.

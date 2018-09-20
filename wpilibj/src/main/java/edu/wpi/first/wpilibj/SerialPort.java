@@ -10,9 +10,9 @@ package edu.wpi.first.wpilibj;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.SerialPortJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SerialPortJNI;
 
 /**
  * Driver for the RS-232 serial port on the roboRIO.

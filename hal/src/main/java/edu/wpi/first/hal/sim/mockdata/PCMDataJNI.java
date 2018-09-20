@@ -7,8 +7,8 @@
 
 package edu.wpi.first.hal.sim.mockdata;
 
-import edu.wpi.first.wpilibj.sim.NotifyCallback;
-import edu.wpi.first.wpilibj.hal.JNIWrapper;
+import edu.wpi.first.hal.sim.NotifyCallback;
+import edu.wpi.first.hal.JNIWrapper;
 
 public class PCMDataJNI extends JNIWrapper {
   public static native int registerSolenoidInitializedCallback(int index, int channel, NotifyCallback callback, boolean initialNotify);

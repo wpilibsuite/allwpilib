@@ -10,7 +10,8 @@ package edu.wpi.first.wpilibj.sim;
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.sim.AnalogInSim;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

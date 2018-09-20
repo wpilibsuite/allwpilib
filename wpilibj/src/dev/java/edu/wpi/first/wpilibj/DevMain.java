@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.networktables.NetworkTablesJNI;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpiutil.RuntimeDetector;
 
 public final class DevMain {

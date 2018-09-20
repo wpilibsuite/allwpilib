@@ -9,10 +9,8 @@ package edu.wpi.first.hal.sim;
 
 import org.junit.jupiter.api.Test;
 
-import edu.wpi.first.wpilibj.hal.AccelerometerJNI;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.sim.AccelerometerSim;
-import edu.wpi.first.wpilibj.sim.CallbackStore;
+import edu.wpi.first.hal.AccelerometerJNI;
+import edu.wpi.first.hal.HAL;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

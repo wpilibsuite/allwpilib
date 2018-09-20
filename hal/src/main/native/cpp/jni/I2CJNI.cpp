@@ -12,7 +12,7 @@
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_wpilibj_hal_I2CJNI.h"
+#include "edu_wpi_first_hal_I2CJNI.h"
 #include "hal/I2C.h"
 #include "hal/cpp/Log.h"
 
@@ -31,12 +31,12 @@ TLogLevel i2cJNILogLevel = logWARNING;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_I2CJNI
+ * Class:     edu_wpi_first_hal_I2CJNI
  * Method:    i2CInitialize
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CInitialize
+Java_edu_wpi_first_hal_I2CJNI_i2CInitialize
   (JNIEnv* env, jclass, jint port)
 {
   I2CJNI_LOG(logDEBUG) << "Calling I2CJNI i2CInititalize";
@@ -48,12 +48,12 @@ Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CInitialize
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_I2CJNI
+ * Class:     edu_wpi_first_hal_I2CJNI
  * Method:    i2CTransaction
  * Signature: (IBLjava/lang/Object;BLjava/lang/Object;B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CTransaction
+Java_edu_wpi_first_hal_I2CJNI_i2CTransaction
   (JNIEnv* env, jclass, jint port, jbyte address, jobject dataToSend,
    jbyte sendSize, jobject dataReceived, jbyte receiveSize)
 {
@@ -81,12 +81,12 @@ Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CTransaction
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_I2CJNI
+ * Class:     edu_wpi_first_hal_I2CJNI
  * Method:    i2CTransactionB
  * Signature: (IB[BB[BB)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CTransactionB
+Java_edu_wpi_first_hal_I2CJNI_i2CTransactionB
   (JNIEnv* env, jclass, jint port, jbyte address, jbyteArray dataToSend,
    jbyte sendSize, jbyteArray dataReceived, jbyte receiveSize)
 {
@@ -109,12 +109,12 @@ Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CTransactionB
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_I2CJNI
+ * Class:     edu_wpi_first_hal_I2CJNI
  * Method:    i2CWrite
  * Signature: (IBLjava/lang/Object;B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CWrite
+Java_edu_wpi_first_hal_I2CJNI_i2CWrite
   (JNIEnv* env, jclass, jint port, jbyte address, jobject dataToSend,
    jbyte sendSize)
 {
@@ -136,12 +136,12 @@ Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CWrite
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_I2CJNI
+ * Class:     edu_wpi_first_hal_I2CJNI
  * Method:    i2CWriteB
  * Signature: (IB[BB)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CWriteB
+Java_edu_wpi_first_hal_I2CJNI_i2CWriteB
   (JNIEnv* env, jclass, jint port, jbyte address, jbyteArray dataToSend,
    jbyte sendSize)
 {
@@ -159,12 +159,12 @@ Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CWriteB
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_I2CJNI
+ * Class:     edu_wpi_first_hal_I2CJNI
  * Method:    i2CRead
  * Signature: (IBLjava/lang/Object;B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CRead
+Java_edu_wpi_first_hal_I2CJNI_i2CRead
   (JNIEnv* env, jclass, jint port, jbyte address, jobject dataReceived,
    jbyte receiveSize)
 {
@@ -182,12 +182,12 @@ Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CRead
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_I2CJNI
+ * Class:     edu_wpi_first_hal_I2CJNI
  * Method:    i2CReadB
  * Signature: (IB[BB)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CReadB
+Java_edu_wpi_first_hal_I2CJNI_i2CReadB
   (JNIEnv* env, jclass, jint port, jbyte address, jbyteArray dataReceived,
    jbyte receiveSize)
 {
@@ -206,12 +206,12 @@ Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CReadB
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_I2CJNI
+ * Class:     edu_wpi_first_hal_I2CJNI
  * Method:    i2CClose
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CClose
+Java_edu_wpi_first_hal_I2CJNI_i2CClose
   (JNIEnv*, jclass, jint port)
 {
   I2CJNI_LOG(logDEBUG) << "Calling I2CJNI i2CClose";
