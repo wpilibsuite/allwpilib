@@ -16,6 +16,7 @@
 namespace frc {
 class CameraServerShared {
  public:
+  virtual ~CameraServerShared() = default;
   virtual void ReportUsbCamera(int id) = 0;
   virtual void ReportAxisCamera(int id) = 0;
   virtual void ReportVideoServer(int id) = 0;
