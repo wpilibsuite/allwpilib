@@ -11,7 +11,7 @@ import org.opencv.core.Mat;
 
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.VideoSource;
-import edu.wpi.first.wpilibj.CameraServerSharedStore;
+import edu.wpi.first.cameraserver.CameraServerSharedStore;
 
 /**
  * A vision runner is a convenient wrapper object to make it easy to run vision pipelines
