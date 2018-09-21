@@ -116,6 +116,7 @@ cppSourcesZip {
 }
 
 cppHeadersZip {
+    dependsOn generateUsageReporting
     from(generatedHeaders) {
         into '/'
     }
