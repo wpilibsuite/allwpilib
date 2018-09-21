@@ -11,7 +11,7 @@
 #include <cstdio>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_wpilibj_hal_NotifierJNI.h"
+#include "edu_wpi_first_hal_NotifierJNI.h"
 #include "hal/Notifier.h"
 #include "hal/cpp/Log.h"
 
@@ -29,12 +29,12 @@ TLogLevel notifierJNILogLevel = logWARNING;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
+ * Class:     edu_wpi_first_hal_NotifierJNI
  * Method:    initializeNotifier
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier
+Java_edu_wpi_first_hal_NotifierJNI_initializeNotifier
   (JNIEnv* env, jclass)
 {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI initializeNotifier";
@@ -53,12 +53,12 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
+ * Class:     edu_wpi_first_hal_NotifierJNI
  * Method:    stopNotifier
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_NotifierJNI_stopNotifier
+Java_edu_wpi_first_hal_NotifierJNI_stopNotifier
   (JNIEnv* env, jclass cls, jint notifierHandle)
 {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI stopNotifier";
@@ -72,12 +72,12 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_stopNotifier
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
+ * Class:     edu_wpi_first_hal_NotifierJNI
  * Method:    cleanNotifier
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier
+Java_edu_wpi_first_hal_NotifierJNI_cleanNotifier
   (JNIEnv* env, jclass, jint notifierHandle)
 {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI cleanNotifier";
@@ -91,12 +91,12 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
+ * Class:     edu_wpi_first_hal_NotifierJNI
  * Method:    updateNotifierAlarm
  * Signature: (IJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifierAlarm
+Java_edu_wpi_first_hal_NotifierJNI_updateNotifierAlarm
   (JNIEnv* env, jclass cls, jint notifierHandle, jlong triggerTime)
 {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI updateNotifierAlarm";
@@ -113,12 +113,12 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifierAlarm
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
+ * Class:     edu_wpi_first_hal_NotifierJNI
  * Method:    cancelNotifierAlarm
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cancelNotifierAlarm
+Java_edu_wpi_first_hal_NotifierJNI_cancelNotifierAlarm
   (JNIEnv* env, jclass cls, jint notifierHandle)
 {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI cancelNotifierAlarm";
@@ -132,12 +132,12 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cancelNotifierAlarm
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
+ * Class:     edu_wpi_first_hal_NotifierJNI
  * Method:    waitForNotifierAlarm
  * Signature: (I)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_NotifierJNI_waitForNotifierAlarm
+Java_edu_wpi_first_hal_NotifierJNI_waitForNotifierAlarm
   (JNIEnv* env, jclass cls, jint notifierHandle)
 {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI waitForNotifierAlarm";

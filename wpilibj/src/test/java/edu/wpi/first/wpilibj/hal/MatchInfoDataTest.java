@@ -9,6 +9,8 @@ package edu.wpi.first.wpilibj.hal;
 
 import org.junit.jupiter.api.Test;
 
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.MatchInfoData;
 import edu.wpi.first.hal.sim.mockdata.DriverStationDataJNI;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 

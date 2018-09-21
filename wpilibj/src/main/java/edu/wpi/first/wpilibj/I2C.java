@@ -9,10 +9,10 @@ package edu.wpi.first.wpilibj;
 
 import java.nio.ByteBuffer;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.I2CJNI;
-import edu.wpi.first.wpilibj.util.BoundaryException;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.I2CJNI;
+import edu.wpi.first.hal.util.BoundaryException;
 
 import static java.util.Objects.requireNonNull;
 

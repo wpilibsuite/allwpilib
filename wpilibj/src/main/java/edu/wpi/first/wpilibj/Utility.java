@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.HALUtil;
+import edu.wpi.first.hal.HALUtil;
 
 /**
  * Contains global utility functions.

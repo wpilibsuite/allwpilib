@@ -10,7 +10,7 @@
 #include <cassert>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_wpilibj_hal_PWMJNI.h"
+#include "edu_wpi_first_hal_PWMJNI.h"
 #include "hal/DIO.h"
 #include "hal/PWM.h"
 #include "hal/Ports.h"
@@ -31,12 +31,12 @@ TLogLevel pwmJNILogLevel = logWARNING;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    initializePWMPort
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_initializePWMPort
+Java_edu_wpi_first_hal_PWMJNI_initializePWMPort
   (JNIEnv* env, jclass, jint id)
 {
   PWMJNI_LOG(logDEBUG) << "Calling PWMJNI initializePWMPort";
@@ -51,12 +51,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_initializePWMPort
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    checkPWMChannel
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_checkPWMChannel
+Java_edu_wpi_first_hal_PWMJNI_checkPWMChannel
   (JNIEnv* env, jclass, jint channel)
 {
   PWMJNI_LOG(logDEBUG) << "Calling PWMJNI checkPWMChannel";
@@ -65,12 +65,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_checkPWMChannel
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    freePWMPort
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWMPort
+Java_edu_wpi_first_hal_PWMJNI_freePWMPort
   (JNIEnv* env, jclass, jint id)
 {
   PWMJNI_LOG(logDEBUG) << "Calling PWMJNI freePWMPort";
@@ -81,12 +81,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWMPort
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    setPWMConfigRaw
  * Signature: (IIIIII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMConfigRaw
+Java_edu_wpi_first_hal_PWMJNI_setPWMConfigRaw
   (JNIEnv* env, jclass, jint id, jint maxPwm, jint deadbandMaxPwm,
    jint centerPwm, jint deadbandMinPwm, jint minPwm)
 {
@@ -99,12 +99,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMConfigRaw
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    setPWMConfig
  * Signature: (IDDDDD)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMConfig
+Java_edu_wpi_first_hal_PWMJNI_setPWMConfig
   (JNIEnv* env, jclass, jint id, jdouble maxPwm, jdouble deadbandMaxPwm,
    jdouble centerPwm, jdouble deadbandMinPwm, jdouble minPwm)
 {
@@ -117,12 +117,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMConfig
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    getPWMConfigRaw
  * Signature: (I)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMConfigRaw
+Java_edu_wpi_first_hal_PWMJNI_getPWMConfigRaw
   (JNIEnv* env, jclass, jint id)
 {
   PWMJNI_LOG(logDEBUG) << "Calling PWMJNI getPWMConfigRaw";
@@ -141,12 +141,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMConfigRaw
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    setPWMEliminateDeadband
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMEliminateDeadband
+Java_edu_wpi_first_hal_PWMJNI_setPWMEliminateDeadband
   (JNIEnv* env, jclass, jint id, jboolean value)
 {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
@@ -157,12 +157,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMEliminateDeadband
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    getPWMEliminateDeadband
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMEliminateDeadband
+Java_edu_wpi_first_hal_PWMJNI_getPWMEliminateDeadband
   (JNIEnv* env, jclass, jint id)
 {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
@@ -174,12 +174,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMEliminateDeadband
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    setPWMRaw
  * Signature: (IS)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMRaw
+Java_edu_wpi_first_hal_PWMJNI_setPWMRaw
   (JNIEnv* env, jclass, jint id, jshort value)
 {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
@@ -191,12 +191,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMRaw
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    setPWMSpeed
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMSpeed
+Java_edu_wpi_first_hal_PWMJNI_setPWMSpeed
   (JNIEnv* env, jclass, jint id, jdouble value)
 {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
@@ -208,12 +208,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMSpeed
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    setPWMPosition
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMPosition
+Java_edu_wpi_first_hal_PWMJNI_setPWMPosition
   (JNIEnv* env, jclass, jint id, jdouble value)
 {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
@@ -225,12 +225,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMPosition
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    getPWMRaw
  * Signature: (I)S
  */
 JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMRaw
+Java_edu_wpi_first_hal_PWMJNI_getPWMRaw
   (JNIEnv* env, jclass, jint id)
 {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
@@ -243,12 +243,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMRaw
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    getPWMSpeed
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMSpeed
+Java_edu_wpi_first_hal_PWMJNI_getPWMSpeed
   (JNIEnv* env, jclass, jint id)
 {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
@@ -261,12 +261,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMSpeed
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    getPWMPosition
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMPosition
+Java_edu_wpi_first_hal_PWMJNI_getPWMPosition
   (JNIEnv* env, jclass, jint id)
 {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
@@ -279,12 +279,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMPosition
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    setPWMDisabled
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMDisabled
+Java_edu_wpi_first_hal_PWMJNI_setPWMDisabled
   (JNIEnv* env, jclass, jint id)
 {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
@@ -295,12 +295,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMDisabled
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    latchPWMZero
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_latchPWMZero
+Java_edu_wpi_first_hal_PWMJNI_latchPWMZero
   (JNIEnv* env, jclass, jint id)
 {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
@@ -311,12 +311,12 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_latchPWMZero
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    setPWMPeriodScale
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMPeriodScale
+Java_edu_wpi_first_hal_PWMJNI_setPWMPeriodScale
   (JNIEnv* env, jclass, jint id, jint value)
 {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;

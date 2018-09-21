@@ -19,7 +19,7 @@
 #include <wpi/jni_util.h>
 #include <wpi/raw_ostream.h>
 
-#include "edu_wpi_first_wpilibj_hal_HALUtil.h"
+#include "edu_wpi_first_hal_HALUtil.h"
 #include "hal/CAN.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
@@ -61,26 +61,25 @@ static JClass accumulatorResultCls;
 static JClass canDataCls;
 
 static const JClassInit classes[] = {
-    {"edu/wpi/first/wpilibj/PWMConfigDataResult", &pwmConfigDataResultCls},
-    {"edu/wpi/first/wpilibj/can/CANStatus", &canStatusCls},
-    {"edu/wpi/first/wpilibj/hal/MatchInfoData", &matchInfoDataCls},
-    {"edu/wpi/first/wpilibj/AccumulatorResult", &accumulatorResultCls},
-    {"edu/wpi/first/wpilibj/CANData", &canDataCls}};
+    {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
+    {"edu/wpi/first/hal/can/CANStatus", &canStatusCls},
+    {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
+    {"edu/wpi/first/hal/AccumulatorResult", &accumulatorResultCls},
+    {"edu/wpi/first/hal/CANData", &canDataCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
-    {"edu/wpi/first/wpilibj/util/BoundaryException", &boundaryExCls},
-    {"edu/wpi/first/wpilibj/util/AllocationException", &allocationExCls},
-    {"edu/wpi/first/wpilibj/util/HalHandleException", &halHandleExCls},
-    {"edu/wpi/first/wpilibj/can/CANInvalidBufferException",
-     &canInvalidBufferExCls},
-    {"edu/wpi/first/wpilibj/can/CANMessageNotFoundException",
+    {"edu/wpi/first/hal/util/BoundaryException", &boundaryExCls},
+    {"edu/wpi/first/hal/util/AllocationException", &allocationExCls},
+    {"edu/wpi/first/hal/util/HalHandleException", &halHandleExCls},
+    {"edu/wpi/first/hal/can/CANInvalidBufferException", &canInvalidBufferExCls},
+    {"edu/wpi/first/hal/can/CANMessageNotFoundException",
      &canMessageNotFoundExCls},
-    {"edu/wpi/first/wpilibj/can/CANMessageNotAllowedException",
+    {"edu/wpi/first/hal/can/CANMessageNotAllowedException",
      &canMessageNotAllowedExCls},
-    {"edu/wpi/first/wpilibj/can/CANNotInitializedException",
+    {"edu/wpi/first/hal/can/CANNotInitializedException",
      &canNotInitializedExCls},
-    {"edu/wpi/first/wpilibj/util/UncleanStatusException", &uncleanStatusExCls}};
+    {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls}};
 
 namespace frc {
 
@@ -339,12 +338,12 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getFPGAVersion
  * Signature: ()S
  */
 JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAVersion
+Java_edu_wpi_first_hal_HALUtil_getFPGAVersion
   (JNIEnv* env, jclass)
 {
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGAVersion";
@@ -357,12 +356,12 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAVersion
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getFPGARevision
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGARevision
+Java_edu_wpi_first_hal_HALUtil_getFPGARevision
   (JNIEnv* env, jclass)
 {
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGARevision";
@@ -375,12 +374,12 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGARevision
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getFPGATime
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime
+Java_edu_wpi_first_hal_HALUtil_getFPGATime
   (JNIEnv* env, jclass)
 {
   // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
@@ -393,12 +392,12 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getHALRuntimeType
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALRuntimeType
+Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType
   (JNIEnv* env, jclass)
 {
   // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALRuntimeType";
@@ -408,12 +407,12 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALRuntimeType
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getFPGAButton
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton
+Java_edu_wpi_first_hal_HALUtil_getFPGAButton
   (JNIEnv* env, jclass)
 {
   // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
@@ -426,12 +425,12 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getHALErrorMessage
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage
+Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage
   (JNIEnv* paramEnv, jclass, jint paramId)
 {
   const char* msg = HAL_GetErrorMessage(paramId);
@@ -441,24 +440,24 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getHALErrno
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrno
+Java_edu_wpi_first_hal_HALUtil_getHALErrno
   (JNIEnv*, jclass)
 {
   return errno;
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getHALstrerror
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALstrerror
+Java_edu_wpi_first_hal_HALUtil_getHALstrerror
   (JNIEnv* env, jclass, jint errorCode)
 {
   const char* msg = std::strerror(errno);

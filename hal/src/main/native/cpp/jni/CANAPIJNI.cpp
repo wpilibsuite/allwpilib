@@ -14,7 +14,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_wpilibj_hal_CANAPIJNI.h"
+#include "edu_wpi_first_hal_CANAPIJNI.h"
 #include "hal/CAN.h"
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
@@ -25,12 +25,12 @@ using namespace wpi::java;
 
 extern "C" {
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CANAPIJNI
+ * Class:     edu_wpi_first_hal_CANAPIJNI
  * Method:    initializeCAN
  * Signature: (III)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_initializeCAN
+Java_edu_wpi_first_hal_CANAPIJNI_initializeCAN
   (JNIEnv* env, jclass, jint manufacturer, jint deviceId, jint deviceType)
 {
   int32_t status = 0;
@@ -44,24 +44,24 @@ Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_initializeCAN
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CANAPIJNI
+ * Class:     edu_wpi_first_hal_CANAPIJNI
  * Method:    cleanCAN
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_cleanCAN
+Java_edu_wpi_first_hal_CANAPIJNI_cleanCAN
   (JNIEnv* env, jclass, jint handle)
 {
   HAL_CleanCAN(static_cast<HAL_CANHandle>(handle));
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CANAPIJNI
+ * Class:     edu_wpi_first_hal_CANAPIJNI
  * Method:    writeCANPacket
  * Signature: (I[BI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_writeCANPacket
+Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacket
   (JNIEnv* env, jclass, jint handle, jbyteArray data, jint apiId)
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
@@ -74,12 +74,12 @@ Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_writeCANPacket
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CANAPIJNI
+ * Class:     edu_wpi_first_hal_CANAPIJNI
  * Method:    writeCANPacketRepeating
  * Signature: (I[BII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_writeCANPacketRepeating
+Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeating
   (JNIEnv* env, jclass, jint handle, jbyteArray data, jint apiId,
    jint timeoutMs)
 {
@@ -94,12 +94,12 @@ Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_writeCANPacketRepeating
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CANAPIJNI
+ * Class:     edu_wpi_first_hal_CANAPIJNI
  * Method:    stopCANPacketRepeating
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_stopCANPacketRepeating
+Java_edu_wpi_first_hal_CANAPIJNI_stopCANPacketRepeating
   (JNIEnv* env, jclass, jint handle, jint apiId)
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
@@ -109,12 +109,12 @@ Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_stopCANPacketRepeating
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CANAPIJNI
+ * Class:     edu_wpi_first_hal_CANAPIJNI
  * Method:    readCANPacketNew
  * Signature: (IILjava/lang/Object;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacketNew
+Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketNew
   (JNIEnv* env, jclass, jint handle, jint apiId, jobject data)
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
@@ -141,12 +141,12 @@ Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacketNew
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CANAPIJNI
+ * Class:     edu_wpi_first_hal_CANAPIJNI
  * Method:    readCANPacketLatest
  * Signature: (IILjava/lang/Object;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacketLatest
+Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketLatest
   (JNIEnv* env, jclass, jint handle, jint apiId, jobject data)
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
@@ -173,12 +173,12 @@ Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacketLatest
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CANAPIJNI
+ * Class:     edu_wpi_first_hal_CANAPIJNI
  * Method:    readCANPacketTimeout
  * Signature: (IIILjava/lang/Object;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacketTimeout
+Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketTimeout
   (JNIEnv* env, jclass, jint handle, jint apiId, jint timeoutMs, jobject data)
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
@@ -206,12 +206,12 @@ Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPacketTimeout
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CANAPIJNI
+ * Class:     edu_wpi_first_hal_CANAPIJNI
  * Method:    readCANPeriodicPacket
  * Signature: (IIIILjava/lang/Object;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_CANAPIJNI_readCANPeriodicPacket
+Java_edu_wpi_first_hal_CANAPIJNI_readCANPeriodicPacket
   (JNIEnv* env, jclass, jint handle, jint apiId, jint timeoutMs, jint periodMs,
    jobject data)
 {

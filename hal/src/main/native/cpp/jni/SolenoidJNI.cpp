@@ -8,7 +8,7 @@
 #include <jni.h>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_wpilibj_hal_SolenoidJNI.h"
+#include "edu_wpi_first_hal_SolenoidJNI.h"
 #include "hal/Ports.h"
 #include "hal/Solenoid.h"
 #include "hal/cpp/Log.h"
@@ -27,12 +27,12 @@ TLogLevel solenoidJNILogLevel = logERROR;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    initializeSolenoidPort
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_initializeSolenoidPort
+Java_edu_wpi_first_hal_SolenoidJNI_initializeSolenoidPort
   (JNIEnv* env, jclass, jint id)
 {
   SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI initializeSolenoidPort";
@@ -53,12 +53,12 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_initializeSolenoidPort
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    checkSolenoidChannel
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_checkSolenoidChannel
+Java_edu_wpi_first_hal_SolenoidJNI_checkSolenoidChannel
   (JNIEnv* env, jclass, jint channel)
 {
   SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI checkSolenoidChannel";
@@ -67,12 +67,12 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_checkSolenoidChannel
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    checkSolenoidModule
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_checkSolenoidModule
+Java_edu_wpi_first_hal_SolenoidJNI_checkSolenoidModule
   (JNIEnv* env, jclass, jint module)
 {
   SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI checkSolenoidModule";
@@ -81,12 +81,12 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_checkSolenoidModule
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    freeSolenoidPort
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_freeSolenoidPort
+Java_edu_wpi_first_hal_SolenoidJNI_freeSolenoidPort
   (JNIEnv* env, jclass, jint id)
 {
   SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI initializeSolenoidPort";
@@ -96,12 +96,12 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_freeSolenoidPort
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    setSolenoid
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_setSolenoid
+Java_edu_wpi_first_hal_SolenoidJNI_setSolenoid
   (JNIEnv* env, jclass, jint solenoid_port, jboolean value)
 {
   SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI SetSolenoid";
@@ -115,12 +115,12 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_setSolenoid
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    getSolenoid
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getSolenoid
+Java_edu_wpi_first_hal_SolenoidJNI_getSolenoid
   (JNIEnv* env, jclass, jint solenoid_port)
 {
   int32_t status = 0;
@@ -130,12 +130,12 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getSolenoid
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    getAllSolenoids
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getAllSolenoids
+Java_edu_wpi_first_hal_SolenoidJNI_getAllSolenoids
   (JNIEnv* env, jclass, jint module)
 {
   int32_t status = 0;
@@ -145,12 +145,12 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getAllSolenoids
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    getPCMSolenoidBlackList
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidBlackList
+Java_edu_wpi_first_hal_SolenoidJNI_getPCMSolenoidBlackList
   (JNIEnv* env, jclass, jint module)
 {
   int32_t status = 0;
@@ -159,12 +159,12 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidBlackList
   return val;
 }
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    getPCMSolenoidVoltageStickyFault
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageStickyFault
+Java_edu_wpi_first_hal_SolenoidJNI_getPCMSolenoidVoltageStickyFault
   (JNIEnv* env, jclass, jint module)
 {
   int32_t status = 0;
@@ -173,12 +173,12 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageStickyFault
   return val;
 }
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    getPCMSolenoidVoltageFault
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageFault
+Java_edu_wpi_first_hal_SolenoidJNI_getPCMSolenoidVoltageFault
   (JNIEnv* env, jclass, jint module)
 {
   int32_t status = 0;
@@ -187,12 +187,12 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageFault
   return val;
 }
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    clearAllPCMStickyFaults
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_clearAllPCMStickyFaults
+Java_edu_wpi_first_hal_SolenoidJNI_clearAllPCMStickyFaults
   (JNIEnv* env, jclass, jint module)
 {
   int32_t status = 0;
@@ -201,12 +201,12 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_clearAllPCMStickyFaults
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    setOneShotDuration
  * Signature: (IJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_setOneShotDuration
+Java_edu_wpi_first_hal_SolenoidJNI_setOneShotDuration
   (JNIEnv* env, jclass, jint solenoid_port, jlong durationMS)
 {
   SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI SetOneShotDuration";
@@ -222,12 +222,12 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_setOneShotDuration
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    fireOneShot
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_fireOneShot
+Java_edu_wpi_first_hal_SolenoidJNI_fireOneShot
   (JNIEnv* env, jclass, jint solenoid_port)
 {
   SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI fireOneShot";

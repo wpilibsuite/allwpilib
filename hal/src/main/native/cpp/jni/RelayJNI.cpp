@@ -10,7 +10,7 @@
 #include <cassert>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_wpilibj_hal_RelayJNI.h"
+#include "edu_wpi_first_hal_RelayJNI.h"
 #include "hal/Ports.h"
 #include "hal/Relay.h"
 #include "hal/cpp/Log.h"
@@ -30,12 +30,12 @@ TLogLevel relayJNILogLevel = logWARNING;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_RelayJNI
+ * Class:     edu_wpi_first_hal_RelayJNI
  * Method:    initializeRelayPort
  * Signature: (IZ)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_RelayJNI_initializeRelayPort
+Java_edu_wpi_first_hal_RelayJNI_initializeRelayPort
   (JNIEnv* env, jclass, jint id, jboolean fwd)
 {
   RELAYJNI_LOG(logDEBUG) << "Calling RELAYJNI initializeRelayPort";
@@ -52,12 +52,12 @@ Java_edu_wpi_first_wpilibj_hal_RelayJNI_initializeRelayPort
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_RelayJNI
+ * Class:     edu_wpi_first_hal_RelayJNI
  * Method:    freeRelayPort
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_RelayJNI_freeRelayPort
+Java_edu_wpi_first_hal_RelayJNI_freeRelayPort
   (JNIEnv* env, jclass, jint id)
 {
   RELAYJNI_LOG(logDEBUG) << "Calling RELAYJNI freeRelayPort";
@@ -66,12 +66,12 @@ Java_edu_wpi_first_wpilibj_hal_RelayJNI_freeRelayPort
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_RelayJNI
+ * Class:     edu_wpi_first_hal_RelayJNI
  * Method:    checkRelayChannel
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_RelayJNI_checkRelayChannel
+Java_edu_wpi_first_hal_RelayJNI_checkRelayChannel
   (JNIEnv* env, jclass, jint channel)
 {
   RELAYJNI_LOG(logDEBUG) << "Calling RELAYJNI checkRelayChannel";
@@ -80,12 +80,12 @@ Java_edu_wpi_first_wpilibj_hal_RelayJNI_checkRelayChannel
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_RelayJNI
+ * Class:     edu_wpi_first_hal_RelayJNI
  * Method:    setRelay
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_RelayJNI_setRelay
+Java_edu_wpi_first_hal_RelayJNI_setRelay
   (JNIEnv* env, jclass, jint id, jboolean value)
 {
   RELAYJNI_LOG(logDEBUG) << "Calling RELAYJNI setRelay";
@@ -98,12 +98,12 @@ Java_edu_wpi_first_wpilibj_hal_RelayJNI_setRelay
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_RelayJNI
+ * Class:     edu_wpi_first_hal_RelayJNI
  * Method:    getRelay
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_RelayJNI_getRelay
+Java_edu_wpi_first_hal_RelayJNI_getRelay
   (JNIEnv* env, jclass, jint id)
 {
   RELAYJNI_LOG(logDEBUG) << "Calling RELAYJNI getRelay";

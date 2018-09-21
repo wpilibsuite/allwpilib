@@ -10,7 +10,7 @@
 #include <cassert>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_wpilibj_hal_ThreadsJNI.h"
+#include "edu_wpi_first_hal_ThreadsJNI.h"
 #include "hal/Threads.h"
 #include "hal/cpp/Log.h"
 
@@ -27,12 +27,12 @@ TLogLevel threadsJNILogLevel = logWARNING;
 
 extern "C" {
 /*
- * Class:     edu_wpi_first_wpilibj_hal_ThreadsJNI
+ * Class:     edu_wpi_first_hal_ThreadsJNI
  * Method:    getCurrentThreadPriority
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_ThreadsJNI_getCurrentThreadPriority
+Java_edu_wpi_first_hal_ThreadsJNI_getCurrentThreadPriority
   (JNIEnv* env, jclass)
 {
   THREADSJNI_LOG(logDEBUG) << "Callling GetCurrentThreadPriority";
@@ -44,12 +44,12 @@ Java_edu_wpi_first_wpilibj_hal_ThreadsJNI_getCurrentThreadPriority
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_ThreadsJNI
+ * Class:     edu_wpi_first_hal_ThreadsJNI
  * Method:    getCurrentThreadIsRealTime
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_ThreadsJNI_getCurrentThreadIsRealTime
+Java_edu_wpi_first_hal_ThreadsJNI_getCurrentThreadIsRealTime
   (JNIEnv* env, jclass)
 {
   THREADSJNI_LOG(logDEBUG) << "Callling GetCurrentThreadIsRealTime";
@@ -61,12 +61,12 @@ Java_edu_wpi_first_wpilibj_hal_ThreadsJNI_getCurrentThreadIsRealTime
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_ThreadsJNI
+ * Class:     edu_wpi_first_hal_ThreadsJNI
  * Method:    setCurrentThreadPriority
  * Signature: (ZI)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_ThreadsJNI_setCurrentThreadPriority
+Java_edu_wpi_first_hal_ThreadsJNI_setCurrentThreadPriority
   (JNIEnv* env, jclass, jboolean realTime, jint priority)
 {
   THREADSJNI_LOG(logDEBUG) << "Callling SetCurrentThreadPriority";
