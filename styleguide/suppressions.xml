@@ -9,4 +9,6 @@ suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
             checks="JavadocMethod" />
   <suppress files=".*JNI.*"
             checks="(LineLength|EmptyLineSeparator|ParameterName)" />
+  <suppress files="package-info.java"
+            checks="LineLength" />
 </suppressions>
