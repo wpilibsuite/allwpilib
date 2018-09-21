@@ -38,7 +38,7 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
  * @deprecated Use {@link edu.wpi.first.networktables.NetworkTable} instead.
  */
 @Deprecated
-@SuppressWarnings("checkstyle:all")
+@SuppressWarnings({"checkstyle:all", "PMD"})
 public class NetworkTable implements ITable, IRemote {
   /**
    * The path separator for sub-tables and keys
