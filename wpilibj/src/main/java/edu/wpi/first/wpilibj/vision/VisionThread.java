@@ -18,7 +18,7 @@ import edu.wpi.cscore.VideoSource;
  * @see VisionRunner
  * @see Thread#setDaemon(boolean)
  *
- * @deprecated Replaced with edu.wpi.first.cameraserver.vision.VisionThread
+ * @deprecated Replaced with edu.wpi.first.vision.VisionThread
  */
 @Deprecated
 public class VisionThread extends Thread {

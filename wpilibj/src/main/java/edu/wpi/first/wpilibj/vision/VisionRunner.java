@@ -22,7 +22,7 @@ import edu.wpi.first.cameraserver.CameraServerSharedStore;
  * @see VisionThread
  * @see <a href="package-summary.html">vision</a>
  *
- * @deprecated Replaced with edu.wpi.first.cameraserver.vision.VisionRunner
+ * @deprecated Replaced with edu.wpi.first.vision.VisionRunner
  */
 @Deprecated
 public class VisionRunner<P extends VisionPipeline> {

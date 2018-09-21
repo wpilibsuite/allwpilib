@@ -16,7 +16,7 @@ import org.opencv.core.Mat;
  * @see VisionRunner
  * @see VisionThread
  *
- * @deprecated Replaced with edu.wpi.first.cameraserver.vision.VisionPipeline
+ * @deprecated Replaced with edu.wpi.first.vision.VisionPipeline
  */
 @Deprecated
 public interface VisionPipeline {
