@@ -16,16 +16,16 @@ model {
       artifactId = 'chipobject'
       headerClassifier = 'headers'
       ext = 'zip'
-      version = '2018.17.0'
+      version = '2018.17.1'
       sharedConfigs = chipObjectConfigs
       staticConfigs = [:]
     }
     netcomm(DependencyConfig) {
       groupId = 'edu.wpi.first.ni-libraries'
-      artifactId = 'netcomm-cpp'
+      artifactId = 'netcomm'
       headerClassifier = 'headers'
       ext = 'zip'
-      version = '2018.17.0'
+      version = '2018.17.1'
       sharedConfigs = netCommLibConfigs
       staticConfigs = [:]
     }
