@@ -117,7 +117,7 @@ cppSourcesZip {
 
 cppHeadersZip {
     from(generatedHeaders) {
-        into '/hal'
+        into '/'
     }
 }
 
