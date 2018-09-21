@@ -21,7 +21,10 @@ import edu.wpi.first.cameraserver.CameraServerSharedStore;
  * @see VisionPipeline
  * @see VisionThread
  * @see <a href="package-summary.html">vision</a>
+ *
+ * @deprecated Replaced with edu.wpi.first.cameraserver.vision.VisionRunner
  */
+@Deprecated
 public class VisionRunner<P extends VisionPipeline> {
   private final CvSink m_cvSink = new CvSink("VisionRunner CvSink");
   private final P m_pipeline;

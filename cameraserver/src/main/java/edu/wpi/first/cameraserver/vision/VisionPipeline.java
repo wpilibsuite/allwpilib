@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.vision;
+package edu.wpi.first.cameraserver.vision;
 
 import org.opencv.core.Mat;
 

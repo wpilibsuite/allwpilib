@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj;
+package edu.wpi.first.cameraserver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +13,6 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import edu.wpi.first.cameraserver.CameraServerSharedStore;
 import edu.wpi.cscore.AxisCamera;
 import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.cscore.CvSink;

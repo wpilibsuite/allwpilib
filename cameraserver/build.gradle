@@ -9,6 +9,14 @@ evaluationDependsOn(':hal')
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
+checkstyle {
+    checkstyleMain {
+        // This is required because of a too long line in vision/package-info.java.
+        // Changing the length of this line changes the semantics of the doc.
+        exclude '**/package-info.java'
+    }
+}
+
 dependencies {
     compile project(':wpiutil')
     compile project(':ntcore')
