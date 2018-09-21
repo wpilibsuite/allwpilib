@@ -16,7 +16,7 @@ import java.util.Set;
  * @deprecated Use {@link edu.wpi.first.networktables.NetworkTable}.
  */
 @Deprecated
-@SuppressWarnings({"checkstyle:all", "PMD"})
+@SuppressWarnings("checkstyle:all")
 public interface ITable {
 
   /**
