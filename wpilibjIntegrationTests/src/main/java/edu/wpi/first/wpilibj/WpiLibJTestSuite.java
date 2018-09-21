@@ -19,12 +19,11 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
  */
 @RunWith(Suite.class)
 @SuiteClasses({AnalogCrossConnectTest.class, AnalogPotentiometerTest.class,
-    BuiltInAccelerometerTest.class,
-    CircularBufferTest.class, ConstantsPortsTest.class, CounterTest.class,
+    BuiltInAccelerometerTest.class, ConstantsPortsTest.class, CounterTest.class,
     DigitalGlitchFilterTest.class, DIOCrossConnectTest.class, DriverStationTest.class,
     EncoderTest.class, FilterNoiseTest.class, FilterOutputTest.class, GyroTest.class,
     MotorEncoderTest.class, MotorInvertingTest.class, PCMTest.class, PDPTest.class,
-    PIDTest.class, PIDToleranceTest.class, PreferencesTest.class, RelayCrossConnectTest.class,
+    PIDTest.class, PreferencesTest.class, RelayCrossConnectTest.class,
     RobotDriveTest.class, SampleTest.class, TimerTest.class})
 public class WpiLibJTestSuite extends AbstractTestSuite {
 }

@@ -22,7 +22,6 @@ repositories {
 
 dependencies {
     compile project(':wpilibj')
-    compile files(project(':wpilibj').sourceSets.test.output)
     compile project(':hal')
     compile project(':wpiutil')
     compile project(':ntcore')
