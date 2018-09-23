@@ -10,9 +10,11 @@
 
 #include <uv.h>
 
+#include <atomic>
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <thread>
 #include <utility>
 
 #include "wpi/Signal.h"
@@ -95,8 +97,10 @@ class Loop final : public std::enable_shared_from_this<Loop> {
    * @return True when done, false in all other cases.
    */
   bool Run(Mode mode = kDefault) {
-    return uv_run(m_loop, static_cast<uv_run_mode>(static_cast<int>(mode))) ==
-           0;
+    m_tid = std::this_thread::get_id();
+    int rv = uv_run(m_loop, static_cast<uv_run_mode>(static_cast<int>(mode)));
+    m_tid = std::thread::id{};
+    return rv == 0;
   }
 
   /**
@@ -224,6 +228,12 @@ class Loop final : public std::enable_shared_from_this<Loop> {
   void SetData(std::shared_ptr<void> data) { m_data = std::move(data); }
 
   /**
+   * Get the thread id of the loop thread.  If the loop is not currently
+   * running, returns default-constructed thread id.
+   */
+  std::thread::id GetThreadId() const { return m_tid; }
+
+  /**
    * Error signal
    */
   sig::Signal<Error> error;
@@ -238,6 +248,7 @@ class Loop final : public std::enable_shared_from_this<Loop> {
   std::shared_ptr<void> m_data;
   uv_loop_t* m_loop;
   uv_loop_t m_loopStruct;
+  std::atomic<std::thread::id> m_tid;
 };
 
 }  // namespace uv
