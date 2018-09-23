@@ -9,6 +9,7 @@
 #define WPIUTIL_WPI_EVENTLOOPRUNNER_H_
 
 #include <functional>
+#include <memory>
 
 #include "wpi/SafeThread.h"
 #include "wpi/uv/Loop.h"
@@ -41,6 +42,12 @@ class EventLoopRunner {
    * @param func function to execute on the loop
    */
   void ExecSync(LoopFunc func);
+
+  /**
+   * Get the loop.  If the loop thread is not running, returns nullptr.
+   * @return The loop
+   */
+  std::shared_ptr<uv::Loop> GetLoop();
 
  private:
   class Thread;

@@ -63,3 +63,8 @@ void EventLoopRunner::ExecSync(LoopFunc func) {
     }
   }
 }
+
+std::shared_ptr<uv::Loop> EventLoopRunner::GetLoop() {
+  if (auto thr = m_owner.GetThread()) return thr->m_loop;
+  return nullptr;
+}
