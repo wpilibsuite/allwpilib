@@ -46,12 +46,12 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   initializeDigital(status);
   if (*status != 0) return;
 
-  if (port > 1) {
+  if (port < 0 || port > 1) {
     // Set port out of range error here
     return;
   }
 
-  if (port == 0) {
+  if (port == HAL_I2C_kOnboard) {
     std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
     i2COnboardObjCount++;
     if (i2COnboardObjCount > 1) return;
@@ -88,7 +88,7 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
 int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
                            const uint8_t* dataToSend, int32_t sendSize,
                            uint8_t* dataReceived, int32_t receiveSize) {
-  if (port > 1) {
+  if (port < 0 || port > 1) {
     // Set port out of range error here
     return -1;
   }
@@ -107,7 +107,7 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
   rdwr.msgs = msgs;
   rdwr.nmsgs = 2;
 
-  if (port == 0) {
+  if (port == HAL_I2C_kOnboard) {
     std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
     return ioctl(i2COnBoardHandle, I2C_RDWR, &rdwr);
   } else {
@@ -118,7 +118,7 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
 
 int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
                      const uint8_t* dataToSend, int32_t sendSize) {
-  if (port > 1) {
+  if (port < 0 || port > 1) {
     // Set port out of range error here
     return -1;
   }
@@ -133,7 +133,7 @@ int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
   rdwr.msgs = &msg;
   rdwr.nmsgs = 1;
 
-  if (port == 0) {
+  if (port == HAL_I2C_kOnboard) {
     std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
     return ioctl(i2COnBoardHandle, I2C_RDWR, &rdwr);
   } else {
@@ -144,7 +144,7 @@ int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
 
 int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
                     int32_t count) {
-  if (port > 1) {
+  if (port < 0 || port > 1) {
     // Set port out of range error here
     return -1;
   }
@@ -159,7 +159,7 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
   rdwr.msgs = &msg;
   rdwr.nmsgs = 1;
 
-  if (port == 0) {
+  if (port == HAL_I2C_kOnboard) {
     std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
     return ioctl(i2COnBoardHandle, I2C_RDWR, &rdwr);
   } else {
@@ -169,12 +169,12 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
 }
 
 void HAL_CloseI2C(HAL_I2CPort port) {
-  if (port > 1) {
+  if (port < 0 || port > 1) {
     // Set port out of range error here
     return;
   }
 
-  if (port == 0) {
+  if (port == HAL_I2C_kOnboard) {
     std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
     if (i2COnboardObjCount-- == 0) {
       close(i2COnBoardHandle);

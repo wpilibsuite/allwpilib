@@ -20,7 +20,8 @@
 
 // clang-format off
 HAL_ENUM(HAL_SPIPort) {
-  HAL_SPI_kOnboardCS0 = 0,
+  HAL_SPI_kInvalid = -1,
+  HAL_SPI_kOnboardCS0,
   HAL_SPI_kOnboardCS1,
   HAL_SPI_kOnboardCS2,
   HAL_SPI_kOnboardCS3,

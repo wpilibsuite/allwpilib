@@ -110,7 +110,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
   int handle;
   if (HAL_GetSPIHandle(port) != 0) return;
   switch (port) {
-    case 0:
+    case HAL_SPI_kOnboardCS0:
       CommonSPIPortInit(status);
       if (*status != 0) return;
       // CS0 is not a DIO port, so nothing to allocate
@@ -123,7 +123,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       HAL_SetSPIHandle(HAL_SPI_kOnboardCS0, handle);
       break;
-    case 1:
+    case HAL_SPI_kOnboardCS1:
       CommonSPIPortInit(status);
       if (*status != 0) return;
       // CS1, Allocate
@@ -144,7 +144,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       HAL_SetSPIHandle(HAL_SPI_kOnboardCS1, handle);
       break;
-    case 2:
+    case HAL_SPI_kOnboardCS2:
       CommonSPIPortInit(status);
       if (*status != 0) return;
       // CS2, Allocate
@@ -165,7 +165,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       HAL_SetSPIHandle(HAL_SPI_kOnboardCS2, handle);
       break;
-    case 3:
+    case HAL_SPI_kOnboardCS3:
       CommonSPIPortInit(status);
       if (*status != 0) return;
       // CS3, Allocate
@@ -186,7 +186,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       HAL_SetSPIHandle(HAL_SPI_kOnboardCS3, handle);
       break;
-    case 4:
+    case HAL_SPI_kMXP:
       initializeDigital(status);
       if (*status != 0) return;
       if ((digitalHandles[5] = HAL_InitializeDIOPort(createPortHandleForSPI(14),
