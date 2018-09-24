@@ -31,6 +31,8 @@ jobs:
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
         options: '-PonlyAthena'
+        checkStyleRunAnalysis: true
+        pmdRunAnalysis: true
 
  - job: Linux
    pool:
@@ -45,10 +47,12 @@ jobs:
         javaHomeOption: 'JDKVersion'
         jdkVersionOption: '1.8'
         jdkArchitectureOption: 'x64'
-        publishJUnitResults: false
+        publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
         options: '-PskipAthena'
+        checkStyleRunAnalysis: true
+        pmdRunAnalysis: true
 
  - job: Styleguide
    pool:
@@ -83,9 +87,11 @@ jobs:
         javaHomeOption: 'JDKVersion'
         jdkVersionOption: '1.8'
         jdkArchitectureOption: 'x64'
-        publishJUnitResults: false
+        publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
+        checkStyleRunAnalysis: true
+        pmdRunAnalysis: true
 
  - job: Windows_32_Bit
    pool:
@@ -99,9 +105,11 @@ jobs:
         javaHomeOption: 'JDKVersion'
         jdkVersionOption: '1.8'
         jdkArchitectureOption: 'x86'
-        publishJUnitResults: false
+        publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
+        checkStyleRunAnalysis: true
+        pmdRunAnalysis: true
 
  - job: Mac
    pool:
@@ -115,6 +123,8 @@ jobs:
         javaHomeOption: 'JDKVersion'
         jdkVersionOption: '1.8'
         jdkArchitectureOption: 'x64'
-        publishJUnitResults: false
+        publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
+        checkStyleRunAnalysis: true
+        pmdRunAnalysis: true
