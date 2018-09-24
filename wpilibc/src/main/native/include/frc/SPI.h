@@ -11,12 +11,11 @@
 
 #include <memory>
 
+#include <hal/SPI.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/deprecated.h>
 
 #include "frc/ErrorBase.h"
-
-enum HAL_SPIPort : int32_t;
 
 namespace frc {
 
@@ -315,7 +314,7 @@ class SPI : public ErrorBase {
   void GetAccumulatorOutput(int64_t& value, int64_t& count) const;
 
  protected:
-  HAL_SPIPort m_port;
+  HAL_SPIPort m_port = HAL_SPI_kInvalid;
   bool m_msbFirst = false;          // Default little-endian
   bool m_sampleOnTrailing = false;  // Default data updated on falling edge
   bool m_clockIdleHigh = false;     // Default clock active high
