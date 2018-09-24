@@ -318,7 +318,7 @@ class SPI : public ErrorBase {
   HAL_SPIPort m_port;
   bool m_msbFirst = false;          // Default little-endian
   bool m_sampleOnTrailing = false;  // Default data updated on falling edge
-  bool m_clk_idle_high = false;     // Default clock active high
+  bool m_clockIdleHigh = false;     // Default clock active high
 
  private:
   void Init();

@@ -33,9 +33,9 @@ public class SPI implements AutoCloseable {
   private static int devices;
 
   private int m_port;
-  private int m_bitOrder;
-  private int m_clockPolarity;
-  private int m_dataOnTrailing;
+  private int m_msbFirst;
+  private int m_clockIdleHigh;
+  private int m_sampleOnTrailing;
 
   /**
    * Constructor.
@@ -81,8 +81,8 @@ public class SPI implements AutoCloseable {
    * first.
    */
   public final void setMSBFirst() {
-    m_bitOrder = 1;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_msbFirst = 1;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -90,8 +90,8 @@ public class SPI implements AutoCloseable {
    * first.
    */
   public final void setLSBFirst() {
-    m_bitOrder = 0;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_msbFirst = 0;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -99,8 +99,8 @@ public class SPI implements AutoCloseable {
    * or clock idle high.
    */
   public final void setClockActiveLow() {
-    m_clockPolarity = 1;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_clockIdleHigh = 1;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -108,8 +108,8 @@ public class SPI implements AutoCloseable {
    * or clock idle low.
    */
   public final void setClockActiveHigh() {
-    m_clockPolarity = 0;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_clockIdleHigh = 0;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -117,8 +117,8 @@ public class SPI implements AutoCloseable {
    * edge.
    */
   public final void setSampleDataOnLeadingEdge() {
-    m_dataOnTrailing = 0;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_sampleOnTrailing = 0;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -126,8 +126,8 @@ public class SPI implements AutoCloseable {
    * edge.
    */
   public final void setSampleDataOnTrailingEdge() {
-    m_dataOnTrailing = 1;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_sampleOnTrailing = 1;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -137,8 +137,8 @@ public class SPI implements AutoCloseable {
    */
   @Deprecated
   public final void setSampleDataOnFalling() {
-    m_dataOnTrailing = 1;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_sampleOnTrailing = 1;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -148,8 +148,8 @@ public class SPI implements AutoCloseable {
    */
   @Deprecated
   public final void setSampleDataOnRising() {
-    m_dataOnTrailing = 0;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_sampleOnTrailing = 0;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
 
