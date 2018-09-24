@@ -63,6 +63,9 @@ class AnalogAccelerometer : public ErrorBase,
 
   ~AnalogAccelerometer() override = default;
 
+  AnalogAccelerometer(AnalogAccelerometer&&) = default;
+  AnalogAccelerometer& operator=(AnalogAccelerometer&&) = default;
+
   /**
    * Return the acceleration in Gs.
    *

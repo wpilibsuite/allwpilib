@@ -7,6 +7,8 @@
 
 #include "frc/CAN.h"
 
+#include <utility>
+
 #include <hal/HAL.h>
 
 using namespace frc;
@@ -44,6 +46,18 @@ CAN::~CAN() {
     HAL_CleanCAN(m_handle);
     m_handle = HAL_kInvalidHandle;
   }
+}
+
+CAN::CAN(CAN&& rhs) : ErrorBase(std::move(rhs)) {
+  std::swap(m_handle, rhs.m_handle);
+}
+
+CAN& CAN::operator=(CAN&& rhs) {
+  ErrorBase::operator=(std::move(rhs));
+
+  std::swap(m_handle, rhs.m_handle);
+
+  return *this;
 }
 
 void CAN::WritePacket(const uint8_t* data, int length, int apiId) {

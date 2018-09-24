@@ -35,8 +35,8 @@ class Watchdog {
    */
   explicit Watchdog(double timeout, std::function<void()> callback = [] {});
 
-  Watchdog(const Watchdog&) = delete;
-  Watchdog& operator=(const Watchdog&) = delete;
+  Watchdog(Watchdog&&) = default;
+  Watchdog& operator=(Watchdog&&) = default;
 
   /**
    * Get the time in seconds since the watchdog was last fed.

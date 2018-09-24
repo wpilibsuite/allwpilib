@@ -24,6 +24,9 @@ class PWMVictorSPX : public PWMSpeedController {
    *                are on-board, 10-19 are on the MXP port
    */
   explicit PWMVictorSPX(int channel);
+
+  PWMVictorSPX(PWMVictorSPX&&) = default;
+  PWMVictorSPX& operator=(PWMVictorSPX&&) = default;
 };
 
 }  // namespace frc

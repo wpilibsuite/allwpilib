@@ -131,8 +131,10 @@ class RobotBase {
 
   virtual ~RobotBase() = default;
 
-  RobotBase(const RobotBase&) = delete;
-  RobotBase& operator=(const RobotBase&) = delete;
+  // m_ds isn't moved in these because DriverStation is a singleton; every
+  // instance of RobotBase has a reference to the same object.
+  RobotBase(RobotBase&&);
+  RobotBase& operator=(RobotBase&&);
 
   DriverStation& m_ds;
 

@@ -42,6 +42,9 @@ class ADXRS450_Gyro : public GyroBase {
 
   virtual ~ADXRS450_Gyro() = default;
 
+  ADXRS450_Gyro(ADXRS450_Gyro&&) = default;
+  ADXRS450_Gyro& operator=(ADXRS450_Gyro&&) = default;
+
   /**
    * Return the actual angle in degrees that the robot is currently facing.
    *

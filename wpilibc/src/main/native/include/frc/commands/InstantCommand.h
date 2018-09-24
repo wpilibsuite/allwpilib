@@ -81,6 +81,9 @@ class InstantCommand : public Command {
   InstantCommand() = default;
   virtual ~InstantCommand() = default;
 
+  InstantCommand(InstantCommand&&) = default;
+  InstantCommand& operator=(InstantCommand&&) = default;
+
  protected:
   std::function<void()> m_func = nullptr;
   void _Initialize() override;

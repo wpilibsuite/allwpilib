@@ -116,6 +116,9 @@ class SolenoidBase : public ErrorBase, public SendableBase {
    */
   explicit SolenoidBase(int pcmID);
 
+  SolenoidBase(SolenoidBase&&) = default;
+  SolenoidBase& operator=(SolenoidBase&&) = default;
+
   static constexpr int m_maxModules = 63;
   static constexpr int m_maxPorts = 8;
 

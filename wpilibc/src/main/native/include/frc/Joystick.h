@@ -57,8 +57,8 @@ class Joystick : public GenericHID {
 
   virtual ~Joystick() = default;
 
-  Joystick(const Joystick&) = delete;
-  Joystick& operator=(const Joystick&) = delete;
+  Joystick(Joystick&&) = default;
+  Joystick& operator=(Joystick&&) = default;
 
   /**
    * Set the channel associated with the X axis.

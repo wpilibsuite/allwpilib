@@ -40,6 +40,9 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
              Subsystem& subsystem);
   virtual ~PIDCommand() = default;
 
+  PIDCommand(PIDCommand&&) = default;
+  PIDCommand& operator=(PIDCommand&&) = default;
+
   void SetSetpointRelative(double deltaSetpoint);
 
   // PIDOutput interface

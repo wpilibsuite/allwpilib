@@ -8,6 +8,7 @@
 #include "frc/AnalogOutput.h"
 
 #include <limits>
+#include <utility>
 
 #include <hal/HAL.h>
 #include <hal/Ports.h>
@@ -45,6 +46,23 @@ AnalogOutput::AnalogOutput(int channel) {
 }
 
 AnalogOutput::~AnalogOutput() { HAL_FreeAnalogOutputPort(m_port); }
+
+AnalogOutput::AnalogOutput(AnalogOutput&& rhs)
+    : ErrorBase(std::move(rhs)),
+      SendableBase(std::move(rhs)),
+      m_channel(std::move(rhs.m_channel)) {
+  std::swap(m_port, rhs.m_port);
+}
+
+AnalogOutput& AnalogOutput::operator=(AnalogOutput&& rhs) {
+  ErrorBase::operator=(std::move(rhs));
+  SendableBase::operator=(std::move(rhs));
+
+  m_channel = std::move(rhs.m_channel);
+  std::swap(m_port, rhs.m_port);
+
+  return *this;
+}
 
 void AnalogOutput::SetVoltage(double voltage) {
   int32_t status = 0;

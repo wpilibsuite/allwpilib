@@ -26,6 +26,9 @@ class Victor : public PWMSpeedController {
    *                are on-board, 10-19 are on the MXP port
    */
   explicit Victor(int channel);
+
+  Victor(Victor&&) = default;
+  Victor& operator=(Victor&&) = default;
 };
 
 }  // namespace frc

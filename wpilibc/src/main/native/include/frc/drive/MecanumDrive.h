@@ -75,8 +75,8 @@ class MecanumDrive : public RobotDriveBase {
 
   ~MecanumDrive() override = default;
 
-  MecanumDrive(const MecanumDrive&) = delete;
-  MecanumDrive& operator=(const MecanumDrive&) = delete;
+  MecanumDrive(MecanumDrive&&) = default;
+  MecanumDrive& operator=(MecanumDrive&&) = default;
 
   /**
    * Drive method for Mecanum platform.

@@ -144,6 +144,9 @@ class IterativeRobotBase : public RobotBase {
 
   virtual ~IterativeRobotBase() = default;
 
+  IterativeRobotBase(IterativeRobotBase&&) = default;
+  IterativeRobotBase& operator=(IterativeRobotBase&&) = default;
+
   void LoopFunc();
 
   double m_period;

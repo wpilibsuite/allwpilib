@@ -39,6 +39,9 @@ class NidecBrushless : public ErrorBase,
 
   ~NidecBrushless() override = default;
 
+  NidecBrushless(NidecBrushless&&) = default;
+  NidecBrushless& operator=(NidecBrushless&&) = default;
+
   // SpeedController interface
   /**
    * Set the PWM value.

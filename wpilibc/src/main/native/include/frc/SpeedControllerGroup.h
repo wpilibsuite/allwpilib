@@ -22,6 +22,9 @@ class SpeedControllerGroup : public SendableBase, public SpeedController {
                                 SpeedControllers&... speedControllers);
   ~SpeedControllerGroup() override = default;
 
+  SpeedControllerGroup(SpeedControllerGroup&&) = default;
+  SpeedControllerGroup& operator=(SpeedControllerGroup&&) = default;
+
   void Set(double speed) override;
   double Get() const override;
   void SetInverted(bool isInverted) override;

@@ -23,6 +23,9 @@ class Talon : public PWMSpeedController {
    *                are on-board, 10-19 are on the MXP port
    */
   explicit Talon(int channel);
+
+  Talon(Talon&&) = default;
+  Talon& operator=(Talon&&) = default;
 };
 
 }  // namespace frc

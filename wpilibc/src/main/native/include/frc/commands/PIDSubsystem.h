@@ -105,6 +105,9 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
 
   ~PIDSubsystem() override = default;
 
+  PIDSubsystem(PIDSubsystem&&) = default;
+  PIDSubsystem& operator=(PIDSubsystem&&) = default;
+
   /**
    * Enables the internal PIDController.
    */

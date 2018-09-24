@@ -16,6 +16,10 @@ class ButtonScheduler {
  public:
   ButtonScheduler(bool last, Trigger* button, Command* orders);
   virtual ~ButtonScheduler() = default;
+
+  ButtonScheduler(ButtonScheduler&&) = default;
+  ButtonScheduler& operator=(ButtonScheduler&&) = default;
+
   virtual void Execute() = 0;
   void Start();
 

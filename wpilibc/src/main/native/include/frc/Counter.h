@@ -140,6 +140,9 @@ class Counter : public ErrorBase, public SendableBase, public CounterBase {
 
   ~Counter() override;
 
+  Counter(Counter&& rhs);
+  Counter& operator=(Counter&& rhs);
+
   /**
    * Set the upsource for the counter as a digital input channel.
    *

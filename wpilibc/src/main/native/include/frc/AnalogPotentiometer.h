@@ -94,6 +94,9 @@ class AnalogPotentiometer : public ErrorBase,
 
   ~AnalogPotentiometer() override = default;
 
+  AnalogPotentiometer(AnalogPotentiometer&&) = default;
+  AnalogPotentiometer& operator=(AnalogPotentiometer&&) = default;
+
   /**
    * Get the current reading of the potentiomer.
    *

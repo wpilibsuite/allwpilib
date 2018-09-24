@@ -29,6 +29,9 @@ class BuiltInAccelerometer : public ErrorBase,
    */
   explicit BuiltInAccelerometer(Range range = kRange_8G);
 
+  BuiltInAccelerometer(BuiltInAccelerometer&&) = default;
+  BuiltInAccelerometer& operator=(BuiltInAccelerometer&&) = default;
+
   // Accelerometer interface
   /**
    * Set the measuring range of the accelerometer.

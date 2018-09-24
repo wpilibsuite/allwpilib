@@ -34,6 +34,9 @@ class DigitalGlitchFilter : public ErrorBase, public SendableBase {
   DigitalGlitchFilter();
   ~DigitalGlitchFilter() override;
 
+  DigitalGlitchFilter(DigitalGlitchFilter&& rhs);
+  DigitalGlitchFilter& operator=(DigitalGlitchFilter&& rhs);
+
   /**
    * Assigns the DigitalSource to this glitch filter.
    *

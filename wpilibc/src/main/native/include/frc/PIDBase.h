@@ -60,8 +60,8 @@ class PIDBase : public SendableBase, public PIDInterface, public PIDOutput {
 
   ~PIDBase() override = default;
 
-  PIDBase(const PIDBase&) = delete;
-  PIDBase& operator=(const PIDBase) = delete;
+  PIDBase(PIDBase&&) = default;
+  PIDBase& operator=(PIDBase&&) = default;
 
   /**
    * Return the current PID result.

@@ -21,6 +21,10 @@ class CommandGroupEntry {
 
   CommandGroupEntry() = default;
   CommandGroupEntry(Command* command, Sequence state, double timeout = -1.0);
+
+  CommandGroupEntry(CommandGroupEntry&&) = default;
+  CommandGroupEntry& operator=(CommandGroupEntry&&) = default;
+
   bool IsTimedOut() const;
 
   double m_timeout = -1.0;

@@ -89,8 +89,8 @@ class SerialPort : public ErrorBase {
 
   ~SerialPort();
 
-  SerialPort(const SerialPort&) = delete;
-  SerialPort& operator=(const SerialPort&) = delete;
+  SerialPort(SerialPort&& rhs);
+  SerialPort& operator=(SerialPort&& rhs);
 
   /**
    * Set the type of flow control to enable on this port.
@@ -217,7 +217,7 @@ class SerialPort : public ErrorBase {
   int m_resourceManagerHandle = 0;
   int m_portHandle = 0;
   bool m_consoleModeEnabled = false;
-  int m_port;
+  Port m_port = kOnboard;
 };
 
 }  // namespace frc

@@ -33,6 +33,9 @@ class MotorSafetyHelper : public ErrorBase {
 
   ~MotorSafetyHelper();
 
+  MotorSafetyHelper(MotorSafetyHelper&&) = default;
+  MotorSafetyHelper& operator=(MotorSafetyHelper&&) = default;
+
   /**
    * Feed the motor safety object.
    *

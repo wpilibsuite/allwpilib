@@ -195,6 +195,9 @@ class Preferences : public ErrorBase {
   Preferences();
   virtual ~Preferences() = default;
 
+  Preferences(Preferences&&) = default;
+  Preferences& operator=(Preferences&&) = default;
+
  private:
   std::shared_ptr<nt::NetworkTable> m_table;
   NT_EntryListener m_listener;

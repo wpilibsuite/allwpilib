@@ -37,6 +37,9 @@ class SafePWM : public PWM, public MotorSafety {
 
   virtual ~SafePWM() = default;
 
+  SafePWM(SafePWM&&) = default;
+  SafePWM& operator=(SafePWM&&) = default;
+
   /**
    * Set the expiration time for the PWM object.
    *

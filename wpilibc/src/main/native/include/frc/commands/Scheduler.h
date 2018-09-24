@@ -87,6 +87,9 @@ class Scheduler : public ErrorBase, public SendableBase {
   Scheduler();
   ~Scheduler() override;
 
+  Scheduler(Scheduler&&) = default;
+  Scheduler& operator=(Scheduler&&) = default;
+
   struct Impl;
   std::unique_ptr<Impl> m_impl;
 };

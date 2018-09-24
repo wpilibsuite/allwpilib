@@ -23,6 +23,9 @@ class SD540 : public PWMSpeedController {
    *                on-board, 10-19 are on the MXP port
    */
   explicit SD540(int channel);
+
+  SD540(SD540&&) = default;
+  SD540& operator=(SD540&&) = default;
 };
 
 }  // namespace frc

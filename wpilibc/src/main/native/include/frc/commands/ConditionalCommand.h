@@ -54,6 +54,9 @@ class ConditionalCommand : public Command {
 
   virtual ~ConditionalCommand() = default;
 
+  ConditionalCommand(ConditionalCommand&&) = default;
+  ConditionalCommand& operator=(ConditionalCommand&&) = default;
+
  protected:
   /**
    * The Condition to test to determine which Command to run.

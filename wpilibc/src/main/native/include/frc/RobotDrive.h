@@ -129,8 +129,8 @@ class RobotDrive : public MotorSafety, public ErrorBase {
 
   virtual ~RobotDrive() = default;
 
-  RobotDrive(const RobotDrive&) = delete;
-  RobotDrive& operator=(const RobotDrive&) = delete;
+  RobotDrive(RobotDrive&&) = default;
+  RobotDrive& operator=(RobotDrive&&) = default;
 
   /**
    * Drive the motors at "outputMagnitude" and "curve".

@@ -34,8 +34,8 @@ class XboxController : public GenericHID {
 
   virtual ~XboxController() = default;
 
-  XboxController(const XboxController&) = delete;
-  XboxController& operator=(const XboxController&) = delete;
+  XboxController(XboxController&&) = default;
+  XboxController& operator=(XboxController&&) = default;
 
   /**
    * Get the X axis value of the controller.

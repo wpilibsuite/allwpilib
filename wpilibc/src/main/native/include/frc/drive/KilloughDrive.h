@@ -86,8 +86,8 @@ class KilloughDrive : public RobotDriveBase {
 
   ~KilloughDrive() override = default;
 
-  KilloughDrive(const KilloughDrive&) = delete;
-  KilloughDrive& operator=(const KilloughDrive&) = delete;
+  KilloughDrive(KilloughDrive&&) = default;
+  KilloughDrive& operator=(KilloughDrive&&) = default;
 
   /**
    * Drive method for Killough platform.

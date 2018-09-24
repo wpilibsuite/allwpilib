@@ -90,6 +90,9 @@ class LinearDigitalFilter : public Filter {
                       wpi::ArrayRef<double> ffGains,
                       wpi::ArrayRef<double> fbGains);
 
+  LinearDigitalFilter(LinearDigitalFilter&&) = default;
+  LinearDigitalFilter& operator=(LinearDigitalFilter&&) = default;
+
   // Static methods to create commonly used filters
   /**
    * Creates a one-pole IIR low-pass filter of the form:<br>

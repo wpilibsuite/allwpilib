@@ -72,6 +72,9 @@ class PWM : public ErrorBase, public SendableBase {
    */
   ~PWM() override;
 
+  PWM(PWM&& rhs);
+  PWM& operator=(PWM&& rhs);
+
   /**
    * Set the PWM value directly to the hardware.
    *
@@ -223,7 +226,7 @@ class PWM : public ErrorBase, public SendableBase {
 
  private:
   int m_channel;
-  HAL_DigitalHandle m_handle;
+  HAL_DigitalHandle m_handle = HAL_kInvalidHandle;
 };
 
 }  // namespace frc

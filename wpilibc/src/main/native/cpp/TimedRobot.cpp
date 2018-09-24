@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+#include <utility>
+
 #include <hal/HAL.h>
 
 #include "frc/Timer.h"
@@ -59,6 +61,22 @@ TimedRobot::~TimedRobot() {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   HAL_CleanNotifier(m_notifier, &status);
+}
+
+TimedRobot::TimedRobot(TimedRobot&& rhs)
+    : IterativeRobotBase(std::move(rhs)),
+      m_expirationTime(std::move(rhs.m_expirationTime)) {
+  std::swap(m_notifier, rhs.m_notifier);
+}
+
+TimedRobot& TimedRobot::operator=(TimedRobot&& rhs) {
+  IterativeRobotBase::operator=(std::move(rhs));
+  ErrorBase::operator=(std::move(rhs));
+
+  std::swap(m_notifier, rhs.m_notifier);
+  m_expirationTime = std::move(rhs.m_expirationTime);
+
+  return *this;
 }
 
 void TimedRobot::UpdateAlarm() {

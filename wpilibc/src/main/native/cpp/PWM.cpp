@@ -7,6 +7,8 @@
 
 #include "frc/PWM.h"
 
+#include <utility>
+
 #include <hal/HAL.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
@@ -55,6 +57,23 @@ PWM::~PWM() {
 
   HAL_FreePWMPort(m_handle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+PWM::PWM(PWM&& rhs)
+    : ErrorBase(std::move(rhs)),
+      SendableBase(std::move(rhs)),
+      m_channel(std::move(rhs.m_channel)) {
+  std::swap(m_handle, rhs.m_handle);
+}
+
+PWM& PWM::operator=(PWM&& rhs) {
+  ErrorBase::operator=(std::move(rhs));
+  SendableBase::operator=(std::move(rhs));
+
+  m_channel = std::move(rhs.m_channel);
+  std::swap(m_handle, rhs.m_handle);
+
+  return *this;
 }
 
 void PWM::SetRaw(uint16_t value) {

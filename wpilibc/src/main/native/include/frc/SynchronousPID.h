@@ -44,8 +44,8 @@ class SynchronousPID : public PIDBase {
   SynchronousPID(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
                  PIDOutput& output);
 
-  SynchronousPID(const SynchronousPID&) = delete;
-  SynchronousPID& operator=(const SynchronousPID) = delete;
+  SynchronousPID(SynchronousPID&&) = default;
+  SynchronousPID& operator=(SynchronousPID&&) = default;
 
   /**
    * Read the input, calculate the output accordingly, and write to the output.

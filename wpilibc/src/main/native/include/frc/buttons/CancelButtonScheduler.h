@@ -18,6 +18,10 @@ class CancelButtonScheduler : public ButtonScheduler {
  public:
   CancelButtonScheduler(bool last, Trigger* button, Command* orders);
   virtual ~CancelButtonScheduler() = default;
+
+  CancelButtonScheduler(CancelButtonScheduler&&) = default;
+  CancelButtonScheduler& operator=(CancelButtonScheduler&&) = default;
+
   virtual void Execute();
 
  private:

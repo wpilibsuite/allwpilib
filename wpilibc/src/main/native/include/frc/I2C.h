@@ -35,8 +35,8 @@ class I2C : public ErrorBase {
 
   ~I2C() override;
 
-  I2C(const I2C&) = delete;
-  I2C& operator=(const I2C&) = delete;
+  I2C(I2C&& rhs);
+  I2C& operator=(I2C&& rhs);
 
   /**
    * Generic transaction.

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <hal/PDP.h>
+
 #include "frc/ErrorBase.h"
 #include "frc/smartdashboard/SendableBase.h"
 
@@ -20,6 +22,9 @@ class PowerDistributionPanel : public ErrorBase, public SendableBase {
  public:
   PowerDistributionPanel();
   explicit PowerDistributionPanel(int module);
+
+  PowerDistributionPanel(PowerDistributionPanel&&) = default;
+  PowerDistributionPanel& operator=(PowerDistributionPanel&&) = default;
 
   /**
    * Query the input voltage of the PDP.
@@ -78,7 +83,7 @@ class PowerDistributionPanel : public ErrorBase, public SendableBase {
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  int m_handle;
+  HAL_PDPHandle m_handle = HAL_kInvalidHandle;
 };
 
 }  // namespace frc

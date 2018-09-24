@@ -7,6 +7,8 @@
 
 #include "frc/Relay.h"
 
+#include <utility>
+
 #include <hal/HAL.h>
 #include <hal/Ports.h>
 #include <hal/Relay.h>
@@ -88,6 +90,31 @@ Relay::~Relay() {
   // ignore errors, as we want to make sure a free happens.
   if (m_forwardHandle != HAL_kInvalidHandle) HAL_FreeRelayPort(m_forwardHandle);
   if (m_reverseHandle != HAL_kInvalidHandle) HAL_FreeRelayPort(m_reverseHandle);
+}
+
+Relay::Relay(Relay&& rhs)
+    : MotorSafety(std::move(rhs)),
+      ErrorBase(std::move(rhs)),
+      SendableBase(std::move(rhs)),
+      m_channel(std::move(rhs.m_channel)),
+      m_direction(std::move(rhs.m_direction)),
+      m_safetyHelper(std::move(rhs.m_safetyHelper)) {
+  std::swap(m_forwardHandle, rhs.m_forwardHandle);
+  std::swap(m_reverseHandle, rhs.m_reverseHandle);
+}
+
+Relay& Relay::operator=(Relay&& rhs) {
+  MotorSafety::operator=(std::move(rhs));
+  ErrorBase::operator=(std::move(rhs));
+  SendableBase::operator=(std::move(rhs));
+
+  m_channel = std::move(rhs.m_channel);
+  m_direction = std::move(rhs.m_direction);
+  std::swap(m_forwardHandle, rhs.m_forwardHandle);
+  std::swap(m_reverseHandle, rhs.m_reverseHandle);
+  m_safetyHelper = std::move(rhs.m_safetyHelper);
+
+  return *this;
 }
 
 void Relay::Set(Relay::Value value) {
