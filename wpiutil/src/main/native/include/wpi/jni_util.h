@@ -26,7 +26,10 @@
 #include "wpi/mutex.h"
 #include "wpi/raw_ostream.h"
 
+/** WPILib C++ utilities (wpiutil) namespace */
 namespace wpi {
+
+/** Java Native Interface (JNI) utility functions */
 namespace java {
 
 // Gets a Java stack trace.  Also provides the last function

@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_canstream CAN Stream Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 // These are copies of defines located in CANSessionMux.h prepended with HAL_
 
 #define HAL_CAN_SEND_PERIOD_NO_REPEAT 0
@@ -115,3 +121,4 @@ void HAL_CAN_GetCANStatus(float* percentBusUtilization, uint32_t* busOffCount,
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

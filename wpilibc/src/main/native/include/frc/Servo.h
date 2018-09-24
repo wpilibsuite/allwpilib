@@ -26,6 +26,9 @@ class Servo : public SafePWM {
    */
   explicit Servo(int channel);
 
+  Servo(Servo&&) = default;
+  Servo& operator=(Servo&&) = default;
+
   /**
    * Set the servo position.
    *

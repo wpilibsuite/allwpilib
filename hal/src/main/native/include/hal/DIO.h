@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_dio DIO Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -191,3 +197,4 @@ int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

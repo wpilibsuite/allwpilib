@@ -10,11 +10,11 @@ package edu.wpi.first.wpilibj;
 import java.util.Arrays;
 import java.util.Optional;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.RelayJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.RelayJNI;
+import edu.wpi.first.hal.util.UncleanStatusException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.util.UncleanStatusException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -34,7 +34,7 @@ public class Relay extends SendableBase implements MotorSafety {
    * This class represents errors in trying to set relay values contradictory to the direction to
    * which the relay is set.
    */
-  public class InvalidValueException extends RuntimeException {
+  public static class InvalidValueException extends RuntimeException {
     /**
      * Create a new exception with the given message.
      *

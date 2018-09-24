@@ -23,6 +23,9 @@ class DMC60 : public PWMSpeedController {
    *                on-board, 10-19 are on the MXP port
    */
   explicit DMC60(int channel);
+
+  DMC60(DMC60&&) = default;
+  DMC60& operator=(DMC60&&) = default;
 };
 
 }  // namespace frc

@@ -11,8 +11,14 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_i2c I2C Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 // clang-format off
-HAL_ENUM(HAL_I2CPort) { HAL_I2C_kOnboard = 0, HAL_I2C_kMXP };
+HAL_ENUM(HAL_I2CPort) { HAL_I2C_kInvalid = -1, HAL_I2C_kOnboard, HAL_I2C_kMXP };
 // clang-format on
 
 #ifdef __cplusplus
@@ -87,3 +93,4 @@ void HAL_CloseI2C(HAL_I2CPort port);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

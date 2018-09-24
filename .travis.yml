@@ -10,12 +10,14 @@ addons:
     packages:
       - g++-6
       - python3.5-dev
+      - cmake
 
 before_install:
   - sudo sh -c 'echo "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main" > /etc/apt/sources.list.d/llvm.list'
   - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+  - sudo add-apt-repository ppa:lkoppel/opencv -y
   - sudo apt-get update -q || true
-  - sudo apt-get install clang-format-5.0 -y
+  - sudo apt-get install clang-format-5.0 libopencv-dev -y
 
 install:
   - wget https://bootstrap.pypa.io/get-pip.py
@@ -36,6 +38,6 @@ cache:
 
 script:
   - python3.5 -m wpiformat -y 2018 -clang 5.0
-  - python3.5 gen/wpilibj_frcnetcomm.py
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
   - ./gradlew --no-daemon --console=plain -PskipAthena :hal:halSharedLibrary :hal:halJNISharedLibrary :wpilibc:wpilibcSharedLibrary :wpilibj:jar
+  - mkdir cmake-build && cd cmake-build && env CXX=g++-6 CC=gcc-6 cmake -DWITHOUT_ALLWPILIB=OFF .. && make

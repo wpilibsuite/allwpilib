@@ -79,7 +79,9 @@ public class CameraServerJNI {
   public static native String getSourceName(int source);
   public static native String getSourceDescription(int source);
   public static native long getSourceLastFrameTime(int source);
+  public static native void setSourceConnectionStrategy(int source, int strategy);
   public static native boolean isSourceConnected(int source);
+  public static native boolean isSourceEnabled(int source);
   public static native int getSourceProperty(int source, String name);
   public static native int[] enumerateSourceProperties(int source);
   public static native VideoMode getSourceVideoMode(int source);
@@ -179,7 +181,7 @@ public class CameraServerJNI {
     kSourceFramesReceived(2);
 
     @SuppressWarnings("MemberName")
-    private int value;
+    private final int value;
 
     TelemetryKind(int value) {
       this.value = value;

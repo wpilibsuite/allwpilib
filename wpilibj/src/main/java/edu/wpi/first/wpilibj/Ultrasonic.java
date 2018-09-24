@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 import static java.util.Objects.requireNonNull;
@@ -65,7 +65,7 @@ public class Ultrasonic extends SendableBase implements PIDSource {
    * certainly break. Make sure to disable automatic mode before changing anything with the
    * sensors!!
    */
-  private class UltrasonicChecker extends Thread {
+  private static class UltrasonicChecker extends Thread {
     @Override
     public synchronized void run() {
       Ultrasonic ultrasonic = null;

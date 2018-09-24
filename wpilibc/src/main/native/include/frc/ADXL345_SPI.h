@@ -42,8 +42,8 @@ class ADXL345_SPI : public ErrorBase,
 
   ~ADXL345_SPI() override = default;
 
-  ADXL345_SPI(const ADXL345_SPI&) = delete;
-  ADXL345_SPI& operator=(const ADXL345_SPI&) = delete;
+  ADXL345_SPI(ADXL345_SPI&&) = default;
+  ADXL345_SPI& operator=(ADXL345_SPI&&) = default;
 
   // Accelerometer interface
   void SetRange(Range range) override;

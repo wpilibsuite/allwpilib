@@ -7,10 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.NotifierJNI;
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.NotifierJNI;
 
 /**
  * TimedRobot implements the IterativeRobotBase robot program framework.
@@ -28,8 +28,6 @@ public class TimedRobot extends IterativeRobotBase {
 
   // The absolute expiration time
   private double m_expirationTime;
-
-  private double m_period;
 
   /**
    * Constructor for TimedRobot.
@@ -60,6 +58,7 @@ public class TimedRobot extends IterativeRobotBase {
    * Provide an alternate "main loop" via startCompetition().
    */
   @Override
+  @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
     robotInit();
 
@@ -93,6 +92,7 @@ public class TimedRobot extends IterativeRobotBase {
   /**
    * Update the alarm hardware to reflect the next alarm.
    */
+  @SuppressWarnings("UnsafeFinalization")
   private void updateAlarm() {
     NotifierJNI.updateNotifierAlarm(m_notifier, (long) (m_expirationTime * 1e6));
   }

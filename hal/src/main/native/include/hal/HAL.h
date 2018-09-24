@@ -41,10 +41,14 @@
 #include "hal/Types.h"
 
 #ifdef __cplusplus
-#include "UsageReporting.h"
-
-namespace HALUsageReporting = nUsageReporting;
+#include "hal/FRCUsageReporting.h"
 #endif
+
+/**
+ * @defgroup hal_capi WPILib HAL API
+ * Hardware Abstraction Layer to hardware or simulator
+ * @{
+ */
 
 // clang-format off
 HAL_ENUM(HAL_RuntimeType) { HAL_Athena, HAL_Mock };
@@ -208,3 +212,4 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

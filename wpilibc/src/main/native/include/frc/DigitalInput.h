@@ -35,6 +35,9 @@ class DigitalInput : public DigitalSource {
 
   ~DigitalInput() override;
 
+  DigitalInput(DigitalInput&& rhs);
+  DigitalInput& operator=(DigitalInput&& rhs);
+
   /**
    * Get the value from a digital input channel.
    *
@@ -67,7 +70,7 @@ class DigitalInput : public DigitalSource {
 
  private:
   int m_channel;
-  HAL_DigitalHandle m_handle;
+  HAL_DigitalHandle m_handle = HAL_kInvalidHandle;
 
   friend class DigitalGlitchFilter;
 };

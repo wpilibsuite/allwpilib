@@ -7,6 +7,8 @@
 
 #include "frc/AnalogInput.h"
 
+#include <utility>
+
 #include <hal/AnalogAccumulator.h>
 #include <hal/AnalogInput.h>
 #include <hal/HAL.h>
@@ -43,9 +45,27 @@ AnalogInput::AnalogInput(int channel) {
   SetName("AnalogInput", channel);
 }
 
-AnalogInput::~AnalogInput() {
-  HAL_FreeAnalogInputPort(m_port);
-  m_port = HAL_kInvalidHandle;
+AnalogInput::~AnalogInput() { HAL_FreeAnalogInputPort(m_port); }
+
+AnalogInput::AnalogInput(AnalogInput&& rhs)
+    : ErrorBase(std::move(rhs)),
+      SendableBase(std::move(rhs)),
+      PIDSource(std::move(rhs)),
+      m_channel(std::move(rhs.m_channel)),
+      m_accumulatorOffset(std::move(rhs.m_accumulatorOffset)) {
+  std::swap(m_port, rhs.m_port);
+}
+
+AnalogInput& AnalogInput::operator=(AnalogInput&& rhs) {
+  ErrorBase::operator=(std::move(rhs));
+  SendableBase::operator=(std::move(rhs));
+  PIDSource::operator=(std::move(rhs));
+
+  m_channel = std::move(rhs.m_channel);
+  std::swap(m_port, rhs.m_port);
+  m_accumulatorOffset = std::move(rhs.m_accumulatorOffset);
+
+  return *this;
 }
 
 int AnalogInput::GetValue() const {

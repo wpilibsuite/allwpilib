@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <frc/IterativeRobot.h>
 #include <frc/Joystick.h>
 #include <frc/Relay.h>
+#include <frc/TimedRobot.h>
 
 /**
  * This is a sample program which uses joystick buttons to control a relay.
@@ -20,7 +20,7 @@
  * one output; pressing the button sets the output to 12V and releasing sets it
  * to 0V.
  */
-class Robot : public frc::IterativeRobot {
+class Robot : public frc::TimedRobot {
  public:
   void TeleopPeriodic() override {
     /* Retrieve the button values. GetRawButton() will return true if the button

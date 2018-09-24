@@ -45,9 +45,9 @@ class PIDController : public PIDBase, public Controller {
    * @param Kd     the derivative coefficient
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
-   * @param period the loop time for doing calculations. This particularly
-   *               effects calculations of the integral and differental terms.
-   *               The default is 50ms.
+   * @param period the loop time for doing calculations in seconds. This
+   *               particularly affects calculations of the integral and
+   *               differental terms. The default is 0.05 (50ms).
    */
   PIDController(double p, double i, double d, PIDSource* source,
                 PIDOutput* output, double period = 0.05);
@@ -60,9 +60,9 @@ class PIDController : public PIDBase, public Controller {
    * @param Kd     the derivative coefficient
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
-   * @param period the loop time for doing calculations. This particularly
-   *               effects calculations of the integral and differental terms.
-   *               The default is 50ms.
+   * @param period the loop time for doing calculations in seconds. This
+   *               particularly affects calculations of the integral and
+   *               differental terms. The default is 0.05 (50ms).
    */
   PIDController(double p, double i, double d, double f, PIDSource* source,
                 PIDOutput* output, double period = 0.05);
@@ -75,9 +75,9 @@ class PIDController : public PIDBase, public Controller {
    * @param Kd     the derivative coefficient
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
-   * @param period the loop time for doing calculations. This particularly
-   *               effects calculations of the integral and differental terms.
-   *               The default is 50ms.
+   * @param period the loop time for doing calculations in seconds. This
+   *               particularly affects calculations of the integral and
+   *               differental terms. The default is 0.05 (50ms).
    */
   PIDController(double p, double i, double d, PIDSource& source,
                 PIDOutput& output, double period = 0.05);
@@ -90,17 +90,17 @@ class PIDController : public PIDBase, public Controller {
    * @param Kd     the derivative coefficient
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
-   * @param period the loop time for doing calculations. This particularly
-   *               effects calculations of the integral and differental terms.
-   *               The default is 50ms.
+   * @param period the loop time for doing calculations in seconds. This
+   *               particularly affects calculations of the integral and
+   *               differental terms. The default is 0.05 (50ms).
    */
   PIDController(double p, double i, double d, double f, PIDSource& source,
                 PIDOutput& output, double period = 0.05);
 
   ~PIDController() override;
 
-  PIDController(const PIDController&) = delete;
-  PIDController& operator=(const PIDController) = delete;
+  PIDController(PIDController&&) = default;
+  PIDController& operator=(PIDController&&) = default;
 
   /**
    * Begin running the PIDController.

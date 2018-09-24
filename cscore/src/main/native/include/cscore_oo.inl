@@ -56,7 +56,7 @@ inline wpi::StringRef VideoProperty::GetString(
   return GetStringProperty(m_handle, buf, &m_status);
 }
 
-inline void VideoProperty::SetString(wpi::StringRef value) {
+inline void VideoProperty::SetString(const wpi::Twine& value) {
   m_status = 0;
   SetStringProperty(m_handle, value, &m_status);
 }
@@ -116,12 +116,24 @@ inline uint64_t VideoSource::GetLastFrameTime() const {
   return GetSourceLastFrameTime(m_handle, &m_status);
 }
 
+inline void VideoSource::SetConnectionStrategy(ConnectionStrategy strategy) {
+  m_status = 0;
+  SetSourceConnectionStrategy(
+      m_handle, static_cast<CS_ConnectionStrategy>(static_cast<int>(strategy)),
+      &m_status);
+}
+
 inline bool VideoSource::IsConnected() const {
   m_status = 0;
   return IsSourceConnected(m_handle, &m_status);
 }
 
-inline VideoProperty VideoSource::GetProperty(wpi::StringRef name) {
+inline bool VideoSource::IsEnabled() const {
+  m_status = 0;
+  return IsSourceEnabled(m_handle, &m_status);
+}
+
+inline VideoProperty VideoSource::GetProperty(const wpi::Twine& name) {
   m_status = 0;
   return VideoProperty{GetSourceProperty(m_handle, name, &m_status)};
 }
@@ -215,11 +227,11 @@ inline void VideoCamera::SetExposureManual(int value) {
   SetCameraExposureManual(m_handle, value, &m_status);
 }
 
-inline UsbCamera::UsbCamera(wpi::StringRef name, int dev) {
+inline UsbCamera::UsbCamera(const wpi::Twine& name, int dev) {
   m_handle = CreateUsbCameraDev(name, dev, &m_status);
 }
 
-inline UsbCamera::UsbCamera(wpi::StringRef name, wpi::StringRef path) {
+inline UsbCamera::UsbCamera(const wpi::Twine& name, const wpi::Twine& path) {
   m_handle = CreateUsbCameraPath(name, path, &m_status);
 }
 
@@ -239,25 +251,25 @@ inline void UsbCamera::SetConnectVerbose(int level) {
               &m_status);
 }
 
-inline HttpCamera::HttpCamera(wpi::StringRef name, wpi::StringRef url,
+inline HttpCamera::HttpCamera(const wpi::Twine& name, const wpi::Twine& url,
                               HttpCameraKind kind) {
   m_handle = CreateHttpCamera(
       name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
       &m_status);
 }
 
-inline HttpCamera::HttpCamera(wpi::StringRef name, const char* url,
+inline HttpCamera::HttpCamera(const wpi::Twine& name, const char* url,
                               HttpCameraKind kind) {
   m_handle = CreateHttpCamera(
       name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
       &m_status);
 }
 
-inline HttpCamera::HttpCamera(wpi::StringRef name, const std::string& url,
+inline HttpCamera::HttpCamera(const wpi::Twine& name, const std::string& url,
                               HttpCameraKind kind)
-    : HttpCamera(name, wpi::StringRef{url}, kind) {}
+    : HttpCamera(name, wpi::Twine{url}, kind) {}
 
-inline HttpCamera::HttpCamera(wpi::StringRef name,
+inline HttpCamera::HttpCamera(const wpi::Twine& name,
                               wpi::ArrayRef<std::string> urls,
                               HttpCameraKind kind) {
   m_handle = CreateHttpCamera(
@@ -266,7 +278,7 @@ inline HttpCamera::HttpCamera(wpi::StringRef name,
 }
 
 template <typename T>
-inline HttpCamera::HttpCamera(wpi::StringRef name,
+inline HttpCamera::HttpCamera(const wpi::Twine& name,
                               std::initializer_list<T> urls,
                               HttpCameraKind kind) {
   std::vector<std::string> vec;
@@ -302,11 +314,8 @@ inline std::vector<std::string> HttpCamera::GetUrls() const {
   return ::cs::GetHttpCameraUrls(m_handle, &m_status);
 }
 
-inline std::string AxisCamera::HostToUrl(wpi::StringRef host) {
-  std::string rv{"http://"};
-  rv += host;
-  rv += "/mjpg/video.mjpg";
-  return rv;
+inline std::string AxisCamera::HostToUrl(const wpi::Twine& host) {
+  return ("http://" + host + "/mjpg/video.mjpg").str();
 }
 
 inline std::vector<std::string> AxisCamera::HostToUrl(
@@ -328,29 +337,29 @@ inline std::vector<std::string> AxisCamera::HostToUrl(
   return rv;
 }
 
-inline AxisCamera::AxisCamera(wpi::StringRef name, wpi::StringRef host)
+inline AxisCamera::AxisCamera(const wpi::Twine& name, const wpi::Twine& host)
     : HttpCamera(name, HostToUrl(host), kAxis) {}
 
-inline AxisCamera::AxisCamera(wpi::StringRef name, const char* host)
+inline AxisCamera::AxisCamera(const wpi::Twine& name, const char* host)
     : HttpCamera(name, HostToUrl(host), kAxis) {}
 
-inline AxisCamera::AxisCamera(wpi::StringRef name, const std::string& host)
-    : HttpCamera(name, HostToUrl(wpi::StringRef{host}), kAxis) {}
+inline AxisCamera::AxisCamera(const wpi::Twine& name, const std::string& host)
+    : HttpCamera(name, HostToUrl(wpi::Twine{host}), kAxis) {}
 
-inline AxisCamera::AxisCamera(wpi::StringRef name,
+inline AxisCamera::AxisCamera(const wpi::Twine& name,
                               wpi::ArrayRef<std::string> hosts)
     : HttpCamera(name, HostToUrl(hosts), kAxis) {}
 
 template <typename T>
-inline AxisCamera::AxisCamera(wpi::StringRef name,
+inline AxisCamera::AxisCamera(const wpi::Twine& name,
                               std::initializer_list<T> hosts)
     : HttpCamera(name, HostToUrl(hosts), kAxis) {}
 
-inline CvSource::CvSource(wpi::StringRef name, const VideoMode& mode) {
+inline CvSource::CvSource(const wpi::Twine& name, const VideoMode& mode) {
   m_handle = CreateCvSource(name, mode, &m_status);
 }
 
-inline CvSource::CvSource(wpi::StringRef name, VideoMode::PixelFormat format,
+inline CvSource::CvSource(const wpi::Twine& name, VideoMode::PixelFormat format,
                           int width, int height, int fps) {
   m_handle =
       CreateCvSource(name, VideoMode{format, width, height, fps}, &m_status);
@@ -361,7 +370,7 @@ inline void CvSource::PutFrame(cv::Mat& image) {
   PutSourceFrame(m_handle, image, &m_status);
 }
 
-inline void CvSource::NotifyError(wpi::StringRef msg) {
+inline void CvSource::NotifyError(const wpi::Twine& msg) {
   m_status = 0;
   NotifySourceError(m_handle, msg, &m_status);
 }
@@ -371,12 +380,12 @@ inline void CvSource::SetConnected(bool connected) {
   SetSourceConnected(m_handle, connected, &m_status);
 }
 
-inline void CvSource::SetDescription(wpi::StringRef description) {
+inline void CvSource::SetDescription(const wpi::Twine& description) {
   m_status = 0;
   SetSourceDescription(m_handle, description, &m_status);
 }
 
-inline VideoProperty CvSource::CreateProperty(wpi::StringRef name,
+inline VideoProperty CvSource::CreateProperty(const wpi::Twine& name,
                                               VideoProperty::Kind kind,
                                               int minimum, int maximum,
                                               int step, int defaultValue,
@@ -387,7 +396,7 @@ inline VideoProperty CvSource::CreateProperty(wpi::StringRef name,
       minimum, maximum, step, defaultValue, value, &m_status)};
 }
 
-inline VideoProperty CvSource::CreateIntegerProperty(wpi::StringRef name,
+inline VideoProperty CvSource::CreateIntegerProperty(const wpi::Twine& name,
                                                     int minimum, int maximum,
                                                     int step, int defaultValue,
                                                     int value) {
@@ -397,7 +406,7 @@ inline VideoProperty CvSource::CreateIntegerProperty(wpi::StringRef name,
       minimum, maximum, step, defaultValue, value, &m_status)};
 }
 
-inline VideoProperty CvSource::CreateBooleanProperty(wpi::StringRef name,
+inline VideoProperty CvSource::CreateBooleanProperty(const wpi::Twine& name,
                                                      bool defaultValue,
                                                      bool value) {
   m_status = 0;
@@ -406,8 +415,8 @@ inline VideoProperty CvSource::CreateBooleanProperty(wpi::StringRef name,
       0, 1, 1, defaultValue ? 1 : 0, value ? 1 : 0, &m_status)};
 }
 
-inline VideoProperty CvSource::CreateStringProperty(wpi::StringRef name,
-                                                    wpi::StringRef value) {
+inline VideoProperty CvSource::CreateStringProperty(const wpi::Twine& name,
+                                                    const wpi::Twine& value) {
   m_status = 0;
   auto prop = VideoProperty{CreateSourceProperty(
       m_handle, name, static_cast<CS_PropertyKind>(static_cast<int>(VideoProperty::Kind::kString)),
@@ -465,7 +474,7 @@ inline std::string VideoSink::GetDescription() const {
   return GetSinkDescription(m_handle, &m_status);
 }
 
-inline VideoProperty VideoSink::GetProperty(wpi::StringRef name) {
+inline VideoProperty VideoSink::GetProperty(const wpi::Twine& name) {
   m_status = 0;
   return VideoProperty{GetSinkProperty(m_handle, name, &m_status)};
 }
@@ -484,13 +493,13 @@ inline VideoSource VideoSink::GetSource() const {
   return VideoSource{handle == 0 ? 0 : CopySource(handle, &m_status)};
 }
 
-inline VideoProperty VideoSink::GetSourceProperty(wpi::StringRef name) {
+inline VideoProperty VideoSink::GetSourceProperty(const wpi::Twine& name) {
   m_status = 0;
   return VideoProperty{GetSinkSourceProperty(m_handle, name, &m_status)};
 }
 
-inline MjpegServer::MjpegServer(wpi::StringRef name,
-                                wpi::StringRef listenAddress, int port) {
+inline MjpegServer::MjpegServer(const wpi::Twine& name,
+                                const wpi::Twine& listenAddress, int port) {
   m_handle = CreateMjpegServer(name, listenAddress, port, &m_status);
 }
 
@@ -528,16 +537,16 @@ inline void MjpegServer::SetDefaultCompression(int quality) {
               quality, &m_status);
 }
 
-inline CvSink::CvSink(wpi::StringRef name) {
+inline CvSink::CvSink(const wpi::Twine& name) {
   m_handle = CreateCvSink(name, &m_status);
 }
 
-inline CvSink::CvSink(wpi::StringRef name,
+inline CvSink::CvSink(const wpi::Twine& name,
                       std::function<void(uint64_t time)> processFrame) {
   m_handle = CreateCvSinkCallback(name, processFrame, &m_status);
 }
 
-inline void CvSink::SetDescription(wpi::StringRef description) {
+inline void CvSink::SetDescription(const wpi::Twine& description) {
   m_status = 0;
   SetSinkDescription(m_handle, description, &m_status);
 }

@@ -9,9 +9,10 @@ package edu.wpi.first.wpilibj;
 
 import java.io.Closeable;
 
-import edu.wpi.first.wpilibj.hal.CANAPIJNI;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.CANAPIJNI;
+import edu.wpi.first.hal.CANData;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 
 /**
  * High level class for interfacing with CAN devices conforming to
@@ -32,10 +33,27 @@ public class CAN implements Closeable {
 
   /**
    * Create a new CAN communication interface with the specific device ID.
-   * The device ID is 6 bits (0-63)
+   * This uses the team manufacturer and device types.
+   * The device ID is 6 bits (0-63).
+   *
+   * @param deviceId The device id
    */
   public CAN(int deviceId) {
     m_handle = CANAPIJNI.initializeCAN(kTeamManufacturer, deviceId, kTeamDeviceType);
+    HAL.report(tResourceType.kResourceType_CAN, deviceId);
+  }
+
+  /**
+   * Create a new CAN communication interface with a specific device ID,
+   * manufacturer and device type. The device ID is 6 bits, the
+   * manufacturer is 8 bits, and the device type is 5 bits.
+   *
+   * @param deviceId           The device ID
+   * @param deviceManufacturer The device manufacturer
+   * @param deviceType         The device type
+   */
+  public CAN(int deviceId, int deviceManufacturer, int deviceType) {
+    m_handle = CANAPIJNI.initializeCAN(deviceManufacturer, deviceId, deviceType);
     HAL.report(tResourceType.kResourceType_CAN, deviceId);
   }
 

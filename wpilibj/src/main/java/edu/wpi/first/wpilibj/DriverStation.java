@@ -13,14 +13,14 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.hal.ControlWord;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.MatchInfoData;
+import edu.wpi.first.hal.PowerJNI;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.hal.AllianceStationID;
-import edu.wpi.first.wpilibj.hal.ControlWord;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.MatchInfoData;
-import edu.wpi.first.wpilibj.hal.PowerJNI;
 
 /**
  * Provide access to the network communication data to / from the Driver Station.
@@ -34,12 +34,12 @@ public class DriverStation {
    */
   public static final int kJoystickPorts = 6;
 
-  private class HALJoystickButtons {
+  private static class HALJoystickButtons {
     public int m_buttons;
     public byte m_count;
   }
 
-  private class HALJoystickAxes {
+  private static class HALJoystickAxes {
     public float[] m_axes;
     public short m_count;
 
@@ -48,7 +48,7 @@ public class DriverStation {
     }
   }
 
-  private class HALJoystickPOVs {
+  private static class HALJoystickPOVs {
     public short[] m_povs;
     public short m_count;
 

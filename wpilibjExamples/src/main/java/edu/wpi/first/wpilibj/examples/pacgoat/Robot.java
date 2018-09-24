@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat;
 
-import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -25,12 +25,12 @@ import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Shooter;
  * This is the main class for running the PacGoat code.
  *
  * <p>The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the IterativeRobot
+ * functions corresponding to each mode, as described in the TimedRobot
  * documentation. If you change the name of this class or the package after
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
   Command m_autonomousCommand;
   public static OI oi;
 
@@ -62,8 +62,8 @@ public class Robot extends IterativeRobot {
 
     // instantiate the command used for the autonomous period
     m_autoChooser = new SendableChooser<Command>();
-    m_autoChooser.addDefault("Drive and Shoot", new DriveAndShootAutonomous());
-    m_autoChooser.addObject("Drive Forward", new DriveForward());
+    m_autoChooser.setDefaultOption("Drive and Shoot", new DriveAndShootAutonomous());
+    m_autoChooser.addOption("Drive Forward", new DriveForward());
     SmartDashboard.putData("Auto Mode", m_autoChooser);
   }
 

@@ -35,19 +35,23 @@ class UrlParser {
    */
   bool IsValid() const { return !m_error; }
 
-  bool HasSchema() const { return (m_url.field_set & UF_SCHEMA) != 0; }
+  bool HasSchema() const { return (m_url.field_set & (1 << UF_SCHEMA)) != 0; }
 
-  bool HasHost() const { return (m_url.field_set & UF_HOST) != 0; }
+  bool HasHost() const { return (m_url.field_set & (1 << UF_HOST)) != 0; }
 
-  bool HasPort() const { return (m_url.field_set & UF_PORT) != 0; }
+  bool HasPort() const { return (m_url.field_set & (1 << UF_PORT)) != 0; }
 
-  bool HasPath() const { return (m_url.field_set & UF_PATH) != 0; }
+  bool HasPath() const { return (m_url.field_set & (1 << UF_PATH)) != 0; }
 
-  bool HasQuery() const { return (m_url.field_set & UF_QUERY) != 0; }
+  bool HasQuery() const { return (m_url.field_set & (1 << UF_QUERY)) != 0; }
 
-  bool HasFragment() const { return (m_url.field_set & UF_FRAGMENT) != 0; }
+  bool HasFragment() const {
+    return (m_url.field_set & (1 << UF_FRAGMENT)) != 0;
+  }
 
-  bool HasUserInfo() const { return (m_url.field_set & UF_USERINFO) != 0; }
+  bool HasUserInfo() const {
+    return (m_url.field_set & (1 << UF_USERINFO)) != 0;
+  }
 
   StringRef GetSchema() const {
     return m_data.substr(m_url.field_data[UF_SCHEMA].off,

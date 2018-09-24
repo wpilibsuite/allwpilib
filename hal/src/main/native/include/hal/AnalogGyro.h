@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_analoggyro Analog Gyro Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -129,3 +135,4 @@ int32_t HAL_GetAnalogGyroCenter(HAL_GyroHandle handle, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

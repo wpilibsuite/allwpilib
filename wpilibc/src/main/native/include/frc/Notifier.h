@@ -43,8 +43,8 @@ class Notifier : public ErrorBase {
    */
   virtual ~Notifier();
 
-  Notifier(const Notifier&) = delete;
-  Notifier& operator=(const Notifier&) = delete;
+  Notifier(Notifier&& rhs);
+  Notifier& operator=(Notifier&& rhs);
 
   /**
    * Change the handler function.
@@ -88,6 +88,13 @@ class Notifier : public ErrorBase {
  private:
   /**
    * Update the HAL alarm time.
+   *
+   * @param triggerTime the time at which the next alarm will be triggered
+   */
+  void UpdateAlarm(uint64_t triggerTime);
+
+  /**
+   * Update the HAL alarm time based on m_expirationTime.
    */
   void UpdateAlarm();
 

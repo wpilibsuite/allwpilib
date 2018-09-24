@@ -378,7 +378,7 @@ Java_edu_wpi_cscore_CameraServerJNI_setStringProperty
     return;
   }
   CS_Status status = 0;
-  cs::SetStringProperty(property, JStringRef{env, value}, &status);
+  cs::SetStringProperty(property, JStringRef{env, value}.str(), &status);
   CheckStatus(env, status);
 }
 
@@ -415,7 +415,7 @@ Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraDev
     return 0;
   }
   CS_Status status = 0;
-  auto val = cs::CreateUsbCameraDev(JStringRef{env, name}, dev, &status);
+  auto val = cs::CreateUsbCameraDev(JStringRef{env, name}.str(), dev, &status);
   CheckStatus(env, status);
   return val;
 #endif
@@ -443,8 +443,8 @@ Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraPath
     return 0;
   }
   CS_Status status = 0;
-  auto val = cs::CreateUsbCameraPath(JStringRef{env, name},
-                                     JStringRef{env, path}, &status);
+  auto val = cs::CreateUsbCameraPath(JStringRef{env, name}.str(),
+                                     JStringRef{env, path}.str(), &status);
   CheckStatus(env, status);
   return val;
 #endif
@@ -468,9 +468,9 @@ Java_edu_wpi_cscore_CameraServerJNI_createHttpCamera
     return 0;
   }
   CS_Status status = 0;
-  auto val =
-      cs::CreateHttpCamera(JStringRef{env, name}, JStringRef{env, url},
-                           static_cast<CS_HttpCameraKind>(kind), &status);
+  auto val = cs::CreateHttpCamera(
+      JStringRef{env, name}.str(), JStringRef{env, url}.str(),
+      static_cast<CS_HttpCameraKind>(kind), &status);
   CheckStatus(env, status);
   return val;
 }
@@ -506,7 +506,7 @@ Java_edu_wpi_cscore_CameraServerJNI_createHttpCameraMulti
   }
   CS_Status status = 0;
   auto val =
-      cs::CreateHttpCamera(JStringRef{env, name}, vec,
+      cs::CreateHttpCamera(JStringRef{env, name}.str(), vec,
                            static_cast<CS_HttpCameraKind>(kind), &status);
   CheckStatus(env, status);
   return val;
@@ -528,7 +528,7 @@ Java_edu_wpi_cscore_CameraServerJNI_createCvSource
   }
   CS_Status status = 0;
   auto val = cs::CreateCvSource(
-      JStringRef{env, name},
+      JStringRef{env, name}.str(),
       cs::VideoMode{static_cast<cs::VideoMode::PixelFormat>(pixelFormat),
                     static_cast<int>(width), static_cast<int>(height),
                     static_cast<int>(fps)},
@@ -601,6 +601,21 @@ Java_edu_wpi_cscore_CameraServerJNI_getSourceLastFrameTime
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    setSourceConnectionStrategy
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_setSourceConnectionStrategy
+  (JNIEnv* env, jclass, jint source, jint strategy)
+{
+  CS_Status status = 0;
+  cs::SetSourceConnectionStrategy(
+      source, static_cast<CS_ConnectionStrategy>(strategy), &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    isSourceConnected
  * Signature: (I)Z
  */
@@ -610,6 +625,21 @@ Java_edu_wpi_cscore_CameraServerJNI_isSourceConnected
 {
   CS_Status status = 0;
   auto val = cs::IsSourceConnected(source, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    isSourceEnabled
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_isSourceEnabled
+  (JNIEnv* env, jclass, jint source)
+{
+  CS_Status status = 0;
+  auto val = cs::IsSourceEnabled(source, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -628,7 +658,8 @@ Java_edu_wpi_cscore_CameraServerJNI_getSourceProperty
     return 0;
   }
   CS_Status status = 0;
-  auto val = cs::GetSourceProperty(source, JStringRef{env, name}, &status);
+  auto val =
+      cs::GetSourceProperty(source, JStringRef{env, name}.str(), &status);
   CheckStatus(env, status);
   return val;
 }
@@ -1018,7 +1049,7 @@ Java_edu_wpi_cscore_CameraServerJNI_notifySourceError
     return;
   }
   CS_Status status = 0;
-  cs::NotifySourceError(source, JStringRef{env, msg}, &status);
+  cs::NotifySourceError(source, JStringRef{env, msg}.str(), &status);
   CheckStatus(env, status);
 }
 
@@ -1050,7 +1081,7 @@ Java_edu_wpi_cscore_CameraServerJNI_setSourceDescription
     return;
   }
   CS_Status status = 0;
-  cs::SetSourceDescription(source, JStringRef{env, description}, &status);
+  cs::SetSourceDescription(source, JStringRef{env, description}.str(), &status);
   CheckStatus(env, status);
 }
 
@@ -1066,7 +1097,7 @@ Java_edu_wpi_cscore_CameraServerJNI_createSourceProperty
 {
   CS_Status status = 0;
   auto val = cs::CreateSourceProperty(
-      source, JStringRef{env, name}, static_cast<CS_PropertyKind>(kind),
+      source, JStringRef{env, name}.str(), static_cast<CS_PropertyKind>(kind),
       minimum, maximum, step, defaultValue, value, &status);
   CheckStatus(env, status);
   return val;
@@ -1120,8 +1151,9 @@ Java_edu_wpi_cscore_CameraServerJNI_createMjpegServer
     return 0;
   }
   CS_Status status = 0;
-  auto val = cs::CreateMjpegServer(
-      JStringRef{env, name}, JStringRef{env, listenAddress}, port, &status);
+  auto val = cs::CreateMjpegServer(JStringRef{env, name}.str(),
+                                   JStringRef{env, listenAddress}.str(), port,
+                                   &status);
   CheckStatus(env, status);
   return val;
 }
@@ -1140,7 +1172,7 @@ Java_edu_wpi_cscore_CameraServerJNI_createCvSink
     return 0;
   }
   CS_Status status = 0;
-  auto val = cs::CreateCvSink(JStringRef{env, name}, &status);
+  auto val = cs::CreateCvSink(JStringRef{env, name}.str(), &status);
   CheckStatus(env, status);
   return val;
 }
@@ -1206,7 +1238,7 @@ Java_edu_wpi_cscore_CameraServerJNI_getSinkProperty
     return 0;
   }
   CS_Status status = 0;
-  auto val = cs::GetSinkProperty(sink, JStringRef{env, name}, &status);
+  auto val = cs::GetSinkProperty(sink, JStringRef{env, name}.str(), &status);
   CheckStatus(env, status);
   return val;
 }
@@ -1255,7 +1287,8 @@ Java_edu_wpi_cscore_CameraServerJNI_getSinkSourceProperty
     return 0;
   }
   CS_Status status = 0;
-  auto val = cs::GetSinkSourceProperty(sink, JStringRef{env, name}, &status);
+  auto val =
+      cs::GetSinkSourceProperty(sink, JStringRef{env, name}.str(), &status);
   CheckStatus(env, status);
   return val;
 }
@@ -1348,7 +1381,7 @@ Java_edu_wpi_cscore_CameraServerJNI_setSinkDescription
     return;
   }
   CS_Status status = 0;
-  cs::SetSinkDescription(sink, JStringRef{env, description}, &status);
+  cs::SetSinkDescription(sink, JStringRef{env, description}.str(), &status);
   CheckStatus(env, status);
 }
 

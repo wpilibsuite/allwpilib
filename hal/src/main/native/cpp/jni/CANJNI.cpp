@@ -14,7 +14,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_wpilibj_can_CANJNI.h"
+#include "edu_wpi_first_hal_can_CANJNI.h"
 #include "hal/CAN.h"
 #include "hal/cpp/Log.h"
 
@@ -34,12 +34,12 @@ TLogLevel canJNILogLevel = logERROR;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_wpilibj_can_CANJNI
+ * Class:     edu_wpi_first_hal_can_CANJNI
  * Method:    FRCNetCommCANSessionMuxSendMessage
  * Signature: (I[BI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage
+Java_edu_wpi_first_hal_can_CANJNI_FRCNetCommCANSessionMuxSendMessage
   (JNIEnv* env, jclass, jint messageID, jbyteArray data, jint periodMs)
 {
   CANJNI_LOG(logDEBUG) << "Calling CANJNI FRCNetCommCANSessionMuxSendMessage";
@@ -77,12 +77,12 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_can_CANJNI
+ * Class:     edu_wpi_first_hal_can_CANJNI
  * Method:    FRCNetCommCANSessionMuxReceiveMessage
  * Signature: (Ljava/lang/Object;ILjava/lang/Object;)[B
  */
 JNIEXPORT jbyteArray JNICALL
-Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage
+Java_edu_wpi_first_hal_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage
   (JNIEnv* env, jclass, jobject messageID, jint messageIDMask,
    jobject timeStamp)
 {
@@ -130,12 +130,12 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_can_CANJNI
+ * Class:     edu_wpi_first_hal_can_CANJNI
  * Method:    GetCANStatus
  * Signature: (Ljava/lang/Object;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_can_CANJNI_GetCANStatus
+Java_edu_wpi_first_hal_can_CANJNI_GetCANStatus
   (JNIEnv* env, jclass, jobject canStatus)
 {
   CANJNI_LOG(logDEBUG) << "Calling CANJNI HAL_CAN_GetCANStatus";

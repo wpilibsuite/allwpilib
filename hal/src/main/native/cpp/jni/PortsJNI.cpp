@@ -10,7 +10,7 @@
 #include <cassert>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_wpilibj_hal_PortsJNI.h"
+#include "edu_wpi_first_hal_PortsJNI.h"
 #include "hal/Ports.h"
 #include "hal/cpp/Log.h"
 
@@ -27,12 +27,12 @@ TLogLevel portsJNILogLevel = logWARNING;
 
 extern "C" {
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumAccumulators
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumAccumulators
+Java_edu_wpi_first_hal_PortsJNI_getNumAccumulators
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumAccumulators";
@@ -42,12 +42,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumAccumulators
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumAnalogTriggers
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumAnalogTriggers
+Java_edu_wpi_first_hal_PortsJNI_getNumAnalogTriggers
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumAnalogTriggers";
@@ -57,12 +57,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumAnalogTriggers
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumAnalogInputs
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumAnalogInputs
+Java_edu_wpi_first_hal_PortsJNI_getNumAnalogInputs
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumAnalogInputs";
@@ -72,12 +72,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumAnalogInputs
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumAnalogOutputs
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumAnalogOutputs
+Java_edu_wpi_first_hal_PortsJNI_getNumAnalogOutputs
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumAnalogOutputs";
@@ -87,12 +87,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumAnalogOutputs
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumCounters
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumCounters
+Java_edu_wpi_first_hal_PortsJNI_getNumCounters
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumCounters";
@@ -102,12 +102,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumCounters
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumDigitalHeaders
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumDigitalHeaders
+Java_edu_wpi_first_hal_PortsJNI_getNumDigitalHeaders
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumDigitalHeaders";
@@ -117,12 +117,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumDigitalHeaders
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumPWMHeaders
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPWMHeaders
+Java_edu_wpi_first_hal_PortsJNI_getNumPWMHeaders
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumPWMHeaders";
@@ -132,12 +132,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPWMHeaders
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumDigitalChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumDigitalChannels
+Java_edu_wpi_first_hal_PortsJNI_getNumDigitalChannels
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumDigitalChannels";
@@ -147,12 +147,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumDigitalChannels
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumPWMChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPWMChannels
+Java_edu_wpi_first_hal_PortsJNI_getNumPWMChannels
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumPWMChannels";
@@ -162,12 +162,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPWMChannels
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumDigitalPWMOutputs
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumDigitalPWMOutputs
+Java_edu_wpi_first_hal_PortsJNI_getNumDigitalPWMOutputs
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumDigitalPWMOutputs";
@@ -177,12 +177,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumDigitalPWMOutputs
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumEncoders
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumEncoders
+Java_edu_wpi_first_hal_PortsJNI_getNumEncoders
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumEncoders";
@@ -192,12 +192,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumEncoders
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumInterrupts
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumInterrupts
+Java_edu_wpi_first_hal_PortsJNI_getNumInterrupts
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumInterrupts";
@@ -207,12 +207,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumInterrupts
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumRelayChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumRelayChannels
+Java_edu_wpi_first_hal_PortsJNI_getNumRelayChannels
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumRelayChannels";
@@ -222,12 +222,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumRelayChannels
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumRelayHeaders
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumRelayHeaders
+Java_edu_wpi_first_hal_PortsJNI_getNumRelayHeaders
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumRelayHeaders";
@@ -237,12 +237,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumRelayHeaders
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumPCMModules
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPCMModules
+Java_edu_wpi_first_hal_PortsJNI_getNumPCMModules
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumPCMModules";
@@ -252,12 +252,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPCMModules
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumSolenoidChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumSolenoidChannels
+Java_edu_wpi_first_hal_PortsJNI_getNumSolenoidChannels
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumSolenoidChannels";
@@ -267,12 +267,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumSolenoidChannels
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumPDPModules
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPDPModules
+Java_edu_wpi_first_hal_PortsJNI_getNumPDPModules
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumPDPModules";
@@ -282,12 +282,12 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPDPModules
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumPDPChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPDPChannels
+Java_edu_wpi_first_hal_PortsJNI_getNumPDPChannels
   (JNIEnv* env, jclass)
 {
   PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumPDPChannels";

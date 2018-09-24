@@ -151,7 +151,7 @@ void Notifier::RemoveListener(int uid) {
   thr->m_listeners.erase(uid);
 }
 
-void Notifier::NotifySource(wpi::StringRef name, CS_Source source,
+void Notifier::NotifySource(const wpi::Twine& name, CS_Source source,
                             CS_EventKind kind) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
@@ -176,9 +176,9 @@ void Notifier::NotifySourceVideoMode(const SourceImpl& source,
 }
 
 void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
-                                    wpi::StringRef propertyName, int property,
-                                    CS_PropertyKind propertyKind, int value,
-                                    wpi::StringRef valueStr) {
+                                    const wpi::Twine& propertyName,
+                                    int property, CS_PropertyKind propertyKind,
+                                    int value, const wpi::Twine& valueStr) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
 
@@ -191,7 +191,7 @@ void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
   thr->m_cond.notify_one();
 }
 
-void Notifier::NotifySink(wpi::StringRef name, CS_Sink sink,
+void Notifier::NotifySink(const wpi::Twine& name, CS_Sink sink,
                           CS_EventKind kind) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
@@ -205,7 +205,7 @@ void Notifier::NotifySink(const SinkImpl& sink, CS_EventKind kind) {
   NotifySink(sink.GetName(), handleData.first, kind);
 }
 
-void Notifier::NotifySinkSourceChanged(wpi::StringRef name, CS_Sink sink,
+void Notifier::NotifySinkSourceChanged(const wpi::Twine& name, CS_Sink sink,
                                        CS_Source source) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
@@ -218,9 +218,9 @@ void Notifier::NotifySinkSourceChanged(wpi::StringRef name, CS_Sink sink,
 }
 
 void Notifier::NotifySinkProperty(const SinkImpl& sink, CS_EventKind kind,
-                                  wpi::StringRef propertyName, int property,
+                                  const wpi::Twine& propertyName, int property,
                                   CS_PropertyKind propertyKind, int value,
-                                  wpi::StringRef valueStr) {
+                                  const wpi::Twine& valueStr) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
 

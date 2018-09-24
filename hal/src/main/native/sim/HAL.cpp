@@ -7,6 +7,7 @@
 
 #include "hal/HAL.h"
 
+#include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
 
 #include "ErrorsInternal.h"
@@ -213,7 +214,7 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
 uint64_t HAL_GetFPGATime(int32_t* status) { return hal::GetFPGATime(); }
 
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
-  return SimRoboRioData[0].GetFPGAButton();
+  return SimRoboRioData[0].fpgaButton;
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {

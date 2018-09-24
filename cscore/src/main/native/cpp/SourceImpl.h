@@ -16,6 +16,7 @@
 
 #include <wpi/ArrayRef.h>
 #include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
@@ -30,16 +31,25 @@ class SourceImpl : public PropertyContainer {
   friend class Frame;
 
  public:
-  explicit SourceImpl(wpi::StringRef name);
+  explicit SourceImpl(const wpi::Twine& name);
   virtual ~SourceImpl();
   SourceImpl(const SourceImpl& oth) = delete;
   SourceImpl& operator=(const SourceImpl& oth) = delete;
 
   wpi::StringRef GetName() const { return m_name; }
 
-  void SetDescription(wpi::StringRef description);
+  void SetDescription(const wpi::Twine& description);
   wpi::StringRef GetDescription(wpi::SmallVectorImpl<char>& buf) const;
 
+  void SetConnectionStrategy(CS_ConnectionStrategy strategy) {
+    m_strategy = static_cast<int>(strategy);
+  }
+  bool IsEnabled() const {
+    return m_strategy == CS_CONNECTION_KEEP_OPEN ||
+           (m_strategy == CS_CONNECTION_AUTO_MANAGE && m_numSinksEnabled > 0);
+  }
+
+  // User-visible connection status
   void SetConnected(bool connected);
   bool IsConnected() const { return m_connected; }
 
@@ -117,19 +127,18 @@ class SourceImpl : public PropertyContainer {
  protected:
   void NotifyPropertyCreated(int propIndex, PropertyImpl& prop) override;
   void UpdatePropertyValue(int property, bool setString, int value,
-                           wpi::StringRef valueStr) override;
+                           const wpi::Twine& valueStr) override;
 
   void PutFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
                 wpi::StringRef data, Frame::Time time);
   void PutFrame(std::unique_ptr<Image> image, Frame::Time time);
-  void PutError(wpi::StringRef msg, Frame::Time time);
+  void PutError(const wpi::Twine& msg, Frame::Time time);
 
   // Notification functions for corresponding atomics
   virtual void NumSinksChanged() = 0;
   virtual void NumSinksEnabledChanged() = 0;
 
   std::atomic_int m_numSinks{0};
-  std::atomic_int m_numSinksEnabled{0};
 
  protected:
   // Cached video modes (protected with m_mutex)
@@ -144,6 +153,9 @@ class SourceImpl : public PropertyContainer {
 
   std::string m_name;
   std::string m_description;
+
+  std::atomic_int m_strategy{CS_CONNECTION_AUTO_MANAGE};
+  std::atomic_int m_numSinksEnabled{0};
 
   wpi::mutex m_frameMutex;
   wpi::condition_variable m_frameCv;

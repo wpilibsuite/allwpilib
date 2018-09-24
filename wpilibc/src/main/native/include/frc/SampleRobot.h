@@ -98,6 +98,9 @@ class WPI_DEPRECATED(
   SampleRobot();
   virtual ~SampleRobot() = default;
 
+  SampleRobot(SampleRobot&&) = default;
+  SampleRobot& operator=(SampleRobot&&) = default;
+
  private:
   bool m_robotMainOverridden = true;
 };

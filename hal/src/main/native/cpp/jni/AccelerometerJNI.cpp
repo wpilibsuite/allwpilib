@@ -7,66 +7,66 @@
 
 #include <jni.h>
 
-#include "edu_wpi_first_wpilibj_hal_AccelerometerJNI.h"
+#include "edu_wpi_first_hal_AccelerometerJNI.h"
 #include "hal/Accelerometer.h"
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AccelerometerJNI
+ * Class:     edu_wpi_first_hal_AccelerometerJNI
  * Method:    setAccelerometerActive
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccelerometerActive
+Java_edu_wpi_first_hal_AccelerometerJNI_setAccelerometerActive
   (JNIEnv*, jclass, jboolean active)
 {
   HAL_SetAccelerometerActive(active);
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AccelerometerJNI
+ * Class:     edu_wpi_first_hal_AccelerometerJNI
  * Method:    setAccelerometerRange
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccelerometerRange
+Java_edu_wpi_first_hal_AccelerometerJNI_setAccelerometerRange
   (JNIEnv*, jclass, jint range)
 {
   HAL_SetAccelerometerRange((HAL_AccelerometerRange)range);
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AccelerometerJNI
+ * Class:     edu_wpi_first_hal_AccelerometerJNI
  * Method:    getAccelerometerX
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerX
+Java_edu_wpi_first_hal_AccelerometerJNI_getAccelerometerX
   (JNIEnv*, jclass)
 {
   return HAL_GetAccelerometerX();
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AccelerometerJNI
+ * Class:     edu_wpi_first_hal_AccelerometerJNI
  * Method:    getAccelerometerY
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerY
+Java_edu_wpi_first_hal_AccelerometerJNI_getAccelerometerY
   (JNIEnv*, jclass)
 {
   return HAL_GetAccelerometerY();
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AccelerometerJNI
+ * Class:     edu_wpi_first_hal_AccelerometerJNI
  * Method:    getAccelerometerZ
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerZ
+Java_edu_wpi_first_hal_AccelerometerJNI_getAccelerometerZ
   (JNIEnv*, jclass)
 {
   return HAL_GetAccelerometerZ();

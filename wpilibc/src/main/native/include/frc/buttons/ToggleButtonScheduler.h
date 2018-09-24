@@ -18,6 +18,10 @@ class ToggleButtonScheduler : public ButtonScheduler {
  public:
   ToggleButtonScheduler(bool last, Trigger* button, Command* orders);
   virtual ~ToggleButtonScheduler() = default;
+
+  ToggleButtonScheduler(ToggleButtonScheduler&&) = default;
+  ToggleButtonScheduler& operator=(ToggleButtonScheduler&&) = default;
+
   virtual void Execute();
 
  private:

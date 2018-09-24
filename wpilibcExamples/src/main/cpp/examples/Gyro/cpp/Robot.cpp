@@ -8,9 +8,9 @@
 #include <cmath>
 
 #include <frc/AnalogGyro.h>
-#include <frc/IterativeRobot.h>
 #include <frc/Joystick.h>
 #include <frc/Spark.h>
+#include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
 
 /**
@@ -18,7 +18,7 @@
  * robot drive straight. This program uses a joystick to drive forwards and
  * backwards while the gyro is used for direction keeping.
  */
-class Robot : public frc::IterativeRobot {
+class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override { m_gyro.SetSensitivity(kVoltsPerDegreePerSecond); }
 

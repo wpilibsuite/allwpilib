@@ -23,6 +23,9 @@ class Spark : public PWMSpeedController {
    *                on-board, 10-19 are on the MXP port
    */
   explicit Spark(int channel);
+
+  Spark(Spark&&) = default;
+  Spark& operator=(Spark&&) = default;
 };
 
 }  // namespace frc

@@ -8,7 +8,9 @@
 package edu.wpi.first.wpilibj.sim;
 
 import edu.wpi.first.wpilibj.AnalogOutput;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.sim.AnalogOutSim;
+import edu.wpi.first.hal.sim.CallbackStore;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

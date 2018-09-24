@@ -21,7 +21,7 @@ using namespace cs;
 
 static constexpr size_t kMaxImagesAvail = 32;
 
-SourceImpl::SourceImpl(wpi::StringRef name) : m_name{name} {
+SourceImpl::SourceImpl(const wpi::Twine& name) : m_name{name.str()} {
   m_frame = Frame{*this, wpi::StringRef{}, 0};
 }
 
@@ -38,9 +38,9 @@ SourceImpl::~SourceImpl() {
   // Everything else can clean up itself.
 }
 
-void SourceImpl::SetDescription(wpi::StringRef description) {
+void SourceImpl::SetDescription(const wpi::Twine& description) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  m_description = description;
+  m_description = description.str();
 }
 
 wpi::StringRef SourceImpl::GetDescription(
@@ -229,7 +229,7 @@ void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
   m_frameCv.notify_all();
 }
 
-void SourceImpl::PutError(wpi::StringRef msg, Frame::Time time) {
+void SourceImpl::PutError(const wpi::Twine& msg, Frame::Time time) {
   // Update frame
   {
     std::lock_guard<wpi::mutex> lock{m_frameMutex};
@@ -249,11 +249,11 @@ void SourceImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
   if (prop.propKind == CS_PROP_ENUM)
     notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
                                   prop.name, propIndex, prop.propKind,
-                                  prop.value, wpi::StringRef{});
+                                  prop.value, wpi::Twine{});
 }
 
 void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
-                                     wpi::StringRef valueStr) {
+                                     const wpi::Twine& valueStr) {
   auto prop = GetProperty(property);
   if (!prop) return;
 

@@ -8,6 +8,7 @@
 #include "frc/SPI.h"
 
 #include <cstring>
+#include <utility>
 
 #include <hal/HAL.h>
 #include <hal/SPI.h>
@@ -138,46 +139,67 @@ SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
 
 SPI::~SPI() { HAL_CloseSPI(m_port); }
 
+SPI::SPI(SPI&& rhs)
+    : ErrorBase(std::move(rhs)),
+      m_msbFirst(std::move(rhs.m_msbFirst)),
+      m_sampleOnTrailing(std::move(rhs.m_sampleOnTrailing)),
+      m_clockIdleHigh(std::move(rhs.m_clockIdleHigh)),
+      m_accum(std::move(rhs.m_accum)) {
+  std::swap(m_port, rhs.m_port);
+}
+
+SPI& SPI::operator=(SPI&& rhs) {
+  ErrorBase::operator=(std::move(rhs));
+
+  std::swap(m_port, rhs.m_port);
+  m_msbFirst = std::move(rhs.m_msbFirst);
+  m_sampleOnTrailing = std::move(rhs.m_sampleOnTrailing);
+  m_clockIdleHigh = std::move(rhs.m_clockIdleHigh);
+  m_accum = std::move(rhs.m_accum);
+
+  return *this;
+}
+
 void SPI::SetClockRate(double hz) { HAL_SetSPISpeed(m_port, hz); }
 
 void SPI::SetMSBFirst() {
   m_msbFirst = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetLSBFirst() {
   m_msbFirst = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetSampleDataOnLeadingEdge() {
   m_sampleOnTrailing = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetSampleDataOnTrailingEdge() {
   m_sampleOnTrailing = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetSampleDataOnFalling() {
   m_sampleOnTrailing = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetSampleDataOnRising() {
   m_sampleOnTrailing = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetClockActiveLow() {
-  m_clk_idle_high = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  m_clockIdleHigh = true;
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetClockActiveHigh() {
-  m_clk_idle_high = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  m_clockIdleHigh = false;
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetChipSelectActiveHigh() {

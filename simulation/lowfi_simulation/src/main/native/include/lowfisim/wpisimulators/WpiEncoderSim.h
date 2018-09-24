@@ -8,15 +8,17 @@
 #pragma once
 
 #include "lowfisim/EncoderSim.h"
+#include "lowfisim/SimulatorComponentBase.h"
 #include "simulation/EncoderSim.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class WpiEncoderSim : public EncoderSim {
+class WpiEncoderSim : public SimulatorComponentBase, public EncoderSim {
  public:
   explicit WpiEncoderSim(int index);
+  bool IsWrapperInitialized() const override;
 
   void SetPosition(double position) override;
   void SetVelocity(double velocity) override;

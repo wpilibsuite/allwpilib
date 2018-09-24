@@ -8,10 +8,10 @@
 package edu.wpi.first.wpilibj.examples.motorcontrolencoder;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * <p>In addition, the encoder value of an encoder connected to ports 0 and 1 is
  * consistently sent to the Dashboard.
  */
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
   private static final int kMotorPort = 0;
   private static final int kJoystickPort = 0;
   private static final int kEncoderPortA = 0;

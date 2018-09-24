@@ -29,6 +29,9 @@ class SendableChooserBase : public SendableBase {
   SendableChooserBase();
   ~SendableChooserBase() override = default;
 
+  SendableChooserBase(SendableChooserBase&&) = default;
+  SendableChooserBase& operator=(SendableChooserBase&&) = default;
+
  protected:
   static constexpr const char* kDefault = "default";
   static constexpr const char* kOptions = "options";

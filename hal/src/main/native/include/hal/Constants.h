@@ -9,6 +9,12 @@
 
 #include <stdint.h>
 
+/**
+ * @defgroup hal_constants Constants Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -22,3 +28,4 @@ int32_t HAL_GetSystemClockTicksPerMicrosecond(void);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

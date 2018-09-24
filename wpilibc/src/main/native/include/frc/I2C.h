@@ -9,9 +9,9 @@
 
 #include <stdint.h>
 
-#include "frc/ErrorBase.h"
+#include <hal/I2C.h>
 
-enum HAL_I2CPort : int32_t;
+#include "frc/ErrorBase.h"
 
 namespace frc {
 
@@ -35,8 +35,8 @@ class I2C : public ErrorBase {
 
   ~I2C() override;
 
-  I2C(const I2C&) = delete;
-  I2C& operator=(const I2C&) = delete;
+  I2C(I2C&& rhs);
+  I2C& operator=(I2C&& rhs);
 
   /**
    * Generic transaction.
@@ -135,7 +135,7 @@ class I2C : public ErrorBase {
   bool VerifySensor(int registerAddress, int count, const uint8_t* expected);
 
  private:
-  HAL_I2CPort m_port;
+  HAL_I2CPort m_port = HAL_I2C_kInvalid;
   int m_deviceAddress;
 };
 

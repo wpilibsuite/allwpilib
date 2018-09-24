@@ -27,7 +27,9 @@ class DriverStationSim {
         &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetEnabled() { return HALSIM_GetDriverStationEnabled(); }
+
+  bool GetEnabled() const { return HALSIM_GetDriverStationEnabled(); }
+
   void SetEnabled(bool enabled) { HALSIM_SetDriverStationEnabled(enabled); }
 
   std::unique_ptr<CallbackStore> RegisterAutonomousCallback(
@@ -38,7 +40,9 @@ class DriverStationSim {
         &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetAutonomous() { return HALSIM_GetDriverStationAutonomous(); }
+
+  bool GetAutonomous() const { return HALSIM_GetDriverStationAutonomous(); }
+
   void SetAutonomous(bool autonomous) {
     HALSIM_SetDriverStationAutonomous(autonomous);
   }
@@ -51,7 +55,9 @@ class DriverStationSim {
         &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetTest() { return HALSIM_GetDriverStationTest(); }
+
+  bool GetTest() const { return HALSIM_GetDriverStationTest(); }
+
   void SetTest(bool test) { HALSIM_SetDriverStationTest(test); }
 
   std::unique_ptr<CallbackStore> RegisterEStopCallback(NotifyCallback callback,
@@ -62,7 +68,9 @@ class DriverStationSim {
         &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetEStop() { return HALSIM_GetDriverStationEStop(); }
+
+  bool GetEStop() const { return HALSIM_GetDriverStationEStop(); }
+
   void SetEStop(bool eStop) { HALSIM_SetDriverStationEStop(eStop); }
 
   std::unique_ptr<CallbackStore> RegisterFmsAttachedCallback(
@@ -73,7 +81,9 @@ class DriverStationSim {
         &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetFmsAttached() { return HALSIM_GetDriverStationFmsAttached(); }
+
+  bool GetFmsAttached() const { return HALSIM_GetDriverStationFmsAttached(); }
+
   void SetFmsAttached(bool fmsAttached) {
     HALSIM_SetDriverStationFmsAttached(fmsAttached);
   }
@@ -86,7 +96,9 @@ class DriverStationSim {
         &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetDsAttached() { return HALSIM_GetDriverStationDsAttached(); }
+
+  bool GetDsAttached() const { return HALSIM_GetDriverStationDsAttached(); }
+
   void SetDsAttached(bool dsAttached) {
     HALSIM_SetDriverStationDsAttached(dsAttached);
   }

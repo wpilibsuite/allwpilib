@@ -9,10 +9,10 @@ package edu.wpi.first.wpilibj;
 
 import java.nio.ByteBuffer;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.I2CJNI;
-import edu.wpi.first.wpilibj.util.BoundaryException;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.I2CJNI;
+import edu.wpi.first.hal.util.BoundaryException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -100,7 +100,7 @@ public class I2C implements AutoCloseable {
    * @param receiveSize  Number of bytes to read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "ByteBufferBackingArray"})
   public synchronized boolean transaction(ByteBuffer dataToSend, int sendSize,
                                           ByteBuffer dataReceived, int receiveSize) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {
@@ -191,6 +191,7 @@ public class I2C implements AutoCloseable {
    * @param size The number of data bytes to write.
    * @return Transfer Aborted... false for success, true for aborted.
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public synchronized boolean writeBulk(ByteBuffer data, int size) {
     if (data.hasArray()) {
       return writeBulk(data.array(), size);
@@ -246,6 +247,7 @@ public class I2C implements AutoCloseable {
    * @param buffer          A buffer to store the data read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public boolean read(int registerAddress, int count, ByteBuffer buffer) {
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
@@ -303,6 +305,7 @@ public class I2C implements AutoCloseable {
    * @param count  The number of bytes to read in the transaction.
    * @return Transfer Aborted... false for success, true for aborted.
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public boolean readOnly(ByteBuffer buffer, int count) {
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count

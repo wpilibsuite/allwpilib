@@ -66,8 +66,8 @@ class Timer {
 
   virtual ~Timer() = default;
 
-  Timer(const Timer&) = delete;
-  Timer& operator=(const Timer&) = delete;
+  Timer(Timer&&) = default;
+  Timer& operator=(Timer&&) = default;
 
   /**
    * Get the current time from the timer. If the clock is running it is derived

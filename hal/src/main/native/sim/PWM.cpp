@@ -57,7 +57,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 
   port->channel = origChannel;
 
-  SimPWMData[origChannel].SetInitialized(true);
+  SimPWMData[origChannel].initialized = true;
 
   // Defaults to allow an always valid config.
   HAL_SetPWMConfig(handle, 2.0, 1.501, 1.5, 1.499, 1.0, status);
@@ -71,7 +71,7 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return;
   }
 
-  SimPWMData[port->channel].SetInitialized(false);
+  SimPWMData[port->channel].initialized = false;
 
   digitalChannelHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
 }
@@ -174,7 +174,7 @@ void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value,
     return;
   }
 
-  SimPWMData[port->channel].SetRawValue(value);
+  SimPWMData[port->channel].rawValue = value;
 }
 
 void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
@@ -195,7 +195,7 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
     speed = 1.0;
   }
 
-  SimPWMData[port->channel].SetSpeed(speed);
+  SimPWMData[port->channel].speed = speed;
 }
 
 void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double pos,
@@ -216,7 +216,7 @@ void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double pos,
     pos = 1.0;
   }
 
-  SimPWMData[port->channel].SetPosition(pos);
+  SimPWMData[port->channel].position = pos;
 }
 
 void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
@@ -225,9 +225,9 @@ void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  SimPWMData[port->channel].SetRawValue(0);
-  SimPWMData[port->channel].SetPosition(0);
-  SimPWMData[port->channel].SetSpeed(0);
+  SimPWMData[port->channel].rawValue = 0;
+  SimPWMData[port->channel].position = 0;
+  SimPWMData[port->channel].speed = 0;
 }
 
 int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
@@ -237,7 +237,7 @@ int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return 0;
   }
 
-  return SimPWMData[port->channel].GetRawValue();
+  return SimPWMData[port->channel].rawValue;
 }
 
 double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
@@ -251,7 +251,7 @@ double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return 0;
   }
 
-  double speed = SimPWMData[port->channel].GetSpeed();
+  double speed = SimPWMData[port->channel].speed;
   if (speed > 1) speed = 1;
   if (speed < -1) speed = -1;
   return speed;
@@ -268,7 +268,7 @@ double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return 0;
   }
 
-  double position = SimPWMData[port->channel].GetPosition();
+  double position = SimPWMData[port->channel].position;
   if (position > 1) position = 1;
   if (position < 0) position = 0;
   return position;
@@ -281,8 +281,8 @@ void HAL_LatchPWMZero(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return;
   }
 
-  SimPWMData[port->channel].SetZeroLatch(true);
-  SimPWMData[port->channel].SetZeroLatch(false);
+  SimPWMData[port->channel].zeroLatch = true;
+  SimPWMData[port->channel].zeroLatch = false;
 }
 
 void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
@@ -293,7 +293,7 @@ void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
     return;
   }
 
-  SimPWMData[port->channel].SetPeriodScale(squelchMask);
+  SimPWMData[port->channel].periodScale = squelchMask;
 }
 
 int32_t HAL_GetPWMLoopTiming(int32_t* status) { return kExpectedLoopTiming; }

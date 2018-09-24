@@ -17,6 +17,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_threads Threads Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 extern "C" {
 /**
  * Gets the thread priority for the specified thread.
@@ -69,3 +75,4 @@ HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
 HAL_Bool HAL_SetCurrentThreadPriority(HAL_Bool realTime, int32_t priority,
                                       int32_t* status);
 }  // extern "C"
+/** @} */

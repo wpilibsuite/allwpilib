@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.InterruptJNI;
-import edu.wpi.first.wpilibj.util.AllocationException;
+import edu.wpi.first.hal.InterruptJNI;
+import edu.wpi.first.hal.util.AllocationException;
 
 
 /**

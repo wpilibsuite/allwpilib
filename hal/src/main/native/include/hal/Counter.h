@@ -12,6 +12,12 @@
 #include "hal/AnalogTrigger.h"
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_counter Counter Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 // clang-format off
 /**
  * The counter mode.
@@ -298,3 +304,4 @@ void HAL_SetCounterReverseDirection(HAL_CounterHandle counterHandle,
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

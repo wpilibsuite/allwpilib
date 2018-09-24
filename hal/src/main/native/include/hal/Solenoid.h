@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_solenoid Solenoid Output Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -132,3 +138,4 @@ void HAL_FireOneShot(HAL_SolenoidHandle solenoidPortHandle, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

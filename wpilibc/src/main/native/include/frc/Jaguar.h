@@ -23,6 +23,9 @@ class Jaguar : public PWMSpeedController {
    *                on-board, 10-19 are on the MXP port
    */
   explicit Jaguar(int channel);
+
+  Jaguar(Jaguar&&) = default;
+  Jaguar& operator=(Jaguar&&) = default;
 };
 
 }  // namespace frc

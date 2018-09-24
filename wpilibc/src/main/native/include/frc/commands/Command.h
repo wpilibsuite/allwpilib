@@ -73,6 +73,13 @@ class Command : public ErrorBase, public SendableBase {
   explicit Command(double timeout);
 
   /**
+   * Creates a new command with the given timeout and a default name.
+   *
+   * @param subsystem the subsystem that the command requires
+   */
+  explicit Command(Subsystem& subsystem);
+
+  /**
    * Creates a new command with the given name and timeout.
    *
    * @param name    the name of the command
@@ -81,7 +88,35 @@ class Command : public ErrorBase, public SendableBase {
    */
   Command(const wpi::Twine& name, double timeout);
 
+  /**
+   * Creates a new command with the given name and timeout.
+   *
+   * @param name      the name of the command
+   * @param subsystem the subsystem that the command requires
+   */
+  Command(const wpi::Twine& name, Subsystem& subsystem);
+
+  /**
+   * Creates a new command with the given name and timeout.
+   *
+   * @param timeout   the time (in seconds) before this command "times out"
+   * @param subsystem the subsystem that the command requires @see IsTimedOut()
+   */
+  Command(double timeout, Subsystem& subsystem);
+
+  /**
+   * Creates a new command with the given name and timeout.
+   *
+   * @param name      the name of the command
+   * @param timeout   the time (in seconds) before this command "times out"
+   * @param subsystem the subsystem that the command requires @see IsTimedOut()
+   */
+  Command(const wpi::Twine& name, double timeout, Subsystem& subsystem);
+
   ~Command() override = default;
+
+  Command(Command&&) = default;
+  Command& operator=(Command&&) = default;
 
   /**
    * Returns the time since this command was initialized (in seconds).

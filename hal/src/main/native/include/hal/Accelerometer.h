@@ -9,6 +9,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_accelerometer Accelerometer Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 // clang-format off
 /**
  * The acceptable accelerometer ranges.
@@ -69,4 +75,5 @@ double HAL_GetAccelerometerY(void);
 double HAL_GetAccelerometerZ(void);
 #ifdef __cplusplus
 }  // extern "C"
+/** @} */
 #endif

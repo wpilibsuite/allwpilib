@@ -11,6 +11,13 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_pdp PDP Functions
+ * @ingroup hal_capi
+ * Functions to control the Power Distribution Panel.
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -112,3 +119,4 @@ void HAL_ClearPDPStickyFaults(HAL_PDPHandle handle, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

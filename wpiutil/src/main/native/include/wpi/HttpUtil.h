@@ -141,6 +141,49 @@ class HttpConnection {
   explicit operator bool() const { return stream && !is.has_error(); }
 };
 
+class HttpMultipartScanner {
+ public:
+  explicit HttpMultipartScanner(StringRef boundary, bool saveSkipped = false) {
+    Reset(saveSkipped);
+    SetBoundary(boundary);
+  }
+
+  // Change the boundary.  This is only safe to do when IsDone() is true (or
+  // immediately after construction).
+  void SetBoundary(StringRef boundary);
+
+  // Reset the scanner.  This allows reuse of internal buffers.
+  void Reset(bool saveSkipped = false);
+
+  // Execute the scanner.  Will automatically call Reset() on entry if IsDone()
+  // is true.
+  // @param in input data
+  // @return the input not consumed; empty if all input consumed
+  StringRef Execute(StringRef in);
+
+  // Returns true when the boundary has been found.
+  bool IsDone() const { return m_state == kDone; }
+
+  // Get the skipped data.  Will be empty if saveSkipped was false.
+  StringRef GetSkipped() const {
+    return m_saveSkipped ? StringRef{m_buf} : StringRef{};
+  }
+
+ private:
+  SmallString<64> m_boundaryWith, m_boundaryWithout;
+
+  // Internal state
+  enum State { kBoundary, kPadding, kDone };
+  State m_state;
+  size_t m_posWith, m_posWithout;
+  enum Dashes { kUnknown, kWith, kWithout };
+  Dashes m_dashes;
+
+  // Buffer
+  bool m_saveSkipped;
+  std::string m_buf;
+};
+
 }  // namespace wpi
 
 #include "HttpUtil.inl"

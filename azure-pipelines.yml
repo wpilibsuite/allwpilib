@@ -1,0 +1,120 @@
+# Gradle
+# Build your Java projects and run tests with Gradle using a Gradle wrapper script.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/vsts/pipelines/languages/java
+
+resources:
+  containers:
+  - container: ubuntu18
+    image: ubuntu:18.04
+
+jobs:
+ - job: Linux_Arm
+   pool:
+     vmImage: 'Ubuntu 16.04'
+
+   steps:
+    - script: |
+        sudo add-apt-repository ppa:wpilib/toolchain -y
+        sudo apt-get update -y
+        sudo apt-get install frc-toolchain -y
+      displayName: 'Install Toolchain'
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.8'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: false
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'build'
+        options: '-PonlyAthena'
+
+ - job: Linux
+   pool:
+     vmImage: 'Ubuntu 16.04'
+
+   steps:
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.8'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: false
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'build'
+        options: '-PskipAthena'
+
+ - job: Styleguide
+   pool:
+     vmImage: 'Ubuntu 16.04'
+
+   steps:
+      - script: |
+          sudo apt-get update -y
+          sudo apt-get install clang-format-5.0 python3-setuptools -y
+          sudo pip3 install --upgrade pip
+          sudo pip3 install wpiformat
+          git checkout -b master
+        displayName: 'Install Dependencies'
+      - script: |
+          wpiformat -y 2018 -clang 5.0
+        displayName: 'Run WPIFormat'
+        failOnStderr: true
+      - script: |
+          git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+        displayName: 'Check WPIFormat Output'
+        failOnStderr: true
+
+ - job: Windows_64_Bit
+   pool:
+     vmImage: 'vs2017-win2017'
+   steps:
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.8'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: false
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'build'
+
+ - job: Windows_32_Bit
+   pool:
+     vmImage: 'vs2017-win2017'
+   steps:
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx1024m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.8'
+        jdkArchitectureOption: 'x86'
+        publishJUnitResults: false
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'build'
+
+ - job: Mac
+   pool:
+     vmImage: 'xcode9-macos10.13'
+   steps:
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.8'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: false
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'build'

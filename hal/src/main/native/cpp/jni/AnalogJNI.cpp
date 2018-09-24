@@ -10,7 +10,7 @@
 #include <cassert>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_wpilibj_hal_AnalogJNI.h"
+#include "edu_wpi_first_hal_AnalogJNI.h"
 #include "hal/AnalogAccumulator.h"
 #include "hal/AnalogInput.h"
 #include "hal/AnalogOutput.h"
@@ -33,12 +33,12 @@ TLogLevel analogJNILogLevel = logWARNING;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    initializeAnalogInputPort
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogInputPort
+Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogInputPort
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_PortHandle)id;
@@ -52,12 +52,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogInputPort
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    freeAnalogInputPort
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_freeAnalogInputPort
+Java_edu_wpi_first_hal_AnalogJNI_freeAnalogInputPort
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_AnalogInputHandle)id;
@@ -65,12 +65,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_freeAnalogInputPort
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    initializeAnalogOutputPort
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogOutputPort
+Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogOutputPort
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_PortHandle)id;
@@ -85,12 +85,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogOutputPort
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    freeAnalogOutputPort
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_freeAnalogOutputPort
+Java_edu_wpi_first_hal_AnalogJNI_freeAnalogOutputPort
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Port Handle = " << id;
@@ -98,12 +98,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_freeAnalogOutputPort
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    checkAnalogModule
  * Signature: (B)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogModule
+Java_edu_wpi_first_hal_AnalogJNI_checkAnalogModule
   (JNIEnv*, jclass, jbyte value)
 {
   // ANALOGJNI_LOG(logDEBUG) << "Module = " << (jint)value;
@@ -114,12 +114,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogModule
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    checkAnalogInputChannel
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogInputChannel
+Java_edu_wpi_first_hal_AnalogJNI_checkAnalogInputChannel
   (JNIEnv*, jclass, jint value)
 {
   // ANALOGJNI_LOG(logDEBUG) << "Channel = " << value;
@@ -130,12 +130,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogInputChannel
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    checkAnalogOutputChannel
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogOutputChannel
+Java_edu_wpi_first_hal_AnalogJNI_checkAnalogOutputChannel
   (JNIEnv*, jclass, jint value)
 {
   // ANALOGJNI_LOG(logDEBUG) << "Channel = " << value;
@@ -146,12 +146,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogOutputChannel
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogOutput
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogOutput
+Java_edu_wpi_first_hal_AnalogJNI_setAnalogOutput
   (JNIEnv* env, jclass, jint id, jdouble voltage)
 {
   ANALOGJNI_LOG(logDEBUG) << "Calling setAnalogOutput";
@@ -163,12 +163,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogOutput
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogOutput
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOutput
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogOutput
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -178,12 +178,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOutput
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogSampleRate
  * Signature: (D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogSampleRate
+Java_edu_wpi_first_hal_AnalogJNI_setAnalogSampleRate
   (JNIEnv* env, jclass, jdouble value)
 {
   ANALOGJNI_LOG(logDEBUG) << "SampleRate = " << value;
@@ -194,12 +194,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogSampleRate
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogSampleRate
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogSampleRate
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogSampleRate
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
@@ -211,12 +211,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogSampleRate
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogAverageBits
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogAverageBits
+Java_edu_wpi_first_hal_AnalogJNI_setAnalogAverageBits
   (JNIEnv* env, jclass, jint id, jint value)
 {
   ANALOGJNI_LOG(logDEBUG) << "AverageBits = " << value;
@@ -228,12 +228,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogAverageBits
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogAverageBits
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageBits
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogAverageBits
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -247,12 +247,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageBits
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogOversampleBits
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogOversampleBits
+Java_edu_wpi_first_hal_AnalogJNI_setAnalogOversampleBits
   (JNIEnv* env, jclass, jint id, jint value)
 {
   ANALOGJNI_LOG(logDEBUG) << "OversampleBits = " << value;
@@ -264,12 +264,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogOversampleBits
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogOversampleBits
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOversampleBits
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogOversampleBits
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -283,12 +283,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOversampleBits
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogValue
  * Signature: (I)S
  */
 JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogValue
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogValue
   (JNIEnv* env, jclass, jint id)
 {
   // ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (void*)id;
@@ -301,12 +301,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogValue
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogAverageValue
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageValue
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogAverageValue
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -320,12 +320,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageValue
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogVoltsToValue
  * Signature: (ID)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogVoltsToValue
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogVoltsToValue
   (JNIEnv* env, jclass, jint id, jdouble voltageValue)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -340,12 +340,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogVoltsToValue
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogVoltage
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogVoltage
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogVoltage
   (JNIEnv* env, jclass, jint id)
 {
   // ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (void*)id;
@@ -359,12 +359,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogVoltage
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogAverageVoltage
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageVoltage
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogAverageVoltage
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -378,12 +378,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageVoltage
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogLSBWeight
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogLSBWeight
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogLSBWeight
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -397,12 +397,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogLSBWeight
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogOffset
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOffset
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogOffset
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -416,12 +416,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOffset
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    isAccumulatorChannel
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_isAccumulatorChannel
+Java_edu_wpi_first_hal_AnalogJNI_isAccumulatorChannel
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "isAccumulatorChannel";
@@ -437,12 +437,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_isAccumulatorChannel
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    initAccumulator
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initAccumulator
+Java_edu_wpi_first_hal_AnalogJNI_initAccumulator
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -453,12 +453,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initAccumulator
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    resetAccumulator
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_resetAccumulator
+Java_edu_wpi_first_hal_AnalogJNI_resetAccumulator
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -469,12 +469,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_resetAccumulator
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAccumulatorCenter
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAccumulatorCenter
+Java_edu_wpi_first_hal_AnalogJNI_setAccumulatorCenter
   (JNIEnv* env, jclass, jint id, jint center)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -485,12 +485,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAccumulatorCenter
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAccumulatorDeadband
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAccumulatorDeadband
+Java_edu_wpi_first_hal_AnalogJNI_setAccumulatorDeadband
   (JNIEnv* env, jclass, jint id, jint deadband)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -501,12 +501,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAccumulatorDeadband
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAccumulatorValue
  * Signature: (I)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorValue
+Java_edu_wpi_first_hal_AnalogJNI_getAccumulatorValue
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -521,12 +521,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorValue
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAccumulatorCount
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorCount
+Java_edu_wpi_first_hal_AnalogJNI_getAccumulatorCount
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -540,12 +540,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorCount
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAccumulatorOutput
  * Signature: (ILjava/lang/Object;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorOutput
+Java_edu_wpi_first_hal_AnalogJNI_getAccumulatorOutput
   (JNIEnv* env, jclass, jint id, jobject accumulatorResult)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
@@ -561,12 +561,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorOutput
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    initializeAnalogTrigger
  * Signature: (ILjava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogTrigger
+Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTrigger
   (JNIEnv* env, jclass, jint id, jobject index)
 {
   ANALOGJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_AnalogInputHandle)id;
@@ -584,12 +584,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogTrigger
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    cleanAnalogTrigger
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_cleanAnalogTrigger
+Java_edu_wpi_first_hal_AnalogJNI_cleanAnalogTrigger
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Trigger Handle = "
@@ -600,12 +600,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_cleanAnalogTrigger
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogTriggerLimitsRaw
  * Signature: (III)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogTriggerLimitsRaw
+Java_edu_wpi_first_hal_AnalogJNI_setAnalogTriggerLimitsRaw
   (JNIEnv* env, jclass, jint id, jint lower, jint upper)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Trigger Handle = "
@@ -617,12 +617,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogTriggerLimitsRaw
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogTriggerLimitsVoltage
  * Signature: (IDD)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogTriggerLimitsVoltage
+Java_edu_wpi_first_hal_AnalogJNI_setAnalogTriggerLimitsVoltage
   (JNIEnv* env, jclass, jint id, jdouble lower, jdouble upper)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Trigger Handle = "
@@ -634,12 +634,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogTriggerLimitsVoltage
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogTriggerAveraged
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogTriggerAveraged
+Java_edu_wpi_first_hal_AnalogJNI_setAnalogTriggerAveraged
   (JNIEnv* env, jclass, jint id, jboolean averaged)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Trigger Handle = "
@@ -650,12 +650,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogTriggerAveraged
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogTriggerFiltered
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogTriggerFiltered
+Java_edu_wpi_first_hal_AnalogJNI_setAnalogTriggerFiltered
   (JNIEnv* env, jclass, jint id, jboolean filtered)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Trigger Handle = "
@@ -666,12 +666,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogTriggerFiltered
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogTriggerInWindow
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogTriggerInWindow
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogTriggerInWindow
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Trigger Handle = "
@@ -684,12 +684,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogTriggerInWindow
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogTriggerTriggerState
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogTriggerTriggerState
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogTriggerTriggerState
   (JNIEnv* env, jclass, jint id)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Trigger Handle = "
@@ -702,12 +702,12 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogTriggerTriggerState
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogTriggerOutput
  * Signature: (II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogTriggerOutput
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogTriggerOutput
   (JNIEnv* env, jclass, jint id, jint type)
 {
   ANALOGJNI_LOG(logDEBUG) << "Analog Trigger Handle = "

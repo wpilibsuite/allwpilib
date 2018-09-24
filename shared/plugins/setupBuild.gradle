@@ -2,6 +2,14 @@ apply plugin: 'cpp'
 apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: ExtraTasks
 
+ext {
+    chipObjectComponents = ["$pluginName".toString(), "${pluginName}Dev".toString(), "${pluginName}Test".toString()]
+    netCommComponents = ["$pluginName".toString(), "${pluginName}Dev".toString(), "${pluginName}Test".toString()]
+    useNiJava = false
+}
+
+apply from: "${rootDir}/shared/nilibraries.gradle"
+
 if (!project.hasProperty('onlyAthena')) {
     ext.skipAthena = true
     apply from: "${rootDir}/shared/config.gradle"
@@ -25,7 +33,7 @@ if (!project.hasProperty('onlyAthena')) {
                         it.buildable = false
                         return
                     }
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(it, 'shared')
                     if (project.hasProperty('includeNtCore')) {
                         lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     }
@@ -47,7 +55,7 @@ if (!project.hasProperty('onlyAthena')) {
                     }
                 }
                 binaries.all {
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(it, 'shared')
                     lib library: pluginName
                     if (project.hasProperty('includeNtCore')) {
                         lib project: ':ntcore', library: 'ntcore', linkage: 'shared'

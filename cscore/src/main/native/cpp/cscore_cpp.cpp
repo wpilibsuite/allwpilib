@@ -144,7 +144,7 @@ wpi::StringRef GetStringProperty(CS_Property property,
   return container->GetStringProperty(propertyIndex, buf, status);
 }
 
-void SetStringProperty(CS_Property property, wpi::StringRef value,
+void SetStringProperty(CS_Property property, const wpi::Twine& value,
                        CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
@@ -222,6 +222,17 @@ uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
   return data->source->GetCurFrameTime();
 }
 
+void SetSourceConnectionStrategy(CS_Source source,
+                                 CS_ConnectionStrategy strategy,
+                                 CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->source->SetConnectionStrategy(strategy);
+}
+
 bool IsSourceConnected(CS_Source source, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data) {
@@ -231,7 +242,16 @@ bool IsSourceConnected(CS_Source source, CS_Status* status) {
   return data->source->IsConnected();
 }
 
-CS_Property GetSourceProperty(CS_Source source, wpi::StringRef name,
+bool IsSourceEnabled(CS_Source source, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return false;
+  }
+  return data->source->IsEnabled();
+}
+
+CS_Property GetSourceProperty(CS_Source source, const wpi::Twine& name,
                               CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data) {
@@ -489,7 +509,7 @@ wpi::StringRef GetSinkDescription(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
   return data->sink->GetDescription(buf);
 }
 
-CS_Property GetSinkProperty(CS_Sink sink, wpi::StringRef name,
+CS_Property GetSinkProperty(CS_Sink sink, const wpi::Twine& name,
                             CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
   if (!data) {
@@ -547,7 +567,7 @@ CS_Source GetSinkSource(CS_Sink sink, CS_Status* status) {
   return data->sourceHandle.load();
 }
 
-CS_Property GetSinkSourceProperty(CS_Sink sink, wpi::StringRef name,
+CS_Property GetSinkSourceProperty(CS_Sink sink, const wpi::Twine& name,
                                   CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
   if (!data) {

@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_pwm PWM Output Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -224,3 +230,4 @@ uint64_t HAL_GetPWMCycleStartTime(int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

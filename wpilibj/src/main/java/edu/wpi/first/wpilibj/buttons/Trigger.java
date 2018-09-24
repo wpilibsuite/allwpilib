@@ -172,10 +172,10 @@ public abstract class Trigger extends SendableBase {
    * An internal class of {@link Trigger}. The user should ignore this, it is only public to
    * interface between packages.
    */
-  public abstract class ButtonScheduler {
+  public abstract static class ButtonScheduler {
     public abstract void execute();
 
-    protected void start() {
+    public void start() {
       Scheduler.getInstance().addButton(this);
     }
   }

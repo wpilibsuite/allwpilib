@@ -46,8 +46,8 @@ class ADXL362 : public ErrorBase, public SendableBase, public Accelerometer {
 
   virtual ~ADXL362() = default;
 
-  ADXL362(const ADXL362&) = delete;
-  ADXL362& operator=(const ADXL362&) = delete;
+  ADXL362(ADXL362&&) = default;
+  ADXL362& operator=(ADXL362&&) = default;
 
   // Accelerometer interface
   void SetRange(Range range) override;

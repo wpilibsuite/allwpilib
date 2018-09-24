@@ -45,7 +45,7 @@ model {
     }
     binaries {
         withType(GoogleTestTestSuiteBinarySpec) {
-            lib project: ':hal', library: 'hal', linkage: 'shared'
+            project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib library: pluginName, linkage: 'shared'
         }

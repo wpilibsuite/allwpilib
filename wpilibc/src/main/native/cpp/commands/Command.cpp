@@ -27,6 +27,10 @@ Command::Command(const wpi::Twine& name) : Command(name, -1.0) {}
 
 Command::Command(double timeout) : Command("", timeout) {}
 
+Command::Command(Subsystem& subsystem) : Command("", -1.0) {
+  Requires(&subsystem);
+}
+
 Command::Command(const wpi::Twine& name, double timeout) : SendableBase(false) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0.0 && timeout != -1.0)
@@ -41,6 +45,20 @@ Command::Command(const wpi::Twine& name, double timeout) : SendableBase(false) {
   } else {
     SetName(name);
   }
+}
+
+Command::Command(const wpi::Twine& name, Subsystem& subsystem)
+    : Command(name, -1.0) {
+  Requires(&subsystem);
+}
+
+Command::Command(double timeout, Subsystem& subsystem) : Command("", timeout) {
+  Requires(&subsystem);
+}
+
+Command::Command(const wpi::Twine& name, double timeout, Subsystem& subsystem)
+    : Command(name, timeout) {
+  Requires(&subsystem);
 }
 
 double Command::TimeSinceInitialized() const {

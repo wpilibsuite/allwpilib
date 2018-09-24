@@ -17,6 +17,9 @@ class InternalButton : public Button {
   explicit InternalButton(bool inverted);
   virtual ~InternalButton() = default;
 
+  InternalButton(InternalButton&&) = default;
+  InternalButton& operator=(InternalButton&&) = default;
+
   void SetInverted(bool inverted);
   void SetPressed(bool pressed);
 

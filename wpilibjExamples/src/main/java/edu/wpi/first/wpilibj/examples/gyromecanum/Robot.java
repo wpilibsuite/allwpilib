@@ -8,9 +8,9 @@
 package edu.wpi.first.wpilibj.examples.gyromecanum;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
-import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 /**
@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
  * maintian rotation vectorsin relation to the starting orientation of the robot
  * (field-oriented controls).
  */
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
   // gyro calibration constant, may need to be adjusted;
   // gyro value of 360 is set to correspond to one full revolution
   private static final double kVoltsPerDegreePerSecond = 0.0128;

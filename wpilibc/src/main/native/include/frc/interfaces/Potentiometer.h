@@ -16,7 +16,11 @@ namespace frc {
  */
 class Potentiometer : public PIDSource {
  public:
+  Potentiometer() = default;
   virtual ~Potentiometer() = default;
+
+  Potentiometer(Potentiometer&&) = default;
+  Potentiometer& operator=(Potentiometer&&) = default;
 
   /**
    * Common interface for getting the current value of a potentiometer.

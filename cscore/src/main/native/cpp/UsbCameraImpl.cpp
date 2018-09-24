@@ -215,9 +215,9 @@ static std::string GetDescriptionImpl(const char* cpath) {
   return std::string{};
 }
 
-UsbCameraImpl::UsbCameraImpl(wpi::StringRef name, wpi::StringRef path)
+UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, const wpi::Twine& path)
     : SourceImpl{name},
-      m_path{path},
+      m_path{path.str()},
       m_fd{-1},
       m_command_fd{eventfd(0, 0)},
       m_active{true} {
@@ -309,10 +309,10 @@ void UsbCameraImpl::CameraThreadMain() {
       }
     }
 
-    // Turn off streaming if no one is listening, and turn it on if there is.
-    if (m_streaming && m_numSinksEnabled == 0) {
+    // Turn off streaming if not enabled, and turn it on if enabled
+    if (m_streaming && !IsEnabled()) {
       DeviceStreamOff();
-    } else if (!m_streaming && m_numSinksEnabled > 0) {
+    } else if (!m_streaming && IsEnabled()) {
       DeviceStreamOn();
     }
 
@@ -1130,7 +1130,7 @@ void UsbCameraImpl::Send(Message&& msg) const {
 }
 
 std::unique_ptr<PropertyImpl> UsbCameraImpl::CreateEmptyProperty(
-    wpi::StringRef name) const {
+    const wpi::Twine& name) const {
   return wpi::make_unique<UsbCameraProperty>(name);
 }
 
@@ -1159,11 +1159,11 @@ void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
   *status = SendAndWait(std::move(msg));
 }
 
-void UsbCameraImpl::SetStringProperty(int property, wpi::StringRef value,
+void UsbCameraImpl::SetStringProperty(int property, const wpi::Twine& value,
                                       CS_Status* status) {
   Message msg{Message::kCmdSetPropertyStr};
   msg.data[0] = property;
-  msg.dataStr = value;
+  msg.dataStr = value.str();
   *status = SendAndWait(std::move(msg));
 }
 
@@ -1255,14 +1255,15 @@ void UsbCameraImpl::NumSinksEnabledChanged() {
 
 namespace cs {
 
-CS_Source CreateUsbCameraDev(wpi::StringRef name, int dev, CS_Status* status) {
+CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
+                             CS_Status* status) {
   wpi::SmallString<32> path;
   wpi::raw_svector_ostream oss{path};
   oss << "/dev/video" << dev;
   return CreateUsbCameraPath(name, oss.str(), status);
 }
 
-CS_Source CreateUsbCameraPath(wpi::StringRef name, wpi::StringRef path,
+CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
                               CS_Status* status) {
   auto source = std::make_shared<UsbCameraImpl>(name, path);
   auto handle = Sources::GetInstance().Allocate(CS_SOURCE_USB, source);

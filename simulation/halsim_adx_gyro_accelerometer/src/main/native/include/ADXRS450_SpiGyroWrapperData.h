@@ -7,11 +7,7 @@
 
 #pragma once
 
-#include <atomic>
-#include <memory>
-
-#include <mockdata/NotifyListenerVector.h>
-#include <wpi/mutex.h>
+#include <mockdata/SimDataValue.h>
 
 namespace hal {
 class ADXRS450_SpiGyroWrapper {
@@ -19,29 +15,31 @@ class ADXRS450_SpiGyroWrapper {
   explicit ADXRS450_SpiGyroWrapper(int port);
   virtual ~ADXRS450_SpiGyroWrapper();
 
+  bool GetInitialized() const;
+
   void HandleRead(uint8_t* buffer, uint32_t count);
   void HandleAutoReceiveData(uint8_t* buffer, int32_t numToRead,
                              int32_t& outputCount);
 
-  virtual void ResetData();
-
   int32_t RegisterAngleCallback(HAL_NotifyCallback callback, void* param,
-                                HAL_Bool initialNotify);
-  void CancelAngleCallback(int32_t uid);
-  void InvokeAngleCallback(HAL_Value value);
-  double GetAngle();
+                                HAL_Bool initialNotify) {
+    return m_angle.RegisterCallback(callback, param, initialNotify);
+  }
+  void CancelAngleCallback(int32_t uid) { m_angle.CancelCallback(uid); }
+  double GetAngle() { return m_angle; }
   void SetAngle(double angle);
+
+  virtual void ResetData();
 
  private:
   int m_port;
   int m_readCallbackId;
   int m_autoReceiveReadCallbackId;
 
-  wpi::mutex m_registerMutex;
-  wpi::mutex m_dataMutex;
-  double m_angle = 0.0;
+  HAL_SIMDATAVALUE_DEFINE_NAME(Angle)
+
+  SimDataValue<double, MakeDouble, GetAngleName> m_angle{0.0};
   double m_angleDiff = 0.0;
-  std::shared_ptr<NotifyListenerVector> m_angleCallbacks = nullptr;
 
   static const double kAngleLsb;
   // The maximum difference that can fit inside of the shifted and masked data

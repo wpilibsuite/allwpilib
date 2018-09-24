@@ -19,6 +19,9 @@ class WaitForChildren : public Command {
   WaitForChildren(const wpi::Twine& name, double timeout);
   virtual ~WaitForChildren() = default;
 
+  WaitForChildren(WaitForChildren&&) = default;
+  WaitForChildren& operator=(WaitForChildren&&) = default;
+
  protected:
   virtual bool IsFinished();
 };

@@ -9,6 +9,12 @@
 
 #include <stdint.h>
 
+/**
+ * @defgroup hal_types Type Definitions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #define HAL_kInvalidHandle 0
 
 typedef int32_t HAL_Handle;
@@ -56,3 +62,4 @@ typedef int32_t HAL_Bool;
   typedef int32_t name; \
   enum name
 #endif
+/** @} */

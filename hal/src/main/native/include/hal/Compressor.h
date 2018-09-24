@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_compressor Compressor Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -134,3 +140,4 @@ HAL_Bool HAL_GetCompressorNotConnectedFault(
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

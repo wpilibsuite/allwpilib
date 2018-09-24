@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_canapi CAN API Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 // clang-format off
 /**
  * The CAN device type.
@@ -189,3 +195,4 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

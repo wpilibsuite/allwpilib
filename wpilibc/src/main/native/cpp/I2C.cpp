@@ -7,6 +7,8 @@
 
 #include "frc/I2C.h"
 
+#include <utility>
+
 #include <hal/HAL.h>
 #include <hal/I2C.h>
 
@@ -24,6 +26,21 @@ I2C::I2C(Port port, int deviceAddress)
 }
 
 I2C::~I2C() { HAL_CloseI2C(m_port); }
+
+I2C::I2C(I2C&& rhs)
+    : ErrorBase(std::move(rhs)),
+      m_deviceAddress(std::move(rhs.m_deviceAddress)) {
+  std::swap(m_port, rhs.m_port);
+}
+
+I2C& I2C::operator=(I2C&& rhs) {
+  ErrorBase::operator=(std::move(rhs));
+
+  std::swap(m_port, rhs.m_port);
+  m_deviceAddress = std::move(rhs.m_deviceAddress);
+
+  return *this;
+}
 
 bool I2C::Transaction(uint8_t* dataToSend, int sendSize, uint8_t* dataReceived,
                       int receiveSize) {

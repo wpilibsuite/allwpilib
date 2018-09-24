@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.ThreadsJNI;
+import edu.wpi.first.hal.ThreadsJNI;
 
 public final class Threads {
   /**

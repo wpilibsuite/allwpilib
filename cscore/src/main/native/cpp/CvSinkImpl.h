@@ -17,6 +17,7 @@
 #include <wpi/NetworkStream.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/raw_socket_ostream.h>
@@ -29,8 +30,8 @@ class SourceImpl;
 
 class CvSinkImpl : public SinkImpl {
  public:
-  explicit CvSinkImpl(wpi::StringRef name);
-  CvSinkImpl(wpi::StringRef name,
+  explicit CvSinkImpl(const wpi::Twine& name);
+  CvSinkImpl(const wpi::Twine& name,
              std::function<void(uint64_t time)> processFrame);
   ~CvSinkImpl() override;
 

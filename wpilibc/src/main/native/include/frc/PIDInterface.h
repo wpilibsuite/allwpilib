@@ -10,6 +10,11 @@
 namespace frc {
 
 class PIDInterface {
+ public:
+  PIDInterface() = default;
+  PIDInterface(PIDInterface&&) = default;
+  PIDInterface& operator=(PIDInterface&&) = default;
+
   virtual void SetPID(double p, double i, double d) = 0;
   virtual double GetP() const = 0;
   virtual double GetI() const = 0;

@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_analoginput Analog Input Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -221,3 +227,4 @@ int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

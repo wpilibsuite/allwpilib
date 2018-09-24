@@ -11,6 +11,7 @@
 
 #include <wpi/StringMap.h>
 #include <wpi/StringRef.h>
+#include <wpi/deprecated.h>
 
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableChooserBase.h"
@@ -46,8 +47,16 @@ class SendableChooser : public SendableChooserBase {
  public:
   ~SendableChooser() override = default;
 
-  void AddObject(wpi::StringRef name, T object);
-  void AddDefault(wpi::StringRef name, T object);
+  void AddOption(wpi::StringRef name, T object);
+  void SetDefaultOption(wpi::StringRef name, T object);
+
+  WPI_DEPRECATED("use AddOption() instead")
+  void AddObject(wpi::StringRef name, T object) { AddOption(name, object); }
+
+  WPI_DEPRECATED("use SetDefaultOption() instead")
+  void AddDefault(wpi::StringRef name, T object) {
+    SetDefaultOption(name, object);
+  }
 
   auto GetSelected() -> decltype(_unwrap_smart_ptr(m_choices[""]));
 

@@ -64,6 +64,7 @@ doxygen {
     warn_logfile false
     warn_if_undocumented false
     generate_latex false
+    use_mathjax true
     html_timestamp true
     generate_treeview true
 }
@@ -100,6 +101,7 @@ task generateJavaDocs(type: Javadoc) {
     options.addStringOption "tag", "pre:a:Pre-Condition"
     options.addStringOption('Xdoclint:accessibility,html,missing,reference,syntax')
     dependsOn project(':wpilibj').generateJavaVersion
+    dependsOn project(':hal').generateUsageReporting
     source project(':hal').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
     source project(':cscore').sourceSets.main.java

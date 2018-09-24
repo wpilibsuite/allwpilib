@@ -29,7 +29,9 @@ class PWMSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetInitialized() { return HALSIM_GetPWMInitialized(m_index); }
+
+  bool GetInitialized() const { return HALSIM_GetPWMInitialized(m_index); }
+
   void SetInitialized(bool initialized) {
     HALSIM_SetPWMInitialized(m_index, initialized);
   }
@@ -42,7 +44,9 @@ class PWMSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetRawValue() { return HALSIM_GetPWMRawValue(m_index); }
+
+  int GetRawValue() const { return HALSIM_GetPWMRawValue(m_index); }
+
   void SetRawValue(int rawValue) { HALSIM_SetPWMRawValue(m_index, rawValue); }
 
   std::unique_ptr<CallbackStore> RegisterSpeedCallback(NotifyCallback callback,
@@ -53,7 +57,9 @@ class PWMSim {
                                                   store.get(), initialNotify));
     return store;
   }
-  double GetSpeed() { return HALSIM_GetPWMSpeed(m_index); }
+
+  double GetSpeed() const { return HALSIM_GetPWMSpeed(m_index); }
+
   void SetSpeed(double speed) { HALSIM_SetPWMSpeed(m_index, speed); }
 
   std::unique_ptr<CallbackStore> RegisterPositionCallback(
@@ -64,7 +70,9 @@ class PWMSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetPosition() { return HALSIM_GetPWMPosition(m_index); }
+
+  double GetPosition() const { return HALSIM_GetPWMPosition(m_index); }
+
   void SetPosition(double position) {
     HALSIM_SetPWMPosition(m_index, position);
   }
@@ -77,7 +85,9 @@ class PWMSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetPeriodScale() { return HALSIM_GetPWMPeriodScale(m_index); }
+
+  int GetPeriodScale() const { return HALSIM_GetPWMPeriodScale(m_index); }
+
   void SetPeriodScale(int periodScale) {
     HALSIM_SetPWMPeriodScale(m_index, periodScale);
   }
@@ -90,7 +100,9 @@ class PWMSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetZeroLatch() { return HALSIM_GetPWMZeroLatch(m_index); }
+
+  bool GetZeroLatch() const { return HALSIM_GetPWMZeroLatch(m_index); }
+
   void SetZeroLatch(bool zeroLatch) {
     HALSIM_SetPWMZeroLatch(m_index, zeroLatch);
   }

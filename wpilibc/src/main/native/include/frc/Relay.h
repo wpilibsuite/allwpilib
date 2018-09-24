@@ -55,6 +55,9 @@ class Relay : public MotorSafety, public ErrorBase, public SendableBase {
    */
   ~Relay() override;
 
+  Relay(Relay&& rhs);
+  Relay& operator=(Relay&& rhs);
+
   /**
    * Set the relay state.
    *

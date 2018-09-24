@@ -9,9 +9,10 @@ package edu.wpi.first.wpilibj;
 
 import java.nio.ByteBuffer;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.SPIJNI;
+import edu.wpi.first.hal.AccumulatorResult;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SPIJNI;
 
 /**
  * Represents a SPI bus port.
@@ -22,7 +23,7 @@ public class SPI implements AutoCloseable {
     kOnboardCS0(0), kOnboardCS1(1), kOnboardCS2(2), kOnboardCS3(3), kMXP(4);
 
     @SuppressWarnings("MemberName")
-    public int value;
+    public final int value;
 
     Port(int value) {
       this.value = value;
@@ -32,9 +33,9 @@ public class SPI implements AutoCloseable {
   private static int devices;
 
   private int m_port;
-  private int m_bitOrder;
-  private int m_clockPolarity;
-  private int m_dataOnTrailing;
+  private int m_msbFirst;
+  private int m_clockIdleHigh;
+  private int m_sampleOnTrailing;
 
   /**
    * Constructor.
@@ -80,8 +81,8 @@ public class SPI implements AutoCloseable {
    * first.
    */
   public final void setMSBFirst() {
-    m_bitOrder = 1;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_msbFirst = 1;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -89,8 +90,8 @@ public class SPI implements AutoCloseable {
    * first.
    */
   public final void setLSBFirst() {
-    m_bitOrder = 0;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_msbFirst = 0;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -98,8 +99,8 @@ public class SPI implements AutoCloseable {
    * or clock idle high.
    */
   public final void setClockActiveLow() {
-    m_clockPolarity = 1;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_clockIdleHigh = 1;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -107,8 +108,8 @@ public class SPI implements AutoCloseable {
    * or clock idle low.
    */
   public final void setClockActiveHigh() {
-    m_clockPolarity = 0;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_clockIdleHigh = 0;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -116,8 +117,8 @@ public class SPI implements AutoCloseable {
    * edge.
    */
   public final void setSampleDataOnLeadingEdge() {
-    m_dataOnTrailing = 0;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_sampleOnTrailing = 0;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -125,8 +126,8 @@ public class SPI implements AutoCloseable {
    * edge.
    */
   public final void setSampleDataOnTrailingEdge() {
-    m_dataOnTrailing = 1;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_sampleOnTrailing = 1;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -136,8 +137,8 @@ public class SPI implements AutoCloseable {
    */
   @Deprecated
   public final void setSampleDataOnFalling() {
-    m_dataOnTrailing = 1;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_sampleOnTrailing = 1;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -147,8 +148,8 @@ public class SPI implements AutoCloseable {
    */
   @Deprecated
   public final void setSampleDataOnRising() {
-    m_dataOnTrailing = 0;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_sampleOnTrailing = 0;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
 
@@ -188,6 +189,7 @@ public class SPI implements AutoCloseable {
    *
    * @param dataToSend The buffer containing the data to send.
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public int write(ByteBuffer dataToSend, int size) {
     if (dataToSend.hasArray()) {
       return write(dataToSend.array(), size);
@@ -232,6 +234,7 @@ public class SPI implements AutoCloseable {
    * @param dataReceived The buffer to be filled with the received data.
    * @param size         The length of the transaction, in bytes
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public int read(boolean initiate, ByteBuffer dataReceived, int size) {
     if (dataReceived.hasArray()) {
       return read(initiate, dataReceived.array(), size);
@@ -269,7 +272,7 @@ public class SPI implements AutoCloseable {
    * @param dataReceived Buffer to receive data from the device.
    * @param size         The length of the transaction, in bytes
    */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "ByteBufferBackingArray"})
   public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, int size) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {
       return transaction(dataToSend.array(), dataReceived.array(), size);
@@ -376,6 +379,7 @@ public class SPI implements AutoCloseable {
    * @param timeout timeout in seconds (ms resolution)
    * @return Number of bytes remaining to be read
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public int readAutoReceivedData(ByteBuffer buffer, int numToRead, double timeout) {
     if (buffer.hasArray()) {
       return readAutoReceivedData(buffer.array(), numToRead, timeout);

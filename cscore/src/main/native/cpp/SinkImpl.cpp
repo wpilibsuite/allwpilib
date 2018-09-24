@@ -12,7 +12,7 @@
 
 using namespace cs;
 
-SinkImpl::SinkImpl(wpi::StringRef name) : m_name{name} {}
+SinkImpl::SinkImpl(const wpi::Twine& name) : m_name{name.str()} {}
 
 SinkImpl::~SinkImpl() {
   if (m_source) {
@@ -21,9 +21,9 @@ SinkImpl::~SinkImpl() {
   }
 }
 
-void SinkImpl::SetDescription(wpi::StringRef description) {
+void SinkImpl::SetDescription(const wpi::Twine& description) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  m_description = description;
+  m_description = description.str();
 }
 
 wpi::StringRef SinkImpl::GetDescription(wpi::SmallVectorImpl<char>& buf) const {
@@ -105,11 +105,11 @@ void SinkImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
   if (prop.propKind == CS_PROP_ENUM)
     notifier.NotifySinkProperty(*this, CS_SINK_PROPERTY_CHOICES_UPDATED,
                                 prop.name, propIndex, prop.propKind, prop.value,
-                                wpi::StringRef{});
+                                wpi::Twine{});
 }
 
 void SinkImpl::UpdatePropertyValue(int property, bool setString, int value,
-                                   wpi::StringRef valueStr) {
+                                   const wpi::Twine& valueStr) {
   auto prop = GetProperty(property);
   if (!prop) return;
 

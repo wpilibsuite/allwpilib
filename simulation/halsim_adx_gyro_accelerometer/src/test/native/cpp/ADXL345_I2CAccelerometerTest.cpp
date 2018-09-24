@@ -5,9 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ADXL345_I2C.h"
 #include "ADXL345_I2CAccelerometerData.h"
-#include "Talon.h"
+#include "frc/ADXL345_I2C.h"
 #include "gtest/gtest.h"
 
 class ADXL345_I2CAccelerometerTest
@@ -44,4 +43,5 @@ TEST_P(ADXL345_I2CAccelerometerTest, TestAccelerometer) {
 
 INSTANTIATE_TEST_CASE_P(ADXL345_I2CAccelerometerTest,
                         ADXL345_I2CAccelerometerTest,
-                        ::testing::Values(frc::I2C::kOnboard, frc::I2C::kMXP));
+                        ::testing::Values(frc::I2C::kOnboard,
+                                          frc::I2C::kMXP), );

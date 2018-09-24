@@ -92,9 +92,15 @@ static int GetStringCtrlIoctl(int fd, int id, int maximum, std::string* value) {
 }
 
 static int SetStringCtrlIoctl(int fd, int id, int maximum,
-                              wpi::StringRef value) {
-  wpi::SmallString<64> str{
-      value.substr(0, std::min(value.size(), static_cast<size_t>(maximum)))};
+                              const wpi::Twine& value) {
+  wpi::SmallString<64> strBuf, strBuf2;
+  wpi::StringRef str = value.toNullTerminatedStringRef(strBuf);
+  if (str.size() > static_cast<size_t>(maximum)) {
+    // don't know if strBuf was used, just recopy
+    strBuf2 = str.take_front(maximum);
+    str = strBuf2;
+    strBuf2.push_back('\0');  // null terminate
+  }
 
   struct v4l2_ext_control ctrl;
   struct v4l2_ext_controls ctrls;
@@ -102,7 +108,7 @@ static int SetStringCtrlIoctl(int fd, int id, int maximum,
   std::memset(&ctrls, 0, sizeof(ctrls));
   ctrl.id = id;
   ctrl.size = str.size();
-  ctrl.string = const_cast<char*>(str.c_str());
+  ctrl.string = const_cast<char*>(str.data());
   ctrls.ctrl_class = V4L2_CTRL_ID2CLASS(id);
   ctrls.count = 1;
   ctrls.controls = &ctrl;
@@ -288,7 +294,7 @@ bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
 
 bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd,
                                   int newValue,
-                                  wpi::StringRef newValueStr) const {
+                                  const wpi::Twine& newValueStr) const {
   if (!device || fd < 0) return true;
   unsigned idCopy = id;
   int rv = 0;

@@ -35,7 +35,27 @@ class TimedCommand : public Command {
    */
   explicit TimedCommand(double timeout);
 
+  /**
+   * Creates a new TimedCommand with the given name and timeout.
+   *
+   * @param name      the name of the command
+   * @param timeout   the time (in seconds) before this command "times out"
+   * @param subsystem the subsystem that the command requires
+   */
+  TimedCommand(const wpi::Twine& name, double timeout, Subsystem& subsystem);
+
+  /**
+   * Creates a new WaitCommand with the given timeout.
+   *
+   * @param timeout   the time (in seconds) before this command "times out"
+   * @param subsystem the subsystem that the command requires
+   */
+  TimedCommand(double timeout, Subsystem& subsystem);
+
   virtual ~TimedCommand() = default;
+
+  TimedCommand(TimedCommand&&) = default;
+  TimedCommand& operator=(TimedCommand&&) = default;
 
  protected:
   /**

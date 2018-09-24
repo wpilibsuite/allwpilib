@@ -46,14 +46,14 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
 
   ~TimedRobot() override;
 
+  TimedRobot(TimedRobot&& rhs);
+  TimedRobot& operator=(TimedRobot&& rhs);
+
  private:
   HAL_NotifierHandle m_notifier{0};
 
   // The absolute expiration time
   double m_expirationTime = 0;
-
-  // The relative time
-  double m_period;
 
   /**
    * Update the HAL alarm time.

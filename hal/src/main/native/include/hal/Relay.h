@@ -11,6 +11,12 @@
 
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_relay Relay Output Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -62,3 +68,4 @@ HAL_Bool HAL_GetRelay(HAL_RelayHandle relayPortHandle, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

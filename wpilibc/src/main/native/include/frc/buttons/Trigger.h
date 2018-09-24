@@ -32,6 +32,10 @@ class Trigger : public SendableBase {
  public:
   Trigger() = default;
   ~Trigger() override = default;
+
+  Trigger(Trigger&&) = default;
+  Trigger& operator=(Trigger&&) = default;
+
   bool Grab();
   virtual bool Get() = 0;
   void WhenActive(Command* command);

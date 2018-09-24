@@ -12,6 +12,7 @@
 #include <string>
 
 #include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 #include <wpi/mutex.h>
 
 #include "SourceImpl.h"
@@ -22,14 +23,14 @@ class Frame;
 
 class SinkImpl : public PropertyContainer {
  public:
-  explicit SinkImpl(wpi::StringRef name);
+  explicit SinkImpl(const wpi::Twine& name);
   virtual ~SinkImpl();
   SinkImpl(const SinkImpl& queue) = delete;
   SinkImpl& operator=(const SinkImpl& queue) = delete;
 
   wpi::StringRef GetName() const { return m_name; }
 
-  void SetDescription(wpi::StringRef description);
+  void SetDescription(const wpi::Twine& description);
   wpi::StringRef GetDescription(wpi::SmallVectorImpl<char>& buf) const;
 
   void Enable();
@@ -50,7 +51,7 @@ class SinkImpl : public PropertyContainer {
   // PropertyContainer implementation
   void NotifyPropertyCreated(int propIndex, PropertyImpl& prop) override;
   void UpdatePropertyValue(int property, bool setString, int value,
-                           wpi::StringRef valueStr) override;
+                           const wpi::Twine& valueStr) override;
 
   virtual void SetSourceImpl(std::shared_ptr<SourceImpl> source);
 

@@ -17,6 +17,9 @@ namespace frc {
  */
 class PWMSpeedController : public SafePWM, public SpeedController {
  public:
+  PWMSpeedController(PWMSpeedController&&) = default;
+  PWMSpeedController& operator=(PWMSpeedController&&) = default;
+
   /**
    * Set the PWM value.
    *

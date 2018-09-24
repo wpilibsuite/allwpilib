@@ -13,6 +13,7 @@
 
 #include <wpi/Signal.h>
 #include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 
 #include "cscore_c.h"
 
@@ -22,17 +23,17 @@ namespace cs {
 class PropertyImpl {
  public:
   PropertyImpl() = default;
-  explicit PropertyImpl(wpi::StringRef name_);
-  PropertyImpl(wpi::StringRef name_, CS_PropertyKind kind_, int step_,
+  explicit PropertyImpl(const wpi::Twine& name_);
+  PropertyImpl(const wpi::Twine& name_, CS_PropertyKind kind_, int step_,
                int defaultValue_, int value_);
-  PropertyImpl(wpi::StringRef name_, CS_PropertyKind kind_, int minimum_,
+  PropertyImpl(const wpi::Twine& name_, CS_PropertyKind kind_, int minimum_,
                int maximum_, int step_, int defaultValue_, int value_);
   virtual ~PropertyImpl() = default;
   PropertyImpl(const PropertyImpl& oth) = delete;
   PropertyImpl& operator=(const PropertyImpl& oth) = delete;
 
   void SetValue(int v);
-  void SetValue(wpi::StringRef v);
+  void SetValue(const wpi::Twine& v);
   void SetDefaultValue(int v);
 
   std::string name;

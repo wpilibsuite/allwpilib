@@ -52,6 +52,9 @@ class AnalogTriggerOutput : public DigitalSource {
  public:
   ~AnalogTriggerOutput() override;
 
+  AnalogTriggerOutput(AnalogTriggerOutput&&) = default;
+  AnalogTriggerOutput& operator=(AnalogTriggerOutput&&) = default;
+
   /**
    * Get the state of the analog trigger output.
    *

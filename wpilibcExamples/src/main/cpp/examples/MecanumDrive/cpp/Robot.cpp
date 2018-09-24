@@ -5,16 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <frc/IterativeRobot.h>
 #include <frc/Joystick.h>
 #include <frc/Spark.h>
+#include <frc/TimedRobot.h>
 #include <frc/drive/MecanumDrive.h>
 
 /**
  * This is a demo program showing how to use Mecanum control with the
  * MecanumDrive class.
  */
-class Robot : public frc::IterativeRobot {
+class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
     // Invert the left side motors. You may need to change or remove this to

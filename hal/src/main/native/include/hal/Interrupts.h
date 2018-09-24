@@ -12,6 +12,12 @@
 #include "hal/AnalogTrigger.h"
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_interrupts Interrupts Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -146,3 +152,4 @@ void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */

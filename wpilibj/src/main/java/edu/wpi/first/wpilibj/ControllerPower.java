@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.PowerJNI;
+import edu.wpi.first.hal.PowerJNI;
 
 /**
  * Old Controller PR class.

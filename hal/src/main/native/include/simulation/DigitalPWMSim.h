@@ -29,7 +29,11 @@ class DigitalPWMSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  bool GetInitialized() { return HALSIM_GetDigitalPWMInitialized(m_index); }
+
+  bool GetInitialized() const {
+    return HALSIM_GetDigitalPWMInitialized(m_index);
+  }
+
   void SetInitialized(bool initialized) {
     HALSIM_SetDigitalPWMInitialized(m_index, initialized);
   }
@@ -42,7 +46,9 @@ class DigitalPWMSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  double GetDutyCycle() { return HALSIM_GetDigitalPWMDutyCycle(m_index); }
+
+  double GetDutyCycle() const { return HALSIM_GetDigitalPWMDutyCycle(m_index); }
+
   void SetDutyCycle(double dutyCycle) {
     HALSIM_SetDigitalPWMDutyCycle(m_index, dutyCycle);
   }
@@ -55,7 +61,9 @@ class DigitalPWMSim {
         m_index, &CallbackStoreThunk, store.get(), initialNotify));
     return store;
   }
-  int GetPin() { return HALSIM_GetDigitalPWMPin(m_index); }
+
+  int GetPin() const { return HALSIM_GetDigitalPWMPin(m_index); }
+
   void SetPin(int pin) { HALSIM_SetDigitalPWMPin(m_index, pin); }
 
   void ResetData() { HALSIM_ResetDigitalPWMData(m_index); }

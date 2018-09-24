@@ -111,8 +111,8 @@ class DifferentialDrive : public RobotDriveBase {
 
   ~DifferentialDrive() override = default;
 
-  DifferentialDrive(const DifferentialDrive&) = delete;
-  DifferentialDrive& operator=(const DifferentialDrive&) = delete;
+  DifferentialDrive(DifferentialDrive&&) = default;
+  DifferentialDrive& operator=(DifferentialDrive&&) = default;
 
   /**
    * Arcade drive method for differential drive platform.

@@ -10,7 +10,7 @@
 #include <cassert>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_wpilibj_hal_CounterJNI.h"
+#include "edu_wpi_first_hal_CounterJNI.h"
 #include "hal/Counter.h"
 #include "hal/Errors.h"
 #include "hal/cpp/Log.h"
@@ -29,12 +29,12 @@ TLogLevel counterJNILogLevel = logWARNING;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    initializeCounter
  * Signature: (ILjava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_initializeCounter
+Java_edu_wpi_first_hal_CounterJNI_initializeCounter
   (JNIEnv* env, jclass, jint mode, jobject index)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI initializeCounter";
@@ -53,12 +53,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_initializeCounter
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    freeCounter
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_freeCounter
+Java_edu_wpi_first_hal_CounterJNI_freeCounter
   (JNIEnv* env, jclass, jint id)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI freeCounter";
@@ -70,12 +70,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_freeCounter
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    setCounterAverageSize
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterAverageSize
+Java_edu_wpi_first_hal_CounterJNI_setCounterAverageSize
   (JNIEnv* env, jclass, jint id, jint value)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterAverageSize";
@@ -88,12 +88,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterAverageSize
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    setCounterUpSource
  * Signature: (III)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSource
+Java_edu_wpi_first_hal_CounterJNI_setCounterUpSource
   (JNIEnv* env, jclass, jint id, jint digitalSourceHandle,
    jint analogTriggerType)
 {
@@ -109,12 +109,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSource
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    setCounterUpSourceEdge
  * Signature: (IZZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSourceEdge
+Java_edu_wpi_first_hal_CounterJNI_setCounterUpSourceEdge
   (JNIEnv* env, jclass, jint id, jboolean valueRise, jboolean valueFall)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterUpSourceEdge";
@@ -129,12 +129,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSourceEdge
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    clearCounterUpSource
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_clearCounterUpSource
+Java_edu_wpi_first_hal_CounterJNI_clearCounterUpSource
   (JNIEnv* env, jclass, jint id)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI clearCounterUpSource";
@@ -146,12 +146,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_clearCounterUpSource
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    setCounterDownSource
  * Signature: (III)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownSource
+Java_edu_wpi_first_hal_CounterJNI_setCounterDownSource
   (JNIEnv* env, jclass, jint id, jint digitalSourceHandle,
    jint analogTriggerType)
 {
@@ -174,12 +174,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownSource
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    setCounterDownSourceEdge
  * Signature: (IZZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownSourceEdge
+Java_edu_wpi_first_hal_CounterJNI_setCounterDownSourceEdge
   (JNIEnv* env, jclass, jint id, jboolean valueRise, jboolean valueFall)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterDownSourceEdge";
@@ -194,12 +194,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownSourceEdge
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    clearCounterDownSource
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_clearCounterDownSource
+Java_edu_wpi_first_hal_CounterJNI_clearCounterDownSource
   (JNIEnv* env, jclass, jint id)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI clearCounterDownSource";
@@ -211,12 +211,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_clearCounterDownSource
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    setCounterUpDownMode
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpDownMode
+Java_edu_wpi_first_hal_CounterJNI_setCounterUpDownMode
   (JNIEnv* env, jclass, jint id)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterUpDownMode";
@@ -228,12 +228,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpDownMode
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    setCounterExternalDirectionMode
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterExternalDirectionMode
+Java_edu_wpi_first_hal_CounterJNI_setCounterExternalDirectionMode
   (JNIEnv* env, jclass, jint id)
 {
   COUNTERJNI_LOG(logDEBUG)
@@ -246,12 +246,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterExternalDirectionMode
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    setCounterSemiPeriodMode
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterSemiPeriodMode
+Java_edu_wpi_first_hal_CounterJNI_setCounterSemiPeriodMode
   (JNIEnv* env, jclass, jint id, jboolean value)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterSemiPeriodMode";
@@ -264,12 +264,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterSemiPeriodMode
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    setCounterPulseLengthMode
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterPulseLengthMode
+Java_edu_wpi_first_hal_CounterJNI_setCounterPulseLengthMode
   (JNIEnv* env, jclass, jint id, jdouble value)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterPulseLengthMode";
@@ -282,12 +282,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterPulseLengthMode
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    getCounterSamplesToAverage
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterSamplesToAverage
+Java_edu_wpi_first_hal_CounterJNI_getCounterSamplesToAverage
   (JNIEnv* env, jclass, jint id)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI getCounterSamplesToAverage";
@@ -303,12 +303,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterSamplesToAverage
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    setCounterSamplesToAverage
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterSamplesToAverage
+Java_edu_wpi_first_hal_CounterJNI_setCounterSamplesToAverage
   (JNIEnv* env, jclass, jint id, jint value)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterSamplesToAverage";
@@ -325,12 +325,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterSamplesToAverage
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    resetCounter
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_resetCounter
+Java_edu_wpi_first_hal_CounterJNI_resetCounter
   (JNIEnv* env, jclass, jint id)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI resetCounter";
@@ -342,12 +342,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_resetCounter
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    getCounter
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounter
+Java_edu_wpi_first_hal_CounterJNI_getCounter
   (JNIEnv* env, jclass, jint id)
 {
   // COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI getCounter";
@@ -361,12 +361,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounter
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    getCounterPeriod
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterPeriod
+Java_edu_wpi_first_hal_CounterJNI_getCounterPeriod
   (JNIEnv* env, jclass, jint id)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI getCounterPeriod";
@@ -380,12 +380,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterPeriod
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    setCounterMaxPeriod
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterMaxPeriod
+Java_edu_wpi_first_hal_CounterJNI_setCounterMaxPeriod
   (JNIEnv* env, jclass, jint id, jdouble value)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterMaxPeriod";
@@ -398,12 +398,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterMaxPeriod
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    setCounterUpdateWhenEmpty
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpdateWhenEmpty
+Java_edu_wpi_first_hal_CounterJNI_setCounterUpdateWhenEmpty
   (JNIEnv* env, jclass, jint id, jboolean value)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterMaxPeriod";
@@ -416,12 +416,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpdateWhenEmpty
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    getCounterStopped
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterStopped
+Java_edu_wpi_first_hal_CounterJNI_getCounterStopped
   (JNIEnv* env, jclass, jint id)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI getCounterStopped";
@@ -435,12 +435,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterStopped
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    getCounterDirection
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterDirection
+Java_edu_wpi_first_hal_CounterJNI_getCounterDirection
   (JNIEnv* env, jclass, jint id)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI getCounterDirection";
@@ -456,12 +456,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterDirection
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
+ * Class:     edu_wpi_first_hal_CounterJNI
  * Method:    setCounterReverseDirection
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterReverseDirection
+Java_edu_wpi_first_hal_CounterJNI_setCounterReverseDirection
   (JNIEnv* env, jclass, jint id, jboolean value)
 {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterReverseDirection";

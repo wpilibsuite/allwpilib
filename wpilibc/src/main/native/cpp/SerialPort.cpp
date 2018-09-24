@@ -7,6 +7,8 @@
 
 #include "frc/SerialPort.h"
 
+#include <utility>
+
 #include <hal/HAL.h>
 #include <hal/SerialPort.h>
 
@@ -93,6 +95,25 @@ SerialPort::~SerialPort() {
   int32_t status = 0;
   HAL_CloseSerial(static_cast<HAL_SerialPort>(m_port), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+SerialPort::SerialPort(SerialPort&& rhs)
+    : ErrorBase(std::move(rhs)),
+      m_resourceManagerHandle(std::move(rhs.m_resourceManagerHandle)),
+      m_portHandle(std::move(rhs.m_portHandle)),
+      m_consoleModeEnabled(std::move(rhs.m_consoleModeEnabled)) {
+  std::swap(m_port, rhs.m_port);
+}
+
+SerialPort& SerialPort::operator=(SerialPort&& rhs) {
+  ErrorBase::operator=(std::move(rhs));
+
+  m_resourceManagerHandle = std::move(rhs.m_resourceManagerHandle);
+  m_portHandle = std::move(rhs.m_portHandle);
+  m_consoleModeEnabled = std::move(rhs.m_consoleModeEnabled);
+  std::swap(m_port, rhs.m_port);
+
+  return *this;
 }
 
 void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {

@@ -27,23 +27,23 @@ namespace frc {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddObject(wpi::StringRef name, T object) {
+void SendableChooser<T>::AddOption(wpi::StringRef name, T object) {
   m_choices[name] = std::move(object);
 }
 
 /**
  * Add the given object to the list of options and marks it as the default.
  *
- * Functionally, this is very close to AddObject() except that it will use this
+ * Functionally, this is very close to AddOption() except that it will use this
  * as the default option if none other is explicitly selected.
  *
  * @param name   the name of the option
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddDefault(wpi::StringRef name, T object) {
+void SendableChooser<T>::SetDefaultOption(wpi::StringRef name, T object) {
   m_defaultChoice = name;
-  AddObject(name, std::move(object));
+  AddOption(name, std::move(object));
 }
 
 /**

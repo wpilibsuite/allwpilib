@@ -29,6 +29,40 @@ public class VideoSource implements AutoCloseable {
   }
 
   /**
+   * Connection strategy.
+   */
+  public enum ConnectionStrategy {
+    /**
+     * Automatically connect or disconnect based on whether any sinks are
+     * connected to this source.  This is the default behavior.
+     */
+    kAutoManage(0),
+
+    /**
+     * Try to keep the connection open regardless of whether any sinks are
+     * connected.
+     */
+    kKeepOpen(1),
+
+    /**
+     * Never open the connection.  If this is set when the connection is open,
+     * close the connection.
+     */
+    kForceClose(2);
+
+    @SuppressWarnings("MemberName")
+    private final int value;
+
+    ConnectionStrategy(int value) {
+      this.value = value;
+    }
+
+    public int getValue() {
+      return value;
+    }
+  }
+
+  /**
    * Convert from the numerical representation of kind to an enum type.
    *
    * @param kind The numerical representation of kind
@@ -119,10 +153,34 @@ public class VideoSource implements AutoCloseable {
   }
 
   /**
+   * Sets the connection strategy.  By default, the source will automatically
+   * connect or disconnect based on whether any sinks are connected.
+   *
+   * <p>This function is non-blocking; look for either a connection open or
+   * close event or call {@link #isConnected()} to determine the connection
+   * state.
+   *
+   * @param strategy connection strategy (auto, keep open, or force close)
+   */
+  public void setConnectionStrategy(ConnectionStrategy strategy) {
+    CameraServerJNI.setSourceConnectionStrategy(m_handle, strategy.getValue());
+  }
+
+  /**
    * Returns if the source currently connected to whatever is providing the images.
    */
   public boolean isConnected() {
     return CameraServerJNI.isSourceConnected(m_handle);
+  }
+
+  /**
+   * Gets source enable status.  This is determined with a combination of
+   * connection strategy and the number of sinks connected.
+   *
+   * @return True if enabled, false otherwise.
+   */
+  public boolean isEnabled() {
+    return CameraServerJNI.isSourceEnabled(m_handle);
   }
 
   /**

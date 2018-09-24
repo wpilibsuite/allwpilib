@@ -15,7 +15,7 @@ public class HttpCamera extends VideoCamera {
     kUnknown(0), kMJPGStreamer(1), kCSCore(2), kAxis(3);
 
     @SuppressWarnings("MemberName")
-    private int value;
+    private final int value;
 
     HttpCameraKind(int value) {
       this.value = value;

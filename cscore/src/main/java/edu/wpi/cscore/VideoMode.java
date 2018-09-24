@@ -15,7 +15,7 @@ public class VideoMode {
     kUnknown(0), kMJPEG(1), kYUYV(2), kRGB565(3), kBGR(4), kGray(5);
 
     @SuppressWarnings("MemberName")
-    private int value;
+    private final int value;
 
     PixelFormat(int value) {
       this.value = value;

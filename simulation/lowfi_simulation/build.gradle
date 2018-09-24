@@ -30,6 +30,15 @@ if (!project.hasProperty('onlyAthena')) {
 
     project(':').libraryBuild.dependsOn build
 
+    ext {
+        chipObjectComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
+                                "${nativeName}Test".toString()]
+        netCommComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
+                             "${nativeName}Test".toString()]
+        useNiJava = false
+    }
+
+    apply from: "${rootDir}/shared/nilibraries.gradle"
 
     model {
         exportsConfigs {
@@ -49,7 +58,7 @@ if (!project.hasProperty('onlyAthena')) {
                 sources {
                     cpp {
                         source {
-                            srcDirs = ['src/main/native/cpp', "$buildDir/generated/cpp"]
+                            srcDirs = ['src/main/native/cpp']
                             include '**/*.cpp'
                         }
                         exportedHeaders {
@@ -66,9 +75,9 @@ if (!project.hasProperty('onlyAthena')) {
                         it.buildable = false
                         return
                     }
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(it, 'shared')
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    project(':ni-libraries').addNiLibrariesToLinker(it)
+                    lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
                 }
             }
             "${nativeName}"(NativeLibrarySpec) {
@@ -88,9 +97,9 @@ if (!project.hasProperty('onlyAthena')) {
                         it.buildable = false
                         return
                     }
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(it, 'shared')
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    project(':ni-libraries').addNiLibrariesToLinker(it)
+                    lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
                 }
             }
             // By default, a development executable will be generated. This is to help the case of
@@ -101,7 +110,7 @@ if (!project.hasProperty('onlyAthena')) {
                         source {
                             srcDirs 'src/dev/native/cpp'
                             include '**/*.cpp'
-                            lib library: 'lowfi_sim'
+                            lib library: "${nativeName}"
                         }
                         exportedHeaders {
                             srcDirs 'src/dev/native/include'
@@ -113,9 +122,10 @@ if (!project.hasProperty('onlyAthena')) {
                         it.buildable = false
                         return
                     }
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(it, 'shared')
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    project(':ni-libraries').addNiLibrariesToLinker(it)
+                    lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
+                    lib library: nativeName, linkage: 'shared'
                 }
             }
         }
@@ -123,11 +133,11 @@ if (!project.hasProperty('onlyAthena')) {
             withType(GoogleTestTestSuiteBinarySpec) {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                lib project: ':hal', library: 'hal', linkage: 'shared'
+                project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
-                project(':ni-libraries').addNiLibrariesToLinker(it)
+                lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
                 lib library: nativeName, linkage: 'shared'
             }
         }
@@ -172,6 +182,7 @@ model {
                             def arch = it.targetPlatform.architecture.name
                             if (arch == 'x86-64' || arch == 'x86') {
                                 dependsOn it.tasks.install
+								commandLine it.tasks.install.runScriptFile.get().asFile.toString()
 
                                 found = true
                             }

@@ -10,15 +10,18 @@ package edu.wpi.first.wpilibj;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.function.Supplier;
 
 import edu.wpi.cscore.CameraServerJNI;
+import edu.wpi.first.cameraserver.CameraServerShared;
+import edu.wpi.first.cameraserver.CameraServerSharedStore;
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
@@ -244,12 +247,13 @@ public abstract class RobotBase implements AutoCloseable {
       file.createNewFile();
 
       try (OutputStream output = Files.newOutputStream(file.toPath())) {
-        output.write("Java ".getBytes());
-        output.write(WPILibVersion.Version.getBytes());
+        output.write("Java ".getBytes(StandardCharsets.UTF_8));
+        output.write(WPILibVersion.Version.getBytes(StandardCharsets.UTF_8));
       }
 
     } catch (IOException ex) {
-      ex.printStackTrace();
+      DriverStation.reportError("Could not write FRC_Lib_Version.ini: " + ex.toString(),
+          ex.getStackTrace());
     }
 
     boolean errorOnExit = false;

@@ -8,6 +8,7 @@
 #include "frc/DigitalInput.h"
 
 #include <limits>
+#include <utility>
 
 #include <hal/DIO.h>
 #include <hal/HAL.h>
@@ -52,6 +53,20 @@ DigitalInput::~DigitalInput() {
   }
 
   HAL_FreeDIOPort(m_handle);
+}
+
+DigitalInput::DigitalInput(DigitalInput&& rhs)
+    : DigitalSource(std::move(rhs)), m_channel(std::move(rhs.m_channel)) {
+  std::swap(m_handle, rhs.m_handle);
+}
+
+DigitalInput& DigitalInput::operator=(DigitalInput&& rhs) {
+  DigitalSource::operator=(std::move(rhs));
+
+  m_channel = std::move(rhs.m_channel);
+  std::swap(m_handle, rhs.m_handle);
+
+  return *this;
 }
 
 bool DigitalInput::Get() const {

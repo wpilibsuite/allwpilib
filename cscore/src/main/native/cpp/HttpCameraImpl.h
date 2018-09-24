@@ -19,6 +19,7 @@
 #include <wpi/HttpUtil.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringMap.h>
+#include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 #include <wpi/raw_istream.h>
 
@@ -29,14 +30,14 @@ namespace cs {
 
 class HttpCameraImpl : public SourceImpl {
  public:
-  HttpCameraImpl(wpi::StringRef name, CS_HttpCameraKind kind);
+  HttpCameraImpl(const wpi::Twine& name, CS_HttpCameraKind kind);
   ~HttpCameraImpl() override;
 
   void Start();
 
   // Property functions
   void SetProperty(int property, int value, CS_Status* status) override;
-  void SetStringProperty(int property, wpi::StringRef value,
+  void SetStringProperty(int property, const wpi::Twine& value,
                          CS_Status* status) override;
 
   // Standard common camera properties
@@ -62,13 +63,13 @@ class HttpCameraImpl : public SourceImpl {
   class PropertyData : public PropertyImpl {
    public:
     PropertyData() = default;
-    explicit PropertyData(wpi::StringRef name_) : PropertyImpl{name_} {}
-    PropertyData(wpi::StringRef name_, wpi::StringRef httpParam_,
+    explicit PropertyData(const wpi::Twine& name_) : PropertyImpl{name_} {}
+    PropertyData(const wpi::Twine& name_, const wpi::Twine& httpParam_,
                  bool viaSettings_, CS_PropertyKind kind_, int minimum_,
                  int maximum_, int step_, int defaultValue_, int value_)
         : PropertyImpl(name_, kind_, step_, defaultValue_, value_),
           viaSettings(viaSettings_),
-          httpParam(httpParam_) {
+          httpParam(httpParam_.str()) {
       hasMinimum = true;
       minimum = minimum_;
       hasMaximum = true;
@@ -82,16 +83,16 @@ class HttpCameraImpl : public SourceImpl {
 
  protected:
   std::unique_ptr<PropertyImpl> CreateEmptyProperty(
-      wpi::StringRef name) const override;
+      const wpi::Twine& name) const override;
 
   bool CacheProperties(CS_Status* status) const override;
 
-  void CreateProperty(wpi::StringRef name, wpi::StringRef httpParam,
+  void CreateProperty(const wpi::Twine& name, const wpi::Twine& httpParam,
                       bool viaSettings, CS_PropertyKind kind, int minimum,
                       int maximum, int step, int defaultValue, int value) const;
 
   template <typename T>
-  void CreateEnumProperty(wpi::StringRef name, wpi::StringRef httpParam,
+  void CreateEnumProperty(const wpi::Twine& name, const wpi::Twine& httpParam,
                           bool viaSettings, int defaultValue, int value,
                           std::initializer_list<T> choices) const;
 
@@ -139,11 +140,11 @@ class HttpCameraImpl : public SourceImpl {
 
 class AxisCameraImpl : public HttpCameraImpl {
  public:
-  explicit AxisCameraImpl(wpi::StringRef name)
+  explicit AxisCameraImpl(const wpi::Twine& name)
       : HttpCameraImpl{name, CS_HTTP_AXIS} {}
 #if 0
   void SetProperty(int property, int value, CS_Status* status) override;
-  void SetStringProperty(int property, wpi::StringRef value,
+  void SetStringProperty(int property, const wpi::Twine& value,
                          CS_Status* status) override;
 #endif
  protected:

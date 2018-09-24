@@ -9,11 +9,11 @@ package edu.wpi.first.wpilibj;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.util.BoundaryException;
 import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.util.BoundaryException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -110,7 +110,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
   /**
    * Used internally for when Tolerance hasn't been set.
    */
-  public class NullTolerance implements Tolerance {
+  public static class NullTolerance implements Tolerance {
     @Override
     public boolean onTarget() {
       throw new IllegalStateException("No tolerance value set when calling onTarget().");

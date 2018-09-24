@@ -15,7 +15,7 @@ public class VideoProperty {
     kNone(0), kBoolean(1), kInteger(2), kString(4), kEnum(8);
 
     @SuppressWarnings("MemberName")
-    private int value;
+    private final int value;
 
     Kind(int value) {
       this.value = value;

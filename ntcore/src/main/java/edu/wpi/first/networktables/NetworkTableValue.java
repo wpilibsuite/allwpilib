@@ -258,7 +258,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeBoolean(boolean value) {
-    return new NetworkTableValue(NetworkTableType.kBoolean, new Boolean(value));
+    return new NetworkTableValue(NetworkTableType.kBoolean, Boolean.valueOf(value));
   }
 
   /**
@@ -269,7 +269,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeBoolean(boolean value, long time) {
-    return new NetworkTableValue(NetworkTableType.kBoolean, new Boolean(value), time);
+    return new NetworkTableValue(NetworkTableType.kBoolean, Boolean.valueOf(value), time);
   }
 
   /**
@@ -279,7 +279,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeDouble(double value) {
-    return new NetworkTableValue(NetworkTableType.kDouble, new Double(value));
+    return new NetworkTableValue(NetworkTableType.kDouble, Double.valueOf(value));
   }
 
   /**
@@ -290,7 +290,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeDouble(double value, long time) {
-    return new NetworkTableValue(NetworkTableType.kDouble, new Double(value), time);
+    return new NetworkTableValue(NetworkTableType.kDouble, Double.valueOf(value), time);
   }
 
   /**

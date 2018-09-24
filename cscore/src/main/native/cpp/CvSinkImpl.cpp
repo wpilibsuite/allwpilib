@@ -20,12 +20,12 @@
 
 using namespace cs;
 
-CvSinkImpl::CvSinkImpl(wpi::StringRef name) : SinkImpl{name} {
+CvSinkImpl::CvSinkImpl(const wpi::Twine& name) : SinkImpl{name} {
   m_active = true;
   // m_thread = std::thread(&CvSinkImpl::ThreadMain, this);
 }
 
-CvSinkImpl::CvSinkImpl(wpi::StringRef name,
+CvSinkImpl::CvSinkImpl(const wpi::Twine& name,
                        std::function<void(uint64_t time)> processFrame)
     : SinkImpl{name} {}
 
@@ -118,14 +118,14 @@ void CvSinkImpl::ThreadMain() {
 
 namespace cs {
 
-CS_Sink CreateCvSink(wpi::StringRef name, CS_Status* status) {
+CS_Sink CreateCvSink(const wpi::Twine& name, CS_Status* status) {
   auto sink = std::make_shared<CvSinkImpl>(name);
   auto handle = Sinks::GetInstance().Allocate(CS_SINK_CV, sink);
   Notifier::GetInstance().NotifySink(name, handle, CS_SINK_CREATED);
   return handle;
 }
 
-CS_Sink CreateCvSinkCallback(wpi::StringRef name,
+CS_Sink CreateCvSinkCallback(const wpi::Twine& name,
                              std::function<void(uint64_t time)> processFrame,
                              CS_Status* status) {
   auto sink = std::make_shared<CvSinkImpl>(name, processFrame);
@@ -134,7 +134,7 @@ CS_Sink CreateCvSinkCallback(wpi::StringRef name,
   return handle;
 }
 
-void SetSinkDescription(CS_Sink sink, wpi::StringRef description,
+void SetSinkDescription(CS_Sink sink, const wpi::Twine& description,
                         CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
   if (!data || data->kind != CS_SINK_CV) {

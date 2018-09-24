@@ -18,7 +18,11 @@ namespace frc {
  */
 class Controller {
  public:
+  Controller() = default;
   virtual ~Controller() = default;
+
+  Controller(Controller&&) = default;
+  Controller& operator=(Controller&&) = default;
 
   /**
    * Allows the control loop to run

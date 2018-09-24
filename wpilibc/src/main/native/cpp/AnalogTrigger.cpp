@@ -7,7 +7,7 @@
 
 #include "frc/AnalogTrigger.h"
 
-#include <memory>
+#include <utility>
 
 #include <hal/HAL.h>
 
@@ -43,9 +43,30 @@ AnalogTrigger::~AnalogTrigger() {
   int32_t status = 0;
   HAL_CleanAnalogTrigger(m_trigger, &status);
 
-  if (m_ownsAnalog && m_analogInput != nullptr) {
+  if (m_ownsAnalog) {
     delete m_analogInput;
   }
+}
+
+AnalogTrigger::AnalogTrigger(AnalogTrigger&& rhs)
+    : ErrorBase(std::move(rhs)),
+      SendableBase(std::move(rhs)),
+      m_index(std::move(rhs.m_index)) {
+  std::swap(m_trigger, rhs.m_trigger);
+  std::swap(m_analogInput, rhs.m_analogInput);
+  std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
+}
+
+AnalogTrigger& AnalogTrigger::operator=(AnalogTrigger&& rhs) {
+  ErrorBase::operator=(std::move(rhs));
+  SendableBase::operator=(std::move(rhs));
+
+  m_index = std::move(rhs.m_index);
+  std::swap(m_trigger, rhs.m_trigger);
+  std::swap(m_analogInput, rhs.m_analogInput);
+  std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
+
+  return *this;
 }
 
 void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {

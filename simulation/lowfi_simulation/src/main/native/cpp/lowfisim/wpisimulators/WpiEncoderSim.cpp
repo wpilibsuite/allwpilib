@@ -13,6 +13,10 @@ namespace lowfi {
 
 WpiEncoderSim::WpiEncoderSim(int index) : m_encoderSimulator(index) {}
 
+bool WpiEncoderSim::IsWrapperInitialized() const {
+  return m_encoderSimulator.GetInitialized();
+}
+
 void WpiEncoderSim::SetPosition(double position) {
   m_encoderSimulator.SetCount(
       static_cast<int>(position / m_encoderSimulator.GetDistancePerPulse()));

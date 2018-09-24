@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 
 /**
  * Handle input from Xbox 360 or Xbox One controllers connected to the Driver Station.
@@ -34,7 +34,7 @@ public class XboxController extends GenericHID {
     kStart(8);
 
     @SuppressWarnings({"MemberName", "PMD.SingularField"})
-    private int value;
+    private final int value;
 
     Button(int value) {
       this.value = value;

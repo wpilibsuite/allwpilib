@@ -49,6 +49,9 @@ class GenericHID : public ErrorBase {
   explicit GenericHID(int port);
   virtual ~GenericHID() = default;
 
+  GenericHID(GenericHID&&) = default;
+  GenericHID& operator=(GenericHID&&) = default;
+
   virtual double GetX(JoystickHand hand = kRightHand) const = 0;
   virtual double GetY(JoystickHand hand = kRightHand) const = 0;
 

@@ -39,6 +39,21 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
+ext {
+    chipObjectComponents = ['commands']
+    netCommComponents = ['commands']
+    examplesMap.each { key, value ->
+        chipObjectComponents << key.toString()
+        netCommComponents << key.toString()
+    }
+    templatesMap.each { key, value ->
+        chipObjectComponents << key.toString()
+        netCommComponents << key.toString()
+    }
+}
+
+apply from: "${rootDir}/shared/nilibraries.gradle"
+
 model {
     components {
         commands(NativeLibrarySpec) {
@@ -50,10 +65,9 @@ model {
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                lib project: ':hal', library: 'hal', linkage: 'shared'
+                project(':hal').addHalDependency(binary, 'shared')
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                project(':ni-libraries').addNiLibrariesToLinker(binary)
             }
             sources {
                 cpp {
@@ -75,10 +89,9 @@ model {
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    project(':ni-libraries').addNiLibrariesToLinker(binary)
                     if (binary.targetPlatform.architecture.name != 'athena') {
                         lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
                         lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
@@ -106,7 +119,7 @@ model {
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    lib project: ':hal', library: 'hal', linkage: 'shared'
+                    project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     binary.tasks.withType(CppCompile) {
@@ -114,7 +127,6 @@ model {
                             cppCompiler.args "-Wno-error=deprecated-declarations"
                         }
                     }
-                    project(':ni-libraries').addNiLibrariesToLinker(binary)
                     if (binary.targetPlatform.architecture.name != 'athena') {
                         lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
                         lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'

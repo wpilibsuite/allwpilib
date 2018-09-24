@@ -43,6 +43,9 @@ class AnalogTrigger : public ErrorBase, public SendableBase {
 
   ~AnalogTrigger() override;
 
+  AnalogTrigger(AnalogTrigger&& rhs);
+  AnalogTrigger& operator=(AnalogTrigger&& rhs);
+
   /**
    * Set the upper and lower limits of the analog trigger.
    *
@@ -133,7 +136,7 @@ class AnalogTrigger : public ErrorBase, public SendableBase {
 
  private:
   int m_index;
-  HAL_AnalogTriggerHandle m_trigger;
+  HAL_AnalogTriggerHandle m_trigger = HAL_kInvalidHandle;
   AnalogInput* m_analogInput = nullptr;
   bool m_ownsAnalog = false;
 };
