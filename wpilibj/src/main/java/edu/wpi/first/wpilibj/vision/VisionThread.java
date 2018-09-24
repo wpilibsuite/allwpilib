@@ -17,7 +17,10 @@ import edu.wpi.cscore.VideoSource;
  * @see VisionPipeline
  * @see VisionRunner
  * @see Thread#setDaemon(boolean)
+ *
+ * @deprecated Replaced with edu.wpi.first.vision.VisionThread
  */
+@Deprecated
 public class VisionThread extends Thread {
   /**
    * Creates a vision thread that continuously runs a {@link VisionPipeline}.

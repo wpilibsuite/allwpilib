@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj;
+package edu.wpi.first.cameraserver;
 
 public final class CameraServerSharedStore {
   private static CameraServerShared cameraServerShared;

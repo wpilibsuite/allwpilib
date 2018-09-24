@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.quickvision;
 
-import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 /**

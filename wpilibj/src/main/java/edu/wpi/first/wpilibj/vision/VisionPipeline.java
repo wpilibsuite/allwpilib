@@ -15,7 +15,10 @@ import org.opencv.core.Mat;
  *
  * @see VisionRunner
  * @see VisionThread
+ *
+ * @deprecated Replaced with edu.wpi.first.vision.VisionPipeline
  */
+@Deprecated
 public interface VisionPipeline {
   /**
    * Processes the image input and sets the result objects.

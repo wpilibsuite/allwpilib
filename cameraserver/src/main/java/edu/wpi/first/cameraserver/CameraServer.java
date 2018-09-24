@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj;
+package edu.wpi.first.cameraserver;
 
 import java.util.ArrayList;
 import java.util.Arrays;

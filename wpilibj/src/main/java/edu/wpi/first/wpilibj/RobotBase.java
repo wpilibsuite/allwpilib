@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.util.function.Supplier;
 
 import edu.wpi.cscore.CameraServerJNI;
+import edu.wpi.first.cameraserver.CameraServerShared;
+import edu.wpi.first.cameraserver.CameraServerSharedStore;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
