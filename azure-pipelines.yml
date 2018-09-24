@@ -12,7 +12,7 @@ jobs:
  - job: Linux_Arm
    pool:
      vmImage: 'Ubuntu 16.04'
- 
+
    steps:
     - script: |
         sudo add-apt-repository ppa:wpilib/toolchain -y
@@ -31,11 +31,11 @@ jobs:
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
         options: '-PonlyAthena'
-       
+
  - job: Linux
    pool:
      vmImage: 'Ubuntu 16.04'
- 
+
    steps:
     - task: Gradle@2
       inputs:
@@ -65,7 +65,7 @@ jobs:
         publishJUnitResults: false
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
-        
+
  - job: Windows_32_Bit
    pool:
      vmImage: 'vs2017-win2017'
@@ -81,7 +81,7 @@ jobs:
         publishJUnitResults: false
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
-          
+
  - job: Mac
    pool:
      vmImage: 'xcode9-macos10.13'
