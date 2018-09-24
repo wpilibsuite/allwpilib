@@ -142,42 +142,42 @@ void SPI::SetClockRate(double hz) { HAL_SetSPISpeed(m_port, hz); }
 
 void SPI::SetMSBFirst() {
   m_msbFirst = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetLSBFirst() {
   m_msbFirst = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetSampleDataOnLeadingEdge() {
   m_sampleOnTrailing = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetSampleDataOnTrailingEdge() {
   m_sampleOnTrailing = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetSampleDataOnFalling() {
   m_sampleOnTrailing = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetSampleDataOnRising() {
   m_sampleOnTrailing = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetClockActiveLow() {
-  m_clk_idle_high = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  m_clockIdleHigh = true;
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetClockActiveHigh() {
-  m_clk_idle_high = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
+  m_clockIdleHigh = false;
+  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
 void SPI::SetChipSelectActiveHigh() {
