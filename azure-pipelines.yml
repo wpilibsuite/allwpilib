@@ -75,6 +75,9 @@ jobs:
    pool:
      vmImage: 'vs2017-win2017'
    steps:
+    - powershell: |
+        Set-MpPreference -DisableRealtimeMonitoring $true
+      displayName: 'Disable Windows Defender'
     - task: Gradle@2
       inputs:
         workingDirectory: ''
@@ -91,6 +94,9 @@ jobs:
    pool:
      vmImage: 'vs2017-win2017'
    steps:
+    - powershell: |
+        Set-MpPreference -DisableRealtimeMonitoring $true
+      displayName: 'Disable Windows Defender'
     - task: Gradle@2
       inputs:
         workingDirectory: ''
