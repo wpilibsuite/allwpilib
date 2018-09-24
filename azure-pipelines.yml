@@ -50,6 +50,27 @@ jobs:
         tasks: 'build'
         options: '-PskipAthena'
 
+ - job: Styleguide
+   pool:
+     vmImage: 'Ubuntu 16.04'
+
+   steps:
+      - script: |
+          sudo apt-get update -y
+          sudo apt-get install clang-format-5.0 python3-setuptools -y
+          sudo pip3 install --upgrade pip
+          sudo pip3 install wpiformat
+          git checkout -b master
+        displayName: 'Install Dependencies'
+      - script: |
+          wpiformat -y 2018 -clang 5.0
+        displayName: 'Run WPIFormat'
+        failOnStderr: true
+      - script: |
+          git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+        displayName: 'Check WPIFormat Output'
+        failOnStderr: true
+
  - job: Windows_64_Bit
    pool:
      vmImage: 'vs2017-win2017'
