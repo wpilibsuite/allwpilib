@@ -13,8 +13,6 @@ jobs:
    pool:
      vmImage: 'Ubuntu 16.04'
 
-   container: ubuntu18
-
    steps:
     - script: |
         sudo add-apt-repository ppa:wpilib/toolchain -y
@@ -39,6 +37,8 @@ jobs:
  - job: Linux
    pool:
      vmImage: 'Ubuntu 16.04'
+
+   container: ubuntu18
 
    steps:
     - task: Gradle@2
