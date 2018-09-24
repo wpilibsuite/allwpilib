@@ -71,6 +71,24 @@ jobs:
         displayName: 'Check WPIFormat Output'
         failOnStderr: true
 
+ - job: CMakeBuild
+   pool:
+     vmImage: 'Ubuntu 16.04'
+
+   steps:
+      - script: |
+          sudo add-apt-repository ppa:lkoppel/opencv -y
+          sudo apt-get update -y
+          sudo apt-get install libopencv-dev -y
+        displayName: 'Install Dependencies'
+      - task: CMake@1
+        inputs:
+          cmakeArgs: '-DWITHOUT_ALLWPILIB=OFF ..'
+      - script: |
+          make -j3
+        workingDirectory: 'build'
+        displayName: 'Build'
+
  - job: Windows_64_Bit
    pool:
      vmImage: 'vs2017-win2017'
