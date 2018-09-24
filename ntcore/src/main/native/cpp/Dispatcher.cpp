@@ -58,7 +58,9 @@ void Dispatcher::SetServerTeam(unsigned int team, unsigned int port) {
   wpi::SmallString<32> fixed;
   {
     wpi::raw_svector_ostream oss{fixed};
-    oss << "10." << static_cast<int>((int)team / 100) << '.' << static_cast<int>(team % 100) << ".2"; servers[0] = std::make_pair(oss.str(), port);
+    oss << "10." << static_cast<int>(team / 100) << '.'
+        << static_cast<int>(team % 100) << ".2";
+    servers[0] = std::make_pair(oss.str(), port);
   }
 
   // 172.22.11.2
