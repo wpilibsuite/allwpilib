@@ -11,6 +11,8 @@
 #include <jni.h>
 #include <stdint.h>
 
+#include <wpi/StringRef.h>
+
 struct HAL_MatchInfo;
 
 namespace frc {
@@ -43,7 +45,7 @@ inline bool CheckCANStatus(JNIEnv* env, int32_t status, int32_t message_id) {
   return status == 0;
 }
 
-void ThrowIllegalArgumentException(JNIEnv* env, const char* msg);
+void ThrowIllegalArgumentException(JNIEnv* env, wpi::StringRef msg);
 void ThrowBoundaryException(JNIEnv* env, double value, double lower,
                             double upper);
 

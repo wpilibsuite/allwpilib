@@ -206,7 +206,7 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
   }
 }
 
-void ThrowIllegalArgumentException(JNIEnv* env, const char* msg) {
+void ThrowIllegalArgumentException(JNIEnv* env, wpi::StringRef msg) {
   illegalArgExCls.Throw(env, msg);
 }
 
