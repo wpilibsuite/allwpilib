@@ -7,18 +7,17 @@ resources:
   containers:
   - container: ubuntu18
     image: ubuntu:18.04
+  - container: wpilib
+    image: wpilib:roborio-cross-ubuntu
 
 jobs:
  - job: Linux_Arm
    pool:
      vmImage: 'Ubuntu 16.04'
 
+   container: wpilib
+
    steps:
-    - script: |
-        sudo add-apt-repository ppa:wpilib/toolchain -y
-        sudo apt-get update -y
-        sudo apt-get install frc-toolchain -y
-      displayName: 'Install Toolchain'
     - task: Gradle@2
       inputs:
         workingDirectory: ''
@@ -37,8 +36,6 @@ jobs:
  - job: Linux
    pool:
      vmImage: 'Ubuntu 16.04'
-
-   container: ubuntu18
 
    steps:
     - script: |
