@@ -9,12 +9,12 @@
 
 #include <condition_variable>
 
-#include "priority_condition_variable.h"
+#include "wpi/priority_mutex.h"
 
 namespace wpi {
 
-#ifdef WPI_HAVE_PRIORITY_CONDITION_VARIABLE
-using condition_variable = priority_condition_variable;
+#if defined(__linux__) && defined(WPI_HAVE_PRIORITY_MUTEX)
+using condition_variable = ::std::condition_variable_any;
 #else
 using condition_variable = ::std::condition_variable;
 #endif
