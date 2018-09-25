@@ -176,8 +176,14 @@ Java_edu_wpi_first_hal_HAL_getJoystickAxes
 
   jsize javaSize = env->GetArrayLength(axesArray);
   if (axes.count > javaSize) {
-    ThrowIllegalArgumentException(
-        env, "Native array size larger then passed in java array size");
+    wpi::SmallString<128> errStr;
+    wpi::raw_svector_ostream oss{errStr};
+    oss << "Native array size larger then passed in java array size "
+        << "Native Size: " << static_cast<int>(axes.count)
+        << " Java Size: " << static_cast<int>(javaSize);
+
+    ThrowIllegalArgumentException(env, errStr.str());
+    return 0;
   }
 
   env->SetFloatArrayRegion(axesArray, 0, axes.count, axes.axes);
@@ -200,8 +206,14 @@ Java_edu_wpi_first_hal_HAL_getJoystickPOVs
 
   jsize javaSize = env->GetArrayLength(povsArray);
   if (povs.count > javaSize) {
-    ThrowIllegalArgumentException(
-        env, "Native array size larger then passed in java array size");
+    wpi::SmallString<128> errStr;
+    wpi::raw_svector_ostream oss{errStr};
+    oss << "Native array size larger then passed in java array size "
+        << "Native Size: " << static_cast<int>(povs.count)
+        << " Java Size: " << static_cast<int>(javaSize);
+
+    ThrowIllegalArgumentException(env, errStr.str());
+    return 0;
   }
 
   env->SetShortArrayRegion(povsArray, 0, povs.count, povs.povs);
