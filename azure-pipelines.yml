@@ -8,7 +8,7 @@ resources:
   - container: ubuntu18
     image: ubuntu:18.04
   - container: wpilib
-    image: wpilib:roborio-cross-ubuntu
+    image: wpilib/roborio-cross-ubuntu:2018-17.10
 
 jobs:
  - job: Linux_Arm
@@ -38,13 +38,6 @@ jobs:
      vmImage: 'Ubuntu 16.04'
 
    steps:
-    - script: |
-        add-apt-repository ppa:webupd8team/java -y
-        apt-get update -y
-        echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
-        apt-get install -y oracle-java8-installer
-        apt-get install gcc g++ build-essential  -y
-      displayName: 'Install Dependencies'
     - task: Gradle@2
       inputs:
         workingDirectory: ''
