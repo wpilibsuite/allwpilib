@@ -371,9 +371,8 @@ double GetTelemetryAverageValue(CS_Handle handle, CS_TelemetryKind kind,
  * @defgroup cscore_logging_func Logging Functions
  * @{
  */
-typedef std::function<void(unsigned int level, const char* file,
-                           unsigned int line, const char* msg)>
-    LogFunc;
+using LogFunc = std::function<void(unsigned int level, const char* file,
+                                   unsigned int line, const char* msg)>;
 void SetLogger(LogFunc func, unsigned int min_level);
 void SetDefaultLogger(unsigned int min_level);
 /** @} */

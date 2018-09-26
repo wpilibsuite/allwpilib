@@ -221,7 +221,7 @@ class Command : public ErrorBase, public SendableBase {
    */
   bool DoesRequire(Subsystem* subsystem) const;
 
-  typedef wpi::SmallPtrSetImpl<Subsystem*> SubsystemSet;
+  using SubsystemSet = wpi::SmallPtrSetImpl<Subsystem*>;
 
   /**
    * Returns the requirements (as an std::set of Subsystem pointers) of this

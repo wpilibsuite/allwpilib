@@ -29,7 +29,7 @@ class Frame {
   friend class SourceImpl;
 
  public:
-  typedef uint64_t Time;
+  using Time = uint64_t;
 
  private:
   struct Impl {

@@ -13,11 +13,11 @@ class Command;
 
 class CommandGroupEntry {
  public:
-  typedef enum {
+  enum Sequence {
     kSequence_InSequence,
     kSequence_BranchPeer,
     kSequence_BranchChild
-  } Sequence;
+  };
 
   CommandGroupEntry() = default;
   CommandGroupEntry(Command* command, Sequence state, double timeout = -1.0);

@@ -14,7 +14,7 @@ namespace cs {
 // convert value initialization into default initialization.
 template <typename T, typename A = std::allocator<T>>
 class default_init_allocator : public A {
-  typedef std::allocator_traits<A> a_t;
+  using a_t = std::allocator_traits<A>;
 
  public:
   template <typename U>

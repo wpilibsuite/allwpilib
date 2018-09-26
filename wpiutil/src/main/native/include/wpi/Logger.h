@@ -29,9 +29,8 @@ enum LogLevel {
 
 class Logger {
  public:
-  typedef std::function<void(unsigned int level, const char* file,
-                             unsigned int line, const char* msg)>
-      LogFunc;
+  using LogFunc = std::function<void(unsigned int level, const char* file,
+                                     unsigned int line, const char* msg)>;
 
   Logger() = default;
   explicit Logger(const LogFunc& func) : m_func(func) {}

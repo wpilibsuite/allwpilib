@@ -24,7 +24,7 @@ namespace {
 template <typename T>
 class UidVector {
  public:
-  typedef typename std::vector<T>::size_type size_type;
+  using size_type = typename std::vector<T>::size_type;
 
   size_type size() const { return m_vector.size(); }
   T& operator[](size_type i) { return m_vector[i]; }

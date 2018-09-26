@@ -21,7 +21,7 @@
 
 namespace frc {
 
-typedef std::function<void()> TimerEventHandler;
+using TimerEventHandler = std::function<void()>;
 
 class Notifier : public ErrorBase {
  public:
