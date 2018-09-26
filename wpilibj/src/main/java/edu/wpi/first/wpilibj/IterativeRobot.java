@@ -18,7 +18,11 @@ import edu.wpi.first.hal.HAL;
  *
  * <p>periodic() functions from the base class are called each time a new packet is received from
  * the driver station.
+ *
+ * @deprecated Use TimedRobot instead. It's a drop-in replacement that provides more regular
+ *     execution periods.
  */
+@Deprecated
 public class IterativeRobot extends IterativeRobotBase {
   private static final double kPacketPeriod = 0.02;
 
