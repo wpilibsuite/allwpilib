@@ -90,7 +90,7 @@ inline TLogLevel Log::FromString(const std::string& level) {
   return logINFO;
 }
 
-typedef Log FILELog;
+using FILELog = Log;  // NOLINT
 
 #define FILE_LOG(level)                  \
   if (level > FILELog::ReportingLevel()) \

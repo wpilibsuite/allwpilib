@@ -18,10 +18,10 @@ namespace hal {
  */
 class fpga_clock {
  public:
-  typedef std::chrono::microseconds::rep rep;
-  typedef std::chrono::microseconds::period period;
-  typedef std::chrono::microseconds duration;
-  typedef std::chrono::time_point<fpga_clock> time_point;
+  using rep = std::chrono::microseconds::rep;
+  using period = std::chrono::microseconds::period;
+  using duration = std::chrono::microseconds;
+  using time_point = std::chrono::time_point<fpga_clock>;
 
   static fpga_clock::time_point now() noexcept;
   static constexpr bool is_steady = true;

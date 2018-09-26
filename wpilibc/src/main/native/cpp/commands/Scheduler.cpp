@@ -28,15 +28,15 @@ struct Scheduler::Impl {
   void Remove(Command* command);
   void ProcessCommandAddition(Command* command);
 
-  typedef std::set<Subsystem*> SubsystemSet;
+  using SubsystemSet = std::set<Subsystem*>;
   SubsystemSet subsystems;
   wpi::mutex buttonsMutex;
-  typedef std::vector<std::unique_ptr<ButtonScheduler>> ButtonVector;
+  using ButtonVector = std::vector<std::unique_ptr<ButtonScheduler>>;
   ButtonVector buttons;
-  typedef std::vector<Command*> CommandVector;
+  using CommandVector = std::vector<Command*>;
   wpi::mutex additionsMutex;
   CommandVector additions;
-  typedef std::set<Command*> CommandSet;
+  using CommandSet = std::set<Command*>;
   CommandSet commands;
   bool adding = false;
   bool enabled = true;

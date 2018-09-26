@@ -14,7 +14,7 @@
 
 namespace frc {
 
-typedef void (*TimerInterruptHandler)(void* param);
+using TimerInterruptHandler = void (*)(void* param);
 
 /**
  * Pause the task for a specified time.

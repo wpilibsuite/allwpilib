@@ -26,7 +26,7 @@ namespace wpi {
 
 class priority_recursive_mutex {
  public:
-  typedef pthread_mutex_t* native_handle_type;
+  using native_handle_type = pthread_mutex_t*;
 
   constexpr priority_recursive_mutex() noexcept = default;
   priority_recursive_mutex(const priority_recursive_mutex&) = delete;
@@ -57,7 +57,7 @@ class priority_recursive_mutex {
 
 class priority_mutex {
  public:
-  typedef pthread_mutex_t* native_handle_type;
+  using native_handle_type = pthread_mutex_t*;
 
   constexpr priority_mutex() noexcept = default;
   priority_mutex(const priority_mutex&) = delete;

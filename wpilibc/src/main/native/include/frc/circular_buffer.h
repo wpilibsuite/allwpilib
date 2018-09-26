@@ -21,13 +21,13 @@ class circular_buffer {
  public:
   explicit circular_buffer(size_t size);
 
-  typedef T value_type;
-  typedef value_type& reference;
-  typedef const value_type& const_reference;
-  typedef value_type* pointer;
-  typedef size_t size_type;
-  typedef std::forward_iterator_tag iterator_category;
-  typedef std::ptrdiff_t difference_type;
+  using value_type = T;
+  using reference = value_type&;
+  using const_reference = const value_type&;
+  using pointer = value_type*;
+  using size_type = size_t;
+  using iterator_category = std::forward_iterator_tag;
+  using difference_type = std::ptrdiff_t;
 
   size_type size() const;
   T& front();

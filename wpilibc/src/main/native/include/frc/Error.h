@@ -31,7 +31,7 @@ class ErrorBase;
  */
 class Error {
  public:
-  typedef int Code;
+  using Code = int;
 
   Error() = default;
   Error(Code code, const wpi::Twine& contextMessage, wpi::StringRef filename,
