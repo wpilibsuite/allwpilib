@@ -7,7 +7,7 @@ resources:
   containers:
   - container: ubuntu18
     image: ubuntu:18.04
-  - container: wpilib
+  - container: wpilib2018
     image: wpilib/roborio-cross-ubuntu:2018-17.10
   - container: wpilib2019
     image: 'wpilib/roborio-cross-ubuntu:2019-18.04'
@@ -17,7 +17,7 @@ jobs:
    pool:
      vmImage: 'Ubuntu 16.04'
 
-   container: wpilib
+   container: wpilib2018
 
    steps:
     - task: Gradle@2
@@ -36,7 +36,7 @@ jobs:
    pool:
      vmImage: 'Ubuntu 16.04'
 
-   container: 'wpilib2019'
+   container: wpilib2018
 
    steps:
     - task: Gradle@2
