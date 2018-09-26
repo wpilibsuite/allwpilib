@@ -44,9 +44,6 @@ jobs:
         workingDirectory: ''
         gradleWrapperFile: 'gradlew'
         gradleOptions: '-Xmx3072m'
-        javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.8'
-        jdkArchitectureOption: 'x64'
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
@@ -82,11 +79,6 @@ jobs:
    container: 'wpilib2019'
 
    steps:
-      - script: |
-          sudo add-apt-repository ppa:lkoppel/opencv -y
-          sudo apt-get update -y
-          sudo apt-get install libopencv-dev -y
-        displayName: 'Install Dependencies'
       - task: CMake@1
         inputs:
           cmakeArgs: '-DWITHOUT_ALLWPILIB=OFF ..'
