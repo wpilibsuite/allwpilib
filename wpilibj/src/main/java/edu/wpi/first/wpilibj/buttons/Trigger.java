@@ -56,14 +56,13 @@ public abstract class Trigger extends SendableBase {
 
       @Override
       public void execute() {
-        if (grab()) {
-          if (!m_pressedLast) {
-            m_pressedLast = true;
-            command.start();
-          }
-        } else {
-          m_pressedLast = false;
+        boolean pressed = grab();
+
+        if (!m_pressedLast && pressed) {
+          command.start();
         }
+
+        m_pressedLast = pressed;
       }
     }.start();
   }
@@ -82,15 +81,15 @@ public abstract class Trigger extends SendableBase {
 
       @Override
       public void execute() {
-        if (grab()) {
-          m_pressedLast = true;
+        boolean pressed = grab();
+
+        if (!m_pressedLast && pressed) {
           command.start();
-        } else {
-          if (m_pressedLast) {
-            m_pressedLast = false;
-            command.cancel();
-          }
+        } else if (m_pressedLast && !pressed) {
+          command.cancel();
         }
+
+        m_pressedLast = pressed;
       }
     }.start();
   }
@@ -106,14 +105,13 @@ public abstract class Trigger extends SendableBase {
 
       @Override
       public void execute() {
-        if (grab()) {
-          m_pressedLast = true;
-        } else {
-          if (m_pressedLast) {
-            m_pressedLast = false;
-            command.start();
-          }
+        boolean pressed = grab();
+
+        if (m_pressedLast && !pressed) {
+          command.start();
         }
+
+        m_pressedLast = pressed;
       }
     }.start();
   }
@@ -129,18 +127,17 @@ public abstract class Trigger extends SendableBase {
 
       @Override
       public void execute() {
-        if (grab()) {
-          if (!m_pressedLast) {
-            m_pressedLast = true;
-            if (command.isRunning()) {
-              command.cancel();
-            } else {
-              command.start();
-            }
+        boolean pressed = grab();
+
+        if (!m_pressedLast && pressed) {
+          if (command.isRunning()) {
+            command.cancel();
+          } else {
+            command.start();
           }
-        } else {
-          m_pressedLast = false;
         }
+
+        m_pressedLast = pressed;
       }
     }.start();
   }
@@ -156,14 +153,13 @@ public abstract class Trigger extends SendableBase {
 
       @Override
       public void execute() {
-        if (grab()) {
-          if (!m_pressedLast) {
-            m_pressedLast = true;
-            command.cancel();
-          }
-        } else {
-          m_pressedLast = false;
+        boolean pressed = grab();
+
+        if (!m_pressedLast && pressed) {
+          command.cancel();
         }
+
+        m_pressedLast = pressed;
       }
     }.start();
   }

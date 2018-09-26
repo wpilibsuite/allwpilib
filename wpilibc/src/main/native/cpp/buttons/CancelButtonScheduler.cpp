@@ -14,17 +14,14 @@ using namespace frc;
 
 CancelButtonScheduler::CancelButtonScheduler(bool last, Trigger* button,
                                              Command* orders)
-    : ButtonScheduler(last, button, orders) {
-  pressedLast = m_button->Grab();
-}
+    : ButtonScheduler(last, button, orders) {}
 
 void CancelButtonScheduler::Execute() {
-  if (m_button->Grab()) {
-    if (!pressedLast) {
-      pressedLast = true;
-      m_command->Cancel();
-    }
-  } else {
-    pressedLast = false;
+  bool pressed = m_button->Grab();
+
+  if (!m_pressedLast && pressed) {
+    m_command->Cancel();
   }
+
+  m_pressedLast = pressed;
 }

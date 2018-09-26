@@ -17,13 +17,13 @@ HeldButtonScheduler::HeldButtonScheduler(bool last, Trigger* button,
     : ButtonScheduler(last, button, orders) {}
 
 void HeldButtonScheduler::Execute() {
-  if (m_button->Grab()) {
-    m_pressedLast = true;
+  bool pressed = m_button->Grab();
+
+  if (!m_pressedLast && pressed) {
     m_command->Start();
-  } else {
-    if (m_pressedLast) {
-      m_pressedLast = false;
-      m_command->Cancel();
-    }
+  } else if (m_pressedLast && !pressed) {
+    m_command->Cancel();
   }
+
+  m_pressedLast = pressed;
 }
