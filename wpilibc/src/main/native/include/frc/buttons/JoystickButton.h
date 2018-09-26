@@ -20,7 +20,9 @@ class JoystickButton : public Button {
   JoystickButton(JoystickButton&&) = default;
   JoystickButton& operator=(JoystickButton&&) = default;
 
-  virtual bool Get();
+  bool Get() override;
+  bool GetPressed() override;
+  bool GetReleased() override;
 
  private:
   GenericHID* m_joystick;

@@ -21,12 +21,23 @@ class InternalButton : public Button {
   InternalButton& operator=(InternalButton&&) = default;
 
   void SetInverted(bool inverted);
+
+  /**
+   * Set current state of button.
+   *
+   * @param pressed Whether the button is pressed.
+   */
   void SetPressed(bool pressed);
 
   virtual bool Get();
+  virtual bool GetPressed();
+  virtual bool GetReleased();
 
  private:
+  bool m_state = false;
+  bool m_lastState = false;
   bool m_pressed = false;
+  bool m_released = false;
   bool m_inverted = false;
 };
 

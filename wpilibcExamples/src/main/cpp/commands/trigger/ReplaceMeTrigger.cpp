@@ -10,3 +10,7 @@
 ReplaceMeTrigger::ReplaceMeTrigger() {}
 
 bool ReplaceMeTrigger::Get() { return false; }
+
+bool ReplaceMeTrigger::GetPressed() { return false; }
+
+bool ReplaceMeTrigger::GetReleased() { return false; }

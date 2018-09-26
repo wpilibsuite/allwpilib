@@ -17,4 +17,14 @@ public class ReplaceMeTrigger extends Trigger {
   public boolean get() {
     return false;
   }
+
+  @Override
+  public boolean getPressed() {
+    return false;
+  }
+
+  @Override
+  public boolean getReleased() {
+    return false;
+  }
 }

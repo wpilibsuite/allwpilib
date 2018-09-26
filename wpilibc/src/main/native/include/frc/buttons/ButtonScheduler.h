@@ -24,7 +24,7 @@ class ButtonScheduler {
   void Start();
 
  protected:
-  bool m_pressedLast;
+  bool m_lastState;
   Trigger* m_button;
   Command* m_command;
 };

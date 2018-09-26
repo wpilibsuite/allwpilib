@@ -14,21 +14,26 @@ using namespace frc;
 
 ToggleButtonScheduler::ToggleButtonScheduler(bool last, Trigger* button,
                                              Command* orders)
-    : ButtonScheduler(last, button, orders) {
-  pressedLast = m_button->Grab();
-}
+    : ButtonScheduler(last, button, orders) {}
 
 void ToggleButtonScheduler::Execute() {
-  if (m_button->Grab()) {
-    if (!pressedLast) {
-      pressedLast = true;
-      if (m_command->IsRunning()) {
-        m_command->Cancel();
-      } else {
-        m_command->Start();
-      }
+  bool state = m_button->GetSendableState();
+
+  if (!m_lastState && state) {
+    // If sendable button wasn't pressed and is now, start command
+    if (m_command->IsRunning()) {
+      m_command->Cancel();
+    } else {
+      m_command->Start();
     }
-  } else {
-    pressedLast = false;
+  } else if (m_button->GetPressed()) {
+    // Otherwise, check whether the normal button has been pressed
+    if (m_command->IsRunning()) {
+      m_command->Cancel();
+    } else {
+      m_command->Start();
+    }
   }
+
+  m_lastState = state;
 }
