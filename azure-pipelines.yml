@@ -76,7 +76,7 @@ jobs:
    pool:
      vmImage: 'Ubuntu 16.04'
 
-   container: 'wpilib2019'
+   container: wpilib2019
 
    steps:
       - task: CMake@1
