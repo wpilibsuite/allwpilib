@@ -113,6 +113,7 @@ dependencies {
     devCompile sourceSets.main.output
 
     errorprone 'com.google.errorprone:error_prone_core:2.3.2-SNAPSHOT'
+    errorproneJavac 'com.google.errorprone:error_prone_core:2.3.1'
 }
 
 task run(type: JavaExec) {
