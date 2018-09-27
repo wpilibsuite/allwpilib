@@ -12,11 +12,15 @@ def baseTemplatesArtifactId = 'templates'
 def baseCommandsArtifactId = 'commands'
 def artifactGroupId = 'edu.wpi.first.wpilibc'
 
+def examplesZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_examples_CLS'
+def templatesZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_templates_CLS'
+def commandsZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_commands_CLS'
+
 def outputsFolder = file("$project.buildDir/outputs")
 
 task cppExamplesZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'wpilibc-examples'
+    baseName = examplesZipBaseName
 
     from(licenseFile) {
         into '/'
@@ -29,7 +33,7 @@ task cppExamplesZip(type: Zip) {
 
 task cppTemplatesZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'wpilibc-templates'
+    baseName = templatesZipBaseName
 
     from(licenseFile) {
         into '/'
@@ -42,7 +46,7 @@ task cppTemplatesZip(type: Zip) {
 
 task cppCommandsZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'wpilibc-commands'
+    baseName = commandsZipBaseName
 
     from(licenseFile) {
         into '/'
@@ -56,6 +60,10 @@ task cppCommandsZip(type: Zip) {
 build.dependsOn cppTemplatesZip
 build.dependsOn cppExamplesZip
 build.dependsOn cppCommandsZip
+
+addTaskToCopyAllOutputs(cppTemplatesZip)
+addTaskToCopyAllOutputs(cppExamplesZip)
+addTaskToCopyAllOutputs(cppCommandsZip)
 
 publishing {
     publications {
