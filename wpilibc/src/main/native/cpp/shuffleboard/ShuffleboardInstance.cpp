@@ -33,7 +33,7 @@ ShuffleboardInstance::~ShuffleboardInstance() {}
 
 frc::ShuffleboardTab& ShuffleboardInstance::GetTab(wpi::StringRef title) {
   if (m_impl->tabs.find(title) == m_impl->tabs.end()) {
-    m_impl->tabs.try_emplace(title, std::move(ShuffleboardTab(*this, title)));
+    m_impl->tabs.try_emplace(title, ShuffleboardTab(*this, title));
     m_impl->tabsChanged = true;
   }
   return m_impl->tabs.find(title)->second;

@@ -43,14 +43,14 @@ class ShuffleboardComponentBase : public virtual ShuffleboardValue {
  protected:
   wpi::StringMap<std::shared_ptr<nt::Value>> m_properties;
   bool m_metadataDirty = false;
-
- private:
-  ShuffleboardContainer& m_parent;
-  std::string m_type;
   int m_column = -1;
   int m_row = -1;
   int m_width = -1;
   int m_height = -1;
+
+ private:
+  ShuffleboardContainer& m_parent;
+  std::string m_type;
 
   /**
    * Gets the custom properties for this component. May be null.
