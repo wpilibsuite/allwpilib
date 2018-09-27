@@ -1,11 +1,6 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java'
-
-if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
-    apply plugin: 'net.ltgt.errorprone'
-} else {
-    apply plugin: 'net.ltgt.errorprone-javacplugin'
-}
+apply plugin: 'net.ltgt.errorprone'
 
 def pubVersion
 if (project.hasProperty("publishVersion")) {
@@ -98,6 +93,7 @@ if (project.hasProperty('onlyAthena')) {
 
 repositories {
     mavenCentral()
+    maven.url "https://oss.sonatype.org/content/repositories/snapshots/"
 }
 
 sourceSets {
@@ -116,7 +112,7 @@ dependencies {
 
     devCompile sourceSets.main.output
 
-    errorprone 'com.google.errorprone:error_prone_core:2.3.1'
+    errorprone 'com.google.errorprone:error_prone_core:2.3.2-SNAPSHOT'
 }
 
 task run(type: JavaExec) {
