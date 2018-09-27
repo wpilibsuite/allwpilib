@@ -68,6 +68,9 @@ public class Watchdog {
   /**
    * Adds time since last epoch to the list printed by printEpochs().
    *
+   * <p>Epochs are a way to partition the time elapsed so that when overruns occur, one can
+   * determine which parts of an operation consumed the most time.
+   *
    * @param epochName The name to associate with the epoch.
    */
   public void addEpoch(String epochName) {
