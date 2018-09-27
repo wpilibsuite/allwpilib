@@ -10,7 +10,7 @@ resources:
   - container: wpilib2018
     image: wpilib/roborio-cross-ubuntu:2018-17.10
   - container: wpilib2019
-    image: 'wpilib/roborio-cross-ubuntu:2019-18.04'
+    image: wpilib/roborio-cross-ubuntu:2019-18.04
 
 jobs:
  - job: Linux_Arm
