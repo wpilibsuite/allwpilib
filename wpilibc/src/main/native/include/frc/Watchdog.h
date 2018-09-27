@@ -7,12 +7,13 @@
 
 #pragma once
 
+#include <chrono>
 #include <functional>
 
+#include <hal/cpp/fpga_clock.h>
+#include <wpi/SafeThread.h>
 #include <wpi/StringMap.h>
 #include <wpi/StringRef.h>
-
-#include "frc/Notifier.h"
 
 namespace frc {
 
@@ -30,18 +31,34 @@ class Watchdog {
   /**
    * Watchdog constructor.
    *
-   * @param timeout  The watchdog's timeout in seconds.
+   * @param timeout  The watchdog's timeout in seconds with microsecond
+   *                 resolution.
    * @param callback This function is called when the timeout expires.
    */
-  explicit Watchdog(double timeout, std::function<void()> callback = [] {});
+  Watchdog(double timeout, std::function<void()> callback);
+
+  ~Watchdog();
 
   Watchdog(Watchdog&&) = default;
   Watchdog& operator=(Watchdog&&) = default;
 
   /**
-   * Get the time in seconds since the watchdog was last fed.
+   * Returns the time in seconds since the watchdog was last fed.
    */
   double GetTime() const;
+
+  /**
+   * Sets the watchdog's timeout.
+   *
+   * @param timeout The watchdog's timeout in seconds with microsecond
+   *                resolution.
+   */
+  void SetTimeout(double timeout);
+
+  /**
+   * Returns the watchdog's timeout in seconds.
+   */
+  double GetTimeout() const;
 
   /**
    * Returns true if the watchdog timer has expired.
@@ -76,20 +93,25 @@ class Watchdog {
   void Enable();
 
   /**
-   * Disable the watchdog.
+   * Disables the watchdog timer.
    */
   void Disable();
 
  private:
-  double m_timeout;
+  hal::fpga_clock::time_point m_startTime;
+  std::chrono::microseconds m_timeout;
+  hal::fpga_clock::time_point m_expirationTime;
   std::function<void()> m_callback;
-  Notifier m_notifier;
 
-  double m_startTime = 0.0;
-  wpi::StringMap<double> m_epochs;
+  wpi::StringMap<std::chrono::microseconds> m_epochs;
   bool m_isExpired = false;
 
-  void TimeoutFunc();
+  class Thread;
+  wpi::SafeThreadOwner<Thread>* m_owner;
+
+  bool operator>(const Watchdog& rhs);
+
+  static wpi::SafeThreadOwner<Thread>& GetThreadOwner();
 };
 
 }  // namespace frc
