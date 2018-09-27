@@ -17,12 +17,11 @@ PressedButtonScheduler::PressedButtonScheduler(bool last, Trigger* button,
     : ButtonScheduler(last, button, orders) {}
 
 void PressedButtonScheduler::Execute() {
-  if (m_button->Grab()) {
-    if (!m_pressedLast) {
-      m_pressedLast = true;
-      m_command->Start();
-    }
-  } else {
-    m_pressedLast = false;
+  bool pressed = m_button->Grab();
+
+  if (!m_pressedLast && pressed) {
+    m_command->Start();
   }
+
+  m_pressedLast = pressed;
 }
