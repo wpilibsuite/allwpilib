@@ -3,8 +3,9 @@ apply plugin: 'checkstyle'
 apply plugin: 'pmd'
 
 checkstyle {
-    toolVersion = "8.10"
-    configFile = new File(rootDir, "styleguide/checkstyle.xml")
+    toolVersion = "8.12"
+    configDir = file("${project.rootDir}/styleguide")
+    config = resources.text.fromFile(new File(configDir, "checkstyle.xml"))
 }
 
 pmd {
