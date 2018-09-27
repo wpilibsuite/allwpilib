@@ -7,9 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 /**
  * This base class runs a watchdog timer and calls the subclass's StopMotor()
  * function if the timeout expires.
@@ -19,21 +16,9 @@ import java.util.Set;
 public abstract class MotorSafety {
   private static final double kDefaultSafetyExpiration = 0.1;
 
-  private double m_expiration = kDefaultSafetyExpiration;
+  private final Watchdog m_watchdog = new Watchdog(kDefaultSafetyExpiration, this::timeoutFunc);
   private boolean m_enabled;
-  private double m_stopTime = Timer.getFPGATimestamp();
   private final Object m_thisMutex = new Object();
-  private static final Set<MotorSafety> m_instanceList = new LinkedHashSet<>();
-  private static final Object m_listMutex = new Object();
-
-  /**
-   * MotorSafety constructor.
-   */
-  public MotorSafety() {
-    synchronized (m_listMutex) {
-      m_instanceList.add(this);
-    }
-  }
 
   /**
    * Feed the motor safety object.
@@ -42,7 +27,7 @@ public abstract class MotorSafety {
    */
   public void feed() {
     synchronized (m_thisMutex) {
-      m_stopTime = Timer.getFPGATimestamp() + m_expiration;
+      m_watchdog.reset();
     }
   }
 
@@ -53,7 +38,7 @@ public abstract class MotorSafety {
    */
   public void setExpiration(double expirationTime) {
     synchronized (m_thisMutex) {
-      m_expiration = expirationTime;
+      m_watchdog.setTimeout(expirationTime);
     }
   }
 
@@ -64,7 +49,7 @@ public abstract class MotorSafety {
    */
   public double getExpiration() {
     synchronized (m_thisMutex) {
-      return m_expiration;
+      return m_watchdog.getTimeout();
     }
   }
 
@@ -75,32 +60,7 @@ public abstract class MotorSafety {
    */
   public boolean isAlive() {
     synchronized (m_thisMutex) {
-      return !m_enabled || m_stopTime > Timer.getFPGATimestamp();
-    }
-  }
-
-  /**
-   * Check if this motor has exceeded its timeout. This method is called periodically to determine
-   * if this motor has exceeded its timeout value. If it has, the stop method is called, and the
-   * motor is shut down until its value is updated again.
-   */
-  public void check() {
-    boolean enabled;
-    double stopTime;
-
-    synchronized (m_thisMutex) {
-      enabled = m_enabled;
-      stopTime = m_stopTime;
-    }
-
-    if (!enabled || RobotState.isDisabled() || RobotState.isTest()) {
-      return;
-    }
-
-    if (stopTime < Timer.getFPGATimestamp()) {
-      DriverStation.reportError(getDescription() + "... Output not updated often enough.", false);
-
-      stopMotor();
+      return !m_enabled || !m_watchdog.isExpired();
     }
   }
 
@@ -113,6 +73,11 @@ public abstract class MotorSafety {
    */
   public void setSafetyEnabled(boolean enabled) {
     synchronized (m_thisMutex) {
+      if (enabled) {
+        m_watchdog.enable();
+      } else {
+        m_watchdog.disable();
+      }
       m_enabled = enabled;
     }
   }
@@ -130,18 +95,15 @@ public abstract class MotorSafety {
     }
   }
 
-  /**
-   * Check the motors to see if any have timed out.
-   *
-   * <p>This static method is called periodically to poll all the motors and stop any that have
-   * timed out.
-   */
-  public static void checkMotors() {
-    synchronized (m_listMutex) {
-      for (MotorSafety elem : m_instanceList) {
-        elem.check();
-      }
+  private void timeoutFunc() {
+    DriverStation ds = DriverStation.getInstance();
+    if (ds.isDisabled() || ds.isTest()) {
+      return;
     }
+
+    DriverStation.reportError(getDescription() + "... Output not updated often enough.", false);
+
+    stopMotor();
   }
 
   public abstract void stopMotor();

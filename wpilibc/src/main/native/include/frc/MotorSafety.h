@@ -10,8 +10,10 @@
 #include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
 
+#include "frc/DriverStation.h"
 #include "frc/ErrorBase.h"
 #include "frc/Timer.h"
+#include "frc/Watchdog.h"
 
 namespace frc {
 
@@ -23,8 +25,8 @@ namespace frc {
  */
 class MotorSafety : public ErrorBase {
  public:
-  MotorSafety();
-  virtual ~MotorSafety();
+  MotorSafety() = default;
+  virtual ~MotorSafety() = default;
 
   MotorSafety(MotorSafety&& rhs);
   MotorSafety& operator=(MotorSafety&& rhs);
@@ -75,39 +77,20 @@ class MotorSafety : public ErrorBase {
    */
   bool IsSafetyEnabled() const;
 
-  /**
-   * Check if this motor has exceeded its timeout.
-   *
-   * This method is called periodically to determine if this motor has exceeded
-   * its timeout value. If it has, the stop method is called, and the motor is
-   * shut down until its value is updated again.
-   */
-  void Check();
-
-  /**
-   * Check the motors to see if any have timed out.
-   *
-   * This static method is called periodically to poll all the motors and stop
-   * any that have timed out.
-   */
-  static void CheckMotors();
-
   virtual void StopMotor() = 0;
   virtual void GetDescription(wpi::raw_ostream& desc) const = 0;
 
  private:
   static constexpr double kDefaultSafetyExpiration = 0.1;
 
-  // The expiration time for this object
-  double m_expiration = kDefaultSafetyExpiration;
+  Watchdog m_watchdog{kDefaultSafetyExpiration, [this] { TimeoutFunc(); }};
 
   // True if motor safety is enabled for this motor
   bool m_enabled = false;
 
-  // The FPGA clock value when the motor has expired
-  double m_stopTime = Timer::GetFPGATimestamp();
-
   mutable wpi::mutex m_thisMutex;
+
+  void TimeoutFunc();
 };
 
 }  // namespace frc
