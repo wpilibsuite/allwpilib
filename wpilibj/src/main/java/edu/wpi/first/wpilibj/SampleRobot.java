@@ -11,6 +11,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 /**
  * A simple robot base class that knows the standard FRC competition states (disabled, autonomous,
@@ -142,6 +143,7 @@ public class SampleRobot extends RobotBase {
           }
         } else if (isTest()) {
           LiveWindow.setEnabled(true);
+          Shuffleboard.enableActuatorWidgets();
           m_ds.InTest(true);
           test();
           m_ds.InTest(false);
@@ -149,6 +151,7 @@ public class SampleRobot extends RobotBase {
             Timer.delay(0.01);
           }
           LiveWindow.setEnabled(false);
+          Shuffleboard.disableActuatorWidgets();
         } else {
           m_ds.InOperatorControl(true);
           operatorControl();

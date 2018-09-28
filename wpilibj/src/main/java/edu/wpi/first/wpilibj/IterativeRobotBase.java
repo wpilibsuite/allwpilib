@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -200,6 +201,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       // or from power-on.
       if (m_lastMode != Mode.kDisabled) {
         LiveWindow.setEnabled(false);
+        Shuffleboard.disableActuatorWidgets();
         disabledInit();
         m_watchdog.addEpoch("disabledInit()");
         m_lastMode = Mode.kDisabled;
@@ -213,6 +215,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       // mode or from power-on.
       if (m_lastMode != Mode.kAutonomous) {
         LiveWindow.setEnabled(false);
+        Shuffleboard.disableActuatorWidgets();
         autonomousInit();
         m_watchdog.addEpoch("autonomousInit()");
         m_lastMode = Mode.kAutonomous;
@@ -226,6 +229,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       // from power-on.
       if (m_lastMode != Mode.kTeleop) {
         LiveWindow.setEnabled(false);
+        Shuffleboard.disableActuatorWidgets();
         teleopInit();
         m_watchdog.addEpoch("teleopInit()");
         m_lastMode = Mode.kTeleop;
@@ -239,6 +243,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       // power-on.
       if (m_lastMode != Mode.kTest) {
         LiveWindow.setEnabled(true);
+        Shuffleboard.enableActuatorWidgets();
         testInit();
         m_watchdog.addEpoch("testInit()");
         m_lastMode = Mode.kTest;
@@ -255,6 +260,7 @@ public abstract class IterativeRobotBase extends RobotBase {
     SmartDashboard.updateValues();
 
     LiveWindow.updateValues();
+    Shuffleboard.update();
 
     // Warn on loop time overruns
     if (m_watchdog.isExpired()) {

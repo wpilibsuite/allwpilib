@@ -23,6 +23,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
 
 /**
@@ -91,6 +92,7 @@ public abstract class RobotBase implements AutoCloseable {
     inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
 
     LiveWindow.setEnabled(false);
+    Shuffleboard.disableActuatorWidgets();
   }
 
   @Deprecated

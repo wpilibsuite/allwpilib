@@ -43,6 +43,15 @@ Value::~Value() {
     delete[] m_val.data.arr_string.arr;
 }
 
+std::shared_ptr<Value> Value::MakeBooleanArray(wpi::ArrayRef<bool> value,
+                                               uint64_t time) {
+  auto val = std::make_shared<Value>(NT_BOOLEAN_ARRAY, time, private_init());
+  val->m_val.data.arr_boolean.arr = new int[value.size()];
+  val->m_val.data.arr_boolean.size = value.size();
+  std::copy(value.begin(), value.end(), val->m_val.data.arr_boolean.arr);
+  return val;
+}
+
 std::shared_ptr<Value> Value::MakeBooleanArray(wpi::ArrayRef<int> value,
                                                uint64_t time) {
   auto val = std::make_shared<Value>(NT_BOOLEAN_ARRAY, time, private_init());

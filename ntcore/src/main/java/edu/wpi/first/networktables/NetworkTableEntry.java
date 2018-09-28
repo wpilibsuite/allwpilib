@@ -247,6 +247,26 @@ public final class NetworkTableEntry {
   }
 
   /**
+   * Checks if a data value is of a type that can be placed in a NetworkTable entry.
+   *
+   * @param data the data to check
+   * @return true if the data can be placed in an entry, false if it cannot
+   */
+  public static boolean isValidDataType(Object data) {
+    return data instanceof Number
+        || data instanceof Boolean
+        || data instanceof String
+        || data instanceof double[]
+        || data instanceof Double[]
+        || data instanceof Number[]
+        || data instanceof boolean[]
+        || data instanceof Boolean[]
+        || data instanceof String[]
+        || data instanceof byte[]
+        || data instanceof Byte[];
+  }
+
+  /**
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set

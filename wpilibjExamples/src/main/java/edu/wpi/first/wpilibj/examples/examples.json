@@ -176,5 +176,16 @@
     "foldername": "axiscamera",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "Shuffleboard Sample",
+    "description": "An example program that adds data to various Shuffleboard tabs that demonstrates the Shuffleboard API",
+    "tags": [
+      "Shuffleboard",
+      "Dashboards"
+    ],
+    "foldername": "shuffleboard",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
