@@ -7,26 +7,24 @@ resources:
   containers:
   - container: ubuntu18
     image: ubuntu:18.04
+  - container: wpilib2018
+    image: wpilib/roborio-cross-ubuntu:2018-17.10
+  - container: wpilib2019
+    image: wpilib/roborio-cross-ubuntu:2019-18.04
 
 jobs:
  - job: Linux_Arm
    pool:
      vmImage: 'Ubuntu 16.04'
 
+   container: wpilib2018
+
    steps:
-    - script: |
-        sudo add-apt-repository ppa:wpilib/toolchain -y
-        sudo apt-get update -y
-        sudo apt-get install frc-toolchain -y
-      displayName: 'Install Toolchain'
     - task: Gradle@2
       inputs:
         workingDirectory: ''
         gradleWrapperFile: 'gradlew'
         gradleOptions: '-Xmx3072m'
-        javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.8'
-        jdkArchitectureOption: 'x64'
         publishJUnitResults: false
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
@@ -38,15 +36,14 @@ jobs:
    pool:
      vmImage: 'Ubuntu 16.04'
 
+   container: wpilib2018
+
    steps:
     - task: Gradle@2
       inputs:
         workingDirectory: ''
         gradleWrapperFile: 'gradlew'
         gradleOptions: '-Xmx3072m'
-        javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.8'
-        jdkArchitectureOption: 'x64'
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
@@ -79,12 +76,9 @@ jobs:
    pool:
      vmImage: 'Ubuntu 16.04'
 
+   container: wpilib2019
+
    steps:
-      - script: |
-          sudo add-apt-repository ppa:lkoppel/opencv -y
-          sudo apt-get update -y
-          sudo apt-get install libopencv-dev -y
-        displayName: 'Install Dependencies'
       - task: CMake@1
         inputs:
           cmakeArgs: '-DWITHOUT_ALLWPILIB=OFF ..'
