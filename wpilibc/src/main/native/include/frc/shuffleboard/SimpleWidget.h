@@ -37,7 +37,6 @@ class SimpleWidget final : public ShuffleboardWidget<SimpleWidget> {
 
  private:
   nt::NetworkTableEntry m_entry;
-  bool m_entryInitialized = false;
 
   void ForceGenerate();
 };

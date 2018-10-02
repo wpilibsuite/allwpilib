@@ -84,8 +84,8 @@ TEST_F(ShuffleboardTabTest, AddNumberArray) {
   EXPECT_EQ("/Shuffleboard/Tab/DoubleArray", entry.GetName());
 
   auto actual = entry.GetValue()->GetDoubleArray();
-  EXPECT_EQ(sizeof(expect), sizeof(actual));
-  for (size_t i = 0; i < sizeof(expect); i++) {
+  EXPECT_EQ(expect.size(), actual.size());
+  for (size_t i = 0; i < expect.size(); i++) {
     EXPECT_FLOAT_EQ(expect[i], actual[i]);
   }
 }
@@ -96,8 +96,8 @@ TEST_F(ShuffleboardTabTest, AddBooleanArray) {
   EXPECT_EQ("/Shuffleboard/Tab/BoolArray", entry.GetName());
 
   auto actual = entry.GetValue()->GetBooleanArray();
-  EXPECT_EQ(sizeof(expect), sizeof(actual));
-  for (size_t i = 0; i < sizeof(expect); i++) {
+  EXPECT_EQ(expect.size(), actual.size());
+  for (size_t i = 0; i < expect.size(); i++) {
     EXPECT_EQ(expect[i], actual[i]);
   }
 }
@@ -108,8 +108,8 @@ TEST_F(ShuffleboardTabTest, AddStringArray) {
   EXPECT_EQ("/Shuffleboard/Tab/StringArray", entry.GetName());
 
   auto actual = entry.GetValue()->GetStringArray();
-  EXPECT_EQ(sizeof(expect), sizeof(actual));
-  for (size_t i = 0; i < sizeof(expect); i++) {
+  EXPECT_EQ(expect.size(), actual.size());
+  for (size_t i = 0; i < expect.size(); i++) {
     EXPECT_EQ(expect[i], actual[i]);
   }
 }
