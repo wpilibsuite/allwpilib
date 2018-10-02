@@ -79,7 +79,7 @@ TEST_F(ShuffleboardTabTest, AddNamedSendableWithProperties) {
 }
 
 TEST_F(ShuffleboardTabTest, AddNumberArray) {
-  std::array<double, 3> expect = {1.0, 2.0, 3.0};
+  std::array<double, 3> expect = {{1.0, 2.0, 3.0}};
   auto entry = m_tab->Add("DoubleArray", expect).GetEntry();
   EXPECT_EQ("/Shuffleboard/Tab/DoubleArray", entry.GetName());
 
@@ -91,7 +91,7 @@ TEST_F(ShuffleboardTabTest, AddNumberArray) {
 }
 
 TEST_F(ShuffleboardTabTest, AddBooleanArray) {
-  std::array<bool, 2> expect = {true, false};
+  std::array<bool, 2> expect = {{true, false}};
   auto entry = m_tab->Add("BoolArray", expect).GetEntry();
   EXPECT_EQ("/Shuffleboard/Tab/BoolArray", entry.GetName());
 
@@ -103,7 +103,7 @@ TEST_F(ShuffleboardTabTest, AddBooleanArray) {
 }
 
 TEST_F(ShuffleboardTabTest, AddStringArray) {
-  std::array<std::string, 2> expect = {"foo", "bar"};
+  std::array<std::string, 2> expect = {{"foo", "bar"}};
   auto entry = m_tab->Add("StringArray", expect).GetEntry();
   EXPECT_EQ("/Shuffleboard/Tab/StringArray", entry.GetName());
 
