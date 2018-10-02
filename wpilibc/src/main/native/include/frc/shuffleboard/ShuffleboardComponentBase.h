@@ -42,7 +42,7 @@ class ShuffleboardComponentBase : public virtual ShuffleboardValue {
 
  protected:
   wpi::StringMap<std::shared_ptr<nt::Value>> m_properties;
-  bool m_metadataDirty = false;
+  bool m_metadataDirty = true;
   int m_column = -1;
   int m_row = -1;
   int m_width = -1;
