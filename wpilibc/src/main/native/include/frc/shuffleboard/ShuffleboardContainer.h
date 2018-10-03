@@ -149,6 +149,18 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    *         container with the given title
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
+  SimpleWidget& Add(const wpi::Twine& title, const char* defaultValue);
+
+  /**
+   * Adds a widget to this container to display the given data.
+   *
+   * @param title the title of the widget
+   * @param defaultValue  the default value of the widget
+   * @return a widget to display the sendable data
+   * @throws IllegalArgumentException if a widget already exists in this
+   *         container with the given title
+   * @see #addPersistent(String, Object) add(String title, Object defaultValue)
+   */
   SimpleWidget& Add(const wpi::Twine& title, wpi::ArrayRef<bool> defaultValue);
 
   /**

@@ -15,12 +15,11 @@ using namespace frc;
 
 SimpleWidget::SimpleWidget(ShuffleboardContainer& parent,
                            const wpi::Twine& title)
-    : ShuffleboardValue(title), ShuffleboardWidget(parent, title) {}
+    : ShuffleboardValue(title), ShuffleboardWidget(parent, title), m_entry() {}
 
 nt::NetworkTableEntry SimpleWidget::GetEntry() {
-  if (!m_entryInitialized) {
+  if (!m_entry) {
     ForceGenerate();
-    m_entryInitialized = true;
   }
   return m_entry;
 }
@@ -28,9 +27,8 @@ nt::NetworkTableEntry SimpleWidget::GetEntry() {
 void SimpleWidget::BuildInto(std::shared_ptr<nt::NetworkTable> parentTable,
                              std::shared_ptr<nt::NetworkTable> metaTable) {
   BuildMetadata(metaTable);
-  if (!m_entryInitialized) {
+  if (!m_entry) {
     m_entry = parentTable->GetEntry(GetTitle());
-    m_entryInitialized = true;
   }
 }
 

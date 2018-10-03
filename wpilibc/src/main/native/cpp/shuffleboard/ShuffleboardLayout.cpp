@@ -12,7 +12,7 @@ using namespace frc;
 ShuffleboardLayout::ShuffleboardLayout(ShuffleboardContainer& parent,
                                        const wpi::Twine& name,
                                        const wpi::Twine& type)
-    : ShuffleboardValue(name),
+    : ShuffleboardValue(type),
       ShuffleboardComponent(parent, type, name),
       ShuffleboardContainer(name) {
   m_isLayout = true;

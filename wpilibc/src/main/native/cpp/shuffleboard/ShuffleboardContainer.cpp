@@ -60,8 +60,8 @@ SimpleWidget& ShuffleboardContainer::Add(
 
   auto widget = std::make_unique<SimpleWidget>(*this, title);
   auto ptr = widget.get();
-  widget->GetEntry().SetDefaultValue(defaultValue);
   m_components.emplace_back(std::move(widget));
+  ptr->GetEntry().SetDefaultValue(defaultValue);
   return *ptr;
 }
 
@@ -82,6 +82,11 @@ SimpleWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
 
 SimpleWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
                                          const wpi::Twine& defaultValue) {
+  return Add(title, nt::Value::MakeString(defaultValue));
+}
+
+SimpleWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
+                                         const char* defaultValue) {
   return Add(title, nt::Value::MakeString(defaultValue));
 }
 
