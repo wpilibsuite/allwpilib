@@ -17,7 +17,7 @@ jobs:
    pool:
      vmImage: 'Ubuntu 16.04'
 
-   container: wpilib2018
+   container: wpilib2019
 
    steps:
     - task: Gradle@2
