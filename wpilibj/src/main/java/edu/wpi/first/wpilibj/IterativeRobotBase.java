@@ -209,7 +209,7 @@ public abstract class IterativeRobotBase extends RobotBase {
 
       HAL.observeUserProgramDisabled();
       disabledPeriodic();
-      m_watchdog.addEpoch("disablePeroidic()");
+      m_watchdog.addEpoch("disablePeriodic()");
     } else if (isAutonomous()) {
       // Call AutonomousInit() if we are now just entering autonomous mode from either a different
       // mode or from power-on.
