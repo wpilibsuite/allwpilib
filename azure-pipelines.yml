@@ -29,8 +29,8 @@ jobs:
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
         options: '-PonlyAthena'
-        checkStyleRunAnalysis: true
-        pmdRunAnalysis: true
+        # checkStyleRunAnalysis: true
+        # pmdRunAnalysis: true
 
  - job: Linux
    pool:
@@ -48,8 +48,8 @@ jobs:
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
         options: '-PskipAthena'
-        checkStyleRunAnalysis: true
-        pmdRunAnalysis: true
+        # checkStyleRunAnalysis: true
+        # pmdRunAnalysis: true
 
  - job: Styleguide
    pool:
@@ -102,8 +102,8 @@ jobs:
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
-        checkStyleRunAnalysis: true
-        pmdRunAnalysis: true
+        # checkStyleRunAnalysis: true
+        # pmdRunAnalysis: true
 
  - job: Windows_32_Bit
    pool:
@@ -120,8 +120,8 @@ jobs:
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
-        checkStyleRunAnalysis: true
-        pmdRunAnalysis: true
+        # checkStyleRunAnalysis: true
+        # pmdRunAnalysis: true
 
  - job: Mac
    pool:
@@ -138,5 +138,5 @@ jobs:
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
-        checkStyleRunAnalysis: true
-        pmdRunAnalysis: true
+        # checkStyleRunAnalysis: true
+        # pmdRunAnalysis: true
