@@ -22,6 +22,9 @@ namespace frc {
  */
 class IterativeRobot : public IterativeRobotBase {
  public:
+  WPI_DEPRECATED(
+      "Use TimedRobot instead. It's a drop-in replacement that provides more "
+      "regular execution periods.")
   IterativeRobot();
   virtual ~IterativeRobot() = default;
 
