@@ -26,7 +26,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableType;
 import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.networktables.PersistentException;
 import edu.wpi.first.wpilibj.tables.IRemote;
 import edu.wpi.first.wpilibj.tables.IRemoteConnectionListener;
@@ -668,7 +667,7 @@ public class NetworkTable implements ITable, IRemote {
 
   @Override
   public boolean containsSubTable(String key) {
-    int[] handles = NetworkTablesJNI.getEntries(inst.getHandle(), pathWithSep + key + PATH_SEPARATOR, 0);
+    int[] handles = inst.getJni().getEntries(inst.getHandle(), pathWithSep + key + PATH_SEPARATOR, 0);
     return handles.length != 0;
   }
 

@@ -71,7 +71,7 @@ public final class RpcCall implements AutoCloseable {
    * @return Received result (output)
    */
   public byte[] getResult() {
-    byte[] result = NetworkTablesJNI.getRpcResult(m_entry.getHandle(), m_call);
+    byte[] result = m_entry.getInstance().getJni().getRpcResult(m_entry.getHandle(), m_call);
     if (result.length != 0) {
       m_call = 0;
     }
@@ -86,7 +86,8 @@ public final class RpcCall implements AutoCloseable {
    * @return Received result (output)
    */
   public byte[] getResult(double timeout) {
-    byte[] result = NetworkTablesJNI.getRpcResult(m_entry.getHandle(), m_call, timeout);
+    byte[] result = m_entry.getInstance().getJni().getRpcResult(m_entry.getHandle(), m_call,
+                                                                timeout);
     if (result.length != 0) {
       m_call = 0;
     }
@@ -97,7 +98,7 @@ public final class RpcCall implements AutoCloseable {
    * Ignore the result.  This function is non-blocking.
    */
   public void cancelResult() {
-    NetworkTablesJNI.cancelRpcResult(m_entry.getHandle(), m_call);
+    m_entry.getInstance().getJni().cancelRpcResult(m_entry.getHandle(), m_call);
   }
 
   private final NetworkTableEntry m_entry;

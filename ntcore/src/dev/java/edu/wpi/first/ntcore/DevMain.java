@@ -17,7 +17,7 @@ public final class DevMain {
   public static void main(String[] args) {
     System.out.println("Hello World!");
     System.out.println(RuntimeDetector.getPlatformPath());
-    NetworkTablesJNI.flush(NetworkTablesJNI.getDefaultInstance());
+    NetworkTablesJNI.getInstance().flush(NetworkTablesJNI.getInstance().getDefaultInstance());
   }
 
   private DevMain() {

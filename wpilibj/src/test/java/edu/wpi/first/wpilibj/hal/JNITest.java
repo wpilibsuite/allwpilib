@@ -17,7 +17,7 @@ class JNITest {
   @Test
   void jniNtcoreLinkTest() {
     // Test to verify that the JNI test link works correctly.
-    NetworkTablesJNI.flush(NetworkTablesJNI.getDefaultInstance());
+    NetworkTablesJNI.getInstance().flush(NetworkTablesJNI.getInstance().getDefaultInstance());
   }
 
   @Test

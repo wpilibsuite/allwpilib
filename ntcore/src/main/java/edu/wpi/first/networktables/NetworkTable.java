@@ -276,7 +276,7 @@ public final class NetworkTable {
    *     its own
    */
   public boolean containsSubTable(String key) {
-    int[] handles = NetworkTablesJNI.getEntries(m_inst.getHandle(),
+    int[] handles = m_inst.getJni().getEntries(m_inst.getHandle(),
         m_pathWithSep + key + PATH_SEPARATOR, 0);
     return handles.length != 0;
   }

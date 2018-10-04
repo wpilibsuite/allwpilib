@@ -335,7 +335,7 @@ extern "C" {
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getDefaultInstance
-  (JNIEnv*, jclass)
+  (JNIEnv*, jobject)
 {
   return nt::GetDefaultInstance();
 }
@@ -347,7 +347,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getDefaultInstance
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
-  (JNIEnv*, jclass)
+  (JNIEnv*, jobject)
 {
   return nt::CreateInstance();
 }
@@ -359,7 +359,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyInstance
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv*, jobject, jint inst)
 {
   nt::DestroyInstance(inst);
 }
@@ -371,7 +371,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyInstance
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getInstanceFromHandle
-  (JNIEnv*, jclass, jint handle)
+  (JNIEnv*, jobject, jint handle)
 {
   return nt::GetInstanceFromHandle(handle);
 }
@@ -383,7 +383,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getInstanceFromHandle
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry
-  (JNIEnv* env, jclass, jint inst, jstring key)
+  (JNIEnv* env, jobject, jint inst, jstring key)
 {
   if (!key) {
     nullPointerEx.Throw(env, "key cannot be null");
@@ -399,7 +399,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry
  */
 JNIEXPORT jintArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntries
-  (JNIEnv* env, jclass, jint inst, jstring prefix, jint types)
+  (JNIEnv* env, jobject, jint inst, jstring prefix, jint types)
 {
   if (!prefix) {
     nullPointerEx.Throw(env, "prefix cannot be null");
@@ -416,7 +416,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntries
  */
 JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryName
-  (JNIEnv* env, jclass, jint entry)
+  (JNIEnv* env, jobject, jint entry)
 {
   return MakeJString(env, nt::GetEntryName(entry));
 }
@@ -428,7 +428,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryName
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryLastChange
-  (JNIEnv*, jclass, jint entry)
+  (JNIEnv*, jobject, jint entry)
 {
   return nt::GetEntryLastChange(entry);
 }
@@ -440,7 +440,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryLastChange
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getType
-  (JNIEnv*, jclass, jint entry)
+  (JNIEnv*, jobject, jint entry)
 {
   return nt::GetEntryType(entry);
 }
@@ -452,7 +452,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getType
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setBoolean
-  (JNIEnv*, jclass, jint entry, jlong time, jboolean value, jboolean force)
+  (JNIEnv*, jobject, jint entry, jlong time, jboolean value, jboolean force)
 {
   if (force) {
     nt::SetEntryTypeValue(entry,
@@ -470,7 +470,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setBoolean
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setDouble
-  (JNIEnv*, jclass, jint entry, jlong time, jdouble value, jboolean force)
+  (JNIEnv*, jobject, jint entry, jlong time, jdouble value, jboolean force)
 {
   if (force) {
     nt::SetEntryTypeValue(entry, nt::Value::MakeDouble(value, time));
@@ -486,7 +486,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDouble
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setString
-  (JNIEnv* env, jclass, jint entry, jlong time, jstring value, jboolean force)
+  (JNIEnv* env, jobject, jint entry, jlong time, jstring value, jboolean force)
 {
   if (!value) {
     nullPointerEx.Throw(env, "value cannot be null");
@@ -508,7 +508,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setString
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw__IJ_3BZ
-  (JNIEnv* env, jclass, jint entry, jlong time, jbyteArray value,
+  (JNIEnv* env, jobject, jint entry, jlong time, jbyteArray value,
    jboolean force)
 {
   if (!value) {
@@ -531,7 +531,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw__IJ_3BZ
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw__IJLjava_nio_ByteBuffer_2IZ
-  (JNIEnv* env, jclass, jint entry, jlong time, jobject value, jint len,
+  (JNIEnv* env, jobject, jint entry, jlong time, jobject value, jint len,
    jboolean force)
 {
   if (!value) {
@@ -554,7 +554,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw__IJLjava_nio_ByteBuffer
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setBooleanArray
-  (JNIEnv* env, jclass, jint entry, jlong time, jbooleanArray value,
+  (JNIEnv* env, jobject, jint entry, jlong time, jbooleanArray value,
    jboolean force)
 {
   if (!value) {
@@ -577,7 +577,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setBooleanArray
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setDoubleArray
-  (JNIEnv* env, jclass, jint entry, jlong time, jdoubleArray value,
+  (JNIEnv* env, jobject, jint entry, jlong time, jdoubleArray value,
    jboolean force)
 {
   if (!value) {
@@ -600,7 +600,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDoubleArray
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setStringArray
-  (JNIEnv* env, jclass, jint entry, jlong time, jobjectArray value,
+  (JNIEnv* env, jobject, jint entry, jlong time, jobjectArray value,
    jboolean force)
 {
   if (!value) {
@@ -623,7 +623,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setStringArray
  */
 JNIEXPORT jobject JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getValue
-  (JNIEnv* env, jclass, jint entry)
+  (JNIEnv* env, jobject, jint entry)
 {
   auto val = nt::GetEntryValue(entry);
   return MakeJValue(env, val.get());
@@ -636,7 +636,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getValue
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getBoolean
-  (JNIEnv*, jclass, jint entry, jboolean defaultValue)
+  (JNIEnv*, jobject, jint entry, jboolean defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
   if (!val || !val->IsBoolean()) return defaultValue;
@@ -650,7 +650,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getBoolean
  */
 JNIEXPORT jdouble JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getDouble
-  (JNIEnv*, jclass, jint entry, jdouble defaultValue)
+  (JNIEnv*, jobject, jint entry, jdouble defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
   if (!val || !val->IsDouble()) return defaultValue;
@@ -664,7 +664,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getDouble
  */
 JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getString
-  (JNIEnv* env, jclass, jint entry, jstring defaultValue)
+  (JNIEnv* env, jobject, jint entry, jstring defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
   if (!val || !val->IsString()) return defaultValue;
@@ -678,7 +678,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getString
  */
 JNIEXPORT jbyteArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getRaw
-  (JNIEnv* env, jclass, jint entry, jbyteArray defaultValue)
+  (JNIEnv* env, jobject, jint entry, jbyteArray defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
   if (!val || !val->IsRaw()) return defaultValue;
@@ -692,7 +692,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getRaw
  */
 JNIEXPORT jbooleanArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getBooleanArray
-  (JNIEnv* env, jclass, jint entry, jbooleanArray defaultValue)
+  (JNIEnv* env, jobject, jint entry, jbooleanArray defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
   if (!val || !val->IsBooleanArray()) return defaultValue;
@@ -706,7 +706,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getBooleanArray
  */
 JNIEXPORT jdoubleArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getDoubleArray
-  (JNIEnv* env, jclass, jint entry, jdoubleArray defaultValue)
+  (JNIEnv* env, jobject, jint entry, jdoubleArray defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
   if (!val || !val->IsDoubleArray()) return defaultValue;
@@ -720,7 +720,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getDoubleArray
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getStringArray
-  (JNIEnv* env, jclass, jint entry, jobjectArray defaultValue)
+  (JNIEnv* env, jobject, jint entry, jobjectArray defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
   if (!val || !val->IsStringArray()) return defaultValue;
@@ -734,7 +734,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getStringArray
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultBoolean
-  (JNIEnv*, jclass, jint entry, jlong time, jboolean defaultValue)
+  (JNIEnv*, jobject, jint entry, jlong time, jboolean defaultValue)
 {
   return nt::SetDefaultEntryValue(
       entry, nt::Value::MakeBoolean(defaultValue != JNI_FALSE, time));
@@ -747,7 +747,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultBoolean
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultDouble
-  (JNIEnv*, jclass, jint entry, jlong time, jdouble defaultValue)
+  (JNIEnv*, jobject, jint entry, jlong time, jdouble defaultValue)
 {
   return nt::SetDefaultEntryValue(entry,
                                   nt::Value::MakeDouble(defaultValue, time));
@@ -760,7 +760,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultDouble
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultString
-  (JNIEnv* env, jclass, jint entry, jlong time, jstring defaultValue)
+  (JNIEnv* env, jobject, jint entry, jlong time, jstring defaultValue)
 {
   if (!defaultValue) {
     nullPointerEx.Throw(env, "defaultValue cannot be null");
@@ -777,7 +777,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultString
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultRaw
-  (JNIEnv* env, jclass, jint entry, jlong time, jbyteArray defaultValue)
+  (JNIEnv* env, jobject, jint entry, jlong time, jbyteArray defaultValue)
 {
   if (!defaultValue) {
     nullPointerEx.Throw(env, "defaultValue cannot be null");
@@ -794,7 +794,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultRaw
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultBooleanArray
-  (JNIEnv* env, jclass, jint entry, jlong time, jbooleanArray defaultValue)
+  (JNIEnv* env, jobject, jint entry, jlong time, jbooleanArray defaultValue)
 {
   if (!defaultValue) {
     nullPointerEx.Throw(env, "defaultValue cannot be null");
@@ -811,7 +811,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultBooleanArray
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultDoubleArray
-  (JNIEnv* env, jclass, jint entry, jlong time, jdoubleArray defaultValue)
+  (JNIEnv* env, jobject, jint entry, jlong time, jdoubleArray defaultValue)
 {
   if (!defaultValue) {
     nullPointerEx.Throw(env, "defaultValue cannot be null");
@@ -828,7 +828,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultDoubleArray
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultStringArray
-  (JNIEnv* env, jclass, jint entry, jlong time, jobjectArray defaultValue)
+  (JNIEnv* env, jobject, jint entry, jlong time, jobjectArray defaultValue)
 {
   if (!defaultValue) {
     nullPointerEx.Throw(env, "defaultValue cannot be null");
@@ -845,7 +845,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultStringArray
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setEntryFlags
-  (JNIEnv*, jclass, jint entry, jint flags)
+  (JNIEnv*, jobject, jint entry, jint flags)
 {
   nt::SetEntryFlags(entry, flags);
 }
@@ -857,7 +857,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setEntryFlags
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryFlags
-  (JNIEnv*, jclass, jint entry)
+  (JNIEnv*, jobject, jint entry)
 {
   return nt::GetEntryFlags(entry);
 }
@@ -869,7 +869,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryFlags
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_deleteEntry
-  (JNIEnv*, jclass, jint entry)
+  (JNIEnv*, jobject, jint entry)
 {
   nt::DeleteEntry(entry);
 }
@@ -881,7 +881,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_deleteEntry
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_deleteAllEntries
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv*, jobject, jint inst)
 {
   nt::DeleteAllEntries(inst);
 }
@@ -893,7 +893,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_deleteAllEntries
  */
 JNIEXPORT jobject JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryInfoHandle
-  (JNIEnv* env, jclass, jobject inst, jint entry)
+  (JNIEnv* env, jobject, jobject inst, jint entry)
 {
   return MakeJObject(env, inst, nt::GetEntryInfo(entry));
 }
@@ -905,7 +905,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryInfoHandle
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryInfo
-  (JNIEnv* env, jclass, jobject instObject, jint inst, jstring prefix,
+  (JNIEnv* env, jobject, jobject instObject, jint inst, jstring prefix,
    jint types)
 {
   if (!prefix) {
@@ -929,7 +929,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryInfo
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_createEntryListenerPoller
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv*, jobject, jint inst)
 {
   return nt::CreateEntryListenerPoller(inst);
 }
@@ -941,7 +941,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createEntryListenerPoller
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyEntryListenerPoller
-  (JNIEnv*, jclass, jint poller)
+  (JNIEnv*, jobject, jint poller)
 {
   nt::DestroyEntryListenerPoller(poller);
 }
@@ -953,7 +953,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyEntryListenerPoller
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledEntryListener__ILjava_lang_String_2I
-  (JNIEnv* env, jclass, jint poller, jstring prefix, jint flags)
+  (JNIEnv* env, jobject, jint poller, jstring prefix, jint flags)
 {
   if (!prefix) {
     nullPointerEx.Throw(env, "prefix cannot be null");
@@ -970,7 +970,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledEntryListener__ILjava
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledEntryListener__III
-  (JNIEnv* env, jclass, jint poller, jint entry, jint flags)
+  (JNIEnv* env, jobject, jint poller, jint entry, jint flags)
 {
   return nt::AddPolledEntryListener(poller, entry, flags);
 }
@@ -982,7 +982,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledEntryListener__III
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_pollEntryListener
-  (JNIEnv* env, jclass, jobject inst, jint poller)
+  (JNIEnv* env, jobject, jobject inst, jint poller)
 {
   auto events = nt::PollEntryListener(poller);
   if (events.empty()) {
@@ -999,7 +999,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_pollEntryListener
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_pollEntryListenerTimeout
-  (JNIEnv* env, jclass, jobject inst, jint poller, jdouble timeout)
+  (JNIEnv* env, jobject, jobject inst, jint poller, jdouble timeout)
 {
   bool timed_out = false;
   auto events = nt::PollEntryListener(poller, timeout, &timed_out);
@@ -1017,7 +1017,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_pollEntryListenerTimeout
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_cancelPollEntryListener
-  (JNIEnv*, jclass, jint poller)
+  (JNIEnv*, jobject, jint poller)
 {
   nt::CancelPollEntryListener(poller);
 }
@@ -1029,7 +1029,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_cancelPollEntryListener
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_removeEntryListener
-  (JNIEnv*, jclass, jint entryListenerUid)
+  (JNIEnv*, jobject, jint entryListenerUid)
 {
   nt::RemoveEntryListener(entryListenerUid);
 }
@@ -1041,7 +1041,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_removeEntryListener
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_waitForEntryListenerQueue
-  (JNIEnv*, jclass, jint inst, jdouble timeout)
+  (JNIEnv*, jobject, jint inst, jdouble timeout)
 {
   return nt::WaitForEntryListenerQueue(inst, timeout);
 }
@@ -1053,7 +1053,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_waitForEntryListenerQueue
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_createConnectionListenerPoller
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv*, jobject, jint inst)
 {
   return nt::CreateConnectionListenerPoller(inst);
 }
@@ -1065,7 +1065,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createConnectionListenerPoller
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyConnectionListenerPoller
-  (JNIEnv*, jclass, jint poller)
+  (JNIEnv*, jobject, jint poller)
 {
   nt::DestroyConnectionListenerPoller(poller);
 }
@@ -1077,7 +1077,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyConnectionListenerPolle
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledConnectionListener
-  (JNIEnv* env, jclass, jint poller, jboolean immediateNotify)
+  (JNIEnv* env, jobject, jint poller, jboolean immediateNotify)
 {
   return nt::AddPolledConnectionListener(poller, immediateNotify);
 }
@@ -1089,7 +1089,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledConnectionListener
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_pollConnectionListener
-  (JNIEnv* env, jclass, jobject inst, jint poller)
+  (JNIEnv* env, jobject, jobject inst, jint poller)
 {
   auto events = nt::PollConnectionListener(poller);
   if (events.empty()) {
@@ -1106,7 +1106,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_pollConnectionListener
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_pollConnectionListenerTimeout
-  (JNIEnv* env, jclass, jobject inst, jint poller, jdouble timeout)
+  (JNIEnv* env, jobject, jobject inst, jint poller, jdouble timeout)
 {
   bool timed_out = false;
   auto events = nt::PollConnectionListener(poller, timeout, &timed_out);
@@ -1124,7 +1124,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_pollConnectionListenerTimeout
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_cancelPollConnectionListener
-  (JNIEnv*, jclass, jint poller)
+  (JNIEnv*, jobject, jint poller)
 {
   nt::CancelPollConnectionListener(poller);
 }
@@ -1136,7 +1136,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_cancelPollConnectionListener
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_removeConnectionListener
-  (JNIEnv*, jclass, jint connListenerUid)
+  (JNIEnv*, jobject, jint connListenerUid)
 {
   nt::RemoveConnectionListener(connListenerUid);
 }
@@ -1148,7 +1148,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_removeConnectionListener
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_waitForConnectionListenerQueue
-  (JNIEnv*, jclass, jint inst, jdouble timeout)
+  (JNIEnv*, jobject, jint inst, jdouble timeout)
 {
   return nt::WaitForConnectionListenerQueue(inst, timeout);
 }
@@ -1160,7 +1160,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_waitForConnectionListenerQueue
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_createRpcCallPoller
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv*, jobject, jint inst)
 {
   return nt::CreateRpcCallPoller(inst);
 }
@@ -1172,7 +1172,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createRpcCallPoller
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyRpcCallPoller
-  (JNIEnv*, jclass, jint poller)
+  (JNIEnv*, jobject, jint poller)
 {
   nt::DestroyRpcCallPoller(poller);
 }
@@ -1184,7 +1184,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyRpcCallPoller
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_createPolledRpc
-  (JNIEnv* env, jclass, jint entry, jbyteArray def, jint poller)
+  (JNIEnv* env, jobject, jint entry, jbyteArray def, jint poller)
 {
   if (!def) {
     nullPointerEx.Throw(env, "def cannot be null");
@@ -1200,7 +1200,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createPolledRpc
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_pollRpc
-  (JNIEnv* env, jclass, jobject inst, jint poller)
+  (JNIEnv* env, jobject, jobject inst, jint poller)
 {
   auto infos = nt::PollRpc(poller);
   if (infos.empty()) {
@@ -1217,7 +1217,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_pollRpc
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_pollRpcTimeout
-  (JNIEnv* env, jclass, jobject inst, jint poller, jdouble timeout)
+  (JNIEnv* env, jobject, jobject inst, jint poller, jdouble timeout)
 {
   bool timed_out = false;
   auto infos = nt::PollRpc(poller, timeout, &timed_out);
@@ -1235,7 +1235,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_pollRpcTimeout
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_cancelPollRpc
-  (JNIEnv*, jclass, jint poller)
+  (JNIEnv*, jobject, jint poller)
 {
   nt::CancelPollRpc(poller);
 }
@@ -1247,7 +1247,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_cancelPollRpc
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_waitForRpcCallQueue
-  (JNIEnv*, jclass, jint inst, jdouble timeout)
+  (JNIEnv*, jobject, jint inst, jdouble timeout)
 {
   return nt::WaitForRpcCallQueue(inst, timeout);
 }
@@ -1259,7 +1259,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_waitForRpcCallQueue
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_postRpcResponse
-  (JNIEnv* env, jclass, jint entry, jint call, jbyteArray result)
+  (JNIEnv* env, jobject, jint entry, jint call, jbyteArray result)
 {
   if (!result) {
     nullPointerEx.Throw(env, "result cannot be null");
@@ -1275,7 +1275,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_postRpcResponse
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_callRpc
-  (JNIEnv* env, jclass, jint entry, jbyteArray params)
+  (JNIEnv* env, jobject, jint entry, jbyteArray params)
 {
   if (!params) {
     nullPointerEx.Throw(env, "params cannot be null");
@@ -1291,7 +1291,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_callRpc
  */
 JNIEXPORT jbyteArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getRpcResult__II
-  (JNIEnv* env, jclass, jint entry, jint call)
+  (JNIEnv* env, jobject, jint entry, jint call)
 {
   std::string result;
   if (!nt::GetRpcResult(entry, call, &result)) return nullptr;
@@ -1305,7 +1305,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getRpcResult__II
  */
 JNIEXPORT jbyteArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getRpcResult__IID
-  (JNIEnv* env, jclass, jint entry, jint call, jdouble timeout)
+  (JNIEnv* env, jobject, jint entry, jint call, jdouble timeout)
 {
   std::string result;
   bool timed_out = false;
@@ -1321,7 +1321,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getRpcResult__IID
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_cancelRpcResult
-  (JNIEnv*, jclass, jint entry, jint call)
+  (JNIEnv*, jobject, jint entry, jint call)
 {
   nt::CancelRpcResult(entry, call);
 }
@@ -1333,7 +1333,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_cancelRpcResult
  */
 JNIEXPORT jbyteArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getRpc
-  (JNIEnv* env, jclass, jint entry, jbyteArray defaultValue)
+  (JNIEnv* env, jobject, jint entry, jbyteArray defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
   if (!val || !val->IsRpc()) return defaultValue;
@@ -1347,7 +1347,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getRpc
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setNetworkIdentity
-  (JNIEnv* env, jclass, jint inst, jstring name)
+  (JNIEnv* env, jobject, jint inst, jstring name)
 {
   if (!name) {
     nullPointerEx.Throw(env, "name cannot be null");
@@ -1363,7 +1363,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setNetworkIdentity
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getNetworkMode
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv*, jobject, jint inst)
 {
   return nt::GetNetworkMode(inst);
 }
@@ -1375,7 +1375,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getNetworkMode
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_startServer
-  (JNIEnv* env, jclass, jint inst, jstring persistFilename,
+  (JNIEnv* env, jobject, jint inst, jstring persistFilename,
    jstring listenAddress, jint port)
 {
   if (!persistFilename) {
@@ -1397,7 +1397,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startServer
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_stopServer
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv*, jobject, jint inst)
 {
   nt::StopServer(inst);
 }
@@ -1409,7 +1409,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_stopServer
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient__I
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv*, jobject, jint inst)
 {
   nt::StartClient(inst);
 }
@@ -1421,7 +1421,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient__I
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient__ILjava_lang_String_2I
-  (JNIEnv* env, jclass, jint inst, jstring serverName, jint port)
+  (JNIEnv* env, jobject, jint inst, jstring serverName, jint port)
 {
   if (!serverName) {
     nullPointerEx.Throw(env, "serverName cannot be null");
@@ -1437,7 +1437,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient__ILjava_lang_Strin
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient__I_3Ljava_lang_String_2_3I
-  (JNIEnv* env, jclass, jint inst, jobjectArray serverNames, jintArray ports)
+  (JNIEnv* env, jobject, jint inst, jobjectArray serverNames, jintArray ports)
 {
   if (!serverNames) {
     nullPointerEx.Throw(env, "serverNames cannot be null");
@@ -1482,7 +1482,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient__I_3Ljava_lang_Str
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_startClientTeam
-  (JNIEnv* env, jclass cls, jint inst, jint team, jint port)
+  (JNIEnv* env, jobject cls, jint inst, jint team, jint port)
 {
   nt::StartClientTeam(inst, team, port);
 }
@@ -1494,7 +1494,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startClientTeam
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_stopClient
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv*, jobject, jint inst)
 {
   nt::StopClient(inst);
 }
@@ -1506,7 +1506,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_stopClient
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__ILjava_lang_String_2I
-  (JNIEnv* env, jclass, jint inst, jstring serverName, jint port)
+  (JNIEnv* env, jobject, jint inst, jstring serverName, jint port)
 {
   if (!serverName) {
     nullPointerEx.Throw(env, "serverName cannot be null");
@@ -1522,7 +1522,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__ILjava_lang_String_
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_String_2_3I
-  (JNIEnv* env, jclass, jint inst, jobjectArray serverNames, jintArray ports)
+  (JNIEnv* env, jobject, jint inst, jobjectArray serverNames, jintArray ports)
 {
   if (!serverNames) {
     nullPointerEx.Throw(env, "serverNames cannot be null");
@@ -1567,7 +1567,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_Strin
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setServerTeam
-  (JNIEnv* env, jclass, jint inst, jint team, jint port)
+  (JNIEnv* env, jobject, jint inst, jint team, jint port)
 {
   nt::SetServerTeam(inst, team, port);
 }
@@ -1579,7 +1579,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServerTeam
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_startDSClient
-  (JNIEnv*, jclass, jint inst, jint port)
+  (JNIEnv*, jobject, jint inst, jint port)
 {
   nt::StartDSClient(inst, port);
 }
@@ -1591,7 +1591,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startDSClient
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_stopDSClient
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv*, jobject, jint inst)
 {
   nt::StopDSClient(inst);
 }
@@ -1603,7 +1603,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_stopDSClient
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setUpdateRate
-  (JNIEnv*, jclass, jint inst, jdouble interval)
+  (JNIEnv*, jobject, jint inst, jdouble interval)
 {
   nt::SetUpdateRate(inst, interval);
 }
@@ -1615,7 +1615,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setUpdateRate
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_flush
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv*, jobject, jint inst)
 {
   nt::Flush(inst);
 }
@@ -1627,7 +1627,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_flush
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_getConnections
-  (JNIEnv* env, jclass, jint inst)
+  (JNIEnv* env, jobject, jint inst)
 {
   auto arr = nt::GetConnections(inst);
   jobjectArray jarr =
@@ -1647,7 +1647,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getConnections
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_isConnected
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv*, jobject, jint inst)
 {
   return nt::IsConnected(inst);
 }
@@ -1659,7 +1659,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_isConnected
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_savePersistent
-  (JNIEnv* env, jclass, jint inst, jstring filename)
+  (JNIEnv* env, jobject, jint inst, jstring filename)
 {
   if (!filename) {
     nullPointerEx.Throw(env, "filename cannot be null");
@@ -1676,7 +1676,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_savePersistent
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_loadPersistent
-  (JNIEnv* env, jclass, jint inst, jstring filename)
+  (JNIEnv* env, jobject, jint inst, jstring filename)
 {
   if (!filename) {
     nullPointerEx.Throw(env, "filename cannot be null");
@@ -1704,7 +1704,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_loadPersistent
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_saveEntries
-  (JNIEnv* env, jclass, jint inst, jstring filename, jstring prefix)
+  (JNIEnv* env, jobject, jint inst, jstring filename, jstring prefix)
 {
   if (!filename) {
     nullPointerEx.Throw(env, "filename cannot be null");
@@ -1726,7 +1726,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_saveEntries
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_loadEntries
-  (JNIEnv* env, jclass, jint inst, jstring filename, jstring prefix)
+  (JNIEnv* env, jobject, jint inst, jstring filename, jstring prefix)
 {
   if (!filename) {
     nullPointerEx.Throw(env, "filename cannot be null");
@@ -1759,7 +1759,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_loadEntries
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_now
-  (JNIEnv*, jclass)
+  (JNIEnv*, jobject)
 {
   return nt::Now();
 }
@@ -1771,7 +1771,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_now
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_createLoggerPoller
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv*, jobject, jint inst)
 {
   return nt::CreateLoggerPoller(inst);
 }
@@ -1783,7 +1783,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createLoggerPoller
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyLoggerPoller
-  (JNIEnv*, jclass, jint poller)
+  (JNIEnv*, jobject, jint poller)
 {
   nt::DestroyLoggerPoller(poller);
 }
@@ -1795,7 +1795,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyLoggerPoller
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledLogger
-  (JNIEnv*, jclass, jint poller, jint minLevel, jint maxLevel)
+  (JNIEnv*, jobject, jint poller, jint minLevel, jint maxLevel)
 {
   return nt::AddPolledLogger(poller, minLevel, maxLevel);
 }
@@ -1807,7 +1807,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledLogger
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_pollLogger
-  (JNIEnv* env, jclass, jobject inst, jint poller)
+  (JNIEnv* env, jobject, jobject inst, jint poller)
 {
   auto events = nt::PollLogger(poller);
   if (events.empty()) {
@@ -1824,7 +1824,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_pollLogger
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_pollLoggerTimeout
-  (JNIEnv* env, jclass, jobject inst, jint poller, jdouble timeout)
+  (JNIEnv* env, jobject, jobject inst, jint poller, jdouble timeout)
 {
   bool timed_out = false;
   auto events = nt::PollLogger(poller, timeout, &timed_out);
@@ -1842,7 +1842,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_pollLoggerTimeout
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_cancelPollLogger
-  (JNIEnv*, jclass, jint poller)
+  (JNIEnv*, jobject, jint poller)
 {
   nt::CancelPollLogger(poller);
 }
@@ -1854,7 +1854,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_cancelPollLogger
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_removeLogger
-  (JNIEnv*, jclass, jint logger)
+  (JNIEnv*, jobject, jint logger)
 {
   nt::RemoveLogger(logger);
 }
@@ -1866,7 +1866,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_removeLogger
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_waitForLoggerQueue
-  (JNIEnv*, jclass, jint inst, jdouble timeout)
+  (JNIEnv*, jobject, jint inst, jdouble timeout)
 {
   return nt::WaitForLoggerQueue(inst, timeout);
 }

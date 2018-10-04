@@ -71,7 +71,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   @Override
   public synchronized void close() {
     if (m_owned && m_handle != 0) {
-      NetworkTablesJNI.destroyInstance(m_handle);
+      m_jni.destroyInstance(m_handle);
     }
   }
 
@@ -94,7 +94,20 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public static synchronized NetworkTableInstance getDefault() {
     if (s_defaultInstance == null) {
-      s_defaultInstance = new NetworkTableInstance(NetworkTablesJNI.getDefaultInstance());
+      s_defaultInstance = new NetworkTableInstance(NetworkTablesJNI.getInstance()
+                                                                   .getDefaultInstance());
+    }
+    return s_defaultInstance;
+  }
+
+  /**
+   * Get global default instance.
+   *
+   * @return Global default instance
+   */
+  public static synchronized NetworkTableInstance getDefault(INetworkTablesJNI jni) {
+    if (s_defaultInstance == null) {
+      s_defaultInstance = new NetworkTableInstance(jni.getDefaultInstance());
     }
     return s_defaultInstance;
   }
@@ -107,7 +120,21 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @return Newly created instance
    */
   public static NetworkTableInstance create() {
-    NetworkTableInstance inst = new NetworkTableInstance(NetworkTablesJNI.createInstance());
+    NetworkTableInstance inst = new NetworkTableInstance(NetworkTablesJNI.getInstance()
+                                                                         .createInstance());
+    inst.m_owned = true;
+    return inst;
+  }
+
+  /**
+   * Create an instance.
+   * Note: A reference to the returned instance must be retained to ensure the
+   * instance is not garbage collected.
+   *
+   * @return Newly created instance
+   */
+  public static NetworkTableInstance create(INetworkTablesJNI jni) {
+    NetworkTableInstance inst = new NetworkTableInstance(jni.createInstance());
     inst.m_owned = true;
     return inst;
   }
@@ -121,6 +148,10 @@ public final class NetworkTableInstance implements AutoCloseable {
     return m_handle;
   }
 
+  public INetworkTablesJNI getJni() {
+    return m_jni;
+  }
+
   /**
    * Gets the entry for a key.
    *
@@ -128,7 +159,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @return Network table entry.
    */
   public NetworkTableEntry getEntry(String name) {
-    return new NetworkTableEntry(this, NetworkTablesJNI.getEntry(m_handle, name));
+    return new NetworkTableEntry(this, m_jni.getEntry(m_handle, name));
   }
 
   /**
@@ -142,7 +173,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @return Array of entries.
    */
   public NetworkTableEntry[] getEntries(String prefix, int types) {
-    int[] handles = NetworkTablesJNI.getEntries(m_handle, prefix, types);
+    int[] handles = m_jni.getEntries(m_handle, prefix, types);
     NetworkTableEntry[] entries = new NetworkTableEntry[handles.length];
     for (int i = 0; i < handles.length; i++) {
       entries[i] = new NetworkTableEntry(this, handles[i]);
@@ -161,7 +192,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @return Array of entry information.
    */
   public EntryInfo[] getEntryInfo(String prefix, int types) {
-    return NetworkTablesJNI.getEntryInfo(this, m_handle, prefix, types);
+    return m_jni.getEntryInfo(this, m_handle, prefix, types);
   }
 
   /* Cache of created tables. */
@@ -201,7 +232,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * Use with caution!
    */
   public void deleteAllEntries() {
-    NetworkTablesJNI.deleteAllEntries(m_handle);
+    m_jni.deleteAllEntries(m_handle);
   }
 
   /*
@@ -231,7 +262,7 @@ public final class NetworkTableInstance implements AutoCloseable {
       while (!Thread.interrupted()) {
         EntryNotification[] events;
         try {
-          events = NetworkTablesJNI.pollEntryListener(this, m_entryListenerPoller);
+          events = m_jni.pollEntryListener(this, m_entryListenerPoller);
         } catch (InterruptedException ex) {
           m_entryListenerLock.lock();
           try {
@@ -271,7 +302,7 @@ public final class NetworkTableInstance implements AutoCloseable {
       m_entryListenerLock.lock();
       try {
         if (!wasInterrupted) {
-          NetworkTablesJNI.destroyEntryListenerPoller(m_entryListenerPoller);
+          m_jni.destroyEntryListenerPoller(m_entryListenerPoller);
         }
         m_entryListenerPoller = 0;
       } finally {
@@ -294,10 +325,10 @@ public final class NetworkTableInstance implements AutoCloseable {
     m_entryListenerLock.lock();
     try {
       if (m_entryListenerPoller == 0) {
-        m_entryListenerPoller = NetworkTablesJNI.createEntryListenerPoller(m_handle);
+        m_entryListenerPoller = m_jni.createEntryListenerPoller(m_handle);
         startEntryListenerThread();
       }
-      int handle = NetworkTablesJNI.addPolledEntryListener(m_entryListenerPoller, prefix, flags);
+      int handle = m_jni.addPolledEntryListener(m_entryListenerPoller, prefix, flags);
       m_entryListeners.put(handle, new EntryConsumer<>(null, listener));
       return handle;
     } finally {
@@ -322,10 +353,10 @@ public final class NetworkTableInstance implements AutoCloseable {
     m_entryListenerLock.lock();
     try {
       if (m_entryListenerPoller == 0) {
-        m_entryListenerPoller = NetworkTablesJNI.createEntryListenerPoller(m_handle);
+        m_entryListenerPoller = m_jni.createEntryListenerPoller(m_handle);
         startEntryListenerThread();
       }
-      int handle = NetworkTablesJNI.addPolledEntryListener(m_entryListenerPoller, entry.getHandle(),
+      int handle = m_jni.addPolledEntryListener(m_entryListenerPoller, entry.getHandle(),
           flags);
       m_entryListeners.put(handle, new EntryConsumer<>(entry, listener));
       return handle;
@@ -340,7 +371,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param listener Listener handle to remove
    */
   public void removeEntryListener(int listener) {
-    NetworkTablesJNI.removeEntryListener(listener);
+    m_jni.removeEntryListener(listener);
   }
 
   /**
@@ -354,14 +385,14 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @return False if timed out, otherwise true.
   */
   public boolean waitForEntryListenerQueue(double timeout) {
-    if (!NetworkTablesJNI.waitForEntryListenerQueue(m_handle, timeout)) {
+    if (!m_jni.waitForEntryListenerQueue(m_handle, timeout)) {
       return false;
     }
     m_entryListenerLock.lock();
     try {
       if (m_entryListenerPoller != 0) {
         m_entryListenerWaitQueue = true;
-        NetworkTablesJNI.cancelPollEntryListener(m_entryListenerPoller);
+        m_jni.cancelPollEntryListener(m_entryListenerPoller);
         while (m_entryListenerWaitQueue) {
           try {
             if (timeout < 0) {
@@ -397,7 +428,7 @@ public final class NetworkTableInstance implements AutoCloseable {
       while (!Thread.interrupted()) {
         ConnectionNotification[] events;
         try {
-          events = NetworkTablesJNI.pollConnectionListener(this, m_connectionListenerPoller);
+          events = m_jni.pollConnectionListener(this, m_connectionListenerPoller);
         } catch (InterruptedException ex) {
           m_connectionListenerLock.lock();
           try {
@@ -436,7 +467,7 @@ public final class NetworkTableInstance implements AutoCloseable {
       m_connectionListenerLock.lock();
       try {
         if (!wasInterrupted) {
-          NetworkTablesJNI.destroyConnectionListenerPoller(m_connectionListenerPoller);
+          m_jni.destroyConnectionListenerPoller(m_connectionListenerPoller);
         }
         m_connectionListenerPoller = 0;
       } finally {
@@ -459,10 +490,10 @@ public final class NetworkTableInstance implements AutoCloseable {
     m_connectionListenerLock.lock();
     try {
       if (m_connectionListenerPoller == 0) {
-        m_connectionListenerPoller = NetworkTablesJNI.createConnectionListenerPoller(m_handle);
+        m_connectionListenerPoller = m_jni.createConnectionListenerPoller(m_handle);
         startConnectionListenerThread();
       }
-      int handle = NetworkTablesJNI.addPolledConnectionListener(m_connectionListenerPoller,
+      int handle = m_jni.addPolledConnectionListener(m_connectionListenerPoller,
           immediateNotify);
       m_connectionListeners.put(handle, listener);
       return handle;
@@ -483,7 +514,7 @@ public final class NetworkTableInstance implements AutoCloseable {
     } finally {
       m_connectionListenerLock.unlock();
     }
-    NetworkTablesJNI.removeConnectionListener(listener);
+    m_jni.removeConnectionListener(listener);
   }
 
   /**
@@ -497,14 +528,14 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @return False if timed out, otherwise true.
    */
   public boolean waitForConnectionListenerQueue(double timeout) {
-    if (!NetworkTablesJNI.waitForConnectionListenerQueue(m_handle, timeout)) {
+    if (!m_jni.waitForConnectionListenerQueue(m_handle, timeout)) {
       return false;
     }
     m_connectionListenerLock.lock();
     try {
       if (m_connectionListenerPoller != 0) {
         m_connectionListenerWaitQueue = true;
-        NetworkTablesJNI.cancelPollConnectionListener(m_connectionListenerPoller);
+        m_jni.cancelPollConnectionListener(m_connectionListenerPoller);
         while (m_connectionListenerWaitQueue) {
           try {
             if (timeout < 0) {
@@ -542,7 +573,7 @@ public final class NetworkTableInstance implements AutoCloseable {
       while (!Thread.interrupted()) {
         RpcAnswer[] events;
         try {
-          events = NetworkTablesJNI.pollRpc(this, m_rpcCallPoller);
+          events = m_jni.pollRpc(this, m_rpcCallPoller);
         } catch (InterruptedException ex) {
           m_rpcCallLock.lock();
           try {
@@ -583,7 +614,7 @@ public final class NetworkTableInstance implements AutoCloseable {
       m_rpcCallLock.lock();
       try {
         if (!wasInterrupted) {
-          NetworkTablesJNI.destroyRpcCallPoller(m_rpcCallPoller);
+          m_jni.destroyRpcCallPoller(m_rpcCallPoller);
         }
         m_rpcCallPoller = 0;
       } finally {
@@ -608,10 +639,10 @@ public final class NetworkTableInstance implements AutoCloseable {
     m_rpcCallLock.lock();
     try {
       if (m_rpcCallPoller == 0) {
-        m_rpcCallPoller = NetworkTablesJNI.createRpcCallPoller(m_handle);
+        m_rpcCallPoller = m_jni.createRpcCallPoller(m_handle);
         startRpcCallThread();
       }
-      NetworkTablesJNI.createPolledRpc(entry.getHandle(), rev0def, m_rpcCallPoller);
+      m_jni.createPolledRpc(entry.getHandle(), rev0def, m_rpcCallPoller);
       m_rpcCalls.put(entry.getHandle(), new EntryConsumer<>(entry, callback));
     } finally {
       m_rpcCallLock.unlock();
@@ -629,14 +660,14 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @return False if timed out, otherwise true.
    */
   public boolean waitForRpcCallQueue(double timeout) {
-    if (!NetworkTablesJNI.waitForRpcCallQueue(m_handle, timeout)) {
+    if (!m_jni.waitForRpcCallQueue(m_handle, timeout)) {
       return false;
     }
     m_rpcCallLock.lock();
     try {
       if (m_rpcCallPoller != 0) {
         m_rpcCallWaitQueue = true;
-        NetworkTablesJNI.cancelPollRpc(m_rpcCallPoller);
+        m_jni.cancelPollRpc(m_rpcCallPoller);
         while (m_rpcCallWaitQueue) {
           try {
             if (timeout < 0) {
@@ -668,7 +699,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param name      identity to advertise
    */
   public void setNetworkIdentity(String name) {
-    NetworkTablesJNI.setNetworkIdentity(m_handle, name);
+    m_jni.setNetworkIdentity(m_handle, name);
   }
 
   /**
@@ -677,7 +708,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @return Bitmask of NetworkMode.
    */
   public int getNetworkMode() {
-    return NetworkTablesJNI.getNetworkMode(m_handle);
+    return m_jni.getNetworkMode(m_handle);
   }
 
   /**
@@ -719,21 +750,21 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param port             port to communicate over
    */
   public void startServer(String persistFilename, String listenAddress, int port) {
-    NetworkTablesJNI.startServer(m_handle, persistFilename, listenAddress, port);
+    m_jni.startServer(m_handle, persistFilename, listenAddress, port);
   }
 
   /**
    * Stops the server if it is running.
    */
   public void stopServer() {
-    NetworkTablesJNI.stopServer(m_handle);
+    m_jni.stopServer(m_handle);
   }
 
   /**
    * Starts a client.  Use SetServer to set the server name and port.
    */
   public void startClient() {
-    NetworkTablesJNI.startClient(m_handle);
+    m_jni.startClient(m_handle);
   }
 
   /**
@@ -752,7 +783,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param port        port to communicate over
    */
   public void startClient(String serverName, int port) {
-    NetworkTablesJNI.startClient(m_handle, serverName, port);
+    m_jni.startClient(m_handle, serverName, port);
   }
 
   /**
@@ -788,7 +819,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param ports         array of port numbers
    */
   public void startClient(String[] serverNames, int[] ports) {
-    NetworkTablesJNI.startClient(m_handle, serverNames, ports);
+    m_jni.startClient(m_handle, serverNames, ports);
   }
 
   /**
@@ -809,14 +840,14 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param port        port to communicate over
    */
   public void startClientTeam(int team, int port) {
-    NetworkTablesJNI.startClientTeam(m_handle, team, port);
+    m_jni.startClientTeam(m_handle, team, port);
   }
 
   /**
    * Stops the client if it is running.
    */
   public void stopClient() {
-    NetworkTablesJNI.stopClient(m_handle);
+    m_jni.stopClient(m_handle);
   }
 
   /**
@@ -836,7 +867,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param port        port to communicate over
    */
   public void setServer(String serverName, int port) {
-    NetworkTablesJNI.setServer(m_handle, serverName, port);
+    m_jni.setServer(m_handle, serverName, port);
   }
 
   /**
@@ -873,7 +904,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param ports         array of port numbers
    */
   public void setServer(String[] serverNames, int[] ports) {
-    NetworkTablesJNI.setServer(m_handle, serverNames, ports);
+    m_jni.setServer(m_handle, serverNames, ports);
   }
 
   /**
@@ -895,7 +926,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param port        port to communicate over
    */
   public void setServerTeam(int team, int port) {
-    NetworkTablesJNI.setServerTeam(m_handle, team, port);
+    m_jni.setServerTeam(m_handle, team, port);
   }
 
   /**
@@ -915,14 +946,14 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param port server port to use in combination with IP from DS
    */
   public void startDSClient(int port) {
-    NetworkTablesJNI.startDSClient(m_handle, port);
+    m_jni.startDSClient(m_handle, port);
   }
 
   /**
    * Stops requesting server address from Driver Station.
    */
   public void stopDSClient() {
-    NetworkTablesJNI.stopDSClient(m_handle);
+    m_jni.stopDSClient(m_handle);
   }
 
   /**
@@ -932,7 +963,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param interval update interval in seconds (range 0.01 to 1.0)
    */
   public void setUpdateRate(double interval) {
-    NetworkTablesJNI.setUpdateRate(m_handle, interval);
+    m_jni.setUpdateRate(m_handle, interval);
   }
 
   /**
@@ -942,7 +973,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * user code.
    */
   public void flush() {
-    NetworkTablesJNI.flush(m_handle);
+    m_jni.flush(m_handle);
   }
 
   /**
@@ -952,7 +983,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @return array of connection information
    */
   public ConnectionInfo[] getConnections() {
-    return NetworkTablesJNI.getConnections(m_handle);
+    return m_jni.getConnections(m_handle);
   }
 
   /**
@@ -961,7 +992,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @return True if connected.
    */
   public boolean isConnected() {
-    return NetworkTablesJNI.isConnected(m_handle);
+    return m_jni.isConnected(m_handle);
   }
 
   /**
@@ -971,7 +1002,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @throws PersistentException if error saving file
    */
   public void savePersistent(String filename) throws PersistentException {
-    NetworkTablesJNI.savePersistent(m_handle, filename);
+    m_jni.savePersistent(m_handle, filename);
   }
 
   /**
@@ -982,7 +1013,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @throws PersistentException if error reading file
    */
   public String[] loadPersistent(String filename) throws PersistentException {
-    return NetworkTablesJNI.loadPersistent(m_handle, filename);
+    return m_jni.loadPersistent(m_handle, filename);
   }
 
   /**
@@ -994,7 +1025,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @throws PersistentException if error saving file
    */
   public void saveEntries(String filename, String prefix) throws PersistentException {
-    NetworkTablesJNI.saveEntries(m_handle, filename, prefix);
+    m_jni.saveEntries(m_handle, filename, prefix);
   }
 
   /**
@@ -1007,7 +1038,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @throws PersistentException if error saving file
    */
   public String[] loadEntries(String filename, String prefix) throws PersistentException {
-    return NetworkTablesJNI.loadEntries(m_handle, filename, prefix);
+    return m_jni.loadEntries(m_handle, filename, prefix);
   }
 
   private final ReentrantLock m_loggerLock = new ReentrantLock();
@@ -1023,7 +1054,7 @@ public final class NetworkTableInstance implements AutoCloseable {
       while (!Thread.interrupted()) {
         LogMessage[] events;
         try {
-          events = NetworkTablesJNI.pollLogger(this, m_loggerPoller);
+          events = m_jni.pollLogger(this, m_loggerPoller);
         } catch (InterruptedException ex) {
           Thread.currentThread().interrupt();
           // don't try to destroy poller, as its handle is likely no longer valid
@@ -1052,7 +1083,7 @@ public final class NetworkTableInstance implements AutoCloseable {
       m_loggerLock.lock();
       try {
         if (!wasInterrupted) {
-          NetworkTablesJNI.destroyLoggerPoller(m_loggerPoller);
+          m_jni.destroyLoggerPoller(m_loggerPoller);
         }
         m_rpcCallPoller = 0;
       } finally {
@@ -1079,10 +1110,10 @@ public final class NetworkTableInstance implements AutoCloseable {
     m_loggerLock.lock();
     try {
       if (m_loggerPoller == 0) {
-        m_loggerPoller = NetworkTablesJNI.createLoggerPoller(m_handle);
+        m_loggerPoller = m_jni.createLoggerPoller(m_handle);
         startLogThread();
       }
-      int handle = NetworkTablesJNI.addPolledLogger(m_loggerPoller, minLevel, maxLevel);
+      int handle = m_jni.addPolledLogger(m_loggerPoller, minLevel, maxLevel);
       m_loggers.put(handle, func);
       return handle;
     } finally {
@@ -1102,7 +1133,7 @@ public final class NetworkTableInstance implements AutoCloseable {
     } finally {
       m_loggerLock.unlock();
     }
-    NetworkTablesJNI.removeLogger(logger);
+    m_jni.removeLogger(logger);
   }
 
   /**
@@ -1116,14 +1147,14 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @return False if timed out, otherwise true.
    */
   public boolean waitForLoggerQueue(double timeout) {
-    if (!NetworkTablesJNI.waitForLoggerQueue(m_handle, timeout)) {
+    if (!m_jni.waitForLoggerQueue(m_handle, timeout)) {
       return false;
     }
     m_loggerLock.lock();
     try {
       if (m_loggerPoller != 0) {
         m_loggerWaitQueue = true;
-        NetworkTablesJNI.cancelPollLogger(m_loggerPoller);
+        m_jni.cancelPollLogger(m_loggerPoller);
         while (m_loggerWaitQueue) {
           try {
             if (timeout < 0) {
@@ -1162,4 +1193,5 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   private boolean m_owned;
   private int m_handle;
+  private INetworkTablesJNI m_jni;
 }

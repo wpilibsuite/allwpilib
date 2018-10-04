@@ -59,7 +59,7 @@ public final class RpcAnswer {
    */
   void finish() {
     if (call != 0) {
-      NetworkTablesJNI.postRpcResponse(entry, call, emptyResponse);
+      m_inst.getJni().postRpcResponse(entry, call, emptyResponse);
       call = 0;
     }
   }
@@ -80,7 +80,7 @@ public final class RpcAnswer {
    * @return        true if the response was posted, otherwise false
    */
   public boolean postResponse(byte[] result) {
-    boolean ret = NetworkTablesJNI.postRpcResponse(entry, call, result);
+    boolean ret = m_inst.getJni().postRpcResponse(entry, call, result);
     call = 0;
     return ret;
   }
