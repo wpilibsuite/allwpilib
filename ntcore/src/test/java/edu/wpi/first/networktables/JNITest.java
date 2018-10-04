@@ -13,7 +13,7 @@ class JNITest {
   @Test
   void jniLinkTest() {
     // Test to verify that the JNI test link works correctly.
-    int inst = NetworkTablesJNI.getDefaultInstance();
-    NetworkTablesJNI.flush(inst);
+    int inst = NetworkTablesJNI.getInstance().getDefaultInstance();
+    NetworkTablesJNI.getInstance().flush(inst);
   }
 }

@@ -19,8 +19,8 @@ public final class NetworkTableValue {
     m_time = time;
   }
 
-  NetworkTableValue(NetworkTableType type, Object value) {
-    this(type, value, NetworkTablesJNI.now());
+  NetworkTableValue(NetworkTableType type, Object value, INetworkTablesJNI jni) {
+    this(type, value, jni.now());
   }
 
   NetworkTableValue(int type, Object value, long time) {
@@ -258,7 +258,19 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeBoolean(boolean value) {
-    return new NetworkTableValue(NetworkTableType.kBoolean, Boolean.valueOf(value));
+    return new NetworkTableValue(NetworkTableType.kBoolean, Boolean.valueOf(value),
+                                 NetworkTablesJNI.getInstance().now());
+  }
+
+  /**
+   * Creates a boolean entry value.
+   *
+   * @param value the value
+   * @param jni   the jni instance to use
+   * @return The entry value
+   */
+  public static NetworkTableValue makeBoolean(boolean value, INetworkTablesJNI jni) {
+    return new NetworkTableValue(NetworkTableType.kBoolean, Boolean.valueOf(value), jni);
   }
 
   /**
@@ -279,7 +291,19 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeDouble(double value) {
-    return new NetworkTableValue(NetworkTableType.kDouble, Double.valueOf(value));
+    return new NetworkTableValue(NetworkTableType.kDouble, Double.valueOf(value),
+                                 NetworkTablesJNI.getInstance().now());
+  }
+
+
+  /**
+   * Creates a double entry value.
+   *
+   * @param value the value
+   * @return The entry value
+   */
+  public static NetworkTableValue makeDouble(double value, INetworkTablesJNI jni) {
+    return new NetworkTableValue(NetworkTableType.kDouble, Double.valueOf(value), jni);
   }
 
   /**
@@ -300,7 +324,18 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeString(String value) {
-    return new NetworkTableValue(NetworkTableType.kString, value);
+    return new NetworkTableValue(NetworkTableType.kString, value,
+                                 NetworkTablesJNI.getInstance().now());
+  }
+
+  /**
+   * Creates a string entry value.
+   *
+   * @param value the value
+   * @return The entry value
+   */
+  public static NetworkTableValue makeString(String value, INetworkTablesJNI jni) {
+    return new NetworkTableValue(NetworkTableType.kString, value, jni);
   }
 
   /**
@@ -321,7 +356,18 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeRaw(byte[] value) {
-    return new NetworkTableValue(NetworkTableType.kRaw, value);
+    return new NetworkTableValue(NetworkTableType.kRaw, value,
+                                 NetworkTablesJNI.getInstance().now());
+  }
+
+  /**
+   * Creates a raw entry value.
+   *
+   * @param value the value
+   * @return The entry value
+   */
+  public static NetworkTableValue makeRaw(byte[] value, INetworkTablesJNI jni) {
+    return new NetworkTableValue(NetworkTableType.kRaw, value, jni);
   }
 
   /**
@@ -342,7 +388,18 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeRpc(byte[] value) {
-    return new NetworkTableValue(NetworkTableType.kRpc, value);
+    return new NetworkTableValue(NetworkTableType.kRpc, value,
+                                 NetworkTablesJNI.getInstance().now());
+  }
+
+  /**
+   * Creates a rpc entry value.
+   *
+   * @param value the value
+   * @return The entry value
+   */
+  public static NetworkTableValue makeRpc(byte[] value, INetworkTablesJNI jni) {
+    return new NetworkTableValue(NetworkTableType.kRpc, value, jni);
   }
 
   /**
@@ -363,7 +420,18 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeBooleanArray(boolean[] value) {
-    return new NetworkTableValue(NetworkTableType.kBooleanArray, value);
+    return new NetworkTableValue(NetworkTableType.kBooleanArray, value,
+                                 NetworkTablesJNI.getInstance().now());
+  }
+
+  /**
+   * Creates a boolean array entry value.
+   *
+   * @param value the value
+   * @return The entry value
+   */
+  public static NetworkTableValue makeBooleanArray(boolean[] value, INetworkTablesJNI jni) {
+    return new NetworkTableValue(NetworkTableType.kBooleanArray, value, jni);
   }
 
   /**
@@ -384,7 +452,18 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeBooleanArray(Boolean[] value) {
-    return new NetworkTableValue(NetworkTableType.kBooleanArray, toNative(value));
+    return new NetworkTableValue(NetworkTableType.kBooleanArray, toNative(value),
+                                 NetworkTablesJNI.getInstance().now());
+  }
+
+  /**
+   * Creates a boolean array entry value.
+   *
+   * @param value the value
+   * @return The entry value
+   */
+  public static NetworkTableValue makeBooleanArray(Boolean[] value, INetworkTablesJNI jni) {
+    return new NetworkTableValue(NetworkTableType.kBooleanArray, toNative(value), jni);
   }
 
   /**
@@ -405,7 +484,18 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeDoubleArray(double[] value) {
-    return new NetworkTableValue(NetworkTableType.kDoubleArray, value);
+    return new NetworkTableValue(NetworkTableType.kDoubleArray, value,
+                                 NetworkTablesJNI.getInstance().now());
+  }
+
+  /**
+   * Creates a double array entry value.
+   *
+   * @param value the value
+   * @return The entry value
+   */
+  public static NetworkTableValue makeDoubleArray(double[] value, INetworkTablesJNI jni) {
+    return new NetworkTableValue(NetworkTableType.kDoubleArray, value, jni);
   }
 
   /**
@@ -426,7 +516,18 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeDoubleArray(Number[] value) {
-    return new NetworkTableValue(NetworkTableType.kDoubleArray, toNative(value));
+    return new NetworkTableValue(NetworkTableType.kDoubleArray, toNative(value),
+                                 NetworkTablesJNI.getInstance().now());
+  }
+
+  /**
+   * Creates a double array entry value.
+   *
+   * @param value the value
+   * @return The entry value
+   */
+  public static NetworkTableValue makeDoubleArray(Number[] value, INetworkTablesJNI jni) {
+    return new NetworkTableValue(NetworkTableType.kDoubleArray, toNative(value), jni);
   }
 
   /**
@@ -447,7 +548,18 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeStringArray(String[] value) {
-    return new NetworkTableValue(NetworkTableType.kStringArray, value);
+    return new NetworkTableValue(NetworkTableType.kStringArray, value,
+                                 NetworkTablesJNI.getInstance().now());
+  }
+
+  /**
+   * Creates a string array entry value.
+   *
+   * @param value the value
+   * @return The entry value
+   */
+  public static NetworkTableValue makeStringArray(String[] value, INetworkTablesJNI jni) {
+    return new NetworkTableValue(NetworkTableType.kStringArray, value, jni);
   }
 
   /**

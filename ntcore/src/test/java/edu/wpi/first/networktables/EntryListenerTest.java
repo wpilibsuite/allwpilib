@@ -44,10 +44,12 @@ class EntryListenerTest {
     m_clientInst.startClient("127.0.0.1", 10000);
 
     // Use connection listener to ensure we've connected
-    int poller = NetworkTablesJNI.createConnectionListenerPoller(m_clientInst.getHandle());
-    NetworkTablesJNI.addPolledConnectionListener(poller, false);
+    int poller = NetworkTablesJNI.getInstance()
+                                 .createConnectionListenerPoller(m_clientInst.getHandle());
+    NetworkTablesJNI.getInstance().addPolledConnectionListener(poller, false);
     try {
-      if (NetworkTablesJNI.pollConnectionListenerTimeout(m_clientInst, poller, 1.0).length == 0) {
+      if (NetworkTablesJNI.getInstance()
+                          .pollConnectionListenerTimeout(m_clientInst, poller, 1.0).length == 0) {
         fail("client didn't connect to server");
       }
     } catch (InterruptedException ex) {

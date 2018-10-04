@@ -64,9 +64,11 @@ class ConnectionListenerTest {
   @DisabledOnOs(OS.WINDOWS)
   void testJNI() {
     // set up the poller
-    int poller = NetworkTablesJNI.createConnectionListenerPoller(m_serverInst.getHandle());
+    int poller = NetworkTablesJNI.getInstance()
+                                 .createConnectionListenerPoller(m_serverInst.getHandle());
     assertTrue(poller != 0, "bad poller handle");
-    int handle = NetworkTablesJNI.addPolledConnectionListener(poller, false);
+    int handle = NetworkTablesJNI.getInstance()
+                                 .addPolledConnectionListener(poller, false);
     assertTrue(handle != 0, "bad listener handle");
 
     // trigger a connect event
@@ -76,7 +78,8 @@ class ConnectionListenerTest {
     assertTrue(m_serverInst.waitForConnectionListenerQueue(1.0));
     ConnectionNotification[] events = null;
     try {
-      events = NetworkTablesJNI.pollConnectionListenerTimeout(m_serverInst, poller, 0.0);
+      events = NetworkTablesJNI.getInstance()
+                               .pollConnectionListenerTimeout(m_serverInst, poller, 0.0);
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
       fail("unexpected interrupted exception" + ex);
@@ -98,7 +101,8 @@ class ConnectionListenerTest {
     // get the event
     assertTrue(m_serverInst.waitForConnectionListenerQueue(1.0));
     try {
-      events = NetworkTablesJNI.pollConnectionListenerTimeout(m_serverInst, poller, 0.0);
+      events = NetworkTablesJNI.getInstance()
+                               .pollConnectionListenerTimeout(m_serverInst, poller, 0.0);
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
       fail("unexpected interrupted exception" + ex);
