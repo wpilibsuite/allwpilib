@@ -865,10 +865,7 @@ void MjpegServerImpl::ServerThreadMain() {
     }
 
     // Start it if not already started
-    {
-      auto thr = it->GetThread();
-      if (!thr) it->Start(new ConnThread{GetName()});
-    }
+    it->Start(GetName());
 
     auto nstreams =
         std::count_if(m_connThreads.begin(), m_connThreads.end(),

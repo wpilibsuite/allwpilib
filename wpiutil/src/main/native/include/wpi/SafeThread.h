@@ -9,7 +9,9 @@
 #define WPIUTIL_WPI_SAFETHREAD_H_
 
 #include <atomic>
+#include <memory>
 #include <thread>
+#include <utility>
 
 #include "wpi/condition_variable.h"
 #include "wpi/mutex.h"
@@ -23,7 +25,7 @@ class SafeThread {
   virtual ~SafeThread() = default;
   virtual void Main() = 0;
 
-  wpi::mutex m_mutex;
+  mutable wpi::mutex m_mutex;
   std::atomic_bool m_active;
   wpi::condition_variable m_cond;
 };
@@ -33,20 +35,12 @@ namespace detail {
 // Non-template proxy base class for common proxy code.
 class SafeThreadProxyBase {
  public:
-  explicit SafeThreadProxyBase(SafeThread* thr) : m_thread(thr) {
-    if (!m_thread) return;
-    m_lock = std::unique_lock<wpi::mutex>(m_thread->m_mutex);
-    if (!m_thread->m_active) {
-      m_lock.unlock();
-      m_thread = nullptr;
-      return;
-    }
-  }
+  explicit SafeThreadProxyBase(std::shared_ptr<SafeThread> thr);
   explicit operator bool() const { return m_thread != nullptr; }
   std::unique_lock<wpi::mutex>& GetLock() { return m_lock; }
 
  protected:
-  SafeThread* m_thread;
+  std::shared_ptr<SafeThread> m_thread;
   std::unique_lock<wpi::mutex> m_lock;
 };
 
@@ -55,9 +49,10 @@ class SafeThreadProxyBase {
 template <typename T>
 class SafeThreadProxy : public SafeThreadProxyBase {
  public:
-  explicit SafeThreadProxy(SafeThread* thr) : SafeThreadProxyBase(thr) {}
-  T& operator*() const { return *static_cast<T*>(m_thread); }
-  T* operator->() const { return static_cast<T*>(m_thread); }
+  explicit SafeThreadProxy(std::shared_ptr<SafeThread> thr)
+      : SafeThreadProxyBase(std::move(thr)) {}
+  T& operator*() const { return *static_cast<T*>(m_thread.get()); }
+  T* operator->() const { return static_cast<T*>(m_thread.get()); }
 };
 
 // Non-template owner base class for common owner code.
@@ -65,62 +60,47 @@ class SafeThreadOwnerBase {
  public:
   void Stop();
 
-  SafeThreadOwnerBase() { m_thread = nullptr; }
+  SafeThreadOwnerBase() noexcept = default;
   SafeThreadOwnerBase(const SafeThreadOwnerBase&) = delete;
   SafeThreadOwnerBase& operator=(const SafeThreadOwnerBase&) = delete;
-  SafeThreadOwnerBase(SafeThreadOwnerBase&& other)
-      : m_thread(other.m_thread.exchange(nullptr)) {}
-  SafeThreadOwnerBase& operator=(SafeThreadOwnerBase other) {
-    SafeThread* otherthr = other.m_thread.exchange(nullptr);
-    SafeThread* curthr = m_thread.exchange(otherthr);
-    other.m_thread.exchange(curthr);  // other destructor will clean up
+  SafeThreadOwnerBase(SafeThreadOwnerBase&& other) noexcept
+      : SafeThreadOwnerBase() {
+    swap(*this, other);
+  }
+  SafeThreadOwnerBase& operator=(SafeThreadOwnerBase other) noexcept {
+    swap(*this, other);
     return *this;
   }
   ~SafeThreadOwnerBase() { Stop(); }
 
-  explicit operator bool() const { return m_thread.load(); }
+  friend void swap(SafeThreadOwnerBase& lhs, SafeThreadOwnerBase& rhs) noexcept;
+
+  explicit operator bool() const;
+
+  std::thread::native_handle_type GetNativeThreadHandle() const;
 
  protected:
-  void Start(SafeThread* thr);
-  SafeThread* GetThread() const { return m_thread.load(); }
-  std::thread::native_handle_type GetNativeThreadHandle() const {
-    return m_nativeHandle;
-  }
+  void Start(std::shared_ptr<SafeThread> thr);
+  std::shared_ptr<SafeThread> GetThread() const;
 
  private:
-  std::atomic<SafeThread*> m_thread;
-  std::atomic<std::thread::native_handle_type> m_nativeHandle;
+  mutable wpi::mutex m_mutex;
+  std::weak_ptr<SafeThread> m_thread;
+  std::thread::native_handle_type m_nativeHandle;
 };
 
-inline void SafeThreadOwnerBase::Start(SafeThread* thr) {
-  SafeThread* curthr = nullptr;
-  SafeThread* newthr = thr;
-  if (!m_thread.compare_exchange_strong(curthr, newthr)) {
-    delete newthr;
-    return;
-  }
-  std::thread stdThread([=]() {
-    newthr->Main();
-    delete newthr;
-  });
-  m_nativeHandle = stdThread.native_handle();
-  stdThread.detach();
-}
-
-inline void SafeThreadOwnerBase::Stop() {
-  SafeThread* thr = m_thread.exchange(nullptr);
-  if (!thr) return;
-  thr->m_active = false;
-  thr->m_cond.notify_one();
-}
+void swap(SafeThreadOwnerBase& lhs, SafeThreadOwnerBase& rhs) noexcept;
 
 }  // namespace detail
 
 template <typename T>
 class SafeThreadOwner : public detail::SafeThreadOwnerBase {
  public:
-  void Start() { Start(new T); }
-  void Start(T* thr) { detail::SafeThreadOwnerBase::Start(thr); }
+  template <typename... Args>
+  void Start(Args&&... args) {
+    detail::SafeThreadOwnerBase::Start(
+        std::make_shared<T>(std::forward<Args>(args)...));
+  }
 
   using Proxy = typename detail::SafeThreadProxy<T>;
   Proxy GetThread() const {

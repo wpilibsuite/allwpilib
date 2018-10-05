@@ -36,7 +36,7 @@ DsClient::DsClient(Dispatcher& dispatcher, wpi::Logger& logger)
 void DsClient::Start(unsigned int port) {
   auto thr = m_owner.GetThread();
   if (!thr)
-    m_owner.Start(new Thread(m_dispatcher, m_logger, port));
+    m_owner.Start(m_dispatcher, m_logger, port);
   else
     thr->m_port = port;
 }

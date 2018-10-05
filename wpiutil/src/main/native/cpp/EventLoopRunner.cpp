@@ -39,7 +39,7 @@ class EventLoopRunner::Thread : public SafeThread {
   std::weak_ptr<UvExecFunc> m_doExec;
 };
 
-EventLoopRunner::EventLoopRunner() { m_owner.Start(new Thread); }
+EventLoopRunner::EventLoopRunner() { m_owner.Start(); }
 
 EventLoopRunner::~EventLoopRunner() {
   ExecAsync([](uv::Loop& loop) {
