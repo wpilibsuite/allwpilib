@@ -294,8 +294,7 @@ class CallbackManager {
  protected:
   template <typename... Args>
   void DoStart(Args&&... args) {
-    auto thr = m_owner.GetThread();
-    if (!thr) m_owner.Start(new Thread(std::forward<Args>(args)...));
+    m_owner.Start(std::forward<Args>(args)...);
   }
 
   template <typename... Args>

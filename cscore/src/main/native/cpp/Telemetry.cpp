@@ -45,10 +45,7 @@ Telemetry::Telemetry() {}
 
 Telemetry::~Telemetry() {}
 
-void Telemetry::Start() {
-  auto thr = m_owner.GetThread();
-  if (!thr) m_owner.Start(new Thread);
-}
+void Telemetry::Start() { m_owner.Start(); }
 
 void Telemetry::Stop() { m_owner.Stop(); }
 

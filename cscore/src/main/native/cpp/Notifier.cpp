@@ -94,10 +94,7 @@ Notifier::Notifier() { s_destroyed = false; }
 
 Notifier::~Notifier() { s_destroyed = true; }
 
-void Notifier::Start() {
-  auto thr = m_owner.GetThread();
-  if (!thr) m_owner.Start(new Thread(m_on_start, m_on_exit));
-}
+void Notifier::Start() { m_owner.Start(m_on_start, m_on_exit); }
 
 void Notifier::Stop() { m_owner.Stop(); }
 
