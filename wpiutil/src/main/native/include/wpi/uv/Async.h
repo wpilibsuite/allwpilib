@@ -11,6 +11,7 @@
 #include <uv.h>
 
 #include <memory>
+#include <thread>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -83,16 +84,23 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
   /**
    * Wakeup the event loop and emit the event.
    *
-   * It’s safe to call this function from any thread EXCEPT the loop thread.
+   * It’s safe to call this function from any thread including the loop thread.
    * An async event will be emitted on the loop thread.
    */
   template <typename... U>
   void Send(U&&... u) {
+    auto loop = m_loop.lock();
+    if (loop && loop->GetThreadId() == std::this_thread::get_id()) {
+      // called from within the loop, just call the function directly
+      wakeup(std::forward<U>(u)...);
+      return;
+    }
+
     {
       std::lock_guard<wpi::mutex> lock(m_mutex);
       m_data.emplace_back(std::forward_as_tuple(std::forward<U>(u)...));
     }
-    if (auto loop = m_loop.lock()) this->Invoke(&uv_async_send, this->GetRaw());
+    if (loop) this->Invoke(&uv_async_send, this->GetRaw());
   }
 
   /**
