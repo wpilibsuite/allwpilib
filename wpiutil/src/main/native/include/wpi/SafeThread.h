@@ -21,12 +21,11 @@ namespace wpi {
 // Base class for SafeThreadOwner threads.
 class SafeThread {
  public:
-  SafeThread() { m_active = true; }
   virtual ~SafeThread() = default;
   virtual void Main() = 0;
 
   mutable wpi::mutex m_mutex;
-  std::atomic_bool m_active;
+  std::atomic_bool m_active{true};
   wpi::condition_variable m_cond;
 };
 
@@ -59,6 +58,7 @@ class SafeThreadProxy : public SafeThreadProxyBase {
 class SafeThreadOwnerBase {
  public:
   void Stop();
+  void Join();
 
   SafeThreadOwnerBase() noexcept = default;
   SafeThreadOwnerBase(const SafeThreadOwnerBase&) = delete;
@@ -71,13 +71,15 @@ class SafeThreadOwnerBase {
     swap(*this, other);
     return *this;
   }
-  ~SafeThreadOwnerBase() { Stop(); }
+  ~SafeThreadOwnerBase();
 
   friend void swap(SafeThreadOwnerBase& lhs, SafeThreadOwnerBase& rhs) noexcept;
 
   explicit operator bool() const;
 
-  std::thread::native_handle_type GetNativeThreadHandle() const;
+  std::thread::native_handle_type GetNativeThreadHandle();
+
+  void SetJoinAtExit(bool joinAtExit) { m_joinAtExit = joinAtExit; }
 
  protected:
   void Start(std::shared_ptr<SafeThread> thr);
@@ -85,8 +87,9 @@ class SafeThreadOwnerBase {
 
  private:
   mutable wpi::mutex m_mutex;
+  std::thread m_stdThread;
   std::weak_ptr<SafeThread> m_thread;
-  std::thread::native_handle_type m_nativeHandle;
+  std::atomic_bool m_joinAtExit{true};
 };
 
 void swap(SafeThreadOwnerBase& lhs, SafeThreadOwnerBase& rhs) noexcept;
