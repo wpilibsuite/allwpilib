@@ -21,20 +21,39 @@ detail::SafeThreadProxyBase::SafeThreadProxyBase(
   }
 }
 
+detail::SafeThreadOwnerBase::~SafeThreadOwnerBase() {
+  if (m_joinAtExit)
+    Join();
+  else
+    Stop();
+}
+
 void detail::SafeThreadOwnerBase::Start(std::shared_ptr<SafeThread> thr) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   if (auto thr = m_thread.lock()) return;
-  std::thread stdThread([=] { thr->Main(); });
+  m_stdThread = std::thread([=] { thr->Main(); });
   m_thread = thr;
-  m_nativeHandle = stdThread.native_handle();
-  stdThread.detach();
 }
 
 void detail::SafeThreadOwnerBase::Stop() {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   if (auto thr = m_thread.lock()) {
     thr->m_active = false;
-    thr->m_cond.notify_one();
+    thr->m_cond.notify_all();
+    m_stdThread.detach();
+    m_thread.reset();
+  }
+}
+
+void detail::SafeThreadOwnerBase::Join() {
+  std::unique_lock<wpi::mutex> lock(m_mutex);
+  if (auto thr = m_thread.lock()) {
+    auto stdThread = std::move(m_stdThread);
+    m_thread.reset();
+    lock.unlock();
+    thr->m_active = false;
+    thr->m_cond.notify_all();
+    stdThread.join();
   }
 }
 
@@ -44,8 +63,8 @@ void detail::swap(SafeThreadOwnerBase& lhs, SafeThreadOwnerBase& rhs) noexcept {
   std::lock(lhs.m_mutex, rhs.m_mutex);
   std::lock_guard<wpi::mutex> lock_lhs(lhs.m_mutex, std::adopt_lock);
   std::lock_guard<wpi::mutex> lock_rhs(rhs.m_mutex, std::adopt_lock);
+  std::swap(lhs.m_stdThread, rhs.m_stdThread);
   std::swap(lhs.m_thread, rhs.m_thread);
-  std::swap(lhs.m_nativeHandle, rhs.m_nativeHandle);
 }
 
 detail::SafeThreadOwnerBase::operator bool() const {
@@ -54,9 +73,9 @@ detail::SafeThreadOwnerBase::operator bool() const {
 }
 
 std::thread::native_handle_type
-detail::SafeThreadOwnerBase::GetNativeThreadHandle() const {
+detail::SafeThreadOwnerBase::GetNativeThreadHandle() {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  return m_nativeHandle;
+  return m_stdThread.native_handle();
 }
 
 std::shared_ptr<SafeThread> detail::SafeThreadOwnerBase::GetThread() const {

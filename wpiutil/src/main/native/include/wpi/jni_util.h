@@ -479,6 +479,7 @@ class JCallbackThread : public SafeThread {
 template <typename T>
 class JCallbackManager : public SafeThreadOwner<JCallbackThread<T>> {
  public:
+  JCallbackManager() { this->SetJoinAtExit(false); }
   void SetFunc(JNIEnv* env, jobject func, jmethodID mid);
 
   template <typename... Args>
