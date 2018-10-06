@@ -13,6 +13,7 @@
 
 #include <functional>
 #include <memory>
+#include <thread>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -112,7 +113,7 @@ class AsyncFunction<R(T...)> final
    * Wakeup the event loop, call the async function, and return a future for
    * the result.
    *
-   * It’s safe to call this function from any thread EXCEPT the loop thread.
+   * It’s safe to call this function from any thread including the loop thread.
    * The async function will be called on the loop thread.
    *
    * The future will return a default-constructed result if this handle is
@@ -123,6 +124,13 @@ class AsyncFunction<R(T...)> final
     // create the future
     uint64_t req = m_promises.CreateRequest();
 
+    auto loop = m_loop.lock();
+    if (loop && loop->GetThreadId() == std::this_thread::get_id()) {
+      // called from within the loop, just call the function directly
+      wakeup(m_promises.CreatePromise(req), std::forward<U>(u)...);
+      return m_promises.CreateFuture(req);
+    }
+
     // add the parameters to the input queue
     {
       std::lock_guard<wpi::mutex> lock(m_mutex);
@@ -132,7 +140,7 @@ class AsyncFunction<R(T...)> final
     }
 
     // signal the loop
-    if (auto loop = m_loop.lock()) this->Invoke(&uv_async_send, this->GetRaw());
+    if (loop) this->Invoke(&uv_async_send, this->GetRaw());
 
     // return future
     return m_promises.CreateFuture(req);
