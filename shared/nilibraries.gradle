@@ -19,6 +19,7 @@ model {
       version = '2018.17.1'
       sharedConfigs = chipObjectConfigs
       staticConfigs = [:]
+      compileOnlyShared = true
     }
     netcomm(DependencyConfig) {
       groupId = 'edu.wpi.first.ni-libraries'
@@ -28,6 +29,7 @@ model {
       version = '2018.17.1'
       sharedConfigs = netCommLibConfigs
       staticConfigs = [:]
+      compileOnlyShared = true
     }
   }
 }
