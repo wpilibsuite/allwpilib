@@ -19,6 +19,7 @@ import org.junit.jupiter.api.condition.OS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -65,9 +66,9 @@ class ConnectionListenerTest {
   void testJNI() {
     // set up the poller
     int poller = NetworkTablesJNI.createConnectionListenerPoller(m_serverInst.getHandle());
-    assertTrue(poller != 0, "bad poller handle");
+    assertNotSame(poller, 0, "bad poller handle");
     int handle = NetworkTablesJNI.addPolledConnectionListener(poller, false);
-    assertTrue(handle != 0, "bad listener handle");
+    assertNotSame(handle, 0, "bad listener handle");
 
     // trigger a connect event
     connect();

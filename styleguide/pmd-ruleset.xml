@@ -50,6 +50,8 @@
     <exclude name="DataflowAnomalyAnalysis" />
     <exclude name="DoNotCallSystemExit" />
     <exclude name="FinalizeDoesNotCallSuperFinalize" />
+    <exclude name="JUnitSpelling" />
+    <exclude name="MissingSerialVersionUID" />
     <exclude name="NullAssignment" />
   </rule>
 

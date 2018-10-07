@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ConditionalCommandTest extends AbstractCommandTest {
@@ -75,7 +76,7 @@ class ConditionalCommandTest extends AbstractCommandTest {
     assertConditionalCommandState(m_command, 1, 5, 5, 1, 0);
 
     assertTrue(m_onTrue.getInitializeCount() > 0, "Did not initialize the true command");
-    assertTrue(m_onFalse.getInitializeCount() == 0, "Initialized the false command");
+    assertSame(m_onFalse.getInitializeCount(), 0, "Initialized the false command");
   }
 
   @Test
@@ -113,7 +114,7 @@ class ConditionalCommandTest extends AbstractCommandTest {
     assertConditionalCommandState(m_command, 1, 5, 5, 1, 0);
 
     assertTrue(m_onFalse.getInitializeCount() > 0, "Did not initialize the false command");
-    assertTrue(m_onTrue.getInitializeCount() == 0, "Initialized the true command");
+    assertSame(m_onTrue.getInitializeCount(), 0, "Initialized the true command");
   }
 
   @Test
