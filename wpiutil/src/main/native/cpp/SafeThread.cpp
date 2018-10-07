@@ -40,9 +40,9 @@ void detail::SafeThreadOwnerBase::Stop() {
   if (auto thr = m_thread.lock()) {
     thr->m_active = false;
     thr->m_cond.notify_all();
-    m_stdThread.detach();
     m_thread.reset();
   }
+  if (m_stdThread.joinable()) m_stdThread.detach();
 }
 
 void detail::SafeThreadOwnerBase::Join() {
@@ -54,6 +54,8 @@ void detail::SafeThreadOwnerBase::Join() {
     thr->m_active = false;
     thr->m_cond.notify_all();
     stdThread.join();
+  } else if (m_stdThread.joinable()) {
+    m_stdThread.detach();
   }
 }
 
