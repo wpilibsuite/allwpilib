@@ -770,5 +770,15 @@
     "gradlebase": "javaromi",
     "mainclass": "Main",
     "commandversion": 2
+  },
+  {
+    "name": "Digital Communication Sample",
+    "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's DIO",
+    "tags": [
+      "Digital"
+    ],
+    "foldername": "digitalcommunication",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
