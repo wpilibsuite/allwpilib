@@ -780,5 +780,15 @@
     "foldername": "digitalcommunication",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "I2C Communication Sample",
+    "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's I2C port",
+    "tags": [
+      "I2C"
+    ],
+    "foldername": "i2ccommunication",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
