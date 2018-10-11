@@ -154,8 +154,7 @@ class DifferentialDrive : public RobotDriveBase {
    *                      [-1.0..1.0]. Forward is positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
-  void TankDrive(double leftSpeed, double rightSpeed,
-                 bool squareInputs = true);
+  void TankDrive(double leftSpeed, double rightSpeed, bool squareInputs = true);
 
   /**
    * Sets the QuickStop speed threshold in curvature drive.
