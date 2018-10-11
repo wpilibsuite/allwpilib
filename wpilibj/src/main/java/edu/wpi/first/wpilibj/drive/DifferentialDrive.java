@@ -140,10 +140,10 @@ public class DifferentialDrive extends RobotDriveBase {
    * @param xSpeed        The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param zRotation     The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
    *                      positive.
-   * @param squaredInputs If set, decreases the input sensitivity at low speeds.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
   @SuppressWarnings("ParameterName")
-  public void arcadeDrive(double xSpeed, double zRotation, boolean squaredInputs) {
+  public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
     if (!m_reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, 2,
                  tInstances.kRobotDrive2_DifferentialArcade);
@@ -158,7 +158,7 @@ public class DifferentialDrive extends RobotDriveBase {
 
     // Square the inputs (while preserving the sign) to increase fine control
     // while permitting full power.
-    if (squaredInputs) {
+    if (squareInputs) {
       xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
       zRotation = Math.copySign(zRotation * zRotation, zRotation);
     }
@@ -298,9 +298,9 @@ public class DifferentialDrive extends RobotDriveBase {
    *                      positive.
    * @param rightSpeed    The robot right side's speed along the X axis [-1.0..1.0]. Forward is
    *                      positive.
-   * @param squaredInputs If set, decreases the input sensitivity at low speeds.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
-  public void tankDrive(double leftSpeed, double rightSpeed, boolean squaredInputs) {
+  public void tankDrive(double leftSpeed, double rightSpeed, boolean squareInputs) {
     if (!m_reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, 2,
                  tInstances.kRobotDrive2_DifferentialTank);
@@ -315,7 +315,7 @@ public class DifferentialDrive extends RobotDriveBase {
 
     // Square the inputs (while preserving the sign) to increase fine control
     // while permitting full power.
-    if (squaredInputs) {
+    if (squareInputs) {
       leftSpeed = Math.copySign(leftSpeed * leftSpeed, leftSpeed);
       rightSpeed = Math.copySign(rightSpeed * rightSpeed, rightSpeed);
     }
