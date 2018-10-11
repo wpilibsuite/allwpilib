@@ -28,7 +28,7 @@ DifferentialDrive::DifferentialDrive(SpeedController& leftMotor,
 }
 
 void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
-                                    bool squaredInputs) {
+                                    bool squareInputs) {
   static bool reported = false;
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 2,
@@ -44,7 +44,7 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
 
   // Square the inputs (while preserving the sign) to increase fine control
   // while permitting full power.
-  if (squaredInputs) {
+  if (squareInputs) {
     xSpeed = std::copysign(xSpeed * xSpeed, xSpeed);
     zRotation = std::copysign(zRotation * zRotation, zRotation);
   }
@@ -156,7 +156,7 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
 }
 
 void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
-                                  bool squaredInputs) {
+                                  bool squareInputs) {
   static bool reported = false;
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 2,
@@ -172,7 +172,7 @@ void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
 
   // Square the inputs (while preserving the sign) to increase fine control
   // while permitting full power.
-  if (squaredInputs) {
+  if (squareInputs) {
     leftSpeed = std::copysign(leftSpeed * leftSpeed, leftSpeed);
     rightSpeed = std::copysign(rightSpeed * rightSpeed, rightSpeed);
   }
