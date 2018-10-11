@@ -13,9 +13,19 @@
 #include <random>
 #include <thread>
 
-#include "TestBench.h"
 #include "frc/Base.h"
 #include "gtest/gtest.h"
+
+/* Filter constants */
+static constexpr double kFilterStep = 0.005;
+static constexpr double kFilterTime = 2.0;
+static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
+static constexpr double kSinglePoleIIRExpectedOutput = -3.2172003;
+static constexpr double kHighPassTimeConstant = 0.006631;
+static constexpr double kHighPassExpectedOutput = 10.074717;
+static constexpr int32_t kMovAvgTaps = 6;
+static constexpr double kMovAvgExpectedOutput = -10.191644;
+static constexpr double kPi = 3.14159265358979323846;
 
 using namespace frc;
 
@@ -52,17 +62,17 @@ class DataWrapper : public PIDSource {
   virtual void SetPIDSourceType(PIDSourceType pidSource) {}
 
   virtual double PIDGet() {
-    m_count += TestBench::kFilterStep;
+    m_count += kFilterStep;
     return m_dataFunc(m_count);
   }
 
-  void Reset() { m_count = -TestBench::kFilterStep; }
+  void Reset() { m_count = -kFilterStep; }
 
  private:
   std::function<double(double)> m_dataFunc;
 
   // Make sure first call to PIDGet() uses m_count == 0
-  double m_count = -TestBench::kFilterStep;
+  double m_count = -kFilterStep;
 };
 
 /**
@@ -75,7 +85,7 @@ class FilterOutputTest : public testing::TestWithParam<FilterOutputTestType> {
   double m_expectedOutput = 0.0;
 
   static double GetData(double t) {
-    return 100.0 * std::sin(2.0 * M_PI * t) + 20.0 * std::cos(50.0 * M_PI * t);
+    return 100.0 * std::sin(2.0 * kPi * t) + 20.0 * std::cos(50.0 * kPi * t);
   }
 
   static double GetPulseData(double t) {
@@ -92,9 +102,8 @@ class FilterOutputTest : public testing::TestWithParam<FilterOutputTestType> {
         m_data = std::make_shared<DataWrapper>(GetData);
         m_filter = std::make_unique<LinearDigitalFilter>(
             LinearDigitalFilter::SinglePoleIIR(
-                m_data, TestBench::kSinglePoleIIRTimeConstant,
-                TestBench::kFilterStep));
-        m_expectedOutput = TestBench::kSinglePoleIIRExpectedOutput;
+                m_data, kSinglePoleIIRTimeConstant, kFilterStep));
+        m_expectedOutput = kSinglePoleIIRExpectedOutput;
         break;
       }
 
@@ -102,24 +111,23 @@ class FilterOutputTest : public testing::TestWithParam<FilterOutputTestType> {
         m_data = std::make_shared<DataWrapper>(GetData);
         m_filter =
             std::make_unique<LinearDigitalFilter>(LinearDigitalFilter::HighPass(
-                m_data, TestBench::kHighPassTimeConstant,
-                TestBench::kFilterStep));
-        m_expectedOutput = TestBench::kHighPassExpectedOutput;
+                m_data, kHighPassTimeConstant, kFilterStep));
+        m_expectedOutput = kHighPassExpectedOutput;
         break;
       }
 
       case TEST_MOVAVG: {
         m_data = std::make_shared<DataWrapper>(GetData);
         m_filter = std::make_unique<LinearDigitalFilter>(
-            LinearDigitalFilter::MovingAverage(m_data, TestBench::kMovAvgTaps));
-        m_expectedOutput = TestBench::kMovAvgExpectedOutput;
+            LinearDigitalFilter::MovingAverage(m_data, kMovAvgTaps));
+        m_expectedOutput = kMovAvgExpectedOutput;
         break;
       }
 
       case TEST_PULSE: {
         m_data = std::make_shared<DataWrapper>(GetPulseData);
         m_filter = std::make_unique<LinearDigitalFilter>(
-            LinearDigitalFilter::MovingAverage(m_data, TestBench::kMovAvgTaps));
+            LinearDigitalFilter::MovingAverage(m_data, kMovAvgTaps));
         m_expectedOutput = 0.0;
         break;
       }
@@ -134,8 +142,7 @@ TEST_P(FilterOutputTest, FilterOutput) {
   m_data->Reset();
 
   double filterOutput = 0.0;
-  for (double t = 0.0; t < TestBench::kFilterTime;
-       t += TestBench::kFilterStep) {
+  for (double t = 0.0; t < kFilterTime; t += kFilterStep) {
     filterOutput = m_filter->PIDGet();
   }
 
