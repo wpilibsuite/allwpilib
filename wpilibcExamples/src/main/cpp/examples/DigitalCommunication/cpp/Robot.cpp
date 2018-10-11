@@ -6,8 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/DigitalOutput.h>
-#include <frc/TimedRobot.h>
 #include <frc/DriverStation.h>
+#include <frc/TimedRobot.h>
 
 /**
  * This is a sample program demonstrating how to communicate to a light
