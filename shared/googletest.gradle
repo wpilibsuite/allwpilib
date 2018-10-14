@@ -1,7 +1,7 @@
 model {
     dependencyConfigs {
         googletest(DependencyConfig) {
-            groupId = 'edu.wpi.first.thirdparty.frc2018'
+            groupId = 'edu.wpi.first.thirdparty.frc2019'
             artifactId = 'googletest'
             headerClassifier = 'headers'
             ext = 'zip'
