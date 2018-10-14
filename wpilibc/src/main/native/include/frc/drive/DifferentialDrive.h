@@ -124,9 +124,9 @@ class DifferentialDrive : public RobotDriveBase {
    *                      axis [-1.0..1.0]. Forward is negative.
    * @param zRotation     The rotation rate of the robot around the Z axis
    *                      [-1.0..1.0]. Clockwise is positive.
-   * @param squaredInputs If set, decreases the input sensitivity at low speeds.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
-  void ArcadeDrive(double xSpeed, double zRotation, bool squaredInputs = true);
+  void ArcadeDrive(double xSpeed, double zRotation, bool squareInputs = true);
 
   /**
    * Curvature drive method for differential drive platform.
@@ -152,10 +152,9 @@ class DifferentialDrive : public RobotDriveBase {
    *                      [-1.0..1.0]. Forward is positive.
    * @param rightSpeed    The robot right side's speed along the X axis
    *                      [-1.0..1.0]. Forward is positive.
-   * @param squaredInputs If set, decreases the input sensitivity at low speeds.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
-  void TankDrive(double leftSpeed, double rightSpeed,
-                 bool squaredInputs = true);
+  void TankDrive(double leftSpeed, double rightSpeed, bool squareInputs = true);
 
   /**
    * Sets the QuickStop speed threshold in curvature drive.
