@@ -47,7 +47,7 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   if (*status != 0) return;
 
   if (port < 0 || port > 1) {
-    // Set port out of range error here
+    std::printf("i2c port out of range: %i\n", port);
     return;
   }
 
@@ -89,7 +89,7 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
                            const uint8_t* dataToSend, int32_t sendSize,
                            uint8_t* dataReceived, int32_t receiveSize) {
   if (port < 0 || port > 1) {
-    // Set port out of range error here
+    std::printf("i2c port out of range: %i\n", port);
     return -1;
   }
 
@@ -119,7 +119,7 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
 int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
                      const uint8_t* dataToSend, int32_t sendSize) {
   if (port < 0 || port > 1) {
-    // Set port out of range error here
+    std::printf("i2c port out of range: %i\n", port);
     return -1;
   }
 
@@ -145,7 +145,7 @@ int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
 int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
                     int32_t count) {
   if (port < 0 || port > 1) {
-    // Set port out of range error here
+    std::printf("i2c port out of range: %i\n", port);
     return -1;
   }
 
@@ -170,7 +170,7 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
 
 void HAL_CloseI2C(HAL_I2CPort port) {
   if (port < 0 || port > 1) {
-    // Set port out of range error here
+    std::printf("i2c port out of range: %i\n", port);
     return;
   }
 
