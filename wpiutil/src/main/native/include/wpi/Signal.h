@@ -511,7 +511,7 @@ class SignalBase {
                 // call non blocked, non connected slots
                 if ((*curr)->connected()) {
                     if (!m_base.m_block && !(*curr)->blocked())
-                        (*curr)->operator()(std::forward<A>(a)...);
+                        (*curr)->operator()(a...);
                     prev = curr;
                     curr = (*curr)->next ? &((*curr)->next) : nullptr;
                 }
