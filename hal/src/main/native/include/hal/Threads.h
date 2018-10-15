@@ -7,13 +7,7 @@
 
 #pragma once
 
-#ifdef _WIN32
-#include <windows.h>
-#define NativeThreadHandle const HANDLE*
-#else
-#include <pthread.h>
-#define NativeThreadHandle const pthread_t*
-#endif
+#define NativeThreadHandle const void*
 
 #include "hal/Types.h"
 
