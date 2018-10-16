@@ -88,6 +88,7 @@ jobs:
      vmImage: 'vs2017-win2016'
    steps:
     - powershell: |
+        appverif.exe -logtofile disable
         mkdir build
         $ProgressPreference = 'SilentlyContinue'
         wget "https://download.java.net/java/ga/jdk11/openjdk-11_windows-x64_bin.zip" -O "build\jdk.zip"
@@ -114,6 +115,7 @@ jobs:
      vmImage: 'vs2017-win2016'
    steps:
     - powershell: |
+        appverif.exe -logtofile disable
         mkdir build
         $ProgressPreference = 'SilentlyContinue'
         wget "https://github.com/wpilibsuite/frc-openjdk-windows/releases/download/v11.0.0u28-1/jdk-x86-11.0.0u28-1.zip" -O "build\jdk.zip"
