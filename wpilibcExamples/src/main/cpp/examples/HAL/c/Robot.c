@@ -1,6 +1,13 @@
-#include "hal/HAL.h"
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
 
 #include <stdio.h>
+
+#include "hal/HAL.h"
 
 enum DriverStationMode {
   DisabledMode,
@@ -9,30 +16,30 @@ enum DriverStationMode {
   AutoMode,
 };
 
-enum DriverStationMode getDSMode() {
+enum DriverStationMode getDSMode(void) {
   // Get Robot State
-    HAL_ControlWord word;
-    HAL_GetControlWord(&word);
+  HAL_ControlWord word;
+  HAL_GetControlWord(&word);
 
-    // We send the observes, otherwise the DS disables
-    if (!word.enabled) {
-      HAL_ObserveUserProgramDisabled();
-      return DisabledMode;
+  // We send the observes, otherwise the DS disables
+  if (!word.enabled) {
+    HAL_ObserveUserProgramDisabled();
+    return DisabledMode;
+  } else {
+    if (word.autonomous) {
+      HAL_ObserveUserProgramAutonomous();
+      return AutoMode;
+    } else if (word.test) {
+      HAL_ObserveUserProgramTest();
+      return TestMode;
     } else {
-      if (word.autonomous) {
-        HAL_ObserveUserProgramAutonomous();
-        return AutoMode;
-      } else if (word.test) {
-        HAL_ObserveUserProgramTest();
-        return TestMode;
-      } else {
-        HAL_ObserveUserProgramTeleop();
-        return TeleopMode;
-      }
+      HAL_ObserveUserProgramTeleop();
+      return TeleopMode;
     }
+  }
 }
 
-int main() {
+int main(void) {
   // Must initialize the HAL, 500ms timeout
   HAL_Bool initialized = HAL_Initialize(500, 0);
   if (!initialized) {
