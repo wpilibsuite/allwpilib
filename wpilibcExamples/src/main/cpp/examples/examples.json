@@ -216,5 +216,14 @@
     ],
     "foldername": "PacGoat",
     "gradlebase": "cpp"
+  },
+  {
+    "name": "HAL",
+    "description": "A program created using exclusively the HAL. This is a very advanced example",
+    "tags": [
+      "HAL"
+    ],
+    "foldername": "HAL",
+    "gradlebase": "c"
   }
 ]

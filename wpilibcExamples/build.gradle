@@ -1,6 +1,7 @@
 import org.gradle.language.base.internal.ProjectLayout
 
 apply plugin: 'cpp'
+apply plugin: 'c'
 apply plugin: 'visual-studio'
 apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: ExtraTasks
@@ -104,6 +105,18 @@ model {
                         source {
                             srcDirs 'src/main/cpp/examples/' + "${key}" + "/cpp"
                             include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/main/cpp/examples/' + "${key}" + "/include"
+                            include '**/*.h'
+                        }
+                    }
+                }
+                sources {
+                    c {
+                        source {
+                            srcDirs 'src/main/cpp/examples/' + "${key}" + "/c"
+                            include '**/*.c'
                         }
                         exportedHeaders {
                             srcDirs 'src/main/cpp/examples/' + "${key}" + "/include"
