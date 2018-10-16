@@ -125,7 +125,7 @@ public final class CameraServer {
       }
     }
 
-    return values.toArray(new String[0]);
+    return values.toArray(String[]::new);
   }
 
   @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})

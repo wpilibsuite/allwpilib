@@ -152,7 +152,7 @@ public class SendableChooser<V> extends SendableBase {
       return m_defaultChoice;
     }, null);
     builder.addStringArrayProperty(OPTIONS, () -> {
-      return m_map.keySet().toArray(new String[0]);
+      return m_map.keySet().toArray(String[]::new);
     }, null);
     builder.addStringProperty(ACTIVE, () -> {
       m_mutex.lock();
