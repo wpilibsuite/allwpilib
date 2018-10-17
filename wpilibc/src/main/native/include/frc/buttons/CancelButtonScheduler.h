@@ -23,6 +23,9 @@ class CancelButtonScheduler : public ButtonScheduler {
   CancelButtonScheduler& operator=(CancelButtonScheduler&&) = default;
 
   virtual void Execute();
+
+ private:
+  bool pressedLast;
 };
 
 }  // namespace frc

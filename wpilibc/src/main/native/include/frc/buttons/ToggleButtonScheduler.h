@@ -23,6 +23,9 @@ class ToggleButtonScheduler : public ButtonScheduler {
   ToggleButtonScheduler& operator=(ToggleButtonScheduler&&) = default;
 
   virtual void Execute();
+
+ private:
+  bool pressedLast;
 };
 
 }  // namespace frc
