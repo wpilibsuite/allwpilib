@@ -9,4 +9,12 @@
 
 #include "cscore.h"
 
-int main() { std::cout << cs::GetHostname() << std::endl; }
+int main() {
+  std::cout << cs::GetHostname() << std::endl;
+
+  int32_t status = 0;
+  auto parameter = cs::EnumerateUsbCameras(&status);
+  for (auto&& cam : parameter) {
+    std::cout << cam.name << "\n";
+  }
+}

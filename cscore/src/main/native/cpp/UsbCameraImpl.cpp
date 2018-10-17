@@ -1360,6 +1360,27 @@ void CS_FreeEnumeratedUsbCameras(CS_UsbCameraInfo* cameras, int count) {
 
 }  // extern "C"
 
+#elif defined (_WIN32)
+
+extern "C" {
+
+CS_Source CS_CreateUsbCameraDev(const char* name, int dev, CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
+  return 0;
+}
+
+CS_Source CS_CreateUsbCameraPath(const char* name, const char* path,
+                                 CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
+  return 0;
+}
+
+char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
+  return nullptr;
+}
+}  // extern "C"
+
 #else
 
 extern "C" {

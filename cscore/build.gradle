@@ -33,6 +33,20 @@ ext {
                 }
             }
         }
+        if (it.targetPlatform.operatingSystem.name == 'windows') {
+            it.sources {
+                windowsCpp(CppSourceSet) {
+                    source {
+                        srcDirs = ['src/main/native/windows']
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+
+                    }
+                }
+            }
+        }
     }
 }
 
