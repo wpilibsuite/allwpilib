@@ -12,6 +12,11 @@
 #include <linux/videodev2.h>
 #endif
 
+#ifdef _WIN32
+#include <mfidl.h>
+#include <mfreadwrite.h>
+#endif
+
 #include <atomic>
 #include <memory>
 #include <string>
@@ -30,6 +35,9 @@
 #include "SourceImpl.h"
 #include "UsbCameraBuffer.h"
 #include "UsbCameraProperty.h"
+
+template<typename T>
+using com_unique_ptr = std::unique_ptr<T,void(*)(T*)>;
 
 namespace cs {
 
@@ -145,6 +153,12 @@ class UsbCameraImpl : public SourceImpl {
   bool m_modeSetResolution{false};
   bool m_modeSetFPS{false};
   int m_connectVerbose{1};
+
+#ifdef _WIN32
+  com_unique_ptr<IMFMediaSource> m_mediaSource;
+  com_unique_ptr<IMFSourceReader> m_sourceReader;
+#endif
+
 #ifdef __linux__
   unsigned m_capabilities = 0;
 #endif
@@ -158,6 +172,8 @@ class UsbCameraImpl : public SourceImpl {
   // Path never changes, so not protected by mutex.
   //
   std::string m_path;
+
+  std::wstring m_widePath;
 
 #ifdef __linux__
   std::atomic_int m_fd;

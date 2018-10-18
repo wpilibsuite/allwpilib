@@ -9,6 +9,8 @@
 #include <ks.h>
 #include <ksmedia.h>
 
+#include <iostream>
+
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")
 #pragma comment(lib, "mfuuid.lib")
@@ -17,31 +19,36 @@
 
 namespace cs {
 
-// Storing pointer globally to use from our responce proc
-static WindowsMessagePump* messagePumpStore;
-
-void HandleDeviceChange(HWND, WPARAM, LPARAM) {
-
-}
-
-LRESULT CALLBACK pWndProc(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
-  switch (uiMsg) {
-    case WM_DEVICECHANGE:
-      HandleDeviceChange(hwnd, wParam, lParam);
-      break;
-    HANDLE_MSG(hwnd, WM_CLOSE, [](HWND){ PostQuitMessage(0); });
+static LRESULT CALLBACK pWndProc(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
+  WindowsMessagePump* pumpContainer;
+  if (uiMsg == WM_CREATE) {
+      CREATESTRUCT *pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
+      pumpContainer = reinterpret_cast<WindowsMessagePump*>(pCreate->lpCreateParams);
+      SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)pumpContainer);
+      SetWindowPos(hwnd, HWND_MESSAGE, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+  } else {
+    pumpContainer = reinterpret_cast<WindowsMessagePump*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
   }
-  return DefWindowProc(hwnd, uiMsg, wParam, lParam);
+
+  if (pumpContainer) {
+    pumpContainer->m_callback(hwnd, uiMsg, wParam, lParam);
+  }
+
+  switch (uiMsg) {
+    HANDLE_MSG(hwnd, WM_CLOSE, [](HWND){ PostQuitMessage(0); });
+    default:
+      return DefWindowProc(hwnd, uiMsg, wParam, lParam);
+  }
 }
 
-WindowsMessagePump::WindowsMessagePump() {
-  messagePumpStore = this;
-  mainThread = std::thread([=](){ ThreadMain(); });
+WindowsMessagePump::WindowsMessagePump(std::function<void(HWND, UINT, WPARAM, LPARAM)> callback) {
+  m_callback = callback;
+  m_mainThread = std::thread([=](){ ThreadMain(); });
 }
 
 WindowsMessagePump::~WindowsMessagePump() {
   SendMessage(hwnd, WM_CLOSE, NULL, NULL);
-  if (mainThread.joinable()) mainThread.join();
+  if (m_mainThread.joinable()) m_mainThread.join();
 }
 
 void WindowsMessagePump::ThreadMain() {
@@ -58,7 +65,7 @@ void WindowsMessagePump::ThreadMain() {
   wx.hInstance = current_instance;
   wx.lpszClassName = class_name;
   if (RegisterClassEx(&wx)) {
-    hwnd = CreateWindowEx(0, class_name, "dummy_name", 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, NULL, NULL);
+    hwnd = CreateWindowEx(0, class_name, "dummy_name", 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, NULL, this);
 
     // Register for device notifications
     HDEVNOTIFY  g_hdevnotify = NULL;
@@ -88,11 +95,8 @@ void WindowsMessagePump::ThreadMain() {
 
   MFShutdown();
   CoUninitialize();
-}
 
-WindowsMessagePump& GetMessagePump() {
-  static WindowsMessagePump messagePump;
-  return messagePump;
+  std::cout << "Loop completely dead\n";
 }
 
 }

@@ -2,6 +2,7 @@
 
 #include <thread>
 #include <windows.h>
+#include <functional>
 
 template <class T> void SafeRelease(T **ppT)
 {
@@ -15,14 +16,16 @@ template <class T> void SafeRelease(T **ppT)
 namespace cs {
 class WindowsMessagePump {
  public:
-  WindowsMessagePump();
+  WindowsMessagePump(std::function<void(HWND, UINT, WPARAM, LPARAM)> callback);
   ~WindowsMessagePump();
+
+  HWND hwnd;
+  std::function<void(HWND, UINT, WPARAM, LPARAM)> m_callback;
 
  private:
   void ThreadMain();
-  std::thread mainThread;
-  HWND hwnd;
-};
 
-WindowsMessagePump& GetMessagePump();
+  std::thread m_mainThread;
+
+};
 }
