@@ -169,6 +169,7 @@ void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
 
   HAL_InitAccumulator(gyro->handle, status);
   if (*status != 0) return;
+  std::printf("Callibrating analog gyro for %d seconds.", kCalibrationSampleTime);
   Wait(kCalibrationSampleTime);
 
   int64_t value;
