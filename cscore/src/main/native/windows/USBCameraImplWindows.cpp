@@ -49,6 +49,7 @@
 #pragma comment(lib, "Ole32.lib")
 #pragma comment(lib, "User32.lib")
 #pragma comment(lib, "Mfreadwrite.lib")
+#pragma comment(lib, "Shlwapi.lib")
 
 using namespace cs;
 
@@ -57,8 +58,8 @@ namespace cs {
 class SourceReaderCB : public IMFSourceReaderCallback
 {
 public:
-    SourceReaderCB(HANDLE hEvent) :
-      m_nRefCount(1), m_hEvent(hEvent), m_bEOS(FALSE), m_hrStatus(S_OK)
+    SourceReaderCB(HANDLE hEvent, HWND hwnd, UsbCameraImplWindows* cameraImpl) :
+      m_nRefCount(1), m_hEvent(hEvent), m_bEOS(FALSE), m_hrStatus(S_OK), m_hwnd(hwnd), m_cameraImpl(cameraImpl)
     {
         InitializeCriticalSection(&m_critsec);
     }
@@ -138,6 +139,8 @@ private:
     HANDLE              m_hEvent;
     BOOL                m_bEOS;
     HRESULT             m_hrStatus;
+    HWND                m_hwnd;
+    UsbCameraImplWindows* m_cameraImpl;
 
 };
 
@@ -151,12 +154,17 @@ HRESULT SourceReaderCB::OnReadSample(
 {
     EnterCriticalSection(&m_critsec);
 
+    std::cout << "Sample Read\n";
+
     if (SUCCEEDED(hrStatus))
     {
         if (pSample)
         {
             // Do something with the sample.
             wprintf(L"Frame @ %I64d\n", llTimestamp);
+
+            IMFMediaBuffer* outputBuffer;
+            pSample->ConvertToContiguousBuffer(&outputBuffer);
         }
     }
     else
@@ -174,34 +182,13 @@ HRESULT SourceReaderCB::OnReadSample(
 
     LeaveCriticalSection(&m_critsec);
     SetEvent(m_hEvent);
+    PostMessage(m_hwnd, 4488, 0, 0);
     return S_OK;
-}
-
-static void MediaSourceDeleter(IMFMediaSource* mf) {
-  std::cout << "MainStart\n";
-  if (mf) {
-    mf->Shutdown();
-    mf->Release();
-    mf = NULL;
-  }
-  std::cout << "MainEnd\n";
-}
-
-static void SourceReaderDeleter(IMFSourceReader* mf) {
-  std::cout << (int)mf << " Source deleter start\n";
-
-  if (mf) {
-    mf->Release();
-    mf = NULL;
-  }
-  std::cout << "Source deleter end\n";
 }
 
 UsbCameraImplWindows::UsbCameraImplWindows(const wpi::Twine& name, const wpi::Twine& path)
     : SourceImpl{name},
-      m_path{path.str()},
-      m_mediaSource{nullptr, MediaSourceDeleter},
-      m_sourceReader{nullptr, SourceReaderDeleter} {
+      m_path{path.str()} {
         //std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
@@ -286,28 +273,26 @@ bool UsbCameraImplWindows::CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR *p
 
 void UsbCameraImplWindows::TryConnectCamera() {
   DeviceConnect();
-
-
 }
 
 void UsbCameraImplWindows::DisconnectCamera() {
   if (m_connectVerbose) SINFO("Disconnected from " << m_path);
-  m_mediaSource = com_unique_ptr<IMFMediaSource>{nullptr, MediaSourceDeleter};
-  m_sourceReader = com_unique_ptr<IMFSourceReader>{nullptr, SourceReaderDeleter};
+  SafeRelease(&m_sourceReader);
+  SafeRelease(&m_mediaSource);
   SetConnected(false);
 }
 
 void UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
   switch (uiMsg) {
     case WM_CLOSE:
-      std::cout << "Close called\n";
-      m_mediaSource = com_unique_ptr<IMFMediaSource>{nullptr, MediaSourceDeleter};
-      m_sourceReader = com_unique_ptr<IMFSourceReader>{nullptr, SourceReaderDeleter};
-      //KillTimer(m_messagePump->hwnd, 0);
-      std::cout << "Finished closing in upstra\n";
+      SafeRelease(&m_sourceReader);
+      SafeRelease(&m_mediaSource);
+      SafeRelease(&m_imageCallback);
       break;
     case WM_CREATE:
       // Pump Created and ready to go
+      m_callbackEventHandle = CreateEvent(NULL, FALSE, FALSE, NULL);
+      m_imageCallback = new SourceReaderCB(m_callbackEventHandle, hwnd, this);
       TryConnectCamera();
       break;
     case WM_DEVICECHANGE: {
@@ -324,6 +309,10 @@ void UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM
           }
         }
       }
+      break;
+    case 4488: // New image
+        m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
+            0, NULL, NULL, NULL, NULL);
       break;
     case WM_TIMER:
         // Reconnect timer
@@ -345,12 +334,41 @@ void UsbCameraImplWindows::CameraThreadMain() {
   // std::cout << "Thread Died" << std::endl;
 }
 
-static com_unique_ptr<IMFMediaSource> CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink)
+static IMFSourceReader* CreateSourceReader(IMFMediaSource* mediaSource, IMFSourceReaderCallback* callback) {
+  HRESULT hr = S_OK;
+    IMFAttributes *pAttributes = NULL;
+
+    IMFSourceReader* sourceReader = NULL;
+
+    hr = MFCreateAttributes(&pAttributes, 1);
+    if (FAILED(hr))
+    {
+        goto done;
+    }
+
+    hr = pAttributes->SetUnknown(MF_SOURCE_READER_ASYNC_CALLBACK, callback);
+    if (FAILED(hr))
+    {
+        goto done;
+    }
+
+    hr = pAttributes->SetUINT32(MF_SOURCE_READER_DISCONNECT_MEDIASOURCE_ON_SHUTDOWN, TRUE);
+    if (FAILED(hr))
+    {
+        goto done;
+    }
+
+    hr = MFCreateSourceReaderFromMediaSource(mediaSource, pAttributes, &sourceReader);
+
+done:
+    SafeRelease(&pAttributes);
+    return sourceReader;
+}
+
+static IMFMediaSource* CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink)
 {
     IMFAttributes *pAttributes = NULL;
     IMFMediaSource *pSource = NULL;
-
-    com_unique_ptr<IMFMediaSource> retPtr{nullptr, MediaSourceDeleter};
 
     HRESULT hr = MFCreateAttributes(&pAttributes, 2);
 
@@ -361,8 +379,6 @@ static com_unique_ptr<IMFMediaSource> CreateVideoCaptureDevice(LPCWSTR pszSymbol
             MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
             MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID
             );
-    } else {
-      std::cout << "Failed Create Attributes? " << std::endl;
     }
 
 
@@ -373,26 +389,83 @@ static com_unique_ptr<IMFMediaSource> CreateVideoCaptureDevice(LPCWSTR pszSymbol
             MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK,
             pszSymbolicLink
             );
-    } else {
-      std::cout << "Failed Set String? " << std::endl;
     }
 
     if (SUCCEEDED(hr))
     {
-        IMFMediaSource* mediaSource;
-        hr = MFCreateDeviceSource(pAttributes, &mediaSource);
-        if (SUCCEEDED(hr)) {
-          std::cout << "Successful device source? " << std::endl;
-          retPtr = com_unique_ptr<IMFMediaSource>{mediaSource, MediaSourceDeleter};
-        } else {
-          std::cout << "Failed device source? " << std::endl;
-        }
-    } else {
-      std::cout << "Failed Source? " << std::endl;
+        hr = MFCreateDeviceSource(pAttributes, &pSource);
     }
 
     SafeRelease(&pAttributes);
-    return retPtr;
+    return pSource;
+}
+
+static HRESULT ConfigureDecoder(IMFSourceReader *pReader, DWORD dwStreamIndex)
+{
+    IMFMediaType *pNativeType = NULL;
+    IMFMediaType *pType = NULL;
+
+    // Find the native format of the stream.
+    HRESULT hr = pReader->GetNativeMediaType(dwStreamIndex, 0, &pNativeType);
+    if (FAILED(hr))
+    {
+        return hr;
+    }
+
+    GUID majorType, subtype;
+
+    // Find the major type.
+    hr = pNativeType->GetGUID(MF_MT_MAJOR_TYPE, &majorType);
+    if (FAILED(hr))
+    {
+        goto done;
+    }
+
+    // Define the output type.
+    hr = MFCreateMediaType(&pType);
+    if (FAILED(hr))
+    {
+        goto done;
+    }
+
+    hr = pType->SetGUID(MF_MT_MAJOR_TYPE, majorType);
+    if (FAILED(hr))
+    {
+        goto done;
+    }
+
+    // Select a subtype.
+    if (majorType == MFMediaType_Video)
+    {
+        subtype= MFVideoFormat_RGB24;
+    }
+    else if (majorType == MFMediaType_Audio)
+    {
+        subtype = MFAudioFormat_PCM;
+    }
+    else
+    {
+        // Unrecognized type. Skip.
+        goto done;
+    }
+
+    hr = pType->SetGUID(MF_MT_SUBTYPE, subtype);
+    if (FAILED(hr))
+    {
+        goto done;
+    }
+
+    // Set the uncompressed format.
+    hr = pReader->SetCurrentMediaType(dwStreamIndex, NULL, pType);
+    if (FAILED(hr))
+    {
+        goto done;
+    }
+
+done:
+    SafeRelease(&pNativeType);
+    SafeRelease(&pType);
+    return hr;
 }
 
 bool UsbCameraImplWindows::DeviceConnect() {
@@ -407,17 +480,17 @@ bool UsbCameraImplWindows::DeviceConnect() {
 
   if (!m_mediaSource) return false;
 
-  IMFSourceReader* sourceReader;
+  m_sourceReader = CreateSourceReader(m_mediaSource, m_imageCallback);
 
-  auto res = MFCreateSourceReaderFromMediaSource(m_mediaSource.get(), NULL, &sourceReader);
-
-  if (SUCCEEDED(res)) {
-    m_sourceReader = com_unique_ptr<IMFSourceReader>{sourceReader, SourceReaderDeleter};
-  } else {
-      m_mediaSource = com_unique_ptr<IMFMediaSource>{nullptr, MediaSourceDeleter};
-      m_sourceReader = com_unique_ptr<IMFSourceReader>{nullptr, SourceReaderDeleter};
+  if (!m_sourceReader) {
+    SafeRelease(&m_mediaSource);
     return false;
   }
+
+  ConfigureDecoder(m_sourceReader, MF_SOURCE_READER_FIRST_VIDEO_STREAM);
+
+  m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
+            0, NULL, NULL, NULL, NULL);
 
   SetConnected(true);
   return true;

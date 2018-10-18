@@ -44,9 +44,6 @@
 #include "UsbCameraBuffer.h"
 #include "UsbCameraProperty.h"
 
-template<typename T>
-using com_unique_ptr = std::unique_ptr<T,void(*)(T*)>;
-
 namespace cs {
 
 class UsbCameraImplWindows : public SourceImpl {
@@ -170,8 +167,10 @@ class UsbCameraImplWindows : public SourceImpl {
   int m_connectVerbose{1};
 
 #ifdef _WIN32
-  com_unique_ptr<IMFMediaSource> m_mediaSource;
-  com_unique_ptr<IMFSourceReader> m_sourceReader;
+  IMFMediaSource* m_mediaSource = nullptr;
+  IMFSourceReader* m_sourceReader = nullptr;
+  IMFSourceReaderCallback* m_imageCallback = nullptr;
+  HANDLE m_callbackEventHandle = 0;
   std::unique_ptr<cs::WindowsMessagePump> m_messagePump;
 #endif
 
