@@ -14,6 +14,7 @@
 #include "hal/AnalogAccumulator.h"
 #include "hal/AnalogInput.h"
 #include "hal/handles/IndexedHandleResource.h"
+#include <wpi/raw_ostream.h>
 
 namespace {
 
