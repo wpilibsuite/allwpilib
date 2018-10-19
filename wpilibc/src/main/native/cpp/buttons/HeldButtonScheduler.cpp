@@ -19,7 +19,7 @@ HeldButtonScheduler::HeldButtonScheduler(bool last, Trigger* button,
 void HeldButtonScheduler::Execute() {
   bool pressed = m_button->Grab();
 
-  if (!m_pressedLast && pressed) {
+  if (pressed) {
     m_command->Start();
   } else if (m_pressedLast && !pressed) {
     m_command->Cancel();
