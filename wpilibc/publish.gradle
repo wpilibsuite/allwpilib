@@ -60,15 +60,23 @@ model {
             allTask = createAllCombined(wpilibCTaskList, 'wpilibc', zipBaseName, Zip, project)
         }
 
-
+        def wpilibCTaskListDebug = createComponentZipTasksDebug($.components, 'wpilibc', zipBaseName, Zip, project, includeStandardZipFormat)
+        def allTaskDebug
+        if (!project.hasProperty('jenkinsBuild')) {
+            allTaskDebug = createAllCombinedDebug(wpilibCTaskList, 'wpilibc', zipBaseName, Zip, project)
+        }
 
         publications {
             cpp(MavenPublication) {
                 wpilibCTaskList.each {
                     artifact it
                 }
+                wpilibCTaskListDebug.each {
+                    artifact it
+                }
                 if (!project.hasProperty('jenkinsBuild')) {
                     artifact allTask
+                    artifact allTaskDebug
                 }
                 artifact cppHeadersZip
                 artifact cppSourcesZip

@@ -111,6 +111,7 @@ if (!project.hasProperty('skipAthena')) {
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
                 releaseStripBinaries = true
+                debugStripBinaries = true
                 compilerFamily = 'Gcc'
             }
         }
@@ -151,6 +152,7 @@ if (!project.hasProperty('onlyAthena')) {
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
                 releaseStripBinaries = true
+                debugStripBinaries = true
                 compilerFamily = 'Gcc'
                 detectPlatform = linux64IntelPlatformDetect
             }
@@ -183,6 +185,7 @@ if (project.hasProperty('linuxCross')) {
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
                 releaseStripBinaries = true
+                debugStripBinaries = true
                 skipByDefault = true
                 compilerFamily = 'Gcc'
             }
@@ -200,6 +203,7 @@ if (project.hasProperty('linuxCross')) {
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
                 releaseStripBinaries = true
+                debugStripBinaries = true
                 compilerFamily = 'Gcc'
                 detectPlatform = linuxArmPlatformDetect
             }
@@ -215,21 +219,57 @@ ext.getPlatformPath = { binary ->
     return NativeUtils.getPlatformPath(binary)
 }
 
-ext.createComponentZipTasks = { components, name, base, type, project, func ->
+ext.createComponentZipTasksDebug = { components, name, base, type, project, func ->
     def configMap = [:]
-    def configMapDebug = [:]
     components.each {
         if (it in NativeLibrarySpec && it.name == name) {
             it.binaries.each {
                 if (it.buildType.name == "debug") {
                     def target = getClassifier(it)
-                    if (configMapDebug.containsKey(target)) {
-                        configMapDebug.get(target).add(it)
+                    if (configMap.containsKey(target)) {
+                        configMap.get(target).add(it)
                     } else {
-                        configMapDebug.put(target, [])
-                        configMapDebug.get(target).add(it)
+                        configMap.put(target, [])
+                        configMap.get(target).add(it)
                     }
-                } else {
+                }
+            }
+        }
+    }
+    def taskList = []
+    def outputsFolder = file("$project.buildDir/outputs")
+    configMap.each { key, value ->
+        def task = project.tasks.create(base + "-${key}-debug", type) {
+            description = 'Creates component archive for platform ' + key
+            destinationDir = outputsFolder
+            classifier = key + 'debug'
+            baseName = '_M_' + base
+            duplicatesStrategy = 'exclude'
+
+            from(licenseFile) {
+                into '/'
+            }
+
+            func(it, value)
+        }
+        taskList.add(task)
+
+        project.build.dependsOn task
+
+        project.artifacts {
+            task
+        }
+        addTaskToCopyAllOutputs(task)
+    }
+    return taskList
+}
+
+ext.createComponentZipTasks = { components, name, base, type, project, func ->
+    def configMap = [:]
+    components.each {
+        if (it in NativeLibrarySpec && it.name == name) {
+            it.binaries.each {
+                if (it.buildType.name == "release") {
                     def target = getClassifier(it)
                     if (configMap.containsKey(target)) {
                         configMap.get(target).add(it)
@@ -275,6 +315,31 @@ ext.createAllCombined = { list, name, base, type, project ->
         description = 'Creates component archive for all classifiers'
         destinationDir = outputsFolder
         classifier = 'all'
+        baseName = base
+        duplicatesStrategy = 'exclude'
+
+        list.each {
+            from project.zipTree(it.archivePath)
+            dependsOn it
+        }
+    }
+
+    project.build.dependsOn task
+
+    project.artifacts {
+        task
+    }
+
+    return task
+
+}
+
+ext.createAllCombinedDebug = { list, name, base, type, project ->
+    def outputsFolder = file("$project.buildDir/outputs")
+    def task = project.tasks.create(base + '-all-debug', type) {
+        description = 'Creates component archive for all classifiers'
+        destinationDir = outputsFolder
+        classifier = 'alldebug'
         baseName = base
         duplicatesStrategy = 'exclude'
 

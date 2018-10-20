@@ -56,5 +56,40 @@ class MultiBuilds implements Plugin<Project> {
             buildTypes.create('release')
         }
     }
+
+    @CompileDynamic
+    private static void setBuildableFalseDynamically(NativeBinarySpec binary) {
+        binary.buildable = false
+    }
+
+    @Mutate
+    @CompileStatic
+    void disableReleaseGoogleTest(BinaryContainer binaries, ProjectLayout projectLayout) {
+      def project = (Project) projectLayout.projectIdentifier
+      if (project.hasProperty('testRelease')) {
+        return
+      }
+      binaries.withType(GoogleTestTestSuiteBinarySpec) { oSpec ->
+        GoogleTestTestSuiteBinarySpec spec = (GoogleTestTestSuiteBinarySpec) oSpec
+        if (spec.buildType.name == 'release') {
+          Rules.setBuildableFalseDynamically(spec)
+        }
+      }
+        // def crossCompileConfigs = []
+        // for (BuildConfig config : configs) {
+        //     if (!BuildConfigRulesBase.isCrossCompile(config)) {
+        //         continue
+        //     }
+        //     crossCompileConfigs << config.architecture
+        // }
+        // if (!crossCompileConfigs.empty) {
+        //     binaries.withType(GoogleTestTestSuiteBinarySpec) { oSpec ->
+        //         GoogleTestTestSuiteBinarySpec spec = (GoogleTestTestSuiteBinarySpec) oSpec
+        //         if (crossCompileConfigs.contains(spec.targetPlatform.architecture.name)) {
+        //             setBuildableFalseDynamically(spec)
+        //         }
+        //     }
+        // }
+    }
   }
 }

@@ -56,6 +56,12 @@ model {
             allTask = createAllCombined(lowfiSimTaskList, nativeName, zipBaseName, Zip, project)
         }
 
+        def lowfiSimTaskListDebug = createComponentZipTasksDebug($.components, nativeName, zipBaseName, Zip, project, includeStandardZipFormat)
+        def allTaskDebug
+        if (!project.hasProperty('jenkinsBuild')) {
+            allTaskDebug = createAllCombinedDebug(lowfiSimTaskListDebug, nativeName, zipBaseName, Zip, project)
+        }
+
 
 
         publications {
@@ -64,8 +70,13 @@ model {
                     artifact it
                 }
 
+                lowfiSimTaskListDebug.each {
+                    artifact it
+                }
+
                 if (!project.hasProperty('jenkinsBuild')) {
                     artifact allTask
+                    artifact allTaskDebug
                 }
 
                 artifact cppHeadersZip

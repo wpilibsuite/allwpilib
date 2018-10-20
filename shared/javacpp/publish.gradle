@@ -60,9 +60,19 @@ model {
             allTask = createAllCombined(taskList, nativeName, zipBaseName, Zip, project)
         }
 
+        def taskListDebug = createComponentZipTasksDebug($.components, nativeName, zipBaseName, Zip, project, includeStandardZipFormat)
+
+        def allTaskDebug
+        if (!project.hasProperty('jenkinsBuild')) {
+            allTaskDebug = createAllCombinedDebug(taskListDebug, nativeName, zipBaseName, Zip, project)
+        }
+
         publications {
             cpp(MavenPublication) {
                 taskList.each {
+                    artifact it
+                }
+                taskListDebug.each {
                     artifact it
                 }
                 artifact cppHeadersZip
@@ -70,6 +80,7 @@ model {
 
                 if (!project.hasProperty('jenkinsBuild')) {
                     artifact allTask
+                    artifact allTaskDebug
                 }
 
                 artifactId = "${baseArtifactId}-cpp"

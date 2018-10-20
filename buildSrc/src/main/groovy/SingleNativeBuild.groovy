@@ -79,7 +79,8 @@ class SingleNativeBuild implements Plugin<Project> {
                         }
                         def tmpBaseBin = (NativeBinarySpec) oTmpBaseBin
                         if (tmpBaseBin.targetPlatform.operatingSystem.name == binary.targetPlatform.operatingSystem.name &&
-                                tmpBaseBin.targetPlatform.architecture.name == binary.targetPlatform.architecture.name) {
+                                tmpBaseBin.targetPlatform.architecture.name == binary.targetPlatform.architecture.name &&
+                                tmpBaseBin.buildType == binary.buildType) {
                             baseBin = tmpBaseBin
                         }
                     }
