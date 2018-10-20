@@ -18,6 +18,7 @@
 #endif
 
 #include <atomic>
+#include <ComPtr.h>
 
 #include "WindowsMessagePump.h"
 #include <memory>
@@ -39,6 +40,7 @@
 #include <Dbt.h>
 #include <ks.h>
 #include <ksmedia.h>
+#include <ComCreators.h>
 
 #include "SourceImpl.h"
 #include "UsbCameraBuffer.h"
@@ -143,6 +145,8 @@ class UsbCameraImplWindows : public SourceImpl {
   void DeviceCacheProperties();
   void DeviceCacheVideoModes();
 
+  void ProcessFrame(_ComPtr<IMFSample>& sample);
+
   // Command helper functions
   CS_StatusValue DeviceProcessCommand(std::unique_lock<wpi::mutex>& lock,
                                       const Message& msg);
@@ -166,11 +170,13 @@ class UsbCameraImplWindows : public SourceImpl {
   bool m_modeSetFPS{false};
   int m_connectVerbose{1};
 
+  int m_width;
+  int m_height;
+
 #ifdef _WIN32
   IMFMediaSource* m_mediaSource = nullptr;
   IMFSourceReader* m_sourceReader = nullptr;
-  IMFSourceReaderCallback* m_imageCallback = nullptr;
-  HANDLE m_callbackEventHandle = 0;
+  SourceReaderCB* m_imageCallback = nullptr;
   std::unique_ptr<cs::WindowsMessagePump> m_messagePump;
 #endif
 

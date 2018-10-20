@@ -5,6 +5,7 @@ plugins {
     id 'edu.wpi.first.GradleJni' version '0.3.0'
     id 'edu.wpi.first.GradleVsCode' version '0.4.2'
     id 'idea'
+    id 'visual-studio'
     id 'com.gradle.build-scan' version '1.15.1'
     id 'net.ltgt.errorprone' version '0.6' apply false
 }

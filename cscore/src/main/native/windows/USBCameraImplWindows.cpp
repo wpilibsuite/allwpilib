@@ -9,6 +9,7 @@
 #include "Log.h"
 
 #include "WindowsMessagePump.h"
+#include <ComPtr.h>
 
 #include <shlwapi.h>
 #include <Windows.h>
@@ -29,6 +30,8 @@
 #include "UsbUtil.h"
 #include "c_util.h"
 #include "cscore_cpp.h"
+
+#include "COMCreators.h"
 
 #include <iostream>
 
@@ -51,140 +54,11 @@
 #pragma comment(lib, "Mfreadwrite.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
+const int NewImageMessage = 4488;
+
 using namespace cs;
 
 namespace cs {
-
-class SourceReaderCB : public IMFSourceReaderCallback
-{
-public:
-    SourceReaderCB(HANDLE hEvent, HWND hwnd, UsbCameraImplWindows* cameraImpl) :
-      m_nRefCount(1), m_hEvent(hEvent), m_bEOS(FALSE), m_hrStatus(S_OK), m_hwnd(hwnd), m_cameraImpl(cameraImpl)
-    {
-        InitializeCriticalSection(&m_critsec);
-    }
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID iid, void** ppv)
-    {
-        static const QITAB qit[] =
-        {
-            QITABENT(SourceReaderCB, IMFSourceReaderCallback),
-            { 0 },
-        };
-        return QISearch(this, qit, iid, ppv);
-    }
-    STDMETHODIMP_(ULONG) AddRef()
-    {
-        return InterlockedIncrement(&m_nRefCount);
-    }
-    STDMETHODIMP_(ULONG) Release()
-    {
-        ULONG uCount = InterlockedDecrement(&m_nRefCount);
-        if (uCount == 0)
-        {
-            delete this;
-        }
-        return uCount;
-    }
-
-    // IMFSourceReaderCallback methods
-    STDMETHODIMP OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
-        DWORD dwStreamFlags, LONGLONG llTimestamp, IMFSample *pSample);
-
-    STDMETHODIMP OnEvent(DWORD, IMFMediaEvent *)
-    {
-        return S_OK;
-    }
-
-    STDMETHODIMP OnFlush(DWORD)
-    {
-        return S_OK;
-    }
-
-public:
-    HRESULT Wait(DWORD dwMilliseconds, BOOL *pbEOS)
-    {
-        *pbEOS = FALSE;
-
-        DWORD dwResult = WaitForSingleObject(m_hEvent, dwMilliseconds);
-        if (dwResult == WAIT_TIMEOUT)
-        {
-            return E_PENDING;
-        }
-        else if (dwResult != WAIT_OBJECT_0)
-        {
-            return HRESULT_FROM_WIN32(GetLastError());
-        }
-
-        *pbEOS = m_bEOS;
-        return m_hrStatus;
-    }
-
-private:
-
-    // Destructor is private. Caller should call Release.
-    virtual ~SourceReaderCB()
-    {
-    }
-
-    void NotifyError(HRESULT hr)
-    {
-        wprintf(L"Source Reader error: 0x%X\n", hr);
-    }
-
-private:
-    long                m_nRefCount;        // Reference count.
-    CRITICAL_SECTION    m_critsec;
-    HANDLE              m_hEvent;
-    BOOL                m_bEOS;
-    HRESULT             m_hrStatus;
-    HWND                m_hwnd;
-    UsbCameraImplWindows* m_cameraImpl;
-
-};
-
-HRESULT SourceReaderCB::OnReadSample(
-    HRESULT hrStatus,
-    DWORD /* dwStreamIndex */,
-    DWORD dwStreamFlags,
-    LONGLONG llTimestamp,
-    IMFSample *pSample      // Can be NULL
-    )
-{
-    EnterCriticalSection(&m_critsec);
-
-    std::cout << "Sample Read\n";
-
-    if (SUCCEEDED(hrStatus))
-    {
-        if (pSample)
-        {
-            // Do something with the sample.
-            wprintf(L"Frame @ %I64d\n", llTimestamp);
-
-            IMFMediaBuffer* outputBuffer;
-            pSample->ConvertToContiguousBuffer(&outputBuffer);
-        }
-    }
-    else
-    {
-        // Streaming error.
-        NotifyError(hrStatus);
-    }
-
-    if (MF_SOURCE_READERF_ENDOFSTREAM & dwStreamFlags)
-    {
-        // Reached the end of the stream.
-        m_bEOS = TRUE;
-    }
-    m_hrStatus = hrStatus;
-
-    LeaveCriticalSection(&m_critsec);
-    SetEvent(m_hEvent);
-    PostMessage(m_hwnd, 4488, 0, 0);
-    return S_OK;
-}
 
 UsbCameraImplWindows::UsbCameraImplWindows(const wpi::Twine& name, const wpi::Twine& path)
     : SourceImpl{name},
@@ -282,6 +156,72 @@ void UsbCameraImplWindows::DisconnectCamera() {
   SetConnected(false);
 }
 
+void UsbCameraImplWindows::ProcessFrame(_ComPtr<IMFSample>& videoSample) {
+
+
+    do {
+        if (!videoSample)
+            break;
+
+        _ComPtr<IMFMediaBuffer> buf = NULL;
+
+        if (!SUCCEEDED(videoSample->ConvertToContiguousBuffer(&buf)))
+        {
+            DWORD bcnt = 0;
+            if (!SUCCEEDED(videoSample->GetBufferCount(&bcnt)))
+                break;
+            if (bcnt == 0)
+                break;
+            if (!SUCCEEDED(videoSample->GetBufferByIndex(0, &buf)))
+                break;
+        }
+
+        bool lock2d = false;
+        BYTE* ptr = NULL;
+        LONG pitch = 0;
+        DWORD maxsize = 0, cursize = 0;
+
+        // "For 2-D buffers, the Lock2D method is more efficient than the Lock method"
+        // see IMFMediaBuffer::Lock method documentation: https://msdn.microsoft.com/en-us/library/windows/desktop/bb970366(v=vs.85).aspx
+        _ComPtr<IMF2DBuffer> buffer2d;
+        if (true)
+        {
+            if (SUCCEEDED(buf.As<IMF2DBuffer>(buffer2d)))
+            {
+                if (SUCCEEDED(buffer2d->Lock2D(&ptr, &pitch)))
+                {
+                    lock2d = true;
+                }
+            }
+        }
+        if (ptr == NULL)
+        {
+            if (!SUCCEEDED(buf->Lock(&ptr, &maxsize, &cursize)))
+            {
+                break;
+            }
+        }
+        if (!ptr)
+            break;
+
+        cv::Mat tmpMat;
+        cv::Mat(m_height, m_width, CV_8UC3, ptr, pitch).copyTo(tmpMat);
+        //cv::Mat(m_height, m_width, CV_8UC2, ptr, pitch).copyTo(tmpMat);
+        //cv::Mat inputMat(1, cursize, CV_8UC1, ptr, pitch);
+        std::cout << "Putting frame in code\n";
+        PutFrame(cs::VideoMode::kBGR, m_width, m_height, wpi::StringRef((char*)tmpMat.data, (size_t)(tmpMat.dataend - tmpMat.datastart)), wpi::Now());
+
+        if (lock2d)
+            buffer2d->Unlock2D();
+        else
+            buf->Unlock();
+    }
+    while (0);
+
+
+
+}
+
 void UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
   switch (uiMsg) {
     case WM_CLOSE:
@@ -291,8 +231,7 @@ void UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM
       break;
     case WM_CREATE:
       // Pump Created and ready to go
-      m_callbackEventHandle = CreateEvent(NULL, FALSE, FALSE, NULL);
-      m_imageCallback = new SourceReaderCB(m_callbackEventHandle, hwnd, this);
+      m_imageCallback = CreateSourceReaderCB(hwnd);
       TryConnectCamera();
       break;
     case WM_DEVICECHANGE: {
@@ -310,10 +249,13 @@ void UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM
         }
       }
       break;
-    case 4488: // New image
-        m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-            0, NULL, NULL, NULL, NULL);
-      break;
+    case 4488: {// New image
+            _ComPtr<IMFSample> videoSample = m_imageCallback->GetLatestSample();
+            m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
+                0, NULL, NULL, NULL, NULL);
+            ProcessFrame(videoSample);
+        break;
+        }
     case WM_TIMER:
         // Reconnect timer
         TryConnectCamera();
@@ -334,138 +276,10 @@ void UsbCameraImplWindows::CameraThreadMain() {
   // std::cout << "Thread Died" << std::endl;
 }
 
-static IMFSourceReader* CreateSourceReader(IMFMediaSource* mediaSource, IMFSourceReaderCallback* callback) {
-  HRESULT hr = S_OK;
-    IMFAttributes *pAttributes = NULL;
-
-    IMFSourceReader* sourceReader = NULL;
-
-    hr = MFCreateAttributes(&pAttributes, 1);
-    if (FAILED(hr))
-    {
-        goto done;
-    }
-
-    hr = pAttributes->SetUnknown(MF_SOURCE_READER_ASYNC_CALLBACK, callback);
-    if (FAILED(hr))
-    {
-        goto done;
-    }
-
-    hr = pAttributes->SetUINT32(MF_SOURCE_READER_DISCONNECT_MEDIASOURCE_ON_SHUTDOWN, TRUE);
-    if (FAILED(hr))
-    {
-        goto done;
-    }
-
-    hr = MFCreateSourceReaderFromMediaSource(mediaSource, pAttributes, &sourceReader);
-
-done:
-    SafeRelease(&pAttributes);
-    return sourceReader;
-}
-
-static IMFMediaSource* CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink)
-{
-    IMFAttributes *pAttributes = NULL;
-    IMFMediaSource *pSource = NULL;
-
-    HRESULT hr = MFCreateAttributes(&pAttributes, 2);
-
-    // Set the device type to video.
-    if (SUCCEEDED(hr))
-    {
-        hr = pAttributes->SetGUID(
-            MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
-            MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID
-            );
-    }
-
-
-    // Set the symbolic link.
-    if (SUCCEEDED(hr))
-    {
-        hr = pAttributes->SetString(
-            MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK,
-            pszSymbolicLink
-            );
-    }
-
-    if (SUCCEEDED(hr))
-    {
-        hr = MFCreateDeviceSource(pAttributes, &pSource);
-    }
-
-    SafeRelease(&pAttributes);
-    return pSource;
-}
-
-static HRESULT ConfigureDecoder(IMFSourceReader *pReader, DWORD dwStreamIndex)
-{
-    IMFMediaType *pNativeType = NULL;
-    IMFMediaType *pType = NULL;
-
-    // Find the native format of the stream.
-    HRESULT hr = pReader->GetNativeMediaType(dwStreamIndex, 0, &pNativeType);
-    if (FAILED(hr))
-    {
-        return hr;
-    }
-
-    GUID majorType, subtype;
-
-    // Find the major type.
-    hr = pNativeType->GetGUID(MF_MT_MAJOR_TYPE, &majorType);
-    if (FAILED(hr))
-    {
-        goto done;
-    }
-
-    // Define the output type.
-    hr = MFCreateMediaType(&pType);
-    if (FAILED(hr))
-    {
-        goto done;
-    }
-
-    hr = pType->SetGUID(MF_MT_MAJOR_TYPE, majorType);
-    if (FAILED(hr))
-    {
-        goto done;
-    }
-
-    // Select a subtype.
-    if (majorType == MFMediaType_Video)
-    {
-        subtype= MFVideoFormat_RGB24;
-    }
-    else if (majorType == MFMediaType_Audio)
-    {
-        subtype = MFAudioFormat_PCM;
-    }
-    else
-    {
-        // Unrecognized type. Skip.
-        goto done;
-    }
-
-    hr = pType->SetGUID(MF_MT_SUBTYPE, subtype);
-    if (FAILED(hr))
-    {
-        goto done;
-    }
-
-    // Set the uncompressed format.
-    hr = pReader->SetCurrentMediaType(dwStreamIndex, NULL, pType);
-    if (FAILED(hr))
-    {
-        goto done;
-    }
-
-done:
-    SafeRelease(&pNativeType);
-    SafeRelease(&pType);
-    return hr;
+static std::string guidToString(GUID guid) {
+    std::array<char,40> output;
+    snprintf(output.data(), output.size(), "{%08X-%04hX-%04hX-%02X%02X-%02X%02X%02X%02X%02X%02X}", guid.Data1, guid.Data2, guid.Data3, guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3], guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
+    return std::string(output.data());
 }
 
 bool UsbCameraImplWindows::DeviceConnect() {
@@ -478,6 +292,7 @@ bool UsbCameraImplWindows::DeviceConnect() {
   const wchar_t* path = m_widePath.c_str();
   m_mediaSource = CreateVideoCaptureDevice(path);
 
+
   if (!m_mediaSource) return false;
 
   m_sourceReader = CreateSourceReader(m_mediaSource, m_imageCallback);
@@ -487,7 +302,51 @@ bool UsbCameraImplWindows::DeviceConnect() {
     return false;
   }
 
-  ConfigureDecoder(m_sourceReader, MF_SOURCE_READER_FIRST_VIDEO_STREAM);
+  m_width = 0;
+  m_height = 0;
+
+  {
+    IMFMediaType* nativeTypeSelected = NULL;
+    int count = 0;
+    while (true) {
+        auto hr = m_sourceReader->GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, count, &nativeTypeSelected);
+        if (FAILED(hr)) {
+            break;
+        }
+          GUID nativeGuid2 = {0};
+    nativeTypeSelected->GetGUID(MF_MT_SUBTYPE, &nativeGuid2);
+
+    std::cout << guidToString(nativeGuid2) << "\n";
+        nativeTypeSelected->Release();
+        count++;
+    }
+  }
+
+  IMFMediaType* nativeType = NULL;
+
+  m_sourceReader->GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, MF_SOURCE_READER_CURRENT_TYPE_INDEX, &nativeType);
+
+  GUID nativeGuid = {0};
+    nativeType->GetGUID(MF_MT_SUBTYPE, &nativeGuid);
+
+    GUID subtype;
+
+    subtype = MFVideoFormat_RGB24;
+    //subtype = MFVideoFormat_YUY2;
+
+    nativeType->SetGUID(MF_MT_SUBTYPE, subtype);
+
+    std::cout << guidToString(nativeGuid) << "\n";
+
+  UINT32 width, height;
+  ::MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &width, &height);
+
+  m_width = width;
+  m_height = height;
+
+  std::cout << (int)m_sourceReader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, NULL, nativeType) << "\n";
+
+  //std::cout << (int)ConfigureDecoder(m_sourceReader, MF_SOURCE_READER_FIRST_VIDEO_STREAM) << "\n";
 
   m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
             0, NULL, NULL, NULL, NULL);
