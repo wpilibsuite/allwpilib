@@ -52,6 +52,7 @@ jar {
 model {
     components {
         myRobotCpp(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
             baseName = 'FRCUserProgram'
             sources {
                 cpp {
@@ -75,6 +76,7 @@ model {
             }
         }
         myRobotCppStatic(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
             baseName = 'FRCUserProgram'
             sources {
                 cpp {

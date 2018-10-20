@@ -64,6 +64,7 @@ model {
         // By default, a development executable will be generated. This is to help the case of
         // testing specific functionality of the library.
         "${nativeName}Dev"(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
             sources {
                 cpp {
                     source {

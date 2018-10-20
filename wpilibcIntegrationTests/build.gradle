@@ -30,6 +30,7 @@ apply from: "${rootDir}/shared/nilibraries.gradle"
 model {
     components {
         wpilibcIntegrationTests(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
             baseName = 'FRCUserProgram'
             binaries.all { binary ->
                 if (binary.targetPlatform.architecture.name == 'athena') {

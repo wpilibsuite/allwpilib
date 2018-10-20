@@ -96,6 +96,7 @@ apply from: "${rootDir}/shared/opencv.gradle"
 model {
     components {
         wpilibjDev(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
             sources {
                 cpp {
                     source {

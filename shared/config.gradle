@@ -217,15 +217,26 @@ ext.getPlatformPath = { binary ->
 
 ext.createComponentZipTasks = { components, name, base, type, project, func ->
     def configMap = [:]
+    def configMapDebug = [:]
     components.each {
         if (it in NativeLibrarySpec && it.name == name) {
             it.binaries.each {
-                def target = getClassifier(it)
-                if (configMap.containsKey(target)) {
-                    configMap.get(target).add(it)
+                if (it.buildType.name == "debug") {
+                    def target = getClassifier(it)
+                    if (configMapDebug.containsKey(target)) {
+                        configMapDebug.get(target).add(it)
+                    } else {
+                        configMapDebug.put(target, [])
+                        configMapDebug.get(target).add(it)
+                    }
                 } else {
-                    configMap.put(target, [])
-                    configMap.get(target).add(it)
+                    def target = getClassifier(it)
+                    if (configMap.containsKey(target)) {
+                        configMap.get(target).add(it)
+                    } else {
+                        configMap.put(target, [])
+                        configMap.get(target).add(it)
+                    }
                 }
             }
         }

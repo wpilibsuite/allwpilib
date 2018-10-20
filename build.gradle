@@ -77,6 +77,12 @@ subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
 
+    def subproj = it
+
+    plugins.withType(NativeComponentPlugin) {
+        subproj.apply plugin: MultiBuilds
+    }
+
     apply from: "${rootDir}/shared/java/javastyle.gradle"
 
     repositories {
