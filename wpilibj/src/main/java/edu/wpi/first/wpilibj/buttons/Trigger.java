@@ -83,7 +83,7 @@ public abstract class Trigger extends SendableBase {
       public void execute() {
         boolean pressed = grab();
 
-        if (!m_pressedLast && pressed) {
+        if (pressed) {
           command.start();
         } else if (m_pressedLast && !pressed) {
           command.cancel();
