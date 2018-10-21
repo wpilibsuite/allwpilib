@@ -13,7 +13,7 @@
 namespace frc {
 class POVButton : public Button {
  public:
-  POVButton(GenericHID &joystick, int angle, int povNumber);
+  POVButton(GenericHID& joystick, int angle, int povNumber);
   virtual ~POVButton() = default;
 
   POVButton(POVButton&&);
@@ -24,6 +24,6 @@ class POVButton : public Button {
  private:
   int m_angle;
   int m_povNumber;
-  GenericHID &m_joystick;
+  GenericHID& m_joystick;
 };
-} // namespace frc
+}  // namespace frc
