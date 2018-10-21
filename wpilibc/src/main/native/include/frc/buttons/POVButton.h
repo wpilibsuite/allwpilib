@@ -12,18 +12,18 @@
 
 namespace frc {
 class POVButton : public Button {
-
  public:
-  POVButton(GenericHID* joystick, int angle, int povNumber);
+  POVButton(GenericHID &joystick, int angle, int povNumber);
   virtual ~POVButton() = default;
 
-  POVButton(POVButton&&) = default;
+  POVButton(POVButton&&);
   POVButton& operator=(POVButton&&) = default;
 
-  virtual bool Get();
+  bool Get() override;
+
  private:
   int m_angle;
   int m_povNumber;
-  GenericHID* m_joystick;
+  GenericHID &m_joystick;
 };
-}
+} // namespace frc
