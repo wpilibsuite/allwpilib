@@ -13,17 +13,24 @@
 namespace frc {
 class POVButton : public Button {
  public:
-  POVButton(GenericHID& joystick, int angle, int povNumber);
+  /**
+   * Creates a POV button for triggering commands.
+   *
+   * @param joystick The GenericHID object that has the POV
+   * @param angle The desired angle (e.g. 90, 270)
+   * @param povNumber The POV number (@see GenericHID#GetPOV)
+   */
+  POVButton(GenericHID& joystick, int angle, int povNumber = 0);
   virtual ~POVButton() = default;
 
-  POVButton(POVButton&&);
+  POVButton(POVButton&&) = default;
   POVButton& operator=(POVButton&&) = default;
 
   bool Get() override;
 
  private:
-  int m_angle;
+  GenericHID* m_joystick;
   int m_povNumber;
-  GenericHID& m_joystick;
+  int m_angle;
 };
 }  // namespace frc
