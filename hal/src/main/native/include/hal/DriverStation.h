@@ -9,9 +9,8 @@
 
 #include <stdint.h>
 
-#include "hal/Types.h"
-
 #include "hal/DriverStationTypes.h"
+#include "hal/Types.h"
 
 /**
  * @defgroup hal_driverstation Driver Station Functions

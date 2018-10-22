@@ -9,9 +9,8 @@
 
 #include <stdint.h>
 
-#include "hal/Types.h"
-
 #include "hal/I2CTypes.h"
+#include "hal/Types.h"
 
 /**
  * @defgroup hal_i2c I2C Functions

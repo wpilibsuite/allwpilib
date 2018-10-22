@@ -9,9 +9,8 @@
 
 #include <stdint.h>
 
-#include "hal/Types.h"
-
 #include "hal/CANAPITypes.h"
+#include "hal/Types.h"
 
 /**
  * @defgroup hal_canapi CAN API Functions
