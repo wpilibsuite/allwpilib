@@ -63,7 +63,7 @@ HRESULT SourceReaderCB::OnReadSample(
     m_hrStatus = hrStatus;
 
     LeaveCriticalSection(&m_critsec);
-    PostMessage(m_hwnd, 4488, 0, 0);
+    PostMessage(m_hwnd, 0x0400 + 4488, 0, 0);
     return S_OK;
 }
 

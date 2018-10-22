@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "Log.h"
+#include <math.h>
 
 #include "WindowsMessagePump.h"
 #include <ComPtr.h>
@@ -46,6 +47,8 @@
 #include <ks.h>
 #include <ksmedia.h>
 
+#include "GUIDName.h"
+
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")
 #pragma comment(lib, "mfuuid.lib")
@@ -54,7 +57,8 @@
 #pragma comment(lib, "Mfreadwrite.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
-const int NewImageMessage = 4488;
+const int NewImageMessage = 0x0400 + 4488;
+const int SetCameraMessage = 0x0400 + 254;
 
 using namespace cs;
 
@@ -66,6 +70,12 @@ UsbCameraImplWindows::UsbCameraImplWindows(const wpi::Twine& name, const wpi::Tw
         //std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
+}
+
+UsbCameraImplWindows::UsbCameraImplWindows(const wpi::Twine& name, int deviceId)
+    : SourceImpl{name},
+      m_deviceId(deviceId) {
+
 }
 
 UsbCameraImplWindows::~UsbCameraImplWindows() {
@@ -92,7 +102,16 @@ void UsbCameraImplWindows::SetExposureAuto(CS_Status* status) {}
 void UsbCameraImplWindows::SetExposureHoldCurrent(CS_Status* status) {}
 void UsbCameraImplWindows::SetExposureManual(int value, CS_Status* status) {}
 
-bool UsbCameraImplWindows::SetVideoMode(const VideoMode& mode, CS_Status* status) { return true; }
+bool UsbCameraImplWindows::SetVideoMode(const VideoMode& mode, CS_Status* status) {
+  Message msg{Message::kCmdSetMode};
+  msg.data[0] = mode.pixelFormat;
+  msg.data[1] = mode.width;
+  msg.data[2] = mode.height;
+  msg.data[3] = mode.fps;
+  std::cout << "Posting Message\n";
+  SendMessage(m_messagePump->hwnd, SetCameraMessage, NULL, reinterpret_cast<LPARAM>(&msg));
+  return true;
+ }
 bool UsbCameraImplWindows::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
                     CS_Status* status) {return true;}
 bool UsbCameraImplWindows::SetResolution(int width, int height, CS_Status* status) { return true; }
@@ -205,11 +224,35 @@ void UsbCameraImplWindows::ProcessFrame(_ComPtr<IMFSample>& videoSample) {
             break;
 
         cv::Mat tmpMat;
-        cv::Mat(m_height, m_width, CV_8UC3, ptr, pitch).copyTo(tmpMat);
+
+        switch (m_pixelFormat) {
+          case cs::VideoMode::PixelFormat::kMJPEG:
+            // cv::Mat(m_height, m_width, CV_8UC3, ptr, pitch).copyTo(tmpMat);
+            //Special case
+            //PutFrame(m_pixelFormat, m_width, m_height, )
+            goto end;
+            break;
+          case cs::VideoMode::PixelFormat::kGray:
+            cv::Mat(m_height, m_width, CV_8UC1, ptr, pitch).copyTo(tmpMat);
+            break;
+          case cs::VideoMode::PixelFormat::kBGR:
+            cv::Mat(m_height, m_width, CV_8UC3, ptr, pitch).copyTo(tmpMat);
+            break;
+          case cs::VideoMode::PixelFormat::kYUYV:
+            cv::Mat(m_height, m_width, CV_8UC2, ptr, pitch).copyTo(tmpMat);
+            break;
+          default:
+            std::cout << "default case\n";
+            goto end;
+            break;
+        }
+
         //cv::Mat(m_height, m_width, CV_8UC2, ptr, pitch).copyTo(tmpMat);
         //cv::Mat inputMat(1, cursize, CV_8UC1, ptr, pitch);
         std::cout << "Putting frame in code\n";
-        PutFrame(cs::VideoMode::kBGR, m_width, m_height, wpi::StringRef((char*)tmpMat.data, (size_t)(tmpMat.dataend - tmpMat.datastart)), wpi::Now());
+        PutFrame(m_pixelFormat, m_width, m_height, wpi::StringRef((char*)tmpMat.data, (size_t)(tmpMat.dataend - tmpMat.datastart)), wpi::Now());
+
+        end:
 
         if (lock2d)
             buffer2d->Unlock2D();
@@ -237,10 +280,28 @@ void UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM
     case WM_DEVICECHANGE: {
         // Device potentially changed
         PDEV_BROADCAST_HDR parameter = reinterpret_cast<PDEV_BROADCAST_HDR>(lParam);
+        // Check if we're waiting on a device path, and this is a connection
+        if (m_path.empty() && wParam == DBT_DEVICEARRIVAL &&
+            parameter->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
+          // If path is empty, we attempted to connect with a device ID. Enumerate and check
+          CS_Status status = 0;
+          auto devices = cs::EnumerateUsbCameras(&status);
+          if (devices.size() > m_deviceId) {
+            // If has device ID, use the device ID from the event
+            // because of windows bug
+            auto&& device = devices[m_deviceId];
+            DEV_BROADCAST_DEVICEINTERFACE *pDi = (DEV_BROADCAST_DEVICEINTERFACE*)parameter;
+            m_path = pDi->dbcc_name;
+            std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
+            m_widePath = utf8_conv.from_bytes(m_path.c_str());
+          } else {
+            // This device not found
+            break;
+          }
+        }
         bool connected = false;
         if (CheckDeviceChange(wParam, parameter, &connected)) {
           if (connected) {
-            // Connected
             TryConnectCamera();
           } else {
             // Disconnected
@@ -249,13 +310,17 @@ void UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM
         }
       }
       break;
-    case 4488: {// New image
+    case NewImageMessage: {// New image
             _ComPtr<IMFSample> videoSample = m_imageCallback->GetLatestSample();
             m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
                 0, NULL, NULL, NULL, NULL);
             ProcessFrame(videoSample);
         break;
         }
+    case SetCameraMessage: {
+      std::cout << "Set Camera Message" << std::endl;
+      break;
+    }
     case WM_TIMER:
         // Reconnect timer
         TryConnectCamera();
@@ -282,6 +347,24 @@ static std::string guidToString(GUID guid) {
     return std::string(output.data());
 }
 
+static cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
+  wpi::StringRef guidRef = cs::GetGUIDNameConstNew(guid);
+  // Compare GUID to one of the supported ones
+  if (guidRef.equals("MFVideoFormat_NV12")) {
+    // GrayScale
+    return cs::VideoMode::PixelFormat::kGray;
+  } else if (guidRef.equals("MFVideoFormat_YUY2")) {
+    return cs::VideoMode::PixelFormat::kYUYV;
+  } else if (guidRef.equals("MFVideoFormat_RGB24")) {
+    return cs::VideoMode::PixelFormat::kBGR;
+  } else if (guidRef.equals("MFVideoFormat_MJPG")) {
+    return cs::VideoMode::PixelFormat::kMJPEG;
+  } else {
+    std::cout << guidRef << std::endl;
+    return cs::VideoMode::PixelFormat::kUnknown;
+  }
+}
+
 bool UsbCameraImplWindows::DeviceConnect() {
   if (m_mediaSource && m_sourceReader) return true;
 
@@ -305,44 +388,54 @@ bool UsbCameraImplWindows::DeviceConnect() {
   m_width = 0;
   m_height = 0;
 
-  {
-    IMFMediaType* nativeTypeSelected = NULL;
-    int count = 0;
-    while (true) {
-        auto hr = m_sourceReader->GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, count, &nativeTypeSelected);
-        if (FAILED(hr)) {
-            break;
-        }
-          GUID nativeGuid2 = {0};
-    nativeTypeSelected->GetGUID(MF_MT_SUBTYPE, &nativeGuid2);
-
-    std::cout << guidToString(nativeGuid2) << "\n";
-        nativeTypeSelected->Release();
-        count++;
-    }
-  }
+  // Enumerate Known Modes
+  DeviceCacheVideoModes();
 
   IMFMediaType* nativeType = NULL;
-
+  // Get the default media type of the camera
   m_sourceReader->GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, MF_SOURCE_READER_CURRENT_TYPE_INDEX, &nativeType);
 
   GUID nativeGuid = {0};
-    nativeType->GetGUID(MF_MT_SUBTYPE, &nativeGuid);
+  nativeType->GetGUID(MF_MT_SUBTYPE, &nativeGuid);
+  wpi::StringRef guidRef = cs::GetGUIDNameConstNew(nativeGuid);
 
-    GUID subtype;
+  // Compare GUID to one of the supported ones
+  if (guidRef.equals("MFVideoFormat_NV12")) {
+    // GrayScale
+    m_pixelFormat = cs::VideoMode::PixelFormat::kGray;
+    std::cout << "NV12\n";
+  } else if (guidRef.equals("MFVideoFormat_YUY2")) {
+    m_pixelFormat = cs::VideoMode::PixelFormat::kYUYV;
+    std::cout << "YUY2\n";
+  } else if (guidRef.equals("MFVideoFormat_RGB24")) {
+    m_pixelFormat = cs::VideoMode::PixelFormat::kBGR;
+    std::cout << "RGB24\n";
+  } else if (guidRef.equals("MFVideoFormat_MJPG")) {
+    m_pixelFormat = cs::VideoMode::PixelFormat::kMJPEG;
+    std::cout << "MJEPG\n";
+  } else {
+    // TODO: Search and find the first available GUID
+    std::cout << "Unknown\n";
+  }
 
-    subtype = MFVideoFormat_RGB24;
+    //GUID subtype;
+
+    std::cout << cs::GetGUIDNameConstNew(nativeGuid) << std::endl;
+
+    //subtype = MFVideoFormat_RGB24;
     //subtype = MFVideoFormat_YUY2;
 
-    nativeType->SetGUID(MF_MT_SUBTYPE, subtype);
+    //nativeType->SetGUID(MF_MT_SUBTYPE, subtype);
 
-    std::cout << guidToString(nativeGuid) << "\n";
+    //std::cout << guidToString(nativeGuid) << "\n";
 
   UINT32 width, height;
   ::MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &width, &height);
 
   m_width = width;
   m_height = height;
+
+  std::cout << "width: " << width << " height: " << height << "\n";
 
   std::cout << (int)m_sourceReader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, NULL, nativeType) << "\n";
 
@@ -362,6 +455,48 @@ std::unique_ptr<PropertyImpl> UsbCameraImplWindows::CreateEmptyProperty(
 
 bool UsbCameraImplWindows::CacheProperties(CS_Status* status) const {
   return true;
+}
+
+void UsbCameraImplWindows::DeviceCacheVideoModes() {
+  std::vector<VideoMode> modes;
+
+
+    IMFMediaType* nativeType = NULL;
+    int count = 0;
+    while (true) {
+        auto hr = m_sourceReader->GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, count, &nativeType);
+        if (FAILED(hr)) {
+          break;
+        }
+          GUID guid = {0};
+          nativeType->GetGUID(MF_MT_SUBTYPE, &guid);
+
+        //auto name = cs::GetGUIDNameConstNew(guid);
+        auto format = GetFromGUID(guid);
+        UINT32 width, height;
+        ::MFGetAttributeSize(nativeType, MF_MT_FRAME_SIZE, &width, &height);
+
+        UINT32 num, dom;
+        ::MFGetAttributeRatio(nativeType, MF_MT_FRAME_RATE, &num, &dom);
+
+        int fps = 30;
+
+        if (dom != 0) {
+          fps = ceil(num / (double)dom);
+        }
+
+        modes.emplace_back(format, static_cast<int>(width), static_cast<int>(height), fps);
+
+        nativeType->Release();
+        count++;
+    }
+
+    {
+      std::lock_guard<wpi::mutex> lock(m_mutex);
+      m_videoModes.swap(modes);
+    }
+    Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
+
 }
 
 
@@ -435,14 +570,18 @@ done:
 
 CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
                              CS_Status* status) {
-
-  auto devices = EnumerateUsbCameras(status);
+  // First check if device exists
+  auto devices = cs::EnumerateUsbCameras(status);
   if (devices.size() > dev) {
     return CreateUsbCameraPath(name, devices[dev].path, status);
-  } else {
-    // Error
-    return CS_INVALID_HANDLE;
   }
+  auto source = std::make_shared<UsbCameraImplWindows>(name, dev);
+  auto handle = Sources::GetInstance().Allocate(CS_SOURCE_USB, source);
+  Notifier::GetInstance().NotifySource(name, handle, CS_SOURCE_CREATED);
+  // Start thread after the source created event to ensure other events
+  // come after it.
+  source->Start();
+  return handle;
 }
 
 CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,

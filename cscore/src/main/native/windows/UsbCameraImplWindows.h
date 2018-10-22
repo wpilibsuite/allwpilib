@@ -51,6 +51,7 @@ namespace cs {
 class UsbCameraImplWindows : public SourceImpl {
  public:
   UsbCameraImplWindows(const wpi::Twine& name, const wpi::Twine& path);
+  UsbCameraImplWindows(const wpi::Twine& name, int deviceId);
   ~UsbCameraImplWindows() override;
 
   void Start();
@@ -172,12 +173,14 @@ class UsbCameraImplWindows : public SourceImpl {
 
   int m_width;
   int m_height;
+  cs::VideoMode::PixelFormat m_pixelFormat;
 
 #ifdef _WIN32
   IMFMediaSource* m_mediaSource = nullptr;
   IMFSourceReader* m_sourceReader = nullptr;
   SourceReaderCB* m_imageCallback = nullptr;
   std::unique_ptr<cs::WindowsMessagePump> m_messagePump;
+
 #endif
 
 #ifdef __linux__
@@ -195,6 +198,7 @@ class UsbCameraImplWindows : public SourceImpl {
   std::string m_path;
 
   std::wstring m_widePath;
+  int m_deviceId;
 
 #ifdef __linux__
   std::atomic_int m_fd;
