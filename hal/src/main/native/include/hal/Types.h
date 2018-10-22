@@ -63,3 +63,4 @@ typedef int32_t HAL_Bool;
   enum name
 #endif
 /** @} */
+
