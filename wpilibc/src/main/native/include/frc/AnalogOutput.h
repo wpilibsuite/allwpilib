@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <hal/AnalogOutput.h>
-
 #include "frc/ErrorBase.h"
 #include "frc/smartdashboard/SendableBase.h"
 

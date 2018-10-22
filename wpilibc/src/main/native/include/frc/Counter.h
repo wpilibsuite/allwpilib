@@ -9,7 +9,6 @@
 
 #include <memory>
 
-#include <hal/Counter.h>
 #include <hal/Types.h>
 
 #include "frc/AnalogTrigger.h"

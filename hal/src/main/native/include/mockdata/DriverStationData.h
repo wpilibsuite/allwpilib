@@ -11,7 +11,7 @@
 
 #include "NotifyListener.h"
 #include "hal/DriverStation.h"
-#include "hal/HAL.h"
+#include "hal/Types.h"
 
 #ifdef __cplusplus
 extern "C" {

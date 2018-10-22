@@ -23,6 +23,17 @@
 
 using namespace frc;
 
+int frc::RunHALInitialization() {
+  if (!HAL_Initialize(500, 0)) {
+    wpi::errs() << "FATAL ERROR: HAL could not be initialized\n";
+    return -1;
+  }
+  HAL_Report(HALUsageReporting::kResourceType_Language,
+             HALUsageReporting::kLanguage_CPlusPlus);
+  wpi::outs() << "\n********** Robot program starting **********\n";
+  return 0;
+}
+
 std::thread::id RobotBase::m_threadId;
 
 namespace {
