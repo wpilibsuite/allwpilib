@@ -30,20 +30,32 @@ static LRESULT CALLBACK pWndProc(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lP
     pumpContainer = reinterpret_cast<WindowsMessagePump*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
   }
 
+  bool hasCalledBack = false;
+  LRESULT result;
+
   if (pumpContainer) {
-    pumpContainer->m_callback(hwnd, uiMsg, wParam, lParam);
+    hasCalledBack = true;
+    result = pumpContainer->m_callback(hwnd, uiMsg, wParam, lParam);
   }
 
   switch (uiMsg) {
     HANDLE_MSG(hwnd, WM_CLOSE, [](HWND){ PostQuitMessage(0); });
     default:
+      if (hasCalledBack) {
+        return result;
+      }
       return DefWindowProc(hwnd, uiMsg, wParam, lParam);
   }
 }
 
-WindowsMessagePump::WindowsMessagePump(std::function<void(HWND, UINT, WPARAM, LPARAM)> callback) {
+WindowsMessagePump::WindowsMessagePump(std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> callback) {
   m_callback = callback;
-  m_mainThread = std::thread([=](){ ThreadMain(); });
+  auto handle = CreateEvent(NULL, true, false, NULL);
+  m_mainThread = std::thread([=](){ ThreadMain(handle); });
+  auto waitResult = WaitForSingleObject(handle, 1000);
+  if (waitResult == WAIT_OBJECT_0) {
+    CloseHandle(handle);
+  }
 }
 
 WindowsMessagePump::~WindowsMessagePump() {
@@ -51,7 +63,7 @@ WindowsMessagePump::~WindowsMessagePump() {
   if (m_mainThread.joinable()) m_mainThread.join();
 }
 
-void WindowsMessagePump::ThreadMain() {
+void WindowsMessagePump::ThreadMain(HANDLE eventHandle) {
   // Initialize COM
   CoInitializeEx(0, COINIT_MULTITHREADED);
   // Initialize MF
@@ -81,6 +93,8 @@ void WindowsMessagePump::ThreadMain() {
       DEVICE_NOTIFY_WINDOW_HANDLE
     );
 
+    SetEvent(eventHandle);
+
 
     MSG Msg;
     while (GetMessage(&Msg, NULL, 0, 0) > 0)
@@ -91,6 +105,8 @@ void WindowsMessagePump::ThreadMain() {
     UnregisterDeviceNotification(g_hdevnotify);
     UnregisterClass(class_name, current_instance);
 
+  } else {
+    SetEvent(eventHandle);
   }
 
   MFShutdown();

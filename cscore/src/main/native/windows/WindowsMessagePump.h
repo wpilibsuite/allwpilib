@@ -16,14 +16,14 @@ template <class T> void SafeRelease(T **ppT)
 namespace cs {
 class WindowsMessagePump {
  public:
-  WindowsMessagePump(std::function<void(HWND, UINT, WPARAM, LPARAM)> callback);
+  WindowsMessagePump(std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> callback);
   ~WindowsMessagePump();
 
   HWND hwnd;
-  std::function<void(HWND, UINT, WPARAM, LPARAM)> m_callback;
+  std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> m_callback;
 
  private:
-  void ThreadMain();
+  void ThreadMain(HANDLE eventHandle);
 
   std::thread m_mainThread;
 

@@ -126,7 +126,7 @@ class UsbCameraImplWindows : public SourceImpl {
   // The camera processing thread
   void CameraThreadMain();
 
-  void PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
+  LRESULT PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 
   bool CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR *pHdr, bool* connected);
 
@@ -138,7 +138,6 @@ class UsbCameraImplWindows : public SourceImpl {
   bool DeviceConnect();
   bool DeviceStreamOn();
   bool DeviceStreamOff();
-  void DeviceProcessCommands();
   void DeviceSetMode();
   void DeviceSetFPS();
   void DeviceCacheMode();
@@ -170,10 +169,6 @@ class UsbCameraImplWindows : public SourceImpl {
   bool m_modeSetResolution{false};
   bool m_modeSetFPS{false};
   int m_connectVerbose{1};
-
-  int m_width;
-  int m_height;
-  cs::VideoMode::PixelFormat m_pixelFormat;
 
 #ifdef _WIN32
   IMFMediaSource* m_mediaSource = nullptr;

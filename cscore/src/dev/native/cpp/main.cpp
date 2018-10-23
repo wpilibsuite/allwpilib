@@ -23,15 +23,15 @@ int main() {
 
   //auto handle = cs::CreateUsbCameraPath("test", "\\\\?\\USB#VID_046D&PID_0825&MI_00#6&900429&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\{bbefb6c7-2fc4-4139-bb8b-a58bba724083}", &status);
 
-  cs::UsbCamera camera("camera", 1);//"\\\\?\\USB#VID_046D&PID_0825&MI_00#6&900429&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\{bbefb6c7-2fc4-4139-bb8b-a58bba724083}");
-
+  cs::UsbCamera camera("camera", 0);//"\\\\?\\USB#VID_046D&PID_0825&MI_00#6&900429&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\{bbefb6c7-2fc4-4139-bb8b-a58bba724083}");
+  camera.SetVideoMode(cs::VideoMode::PixelFormat::kGray, 640, 360, 30);
 
 
   cs::MjpegServer server("server", 1181);
 
   server.SetSource(camera);
 
-  std::this_thread::sleep_for(std::chrono::seconds(1));
+  std::this_thread::sleep_for(std::chrono::seconds(5));
   camera.SetVideoMode(cs::VideoMode::PixelFormat::kYUYV, 640, 360, 30);
   //std::cout << (int)handle << "\n";
   system("PAUSE");
