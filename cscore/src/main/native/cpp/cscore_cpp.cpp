@@ -7,13 +7,6 @@
 
 #include "cscore_cpp.h"
 
-#if defined(__linux__)
-#include <arpa/inet.h>
-#include <ifaddrs.h>
-#include <sys/types.h>
-#include <unistd.h>
-#endif
-
 #include <wpi/SmallString.h>
 
 #include "Handle.h"
@@ -691,41 +684,6 @@ wpi::ArrayRef<CS_Source> EnumerateSourceHandles(
 wpi::ArrayRef<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
                                             CS_Status* status) {
   return Sinks::GetInstance().GetAll(vec);
-}
-
-std::string GetHostname() {
-#ifdef __linux__
-  char name[256];
-  if (::gethostname(name, sizeof(name)) != 0) return "";
-  name[255] = '\0';  // Per POSIX, may not be null terminated if too long
-  return name;
-#else
-  return "";                          // TODO
-#endif
-}
-
-std::vector<std::string> GetNetworkInterfaces() {
-#ifdef __linux__
-  struct ifaddrs* ifa;
-  if (::getifaddrs(&ifa) != 0) return std::vector<std::string>{};
-
-  std::vector<std::string> rv;
-  char buf[256];
-  for (struct ifaddrs* i = ifa; i; i = i->ifa_next) {
-    if (!i->ifa_addr) continue;                       // no address
-    if (i->ifa_addr->sa_family != AF_INET) continue;  // only return IPv4
-    struct sockaddr_in* addr_in = reinterpret_cast<sockaddr_in*>(i->ifa_addr);
-    const char* addr =
-        ::inet_ntop(addr_in->sin_family, &addr_in->sin_addr, buf, sizeof(buf));
-    if (!addr) continue;  // error converting address
-    rv.emplace_back(addr);
-  }
-
-  ::freeifaddrs(ifa);
-  return rv;
-#else
-  return std::vector<std::string>{};  // TODO
-#endif
 }
 
 }  // namespace cs

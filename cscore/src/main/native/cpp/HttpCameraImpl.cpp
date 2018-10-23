@@ -53,15 +53,6 @@ void HttpCameraImpl::Start() {
   m_settingsThread = std::thread(&HttpCameraImpl::SettingsThreadMain, this);
 }
 
-#ifdef __linux__
-static inline void DoFdSet(int fd, fd_set* set, int* nfds) {
-  if (fd >= 0) {
-    FD_SET(fd, set);
-    if ((fd + 1) > *nfds) *nfds = fd + 1;
-  }
-}
-#endif
-
 void HttpCameraImpl::StreamThreadMain() {
   while (m_active) {
     SetConnected(false);

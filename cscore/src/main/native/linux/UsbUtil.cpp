@@ -8,11 +8,8 @@
 #include "UsbUtil.h"
 
 #include <fcntl.h>
-
-#ifdef __linux__
 #include <libgen.h>
 #include <sys/ioctl.h>
-#endif
 
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
@@ -22,8 +19,6 @@
 #include "Log.h"
 
 namespace cs {
-
-#ifdef __linux__
 
 static wpi::StringRef GetUsbNameFromFile(int vendor, int product,
                                          wpi::SmallVectorImpl<char>& buf) {
@@ -160,7 +155,5 @@ int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
   }
   return retval;
 }
-
-#endif  // __linux__
 
 }  // namespace cs

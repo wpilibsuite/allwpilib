@@ -19,6 +19,9 @@ licenseUpdateExclude {
 includeGuardRoots {
   cscore/src/main/native/cpp/
   cscore/src/main/native/include/
+  cscore/src/main/native/linux/
+  cscore/src/main/native/osx/
+  cscore/src/main/native/windows/
   cscore/src/main/test/native/cpp/
 }
 
