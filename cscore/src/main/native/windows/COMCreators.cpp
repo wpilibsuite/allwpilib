@@ -37,7 +37,6 @@ HRESULT SourceReaderCB::OnReadSample(
     IMFSample *pSample      // Can be NULL
     )
 {
-    EnterCriticalSection(&m_critsec);
 
     if (SUCCEEDED(hrStatus))
     {
@@ -46,7 +45,8 @@ HRESULT SourceReaderCB::OnReadSample(
             // Do something with the sample.
             wprintf(L"Frame @ %I64d\n", llTimestamp);
 
-            m_lastSample = pSample;
+            // Do sample
+            m_source->ProcessFrame(pSample);
         }
     }
     else
@@ -54,21 +54,12 @@ HRESULT SourceReaderCB::OnReadSample(
         // Streaming error.
         NotifyError(hrStatus);
     }
-
-    if (MF_SOURCE_READERF_ENDOFSTREAM & dwStreamFlags)
-    {
-        // Reached the end of the stream.
-        m_bEOS = TRUE;
-    }
-    m_hrStatus = hrStatus;
-
-    LeaveCriticalSection(&m_critsec);
     PostMessage(m_hwnd, 0x0400 + 4488, 0, 0);
     return S_OK;
 }
 
-SourceReaderCB* CreateSourceReaderCB(HWND hwnd) {
-  return new SourceReaderCB(hwnd);
+SourceReaderCB* CreateSourceReaderCB(HWND hwnd, UsbCameraImplWindows* source) {
+  return new SourceReaderCB(hwnd, source);
 }
 
 IMFMediaSource* CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink)

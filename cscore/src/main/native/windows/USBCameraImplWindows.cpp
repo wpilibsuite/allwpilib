@@ -46,6 +46,7 @@
 #include <Dbt.h>
 #include <ks.h>
 #include <ksmedia.h>
+#include <mferror.h>
 
 #include "GUIDName.h"
 
@@ -171,7 +172,7 @@ void UsbCameraImplWindows::DeviceDisconnect() {
   SetConnected(false);
 }
 
-void UsbCameraImplWindows::ProcessFrame(_ComPtr<IMFSample>& videoSample) {
+void UsbCameraImplWindows::ProcessFrame(IMFSample* videoSample) {
 
 
     do {
@@ -199,10 +200,12 @@ void UsbCameraImplWindows::ProcessFrame(_ComPtr<IMFSample>& videoSample) {
         // "For 2-D buffers, the Lock2D method is more efficient than the Lock method"
         // see IMFMediaBuffer::Lock method documentation: https://msdn.microsoft.com/en-us/library/windows/desktop/bb970366(v=vs.85).aspx
         _ComPtr<IMF2DBuffer> buffer2d;
+        DWORD memLength2d = 0;
         if (true)
         {
             if (SUCCEEDED(buf.As<IMF2DBuffer>(buffer2d)))
             {
+                buffer2d->GetContiguousLength(&memLength2d);
                 if (SUCCEEDED(buffer2d->Lock2D(&ptr, &pitch)))
                 {
                     lock2d = true;
@@ -219,23 +222,36 @@ void UsbCameraImplWindows::ProcessFrame(_ComPtr<IMFSample>& videoSample) {
         if (!ptr)
             break;
 
+
+
+
         cv::Mat tmpMat;
+        std::unique_ptr<Image> dest;
 
         switch (m_mode.pixelFormat) {
           case cs::VideoMode::PixelFormat::kMJPEG:
+            std::cout << cursize << std::endl;
+            std::cout << memLength2d << std::endl;
+            std::cout << maxsize << std::endl;
             // cv::Mat(m_height, m_width, CV_8UC3, ptr, pitch).copyTo(tmpMat);
             //Special case
-            //PutFrame(m_pixelFormat, m_width, m_height, )
+            PutFrame(VideoMode::kMJPEG, m_mode.width, m_mode.height, wpi::StringRef((char*)ptr, memLength2d), wpi::Now());
             goto end;
             break;
           case cs::VideoMode::PixelFormat::kGray:
-            cv::Mat(m_mode.height, m_mode.width, CV_8UC1, ptr, pitch).copyTo(tmpMat);
+            tmpMat = cv::Mat(m_mode.height, m_mode.width, CV_8UC1, ptr, pitch);
+            dest = AllocImage(VideoMode::kGray, tmpMat.cols, tmpMat.rows, tmpMat.total());
+            tmpMat.copyTo(dest->AsMat());
             break;
           case cs::VideoMode::PixelFormat::kBGR:
-            cv::Mat(m_mode.height, m_mode.width, CV_8UC3, ptr, pitch).copyTo(tmpMat);
+            tmpMat = cv::Mat(m_mode.height, m_mode.width, CV_8UC3, ptr, pitch);
+            dest = AllocImage(VideoMode::kBGR, tmpMat.cols, tmpMat.rows, tmpMat.total() * 3);
+            tmpMat.copyTo(dest->AsMat());
             break;
           case cs::VideoMode::PixelFormat::kYUYV:
-            cv::Mat(m_mode.height, m_mode.width, CV_8UC2, ptr, pitch).copyTo(tmpMat);
+            tmpMat = cv::Mat(m_mode.height, m_mode.width, CV_8UC2, ptr, pitch);
+            dest = AllocImage(VideoMode::kYUYV, tmpMat.cols, tmpMat.rows, tmpMat.total() * 2);
+            tmpMat.copyTo(dest->AsMat());
             break;
           default:
             std::cout << "default case\n";
@@ -246,7 +262,7 @@ void UsbCameraImplWindows::ProcessFrame(_ComPtr<IMFSample>& videoSample) {
         //cv::Mat(m_height, m_width, CV_8UC2, ptr, pitch).copyTo(tmpMat);
         //cv::Mat inputMat(1, cursize, CV_8UC1, ptr, pitch);
         std::cout << "Putting frame in code\n";
-        PutFrame(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat), m_mode.width, m_mode.height, wpi::StringRef((char*)tmpMat.data, (size_t)(tmpMat.dataend - tmpMat.datastart)), wpi::Now());
+        PutFrame(std::move(dest), wpi::Now());
 
         end:
 
@@ -256,9 +272,6 @@ void UsbCameraImplWindows::ProcessFrame(_ComPtr<IMFSample>& videoSample) {
             buf->Unlock();
     }
     while (0);
-
-
-
 }
 
 LRESULT UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
@@ -270,7 +283,7 @@ LRESULT UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
       break;
     case WM_CREATE:
       // Pump Created and ready to go
-      m_imageCallback = CreateSourceReaderCB(hwnd);
+      m_imageCallback = CreateSourceReaderCB(hwnd, this);
       DeviceConnect();
       break;
     case WM_DEVICECHANGE: {
@@ -307,10 +320,8 @@ LRESULT UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
       }
       break;
     case NewImageMessage: {// New image
-            _ComPtr<IMFSample> videoSample = m_imageCallback->GetLatestSample();
             m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
                 0, NULL, NULL, NULL, NULL);
-            ProcessFrame(videoSample);
         break;
         }
     case SetCameraMessage: {
@@ -572,7 +583,25 @@ void UsbCameraImplWindows::DeviceSetMode() {
   ::MFSetAttributeSize(nativeType, MF_MT_FRAME_SIZE, m_mode.width, m_mode.height);
   ::MFSetAttributeRatio(nativeType, MF_MT_FRAME_RATE, m_mode.fps, 1);
 
-  m_sourceReader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, NULL, nativeType);
+  HRESULT setResult = m_sourceReader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, NULL, nativeType);
+
+  switch (setResult) {
+    case S_OK:
+      std::cout << "S_OK\n";
+      break;
+    case MF_E_INVALIDMEDIATYPE:
+      std::cout << "InvalidMediaType\n";
+      break;
+    case MF_E_INVALIDREQUEST:
+      std::cout << "Invalid\n";
+      break;
+    case MF_E_INVALIDSTREAMNUMBER:
+      std::cout << "StreamNum\n";
+      break;
+    case MF_E_TOPO_CODEC_NOT_FOUND:
+      std::cout << "Codec\n";
+      break;
+  }
 
 
 }

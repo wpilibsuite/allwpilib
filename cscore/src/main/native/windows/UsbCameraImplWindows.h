@@ -80,6 +80,8 @@ class UsbCameraImplWindows : public SourceImpl {
   void NumSinksChanged() override;
   void NumSinksEnabledChanged() override;
 
+  void ProcessFrame(IMFSample* sample);
+
   std::string GetPath() { return m_path; }
 
   // Messages passed to/from camera thread
@@ -141,8 +143,6 @@ class UsbCameraImplWindows : public SourceImpl {
   void DeviceCacheProperty(std::unique_ptr<UsbCameraProperty> rawProp);
   void DeviceCacheProperties();
   void DeviceCacheVideoModes();
-
-  void ProcessFrame(_ComPtr<IMFSample>& sample);
 
   // Command helper functions
   CS_StatusValue DeviceProcessCommand(std::unique_lock<wpi::mutex>& lock,

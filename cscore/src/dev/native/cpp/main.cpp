@@ -31,7 +31,7 @@ int main() {
 
   server.SetSource(camera);
 
-  std::this_thread::sleep_for(std::chrono::seconds(5));
+  std::this_thread::sleep_for(std::chrono::seconds(1));
   camera.SetVideoMode(cs::VideoMode::PixelFormat::kYUYV, 640, 360, 30);
   //std::cout << (int)handle << "\n";
   system("PAUSE");
