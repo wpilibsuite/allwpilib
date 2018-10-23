@@ -47,6 +47,7 @@
 #include <ks.h>
 #include <ksmedia.h>
 #include <mferror.h>
+#include <Dshow.h>
 
 #include "GUIDName.h"
 
@@ -104,19 +105,51 @@ void UsbCameraImplWindows::SetExposureHoldCurrent(CS_Status* status) {}
 void UsbCameraImplWindows::SetExposureManual(int value, CS_Status* status) {}
 
 bool UsbCameraImplWindows::SetVideoMode(const VideoMode& mode, CS_Status* status) {
+  if (mode.pixelFormat != VideoMode::kBGR ||
+      mode.pixelFormat != VideoMode::kGray ||
+      mode.pixelFormat != VideoMode::kYUYV) {
+    *status = CS_UNSUPPORTED_MODE;
+    return false;
+  }
   Message* msg = new Message{Message::kCmdSetMode};
   msg->data[0] = mode.pixelFormat;
   msg->data[1] = mode.width;
   msg->data[2] = mode.height;
   msg->data[3] = mode.fps;
   auto result = SendMessage(m_messagePump->hwnd, SetCameraMessage, NULL, reinterpret_cast<LPARAM>(msg));
-  std::cout << result << std::endl;
-  return true;
+  *status = result;
+  return result == 0;
  }
+
 bool UsbCameraImplWindows::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
-                    CS_Status* status) {return true;}
-bool UsbCameraImplWindows::SetResolution(int width, int height, CS_Status* status) { return true; }
-bool UsbCameraImplWindows::SetFPS(int fps, CS_Status* status) { return true; }
+                    CS_Status* status) {
+  if (pixelFormat != VideoMode::kBGR ||
+      pixelFormat != VideoMode::kGray ||
+      pixelFormat != VideoMode::kYUYV) {
+    *status = CS_UNSUPPORTED_MODE;
+    return false;
+  }
+  Message* msg = new Message{Message::kCmdSetPixelFormat};
+  msg->data[0] = pixelFormat;
+  auto result = SendMessage(m_messagePump->hwnd, SetCameraMessage, NULL, reinterpret_cast<LPARAM>(msg));
+  *status = result;
+  return result == 0;
+}
+bool UsbCameraImplWindows::SetResolution(int width, int height, CS_Status* status) {
+    Message* msg = new Message{Message::kCmdSetResolution};
+    msg->data[0] = width;
+  msg->data[1] = height;
+  auto result = SendMessage(m_messagePump->hwnd, SetCameraMessage, NULL, reinterpret_cast<LPARAM>(msg));
+  *status = result;
+  return result == 0;
+ }
+bool UsbCameraImplWindows::SetFPS(int fps, CS_Status* status) {
+    Message* msg = new Message{Message::kCmdSetFPS};
+  msg->data[0] = fps;
+  auto result = SendMessage(m_messagePump->hwnd, SetCameraMessage, NULL, reinterpret_cast<LPARAM>(msg));
+  *status = result;
+  return result == 0;
+ }
 
 void UsbCameraImplWindows::NumSinksChanged() {
   std::cout << "Sinks Changed\n";
@@ -157,6 +190,9 @@ bool UsbCameraImplWindows::CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR *p
     pDi = (DEV_BROADCAST_DEVICEINTERFACE*)pHdr;
 
     std::cout << "Device change check\n";
+
+    std::cout << "DC'd: " << pDi->dbcc_name << "\n";
+    std::cout << "Path: " << m_path << "\n";
 
     if (_stricmp(m_path.c_str(), pDi->dbcc_name) == 0)
     {
@@ -380,7 +416,6 @@ static cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
   } else if (guidRef.equals("MFVideoFormat_MJPG")) {
     return cs::VideoMode::PixelFormat::kMJPEG;
   } else {
-    std::cout << guidRef << std::endl;
     return cs::VideoMode::PixelFormat::kUnknown;
   }
 }
@@ -407,7 +442,7 @@ bool UsbCameraImplWindows::DeviceConnect() {
 
   if (!m_properties_cached) {
     SDEBUG3("caching properties");
-    //DeviceCacheProperties();
+    DeviceCacheProperties();
     DeviceCacheVideoModes();
     DeviceCacheMode();
     m_properties_cached = true;
@@ -437,6 +472,180 @@ std::unique_ptr<PropertyImpl> UsbCameraImplWindows::CreateEmptyProperty(
 
 bool UsbCameraImplWindows::CacheProperties(CS_Status* status) const {
   return true;
+}
+
+static std::unique_ptr<UsbCameraProperty> GetUsbProperty(wpi::StringRef name, tagVideoProcAmpProperty tag, IAMVideoProcAmp *pProcAmp) {
+  long paramVal, paramFlag;
+  HRESULT hr;
+  long minVal, maxVal, stepVal;
+  hr = pProcAmp->GetRange(tag, &minVal, &maxVal, &stepVal, &paramVal, &paramFlag);//Unable to get the property, trying to return default value
+  if (SUCCEEDED(hr)) {
+    auto ptr = std::make_unique<UsbCameraProperty>();
+    ptr->name = name;
+    ptr->minimum = minVal;
+    ptr->maximum = maxVal;
+    ptr->hasMaximum = true;
+    ptr->hasMinimum = true;
+    ptr->defaultValue = paramVal;
+    ptr->step = stepVal;
+    ptr->value = paramVal;
+    ptr->propKind = CS_PropertyKind::CS_PROP_INTEGER;
+    return std::move(ptr);
+  } else {
+    return nullptr;
+  }
+}
+
+#define CREATEPROPERTY(val) \
+{ \
+  auto newProp = GetUsbProperty(#val, VideoProcAmp_##val, pProcAmp); \
+  if (newProp) { \
+    DeviceCacheProperty(std::move(newProp)); \
+  } \
+}
+
+void UsbCameraImplWindows::DeviceCacheProperties() {
+  if (!m_sourceReader) return;
+
+  IAMVideoProcAmp *pProcAmp = NULL;
+
+  if (SUCCEEDED(m_sourceReader->GetServiceForStream((DWORD)MF_SOURCE_READER_MEDIASOURCE, GUID_NULL, IID_PPV_ARGS(&pProcAmp)))) {
+    // {
+    //   auto newProp = GetUsbProperty("Brightness", VideoProcAmp_Brightness, pProcAmp);
+    //   if (newProp) {
+    //     DeviceCacheProperty(std::move(newProp));
+    //   }
+    // }
+    CREATEPROPERTY(Brightness)
+    CREATEPROPERTY(Contrast)
+    CREATEPROPERTY(Hue)
+    CREATEPROPERTY(Saturation)
+    CREATEPROPERTY(Sharpness)
+    CREATEPROPERTY(Gamma)
+    CREATEPROPERTY(ColorEnable)
+    CREATEPROPERTY(WhiteBalance)
+    CREATEPROPERTY(BacklightCompensation)
+    CREATEPROPERTY(Gain)
+  }
+
+}
+
+int UsbCameraImplWindows::RawToPercentage(const UsbCameraProperty& rawProp,
+                                   int rawValue) {
+  return 100.0 * (rawValue - rawProp.minimum) /
+         (rawProp.maximum - rawProp.minimum);
+}
+
+int UsbCameraImplWindows::PercentageToRaw(const UsbCameraProperty& rawProp,
+                                   int percentValue) {
+  return rawProp.minimum +
+         (rawProp.maximum - rawProp.minimum) * (percentValue / 100.0);
+}
+
+void UsbCameraImplWindows::DeviceCacheProperty(std::unique_ptr<UsbCameraProperty> rawProp) {
+  // For percentage properties, we want to cache both the raw and the
+  // percentage versions.  This function is always called with prop being
+  // the raw property (as it's coming from the camera) so if required, we need
+  // to rename this one as well as create/cache the percentage version.
+  //
+  // This is complicated by the fact that either the percentage version or the
+  // the raw version may have been set previously.  If both were previously set,
+  // the raw version wins.
+  std::unique_ptr<UsbCameraProperty> perProp;
+  if (false) {
+    perProp =
+        wpi::make_unique<UsbCameraProperty>(rawProp->name, 0, *rawProp, 0, 0);
+    rawProp->name = "raw_" + perProp->name;
+  }
+
+  std::unique_lock<wpi::mutex> lock(m_mutex);
+  int* rawIndex = &m_properties[rawProp->name];
+  bool newRaw = *rawIndex == 0;
+  UsbCameraProperty* oldRawProp =
+      newRaw ? nullptr
+             : static_cast<UsbCameraProperty*>(GetProperty(*rawIndex));
+
+  int* perIndex = perProp ? &m_properties[perProp->name] : nullptr;
+  bool newPer = !perIndex || *perIndex == 0;
+  UsbCameraProperty* oldPerProp =
+      newPer ? nullptr
+             : static_cast<UsbCameraProperty*>(GetProperty(*perIndex));
+
+  if (oldRawProp && oldRawProp->valueSet) {
+    // Merge existing raw setting and set percentage from it
+    rawProp->SetValue(oldRawProp->value);
+    rawProp->valueStr = std::move(oldRawProp->valueStr);
+
+    if (perProp) {
+      perProp->SetValue(RawToPercentage(*rawProp, rawProp->value));
+      perProp->valueStr = rawProp->valueStr;  // copy
+    }
+  } else if (oldPerProp && oldPerProp->valueSet) {
+    // Merge existing percentage setting and set raw from it
+    perProp->SetValue(oldPerProp->value);
+    perProp->valueStr = std::move(oldPerProp->valueStr);
+
+    rawProp->SetValue(PercentageToRaw(*rawProp, perProp->value));
+    rawProp->valueStr = perProp->valueStr;  // copy
+  } else {
+    /*
+    // Read current raw value and set percentage from it
+    if (!rawProp->DeviceGet(lock, m_fd))
+      SWARNING("failed to get property " << rawProp->name);
+
+    if (perProp) {
+      perProp->SetValue(RawToPercentage(*rawProp, rawProp->value));
+      perProp->valueStr = rawProp->valueStr;  // copy
+    }
+    */
+  }
+
+  // Set value on device if user-configured
+  /*
+  if (rawProp->valueSet) {
+    if (!rawProp->DeviceSet(lock, m_fd))
+      SWARNING("failed to set property " << rawProp->name);
+  }
+  */
+
+  // Update pointers since we released the lock
+  rawIndex = &m_properties[rawProp->name];
+  perIndex = perProp ? &m_properties[perProp->name] : nullptr;
+
+  // Get pointers before we move the std::unique_ptr values
+  auto rawPropPtr = rawProp.get();
+  auto perPropPtr = perProp.get();
+
+  if (newRaw) {
+    // create a new index
+    *rawIndex = m_propertyData.size() + 1;
+    m_propertyData.emplace_back(std::move(rawProp));
+  } else {
+    // update
+    m_propertyData[*rawIndex - 1] = std::move(rawProp);
+  }
+
+  // Finish setting up percentage property
+  if (perProp) {
+    perProp->propPair = *rawIndex;
+    perProp->defaultValue =
+        RawToPercentage(*rawPropPtr, rawPropPtr->defaultValue);
+
+    if (newPer) {
+      // create a new index
+      *perIndex = m_propertyData.size() + 1;
+      m_propertyData.emplace_back(std::move(perProp));
+    } else if (perIndex) {
+      // update
+      m_propertyData[*perIndex - 1] = std::move(perProp);
+    }
+
+    // Tell raw property where to find percentage property
+    rawPropPtr->propPair = *perIndex;
+  }
+
+  NotifyPropertyCreated(*rawIndex, *rawPropPtr);
+  if (perPropPtr) NotifyPropertyCreated(*perIndex, *perPropPtr);
 }
 
 CS_StatusValue UsbCameraImplWindows::DeviceProcessCommand(
@@ -687,7 +896,7 @@ void UsbCameraImplWindows::DeviceCacheVideoModes() {
         UINT32 num, dom;
         ::MFGetAttributeRatio(nativeType, MF_MT_FRAME_RATE, &num, &dom);
 
-        std::cout << "format: " << cs::GetGUIDNameConstNew(guid) << "num: " << num << "dom: " << dom << "\n";
+        //std::cout << "format: " << cs::GetGUIDNameConstNew(guid) << "num: " << num << "dom: " << dom << "\n";
 
         int fps = 30;
 

@@ -10,12 +10,15 @@
 #include <ksmedia.h>
 
 #include <iostream>
+#include <atomic>
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")
 #pragma comment(lib, "mfuuid.lib")
 #pragma comment(lib, "Ole32.lib")
 #pragma comment(lib, "User32.lib")
+
+
 
 namespace cs {
 
@@ -48,6 +51,31 @@ static LRESULT CALLBACK pWndProc(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lP
   }
 }
 
+namespace {
+  struct ClassHolder {
+    HINSTANCE current_instance;
+    WNDCLASSEX wx;
+    const char* class_name = "DUMMY_CLASS";
+    ClassHolder() {
+      current_instance = (HINSTANCE)GetModuleHandle(NULL);
+      wx = {};
+      wx.cbSize = sizeof(WNDCLASSEX);
+      wx.lpfnWndProc = pWndProc;        // function which will handle messages
+      wx.hInstance = current_instance;
+      wx.lpszClassName = class_name;
+      RegisterClassEx(&wx);
+    }
+    ~ClassHolder() {
+      UnregisterClass(class_name, current_instance);
+    }
+  };
+}
+
+static const char* GetClass() {
+  static ClassHolder clsHolder;
+  return clsHolder.class_name;
+}
+
 WindowsMessagePump::WindowsMessagePump(std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> callback) {
   m_callback = callback;
   auto handle = CreateEvent(NULL, true, false, NULL);
@@ -69,45 +97,33 @@ void WindowsMessagePump::ThreadMain(HANDLE eventHandle) {
   // Initialize MF
   MFStartup(MF_VERSION);
 
-  HINSTANCE current_instance = (HINSTANCE)GetModuleHandle(NULL);
-  static const char* class_name = "DUMMY_CLASS";
-  WNDCLASSEX wx = {};
-  wx.cbSize = sizeof(WNDCLASSEX);
-  wx.lpfnWndProc = pWndProc;        // function which will handle messages
-  wx.hInstance = current_instance;
-  wx.lpszClassName = class_name;
-  if (RegisterClassEx(&wx)) {
-    hwnd = CreateWindowEx(0, class_name, "dummy_name", 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, NULL, this);
+  const char* class_name = GetClass();
+  hwnd = CreateWindowEx(0, class_name, "dummy_name", 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, NULL, this);
 
-    // Register for device notifications
-    HDEVNOTIFY  g_hdevnotify = NULL;
+  // Register for device notifications
+  HDEVNOTIFY  g_hdevnotify = NULL;
 
-    DEV_BROADCAST_DEVICEINTERFACE di = { 0 };
-    di.dbcc_size = sizeof(di);
-    di.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
-    di.dbcc_classguid = KSCATEGORY_CAPTURE;
+  DEV_BROADCAST_DEVICEINTERFACE di = { 0 };
+  di.dbcc_size = sizeof(di);
+  di.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
+  di.dbcc_classguid = KSCATEGORY_CAPTURE;
 
-    g_hdevnotify = RegisterDeviceNotification(
-      hwnd,
-      &di,
-      DEVICE_NOTIFY_WINDOW_HANDLE
-    );
+  g_hdevnotify = RegisterDeviceNotification(
+    hwnd,
+    &di,
+    DEVICE_NOTIFY_WINDOW_HANDLE
+  );
 
-    SetEvent(eventHandle);
+  SetEvent(eventHandle);
 
 
-    MSG Msg;
-    while (GetMessage(&Msg, NULL, 0, 0) > 0)
-    {
-      TranslateMessage(&Msg);
-      DispatchMessage(&Msg);
-    }
-    UnregisterDeviceNotification(g_hdevnotify);
-    UnregisterClass(class_name, current_instance);
-
-  } else {
-    SetEvent(eventHandle);
+  MSG Msg;
+  while (GetMessage(&Msg, NULL, 0, 0) > 0)
+  {
+    TranslateMessage(&Msg);
+    DispatchMessage(&Msg);
   }
+  UnregisterDeviceNotification(g_hdevnotify);
 
   MFShutdown();
   CoUninitialize();
