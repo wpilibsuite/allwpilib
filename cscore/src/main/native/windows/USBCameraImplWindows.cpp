@@ -104,12 +104,12 @@ void UsbCameraImplWindows::SetExposureHoldCurrent(CS_Status* status) {}
 void UsbCameraImplWindows::SetExposureManual(int value, CS_Status* status) {}
 
 bool UsbCameraImplWindows::SetVideoMode(const VideoMode& mode, CS_Status* status) {
-  Message msg{Message::kCmdSetMode};
-  msg.data[0] = mode.pixelFormat;
-  msg.data[1] = mode.width;
-  msg.data[2] = mode.height;
-  msg.data[3] = mode.fps;
-  auto result = SendMessage(m_messagePump->hwnd, SetCameraMessage, NULL, reinterpret_cast<LPARAM>(&msg));
+  Message* msg = new Message{Message::kCmdSetMode};
+  msg->data[0] = mode.pixelFormat;
+  msg->data[1] = mode.width;
+  msg->data[2] = mode.height;
+  msg->data[3] = mode.fps;
+  auto result = SendMessage(m_messagePump->hwnd, SetCameraMessage, NULL, reinterpret_cast<LPARAM>(msg));
   std::cout << result << std::endl;
   return true;
  }
@@ -118,8 +118,17 @@ bool UsbCameraImplWindows::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
 bool UsbCameraImplWindows::SetResolution(int width, int height, CS_Status* status) { return true; }
 bool UsbCameraImplWindows::SetFPS(int fps, CS_Status* status) { return true; }
 
-void UsbCameraImplWindows::NumSinksChanged() {}
-void UsbCameraImplWindows::NumSinksEnabledChanged() {}
+void UsbCameraImplWindows::NumSinksChanged() {
+  std::cout << "Sinks Changed\n";
+
+  Message* msg = new Message{Message::kNumSinksChanged};
+  PostMessage(m_messagePump->hwnd, SetCameraMessage, NULL, reinterpret_cast<LPARAM>(msg));
+}
+void UsbCameraImplWindows::NumSinksEnabledChanged() {
+  std::cout << "Sinks Enabled Changed\n";
+    Message* msg = new Message{Message::kNumSinksEnabledChanged};
+  PostMessage(m_messagePump->hwnd, SetCameraMessage, NULL, reinterpret_cast<LPARAM>(msg));
+}
 
 void UsbCameraImplWindows::Start() {
   // Kick off the message pump
@@ -173,6 +182,8 @@ void UsbCameraImplWindows::DeviceDisconnect() {
 }
 
 void UsbCameraImplWindows::ProcessFrame(IMFSample* videoSample) {
+
+  std::cout << "Procesing frame\n";
 
 
     do {
@@ -284,6 +295,15 @@ LRESULT UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
     case WM_CREATE:
       // Pump Created and ready to go
       m_imageCallback = CreateSourceReaderCB(hwnd, this);
+      {
+        // Set a default image
+        std::unique_ptr<Image> dest;
+        cv::Mat tmpMat;
+        tmpMat = cv::Mat(240, 320, CV_8UC1);
+        dest = AllocImage(VideoMode::kGray, tmpMat.cols, tmpMat.rows, tmpMat.total());
+        tmpMat.copyTo(dest->AsMat());
+        PutFrame(std::move(dest), wpi::Now());
+      }
       DeviceConnect();
       break;
     case WM_DEVICECHANGE: {
@@ -328,9 +348,12 @@ LRESULT UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
         }
     case SetCameraMessage: {
       {
+        std::cout << "Set Camera Message\n";
         Message* msg = reinterpret_cast<Message*>(lParam);
         std::unique_lock<wpi::mutex> lock(m_mutex);
-        return DeviceProcessCommand(lock, *msg);
+        auto retVal = DeviceProcessCommand(lock, *msg);
+        delete msg;
+        return retVal;
       }
       break;
     }
@@ -395,10 +418,13 @@ bool UsbCameraImplWindows::DeviceConnect() {
 
   SetConnected(true);
 
+  std::cout << "Setting Stream: " << m_streaming  << " " << IsEnabled() << std::endl;
+
   // Turn off streaming if not enabled, and turn it on if enabled
   if (m_streaming && !IsEnabled()) {
     DeviceStreamOff();
   } else if (!m_streaming && IsEnabled()) {
+     std::cout << "Setting Stream On" << std::endl;
     DeviceStreamOn();
   }
   return true;
@@ -415,6 +441,7 @@ bool UsbCameraImplWindows::CacheProperties(CS_Status* status) const {
 
 CS_StatusValue UsbCameraImplWindows::DeviceProcessCommand(
     std::unique_lock<wpi::mutex>& lock, const Message& msg) {
+      std::cout << msg.kind << std::endl;
   if (msg.kind == Message::kCmdSetMode ||
       msg.kind == Message::kCmdSetPixelFormat ||
       msg.kind == Message::kCmdSetResolution ||
@@ -426,6 +453,13 @@ CS_StatusValue UsbCameraImplWindows::DeviceProcessCommand(
     return CS_OK;
   } else if (msg.kind == Message::kNumSinksChanged ||
              msg.kind == Message::kNumSinksEnabledChanged) {
+        std::cout << "Stream Sink Event\n";
+    // Turn On Streams
+    if (m_streaming && !IsEnabled()) {
+      DeviceStreamOff();
+    } else if (!m_streaming && IsEnabled()) {
+      DeviceStreamOn();
+    }
     return CS_OK;
   } else {
     return CS_OK;
@@ -482,6 +516,7 @@ CS_StatusValue UsbCameraImplWindows::DeviceCmdSetMode(
 bool UsbCameraImplWindows::DeviceStreamOn() {
   if (m_streaming) return false;
   m_streaming = true;
+   std::cout << "Calling Read Sample" << std::endl;
   m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
           0, NULL, NULL, NULL, NULL);
   return true;
@@ -574,11 +609,12 @@ void UsbCameraImplWindows::DeviceCacheMode() {
 
   if (formatChanged || fpsChanged) DeviceSetMode();
 
+  std::cout << "Notify change\n";
+
   Notifier::GetInstance().NotifySourceVideoMode(*this, m_mode);
 }
 
 void UsbCameraImplWindows::DeviceSetMode() {
-  _ComPtr<IMFMediaType> mediaTypeOut;
 
   IMFMediaType* nativeType = NULL;
   // Get the default media type of the camera
@@ -630,6 +666,8 @@ void UsbCameraImplWindows::DeviceCacheVideoModes() {
 
   std::vector<VideoMode> modes;
 
+  bool set = false;
+
 
     IMFMediaType* nativeType = NULL;
     int count = 0;
@@ -648,6 +686,8 @@ void UsbCameraImplWindows::DeviceCacheVideoModes() {
 
         UINT32 num, dom;
         ::MFGetAttributeRatio(nativeType, MF_MT_FRAME_RATE, &num, &dom);
+
+        std::cout << "format: " << cs::GetGUIDNameConstNew(guid) << "num: " << num << "dom: " << dom << "\n";
 
         int fps = 30;
 
