@@ -164,11 +164,7 @@ bool UsbCameraImplWindows::CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR *p
     return false;
 }
 
-void UsbCameraImplWindows::TryConnectCamera() {
-  DeviceConnect();
-}
-
-void UsbCameraImplWindows::DisconnectCamera() {
+void UsbCameraImplWindows::DeviceDisconnect() {
   if (m_connectVerbose) SINFO("Disconnected from " << m_path);
   SafeRelease(&m_sourceReader);
   SafeRelease(&m_mediaSource);
@@ -275,7 +271,7 @@ LRESULT UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
     case WM_CREATE:
       // Pump Created and ready to go
       m_imageCallback = CreateSourceReaderCB(hwnd);
-      TryConnectCamera();
+      DeviceConnect();
       break;
     case WM_DEVICECHANGE: {
         // Device potentially changed
@@ -302,10 +298,10 @@ LRESULT UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
         bool connected = false;
         if (CheckDeviceChange(wParam, parameter, &connected)) {
           if (connected) {
-            TryConnectCamera();
+            DeviceConnect();
           } else {
             // Disconnected
-            DisconnectCamera();
+            DeviceDisconnect();
           }
         }
       }
@@ -325,25 +321,8 @@ LRESULT UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
       }
       break;
     }
-    case WM_TIMER:
-        // Reconnect timer
-        TryConnectCamera();
-      break;
   }
   return 0l;
-}
-
-void UsbCameraImplWindows::CameraThreadMain() {
-  // Register to respond to Device change events
-
-  bool wasStreaming = false;
-  m_streaming = false;
-
-  // while (m_active) {
-  //   // Device Connect
-  //   if (!m_mediaSource) DeviceConnect();
-  // }
-  // std::cout << "Thread Died" << std::endl;
 }
 
 static std::string guidToString(GUID guid) {
@@ -472,7 +451,7 @@ CS_StatusValue UsbCameraImplWindows::DeviceCmdSetMode(
       bool wasStreaming = true;
       //if (wasStreaming) DeviceStreamOff();
       if (m_sourceReader) {
-        DisconnectCamera();
+        DeviceDisconnect();
         DeviceConnect();
       }
       //if (wasStreaming) DeviceStreamOn();

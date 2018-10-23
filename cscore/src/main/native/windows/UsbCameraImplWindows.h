@@ -130,9 +130,6 @@ class UsbCameraImplWindows : public SourceImpl {
 
   bool CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR *pHdr, bool* connected);
 
-  void TryConnectCamera();
-  void DisconnectCamera();
-
   // Functions used by CameraThreadMain()
   void DeviceDisconnect();
   bool DeviceConnect();
