@@ -320,8 +320,10 @@ LRESULT UsbCameraImplWindows::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
       }
       break;
     case NewImageMessage: {// New image
+          if (m_streaming) {
             m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
                 0, NULL, NULL, NULL, NULL);
+          }
         break;
         }
     case SetCameraMessage: {
@@ -391,10 +393,14 @@ bool UsbCameraImplWindows::DeviceConnect() {
     DeviceSetMode();
   }
 
-  m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-            0, NULL, NULL, NULL, NULL);
-
   SetConnected(true);
+
+  // Turn off streaming if not enabled, and turn it on if enabled
+  if (m_streaming && !IsEnabled()) {
+    DeviceStreamOff();
+  } else if (!m_streaming && IsEnabled()) {
+    DeviceStreamOn();
+  }
   return true;
 }
 
@@ -460,17 +466,30 @@ CS_StatusValue UsbCameraImplWindows::DeviceCmdSetMode(
       m_mode = newMode;
       lock.unlock();
       bool wasStreaming = true;
-      //if (wasStreaming) DeviceStreamOff();
+      if (wasStreaming) DeviceStreamOff();
       if (m_sourceReader) {
         DeviceDisconnect();
         DeviceConnect();
       }
-      //if (wasStreaming) DeviceStreamOn();
+      if (wasStreaming) DeviceStreamOn();
       Notifier::GetInstance().NotifySourceVideoMode(*this, newMode);
       lock.lock();
   }
 
   return CS_OK;
+}
+
+bool UsbCameraImplWindows::DeviceStreamOn() {
+  if (m_streaming) return false;
+  m_streaming = true;
+  m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
+          0, NULL, NULL, NULL, NULL);
+  return true;
+}
+
+bool UsbCameraImplWindows::DeviceStreamOff() {
+  m_streaming = false;
+  return true;
 }
 
 void UsbCameraImplWindows::DeviceCacheMode() {

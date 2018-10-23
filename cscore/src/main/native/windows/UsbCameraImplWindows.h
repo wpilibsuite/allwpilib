@@ -161,7 +161,7 @@ class UsbCameraImplWindows : public SourceImpl {
   //
   // Variables only used within camera thread
   //
-  bool m_streaming;
+  std::atomic_bool m_streaming{false};
   bool m_modeSetPixelFormat{false};
   bool m_modeSetResolution{false};
   bool m_modeSetFPS{false};
