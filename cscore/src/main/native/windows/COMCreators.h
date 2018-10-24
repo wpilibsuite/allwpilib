@@ -5,12 +5,12 @@
 
 namespace cs {
 
-class UsbCameraImplWindows;
+class UsbCameraImpl;
 
 class SourceReaderCB : public IMFSourceReaderCallback
 {
 public:
-    SourceReaderCB(HWND hwnd, cs::UsbCameraImplWindows* source) :
+    SourceReaderCB(HWND hwnd, cs::UsbCameraImpl* source) :
       m_nRefCount(1), m_hwnd(hwnd), m_source(source)
     {
     }
@@ -71,10 +71,10 @@ private:
 private:
     long                m_nRefCount;        // Reference count.
     HWND                m_hwnd;
-    UsbCameraImplWindows*         m_source;
+    UsbCameraImpl*      m_source;
 };
 
-SourceReaderCB* CreateSourceReaderCB(HWND hwnd, cs::UsbCameraImplWindows* source);
+SourceReaderCB* CreateSourceReaderCB(HWND hwnd, cs::UsbCameraImpl* source);
 IMFSourceReader* CreateSourceReader(IMFMediaSource* mediaSource, IMFSourceReaderCallback* callback);
 IMFMediaSource* CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink);
 HRESULT ConfigureDecoder(IMFSourceReader* sourceReader, DWORD dwStreamIndex);

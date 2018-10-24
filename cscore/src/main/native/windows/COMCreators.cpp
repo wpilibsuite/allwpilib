@@ -5,7 +5,7 @@
 #include <mfapi.h>
 #include <iostream>
 
-#include <UsbCameraImplWindows.h>
+#include "UsbCameraImpl.h"
 
 //https://github.com/opencv/opencv/blob/master/modules/videoio/src/cap_msmf.cpp
 
@@ -43,7 +43,7 @@ HRESULT SourceReaderCB::OnReadSample(
         if (pSample)
         {
             // Do something with the sample.
-            wprintf(L"Frame @ %I64d\n", llTimestamp);
+           // wprintf(L"Frame @ %I64d\n", llTimestamp);
 
             // Do sample
             m_source->ProcessFrame(pSample);
@@ -58,7 +58,7 @@ HRESULT SourceReaderCB::OnReadSample(
     return S_OK;
 }
 
-SourceReaderCB* CreateSourceReaderCB(HWND hwnd, UsbCameraImplWindows* source) {
+SourceReaderCB* CreateSourceReaderCB(HWND hwnd, UsbCameraImpl* source) {
   return new SourceReaderCB(hwnd, source);
 }
 

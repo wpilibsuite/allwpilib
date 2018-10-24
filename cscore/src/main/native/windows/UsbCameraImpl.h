@@ -18,7 +18,7 @@
 #endif
 
 #include <atomic>
-#include <ComPtr.h>
+#include "ComPtr.h"
 
 #include "WindowsMessagePump.h"
 #include <memory>
@@ -40,19 +40,18 @@
 #include <Dbt.h>
 #include <ks.h>
 #include <ksmedia.h>
-#include <ComCreators.h>
+#include "ComCreators.h"
 
 #include "SourceImpl.h"
-#include "UsbCameraBuffer.h"
 #include "UsbCameraProperty.h"
 
 namespace cs {
 
-class UsbCameraImplWindows : public SourceImpl {
+class UsbCameraImpl : public SourceImpl {
  public:
-  UsbCameraImplWindows(const wpi::Twine& name, const wpi::Twine& path);
-  UsbCameraImplWindows(const wpi::Twine& name, int deviceId);
-  ~UsbCameraImplWindows() override;
+  UsbCameraImpl(const wpi::Twine& name, const wpi::Twine& path);
+  UsbCameraImpl(const wpi::Twine& name, int deviceId);
+  ~UsbCameraImpl() override;
 
   void Start();
 
@@ -140,7 +139,7 @@ class UsbCameraImplWindows : public SourceImpl {
   void DeviceSetMode();
   void DeviceSetFPS();
   void DeviceCacheMode();
-  void DeviceCacheProperty(std::unique_ptr<UsbCameraProperty> rawProp);
+  void DeviceCacheProperty(std::unique_ptr<UsbCameraProperty> rawProp, IAMVideoProcAmp *pProcAmp);
   void DeviceCacheProperties();
   void DeviceCacheVideoModes();
 
