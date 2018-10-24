@@ -73,11 +73,6 @@ model {
     publishing {
         def taskList = createComponentZipTasks($.components, nativeName, zipBaseName, Zip, project, includeStandardZipFormat)
 
-        def allTask
-        if (!project.hasProperty('jenkinsBuild')) {
-            allTask = createAllCombined(taskList, nativeName, zipBaseName, Zip, project)
-        }
-
         def jniTaskList = createComponentZipTasks($.components, "${nativeName}JNI", jniBaseName, Jar, project, { task, value ->
             value.each { binary ->
                 if (binary.buildable) {
@@ -105,55 +100,13 @@ model {
             allJniTask = createAllCombined(jniTaskList, "${nativeName}JNI", jniBaseName, Jar, project)
         }
 
-        def taskListDebug = createComponentZipTasksDebug($.components, nativeName, zipBaseName, Zip, project, includeStandardZipFormat)
-
-        def allTaskDebug
-        if (!project.hasProperty('jenkinsBuild')) {
-            allTaskDebug = createAllCombinedDebug(taskListDebug, nativeName, zipBaseName, Zip, project)
-        }
-
-        def jniTaskListDebug = createComponentZipTasksDebug($.components, "${nativeName}JNI", jniBaseName, Jar, project, { task, value ->
-            value.each { binary ->
-                if (binary.buildable) {
-                    if (binary instanceof SharedLibraryBinarySpec) {
-                        task.dependsOn binary.tasks.link
-                        def hashFile = new File(binary.sharedLibraryFile.parentFile.absolutePath, "${binary.component.baseName}.hash")
-                        task.outputs.file(hashFile)
-                        task.inputs.file(binary.sharedLibraryFile)
-                        task.from(hashFile) {
-                            into getPlatformPath(binary)
-                        }
-                        task.doFirst {
-                            hashFile.text = MessageDigest.getInstance("MD5").digest(binary.sharedLibraryFile.bytes).encodeHex().toString()
-                        }
-                        task.from(binary.sharedLibraryFile) {
-                            into getPlatformPath(binary)
-                        }
-                    }
-                }
-            }
-        })
-
-        def allJniTaskDebug
-        if (!project.hasProperty('jenkinsBuild')) {
-            allJniTaskDebug = createAllCombinedDebug(jniTaskListDebug, "${nativeName}JNI", jniBaseName, Jar, project)
-        }
-
         publications {
             cpp(MavenPublication) {
                 taskList.each {
                     artifact it
                 }
-                taskListDebug.each {
-                    artifact it
-                }
                 artifact cppHeadersZip
                 artifact cppSourcesZip
-
-                if (!project.hasProperty('jenkinsBuild')) {
-                    artifact allTask
-                    artifact allTaskDebug
-                }
 
                 artifactId = "${baseArtifactId}-cpp"
                 groupId artifactGroupId

@@ -1,11 +1,21 @@
 import edu.wpi.first.nativeutils.*
 import org.gradle.internal.os.OperatingSystem
 
-def windowsCompilerArgs = ['/EHsc', '/DNOMINMAX', '/Zi', '/FS', '/Zc:inline', '/MT']
-def windowsCCompilerArgs = ['/Zi', '/FS', '/Zc:inline', '/MT']
-def windowsReleaseCompilerArgs = ['/O2']
+def windowsCompilerArgs = ['/EHsc', '/DNOMINMAX', '/Zi', '/FS', '/Zc:inline', '/MP4']
+def windowsCCompilerArgs = ['/Zi', '/FS', '/Zc:inline']
+def windowsReleaseCompilerArgs = ['/O2', '/MD']
+def windowsDebugCompilerArgs = ['/Od', '/MDd']
 def windowsLinkerArgs = ['/DEBUG:FULL']
 def windowsReleaseLinkerArgs = ['/OPT:REF', '/OPT:ICF']
+
+def linuxCrossCompilerArgs = ['-std=c++14', '-Wformat=2', '-Wall', '-Wextra', '-Werror', '-pedantic', '-Wno-psabi', '-g',
+                         '-Wno-unused-parameter', '-Wno-error=deprecated-declarations', '-fPIC', '-rdynamic',
+                         '-pthread']
+def linuxCrossCCompilerArgs = ['-Wformat=2', '-Wall', '-Wextra', '-Werror', '-pedantic', '-Wno-psabi', '-g',
+                          '-Wno-unused-parameter', '-fPIC', '-rdynamic', '-pthread']
+def linuxCrossLinkerArgs = ['-rdynamic', '-pthread', '-ldl']
+def linuxCrossReleaseCompilerArgs = ['-O2']
+def linuxCrossDebugCompilerArgs = ['-Og']
 
 def linuxCompilerArgs = ['-std=c++14', '-Wformat=2', '-Wall', '-Wextra', '-Werror', '-pedantic', '-Wno-psabi', '-g',
                          '-Wno-unused-parameter', '-Wno-error=deprecated-declarations', '-fPIC', '-rdynamic',
@@ -13,7 +23,7 @@ def linuxCompilerArgs = ['-std=c++14', '-Wformat=2', '-Wall', '-Wextra', '-Werro
 def linuxCCompilerArgs = ['-Wformat=2', '-Wall', '-Wextra', '-Werror', '-pedantic', '-Wno-psabi', '-g',
                           '-Wno-unused-parameter', '-fPIC', '-rdynamic', '-pthread']
 def linuxLinkerArgs = ['-rdynamic', '-pthread', '-ldl']
-def linuxReleaseCompilerArgs = ['-Og']
+def linuxReleaseCompilerArgs = ['-O2']
 def linuxDebugCompilerArgs = ['-O0']
 def linux32BitArg = '-m32'
 
@@ -105,13 +115,12 @@ if (!project.hasProperty('skipAthena')) {
                 architecture = 'athena'
                 operatingSystem = 'linux'
                 toolChainPrefix = 'arm-frc2019-linux-gnueabi-'
-                compilerArgs = linuxCompilerArgs
-                CCompilerArgs = linuxCCompilerArgs
-                linkerArgs = linuxLinkerArgs
-                debugCompilerArgs = linuxDebugCompilerArgs
-                releaseCompilerArgs = linuxReleaseCompilerArgs
-                releaseStripBinaries = true
-                debugStripBinaries = true
+                compilerArgs = linuxCrossCompilerArgs
+                CCompilerArgs = linuxCrossCCompilerArgs
+                linkerArgs = linuxCrossLinkerArgs
+                debugCompilerArgs = linuxCrossDebugCompilerArgs
+                releaseCompilerArgs = linuxCrossReleaseCompilerArgs
+                stripBuildTypes = ['debug', 'release']
                 compilerFamily = 'Gcc'
             }
         }
@@ -129,6 +138,7 @@ if (!project.hasProperty('onlyAthena')) {
                 linkerArgs = windowsLinkerArgs
                 releaseCompilerArgs = windowsReleaseCompilerArgs
                 releaseLinkerArgs = windowsReleaseLinkerArgs
+                debugCompilerArgs = windowsDebugCompilerArgs
                 compilerFamily = 'VisualCpp'
                 detectPlatform = windows32PlatformDetect
             }
@@ -140,6 +150,7 @@ if (!project.hasProperty('onlyAthena')) {
                 linkerArgs = windowsLinkerArgs
                 releaseCompilerArgs = windowsReleaseCompilerArgs
                 releaseLinkerArgs = windowsReleaseLinkerArgs
+                debugCompilerArgs = windowsDebugCompilerArgs
                 compilerFamily = 'VisualCpp'
                 detectPlatform = windows64PlatformDetect
             }
@@ -151,8 +162,7 @@ if (!project.hasProperty('onlyAthena')) {
                 linkerArgs = linuxLinkerArgs
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
-                releaseStripBinaries = true
-                debugStripBinaries = true
+                stripBuildTypes = ['debug', 'release']
                 compilerFamily = 'Gcc'
                 detectPlatform = linux64IntelPlatformDetect
             }
@@ -167,6 +177,18 @@ if (!project.hasProperty('onlyAthena')) {
                 linkerArgs = macLinkerArgs
                 compilerFamily = 'Clang'
                 detectPlatform = mac64PlatformDetect
+            }
+            raspbian(CrossBuildConfig) {
+                architecture = 'raspbian'
+                operatingSystem = 'linux'
+                toolChainPrefix = 'arm-raspbian9-linux-gnueabihf-'
+                compilerArgs = linuxCrossCompilerArgs
+                CCompilerArgs = linuxCrossCCompilerArgs
+                linkerArgs = linuxCrossLinkerArgs
+                debugCompilerArgs = linuxCrossDebugCompilerArgs
+                releaseCompilerArgs = linuxCrossReleaseCompilerArgs
+                stripBuildTypes = ['debug', 'release']
+                compilerFamily = 'Gcc'
             }
         }
     }
@@ -184,8 +206,7 @@ if (project.hasProperty('linuxCross')) {
                 linkerArgs = linuxLinkerArgs
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
-                releaseStripBinaries = true
-                debugStripBinaries = true
+                stripBuildTypes = ['debug', 'release']
                 skipByDefault = true
                 compilerFamily = 'Gcc'
             }
@@ -202,8 +223,7 @@ if (project.hasProperty('linuxCross')) {
                 linkerArgs = linuxLinkerArgs
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
-                releaseStripBinaries = true
-                debugStripBinaries = true
+                stripBuildTypes = ['debug', 'release']
                 compilerFamily = 'Gcc'
                 detectPlatform = linuxArmPlatformDetect
             }
@@ -211,57 +231,12 @@ if (project.hasProperty('linuxCross')) {
     }
 }
 
-ext.getClassifier = { binary ->
-    return NativeUtils.getClassifier(binary)
+ext.getPublishClassifier = { binary ->
+    return NativeUtils.getPublishClassifier(binary)
 }
 
 ext.getPlatformPath = { binary ->
     return NativeUtils.getPlatformPath(binary)
-}
-
-ext.createComponentZipTasksDebug = { components, name, base, type, project, func ->
-    def configMap = [:]
-    components.each {
-        if (it in NativeLibrarySpec && it.name == name) {
-            it.binaries.each {
-                if (it.buildType.name == "debug") {
-                    def target = getClassifier(it)
-                    if (configMap.containsKey(target)) {
-                        configMap.get(target).add(it)
-                    } else {
-                        configMap.put(target, [])
-                        configMap.get(target).add(it)
-                    }
-                }
-            }
-        }
-    }
-    def taskList = []
-    def outputsFolder = file("$project.buildDir/outputs")
-    configMap.each { key, value ->
-        def task = project.tasks.create(base + "-${key}-debug", type) {
-            description = 'Creates component archive for platform ' + key
-            destinationDir = outputsFolder
-            classifier = key + 'debug'
-            baseName = '_M_' + base
-            duplicatesStrategy = 'exclude'
-
-            from(licenseFile) {
-                into '/'
-            }
-
-            func(it, value)
-        }
-        taskList.add(task)
-
-        project.build.dependsOn task
-
-        project.artifacts {
-            task
-        }
-        addTaskToCopyAllOutputs(task)
-    }
-    return taskList
 }
 
 ext.createComponentZipTasks = { components, name, base, type, project, func ->
@@ -269,14 +244,13 @@ ext.createComponentZipTasks = { components, name, base, type, project, func ->
     components.each {
         if (it in NativeLibrarySpec && it.name == name) {
             it.binaries.each {
-                if (it.buildType.name == "release") {
-                    def target = getClassifier(it)
-                    if (configMap.containsKey(target)) {
-                        configMap.get(target).add(it)
-                    } else {
-                        configMap.put(target, [])
-                        configMap.get(target).add(it)
-                    }
+                if (!it.buildable) return
+                def target = getPublishClassifier(it)
+                if (configMap.containsKey(target)) {
+                    configMap.get(target).add(it)
+                } else {
+                    configMap.put(target, [])
+                    configMap.get(target).add(it)
                 }
             }
         }
@@ -311,40 +285,18 @@ ext.createComponentZipTasks = { components, name, base, type, project, func ->
 
 ext.createAllCombined = { list, name, base, type, project ->
     def outputsFolder = file("$project.buildDir/outputs")
-    def task = project.tasks.create(base + '-all', type) {
-        description = 'Creates component archive for all classifiers'
+
+    def task = project.tasks.create(base + "-all", type) {
+        description = "Creates component archive for all classifiers"
         destinationDir = outputsFolder
-        classifier = 'all'
+        classifier = "all"
         baseName = base
         duplicatesStrategy = 'exclude'
 
         list.each {
-            from project.zipTree(it.archivePath)
-            dependsOn it
-        }
-    }
-
-    project.build.dependsOn task
-
-    project.artifacts {
-        task
-    }
-
-    return task
-
-}
-
-ext.createAllCombinedDebug = { list, name, base, type, project ->
-    def outputsFolder = file("$project.buildDir/outputs")
-    def task = project.tasks.create(base + '-all-debug', type) {
-        description = 'Creates component archive for all classifiers'
-        destinationDir = outputsFolder
-        classifier = 'alldebug'
-        baseName = base
-        duplicatesStrategy = 'exclude'
-
-        list.each {
-            from project.zipTree(it.archivePath)
+            it.outputs.files.each {
+                from project.zipTree(it)
+            }
             dependsOn it
         }
     }
@@ -379,7 +331,7 @@ ext.includeStandardZipFormat = { task, value ->
                 task.from(binary.sharedLibraryLinkFile) {
                     into getPlatformPath(binary) + '/shared'
                 }
-            } else if (binary instanceof StaticLibraryBinarySpec) {
+            } else  if (binary instanceof StaticLibraryBinarySpec) {
                 task.dependsOn binary.tasks.createStaticLib
                 task.from(binary.staticLibraryFile) {
                     into getPlatformPath(binary) + '/static'

@@ -50,30 +50,11 @@ addTaskToCopyAllOutputs(cppHeadersZip)
 model {
     publishing {
         def halsim_adx_gyro_accelerometerTaskList = createComponentZipTasks($.components, nativeName, zipBaseName, Zip, project, includeStandardZipFormat)
-        def allTask
-        if (!project.hasProperty('jenkinsBuild')) {
-            allTask = createAllCombined(halsim_adx_gyro_accelerometerTaskList, nativeName, zipBaseName, Zip, project)
-        }
-
-        def halsim_adx_gyro_accelerometerTaskListDebug = createComponentZipTasksDebug($.components, nativeName, zipBaseName, Zip, project, includeStandardZipFormat)
-        def allTaskDebug
-        if (!project.hasProperty('jenkinsBuild')) {
-            allTaskDebug = createAllCombinedDebug(halsim_adx_gyro_accelerometerTaskListDebug, nativeName, zipBaseName, Zip, project)
-        }
 
         publications {
             cpp(MavenPublication) {
                 halsim_adx_gyro_accelerometerTaskList.each {
                     artifact it
-                }
-
-                halsim_adx_gyro_accelerometerTaskListDebug.each {
-                    artifact it
-                }
-
-                if (!project.hasProperty('jenkinsBuild')) {
-                    artifact allTask
-                    artifact allTaskDebug
                 }
 
                 artifact cppHeadersZip

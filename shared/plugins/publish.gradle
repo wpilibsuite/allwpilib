@@ -63,42 +63,10 @@ model {
             }
         })
 
-        def allTask
-        if (!project.hasProperty('jenkinsBuild')) {
-            allTask = createAllCombined(pluginTaskList, pluginName, zipBaseName, Zip, project)
-        }
-
-        def pluginTaskListDebug = createComponentZipTasksDebug($.components, pluginName, zipBaseName, Zip, project, { task, value ->
-            value.each { binary ->
-                if (binary.buildable) {
-                    if (binary instanceof SharedLibraryBinarySpec) {
-                        task.dependsOn binary.buildTask
-                        task.from(binary.sharedLibraryFile) {
-                            into getPlatformPath(binary) + '/shared'
-                        }
-                    }
-                }
-            }
-        })
-
-        def allTaskDebug
-        if (!project.hasProperty('jenkinsBuild')) {
-            allTaskDebug = createAllCombinedDebug(pluginTaskListDebug, pluginName, zipBaseName, Zip, project)
-        }
-
         publications {
             cpp(MavenPublication) {
                 pluginTaskList.each {
                     artifact it
-                }
-
-                pluginTaskListDebug.each {
-                    artifact it
-                }
-
-                if (!project.hasProperty('jenkinsBuild')) {
-                    artifact allTask
-                    artifact allTaskDebug
                 }
 
                 artifact cppHeadersZip
