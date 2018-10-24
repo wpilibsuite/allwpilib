@@ -8,9 +8,7 @@
 #ifndef CSCORE_USBCAMERABUFFER_H_
 #define CSCORE_USBCAMERABUFFER_H_
 
-#ifdef __linux__
 #include <sys/mman.h>
-#endif
 
 #include <utility>
 
@@ -29,7 +27,6 @@ class UsbCameraBuffer {
   UsbCameraBuffer(const UsbCameraBuffer&) = delete;
   UsbCameraBuffer& operator=(const UsbCameraBuffer&) = delete;
 
-#ifdef __linux__
   UsbCameraBuffer(int fd, size_t length, off_t offset) noexcept
       : m_length{length} {
     m_data =
@@ -43,7 +40,6 @@ class UsbCameraBuffer {
   ~UsbCameraBuffer() {
     if (m_data) munmap(m_data, m_length);
   }
-#endif
 
   friend void swap(UsbCameraBuffer& first, UsbCameraBuffer& second) noexcept {
     using std::swap;

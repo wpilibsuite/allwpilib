@@ -31,6 +31,39 @@ ext {
                         srcDirs 'src/main/native/include'
                     }
                 }
+                cscoreMacCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/osx'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                    }
+                }
+            }
+        } else if (it.targetPlatform.operatingSystem.name == 'linux') {
+            it.sources {
+                cscoreLinuxCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/linux'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                    }
+                }
+            }
+        } else if (it.targetPlatform.operatingSystem.name == 'windows') {
+            it.sources {
+                cscoreWindowsCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/windows'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                    }
+                }
             }
         }
     }

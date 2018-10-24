@@ -15,8 +15,6 @@
 
 namespace cs {
 
-#ifdef __linux__
-
 wpi::StringRef GetUsbNameFromId(int vendor, int product,
                                 wpi::SmallVectorImpl<char>& buf);
 
@@ -27,8 +25,6 @@ int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
   CheckedIoctl(fd, req, data, #req, __FILE__, __LINE__, false)
 #define TryIoctl(fd, req, data) \
   CheckedIoctl(fd, req, data, #req, __FILE__, __LINE__, true)
-
-#endif  // __linux__
 
 }  // namespace cs
 

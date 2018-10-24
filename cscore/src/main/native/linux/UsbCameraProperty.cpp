@@ -14,8 +14,6 @@
 
 using namespace cs;
 
-#ifdef __linux__
-
 static int GetIntCtrlIoctl(int fd, unsigned id, int type, int64_t* value) {
   unsigned ctrl_class = V4L2_CTRL_ID2CLASS(id);
   if (type == V4L2_CTRL_TYPE_INTEGER64 || V4L2_CTRL_DRIVER_PRIV(id) ||
@@ -322,5 +320,3 @@ bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd,
 
   return rv >= 0;
 }
-
-#endif  // __linux__
