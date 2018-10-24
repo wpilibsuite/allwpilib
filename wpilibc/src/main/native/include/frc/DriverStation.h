@@ -266,9 +266,33 @@ class DriverStation : public ErrorBase {
   bool IsBrownedOut() const;
 
   std::string GetGameSpecificMessage() const;
+  /**
+   * Returns the name of the competition event from the FMS.
+   *
+   * @return An std::string containing the event name
+   */
   std::string GetEventName() const;
+
+  /**
+   * Return the type of match being played from the FMS.
+   *
+   * @return The match type enum (kNone, kPractice, kQualification,
+   * kElimination)
+   */
   MatchType GetMatchType() const;
+
+  /**
+   * Return the match number from the FMS.
+   *
+   * @return The number of the match
+   */
   int GetMatchNumber() const;
+
+  /**
+   * Returns The number or times the current match has been replayed.
+   *
+   * @return The number of replays
+   */
   int GetReplayNumber() const;
 
   /**
