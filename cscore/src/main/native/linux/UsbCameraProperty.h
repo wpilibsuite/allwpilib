@@ -8,9 +8,7 @@
 #ifndef CSCORE_USBCAMERAPROPERTY_H_
 #define CSCORE_USBCAMERAPROPERTY_H_
 
-#ifdef __linux__
 #include <linux/videodev2.h>
-#endif
 
 #include <memory>
 
@@ -50,7 +48,6 @@ class UsbCameraProperty : public PropertyImpl {
     maximum = 100;
   }
 
-#ifdef __linux__
 #ifdef VIDIOC_QUERY_EXT_CTRL
   explicit UsbCameraProperty(const struct v4l2_query_ext_ctrl& ctrl);
 #endif
@@ -62,7 +59,6 @@ class UsbCameraProperty : public PropertyImpl {
   bool DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd) const;
   bool DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd, int newValue,
                  const wpi::Twine& newValueStr) const;
-#endif
 
   // If this is a device (rather than software) property
   bool device{true};

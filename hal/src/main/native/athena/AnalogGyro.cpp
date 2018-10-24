@@ -9,6 +9,8 @@
 
 #include <thread>
 
+#include <wpi/raw_ostream.h>
+
 #include "AnalogInternal.h"
 #include "HALInitializer.h"
 #include "hal/AnalogAccumulator.h"
@@ -169,6 +171,8 @@ void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
 
   HAL_InitAccumulator(gyro->handle, status);
   if (*status != 0) return;
+  wpi::outs() << "Calibrating analog gyro for " << kCalibrationSampleTime
+              << " seconds." << '\n';
   Wait(kCalibrationSampleTime);
 
   int64_t value;
