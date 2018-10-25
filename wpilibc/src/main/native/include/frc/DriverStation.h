@@ -269,7 +269,7 @@ class DriverStation : public ErrorBase {
   /**
    * Returns the name of the competition event from the FMS.
    *
-   * @return An std::string containing the event name
+   * @return A string containing the event name
    */
   std::string GetEventName() const;
 
