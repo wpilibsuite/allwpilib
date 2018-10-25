@@ -7,6 +7,8 @@ resources:
   containers:
   - container: wpilib2019
     image: wpilib/roborio-cross-ubuntu:2019-18.04
+  - container: raspbian
+    image:  wpilib/raspbian-cross-ubuntu:18.04
 
 jobs:
  - job: Linux_Arm
@@ -32,7 +34,7 @@ jobs:
    pool:
      vmImage: 'Ubuntu 16.04'
 
-   container: wpilib2019
+   container: raspbian
 
    steps:
     - task: Gradle@2

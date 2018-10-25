@@ -57,7 +57,11 @@ void DSCommPacket::ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData) {
   store |= tagData[4] << 8;
   store |= tagData[5];
 
-  float matchTime = *reinterpret_cast<float*>(&store);
+  static_assert(sizeof(uint32_t) == sizeof(float));
+
+  float matchTime = 0;
+
+  std::memcpy(&matchTime, &store, sizeof(float));
   m_match_time = matchTime;
 }
 
