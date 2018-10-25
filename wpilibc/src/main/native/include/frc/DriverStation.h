@@ -282,7 +282,7 @@ class DriverStation : public ErrorBase {
   MatchType GetMatchType() const;
 
   /**
-   * Return the match number from the FMS.
+   * Returns the match number provided by FMS.
    *
    * @return The number of the match
    */
