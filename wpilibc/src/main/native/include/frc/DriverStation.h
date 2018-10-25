@@ -289,7 +289,7 @@ class DriverStation : public ErrorBase {
   int GetMatchNumber() const;
 
   /**
-   * Returns The number or times the current match has been replayed.
+   * Returns the number or times the current match has been replayed.
    *
    * @return The number of replays
    */
