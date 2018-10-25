@@ -277,7 +277,7 @@ class DriverStation : public ErrorBase {
    * Return the type of match being played from the FMS.
    *
    * @return The match type enum (kNone, kPractice, kQualification,
-   * kElimination)
+   *         kElimination)
    */
   MatchType GetMatchType() const;
 
