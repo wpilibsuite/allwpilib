@@ -166,6 +166,8 @@ class UsbCameraImpl : public SourceImpl {
   bool m_modeSetFPS{false};
   int m_connectVerbose{1};
 
+  bool m_deviceValid{false};
+
 #ifdef _WIN32
   IMFMediaSource* m_mediaSource = nullptr;
   IMFSourceReader* m_sourceReader = nullptr;
@@ -201,6 +203,8 @@ class UsbCameraImpl : public SourceImpl {
 
   // Quirks
   bool m_lifecam_exposure{false};  // Microsoft LifeCam exposure
+
+  std::vector<std::pair<VideoMode, _ComPtr<IMFMediaType>>> m_windowsVideoModes;
 
   //
   // Variables protected by m_mutex

@@ -782,6 +782,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
 
 bool UsbCameraImpl::DeviceStreamOn() {
   if (m_streaming) return false;
+  if (!m_deviceValid) return false;
   m_streaming = true;
    std::cout << "Calling Read Sample" << std::endl;
   m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
@@ -874,7 +875,11 @@ void UsbCameraImpl::DeviceCacheMode() {
     m_mode.fps = fps;
   }
 
-  if (formatChanged || fpsChanged) DeviceSetMode();
+  if (formatChanged || fpsChanged)  {
+    DeviceSetMode();
+  } else {
+    m_deviceValid = true;
+  }
 
   std::cout << "Notify change\n";
 
@@ -884,6 +889,12 @@ void UsbCameraImpl::DeviceCacheMode() {
 void UsbCameraImpl::DeviceSetMode() {
 
   std::cout << "Setting Device Mode\n";
+
+  // Find the matching mode
+  std::find_if(m_windowsVideoModes.begin(), m_windowsVideoModes.end(), [&](std::pair<VideoMode, _ComPtr<IMFMediaType>>& input){
+    return input.first == m_mode;
+  });
+
 
   IMFMediaType* nativeType = NULL;
   // Get the default media type of the camera
@@ -897,6 +908,7 @@ void UsbCameraImpl::DeviceSetMode() {
       nativeType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_MJPG);
       break;
     case cs::VideoMode::PixelFormat::kBGR:
+      std::cout << "Setting BGR\n";
       nativeType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_RGB24);
       break;
     case cs::VideoMode::PixelFormat::kYUYV:
@@ -904,10 +916,14 @@ void UsbCameraImpl::DeviceSetMode() {
       break;
   }
 
+  std::cout << m_mode.width << " " << m_mode.height << "\n";
+
   ::MFSetAttributeSize(nativeType, MF_MT_FRAME_SIZE, m_mode.width, m_mode.height);
-  ::MFSetAttributeRatio(nativeType, MF_MT_FRAME_RATE, m_mode.fps, 1);
+  //::MFSetAttributeRatio(nativeType, MF_MT_FRAME_RATE, m_mode.fps, 1);
 
   HRESULT setResult = m_sourceReader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, NULL, nativeType);
+
+  m_deviceValid = SUCCEEDED(setResult);
 
   switch (setResult) {
     case S_OK:
@@ -934,6 +950,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   if (!m_sourceReader) return;
 
   std::vector<VideoMode> modes;
+  m_windowsVideoModes.clear();
 
   bool set = false;
 
@@ -964,9 +981,10 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
           fps = ceil(num / (double)dom);
         }
 
-        modes.emplace_back(format, static_cast<int>(width), static_cast<int>(height), fps);
+        VideoMode newMode = {format, static_cast<int>(width), static_cast<int>(height), fps};
 
-        nativeType->Release();
+        modes.emplace_back(newMode);
+        m_windowsVideoModes.emplace_back(newMode, _ComPtr<IMFMediaType>(nativeType));
         count++;
     }
 

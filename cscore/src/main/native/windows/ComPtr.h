@@ -4,63 +4,151 @@
 
 #include <shlwapi.h>  // QISearch
 
-namespace cs
-{
+namespace cs {
 
-template <class T>
-class ComPtr
-{
-public:
-    ComPtr()
-    {
-    }
-    ComPtr(T* lp)
-    {
-        p = lp;
-    }
-    ComPtr(_In_ const ComPtr<T>& lp)
-    {
-        p = lp.p;
-    }
-    virtual ~ComPtr()
-    {
-    }
-
-    T** operator&()
-    {
-        return p.operator&();
-    }
-    T* operator->() const
-    {
-        return p.operator->();
-    }
-    operator bool()
-    {
-        return p.operator!=(NULL);
-    }
-
-    T* Get() const
-    {
-        return p;
-    }
-
-    void Release()
-    {
-        if (p)
-            p.Release();
-    }
-
-    // query for U interface
-    template<typename U>
-    HRESULT As(_Out_ ComPtr<U>& lp) const
-    {
-        lp.Release();
-        return p->QueryInterface(__uuidof(U), reinterpret_cast<void**>((T**)&lp));
-    }
-private:
-    _COM_SMARTPTR_TYPEDEF(T, __uuidof(T));
-    TPtr p;
+template <typename Interface>
+class RemoveAddRefRelease : public Interface {
+    ULONG __stdcall AddRef();
+    ULONG __stdcall Release();
 };
+
+template <typename Interface>
+class ComPtr {
+  public:
+    template <typename T>
+    friend class ComPtr;
+
+    ComPtr() noexcept = default;
+    ComPtr(const ComPtr& other) noexcept :
+        m_ptr(other.m_ptr) {
+        InternalAddRef();
+    }
+
+    template <typename T>
+    ComPtr(const ComPtr<T>& other) noexcept :
+        m_ptr(other.m_ptr) {
+        InternalAddRef();
+    }
+
+    template <typename T>
+    ComPtr(ComPtr<T>&& other) noexcept :
+        m_ptr(other.m_ptr) {
+        other.m_ptr = nullptr;
+    }
+
+    ~ComPtr() noexcept {
+        InternalRelease();
+    }
+
+    ComPtr& operator=(const ComPtr& other) noexcept {
+        InternalCopy(other.m_ptr);
+        return *this;
+    }
+
+    template <typename T>
+    ComPtr& operator=(const ComPtr<T>& other) noexcept {
+        InternalCopy(other.m_ptr);
+        return *this;
+    }
+
+    template <typename T>
+    ComPtr& operator=(ComPtr<T>&& other) noexcept {
+        InternalMove(other);
+        return *this;
+    }
+
+    void Swap(ComPtr& other) noexcept {
+        Interface * temp = m_ptr;
+        m_ptr = other.m_ptr;
+        other.m_ptr = temp;
+    }
+
+    explicit operator bool() const noexcept {
+        return nullptr != m_ptr;
+    }
+
+    void Reset() noexcept {
+        InternalRelease();
+    }
+
+    Interface* Get() const noexcept {
+        return m_ptr;
+    }
+
+    Interface* Detach() noexcept {
+        Interface * temp = m_ptr;
+        m_ptr = nullptr;
+        return temp;
+    }
+
+    void Copy(Interface* other) noexcept {
+        InternalCopy(other);
+    }
+
+    void Attach(Interface* other) noexcept {
+        InternalRelease();
+        m_ptr = other;
+    }
+
+    Interface** GetAddressOf() noexcept {
+        ASSERT(m_ptr == nullptr);
+        return &m_ptr;
+    }
+
+    void CopyTo(Interface** other) const noexcept {
+        InternalAddRef();
+        *other = m_ptr;
+    }
+
+    template <typename T>
+    ComPtr<T> As() const noexcept {
+        ComPtr<T> temp;
+        m_ptr->QueryInterface(temp.GetAddressOf());
+        return temp;
+    }
+
+    RemoveAddRefRelease<Interface>* operator->() const noexcept {
+       return static_cast<RemoveAddRefRelease<Interface> *>(m_ptr);
+    }
+  private:
+    Interface* m_ptr = nullptr;
+
+    void InternalAddRef() const noexcept {
+        if (m_ptr) {
+            m_ptr->AddRef();
+        }
+    }
+
+    void InternalRelease() noexcept {
+        Interface* temp = m_ptr;
+        if (temp) {
+            m_ptr = nullptr;
+            temp->Release();
+        }
+    }
+
+    void InternalCopy(Interface* other) noexcept {
+        if (m_ptr != other) {
+            InternalRelease();
+            m_ptr = other;
+            InternalAddRef();
+        }
+    }
+
+    template <typename T>
+    void InternalMove(ComPtr<T>& other) noexcept {
+        if (m_ptr != other.m_ptr) {
+            InternalRelease();
+            m_ptr = other.m_ptr;
+            other.m_ptr = nullptr;
+        }
+    }
+};
+
+template <typename Interface>
+void swap(ComPtr<Interface> & left,
+          ComPtr<Interface> & right) noexcept {
+    left.Swap(right);
 }
 
-#define _ComPtr cs::ComPtr
+}
