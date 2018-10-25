@@ -274,7 +274,7 @@ class DriverStation : public ErrorBase {
   std::string GetEventName() const;
 
   /**
-   * Return the type of match being played from the FMS.
+   * Returns the type of match being played provided by FMS.
    *
    * @return The match type enum (kNone, kPractice, kQualification,
    *         kElimination)
