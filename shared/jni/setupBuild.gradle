@@ -50,6 +50,7 @@ model {
             }
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions('athena')
+            jniCrossCompileOptions << JniCrossCompileOptions('raspbian')
             sources {
                 cpp {
                     source {
@@ -82,6 +83,7 @@ model {
             enableCheckTask true
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions('athena')
+            jniCrossCompileOptions << JniCrossCompileOptions('raspbian')
             sources {
                 cpp {
                     source {
@@ -110,6 +112,7 @@ model {
             enableCheckTask true
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions('athena')
+            jniCrossCompileOptions << JniCrossCompileOptions('raspbian')
             sources {
                 cpp {
                     source {
