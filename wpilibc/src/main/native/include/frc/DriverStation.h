@@ -265,7 +265,13 @@ class DriverStation : public ErrorBase {
   WPI_DEPRECATED("Use RobotController static class method")
   bool IsBrownedOut() const;
 
+  /**
+   * Returns the game specific message provided by FMS.
+   * 
+   * @return A string containing the game specific message.
+   */
   std::string GetGameSpecificMessage() const;
+
   /**
    * Returns the name of the competition event provided by FMS.
    *
