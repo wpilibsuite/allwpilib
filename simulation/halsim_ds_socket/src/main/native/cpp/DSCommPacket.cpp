@@ -57,7 +57,7 @@ void DSCommPacket::ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData) {
   store |= tagData[4] << 8;
   store |= tagData[5];
 
-  static_assert(sizeof(uint32_t) == sizeof(float));
+  static_assert(sizeof(uint32_t) == sizeof(float), "float must be 32 bits");
 
   float matchTime = 0;
 
