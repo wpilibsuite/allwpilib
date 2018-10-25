@@ -239,6 +239,40 @@ ext.getPlatformPath = { binary ->
     return NativeUtils.getPlatformPath(binary)
 }
 
+ext.appendDebugPathToBinaries = { binaries->
+    binaries.withType(StaticLibraryBinarySpec) {
+        if (it.buildType.name.contains('debug')) {
+            def staticFileDir = it.staticLibraryFile.parentFile
+            def staticFileName = it.staticLibraryFile.name
+            def staticFileExtension = staticFileName.substring(staticFileName.lastIndexOf('.'))
+            staticFileName = staticFileName.substring(0, staticFileName.lastIndexOf('.'))
+            staticFileName = staticFileName + 'd' + staticFileExtension
+            def newStaticFile = new File(staticFileDir, staticFileName)
+            it.staticLibraryFile = newStaticFile
+        }
+    }
+    binaries.withType(SharedLibraryBinarySpec) {
+        if (it.buildType.name.contains('debug')) {
+            def sharedFileDir = it.sharedLibraryFile.parentFile
+            def sharedFileName = it.sharedLibraryFile.name
+            def sharedFileExtension = sharedFileName.substring(sharedFileName.lastIndexOf('.'))
+            sharedFileName = sharedFileName.substring(0, sharedFileName.lastIndexOf('.'))
+            sharedFileName = sharedFileName + 'd' + sharedFileExtension
+            def newSharedFile = new File(sharedFileDir, sharedFileName)
+
+            def sharedLinkFileDir = it.sharedLibraryLinkFile.parentFile
+            def sharedLinkFileName = it.sharedLibraryLinkFile.name
+            def sharedLinkFileExtension = sharedLinkFileName.substring(sharedLinkFileName.lastIndexOf('.'))
+            sharedLinkFileName = sharedLinkFileName.substring(0, sharedLinkFileName.lastIndexOf('.'))
+            sharedLinkFileName = sharedLinkFileName + 'd' + sharedLinkFileExtension
+            def newLinkFile = new File(sharedLinkFileDir, sharedLinkFileName)
+
+            it.sharedLibraryLinkFile = newLinkFile
+            it.sharedLibraryFile = newSharedFile
+        }
+    }
+}
+
 ext.createComponentZipTasks = { components, name, base, type, project, func ->
     def configMap = [:]
     components.each {

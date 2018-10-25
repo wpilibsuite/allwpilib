@@ -138,6 +138,7 @@ model {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
             }
+            appendDebugPathToBinaries(binaries)
         }
         // By default, a development executable will be generated. This is to help the case of
         // testing specific functionality of the library.

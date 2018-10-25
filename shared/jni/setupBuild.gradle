@@ -99,6 +99,7 @@ model {
             binaries.all {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
+            appendDebugPathToBinaries(binaries)
         }
         "${nativeName}JNI"(JniNativeLibrarySpec) {
             if (project.hasProperty('setBaseName')) {
