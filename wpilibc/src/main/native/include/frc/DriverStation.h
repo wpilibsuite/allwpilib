@@ -267,7 +267,7 @@ class DriverStation : public ErrorBase {
 
   std::string GetGameSpecificMessage() const;
   /**
-   * Returns the name of the competition event from the FMS.
+   * Returns the name of the competition event provided by FMS.
    *
    * @return A string containing the event name
    */
