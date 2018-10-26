@@ -108,7 +108,7 @@ def mac32PlatformDetect = {
     }
 }
 
-if (!project.hasProperty('skipAthena')) {
+if (!project.hasProperty('skipAthena') && !project.hasProperty('onlyRaspbian')) {
     model {
         buildConfigs {
             roboRio(CrossBuildConfig) {
@@ -127,7 +127,7 @@ if (!project.hasProperty('skipAthena')) {
     }
 }
 
-if (!project.hasProperty('skipRaspbian')) {
+if (!project.hasProperty('skipRaspbian') && !project.hasProperty('onlyAthena')) {
     model {
         buildConfigs {
             raspbian(CrossBuildConfig) {
