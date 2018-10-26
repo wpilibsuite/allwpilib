@@ -127,7 +127,26 @@ if (!project.hasProperty('skipAthena')) {
     }
 }
 
-if (!project.hasProperty('onlyAthena')) {
+if (!project.hasProperty('skipRaspbian')) {
+    model {
+        buildConfigs {
+            raspbian(CrossBuildConfig) {
+                architecture = 'raspbian'
+                operatingSystem = 'linux'
+                toolChainPrefix = 'arm-raspbian9-linux-gnueabihf-'
+                compilerArgs = linuxCrossCompilerArgs
+                CCompilerArgs = linuxCrossCCompilerArgs
+                linkerArgs = linuxCrossLinkerArgs
+                debugCompilerArgs = linuxCrossDebugCompilerArgs
+                releaseCompilerArgs = linuxCrossReleaseCompilerArgs
+                stripBuildTypes = ['debug', 'release']
+                compilerFamily = 'Gcc'
+            }
+        }
+    }
+}
+
+if (!project.hasProperty('onlyAthena') && !hasProperty('onlyRaspbian')) {
     model {
         buildConfigs {
             winX86(BuildConfig) {
@@ -177,18 +196,6 @@ if (!project.hasProperty('onlyAthena')) {
                 linkerArgs = macLinkerArgs
                 compilerFamily = 'Clang'
                 detectPlatform = mac64PlatformDetect
-            }
-            raspbian(CrossBuildConfig) {
-                architecture = 'raspbian'
-                operatingSystem = 'linux'
-                toolChainPrefix = 'arm-raspbian9-linux-gnueabihf-'
-                compilerArgs = linuxCrossCompilerArgs
-                CCompilerArgs = linuxCrossCCompilerArgs
-                linkerArgs = linuxCrossLinkerArgs
-                debugCompilerArgs = linuxCrossDebugCompilerArgs
-                releaseCompilerArgs = linuxCrossReleaseCompilerArgs
-                stripBuildTypes = ['debug', 'release']
-                compilerFamily = 'Gcc'
             }
         }
     }

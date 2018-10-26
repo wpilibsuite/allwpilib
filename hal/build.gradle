@@ -68,6 +68,7 @@ ext {
             it.dependsOn generateUsageReporting
         }
         if (it.targetPlatform.architecture.name == 'athena') {
+
             it.sources {
                 athenaJniCpp(CppSourceSet) {
                     source {

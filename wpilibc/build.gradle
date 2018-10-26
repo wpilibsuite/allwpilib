@@ -202,7 +202,7 @@ model {
             }
         }
         withType(GoogleTestTestSuiteBinarySpec) {
-            if (!project.hasProperty('onlyAthena')) {
+            if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')

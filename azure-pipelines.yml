@@ -30,11 +30,30 @@ jobs:
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
 
- - job: Linux
+ - job: Linux_Raspbian
    pool:
      vmImage: 'Ubuntu 16.04'
 
    container: raspbian
+
+   steps:
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        publishJUnitResults: true
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'build'
+        options: '-PonlyRaspbian'
+        # checkStyleRunAnalysis: true
+        # pmdRunAnalysis: true
+
+ - job: Linux
+   pool:
+     vmImage: 'Ubuntu 16.04'
+
+   container: wpilib2019
 
    steps:
     - task: Gradle@2

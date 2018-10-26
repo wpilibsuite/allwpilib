@@ -221,7 +221,7 @@ model {
     }
     binaries {
         withType(GoogleTestTestSuiteBinarySpec) {
-            if (!project.hasProperty('onlyAthena')) {
+            if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
                 lib library: nativeName, linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             } else {

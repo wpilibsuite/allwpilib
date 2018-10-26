@@ -150,7 +150,7 @@ if (!project.hasProperty('onlyAthena')) {
 model {
 
     testSuites {
-        if (!project.hasProperty('onlyAthena')) {
+        if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
             "${nativeName}Test"(GoogleTestTestSuiteSpec) {
                 for(NativeComponentSpec c : $.components) {
                     if (c.name == nativeName) {
