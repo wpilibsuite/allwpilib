@@ -62,7 +62,7 @@ class SingleNativeBuild implements Plugin<Project> {
             components.each { component ->
                 if (component.name == "${nativeName}Base") {
                     base = (NativeLibrarySpec) component
-                } else if (component.name == "${nativeName}" || component.name == "${nativeName}JNI") {
+                } else if (component.name == "${nativeName}") {
                     subs << component
                 }
             }
