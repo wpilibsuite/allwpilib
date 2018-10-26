@@ -70,9 +70,8 @@ ext {
         if (it.targetPlatform.architecture.name == 'athena') {
             it.sources {
                 athenaJniCpp(CppSourceSet) {
-                    generatedBy generateAthenaSimFiles
                     source {
-                        srcDirs = ["$buildDir/generated/cpp"]
+                        srcDirs = ["${rootDir}/shared/singlelib", "$buildDir/generated/cpp"]
                         include '**/*.cpp'
                     }
                     exportedHeaders {
