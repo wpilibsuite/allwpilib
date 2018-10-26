@@ -106,6 +106,14 @@ if (NOT WITHOUT_JAVA)
 
     set_property(TARGET cscorejni PROPERTY FOLDER "libraries")
 
+    if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
+        target_include_directories(cscorejni PRIVATE ${JNI_INCLUDE_DIRS})
+        target_include_directories(cscorejni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
+    else()
+        target_link_libraries(cscorejni PRIVATE cscore_jni_headers)
+    endif()
+    add_dependencies(cscorejni cscore_jar)
+
     if (MSVC)
         install(TARGETS cscorejni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
     endif()
