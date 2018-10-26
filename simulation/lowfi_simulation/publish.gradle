@@ -50,7 +50,7 @@ addTaskToCopyAllOutputs(cppHeadersZip)
 
 model {
     publishing {
-        def lowfiSimTaskList = createComponentZipTasks($.components, nativeName, zipBaseName, Zip, project, includeStandardZipFormat)
+        def lowfiSimTaskList = createComponentZipTasks($.components, [nativeName], zipBaseName, Zip, project, includeStandardZipFormat)
 
         publications {
             cpp(MavenPublication) {

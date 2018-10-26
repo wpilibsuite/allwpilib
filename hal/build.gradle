@@ -51,11 +51,50 @@ ext {
         binary.lib project: ':hal', library: 'hal', linkage: shared
     }
 
+    addHalJniDependency = { binary->
+        binary.tasks.withType(AbstractNativeSourceCompileTask) {
+            it.dependsOn generateUsageReporting
+        }
+        binary.lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
+    }
+
     nativeName = 'hal'
     setBaseName = 'wpiHal'
     devMain = 'DevMain'
     niLibraries = true
     generatedHeaders = "$buildDir/generated/headers"
+    jniSplitSetup = {
+        it.tasks.withType(AbstractNativeSourceCompileTask) {
+            it.dependsOn generateUsageReporting
+        }
+        if (it.targetPlatform.architecture.name == 'athena') {
+            it.sources {
+                athenaJniCpp(CppSourceSet) {
+                    source {
+                        srcDirs = ["$buildDir/generated/cpp"]
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        srcDir generatedHeaders
+                    }
+                }
+            }
+        } else {
+            it.sources {
+                simJniCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/sim'
+                        include '**/jni/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        srcDir generatedHeaders
+                    }
+                }
+            }
+        }
+    }
     splitSetup = {
         it.tasks.withType(AbstractNativeSourceCompileTask) {
             it.dependsOn generateUsageReporting
@@ -64,8 +103,9 @@ ext {
             it.sources {
                 athenaCpp(CppSourceSet) {
                     source {
-                        srcDirs = ['src/main/native/athena', "$buildDir/generated/cpp"]
+                        srcDirs = ['src/main/native/athena']
                         include '**/*.cpp'
+                        exclude '**/jni/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -79,6 +119,7 @@ ext {
                     source {
                         srcDirs 'src/main/native/sim'
                         include '**/*.cpp'
+                        exclude '**/jni/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -137,26 +178,6 @@ model {
                                  '_CT??_R0?AVbad_cast',
                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
                                  '_TI5?AVfailure']
-        }
-        halJNI(ExportsConfig) {
-            x86SymbolFilter = { symbols ->
-                def retList = []
-                symbols.each { symbol ->
-                    if (symbol.startsWith('HAL_') || symbol.startsWith('Java_') || symbol.startsWith('JNI_')) {
-                        retList << symbol
-                    }
-                }
-                return retList
-            }
-            x64SymbolFilter = { symbols ->
-                def retList = []
-                symbols.each { symbol ->
-                    if (symbol.startsWith('HAL_') || symbol.startsWith('Java_') || symbol.startsWith('JNI_')) {
-                        retList << symbol
-                    }
-                }
-                return retList
-            }
         }
     }
 }

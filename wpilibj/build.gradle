@@ -105,6 +105,9 @@ model {
                         lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                         lib project: ':cscore', library: 'cscore', linkage: 'shared'
                         lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                        lib project: ':ntcoreJNIShared', library: 'ntcore', linkage: 'shared'
+                        lib project: ':cscoreJNIShared', library: 'cscore', linkage: 'shared'
+                        lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                         lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     }
                     exportedHeaders {
@@ -114,6 +117,7 @@ model {
             }
             binaries.all {
                 project(':hal').addHalDependency(it, 'shared')
+                project(':hal').addHalJniDependency(it)
             }
         }
     }

@@ -50,7 +50,7 @@ addTaskToCopyAllOutputs(cppHeadersZip)
 
 model {
     publishing {
-        def pluginTaskList = createComponentZipTasks($.components, pluginName, zipBaseName, Zip, project, { task, value ->
+        def pluginTaskList = createComponentZipTasks($.components, [pluginName], zipBaseName, Zip, project, { task, value ->
             value.each { binary ->
                 if (binary.buildable) {
                     if (binary instanceof SharedLibraryBinarySpec) {

@@ -273,10 +273,11 @@ ext.appendDebugPathToBinaries = { binaries->
     }
 }
 
-ext.createComponentZipTasks = { components, name, base, type, project, func ->
+ext.createComponentZipTasks = { components, names, base, type, project, func ->
+    def stringNames = names.collect {it.toString()}
     def configMap = [:]
     components.each {
-        if (it in NativeLibrarySpec && it.name == name) {
+        if (it in NativeLibrarySpec && stringNames.contains(it.name)) {
             it.binaries.each {
                 if (!it.buildable) return
                 def target = getPublishClassifier(it)
@@ -292,6 +293,7 @@ ext.createComponentZipTasks = { components, name, base, type, project, func ->
     def taskList = []
     def outputsFolder = file("$project.buildDir/outputs")
     configMap.each { key, value ->
+        println base + "-${key}"
         def task = project.tasks.create(base + "-${key}", type) {
             description = 'Creates component archive for platform ' + key
             destinationDir = outputsFolder
