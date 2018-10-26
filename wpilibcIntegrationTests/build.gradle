@@ -54,7 +54,10 @@ model {
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                    lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
+                    lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
                     project(':hal').addHalDependency(binary, 'shared')
+                    project(':hal').addHalJniDependency(it)
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 } else {
