@@ -68,9 +68,9 @@ ext {
             it.dependsOn generateUsageReporting
         }
         if (it.targetPlatform.architecture.name == 'athena') {
-
             it.sources {
                 athenaJniCpp(CppSourceSet) {
+                    generatedBy generateAthenaSimFiles
                     source {
                         srcDirs = ["$buildDir/generated/cpp"]
                         include '**/*.cpp'

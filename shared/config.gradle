@@ -300,7 +300,6 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
     def taskList = []
     def outputsFolder = file("$project.buildDir/outputs")
     configMap.each { key, value ->
-        println base + "-${key}"
         def task = project.tasks.create(base + "-${key}", type) {
             description = 'Creates component archive for platform ' + key
             destinationDir = outputsFolder
