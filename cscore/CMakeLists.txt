@@ -7,6 +7,7 @@ find_package( OpenCV REQUIRED )
 file(GLOB
     cscore_native_src src/main/native/cpp/*.cpp)
 add_library(cscore ${cscore_native_src})
+set_target_properties(cscore PROPERTIES DEBUG_POSTFIX "d")
 target_include_directories(cscore PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/cscore>)

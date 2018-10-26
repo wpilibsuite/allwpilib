@@ -28,6 +28,7 @@ file(GLOB
     hal_sim_native_src src/main/native/sim/*.cpp
     hal_sim_native_src src/main/native/sim/MockData/*.cpp)
 add_library(hal ${hal_shared_native_src})
+set_target_properties(hal PROPERTIES DEBUG_POSTFIX "d")
 
 if(USE_EXTERNAL_HAL)
     include(${EXTERNAL_HAL_FILE})

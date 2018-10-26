@@ -5,6 +5,7 @@ file(GLOB
     ntcore_native_src src/main/native/cpp/networktables/*.cpp
     ntcore_native_src src/main/native/cpp/tables/*.cpp)
 add_library(ntcore ${ntcore_native_src})
+set_target_properties(ntcore PROPERTIES DEBUG_POSTFIX "d")
 target_include_directories(ntcore PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/ntcore>)
