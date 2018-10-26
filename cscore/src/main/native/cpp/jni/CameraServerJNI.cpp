@@ -181,7 +181,6 @@ static inline bool CheckStatus(JNIEnv* env, CS_Status status) {
   return status == CS_OK;
 }
 
-#ifdef __linux__
 static jobject MakeJObject(JNIEnv* env, const cs::UsbCameraInfo& info) {
   static jmethodID constructor = env->GetMethodID(
       usbCameraInfoCls, "<init>", "(ILjava/lang/String;Ljava/lang/String;)V");
@@ -190,7 +189,6 @@ static jobject MakeJObject(JNIEnv* env, const cs::UsbCameraInfo& info) {
   return env->NewObject(usbCameraInfoCls, constructor,
                         static_cast<jint>(info.dev), path.obj(), name.obj());
 }
-#endif
 
 static jobject MakeJObject(JNIEnv* env, const cs::VideoMode& videoMode) {
   static jmethodID constructor =
@@ -406,10 +404,6 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraDev
   (JNIEnv* env, jclass, jstring name, jint dev)
 {
-#ifndef __linux__
-  unsupportedEx.Throw(env, "USB is not supported yet");
-  return 0;
-#else
   if (!name) {
     nullPointerEx.Throw(env, "name cannot be null");
     return 0;
@@ -418,7 +412,6 @@ Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraDev
   auto val = cs::CreateUsbCameraDev(JStringRef{env, name}.str(), dev, &status);
   CheckStatus(env, status);
   return val;
-#endif
 }
 
 /*
@@ -430,10 +423,6 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraPath
   (JNIEnv* env, jclass, jstring name, jstring path)
 {
-#ifndef __linux__
-  unsupportedEx.Throw(env, "USB is not supported yet");
-  return 0;
-#else
   if (!name) {
     nullPointerEx.Throw(env, "name cannot be null");
     return 0;
@@ -447,7 +436,6 @@ Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraPath
                                      JStringRef{env, path}.str(), &status);
   CheckStatus(env, status);
   return val;
-#endif
 }
 
 /*
@@ -949,15 +937,10 @@ JNIEXPORT jstring JNICALL
 Java_edu_wpi_cscore_CameraServerJNI_getUsbCameraPath
   (JNIEnv* env, jclass, jint source)
 {
-#ifndef __linux__
-  unsupportedEx.Throw(env, "USB is not supported yet");
-  return 0;
-#else
   CS_Status status = 0;
   auto str = cs::GetUsbCameraPath(source, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
-#endif
 }
 
 /*
@@ -1582,10 +1565,6 @@ JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_cscore_CameraServerJNI_enumerateUsbCameras
   (JNIEnv* env, jclass)
 {
-#ifndef __linux__
-  unsupportedEx.Throw(env, "USB is not supported yet");
-  return 0;
-#else
   CS_Status status = 0;
   auto arr = cs::EnumerateUsbCameras(&status);
   if (!CheckStatus(env, status)) return nullptr;
@@ -1597,7 +1576,6 @@ Java_edu_wpi_cscore_CameraServerJNI_enumerateUsbCameras
     env->SetObjectArrayElement(jarr, i, jelem);
   }
   return jarr;
-#endif
 }
 
 /*
