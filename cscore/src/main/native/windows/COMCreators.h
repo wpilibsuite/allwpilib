@@ -10,6 +10,8 @@
 #include <mfidl.h>
 #include <mfreadwrite.h>
 
+#include "ComPtr.h"
+
 namespace cs {
 
 class UsbCameraImpl;

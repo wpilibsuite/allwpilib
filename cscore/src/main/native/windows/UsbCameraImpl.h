@@ -8,19 +8,13 @@
 #ifndef CSCORE_USBCAMERAIMPL_H_
 #define CSCORE_USBCAMERAIMPL_H_
 
-#include <ks.h>
-#include <ksmedia.h>
 #include <mfapi.h>
 #include <mfidl.h>
-
-#ifdef __linux__
-#include <linux/videodev2.h>
-#endif
-
-#ifdef _WIN32
-#include <mfidl.h>
 #include <mfreadwrite.h>
-#endif
+
+#include <ks.h>  // NOLINT(build/include_order)
+
+#include <ksmedia.h>  // NOLINT(build/include_order)
 
 #include <atomic>
 #include <memory>
