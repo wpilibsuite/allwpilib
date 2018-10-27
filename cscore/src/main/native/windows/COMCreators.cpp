@@ -92,6 +92,7 @@ HRESULT SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
 
       // Do sample
       m_source->ProcessFrame(pSample);
+      pSample->Release();
     }
   } else {
     // Streaming error.

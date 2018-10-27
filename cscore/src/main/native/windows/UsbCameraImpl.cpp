@@ -282,6 +282,12 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample) {
     std::unique_ptr<Image> dest;
     bool doFinalSet = true;
 
+    VideoMode mode;
+    {
+      std::unique_lock<wpi::mutex> lock(m_mutex);
+      mode = m_mode;
+    }
+
     switch (m_mode.pixelFormat) {
       case cs::VideoMode::PixelFormat::kMJPEG: {
         // Special case
@@ -938,6 +944,9 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   }
   Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
 }
+
+
+
 
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   std::vector<UsbCameraInfo> retval;

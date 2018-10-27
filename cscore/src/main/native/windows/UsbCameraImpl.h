@@ -158,28 +158,16 @@ class UsbCameraImpl : public SourceImpl {
   //
   // Variables only used within camera thread
   //
-  std::atomic_bool m_streaming{false};
+  bool m_streaming{false};
   bool m_modeSet{false};
   int m_connectVerbose{1};
-
   bool m_deviceValid{false};
 
-#ifdef _WIN32
   ComPtr<IMFMediaSource> m_mediaSource;
   ComPtr<IMFSourceReader> m_sourceReader;
   ComPtr<IMFSourceReaderCallback> m_imageCallback;
   std::unique_ptr<cs::WindowsMessagePump> m_messagePump;
   ComPtr<IMFMediaType> m_currentMode;
-#endif
-
-#ifdef __linux__
-  unsigned m_capabilities = 0;
-#endif
-  // Number of buffers to ask OS for
-  static constexpr int kNumBuffers = 4;
-#ifdef __linux__
-  std::array<UsbCameraBuffer, kNumBuffers> m_buffers;
-#endif
 
   //
   // Path never changes, so not protected by mutex.
@@ -189,27 +177,7 @@ class UsbCameraImpl : public SourceImpl {
   std::wstring m_widePath;
   int m_deviceId;
 
-#ifdef __linux__
-  std::atomic_int m_fd;
-  std::atomic_int m_command_fd;  // for command eventfd
-#endif
-
-  // std::atomic_bool m_active;  // set to false to terminate thread
-  // std::thread m_cameraThread;
-
-  // Quirks
-  bool m_lifecam_exposure{false};  // Microsoft LifeCam exposure
-
   std::vector<std::pair<VideoMode, ComPtr<IMFMediaType>>> m_windowsVideoModes;
-
-  //
-  // Variables protected by m_mutex
-  //
-
-  // Message queues
-  mutable std::vector<Message> m_commands;
-  mutable std::vector<std::pair<std::thread::id, CS_StatusValue>> m_responses;
-  mutable wpi::condition_variable m_responseCv;
 };
 
 }  // namespace cs
