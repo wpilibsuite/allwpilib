@@ -24,9 +24,14 @@ int main() {
   // "\\\\?\\USB#VID_046D&PID_0825&MI_00#6&900429&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\{bbefb6c7-2fc4-4139-bb8b-a58bba724083}",
   // &status);
 
+  auto ifaces = cs::GetNetworkInterfaces();
+  for (auto&& iff : ifaces) {
+    std::cout << iff << std::endl;
+  }
+
   cs::UsbCamera camera("camera", 1);
 
-//"\\\\?\\USB#VID_046D&PID_0825&MI_00#6&900429&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\{bbefb6c7-2fc4-4139-bb8b-a58bba724083}"
+  // "\\\\?\\USB#VID_046D&PID_0825&MI_00#6&900429&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\{bbefb6c7-2fc4-4139-bb8b-a58bba724083}"
 
   cs::MjpegServer server("server", 1181);
 

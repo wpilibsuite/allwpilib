@@ -9,9 +9,7 @@
 
 namespace cs {
 
-std::string GetHostname() {
-  return wpi::GetHostname();
-}
+std::string GetHostname() { return wpi::GetHostname(); }
 
 std::vector<std::string> GetNetworkInterfaces() {
   return std::vector<std::string>{};  // TODO

@@ -27,7 +27,7 @@ wpi::StringRef GetGUIDNameConstNew(const GUID& guid) {
   IF_GUID_EQUAL_RETURN(MF_MT_FRAME_RATE_RANGE_MAX);
   IF_GUID_EQUAL_RETURN(MF_MT_FRAME_RATE_RANGE_MIN);
   IF_GUID_EQUAL_RETURN(MFVideoFormat_RGB565);  //   D3DFMT_R5G6B5
-  IF_GUID_EQUAL_RETURN(MFVideoFormat_YUY2);  //     FCC('YUY2')
+  IF_GUID_EQUAL_RETURN(MFVideoFormat_YUY2);    //     FCC('YUY2')
   IF_GUID_EQUAL_RETURN(MFVideoFormat_NV12);    //     FCC('NV12')
   IF_GUID_EQUAL_RETURN(MFVideoFormat_RGB24);   //    D3DFMT_R8G8B8
   IF_GUID_EQUAL_RETURN(MFVideoFormat_MJPG);
@@ -116,12 +116,12 @@ wpi::StringRef GetGUIDNameConstNew(const GUID& guid) {
   IF_GUID_EQUAL_RETURN(MFVideoFormat_DVH1);    //     FCC('dvh1')
   IF_GUID_EQUAL_RETURN(MFVideoFormat_DVC);
   IF_GUID_EQUAL_RETURN(MFVideoFormat_DVHD);
-  IF_GUID_EQUAL_RETURN(MFVideoFormat_DVSD);  //     FCC('dvsd')
-  IF_GUID_EQUAL_RETURN(MFVideoFormat_DVSL);  //     FCC('dvsl')
-  IF_GUID_EQUAL_RETURN(MFVideoFormat_H264);  //     FCC('H264')
-  IF_GUID_EQUAL_RETURN(MFVideoFormat_I420);  //     FCC('I420')
-  IF_GUID_EQUAL_RETURN(MFVideoFormat_IYUV);  //     FCC('IYUV')
-  IF_GUID_EQUAL_RETURN(MFVideoFormat_M4S2);  //     FCC('M4S2')
+  IF_GUID_EQUAL_RETURN(MFVideoFormat_DVSD);    //     FCC('dvsd')
+  IF_GUID_EQUAL_RETURN(MFVideoFormat_DVSL);    //     FCC('dvsl')
+  IF_GUID_EQUAL_RETURN(MFVideoFormat_H264);    //     FCC('H264')
+  IF_GUID_EQUAL_RETURN(MFVideoFormat_I420);    //     FCC('I420')
+  IF_GUID_EQUAL_RETURN(MFVideoFormat_IYUV);    //     FCC('IYUV')
+  IF_GUID_EQUAL_RETURN(MFVideoFormat_M4S2);    //     FCC('M4S2')
   IF_GUID_EQUAL_RETURN(MFVideoFormat_MP43);    //     FCC('MP43')
   IF_GUID_EQUAL_RETURN(MFVideoFormat_MP4S);    //     FCC('MP4S')
   IF_GUID_EQUAL_RETURN(MFVideoFormat_MP4V);    //     FCC('MP4V')

@@ -12,17 +12,12 @@
 
 using namespace cs;
 
-class NetworkListener::Pimpl {
-};
+class NetworkListener::Pimpl {};
 
-NetworkListener::NetworkListener() {
-  m_data = std::make_unique<Pimpl>();
-}
+NetworkListener::NetworkListener() { m_data = std::make_unique<Pimpl>(); }
 
 NetworkListener::~NetworkListener() { Stop(); }
 
-void NetworkListener::Start() {
-}
+void NetworkListener::Start() {}
 
-void NetworkListener::Stop() {
-}
+void NetworkListener::Stop() {}

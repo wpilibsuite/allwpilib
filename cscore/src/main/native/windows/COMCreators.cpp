@@ -42,8 +42,8 @@ namespace cs {
 // COM object, so it needs a to ref count itself.
 class SourceReaderCB : public IMFSourceReaderCallback {
  public:
-  SourceReaderCB(cs::UsbCameraImpl* source)
-      : m_nRefCount(1),  m_source(source) {}
+  explicit SourceReaderCB(cs::UsbCameraImpl* source)
+      : m_nRefCount(1), m_source(source) {}
 
   // IUnknown methods
   STDMETHODIMP QueryInterface(REFIID iid, void** ppv) {
@@ -160,7 +160,7 @@ ComPtr<IMFSourceReader> CreateSourceReader(IMFMediaSource* mediaSource,
   }
 
   MFCreateSourceReaderFromMediaSource(mediaSource, pAttributes.Get(),
-                                           sourceReader.GetAddressOf());
+                                      sourceReader.GetAddressOf());
 
   // No need to check last HR, as the sourceReader would be null anyway.
   return sourceReader;

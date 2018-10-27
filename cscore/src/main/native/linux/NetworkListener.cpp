@@ -34,16 +34,14 @@ class NetworkListenerThread : public wpi::SafeThread {
   int m_command_fd = -1;
 };
 
-}
+}  // namespace
 
 class NetworkListener::Pimpl {
  public:
   wpi::SafeThreadOwner<NetworkListenerThread> m_owner;
 };
 
-NetworkListener::NetworkListener() {
-  m_data = std::make_unique<Pimpl>();
-}
+NetworkListener::NetworkListener() { m_data = std::make_unique<Pimpl>(); }
 
 NetworkListener::~NetworkListener() { Stop(); }
 

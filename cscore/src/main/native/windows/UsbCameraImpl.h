@@ -139,7 +139,8 @@ class UsbCameraImpl : public SourceImpl {
 
   // Command helper functions
   CS_StatusValue DeviceProcessCommand(std::unique_lock<wpi::mutex>& lock,
-                                      Message::Kind msgKind, const Message* msg);
+                                      Message::Kind msgKind,
+                                      const Message* msg);
   CS_StatusValue DeviceCmdSetMode(std::unique_lock<wpi::mutex>& lock,
                                   const Message& msg);
   CS_StatusValue DeviceCmdSetProperty(std::unique_lock<wpi::mutex>& lock,

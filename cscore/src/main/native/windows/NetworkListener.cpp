@@ -7,16 +7,20 @@
 
 #include "NetworkListener.h"
 
-#include <winsock2.h>
-#include <windows.h>
-#include <ws2def.h>
-#include <ws2ipdef.h>
-#include <iphlpapi.h>
-#include <netioapi.h>
+#include <winsock2.h>  // NOLINT(build/include_order)
+
+#include <windows.h>  // NOLINT(build/include_order)
+
+#include <ws2def.h>  // NOLINT(build/include_order)
+
+#include <ws2ipdef.h>  // NOLINT(build/include_order)
+
+#include <iphlpapi.h>  // NOLINT(build/include_order)
+
+#include <netioapi.h>  // NOLINT(build/include_order)
 
 #include "Log.h"
 #include "Notifier.h"
-
 
 #pragma comment(lib, "Iphlpapi.lib")
 
@@ -30,19 +34,17 @@ class NetworkListener::Pimpl {
 // Static Callback function for NotifyIpInterfaceChange API.
 static void WINAPI OnInterfaceChange(PVOID callerContext,
                                      PMIB_IPINTERFACE_ROW row,
-                                     MIB_NOTIFICATION_TYPE notificationType)
-{
+                                     MIB_NOTIFICATION_TYPE notificationType) {
   Notifier::GetInstance().NotifyNetworkInterfacesChanged();
 }
 
-NetworkListener::NetworkListener() {
-  m_data = std::make_unique<Pimpl>();
-}
+NetworkListener::NetworkListener() { m_data = std::make_unique<Pimpl>(); }
 
 NetworkListener::~NetworkListener() { Stop(); }
 
 void NetworkListener::Start() {
-  NotifyIpInterfaceChange(AF_INET, OnInterfaceChange, nullptr, true, &m_data->eventHandle);
+  NotifyIpInterfaceChange(AF_INET, OnInterfaceChange, nullptr, true,
+                          &m_data->eventHandle);
 }
 
 void NetworkListener::Stop() {
