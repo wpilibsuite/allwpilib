@@ -40,8 +40,8 @@ namespace cs {
 
 class SourceReaderCB : public IMFSourceReaderCallback {
  public:
-  SourceReaderCB(HWND hwnd, cs::UsbCameraImpl* source, UINT updateMessageId)
-      : m_nRefCount(1), m_hwnd(hwnd), m_source(source), m_updateMessageId(updateMessageId) {}
+  SourceReaderCB(cs::UsbCameraImpl* source)
+      : m_nRefCount(1),  m_source(source) {}
 
   // IUnknown methods
   STDMETHODIMP QueryInterface(REFIID iid, void** ppv) {
@@ -77,9 +77,7 @@ class SourceReaderCB : public IMFSourceReaderCallback {
 
  private:
   ULONG m_nRefCount;  // Reference count.
-  HWND m_hwnd;
   UsbCameraImpl* m_source;
-  UINT m_updateMessageId;
 };
 
 HRESULT SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
@@ -99,14 +97,12 @@ HRESULT SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
     // Streaming error.
     NotifyError(hrStatus);
   }
-  PostMessage(m_hwnd, m_updateMessageId, 0, 0);
+  m_source->PostRequestNewFrame();
   return S_OK;
 }
 
-ComPtr<IMFSourceReaderCallback> CreateSourceReaderCB(HWND hwnd,
-                                                     UsbCameraImpl* source,
-                                                     UINT updateMessageId) {
-  IMFSourceReaderCallback* ptr = new SourceReaderCB(hwnd, source, updateMessageId);
+ComPtr<IMFSourceReaderCallback> CreateSourceReaderCB(UsbCameraImpl* source) {
+  IMFSourceReaderCallback* ptr = new SourceReaderCB(source);
   ComPtr<IMFSourceReaderCallback> sourceReaderCB;
   sourceReaderCB.Attach(ptr);
   return sourceReaderCB;

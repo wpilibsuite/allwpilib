@@ -16,8 +16,7 @@ namespace cs {
 
 class UsbCameraImpl;
 
-ComPtr<IMFSourceReaderCallback> CreateSourceReaderCB(HWND hwnd,
-                                                     cs::UsbCameraImpl* source);
+ComPtr<IMFSourceReaderCallback> CreateSourceReaderCB(cs::UsbCameraImpl* source);
 ComPtr<IMFSourceReader> CreateSourceReader(IMFMediaSource* mediaSource,
                                            IMFSourceReaderCallback* callback);
 ComPtr<IMFMediaSource> CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink);

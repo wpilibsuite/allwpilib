@@ -170,12 +170,14 @@ void UsbCameraImpl::NumSinksEnabledChanged() {
 }
 
 void UsbCameraImpl::Start() {
-  // Kick off the message pump
-
   m_messagePump = std::make_unique<WindowsMessagePump>(
       [this](HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
         return this->PumpMain(hwnd, uiMsg, wParam, lParam);
       });
+}
+
+void UsbCameraImpl::PostRequestNewFrame() {
+  m_messagePump->PostWindowMessage(NewImageMessage, nullptr, nullptr);
 }
 
 bool UsbCameraImpl::CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR* pHdr,
@@ -329,7 +331,7 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
       break;
     case WM_CREATE:
       // Pump Created and ready to go
-      m_imageCallback = CreateSourceReaderCB(hwnd, this, NewImageMessage);
+      m_imageCallback = CreateSourceReaderCB(this);
       DeviceConnect();
       break;
     case WM_DEVICECHANGE: {
