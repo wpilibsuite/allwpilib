@@ -4,6 +4,57 @@ include(SubDirList)
 
 find_package( OpenCV REQUIRED )
 
+file(GLOB
+    cscore_native_src src/main/native/cpp/*.cpp)
+file(GLOB cscore_linux_src src/main/native/linux/*.cpp)
+file(GLOB cscore_osx_src src/main/native/osx/*.cpp)
+file(GLOB cscore_windows_src src/main/native/windows/*.cpp)
+
+add_library(cscore ${cscore_native_src})
+set_target_properties(cscore PROPERTIES DEBUG_POSTFIX "d")
+
+if(NOT MSVC)
+    if (APPLE)
+        target_sources(cscore PRIVATE ${cscore_osx_src})
+    else()
+        target_sources(cscore PRIVATE ${cscore_linux_src})
+    endif()
+    target_compile_options(cscore PRIVATE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE)
+else()
+    target_sources(cscore PRIVATE ${cscore_windows_src})
+    target_compile_options(cscore PUBLIC -DNOMINMAX)
+    target_compile_options(cscore PRIVATE -D_CRT_SECURE_NO_WARNINGS)
+endif()
+
+target_include_directories(cscore PUBLIC
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+                            $<INSTALL_INTERFACE:${include_dest}/cscore>)
+target_include_directories(cscore PRIVATE src/main/native/cpp)
+target_link_libraries(cscore PUBLIC wpiutil ${OpenCV_LIBS})
+
+set_property(TARGET cscore PROPERTY FOLDER "libraries")
+
+install(TARGETS cscore EXPORT cscore DESTINATION "${main_lib_dest}")
+install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cscore")
+
+if (MSVC)
+    set (cscore_config_dir ${wpilib_dest})
+else()
+    set (cscore_config_dir share/cscore)
+endif()
+
+install(FILES cscore-config.cmake DESTINATION ${cscore_config_dir})
+install(EXPORT cscore DESTINATION ${cscore_config_dir})
+
+SUBDIR_LIST(cscore_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+foreach(example ${cscore_examples})
+    file(GLOB cscore_example_src examples/${example}/*.cpp)
+    if(cscore_example_src)
+        add_executable(cscore_${example} ${cscore_example_src})
+        target_link_libraries(cscore_${example} cscore)
+    endif()
+endforeach()
+
 # Java bindings
 if (NOT WITHOUT_JAVA)
     find_package(Java REQUIRED)
@@ -50,68 +101,23 @@ if (NOT WITHOUT_JAVA)
 
     set_property(TARGET cscore_jar PROPERTY FOLDER "java")
 
-endif()
+    add_library(cscorejni ${cscore_jni_src})
+    target_link_libraries(cscorejni PUBLIC cscore wpiutil ${OpenCV_LIBS})
 
-file(GLOB
-    cscore_native_src src/main/native/cpp/*.cpp)
-file(GLOB cscore_linux_src src/main/native/linux/*.cpp)
-file(GLOB cscore_osx_src src/main/native/osx/*.cpp)
-file(GLOB cscore_windows_src src/main/native/windows/*.cpp)
+    set_property(TARGET cscorejni PROPERTY FOLDER "libraries")
 
-add_library(cscore ${cscore_native_src} ${cscore_jni_src})
-
-if(NOT MSVC)
-    if (APPLE)
-        target_sources(cscore PRIVATE ${cscore_osx_src})
-    else()
-        target_sources(cscore PRIVATE ${cscore_linux_src})
-    endif()
-    target_compile_options(cscore PRIVATE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE)
-else()
-    target_sources(cscore PRIVATE ${cscore_windows_src})
-    target_compile_options(cscore PUBLIC -DNOMINMAX)
-    target_compile_options(cscore PRIVATE -D_CRT_SECURE_NO_WARNINGS)
-endif()
-
-target_include_directories(cscore PUBLIC
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-                            $<INSTALL_INTERFACE:${include_dest}/cscore>)
-target_include_directories(cscore PRIVATE src/main/native/cpp)
-target_link_libraries(cscore PUBLIC wpiutil ${OpenCV_LIBS})
-
-set_property(TARGET cscore PROPERTY FOLDER "libraries")
-
-if (NOT WITHOUT_JAVA)
     if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-        target_include_directories(cscore PRIVATE ${JNI_INCLUDE_DIRS})
-        target_include_directories(cscore PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
+        target_include_directories(cscorejni PRIVATE ${JNI_INCLUDE_DIRS})
+        target_include_directories(cscorejni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
     else()
-        target_link_libraries(cscore PRIVATE cscore_jni_headers)
+        target_link_libraries(cscorejni PRIVATE cscore_jni_headers)
     endif()
-    add_dependencies(cscore cscore_jar)
-endif()
+    add_dependencies(cscorejni cscore_jar)
 
-install(TARGETS cscore EXPORT cscore DESTINATION "${main_lib_dest}")
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cscore")
-
-if (NOT WITHOUT_JAVA AND MSVC)
-    install(TARGETS cscore RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
-
-if (MSVC)
-    set (cscore_config_dir ${wpilib_dest})
-else()
-    set (cscore_config_dir share/cscore)
-endif()
-
-install(FILES cscore-config.cmake DESTINATION ${cscore_config_dir})
-install(EXPORT cscore DESTINATION ${cscore_config_dir})
-
-SUBDIR_LIST(cscore_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
-foreach(example ${cscore_examples})
-    file(GLOB cscore_example_src examples/${example}/*.cpp)
-    if(cscore_example_src)
-        add_executable(cscore_${example} ${cscore_example_src})
-        target_link_libraries(cscore_${example} cscore)
+    if (MSVC)
+        install(TARGETS cscorejni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
     endif()
-endforeach()
+
+    install(TARGETS cscorejni EXPORT cscorejni DESTINATION "${main_lib_dest}")
+
+endif()

@@ -16,7 +16,7 @@ model {
       artifactId = 'chipobject'
       headerClassifier = 'headers'
       ext = 'zip'
-      version = '2019.4.1'
+      version = '2019.4.2'
       sharedConfigs = chipObjectConfigs
       staticConfigs = [:]
       compileOnlyShared = true
@@ -26,7 +26,7 @@ model {
       artifactId = 'netcomm'
       headerClassifier = 'headers'
       ext = 'zip'
-      version = '2019.4.1'
+      version = '2019.4.2'
       sharedConfigs = netCommLibConfigs
       staticConfigs = [:]
       compileOnlyShared = true

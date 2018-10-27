@@ -8,6 +8,7 @@ file(GLOB_RECURSE
     wpilibc_native_src src/main/native/cpp/*.cpp)
 
 add_library(wpilibc ${wpilibc_native_src} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
+set_target_properties(wpilibc PROPERTIES DEBUG_POSTFIX "d")
 
 target_include_directories(wpilibc PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>

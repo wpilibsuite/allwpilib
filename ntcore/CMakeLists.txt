@@ -1,5 +1,29 @@
 project(ntcore)
 
+file(GLOB
+    ntcore_native_src src/main/native/cpp/*.cpp
+    ntcore_native_src src/main/native/cpp/networktables/*.cpp
+    ntcore_native_src src/main/native/cpp/tables/*.cpp)
+add_library(ntcore ${ntcore_native_src})
+set_target_properties(ntcore PROPERTIES DEBUG_POSTFIX "d")
+target_include_directories(ntcore PUBLIC
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+                            $<INSTALL_INTERFACE:${include_dest}/ntcore>)
+target_link_libraries(ntcore PUBLIC wpiutil)
+
+set_property(TARGET ntcore PROPERTY FOLDER "libraries")
+
+install(TARGETS ntcore EXPORT ntcore DESTINATION "${main_lib_dest}")
+install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
+
+if (MSVC)
+    set (ntcore_config_dir ${wpilib_dest})
+else()
+    set (ntcore_config_dir share/ntcore)
+endif()
+
+install(FILES ntcore-config.cmake DESTINATION ${ntcore_config_dir})
+install(EXPORT ntcore DESTINATION ${ntcore_config_dir})
 
 # Java bindings
 if (NOT WITHOUT_JAVA)
@@ -26,42 +50,23 @@ if (NOT WITHOUT_JAVA)
 
     set_property(TARGET ntcore_jar PROPERTY FOLDER "java")
 
-endif()
+    add_library(ntcorejni ${ntcore_jni_src})
+    target_link_libraries(ntcorejni PUBLIC ntcore wpiutil)
 
-file(GLOB
-    ntcore_native_src src/main/native/cpp/*.cpp
-    ntcore_native_src src/main/native/cpp/networktables/*.cpp
-    ntcore_native_src src/main/native/cpp/tables/*.cpp)
-add_library(ntcore ${ntcore_native_src} ${ntcore_jni_src})
-target_include_directories(ntcore PUBLIC
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-                            $<INSTALL_INTERFACE:${include_dest}/ntcore>)
-target_link_libraries(ntcore PUBLIC wpiutil)
+    set_property(TARGET ntcorejni PROPERTY FOLDER "libraries")
 
-set_property(TARGET ntcore PROPERTY FOLDER "libraries")
-
-if (NOT WITHOUT_JAVA)
-    if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-        target_include_directories(ntcore PRIVATE ${JNI_INCLUDE_DIRS})
-        target_include_directories(ntcore PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-    else()
-        target_link_libraries(ntcore PRIVATE ntcore_jni_headers)
+    if (MSVC)
+        install(TARGETS ntcorejni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
     endif()
-    add_dependencies(ntcore ntcore_jar)
+
+    if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
+        target_include_directories(ntcorejni PRIVATE ${JNI_INCLUDE_DIRS})
+        target_include_directories(ntcorejni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
+    else()
+        target_link_libraries(ntcorejni PRIVATE ntcore_jni_headers)
+    endif()
+    add_dependencies(ntcorejni ntcore_jar)
+
+    install(TARGETS ntcorejni EXPORT ntcorejni DESTINATION "${main_lib_dest}")
+
 endif()
-
-install(TARGETS ntcore EXPORT ntcore DESTINATION "${main_lib_dest}")
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
-
-if (NOT WITHOUT_JAVA AND MSVC)
-    install(TARGETS ntcore RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
-
-if (MSVC)
-    set (ntcore_config_dir ${wpilib_dest})
-else()
-    set (ntcore_config_dir share/ntcore)
-endif()
-
-install(FILES ntcore-config.cmake DESTINATION ${ntcore_config_dir})
-install(EXPORT ntcore DESTINATION ${ntcore_config_dir})

@@ -100,6 +100,7 @@ if (!project.hasProperty('onlyAthena')) {
             // By default, a development executable will be generated. This is to help the case of
             // testing specific functionality of the library.
             "${nativeName}Dev"(NativeExecutableSpec) {
+                targetBuildTypes 'debug'
                 sources {
                     cpp {
                         source {
@@ -125,13 +126,17 @@ if (!project.hasProperty('onlyAthena')) {
         }
         binaries {
             withType(GoogleTestTestSuiteBinarySpec) {
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
-                lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                project(':hal').addHalDependency(it, 'shared')
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-                lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
-                lib library: nativeName, linkage: 'shared'
+                if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
+                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                    project(':hal').addHalDependency(it, 'shared')
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib library: nativeName, linkage: 'shared'
+                } else {
+                    it.buildable = false
+                }
             }
         }
     }
@@ -142,7 +147,7 @@ if (!project.hasProperty('onlyAthena')) {
 model {
 
     testSuites {
-        if (!project.hasProperty('onlyAthena')) {
+        if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
             "${nativeName}Test"(GoogleTestTestSuiteSpec) {
                 for(NativeComponentSpec c : $.components) {
                     if (c.name == nativeName) {

@@ -85,6 +85,7 @@ model {
 
         examplesMap.each { key, value ->
             "${key}"(NativeExecutableSpec) {
+                targetBuildTypes 'debug'
                 binaries.all { binary ->
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
@@ -115,6 +116,7 @@ model {
         }
         templatesMap.each { key, value ->
             "${key}"(NativeExecutableSpec) {
+                targetBuildTypes 'debug'
                 binaries.all { binary ->
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
