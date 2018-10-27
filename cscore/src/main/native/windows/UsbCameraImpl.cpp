@@ -77,20 +77,20 @@ UsbCameraImpl::~UsbCameraImpl() {
 }
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
-  Message* msg = new Message{Message::kCmdSetProperty};
-  msg->data[0] = property;
-  msg->data[1] = value;
-  auto result = m_messagePump->SendWindowMessage<CS_Status, WPARAM, Message*>(
-      SetCameraMessage, NULL, msg);
+  Message msg{Message::kCmdSetProperty};
+  msg.data[0] = property;
+  msg.data[1] = value;
+  auto result = m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
+      SetCameraMessage, msg.kind, &msg);
   *status = result;
 }
 void UsbCameraImpl::SetStringProperty(int property, const wpi::Twine& value,
                                       CS_Status* status) {
-  Message* msg = new Message{Message::kCmdSetPropertyStr};
-  msg->data[0] = property;
-  msg->dataStr = value.str();
-  auto result = m_messagePump->SendWindowMessage<CS_Status, WPARAM, Message*>(
-      SetCameraMessage, NULL, msg);
+  Message msg{Message::kCmdSetPropertyStr};
+  msg.data[0] = property;
+  msg.dataStr = value.str();
+  auto result = m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
+      SetCameraMessage, msg.kind, &msg);
   *status = result;
 }
 
@@ -112,13 +112,13 @@ bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   }
 
   std::cout << "Setting Video Mode\n";
-  Message* msg = new Message{Message::kCmdSetMode};
-  msg->data[0] = mode.pixelFormat;
-  msg->data[1] = mode.width;
-  msg->data[2] = mode.height;
-  msg->data[3] = mode.fps;
-  auto result = m_messagePump->SendWindowMessage<CS_Status, WPARAM, Message*>(
-      SetCameraMessage, NULL, msg);
+  Message msg{Message::kCmdSetMode};
+  msg.data[0] = mode.pixelFormat;
+  msg.data[1] = mode.width;
+  msg.data[2] = mode.height;
+  msg.data[3] = mode.fps;
+  auto result = m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
+      SetCameraMessage, msg.kind, &msg);
   *status = result;
   return result == 0;
 }
@@ -130,43 +130,36 @@ bool UsbCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
     return false;
   }
   std::cout << "Setting Pixel Format Mode\n";
-  Message* msg = new Message{Message::kCmdSetPixelFormat};
-  msg->data[0] = pixelFormat;
-  auto result = m_messagePump->SendWindowMessage<CS_Status, WPARAM, Message*>(
-      SetCameraMessage, NULL, msg);
+  Message msg{Message::kCmdSetPixelFormat};
+  msg.data[0] = pixelFormat;
+  auto result = m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
+      SetCameraMessage, msg.kind, &msg);
   *status = result;
   return result == 0;
 }
 bool UsbCameraImpl::SetResolution(int width, int height, CS_Status* status) {
-  Message* msg = new Message{Message::kCmdSetResolution};
-  msg->data[0] = width;
-  msg->data[1] = height;
-  auto result = m_messagePump->SendWindowMessage<CS_Status, WPARAM, Message*>(
-      SetCameraMessage, NULL, msg);
+  Message msg{Message::kCmdSetResolution};
+  msg.data[0] = width;
+  msg.data[1] = height;
+  auto result = m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
+      SetCameraMessage, msg.kind, &msg);
   *status = result;
   return result == 0;
 }
 bool UsbCameraImpl::SetFPS(int fps, CS_Status* status) {
-  Message* msg = new Message{Message::kCmdSetFPS};
-  msg->data[0] = fps;
-  auto result = m_messagePump->SendWindowMessage<CS_Status, WPARAM, Message*>(
-      SetCameraMessage, NULL, msg);
+  Message msg{Message::kCmdSetFPS};
+  msg.data[0] = fps;
+  auto result = m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
+      SetCameraMessage, msg.kind, &msg);
   *status = result;
   return result == 0;
 }
 
 void UsbCameraImpl::NumSinksChanged() {
-  std::cout << "Sinks Changed\n";
-
-  Message* msg = new Message{Message::kNumSinksChanged};
-  m_messagePump->PostWindowMessage<WPARAM, Message*>(SetCameraMessage, NULL,
-                                                     msg);
+  m_messagePump->PostWindowMessage<Message::Kind, Message*>(SetCameraMessage, Message::kNumSinksChanged, nullptr);
 }
 void UsbCameraImpl::NumSinksEnabledChanged() {
-  std::cout << "Sinks Enabled Changed\n";
-  Message* msg = new Message{Message::kNumSinksEnabledChanged};
-  m_messagePump->PostWindowMessage<WPARAM, Message*>(SetCameraMessage, NULL,
-                                                     msg);
+  m_messagePump->PostWindowMessage<Message::Kind, Message*>(SetCameraMessage, Message::kNumSinksEnabledChanged, nullptr);
 }
 
 void UsbCameraImpl::Start() {
@@ -380,9 +373,9 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
       {
         std::cout << "Set Camera Message\n";
         Message* msg = reinterpret_cast<Message*>(lParam);
+        Message::Kind msgKind = static_cast<Message::Kind>(wParam);
         std::unique_lock<wpi::mutex> lock(m_mutex);
-        auto retVal = DeviceProcessCommand(lock, *msg);
-        delete msg;
+        auto retVal = DeviceProcessCommand(lock, msgKind, msg);
         return retVal;
       }
       break;
@@ -615,19 +608,18 @@ void UsbCameraImpl::DeviceCacheProperty(
 }
 
 CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
-    std::unique_lock<wpi::mutex>& lock, const Message& msg) {
-  std::cout << msg.kind << std::endl;
-  if (msg.kind == Message::kCmdSetMode ||
-      msg.kind == Message::kCmdSetPixelFormat ||
-      msg.kind == Message::kCmdSetResolution ||
-      msg.kind == Message::kCmdSetFPS) {
-    return DeviceCmdSetMode(lock, msg);
-  } else if (msg.kind == Message::kCmdSetProperty ||
-             msg.kind == Message::kCmdSetPropertyStr) {
-    return DeviceCmdSetProperty(lock, msg);
+    std::unique_lock<wpi::mutex>& lock, Message::Kind msgKind, const Message* msg) {
+  if (msgKind == Message::kCmdSetMode ||
+      msgKind == Message::kCmdSetPixelFormat ||
+      msgKind == Message::kCmdSetResolution ||
+      msgKind == Message::kCmdSetFPS) {
+    return DeviceCmdSetMode(lock, *msg);
+  } else if (msgKind == Message::kCmdSetProperty ||
+             msgKind == Message::kCmdSetPropertyStr) {
+    return DeviceCmdSetProperty(lock, *msg);
     return CS_OK;
-  } else if (msg.kind == Message::kNumSinksChanged ||
-             msg.kind == Message::kNumSinksEnabledChanged) {
+  } else if (msgKind == Message::kNumSinksChanged ||
+             msgKind == Message::kNumSinksEnabledChanged) {
     std::cout << "Stream Sink Event\n";
     // Turn On Streams
     if (m_streaming && !IsEnabled()) {

@@ -113,11 +113,6 @@ class UsbCameraImpl : public SourceImpl {
   bool CacheProperties(CS_Status* status) const override;
 
  private:
-  // Send a message to the camera thread and wait for a response (generic)
-  CS_StatusValue SendAndWait(Message&& msg) const;
-  // Send a message to the camera thread with no response
-  void Send(Message&& msg) const;
-
   // The camera processing thread
   void CameraThreadMain();
 
@@ -144,7 +139,7 @@ class UsbCameraImpl : public SourceImpl {
 
   // Command helper functions
   CS_StatusValue DeviceProcessCommand(std::unique_lock<wpi::mutex>& lock,
-                                      const Message& msg);
+                                      Message::Kind msgKind, const Message* msg);
   CS_StatusValue DeviceCmdSetMode(std::unique_lock<wpi::mutex>& lock,
                                   const Message& msg);
   CS_StatusValue DeviceCmdSetProperty(std::unique_lock<wpi::mutex>& lock,
