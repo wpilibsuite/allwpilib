@@ -9,8 +9,8 @@
 
 #include <memory>
 
-#include <wpi/mutex.h>
 #include <Dshow.h>
+#include <wpi/mutex.h>
 
 #include "PropertyImpl.h"
 
@@ -46,11 +46,14 @@ class UsbCameraProperty : public PropertyImpl {
     maximum = 100;
   }
 
-  UsbCameraProperty(const wpi::Twine& name_, tagVideoProcAmpProperty tag, bool autoProp, IAMVideoProcAmp *pProcAmp, bool* isValid);
+  UsbCameraProperty(const wpi::Twine& name_, tagVideoProcAmpProperty tag,
+                    bool autoProp, IAMVideoProcAmp* pProcAmp, bool* isValid);
 
-  bool DeviceGet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp *pProcAmp);
-  bool DeviceSet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp *pProcAmp) const;
-  bool DeviceSet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp *pProcAmp, int newValue) const;
+  bool DeviceGet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp* pProcAmp);
+  bool DeviceSet(std::unique_lock<wpi::mutex>& lock,
+                 IAMVideoProcAmp* pProcAmp) const;
+  bool DeviceSet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp* pProcAmp,
+                 int newValue) const;
 
   // If this is a device (rather than software) property
   bool device{true};
@@ -66,4 +69,4 @@ class UsbCameraProperty : public PropertyImpl {
   unsigned id{0};  // implementation-level id
   int type{0};     // implementation type, not CS_PropertyKind!
 };
-}
+}  // namespace cs

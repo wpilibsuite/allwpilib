@@ -8,6 +8,11 @@
 #ifndef CSCORE_USBCAMERAIMPL_H_
 #define CSCORE_USBCAMERAIMPL_H_
 
+#include <ks.h>
+#include <ksmedia.h>
+#include <mfapi.h>
+#include <mfidl.h>
+
 #ifdef __linux__
 #include <linux/videodev2.h>
 #endif
@@ -18,15 +23,13 @@
 #endif
 
 #include <atomic>
-#include "ComPtr.h"
-
-#include "WindowsMessagePump.h"
 #include <memory>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
 
+#include <Dbt.h>
 #include <wpi/STLExtras.h>
 #include <wpi/SmallVector.h>
 #include <wpi/Twine.h>
@@ -35,16 +38,11 @@
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 
-#include <mfidl.h>
-#include <mfapi.h>
-#include <Dbt.h>
-#include <ks.h>
-#include <ksmedia.h>
 #include "ComCreators.h"
 #include "ComPtr.h"
-
 #include "SourceImpl.h"
 #include "UsbCameraProperty.h"
+#include "WindowsMessagePump.h"
 
 namespace cs {
 
@@ -130,7 +128,8 @@ class UsbCameraImpl : public SourceImpl {
 
   LRESULT PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 
-  bool CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR *pHdr, bool* connected);
+  bool CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR* pHdr,
+                         bool* connected);
 
   // Functions used by CameraThreadMain()
   void DeviceDisconnect();
@@ -139,10 +138,12 @@ class UsbCameraImpl : public SourceImpl {
   bool DeviceStreamOff();
   CS_StatusValue DeviceSetMode();
   void DeviceCacheMode();
-  void DeviceCacheProperty(std::unique_ptr<UsbCameraProperty> rawProp, IAMVideoProcAmp *pProcAmp);
+  void DeviceCacheProperty(std::unique_ptr<UsbCameraProperty> rawProp,
+                           IAMVideoProcAmp* pProcAmp);
   void DeviceCacheProperties();
   void DeviceCacheVideoModes();
-  void DeviceAddProperty(const wpi::Twine& name_, tagVideoProcAmpProperty tag, IAMVideoProcAmp *pProcAmp);
+  void DeviceAddProperty(const wpi::Twine& name_, tagVideoProcAmpProperty tag,
+                         IAMVideoProcAmp* pProcAmp);
 
   ComPtr<IMFMediaType> DeviceCheckModeValid(const VideoMode& toCheck);
 
@@ -199,8 +200,8 @@ class UsbCameraImpl : public SourceImpl {
   std::atomic_int m_command_fd;  // for command eventfd
 #endif
 
-  //std::atomic_bool m_active;  // set to false to terminate thread
-  //std::thread m_cameraThread;
+  // std::atomic_bool m_active;  // set to false to terminate thread
+  // std::thread m_cameraThread;
 
   // Quirks
   bool m_lifecam_exposure{false};  // Microsoft LifeCam exposure

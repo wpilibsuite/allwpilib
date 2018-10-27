@@ -1,13 +1,22 @@
-#include <shlwapi.h>
-#include <Windows.h>
-#include <windowsx.h>
-#include <mfidl.h>
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include <mfapi.h>
+#include <mfidl.h>
+#include <shlwapi.h>
+#include <windowsx.h>
+
 #include <iostream>
+
+#include <Windows.h>
 
 #include "UsbCameraImpl.h"
 
-//https://github.com/opencv/opencv/blob/master/modules/videoio/src/cap_msmf.cpp
+// https://github.com/opencv/opencv/blob/master/modules/videoio/src/cap_msmf.cpp
 
 #include <mfidl.h>
 #include <mfapi.h>
@@ -29,171 +38,131 @@
 
 namespace cs {
 
-class SourceReaderCB : public IMFSourceReaderCallback
-{
-public:
-    SourceReaderCB(HWND hwnd, cs::UsbCameraImpl* source) :
-      m_nRefCount(1), m_hwnd(hwnd), m_source(source)
-    {
+class SourceReaderCB : public IMFSourceReaderCallback {
+ public:
+  SourceReaderCB(HWND hwnd, cs::UsbCameraImpl* source)
+      : m_nRefCount(1), m_hwnd(hwnd), m_source(source) {}
+
+  // IUnknown methods
+  STDMETHODIMP QueryInterface(REFIID iid, void** ppv) {
+    static const QITAB qit[] = {
+        QITABENT(SourceReaderCB, IMFSourceReaderCallback),
+        {0},
+    };
+    return QISearch(this, qit, iid, ppv);
+  }
+  STDMETHODIMP_(ULONG) AddRef() { return InterlockedIncrement(&m_nRefCount); }
+  STDMETHODIMP_(ULONG) Release() {
+    ULONG uCount = InterlockedDecrement(&m_nRefCount);
+    if (uCount == 0) {
+      delete this;
     }
+    return uCount;
+  }
 
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID iid, void** ppv)
-    {
-        static const QITAB qit[] =
-        {
-            QITABENT(SourceReaderCB, IMFSourceReaderCallback),
-            { 0 },
-        };
-        return QISearch(this, qit, iid, ppv);
-    }
-    STDMETHODIMP_(ULONG) AddRef()
-    {
-        return InterlockedIncrement(&m_nRefCount);
-    }
-    STDMETHODIMP_(ULONG) Release()
-    {
-        ULONG uCount = InterlockedDecrement(&m_nRefCount);
-        if (uCount == 0)
-        {
-            delete this;
-        }
-        return uCount;
-    }
+  // IMFSourceReaderCallback methods
+  STDMETHODIMP OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
+                            DWORD dwStreamFlags, LONGLONG llTimestamp,
+                            IMFSample* pSample);
 
-    // IMFSourceReaderCallback methods
-    STDMETHODIMP OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
-        DWORD dwStreamFlags, LONGLONG llTimestamp, IMFSample *pSample);
+  STDMETHODIMP OnEvent(DWORD, IMFMediaEvent*) { return S_OK; }
 
-    STDMETHODIMP OnEvent(DWORD, IMFMediaEvent *)
-    {
-        return S_OK;
-    }
+  STDMETHODIMP OnFlush(DWORD) { return S_OK; }
 
-    STDMETHODIMP OnFlush(DWORD)
-    {
-        return S_OK;
-    }
+ private:
+  // Destructor is private. Caller should call Release.
+  virtual ~SourceReaderCB() {}
 
-public:
+  void NotifyError(HRESULT hr) { wprintf(L"Source Reader error: 0x%X\n", hr); }
 
-
-private:
-
-    // Destructor is private. Caller should call Release.
-    virtual ~SourceReaderCB()
-    {
-    }
-
-    void NotifyError(HRESULT hr)
-    {
-        wprintf(L"Source Reader error: 0x%X\n", hr);
-    }
-
-private:
-    long                m_nRefCount;        // Reference count.
-    HWND                m_hwnd;
-    UsbCameraImpl*      m_source;
+ private:
+  ULONG m_nRefCount;  // Reference count.
+  HWND m_hwnd;
+  UsbCameraImpl* m_source;
 };
 
-HRESULT SourceReaderCB::OnReadSample(
-    HRESULT hrStatus,
-    DWORD dwStreamIndex,
-    DWORD dwStreamFlags,
-    LONGLONG llTimestamp,
-    IMFSample *pSample      // Can be NULL
-    )
-{
+HRESULT SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
+                                     DWORD dwStreamFlags, LONGLONG llTimestamp,
+                                     IMFSample* pSample  // Can be NULL
+) {
+  if (SUCCEEDED(hrStatus)) {
+    if (pSample) {
+      // Do something with the sample.
+      // wprintf(L"Frame @ %I64d\n", llTimestamp);
 
-    if (SUCCEEDED(hrStatus))
-    {
-        if (pSample)
-        {
-            // Do something with the sample.
-           // wprintf(L"Frame @ %I64d\n", llTimestamp);
-
-            // Do sample
-            m_source->ProcessFrame(pSample);
-        }
+      // Do sample
+      m_source->ProcessFrame(pSample);
     }
-    else
-    {
-        // Streaming error.
-        NotifyError(hrStatus);
-    }
-    PostMessage(m_hwnd, 0x0400 + 4488, 0, 0);
-    return S_OK;
+  } else {
+    // Streaming error.
+    NotifyError(hrStatus);
+  }
+  PostMessage(m_hwnd, 0x0400 + 4488, 0, 0);
+  return S_OK;
 }
 
-ComPtr<IMFSourceReaderCallback> CreateSourceReaderCB(HWND hwnd, UsbCameraImpl* source) {
+ComPtr<IMFSourceReaderCallback> CreateSourceReaderCB(HWND hwnd,
+                                                     UsbCameraImpl* source) {
   IMFSourceReaderCallback* ptr = new SourceReaderCB(hwnd, source);
   ComPtr<IMFSourceReaderCallback> sourceReaderCB;
   sourceReaderCB.Attach(ptr);
   return sourceReaderCB;
 }
 
-ComPtr<IMFMediaSource> CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink)
-{
-    ComPtr<IMFAttributes> pAttributes;
-    ComPtr<IMFMediaSource> pSource;
+ComPtr<IMFMediaSource> CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink) {
+  ComPtr<IMFAttributes> pAttributes;
+  ComPtr<IMFMediaSource> pSource;
 
-    HRESULT hr = MFCreateAttributes(pAttributes.GetAddressOf(), 2);
+  HRESULT hr = MFCreateAttributes(pAttributes.GetAddressOf(), 2);
 
-    // Set the device type to video.
-    if (SUCCEEDED(hr))
-    {
-        hr = pAttributes->SetGUID(
-            MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
-            MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID
-            );
-    }
+  // Set the device type to video.
+  if (SUCCEEDED(hr)) {
+    hr = pAttributes->SetGUID(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
+                              MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
+  }
 
+  // Set the symbolic link.
+  if (SUCCEEDED(hr)) {
+    hr = pAttributes->SetString(
+        MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK,
+        pszSymbolicLink);
+  }
 
-    // Set the symbolic link.
-    if (SUCCEEDED(hr))
-    {
-        hr = pAttributes->SetString(
-            MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK,
-            pszSymbolicLink
-            );
-    }
+  if (SUCCEEDED(hr)) {
+    hr = MFCreateDeviceSource(pAttributes.Get(), pSource.GetAddressOf());
+  }
 
-    if (SUCCEEDED(hr))
-    {
-        hr = MFCreateDeviceSource(pAttributes.Get(), pSource.GetAddressOf());
-    }
-
-    return pSource;
+  return pSource;
 }
 
-ComPtr<IMFSourceReader> CreateSourceReader(IMFMediaSource* mediaSource, IMFSourceReaderCallback* callback) {
-    HRESULT hr = S_OK;
-    ComPtr<IMFAttributes> pAttributes;
+ComPtr<IMFSourceReader> CreateSourceReader(IMFMediaSource* mediaSource,
+                                           IMFSourceReaderCallback* callback) {
+  HRESULT hr = S_OK;
+  ComPtr<IMFAttributes> pAttributes;
 
-    ComPtr<IMFSourceReader> sourceReader ;
+  ComPtr<IMFSourceReader> sourceReader;
 
-    hr = MFCreateAttributes(pAttributes.GetAddressOf(), 1);
-    if (FAILED(hr))
-    {
-        goto done;
-    }
+  hr = MFCreateAttributes(pAttributes.GetAddressOf(), 1);
+  if (FAILED(hr)) {
+    goto done;
+  }
 
-    hr = pAttributes->SetUnknown(MF_SOURCE_READER_ASYNC_CALLBACK, callback);
-    if (FAILED(hr))
-    {
-        goto done;
-    }
+  hr = pAttributes->SetUnknown(MF_SOURCE_READER_ASYNC_CALLBACK, callback);
+  if (FAILED(hr)) {
+    goto done;
+  }
 
-    hr = pAttributes->SetUINT32(MF_SOURCE_READER_DISCONNECT_MEDIASOURCE_ON_SHUTDOWN, TRUE);
-    if (FAILED(hr))
-    {
-        goto done;
-    }
+  hr = pAttributes->SetUINT32(
+      MF_SOURCE_READER_DISCONNECT_MEDIASOURCE_ON_SHUTDOWN, TRUE);
+  if (FAILED(hr)) {
+    goto done;
+  }
 
-    hr = MFCreateSourceReaderFromMediaSource(mediaSource, pAttributes.Get(), sourceReader.GetAddressOf());
+  hr = MFCreateSourceReaderFromMediaSource(mediaSource, pAttributes.Get(),
+                                           sourceReader.GetAddressOf());
 
 done:
-    return sourceReader;
+  return sourceReader;
 }
 
-}
+}  // namespace cs

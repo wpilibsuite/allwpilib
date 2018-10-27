@@ -34,9 +34,6 @@
 #include "UsbCameraBuffer.h"
 #include "UsbCameraProperty.h"
 
-template<typename T>
-using com_unique_ptr = std::unique_ptr<T,void(*)(T*)>;
-
 namespace cs {
 
 class UsbCameraImpl : public SourceImpl {
