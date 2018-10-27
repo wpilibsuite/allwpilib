@@ -111,6 +111,7 @@ void WindowsMessagePump::ThreadMain(HANDLE eventHandle) {
 
   // Register for device notifications
   HDEVNOTIFY g_hdevnotify = NULL;
+  HDEVNOTIFY g_hdevnotify2 = NULL;
 
   DEV_BROADCAST_DEVICEINTERFACE di = {0};
   di.dbcc_size = sizeof(di);
@@ -120,6 +121,14 @@ void WindowsMessagePump::ThreadMain(HANDLE eventHandle) {
   g_hdevnotify =
       RegisterDeviceNotification(hwnd, &di, DEVICE_NOTIFY_WINDOW_HANDLE);
 
+  DEV_BROADCAST_DEVICEINTERFACE di2 = {0};
+  di2.dbcc_size = sizeof(di2);
+  di2.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
+  di2.dbcc_classguid = KSCATEGORY_VIDEO_CAMERA;
+
+  g_hdevnotify2 =
+      RegisterDeviceNotification(hwnd, &di2, DEVICE_NOTIFY_WINDOW_HANDLE);
+
   SetEvent(eventHandle);
 
   MSG Msg;
@@ -128,6 +137,7 @@ void WindowsMessagePump::ThreadMain(HANDLE eventHandle) {
     DispatchMessage(&Msg);
   }
   UnregisterDeviceNotification(g_hdevnotify);
+  UnregisterDeviceNotification(g_hdevnotify2);
 
   MFShutdown();
   CoUninitialize();

@@ -7,31 +7,46 @@
 
 #include "NetworkListener.h"
 
+#include <winsock2.h>
+#include <windows.h>
+#include <ws2def.h>
+#include <ws2ipdef.h>
+#include <iphlpapi.h>
+#include <netioapi.h>
+
 #include "Log.h"
 #include "Notifier.h"
 
+
+#pragma comment(lib, "Iphlpapi.lib")
+
 using namespace cs;
 
-class NetworkListener::Thread : public wpi::SafeThread {
+class NetworkListener::Pimpl {
  public:
-  void Main();
+  HANDLE eventHandle = 0;
 };
+
+// Static Callback function for NotifyIpInterfaceChange API.
+static void WINAPI OnInterfaceChange(PVOID callerContext,
+                                     PMIB_IPINTERFACE_ROW row,
+                                     MIB_NOTIFICATION_TYPE notificationType)
+{
+  Notifier::GetInstance().NotifyNetworkInterfacesChanged();
+}
+
+NetworkListener::NetworkListener() {
+  m_data = std::make_unique<Pimpl>();
+}
 
 NetworkListener::~NetworkListener() { Stop(); }
 
 void NetworkListener::Start() {
-  auto thr = m_owner.GetThread();
-  if (!thr) m_owner.Start();
+  NotifyIpInterfaceChange(AF_INET, OnInterfaceChange, nullptr, true, &m_data->eventHandle);
 }
 
 void NetworkListener::Stop() {
-  // Wake up thread
-  if (auto thr = m_owner.GetThread()) {
-    thr->m_active = false;
+  if (m_data->eventHandle) {
+    CancelMibChangeNotify2(m_data->eventHandle);
   }
-  m_owner.Stop();
-}
-
-void NetworkListener::Thread::Main() {
-  // TODO
 }

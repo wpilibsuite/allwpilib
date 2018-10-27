@@ -12,13 +12,12 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "wpi/hostname.h"
+
 namespace cs {
 
 std::string GetHostname() {
-  char name[256];
-  if (::gethostname(name, sizeof(name)) != 0) return "";
-  name[255] = '\0';  // Per POSIX, may not be null terminated if too long
-  return name;
+  return wpi::GetHostname();
 }
 
 std::vector<std::string> GetNetworkInterfaces() {

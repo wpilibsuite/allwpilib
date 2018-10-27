@@ -12,26 +12,17 @@
 
 using namespace cs;
 
-class NetworkListener::Thread : public wpi::SafeThread {
- public:
-  void Main();
+class NetworkListener::Pimpl {
 };
+
+NetworkListener::NetworkListener() {
+  m_data = std::make_unique<Pimpl>();
+}
 
 NetworkListener::~NetworkListener() { Stop(); }
 
 void NetworkListener::Start() {
-  auto thr = m_owner.GetThread();
-  if (!thr) m_owner.Start();
 }
 
 void NetworkListener::Stop() {
-  // Wake up thread
-  if (auto thr = m_owner.GetThread()) {
-    thr->m_active = false;
-  }
-  m_owner.Stop();
-}
-
-void NetworkListener::Thread::Main() {
-  // TODO
 }

@@ -25,35 +25,43 @@
 
 using namespace cs;
 
-class NetworkListener::Thread : public wpi::SafeThread {
+namespace {
+
+class NetworkListenerThread : public wpi::SafeThread {
  public:
   void Main();
 
-#ifdef __linux__
   int m_command_fd = -1;
-#endif
 };
+
+}
+
+class NetworkListener::Pimpl {
+ public:
+  wpi::SafeThreadOwner<NetworkListenerThread> m_owner;
+};
+
+NetworkListener::NetworkListener() {
+  m_data = std::make_unique<Pimpl>();
+}
 
 NetworkListener::~NetworkListener() { Stop(); }
 
 void NetworkListener::Start() {
-  auto thr = m_owner.GetThread();
-  if (!thr) m_owner.Start();
+  auto thr = m_data->m_owner.GetThread();
+  if (!thr) m_data->m_owner.Start();
 }
 
 void NetworkListener::Stop() {
   // Wake up thread
-  if (auto thr = m_owner.GetThread()) {
+  if (auto thr = m_data->m_owner.GetThread()) {
     thr->m_active = false;
-#ifdef __linux__
     if (thr->m_command_fd >= 0) eventfd_write(thr->m_command_fd, 1);
-#endif
   }
-  m_owner.Stop();
+  m_data->m_owner.Stop();
 }
 
-void NetworkListener::Thread::Main() {
-#ifdef __linux__
+void NetworkListenerThread::Main() {
   // Create event socket so we can be shut down
   m_command_fd = ::eventfd(0, 0);
   if (m_command_fd < 0) {
@@ -132,5 +140,4 @@ void NetworkListener::Thread::Main() {
   ::close(sd);
   ::close(m_command_fd);
   m_command_fd = -1;
-#endif
 }

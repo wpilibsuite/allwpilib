@@ -7,10 +7,12 @@
 
 #include "cscore_cpp.h"
 
+#include "wpi/hostname.h"
+
 namespace cs {
 
 std::string GetHostname() {
-  return "";  // TODO
+  return wpi::GetHostname();
 }
 
 std::vector<std::string> GetNetworkInterfaces() {

@@ -8,7 +8,7 @@
 #ifndef CSCORE_NETWORKLISTENER_H_
 #define CSCORE_NETWORKLISTENER_H_
 
-#include <wpi/SafeThread.h>
+#include <memory>
 
 namespace cs {
 
@@ -24,10 +24,11 @@ class NetworkListener {
   void Stop();
 
  private:
-  NetworkListener() = default;
+  NetworkListener();
 
-  class Thread;
-  wpi::SafeThreadOwner<Thread> m_owner;
+  class Pimpl;
+
+  std::unique_ptr<Pimpl> m_data;
 };
 
 }  // namespace cs

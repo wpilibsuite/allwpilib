@@ -38,6 +38,8 @@
 
 namespace cs {
 
+// Source callback used by the source reader.
+// COM object, so it needs a to ref count itself.
 class SourceReaderCB : public IMFSourceReaderCallback {
  public:
   SourceReaderCB(cs::UsbCameraImpl* source)
@@ -86,10 +88,7 @@ HRESULT SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
 ) {
   if (SUCCEEDED(hrStatus)) {
     if (pSample) {
-      // Do something with the sample.
-      // wprintf(L"Frame @ %I64d\n", llTimestamp);
-
-      // Do sample
+      // Prcoess sample
       m_source->ProcessFrame(pSample);
       pSample->Release();
     }
@@ -97,10 +96,13 @@ HRESULT SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
     // Streaming error.
     NotifyError(hrStatus);
   }
+  // Trigger asking for a new frame.
+  // This is piped through the message pump for concurrency reasons
   m_source->PostRequestNewFrame();
   return S_OK;
 }
 
+// Create a Source Reader COM Smart Object
 ComPtr<IMFSourceReaderCallback> CreateSourceReaderCB(UsbCameraImpl* source) {
   IMFSourceReaderCallback* ptr = new SourceReaderCB(source);
   ComPtr<IMFSourceReaderCallback> sourceReaderCB;
@@ -131,6 +133,7 @@ ComPtr<IMFMediaSource> CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink) {
     hr = MFCreateDeviceSource(pAttributes.Get(), pSource.GetAddressOf());
   }
 
+  // No need to check last HR, as the source would be null anyway.
   return pSource;
 }
 
@@ -138,29 +141,28 @@ ComPtr<IMFSourceReader> CreateSourceReader(IMFMediaSource* mediaSource,
                                            IMFSourceReaderCallback* callback) {
   HRESULT hr = S_OK;
   ComPtr<IMFAttributes> pAttributes;
-
   ComPtr<IMFSourceReader> sourceReader;
 
   hr = MFCreateAttributes(pAttributes.GetAddressOf(), 1);
   if (FAILED(hr)) {
-    goto done;
+    return nullptr;
   }
 
   hr = pAttributes->SetUnknown(MF_SOURCE_READER_ASYNC_CALLBACK, callback);
   if (FAILED(hr)) {
-    goto done;
+    return nullptr;
   }
 
   hr = pAttributes->SetUINT32(
       MF_SOURCE_READER_DISCONNECT_MEDIASOURCE_ON_SHUTDOWN, TRUE);
   if (FAILED(hr)) {
-    goto done;
+    return nullptr;
   }
 
-  hr = MFCreateSourceReaderFromMediaSource(mediaSource, pAttributes.Get(),
+  MFCreateSourceReaderFromMediaSource(mediaSource, pAttributes.Get(),
                                            sourceReader.GetAddressOf());
 
-done:
+  // No need to check last HR, as the sourceReader would be null anyway.
   return sourceReader;
 }
 
