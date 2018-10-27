@@ -57,13 +57,6 @@
 static constexpr int NewImageMessage = 0x0400 + 4488;
 static constexpr int SetCameraMessage = 0x0400 + 254;
 
-#define PROPERTYCONSTANT(val)                     \
-  static constexpr char const* kProp##val = #val; \
-  static constexpr char const* kAutoProp##val = "##val_auto";
-
-PROPERTYCONSTANT(Brightness)
-PROPERTYCONSTANT(WhiteBalance)
-
 static constexpr unsigned kPropConnectVerboseId = 0;
 
 using namespace cs;
@@ -72,21 +65,15 @@ namespace cs {
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, const wpi::Twine& path)
     : SourceImpl{name}, m_path{path.str()} {
-  // std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
-  std::cout << kAutoPropBrightness << "\n";
 }
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, int deviceId)
     : SourceImpl{name}, m_deviceId(deviceId) {}
 
 UsbCameraImpl::~UsbCameraImpl() {
-  // m_active = false;
-  std::cout << "Starting Destructor\n";
-
   m_messagePump = nullptr;
-  std::cout << "Destructed loop\n";
 }
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
@@ -342,17 +329,7 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
       break;
     case WM_CREATE:
       // Pump Created and ready to go
-      m_imageCallback = CreateSourceReaderCB(hwnd, this);
-      {
-        // Set a default image
-        std::unique_ptr<Image> dest;
-        cv::Mat tmpMat;
-        tmpMat = cv::Mat(240, 320, CV_8UC1);
-        dest = AllocImage(VideoMode::kGray, tmpMat.cols, tmpMat.rows,
-                          tmpMat.total());
-        tmpMat.copyTo(dest->AsMat());
-        PutFrame(std::move(dest), wpi::Now());
-      }
+      m_imageCallback = CreateSourceReaderCB(hwnd, this, NewImageMessage);
       DeviceConnect();
       break;
     case WM_DEVICECHANGE: {
@@ -410,16 +387,6 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
     }
   }
   return 0l;
-}
-
-static std::string guidToString(GUID guid) {
-  std::array<char, 40> output;
-  std::snprintf(output.data(), output.size(),
-                "{%08X-%04hX-%04hX-%02X%02X-%02X%02X%02X%02X%02X%02X}",
-                guid.Data1, guid.Data2, guid.Data3, guid.Data4[0],
-                guid.Data4[1], guid.Data4[2], guid.Data4[3], guid.Data4[4],
-                guid.Data4[5], guid.Data4[6], guid.Data4[7]);
-  return std::string(output.data());
 }
 
 static cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
