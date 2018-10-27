@@ -224,7 +224,6 @@ void UsbCameraImpl::DeviceDisconnect() {
 }
 
 void UsbCameraImpl::ProcessFrame(IMFSample* videoSample) {
-  // std::cout << "Procesing frame\n";
 
   do {
     if (!videoSample) break;
@@ -276,29 +275,29 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample) {
       mode = m_mode;
     }
 
-    switch (m_mode.pixelFormat) {
+    switch (mode.pixelFormat) {
       case cs::VideoMode::PixelFormat::kMJPEG: {
         // Special case
-        PutFrame(VideoMode::kMJPEG, m_mode.width, m_mode.height,
+        PutFrame(VideoMode::kMJPEG, mode.width, mode.height,
                  wpi::StringRef(reinterpret_cast<char*>(ptr), cursize),
                  wpi::Now());
         doFinalSet = false;
         break;
       }
       case cs::VideoMode::PixelFormat::kGray:
-        tmpMat = cv::Mat(m_mode.height, m_mode.width, CV_8UC1, ptr, pitch);
+        tmpMat = cv::Mat(mode.height, mode.width, CV_8UC1, ptr, pitch);
         dest = AllocImage(VideoMode::kGray, tmpMat.cols, tmpMat.rows,
                           tmpMat.total());
         tmpMat.copyTo(dest->AsMat());
         break;
       case cs::VideoMode::PixelFormat::kBGR:
-        tmpMat = cv::Mat(m_mode.height, m_mode.width, CV_8UC3, ptr, pitch);
+        tmpMat = cv::Mat(mode.height, mode.width, CV_8UC3, ptr, pitch);
         dest = AllocImage(VideoMode::kBGR, tmpMat.cols, tmpMat.rows,
                           tmpMat.total() * 3);
         tmpMat.copyTo(dest->AsMat());
         break;
       case cs::VideoMode::PixelFormat::kYUYV:
-        tmpMat = cv::Mat(m_mode.height, m_mode.width, CV_8UC2, ptr, pitch);
+        tmpMat = cv::Mat(mode.height, mode.width, CV_8UC2, ptr, pitch);
         dest = AllocImage(VideoMode::kYUYV, tmpMat.cols, tmpMat.rows,
                           tmpMat.total() * 2);
         tmpMat.copyTo(dest->AsMat());
@@ -369,7 +368,7 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
       }
     } break;
     case NewImageMessage: {  // New image
-      if (m_streaming) {
+      if (m_streaming && m_sourceReader) {
         m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, NULL,
                                    NULL, NULL, NULL);
       }
@@ -444,11 +443,15 @@ bool UsbCameraImpl::DeviceConnect() {
   std::cout << "Setting Stream: " << m_streaming << " " << IsEnabled()
             << std::endl;
 
+
+
   // Turn off streaming if not enabled, and turn it on if enabled
   if (m_streaming && !IsEnabled()) {
     DeviceStreamOff();
-  } else if (!m_streaming && IsEnabled()) {
+  } else if (IsEnabled()) {
     std::cout << "Setting Stream On" << std::endl;
+    std::cout << m_streaming << std::endl;
+    std::cout << m_deviceValid << std::endl;
     DeviceStreamOn();
   }
   return true;
@@ -742,13 +745,17 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
     newMode.fps = msg.data[0];
   }
 
-  std::cout << "DeviceCmdSetMode\n";
+  // Check if the device is not connected, if not just apply and leave
+  if (!m_properties_cached) {
+    m_mode = newMode;
+    return CS_OK;
+  }
+
 
   // If the pixel format or resolution changed, we need to disconnect and
   // reconnect
   if (newMode != m_mode) {
     // First check if the new mode is valid
-    std::cout << (newMode.pixelFormat == VideoMode::kYUYV) << " New Mode \n";
     auto newModeType = DeviceCheckModeValid(newMode);
     if (!newModeType) {
       return CS_UNSUPPORTED_MODE;
@@ -790,7 +797,11 @@ void UsbCameraImpl::DeviceCacheMode() {
   if (!m_sourceReader) return;
 
   if (!m_currentMode) {
-    if (FAILED(m_sourceReader->GetCurrentMediaType(
+
+    // First, see if our set mode is valid
+    m_currentMode = DeviceCheckModeValid(m_mode);
+    if (!m_currentMode) {
+      if (FAILED(m_sourceReader->GetCurrentMediaType(
             MF_SOURCE_READER_FIRST_VIDEO_STREAM,
             m_currentMode.GetAddressOf()))) {
       return;
@@ -817,6 +828,11 @@ void UsbCameraImpl::DeviceCacheMode() {
       std::lock_guard<wpi::mutex> lock(m_mutex);
       m_mode = result->first;
     }
+    }
+
+
+
+
   }
 
   DeviceSetMode();

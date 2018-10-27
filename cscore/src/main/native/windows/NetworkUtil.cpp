@@ -15,6 +15,8 @@
 
 #include <wpi/hostname.h>
 
+#include <uv.h>
+
 #include "cscore_cpp.h"
 
 #pragma comment(lib, "IPHLPAPI.lib")
@@ -31,6 +33,34 @@ namespace cs {
 std::string GetHostname() { return wpi::GetHostname(); }
 
 std::vector<std::string> GetNetworkInterfaces() {
+  uv_interface_address_t* adrs;
+  int counts = 0;
+
+    std::vector<std::string> addresses{};
+
+  uv_interface_addresses(&adrs, &counts);
+
+  char ip[50];
+
+  for (int i = 0; i < counts; i++) {
+    if (adrs[i].is_internal) continue;
+    std::cout << adrs[i].name << std::endl;
+                InetNtop(PF_INET, &(adrs[i].netmask.netmask4.sin_addr.s_addr), ip, sizeof(ip) - 1);
+        ip[49] = '\0';
+        std::cout << ip << std::endl;
+            InetNtop(PF_INET, &(adrs[i].address.address4.sin_addr.s_addr), ip, sizeof(ip) - 1);
+        ip[49] = '\0';
+        std::cout << ip << std::endl;
+        addresses.emplace_back(std::string{ip});
+  }
+
+  uv_free_interface_addresses(adrs, counts);
+
+  std::cout << "finished\n";
+
+  return addresses;
+
+
   PIP_ADAPTER_ADDRESSES pAddresses = NULL;
   PIP_ADAPTER_ADDRESSES pCurrAddresses = NULL;
   PIP_ADAPTER_UNICAST_ADDRESS pUnicast = NULL;
@@ -42,7 +72,7 @@ std::vector<std::string> GetNetworkInterfaces() {
   ULONG Iterations = 0;
   DWORD dwRetVal = 0;
 
-  std::vector<std::string> addresses{};
+
 
   // Allocate a 15 KB buffer to start with.
   outBufLen = WORKING_BUFFER_SIZE;
@@ -66,8 +96,6 @@ std::vector<std::string> GetNetworkInterfaces() {
 
     Iterations++;
   } while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (Iterations < MAX_TRIES));
-
-  char ip[50];
 
   if (dwRetVal == NO_ERROR) {
     pCurrAddresses = pAddresses;
