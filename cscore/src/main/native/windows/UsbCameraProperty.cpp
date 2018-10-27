@@ -3,7 +3,7 @@
 using namespace cs;
 
 
-UsbCameraProperty::UsbCameraProperty(const wpi::Twine& name_, tagVideoProcAmpProperty tag, bool autoProp, IAMVideoProcAmp *pProcAmp) : PropertyImpl{autoProp ? name_ + "_auto" : name_} {
+UsbCameraProperty::UsbCameraProperty(const wpi::Twine& name_, tagVideoProcAmpProperty tag, bool autoProp, IAMVideoProcAmp *pProcAmp, bool* isValid) : PropertyImpl{autoProp ? name_ + "_auto" : name_} {
   this->tag = tag;
   this->isAutoProp = autoProp;
   long paramVal, paramFlag;
@@ -19,8 +19,10 @@ UsbCameraProperty::UsbCameraProperty(const wpi::Twine& name_, tagVideoProcAmpPro
     step = stepVal;
     value = paramVal;
     propKind = CS_PropertyKind::CS_PROP_INTEGER;
+    *isValid = true;
   } else {
     // TODO on failure
+    *isValid = false;
   }
 }
 

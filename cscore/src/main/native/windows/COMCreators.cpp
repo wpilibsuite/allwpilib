@@ -29,6 +29,73 @@
 
 namespace cs {
 
+class SourceReaderCB : public IMFSourceReaderCallback
+{
+public:
+    SourceReaderCB(HWND hwnd, cs::UsbCameraImpl* source) :
+      m_nRefCount(1), m_hwnd(hwnd), m_source(source)
+    {
+    }
+
+    // IUnknown methods
+    STDMETHODIMP QueryInterface(REFIID iid, void** ppv)
+    {
+        static const QITAB qit[] =
+        {
+            QITABENT(SourceReaderCB, IMFSourceReaderCallback),
+            { 0 },
+        };
+        return QISearch(this, qit, iid, ppv);
+    }
+    STDMETHODIMP_(ULONG) AddRef()
+    {
+        return InterlockedIncrement(&m_nRefCount);
+    }
+    STDMETHODIMP_(ULONG) Release()
+    {
+        ULONG uCount = InterlockedDecrement(&m_nRefCount);
+        if (uCount == 0)
+        {
+            delete this;
+        }
+        return uCount;
+    }
+
+    // IMFSourceReaderCallback methods
+    STDMETHODIMP OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
+        DWORD dwStreamFlags, LONGLONG llTimestamp, IMFSample *pSample);
+
+    STDMETHODIMP OnEvent(DWORD, IMFMediaEvent *)
+    {
+        return S_OK;
+    }
+
+    STDMETHODIMP OnFlush(DWORD)
+    {
+        return S_OK;
+    }
+
+public:
+
+
+private:
+
+    // Destructor is private. Caller should call Release.
+    virtual ~SourceReaderCB()
+    {
+    }
+
+    void NotifyError(HRESULT hr)
+    {
+        wprintf(L"Source Reader error: 0x%X\n", hr);
+    }
+
+private:
+    long                m_nRefCount;        // Reference count.
+    HWND                m_hwnd;
+    UsbCameraImpl*      m_source;
+};
+
 HRESULT SourceReaderCB::OnReadSample(
     HRESULT hrStatus,
     DWORD dwStreamIndex,
@@ -58,16 +125,19 @@ HRESULT SourceReaderCB::OnReadSample(
     return S_OK;
 }
 
-SourceReaderCB* CreateSourceReaderCB(HWND hwnd, UsbCameraImpl* source) {
-  return new SourceReaderCB(hwnd, source);
+ComPtr<IMFSourceReaderCallback> CreateSourceReaderCB(HWND hwnd, UsbCameraImpl* source) {
+  IMFSourceReaderCallback* ptr = new SourceReaderCB(hwnd, source);
+  ComPtr<IMFSourceReaderCallback> sourceReaderCB;
+  sourceReaderCB.Attach(ptr);
+  return sourceReaderCB;
 }
 
-IMFMediaSource* CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink)
+ComPtr<IMFMediaSource> CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink)
 {
-    IMFAttributes *pAttributes = NULL;
-    IMFMediaSource *pSource = NULL;
+    ComPtr<IMFAttributes> pAttributes;
+    ComPtr<IMFMediaSource> pSource;
 
-    HRESULT hr = MFCreateAttributes(&pAttributes, 2);
+    HRESULT hr = MFCreateAttributes(pAttributes.GetAddressOf(), 2);
 
     // Set the device type to video.
     if (SUCCEEDED(hr))
@@ -90,20 +160,19 @@ IMFMediaSource* CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink)
 
     if (SUCCEEDED(hr))
     {
-        hr = MFCreateDeviceSource(pAttributes, &pSource);
+        hr = MFCreateDeviceSource(pAttributes.Get(), pSource.GetAddressOf());
     }
 
-    SafeRelease(&pAttributes);
     return pSource;
 }
 
-IMFSourceReader* CreateSourceReader(IMFMediaSource* mediaSource, IMFSourceReaderCallback* callback) {
-  HRESULT hr = S_OK;
-    IMFAttributes *pAttributes = NULL;
+ComPtr<IMFSourceReader> CreateSourceReader(IMFMediaSource* mediaSource, IMFSourceReaderCallback* callback) {
+    HRESULT hr = S_OK;
+    ComPtr<IMFAttributes> pAttributes;
 
-    IMFSourceReader* sourceReader = NULL;
+    ComPtr<IMFSourceReader> sourceReader ;
 
-    hr = MFCreateAttributes(&pAttributes, 1);
+    hr = MFCreateAttributes(pAttributes.GetAddressOf(), 1);
     if (FAILED(hr))
     {
         goto done;
@@ -121,86 +190,10 @@ IMFSourceReader* CreateSourceReader(IMFMediaSource* mediaSource, IMFSourceReader
         goto done;
     }
 
-    hr = MFCreateSourceReaderFromMediaSource(mediaSource, pAttributes, &sourceReader);
+    hr = MFCreateSourceReaderFromMediaSource(mediaSource, pAttributes.Get(), sourceReader.GetAddressOf());
 
 done:
-    SafeRelease(&pAttributes);
     return sourceReader;
-}
-
- HRESULT ConfigureDecoder(IMFSourceReader *pReader, DWORD dwStreamIndex)
-{
-    IMFMediaType *pNativeType = NULL;
-    IMFMediaType *pType = NULL;
-
-    // Find the native format of the stream.
-    HRESULT hr = pReader->GetNativeMediaType(dwStreamIndex, 0, &pNativeType);
-    if (FAILED(hr))
-    {
-        std::cout << "Failed getnative\n";
-        return hr;
-    }
-
-    GUID majorType, subtype;
-
-    // Find the major type.
-    hr = pNativeType->GetGUID(MF_MT_MAJOR_TYPE, &majorType);
-    if (FAILED(hr))
-    {
-        std::cout << "Failed getguid\n";
-        goto done;
-    }
-
-    // Define the output type.
-    hr = MFCreateMediaType(&pType);
-    if (FAILED(hr))
-    {
-        std::cout << "Failed nediatype\n";
-        goto done;
-    }
-
-    hr = pType->SetGUID(MF_MT_MAJOR_TYPE, majorType);
-    if (FAILED(hr))
-    {
-        std::cout << "Failed setguid major\n";
-        goto done;
-    }
-
-    // Select a subtype.
-    if (majorType == MFMediaType_Video)
-    {
-        std::cout << "Setting media type\n";
-        subtype= MFVideoFormat_RGB24;
-    }
-    else if (majorType == MFMediaType_Audio)
-    {
-        subtype = MFAudioFormat_PCM;
-    }
-    else
-    {
-        // Unrecognized type. Skip.
-        goto done;
-    }
-
-    hr = pType->SetGUID(MF_MT_SUBTYPE, subtype);
-    if (FAILED(hr))
-    {
-        std::cout << "Failed setguid\n";
-        goto done;
-    }
-
-    // Set the uncompressed format.
-    hr = pReader->SetCurrentMediaType(dwStreamIndex, NULL, pType);
-    if (FAILED(hr))
-    {
-        std::cout << "Failed setformat\n";
-        goto done;
-    }
-
-done:
-    SafeRelease(&pNativeType);
-    SafeRelease(&pType);
-    return hr;
 }
 
 }

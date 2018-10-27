@@ -4,26 +4,47 @@
 #include <windows.h>
 #include <functional>
 
-template <class T> void SafeRelease(T **ppT)
-{
-	if (*ppT)
-	{
-		(*ppT)->Release();
-		*ppT = NULL;
-	}
-}
-
 namespace cs {
 class WindowsMessagePump {
  public:
   WindowsMessagePump(std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> callback);
   ~WindowsMessagePump();
 
-  HWND hwnd;
-  std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> m_callback;
+  friend LRESULT CALLBACK pWndProc(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
+
+  template<typename RetVal = LRESULT, typename FirstParam = WPARAM, typename SecondParam = LPARAM>
+  RetVal SendWindowMessage(UINT msg, FirstParam wParam, SecondParam lParam) {
+    static_assert(sizeof(FirstParam) <= sizeof(WPARAM), "First Parameter Does Not Fit");
+    static_assert(sizeof(SecondParam) <= sizeof(LPARAM), "Second Parameter Does Not Fit");
+    static_assert(sizeof(RetVal) <= sizeof(LRESULT), "Return Value Does Not Fit");
+    WPARAM firstToSend = 0;
+    LPARAM secondToSend = 0;
+    std::memcpy(&firstToSend, &wParam, sizeof(FirstParam));
+    std::memcpy(&secondToSend, &lParam, sizeof(SecondParam));
+    LRESULT result = SendMessage(hwnd, msg, firstToSend, secondToSend);
+    RetVal toReturn;
+    std::memset(&toReturn, 0, sizeof(RetVal));
+    std::memcpy(&toReturn, &result, sizeof(RetVal));
+    return toReturn;
+  }
+
+  template<typename FirstParam = WPARAM, typename SecondParam = LPARAM>
+  BOOL PostWindowMessage(UINT msg, FirstParam wParam, SecondParam lParam) {
+    static_assert(sizeof(FirstParam) <= sizeof(WPARAM), "First Parameter Does Not Fit");
+    static_assert(sizeof(SecondParam) <= sizeof(LPARAM), "Second Parameter Does Not Fit");
+    WPARAM firstToSend = 0;
+    LPARAM secondToSend = 0;
+    std::memcpy(&firstToSend, &wParam, sizeof(FirstParam));
+    std::memcpy(&secondToSend, &lParam, sizeof(SecondParam));
+    return PostMessage(hwnd, msg, firstToSend, secondToSend);
+
+  }
 
  private:
   void ThreadMain(HANDLE eventHandle);
+
+  HWND hwnd;
+  std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> m_callback;
 
   std::thread m_mainThread;
 

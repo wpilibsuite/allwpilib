@@ -4,6 +4,8 @@
 
 #include <shlwapi.h>  // QISearch
 
+#include <assert.h>
+
 namespace cs {
 
 template <typename Interface>
@@ -18,7 +20,7 @@ class ComPtr {
     template <typename T>
     friend class ComPtr;
 
-    ComPtr() noexcept = default;
+    ComPtr(std::nullptr_t = nullptr) noexcept {}
     ComPtr(const ComPtr& other) noexcept :
         m_ptr(other.m_ptr) {
         InternalAddRef();
@@ -91,7 +93,7 @@ class ComPtr {
     }
 
     Interface** GetAddressOf() noexcept {
-        ASSERT(m_ptr == nullptr);
+        assert(m_ptr == nullptr);
         return &m_ptr;
     }
 

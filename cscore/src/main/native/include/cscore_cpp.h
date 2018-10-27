@@ -75,6 +75,17 @@ struct VideoMode : public CS_VideoMode {
     fps = fps_;
   }
   explicit operator bool() const { return pixelFormat == kUnknown; }
+
+  bool operator==(const VideoMode& other) const {
+    return pixelFormat == other.pixelFormat &&
+            width == other.width &&
+            height == other.height &&
+            fps == other.fps;
+  }
+
+  bool operator!=(const VideoMode& other) const {
+    return !(*this == other);
+  }
 };
 
 /**

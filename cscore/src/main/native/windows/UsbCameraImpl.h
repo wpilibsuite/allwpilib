@@ -41,6 +41,7 @@
 #include <ks.h>
 #include <ksmedia.h>
 #include "ComCreators.h"
+#include "ComPtr.h"
 
 #include "SourceImpl.h"
 #include "UsbCameraProperty.h"
@@ -136,12 +137,14 @@ class UsbCameraImpl : public SourceImpl {
   bool DeviceConnect();
   bool DeviceStreamOn();
   bool DeviceStreamOff();
-  void DeviceSetMode();
-  void DeviceSetFPS();
+  CS_StatusValue DeviceSetMode();
   void DeviceCacheMode();
   void DeviceCacheProperty(std::unique_ptr<UsbCameraProperty> rawProp, IAMVideoProcAmp *pProcAmp);
   void DeviceCacheProperties();
   void DeviceCacheVideoModes();
+  void DeviceAddProperty(const wpi::Twine& name_, tagVideoProcAmpProperty tag, IAMVideoProcAmp *pProcAmp);
+
+  ComPtr<IMFMediaType> DeviceCheckModeValid(const VideoMode& toCheck);
 
   // Command helper functions
   CS_StatusValue DeviceProcessCommand(std::unique_lock<wpi::mutex>& lock,
@@ -161,19 +164,17 @@ class UsbCameraImpl : public SourceImpl {
   // Variables only used within camera thread
   //
   std::atomic_bool m_streaming{false};
-  bool m_modeSetPixelFormat{false};
-  bool m_modeSetResolution{false};
-  bool m_modeSetFPS{false};
+  bool m_modeSet{false};
   int m_connectVerbose{1};
 
   bool m_deviceValid{false};
 
 #ifdef _WIN32
-  IMFMediaSource* m_mediaSource = nullptr;
-  IMFSourceReader* m_sourceReader = nullptr;
-  SourceReaderCB* m_imageCallback = nullptr;
+  ComPtr<IMFMediaSource> m_mediaSource;
+  ComPtr<IMFSourceReader> m_sourceReader;
+  ComPtr<IMFSourceReaderCallback> m_imageCallback;
   std::unique_ptr<cs::WindowsMessagePump> m_messagePump;
-
+  ComPtr<IMFMediaType> m_currentMode;
 #endif
 
 #ifdef __linux__
@@ -204,7 +205,7 @@ class UsbCameraImpl : public SourceImpl {
   // Quirks
   bool m_lifecam_exposure{false};  // Microsoft LifeCam exposure
 
-  std::vector<std::pair<VideoMode, _ComPtr<IMFMediaType>>> m_windowsVideoModes;
+  std::vector<std::pair<VideoMode, ComPtr<IMFMediaType>>> m_windowsVideoModes;
 
   //
   // Variables protected by m_mutex

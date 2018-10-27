@@ -46,7 +46,7 @@ class UsbCameraProperty : public PropertyImpl {
     maximum = 100;
   }
 
-  UsbCameraProperty(const wpi::Twine& name_, tagVideoProcAmpProperty tag, bool autoProp, IAMVideoProcAmp *pProcAmp);
+  UsbCameraProperty(const wpi::Twine& name_, tagVideoProcAmpProperty tag, bool autoProp, IAMVideoProcAmp *pProcAmp, bool* isValid);
 
   bool DeviceGet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp *pProcAmp);
   bool DeviceSet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp *pProcAmp) const;
