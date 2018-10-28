@@ -7,8 +7,8 @@
 
 #include "cscore_cpp.h"
 
-#include <wpi/hostname.h>
 #include <wpi/SmallString.h>
+#include <wpi/hostname.h>
 
 #include "Handle.h"
 #include "Log.h"
