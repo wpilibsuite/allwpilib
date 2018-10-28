@@ -9,10 +9,6 @@
 
 namespace cs {
 
-std::string GetHostname() {
-  return "";  // TODO
-}
-
 std::vector<std::string> GetNetworkInterfaces() {
   return std::vector<std::string>{};  // TODO
 }

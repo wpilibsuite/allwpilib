@@ -7,6 +7,7 @@
 
 #include "cscore_cpp.h"
 
+#include <wpi/hostname.h>
 #include <wpi/SmallString.h>
 
 #include "Handle.h"
@@ -685,5 +686,7 @@ wpi::ArrayRef<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
                                             CS_Status* status) {
   return Sinks::GetInstance().GetAll(vec);
 }
+
+std::string GetHostname() { return wpi::GetHostname(); }
 
 }  // namespace cs
