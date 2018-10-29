@@ -7,9 +7,10 @@
 
 #pragma once
 
+#include <hal/Types.h>
+
 #include "frc/ErrorBase.h"
 #include "frc/smartdashboard/SendableBase.h"
-#include "hal/Types.h"
 
 namespace frc {
 

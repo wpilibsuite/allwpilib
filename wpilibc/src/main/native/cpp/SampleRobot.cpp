@@ -7,15 +7,15 @@
 
 #include "frc/SampleRobot.h"
 
+#include <hal/DriverStation.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <networktables/NetworkTable.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/DriverStation.h"
 #include "frc/Timer.h"
 #include "frc/livewindow/LiveWindow.h"
-#include "hal/DriverStation.h"
-#include "hal/HALBase.h"
-#include "hal/FRCUsageReporting.h"
 
 using namespace frc;
 
