@@ -10,7 +10,7 @@
 #include <FRC_NetworkCommunication/AICalibration.h>
 #include <wpi/mutex.h>
 
-#include "AnalogAccumulator.h"
+#include "hal/AnalogAccumulator.h"
 #include "AnalogInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
