@@ -10,6 +10,7 @@
 #include <string>
 
 #include "DriverStationDataInternal.h"
+#include "hal/DriverStation.h"
 
 namespace hal {
 struct JoystickOutputStore {
