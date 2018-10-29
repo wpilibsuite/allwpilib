@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/GenericHID.h>
-#include <frc/Joystick.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
 
