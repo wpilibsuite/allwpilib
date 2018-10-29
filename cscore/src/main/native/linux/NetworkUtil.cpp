@@ -14,13 +14,6 @@
 
 namespace cs {
 
-std::string GetHostname() {
-  char name[256];
-  if (::gethostname(name, sizeof(name)) != 0) return "";
-  name[255] = '\0';  // Per POSIX, may not be null terminated if too long
-  return name;
-}
-
 std::vector<std::string> GetNetworkInterfaces() {
   struct ifaddrs* ifa;
   if (::getifaddrs(&ifa) != 0) return std::vector<std::string>{};
