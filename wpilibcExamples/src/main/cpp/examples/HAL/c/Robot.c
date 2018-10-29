@@ -12,7 +12,7 @@ C++ as well.
 
 The HAL is considered a stable but changeable API. The API is stable during a
 season, and is safe to use for events. However, between seasons there might be
-changes to the API. This is an advance sample, and should only be used by users
+changes to the API. This is an advanced sample, and should only be used by users
 that want even more control over what code runs on their robot.
 */
 
