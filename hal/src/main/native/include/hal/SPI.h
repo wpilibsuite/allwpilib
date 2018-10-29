@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include "hal/AnalogTrigger.h"
+#include "hal/SPITypes.h"
 #include "hal/Types.h"
 
 /**
