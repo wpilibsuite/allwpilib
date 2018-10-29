@@ -7,10 +7,10 @@
 
 #include "hal/AnalogInput.h"
 
-#include "AnalogAccumulator.h"
 #include "AnalogInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/AnalogAccumulator.h"
 #include "hal/handles/HandlesInternal.h"
 #include "mockdata/AnalogInDataInternal.h"
 
