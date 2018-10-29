@@ -10,7 +10,6 @@
 #include <mfidl.h>
 #include <mfreadwrite.h>
 
-#include <atomic>
 #include <memory>
 
 #include "ComPtr.h"
@@ -48,7 +47,7 @@ class SourceReaderCB : public IMFSourceReaderCallback {
 
   ULONG m_nRefCount;
   std::weak_ptr<cs::UsbCameraImpl> m_source;
-  std::atomic<cs::VideoMode> m_mode;
+  cs::VideoMode m_mode;
 };
 
 ComPtr<SourceReaderCB> CreateSourceReaderCB(

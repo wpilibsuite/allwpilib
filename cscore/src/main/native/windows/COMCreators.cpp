@@ -78,7 +78,7 @@ HRESULT SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
   if (SUCCEEDED(hrStatus)) {
     if (pSample) {
       // Prcoess sample
-      source->ProcessFrame(pSample);
+      source->ProcessFrame(pSample, m_mode);
       // DO NOT release the frame
     }
   } else {

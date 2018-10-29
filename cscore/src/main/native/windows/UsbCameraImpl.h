@@ -73,7 +73,7 @@ class UsbCameraImpl : public SourceImpl,
   void NumSinksChanged() override;
   void NumSinksEnabledChanged() override;
 
-  void ProcessFrame(IMFSample* sample);
+  void ProcessFrame(IMFSample* sample, const VideoMode& mode);
   void PostRequestNewFrame();
 
   std::string GetPath() { return m_path; }

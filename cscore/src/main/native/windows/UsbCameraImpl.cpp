@@ -228,7 +228,8 @@ void UsbCameraImpl::DeviceDisconnect() {
   SetConnected(false);
 }
 
-void UsbCameraImpl::ProcessFrame(IMFSample* videoSample) {
+void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
+                                 const VideoMode& mode) {
   do {
     if (!videoSample) break;
 
@@ -272,12 +273,6 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample) {
     cv::Mat tmpMat;
     std::unique_ptr<Image> dest;
     bool doFinalSet = true;
-
-    VideoMode mode;
-    {
-      std::unique_lock<wpi::mutex> lock(m_mutex);
-      mode = m_mode;
-    }
 
     switch (mode.pixelFormat) {
       case cs::VideoMode::PixelFormat::kMJPEG: {
@@ -852,6 +847,8 @@ CS_StatusValue UsbCameraImpl::DeviceSetMode() {
       MF_SOURCE_READER_FIRST_VIDEO_STREAM, NULL, m_currentMode.Get());
 
   m_deviceValid = SUCCEEDED(setResult);
+
+  m_imageCallback->SetVideoMode(m_mode);
 
   switch (setResult) {
     case S_OK:
