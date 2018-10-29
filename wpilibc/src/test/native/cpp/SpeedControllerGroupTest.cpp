@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "MockSpeedController.h"
-#include "TestBench.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

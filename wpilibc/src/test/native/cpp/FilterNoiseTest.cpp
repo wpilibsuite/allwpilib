@@ -13,9 +13,19 @@
 #include <random>
 #include <thread>
 
-#include "TestBench.h"
 #include "frc/Base.h"
 #include "gtest/gtest.h"
+
+/* Filter constants */
+static constexpr double kFilterStep = 0.005;
+static constexpr double kFilterTime = 2.0;
+static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
+static constexpr double kSinglePoleIIRExpectedOutput = -3.2172003;
+static constexpr double kHighPassTimeConstant = 0.006631;
+static constexpr double kHighPassExpectedOutput = 10.074717;
+static constexpr int32_t kMovAvgTaps = 6;
+static constexpr double kMovAvgExpectedOutput = -10.191644;
+static constexpr double kPi = 3.14159265358979323846;
 
 using namespace frc;
 
@@ -53,18 +63,18 @@ class NoiseGenerator : public PIDSource {
 
   double PIDGet() override {
     m_noise = m_distr(m_gen);
-    m_count += TestBench::kFilterStep;
+    m_count += kFilterStep;
     return m_dataFunc(m_count) + m_noise;
   }
 
-  void Reset() { m_count = -TestBench::kFilterStep; }
+  void Reset() { m_count = -kFilterStep; }
 
  private:
   std::function<double(double)> m_dataFunc;
   double m_noise = 0.0;
 
   // Make sure first call to PIDGet() uses m_count == 0
-  double m_count = -TestBench::kFilterStep;
+  double m_count = -kFilterStep;
 
   std::random_device m_rd;
   std::mt19937 m_gen{m_rd()};
@@ -79,7 +89,7 @@ class FilterNoiseTest : public testing::TestWithParam<FilterNoiseTestType> {
   std::unique_ptr<PIDSource> m_filter;
   std::shared_ptr<NoiseGenerator> m_noise;
 
-  static double GetData(double t) { return 100.0 * std::sin(2.0 * M_PI * t); }
+  static double GetData(double t) { return 100.0 * std::sin(2.0 * kPi * t); }
 
   void SetUp() override {
     m_noise = std::make_shared<NoiseGenerator>(GetData, kStdDev);
@@ -88,15 +98,13 @@ class FilterNoiseTest : public testing::TestWithParam<FilterNoiseTestType> {
       case TEST_SINGLE_POLE_IIR: {
         m_filter = std::make_unique<LinearDigitalFilter>(
             LinearDigitalFilter::SinglePoleIIR(
-                m_noise, TestBench::kSinglePoleIIRTimeConstant,
-                TestBench::kFilterStep));
+                m_noise, kSinglePoleIIRTimeConstant, kFilterStep));
         break;
       }
 
       case TEST_MOVAVG: {
         m_filter = std::make_unique<LinearDigitalFilter>(
-            LinearDigitalFilter::MovingAverage(m_noise,
-                                               TestBench::kMovAvgTaps));
+            LinearDigitalFilter::MovingAverage(m_noise, kMovAvgTaps));
         break;
       }
     }
@@ -112,7 +120,7 @@ TEST_P(FilterNoiseTest, NoiseReduce) {
   double filterError = 0.0;
 
   m_noise->Reset();
-  for (double t = 0; t < TestBench::kFilterTime; t += TestBench::kFilterStep) {
+  for (double t = 0; t < kFilterTime; t += kFilterStep) {
     theoryData = GetData(t);
     filterError += std::abs(m_filter->PIDGet() - theoryData);
     noiseGenError += std::abs(m_noise->Get() - theoryData);

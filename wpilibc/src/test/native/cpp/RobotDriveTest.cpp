@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "MockSpeedController.h"
-#include "TestBench.h"
 #include "frc/RobotDrive.h"
 #include "frc/drive/DifferentialDrive.h"
 #include "frc/drive/MecanumDrive.h"

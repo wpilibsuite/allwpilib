@@ -56,14 +56,4 @@ class TestBench {
   /* PCM channels */
   static const int32_t kSolenoidChannel1 = 0;
   static const int32_t kSolenoidChannel2 = 1;
-
-  /* Filter constants */
-  static constexpr double kFilterStep = 0.005;
-  static constexpr double kFilterTime = 2.0;
-  static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
-  static constexpr double kSinglePoleIIRExpectedOutput = -3.2172003;
-  static constexpr double kHighPassTimeConstant = 0.006631;
-  static constexpr double kHighPassExpectedOutput = 10.074717;
-  static constexpr int32_t kMovAvgTaps = 6;
-  static constexpr double kMovAvgExpectedOutput = -10.191644;
 };
