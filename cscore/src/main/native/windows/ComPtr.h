@@ -18,6 +18,7 @@ template <typename Interface>
 class RemoveAddRefRelease : public Interface {
   ULONG __stdcall AddRef();
   ULONG __stdcall Release();
+  virtual ~RemoveAddRefRelease();
 };
 
 template <typename Interface>

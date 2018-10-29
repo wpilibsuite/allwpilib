@@ -220,11 +220,15 @@ void UsbCameraImpl::DeviceDisconnect() {
   if (m_connectVerbose) SINFO("Disconnected from " << m_path);
   m_sourceReader.Reset();
   m_mediaSource.Reset();
+  if (m_imageCallback) {
+    m_imageCallback->InvalidateCapture();
+  }
+  m_imageCallback.Reset();
+  m_streaming = false;
   SetConnected(false);
 }
 
 void UsbCameraImpl::ProcessFrame(IMFSample* videoSample) {
-
   do {
     if (!videoSample) break;
 
@@ -325,11 +329,13 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
     case WM_CLOSE:
       m_sourceReader.Reset();
       m_mediaSource.Reset();
+      if (m_imageCallback) {
+        m_imageCallback->InvalidateCapture();
+      }
       m_imageCallback.Reset();
       break;
     case WM_CREATE:
       // Pump Created and ready to go
-      m_imageCallback = CreateSourceReaderCB(this);
       DeviceConnect();
       break;
     case WM_DEVICECHANGE: {
@@ -418,6 +424,7 @@ bool UsbCameraImpl::DeviceConnect() {
   m_mediaSource = CreateVideoCaptureDevice(path);
 
   if (!m_mediaSource) return false;
+  m_imageCallback = CreateSourceReaderCB(shared_from_this(), m_mode);
 
   m_sourceReader =
       CreateSourceReader(m_mediaSource.Get(), m_imageCallback.Get());
@@ -443,12 +450,10 @@ bool UsbCameraImpl::DeviceConnect() {
   std::cout << "Setting Stream: " << m_streaming << " " << IsEnabled()
             << std::endl;
 
-
-
   // Turn off streaming if not enabled, and turn it on if enabled
   if (m_streaming && !IsEnabled()) {
     DeviceStreamOff();
-  } else if (IsEnabled()) {
+  } else if (!m_streaming && IsEnabled()) {
     std::cout << "Setting Stream On" << std::endl;
     std::cout << m_streaming << std::endl;
     std::cout << m_deviceValid << std::endl;
@@ -751,7 +756,6 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
     return CS_OK;
   }
 
-
   // If the pixel format or resolution changed, we need to disconnect and
   // reconnect
   if (newMode != m_mode) {
@@ -782,6 +786,7 @@ bool UsbCameraImpl::DeviceStreamOn() {
   if (m_streaming) return false;
   if (!m_deviceValid) return false;
   m_streaming = true;
+  m_wasStreaming = true;
   std::cout << "Calling Read Sample" << std::endl;
   m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, NULL, NULL,
                              NULL, NULL);
@@ -790,49 +795,47 @@ bool UsbCameraImpl::DeviceStreamOn() {
 
 bool UsbCameraImpl::DeviceStreamOff() {
   m_streaming = false;
+  m_wasStreaming = false;
   return true;
 }
 
 void UsbCameraImpl::DeviceCacheMode() {
   if (!m_sourceReader) return;
 
-  if (!m_currentMode) {
+  if (m_windowsVideoModes.size() == 0) return;
 
+  if (!m_currentMode) {
     // First, see if our set mode is valid
     m_currentMode = DeviceCheckModeValid(m_mode);
     if (!m_currentMode) {
       if (FAILED(m_sourceReader->GetCurrentMediaType(
-            MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-            m_currentMode.GetAddressOf()))) {
-      return;
+              MF_SOURCE_READER_FIRST_VIDEO_STREAM,
+              m_currentMode.GetAddressOf()))) {
+        return;
+      }
+      // Find cached version
+      DWORD compare = MF_MEDIATYPE_EQUAL_MAJOR_TYPES |
+                      MF_MEDIATYPE_EQUAL_FORMAT_TYPES |
+                      MF_MEDIATYPE_EQUAL_FORMAT_DATA;
+      auto result = std::find_if(
+          m_windowsVideoModes.begin(), m_windowsVideoModes.end(),
+          [this, &compare](std::pair<VideoMode, ComPtr<IMFMediaType>>& input) {
+            return input.second->IsEqual(m_currentMode.Get(), &compare) == S_OK;
+          });
+
+      if (result == m_windowsVideoModes.end()) {
+        // Default mode is not supported. Grab first supported image
+        auto&& firstSupported = m_windowsVideoModes[0];
+        m_currentMode = firstSupported.second;
+        std::lock_guard<wpi::mutex> lock(m_mutex);
+        m_mode = firstSupported.first;
+      } else {
+        std::cout << "Setting Current Mode: " << result->first.pixelFormat
+                  << "\n";
+        std::lock_guard<wpi::mutex> lock(m_mutex);
+        m_mode = result->first;
+      }
     }
-    // Find cached version
-    DWORD compare = MF_MEDIATYPE_EQUAL_MAJOR_TYPES |
-                    MF_MEDIATYPE_EQUAL_FORMAT_TYPES |
-                    MF_MEDIATYPE_EQUAL_FORMAT_DATA;
-    auto result = std::find_if(
-        m_windowsVideoModes.begin(), m_windowsVideoModes.end(),
-        [this, &compare](std::pair<VideoMode, ComPtr<IMFMediaType>>& input) {
-          return input.second->IsEqual(m_currentMode.Get(), &compare) == S_OK;
-        });
-
-    if (result == m_windowsVideoModes.end()) {
-      // Default mode is not supported. Grab first supported image
-      auto&& firstSupported = m_windowsVideoModes[0];
-      m_currentMode = firstSupported.second;
-      std::lock_guard<wpi::mutex> lock(m_mutex);
-      m_mode = firstSupported.first;
-    } else {
-      std::cout << "Setting Current Mode: " << result->first.pixelFormat
-                << "\n";
-      std::lock_guard<wpi::mutex> lock(m_mutex);
-      m_mode = result->first;
-    }
-    }
-
-
-
-
   }
 
   DeviceSetMode();
@@ -997,6 +1000,7 @@ CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
                              CS_Status* status) {
   // First check if device exists
   auto devices = cs::EnumerateUsbCameras(status);
+  std::cout << devices.size() << std::endl;
   if (devices.size() > dev) {
     return CreateUsbCameraPath(name, devices[dev].path, status);
   }

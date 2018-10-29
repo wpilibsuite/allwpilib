@@ -38,58 +38,47 @@
 
 namespace cs {
 
-// Source callback used by the source reader.
-// COM object, so it needs a to ref count itself.
-class SourceReaderCB : public IMFSourceReaderCallback {
- public:
-  explicit SourceReaderCB(cs::UsbCameraImpl* source)
-      : m_nRefCount(1), m_source(source) {}
+SourceReaderCB::SourceReaderCB(std::weak_ptr<cs::UsbCameraImpl> source,
+                               const cs::VideoMode& mode)
+    : m_nRefCount(1), m_source(source), m_mode{mode} {}
 
-  // IUnknown methods
-  STDMETHODIMP QueryInterface(REFIID iid, void** ppv) {
-    static const QITAB qit[] = {
-        QITABENT(SourceReaderCB, IMFSourceReaderCallback),
-        {0},
-    };
-    return QISearch(this, qit, iid, ppv);
+// IUnknown methods
+STDMETHODIMP SourceReaderCB::QueryInterface(REFIID iid, void** ppv) {
+  static const QITAB qit[] = {
+      QITABENT(SourceReaderCB, IMFSourceReaderCallback),
+      {0},
+  };
+  return QISearch(this, qit, iid, ppv);
+}
+STDMETHODIMP_(ULONG) SourceReaderCB::AddRef() {
+  return InterlockedIncrement(&m_nRefCount);
+}
+STDMETHODIMP_(ULONG) SourceReaderCB::Release() {
+  ULONG uCount = InterlockedDecrement(&m_nRefCount);
+  if (uCount == 0) {
+    delete this;
   }
-  STDMETHODIMP_(ULONG) AddRef() { return InterlockedIncrement(&m_nRefCount); }
-  STDMETHODIMP_(ULONG) Release() {
-    ULONG uCount = InterlockedDecrement(&m_nRefCount);
-    if (uCount == 0) {
-      delete this;
-    }
-    return uCount;
-  }
+  return uCount;
+}
 
-  // IMFSourceReaderCallback methods
-  STDMETHODIMP OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
-                            DWORD dwStreamFlags, LONGLONG llTimestamp,
-                            IMFSample* pSample);
+STDMETHODIMP SourceReaderCB::OnEvent(DWORD, IMFMediaEvent*) { return S_OK; }
 
-  STDMETHODIMP OnEvent(DWORD, IMFMediaEvent*) { return S_OK; }
+STDMETHODIMP SourceReaderCB::OnFlush(DWORD) { return S_OK; }
 
-  STDMETHODIMP OnFlush(DWORD) { return S_OK; }
-
- private:
-  // Destructor is private. Caller should call Release.
-  virtual ~SourceReaderCB() {}
-
-  void NotifyError(HRESULT hr) { wprintf(L"Source Reader error: 0x%X\n", hr); }
-
- private:
-  ULONG m_nRefCount;  // Reference count.
-  UsbCameraImpl* m_source;
-};
+void SourceReaderCB::NotifyError(HRESULT hr) {
+  wprintf(L"Source Reader error: 0x%X\n", hr);
+}
 
 HRESULT SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
                                      DWORD dwStreamFlags, LONGLONG llTimestamp,
                                      IMFSample* pSample  // Can be NULL
 ) {
+  auto source = m_source.lock();
+  if (!source) return S_OK;
   if (SUCCEEDED(hrStatus)) {
     if (pSample) {
       // Prcoess sample
-      m_source->ProcessFrame(pSample);
+      source->ProcessFrame(pSample);
       // DO NOT release the frame
     }
   } else {
@@ -98,14 +87,15 @@ HRESULT SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
   }
   // Trigger asking for a new frame.
   // This is piped through the message pump for concurrency reasons
-  m_source->PostRequestNewFrame();
+  source->PostRequestNewFrame();
   return S_OK;
 }
 
 // Create a Source Reader COM Smart Object
-ComPtr<IMFSourceReaderCallback> CreateSourceReaderCB(UsbCameraImpl* source) {
-  IMFSourceReaderCallback* ptr = new SourceReaderCB(source);
-  ComPtr<IMFSourceReaderCallback> sourceReaderCB;
+ComPtr<SourceReaderCB> CreateSourceReaderCB(
+    std::weak_ptr<cs::UsbCameraImpl> source, const cs::VideoMode& mode) {
+  SourceReaderCB* ptr = new SourceReaderCB(source, mode);
+  ComPtr<SourceReaderCB> sourceReaderCB;
   sourceReaderCB.Attach(ptr);
   return sourceReaderCB;
 }

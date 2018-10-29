@@ -61,6 +61,7 @@ model {
                         if (project.hasProperty('generatedHeaders')) {
                             srcDir generatedHeaders
                         }
+                        include '**/*.h'
                     }
                 }
             }
@@ -93,7 +94,9 @@ model {
                         if (project.hasProperty('generatedHeaders')) {
                             srcDir generatedHeaders
                         }
+                        include '**/*.h'
                     }
+
                 }
             }
             binaries.all {
@@ -120,6 +123,7 @@ model {
                         if (project.hasProperty('generatedHeaders')) {
                             srcDir generatedHeaders
                         }
+                        include '**/*.h'
                     }
                 }
             }

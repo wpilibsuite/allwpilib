@@ -29,6 +29,7 @@ ext {
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include'
+                        include '**/*.h'
                     }
                 }
                 cscoreMacCpp(CppSourceSet) {
@@ -38,6 +39,7 @@ ext {
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
                     }
                 }
             }
@@ -50,6 +52,7 @@ ext {
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
                     }
                 }
             }
@@ -62,6 +65,7 @@ ext {
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
                     }
                 }
             }

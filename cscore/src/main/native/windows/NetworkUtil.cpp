@@ -11,11 +11,11 @@
 
 #include <ws2tcpip.h>  // NOLINT(build/include_order)
 
+#include <uv.h>
+
 #include <iostream>
 
 #include <wpi/hostname.h>
-
-#include <uv.h>
 
 #include "cscore_cpp.h"
 
@@ -36,7 +36,7 @@ std::vector<std::string> GetNetworkInterfaces() {
   uv_interface_address_t* adrs;
   int counts = 0;
 
-    std::vector<std::string> addresses{};
+  std::vector<std::string> addresses{};
 
   uv_interface_addresses(&adrs, &counts);
 
@@ -45,13 +45,15 @@ std::vector<std::string> GetNetworkInterfaces() {
   for (int i = 0; i < counts; i++) {
     if (adrs[i].is_internal) continue;
     std::cout << adrs[i].name << std::endl;
-                InetNtop(PF_INET, &(adrs[i].netmask.netmask4.sin_addr.s_addr), ip, sizeof(ip) - 1);
-        ip[49] = '\0';
-        std::cout << ip << std::endl;
-            InetNtop(PF_INET, &(adrs[i].address.address4.sin_addr.s_addr), ip, sizeof(ip) - 1);
-        ip[49] = '\0';
-        std::cout << ip << std::endl;
-        addresses.emplace_back(std::string{ip});
+    InetNtop(PF_INET, &(adrs[i].netmask.netmask4.sin_addr.s_addr), ip,
+             sizeof(ip) - 1);
+    ip[49] = '\0';
+    std::cout << ip << std::endl;
+    InetNtop(PF_INET, &(adrs[i].address.address4.sin_addr.s_addr), ip,
+             sizeof(ip) - 1);
+    ip[49] = '\0';
+    std::cout << ip << std::endl;
+    addresses.emplace_back(std::string{ip});
   }
 
   uv_free_interface_addresses(adrs, counts);
@@ -59,7 +61,6 @@ std::vector<std::string> GetNetworkInterfaces() {
   std::cout << "finished\n";
 
   return addresses;
-
 
   PIP_ADAPTER_ADDRESSES pAddresses = NULL;
   PIP_ADAPTER_ADDRESSES pCurrAddresses = NULL;
@@ -71,8 +72,6 @@ std::vector<std::string> GetNetworkInterfaces() {
   ULONG outBufLen = 0;
   ULONG Iterations = 0;
   DWORD dwRetVal = 0;
-
-
 
   // Allocate a 15 KB buffer to start with.
   outBufLen = WORKING_BUFFER_SIZE;

@@ -40,7 +40,8 @@
 
 namespace cs {
 
-class UsbCameraImpl : public SourceImpl {
+class UsbCameraImpl : public SourceImpl,
+                      public std::enable_shared_from_this<UsbCameraImpl> {
  public:
   UsbCameraImpl(const wpi::Twine& name, const wpi::Twine& path);
   UsbCameraImpl(const wpi::Twine& name, int deviceId);
@@ -156,13 +157,14 @@ class UsbCameraImpl : public SourceImpl {
   // Variables only used within camera thread
   //
   bool m_streaming{false};
+  bool m_wasStreaming{false};
   bool m_modeSet{false};
   int m_connectVerbose{1};
   bool m_deviceValid{false};
 
   ComPtr<IMFMediaSource> m_mediaSource;
   ComPtr<IMFSourceReader> m_sourceReader;
-  ComPtr<IMFSourceReaderCallback> m_imageCallback;
+  ComPtr<SourceReaderCB> m_imageCallback;
   std::unique_ptr<cs::WindowsMessagePump> m_messagePump;
   ComPtr<IMFMediaType> m_currentMode;
 
