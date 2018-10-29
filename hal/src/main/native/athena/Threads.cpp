@@ -24,7 +24,8 @@ int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,
                               int32_t* status) {
   sched_param sch;
   int policy;
-  int success = pthread_getschedparam(*handle, &policy, &sch);
+  int success = pthread_getschedparam(
+      *reinterpret_cast<const pthread_t*>(handle), &policy, &sch);
   if (success == 0) {
     *status = 0;
   } else {
@@ -66,13 +67,15 @@ HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
 
   sched_param sch;
   int policy;
-  pthread_getschedparam(*handle, &policy, &sch);
+  pthread_getschedparam(*reinterpret_cast<const pthread_t*>(handle), &policy,
+                        &sch);
   if (scheduler == SCHED_FIFO || scheduler == SCHED_RR)
     sch.sched_priority = priority;
   else
     // Only need to set 0 priority for non RT thread
     sch.sched_priority = 0;
-  if (pthread_setschedparam(*handle, scheduler, &sch)) {
+  if (pthread_setschedparam(*reinterpret_cast<const pthread_t*>(handle),
+                            scheduler, &sch)) {
     *status = HAL_THREAD_PRIORITY_ERROR;
     return false;
   } else {

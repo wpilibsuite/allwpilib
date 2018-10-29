@@ -15,8 +15,7 @@
 #include <wpi/Twine.h>
 
 #ifdef _WIN32
-#include <Windows.h>
-// Windows.h defines #define GetMessage GetMessageW, which we don't want.
+#pragma push_macro("GetMessage")
 #undef GetMessage
 #endif
 
@@ -65,3 +64,7 @@ class Error {
 };
 
 }  // namespace frc
+
+#ifdef _WIN32
+#pragma pop_macro("GetMessage")
+#endif
