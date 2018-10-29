@@ -145,6 +145,15 @@
     "gradlebase": "cpp"
   },
   {
+    "name": "HID Rumble",
+    "description": "An example program showing how to make human interface devices rumble.",
+    "tags": [
+      "Joystick"
+    ],
+    "foldername": "HidRumble",
+    "gradlebase": "cpp"
+  },
+  {
     "name": "PotentiometerPID",
     "description": "An example to demonstrate the use of a potentiometer and PID control to reach elevator position setpoints.",
     "tags": [
