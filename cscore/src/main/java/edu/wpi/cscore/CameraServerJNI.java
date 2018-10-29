@@ -24,7 +24,7 @@ public class CameraServerJNI {
   static {
     if (!libraryLoaded) {
       try {
-        loader = new RuntimeLoader<>("cscore", RuntimeLoader.getDefaultExtractionRoot(), CameraServerJNI.class);
+        loader = new RuntimeLoader<>("cscorejni", RuntimeLoader.getDefaultExtractionRoot(), CameraServerJNI.class);
         loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();

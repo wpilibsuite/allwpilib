@@ -9,7 +9,9 @@
 
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/Encoder.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 
 #include "frc/DigitalInput.h"
 #include "frc/WPIErrors.h"

@@ -21,26 +21,6 @@ model {
                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
                                  '_TI5?AVfailure']
         }
-        ntcoreJNI(ExportsConfig) {
-            x86SymbolFilter = { symbols ->
-                def retList = []
-                symbols.each { symbol ->
-                    if (symbol.startsWith('NT_') || symbol.startsWith('Java_') || symbol.startsWith('JNI_')) {
-                        retList << symbol
-                    }
-                }
-                return retList
-            }
-            x64SymbolFilter = { symbols ->
-                def retList = []
-                symbols.each { symbol ->
-                    if (symbol.startsWith('NT_') || symbol.startsWith('Java_') || symbol.startsWith('JNI_')) {
-                        retList << symbol
-                    }
-                }
-                return retList
-            }
-        }
     }
 }
 

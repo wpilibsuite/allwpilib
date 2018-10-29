@@ -7,6 +7,9 @@
 
 #include "frc/SampleRobot.h"
 
+#include <hal/DriverStation.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <networktables/NetworkTable.h>
 #include <wpi/raw_ostream.h>
 

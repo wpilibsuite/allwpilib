@@ -22,6 +22,47 @@ endforeach()
 string(REPLACE ";" "\n" usage_reporting_types_cpp "${usage_reporting_types_cpp}")
 string(REPLACE ";" "\n" usage_reporting_instances_cpp "${usage_reporting_instances_cpp}")
 
+file(GLOB
+    hal_shared_native_src src/main/native/cpp/cpp/*.cpp
+    hal_shared_native_src src/main/native/cpp/handles/*.cpp
+    hal_sim_native_src src/main/native/sim/*.cpp
+    hal_sim_native_src src/main/native/sim/MockData/*.cpp)
+add_library(hal ${hal_shared_native_src})
+set_target_properties(hal PROPERTIES DEBUG_POSTFIX "d")
+
+if(USE_EXTERNAL_HAL)
+    include(${EXTERNAL_HAL_FILE})
+else()
+    target_sources(hal PRIVATE ${hal_sim_native_src} ${hal_sim_jni_src})
+endif()
+
+configure_file(src/generate/FRCUsageReporting.h.in gen/hal/FRCUsageReporting.h)
+
+set_target_properties(hal PROPERTIES OUTPUT_NAME "wpiHal")
+
+target_include_directories(hal PUBLIC
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+                            $<INSTALL_INTERFACE:${include_dest}/hal>)
+
+target_include_directories(hal PUBLIC
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/gen>
+                            $<INSTALL_INTERFACE:${include_dest}/hal>)
+target_link_libraries(hal PUBLIC wpiutil)
+
+set_property(TARGET hal PROPERTY FOLDER "libraries")
+
+install(TARGETS hal EXPORT hal DESTINATION "${main_lib_dest}")
+install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gen DESTINATION "${include_dest}/hal")
+
+if (MSVC)
+    set (hal_config_dir ${wpilib_dest})
+else()
+    set (hal_config_dir share/hal)
+endif()
+
+install(FILES hal-config.cmake DESTINATION ${hal_config_dir})
+install(EXPORT hal DESTINATION ${hal_config_dir})
 
 # Java bindings
 if (NOT WITHOUT_JAVA)
@@ -53,59 +94,32 @@ if (NOT WITHOUT_JAVA)
 
     set_property(TARGET hal_jar PROPERTY FOLDER "java")
 
-endif()
+    add_library(haljni ${hal_shared_jni_src})
 
-file(GLOB
-    hal_shared_native_src src/main/native/cpp/cpp/*.cpp
-    hal_shared_native_src src/main/native/cpp/handles/*.cpp
-    hal_sim_native_src src/main/native/sim/*.cpp
-    hal_sim_native_src src/main/native/sim/MockData/*.cpp)
-add_library(hal ${hal_shared_native_src} ${hal_shared_jni_src})
-
-if(USE_EXTERNAL_HAL)
-    include(${EXTERNAL_HAL_FILE})
-else()
-    target_sources(hal PRIVATE ${hal_sim_native_src} ${hal_sim_jni_src})
-endif()
-
-configure_file(src/generate/FRCUsageReporting.h.in gen/hal/FRCUsageReporting.h)
-
-set_target_properties(hal PROPERTIES OUTPUT_NAME "wpiHal")
-
-target_include_directories(hal PUBLIC
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-                            $<INSTALL_INTERFACE:${include_dest}/hal>)
-
-target_include_directories(hal PUBLIC
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/gen>
-                            $<INSTALL_INTERFACE:${include_dest}/hal>)
-target_link_libraries(hal PUBLIC wpiutil)
-
-set_property(TARGET hal PROPERTY FOLDER "libraries")
-
-if (NOT WITHOUT_JAVA)
-    if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-        target_include_directories(hal PRIVATE ${JNI_INCLUDE_DIRS})
-        target_include_directories(hal PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
+    if(USE_EXTERNAL_HAL)
+        include(${EXTERNAL_HAL_FILE})
     else()
-        target_link_libraries(hal PRIVATE hal_jni_headers)
+        target_sources(haljni PRIVATE ${hal_sim_jni_src})
     endif()
-    add_dependencies(hal hal_jar)
+
+    set_target_properties(haljni PROPERTIES OUTPUT_NAME "wpiHaljni")
+
+    target_link_libraries(haljni PUBLIC hal wpiutil)
+
+    set_property(TARGET haljni PROPERTY FOLDER "libraries")
+
+    if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
+        target_include_directories(haljni PRIVATE ${JNI_INCLUDE_DIRS})
+        target_include_directories(haljni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
+    else()
+        target_link_libraries(haljni PRIVATE hal_jni_headers)
+    endif()
+    add_dependencies(haljni hal_jar)
+
+    if (MSVC)
+        install(TARGETS haljni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
+    endif()
+
+    install(TARGETS haljni EXPORT haljni DESTINATION "${main_lib_dest}")
+
 endif()
-
-install(TARGETS hal EXPORT hal DESTINATION "${main_lib_dest}")
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gen DESTINATION "${include_dest}/hal")
-
-if (NOT WITHOUT_JAVA AND MSVC)
-    install(TARGETS hal RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
-endif()
-
-if (MSVC)
-    set (hal_config_dir ${wpilib_dest})
-else()
-    set (hal_config_dir share/hal)
-endif()
-
-install(FILES hal-config.cmake DESTINATION ${hal_config_dir})
-install(EXPORT hal DESTINATION ${hal_config_dir})

@@ -10,7 +10,7 @@
 #ifndef __FRC_ROBORIO__
 
 #include "NotifyListener.h"
-#include "hal/HAL.h"
+#include "hal/Types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -9,7 +9,6 @@
 
 #include <thread>
 
-#include <hal/HAL.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/Base.h"
@@ -18,15 +17,14 @@ namespace frc {
 
 class DriverStation;
 
+int RunHALInitialization();
+
 template <class Robot>
 int StartRobot() {
-  if (!HAL_Initialize(500, 0)) {
-    wpi::errs() << "FATAL ERROR: HAL could not be initialized\n";
-    return -1;
+  int halInit = RunHALInitialization();
+  if (halInit != 0) {
+    return halInit;
   }
-  HAL_Report(HALUsageReporting::kResourceType_Language,
-             HALUsageReporting::kLanguage_CPlusPlus);
-  wpi::outs() << "\n********** Robot program starting **********\n";
   static Robot robot;
   robot.StartCompetition();
 

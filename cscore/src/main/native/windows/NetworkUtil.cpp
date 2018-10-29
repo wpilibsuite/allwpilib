@@ -30,8 +30,6 @@
 
 namespace cs {
 
-std::string GetHostname() { return wpi::GetHostname(); }
-
 std::vector<std::string> GetNetworkInterfaces() {
   uv_interface_address_t* adrs;
   int counts = 0;

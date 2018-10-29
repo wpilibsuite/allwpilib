@@ -62,7 +62,7 @@ class SingleNativeBuild implements Plugin<Project> {
             components.each { component ->
                 if (component.name == "${nativeName}Base") {
                     base = (NativeLibrarySpec) component
-                } else if (component.name == "${nativeName}" || component.name == "${nativeName}JNI") {
+                } else if (component.name == "${nativeName}") {
                     subs << component
                 }
             }
@@ -79,7 +79,8 @@ class SingleNativeBuild implements Plugin<Project> {
                         }
                         def tmpBaseBin = (NativeBinarySpec) oTmpBaseBin
                         if (tmpBaseBin.targetPlatform.operatingSystem.name == binary.targetPlatform.operatingSystem.name &&
-                                tmpBaseBin.targetPlatform.architecture.name == binary.targetPlatform.architecture.name) {
+                                tmpBaseBin.targetPlatform.architecture.name == binary.targetPlatform.architecture.name &&
+                                tmpBaseBin.buildType == binary.buildType) {
                             baseBin = tmpBaseBin
                         }
                     }

@@ -14,7 +14,7 @@
 #include <thread>
 #include <utility>
 
-#include <hal/Notifier.h>
+#include <hal/Types.h>
 #include <wpi/mutex.h>
 
 #include "frc/ErrorBase.h"

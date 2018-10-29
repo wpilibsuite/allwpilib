@@ -21,7 +21,7 @@ public class JNIWrapper {
   static {
     if (!libraryLoaded) {
       try {
-        loader = new RuntimeLoader<>("wpiHal", RuntimeLoader.getDefaultExtractionRoot(), JNIWrapper.class);
+        loader = new RuntimeLoader<>("wpiHaljni", RuntimeLoader.getDefaultExtractionRoot(), JNIWrapper.class);
         loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();

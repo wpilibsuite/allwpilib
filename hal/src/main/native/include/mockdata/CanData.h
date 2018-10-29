@@ -11,7 +11,7 @@
 
 #include "HAL_Value.h"
 #include "NotifyListener.h"
-#include "hal/HAL.h"
+#include "hal/Types.h"
 
 typedef void (*HAL_CAN_SendMessageCallback)(const char* name, void* param,
                                             uint32_t messageID,

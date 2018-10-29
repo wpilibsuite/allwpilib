@@ -138,10 +138,12 @@ model {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
             }
+            appendDebugPathToBinaries(binaries)
         }
         // By default, a development executable will be generated. This is to help the case of
         // testing specific functionality of the library.
         "${nativeName}Dev"(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
             sources {
                 cpp {
                     source {
@@ -200,7 +202,7 @@ model {
             }
         }
         withType(GoogleTestTestSuiteBinarySpec) {
-            if (!project.hasProperty('onlyAthena')) {
+            if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')

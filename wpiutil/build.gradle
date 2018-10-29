@@ -138,6 +138,7 @@ model {
     components {
         examplesMap.each { key, value ->
             "${key}"(NativeExecutableSpec) {
+                targetBuildTypes 'debug'
                 binaries.all {
                     lib library: 'wpiutil', linkage: 'shared'
                 }

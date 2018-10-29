@@ -19,7 +19,7 @@ public final class NetworkTablesJNI {
   static {
     if (!libraryLoaded) {
       try {
-        loader = new RuntimeLoader<>("ntcore", RuntimeLoader.getDefaultExtractionRoot(), NetworkTablesJNI.class);
+        loader = new RuntimeLoader<>("ntcorejni", RuntimeLoader.getDefaultExtractionRoot(), NetworkTablesJNI.class);
         loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();

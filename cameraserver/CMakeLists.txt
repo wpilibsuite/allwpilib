@@ -28,6 +28,7 @@ endif()
 file(GLOB_RECURSE
     cameraserver_native_src src/main/native/cpp/*.cpp)
 add_library(cameraserver ${cameraserver_native_src})
+set_target_properties(cameraserver PROPERTIES DEBUG_POSTFIX "d")
 target_include_directories(cameraserver PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/cameraserver>)

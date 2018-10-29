@@ -7,6 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -40,8 +43,8 @@ public class Ultrasonic extends SendableBase implements PIDSource {
   // Time (sec) for the ping trigger pulse.
   private static final double kPingTime = 10 * 1e-6;
   private static final double kSpeedOfSoundInchesPerSec = 1130.0 * 12.0;
-  // head of the ultrasonic sensor list
-  private static Ultrasonic m_firstSensor;
+  // ultrasonic sensor list
+  private static final List<Ultrasonic> m_sensors = new ArrayList<>();
   // automatic round robin mode
   private static boolean m_automaticEnabled;
   private DigitalInput m_echoChannel;
@@ -49,7 +52,6 @@ public class Ultrasonic extends SendableBase implements PIDSource {
   private boolean m_allocatedChannels;
   private boolean m_enabled;
   private Counter m_counter;
-  private Ultrasonic m_nextSensor;
   // task doing the round-robin automatic sensing
   private static Thread m_task;
   private Unit m_units;
@@ -68,19 +70,29 @@ public class Ultrasonic extends SendableBase implements PIDSource {
   private static class UltrasonicChecker extends Thread {
     @Override
     public synchronized void run() {
-      Ultrasonic ultrasonic = null;
+      int sensorIndex = 0;
+      Ultrasonic ultrasonic;
       while (m_automaticEnabled) {
-        if (ultrasonic == null) {
-          ultrasonic = m_firstSensor;
-        }
-        if (ultrasonic == null) {
-          return;
+        //lock list to ensure deletion doesn't occur between empty check and retrieving sensor
+        synchronized (m_sensors) {
+          if (m_sensors.isEmpty()) {
+            return;
+          }
+          if (sensorIndex >= m_sensors.size()) {
+            sensorIndex = m_sensors.size() - 1;
+          }
+          ultrasonic = m_sensors.get(sensorIndex);
         }
         if (ultrasonic.isEnabled()) {
           // Do the ping
           ultrasonic.m_pingChannel.pulse(kPingTime);
         }
-        ultrasonic = ultrasonic.m_nextSensor;
+        if (sensorIndex < m_sensors.size()) {
+          sensorIndex++;
+        } else {
+          sensorIndex = 0;
+        }
+
         Timer.delay(.1); // wait for ping to return
       }
     }
@@ -98,8 +110,7 @@ public class Ultrasonic extends SendableBase implements PIDSource {
     }
     final boolean originalMode = m_automaticEnabled;
     setAutomaticMode(false); // kill task when adding a new sensor
-    m_nextSensor = m_firstSensor;
-    m_firstSensor = this;
+    m_sensors.add(this);
 
     m_counter = new Counter(m_echoChannel); // set up counter for this
     addChild(m_counter);
@@ -190,7 +201,6 @@ public class Ultrasonic extends SendableBase implements PIDSource {
    * stopped, then started again after this sensor is removed (provided this wasn't the last
    * sensor).
    */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   @Override
   public synchronized void close() {
     super.close();
@@ -212,21 +222,10 @@ public class Ultrasonic extends SendableBase implements PIDSource {
 
     m_pingChannel = null;
     m_echoChannel = null;
-
-    if (this == m_firstSensor) {
-      m_firstSensor = m_nextSensor;
-      if (m_firstSensor == null) {
-        setAutomaticMode(false);
-      }
-    } else {
-      for (Ultrasonic s = m_firstSensor; s != null; s = s.m_nextSensor) {
-        if (this == s.m_nextSensor) {
-          s.m_nextSensor = s.m_nextSensor.m_nextSensor;
-          break;
-        }
-      }
+    synchronized (m_sensors) {
+      m_sensors.remove(this);
     }
-    if (m_firstSensor != null && wasAutomaticMode) {
+    if (!m_sensors.isEmpty() && wasAutomaticMode) {
       setAutomaticMode(true);
     }
   }
@@ -251,7 +250,7 @@ public class Ultrasonic extends SendableBase implements PIDSource {
       /* Clear all the counters so no data is valid. No synchronization is
        * needed because the background task is stopped.
        */
-      for (Ultrasonic u = m_firstSensor; u != null; u = u.m_nextSensor) {
+      for (Ultrasonic u : m_sensors) {
         u.m_counter.reset();
       }
 
@@ -270,7 +269,7 @@ public class Ultrasonic extends SendableBase implements PIDSource {
        * disabled. No synchronization is needed because the background task is
        * stopped.
        */
-      for (Ultrasonic u = m_firstSensor; u != null; u = u.m_nextSensor) {
+      for (Ultrasonic u : m_sensors) {
         u.m_counter.reset();
       }
     }

@@ -10,8 +10,8 @@
 #ifndef __FRC_ROBORIO__
 
 #include "NotifyListener.h"
-#include "hal/DriverStation.h"
-#include "hal/HAL.h"
+#include "hal/DriverStationTypes.h"
+#include "hal/Types.h"
 
 #ifdef __cplusplus
 extern "C" {

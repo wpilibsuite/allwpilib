@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include <hal/Encoder.h>
+#include <hal/Types.h>
 
 #include "frc/Counter.h"
 #include "frc/CounterBase.h"

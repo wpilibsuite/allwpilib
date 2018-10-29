@@ -70,6 +70,7 @@ set(uv_linux_src
 )
 
 add_library(wpiutil ${wpiutil_native_src} ${uv_native_src})
+set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
 

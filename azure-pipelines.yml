@@ -7,6 +7,8 @@ resources:
   containers:
   - container: wpilib2019
     image: wpilib/roborio-cross-ubuntu:2019-18.04
+  - container: raspbian
+    image:  wpilib/raspbian-cross-ubuntu:18.04
 
 jobs:
  - job: Linux_Arm
@@ -25,6 +27,25 @@ jobs:
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
         options: '-PonlyAthena'
+        # checkStyleRunAnalysis: true
+        # pmdRunAnalysis: true
+
+ - job: Linux_Raspbian
+   pool:
+     vmImage: 'Ubuntu 16.04'
+
+   container: raspbian
+
+   steps:
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        publishJUnitResults: true
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'build'
+        options: '-PonlyRaspbian'
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
 

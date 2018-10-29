@@ -17,4 +17,8 @@ TEST(HostNameTest, HostNameNotEmptySmallVector) {
   SmallVector<char, 256> name;
   ASSERT_NE(GetHostname(name), "");
 }
+TEST(HostNameTest, HostNameEq) {
+  SmallVector<char, 256> nameBuf;
+  ASSERT_EQ(GetHostname(nameBuf), GetHostname());
+}
 }  // namespace wpi

@@ -52,6 +52,7 @@ model {
         servo(NativeLibrarySpec)
         drive_motor(NativeLibrarySpec)
         all { component ->
+            component.targetBuildTypes 'debug'
             sources {
                 cpp.lib library:  "${component.name}", linkage: "static"
             }

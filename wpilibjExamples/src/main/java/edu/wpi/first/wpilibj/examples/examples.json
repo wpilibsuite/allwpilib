@@ -99,6 +99,16 @@
     "mainclass": "Main"
   },
   {
+    "name": "HID Rumble",
+    "description": "An example program showing how to make human interface devices rumble.",
+    "tags": [
+      "Joystick"
+    ],
+    "foldername": "hidrumble",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
     "name": "Motor Controller",
     "description": "Demonstrate controlling a single motor with a joystick",
     "tags": [

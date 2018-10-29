@@ -9,7 +9,7 @@
 
 #include <cstring>
 
-#include <hal/DriverStation.h>
+#include <hal/DriverStationTypes.h>
 
 namespace halsim {
 

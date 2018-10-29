@@ -16,8 +16,6 @@
 
 namespace cs {
 
-std::string GetHostname() { return wpi::GetHostname(); }
-
 std::vector<std::string> GetNetworkInterfaces() {
   struct ifaddrs* ifa;
   if (::getifaddrs(&ifa) != 0) return std::vector<std::string>{};

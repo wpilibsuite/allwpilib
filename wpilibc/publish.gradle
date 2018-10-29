@@ -54,22 +54,14 @@ addTaskToCopyAllOutputs(cppSourcesZip)
 
 model {
     publishing {
-        def wpilibCTaskList = createComponentZipTasks($.components, 'wpilibc', zipBaseName, Zip, project, includeStandardZipFormat)
-        def allTask
-        if (!project.hasProperty('jenkinsBuild')) {
-            allTask = createAllCombined(wpilibCTaskList, 'wpilibc', zipBaseName, Zip, project)
-        }
-
-
+        def wpilibCTaskList = createComponentZipTasks($.components, ['wpilibc'], zipBaseName, Zip, project, includeStandardZipFormat)
 
         publications {
             cpp(MavenPublication) {
                 wpilibCTaskList.each {
                     artifact it
                 }
-                if (!project.hasProperty('jenkinsBuild')) {
-                    artifact allTask
-                }
+
                 artifact cppHeadersZip
                 artifact cppSourcesZip
 

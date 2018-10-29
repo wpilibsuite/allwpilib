@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hal/PDP.h>
+#include <hal/Types.h>
 
 #include "frc/ErrorBase.h"
 #include "frc/smartdashboard/SendableBase.h"

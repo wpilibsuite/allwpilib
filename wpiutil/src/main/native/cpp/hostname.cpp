@@ -7,59 +7,50 @@
 
 #include "wpi/hostname.h"
 
-#ifdef _WIN32
-#include <Winsock2.h>
-#pragma comment(lib, "Ws2_32.lib")
-#else
-#include <unistd.h>
-#endif
-
+#include <cstdlib>
 #include <string>
 
+#include "uv.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
 
-#ifdef _WIN32
-struct WSAHelper {
-  WSAHelper() {
-    WSAData wsaData;
-    WORD wVersionRequested = MAKEWORD(2, 2);
-    WSAStartup(wVersionRequested, &wsaData);
-  }
-  ~WSAHelper() { WSACleanup(); }
-};
-static WSAHelper& GetWSAHelper() {
-  static WSAHelper helper;
-  return helper;
-}
-#endif
-
 namespace wpi {
-static bool GetHostnameImpl(char* name, size_t name_len) {
-#ifdef _WIN32
-  GetWSAHelper();
-#endif
-  if (::gethostname(name, name_len) != 0) return false;
-  name[name_len - 1] =
-      '\0';  // Per POSIX, may not be null terminated if too long
-  return true;
-}
 
 std::string GetHostname() {
+  std::string rv;
   char name[256];
-  if (!GetHostnameImpl(name, sizeof(name))) return "";
-  return name;
+  size_t size = sizeof(name);
+
+  int err = uv_os_gethostname(name, &size);
+  if (err == 0) {
+    rv.assign(name, size);
+  } else if (err == UV_ENOBUFS) {
+    char* name2 = static_cast<char*>(std::malloc(size));
+    err = uv_os_gethostname(name2, &size);
+    if (err == 0) rv.assign(name2, size);
+    std::free(name2);
+  }
+
+  return rv;
 }
 
 StringRef GetHostname(SmallVectorImpl<char>& name) {
   // Use a tmp array to not require the SmallVector to be too large.
   char tmpName[256];
-  if (!GetHostnameImpl(tmpName, sizeof(tmpName))) {
-    return StringRef{};
-  }
-  name.clear();
-  name.append(tmpName, tmpName + std::strlen(tmpName) + 1);
+  size_t size = sizeof(tmpName);
 
-  return StringRef{name.data(), name.size()};
+  name.clear();
+
+  int err = uv_os_gethostname(tmpName, &size);
+  if (err == 0) {
+    name.append(tmpName, tmpName + size);
+  } else if (err == UV_ENOBUFS) {
+    name.resize(size);
+    err = uv_os_gethostname(name.data(), &size);
+    if (err != 0) size = 0;
+  }
+
+  return StringRef{name.data(), size};
 }
+
 }  // namespace wpi

@@ -11,7 +11,7 @@
 
 #include <memory>
 
-#include <hal/SPI.h>
+#include <hal/SPITypes.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/deprecated.h>
 
