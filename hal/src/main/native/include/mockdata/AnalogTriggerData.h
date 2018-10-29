@@ -10,7 +10,7 @@
 #ifndef __FRC_ROBORIO__
 
 #include "NotifyListener.h"
-#include "hal/HAL.h"
+#include "hal/Types.h"
 
 enum HALSIM_AnalogTriggerMode : int32_t {
   HALSIM_AnalogTriggerUnassigned,

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hal/Notifier.h>
+#include <hal/Types.h>
 
 #include "frc/ErrorBase.h"
 #include "frc/IterativeRobotBase.h"

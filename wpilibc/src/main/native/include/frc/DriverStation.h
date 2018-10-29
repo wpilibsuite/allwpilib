@@ -13,7 +13,7 @@
 #include <string>
 #include <thread>
 
-#include <hal/DriverStation.h>
+#include <hal/DriverStationTypes.h>
 #include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 #include <wpi/deprecated.h>

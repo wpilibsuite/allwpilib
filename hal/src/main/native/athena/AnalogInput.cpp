@@ -14,7 +14,6 @@
 #include "HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/AnalogAccumulator.h"
-#include "hal/HAL.h"
 #include "hal/handles/HandlesInternal.h"
 
 namespace hal {

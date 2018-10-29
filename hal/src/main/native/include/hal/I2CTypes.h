@@ -7,25 +7,18 @@
 
 #pragma once
 
-#include <cstring>
+#include <stdint.h>
 
-#include <hal/DriverStationTypes.h>
+#include "hal/Types.h"
 
-namespace halsim {
+/**
+ * @defgroup hal_i2c I2C Functions
+ * @ingroup hal_capi
+ * @{
+ */
 
-typedef struct {
-  HAL_JoystickAxes axes;
-  HAL_JoystickButtons buttons;
-  HAL_JoystickPOVs povs;
-  HAL_JoystickDescriptor descriptor;
+// clang-format off
+HAL_ENUM(HAL_I2CPort) { HAL_I2C_kInvalid = -1, HAL_I2C_kOnboard, HAL_I2C_kMXP };
+// clang-format on
 
-  void ResetUdp() {
-    std::memset(&axes, 0, sizeof(axes));
-    std::memset(&buttons, 0, sizeof(buttons));
-    std::memset(&povs, 0, sizeof(povs));
-  }
-
-  void ResetTcp() { std::memset(&descriptor, 0, sizeof(descriptor)); }
-} DSCommJoystickPacket;
-
-}  // namespace halsim
+/** @} */

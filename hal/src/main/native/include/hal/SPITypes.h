@@ -7,25 +7,24 @@
 
 #pragma once
 
-#include <cstring>
+#include <stdint.h>
 
-#include <hal/DriverStationTypes.h>
+#include "hal/Types.h"
 
-namespace halsim {
+/**
+ * @defgroup hal_spi SPI Functions
+ * @ingroup hal_capi
+ * @{
+ */
 
-typedef struct {
-  HAL_JoystickAxes axes;
-  HAL_JoystickButtons buttons;
-  HAL_JoystickPOVs povs;
-  HAL_JoystickDescriptor descriptor;
-
-  void ResetUdp() {
-    std::memset(&axes, 0, sizeof(axes));
-    std::memset(&buttons, 0, sizeof(buttons));
-    std::memset(&povs, 0, sizeof(povs));
-  }
-
-  void ResetTcp() { std::memset(&descriptor, 0, sizeof(descriptor)); }
-} DSCommJoystickPacket;
-
-}  // namespace halsim
+// clang-format off
+HAL_ENUM(HAL_SPIPort) {
+  HAL_SPI_kInvalid = -1,
+  HAL_SPI_kOnboardCS0,
+  HAL_SPI_kOnboardCS1,
+  HAL_SPI_kOnboardCS2,
+  HAL_SPI_kOnboardCS3,
+  HAL_SPI_kMXP
+};
+// clang-format on
+/** @} */

@@ -9,7 +9,11 @@
 
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/CAN.h>
+#include <hal/CANAPI.h>
+#include <hal/Errors.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 
 using namespace frc;
 

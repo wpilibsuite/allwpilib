@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include <hal/I2C.h>
+#include <hal/I2CTypes.h>
 
 #include "frc/ErrorBase.h"
 
