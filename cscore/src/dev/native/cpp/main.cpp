@@ -6,62 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <iostream>
-#include <thread>
 
-#include "../../native/windows/WindowsMessagePump.h"
 #include "cscore.h"
 
-#pragma comment(lib, "User32.lib")
-
-int main() {
-  int32_t status = 0;
-  auto parameter = cs::EnumerateUsbCameras(&status);
-  for (auto&& cam : parameter) {
-    std::cout << cam.name << " \n" << cam.path << "\n";
-  }
-
-  // auto handle = cs::CreateUsbCameraPath("test",
-  // "\\\\?\\USB#VID_046D&PID_0825&MI_00#6&900429&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\{bbefb6c7-2fc4-4139-bb8b-a58bba724083}",
-  // &status);
-
-  cs::UsbCamera camera("camera", 0);
-  camera.SetVideoMode(cs::VideoMode::PixelFormat::kMJPEG, 640, 360, 30);
-
-  // "\\\\?\\USB#VID_046D&PID_0825&MI_00#6&900429&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\{bbefb6c7-2fc4-4139-bb8b-a58bba724083}"
-
-  cs::MjpegServer server("server", 1181);
-
-  server.SetSource(camera);
-
-  cs::UsbCamera camera2("camera2",
-                        "\\\\?\\usb#vid_046d&pid_0825&mi_00#6&900429&0&0000#{"
-                        "e5323777-f976-4f5b-9b55-b94699c46e44}\\{bbefb6c7-2fc4-"
-                        "4139-bb8b-a58bba724083}");
-
-  // "\\\\?\\USB#VID_046D&PID_0825&MI_00#6&900429&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\{bbefb6c7-2fc4-4139-bb8b-a58bba724083}"
-
-  cs::MjpegServer server2("server2", 1182);
-
-  server2.SetSource(camera2);
-
-  cs::UsbCamera camera3("camera",
-                        "\\\\?\\usb#vid_045e&pid_0779&mi_00#6&1364bb37&0&0000#{"
-                        "e5323777-f976-4f5b-9b55-b94699c46e44}\\global");
-
-  // "\\\\?\\USB#VID_046D&PID_0825&MI_00#6&900429&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\{bbefb6c7-2fc4-4139-bb8b-a58bba724083}"
-
-  cs::MjpegServer server3("server", 1183);
-
-  server3.SetSource(camera3);
-
-  // cs::UsbCamera camera2("camera2", 1);
-  // cs::MjpegServer server2("server2", 1182);
-  // server2.SetSource(camera2);
-
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-  // camera.SetVideoMode(cs::VideoMode::PixelFormat::kMJPEG, 640, 360, 30);
-  // camera.SetVideoMode(cs::VideoMode::PixelFormat::kBGR, 160, 120, 30);
-  // std::cout << (int)handle << "\n";
-  std::system("PAUSE");
-  // cs::ReleaseSource(handle, &status);
-}
+int main() { std::cout << cs::GetHostname() << std::endl; }

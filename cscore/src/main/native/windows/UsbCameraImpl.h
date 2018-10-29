@@ -151,8 +151,6 @@ class UsbCameraImpl : public SourceImpl,
   int RawToPercentage(const UsbCameraProperty& rawProp, int rawValue);
   int PercentageToRaw(const UsbCameraProperty& rawProp, int percentValue);
 
-  void SetQuirks();
-
   //
   // Variables only used within camera thread
   //

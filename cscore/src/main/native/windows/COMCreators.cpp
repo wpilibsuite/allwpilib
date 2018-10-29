@@ -10,8 +10,6 @@
 #include <shlwapi.h>
 #include <windowsx.h>
 
-#include <iostream>
-
 #include <Windows.h>
 
 #include "UsbCameraImpl.h"
