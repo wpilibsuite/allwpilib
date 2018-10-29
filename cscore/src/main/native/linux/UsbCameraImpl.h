@@ -10,11 +10,6 @@
 
 #include <linux/videodev2.h>
 
-#ifdef _WIN32
-#include <mfidl.h>
-#include <mfreadwrite.h>
-#endif
-
 #include <atomic>
 #include <memory>
 #include <string>
