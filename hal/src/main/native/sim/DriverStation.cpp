@@ -149,8 +149,7 @@ char* HAL_GetJoystickName(int32_t joystickNum) {
   SimDriverStationData->GetJoystickDescriptor(joystickNum, &desc);
   size_t len = std::strlen(desc.name);
   char* name = static_cast<char*>(std::malloc(len + 1));
-  std::strncpy(name, desc.name, len);
-  name[len] = '\0';
+  std::memcpy(name, desc.name, len + 1);
   return name;
 }
 
