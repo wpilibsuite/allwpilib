@@ -7,6 +7,7 @@
 
 #include "hal/AnalogInput.h"
 
+#include "AnalogAccumulator.h"
 #include "AnalogInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
