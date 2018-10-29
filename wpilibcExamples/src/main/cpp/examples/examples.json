@@ -219,7 +219,7 @@
   },
   {
     "name": "HAL",
-    "description": "A program created using the HAL exclusively. This is a very advanced example",
+    "description": "A program created using the HAL exclusively. This example is for advanced users",
     "tags": [
       "HAL"
     ],
