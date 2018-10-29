@@ -9,6 +9,7 @@
 
 #include <utility>
 
+#include <hal/CAN.h>
 #include <hal/CANAPI.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
