@@ -9,6 +9,7 @@
 
 #include "frc/ErrorBase.h"
 #include "frc/smartdashboard/SendableBase.h"
+#include "hal/Types.h"
 
 namespace frc {
 

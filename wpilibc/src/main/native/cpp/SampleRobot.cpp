@@ -13,6 +13,9 @@
 #include "frc/DriverStation.h"
 #include "frc/Timer.h"
 #include "frc/livewindow/LiveWindow.h"
+#include "hal/DriverStation.h"
+#include "hal/HALBase.h"
+#include "hal/FRCUsageReporting.h"
 
 using namespace frc;
 
