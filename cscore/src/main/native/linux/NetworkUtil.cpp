@@ -12,8 +12,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <wpi/hostname.h>
-
 namespace cs {
 
 std::vector<std::string> GetNetworkInterfaces() {

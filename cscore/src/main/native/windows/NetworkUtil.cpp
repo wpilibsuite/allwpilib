@@ -15,8 +15,6 @@
 
 #include <iostream>
 
-#include <wpi/hostname.h>
-
 #include "cscore_cpp.h"
 
 #pragma comment(lib, "IPHLPAPI.lib")
