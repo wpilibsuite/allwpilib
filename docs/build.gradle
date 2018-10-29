@@ -100,6 +100,7 @@ task generateJavaDocs(type: Javadoc) {
     options.links("https://docs.oracle.com/javase/8/docs/api/")
     options.addStringOption "tag", "pre:a:Pre-Condition"
     options.addStringOption('Xdoclint:accessibility,html,missing,reference,syntax')
+    options.addBooleanOption('html5', true)
     dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':hal').generateUsageReporting
     source project(':hal').sourceSets.main.java
