@@ -53,9 +53,6 @@ static wpi::mutex m_controlWordMutex;
 
 // Message and Data variables
 static wpi::mutex msgMutex;
-static wpi::condition_variable* newDSDataAvailableCond;
-static wpi::mutex newDSDataAvailableMutex;
-static int newDSDataAvailableCounter{0};
 
 static void InitializeDriverStationCaches() {
   m_joystickAxes = std::make_unique<HAL_JoystickAxes[]>(kJoystickPorts);
@@ -229,16 +226,23 @@ class DriverStationThread : public wpi::SafeThread {
       if (!m_active) break;
       m_notify = false;
 
+      lock.unlock();
       UpdateDriverStationDataCaches();
+      lock.lock();
 
-      std::lock_guard<wpi::mutex> lock(newDSDataAvailableMutex);
-      // Nofify all threads
+      // Notify all threads
       newDSDataAvailableCounter++;
-      newDSDataAvailableCond->notify_all();
+      newDSDataAvailableCond.notify_all();
     }
+
+    // Notify waiters on thread exit
+    newDSDataAvailableCounter++;
+    newDSDataAvailableCond.notify_all();
   }
 
   bool m_notify = false;
+  wpi::condition_variable newDSDataAvailableCond;
+  int newDSDataAvailableCounter{0};
 };
 
 class DriverStationThreadOwner
@@ -256,10 +260,7 @@ static std::unique_ptr<DriverStationThreadOwner> dsThread = nullptr;
 
 namespace hal {
 namespace init {
-void InitializeFRCDriverStation() {
-  static wpi::condition_variable nddaC;
-  newDSDataAvailableCond = &nddaC;
-}
+void InitializeFRCDriverStation() {}
 }  // namespace init
 }  // namespace hal
 
@@ -447,11 +448,10 @@ HAL_Bool HAL_IsNewControlData(void) {
   // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
   // worth the cycles to check.
   thread_local int lastCount{-1};
-  int currentCount = 0;
-  {
-    std::unique_lock<wpi::mutex> lock(newDSDataAvailableMutex);
-    currentCount = newDSDataAvailableCounter;
-  }
+  if (!dsThread) return false;
+  auto thr = dsThread->GetThread();
+  if (!thr) return false;
+  int currentCount = thr->newDSDataAvailableCounter;
   if (lastCount == currentCount) return false;
   lastCount = currentCount;
   return true;
@@ -471,16 +471,19 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  std::unique_lock<wpi::mutex> lock(newDSDataAvailableMutex);
-  int currentCount = newDSDataAvailableCounter;
-  while (newDSDataAvailableCounter == currentCount) {
+  if (!dsThread) return false;
+  auto thr = dsThread->GetThread();
+  if (!thr) return false;
+  int currentCount = thr->newDSDataAvailableCounter;
+  while (thr->newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
-      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
+      auto timedOut =
+          thr->newDSDataAvailableCond.wait_until(thr.GetLock(), timeoutTime);
       if (timedOut == std::cv_status::timeout) {
         return false;
       }
     } else {
-      newDSDataAvailableCond->wait(lock);
+      thr->newDSDataAvailableCond.wait(thr.GetLock());
     }
   }
   return true;
