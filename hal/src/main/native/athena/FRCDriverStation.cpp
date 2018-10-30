@@ -226,9 +226,11 @@ class DriverStationThread : public wpi::SafeThread {
       if (!m_active) break;
       m_notify = false;
 
-      UpdateDriverStationDataCaches();
 
-      std::lock_guard<wpi::mutex> lock(newDSDataAvailableMutex);
+      lock.unlock();
+      UpdateDriverStationDataCaches();
+      lock.lock();
+
       // Nofify all threads
       newDSDataAvailableCounter++;
       newDSDataAvailableCond.notify_all();
@@ -237,7 +239,6 @@ class DriverStationThread : public wpi::SafeThread {
 
   bool m_notify = false;
   wpi::condition_variable newDSDataAvailableCond;
-  wpi::mutex newDSDataAvailableMutex;
   int newDSDataAvailableCounter{0};
 };
 
@@ -449,7 +450,6 @@ HAL_Bool HAL_IsNewControlData(void) {
   if (!thr) return;
   int currentCount = 0;
   {
-    std::unique_lock<wpi::mutex> lock(thr->newDSDataAvailableMutex);
     currentCount = thr->newDSDataAvailableCounter;
   }
   if (lastCount == currentCount) return false;
@@ -473,16 +473,15 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
 
   auto thr = dsThread->GetThread();
   if (!thr) return;
-  std::unique_lock<wpi::mutex> lock(thr->newDSDataAvailableMutex);
   int currentCount = thr->newDSDataAvailableCounter;
   while (thr->newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
-      auto timedOut = thr->newDSDataAvailableCond.wait_until(lock, timeoutTime);
+      auto timedOut = thr->newDSDataAvailableCond.wait_until(thr.GetLock(), timeoutTime);
       if (timedOut == std::cv_status::timeout) {
         return false;
       }
     } else {
-      thr->newDSDataAvailableCond.wait(lock);
+      thr->newDSDataAvailableCond.wait(thr.GetLock());
     }
   }
   return true;
