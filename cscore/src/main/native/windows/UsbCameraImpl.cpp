@@ -246,91 +246,89 @@ static bool IsPercentageProperty(wpi::StringRef name) {
 
 void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
                                  const VideoMode& mode) {
-  do {
-    if (!videoSample) break;
+  if (!videoSample) return;
 
-    ComPtr<IMFMediaBuffer> buf;
+  ComPtr<IMFMediaBuffer> buf;
 
-    if (!SUCCEEDED(
-            videoSample->ConvertToContiguousBuffer(buf.GetAddressOf()))) {
-      DWORD bcnt = 0;
-      if (!SUCCEEDED(videoSample->GetBufferCount(&bcnt))) break;
-      if (bcnt == 0) break;
-      if (!SUCCEEDED(videoSample->GetBufferByIndex(0, buf.GetAddressOf())))
-        break;
-    }
+  if (!SUCCEEDED(
+          videoSample->ConvertToContiguousBuffer(buf.GetAddressOf()))) {
+    DWORD bcnt = 0;
+    if (!SUCCEEDED(videoSample->GetBufferCount(&bcnt))) return;
+    if (bcnt == 0) return;
+    if (!SUCCEEDED(videoSample->GetBufferByIndex(0, buf.GetAddressOf())))
+      return;
+  }
 
-    bool lock2d = false;
-    BYTE* ptr = NULL;
-    LONG pitch = 0;
-    DWORD maxsize = 0, cursize = 0;
+  bool lock2d = false;
+  BYTE* ptr = NULL;
+  LONG pitch = 0;
+  DWORD maxsize = 0, cursize = 0;
 
-    // "For 2-D buffers, the Lock2D method is more efficient than the Lock
-    // method" see IMFMediaBuffer::Lock method documentation:
-    // https://msdn.microsoft.com/en-us/library/windows/desktop/bb970366(v=vs.85).aspx
-    ComPtr<IMF2DBuffer> buffer2d;
-    DWORD memLength2d = 0;
-    if (true) {
-      buffer2d = buf.As<IMF2DBuffer>();
-      if (buffer2d) {
-        buffer2d->GetContiguousLength(&memLength2d);
-        if (SUCCEEDED(buffer2d->Lock2D(&ptr, &pitch))) {
-          lock2d = true;
-        }
+  // "For 2-D buffers, the Lock2D method is more efficient than the Lock
+  // method" see IMFMediaBuffer::Lock method documentation:
+  // https://msdn.microsoft.com/en-us/library/windows/desktop/bb970366(v=vs.85).aspx
+  ComPtr<IMF2DBuffer> buffer2d;
+  DWORD memLength2d = 0;
+  if (true) {
+    buffer2d = buf.As<IMF2DBuffer>();
+    if (buffer2d) {
+      buffer2d->GetContiguousLength(&memLength2d);
+      if (SUCCEEDED(buffer2d->Lock2D(&ptr, &pitch))) {
+        lock2d = true;
       }
     }
-    if (ptr == NULL) {
-      if (!SUCCEEDED(buf->Lock(&ptr, &maxsize, &cursize))) {
-        break;
-      }
+  }
+  if (ptr == NULL) {
+    if (!SUCCEEDED(buf->Lock(&ptr, &maxsize, &cursize))) {
+      return;
     }
-    if (!ptr) break;
+  }
+  if (!ptr) return;
 
-    cv::Mat tmpMat;
-    std::unique_ptr<Image> dest;
-    bool doFinalSet = true;
+  cv::Mat tmpMat;
+  std::unique_ptr<Image> dest;
+  bool doFinalSet = true;
 
-    switch (mode.pixelFormat) {
-      case cs::VideoMode::PixelFormat::kMJPEG: {
-        // Special case
-        PutFrame(VideoMode::kMJPEG, mode.width, mode.height,
-                 wpi::StringRef(reinterpret_cast<char*>(ptr), cursize),
-                 wpi::Now());
-        doFinalSet = false;
-        break;
-      }
-      case cs::VideoMode::PixelFormat::kGray:
-        tmpMat = cv::Mat(mode.height, mode.width, CV_8UC1, ptr, pitch);
-        dest = AllocImage(VideoMode::kGray, tmpMat.cols, tmpMat.rows,
-                          tmpMat.total());
-        tmpMat.copyTo(dest->AsMat());
-        break;
-      case cs::VideoMode::PixelFormat::kBGR:
-        tmpMat = cv::Mat(mode.height, mode.width, CV_8UC3, ptr, pitch);
-        dest = AllocImage(VideoMode::kBGR, tmpMat.cols, tmpMat.rows,
-                          tmpMat.total() * 3);
-        tmpMat.copyTo(dest->AsMat());
-        break;
-      case cs::VideoMode::PixelFormat::kYUYV:
-        tmpMat = cv::Mat(mode.height, mode.width, CV_8UC2, ptr, pitch);
-        dest = AllocImage(VideoMode::kYUYV, tmpMat.cols, tmpMat.rows,
-                          tmpMat.total() * 2);
-        tmpMat.copyTo(dest->AsMat());
-        break;
-      default:
-        doFinalSet = false;
-        break;
+  switch (mode.pixelFormat) {
+    case cs::VideoMode::PixelFormat::kMJPEG: {
+      // Special case
+      PutFrame(VideoMode::kMJPEG, mode.width, mode.height,
+                wpi::StringRef(reinterpret_cast<char*>(ptr), cursize),
+                wpi::Now());
+      doFinalSet = false;
+      break;
     }
+    case cs::VideoMode::PixelFormat::kGray:
+      tmpMat = cv::Mat(mode.height, mode.width, CV_8UC1, ptr, pitch);
+      dest = AllocImage(VideoMode::kGray, tmpMat.cols, tmpMat.rows,
+                        tmpMat.total());
+      tmpMat.copyTo(dest->AsMat());
+      break;
+    case cs::VideoMode::PixelFormat::kBGR:
+      tmpMat = cv::Mat(mode.height, mode.width, CV_8UC3, ptr, pitch);
+      dest = AllocImage(VideoMode::kBGR, tmpMat.cols, tmpMat.rows,
+                        tmpMat.total() * 3);
+      tmpMat.copyTo(dest->AsMat());
+      break;
+    case cs::VideoMode::PixelFormat::kYUYV:
+      tmpMat = cv::Mat(mode.height, mode.width, CV_8UC2, ptr, pitch);
+      dest = AllocImage(VideoMode::kYUYV, tmpMat.cols, tmpMat.rows,
+                        tmpMat.total() * 2);
+      tmpMat.copyTo(dest->AsMat());
+      break;
+    default:
+      doFinalSet = false;
+      break;
+  }
 
-    if (doFinalSet) {
-      PutFrame(std::move(dest), wpi::Now());
-    }
+  if (doFinalSet) {
+    PutFrame(std::move(dest), wpi::Now());
+  }
 
-    if (lock2d)
-      buffer2d->Unlock2D();
-    else
-      buf->Unlock();
-  } while (0);
+  if (lock2d)
+    buffer2d->Unlock2D();
+  else
+    buf->Unlock();
 }
 
 LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
@@ -799,6 +797,11 @@ bool UsbCameraImpl::DeviceStreamOn() {
   if (!m_deviceValid) return false;
   m_streaming = true;
   m_wasStreaming = true;
+      cv::Mat tmpMat(m_mode.height, m_mode.width, CV_8UC1);
+      auto dest = AllocImage(VideoMode::kGray, tmpMat.cols, tmpMat.rows,
+                        tmpMat.total());
+      tmpMat.copyTo(dest->AsMat());
+      PutFrame(std::move(dest), wpi::Now());
   m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, NULL, NULL,
                              NULL, NULL);
   return true;

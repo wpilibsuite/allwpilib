@@ -9,4 +9,11 @@
 
 #include "cscore.h"
 
-int main() { std::cout << cs::GetHostname() << std::endl; }
+int main() {
+  std::cout << cs::GetHostname() << std::endl;
+  cs::UsbCamera camera{"camera", 0};
+  cs::MjpegServer server{"server", 1181};
+  server.SetSource(camera);
+
+  system("PAUSE");
+  }

@@ -14,9 +14,6 @@
 #include <windows.h>
 #include <windowsx.h>
 
-#include <atomic>
-#include <iostream>
-
 #include <Dbt.h>
 
 #pragma comment(lib, "Mfplat.lib")
@@ -30,6 +27,9 @@ namespace cs {
 static LRESULT CALLBACK pWndProc(HWND hwnd, UINT uiMsg, WPARAM wParam,
                                  LPARAM lParam) {
   WindowsMessagePump* pumpContainer;
+  // Our "this" parameter is passed only during WM_CREATE
+  // If it is create, store in our user parameter
+  // Otherwise grab from our user parameter
   if (uiMsg == WM_CREATE) {
     CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
     pumpContainer =
@@ -42,6 +42,7 @@ static LRESULT CALLBACK pWndProc(HWND hwnd, UINT uiMsg, WPARAM wParam,
         GetWindowLongPtr(hwnd, GWLP_USERDATA));
   }
 
+  // Run the callback
   bool hasCalledBack = false;
   LRESULT result;
 
@@ -50,14 +51,16 @@ static LRESULT CALLBACK pWndProc(HWND hwnd, UINT uiMsg, WPARAM wParam,
     result = pumpContainer->m_callback(hwnd, uiMsg, wParam, lParam);
   }
 
-  switch (uiMsg) {
-    HANDLE_MSG(hwnd, WM_CLOSE, [](HWND) { PostQuitMessage(0); });
-    default:
-      if (hasCalledBack) {
-        return result;
-      }
-      return DefWindowProc(hwnd, uiMsg, wParam, lParam);
+  // Handle a close message
+  if (uiMsg == WM_CLOSE) {
+    return HANDLE_WM_CLOSE(hwnd, 0, 0, [](HWND) { PostQuitMessage(0); });
   }
+
+  // Return message, otherwise return the base handler
+  if (hasCalledBack) {
+    return result;
+  }
+  return DefWindowProc(hwnd, uiMsg, wParam, lParam);
 }
 
 namespace {
@@ -141,8 +144,6 @@ void WindowsMessagePump::ThreadMain(HANDLE eventHandle) {
 
   MFShutdown();
   CoUninitialize();
-
-  std::cout << "Loop completely dead\n";
 }
 
 }  // namespace cs
