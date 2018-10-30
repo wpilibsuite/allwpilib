@@ -230,10 +230,14 @@ class DriverStationThread : public wpi::SafeThread {
       UpdateDriverStationDataCaches();
       lock.lock();
 
-      // Nofify all threads
+      // Notify all threads
       newDSDataAvailableCounter++;
       newDSDataAvailableCond.notify_all();
     }
+
+    // Notify waiters on thread exit
+    newDSDataAvailableCounter++;
+    newDSDataAvailableCond.notify_all();
   }
 
   bool m_notify = false;
