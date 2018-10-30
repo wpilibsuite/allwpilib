@@ -226,7 +226,6 @@ class DriverStationThread : public wpi::SafeThread {
       if (!m_active) break;
       m_notify = false;
 
-
       lock.unlock();
       UpdateDriverStationDataCaches();
       lock.lock();
@@ -446,8 +445,9 @@ HAL_Bool HAL_IsNewControlData(void) {
   // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
   // worth the cycles to check.
   thread_local int lastCount{-1};
+  if (!dsThread) return false;
   auto thr = dsThread->GetThread();
-  if (!thr) return;
+  if (!thr) return false;
   int currentCount = 0;
   {
     currentCount = thr->newDSDataAvailableCounter;
@@ -471,8 +471,9 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
+  if (!dsThread) return false;
   auto thr = dsThread->GetThread();
-  if (!thr) return;
+  if (!thr) return false;
   int currentCount = thr->newDSDataAvailableCounter;
   while (thr->newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
