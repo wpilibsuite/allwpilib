@@ -260,8 +260,7 @@ static std::unique_ptr<DriverStationThreadOwner> dsThread = nullptr;
 
 namespace hal {
 namespace init {
-void InitializeFRCDriverStation() {
-}
+void InitializeFRCDriverStation() {}
 }  // namespace init
 }  // namespace hal
 
@@ -478,7 +477,8 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   int currentCount = thr->newDSDataAvailableCounter;
   while (thr->newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
-      auto timedOut = thr->newDSDataAvailableCond.wait_until(thr.GetLock(), timeoutTime);
+      auto timedOut =
+          thr->newDSDataAvailableCond.wait_until(thr.GetLock(), timeoutTime);
       if (timedOut == std::cv_status::timeout) {
         return false;
       }
