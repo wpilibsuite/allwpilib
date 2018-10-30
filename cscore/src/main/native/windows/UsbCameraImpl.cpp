@@ -457,9 +457,7 @@ bool UsbCameraImpl::DeviceConnect() {
   SetConnected(true);
 
   // Turn off streaming if not enabled, and turn it on if enabled
-  if (m_streaming && !IsEnabled()) {
-    DeviceStreamOff();
-  } else if (!m_streaming && IsEnabled()) {
+  if (IsEnabled()) {
     DeviceStreamOn();
   }
   return true;
@@ -649,7 +647,7 @@ CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
   } else if (msgKind == Message::kNumSinksChanged ||
              msgKind == Message::kNumSinksEnabledChanged) {
     // Turn On Streams
-    if (m_streaming && !IsEnabled()) {
+    if (!IsEnabled()) {
       DeviceStreamOff();
     } else if (!m_streaming && IsEnabled()) {
       DeviceStreamOn();
@@ -778,13 +776,10 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
     m_currentMode = std::move(newModeType);
     m_mode = newMode;
     lock.unlock();
-    bool wasStreaming = m_streaming;
-    if (wasStreaming) DeviceStreamOff();
     if (m_sourceReader) {
       DeviceDisconnect();
       DeviceConnect();
     }
-    if (wasStreaming) DeviceStreamOn();
     Notifier::GetInstance().NotifySourceVideoMode(*this, newMode);
     lock.lock();
   }
@@ -796,12 +791,6 @@ bool UsbCameraImpl::DeviceStreamOn() {
   if (m_streaming) return false;
   if (!m_deviceValid) return false;
   m_streaming = true;
-  m_wasStreaming = true;
-      cv::Mat tmpMat(m_mode.height, m_mode.width, CV_8UC1);
-      auto dest = AllocImage(VideoMode::kGray, tmpMat.cols, tmpMat.rows,
-                        tmpMat.total());
-      tmpMat.copyTo(dest->AsMat());
-      PutFrame(std::move(dest), wpi::Now());
   m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, NULL, NULL,
                              NULL, NULL);
   return true;
@@ -809,7 +798,6 @@ bool UsbCameraImpl::DeviceStreamOn() {
 
 bool UsbCameraImpl::DeviceStreamOff() {
   m_streaming = false;
-  m_wasStreaming = false;
   return true;
 }
 

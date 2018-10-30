@@ -13,7 +13,12 @@ int main() {
   std::cout << cs::GetHostname() << std::endl;
   cs::UsbCamera camera{"camera", 0};
   cs::MjpegServer server{"server", 1181};
+  camera.SetBrightness(0);
   server.SetSource(camera);
+
+  system("PAUSE");
+
+  camera.SetVideoMode(cs::VideoMode::kYUYV, 1280, 720, 30);
 
   system("PAUSE");
   }
