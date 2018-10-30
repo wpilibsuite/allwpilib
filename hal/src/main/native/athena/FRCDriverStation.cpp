@@ -448,10 +448,7 @@ HAL_Bool HAL_IsNewControlData(void) {
   if (!dsThread) return false;
   auto thr = dsThread->GetThread();
   if (!thr) return false;
-  int currentCount = 0;
-  {
-    currentCount = thr->newDSDataAvailableCounter;
-  }
+  int currentCount = thr->newDSDataAvailableCounter;
   if (lastCount == currentCount) return false;
   lastCount = currentCount;
   return true;
