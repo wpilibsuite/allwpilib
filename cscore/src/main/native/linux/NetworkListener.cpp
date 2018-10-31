@@ -38,6 +38,8 @@ class NetworkListener::Thread : public wpi::SafeThread {
 #endif
 };
 
+NetworkListener::~NetworkListener() { Stop(); }
+
 void NetworkListener::Start() { m_owner.Start(m_logger, m_notifier); }
 
 void NetworkListener::Stop() {
