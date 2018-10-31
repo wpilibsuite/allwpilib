@@ -19,6 +19,7 @@ class NetworkListener {
  public:
   NetworkListener(wpi::Logger& logger, Notifier& notifier)
       : m_logger(logger), m_notifier(notifier) {}
+  ~NetworkListener();
 
   void Start();
   void Stop();
