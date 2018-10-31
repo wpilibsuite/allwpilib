@@ -30,6 +30,7 @@
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
+#include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
@@ -209,14 +210,17 @@ static std::string GetDescriptionImpl(const char* cpath) {
   return std::string{};
 }
 
-UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, const wpi::Twine& path)
-    : SourceImpl{name},
+UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
+                             Notifier& notifier, Telemetry& telemetry,
+                             const wpi::Twine& path)
+    : SourceImpl{name, logger, notifier, telemetry},
       m_path{path.str()},
       m_fd{-1},
       m_command_fd{eventfd(0, 0)},
       m_active{true} {
   SetDescription(GetDescriptionImpl(m_path.c_str()));
   SetQuirks();
+
   CreateProperty(kPropConnectVerbose, [] {
     return std::make_unique<UsbCameraProperty>(kPropConnectVerbose,
                                                kPropConnectVerboseId,
@@ -640,7 +644,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
       DeviceConnect();
     }
     if (wasStreaming) DeviceStreamOn();
-    Notifier::GetInstance().NotifySourceVideoMode(*this, newMode);
+    m_notifier.NotifySourceVideoMode(*this, newMode);
     lock.lock();
   } else if (newMode.fps != m_mode.fps) {
     m_mode = newMode;
@@ -650,7 +654,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
     if (wasStreaming) DeviceStreamOff();
     DeviceSetFPS();
     if (wasStreaming) DeviceStreamOn();
-    Notifier::GetInstance().NotifySourceVideoMode(*this, newMode);
+    m_notifier.NotifySourceVideoMode(*this, newMode);
     lock.lock();
   }
 
@@ -886,7 +890,7 @@ void UsbCameraImpl::DeviceCacheMode() {
   if (formatChanged) DeviceSetMode();
   if (fpsChanged) DeviceSetFPS();
 
-  Notifier::GetInstance().NotifySourceVideoMode(*this, m_mode);
+  m_notifier.NotifySourceVideoMode(*this, m_mode);
 }
 
 void UsbCameraImpl::DeviceCacheProperty(
@@ -1068,7 +1072,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     std::lock_guard<wpi::mutex> lock(m_mutex);
     m_videoModes.swap(modes);
   }
-  Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
+  m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
 }
 
 CS_StatusValue UsbCameraImpl::SendAndWait(Message&& msg) const {
@@ -1259,9 +1263,11 @@ CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
 
 CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
                               CS_Status* status) {
-  auto source = std::make_shared<UsbCameraImpl>(name, path);
-  auto handle = Sources::GetInstance().Allocate(CS_SOURCE_USB, source);
-  Notifier::GetInstance().NotifySource(name, handle, CS_SOURCE_CREATED);
+  auto& inst = Instance::GetInstance();
+  auto source = std::make_shared<UsbCameraImpl>(
+      name, inst.logger, inst.notifier, inst.telemetry, path);
+  auto handle = inst.sources.Allocate(CS_SOURCE_USB, source);
+  inst.notifier.NotifySource(name, handle, CS_SOURCE_CREATED);
   // Start thread after the source created event to ensure other events
   // come after it.
   source->Start();
@@ -1269,7 +1275,7 @@ CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
 }
 
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data || data->kind != CS_SOURCE_USB) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
@@ -1300,7 +1306,7 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
     closedir(dp);
   } else {
     // *status = ;
-    ERROR("Could not open /dev");
+    WPI_ERROR(Instance::GetInstance().logger, "Could not open /dev");
     return retval;
   }
 

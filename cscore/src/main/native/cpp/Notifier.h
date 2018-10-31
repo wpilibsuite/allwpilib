@@ -23,10 +23,7 @@ class Notifier {
   friend class NotifierTest;
 
  public:
-  static Notifier& GetInstance() {
-    static Notifier instance;
-    return instance;
-  }
+  Notifier();
   ~Notifier();
 
   void Start();
@@ -62,8 +59,6 @@ class Notifier {
   void NotifyTelemetryUpdated();
 
  private:
-  Notifier();
-
   class Thread;
   wpi::SafeThreadOwner<Thread> m_owner;
 

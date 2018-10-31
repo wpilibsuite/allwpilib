@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Log.h"
+#include "Instance.h"
 
 #include <wpi/Path.h>
 #include <wpi/SmallString.h>
@@ -38,8 +38,27 @@ static void def_log_func(unsigned int level, const char* file,
   wpi::errs() << oss.str();
 }
 
-Logger::Logger() { SetDefaultLogger(); }
+Instance::Instance() : telemetry(notifier), network_listener(logger, notifier) {
+  SetDefaultLogger();
+}
 
-Logger::~Logger() {}
+Instance::~Instance() {}
 
-void Logger::SetDefaultLogger() { SetLogger(def_log_func); }
+Instance& Instance::GetInstance() {
+  static Instance inst;
+  return inst;
+}
+
+void Instance::SetDefaultLogger() { logger.SetLogger(def_log_func); }
+
+std::pair<CS_Source, std::shared_ptr<SourceData>> Instance::FindSource(
+    const SourceImpl& source) {
+  return sources.FindIf(
+      [&](const SourceData& data) { return data.source.get() == &source; });
+}
+
+std::pair<CS_Sink, std::shared_ptr<SinkData>> Instance::FindSink(
+    const SinkImpl& sink) {
+  return sinks.FindIf(
+      [&](const SinkData& data) { return data.sink.get() == &sink; });
+}

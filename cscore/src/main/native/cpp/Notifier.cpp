@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "Handle.h"
+#include "Instance.h"
 #include "SinkImpl.h"
 #include "SourceImpl.h"
 
@@ -157,7 +158,7 @@ void Notifier::NotifySource(const wpi::Twine& name, CS_Source source,
 }
 
 void Notifier::NotifySource(const SourceImpl& source, CS_EventKind kind) {
-  auto handleData = Sources::GetInstance().Find(source);
+  auto handleData = Instance::GetInstance().FindSource(source);
   NotifySource(source.GetName(), handleData.first, kind);
 }
 
@@ -166,7 +167,7 @@ void Notifier::NotifySourceVideoMode(const SourceImpl& source,
   auto thr = m_owner.GetThread();
   if (!thr) return;
 
-  auto handleData = Sources::GetInstance().Find(source);
+  auto handleData = Instance::GetInstance().FindSource(source);
 
   thr->m_notifications.emplace(source.GetName(), handleData.first, mode);
   thr->m_cond.notify_one();
@@ -179,7 +180,7 @@ void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
   auto thr = m_owner.GetThread();
   if (!thr) return;
 
-  auto handleData = Sources::GetInstance().Find(source);
+  auto handleData = Instance::GetInstance().FindSource(source);
 
   thr->m_notifications.emplace(
       propertyName, handleData.first, static_cast<RawEvent::Kind>(kind),
@@ -198,7 +199,7 @@ void Notifier::NotifySink(const wpi::Twine& name, CS_Sink sink,
 }
 
 void Notifier::NotifySink(const SinkImpl& sink, CS_EventKind kind) {
-  auto handleData = Sinks::GetInstance().Find(sink);
+  auto handleData = Instance::GetInstance().FindSink(sink);
   NotifySink(sink.GetName(), handleData.first, kind);
 }
 
@@ -221,7 +222,7 @@ void Notifier::NotifySinkProperty(const SinkImpl& sink, CS_EventKind kind,
   auto thr = m_owner.GetThread();
   if (!thr) return;
 
-  auto handleData = Sinks::GetInstance().Find(sink);
+  auto handleData = Instance::GetInstance().FindSink(sink);
 
   thr->m_notifications.emplace(
       propertyName, handleData.first, static_cast<RawEvent::Kind>(kind),

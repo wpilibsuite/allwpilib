@@ -14,15 +14,20 @@
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
+#include "Instance.h"
 #include "Notifier.h"
+#include "SourceImpl.h"
 #include "cscore_cpp.h"
 
 using namespace cs;
 
 class Telemetry::Thread : public wpi::SafeThread {
  public:
+  explicit Thread(Notifier& notifier) : m_notifier(notifier) {}
+
   void Main();
 
+  Notifier& m_notifier;
   wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_user;
   wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_current;
   double m_period = 0.0;
@@ -41,11 +46,9 @@ int64_t Telemetry::Thread::GetValue(CS_Handle handle, CS_TelemetryKind kind,
   return it->getSecond();
 }
 
-Telemetry::Telemetry() {}
-
 Telemetry::~Telemetry() {}
 
-void Telemetry::Start() { m_owner.Start(); }
+void Telemetry::Start() { m_owner.Start(m_notifier); }
 
 void Telemetry::Stop() { m_owner.Stop(); }
 
@@ -74,7 +77,7 @@ void Telemetry::Thread::Main() {
     prevTime = curTime;
 
     // notify
-    Notifier::GetInstance().NotifyTelemetryUpdated();
+    m_notifier.NotifyTelemetryUpdated();
   }
 }
 
@@ -117,7 +120,7 @@ double Telemetry::GetAverageValue(CS_Handle handle, CS_TelemetryKind kind,
 void Telemetry::RecordSourceBytes(const SourceImpl& source, int quantity) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  auto handleData = Sources::GetInstance().Find(source);
+  auto handleData = Instance::GetInstance().FindSource(source);
   thr->m_current[std::make_pair(Handle{handleData.first, Handle::kSource},
                                 static_cast<int>(CS_SOURCE_BYTES_RECEIVED))] +=
       quantity;
@@ -126,7 +129,7 @@ void Telemetry::RecordSourceBytes(const SourceImpl& source, int quantity) {
 void Telemetry::RecordSourceFrames(const SourceImpl& source, int quantity) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  auto handleData = Sources::GetInstance().Find(source);
+  auto handleData = Instance::GetInstance().FindSource(source);
   thr->m_current[std::make_pair(Handle{handleData.first, Handle::kSource},
                                 static_cast<int>(CS_SOURCE_FRAMES_RECEIVED))] +=
       quantity;

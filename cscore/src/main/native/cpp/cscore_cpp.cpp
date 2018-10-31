@@ -11,6 +11,7 @@
 #include <wpi/hostname.h>
 
 #include "Handle.h"
+#include "Instance.h"
 #include "Log.h"
 #include "NetworkListener.h"
 #include "Notifier.h"
@@ -27,7 +28,7 @@ static std::shared_ptr<PropertyContainer> GetPropertyContainer(
   Handle handle{propertyHandle};
   if (handle.IsType(Handle::kProperty)) {
     int i = handle.GetParentIndex();
-    auto data = Sources::GetInstance().Get(Handle{i, Handle::kSource});
+    auto data = Instance::GetInstance().sources.Get(Handle{i, Handle::kSource});
     if (!data) {
       *status = CS_INVALID_HANDLE;
       return nullptr;
@@ -35,7 +36,7 @@ static std::shared_ptr<PropertyContainer> GetPropertyContainer(
     container = data->source;
   } else if (handle.IsType(Handle::kSinkProperty)) {
     int i = handle.GetParentIndex();
-    auto data = Sinks::GetInstance().Get(Handle{i, Handle::kSink});
+    auto data = Instance::GetInstance().sinks.Get(Handle{i, Handle::kSink});
     if (!data) {
       *status = CS_INVALID_HANDLE;
       return nullptr;
@@ -159,7 +160,7 @@ std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
 //
 
 CS_SourceKind GetSourceKind(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return CS_SOURCE_UNKNOWN;
@@ -168,7 +169,7 @@ CS_SourceKind GetSourceKind(CS_Source source, CS_Status* status) {
 }
 
 std::string GetSourceName(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
@@ -178,7 +179,7 @@ std::string GetSourceName(CS_Source source, CS_Status* status) {
 
 wpi::StringRef GetSourceName(CS_Source source, wpi::SmallVectorImpl<char>& buf,
                              CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return wpi::StringRef{};
@@ -187,7 +188,7 @@ wpi::StringRef GetSourceName(CS_Source source, wpi::SmallVectorImpl<char>& buf,
 }
 
 std::string GetSourceDescription(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
@@ -199,7 +200,7 @@ std::string GetSourceDescription(CS_Source source, CS_Status* status) {
 wpi::StringRef GetSourceDescription(CS_Source source,
                                     wpi::SmallVectorImpl<char>& buf,
                                     CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return wpi::StringRef{};
@@ -208,7 +209,7 @@ wpi::StringRef GetSourceDescription(CS_Source source,
 }
 
 uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return 0;
@@ -219,7 +220,7 @@ uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
 void SetSourceConnectionStrategy(CS_Source source,
                                  CS_ConnectionStrategy strategy,
                                  CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return;
@@ -228,7 +229,7 @@ void SetSourceConnectionStrategy(CS_Source source,
 }
 
 bool IsSourceConnected(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return false;
@@ -237,7 +238,7 @@ bool IsSourceConnected(CS_Source source, CS_Status* status) {
 }
 
 bool IsSourceEnabled(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return false;
@@ -247,7 +248,7 @@ bool IsSourceEnabled(CS_Source source, CS_Status* status) {
 
 CS_Property GetSourceProperty(CS_Source source, const wpi::Twine& name,
                               CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return 0;
@@ -263,7 +264,7 @@ CS_Property GetSourceProperty(CS_Source source, const wpi::Twine& name,
 wpi::ArrayRef<CS_Property> EnumerateSourceProperties(
     CS_Source source, wpi::SmallVectorImpl<CS_Property>& vec,
     CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return 0;
@@ -276,7 +277,7 @@ wpi::ArrayRef<CS_Property> EnumerateSourceProperties(
 }
 
 VideoMode GetSourceVideoMode(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return VideoMode{};
@@ -286,7 +287,7 @@ VideoMode GetSourceVideoMode(CS_Source source, CS_Status* status) {
 
 bool SetSourceVideoMode(CS_Source source, const VideoMode& mode,
                         CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return false;
@@ -296,7 +297,7 @@ bool SetSourceVideoMode(CS_Source source, const VideoMode& mode,
 
 bool SetSourcePixelFormat(CS_Source source, VideoMode::PixelFormat pixelFormat,
                           CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return false;
@@ -306,7 +307,7 @@ bool SetSourcePixelFormat(CS_Source source, VideoMode::PixelFormat pixelFormat,
 
 bool SetSourceResolution(CS_Source source, int width, int height,
                          CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return false;
@@ -315,7 +316,7 @@ bool SetSourceResolution(CS_Source source, int width, int height,
 }
 
 bool SetSourceFPS(CS_Source source, int fps, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return false;
@@ -325,7 +326,7 @@ bool SetSourceFPS(CS_Source source, int fps, CS_Status* status) {
 
 std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
                                                  CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return std::vector<VideoMode>{};
@@ -336,13 +337,14 @@ std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
 wpi::ArrayRef<CS_Sink> EnumerateSourceSinks(CS_Source source,
                                             wpi::SmallVectorImpl<CS_Sink>& vec,
                                             CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto& inst = Instance::GetInstance();
+  auto data = inst.sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return wpi::ArrayRef<CS_Sink>{};
   }
   vec.clear();
-  Sinks::GetInstance().ForEach([&](CS_Sink sinkHandle, const SinkData& data) {
+  inst.sinks.ForEach([&](CS_Sink sinkHandle, const SinkData& data) {
     if (source == data.sourceHandle.load()) vec.push_back(sinkHandle);
   });
   return vec;
@@ -350,7 +352,7 @@ wpi::ArrayRef<CS_Sink> EnumerateSourceSinks(CS_Source source,
 
 CS_Source CopySource(CS_Source source, CS_Status* status) {
   if (source == 0) return 0;
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return 0;
@@ -361,16 +363,16 @@ CS_Source CopySource(CS_Source source, CS_Status* status) {
 
 void ReleaseSource(CS_Source source, CS_Status* status) {
   if (source == 0) return;
-  auto& inst = Sources::GetInstance();
-  auto data = inst.Get(source);
+  auto& inst = Instance::GetInstance();
+  auto data = inst.sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return;
   }
   if (data->refCount-- == 0) {
-    Notifier::GetInstance().NotifySource(data->source->GetName(), source,
-                                         CS_SOURCE_DESTROYED);
-    inst.Free(source);
+    inst.notifier.NotifySource(data->source->GetName(), source,
+                               CS_SOURCE_DESTROYED);
+    inst.sources.Free(source);
   }
 }
 
@@ -379,7 +381,7 @@ void ReleaseSource(CS_Source source, CS_Status* status) {
 //
 
 void SetCameraBrightness(CS_Source source, int brightness, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return;
@@ -388,7 +390,7 @@ void SetCameraBrightness(CS_Source source, int brightness, CS_Status* status) {
 }
 
 int GetCameraBrightness(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return 0;
@@ -397,7 +399,7 @@ int GetCameraBrightness(CS_Source source, CS_Status* status) {
 }
 
 void SetCameraWhiteBalanceAuto(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return;
@@ -406,7 +408,7 @@ void SetCameraWhiteBalanceAuto(CS_Source source, CS_Status* status) {
 }
 
 void SetCameraWhiteBalanceHoldCurrent(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return;
@@ -416,7 +418,7 @@ void SetCameraWhiteBalanceHoldCurrent(CS_Source source, CS_Status* status) {
 
 void SetCameraWhiteBalanceManual(CS_Source source, int value,
                                  CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return;
@@ -425,7 +427,7 @@ void SetCameraWhiteBalanceManual(CS_Source source, int value,
 }
 
 void SetCameraExposureAuto(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return;
@@ -434,7 +436,7 @@ void SetCameraExposureAuto(CS_Source source, CS_Status* status) {
 }
 
 void SetCameraExposureHoldCurrent(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return;
@@ -443,7 +445,7 @@ void SetCameraExposureHoldCurrent(CS_Source source, CS_Status* status) {
 }
 
 void SetCameraExposureManual(CS_Source source, int value, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return;
@@ -456,7 +458,7 @@ void SetCameraExposureManual(CS_Source source, int value, CS_Status* status) {
 //
 
 CS_SinkKind GetSinkKind(CS_Sink sink, CS_Status* status) {
-  auto data = Sinks::GetInstance().Get(sink);
+  auto data = Instance::GetInstance().sinks.Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return CS_SINK_UNKNOWN;
@@ -465,7 +467,7 @@ CS_SinkKind GetSinkKind(CS_Sink sink, CS_Status* status) {
 }
 
 std::string GetSinkName(CS_Sink sink, CS_Status* status) {
-  auto data = Sinks::GetInstance().Get(sink);
+  auto data = Instance::GetInstance().sinks.Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
@@ -475,7 +477,7 @@ std::string GetSinkName(CS_Sink sink, CS_Status* status) {
 
 wpi::StringRef GetSinkName(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                            CS_Status* status) {
-  auto data = Sinks::GetInstance().Get(sink);
+  auto data = Instance::GetInstance().sinks.Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return wpi::StringRef{};
@@ -484,7 +486,7 @@ wpi::StringRef GetSinkName(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
 }
 
 std::string GetSinkDescription(CS_Sink sink, CS_Status* status) {
-  auto data = Sinks::GetInstance().Get(sink);
+  auto data = Instance::GetInstance().sinks.Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
@@ -495,7 +497,7 @@ std::string GetSinkDescription(CS_Sink sink, CS_Status* status) {
 
 wpi::StringRef GetSinkDescription(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                                   CS_Status* status) {
-  auto data = Sinks::GetInstance().Get(sink);
+  auto data = Instance::GetInstance().sinks.Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return wpi::StringRef{};
@@ -505,7 +507,7 @@ wpi::StringRef GetSinkDescription(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
 
 CS_Property GetSinkProperty(CS_Sink sink, const wpi::Twine& name,
                             CS_Status* status) {
-  auto data = Sinks::GetInstance().Get(sink);
+  auto data = Instance::GetInstance().sinks.Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return 0;
@@ -520,7 +522,7 @@ CS_Property GetSinkProperty(CS_Sink sink, const wpi::Twine& name,
 
 wpi::ArrayRef<CS_Property> EnumerateSinkProperties(
     CS_Sink sink, wpi::SmallVectorImpl<CS_Property>& vec, CS_Status* status) {
-  auto data = Sinks::GetInstance().Get(sink);
+  auto data = Instance::GetInstance().sinks.Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return 0;
@@ -532,7 +534,7 @@ wpi::ArrayRef<CS_Property> EnumerateSinkProperties(
 }
 
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
-  auto data = Sinks::GetInstance().Get(sink);
+  auto data = Instance::GetInstance().sinks.Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return;
@@ -540,7 +542,7 @@ void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
   if (source == 0) {
     data->sink->SetSource(nullptr);
   } else {
-    auto sourceData = Sources::GetInstance().Get(source);
+    auto sourceData = Instance::GetInstance().sources.Get(source);
     if (!sourceData) {
       *status = CS_INVALID_HANDLE;
       return;
@@ -548,12 +550,12 @@ void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
     data->sink->SetSource(sourceData->source);
   }
   data->sourceHandle.store(source);
-  Notifier::GetInstance().NotifySinkSourceChanged(data->sink->GetName(), sink,
-                                                  source);
+  Instance::GetInstance().notifier.NotifySinkSourceChanged(
+      data->sink->GetName(), sink, source);
 }
 
 CS_Source GetSinkSource(CS_Sink sink, CS_Status* status) {
-  auto data = Sinks::GetInstance().Get(sink);
+  auto data = Instance::GetInstance().sinks.Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return 0;
@@ -563,7 +565,7 @@ CS_Source GetSinkSource(CS_Sink sink, CS_Status* status) {
 
 CS_Property GetSinkSourceProperty(CS_Sink sink, const wpi::Twine& name,
                                   CS_Status* status) {
-  auto data = Sinks::GetInstance().Get(sink);
+  auto data = Instance::GetInstance().sinks.Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return 0;
@@ -573,7 +575,7 @@ CS_Property GetSinkSourceProperty(CS_Sink sink, const wpi::Twine& name,
 
 CS_Sink CopySink(CS_Sink sink, CS_Status* status) {
   if (sink == 0) return 0;
-  auto data = Sinks::GetInstance().Get(sink);
+  auto data = Instance::GetInstance().sinks.Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return 0;
@@ -584,16 +586,15 @@ CS_Sink CopySink(CS_Sink sink, CS_Status* status) {
 
 void ReleaseSink(CS_Sink sink, CS_Status* status) {
   if (sink == 0) return;
-  auto& inst = Sinks::GetInstance();
-  auto data = inst.Get(sink);
+  auto& inst = Instance::GetInstance();
+  auto data = inst.sinks.Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return;
   }
   if (data->refCount-- == 0) {
-    Notifier::GetInstance().NotifySink(data->sink->GetName(), sink,
-                                       CS_SINK_DESTROYED);
-    inst.Free(sink);
+    inst.notifier.NotifySink(data->sink->GetName(), sink, CS_SINK_DESTROYED);
+    inst.sinks.Free(sink);
   }
 }
 
@@ -602,22 +603,22 @@ void ReleaseSink(CS_Sink sink, CS_Status* status) {
 //
 
 void SetListenerOnStart(std::function<void()> onStart) {
-  Notifier::GetInstance().SetOnStart(onStart);
+  Instance::GetInstance().notifier.SetOnStart(onStart);
 }
 
 void SetListenerOnExit(std::function<void()> onExit) {
-  Notifier::GetInstance().SetOnExit(onExit);
+  Instance::GetInstance().notifier.SetOnExit(onExit);
 }
 
 CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
                         int eventMask, bool immediateNotify,
                         CS_Status* status) {
-  int uid = Notifier::GetInstance().AddListener(callback, eventMask);
+  auto& inst = Instance::GetInstance();
+  int uid = inst.notifier.AddListener(callback, eventMask);
   if ((eventMask & CS_NETWORK_INTERFACES_CHANGED) != 0) {
     // start network interface event listener
-    NetworkListener::GetInstance().Start();
-    if (immediateNotify)
-      Notifier::GetInstance().NotifyNetworkInterfacesChanged();
+    inst.network_listener.Start();
+    if (immediateNotify) inst.notifier.NotifyNetworkInterfacesChanged();
   }
   if (immediateNotify) {
     // TODO
@@ -631,7 +632,7 @@ void RemoveListener(CS_Listener handle, CS_Status* status) {
     *status = CS_INVALID_HANDLE;
     return;
   }
-  Notifier::GetInstance().RemoveListener(uid);
+  Instance::GetInstance().notifier.RemoveListener(uid);
 }
 
 bool NotifierDestroyed() { return Notifier::destroyed(); }
@@ -640,37 +641,39 @@ bool NotifierDestroyed() { return Notifier::destroyed(); }
 // Telemetry Functions
 //
 void SetTelemetryPeriod(double seconds) {
-  Telemetry::GetInstance().Start();
-  Telemetry::GetInstance().SetPeriod(seconds);
+  auto& inst = Instance::GetInstance();
+  inst.telemetry.Start();
+  inst.telemetry.SetPeriod(seconds);
 }
 
 double GetTelemetryElapsedTime() {
-  return Telemetry::GetInstance().GetElapsedTime();
+  return Instance::GetInstance().telemetry.GetElapsedTime();
 }
 
 int64_t GetTelemetryValue(CS_Handle handle, CS_TelemetryKind kind,
                           CS_Status* status) {
-  return Telemetry::GetInstance().GetValue(handle, kind, status);
+  return Instance::GetInstance().telemetry.GetValue(handle, kind, status);
 }
 
 double GetTelemetryAverageValue(CS_Handle handle, CS_TelemetryKind kind,
                                 CS_Status* status) {
-  return Telemetry::GetInstance().GetAverageValue(handle, kind, status);
+  return Instance::GetInstance().telemetry.GetAverageValue(handle, kind,
+                                                           status);
 }
 
 //
 // Logging Functions
 //
 void SetLogger(LogFunc func, unsigned int min_level) {
-  Logger& logger = Logger::GetInstance();
+  auto& logger = Instance::GetInstance().logger;
   logger.SetLogger(func);
   logger.set_min_level(min_level);
 }
 
 void SetDefaultLogger(unsigned int min_level) {
-  Logger& logger = Logger::GetInstance();
-  logger.SetDefaultLogger();
-  logger.set_min_level(min_level);
+  auto& inst = Instance::GetInstance();
+  inst.SetDefaultLogger();
+  inst.logger.set_min_level(min_level);
 }
 
 //
@@ -679,12 +682,12 @@ void SetDefaultLogger(unsigned int min_level) {
 
 wpi::ArrayRef<CS_Source> EnumerateSourceHandles(
     wpi::SmallVectorImpl<CS_Source>& vec, CS_Status* status) {
-  return Sources::GetInstance().GetAll(vec);
+  return Instance::GetInstance().sources.GetAll(vec);
 }
 
 wpi::ArrayRef<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
                                             CS_Status* status) {
-  return Sinks::GetInstance().GetAll(vec);
+  return Instance::GetInstance().sinks.GetAll(vec);
 }
 
 std::string GetHostname() { return wpi::GetHostname(); }

@@ -13,6 +13,7 @@
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
+#include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
@@ -21,8 +22,10 @@
 
 using namespace cs;
 
-HttpCameraImpl::HttpCameraImpl(const wpi::Twine& name, CS_HttpCameraKind kind)
-    : SourceImpl{name}, m_kind{kind} {}
+HttpCameraImpl::HttpCameraImpl(const wpi::Twine& name, CS_HttpCameraKind kind,
+                               wpi::Logger& logger, Notifier& notifier,
+                               Telemetry& telemetry)
+    : SourceImpl{name, logger, notifier, telemetry}, m_kind{kind} {}
 
 HttpCameraImpl::~HttpCameraImpl() {
   m_active = false;
@@ -106,8 +109,8 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   }
 
   // Try to connect
-  auto stream = wpi::TCPConnector::connect(req.host.c_str(), req.port,
-                                           Logger::GetInstance(), 1);
+  auto stream =
+      wpi::TCPConnector::connect(req.host.c_str(), req.port, m_logger, 1);
 
   if (!m_active || !stream) return nullptr;
 
@@ -268,8 +271,8 @@ void HttpCameraImpl::SettingsThreadMain() {
 
 void HttpCameraImpl::DeviceSendSettings(wpi::HttpRequest& req) {
   // Try to connect
-  auto stream = wpi::TCPConnector::connect(req.host.c_str(), req.port,
-                                           Logger::GetInstance(), 1);
+  auto stream =
+      wpi::TCPConnector::connect(req.host.c_str(), req.port, m_logger, 1);
 
   if (!m_active || !stream) return;
 
@@ -332,9 +335,9 @@ void HttpCameraImpl::CreateProperty(const wpi::Twine& name,
       name, httpParam, viaSettings, kind, minimum, maximum, step, defaultValue,
       value));
 
-  Notifier::GetInstance().NotifySourceProperty(
-      *this, CS_SOURCE_PROPERTY_CREATED, name, m_propertyData.size() + 1, kind,
-      value, wpi::Twine{});
+  m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, name,
+                                  m_propertyData.size() + 1, kind, value,
+                                  wpi::Twine{});
 }
 
 template <typename T>
@@ -350,12 +353,12 @@ void HttpCameraImpl::CreateEnumProperty(
   enumChoices.clear();
   for (const auto& choice : choices) enumChoices.emplace_back(choice);
 
-  Notifier::GetInstance().NotifySourceProperty(
-      *this, CS_SOURCE_PROPERTY_CREATED, name, m_propertyData.size() + 1,
-      CS_PROP_ENUM, value, wpi::Twine{});
-  Notifier::GetInstance().NotifySourceProperty(
-      *this, CS_SOURCE_PROPERTY_CHOICES_UPDATED, name,
-      m_propertyData.size() + 1, CS_PROP_ENUM, value, wpi::Twine{});
+  m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, name,
+                                  m_propertyData.size() + 1, CS_PROP_ENUM,
+                                  value, wpi::Twine{});
+  m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
+                                  name, m_propertyData.size() + 1, CS_PROP_ENUM,
+                                  value, wpi::Twine{});
 }
 
 std::unique_ptr<PropertyImpl> HttpCameraImpl::CreateEmptyProperty(
@@ -466,19 +469,21 @@ namespace cs {
 
 CS_Source CreateHttpCamera(const wpi::Twine& name, const wpi::Twine& url,
                            CS_HttpCameraKind kind, CS_Status* status) {
+  auto& inst = Instance::GetInstance();
   std::shared_ptr<HttpCameraImpl> source;
   switch (kind) {
     case CS_HTTP_AXIS:
-      source = std::make_shared<AxisCameraImpl>(name);
+      source = std::make_shared<AxisCameraImpl>(name, inst.logger,
+                                                inst.notifier, inst.telemetry);
       break;
     default:
-      source = std::make_shared<HttpCameraImpl>(name, kind);
+      source = std::make_shared<HttpCameraImpl>(name, kind, inst.logger,
+                                                inst.notifier, inst.telemetry);
       break;
   }
   if (!source->SetUrls(url.str(), status)) return 0;
-  auto handle = Sources::GetInstance().Allocate(CS_SOURCE_HTTP, source);
-  auto& notifier = Notifier::GetInstance();
-  notifier.NotifySource(name, handle, CS_SOURCE_CREATED);
+  auto handle = inst.sources.Allocate(CS_SOURCE_HTTP, source);
+  inst.notifier.NotifySource(name, handle, CS_SOURCE_CREATED);
   source->Start();
   return handle;
 }
@@ -486,21 +491,22 @@ CS_Source CreateHttpCamera(const wpi::Twine& name, const wpi::Twine& url,
 CS_Source CreateHttpCamera(const wpi::Twine& name,
                            wpi::ArrayRef<std::string> urls,
                            CS_HttpCameraKind kind, CS_Status* status) {
+  auto& inst = Instance::GetInstance();
   if (urls.empty()) {
     *status = CS_EMPTY_VALUE;
     return 0;
   }
-  auto source = std::make_shared<HttpCameraImpl>(name, kind);
+  auto source = std::make_shared<HttpCameraImpl>(name, kind, inst.logger,
+                                                 inst.notifier, inst.telemetry);
   if (!source->SetUrls(urls, status)) return 0;
-  auto handle = Sources::GetInstance().Allocate(CS_SOURCE_HTTP, source);
-  auto& notifier = Notifier::GetInstance();
-  notifier.NotifySource(name, handle, CS_SOURCE_CREATED);
+  auto handle = inst.sources.Allocate(CS_SOURCE_HTTP, source);
+  inst.notifier.NotifySource(name, handle, CS_SOURCE_CREATED);
   source->Start();
   return handle;
 }
 
 CS_HttpCameraKind GetHttpCameraKind(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data || data->kind != CS_SOURCE_HTTP) {
     *status = CS_INVALID_HANDLE;
     return CS_HTTP_UNKNOWN;
@@ -514,7 +520,7 @@ void SetHttpCameraUrls(CS_Source source, wpi::ArrayRef<std::string> urls,
     *status = CS_EMPTY_VALUE;
     return;
   }
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data || data->kind != CS_SOURCE_HTTP) {
     *status = CS_INVALID_HANDLE;
     return;
@@ -524,7 +530,7 @@ void SetHttpCameraUrls(CS_Source source, wpi::ArrayRef<std::string> urls,
 
 std::vector<std::string> GetHttpCameraUrls(CS_Source source,
                                            CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = Instance::GetInstance().sources.Get(source);
   if (!data || data->kind != CS_SOURCE_HTTP) {
     *status = CS_INVALID_HANDLE;
     return std::vector<std::string>{};
