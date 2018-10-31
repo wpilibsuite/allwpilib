@@ -308,6 +308,8 @@ static bool killExistingProgram(int timeout, int mode) {
       std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
       if (kill(pid, 0) == 0) {
         // still not successfull
+        wpi::outs() << "FRC pid " << pid << " did not die within " << timeout
+                      << "ms. Force killing with kill -9\n";
         // Force kill -9
         kill(pid, SIGKILL);
         // Give a bit of time for the kill to take place
