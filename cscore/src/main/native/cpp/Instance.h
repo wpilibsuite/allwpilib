@@ -50,6 +50,7 @@ class Instance {
   ~Instance();
 
   static Instance& GetInstance();
+  static Instance* GetInstancePtr();
 
   UnlimitedHandleResource<Handle, SourceData, Handle::kSource> sources;
   UnlimitedHandleResource<Handle, SinkData, Handle::kSink> sinks;

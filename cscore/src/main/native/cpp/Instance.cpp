@@ -44,8 +44,10 @@ Instance::Instance() : telemetry(notifier), network_listener(logger, notifier) {
 
 Instance::~Instance() {}
 
-Instance& Instance::GetInstance() {
-  static Instance inst;
+Instance& Instance::GetInstance() { return *Instance::GetInstancePtr(); }
+
+Instance* Instance::GetInstancePtr() {
+  static Instance* inst = new Instance();
   return inst;
 }
 
@@ -62,3 +64,17 @@ std::pair<CS_Sink, std::shared_ptr<SinkData>> Instance::FindSink(
   return sinks.FindIf(
       [&](const SinkData& data) { return data.sink.get() == &sink; });
 }
+
+namespace cs {
+void Initialize() { Instance::GetInstancePtr(); }
+
+void Shutdown() {
+  Instance* ptr = Instance::GetInstancePtr();
+  delete ptr;
+}
+}  // namespace cs
+
+extern "C" {
+void CS_Initialize(void) { cs::Initialize(); }
+void CS_Shutdown(void) { cs::Shutdown(); }
+}  // extern "C"

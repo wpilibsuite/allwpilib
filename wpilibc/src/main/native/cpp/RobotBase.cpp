@@ -10,6 +10,7 @@
 #include <cstdio>
 
 #include <cameraserver/CameraServerShared.h>
+#include <cscore.h>
 #include <hal/HAL.h>
 #include <networktables/NetworkTableInstance.h>
 
@@ -91,6 +92,8 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
   SetupCameraServerShared();
 
+  cs::Initialize();
+
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.SetNetworkIdentity("Robot");
   inst.StartServer("/home/lvuser/networktables.ini");
@@ -116,5 +119,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 }
 
 RobotBase::RobotBase(RobotBase&&) : m_ds(DriverStation::GetInstance()) {}
+
+RobotBase::~RobotBase() { cs::Shutdown(); }
 
 RobotBase& RobotBase::operator=(RobotBase&&) { return *this; }
