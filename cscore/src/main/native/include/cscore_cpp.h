@@ -378,10 +378,9 @@ void SetDefaultLogger(unsigned int min_level);
 /** @} */
 
 /**
- * @defgroup cscore_init_func Library Initialization Functions
+ * @defgroup cscore_shutdown_func Library Shutdown Function
  * @{
  */
-void Initialize();
 void Shutdown();
 /** @} */
 

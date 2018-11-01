@@ -7,12 +7,16 @@
 
 #include "Instance.h"
 
+#include <atomic>
+
 #include <wpi/Path.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
 
 using namespace cs;
+
+static std::atomic<Instance*> instance{nullptr};
 
 static void def_log_func(unsigned int level, const char* file,
                          unsigned int line, const char* msg) {
@@ -39,16 +43,15 @@ static void def_log_func(unsigned int level, const char* file,
 }
 
 Instance::Instance() : telemetry(notifier), network_listener(logger, notifier) {
+  instance = this;
   SetDefaultLogger();
 }
 
 Instance::~Instance() {}
 
-Instance& Instance::GetInstance() { return *Instance::GetInstancePtr(); }
-
-Instance* Instance::GetInstancePtr() {
+Instance& Instance::GetInstance() {
   static Instance* inst = new Instance();
-  return inst;
+  return *inst;
 }
 
 void Instance::SetDefaultLogger() { logger.SetLogger(def_log_func); }
@@ -66,15 +69,15 @@ std::pair<CS_Sink, std::shared_ptr<SinkData>> Instance::FindSink(
 }
 
 namespace cs {
-void Initialize() { Instance::GetInstancePtr(); }
 
 void Shutdown() {
-  Instance* ptr = Instance::GetInstancePtr();
-  delete ptr;
+  auto tmp = instance.exchange(nullptr);
+  if (tmp) {
+    delete instance;
+  }
 }
 }  // namespace cs
 
 extern "C" {
-void CS_Initialize(void) { cs::Initialize(); }
 void CS_Shutdown(void) { cs::Shutdown(); }
 }  // extern "C"

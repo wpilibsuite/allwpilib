@@ -82,7 +82,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   // Initial configuration of listener start/exit
   cs::SetListenerOnStart(ListenerOnStart);
   cs::SetListenerOnExit(ListenerOnExit);
-  cs::Initialize();
 
   return JNI_VERSION_1_6;
 }

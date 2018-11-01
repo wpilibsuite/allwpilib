@@ -92,8 +92,6 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
   SetupCameraServerShared();
 
-  cs::Initialize();
-
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.SetNetworkIdentity("Robot");
   inst.StartServer("/home/lvuser/networktables.ini");
