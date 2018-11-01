@@ -7,12 +7,18 @@
 
 #include "SinkImpl.h"
 
+#include "Instance.h"
 #include "Notifier.h"
 #include "SourceImpl.h"
 
 using namespace cs;
 
-SinkImpl::SinkImpl(const wpi::Twine& name) : m_name{name.str()} {}
+SinkImpl::SinkImpl(const wpi::Twine& name, wpi::Logger& logger,
+                   Notifier& notifier, Telemetry& telemetry)
+    : m_logger(logger),
+      m_notifier(notifier),
+      m_telemetry(telemetry),
+      m_name{name.str()} {}
 
 SinkImpl::~SinkImpl() {
   if (m_source) {
@@ -37,7 +43,7 @@ void SinkImpl::Enable() {
   ++m_enabledCount;
   if (m_enabledCount == 1) {
     if (m_source) m_source->EnableSink();
-    Notifier::GetInstance().NotifySink(*this, CS_SINK_ENABLED);
+    m_notifier.NotifySink(*this, CS_SINK_ENABLED);
   }
 }
 
@@ -46,7 +52,7 @@ void SinkImpl::Disable() {
   --m_enabledCount;
   if (m_enabledCount == 0) {
     if (m_source) m_source->DisableSink();
-    Notifier::GetInstance().NotifySink(*this, CS_SINK_DISABLED);
+    m_notifier.NotifySink(*this, CS_SINK_DISABLED);
   }
 }
 
@@ -55,11 +61,11 @@ void SinkImpl::SetEnabled(bool enabled) {
   if (enabled && m_enabledCount == 0) {
     if (m_source) m_source->EnableSink();
     m_enabledCount = 1;
-    Notifier::GetInstance().NotifySink(*this, CS_SINK_ENABLED);
+    m_notifier.NotifySink(*this, CS_SINK_ENABLED);
   } else if (!enabled && m_enabledCount > 0) {
     if (m_source) m_source->DisableSink();
     m_enabledCount = 0;
-    Notifier::GetInstance().NotifySink(*this, CS_SINK_DISABLED);
+    m_notifier.NotifySink(*this, CS_SINK_DISABLED);
   }
 }
 
@@ -97,15 +103,14 @@ wpi::StringRef SinkImpl::GetError(wpi::SmallVectorImpl<char>& buf) const {
 }
 
 void SinkImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
-  auto& notifier = Notifier::GetInstance();
-  notifier.NotifySinkProperty(*this, CS_SINK_PROPERTY_CREATED, prop.name,
-                              propIndex, prop.propKind, prop.value,
-                              prop.valueStr);
+  m_notifier.NotifySinkProperty(*this, CS_SINK_PROPERTY_CREATED, prop.name,
+                                propIndex, prop.propKind, prop.value,
+                                prop.valueStr);
   // also notify choices updated event for enum types
   if (prop.propKind == CS_PROP_ENUM)
-    notifier.NotifySinkProperty(*this, CS_SINK_PROPERTY_CHOICES_UPDATED,
-                                prop.name, propIndex, prop.propKind, prop.value,
-                                wpi::Twine{});
+    m_notifier.NotifySinkProperty(*this, CS_SINK_PROPERTY_CHOICES_UPDATED,
+                                  prop.name, propIndex, prop.propKind,
+                                  prop.value, wpi::Twine{});
 }
 
 void SinkImpl::UpdatePropertyValue(int property, bool setString, int value,
@@ -119,10 +124,11 @@ void SinkImpl::UpdatePropertyValue(int property, bool setString, int value,
     prop->SetValue(value);
 
   // Only notify updates after we've notified created
-  if (m_properties_cached)
-    Notifier::GetInstance().NotifySinkProperty(
-        *this, CS_SINK_PROPERTY_VALUE_UPDATED, prop->name, property,
-        prop->propKind, prop->value, prop->valueStr);
+  if (m_properties_cached) {
+    m_notifier.NotifySinkProperty(*this, CS_SINK_PROPERTY_VALUE_UPDATED,
+                                  prop->name, property, prop->propKind,
+                                  prop->value, prop->valueStr);
+  }
 }
 
 void SinkImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {}

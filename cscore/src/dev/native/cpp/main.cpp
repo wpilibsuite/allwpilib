@@ -8,17 +8,15 @@
 #include <iostream>
 
 #include "cscore.h"
+#include <thread>
 
 int main() {
   std::cout << cs::GetHostname() << std::endl;
-  cs::UsbCamera camera{"camera", 0};
-  cs::MjpegServer server{"server", 1181};
-  camera.SetBrightness(0);
-  server.SetSource(camera);
 
-  system("PAUSE");
+  CS_Status status = 0;
+  auto cam = cs::CreateUsbCameraDev("Camera", 0, &status);
 
-  camera.SetVideoMode(cs::VideoMode::kYUYV, 1280, 720, 30);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-  system("PAUSE");
-  }
+  //cs::ReleaseSource(cam, &status);
+}

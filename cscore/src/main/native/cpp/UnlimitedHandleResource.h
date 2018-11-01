@@ -163,20 +163,6 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::FindIf(F func) {
   return std::make_pair(0, nullptr);
 }
 
-template <typename THandle, typename TStruct, int typeValue,
-          typename TMutex = wpi::mutex>
-class StaticUnlimitedHandleResource
-    : public UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex> {
- public:
-  static StaticUnlimitedHandleResource& GetInstance() {
-    static StaticUnlimitedHandleResource instance;
-    return instance;
-  }
-
- private:
-  StaticUnlimitedHandleResource() = default;
-};
-
 }  // namespace cs
 
 #endif  // CSCORE_UNLIMITEDHANDLERESOURCE_H_

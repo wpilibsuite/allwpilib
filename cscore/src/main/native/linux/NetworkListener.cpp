@@ -29,8 +29,12 @@ namespace {
 
 class NetworkListenerThread : public wpi::SafeThread {
  public:
+  NetworkListenerThread(wpi::Logger& logger, Notifier& notifier)
+      : m_logger(logger), m_notifier(notifier) {}
   void Main();
 
+  wpi::Logger& m_logger;
+  Notifier& m_notifier;
   int m_command_fd = -1;
 };
 
@@ -41,14 +45,14 @@ class NetworkListener::Pimpl {
   wpi::SafeThreadOwner<NetworkListenerThread> m_owner;
 };
 
-NetworkListener::NetworkListener() { m_data = std::make_unique<Pimpl>(); }
+NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
+    : m_logger(logger), m_notifier(notifier) {
+  m_data = std::make_unique<Pimpl>();
+}
 
 NetworkListener::~NetworkListener() { Stop(); }
 
-void NetworkListener::Start() {
-  auto thr = m_data->m_owner.GetThread();
-  if (!thr) m_data->m_owner.Start();
-}
+void NetworkListener::Start() { m_data->m_owner.Start(m_logger, m_notifier); }
 
 void NetworkListener::Stop() {
   // Wake up thread
@@ -131,7 +135,7 @@ void NetworkListenerThread::Main() {
       if (nh->nlmsg_type == NLMSG_DONE) break;
       if (nh->nlmsg_type == RTM_NEWLINK || nh->nlmsg_type == RTM_DELLINK ||
           nh->nlmsg_type == RTM_NEWADDR || nh->nlmsg_type == RTM_DELADDR) {
-        Notifier::GetInstance().NotifyNetworkInterfacesChanged();
+        m_notifier.NotifyNetworkInterfacesChanged();
       }
     }
   }

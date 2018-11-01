@@ -15,23 +15,29 @@
 #include <vector>
 
 #include <wpi/ArrayRef.h>
+#include <wpi/Logger.h>
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
 #include "Frame.h"
+#include "Handle.h"
 #include "Image.h"
 #include "PropertyContainer.h"
 #include "cscore_cpp.h"
 
 namespace cs {
 
+class Notifier;
+class Telemetry;
+
 class SourceImpl : public PropertyContainer {
   friend class Frame;
 
  public:
-  explicit SourceImpl(const wpi::Twine& name);
+  SourceImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+             Telemetry& telemetry);
   virtual ~SourceImpl();
   SourceImpl(const SourceImpl& oth) = delete;
   SourceImpl& operator=(const SourceImpl& oth) = delete;
@@ -145,6 +151,10 @@ class SourceImpl : public PropertyContainer {
   mutable std::vector<VideoMode> m_videoModes;
   // Current video mode
   mutable VideoMode m_mode;
+
+  wpi::Logger& m_logger;
+  Notifier& m_notifier;
+  Telemetry& m_telemetry;
 
  private:
   void ReleaseImage(std::unique_ptr<Image> image);

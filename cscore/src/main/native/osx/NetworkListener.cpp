@@ -14,7 +14,10 @@ using namespace cs;
 
 class NetworkListener::Pimpl {};
 
-NetworkListener::NetworkListener() { m_data = std::make_unique<Pimpl>(); }
+NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
+    : m_logger(logger), m_notifier(notifier) {
+  m_data = std::make_unique<Pimpl>();
+}
 
 NetworkListener::~NetworkListener() { Stop(); }
 

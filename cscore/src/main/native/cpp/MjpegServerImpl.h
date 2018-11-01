@@ -31,8 +31,10 @@ class SourceImpl;
 
 class MjpegServerImpl : public SinkImpl {
  public:
-  MjpegServerImpl(const wpi::Twine& name, const wpi::Twine& listenAddress,
-                  int port, std::unique_ptr<wpi::NetworkAcceptor> acceptor);
+  MjpegServerImpl(const wpi::Twine& name, wpi::Logger& logger,
+                  Notifier& notifier, Telemetry& telemetry,
+                  const wpi::Twine& listenAddress, int port,
+                  std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   ~MjpegServerImpl() override;
 
   void Stop();

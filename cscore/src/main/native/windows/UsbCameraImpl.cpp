@@ -5,6 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#define _WINSOCKAPI_
 #include "UsbCameraImpl.h"
 
 #include <ks.h>
@@ -35,6 +36,7 @@
 #include "COMCreators.h"
 #include "ComPtr.h"
 #include "Handle.h"
+#include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
@@ -67,16 +69,22 @@ using namespace cs;
 
 namespace cs {
 
-UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, const wpi::Twine& path)
-    : SourceImpl{name}, m_path{path.str()} {
+UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
+                             Notifier& notifier, Telemetry& telemetry,
+                             const wpi::Twine& path)
+    : SourceImpl{name, logger, notifier, telemetry}, m_path{path.str()} {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
 }
 
-UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, int deviceId)
-    : SourceImpl{name}, m_deviceId(deviceId) {}
+UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
+                             Notifier& notifier, Telemetry& telemetry,
+                             int deviceId)
+    : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {}
 
-UsbCameraImpl::~UsbCameraImpl() { m_messagePump = nullptr; }
+UsbCameraImpl::~UsbCameraImpl() { 
+	m_messagePump = nullptr; 
+}
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
   Message msg{Message::kCmdSetProperty};
@@ -250,8 +258,7 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
 
   ComPtr<IMFMediaBuffer> buf;
 
-  if (!SUCCEEDED(
-          videoSample->ConvertToContiguousBuffer(buf.GetAddressOf()))) {
+  if (!SUCCEEDED(videoSample->ConvertToContiguousBuffer(buf.GetAddressOf()))) {
     DWORD bcnt = 0;
     if (!SUCCEEDED(videoSample->GetBufferCount(&bcnt))) return;
     if (bcnt == 0) return;
@@ -293,8 +300,8 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
     case cs::VideoMode::PixelFormat::kMJPEG: {
       // Special case
       PutFrame(VideoMode::kMJPEG, mode.width, mode.height,
-                wpi::StringRef(reinterpret_cast<char*>(ptr), cursize),
-                wpi::Now());
+               wpi::StringRef(reinterpret_cast<char*>(ptr), cursize),
+               wpi::Now());
       doFinalSet = false;
       break;
     }
@@ -780,7 +787,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
       DeviceDisconnect();
       DeviceConnect();
     }
-    Notifier::GetInstance().NotifySourceVideoMode(*this, newMode);
+    m_notifier.NotifySourceVideoMode(*this, newMode);
     lock.lock();
   }
 
@@ -840,7 +847,7 @@ void UsbCameraImpl::DeviceCacheMode() {
 
   DeviceSetMode();
 
-  Notifier::GetInstance().NotifySourceVideoMode(*this, m_mode);
+  m_notifier.NotifySourceVideoMode(*this, m_mode);
 }
 
 CS_StatusValue UsbCameraImpl::DeviceSetMode() {
@@ -917,7 +924,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     std::lock_guard<wpi::mutex> lock(m_mutex);
     m_videoModes.swap(modes);
   }
-  Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
+  m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
 }
 
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
@@ -992,9 +999,11 @@ CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
   if (devices.size() > dev) {
     return CreateUsbCameraPath(name, devices[dev].path, status);
   }
-  auto source = std::make_shared<UsbCameraImpl>(name, dev);
-  auto handle = Sources::GetInstance().Allocate(CS_SOURCE_USB, source);
-  Notifier::GetInstance().NotifySource(name, handle, CS_SOURCE_CREATED);
+  auto& inst = cs::Instance::GetInstance();
+  auto source = std::make_shared<UsbCameraImpl>(
+      name, inst.logger, inst.notifier, inst.telemetry, dev);
+  auto handle = inst.sources.Allocate(CS_SOURCE_USB, source);
+  inst.notifier.NotifySource(name, handle, CS_SOURCE_CREATED);
   // Start thread after the source created event to ensure other events
   // come after it.
   source->Start();
@@ -1003,9 +1012,11 @@ CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
 
 CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
                               CS_Status* status) {
-  auto source = std::make_shared<UsbCameraImpl>(name, path);
-  auto handle = Sources::GetInstance().Allocate(CS_SOURCE_USB, source);
-  Notifier::GetInstance().NotifySource(name, handle, CS_SOURCE_CREATED);
+  auto& inst = cs::Instance::GetInstance();
+  auto source = std::make_shared<UsbCameraImpl>(
+      name, inst.logger, inst.notifier, inst.telemetry, path);
+  auto handle = inst.sources.Allocate(CS_SOURCE_USB, source);
+  inst.notifier.NotifySource(name, handle, CS_SOURCE_CREATED);
   // Start thread after the source created event to ensure other events
   // come after it.
   source->Start();
@@ -1013,7 +1024,7 @@ CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
 }
 
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
+  auto data = cs::Instance::GetInstance().sources.Get(source);
   if (!data || data->kind != CS_SOURCE_USB) {
     *status = CS_INVALID_HANDLE;
     return std::string{};

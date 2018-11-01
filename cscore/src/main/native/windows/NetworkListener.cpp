@@ -19,6 +19,7 @@
 
 #include <netioapi.h>  // NOLINT(build/include_order)
 
+#include "Instance.h"
 #include "Log.h"
 #include "Notifier.h"
 
@@ -35,10 +36,13 @@ class NetworkListener::Pimpl {
 static void WINAPI OnInterfaceChange(PVOID callerContext,
                                      PMIB_IPINTERFACE_ROW row,
                                      MIB_NOTIFICATION_TYPE notificationType) {
-  Notifier::GetInstance().NotifyNetworkInterfacesChanged();
+  cs::Instance::GetInstance().notifier.NotifyNetworkInterfacesChanged();
 }
 
-NetworkListener::NetworkListener() { m_data = std::make_unique<Pimpl>(); }
+NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
+    : m_logger(logger), m_notifier(notifier) {
+  m_data = std::make_unique<Pimpl>();
+}
 
 NetworkListener::~NetworkListener() { Stop(); }
 

@@ -14,16 +14,14 @@
 
 namespace cs {
 
+class Notifier;
 class SourceImpl;
 
 class Telemetry {
   friend class TelemetryTest;
 
  public:
-  static Telemetry& GetInstance() {
-    static Telemetry instance;
-    return instance;
-  }
+  explicit Telemetry(Notifier& notifier) : m_notifier(notifier) {}
   ~Telemetry();
 
   void Start();
@@ -41,7 +39,7 @@ class Telemetry {
   void RecordSourceFrames(const SourceImpl& source, int quantity);
 
  private:
-  Telemetry();
+  Notifier& m_notifier;
 
   class Thread;
   wpi::SafeThreadOwner<Thread> m_owner;

@@ -43,8 +43,10 @@ namespace cs {
 class UsbCameraImpl : public SourceImpl,
                       public std::enable_shared_from_this<UsbCameraImpl> {
  public:
-  UsbCameraImpl(const wpi::Twine& name, const wpi::Twine& path);
-  UsbCameraImpl(const wpi::Twine& name, int deviceId);
+  UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+                Telemetry& telemetry, const wpi::Twine& path);
+  UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+                Telemetry& telemetry, int deviceId);
   ~UsbCameraImpl() override;
 
   void Start();

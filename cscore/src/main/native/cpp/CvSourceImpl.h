@@ -14,13 +14,18 @@
 #include <string>
 #include <vector>
 
+#include <opencv2/core/core.hpp>
+#include <wpi/ArrayRef.h>
+#include <wpi/Twine.h>
+
 #include "SourceImpl.h"
 
 namespace cs {
 
 class CvSourceImpl : public SourceImpl {
  public:
-  CvSourceImpl(const wpi::Twine& name, const VideoMode& mode);
+  CvSourceImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+               Telemetry& telemetry, const VideoMode& mode);
   ~CvSourceImpl() override;
 
   void Start();

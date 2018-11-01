@@ -16,6 +16,8 @@
 
 #include <Dbt.h>
 
+#include <memory>
+
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")
 #pragma comment(lib, "mfuuid.lib")
@@ -77,13 +79,15 @@ struct ClassHolder {
     wx.lpszClassName = class_name;
     RegisterClassEx(&wx);
   }
-  ~ClassHolder() { UnregisterClass(class_name, current_instance); }
+  ~ClassHolder() {
+	  UnregisterClass(class_name, current_instance);
+  }
 };
 }  // namespace
 
-static const char* GetClass() {
-  static ClassHolder clsHolder;
-  return clsHolder.class_name;
+static std::shared_ptr<ClassHolder> GetClassHolder() {
+  static std::shared_ptr<ClassHolder> clsHolder = std::make_shared<ClassHolder>();
+  return clsHolder;
 }
 
 WindowsMessagePump::WindowsMessagePump(
@@ -98,7 +102,7 @@ WindowsMessagePump::WindowsMessagePump(
 }
 
 WindowsMessagePump::~WindowsMessagePump() {
-  SendMessage(hwnd, WM_CLOSE, NULL, NULL);
+  auto res = SendMessage(hwnd, WM_CLOSE, NULL, NULL);
   if (m_mainThread.joinable()) m_mainThread.join();
 }
 
@@ -108,8 +112,8 @@ void WindowsMessagePump::ThreadMain(HANDLE eventHandle) {
   // Initialize MF
   MFStartup(MF_VERSION);
 
-  const char* class_name = GetClass();
-  hwnd = CreateWindowEx(0, class_name, "dummy_name", 0, 0, 0, 0, 0,
+  auto classHolder = GetClassHolder();
+  hwnd = CreateWindowEx(0, classHolder->class_name, "dummy_name", 0, 0, 0, 0, 0,
                         HWND_MESSAGE, NULL, NULL, this);
 
   // Register for device notifications
