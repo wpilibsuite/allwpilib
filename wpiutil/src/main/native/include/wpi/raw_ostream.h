@@ -84,6 +84,13 @@ public:
     SAVEDCOLOR
   };
 
+  // Nifty counter initializer
+  class Init {
+   public:
+    Init();
+    ~Init();
+  };
+
   explicit raw_ostream(bool unbuffered = false)
       : BufferMode(unbuffered ? Unbuffered : InternalBuffer) {
     // Start out ready to flush.
@@ -461,6 +468,9 @@ public:
   ///
   void clear_error() { EC = std::error_code(); }
 };
+
+// Nifty counter initializer for outs(), errs(), and nulls().
+static raw_ostream::Init raw_ostream_init;
 
 /// This returns a reference to a raw_ostream for standard output. Use it like:
 /// outs() << "foo" << "bar";

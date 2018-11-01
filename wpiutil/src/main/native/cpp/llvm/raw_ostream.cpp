@@ -23,6 +23,7 @@
 #include "wpi/NativeFormatting.h"
 #include "wpi/WindowsError.h"
 #include <algorithm>
+#include <atomic>
 #include <cctype>
 #include <cerrno>
 #include <cstdio>
@@ -670,28 +671,43 @@ void raw_fd_ostream::anchor() {}
 //  outs(), errs(), nulls()
 //===----------------------------------------------------------------------===//
 
+static std::atomic_int raw_ostream_init_count{0};
+static raw_ostream* raw_outs = nullptr;
+static raw_ostream* raw_errs = nullptr;
+static raw_ostream* raw_nulls = nullptr;
+
+raw_ostream::Init::Init() {
+  if (raw_ostream_init_count++ == 0) {
+    std::error_code EC;
+    raw_outs = new raw_fd_ostream("-", EC, sys::fs::F_None);
+    raw_errs = new raw_fd_ostream(STDERR_FILENO, false, true);
+    raw_nulls = new raw_null_ostream;
+  }
+}
+
+raw_ostream::Init::~Init() {
+  if (--raw_ostream_init_count == 0) {
+    delete raw_nulls;
+    delete raw_errs;
+    delete raw_outs;
+  }
+}
+
 /// outs() - This returns a reference to a raw_ostream for standard output.
 /// Use it like: outs() << "foo" << "bar";
 raw_ostream &wpi::outs() {
-  // Set buffer settings to model stdout behavior.
-  std::error_code EC;
-  static raw_fd_ostream S("-", EC, sys::fs::F_None);
-  assert(!EC);
-  return S;
+  return *raw_outs;
 }
 
 /// errs() - This returns a reference to a raw_ostream for standard error.
 /// Use it like: errs() << "foo" << "bar";
-raw_ostream &wpi::errs() {
-  // Set standard error to be unbuffered by default.
-  static raw_fd_ostream S(STDERR_FILENO, false, true);
-  return S;
+raw_ostream& wpi::errs() {
+  return *raw_errs;
 }
 
 /// nulls() - This returns a reference to a raw_ostream which discards output.
-raw_ostream &wpi::nulls() {
-  static raw_null_ostream S;
-  return S;
+raw_ostream& wpi::nulls() {
+  return *raw_nulls;
 }
 
 //===----------------------------------------------------------------------===//
