@@ -13,13 +13,15 @@ import java.io.File;
  * Class for interacting with the Filesystem, particularly, interacting with
  * FRC-related paths on the system, such as the launch and deploy directories.
  *
- * This class is primarily used for obtaining resources in src/main/deploy, and
- * the RoboRIO path /home/lvuser in a simulation-compatible way.
+ * <p>This class is primarily used for obtaining resources in src/main/deploy, and
+ * the RoboRIO path /home/lvuser in a simulation-compatible way.</p>
  */
-public class Filesystem {
+public final class Filesystem {
+
+  private Filesystem() { }
+
   /**
    * Obtain the current working path that the program was launched with.
-   *
    * This is analogous to the `pwd` command on unix.
    *
    * @return The current working directory (launch directory)
