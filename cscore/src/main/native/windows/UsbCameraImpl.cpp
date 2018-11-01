@@ -82,9 +82,7 @@ UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
                              int deviceId)
     : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {}
 
-UsbCameraImpl::~UsbCameraImpl() { 
-	m_messagePump = nullptr; 
-}
+UsbCameraImpl::~UsbCameraImpl() { m_messagePump = nullptr; }
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
   Message msg{Message::kCmdSetProperty};

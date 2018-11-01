@@ -67,9 +67,10 @@ void SourceReaderCB::NotifyError(HRESULT hr) {
   wprintf(L"Source Reader error: 0x%X\n", hr);
 }
 
-HRESULT SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
-                                     DWORD dwStreamFlags, LONGLONG llTimestamp,
-                                     IMFSample* pSample  // Can be NULL
+STDMETHODIMP SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
+                                          DWORD dwStreamFlags,
+                                          LONGLONG llTimestamp,
+                                          IMFSample* pSample  // Can be NULL
 ) {
   auto source = m_source.lock();
   if (!source) return S_OK;

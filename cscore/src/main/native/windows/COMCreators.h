@@ -33,9 +33,9 @@ class SourceReaderCB : public IMFSourceReaderCallback {
 
   STDMETHODIMP OnEvent(DWORD, IMFMediaEvent*);
   STDMETHODIMP OnFlush(DWORD);
-  HRESULT OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
-                       DWORD dwStreamFlags, LONGLONG llTimestamp,
-                       IMFSample* pSample  // Can be NULL
+  STDMETHODIMP OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
+                            DWORD dwStreamFlags, LONGLONG llTimestamp,
+                            IMFSample* pSample  // Can be NULL
   );
 
   void InvalidateCapture() { m_source = std::weak_ptr<cs::UsbCameraImpl>(); }

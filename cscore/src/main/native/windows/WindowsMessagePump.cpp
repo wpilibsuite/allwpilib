@@ -14,9 +14,9 @@
 #include <windows.h>
 #include <windowsx.h>
 
-#include <Dbt.h>
-
 #include <memory>
+
+#include <Dbt.h>
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")
@@ -79,14 +79,13 @@ struct ClassHolder {
     wx.lpszClassName = class_name;
     RegisterClassEx(&wx);
   }
-  ~ClassHolder() {
-	  UnregisterClass(class_name, current_instance);
-  }
+  ~ClassHolder() { UnregisterClass(class_name, current_instance); }
 };
 }  // namespace
 
 static std::shared_ptr<ClassHolder> GetClassHolder() {
-  static std::shared_ptr<ClassHolder> clsHolder = std::make_shared<ClassHolder>();
+  static std::shared_ptr<ClassHolder> clsHolder =
+      std::make_shared<ClassHolder>();
   return clsHolder;
 }
 

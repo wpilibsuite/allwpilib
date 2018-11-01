@@ -6,17 +6,17 @@
 /*----------------------------------------------------------------------------*/
 
 #include <iostream>
+#include <thread>
 
 #include "cscore.h"
-#include <thread>
 
 int main() {
   std::cout << cs::GetHostname() << std::endl;
 
   CS_Status status = 0;
-  auto cam = cs::CreateUsbCameraDev("Camera", 0, &status);
+  cs::CreateUsbCameraDev("Camera", 0, &status);
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-  //cs::ReleaseSource(cam, &status);
+  // cs::ReleaseSource(cam, &status);
 }
