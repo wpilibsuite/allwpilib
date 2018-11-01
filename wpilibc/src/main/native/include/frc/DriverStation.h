@@ -295,7 +295,7 @@ class DriverStation : public ErrorBase {
   int GetMatchNumber() const;
 
   /**
-   * Returns the number or times the current match has been replayed from the
+   * Returns the number of times the current match has been replayed from the
    * FMS.
    *
    * @return The number of replays
