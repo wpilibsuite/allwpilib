@@ -10,34 +10,18 @@
 
 #include <wpi/Logger.h>
 
-namespace cs {
-
-class Logger : public wpi::Logger {
- public:
-  static Logger& GetInstance() {
-    static Logger instance;
-    return instance;
-  }
-  ~Logger();
-
-  void SetDefaultLogger();
-
- private:
-  Logger();
-};
-
-#define LOG(level, x) WPI_LOG(cs::Logger::GetInstance(), level, x)
+#define LOG(level, x) WPI_LOG(m_logger, level, x)
 
 #undef ERROR
-#define ERROR(x) WPI_ERROR(cs::Logger::GetInstance(), x)
-#define WARNING(x) WPI_WARNING(cs::Logger::GetInstance(), x)
-#define INFO(x) WPI_INFO(cs::Logger::GetInstance(), x)
+#define ERROR(x) WPI_ERROR(m_logger, x)
+#define WARNING(x) WPI_WARNING(m_logger, x)
+#define INFO(x) WPI_INFO(m_logger, x)
 
-#define DEBUG(x) WPI_DEBUG(cs::Logger::GetInstance(), x)
-#define DEBUG1(x) WPI_DEBUG1(cs::Logger::GetInstance(), x)
-#define DEBUG2(x) WPI_DEBUG2(cs::Logger::GetInstance(), x)
-#define DEBUG3(x) WPI_DEBUG3(cs::Logger::GetInstance(), x)
-#define DEBUG4(x) WPI_DEBUG4(cs::Logger::GetInstance(), x)
+#define DEBUG(x) WPI_DEBUG(m_logger, x)
+#define DEBUG1(x) WPI_DEBUG1(m_logger, x)
+#define DEBUG2(x) WPI_DEBUG2(m_logger, x)
+#define DEBUG3(x) WPI_DEBUG3(m_logger, x)
+#define DEBUG4(x) WPI_DEBUG4(m_logger, x)
 
 #define SERROR(x) ERROR(GetName() << ": " << x)
 #define SWARNING(x) WARNING(GetName() << ": " << x)
@@ -48,7 +32,5 @@ class Logger : public wpi::Logger {
 #define SDEBUG2(x) DEBUG2(GetName() << ": " << x)
 #define SDEBUG3(x) DEBUG3(GetName() << ": " << x)
 #define SDEBUG4(x) DEBUG4(GetName() << ": " << x)
-
-}  // namespace cs
 
 #endif  // CSCORE_LOG_H_

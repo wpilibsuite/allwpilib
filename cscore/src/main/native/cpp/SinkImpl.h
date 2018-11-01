@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 
+#include <wpi/Logger.h>
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
 #include <wpi/mutex.h>
@@ -20,10 +21,13 @@
 namespace cs {
 
 class Frame;
+class Notifier;
+class Telemetry;
 
 class SinkImpl : public PropertyContainer {
  public:
-  explicit SinkImpl(const wpi::Twine& name);
+  explicit SinkImpl(const wpi::Twine& name, wpi::Logger& logger,
+                    Notifier& notifier, Telemetry& telemetry);
   virtual ~SinkImpl();
   SinkImpl(const SinkImpl& queue) = delete;
   SinkImpl& operator=(const SinkImpl& queue) = delete;
@@ -54,6 +58,11 @@ class SinkImpl : public PropertyContainer {
                            const wpi::Twine& valueStr) override;
 
   virtual void SetSourceImpl(std::shared_ptr<SourceImpl> source);
+
+ protected:
+  wpi::Logger& m_logger;
+  Notifier& m_notifier;
+  Telemetry& m_telemetry;
 
  private:
   std::string m_name;

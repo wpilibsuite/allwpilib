@@ -16,6 +16,7 @@
 #include <wpi/raw_socket_ostream.h>
 
 #include "Handle.h"
+#include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
@@ -73,7 +74,8 @@ static const char* endRootPage = "</div></body></html>";
 
 class MjpegServerImpl::ConnThread : public wpi::SafeThread {
  public:
-  explicit ConnThread(const wpi::Twine& name) : m_name(name.str()) {}
+  explicit ConnThread(const wpi::Twine& name, wpi::Logger& logger)
+      : m_name(name.str()), m_logger(logger) {}
 
   void Main();
 
@@ -97,6 +99,7 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
 
  private:
   std::string m_name;
+  wpi::Logger& m_logger;
 
   wpi::StringRef GetName() { return m_name; }
 
@@ -548,10 +551,11 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
   os.flush();
 }
 
-MjpegServerImpl::MjpegServerImpl(const wpi::Twine& name,
+MjpegServerImpl::MjpegServerImpl(const wpi::Twine& name, wpi::Logger& logger,
+                                 Notifier& notifier, Telemetry& telemetry,
                                  const wpi::Twine& listenAddress, int port,
                                  std::unique_ptr<wpi::NetworkAcceptor> acceptor)
-    : SinkImpl{name},
+    : SinkImpl{name, logger, notifier, telemetry},
       m_listenAddress(listenAddress.str()),
       m_port(port),
       m_acceptor{std::move(acceptor)} {
@@ -865,7 +869,7 @@ void MjpegServerImpl::ServerThreadMain() {
     }
 
     // Start it if not already started
-    it->Start(GetName());
+    it->Start(GetName(), m_logger);
 
     auto nstreams =
         std::count_if(m_connThreads.begin(), m_connThreads.end(),
@@ -909,20 +913,21 @@ namespace cs {
 CS_Sink CreateMjpegServer(const wpi::Twine& name,
                           const wpi::Twine& listenAddress, int port,
                           CS_Status* status) {
+  auto& inst = Instance::GetInstance();
   wpi::SmallString<128> listenAddressBuf;
   auto sink = std::make_shared<MjpegServerImpl>(
-      name, listenAddress, port,
+      name, inst.logger, inst.notifier, inst.telemetry, listenAddress, port,
       std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
           port,
           listenAddress.toNullTerminatedStringRef(listenAddressBuf).data(),
-          Logger::GetInstance())));
-  auto handle = Sinks::GetInstance().Allocate(CS_SINK_MJPEG, sink);
-  Notifier::GetInstance().NotifySink(name, handle, CS_SINK_CREATED);
+          inst.logger)));
+  auto handle = inst.sinks.Allocate(CS_SINK_MJPEG, sink);
+  inst.notifier.NotifySink(name, handle, CS_SINK_CREATED);
   return handle;
 }
 
 std::string GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status) {
-  auto data = Sinks::GetInstance().Get(sink);
+  auto data = Instance::GetInstance().sinks.Get(sink);
   if (!data || data->kind != CS_SINK_MJPEG) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
@@ -931,7 +936,7 @@ std::string GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status) {
 }
 
 int GetMjpegServerPort(CS_Sink sink, CS_Status* status) {
-  auto data = Sinks::GetInstance().Get(sink);
+  auto data = Instance::GetInstance().sinks.Get(sink);
   if (!data || data->kind != CS_SINK_MJPEG) {
     *status = CS_INVALID_HANDLE;
     return 0;

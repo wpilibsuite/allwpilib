@@ -16,6 +16,7 @@
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 
+#include "Instance.h"
 #include "Log.h"
 
 namespace cs {
@@ -150,8 +151,9 @@ int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
   if (!quiet && retval < 0) {
     wpi::SmallString<64> localfile{file};
     localfile.push_back('\0');
-    ERROR("ioctl " << name << " failed at " << basename(localfile.data()) << ":"
-                   << line << ": " << std::strerror(errno));
+    WPI_ERROR(Instance::GetInstance().logger,
+              "ioctl " << name << " failed at " << basename(localfile.data())
+                       << ":" << line << ": " << std::strerror(errno));
   }
   return retval;
 }

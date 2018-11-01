@@ -21,7 +21,12 @@ using namespace cs;
 
 static constexpr size_t kMaxImagesAvail = 32;
 
-SourceImpl::SourceImpl(const wpi::Twine& name) : m_name{name.str()} {
+SourceImpl::SourceImpl(const wpi::Twine& name, wpi::Logger& logger,
+                       Notifier& notifier, Telemetry& telemetry)
+    : m_logger(logger),
+      m_notifier(notifier),
+      m_telemetry(telemetry),
+      m_name{name.str()} {
   m_frame = Frame{*this, wpi::StringRef{}, 0};
 }
 
@@ -53,9 +58,9 @@ wpi::StringRef SourceImpl::GetDescription(
 void SourceImpl::SetConnected(bool connected) {
   bool wasConnected = m_connected.exchange(connected);
   if (wasConnected && !connected)
-    Notifier::GetInstance().NotifySource(*this, CS_SOURCE_DISCONNECTED);
+    m_notifier.NotifySource(*this, CS_SOURCE_DISCONNECTED);
   else if (!wasConnected && connected)
-    Notifier::GetInstance().NotifySource(*this, CS_SOURCE_CONNECTED);
+    m_notifier.NotifySource(*this, CS_SOURCE_CONNECTED);
 }
 
 uint64_t SourceImpl::GetCurFrameTime() {
@@ -215,9 +220,8 @@ void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
 
 void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
   // Update telemetry
-  Telemetry::GetInstance().RecordSourceFrames(*this, 1);
-  Telemetry::GetInstance().RecordSourceBytes(*this,
-                                             static_cast<int>(image->size()));
+  m_telemetry.RecordSourceFrames(*this, 1);
+  m_telemetry.RecordSourceBytes(*this, static_cast<int>(image->size()));
 
   // Update frame
   {
@@ -241,15 +245,14 @@ void SourceImpl::PutError(const wpi::Twine& msg, Frame::Time time) {
 }
 
 void SourceImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
-  auto& notifier = Notifier::GetInstance();
-  notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, prop.name,
-                                propIndex, prop.propKind, prop.value,
-                                prop.valueStr);
+  m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, prop.name,
+                                  propIndex, prop.propKind, prop.value,
+                                  prop.valueStr);
   // also notify choices updated event for enum types
   if (prop.propKind == CS_PROP_ENUM)
-    notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
-                                  prop.name, propIndex, prop.propKind,
-                                  prop.value, wpi::Twine{});
+    m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
+                                    prop.name, propIndex, prop.propKind,
+                                    prop.value, wpi::Twine{});
 }
 
 void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
@@ -263,10 +266,11 @@ void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
     prop->SetValue(value);
 
   // Only notify updates after we've notified created
-  if (m_properties_cached)
-    Notifier::GetInstance().NotifySourceProperty(
-        *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, prop->name, property,
-        prop->propKind, prop->value, prop->valueStr);
+  if (m_properties_cached) {
+    m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_VALUE_UPDATED,
+                                    prop->name, property, prop->propKind,
+                                    prop->value, prop->valueStr);
+  }
 }
 
 void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {

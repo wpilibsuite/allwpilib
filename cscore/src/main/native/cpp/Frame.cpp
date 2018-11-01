@@ -13,6 +13,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "Instance.h"
 #include "Log.h"
 #include "SourceImpl.h"
 
@@ -450,9 +451,11 @@ Image* Frame::GetImageImpl(int width, int height,
   if (!cur || cur->Is(width, height, pixelFormat, requiredJpegQuality))
     return cur;
 
-  DEBUG4("converting image from "
-         << cur->width << "x" << cur->height << " type " << cur->pixelFormat
-         << " to " << width << "x" << height << " type " << pixelFormat);
+  WPI_DEBUG4(Instance::GetInstance().logger,
+             "converting image from " << cur->width << "x" << cur->height
+                                      << " type " << cur->pixelFormat << " to "
+                                      << width << "x" << height << " type "
+                                      << pixelFormat);
 
   // If the source image is a JPEG, we need to decode it before we can do
   // anything else with it.  Note that if the destination format is JPEG, we

@@ -27,8 +27,12 @@ using namespace cs;
 
 class NetworkListener::Thread : public wpi::SafeThread {
  public:
+  Thread(wpi::Logger& logger, Notifier& notifier)
+      : m_logger(logger), m_notifier(notifier) {}
   void Main();
 
+  wpi::Logger& m_logger;
+  Notifier& m_notifier;
 #ifdef __linux__
   int m_command_fd = -1;
 #endif
@@ -36,10 +40,7 @@ class NetworkListener::Thread : public wpi::SafeThread {
 
 NetworkListener::~NetworkListener() { Stop(); }
 
-void NetworkListener::Start() {
-  auto thr = m_owner.GetThread();
-  if (!thr) m_owner.Start();
-}
+void NetworkListener::Start() { m_owner.Start(m_logger, m_notifier); }
 
 void NetworkListener::Stop() {
   // Wake up thread
@@ -125,7 +126,7 @@ void NetworkListener::Thread::Main() {
       if (nh->nlmsg_type == NLMSG_DONE) break;
       if (nh->nlmsg_type == RTM_NEWLINK || nh->nlmsg_type == RTM_DELLINK ||
           nh->nlmsg_type == RTM_NEWADDR || nh->nlmsg_type == RTM_DELADDR) {
-        Notifier::GetInstance().NotifyNetworkInterfacesChanged();
+        m_notifier.NotifyNetworkInterfacesChanged();
       }
     }
   }
