@@ -7,7 +7,6 @@
 
 #include "NetworkListener.h"
 
-#ifdef __linux__
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <sys/eventfd.h>
@@ -18,7 +17,6 @@
 #include <unistd.h>
 
 #include <cerrno>
-#endif
 
 #include "Log.h"
 #include "Notifier.h"
@@ -33,9 +31,7 @@ class NetworkListener::Thread : public wpi::SafeThread {
 
   wpi::Logger& m_logger;
   Notifier& m_notifier;
-#ifdef __linux__
   int m_command_fd = -1;
-#endif
 };
 
 NetworkListener::~NetworkListener() { Stop(); }
@@ -46,15 +42,12 @@ void NetworkListener::Stop() {
   // Wake up thread
   if (auto thr = m_owner.GetThread()) {
     thr->m_active = false;
-#ifdef __linux__
     if (thr->m_command_fd >= 0) eventfd_write(thr->m_command_fd, 1);
-#endif
   }
   m_owner.Stop();
 }
 
 void NetworkListener::Thread::Main() {
-#ifdef __linux__
   // Create event socket so we can be shut down
   m_command_fd = ::eventfd(0, 0);
   if (m_command_fd < 0) {
@@ -133,5 +126,4 @@ void NetworkListener::Thread::Main() {
   ::close(sd);
   ::close(m_command_fd);
   m_command_fd = -1;
-#endif
 }
