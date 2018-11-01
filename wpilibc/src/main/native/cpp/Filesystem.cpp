@@ -6,18 +6,20 @@
 /*----------------------------------------------------------------------------*/
 
 #include "frc/Filesystem.h"
-#include "frc/RobotBase.h"
 
-#include <wpi/Path.h>
 #include <wpi/FileSystem.h>
+#include <wpi/Path.h>
+
+#include "frc/RobotBase.h"
 
 void frc::filesystem::GetLaunchDirectory(wpi::SmallVectorImpl<char>& result) {
   wpi::sys::fs::current_path(result);
 }
 
-void frc::filesystem::GetOperatingDirectory(wpi::SmallVectorImpl<char>& result) {
+void frc::filesystem::GetOperatingDirectory(
+    wpi::SmallVectorImpl<char>& result) {
   if (RobotBase::IsReal()) {
-    wpi::sys::path::native(wpi::Twine("/home/lvuser"), result);
+    wpi::sys::path::native("/home/lvuser", result);
   } else {
     frc::filesystem::GetLaunchDirectory(result);
   }

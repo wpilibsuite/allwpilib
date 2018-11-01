@@ -16,7 +16,6 @@ namespace filesystem {
 
 /**
  * Obtain the current working path that the program was launched with.
- *
  * This is analogous to the `pwd` command on unix.
  *
  * @param result The result of the current working path lookup.
