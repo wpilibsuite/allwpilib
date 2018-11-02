@@ -7,16 +7,12 @@
 
 #include "Instance.h"
 
-#include <atomic>
-
 #include <wpi/Path.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
 
 using namespace cs;
-
-static std::atomic<Instance*> instance{nullptr};
 
 static void def_log_func(unsigned int level, const char* file,
                          unsigned int line, const char* msg) {
@@ -43,7 +39,6 @@ static void def_log_func(unsigned int level, const char* file,
 }
 
 Instance::Instance() : telemetry(notifier), network_listener(logger, notifier) {
-  instance = this;
   SetDefaultLogger();
 }
 
@@ -80,10 +75,8 @@ void Shutdown() {
   instance.sources.ClearAll();
   instance.sinks.ClearAll();
 }
-}
+}  // namespace cs
 
 extern "C" {
-void CS_Shutdown(void) {
-  cs::Shutdown();
-}
-}
+void CS_Shutdown(void) { cs::Shutdown(); }
+}  // extern "C"
