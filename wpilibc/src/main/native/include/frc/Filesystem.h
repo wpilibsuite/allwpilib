@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,7 +15,7 @@ namespace frc {
 namespace filesystem {
 
 /**
- * Obtain the current working path that the program was launched with.
+ * Obtains the current working path that the program was launched with.
  * This is analogous to the `pwd` command on unix.
  *
  * @param result The result of the current working path lookup.
@@ -23,7 +23,7 @@ namespace filesystem {
 void GetLaunchDirectory(wpi::SmallVectorImpl<char>& result);
 
 /**
- * Obtain the operating directory of the program. On the RoboRIO, this
+ * Obtains the operating directory of the program. On the roboRIO, this
  * is /home/lvuser. In simulation, it is where the simulation was launched
  * from (`pwd`).
  *
@@ -32,8 +32,8 @@ void GetLaunchDirectory(wpi::SmallVectorImpl<char>& result);
 void GetOperatingDirectory(wpi::SmallVectorImpl<char>& result);
 
 /**
- * Obtain the deploy directory of the program, which is the remote location
- * src/main/deploy is deployed to by default. On the RoboRIO, this is
+ * Obtains the deploy directory of the program, which is the remote location
+ * src/main/deploy is deployed to by default. On the roboRIO, this is
  * /home/lvuser/deploy. In simulation, it is where the simulation was launched
  * from, in the subdirectory "deploy" (`pwd`/deploy).
  *

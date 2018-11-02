@@ -20,7 +20,7 @@ public final class Filesystem {
   private Filesystem() { }
 
   /**
-   * Obtain the current working path that the program was launched with.
+   * Obtains the current working path that the program was launched with.
    * This is analogous to the `pwd` command on unix.
    *
    * @return The current working directory (launch directory)
@@ -30,7 +30,7 @@ public final class Filesystem {
   }
 
   /**
-   * Obtain the operating directory of the program. On the RoboRIO, this is
+   * Obtains the operating directory of the program. On the roboRIO, this is
    * /home/lvuser. In simulation, it is where the simulation was launched from
    * (`pwd`).
    *
@@ -45,8 +45,8 @@ public final class Filesystem {
   }
 
   /**
-   * Obtain the deploy directory of the program, which is the remote location
-   * src/main/deploy is deployed to by default. On the RoboRIO, this is
+   * Obtains the deploy directory of the program, which is the remote location
+   * src/main/deploy is deployed to by default. On the roboRIO, this is
    * /home/lvuser/deploy. In simulation, it is where the simulation was launched
    * from, in the subdirectory "deploy" (`pwd`/deploy).
    *
