@@ -62,3 +62,23 @@ std::pair<CS_Sink, std::shared_ptr<SinkData>> Instance::FindSink(
   return sinks.FindIf(
       [&](const SinkData& data) { return data.sink.get() == &sink; });
 }
+
+namespace cs {
+void Shutdown() {
+  auto& instance = Instance::GetInstance();
+  instance.notifier.Stop();
+  instance.network_listener.Stop();
+  auto loop = instance.event_loop.GetLoop();
+  if (loop) {
+    loop->Stop();
+  }
+  instance.sources.ClearAll();
+  instance.sinks.ClearAll();
+}
+}
+
+extern "C" {
+void CS_Shutdown(void) {
+  cs::Shutdown();
+}
+}

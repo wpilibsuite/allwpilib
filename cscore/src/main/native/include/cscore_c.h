@@ -441,6 +441,8 @@ void CS_SetLogger(CS_LogFunc func, unsigned int min_level);
 void CS_SetDefaultLogger(unsigned int min_level);
 /** @} */
 
+void CS_Shutdown(void);
+
 /**
  * @defgroup cscore_utility_cfunc Utility Functions
  * @{
