@@ -377,6 +377,8 @@ void SetLogger(LogFunc func, unsigned int min_level);
 void SetDefaultLogger(unsigned int min_level);
 /** @} */
 
+void Shutdown();
+
 /**
  * @defgroup cscore_shutdown_func Library Shutdown Function
  * @{
