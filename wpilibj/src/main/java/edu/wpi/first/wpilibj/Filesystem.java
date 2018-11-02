@@ -26,7 +26,7 @@ public final class Filesystem {
    * @return The current working directory (launch directory)
    */
   public static File getLaunchDirectory() {
-    return new File(".").getAbsoluteFile();
+    return new File(System.getProperty("user.dir")).getAbsoluteFile();
   }
 
   /**
