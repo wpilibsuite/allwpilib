@@ -7,31 +7,14 @@
 
 #include "NetworkListener.h"
 
-#include "Log.h"
-#include "Notifier.h"
-
 using namespace cs;
 
-class NetworkListener::Thread : public wpi::SafeThread {
- public:
-  void Main();
-};
+class NetworkListener::Impl {};
 
-NetworkListener::~NetworkListener() { Stop(); }
+NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier) {}
 
-void NetworkListener::Start() {
-  auto thr = m_owner.GetThread();
-  if (!thr) m_owner.Start();
-}
+NetworkListener::~NetworkListener() {}
 
-void NetworkListener::Stop() {
-  // Wake up thread
-  if (auto thr = m_owner.GetThread()) {
-    thr->m_active = false;
-  }
-  m_owner.Stop();
-}
+void NetworkListener::Start() {}
 
-void NetworkListener::Thread::Main() {
-  // TODO
-}
+void NetworkListener::Stop() {}

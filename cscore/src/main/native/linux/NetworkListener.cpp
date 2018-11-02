@@ -18,36 +18,54 @@
 
 #include <cerrno>
 
+#include <wpi/SafeThread.h>
+
 #include "Log.h"
 #include "Notifier.h"
 
 using namespace cs;
 
-class NetworkListener::Thread : public wpi::SafeThread {
+class NetworkListener::Impl {
  public:
-  Thread(wpi::Logger& logger, Notifier& notifier)
+  Impl(wpi::Logger& logger, Notifier& notifier)
       : m_logger(logger), m_notifier(notifier) {}
-  void Main();
 
   wpi::Logger& m_logger;
   Notifier& m_notifier;
-  int m_command_fd = -1;
+
+  class Thread : public wpi::SafeThread {
+   public:
+    Thread(wpi::Logger& logger, Notifier& notifier)
+        : m_logger(logger), m_notifier(notifier) {}
+    void Main();
+
+    wpi::Logger& m_logger;
+    Notifier& m_notifier;
+    int m_command_fd = -1;
+  };
+
+  wpi::SafeThreadOwner<Thread> m_owner;
 };
+
+NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
+    : m_impl(std::make_unique<Impl>(logger, notifier)) {}
 
 NetworkListener::~NetworkListener() { Stop(); }
 
-void NetworkListener::Start() { m_owner.Start(m_logger, m_notifier); }
+void NetworkListener::Start() {
+  m_impl->m_owner.Start(m_impl->m_logger, m_impl->m_notifier);
+}
 
 void NetworkListener::Stop() {
   // Wake up thread
-  if (auto thr = m_owner.GetThread()) {
+  if (auto thr = m_impl->m_owner.GetThread()) {
     thr->m_active = false;
     if (thr->m_command_fd >= 0) eventfd_write(thr->m_command_fd, 1);
   }
-  m_owner.Stop();
+  m_impl->m_owner.Stop();
 }
 
-void NetworkListener::Thread::Main() {
+void NetworkListener::Impl::Thread::Main() {
   // Create event socket so we can be shut down
   m_command_fd = ::eventfd(0, 0);
   if (m_command_fd < 0) {
