@@ -66,14 +66,19 @@ std::pair<CS_Sink, std::shared_ptr<SinkData>> Instance::FindSink(
 namespace cs {
 void Shutdown() {
   auto& instance = Instance::GetInstance();
-  instance.notifier.Stop();
-  instance.network_listener.Stop();
+
   auto loop = instance.event_loop.GetLoop();
   if (loop) {
     loop->Stop();
   }
-  instance.sources.ClearAll();
+
+  instance.notifier.Stop();
+  instance.telemetry.Stop();
+  instance.network_listener.Stop();
+
   instance.sinks.ClearAll();
+  instance.sources.ClearAll();
+
 }
 }  // namespace cs
 
