@@ -42,7 +42,24 @@ if (project.hasProperty('niLibraries')) {
     apply from: "${rootDir}/shared/nilibraries.gradle"
 }
 
+def exportsFile = file("$projectDir/CExports.txt")
+
+tasks.withType(ExportsGenerationTask).configureEach {
+    it.inputs.file exportsFile
+}
+
 model {
+    exportsConfigs {
+        "${nativeName}JNI"(ExportsConfig) {
+            x86SymbolFilter = { symbols ->
+                return exportsFile.readLines()
+            }
+            x64SymbolFilter = { symbols ->
+                return exportsFile.readLines()
+            }
+        }
+    }
+
     components {
         "${nativeName}Base"(NativeLibrarySpec) {
             if (project.hasProperty('setBaseName')) {
