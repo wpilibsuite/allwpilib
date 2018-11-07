@@ -27,6 +27,12 @@ class EventLoopRunner {
   virtual ~EventLoopRunner();
 
   /**
+   * Stop the loop.  Once the loop is stopped it cannot be restarted.
+   * This function does not return until the loop has exited.
+   */
+  void Stop();
+
+  /**
    * Run a function asynchronously (once) on the loop.
    * This is safe to call from any thread, but is NOT safe to call from the
    * provided function (it will deadlock).
