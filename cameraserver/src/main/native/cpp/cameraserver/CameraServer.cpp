@@ -55,7 +55,6 @@ static wpi::StringRef MakeSourceValue(CS_Source source,
   CS_Status status = 0;
   buf.clear();
   switch (cs::GetSourceKind(source, &status)) {
-#ifdef __linux__
     case cs::VideoSource::kUsb: {
       wpi::StringRef prefix{"usb:"};
       buf.append(prefix.begin(), prefix.end());
@@ -63,7 +62,6 @@ static wpi::StringRef MakeSourceValue(CS_Source source,
       buf.append(path.begin(), path.end());
       break;
     }
-#endif
     case cs::VideoSource::kHttp: {
       wpi::StringRef prefix{"ip:"};
       buf.append(prefix.begin(), prefix.end());
@@ -457,7 +455,6 @@ CameraServer::CameraServer() : m_impl(new Impl) {}
 
 CameraServer::~CameraServer() {}
 
-#ifdef __linux__
 cs::UsbCamera CameraServer::StartAutomaticCapture() {
   cs::UsbCamera camera = StartAutomaticCapture(m_impl->m_defaultUsbDevice++);
   auto csShared = GetCameraServerShared();
@@ -490,7 +487,6 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(const wpi::Twine& name,
   csShared->ReportUsbCamera(camera.GetHandle());
   return camera;
 }
-#endif
 
 cs::AxisCamera CameraServer::AddAxisCamera(const wpi::Twine& host) {
   return AddAxisCamera("Axis Camera", host);

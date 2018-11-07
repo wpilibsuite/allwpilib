@@ -36,8 +36,6 @@ class CameraServer {
    */
   static CameraServer* GetInstance();
 
-#ifdef __linux__
-  // USBCamera does not work on anything except Linux.
   /**
    * Start automatically capturing images to send to the dashboard.
    *
@@ -77,7 +75,6 @@ class CameraServer {
    */
   cs::UsbCamera StartAutomaticCapture(const wpi::Twine& name,
                                       const wpi::Twine& path);
-#endif
 
   /**
    * Start automatically capturing images to send to the dashboard from
