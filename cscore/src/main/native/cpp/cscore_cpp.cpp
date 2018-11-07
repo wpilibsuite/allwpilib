@@ -606,7 +606,7 @@ CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
   int uid = inst.notifier.AddListener(callback, eventMask);
   if ((eventMask & CS_NETWORK_INTERFACES_CHANGED) != 0) {
     // start network interface event listener
-    inst.network_listener.Start();
+    inst.networkListener.Start();
     if (immediateNotify) inst.notifier.NotifyNetworkInterfacesChanged();
   }
   if (immediateNotify) {

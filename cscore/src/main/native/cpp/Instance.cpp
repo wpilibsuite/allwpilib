@@ -38,7 +38,7 @@ static void def_log_func(unsigned int level, const char* file,
   wpi::errs() << oss.str();
 }
 
-Instance::Instance() : telemetry(notifier), network_listener(logger, notifier) {
+Instance::Instance() : telemetry(notifier), networkListener(logger, notifier) {
   SetDefaultLogger();
 }
 
