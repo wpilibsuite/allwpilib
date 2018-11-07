@@ -28,7 +28,7 @@ class CvSourceImpl : public SourceImpl {
                Telemetry& telemetry, const VideoMode& mode);
   ~CvSourceImpl() override;
 
-  void Start();
+  void Start() override;
 
   bool SetVideoMode(const VideoMode& mode, CS_Status* status) override;
 

@@ -482,10 +482,7 @@ CS_Source CreateHttpCamera(const wpi::Twine& name, const wpi::Twine& url,
       break;
   }
   if (!source->SetUrls(url.str(), status)) return 0;
-  auto handle = inst.sources.Allocate(CS_SOURCE_HTTP, source);
-  inst.notifier.NotifySource(name, handle, CS_SOURCE_CREATED);
-  source->Start();
-  return handle;
+  return inst.CreateSource(CS_SOURCE_HTTP, source);
 }
 
 CS_Source CreateHttpCamera(const wpi::Twine& name,
@@ -499,14 +496,11 @@ CS_Source CreateHttpCamera(const wpi::Twine& name,
   auto source = std::make_shared<HttpCameraImpl>(name, kind, inst.logger,
                                                  inst.notifier, inst.telemetry);
   if (!source->SetUrls(urls, status)) return 0;
-  auto handle = inst.sources.Allocate(CS_SOURCE_HTTP, source);
-  inst.notifier.NotifySource(name, handle, CS_SOURCE_CREATED);
-  source->Start();
-  return handle;
+  return inst.CreateSource(CS_SOURCE_HTTP, source);
 }
 
 CS_HttpCameraKind GetHttpCameraKind(CS_Source source, CS_Status* status) {
-  auto data = Instance::GetInstance().sources.Get(source);
+  auto data = Instance::GetInstance().GetSource(source);
   if (!data || data->kind != CS_SOURCE_HTTP) {
     *status = CS_INVALID_HANDLE;
     return CS_HTTP_UNKNOWN;
@@ -520,7 +514,7 @@ void SetHttpCameraUrls(CS_Source source, wpi::ArrayRef<std::string> urls,
     *status = CS_EMPTY_VALUE;
     return;
   }
-  auto data = Instance::GetInstance().sources.Get(source);
+  auto data = Instance::GetInstance().GetSource(source);
   if (!data || data->kind != CS_SOURCE_HTTP) {
     *status = CS_INVALID_HANDLE;
     return;
@@ -530,7 +524,7 @@ void SetHttpCameraUrls(CS_Source source, wpi::ArrayRef<std::string> urls,
 
 std::vector<std::string> GetHttpCameraUrls(CS_Source source,
                                            CS_Status* status) {
-  auto data = Instance::GetInstance().sources.Get(source);
+  auto data = Instance::GetInstance().GetSource(source);
   if (!data || data->kind != CS_SOURCE_HTTP) {
     *status = CS_INVALID_HANDLE;
     return std::vector<std::string>{};

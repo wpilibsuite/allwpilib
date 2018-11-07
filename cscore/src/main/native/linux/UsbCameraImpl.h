@@ -40,7 +40,7 @@ class UsbCameraImpl : public SourceImpl {
                 Telemetry& telemetry, const wpi::Twine& path);
   ~UsbCameraImpl() override;
 
-  void Start();
+  void Start() override;
 
   // Property functions
   void SetProperty(int property, int value, CS_Status* status) override;
