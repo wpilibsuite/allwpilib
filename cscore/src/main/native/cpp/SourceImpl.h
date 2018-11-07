@@ -42,6 +42,8 @@ class SourceImpl : public PropertyContainer {
   SourceImpl(const SourceImpl& oth) = delete;
   SourceImpl& operator=(const SourceImpl& oth) = delete;
 
+  virtual void Start() = 0;
+
   wpi::StringRef GetName() const { return m_name; }
 
   void SetDescription(const wpi::Twine& description);

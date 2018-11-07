@@ -915,19 +915,18 @@ CS_Sink CreateMjpegServer(const wpi::Twine& name,
                           CS_Status* status) {
   auto& inst = Instance::GetInstance();
   wpi::SmallString<128> listenAddressBuf;
-  auto sink = std::make_shared<MjpegServerImpl>(
-      name, inst.logger, inst.notifier, inst.telemetry, listenAddress, port,
-      std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
-          port,
-          listenAddress.toNullTerminatedStringRef(listenAddressBuf).data(),
-          inst.logger)));
-  auto handle = inst.sinks.Allocate(CS_SINK_MJPEG, sink);
-  inst.notifier.NotifySink(name, handle, CS_SINK_CREATED);
-  return handle;
+  return inst.CreateSink(
+      CS_SINK_MJPEG,
+      std::make_shared<MjpegServerImpl>(
+          name, inst.logger, inst.notifier, inst.telemetry, listenAddress, port,
+          std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
+              port,
+              listenAddress.toNullTerminatedStringRef(listenAddressBuf).data(),
+              inst.logger))));
 }
 
 std::string GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status) {
-  auto data = Instance::GetInstance().sinks.Get(sink);
+  auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_MJPEG) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
@@ -936,7 +935,7 @@ std::string GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status) {
 }
 
 int GetMjpegServerPort(CS_Sink sink, CS_Status* status) {
-  auto data = Instance::GetInstance().sinks.Get(sink);
+  auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_MJPEG) {
     *status = CS_INVALID_HANDLE;
     return 0;
