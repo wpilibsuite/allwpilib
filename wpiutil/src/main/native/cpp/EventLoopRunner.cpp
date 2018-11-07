@@ -44,11 +44,14 @@ class EventLoopRunner::Thread : public SafeThread {
 
 EventLoopRunner::EventLoopRunner() { m_owner.Start(); }
 
-EventLoopRunner::~EventLoopRunner() {
+EventLoopRunner::~EventLoopRunner() { Stop(); }
+
+void EventLoopRunner::Stop() {
   ExecAsync([](uv::Loop& loop) {
     // close all handles; this will (eventually) stop the loop
     loop.Walk([](uv::Handle& h) { h.Close(); });
   });
+  m_owner.Join();
 }
 
 void EventLoopRunner::ExecAsync(LoopFunc func) {
@@ -60,11 +63,13 @@ void EventLoopRunner::ExecAsync(LoopFunc func) {
 }
 
 void EventLoopRunner::ExecSync(LoopFunc func) {
+  wpi::future<void> f;
   if (auto thr = m_owner.GetThread()) {
     if (auto doExec = thr->m_doExec.lock()) {
-      doExec->Call(func);
+      f = doExec->Call(func);
     }
   }
+  if (f.valid()) f.wait();
 }
 
 std::shared_ptr<uv::Loop> EventLoopRunner::GetLoop() {
