@@ -60,10 +60,6 @@
 # include <AvailabilityMacros.h>
 #endif
 
-#ifdef __FRC_ROBORIO__
-#include "wpi/timestamp.h"
-#endif
-
 #if defined(__ANDROID__)
 int uv__pthread_sigmask(int how, const sigset_t* set, sigset_t* oset);
 # ifdef pthread_sigmask
@@ -341,11 +337,7 @@ static const int kFSEventStreamEventFlagItemIsSymlink = 0x00040000;
 UV_UNUSED(static void uv__update_time(uv_loop_t* loop)) {
   /* Use a fast time source if available.  We only need millisecond precision.
    */
-#ifdef __FRC_ROBORIO__
-  loop->time = wpi::Now() / 1000;
-#else
   loop->time = uv__hrtime(UV_CLOCK_FAST) / 1000000;
-#endif
 }
 
 UV_UNUSED(static const char* uv__basename_r(const char* path)) {
