@@ -72,9 +72,7 @@ static wpi::StringRef MakeSourceValue(CS_Source source,
       break;
     }
     case cs::VideoSource::kCv:
-      // FIXME: Should be "cv:", but LabVIEW dashboard requires "usb:".
-      // https://github.com/wpilibsuite/allwpilib/issues/407
-      return "usb:";
+      return "cv:";
     default:
       return "unknown:";
   }
