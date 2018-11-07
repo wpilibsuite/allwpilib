@@ -54,14 +54,14 @@ class Instance {
   wpi::Logger logger;
   Notifier notifier;
   Telemetry telemetry;
-  NetworkListener network_listener;
+  NetworkListener networkListener;
 
  private:
   UnlimitedHandleResource<Handle, SourceData, Handle::kSource> m_sources;
   UnlimitedHandleResource<Handle, SinkData, Handle::kSink> m_sinks;
 
  public:
-  wpi::EventLoopRunner event_loop;
+  wpi::EventLoopRunner eventLoop;
 
   std::pair<CS_Sink, std::shared_ptr<SinkData>> FindSink(const SinkImpl& sink);
   std::pair<CS_Source, std::shared_ptr<SourceData>> FindSource(
