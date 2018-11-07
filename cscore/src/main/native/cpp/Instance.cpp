@@ -45,8 +45,17 @@ Instance::Instance() : telemetry(notifier), networkListener(logger, notifier) {
 Instance::~Instance() {}
 
 Instance& Instance::GetInstance() {
-  static Instance inst;
-  return inst;
+  static Instance* inst = new Instance;
+  return *inst;
+}
+
+void Instance::Shutdown() {
+  eventLoop.Stop();
+  m_sinks.FreeAll();
+  m_sources.FreeAll();
+  networkListener.Stop();
+  telemetry.Stop();
+  notifier.Stop();
 }
 
 void Instance::SetDefaultLogger() { logger.SetLogger(def_log_func); }

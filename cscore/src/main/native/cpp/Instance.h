@@ -51,6 +51,8 @@ class Instance {
 
   static Instance& GetInstance();
 
+  void Shutdown();
+
   wpi::Logger logger;
   Notifier notifier;
   Telemetry telemetry;

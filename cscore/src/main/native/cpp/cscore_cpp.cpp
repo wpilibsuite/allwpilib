@@ -666,6 +666,11 @@ void SetDefaultLogger(unsigned int min_level) {
 }
 
 //
+// Shutdown Function
+//
+void Shutdown() { Instance::GetInstance().Shutdown(); }
+
+//
 // Utility Functions
 //
 

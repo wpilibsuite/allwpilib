@@ -348,6 +348,8 @@ void CS_SetDefaultLogger(unsigned int min_level) {
   cs::SetDefaultLogger(min_level);
 }
 
+void CS_Shutdown(void) { cs::Shutdown(); }
+
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
   wpi::SmallVector<CS_Source, 32> buf;
   auto handles = cs::EnumerateSourceHandles(buf, status);
