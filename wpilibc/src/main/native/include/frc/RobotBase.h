@@ -127,7 +127,7 @@ class RobotBase {
    */
   RobotBase();
 
-  virtual ~RobotBase() = default;
+  virtual ~RobotBase();
 
   // m_ds isn't moved in these because DriverStation is a singleton; every
   // instance of RobotBase has a reference to the same object.
