@@ -44,11 +44,12 @@ class RpcServerThread
   RpcServerThread(int inst, wpi::Logger& logger)
       : m_inst(inst), m_logger(logger) {}
 
-  bool Matches(const RpcListenerData& listener, const RpcNotifierData& data) {
+  bool Matches(const RpcListenerData& /*listener*/,
+               const RpcNotifierData& data) {
     return !data.name.empty() && data.send_response;
   }
 
-  void SetListener(RpcNotifierData* data, unsigned int listener_uid) {
+  void SetListener(RpcNotifierData* data, unsigned int /*listener_uid*/) {
     unsigned int local_id = Handle{data->entry}.GetIndex();
     unsigned int call_uid = Handle{data->call}.GetIndex();
     RpcIdPair lookup_uid{local_id, call_uid};
