@@ -21,8 +21,6 @@ RecordingController::RecordingController(nt::NetworkTableInstance ntInstance)
   m_eventsTable = ntInstance.GetTable("/Shuffleboard/.recording/events");
 }
 
-RecordingController::~RecordingController() {}
-
 void RecordingController::StartRecording() {
   m_recordingControlEntry.SetBoolean(true);
 }

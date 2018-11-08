@@ -23,7 +23,7 @@ namespace detail {
 class RecordingController final {
  public:
   explicit RecordingController(nt::NetworkTableInstance ntInstance);
-  virtual ~RecordingController();
+  virtual ~RecordingController() = default;
 
   void StartRecording();
   void StopRecording();
