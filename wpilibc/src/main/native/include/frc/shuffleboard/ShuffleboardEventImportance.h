@@ -9,6 +9,10 @@
 
 namespace frc {
 
+// Maintainer note: this enum is mirrored in WPILibJ and in Shuffleboard
+// Modifying the enum or enum strings requires a corresponding change to the Java enum
+// and the enum in Shuffleboard
+
 enum ShuffleboardEventImportance { kTrivial, kLow, kNormal, kHigh, kCritical };
 
 inline wpi::StringRef ShuffleboardEventImportanceName(
