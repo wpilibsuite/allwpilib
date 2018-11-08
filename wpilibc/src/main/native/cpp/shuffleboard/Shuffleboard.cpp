@@ -29,8 +29,39 @@ void Shuffleboard::DisableActuatorWidgets() {
   GetInstance().DisableActuatorWidgets();
 }
 
+void Shuffleboard::StartRecording() {
+  GetRecordingController().StartRecording();
+}
+
+void Shuffleboard::StopRecording() { GetRecordingController().StopRecording(); }
+
+void Shuffleboard::SetRecordingFileNameFormat(wpi::StringRef format) {
+  GetRecordingController().SetRecordingFileNameFormat(format);
+}
+
+void Shuffleboard::ClearRecordingFileNameFormat() {
+  GetRecordingController().ClearRecordingFileNameFormat();
+}
+
+void Shuffleboard::AddEventMarker(wpi::StringRef name,
+                                  wpi::StringRef description,
+                                  ShuffleboardEventImportance importance) {
+  GetRecordingController().AddEventMarker(name, description, importance);
+}
+
+void Shuffleboard::AddEventMarker(wpi::StringRef name,
+                                  ShuffleboardEventImportance importance) {
+  AddEventMarker(name, "", importance);
+}
+
 detail::ShuffleboardInstance& Shuffleboard::GetInstance() {
   static detail::ShuffleboardInstance inst(
+      nt::NetworkTableInstance::GetDefault());
+  return inst;
+}
+
+detail::RecordingController& Shuffleboard::GetRecordingController() {
+  static detail::RecordingController inst(
       nt::NetworkTableInstance::GetDefault());
   return inst;
 }
