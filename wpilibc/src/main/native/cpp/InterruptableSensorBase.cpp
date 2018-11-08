@@ -96,18 +96,18 @@ double InterruptableSensorBase::ReadRisingTimestamp() {
   if (StatusIsFatal()) return 0.0;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
-  double timestamp = HAL_ReadInterruptRisingTimestamp(m_interrupt, &status);
+  int64_t timestamp = HAL_ReadInterruptRisingTimestamp(m_interrupt, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-  return timestamp;
+  return timestamp * 1e-6;
 }
 
 double InterruptableSensorBase::ReadFallingTimestamp() {
   if (StatusIsFatal()) return 0.0;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
-  double timestamp = HAL_ReadInterruptFallingTimestamp(m_interrupt, &status);
+  int64_t timestamp = HAL_ReadInterruptFallingTimestamp(m_interrupt, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-  return timestamp;
+  return timestamp * 1e-6;
 }
 
 void InterruptableSensorBase::SetUpSourceEdge(bool risingEdge,

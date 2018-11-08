@@ -77,24 +77,28 @@ void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
 /**
  * Returns the timestamp for the rising interrupt that occurred most recently.
  *
- * This is in the same time domain as HAL_GetFPGATime().
+ * This is in the same time domain as HAL_GetFPGATime().  It only contains the
+ * bottom 32 bits of the timestamp.  If your robot has been running for over 1
+ * hour, you will need to fill in the upper 32 bits yourself.
  *
  * @param interruptHandle the interrupt handle
- * @return                timestamp in seconds since FPGA Initialization
+ * @return                timestamp in microseconds since FPGA Initialization
  */
-double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
-                                        int32_t* status);
+int64_t HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
+                                         int32_t* status);
 
 /**
  * Returns the timestamp for the falling interrupt that occurred most recently.
  *
- * This is in the same time domain as HAL_GetFPGATime().
+ * This is in the same time domain as HAL_GetFPGATime().  It only contains the
+ * bottom 32 bits of the timestamp.  If your robot has been running for over 1
+ * hour, you will need to fill in the upper 32 bits yourself.
  *
  * @param interruptHandle the interrupt handle
- * @return                timestamp in seconds since FPGA Initialization
+ * @return                timestamp in microseconds since FPGA Initialization
  */
-double HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
-                                         int32_t* status);
+int64_t HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
+                                          int32_t* status);
 
 /**
  * Requests interrupts on a specific digital source.

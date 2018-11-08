@@ -249,7 +249,8 @@ Java_edu_wpi_first_hal_InterruptJNI_readInterruptRisingTimestamp
 
   int32_t status = 0;
   jdouble timeStamp = HAL_ReadInterruptRisingTimestamp(
-      (HAL_InterruptHandle)interruptHandle, &status);
+                          (HAL_InterruptHandle)interruptHandle, &status) *
+                      1e-6;
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
@@ -272,7 +273,8 @@ Java_edu_wpi_first_hal_InterruptJNI_readInterruptFallingTimestamp
 
   int32_t status = 0;
   jdouble timeStamp = HAL_ReadInterruptFallingTimestamp(
-      (HAL_InterruptHandle)interruptHandle, &status);
+                          (HAL_InterruptHandle)interruptHandle, &status) *
+                      1e-6;
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
