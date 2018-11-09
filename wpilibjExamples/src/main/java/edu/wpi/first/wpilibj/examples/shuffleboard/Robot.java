@@ -41,7 +41,7 @@ public class Robot extends IterativeRobot {
     ShuffleboardTab driveBaseTab = Shuffleboard.getTab("Drivebase");
     driveBaseTab.add("Tank Drive", m_tankDrive);
     // Put both encoders in a list layout
-    ShuffleboardLayout encoders = driveBaseTab.getLayout("List", "Encoders")
+    ShuffleboardLayout encoders = driveBaseTab.getLayout("List Layout", "Encoders")
                                               .withPosition(0, 0)
                                               .withSize(2, 2);
     encoders.add("Left Encoder", m_leftEncoder);
