@@ -1,3 +1,5 @@
+def opencvVersion = '3.4.3-16'
+
 if (project.hasProperty('useCpp') && project.useCpp) {
     model {
         dependencyConfigs {
@@ -6,7 +8,7 @@ if (project.hasProperty('useCpp') && project.useCpp) {
                 artifactId = 'opencv-cpp'
                 headerClassifier = 'headers'
                 ext = 'zip'
-                version = '3.4.3-15'
+                version = opencvVersion
                 sharedConfigs = project.sharedCvConfigs
                 staticConfigs = project.staticCvConfigs
                 linkExcludes = ['**/*java*']
@@ -17,12 +19,12 @@ if (project.hasProperty('useCpp') && project.useCpp) {
 
 if (project.hasProperty('useJava') && project.useJava) {
     dependencies {
-        compile 'edu.wpi.first.thirdparty.frc2019.opencv:opencv-java:3.4.3-15'
+        compile "edu.wpi.first.thirdparty.frc2019.opencv:opencv-java:${opencvVersion}"
         if (!project.hasProperty('skipDev') || !project.skipDev) {
-            devCompile 'edu.wpi.first.thirdparty.frc2019.opencv:opencv-java:3.4.3-15'
+            devCompile "edu.wpi.first.thirdparty.frc2019.opencv:opencv-java:${opencvVersion}"
         }
         if (project.hasProperty('useDocumentation') && project.useDocumentation) {
-            javaSource 'edu.wpi.first.thirdparty.frc2019.opencv:opencv-java:3.4.3-15:sources'
+            javaSource "edu.wpi.first.thirdparty.frc2019.opencv:opencv-java:${opencvVersion}:sources"
         }
     }
 }
