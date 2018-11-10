@@ -112,6 +112,9 @@ if [[ $# -lt $PARAM_COUNTER ]]; then
     exit 1
 fi
 
+# Make sure the webserver is disabled to save memory
+/usr/local/natinst/etc/init.d/systemWebServer stop
+
 # Kill all running robot programs
 killall java FRCUserProgram
 
