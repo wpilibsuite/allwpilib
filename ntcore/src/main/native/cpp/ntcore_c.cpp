@@ -727,7 +727,7 @@ void NT_InitString(NT_String* str) {
   str->len = 0;
 }
 
-void NT_DisposeEntryArray(NT_Entry* arr, size_t count) { std::free(arr); }
+void NT_DisposeEntryArray(NT_Entry* arr, size_t /*count*/) { std::free(arr); }
 
 void NT_DisposeConnectionInfoArray(NT_ConnectionInfo* arr, size_t count) {
   for (size_t i = 0; i < count; i++) DisposeConnectionInfo(&arr[i]);
