@@ -71,17 +71,15 @@ ext {
 
 def examplesMap = [:];
 
-if (OperatingSystem.current().isLinux()) {
-    File examplesTree = file("$projectDir/examples")
-    examplesTree.list(new FilenameFilter() {
-        @Override
-        public boolean accept(File current, String name) {
-            return new File(current, name).isDirectory();
-        }
-    }).each {
-        sharedCvConfigs.put(it, [])
-        examplesMap.put(it, [])
+File examplesTree = file("$projectDir/examples")
+examplesTree.list(new FilenameFilter() {
+    @Override
+    public boolean accept(File current, String name) {
+        return new File(current, name).isDirectory();
     }
+}).each {
+    sharedCvConfigs.put(it, [])
+    examplesMap.put(it, [])
 }
 
 apply from: "${rootDir}/shared/opencv.gradle"
