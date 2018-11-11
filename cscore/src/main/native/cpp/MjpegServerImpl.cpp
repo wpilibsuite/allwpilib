@@ -817,8 +817,9 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
         CS_Status status = CS_OK;
         os << source->GetConfigJson(&status);
         os.flush();
-      } else
+      } else {
         SendError(os, 404, "Resource not found");
+      }
       break;
     case kRootPage:
       SDEBUG("request for root page");

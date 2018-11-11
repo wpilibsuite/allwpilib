@@ -183,17 +183,17 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
     try {
       auto str = config.at("pixel format").get<std::string>();
       wpi::StringRef s(str);
-      if (s.equals_lower("mjpeg"))
+      if (s.equals_lower("mjpeg")) {
         mode.pixelFormat = cs::VideoMode::kMJPEG;
-      else if (s.equals_lower("yuyv"))
+      } else if (s.equals_lower("yuyv")) {
         mode.pixelFormat = cs::VideoMode::kYUYV;
-      else if (s.equals_lower("rgb565"))
+      } else if (s.equals_lower("rgb565")) {
         mode.pixelFormat = cs::VideoMode::kRGB565;
-      else if (s.equals_lower("bgr"))
+      } else if (s.equals_lower("bgr")) {
         mode.pixelFormat = cs::VideoMode::kBGR;
-      else if (s.equals_lower("gray"))
+      } else if (s.equals_lower("gray")) {
         mode.pixelFormat = cs::VideoMode::kGray;
-      else {
+      } else {
         SWARNING("SetConfigJson: could not understand pixel format value '"
                  << str << '\'');
       }
