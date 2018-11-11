@@ -341,7 +341,7 @@ void MjpegServerImpl::ConnThread::SendHTMLHeadTitle(
 // Send the root html file with controls for all the settable properties.
 void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
                                            SourceImpl& source, bool header) {
-  if (header) SendHeader(os, 200, "OK", "application/x-javascript");
+  if (header) SendHeader(os, 200, "OK", "text/html");
 
   SendHTMLHeadTitle(os);
   os << startRootPage;
@@ -454,7 +454,7 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
 // Send a JSON file which is contains information about the source parameters.
 void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
                                            SourceImpl& source, bool header) {
-  if (header) SendHeader(os, 200, "OK", "application/x-javascript");
+  if (header) SendHeader(os, 200, "OK", "application/json");
 
   os << "{\n\"controls\": [\n";
   wpi::SmallVector<int, 32> properties_vec;
@@ -813,7 +813,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
     case kGetSourceConfig:
       SDEBUG("request for JSON file");
       if (auto source = GetSource()) {
-        SendHeader(os, 200, "OK", "application/x-javascript");
+        SendHeader(os, 200, "OK", "application/json");
         CS_Status status = CS_OK;
         os << source->GetConfigJson(&status);
         os.flush();
