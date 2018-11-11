@@ -11,8 +11,8 @@
 #include <cstring>
 
 #include <wpi/STLExtras.h>
-#include <wpi/timestamp.h>
 #include <wpi/json.h>
+#include <wpi/timestamp.h>
 
 #include "Log.h"
 #include "Notifier.h"
