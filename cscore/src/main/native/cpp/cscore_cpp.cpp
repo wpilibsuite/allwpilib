@@ -9,6 +9,7 @@
 
 #include <wpi/SmallString.h>
 #include <wpi/hostname.h>
+#include <wpi/json.h>
 
 #include "Handle.h"
 #include "Instance.h"
@@ -322,6 +323,44 @@ bool SetSourceFPS(CS_Source source, int fps, CS_Status* status) {
     return false;
   }
   return data->source->SetFPS(fps, status);
+}
+
+bool SetSourceConfigJson(CS_Source source, wpi::StringRef config,
+                         CS_Status* status) {
+  auto data = Instance::GetInstance().GetSource(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return false;
+  }
+  return data->source->SetConfigJson(config, status);
+}
+
+bool SetSourceConfigJson(CS_Source source, const wpi::json& config,
+                         CS_Status* status) {
+  auto data = Instance::GetInstance().GetSource(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return false;
+  }
+  return data->source->SetConfigJson(config, status);
+}
+
+std::string GetSourceConfigJson(CS_Source source, CS_Status* status) {
+  auto data = Instance::GetInstance().GetSource(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return std::string{};
+  }
+  return data->source->GetConfigJson(status);
+}
+
+wpi::json GetSourceConfigJsonObject(CS_Source source, CS_Status* status) {
+  auto data = Instance::GetInstance().GetSource(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return wpi::json{};
+  }
+  return data->source->GetConfigJsonObject(status);
 }
 
 std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,

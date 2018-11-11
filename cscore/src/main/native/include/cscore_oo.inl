@@ -170,6 +170,21 @@ inline bool VideoSource::SetFPS(int fps) {
   return SetSourceFPS(m_handle, fps, &m_status);
 }
 
+inline bool VideoSource::SetConfigJson(wpi::StringRef config) {
+  m_status = 0;
+  return SetSourceConfigJson(m_handle, config, &m_status);
+}
+
+inline bool VideoSource::SetConfigJson(const wpi::json& config) {
+  m_status = 0;
+  return SetSourceConfigJson(m_handle, config, &m_status);
+}
+
+inline std::string VideoSource::GetConfigJson() const {
+  m_status = 0;
+  return GetSourceConfigJson(m_handle, &m_status);
+}
+
 inline double VideoSource::GetActualFPS() const {
   m_status = 0;
   return cs::GetTelemetryAverageValue(m_handle, CS_SOURCE_FRAMES_RECEIVED,

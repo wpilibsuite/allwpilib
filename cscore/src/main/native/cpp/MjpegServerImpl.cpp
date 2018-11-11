@@ -67,7 +67,8 @@ static const char* startRootPage =
     "</head><body>\n"
     "<div class=\"stream\">\n"
     "<img src=\"/stream.mjpg\" /><p />\n"
-    "<a href=\"/settings.json\">Settings JSON</a>\n"
+    "<a href=\"/settings.json\">Settings JSON</a> |\n"
+    "<a href=\"/config.json\">Source Config JSON</a>\n"
     "</div>\n"
     "<div class=\"settings\">\n";
 static const char* endRootPage = "</div></body></html>";
@@ -728,7 +729,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
     return;
   }
 
-  enum { kCommand, kStream, kGetSettings, kRootPage } kind;
+  enum { kCommand, kStream, kGetSettings, kGetSourceConfig, kRootPage } kind;
   wpi::StringRef parameters;
   size_t pos;
 
@@ -748,6 +749,9 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   } else if (req.find("GET /settings") != wpi::StringRef::npos &&
              req.find(".json") != wpi::StringRef::npos) {
     kind = kGetSettings;
+  } else if (req.find("GET /config") != wpi::StringRef::npos &&
+             req.find(".json") != wpi::StringRef::npos) {
+    kind = kGetSourceConfig;
   } else if (req.find("GET /input") != wpi::StringRef::npos &&
              req.find(".json") != wpi::StringRef::npos) {
     kind = kGetSettings;
@@ -804,6 +808,16 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
       if (auto source = GetSource())
         SendJSON(os, *source, true);
       else
+        SendError(os, 404, "Resource not found");
+      break;
+    case kGetSourceConfig:
+      SDEBUG("request for JSON file");
+      if (auto source = GetSource()) {
+        SendHeader(os, 200, "OK", "application/x-javascript");
+        CS_Status status = CS_OK;
+        os << source->GetConfigJson(&status);
+        os.flush();
+      } else
         SendError(os, 404, "Resource not found");
       break;
     case kRootPage:
