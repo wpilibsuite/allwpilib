@@ -89,6 +89,8 @@ public class CameraServerJNI {
   public static native boolean setSourcePixelFormat(int source, int pixelFormat);
   public static native boolean setSourceResolution(int source, int width, int height);
   public static native boolean setSourceFPS(int source, int fps);
+  public static native boolean setSourceConfigJson(int source, String config);
+  public static native String getSourceConfigJson(int source);
   public static native VideoMode[] enumerateSourceVideoModes(int source);
   public static native int[] enumerateSourceSinks(int source);
   public static native int copySource(int source);

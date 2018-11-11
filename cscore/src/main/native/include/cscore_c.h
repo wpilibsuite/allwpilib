@@ -289,6 +289,9 @@ CS_Bool CS_SetSourcePixelFormat(CS_Source source,
 CS_Bool CS_SetSourceResolution(CS_Source source, int width, int height,
                                CS_Status* status);
 CS_Bool CS_SetSourceFPS(CS_Source source, int fps, CS_Status* status);
+CS_Bool CS_SetSourceConfigJson(CS_Source source, const char* config,
+                               CS_Status* status);
+char* CS_GetSourceConfigJson(CS_Source source, CS_Status* status);
 CS_VideoMode* CS_EnumerateSourceVideoModes(CS_Source source, int* count,
                                            CS_Status* status);
 CS_Sink* CS_EnumerateSourceSinks(CS_Source source, int* count,
