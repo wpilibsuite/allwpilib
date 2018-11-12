@@ -100,6 +100,26 @@ model {
                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
                                  '_TI5?AVfailure']
         }
+        cscoreJNI(ExportsConfig) {
+            x86SymbolFilter = { symbols ->
+                def retList = []
+                symbols.each { symbol ->
+                    if (symbol.startsWith('CS_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+            x64SymbolFilter = { symbols ->
+                def retList = []
+                symbols.each { symbol ->
+                    if (symbol.startsWith('CS_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+        }
     }
     components {
         examplesMap.each { key, value ->
