@@ -166,7 +166,7 @@ bool SourceImpl::SetConfigJson(wpi::StringRef config, CS_Status* status) {
   wpi::json j;
   try {
     j = wpi::json::parse(config);
-  } catch (wpi::json::parse_error e) {
+  } catch (const wpi::json::parse_error& e) {
     SWARNING("SetConfigJson: parse error at byte " << e.byte << ": "
                                                    << e.what());
     *status = CS_PROPERTY_WRITE_FAILED;
@@ -197,7 +197,7 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
         SWARNING("SetConfigJson: could not understand pixel format value '"
                  << str << '\'');
       }
-    } catch (wpi::json::exception e) {
+    } catch (const wpi::json::exception& e) {
       SWARNING("SetConfigJson: could not read pixel format: " << e.what());
     }
   }
@@ -206,7 +206,7 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
   if (config.count("width") != 0) {
     try {
       mode.width = config.at("width").get<unsigned int>();
-    } catch (wpi::json::exception e) {
+    } catch (const wpi::json::exception& e) {
       SWARNING("SetConfigJson: could not read width: " << e.what());
     }
   }
@@ -215,7 +215,7 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
   if (config.count("height") != 0) {
     try {
       mode.height = config.at("height").get<unsigned int>();
-    } catch (wpi::json::exception e) {
+    } catch (const wpi::json::exception& e) {
       SWARNING("SetConfigJson: could not read height: " << e.what());
     }
   }
@@ -224,7 +224,7 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
   if (config.count("fps") != 0) {
     try {
       mode.fps = config.at("fps").get<unsigned int>();
-    } catch (wpi::json::exception e) {
+    } catch (const wpi::json::exception& e) {
       SWARNING("SetConfigJson: could not read fps: " << e.what());
     }
   }
@@ -259,7 +259,7 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
       int val = config.at("brightness").get<int>();
       SINFO("SetConfigJson: setting brightness to " << val);
       SetBrightness(val, status);
-    } catch (wpi::json::exception e) {
+    } catch (const wpi::json::exception& e) {
       SWARNING("SetConfigJson: could not read brightness: " << e.what());
     }
   }
@@ -286,7 +286,7 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
         SINFO("SetConfigJson: setting white balance to " << val);
         SetWhiteBalanceManual(val, status);
       }
-    } catch (wpi::json::exception e) {
+    } catch (const wpi::json::exception& e) {
       SWARNING("SetConfigJson: could not read white balance: " << e.what());
     }
   }
@@ -313,7 +313,7 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
         SINFO("SetConfigJson: setting exposure to " << val);
         SetExposureManual(val, status);
       }
-    } catch (wpi::json::exception e) {
+    } catch (const wpi::json::exception& e) {
       SWARNING("SetConfigJson: could not read exposure: " << e.what());
     }
   }
@@ -324,7 +324,7 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
       std::string name;
       try {
         name = prop.at("name").get<std::string>();
-      } catch (wpi::json::exception e) {
+      } catch (const wpi::json::exception& e) {
         SWARNING("SetConfigJson: could not read property name: " << e.what());
         continue;
       }
@@ -345,7 +345,7 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
           SINFO("SetConfigJson: setting property '" << name << "' to " << val);
           SetProperty(n, val, status);
         }
-      } catch (wpi::json::exception e) {
+      } catch (const wpi::json::exception& e) {
         SWARNING("SetConfigJson: could not read property value: " << e.what());
         continue;
       }
