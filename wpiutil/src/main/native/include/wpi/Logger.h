@@ -58,7 +58,8 @@ class Logger {
 #define WPI_LOG(logger_inst, level, x)                                 \
   do {                                                                 \
     ::wpi::Logger& WPI_logger_ = logger_inst;                          \
-    if (WPI_logger_.min_level() <= level && WPI_logger_.HasLogger()) { \
+    if (WPI_logger_.min_level() <= static_cast<unsigned int>(level) && \
+        WPI_logger_.HasLogger()) {                                     \
       ::wpi::SmallString<128> log_buf_;                                \
       ::wpi::raw_svector_ostream log_os_{log_buf_};                    \
       log_os_ << x;                                                    \

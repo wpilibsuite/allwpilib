@@ -271,6 +271,45 @@ public class VideoSource implements AutoCloseable {
   }
 
   /**
+   * Set video mode and properties from a JSON configuration string.
+   *
+   * <p>The format of the JSON input is:
+   *
+   * <pre>
+   * {
+   *     "pixel format": "MJPEG", "YUYV", etc
+   *     "width": video mode width
+   *     "height": video mode height
+   *     "fps": video mode fps
+   *     "brightness": percentage brightness
+   *     "white balance": "auto", "hold", or value
+   *     "exposure": "auto", "hold", or value
+   *     "properties": [
+   *         {
+   *             "name": property name
+   *             "value": property value
+   *         }
+   *     ]
+   * }
+   * </pre>
+   *
+   * @param config configuration
+   * @return True if set successfully
+   */
+  public boolean setConfigJson(String config) {
+    return CameraServerJNI.setSourceConfigJson(m_handle, config);
+  }
+
+  /**
+   * Get a JSON configuration string.
+   *
+   * @return JSON configuration string
+   */
+  public String getConfigJson() {
+    return CameraServerJNI.getSourceConfigJson(m_handle);
+  }
+
+  /**
    * Get the actual FPS.
    *
    * <p>CameraServerJNI#setTelemetryPeriod() must be called for this to be valid

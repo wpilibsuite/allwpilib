@@ -124,27 +124,23 @@ namespace cs {
 
 CS_Sink CreateCvSink(const wpi::Twine& name, CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  auto sink = std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
-                                           inst.telemetry);
-  auto handle = inst.sinks.Allocate(CS_SINK_CV, sink);
-  inst.notifier.NotifySink(name, handle, CS_SINK_CREATED);
-  return handle;
+  return inst.CreateSink(
+      CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
+                                               inst.telemetry));
 }
 
 CS_Sink CreateCvSinkCallback(const wpi::Twine& name,
                              std::function<void(uint64_t time)> processFrame,
                              CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  auto sink = std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
-                                           inst.telemetry, processFrame);
-  auto handle = inst.sinks.Allocate(CS_SINK_CV, sink);
-  inst.notifier.NotifySink(name, handle, CS_SINK_CREATED);
-  return handle;
+  return inst.CreateSink(
+      CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
+                                               inst.telemetry, processFrame));
 }
 
 void SetSinkDescription(CS_Sink sink, const wpi::Twine& description,
                         CS_Status* status) {
-  auto data = Instance::GetInstance().sinks.Get(sink);
+  auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return;
@@ -153,7 +149,7 @@ void SetSinkDescription(CS_Sink sink, const wpi::Twine& description,
 }
 
 uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status) {
-  auto data = Instance::GetInstance().sinks.Get(sink);
+  auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return 0;
@@ -163,7 +159,7 @@ uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status) {
 
 uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
                               CS_Status* status) {
-  auto data = Instance::GetInstance().sinks.Get(sink);
+  auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return 0;
@@ -172,7 +168,7 @@ uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
 }
 
 std::string GetSinkError(CS_Sink sink, CS_Status* status) {
-  auto data = Instance::GetInstance().sinks.Get(sink);
+  auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
@@ -182,7 +178,7 @@ std::string GetSinkError(CS_Sink sink, CS_Status* status) {
 
 wpi::StringRef GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                             CS_Status* status) {
-  auto data = Instance::GetInstance().sinks.Get(sink);
+  auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return wpi::StringRef{};
@@ -191,7 +187,7 @@ wpi::StringRef GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
 }
 
 void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
-  auto data = Instance::GetInstance().sinks.Get(sink);
+  auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return;

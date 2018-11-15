@@ -25,6 +25,10 @@ namespace cv {
 class Mat;
 }  // namespace cv
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 /** CameraServer (cscore) namespace */
 namespace cs {
 
@@ -228,6 +232,12 @@ bool SetSourcePixelFormat(CS_Source source, VideoMode::PixelFormat pixelFormat,
 bool SetSourceResolution(CS_Source source, int width, int height,
                          CS_Status* status);
 bool SetSourceFPS(CS_Source source, int fps, CS_Status* status);
+bool SetSourceConfigJson(CS_Source source, wpi::StringRef config,
+                         CS_Status* status);
+bool SetSourceConfigJson(CS_Source source, const wpi::json& config,
+                         CS_Status* status);
+std::string GetSourceConfigJson(CS_Source source, CS_Status* status);
+wpi::json GetSourceConfigJsonObject(CS_Source source, CS_Status* status);
 std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
                                                  CS_Status* status);
 wpi::ArrayRef<CS_Sink> EnumerateSourceSinks(CS_Source source,
@@ -385,6 +395,13 @@ void SetDefaultLogger(unsigned int min_level);
 /** @} */
 
 void Shutdown();
+
+/**
+ * @defgroup cscore_shutdown_func Library Shutdown Function
+ * @{
+ */
+void Shutdown();
+/** @} */
 
 /**
  * @defgroup cscore_utility_func Utility Functions

@@ -7,7 +7,6 @@
 
 #include "NetworkListener.h"
 
-#ifdef __linux__
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <sys/eventfd.h>
@@ -18,52 +17,55 @@
 #include <unistd.h>
 
 #include <cerrno>
-#endif
+
+#include <wpi/SafeThread.h>
 
 #include "Log.h"
 #include "Notifier.h"
 
 using namespace cs;
 
-namespace {
-
-class NetworkListenerThread : public wpi::SafeThread {
+class NetworkListener::Impl {
  public:
-  NetworkListenerThread(wpi::Logger& logger, Notifier& notifier)
+  Impl(wpi::Logger& logger, Notifier& notifier)
       : m_logger(logger), m_notifier(notifier) {}
-  void Main();
 
   wpi::Logger& m_logger;
   Notifier& m_notifier;
-  int m_command_fd = -1;
-};
 
-}  // namespace
+  class Thread : public wpi::SafeThread {
+   public:
+    Thread(wpi::Logger& logger, Notifier& notifier)
+        : m_logger(logger), m_notifier(notifier) {}
+    void Main();
 
-class NetworkListener::Pimpl {
- public:
-  wpi::SafeThreadOwner<NetworkListenerThread> m_owner;
+    wpi::Logger& m_logger;
+    Notifier& m_notifier;
+    int m_command_fd = -1;
+  };
+
+  wpi::SafeThreadOwner<Thread> m_owner;
 };
 
 NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
-    : m_logger(logger), m_notifier(notifier) {
-  m_data = std::make_unique<Pimpl>();
-}
+    : m_impl(std::make_unique<Impl>(logger, notifier)) {}
 
 NetworkListener::~NetworkListener() { Stop(); }
 
-void NetworkListener::Start() { m_data->m_owner.Start(m_logger, m_notifier); }
+void NetworkListener::Start() {
+  m_impl->m_owner.Start(m_impl->m_logger, m_impl->m_notifier);
+}
 
 void NetworkListener::Stop() {
   // Wake up thread
-  if (auto thr = m_data->m_owner.GetThread()) {
+  if (auto thr = m_impl->m_owner.GetThread()) {
     thr->m_active = false;
     if (thr->m_command_fd >= 0) eventfd_write(thr->m_command_fd, 1);
   }
-  m_data->m_owner.Stop();
+  m_impl->m_owner.Stop();
 }
 
-void NetworkListenerThread::Main() {
+void NetworkListener::Impl::Thread::Main() {
   // Create event socket so we can be shut down
   m_command_fd = ::eventfd(0, 0);
   if (m_command_fd < 0) {

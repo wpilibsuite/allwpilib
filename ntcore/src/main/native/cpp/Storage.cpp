@@ -310,7 +310,7 @@ void Storage::ProcessIncomingClearEntries(std::shared_ptr<Message> msg,
 }
 
 void Storage::ProcessIncomingExecuteRpc(
-    std::shared_ptr<Message> msg, INetworkConnection* conn,
+    std::shared_ptr<Message> msg, INetworkConnection* /*conn*/,
     std::weak_ptr<INetworkConnection> conn_weak) {
   std::unique_lock<wpi::mutex> lock(m_mutex);
   if (!m_server) return;  // only process on server
@@ -350,7 +350,7 @@ void Storage::ProcessIncomingExecuteRpc(
 }
 
 void Storage::ProcessIncomingRpcResponse(std::shared_ptr<Message> msg,
-                                         INetworkConnection* conn) {
+                                         INetworkConnection* /*conn*/) {
   std::unique_lock<wpi::mutex> lock(m_mutex);
   if (m_server) return;  // only process on client
   unsigned int id = msg->id();
@@ -387,7 +387,7 @@ void Storage::GetInitialAssignments(
 
 void Storage::ApplyInitialAssignments(
     INetworkConnection& conn, wpi::ArrayRef<std::shared_ptr<Message>> msgs,
-    bool new_server, std::vector<std::shared_ptr<Message>>* out_msgs) {
+    bool /*new_server*/, std::vector<std::shared_ptr<Message>>* out_msgs) {
   std::unique_lock<wpi::mutex> lock(m_mutex);
   if (m_server) return;  // should not do this on server
 

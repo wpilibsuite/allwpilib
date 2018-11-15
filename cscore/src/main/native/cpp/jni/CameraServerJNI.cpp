@@ -753,6 +753,36 @@ Java_edu_wpi_cscore_CameraServerJNI_setSourceFPS
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    setSourceConfigJson
+ * Signature: (ILjava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_setSourceConfigJson
+  (JNIEnv* env, jclass, jint source, jstring config)
+{
+  CS_Status status = 0;
+  auto val = cs::SetSourceConfigJson(source, JStringRef{env, config}, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    getSourceConfigJson
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_getSourceConfigJson
+  (JNIEnv* env, jclass, jint source)
+{
+  CS_Status status = 0;
+  auto val = cs::GetSourceConfigJson(source, &status);
+  CheckStatus(env, status);
+  return MakeJString(env, val);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    enumerateSourceVideoModes
  * Signature: (I)[Ljava/lang/Object;
  */

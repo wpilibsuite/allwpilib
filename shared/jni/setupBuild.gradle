@@ -166,7 +166,6 @@ model {
                     it.buildable = false
                     return
                 }
-                lib library: "${nativeName}", linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 if (project.hasProperty('jniSplitSetup')) {
                     jniSplitSetup(it)

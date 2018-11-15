@@ -10,14 +10,14 @@ package edu.wpi.first.wpilibj.examples.shuffleboard;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
   private final DifferentialDrive m_tankDrive = new DifferentialDrive(new Spark(0), new Spark(1));
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
@@ -41,7 +41,7 @@ public class Robot extends IterativeRobot {
     ShuffleboardTab driveBaseTab = Shuffleboard.getTab("Drivebase");
     driveBaseTab.add("Tank Drive", m_tankDrive);
     // Put both encoders in a list layout
-    ShuffleboardLayout encoders = driveBaseTab.getLayout("List", "Encoders")
+    ShuffleboardLayout encoders = driveBaseTab.getLayout("List Layout", "Encoders")
                                               .withPosition(0, 0)
                                               .withSize(2, 2);
     encoders.add("Left Encoder", m_leftEncoder);

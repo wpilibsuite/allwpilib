@@ -11,7 +11,6 @@
 #include <memory>
 
 #include <wpi/Logger.h>
-#include <wpi/SafeThread.h>
 
 namespace cs {
 
@@ -26,12 +25,8 @@ class NetworkListener {
   void Stop();
 
  private:
-  wpi::Logger& m_logger;
-  Notifier& m_notifier;
-
-  class Pimpl;
-
-  std::unique_ptr<Pimpl> m_data;
+  class Impl;
+  std::unique_ptr<Impl> m_impl;
 };
 
 }  // namespace cs

@@ -7,19 +7,13 @@
 
 #include "NetworkListener.h"
 
-#include "Log.h"
-#include "Notifier.h"
-
 using namespace cs;
 
-class NetworkListener::Pimpl {};
+class NetworkListener::Impl {};
 
-NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
-    : m_logger(logger), m_notifier(notifier) {
-  m_data = std::make_unique<Pimpl>();
-}
+NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier) {}
 
-NetworkListener::~NetworkListener() { Stop(); }
+NetworkListener::~NetworkListener() {}
 
 void NetworkListener::Start() {}
 

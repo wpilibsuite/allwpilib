@@ -27,6 +27,10 @@
 #include "PropertyContainer.h"
 #include "cscore_cpp.h"
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 namespace cs {
 
 class Notifier;
@@ -41,6 +45,8 @@ class SourceImpl : public PropertyContainer {
   virtual ~SourceImpl();
   SourceImpl(const SourceImpl& oth) = delete;
   SourceImpl& operator=(const SourceImpl& oth) = delete;
+
+  virtual void Start() = 0;
 
   wpi::StringRef GetName() const { return m_name; }
 
@@ -124,6 +130,11 @@ class SourceImpl : public PropertyContainer {
                               CS_Status* status);
   virtual bool SetResolution(int width, int height, CS_Status* status);
   virtual bool SetFPS(int fps, CS_Status* status);
+
+  bool SetConfigJson(wpi::StringRef config, CS_Status* status);
+  virtual bool SetConfigJson(const wpi::json& config, CS_Status* status);
+  std::string GetConfigJson(CS_Status* status);
+  virtual wpi::json GetConfigJsonObject(CS_Status* status);
 
   std::vector<VideoMode> EnumerateVideoModes(CS_Status* status) const;
 

@@ -308,16 +308,16 @@ static bool killExistingProgram(int timeout, int mode) {
       std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
       if (kill(pid, 0) == 0) {
         // still not successfull
-        if (mode == 0) {
-          wpi::outs() << "FRC pid " << pid << " did not die within " << timeout
-                      << "ms. Aborting\n";
-          return 0;              // just fail
-        } else if (mode == 1) {  // kill -9 it
-          kill(pid, SIGKILL);
-        } else {
-          wpi::outs() << "WARNING: FRC pid " << pid << " did not die within "
-                      << timeout << "ms.\n";
+        wpi::outs() << "FRC pid " << pid << " did not die within " << timeout
+                    << "ms. Force killing with kill -9\n";
+        // Force kill -9
+        auto forceKill = kill(pid, SIGKILL);
+        if (forceKill != 0) {
+          auto errorMsg = std::strerror(forceKill);
+          wpi::outs() << "Kill -9 error: " << errorMsg << "\n";
         }
+        // Give a bit of time for the kill to take place
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
       }
     }
   }

@@ -27,8 +27,10 @@
 
 using namespace cs;
 
-class NetworkListener::Pimpl {
+class NetworkListener::Impl {
  public:
+  wpi::Logger& m_logger;
+  Notifier& m_notifier;
   HANDLE eventHandle = 0;
 };
 
@@ -36,23 +38,22 @@ class NetworkListener::Pimpl {
 static void WINAPI OnInterfaceChange(PVOID callerContext,
                                      PMIB_IPINTERFACE_ROW row,
                                      MIB_NOTIFICATION_TYPE notificationType) {
-  cs::Instance::GetInstance().notifier.NotifyNetworkInterfacesChanged();
+  Notifier* notifier = reinterpret_cast<Notifier*>(callerContext);
+  notifier->NotifyNetworkInterfacesChanged();
 }
 
 NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
-    : m_logger(logger), m_notifier(notifier) {
-  m_data = std::make_unique<Pimpl>();
-}
+    : m_impl(std::make_unique<Impl>(logger, notifier)) {}
 
 NetworkListener::~NetworkListener() { Stop(); }
 
 void NetworkListener::Start() {
-  NotifyIpInterfaceChange(AF_INET, OnInterfaceChange, nullptr, true,
-                          &m_data->eventHandle);
+  NotifyIpInterfaceChange(AF_INET, OnInterfaceChange, &m_impl->m_notifier, true,
+                          &m_impl->eventHandle);
 }
 
 void NetworkListener::Stop() {
-  if (m_data->eventHandle) {
-    CancelMibChangeNotify2(m_data->eventHandle);
+  if (m_impl->eventHandle) {
+    CancelMibChangeNotify2(m_impl->eventHandle);
   }
 }

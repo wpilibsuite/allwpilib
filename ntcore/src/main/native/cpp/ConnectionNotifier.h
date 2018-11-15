@@ -22,8 +22,8 @@ class ConnectionNotifierThread
  public:
   explicit ConnectionNotifierThread(int inst) : m_inst(inst) {}
 
-  bool Matches(const ListenerData& listener,
-               const ConnectionNotification& data) {
+  bool Matches(const ListenerData& /*listener*/,
+               const ConnectionNotification& /*data*/) {
     return true;
   }
 

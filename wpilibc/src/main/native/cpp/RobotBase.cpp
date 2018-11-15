@@ -10,6 +10,7 @@
 #include <cstdio>
 
 #include <cameraserver/CameraServerShared.h>
+#include <cscore.h>
 #include <hal/HAL.h>
 #include <networktables/NetworkTableInstance.h>
 
@@ -116,5 +117,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 }
 
 RobotBase::RobotBase(RobotBase&&) : m_ds(DriverStation::GetInstance()) {}
+
+RobotBase::~RobotBase() { cs::Shutdown(); }
 
 RobotBase& RobotBase::operator=(RobotBase&&) { return *this; }

@@ -67,7 +67,8 @@ static const char* startRootPage =
     "</head><body>\n"
     "<div class=\"stream\">\n"
     "<img src=\"/stream.mjpg\" /><p />\n"
-    "<a href=\"/settings.json\">Settings JSON</a>\n"
+    "<a href=\"/settings.json\">Settings JSON</a> |\n"
+    "<a href=\"/config.json\">Source Config JSON</a>\n"
     "</div>\n"
     "<div class=\"settings\">\n";
 static const char* endRootPage = "</div></body></html>";
@@ -340,7 +341,7 @@ void MjpegServerImpl::ConnThread::SendHTMLHeadTitle(
 // Send the root html file with controls for all the settable properties.
 void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
                                            SourceImpl& source, bool header) {
-  if (header) SendHeader(os, 200, "OK", "application/x-javascript");
+  if (header) SendHeader(os, 200, "OK", "text/html");
 
   SendHTMLHeadTitle(os);
   os << startRootPage;
@@ -453,7 +454,7 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
 // Send a JSON file which is contains information about the source parameters.
 void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
                                            SourceImpl& source, bool header) {
-  if (header) SendHeader(os, 200, "OK", "application/x-javascript");
+  if (header) SendHeader(os, 200, "OK", "application/json");
 
   os << "{\n\"controls\": [\n";
   wpi::SmallVector<int, 32> properties_vec;
@@ -728,7 +729,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
     return;
   }
 
-  enum { kCommand, kStream, kGetSettings, kRootPage } kind;
+  enum { kCommand, kStream, kGetSettings, kGetSourceConfig, kRootPage } kind;
   wpi::StringRef parameters;
   size_t pos;
 
@@ -748,6 +749,9 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   } else if (req.find("GET /settings") != wpi::StringRef::npos &&
              req.find(".json") != wpi::StringRef::npos) {
     kind = kGetSettings;
+  } else if (req.find("GET /config") != wpi::StringRef::npos &&
+             req.find(".json") != wpi::StringRef::npos) {
+    kind = kGetSourceConfig;
   } else if (req.find("GET /input") != wpi::StringRef::npos &&
              req.find(".json") != wpi::StringRef::npos) {
     kind = kGetSettings;
@@ -805,6 +809,17 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
         SendJSON(os, *source, true);
       else
         SendError(os, 404, "Resource not found");
+      break;
+    case kGetSourceConfig:
+      SDEBUG("request for JSON file");
+      if (auto source = GetSource()) {
+        SendHeader(os, 200, "OK", "application/json");
+        CS_Status status = CS_OK;
+        os << source->GetConfigJson(&status);
+        os.flush();
+      } else {
+        SendError(os, 404, "Resource not found");
+      }
       break;
     case kRootPage:
       SDEBUG("request for root page");
@@ -915,19 +930,18 @@ CS_Sink CreateMjpegServer(const wpi::Twine& name,
                           CS_Status* status) {
   auto& inst = Instance::GetInstance();
   wpi::SmallString<128> listenAddressBuf;
-  auto sink = std::make_shared<MjpegServerImpl>(
-      name, inst.logger, inst.notifier, inst.telemetry, listenAddress, port,
-      std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
-          port,
-          listenAddress.toNullTerminatedStringRef(listenAddressBuf).data(),
-          inst.logger)));
-  auto handle = inst.sinks.Allocate(CS_SINK_MJPEG, sink);
-  inst.notifier.NotifySink(name, handle, CS_SINK_CREATED);
-  return handle;
+  return inst.CreateSink(
+      CS_SINK_MJPEG,
+      std::make_shared<MjpegServerImpl>(
+          name, inst.logger, inst.notifier, inst.telemetry, listenAddress, port,
+          std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
+              port,
+              listenAddress.toNullTerminatedStringRef(listenAddressBuf).data(),
+              inst.logger))));
 }
 
 std::string GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status) {
-  auto data = Instance::GetInstance().sinks.Get(sink);
+  auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_MJPEG) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
@@ -936,7 +950,7 @@ std::string GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status) {
 }
 
 int GetMjpegServerPort(CS_Sink sink, CS_Status* status) {
-  auto data = Instance::GetInstance().sinks.Get(sink);
+  auto data = Instance::GetInstance().GetSink(sink);
   if (!data || data->kind != CS_SINK_MJPEG) {
     *status = CS_INVALID_HANDLE;
     return 0;

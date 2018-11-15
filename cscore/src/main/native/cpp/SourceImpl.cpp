@@ -11,6 +11,7 @@
 #include <cstring>
 
 #include <wpi/STLExtras.h>
+#include <wpi/json.h>
 #include <wpi/timestamp.h>
 
 #include "Log.h"
@@ -159,6 +160,272 @@ bool SourceImpl::SetFPS(int fps, CS_Status* status) {
   if (!mode) return false;
   mode.fps = fps;
   return SetVideoMode(mode, status);
+}
+
+bool SourceImpl::SetConfigJson(wpi::StringRef config, CS_Status* status) {
+  wpi::json j;
+  try {
+    j = wpi::json::parse(config);
+  } catch (const wpi::json::parse_error& e) {
+    SWARNING("SetConfigJson: parse error at byte " << e.byte << ": "
+                                                   << e.what());
+    *status = CS_PROPERTY_WRITE_FAILED;
+    return false;
+  }
+  return SetConfigJson(j, status);
+}
+
+bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
+  VideoMode mode;
+
+  // pixel format
+  if (config.count("pixel format") != 0) {
+    try {
+      auto str = config.at("pixel format").get<std::string>();
+      wpi::StringRef s(str);
+      if (s.equals_lower("mjpeg")) {
+        mode.pixelFormat = cs::VideoMode::kMJPEG;
+      } else if (s.equals_lower("yuyv")) {
+        mode.pixelFormat = cs::VideoMode::kYUYV;
+      } else if (s.equals_lower("rgb565")) {
+        mode.pixelFormat = cs::VideoMode::kRGB565;
+      } else if (s.equals_lower("bgr")) {
+        mode.pixelFormat = cs::VideoMode::kBGR;
+      } else if (s.equals_lower("gray")) {
+        mode.pixelFormat = cs::VideoMode::kGray;
+      } else {
+        SWARNING("SetConfigJson: could not understand pixel format value '"
+                 << str << '\'');
+      }
+    } catch (const wpi::json::exception& e) {
+      SWARNING("SetConfigJson: could not read pixel format: " << e.what());
+    }
+  }
+
+  // width
+  if (config.count("width") != 0) {
+    try {
+      mode.width = config.at("width").get<unsigned int>();
+    } catch (const wpi::json::exception& e) {
+      SWARNING("SetConfigJson: could not read width: " << e.what());
+    }
+  }
+
+  // height
+  if (config.count("height") != 0) {
+    try {
+      mode.height = config.at("height").get<unsigned int>();
+    } catch (const wpi::json::exception& e) {
+      SWARNING("SetConfigJson: could not read height: " << e.what());
+    }
+  }
+
+  // fps
+  if (config.count("fps") != 0) {
+    try {
+      mode.fps = config.at("fps").get<unsigned int>();
+    } catch (const wpi::json::exception& e) {
+      SWARNING("SetConfigJson: could not read fps: " << e.what());
+    }
+  }
+
+  // if all of video mode is set, use SetVideoMode, otherwise piecemeal it
+  if (mode.pixelFormat != VideoMode::kUnknown && mode.width != 0 &&
+      mode.height != 0 && mode.fps != 0) {
+    SINFO("SetConfigJson: setting video mode to pixelFormat "
+          << mode.pixelFormat << ", width " << mode.width << ", height "
+          << mode.height << ", fps " << mode.fps);
+    SetVideoMode(mode, status);
+  } else {
+    if (mode.pixelFormat != cs::VideoMode::kUnknown) {
+      SINFO("SetConfigJson: setting pixelFormat " << mode.pixelFormat);
+      SetPixelFormat(static_cast<cs::VideoMode::PixelFormat>(mode.pixelFormat),
+                     status);
+    }
+    if (mode.width != 0 && mode.height != 0) {
+      SINFO("SetConfigJson: setting width " << mode.width << ", height "
+                                            << mode.height);
+      SetResolution(mode.width, mode.height, status);
+    }
+    if (mode.fps != 0) {
+      SINFO("SetConfigJson: setting fps " << mode.fps);
+      SetFPS(mode.fps, status);
+    }
+  }
+
+  // brightness
+  if (config.count("brightness") != 0) {
+    try {
+      int val = config.at("brightness").get<int>();
+      SINFO("SetConfigJson: setting brightness to " << val);
+      SetBrightness(val, status);
+    } catch (const wpi::json::exception& e) {
+      SWARNING("SetConfigJson: could not read brightness: " << e.what());
+    }
+  }
+
+  // white balance
+  if (config.count("white balance") != 0) {
+    try {
+      auto& setting = config.at("white balance");
+      if (setting.is_string()) {
+        auto str = setting.get<std::string>();
+        wpi::StringRef s(str);
+        if (s.equals_lower("auto")) {
+          SINFO("SetConfigJson: setting white balance to auto");
+          SetWhiteBalanceAuto(status);
+        } else if (s.equals_lower("hold")) {
+          SINFO("SetConfigJson: setting white balance to hold current");
+          SetWhiteBalanceHoldCurrent(status);
+        } else {
+          SWARNING("SetConfigJson: could not understand white balance value '"
+                   << str << '\'');
+        }
+      } else {
+        int val = setting.get<int>();
+        SINFO("SetConfigJson: setting white balance to " << val);
+        SetWhiteBalanceManual(val, status);
+      }
+    } catch (const wpi::json::exception& e) {
+      SWARNING("SetConfigJson: could not read white balance: " << e.what());
+    }
+  }
+
+  // exposure
+  if (config.count("exposure") != 0) {
+    try {
+      auto& setting = config.at("exposure");
+      if (setting.is_string()) {
+        auto str = setting.get<std::string>();
+        wpi::StringRef s(str);
+        if (s.equals_lower("auto")) {
+          SINFO("SetConfigJson: setting exposure to auto");
+          SetExposureAuto(status);
+        } else if (s.equals_lower("hold")) {
+          SINFO("SetConfigJson: setting exposure to hold current");
+          SetExposureHoldCurrent(status);
+        } else {
+          SWARNING("SetConfigJson: could not understand exposure value '"
+                   << str << '\'');
+        }
+      } else {
+        int val = setting.get<int>();
+        SINFO("SetConfigJson: setting exposure to " << val);
+        SetExposureManual(val, status);
+      }
+    } catch (const wpi::json::exception& e) {
+      SWARNING("SetConfigJson: could not read exposure: " << e.what());
+    }
+  }
+
+  // properties
+  if (config.count("properties") != 0) {
+    for (auto&& prop : config.at("properties")) {
+      std::string name;
+      try {
+        name = prop.at("name").get<std::string>();
+      } catch (const wpi::json::exception& e) {
+        SWARNING("SetConfigJson: could not read property name: " << e.what());
+        continue;
+      }
+      int n = GetPropertyIndex(name);
+      try {
+        auto& v = prop.at("value");
+        if (v.is_string()) {
+          std::string val = v.get<std::string>();
+          SINFO("SetConfigJson: setting property '" << name << "' to '" << val
+                                                    << '\'');
+          SetStringProperty(n, val, status);
+        } else if (v.is_boolean()) {
+          bool val = v.get<bool>();
+          SINFO("SetConfigJson: setting property '" << name << "' to " << val);
+          SetProperty(n, val, status);
+        } else {
+          int val = v.get<int>();
+          SINFO("SetConfigJson: setting property '" << name << "' to " << val);
+          SetProperty(n, val, status);
+        }
+      } catch (const wpi::json::exception& e) {
+        SWARNING("SetConfigJson: could not read property value: " << e.what());
+        continue;
+      }
+    }
+  }
+
+  return true;
+}
+
+std::string SourceImpl::GetConfigJson(CS_Status* status) {
+  std::string rv;
+  wpi::raw_string_ostream os(rv);
+  GetConfigJsonObject(status).dump(os, 4);
+  os.flush();
+  return rv;
+}
+
+wpi::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
+  wpi::json j;
+
+  // pixel format
+  wpi::StringRef pixelFormat;
+  switch (m_mode.pixelFormat) {
+    case VideoMode::kMJPEG:
+      pixelFormat = "mjpeg";
+      break;
+    case VideoMode::kYUYV:
+      pixelFormat = "yuyv";
+      break;
+    case VideoMode::kRGB565:
+      pixelFormat = "rgb565";
+      break;
+    case VideoMode::kBGR:
+      pixelFormat = "bgr";
+      break;
+    case VideoMode::kGray:
+      pixelFormat = "gray";
+      break;
+    default:
+      break;
+  }
+  if (!pixelFormat.empty()) j.emplace("pixel format", pixelFormat);
+
+  // width
+  if (m_mode.width != 0) j.emplace("width", m_mode.width);
+
+  // height
+  if (m_mode.height != 0) j.emplace("height", m_mode.height);
+
+  // fps
+  if (m_mode.fps != 0) j.emplace("fps", m_mode.fps);
+
+  // TODO: output brightness, white balance, and exposure?
+
+  // properties
+  wpi::json props;
+  wpi::SmallVector<int, 32> propVec;
+  for (int p : EnumerateProperties(propVec, status)) {
+    wpi::json prop;
+    wpi::SmallString<128> strBuf;
+    prop.emplace("name", GetPropertyName(p, strBuf, status));
+    switch (GetPropertyKind(p)) {
+      case CS_PROP_BOOLEAN:
+        prop.emplace("value", static_cast<bool>(GetProperty(p, status)));
+        break;
+      case CS_PROP_INTEGER:
+      case CS_PROP_ENUM:
+        prop.emplace("value", GetProperty(p, status));
+        break;
+      case CS_PROP_STRING:
+        prop.emplace("value", GetStringProperty(p, strBuf, status));
+        break;
+      default:
+        continue;
+    }
+    props.emplace_back(prop);
+  }
+  if (props.is_array()) j.emplace("properties", props);
+
+  return j;
 }
 
 std::vector<VideoMode> SourceImpl::EnumerateVideoModes(

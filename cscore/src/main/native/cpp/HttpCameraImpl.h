@@ -34,7 +34,7 @@ class HttpCameraImpl : public SourceImpl {
                  wpi::Logger& logger, Notifier& notifier, Telemetry& telemetry);
   ~HttpCameraImpl() override;
 
-  void Start();
+  void Start() override;
 
   // Property functions
   void SetProperty(int property, int value, CS_Status* status) override;

@@ -75,17 +75,15 @@ ext {
 
 def examplesMap = [:];
 
-if (OperatingSystem.current().isLinux()) {
-    File examplesTree = file("$projectDir/examples")
-    examplesTree.list(new FilenameFilter() {
-        @Override
-        public boolean accept(File current, String name) {
-            return new File(current, name).isDirectory();
-        }
-    }).each {
-        sharedCvConfigs.put(it, [])
-        examplesMap.put(it, [])
+File examplesTree = file("$projectDir/examples")
+examplesTree.list(new FilenameFilter() {
+    @Override
+    public boolean accept(File current, String name) {
+        return new File(current, name).isDirectory();
     }
+}).each {
+    sharedCvConfigs.put(it, [])
+    examplesMap.put(it, [])
 }
 
 apply from: "${rootDir}/shared/opencv.gradle"
@@ -105,6 +103,26 @@ model {
                                  '_CT??_R0?AVbad_cast',
                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
                                  '_TI5?AVfailure', '==']
+        }
+        cscoreJNI(ExportsConfig) {
+            x86SymbolFilter = { symbols ->
+                def retList = []
+                symbols.each { symbol ->
+                    if (symbol.startsWith('CS_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+            x64SymbolFilter = { symbols ->
+                def retList = []
+                symbols.each { symbol ->
+                    if (symbol.startsWith('CS_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
         }
     }
     components {

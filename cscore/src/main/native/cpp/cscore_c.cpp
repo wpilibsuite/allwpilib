@@ -170,6 +170,15 @@ CS_Bool CS_SetSourceFPS(CS_Source source, int fps, CS_Status* status) {
   return cs::SetSourceFPS(source, fps, status);
 }
 
+CS_Bool CS_SetSourceConfigJson(CS_Source source, const char* config,
+                               CS_Status* status) {
+  return cs::SetSourceConfigJson(source, config, status);
+}
+
+char* CS_GetSourceConfigJson(CS_Source source, CS_Status* status) {
+  return cs::ConvertToC(cs::GetSourceConfigJson(source, status));
+}
+
 CS_VideoMode* CS_EnumerateSourceVideoModes(CS_Source source, int* count,
                                            CS_Status* status) {
   auto vec = cs::EnumerateSourceVideoModes(source, status);
@@ -347,6 +356,8 @@ void CS_SetLogger(CS_LogFunc func, unsigned int min_level) {
 void CS_SetDefaultLogger(unsigned int min_level) {
   cs::SetDefaultLogger(min_level);
 }
+
+void CS_Shutdown(void) { cs::Shutdown(); }
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
   wpi::SmallVector<CS_Source, 32> buf;

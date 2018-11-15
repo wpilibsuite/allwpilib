@@ -254,6 +254,56 @@ class VideoSource {
   bool SetFPS(int fps);
 
   /**
+   * Set video mode and properties from a JSON configuration string.
+   *
+   * The format of the JSON input is:
+   *
+   * <pre>
+   * {
+   *     "pixel format": "MJPEG", "YUYV", etc
+   *     "width": video mode width
+   *     "height": video mode height
+   *     "fps": video mode fps
+   *     "brightness": percentage brightness
+   *     "white balance": "auto", "hold", or value
+   *     "exposure": "auto", "hold", or value
+   *     "properties": [
+   *         {
+   *             "name": property name
+   *             "value": property value
+   *         }
+   *     ]
+   * }
+   * </pre>
+   *
+   * @param config configuration
+   * @return True if set successfully
+   */
+  bool SetConfigJson(wpi::StringRef config);
+
+  /**
+   * Set video mode and properties from a JSON configuration object.
+   *
+   * @param config configuration
+   * @return True if set successfully
+   */
+  bool SetConfigJson(const wpi::json& config);
+
+  /**
+   * Get a JSON configuration string.
+   *
+   * @return JSON configuration string
+   */
+  std::string GetConfigJson() const;
+
+  /**
+   * Get a JSON configuration object.
+   *
+   * @return JSON configuration object
+   */
+  wpi::json GetConfigJsonObject() const;
+
+  /**
    * Get the actual FPS.
    *
    * <p>SetTelemetryPeriod() must be called for this to be valid.

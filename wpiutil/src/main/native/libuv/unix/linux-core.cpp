@@ -65,6 +65,10 @@
 # define CLOCK_MONOTONIC_COARSE 6
 #endif
 
+#ifdef __FRC_ROBORIO__
+#include "wpi/timestamp.h"
+#endif
+
 /* This is rather annoying: CLOCK_BOOTTIME lives in <linux/time.h> but we can't
  * include that file because it conflicts with <time.h>. We'll just have to
  * define it ourselves.
@@ -441,6 +445,9 @@ update_timeout:
 
 
 uint64_t uv__hrtime(uv_clocktype_t type) {
+#ifdef __FRC_ROBORIO__
+  return wpi::Now() * 1000u;
+#else
   static clock_t fast_clock_id = -1;
   struct timespec t;
   clock_t clock_id;
@@ -470,6 +477,7 @@ uint64_t uv__hrtime(uv_clocktype_t type) {
     return 0;  /* Not really possible. */
 
   return t.tv_sec * (uint64_t) 1e9 + t.tv_nsec;
+#endif
 }
 
 

@@ -51,20 +51,60 @@ class Instance {
 
   static Instance& GetInstance();
 
-  UnlimitedHandleResource<Handle, SourceData, Handle::kSource> sources;
-  UnlimitedHandleResource<Handle, SinkData, Handle::kSink> sinks;
+  void Shutdown();
 
   wpi::Logger logger;
   Notifier notifier;
   Telemetry telemetry;
-  NetworkListener network_listener;
-  wpi::EventLoopRunner event_loop;
+  NetworkListener networkListener;
+
+ private:
+  UnlimitedHandleResource<Handle, SourceData, Handle::kSource> m_sources;
+  UnlimitedHandleResource<Handle, SinkData, Handle::kSink> m_sinks;
+
+ public:
+  wpi::EventLoopRunner eventLoop;
 
   std::pair<CS_Sink, std::shared_ptr<SinkData>> FindSink(const SinkImpl& sink);
   std::pair<CS_Source, std::shared_ptr<SourceData>> FindSource(
       const SourceImpl& source);
 
   void SetDefaultLogger();
+
+  std::shared_ptr<SourceData> GetSource(CS_Source handle) {
+    return m_sources.Get(handle);
+  }
+
+  std::shared_ptr<SinkData> GetSink(CS_Sink handle) {
+    return m_sinks.Get(handle);
+  }
+
+  CS_Source CreateSource(CS_SourceKind kind,
+                         std::shared_ptr<SourceImpl> source);
+
+  CS_Sink CreateSink(CS_SinkKind kind, std::shared_ptr<SinkImpl> sink);
+
+  void DestroySource(CS_Source handle);
+  void DestroySink(CS_Sink handle);
+
+  wpi::ArrayRef<CS_Source> EnumerateSourceHandles(
+      wpi::SmallVectorImpl<CS_Source>& vec) {
+    return m_sources.GetAll(vec);
+  }
+
+  wpi::ArrayRef<CS_Sink> EnumerateSinkHandles(
+      wpi::SmallVectorImpl<CS_Sink>& vec) {
+    return m_sinks.GetAll(vec);
+  }
+
+  wpi::ArrayRef<CS_Sink> EnumerateSourceSinks(
+      CS_Source source, wpi::SmallVectorImpl<CS_Sink>& vec) {
+    vec.clear();
+    m_sinks.ForEach([&](CS_Sink sinkHandle, const SinkData& data) {
+      if (source == data.sourceHandle.load()) vec.push_back(sinkHandle);
+    });
+    return vec;
+  }
 
  private:
   Instance();

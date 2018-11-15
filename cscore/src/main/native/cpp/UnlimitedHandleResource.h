@@ -50,10 +50,12 @@ class UnlimitedHandleResource {
 
   std::shared_ptr<TStruct> Get(THandle handle);
 
-  void Free(THandle handle);
+  std::shared_ptr<TStruct> Free(THandle handle);
 
   template <typename T>
   wpi::ArrayRef<T> GetAll(wpi::SmallVectorImpl<T>& vec);
+
+  std::vector<std::shared_ptr<TStruct>> FreeAll();
 
   // @param func functor with (THandle, const TStruct&) parameters
   template <typename F>
@@ -133,14 +135,17 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Get(
 }
 
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>
-inline void UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Free(
+inline std::shared_ptr<TStruct>
+UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Free(
     THandle handle) {
   auto index =
       handle.GetTypedIndex(static_cast<typename THandle::Type>(typeValue));
-  if (index < 0) return;
+  if (index < 0) return nullptr;
   std::lock_guard<TMutex> sync(m_handleMutex);
-  if (index >= static_cast<int>(m_structures.size())) return;
+  if (index >= static_cast<int>(m_structures.size())) return nullptr;
+  auto rv = std::move(m_structures[index]);
   m_structures[index].reset();
+  return rv;
 }
 
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>
@@ -150,6 +155,15 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll(
     wpi::SmallVectorImpl<T>& vec) {
   ForEach([&](THandle handle, const TStruct& data) { vec.push_back(handle); });
   return vec;
+}
+
+template <typename THandle, typename TStruct, int typeValue, typename TMutex>
+inline std::vector<std::shared_ptr<TStruct>>
+UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::FreeAll() {
+  std::lock_guard<TMutex> sync(m_handleMutex);
+  auto rv = std::move(m_structures);
+  m_structures.clear();
+  return rv;
 }
 
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>

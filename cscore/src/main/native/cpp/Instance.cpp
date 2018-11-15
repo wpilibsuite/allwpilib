@@ -38,47 +38,60 @@ static void def_log_func(unsigned int level, const char* file,
   wpi::errs() << oss.str();
 }
 
-Instance::Instance() : telemetry(notifier), network_listener(logger, notifier) {
+Instance::Instance() : telemetry(notifier), networkListener(logger, notifier) {
   SetDefaultLogger();
 }
 
 Instance::~Instance() {}
 
 Instance& Instance::GetInstance() {
-  static Instance inst;
-  return inst;
+  static Instance* inst = new Instance;
+  return *inst;
+}
+
+void Instance::Shutdown() {
+  eventLoop.Stop();
+  m_sinks.FreeAll();
+  m_sources.FreeAll();
+  networkListener.Stop();
+  telemetry.Stop();
+  notifier.Stop();
 }
 
 void Instance::SetDefaultLogger() { logger.SetLogger(def_log_func); }
 
 std::pair<CS_Source, std::shared_ptr<SourceData>> Instance::FindSource(
     const SourceImpl& source) {
-  return sources.FindIf(
+  return m_sources.FindIf(
       [&](const SourceData& data) { return data.source.get() == &source; });
 }
 
 std::pair<CS_Sink, std::shared_ptr<SinkData>> Instance::FindSink(
     const SinkImpl& sink) {
-  return sinks.FindIf(
+  return m_sinks.FindIf(
       [&](const SinkData& data) { return data.sink.get() == &sink; });
 }
 
-namespace cs {
-void Shutdown() {
-  auto& instance = Instance::GetInstance();
-  instance.notifier.Stop();
-  instance.network_listener.Stop();
-  auto loop = instance.event_loop.GetLoop();
-  if (loop) {
-    loop->Stop();
-  }
-  instance.sources.ClearAll();
-  instance.sinks.ClearAll();
-}
+CS_Source Instance::CreateSource(CS_SourceKind kind,
+                                 std::shared_ptr<SourceImpl> source) {
+  auto handle = m_sources.Allocate(kind, source);
+  notifier.NotifySource(source->GetName(), handle, CS_SOURCE_CREATED);
+  source->Start();
+  return handle;
 }
 
-extern "C" {
-void CS_Shutdown(void) {
-  cs::Shutdown();
+CS_Sink Instance::CreateSink(CS_SinkKind kind, std::shared_ptr<SinkImpl> sink) {
+  auto handle = m_sinks.Allocate(kind, sink);
+  notifier.NotifySink(sink->GetName(), handle, CS_SINK_CREATED);
+  return handle;
 }
+
+void Instance::DestroySource(CS_Source handle) {
+  if (auto data = m_sources.Free(handle))
+    notifier.NotifySource(data->source->GetName(), handle, CS_SOURCE_DESTROYED);
+}
+
+void Instance::DestroySink(CS_Sink handle) {
+  if (auto data = m_sinks.Free(handle))
+    notifier.NotifySink(data->sink->GetName(), handle, CS_SINK_DESTROYED);
 }
