@@ -29,6 +29,8 @@ using namespace cs;
 
 class NetworkListener::Impl {
  public:
+   Impl(wpi::Logger& logger, Notifier& notifier)
+      : m_logger(logger), m_notifier(notifier) {}
   wpi::Logger& m_logger;
   Notifier& m_notifier;
   HANDLE eventHandle = 0;

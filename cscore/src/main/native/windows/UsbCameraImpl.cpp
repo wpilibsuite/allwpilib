@@ -997,32 +997,22 @@ CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
   if (devices.size() > dev) {
     return CreateUsbCameraPath(name, devices[dev].path, status);
   }
-  auto& inst = cs::Instance::GetInstance();
+  auto& inst = Instance::GetInstance();
   auto source = std::make_shared<UsbCameraImpl>(
       name, inst.logger, inst.notifier, inst.telemetry, dev);
-  auto handle = inst.sources.Allocate(CS_SOURCE_USB, source);
-  inst.notifier.NotifySource(name, handle, CS_SOURCE_CREATED);
-  // Start thread after the source created event to ensure other events
-  // come after it.
-  source->Start();
-  return handle;
+  return inst.CreateSource(CS_SOURCE_USB, source);
 }
 
 CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
                               CS_Status* status) {
-  auto& inst = cs::Instance::GetInstance();
+  auto& inst = Instance::GetInstance();
   auto source = std::make_shared<UsbCameraImpl>(
       name, inst.logger, inst.notifier, inst.telemetry, path);
-  auto handle = inst.sources.Allocate(CS_SOURCE_USB, source);
-  inst.notifier.NotifySource(name, handle, CS_SOURCE_CREATED);
-  // Start thread after the source created event to ensure other events
-  // come after it.
-  source->Start();
-  return handle;
+  return inst.CreateSource(CS_SOURCE_USB, source);
 }
 
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {
-  auto data = cs::Instance::GetInstance().sources.Get(source);
+  auto data = Instance::GetInstance().GetSource(source);
   if (!data || data->kind != CS_SOURCE_USB) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
