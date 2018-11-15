@@ -65,8 +65,6 @@ class UnlimitedHandleResource {
   template <typename F>
   std::pair<THandle, std::shared_ptr<TStruct>> FindIf(F func);
 
-  void ClearAll();
-
  private:
   THandle MakeHandle(size_t i) {
     return THandle{static_cast<int>(i),
@@ -75,16 +73,6 @@ class UnlimitedHandleResource {
   std::vector<std::shared_ptr<TStruct>> m_structures;
   TMutex m_handleMutex;
 };
-
-template <typename THandle, typename TStruct, int typeValue, typename TMutex>
-void UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::ClearAll() {
-  std::unique_lock<TMutex> sync(m_handleMutex);
-  for (int index = 0; index < m_structures.size(); index++) {
-    sync.unlock();
-    m_structures[index].reset();
-    sync.lock();
-  }
-}
 
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename... Args>
