@@ -236,7 +236,7 @@ Java_edu_wpi_first_hal_InterruptJNI_disableInterrupts
 /*
  * Class:     edu_wpi_first_hal_InterruptJNI
  * Method:    readInterruptRisingTimestamp
- * Signature: (I)D
+ * Signature: (I)J
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_hal_InterruptJNI_readInterruptRisingTimestamp
@@ -259,7 +259,7 @@ Java_edu_wpi_first_hal_InterruptJNI_readInterruptRisingTimestamp
 /*
  * Class:     edu_wpi_first_hal_InterruptJNI
  * Method:    readInterruptFallingTimestamp
- * Signature: (I)D
+ * Signature: (I)J
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_hal_InterruptJNI_readInterruptFallingTimestamp
