@@ -165,26 +165,26 @@ void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
   anInterrupt->manager->disable(status);
 }
 
-double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
-                                        int32_t* status) {
-  auto anInterrupt = interruptHandles->Get(interruptHandle);
-  if (anInterrupt == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-  uint32_t timestamp = anInterrupt->anInterrupt->readRisingTimeStamp(status);
-  return timestamp * 1e-6;
-}
-
-double HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
+int64_t HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
                                          int32_t* status) {
   auto anInterrupt = interruptHandles->Get(interruptHandle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
+  uint32_t timestamp = anInterrupt->anInterrupt->readRisingTimeStamp(status);
+  return timestamp;
+}
+
+int64_t HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
+                                          int32_t* status) {
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
+  if (anInterrupt == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
   uint32_t timestamp = anInterrupt->anInterrupt->readFallingTimeStamp(status);
-  return timestamp * 1e-6;
+  return timestamp;
 }
 
 void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,

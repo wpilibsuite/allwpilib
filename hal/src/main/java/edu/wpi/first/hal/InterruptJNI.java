@@ -25,9 +25,9 @@ public class InterruptJNI extends JNIWrapper {
 
   public static native void disableInterrupts(int interruptHandle);
 
-  public static native double readInterruptRisingTimestamp(int interruptHandle);
+  public static native long readInterruptRisingTimestamp(int interruptHandle);
 
-  public static native double readInterruptFallingTimestamp(int interruptHandle);
+  public static native long readInterruptFallingTimestamp(int interruptHandle);
 
   public static native void requestInterrupts(int interruptHandle, int digitalSourceHandle,
                                               int analogTriggerType);

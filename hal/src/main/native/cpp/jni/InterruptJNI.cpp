@@ -236,9 +236,9 @@ Java_edu_wpi_first_hal_InterruptJNI_disableInterrupts
 /*
  * Class:     edu_wpi_first_hal_InterruptJNI
  * Method:    readInterruptRisingTimestamp
- * Signature: (I)D
+ * Signature: (I)J
  */
-JNIEXPORT jdouble JNICALL
+JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_hal_InterruptJNI_readInterruptRisingTimestamp
   (JNIEnv* env, jclass, jint interruptHandle)
 {
@@ -248,7 +248,7 @@ Java_edu_wpi_first_hal_InterruptJNI_readInterruptRisingTimestamp
       << "Interrupt Handle = " << (HAL_InterruptHandle)interruptHandle;
 
   int32_t status = 0;
-  jdouble timeStamp = HAL_ReadInterruptRisingTimestamp(
+  jlong timeStamp = HAL_ReadInterruptRisingTimestamp(
       (HAL_InterruptHandle)interruptHandle, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
@@ -259,9 +259,9 @@ Java_edu_wpi_first_hal_InterruptJNI_readInterruptRisingTimestamp
 /*
  * Class:     edu_wpi_first_hal_InterruptJNI
  * Method:    readInterruptFallingTimestamp
- * Signature: (I)D
+ * Signature: (I)J
  */
-JNIEXPORT jdouble JNICALL
+JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_hal_InterruptJNI_readInterruptFallingTimestamp
   (JNIEnv* env, jclass, jint interruptHandle)
 {
@@ -271,7 +271,7 @@ Java_edu_wpi_first_hal_InterruptJNI_readInterruptFallingTimestamp
       << "Interrupt Handle = " << (HAL_InterruptHandle)interruptHandle;
 
   int32_t status = 0;
-  jdouble timeStamp = HAL_ReadInterruptFallingTimestamp(
+  jlong timeStamp = HAL_ReadInterruptFallingTimestamp(
       (HAL_InterruptHandle)interruptHandle, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
