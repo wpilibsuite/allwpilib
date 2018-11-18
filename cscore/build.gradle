@@ -29,6 +29,7 @@ ext {
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include'
+                        include '**/*.h'
                     }
                 }
                 cscoreMacCpp(CppSourceSet) {
@@ -38,6 +39,7 @@ ext {
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
                     }
                 }
             }
@@ -50,6 +52,7 @@ ext {
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
                     }
                 }
             }
@@ -62,6 +65,7 @@ ext {
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
                     }
                 }
             }
@@ -94,11 +98,11 @@ model {
             x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
                                  '_CT??_R0?AVbad_cast',
                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                 '_TI5?AVfailure']
+                                 '_TI5?AVfailure', '==']
             x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
                                  '_CT??_R0?AVbad_cast',
                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                 '_TI5?AVfailure']
+                                 '_TI5?AVfailure', '==']
         }
         cscoreJNI(ExportsConfig) {
             x86SymbolFilter = { symbols ->
