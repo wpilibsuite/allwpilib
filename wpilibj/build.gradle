@@ -162,3 +162,10 @@ def oldWpilibVersionFile = file('src/main/java/edu/wpi/first/wpilibj/util/WPILib
 clean {
     delete oldWpilibVersionFile
 }
+
+test {
+    testLogging {
+        outputs.upToDateWhen {false}
+        showStandardStreams = true
+    }
+}
