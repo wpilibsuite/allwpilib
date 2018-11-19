@@ -40,7 +40,7 @@ class WebSocketClientTest : public WebSocketTest {
       SmallString<64> hashBuf;
       SmallString<64> acceptBuf;
       os << "Sec-WebSocket-Accept: "
-         << Base64Encode(hash.Final(hashBuf), acceptBuf) << "\r\n";
+         << Base64Encode(hash.RawFinal(hashBuf), acceptBuf) << "\r\n";
 
       if (!mockProtocol.empty())
         os << "Sec-WebSocket-Protocol: " << mockProtocol << "\r\n";

@@ -71,7 +71,7 @@ static StringRef AcceptHash(StringRef key, SmallVectorImpl<char>& buf) {
   hash.Update(key);
   hash.Update("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
   SmallString<64> hashBuf;
-  return Base64Encode(hash.Final(hashBuf), buf);
+  return Base64Encode(hash.RawFinal(hashBuf), buf);
 }
 
 WebSocket::WebSocket(uv::Stream& stream, bool server, const private_init&)

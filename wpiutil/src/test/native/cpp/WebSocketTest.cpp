@@ -223,6 +223,7 @@ TEST_F(WebSocketTest, CreateServerBasic) {
       ASSERT_EQ(value, "Upgrade");
       ++gotConnection;
     } else if (name.equals_lower("sec-websocket-accept")) {
+      ASSERT_EQ(value, "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=");
       ++gotAccept;
     } else {
       FAIL() << "unexpected header " << name.str();
@@ -232,7 +233,7 @@ TEST_F(WebSocketTest, CreateServerBasic) {
 
   serverPipe->Listen([&]() {
     auto conn = serverPipe->Accept();
-    auto ws = WebSocket::CreateServer(*conn, "foo", "13");
+    auto ws = WebSocket::CreateServer(*conn, "dGhlIHNhbXBsZSBub25jZQ==", "13");
     ws->open.connect([&](StringRef protocol) {
       ++gotOpen;
       ASSERT_TRUE(protocol.empty());
