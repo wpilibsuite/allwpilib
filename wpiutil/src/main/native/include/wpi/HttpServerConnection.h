@@ -65,7 +65,7 @@ class HttpServerConnection {
    * @param contentType MIME content type (e.g. "text/plain")
    * @param contentLength Length of content.  If 0 is provided, m_keepAlive will
    *                      be set to false.
-   * @param extra Extra HTTP headers to send, not including final "\r\n"
+   * @param extra Extra HTTP headers to send, including final "\r\n"
    */
   void BuildHeader(raw_ostream& os, int code, const Twine& codeText,
                    const Twine& contentType, uint64_t contentLength,
@@ -92,10 +92,28 @@ class HttpServerConnection {
    * @param codeText HTTP response code text (e.g. "OK")
    * @param contentType MIME content type (e.g. "text/plain")
    * @param content Response message content
-   * @param extraHeader Extra HTTP headers to send, not including final "\r\n"
+   * @param extraHeader Extra HTTP headers to send, including final "\r\n"
    */
   void SendResponse(int code, const Twine& codeText, const Twine& contentType,
                     StringRef content, const Twine& extraHeader = Twine{});
+
+  /**
+   * Send HTTP response from static data, along with other header information
+   * like mimetype.  Calls BuildHeader().  Supports gzip pre-compressed data
+   * (it will decompress if the client does not accept gzip encoded data).
+   * Unlike SendResponse(), content is not copied and its contents must remain
+   * valid for an unspecified lifetime.
+   *
+   * @param code HTTP response code (e.g. 200)
+   * @param codeText HTTP response code text (e.g. "OK")
+   * @param contentType MIME content type (e.g. "text/plain")
+   * @param content Response message content
+   * @param gzipped True if content is gzip compressed
+   * @param extraHeader Extra HTTP headers to send, including final "\r\n"
+   */
+  void SendStaticResponse(int code, const Twine& codeText,
+                          const Twine& contentType, StringRef content,
+                          bool gzipped, const Twine& extraHeader = Twine{});
 
   /**
    * Send error header and message.
@@ -114,8 +132,17 @@ class HttpServerConnection {
   /** Whether the connection should be kept alive. */
   bool m_keepAlive = false;
 
+  /** If gzip is an acceptable encoding for responses. */
+  bool m_acceptGzip = false;
+
   /** The underlying stream for the connection. */
   uv::Stream& m_stream;
+
+  /** The header reader connection. */
+  sig::Connection m_headerConn;
+
+  /** The message complete connection. */
+  sig::Connection m_messageCompleteConn;
 };
 
 }  // namespace wpi
