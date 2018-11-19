@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 
+#include "wpi/ArrayRef.h"
 #include "wpi/Signal.h"
 #include "wpi/SmallVector.h"
 #include "wpi/Twine.h"
@@ -25,114 +26,6 @@ class Loop;
 class Pipe;
 
 /**
- * Process options.
- */
-class ProcessOptions final {
-  friend class Process;
-
- public:
-  /**
-   * Set environment variables for the subprocess.  If not set or set to
-   * nullptr, the parent's environment is used.
-   * @param env environment variables
-   */
-  ProcessOptions& SetEnv(char** env) {
-    m_env = env;
-    return *this;
-  }
-
-  /**
-   * Set the current working directory for the subprocess.
-   * @param cwd current working directory
-   */
-  ProcessOptions& SetCwd(const Twine& cwd) {
-    m_cwd = cwd.str();
-    return *this;
-  }
-
-  /**
-   * Set the child process' user id.
-   * @param uid user id
-   */
-  ProcessOptions& SetUid(uv_uid_t uid) noexcept {
-    m_uid = uid;
-    m_flags |= UV_PROCESS_SETUID;
-    return *this;
-  }
-
-  /**
-   * Set the child process' group id.
-   * @param gid group id
-   */
-  ProcessOptions& SetGid(uv_gid_t gid) noexcept {
-    m_gid = gid;
-    m_flags |= UV_PROCESS_SETGID;
-    return *this;
-  }
-
-  /**
-   * Set flags.
-   * @param flags Bitmask values from uv_process_flags.
-   */
-  ProcessOptions& SetFlags(unsigned int flags) noexcept {
-    m_flags |= flags;
-    return *this;
-  }
-
-  /**
-   * Clear flags.
-   * @param flags Bitmask values from uv_process_flags.
-   */
-  ProcessOptions& ClearFlags(unsigned int flags) noexcept {
-    m_flags &= ~flags;
-    return *this;
-  }
-
-  /**
-   * Explicitly ignore a stdio.
-   * @param index stdio index
-   */
-  ProcessOptions& StdioIgnore(size_t index);
-
-  /**
-   * Inherit a file descriptor from the parent process.
-   * @param index stdio index
-   * @param fd parent file descriptor
-   */
-  ProcessOptions& StdioInherit(size_t index, int fd);
-
-  /**
-   * Inherit a pipe from the parent process.
-   * @param index stdio index
-   * @param pipe pipe
-   */
-  ProcessOptions& StdioInherit(size_t index, Pipe& pipe);
-
-  /**
-   * Create a pipe between the child and the parent.
-   * @param index stdio index
-   * @param pipe pipe
-   * @param flags Some combination of UV_READABLE_PIPE, UV_WRITABLE_PIPE, and
-   *              UV_OVERLAPPED_PIPE (Windows only, ignored on Unix).
-   */
-  ProcessOptions& StdioCreatePipe(size_t index, Pipe& pipe, unsigned int flags);
-
- private:
-  char** m_env = nullptr;
-  std::string m_cwd;
-  unsigned int m_flags = 0;
-  struct StdioContainer : public uv_stdio_container_t {
-    StdioContainer() {
-      flags = UV_IGNORE;
-      data.fd = 0;
-    }
-  };
-  SmallVector<StdioContainer, 4> m_stdio;
-  uv_uid_t m_uid = 0;
-  uv_gid_t m_gid = 0;
-};
-
-/**
  * Process handle.
  * Process handles will spawn a new process and allow the user to control it
  * and establish communication channels with it using streams.
@@ -143,6 +36,178 @@ class Process final : public HandleImpl<Process, uv_process_t> {
  public:
   explicit Process(const private_init&) {}
   ~Process() noexcept override = default;
+
+  /**
+   * Structure for Spawn() option temporaries.  This is a reference type
+   * similar to StringRef, so if this value is stored outside of a temporary,
+   * be careful about overwriting what it points to.
+   */
+  struct Option {
+    enum Type {
+      kNone,
+      kArg,
+      kEnv,
+      kCwd,
+      kUid,
+      kGid,
+      kSetFlags,
+      kClearFlags,
+      kStdioIgnore,
+      kStdioInheritFd,
+      kStdioInheritPipe,
+      kStdioCreatePipe
+    };
+
+    Option() : m_type(kNone) {}
+
+    /*implicit*/ Option(const char* arg) { m_data.str = arg; }
+
+    /*implicit*/ Option(const std::string& arg) { m_data.str = arg.data(); }
+
+    /*implicit*/ Option(StringRef arg) : m_strData(arg) {
+      m_data.str = m_strData.c_str();
+    }
+
+    /*implicit*/ Option(const SmallVectorImpl<char>& arg)
+        : m_strData(arg.data(), arg.size()) {
+      m_data.str = m_strData.c_str();
+    }
+
+    /*implicit*/ Option(const Twine& arg) : m_strData(arg.str()) {
+      m_data.str = m_strData.c_str();
+    }
+
+    explicit Option(Type type) : m_type(type) {}
+
+    Type m_type = kArg;
+    std::string m_strData;
+    union {
+      const char* str;
+      uv_uid_t uid;
+      uv_gid_t gid;
+      unsigned int flags;
+      struct {
+        size_t index;
+        union {
+          int fd;
+          Pipe* pipe;
+        };
+        unsigned int flags;
+      } stdio;
+    } m_data;
+  };
+
+  /**
+   * Set environment variable for the subprocess.  If not set, the parent's
+   * environment is used.
+   * @param env environment variable
+   */
+  static Option Env(const Twine& env) {
+    Option o(Option::kEnv);
+    o.m_strData = env.str();
+    o.m_data.str = o.m_strData.c_str();
+    return o;
+  }
+
+  /**
+   * Set the current working directory for the subprocess.
+   * @param cwd current working directory
+   */
+  static Option Cwd(const Twine& cwd) {
+    Option o(Option::kCwd);
+    o.m_strData = cwd.str();
+    o.m_data.str = o.m_strData.c_str();
+    return o;
+  }
+
+  /**
+   * Set the child process' user id.
+   * @param uid user id
+   */
+  static Option Uid(uv_uid_t uid) {
+    Option o(Option::kUid);
+    o.m_data.uid = uid;
+    return o;
+  }
+
+  /**
+   * Set the child process' group id.
+   * @param gid group id
+   */
+  static Option Gid(uv_gid_t gid) {
+    Option o(Option::kGid);
+    o.m_data.gid = gid;
+    return o;
+  }
+
+  /**
+   * Set spawn flags.
+   * @param flags Bitmask values from uv_process_flags.
+   */
+  static Option SetFlags(unsigned int flags) {
+    Option o(Option::kSetFlags);
+    o.m_data.flags = flags;
+    return o;
+  }
+
+  /**
+   * Clear spawn flags.
+   * @param flags Bitmask values from uv_process_flags.
+   */
+  static Option ClearFlags(unsigned int flags) {
+    Option o(Option::kClearFlags);
+    o.m_data.flags = flags;
+    return o;
+  }
+
+  /**
+   * Explicitly ignore a stdio.
+   * @param index stdio index
+   */
+  static Option StdioIgnore(size_t index) {
+    Option o(Option::kStdioIgnore);
+    o.m_data.stdio.index = index;
+    return o;
+  }
+
+  /**
+   * Inherit a file descriptor from the parent process.
+   * @param index stdio index
+   * @param fd parent file descriptor
+   */
+  static Option StdioInherit(size_t index, int fd) {
+    Option o(Option::kStdioInheritFd);
+    o.m_data.stdio.index = index;
+    o.m_data.stdio.fd = fd;
+    return o;
+  }
+
+  /**
+   * Inherit a pipe from the parent process.
+   * @param index stdio index
+   * @param pipe pipe
+   */
+  static Option StdioInherit(size_t index, Pipe& pipe) {
+    Option o(Option::kStdioInheritPipe);
+    o.m_data.stdio.index = index;
+    o.m_data.stdio.pipe = &pipe;
+    return o;
+  }
+
+  /**
+   * Create a pipe between the child and the parent.
+   * @param index stdio index
+   * @param pipe pipe
+   * @param flags Some combination of UV_READABLE_PIPE, UV_WRITABLE_PIPE, and
+   *              UV_OVERLAPPED_PIPE (Windows only, ignored on Unix).
+   */
+  static Option StdioCreatePipe(size_t index, Pipe& pipe, unsigned int flags) {
+    Option o(Option::kStdioCreatePipe);
+    o.m_data.stdio.index = index;
+    o.m_data.stdio.pipe = &pipe;
+    o.m_data.stdio.flags = flags;
+    return o;
+  }
 
   /**
    * Disables inheritance for file descriptors / handles that this process
@@ -166,12 +231,16 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    *
    * @param loop Loop object where this handle runs.
    * @param file Path pointing to the program to be executed
-   * @param args Command line arguments
    * @param options Process options
    */
-  static std::shared_ptr<Process> Spawn(
-      Loop& loop, const Twine& file, char** args,
-      const ProcessOptions& options = ProcessOptions{});
+  static std::shared_ptr<Process> SpawnArray(Loop& loop, const Twine& file,
+                                             ArrayRef<Option> options);
+
+  template <typename... Args>
+  static std::shared_ptr<Process> Spawn(Loop& loop, const Twine& file,
+                                        const Args&... options) {
+    return SpawnArray(loop, file, {options...});
+  }
 
   /**
    * Starts a process.  If the process is not successfully spawned, an error
@@ -184,13 +253,19 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    *
    * @param loop Loop object where this handle runs.
    * @param file Path pointing to the program to be executed
-   * @param args Command line arguments
    * @param options Process options
    */
-  static std::shared_ptr<Process> Spawn(
-      const std::shared_ptr<Loop>& loop, const Twine& file, char** args,
-      const ProcessOptions& options = ProcessOptions{}) {
-    return Spawn(*loop, file, args, options);
+  static std::shared_ptr<Process> SpawnArray(const std::shared_ptr<Loop>& loop,
+                                             const Twine& file,
+                                             ArrayRef<Option> options) {
+    return SpawnArray(*loop, file, options);
+  }
+
+  template <typename... Args>
+  static std::shared_ptr<Process> Spawn(const std::shared_ptr<Loop>& loop,
+                                        const Twine& file,
+                                        const Args&... options) {
+    return SpawnArray(*loop, file, {options...});
   }
 
   /**
