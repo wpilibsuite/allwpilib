@@ -38,6 +38,7 @@ class SHA1 {
   void Update(raw_istream& is);
   std::string Final();
   StringRef Final(SmallVectorImpl<char>& buf);
+  StringRef RawFinal(SmallVectorImpl<char>& buf);
   static std::string FromFile(StringRef filename);
 
  private:

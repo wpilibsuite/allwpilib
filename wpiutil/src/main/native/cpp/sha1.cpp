@@ -237,7 +237,7 @@ void SHA1::Update(raw_istream& is) {
  */
 
 static void finalize(uint32_t digest[], unsigned char* buffer, size_t& buf_size,
-                     uint64_t& transforms, raw_ostream& os) {
+                     uint64_t& transforms, raw_ostream& os, bool hex) {
   /* Total number of hashed bits */
   uint64_t total_bits = (transforms * BLOCK_BYTES + buf_size) * 8;
 
@@ -266,9 +266,16 @@ static void finalize(uint32_t digest[], unsigned char* buffer, size_t& buf_size,
   static const char* const LUT = "0123456789abcdef";
   for (size_t i = 0; i < 5; i++) {
     uint32_t v = digest[i];
-    os << LUT[(v >> 28) & 0xf] << LUT[(v >> 24) & 0xf] << LUT[(v >> 20) & 0xf]
-       << LUT[(v >> 16) & 0xf] << LUT[(v >> 12) & 0xf] << LUT[(v >> 8) & 0xf]
-       << LUT[(v >> 4) & 0xf] << LUT[(v >> 0) & 0xf];
+    if (hex) {
+      os << LUT[(v >> 28) & 0xf] << LUT[(v >> 24) & 0xf] << LUT[(v >> 20) & 0xf]
+         << LUT[(v >> 16) & 0xf] << LUT[(v >> 12) & 0xf] << LUT[(v >> 8) & 0xf]
+         << LUT[(v >> 4) & 0xf] << LUT[(v >> 0) & 0xf];
+    } else {
+      os.write(static_cast<unsigned char>((v >> 24) & 0xff));
+      os.write(static_cast<unsigned char>((v >> 16) & 0xff));
+      os.write(static_cast<unsigned char>((v >> 8) & 0xff));
+      os.write(static_cast<unsigned char>((v >> 0) & 0xff));
+    }
   }
 
   /* Reset for next run */
@@ -279,7 +286,7 @@ std::string SHA1::Final() {
   std::string out;
   raw_string_ostream os(out);
 
-  finalize(digest, buffer, buf_size, transforms, os);
+  finalize(digest, buffer, buf_size, transforms, os, true);
 
   return os.str();
 }
@@ -287,7 +294,15 @@ std::string SHA1::Final() {
 StringRef SHA1::Final(SmallVectorImpl<char>& buf) {
   raw_svector_ostream os(buf);
 
-  finalize(digest, buffer, buf_size, transforms, os);
+  finalize(digest, buffer, buf_size, transforms, os, true);
+
+  return os.str();
+}
+
+StringRef SHA1::RawFinal(SmallVectorImpl<char>& buf) {
+  raw_svector_ostream os(buf);
+
+  finalize(digest, buffer, buf_size, transforms, os, false);
 
   return os.str();
 }
