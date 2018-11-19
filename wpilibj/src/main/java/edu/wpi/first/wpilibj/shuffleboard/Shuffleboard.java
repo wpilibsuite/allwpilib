@@ -54,6 +54,8 @@ public final class Shuffleboard {
 
   private static final ShuffleboardRoot root =
       new ShuffleboardInstance(NetworkTableInstance.getDefault());
+  private static final RecordingController recordingController =
+      new RecordingController(NetworkTableInstance.getDefault());
 
   // TODO usage reporting
 
@@ -101,4 +103,80 @@ public final class Shuffleboard {
     root.disableActuatorWidgets();
   }
 
+  /**
+   * Starts data recording on the dashboard. Has no effect if recording is already in progress.
+   *
+   * @see #stopRecording()
+   */
+  public static void startRecording() {
+    recordingController.startRecording();
+  }
+
+  /**
+   * Stops data recording on the dashboard. Has no effect if no recording is in progress.
+   *
+   * @see #startRecording()
+   */
+  public static void stopRecording() {
+    recordingController.stopRecording();
+  }
+
+  /**
+   * Sets the file name format for new recording files to use. If recording is in progress when this
+   * method is called, it will continue to use the same file. New recordings will use the format.
+   *
+   * <p>To avoid recording files overwriting each other, make sure to use unique recording file
+   * names. File name formats accept templates for inserting the date and time when the recording
+   * started with the {@code ${date}} and {@code ${time}} templates, respectively. For example,
+   * the default format is {@code "recording-${time}"} and recording files created with it will have
+   * names like {@code "recording-2018.01.15.sbr"}. Users are <strong>strongly</strong> recommended
+   * to use the {@code ${time}} template to ensure unique file names.
+   * </p>
+   *
+   * @param format the format for the
+   * @see #clearRecordingFileNameFormat()
+   */
+  public static void setRecordingFileNameFormat(String format) {
+    recordingController.setRecordingFileNameFormat(format);
+  }
+
+  /**
+   * Clears the custom name format for recording files. New recordings will use the default format.
+   *
+   * @see #setRecordingFileNameFormat(String)
+   */
+  public static void clearRecordingFileNameFormat() {
+    recordingController.clearRecordingFileNameFormat();
+  }
+
+  /**
+   * Notifies Shuffleboard of an event. Events can range from as trivial as a change in a command
+   * state to as critical as a total power loss or component failure. If Shuffleboard is recording,
+   * the event will also be recorded.
+   *
+   * <p>If {@code name} is {@code null} or empty, or {@code importance} is {@code null}, then
+   * no event will be sent and an error will be printed to the driver station.
+   *
+   * @param name        the name of the event
+   * @param description a description of the event
+   * @param importance  the importance of the event
+   */
+  public static void addEventMarker(String name, String description, EventImportance importance) {
+    recordingController.addEventMarker(name, description, importance);
+  }
+
+  /**
+   * Notifies Shuffleboard of an event. Events can range from as trivial as a change in a command
+   * state to as critical as a total power loss or component failure. If Shuffleboard is recording,
+   * the event will also be recorded.
+   *
+   * <p>If {@code name} is {@code null} or empty, or {@code importance} is {@code null}, then
+   * no event will be sent and an error will be printed to the driver station.
+   *
+   * @param name        the name of the event
+   * @param importance  the importance of the event
+   */
+  public static void addEventMarker(String name, EventImportance importance) {
+    addEventMarker(name, "", importance);
+  }
 }
