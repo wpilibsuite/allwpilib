@@ -53,6 +53,7 @@ generatedFileExclude {
   src/main/native/libuv/
   src/main/native/include/wpi/optional\.h$
   src/test/native/cpp/test_optional\.cpp$
+  src/main/native/resources/
 }
 
 licenseUpdateExclude {

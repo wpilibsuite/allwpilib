@@ -1,0 +1,50 @@
+ext.createGenerateResourcesTask = { name, prefix, namespace, project ->
+    def generatedOutputDir = file("$buildDir/generated/$name/cpp")
+
+    def inputDir = file("$projectDir/src/$name/native/resources")
+
+    if (!prefix.isEmpty()) prefix += '_'
+
+    def task = project.tasks.create("generateResources-$name") {
+        outputs.dir generatedOutputDir
+        inputs.dir inputDir
+
+        doLast {
+            generatedOutputDir.mkdirs()
+            inputDir.eachFile { inputFile ->
+                if (inputFile.name.startsWith('.')) return
+                def fileBytes = inputFile.bytes
+                def outputFile = file("$generatedOutputDir/${inputFile.name}.cpp")
+                def funcName = "GetResource_" + inputFile.name.replaceAll('[^a-zA-Z0-9]', '_')
+                outputFile.withWriter { out ->
+                    def inputBytes = inputFile.bytes
+                    out.print '''#include <stddef.h>
+#include <wpi/StringRef.h>
+extern "C" {
+static const unsigned char contents[] = { '''
+
+                    for (int i = 0; i < fileBytes.size(); i++) {
+                        out.print String.format('0x%02x', (int) fileBytes[i] & 0xff)
+                        out.print ', '
+                    }
+                    out.println """};
+const unsigned char* ${prefix}${funcName}(size_t* len) {
+  *len = ${fileBytes.size()};
+  return contents;
+}
+}"""
+                    if (!namespace.isEmpty()) {
+                        out.println "namespace ${namespace} {"
+                    }
+                    out.println """wpi::StringRef ${funcName}() {
+  return wpi::StringRef(reinterpret_cast<const char*>(contents), ${fileBytes.size()});
+}"""
+                    if (!namespace.isEmpty()) {
+                        out.println '}'
+                    }
+                }
+            }
+        }
+    }
+    return task
+}
