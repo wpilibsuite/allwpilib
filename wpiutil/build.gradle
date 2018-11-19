@@ -1,7 +1,13 @@
+apply from: "${rootDir}/shared/resources.gradle"
+
 ext {
     nativeName = 'wpiutil'
     devMain = 'edu.wpi.first.wpiutil.DevMain'
+    def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
     extraSetup = {
+        it.tasks.withType(CppCompile) {
+            dependsOn generateTask
+        }
         it.sources {
             libuvCpp(CppSourceSet) {
                 source {
@@ -10,6 +16,15 @@ ext {
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/include', 'src/main/native/include/uv-private', 'src/main/native/libuv'
+                }
+            }
+            resourcesCpp(CppSourceSet) {
+                source {
+                    srcDirs "$buildDir/generated/main/cpp"
+                    include '*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include'
                 }
             }
         }
