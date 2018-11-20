@@ -372,7 +372,7 @@ raw_ostream &raw_ostream::operator<<(const FormattedBytes &FB) {
   const size_t Size = Bytes.size();
   HexPrintStyle HPS = FB.Upper ? HexPrintStyle::Upper : HexPrintStyle::Lower;
   uint64_t OffsetWidth = 0;
-  if (FB.FirstByteOffset.hasValue()) {
+  if (FB.FirstByteOffset.has_value()) {
     // Figure out how many nibbles are needed to print the largest offset
     // represented by this data set, so that we can align the offset field
     // to the right width.
@@ -392,8 +392,8 @@ raw_ostream &raw_ostream::operator<<(const FormattedBytes &FB) {
   while (!Bytes.empty()) {
     indent(FB.IndentLevel);
 
-    if (FB.FirstByteOffset.hasValue()) {
-      uint64_t Offset = FB.FirstByteOffset.getValue();
+    if (FB.FirstByteOffset.has_value()) {
+      uint64_t Offset = FB.FirstByteOffset.value();
       wpi::write_hex(*this, Offset + LineIndex, HPS, OffsetWidth);
       *this << ": ";
     }

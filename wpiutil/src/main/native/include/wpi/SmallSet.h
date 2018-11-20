@@ -14,7 +14,7 @@
 #ifndef WPIUTIL_WPI_SMALLSET_H
 #define WPIUTIL_WPI_SMALLSET_H
 
-#include "wpi/None.h"
+#include "wpi/optional.h"
 #include "wpi/SmallPtrSet.h"
 #include "wpi/SmallVector.h"
 #include "wpi/Compiler.h"
@@ -78,16 +78,16 @@ public:
   /// concept.
   // FIXME: Add iterators that abstract over the small and large form, and then
   // return those here.
-  std::pair<NoneType, bool> insert(const T &V) {
+  std::pair<nullopt_t, bool> insert(const T &V) {
     if (!isSmall())
-      return std::make_pair(None, Set.insert(V).second);
+      return std::make_pair(nullopt, Set.insert(V).second);
 
     VIterator I = vfind(V);
     if (I != Vector.end())    // Don't reinsert if it already exists.
-      return std::make_pair(None, false);
+      return std::make_pair(nullopt, false);
     if (Vector.size() < N) {
       Vector.push_back(V);
-      return std::make_pair(None, true);
+      return std::make_pair(nullopt, true);
     }
 
     // Otherwise, grow from vector to set.
@@ -96,7 +96,7 @@ public:
       Vector.pop_back();
     }
     Set.insert(V);
-    return std::make_pair(None, true);
+    return std::make_pair(nullopt, true);
   }
 
   template <typename IterT>

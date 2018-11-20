@@ -11,7 +11,7 @@
 #define WPIUTIL_WPI_ARRAYREF_H
 
 #include "wpi/Hashing.h"
-#include "wpi/None.h"
+#include "wpi/optional.h"
 #include "wpi/SmallVector.h"
 #include "wpi/STLExtras.h"
 #include "wpi/Compiler.h"
@@ -60,8 +60,8 @@ namespace wpi {
     /// Construct an empty ArrayRef.
     /*implicit*/ ArrayRef() = default;
 
-    /// Construct an empty ArrayRef from None.
-    /*implicit*/ ArrayRef(NoneType) {}
+    /// Construct an empty ArrayRef from nullopt.
+    /*implicit*/ ArrayRef(nullopt_t) {}
 
     /// Construct an ArrayRef from a single element.
     /*implicit*/ ArrayRef(const T &OneElt)
@@ -296,8 +296,8 @@ namespace wpi {
     /// Construct an empty MutableArrayRef.
     /*implicit*/ MutableArrayRef() = default;
 
-    /// Construct an empty MutableArrayRef from None.
-    /*implicit*/ MutableArrayRef(NoneType) : ArrayRef<T>() {}
+    /// Construct an empty MutableArrayRef from nullopt.
+    /*implicit*/ MutableArrayRef(nullopt_t) : ArrayRef<T>() {}
 
     /// Construct an MutableArrayRef from a single element.
     /*implicit*/ MutableArrayRef(T &OneElt) : ArrayRef<T>(OneElt) {}

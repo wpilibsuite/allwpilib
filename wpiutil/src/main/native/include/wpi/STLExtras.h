@@ -17,10 +17,10 @@
 #ifndef WPIUTIL_WPI_STLEXTRAS_H
 #define WPIUTIL_WPI_STLEXTRAS_H
 
-#include "wpi/LLVMOptional.h"
 #include "wpi/SmallVector.h"
 #include "wpi/iterator.h"
 #include "wpi/iterator_range.h"
+#include "wpi/optional.h"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
