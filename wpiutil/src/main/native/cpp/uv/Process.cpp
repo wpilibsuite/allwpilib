@@ -14,55 +14,105 @@
 namespace wpi {
 namespace uv {
 
-ProcessOptions& ProcessOptions::StdioIgnore(size_t index) {
-  if (index >= m_stdio.size()) m_stdio.resize(index + 1);
-  m_stdio[index].flags = UV_IGNORE;
-  m_stdio[index].data.fd = 0;
-  return *this;
-}
-
-ProcessOptions& ProcessOptions::StdioInherit(size_t index, int fd) {
-  if (index >= m_stdio.size()) m_stdio.resize(index + 1);
-  m_stdio[index].flags = UV_INHERIT_FD;
-  m_stdio[index].data.fd = fd;
-  return *this;
-}
-
-ProcessOptions& ProcessOptions::StdioInherit(size_t index, Pipe& pipe) {
-  if (index >= m_stdio.size()) m_stdio.resize(index + 1);
-  m_stdio[index].flags = UV_INHERIT_STREAM;
-  m_stdio[index].data.stream = pipe.GetRawStream();
-  return *this;
-}
-
-ProcessOptions& ProcessOptions::StdioCreatePipe(size_t index, Pipe& pipe,
-                                                unsigned int flags) {
-  if (index >= m_stdio.size()) m_stdio.resize(index + 1);
-  m_stdio[index].flags = static_cast<uv_stdio_flags>(UV_CREATE_PIPE | flags);
-  m_stdio[index].data.stream = pipe.GetRawStream();
-  return *this;
-}
-
-std::shared_ptr<Process> Process::Spawn(Loop& loop, const Twine& file,
-                                        char** args,
-                                        const ProcessOptions& options) {
-  // convert ProcessOptions to libuv structure
-  SmallString<128> fileBuf;
+std::shared_ptr<Process> Process::SpawnArray(Loop& loop, const Twine& file,
+                                             ArrayRef<Option> options) {
+  // convert Option array to libuv structure
   uv_process_options_t coptions;
+
   coptions.exit_cb = [](uv_process_t* handle, int64_t status, int signal) {
     auto& h = *static_cast<Process*>(handle->data);
     h.exited(status, signal);
   };
+
+  SmallString<128> fileBuf;
   coptions.file = file.toNullTerminatedStringRef(fileBuf).data();
-  coptions.args = args;
-  coptions.env = options.m_env;
-  coptions.cwd = options.m_cwd.empty() ? nullptr : options.m_cwd.c_str();
-  coptions.flags = options.m_flags;
-  coptions.stdio_count = options.m_stdio.size();
-  coptions.stdio = const_cast<uv_stdio_container_t*>(
-      static_cast<const uv_stdio_container_t*>(options.m_stdio.data()));
-  coptions.uid = options.m_uid;
-  coptions.gid = options.m_gid;
+  coptions.cwd = nullptr;
+  coptions.flags = 0;
+  coptions.uid = 0;
+  coptions.gid = 0;
+
+  SmallVector<char*, 4> argsBuf;
+  SmallVector<char*, 4> envBuf;
+  struct StdioContainer : public uv_stdio_container_t {
+    StdioContainer() {
+      flags = UV_IGNORE;
+      data.fd = 0;
+    }
+  };
+  SmallVector<StdioContainer, 4> stdioBuf;
+
+  for (auto&& o : options) {
+    switch (o.m_type) {
+      case Option::kArg:
+        argsBuf.push_back(const_cast<char*>(o.m_data.str));
+        break;
+      case Option::kEnv:
+        envBuf.push_back(const_cast<char*>(o.m_data.str));
+        break;
+      case Option::kCwd:
+        coptions.cwd = o.m_data.str[0] == '\0' ? nullptr : o.m_data.str;
+        break;
+      case Option::kUid:
+        coptions.uid = o.m_data.uid;
+        coptions.flags |= UV_PROCESS_SETUID;
+        break;
+      case Option::kGid:
+        coptions.gid = o.m_data.gid;
+        coptions.flags |= UV_PROCESS_SETGID;
+        break;
+      case Option::kSetFlags:
+        coptions.flags |= o.m_data.flags;
+        break;
+      case Option::kClearFlags:
+        coptions.flags &= ~o.m_data.flags;
+        break;
+      case Option::kStdioIgnore: {
+        size_t index = o.m_data.stdio.index;
+        if (index >= stdioBuf.size()) stdioBuf.resize(index + 1);
+        stdioBuf[index].flags = UV_IGNORE;
+        stdioBuf[index].data.fd = 0;
+        break;
+      }
+      case Option::kStdioInheritFd: {
+        size_t index = o.m_data.stdio.index;
+        if (index >= stdioBuf.size()) stdioBuf.resize(index + 1);
+        stdioBuf[index].flags = UV_INHERIT_FD;
+        stdioBuf[index].data.fd = o.m_data.stdio.fd;
+        break;
+      }
+      case Option::kStdioInheritPipe: {
+        size_t index = o.m_data.stdio.index;
+        if (index >= stdioBuf.size()) stdioBuf.resize(index + 1);
+        stdioBuf[index].flags = UV_INHERIT_STREAM;
+        stdioBuf[index].data.stream = o.m_data.stdio.pipe->GetRawStream();
+        break;
+      }
+      case Option::kStdioCreatePipe: {
+        size_t index = o.m_data.stdio.index;
+        if (index >= stdioBuf.size()) stdioBuf.resize(index + 1);
+        stdioBuf[index].flags =
+            static_cast<uv_stdio_flags>(UV_CREATE_PIPE | o.m_data.stdio.flags);
+        stdioBuf[index].data.stream = o.m_data.stdio.pipe->GetRawStream();
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  if (argsBuf.empty()) argsBuf.push_back(const_cast<char*>(coptions.file));
+  argsBuf.push_back(nullptr);
+  coptions.args = argsBuf.data();
+
+  if (envBuf.empty()) {
+    coptions.env = nullptr;
+  } else {
+    envBuf.push_back(nullptr);
+    coptions.env = envBuf.data();
+  }
+
+  coptions.stdio_count = stdioBuf.size();
+  coptions.stdio = static_cast<uv_stdio_container_t*>(stdioBuf.data());
 
   auto h = std::make_shared<Process>(private_init{});
   int err = uv_spawn(loop.GetRaw(), h->GetRaw(), &coptions);
