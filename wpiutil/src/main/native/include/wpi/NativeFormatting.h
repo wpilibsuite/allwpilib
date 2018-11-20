@@ -10,7 +10,7 @@
 #ifndef WPIUTIL_WPI_NATIVE_FORMATTING_H
 #define WPIUTIL_WPI_NATIVE_FORMATTING_H
 
-#include "wpi/LLVMOptional.h"
+#include "wpi/optional.h"
 #include "wpi/raw_ostream.h"
 
 #include <cstdint>
@@ -40,9 +40,9 @@ void write_integer(raw_ostream &S, long long N, size_t MinDigits,
                    IntegerStyle Style);
 
 void write_hex(raw_ostream &S, uint64_t N, HexPrintStyle Style,
-               Optional<size_t> Width = None);
+               optional<size_t> Width = nullopt);
 void write_double(raw_ostream &S, double D, FloatStyle Style,
-                  Optional<size_t> Precision = None);
+                  optional<size_t> Precision = nullopt);
 }
 
 #endif
