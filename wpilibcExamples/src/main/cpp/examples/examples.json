@@ -234,5 +234,14 @@
     ],
     "foldername": "HAL",
     "gradlebase": "c"
+  },
+  {
+    "name": "ShuffleBoard",
+    "description": "An example program that uses ShuffleBoard with its Widgets and Tabs.",
+    "tags": [
+      "ShuffleBoard"
+    ],
+    "foldername": "ShuffleBoard",
+    "gradlebase": "cpp"
   }
 ]
