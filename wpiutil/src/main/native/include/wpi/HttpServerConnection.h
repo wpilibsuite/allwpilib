@@ -139,7 +139,10 @@ class HttpServerConnection {
   uv::Stream& m_stream;
 
   /** The header reader connection. */
-  sig::Connection m_headerConn;
+  sig::ScopedConnection m_dataConn;
+
+  /** The end stream connection. */
+  sig::ScopedConnection m_endConn;
 
   /** The message complete connection. */
   sig::Connection m_messageCompleteConn;
