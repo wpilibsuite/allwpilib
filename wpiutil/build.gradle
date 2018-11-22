@@ -150,5 +150,22 @@ model {
                 }
             }
         }
+        netconsoleServer(NativeExecutableSpec) {
+            targetBuildTypes 'release'
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src/netconsoleServer/native/cpp']
+                        includes = ['**/*.cpp']
+                    }
+                }
+            }
+            binaries.all { binary ->
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                if (binary.targetPlatform.operatingSystem.isLinux()) {
+                    linker.args "-lutil"
+                }
+            }
+        }
     }
 }
