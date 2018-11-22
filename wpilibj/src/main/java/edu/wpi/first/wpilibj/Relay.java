@@ -14,7 +14,6 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.RelayJNI;
 import edu.wpi.first.hal.util.UncleanStatusException;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 import static java.util.Objects.requireNonNull;
@@ -94,8 +93,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
   private Direction m_direction;
 
-  private String m_name = "";
-  private String m_subsystem = "Ungrouped";
+  private final SendableImpl m_sendableImpl;
 
   /**
    * Common relay initialization method. This code is common to all Relay constructors and
@@ -127,7 +125,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * @param direction The direction that the Relay object will control.
    */
   public Relay(final int channel, Direction direction) {
-    LiveWindow.add(this);
+    m_sendableImpl = new SendableImpl(true);
 
     m_channel = channel;
     m_direction = requireNonNull(direction, "Null Direction was given");
@@ -146,7 +144,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
   @Override
   public void close() {
-    LiveWindow.remove(this);
+    m_sendableImpl.close();
     freeRelay();
   }
 
@@ -171,12 +169,12 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
   @Override
   public final synchronized String getName() {
-    return m_name;
+    return m_sendableImpl.getName();
   }
 
   @Override
   public final synchronized void setName(String name) {
-    m_name = name;
+    m_sendableImpl.setName(name);
   }
 
   /**
@@ -186,7 +184,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * @param channel    The channel number the device is plugged into
    */
   protected final void setName(String moduleType, int channel) {
-    setName(moduleType + "[" + channel + "]");
+    m_sendableImpl.setName(moduleType, channel);
   }
 
   /**
@@ -197,17 +195,17 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * @param channel      The channel number the device is plugged into (usually PWM)
    */
   protected final void setName(String moduleType, int moduleNumber, int channel) {
-    setName(moduleType + "[" + moduleNumber + "," + channel + "]");
+    m_sendableImpl.setName(moduleType, moduleNumber, channel);
   }
 
   @Override
   public final synchronized String getSubsystem() {
-    return m_subsystem;
+    return m_sendableImpl.getSubsystem();
   }
 
   @Override
   public final synchronized void setSubsystem(String subsystem) {
-    m_subsystem = subsystem;
+    m_sendableImpl.setSubsystem(subsystem);
   }
 
   /**
@@ -216,7 +214,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * @param child child component
    */
   protected final void addChild(Object child) {
-    LiveWindow.addChild(this, child);
+    m_sendableImpl.addChild(child);
   }
 
   /**

@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj.drive;
 
 import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.SendableImpl;
 
 /**
  * Common base class for drive platforms.
@@ -21,8 +21,7 @@ public abstract class RobotDriveBase extends MotorSafety implements Sendable, Au
   protected double m_deadband = kDefaultDeadband;
   protected double m_maxOutput = kDefaultMaxOutput;
 
-  private String m_name = "";
-  private String m_subsystem = "Ungrouped";
+  private final SendableImpl m_sendableImpl;
 
   /**
    * The location of a motor on the robot for the purpose of driving.
@@ -43,7 +42,7 @@ public abstract class RobotDriveBase extends MotorSafety implements Sendable, Au
    * RobotDriveBase constructor.
    */
   public RobotDriveBase() {
-    LiveWindow.add(this);
+    m_sendableImpl = new SendableImpl(true);
 
     setSafetyEnabled(true);
     setName("RobotDriveBase");
@@ -51,17 +50,17 @@ public abstract class RobotDriveBase extends MotorSafety implements Sendable, Au
 
   @Override
   public void close() {
-    LiveWindow.remove(this);
+    m_sendableImpl.close();
   }
 
   @Override
   public final synchronized String getName() {
-    return m_name;
+    return m_sendableImpl.getName();
   }
 
   @Override
   public final synchronized void setName(String name) {
-    m_name = name;
+    m_sendableImpl.setName(name);
   }
 
   /**
@@ -71,7 +70,7 @@ public abstract class RobotDriveBase extends MotorSafety implements Sendable, Au
    * @param channel    The channel number the device is plugged into
    */
   protected final void setName(String moduleType, int channel) {
-    setName(moduleType + "[" + channel + "]");
+    m_sendableImpl.setName(moduleType, channel);
   }
 
   /**
@@ -82,17 +81,17 @@ public abstract class RobotDriveBase extends MotorSafety implements Sendable, Au
    * @param channel      The channel number the device is plugged into (usually PWM)
    */
   protected final void setName(String moduleType, int moduleNumber, int channel) {
-    setName(moduleType + "[" + moduleNumber + "," + channel + "]");
+    m_sendableImpl.setName(moduleType, moduleNumber, channel);
   }
 
   @Override
   public final synchronized String getSubsystem() {
-    return m_subsystem;
+    return m_sendableImpl.getSubsystem();
   }
 
   @Override
   public final synchronized void setSubsystem(String subsystem) {
-    m_subsystem = subsystem;
+    m_sendableImpl.setSubsystem(subsystem);
   }
 
   /**
@@ -101,7 +100,7 @@ public abstract class RobotDriveBase extends MotorSafety implements Sendable, Au
    * @param child child component
    */
   protected final void addChild(Object child) {
-    LiveWindow.addChild(this, child);
+    m_sendableImpl.addChild(child);
   }
 
   /**

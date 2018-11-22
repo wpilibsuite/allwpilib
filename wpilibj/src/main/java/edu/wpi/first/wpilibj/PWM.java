@@ -11,7 +11,6 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.PWMConfigDataResult;
 import edu.wpi.first.hal.PWMJNI;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -48,8 +47,7 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
   private final int m_channel;
   private int m_handle;
 
-  private String m_name = "";
-  private String m_subsystem = "Ungrouped";
+  private final SendableImpl m_sendableImpl;
 
   /**
    * Allocate a PWM given a channel.
@@ -57,7 +55,7 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
    */
   public PWM(final int channel) {
-    LiveWindow.add(this);
+    m_sendableImpl = new SendableImpl(true);
 
     SensorUtil.checkPWMChannel(channel);
     m_channel = channel;
@@ -79,7 +77,7 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
    */
   @Override
   public void close() {
-    LiveWindow.remove(this);
+    m_sendableImpl.close();
 
     if (m_handle == 0) {
       return;
@@ -91,12 +89,12 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
 
   @Override
   public final synchronized String getName() {
-    return m_name;
+    return m_sendableImpl.getName();
   }
 
   @Override
   public final synchronized void setName(String name) {
-    m_name = name;
+    m_sendableImpl.setName(name);
   }
 
   /**
@@ -106,7 +104,7 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
    * @param channel    The channel number the device is plugged into
    */
   protected final void setName(String moduleType, int channel) {
-    setName(moduleType + "[" + channel + "]");
+    m_sendableImpl.setName(moduleType, channel);
   }
 
   /**
@@ -117,17 +115,17 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
    * @param channel      The channel number the device is plugged into (usually PWM)
    */
   protected final void setName(String moduleType, int moduleNumber, int channel) {
-    setName(moduleType + "[" + moduleNumber + "," + channel + "]");
+    m_sendableImpl.setName(moduleType, moduleNumber, channel);
   }
 
   @Override
   public final synchronized String getSubsystem() {
-    return m_subsystem;
+    return m_sendableImpl.getSubsystem();
   }
 
   @Override
   public final synchronized void setSubsystem(String subsystem) {
-    m_subsystem = subsystem;
+    m_sendableImpl.setSubsystem(subsystem);
   }
 
   /**
@@ -136,7 +134,7 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
    * @param child child component
    */
   protected final void addChild(Object child) {
-    LiveWindow.addChild(this, child);
+    m_sendableImpl.addChild(child);
   }
 
   @Override

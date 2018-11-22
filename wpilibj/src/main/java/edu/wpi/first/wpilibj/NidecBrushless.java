@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -23,8 +22,7 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
   private volatile double m_speed;
   private volatile boolean m_disabled;
 
-  private String m_name = "";
-  private String m_subsystem = "Ungrouped";
+  private final SendableImpl m_sendableImpl;
 
   /**
    * Constructor.
@@ -35,7 +33,7 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
    *                   0-9 are on-board, 10-25 are on the MXP port
    */
   public NidecBrushless(final int pwmChannel, final int dioChannel) {
-    LiveWindow.add(this);
+    m_sendableImpl = new SendableImpl(true);
 
     setSafetyEnabled(false);
 
@@ -55,19 +53,19 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
 
   @Override
   public void close() {
-    LiveWindow.remove(this);
+    m_sendableImpl.close();
     m_dio.close();
     m_pwm.close();
   }
 
   @Override
   public final synchronized String getName() {
-    return m_name;
+    return m_sendableImpl.getName();
   }
 
   @Override
   public final synchronized void setName(String name) {
-    m_name = name;
+    m_sendableImpl.setName(name);
   }
 
   /**
@@ -77,7 +75,7 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
    * @param channel    The channel number the device is plugged into
    */
   protected final void setName(String moduleType, int channel) {
-    setName(moduleType + "[" + channel + "]");
+    m_sendableImpl.setName(moduleType, channel);
   }
 
   /**
@@ -88,17 +86,17 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
    * @param channel      The channel number the device is plugged into (usually PWM)
    */
   protected final void setName(String moduleType, int moduleNumber, int channel) {
-    setName(moduleType + "[" + moduleNumber + "," + channel + "]");
+    m_sendableImpl.setName(moduleType, moduleNumber, channel);
   }
 
   @Override
   public final synchronized String getSubsystem() {
-    return m_subsystem;
+    return m_sendableImpl.getSubsystem();
   }
 
   @Override
   public final synchronized void setSubsystem(String subsystem) {
-    m_subsystem = subsystem;
+    m_sendableImpl.setSubsystem(subsystem);
   }
 
   /**
@@ -107,7 +105,7 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
    * @param child child component
    */
   protected final void addChild(Object child) {
-    LiveWindow.addChild(this, child);
+    m_sendableImpl.addChild(child);
   }
 
   /**
