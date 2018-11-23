@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "frc/SafePWM.h"
+#include "frc/PWM.h"
 #include "frc/SpeedController.h"
 
 namespace frc {
@@ -15,7 +15,7 @@ namespace frc {
 /**
  * Common base class for all PWM Speed Controllers.
  */
-class PWMSpeedController : public SafePWM, public SpeedController {
+class PWMSpeedController : public PWM, public SpeedController {
  public:
   PWMSpeedController(PWMSpeedController&&) = default;
   PWMSpeedController& operator=(PWMSpeedController&&) = default;

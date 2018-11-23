@@ -70,7 +70,7 @@ void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
   m_rearRightMotor.Set(wheelSpeeds[kRearRight] * m_maxOutput *
                        m_rightSideInvertMultiplier);
 
-  m_safetyHelper.Feed();
+  Feed();
 }
 
 void MecanumDrive::DrivePolar(double magnitude, double angle,
@@ -98,7 +98,7 @@ void MecanumDrive::StopMotor() {
   m_frontRightMotor.StopMotor();
   m_rearLeftMotor.StopMotor();
   m_rearRightMotor.StopMotor();
-  m_safetyHelper.Feed();
+  Feed();
 }
 
 void MecanumDrive::GetDescription(wpi::raw_ostream& desc) const {

@@ -25,11 +25,11 @@ bool PWMSpeedController::GetInverted() const { return m_isInverted; }
 
 void PWMSpeedController::Disable() { SetDisabled(); }
 
-void PWMSpeedController::StopMotor() { SafePWM::StopMotor(); }
+void PWMSpeedController::StopMotor() { PWM::StopMotor(); }
 
 void PWMSpeedController::PIDWrite(double output) { Set(output); }
 
-PWMSpeedController::PWMSpeedController(int channel) : SafePWM(channel) {}
+PWMSpeedController::PWMSpeedController(int channel) : PWM(channel) {}
 
 void PWMSpeedController::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Speed Controller");

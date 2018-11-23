@@ -19,7 +19,7 @@ constexpr double Servo::kMinServoAngle;
 constexpr double Servo::kDefaultMaxServoPWM;
 constexpr double Servo::kDefaultMinServoPWM;
 
-Servo::Servo(int channel) : SafePWM(channel) {
+Servo::Servo(int channel) : PWM(channel) {
   // Set minimum and maximum PWM values supported by the servo
   SetBounds(kDefaultMaxServoPWM, 0.0, 0.0, 0.0, kDefaultMinServoPWM);
 

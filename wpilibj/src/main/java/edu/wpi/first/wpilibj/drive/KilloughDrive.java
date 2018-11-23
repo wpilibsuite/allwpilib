@@ -162,7 +162,7 @@ public class KilloughDrive extends RobotDriveBase {
     m_rightMotor.set(wheelSpeeds[MotorType.kRight.value] * m_maxOutput);
     m_backMotor.set(wheelSpeeds[MotorType.kBack.value] * m_maxOutput);
 
-    m_safetyHelper.feed();
+    feed();
   }
 
   /**
@@ -193,7 +193,7 @@ public class KilloughDrive extends RobotDriveBase {
     m_leftMotor.stopMotor();
     m_rightMotor.stopMotor();
     m_backMotor.stopMotor();
-    m_safetyHelper.feed();
+    feed();
   }
 
   @Override

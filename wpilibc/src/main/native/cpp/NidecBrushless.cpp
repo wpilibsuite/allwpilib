@@ -14,11 +14,11 @@
 using namespace frc;
 
 NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
-    : m_safetyHelper(this), m_dio(dioChannel), m_pwm(pwmChannel) {
+    : m_dio(dioChannel), m_pwm(pwmChannel) {
   AddChild(&m_dio);
   AddChild(&m_pwm);
-  m_safetyHelper.SetExpiration(0.0);
-  m_safetyHelper.SetSafetyEnabled(false);
+  SetExpiration(0.0);
+  SetSafetyEnabled(false);
 
   // the dio controls the output (in PWM mode)
   m_dio.SetPWMRate(15625);
@@ -34,7 +34,7 @@ void NidecBrushless::Set(double speed) {
     m_dio.UpdateDutyCycle(0.5 + 0.5 * (m_isInverted ? -speed : speed));
     m_pwm.SetRaw(0xffff);
   }
-  m_safetyHelper.Feed();
+  Feed();
 }
 
 double NidecBrushless::Get() const { return m_speed; }
@@ -49,31 +49,13 @@ void NidecBrushless::Disable() {
   m_pwm.SetDisabled();
 }
 
-void NidecBrushless::StopMotor() {
-  m_dio.UpdateDutyCycle(0.5);
-  m_pwm.SetDisabled();
-}
-
 void NidecBrushless::Enable() { m_disabled = false; }
 
 void NidecBrushless::PIDWrite(double output) { Set(output); }
 
-void NidecBrushless::SetExpiration(double timeout) {
-  m_safetyHelper.SetExpiration(timeout);
-}
-
-double NidecBrushless::GetExpiration() const {
-  return m_safetyHelper.GetExpiration();
-}
-
-bool NidecBrushless::IsAlive() const { return m_safetyHelper.IsAlive(); }
-
-void NidecBrushless::SetSafetyEnabled(bool enabled) {
-  m_safetyHelper.SetSafetyEnabled(enabled);
-}
-
-bool NidecBrushless::IsSafetyEnabled() const {
-  return m_safetyHelper.IsSafetyEnabled();
+void NidecBrushless::StopMotor() {
+  m_dio.UpdateDutyCycle(0.5);
+  m_pwm.SetDisabled();
 }
 
 void NidecBrushless::GetDescription(wpi::raw_ostream& desc) const {

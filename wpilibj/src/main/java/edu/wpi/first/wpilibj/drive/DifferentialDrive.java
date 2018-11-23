@@ -191,7 +191,7 @@ public class DifferentialDrive extends RobotDriveBase {
     m_leftMotor.set(limit(leftMotorOutput) * m_maxOutput);
     m_rightMotor.set(limit(rightMotorOutput) * m_maxOutput * m_rightSideInvertMultiplier);
 
-    m_safetyHelper.feed();
+    feed();
   }
 
   /**
@@ -275,7 +275,7 @@ public class DifferentialDrive extends RobotDriveBase {
     m_leftMotor.set(leftMotorOutput * m_maxOutput);
     m_rightMotor.set(rightMotorOutput * m_maxOutput * m_rightSideInvertMultiplier);
 
-    m_safetyHelper.feed();
+    feed();
   }
 
   /**
@@ -323,7 +323,7 @@ public class DifferentialDrive extends RobotDriveBase {
     m_leftMotor.set(leftSpeed * m_maxOutput);
     m_rightMotor.set(rightSpeed * m_maxOutput * m_rightSideInvertMultiplier);
 
-    m_safetyHelper.feed();
+    feed();
   }
 
   /**
@@ -379,7 +379,7 @@ public class DifferentialDrive extends RobotDriveBase {
   public void stopMotor() {
     m_leftMotor.stopMotor();
     m_rightMotor.stopMotor();
-    m_safetyHelper.feed();
+    feed();
   }
 
   @Override

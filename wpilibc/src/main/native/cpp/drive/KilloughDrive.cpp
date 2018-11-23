@@ -73,7 +73,7 @@ void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
   m_rightMotor.Set(wheelSpeeds[kRight] * m_maxOutput);
   m_backMotor.Set(wheelSpeeds[kBack] * m_maxOutput);
 
-  m_safetyHelper.Feed();
+  Feed();
 }
 
 void KilloughDrive::DrivePolar(double magnitude, double angle,
@@ -92,7 +92,7 @@ void KilloughDrive::StopMotor() {
   m_leftMotor.StopMotor();
   m_rightMotor.StopMotor();
   m_backMotor.StopMotor();
-  m_safetyHelper.Feed();
+  Feed();
 }
 
 void KilloughDrive::GetDescription(wpi::raw_ostream& desc) const {

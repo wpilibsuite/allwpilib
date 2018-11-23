@@ -12,7 +12,6 @@
 #include "frc/DigitalOutput.h"
 #include "frc/ErrorBase.h"
 #include "frc/MotorSafety.h"
-#include "frc/MotorSafetyHelper.h"
 #include "frc/PWM.h"
 #include "frc/SpeedController.h"
 #include "frc/smartdashboard/SendableBase.h"
@@ -22,8 +21,7 @@ namespace frc {
 /**
  * Nidec Brushless Motor.
  */
-class NidecBrushless : public ErrorBase,
-                       public SendableBase,
+class NidecBrushless : public SendableBase,
                        public SpeedController,
                        public MotorSafety {
  public:
@@ -71,15 +69,6 @@ class NidecBrushless : public ErrorBase,
   void Disable() override;
 
   /**
-   * Stop the motor.
-   *
-   * This is called by the MotorSafetyHelper object when it has a timeout for
-   * this PWM and needs to stop it from running. Calling Set() will re-enable
-   * the motor.
-   */
-  void StopMotor() override;
-
-  /**
    * Re-enable the motor after Disable() has been called. The Set() function
    * must be called to set a new motor speed.
    */
@@ -94,32 +83,7 @@ class NidecBrushless : public ErrorBase,
   void PIDWrite(double output) override;
 
   // MotorSafety interface
-  /**
-   * Set the safety expiration time.
-   *
-   * @param timeout The timeout (in seconds) for this motor object
-   */
-  void SetExpiration(double timeout) override;
-
-  /**
-   * Return the safety expiration time.
-   *
-   * @return The expiration time value.
-   */
-  double GetExpiration() const override;
-
-  /**
-   * Check if the motor is currently alive or stopped due to a timeout.
-   *
-   * @return a bool value that is true if the motor has NOT timed out and should
-   *         still be running.
-   */
-  bool IsAlive() const override;
-
-  void SetSafetyEnabled(bool enabled) override;
-
-  bool IsSafetyEnabled() const override;
-
+  void StopMotor() override;
   void GetDescription(wpi::raw_ostream& desc) const override;
 
   /**
@@ -133,7 +97,6 @@ class NidecBrushless : public ErrorBase,
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  MotorSafetyHelper m_safetyHelper;
   bool m_isInverted = false;
   std::atomic_bool m_disabled{false};
   DigitalOutput m_dio;

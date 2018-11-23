@@ -18,8 +18,6 @@
 
 namespace frc {
 
-class MotorSafetyHelper;
-
 /**
  * Class for Spike style relay outputs.
  *
@@ -32,7 +30,7 @@ class MotorSafetyHelper;
  * independently for something that does not care about voltage polarity (like
  * a solenoid).
  */
-class Relay : public MotorSafety, public ErrorBase, public SendableBase {
+class Relay : public MotorSafety, public SendableBase {
  public:
   enum Value { kOff, kOn, kForward, kReverse };
   enum Direction { kBothDirections, kForwardOnly, kReverseOnly };
@@ -89,51 +87,8 @@ class Relay : public MotorSafety, public ErrorBase, public SendableBase {
 
   int GetChannel() const;
 
-  /**
-   * Set the expiration time for the Relay object.
-   *
-   * @param timeout The timeout (in seconds) for this relay object
-   */
-  void SetExpiration(double timeout) override;
-
-  /**
-   * Return the expiration time for the relay object.
-   *
-   * @return The expiration time value.
-   */
-  double GetExpiration() const override;
-
-  /**
-   * Check if the relay object is currently alive or stopped due to a timeout.
-   *
-   * @return a bool value that is true if the motor has NOT timed out and should
-   *         still be running.
-   */
-  bool IsAlive() const override;
-
-  /**
-   * Stop the motor associated with this PWM object.
-   *
-   * This is called by the MotorSafetyHelper object when it has a timeout for
-   * this relay and needs to stop it from running.
-   */
+  // MotorSafety interface
   void StopMotor() override;
-
-  /**
-   * Enable/disable motor safety for this device.
-   *
-   * Turn on and off the motor safety option for this relay object.
-   *
-   * @param enabled True if motor safety is enforced for this object
-   */
-  void SetSafetyEnabled(bool enabled) override;
-
-  /**
-   * Check if motor safety is enabled for this object.
-   *
-   * @returns True if motor safety is enforced for this object
-   */
-  bool IsSafetyEnabled() const override;
 
   void GetDescription(wpi::raw_ostream& desc) const override;
 
@@ -145,8 +100,6 @@ class Relay : public MotorSafety, public ErrorBase, public SendableBase {
 
   HAL_RelayHandle m_forwardHandle = HAL_kInvalidHandle;
   HAL_RelayHandle m_reverseHandle = HAL_kInvalidHandle;
-
-  std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
 };
 
 }  // namespace frc

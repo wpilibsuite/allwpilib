@@ -47,6 +47,8 @@ PWM::PWM(int channel) {
 
   HAL_Report(HALUsageReporting::kResourceType_PWM, channel);
   SetName("PWM", channel);
+
+  SetSafetyEnabled(false);
 }
 
 PWM::~PWM() {
@@ -60,7 +62,7 @@ PWM::~PWM() {
 }
 
 PWM::PWM(PWM&& rhs)
-    : ErrorBase(std::move(rhs)),
+    : MotorSafety(std::move(rhs)),
       SendableBase(std::move(rhs)),
       m_channel(std::move(rhs.m_channel)) {
   std::swap(m_handle, rhs.m_handle);
@@ -74,6 +76,12 @@ PWM& PWM::operator=(PWM&& rhs) {
   std::swap(m_handle, rhs.m_handle);
 
   return *this;
+}
+
+void PWM::StopMotor() { SetDisabled(); }
+
+void PWM::GetDescription(wpi::raw_ostream& desc) const {
+  desc << "PWM " << GetChannel();
 }
 
 void PWM::SetRaw(uint16_t value) {
@@ -114,6 +122,8 @@ void PWM::SetSpeed(double speed) {
   int32_t status = 0;
   HAL_SetPWMSpeed(m_handle, speed, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+
+  Feed();
 }
 
 double PWM::GetSpeed() const {
