@@ -39,9 +39,21 @@ class Watchdog {
   Watchdog& operator=(Watchdog&&) = default;
 
   /**
-   * Get the time in seconds since the watchdog was last fed.
+   * Returns the time in seconds since the watchdog was last fed.
    */
   double GetTime() const;
+
+  /**
+   * Sets the watchdog's timeout.
+   *
+   * @param timeout The watchdog's timeout in seconds.
+   */
+  void SetTimeout(double timeout);
+
+  /**
+   * Returns the watchdog's timeout in seconds.
+   */
+  double GetTimeout() const;
 
   /**
    * Returns true if the watchdog timer has expired.
@@ -76,7 +88,7 @@ class Watchdog {
   void Enable();
 
   /**
-   * Disable the watchdog.
+   * Disables the watchdog timer.
    */
   void Disable();
 

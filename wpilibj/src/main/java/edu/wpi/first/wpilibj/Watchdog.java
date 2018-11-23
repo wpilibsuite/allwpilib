@@ -48,14 +48,30 @@ public class Watchdog {
     m_timeout = timeout;
     m_callback = callback;
     m_notifier = new Notifier(this::timeoutFunc);
-    enable();
   }
 
   /**
-   * Get the time in seconds since the watchdog was last fed.
+   * Returns the time in seconds since the watchdog was last fed.
    */
   public double getTime() {
     return Timer.getFPGATimestamp() - m_startTime;
+  }
+
+  /**
+   * Sets the watchdog's timeout.
+   *
+   * @param timeout The watchdog's timeout in seconds.
+   */
+  public void setTimeout(double timeout) {
+    m_timeout = timeout;
+    reset();
+  }
+
+  /**
+   * Returns the watchdog's timeout in seconds.
+   */
+  public double getTimeout() {
+    return m_timeout;
   }
 
   /**
@@ -84,7 +100,7 @@ public class Watchdog {
    */
   public void printEpochs() {
     m_epochs.forEach((key, value) -> {
-      System.out.println("\t" + key + ": " + value + "s");
+      System.out.format("\t" + key + ": %.6fs\n", value);
     });
   }
 
@@ -108,7 +124,7 @@ public class Watchdog {
   }
 
   /**
-   * Disable the watchdog.
+   * Disables the watchdog timer.
    */
   public void disable() {
     m_notifier.stop();
@@ -116,7 +132,7 @@ public class Watchdog {
 
   private void timeoutFunc() {
     if (!m_isExpired) {
-      System.out.println("Watchdog not fed after " + m_timeout + "s");
+      System.out.format("Watchdog not fed within %.6fs\n", m_timeout);
       m_callback.run();
       m_isExpired = true;
       disable();

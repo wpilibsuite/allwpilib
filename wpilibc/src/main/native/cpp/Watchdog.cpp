@@ -7,6 +7,7 @@
 
 #include "frc/Watchdog.h"
 
+#include <wpi/Format.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/Timer.h"
@@ -16,13 +17,18 @@ using namespace frc;
 Watchdog::Watchdog(double timeout, std::function<void()> callback)
     : m_timeout(timeout),
       m_callback(callback),
-      m_notifier(&Watchdog::TimeoutFunc, this) {
-  Enable();
-}
+      m_notifier(&Watchdog::TimeoutFunc, this) {}
 
 double Watchdog::GetTime() const {
   return Timer::GetFPGATimestamp() - m_startTime;
 }
+
+void Watchdog::SetTimeout(double timeout) {
+  m_timeout = timeout;
+  Reset();
+}
+
+double Watchdog::GetTimeout() const { return m_timeout; }
 
 bool Watchdog::IsExpired() const { return m_isExpired; }
 
@@ -34,7 +40,8 @@ void Watchdog::AddEpoch(wpi::StringRef epochName) {
 
 void Watchdog::PrintEpochs() {
   for (const auto& epoch : m_epochs) {
-    wpi::outs() << "\t" << epoch.getKey() << ": " << epoch.getValue() << "s\n";
+    wpi::outs() << "\t" << epoch.getKey() << ": "
+                << wpi::format("%.6f", epoch.getValue()) << "s\n";
   }
 }
 
@@ -51,7 +58,8 @@ void Watchdog::Disable() { m_notifier.Stop(); }
 
 void Watchdog::TimeoutFunc() {
   if (!m_isExpired) {
-    wpi::outs() << "Watchdog not fed after " << m_timeout << "s\n";
+    wpi::outs() << "Watchdog not fed within " << wpi::format("%.6f", m_timeout)
+                << "s\n";
     m_callback();
     m_isExpired = true;
     Disable();
