@@ -18,6 +18,15 @@
     "gradlebase": "cpp"
   },
   {
+    "name": "Timed Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for TimedRobot",
+    "tags": [
+      "Timed", "Skeleton"
+    ],
+    "foldername": "timedskeleton",
+    "gradlebase": "cpp"
+  },
+  {
     "name": "Command Robot",
     "description": "Command style",
     "tags": [
