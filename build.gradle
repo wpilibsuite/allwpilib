@@ -6,7 +6,7 @@ plugins {
     id 'edu.wpi.first.GradleVsCode' version '0.6.1'
     id 'idea'
     id 'visual-studio'
-    id 'com.gradle.build-scan' version '1.15.1'
+    id 'com.gradle.build-scan' version '2.0.2'
     id 'net.ltgt.errorprone' version '0.6' apply false
 }
 
@@ -99,5 +99,5 @@ subprojects {
 }
 
 wrapper {
-    gradleVersion = '4.9'
+    gradleVersion = '5.0'
 }
