@@ -3,7 +3,6 @@ plugins {
     id 'application'
     id 'cpp'
     id 'visual-studio'
-    id 'com.github.johnrengelman.shadow' version '2.0.3' apply false
 }
 
 apply plugin: 'edu.wpi.first.NativeUtils'
