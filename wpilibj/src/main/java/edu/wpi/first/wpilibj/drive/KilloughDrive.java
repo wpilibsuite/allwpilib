@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.drive;
 
+import java.util.StringJoiner;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -87,6 +89,7 @@ public class KilloughDrive extends RobotDriveBase {
   public KilloughDrive(SpeedController leftMotor, SpeedController rightMotor,
                        SpeedController backMotor, double leftMotorAngle, double rightMotorAngle,
                        double backMotorAngle) {
+    verify(leftMotor, rightMotor, backMotor);
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
     m_backMotor = backMotor;
@@ -101,6 +104,33 @@ public class KilloughDrive extends RobotDriveBase {
     addChild(m_backMotor);
     instances++;
     setName("KilloughDrive", instances);
+  }
+
+  /**
+   * Verifies that all motors are nonnull, throwing a NullPointerException if any of them are.
+   * The exception's error message will specify all null motors, e.g. {@code
+   * NullPointerException("leftMotor, rightMotor")}, to give as much information as possible to
+   * the programmer.
+   *
+   * @throws NullPointerException if any of the given motors are null
+   */
+  @SuppressWarnings("PMD.AvoidThrowingNullPointerException")
+  private void verify(SpeedController leftMotor, SpeedController rightMotor,
+                      SpeedController backMotor) {
+    if (leftMotor != null && rightMotor != null && backMotor != null) {
+      return;
+    }
+    StringJoiner joiner = new StringJoiner(", ");
+    if (leftMotor == null) {
+      joiner.add("leftMotor");
+    }
+    if (rightMotor == null) {
+      joiner.add("rightMotor");
+    }
+    if (backMotor == null) {
+      joiner.add("backMotor");
+    }
+    throw new NullPointerException(joiner.toString());
   }
 
   /**
