@@ -166,15 +166,18 @@ jobs:
         sudo tar xvzf build/jdk.tar.gz -C /Library/Java/JavaVirtualMachines/
         export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/
       displayName: 'Setup JDK'
-    - task: Gradle@2
-      inputs:
-        workingDirectory: ''
-        gradleWrapperFile: 'gradlew'
-        gradleOptions: '-Xmx3072m'
-        javaHomeOption: 'path'
-        jdkDirectory: '/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/'
-        publishJUnitResults: true
-        testResultsFiles: '**/TEST-*.xml'
-        tasks: 'build'
+    - script: |
+        ./gradlew build "-Dorg.gradle.java.home=/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/"
+      displayName: 'Run Gradle'
+    # - task: Gradle@2
+    #   inputs:
+    #     workingDirectory: ''
+    #     gradleWrapperFile: 'gradlew'
+    #     gradleOptions: '-Xmx3072m'
+    #     javaHomeOption: 'path'
+    #     jdkDirectory: '/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/'
+    #     publishJUnitResults: true
+    #     testResultsFiles: '**/TEST-*.xml'
+    #     tasks: 'build'
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
