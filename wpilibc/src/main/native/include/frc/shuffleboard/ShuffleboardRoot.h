@@ -47,8 +47,9 @@ class ShuffleboardRoot {
   virtual void DisableActuatorWidgets() = 0;
 
   /**
-   * Selects the tab in the dashboard with the given index in the range [0..n-1], where <i>n</i>
-   * is the number of tabs in the dashboard at the time this method is called.
+   * Selects the tab in the dashboard with the given index in the range
+   * [0..n-1], where <i>n</i> is the number of tabs in the dashboard at the time
+   * this method is called.
    *
    * @param index the index of the tab to select
    */
@@ -60,7 +61,6 @@ class ShuffleboardRoot {
    * @param title the title of the tab to select
    */
   virtual void SelectTab(wpi::StringRef title) = 0;
-
 };
 
 }  // namespace frc

@@ -19,9 +19,7 @@ ShuffleboardTab& Shuffleboard::GetTab(wpi::StringRef title) {
   return GetInstance().GetTab(title);
 }
 
-void Shuffleboard::SelectTab(int index) {
-  GetInstance().SelectTab(index);
-}
+void Shuffleboard::SelectTab(int index) { GetInstance().SelectTab(index); }
 
 void Shuffleboard::SelectTab(wpi::StringRef title) {
   GetInstance().SelectTab(title);
