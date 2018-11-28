@@ -18,6 +18,15 @@
 
 using namespace frc;
 
+namespace frc {
+TEST(HALSERIAL, SerialTest) {
+  int32_t status = 0;
+  HAL_InitializeSerialPort(HAL_SerialPort_MXP, &status);
+  EXPECT_NE(status, 0);
+  HAL_CloseSerial(HAL_SerialPort_MXP, &status);
+}
+}
+
 class TestEnvironment : public testing::Environment {
   bool m_alreadySetUp = false;
   MockDS m_mockDS;

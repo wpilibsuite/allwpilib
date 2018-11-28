@@ -19,11 +19,4 @@ TEST(HALSOLENOID, SolenoidTest) {
   HAL_InitializeSolenoidPort(0, &status);
   EXPECT_NE(status, 0);
 }
-
-TEST(HALSERIAL, SerialTest) {
-  int32_t status = 0;
-  HAL_InitializeSerialPort(HAL_SerialPort_MXP, &status);
-  EXPECT_NE(status, 0);
-  HAL_CloseSerial(HAL_SerialPort_MXP, &status);
-}
 }  // namespace hal

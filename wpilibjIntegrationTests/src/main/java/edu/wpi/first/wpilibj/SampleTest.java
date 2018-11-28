@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.wpi.first.hal.SerialPortJNI;
 import edu.wpi.first.wpilibj.fixtures.SampleFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
@@ -61,6 +62,12 @@ public class SampleTest extends AbstractComsSetup {
   public void test() {
     Timer.delay(0.5);
     assertTrue(true);
+  }
+
+  @Test
+  public void testSerialPort() {
+    SerialPortJNI.serialInitializePort((byte)1);
+    SerialPortJNI.serialClear((byte)1);
   }
 
 }
