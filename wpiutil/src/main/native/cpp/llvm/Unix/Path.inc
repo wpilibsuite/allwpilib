@@ -28,6 +28,56 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+namespace {
+
+#ifndef _WIN32
+  /**
+ * Demangle a C++ symbol, used for printing stack traces.
+ */
+static std::string demangle(char const* mangledSymbol) {
+  char buffer[256];
+  size_t length;
+  int32_t status;
+
+  if (std::sscanf(mangledSymbol, "%*[^(]%*[(]%255[^)+]", buffer)) {
+    char* symbol = abi::__cxa_demangle(buffer, nullptr, &length, &status);
+    if (status == 0) {
+      return symbol;
+    } else {
+      // If the symbol couldn't be demangled, it's probably a C function,
+      // so just return it as-is.
+      return buffer;
+    }
+  }
+
+  // If everything else failed, just return the mangled symbol
+  return mangledSymbol;
+}
+
+std::string GetStackTrace(int offset) {
+  void* stackTrace[128];
+  int stackSize = backtrace(stackTrace, 128);
+  char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
+  wpi::SmallString<1024> buf;
+  wpi::raw_svector_ostream trace(buf);
+
+  for (int i = offset; i < stackSize; i++) {
+    // Only print recursive functions once in a row.
+    if (i == 0 || stackTrace[i] != stackTrace[i - 1]) {
+      trace << "\tat " << demangle(mangledSymbols[i]) << "\n";
+    }
+  }
+
+  std::free(mangledSymbols);
+
+  return trace.str();
+}
+#else
+  std::string GetStackTrace(int offset) { return "no stack trace on windows"; }
+#endif
+
+}
+
 namespace wpi {
 namespace sys  {
 namespace fs {
@@ -193,6 +243,12 @@ std::error_code detail::directory_iterator_destruct(detail::DirIterState &it) {
 
 std::error_code detail::directory_iterator_increment(detail::DirIterState &it) {
   errno = 0;
+  if (reinterpret_cast<DIR *>(it.IterationHandle) == nullptr) {
+    auto bt = GetStackTrace(0);
+    wpi::errs() << bt << "\n";
+    wpi::flush();
+    std::terminate();
+  }
   dirent *cur_dir = ::readdir(reinterpret_cast<DIR *>(it.IterationHandle));
   if (cur_dir == nullptr && errno != 0) {
     return std::error_code(errno, std::generic_category());

@@ -63,11 +63,4 @@ public class SampleTest extends AbstractComsSetup {
     Timer.delay(0.5);
     assertTrue(true);
   }
-
-  @Test
-  public void testSerialPort() {
-    SerialPortJNI.serialInitializePort((byte)1);
-    SerialPortJNI.serialClear((byte)1);
-  }
-
 }
