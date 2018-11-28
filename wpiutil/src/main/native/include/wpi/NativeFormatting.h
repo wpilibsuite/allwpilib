@@ -10,7 +10,7 @@
 #ifndef WPIUTIL_WPI_NATIVE_FORMATTING_H
 #define WPIUTIL_WPI_NATIVE_FORMATTING_H
 
-#include "wpi/Optional.h"
+#include "wpi/LLVMOptional.h"
 #include "wpi/raw_ostream.h"
 
 #include <cstdint>
