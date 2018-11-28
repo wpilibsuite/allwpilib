@@ -7,13 +7,13 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-
-import java.util.Map;
-import java.util.WeakHashMap;
 
 /**
  * A wrapper to make video sources sendable and usable from Shuffleboard.
