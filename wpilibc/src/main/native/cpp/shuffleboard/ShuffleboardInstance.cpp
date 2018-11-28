@@ -72,3 +72,11 @@ void ShuffleboardInstance::DisableActuatorWidgets() {
     }
   }
 }
+
+void ShuffleboardInstance::SelectTab(int index) {
+  m_impl->rootMetaTable->GetEntry("Selected").ForceSetDouble(index);
+}
+
+void ShuffleboardInstance::SelectTab(wpi::StringRef title) {
+  m_impl->rootMetaTable->GetEntry("Selected").ForceSetString(title);
+}
