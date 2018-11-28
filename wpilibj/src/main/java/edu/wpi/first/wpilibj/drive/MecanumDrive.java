@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.drive;
 
+import java.util.StringJoiner;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -74,6 +76,7 @@ public class MecanumDrive extends RobotDriveBase {
    */
   public MecanumDrive(SpeedController frontLeftMotor, SpeedController rearLeftMotor,
                       SpeedController frontRightMotor, SpeedController rearRightMotor) {
+    verify(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
     m_frontLeftMotor = frontLeftMotor;
     m_rearLeftMotor = rearLeftMotor;
     m_frontRightMotor = frontRightMotor;
@@ -84,6 +87,36 @@ public class MecanumDrive extends RobotDriveBase {
     addChild(m_rearRightMotor);
     instances++;
     setName("MecanumDrive", instances);
+  }
+
+  /**
+   * Verifies that all motors are nonnull, throwing a NullPointerException if any of them are.
+   * The exception's error message will specify all null motors, e.g. {@code
+   * NullPointerException("frontLeftMotor, rearRightMotor")}, to give as much information as
+   * possible to the programmer.
+   *
+   * @throws NullPointerException if any of the given motors are null
+   */
+  @SuppressWarnings({"PMD.AvoidThrowingNullPointerException", "PMD.CyclomaticComplexity"})
+  private void verify(SpeedController frontLeft, SpeedController rearLeft,
+                      SpeedController frontRight, SpeedController rearRightMotor) {
+    if (frontLeft != null && rearLeft != null && frontRight != null && rearRightMotor != null) {
+      return;
+    }
+    StringJoiner joiner = new StringJoiner(", ");
+    if (frontLeft == null) {
+      joiner.add("frontLeftMotor");
+    }
+    if (rearLeft == null) {
+      joiner.add("rearLeftMotor");
+    }
+    if (frontRight == null) {
+      joiner.add("frontRightMotor");
+    }
+    if (rearRightMotor == null) {
+      joiner.add("rearRightMotor");
+    }
+    throw new NullPointerException(joiner.toString());
   }
 
   /**

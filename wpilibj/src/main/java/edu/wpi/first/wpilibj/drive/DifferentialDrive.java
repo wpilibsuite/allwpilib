@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.drive;
 
+import java.util.StringJoiner;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -113,12 +115,36 @@ public class DifferentialDrive extends RobotDriveBase {
    * inverted, do so before passing it in.
    */
   public DifferentialDrive(SpeedController leftMotor, SpeedController rightMotor) {
+    verify(leftMotor, rightMotor);
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
     addChild(m_leftMotor);
     addChild(m_rightMotor);
     instances++;
     setName("DifferentialDrive", instances);
+  }
+
+  /**
+   * Verifies that all motors are nonnull, throwing a NullPointerException if any of them are.
+   * The exception's error message will specify all null motors, e.g. {@code
+   * NullPointerException("leftMotor, rightMotor")}, to give as much information as possible to
+   * the programmer.
+   *
+   * @throws NullPointerException if any of the given motors are null
+   */
+  @SuppressWarnings("PMD.AvoidThrowingNullPointerException")
+  private void verify(SpeedController leftMotor, SpeedController rightMotor) {
+    if (leftMotor != null && rightMotor != null) {
+      return;
+    }
+    StringJoiner joiner = new StringJoiner(", ");
+    if (leftMotor == null) {
+      joiner.add("leftMotor");
+    }
+    if (rightMotor == null) {
+      joiner.add("rightMotor");
+    }
+    throw new NullPointerException(joiner.toString());
   }
 
   /**
