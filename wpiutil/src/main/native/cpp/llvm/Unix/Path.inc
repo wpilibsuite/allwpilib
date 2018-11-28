@@ -28,6 +28,13 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#ifndef _WIN32
+#include <cxxabi.h>
+#include <execinfo.h>
+#endif
+
+#include "wpi/raw_ostream.h"
+
 namespace {
 
 #ifndef _WIN32
@@ -246,7 +253,7 @@ std::error_code detail::directory_iterator_increment(detail::DirIterState &it) {
   if (reinterpret_cast<DIR *>(it.IterationHandle) == nullptr) {
     auto bt = GetStackTrace(0);
     wpi::errs() << bt << "\n";
-    wpi::flush();
+    wpi::errs().flush();
     std::terminate();
   }
   dirent *cur_dir = ::readdir(reinterpret_cast<DIR *>(it.IterationHandle));
