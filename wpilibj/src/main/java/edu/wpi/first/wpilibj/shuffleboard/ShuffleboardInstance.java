@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 final class ShuffleboardInstance implements ShuffleboardRoot {
@@ -21,11 +22,13 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
   private boolean m_tabsChanged = false; // NOPMD redundant field initializer
   private final NetworkTable m_rootTable;
   private final NetworkTable m_rootMetaTable;
+  private final NetworkTableEntry m_selectedTabEntry;
 
   ShuffleboardInstance(NetworkTableInstance ntInstance) {
     Objects.requireNonNull(ntInstance, "NetworkTable instance cannot be null");
     m_rootTable = ntInstance.getTable(Shuffleboard.kBaseTableName);
     m_rootMetaTable = m_rootTable.getSubTable(".metadata");
+    m_selectedTabEntry = m_rootMetaTable.getEntry("Selected");
   }
 
   @Override
@@ -62,6 +65,16 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
   @Override
   public void disableActuatorWidgets() {
     applyToAllComplexWidgets(ComplexWidget::disableIfActuator);
+  }
+
+  @Override
+  public void selectTab(int index) {
+    m_selectedTabEntry.forceSetDouble(index);
+  }
+
+  @Override
+  public void selectTab(String title) {
+    m_selectedTabEntry.forceSetString(title);
   }
 
   /**

@@ -83,6 +83,22 @@ class Shuffleboard final {
   static ShuffleboardTab& GetTab(wpi::StringRef title);
 
   /**
+   * Selects the tab in the dashboard with the given index in the range
+   * [0..n-1], where <i>n</i> is the number of tabs in the dashboard at the time
+   * this method is called.
+   *
+   * @param index the index of the tab to select
+   */
+  static void SelectTab(int index);
+
+  /**
+   * Selects the tab in the dashboard with the given title.
+   *
+   * @param title the title of the tab to select
+   */
+  static void SelectTab(wpi::StringRef title);
+
+  /**
    * Enables user control of widgets containing actuators: speed controllers,
    * relays, etc. This should only be used when the robot is in test mode.
    * IterativeRobotBase and SampleRobot are both configured to call this method

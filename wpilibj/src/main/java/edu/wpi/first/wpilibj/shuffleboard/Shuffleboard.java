@@ -83,6 +83,25 @@ public final class Shuffleboard {
   }
 
   /**
+   * Selects the tab in the dashboard with the given index in the range [0..n-1], where <i>n</i>
+   * is the number of tabs in the dashboard at the time this method is called.
+   *
+   * @param index the index of the tab to select
+   */
+  public static void selectTab(int index) {
+    root.selectTab(index);
+  }
+
+  /**
+   * Selects the tab in the dashboard with the given title.
+   *
+   * @param title the title of the tab to select
+   */
+  public static void selectTab(String title) {
+    root.selectTab(title);
+  }
+
+  /**
    * Enables user control of widgets containing actuators: speed controllers, relays, etc. This
    * should only be used when the robot is in test mode. IterativeRobotBase and SampleRobot are
    * both configured to call this method when entering test mode; most users should not need to use

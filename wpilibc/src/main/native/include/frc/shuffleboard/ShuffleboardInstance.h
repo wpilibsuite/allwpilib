@@ -28,6 +28,10 @@ class ShuffleboardInstance final : public ShuffleboardRoot {
 
   void DisableActuatorWidgets() override;
 
+  void SelectTab(int index) override;
+
+  void SelectTab(wpi::StringRef) override;
+
  private:
   struct Impl;
   std::unique_ptr<Impl> m_impl;
