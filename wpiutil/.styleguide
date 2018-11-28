@@ -27,7 +27,7 @@ generatedFileExclude {
   src/main/native/include/wpi/MathExtras\.h$
   src/main/native/include/wpi/NativeFormatting\.h$
   src/main/native/include/wpi/None\.h$
-  src/main/native/include/wpi/Optional\.h$
+  src/main/native/include/wpi/LLVMOptional\.h$
   src/main/native/include/wpi/Path\.h$
   src/main/native/include/wpi/PointerLikeTypeTraits\.h$
   src/main/native/include/wpi/STLExtras\.h$

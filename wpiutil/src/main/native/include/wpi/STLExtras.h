@@ -17,7 +17,7 @@
 #ifndef WPIUTIL_WPI_STLEXTRAS_H
 #define WPIUTIL_WPI_STLEXTRAS_H
 
-#include "wpi/Optional.h"
+#include "wpi/LLVMOptional.h"
 #include "wpi/SmallVector.h"
 #include "wpi/iterator.h"
 #include "wpi/iterator_range.h"
