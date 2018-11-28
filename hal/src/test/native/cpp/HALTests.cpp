@@ -16,7 +16,7 @@ TEST(HALTests, RuntimeType) {
 
 TEST(HALSOLENOID, SolenoidTest) {
   int32_t status = 0;
-  HAL_InitializeSolenoidPort(0, &status);
-  EXPECT_NE(status, 0);
+  HAL_InitializeSolenoidPort(HAL_SerialPort_USB1, &status);
+  EXPECT_EQ(status, 0);
 }
 }  // namespace hal
