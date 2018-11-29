@@ -14,6 +14,7 @@ ext {
             }
         }
         if (it.targetPlatform.operatingSystem.name != 'windows') {
+            it.cppCompiler.define '_GNU_SOURCE'
             it.sources {
                 libuvUnixCpp(CppSourceSet) {
                     source {
