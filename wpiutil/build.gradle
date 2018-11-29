@@ -14,9 +14,6 @@ ext {
             }
         }
         if (it.targetPlatform.operatingSystem.name != 'windows') {
-            it.cppCompiler.define '_LARGEFILE_SOURCE'
-            it.cppCompiler.define '_FILE_OFFSET_BITS=64'
-            it.cppCompiler.define '_GNU_SOURCE'
             it.sources {
                 libuvUnixCpp(CppSourceSet) {
                     source {
