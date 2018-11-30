@@ -9,7 +9,8 @@
 
 #include <stdint.h>
 
-#include <hal/cpp/fpga_clock.h>
+#include <chrono>
+
 #include <wpi/Logger.h>
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
@@ -59,13 +60,13 @@ void MockDS::start() {
     wpi::Logger logger(LoggerFunc);
     wpi::UDPClient client(logger);
     client.start();
-    auto timeout_time = hal::fpga_clock::now();
+    auto timeout_time = std::chrono::steady_clock::now();
     int initCount = 0;
     uint16_t sendCount = 0;
     wpi::SmallVector<uint8_t, 8> data;
     while (m_active) {
       // Keep 20ms intervals, and increase time to next interval
-      auto current = hal::fpga_clock::now();
+      auto current = std::chrono::steady_clock::now();
       while (timeout_time <= current) {
         timeout_time += std::chrono::milliseconds(20);
       }

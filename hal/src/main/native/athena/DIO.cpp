@@ -15,7 +15,7 @@
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
-#include "hal/cpp/fpga_clock.h"
+#include "hal/HALBase.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 
@@ -131,10 +131,11 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
 
   // Wait for no other object to hold this handle.
-  auto start = hal::fpga_clock::now();
-  while (port.use_count() != 1) {
-    auto current = hal::fpga_clock::now();
-    if (start + std::chrono::seconds(1) < current) {
+  int32_t status = 0;
+  uint64_t end = HAL_GetFPGATime(&status) + 1000000;  // 1 second
+  while (status == 0 && port.use_count() != 1) {
+    uint64_t current = HAL_GetFPGATime(&status);
+    if (current >= end) {
       wpi::outs() << "DIO handle free timeout\n";
       wpi::outs().flush();
       break;
@@ -142,7 +143,6 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
     std::this_thread::yield();
   }
 
-  int32_t status = 0;
   std::lock_guard<wpi::mutex> lock(digitalDIOMutex);
   if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
     // Unset the SPI flag

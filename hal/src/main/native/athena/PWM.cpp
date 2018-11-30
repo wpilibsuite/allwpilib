@@ -16,7 +16,7 @@
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
-#include "hal/cpp/fpga_clock.h"
+#include "hal/HALBase.h"
 #include "hal/handles/HandlesInternal.h"
 
 using namespace hal;
@@ -127,10 +127,10 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   digitalChannelHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
 
   // Wait for no other object to hold this handle.
-  auto start = hal::fpga_clock::now();
-  while (port.use_count() != 1) {
-    auto current = hal::fpga_clock::now();
-    if (start + std::chrono::seconds(1) < current) {
+  uint64_t end = HAL_GetFPGATime(status) + 1000000;  // 1 second
+  while (*status == 0 && port.use_count() != 1) {
+    uint64_t current = HAL_GetFPGATime(status);
+    if (current >= end) {
       wpi::outs() << "PWM handle free timeout\n";
       wpi::outs().flush();
       break;

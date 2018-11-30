@@ -15,7 +15,6 @@
 
 #include "HALInitializer.h"
 #include "hal/HAL.h"
-#include "hal/cpp/fpga_clock.h"
 #include "hal/handles/UnlimitedHandleResource.h"
 
 namespace {
@@ -132,18 +131,21 @@ uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
   while (notifier->active) {
     double waitTime;
     if (!notifier->running) {
-      waitTime = (HAL_GetFPGATime(status) * 1e-6) + 1000.0;
       // If not running, wait 1000 seconds
+      waitTime = 1000.0;
     } else {
-      waitTime = notifier->waitTime * 1e-6;
+      uint64_t now = HAL_GetFPGATime(status);
+      if (now >= notifier->waitTime)
+        waitTime = 0.0;
+      else
+        waitTime = (notifier->waitTime - now) * 1e-6;
     }
 
     // Don't wait twice
     notifier->updatedAlarm = false;
 
-    auto timeoutTime =
-        hal::fpga_clock::epoch() + std::chrono::duration<double>(waitTime);
-    notifier->cond.wait_until(lock, timeoutTime);
+    if (waitTime > 0.0)
+      notifier->cond.wait_for(lock, std::chrono::duration<double>(waitTime));
     if (notifier->updatedAlarm) {
       notifier->updatedAlarm = false;
       continue;
