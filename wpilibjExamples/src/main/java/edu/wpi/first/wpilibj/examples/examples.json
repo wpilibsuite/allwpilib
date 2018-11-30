@@ -197,5 +197,15 @@
     "foldername": "shuffleboard",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "Testable Robot",
+    "description": "An example robot program that demonstrates how to perform automated tests without a robot or simulator",
+    "tags": [
+      "Complete Robot"
+    ],
+    "foldername": "testablerobot",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
