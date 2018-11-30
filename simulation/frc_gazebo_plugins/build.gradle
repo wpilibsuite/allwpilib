@@ -5,6 +5,7 @@ apply plugin: 'cpp'
 apply plugin: "google-test"
 
 ext.skipAthena = true
+ext.skipRaspbian = true
 
 apply from: "${rootDir}/shared/config.gradle"
 
