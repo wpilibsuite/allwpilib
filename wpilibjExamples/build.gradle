@@ -9,7 +9,9 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-
+repositories {
+    mavenCentral()
+}
 
 dependencies {
     compile project(':wpilibj')
@@ -19,6 +21,17 @@ dependencies {
     compile project(':ntcore')
     compile project(':cscore')
     compile project(':cameraserver')
+    
+    // These are not using testImplmentation because testablerobot is
+    // distributing tests as part of the example.
+    implementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
+    implementation 'org.junit.jupiter:junit-jupiter-params:5.2.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+    implementation 'org.mockito:mockito-core:2.23.4'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 pmd {
