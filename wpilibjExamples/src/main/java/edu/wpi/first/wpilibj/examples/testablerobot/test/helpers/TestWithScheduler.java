@@ -21,9 +21,9 @@ import edu.wpi.first.wpilibj.command.Scheduler;
  * to pump the scheduler.
  */
 @ExtendWith(MockHardwareExtension.class)
-public abstract class TestWithScheduler {
+public class TestWithScheduler {
   @BeforeAll
-  public void schedulerStart() {
+  public static void schedulerStart() {
     Scheduler.getInstance().removeAll();
     Scheduler.getInstance().enable();
   }
@@ -34,7 +34,7 @@ public abstract class TestWithScheduler {
   }
 
   @AfterAll
-  public void schedulerDestroy() {
+  public static void schedulerDestroy() {
     Scheduler.getInstance().disable();
     Scheduler.getInstance().close();
   }
