@@ -134,3 +134,7 @@ endif()
 file(GLOB netconsoleServer_src src/netconsoleServer/native/cpp/*.cpp)
 add_executable(netconsoleServer ${netconsoleServer_src})
 target_link_libraries(netconsoleServer wpiutil ${LIBUTIL})
+
+file(GLOB netconsoleTee_src src/netconsoleTee/native/cpp/*.cpp)
+add_executable(netconsoleTee ${netconsoleTee_src})
+target_link_libraries(netconsoleTee wpiutil)
