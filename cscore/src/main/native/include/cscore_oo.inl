@@ -361,6 +361,9 @@ inline AxisCamera::AxisCamera(const wpi::Twine& name, const char* host)
 inline AxisCamera::AxisCamera(const wpi::Twine& name, const std::string& host)
     : HttpCamera(name, HostToUrl(wpi::Twine{host}), kAxis) {}
 
+inline AxisCamera::AxisCamera(const wpi::Twine& name, wpi::StringRef host)
+    : HttpCamera(name, HostToUrl(host), kAxis) {}
+
 inline AxisCamera::AxisCamera(const wpi::Twine& name,
                               wpi::ArrayRef<std::string> hosts)
     : HttpCamera(name, HostToUrl(hosts), kAxis) {}
