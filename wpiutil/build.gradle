@@ -167,5 +167,19 @@ model {
                 }
             }
         }
+        netconsoleTee(NativeExecutableSpec) {
+            targetBuildTypes 'release'
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src/netconsoleTee/native/cpp']
+                        includes = ['**/*.cpp']
+                    }
+                }
+            }
+            binaries.all { binary ->
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+            }
+        }
     }
 }
