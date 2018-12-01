@@ -23,7 +23,7 @@ using namespace frc;
 
 IterativeRobotBase::IterativeRobotBase(double period)
     : m_period(period),
-      m_watchdog(period, [&] { PrintLoopOverrunMessage(); }) {}
+      m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
 
 void IterativeRobotBase::RobotInit() {
   wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
