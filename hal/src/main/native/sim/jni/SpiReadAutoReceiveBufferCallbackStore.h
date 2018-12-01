@@ -22,7 +22,7 @@ namespace sim {
 class SpiReadAutoReceiveBufferCallbackStore {
  public:
   void create(JNIEnv* env, jobject obj);
-  int32_t performCallback(const char* name, unsigned char* buffer,
+  int32_t performCallback(const char* name, uint32_t* buffer,
                           int32_t numToRead);
   void free(JNIEnv* env);
   void setCallbackId(int32_t id) { callbackId = id; }

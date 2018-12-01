@@ -14,7 +14,7 @@
 
 typedef void (*HAL_SpiReadAutoReceiveBufferCallback)(const char* name,
                                                      void* param,
-                                                     unsigned char* buffer,
+                                                     uint32_t* buffer,
                                                      int32_t numToRead,
                                                      int32_t* outputCount);
 

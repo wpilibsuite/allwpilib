@@ -436,8 +436,8 @@ Java_edu_wpi_first_hal_SPIJNI_spiReadAutoReceivedData__ILjava_nio_ByteBuffer_2ID
   SPIJNI_LOG(logDEBUG) << "Port = " << port;
   SPIJNI_LOG(logDEBUG) << "NumToRead = " << numToRead;
   SPIJNI_LOG(logDEBUG) << "Timeout = " << timeout;
-  uint8_t* recvBuf =
-      reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(buffer));
+  uint32_t* recvBuf =
+      reinterpret_cast<uint32_t*>(env->GetDirectBufferAddress(buffer));
   int32_t status = 0;
   jint retval = HAL_ReadSPIAutoReceivedData(
       static_cast<HAL_SPIPort>(port), recvBuf, numToRead, timeout, &status);
@@ -450,18 +450,18 @@ Java_edu_wpi_first_hal_SPIJNI_spiReadAutoReceivedData__ILjava_nio_ByteBuffer_2ID
 /*
  * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiReadAutoReceivedData
- * Signature: (I[BID)I
+ * Signature: (I[IID)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_SPIJNI_spiReadAutoReceivedData__I_3BID
-  (JNIEnv* env, jclass, jint port, jbyteArray buffer, jint numToRead,
+Java_edu_wpi_first_hal_SPIJNI_spiReadAutoReceivedData__I_3IID
+  (JNIEnv* env, jclass, jint port, jintArray buffer, jint numToRead,
    jdouble timeout)
 {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiReadAutoReceivedData";
   SPIJNI_LOG(logDEBUG) << "Port = " << port;
   SPIJNI_LOG(logDEBUG) << "NumToRead = " << numToRead;
   SPIJNI_LOG(logDEBUG) << "Timeout = " << timeout;
-  wpi::SmallVector<uint8_t, 128> recvBuf;
+  wpi::SmallVector<uint32_t, 128> recvBuf;
   recvBuf.resize(numToRead);
   int32_t status = 0;
   jint retval =
@@ -471,8 +471,8 @@ Java_edu_wpi_first_hal_SPIJNI_spiReadAutoReceivedData__I_3BID
   SPIJNI_LOG(logDEBUG) << "Return = " << retval;
   if (!CheckStatus(env, status)) return retval;
   if (numToRead > 0) {
-    env->SetByteArrayRegion(buffer, 0, numToRead,
-                            reinterpret_cast<const jbyte*>(recvBuf.data()));
+    env->SetIntArrayRegion(buffer, 0, numToRead,
+                           reinterpret_cast<const jint*>(recvBuf.data()));
   }
   return retval;
 }
