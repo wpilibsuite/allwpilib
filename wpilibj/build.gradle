@@ -54,14 +54,6 @@ compileJava {
     dependsOn generateJavaVersion
 }
 
-// Copy over JUnit extension enabling teams to run sim env for JUnit testing
-task copyWpilibjTestingUtil(type: Copy) {
-    dependsOn compileTestJava
-    from 'build/classes/java/test/edu/wpi/first/wpilibj/MockHardwareExtension.class'
-    into 'build/classes/java/main/edu/wpi/first/wpilibj'
-}
-jar.dependsOn copyWpilibjTestingUtil
-
 dependencies {
     compile project(':hal')
     compile project(':wpiutil')

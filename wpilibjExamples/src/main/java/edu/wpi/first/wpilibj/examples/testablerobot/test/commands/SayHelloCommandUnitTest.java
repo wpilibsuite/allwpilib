@@ -7,18 +7,15 @@
 
 package edu.wpi.first.wpilibj.examples.testablerobot.test.commands;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-import edu.wpi.first.wpilibj.MockHardwareExtension;
 import edu.wpi.first.wpilibj.command.CommandTestHelper;
-import edu.wpi.first.wpilibj.command.SchedulerTestHelper;
 
 import edu.wpi.first.wpilibj.examples.testablerobot.commands.SayHelloCommand;
 import edu.wpi.first.wpilibj.examples.testablerobot.subsystems.HelloWorldSubsystem;
+import edu.wpi.first.wpilibj.examples.testablerobot.test.helpers.TestWithScheduler;
 
+import static edu.wpi.first.wpilibj.examples.testablerobot.test.helpers.SchedulerPumpHelper.runForDuration;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atMost;
@@ -29,30 +26,7 @@ import static org.mockito.Mockito.verify;
 /**
  * These are unit tests for the say hello command, which blinks an LED.
  */
-@ExtendWith(MockHardwareExtension.class)
-public class SayHelloCommandUnitTest {
-  // We need to run the scheduler
-  private SchedulerTestHelper m_scheduler;
-
-  /**
-   * Before a test starts, wire up the command scheduler to run
-   * our scheduled command every 20 milliseconds.
-   */
-  @BeforeEach
-  public void setupSchedulerHelper() {
-    m_scheduler = new SchedulerTestHelper(20);
-  }
-
-  /**
-   * When a test finishes, tear down the scheduler, because it uses threading
-   * to do its work, and if you do not tear it down, the test runner will never
-   * terminate.
-   */
-  @AfterEach
-  public void cleanUpSchedulerHelper() {
-    m_scheduler.destroy();
-  }
-
+public class SayHelloCommandUnitTest extends TestWithScheduler {
   /**
    * A test that checks that the command will flash the LED through the
    * hello world subsystem the requisite number of times once run
@@ -72,7 +46,7 @@ public class SayHelloCommandUnitTest {
 
       // Act
       // Run our command for a given number of milliseconds.
-      m_scheduler.runForDuration(3000);  
+      runForDuration(3000);  
     }
     
 
@@ -89,7 +63,7 @@ public class SayHelloCommandUnitTest {
    * will be interrupted within WPILib).
    */
   @Test
-  public void itTurnsOffMyLEDWhenStopping() throws InterruptedException {
+  public void itTurnsOffMyLEDWhenCancelled() throws InterruptedException {
     // Assemble
     HelloWorldSubsystem mockHelloWorldSubsystem = mock(HelloWorldSubsystem.class);
     // This try syntax makes sure that close gets called on the command when it is done
@@ -101,7 +75,11 @@ public class SayHelloCommandUnitTest {
 
       // Act
       // Run our command for a given number of milliseconds.
-      m_scheduler.runForDuration(1000);
+      runForDuration(1000);
+      // Cancel the command
+      classUnderTest.cancel();
+      // Pump the scheduler a bit more to propagate the cancel
+      runForDuration(10);
     }
 
     // Assert

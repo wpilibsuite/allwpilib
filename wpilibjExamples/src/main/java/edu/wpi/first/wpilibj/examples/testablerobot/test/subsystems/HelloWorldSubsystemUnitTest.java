@@ -84,11 +84,13 @@ public class HelloWorldSubsystemUnitTest {
   public void itShouldTurnOnTheLED() {
     // Assemble
     DigitalOutput mockLED = mock(DigitalOutput.class);
-    HelloWorldSubsystem classUnderTest = new HelloWorldSubsystem(mockLED);
+    try
+    (HelloWorldSubsystem classUnderTest = new HelloWorldSubsystem(mockLED)) {
 
-    // Act
-    classUnderTest.turnOnLED();
-
+      // Act
+      classUnderTest.turnOnLED();
+    }
+    
     // Assert
     // Make sure that we have set the digital output to true.
     // This may seem useless, but for the purpose of this test, we don't
@@ -105,11 +107,13 @@ public class HelloWorldSubsystemUnitTest {
   public void itShouldTurnOffTheLED() {
     // Assemble
     DigitalOutput mockLED = mock(DigitalOutput.class);
-    HelloWorldSubsystem classUnderTest = new HelloWorldSubsystem(mockLED);
+    try
+    (HelloWorldSubsystem classUnderTest = new HelloWorldSubsystem(mockLED)) {
 
-    // Act
-    classUnderTest.turnOffLED();
-    
+      // Act
+      classUnderTest.turnOffLED();
+    }
+
     // Assert
     // Make sure that we have set the digital output to false.
     // This may seem useless, but for the purpose of this test, we don't
@@ -126,30 +130,32 @@ public class HelloWorldSubsystemUnitTest {
   public void itShouldToggleTheLED() {
     // Assemble
     DigitalOutput mockLED = mock(DigitalOutput.class);
-    HelloWorldSubsystem classUnderTest = new HelloWorldSubsystem(mockLED);
-    // Wire up some state so we know what our digital IO port will return.
-    // Note that you can stack the return state when your matcher is called
-    // more than once.
-    when(mockLED.get()).thenReturn(false).thenReturn(true);
+    try
+    (HelloWorldSubsystem classUnderTest = new HelloWorldSubsystem(mockLED)) {
+      // Wire up some state so we know what our digital IO port will return.
+      // Note that you can stack the return state when your matcher is called
+      // more than once.
+      when(mockLED.get()).thenReturn(false).thenReturn(true);
 
-    // Act
-    classUnderTest.toggleLED();
-    
-    // Assert
-    // Make sure that we have set the digital output to the opposite
-    // of the state that it is currently at, as defined by the when matcher above.
-    verify(mockLED, times(1)).set(true);
+      // Act
+      classUnderTest.toggleLED();
+      
+      // Assert
+      // Make sure that we have set the digital output to the opposite
+      // of the state that it is currently at, as defined by the when matcher above.
+      verify(mockLED, times(1)).set(true);
 
-    // Act, again...normally we want to limit assertions in any given test,
-    // but it's useful to demonstrate the use of Mockito matchers. The more
-    // assertions you have in any given test, the more it is telling you to
-    // break up the test into smaller parts.
-    classUnderTest.toggleLED();
-    
-    // Assert
-    // Make sure that we have set the digital output to the opposite
-    // of the state that it is currently at, as defined by the when matcher above.
-    verify(mockLED, times(1)).set(false);
+      // Act, again...normally we want to limit assertions in any given test,
+      // but it's useful to demonstrate the use of Mockito matchers. The more
+      // assertions you have in any given test, the more it is telling you to
+      // break up the test into smaller parts.
+      classUnderTest.toggleLED();
+      
+      // Assert
+      // Make sure that we have set the digital output to the opposite
+      // of the state that it is currently at, as defined by the when matcher above.
+      verify(mockLED, times(1)).set(false);
+    }
   }
 
   /**
