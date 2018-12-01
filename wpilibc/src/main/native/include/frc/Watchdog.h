@@ -9,6 +9,7 @@
 
 #include <chrono>
 #include <functional>
+#include <utility>
 
 #include <hal/cpp/fpga_clock.h>
 #include <wpi/SafeThread.h>
@@ -36,6 +37,12 @@ class Watchdog {
    * @param callback This function is called when the timeout expires.
    */
   Watchdog(double timeout, std::function<void()> callback);
+
+  template <typename Callable, typename Arg, typename... Args>
+  Watchdog(double timeout, Callable&& f, Arg&& arg, Args&&... args)
+      : Watchdog(timeout,
+                 std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
+                           std::forward<Args>(args)...)) {}
 
   ~Watchdog();
 
@@ -98,10 +105,15 @@ class Watchdog {
   void Disable();
 
  private:
+  // Used for timeout print rate-limiting
+  static constexpr std::chrono::milliseconds kMinPrintPeriod{1000};
+
   hal::fpga_clock::time_point m_startTime;
   std::chrono::microseconds m_timeout;
   hal::fpga_clock::time_point m_expirationTime;
   std::function<void()> m_callback;
+  hal::fpga_clock::time_point m_lastTimeoutPrintTime = hal::fpga_clock::epoch();
+  hal::fpga_clock::time_point m_lastEpochsPrintTime = hal::fpga_clock::epoch();
 
   wpi::StringMap<std::chrono::microseconds> m_epochs;
   bool m_isExpired = false;

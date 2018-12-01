@@ -103,7 +103,6 @@ TEST(WatchdogTest, Epochs) {
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   watchdog.AddEpoch("Epoch 3");
   watchdog.Disable();
-  watchdog.PrintEpochs();
 
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 
@@ -115,7 +114,6 @@ TEST(WatchdogTest, Epochs) {
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   watchdog.AddEpoch("Epoch 2");
   watchdog.Disable();
-  watchdog.PrintEpochs();
 
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 }

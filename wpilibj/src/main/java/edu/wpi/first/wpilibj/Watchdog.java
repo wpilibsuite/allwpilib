@@ -24,10 +24,15 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>The watchdog is initialized disabled, so the user needs to call enable() before use.
  */
 public class Watchdog implements Closeable, Comparable<Watchdog> {
+  // Used for timeout print rate-limiting
+  private static final long kMinPrintPeriod = 1000000; // us
+
   private long m_startTime; // us
   private long m_timeout; // us
   private long m_expirationTime; // us
   private final Runnable m_callback;
+  private long m_lastTimeoutPrintTime; // us
+  private long m_lastEpochsPrintTime; // us
 
   @SuppressWarnings("PMD.UseConcurrentHashMap")
   private final Map<String, Long> m_epochs = new HashMap<>();
@@ -143,9 +148,13 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * Prints list of epochs added so far and their times.
    */
   public void printEpochs() {
-    m_epochs.forEach((key, value) -> {
-      System.out.format("\t" + key + ": %.6fs\n", value / 1.0e6);
-    });
+    long now = RobotController.getFPGATime();
+    if (now  - m_lastEpochsPrintTime > kMinPrintPeriod) {
+      m_lastEpochsPrintTime = now;
+      m_epochs.forEach((key, value) -> {
+        System.out.format("\t" + key + ": %.6fs\n", value / 1.0e6);
+      });
+    }
   }
 
   /**
@@ -217,7 +226,11 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
             // has occurred, so call its timeout function.
             Watchdog watchdog = m_watchdogs.poll();
 
-            System.out.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout / 1.0e6);
+            long now = RobotController.getFPGATime();
+            if (now  - watchdog.m_lastTimeoutPrintTime > kMinPrintPeriod) {
+              watchdog.m_lastTimeoutPrintTime = now;
+              System.out.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout / 1.0e6);
+            }
             m_queueMutex.unlock();
             watchdog.m_callback.run();
             m_queueMutex.lock();
