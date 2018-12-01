@@ -19,7 +19,6 @@
 #include <wpi/StringRef.h>
 
 #include "frc/AnalogInput.h"
-#include "frc/MotorSafety.h"
 #include "frc/Timer.h"
 #include "frc/Utility.h"
 #include "frc/WPIErrors.h"
@@ -549,17 +548,10 @@ void DriverStation::ReportJoystickUnpluggedWarning(const wpi::Twine& message) {
 
 void DriverStation::Run() {
   m_isRunning = true;
-  int safetyCounter = 0;
   while (m_isRunning) {
     HAL_WaitForDSData();
     GetData();
 
-    if (IsDisabled()) safetyCounter = 0;
-
-    if (++safetyCounter >= 4) {
-      MotorSafety::CheckMotors();
-      safetyCounter = 0;
-    }
     if (m_userInDisabled) HAL_ObserveUserProgramDisabled();
     if (m_userInAutonomous) HAL_ObserveUserProgramAutonomous();
     if (m_userInTeleop) HAL_ObserveUserProgramTeleop();
