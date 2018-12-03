@@ -1,7 +1,10 @@
+import org.ysb33r.gradle.doxygen.DoxygenPlugin
+
 plugins {
-    id 'org.ysb33r.doxygen' version '0.4'
     id 'java'
 }
+
+apply plugin: DoxygenPlugin
 
 evaluationDependsOn(':wpiutil')
 evaluationDependsOn(':ntcore')
@@ -39,7 +42,7 @@ cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 
 doxygen {
   executables {
-     doxygen version : '1.8.8'
+     doxygen version : '1.8.14'
   }
 }
 

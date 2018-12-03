@@ -1,0 +1,7 @@
+repositories {
+  jcenter()
+}
+
+dependencies {
+  compile 'org.ysb33r.gradle:grolifant:0.5.1'
+}
