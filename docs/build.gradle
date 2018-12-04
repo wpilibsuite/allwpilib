@@ -1,10 +1,7 @@
-import org.ysb33r.gradle.doxygen.DoxygenPlugin
-
 plugins {
     id 'java'
+    id "org.ysb33r.doxygen" version "0.5"
 }
-
-apply plugin: DoxygenPlugin
 
 evaluationDependsOn(':wpiutil')
 evaluationDependsOn(':ntcore')
