@@ -297,6 +297,35 @@ void NetworkTable::AddSubTableListener(ITableListener* listener) {
   AddSubTableListener(listener, false);
 }
 
+NT_EntryListener NetworkTable::AddSubTableListener(TableListener listener,
+                                                   bool localNotify) {
+  size_t prefix_len = m_path.size() + 1;
+
+  // The lambda needs to be copyable, but StringMap is not, so use
+  // a shared_ptr to it.
+  auto notified_tables = std::make_shared<wpi::StringMap<char>>();
+
+  unsigned int flags = NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE;
+  if (localNotify) flags |= NT_NOTIFY_LOCAL;
+  return nt::AddEntryListener(
+      m_inst, m_path + Twine(PATH_SEPARATOR_CHAR),
+      [=](const EntryNotification& event) {
+        StringRef relative_key = event.name.substr(prefix_len);
+        auto end_sub_table = relative_key.find(PATH_SEPARATOR_CHAR);
+        if (end_sub_table == StringRef::npos) return;
+        StringRef sub_table_key = relative_key.substr(0, end_sub_table);
+        if (notified_tables->find(sub_table_key) == notified_tables->end())
+          return;
+        notified_tables->insert(std::make_pair(sub_table_key, '\0'));
+        listener(this, sub_table_key, this->GetSubTable(sub_table_key));
+      },
+      flags);
+}
+
+void NetworkTable::RemoveTableListener(NT_EntryListener listener) const {
+  nt::RemoveEntryListener(listener);
+}
+
 void NetworkTable::AddSubTableListener(ITableListener* listener,
                                        bool localNotify) {
   std::lock_guard<wpi::mutex> lock(m_mutex);

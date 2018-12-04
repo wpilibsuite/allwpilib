@@ -338,7 +338,7 @@ class NetworkTable final : public ITable {
    * @return Listener handle
    */
   NT_EntryListener AddSubTableListener(TableListener listener,
-                                       bool localNotify = false) const;
+                                       bool localNotify = false);
 
   /**
    * Remove a sub-table listener.
