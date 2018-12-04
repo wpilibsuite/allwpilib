@@ -322,6 +322,7 @@ NT_EntryListener NetworkTable::AddSubTableListener(TableListener listener,
       },
       flags);
   m_lambdaListeners.emplace_back(id);
+  return id;
 }
 
 void NetworkTable::RemoveTableListener(NT_EntryListener listener) {
