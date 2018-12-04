@@ -194,6 +194,7 @@ NetworkTable::NetworkTable(NT_Inst inst, const Twine& path, const private_init&)
 
 NetworkTable::~NetworkTable() {
   for (auto& i : m_listeners) RemoveEntryListener(i.second);
+  for (auto i : m_lambdaListeners) RemoveEntryListener(i);
 }
 
 NetworkTableInstance NetworkTable::GetInstance() const {
@@ -307,7 +308,7 @@ NT_EntryListener NetworkTable::AddSubTableListener(TableListener listener,
 
   unsigned int flags = NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE;
   if (localNotify) flags |= NT_NOTIFY_LOCAL;
-  return nt::AddEntryListener(
+  NT_EntryListener id = nt::AddEntryListener(
       m_inst, m_path + Twine(PATH_SEPARATOR_CHAR),
       [=](const EntryNotification& event) {
         StringRef relative_key = event.name.substr(prefix_len);
@@ -320,10 +321,14 @@ NT_EntryListener NetworkTable::AddSubTableListener(TableListener listener,
         listener(this, sub_table_key, this->GetSubTable(sub_table_key));
       },
       flags);
+  m_lambdaListeners.emplace_back(id);
 }
 
-void NetworkTable::RemoveTableListener(NT_EntryListener listener) const {
+void NetworkTable::RemoveTableListener(NT_EntryListener listener) {
   nt::RemoveEntryListener(listener);
+  auto matches_begin =
+      std::remove(m_lambdaListeners.begin(), m_lambdaListeners.end(), listener);
+  m_lambdaListeners.erase(matches_begin, m_lambdaListeners.end());
 }
 
 void NetworkTable::AddSubTableListener(ITableListener* listener,

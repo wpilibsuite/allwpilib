@@ -56,6 +56,7 @@ class NetworkTable final : public ITable {
   mutable wpi::StringMap<NT_Entry> m_entries;
   typedef std::pair<ITableListener*, NT_EntryListener> Listener;
   std::vector<Listener> m_listeners;
+  std::vector<NT_EntryListener> m_lambdaListeners;
 
   static std::vector<std::string> s_ip_addresses;
   static std::string s_persistent_filename;
@@ -345,7 +346,7 @@ class NetworkTable final : public ITable {
    *
    * @param listener    listener handle
    */
-  void RemoveTableListener(NT_EntryListener listener) const;
+  void RemoveTableListener(NT_EntryListener listener);
 
   WPI_DEPRECATED(
       "use AddEntryListener() instead with flags value of NT_NOTIFY_NEW | "
