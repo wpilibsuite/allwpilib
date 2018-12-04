@@ -7,18 +7,20 @@
 
 package edu.wpi.first.wpilibj.examples.testablerobot.test.helpers;
 
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.sim.DriverStationSim;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * JUnit 5 testing extension which ensures all WPILib foundational bits
  * are initialized to be able to run the scheduler. 
  */
-public final class MockHardwareExtension implements BeforeAllCallback {
+public final class MockHardwareExtension implements BeforeAllCallback, AfterAllCallback {
   private static ExtensionContext getRoot(ExtensionContext context) {
     return context.getParent().map(MockHardwareExtension::getRoot).orElse(context);
   }
@@ -31,6 +33,15 @@ public final class MockHardwareExtension implements BeforeAllCallback {
     }, Boolean.class);
   }
 
+  @Override
+  public void afterAll(ExtensionContext context) throws Exception {
+    getRoot(context).getStore(Namespace.GLOBAL).getOrComputeIfAbsent("DS Release", key -> {
+      DriverStation.getInstance().release();
+      HAL.releaseDSMutex();
+      return true;
+    }, Boolean.class);
+  }
+
   private void initializeHardware() {
     HAL.initialize(500, 0);
     DriverStationSim dsSim = new DriverStationSim();
@@ -38,7 +49,5 @@ public final class MockHardwareExtension implements BeforeAllCallback {
     dsSim.setAutonomous(false);
     dsSim.setEnabled(true);
     dsSim.setTest(true);
-
-
   }
 }

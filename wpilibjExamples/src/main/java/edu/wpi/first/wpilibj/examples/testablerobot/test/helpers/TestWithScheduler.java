@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 
 /**
  * Extend this class when your test requires commands or command groups
- * to be exercised with the scheduler. Use {@link SchedulerPumpHelper#runForDuration(int, int...)}
- * to pump the scheduler.
+ * to be exercised with the full WPI scheduler. Use 
+ * {@link SchedulerPumpHelper#runForDuration(int, int...)} to pump the scheduler.
  */
 @ExtendWith(MockHardwareExtension.class)
 public class TestWithScheduler {
