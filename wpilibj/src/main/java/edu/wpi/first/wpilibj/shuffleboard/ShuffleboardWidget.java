@@ -21,9 +21,23 @@ abstract class ShuffleboardWidget<W extends ShuffleboardWidget<W>>
     super(parent, title);
   }
 
+
   /**
    * Sets the type of widget used to display the data. If not set, the default widget type will be
    * used.
+   *
+   * @param widgetType the type of the widget used to display the data
+   * @return this widget object
+   * @see BuiltInWidgets
+   */
+  public final W withWidget(WidgetType widgetType) {
+    return withWidget(widgetType.getWidgetName());
+  }
+
+  /**
+   * Sets the type of widget used to display the data. If not set, the default widget type will be
+   * used. This method should only be used to use a widget that does not come built into
+   * Shuffleboard; use {@link #withWidget(WidgetType)} in that case
    *
    * @param widgetType the type of the widget used to display the data
    * @return this widget object

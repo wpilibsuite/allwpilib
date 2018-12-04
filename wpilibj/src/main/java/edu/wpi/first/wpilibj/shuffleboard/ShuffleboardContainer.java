@@ -25,11 +25,25 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * Gets the layout with the given type and title, creating it if it does not already exist at the
    * time this method is called.
    *
+   * @param type  the type of the layout, eg "List Layout" or "Grid Layout"
+   * @param title the title of the layout
+   * @return the layout
+   * @see #getLayout(LayoutType, String)
+   */
+  ShuffleboardLayout getLayout(String type, String title);
+
+
+  /**
+   * Gets the layout with the given type and title, creating it if it does not already exist at the
+   * time this method is called.
+   *
    * @param type  the type of the layout, eg "List" or "Grid"
    * @param title the title of the layout
    * @return the layout
    */
-  ShuffleboardLayout getLayout(String type, String title);
+  default ShuffleboardLayout getLayout(LayoutType layoutType, String title) {
+    return getLayout(layoutType.getLayoutName(), title);
+  }
 
   /**
    * Adds a widget to this container to display the given sendable.
