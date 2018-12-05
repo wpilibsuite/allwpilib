@@ -21,7 +21,6 @@ abstract class ShuffleboardWidget<W extends ShuffleboardWidget<W>>
     super(parent, title);
   }
 
-
   /**
    * Sets the type of widget used to display the data. If not set, the default widget type will be
    * used.
