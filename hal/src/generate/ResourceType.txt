@@ -80,3 +80,4 @@ kResourceType_Shuffleboard = 78
 kResourceType_CAN = 79
 kResourceType_DigilentDMC60 = 80
 kResourceType_PWMVictorSPX = 81
+kResourceType_RevSparkMax = 82
