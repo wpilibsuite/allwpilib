@@ -4,7 +4,6 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-enableFeaturePreview('STABLE_PUBLISHING')
 
 include 'wpiutil'
 include 'ntcore'

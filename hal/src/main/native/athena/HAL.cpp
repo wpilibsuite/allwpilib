@@ -207,6 +207,10 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_SERIAL_PORT_ERROR_MESSAGE;
     case HAL_CAN_TIMEOUT:
       return HAL_CAN_TIMEOUT_MESSAGE;
+    case ERR_FRCSystem_NetCommNotResponding:
+      return ERR_FRCSystem_NetCommNotResponding_MESSAGE;
+    case ERR_FRCSystem_NoDSConnection:
+      return ERR_FRCSystem_NoDSConnection_MESSAGE;
     default:
       return "Unknown error status";
   }

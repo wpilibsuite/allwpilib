@@ -1116,20 +1116,10 @@ public class DriverStation {
    * Provides the service routine for the DS polling m_thread.
    */
   private void run() {
-    int safetyCounter = 0;
     while (m_threadKeepAlive) {
       HAL.waitForDSData();
       getData();
 
-      if (isDisabled()) {
-        safetyCounter = 0;
-      }
-
-      safetyCounter++;
-      if (safetyCounter >= 4) {
-        MotorSafety.checkMotors();
-        safetyCounter = 0;
-      }
       if (m_userInDisabled) {
         HAL.observeUserProgramDisabled();
       }

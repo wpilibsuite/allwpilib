@@ -39,6 +39,11 @@
 #define ERR_CANSessionMux_NotAllowed_MESSAGE "CAN: Not allowed"
 #define ERR_CANSessionMux_NotInitialized_MESSAGE "CAN: Not initialized"
 
+#define ERR_FRCSystem_NetCommNotResponding_MESSAGE \
+  "FRCSystem: NetComm not responding"
+#define ERR_FRCSystem_NoDSConnection_MESSAGE \
+  "FRCSystem: No driver station connected"
+
 #define SAMPLE_RATE_TOO_HIGH 1001
 #define SAMPLE_RATE_TOO_HIGH_MESSAGE \
   "HAL: Analog module sample rate is too high"

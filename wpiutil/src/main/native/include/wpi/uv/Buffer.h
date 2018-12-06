@@ -67,6 +67,12 @@ class Buffer : public uv_buf_t {
     return buf;
   }
 
+  Buffer Dup() const {
+    Buffer buf = Allocate(len);
+    std::memcpy(buf.base, base, len);
+    return buf;
+  }
+
   void Deallocate() {
     delete[] base;
     base = nullptr;

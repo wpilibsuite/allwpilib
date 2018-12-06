@@ -586,6 +586,15 @@ class AxisCamera : public HttpCamera {
    * Create a source for an Axis IP camera.
    *
    * @param name Source name (arbitrary unique identifier)
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   * @param kind Camera kind (e.g. kAxis)
+   */
+  AxisCamera(const wpi::Twine& name, wpi::StringRef host);
+
+  /**
+   * Create a source for an Axis IP camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
    * @param hosts Array of Camera host IPs/DNS names
    * @param kind Camera kind (e.g. kAxis)
    */

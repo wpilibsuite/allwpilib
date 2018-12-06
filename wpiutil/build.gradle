@@ -14,8 +14,6 @@ ext {
             }
         }
         if (it.targetPlatform.operatingSystem.name != 'windows') {
-            it.cppCompiler.define '_LARGEFILE_SOURCE'
-            it.cppCompiler.define '_FILE_OFFSET_BITS=64'
             it.cppCompiler.define '_GNU_SOURCE'
             it.sources {
                 libuvUnixCpp(CppSourceSet) {
@@ -150,6 +148,37 @@ model {
                         }
                     }
                 }
+            }
+        }
+        netconsoleServer(NativeExecutableSpec) {
+            targetBuildTypes 'release'
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src/netconsoleServer/native/cpp']
+                        includes = ['**/*.cpp']
+                    }
+                }
+            }
+            binaries.all { binary ->
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                if (binary.targetPlatform.operatingSystem.isLinux()) {
+                    linker.args "-lutil"
+                }
+            }
+        }
+        netconsoleTee(NativeExecutableSpec) {
+            targetBuildTypes 'release'
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src/netconsoleTee/native/cpp']
+                        includes = ['**/*.cpp']
+                    }
+                }
+            }
+            binaries.all { binary ->
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
             }
         }
     }
