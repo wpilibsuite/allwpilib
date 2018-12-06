@@ -47,7 +47,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * Adds a widget to this container to display the given video stream.
    *
    * @param title    the title of the widget
-   * @param sendable the sendable to display
+   * @param video    the video stream to display
    * @return a widget to display the sendable data
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *                                  title
@@ -69,7 +69,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
   /**
    * Adds a widget to this container to display the given video stream.
    *
-   * @param sendable the sendable to display
+   * @param video the video to display
    * @return a widget to display the sendable data
    * @throws IllegalArgumentException if a widget already exists in this container with the same
    *                                  title as the video source
