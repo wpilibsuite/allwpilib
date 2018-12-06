@@ -9,7 +9,7 @@ project.netCommComponents.each { String s->
   netCommLibConfigs[s] = ['linux:athena']
 }
 
-def niLibrariesVersion = '2019.7.1'
+def niLibrariesVersion = '2019.9.1'
 
 model {
   dependencyConfigs {
