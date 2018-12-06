@@ -51,10 +51,10 @@ public class ShuffleboardInstanceTest {
   @Test
   void testNestedLayoutsFluent() {
     NetworkTableEntry entry = m_shuffleboardInstance.getTab("Tab")
-                                                  .getLayout("List", "First")
-                                                  .getLayout("List", "Second")
-                                                  .getLayout("List", "Third")
-                                                  .getLayout("List", "Fourth")
+                                                  .getLayout("First", "List")
+                                                  .getLayout("Second", "List")
+                                                  .getLayout("Third", "List")
+                                                  .getLayout("Fourth", "List")
                                                   .add("Value", "string")
                                                   .getEntry();
 
@@ -67,10 +67,10 @@ public class ShuffleboardInstanceTest {
   @Test
   void testNestedLayoutsOop() {
     ShuffleboardTab tab = m_shuffleboardInstance.getTab("Tab");
-    ShuffleboardLayout first = tab.getLayout("List", "First");
-    ShuffleboardLayout second = first.getLayout("List", "Second");
-    ShuffleboardLayout third = second.getLayout("List", "Third");
-    ShuffleboardLayout fourth = third.getLayout("List", "Fourth");
+    ShuffleboardLayout first = tab.getLayout("First", "List");
+    ShuffleboardLayout second = first.getLayout("Second", "List");
+    ShuffleboardLayout third = second.getLayout("Third", "List");
+    ShuffleboardLayout fourth = third.getLayout("Fourth", "List");
     SimpleWidget widget = fourth.add("Value", "string");
     NetworkTableEntry entry = widget.getEntry();
 
@@ -84,7 +84,7 @@ public class ShuffleboardInstanceTest {
   void testLayoutTypeIsSet() {
     String layoutType = "Type";
     m_shuffleboardInstance.getTab("Tab")
-                          .getLayout(layoutType, "Title");
+                          .getLayout("Title", layoutType);
     m_shuffleboardInstance.update();
     NetworkTableEntry entry = m_ntInstance.getEntry(
         "/Shuffleboard/.metadata/Tab/Title/PreferredComponent");
@@ -94,7 +94,7 @@ public class ShuffleboardInstanceTest {
   @Test
   void testNestedActuatorWidgetsAreDisabled() {
     m_shuffleboardInstance.getTab("Tab")
-                          .getLayout("Layout", "Title")
+                          .getLayout("Title", "Layout")
                           .add(new MockActuatorSendable("Actuator"));
     NetworkTableEntry controllableEntry =
         m_ntInstance.getEntry("/Shuffleboard/Tab/Title/Actuator/.controllable");

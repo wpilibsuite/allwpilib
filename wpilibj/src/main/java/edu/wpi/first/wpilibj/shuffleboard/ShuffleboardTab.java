@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Sendable;
@@ -43,8 +44,13 @@ public final class ShuffleboardTab implements ShuffleboardContainer {
   }
 
   @Override
-  public ShuffleboardLayout getLayout(String type, String title) {
-    return m_helper.getLayout(type, title);
+  public ShuffleboardLayout getLayout(String title, String type) {
+    return m_helper.getLayout(title, type);
+  }
+
+  @Override
+  public ShuffleboardLayout getLayout(String title) throws NoSuchElementException {
+    return m_helper.getLayout(title);
   }
 
   @Override

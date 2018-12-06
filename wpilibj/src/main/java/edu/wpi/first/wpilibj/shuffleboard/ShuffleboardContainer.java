@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import edu.wpi.first.wpilibj.Sendable;
 
@@ -25,13 +26,30 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * Gets the layout with the given type and title, creating it if it does not already exist at the
    * time this method is called.
    *
-   * @param type  the type of the layout, eg "List Layout" or "Grid Layout"
    * @param title the title of the layout
+   * @param type  the type of the layout, eg "List Layout" or "Grid Layout"
    * @return the layout
-   * @see #getLayout(LayoutType, String)
+   * @see #getLayout(String, LayoutType)
    */
-  ShuffleboardLayout getLayout(String type, String title);
+  ShuffleboardLayout getLayout(String title, String type);
 
+  /**
+   * Gets the already-defined layout in this container with the given title.
+   *
+   * <pre>{@code
+   * Shuffleboard.getTab("Example Tab")
+   *   .getLayout("My Layout", BuiltInLayouts.kList);
+   *
+   * // Later...
+   * Shuffleboard.getTab("Example Tab")
+   *   .getLayout("My Layout");
+   * }</pre>
+   *
+   * @param title the title of the layout to get
+   * @return the layout with the given title
+   * @throws NoSuchElementException if no layout has yet been defined with the given title
+   */
+  ShuffleboardLayout getLayout(String title) throws NoSuchElementException;
 
   /**
    * Gets the layout with the given type and title, creating it if it does not already exist at the
@@ -41,8 +59,8 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @param title the title of the layout
    * @return the layout
    */
-  default ShuffleboardLayout getLayout(LayoutType layoutType, String title) {
-    return getLayout(layoutType.getLayoutName(), title);
+  default ShuffleboardLayout getLayout(String title, LayoutType layoutType) {
+    return getLayout(title, layoutType.getLayoutName());
   }
 
   /**
@@ -83,7 +101,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * {@link #add(String, Object)}, the value in the widget will be saved on the robot and will be
    * used when the robot program next starts rather than {@code defaultValue}.
    *
-   * @param title the title of the widget
+   * @param title        the title of the widget
    * @param defaultValue the default value of the widget
    * @return a widget to display the sendable data
    * @throws IllegalArgumentException if a widget already exists in this container with the given
