@@ -172,13 +172,15 @@ bool LiveWindow::IsEnabled() const {
 }
 
 void LiveWindow::SetEnabled(bool enabled) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::unique_lock<wpi::mutex> lock(m_impl->mutex);
   if (m_impl->liveWindowEnabled == enabled) return;
   Scheduler* scheduler = Scheduler::GetInstance();
   m_impl->startLiveWindow = enabled;
   m_impl->liveWindowEnabled = enabled;
+  lock.unlock();
   // Force table generation now to make sure everything is defined
   UpdateValues();
+  lock.lock();
   if (enabled) {
     scheduler->SetEnabled(false);
     scheduler->RemoveAll();
