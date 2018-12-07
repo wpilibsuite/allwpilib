@@ -208,6 +208,11 @@ class LiveWindow {
 
   struct Impl;
   std::unique_ptr<Impl> m_impl;
+
+  /**
+   * Updates the entries, without using a mutex or lock.
+   */
+  void UpdateValuesUnsafe();
 };
 
 }  // namespace frc
