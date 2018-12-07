@@ -31,7 +31,7 @@ using wpi::StringRef;
  * @ingroup ntcore_cpp_api
  */
 typedef std::function<void(NetworkTable* parent, StringRef name,
-                           NetworkTable* table)>
+                           std::shared_ptr<NetworkTable> table)>
     TableListener;
 
 }  // namespace nt
