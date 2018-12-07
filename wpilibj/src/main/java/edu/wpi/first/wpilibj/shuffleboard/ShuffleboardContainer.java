@@ -24,7 +24,9 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
 
   /**
    * Gets the layout with the given type and title, creating it if it does not already exist at the
-   * time this method is called.
+   * time this method is called. Note: this method should only be used to use a layout type that
+   * is not already built into Shuffleboard. To use a layout built into Shuffleboard, use
+   * {@link #getLayout(String, LayoutType)} and the layouts in {@link BuiltInLayouts}.
    *
    * @param title the title of the layout
    * @param type  the type of the layout, eg "List Layout" or "Grid Layout"
@@ -32,6 +34,18 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @see #getLayout(String, LayoutType)
    */
   ShuffleboardLayout getLayout(String title, String type);
+
+  /**
+   * Gets the layout with the given type and title, creating it if it does not already exist at the
+   * time this method is called.
+   *
+   * @param title      the title of the layout
+   * @param layoutType the type of the layout, eg "List" or "Grid"
+   * @return the layout
+   */
+  default ShuffleboardLayout getLayout(String title, LayoutType layoutType) {
+    return getLayout(title, layoutType.getLayoutName());
+  }
 
   /**
    * Gets the already-defined layout in this container with the given title.
@@ -50,18 +64,6 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws NoSuchElementException if no layout has yet been defined with the given title
    */
   ShuffleboardLayout getLayout(String title) throws NoSuchElementException;
-
-  /**
-   * Gets the layout with the given type and title, creating it if it does not already exist at the
-   * time this method is called.
-   *
-   * @param type  the type of the layout, eg "List" or "Grid"
-   * @param title the title of the layout
-   * @return the layout
-   */
-  default ShuffleboardLayout getLayout(String title, LayoutType layoutType) {
-    return getLayout(title, layoutType.getLayoutName());
-  }
 
   /**
    * Adds a widget to this container to display the given sendable.

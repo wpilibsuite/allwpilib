@@ -34,7 +34,8 @@ public enum BuiltInLayouts implements LayoutType {
    * <br>Custom properties:
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
-   * <tr><td>Number of columns</td><td>Number</td><td>3</td><td>Must be in the range [1,15]</td></tr>
+   * <tr><td>Number of columns</td><td>Number</td><td>3</td><td>Must be in the range [1,15]</td>
+   * </tr>
    * <tr><td>Number of rows</td><td>Number</td><td>3</td><td>Must be in the range [1,15]</td></tr>
    * <tr>
    * <td>Label position</td>
@@ -48,14 +49,14 @@ public enum BuiltInLayouts implements LayoutType {
   kGrid("Grid Layout"),
   ;
 
-  private final String layoutName;
+  private final String m_layoutName;
 
   BuiltInLayouts(String layoutName) {
-    this.layoutName = layoutName;
+    m_layoutName = layoutName;
   }
 
   @Override
   public String getLayoutName() {
-    return layoutName;
+    return m_layoutName;
   }
 }

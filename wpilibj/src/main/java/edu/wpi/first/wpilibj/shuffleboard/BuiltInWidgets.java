@@ -47,7 +47,8 @@ public enum BuiltInWidgets implements WidgetType {
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Min</td><td>Number</td><td>-1.0</td><td>The minimum value of the slider</td></tr>
    * <tr><td>Max</td><td>Number</td><td>1.0</td><td>The maximum value of the slider</td></tr>
-   * <tr><td>Block increment</td><td>Number</td><td>0.0625</td><td>How much to move the slider by with the arrow keys</td></tr>
+   * <tr><td>Block increment</td><td>Number</td><td>0.0625</td>
+   * <td>How much to move the slider by with the arrow keys</td></tr>
    * </table>
    */
   kNumberSlider("Number Slider"),
@@ -77,7 +78,8 @@ public enum BuiltInWidgets implements WidgetType {
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Min</td><td>Number</td><td>0</td><td>The minimum value of the dial</td></tr>
    * <tr><td>Max</td><td>Number</td><td>100</td><td>The maximum value of the dial</td></tr>
-   * <tr><td>Show value</td><td>Boolean</td><td>true</td><td>Whether or not to show the value as text</td></tr>
+   * <tr><td>Show value</td><td>Boolean</td><td>true</td>
+   * <td>Whether or not to show the value as text</td></tr>
    * </table>
    */
   kDial("Simple Dial"),
@@ -93,7 +95,8 @@ public enum BuiltInWidgets implements WidgetType {
    * <br>Custom properties:
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
-   * <tr><td>Visible time</td><td>Number</td><td>30</td><td>How long, in seconds, should past data be visible for</td></tr>
+   * <tr><td>Visible time</td><td>Number</td><td>30</td>
+   * <td>How long, in seconds, should past data be visible for</td></tr>
    * </table>
    */
   kGraph("Graph"),
@@ -106,8 +109,11 @@ public enum BuiltInWidgets implements WidgetType {
    * <br>Custom properties:
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
-   * <tr><td>Color when true</td><td>Color</td><td>"green"</td><td>Can be specified as a string ({@code "#00FF00"}) or a rgba integer ({@code 0x00FF0000})</td></tr>
-   * <tr><td>Color when false</td><td>Color</td><td>"red"</td><td>Can be specified as a string or a number</td></tr>
+   * <tr><td>Color when true</td><td>Color</td><td>"green"</td>
+   * <td>Can be specified as a string ({@code "#00FF00"}) or a rgba integer ({@code 0x00FF0000})
+   * </td></tr>
+   * <tr><td>Color when false</td><td>Color</td><td>"red"</td>
+   * <td>Can be specified as a string or a number</td></tr>
    * </table>
    */
   kBooleanBox("Boolean Box"),
@@ -130,13 +136,22 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kToggleSwitch("Toggle Switch"),
   /**
+   * Displays an analog input or a raw number with a number bar.
    * <br>Supported types:
    * <ul>
+   * <li>Number</li>
+   * <li>{@link edu.wpi.first.wpilibj.AnalogInput}</li>
    * </ul>
    * <br>Custom properties:
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
-   * <tr><td>AAAAAA</td><td>AAAAAA</td><td>AAAAA</td><td>AAAAA</td></tr>
+   * <tr><td>Min</td><td>Number</td><td>0</td><td>The minimum value of the bar</td></tr>
+   * <tr><td>Max</td><td>Number</td><td>5</td><td>The maximum value of the bar</td></tr>
+   * <tr><td>Center</td><td>Number</td><td>0</td><td>The center ("zero") value of the bar</td></tr>
+   * <tr><td>Orientation</td><td>String</td><td>"HORIZONTAL"</td>
+   * <td>The orientation of the bar. One of {@code ["HORIZONTAL", "VERTICAL"]}</td></tr>
+   * <tr><td>Number of tick marks</td><td>Number</td><td>5</td>
+   * <td>The number of discrete ticks on the bar</td></tr>
    * </table>
    */
   kVoltageView("Voltage View"),
@@ -149,7 +164,8 @@ public enum BuiltInWidgets implements WidgetType {
    * <br>Custom properties:
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
-   * <tr><td>Show voltage and current values</td><td>Boolean</td><td>true</td><td>Whether or not to display the voltage and current draw</td></tr>
+   * <tr><td>Show voltage and current values</td><td>Boolean</td><td>true</td>
+   * <td>Whether or not to display the voltage and current draw</td></tr>
    * </table>
    */
   kPowerDistributionPanel("PDP"),
@@ -204,7 +220,8 @@ public enum BuiltInWidgets implements WidgetType {
    * <br>Custom properties:
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
-   * <tr><td>Orientation</td><td>String</td><td>"HORIZONTAL"</td><td>One of {@code ["HORIZONTAL", "VERTICAL"]}</td></tr>
+   * <tr><td>Orientation</td><td>String</td><td>"HORIZONTAL"</td>
+   * <td>One of {@code ["HORIZONTAL", "VERTICAL"]}</td></tr>
    * </table>
    */
   kSpeedController("Speed Controller"),
@@ -239,8 +256,7 @@ public enum BuiltInWidgets implements WidgetType {
    * <ul>
    * <li>{@link edu.wpi.first.wpilibj.PIDController}</li>
    * </ul>
-   * <br>Custom properties:
-   * <table>This widget has no custom properties.
+   * <br>This widget has no custom properties.
    */
   kPIDController("PID Controller"),
   /**
@@ -253,11 +269,16 @@ public enum BuiltInWidgets implements WidgetType {
    * <br>Custom properties:
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
-   * <tr><td>Min</td><td>Number</td><td>-1</td><td>The minimum acceleration value to display</td></tr>
-   * <tr><td>Max</td><td>Number</td><td>1</td><td>The maximum acceleration value to display</td></tr>
-   * <tr><td>Show text</td><td>Boolean</td><td>true</td><td>Show or hide the acceleration values</td></tr>
-   * <tr><td>Precision</td><td>Number</td><td>2</td><td>How many numbers to display after the decimal point</td></tr>
-   * <tr><td>Show tick marks</td><td>Boolean</td><td>false</td><td>Show or hide the tick marks on the number bars</td></tr>
+   * <tr><td>Min</td><td>Number</td><td>-1</td>
+   * <td>The minimum acceleration value to display</td></tr>
+   * <tr><td>Max</td><td>Number</td><td>1</td>
+   * <td>The maximum acceleration value to display</td></tr>
+   * <tr><td>Show text</td><td>Boolean</td><td>true</td>
+   * <td>Show or hide the acceleration values</td></tr>
+   * <tr><td>Precision</td><td>Number</td><td>2</td>
+   * <td>How many numbers to display after the decimal point</td></tr>
+   * <tr><td>Show tick marks</td><td>Boolean</td><td>false</td>
+   * <td>Show or hide the tick marks on the number bars</td></tr>
    * </table>
    */
   kAccelerometer("Accelerometer"),
@@ -273,9 +294,12 @@ public enum BuiltInWidgets implements WidgetType {
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Range</td><td>{@link Range}</td><td>k16G</td><td>The accelerometer range</td></tr>
-   * <tr><td>Show value</td><td>Boolean</td><td>true</td><td>Show or hide the acceleration values</td></tr>
-   * <tr><td>Precision</td><td>Number</td><td>2</td><td>How many numbers to display after the decimal point</td></tr>
-   * <tr><td>Show tick marks</td><td>Boolean</td><td>false</td><td>Show or hide the tick marks on the number bars</td></tr>
+   * <tr><td>Show value</td><td>Boolean</td><td>true</td>
+   * <td>Show or hide the acceleration values</td></tr>
+   * <tr><td>Precision</td><td>Number</td><td>2</td>
+   * <td>How many numbers to display after the decimal point</td></tr>
+   * <tr><td>Show tick marks</td><td>Boolean</td><td>false</td>
+   * <td>Show or hide the tick marks on the number bars</td></tr>
    * </table>
    */
   k3AxisAccelerometer("3-Axis Accelerometer"),
@@ -291,7 +315,8 @@ public enum BuiltInWidgets implements WidgetType {
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Major tick spacing</td><td>Number</td><td>45</td><td>Degrees</td></tr>
-   * <tr><td>Starting angle</td><td>Number</td><td>180</td><td>How far to rotate the entire dial, in degrees</td></tr>
+   * <tr><td>Starting angle</td><td>Number</td><td>180</td>
+   * <td>How far to rotate the entire dial, in degrees</td></tr>
    * <tr><td>Show tick mark ring</td><td>Boolean</td><td>true</td></tr>
    * </table>
    */
@@ -316,7 +341,8 @@ public enum BuiltInWidgets implements WidgetType {
    * <br>Custom properties:
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
-   * <tr><td>Number of wheels</td><td>Number</td><td>4</td><td>Must be a positive even integer</td></tr>
+   * <tr><td>Number of wheels</td><td>Number</td><td>4</td><td>Must be a positive even integer
+   * </td></tr>
    * <tr><td>Wheel diameter</td><td>Number</td><td>80</td><td>Pixels</td></tr>
    * <tr><td>Show velocity vectors</td><td>Boolean</td><td>true</td></tr>
    * </table>
@@ -346,23 +372,28 @@ public enum BuiltInWidgets implements WidgetType {
    * <br>Custom properties:
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
-   * <tr><td>Show crosshair</td><td>Boolean</td><td>true</td><td>Show or hide a crosshair on the image</td></tr>
-   * <tr><td>Crosshair color</td><td>Color</td><td>"white"</td><td>Can be a string or a rgba integer</td></tr>
-   * <tr><td>Show controls</td><td>Boolean</td><td>true</td><td>Show or hide the stream controls</td></tr>
-   * <tr><td>Rotation</td><td>String</td><td>"NONE"</td><td>Rotates the displayed image. One of {@code ["NONE", "QUARTER_CW", "QUARTER_CCW", "HALF"]}</td></tr>
+   * <tr><td>Show crosshair</td><td>Boolean</td><td>true</td>
+   * <td>Show or hide a crosshair on the image</td></tr>
+   * <tr><td>Crosshair color</td><td>Color</td><td>"white"</td>
+   * <td>Can be a string or a rgba integer</td></tr>
+   * <tr><td>Show controls</td><td>Boolean</td><td>true</td><td>Show or hide the stream controls
+   * </td></tr>
+   * <tr><td>Rotation</td><td>String</td><td>"NONE"</td>
+   * <td>Rotates the displayed image. One of {@code ["NONE", "QUARTER_CW", "QUARTER_CCW", "HALF"]}
+   * </td></tr>
    * </table>
    */
   kCameraStream("Camera Stream"),
   ;
 
-  private final String widgetName;
+  private final String m_widgetName;
 
   BuiltInWidgets(String widgetName) {
-    this.widgetName = widgetName;
+    this.m_widgetName = widgetName;
   }
 
   @Override
   public String getWidgetName() {
-    return widgetName;
+    return m_widgetName;
   }
 }

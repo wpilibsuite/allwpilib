@@ -37,14 +37,14 @@ public class ShuffleboardInstanceTest {
   @Test
   void testPathFluent() {
     NetworkTableEntry entry = m_shuffleboardInstance.getTab("Tab Title")
-                                                  .getLayout("List", "List Layout")
+                                                  .getLayout("Layout Title", "List Layout")
                                                   .add("Data", "string")
                                                   .withWidget("Text View")
                                                   .getEntry();
 
     assertAll(
         () -> assertEquals("string", entry.getString(null), "Wrong entry value"),
-        () -> assertEquals("/Shuffleboard/Tab Title/List Layout/Data", entry.getName(),
+        () -> assertEquals("/Shuffleboard/Tab Title/Layout Title/Data", entry.getName(),
                            "Entry path generated incorrectly"));
   }
 
