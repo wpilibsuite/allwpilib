@@ -86,7 +86,7 @@ uint16_t ADXRS450_Gyro::ReadRegister(int reg) {
 }
 
 double ADXRS450_Gyro::GetAngle() const {
-  return m_spi.GetAccumulatorValue() * kDegreePerSecondPerLSB * kSamplePeriod;
+  return m_spi.GetAccumulatorIntegratedValue() * kDegreePerSecondPerLSB;
 }
 
 double ADXRS450_Gyro::GetRate() const {
@@ -99,11 +99,11 @@ void ADXRS450_Gyro::Reset() { m_spi.ResetAccumulator(); }
 void ADXRS450_Gyro::Calibrate() {
   Wait(0.1);
 
-  m_spi.SetAccumulatorCenter(0);
+  m_spi.SetAccumulatorIntegratedCenter(0);
   m_spi.ResetAccumulator();
 
   Wait(kCalibrationSampleTime);
 
-  m_spi.SetAccumulatorCenter(static_cast<int>(m_spi.GetAccumulatorAverage()));
+  m_spi.SetAccumulatorIntegratedCenter(m_spi.GetAccumulatorIntegratedAverage());
   m_spi.ResetAccumulator();
 }

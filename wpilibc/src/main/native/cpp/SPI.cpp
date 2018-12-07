@@ -31,13 +31,13 @@ class SPI::Accumulator {
           std::lock_guard<wpi::mutex> lock(m_mutex);
           Update();
         }),
-        m_buf(new uint8_t[xferSize * kAccumulateDepth]),
+        m_buf(new uint32_t[(xferSize + 1) * kAccumulateDepth]),
         m_validMask(validMask),
         m_validValue(validValue),
         m_dataMax(1 << dataSize),
         m_dataMsbMask(1 << (dataSize - 1)),
         m_dataShift(dataShift),
-        m_xferSize(xferSize),
+        m_xferSize(xferSize + 1),  // +1 for timestamp
         m_isSigned(isSigned),
         m_bigEndian(bigEndian),
         m_port(port) {}
@@ -46,15 +46,18 @@ class SPI::Accumulator {
   void Update();
 
   Notifier m_notifier;
-  uint8_t* m_buf;
+  uint32_t* m_buf;
   wpi::mutex m_mutex;
 
   int64_t m_value = 0;
   uint32_t m_count = 0;
   int32_t m_lastValue = 0;
+  uint32_t m_lastTimestamp = 0;
+  double m_integratedValue = 0;
 
   int32_t m_center = 0;
   int32_t m_deadband = 0;
+  double m_integratedCenter = 0;
 
   int32_t m_validMask;
   int32_t m_validValue;
@@ -78,7 +81,7 @@ void SPI::Accumulator::Update() {
         HAL_ReadSPIAutoReceivedData(m_port, m_buf, 0, 0, &status);
     if (status != 0) return;  // error reading
 
-    // only get whole responses
+    // only get whole responses; +1 is for timestamp
     numToRead -= numToRead % m_xferSize;
     if (numToRead > m_xferSize * kAccumulateDepth) {
       numToRead = m_xferSize * kAccumulateDepth;
@@ -92,15 +95,18 @@ void SPI::Accumulator::Update() {
 
     // loop over all responses
     for (int32_t off = 0; off < numToRead; off += m_xferSize) {
+      // get timestamp from first word
+      uint32_t timestamp = m_buf[off];
+
       // convert from bytes
       uint32_t resp = 0;
       if (m_bigEndian) {
-        for (int32_t i = 0; i < m_xferSize; ++i) {
+        for (int32_t i = 1; i < m_xferSize; ++i) {
           resp <<= 8;
           resp |= m_buf[off + i] & 0xff;
         }
       } else {
-        for (int32_t i = m_xferSize - 1; i >= 0; --i) {
+        for (int32_t i = m_xferSize - 1; i >= 1; --i) {
           resp <<= 8;
           resp |= m_buf[off + i] & 0xff;
         }
@@ -114,15 +120,34 @@ void SPI::Accumulator::Update() {
         // 2s complement conversion if signed MSB is set
         if (m_isSigned && (data & m_dataMsbMask) != 0) data -= m_dataMax;
         // center offset
+        int32_t dataNoCenter = data;
         data -= m_center;
         // only accumulate if outside deadband
-        if (data < -m_deadband || data > m_deadband) m_value += data;
+        if (data < -m_deadband || data > m_deadband) {
+          m_value += data;
+          if (m_count != 0) {
+            // timestamps use the 1us FPGA clock; also handle rollover
+            if (timestamp >= m_lastTimestamp)
+              m_integratedValue +=
+                  dataNoCenter *
+                      static_cast<int32_t>(timestamp - m_lastTimestamp) * 1e-6 -
+                  m_integratedCenter;
+            else
+              m_integratedValue +=
+                  dataNoCenter *
+                      static_cast<int32_t>((1ULL << 32) - m_lastTimestamp +
+                                           timestamp) *
+                      1e-6 -
+                  m_integratedCenter;
+          }
+        }
         ++m_count;
         m_lastValue = data;
       } else {
         // no data from the sensor; just clear the last value
         m_lastValue = 0;
       }
+      m_lastTimestamp = timestamp;
     }
   } while (!done);
 }
@@ -284,7 +309,7 @@ void SPI::ForceAutoRead() {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-int SPI::ReadAutoReceivedData(uint8_t* buffer, int numToRead, double timeout) {
+int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead, double timeout) {
   int32_t status = 0;
   int32_t val =
       HAL_ReadSPIAutoReceivedData(m_port, buffer, numToRead, timeout, &status);
@@ -337,6 +362,8 @@ void SPI::ResetAccumulator() {
   m_accum->m_value = 0;
   m_accum->m_count = 0;
   m_accum->m_lastValue = 0;
+  m_accum->m_lastTimestamp = 0;
+  m_accum->m_integratedValue = 0;
 }
 
 void SPI::SetAccumulatorCenter(int center) {
@@ -390,4 +417,26 @@ void SPI::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
   m_accum->Update();
   value = m_accum->m_value;
   count = m_accum->m_count;
+}
+
+void SPI::SetAccumulatorIntegratedCenter(double center) {
+  if (!m_accum) return;
+  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  m_accum->m_integratedCenter = center;
+}
+
+double SPI::GetAccumulatorIntegratedValue() const {
+  if (!m_accum) return 0;
+  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  m_accum->Update();
+  return m_accum->m_integratedValue;
+}
+
+double SPI::GetAccumulatorIntegratedAverage() const {
+  if (!m_accum) return 0;
+  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  m_accum->Update();
+  if (m_accum->m_count <= 1) return 0.0;
+  // count-1 due to not integrating the first value received
+  return m_accum->m_integratedValue / (m_accum->m_count - 1);
 }

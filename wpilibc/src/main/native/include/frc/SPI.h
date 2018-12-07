@@ -211,15 +211,20 @@ class SPI : public ErrorBase {
    * Transfers may be made a byte at a time, so it's necessary for the caller
    * to handle cases where an entire transfer has not been completed.
    *
-   * Blocks until numToRead bytes have been read or timeout expires.
-   * May be called with numToRead=0 to retrieve how many bytes are available.
+   * Each received data sequence consists of a timestamp followed by the
+   * received data bytes, one byte per word (in the least significant byte).
+   * The length of each received data sequence is the same as the combined
+   * size of the data and zeroSize set in SetAutoTransmitData().
    *
-   * @param buffer buffer where read bytes are stored
-   * @param numToRead number of bytes to read
+   * Blocks until numToRead words have been read or timeout expires.
+   * May be called with numToRead=0 to retrieve how many words are available.
+   *
+   * @param buffer buffer where read words are stored
+   * @param numToRead number of words to read
    * @param timeout timeout in seconds (ms resolution)
-   * @return Number of bytes remaining to be read
+   * @return Number of words remaining to be read
    */
-  int ReadAutoReceivedData(uint8_t* buffer, int numToRead, double timeout);
+  int ReadAutoReceivedData(uint32_t* buffer, int numToRead, double timeout);
 
   /**
    * Get the number of bytes dropped by the automatic SPI transfer engine due
@@ -312,6 +317,32 @@ class SPI : public ErrorBase {
    * @param count Pointer to the number of accumulation cycles.
    */
   void GetAccumulatorOutput(int64_t& value, int64_t& count) const;
+
+  /**
+   * Set the center value of the accumulator integrator.
+   *
+   * The center value is subtracted from each value*dt before it is added to the
+   * integrated value. This is used for the center value of devices like gyros
+   * and accelerometers to take the device offset into account when integrating.
+   */
+  void SetAccumulatorIntegratedCenter(double center);
+
+  /**
+   * Read the integrated value.  This is the sum of (each value * time between
+   * values).
+   *
+   * @return The integrated value accumulated since the last Reset().
+   */
+  double GetAccumulatorIntegratedValue() const;
+
+  /**
+   * Read the average of the integrated value.  This is the sum of (each value
+   * times the time between values), divided by the count.
+   *
+   * @return The average of the integrated value accumulated since the last
+   *         Reset().
+   */
+  double GetAccumulatorIntegratedAverage() const;
 
  protected:
   HAL_SPIPort m_port = HAL_SPI_kInvalid;

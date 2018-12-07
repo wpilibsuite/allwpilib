@@ -8,6 +8,8 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 
 import edu.wpi.first.hal.AccumulatorResult;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -371,24 +373,26 @@ public class SPI implements AutoCloseable {
    * <p>Transfers may be made a byte at a time, so it's necessary for the caller
    * to handle cases where an entire transfer has not been completed.
    *
-   * <p>Blocks until numToRead bytes have been read or timeout expires.
-   * May be called with numToRead=0 to retrieve how many bytes are available.
+   * <p>Each received data sequence consists of a timestamp followed by the
+   * received data bytes, one byte per word (in the least significant byte).
+   * The length of each received data sequence is the same as the combined
+   * size of the data and zeroSize set in setAutoTransmitData().
    *
-   * @param buffer buffer where read bytes are stored
-   * @param numToRead number of bytes to read
+   * <p>Blocks until numToRead words have been read or timeout expires.
+   * May be called with numToRead=0 to retrieve how many words are available.
+   *
+   * @param buffer buffer where read words are stored
+   * @param numToRead number of words to read
    * @param timeout timeout in seconds (ms resolution)
-   * @return Number of bytes remaining to be read
+   * @return Number of words remaining to be read
    */
-  @SuppressWarnings("ByteBufferBackingArray")
   public int readAutoReceivedData(ByteBuffer buffer, int numToRead, double timeout) {
-    if (buffer.hasArray()) {
-      return readAutoReceivedData(buffer.array(), numToRead, timeout);
-    }
     if (!buffer.isDirect()) {
       throw new IllegalArgumentException("must be a direct buffer");
     }
-    if (buffer.capacity() < numToRead) {
-      throw new IllegalArgumentException("buffer is too small, must be at least " + numToRead);
+    if (buffer.capacity() < numToRead * 4) {
+      throw new IllegalArgumentException("buffer is too small, must be at least "
+          + (numToRead * 4));
     }
     return SPIJNI.spiReadAutoReceivedData(m_port, buffer, numToRead, timeout);
   }
@@ -399,15 +403,20 @@ public class SPI implements AutoCloseable {
    * <p>Transfers may be made a byte at a time, so it's necessary for the caller
    * to handle cases where an entire transfer has not been completed.
    *
-   * <p>Blocks until numToRead bytes have been read or timeout expires.
-   * May be called with numToRead=0 to retrieve how many bytes are available.
+   * <p>Each received data sequence consists of a timestamp followed by the
+   * received data bytes, one byte per word (in the least significant byte).
+   * The length of each received data sequence is the same as the combined
+   * size of the data and zeroSize set in setAutoTransmitData().
    *
-   * @param buffer array where read bytes are stored
-   * @param numToRead number of bytes to read
+   * <p>Blocks until numToRead words have been read or timeout expires.
+   * May be called with numToRead=0 to retrieve how many words are available.
+   *
+   * @param buffer array where read words are stored
+   * @param numToRead number of words to read
    * @param timeout timeout in seconds (ms resolution)
-   * @return Number of bytes remaining to be read
+   * @return Number of words remaining to be read
    */
-  public int readAutoReceivedData(byte[] buffer, int numToRead, double timeout) {
+  public int readAutoReceivedData(int[] buffer, int numToRead, double timeout) {
     if (buffer.length < numToRead) {
       throw new IllegalArgumentException("buffer is too small, must be at least " + numToRead);
     }
@@ -431,8 +440,10 @@ public class SPI implements AutoCloseable {
     Accumulator(int port, int xferSize, int validMask, int validValue, int dataShift,
                 int dataSize, boolean isSigned, boolean bigEndian) {
       m_notifier = new Notifier(this::update);
-      m_buf = ByteBuffer.allocateDirect(xferSize * kAccumulateDepth);
-      m_xferSize = xferSize;
+      m_buf = ByteBuffer.allocateDirect((xferSize + 1) * kAccumulateDepth * 4)
+          .order(ByteOrder.nativeOrder());
+      m_intBuf = m_buf.asIntBuffer();
+      m_xferSize = xferSize + 1;  // +1 for timestamp
       m_validMask = validMask;
       m_validValue = validValue;
       m_dataShift = dataShift;
@@ -450,14 +461,18 @@ public class SPI implements AutoCloseable {
 
     final Notifier m_notifier;
     final ByteBuffer m_buf;
+    final IntBuffer m_intBuf;
     final Object m_mutex = new Object();
 
     long m_value;
     int m_count;
     int m_lastValue;
+    long m_lastTimestamp;
+    double m_integratedValue;
 
     int m_center;
     int m_deadband;
+    double m_integratedCenter;
 
     final int m_validMask;
     final int m_validValue;
@@ -469,7 +484,7 @@ public class SPI implements AutoCloseable {
     final boolean m_bigEndian;  // is response big endian?
     final int m_port;
 
-    @SuppressWarnings("PMD.CyclomaticComplexity")
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     void update() {
       synchronized (m_mutex) {
         boolean done = false;
@@ -494,17 +509,20 @@ public class SPI implements AutoCloseable {
 
           // loop over all responses
           for (int off = 0; off < numToRead; off += m_xferSize) {
+            // get timestamp from first word
+            long timestamp = m_intBuf.get(off) & 0xffffffffL;
+
             // convert from bytes
             int resp = 0;
             if (m_bigEndian) {
-              for (int i = 0; i < m_xferSize; ++i) {
+              for (int i = 1; i < m_xferSize; ++i) {
                 resp <<= 8;
-                resp |= ((int) m_buf.get(off + i)) & 0xff;
+                resp |= m_intBuf.get(off + i) & 0xff;
               }
             } else {
-              for (int i = m_xferSize - 1; i >= 0; --i) {
+              for (int i = m_xferSize - 1; i >= 1; --i) {
                 resp <<= 8;
-                resp |= ((int) m_buf.get(off + i)) & 0xff;
+                resp |= m_intBuf.get(off + i) & 0xff;
               }
             }
 
@@ -518,10 +536,21 @@ public class SPI implements AutoCloseable {
                 data -= m_dataMax;
               }
               // center offset
+              int dataNoCenter = data;
               data -= m_center;
               // only accumulate if outside deadband
               if (data < -m_deadband || data > m_deadband) {
                 m_value += data;
+                if (m_count != 0) {
+                  // timestamps use the 1us FPGA clock; also handle rollover
+                  if (timestamp >= m_lastTimestamp) {
+                    m_integratedValue += dataNoCenter * (timestamp - m_lastTimestamp)
+                        * 1e-6 - m_integratedCenter;
+                  } else {
+                    m_integratedValue += dataNoCenter * ((1L << 32) - m_lastTimestamp + timestamp)
+                        * 1e-6 - m_integratedCenter;
+                  }
+                }
               }
               ++m_count;
               m_lastValue = data;
@@ -529,6 +558,7 @@ public class SPI implements AutoCloseable {
               // no data from the sensor; just clear the last value
               m_lastValue = 0;
             }
+            m_lastTimestamp = timestamp;
           }
         }
       }
@@ -600,6 +630,8 @@ public class SPI implements AutoCloseable {
       m_accum.m_value = 0;
       m_accum.m_count = 0;
       m_accum.m_lastValue = 0;
+      m_accum.m_lastTimestamp = 0;
+      m_accum.m_integratedValue = 0;
     }
   }
 
@@ -714,6 +746,59 @@ public class SPI implements AutoCloseable {
       m_accum.update();
       result.value = m_accum.m_value;
       result.count = m_accum.m_count;
+    }
+  }
+
+  /**
+   * Set the center value of the accumulator integrator.
+   *
+   * <p>The center value is subtracted from each value*dt before it is added to the
+   * integrated value. This is used for the center value of devices like gyros
+   * and accelerometers to take the device offset into account when integrating.
+   */
+  public void setAccumulatorIntegratedCenter(double center) {
+    if (m_accum == null) {
+      return;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.m_integratedCenter = center;
+    }
+  }
+
+  /**
+   * Read the integrated value.  This is the sum of (each value * time between
+   * values).
+   *
+   * @return The integrated value accumulated since the last Reset().
+   */
+  public double getAccumulatorIntegratedValue() {
+    if (m_accum == null) {
+      return 0;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.update();
+      return m_accum.m_integratedValue;
+    }
+  }
+
+  /**
+   * Read the average of the integrated value.  This is the sum of (each value
+   * times the time between values), divided by the count.
+   *
+   * @return The average of the integrated value accumulated since the last
+   *         Reset().
+   */
+  public double getAccumulatorIntegratedAverage() {
+    if (m_accum == null) {
+      return 0;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.update();
+      if (m_accum.m_count <= 1) {
+        return 0.0;
+      }
+      // count-1 due to not integrating the first value received
+      return m_accum.m_integratedValue / (m_accum.m_count - 1);
     }
   }
 }

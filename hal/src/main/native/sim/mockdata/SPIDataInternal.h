@@ -24,7 +24,7 @@ class SPIData {
   int32_t Write(const uint8_t* dataToSend, int32_t sendSize);
   int32_t Transaction(const uint8_t* dataToSend, uint8_t* dataReceived,
                       int32_t size);
-  int32_t ReadAutoReceivedData(uint8_t* buffer, int32_t numToRead,
+  int32_t ReadAutoReceivedData(uint32_t* buffer, int32_t numToRead,
                                double timeout, int32_t* status);
 
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
