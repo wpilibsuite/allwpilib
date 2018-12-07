@@ -420,7 +420,7 @@ public class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (axis >= HAL.kMaxJoystickAxes) {
+    if (axis < 0 || axis >= HAL.kMaxJoystickAxes) {
       throw new IllegalArgumentException("Joystick axis is out of range");
     }
 
@@ -451,7 +451,7 @@ public class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (pov >= HAL.kMaxJoystickPOVs) {
+    if (pov < 0 || pov >= HAL.kMaxJoystickPOVs) {
       throw new IllegalArgumentException("Joystick POV is out of range");
     }
 
