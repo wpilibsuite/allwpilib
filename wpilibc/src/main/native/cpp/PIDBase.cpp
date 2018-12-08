@@ -234,7 +234,7 @@ void PIDBase::Reset() {
 void PIDBase::PIDWrite(double output) { SetSetpoint(output); }
 
 void PIDBase::InitSendable(SendableBuilder& builder) {
-  builder.SetSmartDashboardType("PIDBase");
+  builder.SetSmartDashboardType("PIDController");
   builder.SetSafeState([=]() { Reset(); });
   builder.AddDoubleProperty("p", [=]() { return GetP(); },
                             [=](double value) { SetP(value); });
