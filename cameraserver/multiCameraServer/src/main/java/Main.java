@@ -49,7 +49,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
    }
  */
 
-public final class MultiCameraServer {
+public final class Main {
   private static String configFile = "/boot/frc.json";
 
   @SuppressWarnings("MemberName")
@@ -63,7 +63,7 @@ public final class MultiCameraServer {
   public static boolean server;
   public static List<CameraConfig> cameras = new ArrayList<>();
 
-  private MultiCameraServer() {
+  private Main() {
   }
 
   /**

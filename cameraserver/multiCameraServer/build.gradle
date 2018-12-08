@@ -16,10 +16,6 @@ ext {
     skipDev = true
 }
 
-ext {
-    useNiJava = false
-}
-
 apply from: "${rootDir}/shared/opencv.gradle"
 
 mainClassName = 'Main'
@@ -37,10 +33,6 @@ dependencies {
     compile project(':ntcore')
     compile project(':cscore')
     compile project(':cameraserver')
-}
-
-jar {
-    manifest { attributes 'Robot-Class': 'MyRobot' }
 }
 
 model {
