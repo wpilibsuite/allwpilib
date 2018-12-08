@@ -175,6 +175,10 @@ void LiveWindow::SetEnabled(bool enabled) {
   std::lock_guard<wpi::mutex> lock(m_impl->mutex);
   if (m_impl->liveWindowEnabled == enabled) return;
   Scheduler* scheduler = Scheduler::GetInstance();
+  m_impl->startLiveWindow = enabled;
+  m_impl->liveWindowEnabled = enabled;
+  // Force table generation now to make sure everything is defined
+  UpdateValuesUnsafe();
   if (enabled) {
     scheduler->SetEnabled(false);
     scheduler->RemoveAll();
@@ -184,13 +188,15 @@ void LiveWindow::SetEnabled(bool enabled) {
     }
     scheduler->SetEnabled(true);
   }
-  m_impl->startLiveWindow = enabled;
-  m_impl->liveWindowEnabled = enabled;
   m_impl->enabledEntry.SetBoolean(enabled);
 }
 
 void LiveWindow::UpdateValues() {
   std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  UpdateValuesUnsafe();
+}
+
+void LiveWindow::UpdateValuesUnsafe() {
   // Only do this if either LiveWindow mode or telemetry is enabled.
   if (!m_impl->liveWindowEnabled && !m_impl->telemetryEnabled) return;
 

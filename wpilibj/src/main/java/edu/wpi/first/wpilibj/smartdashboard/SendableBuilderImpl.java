@@ -107,7 +107,9 @@ public class SendableBuilderImpl implements SendableBuilder {
     for (Property property : m_properties) {
       property.startListener();
     }
-    m_controllableEntry.setBoolean(true);
+    if (m_controllableEntry != null) {
+      m_controllableEntry.setBoolean(true);
+    }
   }
 
   /**
@@ -117,7 +119,9 @@ public class SendableBuilderImpl implements SendableBuilder {
     for (Property property : m_properties) {
       property.stopListener();
     }
-    m_controllableEntry.setBoolean(false);
+    if (m_controllableEntry != null) {
+      m_controllableEntry.setBoolean(false);
+    }
   }
 
   /**
