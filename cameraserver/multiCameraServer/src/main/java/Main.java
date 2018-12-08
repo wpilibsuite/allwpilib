@@ -125,7 +125,7 @@ public final class Main {
     // team number
     JsonElement teamElement = obj.get("team");
     if (teamElement == null) {
-      parseError("could not read team number\n");
+      parseError("could not read team number");
       return false;
     }
     team = teamElement.getAsInt();
