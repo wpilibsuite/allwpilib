@@ -86,7 +86,7 @@ WebSocketServer::WebSocketServer(uv::Stream& stream,
     StringRef protocol = m_helper.MatchProtocol(protocols).second;
 
     // Disconnect our header reader
-    m_headerConn.disconnect();
+    m_dataConn.disconnect();
 
     // Accepting the stream may destroy this (as it replaces the stream user
     // data), so grab a shared pointer first.
@@ -104,14 +104,15 @@ WebSocketServer::WebSocketServer(uv::Stream& stream,
 
   // Set up stream
   stream.StartRead();
-  m_headerConn =
+  m_dataConn =
       stream.data.connect_connection([this](uv::Buffer& buf, size_t size) {
         if (m_aborted) return;
         m_req.Execute(StringRef{buf.base, size});
         if (m_req.HasError()) Abort(400, "Bad Request");
       });
-  stream.error.connect([this](uv::Error) { m_stream.Close(); });
-  stream.end.connect([this] { m_stream.Close(); });
+  m_errorConn =
+      stream.error.connect_connection([this](uv::Error) { m_stream.Close(); });
+  m_endConn = stream.end.connect_connection([this] { m_stream.Close(); });
 }
 
 std::shared_ptr<WebSocketServer> WebSocketServer::Create(

@@ -31,7 +31,7 @@ HttpServerConnection::HttpServerConnection(std::shared_ptr<uv::Stream> stream)
   });
 
   // pass incoming data to HTTP parser
-  m_headerConn =
+  m_dataConn =
       stream->data.connect_connection([this](uv::Buffer& buf, size_t size) {
         m_request.Execute(StringRef{buf.base, size});
         if (m_request.HasError()) {
@@ -41,7 +41,8 @@ HttpServerConnection::HttpServerConnection(std::shared_ptr<uv::Stream> stream)
       });
 
   // close when remote side closes
-  stream->end.connect([h = stream.get()] { h->Close(); });
+  m_endConn =
+      stream->end.connect_connection([h = stream.get()] { h->Close(); });
 
   // start reading
   stream->StartRead();
