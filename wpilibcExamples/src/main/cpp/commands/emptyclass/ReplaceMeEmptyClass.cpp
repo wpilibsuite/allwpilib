@@ -7,5 +7,4 @@
 
 #include "ReplaceMeEmptyClass.h"
 
-ReplaceMeEmptyClass::ReplaceMeEmptyClass() {
-}
+ReplaceMeEmptyClass::ReplaceMeEmptyClass() {}
