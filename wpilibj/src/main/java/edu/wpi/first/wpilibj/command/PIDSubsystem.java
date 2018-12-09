@@ -89,7 +89,7 @@ public abstract class PIDSubsystem extends Subsystem {
    * @param p      the proportional value
    * @param i      the integral value
    * @param d      the derivative value
-   * @param f    the feed forward value
+   * @param f      the feed forward value
    * @param period the time (in seconds) between calculations
    */
   @SuppressWarnings("ParameterName")
