@@ -68,6 +68,7 @@ licenseUpdateExclude {
   src/main/native/include/wpi/TCPAcceptor\.h$
   src/main/native/include/wpi/TCPConnector\.h$
   src/main/native/include/wpi/TCPStream\.h$
+  src/test/native/cpp/inja/
 }
 
 repoRootNameOverride {
@@ -78,4 +79,5 @@ includeGuardRoots {
   wpiutil/src/main/native/cpp/
   wpiutil/src/main/native/include/
   wpiutil/src/test/native/cpp/
+  wpiutil/src/test/native/include/
 }
