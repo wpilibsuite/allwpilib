@@ -1,5 +1,20 @@
 [
   {
+    "name": "Empty Class",
+    "description": "Create an empty command",
+    "tags": [
+      "class"
+    ],
+    "foldername": "emptyclass",
+    "headers": [
+      "ReplaceMeEmptyClass.h"
+    ],
+    "source": [
+      "ReplaceMeEmptyClass.cpp"
+    ],
+    "replacename": "ReplaceMeEmptyClass"
+  },
+  {
     "name": "Command",
     "description": "Create a base command",
     "tags": [
