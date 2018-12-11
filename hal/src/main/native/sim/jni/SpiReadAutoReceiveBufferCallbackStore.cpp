@@ -39,7 +39,7 @@ void SpiReadAutoReceiveBufferCallbackStore::create(JNIEnv* env, jobject obj) {
 }
 
 int32_t SpiReadAutoReceiveBufferCallbackStore::performCallback(
-    const char* name, unsigned char* buffer, int32_t numToRead) {
+    const char* name, uint32_t* buffer, int32_t numToRead) {
   JNIEnv* env;
   JavaVM* vm = sim::GetJVM();
   bool didAttachThread = false;
@@ -58,15 +58,14 @@ int32_t SpiReadAutoReceiveBufferCallbackStore::performCallback(
     wpi::outs().flush();
   }
 
-  auto toCallbackArr =
-      MakeJByteArray(env, wpi::StringRef{reinterpret_cast<const char*>(buffer),
-                                         static_cast<size_t>(numToRead)});
+  auto toCallbackArr = MakeJIntArray(
+      env, wpi::ArrayRef<uint32_t>{buffer, static_cast<size_t>(numToRead)});
 
   jint ret = env->CallIntMethod(m_call, sim::GetBufferCallback(),
                                 MakeJString(env, name), toCallbackArr,
                                 (jint)numToRead);
 
-  jbyte* fromCallbackArr = reinterpret_cast<jbyte*>(
+  jint* fromCallbackArr = reinterpret_cast<jint*>(
       env->GetPrimitiveArrayCritical(toCallbackArr, nullptr));
 
   for (int i = 0; i < ret; i++) {
@@ -106,7 +105,7 @@ SIM_JniHandle sim::AllocateSpiBufferCallback(
 
   callbackStore->create(env, callback);
 
-  auto callbackFunc = [](const char* name, void* param, unsigned char* buffer,
+  auto callbackFunc = [](const char* name, void* param, uint32_t* buffer,
                          int32_t numToRead, int32_t* outputCount) {
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle handle = static_cast<SIM_JniHandle>(handleTmp);

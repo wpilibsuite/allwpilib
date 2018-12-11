@@ -46,7 +46,7 @@ int32_t SPIData::Transaction(const uint8_t* dataToSend, uint8_t* dataReceived,
   return size;
 }
 
-int32_t SPIData::ReadAutoReceivedData(uint8_t* buffer, int32_t numToRead,
+int32_t SPIData::ReadAutoReceivedData(uint32_t* buffer, int32_t numToRead,
                                       double timeout, int32_t* status) {
   int32_t outputCount = 0;
   autoReceivedData(buffer, numToRead, &outputCount);

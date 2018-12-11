@@ -51,3 +51,7 @@ endif()
 
 install(FILES cameraserver-config.cmake DESTINATION ${cameraserver_config_dir})
 install(EXPORT cameraserver DESTINATION ${cameraserver_config_dir})
+
+file(GLOB multiCameraServer_src multiCameraServer/src/main/native/cpp/*.cpp)
+add_executable(multiCameraServer ${multiCameraServer_src})
+target_link_libraries(multiCameraServer cameraserver)

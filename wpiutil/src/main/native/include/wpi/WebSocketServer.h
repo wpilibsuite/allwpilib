@@ -137,7 +137,9 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
   SmallVector<std::string, 2> m_protocols;
   ServerOptions m_options;
   bool m_aborted = false;
-  sig::Connection m_headerConn;
+  sig::ScopedConnection m_dataConn;
+  sig::ScopedConnection m_errorConn;
+  sig::ScopedConnection m_endConn;
 
   void Abort(uint16_t code, StringRef reason);
 };

@@ -1,5 +1,14 @@
 [
   {
+    "name": "Empty Class",
+    "description": "Create an empty class",
+    "tags": [
+      "class"
+    ],
+    "foldername": "emptyclass",
+    "replacename": "ReplaceMeEmptyClass"
+  },
+  {
     "name": "Command",
     "description": "Create a base command",
     "tags": [

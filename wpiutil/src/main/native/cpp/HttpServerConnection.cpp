@@ -16,22 +16,33 @@ using namespace wpi;
 HttpServerConnection::HttpServerConnection(std::shared_ptr<uv::Stream> stream)
     : m_stream(*stream) {
   // process HTTP messages
-  m_request.messageComplete.connect([this](bool keepAlive) {
-    m_keepAlive = keepAlive;
-    ProcessRequest();
-  });
+  m_messageCompleteConn =
+      m_request.messageComplete.connect_connection([this](bool keepAlive) {
+        m_keepAlive = keepAlive;
+        ProcessRequest();
+      });
 
-  // pass incoming data to HTTP parser
-  stream->data.connect([this](uv::Buffer& buf, size_t size) {
-    m_request.Execute(StringRef{buf.base, size});
-    if (m_request.HasError()) {
-      // could not parse; just close the connection
-      m_stream.Close();
+  // look for Accept-Encoding headers to determine if gzip is acceptable
+  m_request.messageBegin.connect([this] { m_acceptGzip = false; });
+  m_request.header.connect([this](StringRef name, StringRef value) {
+    if (name.equals_lower("accept-encoding") && value.contains("gzip")) {
+      m_acceptGzip = true;
     }
   });
 
+  // pass incoming data to HTTP parser
+  m_dataConn =
+      stream->data.connect_connection([this](uv::Buffer& buf, size_t size) {
+        m_request.Execute(StringRef{buf.base, size});
+        if (m_request.HasError()) {
+          // could not parse; just close the connection
+          m_stream.Close();
+        }
+      });
+
   // close when remote side closes
-  stream->end.connect([h = stream.get()] { h->Close(); });
+  m_endConn =
+      stream->end.connect_connection([h = stream.get()] { h->Close(); });
 
   // start reading
   stream->StartRead();
@@ -60,7 +71,7 @@ void HttpServerConnection::BuildHeader(raw_ostream& os, int code,
   os << "Access-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\n";
   SmallString<128> extraBuf;
   StringRef extraStr = extra.toStringRef(extraBuf);
-  if (!extraStr.empty()) os << extraStr << "\r\n";
+  if (!extraStr.empty()) os << extraStr;
   os << "\r\n";  // header ends with a blank line
 }
 
@@ -83,6 +94,31 @@ void HttpServerConnection::SendResponse(int code, const Twine& codeText,
   os << content;
   // close after write completes if we aren't keeping alive
   SendData(os.bufs(), !m_keepAlive);
+}
+
+void HttpServerConnection::SendStaticResponse(int code, const Twine& codeText,
+                                              const Twine& contentType,
+                                              StringRef content, bool gzipped,
+                                              const Twine& extraHeader) {
+  // TODO: handle remote side not accepting gzip (very rare)
+
+  StringRef contentEncodingHeader;
+  if (gzipped /* && m_acceptGzip*/)
+    contentEncodingHeader = "Content-Encoding: gzip\r\n";
+
+  SmallVector<uv::Buffer, 4> bufs;
+  raw_uv_ostream os{bufs, 4096};
+  BuildHeader(os, code, codeText, contentType, content.size(),
+              extraHeader + contentEncodingHeader);
+  // can send content without copying
+  bufs.emplace_back(content);
+
+  m_stream.Write(bufs, [ closeAfter = !m_keepAlive, stream = &m_stream ](
+                           MutableArrayRef<uv::Buffer> bufs, uv::Error) {
+    // don't deallocate the static content
+    for (auto&& buf : bufs.drop_back()) buf.Deallocate();
+    if (closeAfter) stream->Close();
+  });
 }
 
 void HttpServerConnection::SendError(int code, const Twine& message) {

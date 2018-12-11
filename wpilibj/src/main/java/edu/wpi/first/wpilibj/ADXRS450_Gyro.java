@@ -92,12 +92,12 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
     Timer.delay(0.1);
 
-    m_spi.setAccumulatorCenter(0);
+    m_spi.setAccumulatorIntegratedCenter(0);
     m_spi.resetAccumulator();
 
     Timer.delay(kCalibrationSampleTime);
 
-    m_spi.setAccumulatorCenter((int) m_spi.getAccumulatorAverage());
+    m_spi.setAccumulatorIntegratedCenter(m_spi.getAccumulatorIntegratedAverage());
     m_spi.resetAccumulator();
   }
 
@@ -154,7 +154,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
     if (m_spi == null) {
       return 0.0;
     }
-    return m_spi.getAccumulatorValue() * kDegreePerSecondPerLSB * kSamplePeriod;
+    return m_spi.getAccumulatorIntegratedValue() * kDegreePerSecondPerLSB;
   }
 
   @Override

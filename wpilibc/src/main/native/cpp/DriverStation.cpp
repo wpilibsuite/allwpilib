@@ -160,7 +160,7 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
     wpi_setWPIError(BadJoystickIndex);
     return false;
   }
-  if (button == 0) {
+  if (button <= 0) {
     ReportJoystickUnpluggedError(
         "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
@@ -189,7 +189,7 @@ double DriverStation::GetStickAxis(int stick, int axis) {
     wpi_setWPIError(BadJoystickIndex);
     return 0.0;
   }
-  if (axis >= HAL_kMaxJoystickAxes) {
+  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
     wpi_setWPIError(BadJoystickAxis);
     return 0.0;
   }
@@ -211,7 +211,7 @@ int DriverStation::GetStickPOV(int stick, int pov) {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
   }
-  if (pov >= HAL_kMaxJoystickPOVs) {
+  if (pov < 0 || pov >= HAL_kMaxJoystickPOVs) {
     wpi_setWPIError(BadJoystickAxis);
     return -1;
   }

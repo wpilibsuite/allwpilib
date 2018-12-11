@@ -69,7 +69,7 @@ jint SimOnLoad(JavaVM* vm, void* reserved) {
 
   spiReadAutoReceiveBufferCallbackCallback =
       env->GetMethodID(spiReadAutoReceiveBufferCallbackCls, "callback",
-                       "(Ljava/lang/String;[BI)I");
+                       "(Ljava/lang/String;[II)I");
   if (!spiReadAutoReceiveBufferCallbackCallback) return JNI_ERR;
 
   InitializeStore();

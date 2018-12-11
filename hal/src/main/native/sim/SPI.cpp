@@ -54,7 +54,7 @@ void HAL_SetSPIAutoTransmitData(HAL_SPIPort port, const uint8_t* dataToSend,
                                 int32_t dataSize, int32_t zeroSize,
                                 int32_t* status) {}
 void HAL_ForceSPIAutoRead(HAL_SPIPort port, int32_t* status) {}
-int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint8_t* buffer,
+int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint32_t* buffer,
                                     int32_t numToRead, double timeout,
                                     int32_t* status) {
   return SimSPIData[port].ReadAutoReceivedData(buffer, numToRead, timeout,

@@ -65,6 +65,9 @@ public class LiveWindow {
    */
   public static synchronized void setEnabled(boolean enabled) {
     if (liveWindowEnabled != enabled) {
+      startLiveWindow = enabled;
+      liveWindowEnabled = enabled;
+      updateValues(); // Force table generation now to make sure everything is defined
       Scheduler scheduler = Scheduler.getInstance();
       if (enabled) {
         System.out.println("Starting live window mode.");
@@ -77,8 +80,6 @@ public class LiveWindow {
         }
         scheduler.enable();
       }
-      startLiveWindow = enabled;
-      liveWindowEnabled = enabled;
       enabledEntry.setBoolean(enabled);
     }
   }

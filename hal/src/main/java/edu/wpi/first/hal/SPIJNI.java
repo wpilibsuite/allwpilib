@@ -57,7 +57,7 @@ public class SPIJNI extends JNIWrapper {
   public static native int spiReadAutoReceivedData(int port, ByteBuffer buffer, int numToRead,
                                                    double timeout);
 
-  public static native int spiReadAutoReceivedData(int port, byte[] buffer, int numToRead,
+  public static native int spiReadAutoReceivedData(int port, int[] buffer, int numToRead,
                                                    double timeout);
 
   public static native int spiGetAutoDroppedCount(int port);

@@ -33,12 +33,12 @@ void SendableBuilderImpl::UpdateTable() {
 
 void SendableBuilderImpl::StartListeners() {
   for (auto& property : m_properties) property.StartListener();
-  m_controllableEntry.SetBoolean(true);
+  if (m_controllableEntry) m_controllableEntry.SetBoolean(true);
 }
 
 void SendableBuilderImpl::StopListeners() {
   for (auto& property : m_properties) property.StopListener();
-  m_controllableEntry.SetBoolean(false);
+  if (m_controllableEntry) m_controllableEntry.SetBoolean(false);
 }
 
 void SendableBuilderImpl::StartLiveWindowMode() {

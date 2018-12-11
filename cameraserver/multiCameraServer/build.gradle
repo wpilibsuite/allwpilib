@@ -1,0 +1,62 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'cpp'
+    id 'visual-studio'
+}
+
+apply plugin: 'edu.wpi.first.NativeUtils'
+
+apply from: "${rootDir}/shared/config.gradle"
+
+ext {
+    staticCvConfigs = [multiCameraServerCpp: []]
+    useJava = true
+    useCpp = true
+    skipDev = true
+}
+
+apply from: "${rootDir}/shared/opencv.gradle"
+
+mainClassName = 'Main'
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.google.code.gson:gson:2.8.5'
+
+    compile project(':wpiutil')
+    compile project(':ntcore')
+    compile project(':cscore')
+    compile project(':cameraserver')
+}
+
+model {
+    components {
+        multiCameraServerCpp(NativeExecutableSpec) {
+            targetBuildTypes 'release'
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src/main/native/cpp']
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        srcDirs = ['src/main/native/include']
+                        includes = ['**/*.h']
+                    }
+                }
+            }
+            binaries.all { binary ->
+                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
+                    lib project: ':ntcore', library: 'ntcore', linkage: 'static'
+                    lib project: ':cscore', library: 'cscore', linkage: 'static'
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+            }
+        }
+    }
+}

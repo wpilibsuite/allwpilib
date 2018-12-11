@@ -194,6 +194,7 @@ NetworkTable::NetworkTable(NT_Inst inst, const Twine& path, const private_init&)
 
 NetworkTable::~NetworkTable() {
   for (auto& i : m_listeners) RemoveEntryListener(i.second);
+  for (auto i : m_lambdaListeners) RemoveEntryListener(i);
 }
 
 NetworkTableInstance NetworkTable::GetInstance() const {
@@ -295,6 +296,40 @@ void NetworkTable::AddTableListenerEx(StringRef key, ITableListener* listener,
 
 void NetworkTable::AddSubTableListener(ITableListener* listener) {
   AddSubTableListener(listener, false);
+}
+
+NT_EntryListener NetworkTable::AddSubTableListener(TableListener listener,
+                                                   bool localNotify) {
+  size_t prefix_len = m_path.size() + 1;
+
+  // The lambda needs to be copyable, but StringMap is not, so use
+  // a shared_ptr to it.
+  auto notified_tables = std::make_shared<wpi::StringMap<char>>();
+
+  unsigned int flags = NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE;
+  if (localNotify) flags |= NT_NOTIFY_LOCAL;
+  NT_EntryListener id = nt::AddEntryListener(
+      m_inst, m_path + Twine(PATH_SEPARATOR_CHAR),
+      [=](const EntryNotification& event) {
+        StringRef relative_key = event.name.substr(prefix_len);
+        auto end_sub_table = relative_key.find(PATH_SEPARATOR_CHAR);
+        if (end_sub_table == StringRef::npos) return;
+        StringRef sub_table_key = relative_key.substr(0, end_sub_table);
+        if (notified_tables->find(sub_table_key) == notified_tables->end())
+          return;
+        notified_tables->insert(std::make_pair(sub_table_key, '\0'));
+        listener(this, sub_table_key, this->GetSubTable(sub_table_key));
+      },
+      flags);
+  m_lambdaListeners.emplace_back(id);
+  return id;
+}
+
+void NetworkTable::RemoveTableListener(NT_EntryListener listener) {
+  nt::RemoveEntryListener(listener);
+  auto matches_begin =
+      std::remove(m_lambdaListeners.begin(), m_lambdaListeners.end(), listener);
+  m_lambdaListeners.erase(matches_begin, m_lambdaListeners.end());
 }
 
 void NetworkTable::AddSubTableListener(ITableListener* listener,

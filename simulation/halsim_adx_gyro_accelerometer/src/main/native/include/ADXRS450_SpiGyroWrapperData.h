@@ -18,7 +18,7 @@ class ADXRS450_SpiGyroWrapper {
   bool GetInitialized() const;
 
   void HandleRead(uint8_t* buffer, uint32_t count);
-  void HandleAutoReceiveData(uint8_t* buffer, int32_t numToRead,
+  void HandleAutoReceiveData(uint32_t* buffer, int32_t numToRead,
                              int32_t& outputCount);
 
   int32_t RegisterAngleCallback(HAL_NotifyCallback callback, void* param,

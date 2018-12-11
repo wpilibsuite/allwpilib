@@ -24,7 +24,7 @@ class WatchdogTest {
       watchdogCounter.addAndGet(1);
     });
 
-    // Run 1
+    System.out.println("Run 1");
     watchdog.enable();
     try {
       Thread.sleep(200);
@@ -35,7 +35,7 @@ class WatchdogTest {
 
     assertEquals(0, watchdogCounter.get(), "Watchdog triggered early");
 
-    // Run 2
+    System.out.println("Run 2");
     watchdogCounter.set(0);
     watchdog.enable();
     try {
@@ -140,7 +140,7 @@ class WatchdogTest {
       watchdogCounter.addAndGet(1);
     });
 
-    // Run 1
+    System.out.println("Run 1");
     watchdog.enable();
     watchdog.addEpoch("Epoch 1");
     try {
@@ -156,11 +156,10 @@ class WatchdogTest {
     }
     watchdog.addEpoch("Epoch 3");
     watchdog.disable();
-    watchdog.printEpochs();
 
     assertEquals(0, watchdogCounter.get(), "Watchdog triggered early");
 
-    // Run 2
+    System.out.println("Run 2");
     watchdog.enable();
     watchdog.addEpoch("Epoch 1");
     try {
@@ -176,7 +175,6 @@ class WatchdogTest {
     }
     watchdog.addEpoch("Epoch 2");
     watchdog.disable();
-    watchdog.printEpochs();
 
     assertEquals(0, watchdogCounter.get(), "Watchdog triggered early");
   }

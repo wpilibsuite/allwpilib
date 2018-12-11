@@ -218,16 +218,20 @@ void HAL_SetSPIAutoTransmitData(HAL_SPIPort port, const uint8_t* dataToSend,
 void HAL_ForceSPIAutoRead(HAL_SPIPort port, int32_t* status);
 
 /**
- * Reads data received by the SPI accumulator.
+ * Reads data received by the SPI accumulator.  Each received data sequence
+ * consists of a timestamp followed by the received data bytes, one byte per
+ * word (in the least significant byte).  The length of each received data
+ * sequence is the same as the combined dataSize + zeroSize set in
+ * HAL_SetSPIAutoTransmitData.
  *
  * @param port      The number of the port to use. 0-3 for Onboard CS0-CS2, 4
  * for MXP.
  * @param buffer    The buffer to store the data into.
- * @param numToRead The number of bytes to read.
+ * @param numToRead The number of words to read.
  * @param timeout   The read timeout (in seconds).
- * @return          The number of bytes actually read.
+ * @return          The number of words actually read.
  */
-int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint8_t* buffer,
+int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint32_t* buffer,
                                     int32_t numToRead, double timeout,
                                     int32_t* status);
 

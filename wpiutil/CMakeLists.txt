@@ -1,6 +1,7 @@
 project(wpiutil)
 
 include(SubDirList)
+include(GenResources)
 
 # Java bindings
 if (NOT WITHOUT_JAVA)
@@ -22,6 +23,8 @@ endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
+
+GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpiutil_resources_src)
 
 file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp)
 
@@ -69,7 +72,7 @@ set(uv_linux_src
     src/main/native/libuv/unix/sysinfo-memory.cpp
 )
 
-add_library(wpiutil ${wpiutil_native_src} ${uv_native_src})
+add_library(wpiutil ${wpiutil_native_src} ${uv_native_src} ${wpiutil_resources_src})
 set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpiutil PROPERTY FOLDER "libraries")

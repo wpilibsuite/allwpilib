@@ -13,6 +13,8 @@
 
 using namespace frc;
 
+constexpr std::chrono::milliseconds Watchdog::kMinPrintPeriod;
+
 class Watchdog::Thread : public wpi::SafeThread {
  public:
   template <typename T>
@@ -46,9 +48,14 @@ void Watchdog::Thread::Main() {
         auto watchdog = m_watchdogs.top();
         m_watchdogs.pop();
 
-        wpi::outs() << "Watchdog not fed within "
-                    << wpi::format("%.6f", watchdog->m_timeout.count() / 1.0e6)
-                    << "s\n";
+        auto now = hal::fpga_clock::now();
+        if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
+          watchdog->m_lastTimeoutPrintTime = now;
+          wpi::outs() << "Watchdog not fed within "
+                      << wpi::format("%.6f",
+                                     watchdog->m_timeout.count() / 1.0e6)
+                      << "s\n";
+        }
         lock.unlock();
         watchdog->m_callback();
         lock.lock();
@@ -112,10 +119,14 @@ void Watchdog::AddEpoch(wpi::StringRef epochName) {
 }
 
 void Watchdog::PrintEpochs() {
-  for (const auto& epoch : m_epochs) {
-    wpi::outs() << '\t' << epoch.getKey() << ": "
-                << wpi::format("%.6f", epoch.getValue().count() / 1.0e6)
-                << "s\n";
+  auto now = hal::fpga_clock::now();
+  if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
+    m_lastEpochsPrintTime = now;
+    for (const auto& epoch : m_epochs) {
+      wpi::outs() << '\t' << epoch.getKey() << ": "
+                  << wpi::format("%.6f", epoch.getValue().count() / 1.0e6)
+                  << "s\n";
+    }
   }
 }
 

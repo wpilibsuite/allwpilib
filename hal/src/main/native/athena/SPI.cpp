@@ -604,7 +604,7 @@ void HAL_ForceSPIAutoRead(HAL_SPIPort port, int32_t* status) {
   spiSystem->strobeAutoForceOne(status);
 }
 
-int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint8_t* buffer,
+int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint32_t* buffer,
                                     int32_t numToRead, double timeout,
                                     int32_t* status) {
   std::lock_guard<wpi::mutex> lock(spiAutoMutex);
