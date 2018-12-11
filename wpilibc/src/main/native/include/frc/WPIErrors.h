@@ -75,6 +75,7 @@ S(SmartDashboardMissingKey, -43, "SmartDashboard data does not exist");
 S(CommandIllegalUse, -50, "Illegal use of Command");
 S(UnsupportedInSimulation, -80, "Unsupported in simulation");
 S(CameraServerError, -90, "CameraServer error");
+S(InvalidParameter, -100, "Invalid parameter value");
 
 // Warnings
 S(SampleRateTooHigh, 1, "Analog module sample rate is too high");

@@ -18,6 +18,8 @@
 #include <wpi/StringMap.h>
 #include <wpi/Twine.h>
 
+#include "frc/ErrorBase.h"
+#include "frc/WPIErrors.h"
 #include "frc/shuffleboard/LayoutType.h"
 #include "frc/shuffleboard/ShuffleboardComponentBase.h"
 #include "frc/shuffleboard/ShuffleboardValue.h"
@@ -32,7 +34,8 @@ class SimpleWidget;
 /**
  * Common interface for objects that can contain shuffleboard components.
  */
-class ShuffleboardContainer : public virtual ShuffleboardValue {
+class ShuffleboardContainer : public virtual ShuffleboardValue,
+                              public ErrorBase {
  public:
   explicit ShuffleboardContainer(const wpi::Twine& title);
 

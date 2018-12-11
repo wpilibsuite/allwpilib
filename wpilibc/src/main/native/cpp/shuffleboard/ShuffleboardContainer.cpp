@@ -47,7 +47,8 @@ ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& title) {
   wpi::SmallVector<char, 16> storage;
   auto titleRef = title.toStringRef(storage);
   if (m_layouts.count(titleRef) == 0) {
-    // TODO error - no such layout
+    wpi_setWPIErrorWithContext(
+        InvalidParameter, "No layout with the given title has been defined");
   }
   return *m_layouts[titleRef];
 }
