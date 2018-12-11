@@ -54,8 +54,8 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @param layoutType the type of the layout, eg "List" or "Grid"
    * @return the layout
    */
-  ShuffleboardLayout& GetLayout(const LayoutType& type,
-                                const wpi::Twine& title);
+  ShuffleboardLayout& GetLayout(const wpi::Twine& title,
+                                const LayoutType& type);
 
   /**
    * Gets the layout with the given type and title, creating it if it does not
@@ -70,8 +70,8 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return the layout
    * @see #GetLayout(String, LayoutType)
    */
-  ShuffleboardLayout& GetLayout(const wpi::Twine& type,
-                                const wpi::Twine& title);
+  ShuffleboardLayout& GetLayout(const wpi::Twine& title,
+                                const wpi::Twine& type);
 
   /**
    * Gets the already-defined layout in this container with the given title.

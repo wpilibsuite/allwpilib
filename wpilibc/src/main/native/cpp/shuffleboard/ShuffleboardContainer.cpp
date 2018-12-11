@@ -25,8 +25,13 @@ ShuffleboardContainer::GetComponents() const {
   return m_components;
 }
 
-ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& type,
-                                                     const wpi::Twine& title) {
+ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& title,
+                                                     const LayoutType& type) {
+  return GetLayout(title, type.GetLayoutName());
+}
+
+ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& title,
+                                                     const wpi::Twine& type) {
   wpi::SmallVector<char, 16> storage;
   auto titleRef = title.toStringRef(storage);
   if (m_layouts.count(titleRef) == 0) {
@@ -34,6 +39,15 @@ ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& type,
     auto ptr = layout.get();
     m_components.emplace_back(std::move(layout));
     m_layouts.insert(std::make_pair(titleRef, ptr));
+  }
+  return *m_layouts[titleRef];
+}
+
+ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& title) {
+  wpi::SmallVector<char, 16> storage;
+  auto titleRef = title.toStringRef(storage);
+  if (m_layouts.count(titleRef) == 0) {
+    // TODO error - no such layout
   }
   return *m_layouts[titleRef];
 }
