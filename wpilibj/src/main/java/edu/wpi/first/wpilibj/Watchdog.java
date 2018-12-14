@@ -23,6 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * <p>The watchdog is initialized disabled, so the user needs to call enable() before use.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class Watchdog implements Closeable, Comparable<Watchdog> {
   // Used for timeout print rate-limiting
   private static final long kMinPrintPeriod = 1000000; // us
@@ -37,6 +38,8 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   @SuppressWarnings("PMD.UseConcurrentHashMap")
   private final Map<String, Long> m_epochs = new HashMap<>();
   boolean m_isExpired;
+
+  boolean m_suppressTimeoutMessage;
 
   static {
     startDaemonThread(() -> schedulerFunc());
@@ -201,6 +204,17 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     }
   }
 
+  /**
+   * Enable or disable suppression of the generic timeout message.
+   *
+   * <p>This may be desirable if the user-provided callback already prints a more specific message.
+   *
+   * @param suppress Whether to suppress generic timeout message.
+   */
+  public void suppressTimeoutMessage(boolean suppress) {
+    m_suppressTimeoutMessage = suppress;
+  }
+
   private static Thread startDaemonThread(Runnable target) {
     Thread inst = new Thread(target);
     inst.setDaemon(true);
@@ -229,7 +243,9 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
             long now = RobotController.getFPGATime();
             if (now  - watchdog.m_lastTimeoutPrintTime > kMinPrintPeriod) {
               watchdog.m_lastTimeoutPrintTime = now;
-              System.out.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout / 1.0e6);
+              if (!watchdog.m_suppressTimeoutMessage) {
+                System.out.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout / 1.0e6);
+              }
             }
             m_queueMutex.unlock();
             watchdog.m_callback.run();
