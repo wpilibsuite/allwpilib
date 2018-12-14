@@ -51,10 +51,12 @@ void Watchdog::Thread::Main() {
         auto now = hal::fpga_clock::now();
         if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
           watchdog->m_lastTimeoutPrintTime = now;
-          wpi::outs() << "Watchdog not fed within "
-                      << wpi::format("%.6f",
-                                     watchdog->m_timeout.count() / 1.0e6)
-                      << "s\n";
+          if (!watchdog->m_suppressTimeoutMessage) {
+            wpi::outs() << "Watchdog not fed within "
+                        << wpi::format("%.6f",
+                                       watchdog->m_timeout.count() / 1.0e6)
+                        << "s\n";
+          }
         }
         lock.unlock();
         watchdog->m_callback();
@@ -157,6 +159,10 @@ void Watchdog::Disable() {
 
   thr->m_watchdogs.remove(this);
   thr->m_cond.notify_all();
+}
+
+void Watchdog::SuppressTimeoutMessage(bool suppress) {
+  m_suppressTimeoutMessage = suppress;
 }
 
 bool Watchdog::operator>(const Watchdog& rhs) {
