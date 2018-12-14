@@ -7,6 +7,8 @@
 
 #include "inja_parser.h"
 
+#include <cctype>
+
 #include "wpi/Path.h"
 #include "wpi/SmallString.h"
 #include "wpi/raw_istream.h"
