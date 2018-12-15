@@ -307,6 +307,7 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
         std::memcpy(i->second.data, data, i->second.length);
         *length = i->second.length;
         *receivedTimestamp = i->second.lastTimeStamp;
+        return;
       }
     }
   }
