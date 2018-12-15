@@ -196,6 +196,7 @@ void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
     auto& msg = can->receives[messageId];
     msg.length = dataSize;
     msg.lastTimeStamp = timestamp;
+    // The NetComm call placed in data, copy into the msg
     std::memcpy(msg.data, data, dataSize);
   }
   *length = dataSize;
@@ -226,11 +227,13 @@ void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
     *length = dataSize;
     msg.lastTimeStamp = timestamp;
     *receivedTimestamp = timestamp;
+    // The NetComm call placed in data, copy into the msg
     std::memcpy(msg.data, data, dataSize);
   } else {
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
-      std::memcpy(i->second.data, data, i->second.length);
+      // Read the data from the stored message into the output
+      std::memcpy(data, i->second.data, i->second.length);
       *length = i->second.length;
       *receivedTimestamp = i->second.lastTimeStamp;
       *status = 0;
@@ -263,6 +266,7 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
     *length = dataSize;
     msg.lastTimeStamp = timestamp;
     *receivedTimestamp = timestamp;
+    // The NetComm call placed in data, copy into the msg
     std::memcpy(msg.data, data, dataSize);
   } else {
     auto i = can->receives.find(messageId);
@@ -275,7 +279,8 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
         *status = HAL_CAN_TIMEOUT;
         return;
       }
-      std::memcpy(i->second.data, data, i->second.length);
+      // Read the data from the stored message into the output
+      std::memcpy(data, i->second.data, i->second.length);
       *length = i->second.length;
       *receivedTimestamp = i->second.lastTimeStamp;
       *status = 0;
@@ -304,7 +309,8 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
       if (now - i->second.lastTimeStamp <
           static_cast<uint64_t>(periodMs) * 1000) {
         *status = 0;
-        std::memcpy(i->second.data, data, i->second.length);
+        // Read the data from the stored message into the output
+        std::memcpy(data, i->second.data, i->second.length);
         *length = i->second.length;
         *receivedTimestamp = i->second.lastTimeStamp;
         return;
@@ -326,6 +332,7 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
     *length = dataSize;
     msg.lastTimeStamp = timestamp;
     *receivedTimestamp = timestamp;
+    // The NetComm call placed in data, copy into the msg
     std::memcpy(msg.data, data, dataSize);
   } else {
     auto i = can->receives.find(messageId);
@@ -338,7 +345,8 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
         *status = HAL_CAN_TIMEOUT;
         return;
       }
-      std::memcpy(i->second.data, data, i->second.length);
+      // Read the data from the stored message into the output
+      std::memcpy(data, i->second.data, i->second.length);
       *length = i->second.length;
       *receivedTimestamp = i->second.lastTimeStamp;
       *status = 0;
