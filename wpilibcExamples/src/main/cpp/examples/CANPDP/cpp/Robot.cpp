@@ -37,4 +37,6 @@ class Robot : public frc::TimedRobot {
   frc::PowerDistributionPanel m_pdp;
 };
 
+#ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
+#endif

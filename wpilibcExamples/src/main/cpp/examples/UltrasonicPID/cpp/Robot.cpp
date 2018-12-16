@@ -80,4 +80,6 @@ class Robot : public frc::TimedRobot {
   frc::PIDController m_pidController{kP, kI, kD, m_ultrasonic, m_pidOutput};
 };
 
+#ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
+#endif

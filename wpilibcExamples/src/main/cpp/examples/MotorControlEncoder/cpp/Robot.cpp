@@ -48,4 +48,6 @@ class Robot : public frc::TimedRobot {
   frc::Encoder m_encoder{0, 1};
 };
 
+#ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
+#endif

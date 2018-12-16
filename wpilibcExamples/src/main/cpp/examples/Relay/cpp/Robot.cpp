@@ -55,4 +55,6 @@ class Robot : public frc::TimedRobot {
   static constexpr int kRelayReverseButton = 2;
 };
 
+#ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
+#endif

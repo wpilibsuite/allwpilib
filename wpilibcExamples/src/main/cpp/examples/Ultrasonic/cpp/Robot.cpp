@@ -50,4 +50,6 @@ class Robot : public frc::TimedRobot {
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
 };
 
+#ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
+#endif
