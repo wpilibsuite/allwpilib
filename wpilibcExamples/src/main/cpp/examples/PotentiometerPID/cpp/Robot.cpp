@@ -73,4 +73,6 @@ class Robot : public frc::TimedRobot {
 
 constexpr std::array<double, 3> Robot::kSetPoints;
 
+#ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
+#endif

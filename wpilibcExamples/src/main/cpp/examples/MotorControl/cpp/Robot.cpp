@@ -26,4 +26,6 @@ class Robot : public frc::TimedRobot {
   frc::Spark m_motor{0};
 };
 
+#ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
+#endif

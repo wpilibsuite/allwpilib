@@ -58,4 +58,6 @@ class Robot : public frc::TimedRobot {
   frc::Joystick m_joystick{kJoystickPort};
 };
 
+#ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
+#endif
