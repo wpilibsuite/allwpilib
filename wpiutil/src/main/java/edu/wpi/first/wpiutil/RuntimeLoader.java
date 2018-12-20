@@ -51,6 +51,16 @@ public final class RuntimeLoader<T> {
     m_extractionRoot = extractionRoot;
   }
 
+  private String getLoadErrorMessage() {
+    StringBuilder msg = new StringBuilder(256);
+    msg.append(m_libraryName)
+       .append(" could not be loaded from path or an embedded resource.\n"
+               + "\tattempted to load for platform ")
+       .append(RuntimeDetector.getPlatformPath())
+       .append('\n');
+    return msg.toString();
+  }
+
   /**
    * Loads a native library.
    */
@@ -66,7 +76,7 @@ public final class RuntimeLoader<T> {
       String resname = RuntimeDetector.getLibraryResource(m_libraryName);
       try (InputStream hashIs = m_loadClass.getResourceAsStream(hashName)) {
         if (hashIs == null) {
-          throw new IOException(hashName + " Resource not found");
+          throw new IOException(getLoadErrorMessage());
         }
         try (Scanner scanner = new Scanner(hashIs, StandardCharsets.UTF_8.name())) {
           String hash = scanner.nextLine();
@@ -78,7 +88,7 @@ public final class RuntimeLoader<T> {
             // If extraction failed, extract
             try (InputStream resIs = m_loadClass.getResourceAsStream(resname)) {
               if (resIs == null) {
-                throw new IOException(resname + " Resource not found");
+                throw new IOException(getLoadErrorMessage());
               }
               jniLibrary.getParentFile().mkdirs();
               try (OutputStream os = Files.newOutputStream(jniLibrary.toPath())) {
@@ -112,7 +122,7 @@ public final class RuntimeLoader<T> {
       String hash = null;
       try (InputStream is = m_loadClass.getResourceAsStream(resname)) {
         if (is == null) {
-          throw new IOException(resname + " Resource not found");
+          throw new IOException(getLoadErrorMessage());
         }
         MessageDigest md = null;
         try {
@@ -144,7 +154,7 @@ public final class RuntimeLoader<T> {
         // If extraction failed, extract
         try (InputStream resIs = m_loadClass.getResourceAsStream(resname)) {
           if (resIs == null) {
-            throw new IOException(resname + " Resource not found");
+            throw new IOException(getLoadErrorMessage());
           }
           jniLibrary.getParentFile().mkdirs();
           try (OutputStream os = Files.newOutputStream(jniLibrary.toPath())) {
