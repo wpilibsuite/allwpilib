@@ -7,7 +7,11 @@
 
 package edu.wpi.first.wpiutil;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public final class RuntimeDetector {
   private static String filePrefix;
@@ -49,6 +53,8 @@ public final class RuntimeDetector {
         filePath = "/linux/x86-64/";
       } else if (isAthena()) {
         filePath = "/linux/athena/";
+      } else if (isRaspbian()) {
+        filePath = "/linux/raspbian/";
       } else {
         filePath = "/linux/nativearm/";
       }
@@ -107,6 +113,19 @@ public final class RuntimeDetector {
   public static boolean isAthena() {
     File runRobotFile = new File("/usr/local/frc/bin/frcRunRobot.sh");
     return runRobotFile.exists();
+  }
+
+  /** check if os is raspbian.
+   *
+   * @return if os is raspbian
+   */
+  public static boolean isRaspbian() {
+    try (BufferedReader reader = Files.newBufferedReader(Paths.get("/etc/os-release"))) {
+      String value = reader.readLine();
+      return value.contains("Raspbian");
+    } catch (IOException ex) {
+      return false;
+    }
   }
 
   public static boolean isLinux() {
