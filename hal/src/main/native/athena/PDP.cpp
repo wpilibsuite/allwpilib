@@ -8,7 +8,6 @@
 #include "hal/PDP.h"
 
 #include <cstring>  // std::memcpy
-#include <iostream>
 #include <memory>
 
 #include <FRC_NetworkCommunication/CANSessionMux.h>
@@ -18,6 +17,7 @@
 #include "PortsInternal.h"
 #include "hal/Errors.h"
 #include "hal/Ports.h"
+#include "hal/handles/UnlimitedHandleResource.h"
 
 using namespace hal;
 
@@ -28,12 +28,10 @@ static constexpr uint32_t kStatusEnergy = 0x08041740;
 
 static constexpr uint32_t kControl1 = 0x08041C00;
 
-static constexpr int32_t kHandleOffset = 100;
-
 static constexpr int32_t kTimeoutMs = 255;
 static constexpr int32_t kOneMinuteMs = 360000;
 
-int32_t GetTimeMs() {
+static int32_t GetTimeMs() {
   std::chrono::time_point<std::chrono::steady_clock> now;
   now = std::chrono::steady_clock::now();
 
@@ -44,18 +42,39 @@ int32_t GetTimeMs() {
   return (int64_t)millis;
 }
 
-wpi::mutex _pdpMut;
-uint8_t _stat0to5[8];
-uint8_t _stat6to11[8];
-uint8_t _stat12to15[8];
-uint8_t _statEnergy[8];
+namespace {
+struct PDPStorage {
+  PDPStorage(uint32_t module_) : module(module_) {
+    time0to5 = GetTimeMs() - kOneMinuteMs;
+    time6to11 = GetTimeMs() - kOneMinuteMs;
+    time12to15 = GetTimeMs() - kOneMinuteMs;
+    timeEnergy = GetTimeMs() - kOneMinuteMs;
+  }
 
-// back-date the starting time so we timeout immediately if no data is received
-// at start.
-int32_t _time0to5 = GetTimeMs() - kOneMinuteMs;
-int32_t _time6to11 = GetTimeMs() - kOneMinuteMs;
-int32_t _time12to15 = GetTimeMs() - kOneMinuteMs;
-int32_t _timeEnergy = GetTimeMs() - kOneMinuteMs;
+  void GetStatus0to5();
+  void GetStatus6to11();
+  void GetStatus12to15();
+  void GetStatusEnergy();
+
+  uint32_t module;
+
+  wpi::mutex pdpMutex;
+  uint8_t stat0to5[8];
+  uint8_t stat6to11[8];
+  uint8_t stat12to15[8];
+  uint8_t statEnergy[8];
+
+  // back-date the starting time so we timeout immediately if no data is
+  // received at start.
+  int32_t time0to5;
+  int32_t time6to11;
+  int32_t time12to15;
+  int32_t timeEnergy;
+};
+}
+
+static UnlimitedHandleResource<HAL_PDPHandle, PDPStorage, HAL_HandleEnum::PDP>*
+    pdpHandles;
 
 /* encoder/decoders */
 union PdpStatus1 {
@@ -131,12 +150,17 @@ union PdpStatusEnergy {
 
 namespace hal {
 namespace init {
-void InitializePDP() {}
+void InitializePDP() {
+  static UnlimitedHandleResource<HAL_PDPHandle, PDPStorage, HAL_HandleEnum::PDP>
+      pH;
+  pdpHandles = &pH;
+}
 }  // namespace init
 }  // namespace hal
 
 /* ----------- CAN routines  ------- */
-int32_t PDP_ReadMsg(uint32_t messageID, uint32_t* timeStamp, uint8_t data[8]) {
+static int32_t PDP_ReadMsg(uint32_t messageID, uint32_t* timeStamp,
+                           uint8_t data[8]) {
   uint8_t dataSize = 0;
   *timeStamp = 0;
   int32_t status = 0;
@@ -144,8 +168,9 @@ int32_t PDP_ReadMsg(uint32_t messageID, uint32_t* timeStamp, uint8_t data[8]) {
       &messageID, 0x1fffffff, data, &dataSize, timeStamp, &status);
   return status;
 }
-int32_t PDP_WriteMsgOnce(uint32_t messageID, const uint8_t data[8],
-                         uint8_t dataSize) {
+
+static int32_t PDP_WriteMsgOnce(uint32_t messageID, const uint8_t data[8],
+                                uint8_t dataSize) {
   int32_t status = 0;
   FRC_NetworkCommunication_CANSessionMux_sendMessage(messageID, data, dataSize,
                                                      0, &status);
@@ -153,7 +178,7 @@ int32_t PDP_WriteMsgOnce(uint32_t messageID, const uint8_t data[8],
 }
 
 /* ----------- util  ------- */
-int PDP_CheckTime(int32_t lastTime) {
+static int PDP_CheckTime(int32_t lastTime) {
   int32_t now = GetTimeMs();
   int32_t delta = now - lastTime;
   if (delta < 0) {
@@ -167,52 +192,51 @@ int PDP_CheckTime(int32_t lastTime) {
 }
 
 /* ----------- update routines ------- */
-void GetStatus0to5(int handle) {
+void PDPStorage::GetStatus0to5() {
   uint8_t temp[8];
   uint32_t timeStamp;
-  int32_t err =
-      PDP_ReadMsg(kStatus1 | (handle - kHandleOffset), &timeStamp, temp);
+  int32_t err = PDP_ReadMsg(kStatus1 | module, &timeStamp, temp);
 
-  std::lock_guard<wpi::mutex> lock(_pdpMut);
+  std::lock_guard<wpi::mutex> lock(pdpMutex);
   if (err == 0) {
-    std::memcpy((void*)_stat0to5, (const void*)temp, 8);
-    _time0to5 = GetTimeMs();
+    std::memcpy(stat0to5, temp, 8);
+    time0to5 = GetTimeMs();
   }
 }
-void GetStatus6to11(int handle) {
+
+void PDPStorage::GetStatus6to11() {
   uint8_t temp[8];
   uint32_t timeStamp;
-  int32_t err =
-      PDP_ReadMsg(kStatus2 | (handle - kHandleOffset), &timeStamp, temp);
+  int32_t err = PDP_ReadMsg(kStatus2 | module, &timeStamp, temp);
 
-  std::lock_guard<wpi::mutex> lock(_pdpMut);
+  std::lock_guard<wpi::mutex> lock(pdpMutex);
   if (err == 0) {
-    std::memcpy(_stat6to11, temp, 8);
-    _time6to11 = GetTimeMs();
+    std::memcpy(stat6to11, temp, 8);
+    time6to11 = GetTimeMs();
   }
 }
-void GetStatus12to15(int handle) {
+
+void PDPStorage::GetStatus12to15() {
   uint8_t temp[8];
   uint32_t timeStamp;
-  int32_t err =
-      PDP_ReadMsg(kStatus3 | (handle - kHandleOffset), &timeStamp, temp);
+  int32_t err = PDP_ReadMsg(kStatus3 | module, &timeStamp, temp);
 
-  std::lock_guard<wpi::mutex> lock(_pdpMut);
+  std::lock_guard<wpi::mutex> lock(pdpMutex);
   if (err == 0) {
-    std::memcpy(_stat12to15, temp, 8);
-    _time12to15 = GetTimeMs();
+    std::memcpy(stat12to15, temp, 8);
+    time12to15 = GetTimeMs();
   }
 }
-void GetStatusEnergy(int handle) {
+
+void PDPStorage::GetStatusEnergy() {
   uint8_t temp[8];
   uint32_t timeStamp;
-  int32_t err =
-      PDP_ReadMsg(kStatusEnergy | (handle - kHandleOffset), &timeStamp, temp);
+  int32_t err = PDP_ReadMsg(kStatusEnergy | module, &timeStamp, temp);
 
-  std::lock_guard<wpi::mutex> lock(_pdpMut);
+  std::lock_guard<wpi::mutex> lock(pdpMutex);
   if (err == 0) {
-    std::memcpy(_statEnergy, temp, 8);
-    _timeEnergy = GetTimeMs();
+    std::memcpy(statEnergy, temp, 8);
+    timeEnergy = GetTimeMs();
   }
 }
 
@@ -223,12 +247,19 @@ int HAL_InitializePDP(int32_t module, int32_t* status) {
     *status = PARAMETER_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
-
-  *status = 0;
-  return module + kHandleOffset;  // device ID + offset
+  auto pdp = std::make_shared<PDPStorage>(module);
+  auto handle = pdpHandles->Allocate(pdp);
+  if (handle == HAL_kInvalidHandle) {
+    *status = NO_AVAILABLE_RESOURCES;
+    return HAL_kInvalidHandle;
+  }
+  return handle;
 }
 
-void HAL_CleanPDP(int handle) {}
+void HAL_CleanPDP(HAL_PDPHandle handle) {
+  auto data = pdpHandles->Free(handle);
+  // XXX: should this do a SEND_PERIOD_STOP_REPEATING?
+}
 
 HAL_Bool HAL_CheckPDPModule(int32_t module) {
   return module < kNumPDPModules && module >= 0;
@@ -238,49 +269,65 @@ HAL_Bool HAL_CheckPDPChannel(int32_t channel) {
   return channel < kNumPDPChannels && channel >= 0;
 }
 
-double HAL_GetPDPTemperature(int handle, int32_t* status) {
-  GetStatus12to15(handle);
+double HAL_GetPDPTemperature(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (!pdp) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+  pdp->GetStatus12to15();
   {
-    std::lock_guard<wpi::mutex> lock(_pdpMut);
+    std::lock_guard<wpi::mutex> lock(pdp->pdpMutex);
     PdpStatus3 pdpStatus;
-    std::memcpy(&pdpStatus, _stat12to15, 8);
-    *status = PDP_CheckTime(_time12to15);
+    std::memcpy(&pdpStatus, pdp->stat12to15, 8);
+    *status = PDP_CheckTime(pdp->time12to15);
     return pdpStatus.bits.temp * 1.03250836957542 - 67.8564500484966;
   }
 }
 
-double HAL_GetPDPVoltage(int handle, int32_t* status) {
-  GetStatus12to15(handle);
+double HAL_GetPDPVoltage(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (!pdp) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+  pdp->GetStatus12to15();
   {
-    std::lock_guard<wpi::mutex> lock(_pdpMut);
+    std::lock_guard<wpi::mutex> lock(pdp->pdpMutex);
     PdpStatus3 pdpStatus;
-    std::memcpy(&pdpStatus, _stat12to15, 8);
-    *status = PDP_CheckTime(_time12to15);
+    std::memcpy(&pdpStatus, pdp->stat12to15, 8);
+    *status = PDP_CheckTime(pdp->time12to15);
     return pdpStatus.bits.busVoltage * 0.05 + 4.0; /* 50mV per unit plus 4V. */
   }
 }
 
-double HAL_GetPDPChannelCurrent(int handle, int32_t channel, int32_t* status) {
+double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
+                                int32_t* status) {
   if (!HAL_CheckPDPChannel(channel)) {
     *status = PARAMETER_OUT_OF_RANGE;
     return 0;
   }
+  auto pdp = pdpHandles->Get(handle);
+  if (!pdp) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
 
   if (channel <= 5) {
-    GetStatus0to5(handle);
+    pdp->GetStatus0to5();
   } else if (channel <= 11) {
-    GetStatus6to11(handle);
+    pdp->GetStatus6to11();
   } else {
-    GetStatus12to15(handle);
+    pdp->GetStatus12to15();
   }
 
   double raw = 0;
 
   if (channel <= 5) {
-    std::lock_guard<wpi::mutex> lock(_pdpMut);
+    std::lock_guard<wpi::mutex> lock(pdp->pdpMutex);
     PdpStatus1 pdpStatus;
-    std::memcpy(&pdpStatus, _stat0to5, 8);
-    *status = PDP_CheckTime(_time0to5);
+    std::memcpy(&pdpStatus, pdp->stat0to5, 8);
+    *status = PDP_CheckTime(pdp->time0to5);
 
     switch (channel) {
       case 0:
@@ -309,10 +356,10 @@ double HAL_GetPDPChannelCurrent(int handle, int32_t channel, int32_t* status) {
         break;
     }
   } else if (channel <= 11) {
-    std::lock_guard<wpi::mutex> lock(_pdpMut);
+    std::lock_guard<wpi::mutex> lock(pdp->pdpMutex);
     PdpStatus2 pdpStatus;
-    std::memcpy(&pdpStatus, _stat6to11, 8);
-    *status = PDP_CheckTime(_time6to11);
+    std::memcpy(&pdpStatus, pdp->stat6to11, 8);
+    *status = PDP_CheckTime(pdp->time6to11);
 
     switch (channel) {
       case 6:
@@ -341,10 +388,10 @@ double HAL_GetPDPChannelCurrent(int handle, int32_t channel, int32_t* status) {
         break;
     }
   } else {
-    std::lock_guard<wpi::mutex> lock(_pdpMut);
+    std::lock_guard<wpi::mutex> lock(pdp->pdpMutex);
     PdpStatus3 pdpStatus;
-    std::memcpy(&pdpStatus, _stat12to15, 8);
-    *status = PDP_CheckTime(_time12to15);
+    std::memcpy(&pdpStatus, pdp->stat12to15, 8);
+    *status = PDP_CheckTime(pdp->time12to15);
 
     switch (channel) {
       case 12:
@@ -370,13 +417,19 @@ double HAL_GetPDPChannelCurrent(int handle, int32_t channel, int32_t* status) {
   return raw * 0.125; /* 7.3 fixed pt value in Amps */
 }
 
-double HAL_GetPDPTotalCurrent(int handle, int32_t* status) {
-  GetStatusEnergy(handle);
+double HAL_GetPDPTotalCurrent(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (!pdp) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
+  pdp->GetStatusEnergy();
   {
-    std::lock_guard<wpi::mutex> lock(_pdpMut);
+    std::lock_guard<wpi::mutex> lock(pdp->pdpMutex);
     PdpStatusEnergy pdpStatus;
-    std::memcpy(&pdpStatus, _statEnergy, 8);
-    *status = PDP_CheckTime(_timeEnergy);
+    std::memcpy(&pdpStatus, pdp->statEnergy, 8);
+    *status = PDP_CheckTime(pdp->timeEnergy);
 
     uint32_t raw;
     raw = pdpStatus.bits.TotalCurrent_125mAperunit_h8;
@@ -387,57 +440,79 @@ double HAL_GetPDPTotalCurrent(int handle, int32_t* status) {
   }
 }
 
-double HAL_GetPDPTotalPower(int handle, int32_t* status) {
-  GetStatusEnergy(handle);
-  {
-    std::lock_guard<wpi::mutex> lock(_pdpMut);
-    PdpStatusEnergy pdpStatus;
-    std::memcpy(&pdpStatus, _statEnergy, 8);
-    *status = PDP_CheckTime(_timeEnergy);
-
-    uint32_t raw;
-    raw = pdpStatus.bits.Power_125mWperunit_h4;
-    raw <<= 8;
-    raw |= pdpStatus.bits.Power_125mWperunit_m8;
-    raw <<= 4;
-    raw |= pdpStatus.bits.Power_125mWperunit_l4;
-    return raw * 0.125; /* 7.3 fixed pt value in Watts */
+double HAL_GetPDPTotalPower(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (!pdp) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
   }
+
+  pdp->GetStatusEnergy();
+
+  std::lock_guard<wpi::mutex> lock(pdp->pdpMutex);
+  PdpStatusEnergy pdpStatus;
+  std::memcpy(&pdpStatus, pdp->statEnergy, 8);
+  *status = PDP_CheckTime(pdp->timeEnergy);
+
+  uint32_t raw;
+  raw = pdpStatus.bits.Power_125mWperunit_h4;
+  raw <<= 8;
+  raw |= pdpStatus.bits.Power_125mWperunit_m8;
+  raw <<= 4;
+  raw |= pdpStatus.bits.Power_125mWperunit_l4;
+  return raw * 0.125; /* 7.3 fixed pt value in Watts */
 }
 
-double HAL_GetPDPTotalEnergy(int handle, int32_t* status) {
-  GetStatusEnergy(handle);
-  {
-    std::lock_guard<wpi::mutex> lock(_pdpMut);
-    PdpStatusEnergy pdpStatus;
-    std::memcpy(&pdpStatus, _statEnergy, 8);
-    *status = PDP_CheckTime(_timeEnergy);
-
-    uint32_t raw;
-    raw = pdpStatus.bits.Energy_125mWPerUnitXTmeas_h4;
-    raw <<= 8;
-    raw |= pdpStatus.bits.Energy_125mWPerUnitXTmeas_mh8;
-    raw <<= 8;
-    raw |= pdpStatus.bits.Energy_125mWPerUnitXTmeas_ml8;
-    raw <<= 8;
-    raw |= pdpStatus.bits.Energy_125mWPerUnitXTmeas_l8;
-
-    double energyJoules = raw * 0.125; /* mW integrated every TmeasMs */
-    energyJoules *=
-        pdpStatus.bits
-            .TmeasMs_likelywillbe20ms_; /* multiplied by TmeasMs = joules */
-    return energyJoules;
+double HAL_GetPDPTotalEnergy(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (!pdp) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
   }
+
+  pdp->GetStatusEnergy();
+
+  std::lock_guard<wpi::mutex> lock(pdp->pdpMutex);
+  PdpStatusEnergy pdpStatus;
+  std::memcpy(&pdpStatus, pdp->statEnergy, 8);
+  *status = PDP_CheckTime(pdp->timeEnergy);
+
+  uint32_t raw;
+  raw = pdpStatus.bits.Energy_125mWPerUnitXTmeas_h4;
+  raw <<= 8;
+  raw |= pdpStatus.bits.Energy_125mWPerUnitXTmeas_mh8;
+  raw <<= 8;
+  raw |= pdpStatus.bits.Energy_125mWPerUnitXTmeas_ml8;
+  raw <<= 8;
+  raw |= pdpStatus.bits.Energy_125mWPerUnitXTmeas_l8;
+
+  double energyJoules = raw * 0.125; /* mW integrated every TmeasMs */
+  energyJoules *=
+      pdpStatus.bits
+          .TmeasMs_likelywillbe20ms_; /* multiplied by TmeasMs = joules */
+  return energyJoules;
 }
 
-void HAL_ResetPDPTotalEnergy(int handle, int32_t* status) {
+void HAL_ResetPDPTotalEnergy(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (!pdp) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
   uint8_t pdpControl[] = {0x40}; /* only bit set is ResetEnergy */
-  PDP_WriteMsgOnce(kControl1 | (handle - kHandleOffset), pdpControl, 1);
+  PDP_WriteMsgOnce(kControl1 | pdp->module, pdpControl, 1);
 }
 
-void HAL_ClearPDPStickyFaults(int handle, int32_t* status) {
+void HAL_ClearPDPStickyFaults(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (!pdp) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
   uint8_t pdpControl[] = {0x80}; /* only bit set is ClearStickyFaults */
-  PDP_WriteMsgOnce(kControl1 | (handle - kHandleOffset), pdpControl, 1);
+  PDP_WriteMsgOnce(kControl1 | pdp->module, pdpControl, 1);
 }
 
 }  // extern "C"
