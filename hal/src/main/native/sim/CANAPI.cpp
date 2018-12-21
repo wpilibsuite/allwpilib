@@ -266,6 +266,7 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
+      *status = 0;
       uint64_t now = HAL_GetFPGATime(status);
       if (now - i->second.lastTimeStamp >
           static_cast<uint64_t>(timeoutMs) * 1000) {
@@ -298,6 +299,7 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
     std::lock_guard<wpi::mutex> lock(can->mapMutex);
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
+      *status = 0;
       uint64_t now = HAL_GetFPGATime(status);
       // Found, check if new enough
       if (now - i->second.lastTimeStamp <
@@ -332,6 +334,7 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
+      *status = 0;
       uint64_t now = HAL_GetFPGATime(status);
       if (now - i->second.lastTimeStamp >
           static_cast<uint64_t>(timeoutMs) * 1000) {
