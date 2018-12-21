@@ -48,7 +48,7 @@ final class RecordingController {
   }
 
   public void addEventMarker(String name, String description, EventImportance importance) {
-    if (name == null || name.isEmpty() || name.isBlank()) {
+    if (name == null || name.isEmpty()) {
       DriverStation.reportError(
           "Shuffleboard event name was not specified", true);
       return;
@@ -60,7 +60,7 @@ final class RecordingController {
       return;
     }
 
-    String eventDescription = description == null || description.isBlank() ? "" : description;
+    String eventDescription = description == null ? "" : description;
 
     m_eventsTable.getSubTable(name)
         .getEntry("Info")

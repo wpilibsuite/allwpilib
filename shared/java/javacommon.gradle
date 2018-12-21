@@ -100,9 +100,8 @@ sourceSets {
     dev
 }
 
-compileJava {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs = ['--release', '8']
 }
 
 dependencies {
