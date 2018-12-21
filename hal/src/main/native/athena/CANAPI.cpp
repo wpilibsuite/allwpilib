@@ -249,7 +249,7 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
     if (i != can->receives.end()) {
       // Found, check if new enough
       uint32_t now = GetPacketBaseTime();
-      if (now - i->second.lastTimeStamp > timeoutMs) {
+      if (now - i->second.lastTimeStamp > static_cast<uint32_t>(timeoutMs)) {
         // Timeout, return bad status
         *status = HAL_CAN_TIMEOUT;
         return;
@@ -281,12 +281,12 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
     if (i != can->receives.end()) {
       // Found, check if new enough
       uint32_t now = GetPacketBaseTime();
-      if (now - i->second.lastTimeStamp > timeoutMs) {
-        *status = 0;
+      if (now - i->second.lastTimeStamp > static_cast<uint32_t>(periodMs)) {
         // Read the data from the stored message into the output
         std::memcpy(data, i->second.data, i->second.length);
         *length = i->second.length;
         *receivedTimestamp = i->second.lastTimeStamp;
+        *status = 0;
         return;
       }
     }
@@ -311,7 +311,7 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
     if (i != can->receives.end()) {
       // Found, check if new enough
       uint32_t now = GetPacketBaseTime();
-      if (now - i->second.lastTimeStamp > timeoutMs) {
+      if (now - i->second.lastTimeStamp > static_cast<uint32_t>(timeoutMs)) {
         // Timeout, return bad status
         *status = HAL_CAN_TIMEOUT;
         return;

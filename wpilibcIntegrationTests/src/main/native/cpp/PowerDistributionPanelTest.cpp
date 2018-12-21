@@ -7,12 +7,13 @@
 
 #include "frc/PowerDistributionPanel.h"  // NOLINT(build/include_order)
 
+#include <hal/Ports.h>
+
 #include "TestBench.h"
 #include "frc/Jaguar.h"
 #include "frc/Talon.h"
 #include "frc/Timer.h"
 #include "frc/Victor.h"
-#include "hal/Ports.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
