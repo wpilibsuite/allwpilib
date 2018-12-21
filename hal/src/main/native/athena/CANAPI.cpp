@@ -55,14 +55,14 @@ static void CheckDeltaTime() {
   uint64_t fpgaTime = HAL_GetFPGATime(&status);
 
   // Convert t to microseconds
-  uint64_t us = t.tv_sec * 1000000 + t.tv_nsec / 1000;
+  uint64_t us = t.tv_sec * 1000000ull + t.tv_nsec / 1000ull;
 
   timeSpanDiff =
       us - fpgaTime;  // This assumes CLOCK_MONOTONIC is greater then FPGA Time.
 }
 
 static inline uint64_t ConvertToFPGATime(uint32_t canMs) {
-  uint64_t canMsToUs = canMs * 1000;
+  uint64_t canMsToUs = canMs * 1000ull;
   return canMsToUs - timeSpanDiff;
 }
 
