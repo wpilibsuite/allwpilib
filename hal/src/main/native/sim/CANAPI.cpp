@@ -45,7 +45,7 @@ static uint32_t GetPacketBaseTime() {
   int status = 0;
   auto basetime = HAL_GetFPGATime(&status);
   // us to ms
-  return (status / 1000ull) & 0xFFFFFFFF;
+  return (basetime / 1000ull) & 0xFFFFFFFF;
 }
 
 namespace hal {
