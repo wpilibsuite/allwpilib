@@ -290,7 +290,7 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
     if (i != can->receives.end()) {
       // Found, check if new enough
       uint32_t now = GetPacketBaseTime();
-      if (now - i->second.lastTimeStamp > static_cast<uint32_t>(periodMs)) {
+      if (now - i->second.lastTimeStamp < static_cast<uint32_t>(periodMs)) {
         *status = 0;
         // Read the data from the stored message into the output
         std::memcpy(data, i->second.data, i->second.length);
