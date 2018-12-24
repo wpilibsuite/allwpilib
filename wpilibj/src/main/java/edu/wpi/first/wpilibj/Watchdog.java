@@ -276,9 +276,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   private static boolean awaitUntil(Condition cond, long time) {
     long delta = time - RobotController.getFPGATime();
     try {
-      if (delta > 0) {
-        return cond.await(delta, TimeUnit.MICROSECONDS);
-      }
+      return cond.await(delta, TimeUnit.MICROSECONDS);
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
       ex.printStackTrace();
