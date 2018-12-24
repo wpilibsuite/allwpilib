@@ -82,7 +82,7 @@ class SerialPort : public ErrorBase {
    * @param stopBits The number of stop bits to use as defined by the enum
    *                 StopBits.
    */
-  WPI_DEPRECATED("Will be removed for 2019")
+  WPI_DEPRECATED("Will be removed for 2020")
   SerialPort(int baudRate, const wpi::Twine& portName, Port port = kOnboard,
              int dataBits = 8, Parity parity = kParity_None,
              StopBits stopBits = kStopBits_One);
