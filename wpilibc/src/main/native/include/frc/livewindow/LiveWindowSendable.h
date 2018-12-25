@@ -19,9 +19,9 @@ namespace frc {
  * Live Window Sendable is a special type of object sendable to the live window.
  * @deprecated Use Sendable directly instead
  */
-class WPI_DEPRECATED("use Sendable directly instead") LiveWindowSendable
-    : public Sendable {
+class LiveWindowSendable : public Sendable {
  public:
+  WPI_DEPRECATED("use Sendable directly instead")
   LiveWindowSendable() = default;
   LiveWindowSendable(LiveWindowSendable&&) = default;
   LiveWindowSendable& operator=(LiveWindowSendable&&) = default;

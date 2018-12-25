@@ -16,9 +16,9 @@ namespace frc {
 /**
  * Joystick Interface.
  */
-class WPI_DEPRECATED("Inherit directly from GenericHID instead.") JoystickBase
-    : public GenericHID {
+class JoystickBase : public GenericHID {
  public:
+  WPI_DEPRECATED("Inherit directly from GenericHID instead.")
   explicit JoystickBase(int port);
   virtual ~JoystickBase() = default;
 
