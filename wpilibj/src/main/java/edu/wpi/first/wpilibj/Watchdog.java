@@ -155,7 +155,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     if (now  - m_lastEpochsPrintTime > kMinPrintPeriod) {
       m_lastEpochsPrintTime = now;
       m_epochs.forEach((key, value) -> {
-        System.out.format("\t" + key + ": %.6fs\n", value / 1.0e6);
+        System.out.format("\t%s: %.6fs\n", key, value / 1.0e6);
       });
     }
   }
