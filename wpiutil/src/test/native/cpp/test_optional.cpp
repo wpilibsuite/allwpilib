@@ -622,8 +622,8 @@ TEST(Optional, example_rationale)
   /////////////////////////////////
   {
   typedef int T;
-  optional<optional<T>> ot {in_place};
-  optional<optional<T>> ou {in_place, nullopt};
+  //optional<optional<T>> ot {in_place};
+  //optional<optional<T>> ou {in_place, nullopt};
   optional<optional<T>> ov {optional<T>{}};
   
   optional<int> oi;
