@@ -8,10 +8,13 @@
 package edu.wpi.first.wpilibj.smartdashboard;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiConsumer;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.SendableBase;
@@ -59,6 +62,8 @@ public class SendableChooser<V> extends SendableBase {
   private final LinkedHashMap<String, V> m_map = new LinkedHashMap<>();
   private String m_defaultChoice = "";
   private final int m_instance;
+  private final List<BiConsumer<String, V>> m_selectedListeners
+      = Collections.synchronizedList(new ArrayList<>());
   private static final AtomicInteger s_instances = new AtomicInteger();
 
   /**
@@ -140,6 +145,27 @@ public class SendableChooser<V> extends SendableBase {
     }
   }
 
+  /**
+   * Adds a listener to be called when the selected option is changed.
+   * 
+   * @param listener The listener to be called with the new value
+   */
+  public void addSelectionChangedListener(final BiConsumer<String, V> listener) {
+    Objects.requireNonNull(listener);
+
+    m_selectedListeners.add(listener);
+  }
+
+  /**
+   * Removes a listener to be called when the selected option is changed.
+   * 
+   * @param listener The listener to remove
+   * @return true if the remove was successful
+   */
+  public boolean removeSelectionChangedListener(final BiConsumer<String, V> listener) {
+    return m_selectedListeners.remove(listener);
+  }
+
   private String m_selected;
   private final List<NetworkTableEntry> m_activeEntries = new ArrayList<>();
   private final ReentrantLock m_mutex = new ReentrantLock();
@@ -176,6 +202,12 @@ public class SendableChooser<V> extends SendableBase {
       m_mutex.lock();
       try {
         m_selected = val;
+        synchronized (m_selectedListeners) {
+          V selectionValue = getSelected();
+          for (BiConsumer<String, V> listener : m_selectedListeners) {
+            listener.accept(m_selected, selectionValue);
+          }
+        }
         for (NetworkTableEntry entry : m_activeEntries) {
           entry.setString(val);
         }

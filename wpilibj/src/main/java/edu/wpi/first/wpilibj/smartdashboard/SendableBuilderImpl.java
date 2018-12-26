@@ -223,7 +223,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isBoolean()) {
           setter.accept(event.value.getBoolean());
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -246,7 +249,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isDouble()) {
           setter.accept(event.value.getDouble());
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -269,7 +275,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isString()) {
           setter.accept(event.value.getString());
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -293,7 +302,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isBooleanArray()) {
           setter.accept(event.value.getBooleanArray());
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -317,7 +329,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isDoubleArray()) {
           setter.accept(event.value.getDoubleArray());
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -341,7 +356,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isStringArray()) {
           setter.accept(event.value.getStringArray());
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -364,7 +382,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isRaw()) {
           setter.accept(event.value.getRaw());
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -386,7 +407,10 @@ public class SendableBuilderImpl implements SendableBuilder {
     if (setter != null) {
       property.m_createListener = entry -> entry.addListener(event -> {
         setter.accept(event.value);
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
