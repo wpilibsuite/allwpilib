@@ -19,6 +19,8 @@ enum class PIDSourceType { kDisplacement, kRate };
  */
 class PIDSource {
  public:
+  virtual ~PIDSource() = default;
+
   /**
    * Set which parameter you are using as a process control variable.
    *
