@@ -16,6 +16,8 @@
 
 using namespace frc;
 
+MotorSafety::MotorSafety() { m_watchdog.SuppressTimeoutMessage(true); }
+
 MotorSafety::MotorSafety(MotorSafety&& rhs)
     : ErrorBase(std::move(rhs)), m_enabled(std::move(rhs.m_enabled)) {
   m_watchdog = Watchdog(rhs.m_watchdog.GetTimeout(), [this] { TimeoutFunc(); });
