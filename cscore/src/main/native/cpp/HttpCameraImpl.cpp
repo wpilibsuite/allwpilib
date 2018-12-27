@@ -30,6 +30,12 @@ HttpCameraImpl::HttpCameraImpl(const wpi::Twine& name, CS_HttpCameraKind kind,
 HttpCameraImpl::~HttpCameraImpl() {
   m_active = false;
 
+  // force wakeup of monitor thread
+  m_monitorCond.notify_one();
+
+  // join monitor thread
+  if (m_monitorThread.joinable()) m_monitorThread.join();
+
   // Close file if it's open
   {
     std::lock_guard<wpi::mutex> lock(m_mutex);
@@ -54,6 +60,31 @@ void HttpCameraImpl::Start() {
   // Kick off the stream and settings threads
   m_streamThread = std::thread(&HttpCameraImpl::StreamThreadMain, this);
   m_settingsThread = std::thread(&HttpCameraImpl::SettingsThreadMain, this);
+  m_monitorThread = std::thread(&HttpCameraImpl::MonitorThreadMain, this);
+}
+
+void HttpCameraImpl::MonitorThreadMain() {
+  while (m_active) {
+    std::unique_lock<wpi::mutex> lock(m_mutex);
+    // sleep for 1 second between checks
+    m_monitorCond.wait_for(lock, std::chrono::seconds(1),
+                           [=] { return !m_active; });
+
+    if (!m_active) break;
+
+    // check to see if we got any frames, and close the stream if not
+    // (this will result in an error at the read point, and ultimately
+    // a reconnect attempt)
+    if (m_streamConn && m_frameCount == 0) {
+      SWARNING("Monitor detected stream hung, disconnecting");
+      m_streamConn->stream->close();
+    }
+
+    // reset the frame counter
+    m_frameCount = 0;
+  }
+
+  SDEBUG("Monitor Thread exiting");
 }
 
 void HttpCameraImpl::StreamThreadMain() {
@@ -86,6 +117,10 @@ void HttpCameraImpl::StreamThreadMain() {
 
     // stream
     DeviceStream(conn->is, boundary);
+    {
+      std::unique_lock<wpi::mutex> lock(m_mutex);
+      m_streamConn = nullptr;
+    }
   }
 
   SDEBUG("Camera Thread exiting");
@@ -120,6 +155,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   // update m_streamConn
   {
     std::lock_guard<wpi::mutex> lock(m_mutex);
+    m_frameCount = 1;  // avoid a race with monitor thread
     m_streamConn = std::move(connPtr);
   }
 
@@ -229,6 +265,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
     }
     PutFrame(VideoMode::PixelFormat::kMJPEG, width, height, imageBuf,
              wpi::Now());
+    ++m_frameCount;
     return true;
   }
 
@@ -246,6 +283,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
   image->width = width;
   image->height = height;
   PutFrame(std::move(image), wpi::Now());
+  ++m_frameCount;
   return true;
 }
 

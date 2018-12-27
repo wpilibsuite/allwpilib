@@ -111,10 +111,14 @@ class HttpCameraImpl : public SourceImpl {
   void SettingsThreadMain();
   void DeviceSendSettings(wpi::HttpRequest& req);
 
+  // The monitor thread
+  void MonitorThreadMain();
+
   std::atomic_bool m_connected{false};
   std::atomic_bool m_active{true};  // set to false to terminate thread
   std::thread m_streamThread;
   std::thread m_settingsThread;
+  std::thread m_monitorThread;
 
   //
   // Variables protected by m_mutex
@@ -130,6 +134,8 @@ class HttpCameraImpl : public SourceImpl {
   size_t m_nextLocation{0};
   int m_prefLocation{-1};  // preferred location
 
+  std::atomic_int m_frameCount{0};
+
   wpi::condition_variable m_sinkEnabledCond;
 
   wpi::StringMap<wpi::SmallString<16>> m_settings;
@@ -137,6 +143,8 @@ class HttpCameraImpl : public SourceImpl {
 
   wpi::StringMap<wpi::SmallString<16>> m_streamSettings;
   std::atomic_bool m_streamSettingsUpdated{false};
+
+  wpi::condition_variable m_monitorCond;
 };
 
 class AxisCameraImpl : public HttpCameraImpl {
