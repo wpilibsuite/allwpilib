@@ -1,4 +1,4 @@
-def opencvVersion = '3.4.4-3'
+def opencvVersion = '3.4.4-4'
 
 if (project.hasProperty('useCpp') && project.useCpp) {
     model {

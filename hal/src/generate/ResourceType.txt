@@ -82,3 +82,4 @@ kResourceType_DigilentDMC60 = 80
 kResourceType_PWMVictorSPX = 81
 kResourceType_RevSparkMaxPWM = 82
 kResourceType_RevSparkMaxCAN = 83
+kResourceType_ADIS16470 = 84

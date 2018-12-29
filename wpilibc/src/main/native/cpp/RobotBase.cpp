@@ -98,13 +98,15 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
   SmartDashboard::init();
 
-  std::FILE* file = nullptr;
-  file = std::fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
+  if (IsReal()) {
+    std::FILE* file = nullptr;
+    file = std::fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
 
-  if (file != nullptr) {
-    std::fputs("C++ ", file);
-    std::fputs(GetWPILibVersion(), file);
-    std::fclose(file);
+    if (file != nullptr) {
+      std::fputs("C++ ", file);
+      std::fputs(GetWPILibVersion(), file);
+      std::fclose(file);
+    }
   }
 
   // First and one-time initialization

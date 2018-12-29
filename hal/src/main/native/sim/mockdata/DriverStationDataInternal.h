@@ -63,7 +63,7 @@ class DriverStationData {
   SimDataValue<HAL_Bool, MakeBoolean, GetTestName> test{false};
   SimDataValue<HAL_Bool, MakeBoolean, GetEStopName> eStop{false};
   SimDataValue<HAL_Bool, MakeBoolean, GetFmsAttachedName> fmsAttached{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetDsAttachedName> dsAttached{false};
+  SimDataValue<HAL_Bool, MakeBoolean, GetDsAttachedName> dsAttached{true};
   SimDataValue<HAL_AllianceStationID, MakeAllianceStationIdValue,
                GetAllianceStationIdName>
       allianceStationId{static_cast<HAL_AllianceStationID>(0)};

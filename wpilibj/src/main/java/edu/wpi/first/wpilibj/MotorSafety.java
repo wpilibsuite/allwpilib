@@ -20,6 +20,10 @@ public abstract class MotorSafety {
   private boolean m_enabled;
   private final Object m_thisMutex = new Object();
 
+  public MotorSafety() {
+    m_watchdog.suppressTimeoutMessage(true);
+  }
+
   /**
    * Feed the motor safety object.
    *

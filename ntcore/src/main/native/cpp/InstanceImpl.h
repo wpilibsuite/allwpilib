@@ -51,7 +51,7 @@ class InstanceImpl {
 
   static std::atomic<int> s_default;
   static std::atomic<InstanceImpl*> s_fast_instances[10];
-  static wpi::UidVector<std::unique_ptr<InstanceImpl>, 10> s_instances;
+  static wpi::UidVector<InstanceImpl*, 10> s_instances;
   static wpi::mutex s_mutex;
 };
 

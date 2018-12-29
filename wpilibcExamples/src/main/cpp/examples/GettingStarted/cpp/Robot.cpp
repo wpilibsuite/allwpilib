@@ -55,4 +55,6 @@ class Robot : public frc::TimedRobot {
   frc::Timer m_timer;
 };
 
+#ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
+#endif

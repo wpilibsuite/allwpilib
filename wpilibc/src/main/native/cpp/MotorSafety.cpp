@@ -16,15 +16,19 @@
 
 using namespace frc;
 
+MotorSafety::MotorSafety() { m_watchdog.SuppressTimeoutMessage(true); }
+
 MotorSafety::MotorSafety(MotorSafety&& rhs)
     : ErrorBase(std::move(rhs)), m_enabled(std::move(rhs.m_enabled)) {
   m_watchdog = Watchdog(rhs.m_watchdog.GetTimeout(), [this] { TimeoutFunc(); });
+  m_watchdog.SuppressTimeoutMessage(true);
 }
 
 MotorSafety& MotorSafety::operator=(MotorSafety&& rhs) {
   ErrorBase::operator=(std::move(rhs));
 
   m_watchdog = Watchdog(rhs.m_watchdog.GetTimeout(), [this] { TimeoutFunc(); });
+  m_watchdog.SuppressTimeoutMessage(true);
   m_enabled = std::move(rhs.m_enabled);
 
   return *this;

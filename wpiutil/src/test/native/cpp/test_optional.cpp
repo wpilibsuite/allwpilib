@@ -625,6 +625,9 @@ TEST(Optional, example_rationale)
   optional<optional<T>> ot {in_place};
   optional<optional<T>> ou {in_place, nullopt};
   optional<optional<T>> ov {optional<T>{}};
+
+  (void) ot;
+  (void) ou;
   
   optional<int> oi;
   auto ooi = make_optional(oi);

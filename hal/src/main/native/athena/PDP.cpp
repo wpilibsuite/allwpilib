@@ -31,7 +31,7 @@ static constexpr int32_t StatusEnergy = 0x5D;
 
 static constexpr int32_t Control1 = 0x70;
 
-static constexpr int32_t TimeoutMs = 50;
+static constexpr int32_t TimeoutMs = 100;
 static constexpr int32_t StatusPeriodMs = 25;
 
 /* encoder/decoders */

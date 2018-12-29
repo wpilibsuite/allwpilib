@@ -80,4 +80,6 @@ class Robot : public frc::TimedRobot {
   frc::Encoder m_encoder{1, 2, false, frc::Encoder::k4X};
 };
 
+#ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
+#endif

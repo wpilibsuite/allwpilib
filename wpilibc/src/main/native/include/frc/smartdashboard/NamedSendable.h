@@ -20,9 +20,11 @@ namespace frc {
  * the Smart Dashboard.
  * @deprecated Use Sendable directly instead
  */
-class WPI_DEPRECATED("use Sendable directly instead") NamedSendable
-    : public Sendable {
+class NamedSendable : public Sendable {
  public:
+  WPI_DEPRECATED("use Sendable directly instead")
+  NamedSendable() = default;
+
   void SetName(const wpi::Twine& name) override;
   std::string GetSubsystem() const override;
   void SetSubsystem(const wpi::Twine& subsystem) override;

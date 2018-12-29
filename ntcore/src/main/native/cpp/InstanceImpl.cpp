@@ -11,7 +11,7 @@ using namespace nt;
 
 std::atomic<int> InstanceImpl::s_default{-1};
 std::atomic<InstanceImpl*> InstanceImpl::s_fast_instances[10];
-wpi::UidVector<std::unique_ptr<InstanceImpl>, 10> InstanceImpl::s_instances;
+wpi::UidVector<InstanceImpl*, 10> InstanceImpl::s_instances;
 wpi::mutex InstanceImpl::s_mutex;
 
 using namespace std::placeholders;
@@ -54,7 +54,7 @@ InstanceImpl* InstanceImpl::Get(int inst) {
 
   // vector
   if (static_cast<unsigned int>(inst) < s_instances.size()) {
-    return s_instances[inst].get();
+    return s_instances[inst];
   }
 
   // doesn't exist
@@ -84,9 +84,9 @@ int InstanceImpl::Alloc() {
 }
 
 int InstanceImpl::AllocImpl() {
-  unsigned int inst = s_instances.emplace_back();
+  unsigned int inst = s_instances.emplace_back(nullptr);
   InstanceImpl* ptr = new InstanceImpl(inst);
-  s_instances[inst].reset(ptr);
+  s_instances[inst] = ptr;
 
   if (inst < (sizeof(s_fast_instances) / sizeof(s_fast_instances[0]))) {
     s_fast_instances[inst] = ptr;
@@ -104,5 +104,6 @@ void InstanceImpl::Destroy(int inst) {
     s_fast_instances[inst] = nullptr;
   }
 
+  delete s_instances[inst];
   s_instances.erase(inst);
 }

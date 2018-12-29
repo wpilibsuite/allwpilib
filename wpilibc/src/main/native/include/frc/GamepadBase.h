@@ -16,9 +16,9 @@ namespace frc {
 /**
  * Gamepad Interface.
  */
-class WPI_DEPRECATED("Inherit directly from GenericHID instead.") GamepadBase
-    : public GenericHID {
+class GamepadBase : public GenericHID {
  public:
+  WPI_DEPRECATED("Inherit directly from GenericHID instead.")
   explicit GamepadBase(int port);
   virtual ~GamepadBase() = default;
 

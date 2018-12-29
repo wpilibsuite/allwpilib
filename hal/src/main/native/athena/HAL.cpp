@@ -239,7 +239,7 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
   }
-
+  *status = 0;
   uint64_t upper1 = global->readLocalTimeUpper(status);
   uint32_t lower = global->readLocalTime(status);
   uint64_t upper2 = global->readLocalTimeUpper(status);
