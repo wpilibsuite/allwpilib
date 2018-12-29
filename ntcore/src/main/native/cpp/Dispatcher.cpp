@@ -22,14 +22,15 @@ using namespace nt;
 
 void Dispatcher::StartServer(const Twine& persist_filename,
                              const char* listen_address, unsigned int port) {
+  std::string listen_address_copy(StringRef(listen_address).trim());
   DispatcherBase::StartServer(
       persist_filename,
       std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
-          static_cast<int>(port), listen_address, m_logger)));
+          static_cast<int>(port), listen_address_copy.c_str(), m_logger)));
 }
 
 void Dispatcher::SetServer(const char* server_name, unsigned int port) {
-  std::string server_name_copy(server_name);
+  std::string server_name_copy(StringRef(server_name).trim());
   SetConnector([=]() -> std::unique_ptr<wpi::NetworkStream> {
     return wpi::TCPConnector::connect(server_name_copy.c_str(),
                                       static_cast<int>(port), m_logger, 1);
@@ -40,7 +41,7 @@ void Dispatcher::SetServer(
     ArrayRef<std::pair<StringRef, unsigned int>> servers) {
   wpi::SmallVector<std::pair<std::string, int>, 16> servers_copy;
   for (const auto& server : servers)
-    servers_copy.emplace_back(std::string{server.first},
+    servers_copy.emplace_back(std::string{server.first.trim()},
                               static_cast<int>(server.second));
 
   SetConnector([=]() -> std::unique_ptr<wpi::NetworkStream> {
@@ -94,7 +95,7 @@ void Dispatcher::SetServerTeam(unsigned int team, unsigned int port) {
 }
 
 void Dispatcher::SetServerOverride(const char* server_name, unsigned int port) {
-  std::string server_name_copy(server_name);
+  std::string server_name_copy(StringRef(server_name).trim());
   SetConnectorOverride([=]() -> std::unique_ptr<wpi::NetworkStream> {
     return wpi::TCPConnector::connect(server_name_copy.c_str(),
                                       static_cast<int>(port), m_logger, 1);
