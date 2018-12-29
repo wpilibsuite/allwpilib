@@ -224,6 +224,17 @@ struct CS_Event {
 };
 
 /**
+ * USB camera infomation
+ */
+typedef struct CS_UsbCameraInfo {
+  int dev;
+  char* path;
+  char* name;
+  int otherPathsCount;
+  char** otherPaths;
+} CS_UsbCameraInfo;
+
+/**
  * @defgroup cscore_property_cfunc Property Functions
  * @{
  */
@@ -322,6 +333,7 @@ void CS_SetCameraExposureManual(CS_Source source, int value, CS_Status* status);
  * @{
  */
 char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status);
+CS_UsbCameraInfo* CS_GetUsbCameraInfo(CS_Source source, CS_Status* status);
 /** @} */
 
 /**
@@ -456,15 +468,6 @@ void CS_Shutdown(void);
  * @{
  */
 
-/**
- * USB camera infomation
- */
-typedef struct CS_UsbCameraInfo {
-  int dev;
-  char* path;
-  char* name;
-} CS_UsbCameraInfo;
-
 CS_UsbCameraInfo* CS_EnumerateUsbCameras(int* count, CS_Status* status);
 void CS_FreeEnumeratedUsbCameras(CS_UsbCameraInfo* cameras, int count);
 
@@ -476,6 +479,7 @@ void CS_ReleaseEnumeratedSinks(CS_Sink* sinks, int count);
 
 void CS_FreeString(char* str);
 void CS_FreeEnumPropertyChoices(char** choices, int count);
+void CS_FreeUsbCameraInfo(CS_UsbCameraInfo* info);
 void CS_FreeHttpCameraUrls(char** urls, int count);
 
 void CS_FreeEnumeratedProperties(CS_Property* properties, int count);

@@ -413,6 +413,15 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
     }
   }
 
+  status = 0;
+  auto info = GetUsbCameraInfo(Instance::GetInstance().FindSource(source).first,
+                               &status);
+  if (status == CS_OK) {
+    os << "<p>USB device path: " << info.path << '\n';
+    for (auto&& path : info.otherPaths)
+      os << "<p>Alternate device path: " << path << '\n';
+  }
+
   os << "<p>Supported Video Modes:</p>\n";
   os << "<table cols=\"4\" style=\"border: 1px solid black\">\n";
   os << "<tr><th>Pixel Format</th>"

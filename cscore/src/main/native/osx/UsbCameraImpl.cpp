@@ -26,6 +26,11 @@ std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {
   return std::string{};
 }
 
+UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status) {
+  *status = CS_INVALID_HANDLE;
+  return UsbCameraInfo{};
+}
+
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   *status = CS_INVALID_HANDLE;
   return std::vector<UsbCameraInfo>{};

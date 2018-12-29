@@ -112,6 +112,7 @@ public class CameraServerJNI {
   // UsbCamera Source Functions
   //
   public static native String getUsbCameraPath(int source);
+  public static native UsbCameraInfo getUsbCameraInfo(int source);
 
   //
   // HttpCamera Source Functions

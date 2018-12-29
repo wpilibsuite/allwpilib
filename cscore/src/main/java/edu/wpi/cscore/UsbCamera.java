@@ -48,6 +48,13 @@ public class UsbCamera extends VideoCamera {
   }
 
   /**
+   * Get the full camera information for the device.
+   */
+  public UsbCameraInfo getInfo() {
+    return CameraServerJNI.getUsbCameraInfo(m_handle);
+  }
+
+  /**
    * Set how verbose the camera connection messages are.
    *
    * @param level 0=don't display Connecting message, 1=do display message

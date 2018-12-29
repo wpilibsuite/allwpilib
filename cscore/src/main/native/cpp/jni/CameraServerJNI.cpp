@@ -185,11 +185,14 @@ static inline bool CheckStatus(JNIEnv* env, CS_Status status) {
 
 static jobject MakeJObject(JNIEnv* env, const cs::UsbCameraInfo& info) {
   static jmethodID constructor = env->GetMethodID(
-      usbCameraInfoCls, "<init>", "(ILjava/lang/String;Ljava/lang/String;)V");
+      usbCameraInfoCls, "<init>",
+      "(ILjava/lang/String;Ljava/lang/String;[Ljava/lang/String;)V");
   JLocal<jstring> path(env, MakeJString(env, info.path));
   JLocal<jstring> name(env, MakeJString(env, info.name));
+  JLocal<jobjectArray> otherPaths(env, MakeJStringArray(env, info.otherPaths));
   return env->NewObject(usbCameraInfoCls, constructor,
-                        static_cast<jint>(info.dev), path.obj(), name.obj());
+                        static_cast<jint>(info.dev), path.obj(), name.obj(),
+                        otherPaths.obj());
 }
 
 static jobject MakeJObject(JNIEnv* env, const cs::VideoMode& videoMode) {
@@ -973,6 +976,21 @@ Java_edu_wpi_cscore_CameraServerJNI_getUsbCameraPath
   auto str = cs::GetUsbCameraPath(source, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    getUsbCameraInfo
+ * Signature: (I)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_getUsbCameraInfo
+  (JNIEnv* env, jclass, jint source)
+{
+  CS_Status status = 0;
+  auto info = cs::GetUsbCameraInfo(source, &status);
+  if (!CheckStatus(env, status)) return nullptr;
+  return MakeJObject(env, info);
 }
 
 /*

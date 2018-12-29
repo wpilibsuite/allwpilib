@@ -17,6 +17,12 @@ int main() {
   for (const auto& caminfo : cs::EnumerateUsbCameras(&status)) {
     wpi::outs() << caminfo.dev << ": " << caminfo.path << " (" << caminfo.name
                 << ")\n";
+    if (!caminfo.otherPaths.empty()) {
+      wpi::outs() << "Other device paths:\n";
+      for (auto&& path : caminfo.otherPaths)
+        wpi::outs() << "  " << path << '\n';
+    }
+
     cs::UsbCamera camera{"usbcam", caminfo.dev};
 
     wpi::outs() << "Properties:\n";

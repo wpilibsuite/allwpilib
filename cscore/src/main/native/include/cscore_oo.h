@@ -450,6 +450,11 @@ class UsbCamera : public VideoCamera {
   std::string GetPath() const;
 
   /**
+   * Get the full camera information for the device.
+   */
+  UsbCameraInfo GetInfo() const;
+
+  /**
    * Set how verbose the camera connection messages are.
    *
    * @param level 0=don't display Connecting message, 1=do display message
