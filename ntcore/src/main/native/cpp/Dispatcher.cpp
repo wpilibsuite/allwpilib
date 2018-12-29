@@ -20,19 +20,27 @@
 
 using namespace nt;
 
+std::string strip_whitespace(std::string str) {
+  str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
+  return str;
+}
+
 void Dispatcher::StartServer(const Twine& persist_filename,
                              const char* listen_address, unsigned int port) {
+  std::string listen_address_copy(listen_address);
   DispatcherBase::StartServer(
       persist_filename,
       std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
-          static_cast<int>(port), listen_address, m_logger)));
+          static_cast<int>(port), strip_whitespace(listen_address_copy).c_str(),
+          m_logger)));
 }
 
 void Dispatcher::SetServer(const char* server_name, unsigned int port) {
   std::string server_name_copy(server_name);
   SetConnector([=]() -> std::unique_ptr<wpi::NetworkStream> {
-    return wpi::TCPConnector::connect(server_name_copy.c_str(),
-                                      static_cast<int>(port), m_logger, 1);
+    return wpi::TCPConnector::connect(
+        strip_whitespace(server_name_copy).c_str(), static_cast<int>(port),
+        m_logger, 1);
   });
 }
 
@@ -40,7 +48,7 @@ void Dispatcher::SetServer(
     ArrayRef<std::pair<StringRef, unsigned int>> servers) {
   wpi::SmallVector<std::pair<std::string, int>, 16> servers_copy;
   for (const auto& server : servers)
-    servers_copy.emplace_back(std::string{server.first},
+    servers_copy.emplace_back(strip_whitespace(std::string{server.first}),
                               static_cast<int>(server.second));
 
   SetConnector([=]() -> std::unique_ptr<wpi::NetworkStream> {
@@ -96,8 +104,9 @@ void Dispatcher::SetServerTeam(unsigned int team, unsigned int port) {
 void Dispatcher::SetServerOverride(const char* server_name, unsigned int port) {
   std::string server_name_copy(server_name);
   SetConnectorOverride([=]() -> std::unique_ptr<wpi::NetworkStream> {
-    return wpi::TCPConnector::connect(server_name_copy.c_str(),
-                                      static_cast<int>(port), m_logger, 1);
+    return wpi::TCPConnector::connect(
+        strip_whitespace(server_name_copy).c_str(), static_cast<int>(port),
+        m_logger, 1);
   });
 }
 
