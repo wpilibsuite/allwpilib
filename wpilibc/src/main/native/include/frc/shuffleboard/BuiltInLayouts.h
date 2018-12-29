@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "frc/shuffleboard/LayoutType.h"
+
 namespace frc {
 
 /**
@@ -28,7 +30,7 @@ class BuiltInLayouts {
    * {@code ["TOP", "LEFT", "BOTTOM", "RIGHT", "HIDDEN"}</td></tr>
    * </table>
    */
-  static const LayoutType kList{"List Layout"};
+  static const LayoutType kList;
 
   /**
    * Groups components in an <i>n</i> x <i>m</i> grid. Grid layouts default to
@@ -45,7 +47,7 @@ class BuiltInLayouts {
    * </tr>
    * </table>
    */
-  static const LayoutType kGrid{"Grid Layout"};
+  static const LayoutType kGrid;
 };
 
 }  // namespace frc

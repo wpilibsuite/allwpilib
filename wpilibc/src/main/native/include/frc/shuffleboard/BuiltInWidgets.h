@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "frc/shuffleboard/WidgetType.h"
+
 namespace frc {
 
 /**
@@ -35,7 +37,7 @@ class BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static const WidgetType kTextView{"Text View"};
+  static const WidgetType kTextView;
   /**
    * Displays a number with a controllable slider.
    * <br>Supported types:
@@ -52,7 +54,7 @@ class BuiltInWidgets {
    * slider by with the arrow keys</td></tr>
    * </table>
    */
-  static const WidgetType kNumberSlider{"Number Slider"};
+  static const WidgetType kNumberSlider;
   /**
    * Displays a number with a view-only bar.
    * <br>Supported types:
@@ -69,7 +71,7 @@ class BuiltInWidgets {
    * of the bar</td></tr>
    * </table>
    */
-  static const WidgetType kNumberBar{"Number Bar"};
+  static const WidgetType kNumberBar;
   /**
    * Displays a number with a view-only dial. Displayed values are rounded to
    * the nearest integer. <br>Supported types: <ul> <li>Number</li>
@@ -84,7 +86,7 @@ class BuiltInWidgets {
    * value as text</td></tr>
    * </table>
    */
-  static const WidgetType kDial{"Simple Dial"};
+  static const WidgetType kDial;
   /**
    * Displays a number with a graph. <strong>NOTE:</strong> graphs can be taxing
    * on the computer running the dashboard. Keep the number of visible data
@@ -101,7 +103,7 @@ class BuiltInWidgets {
    * <td>How long, in seconds, should past data be visible for</td></tr>
    * </table>
    */
-  static const WidgetType kGraph{"Graph"};
+  static const WidgetType kGraph;
   /**
    * Displays a boolean value as a large colored box.
    * <br>Supported types:
@@ -119,7 +121,7 @@ class BuiltInWidgets {
    * <td>Can be specified as a string or a number</td></tr>
    * </table>
    */
-  static const WidgetType kBooleanBox{"Boolean Box"};
+  static const WidgetType kBooleanBox;
   /**
    * Displays a boolean with a large interactive toggle button.
    * <br>Supported types:
@@ -128,7 +130,7 @@ class BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static const WidgetType kToggleButton{"Toggle Button"};
+  static const WidgetType kToggleButton;
   /**
    * Displays a boolean with a fixed-size toggle switch.
    * <br>Supported types:
@@ -137,7 +139,7 @@ class BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static const WidgetType kToggleSwitch{"Toggle Switch"};
+  static const WidgetType kToggleSwitch;
   /**
    * Displays an analog input or a raw number with a number bar.
    * <br>Supported types:
@@ -160,7 +162,7 @@ class BuiltInWidgets {
    * bar</td></tr>
    * </table>
    */
-  static const WidgetType kVoltageView{"Voltage View"};
+  static const WidgetType kVoltageView;
   /**
    * Displays a {@link edu.wpi.first.wpilibj.PowerDistributionPanel
    * PowerDistributionPanel}. <br>Supported types: <ul> <li>{@link
@@ -173,7 +175,7 @@ class BuiltInWidgets {
    * <td>Whether or not to display the voltage and current draw</td></tr>
    * </table>
    */
-  static const WidgetType kPowerDistributionPanel{"PDP"};
+  static const WidgetType kPowerDistributionPanel;
   /**
    * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser
    * SendableChooser} with a dropdown combo box with a list of options.
@@ -183,7 +185,7 @@ class BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static const WidgetType kComboBoxChooser{"ComboBox Chooser"};
+  static const WidgetType kComboBoxChooser;
   /**
    * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser
    * SendableChooser} with a toggle button for each available option.
@@ -193,7 +195,7 @@ class BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static const WidgetType kSplitButtonChooser{"Split Button Chooser"};
+  static const WidgetType kSplitButtonChooser;
   /**
    * Displays an {@link edu.wpi.first.wpilibj.Encoder} displaying its speed,
    * total travelled distance, and its distance per tick. <br>Supported types:
@@ -202,7 +204,7 @@ class BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static const WidgetType kEncoder{"Encoder"};
+  static const WidgetType kEncoder;
   /**
    * Displays a {@link edu.wpi.first.wpilibj.SpeedController SpeedController}.
    * The speed controller will be controllable from the dashboard when test mode
@@ -226,7 +228,7 @@ class BuiltInWidgets {
    * <td>One of {@code ["HORIZONTAL", "VERTICAL"]}</td></tr>
    * </table>
    */
-  static const WidgetType kSpeedController{"Speed Controller"};
+  static const WidgetType kSpeedController;
   /**
    * Displays a command with a toggle button. Pressing the button will start the
    * command, and the button will automatically release when the command
@@ -237,7 +239,7 @@ class BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static const WidgetType kCommand{"Command"};
+  static const WidgetType kCommand;
   /**
    * Displays a PID command with a checkbox and an editor for the PIDF
    * constants. Selecting the checkbox will start the command, and the checkbox
@@ -247,7 +249,7 @@ class BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static const WidgetType kPIDCommand{"PID Command"};
+  static const WidgetType kPIDCommand;
   /**
    * Displays a PID controller with an editor for the PIDF constants and a
    * toggle switch for enabling and disabling the controller. <br>Supported
@@ -255,7 +257,7 @@ class BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static const WidgetType kPIDController{"PID Controller"};
+  static const WidgetType kPIDController;
   /**
    * Displays an accelerometer with a number bar displaying the magnitude of the
    * acceleration and text displaying the exact value. <br>Supported types: <ul>
@@ -276,7 +278,7 @@ class BuiltInWidgets {
    * <td>Show or hide the tick marks on the number bars</td></tr>
    * </table>
    */
-  static const WidgetType kAccelerometer{"Accelerometer"};
+  static const WidgetType kAccelerometer;
   /**
    * Displays a 3-axis accelerometer with a number bar for each axis'
    * accleration. <br>Supported types: <ul> <li>{@link
@@ -296,7 +298,7 @@ class BuiltInWidgets {
    * <td>Show or hide the tick marks on the number bars</td></tr>
    * </table>
    */
-  static const WidgetType k3AxisAccelerometer{"3-Axis Accelerometer"};
+  static const WidgetType k3AxisAccelerometer;
   /**
    * Displays a gyro with a dial from 0 to 360 degrees.
    * <br>Supported types:
@@ -315,7 +317,7 @@ class BuiltInWidgets {
    * <tr><td>Show tick mark ring</td><td>Boolean</td><td>true</td></tr>
    * </table>
    */
-  static const WidgetType kGyro{"Gyro"};
+  static const WidgetType kGyro;
   /**
    * Displays a relay with toggle buttons for each supported mode (off, on,
    * forward, reverse). <br>Supported types: <ul> <li>{@link
@@ -323,7 +325,7 @@ class BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static const WidgetType kRelay{"Relay"};
+  static const WidgetType kRelay;
   /**
    * Displays a differential drive with a widget that displays the speed of each
    * side of the drivebase and a vector for the direction and rotation of the
@@ -342,7 +344,7 @@ class BuiltInWidgets {
    * <tr><td>Show velocity vectors</td><td>Boolean</td><td>true</td></tr>
    * </table>
    */
-  static const WidgetType kDifferentialDrive{"Differential Drivebase"};
+  static const WidgetType kDifferentialDrive;
   /**
    * Displays a mecanum drive with a widget that displays the speed of each
    * wheel, and vectors for the direction and rotation of the drivebase. The
@@ -355,7 +357,7 @@ class BuiltInWidgets {
    * <tr><td>Show velocity vectors</td><td>Boolean</td><td>true</td></tr>
    * </table>
    */
-  static const WidgetType kMecanumDrive{"Mecanum Drivebase"};
+  static const WidgetType kMecanumDrive;
   /**
    * Displays a camera stream.
    * <br>Supported types:
@@ -379,7 +381,7 @@ class BuiltInWidgets {
    * </td></tr>
    * </table>
    */
-  static const WidgetType kCameraStream{"Camera Stream"};
+  static const WidgetType kCameraStream;
 };
 
 }  // namespace frc
