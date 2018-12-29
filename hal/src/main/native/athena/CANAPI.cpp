@@ -22,7 +22,7 @@ using namespace hal;
 
 namespace {
 struct Receives {
-  uint64_t lastTimeStamp;
+  uint32_t lastTimeStamp;
   uint8_t data[8];
   uint8_t length;
 };
@@ -40,30 +40,13 @@ struct CANStorage {
 static UnlimitedHandleResource<HAL_CANHandle, CANStorage, HAL_HandleEnum::CAN>*
     canHandles;
 
-static std::atomic_bool HasFixedTime{false};
-static uint64_t timeSpanDiff;
-
-static void CheckDeltaTime() {
-  if (HasFixedTime) return;
-  HasFixedTime = true;
-
-  // TODO: Fix locking
+static uint32_t GetPacketBaseTime() {
   timespec t;
   clock_gettime(CLOCK_MONOTONIC, &t);
 
-  int32_t status = 0;
-  uint64_t fpgaTime = HAL_GetFPGATime(&status);
-
-  // Convert t to microseconds
-  uint64_t us = t.tv_sec * 1000000 + t.tv_nsec / 1000;
-
-  timeSpanDiff =
-      us - fpgaTime;  // This assumes CLOCK_MONOTONIC is greater then FPGA Time.
-}
-
-static inline uint64_t ConvertToFPGATime(uint32_t canMs) {
-  uint64_t canMsToUs = canMs * 1000;
-  return canMsToUs - timeSpanDiff;
+  // Convert t to milliseconds
+  uint64_t ms = t.tv_sec * 1000ull + t.tv_nsec / 1000000ull;
+  return ms & 0xFFFFFFFF;
 }
 
 namespace hal {
@@ -89,7 +72,6 @@ HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
                                 int32_t deviceId, HAL_CANDeviceType deviceType,
                                 int32_t* status) {
   hal::init::CheckInit();
-  CheckDeltaTime();
   auto can = std::make_shared<CANStorage>();
 
   auto handle = canHandles->Allocate(can);
@@ -189,18 +171,16 @@ void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
   uint32_t ts = 0;
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
-  uint64_t timestamp = ConvertToFPGATime(ts);
-
   if (*status == 0) {
     std::lock_guard<wpi::mutex> lock(can->mapMutex);
     auto& msg = can->receives[messageId];
     msg.length = dataSize;
-    msg.lastTimeStamp = timestamp;
+    msg.lastTimeStamp = ts;
     // The NetComm call placed in data, copy into the msg
     std::memcpy(msg.data, data, dataSize);
   }
   *length = dataSize;
-  *receivedTimestamp = timestamp;
+  *receivedTimestamp = ts;
 }
 
 void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
@@ -217,16 +197,14 @@ void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
   uint32_t ts = 0;
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
-  uint64_t timestamp = ConvertToFPGATime(ts);
-
   std::lock_guard<wpi::mutex> lock(can->mapMutex);
   if (*status == 0) {
     // fresh update
     auto& msg = can->receives[messageId];
     msg.length = dataSize;
     *length = dataSize;
-    msg.lastTimeStamp = timestamp;
-    *receivedTimestamp = timestamp;
+    msg.lastTimeStamp = ts;
+    *receivedTimestamp = ts;
     // The NetComm call placed in data, copy into the msg
     std::memcpy(msg.data, data, dataSize);
   } else {
@@ -256,25 +234,22 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
   uint32_t ts = 0;
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
-  uint64_t timestamp = ConvertToFPGATime(ts);
-
   std::lock_guard<wpi::mutex> lock(can->mapMutex);
   if (*status == 0) {
     // fresh update
     auto& msg = can->receives[messageId];
     msg.length = dataSize;
     *length = dataSize;
-    msg.lastTimeStamp = timestamp;
-    *receivedTimestamp = timestamp;
+    msg.lastTimeStamp = ts;
+    *receivedTimestamp = ts;
     // The NetComm call placed in data, copy into the msg
     std::memcpy(msg.data, data, dataSize);
   } else {
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
-      uint64_t now = HAL_GetFPGATime(status);
-      if (now - i->second.lastTimeStamp >
-          static_cast<uint64_t>(timeoutMs) * 1000) {
+      uint32_t now = GetPacketBaseTime();
+      if (now - i->second.lastTimeStamp > static_cast<uint32_t>(timeoutMs)) {
         // Timeout, return bad status
         *status = HAL_CAN_TIMEOUT;
         return;
@@ -304,15 +279,14 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
     std::lock_guard<wpi::mutex> lock(can->mapMutex);
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
-      uint64_t now = HAL_GetFPGATime(status);
       // Found, check if new enough
-      if (now - i->second.lastTimeStamp <
-          static_cast<uint64_t>(periodMs) * 1000) {
-        *status = 0;
+      uint32_t now = GetPacketBaseTime();
+      if (now - i->second.lastTimeStamp < static_cast<uint32_t>(periodMs)) {
         // Read the data from the stored message into the output
         std::memcpy(data, i->second.data, i->second.length);
         *length = i->second.length;
         *receivedTimestamp = i->second.lastTimeStamp;
+        *status = 0;
         return;
       }
     }
@@ -322,25 +296,22 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
   uint32_t ts = 0;
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
-  uint64_t timestamp = ConvertToFPGATime(ts);
-
   std::lock_guard<wpi::mutex> lock(can->mapMutex);
   if (*status == 0) {
     // fresh update
     auto& msg = can->receives[messageId];
     msg.length = dataSize;
     *length = dataSize;
-    msg.lastTimeStamp = timestamp;
-    *receivedTimestamp = timestamp;
+    msg.lastTimeStamp = ts;
+    *receivedTimestamp = ts;
     // The NetComm call placed in data, copy into the msg
     std::memcpy(msg.data, data, dataSize);
   } else {
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
-      uint64_t now = HAL_GetFPGATime(status);
-      if (now - i->second.lastTimeStamp >
-          static_cast<uint64_t>(timeoutMs) * 1000) {
+      uint32_t now = GetPacketBaseTime();
+      if (now - i->second.lastTimeStamp > static_cast<uint32_t>(timeoutMs)) {
         // Timeout, return bad status
         *status = HAL_CAN_TIMEOUT;
         return;
