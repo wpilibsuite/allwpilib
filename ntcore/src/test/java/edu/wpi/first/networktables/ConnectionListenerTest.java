@@ -116,7 +116,7 @@ class ConnectionListenerTest {
 
   @ParameterizedTest
   @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
-  @ValueSource(strings = { "127.0.0.1", "127.0.0.1 ", " 1 27. 0 .0.1 " })
+  @ValueSource(strings = { "127.0.0.1", "127.0.0.1 ", " 127.0.0.1 " })
   void testThreaded(String address) {
     m_serverInst.startServer("connectionlistenertest.ini", address, 10000);
     List<ConnectionNotification> events = new ArrayList<>();
