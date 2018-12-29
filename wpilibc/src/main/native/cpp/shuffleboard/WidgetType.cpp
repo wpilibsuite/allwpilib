@@ -9,6 +9,4 @@
 
 using namespace frc;
 
-WidgetType::WidgetType(const char* widgetName) : m_widgetName(widgetName) {}
-
 wpi::StringRef WidgetType::GetWidgetName() const { return m_widgetName; }
