@@ -20,7 +20,7 @@ namespace frc {
  */
 class LayoutType {
  public:
-  explicit LayoutType(const char* layoutName): m_layoutName(layoutName){}
+  explicit LayoutType(const char* layoutName) : m_layoutName(layoutName) {}
   ~LayoutType() = default;
 
   /**

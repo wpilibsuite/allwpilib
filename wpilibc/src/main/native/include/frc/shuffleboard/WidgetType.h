@@ -20,7 +20,7 @@ namespace frc {
  */
 class WidgetType {
  public:
-  explicit WidgetType(const char* widgetName) : m_widgetName(widgetName){}
+  explicit WidgetType(const char* widgetName) : m_widgetName(widgetName) {}
   ~WidgetType() = default;
 
   /**
