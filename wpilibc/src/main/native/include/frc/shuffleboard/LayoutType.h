@@ -20,17 +20,17 @@ namespace frc {
  */
 class LayoutType {
  public:
-  explicit LayoutType(wpi::Twine& layoutName);
+  explicit LayoutType(const char* layoutName);
   ~LayoutType() = default;
 
   /**
    * Gets the string type of the layout as defined by that layout in
    * Shuffleboard.
    */
-  wpi::Twine& GetLayoutName() const;
+  wpi::StringRef GetLayoutName() const;
 
  private:
-  wpi::Twine& m_layoutName;
+  wpi::StringRef m_layoutName;
 };
 
 }  // namespace frc

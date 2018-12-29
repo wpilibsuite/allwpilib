@@ -20,17 +20,17 @@ namespace frc {
  */
 class WidgetType {
  public:
-  explicit WidgetType(wpi::Twine& widgetName);
+  explicit WidgetType(const char* widgetName);
   ~WidgetType() = default;
 
   /**
    * Gets the string type of the widget as defined by that widget in
    * Shuffleboard.
    */
-  wpi::Twine& GetWidgetName() const;
+  wpi::StringRef GetWidgetName() const;
 
  private:
-  wpi::Twine& m_widgetName;
+  wpi::StringRef m_widgetName;
 };
 
 }  // namespace frc

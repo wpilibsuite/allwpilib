@@ -9,6 +9,6 @@
 
 using namespace frc;
 
-LayoutType::LayoutType(wpi::Twine& layoutName) : m_layoutName(layoutName) {}
+LayoutType::LayoutType(const char* layoutName) : m_layoutName(layoutName) {}
 
-wpi::Twine& LayoutType::GetLayoutName() const { return m_layoutName; }
+wpi::StringRef LayoutType::GetLayoutName() const { return m_layoutName; }
