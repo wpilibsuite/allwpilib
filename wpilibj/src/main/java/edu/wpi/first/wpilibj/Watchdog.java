@@ -76,7 +76,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
   /**
-   * Get the time in seconds since the watchdog was last fed.
+   * Returns the time in seconds since the watchdog was last fed.
    */
   public double getTime() {
     return (RobotController.getFPGATime() - m_startTime) / 1.0e6;
@@ -187,7 +187,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
   /**
-   * Disable the watchdog.
+   * Disables the watchdog timer.
    */
   public void disable() {
     m_queueMutex.lock();
