@@ -47,11 +47,13 @@ namespace cs {
  */
 struct UsbCameraInfo {
   /** Device number (e.g. N in '/dev/videoN' on Linux) */
-  int dev;
+  int dev = -1;
   /** Path to device if available (e.g. '/dev/video0' on Linux) */
   std::string path;
   /** Vendor/model name of the camera as provided by the USB driver */
   std::string name;
+  /** Other path aliases to device (e.g. '/dev/v4l/by-id/...' etc on Linux) */
+  std::vector<std::string> otherPaths;
 };
 
 /**
@@ -267,6 +269,7 @@ void SetCameraExposureManual(CS_Source source, int value, CS_Status* status);
  * @{
  */
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status);
+UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status);
 /** @} */
 
 /**

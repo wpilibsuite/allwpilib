@@ -1020,4 +1020,17 @@ std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {
   return static_cast<UsbCameraImpl&>(*data->source).GetPath();
 }
 
+UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status) {
+  UsbCameraInfo info;
+  auto data = Instance::GetInstance().GetSource(source);
+  if (!data || data->kind != CS_SOURCE_USB) {
+    *status = CS_INVALID_HANDLE;
+    return info;
+  }
+
+  info.path = static_cast<UsbCameraImpl&>(*data->source).GetPath();
+  // TODO: dev and name
+  return info;
+}
+
 }  // namespace cs

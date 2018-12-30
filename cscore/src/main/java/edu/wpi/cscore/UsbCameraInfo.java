@@ -17,11 +17,14 @@ public class UsbCameraInfo {
    * @param dev Device number (e.g. N in '/dev/videoN' on Linux)
    * @param path Path to device if available (e.g. '/dev/video0' on Linux)
    * @param name Vendor/model name of the camera as provided by the USB driver
+   * @param otherPaths Other path aliases to device
    */
-  public UsbCameraInfo(int dev, String path, String name) {
+  @SuppressWarnings("PMD.ArrayIsStoredDirectly")
+  public UsbCameraInfo(int dev, String path, String name, String[] otherPaths) {
     this.dev = dev;
     this.path = path;
     this.name = name;
+    this.otherPaths = otherPaths;
   }
 
   /**
@@ -41,4 +44,10 @@ public class UsbCameraInfo {
    */
   @SuppressWarnings("MemberName")
   public String name;
+
+  /**
+   * Other path aliases to device (e.g. '/dev/v4l/by-id/...' etc on Linux).
+   */
+  @SuppressWarnings("MemberName")
+  public String[] otherPaths;
 }
