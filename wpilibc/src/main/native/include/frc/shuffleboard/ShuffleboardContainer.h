@@ -21,6 +21,10 @@
 #include "frc/shuffleboard/ShuffleboardComponentBase.h"
 #include "frc/shuffleboard/ShuffleboardValue.h"
 
+namespace cs {
+class VideoSource;
+}  // namespace cs
+
 namespace frc {
 
 class ComplexWidget;
@@ -68,6 +72,17 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
   ComplexWidget& Add(const wpi::Twine& title, Sendable& sendable);
 
   /**
+   * Adds a widget to this container to display the given video stream.
+   *
+   * @param title    the title of the widget
+   * @param video    the video stream to display
+   * @return a widget to display the sendable data
+   * @throws IllegalArgumentException if a widget already exists in this
+   * container with the given title
+   */
+  ComplexWidget& Add(const wpi::Twine& title, const cs::VideoSource& video);
+
+  /**
    * Adds a widget to this container to display the given sendable.
    *
    * @param sendable the sendable to display
@@ -77,6 +92,16 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * specified
    */
   ComplexWidget& Add(Sendable& sendable);
+
+  /**
+   * Adds a widget to this container to display the given video stream.
+   *
+   * @param video the video to display
+   * @return a widget to display the sendable data
+   * @throws IllegalArgumentException if a widget already exists in this
+   * container with the same title as the video source
+   */
+  ComplexWidget& Add(const cs::VideoSource& video);
 
   /**
    * Adds a widget to this container to display the given data.
