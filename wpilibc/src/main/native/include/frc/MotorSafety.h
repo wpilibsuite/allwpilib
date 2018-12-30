@@ -25,7 +25,7 @@ namespace frc {
  */
 class MotorSafety : public ErrorBase {
  public:
-  MotorSafety();
+  MotorSafety() = default;
   virtual ~MotorSafety() = default;
 
   MotorSafety(MotorSafety&& rhs);
