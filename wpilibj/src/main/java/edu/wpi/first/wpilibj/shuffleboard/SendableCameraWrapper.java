@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * A wrapper to make video sources sendable and usable from Shuffleboard.
  */
 public final class SendableCameraWrapper extends SendableBase {
-  private static final String PROTOCOL = "camera_server://";
+  private static final String kProtocol = "camera_server://";
 
   private static Map<VideoSource, SendableCameraWrapper> m_wrappers = new WeakHashMap<>();
 
@@ -35,7 +35,7 @@ public final class SendableCameraWrapper extends SendableBase {
     super(false);
     String name = source.getName();
     setName(name);
-    m_uri = PROTOCOL + name;
+    m_uri = kProtocol + name;
   }
 
   /**
