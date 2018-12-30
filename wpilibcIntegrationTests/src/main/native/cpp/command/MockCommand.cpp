@@ -7,6 +7,9 @@
 
 #include "command/MockCommand.h"
 
+#include <chrono>
+#include <thread>
+
 using namespace frc;
 
 MockCommand::MockCommand(Subsystem* subsys) : MockCommand() {

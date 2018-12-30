@@ -40,6 +40,10 @@ class CommandTest : public testing::Test {
     EXPECT_EQ(end, command->GetEndCount());
     EXPECT_EQ(interrupted, command->GetInterruptedCount());
   }
+
+  void AssertBetween(double value, double lower, double upper) {
+    EXPECT_TRUE(value >= lower && value <= upper);
+  }
 };
 
 class ASubsystem : public Subsystem {

@@ -39,7 +39,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @see CommandGroup
  * @see IllegalUseOfCommandException
  */
-@SuppressWarnings("PMD.TooManyMethods")
+@SuppressWarnings({ "PMD.TooManyMethods", "PMD.GodClass" })
 public abstract class Command extends SendableBase {
   /**
    * The time since this command was initialized.
@@ -50,6 +50,16 @@ public abstract class Command extends SendableBase {
    * The time (in seconds) before this command "times out" (or -1 if no timeout).
    */
   private double m_timeout = -1;
+
+  /**
+   * The time (in seconds) taken for the command to initialize.
+   */
+  private double m_initializeTime = -1;
+
+  /**
+   * The time (in seconds) taken for the previous execute method to run.
+   */
+  private double m_executeTime = -1;
 
   /**
    * Whether or not this command has been initialized.
@@ -285,11 +295,18 @@ public abstract class Command extends SendableBase {
     if (!m_initialized) {
       m_initialized = true;
       startTiming();
+
+      double initializeStart = Timer.getFPGATimestamp();
       _initialize();
       initialize();
+      m_initializeTime = Timer.getFPGATimestamp() - initializeStart;
     }
+
+    double executeStart = Timer.getFPGATimestamp();
     _execute();
     execute();
+    m_executeTime = Timer.getFPGATimestamp() - executeStart;
+
     return !isFinished();
   }
 
@@ -492,6 +509,26 @@ public abstract class Command extends SendableBase {
   }
 
   /**
+   * Returns the amount of time taken to initialize this command. If the command is not yet
+   * initialized, returns -1.
+   *
+   * @return the amount of time taken to initialize this command
+   */
+  public synchronized double getInitializeTime() {
+    return m_initializeTime;
+  }
+
+  /**
+   * Returns the amount of time taken to run the {@link Command#execute()} method. If the command
+   * has not yet been started, returns -1.
+   *
+   * @return the amount of time taken to execute this command
+   */
+  public synchronized double getExecuteTime() {
+    return m_executeTime;
+  }
+
+  /**
    * This will cancel the current command. <p> This will cancel the current command eventually. It
    * can be called multiple times. And it can be called when the command is not running. If the
    * command is running though, then the command will be marked as canceled and eventually removed.
@@ -610,6 +647,7 @@ public abstract class Command extends SendableBase {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Command");
     builder.addStringProperty(".name", this::getName, null);
+    builder.addBooleanProperty(".isParented", this::isParented, null);
     builder.addBooleanProperty("running", this::isRunning, value -> {
       if (value) {
         if (!isRunning()) {
@@ -621,6 +659,7 @@ public abstract class Command extends SendableBase {
         }
       }
     });
-    builder.addBooleanProperty(".isParented", this::isParented, null);
+    builder.addDoubleProperty("executeTime", this::getExecuteTime, null);
+    builder.addDoubleProperty("initializeTime", this::getInitializeTime, null);
   }
 }

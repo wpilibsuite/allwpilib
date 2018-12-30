@@ -243,6 +243,22 @@ class Command : public ErrorBase, public SendableBase {
   CommandGroup* GetGroup() const;
 
   /**
+   * Returns the amount of time taken to initialize this command. If the command
+   * is not yet initialized, returns -1.
+   *
+   * @return the amount of time taken to initialize this command
+   */
+  double GetInitializeTime() const;
+
+  /**
+   * Returns the amount of time taken to run the execute method. If the command
+   * has not yet been started, returns -1.
+   *
+   * @return the amount of time taken to execute this command
+   */
+  double GetExecuteTime() const;
+
+  /**
    * Sets whether or not this Command should run when the robot is disabled.
    *
    * By default a command will not run when the robot is disabled, and will in
@@ -423,6 +439,12 @@ class Command : public ErrorBase, public SendableBase {
 
   // The time (in seconds) before this command "times out" (-1 if no timeout)
   double m_timeout;
+
+  // The time (in seconds) taken for the command to initialize.
+  double m_initializeTime = -1;
+
+  // The time (in seconds) taken for the previous execute method to run.
+  double m_executeTime = -1;
 
   // Whether or not this command has been initialized
   bool m_initialized = false;

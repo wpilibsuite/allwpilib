@@ -97,11 +97,18 @@ bool Command::Run() {
   if (!m_initialized) {
     m_initialized = true;
     StartTiming();
+
+    double initializeStart = Timer::GetFPGATimestamp();
     _Initialize();
     Initialize();
+    m_initializeTime = Timer::GetFPGATimestamp() - initializeStart;
   }
+
+  double executeStart = Timer::GetFPGATimestamp();
   _Execute();
   Execute();
+  m_executeTime = Timer::GetFPGATimestamp() - executeStart;
+
   return !IsFinished();
 }
 
@@ -137,6 +144,10 @@ const Command::SubsystemSet& Command::GetRequirements() const {
 }
 
 CommandGroup* Command::GetGroup() const { return m_parent; }
+
+double Command::GetInitializeTime() const { return m_initializeTime; }
+
+double Command::GetExecuteTime() const { return m_executeTime; }
 
 void Command::SetRunWhenDisabled(bool run) { m_runWhenDisabled = run; }
 
@@ -231,6 +242,8 @@ void Command::StartTiming() { m_startTime = Timer::GetFPGATimestamp(); }
 void Command::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
   builder.AddStringProperty(".name", [=]() { return GetName(); }, nullptr);
+  builder.AddBooleanProperty(".isParented", [=]() { return IsParented(); },
+                             nullptr);
   builder.AddBooleanProperty("running", [=]() { return IsRunning(); },
                              [=](bool value) {
                                if (value) {
@@ -239,6 +252,8 @@ void Command::InitSendable(SendableBuilder& builder) {
                                  if (IsRunning()) Cancel();
                                }
                              });
-  builder.AddBooleanProperty(".isParented", [=]() { return IsParented(); },
-                             nullptr);
+  builder.AddDoubleProperty("executeTime", [=]() { return GetExecuteTime(); },
+                            nullptr);
+  builder.AddDoubleProperty("initializeTime",
+                            [=]() { return GetInitializeTime(); }, nullptr);
 }
