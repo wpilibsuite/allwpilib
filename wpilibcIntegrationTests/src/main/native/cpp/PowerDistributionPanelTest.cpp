@@ -7,6 +7,8 @@
 
 #include "frc/PowerDistributionPanel.h"  // NOLINT(build/include_order)
 
+#include <thread>
+
 #include <hal/Ports.h>
 
 #include "TestBench.h"
