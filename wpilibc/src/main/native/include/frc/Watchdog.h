@@ -104,6 +104,16 @@ class Watchdog {
    */
   void Disable();
 
+  /**
+   * Enable or disable suppression of the generic timeout message.
+   *
+   * This may be desirable if the user-provided callback already prints a more
+   * specific message.
+   *
+   * @param suppress Whether to suppress generic timeout message.
+   */
+  void SuppressTimeoutMessage(bool suppress);
+
  private:
   // Used for timeout print rate-limiting
   static constexpr std::chrono::milliseconds kMinPrintPeriod{1000};
@@ -117,6 +127,8 @@ class Watchdog {
 
   wpi::StringMap<std::chrono::microseconds> m_epochs;
   bool m_isExpired = false;
+
+  bool m_suppressTimeoutMessage = false;
 
   class Thread;
   wpi::SafeThreadOwner<Thread>* m_owner;
