@@ -9,6 +9,8 @@
 
 #include <cscore_c.h>
 
+#include <string>
+
 #include "frc/smartdashboard/SendableBase.h"
 
 namespace cs {
