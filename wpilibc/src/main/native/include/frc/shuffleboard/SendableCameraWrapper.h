@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <cscore_c.h>
-
 #include <string>
+
+#include <cscore_c.h>
 
 #include "frc/smartdashboard/SendableBase.h"
 
