@@ -33,7 +33,7 @@ class ShuffleboardInstanceTest : public testing::Test {
 
 TEST_F(ShuffleboardInstanceTest, PathFluent) {
   auto entry = m_shuffleboardInstance->GetTab("Tab Title")
-                   .GetLayout("List", "List Layout")
+                   .GetLayout("List Layout", "List")
                    .Add("Data", "string")
                    .WithWidget("Text View")
                    .GetEntry();
@@ -45,10 +45,10 @@ TEST_F(ShuffleboardInstanceTest, PathFluent) {
 
 TEST_F(ShuffleboardInstanceTest, NestedLayoutsFluent) {
   auto entry = m_shuffleboardInstance->GetTab("Tab")
-                   .GetLayout("List", "First")
-                   .GetLayout("List", "Second")
-                   .GetLayout("List", "Third")
-                   .GetLayout("List", "Fourth")
+                   .GetLayout("First", "List")
+                   .GetLayout("Second", "List")
+                   .GetLayout("Third", "List")
+                   .GetLayout("Fourth", "List")
                    .Add("Value", "string")
                    .GetEntry();
 
@@ -60,10 +60,10 @@ TEST_F(ShuffleboardInstanceTest, NestedLayoutsFluent) {
 
 TEST_F(ShuffleboardInstanceTest, NestedLayoutsOop) {
   ShuffleboardTab& tab = m_shuffleboardInstance->GetTab("Tab");
-  ShuffleboardLayout& first = tab.GetLayout("List", "First");
-  ShuffleboardLayout& second = first.GetLayout("List", "Second");
-  ShuffleboardLayout& third = second.GetLayout("List", "Third");
-  ShuffleboardLayout& fourth = third.GetLayout("List", "Fourth");
+  ShuffleboardLayout& first = tab.GetLayout("First", "List");
+  ShuffleboardLayout& second = first.GetLayout("Second", "List");
+  ShuffleboardLayout& third = second.GetLayout("Third", "List");
+  ShuffleboardLayout& fourth = third.GetLayout("Fourth", "List");
   SimpleWidget& widget = fourth.Add("Value", "string");
   auto entry = widget.GetEntry();
 
@@ -75,17 +75,17 @@ TEST_F(ShuffleboardInstanceTest, NestedLayoutsOop) {
 
 TEST_F(ShuffleboardInstanceTest, LayoutTypeIsSet) {
   std::string layoutType = "Type";
-  m_shuffleboardInstance->GetTab("Tab").GetLayout(layoutType, "Title");
+  m_shuffleboardInstance->GetTab("Tab").GetLayout("Title", layoutType);
   m_shuffleboardInstance->Update();
   nt::NetworkTableEntry entry = m_ntInstance.GetEntry(
       "/Shuffleboard/.metadata/Tab/Title/PreferredComponent");
   EXPECT_EQ(layoutType, entry.GetString("Not Set")) << "Layout type not set";
 }
 
-TEST_F(ShuffleboardInstanceTest, NestedActuatoWidgetsAreDisabled) {
+TEST_F(ShuffleboardInstanceTest, NestedActuatorWidgetsAreDisabled) {
   MockActuatorSendable sendable("Actuator");
   m_shuffleboardInstance->GetTab("Tab")
-      .GetLayout("Layout", "Title")
+      .GetLayout("Title", "Type")
       .Add(sendable);
   auto controllableEntry =
       m_ntInstance.GetEntry("/Shuffleboard/Tab/Title/Actuator/.controllable");

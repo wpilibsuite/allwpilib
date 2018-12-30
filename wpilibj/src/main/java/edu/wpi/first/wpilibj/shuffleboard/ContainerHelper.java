@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
@@ -35,13 +36,21 @@ final class ContainerHelper {
     return m_components;
   }
 
-  ShuffleboardLayout getLayout(String type, String title) {
+  ShuffleboardLayout getLayout(String title, String type) {
     if (!m_layouts.containsKey(title)) {
       ShuffleboardLayout layout = new ShuffleboardLayout(m_container, type, title);
       m_components.add(layout);
       m_layouts.put(title, layout);
     }
     return m_layouts.get(title);
+  }
+
+  ShuffleboardLayout getLayout(String title) {
+    ShuffleboardLayout layout = m_layouts.get(title);
+    if (layout == null) {
+      throw new NoSuchElementException("No layout has been defined with the title '" + title + "'");
+    }
+    return layout;
   }
 
   ComplexWidget add(String title, Sendable sendable) {
