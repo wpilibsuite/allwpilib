@@ -11,6 +11,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "frc/shuffleboard/ComplexWidget.h"
+#include "frc/shuffleboard/SendableCameraWrapper.h"
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 #include "frc/shuffleboard/ShuffleboardLayout.h"
 #include "frc/shuffleboard/SimpleWidget.h"
@@ -62,11 +63,20 @@ ComplexWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
   return *ptr;
 }
 
+ComplexWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
+                                          const cs::VideoSource& video) {
+  return Add(title, SendableCameraWrapper::Wrap(video));
+}
+
 ComplexWidget& ShuffleboardContainer::Add(Sendable& sendable) {
   if (sendable.GetName().empty()) {
     wpi::outs() << "Sendable must have a name\n";
   }
   return Add(sendable.GetName(), sendable);
+}
+
+ComplexWidget& ShuffleboardContainer::Add(const cs::VideoSource& video) {
+  return Add(SendableCameraWrapper::Wrap(video));
 }
 
 SimpleWidget& ShuffleboardContainer::Add(

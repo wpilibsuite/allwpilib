@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj.shuffleboard;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.Sendable;
 
 /**
@@ -77,6 +78,19 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
   ComplexWidget add(String title, Sendable sendable) throws IllegalArgumentException;
 
   /**
+   * Adds a widget to this container to display the given video stream.
+   *
+   * @param title    the title of the widget
+   * @param video    the video stream to display
+   * @return a widget to display the sendable data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *                                  title
+   */
+  default ComplexWidget add(String title, VideoSource video) throws IllegalArgumentException {
+    return add(title, SendableCameraWrapper.wrap(video));
+  }
+
+  /**
    * Adds a widget to this container to display the given sendable.
    *
    * @param sendable the sendable to display
@@ -85,6 +99,18 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    *                                  title, or if the sendable's name has not been specified
    */
   ComplexWidget add(Sendable sendable);
+
+  /**
+   * Adds a widget to this container to display the given video stream.
+   *
+   * @param video the video to display
+   * @return a widget to display the sendable data
+   * @throws IllegalArgumentException if a widget already exists in this container with the same
+   *                                  title as the video source
+   */
+  default ComplexWidget add(VideoSource video) {
+    return add(SendableCameraWrapper.wrap(video));
+  }
 
   /**
    * Adds a widget to this container to display the given data.
