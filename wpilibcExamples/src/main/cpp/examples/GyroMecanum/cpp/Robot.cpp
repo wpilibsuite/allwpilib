@@ -7,7 +7,7 @@
 
 #include <frc/AnalogGyro.h>
 #include <frc/Joystick.h>
-#include <frc/Spark.h>
+#include <frc/VictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/MecanumDrive.h>
 
@@ -47,10 +47,10 @@ class Robot : public frc::TimedRobot {
   static constexpr int kGyroPort = 0;
   static constexpr int kJoystickPort = 0;
 
-  frc::Spark m_frontLeft{kFrontLeftMotorPort};
-  frc::Spark m_rearLeft{kRearLeftMotorPort};
-  frc::Spark m_frontRight{kFrontRightMotorPort};
-  frc::Spark m_rearRight{kRearRightMotorPort};
+  frc::VictorSPX m_frontLeft{kFrontLeftMotorPort};
+  frc::VictorSPX m_rearLeft{kRearLeftMotorPort};
+  frc::VictorSPX m_frontRight{kFrontRightMotorPort};
+  frc::VictorSPX m_rearRight{kRearRightMotorPort};
   frc::MecanumDrive m_robotDrive{m_frontLeft, m_rearLeft, m_frontRight,
                                  m_rearRight};
 

@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj.examples.mecanumdrive;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.VictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
@@ -29,10 +29,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    Spark frontLeft = new Spark(kFrontLeftChannel);
-    Spark rearLeft = new Spark(kRearLeftChannel);
-    Spark frontRight = new Spark(kFrontRightChannel);
-    Spark rearRight = new Spark(kRearRightChannel);
+    VictorSPX frontLeft = new VictorSPX(kFrontLeftChannel);
+    VictorSPX rearLeft = new VictorSPX(kRearLeftChannel);
+    VictorSPX frontRight = new VictorSPX(kFrontRightChannel);
+    VictorSPX rearRight = new VictorSPX(kRearRightChannel);
 
     // Invert the left side motors.
     // You may need to change or remove this to match your robot.

@@ -9,7 +9,7 @@
 
 #include <frc/DigitalInput.h>
 #include <frc/Solenoid.h>
-#include <frc/Spark.h>
+#include <frc/VictorSPX.h>
 #include <frc/commands/Subsystem.h>
 
 /**
@@ -69,7 +69,7 @@ class Collector : public frc::Subsystem {
 
  private:
   // Subsystem devices
-  frc::Spark m_rollerMotor{6};
+  frc::VictorSPX m_rollerMotor{6};
   frc::DigitalInput m_ballDetector{10};
   frc::Solenoid m_piston{1};
   frc::DigitalInput m_openDetector{6};

@@ -8,7 +8,7 @@
 #pragma once
 
 #include <frc/DigitalInput.h>
-#include <frc/Spark.h>
+#include <frc/VictorSPX.h>
 #include <frc/commands/Subsystem.h>
 
 /**
@@ -46,6 +46,6 @@ class Claw : public frc::Subsystem {
   void Log();
 
  private:
-  frc::Spark m_motor{7};
+  frc::VictorSPX m_motor{7};
   frc::DigitalInput m_contact{5};
 };

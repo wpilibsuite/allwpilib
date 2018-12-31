@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.examples.potentiometerpid;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.VictorSPX;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -48,7 +48,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_potentiometer = new AnalogInput(kPotChannel);
-    m_elevatorMotor = new Spark(kMotorChannel);
+    m_elevatorMotor = new VictorSPX(kMotorChannel);
     m_joystick = new Joystick(kJoystickChannel);
 
     m_pidController = new PIDController(kP, kI, kD, m_potentiometer, m_elevatorMotor);

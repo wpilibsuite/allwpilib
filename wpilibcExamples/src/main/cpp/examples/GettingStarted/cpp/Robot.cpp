@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/Joystick.h>
-#include <frc/Spark.h>
+#include <frc/VictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/Timer.h>
 #include <frc/drive/DifferentialDrive.h>
@@ -46,8 +46,8 @@ class Robot : public frc::TimedRobot {
 
  private:
   // Robot drive system
-  frc::Spark m_left{0};
-  frc::Spark m_right{1};
+  frc::VictorSPX m_left{0};
+  frc::VictorSPX m_right{1};
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
 
   frc::Joystick m_stick{0};

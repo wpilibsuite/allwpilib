@@ -10,7 +10,7 @@
 #include <frc/AnalogGyro.h>
 #include <frc/AnalogInput.h>
 #include <frc/Encoder.h>
-#include <frc/Spark.h>
+#include <frc/VictorSPX.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/commands/Subsystem.h>
 #include <frc/drive/DifferentialDrive.h>
@@ -67,12 +67,12 @@ class DriveTrain : public frc::Subsystem {
   double GetDistanceToObstacle();
 
  private:
-  frc::Spark m_frontLeft{1};
-  frc::Spark m_rearLeft{2};
+  frc::VictorSPX m_frontLeft{1};
+  frc::VictorSPX m_rearLeft{2};
   frc::SpeedControllerGroup m_left{m_frontLeft, m_rearLeft};
 
-  frc::Spark m_frontRight{3};
-  frc::Spark m_rearRight{4};
+  frc::VictorSPX m_frontRight{3};
+  frc::VictorSPX m_rearRight{4};
   frc::SpeedControllerGroup m_right{m_frontRight, m_rearRight};
 
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
