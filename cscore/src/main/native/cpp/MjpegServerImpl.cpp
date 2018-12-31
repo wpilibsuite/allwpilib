@@ -335,7 +335,8 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
 
 void MjpegServerImpl::ConnThread::SendHTMLHeadTitle(
     wpi::raw_ostream& os) const {
-  os << "<html><head><title>" << m_name << " CameraServer</title>";
+  os << "<html><head><title>" << m_name << " CameraServer</title>"
+     << "<meta charset=\"UTF-8\">";
 }
 
 // Send the root html file with controls for all the settable properties.
