@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/Joystick.h>
-#include <frc/VictorSPX.h>
+#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/MecanumDrive.h>
 
@@ -38,10 +38,10 @@ class Robot : public frc::TimedRobot {
 
   static constexpr int kJoystickChannel = 0;
 
-  frc::VictorSPX m_frontLeft{kFrontLeftChannel};
-  frc::VictorSPX m_rearLeft{kRearLeftChannel};
-  frc::VictorSPX m_frontRight{kFrontRightChannel};
-  frc::VictorSPX m_rearRight{kRearRightChannel};
+  frc::PWMVictorSPX m_frontLeft{kFrontLeftChannel};
+  frc::PWMVictorSPX m_rearLeft{kRearLeftChannel};
+  frc::PWMVictorSPX m_frontRight{kFrontRightChannel};
+  frc::PWMVictorSPX m_rearRight{kRearRightChannel};
   frc::MecanumDrive m_robotDrive{m_frontLeft, m_rearLeft, m_frontRight,
                                  m_rearRight};
 

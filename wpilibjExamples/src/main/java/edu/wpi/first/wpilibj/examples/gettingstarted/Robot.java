@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj.examples.gettingstarted;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.VictorSPX;
+import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  */
 public class Robot extends TimedRobot {
   private final DifferentialDrive m_robotDrive
-      = new DifferentialDrive(new VictorSPX(0), new VictorSPX(1));
+      = new DifferentialDrive(new PWMVictorSPX(0), new PWMVictorSPX(1));
   private final Joystick m_stick = new Joystick(0);
   private final Timer m_timer = new Timer();
 

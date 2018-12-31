@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.examples.ultrasonicpid;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
-import edu.wpi.first.wpilibj.VictorSPX;
+import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
@@ -43,8 +43,8 @@ public class Robot extends TimedRobot {
 
   private final AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
   private final DifferentialDrive m_robotDrive
-      = new DifferentialDrive(new VictorSPX(kLeftMotorPort),
-      new VictorSPX(kRightMotorPort));
+      = new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort),
+      new PWMVictorSPX(kRightMotorPort));
   private final PIDController m_pidController
       = new PIDController(kP, kI, kD, m_ultrasonic, new MyPidOutput());
 

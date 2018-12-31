@@ -7,7 +7,7 @@
 
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
-#include <frc/VictorSPX.h>
+#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
@@ -44,7 +44,7 @@ class Robot : public frc::TimedRobot {
 
  private:
   frc::Joystick m_stick{0};
-  frc::VictorSPX m_motor{0};
+  frc::PWMVictorSPX m_motor{0};
   frc::Encoder m_encoder{0, 1};
 };
 

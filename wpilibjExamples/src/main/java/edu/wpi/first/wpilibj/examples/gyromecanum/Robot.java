@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj.examples.gyromecanum;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.VictorSPX;
+import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
@@ -36,10 +36,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    VictorSPX frontLeft = new VictorSPX(kFrontLeftChannel);
-    VictorSPX rearLeft = new VictorSPX(kRearLeftChannel);
-    VictorSPX frontRight = new VictorSPX(kFrontRightChannel);
-    VictorSPX rearRight = new VictorSPX(kRearRightChannel);
+    PWMVictorSPX frontLeft = new PWMVictorSPX(kFrontLeftChannel);
+    PWMVictorSPX rearLeft = new PWMVictorSPX(kRearLeftChannel);
+    PWMVictorSPX frontRight = new PWMVictorSPX(kFrontRightChannel);
+    PWMVictorSPX rearRight = new PWMVictorSPX(kRearRightChannel);
 
     // Invert the left side motors.
     // You may need to change or remove this to match your robot.

@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/Joystick.h>
-#include <frc/VictorSPX.h>
+#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
 
@@ -15,8 +15,8 @@
  * Runs the motors with arcade steering.
  */
 class Robot : public frc::TimedRobot {
-  frc::VictorSPX m_leftMotor{0};
-  frc::VictorSPX m_rightMotor{1};
+  frc::PWMVictorSPX m_leftMotor{0};
+  frc::PWMVictorSPX m_rightMotor{1};
   frc::DifferentialDrive m_robotDrive{m_leftMotor, m_rightMotor};
   frc::Joystick m_stick{0};
 

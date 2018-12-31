@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/Joystick.h>
-#include <frc/VictorSPX.h>
+#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 
 /**
@@ -23,7 +23,7 @@ class Robot : public frc::TimedRobot {
 
  private:
   frc::Joystick m_stick{0};
-  frc::VictorSPX m_motor{0};
+  frc::PWMVictorSPX m_motor{0};
 };
 
 #ifndef RUNNING_FRC_TESTS
