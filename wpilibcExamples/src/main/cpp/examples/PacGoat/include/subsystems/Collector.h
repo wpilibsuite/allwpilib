@@ -8,8 +8,8 @@
 #pragma once
 
 #include <frc/DigitalInput.h>
-#include <frc/Solenoid.h>
 #include <frc/PWMVictorSPX.h>
+#include <frc/Solenoid.h>
 #include <frc/commands/Subsystem.h>
 
 /**

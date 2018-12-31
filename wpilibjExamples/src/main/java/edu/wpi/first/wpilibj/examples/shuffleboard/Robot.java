@@ -18,7 +18,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public class Robot extends TimedRobot {
-  private final DifferentialDrive m_tankDrive = new DifferentialDrive(new PWMVictorSPX(0), new PWMVictorSPX(1));
+  private final DifferentialDrive m_tankDrive = new DifferentialDrive(new PWMVictorSPX(0),
+                                                                      new PWMVictorSPX(1));
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
 

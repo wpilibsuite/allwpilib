@@ -10,8 +10,8 @@
 #include <string>
 
 #include <frc/Joystick.h>
-#include <frc/SampleRobot.h>
 #include <frc/PWMVictorSPX.h>
+#include <frc/SampleRobot.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/smartdashboard/SendableChooser.h>
 
