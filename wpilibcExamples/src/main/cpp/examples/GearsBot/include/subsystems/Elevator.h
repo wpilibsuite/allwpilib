@@ -8,7 +8,7 @@
 #pragma once
 
 #include <frc/AnalogPotentiometer.h>
-#include <frc/Spark.h>
+#include <frc/PWMVictorSPX.h>
 #include <frc/commands/PIDSubsystem.h>
 
 /**
@@ -42,7 +42,7 @@ class Elevator : public frc::PIDSubsystem {
   void UsePIDOutput(double d) override;
 
  private:
-  frc::Spark m_motor{5};
+  frc::PWMVictorSPX m_motor{5};
 
 // Conversion value of potentiometer varies between the real world and
 // simulation
