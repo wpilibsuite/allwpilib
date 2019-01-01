@@ -26,7 +26,8 @@ namespace frc {
  *
  * Init() functions -- each of the following functions is called once when the
  *                     appropriate mode is entered:
- *   - DisabledInit()   -- called only when first disabled
+ *   - DisabledInit()   -- called each and every time disabled is entered from
+ *                         another mode
  *   - AutonomousInit() -- called each and every time autonomous is entered from
  *                         another mode
  *   - TeleopInit()     -- called each and every time teleop is entered from
