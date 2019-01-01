@@ -26,7 +26,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *
  * <p>init() functions -- each of the following functions is called once when the
  * appropriate mode is entered:
- *   - disabledInit()   -- called only when first disabled
+ *   - disabledInit()   -- called each and every time disabled is entered from
+ *                         another mode
  *   - autonomousInit() -- called each and every time autonomous is entered from
  *                         another mode
  *   - teleopInit()     -- called each and every time teleop is entered from
