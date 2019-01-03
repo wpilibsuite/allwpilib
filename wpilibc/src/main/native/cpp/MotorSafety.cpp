@@ -93,7 +93,6 @@ void MotorSafety::Check() {
     return;
   }
 
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   if (stopTime < Timer::GetFPGATimestamp()) {
     wpi::SmallString<128> buf;
     wpi::raw_svector_ostream desc(buf);
