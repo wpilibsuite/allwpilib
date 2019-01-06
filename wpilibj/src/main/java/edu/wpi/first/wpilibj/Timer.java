@@ -70,7 +70,7 @@ public class Timer {
    */
   public synchronized double get() {
     if (m_running) {
-      return ((getMsClock() - m_startTime) + m_accumulatedTime) / 1000.0;
+      return m_accumulatedTime + (getMsClock() - m_startTime) / 1000.0;
     } else {
       return m_accumulatedTime;
     }
