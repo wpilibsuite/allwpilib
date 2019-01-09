@@ -247,10 +247,15 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
                 System.out.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout / 1.0e6);
               }
             }
+
+            // Set expiration flag before calling the callback so any
+            // manipulation of the flag in the callback (e.g., calling
+            // Disable()) isn't clobbered.
+            watchdog.m_isExpired = true;
+
             m_queueMutex.unlock();
             watchdog.m_callback.run();
             m_queueMutex.lock();
-            watchdog.m_isExpired = true;
           }
           // Otherwise, a Watchdog removed itself from the queue (it notifies
           // the scheduler of this) or a spurious wakeup occurred, so just
