@@ -57,6 +57,7 @@
 static constexpr int NewImageMessage = 0x0400 + 4488;
 static constexpr int SetCameraMessage = 0x0400 + 254;
 static constexpr int WaitForStartupMessage = 0x0400 + 294;
+static constexpr int PumpReadyMessage = 0x0400 + 330;
 
 static constexpr char const* kPropWbValue = "WhiteBalance";
 static constexpr char const* kPropExValue = "Exposure";
@@ -196,6 +197,7 @@ void UsbCameraImpl::Start() {
       [this](HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
         return this->PumpMain(hwnd, uiMsg, wParam, lParam);
       });
+  m_messagePump->PostWindowMessage(PumpReadyMessage, nullptr, nullptr);
 }
 
 void UsbCameraImpl::PostRequestNewFrame() {
@@ -347,7 +349,7 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
       }
       m_imageCallback.Reset();
       break;
-    case WM_CREATE:
+    case PumpReadyMessage:
       // Pump Created and ready to go
       DeviceConnect();
       break;
