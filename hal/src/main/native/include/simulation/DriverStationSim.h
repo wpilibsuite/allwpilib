@@ -103,6 +103,8 @@ class DriverStationSim {
     HALSIM_SetDriverStationDsAttached(dsAttached);
   }
 
+  void NotifyNewData() { HALSIM_NotifyDriverStationNewData(); }
+
   void ResetData() { HALSIM_ResetDriverStationData(); }
 };
 }  // namespace sim
