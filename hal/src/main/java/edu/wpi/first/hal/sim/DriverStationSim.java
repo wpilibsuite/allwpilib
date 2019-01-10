@@ -75,6 +75,9 @@ public class DriverStationSim {
   public void setDsAttached(boolean dsAttached) {
     DriverStationDataJNI.setDsAttached(dsAttached);
   }
+  public void notifyNewData() {
+    DriverStationDataJNI.notifyNewData();
+  }
 
   public void resetData() {
     DriverStationDataJNI.resetData();
