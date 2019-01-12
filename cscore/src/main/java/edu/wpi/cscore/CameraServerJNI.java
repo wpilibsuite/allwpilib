@@ -147,6 +147,8 @@ public class CameraServerJNI {
   public static native String getSinkDescription(int sink);
   public static native int getSinkProperty(int sink, String name);
   public static native int[] enumerateSinkProperties(int sink);
+  public static native boolean setSinkConfigJson(int sink, String config);
+  public static native String getSinkConfigJson(int sink);
   public static native void setSinkSource(int sink, int source);
   public static native int getSinkSourceProperty(int sink, String name);
   public static native int getSinkSource(int sink);

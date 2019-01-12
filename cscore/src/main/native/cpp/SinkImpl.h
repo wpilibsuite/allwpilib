@@ -18,6 +18,10 @@
 
 #include "SourceImpl.h"
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 namespace cs {
 
 class Frame;
@@ -50,6 +54,11 @@ class SinkImpl : public PropertyContainer {
 
   std::string GetError() const;
   wpi::StringRef GetError(wpi::SmallVectorImpl<char>& buf) const;
+
+  bool SetConfigJson(wpi::StringRef config, CS_Status* status);
+  virtual bool SetConfigJson(const wpi::json& config, CS_Status* status);
+  std::string GetConfigJson(CS_Status* status);
+  virtual wpi::json GetConfigJsonObject(CS_Status* status);
 
  protected:
   // PropertyContainer implementation

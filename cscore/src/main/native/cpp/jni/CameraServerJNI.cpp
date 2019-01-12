@@ -1294,6 +1294,36 @@ Java_edu_wpi_cscore_CameraServerJNI_enumerateSinkProperties
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    setSinkConfigJson
+ * Signature: (ILjava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_setSinkConfigJson
+  (JNIEnv* env, jclass, jint source, jstring config)
+{
+  CS_Status status = 0;
+  auto val = cs::SetSinkConfigJson(source, JStringRef{env, config}, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    getSinkConfigJson
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_getSinkConfigJson
+  (JNIEnv* env, jclass, jint source)
+{
+  CS_Status status = 0;
+  auto val = cs::GetSinkConfigJson(source, &status);
+  CheckStatus(env, status);
+  return MakeJString(env, val);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    setSinkSource
  * Signature: (II)V
  */

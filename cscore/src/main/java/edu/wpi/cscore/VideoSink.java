@@ -134,6 +134,38 @@ public class VideoSink implements AutoCloseable {
   }
 
   /**
+   * Set properties from a JSON configuration string.
+   *
+   * <p>The format of the JSON input is:
+   *
+   * <pre>
+   * {
+   *     "properties": [
+   *         {
+   *             "name": property name
+   *             "value": property value
+   *         }
+   *     ]
+   * }
+   * </pre>
+   *
+   * @param config configuration
+   * @return True if set successfully
+   */
+  public boolean setConfigJson(String config) {
+    return CameraServerJNI.setSinkConfigJson(m_handle, config);
+  }
+
+  /**
+   * Get a JSON configuration string.
+   *
+   * @return JSON configuration string
+   */
+  public String getConfigJson() {
+    return CameraServerJNI.getSinkConfigJson(m_handle);
+  }
+
+  /**
    * Configure which source should provide frames to this sink.  Each sink
    * can accept frames from only a single source, but a single source can
    * provide frames to multiple clients.

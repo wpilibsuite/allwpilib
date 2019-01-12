@@ -808,6 +808,49 @@ class VideoSink {
   std::vector<VideoProperty> EnumerateProperties() const;
 
   /**
+   * Set properties from a JSON configuration string.
+   *
+   * The format of the JSON input is:
+   *
+   * <pre>
+   * {
+   *     "properties": [
+   *         {
+   *             "name": property name
+   *             "value": property value
+   *         }
+   *     ]
+   * }
+   * </pre>
+   *
+   * @param config configuration
+   * @return True if set successfully
+   */
+  bool SetConfigJson(wpi::StringRef config);
+
+  /**
+   * Set properties from a JSON configuration object.
+   *
+   * @param config configuration
+   * @return True if set successfully
+   */
+  bool SetConfigJson(const wpi::json& config);
+
+  /**
+   * Get a JSON configuration string.
+   *
+   * @return JSON configuration string
+   */
+  std::string GetConfigJson() const;
+
+  /**
+   * Get a JSON configuration object.
+   *
+   * @return JSON configuration object
+   */
+  wpi::json GetConfigJsonObject() const;
+
+  /**
    * Configure which source should provide frames to this sink.  Each sink
    * can accept frames from only a single source, but a single source can
    * provide frames to multiple clients.
