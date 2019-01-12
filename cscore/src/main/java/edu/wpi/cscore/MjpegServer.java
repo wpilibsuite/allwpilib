@@ -60,7 +60,7 @@ public class MjpegServer extends VideoSink {
    * @param width width, 0 for unspecified
    * @param height height, 0 for unspecified
    */
-  void setResolution(int width, int height) {
+  public void setResolution(int width, int height) {
     CameraServerJNI.setProperty(CameraServerJNI.getSinkProperty(m_handle, "width"), width);
     CameraServerJNI.setProperty(CameraServerJNI.getSinkProperty(m_handle, "height"), height);
   }
@@ -72,7 +72,7 @@ public class MjpegServer extends VideoSink {
    *
    * @param fps FPS, 0 for unspecified
    */
-  void setFPS(int fps) {
+  public void setFPS(int fps) {
     CameraServerJNI.setProperty(CameraServerJNI.getSinkProperty(m_handle, "fps"), fps);
   }
 
@@ -85,7 +85,7 @@ public class MjpegServer extends VideoSink {
    *
    * @param quality JPEG compression quality (0-100), -1 for unspecified
    */
-  void setCompression(int quality) {
+  public void setCompression(int quality) {
     CameraServerJNI.setProperty(CameraServerJNI.getSinkProperty(m_handle, "compression"),
                                 quality);
   }
@@ -97,7 +97,7 @@ public class MjpegServer extends VideoSink {
    *
    * @param quality JPEG compression quality (0-100)
    */
-  void setDefaultCompression(int quality) {
+  public void setDefaultCompression(int quality) {
     CameraServerJNI.setProperty(CameraServerJNI.getSinkProperty(m_handle, "default_compression"),
                                 quality);
   }
