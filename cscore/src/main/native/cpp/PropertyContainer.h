@@ -24,6 +24,11 @@
 #include "PropertyImpl.h"
 #include "cscore_cpp.h"
 
+namespace wpi {
+class Logger;
+class json;
+}  // namespace wpi
+
 namespace cs {
 
 class PropertyContainer {
@@ -49,6 +54,10 @@ class PropertyContainer {
                                  CS_Status* status);
   std::vector<std::string> GetEnumPropertyChoices(int property,
                                                   CS_Status* status) const;
+
+  bool SetPropertiesJson(const wpi::json& config, wpi::Logger& logger,
+                         wpi::StringRef logName, CS_Status* status);
+  wpi::json GetPropertiesJsonObject(CS_Status* status);
 
  protected:
   // Get a property; must be called with m_mutex held.

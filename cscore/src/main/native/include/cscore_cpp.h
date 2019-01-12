@@ -332,6 +332,11 @@ wpi::ArrayRef<CS_Property> EnumerateSinkProperties(
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
 CS_Property GetSinkSourceProperty(CS_Sink sink, const wpi::Twine& name,
                                   CS_Status* status);
+bool SetSinkConfigJson(CS_Sink sink, wpi::StringRef config, CS_Status* status);
+bool SetSinkConfigJson(CS_Sink sink, const wpi::json& config,
+                       CS_Status* status);
+std::string GetSinkConfigJson(CS_Sink sink, CS_Status* status);
+wpi::json GetSinkConfigJsonObject(CS_Sink sink, CS_Status* status);
 CS_Source GetSinkSource(CS_Sink sink, CS_Status* status);
 CS_Sink CopySink(CS_Sink sink, CS_Status* status);
 void ReleaseSink(CS_Sink sink, CS_Status* status);

@@ -319,38 +319,8 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
   }
 
   // properties
-  if (config.count("properties") != 0) {
-    for (auto&& prop : config.at("properties")) {
-      std::string name;
-      try {
-        name = prop.at("name").get<std::string>();
-      } catch (const wpi::json::exception& e) {
-        SWARNING("SetConfigJson: could not read property name: " << e.what());
-        continue;
-      }
-      int n = GetPropertyIndex(name);
-      try {
-        auto& v = prop.at("value");
-        if (v.is_string()) {
-          std::string val = v.get<std::string>();
-          SINFO("SetConfigJson: setting property '" << name << "' to '" << val
-                                                    << '\'');
-          SetStringProperty(n, val, status);
-        } else if (v.is_boolean()) {
-          bool val = v.get<bool>();
-          SINFO("SetConfigJson: setting property '" << name << "' to " << val);
-          SetProperty(n, val, status);
-        } else {
-          int val = v.get<int>();
-          SINFO("SetConfigJson: setting property '" << name << "' to " << val);
-          SetProperty(n, val, status);
-        }
-      } catch (const wpi::json::exception& e) {
-        SWARNING("SetConfigJson: could not read property value: " << e.what());
-        continue;
-      }
-    }
-  }
+  if (config.count("properties") != 0)
+    SetPropertiesJson(config.at("properties"), m_logger, GetName(), status);
 
   return true;
 }
@@ -401,28 +371,7 @@ wpi::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
   // TODO: output brightness, white balance, and exposure?
 
   // properties
-  wpi::json props;
-  wpi::SmallVector<int, 32> propVec;
-  for (int p : EnumerateProperties(propVec, status)) {
-    wpi::json prop;
-    wpi::SmallString<128> strBuf;
-    prop.emplace("name", GetPropertyName(p, strBuf, status));
-    switch (GetPropertyKind(p)) {
-      case CS_PROP_BOOLEAN:
-        prop.emplace("value", static_cast<bool>(GetProperty(p, status)));
-        break;
-      case CS_PROP_INTEGER:
-      case CS_PROP_ENUM:
-        prop.emplace("value", GetProperty(p, status));
-        break;
-      case CS_PROP_STRING:
-        prop.emplace("value", GetStringProperty(p, strBuf, status));
-        break;
-      default:
-        continue;
-    }
-    props.emplace_back(prop);
-  }
+  wpi::json props = GetPropertiesJsonObject(status);
   if (props.is_array()) j.emplace("properties", props);
 
   return j;

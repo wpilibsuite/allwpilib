@@ -564,6 +564,43 @@ wpi::ArrayRef<CS_Property> EnumerateSinkProperties(
   return vec;
 }
 
+bool SetSinkConfigJson(CS_Sink sink, wpi::StringRef config, CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return false;
+  }
+  return data->sink->SetConfigJson(config, status);
+}
+
+bool SetSinkConfigJson(CS_Sink sink, const wpi::json& config,
+                       CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return false;
+  }
+  return data->sink->SetConfigJson(config, status);
+}
+
+std::string GetSinkConfigJson(CS_Sink sink, CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return std::string{};
+  }
+  return data->sink->GetConfigJson(status);
+}
+
+wpi::json GetSinkConfigJsonObject(CS_Sink sink, CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return wpi::json{};
+  }
+  return data->sink->GetConfigJsonObject(status);
+}
+
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {

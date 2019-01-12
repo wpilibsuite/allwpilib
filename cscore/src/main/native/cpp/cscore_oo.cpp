@@ -16,6 +16,11 @@ wpi::json VideoSource::GetConfigJsonObject() const {
   return GetSourceConfigJsonObject(m_handle, &m_status);
 }
 
+wpi::json VideoSink::GetConfigJsonObject() const {
+  m_status = 0;
+  return GetSinkConfigJsonObject(m_handle, &m_status);
+}
+
 std::vector<VideoProperty> VideoSource::EnumerateProperties() const {
   wpi::SmallVector<CS_Property, 32> handles_buf;
   CS_Status status = 0;

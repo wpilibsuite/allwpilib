@@ -277,6 +277,15 @@ CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
   return out;
 }
 
+CS_Bool CS_SetSinkConfigJson(CS_Sink sink, const char* config,
+                             CS_Status* status) {
+  return cs::SetSinkConfigJson(sink, config, status);
+}
+
+char* CS_GetSinkConfigJson(CS_Sink sink, CS_Status* status) {
+  return cs::ConvertToC(cs::GetSinkConfigJson(sink, status));
+}
+
 void CS_SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
   return cs::SetSinkSource(sink, source, status);
 }

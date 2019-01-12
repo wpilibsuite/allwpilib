@@ -521,6 +521,21 @@ inline VideoProperty VideoSink::GetSourceProperty(const wpi::Twine& name) {
   return VideoProperty{GetSinkSourceProperty(m_handle, name, &m_status)};
 }
 
+inline bool VideoSink::SetConfigJson(wpi::StringRef config) {
+  m_status = 0;
+  return SetSinkConfigJson(m_handle, config, &m_status);
+}
+
+inline bool VideoSink::SetConfigJson(const wpi::json& config) {
+  m_status = 0;
+  return SetSinkConfigJson(m_handle, config, &m_status);
+}
+
+inline std::string VideoSink::GetConfigJson() const {
+  m_status = 0;
+  return GetSinkConfigJson(m_handle, &m_status);
+}
+
 inline MjpegServer::MjpegServer(const wpi::Twine& name,
                                 const wpi::Twine& listenAddress, int port) {
   m_handle = CreateMjpegServer(name, listenAddress, port, &m_status);
