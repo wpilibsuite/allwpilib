@@ -538,10 +538,12 @@ cs::AxisCamera CameraServer::AddAxisCamera(const wpi::Twine& name,
   return camera;
 }
 
-void CameraServer::StartAutomaticCapture(const cs::VideoSource& camera) {
+cs::MjpegServer CameraServer::StartAutomaticCapture(
+    const cs::VideoSource& camera) {
   AddCamera(camera);
   auto server = AddServer(wpi::Twine("serve_") + camera.GetName());
   server.SetSource(camera);
+  return server;
 }
 
 cs::CvSink CameraServer::GetVideo() {

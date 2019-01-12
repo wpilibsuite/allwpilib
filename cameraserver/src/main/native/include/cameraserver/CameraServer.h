@@ -82,7 +82,7 @@ class CameraServer {
    *
    * @param camera Camera
    */
-  void StartAutomaticCapture(const cs::VideoSource& camera);
+  cs::MjpegServer StartAutomaticCapture(const cs::VideoSource& camera);
 
   /**
    * Adds an Axis IP camera.

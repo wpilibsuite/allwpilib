@@ -537,10 +537,11 @@ public final class CameraServer {
    *
    * @param camera Camera
    */
-  public void startAutomaticCapture(VideoSource camera) {
+  public MjpegServer startAutomaticCapture(VideoSource camera) {
     addCamera(camera);
-    VideoSink server = addServer("serve_" + camera.getName());
+    MjpegServer server = addServer("serve_" + camera.getName());
     server.setSource(camera);
+    return server;
   }
 
   /**
