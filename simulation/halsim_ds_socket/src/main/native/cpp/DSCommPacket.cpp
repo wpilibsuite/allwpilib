@@ -26,6 +26,7 @@ DSCommPacket::DSCommPacket() {
     i.ResetTcp();
     i.ResetUdp();
   }
+  matchInfo.gameSpecificMessageSize = 0;
 }
 
 /*----------------------------------------------------------------------------
