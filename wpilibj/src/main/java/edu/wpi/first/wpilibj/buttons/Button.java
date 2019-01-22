@@ -32,7 +32,7 @@ public abstract class Button extends Trigger {
   /**
    * Runs the given Runnable whenever the button is newly pressed.
    *
-   * @param command the command to start
+   * @param toRun the Runnable to run
    */
   public void whenPressed(final Runnable toRun) {
     whenActive(toRun);
