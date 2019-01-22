@@ -30,6 +30,15 @@ public abstract class Button extends Trigger {
   }
 
   /**
+   * Runs the given Runnable whenever the button is newly pressed.
+   *
+   * @param command the command to start
+   */
+  public void whenPressed(final Runnable toRun) {
+    whenActive(toRun);
+  }
+
+  /**
    * Constantly starts the given command while the button is held.
    *
    * {@link Command#start()} will be called repeatedly while the button is held, and will be
@@ -42,12 +51,30 @@ public abstract class Button extends Trigger {
   }
 
   /**
+   * Constantly runs the given Runnable while the button is held.
+   *
+   * @param toRun the Runnable to run.  Will be called repeatedly.
+   */
+  public void whileHeld(final Runnable toRun) {
+    whileActive(toRun);
+  }
+
+  /**
    * Starts the command when the button is released.
    *
    * @param command the command to start
    */
   public void whenReleased(final Command command) {
     whenInactive(command);
+  }
+
+  /**
+   * Runs the given Runnable when the button is released.
+   *
+   * @param toRun the Runnable to run
+   */
+  public void whenReleased(final Runnable toRun) {
+    whenInactive(toRun);
   }
 
   /**

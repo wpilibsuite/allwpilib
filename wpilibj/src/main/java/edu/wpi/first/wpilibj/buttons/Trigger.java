@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj.buttons;
 
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.InstantCommand;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
@@ -68,7 +69,16 @@ public abstract class Trigger extends SendableBase {
   }
 
   /**
-   * Constantly starts the given command while the button is held.
+   * Runs the given Runnable when the trigger just becomes active.
+   *
+   * @param toRun the runnable to run
+   */
+  public void whenActive(final Runnable toRun) {
+    whenActive(new InstantCommand(toRun));
+  }
+
+  /**
+   * Constantly starts the given command while the trigger is active.
    *
    * {@link Command#start()} will be called repeatedly while the trigger is active, and will be
    * canceled when the trigger becomes inactive.
@@ -95,6 +105,15 @@ public abstract class Trigger extends SendableBase {
   }
 
   /**
+   * Constantly runs the given Runnable while the trigger is active.
+   *
+   * @param toRun the runnable to run.  Will be run repeatedly while the trigger is active.
+   */
+  public void whileActive(final Runnable toRun) {
+    whileActive(new InstantCommand(toRun));
+  }
+
+  /**
    * Starts the command when the trigger becomes inactive.
    *
    * @param command the command to start
@@ -114,6 +133,15 @@ public abstract class Trigger extends SendableBase {
         m_pressedLast = pressed;
       }
     }.start();
+  }
+
+  /**
+   * Runs the given Runnable when the trigger becomes inactive.
+   *
+   * @param toRun the runnable to run
+   */
+  public void whenInactive(final Runnable toRun) {
+    whenInactive(new InstantCommand(toRun));
   }
 
   /**
