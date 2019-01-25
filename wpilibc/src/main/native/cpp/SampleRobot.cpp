@@ -59,23 +59,23 @@ void SampleRobot::StartCompetition() {
 }
 
 void SampleRobot::RobotInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
 }
 
 void SampleRobot::Disabled() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
 }
 
 void SampleRobot::Autonomous() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
 }
 
 void SampleRobot::OperatorControl() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
 }
 
 void SampleRobot::Test() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
 }
 
 void SampleRobot::RobotMain() { m_robotMainOverridden = false; }
