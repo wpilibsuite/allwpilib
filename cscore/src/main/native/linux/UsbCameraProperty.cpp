@@ -9,6 +9,7 @@
 
 #include <wpi/STLExtras.h>
 #include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
 
 #include "UsbUtil.h"
 
@@ -151,6 +152,9 @@ UsbCameraProperty::UsbCameraProperty(const struct v4l2_query_ext_ctrl& ctrl)
       propKind = CS_PROP_BOOLEAN;
       break;
     case V4L2_CTRL_TYPE_INTEGER_MENU:
+      propKind = CS_PROP_ENUM;
+      intMenu = true;
+      break;
     case V4L2_CTRL_TYPE_MENU:
       propKind = CS_PROP_ENUM;
       break;
@@ -243,7 +247,12 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
     for (int i = prop->minimum; i <= prop->maximum; ++i) {
       qmenu.index = static_cast<__u32>(i);
       if (TryIoctl(fd, VIDIOC_QUERYMENU, &qmenu) != 0) continue;
-      prop->enumChoices[i] = reinterpret_cast<const char*>(qmenu.name);
+      if (prop->intMenu) {
+        wpi::raw_string_ostream os(prop->enumChoices[i]);
+        os << qmenu.value;
+      } else {
+        prop->enumChoices[i] = reinterpret_cast<const char*>(qmenu.name);
+      }
     }
   }
 
