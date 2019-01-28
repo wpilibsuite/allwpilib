@@ -450,6 +450,15 @@ bool UsbCameraImpl::DeviceConnect() {
     return false;
   }
 
+  CS_Status st = 0;
+  auto devices = EnumerateUsbCameras(&st);
+
+  for (auto&& device : devices) {
+    if (device.path == m_path) {
+      SetDescription(device.name);
+    }
+  }
+
   if (!m_properties_cached) {
     SDEBUG3("caching properties");
     DeviceCacheProperties();
@@ -933,9 +942,7 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   // Ensure we are initialized by grabbing the message pump
   // GetMessagePump();
 
-  ComPtr<IMFMediaSource> ppSource;
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
-  ComPtr<IMFMediaSource> pSource;
   ComPtr<IMFAttributes> pAttributes;
   IMFActivate** ppDevices = nullptr;
 
@@ -988,7 +995,6 @@ done:
     }
   }
   CoTaskMemFree(ppDevices);
-  pSource.Reset();
   return retval;
 }
 
