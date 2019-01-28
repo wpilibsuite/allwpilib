@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -135,7 +135,7 @@ class UsbCameraImpl : public SourceImpl,
                            IMFSourceReader* sourceReader);
   void DeviceCacheProperties();
   void DeviceCacheVideoModes();
-  template<typename TagProperty, typename IAM>
+  template <typename TagProperty, typename IAM>
   void DeviceAddProperty(const wpi::Twine& name_, TagProperty tag,
                          IAM* pProcAmp);
 

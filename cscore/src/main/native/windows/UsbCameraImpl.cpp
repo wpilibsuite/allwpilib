@@ -488,9 +488,8 @@ bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
   return true;
 }
 
-template<typename TagProperty, typename IAM>
-void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_,
-                                      TagProperty tag,
+template <typename TagProperty, typename IAM>
+void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_, TagProperty tag,
                                       IAM* pProcAmp) {
   // First see if properties exist
   bool isValid = false;
@@ -543,7 +542,6 @@ void UsbCameraImpl::DeviceCacheProperties() {
     pCamControl->Release();
   }
 }
-
 
 int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
                                    int rawValue) {

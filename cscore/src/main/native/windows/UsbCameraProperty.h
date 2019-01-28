@@ -7,12 +7,11 @@
 
 #pragma once
 
-#include <memory>
-
 #include <mfapi.h>
 #include <mfidl.h>
 #include <mfreadwrite.h>
 
+#include <memory>
 
 #include <Dshow.h>
 #include <wpi/mutex.h>
@@ -57,11 +56,12 @@ class UsbCameraProperty : public PropertyImpl {
   UsbCameraProperty(const wpi::Twine& name_, tagCameraControlProperty tag,
                     bool autoProp, IAMCameraControl* pProcAmp, bool* isValid);
 
-  bool DeviceGet(std::unique_lock<wpi::mutex>& lock, IMFSourceReader* sourceReader);
+  bool DeviceGet(std::unique_lock<wpi::mutex>& lock,
+                 IMFSourceReader* sourceReader);
   bool DeviceSet(std::unique_lock<wpi::mutex>& lock,
                  IMFSourceReader* sourceReader) const;
-  bool DeviceSet(std::unique_lock<wpi::mutex>& lock, IMFSourceReader* sourceReader,
-                 int newValue) const;
+  bool DeviceSet(std::unique_lock<wpi::mutex>& lock,
+                 IMFSourceReader* sourceReader, int newValue) const;
 
   // If this is a device (rather than software) property
   bool device{true};
@@ -81,7 +81,8 @@ class UsbCameraProperty : public PropertyImpl {
   int type{0};     // implementation type, not CS_PropertyKind!
 
  private:
-  bool DeviceGet(std::unique_lock<wpi::mutex>& lock, IAMCameraControl* pProcAmp);
+  bool DeviceGet(std::unique_lock<wpi::mutex>& lock,
+                 IAMCameraControl* pProcAmp);
   bool DeviceSet(std::unique_lock<wpi::mutex>& lock,
                  IAMCameraControl* pProcAmp) const;
   bool DeviceSet(std::unique_lock<wpi::mutex>& lock, IAMCameraControl* pProcAmp,
@@ -92,6 +93,5 @@ class UsbCameraProperty : public PropertyImpl {
                  IAMVideoProcAmp* pProcAmp) const;
   bool DeviceSet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp* pProcAmp,
                  int newValue) const;
-
 };
 }  // namespace cs
