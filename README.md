@@ -25,7 +25,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 - A C++ compiler
     - On Linux, GCC works fine
-    - On Windows, you need Visual Studio 2015 (the free community edition works fine).
+    - On Windows, you need Visual Studio 2017 (the free community edition works fine).
       Make sure to select the C++ Programming Language for installation
 - [ARM Compiler Toolchain](https://github.com/wpilibsuite/toolchain-builder/releases)
   * Note that for 2019 and beyond, you should use version 6 or greater of GCC
@@ -78,6 +78,8 @@ The gradlew wrapper only exists in the root of the main project, so be sure to r
 There are a few tasks other than `build` available. To see them, run the meta-task `tasks`. This will print a list of all available tasks, with a description of each task.
 
 wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
+
+CMake is also supported for building. See [README-CMAKE.md](README-CMAKE.md).
 
 ## Publishing
 
