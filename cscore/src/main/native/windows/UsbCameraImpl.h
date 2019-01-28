@@ -132,11 +132,12 @@ class UsbCameraImpl : public SourceImpl,
   CS_StatusValue DeviceSetMode();
   void DeviceCacheMode();
   void DeviceCacheProperty(std::unique_ptr<UsbCameraProperty> rawProp,
-                           IAMVideoProcAmp* pProcAmp);
+                           IMFSourceReader* sourceReader);
   void DeviceCacheProperties();
   void DeviceCacheVideoModes();
-  void DeviceAddProperty(const wpi::Twine& name_, tagVideoProcAmpProperty tag,
-                         IAMVideoProcAmp* pProcAmp);
+  template<typename TagProperty, typename IAM>
+  void DeviceAddProperty(const wpi::Twine& name_, TagProperty tag,
+                         IAM* pProcAmp);
 
   ComPtr<IMFMediaType> DeviceCheckModeValid(const VideoMode& toCheck);
 
