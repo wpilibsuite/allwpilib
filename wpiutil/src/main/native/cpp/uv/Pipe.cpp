@@ -26,7 +26,7 @@ std::shared_ptr<Pipe> Pipe::Create(Loop& loop, bool ipc) {
 }
 
 std::shared_ptr<Pipe> Pipe::Accept() {
-  auto client = Create(GetLoopRef());
+  auto client = Create(GetLoopRef(), GetRaw()->ipc);
   if (!client) return nullptr;
   if (!Accept(client)) {
     client->Release();
