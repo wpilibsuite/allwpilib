@@ -57,6 +57,18 @@ class Pipe final : public NetworkStreamImpl<Pipe, uv_pipe_t> {
   }
 
   /**
+   * Reuse this handle.  This closes the handle, and after the close completes,
+   * reinitializes it (identically to Create) and calls the provided callback.
+   * Unlike Close(), it does NOT emit the closed signal, however, IsClosing()
+   * will return true until the callback is called.  This does nothing if
+   * IsClosing() is true (e.g. if Close() was called).
+   *
+   * @param ipc IPC
+   * @param callback Callback
+   */
+  void Reuse(std::function<void()> callback, bool ipc = false);
+
+  /**
    * Accept incoming connection.
    *
    * This call is used in conjunction with `Listen()` to accept incoming
@@ -176,6 +188,12 @@ class Pipe final : public NetworkStreamImpl<Pipe, uv_pipe_t> {
 
  private:
   Pipe* DoAccept() override;
+
+  struct ReuseData {
+    std::function<void()> callback;
+    bool ipc;
+  };
+  std::unique_ptr<ReuseData> m_reuseData;
 };
 
 /**
