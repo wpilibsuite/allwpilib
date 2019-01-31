@@ -160,8 +160,6 @@ void Watchdog::Disable() {
   auto thr = m_owner->GetThread();
   if (!thr) return;
 
-  m_isExpired = false;
-
   thr->m_watchdogs.remove(this);
   thr->m_cond.notify_all();
 }

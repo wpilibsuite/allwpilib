@@ -121,6 +121,7 @@ class WatchdogTest {
   void isExpiredTest() {
     final Watchdog watchdog = new Watchdog(0.2, () -> {
     });
+    assertFalse(watchdog.isExpired());
     watchdog.enable();
 
     assertFalse(watchdog.isExpired());
@@ -130,6 +131,12 @@ class WatchdogTest {
       Thread.currentThread().interrupt();
     }
     assertTrue(watchdog.isExpired());
+
+    watchdog.disable();
+    assertTrue(watchdog.isExpired());
+
+    watchdog.reset();
+    assertFalse(watchdog.isExpired());
   }
 
   @Test

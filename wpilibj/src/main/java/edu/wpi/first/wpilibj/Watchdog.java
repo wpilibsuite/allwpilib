@@ -195,8 +195,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   public void disable() {
     m_queueMutex.lock();
     try {
-      m_isExpired = false;
-
       m_watchdogs.remove(this);
       m_schedulerWaiter.signalAll();
     } finally {
