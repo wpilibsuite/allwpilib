@@ -109,10 +109,6 @@ static wpi::StringRef UnescapeString(wpi::StringRef source,
       continue;
     }
     switch (*++s) {
-      case '\\':
-      case '"':
-        buf.push_back(s[-1]);
-        break;
       case 't':
         buf.push_back('\t');
         break;
@@ -133,7 +129,7 @@ static wpi::StringRef UnescapeString(wpi::StringRef source,
         break;
       }
       default:
-        buf.push_back(s[-1]);
+        buf.push_back(*s);
         break;
     }
   }
