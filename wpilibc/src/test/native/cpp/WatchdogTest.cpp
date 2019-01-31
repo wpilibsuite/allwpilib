@@ -118,7 +118,11 @@ TEST(WatchdogTest, Epochs) {
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 }
 
+#ifdef __APPLE__
+TEST(WatchdogTest, DISABLED_MultiWatchdog) {
+#else
 TEST(WatchdogTest, MultiWatchdog) {
+#endif
   uint32_t watchdogCounter1 = 0;
   uint32_t watchdogCounter2 = 0;
 
