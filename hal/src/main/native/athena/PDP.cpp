@@ -9,6 +9,8 @@
 
 #include <memory>
 
+#include <wpi/mutex.h>
+
 #include "HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/CANAPI.h"
@@ -106,9 +108,16 @@ union PdpStatusEnergy {
   } bits;
 };
 
+static wpi::mutex pdpHandleMutex;
+static HAL_PDPHandle pdpHandles[kNumPDPModules];
+
 namespace hal {
 namespace init {
-void InitializePDP() {}
+void InitializePDP() {
+  for (int i = 0; i < kNumPDPModules; i++) {
+    pdpHandles[i] = HAL_kInvalidHandle;
+  }
+}
 }  // namespace init
 }  // namespace hal
 
@@ -121,6 +130,13 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status) {
     return HAL_kInvalidHandle;
   }
 
+  std::lock_guard<wpi::mutex> lock(pdpHandleMutex);
+
+  if (pdpHandles[module] != HAL_kInvalidHandle) {
+    *status = 0;
+    return pdpHandles[module];
+  }
+
   auto handle = HAL_InitializeCAN(manufacturer, module, deviceType, status);
 
   if (*status != 0) {
@@ -128,10 +144,21 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status) {
     return HAL_kInvalidHandle;
   }
 
+  pdpHandles[module] = handle;
+
   return handle;
 }
 
-void HAL_CleanPDP(HAL_PDPHandle handle) { HAL_CleanCAN(handle); }
+void HAL_CleanPDP(HAL_PDPHandle handle) {
+  HAL_CleanCAN(handle);
+
+  for (int i = 0; i < kNumPDPModules; i++) {
+    if (pdpHandles[i] == handle) {
+      pdpHandles[i] = HAL_kInvalidHandle;
+      return;
+    }
+  }
+}
 
 HAL_Bool HAL_CheckPDPModule(int32_t module) {
   return module < kNumPDPModules && module >= 0;
