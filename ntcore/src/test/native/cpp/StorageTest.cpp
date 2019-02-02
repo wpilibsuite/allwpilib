@@ -90,6 +90,7 @@ class StorageTestPersistent : public StorageTestEmpty {
     storage.SetEntryTypeValue("string/normal", Value::MakeString("hello"));
     storage.SetEntryTypeValue("string/special",
                               Value::MakeString(StringRef("\0\3\5\n", 4)));
+    storage.SetEntryTypeValue("string/quoted", Value::MakeString("\"a\""));
     storage.SetEntryTypeValue("raw/empty", Value::MakeRaw(""));
     storage.SetEntryTypeValue("raw/normal", Value::MakeRaw("hello"));
     storage.SetEntryTypeValue("raw/special",
@@ -599,6 +600,8 @@ TEST_P(StorageTestPersistent, SavePersistent) {
   std::tie(line, rem) = rem.split('\n');
   ASSERT_EQ("string \"string/normal\"=\"hello\"", line);
   std::tie(line, rem) = rem.split('\n');
+  ASSERT_EQ("string \"string/quoted\"=\"\\\"a\\\"\"", line);
+  std::tie(line, rem) = rem.split('\n');
   ASSERT_EQ("string \"string/special\"=\"\\x00\\x03\\x05\\n\"", line);
   std::tie(line, rem) = rem.split('\n');
   ASSERT_EQ("array string \"stringarr/empty\"=", line);
@@ -787,18 +790,19 @@ TEST_P(StorageTestEmpty, LoadPersistent) {
   in += "string \"string/empty\"=\"\"\n";
   in += "string \"string/normal\"=\"hello\"\n";
   in += "string \"string/special\"=\"\\x00\\x03\\x05\\n\"\n";
+  in += "string \"string/quoted\"=\"\\\"a\\\"\"\n";
   in += "array string \"stringarr/empty\"=\n";
   in += "array string \"stringarr/one\"=\"hello\"\n";
   in += "array string \"stringarr/two\"=\"hello\",\"world\\n\"\n";
 
-  EXPECT_CALL(dispatcher, QueueOutgoing(_, _, _)).Times(22);
+  EXPECT_CALL(dispatcher, QueueOutgoing(_, _, _)).Times(23);
   EXPECT_CALL(notifier,
               NotifyEntry(_, _, _, NT_NOTIFY_NEW | NT_NOTIFY_LOCAL, UINT_MAX))
-      .Times(22);
+      .Times(23);
 
   wpi::raw_mem_istream iss(in);
   EXPECT_TRUE(storage.LoadEntries(iss, "", true, warn_func));
-  ASSERT_EQ(22u, entries().size());
+  ASSERT_EQ(23u, entries().size());
 
   EXPECT_EQ(*Value::MakeBoolean(true), *storage.GetEntryValue("boolean/true"));
   EXPECT_EQ(*Value::MakeBoolean(false),
@@ -811,6 +815,8 @@ TEST_P(StorageTestEmpty, LoadPersistent) {
             *storage.GetEntryValue("string/normal"));
   EXPECT_EQ(*Value::MakeString(StringRef("\0\3\5\n", 4)),
             *storage.GetEntryValue("string/special"));
+  EXPECT_EQ(*Value::MakeString("\"a\""),
+            *storage.GetEntryValue("string/quoted"));
   EXPECT_EQ(*Value::MakeRaw(""), *storage.GetEntryValue("raw/empty"));
   EXPECT_EQ(*Value::MakeRaw("hello"), *storage.GetEntryValue("raw/normal"));
   EXPECT_EQ(*Value::MakeRaw(StringRef("\0\3\5\n", 4)),
