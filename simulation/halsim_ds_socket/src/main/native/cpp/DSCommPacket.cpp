@@ -96,7 +96,7 @@ void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput,
   int numBytes = (buttonCount + 7) / 8;
   stick.buttons.buttons = 0;
   for (int i = 0; i < numBytes; i++) {
-    stick.buttons.buttons |= dataInput[1 + i] << (8 * (i));
+    stick.buttons.buttons |= dataInput[numBytes - i] << (8 * (i));
   }
   stick.buttons.count = buttonCount;
 
