@@ -112,6 +112,19 @@ task generateJavaDocs(type: Javadoc) {
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true
+
+    title = "WPILib API $pubVersion"
+    ext.entryPoint = "$destinationDir/index.html"
+
+    if (JavaVersion.current().isJava11Compatible()) {
+        options.addBooleanOption('-no-module-directories', true)
+        doLast {
+            // This is a work-around for https://bugs.openjdk.java.net/browse/JDK-8211194. Can be removed once that issue is fixed on JDK's side
+            // Since JDK 11, package-list is missing from javadoc output files and superseded by element-list file, but a lot of external tools still need it
+            // Here we generate this file manually
+            new File(destinationDir, 'package-list').text = new File(destinationDir, 'element-list').text
+        }
+    }
 }
 
 tasks.register("zipJavaDocs", Zip) {

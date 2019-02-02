@@ -12,6 +12,7 @@
 #include "frc/RobotBase.h"
 
 namespace frc {
+/** WPILib FileSystem namespace */
 namespace filesystem {
 
 /**
