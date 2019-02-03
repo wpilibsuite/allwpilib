@@ -500,6 +500,14 @@ void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_, TagProperty tag,
   }
 }
 
+template void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_,
+                                               tagVideoProcAmpProperty tag,
+                                               IAMVideoProcAmp* pProcAmp);
+
+template void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_,
+                                               tagCameraControlProperty tag,
+                                               IAMCameraControl* pProcAmp);
+
 #define CREATEPROPERTY(val) \
   DeviceAddProperty(#val, VideoProcAmp_##val, pProcAmp);
 
