@@ -111,13 +111,13 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
 
   void StartStream() {
     std::lock_guard<wpi::mutex> lock(m_mutex);
-    m_source->EnableSink();
+    if (m_source) m_source->EnableSink();
     m_streaming = true;
   }
 
   void StopStream() {
     std::lock_guard<wpi::mutex> lock(m_mutex);
-    m_source->DisableSink();
+    if (m_source) m_source->DisableSink();
     m_streaming = false;
   }
 };
