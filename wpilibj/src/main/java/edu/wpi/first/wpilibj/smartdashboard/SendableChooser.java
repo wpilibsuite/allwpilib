@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj.smartdashboard;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -55,8 +56,7 @@ public class SendableChooser<V> extends SendableBase {
   /**
    * A map linking strings to the objects the represent.
    */
-  @SuppressWarnings("PMD.LooseCoupling")
-  private final LinkedHashMap<String, V> m_map = new LinkedHashMap<>();
+  private final Map<String, V> m_map = new LinkedHashMap<>();
   private String m_defaultChoice = "";
   private final int m_instance;
   private static final AtomicInteger s_instances = new AtomicInteger();

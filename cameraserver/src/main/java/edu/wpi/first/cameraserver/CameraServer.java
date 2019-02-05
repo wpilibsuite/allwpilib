@@ -9,7 +9,7 @@ package edu.wpi.first.cameraserver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -293,9 +293,9 @@ public final class CameraServer {
       "PMD.NPathComplexity"})
   private CameraServer() {
     m_defaultUsbDevice = new AtomicInteger();
-    m_sources = new Hashtable<>();
-    m_sinks = new Hashtable<>();
-    m_tables = new Hashtable<>();
+    m_sources = new HashMap<>();
+    m_sinks = new HashMap<>();
+    m_tables = new HashMap<>();
     m_publishTable = NetworkTableInstance.getDefault().getTable(kPublishName);
     m_nextPort = kBasePort;
     m_addresses = new String[0];

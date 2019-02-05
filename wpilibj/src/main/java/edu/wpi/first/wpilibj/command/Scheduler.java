@@ -7,9 +7,11 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -50,22 +52,13 @@ public final class Scheduler extends SendableBase {
   }
 
   /**
-   * A hashtable of active {@link Command Commands} to their {@link LinkedListElement}.
-   */
-  @SuppressWarnings("PMD.LooseCoupling")
-  private final Hashtable<Command, LinkedListElement> m_commandTable = new Hashtable<>();
-  /**
    * The {@link Set} of all {@link Subsystem Subsystems}.
    */
-  private final Set m_subsystems = new Set();
+  private final Set<Subsystem> m_subsystems = new HashSet<>();
   /**
-   * The first {@link Command} in the list.
+   * The list of {@link Command Commands} that are scheduled to run.
    */
-  private LinkedListElement m_firstCommand;
-  /**
-   * The last {@link Command} in the list.
-   */
-  private LinkedListElement m_lastCommand;
+  private final List<Command> m_commands = new ArrayList<>();
   /**
    * Whether or not we are currently adding a command.
    */
@@ -77,8 +70,7 @@ public final class Scheduler extends SendableBase {
   /**
    * A list of all {@link Command Commands} which need to be added.
    */
-  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
-  private final Vector<Command> m_additions = new Vector<>();
+  private final List<Command> m_additions = new ArrayList<>();
   private NetworkTableEntry m_namesEntry;
   private NetworkTableEntry m_idsEntry;
   private NetworkTableEntry m_cancelEntry;
@@ -86,8 +78,7 @@ public final class Scheduler extends SendableBase {
    * A list of all {@link edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler Buttons}. It is
    * created lazily.
    */
-  @SuppressWarnings("PMD.LooseCoupling")
-  private Vector<ButtonScheduler> m_buttons;
+  private List<ButtonScheduler> m_buttons;
   private boolean m_runningCommandsChanged;
 
   /**
@@ -110,7 +101,7 @@ public final class Scheduler extends SendableBase {
    */
   public void add(Command command) {
     if (command != null) {
-      m_additions.addElement(command);
+      m_additions.add(command);
     }
   }
 
@@ -123,9 +114,9 @@ public final class Scheduler extends SendableBase {
   @SuppressWarnings("PMD.UseArrayListInsteadOfVector")
   public void addButton(ButtonScheduler button) {
     if (m_buttons == null) {
-      m_buttons = new Vector<>();
+      m_buttons = new ArrayList<>();
     }
-    m_buttons.addElement(button);
+    m_buttons.add(button);
   }
 
   /**
@@ -148,11 +139,10 @@ public final class Scheduler extends SendableBase {
     }
 
     // Only add if not already in
-    if (!m_commandTable.containsKey(command)) {
+    if (!m_commands.contains(command)) {
       // Check that the requirements can be had
-      Enumeration requirements = command.getRequirements();
-      while (requirements.hasMoreElements()) {
-        Subsystem lock = (Subsystem) requirements.nextElement();
+      Set<Subsystem> requirements = command.getRequirements();
+      for (Subsystem lock : requirements) {
         if (lock.getCurrentCommand() != null && !lock.getCurrentCommand().isInterruptible()) {
           return;
         }
@@ -160,9 +150,7 @@ public final class Scheduler extends SendableBase {
 
       // Give it the requirements
       m_adding = true;
-      requirements = command.getRequirements();
-      while (requirements.hasMoreElements()) {
-        Subsystem lock = (Subsystem) requirements.nextElement();
+      for (Subsystem lock : requirements) {
         if (lock.getCurrentCommand() != null) {
           lock.getCurrentCommand().cancel();
           remove(lock.getCurrentCommand());
@@ -172,15 +160,7 @@ public final class Scheduler extends SendableBase {
       m_adding = false;
 
       // Add it to the list
-      LinkedListElement element = new LinkedListElement();
-      element.setData(command);
-      if (m_firstCommand == null) {
-        m_firstCommand = m_lastCommand = element;
-      } else {
-        m_lastCommand.add(element);
-        m_lastCommand = element;
-      }
-      m_commandTable.put(command, element);
+      m_commands.add(command);
 
       m_runningCommandsChanged = true;
 
@@ -206,37 +186,30 @@ public final class Scheduler extends SendableBase {
     // Get button input (going backwards preserves button priority)
     if (m_buttons != null) {
       for (int i = m_buttons.size() - 1; i >= 0; i--) {
-        m_buttons.elementAt(i).execute();
+        m_buttons.get(i).execute();
       }
     }
 
     // Call every subsystem's periodic method
-    Enumeration subsystems = m_subsystems.getElements();
-    while (subsystems.hasMoreElements()) {
-      ((Subsystem) subsystems.nextElement()).periodic();
+    for (Subsystem subsystem : m_subsystems) {
+      subsystem.periodic();
     }
 
-    // Loop through the commands
-    LinkedListElement element = m_firstCommand;
-    while (element != null) {
-      Command command = element.getData();
-      element = element.getNext();
-      if (!command.run()) {
-        remove(command);
-        m_runningCommandsChanged = true;
-      }
-    }
+    // Run each command, removing the ones that completed.
+    // Store completed commands in an intermediate collection to avoid modification during iteration
+    m_commands.stream()
+        .filter(c -> !c.run())
+        .collect(Collectors.toList())
+        .forEach(this::remove);
 
     // Add the new things
-    for (int i = 0; i < m_additions.size(); i++) {
-      _add(m_additions.elementAt(i));
+    for (Command addition : m_additions) {
+      _add(addition);
     }
-    m_additions.removeAllElements();
+    m_additions.clear();
 
     // Add in the defaults
-    Enumeration locks = m_subsystems.getElements();
-    while (locks.hasMoreElements()) {
-      Subsystem lock = (Subsystem) locks.nextElement();
+    for (Subsystem lock : m_subsystems) {
       if (lock.getCurrentCommand() == null) {
         _add(lock.getDefaultCommand());
       }
@@ -263,25 +236,14 @@ public final class Scheduler extends SendableBase {
    * @param command the command to remove
    */
   void remove(Command command) {
-    if (command == null || !m_commandTable.containsKey(command)) {
+    if (command == null || !m_commands.contains(command)) {
       return;
     }
-    LinkedListElement element = m_commandTable.get(command);
-    m_commandTable.remove(command);
 
-    if (element.equals(m_lastCommand)) {
-      m_lastCommand = element.getPrevious();
+    m_commands.remove(command);
+    for (Subsystem requirement : command.getRequirements()) {
+      requirement.setCurrentCommand(null);
     }
-    if (element.equals(m_firstCommand)) {
-      m_firstCommand = element.getNext();
-    }
-    element.remove();
-
-    Enumeration requirements = command.getRequirements();
-    while (requirements.hasMoreElements()) {
-      ((Subsystem) requirements.nextElement()).setCurrentCommand(null);
-    }
-
     command.removed();
   }
 
@@ -290,8 +252,8 @@ public final class Scheduler extends SendableBase {
    */
   public void removeAll() {
     // TODO: Confirm that this works with "uninteruptible" commands
-    while (m_firstCommand != null) {
-      remove(m_firstCommand.getData());
+    while (!m_commands.isEmpty()) {
+      remove(m_commands.get(0));
     }
   }
 
@@ -320,10 +282,10 @@ public final class Scheduler extends SendableBase {
         // Get the commands to cancel
         double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
         if (toCancel.length > 0) {
-          for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
+          for (Command command : m_commands) {
             for (double d : toCancel) {
-              if (e.getData().hashCode() == d) {
-                e.getData().cancel();
+              if (command.hashCode() == d) { // NOPMD deeply nested if statement
+                command.cancel();
               }
             }
           }
@@ -332,17 +294,12 @@ public final class Scheduler extends SendableBase {
 
         if (m_runningCommandsChanged) {
           // Set the the running commands
-          int number = 0;
-          for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
-            number++;
-          }
-          String[] commands = new String[number];
-          double[] ids = new double[number];
-          number = 0;
-          for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
-            commands[number] = e.getData().getName();
-            ids[number] = e.getData().hashCode();
-            number++;
+          int size = m_commands.size();
+          String[] commands = new String[size];
+          double[] ids = new double[size];
+          for (int i = 0; i < size; i++) {
+            commands[i] = m_commands.get(i).getName();
+            ids[i] = m_commands.get(i).hashCode();
           }
           m_namesEntry.setStringArray(commands);
           m_idsEntry.setDoubleArray(ids);

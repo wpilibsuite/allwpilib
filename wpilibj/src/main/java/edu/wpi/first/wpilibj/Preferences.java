@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.Vector;
+import java.util.Collection;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -72,12 +72,11 @@ public final class Preferences {
   }
 
   /**
-   * Gets the vector of keys.
-   * @return a vector of the keys
+   * Gets the preferences keys.
+   * @return a collection of the keys
    */
-  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
-  public Vector<String> getKeys() {
-    return new Vector<>(m_table.getKeys());
+  public Collection<String> getKeys() {
+    return m_table.getKeys();
   }
 
   /**
