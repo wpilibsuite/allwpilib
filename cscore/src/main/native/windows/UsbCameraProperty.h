@@ -7,6 +7,10 @@
 
 #pragma once
 
+#include <mfapi.h>
+#include <mfidl.h>
+#include <mfreadwrite.h>
+
 #include <memory>
 
 #include <Dshow.h>
@@ -49,16 +53,23 @@ class UsbCameraProperty : public PropertyImpl {
   UsbCameraProperty(const wpi::Twine& name_, tagVideoProcAmpProperty tag,
                     bool autoProp, IAMVideoProcAmp* pProcAmp, bool* isValid);
 
-  bool DeviceGet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp* pProcAmp);
+  UsbCameraProperty(const wpi::Twine& name_, tagCameraControlProperty tag,
+                    bool autoProp, IAMCameraControl* pProcAmp, bool* isValid);
+
+  bool DeviceGet(std::unique_lock<wpi::mutex>& lock,
+                 IMFSourceReader* sourceReader);
   bool DeviceSet(std::unique_lock<wpi::mutex>& lock,
-                 IAMVideoProcAmp* pProcAmp) const;
-  bool DeviceSet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp* pProcAmp,
-                 int newValue) const;
+                 IMFSourceReader* sourceReader) const;
+  bool DeviceSet(std::unique_lock<wpi::mutex>& lock,
+                 IMFSourceReader* sourceReader, int newValue) const;
 
   // If this is a device (rather than software) property
   bool device{true};
   bool isAutoProp{true};
-  tagVideoProcAmpProperty tag;
+
+  bool isControlProperty{false};
+  tagVideoProcAmpProperty tagVideoProc;
+  tagCameraControlProperty tagCameraControl;
 
   // If this is a percentage (rather than raw) property
   bool percentage{false};
@@ -68,5 +79,19 @@ class UsbCameraProperty : public PropertyImpl {
 
   unsigned id{0};  // implementation-level id
   int type{0};     // implementation type, not CS_PropertyKind!
+
+ private:
+  bool DeviceGet(std::unique_lock<wpi::mutex>& lock,
+                 IAMCameraControl* pProcAmp);
+  bool DeviceSet(std::unique_lock<wpi::mutex>& lock,
+                 IAMCameraControl* pProcAmp) const;
+  bool DeviceSet(std::unique_lock<wpi::mutex>& lock, IAMCameraControl* pProcAmp,
+                 int newValue) const;
+
+  bool DeviceGet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp* pProcAmp);
+  bool DeviceSet(std::unique_lock<wpi::mutex>& lock,
+                 IAMVideoProcAmp* pProcAmp) const;
+  bool DeviceSet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp* pProcAmp,
+                 int newValue) const;
 };
 }  // namespace cs

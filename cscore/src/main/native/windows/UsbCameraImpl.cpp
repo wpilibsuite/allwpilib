@@ -497,20 +497,31 @@ bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
   return true;
 }
 
-void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_,
-                                      tagVideoProcAmpProperty tag,
-                                      IAMVideoProcAmp* pProcAmp) {
+template <typename TagProperty, typename IAM>
+void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_, TagProperty tag,
+                                      IAM* pProcAmp) {
   // First see if properties exist
   bool isValid = false;
   auto property = std::make_unique<UsbCameraProperty>(name_, tag, false,
                                                       pProcAmp, &isValid);
   if (isValid) {
-    DeviceCacheProperty(std::move(property), pProcAmp);
+    DeviceCacheProperty(std::move(property), m_sourceReader.Get());
   }
 }
 
+template void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_,
+                                               tagVideoProcAmpProperty tag,
+                                               IAMVideoProcAmp* pProcAmp);
+
+template void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_,
+                                               tagCameraControlProperty tag,
+                                               IAMCameraControl* pProcAmp);
+
 #define CREATEPROPERTY(val) \
   DeviceAddProperty(#val, VideoProcAmp_##val, pProcAmp);
+
+#define CREATECONTROLPROPERTY(val) \
+  DeviceAddProperty(#val, CameraControl_##val, pCamControl);
 
 void UsbCameraImpl::DeviceCacheProperties() {
   if (!m_sourceReader) return;
@@ -532,6 +543,21 @@ void UsbCameraImpl::DeviceCacheProperties() {
     CREATEPROPERTY(Gain)
     pProcAmp->Release();
   }
+
+  IAMCameraControl* pCamControl = NULL;
+
+  if (SUCCEEDED(m_sourceReader->GetServiceForStream(
+          (DWORD)MF_SOURCE_READER_MEDIASOURCE, GUID_NULL,
+          IID_PPV_ARGS(&pCamControl)))) {
+    CREATECONTROLPROPERTY(Pan)
+    CREATECONTROLPROPERTY(Tilt)
+    CREATECONTROLPROPERTY(Roll)
+    CREATECONTROLPROPERTY(Zoom)
+    CREATECONTROLPROPERTY(Exposure)
+    CREATECONTROLPROPERTY(Iris)
+    CREATECONTROLPROPERTY(Focus)
+    pCamControl->Release();
+  }
 }
 
 int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
@@ -547,7 +573,7 @@ int UsbCameraImpl::PercentageToRaw(const UsbCameraProperty& rawProp,
 }
 
 void UsbCameraImpl::DeviceCacheProperty(
-    std::unique_ptr<UsbCameraProperty> rawProp, IAMVideoProcAmp* pProcAmp) {
+    std::unique_ptr<UsbCameraProperty> rawProp, IMFSourceReader* pProcAmp) {
   // For percentage properties, we want to cache both the raw and the
   // percentage versions.  This function is always called with prop being
   // the raw property (as it's coming from the camera) so if required, we need
@@ -716,16 +742,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
   if (!prop->device) {
     if (prop->id == kPropConnectVerboseId) m_connectVerbose = value;
   } else {
-    IAMVideoProcAmp* pProcAmp = NULL;
-    if (SUCCEEDED(m_sourceReader->GetServiceForStream(
-            (DWORD)MF_SOURCE_READER_MEDIASOURCE, GUID_NULL,
-            IID_PPV_ARGS(&pProcAmp)))) {
-      if (!prop->DeviceSet(lock, pProcAmp, value)) {
-        pProcAmp->Release();
-        return CS_PROPERTY_WRITE_FAILED;
-      }
-      pProcAmp->Release();
-    } else {
+    if (!prop->DeviceSet(lock, m_sourceReader.Get())) {
       return CS_PROPERTY_WRITE_FAILED;
     }
   }
