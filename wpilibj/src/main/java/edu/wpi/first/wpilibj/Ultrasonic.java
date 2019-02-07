@@ -78,18 +78,14 @@ public class Ultrasonic extends SendableBase implements PIDSource {
           if (m_sensors.isEmpty()) {
             return;
           }
-          if (sensorIndex >= m_sensors.size()) {
-            sensorIndex = m_sensors.size() - 1;
-          }
           ultrasonic = m_sensors.get(sensorIndex);
         }
         if (ultrasonic.isEnabled()) {
           // Do the ping
           ultrasonic.m_pingChannel.pulse(kPingTime);
         }
-        if (sensorIndex < m_sensors.size()) {
-          sensorIndex++;
-        } else {
+        sensorIndex++;
+        if (sensorIndex >= m_sensors.size()) {
           sensorIndex = 0;
         }
 
