@@ -10,6 +10,7 @@
 #include <cstdio>
 
 #include <hal/HAL.h>
+#include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
@@ -170,7 +171,7 @@ void IterativeRobotBase::PrintLoopOverrunMessage() {
   wpi::SmallString<128> str;
   wpi::raw_svector_ostream buf(str);
 
-  buf << "Loop time of " << m_period << "s overrun\n";
+  buf << "Loop time of " << wpi::format("%.6f", m_period) << "s overrun\n";
 
   DriverStation::ReportWarning(str);
 }
