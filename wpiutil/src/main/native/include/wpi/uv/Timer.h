@@ -67,9 +67,33 @@ class Timer final : public HandleImpl<Timer, uv_timer_t> {
    * @param timeout Time interval
    * @param func Functor
    */
+  static void SingleShot(Loop& loop, uint64_t timeout,
+                         std::function<void()> func) {
+    SingleShot(loop, Time{timeout}, func);
+  }
+
+  /**
+   * Create a timer that calls a functor after a given time interval.
+   *
+   * @param loop Loop object where the timer should run.
+   * @param timeout Time interval
+   * @param func Functor
+   */
   static void SingleShot(const std::shared_ptr<Loop>& loop, Time timeout,
                          std::function<void()> func) {
-    return SingleShot(*loop, timeout, func);
+    SingleShot(*loop, timeout, func);
+  }
+
+  /**
+   * Create a timer that calls a functor after a given time interval.
+   *
+   * @param loop Loop object where the timer should run.
+   * @param timeout Time interval
+   * @param func Functor
+   */
+  static void SingleShot(const std::shared_ptr<Loop>& loop, uint64_t timeout,
+                         std::function<void()> func) {
+    SingleShot(*loop, Time{timeout}, func);
   }
 
   /**
@@ -85,6 +109,20 @@ class Timer final : public HandleImpl<Timer, uv_timer_t> {
    * `std::chrono::duration<uint64_t, std::milli>`).
    */
   void Start(Time timeout, Time repeat = Time{0});
+
+  /**
+   * Start the timer.
+   *
+   * If timeout is zero, an event is emitted on the next event loop
+   * iteration. If repeat is non-zero, an event is emitted first
+   * after timeout milliseconds and then repeatedly after repeat milliseconds.
+   *
+   * @param timeout Milliseconds before to emit an event.
+   * @param repeat Milliseconds between successive events.
+   */
+  void Start(uint64_t timeout, uint64_t repeat = 0) {
+    Start(Time{timeout}, Time{repeat});
+  }
 
   /**
    * Stop the timer.
@@ -119,6 +157,25 @@ class Timer final : public HandleImpl<Timer, uv_timer_t> {
    * `std::chrono::duration<uint64_t, std::milli>`).
    */
   void SetRepeat(Time repeat) { uv_timer_set_repeat(GetRaw(), repeat.count()); }
+
+  /**
+   * Set the repeat interval value.
+   *
+   * The timer will be scheduled to run on the given interval and will follow
+   * normal timer semantics in the case of a time-slice overrun.
+   * For example, if a 50ms repeating timer first runs for 17ms, it will be
+   * scheduled to run again 33ms later. If other tasks consume more than the
+   * 33ms following the first timer event, then another event will be emitted
+   * as soon as possible.
+   *
+   * If the repeat value is set from a listener bound to an event, it does
+   * not immediately take effect. If the timer was non-repeating before, it
+   * will have been stopped. If it was repeating, then the old repeat value
+   * will have been used to schedule the next timeout.
+   *
+   * @param repeat Repeat interval in milliseconds.
+   */
+  void SetRepeat(uint64_t repeat) { uv_timer_set_repeat(GetRaw(), repeat); }
 
   /**
    * Get the timer repeat value.
