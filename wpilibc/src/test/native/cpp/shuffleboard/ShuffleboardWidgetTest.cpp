@@ -13,10 +13,10 @@
 #include <networktables/NetworkTableInstance.h>
 
 #include "frc/commands/InstantCommand.h"
+#include "frc/shuffleboard/BuiltInWidgets.h"
 #include "frc/shuffleboard/ShuffleboardInstance.h"
 #include "frc/shuffleboard/ShuffleboardTab.h"
 #include "frc/shuffleboard/ShuffleboardWidget.h"
-#include "frc/shuffleboard/BuiltInWidgets.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "gtest/gtest.h"
 
@@ -36,32 +36,30 @@ class ShuffleboardWidgetTest : public testing::Test {
 };
 
 TEST_F(ShuffleboardWidgetTest, UseBuiltInWidget) {
-  auto entry = m_tab->Add("Name", "")
-    .WithWidget(BuiltInWidgets::kTextView)
-    .GetEntry();
+  auto entry =
+      m_tab->Add("Name", "").WithWidget(BuiltInWidgets::kTextView).GetEntry();
   EXPECT_EQ("/Shuffleboard/Tab/Name", entry.GetName())
-    << "The widget entry has the wrong name";
+      << "The widget entry has the wrong name";
 }
 
 TEST_F(ShuffleboardWidgetTest, WithProperties) {
   wpi::StringMap<std::shared_ptr<nt::Value>> properties {
-    std::make_pair("min", nt::Value::MakeDouble(0)),
-    std::make_pair("max", nt::Value::MakeDouble(1))
-  };
-  auto entry = m_tab->Add("WithProperties", "")
-    .WithProperties(properties)
-    .GetEntry();
+      std::make_pair("min", nt::Value::MakeDouble(0)),
+      std::make_pair("max", nt::Value::MakeDouble(1))};
+  auto entry =
+      m_tab->Add("WithProperties", "").WithProperties(properties).GetEntry();
 
-  // Update the instance to generation the metadata entries for the widget properties
+  // Update the instance to generate
+  // the metadata entries for the widget properties
   m_instance->Update();
 
-  auto propertiesTable =
-    m_ntInstance.GetTable("/Shuffleboard/.metadata/Tab/WithProperties/Properties");
+  auto propertiesTable = m_ntInstance.GetTable(
+      "/Shuffleboard/.metadata/Tab/WithProperties/Properties");
 
   EXPECT_EQ("/Shuffleboard/Tab/WithProperties", entry.GetName())
-    << "The widget entry has the wrong name";
+      << "The widget entry has the wrong name";
   EXPECT_FLOAT_EQ(0, propertiesTable->GetEntry("min").GetDouble(-1))
-    << "The 'min' property should be 0";
+      << "The 'min' property should be 0";
   EXPECT_FLOAT_EQ(1, propertiesTable->GetEntry("max").GetDouble(-1))
-    << "The 'max' property should be 1";
+      << "The 'max' property should be 1";
 }
