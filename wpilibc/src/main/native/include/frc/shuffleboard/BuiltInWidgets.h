@@ -409,11 +409,9 @@ inline const WidgetType BuiltInWidgets::k3AxisAccelerometer{
 inline const WidgetType BuiltInWidgets::kGyro{"Gyro"};
 inline const WidgetType BuiltInWidgets::kRelay{"Relay"};
 inline const WidgetType BuiltInWidgets::kDifferentialDrive{
-  "Differential Drivebase"};
+    "Differential Drivebase"};
 inline const WidgetType BuiltInWidgets::kMecanumDrive{"Mecanum Drivebase"};
 inline const WidgetType BuiltInWidgets::kCameraStream{"Camera Stream"};
 #endif
 
-
 }  // namespace frc
-

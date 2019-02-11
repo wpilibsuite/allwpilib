@@ -24,7 +24,7 @@ class Watchdog::Thread : public wpi::SafeThread {
     }
   };
 
-   wpi::PriorityQueue<Watchdog*, std::vector<Watchdog*>, DerefGreater<Watchdog*>>
+  wpi::PriorityQueue<Watchdog*, std::vector<Watchdog*>, DerefGreater<Watchdog*>>
       m_watchdogs;
 
  private:
