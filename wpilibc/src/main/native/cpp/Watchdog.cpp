@@ -17,9 +17,7 @@ constexpr std::chrono::milliseconds Watchdog::kMinPrintPeriod;
 
 class Watchdog::Thread : public wpi::SafeThread {
  public:
-
-  wpi::PriorityQueue<Watchdog*, std::vector<Watchdog*>>
-      m_watchdogs;
+  wpi::PriorityQueue<Watchdog*, std::vector<Watchdog*>> m_watchdogs;
 
  private:
   void Main() override;
