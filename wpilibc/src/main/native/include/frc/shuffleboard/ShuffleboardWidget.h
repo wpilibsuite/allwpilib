@@ -24,8 +24,7 @@ class ShuffleboardContainer;
  * @tparam Derived the self type
  */
 template <typename Derived>
-class ShuffleboardWidget
-    : public ShuffleboardComponent<Derived> {
+class ShuffleboardWidget : public ShuffleboardComponent<Derived> {
  public:
   ShuffleboardWidget(ShuffleboardContainer& parent, const wpi::Twine& title)
       : ShuffleboardValue(title),
