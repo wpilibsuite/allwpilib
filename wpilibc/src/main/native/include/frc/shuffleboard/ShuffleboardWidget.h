@@ -25,11 +25,11 @@ class ShuffleboardContainer;
  */
 template <typename Derived>
 class ShuffleboardWidget
-    : public ShuffleboardComponent<ShuffleboardWidget<Derived>> {
+    : public ShuffleboardComponent<Derived> {
  public:
   ShuffleboardWidget(ShuffleboardContainer& parent, const wpi::Twine& title)
       : ShuffleboardValue(title),
-        ShuffleboardComponent<ShuffleboardWidget<Derived>>(parent, title) {}
+        ShuffleboardComponent<Derived>(parent, title) {}
 
   /**
    * Sets the type of widget used to display the data. If not set, the default
@@ -39,7 +39,7 @@ class ShuffleboardWidget
    * @return this widget object
    * @see BuiltInWidgets
    */
-  Derived& withWidget(const WidgetType& widgetType) {
+  Derived& WithWidget(const WidgetType& widgetType) {
     return WithWidget(widgetType.GetWidgetName());
   }
 
