@@ -9,5 +9,7 @@
 
 using namespace frc;
 
+#ifndef _WIN32
 const LayoutType BuiltInLayouts::kList{"List Layout"};
 const LayoutType BuiltInLayouts::kGrid{"Grid Layout"};
+#endif

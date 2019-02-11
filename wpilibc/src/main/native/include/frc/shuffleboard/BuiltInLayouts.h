@@ -50,4 +50,9 @@ class BuiltInLayouts {
   static const LayoutType kGrid;
 };
 
+#ifdef _WIN32
+inline const LayoutType BuiltInLayouts::kList{"List Layout"};
+inline const LayoutType BuiltInLayouts::kGrid{"Grid Layout"};
+#endif
+
 }  // namespace frc
