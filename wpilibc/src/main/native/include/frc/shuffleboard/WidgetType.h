@@ -30,7 +30,7 @@ class WidgetType {
   wpi::StringRef GetWidgetName() const;
 
  private:
-  wpi::StringRef m_widgetName;
+  std::string m_widgetName;
 };
 
 }  // namespace frc

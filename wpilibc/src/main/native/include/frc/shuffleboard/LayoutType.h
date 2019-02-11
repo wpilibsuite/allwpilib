@@ -30,7 +30,7 @@ class LayoutType {
   wpi::StringRef GetLayoutName() const;
 
  private:
-  wpi::StringRef m_layoutName;
+  std::string m_layoutName;
 };
 
 }  // namespace frc
