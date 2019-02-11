@@ -17,7 +17,15 @@ constexpr std::chrono::milliseconds Watchdog::kMinPrintPeriod;
 
 class Watchdog::Thread : public wpi::SafeThread {
  public:
-  wpi::PriorityQueue<Watchdog*, std::vector<Watchdog*>> m_watchdogs;
+  template <typename T>
+  struct DerefGreater {
+    constexpr bool operator()(const T& lhs, const T& rhs) const {
+      return *lhs > *rhs;
+    }
+  };
+
+   wpi::PriorityQueue<Watchdog*, std::vector<Watchdog*>, DerefGreater<Watchdog*>>
+      m_watchdogs;
 
  private:
   void Main() override;
