@@ -9,6 +9,7 @@
 
 using namespace frc;
 
+#ifndef _WIN32
 const WidgetType BuiltInWidgets::kTextView{"Text View"};
 const WidgetType BuiltInWidgets::kNumberSlider{"Number Slider"};
 const WidgetType BuiltInWidgets::kNumberBar{"Number Bar"};
@@ -33,3 +34,4 @@ const WidgetType BuiltInWidgets::kRelay{"Relay"};
 const WidgetType BuiltInWidgets::kDifferentialDrive{"Differential Drivebase"};
 const WidgetType BuiltInWidgets::kMecanumDrive{"Mecanum Drivebase"};
 const WidgetType BuiltInWidgets::kCameraStream{"Camera Stream"};
+#endif

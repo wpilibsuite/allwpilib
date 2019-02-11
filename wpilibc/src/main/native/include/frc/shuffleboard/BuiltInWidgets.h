@@ -384,4 +384,33 @@ class BuiltInWidgets {
   static const WidgetType kCameraStream;
 };
 
+#ifdef _WIN32
+inline const WidgetType BuiltInWidgets::kTextView{"Text View"};
+inline const WidgetType BuiltInWidgets::kNumberSlider{"Number Slider"};
+inline const WidgetType BuiltInWidgets::kNumberBar{"Number Bar"};
+inline const WidgetType BuiltInWidgets::kDial{"Simple Dial"};
+inline const WidgetType BuiltInWidgets::kGraph{"Graph"};
+inline const WidgetType BuiltInWidgets::kBooleanBox{"Boolean Box"};
+inline const WidgetType BuiltInWidgets::kToggleButton{"Toggle Button"};
+inline const WidgetType BuiltInWidgets::kToggleSwitch{"Toggle Switch"};
+inline const WidgetType BuiltInWidgets::kVoltageView{"Voltage View"};
+inline const WidgetType BuiltInWidgets::kPowerDistributionPanel{"PDP"};
+inline const WidgetType BuiltInWidgets::kComboBoxChooser{"ComboBox Chooser"};
+inline const WidgetType BuiltInWidgets::kSplitButtonChooser{"Split Button Chooser"};
+inline const WidgetType BuiltInWidgets::kEncoder{"Encoder"};
+inline const WidgetType BuiltInWidgets::kSpeedController{"Speed Controller"};
+inline const WidgetType BuiltInWidgets::kCommand{"Command"};
+inline const WidgetType BuiltInWidgets::kPIDCommand{"PID Command"};
+inline const WidgetType BuiltInWidgets::kPIDController{"PID Controller"};
+inline const WidgetType BuiltInWidgets::kAccelerometer{"Accelerometer"};
+inline const WidgetType BuiltInWidgets::k3AxisAccelerometer{"3-Axis Accelerometer"};
+inline const WidgetType BuiltInWidgets::kGyro{"Gyro"};
+inline const WidgetType BuiltInWidgets::kRelay{"Relay"};
+inline const WidgetType BuiltInWidgets::kDifferentialDrive{"Differential Drivebase"};
+inline const WidgetType BuiltInWidgets::kMecanumDrive{"Mecanum Drivebase"};
+inline const WidgetType BuiltInWidgets::kCameraStream{"Camera Stream"};
+#endif
+
+
 }  // namespace frc
+
