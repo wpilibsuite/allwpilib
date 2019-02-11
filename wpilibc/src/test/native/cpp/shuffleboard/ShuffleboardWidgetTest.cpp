@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -43,7 +43,7 @@ TEST_F(ShuffleboardWidgetTest, UseBuiltInWidget) {
 }
 
 TEST_F(ShuffleboardWidgetTest, WithProperties) {
-  wpi::StringMap<std::shared_ptr<nt::Value>> properties {
+  wpi::StringMap<std::shared_ptr<nt::Value>> properties{
       std::make_pair("min", nt::Value::MakeDouble(0)),
       std::make_pair("max", nt::Value::MakeDouble(1))};
   auto entry =
