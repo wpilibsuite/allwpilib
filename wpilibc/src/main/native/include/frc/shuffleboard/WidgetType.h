@@ -22,7 +22,8 @@ namespace frc {
  */
 class WidgetType {
  public:
-  explicit WidgetType(const char* widgetName) : m_widgetName(widgetName) {}
+  explicit constexpr WidgetType(const char* widgetName)
+      : m_widgetName(widgetName) {}
   ~WidgetType() = default;
 
   /**
@@ -32,7 +33,7 @@ class WidgetType {
   wpi::StringRef GetWidgetName() const;
 
  private:
-  std::string m_widgetName;
+  const char* m_widgetName;
 };
 
 }  // namespace frc

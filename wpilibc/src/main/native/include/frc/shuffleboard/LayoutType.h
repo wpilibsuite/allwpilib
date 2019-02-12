@@ -22,7 +22,8 @@ namespace frc {
  */
 class LayoutType {
  public:
-  explicit LayoutType(const char* layoutName) : m_layoutName(layoutName) {}
+  explicit constexpr LayoutType(const char* layoutName)
+      : m_layoutName(layoutName) {}
   ~LayoutType() = default;
 
   /**
@@ -32,7 +33,7 @@ class LayoutType {
   wpi::StringRef GetLayoutName() const;
 
  private:
-  std::string m_layoutName;
+  const char* m_layoutName;
 };
 
 }  // namespace frc

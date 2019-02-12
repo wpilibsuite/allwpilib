@@ -30,7 +30,7 @@ class BuiltInLayouts {
    * {@code ["TOP", "LEFT", "BOTTOM", "RIGHT", "HIDDEN"}</td></tr>
    * </table>
    */
-  static const LayoutType kList;
+  static constexpr LayoutType kList{"List Layout"};
 
   /**
    * Groups components in an <i>n</i> x <i>m</i> grid. Grid layouts default to
@@ -47,12 +47,7 @@ class BuiltInLayouts {
    * </tr>
    * </table>
    */
-  static const LayoutType kGrid;
+  static constexpr LayoutType kGrid{"Grid Layout"};
 };
-
-#ifdef _WIN32
-inline const LayoutType BuiltInLayouts::kList{"List Layout"};
-inline const LayoutType BuiltInLayouts::kGrid{"Grid Layout"};
-#endif
 
 }  // namespace frc
