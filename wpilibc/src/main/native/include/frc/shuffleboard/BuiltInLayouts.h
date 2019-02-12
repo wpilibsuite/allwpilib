@@ -19,8 +19,7 @@ namespace frc {
  *   .GetLayout(BuiltinLayouts::kList, "My List");
  * }</pre>
  */
-class BuiltInLayouts {
- public:
+namespace BuiltInLayouts {
   /**
    * Groups components in a vertical list. New widgets added to the layout will
    * be placed at the bottom of the list. <br>Custom properties: <table>

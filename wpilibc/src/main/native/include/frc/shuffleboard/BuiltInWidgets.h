@@ -25,8 +25,7 @@ namespace frc {
  * <p>Each value in this enum goes into detail on what data types that widget
  * can support, as well as the custom properties that widget uses.
  */
-class BuiltInWidgets {
- public:
+namespace BuiltInWidgets {
   /**
    * Displays a value with a simple text field.
    * <br>Supported types:
