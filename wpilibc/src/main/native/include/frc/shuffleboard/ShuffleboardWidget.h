@@ -9,12 +9,17 @@
 
 #include <wpi/Twine.h>
 
+#include "frc/shuffleboard/BuiltInWidgets.h"
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 #include "frc/shuffleboard/WidgetType.h"
 
 namespace frc {
 
 class ShuffleboardContainer;
+
+namespace detail {
+const char* GetStringForWidgetType(BuiltInWidgets type);
+}
 
 /**
  * Abstract superclass for widgets.
@@ -37,6 +42,17 @@ class ShuffleboardWidget : public ShuffleboardComponent<Derived> {
    * @param widgetType the type of the widget used to display the data
    * @return this widget object
    * @see BuiltInWidgets
+   */
+  Derived& WithWidget(BuiltInWidgets widgetType) {
+    return WithWidget(detail::GetStringForWidgetType(widgetType));
+  }
+
+  /**
+   * Sets the type of widget used to display the data. If not set, the default
+   * widget type will be used.
+   *
+   * @param widgetType the type of the widget used to display the data
+   * @return this widget object
    */
   Derived& WithWidget(const WidgetType& widgetType) {
     return WithWidget(widgetType.GetWidgetName());

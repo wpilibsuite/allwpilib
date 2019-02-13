@@ -18,12 +18,26 @@
 
 using namespace frc;
 
+static constexpr char* layoutStrings[] = {
+    "List Layout",
+    "Grid Layout"
+  };
+
+static constexpr const char* GetStringFromBuiltInLayout(BuiltInLayouts layout) {
+  return layoutStrings[static_cast<int>(layout)];
+}
+
 ShuffleboardContainer::ShuffleboardContainer(const wpi::Twine& title)
     : ShuffleboardValue(title) {}
 
 const std::vector<std::unique_ptr<ShuffleboardComponentBase>>&
 ShuffleboardContainer::GetComponents() const {
   return m_components;
+}
+
+ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& title,
+                                                     BuiltInLayouts type) {
+  return GetLayout(title, GetStringFromBuiltInLayout(type));
 }
 
 ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& title,

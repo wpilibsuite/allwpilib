@@ -25,7 +25,7 @@ namespace frc {
  * <p>Each value in this enum goes into detail on what data types that widget
  * can support, as well as the custom properties that widget uses.
  */
-namespace BuiltInWidgets {
+enum class BuiltInWidgets {
   /**
    * Displays a value with a simple text field.
    * <br>Supported types:
@@ -36,7 +36,7 @@ namespace BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static constexpr WidgetType kTextView{"Text View"};
+  kTextView,
   /**
    * Displays a number with a controllable slider.
    * <br>Supported types:
@@ -53,7 +53,7 @@ namespace BuiltInWidgets {
    * slider by with the arrow keys</td></tr>
    * </table>
    */
-  static constexpr WidgetType kNumberSlider{"Number Slider"};
+  kNumberSlider,
   /**
    * Displays a number with a view-only bar.
    * <br>Supported types:
@@ -70,7 +70,7 @@ namespace BuiltInWidgets {
    * of the bar</td></tr>
    * </table>
    */
-  static constexpr WidgetType kNumberBar{"Number Bar"};
+  kNumberBar,
   /**
    * Displays a number with a view-only dial. Displayed values are rounded to
    * the nearest integer. <br>Supported types: <ul> <li>Number</li>
@@ -85,7 +85,7 @@ namespace BuiltInWidgets {
    * value as text</td></tr>
    * </table>
    */
-  static constexpr WidgetType kDial{"Simple Dial"};
+  kDial,
   /**
    * Displays a number with a graph. <strong>NOTE:</strong> graphs can be taxing
    * on the computer running the dashboard. Keep the number of visible data
@@ -102,7 +102,7 @@ namespace BuiltInWidgets {
    * <td>How long, in seconds, should past data be visible for</td></tr>
    * </table>
    */
-  static constexpr WidgetType kGraph{"Graph"};
+  kGraph,
   /**
    * Displays a boolean value as a large colored box.
    * <br>Supported types:
@@ -120,7 +120,7 @@ namespace BuiltInWidgets {
    * <td>Can be specified as a string or a number</td></tr>
    * </table>
    */
-  static constexpr WidgetType kBooleanBox{"Boolean Box"};
+  kBooleanBox,
   /**
    * Displays a boolean with a large interactive toggle button.
    * <br>Supported types:
@@ -129,7 +129,7 @@ namespace BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static constexpr WidgetType kToggleButton{"Toggle Button"};
+  kToggleButton,
   /**
    * Displays a boolean with a fixed-size toggle switch.
    * <br>Supported types:
@@ -138,7 +138,7 @@ namespace BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static constexpr WidgetType kToggleSwitch{"Toggle Switch"};
+  kToggleSwitch,
   /**
    * Displays an analog input or a raw number with a number bar.
    * <br>Supported types:
@@ -161,7 +161,7 @@ namespace BuiltInWidgets {
    * bar</td></tr>
    * </table>
    */
-  static constexpr WidgetType kVoltageView{"Voltage View"};
+  kVoltageView,
   /**
    * Displays a {@link edu.wpi.first.wpilibj.PowerDistributionPanel
    * PowerDistributionPanel}. <br>Supported types: <ul> <li>{@link
@@ -174,7 +174,7 @@ namespace BuiltInWidgets {
    * <td>Whether or not to display the voltage and current draw</td></tr>
    * </table>
    */
-  static constexpr WidgetType kPowerDistributionPanel{"PDP"};
+  kPowerDistributionPanel,
   /**
    * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser
    * SendableChooser} with a dropdown combo box with a list of options.
@@ -184,7 +184,7 @@ namespace BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static constexpr WidgetType kComboBoxChooser{"ComboBox Chooser"};
+  kComboBoxChooser,
   /**
    * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser
    * SendableChooser} with a toggle button for each available option.
@@ -194,7 +194,7 @@ namespace BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static constexpr WidgetType kSplitButtonChooser{"Split Button Chooser"};
+  kSplitButtonChooser,
   /**
    * Displays an {@link edu.wpi.first.wpilibj.Encoder} displaying its speed,
    * total travelled distance, and its distance per tick. <br>Supported types:
@@ -203,7 +203,7 @@ namespace BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static constexpr WidgetType kEncoder{"Encoder"};
+  kEncoder,
   /**
    * Displays a {@link edu.wpi.first.wpilibj.SpeedController SpeedController}.
    * The speed controller will be controllable from the dashboard when test mode
@@ -227,7 +227,7 @@ namespace BuiltInWidgets {
    * <td>One of {@code ["HORIZONTAL", "VERTICAL"]}</td></tr>
    * </table>
    */
-  static constexpr WidgetType kSpeedController{"Speed Controller"};
+  kSpeedController,
   /**
    * Displays a command with a toggle button. Pressing the button will start the
    * command, and the button will automatically release when the command
@@ -238,7 +238,7 @@ namespace BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static constexpr WidgetType kCommand{"Command"};
+  kCommand,
   /**
    * Displays a PID command with a checkbox and an editor for the PIDF
    * constants. Selecting the checkbox will start the command, and the checkbox
@@ -248,7 +248,7 @@ namespace BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static constexpr WidgetType kPIDCommand{"PID Command"};
+  kPIDCommand,
   /**
    * Displays a PID controller with an editor for the PIDF constants and a
    * toggle switch for enabling and disabling the controller. <br>Supported
@@ -256,7 +256,7 @@ namespace BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static constexpr WidgetType kPIDController{"PID Controller"};
+  kPIDController,
   /**
    * Displays an accelerometer with a number bar displaying the magnitude of the
    * acceleration and text displaying the exact value. <br>Supported types: <ul>
@@ -277,7 +277,7 @@ namespace BuiltInWidgets {
    * <td>Show or hide the tick marks on the number bars</td></tr>
    * </table>
    */
-  static constexpr WidgetType kAccelerometer{"Accelerometer"};
+  kAccelerometer,
   /**
    * Displays a 3-axis accelerometer with a number bar for each axis'
    * accleration. <br>Supported types: <ul> <li>{@link
@@ -297,7 +297,7 @@ namespace BuiltInWidgets {
    * <td>Show or hide the tick marks on the number bars</td></tr>
    * </table>
    */
-  static constexpr WidgetType k3AxisAccelerometer{"3-Axis Accelerometer"};
+  k3AxisAccelerometer,
   /**
    * Displays a gyro with a dial from 0 to 360 degrees.
    * <br>Supported types:
@@ -316,7 +316,7 @@ namespace BuiltInWidgets {
    * <tr><td>Show tick mark ring</td><td>Boolean</td><td>true</td></tr>
    * </table>
    */
-  static constexpr WidgetType kGyro{"Gyro"};
+  kGyro,
   /**
    * Displays a relay with toggle buttons for each supported mode (off, on,
    * forward, reverse). <br>Supported types: <ul> <li>{@link
@@ -324,7 +324,7 @@ namespace BuiltInWidgets {
    * </ul>
    * <br>This widget has no custom properties.
    */
-  static constexpr WidgetType kRelay{"Relay"};
+  kRelay,
   /**
    * Displays a differential drive with a widget that displays the speed of each
    * side of the drivebase and a vector for the direction and rotation of the
@@ -343,7 +343,7 @@ namespace BuiltInWidgets {
    * <tr><td>Show velocity vectors</td><td>Boolean</td><td>true</td></tr>
    * </table>
    */
-  static constexpr WidgetType kDifferentialDrive{"Differential Drivebase"};
+  kDifferentialDrive,
   /**
    * Displays a mecanum drive with a widget that displays the speed of each
    * wheel, and vectors for the direction and rotation of the drivebase. The
@@ -356,7 +356,7 @@ namespace BuiltInWidgets {
    * <tr><td>Show velocity vectors</td><td>Boolean</td><td>true</td></tr>
    * </table>
    */
-  static constexpr WidgetType kMecanumDrive{"Mecanum Drivebase"};
+  kMecanumDrive,
   /**
    * Displays a camera stream.
    * <br>Supported types:
@@ -380,7 +380,7 @@ namespace BuiltInWidgets {
    * </td></tr>
    * </table>
    */
-  static constexpr WidgetType kCameraStream{"Camera Stream"};
-}
+  kCameraStream
+};
 
 }  // namespace frc
