@@ -47,6 +47,6 @@ namespace BuiltInLayouts {
    * </table>
    */
   static constexpr LayoutType kGrid{"Grid Layout"};
-};
+}
 
 }  // namespace frc

@@ -381,6 +381,6 @@ namespace BuiltInWidgets {
    * </table>
    */
   static constexpr WidgetType kCameraStream{"Camera Stream"};
-};
+}
 
 }  // namespace frc
