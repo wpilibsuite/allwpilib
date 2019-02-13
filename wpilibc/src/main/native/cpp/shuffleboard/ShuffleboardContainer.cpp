@@ -18,7 +18,7 @@
 
 using namespace frc;
 
-static constexpr char* layoutStrings[] = {
+static constexpr const char* layoutStrings[] = {
     "List Layout",
     "Grid Layout"
   };

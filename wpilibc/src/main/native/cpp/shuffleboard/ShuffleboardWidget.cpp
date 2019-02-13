@@ -9,7 +9,7 @@
 
 using namespace frc;
 
-static constexpr char* widgetStrings[] = {
+static constexpr const char* widgetStrings[] = {
 "Text View",
 "Number Slider",
 "Number Bar",
