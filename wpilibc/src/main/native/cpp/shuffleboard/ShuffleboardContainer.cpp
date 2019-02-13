@@ -18,10 +18,7 @@
 
 using namespace frc;
 
-static constexpr const char* layoutStrings[] = {
-    "List Layout",
-    "Grid Layout"
-  };
+static constexpr const char* layoutStrings[] = {"List Layout", "Grid Layout"};
 
 static constexpr const char* GetStringFromBuiltInLayout(BuiltInLayouts layout) {
   return layoutStrings[static_cast<int>(layout)];

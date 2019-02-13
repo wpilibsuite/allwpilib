@@ -19,7 +19,7 @@ class ShuffleboardContainer;
 
 namespace detail {
 const char* GetStringForWidgetType(BuiltInWidgets type);
-}
+}  // namespace detail
 
 /**
  * Abstract superclass for widgets.

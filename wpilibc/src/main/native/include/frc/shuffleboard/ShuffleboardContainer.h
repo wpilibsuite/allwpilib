@@ -62,8 +62,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue,
    * @param layoutType the type of the layout, eg "List" or "Grid"
    * @return the layout
    */
-  ShuffleboardLayout& GetLayout(const wpi::Twine& title,
-                                BuiltInLayouts type);
+  ShuffleboardLayout& GetLayout(const wpi::Twine& title, BuiltInLayouts type);
 
   /**
    * Gets the layout with the given type and title, creating it if it does not
