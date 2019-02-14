@@ -65,6 +65,8 @@ public final class CameraServer {
   private final Map<String, VideoSource> m_sources;
   private final Map<String, VideoSink> m_sinks;
   private final Map<Integer, NetworkTable> m_tables;  // indexed by source handle
+  // source handle indexed by sink handle
+  private final Map<Integer, Integer> m_fixedSources;
   private final NetworkTable m_publishTable;
   private final VideoListener m_videoListener; //NOPMD
   private final int m_tableListener; //NOPMD
@@ -157,14 +159,20 @@ public final class CameraServer {
     return values;
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
+  @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP", "PMD.CyclomaticComplexity"})
   private synchronized void updateStreamValues() {
     // Over all the sinks...
     for (VideoSink i : m_sinks.values()) {
       int sink = i.getHandle();
 
       // Get the source's subtable (if none exists, we're done)
-      int source = CameraServerJNI.getSinkSource(sink);
+      int source;
+      Integer fixedSource = m_fixedSources.get(sink);
+      if (fixedSource != null) {
+        source = fixedSource;
+      } else {
+        source = CameraServerJNI.getSinkSource(sink);
+      }
       if (source == 0) {
         continue;
       }
@@ -295,6 +303,7 @@ public final class CameraServer {
     m_defaultUsbDevice = new AtomicInteger();
     m_sources = new Hashtable<>();
     m_sinks = new Hashtable<>();
+    m_fixedSources = new Hashtable<>();
     m_tables = new Hashtable<>();
     m_publishTable = NetworkTableInstance.getDefault().getTable(kPublishName);
     m_nextPort = kBasePort;
@@ -594,6 +603,21 @@ public final class CameraServer {
     startAutomaticCapture(camera);
     CameraServerSharedStore.getCameraServerShared().reportAxisCamera(camera.getHandle());
     return camera;
+  }
+
+  /**
+   * Adds a virtual camera for switching between two streams.  Unlike the
+   * other addCamera methods, this returns a VideoSink rather than a
+   * VideoSource.  Calling setSource() on the returned object can be used
+   * to switch the actual source of the stream.
+   */
+  public MjpegServer addSwitchedCamera(String name) {
+    // create a dummy CvSource
+    CvSource source = new CvSource(name, VideoMode.PixelFormat.kMJPEG, 160, 120, 30);
+    MjpegServer server = startAutomaticCapture(source);
+    m_fixedSources.put(server.getHandle(), source.getHandle());
+
+    return server;
   }
 
   /**
