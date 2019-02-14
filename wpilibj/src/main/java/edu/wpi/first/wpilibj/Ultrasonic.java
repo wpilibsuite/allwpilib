@@ -46,7 +46,7 @@ public class Ultrasonic extends SendableBase implements PIDSource {
   // ultrasonic sensor list
   private static final List<Ultrasonic> m_sensors = new ArrayList<>();
   // automatic round robin mode
-  private static boolean m_automaticEnabled;
+  private static volatile boolean m_automaticEnabled;
   private DigitalInput m_echoChannel;
   private DigitalOutput m_pingChannel;
   private boolean m_allocatedChannels;
@@ -70,30 +70,18 @@ public class Ultrasonic extends SendableBase implements PIDSource {
   private static class UltrasonicChecker extends Thread {
     @Override
     public synchronized void run() {
-      int sensorIndex = 0;
-      Ultrasonic ultrasonic;
       while (m_automaticEnabled) {
-        //lock list to ensure deletion doesn't occur between empty check and retrieving sensor
-        synchronized (m_sensors) {
-          if (m_sensors.isEmpty()) {
-            return;
+        for (Ultrasonic sensor: m_sensors) {
+          if (!m_automaticEnabled) {
+            break;
           }
-          if (sensorIndex >= m_sensors.size()) {
-            sensorIndex = m_sensors.size() - 1;
-          }
-          ultrasonic = m_sensors.get(sensorIndex);
-        }
-        if (ultrasonic.isEnabled()) {
-          // Do the ping
-          ultrasonic.m_pingChannel.pulse(kPingTime);
-        }
-        if (sensorIndex < m_sensors.size()) {
-          sensorIndex++;
-        } else {
-          sensorIndex = 0;
-        }
 
-        Timer.delay(.1); // wait for ping to return
+          if (sensor.isEnabled()) {
+            sensor.m_pingChannel.pulse(kPingTime);  // do the ping
+          }
+
+          Timer.delay(0.1);  // wait for ping to return
+        }
       }
     }
   }
