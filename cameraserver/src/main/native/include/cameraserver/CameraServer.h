@@ -174,6 +174,14 @@ class CameraServer {
                                std::initializer_list<T> hosts);
 
   /**
+   * Adds a virtual camera for switching between two streams.  Unlike the
+   * other addCamera methods, this returns a VideoSink rather than a
+   * VideoSource.  Calling SetSource() on the returned object can be used
+   * to switch the actual source of the stream.
+   */
+  cs::MjpegServer AddSwitchedCamera(const wpi::Twine& name);
+
+  /**
    * Get OpenCV access to the primary camera feed.  This allows you to
    * get images from the camera for image processing on the roboRIO.
    *
