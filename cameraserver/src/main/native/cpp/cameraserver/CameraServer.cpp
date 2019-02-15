@@ -33,7 +33,7 @@ struct CameraServer::Impl {
   void UpdateStreamValues();
 
   wpi::mutex m_mutex;
-  std::atomic<int> m_defaultUsbDevice;
+  std::atomic<int> m_defaultUsbDevice{0};
   std::string m_primarySourceName;
   wpi::StringMap<cs::VideoSource> m_sources;
   wpi::StringMap<cs::VideoSink> m_sinks;
