@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <wpi/Twine.h>
+#include <wpi/StringRef.h>
 
 namespace frc {
 
@@ -20,7 +20,8 @@ namespace frc {
  */
 class WidgetType {
  public:
-  explicit WidgetType(const char* widgetName) : m_widgetName(widgetName) {}
+  explicit constexpr WidgetType(const char* widgetName)
+      : m_widgetName(widgetName) {}
   ~WidgetType() = default;
 
   /**
@@ -30,7 +31,7 @@ class WidgetType {
   wpi::StringRef GetWidgetName() const;
 
  private:
-  wpi::StringRef m_widgetName;
+  const char* m_widgetName;
 };
 
 }  // namespace frc

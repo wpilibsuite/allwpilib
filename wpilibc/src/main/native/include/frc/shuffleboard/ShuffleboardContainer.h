@@ -20,6 +20,7 @@
 
 #include "frc/ErrorBase.h"
 #include "frc/WPIErrors.h"
+#include "frc/shuffleboard/BuiltInLayouts.h"
 #include "frc/shuffleboard/LayoutType.h"
 #include "frc/shuffleboard/ShuffleboardComponentBase.h"
 #include "frc/shuffleboard/ShuffleboardValue.h"
@@ -52,6 +53,16 @@ class ShuffleboardContainer : public virtual ShuffleboardValue,
    */
   const std::vector<std::unique_ptr<ShuffleboardComponentBase>>& GetComponents()
       const;
+
+  /**
+   * Gets the layout with the given type and title, creating it if it does not
+   * already exist at the time this method is called.
+   *
+   * @param title      the title of the layout
+   * @param layoutType the type of the layout, eg "List" or "Grid"
+   * @return the layout
+   */
+  ShuffleboardLayout& GetLayout(const wpi::Twine& title, BuiltInLayouts type);
 
   /**
    * Gets the layout with the given type and title, creating it if it does not

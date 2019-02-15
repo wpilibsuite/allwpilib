@@ -19,8 +19,7 @@ namespace frc {
  *   .GetLayout(BuiltinLayouts::kList, "My List");
  * }</pre>
  */
-class BuiltInLayouts {
- public:
+enum class BuiltInLayouts {
   /**
    * Groups components in a vertical list. New widgets added to the layout will
    * be placed at the bottom of the list. <br>Custom properties: <table>
@@ -30,7 +29,7 @@ class BuiltInLayouts {
    * {@code ["TOP", "LEFT", "BOTTOM", "RIGHT", "HIDDEN"}</td></tr>
    * </table>
    */
-  static const LayoutType kList;
+  kList,
 
   /**
    * Groups components in an <i>n</i> x <i>m</i> grid. Grid layouts default to
@@ -47,7 +46,7 @@ class BuiltInLayouts {
    * </tr>
    * </table>
    */
-  static const LayoutType kGrid;
+  kGrid
 };
 
 }  // namespace frc

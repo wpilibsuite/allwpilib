@@ -18,7 +18,7 @@ constexpr std::chrono::milliseconds Watchdog::kMinPrintPeriod;
 class Watchdog::Thread : public wpi::SafeThread {
  public:
   template <typename T>
-  struct DerefGreater : public std::binary_function<T, T, bool> {
+  struct DerefGreater {
     constexpr bool operator()(const T& lhs, const T& rhs) const {
       return *lhs > *rhs;
     }
