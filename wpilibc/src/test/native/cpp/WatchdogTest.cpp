@@ -83,11 +83,18 @@ TEST(WatchdogTest, SetTimeout) {
 
 TEST(WatchdogTest, IsExpired) {
   Watchdog watchdog(0.2, [] {});
+  EXPECT_FALSE(watchdog.IsExpired());
   watchdog.Enable();
 
   EXPECT_FALSE(watchdog.IsExpired());
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
   EXPECT_TRUE(watchdog.IsExpired());
+
+  watchdog.Disable();
+  EXPECT_TRUE(watchdog.IsExpired());
+
+  watchdog.Reset();
+  EXPECT_FALSE(watchdog.IsExpired());
 }
 
 TEST(WatchdogTest, Epochs) {
@@ -118,7 +125,11 @@ TEST(WatchdogTest, Epochs) {
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 }
 
+#ifdef __APPLE__
+TEST(WatchdogTest, DISABLED_MultiWatchdog) {
+#else
 TEST(WatchdogTest, MultiWatchdog) {
+#endif
   uint32_t watchdogCounter1 = 0;
   uint32_t watchdogCounter2 = 0;
 

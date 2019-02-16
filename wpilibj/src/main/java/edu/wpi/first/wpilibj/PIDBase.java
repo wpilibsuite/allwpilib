@@ -667,7 +667,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @param pidSource the type of input
    */
-  void setPIDSourceType(PIDSourceType pidSource) {
+  public void setPIDSourceType(PIDSourceType pidSource) {
     m_pidInput.setPIDSourceType(pidSource);
   }
 
@@ -676,7 +676,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    *
    * @return the PID controller input type
    */
-  PIDSourceType getPIDSourceType() {
+  public PIDSourceType getPIDSourceType() {
     return m_pidInput.getPIDSourceType();
   }
 

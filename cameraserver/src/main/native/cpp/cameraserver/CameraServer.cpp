@@ -33,10 +33,11 @@ struct CameraServer::Impl {
   void UpdateStreamValues();
 
   wpi::mutex m_mutex;
-  std::atomic<int> m_defaultUsbDevice;
+  std::atomic<int> m_defaultUsbDevice{0};
   std::string m_primarySourceName;
   wpi::StringMap<cs::VideoSource> m_sources;
   wpi::StringMap<cs::VideoSink> m_sinks;
+  wpi::DenseMap<CS_Sink, CS_Source> m_fixedSources;
   wpi::DenseMap<CS_Source, std::shared_ptr<nt::NetworkTable>> m_tables;
   std::shared_ptr<nt::NetworkTable> m_publishTable;
   cs::VideoListener m_videoListener;
@@ -156,7 +157,8 @@ void CameraServer::Impl::UpdateStreamValues() {
     CS_Sink sink = i.second.GetHandle();
 
     // Get the source's subtable (if none exists, we're done)
-    CS_Source source = cs::GetSinkSource(sink, &status);
+    CS_Source source = m_fixedSources.lookup(sink);
+    if (source == 0) source = cs::GetSinkSource(sink, &status);
     if (source == 0) continue;
     auto table = m_tables.lookup(source);
     if (table) {
@@ -536,6 +538,15 @@ cs::AxisCamera CameraServer::AddAxisCamera(const wpi::Twine& name,
   auto csShared = GetCameraServerShared();
   csShared->ReportAxisCamera(camera.GetHandle());
   return camera;
+}
+
+cs::MjpegServer CameraServer::AddSwitchedCamera(const wpi::Twine& name) {
+  // create a dummy CvSource
+  cs::CvSource source{name, cs::VideoMode::PixelFormat::kMJPEG, 160, 120, 30};
+  cs::MjpegServer server = StartAutomaticCapture(source);
+  m_impl->m_fixedSources[server.GetHandle()] = source.GetHandle();
+
+  return server;
 }
 
 cs::MjpegServer CameraServer::StartAutomaticCapture(

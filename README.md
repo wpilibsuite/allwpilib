@@ -25,10 +25,10 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 - A C++ compiler
     - On Linux, GCC works fine
-    - On Windows, you need Visual Studio 2015 (the free community edition works fine).
+    - On Windows, you need Visual Studio 2017 (the free community edition works fine).
       Make sure to select the C++ Programming Language for installation
-- [ARM Compiler Toolchain](http://first.wpi.edu/FRC/roborio/toolchains/)
-  * Note that for 2017-2018 and beyond, you will need version 5 or greater of GCC
+- [ARM Compiler Toolchain](https://github.com/wpilibsuite/toolchain-builder/releases)
+  * Note that for 2019 and beyond, you should use version 6 or greater of GCC
 - Doxygen (Only required if you want to build the C++ documentation)
 
 ## Setup
@@ -79,23 +79,18 @@ There are a few tasks other than `build` available. To see them, run the meta-ta
 
 wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
 
+CMake is also supported for building. See [README-CMAKE.md](README-CMAKE.md).
+
 ## Publishing
 
-If you are building to test with the Eclipse plugins or just want to export the build as a Maven-style dependency, simply run the `publish` task. This task will publish all available packages to ~/releases/maven/development. If you need to publish the project to a different repo, you can specify it with `-Prepo=repo_name`. Valid options are:
+If you are building to test with other dependencies or just want to export the build as a Maven-style dependency, simply run the `publish` task. This task will publish all available packages to ~/releases/maven/development. If you need to publish the project to a different repo, you can specify it with `-Prepo=repo_name`. Valid options are:
 
 - development - The default repo.
 - beta - Publishes to ~/releases/maven/beta.
 - stable - Publishes to ~/releases/maven/stable.
 - release - Publishes to ~/releases/maven/release.
 
-The following maven targets a published by this task:
-
-- edu.wpi.first.wpilib.cmake:cpp-root:1.0.0 - roboRIO C++
-- edu.wpi.first.wpilibc.simulation:WPILibCSim:0.1.0 - Simulation C++
-- edu.wpi.first.wpilibj:wpilibJavaFinal:0.1.0-SNAPSHOT - roboRIO Java
-- edu.wpi.first.wpilibj:wpilibJavaSim:0.1.0-SNAPSHOT - Simulation Java
-- edu.wpi.first.wpilibj.simulation:SimDS:0.1.0-SNAPSHOT - The driverstation for controlling simulation.
-- org.gazebosim:JavaGazebo:0.1.0-SNAPSHOT - Gazebo protocol for Java.
+The maven artifacts are described in [MavenArtifacts.md](MavenArtifacts.md)
 
 ## Structure and Organization
 

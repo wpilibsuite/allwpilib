@@ -127,7 +127,7 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
     ThrowUncleanStatusException(env, buf.c_str(), status);
   } else {
     std::string func;
-    auto stack = GetJavaStackTrace(env, &func, "edu.wpi.first.wpilibj");
+    auto stack = GetJavaStackTrace(env, &func, "edu.wpi.first");
     HAL_SendError(1, status, 0, message, func.c_str(), stack.c_str(), 1);
   }
 }

@@ -18,7 +18,7 @@ constexpr std::chrono::milliseconds Watchdog::kMinPrintPeriod;
 class Watchdog::Thread : public wpi::SafeThread {
  public:
   template <typename T>
-  struct DerefGreater : public std::binary_function<T, T, bool> {
+  struct DerefGreater {
     constexpr bool operator()(const T& lhs, const T& rhs) const {
       return *lhs > *rhs;
     }
@@ -159,8 +159,6 @@ void Watchdog::Disable() {
   // Locks mutex
   auto thr = m_owner->GetThread();
   if (!thr) return;
-
-  m_isExpired = false;
 
   thr->m_watchdogs.remove(this);
   thr->m_cond.notify_all();

@@ -55,7 +55,7 @@ public class SampleRobot extends RobotBase {
   }
 
   /**
-   * Disabled should go here. Users should overload this method to run code that should run while
+   * Disabled should go here. Users should override this method to run code that should run while
    * the field is disabled.
    *
    * <p>Called once each time the robot enters the disabled state.

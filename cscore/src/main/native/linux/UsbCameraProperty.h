@@ -71,6 +71,9 @@ class UsbCameraProperty : public PropertyImpl {
 
   unsigned id{0};  // implementation-level id
   int type{0};     // implementation type, not CS_PropertyKind!
+
+  // If the enum property is integer rather than string
+  bool intMenu{false};
 };
 
 }  // namespace cs

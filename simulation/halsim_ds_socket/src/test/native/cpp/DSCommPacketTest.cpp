@@ -66,13 +66,21 @@ TEST_F(DSCommPacketTest, BlankJoystickTag) {
 
 TEST_F(DSCommPacketTest, MainJoystickTag) {
   for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+    // Just random data
+    std::array<uint8_t, 12> _buttons{{0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1}};
+
+    std::array<uint8_t, 2> _button_bytes{{0, 0}};
+    for (int btn = 0; btn < 8; btn++) _button_bytes[1] |= _buttons[btn] << btn;
+    for (int btn = 8; btn < 12; btn++)
+      _button_bytes[0] |= _buttons[btn] << (btn - 8);
+
     // 5 for base, 4 joystick, 12 buttons (2 bytes) 3 povs
     uint8_t arr[5 + 4 + 2 + 6] = {// Size, Tag
                                   16, 12,
                                   // Axes
                                   4, 0x9C, 0xCE, 0, 75,
-                                  // Buttons
-                                  12, 0xFF, 0x0F,
+                                  // Buttons (LSB 0)
+                                  12, _button_bytes[0], _button_bytes[1],
                                   // POVs
                                   3, 0, 50, 0, 100, 0x0F, 0x00};
 
@@ -80,6 +88,11 @@ TEST_F(DSCommPacketTest, MainJoystickTag) {
     ASSERT_EQ(data.axes.count, 4);
     ASSERT_EQ(data.povs.count, 3);
     ASSERT_EQ(data.buttons.count, 12);
+
+    for (int btn = 0; btn < 12; btn++) {
+      ASSERT_EQ((data.buttons.buttons & (1 << btn)) != 0, _buttons[btn] != 0)
+          << "Button " << btn;
+    }
   }
 }
 
