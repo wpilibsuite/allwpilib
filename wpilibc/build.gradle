@@ -27,7 +27,7 @@ task generateCppVersion() {
     }
 
     // We follow a simple set of checks to determine whether we should generate a new version file:
-    // 1. If the release type is not development, we generate a new verison file
+    // 1. If the release type is not development, we generate a new version file
     // 2. If there is no generated version number, we generate a new version file
     // 3. If there is a generated build number, and the release type is development, then we will
     //    only generate if the publish task is run.
