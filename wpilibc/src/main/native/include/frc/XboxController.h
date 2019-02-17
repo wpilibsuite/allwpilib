@@ -8,6 +8,8 @@
 #pragma once
 
 #include "frc/GenericHID.h"
+#include "frc/buttons/JoystickButton.h"
+#include "frc/DPad.h"
 
 namespace frc {
 
@@ -37,6 +39,21 @@ class XboxController : public GenericHID {
   XboxController(XboxController&&) = default;
   XboxController& operator=(XboxController&&) = default;
 
+  JoystickButton LeftBumper;
+  JoystickButton RightBumper;
+  JoystickButton LeftStickButton;
+  JoystickButton RightStickButton;
+
+  JoystickButton AButton;
+  JoystickButton BButton;
+  JoystickButton XButton;
+  JoystickButton YButton;
+
+  JoystickButton BackButton;
+  JoystickButton StartButton;
+
+  DPad DPad;
+  /**
   /**
    * Get the X axis value of the controller.
    *

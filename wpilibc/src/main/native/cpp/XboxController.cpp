@@ -11,14 +11,28 @@
 
 using namespace frc;
 
-XboxController::XboxController(int port) : GenericHID(port) {
+XboxController::XboxController(int port) : GenericHID(port),
+                                           LeftBumper(this, static_cast<int>(Button::kBumperLeft)),
+                                           RightBumper(this, static_cast<int>(Button::kBumperRight)),
+                                           LeftStickButton(this, static_cast<int>(Button::kStickLeft)),
+                                           RightStickButton(this, static_cast<int>(Button::kStickRight)),
+ 
+                                           AButton(this, static_cast<int>(Button::kA)),
+                                           BButton(this, static_cast<int>(Button::kB)),
+                                           XButton(this, static_cast<int>(Button::kX)),
+                                           YButton(this, static_cast<int>(Button::kY)),
+                                           
+                                           BackButton(this, static_cast<int>(Button::kBack)),
+                                           StartButton(this, static_cast<int>(Button::kStart)),
+                                           DPad(*this, 0)
+{
   HAL_Report(HALUsageReporting::kResourceType_XboxController, port);
 }
 
 double XboxController::GetX(JoystickHand hand) const {
   if (hand == kLeftHand) {
     return GetRawAxis(0);
-  } else {
+  } else {  
     return GetRawAxis(4);
   }
 }
