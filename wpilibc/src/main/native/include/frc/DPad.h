@@ -13,7 +13,7 @@
 namespace frc {
 class DPad {
  public:
-  DPad(GenericHID& joystick, int povNumber = 0);
+  explicit DPad(GenericHID& joystick, int povNumber = 0);
   virtual ~DPad() = default;
 
   DPad(DPad&&) = default;
