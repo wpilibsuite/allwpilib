@@ -52,8 +52,7 @@ class XboxController : public GenericHID {
   JoystickButton BackButton;
   JoystickButton StartButton;
 
-  DPad DPad;
-  /**
+  DPad Dpad;
   /**
    * Get the X axis value of the controller.
    *

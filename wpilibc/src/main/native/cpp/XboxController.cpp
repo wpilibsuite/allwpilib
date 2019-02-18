@@ -24,7 +24,7 @@ XboxController::XboxController(int port) : GenericHID(port),
                                            
                                            BackButton(this, static_cast<int>(Button::kBack)),
                                            StartButton(this, static_cast<int>(Button::kStart)),
-                                           DPad(*this, 0)
+                                           Dpad(*this)
 {
   HAL_Report(HALUsageReporting::kResourceType_XboxController, port);
 }
