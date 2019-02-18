@@ -19,16 +19,12 @@ public class JNIWrapper {
   static RuntimeLoader<JNIWrapper> loader = null;
 
   static {
-    if (!libraryLoaded) {
-      try {
-        loader = new RuntimeLoader<>("wpiHaljni", RuntimeLoader.getDefaultExtractionRoot(), JNIWrapper.class);
-        loader.loadLibrary();
-      } catch (IOException ex) {
-        ex.printStackTrace();
-        System.exit(1);
-      }
-      libraryLoaded = true;
-      libraryLoaded = true;
+    try {
+      loader = new RuntimeLoader<>("wpiHaljni", RuntimeLoader.getDefaultExtractionRoot(), JNIWrapper.class);
+      loader.loadLibrary();
+    } catch (IOException ex) {
+      ex.printStackTrace();
+      System.exit(1);
     }
   }
 }
