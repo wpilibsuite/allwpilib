@@ -17,6 +17,7 @@
 #include "frc/Timer.h"
 #include "frc/commands/Scheduler.h"
 #include "frc/livewindow/LiveWindow.h"
+#include "frc/shuffleboard/Shuffleboard.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
 using namespace frc;
@@ -94,6 +95,7 @@ void IterativeRobotBase::LoopFunc() {
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kDisabled) {
       LiveWindow::GetInstance()->SetEnabled(false);
+      Shuffleboard::DisableActuatorWidgets();
       DisabledInit();
       m_watchdog.AddEpoch("DisabledInit()");
       m_lastMode = Mode::kDisabled;
@@ -107,6 +109,7 @@ void IterativeRobotBase::LoopFunc() {
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kAutonomous) {
       LiveWindow::GetInstance()->SetEnabled(false);
+      Shuffleboard::DisableActuatorWidgets();
       AutonomousInit();
       m_watchdog.AddEpoch("AutonomousInit()");
       m_lastMode = Mode::kAutonomous;
@@ -120,6 +123,7 @@ void IterativeRobotBase::LoopFunc() {
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kTeleop) {
       LiveWindow::GetInstance()->SetEnabled(false);
+      Shuffleboard::DisableActuatorWidgets();
       TeleopInit();
       m_watchdog.AddEpoch("TeleopInit()");
       m_lastMode = Mode::kTeleop;
@@ -134,6 +138,7 @@ void IterativeRobotBase::LoopFunc() {
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kTest) {
       LiveWindow::GetInstance()->SetEnabled(true);
+      Shuffleboard::EnableActuatorWidgets();
       TestInit();
       m_watchdog.AddEpoch("TestInit()");
       m_lastMode = Mode::kTest;
@@ -146,10 +151,14 @@ void IterativeRobotBase::LoopFunc() {
 
   RobotPeriodic();
   m_watchdog.AddEpoch("RobotPeriodic()");
-  m_watchdog.Disable();
-  SmartDashboard::UpdateValues();
 
+  SmartDashboard::UpdateValues();
+  m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
   LiveWindow::GetInstance()->UpdateValues();
+  m_watchdog.AddEpoch("LiveWindow::UpdateValues()");
+  Shuffleboard::Update();
+  m_watchdog.AddEpoch("Shuffleboard::Update()");
+  m_watchdog.Disable();
 
   // Warn on loop time overruns
   if (m_watchdog.IsExpired()) {
