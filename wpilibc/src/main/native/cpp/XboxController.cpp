@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,28 +11,28 @@
 
 using namespace frc;
 
-XboxController::XboxController(int port) : GenericHID(port),
-                                           LeftBumper(this, static_cast<int>(Button::kBumperLeft)),
-                                           RightBumper(this, static_cast<int>(Button::kBumperRight)),
-                                           LeftStickButton(this, static_cast<int>(Button::kStickLeft)),
-                                           RightStickButton(this, static_cast<int>(Button::kStickRight)),
- 
-                                           AButton(this, static_cast<int>(Button::kA)),
-                                           BButton(this, static_cast<int>(Button::kB)),
-                                           XButton(this, static_cast<int>(Button::kX)),
-                                           YButton(this, static_cast<int>(Button::kY)),
-                                           
-                                           BackButton(this, static_cast<int>(Button::kBack)),
-                                           StartButton(this, static_cast<int>(Button::kStart)),
-                                           Dpad(*this)
-{
+XboxController::XboxController(int port)
+    : GenericHID(port),
+      LeftBumper(this, static_cast<int>(Button::kBumperLeft)),
+      RightBumper(this, static_cast<int>(Button::kBumperRight)),
+      LeftStickButton(this, static_cast<int>(Button::kStickLeft)),
+      RightStickButton(this, static_cast<int>(Button::kStickRight)),
+
+      AButton(this, static_cast<int>(Button::kA)),
+      BButton(this, static_cast<int>(Button::kB)),
+      XButton(this, static_cast<int>(Button::kX)),
+      YButton(this, static_cast<int>(Button::kY)),
+
+      BackButton(this, static_cast<int>(Button::kBack)),
+      StartButton(this, static_cast<int>(Button::kStart)),
+      Dpad(*this) {
   HAL_Report(HALUsageReporting::kResourceType_XboxController, port);
 }
 
 double XboxController::GetX(JoystickHand hand) const {
   if (hand == kLeftHand) {
     return GetRawAxis(0);
-  } else {  
+  } else {
     return GetRawAxis(4);
   }
 }
