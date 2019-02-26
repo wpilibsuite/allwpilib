@@ -145,7 +145,7 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
     return true;
   } else if (isHandleType(digitalSourceHandle, HAL_HandleEnum::DIO)) {
     int32_t index = getHandleIndex(digitalSourceHandle);
-    if (index > kNumDigitalHeaders + kNumDigitalMXPChannels) {
+    if (index >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
       // channels 10-15, so need to add headers to remap index
       channel = remapSPIChannel(index) + kNumDigitalHeaders;
       module = 0;
