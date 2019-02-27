@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.function.Supplier;
 
 import edu.wpi.cscore.CameraServerJNI;
@@ -229,10 +230,15 @@ public abstract class RobotBase implements AutoCloseable {
       if (elements.length > 0) {
         robotName = elements[0].getClassName();
       }
-      DriverStation.reportError("Unhandled exception instantiating robot " + robotName + " "
-          + throwable.toString(), elements);
-      DriverStation.reportWarning("Robots should not quit, but yours did!", false);
-      DriverStation.reportError("Could not instantiate robot " + robotName + "!", false);
+      if (throwable instanceof StackOverflowError) {
+        DriverStation.reportError("Stack Overflow Exception, Sending first 20 frames",
+            Arrays.copyOf(elements, 20));
+      } else {
+        DriverStation.reportError("Unhandled exception instantiating robot " + robotName + " "
+            + throwable.toString(), elements);
+        DriverStation.reportWarning("Robots should not quit, but yours did!", false);
+        DriverStation.reportError("Could not instantiate robot " + robotName + "!", false);
+      }
       System.exit(1);
       return;
     }
