@@ -292,8 +292,50 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   }
   int retval = 0;
   if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
-    retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
-                                                details, location, callStack);
+    wpi::StringRef detailsRef{details};
+    wpi::StringRef locationRef{location};
+    wpi::StringRef callStackRef{callStack};
+
+    // 1 tag, 4 timestamp, 2 seqnum
+    // 2 numOccur, 4 error code, 1 flags, 6 strlen
+    size_t baseLength = 20;
+
+    if (baseLength + detailsRef.size() + locationRef.size() +
+            callStackRef.size() <=
+        65536) {
+      // Pass through
+      retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
+                                                  details, location, callStack);
+    } else if (baseLength + detailsRef.size() > 65536) {
+      // Details too long, cut both location and stack
+      auto newLen = 65536 - baseLength;
+      std::unique_ptr<char[]> newDetails = std::make_unique<char[]>(newLen + 1);
+      std::strncpy(newDetails.get(), detailsRef.data(), newLen);
+      newDetails[newLen] = '\0';
+      char empty = '\0';
+      retval = FRC_NetworkCommunication_sendError(
+          isError, errorCode, isLVCode, newDetails.get(), &empty, &empty);
+    } else if (baseLength + detailsRef.size() + locationRef.size() > 65536) {
+      // Location too long, cut stack
+      auto newLen = 65536 - baseLength - detailsRef.size();
+      std::unique_ptr<char[]> newLocation =
+          std::make_unique<char[]>(newLen + 1);
+      std::strncpy(newLocation.get(), locationRef.data(), newLen);
+      newLocation[newLen] = '\0';
+      char empty = '\0';
+      retval = FRC_NetworkCommunication_sendError(
+          isError, errorCode, isLVCode, details, newLocation.get(), &empty);
+    } else {
+      // Stack too long
+      auto newLen = 65536 - baseLength - detailsRef.size() - locationRef.size();
+      std::unique_ptr<char[]> newCallStack =
+          std::make_unique<char[]>(newLen + 1);
+      std::strncpy(newCallStack.get(), locationRef.data(), newLen);
+      newCallStack[newLen] = '\0';
+      char empty = '\0';
+      retval = FRC_NetworkCommunication_sendError(
+          isError, errorCode, isLVCode, details, location, newCallStack.get());
+    }
     if (printMsg) {
       if (location && location[0] != '\0') {
         wpi::errs() << (isError ? "Error" : "Warning") << " at " << location
