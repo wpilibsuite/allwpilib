@@ -332,7 +332,6 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
           std::make_unique<char[]>(newLen + 1);
       std::strncpy(newCallStack.get(), locationRef.data(), newLen);
       newCallStack[newLen] = '\0';
-      char empty = '\0';
       retval = FRC_NetworkCommunication_sendError(
           isError, errorCode, isLVCode, details, location, newCallStack.get());
     }
