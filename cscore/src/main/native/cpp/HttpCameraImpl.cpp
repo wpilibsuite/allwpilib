@@ -190,8 +190,8 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
     if (key.trim() == "boundary") {
       value = value.trim().trim('"');  // value may be quoted
       if (value.startswith("--")) {
-        value = value.slice(2, wpi::StringRef::npos);
-	  }
+        value = value.substr(2);
+      }
       boundary.append(value.begin(), value.end());
     }
   }
@@ -222,7 +222,7 @@ void HttpCameraImpl::DeviceStream(wpi::raw_istream& is,
     if (!FindMultipartBoundary(is, boundary, nullptr)) break;
 
     // Read the next two characters after the boundary (normally \r\n)
-	// Handle just \n for LabVIEW however
+    // Handle just \n for LabVIEW however
     char eol[2];
     is.read(eol, 1);
     if (!m_active || is.has_error()) break;
