@@ -298,7 +298,8 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
 
     // 1 tag, 4 timestamp, 2 seqnum
     // 2 numOccur, 4 error code, 1 flags, 6 strlen
-    size_t baseLength = 20;
+    // 1 extra needed for padding on Netcomm end.
+    size_t baseLength = 21;
 
     if (baseLength + detailsRef.size() + locationRef.size() +
             callStackRef.size() <=
