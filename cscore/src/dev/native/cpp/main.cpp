@@ -7,6 +7,6 @@
 
 #include <iostream>
 
-int main() {
-  std::cout << cs::GetHostname() << std::endl;
-}
+#include "cscore.h"
+
+int main() { std::cout << cs::GetHostname() << std::endl; }
