@@ -146,17 +146,20 @@ public final class CameraServer {
       values[j] = "mjpg:" + values[j];
     }
 
-    // Look to see if we have a passthrough server for this source
-    for (VideoSink i : m_sinks.values()) {
-      int sink = i.getHandle();
-      int sinkSource = CameraServerJNI.getSinkSource(sink);
-      if (source == sinkSource
-          && VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) == VideoSink.Kind.kMjpeg) {
-        // Add USB-only passthrough
-        String[] finalValues = Arrays.copyOf(values, values.length + 1);
-        int port = CameraServerJNI.getMjpegServerPort(sink);
-        finalValues[values.length] = makeStreamValue("172.22.11.2", port);
-        return finalValues;
+    if (CameraServerSharedStore.getCameraServerShared().isRoboRIO()) {
+      // Look to see if we have a passthrough server for this source
+      // Only do this on the roboRIO
+      for (VideoSink i : m_sinks.values()) {
+        int sink = i.getHandle();
+        int sinkSource = CameraServerJNI.getSinkSource(sink);
+        if (source == sinkSource
+            && VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) == VideoSink.Kind.kMjpeg) {
+          // Add USB-only passthrough
+          String[] finalValues = Arrays.copyOf(values, values.length + 1);
+          int port = CameraServerJNI.getMjpegServerPort(sink);
+          finalValues[values.length] = makeStreamValue("172.22.11.2", port);
+          return finalValues;
+        }
       }
     }
 

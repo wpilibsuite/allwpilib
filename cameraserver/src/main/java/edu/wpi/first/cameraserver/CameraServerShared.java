@@ -43,4 +43,13 @@ public interface CameraServerShared {
    * @param id the usage id
    */
   void reportAxisCamera(int id);
+
+  /**
+   * Get if running on a roboRIO.
+   *
+   * @return true if on roboRIO
+   */
+  default boolean isRoboRIO() {
+    return false;
+  }
 }
