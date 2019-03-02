@@ -149,7 +149,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
 
   if (!m_active || !stream) return nullptr;
 
-  auto connPtr = wpi::make_unique<wpi::HttpConnection>(std::move(stream), 2);
+  auto connPtr = wpi::make_unique<wpi::HttpConnection>(std::move(stream), 1);
   wpi::HttpConnection* conn = connPtr.get();
 
   // update m_streamConn
