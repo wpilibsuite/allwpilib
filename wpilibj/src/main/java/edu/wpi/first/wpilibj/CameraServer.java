@@ -153,7 +153,8 @@ public final class CameraServer {
         int sink = i.getHandle();
         int sinkSource = CameraServerJNI.getSinkSource(sink);
         if (source == sinkSource
-            && VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) == VideoSink.Kind.kMjpeg) {
+            && VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink))
+            == VideoSink.Kind.kMjpeg) {
           // Add USB-only passthrough
           String[] finalValues = Arrays.copyOf(values, values.length + 1);
           int port = CameraServerJNI.getMjpegServerPort(sink);
