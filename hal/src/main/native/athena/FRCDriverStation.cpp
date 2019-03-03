@@ -325,8 +325,9 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
       // Stack too long
       auto newLen = 65536 - baseLength - detailsRef.size() - locationRef.size();
       std::string newCallStack{callStack, newLen};
-      retval = FRC_NetworkCommunication_sendError(
-          isError, errorCode, isLVCode, details, location, newCallStack.c_str());
+      retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
+                                                  details, location,
+                                                  newCallStack.c_str());
     }
     if (printMsg) {
       if (location && location[0] != '\0') {
