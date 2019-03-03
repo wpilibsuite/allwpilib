@@ -12,7 +12,7 @@
 
 #include "frc/ErrorBase.h"
 
-using namespace frc;
+namespace frc {
 
 int GetThreadPriority(std::thread& thread, bool* isRealTime) {
   int32_t status = 0;
@@ -47,3 +47,5 @@ bool SetCurrentThreadPriority(bool realTime, int priority) {
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return ret;
 }
+
+}  // namespace frc
