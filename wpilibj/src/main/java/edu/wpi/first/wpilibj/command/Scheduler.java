@@ -7,9 +7,8 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.*;
+import java.util.function.Consumer;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -89,6 +88,11 @@ public final class Scheduler extends SendableBase {
   @SuppressWarnings("PMD.LooseCoupling")
   private Vector<ButtonScheduler> m_buttons;
   private boolean m_runningCommandsChanged;
+
+  private final List<Consumer<Command>> initActions = new ArrayList<>();
+  private final List<Consumer<Command>> executeActions = new ArrayList<>();
+  private final List<Consumer<Command>> interruptActions = new ArrayList<>();
+  private final List<Consumer<Command>> endActions = new ArrayList<>();
 
   /**
    * Instantiates a {@link Scheduler}.
@@ -183,6 +187,9 @@ public final class Scheduler extends SendableBase {
       m_commandTable.put(command, element);
 
       m_runningCommandsChanged = true;
+
+      //Give the command the list of user-specified actions.
+      command.setActions(initActions, executeActions, interruptActions, endActions);
 
       command.startRunning();
     }
@@ -307,6 +314,42 @@ public final class Scheduler extends SendableBase {
    */
   public void enable() {
     m_disabled = false;
+  }
+
+  /**
+   * Adds an action to perform on the initialization of any command by the scheduler.
+   *
+   * @param action the action to perform
+   */
+  public void onCommandInitialize(Consumer<Command> action) {
+    initActions.add(action);
+  }
+
+  /**
+   * Adds an action to perform on the execution of any command by the scheduler.
+   *
+   * @param action the action to perform
+   */
+  public void onCommandExecute(Consumer<Command> action) {
+    executeActions.add(action);
+  }
+
+  /**
+   * Adds an action to perform on the interruption of any command by the scheduler.
+   *
+   * @param action the action to perform
+   */
+  public void onCommandInterrupted(Consumer<Command> action){
+    interruptActions.add(action);
+  }
+
+  /**
+   * Adds an action to perform on the ending of any command by the scheduler.
+   *
+   * @param action the action to perform
+   */
+  public void onCommandEnd(Consumer<Command> action) {
+    endActions.add(action);
   }
 
   @Override

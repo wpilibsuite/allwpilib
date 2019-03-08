@@ -7,7 +7,10 @@
 
 package edu.wpi.first.wpilibj.command;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.function.Consumer;
 
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SendableBase;
@@ -95,6 +98,11 @@ public abstract class Command extends SendableBase {
    * The {@link CommandGroup} this is in.
    */
   private CommandGroup m_parent;
+
+  private List<Consumer<Command>> initActions = new ArrayList<>();
+  private List<Consumer<Command>> executeActions = new ArrayList<>();
+  private List<Consumer<Command>> interruptActions = new ArrayList<>();
+  private List<Consumer<Command>> endActions = new ArrayList<>();
 
   /**
    * Creates a new command. The name of this command will be set to its class name.
@@ -259,9 +267,15 @@ public abstract class Command extends SendableBase {
       if (isCanceled()) {
         interrupted();
         _interrupted();
+        for(Consumer<Command> action : interruptActions) {
+          action.accept(this);
+        }
       } else {
         end();
         _end();
+        for(Consumer<Command> action : endActions) {
+          action.accept(this);
+        }
       }
     }
     m_initialized = false;
@@ -287,9 +301,15 @@ public abstract class Command extends SendableBase {
       startTiming();
       _initialize();
       initialize();
+      for (Consumer<Command> action : initActions) {
+        action.accept(this);
+      }
     }
     _execute();
     execute();
+    for (Consumer<Command> action : executeActions) {
+      action.accept(this);
+    }
     return !isFinished();
   }
 
@@ -594,6 +614,16 @@ public abstract class Command extends SendableBase {
    */
   public boolean willRunWhenDisabled() {
     return m_runWhenDisabled;
+  }
+
+  void setActions(List<Consumer<Command>> initActions,
+                  List<Consumer<Command>> executeActions,
+                  List<Consumer<Command>> interruptActions,
+                  List<Consumer<Command>> endActions) {
+    this.initActions = initActions;
+    this.executeActions = executeActions;
+    this.interruptActions = interruptActions;
+    this.endActions = endActions;
   }
 
   /**
