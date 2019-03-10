@@ -7,12 +7,13 @@
 
 package edu.wpi.first.wpilibj.command;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 import java.util.function.Consumer;
-import java.util.List;
-import java.util.ArrayList;
+
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
