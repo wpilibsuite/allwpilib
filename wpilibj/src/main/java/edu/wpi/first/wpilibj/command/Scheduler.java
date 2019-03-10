@@ -7,8 +7,12 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 import java.util.function.Consumer;
+import java.util.List;
+import java.util.ArrayList;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -89,10 +93,10 @@ public final class Scheduler extends SendableBase {
   private Vector<ButtonScheduler> m_buttons;
   private boolean m_runningCommandsChanged;
 
-  private final List<Consumer<Command>> initActions = new ArrayList<>();
-  private final List<Consumer<Command>> executeActions = new ArrayList<>();
-  private final List<Consumer<Command>> interruptActions = new ArrayList<>();
-  private final List<Consumer<Command>> endActions = new ArrayList<>();
+  private final List<Consumer<Command>> m_initActions = new ArrayList<>();
+  private final List<Consumer<Command>> m_executeActions = new ArrayList<>();
+  private final List<Consumer<Command>> m_interruptActions = new ArrayList<>();
+  private final List<Consumer<Command>> m_endActions = new ArrayList<>();
 
   /**
    * Instantiates a {@link Scheduler}.
@@ -189,7 +193,7 @@ public final class Scheduler extends SendableBase {
       m_runningCommandsChanged = true;
 
       //Give the command the list of user-specified actions.
-      command.setActions(initActions, executeActions, interruptActions, endActions);
+      command.setActions(m_initActions, m_executeActions, m_interruptActions, m_endActions);
 
       command.startRunning();
     }
@@ -322,7 +326,7 @@ public final class Scheduler extends SendableBase {
    * @param action the action to perform
    */
   public void onCommandInitialize(Consumer<Command> action) {
-    initActions.add(action);
+    m_initActions.add(action);
   }
 
   /**
@@ -331,7 +335,7 @@ public final class Scheduler extends SendableBase {
    * @param action the action to perform
    */
   public void onCommandExecute(Consumer<Command> action) {
-    executeActions.add(action);
+    m_executeActions.add(action);
   }
 
   /**
@@ -339,8 +343,8 @@ public final class Scheduler extends SendableBase {
    *
    * @param action the action to perform
    */
-  public void onCommandInterrupted(Consumer<Command> action){
-    interruptActions.add(action);
+  public void onCommandInterrupted(Consumer<Command> action) {
+    m_interruptActions.add(action);
   }
 
   /**
@@ -349,7 +353,7 @@ public final class Scheduler extends SendableBase {
    * @param action the action to perform
    */
   public void onCommandEnd(Consumer<Command> action) {
-    endActions.add(action);
+    m_endActions.add(action);
   }
 
   @Override

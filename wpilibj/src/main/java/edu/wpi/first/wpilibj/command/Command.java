@@ -99,10 +99,10 @@ public abstract class Command extends SendableBase {
    */
   private CommandGroup m_parent;
 
-  private List<Consumer<Command>> initActions = new ArrayList<>();
-  private List<Consumer<Command>> executeActions = new ArrayList<>();
-  private List<Consumer<Command>> interruptActions = new ArrayList<>();
-  private List<Consumer<Command>> endActions = new ArrayList<>();
+  private List<Consumer<Command>> m_initActions = new ArrayList<>();
+  private List<Consumer<Command>> m_executeActions = new ArrayList<>();
+  private List<Consumer<Command>> m_interruptActions = new ArrayList<>();
+  private List<Consumer<Command>> m_endActions = new ArrayList<>();
 
   /**
    * Creates a new command. The name of this command will be set to its class name.
@@ -267,13 +267,13 @@ public abstract class Command extends SendableBase {
       if (isCanceled()) {
         interrupted();
         _interrupted();
-        for(Consumer<Command> action : interruptActions) {
+        for (Consumer<Command> action : m_interruptActions) {
           action.accept(this);
         }
       } else {
         end();
         _end();
-        for(Consumer<Command> action : endActions) {
+        for (Consumer<Command> action : m_endActions) {
           action.accept(this);
         }
       }
@@ -301,13 +301,13 @@ public abstract class Command extends SendableBase {
       startTiming();
       _initialize();
       initialize();
-      for (Consumer<Command> action : initActions) {
+      for (Consumer<Command> action : m_initActions) {
         action.accept(this);
       }
     }
     _execute();
     execute();
-    for (Consumer<Command> action : executeActions) {
+    for (Consumer<Command> action : m_executeActions) {
       action.accept(this);
     }
     return !isFinished();
@@ -620,10 +620,10 @@ public abstract class Command extends SendableBase {
                   List<Consumer<Command>> executeActions,
                   List<Consumer<Command>> interruptActions,
                   List<Consumer<Command>> endActions) {
-    this.initActions = initActions;
-    this.executeActions = executeActions;
-    this.interruptActions = interruptActions;
-    this.endActions = endActions;
+    this.m_initActions = initActions;
+    this.m_executeActions = executeActions;
+    this.m_interruptActions = interruptActions;
+    this.m_endActions = endActions;
   }
 
   /**
