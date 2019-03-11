@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.experimental.buttons.Button;
+import edu.wpi.first.wpilibj.experimental.buttons.JoystickButton;
 
 /**
  * GenericHID Interface.
@@ -282,5 +284,15 @@ public abstract class GenericHID {
       m_rightRumble = (short) (value * 65535);
     }
     HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+  }
+
+  /**
+   * Returns a {@link Button} object corresponding to the specified button number from this HID.
+   *
+   * @param button the number of the button to return (starting at 1)
+   * @return the {@link Button} object
+   */
+  public Button getButton(int button) {
+    return new JoystickButton(this, button);
   }
 }
