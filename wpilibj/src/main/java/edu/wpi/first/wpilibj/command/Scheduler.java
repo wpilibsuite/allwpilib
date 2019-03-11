@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  *
  * @see Command
  */
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields"})
 public final class Scheduler extends SendableBase {
   /**
    * The Singleton Instance.
