@@ -9,6 +9,8 @@ package edu.wpi.first.wpilibj.command;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.DoubleToIntFunction;
+import java.util.stream.IntStream;
 
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -38,8 +40,8 @@ public final class SchedulerNew extends SendableBase {
         return instance;
     }
 
-    private final Map<ICommand, CommandState> m_scheduledCommands = new HashMap<>();
-    private final Map<Subsystem, ICommand> m_requirements = new HashMap<>();
+    private final Map<ICommand, CommandState> m_scheduledCommands = new LinkedHashMap<>();
+    private final Map<Subsystem, ICommand> m_requirements = new LinkedHashMap<>();
     private final Collection<Subsystem> m_subsystems = new HashSet<>();
 
     /**
@@ -59,6 +61,7 @@ public final class SchedulerNew extends SendableBase {
     private NetworkTableEntry m_namesEntry;
     private NetworkTableEntry m_idsEntry;
     private NetworkTableEntry m_cancelEntry;
+
     /**
      * A list of all {@link edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler Buttons}. It is
      * created lazily.
@@ -121,7 +124,7 @@ public final class SchedulerNew extends SendableBase {
                     for (Subsystem requirement : requirements) {
                         ICommand toInterrupt = m_requirements.get(requirement);
                         if (toInterrupt != null) {
-                           cancelCommand(toInterrupt);
+                            cancelCommand(toInterrupt);
                         }
                     }
                     command.initialize();
@@ -274,13 +277,38 @@ public final class SchedulerNew extends SendableBase {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("Scheduler");
+        builder.setSmartDashboardType("SchedulerNew");
         m_namesEntry = builder.getEntry("Names");
         m_idsEntry = builder.getEntry("Ids");
         m_cancelEntry = builder.getEntry("Cancel");
         builder.setUpdateTable(() -> {
             if (m_namesEntry != null && m_idsEntry != null && m_cancelEntry != null) {
-                // Get the commands to cancel
+
+                Map<Double, ICommand> ids = new LinkedHashMap<>();
+
+
+                for (ICommand command : m_scheduledCommands.keySet()) {
+                    ids.put((double) command.hashCode(), command);
+                }
+
+                double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
+                if (toCancel.length > 0) {
+                    for (double hash : toCancel) {
+                        cancelCommand(ids.get(hash));
+                        ids.remove(hash);
+                    }
+                    m_cancelEntry.setDoubleArray(new double[0]);
+                }
+
+                List<String> names = new ArrayList<>();
+
+                ids.values().forEach(command -> names.add(command.getName()));
+
+                m_namesEntry.setStringArray(names.toArray(new String[0]));
+                m_idsEntry.setNumberArray(ids.keySet().toArray(new Double[0]));
+
+
+                /*// Get the commands to cancel
                 double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
                 if (toCancel.length > 0) {
                     for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
@@ -309,7 +337,7 @@ public final class SchedulerNew extends SendableBase {
                     }
                     m_namesEntry.setStringArray(commands);
                     m_idsEntry.setDoubleArray(ids);
-                }
+                }*/
             }
         });
     }
