@@ -14,6 +14,32 @@
 
 using namespace frc;
 
+InterruptableSensorBase::~InterruptableSensorBase() {
+  if (m_interrupt == HAL_kInvalidHandle) return;
+  int32_t status = 0;
+  HAL_CleanInterrupts(m_interrupt, &status);
+  // Ignore status, as an invalid handle just needs to be ignored.
+  m_interrupt = HAL_kInvalidHandle;
+}
+
+InterruptableSensorBase::InterruptableSensorBase(InterruptableSensorBase&& rhs)
+    : ErrorBase(std::move(rhs)),
+      m_interrupt(rhs.m_interrupt.load()),
+      m_handler(std::move(rhs.m_handler)) {
+  rhs.m_interrupt = HAL_kInvalidHandle;
+}
+
+InterruptableSensorBase& InterruptableSensorBase::operator=(
+    InterruptableSensorBase&& rhs) {
+  ErrorBase::operator=(std::move(rhs));
+
+  m_interrupt = rhs.m_interrupt.load();
+  rhs.m_interrupt = HAL_kInvalidHandle;
+  m_handler = std::move(rhs.m_handler);
+
+  return *this;
+}
+
 void InterruptableSensorBase::RequestInterrupts(
     HAL_InterruptHandlerFunction handler, void* param) {
   if (StatusIsFatal()) return;
@@ -29,6 +55,34 @@ void InterruptableSensorBase::RequestInterrupts(
       &status);
   SetUpSourceEdge(true, false);
   HAL_AttachInterruptHandler(m_interrupt, handler, param, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+void InterruptableSensorBase::RequestInterrupts(
+    InterruptEventHandler&& handler) {
+  if (StatusIsFatal()) return;
+
+  wpi_assert(m_interrupt == HAL_kInvalidHandle);
+  AllocateInterrupts(false);
+  if (StatusIsFatal()) return;  // if allocate failed, out of interrupts
+
+  m_handler = std::make_unique<InterruptEventHandler>(std::move(handler));
+
+  int32_t status = 0;
+  HAL_RequestInterrupts(
+      m_interrupt, GetPortHandleForRouting(),
+      static_cast<HAL_AnalogTriggerType>(GetAnalogTriggerTypeForRouting()),
+      &status);
+  SetUpSourceEdge(true, false);
+  HAL_AttachInterruptHandler(
+      m_interrupt,
+      [](uint32_t mask, void* param) {
+        auto self = reinterpret_cast<InterruptEventHandler*>(param);
+        bool rising = (mask & 0xFF) != 0;
+        bool falling = (mask & 0xFF00) != 0;
+        (*self)(rising, falling);
+      },
+      m_handler.get(), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 

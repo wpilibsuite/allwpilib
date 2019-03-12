@@ -7,6 +7,10 @@
 
 #pragma once
 
+#include <atomic>
+#include <functional>
+#include <memory>
+
 #include <hal/Interrupts.h>
 
 #include "frc/AnalogTriggerType.h"
@@ -14,6 +18,13 @@
 #include "frc/smartdashboard/SendableBase.h"
 
 namespace frc {
+
+/**
+ * Handler for interrupts.
+ *
+ * First parameter is if rising, 2nd is if falling.
+ */
+using InterruptEventHandler = std::function<void(bool, bool)>;
 
 class InterruptableSensorBase : public ErrorBase, public SendableBase {
  public:
@@ -26,8 +37,13 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
 
   InterruptableSensorBase() = default;
 
-  InterruptableSensorBase(InterruptableSensorBase&&) = default;
-  InterruptableSensorBase& operator=(InterruptableSensorBase&&) = default;
+  /**
+   * Free the resources for an interrupt event.
+   */
+  virtual ~InterruptableSensorBase();
+
+  InterruptableSensorBase(InterruptableSensorBase&&);
+  InterruptableSensorBase& operator=(InterruptableSensorBase&&);
 
   virtual HAL_Handle GetPortHandleForRouting() const = 0;
   virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const = 0;
@@ -42,6 +58,16 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
    */
   virtual void RequestInterrupts(HAL_InterruptHandlerFunction handler,
                                  void* param);
+
+  /**
+   * Request one of the 8 interrupts asynchronously on this digital input.
+   *
+   * Request interrupts in asynchronous mode where the user's interrupt handler
+   * will be called when the interrupt fires. Users that want control over the
+   * thread priority should use the synchronous method with their own spawned
+   * thread. The default is interrupt on rising edges only.
+   */
+  virtual void RequestInterrupts(InterruptEventHandler&& handler);
 
   /**
    * Request one of the 8 interrupts synchronously on this digital input.
@@ -119,9 +145,13 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
   virtual void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
 
  protected:
-  HAL_InterruptHandle m_interrupt = HAL_kInvalidHandle;
+  // atomic for proper destruction
+  std::atomic<HAL_InterruptHandle> m_interrupt{HAL_kInvalidHandle};
 
   void AllocateInterrupts(bool watcher);
+
+ private:
+  std::unique_ptr<InterruptEventHandler> m_handler;
 };
 
 }  // namespace frc

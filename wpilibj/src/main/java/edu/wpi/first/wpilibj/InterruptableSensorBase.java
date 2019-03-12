@@ -67,6 +67,36 @@ public abstract class InterruptableSensorBase extends SendableBase {
    */
   public abstract int getPortHandleForRouting();
 
+    /**
+   * Request one of the 8 interrupts asynchronously on this digital input.
+   *
+   * @param handler The {@link InterruptHandler} that contains the method {@link
+   *                InterruptHandlerFunction#onInterrupt(boolean, boolean)} that will be called
+   *                whenever there is an interrupt on this device. Request interrupts in synchronous
+   *                mode where the user program interrupt handler will be called when an interrupt
+   *                occurs. The default is interrupt on rising edges only.
+   */
+  public void requestInterrupts(InterruptHandler handler) {
+    if (m_interrupt != 0) {
+      throw new AllocationException("The interrupt has already been allocated");
+    }
+
+    allocateInterrupts(false);
+
+    assert m_interrupt != 0;
+
+    InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
+        getAnalogTriggerTypeForRouting());
+    setUpSourceEdge(true, false);
+    InterruptJNI.attachInterruptHandler(m_interrupt, (mask, obj) -> {
+      // Rising edge result is the interrupt bit set in the byte 0xFF
+      // Falling edge result is the interrupt bit set in the byte 0xFF00
+      boolean rising = ((mask & 0xFF) != 0);
+      boolean falling = ((mask & 0xFF00) != 0);
+      handler.onInterrupt(rising, falling);
+    }, null);
+  }
+
   /**
    * Request one of the 8 interrupts asynchronously on this digital input.
    *
