@@ -159,7 +159,7 @@ public final class SchedulerNew extends SendableBase {
 
             for (ICommand command : m_scheduledCommands.keySet()) {
 
-                if(RobotState.isDisabled() && !command.getRunWhenDisabled()) {
+                if (RobotState.isDisabled() && !command.getRunWhenDisabled()) {
                     cancelCommand(command);
                     break;
                 }
@@ -196,9 +196,7 @@ public final class SchedulerNew extends SendableBase {
      * @param subsystem the system
      */
     void registerSubsystem(Subsystem subsystem) {
-        if (subsystem != null) {
-            m_subsystems.add(subsystem);
-        }
+        m_subsystems.add(subsystem);
     }
 
     public void cancelCommand(ICommand command) {
@@ -209,7 +207,7 @@ public final class SchedulerNew extends SendableBase {
 
 
     public void cancelAll() {
-        for(ICommand command : m_scheduledCommands.keySet()) {
+        for (ICommand command : m_scheduledCommands.keySet()) {
             cancelCommand(command);
         }
     }
