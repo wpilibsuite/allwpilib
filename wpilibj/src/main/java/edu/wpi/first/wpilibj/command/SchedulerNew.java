@@ -156,7 +156,7 @@ public final class SchedulerNew extends SendableBase {
 
                 if (RobotState.isDisabled() && !command.getRunWhenDisabled()) {
                     cancelCommand(command);
-                    break;
+                    continue;
                 }
 
                 command.execute();
