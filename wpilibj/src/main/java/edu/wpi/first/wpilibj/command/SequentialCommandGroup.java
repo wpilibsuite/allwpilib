@@ -20,7 +20,9 @@ public class SequentialCommandGroup implements ICommand {
         m_commands.peek().execute();
         if (m_commands.peek().isFinished()) {
             m_commands.remove().end();
-            m_commands.peek().initialize();
+            if(!m_commands.isEmpty()) {
+                m_commands.peek().initialize();
+            }
         }
     }
 
