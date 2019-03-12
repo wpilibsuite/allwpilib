@@ -6,7 +6,7 @@ public class ParallelCommandGroup implements ICommand {
 
     private final Map<ICommand, Boolean> m_commands = new HashMap<>();
 
-    public ParallelCommandGroup(ICommand... commands) {
+    public ParallelCommandGroup(ICommand[] commands) {
         for (ICommand command : commands) {
             m_commands.put(command, true);
         }

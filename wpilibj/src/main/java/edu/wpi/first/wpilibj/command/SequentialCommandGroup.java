@@ -7,7 +7,7 @@ public class SequentialCommandGroup implements ICommand {
     private final List<ICommand> m_commands = new ArrayList<>();
     private Queue<ICommand> m_commandQueue;
 
-    public SequentialCommandGroup(ICommand... commands) {
+    public SequentialCommandGroup(ICommand[] commands) {
         m_commands.addAll(List.of(commands));
     }
 
