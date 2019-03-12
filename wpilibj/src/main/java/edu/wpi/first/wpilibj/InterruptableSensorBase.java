@@ -67,7 +67,7 @@ public abstract class InterruptableSensorBase extends SendableBase {
    */
   public abstract int getPortHandleForRouting();
 
-    /**
+  /**
    * Request one of the 8 interrupts asynchronously on this digital input.
    *
    * @param handler The {@link InterruptHandler} that contains the method {@link
@@ -91,8 +91,8 @@ public abstract class InterruptableSensorBase extends SendableBase {
     InterruptJNI.attachInterruptHandler(m_interrupt, (mask, obj) -> {
       // Rising edge result is the interrupt bit set in the byte 0xFF
       // Falling edge result is the interrupt bit set in the byte 0xFF00
-      boolean rising = ((mask & 0xFF) != 0);
-      boolean falling = ((mask & 0xFF00) != 0);
+      boolean rising = (mask & 0xFF) != 0;
+      boolean falling = (mask & 0xFF00) != 0;
       handler.onInterrupt(rising, falling);
     }, null);
   }
