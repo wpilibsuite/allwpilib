@@ -57,7 +57,9 @@ public class SequentialCommandGroup implements ICommand {
     @Override
     public Collection<Subsystem> getRequirements() {
         Collection<Subsystem> requirements = new HashSet<>();
-        m_commands.forEach(command -> requirements.addAll(command.getRequirements()));
+        for (ICommand command : m_commands) {
+            requirements.addAll(command.getRequirements());
+        }
         return requirements;
     }
 }

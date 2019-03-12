@@ -18,10 +18,10 @@ public class ParallelCommandGroup implements ICommand {
 
     @Override
     public void initialize() {
-        m_commands.keySet().forEach(command -> {
+        for (ICommand command : m_commands.keySet()) {
             command.initialize();
             m_commands.replace(command, true);
-        });
+        }
     }
 
     @Override
@@ -57,7 +57,9 @@ public class ParallelCommandGroup implements ICommand {
     @Override
     public Collection<Subsystem> getRequirements() {
         Collection<Subsystem> requirements = new HashSet<>();
-        m_commands.keySet().forEach(command -> requirements.addAll(command.getRequirements()));
+        for (ICommand command : m_commands.keySet()) {
+            requirements.addAll(command.getRequirements());
+        }
         return requirements;
     }
 }
