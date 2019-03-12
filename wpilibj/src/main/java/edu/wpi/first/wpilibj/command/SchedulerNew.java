@@ -17,8 +17,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SendableBase;
-import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
-import edu.wpi.first.wpilibj.newbuttons.NewTrigger;
+import edu.wpi.first.wpilibj.buttons.Trigger;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public final class SchedulerNew extends SendableBase {
@@ -65,7 +64,7 @@ public final class SchedulerNew extends SendableBase {
      * created lazily.
      */
     @SuppressWarnings("PMD.LooseCoupling")
-    private Collection<NewTrigger.ButtonScheduler> m_buttons;
+    private Collection<Trigger.ButtonSchedulerNew> m_buttons;
     private boolean m_runningCommandsChanged;
 
     private final List<Consumer<ICommand>> m_initActions = new ArrayList<>();
@@ -88,7 +87,7 @@ public final class SchedulerNew extends SendableBase {
      * @param button the button to add
      */
     @SuppressWarnings("PMD.UseArrayListInsteadOfVector")
-    public void addButton(NewTrigger.ButtonScheduler button) {
+    public void addButton(Trigger.ButtonSchedulerNew button) {
         if (m_buttons == null) {
             m_buttons = new HashSet<>();
         }
@@ -148,7 +147,7 @@ public final class SchedulerNew extends SendableBase {
                 subsystem.periodic();
             }
 
-            for (NewTrigger.ButtonScheduler button : m_buttons) {
+            for (NewTrigger.ButtonSchedulerNew button : m_buttons) {
                 button.execute();
             }
 

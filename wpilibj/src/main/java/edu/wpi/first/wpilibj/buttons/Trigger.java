@@ -9,7 +9,9 @@ package edu.wpi.first.wpilibj.buttons;
 
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.ICommand;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.command.SchedulerNew;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -173,6 +175,137 @@ public abstract class Trigger extends SendableBase {
 
     public void start() {
       Scheduler.getInstance().addButton(this);
+    }
+  }
+
+  /**
+   * Starts the given command whenever the trigger just becomes active.
+   *
+   * @param command the command to start
+   */
+  public void whenActive(final ICommand command, boolean interruptible) {
+    new ButtonSchedulerNew() {
+      private boolean m_pressedLast = grab();
+
+      @Override
+      public void execute() {
+        boolean pressed = grab();
+
+        if (!m_pressedLast && pressed) {
+          command.start(interruptible);
+        }
+
+        m_pressedLast = pressed;
+      }
+    }.start();
+  }
+
+  /**
+   * Constantly starts the given command while the button is held.
+   *
+   * {@link Command#start()} will be called repeatedly while the trigger is active, and will be
+   * canceled when the trigger becomes inactive.
+   *
+   * @param command the command to start
+   */
+  public void whileActive(final ICommand command, boolean interruptible) {
+    new ButtonSchedulerNew() {
+      private boolean m_pressedLast = grab();
+
+      @Override
+      public void execute() {
+        boolean pressed = grab();
+
+        if (pressed) {
+          command.start(interruptible);
+        } else if (m_pressedLast && !pressed) {
+          command.cancel();
+        }
+
+        m_pressedLast = pressed;
+      }
+    }.start();
+  }
+
+  /**
+   * Starts the command when the trigger becomes inactive.
+   *
+   * @param command the command to start
+   */
+  public void whenInactive(final ICommand command, boolean interruptible) {
+    new ButtonSchedulerNew() {
+      private boolean m_pressedLast = grab();
+
+      @Override
+      public void execute() {
+        boolean pressed = grab();
+
+        if (m_pressedLast && !pressed) {
+          command.start(interruptible);
+        }
+
+        m_pressedLast = pressed;
+      }
+    }.start();
+  }
+
+  /**
+   * Toggles a command when the trigger becomes active.
+   *
+   * @param command the command to toggle
+   */
+  public void toggleWhenActive(final ICommand command, boolean interruptible) {
+    new ButtonSchedulerNew() {
+      private boolean m_pressedLast = grab();
+
+      @Override
+      public void execute() {
+        boolean pressed = grab();
+
+        if (!m_pressedLast && pressed) {
+          if (command.isRunning()) {
+            command.cancel();
+          } else {
+            command.start(interruptible);
+          }
+        }
+
+        m_pressedLast = pressed;
+      }
+    }.start();
+  }
+
+  /**
+   * Cancels a command when the trigger becomes active.
+   *
+   * @param command the command to cancel
+   */
+  public void cancelWhenActive(final ICommand command) {
+    new ButtonSchedulerNew() {
+      private boolean m_pressedLast = grab();
+
+      @Override
+      public void execute() {
+        boolean pressed = grab();
+
+        if (!m_pressedLast && pressed) {
+          command.cancel();
+        }
+
+        m_pressedLast = pressed;
+      }
+    }.start();
+  }
+
+  /**
+   * An internal class of {@link Trigger}. The user should ignore this, it is only public to
+   * interface between packages.
+   */
+  public abstract static class ButtonSchedulerNew {
+    public abstract void execute();
+
+    public void start() {
+      SchedulerNew.getInstance().addButton(this);
     }
   }
 
