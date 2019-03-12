@@ -8,9 +8,8 @@
 package edu.wpi.first.wpilibj.command;
 
 import java.util.*;
+import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.DoubleToIntFunction;
-import java.util.stream.IntStream;
 
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -99,7 +98,12 @@ public final class SchedulerNew extends SendableBase {
 
     public void scheduleCommand(ICommand command, boolean interruptible) {
 
-        if (!m_disabled && (!RobotState.isDisabled() || command.getRunWhenDisabled())) {
+        if (CommandGroupBase.getGroupedCommands().contains(command)) {
+            throw new IllegalUseOfCommandException("A command that is part of a command group cannot be independently scheduled");
+        }
+
+        if (!m_disabled
+                && (!RobotState.isDisabled() || command.getRunWhenDisabled())) {
 
             Collection<Subsystem> requirements = command.getRequirements();
 
@@ -277,7 +281,7 @@ public final class SchedulerNew extends SendableBase {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("SchedulerNew");
+        builder.setSmartDashboardType("Scheduler");
         m_namesEntry = builder.getEntry("Names");
         m_idsEntry = builder.getEntry("Ids");
         m_cancelEntry = builder.getEntry("Cancel");
@@ -306,38 +310,6 @@ public final class SchedulerNew extends SendableBase {
 
                 m_namesEntry.setStringArray(names.toArray(new String[0]));
                 m_idsEntry.setNumberArray(ids.keySet().toArray(new Double[0]));
-
-
-                /*// Get the commands to cancel
-                double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
-                if (toCancel.length > 0) {
-                    for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
-                        for (double d : toCancel) {
-                            if (e.getData().hashCode() == d) {
-                                e.getData().cancel();
-                            }
-                        }
-                    }
-                    m_cancelEntry.setDoubleArray(new double[0]);
-                }
-
-                if (m_runningCommandsChanged) {
-                    // Set the the running commands
-                    int number = 0;
-                    for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
-                        number++;
-                    }
-                    String[] commands = new String[number];
-                    double[] ids = new double[number];
-                    number = 0;
-                    for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
-                        commands[number] = e.getData().getName();
-                        ids[number] = e.getData().hashCode();
-                        number++;
-                    }
-                    m_namesEntry.setStringArray(commands);
-                    m_idsEntry.setDoubleArray(ids);
-                }*/
             }
         });
     }

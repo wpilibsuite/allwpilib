@@ -1,19 +1,21 @@
 package edu.wpi.first.wpilibj.command;
 
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
+import java.util.Set;
 
-public class SequentialCommandGroup implements ICommand {
+public class SequentialCommandGroup extends CommandGroupBase implements ICommand {
 
     private final List<ICommand> m_commands = new ArrayList<>();
     private Queue<ICommand> m_commandQueue;
 
     public SequentialCommandGroup(ICommand[] commands) {
+        if(!Collections.disjoint(Set.of(commands), getGroupedCommands())) {
+            throw new IllegalUseOfCommandException("Commands cannot be added to more than one CommandGroup");
+        }
+
+        registerGroupedCommands(commands);
+
         m_commands.addAll(List.of(commands));
     }
 
