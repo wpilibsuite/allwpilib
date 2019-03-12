@@ -11,7 +11,9 @@ public interface ICommand {
 
     void execute();
 
-    void interrupted();
+    default void interrupted() {
+        end();
+    }
 
     void end();
 
@@ -23,20 +25,19 @@ public interface ICommand {
         return new HashSet<>();
     }
 
-    default void start() {
-        //TODO: add this to scheduler here
+    default void start(boolean interruptible) {
+        SchedulerNew.getInstance().scheduleCommand(this, interruptible);
     }
 
     default void cancel() {
-        //TODO: scheduler call to cancel from here
+        SchedulerNew.getInstance().cancelCommand(this);
     }
 
     default boolean isRunning() {
-        //TODO: get this from the scheduler to return the necessary value
-        return false;
+        return SchedulerNew.getInstance().isRunning(this);
     }
 
-    default boolean doesRequire(Subsystem requirement) {
+    default boolean requires(Subsystem requirement) {
         return getRequirements().contains(requirement);
     }
 
@@ -53,13 +54,17 @@ public interface ICommand {
         return false;
     }
 
+    default double timeSinceInitialized() {
+        return SchedulerNew.getInstance().timeSinceInitialized(this);
+    }
+
     default void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Command");
         builder.addStringProperty(".name", this::getName, null);
         builder.addBooleanProperty("running", this::isRunning, value -> {
             if (value) {
                 if (!isRunning()) {
-                    start();
+                    start(true);
                 }
             } else {
                 if (isRunning()) {

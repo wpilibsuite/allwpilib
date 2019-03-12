@@ -10,8 +10,6 @@ import java.util.function.Consumer;
 
 public class CommandState {
 
-    private ICommand m_command;
-
     /**
      * The time since this command was initialized.
      */
@@ -195,7 +193,7 @@ public class CommandState {
      *
      * @return whether or not this command has completed running.
      */
-    public synchronized boolean isCompleted() {
+    synchronized boolean isCompleted() {
         return m_completed;
     }
 
@@ -203,11 +201,11 @@ public class CommandState {
         return m_initialized;
     }
 
-    public ICommand getCommand() {
-        return m_command;
+    boolean isInterruptible() {
+        return m_interruptible;
     }
 
-    public boolean isInterruptible() {
-        return m_interruptible;
+    double timeSinceInitialized() {
+        return Timer.getFPGATimestamp() - m_startTime;
     }
 }
