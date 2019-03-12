@@ -122,12 +122,7 @@ public final class SchedulerNew extends SendableBase {
                     for (Subsystem requirement : requirements) {
                         ICommand toInterrupt = m_requirements.get(requirement);
                         if (toInterrupt != null) {
-                            toInterrupt.interrupted();
-                            for (Consumer<ICommand> action : m_interruptActions) {
-                                action.accept(command);
-                            }
-                            m_scheduledCommands.remove(toInterrupt);
-                            m_requirements.keySet().removeAll(toInterrupt.getRequirements());
+                           cancelCommand(toInterrupt);
                         }
                     }
                     command.initialize();
@@ -201,6 +196,9 @@ public final class SchedulerNew extends SendableBase {
 
     public void cancelCommand(ICommand command) {
         command.interrupted();
+        for (Consumer<ICommand> action : m_interruptActions) {
+            action.accept(command);
+        }
         m_scheduledCommands.remove(command);
         m_requirements.keySet().removeAll(command.getRequirements());
     }
