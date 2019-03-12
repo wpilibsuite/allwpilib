@@ -6,6 +6,11 @@ public class CommandRunner {
 
     Map<ICommand, CommandState> m_scheduledCommands = new HashMap<>();
     Map<Subsystem, ICommand> m_requirements = new HashMap<>();
+    Collection<Subsystem> m_subsystems;
+
+    public CommandRunner(Collection<Subsystem> subsystems) {
+        m_subsystems = subsystems;
+    }
 
     public void scheduleCommand(ICommand command, boolean interruptable) {
 
@@ -47,12 +52,41 @@ public class CommandRunner {
                 m_requirements.keySet().removeAll(command.getRequirements());
             }
         }
+
+        for (Subsystem subsystem : m_subsystems) {
+            if (!m_requirements.containsKey(subsystem)) {
+                if (subsystem.getDefaultICommand() != null) {
+                    scheduleCommand(subsystem.getDefaultICommand(), true);
+                }
+            }
+        }
     }
 
     public void cancelCommand(ICommand command) {
         command.interrupted();
         m_scheduledCommands.remove(command);
         m_requirements.keySet().removeAll(command.getRequirements());
+    }
 
+    public double timeSinceInitialized(ICommand command) {
+        CommandState commandState = m_scheduledCommands.get(command);
+        if (commandState != null) {
+            return commandState.timeSinceInitialized();
+        } else {
+            return -1;
+        }
+    }
+
+    public boolean isCompleted(ICommand command) {
+        CommandState commandState = m_scheduledCommands.get(command);
+        if (commandState != null) {
+            return commandState.isCompleted();
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isRunning(ICommand command) {
+        return m_scheduledCommands.containsKey(command);
     }
 }

@@ -44,6 +44,8 @@ public abstract class Subsystem extends SendableBase {
    */
   private Command m_defaultCommand;
 
+  private ICommand m_defaultICommand;
+
   /**
    * Creates a subsystem with the given name.
    *
@@ -111,6 +113,21 @@ public abstract class Subsystem extends SendableBase {
       initDefaultCommand();
     }
     return m_defaultCommand;
+  }
+
+  public void setDefaultICommand(ICommand command) {
+    if (command == null) {
+      m_defaultICommand = null;
+    } else {
+      if (!command.getRequirements().contains(this)) {
+        throw new IllegalUseOfCommandException("A default command must require the subsystem");
+      }
+      m_defaultICommand = command;
+    }
+  }
+
+  public ICommand getDefaultICommand() {
+    return m_defaultICommand;
   }
 
   /**
