@@ -20,8 +20,8 @@ public class SelectCommandTest extends CommandTestBase {
     MockCommandHolder command3Holder = new MockCommandHolder(true);
     Command command3 = command3Holder.getMock();
 
-    SelectCommand selectCommand =
-        new SelectCommand(Map.ofEntries(
+    SelectCommand<String> selectCommand =
+        new SelectCommand<>(Map.ofEntries(
             Map.entry("one", command1),
             Map.entry("two", command2),
             Map.entry("three", command3)),

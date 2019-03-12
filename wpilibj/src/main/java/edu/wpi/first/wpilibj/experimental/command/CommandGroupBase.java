@@ -45,46 +45,5 @@ public abstract class CommandGroupBase extends SendableCommandBase implements Co
   }
 
   public abstract void addCommands(Command... commands);
-
-  /**
-   * Factory method for {@link SequentialCommandGroup}, included for brevity/convenience.
-   *
-   * @param commands the commands to include
-   * @return the command group
-   */
-  public static CommandGroupBase sequence(Command... commands) {
-    return new SequentialCommandGroup(commands);
-  }
-
-  /**
-   * Factory method for {@link ParallelCommandGroup}, included for brevity/convenience.
-   *
-   * @param commands the commands to include
-   * @return the command group
-   */
-  public static CommandGroupBase parallel(Command... commands) {
-    return new ParallelCommandGroup(commands);
-  }
-
-  /**
-   * Factory method for {@link ParallelRaceGroup}, included for brevity/convenience.
-   *
-   * @param commands the commands to include
-   * @return the command group
-   */
-  public static CommandGroupBase race(Command... commands) {
-    return new ParallelRaceGroup(commands);
-  }
-
-  /**
-   * Factory method for {@link ParallelDeadlineGroup}, included for brevity/convenience.
-   *
-   * @param deadline the deadline command
-   * @param commands the commands to include
-   * @return the command group
-   */
-  public static CommandGroupBase deadline(Command deadline, Command... commands) {
-    return new ParallelDeadlineGroup(deadline, commands);
-  }
 }
 
