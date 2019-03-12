@@ -21,8 +21,9 @@ fpga_clock::time_point fpga_clock::now() noexcept {
   uint64_t currentTime = HAL_GetFPGATime(&status);
   if (status != 0) {
     wpi::errs()
-        << "Call to HAL_GetFPGATime failed."
-        << "Initialization might have failed. Time will not be correct\n";
+        << "Call to HAL_GetFPGATime failed in fpga_clock::now() with status "
+        << status
+        << ". Initialization might have failed. Time will not be correct\n";
     wpi::errs().flush();
     return epoch();
   }
