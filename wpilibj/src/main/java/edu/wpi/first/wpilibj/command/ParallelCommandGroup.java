@@ -1,6 +1,10 @@
 package edu.wpi.first.wpilibj.command;
 
-import java.util.*;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public class ParallelCommandGroup implements ICommand {
 
