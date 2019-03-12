@@ -15,6 +15,10 @@ public interface ICommand {
 
     void end();
 
+    default boolean isFinished() {
+        return false;
+    }
+
     default Collection<Subsystem> getRequirements() {
         return new HashSet<>();
     }

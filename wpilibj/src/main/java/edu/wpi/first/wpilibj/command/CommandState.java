@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class CommandState {
+
+    private ICommand m_command;
+
     /**
      * The time since this command was initialized.
      */
@@ -68,6 +71,12 @@ public class CommandState {
     private List<Consumer<Command>> m_executeActions = new ArrayList<>();
     private List<Consumer<Command>> m_interruptActions = new ArrayList<>();
     private List<Consumer<Command>> m_endActions = new ArrayList<>();
+
+    public CommandState(boolean interruptible) {
+        m_interruptible = interruptible;
+        startTiming();
+        startRunning();
+    }
 
     /**
      * Called to indicate that the timer should start. This is called right before {@link
@@ -188,5 +197,17 @@ public class CommandState {
      */
     public synchronized boolean isCompleted() {
         return m_completed;
+    }
+
+    boolean isInitialized() {
+        return m_initialized;
+    }
+
+    public ICommand getCommand() {
+        return m_command;
+    }
+
+    public boolean isInterruptible() {
+        return m_interruptible;
     }
 }
