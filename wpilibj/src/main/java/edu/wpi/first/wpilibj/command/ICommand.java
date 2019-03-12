@@ -49,15 +49,6 @@ public interface ICommand {
         return this.getClass().getSimpleName();
     }
 
-    default boolean isParented() {
-        //TODO: Get this from scheduler to return the correct value
-        return false;
-    }
-
-    default double timeSinceInitialized() {
-        return SchedulerNew.getInstance().timeSinceInitialized(this);
-    }
-
     default void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Command");
         builder.addStringProperty(".name", this::getName, null);
@@ -72,6 +63,5 @@ public interface ICommand {
                 }
             }
         });
-        builder.addBooleanProperty(".isParented", this::isParented, null);
     }
 }
