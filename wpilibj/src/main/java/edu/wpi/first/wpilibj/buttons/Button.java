@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.buttons;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.ICommand;
 
 /**
  * This class provides an easy way to link commands to OI inputs.
@@ -65,6 +66,54 @@ public abstract class Button extends Trigger {
    * @param command the command to start
    */
   public void cancelWhenPressed(final Command command) {
+    cancelWhenActive(command);
+  }
+
+  /**
+   * Starts the given command whenever the button is newly pressed.
+   *
+   * @param command the command to start
+   */
+  public void whenPressed(final ICommand command, boolean interruptible) {
+    whenActive(command, interruptible);
+  }
+
+  /**
+   * Constantly starts the given command while the button is held.
+   *
+   * {@link Command#start()} will be called repeatedly while the button is held, and will be
+   * canceled when the button is released.
+   *
+   * @param command the command to start
+   */
+  public void whileHeld(final ICommand command, boolean interruptible) {
+    whileActive(command, interruptible);
+  }
+
+  /**
+   * Starts the command when the button is released.
+   *
+   * @param command the command to start
+   */
+  public void whenReleased(final ICommand command, boolean interruptible) {
+    whenInactive(command, interruptible);
+  }
+
+  /**
+   * Toggles the command whenever the button is pressed (on then off then on).
+   *
+   * @param command the command to start
+   */
+  public void toggleWhenPressed(final ICommand command, boolean interruptible) {
+    toggleWhenActive(command, interruptible);
+  }
+
+  /**
+   * Cancel the command when the button is pressed.
+   *
+   * @param command the command to start
+   */
+  public void cancelWhenPressed(final ICommand command) {
     cancelWhenActive(command);
   }
 }
