@@ -19,13 +19,13 @@ public class CommandRunner {
                 m_requirements.put(requirement, command);
             }
         } else {
-            boolean allInterruptable = true;
+            boolean allInterruptible = true;
             for (Subsystem requirement : requirements) {
                 if (m_requirements.keySet().contains(requirement)) {
-                    allInterruptable &= m_scheduledCommands.get(m_requirements.get(requirement)).isInterruptible();
+                    allInterruptible &= m_scheduledCommands.get(m_requirements.get(requirement)).isInterruptible();
                 }
             }
-            if (allInterruptable) {
+            if (allInterruptible) {
                 for (Subsystem requirement : requirements) {
                     ICommand toInterrupt = m_requirements.get(requirement);
                     if (toInterrupt != null) {
