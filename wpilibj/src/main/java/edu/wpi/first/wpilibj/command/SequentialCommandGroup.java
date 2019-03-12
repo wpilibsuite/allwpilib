@@ -20,23 +20,29 @@ public class SequentialCommandGroup implements ICommand {
     @Override
     public void initialize() {
         m_commandQueue = new ArrayDeque<>(m_commands);
-        m_commandQueue.peek().initialize();
+        if (!m_commandQueue.isEmpty()) {
+            m_commandQueue.peek().initialize();
+        }
     }
 
     @Override
     public void execute() {
-        m_commandQueue.peek().execute();
-        if (m_commandQueue.peek().isFinished()) {
-            m_commandQueue.remove().end();
-            if (!m_commandQueue.isEmpty()) {
-                m_commandQueue.peek().initialize();
+        if (!m_commandQueue.isEmpty()) {
+            m_commandQueue.peek().execute();
+            if (m_commandQueue.peek().isFinished()) {
+                m_commandQueue.remove().end();
+                if (!m_commandQueue.isEmpty()) {
+                    m_commandQueue.peek().initialize();
+                }
             }
         }
     }
 
     @Override
     public void interrupted() {
-        m_commandQueue.peek().interrupted();
+        if (!m_commandQueue.isEmpty()) {
+            m_commandQueue.peek().interrupted();
+        }
     }
 
     @Override
