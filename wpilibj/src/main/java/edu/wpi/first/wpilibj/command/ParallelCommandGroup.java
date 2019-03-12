@@ -18,7 +18,10 @@ public class ParallelCommandGroup implements ICommand {
 
     @Override
     public void initialize() {
-        m_commands.keySet().forEach(ICommand::initialize);
+        m_commands.keySet().forEach(command -> {
+            command.initialize();
+            m_commands.replace(command, true);
+        });
     }
 
     @Override
@@ -36,7 +39,7 @@ public class ParallelCommandGroup implements ICommand {
     @Override
     public void interrupted() {
         for (ICommand command : m_commands.keySet()) {
-            if (!m_commands.get(command)) {
+            if (m_commands.get(command)) {
                 command.interrupted();
             }
         }
@@ -44,11 +47,6 @@ public class ParallelCommandGroup implements ICommand {
 
     @Override
     public void end() {
-        for (ICommand command : m_commands.keySet()) {
-            if (!m_commands.get(command)) {
-                command.end();
-            }
-        }
     }
 
     @Override
