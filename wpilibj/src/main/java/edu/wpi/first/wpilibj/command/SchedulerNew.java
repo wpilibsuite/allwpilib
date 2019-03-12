@@ -147,7 +147,7 @@ public final class SchedulerNew extends SendableBase {
                 subsystem.periodic();
             }
 
-            for (NewTrigger.ButtonSchedulerNew button : m_buttons) {
+            for (Trigger.ButtonSchedulerNew button : m_buttons) {
                 button.execute();
             }
 
