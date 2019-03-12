@@ -28,9 +28,11 @@ public class CommandRunner {
             if (allInterruptable) {
                 for (Subsystem requirement : requirements) {
                     ICommand toInterrupt = m_requirements.get(requirement);
-                    toInterrupt.interrupted();
-                    m_scheduledCommands.remove(toInterrupt);
-                    m_requirements.keySet().removeAll(toInterrupt.getRequirements());
+                    if (toInterrupt != null) {
+                        toInterrupt.interrupted();
+                        m_scheduledCommands.remove(toInterrupt);
+                        m_requirements.keySet().removeAll(toInterrupt.getRequirements());
+                    }
                 }
             }
         }
