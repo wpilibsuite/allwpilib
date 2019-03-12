@@ -7,7 +7,16 @@
 
 package edu.wpi.first.wpilibj;
 
+/**
+ * Callback for handling interrupts from the inputs.
+ */
 @FunctionalInterface
 public interface InterruptHandler {
+  /**
+   * Called when an interrupt occurs.
+   *
+   * @param rising true if rising edge
+   * @param falling true if falling edge
+   */
   void onInterrupt(boolean rising, boolean falling);
 }
