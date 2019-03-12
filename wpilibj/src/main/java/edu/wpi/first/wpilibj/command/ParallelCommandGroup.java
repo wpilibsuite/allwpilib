@@ -1,16 +1,20 @@
 package edu.wpi.first.wpilibj.command;
 
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
+import java.util.Set;
 
-public class ParallelCommandGroup implements ICommand {
+public class ParallelCommandGroup extends CommandGroupBase implements ICommand {
 
     private final Map<ICommand, Boolean> m_commands = new HashMap<>();
 
     public ParallelCommandGroup(ICommand[] commands) {
+        if(!Collections.disjoint(Set.of(commands), getGroupedCommands())) {
+            throw new IllegalUseOfCommandException("Commands cannot be added to more than one CommandGroup");
+        }
+
+        registerGroupedCommands(commands);
+
         for (ICommand command : commands) {
             m_commands.put(command, true);
         }
