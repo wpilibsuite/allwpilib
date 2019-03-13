@@ -22,259 +22,260 @@ import edu.wpi.first.wpilibj.buttons.Trigger;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public final class SchedulerNew extends SendableBase {
-    /**
-     * The Singleton Instance.
-     */
-    private static SchedulerNew instance;
+  /**
+   * The Singleton Instance.
+   */
+  private static SchedulerNew instance;
 
 
-    public static synchronized SchedulerNew getInstance() {
-        if (instance == null) {
-            instance = new SchedulerNew();
+  public static synchronized SchedulerNew getInstance() {
+    if (instance == null) {
+      instance = new SchedulerNew();
+    }
+    return instance;
+  }
+
+  private final Map<ICommand, CommandState> m_scheduledCommands = new LinkedHashMap<>();
+  private final Map<Subsystem, ICommand> m_requirements = new LinkedHashMap<>();
+  private final Collection<Subsystem> m_subsystems = new HashSet<>();
+
+
+  @SuppressWarnings("PMD.LooseCoupling")
+  private final Hashtable<Command, LinkedListElement> m_commandTable = new Hashtable<>();
+
+  private boolean m_disabled;
+
+  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
+  private NetworkTableEntry m_namesEntry;
+  private NetworkTableEntry m_idsEntry;
+  private NetworkTableEntry m_cancelEntry;
+
+  @SuppressWarnings("PMD.LooseCoupling")
+  private Collection<Trigger.ButtonSchedulerNew> m_buttons;
+  private boolean m_runningCommandsChanged;
+
+  private final List<Consumer<ICommand>> m_initActions = new ArrayList<>();
+  private final List<Consumer<ICommand>> m_executeActions = new ArrayList<>();
+  private final List<Consumer<ICommand>> m_interruptActions = new ArrayList<>();
+  private final List<Consumer<ICommand>> m_endActions = new ArrayList<>();
+
+  private SchedulerNew() {
+    HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
+    setName("Scheduler");
+  }
+
+  @SuppressWarnings("PMD.UseArrayListInsteadOfVector")
+  public void addButton(Trigger.ButtonSchedulerNew button) {
+    if (m_buttons == null) {
+      m_buttons = new HashSet<>();
+    }
+    m_buttons.add(button);
+  }
+
+  public void scheduleCommand(ICommand command, boolean interruptible) {
+
+    if (CommandGroupBase.getGroupedCommands().contains(command)) {
+      throw new IllegalUseOfCommandException("A command that is part of a command group cannot be independently scheduled");
+    }
+
+    if (!m_disabled
+        && (!RobotState.isDisabled() || command.getRunWhenDisabled())
+        && !m_scheduledCommands.containsKey(command)) {
+
+      Collection<Subsystem> requirements = command.getRequirements();
+
+      if (Collections.disjoint(m_requirements.keySet(), requirements)) {
+        command.initialize();
+        for (Consumer<ICommand> action : m_initActions) {
+          action.accept(command);
         }
-        return instance;
-    }
-
-    private final Map<ICommand, CommandState> m_scheduledCommands = new LinkedHashMap<>();
-    private final Map<Subsystem, ICommand> m_requirements = new LinkedHashMap<>();
-    private final Collection<Subsystem> m_subsystems = new HashSet<>();
-
-
-    @SuppressWarnings("PMD.LooseCoupling")
-    private final Hashtable<Command, LinkedListElement> m_commandTable = new Hashtable<>();
-
-    private boolean m_disabled;
-
-    @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
-    private NetworkTableEntry m_namesEntry;
-    private NetworkTableEntry m_idsEntry;
-    private NetworkTableEntry m_cancelEntry;
-
-    @SuppressWarnings("PMD.LooseCoupling")
-    private Collection<Trigger.ButtonSchedulerNew> m_buttons;
-    private boolean m_runningCommandsChanged;
-
-    private final List<Consumer<ICommand>> m_initActions = new ArrayList<>();
-    private final List<Consumer<ICommand>> m_executeActions = new ArrayList<>();
-    private final List<Consumer<ICommand>> m_interruptActions = new ArrayList<>();
-    private final List<Consumer<ICommand>> m_endActions = new ArrayList<>();
-
-    private SchedulerNew() {
-        HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
-        setName("Scheduler");
-    }
-
-    @SuppressWarnings("PMD.UseArrayListInsteadOfVector")
-    public void addButton(Trigger.ButtonSchedulerNew button) {
-        if (m_buttons == null) {
-            m_buttons = new HashSet<>();
+        for (Subsystem requirement : requirements) {
+          CommandState scheduledCommand = new CommandState(interruptible);
+          m_scheduledCommands.put(command, scheduledCommand);
+          m_requirements.put(requirement, command);
         }
-        m_buttons.add(button);
-    }
-
-    public void scheduleCommand(ICommand command, boolean interruptible) {
-
-        if (CommandGroupBase.getGroupedCommands().contains(command)) {
-            throw new IllegalUseOfCommandException("A command that is part of a command group cannot be independently scheduled");
+      } else {
+        boolean allInterruptible = true;
+        for (Subsystem requirement : requirements) {
+          if (m_requirements.keySet().contains(requirement)) {
+            allInterruptible &=
+                m_scheduledCommands.get(m_requirements.get(requirement)).isInterruptible();
+          }
         }
-
-        if (!m_disabled
-                && (!RobotState.isDisabled() || command.getRunWhenDisabled())
-                && !m_scheduledCommands.containsKey(command)) {
-
-            Collection<Subsystem> requirements = command.getRequirements();
-
-            if (Collections.disjoint(m_requirements.keySet(), requirements)) {
-                command.initialize();
-                for (Consumer<ICommand> action : m_initActions) {
-                    action.accept(command);
-                }
-                for (Subsystem requirement : requirements) {
-                    CommandState scheduledCommand = new CommandState(interruptible);
-                    m_scheduledCommands.put(command, scheduledCommand);
-                    m_requirements.put(requirement, command);
-                }
-            } else {
-                boolean allInterruptible = true;
-                for (Subsystem requirement : requirements) {
-                    if (m_requirements.keySet().contains(requirement)) {
-                        allInterruptible &= m_scheduledCommands.get(m_requirements.get(requirement)).isInterruptible();
-                    }
-                }
-                if (allInterruptible) {
-                    for (Subsystem requirement : requirements) {
-                        ICommand toInterrupt = m_requirements.get(requirement);
-                        if (toInterrupt != null) {
-                            cancelCommand(toInterrupt);
-                        }
-                    }
-                    command.initialize();
-                    for (Consumer<ICommand> action : m_initActions) {
-                        action.accept(command);
-                    }
-                }
+        if (allInterruptible) {
+          for (Subsystem requirement : requirements) {
+            ICommand toInterrupt = m_requirements.get(requirement);
+            if (toInterrupt != null) {
+              cancelCommand(toInterrupt);
             }
-        }
-    }
-
-
-    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
-    public void run() {
-        if (!m_disabled) {
-            for (Subsystem subsystem : m_subsystems) {
-                subsystem.periodic();
-            }
-
-            for (Trigger.ButtonSchedulerNew button : m_buttons) {
-                button.execute();
-            }
-
-            for (ICommand command : m_scheduledCommands.keySet()) {
-
-                if (RobotState.isDisabled() && !command.getRunWhenDisabled()) {
-                    cancelCommand(command);
-                    continue;
-                }
-
-                command.execute();
-                for (Consumer<ICommand> action : m_executeActions) {
-                    action.accept(command);
-                }
-                if (command.isFinished()) {
-                    command.end();
-                    for (Consumer<ICommand> action : m_endActions) {
-                        action.accept(command);
-                    }
-                    m_scheduledCommands.remove(command);
-                    m_requirements.keySet().removeAll(command.getRequirements());
-                }
-            }
-
-            for (Subsystem subsystem : m_subsystems) {
-                if (!m_requirements.containsKey(subsystem)) {
-                    if (subsystem.getDefaultICommand() != null) {
-                        scheduleCommand(subsystem.getDefaultICommand(), true);
-                    }
-                }
-            }
-        }
-    }
-
-    void registerSubsystem(Subsystem subsystem) {
-        m_subsystems.add(subsystem);
-    }
-
-    public void cancelCommand(ICommand command) {
-        command.interrupted();
-        for (Consumer<ICommand> action : m_interruptActions) {
+          }
+          command.initialize();
+          for (Consumer<ICommand> action : m_initActions) {
             action.accept(command);
+          }
         }
-        m_scheduledCommands.remove(command);
-        m_requirements.keySet().removeAll(command.getRequirements());
+      }
     }
+  }
 
 
-    public void cancelAll() {
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
+  public void run() {
+    if (!m_disabled) {
+      for (Subsystem subsystem : m_subsystems) {
+        subsystem.periodic();
+      }
+
+      for (Trigger.ButtonSchedulerNew button : m_buttons) {
+        button.execute();
+      }
+
+      for (ICommand command : m_scheduledCommands.keySet()) {
+
+        if (RobotState.isDisabled() && !command.getRunWhenDisabled()) {
+          cancelCommand(command);
+          continue;
+        }
+
+        command.execute();
+        for (Consumer<ICommand> action : m_executeActions) {
+          action.accept(command);
+        }
+        if (command.isFinished()) {
+          command.end();
+          for (Consumer<ICommand> action : m_endActions) {
+            action.accept(command);
+          }
+          m_scheduledCommands.remove(command);
+          m_requirements.keySet().removeAll(command.getRequirements());
+        }
+      }
+
+      for (Subsystem subsystem : m_subsystems) {
+        if (!m_requirements.containsKey(subsystem)) {
+          if (subsystem.getDefaultICommand() != null) {
+            scheduleCommand(subsystem.getDefaultICommand(), true);
+          }
+        }
+      }
+    }
+  }
+
+  void registerSubsystem(Subsystem subsystem) {
+    m_subsystems.add(subsystem);
+  }
+
+  public void cancelCommand(ICommand command) {
+    command.interrupted();
+    for (Consumer<ICommand> action : m_interruptActions) {
+      action.accept(command);
+    }
+    m_scheduledCommands.remove(command);
+    m_requirements.keySet().removeAll(command.getRequirements());
+  }
+
+
+  public void cancelAll() {
+    for (ICommand command : m_scheduledCommands.keySet()) {
+      cancelCommand(command);
+    }
+  }
+
+  public double timeSinceInitialized(ICommand command) {
+    CommandState commandState = m_scheduledCommands.get(command);
+    if (commandState != null) {
+      return commandState.timeSinceInitialized();
+    } else {
+      return -1;
+    }
+  }
+
+  public boolean isRunning(ICommand command) {
+    return m_scheduledCommands.containsKey(command);
+  }
+
+  /**
+   * Disable the command scheduler.
+   */
+  public void disable() {
+    m_disabled = true;
+  }
+
+  /**
+   * Enable the command scheduler.
+   */
+  public void enable() {
+    m_disabled = false;
+  }
+
+  /**
+   * Adds an action to perform on the initialization of any command by the scheduler.
+   *
+   * @param action the action to perform
+   */
+  public void onCommandInitialize(Consumer<ICommand> action) {
+    m_initActions.add(action);
+  }
+
+  /**
+   * Adds an action to perform on the execution of any command by the scheduler.
+   *
+   * @param action the action to perform
+   */
+  public void onCommandExecute(Consumer<ICommand> action) {
+    m_executeActions.add(action);
+  }
+
+  /**
+   * Adds an action to perform on the interruption of any command by the scheduler.
+   *
+   * @param action the action to perform
+   */
+  public void onCommandInterrupted(Consumer<ICommand> action) {
+    m_interruptActions.add(action);
+  }
+
+  /**
+   * Adds an action to perform on the ending of any command by the scheduler.
+   *
+   * @param action the action to perform
+   */
+  public void onCommandEnd(Consumer<ICommand> action) {
+    m_endActions.add(action);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Scheduler");
+    m_namesEntry = builder.getEntry("Names");
+    m_idsEntry = builder.getEntry("Ids");
+    m_cancelEntry = builder.getEntry("Cancel");
+    builder.setUpdateTable(() -> {
+      if (m_namesEntry != null && m_idsEntry != null && m_cancelEntry != null) {
+
+        Map<Double, ICommand> ids = new LinkedHashMap<>();
+
+
         for (ICommand command : m_scheduledCommands.keySet()) {
-            cancelCommand(command);
+          ids.put((double) command.hashCode(), command);
         }
-    }
 
-    public double timeSinceInitialized(ICommand command) {
-        CommandState commandState = m_scheduledCommands.get(command);
-        if (commandState != null) {
-            return commandState.timeSinceInitialized();
-        } else {
-            return -1;
+        double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
+        if (toCancel.length > 0) {
+          for (double hash : toCancel) {
+            cancelCommand(ids.get(hash));
+            ids.remove(hash);
+          }
+          m_cancelEntry.setDoubleArray(new double[0]);
         }
-    }
 
-    public boolean isRunning(ICommand command) {
-        return m_scheduledCommands.containsKey(command);
-    }
+        List<String> names = new ArrayList<>();
 
-    /**
-     * Disable the command scheduler.
-     */
-    public void disable() {
-        m_disabled = true;
-    }
+        ids.values().forEach(command -> names.add(command.getName()));
 
-    /**
-     * Enable the command scheduler.
-     */
-    public void enable() {
-        m_disabled = false;
-    }
-
-    /**
-     * Adds an action to perform on the initialization of any command by the scheduler.
-     *
-     * @param action the action to perform
-     */
-    public void onCommandInitialize(Consumer<ICommand> action) {
-        m_initActions.add(action);
-    }
-
-    /**
-     * Adds an action to perform on the execution of any command by the scheduler.
-     *
-     * @param action the action to perform
-     */
-    public void onCommandExecute(Consumer<ICommand> action) {
-        m_executeActions.add(action);
-    }
-
-    /**
-     * Adds an action to perform on the interruption of any command by the scheduler.
-     *
-     * @param action the action to perform
-     */
-    public void onCommandInterrupted(Consumer<ICommand> action) {
-        m_interruptActions.add(action);
-    }
-
-    /**
-     * Adds an action to perform on the ending of any command by the scheduler.
-     *
-     * @param action the action to perform
-     */
-    public void onCommandEnd(Consumer<ICommand> action) {
-        m_endActions.add(action);
-    }
-
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("Scheduler");
-        m_namesEntry = builder.getEntry("Names");
-        m_idsEntry = builder.getEntry("Ids");
-        m_cancelEntry = builder.getEntry("Cancel");
-        builder.setUpdateTable(() -> {
-            if (m_namesEntry != null && m_idsEntry != null && m_cancelEntry != null) {
-
-                Map<Double, ICommand> ids = new LinkedHashMap<>();
-
-
-                for (ICommand command : m_scheduledCommands.keySet()) {
-                    ids.put((double) command.hashCode(), command);
-                }
-
-                double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
-                if (toCancel.length > 0) {
-                    for (double hash : toCancel) {
-                        cancelCommand(ids.get(hash));
-                        ids.remove(hash);
-                    }
-                    m_cancelEntry.setDoubleArray(new double[0]);
-                }
-
-                List<String> names = new ArrayList<>();
-
-                ids.values().forEach(command -> names.add(command.getName()));
-
-                m_namesEntry.setStringArray(names.toArray(new String[0]));
-                m_idsEntry.setNumberArray(ids.keySet().toArray(new Double[0]));
-            }
-        });
-    }
+        m_namesEntry.setStringArray(names.toArray(new String[0]));
+        m_idsEntry.setNumberArray(ids.keySet().toArray(new Double[0]));
+      }
+    });
+  }
 }

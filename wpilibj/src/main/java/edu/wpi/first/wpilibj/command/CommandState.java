@@ -8,40 +8,40 @@ import java.util.function.Consumer;
 
 public class CommandState {
 
-    /**
-     * The time since this command was initialized.
-     */
-    private double m_startTime = -1;
+  /**
+   * The time since this command was initialized.
+   */
+  private double m_startTime = -1;
 
-    /**
-     * Whether or not it is interruptible.
-     */
-    private boolean m_interruptible;
+  /**
+   * Whether or not it is interruptible.
+   */
+  private boolean m_interruptible;
 
-    private List<Consumer<Command>> m_initActions = new ArrayList<>();
-    private List<Consumer<Command>> m_executeActions = new ArrayList<>();
-    private List<Consumer<Command>> m_interruptActions = new ArrayList<>();
-    private List<Consumer<Command>> m_endActions = new ArrayList<>();
+  private List<Consumer<Command>> m_initActions = new ArrayList<>();
+  private List<Consumer<Command>> m_executeActions = new ArrayList<>();
+  private List<Consumer<Command>> m_interruptActions = new ArrayList<>();
+  private List<Consumer<Command>> m_endActions = new ArrayList<>();
 
-    public CommandState(boolean interruptible) {
-        m_interruptible = interruptible;
-        startTiming();
-        startRunning();
-    }
+  public CommandState(boolean interruptible) {
+    m_interruptible = interruptible;
+    startTiming();
+    startRunning();
+  }
 
-    private void startTiming() {
-        m_startTime = Timer.getFPGATimestamp();
-    }
+  private void startTiming() {
+    m_startTime = Timer.getFPGATimestamp();
+  }
 
-    synchronized void startRunning() {
-        m_startTime = -1;
-    }
+  synchronized void startRunning() {
+    m_startTime = -1;
+  }
 
-    boolean isInterruptible() {
-        return m_interruptible;
-    }
+  boolean isInterruptible() {
+    return m_interruptible;
+  }
 
-    double timeSinceInitialized() {
-        return Timer.getFPGATimestamp() - m_startTime;
-    }
+  double timeSinceInitialized() {
+    return Timer.getFPGATimestamp() - m_startTime;
+  }
 }
