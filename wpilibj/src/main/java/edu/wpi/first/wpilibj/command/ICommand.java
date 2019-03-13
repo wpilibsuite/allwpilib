@@ -46,6 +46,7 @@ public interface ICommand extends Sendable {
     return false;
   }
 
+  @Override
   default String getName() {
     return this.getClass().getSimpleName();
   }
@@ -72,6 +73,7 @@ public interface ICommand extends Sendable {
    *
    * @param builder the builder used to construct this sendable
    */
+  @Override
   default void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Command");
     builder.addStringProperty(".name", this::getName, null);

@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * certain sensor input). For this, they only have to write the {@link Trigger#get()} method to get
  * the full functionality of the Trigger class.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public abstract class Trigger extends SendableBase {
   private volatile boolean m_sendablePressed;
 

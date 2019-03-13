@@ -1,9 +1,5 @@
 package edu.wpi.first.wpilibj.command;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
 import edu.wpi.first.wpilibj.Timer;
 
 
@@ -17,12 +13,7 @@ public class CommandState {
   /**
    * Whether or not it is interruptible.
    */
-  private boolean m_interruptible;
-
-  private List<Consumer<Command>> m_initActions = new ArrayList<>();
-  private List<Consumer<Command>> m_executeActions = new ArrayList<>();
-  private List<Consumer<Command>> m_interruptActions = new ArrayList<>();
-  private List<Consumer<Command>> m_endActions = new ArrayList<>();
+  private final boolean m_interruptible;
 
   CommandState(boolean interruptible) {
     m_interruptible = interruptible;

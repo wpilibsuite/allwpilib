@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 abstract class CommandGroupBase {
 
   private static Set<ICommand> m_groupedCommands = Collections.newSetFromMap(new WeakHashMap<>());
