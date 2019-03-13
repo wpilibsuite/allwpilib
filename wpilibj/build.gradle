@@ -54,6 +54,10 @@ compileJava {
     dependsOn generateJavaVersion
 }
 
+repositories {
+    jcenter()
+}
+
 dependencies {
     compile project(':hal')
     compile project(':wpiutil')
@@ -61,6 +65,7 @@ dependencies {
     compile project(':cscore')
     compile project(':cameraserver')
     testCompile 'com.google.guava:guava:19.0'
+    testCompile "org.mockito:mockito-core:2.+"
     devCompile project(':hal')
     devCompile project(':wpiutil')
     devCompile project(':ntcore')

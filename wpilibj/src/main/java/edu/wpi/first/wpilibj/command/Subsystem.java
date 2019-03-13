@@ -54,6 +54,7 @@ public abstract class Subsystem extends SendableBase {
   public Subsystem(String name) {
     setName(name, name);
     Scheduler.getInstance().registerSubsystem(this);
+    SchedulerNew.getInstance().registerSubsystem(this);
   }
 
   /**
@@ -64,6 +65,7 @@ public abstract class Subsystem extends SendableBase {
     name = name.substring(name.lastIndexOf('.') + 1);
     setName(name, name);
     Scheduler.getInstance().registerSubsystem(this);
+    SchedulerNew.getInstance().registerSubsystem(this);
     m_currentCommandChanged = true;
   }
 

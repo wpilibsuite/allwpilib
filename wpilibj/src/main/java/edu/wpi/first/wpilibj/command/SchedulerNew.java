@@ -125,11 +125,9 @@ public final class SchedulerNew extends SendableBase {
         }
       }
       if (allInterruptible) {
+        requirements.retainAll(m_requirements.keySet());
         for (Subsystem requirement : requirements) {
-          ICommand toInterrupt = m_requirements.get(requirement);
-          if (toInterrupt != null) {
-            cancelCommand(toInterrupt);
-          }
+          cancelCommand(m_requirements.get(requirement));
         }
         command.initialize();
         for (Consumer<ICommand> action : m_initActions) {
@@ -155,40 +153,43 @@ public final class SchedulerNew extends SendableBase {
    */
   @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   public void run() {
-    if (!m_disabled) {
-      for (Subsystem subsystem : m_subsystems) {
-        subsystem.periodic();
+
+    if (m_disabled) {
+      return;
+    }
+
+    for (Subsystem subsystem : m_subsystems) {
+      subsystem.periodic();
+    }
+
+    for (Trigger.ButtonSchedulerNew button : m_buttons) {
+      button.execute();
+    }
+
+    for (ICommand command : m_scheduledCommands.keySet()) {
+
+      if (RobotState.isDisabled() && !command.getRunWhenDisabled()) {
+        cancelCommand(command);
+        continue;
       }
 
-      for (Trigger.ButtonSchedulerNew button : m_buttons) {
-        button.execute();
+      command.execute();
+      for (Consumer<ICommand> action : m_executeActions) {
+        action.accept(command);
       }
-
-      for (ICommand command : m_scheduledCommands.keySet()) {
-
-        if (RobotState.isDisabled() && !command.getRunWhenDisabled()) {
-          cancelCommand(command);
-          continue;
-        }
-
-        command.execute();
-        for (Consumer<ICommand> action : m_executeActions) {
+      if (command.isFinished()) {
+        command.end();
+        for (Consumer<ICommand> action : m_endActions) {
           action.accept(command);
         }
-        if (command.isFinished()) {
-          command.end();
-          for (Consumer<ICommand> action : m_endActions) {
-            action.accept(command);
-          }
-          m_scheduledCommands.remove(command);
-          m_requirements.keySet().removeAll(command.getRequirements());
-        }
+        m_scheduledCommands.remove(command);
+        m_requirements.keySet().removeAll(command.getRequirements());
       }
+    }
 
-      for (Subsystem subsystem : m_subsystems) {
-        if (!m_requirements.containsKey(subsystem) && subsystem.getDefaultICommand() != null) {
-          scheduleCommand(subsystem.getDefaultICommand(), true);
-        }
+    for (Subsystem subsystem : m_subsystems) {
+      if (!m_requirements.containsKey(subsystem) && subsystem.getDefaultICommand() != null) {
+        scheduleCommand(subsystem.getDefaultICommand(), true);
       }
     }
   }
@@ -307,31 +308,33 @@ public final class SchedulerNew extends SendableBase {
     m_idsEntry = builder.getEntry("Ids");
     m_cancelEntry = builder.getEntry("Cancel");
     builder.setUpdateTable(() -> {
-      if (m_namesEntry != null && m_idsEntry != null && m_cancelEntry != null) {
 
-        Map<Double, ICommand> ids = new LinkedHashMap<>();
-
-
-        for (ICommand command : m_scheduledCommands.keySet()) {
-          ids.put((double) command.hashCode(), command);
-        }
-
-        double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
-        if (toCancel.length > 0) {
-          for (double hash : toCancel) {
-            cancelCommand(ids.get(hash));
-            ids.remove(hash);
-          }
-          m_cancelEntry.setDoubleArray(new double[0]);
-        }
-
-        List<String> names = new ArrayList<>();
-
-        ids.values().forEach(command -> names.add(command.getName()));
-
-        m_namesEntry.setStringArray(names.toArray(new String[0]));
-        m_idsEntry.setNumberArray(ids.keySet().toArray(new Double[0]));
+      if (m_namesEntry == null || m_idsEntry == null || m_cancelEntry == null) {
+        return;
       }
+
+      Map<Double, ICommand> ids = new LinkedHashMap<>();
+
+
+      for (ICommand command : m_scheduledCommands.keySet()) {
+        ids.put((double) command.hashCode(), command);
+      }
+
+      double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
+      if (toCancel.length > 0) {
+        for (double hash : toCancel) {
+          cancelCommand(ids.get(hash));
+          ids.remove(hash);
+        }
+        m_cancelEntry.setDoubleArray(new double[0]);
+      }
+
+      List<String> names = new ArrayList<>();
+
+      ids.values().forEach(command -> names.add(command.getName()));
+
+      m_namesEntry.setStringArray(names.toArray(new String[0]));
+      m_idsEntry.setNumberArray(ids.keySet().toArray(new Double[0]));
     });
   }
 }
