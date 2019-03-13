@@ -93,7 +93,7 @@ public abstract class Trigger extends SendableBase {
 
   /**
    * Constantly starts the given command while the button is held.
-   *
+   * <p>
    * {@link Command#start()} will be called repeatedly while the trigger is active, and will be
    * canceled when the trigger becomes inactive.
    *
@@ -120,7 +120,7 @@ public abstract class Trigger extends SendableBase {
 
   /**
    * Constantly starts the given command while the button is held.
-   *
+   * <p>
    * {@link Command#start()} will be called repeatedly while the trigger is active, and will be
    * canceled when the trigger becomes inactive.
    *

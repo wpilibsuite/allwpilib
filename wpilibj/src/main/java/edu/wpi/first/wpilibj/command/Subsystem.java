@@ -115,6 +115,11 @@ public abstract class Subsystem extends SendableBase {
     return m_defaultCommand;
   }
 
+  /**
+   * Sets the default command.
+   *
+   * @param command the command
+   */
   public void setDefaultICommand(ICommand command) {
     if (command == null) {
       m_defaultICommand = null;
@@ -125,6 +130,12 @@ public abstract class Subsystem extends SendableBase {
       m_defaultICommand = command;
     }
   }
+
+  /**
+   * Gets the default command
+   *
+   * @return the command
+   */
 
   public ICommand getDefaultICommand() {
     return m_defaultICommand;
