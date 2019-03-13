@@ -76,20 +76,19 @@ UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
     : SourceImpl{name, logger, notifier, telemetry}, m_path{path.str()} {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
+  StartMessagePump();
 }
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              int deviceId)
-    : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {}
+    : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {
+  StartMessagePump();
+}
 
 UsbCameraImpl::~UsbCameraImpl() { m_messagePump = nullptr; }
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
-  if (!WaitForPumpReady()) {
-    *status = CS_READ_FAILED;
-    return;
-  }
   Message msg{Message::kCmdSetProperty};
   msg.data[0] = property;
   msg.data[1] = value;
@@ -100,10 +99,6 @@ void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
 }
 void UsbCameraImpl::SetStringProperty(int property, const wpi::Twine& value,
                                       CS_Status* status) {
-  if (!WaitForPumpReady()) {
-    *status = CS_READ_FAILED;
-    return;
-  }
   Message msg{Message::kCmdSetPropertyStr};
   msg.data[0] = property;
   msg.dataStr = value.str();
@@ -144,10 +139,6 @@ bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
     *status = CS_UNSUPPORTED_MODE;
     return false;
   }
-  if (!WaitForPumpReady()) {
-    *status = CS_READ_FAILED;
-    return false;
-  }
 
   Message msg{Message::kCmdSetMode};
   msg.data[0] = mode.pixelFormat;
@@ -167,10 +158,6 @@ bool UsbCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
     *status = CS_UNSUPPORTED_MODE;
     return false;
   }
-  if (!WaitForPumpReady()) {
-    *status = CS_READ_FAILED;
-    return false;
-  }
   Message msg{Message::kCmdSetPixelFormat};
   msg.data[0] = pixelFormat;
   auto result =
@@ -180,10 +167,6 @@ bool UsbCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
   return result == 0;
 }
 bool UsbCameraImpl::SetResolution(int width, int height, CS_Status* status) {
-  if (!WaitForPumpReady()) {
-    *status = CS_READ_FAILED;
-    return false;
-  }
   Message msg{Message::kCmdSetResolution};
   msg.data[0] = width;
   msg.data[1] = height;
@@ -194,10 +177,6 @@ bool UsbCameraImpl::SetResolution(int width, int height, CS_Status* status) {
   return result == 0;
 }
 bool UsbCameraImpl::SetFPS(int fps, CS_Status* status) {
-  if (!WaitForPumpReady()) {
-    *status = CS_READ_FAILED;
-    return false;
-  }
   Message msg{Message::kCmdSetFPS};
   msg.data[0] = fps;
   auto result =
@@ -208,27 +187,23 @@ bool UsbCameraImpl::SetFPS(int fps, CS_Status* status) {
 }
 
 void UsbCameraImpl::NumSinksChanged() {
-  if (!WaitForPumpReady()) {
-    return;
-  }
   m_messagePump->PostWindowMessage<Message::Kind, Message*>(
       SetCameraMessage, Message::kNumSinksChanged, nullptr);
 }
 void UsbCameraImpl::NumSinksEnabledChanged() {
-  if (!WaitForPumpReady()) {
-    return;
-  }
   m_messagePump->PostWindowMessage<Message::Kind, Message*>(
       SetCameraMessage, Message::kNumSinksEnabledChanged, nullptr);
 }
 
-void UsbCameraImpl::Start() {
+void UsbCameraImpl::StartMessagePump() {
   m_messagePump = std::make_unique<WindowsMessagePump>(
       [this](HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
         return this->PumpMain(hwnd, uiMsg, wParam, lParam);
       });
+}
+
+void UsbCameraImpl::Start() {
   m_messagePump->PostWindowMessage(PumpReadyMessage, nullptr, nullptr);
-  m_pumpReady.store(true);
 }
 
 void UsbCameraImpl::PostRequestNewFrame() {
@@ -385,6 +360,7 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
       DeviceConnect();
       break;
     case WaitForStartupMessage:
+      DeviceConnect();
       return CS_OK;
     case WM_DEVICECHANGE: {
       // Device potentially changed
@@ -515,20 +491,7 @@ std::unique_ptr<PropertyImpl> UsbCameraImpl::CreateEmptyProperty(
   return nullptr;
 }
 
-bool UsbCameraImpl::WaitForPumpReady() const {
-  if (m_pumpReady.load() == true) return true;
-  auto start = wpi::Now();
-  while (true) {
-    if (wpi::Now() - start > 50000) return false;
-    if (m_pumpReady.load() == true) return true;
-  }
-}
-
 bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
-  if (!WaitForPumpReady()) {
-    *status = CS_READ_FAILED;
-    return false;
-  }
   // Wait for Camera Thread to be started
   auto result = m_messagePump->SendWindowMessage<CS_Status>(
       WaitForStartupMessage, nullptr, nullptr);

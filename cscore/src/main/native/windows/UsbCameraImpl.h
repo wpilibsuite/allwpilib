@@ -154,7 +154,7 @@ class UsbCameraImpl : public SourceImpl,
   int RawToPercentage(const UsbCameraProperty& rawProp, int rawValue);
   int PercentageToRaw(const UsbCameraProperty& rawProp, int percentValue);
 
-  bool WaitForPumpReady() const;
+  void StartMessagePump();
 
   //
   // Variables only used within camera thread
@@ -169,7 +169,6 @@ class UsbCameraImpl : public SourceImpl,
   ComPtr<IMFSourceReader> m_sourceReader;
   ComPtr<SourceReaderCB> m_imageCallback;
   std::unique_ptr<cs::WindowsMessagePump> m_messagePump;
-  std::atomic_bool m_pumpReady{false};
   ComPtr<IMFMediaType> m_currentMode;
 
   //
