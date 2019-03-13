@@ -99,7 +99,7 @@ public final class SchedulerNew extends SendableBase {
     }
 
     if (m_disabled
-        || (RobotState.isDisabled() || !command.getRunWhenDisabled())
+        || (RobotState.isDisabled() && !command.getRunWhenDisabled())
         || m_scheduledCommands.containsKey(command)) {
       return;
     }
