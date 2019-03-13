@@ -90,7 +90,7 @@ public final class SchedulerNew extends SendableBase {
    * @param command the command to schedule
    * @param interruptible whether this command can be interrupted
    */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   public void scheduleCommand(ICommand command, boolean interruptible) {
 
     if (CommandGroupBase.getGroupedCommands().contains(command)) {
