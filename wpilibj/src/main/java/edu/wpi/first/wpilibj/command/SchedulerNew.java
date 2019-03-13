@@ -110,11 +110,11 @@ public final class SchedulerNew extends SendableBase {
     if (Collections.disjoint(m_requirements.keySet(), requirements)) {
       command.initialize();
       CommandState scheduledCommand = new CommandState(interruptible);
+      m_scheduledCommands.put(command, scheduledCommand);
       for (Consumer<ICommand> action : m_initActions) {
         action.accept(command);
       }
       for (Subsystem requirement : requirements) {
-        m_scheduledCommands.put(command, scheduledCommand);
         m_requirements.put(requirement, command);
       }
     } else {
