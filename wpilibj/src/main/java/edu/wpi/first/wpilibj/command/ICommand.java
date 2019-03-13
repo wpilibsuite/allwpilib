@@ -3,10 +3,10 @@ package edu.wpi.first.wpilibj.command;
 import java.util.Collection;
 import java.util.HashSet;
 
-import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-public interface ICommand {
+public interface ICommand extends Sendable {
 
   void initialize();
 
@@ -35,7 +35,7 @@ public interface ICommand {
   }
 
   default boolean isRunning() {
-    return SchedulerNew.getInstance().isRunning(this);
+    return SchedulerNew.getInstance().isScheduled(this);
   }
 
   default boolean requires(Subsystem requirement) {
@@ -48,6 +48,23 @@ public interface ICommand {
 
   default String getName() {
     return this.getClass().getSimpleName();
+  }
+
+  @Override
+  default void setName(String name) {
+  }
+
+  @Override
+  default void setName(String subsystem, String name) {
+  }
+
+  @Override
+  default String getSubsystem() {
+    return "Ungrouped";
+  }
+
+  @Override
+  default void setSubsystem(String subsystem) {
   }
 
   /**

@@ -1,7 +1,13 @@
 package edu.wpi.first.wpilibj.command;
 
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 public class SequentialCommandGroup extends CommandGroupBase implements ICommand {
@@ -9,6 +15,12 @@ public class SequentialCommandGroup extends CommandGroupBase implements ICommand
   private final List<ICommand> m_commands = new ArrayList<>();
   private Queue<ICommand> m_commandQueue;
 
+  /**
+   * Creates a new SequentialCommandGroup.  The given commands will be run sequentially, with
+   * the commandgroup finishing when the last command finishes.
+   *
+   * @param commands the commands to include in this group.
+   */
   public SequentialCommandGroup(ICommand[] commands) {
     if (!Collections.disjoint(Set.of(commands), getGroupedCommands())) {
       throw new IllegalUseOfCommandException(

@@ -132,7 +132,7 @@ public abstract class Subsystem extends SendableBase {
   }
 
   /**
-   * Gets the default command
+   * Gets the default command.
    *
    * @return the command
    */

@@ -1,16 +1,28 @@
 package edu.wpi.first.wpilibj.command;
 
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class ParallelCommandGroup extends CommandGroupBase implements ICommand {
 
+  //maps commands in this group to whether they are still running
   private final Map<ICommand, Boolean> m_commands = new HashMap<>();
 
+  /**
+   * Creates a new ParallelCommandGroup.  The given commands will be executed simultaneously.
+   * The command group will finish when the last command finishes.  If the commandgroup is
+   * interrupted, only the commands that are still running will be interrupted.
+   *
+   * @param commands the commands to include in this group.
+   */
   public ParallelCommandGroup(ICommand[] commands) {
     if (!Collections.disjoint(Set.of(commands), getGroupedCommands())) {
-      throw new IllegalUseOfCommandException("Commands cannot be added to more than one CommandGroup");
+      throw new IllegalUseOfCommandException("Commands cannot be added to multiple CommandGroups");
     }
 
     registerGroupedCommands(commands);

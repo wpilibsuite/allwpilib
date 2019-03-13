@@ -381,7 +381,7 @@ public abstract class Command extends SendableBase {
   }
 
   /**
-   * Returns whether or not the {@link Command#timeSinceInitialized() timeSinceInitialized()} method
+   * Returns whether or not the {@link Command#timeSinceInitialized() timeSinceScheduled()} method
    * returns a number which is greater than or equal to the timeout for the command. If there is no
    * timeout, this will always return false.
    *
