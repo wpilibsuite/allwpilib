@@ -17,15 +17,16 @@ using namespace frc;
 InterruptableSensorBase::~InterruptableSensorBase() {
   if (m_interrupt == HAL_kInvalidHandle) return;
   int32_t status = 0;
-  HAL_CleanInterrupts(m_interrupt, &status);
+  auto param = HAL_CleanInterrupts(m_interrupt, &status);
+  if (param) {
+    delete reinterpret_cast<InterruptEventHandler*>(param);
+  }
   // Ignore status, as an invalid handle just needs to be ignored.
   m_interrupt = HAL_kInvalidHandle;
 }
 
 InterruptableSensorBase::InterruptableSensorBase(InterruptableSensorBase&& rhs)
-    : ErrorBase(std::move(rhs)),
-      m_interrupt(rhs.m_interrupt.load()),
-      m_handler(std::move(rhs.m_handler)) {
+    : ErrorBase(std::move(rhs)), m_interrupt(rhs.m_interrupt.load()) {
   rhs.m_interrupt = HAL_kInvalidHandle;
 }
 
@@ -35,7 +36,6 @@ InterruptableSensorBase& InterruptableSensorBase::operator=(
 
   m_interrupt = rhs.m_interrupt.load();
   rhs.m_interrupt = HAL_kInvalidHandle;
-  m_handler = std::move(rhs.m_handler);
 
   return *this;
 }
@@ -66,7 +66,7 @@ void InterruptableSensorBase::RequestInterrupts(
   AllocateInterrupts(false);
   if (StatusIsFatal()) return;  // if allocate failed, out of interrupts
 
-  m_handler = std::make_unique<InterruptEventHandler>(std::move(handler));
+  auto handlerPtr = new InterruptEventHandler(std::move(handler));
 
   int32_t status = 0;
   HAL_RequestInterrupts(
@@ -82,7 +82,7 @@ void InterruptableSensorBase::RequestInterrupts(
         bool falling = (mask & 0xFF00) != 0;
         (*self)(rising, falling);
       },
-      m_handler.get(), &status);
+      handlerPtr, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -106,7 +106,10 @@ void InterruptableSensorBase::CancelInterrupts() {
   if (StatusIsFatal()) return;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
-  HAL_CleanInterrupts(m_interrupt, &status);
+  auto param = HAL_CleanInterrupts(m_interrupt, &status);
+  if (param) {
+    delete reinterpret_cast<InterruptEventHandler*>(param);
+  }
   // Ignore status, as an invalid handle just needs to be ignored.
   m_interrupt = HAL_kInvalidHandle;
 }

@@ -9,7 +9,6 @@
 
 #include <atomic>
 #include <functional>
-#include <memory>
 
 #include <hal/Interrupts.h>
 
@@ -149,9 +148,6 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
   std::atomic<HAL_InterruptHandle> m_interrupt{HAL_kInvalidHandle};
 
   void AllocateInterrupts(bool watcher);
-
- private:
-  std::unique_ptr<InterruptEventHandler> m_handler;
 };
 
 }  // namespace frc
