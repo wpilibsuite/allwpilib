@@ -1,11 +1,12 @@
 package edu.wpi.first.wpilibj.command;
 
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-
 import java.util.Collection;
 import java.util.HashSet;
 
-public interface ICommand {
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+
+public interface ICommand extends Sendable {
 
   void initialize();
 
@@ -49,6 +50,7 @@ public interface ICommand {
     return this.getClass().getSimpleName();
   }
 
+  @Override
   default void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Command");
     builder.addStringProperty(".name", this::getName, null);

@@ -8,9 +8,7 @@
 package edu.wpi.first.wpilibj.command;
 
 import java.util.*;
-import java.util.Set;
 import java.util.function.Consumer;
-
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
