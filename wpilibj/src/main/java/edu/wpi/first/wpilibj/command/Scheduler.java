@@ -95,11 +95,6 @@ public final class Scheduler extends SendableBase {
   private Vector<ButtonScheduler> m_buttons;
   private boolean m_runningCommandsChanged;
 
-  private final List<Consumer<Command>> m_initActions = new ArrayList<>();
-  private final List<Consumer<Command>> m_executeActions = new ArrayList<>();
-  private final List<Consumer<Command>> m_interruptActions = new ArrayList<>();
-  private final List<Consumer<Command>> m_endActions = new ArrayList<>();
-
   /**
    * Instantiates a {@link Scheduler}.
    */
@@ -193,9 +188,6 @@ public final class Scheduler extends SendableBase {
       m_commandTable.put(command, element);
 
       m_runningCommandsChanged = true;
-
-      //Give the command the list of user-specified actions.
-      command.setActions(m_initActions, m_executeActions, m_interruptActions, m_endActions);
 
       command.startRunning();
     }
@@ -320,42 +312,6 @@ public final class Scheduler extends SendableBase {
    */
   public void enable() {
     m_disabled = false;
-  }
-
-  /**
-   * Adds an action to perform on the initialization of any command by the scheduler.
-   *
-   * @param action the action to perform
-   */
-  public void onCommandInitialize(Consumer<Command> action) {
-    m_initActions.add(action);
-  }
-
-  /**
-   * Adds an action to perform on the execution of any command by the scheduler.
-   *
-   * @param action the action to perform
-   */
-  public void onCommandExecute(Consumer<Command> action) {
-    m_executeActions.add(action);
-  }
-
-  /**
-   * Adds an action to perform on the interruption of any command by the scheduler.
-   *
-   * @param action the action to perform
-   */
-  public void onCommandInterrupted(Consumer<Command> action) {
-    m_interruptActions.add(action);
-  }
-
-  /**
-   * Adds an action to perform on the ending of any command by the scheduler.
-   *
-   * @param action the action to perform
-   */
-  public void onCommandEnd(Consumer<Command> action) {
-    m_endActions.add(action);
   }
 
   @Override
