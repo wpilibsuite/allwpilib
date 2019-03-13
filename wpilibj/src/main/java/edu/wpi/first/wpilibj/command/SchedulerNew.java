@@ -143,11 +143,16 @@ public final class SchedulerNew extends SendableBase {
 
   /**
    * Runs a single iteration of the scheduler.  The execution occurs in the following order:
+   *
    * <p>Subsystem periodic methods are called.
+   *
    * <p>Button bindings are polled, and new commands are scheduled from them.
+   *
    * <p>Currently-scheduled commands are executed.
+   *
    * <p>End conditions are checked on currently-scheduled commands, and commands that are finished
    * have their end methods called and are removed.
+   *
    * <p>Any subsystems not being used as requirements have their default methods started.
    */
   public void run() {
