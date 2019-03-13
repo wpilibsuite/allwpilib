@@ -100,10 +100,6 @@ sourceSets {
     dev
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs = ['--release', '8']
-}
-
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.2.0'
