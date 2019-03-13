@@ -31,6 +31,15 @@ public abstract class Button extends Trigger {
   }
 
   /**
+   * Starts the given command whenever the button is newly pressed.
+   *
+   * @param command the command to start
+   */
+  public void whenPressed(final ICommand command, boolean interruptible) {
+    whenActive(command, interruptible);
+  }
+
+  /**
    * Constantly starts the given command while the button is held.
    *
    * {@link Command#start()} will be called repeatedly while the button is held, and will be
@@ -40,42 +49,6 @@ public abstract class Button extends Trigger {
    */
   public void whileHeld(final Command command) {
     whileActive(command);
-  }
-
-  /**
-   * Starts the command when the button is released.
-   *
-   * @param command the command to start
-   */
-  public void whenReleased(final Command command) {
-    whenInactive(command);
-  }
-
-  /**
-   * Toggles the command whenever the button is pressed (on then off then on).
-   *
-   * @param command the command to start
-   */
-  public void toggleWhenPressed(final Command command) {
-    toggleWhenActive(command);
-  }
-
-  /**
-   * Cancel the command when the button is pressed.
-   *
-   * @param command the command to start
-   */
-  public void cancelWhenPressed(final Command command) {
-    cancelWhenActive(command);
-  }
-
-  /**
-   * Starts the given command whenever the button is newly pressed.
-   *
-   * @param command the command to start
-   */
-  public void whenPressed(final ICommand command, boolean interruptible) {
-    whenActive(command, interruptible);
   }
 
   /**
@@ -95,6 +68,15 @@ public abstract class Button extends Trigger {
    *
    * @param command the command to start
    */
+  public void whenReleased(final Command command) {
+    whenInactive(command);
+  }
+
+  /**
+   * Starts the command when the button is released.
+   *
+   * @param command the command to start
+   */
   public void whenReleased(final ICommand command, boolean interruptible) {
     whenInactive(command, interruptible);
   }
@@ -104,8 +86,26 @@ public abstract class Button extends Trigger {
    *
    * @param command the command to start
    */
+  public void toggleWhenPressed(final Command command) {
+    toggleWhenActive(command);
+  }
+
+  /**
+   * Toggles the command whenever the button is pressed (on then off then on).
+   *
+   * @param command the command to start
+   */
   public void toggleWhenPressed(final ICommand command, boolean interruptible) {
     toggleWhenActive(command, interruptible);
+  }
+
+  /**
+   * Cancel the command when the button is pressed.
+   *
+   * @param command the command to start
+   */
+  public void cancelWhenPressed(final Command command) {
+    cancelWhenActive(command);
   }
 
   /**
