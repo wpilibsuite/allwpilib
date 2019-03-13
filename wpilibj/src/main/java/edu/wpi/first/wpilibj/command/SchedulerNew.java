@@ -27,11 +27,7 @@ public final class SchedulerNew extends SendableBase {
      */
     private static SchedulerNew instance;
 
-    /**
-     * Returns the {@link SchedulerNew}, creating it if one does not exist.
-     *
-     * @return the {@link SchedulerNew}
-     */
+
     public static synchronized SchedulerNew getInstance() {
         if (instance == null) {
             instance = new SchedulerNew();
@@ -43,28 +39,17 @@ public final class SchedulerNew extends SendableBase {
     private final Map<Subsystem, ICommand> m_requirements = new LinkedHashMap<>();
     private final Collection<Subsystem> m_subsystems = new HashSet<>();
 
-    /**
-     * A hashtable of active {@link Command Commands} to their {@link LinkedListElement}.
-     */
+
     @SuppressWarnings("PMD.LooseCoupling")
     private final Hashtable<Command, LinkedListElement> m_commandTable = new Hashtable<>();
 
-    /**
-     * Whether or not we are currently disabled.
-     */
     private boolean m_disabled;
-    /**
-     * A list of all {@link Command Commands} which need to be added.
-     */
+
     @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
     private NetworkTableEntry m_namesEntry;
     private NetworkTableEntry m_idsEntry;
     private NetworkTableEntry m_cancelEntry;
 
-    /**
-     * A list of all {@link edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler Buttons}. It is
-     * created lazily.
-     */
     @SuppressWarnings("PMD.LooseCoupling")
     private Collection<Trigger.ButtonSchedulerNew> m_buttons;
     private boolean m_runningCommandsChanged;
@@ -74,20 +59,11 @@ public final class SchedulerNew extends SendableBase {
     private final List<Consumer<ICommand>> m_interruptActions = new ArrayList<>();
     private final List<Consumer<ICommand>> m_endActions = new ArrayList<>();
 
-    /**
-     * Instantiates a {@link Scheduler}.
-     */
     private SchedulerNew() {
         HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
         setName("Scheduler");
     }
 
-    /**
-     * Adds a button to the {@link Scheduler}. The {@link Scheduler} will poll the button during its
-     * {@link Scheduler#run()}.
-     *
-     * @param button the button to add
-     */
     @SuppressWarnings("PMD.UseArrayListInsteadOfVector")
     public void addButton(Trigger.ButtonSchedulerNew button) {
         if (m_buttons == null) {
@@ -103,7 +79,8 @@ public final class SchedulerNew extends SendableBase {
         }
 
         if (!m_disabled
-                && (!RobotState.isDisabled() || command.getRunWhenDisabled())) {
+                && (!RobotState.isDisabled() || command.getRunWhenDisabled())
+                && !m_scheduledCommands.containsKey(command)) {
 
             Collection<Subsystem> requirements = command.getRequirements();
 
@@ -140,13 +117,7 @@ public final class SchedulerNew extends SendableBase {
         }
     }
 
-    /**
-     * Runs a single iteration of the loop. This method should be called often in order to have a
-     * functioning {@link Command} system. The loop has five stages:
-     *
-     * <ol> <li>Poll the Buttons</li> <li>Execute/Remove the Commands</li> <li>Send values to
-     * SmartDashboard</li> <li>Add Commands</li> <li>Add Defaults</li> </ol>
-     */
+
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     public void run() {
         if (!m_disabled) {
@@ -189,13 +160,6 @@ public final class SchedulerNew extends SendableBase {
         }
     }
 
-    /**
-     * Registers a {@link Subsystem} to this {@link Scheduler}, so that the {@link Scheduler} might
-     * know if a default {@link Command} needs to be run. All {@link Subsystem Subsystems} should call
-     * this.
-     *
-     * @param subsystem the system
-     */
     void registerSubsystem(Subsystem subsystem) {
         m_subsystems.add(subsystem);
     }
