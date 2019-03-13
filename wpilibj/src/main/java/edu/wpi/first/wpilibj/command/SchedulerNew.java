@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.buttons.Trigger;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public final class SchedulerNew extends SendableBase {
   /**
    * The Singleton Instance.
@@ -49,9 +50,6 @@ public final class SchedulerNew extends SendableBase {
   private final Collection<Subsystem> m_subsystems = new HashSet<>();
 
 
-  @SuppressWarnings("PMD.LooseCoupling")
-  private final Hashtable<Command, LinkedListElement> m_commandTable = new Hashtable<>();
-
   private boolean m_disabled;
 
   @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
@@ -61,7 +59,6 @@ public final class SchedulerNew extends SendableBase {
 
   @SuppressWarnings("PMD.LooseCoupling")
   private Collection<Trigger.ButtonSchedulerNew> m_buttons;
-  private boolean m_runningCommandsChanged;
 
   private final List<Consumer<ICommand>> m_initActions = new ArrayList<>();
   private final List<Consumer<ICommand>> m_executeActions = new ArrayList<>();
@@ -94,6 +91,7 @@ public final class SchedulerNew extends SendableBase {
    * @param command the command to schedule
    * @param interruptible whether this command can be interrupted
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   public void scheduleCommand(ICommand command, boolean interruptible) {
 
     if (CommandGroupBase.getGroupedCommands().contains(command)) {
@@ -101,41 +99,42 @@ public final class SchedulerNew extends SendableBase {
           "A command that is part of a command group cannot be independently scheduled");
     }
 
-    if (!m_disabled
-        && (!RobotState.isDisabled() || command.getRunWhenDisabled())
-        && !m_scheduledCommands.containsKey(command)) {
+    if (m_disabled
+        || (RobotState.isDisabled() || !command.getRunWhenDisabled())
+        || m_scheduledCommands.containsKey(command)) {
+      return;
+    }
 
-      Collection<Subsystem> requirements = command.getRequirements();
+    Collection<Subsystem> requirements = command.getRequirements();
 
-      if (Collections.disjoint(m_requirements.keySet(), requirements)) {
+    if (Collections.disjoint(m_requirements.keySet(), requirements)) {
+      command.initialize();
+      CommandState scheduledCommand = new CommandState(interruptible);
+      for (Consumer<ICommand> action : m_initActions) {
+        action.accept(command);
+      }
+      for (Subsystem requirement : requirements) {
+        m_scheduledCommands.put(command, scheduledCommand);
+        m_requirements.put(requirement, command);
+      }
+    } else {
+      boolean allInterruptible = true;
+      for (Subsystem requirement : requirements) {
+        if (m_requirements.keySet().contains(requirement)) {
+          allInterruptible &=
+              m_scheduledCommands.get(m_requirements.get(requirement)).isInterruptible();
+        }
+      }
+      if (allInterruptible) {
+        for (Subsystem requirement : requirements) {
+          ICommand toInterrupt = m_requirements.get(requirement);
+          if (toInterrupt != null) {
+            cancelCommand(toInterrupt);
+          }
+        }
         command.initialize();
         for (Consumer<ICommand> action : m_initActions) {
           action.accept(command);
-        }
-        for (Subsystem requirement : requirements) {
-          CommandState scheduledCommand = new CommandState(interruptible);
-          m_scheduledCommands.put(command, scheduledCommand);
-          m_requirements.put(requirement, command);
-        }
-      } else {
-        boolean allInterruptible = true;
-        for (Subsystem requirement : requirements) {
-          if (m_requirements.keySet().contains(requirement)) {
-            allInterruptible &=
-                m_scheduledCommands.get(m_requirements.get(requirement)).isInterruptible();
-          }
-        }
-        if (allInterruptible) {
-          for (Subsystem requirement : requirements) {
-            ICommand toInterrupt = m_requirements.get(requirement);
-            if (toInterrupt != null) {
-              cancelCommand(toInterrupt);
-            }
-          }
-          command.initialize();
-          for (Consumer<ICommand> action : m_initActions) {
-            action.accept(command);
-          }
         }
       }
     }
@@ -155,6 +154,7 @@ public final class SchedulerNew extends SendableBase {
    *
    * <p>Any subsystems not being used as requirements have their default methods started.
    */
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   public void run() {
     if (!m_disabled) {
       for (Subsystem subsystem : m_subsystems) {
@@ -187,10 +187,8 @@ public final class SchedulerNew extends SendableBase {
       }
 
       for (Subsystem subsystem : m_subsystems) {
-        if (!m_requirements.containsKey(subsystem)) {
-          if (subsystem.getDefaultICommand() != null) {
-            scheduleCommand(subsystem.getDefaultICommand(), true);
-          }
+        if (!m_requirements.containsKey(subsystem) && subsystem.getDefaultICommand() != null) {
+          scheduleCommand(subsystem.getDefaultICommand(), true);
         }
       }
     }

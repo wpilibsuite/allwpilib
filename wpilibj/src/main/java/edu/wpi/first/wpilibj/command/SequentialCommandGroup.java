@@ -42,13 +42,16 @@ public class SequentialCommandGroup extends CommandGroupBase implements ICommand
 
   @Override
   public void execute() {
-    if (!m_commandQueue.isEmpty()) {
-      m_commandQueue.peek().execute();
-      if (m_commandQueue.peek().isFinished()) {
-        m_commandQueue.remove().end();
-        if (!m_commandQueue.isEmpty()) {
-          m_commandQueue.peek().initialize();
-        }
+
+    if (m_commandQueue.isEmpty()) {
+      return;
+    }
+
+    m_commandQueue.peek().execute();
+    if (m_commandQueue.peek().isFinished()) {
+      m_commandQueue.remove().end();
+      if (!m_commandQueue.isEmpty()) {
+        m_commandQueue.peek().initialize();
       }
     }
   }
