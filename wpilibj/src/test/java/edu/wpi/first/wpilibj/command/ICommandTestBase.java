@@ -1,8 +1,8 @@
 package edu.wpi.first.wpilibj.command;
 
-import org.junit.jupiter.api.BeforeEach;
-
 import java.util.Set;
+
+import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 /**
  * Basic setup for all {@link ICommand tests}.
  */
-abstract class ICommandTestBase {
+public abstract class ICommandTestBase {
 
   @BeforeEach
   void commandSetup() {

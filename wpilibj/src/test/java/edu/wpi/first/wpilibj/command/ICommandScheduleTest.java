@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.verify;
 
 
-class ICommandScheduleTest extends ICommandTestBase{
+class ICommandScheduleTest extends ICommandTestBase {
 
   @Test
   void instantScheduleTest() {
