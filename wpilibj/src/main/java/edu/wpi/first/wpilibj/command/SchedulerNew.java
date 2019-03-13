@@ -7,7 +7,14 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -25,7 +32,11 @@ public final class SchedulerNew extends SendableBase {
    */
   private static SchedulerNew instance;
 
-
+  /**
+   * Returns the Scheduler instance.
+   *
+   * @return the instance
+   */
   public static synchronized SchedulerNew getInstance() {
     if (instance == null) {
       instance = new SchedulerNew();
@@ -62,7 +73,11 @@ public final class SchedulerNew extends SendableBase {
     setName("Scheduler");
   }
 
-  @SuppressWarnings("PMD.UseArrayListInsteadOfVector")
+  /**
+   * Adds a button binding to the scheduler, which will be polled to schedule commands.
+   *
+   * @param button the button to add
+   */
   public void addButton(Trigger.ButtonSchedulerNew button) {
     if (m_buttons == null) {
       m_buttons = new HashSet<>();
@@ -70,10 +85,20 @@ public final class SchedulerNew extends SendableBase {
     m_buttons.add(button);
   }
 
+  /**
+   * Schedules a command for execution.  Does nothing if the command is already scheduled.
+   * If a command's requirements are not available, it will only be started if all the commands
+   * currently using those requirements have been scheduled as interruptible.  If this is
+   * the case, they will be interrupted and the command will be scheduled.
+   *
+   * @param command the command to schedule
+   * @param interruptible whether this command can be interrupted
+   */
   public void scheduleCommand(ICommand command, boolean interruptible) {
 
     if (CommandGroupBase.getGroupedCommands().contains(command)) {
-      throw new IllegalUseOfCommandException("A command that is part of a command group cannot be independently scheduled");
+      throw new IllegalUseOfCommandException(
+          "A command that is part of a command group cannot be independently scheduled");
     }
 
     if (!m_disabled
@@ -116,8 +141,15 @@ public final class SchedulerNew extends SendableBase {
     }
   }
 
-
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
+  /**
+   * Runs a single iteration of the scheduler.  The execution occurs in the following order:
+   * <p>Subsystem periodic methods are called.
+   * <p>Button bindings are polled, and new commands are scheduled from them.
+   * <p>Currently-scheduled commands are executed.
+   * <p>End conditions are checked on currently-scheduled commands, and commands that are finished
+   * have their end methods called and are removed.
+   * <p>Any subsystems not being used as requirements have their default methods started.
+   */
   public void run() {
     if (!m_disabled) {
       for (Subsystem subsystem : m_subsystems) {
@@ -163,6 +195,12 @@ public final class SchedulerNew extends SendableBase {
     m_subsystems.add(subsystem);
   }
 
+  /**
+   * Cancels a command.  The scheduler will only call the interrupted method of a canceled command,
+   * not the end method.
+   *
+   * @param command the command to cancel
+   */
   public void cancelCommand(ICommand command) {
     command.interrupted();
     for (Consumer<ICommand> action : m_interruptActions) {
@@ -172,14 +210,24 @@ public final class SchedulerNew extends SendableBase {
     m_requirements.keySet().removeAll(command.getRequirements());
   }
 
-
+  /**
+   * Cancels all commands that are currently scheduled.
+   */
   public void cancelAll() {
     for (ICommand command : m_scheduledCommands.keySet()) {
       cancelCommand(command);
     }
   }
 
-  public double timeSinceInitialized(ICommand command) {
+  /**
+   * Returns the time since a given command was scheduled.  Note that this only works on commands
+   * that are directly scheduled by the scheduler; it will not work on commands inside of
+   * commandgroups, as the scheduler does not see them.
+   *
+   * @param command the command to query
+   * @return the time since the command was scheduled, in seconds
+   */
+  public double timeSinceScheduled(ICommand command) {
     CommandState commandState = m_scheduledCommands.get(command);
     if (commandState != null) {
       return commandState.timeSinceInitialized();
@@ -188,7 +236,15 @@ public final class SchedulerNew extends SendableBase {
     }
   }
 
-  public boolean isRunning(ICommand command) {
+  /**
+   * Whether a given command is running.  Note that this only works on commands that are directly
+   * scheduled by the scheduler; it will not work on commands inside of commandgroups, as the
+   * scheduler does not see them.
+   *
+   * @param command the command to query
+   * @return whether the command is currently scheduled
+   */
+  public boolean isScheduled(ICommand command) {
     return m_scheduledCommands.containsKey(command);
   }
 
