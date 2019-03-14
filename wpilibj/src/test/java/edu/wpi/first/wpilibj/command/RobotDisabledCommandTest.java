@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class RobotDisabledCommandTest extends ICommandTestBase {
   @Test
