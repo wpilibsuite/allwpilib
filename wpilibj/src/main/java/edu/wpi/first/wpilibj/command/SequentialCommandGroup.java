@@ -21,7 +21,7 @@ public class SequentialCommandGroup extends CommandGroupBase implements ICommand
    *
    * @param commands the commands to include in this group.
    */
-  public SequentialCommandGroup(ICommand[] commands) {
+  public SequentialCommandGroup(ICommand... commands) {
     if (!Collections.disjoint(Set.of(commands), getGroupedCommands())) {
       throw new IllegalUseOfCommandException(
           "Commands cannot be added to more than one CommandGroup");
@@ -79,5 +79,14 @@ public class SequentialCommandGroup extends CommandGroupBase implements ICommand
       requirements.addAll(command.getRequirements());
     }
     return requirements;
+  }
+
+  @Override
+  public boolean getRunWhenDisabled() {
+    boolean allRunWhenDisabled = true;
+    for(ICommand command : m_commands) {
+      allRunWhenDisabled &= command.getRunWhenDisabled();
+    }
+    return allRunWhenDisabled;
   }
 }

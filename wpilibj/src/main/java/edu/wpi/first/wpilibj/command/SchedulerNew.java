@@ -206,6 +206,11 @@ public final class SchedulerNew extends SendableBase {
    * @param command the command to cancel
    */
   public void cancelCommand(ICommand command) {
+
+    if (!m_scheduledCommands.containsKey(command)) {
+      return;
+    }
+
     command.interrupted();
     for (Consumer<ICommand> action : m_interruptActions) {
       action.accept(command);

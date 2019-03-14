@@ -70,4 +70,14 @@ class ICommandScheduleTest extends ICommandTestBase {
 
     assertFalse(scheduler.isScheduled(mockCommand));
   }
+
+  @Test
+  void notScheduledCancelTest() {
+    SchedulerNew scheduler = new SchedulerNew();
+
+    MockCommandHolder holder = new MockCommandHolder(true, new Subsystem[0]);
+    ICommand mockCommand = holder.getMock();
+
+    scheduler.cancelCommand(mockCommand);
+  }
 }
