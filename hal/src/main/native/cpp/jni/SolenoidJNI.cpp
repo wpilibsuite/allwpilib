@@ -131,6 +131,22 @@ Java_edu_wpi_first_hal_SolenoidJNI_getSolenoid
 
 /*
  * Class:     edu_wpi_first_hal_SolenoidJNI
+ * Method:    getLastSetSolenoid
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_SolenoidJNI_getLastSetSolenoid
+  (JNIEnv* env, jclass, jint solenoid_port)
+{
+  int32_t status = 0;
+  jboolean val =
+      HAL_GetLastSetSolenoid((HAL_SolenoidHandle)solenoid_port, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_SolenoidJNI
  * Method:    getAllSolenoids
  * Signature: (I)I
  */

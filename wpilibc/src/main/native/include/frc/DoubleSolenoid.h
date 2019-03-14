@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hal/Types.h>
+#include <wpi/deprecated.h>
 
 #include "frc/SolenoidBase.h"
 
@@ -61,6 +62,14 @@ class DoubleSolenoid : public SolenoidBase {
    * @return The current value of the solenoid.
    */
   virtual Value Get() const;
+
+  /**
+   * Read the last set value of the solenoid.
+   *
+   * @return The last set value of the solenoid.
+   */
+  WPI_DEPRECATED("Workaround for 2019 Live Window Delay")
+  virtual Value GetLastSet() const;
 
   /**
    * Check if the forward solenoid is blacklisted.

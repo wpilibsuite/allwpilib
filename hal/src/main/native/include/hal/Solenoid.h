@@ -63,6 +63,15 @@ HAL_Bool HAL_GetSolenoid(HAL_SolenoidHandle solenoidPortHandle,
                          int32_t* status);
 
 /**
+ * Gets the current last set solenoid output value.
+ *
+ * @param solenoidPortHandle the solenoid handle
+ * @return                   true if the solenoid is on, otherwise false
+ */
+HAL_Bool HAL_GetLastSetSolenoid(HAL_SolenoidHandle solenoidPortHandle,
+                                int32_t* status);
+
+/**
  * Gets the status of all solenoids on a specific module.
  *
  * @param module the module to check

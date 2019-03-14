@@ -247,6 +247,13 @@ CTR_Code PCM::SetOneShotDurationMs(UINT8 idx,uint32_t durMs)
  */
 CTR_Code PCM::GetSolenoid(UINT8 idx, bool &status)
 {
+	GET_PCM_STATUS();
+	status = (rx->SolenoidBits & (1ul<<(idx)) ) ? 1 : 0;
+	return rx.err;
+}
+
+CTR_Code PCM::GetLastSetSolenoid(UINT8 idx, bool &status)
+{
 	CtreCanNode::txTask<PcmControl_t> toFill = GetTx<PcmControl_t>(CONTROL_1 | GetDeviceNumber());
 	if(toFill.IsEmpty())return CTR_UnexpectedArbId;
 	status = (toFill->solenoidBits & (1ul<<(idx)) ) ? 1 : 0;

@@ -42,6 +42,8 @@ public:
      */
     CTR_Code 	GetSolenoid(UINT8 idx, bool &status);
 
+    CTR_Code GetLastSetSolenoid(UINT8 idx, bool &status);
+
     /* Get state of all solenoids
      *
      * @Return	-	CTR_Code	-	Error code (if any)

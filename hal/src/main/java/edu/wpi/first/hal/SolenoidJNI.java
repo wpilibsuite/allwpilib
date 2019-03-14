@@ -20,6 +20,8 @@ public class SolenoidJNI extends JNIWrapper {
 
   public static native boolean getSolenoid(int portHandle);
 
+  public static native boolean getLastSetSolenoid(int portHandle);
+
   public static native int getAllSolenoids(int module);
 
   public static native int getPCMSolenoidBlackList(int module);

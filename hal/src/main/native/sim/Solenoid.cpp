@@ -101,6 +101,16 @@ HAL_Bool HAL_GetSolenoid(HAL_SolenoidHandle solenoidPortHandle,
 
   return HALSIM_GetPCMSolenoidOutput(port->module, port->channel);
 }
+HAL_Bool HAL_GetLastSetSolenoid(HAL_SolenoidHandle solenoidPortHandle,
+                                int32_t* status) {
+  auto port = solenoidHandles->Get(solenoidPortHandle);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return false;
+  }
+
+  return HALSIM_GetPCMSolenoidOutput(port->module, port->channel);
+}
 int32_t HAL_GetAllSolenoids(int32_t module, int32_t* status) {
   int32_t total = 0;
   for (int i = 0; i < kNumSolenoidChannels; i++) {

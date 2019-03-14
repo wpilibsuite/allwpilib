@@ -77,6 +77,17 @@ public class Solenoid extends SolenoidBase {
   }
 
   /**
+   * Read the last set value of the solenoid.
+   *
+   * @return True if the solenoid output is on or false if the solenoid output is off.
+   * @deprecated LiveWindow delay workaround for 2019.
+   */
+  @Deprecated
+  public boolean getLastSet() {
+    return SolenoidJNI.getLastSetSolenoid(m_solenoidHandle);
+  }
+
+  /**
    * Check if solenoid is blacklisted. If a solenoid is shorted, it is added to the blacklist and
    * disabled until power cycle, or until faults are cleared.
    *
@@ -117,6 +128,6 @@ public class Solenoid extends SolenoidBase {
     builder.setSmartDashboardType("Solenoid");
     builder.setActuator(true);
     builder.setSafeState(() -> set(false));
-    builder.addBooleanProperty("Value", this::get, this::set);
+    builder.addBooleanProperty("Value", this::getLastSet, this::set);
   }
 }

@@ -140,6 +140,26 @@ public class DoubleSolenoid extends SolenoidBase {
   }
 
   /**
+   * Read the current value of the solenoid.
+   *
+   * @return The current value of the solenoid.
+   * @deprecated LiveWindow delay workaround for 2019.
+   */
+  @Deprecated
+  public Value getLastSet() {
+    boolean valueForward = SolenoidJNI.getLastSetSolenoid(m_forwardHandle);
+    boolean valueReverse = SolenoidJNI.getLastSetSolenoid(m_reverseHandle);
+
+    if (valueForward) {
+      return Value.kForward;
+    }
+    if (valueReverse) {
+      return Value.kReverse;
+    }
+    return Value.kOff;
+  }
+
+  /**
    * Check if the forward solenoid is blacklisted. If a solenoid is shorted, it is added to the
    * blacklist and disabled until power cycle, or until faults are cleared.
    *
@@ -168,7 +188,7 @@ public class DoubleSolenoid extends SolenoidBase {
     builder.setSmartDashboardType("Double Solenoid");
     builder.setActuator(true);
     builder.setSafeState(() -> set(Value.kOff));
-    builder.addStringProperty("Value", () -> get().name().substring(1), value -> {
+    builder.addStringProperty("Value", () -> getLastSet().name().substring(1), value -> {
       if ("Forward".equals(value)) {
         set(Value.kForward);
       } else if ("Reverse".equals(value)) {

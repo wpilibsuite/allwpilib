@@ -149,6 +149,21 @@ DoubleSolenoid::Value DoubleSolenoid::Get() const {
   return kOff;
 }
 
+DoubleSolenoid::Value DoubleSolenoid::GetLastSet() const {
+  if (StatusIsFatal()) return kOff;
+  int fstatus = 0;
+  int rstatus = 0;
+  bool valueForward = HAL_GetLastSetSolenoid(m_forwardHandle, &fstatus);
+  bool valueReverse = HAL_GetLastSetSolenoid(m_reverseHandle, &rstatus);
+
+  wpi_setErrorWithContext(fstatus, HAL_GetErrorMessage(fstatus));
+  wpi_setErrorWithContext(rstatus, HAL_GetErrorMessage(rstatus));
+
+  if (valueForward) return kForward;
+  if (valueReverse) return kReverse;
+  return kOff;
+}
+
 bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {
   int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
   return (blackList & m_forwardMask) != 0;
@@ -166,7 +181,7 @@ void DoubleSolenoid::InitSendable(SendableBuilder& builder) {
   builder.AddSmallStringProperty(
       "Value",
       [=](wpi::SmallVectorImpl<char>& buf) -> wpi::StringRef {
-        switch (Get()) {
+        switch (GetLastSet()) {
           case kForward:
             return "Forward";
           case kReverse:

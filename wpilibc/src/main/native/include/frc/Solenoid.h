@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hal/Types.h>
+#include <wpi/deprecated.h>
 
 #include "frc/SolenoidBase.h"
 
@@ -54,6 +55,14 @@ class Solenoid : public SolenoidBase {
    * @return The current value of the solenoid.
    */
   virtual bool Get() const;
+
+  /**
+   * Read the last set value of the solenoid.
+   *
+   * @return The last set value of the solenoid.
+   */
+  WPI_DEPRECATED("Workaround for 2019 Live Window Delay")
+  virtual bool GetLastSet() const;
 
   /**
    * Check if solenoid is blacklisted.

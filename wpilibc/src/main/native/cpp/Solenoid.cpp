@@ -81,6 +81,14 @@ bool Solenoid::Get() const {
   return value;
 }
 
+bool Solenoid::GetLastSet() const {
+  if (StatusIsFatal()) return false;
+  int32_t status = 0;
+  bool value = HAL_GetLastSetSolenoid(m_solenoidHandle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  return value;
+}
+
 bool Solenoid::IsBlackListed() const {
   int value = GetPCMSolenoidBlackList(m_moduleNumber) & (1 << m_channel);
   return (value != 0);
@@ -105,6 +113,6 @@ void Solenoid::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Solenoid");
   builder.SetActuator(true);
   builder.SetSafeState([=]() { Set(false); });
-  builder.AddBooleanProperty("Value", [=]() { return Get(); },
+  builder.AddBooleanProperty("Value", [=]() { return GetLastSet(); },
                              [=](bool value) { Set(value); });
 }
