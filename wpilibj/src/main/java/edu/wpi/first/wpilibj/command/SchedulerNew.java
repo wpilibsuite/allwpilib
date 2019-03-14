@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -57,14 +58,14 @@ public final class SchedulerNew extends SendableBase {
   private NetworkTableEntry m_cancelEntry;
 
   @SuppressWarnings("PMD.LooseCoupling")
-  private Collection<Trigger.ButtonSchedulerNew> m_buttons;
+  private Collection<Trigger.ButtonSchedulerNew> m_buttons = new LinkedHashSet<>();
 
   private final List<Consumer<ICommand>> m_initActions = new ArrayList<>();
   private final List<Consumer<ICommand>> m_executeActions = new ArrayList<>();
   private final List<Consumer<ICommand>> m_interruptActions = new ArrayList<>();
   private final List<Consumer<ICommand>> m_endActions = new ArrayList<>();
 
-  private SchedulerNew() {
+  SchedulerNew() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
     setName("Scheduler");
   }
@@ -75,9 +76,6 @@ public final class SchedulerNew extends SendableBase {
    * @param button the button to add
    */
   public void addButton(Trigger.ButtonSchedulerNew button) {
-    if (m_buttons == null) {
-      m_buttons = new HashSet<>();
-    }
     m_buttons.add(button);
   }
 
@@ -125,11 +123,14 @@ public final class SchedulerNew extends SendableBase {
         }
       }
       if (allInterruptible) {
-        requirements.retainAll(m_requirements.keySet());
         for (Subsystem requirement : requirements) {
-          cancelCommand(m_requirements.get(requirement));
+          if (m_requirements.containsKey(requirement)) {
+            cancelCommand(m_requirements.get(requirement));
+          }
         }
         command.initialize();
+        CommandState scheduledCommand = new CommandState(interruptible);
+        m_scheduledCommands.put(command, scheduledCommand);
         for (Consumer<ICommand> action : m_initActions) {
           action.accept(command);
         }

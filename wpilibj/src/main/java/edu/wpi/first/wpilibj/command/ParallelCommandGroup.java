@@ -43,11 +43,13 @@ public class ParallelCommandGroup extends CommandGroupBase implements ICommand {
   @Override
   public void execute() {
     for (ICommand command : m_commands.keySet()) {
+      if(!m_commands.get(command)){
+        continue;
+      }
+      command.execute();
       if (command.isFinished()) {
         command.end();
         m_commands.replace(command, false);
-      } else {
-        command.execute();
       }
     }
   }
