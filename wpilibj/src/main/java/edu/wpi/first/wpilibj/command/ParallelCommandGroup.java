@@ -20,7 +20,7 @@ public class ParallelCommandGroup extends CommandGroupBase implements ICommand {
    *
    * @param commands the commands to include in this group.
    */
-  public ParallelCommandGroup(ICommand[] commands) {
+  public ParallelCommandGroup(ICommand... commands) {
     if (!Collections.disjoint(Set.of(commands), getGroupedCommands())) {
       throw new IllegalUseOfCommandException("Commands cannot be added to multiple CommandGroups");
     }
@@ -43,7 +43,7 @@ public class ParallelCommandGroup extends CommandGroupBase implements ICommand {
   @Override
   public void execute() {
     for (ICommand command : m_commands.keySet()) {
-      if(!m_commands.get(command)){
+      if (!m_commands.get(command)) {
         continue;
       }
       command.execute();
@@ -79,5 +79,14 @@ public class ParallelCommandGroup extends CommandGroupBase implements ICommand {
       requirements.addAll(command.getRequirements());
     }
     return requirements;
+  }
+
+  @Override
+  public boolean getRunWhenDisabled() {
+    boolean allRunWhenDisabled = true;
+    for(ICommand command : m_commands.keySet()) {
+      allRunWhenDisabled &= command.getRunWhenDisabled();
+    }
+    return allRunWhenDisabled;
   }
 }

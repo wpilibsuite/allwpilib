@@ -24,19 +24,17 @@ public abstract class ICommandTestBase {
 
     @Override
     protected void initDefaultCommand() {
-      if (m_command != null) {
-        setDefaultICommand(m_command);
-      }
     }
 
     public void init(ICommand command) {
       m_command = command;
+      setDefaultICommand(m_command);
     }
   }
 
   protected class MockCommandHolder {
 
-    ICommand m_mockCommand = mock(ICommand.class);
+    private ICommand m_mockCommand = mock(ICommand.class);
 
     MockCommandHolder(boolean runWhenDisabled, Subsystem... requirements) {
       when(m_mockCommand.getRequirements()).thenReturn(Set.of(requirements));

@@ -8,7 +8,7 @@ import static org.mockito.Mockito.*;
 public class ParallelCommandGroupTest extends ICommandTestBase {
 
   @Test
-  void parallelCommandScheduleTest() {
+  void parallelGroupScheduleTest() {
     SchedulerNew scheduler = new SchedulerNew();
     
     MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
@@ -16,7 +16,7 @@ public class ParallelCommandGroupTest extends ICommandTestBase {
     MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
     ICommand command2 = command2Holder.getMock();
 
-    ICommand group = new ParallelCommandGroup(new ICommand[]{command1, command2});
+    ICommand group = new ParallelCommandGroup(command1, command2);
 
     scheduler.scheduleCommand(group, true);
 
@@ -37,14 +37,14 @@ public class ParallelCommandGroupTest extends ICommandTestBase {
   }
 
   @Test
-  void parallelCommandInterruptTest() {
+  void parallelGroupInterruptTest() {
     SchedulerNew scheduler = new SchedulerNew();
     MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
     ICommand command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
     ICommand command2 = command2Holder.getMock();
 
-    ICommand group = new ParallelCommandGroup(new ICommand[]{command1, command2});
+    ICommand group = new ParallelCommandGroup(command1, command2);
 
     scheduler.scheduleCommand(group, true);
 
@@ -63,4 +63,19 @@ public class ParallelCommandGroupTest extends ICommandTestBase {
 
     assertFalse(scheduler.isScheduled(group));
   }
+
+  @Test
+  void notScheduledCancelTest() {
+    SchedulerNew scheduler = new SchedulerNew();
+
+    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    ICommand command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
+    ICommand command2 = command2Holder.getMock();
+
+    ICommand group = new ParallelCommandGroup(command1, command2);
+
+    scheduler.cancelCommand(group);
+  }
+
 }
