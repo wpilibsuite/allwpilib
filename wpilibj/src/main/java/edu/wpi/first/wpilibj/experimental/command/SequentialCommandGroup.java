@@ -34,9 +34,8 @@ public class SequentialCommandGroup extends CommandGroupBase implements Command 
 
     registerGroupedCommands(commands);
 
-    m_commands.addAll(List.of(commands));
-
-    for (Command command : m_commands) {
+    for (Command command : commands) {
+      m_commands.add(command);
       m_requirements.addAll(command.getRequirements());
       m_runWhenDisabled &= command.getRunWhenDisabled();
     }
