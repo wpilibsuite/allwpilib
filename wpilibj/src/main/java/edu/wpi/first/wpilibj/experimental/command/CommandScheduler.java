@@ -59,7 +59,7 @@ public final class CommandScheduler extends SendableBase {
   private NetworkTableEntry m_cancelEntry;
 
   @SuppressWarnings("PMD.LooseCoupling")
-  private Collection<Trigger.ButtonScheduler> m_buttons = new LinkedHashSet<>();
+  private final Collection<Trigger.ButtonScheduler> m_buttons = new LinkedHashSet<>();
 
   private final List<Consumer<Command>> m_initActions = new ArrayList<>();
   private final List<Consumer<Command>> m_executeActions = new ArrayList<>();

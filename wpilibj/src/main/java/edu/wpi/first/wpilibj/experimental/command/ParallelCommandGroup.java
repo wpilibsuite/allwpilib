@@ -1,14 +1,13 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-
-import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
 public class ParallelCommandGroup extends CommandGroupBase implements Command {
 
@@ -86,7 +85,7 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
   @Override
   public boolean getRunWhenDisabled() {
     boolean allRunWhenDisabled = true;
-    for(Command command : m_commands.keySet()) {
+    for (Command command : m_commands.keySet()) {
       allRunWhenDisabled &= command.getRunWhenDisabled();
     }
     return allRunWhenDisabled;
