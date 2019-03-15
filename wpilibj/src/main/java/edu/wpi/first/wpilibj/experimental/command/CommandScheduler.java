@@ -23,8 +23,8 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SendableBase;
-import edu.wpi.first.wpilibj.buttons.Trigger;
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
+import edu.wpi.first.wpilibj.experimental.buttons.Trigger;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
@@ -59,7 +59,7 @@ public final class CommandScheduler extends SendableBase {
   private NetworkTableEntry m_cancelEntry;
 
   @SuppressWarnings("PMD.LooseCoupling")
-  private Collection<Trigger.ButtonSchedulerNew> m_buttons = new LinkedHashSet<>();
+  private Collection<Trigger.ButtonScheduler> m_buttons = new LinkedHashSet<>();
 
   private final List<Consumer<Command>> m_initActions = new ArrayList<>();
   private final List<Consumer<Command>> m_executeActions = new ArrayList<>();
@@ -76,7 +76,7 @@ public final class CommandScheduler extends SendableBase {
    *
    * @param button the button to add
    */
-  public void addButton(Trigger.ButtonSchedulerNew button) {
+  public void addButton(Trigger.ButtonScheduler button) {
     m_buttons.add(button);
   }
 
@@ -164,7 +164,7 @@ public final class CommandScheduler extends SendableBase {
       subsystem.periodic();
     }
 
-    for (Trigger.ButtonSchedulerNew button : m_buttons) {
+    for (Trigger.ButtonScheduler button : m_buttons) {
       button.execute();
     }
 
