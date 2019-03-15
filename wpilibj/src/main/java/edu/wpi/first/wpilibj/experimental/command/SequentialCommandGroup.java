@@ -2,7 +2,6 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -74,8 +73,8 @@ public class SequentialCommandGroup extends CommandGroupBase implements Command 
   }
 
   @Override
-  public Collection<Subsystem> getRequirements() {
-    Collection<Subsystem> requirements = new HashSet<>();
+  public Set<Subsystem> getRequirements() {
+    Set<Subsystem> requirements = new HashSet<>();
     for (Command command : m_commands) {
       requirements.addAll(command.getRequirements());
     }

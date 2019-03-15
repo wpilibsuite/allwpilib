@@ -1,7 +1,7 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -22,7 +22,7 @@ public interface Command extends Sendable {
     return false;
   }
 
-  default Collection<Subsystem> getRequirements() {
+  default Set<Subsystem> getRequirements() {
     return new HashSet<>();
   }
 

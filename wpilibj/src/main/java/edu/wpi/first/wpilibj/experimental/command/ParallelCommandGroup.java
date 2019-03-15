@@ -1,6 +1,5 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,8 +73,8 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
   }
 
   @Override
-  public Collection<Subsystem> getRequirements() {
-    Collection<Subsystem> requirements = new HashSet<>();
+  public Set<Subsystem> getRequirements() {
+    Set<Subsystem> requirements = new HashSet<>();
     for (Command command : m_commands.keySet()) {
       requirements.addAll(command.getRequirements());
     }
