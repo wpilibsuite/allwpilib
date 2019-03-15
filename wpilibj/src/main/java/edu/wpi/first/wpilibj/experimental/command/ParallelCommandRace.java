@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
 public class ParallelCommandRace extends CommandGroupBase implements Command {
 
-  //maps commands in this group to whether they are still running
   private final Set<Command> m_commands = new HashSet<>();
   private final Set<Subsystem> m_requirements = new HashSet<>();
   private boolean m_runWhenDisabled = true;
