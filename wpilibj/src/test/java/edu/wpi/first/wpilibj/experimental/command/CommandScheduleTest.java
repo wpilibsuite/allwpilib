@@ -2,9 +2,10 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 
 class CommandScheduleTest extends CommandTestBase {
@@ -78,6 +79,6 @@ class CommandScheduleTest extends CommandTestBase {
     MockCommandHolder holder = new MockCommandHolder(true, new Subsystem[0]);
     Command mockCommand = holder.getMock();
 
-    scheduler.cancelCommand(mockCommand);
+    assertDoesNotThrow(() -> scheduler.cancelCommand(mockCommand));
   }
 }

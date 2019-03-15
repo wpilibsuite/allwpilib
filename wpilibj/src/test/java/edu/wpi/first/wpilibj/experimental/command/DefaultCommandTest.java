@@ -2,7 +2,8 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultCommandTest extends CommandTestBase {
   @Test
@@ -29,9 +30,9 @@ public class DefaultCommandTest extends CommandTestBase {
 
     MockCommandHolder defaultHolder = new MockCommandHolder(true, hasDefaultCommand);
     Command defaultCommand = defaultHolder.getMock();
+    hasDefaultCommand.init(defaultCommand);
     MockCommandHolder interrupterHolder = new MockCommandHolder(true, hasDefaultCommand);
     Command interrupter = interrupterHolder.getMock();
-    hasDefaultCommand.init(defaultCommand);
 
     scheduler.registerSubsystem(hasDefaultCommand);
     scheduler.run();

@@ -1,10 +1,12 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-import edu.wpi.first.hal.sim.DriverStationSim;
-import edu.wpi.first.wpilibj.DriverStation;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import edu.wpi.first.hal.sim.DriverStationSim;
+import edu.wpi.first.wpilibj.DriverStation;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RobotDisabledCommandTest extends CommandTestBase {
   @Test
@@ -25,6 +27,11 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     sim.notifyNewData();
     DriverStation.getInstance().isNewControlData();
     while (DriverStation.getInstance().isEnabled()) {
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e){
+        e.printStackTrace();
+      }
     }
 
     scheduler.run();
@@ -35,6 +42,11 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     sim.notifyNewData();
     DriverStation.getInstance().isNewControlData();
     while (!DriverStation.getInstance().isEnabled()) {
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e){
+        e.printStackTrace();
+      }
     }
   }
 
@@ -56,6 +68,11 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     sim.notifyNewData();
     DriverStation.getInstance().isNewControlData();
     while (DriverStation.getInstance().isEnabled()) {
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e){
+        e.printStackTrace();
+      }
     }
 
     scheduler.run();
@@ -66,6 +83,11 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     sim.notifyNewData();
     DriverStation.getInstance().isNewControlData();
     while (!DriverStation.getInstance().isEnabled()) {
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e){
+        e.printStackTrace();
+      }
     }
   }
 
@@ -89,13 +111,20 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     Command dontRunWhenDisabled = new SequentialCommandGroup(command3, command4);
 
     scheduler.scheduleCommand(runWhenDisabled, true);
-    scheduler.scheduleCommand(runWhenDisabled, true);
+    scheduler.scheduleCommand(dontRunWhenDisabled, true);
 
     sim.setEnabled(false);
     sim.notifyNewData();
     DriverStation.getInstance().isNewControlData();
     while (DriverStation.getInstance().isEnabled()) {
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e){
+        e.printStackTrace();
+      }
     }
+
+    scheduler.run();
 
     assertTrue(scheduler.isScheduled(runWhenDisabled));
     assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
@@ -104,6 +133,11 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     sim.notifyNewData();
     DriverStation.getInstance().isNewControlData();
     while (!DriverStation.getInstance().isEnabled()) {
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e){
+        e.printStackTrace();
+      }
     }
   }
 
@@ -127,13 +161,20 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     Command dontRunWhenDisabled = new ParallelCommandGroup(command3, command4);
 
     scheduler.scheduleCommand(runWhenDisabled, true);
-    scheduler.scheduleCommand(runWhenDisabled, true);
+    scheduler.scheduleCommand(dontRunWhenDisabled, true);
 
     sim.setEnabled(false);
     sim.notifyNewData();
     DriverStation.getInstance().isNewControlData();
     while (DriverStation.getInstance().isEnabled()) {
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e){
+        e.printStackTrace();
+      }
     }
+
+    scheduler.run();
 
     assertTrue(scheduler.isScheduled(runWhenDisabled));
     assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
@@ -142,6 +183,11 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     sim.notifyNewData();
     DriverStation.getInstance().isNewControlData();
     while (!DriverStation.getInstance().isEnabled()) {
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e){
+        e.printStackTrace();
+      }
     }
   }
 }
