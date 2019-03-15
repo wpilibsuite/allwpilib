@@ -46,7 +46,7 @@ public interface Command extends Sendable {
     return getRequirements().contains(requirement);
   }
 
-  default boolean getRunWhenDisabled() {
+  default boolean runsWhenDisabled() {
     return false;
   }
 

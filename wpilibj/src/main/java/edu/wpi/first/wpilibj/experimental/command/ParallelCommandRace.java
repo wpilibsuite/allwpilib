@@ -1,35 +1,34 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
-public class SequentialCommandGroup extends CommandGroupBase implements Command {
+public class ParallelCommandRace extends CommandGroupBase implements Command {
 
-  private final List<Command> m_commands = new ArrayList<>();
+  //maps commands in this group to whether they are still running
+  private final Set<Command> m_commands = new HashSet<>();
   private final Set<Subsystem> m_requirements = new HashSet<>();
-  private int m_currentCommandIndex;
   private boolean m_runWhenDisabled = true;
+  private boolean m_finished;
 
   /**
-   * Creates a new SequentialCommandGroup.  The given commands will be run sequentially, with
-   * the commandgroup finishing when the last command finishes.
+   * Creates a new ParallelCommandRace.  The given commands will be executed simultaneous, and will
+   * "race to the finish" - the first command to finish ends the entire command, with all other
+   * commands being interrupted.
    *
    * @param commands the commands to include in this group.
    */
-  public SequentialCommandGroup(Command... commands) {
+  public ParallelCommandRace(Command... commands) {
     addCommands(commands);
   }
 
   @Override
   public void addCommands(Command... commands) {
     if (!Collections.disjoint(Set.of(commands), getGroupedCommands())) {
-      throw new IllegalUseOfCommandException(
-          "Commands cannot be added to more than one CommandGroup");
+      throw new IllegalUseOfCommandException("Commands cannot be added to multiple CommandGroups");
     }
 
     registerGroupedCommands(commands);
@@ -43,46 +42,38 @@ public class SequentialCommandGroup extends CommandGroupBase implements Command 
 
   @Override
   public void initialize() {
-    m_currentCommandIndex = 0;
-
-    if (!m_commands.isEmpty()) {
-      m_commands.get(0).initialize();
+    for (Command command : m_commands) {
+      command.initialize();
     }
   }
 
   @Override
   public void execute() {
-
-    if (m_commands.isEmpty()) {
-      return;
-    }
-
-    Command currentCommand = m_commands.get(m_currentCommandIndex);
-
-    currentCommand.execute();
-    if (currentCommand.isFinished()) {
-      currentCommand.end();
-      m_currentCommandIndex++;
-      if (m_currentCommandIndex < m_commands.size()) {
-        m_commands.get(m_currentCommandIndex).initialize();
-      }
+    for (Command command : m_commands) {
+      command.execute();
+      m_finished |= command.isFinished();
     }
   }
 
   @Override
   public void interrupted() {
-    if (!m_commands.isEmpty()) {
-      m_commands.get(m_currentCommandIndex).interrupted();
+    for (Command command : m_commands) {
+      command.interrupted();
     }
   }
 
   @Override
   public void end() {
+    for (Command command : m_commands) {
+      if (!command.isFinished()) {
+        command.interrupted();
+      }
+    }
   }
 
   @Override
   public boolean isFinished() {
-    return m_currentCommandIndex == m_commands.size();
+    return m_finished;
   }
 
   @Override

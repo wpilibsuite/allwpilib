@@ -12,7 +12,7 @@ public interface Subsystem extends Sendable {
   }
 
   default Command getCurrentCommand() {
-    return CommandScheduler.getInstance().currentlyRequiring(this);
+    return CommandScheduler.getInstance().requiring(this);
   }
 
   @Override
