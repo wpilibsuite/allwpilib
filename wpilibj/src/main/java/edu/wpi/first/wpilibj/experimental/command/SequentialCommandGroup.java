@@ -13,7 +13,6 @@ public class SequentialCommandGroup extends CommandGroupBase implements Command 
   private final List<Command> m_commands = new ArrayList<>();
   private final Set<Subsystem> m_requirements = new HashSet<>();
   private int m_currentCommandIndex;
-  @SuppressWarnings("PMD.ImmutableField")
   private boolean m_runWhenDisabled = true;
 
   /**
@@ -23,6 +22,11 @@ public class SequentialCommandGroup extends CommandGroupBase implements Command 
    * @param commands the commands to include in this group.
    */
   public SequentialCommandGroup(Command... commands) {
+    addCommands(commands);
+  }
+
+  @Override
+  public void addCommands(Command... commands) {
     if (!Collections.disjoint(Set.of(commands), getGroupedCommands())) {
       throw new IllegalUseOfCommandException(
           "Commands cannot be added to more than one CommandGroup");
