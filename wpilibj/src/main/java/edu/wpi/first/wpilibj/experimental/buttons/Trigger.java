@@ -68,6 +68,10 @@ public abstract class Trigger extends SendableBase {
     }.start();
   }
 
+  public void whenActive(final Command command) {
+    whenActive(command, true);
+  }
+
   /**
    * Constantly starts the given command while the button is held.
    *
@@ -95,6 +99,10 @@ public abstract class Trigger extends SendableBase {
     }.start();
   }
 
+  public void whileActive(final Command command) {
+    whileActive(command, true);
+  }
+
   /**
    * Starts the command when the trigger becomes inactive.
    *
@@ -115,6 +123,10 @@ public abstract class Trigger extends SendableBase {
         m_pressedLast = pressed;
       }
     }.start();
+  }
+
+  public void whenInactive(final Command command) {
+    whenInactive(command, true);
   }
 
   /**
@@ -141,6 +153,10 @@ public abstract class Trigger extends SendableBase {
         m_pressedLast = pressed;
       }
     }.start();
+  }
+
+  public void toggleWhenActive(final Command command) {
+    toggleWhenActive(command, true);
   }
 
   /**

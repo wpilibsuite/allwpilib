@@ -30,6 +30,10 @@ public interface Command extends Sendable {
     CommandScheduler.getInstance().scheduleCommand(this, interruptible);
   }
 
+  default void start() {
+    start(true);
+  }
+
   default void cancel() {
     CommandScheduler.getInstance().cancelCommand(this);
   }
