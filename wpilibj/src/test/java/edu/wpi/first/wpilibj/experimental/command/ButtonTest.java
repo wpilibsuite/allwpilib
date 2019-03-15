@@ -21,11 +21,11 @@ public class ButtonTest extends CommandTestBase {
     button.setPressed(false);
     button.whenPressed(command1);
     scheduler.run();
-    verify(command1, never()).start(true);
+    verify(command1, never()).schedule(true);
     button.setPressed(true);
     scheduler.run();
     scheduler.run();
-    verify(command1).start(true);
+    verify(command1).schedule(true);
   }
 
   @Test
@@ -38,11 +38,11 @@ public class ButtonTest extends CommandTestBase {
     button.setPressed(true);
     button.whenReleased(command1);
     scheduler.run();
-    verify(command1, never()).start(true);
+    verify(command1, never()).schedule(true);
     button.setPressed(false);
     scheduler.run();
     scheduler.run();
-    verify(command1).start(true);
+    verify(command1).schedule(true);
   }
 
   @Test
@@ -55,11 +55,11 @@ public class ButtonTest extends CommandTestBase {
     button.setPressed(false);
     button.whileHeld(command1);
     scheduler.run();
-    verify(command1, never()).start(true);
+    verify(command1, never()).schedule(true);
     button.setPressed(true);
     scheduler.run();
     scheduler.run();
-    verify(command1, times(2)).start(true);
+    verify(command1, times(2)).schedule(true);
     button.setPressed(false);
     scheduler.run();
     verify(command1).cancel();
@@ -75,12 +75,12 @@ public class ButtonTest extends CommandTestBase {
     button.setPressed(false);
     button.toggleWhenPressed(command1);
     scheduler.run();
-    verify(command1, never()).start(true);
+    verify(command1, never()).schedule(true);
     button.setPressed(true);
     scheduler.run();
-    when(command1.isRunning()).thenReturn(true);
+    when(command1.isScheduled()).thenReturn(true);
     scheduler.run();
-    verify(command1).start(true);
+    verify(command1).schedule(true);
     button.setPressed(false);
     scheduler.run();
     verify(command1, never()).cancel();
