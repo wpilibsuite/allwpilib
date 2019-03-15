@@ -18,6 +18,8 @@ public abstract class CommandTestBase {
   void commandSetup() {
     CommandScheduler.getInstance().cancelAll();
     CommandScheduler.getInstance().enable();
+    CommandScheduler.getInstance().clearButtons();
+    CommandGroupBase.clearGroupedCommands();
   }
 
   public class ASubsystem implements Subsystem {

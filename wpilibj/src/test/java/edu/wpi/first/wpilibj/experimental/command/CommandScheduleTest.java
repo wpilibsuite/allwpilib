@@ -55,7 +55,7 @@ class CommandScheduleTest extends CommandTestBase {
   }
 
   @Test
-  void cancelTest() {
+  void schedulerCancelTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
     MockCommandHolder holder = new MockCommandHolder(true, new Subsystem[0]);

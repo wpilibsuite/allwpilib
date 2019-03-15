@@ -30,6 +30,10 @@ public abstract class Button extends Trigger {
     whenActive(command, interruptible);
   }
 
+  public void whenPressed(final Command command) {
+    whenActive(command);
+  }
+
   /**
    * Constantly starts the given command while the button is held.
    *
@@ -42,6 +46,10 @@ public abstract class Button extends Trigger {
     whileActive(command, interruptible);
   }
 
+  public void whileHeld(final Command command) {
+    whileActive(command);
+  }
+
 
   /**
    * Starts the command when the button is released.
@@ -52,6 +60,10 @@ public abstract class Button extends Trigger {
     whenInactive(command, interruptible);
   }
 
+  public void whenReleased(final Command command) {
+    whenInactive(command);
+  }
+
   /**
    * Toggles the command whenever the button is pressed (on then off then on).
    *
@@ -59,6 +71,10 @@ public abstract class Button extends Trigger {
    */
   public void toggleWhenPressed(final Command command, boolean interruptible) {
     toggleWhenActive(command, interruptible);
+  }
+
+  public void toggleWhenPressed(final Command command) {
+    toggleWhenActive(command);
   }
 
   /**
