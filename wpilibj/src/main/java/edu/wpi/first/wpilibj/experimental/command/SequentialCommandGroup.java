@@ -1,11 +1,9 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
@@ -13,7 +11,8 @@ import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 public class SequentialCommandGroup extends CommandGroupBase implements Command {
 
   private final List<Command> m_commands = new ArrayList<>();
-  private Queue<Command> m_commandQueue;
+  private final Set<Subsystem> m_requirements = new HashSet<>();
+  private int m_currentCommandIndex;
 
   /**
    * Creates a new SequentialCommandGroup.  The given commands will be run sequentially, with
@@ -30,36 +29,44 @@ public class SequentialCommandGroup extends CommandGroupBase implements Command 
     registerGroupedCommands(commands);
 
     m_commands.addAll(List.of(commands));
+
+    for (Command command : m_commands) {
+      m_requirements.addAll(command.getRequirements());
+    }
   }
 
   @Override
   public void initialize() {
-    m_commandQueue = new ArrayDeque<>(m_commands);
-    if (!m_commandQueue.isEmpty()) {
-      m_commandQueue.peek().initialize();
+    m_currentCommandIndex = 0;
+
+    if (!m_commands.isEmpty()) {
+      m_commands.get(0).initialize();
     }
   }
 
   @Override
   public void execute() {
 
-    if (m_commandQueue.isEmpty()) {
+    if (m_commands.isEmpty()) {
       return;
     }
 
-    m_commandQueue.peek().execute();
-    if (m_commandQueue.peek().isFinished()) {
-      m_commandQueue.remove().end();
-      if (!m_commandQueue.isEmpty()) {
-        m_commandQueue.peek().initialize();
+    Command currentCommand = m_commands.get(m_currentCommandIndex);
+
+    currentCommand.execute();
+    if (currentCommand.isFinished()) {
+      currentCommand.end();
+      m_currentCommandIndex++;
+      if (m_currentCommandIndex < m_commands.size()) {
+        m_commands.get(m_currentCommandIndex).initialize();
       }
     }
   }
 
   @Override
   public void interrupted() {
-    if (!m_commandQueue.isEmpty()) {
-      m_commandQueue.peek().interrupted();
+    if (!m_commands.isEmpty()) {
+      m_commands.get(m_currentCommandIndex).interrupted();
     }
   }
 
@@ -69,16 +76,12 @@ public class SequentialCommandGroup extends CommandGroupBase implements Command 
 
   @Override
   public boolean isFinished() {
-    return m_commandQueue.isEmpty();
+    return m_currentCommandIndex == m_commands.size();
   }
 
   @Override
   public Set<Subsystem> getRequirements() {
-    Set<Subsystem> requirements = new HashSet<>();
-    for (Command command : m_commands) {
-      requirements.addAll(command.getRequirements());
-    }
-    return requirements;
+    return m_requirements;
   }
 
   @Override

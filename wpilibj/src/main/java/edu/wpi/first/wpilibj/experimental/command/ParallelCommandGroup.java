@@ -12,6 +12,7 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
 
   //maps commands in this group to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
+  private final Set<Subsystem> m_requirements = new HashSet<>();
 
   /**
    * Creates a new ParallelCommandGroup.  The given commands will be executed simultaneously.
@@ -29,6 +30,7 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
 
     for (Command command : commands) {
       m_commands.put(command, true);
+      m_requirements.addAll(command.getRequirements());
     }
   }
 
@@ -74,11 +76,7 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
 
   @Override
   public Set<Subsystem> getRequirements() {
-    Set<Subsystem> requirements = new HashSet<>();
-    for (Command command : m_commands.keySet()) {
-      requirements.addAll(command.getRequirements());
-    }
-    return requirements;
+    return m_requirements;
   }
 
   @Override
