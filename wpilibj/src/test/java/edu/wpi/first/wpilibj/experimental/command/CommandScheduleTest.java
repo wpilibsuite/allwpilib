@@ -2,7 +2,9 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,7 +15,7 @@ class CommandScheduleTest extends CommandTestBase {
   @Test
   void instantScheduleTest() {
     CommandScheduler scheduler = new CommandScheduler();
-    
+
     MockCommandHolder holder = new MockCommandHolder(true, new Subsystem[0]);
     holder.setFinished(true);
     Command mockCommand = holder.getMock();
@@ -33,7 +35,7 @@ class CommandScheduleTest extends CommandTestBase {
   @Test
   void singleIterationScheduleTest() {
     CommandScheduler scheduler = new CommandScheduler();
-    
+
     MockCommandHolder holder = new MockCommandHolder(true, new Subsystem[0]);
     Command mockCommand = holder.getMock();
 
