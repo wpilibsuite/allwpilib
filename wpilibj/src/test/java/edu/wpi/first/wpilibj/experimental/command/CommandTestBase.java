@@ -46,7 +46,7 @@ public abstract class CommandTestBase {
     MockCommandHolder(boolean runWhenDisabled, Subsystem... requirements) {
       when(m_mockCommand.getRequirements()).thenReturn(Set.of(requirements));
       when(m_mockCommand.isFinished()).thenReturn(false);
-      when(m_mockCommand.getRunWhenDisabled()).thenReturn(runWhenDisabled);
+      when(m_mockCommand.runsWhenDisabled()).thenReturn(runWhenDisabled);
     }
 
     Command getMock() {

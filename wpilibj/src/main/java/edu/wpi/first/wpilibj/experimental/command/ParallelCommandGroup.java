@@ -37,7 +37,7 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
     for (Command command : commands) {
       m_commands.put(command, true);
       m_requirements.addAll(command.getRequirements());
-      m_runWhenDisabled &= command.getRunWhenDisabled();
+      m_runWhenDisabled &= command.runsWhenDisabled();
     }
   }
 
@@ -87,7 +87,7 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
   }
 
   @Override
-  public boolean getRunWhenDisabled() {
+  public boolean runsWhenDisabled() {
     return m_runWhenDisabled;
   }
 }

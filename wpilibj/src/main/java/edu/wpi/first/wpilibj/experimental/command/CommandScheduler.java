@@ -103,7 +103,7 @@ public final class CommandScheduler extends SendableBase {
     }
 
     if (m_disabled
-        || (RobotState.isDisabled() && !command.getRunWhenDisabled())
+        || (RobotState.isDisabled() && !command.runsWhenDisabled())
         || m_scheduledCommands.containsKey(command)) {
       return;
     }
@@ -175,7 +175,7 @@ public final class CommandScheduler extends SendableBase {
 
     for (Command command : m_scheduledCommands.keySet()) {
 
-      if (RobotState.isDisabled() && !command.getRunWhenDisabled()) {
+      if (RobotState.isDisabled() && !command.runsWhenDisabled()) {
         cancelCommand(command);
         continue;
       }
@@ -263,7 +263,7 @@ public final class CommandScheduler extends SendableBase {
     return m_scheduledCommands.containsKey(command);
   }
 
-  public Command currentlyRequiring(Subsystem subsystem) {
+  public Command requiring(Subsystem subsystem) {
     return m_requirements.get(subsystem);
   }
 
