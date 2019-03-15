@@ -1,8 +1,5 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-
-import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+
+import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
 public class SequentialCommandGroup extends CommandGroupBase implements Command {
 
@@ -86,7 +85,7 @@ public class SequentialCommandGroup extends CommandGroupBase implements Command 
   @Override
   public boolean getRunWhenDisabled() {
     boolean allRunWhenDisabled = true;
-    for(Command command : m_commands) {
+    for (Command command : m_commands) {
       allRunWhenDisabled &= command.getRunWhenDisabled();
     }
     return allRunWhenDisabled;

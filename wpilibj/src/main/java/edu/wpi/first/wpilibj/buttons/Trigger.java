@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.buttons;
 
 import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
@@ -50,7 +51,7 @@ public abstract class Trigger extends SendableBase {
    *
    * @param command the command to start
    */
-  public void whenActive(final edu.wpi.first.wpilibj.command.Command command) {
+  public void whenActive(final Command command) {
     new ButtonScheduler() {
       private boolean m_pressedLast = grab();
 
@@ -70,12 +71,12 @@ public abstract class Trigger extends SendableBase {
   /**
    * Constantly starts the given command while the button is held.
    *
-   * {@link edu.wpi.first.wpilibj.command.Command#start()} will be called repeatedly while the trigger is active, and will be
+   * {@link Command#start()} will be called repeatedly while the trigger is active, and will be
    * canceled when the trigger becomes inactive.
    *
    * @param command the command to start
    */
-  public void whileActive(final edu.wpi.first.wpilibj.command.Command command) {
+  public void whileActive(final Command command) {
     new ButtonScheduler() {
       private boolean m_pressedLast = grab();
 
@@ -99,7 +100,7 @@ public abstract class Trigger extends SendableBase {
    *
    * @param command the command to start
    */
-  public void whenInactive(final edu.wpi.first.wpilibj.command.Command command) {
+  public void whenInactive(final Command command) {
     new ButtonScheduler() {
       private boolean m_pressedLast = grab();
 
@@ -121,7 +122,7 @@ public abstract class Trigger extends SendableBase {
    *
    * @param command the command to toggle
    */
-  public void toggleWhenActive(final edu.wpi.first.wpilibj.command.Command command) {
+  public void toggleWhenActive(final Command command) {
     new ButtonScheduler() {
       private boolean m_pressedLast = grab();
 
@@ -147,7 +148,7 @@ public abstract class Trigger extends SendableBase {
    *
    * @param command the command to cancel
    */
-  public void cancelWhenActive(final edu.wpi.first.wpilibj.command.Command command) {
+  public void cancelWhenActive(final Command command) {
     new ButtonScheduler() {
       private boolean m_pressedLast = grab();
 
