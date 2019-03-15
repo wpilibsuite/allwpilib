@@ -5,7 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.buttons;
+package edu.wpi.first.wpilibj.experimental.buttons;
+
+import edu.wpi.first.wpilibj.experimental.command.Command;
 
 /**
  * This class provides an easy way to link commands to OI inputs.
@@ -18,34 +20,36 @@ package edu.wpi.first.wpilibj.buttons;
  * wrapper around Trigger with the method names renamed to fit the Button object use.
  */
 public abstract class Button extends Trigger {
+
   /**
    * Starts the given command whenever the button is newly pressed.
    *
    * @param command the command to start
    */
-  public void whenPressed(final edu.wpi.first.wpilibj.command.Command command) {
-    whenActive(command);
+  public void whenPressed(final Command command, boolean interruptible) {
+    whenActive(command, interruptible);
   }
 
   /**
    * Constantly starts the given command while the button is held.
    *
-   * {@link edu.wpi.first.wpilibj.command.Command#start()} will be called repeatedly while the button is held, and will be
+   * {@link Command#start(boolean)} will be called repeatedly while the button is held, and will be
    * canceled when the button is released.
    *
    * @param command the command to start
    */
-  public void whileHeld(final edu.wpi.first.wpilibj.command.Command command) {
-    whileActive(command);
+  public void whileHeld(final Command command, boolean interruptible) {
+    whileActive(command, interruptible);
   }
+
 
   /**
    * Starts the command when the button is released.
    *
    * @param command the command to start
    */
-  public void whenReleased(final edu.wpi.first.wpilibj.command.Command command) {
-    whenInactive(command);
+  public void whenReleased(final Command command, boolean interruptible) {
+    whenInactive(command, interruptible);
   }
 
   /**
@@ -53,8 +57,8 @@ public abstract class Button extends Trigger {
    *
    * @param command the command to start
    */
-  public void toggleWhenPressed(final edu.wpi.first.wpilibj.command.Command command) {
-    toggleWhenActive(command);
+  public void toggleWhenPressed(final Command command, boolean interruptible) {
+    toggleWhenActive(command, interruptible);
   }
 
   /**
@@ -62,7 +66,7 @@ public abstract class Button extends Trigger {
    *
    * @param command the command to start
    */
-  public void cancelWhenPressed(final edu.wpi.first.wpilibj.command.Command command) {
+  public void cancelWhenPressed(final Command command) {
     cancelWhenActive(command);
   }
 }

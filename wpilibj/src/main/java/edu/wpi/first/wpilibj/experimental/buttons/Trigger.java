@@ -5,10 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.buttons;
+package edu.wpi.first.wpilibj.experimental.buttons;
 
 import edu.wpi.first.wpilibj.SendableBase;
-import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.experimental.command.Command;
+import edu.wpi.first.wpilibj.experimental.command.CommandScheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -50,7 +51,7 @@ public abstract class Trigger extends SendableBase {
    *
    * @param command the command to start
    */
-  public void whenActive(final edu.wpi.first.wpilibj.command.Command command) {
+  public void whenActive(final Command command, boolean interruptible) {
     new ButtonScheduler() {
       private boolean m_pressedLast = grab();
 
@@ -59,7 +60,7 @@ public abstract class Trigger extends SendableBase {
         boolean pressed = grab();
 
         if (!m_pressedLast && pressed) {
-          command.start();
+          command.start(interruptible);
         }
 
         m_pressedLast = pressed;
@@ -70,12 +71,12 @@ public abstract class Trigger extends SendableBase {
   /**
    * Constantly starts the given command while the button is held.
    *
-   * {@link edu.wpi.first.wpilibj.command.Command#start()} will be called repeatedly while the trigger is active, and will be
+   * {@link Command#start(boolean)} will be called repeatedly while the trigger is active, and will be
    * canceled when the trigger becomes inactive.
    *
    * @param command the command to start
    */
-  public void whileActive(final edu.wpi.first.wpilibj.command.Command command) {
+  public void whileActive(final Command command, boolean interruptible) {
     new ButtonScheduler() {
       private boolean m_pressedLast = grab();
 
@@ -84,7 +85,7 @@ public abstract class Trigger extends SendableBase {
         boolean pressed = grab();
 
         if (pressed) {
-          command.start();
+          command.start(interruptible);
         } else if (m_pressedLast && !pressed) {
           command.cancel();
         }
@@ -99,7 +100,7 @@ public abstract class Trigger extends SendableBase {
    *
    * @param command the command to start
    */
-  public void whenInactive(final edu.wpi.first.wpilibj.command.Command command) {
+  public void whenInactive(final Command command, boolean interruptible) {
     new ButtonScheduler() {
       private boolean m_pressedLast = grab();
 
@@ -108,7 +109,7 @@ public abstract class Trigger extends SendableBase {
         boolean pressed = grab();
 
         if (m_pressedLast && !pressed) {
-          command.start();
+          command.start(interruptible);
         }
 
         m_pressedLast = pressed;
@@ -121,7 +122,7 @@ public abstract class Trigger extends SendableBase {
    *
    * @param command the command to toggle
    */
-  public void toggleWhenActive(final edu.wpi.first.wpilibj.command.Command command) {
+  public void toggleWhenActive(final Command command, boolean interruptible) {
     new ButtonScheduler() {
       private boolean m_pressedLast = grab();
 
@@ -133,7 +134,7 @@ public abstract class Trigger extends SendableBase {
           if (command.isRunning()) {
             command.cancel();
           } else {
-            command.start();
+            command.start(interruptible);
           }
         }
 
@@ -147,7 +148,7 @@ public abstract class Trigger extends SendableBase {
    *
    * @param command the command to cancel
    */
-  public void cancelWhenActive(final edu.wpi.first.wpilibj.command.Command command) {
+  public void cancelWhenActive(final Command command) {
     new ButtonScheduler() {
       private boolean m_pressedLast = grab();
 
@@ -172,7 +173,7 @@ public abstract class Trigger extends SendableBase {
     public abstract void execute();
 
     public void start() {
-      Scheduler.getInstance().addButton(this);
+      CommandScheduler.getInstance().addButton(this);
     }
   }
 
