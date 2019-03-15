@@ -13,7 +13,6 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
   //maps commands in this group to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
   private final Set<Subsystem> m_requirements = new HashSet<>();
-  @SuppressWarnings("PMD.ImmutableField")
   private boolean m_runWhenDisabled = true;
 
   /**
@@ -24,6 +23,11 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
    * @param commands the commands to include in this group.
    */
   public ParallelCommandGroup(Command... commands) {
+    addCommands(commands);
+  }
+
+  @Override
+  public void addCommands(Command... commands) {
     if (!Collections.disjoint(Set.of(commands), getGroupedCommands())) {
       throw new IllegalUseOfCommandException("Commands cannot be added to multiple CommandGroups");
     }

@@ -16,5 +16,7 @@ abstract class CommandGroupBase {
   static Set<Command> getGroupedCommands() {
     return m_groupedCommands;
   }
+
+  public abstract void addCommands(Command... commands);
 }
 
