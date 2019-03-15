@@ -14,8 +14,8 @@ public class ParallelCommandRace extends CommandGroupBase implements Command {
   private boolean m_finished;
 
   /**
-   * Creates a new ParallelCommandRace.  The given commands will be executed simultaneous, and will
-   * "race to the finish" - the first command to finish ends the entire command, with all other
+   * Creates a new ParallelCommandRace.  The given commands will be executed simultaneously, and
+   * will "race to the finish" - the first command to finish ends the entire command, with all other
    * commands being interrupted.
    *
    * @param commands the commands to include in this group.
@@ -50,7 +50,10 @@ public class ParallelCommandRace extends CommandGroupBase implements Command {
   public void execute() {
     for (Command command : m_commands) {
       command.execute();
-      m_finished |= command.isFinished();
+      if (command.isFinished()) {
+        m_finished = true;
+        command.end();
+      }
     }
   }
 

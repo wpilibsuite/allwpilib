@@ -54,12 +54,10 @@ public final class CommandScheduler extends SendableBase {
 
   private boolean m_disabled;
 
-  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
   private NetworkTableEntry m_namesEntry;
   private NetworkTableEntry m_idsEntry;
   private NetworkTableEntry m_cancelEntry;
 
-  @SuppressWarnings("PMD.LooseCoupling")
   private final Collection<ButtonScheduler> m_buttons = new LinkedHashSet<>();
 
   private final List<Consumer<Command>> m_initActions = new ArrayList<>();
