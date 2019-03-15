@@ -1,22 +1,22 @@
-package edu.wpi.first.wpilibj.command;
+package edu.wpi.first.wpilibj.experimental.command;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class ParallelCommandGroupTest extends ICommandTestBase {
+public class ParallelCommandGroupTest extends CommandTestBase {
 
   @Test
   void parallelGroupScheduleTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
     
     MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand command1 = command1Holder.getMock();
+    Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand command2 = command2Holder.getMock();
+    Command command2 = command2Holder.getMock();
 
-    ICommand group = new ParallelCommandGroup(command1, command2);
+    Command group = new ParallelCommandGroup(command1, command2);
 
     scheduler.scheduleCommand(group, true);
 
@@ -38,13 +38,13 @@ public class ParallelCommandGroupTest extends ICommandTestBase {
 
   @Test
   void parallelGroupInterruptTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
     MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand command1 = command1Holder.getMock();
+    Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand command2 = command2Holder.getMock();
+    Command command2 = command2Holder.getMock();
 
-    ICommand group = new ParallelCommandGroup(command1, command2);
+    Command group = new ParallelCommandGroup(command1, command2);
 
     scheduler.scheduleCommand(group, true);
 
@@ -66,14 +66,14 @@ public class ParallelCommandGroupTest extends ICommandTestBase {
 
   @Test
   void notScheduledCancelTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
 
     MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand command1 = command1Holder.getMock();
+    Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand command2 = command2Holder.getMock();
+    Command command2 = command2Holder.getMock();
 
-    ICommand group = new ParallelCommandGroup(command1, command2);
+    Command group = new ParallelCommandGroup(command1, command2);
 
     scheduler.cancelCommand(group);
   }

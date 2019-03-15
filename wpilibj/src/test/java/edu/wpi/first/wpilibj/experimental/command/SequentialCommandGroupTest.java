@@ -1,21 +1,21 @@
-package edu.wpi.first.wpilibj.command;
+package edu.wpi.first.wpilibj.experimental.command;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class SequentialCommandGroupTest extends ICommandTestBase {
+public class SequentialCommandGroupTest extends CommandTestBase {
   @Test
   void sequentialGroupScheduleTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
 
     MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand command1 = command1Holder.getMock();
+    Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand command2 = command2Holder.getMock();
+    Command command2 = command2Holder.getMock();
 
-    ICommand group = new SequentialCommandGroup(command1, command2);
+    Command group = new SequentialCommandGroup(command1, command2);
 
     scheduler.scheduleCommand(group, true);
 
@@ -44,16 +44,16 @@ public class SequentialCommandGroupTest extends ICommandTestBase {
 
   @Test
   void sequentialGroupInterruptTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
 
     MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand command1 = command1Holder.getMock();
+    Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand command2 = command2Holder.getMock();
+    Command command2 = command2Holder.getMock();
     MockCommandHolder command3Holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand command3 = command3Holder.getMock();
+    Command command3 = command3Holder.getMock();
 
-    ICommand group = new SequentialCommandGroup(command1, command2, command3);
+    Command group = new SequentialCommandGroup(command1, command2, command3);
 
     scheduler.scheduleCommand(group, true);
 
@@ -78,14 +78,14 @@ public class SequentialCommandGroupTest extends ICommandTestBase {
 
   @Test
   void notScheduledCancelTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
 
     MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand command1 = command1Holder.getMock();
+    Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand command2 = command2Holder.getMock();
+    Command command2 = command2Holder.getMock();
 
-    ICommand group = new SequentialCommandGroup(command1, command2);
+    Command group = new SequentialCommandGroup(command1, command2);
 
     scheduler.cancelCommand(group);
   }

@@ -1,5 +1,7 @@
-package edu.wpi.first.wpilibj.command;
+package edu.wpi.first.wpilibj.experimental.command;
 
+
+import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -10,10 +12,10 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-public class SequentialCommandGroup extends CommandGroupBase implements ICommand {
+public class SequentialCommandGroup extends CommandGroupBase implements Command {
 
-  private final List<ICommand> m_commands = new ArrayList<>();
-  private Queue<ICommand> m_commandQueue;
+  private final List<Command> m_commands = new ArrayList<>();
+  private Queue<Command> m_commandQueue;
 
   /**
    * Creates a new SequentialCommandGroup.  The given commands will be run sequentially, with
@@ -21,7 +23,7 @@ public class SequentialCommandGroup extends CommandGroupBase implements ICommand
    *
    * @param commands the commands to include in this group.
    */
-  public SequentialCommandGroup(ICommand... commands) {
+  public SequentialCommandGroup(Command... commands) {
     if (!Collections.disjoint(Set.of(commands), getGroupedCommands())) {
       throw new IllegalUseOfCommandException(
           "Commands cannot be added to more than one CommandGroup");
@@ -75,7 +77,7 @@ public class SequentialCommandGroup extends CommandGroupBase implements ICommand
   @Override
   public Collection<Subsystem> getRequirements() {
     Collection<Subsystem> requirements = new HashSet<>();
-    for (ICommand command : m_commands) {
+    for (Command command : m_commands) {
       requirements.addAll(command.getRequirements());
     }
     return requirements;
@@ -84,7 +86,7 @@ public class SequentialCommandGroup extends CommandGroupBase implements ICommand
   @Override
   public boolean getRunWhenDisabled() {
     boolean allRunWhenDisabled = true;
-    for(ICommand command : m_commands) {
+    for(Command command : m_commands) {
       allRunWhenDisabled &= command.getRunWhenDisabled();
     }
     return allRunWhenDisabled;

@@ -1,4 +1,4 @@
-package edu.wpi.first.wpilibj.command;
+package edu.wpi.first.wpilibj.experimental.command;
 
 import java.util.Set;
 
@@ -9,32 +9,36 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Basic setup for all {@link ICommand tests}.
+ * Basic setup for all {@link Command tests}.
  */
-public abstract class ICommandTestBase {
+public abstract class CommandTestBase {
 
   @BeforeEach
   void commandSetup() {
-    SchedulerNew.getInstance().cancelAll();
-    Scheduler.getInstance().enable();
+    CommandScheduler.getInstance().cancelAll();
+    CommandScheduler.getInstance().enable();
   }
 
-  public class ASubsystem extends Subsystem {
-    ICommand m_command;
+  public class ASubsystem implements Subsystem {
+    private Command m_defaultCommand;
 
     @Override
-    protected void initDefaultCommand() {
+    public void periodic() {
     }
 
-    public void init(ICommand command) {
-      m_command = command;
-      setDefaultICommand(m_command);
+    @Override
+    public Command getDefaultCommand() {
+      return m_defaultCommand;
+    }
+
+    void init(Command defaultCommand) {
+      m_defaultCommand = defaultCommand;
     }
   }
 
   protected class MockCommandHolder {
 
-    private ICommand m_mockCommand = mock(ICommand.class);
+    private Command m_mockCommand = mock(Command.class);
 
     MockCommandHolder(boolean runWhenDisabled, Subsystem... requirements) {
       when(m_mockCommand.getRequirements()).thenReturn(Set.of(requirements));
@@ -42,7 +46,7 @@ public abstract class ICommandTestBase {
       when(m_mockCommand.getRunWhenDisabled()).thenReturn(runWhenDisabled);
     }
 
-    ICommand getMock() {
+    Command getMock() {
       return m_mockCommand;
     }
 
