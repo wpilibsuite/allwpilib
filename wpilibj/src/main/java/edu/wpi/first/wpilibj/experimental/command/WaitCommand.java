@@ -35,4 +35,9 @@ public class WaitCommand implements Command {
   public boolean isFinished() {
     return m_timer.hasPeriodPassed(m_duration);
   }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
 }
