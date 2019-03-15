@@ -34,31 +34,31 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
 
   @Override
   public void initialize() {
-    for (Command command : m_commands.keySet()) {
-      command.initialize();
-      m_commands.replace(command, true);
+    for (Map.Entry<Command, Boolean> entry : m_commands.entrySet()) {
+      entry.getKey().initialize();
+      entry.setValue(true);
     }
   }
 
   @Override
   public void execute() {
-    for (Command command : m_commands.keySet()) {
-      if (!m_commands.get(command)) {
+    for (Map.Entry<Command, Boolean> entry : m_commands.entrySet()) {
+      if (!entry.getValue()) {
         continue;
       }
-      command.execute();
-      if (command.isFinished()) {
-        command.end();
-        m_commands.replace(command, false);
+      entry.getKey().execute();
+      if (entry.getKey().isFinished()) {
+        entry.getKey().end();
+        entry.setValue(false);
       }
     }
   }
 
   @Override
   public void interrupted() {
-    for (Command command : m_commands.keySet()) {
-      if (m_commands.get(command)) {
-        command.interrupted();
+    for (Map.Entry<Command, Boolean> entry : m_commands.entrySet()) {
+      if (entry.getValue()) {
+        entry.getKey().interrupted();
       }
     }
   }
