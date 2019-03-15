@@ -31,19 +31,19 @@ public interface Command extends Sendable {
     return new ParallelCommandRace(this, new WaitCommand(seconds));
   }
 
-  default void start(boolean interruptible) {
+  default void schedule(boolean interruptible) {
     CommandScheduler.getInstance().scheduleCommand(this, interruptible);
   }
 
-  default void start() {
-    start(true);
+  default void schedule() {
+    schedule(true);
   }
 
   default void cancel() {
     CommandScheduler.getInstance().cancelCommand(this);
   }
 
-  default boolean isRunning() {
+  default boolean isScheduled() {
     return CommandScheduler.getInstance().isScheduled(this);
   }
 
@@ -86,13 +86,13 @@ public interface Command extends Sendable {
   default void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Command");
     builder.addStringProperty(".name", this::getName, null);
-    builder.addBooleanProperty("running", this::isRunning, value -> {
+    builder.addBooleanProperty("running", this::isScheduled, value -> {
       if (value) {
-        if (!isRunning()) {
-          start(true);
+        if (!isScheduled()) {
+          schedule(true);
         }
       } else {
-        if (isRunning()) {
+        if (isScheduled()) {
           cancel();
         }
       }

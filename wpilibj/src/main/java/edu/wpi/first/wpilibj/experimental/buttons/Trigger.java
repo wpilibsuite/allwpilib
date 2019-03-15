@@ -60,7 +60,7 @@ public abstract class Trigger extends SendableBase {
         boolean pressed = grab();
 
         if (!m_pressedLast && pressed) {
-          command.start(interruptible);
+          command.schedule(interruptible);
         }
 
         m_pressedLast = pressed;
@@ -75,8 +75,8 @@ public abstract class Trigger extends SendableBase {
   /**
    * Constantly starts the given command while the button is held.
    *
-   * {@link Command#start(boolean)} will be called repeatedly while the trigger is active, and will
-   * be canceled when the trigger becomes inactive.
+   * {@link Command#schedule(boolean)} will be called repeatedly while the trigger is active, and
+   * will be canceled when the trigger becomes inactive.
    *
    * @param command the command to start
    */
@@ -89,7 +89,7 @@ public abstract class Trigger extends SendableBase {
         boolean pressed = grab();
 
         if (pressed) {
-          command.start(interruptible);
+          command.schedule(interruptible);
         } else if (m_pressedLast && !pressed) {
           command.cancel();
         }
@@ -117,7 +117,7 @@ public abstract class Trigger extends SendableBase {
         boolean pressed = grab();
 
         if (m_pressedLast && !pressed) {
-          command.start(interruptible);
+          command.schedule(interruptible);
         }
 
         m_pressedLast = pressed;
@@ -143,10 +143,10 @@ public abstract class Trigger extends SendableBase {
         boolean pressed = grab();
 
         if (!m_pressedLast && pressed) {
-          if (command.isRunning()) {
+          if (command.isScheduled()) {
             command.cancel();
           } else {
-            command.start(interruptible);
+            command.schedule(interruptible);
           }
         }
 
