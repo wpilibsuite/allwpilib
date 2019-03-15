@@ -1,8 +1,9 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
+import org.junit.jupiter.api.Test;
+
 import edu.wpi.first.hal.sim.DriverStationSim;
 import edu.wpi.first.wpilibj.DriverStation;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,8 +29,8 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     while (DriverStation.getInstance().isEnabled()) {
       try {
         Thread.sleep(1);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+      } catch (InterruptedException exception) {
+        exception.printStackTrace();
       }
     }
 
@@ -43,8 +44,8 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     while (!DriverStation.getInstance().isEnabled()) {
       try {
         Thread.sleep(1);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+      } catch (InterruptedException exception) {
+        exception.printStackTrace();
       }
     }
   }
@@ -69,8 +70,8 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     while (DriverStation.getInstance().isEnabled()) {
       try {
         Thread.sleep(1);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+      } catch (InterruptedException exception) {
+        exception.printStackTrace();
       }
     }
 
@@ -84,8 +85,8 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     while (!DriverStation.getInstance().isEnabled()) {
       try {
         Thread.sleep(1);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+      } catch (InterruptedException exception) {
+        exception.printStackTrace();
       }
     }
   }
@@ -118,8 +119,8 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     while (DriverStation.getInstance().isEnabled()) {
       try {
         Thread.sleep(1);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+      } catch (InterruptedException exception) {
+        exception.printStackTrace();
       }
     }
 
@@ -134,8 +135,8 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     while (!DriverStation.getInstance().isEnabled()) {
       try {
         Thread.sleep(1);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+      } catch (InterruptedException exception) {
+        exception.printStackTrace();
       }
     }
   }
@@ -168,8 +169,8 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     while (DriverStation.getInstance().isEnabled()) {
       try {
         Thread.sleep(1);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+      } catch (InterruptedException exception) {
+        exception.printStackTrace();
       }
     }
 
@@ -184,8 +185,8 @@ public class RobotDisabledCommandTest extends CommandTestBase {
     while (!DriverStation.getInstance().isEnabled()) {
       try {
         Thread.sleep(1);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+      } catch (InterruptedException exception) {
+        exception.printStackTrace();
       }
     }
   }
