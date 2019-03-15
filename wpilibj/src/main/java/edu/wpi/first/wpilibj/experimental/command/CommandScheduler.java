@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -103,7 +104,7 @@ public final class CommandScheduler extends SendableBase {
       return;
     }
 
-    Collection<Subsystem> requirements = command.getRequirements();
+    Set<Subsystem> requirements = command.getRequirements();
 
     if (Collections.disjoint(m_requirements.keySet(), requirements)) {
       command.initialize();
