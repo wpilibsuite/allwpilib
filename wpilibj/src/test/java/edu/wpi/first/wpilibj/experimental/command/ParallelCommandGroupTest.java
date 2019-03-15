@@ -2,8 +2,11 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class ParallelCommandGroupTest extends CommandTestBase {
 
@@ -75,7 +78,7 @@ public class ParallelCommandGroupTest extends CommandTestBase {
 
     Command group = new ParallelCommandGroup(command1, command2);
 
-    scheduler.cancelCommand(group);
+    assertDoesNotThrow(() -> scheduler.cancelCommand(group));
   }
 
 }

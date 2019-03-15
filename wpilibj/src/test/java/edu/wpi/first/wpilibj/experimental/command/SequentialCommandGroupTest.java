@@ -2,8 +2,10 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 public class SequentialCommandGroupTest extends CommandTestBase {
   @Test
@@ -87,6 +89,6 @@ public class SequentialCommandGroupTest extends CommandTestBase {
 
     Command group = new SequentialCommandGroup(command1, command2);
 
-    scheduler.cancelCommand(group);
+    assertDoesNotThrow(() -> scheduler.cancelCommand(group));
   }
 }

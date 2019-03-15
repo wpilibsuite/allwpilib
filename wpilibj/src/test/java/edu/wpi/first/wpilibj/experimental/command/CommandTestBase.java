@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 /**
  * Basic setup for all {@link Command tests}.
  */
+@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class CommandTestBase {
 
   @BeforeEach
@@ -38,7 +39,7 @@ public abstract class CommandTestBase {
 
   protected class MockCommandHolder {
 
-    private Command m_mockCommand = mock(Command.class);
+    private final Command m_mockCommand = mock(Command.class);
 
     MockCommandHolder(boolean runWhenDisabled, Subsystem... requirements) {
       when(m_mockCommand.getRequirements()).thenReturn(Set.of(requirements));
