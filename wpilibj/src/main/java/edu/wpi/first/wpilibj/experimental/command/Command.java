@@ -6,6 +6,7 @@ import java.util.Set;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public interface Command extends Sendable {
 
   void initialize();
@@ -24,6 +25,10 @@ public interface Command extends Sendable {
 
   default Set<Subsystem> getRequirements() {
     return new HashSet<>();
+  }
+
+  default Command withTimeout(double seconds) {
+    return new ParallelCommandRace(this, new WaitCommand(seconds));
   }
 
   default void start(boolean interruptible) {
