@@ -13,6 +13,8 @@ public class SequentialCommandGroup extends CommandGroupBase implements Command 
   private final List<Command> m_commands = new ArrayList<>();
   private final Set<Subsystem> m_requirements = new HashSet<>();
   private int m_currentCommandIndex;
+  @SuppressWarnings("PMD.ImmutableField")
+  private boolean m_runWhenDisabled = true;
 
   /**
    * Creates a new SequentialCommandGroup.  The given commands will be run sequentially, with
@@ -32,6 +34,7 @@ public class SequentialCommandGroup extends CommandGroupBase implements Command 
 
     for (Command command : m_commands) {
       m_requirements.addAll(command.getRequirements());
+      m_runWhenDisabled &= command.getRunWhenDisabled();
     }
   }
 
@@ -86,10 +89,6 @@ public class SequentialCommandGroup extends CommandGroupBase implements Command 
 
   @Override
   public boolean getRunWhenDisabled() {
-    boolean allRunWhenDisabled = true;
-    for (Command command : m_commands) {
-      allRunWhenDisabled &= command.getRunWhenDisabled();
-    }
-    return allRunWhenDisabled;
+    return m_runWhenDisabled;
   }
 }

@@ -13,6 +13,8 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
   //maps commands in this group to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
   private final Set<Subsystem> m_requirements = new HashSet<>();
+  @SuppressWarnings("PMD.ImmutableField")
+  private boolean m_runWhenDisabled = true;
 
   /**
    * Creates a new ParallelCommandGroup.  The given commands will be executed simultaneously.
@@ -31,6 +33,7 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
     for (Command command : commands) {
       m_commands.put(command, true);
       m_requirements.addAll(command.getRequirements());
+      m_runWhenDisabled &= command.getRunWhenDisabled();
     }
   }
 
@@ -81,10 +84,6 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
 
   @Override
   public boolean getRunWhenDisabled() {
-    boolean allRunWhenDisabled = true;
-    for (Command command : m_commands.keySet()) {
-      allRunWhenDisabled &= command.getRunWhenDisabled();
-    }
-    return allRunWhenDisabled;
+    return m_runWhenDisabled;
   }
 }
