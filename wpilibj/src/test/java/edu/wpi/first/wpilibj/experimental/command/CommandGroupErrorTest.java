@@ -1,8 +1,7 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-import org.junit.jupiter.api.Test;
-
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

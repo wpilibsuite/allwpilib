@@ -13,7 +13,7 @@ public class ParallelCommandGroupTest extends CommandTestBase {
   @Test
   void parallelGroupScheduleTest() {
     CommandScheduler scheduler = new CommandScheduler();
-    
+
     MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
     Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);

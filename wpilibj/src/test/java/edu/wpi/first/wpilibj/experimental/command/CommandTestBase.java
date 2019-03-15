@@ -1,8 +1,8 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-import java.util.Set;
-
 import org.junit.jupiter.api.BeforeEach;
+
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
