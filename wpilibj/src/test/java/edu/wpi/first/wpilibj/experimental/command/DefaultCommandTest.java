@@ -1,18 +1,18 @@
-package edu.wpi.first.wpilibj.command;
+package edu.wpi.first.wpilibj.experimental.command;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DefaultICommandTest extends ICommandTestBase {
+public class DefaultCommandTest extends CommandTestBase {
   @Test
   void defaultCommandScheduleTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
 
     ASubsystem hasDefaultCommand = new ASubsystem();
 
     MockCommandHolder defaultHolder = new MockCommandHolder(true, hasDefaultCommand);
-    ICommand defaultCommand = defaultHolder.getMock();
+    Command defaultCommand = defaultHolder.getMock();
     hasDefaultCommand.init(defaultCommand);
 
     scheduler.registerSubsystem(hasDefaultCommand);
@@ -23,14 +23,14 @@ public class DefaultICommandTest extends ICommandTestBase {
 
   @Test
   void defaultCommandInterruptResumeTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
 
     ASubsystem hasDefaultCommand = new ASubsystem();
 
     MockCommandHolder defaultHolder = new MockCommandHolder(true, hasDefaultCommand);
-    ICommand defaultCommand = defaultHolder.getMock();
+    Command defaultCommand = defaultHolder.getMock();
     MockCommandHolder interrupterHolder = new MockCommandHolder(true, hasDefaultCommand);
-    ICommand interrupter = interrupterHolder.getMock();
+    Command interrupter = interrupterHolder.getMock();
     hasDefaultCommand.init(defaultCommand);
 
     scheduler.registerSubsystem(hasDefaultCommand);

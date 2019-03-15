@@ -1,4 +1,4 @@
-package edu.wpi.first.wpilibj.command;
+package edu.wpi.first.wpilibj.experimental.command;
 
 import org.junit.jupiter.api.Test;
 
@@ -7,15 +7,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 
-class ICommandScheduleTest extends ICommandTestBase {
+class CommandScheduleTest extends CommandTestBase {
 
   @Test
   void instantScheduleTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
     
     MockCommandHolder holder = new MockCommandHolder(true, new Subsystem[0]);
     holder.setFinished(true);
-    ICommand mockCommand = holder.getMock();
+    Command mockCommand = holder.getMock();
 
     scheduler.scheduleCommand(mockCommand, true);
     assertTrue(scheduler.isScheduled(mockCommand));
@@ -31,10 +31,10 @@ class ICommandScheduleTest extends ICommandTestBase {
 
   @Test
   void singleIterationScheduleTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
     
     MockCommandHolder holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand mockCommand = holder.getMock();
+    Command mockCommand = holder.getMock();
 
     scheduler.scheduleCommand(mockCommand, true);
 
@@ -53,10 +53,10 @@ class ICommandScheduleTest extends ICommandTestBase {
 
   @Test
   void cancelTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
 
     MockCommandHolder holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand mockCommand = holder.getMock();
+    Command mockCommand = holder.getMock();
 
     scheduler.scheduleCommand(mockCommand, true);
 
@@ -73,10 +73,10 @@ class ICommandScheduleTest extends ICommandTestBase {
 
   @Test
   void notScheduledCancelTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
 
     MockCommandHolder holder = new MockCommandHolder(true, new Subsystem[0]);
-    ICommand mockCommand = holder.getMock();
+    Command mockCommand = holder.getMock();
 
     scheduler.cancelCommand(mockCommand);
   }

@@ -44,8 +44,6 @@ public abstract class Subsystem extends SendableBase {
    */
   private Command m_defaultCommand;
 
-  private ICommand m_defaultICommand;
-
   /**
    * Creates a subsystem with the given name.
    *
@@ -54,7 +52,6 @@ public abstract class Subsystem extends SendableBase {
   public Subsystem(String name) {
     setName(name, name);
     Scheduler.getInstance().registerSubsystem(this);
-    SchedulerNew.getInstance().registerSubsystem(this);
   }
 
   /**
@@ -65,7 +62,6 @@ public abstract class Subsystem extends SendableBase {
     name = name.substring(name.lastIndexOf('.') + 1);
     setName(name, name);
     Scheduler.getInstance().registerSubsystem(this);
-    SchedulerNew.getInstance().registerSubsystem(this);
     m_currentCommandChanged = true;
   }
 
@@ -115,32 +111,6 @@ public abstract class Subsystem extends SendableBase {
       initDefaultCommand();
     }
     return m_defaultCommand;
-  }
-
-  /**
-   * Sets the default command.
-   *
-   * @param command the command
-   */
-  public void setDefaultICommand(ICommand command) {
-    if (command == null) {
-      m_defaultICommand = null;
-    } else {
-      if (!command.getRequirements().contains(this)) {
-        throw new IllegalUseOfCommandException("A default command must require the subsystem");
-      }
-      m_defaultICommand = command;
-    }
-  }
-
-  /**
-   * Gets the default command.
-   *
-   * @return the command
-   */
-
-  public ICommand getDefaultICommand() {
-    return m_defaultICommand;
   }
 
   /**

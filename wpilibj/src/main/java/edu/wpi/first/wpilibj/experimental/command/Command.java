@@ -1,4 +1,4 @@
-package edu.wpi.first.wpilibj.command;
+package edu.wpi.first.wpilibj.experimental.command;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -6,7 +6,7 @@ import java.util.HashSet;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-public interface ICommand extends Sendable {
+public interface Command extends Sendable {
 
   void initialize();
 
@@ -27,15 +27,15 @@ public interface ICommand extends Sendable {
   }
 
   default void start(boolean interruptible) {
-    SchedulerNew.getInstance().scheduleCommand(this, interruptible);
+    CommandScheduler.getInstance().scheduleCommand(this, interruptible);
   }
 
   default void cancel() {
-    SchedulerNew.getInstance().cancelCommand(this);
+    CommandScheduler.getInstance().cancelCommand(this);
   }
 
   default boolean isRunning() {
-    return SchedulerNew.getInstance().isScheduled(this);
+    return CommandScheduler.getInstance().isScheduled(this);
   }
 
   default boolean requires(Subsystem requirement) {

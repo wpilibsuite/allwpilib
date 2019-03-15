@@ -1,4 +1,4 @@
-package edu.wpi.first.wpilibj.command;
+package edu.wpi.first.wpilibj.experimental.command;
 
 import edu.wpi.first.wpilibj.Timer;
 

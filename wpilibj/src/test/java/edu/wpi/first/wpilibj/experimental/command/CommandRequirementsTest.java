@@ -1,21 +1,21 @@
-package edu.wpi.first.wpilibj.command;
+package edu.wpi.first.wpilibj.experimental.command;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class ICommandRequirementsTest extends ICommandTestBase{
+public class CommandRequirementsTest extends CommandTestBase {
   @Test
   void requirementInterruptTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
 
     Subsystem requirement = new ASubsystem();
 
     MockCommandHolder interruptedHolder = new MockCommandHolder(true, requirement);
-    ICommand interrupted = interruptedHolder.getMock();
+    Command interrupted = interruptedHolder.getMock();
     MockCommandHolder interrupterHolder = new MockCommandHolder(true, requirement);
-    ICommand interrupter = interrupterHolder.getMock();
+    Command interrupter = interrupterHolder.getMock();
 
     scheduler.scheduleCommand(interrupted, true);
     scheduler.run();
@@ -36,14 +36,14 @@ public class ICommandRequirementsTest extends ICommandTestBase{
 
   @Test
   void requirementUninterruptibleTest() {
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
 
     Subsystem requirement = new ASubsystem();
 
     MockCommandHolder interruptedHolder = new MockCommandHolder(true, requirement);
-    ICommand notInterrupted = interruptedHolder.getMock();
+    Command notInterrupted = interruptedHolder.getMock();
     MockCommandHolder interrupterHolder = new MockCommandHolder(true, requirement);
-    ICommand interrupter = interrupterHolder.getMock();
+    Command interrupter = interrupterHolder.getMock();
 
     scheduler.scheduleCommand(notInterrupted, false);
     scheduler.scheduleCommand(interrupter, true);
@@ -59,16 +59,16 @@ public class ICommandRequirementsTest extends ICommandTestBase{
     Subsystem system3 = new ASubsystem();
     Subsystem system4 = new ASubsystem();
 
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
 
     MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
-    ICommand command1 = command1Holder.getMock();
+    Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, system3);
-    ICommand command2 = command2Holder.getMock();
+    Command command2 = command2Holder.getMock();
     MockCommandHolder command3Holder = new MockCommandHolder(true, system3, system4);
-    ICommand command3 = command3Holder.getMock();
+    Command command3 = command3Holder.getMock();
 
-    ICommand group = new ParallelCommandGroup(command1, command2);
+    Command group = new ParallelCommandGroup(command1, command2);
 
     scheduler.scheduleCommand(group, true);
     scheduler.scheduleCommand(command3, true);
@@ -84,16 +84,16 @@ public class ICommandRequirementsTest extends ICommandTestBase{
     Subsystem system3 = new ASubsystem();
     Subsystem system4 = new ASubsystem();
 
-    SchedulerNew scheduler = new SchedulerNew();
+    CommandScheduler scheduler = new CommandScheduler();
 
     MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
-    ICommand command1 = command1Holder.getMock();
+    Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, system3);
-    ICommand command2 = command2Holder.getMock();
+    Command command2 = command2Holder.getMock();
     MockCommandHolder command3Holder = new MockCommandHolder(true, system3, system4);
-    ICommand command3 = command3Holder.getMock();
+    Command command3 = command3Holder.getMock();
 
-    ICommand group = new SequentialCommandGroup(command1, command2);
+    Command group = new SequentialCommandGroup(command1, command2);
 
     scheduler.scheduleCommand(group, true);
     scheduler.scheduleCommand(command3, true);

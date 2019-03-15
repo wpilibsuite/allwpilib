@@ -1,5 +1,7 @@
-package edu.wpi.first.wpilibj.command;
+package edu.wpi.first.wpilibj.experimental.command;
 
+
+import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -8,10 +10,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ParallelCommandGroup extends CommandGroupBase implements ICommand {
+public class ParallelCommandGroup extends CommandGroupBase implements Command {
 
   //maps commands in this group to whether they are still running
-  private final Map<ICommand, Boolean> m_commands = new HashMap<>();
+  private final Map<Command, Boolean> m_commands = new HashMap<>();
 
   /**
    * Creates a new ParallelCommandGroup.  The given commands will be executed simultaneously.
@@ -20,21 +22,21 @@ public class ParallelCommandGroup extends CommandGroupBase implements ICommand {
    *
    * @param commands the commands to include in this group.
    */
-  public ParallelCommandGroup(ICommand... commands) {
+  public ParallelCommandGroup(Command... commands) {
     if (!Collections.disjoint(Set.of(commands), getGroupedCommands())) {
       throw new IllegalUseOfCommandException("Commands cannot be added to multiple CommandGroups");
     }
 
     registerGroupedCommands(commands);
 
-    for (ICommand command : commands) {
+    for (Command command : commands) {
       m_commands.put(command, true);
     }
   }
 
   @Override
   public void initialize() {
-    for (ICommand command : m_commands.keySet()) {
+    for (Command command : m_commands.keySet()) {
       command.initialize();
       m_commands.replace(command, true);
     }
@@ -42,7 +44,7 @@ public class ParallelCommandGroup extends CommandGroupBase implements ICommand {
 
   @Override
   public void execute() {
-    for (ICommand command : m_commands.keySet()) {
+    for (Command command : m_commands.keySet()) {
       if (!m_commands.get(command)) {
         continue;
       }
@@ -56,7 +58,7 @@ public class ParallelCommandGroup extends CommandGroupBase implements ICommand {
 
   @Override
   public void interrupted() {
-    for (ICommand command : m_commands.keySet()) {
+    for (Command command : m_commands.keySet()) {
       if (m_commands.get(command)) {
         command.interrupted();
       }
@@ -75,7 +77,7 @@ public class ParallelCommandGroup extends CommandGroupBase implements ICommand {
   @Override
   public Collection<Subsystem> getRequirements() {
     Collection<Subsystem> requirements = new HashSet<>();
-    for (ICommand command : m_commands.keySet()) {
+    for (Command command : m_commands.keySet()) {
       requirements.addAll(command.getRequirements());
     }
     return requirements;
@@ -84,7 +86,7 @@ public class ParallelCommandGroup extends CommandGroupBase implements ICommand {
   @Override
   public boolean getRunWhenDisabled() {
     boolean allRunWhenDisabled = true;
-    for(ICommand command : m_commands.keySet()) {
+    for(Command command : m_commands.keySet()) {
       allRunWhenDisabled &= command.getRunWhenDisabled();
     }
     return allRunWhenDisabled;

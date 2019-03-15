@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.command;
+package edu.wpi.first.wpilibj.experimental.command;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,29 +24,30 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.buttons.Trigger;
+import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
-public final class SchedulerNew extends SendableBase {
+public final class CommandScheduler extends SendableBase {
   /**
    * The Singleton Instance.
    */
-  private static SchedulerNew instance;
+  private static CommandScheduler instance;
 
   /**
    * Returns the Scheduler instance.
    *
    * @return the instance
    */
-  public static synchronized SchedulerNew getInstance() {
+  public static synchronized CommandScheduler getInstance() {
     if (instance == null) {
-      instance = new SchedulerNew();
+      instance = new CommandScheduler();
     }
     return instance;
   }
 
-  private final Map<ICommand, CommandState> m_scheduledCommands = new LinkedHashMap<>();
-  private final Map<Subsystem, ICommand> m_requirements = new LinkedHashMap<>();
+  private final Map<Command, CommandState> m_scheduledCommands = new LinkedHashMap<>();
+  private final Map<Subsystem, Command> m_requirements = new LinkedHashMap<>();
   private final Collection<Subsystem> m_subsystems = new HashSet<>();
 
 
@@ -60,12 +61,12 @@ public final class SchedulerNew extends SendableBase {
   @SuppressWarnings("PMD.LooseCoupling")
   private Collection<Trigger.ButtonSchedulerNew> m_buttons = new LinkedHashSet<>();
 
-  private final List<Consumer<ICommand>> m_initActions = new ArrayList<>();
-  private final List<Consumer<ICommand>> m_executeActions = new ArrayList<>();
-  private final List<Consumer<ICommand>> m_interruptActions = new ArrayList<>();
-  private final List<Consumer<ICommand>> m_endActions = new ArrayList<>();
+  private final List<Consumer<Command>> m_initActions = new ArrayList<>();
+  private final List<Consumer<Command>> m_executeActions = new ArrayList<>();
+  private final List<Consumer<Command>> m_interruptActions = new ArrayList<>();
+  private final List<Consumer<Command>> m_endActions = new ArrayList<>();
 
-  SchedulerNew() {
+  CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
     setName("Scheduler");
   }
@@ -89,7 +90,7 @@ public final class SchedulerNew extends SendableBase {
    * @param interruptible whether this command can be interrupted
    */
   @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
-  public void scheduleCommand(ICommand command, boolean interruptible) {
+  public void scheduleCommand(Command command, boolean interruptible) {
 
     if (CommandGroupBase.getGroupedCommands().contains(command)) {
       throw new IllegalUseOfCommandException(
@@ -108,7 +109,7 @@ public final class SchedulerNew extends SendableBase {
       command.initialize();
       CommandState scheduledCommand = new CommandState(interruptible);
       m_scheduledCommands.put(command, scheduledCommand);
-      for (Consumer<ICommand> action : m_initActions) {
+      for (Consumer<Command> action : m_initActions) {
         action.accept(command);
       }
       for (Subsystem requirement : requirements) {
@@ -131,7 +132,7 @@ public final class SchedulerNew extends SendableBase {
         command.initialize();
         CommandState scheduledCommand = new CommandState(interruptible);
         m_scheduledCommands.put(command, scheduledCommand);
-        for (Consumer<ICommand> action : m_initActions) {
+        for (Consumer<Command> action : m_initActions) {
           action.accept(command);
         }
       }
@@ -167,7 +168,7 @@ public final class SchedulerNew extends SendableBase {
       button.execute();
     }
 
-    for (ICommand command : m_scheduledCommands.keySet()) {
+    for (Command command : m_scheduledCommands.keySet()) {
 
       if (RobotState.isDisabled() && !command.getRunWhenDisabled()) {
         cancelCommand(command);
@@ -175,12 +176,12 @@ public final class SchedulerNew extends SendableBase {
       }
 
       command.execute();
-      for (Consumer<ICommand> action : m_executeActions) {
+      for (Consumer<Command> action : m_executeActions) {
         action.accept(command);
       }
       if (command.isFinished()) {
         command.end();
-        for (Consumer<ICommand> action : m_endActions) {
+        for (Consumer<Command> action : m_endActions) {
           action.accept(command);
         }
         m_scheduledCommands.remove(command);
@@ -189,8 +190,8 @@ public final class SchedulerNew extends SendableBase {
     }
 
     for (Subsystem subsystem : m_subsystems) {
-      if (!m_requirements.containsKey(subsystem) && subsystem.getDefaultICommand() != null) {
-        scheduleCommand(subsystem.getDefaultICommand(), true);
+      if (!m_requirements.containsKey(subsystem) && subsystem.getDefaultCommand() != null) {
+        scheduleCommand(subsystem.getDefaultCommand(), true);
       }
     }
   }
@@ -205,14 +206,14 @@ public final class SchedulerNew extends SendableBase {
    *
    * @param command the command to cancel
    */
-  public void cancelCommand(ICommand command) {
+  public void cancelCommand(Command command) {
 
     if (!m_scheduledCommands.containsKey(command)) {
       return;
     }
 
     command.interrupted();
-    for (Consumer<ICommand> action : m_interruptActions) {
+    for (Consumer<Command> action : m_interruptActions) {
       action.accept(command);
     }
     m_scheduledCommands.remove(command);
@@ -223,7 +224,7 @@ public final class SchedulerNew extends SendableBase {
    * Cancels all commands that are currently scheduled.
    */
   public void cancelAll() {
-    for (ICommand command : m_scheduledCommands.keySet()) {
+    for (Command command : m_scheduledCommands.keySet()) {
       cancelCommand(command);
     }
   }
@@ -236,7 +237,7 @@ public final class SchedulerNew extends SendableBase {
    * @param command the command to query
    * @return the time since the command was scheduled, in seconds
    */
-  public double timeSinceScheduled(ICommand command) {
+  public double timeSinceScheduled(Command command) {
     CommandState commandState = m_scheduledCommands.get(command);
     if (commandState != null) {
       return commandState.timeSinceInitialized();
@@ -253,8 +254,12 @@ public final class SchedulerNew extends SendableBase {
    * @param command the command to query
    * @return whether the command is currently scheduled
    */
-  public boolean isScheduled(ICommand command) {
+  public boolean isScheduled(Command command) {
     return m_scheduledCommands.containsKey(command);
+  }
+
+  public Command currentlyRequiring(Subsystem subsystem) {
+    return m_requirements.get(subsystem);
   }
 
   /**
@@ -276,7 +281,7 @@ public final class SchedulerNew extends SendableBase {
    *
    * @param action the action to perform
    */
-  public void onCommandInitialize(Consumer<ICommand> action) {
+  public void onCommandInitialize(Consumer<Command> action) {
     m_initActions.add(action);
   }
 
@@ -285,7 +290,7 @@ public final class SchedulerNew extends SendableBase {
    *
    * @param action the action to perform
    */
-  public void onCommandExecute(Consumer<ICommand> action) {
+  public void onCommandExecute(Consumer<Command> action) {
     m_executeActions.add(action);
   }
 
@@ -294,7 +299,7 @@ public final class SchedulerNew extends SendableBase {
    *
    * @param action the action to perform
    */
-  public void onCommandInterrupted(Consumer<ICommand> action) {
+  public void onCommandInterrupted(Consumer<Command> action) {
     m_interruptActions.add(action);
   }
 
@@ -303,7 +308,7 @@ public final class SchedulerNew extends SendableBase {
    *
    * @param action the action to perform
    */
-  public void onCommandEnd(Consumer<ICommand> action) {
+  public void onCommandEnd(Consumer<Command> action) {
     m_endActions.add(action);
   }
 
@@ -319,10 +324,10 @@ public final class SchedulerNew extends SendableBase {
         return;
       }
 
-      Map<Double, ICommand> ids = new LinkedHashMap<>();
+      Map<Double, Command> ids = new LinkedHashMap<>();
 
 
-      for (ICommand command : m_scheduledCommands.keySet()) {
+      for (Command command : m_scheduledCommands.keySet()) {
         ids.put((double) command.hashCode(), command);
       }
 
