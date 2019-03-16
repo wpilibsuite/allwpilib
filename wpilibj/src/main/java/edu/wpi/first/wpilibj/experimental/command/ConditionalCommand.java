@@ -10,7 +10,7 @@ import java.util.function.BooleanSupplier;
  * through this command; this ensures that the command will behave as expected if used as
  * part of a CommandGroup.  Requires the requirements of both commands, again to ensure proper
  * functioning when used in a CommandGroup.  If this is undesired, consider using
- * {@link ConditionalScheduleCommand} instead.
+ * {@link ScheduleCommand}.
  */
 public class ConditionalCommand implements Command {
 
