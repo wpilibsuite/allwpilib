@@ -11,7 +11,7 @@ import java.util.function.Supplier;
  * through this command; this ensures that the command will behave as expected if used as
  * part of a CommandGroup.  Requires the requirements of all included commands, again to ensure
  * proper functioning when used in a CommandGroup.  If this is undesired, consider using
- * {@link SelectScheduleCommand}.
+ * {@link ScheduleCommand}.
  *
  * @param <K> the type of the selector to use, e.g. String or enum
  */
