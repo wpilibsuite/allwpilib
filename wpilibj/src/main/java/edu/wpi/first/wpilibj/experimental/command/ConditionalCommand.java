@@ -4,6 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
+/**
+ * Runs one of two commands, depending on the value of the given condition when this command is
+ * initialized.  Does not actually schedule the selected command - rather, the command is run
+ * through this command; this ensures that the command will behave as expected if used as
+ * part of a CommandGroup.  Requires the requirements of both commands, again to ensure proper
+ * functioning when used in a CommandGroup.  If this is undesired, consider using
+ * {@link ConditionalScheduleCommand} instead.
+ */
 public class ConditionalCommand implements Command {
 
   private final Command m_onTrue;
@@ -13,12 +21,7 @@ public class ConditionalCommand implements Command {
   private final Set<Subsystem> m_requirements = new HashSet<>();
 
   /**
-   * Runs one of two commands, depending on the value of the given condition when this command is
-   * initialized.  Does not actually schedule the selected command - rather, the command is run
-   * through this command; this ensures that the command will behave as expected if used as
-   * part of a CommandGroup.  Requires the requirements of both commands, again to ensure proper
-   * functioning when used in a CommandGroup.  If this is undesired, consider using
-   * {@link ConditionalScheduleCommand} instead.
+   * Creates a new ConditionalCommand.
    *
    * @param onTrue    the command to run if the condition is true
    * @param onFalse   the command to run if the condition is false
