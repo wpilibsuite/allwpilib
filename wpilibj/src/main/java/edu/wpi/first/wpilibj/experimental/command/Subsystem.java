@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public interface Subsystem extends Sendable {
 
-  void periodic();
+  default void periodic() {}
 
   default Command getDefaultCommand() {
     return null;
