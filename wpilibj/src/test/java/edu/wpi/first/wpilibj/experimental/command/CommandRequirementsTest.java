@@ -2,7 +2,10 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import org.junit.jupiter.api.Test;
 
+import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -77,6 +80,38 @@ public class CommandRequirementsTest extends CommandTestBase {
 
     assertFalse(scheduler.isScheduled(group));
     assertTrue(scheduler.isScheduled(command3));
+  }
+
+  @Test
+  void parallelGroupRequirementErrorTest() {
+    Subsystem system1 = new ASubsystem();
+    Subsystem system2 = new ASubsystem();
+    Subsystem system3 = new ASubsystem();
+
+    CommandScheduler scheduler = new CommandScheduler();
+
+    MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true, system2, system3);
+    Command command2 = command2Holder.getMock();
+
+    assertThrows(IllegalUseOfCommandException.class, () -> new ParallelCommandGroup(command1, command2));
+  }
+
+  @Test
+  void parallelRaceRequirementErrorTest() {
+    Subsystem system1 = new ASubsystem();
+    Subsystem system2 = new ASubsystem();
+    Subsystem system3 = new ASubsystem();
+
+    CommandScheduler scheduler = new CommandScheduler();
+
+    MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true, system2, system3);
+    Command command2 = command2Holder.getMock();
+
+    assertThrows(IllegalUseOfCommandException.class, () -> new ParallelCommandRace(command1, command2));
   }
 
   @Test
