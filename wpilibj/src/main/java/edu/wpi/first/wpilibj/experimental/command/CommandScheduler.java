@@ -79,6 +79,9 @@ public final class CommandScheduler extends SendableBase {
     m_buttons.add(button);
   }
 
+  /**
+   * Removes all button bindings from the scheduler.
+   */
   public void clearButtons() {
     m_buttons.clear();
   }
