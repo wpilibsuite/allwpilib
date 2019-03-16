@@ -12,7 +12,7 @@ public abstract class SynchronousPIDSubsystem extends SubsystemBase {
   private boolean m_enabled;
 
   /**
-   * Creates a new SynchronousPIDSubsystem
+   * Creates a new SynchronousPIDSubsystem.
    *
    * @param controller the PIDController to use
    */
@@ -41,7 +41,7 @@ public abstract class SynchronousPIDSubsystem extends SubsystemBase {
   public abstract void useOutput(double output);
 
   /**
-   * Returns the reference(setpoint) used by the PIDController
+   * Returns the reference(setpoint) used by the PIDController.
    *
    * @return the reference (setpoint) to be used by the controller
    */

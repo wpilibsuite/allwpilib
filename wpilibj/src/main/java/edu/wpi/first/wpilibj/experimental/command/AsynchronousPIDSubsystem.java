@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.experimental.controller.PIDController;
  * A subsystem uses a PIDController to control an output.  The controller is run asynchronously
  * by a separate thread with the period specified by the controller.
  */
-public abstract class AsynchronousPIDSubsystem extends SubsystemBase{
+public abstract class AsynchronousPIDSubsystem extends SubsystemBase {
 
   private final PIDController m_controller;
   private final ControllerRunner m_runner;
@@ -35,7 +35,7 @@ public abstract class AsynchronousPIDSubsystem extends SubsystemBase{
   public abstract void useOutput(double output);
 
   /**
-   * Returns the reference(setpoint) used by the PIDController
+   * Returns the reference(setpoint) used by the PIDController.
    *
    * @return the reference (setpoint) to be used by the controller
    */
