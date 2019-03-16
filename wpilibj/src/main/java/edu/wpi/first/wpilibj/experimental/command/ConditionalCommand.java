@@ -42,6 +42,11 @@ public class ConditionalCommand implements Command {
   }
 
   @Override
+  public boolean isFinished() {
+    return m_selectedCommand.isFinished();
+  }
+
+  @Override
   public Set<Subsystem> getRequirements() {
     if (m_condition.getAsBoolean()) {
       return m_onTrue.getRequirements();
