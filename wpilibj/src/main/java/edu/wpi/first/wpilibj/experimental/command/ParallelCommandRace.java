@@ -18,6 +18,8 @@ public class ParallelCommandRace extends CommandGroupBase implements Command {
    * will "race to the finish" - the first command to finish ends the entire command, with all other
    * commands being interrupted.
    *
+   * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+   *
    * @param commands the commands to include in this group.
    */
   public ParallelCommandRace(Command... commands) {

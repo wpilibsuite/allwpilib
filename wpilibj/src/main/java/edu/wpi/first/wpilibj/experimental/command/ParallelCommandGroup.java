@@ -20,6 +20,8 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
    * The command group will finish when the last command finishes.  If the commandgroup is
    * interrupted, only the commands that are still running will be interrupted.
    *
+   * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+   *
    * @param commands the commands to include in this group.
    */
   public ParallelCommandGroup(Command... commands) {

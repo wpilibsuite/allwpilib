@@ -19,6 +19,8 @@ public class SequentialCommandGroup extends CommandGroupBase implements Command 
    * Creates a new SequentialCommandGroup.  The given commands will be run sequentially, with
    * the commandgroup finishing when the last command finishes.
    *
+   * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+   *
    * @param commands the commands to include in this group.
    */
   public SequentialCommandGroup(Command... commands) {
