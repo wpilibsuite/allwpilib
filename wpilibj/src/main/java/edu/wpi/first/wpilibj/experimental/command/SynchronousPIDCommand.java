@@ -36,4 +36,8 @@ public class SynchronousPIDCommand implements Command {
   public final void setOutput(DoubleConsumer useOutput) {
     m_useOutput = useOutput;
   }
+
+  public PIDController getController() {
+    return m_controller;
+  }
 }
