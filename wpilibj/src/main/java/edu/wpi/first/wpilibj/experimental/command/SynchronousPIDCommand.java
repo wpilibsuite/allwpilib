@@ -13,6 +13,16 @@ public class SynchronousPIDCommand implements Command {
   private DoubleConsumer m_useOutput;
   private final Set<Subsystem> m_requirements;
 
+  /**
+   * A command that controls an output with a PIDController.  Runs forever by default - to add
+   * exit conditions and/or other behavior, subclass this class.  The controller calculation and
+   * output are performed synchronously in the command's execute() method.
+   *
+   * @param controller      the controller that controls the output.
+   * @param referenceSource the controller's reference (aka setpoint)
+   * @param useOutput       the controller's output
+   * @param requirements    the set of subsystems required by this command
+   */
   public SynchronousPIDCommand(PIDController controller,
                                DoubleSupplier referenceSource,
                                DoubleConsumer useOutput,

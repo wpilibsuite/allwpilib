@@ -17,10 +17,11 @@ public class ConditionalCommand implements Command {
    * initialized.  Does not actually schedule the selected command - rather, the command is run
    * through this command; this ensures that the command will behave as expected if used as
    * part of a CommandGroup.  Requires the requirements of both commands, again to ensure proper
-   * functioning when used in a CommandGroup.
+   * functioning when used in a CommandGroup.  If this is undesired, consider using
+   * {@link ConditionalScheduleCommand} instead.
    *
-   * @param onTrue the command to run if the condition is true
-   * @param onFalse the command to run if the condition is false
+   * @param onTrue    the command to run if the condition is true
+   * @param onFalse   the command to run if the condition is false
    * @param condition the condition to determine which command to run
    */
   public ConditionalCommand(Command onTrue, Command onFalse, BooleanSupplier condition) {

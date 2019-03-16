@@ -199,13 +199,21 @@ public final class CommandScheduler extends SendableBase {
     }
   }
 
+  /**
+   * Registers a subsystem with the scheduler.  This must be called for the subsystem's periodic
+   * block to run when the scheduler is run, and for the subsystem's default command to be
+   * scheduled.  It is recommended to call this from the constructor of your subsystem
+   * implementations.
+   *
+   * @param subsystem the subsystem to register
+   */
   void registerSubsystem(Subsystem subsystem) {
     m_subsystems.add(subsystem);
   }
 
   /**
    * Cancels a command.  The scheduler will only call the interrupted method of a canceled command,
-   * not the end method.
+   * not the end method.  Commands will be canceled even if they are not scheduled as interruptible.
    *
    * @param command the command to cancel
    */
@@ -251,7 +259,7 @@ public final class CommandScheduler extends SendableBase {
 
   /**
    * Whether a given command is running.  Note that this only works on commands that are directly
-   * scheduled by the scheduler; it will not work on commands inside of commandgroups, as the
+   * scheduled by the scheduler; it will not work on commands inside of CommandGroups, as the
    * scheduler does not see them.
    *
    * @param command the command to query
@@ -261,6 +269,13 @@ public final class CommandScheduler extends SendableBase {
     return m_scheduledCommands.containsKey(command);
   }
 
+  /**
+   * Returns the command currently requiring a given subsystem.  Null if no command is currently
+   * requiring the subsystem
+   *
+   * @param subsystem the subsystem to be inquired about
+   * @return the command currently requiring the subsystem
+   */
   public Command requiring(Subsystem subsystem) {
     return m_requirements.get(subsystem);
   }

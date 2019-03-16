@@ -3,7 +3,7 @@ package edu.wpi.first.wpilibj.experimental.command;
 import java.util.HashSet;
 import java.util.Set;
 
-public class InstantCommand implements Command{
+public class InstantCommand implements Command {
 
   private final Runnable m_action;
   private final Set<Subsystem> m_requirements;

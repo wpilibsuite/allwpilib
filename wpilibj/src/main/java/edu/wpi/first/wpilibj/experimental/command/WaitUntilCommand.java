@@ -12,7 +12,7 @@ public class WaitUntilCommand implements Command {
    *
    * @param seconds the match time at which to end the command.
    */
-  public WaitUntilCommand(double seconds){
+  public WaitUntilCommand(double seconds) {
     m_time = seconds;
   }
 
