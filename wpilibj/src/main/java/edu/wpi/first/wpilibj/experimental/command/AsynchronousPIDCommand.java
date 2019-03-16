@@ -22,7 +22,8 @@ public class AsynchronousPIDCommand implements Command {
    *
    * @param controller      the controller that controls the output.
    * @param referenceSource the controller's reference (aka setpoint)
-   * @param useOutput       the controller's output
+   * @param useOutput       the controller's output; should be a synchronized method to remain
+   *                        threadsafe
    * @param requirements    the set of subsystems required by this command
    */
   public AsynchronousPIDCommand(PIDController controller,

@@ -4,7 +4,7 @@ package edu.wpi.first.wpilibj.experimental.command;
  * A base for subsystems that handles registration in the constructor, and provides a more intuitive
  * method for setting the default command.
  */
-public class SubsystemBase implements Subsystem {
+public abstract class SubsystemBase implements Subsystem {
 
   private Command m_defaultCommand;
 
