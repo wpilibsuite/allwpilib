@@ -20,7 +20,7 @@ public class ConditionalCommand implements Command {
   public void initialize() {
     if (m_condition.getAsBoolean()) {
       m_selectedCommand = m_onTrue;
-    } else{
+    } else {
       m_selectedCommand = m_onFalse;
     }
     m_selectedCommand.initialize();
