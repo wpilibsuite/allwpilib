@@ -35,6 +35,10 @@ public class ParallelCommandRace extends CommandGroupBase implements Command {
     registerGroupedCommands(commands);
 
     for (Command command : commands) {
+      if (!Collections.disjoint(command.getRequirements(), m_requirements)) {
+        throw new IllegalUseOfCommandException("Multiple commands in a parallel group cannot"
+            + "require the same subsystems");
+      }
       m_commands.add(command);
       m_requirements.addAll(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
