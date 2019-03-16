@@ -9,7 +9,7 @@
 
 #include <frc/AnalogPotentiometer.h>
 #include <frc/PWMVictorSPX.h>
-#include <frc/commands/PIDSubsystem.h>
+#include <frc/experimental/commands/PIDSubsystem.h>
 
 /**
  * The elevator subsystem uses PID to go to a given height. Unfortunately, in
@@ -17,7 +17,7 @@
  * state PID values for simulation are different than in the real world do to
  * minor differences.
  */
-class Elevator : public frc::PIDSubsystem {
+class Elevator : public frc::experimental::PIDSubsystem {
  public:
   Elevator();
 
@@ -32,14 +32,13 @@ class Elevator : public frc::PIDSubsystem {
    * Use the potentiometer as the PID sensor. This method is automatically
    * called by the subsystem.
    */
-  double ReturnPIDInput() override;
+  double GetMeasurement() const override;
 
   /**
-   * Use the motor as the PID output. This method is automatically called
-   * by
+   * Use the motor as the PID output. This method is automatically called by
    * the subsystem.
    */
-  void UsePIDOutput(double d) override;
+  void SetOutput(double output) override;
 
  private:
   frc::PWMVictorSPX m_motor{5};

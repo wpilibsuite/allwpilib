@@ -10,13 +10,13 @@
 #include <frc/AnalogPotentiometer.h>
 #include <frc/DigitalInput.h>
 #include <frc/PWMVictorSPX.h>
-#include <frc/commands/PIDSubsystem.h>
+#include <frc/experimental/commands/PIDSubsystem.h>
 
 /**
  * The Pivot subsystem contains the Van-door motor and the pot for PID control
  * of angle of the pivot and claw.
  */
-class Pivot : public frc::PIDSubsystem {
+class Pivot : public frc::experimental::PIDSubsystem {
  public:
   // Constants for some useful angles
   static constexpr double kCollect = 105;
@@ -35,27 +35,27 @@ class Pivot : public frc::PIDSubsystem {
   /**
    * @return The angle read in by the potentiometer
    */
-  double ReturnPIDInput() override;
+  double GetMeasurement() const override;
 
   /**
    * Set the motor speed based off of the PID output
    */
-  void UsePIDOutput(double output) override;
+  void SetOutput(double output) override;
 
   /**
    * @return If the pivot is at its upper limit.
    */
-  bool IsAtUpperLimit();
+  bool IsAtUpperLimit() const;
 
   /**
    * @return If the pivot is at its lower limit.
    */
-  bool IsAtLowerLimit();
+  bool IsAtLowerLimit() const;
 
   /**
    * @return The current angle of the pivot.
    */
-  double GetAngle();
+  double GetAngle() const;
 
  private:
   // Subsystem devices

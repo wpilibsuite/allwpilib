@@ -8,11 +8,11 @@
 #include "commands/Place.h"
 
 #include "commands/OpenClaw.h"
-#include "commands/SetElevatorSetpoint.h"
-#include "commands/SetWristSetpoint.h"
+#include "commands/SetElevatorReference.h"
+#include "commands/SetWristReference.h"
 
 Place::Place() : frc::CommandGroup("Place") {
-  AddSequential(new SetElevatorSetpoint(0.25));
-  AddSequential(new SetWristSetpoint(0));
+  AddSequential(new SetElevatorReference(0.25));
+  AddSequential(new SetWristReference(0));
   AddSequential(new OpenClaw());
 }

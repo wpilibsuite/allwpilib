@@ -9,8 +9,11 @@ package edu.wpi.first.wpilibj;
 
 /**
  * This interface allows PIDController to write it's results to its output.
+ *
+ * @deprecated Use DoubleConsumer and new PIDController class.
  */
 @FunctionalInterface
+@Deprecated
 public interface PIDOutput {
   /**
    * Set the output to the value calculated by PIDController.

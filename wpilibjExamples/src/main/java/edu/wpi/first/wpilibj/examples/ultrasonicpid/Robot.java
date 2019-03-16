@@ -8,11 +8,11 @@
 package edu.wpi.first.wpilibj.examples.ultrasonicpid;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
+import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
 /**
  * This is a sample program to demonstrate the use of a PIDController with an
@@ -46,7 +46,9 @@ public class Robot extends TimedRobot {
       = new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort),
       new PWMVictorSPX(kRightMotorPort));
   private final PIDController m_pidController
-      = new PIDController(kP, kI, kD, m_ultrasonic, new MyPidOutput());
+      = new PIDController(kP, kI, kD, m_ultrasonic::getAverageVoltage);
+  private final ControllerRunner m_pidRunner = new ControllerRunner(m_pidController,
+      output -> m_robotDrive.arcadeDrive(output, 0));
 
   /**
    * Drives the robot a set distance from an object using PID control and the
@@ -57,15 +59,10 @@ public class Robot extends TimedRobot {
     // Set expected range to 0-24 inches; e.g. at 24 inches from object go
     // full forward, at 0 inches from object go full backward.
     m_pidController.setInputRange(0, kMaxDistance * kValueToInches);
-    // Set setpoint of the pid controller
-    m_pidController.setSetpoint(kHoldDistance * kValueToInches);
-    m_pidController.enable(); // begin PID control
-  }
+    m_pidController.setPercentTolerance(5);
 
-  private class MyPidOutput implements PIDOutput {
-    @Override
-    public void pidWrite(double output) {
-      m_robotDrive.arcadeDrive(output, 0);
-    }
+    // Set reference of the pid controller
+    m_pidController.setReference(kHoldDistance * kValueToInches);
+    m_pidRunner.enable(); // begin PID control
   }
 }

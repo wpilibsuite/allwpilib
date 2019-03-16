@@ -7,10 +7,11 @@
 
 #pragma once
 
-#include <frc/PIDController.h>
-#include <frc/PIDOutput.h>
-#include <frc/PIDSource.h>
 #include <frc/commands/Command.h>
+#include <frc/experimental/controller/ControllerRunner.h>
+#include <frc/experimental/controller/PIDController.h>
+
+#include "Robot.h"
 
 /**
  * Drive until the robot is the given distance away from the box. Uses a local
@@ -25,20 +26,10 @@ class SetDistanceToBox : public frc::Command {
   bool IsFinished() override;
   void End() override;
 
-  class SetDistanceToBoxPIDSource : public frc::PIDSource {
-   public:
-    virtual ~SetDistanceToBoxPIDSource() = default;
-    double PIDGet() override;
-  };
-
-  class SetDistanceToBoxPIDOutput : public frc::PIDOutput {
-   public:
-    virtual ~SetDistanceToBoxPIDOutput() = default;
-    void PIDWrite(double d) override;
-  };
-
  private:
-  SetDistanceToBoxPIDSource m_source;
-  SetDistanceToBoxPIDOutput m_output;
-  frc::PIDController m_pid{-2, 0, 0, &m_source, &m_output};
+  frc::experimental::PIDController m_pidController{
+      -2, 0, 0, [&] { return Robot::drivetrain.GetDistanceToObstacle(); }};
+  frc::experimental::ControllerRunner m_pidRunner{
+      m_pidController,
+      [&](double output) { Robot::drivetrain.Drive(output, output); }};
 };

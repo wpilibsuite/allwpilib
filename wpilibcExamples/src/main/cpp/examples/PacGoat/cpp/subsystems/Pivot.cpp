@@ -7,12 +7,12 @@
 
 #include "subsystems/Pivot.h"
 
-Pivot::Pivot() : frc::PIDSubsystem("Pivot", 7.0, 0.0, 8.0) {
+Pivot::Pivot() : frc::experimental::PIDSubsystem("Pivot", 7.0, 0.0, 8.0) {
   SetAbsoluteTolerance(0.005);
-  GetPIDController()->SetContinuous(false);
+  GetPIDController().SetContinuous(false);
 #ifdef SIMULATION
   // PID is different in simulation.
-  GetPIDController()->SetPID(0.5, 0.001, 2);
+  GetPIDController().SetPID(0.5, 0.001, 2);
   SetAbsoluteTolerance(5);
 #endif
 
@@ -25,18 +25,18 @@ Pivot::Pivot() : frc::PIDSubsystem("Pivot", 7.0, 0.0, 8.0) {
 
 void InitDefaultCommand() {}
 
-double Pivot::ReturnPIDInput() { return m_pot.Get(); }
+double Pivot::GetMeasurement() const { return m_pot.Get(); }
 
-void Pivot::UsePIDOutput(double output) { m_motor.PIDWrite(output); }
+void Pivot::SetOutput(double output) { m_motor.Set(output); }
 
-bool Pivot::IsAtUpperLimit() {
+bool Pivot::IsAtUpperLimit() const {
   return m_upperLimitSwitch.Get();  // TODO: inverted from real robot
                                     // (prefix with !)
 }
 
-bool Pivot::IsAtLowerLimit() {
+bool Pivot::IsAtLowerLimit() const {
   return m_lowerLimitSwitch.Get();  // TODO: inverted from real robot
                                     // (prefix with !)
 }
 
-double Pivot::GetAngle() { return m_pot.Get(); }
+double Pivot::GetAngle() const { return m_pot.Get(); }

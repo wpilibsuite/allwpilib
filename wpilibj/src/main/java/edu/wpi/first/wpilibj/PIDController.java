@@ -18,7 +18,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>This feedback controller runs in discrete time, so time deltas are not used in the integral
  * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
  * given set of PID constants.
+ *
+ * @deprecated Use controllers.PIDController class instead.
  */
+@Deprecated
 public class PIDController extends PIDBase implements Controller {
   Notifier m_controlLoop = new Notifier(this::calculate);
 
