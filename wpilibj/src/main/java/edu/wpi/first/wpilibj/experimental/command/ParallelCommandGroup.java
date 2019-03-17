@@ -2,17 +2,15 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
-public class ParallelCommandGroup extends CommandGroupBase implements Command {
+public class ParallelCommandGroup extends CommandGroupBase {
 
   //maps commands in this group to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
-  private final Set<Subsystem> m_requirements = new HashSet<>();
   private boolean m_runWhenDisabled = true;
 
   /**
@@ -76,10 +74,6 @@ public class ParallelCommandGroup extends CommandGroupBase implements Command {
         commandRunning.getKey().interrupted();
       }
     }
-  }
-
-  @Override
-  public void end() {
   }
 
   @Override

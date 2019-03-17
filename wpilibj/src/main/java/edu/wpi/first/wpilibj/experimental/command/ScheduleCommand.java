@@ -1,6 +1,6 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-public class ScheduleCommand implements Command {
+public class ScheduleCommand extends SendableCommandBase {
 
   private final Command m_toSchedule;
 
@@ -18,16 +18,6 @@ public class ScheduleCommand implements Command {
   @Override
   public void initialize() {
     m_toSchedule.schedule();
-  }
-
-  @Override
-  public void execute() {
-
-  }
-
-  @Override
-  public void end() {
-
   }
 
   @Override

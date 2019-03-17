@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-abstract class CommandGroupBase {
+abstract class CommandGroupBase extends SendableCommandBase implements Command {
 
   private static Set<Command> m_groupedCommands = Collections.newSetFromMap(new WeakHashMap<>());
 

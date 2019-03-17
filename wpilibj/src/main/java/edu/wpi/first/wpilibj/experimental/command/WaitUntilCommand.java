@@ -2,7 +2,7 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import edu.wpi.first.wpilibj.Timer;
 
-public class WaitUntilCommand implements Command {
+public class WaitUntilCommand extends SendableCommandBase {
 
   private final double m_time;
 
@@ -14,21 +14,6 @@ public class WaitUntilCommand implements Command {
    */
   public WaitUntilCommand(double seconds) {
     m_time = seconds;
-  }
-
-  @Override
-  public void initialize() {
-
-  }
-
-  @Override
-  public void execute() {
-
-  }
-
-  @Override
-  public void end() {
-
   }
 
   @Override
