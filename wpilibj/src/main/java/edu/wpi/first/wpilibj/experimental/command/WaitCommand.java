@@ -4,10 +4,10 @@ import edu.wpi.first.wpilibj.Timer;
 
 /**
  * A command that does nothing but takes a specified amount of time to finish.  Useful for
- * CommandGroups.
+ * CommandGroups.  Can also be subclassed to make a command with an internal timer.
  */
 public class WaitCommand extends SendableCommandBase {
-  Timer m_timer = new Timer();
+  protected Timer m_timer = new Timer();
   final double m_duration;
 
   /**
