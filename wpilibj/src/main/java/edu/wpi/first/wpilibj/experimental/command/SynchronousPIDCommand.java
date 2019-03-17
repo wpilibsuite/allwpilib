@@ -23,16 +23,16 @@ public class SynchronousPIDCommand extends SendableCommandBase {
    * @param controller      the controller that controls the output.
    * @param referenceSource the controller's reference (aka setpoint)
    * @param useOutput       the controller's output
-   * @param requirements    the set of subsystems required by this command
+   * @param requirements    the subsystems required by this command
    */
   public SynchronousPIDCommand(PIDController controller,
                                DoubleSupplier referenceSource,
                                DoubleConsumer useOutput,
-                               Set<Subsystem> requirements) {
+                               Subsystem... requirements) {
     m_controller = controller;
     m_useOutput = useOutput;
     m_reference = referenceSource;
-    m_requirements = requirements;
+    m_requirements.addAll(Set.of(requirements));
   }
 
   @Override

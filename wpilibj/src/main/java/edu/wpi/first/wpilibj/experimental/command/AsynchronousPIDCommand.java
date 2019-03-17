@@ -26,15 +26,15 @@ public class AsynchronousPIDCommand extends SendableCommandBase {
    * @param referenceSource the controller's reference (aka setpoint)
    * @param useOutput       the controller's output; should be a synchronized method to remain
    *                        threadsafe
-   * @param requirements    the set of subsystems required by this command
+   * @param requirements    the subsystems required by this command
    */
   public AsynchronousPIDCommand(PIDController controller,
                                 DoubleSupplier referenceSource,
                                 DoubleConsumer useOutput,
-                                Set<Subsystem> requirements) {
+                                Subsystem... requirements) {
     m_controller = controller;
     m_reference = referenceSource;
-    m_requirements = requirements;
+    m_requirements.addAll(Set.of(requirements));
     m_runner = new ControllerRunner(m_controller, useOutput::accept);
   }
 

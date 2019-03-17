@@ -1,6 +1,5 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -16,11 +15,11 @@ public class InstantCommand extends SendableCommandBase {
    * Creates a new InstantCommand that performs the given action with the given requirements.
    *
    * @param action       the action to perform
-   * @param requirements the set of requirements
+   * @param requirements the requirements
    */
-  public InstantCommand(Runnable action, Set<Subsystem> requirements) {
+  public InstantCommand(Runnable action, Subsystem... requirements) {
     m_action = action;
-    m_requirements = requirements;
+    m_requirements.addAll(Set.of(requirements));
   }
 
   /**
@@ -29,7 +28,7 @@ public class InstantCommand extends SendableCommandBase {
    * @param action the action to perform
    */
   public InstantCommand(Runnable action) {
-    this(action, new HashSet<>());
+    this(action, new Subsystem[0]);
   }
 
   /**
