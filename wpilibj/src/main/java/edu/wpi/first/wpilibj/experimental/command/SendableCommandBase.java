@@ -16,6 +16,15 @@ public abstract class SendableCommandBase implements Sendable, Command {
   protected String m_subsystem = "Ungrouped";
   protected Set<Subsystem> m_requirements = new HashSet<>();
 
+  /**
+   * Adds the specified requirements to the command.
+   *
+   * @param requirements the requirements to add
+   */
+  public void addRequirements(Subsystem... requirements) {
+    m_requirements.addAll(Set.of(requirements));
+  }
+
   @Override
   public Set<Subsystem> getRequirements() {
     return m_requirements;
