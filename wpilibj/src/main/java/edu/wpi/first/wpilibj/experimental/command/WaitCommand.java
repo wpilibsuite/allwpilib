@@ -2,6 +2,10 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import edu.wpi.first.wpilibj.Timer;
 
+/**
+ * A command that does nothing but takes a specified amount of time to finish.  Useful for
+ * CommandGroups.
+ */
 public class WaitCommand extends SendableCommandBase {
   Timer m_timer = new Timer();
   final double m_duration;
