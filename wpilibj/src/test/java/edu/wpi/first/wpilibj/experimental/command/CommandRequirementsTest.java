@@ -17,7 +17,7 @@ public class CommandRequirementsTest extends CommandTestBase {
   void requirementInterruptTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
-    Subsystem requirement = new ASubsystem();
+    Subsystem requirement = new TestSubsystem();
 
     MockCommandHolder interruptedHolder = new MockCommandHolder(true, requirement);
     Command interrupted = interruptedHolder.getMock();
@@ -45,7 +45,7 @@ public class CommandRequirementsTest extends CommandTestBase {
   void requirementUninterruptibleTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
-    Subsystem requirement = new ASubsystem();
+    Subsystem requirement = new TestSubsystem();
 
     MockCommandHolder interruptedHolder = new MockCommandHolder(true, requirement);
     Command notInterrupted = interruptedHolder.getMock();
@@ -61,10 +61,10 @@ public class CommandRequirementsTest extends CommandTestBase {
 
   @Test
   void parallelGroupRequirementTest() {
-    Subsystem system1 = new ASubsystem();
-    Subsystem system2 = new ASubsystem();
-    Subsystem system3 = new ASubsystem();
-    Subsystem system4 = new ASubsystem();
+    Subsystem system1 = new TestSubsystem();
+    Subsystem system2 = new TestSubsystem();
+    Subsystem system3 = new TestSubsystem();
+    Subsystem system4 = new TestSubsystem();
 
     CommandScheduler scheduler = new CommandScheduler();
 
@@ -86,9 +86,9 @@ public class CommandRequirementsTest extends CommandTestBase {
 
   @Test
   void parallelGroupRequirementErrorTest() {
-    Subsystem system1 = new ASubsystem();
-    Subsystem system2 = new ASubsystem();
-    Subsystem system3 = new ASubsystem();
+    Subsystem system1 = new TestSubsystem();
+    Subsystem system2 = new TestSubsystem();
+    Subsystem system3 = new TestSubsystem();
 
     MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
     Command command1 = command1Holder.getMock();
@@ -101,9 +101,9 @@ public class CommandRequirementsTest extends CommandTestBase {
 
   @Test
   void parallelRaceRequirementErrorTest() {
-    Subsystem system1 = new ASubsystem();
-    Subsystem system2 = new ASubsystem();
-    Subsystem system3 = new ASubsystem();
+    Subsystem system1 = new TestSubsystem();
+    Subsystem system2 = new TestSubsystem();
+    Subsystem system3 = new TestSubsystem();
 
     MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
     Command command1 = command1Holder.getMock();
@@ -116,10 +116,10 @@ public class CommandRequirementsTest extends CommandTestBase {
 
   @Test
   void sequentialGroupRequirementTest() {
-    Subsystem system1 = new ASubsystem();
-    Subsystem system2 = new ASubsystem();
-    Subsystem system3 = new ASubsystem();
-    Subsystem system4 = new ASubsystem();
+    Subsystem system1 = new TestSubsystem();
+    Subsystem system2 = new TestSubsystem();
+    Subsystem system3 = new TestSubsystem();
+    Subsystem system4 = new TestSubsystem();
 
     CommandScheduler scheduler = new CommandScheduler();
 
@@ -141,10 +141,10 @@ public class CommandRequirementsTest extends CommandTestBase {
 
   @Test
   void selectCommandRequirementTest() {
-    Subsystem system1 = new ASubsystem();
-    Subsystem system2 = new ASubsystem();
-    Subsystem system3 = new ASubsystem();
-    Subsystem system4 = new ASubsystem();
+    Subsystem system1 = new TestSubsystem();
+    Subsystem system2 = new TestSubsystem();
+    Subsystem system3 = new TestSubsystem();
+    Subsystem system4 = new TestSubsystem();
 
     CommandScheduler scheduler = new CommandScheduler();
 
@@ -175,9 +175,9 @@ public class CommandRequirementsTest extends CommandTestBase {
 
   @Test
   void conditionalCommandRequirementTest() {
-    Subsystem system1 = new ASubsystem();
-    Subsystem system2 = new ASubsystem();
-    Subsystem system3 = new ASubsystem();
+    Subsystem system1 = new TestSubsystem();
+    Subsystem system2 = new TestSubsystem();
+    Subsystem system3 = new TestSubsystem();
 
     CommandScheduler scheduler = new CommandScheduler();
 

@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  */
 public abstract class SendableSubsystemBase implements Subsystem, Sendable {
 
-  private Command m_defaultCommand;
+  protected Command m_defaultCommand;
   protected String m_name = this.getClass().getSimpleName();
 
   public SendableSubsystemBase() {
