@@ -40,7 +40,7 @@ public class ParallelCommandRace extends CommandGroupBase {
     for (Command command : commands) {
       if (!Collections.disjoint(command.getRequirements(), m_requirements)) {
         throw new IllegalUseOfCommandException("Multiple commands in a parallel group cannot"
-            + "require the same subsystems");
+            + " require the same subsystems");
       }
       m_commands.add(command);
       m_requirements.addAll(command.getRequirements());

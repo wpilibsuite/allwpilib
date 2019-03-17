@@ -22,6 +22,7 @@ public class WaitCommand extends SendableCommandBase {
 
   @Override
   public void initialize() {
+    m_timer.reset();
     m_timer.start();
   }
 
@@ -33,7 +34,6 @@ public class WaitCommand extends SendableCommandBase {
   @Override
   public void end() {
     m_timer.stop();
-    m_timer.reset();
   }
 
   @Override
