@@ -88,8 +88,6 @@ public class CommandRequirementsTest extends CommandTestBase {
     Subsystem system2 = new ASubsystem();
     Subsystem system3 = new ASubsystem();
 
-    CommandScheduler scheduler = new CommandScheduler();
-
     MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
     Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, system2, system3);
@@ -104,8 +102,6 @@ public class CommandRequirementsTest extends CommandTestBase {
     Subsystem system1 = new ASubsystem();
     Subsystem system2 = new ASubsystem();
     Subsystem system3 = new ASubsystem();
-
-    CommandScheduler scheduler = new CommandScheduler();
 
     MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
     Command command1 = command1Holder.getMock();
