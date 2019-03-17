@@ -17,6 +17,7 @@ public class WaitCommand extends SendableCommandBase {
    */
   public WaitCommand(double seconds) {
     m_duration = seconds;
+    setName(m_name + ": " + seconds + " seconds");
   }
 
   @Override
