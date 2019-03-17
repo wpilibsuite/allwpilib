@@ -1,5 +1,7 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
@@ -135,5 +137,64 @@ public class CommandRequirementsTest extends CommandTestBase {
 
     assertFalse(scheduler.isScheduled(group));
     assertTrue(scheduler.isScheduled(command3));
+  }
+
+  @Test
+  void selectCommandRequirementTest() {
+    Subsystem system1 = new ASubsystem();
+    Subsystem system2 = new ASubsystem();
+    Subsystem system3 = new ASubsystem();
+    Subsystem system4 = new ASubsystem();
+
+    CommandScheduler scheduler = new CommandScheduler();
+
+    MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true, system3);
+    Command command2 = command2Holder.getMock();
+    MockCommandHolder command3Holder = new MockCommandHolder(true, system3, system4);
+    Command command3 = command3Holder.getMock();
+
+    SelectCommand<String> selectCommand =
+        new SelectCommand<>(Map.ofEntries(
+            Map.entry("one", command1),
+            Map.entry("two", command2),
+            Map.entry("three", command3)),
+            () -> "one");
+
+    scheduler.scheduleCommand(selectCommand, true);
+    scheduler.scheduleCommand(command2, true);
+
+    assertTrue(scheduler.isScheduled(command2));
+    assertFalse(scheduler.isScheduled(selectCommand));
+
+    verify(command1).interrupted();
+    verify(command2, never()).interrupted();
+    verify(command3, never()).interrupted();
+  }
+
+  @Test
+  void conditionalCommandRequirementTest() {
+    Subsystem system1 = new ASubsystem();
+    Subsystem system2 = new ASubsystem();
+    Subsystem system3 = new ASubsystem();
+
+    CommandScheduler scheduler = new CommandScheduler();
+
+    MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true, system3);
+    Command command2 = command2Holder.getMock();
+
+    ConditionalCommand conditionalCommand = new ConditionalCommand(command1, command2, () -> true);
+
+    scheduler.scheduleCommand(conditionalCommand, true);
+    scheduler.scheduleCommand(command2, true);
+
+    assertTrue(scheduler.isScheduled(command2));
+    assertFalse(scheduler.isScheduled(conditionalCommand));
+
+    verify(command1).interrupted();
+    verify(command2, never()).interrupted();
   }
 }
