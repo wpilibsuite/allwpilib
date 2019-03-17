@@ -95,7 +95,8 @@ public class CommandRequirementsTest extends CommandTestBase {
     MockCommandHolder command2Holder = new MockCommandHolder(true, system2, system3);
     Command command2 = command2Holder.getMock();
 
-    assertThrows(IllegalUseOfCommandException.class, () -> new ParallelCommandGroup(command1, command2));
+    assertThrows(IllegalUseOfCommandException.class,
+        () -> new ParallelCommandGroup(command1, command2));
   }
 
   @Test
@@ -111,7 +112,8 @@ public class CommandRequirementsTest extends CommandTestBase {
     MockCommandHolder command2Holder = new MockCommandHolder(true, system2, system3);
     Command command2 = command2Holder.getMock();
 
-    assertThrows(IllegalUseOfCommandException.class, () -> new ParallelCommandRace(command1, command2));
+    assertThrows(IllegalUseOfCommandException.class,
+        () -> new ParallelCommandRace(command1, command2));
   }
 
   @Test
