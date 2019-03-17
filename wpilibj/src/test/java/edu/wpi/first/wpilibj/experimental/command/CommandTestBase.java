@@ -22,21 +22,8 @@ public abstract class CommandTestBase {
     CommandGroupBase.clearGroupedCommands();
   }
 
-  public class ASubsystem implements Subsystem {
-    private Command m_defaultCommand;
+  class TestSubsystem extends SendableSubsystemBase {
 
-    @Override
-    public void periodic() {
-    }
-
-    @Override
-    public Command getDefaultCommand() {
-      return m_defaultCommand;
-    }
-
-    void init(Command defaultCommand) {
-      m_defaultCommand = defaultCommand;
-    }
   }
 
   protected class MockCommandHolder {
