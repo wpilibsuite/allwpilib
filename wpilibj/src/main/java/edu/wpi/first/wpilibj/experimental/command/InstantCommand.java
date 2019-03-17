@@ -15,7 +15,7 @@ public class InstantCommand extends SendableCommandBase {
   /**
    * Creates a new InstantCommand that performs the given action with the given requirements.
    *
-   * @param action the action to perform
+   * @param action       the action to perform
    * @param requirements the set of requirements
    */
   public InstantCommand(Runnable action, Set<Subsystem> requirements) {
@@ -37,7 +37,8 @@ public class InstantCommand extends SendableCommandBase {
    * constructor to call from subclass constructors.
    */
   public InstantCommand() {
-    m_action = () -> {};
+    m_action = () -> {
+    };
   }
 
   @Override
