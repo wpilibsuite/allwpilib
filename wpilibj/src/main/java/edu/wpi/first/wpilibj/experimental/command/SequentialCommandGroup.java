@@ -2,16 +2,14 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
-public class SequentialCommandGroup extends CommandGroupBase implements Command {
+public class SequentialCommandGroup extends CommandGroupBase {
 
   private final List<Command> m_commands = new ArrayList<>();
-  private final Set<Subsystem> m_requirements = new HashSet<>();
   private int m_currentCommandIndex;
   private boolean m_runWhenDisabled = true;
 
@@ -76,10 +74,6 @@ public class SequentialCommandGroup extends CommandGroupBase implements Command 
     if (!m_commands.isEmpty()) {
       m_commands.get(m_currentCommandIndex).interrupted();
     }
-  }
-
-  @Override
-  public void end() {
   }
 
   @Override

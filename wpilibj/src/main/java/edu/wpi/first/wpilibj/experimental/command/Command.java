@@ -3,9 +3,6 @@ package edu.wpi.first.wpilibj.experimental.command;
 import java.util.HashSet;
 import java.util.Set;
 
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-
 /**
  * A state machine representing a complete action to be performed by the robot.  Commands are
  * run by the {@link CommandScheduler}, and can be composed into CommandGroups to allow users to
@@ -14,18 +11,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>Commands are run synchronously from the main robot loop; no multithreading is used, unless
  * specified explicitly from the command implementation.
  */
-@SuppressWarnings("PMD.TooManyMethods")
-public interface Command extends Sendable {
+public interface Command {
 
   /**
    * The initial subroutine of a command.  Called once when the command is initially scheduled.
    */
-  void initialize();
+  default void initialize() {}
 
   /**
    * The main body of a command.  Called repeatedly while the command is scheduled.
    */
-  void execute();
+  default void execute() {}
 
   /**
    * The action to take when the command is forced to end early.  Called either when the command
@@ -40,7 +36,7 @@ public interface Command extends Sendable {
    * The action to take when the command ends normally.  Called once after the command reports that
    * it is finished, and called by default from interrupted().
    */
-  void end();
+  default void end() {}
 
   /**
    * Whether the command has finished.  Once a command finishes, the scheduler will call its
@@ -137,47 +133,7 @@ public interface Command extends Sendable {
     return false;
   }
 
-  @Override
   default String getName() {
     return this.getClass().getSimpleName();
-  }
-
-  @Override
-  default void setName(String name) {
-  }
-
-  @Override
-  default void setName(String subsystem, String name) {
-  }
-
-  @Override
-  default String getSubsystem() {
-    return "Ungrouped";
-  }
-
-  @Override
-  default void setSubsystem(String subsystem) {
-  }
-
-  /**
-   * Initializes this sendable.  Useful for allowing implementations to easily extend SendableBase.
-   *
-   * @param builder the builder used to construct this sendable
-   */
-  @Override
-  default void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Command");
-    builder.addStringProperty(".name", this::getName, null);
-    builder.addBooleanProperty("running", this::isScheduled, value -> {
-      if (value) {
-        if (!isScheduled()) {
-          schedule(true);
-        }
-      } else {
-        if (isScheduled()) {
-          cancel();
-        }
-      }
-    });
   }
 }

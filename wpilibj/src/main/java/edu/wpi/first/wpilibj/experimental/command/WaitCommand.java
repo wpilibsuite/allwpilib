@@ -2,7 +2,7 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import edu.wpi.first.wpilibj.Timer;
 
-public class WaitCommand implements Command {
+public class WaitCommand extends SendableCommandBase {
   Timer m_timer = new Timer();
   final double m_duration;
 

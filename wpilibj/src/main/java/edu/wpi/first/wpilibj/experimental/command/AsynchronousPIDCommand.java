@@ -7,11 +7,10 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
-public class AsynchronousPIDCommand implements Command {
+public class AsynchronousPIDCommand extends SendableCommandBase {
 
   private final PIDController m_controller;
   private DoubleSupplier m_reference;
-  private final Set<Subsystem> m_requirements;
   private ControllerRunner m_runner;
 
   /**
@@ -54,7 +53,7 @@ public class AsynchronousPIDCommand implements Command {
   /**
    * Sets the output to be used by the PIDController.
    *
-   * @param useOutput the output to be used
+   * @param useOutput the output to be used; should be a synchronized method to remain threadsafe
    */
   public final void setOutput(DoubleConsumer useOutput) {
     boolean enabled = m_runner.isEnabled();

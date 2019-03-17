@@ -1,6 +1,5 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -15,12 +14,11 @@ import java.util.function.Supplier;
  *
  * @param <K> the type of the selector to use, e.g. String or enum
  */
-public class SelectCommand<K> implements Command {
+public class SelectCommand<K> extends SendableCommandBase {
 
   private final Map<K, Command> m_commands;
   private final Supplier<K> m_selector;
   private Command m_selectedCommand;
-  private final Set<Subsystem> m_requirements = new HashSet<>();
 
   /**
    * Creates a new SelectCommand.

@@ -3,10 +3,9 @@ package edu.wpi.first.wpilibj.experimental.command;
 import java.util.HashSet;
 import java.util.Set;
 
-public class InstantCommand implements Command {
+public class InstantCommand extends SendableCommandBase {
 
   private final Runnable m_action;
-  private final Set<Subsystem> m_requirements;
 
   public InstantCommand(Runnable action, Set<Subsystem> requirements) {
     m_action = action;
@@ -20,16 +19,6 @@ public class InstantCommand implements Command {
   @Override
   public void initialize() {
     m_action.run();
-  }
-
-  @Override
-  public void execute() {
-
-  }
-
-  @Override
-  public void end() {
-
   }
 
   @Override

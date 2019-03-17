@@ -6,12 +6,11 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
-public class SynchronousPIDCommand implements Command {
+public class SynchronousPIDCommand extends SendableCommandBase {
 
   private final PIDController m_controller;
   private DoubleSupplier m_reference;
   private DoubleConsumer m_useOutput;
-  private final Set<Subsystem> m_requirements;
 
   /**
    * A command that controls an output with a PIDController.  Runs forever by default - to add
@@ -34,17 +33,9 @@ public class SynchronousPIDCommand implements Command {
   }
 
   @Override
-  public void initialize() {
-  }
-
-  @Override
   public void execute() {
     m_controller.setReference(m_reference.getAsDouble());
     m_useOutput.accept(m_controller.update());
-  }
-
-  @Override
-  public void end() {
   }
 
   public final void setOutput(DoubleConsumer useOutput) {

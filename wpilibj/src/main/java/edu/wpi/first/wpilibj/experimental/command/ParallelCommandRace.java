@@ -6,10 +6,9 @@ import java.util.Set;
 
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
-public class ParallelCommandRace extends CommandGroupBase implements Command {
+public class ParallelCommandRace extends CommandGroupBase {
 
   private final Set<Command> m_commands = new HashSet<>();
-  private final Set<Subsystem> m_requirements = new HashSet<>();
   private boolean m_runWhenDisabled = true;
   private boolean m_finished;
 

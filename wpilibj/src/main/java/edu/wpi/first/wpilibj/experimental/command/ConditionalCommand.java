@@ -12,7 +12,7 @@ import java.util.function.BooleanSupplier;
  * functioning when used in a CommandGroup.  If this is undesired, consider using
  * {@link ScheduleCommand}.
  */
-public class ConditionalCommand implements Command {
+public class ConditionalCommand extends SendableCommandBase {
 
   private final Command m_onTrue;
   private final Command m_onFalse;
