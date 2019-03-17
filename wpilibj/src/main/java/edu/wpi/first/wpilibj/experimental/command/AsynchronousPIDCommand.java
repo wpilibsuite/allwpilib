@@ -7,6 +7,12 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
+/**
+ * A command that controls an output with a PIDController.  Runs forever by default - to add
+ * exit conditions and/or other behavior, subclass this class.  The controller calculation and
+ * output are performed asynchronously by a separate thread with the period specified by
+ * the controller.
+ */
 public class AsynchronousPIDCommand extends SendableCommandBase {
 
   private final PIDController m_controller;
@@ -14,10 +20,7 @@ public class AsynchronousPIDCommand extends SendableCommandBase {
   private ControllerRunner m_runner;
 
   /**
-   * A command that controls an output with a PIDController.  Runs forever by default - to add
-   * exit conditions and/or other behavior, subclass this class.  The controller calculation and
-   * output are performed asynchronously by a separate thread with the period specified by
-   * the controller.
+   * Creates a new AsynchronousPIDCommand, which controls the given output with a PIDController.
    *
    * @param controller      the controller that controls the output.
    * @param referenceSource the controller's reference (aka setpoint)

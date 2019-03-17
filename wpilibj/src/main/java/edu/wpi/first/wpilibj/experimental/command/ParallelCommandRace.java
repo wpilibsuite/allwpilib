@@ -6,6 +6,12 @@ import java.util.Set;
 
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
+/**
+ * A CommandGroup that runs a set of commands in parallel, ending when the first command ends
+ * and interrupting all the others.
+ *
+ * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ */
 public class ParallelCommandRace extends CommandGroupBase {
 
   private final Set<Command> m_commands = new HashSet<>();
@@ -16,8 +22,6 @@ public class ParallelCommandRace extends CommandGroupBase {
    * Creates a new ParallelCommandRace.  The given commands will be executed simultaneously, and
    * will "race to the finish" - the first command to finish ends the entire command, with all other
    * commands being interrupted.
-   *
-   * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
    *
    * @param commands the commands to include in this group.
    */

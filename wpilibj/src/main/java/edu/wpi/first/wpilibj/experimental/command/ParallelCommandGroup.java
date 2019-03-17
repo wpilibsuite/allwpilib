@@ -7,6 +7,11 @@ import java.util.Set;
 
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
+/**
+ * A CommandGroup that runs a set of commands in parallel, ending when the last command ends.
+ *
+ * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ */
 public class ParallelCommandGroup extends CommandGroupBase {
 
   //maps commands in this group to whether they are still running
@@ -17,8 +22,6 @@ public class ParallelCommandGroup extends CommandGroupBase {
    * Creates a new ParallelCommandGroup.  The given commands will be executed simultaneously.
    * The command group will finish when the last command finishes.  If the commandgroup is
    * interrupted, only the commands that are still running will be interrupted.
-   *
-   * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
    *
    * @param commands the commands to include in this group.
    */

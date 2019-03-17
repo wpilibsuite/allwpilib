@@ -6,6 +6,11 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
+/**
+ * A command that controls an output with a PIDController.  Runs forever by default - to add
+ * exit conditions and/or other behavior, subclass this class.  The controller calculation and
+ * output are performed synchronously in the command's execute() method.
+ */
 public class SynchronousPIDCommand extends SendableCommandBase {
 
   private final PIDController m_controller;
@@ -13,9 +18,7 @@ public class SynchronousPIDCommand extends SendableCommandBase {
   private DoubleConsumer m_useOutput;
 
   /**
-   * A command that controls an output with a PIDController.  Runs forever by default - to add
-   * exit conditions and/or other behavior, subclass this class.  The controller calculation and
-   * output are performed synchronously in the command's execute() method.
+   * Creates a new SynchronousPIDCommand, which controls the given output with a PIDController.
    *
    * @param controller      the controller that controls the output.
    * @param referenceSource the controller's reference (aka setpoint)

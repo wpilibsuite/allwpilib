@@ -7,6 +7,11 @@ import java.util.Set;
 
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
+/**
+ * A CommandGroups that runs a list of commands in sequence.
+ *
+ * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ */
 public class SequentialCommandGroup extends CommandGroupBase {
 
   private final List<Command> m_commands = new ArrayList<>();
@@ -15,9 +20,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
 
   /**
    * Creates a new SequentialCommandGroup.  The given commands will be run sequentially, with
-   * the commandgroup finishing when the last command finishes.
-   *
-   * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+   * the CommandGroup finishing when the last command finishes.
    *
    * @param commands the commands to include in this group.
    */
