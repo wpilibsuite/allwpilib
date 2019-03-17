@@ -17,6 +17,7 @@ public class WaitUntilCommand extends SendableCommandBase {
    */
   public WaitUntilCommand(double seconds) {
     m_time = seconds;
+    setName(m_name + ": " + seconds + " seconds");
   }
 
   @Override
