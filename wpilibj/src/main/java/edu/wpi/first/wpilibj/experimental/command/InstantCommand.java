@@ -37,6 +37,7 @@ public class InstantCommand extends SendableCommandBase {
    * constructor to call from subclass constructors.
    */
   public InstantCommand() {
+    //let's all laugh really hard at the style checker...
     m_action = () -> {
     };
   }
