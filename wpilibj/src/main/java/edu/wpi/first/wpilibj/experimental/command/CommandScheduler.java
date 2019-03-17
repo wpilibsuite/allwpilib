@@ -28,6 +28,13 @@ import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 import edu.wpi.first.wpilibj.experimental.buttons.Trigger.ButtonScheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
+/**
+ * The scheduler responsible for running {@link Command}s.  A Command-based robot should call
+ * {@link CommandScheduler#run()} on the singleton instance in its periodic block in order to
+ * run commands synchronously from the main loop.  Subsystems should be registered with the
+ * scheduler using {@link CommandScheduler#registerSubsystem(Subsystem)} in order for their
+ * {@link Subsystem#periodic()} methods to be called and for their default commands to be scheduled.
+ */
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public final class CommandScheduler extends SendableBase {
   /**
