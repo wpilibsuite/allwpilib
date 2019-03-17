@@ -15,7 +15,7 @@ public class InstantCommand extends SendableCommandBase {
    * Creates a new InstantCommand that performs the given action with the given requirements.
    *
    * @param action       the action to perform
-   * @param requirements the requirements
+   * @param requirements the subsystems required by this command
    */
   public InstantCommand(Runnable action, Subsystem... requirements) {
     m_action = action;
