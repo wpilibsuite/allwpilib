@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.experimental.controller.PIDController;
  * A subsystem that uses a PIDController to control an output.  The controller is run synchronously
  * from the subsystem's periodic() method.
  */
-public abstract class SynchronousPIDSubsystem extends SubsystemBase {
+public abstract class SynchronousPIDSubsystem extends SendableSubsystemBase {
 
   private final PIDController m_controller;
   private boolean m_enabled;
