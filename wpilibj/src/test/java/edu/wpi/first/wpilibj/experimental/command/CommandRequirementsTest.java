@@ -85,6 +85,56 @@ public class CommandRequirementsTest extends CommandTestBase {
   }
 
   @Test
+  void parallelRaceRequirementTest() {
+    Subsystem system1 = new TestSubsystem();
+    Subsystem system2 = new TestSubsystem();
+    Subsystem system3 = new TestSubsystem();
+    Subsystem system4 = new TestSubsystem();
+
+    CommandScheduler scheduler = new CommandScheduler();
+
+    MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true, system3);
+    Command command2 = command2Holder.getMock();
+    MockCommandHolder command3Holder = new MockCommandHolder(true, system3, system4);
+    Command command3 = command3Holder.getMock();
+
+    Command group = new ParallelRaceGroup(command1, command2);
+
+    scheduler.scheduleCommand(group, true);
+    scheduler.scheduleCommand(command3, true);
+
+    assertFalse(scheduler.isScheduled(group));
+    assertTrue(scheduler.isScheduled(command3));
+  }
+
+  @Test
+  void parallelDictatorRequirementTest() {
+    Subsystem system1 = new TestSubsystem();
+    Subsystem system2 = new TestSubsystem();
+    Subsystem system3 = new TestSubsystem();
+    Subsystem system4 = new TestSubsystem();
+
+    CommandScheduler scheduler = new CommandScheduler();
+
+    MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true, system3);
+    Command command2 = command2Holder.getMock();
+    MockCommandHolder command3Holder = new MockCommandHolder(true, system3, system4);
+    Command command3 = command3Holder.getMock();
+
+    Command group = new ParallelDictatorGroup(command1, command2);
+
+    scheduler.scheduleCommand(group, true);
+    scheduler.scheduleCommand(command3, true);
+
+    assertFalse(scheduler.isScheduled(group));
+    assertTrue(scheduler.isScheduled(command3));
+  }
+
+  @Test
   void parallelGroupRequirementErrorTest() {
     Subsystem system1 = new TestSubsystem();
     Subsystem system2 = new TestSubsystem();
@@ -111,7 +161,22 @@ public class CommandRequirementsTest extends CommandTestBase {
     Command command2 = command2Holder.getMock();
 
     assertThrows(IllegalUseOfCommandException.class,
-        () -> new ParallelCommandRace(command1, command2));
+        () -> new ParallelRaceGroup(command1, command2));
+  }
+
+  @Test
+  void parallelDictatorRequirementErrorTest() {
+    Subsystem system1 = new TestSubsystem();
+    Subsystem system2 = new TestSubsystem();
+    Subsystem system3 = new TestSubsystem();
+
+    MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true, system2, system3);
+    Command command2 = command2Holder.getMock();
+
+    assertThrows(IllegalUseOfCommandException.class,
+        () -> new ParallelDictatorGroup(command1, command2));
   }
 
   @Test
