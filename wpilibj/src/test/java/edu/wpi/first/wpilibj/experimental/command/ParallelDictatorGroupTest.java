@@ -8,7 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-public class ParallelDictatorGroupTest extends CommandTestBase{
+public class ParallelDictatorGroupTest extends CommandTestBase {
   @Test
   void parallelDictatorScheduleTest() {
     CommandScheduler scheduler = new CommandScheduler();
