@@ -45,10 +45,4 @@ public abstract class CommandTestBase {
     }
 
   }
-
-  protected void sleep(int time) {
-    assertDoesNotThrow(() -> Thread.sleep(time));
-  }
-
-
 }
