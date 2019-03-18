@@ -2,6 +2,7 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 /**
  * A state machine representing a complete action to be performed by the robot.  Commands are
@@ -16,12 +17,14 @@ public interface Command {
   /**
    * The initial subroutine of a command.  Called once when the command is initially scheduled.
    */
-  default void initialize() {}
+  default void initialize() {
+  }
 
   /**
    * The main body of a command.  Called repeatedly while the command is scheduled.
    */
-  default void execute() {}
+  default void execute() {
+  }
 
   /**
    * The action to take when the command is forced to end early.  Called either when the command
@@ -36,7 +39,8 @@ public interface Command {
    * The action to take when the command ends normally.  Called once after the command reports that
    * it is finished, and called by default from interrupted().
    */
-  default void end() {}
+  default void end() {
+  }
 
   /**
    * Whether the command has finished.  Once a command finishes, the scheduler will call its
@@ -65,7 +69,7 @@ public interface Command {
   }
 
   /**
-   * Adds a timeout to this command.  If the specified timeout is exceeded before the command
+   * Decorates this command with a timeout.  If the specified timeout is exceeded before the command
    * finishes normally, the command will be interrupted and un-scheduled.  Note that the
    * timeout only applies to the command returned by this method; the calling command is
    * not itself changed.
@@ -75,6 +79,19 @@ public interface Command {
    */
   default Command withTimeout(double seconds) {
     return new ParallelRaceGroup(this, new WaitCommand(seconds));
+  }
+
+  /**
+   * Decorates this command with an interrupt condition.  If the specified condition becomes true
+   * before the command finishes normally, the command will be interrupted and un-scheduled.
+   * Note that this only applies to the command returned by this method; the calling command
+   * is not itself changed.
+   *
+   * @param condition the interrupt condition
+   * @return the command with the interrupt condition added
+   */
+  default Command withInterruptCondition(BooleanSupplier condition) {
+    return new ParallelRaceGroup(this, new EndOnConditionCommand(condition));
   }
 
   /**
