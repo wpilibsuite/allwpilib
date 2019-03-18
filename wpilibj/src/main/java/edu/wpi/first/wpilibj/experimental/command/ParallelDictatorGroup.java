@@ -8,25 +8,40 @@ import java.util.Set;
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
 /**
- * A CommandGroup that runs a set of commands in parallel, ending when the last command ends.
+ * A CommandGroup that runs a set of commands is parallel, ending only when a specific command
+ * (the "dictator") ends, interrupting all other commands that are still running at that point.
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
  */
-public class ParallelCommandGroup extends CommandGroupBase {
+public class ParallelDictatorGroup extends CommandGroupBase {
 
   //maps commands in this group to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
   private boolean m_runWhenDisabled = true;
+  private Command m_dictator;
 
   /**
-   * Creates a new ParallelCommandGroup.  The given commands will be executed simultaneously.
-   * The command group will finish when the last command finishes.  If the CommandGroup is
-   * interrupted, only the commands that are still running will be interrupted.
+   * Creates a new ParallelDictatorGroup.  The given commands (including the dictator) will be
+   * executed simultaneously.  The CommandGroup will finish when the dictator finishes,
+   * interrupting all other still-running commands.  If the CommandGroup is interrupted, only
+   * the commands still running will be interrupted.
    *
-   * @param commands the commands to include in this group.
+   * @param dictator
+   * @param commands
    */
-  public ParallelCommandGroup(Command... commands) {
+  public ParallelDictatorGroup(Command dictator, Command... commands) {
+    m_dictator = dictator;
     addCommands(commands);
+    if (!m_commands.containsKey(dictator)) {
+      addCommands(dictator);
+    }
+  }
+
+  public void setDictator(Command dictator) {
+    m_dictator = dictator;
+    if (!m_commands.containsKey(dictator)) {
+      addCommands(dictator);
+    }
   }
 
   @Override
@@ -71,6 +86,11 @@ public class ParallelCommandGroup extends CommandGroupBase {
   }
 
   @Override
+  public void end() {
+    interrupted();
+  }
+
+  @Override
   public void interrupted() {
     for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
       if (commandRunning.getValue()) {
@@ -81,7 +101,7 @@ public class ParallelCommandGroup extends CommandGroupBase {
 
   @Override
   public boolean isFinished() {
-    return !m_commands.values().contains(true);
+    return m_dictator.isFinished();
   }
 
   @Override
