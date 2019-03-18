@@ -54,19 +54,28 @@ public final class CommandScheduler extends SendableBase {
     return instance;
   }
 
+  //A map from commands to their scheduling state.  Also used as a set of the currently-running
+  //commands.
   private final Map<Command, CommandState> m_scheduledCommands = new LinkedHashMap<>();
+
+  //A map from required subsystems to their requiring commands.  Also used as a set of the
+  //currently-required subsystems.
   private final Map<Subsystem, Command> m_requirements = new LinkedHashMap<>();
+
+  //The set of all subsystems that have been registered with the scheduler.
   private final Collection<Subsystem> m_subsystems = new HashSet<>();
 
+  //The set of currently-bound buttons.
+  private final Collection<ButtonScheduler> m_buttons = new LinkedHashSet<>();
 
   private boolean m_disabled;
 
+  //NetworkTable entries for use in Sendable impl
   private NetworkTableEntry m_namesEntry;
   private NetworkTableEntry m_idsEntry;
   private NetworkTableEntry m_cancelEntry;
 
-  private final Collection<ButtonScheduler> m_buttons = new LinkedHashSet<>();
-
+  //Lists of user-supplied actions to be executed on scheduling events for every command.
   private final List<Consumer<Command>> m_initActions = new ArrayList<>();
   private final List<Consumer<Command>> m_executeActions = new ArrayList<>();
   private final List<Consumer<Command>> m_interruptActions = new ArrayList<>();
@@ -110,6 +119,8 @@ public final class CommandScheduler extends SendableBase {
           "A command that is part of a command group cannot be independently scheduled");
     }
 
+    //Do nothing if the scheduler is disabled, the robot is disabled and the command doesn't
+    //run when disabled, or the command is already scheduled.
     if (m_disabled
         || (RobotState.isDisabled() && !command.runsWhenDisabled())
         || m_scheduledCommands.containsKey(command)) {
@@ -118,6 +129,7 @@ public final class CommandScheduler extends SendableBase {
 
     Set<Subsystem> requirements = command.getRequirements();
 
+    //Schedule the command if the requirements are not currently in-use.
     if (Collections.disjoint(m_requirements.keySet(), requirements)) {
       command.initialize();
       CommandState scheduledCommand = new CommandState(interruptible);
@@ -129,6 +141,8 @@ public final class CommandScheduler extends SendableBase {
         m_requirements.put(requirement, command);
       }
     } else {
+      //Else check if the requirements that are in use have all have interruptible commands,
+      //and if so, interrupt those commands and schedule the new command.
       boolean allInterruptible = true;
       for (Subsystem requirement : requirements) {
         if (m_requirements.keySet().contains(requirement)) {
@@ -173,14 +187,17 @@ public final class CommandScheduler extends SendableBase {
       return;
     }
 
+    //Run the periodic method of all registered subsystems.
     for (Subsystem subsystem : m_subsystems) {
       subsystem.periodic();
     }
 
+    //Poll buttons for new commands to add.
     for (ButtonScheduler button : m_buttons) {
       button.execute();
     }
 
+    //Run scheduled commands, and remove if finished.
     for (Command command : m_scheduledCommands.keySet()) {
 
       if (RobotState.isDisabled() && !command.runsWhenDisabled()) {
@@ -202,6 +219,7 @@ public final class CommandScheduler extends SendableBase {
       }
     }
 
+    //Add default commands for un-required registered subsystems.
     for (Subsystem subsystem : m_subsystems) {
       if (!m_requirements.containsKey(subsystem) && subsystem.getDefaultCommand() != null) {
         scheduleCommand(subsystem.getDefaultCommand(), true);
@@ -219,6 +237,16 @@ public final class CommandScheduler extends SendableBase {
    */
   void registerSubsystem(Subsystem subsystem) {
     m_subsystems.add(subsystem);
+  }
+
+  /**
+   * Un-registers a subsystem with the scheduler.  The subsystem will no longer have its periodic
+   * block called, and will not have its default command scheduled.
+   *
+   * @param subsystem the subsystem to un-register
+   */
+  void unregisterSubsystem(Subsystem subsystem) {
+    m_subsystems.remove(subsystem);
   }
 
   /**
