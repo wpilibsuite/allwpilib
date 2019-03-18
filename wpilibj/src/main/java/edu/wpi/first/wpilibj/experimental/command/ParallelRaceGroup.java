@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
  */
-public class ParallelCommandRace extends CommandGroupBase {
+public class ParallelRaceGroup extends CommandGroupBase {
 
   private final Set<Command> m_commands = new HashSet<>();
   private boolean m_runWhenDisabled = true;
@@ -25,7 +25,7 @@ public class ParallelCommandRace extends CommandGroupBase {
    *
    * @param commands the commands to include in this group.
    */
-  public ParallelCommandRace(Command... commands) {
+  public ParallelRaceGroup(Command... commands) {
     addCommands(commands);
   }
 

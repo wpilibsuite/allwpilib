@@ -74,7 +74,7 @@ public interface Command {
    * @return the command with the timeout added
    */
   default Command withTimeout(double seconds) {
-    return new ParallelCommandRace(this, new WaitCommand(seconds));
+    return new ParallelRaceGroup(this, new WaitCommand(seconds));
   }
 
   /**

@@ -38,7 +38,7 @@ public class ParallelDictatorGroup extends CommandGroupBase {
   }
 
   /**
-   * Sets the dictator to the given command.  If dictator is added to the group if it is not
+   * Sets the dictator to the given command.  The dictator is added to the group if it is not
    * already contained.
    *
    * @param dictator the command that determines when the group ends
