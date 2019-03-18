@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * ended/interrupted. </p>
  *
  * @deprecated Use {@link edu.wpi.first.wpilibj.experimental.command.SynchronousPIDCommand}
- *  or {@link edu.wpi.first.wpilibj.experimental.command.AsynchronousPIDCommand} instead.
+ *     or {@link edu.wpi.first.wpilibj.experimental.command.AsynchronousPIDCommand} instead.
  */
 @Deprecated
 public abstract class PIDCommand extends Command {

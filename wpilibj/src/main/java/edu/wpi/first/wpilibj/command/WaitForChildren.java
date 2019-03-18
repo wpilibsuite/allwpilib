@@ -16,10 +16,10 @@ package edu.wpi.first.wpilibj.command;
  * to finish, before continuing in the main {@link CommandGroup} sequence.
  *
  * @deprecated No longer necessary with the new composition-based CommandGroups.  Use
- * {@link edu.wpi.first.wpilibj.experimental.command.SequentialCommandGroup},
- * {@link edu.wpi.first.wpilibj.experimental.command.ParallelCommandGroup},
- * {@link edu.wpi.first.wpilibj.experimental.command.ParallelRaceGroup},
- * or {@link edu.wpi.first.wpilibj.experimental.command.ParallelDictatorGroup} instead.
+ *     {@link edu.wpi.first.wpilibj.experimental.command.SequentialCommandGroup},
+ *     {@link edu.wpi.first.wpilibj.experimental.command.ParallelCommandGroup},
+ *     {@link edu.wpi.first.wpilibj.experimental.command.ParallelRaceGroup},
+ *     or {@link edu.wpi.first.wpilibj.experimental.command.ParallelDictatorGroup} instead.
  */
 @Deprecated
 public class WaitForChildren extends Command {
