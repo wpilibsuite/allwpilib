@@ -27,7 +27,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * which are started if there is no command running which requires this subsystem. </p>
  *
  * @see Command
+ *
+ * @deprecated Use {@link edu.wpi.first.wpilibj.experimental.command.Subsystem} or
+ * {@link edu.wpi.first.wpilibj.experimental.command.SendableSubsystemBase} instead.
  */
+@Deprecated
 public abstract class Subsystem extends SendableBase {
   /**
    * Whether or not getDefaultCommand() was called.

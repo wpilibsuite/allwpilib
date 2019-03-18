@@ -12,7 +12,10 @@ package edu.wpi.first.wpilibj.command;
  * you want a {@link CommandGroup} to pause for a moment.
  *
  * @see CommandGroup
+ *
+ * @deprecated Use {@link edu.wpi.first.wpilibj.experimental.command.WaitCommand} instead.
  */
+@Deprecated
 public class WaitCommand extends TimedCommand {
   /**
    * Instantiates a {@link WaitCommand} with the given timeout.

@@ -12,7 +12,10 @@ import edu.wpi.first.wpilibj.Timer;
 /**
  * WaitUntilCommand - waits until an absolute game time. This will wait until the game clock reaches
  * some value, then continue to the next command.
+ *
+ * @deprecated Use {@link edu.wpi.first.wpilibj.experimental.command.WaitUntilCommand} instead.
  */
+@Deprecated
 public class WaitUntilCommand extends Command {
   private final double m_time;
 

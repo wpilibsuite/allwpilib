@@ -30,7 +30,10 @@ import java.util.Enumeration;
  *
  * @see Command
  * @see Scheduler
+ *
+ * @deprecated Use {@link edu.wpi.first.wpilibj.experimental.command.ConditionalCommand} instead.
  */
+@Deprecated
 public abstract class ConditionalCommand extends Command {
   /**
    * The Command to execute if {@link ConditionalCommand#condition()} returns true.

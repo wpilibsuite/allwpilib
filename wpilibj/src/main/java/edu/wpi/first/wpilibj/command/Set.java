@@ -13,7 +13,10 @@ import java.util.Vector;
 @SuppressWarnings("all")
 /**
  * A set.
+ *
+ * @deprecated Use {@link java.util.Set}.
  */
+@Deprecated
 class Set {
   private Vector m_set = new Vector();
 

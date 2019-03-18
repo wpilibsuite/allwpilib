@@ -10,7 +10,10 @@ package edu.wpi.first.wpilibj.command;
 /**
  * A {@link StartCommand} will call the {@link Command#start() start()} method of another command
  * when it is initialized and will finish immediately.
+ *
+ * @deprecated Use {@link edu.wpi.first.wpilibj.experimental.command.ScheduleCommand} instead.
  */
+@Deprecated
 public class StartCommand extends InstantCommand {
   /**
    * The command to fork.

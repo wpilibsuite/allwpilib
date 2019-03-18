@@ -38,7 +38,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @see Subsystem
  * @see CommandGroup
  * @see IllegalUseOfCommandException
+ *
+ * @deprecated Use {@link edu.wpi.first.wpilibj.experimental.command.Command} or
+ * {@link edu.wpi.first.wpilibj.experimental.command.SendableCommandBase} instead.
  */
+@Deprecated
 @SuppressWarnings("PMD.TooManyMethods")
 public abstract class Command extends SendableBase {
   /**

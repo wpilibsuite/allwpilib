@@ -21,7 +21,8 @@ import edu.wpi.first.wpilibj.PIDSourceType;
  * allows access to the internal {@link PIDController} in order to give total control to the
  * programmer.
  *
- * @deprecated Use PIDSubsystem class instead.
+ * @deprecated Use {@link edu.wpi.first.wpilibj.experimental.command.SynchronousPIDSubsystem} or
+ * {@link edu.wpi.first.wpilibj.experimental.command.AsynchronousPIDSubsystem} instead.
  */
 @Deprecated
 public abstract class PIDSubsystem extends Subsystem {

@@ -20,7 +20,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * start and stop said {@link PIDController} when the {@link PIDCommand} is first initialized and
  * ended/interrupted. </p>
  *
- * @deprecated Use PIDCommand class instead.
+ * @deprecated Use {@link edu.wpi.first.wpilibj.experimental.command.SynchronousPIDCommand}
+ *  or {@link edu.wpi.first.wpilibj.experimental.command.AsynchronousPIDCommand} instead.
  */
 @Deprecated
 public abstract class PIDCommand extends Command {

@@ -10,7 +10,12 @@ package edu.wpi.first.wpilibj.command;
 /**
  * A {@link TimedCommand} will wait for a timeout before finishing.
  * {@link TimedCommand} is used to execute a command for a given amount of time.
+ *
+ * @deprecated Make a subclass of {@link edu.wpi.first.wpilibj.experimental.command.WaitCommand} or
+ * use {@link edu.wpi.first.wpilibj.experimental.command.Command#withTimeout(double)} instead.
  */
+
+@Deprecated
 public class TimedCommand extends Command {
   /**
    * Instantiates a TimedCommand with the given name and timeout.

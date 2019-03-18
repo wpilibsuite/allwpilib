@@ -30,7 +30,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * is already done for you if you use the CommandBased Robot template. </p>
  *
  * @see Command
+ *
+ * @deprecated Use {@link edu.wpi.first.wpilibj.experimental.command.CommandScheduler} instead.
  */
+@Deprecated
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields"})
 public final class Scheduler extends SendableBase {
   /**

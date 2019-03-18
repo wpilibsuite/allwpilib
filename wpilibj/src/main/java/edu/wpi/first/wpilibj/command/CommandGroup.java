@@ -30,7 +30,13 @@ import static java.util.Objects.requireNonNull;
  * @see Command
  * @see Subsystem
  * @see IllegalUseOfCommandException
+ *
+ * @deprecated Use {@link edu.wpi.first.wpilibj.experimental.command.SequentialCommandGroup},
+ * {@link edu.wpi.first.wpilibj.experimental.command.ParallelCommandGroup},
+ * {@link edu.wpi.first.wpilibj.experimental.command.ParallelRaceGroup},
+ * or {@link edu.wpi.first.wpilibj.experimental.command.ParallelDictatorGroup} instead.
  */
+@Deprecated
 @SuppressWarnings("PMD.TooManyMethods")
 public class CommandGroup extends Command {
   /**
