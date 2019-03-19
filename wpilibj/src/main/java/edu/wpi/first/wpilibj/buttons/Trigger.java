@@ -95,6 +95,33 @@ public abstract class Trigger extends SendableBase {
   }
 
   /**
+   * Starts the given command when the button is pressed, cancels when released.
+   *
+   * {@link Command#start()} will be called when the trigger is
+   * active, and will be canceled when the trigger becomes inactive.
+   *
+   * @param command the command to start
+   */
+  public void whenHeld(final Command command) {
+    new ButtonScheduler() {
+      private boolean m_pressedLast = grab();
+
+      @Override
+      public void execute() {
+        boolean pressed = grab();
+
+        if (!m_pressedLast && pressed) {
+          command.start();
+        } else if (m_pressedLast && !pressed) {
+          command.cancel();
+        }
+
+        m_pressedLast = pressed;
+      }
+    }.start();
+  }
+
+  /**
    * Starts the command when the trigger becomes inactive.
    *
    * @param command the command to start
