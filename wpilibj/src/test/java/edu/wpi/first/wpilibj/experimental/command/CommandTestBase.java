@@ -52,4 +52,16 @@ public abstract class CommandTestBase {
       m_counter++;
     }
   }
+
+  protected class ConditionHolder {
+    private boolean m_condition;
+
+    void setCondition(boolean condition) {
+      m_condition = condition;
+    }
+
+    boolean getCondition() {
+      return m_condition;
+    }
+  }
 }
