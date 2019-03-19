@@ -44,4 +44,12 @@ public abstract class CommandTestBase {
     }
 
   }
+
+  protected class Counter {
+    int m_counter;
+
+    void increment() {
+      m_counter++;
+    }
+  }
 }

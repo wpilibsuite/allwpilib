@@ -7,15 +7,7 @@
 
 package edu.wpi.first.wpilibj.experimental.command;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -32,7 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * The scheduler responsible for running {@link Command}s.  A Command-based robot should call
  * {@link CommandScheduler#run()} on the singleton instance in its periodic block in order to
  * run commands synchronously from the main loop.  Subsystems should be registered with the
- * scheduler using {@link CommandScheduler#registerSubsystem(Subsystem)} in order for their
+ * scheduler using {@link CommandScheduler#registerSubsystem(Subsystem...)} in order for their
  * {@link Subsystem#periodic()} methods to be called and for their default commands to be scheduled.
  */
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
@@ -64,12 +56,6 @@ public final class CommandScheduler extends SendableBase {
 
   //The set of all subsystems that have been registered with the scheduler.
   private final Collection<Subsystem> m_subsystems = new HashSet<>();
-
-  //Set of commands to that have finished.  Field to avoid garbage collection/reallocation.
-  private final Set<Command> m_finished = new HashSet<>();
-
-  //Set of commands to cancel.  Field to avoid garbage collection/reallocation.
-  private final Set<Command> m_toCancel = new HashSet<>();
 
   //The set of currently-bound buttons.
   private final Collection<ButtonScheduler> m_buttons = new LinkedHashSet<>();
@@ -203,11 +189,14 @@ public final class CommandScheduler extends SendableBase {
       button.execute();
     }
 
-    //Run scheduled commands, and remove if finished.
-    for (Command command : m_scheduledCommands.keySet()) {
+    //Run scheduled commands, remove finished commands.
+    for (Iterator<Command> iterator = m_scheduledCommands.keySet().iterator();
+         iterator.hasNext();) {
+      Command command = iterator.next();
 
       if (RobotState.isDisabled() && !command.runsWhenDisabled()) {
-        m_toCancel.add(command);
+        iterator.remove();
+        cancelCommand(command);
         continue;
       }
 
@@ -220,20 +209,10 @@ public final class CommandScheduler extends SendableBase {
         for (Consumer<Command> action : m_endActions) {
           action.accept(command);
         }
-        m_finished.add(command);
+        iterator.remove();
+        m_requirements.keySet().removeAll(command.getRequirements());
       }
     }
-
-    for (Command command : m_toCancel) {
-      cancelCommand(command);
-    }
-    m_toCancel.clear();
-
-    for (Command command : m_finished) {
-      m_scheduledCommands.remove(command);
-      m_requirements.keySet().removeAll(command.getRequirements());
-    }
-    m_finished.clear();
 
     //Add default commands for un-required registered subsystems.
     for (Subsystem subsystem : m_subsystems) {
