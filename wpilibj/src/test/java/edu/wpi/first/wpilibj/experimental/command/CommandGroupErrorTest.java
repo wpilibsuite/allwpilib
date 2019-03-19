@@ -39,7 +39,7 @@ public class CommandGroupErrorTest extends CommandTestBase {
   }
 
   @Test
-  void decoratorErrorTest() {
+  void redecoratedCommandErrorTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
     Command command = new InstantCommand();
