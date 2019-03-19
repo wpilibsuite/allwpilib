@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj.experimental.buttons;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.experimental.command.Command;
 import edu.wpi.first.wpilibj.experimental.command.CommandScheduler;
+import edu.wpi.first.wpilibj.experimental.command.InstantCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -49,7 +50,8 @@ public abstract class Trigger extends SendableBase {
   /**
    * Starts the given command whenever the trigger just becomes active.
    *
-   * @param command the command to start
+   * @param command       the command to start
+   * @param interruptible whether the command is interruptible
    */
   public void whenActive(final Command command, boolean interruptible) {
     new ButtonScheduler() {
@@ -68,8 +70,23 @@ public abstract class Trigger extends SendableBase {
     }.start();
   }
 
+  /**
+   * Starts the given command whenever the trigger just becomes active.  The command is set to be
+   * interruptible.
+   *
+   * @param command the command to start
+   */
   public void whenActive(final Command command) {
     whenActive(command, true);
+  }
+
+  /**
+   * Runs the given runnable whenever the trigger just becomes active.
+   *
+   * @param toRun the runnable to run
+   */
+  public void whenActive(final Runnable toRun) {
+    whenActive(new InstantCommand(toRun));
   }
 
   /**
@@ -78,9 +95,10 @@ public abstract class Trigger extends SendableBase {
    * {@link Command#schedule(boolean)} will be called repeatedly while the trigger is active, and
    * will be canceled when the trigger becomes inactive.
    *
-   * @param command the command to start
+   * @param command       the command to start
+   * @param interruptible whether the command is interruptible
    */
-  public void whileActive(final Command command, boolean interruptible) {
+  public void whileActiveContinuous(final Command command, boolean interruptible) {
     new ButtonScheduler() {
       private boolean m_pressedLast = grab();
 
@@ -99,14 +117,68 @@ public abstract class Trigger extends SendableBase {
     }.start();
   }
 
-  public void whileActive(final Command command) {
-    whileActive(command, true);
+  /**
+   * Constantly starts the given command while the button is held.
+   *
+   * {@link Command#schedule(boolean)} will be called repeatedly while the trigger is active, and
+   * will be canceled when the trigger becomes inactive.  The command is set to be interruptible.
+   *
+   * @param command the command to start
+   */
+  public void whileActiveContinuous(final Command command) {
+    whileActiveContinuous(command, true);
+  }
+
+  /**
+   * Constantly runs the given runnable while the button is held.
+   *
+   * @param toRun the runnable to run
+   */
+  public void whileActiveContinuous(final Runnable toRun) {
+    whileActiveContinuous(new InstantCommand(toRun));
+  }
+
+  /**
+   * Starts the given command when the trigger initially becomes active, and ends it when it
+   * becomes inactive, but does not re-start it in-between.
+   *
+   * @param command       the command to start
+   * @param interruptible whether the command is interruptible
+   */
+  public void whileActiveOnce(final Command command, boolean interruptible) {
+    new ButtonScheduler() {
+      private boolean m_pressedLast = grab();
+
+      @Override
+      public void execute() {
+        boolean pressed = grab();
+
+        if (!m_pressedLast && pressed) {
+          command.schedule(interruptible);
+        } else if (m_pressedLast && !pressed) {
+          command.cancel();
+        }
+
+        m_pressedLast = pressed;
+      }
+    }.start();
+  }
+
+  /**
+   * Starts the given command when the trigger initially becomes active, and ends it when it
+   * becomes inactive, but does not re-start it in-between.  The command is set to be interruptible.
+   *
+   * @param command the command to start
+   */
+  public void whileActiveOnce(final Command command) {
+    whileActiveOnce(command, true);
   }
 
   /**
    * Starts the command when the trigger becomes inactive.
    *
-   * @param command the command to start
+   * @param command       the command to start
+   * @param interruptible whether the command is interruptible
    */
   public void whenInactive(final Command command, boolean interruptible) {
     new ButtonScheduler() {
@@ -125,14 +197,29 @@ public abstract class Trigger extends SendableBase {
     }.start();
   }
 
+  /**
+   * Starts the command when the trigger becomes inactive.  The command is set to be interruptible.
+   *
+   * @param command the command to start
+   */
   public void whenInactive(final Command command) {
     whenInactive(command, true);
   }
 
   /**
+   * Runs the given runnable when the trigger becomes inactive.
+   *
+   * @param toRun the runnable to run
+   */
+  public void whenInactive(final Runnable toRun) {
+    whenInactive(new InstantCommand(toRun));
+  }
+
+  /**
    * Toggles a command when the trigger becomes active.
    *
-   * @param command the command to toggle
+   * @param command       the command to toggle
+   * @param interruptible whether the command is interruptible
    */
   public void toggleWhenActive(final Command command, boolean interruptible) {
     new ButtonScheduler() {
@@ -155,6 +242,11 @@ public abstract class Trigger extends SendableBase {
     }.start();
   }
 
+  /**
+   * Toggles a command when the trigger becomes active.  The command is set to be interruptible.
+   *
+   * @param command the command to toggle
+   */
   public void toggleWhenActive(final Command command) {
     toggleWhenActive(command, true);
   }
