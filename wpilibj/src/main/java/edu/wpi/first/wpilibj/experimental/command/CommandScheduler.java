@@ -249,20 +249,20 @@ public final class CommandScheduler extends SendableBase {
    * scheduled.  It is recommended to call this from the constructor of your subsystem
    * implementations.
    *
-   * @param subsystem the subsystem to register
+   * @param subsystems the subsystem to register
    */
-  void registerSubsystem(Subsystem subsystem) {
-    m_subsystems.add(subsystem);
+  void registerSubsystem(Subsystem... subsystems) {
+    m_subsystems.addAll(Set.of(subsystems));
   }
 
   /**
    * Un-registers a subsystem with the scheduler.  The subsystem will no longer have its periodic
    * block called, and will not have its default command scheduled.
    *
-   * @param subsystem the subsystem to un-register
+   * @param subsystems the subsystem to un-register
    */
-  void unregisterSubsystem(Subsystem subsystem) {
-    m_subsystems.remove(subsystem);
+  void unregisterSubsystem(Subsystem... subsystems) {
+    m_subsystems.removeAll(Set.of(subsystems));
   }
 
   /**
