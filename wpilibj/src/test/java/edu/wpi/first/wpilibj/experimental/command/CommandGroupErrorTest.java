@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CommandGroupErrorTest extends CommandTestBase {
@@ -37,5 +38,15 @@ public class CommandGroupErrorTest extends CommandTestBase {
         () -> scheduler.scheduleCommand(command1, true));
   }
 
+  @Test
+  void decoratorErrorTest() {
+    CommandScheduler scheduler = new CommandScheduler();
 
+    Command command = new InstantCommand();
+
+    assertDoesNotThrow(() -> command.withTimeout(10).withInterruptCondition(() -> false));
+    assertThrows(IllegalUseOfCommandException.class, () -> command.withTimeout(10));
+    CommandGroupBase.clearGroupedCommand(command);
+    assertDoesNotThrow(() -> command.withTimeout(10));
+  }
 }
