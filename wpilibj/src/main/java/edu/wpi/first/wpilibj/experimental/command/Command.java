@@ -1,6 +1,5 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
@@ -57,17 +56,14 @@ public interface Command {
    * Specifies the set of subsystems used by this command.  Two commands cannot use the same
    * subsystem at the same time.  If the command is scheduled as interruptible and another
    * command is scheduled that shares a requirement, the command will be interrupted.  Else,
-   * the command will not be scheduled.  If no subsystems are required, return an empty set
-   * (as is done in the default implementation).
+   * the command will not be scheduled.  If no subsystems are required, return an empty set.
    *
    * <p>Note: it is recommended that user implementations contain the requirements as a field,
    * and return that field here, rather than allocating a new set every time this is called.
    *
    * @return the set of subsystems that are required
    */
-  default Set<Subsystem> getRequirements() {
-    return new HashSet<>();
-  }
+  Set<Subsystem> getRequirements();
 
   /**
    * Decorates this command with a timeout.  If the specified timeout is exceeded before the command
