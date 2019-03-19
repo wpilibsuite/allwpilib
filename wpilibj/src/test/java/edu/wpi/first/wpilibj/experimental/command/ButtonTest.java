@@ -129,13 +129,6 @@ class ButtonTest extends CommandTestBase {
 
   @Test
   void runnableBindingTest() {
-    class Counter {
-      int m_counter;
-
-      void increment() {
-        m_counter++;
-      }
-    }
 
     InternalButton buttonWhenPressed = new InternalButton();
     InternalButton buttonWhileHeld = new InternalButton();
