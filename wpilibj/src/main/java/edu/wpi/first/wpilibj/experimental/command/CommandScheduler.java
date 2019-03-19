@@ -109,7 +109,7 @@ public final class CommandScheduler extends SendableBase {
    * currently using those requirements have been scheduled as interruptible.  If this is
    * the case, they will be interrupted and the command will be scheduled.
    *
-   * @param command the command to schedule
+   * @param command       the command to schedule
    * @param interruptible whether this command can be interrupted
    */
   @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
@@ -168,6 +168,21 @@ public final class CommandScheduler extends SendableBase {
   }
 
   /**
+   * Schedules multiple commands for execution.  Does nothing if the command is already scheduled.
+   * If a command's requirements are not available, it will only be started if all the commands
+   * currently using those requirements have been scheduled as interruptible.  If this is
+   * the case, they will be interrupted and the command will be scheduled.
+   *
+   * @param interruptible whether the commands should be interruptible
+   * @param commands      the commands to schedule
+   */
+  public void scheduleCommands(boolean interruptible, Command... commands) {
+    for (Command command : commands) {
+      scheduleCommand(command, interruptible);
+    }
+  }
+
+  /**
    * Runs a single iteration of the scheduler.  The execution occurs in the following order:
    *
    * <p>Subsystem periodic methods are called.
@@ -200,7 +215,7 @@ public final class CommandScheduler extends SendableBase {
 
     //Run scheduled commands, remove finished commands.
     for (Iterator<Command> iterator = m_scheduledCommands.keySet().iterator();
-         iterator.hasNext();) {
+         iterator.hasNext(); ) {
       Command command = iterator.next();
 
       if (RobotState.isDisabled() && !command.runsWhenDisabled()) {
@@ -232,7 +247,7 @@ public final class CommandScheduler extends SendableBase {
   }
 
   /**
-   * Registers a subsystem with the scheduler.  This must be called for the subsystem's periodic
+   * Registers subsystems with the scheduler.  This must be called for the subsystem's periodic
    * block to run when the scheduler is run, and for the subsystem's default command to be
    * scheduled.  It is recommended to call this from the constructor of your subsystem
    * implementations.
@@ -244,7 +259,7 @@ public final class CommandScheduler extends SendableBase {
   }
 
   /**
-   * Un-registers a subsystem with the scheduler.  The subsystem will no longer have its periodic
+   * Un-registers subsystems with the scheduler.  The subsystem will no longer have its periodic
    * block called, and will not have its default command scheduled.
    *
    * @param subsystems the subsystem to un-register
@@ -254,23 +269,24 @@ public final class CommandScheduler extends SendableBase {
   }
 
   /**
-   * Cancels a command.  The scheduler will only call the interrupted method of a canceled command,
+   * Cancels commands.  The scheduler will only call the interrupted method of a canceled command,
    * not the end method.  Commands will be canceled even if they are not scheduled as interruptible.
    *
-   * @param command the command to cancel
+   * @param commands the commands to cancel
    */
-  public void cancelCommand(Command command) {
+  public void cancelCommand(Command... commands) {
+    for (Command command : commands) {
+      if (!m_scheduledCommands.containsKey(command)) {
+        continue;
+      }
 
-    if (!m_scheduledCommands.containsKey(command)) {
-      return;
+      command.interrupted();
+      for (Consumer<Command> action : m_interruptActions) {
+        action.accept(command);
+      }
+      m_scheduledCommands.remove(command);
+      m_requirements.keySet().removeAll(command.getRequirements());
     }
-
-    command.interrupted();
-    for (Consumer<Command> action : m_interruptActions) {
-      action.accept(command);
-    }
-    m_scheduledCommands.remove(command);
-    m_requirements.keySet().removeAll(command.getRequirements());
   }
 
   /**
@@ -300,15 +316,15 @@ public final class CommandScheduler extends SendableBase {
   }
 
   /**
-   * Whether a given command is running.  Note that this only works on commands that are directly
-   * scheduled by the scheduler; it will not work on commands inside of CommandGroups, as the
-   * scheduler does not see them.
+   * Whether the given commands are running.  Note that this only works on commands that are
+   * directly scheduled by the scheduler; it will not work on commands inside of CommandGroups, as
+   * the scheduler does not see them.
    *
-   * @param command the command to query
+   * @param commands the command to query
    * @return whether the command is currently scheduled
    */
-  public boolean isScheduled(Command command) {
-    return m_scheduledCommands.containsKey(command);
+  public boolean isScheduled(Command... commands) {
+    return m_scheduledCommands.keySet().containsAll(Set.of(commands));
   }
 
   /**

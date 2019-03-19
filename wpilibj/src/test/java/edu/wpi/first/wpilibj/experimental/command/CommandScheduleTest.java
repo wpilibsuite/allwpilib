@@ -55,6 +55,37 @@ class CommandScheduleTest extends CommandTestBase {
   }
 
   @Test
+  void multiScheduleTest() {
+    CommandScheduler scheduler = new CommandScheduler();
+
+    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
+    Command command2 = command2Holder.getMock();
+    MockCommandHolder command3Holder = new MockCommandHolder(true, new Subsystem[0]);
+    Command command3 = command3Holder.getMock();
+
+    scheduler.scheduleCommands(true, command1, command2, command3);
+    assertTrue(scheduler.isScheduled(command1, command2, command3));
+    scheduler.run();
+    assertTrue(scheduler.isScheduled(command1, command2, command3));
+
+    command1Holder.setFinished(true);
+    scheduler.run();
+    assertTrue(scheduler.isScheduled(command2, command3));
+    assertFalse(scheduler.isScheduled(command1));
+
+    command2Holder.setFinished(true);
+    scheduler.run();
+    assertTrue(scheduler.isScheduled(command3));
+    assertFalse(scheduler.isScheduled(command1, command2));
+
+    command3Holder.setFinished(true);
+    scheduler.run();
+    assertFalse(scheduler.isScheduled(command1, command2, command3));
+  }
+
+  @Test
   void schedulerCancelTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
