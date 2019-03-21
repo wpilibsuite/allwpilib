@@ -9,7 +9,7 @@ import java.util.Set;
 public class BlockingScheduleCommand extends SendableCommandBase {
 
   private final Set<Command> m_toSchedule;
-  private boolean finished;
+  private boolean m_finished;
 
   /**
    * Creates a new BlockingScheduleCommand that schedules the given commands when initialized,
@@ -23,7 +23,7 @@ public class BlockingScheduleCommand extends SendableCommandBase {
 
   @Override
   public void initialize() {
-    finished = false;
+    m_finished = false;
     for (Command command : m_toSchedule) {
       command.schedule();
     }
@@ -32,12 +32,12 @@ public class BlockingScheduleCommand extends SendableCommandBase {
   @Override
   public void execute() {
     for (Command command : m_toSchedule) {
-      finished &= command.isScheduled();
+      m_finished &= command.isScheduled();
     }
   }
 
   @Override
   public boolean isFinished() {
-    return finished;
+    return m_finished;
   }
 }
