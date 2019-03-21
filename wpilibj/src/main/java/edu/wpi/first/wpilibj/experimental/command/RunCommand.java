@@ -8,18 +8,18 @@ import java.util.function.BooleanSupplier;
  * {@link Command#withInterruptCondition(BooleanSupplier)} to give it one.  If you only wish
  * to execute a Runnable once, use {@link InstantCommand}.
  */
-public class RunRunnableCommand extends SendableCommandBase {
+public class RunCommand extends SendableCommandBase {
 
   protected Runnable m_toRun;
 
   /**
-   * Creates a new RunRunnableCommand.  The Runnable will be run continuously until the command
+   * Creates a new RunCommand.  The Runnable will be run continuously until the command
    * ends.
    *
    * @param toRun        the Runnable to run
    * @param requirements the subsystems to require
    */
-  public RunRunnableCommand(Runnable toRun, Subsystem... requirements) {
+  public RunCommand(Runnable toRun, Subsystem... requirements) {
     m_toRun = toRun;
     addRequirements(requirements);
   }
@@ -30,7 +30,7 @@ public class RunRunnableCommand extends SendableCommandBase {
    *
    * @param toRun the Runnable to run
    */
-  public RunRunnableCommand(Runnable toRun) {
+  public RunCommand(Runnable toRun) {
     this(toRun, new Subsystem[0]);
   }
 
