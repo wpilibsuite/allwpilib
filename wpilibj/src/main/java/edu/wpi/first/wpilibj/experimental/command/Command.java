@@ -174,6 +174,44 @@ public interface Command {
   }
 
   /**
+   * Decorates this command with a set of commands to run parallel to it, ending when the last
+   * command ends.  Often more convenient/less-verbose than constructing a new
+   * {@link ParallelCommandGroup} explicitly.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup.  The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with
+   * {@link CommandGroupBase#clearGroupedCommand(Command)}.  The decorated command can, however, be
+   * further decorated without issue.
+   *
+   * @param parallel the commands to run in parallel
+   * @return the decorated command
+   */
+  default Command asWellAs(Command... parallel) {
+    return new ParallelCommandGroup(
+        (Command[]) Stream.concat(Stream.of(this), Arrays.stream(parallel)).toArray());
+  }
+
+  /**
+   * Decorates this command with a set of commands to run parallel to it, ending when the first
+   * command ends.  Often more convenient/less-verbose than constructing a new
+   * {@link ParallelRaceGroup} explicitly.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup.  The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with
+   * {@link CommandGroupBase#clearGroupedCommand(Command)}.  The decorated command can, however, be
+   * further decorated without issue.
+   *
+   * @param parallel the commands to run in parallel
+   * @return the decorated command
+   */
+  default Command raceWith(Command... parallel) {
+    return new ParallelRaceGroup(
+        (Command[]) Stream.concat(Stream.of(this), Arrays.stream(parallel)).toArray());
+  }
+
+  /**
    * Schedules this command.
    *
    * @param interruptible whether this command can be interrupted by another command that
