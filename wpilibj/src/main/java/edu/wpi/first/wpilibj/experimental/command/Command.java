@@ -1,7 +1,9 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Stream;
 
 /**
  * A state machine representing a complete action to be performed by the robot.  Commands are
@@ -136,10 +138,8 @@ public interface Command {
   }
 
   /**
-   * Decorates this command with a command to run directly after it in sequence.  Note that chaining
-   * this method multiple times does work, but is strictly less-efficient than manually creating a
-   * {@link SequentialCommandGroup}; if more than two commands are desired in sequence, one should
-   * do that instead.
+   * Decorates this command with a set of commands to run after it in sequence.  Often more
+   * convenient/less-verbose than constructing a new {@link SequentialCommandGroup} explicitly.
    *
    * <p>Note: This decorator works by composing this command within a CommandGroup.  The command
    * cannot be used independently after being decorated, or be re-decorated with a different
@@ -147,11 +147,30 @@ public interface Command {
    * {@link CommandGroupBase#clearGroupedCommand(Command)}.  The decorated command can, however, be
    * further decorated without issue.
    *
-   * @param next the command to run next
+   * @param next the commands to run next
    * @return the decorated command
    */
-  default Command andThen(Command next) {
-    return new SequentialCommandGroup(this, next);
+  default Command andThen(Command... next) {
+    return new SequentialCommandGroup(
+        (Command[]) Stream.concat(Stream.of(this), Arrays.stream(next)).toArray());
+  }
+
+  /**
+   * Decorates this command with a set of commands to run parallel to it.  Often more
+   * convenient/less-verbose than constructing a new {@link ParallelCommandGroup} explicitly.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup.  The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with
+   * {@link CommandGroupBase#clearGroupedCommand(Command)}.  The decorated command can, however, be
+   * further decorated without issue.
+   *
+   * @param parallel the commands to run in parallel
+   * @return the decorated command
+   */
+  default Command alongWith(Command... parallel) {
+    return new ParallelCommandGroup(
+        (Command[]) Stream.concat(Stream.of(this), Arrays.stream(parallel)).toArray());
   }
 
   /**
