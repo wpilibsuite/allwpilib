@@ -245,7 +245,12 @@ public class PIDController extends Controller implements Sendable, AutoCloseable
    * @param measurement The latest measurement of the process variable.
    */
   public void setMeasurement(double measurement) {
-    m_measurement = measurement;
+    m_thisMutex.lock();
+    try {
+      m_measurement = measurement;
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
