@@ -307,7 +307,8 @@ public final class CommandScheduler extends SendableBase {
 
   /**
    * Cancels commands.  The scheduler will only call the interrupted method of a canceled command,
-   * not the end method.  Commands will be canceled even if they are not scheduled as interruptible.
+   * not the end method (though the interrupted method may itself call the end method).  Commands
+   * will be canceled even if they are not scheduled as interruptible.
    *
    * @param commands the commands to cancel
    */
