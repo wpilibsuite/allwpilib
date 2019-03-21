@@ -32,7 +32,7 @@ public class BlockingScheduleCommand extends SendableCommandBase {
   @Override
   public void execute() {
     for (Command command : m_toSchedule) {
-      m_finished &= command.isScheduled();
+      m_finished &= !command.isScheduled();
     }
   }
 
