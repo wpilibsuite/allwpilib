@@ -263,4 +263,19 @@ public class CommandRequirementsTest extends CommandTestBase {
     verify(command1).interrupted();
     verify(command2, never()).interrupted();
   }
+
+  @Test
+  void defaultCommandRequirementErrorTest() {
+    CommandScheduler scheduler = new CommandScheduler();
+
+    Subsystem system = new TestSubsystem();
+
+    Command missingRequirement = new EndOnConditionCommand(() -> false);
+    Command ends = new InstantCommand(() -> { }, system);
+
+    assertThrows(IllegalUseOfCommandException.class,
+        () -> scheduler.setDefaultCommand(system, missingRequirement));
+    assertThrows(IllegalUseOfCommandException.class,
+        () -> scheduler.setDefaultCommand(system, ends));
+  }
 }

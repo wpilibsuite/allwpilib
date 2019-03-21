@@ -2,6 +2,7 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SchedulerTest extends CommandTestBase {
@@ -35,5 +36,15 @@ class SchedulerTest extends CommandTestBase {
     scheduler.cancelCommand(command);
 
     assertEquals(counter.m_counter, 1);
+  }
+
+  @Test
+  void unregisterSubsystemTest() {
+    CommandScheduler scheduler = new CommandScheduler();
+
+    Subsystem system = new TestSubsystem();
+
+    scheduler.registerSubsystem(system);
+    assertDoesNotThrow(() -> scheduler.unregisterSubsystem(system));
   }
 }

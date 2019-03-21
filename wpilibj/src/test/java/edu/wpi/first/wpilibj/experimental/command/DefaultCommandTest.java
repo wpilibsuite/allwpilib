@@ -14,9 +14,8 @@ public class DefaultCommandTest extends CommandTestBase {
 
     MockCommandHolder defaultHolder = new MockCommandHolder(true, hasDefaultCommand);
     Command defaultCommand = defaultHolder.getMock();
-    hasDefaultCommand.setDefaultCommand(defaultCommand);
 
-    scheduler.registerSubsystem(hasDefaultCommand);
+    scheduler.setDefaultCommand(hasDefaultCommand, defaultCommand);
     scheduler.run();
 
     assertTrue(scheduler.isScheduled(defaultCommand));
@@ -30,11 +29,10 @@ public class DefaultCommandTest extends CommandTestBase {
 
     MockCommandHolder defaultHolder = new MockCommandHolder(true, hasDefaultCommand);
     Command defaultCommand = defaultHolder.getMock();
-    hasDefaultCommand.setDefaultCommand(defaultCommand);
     MockCommandHolder interrupterHolder = new MockCommandHolder(true, hasDefaultCommand);
     Command interrupter = interrupterHolder.getMock();
 
-    scheduler.registerSubsystem(hasDefaultCommand);
+    scheduler.setDefaultCommand(hasDefaultCommand, defaultCommand);
     scheduler.run();
     scheduler.scheduleCommand(interrupter, true);
 
