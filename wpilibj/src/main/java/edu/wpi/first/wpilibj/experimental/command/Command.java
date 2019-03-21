@@ -104,7 +104,7 @@ public interface Command {
   }
 
   /**
-   * Decorates this command with a runnable to be run after the command finishes.
+   * Decorates this command with a runnable to run after the command finishes.
    *
    * <p>Note: This decorator works by composing this command within a CommandGroup.  The command
    * cannot be used independently after being decorated, or be re-decorated with a different
@@ -133,6 +133,25 @@ public interface Command {
    */
   default Command beforeStarting(Runnable toRun) {
     return new SequentialCommandGroup(new InstantCommand(toRun), this);
+  }
+
+  /**
+   * Decorates this command with a command to run directly after it in sequence.  Note that chaining
+   * this method multiple times does work, but is strictly less-efficient than manually creating a
+   * {@link SequentialCommandGroup}; if more than two commands are desired in sequence, one should
+   * do that instead.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup.  The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with
+   * {@link CommandGroupBase#clearGroupedCommand(Command)}.  The decorated command can, however, be
+   * further decorated without issue.
+   *
+   * @param next the command to run next
+   * @return the decorated command
+   */
+  default Command andThen(Command next) {
+    return new SequentialCommandGroup(this, next);
   }
 
   /**
