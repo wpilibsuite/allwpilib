@@ -11,10 +11,9 @@ package edu.wpi.first.wpilibj.experimental.command;
  *
  * <p>Subsystems must be registered with the scheduler with the
  * {@link CommandScheduler#registerSubsystem(Subsystem...)} method in order for the
- * {@link Subsystem#periodic()} method to be called, and for the default command to be scheduled.
- * It is recommended that this method be called from the constructor of users' Subsystem
- * implementations.  The {@link SendableSubsystemBase} class offers a simple base for user
- * implementations that handles this.
+ * {@link Subsystem#periodic()} method to be called.  It is recommended that this method be called
+ * from the constructor of users' Subsystem implementations.  The {@link SendableSubsystemBase}
+ * class offers a simple base for user implementations that handles this.
  */
 public interface Subsystem {
 
