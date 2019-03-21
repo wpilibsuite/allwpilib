@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.experimental.buttons;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.experimental.command.Command;
 import edu.wpi.first.wpilibj.experimental.command.CommandScheduler;
@@ -25,8 +27,26 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * the full functionality of the Trigger class.
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public abstract class Trigger extends SendableBase {
+public class Trigger extends SendableBase {
   private volatile boolean m_sendablePressed;
+  private final BooleanSupplier m_isActive;
+
+  /**
+   * Creates a new trigger with the given condition determining whether it is active.
+   *
+   * @param isActive returns whether or not the trigger should be active
+   */
+  public Trigger(BooleanSupplier isActive) {
+    m_isActive = isActive;
+  }
+
+  /**
+   * Creates a new trigger that is always inactive.  Useful only as a no-arg constructor
+   * for subclasses that will be overriding {@link Trigger#get()} anyway.
+   */
+  public Trigger() {
+    m_isActive = () -> false;
+  }
 
   /**
    * Returns whether or not the trigger is active.
@@ -35,7 +55,9 @@ public abstract class Trigger extends SendableBase {
    *
    * @return whether or not the trigger condition is active.
    */
-  public abstract boolean get();
+  public boolean get() {
+    return m_isActive.getAsBoolean();
+  }
 
   /**
    * Returns whether get() return true or the internal table for SmartDashboard use is pressed.
@@ -283,6 +305,38 @@ public abstract class Trigger extends SendableBase {
     public void start() {
       CommandScheduler.getInstance().addButton(this);
     }
+  }
+
+  /**
+   * Composes this trigger with another trigger, returning a new trigger that is active when both
+   * triggers are active.
+   *
+   * @param trigger the trigger to compose with
+   * @return the trigger that is active when both triggers are active
+   */
+  public Trigger and(Trigger trigger) {
+    return new Trigger(() -> grab() && trigger.grab());
+  }
+
+  /**
+   * Composes this trigger with another trigger, returning a new trigger that is active when either
+   * trigger is active.
+   *
+   * @param trigger the trigger to compose with
+   * @return the trigger that is active when either trigger is active
+   */
+  public Trigger or(Trigger trigger) {
+    return new Trigger(() -> grab() || trigger.grab());
+  }
+
+  /**
+   * Creates a new trigger that is active when this trigger is inactive, i.e. that acts as the
+   * negation of this trigger.
+   *
+   * @return the negated trigger
+   */
+  public Trigger negate() {
+    return new Trigger(() -> !grab());
   }
 
   @Override
