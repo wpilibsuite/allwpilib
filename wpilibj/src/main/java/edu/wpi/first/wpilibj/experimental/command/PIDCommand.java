@@ -7,17 +7,12 @@
 
 package edu.wpi.first.wpilibj.experimental.command;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.experimental.controller.ControllerOutput;
 import edu.wpi.first.wpilibj.experimental.controller.AsynchronousControllerRunner;
-import edu.wpi.first.wpilibj.experimental.controller.MeasurementSource;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-public abstract class PIDCommand extends Command implements ControllerOutput, MeasurementSource {
+public abstract class PIDCommand extends Command {
   // The internal PIDController
   private final PIDController m_controller;
   private final AsynchronousControllerRunner m_runner;
@@ -47,12 +42,8 @@ public abstract class PIDCommand extends Command implements ControllerOutput, Me
     setReference(getReference() + deltaReference);
   }
 
-  // ControllerOutput interface
-  @Override
   public abstract void setOutput(double output);
 
-  // MeasurementSource interface
-  @Override
   public abstract double getMeasurement();
 
   @Override

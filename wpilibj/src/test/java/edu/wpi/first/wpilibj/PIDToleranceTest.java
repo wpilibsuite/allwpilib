@@ -14,9 +14,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import edu.wpi.first.wpilibj.experimental.controller.ControllerOutput;
 import edu.wpi.first.wpilibj.experimental.controller.AsynchronousControllerRunner;
-import edu.wpi.first.wpilibj.experimental.controller.MeasurementSource;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

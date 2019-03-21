@@ -7,12 +7,8 @@
 
 package edu.wpi.first.wpilibj.experimental.command;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.experimental.controller.ControllerOutput;
 import edu.wpi.first.wpilibj.experimental.controller.AsynchronousControllerRunner;
-import edu.wpi.first.wpilibj.experimental.controller.MeasurementSource;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
 /**
@@ -23,8 +19,7 @@ import edu.wpi.first.wpilibj.experimental.controller.PIDController;
  * <p>It provides some convenience methods to run an internal PIDController. It also allows access
  * to the internal PIDController in order to give total control to the programmer.
  */
-public abstract class PIDSubsystem extends Subsystem implements ControllerOutput,
-       MeasurementSource {
+public abstract class PIDSubsystem extends Subsystem {
   // The internal PIDController
   private final PIDController m_controller;
   private final AsynchronousControllerRunner m_runner;
@@ -59,12 +54,8 @@ public abstract class PIDSubsystem extends Subsystem implements ControllerOutput
     m_runner.disable();
   }
 
-  // ControllerOutput interface
-  @Override
   public abstract void setOutput(double output);
 
-  // MeasurementSource interface
-  @Override
   public abstract double getMeasurement();
 
   /**
