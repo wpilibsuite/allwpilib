@@ -120,6 +120,22 @@ public interface Command {
   }
 
   /**
+   * Decorates this command with a runnable to run before this command starts.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup.  The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with
+   * {@link CommandGroupBase#clearGroupedCommand(Command)}.  The decorated command can, however, be
+   * further decorated without issue.
+   *
+   * @param toRun the Runnable to run
+   * @return the decorated command
+   */
+  default Command beforeStarting(Runnable toRun) {
+    return new SequentialCommandGroup(new InstantCommand(toRun), this);
+  }
+
+  /**
    * Schedules this command.
    *
    * @param interruptible whether this command can be interrupted by another command that
