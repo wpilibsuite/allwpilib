@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.DoubleSupplier;
 import java.util.logging.Logger;
 
 import org.junit.After;
@@ -57,7 +58,21 @@ public class PIDTest extends AbstractComsSetup {
 
   @SuppressWarnings({"MemberName", "EmptyLineSeparator", "MultipleVariableDeclarations"})
   private final Double k_p, k_i, k_d;
-  private double m_reference;
+
+  private class ReferenceHolder implements DoubleSupplier {
+    private double m_reference;
+
+    public void setReference(double reference) {
+      m_reference = reference;
+    }
+
+    @Override
+    public double getAsDouble() {
+      return m_reference;
+    }
+  }
+
+  private ReferenceHolder m_reference = new ReferenceHolder();
 
   @Override
   protected Logger getClassLogger() {
@@ -114,7 +129,7 @@ public class PIDTest extends AbstractComsSetup {
     m_builder.setTable(m_table);
     m_controller = new PIDController(k_p, k_i, k_d);
     m_runner = new AsynchronousControllerRunner(m_controller,
-        () -> m_reference,
+        m_reference,
         me.getEncoder()::getDistance,
         me.getMotor()::set);
     m_controller.initSendable(m_builder);
@@ -143,7 +158,7 @@ public class PIDTest extends AbstractComsSetup {
     setupAbsoluteTolerance();
     setupOutputRange();
     double reference = 2500.0;
-    m_reference = reference;
+    m_reference.setReference(reference);
     assertFalse("PID did not begin disabled", m_runner.isEnabled());
     assertEquals("PID.getError() did not start at " + reference, reference,
         m_controller.getError(), 0);
@@ -160,7 +175,7 @@ public class PIDTest extends AbstractComsSetup {
     setupAbsoluteTolerance();
     setupOutputRange();
     double reference = 2500.0;
-    m_reference = reference;
+    m_reference.setReference(reference);
     m_runner.enable();
     m_builder.updateTable();
     assertTrue(m_table.getEntry("enabled").getBoolean(false));
@@ -179,7 +194,7 @@ public class PIDTest extends AbstractComsSetup {
     setupOutputRange();
     Double reference = 2500.0;
     m_runner.disable();
-    m_reference = reference;
+    m_reference.setReference(reference);
     m_runner.enable();
     assertEquals("Did not correctly set reference", reference, new Double(m_controller
         .getReference()));
@@ -191,7 +206,7 @@ public class PIDTest extends AbstractComsSetup {
     setupOutputRange();
     double reference = 1000.0;
     assertEquals(pidData() + "did not start at 0", 0, m_controller.getOutput(), 0);
-    m_reference = reference;
+    m_reference.setReference(reference);
     assertEquals(pidData() + "did not have an error of " + reference, reference,
         m_controller.getError(), 0);
     m_runner.enable();
