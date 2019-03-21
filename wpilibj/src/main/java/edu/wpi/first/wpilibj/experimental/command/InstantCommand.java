@@ -7,26 +7,26 @@ package edu.wpi.first.wpilibj.experimental.command;
  */
 public class InstantCommand extends SendableCommandBase {
 
-  private final Runnable m_runnable;
+  private final Runnable m_toRun;
 
   /**
    * Creates a new InstantCommand that runs the given Runnable with the given requirements.
    *
-   * @param runnable     the Runnable to run
+   * @param toRun        the Runnable to run
    * @param requirements the subsystems required by this command
    */
-  public InstantCommand(Runnable runnable, Subsystem... requirements) {
-    m_runnable = runnable;
+  public InstantCommand(Runnable toRun, Subsystem... requirements) {
+    m_toRun = toRun;
     addRequirements(requirements);
   }
 
   /**
    * Creates a new InstantCommand that runs the given Runnable with no requirements.
    *
-   * @param runnable the Runnable to run
+   * @param toRun the Runnable to run
    */
-  public InstantCommand(Runnable runnable) {
-    this(runnable, new Subsystem[0]);
+  public InstantCommand(Runnable toRun) {
+    this(toRun, new Subsystem[0]);
   }
 
   /**
@@ -35,13 +35,13 @@ public class InstantCommand extends SendableCommandBase {
    */
   public InstantCommand() {
     //let's all laugh really hard at the style checker...
-    m_runnable = () -> {
+    m_toRun = () -> {
     };
   }
 
   @Override
   public void initialize() {
-    m_runnable.run();
+    m_toRun.run();
   }
 
   @Override
