@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj.experimental.command;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -63,8 +62,9 @@ public final class CommandScheduler extends SendableBase {
   //currently-required subsystems.
   private final Map<Subsystem, Command> m_requirements = new LinkedHashMap<>();
 
-  //The set of all subsystems that have been registered with the scheduler.
-  private final Collection<Subsystem> m_subsystems = new HashSet<>();
+  //A map from subsystems registered with the scheduler to their default commands.  Also used
+  //as a list of currently-registered subsystems.
+  private final Map<Subsystem, Command> m_subsystems = new LinkedHashMap<>();
 
   //The set of currently-bound buttons.
   private final Collection<ButtonScheduler> m_buttons = new LinkedHashSet<>();
@@ -204,7 +204,7 @@ public final class CommandScheduler extends SendableBase {
     }
 
     //Run the periodic method of all registered subsystems.
-    for (Subsystem subsystem : m_subsystems) {
+    for (Subsystem subsystem : m_subsystems.keySet()) {
       subsystem.periodic();
     }
 
@@ -234,14 +234,16 @@ public final class CommandScheduler extends SendableBase {
           action.accept(command);
         }
         iterator.remove();
+
         m_requirements.keySet().removeAll(command.getRequirements());
       }
     }
 
     //Add default commands for un-required registered subsystems.
-    for (Subsystem subsystem : m_subsystems) {
-      if (!m_requirements.containsKey(subsystem) && subsystem.getDefaultCommand() != null) {
-        scheduleCommand(subsystem.getDefaultCommand(), true);
+    for (Map.Entry<Subsystem, Command> subsystemCommand : m_subsystems.entrySet()) {
+      if (!m_requirements.containsKey(subsystemCommand.getKey())
+          && subsystemCommand.getValue() != null) {
+        scheduleCommand(subsystemCommand.getValue(), true);
       }
     }
   }
@@ -254,8 +256,10 @@ public final class CommandScheduler extends SendableBase {
    *
    * @param subsystems the subsystem to register
    */
-  void registerSubsystem(Subsystem... subsystems) {
-    m_subsystems.addAll(Set.of(subsystems));
+  public void registerSubsystem(Subsystem... subsystems) {
+    for (Subsystem subsystem : subsystems) {
+      m_subsystems.put(subsystem, null);
+    }
   }
 
   /**
@@ -264,8 +268,41 @@ public final class CommandScheduler extends SendableBase {
    *
    * @param subsystems the subsystem to un-register
    */
-  void unregisterSubsystem(Subsystem... subsystems) {
-    m_subsystems.removeAll(Set.of(subsystems));
+  public void unregisterSubsystem(Subsystem... subsystems) {
+    m_subsystems.keySet().removeAll(Set.of(subsystems));
+  }
+
+  /**
+   * Sets the default command for a subsystem.  Registers that subsystem if it is not already
+   * registered.  Default commands will run whenever there is no other command currently scheduled
+   * that requires the subsystem.  Default commands should be written to never end
+   * (i.e. their {@link Command#isFinished()} method should return false), as they would simply
+   * be re-scheduled if they do.  Default commands must also require their subsystem.
+   *
+   * @param subsystem      the subsystem whose default command will be set
+   * @param defaultCommand the default command to associate with the subsystem
+   */
+  public void setDefaultCommand(Subsystem subsystem, Command defaultCommand) {
+    if (!defaultCommand.getRequirements().contains(subsystem)) {
+      throw new IllegalUseOfCommandException("Default commands must require their subsystem!");
+    }
+
+    if (defaultCommand.isFinished()) {
+      throw new IllegalUseOfCommandException("Default commands should not end!");
+    }
+
+    m_subsystems.put(subsystem, defaultCommand);
+  }
+
+  /**
+   * Gets the default command associated with this subsystem.  Null if this subsystem has no
+   * default command associated with it.
+   *
+   * @param subsystem the subsystem to inquire about
+   * @return the default command associated with the subsystem
+   */
+  public Command getDefaultCommand(Subsystem subsystem) {
+    return m_subsystems.get(subsystem);
   }
 
   /**

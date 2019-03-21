@@ -40,8 +40,6 @@ public class CommandGroupErrorTest extends CommandTestBase {
 
   @Test
   void redecoratedCommandErrorTest() {
-    CommandScheduler scheduler = new CommandScheduler();
-
     Command command = new InstantCommand();
 
     assertDoesNotThrow(() -> command.withTimeout(10).withInterruptCondition(() -> false));

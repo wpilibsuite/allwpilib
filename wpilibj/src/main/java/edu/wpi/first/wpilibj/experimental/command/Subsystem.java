@@ -24,18 +24,29 @@ public interface Subsystem {
    * try to be consistent within their own codebases about which responsibilities will be handled
    * by Commands, and which will be handled here.
    */
-  default void periodic() {}
+  default void periodic() {
+  }
 
   /**
-   * Specifies the default {@link Command} of the subsystem.  The default command will be
+   * Sets the default {@link Command} of the subsystem.  The default command will be
    * automatically scheduled when no other commands are scheduled that require the subsystem.
    * Default commands should generally not end on their own, i.e. their {@link Command#isFinished()}
    * method should always return false.
    *
-   * @return the default command of this subsystem
+   * @param defaultCommand the default command to associate with this subsystem
+   */
+  default void setDefaultCommand(Command defaultCommand) {
+    CommandScheduler.getInstance().setDefaultCommand(this, defaultCommand);
+  }
+
+  /**
+   * Gets the default command for this subsystem.  Returns null if no default command is
+   * currently associated with the subsystem.
+   *
+   * @return the default command associated with this subsystem
    */
   default Command getDefaultCommand() {
-    return null;
+    return CommandScheduler.getInstance().getDefaultCommand(this);
   }
 
   /**

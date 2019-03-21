@@ -16,20 +16,6 @@ public abstract class SendableSubsystemBase implements Subsystem, Sendable {
     CommandScheduler.getInstance().registerSubsystem(this);
   }
 
-  /**
-   * Sets the default command for this subsystem.
-   *
-   * @param defaultCommand the default command to use
-   */
-  public void setDefaultCommand(Command defaultCommand) {
-    m_defaultCommand = defaultCommand;
-  }
-
-  @Override
-  public Command getDefaultCommand() {
-    return m_defaultCommand;
-  }
-
   @Override
   public String getName() {
     return m_name;
