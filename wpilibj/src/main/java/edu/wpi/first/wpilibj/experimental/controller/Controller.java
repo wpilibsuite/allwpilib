@@ -26,9 +26,18 @@ public abstract class Controller {
   }
 
   /**
-   * Read the input, calculate the output accordingly, and write to the output.
+   * Calculate the output based on the last updated reference and measurement values.
    *
    * @return The controller output.
    */
-  public abstract double update();
+  public abstract double calculate();
+
+  /**
+   * Calculate the output based on the provided reference and measurement values.
+   *
+   * @param reference   The value of the reference.
+   * @param measurement The value of the process variable.
+   * @return The controller output.
+   */
+  public abstract double calculate(double reference, double measurement);
 }

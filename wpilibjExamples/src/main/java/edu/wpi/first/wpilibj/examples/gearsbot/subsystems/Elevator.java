@@ -33,7 +33,7 @@ public class Elevator extends PIDSubsystem {
    */
   public Elevator() {
     super(kP_real, kI_real, 0);
-    if (Robot.isSimulation()) { // Check for simulation and update PID values
+    if (Robot.isSimulation()) { // Check for simulation and calculate PID values
       getPIDController().setPID(kP_simulation, kI_simulation, 0);
     }
     setAbsoluteTolerance(0.005);

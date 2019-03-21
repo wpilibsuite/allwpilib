@@ -23,7 +23,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
+import edu.wpi.first.wpilibj.experimental.controller.AsynchronousControllerRunner;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
@@ -52,11 +52,12 @@ public class PIDTest extends AbstractComsSetup {
   private static final double outputRange = 0.25;
 
   private PIDController m_controller = null;
-  private ControllerRunner m_runner = null;
+  private AsynchronousControllerRunner m_runner = null;
   private static MotorEncoderFixture me = null;
 
   @SuppressWarnings({"MemberName", "EmptyLineSeparator", "MultipleVariableDeclarations"})
   private final Double k_p, k_i, k_d;
+  private double m_reference;
 
   @Override
   protected Logger getClassLogger() {
@@ -111,8 +112,11 @@ public class PIDTest extends AbstractComsSetup {
     m_table = NetworkTableInstance.getDefault().getTable("TEST_PID");
     m_builder = new SendableBuilderImpl();
     m_builder.setTable(m_table);
-    m_controller = new PIDController(k_p, k_i, k_d, me.getEncoder()::getDistance);
-    m_runner = new ControllerRunner(m_controller, me.getMotor()::set);
+    m_controller = new PIDController(k_p, k_i, k_d);
+    m_runner = new AsynchronousControllerRunner(m_controller,
+        () -> m_reference,
+        me.getEncoder()::getDistance,
+        me.getMotor()::set);
     m_controller.initSendable(m_builder);
   }
 
@@ -139,7 +143,7 @@ public class PIDTest extends AbstractComsSetup {
     setupAbsoluteTolerance();
     setupOutputRange();
     double reference = 2500.0;
-    m_controller.setReference(reference);
+    m_reference = reference;
     assertFalse("PID did not begin disabled", m_runner.isEnabled());
     assertEquals("PID.getError() did not start at " + reference, reference,
         m_controller.getError(), 0);
@@ -156,7 +160,7 @@ public class PIDTest extends AbstractComsSetup {
     setupAbsoluteTolerance();
     setupOutputRange();
     double reference = 2500.0;
-    m_controller.setReference(reference);
+    m_reference = reference;
     m_runner.enable();
     m_builder.updateTable();
     assertTrue(m_table.getEntry("enabled").getBoolean(false));
@@ -175,7 +179,7 @@ public class PIDTest extends AbstractComsSetup {
     setupOutputRange();
     Double reference = 2500.0;
     m_runner.disable();
-    m_controller.setReference(reference);
+    m_reference = reference;
     m_runner.enable();
     assertEquals("Did not correctly set reference", reference, new Double(m_controller
         .getReference()));
@@ -187,7 +191,7 @@ public class PIDTest extends AbstractComsSetup {
     setupOutputRange();
     double reference = 1000.0;
     assertEquals(pidData() + "did not start at 0", 0, m_controller.getOutput(), 0);
-    m_controller.setReference(reference);
+    m_reference = reference;
     assertEquals(pidData() + "did not have an error of " + reference, reference,
         m_controller.getError(), 0);
     m_runner.enable();

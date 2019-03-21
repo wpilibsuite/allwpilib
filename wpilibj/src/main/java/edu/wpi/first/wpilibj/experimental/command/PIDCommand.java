@@ -12,7 +12,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.experimental.controller.ControllerOutput;
-import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
+import edu.wpi.first.wpilibj.experimental.controller.AsynchronousControllerRunner;
 import edu.wpi.first.wpilibj.experimental.controller.MeasurementSource;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -20,208 +20,21 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 public abstract class PIDCommand extends Command implements ControllerOutput, MeasurementSource {
   // The internal PIDController
   private final PIDController m_controller;
-  private final ControllerRunner m_runner;
+  private final AsynchronousControllerRunner m_runner;
+  private double m_reference = 0;
 
   /**
    * Instantiates a {@link PIDCommand} that will use the given Kp, Ki, and Kd values.
    *
-   * @param name The name of the command.
    * @param Kp   The proportional value.
    * @param Ki   The integral value.
    * @param Kd   The derivative value.
    */
   @SuppressWarnings("ParameterName")
-  public PIDCommand(String name, double Kp, double Ki, double Kd) {
-    super(name);
-    m_controller = new PIDController(Kp, Ki, Kd, this);
-    m_runner = new ControllerRunner(m_controller, this);
-  }
-
-  /**
-   * Instantiates a {@link PIDCommand} that will use the given Kp, Ki, and Kd values.
-   *
-   * @param name   The name of the command.
-   * @param Kp     The proportional value.
-   * @param Ki     The integral value.
-   * @param Kd     The derivative value.
-   * @param period The period between controller updates in seconds. The default
-   *               is 5ms.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDCommand(String name, double Kp, double Ki, double Kd,
-                    double period) {
-    super(name);
-    m_controller = new PIDController(Kp, Ki, Kd, this, period);
-    m_runner = new ControllerRunner(m_controller, this);
-  }
-
-  /**
-   * Instantiates a {@link PIDCommand} that will use the given Kp, Ki, and Kd values.
-   *
-   * @param name        The name of the command.
-   * @param Kp          The proportional value.
-   * @param Ki          The integral value.
-   * @param Kd          The derivative value.
-   * @param feedforward The arbitrary feedforward function.
-   * @param period      The period between controller updates in seconds. The
-   *                    default is 5ms.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDCommand(String name, double Kp, double Ki, double Kd, DoubleSupplier feedforward,
-                    double period) {
-    super(name);
-    m_controller = new PIDController(Kp, Ki, Kd, feedforward, this, period);
-    m_runner = new ControllerRunner(m_controller, this);
-  }
-
-  /**
-   * Instantiates a {@link PIDCommand} that will use the given Kp, Ki, and Kd values.
-   *
-   * @param Kp The proportional value.
-   * @param Ki The integral value.
-   * @param Kd The derivative value.
-   */
-  @SuppressWarnings("ParameterName")
   public PIDCommand(double Kp, double Ki, double Kd) {
-    m_controller = new PIDController(Kp, Ki, Kd, this);
-    m_runner = new ControllerRunner(m_controller, this);
-  }
-
-  /**
-   * Instantiates a {@link PIDCommand} that will use the given Kp, Ki, and Kd values.
-   *
-   * @param Kp     The proportional value.
-   * @param Ki     The integral value.
-   * @param Kd     The derivative value.
-   * @param period The period between controller updates in seconds. The default
-   *               is 5ms.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDCommand(double Kp, double Ki, double Kd, double period) {
-    m_controller = new PIDController(Kp, Ki, Kd, this, period);
-    m_runner = new ControllerRunner(m_controller, this);
-  }
-
-  /**
-   * Instantiates a {@link PIDCommand} that will use the given Kp, Ki, and Kd values.
-   *
-   * @param Kp          The proportional value.
-   * @param Ki          The integral value.
-   * @param Kd          The derivative value.
-   * @param feedforward The arbitrary feedforward function.
-   * @param period      The period between controller updates in seconds. The
-   *                    default is 5ms.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDCommand(double Kp, double Ki, double Kd, DoubleSupplier feedforward, double period) {
-    m_controller = new PIDController(Kp, Ki, Kd, feedforward, this, period);
-    m_runner = new ControllerRunner(m_controller, this);
-  }
-
-  /**
-   * Instantiates a {@link PIDCommand} that will use the given Kp, Ki, and Kd values.
-   *
-   * @param name      The name of the command.
-   * @param Kp        The proportional value.
-   * @param Ki        The integral value.
-   * @param Kd        The derivative value.
-   * @param subsystem The subsystem that this command requires.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDCommand(String name, double Kp, double Ki, double Kd, Subsystem subsystem) {
-    super(name, subsystem);
-    m_controller = new PIDController(Kp, Ki, Kd, this);
-    m_runner = new ControllerRunner(m_controller, this);
-  }
-
-  /**
-   * Instantiates a {@link PIDCommand} that will use the given Kp, Ki, and Kd values.
-   *
-   * @param name      The name of the command.
-   * @param Kp        The proportional value.
-   * @param Ki        The integral value.
-   * @param Kd        The derivative value.
-   * @param period    The period between controller updates in seconds. The
-   *                  default is 5ms.
-   * @param subsystem The subsystem that this command requires.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDCommand(String name, double Kp, double Ki, double Kd, double period,
-                    Subsystem subsystem) {
-    super(name, subsystem);
-    m_controller = new PIDController(Kp, Ki, Kd, this, period);
-    m_runner = new ControllerRunner(m_controller, this);
-  }
-
-  /**
-   * Instantiates a {@link PIDCommand} that will use the given Kp, Ki, and Kd values.
-   *
-   * @param name        The name of the command.
-   * @param Kp          The proportional value.
-   * @param Ki          The integral value.
-   * @param Kd          The derivative value.
-   * @param feedforward The arbitrary feedforward function.
-   * @param period      The period between controller updates in seconds. The
-   *                    default is 5ms.
-   * @param subsystem   The subsystem that this command requires.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDCommand(String name, double Kp, double Ki, double Kd, DoubleSupplier feedforward,
-                    double period, Subsystem subsystem) {
-    super(name, subsystem);
-    m_controller = new PIDController(Kp, Ki, Kd, feedforward, this, period);
-    m_runner = new ControllerRunner(m_controller, this);
-  }
-
-  /**
-   * Instantiates a {@link PIDCommand} that will use the given Kp, Ki, and Kd values.
-   *
-   * @param Kp        The proportional value.
-   * @param Ki        The integral value.
-   * @param Kd        The derivative value.
-   * @param subsystem The subsystem that this command requires.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDCommand(double Kp, double Ki, double Kd, Subsystem subsystem) {
-    super(subsystem);
-    m_controller = new PIDController(Kp, Ki, Kd, this);
-    m_runner = new ControllerRunner(m_controller, this);
-  }
-
-  /**
-   * Instantiates a {@link PIDCommand} that will use the given Kp, Ki, and Kd values.
-   *
-   * @param Kp        The proportional value.
-   * @param Ki        The integral value.
-   * @param Kd        The derivative value.
-   * @param period    The period between controller updates in seconds. The
-   *                  default is 5ms.
-   * @param subsystem The subsystem that this command requires.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDCommand(double Kp, double Ki, double Kd, double period, Subsystem subsystem) {
-    super(subsystem);
-    m_controller = new PIDController(Kp, Ki, Kd, this, period);
-    m_runner = new ControllerRunner(m_controller, this);
-  }
-
-  /**
-   * Instantiates a {@link PIDCommand} that will use the given Kp, Ki, and Kd values.
-   *
-   * @param Kp          The proportional value.
-   * @param Ki          The integral value.
-   * @param Kd          The derivative value.
-   * @param feedforward The arbitrary feedforward function.
-   * @param period      The period between controller updates in seconds. The
-   *                    default is 5ms.
-   * @param subsystem   The subsystem that this command requires.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDCommand(double Kp, double Ki, double Kd, DoubleSupplier feedforward, double period,
-                    Subsystem subsystem) {
-    super(subsystem);
-    m_controller = new PIDController(Kp, Ki, Kd, feedforward, this, period);
-    m_runner = new ControllerRunner(m_controller, this);
+    m_controller = new PIDController(Kp, Ki, Kd);
+    m_runner = new AsynchronousControllerRunner(
+        m_controller, this::getReference, this::getMeasurement, this::setOutput);
   }
 
   /**
@@ -282,8 +95,8 @@ public abstract class PIDCommand extends Command implements ControllerOutput, Me
    *
    * @param reference The desired reference.
    */
-  protected void setReference(double reference) {
-    m_controller.setReference(reference);
+  protected synchronized void setReference(double reference) {
+    m_reference = reference;
   }
 
   /**
@@ -291,7 +104,7 @@ public abstract class PIDCommand extends Command implements ControllerOutput, Me
    *
    * @return The current reference.
    */
-  protected double getReference() {
-    return m_controller.getReference();
+  protected synchronized double getReference() {
+    return m_reference;
   }
 }

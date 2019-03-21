@@ -11,7 +11,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.experimental.controller.ControllerOutput;
-import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
+import edu.wpi.first.wpilibj.experimental.controller.AsynchronousControllerRunner;
 import edu.wpi.first.wpilibj.experimental.controller.MeasurementSource;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
@@ -27,114 +27,21 @@ public abstract class PIDSubsystem extends Subsystem implements ControllerOutput
        MeasurementSource {
   // The internal PIDController
   private final PIDController m_controller;
-  private final ControllerRunner m_runner;
+  private final AsynchronousControllerRunner m_runner;
+  private double m_reference = 0;
 
   /**
    * Instantiates a PIDSubsystem that will use the given Kp, Ki, and Kd values.
    *
-   * @param name The name.
    * @param Kp   The proportional value.
    * @param Ki   The integral value.
    * @param Kd   The derivative value.
    */
   @SuppressWarnings("ParameterName")
-  public PIDSubsystem(String name, double Kp, double Ki, double Kd) {
-    super(name);
-    m_controller = new PIDController(Kp, Ki, Kd, this);
-    m_runner = new ControllerRunner(m_controller, this);
-    addChild("PIDController", m_controller);
-  }
-
-  /**
-   * Instantiates a PIDSubsystem that will use the given Kp, Ki, and Kd values.
-   *
-   * @param name        The name.
-   * @param Kp          The proportional value.
-   * @param Ki          The integral value.
-   * @param Kd          The derivative value.
-   * @param feedforward The feedforward function.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDSubsystem(String name, double Kp, double Ki, double Kd,
-                      DoubleSupplier feedforward) {
-    super(name);
-    m_controller = new PIDController(Kp, Ki, Kd, feedforward, this);
-    m_runner = new ControllerRunner(m_controller, this);
-    addChild("PIDController", m_controller);
-  }
-
-  /**
-   * Instantiates a PIDSubsystem that will use the given Kp, Ki, and Kd values.
-   *
-   * <p>It will also space the time between PID loop calculations to be equal to the given period.
-   *
-   * @param name        The name.
-   * @param Kp          The proportional value.
-   * @param Ki          The integral value.
-   * @param Kd          The derivative value.
-   * @param feedforward The feedfoward function.
-   * @param period      The time (in seconds) between calculations.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDSubsystem(String name, double Kp, double Ki, double Kd,
-                      DoubleSupplier feedforward, double period) {
-    super(name);
-    m_controller = new PIDController(Kp, Ki, Kd, feedforward, this, period);
-    m_runner = new ControllerRunner(m_controller, this);
-    addChild("PIDController", m_controller);
-  }
-
-  /**
-   * Instantiates a PIDSubsystem that will use the given Kp, Ki, and Kd values.
-   *
-   * <p>It will use the class name as its name.
-   *
-   * @param Kp The proportional value.
-   * @param Ki The integral value.
-   * @param Kd The derivative value.
-   */
-  @SuppressWarnings("ParameterName")
   public PIDSubsystem(double Kp, double Ki, double Kd) {
-    m_controller = new PIDController(Kp, Ki, Kd, this);
-    m_runner = new ControllerRunner(m_controller, this);
-    addChild("PIDController", m_controller);
-  }
-
-  /**
-   * Instantiates a PIDSubsystem that will use the given Kp, Ki, and Kd values.
-   *
-   * <p>It will use the class name as its name.
-   *
-   * @param Kp          The proportional value.
-   * @param Ki          The integral value.
-   * @param Kd          The derivative value.
-   * @param feedforward The feedforward function.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDSubsystem(double Kp, double Ki, double Kd,
-                      DoubleSupplier feedforward) {
-    m_controller = new PIDController(Kp, Ki, Kd, feedforward, this);
-    m_runner = new ControllerRunner(m_controller, this);
-    addChild("PIDController", m_controller);
-  }
-
-  /**
-   * Instantiates a PIDSubsystem that will use the given Kp, Ki, and Kd values.
-   *
-   * <p>It will use the class name as its name. It will also space the time between PID loop
-   * calculations to be equal to the given period.
-   *
-   * @param Kp          The proportional value.
-   * @param Ki          The integral value.
-   * @param Kd          The derivative value.
-   * @param feedforward The feedforward function.
-   * @param period      The time (in seconds) between calculations.
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDSubsystem(double Kp, double Ki, double Kd,
-                      DoubleSupplier feedforward, double period) {
-    m_controller = new PIDController(Kp, Ki, Kd, feedforward, this, period);
-    m_runner = new ControllerRunner(m_controller, this);
+    m_controller = new PIDController(Kp, Ki, Kd);
+    m_runner = new AsynchronousControllerRunner(
+        m_controller, this::getReference, this::getMeasurement, this::setOutput);
     addChild("PIDController", m_controller);
   }
 
@@ -167,8 +74,8 @@ public abstract class PIDSubsystem extends Subsystem implements ControllerOutput
    *
    * @param reference The new reference.
    */
-  public void setReference(double reference) {
-    m_controller.setReference(reference);
+  public synchronized void setReference(double reference) {
+    m_reference = reference;
   }
 
   /**
@@ -207,8 +114,8 @@ public abstract class PIDSubsystem extends Subsystem implements ControllerOutput
    *
    * @return The current reference.
    */
-  public double getReference() {
-    return m_controller.getReference();
+  public synchronized double getReference() {
+    return m_reference;
   }
 
   /**

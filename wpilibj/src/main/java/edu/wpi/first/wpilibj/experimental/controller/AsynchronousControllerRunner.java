@@ -8,30 +8,44 @@
 package edu.wpi.first.wpilibj.experimental.controller;
 
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.DoubleConsumer;
+import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.Notifier;
 
-public class ControllerRunner {
+/**
+ * A runner that runs a controller asynchronously in a {@link Notifier}, allowing the user to pass
+ * in functions for the measurement, reference, and output.  Said functions should be thread-safe.
+ */
+public class AsynchronousControllerRunner {
   private final Notifier m_notifier = new Notifier(this::run);
   private final Controller m_controller;
-  private final ControllerOutput m_controllerOutput;
+  private final DoubleSupplier m_referenceSource;
+  private final DoubleSupplier m_measurementSource;
+  private final DoubleConsumer m_controllerOutput;
   private boolean m_enabled;
 
   private final ReentrantLock m_thisMutex = new ReentrantLock();
 
   // Ensures when disable() is called, m_controllerOutput() won't run if
-  // Controller.update() is already running at that time.
+  // Controller.calculate() is already running at that time.
   private final ReentrantLock m_outputMutex = new ReentrantLock();
 
   /**
-   * Allocate a ControllerRunner.
+   * Creates a new ControllerRunner.
    *
-   * @param controller       The controller on which to call update().
-   * @param controllerOutput The object which updates the plant using the
-   *                         controller output passed as the argument.
+   * @param controller        The controller to run.
+   * @param referenceSource   A method providing the reference value for the controller.
+   * @param measurementSource A method providing the process variable value for the controller.
+   * @param controllerOutput  A method that uses the output of the controller.
    */
-  public ControllerRunner(Controller controller, ControllerOutput controllerOutput) {
+  public AsynchronousControllerRunner(Controller controller,
+                                      DoubleSupplier referenceSource,
+                                      DoubleSupplier measurementSource,
+                                      DoubleConsumer controllerOutput) {
     m_controller = controller;
+    m_referenceSource = referenceSource;
+    m_measurementSource = measurementSource;
     m_controllerOutput = controllerOutput;
     m_notifier.startPeriodic(m_controller.getPeriod());
   }
@@ -65,7 +79,7 @@ public class ControllerRunner {
         m_thisMutex.unlock();
       }
 
-      m_controllerOutput.setOutput(0.0);
+      m_controllerOutput.accept(0.0);
     } finally {
       m_outputMutex.unlock();
     }
@@ -94,7 +108,8 @@ public class ControllerRunner {
           // Don't block other ControllerRunner operations on output
           m_thisMutex.unlock();
 
-          m_controllerOutput.setOutput(m_controller.update());
+          m_controllerOutput.accept(m_controller.calculate(
+              m_referenceSource.getAsDouble(), m_measurementSource.getAsDouble()));
         }
       } finally {
         if (m_thisMutex.isHeldByCurrentThread()) {

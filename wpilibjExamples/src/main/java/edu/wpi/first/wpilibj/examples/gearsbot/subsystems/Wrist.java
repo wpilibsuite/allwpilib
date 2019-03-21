@@ -30,7 +30,7 @@ public class Wrist extends PIDSubsystem {
    */
   public Wrist() {
     super(kP_real, 0, 0);
-    if (Robot.isSimulation()) { // Check for simulation and update PID values
+    if (Robot.isSimulation()) { // Check for simulation and calculate PID values
       getPIDController().setPID(kP_simulation, 0, 0);
     }
     setAbsoluteTolerance(2.5);

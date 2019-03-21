@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
+import edu.wpi.first.wpilibj.experimental.controller.AsynchronousControllerRunner;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
 /**
@@ -37,7 +37,7 @@ public class Robot extends TimedRobot {
   private static final double kD = -2.0;
 
   private PIDController m_pidController;
-  private ControllerRunner m_pidRunner;
+  private AsynchronousControllerRunner m_pidRunner;
   @SuppressWarnings("PMD.SingularField")
   private AnalogInput m_potentiometer;
   @SuppressWarnings("PMD.SingularField")
@@ -53,9 +53,10 @@ public class Robot extends TimedRobot {
     m_elevatorMotor = new PWMVictorSPX(kMotorChannel);
     m_joystick = new Joystick(kJoystickChannel);
 
-    m_pidController = new PIDController(kP, kI, kD, m_potentiometer::getAverageVoltage);
+    m_pidController = new PIDController(kP, kI, kD);
     m_pidController.setInputRange(0, 5);
-    m_pidRunner = new ControllerRunner(m_pidController, m_elevatorMotor::set);
+    m_pidRunner = new AsynchronousControllerRunner(m_pidController, () -> kReferences[m_index],
+        m_potentiometer::getAverageVoltage, m_elevatorMotor::set);
   }
 
   @Override
@@ -73,7 +74,5 @@ public class Robot extends TimedRobot {
       m_index = (m_index + 1) % kReferences.length;
     }
     m_previousButtonValue = currentButtonValue;
-
-    m_pidController.setReference(kReferences[m_index]);
   }
 }

@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
+import edu.wpi.first.wpilibj.experimental.controller.AsynchronousControllerRunner;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  */
 public class SetDistanceToBox extends Command {
   private final PIDController m_pidController;
-  private final ControllerRunner m_pidRunner;
+  private final AsynchronousControllerRunner m_pidRunner;
 
   /**
    * Create a new set distance to box command.
@@ -29,10 +29,11 @@ public class SetDistanceToBox extends Command {
    */
   public SetDistanceToBox(double distance) {
     requires(Robot.m_drivetrain);
-    m_pidController = new PIDController(-2, 0, 0, Robot.m_drivetrain::getDistanceToObstacle);
+    m_pidController = new PIDController(-2, 0, 0);
     m_pidController.setAbsoluteTolerance(0.01);
-    m_pidController.setReference(distance);
-    m_pidRunner = new ControllerRunner(m_pidController,
+    m_pidRunner = new AsynchronousControllerRunner(m_pidController,
+        () -> distance,
+        Robot.m_drivetrain::getDistanceToObstacle,
         output -> Robot.m_drivetrain.drive(output, output));
   }
 

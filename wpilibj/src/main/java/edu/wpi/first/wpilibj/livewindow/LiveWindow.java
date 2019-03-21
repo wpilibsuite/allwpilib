@@ -243,7 +243,7 @@ public class LiveWindow {
   }
 
   /**
-   * Tell all the sensors to update (send) their values.
+   * Tell all the sensors to calculate (send) their values.
    *
    * <p>Actuators are handled through callbacks on their value changing from the
    * SmartDashboard widgets.

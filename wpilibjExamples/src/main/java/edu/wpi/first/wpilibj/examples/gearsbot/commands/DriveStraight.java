@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
+import edu.wpi.first.wpilibj.experimental.controller.AsynchronousControllerRunner;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  */
 public class DriveStraight extends Command {
   private final PIDController m_pidController;
-  private final ControllerRunner m_pidRunner;
+  private final AsynchronousControllerRunner m_pidRunner;
 
   /**
    * Create a new DriveStraight command.
@@ -29,12 +29,12 @@ public class DriveStraight extends Command {
    */
   public DriveStraight(double distance) {
     requires(Robot.m_drivetrain);
-    m_pidController = new PIDController(4, 0, 0, Robot.m_drivetrain::getDistance);
-    m_pidRunner = new ControllerRunner(m_pidController,
+    m_pidController = new PIDController(4, 0, 0);
+    m_pidRunner = new AsynchronousControllerRunner(m_pidController, () -> distance,
+        Robot.m_drivetrain::getDistance,
         output -> Robot.m_drivetrain.drive(output, output));
 
     m_pidController.setAbsoluteTolerance(0.01);
-    m_pidController.setReference(distance);
   }
 
   // Called just before this Command runs the first time
