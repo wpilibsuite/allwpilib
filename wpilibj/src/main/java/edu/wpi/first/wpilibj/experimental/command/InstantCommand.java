@@ -1,7 +1,5 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-import java.util.Set;
-
 /**
  * A Command that runs instantly; it will initialize, execute once, and end on the same
  * iteration of the scheduler.  Users can either pass in a Runnable and a set of requirements,
@@ -9,46 +7,41 @@ import java.util.Set;
  */
 public class InstantCommand extends SendableCommandBase {
 
-  private final Runnable m_action;
+  private final Runnable m_runnable;
 
   /**
-   * Creates a new InstantCommand that performs the given action with the given requirements.
+   * Creates a new InstantCommand that runs the given Runnable with the given requirements.
    *
-   * @param action       the action to perform
+   * @param runnable     the Runnable to run
    * @param requirements the subsystems required by this command
    */
-  public InstantCommand(Runnable action, Subsystem... requirements) {
-    m_action = action;
-    m_requirements.addAll(Set.of(requirements));
+  public InstantCommand(Runnable runnable, Subsystem... requirements) {
+    m_runnable = runnable;
+    addRequirements(requirements);
   }
 
   /**
-   * Creates a new InstantCommand that performs the given action with no requirements.
+   * Creates a new InstantCommand that runs the given Runnable with no requirements.
    *
-   * @param action the action to perform
+   * @param runnable the Runnable to run
    */
-  public InstantCommand(Runnable action) {
-    this(action, new Subsystem[0]);
+  public InstantCommand(Runnable runnable) {
+    this(runnable, new Subsystem[0]);
   }
 
   /**
-   * Creates a new InstantCommand with an action that does nothing.  Useful only as a no-arg
+   * Creates a new InstantCommand with a Runnable that does nothing.  Useful only as a no-arg
    * constructor to call from subclass constructors.
    */
   public InstantCommand() {
     //let's all laugh really hard at the style checker...
-    m_action = () -> {
+    m_runnable = () -> {
     };
   }
 
   @Override
   public void initialize() {
-    m_action.run();
-  }
-
-  @Override
-  public Set<Subsystem> getRequirements() {
-    return m_requirements;
+    m_runnable.run();
   }
 
   @Override

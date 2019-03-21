@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 
 /**
  * A command that runs a motor at a given speed, and turns the motor off when it ends.  Has no end
- * conditions as-is; either subclass it or use {@link Command#withTimeout(double)} or
+ * condition as-is; either subclass it or use {@link Command#withTimeout(double)} or
  * {@link Command#withInterruptCondition(BooleanSupplier)} to give it one.
  */
 public class RunMotorCommand extends SendableCommandBase {
