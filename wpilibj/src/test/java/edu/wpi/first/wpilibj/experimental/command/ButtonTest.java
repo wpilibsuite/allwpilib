@@ -3,8 +3,11 @@ package edu.wpi.first.wpilibj.experimental.command;
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.experimental.buttons.InternalButton;
+import edu.wpi.first.wpilibj.experimental.buttons.Trigger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -152,5 +155,19 @@ class ButtonTest extends CommandTestBase {
     scheduler.run();
 
     assertEquals(counter.m_counter, 4);
+  }
+
+  @Test
+  void buttonCompositionTest(){
+    InternalButton button1 = new InternalButton();
+    InternalButton button2 = new InternalButton();
+
+    button1.setPressed(true);
+    button2.setPressed(false);
+
+    assertFalse(button1.and(button2).get());
+    assertTrue(button1.or(button2).get());
+    assertFalse(button1.negate().get());
+    assertTrue(button1.and(button2.negate()).get());
   }
 }
