@@ -104,6 +104,16 @@ public interface Command {
   }
 
   /**
+   * Decorates this command with a runnable to be run after the command finishes.
+   *
+   * @param toRun the Runnable to run
+   * @return the decorated command
+   */
+  default Command whenFinished(Runnable toRun) {
+    return new SequentialCommandGroup(this, new InstantCommand(toRun));
+  }
+
+  /**
    * Schedules this command.
    *
    * @param interruptible whether this command can be interrupted by another command that
