@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.experimental.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
@@ -70,7 +70,7 @@ public class Pivot extends PIDSubsystem {
    * The angle read in by the potentiometer.
    */
   @Override
-  protected double returnPIDInput() {
+  public double getMeasurement() {
     return m_pot.get();
   }
 
@@ -78,7 +78,7 @@ public class Pivot extends PIDSubsystem {
    * Set the motor speed based off of the PID output.
    */
   @Override
-  protected void usePIDOutput(double output) {
+  public void setOutput(double output) {
     m_motor.pidWrite(output);
   }
 

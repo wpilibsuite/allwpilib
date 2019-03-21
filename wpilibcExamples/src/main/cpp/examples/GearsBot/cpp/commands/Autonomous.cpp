@@ -13,7 +13,7 @@
 #include "commands/Place.h"
 #include "commands/PrepareToPickup.h"
 #include "commands/SetDistanceToBox.h"
-#include "commands/SetWristSetpoint.h"
+#include "commands/SetWristReference.h"
 
 Autonomous::Autonomous() : frc::CommandGroup("Autonomous") {
   AddSequential(new PrepareToPickup());
@@ -25,6 +25,6 @@ Autonomous::Autonomous() : frc::CommandGroup("Autonomous") {
   AddSequential(new SetDistanceToBox(0.60));
   // AddSequential(new DriveStraight(-2));  // Use Encoders if ultrasonic
   // is broken
-  AddParallel(new SetWristSetpoint(-45));
+  AddParallel(new SetWristReference(-45));
   AddSequential(new CloseClaw());
 }

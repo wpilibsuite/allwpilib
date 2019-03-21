@@ -10,18 +10,16 @@
 #include <frc/commands/Command.h>
 
 /**
- * Move the elevator to a given location. This command finishes when it is
- * within
+ * Moves the  pivot to a given angle. This command finishes when it is within
  * the tolerance, but leaves the PID loop running to maintain the position.
- * Other
- * commands using the elevator should make sure they disable PID!
+ * Other commands using the pivot should make sure they disable PID!
  */
-class SetElevatorSetpoint : public frc::Command {
+class SetPivotReference : public frc::Command {
  public:
-  explicit SetElevatorSetpoint(double setpoint);
+  explicit SetPivotReference(double reference);
   void Initialize() override;
   bool IsFinished() override;
 
  private:
-  double m_setpoint;
+  double m_reference;
 };

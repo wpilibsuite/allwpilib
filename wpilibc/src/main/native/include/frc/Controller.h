@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <wpi/deprecated.h>
+
 namespace frc {
 
 /**
@@ -18,6 +20,7 @@ namespace frc {
  */
 class Controller {
  public:
+  WPI_DEPRECATED("Use controllers/Controller class instead.")
   Controller() = default;
   virtual ~Controller() = default;
 

@@ -211,13 +211,13 @@ public class CommandGroup extends Command {
 
   @Override
   @SuppressWarnings("MethodName")
-  void _initialize() {
+  protected void _initialize() {
     m_currentCommandIndex = -1;
   }
 
   @Override
   @SuppressWarnings({"MethodName", "PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
-  void _execute() {
+  protected void _execute() {
     Entry entry = null;
     Command cmd = null;
     boolean firstRun = false;
@@ -285,7 +285,7 @@ public class CommandGroup extends Command {
 
   @Override
   @SuppressWarnings("MethodName")
-  void _end() {
+  protected void _end() {
     // Theoretically, we don't have to check this, but we do if teams override
     // the isFinished method
     if (m_currentCommandIndex != -1 && m_currentCommandIndex < m_commands.size()) {
@@ -305,7 +305,7 @@ public class CommandGroup extends Command {
 
   @Override
   @SuppressWarnings("MethodName")
-  void _interrupted() {
+  protected void _interrupted() {
     _end();
   }
 

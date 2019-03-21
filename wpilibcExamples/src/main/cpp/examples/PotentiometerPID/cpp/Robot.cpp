@@ -9,9 +9,10 @@
 
 #include <frc/AnalogInput.h>
 #include <frc/Joystick.h>
-#include <frc/PIDController.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
+#include <frc/experimental/controller/ControllerRunner.h>
+#include <frc/experimental/controller/PIDController.h>
 
 /**
  * This is a sample program to demonstrate how to use a soft potentiometer and a
@@ -22,7 +23,7 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override { m_pidController.SetInputRange(0, 5); }
 
-  void TeleopInit() override { m_pidController.Enable(); }
+  void TeleopInit() override { m_pidRunner.Enable(); }
 
   void TeleopPeriodic() override {
     // When the button is pressed once, the selected elevator setpoint is
@@ -34,7 +35,7 @@ class Robot : public frc::TimedRobot {
     }
     m_previousButtonValue = currentButtonValue;
 
-    m_pidController.SetSetpoint(kSetPoints[m_index]);
+    m_pidController.SetReference(kSetPoints[m_index]);
   }
 
  private:
@@ -67,8 +68,10 @@ class Robot : public frc::TimedRobot {
   /* Potentiometer (AnalogInput) and elevatorMotor (Victor) can be used as a
    * PIDSource and PIDOutput respectively.
    */
-  frc::PIDController m_pidController{kP, kI, kD, m_potentiometer,
-                                     m_elevatorMotor};
+  frc::experimental::PIDController m_pidController{
+      kP, kI, kD, [&] { return m_potentiometer.GetAverageVoltage(); }};
+  frc::experimental::ControllerRunner m_pidRunner{
+      m_pidController, [&](double output) { m_elevatorMotor.Set(output); }};
 };
 
 constexpr std::array<double, 3> Robot::kSetPoints;

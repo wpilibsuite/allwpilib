@@ -15,15 +15,15 @@
 #include "commands/Pickup.h"
 #include "commands/Place.h"
 #include "commands/PrepareToPickup.h"
-#include "commands/SetElevatorSetpoint.h"
+#include "commands/SetElevatorReference.h"
 
 OI::OI() {
   frc::SmartDashboard::PutData("Open Claw", new OpenClaw());
   frc::SmartDashboard::PutData("Close Claw", new CloseClaw());
 
   // Connect the buttons to commands
-  m_dUp.WhenPressed(new SetElevatorSetpoint(0.2));
-  m_dDown.WhenPressed(new SetElevatorSetpoint(-0.2));
+  m_dUp.WhenPressed(new SetElevatorReference(0.2));
+  m_dDown.WhenPressed(new SetElevatorReference(-0.2));
   m_dRight.WhenPressed(new CloseClaw());
   m_dLeft.WhenPressed(new OpenClaw());
 

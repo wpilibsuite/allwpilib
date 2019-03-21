@@ -19,7 +19,7 @@ public class Pickup extends CommandGroup {
    */
   public Pickup() {
     addSequential(new CloseClaw());
-    addParallel(new SetWristSetpoint(-45));
-    addSequential(new SetElevatorSetpoint(0.25));
+    addParallel(new SetWristReference(-45));
+    addSequential(new SetElevatorReference(0.25));
   }
 }

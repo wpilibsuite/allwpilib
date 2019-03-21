@@ -7,10 +7,11 @@
 
 #pragma once
 
-#include <frc/PIDController.h>
-#include <frc/PIDOutput.h>
-#include <frc/PIDSource.h>
 #include <frc/commands/Command.h>
+#include <frc/experimental/controller/ControllerRunner.h>
+#include <frc/experimental/controller/PIDController.h>
+
+#include "Robot.h"
 
 /**
  * Drive the given distance straight (negative values go backwards).
@@ -25,20 +26,10 @@ class DriveStraight : public frc::Command {
   bool IsFinished() override;
   void End() override;
 
-  class DriveStraightPIDSource : public frc::PIDSource {
-   public:
-    virtual ~DriveStraightPIDSource() = default;
-    double PIDGet() override;
-  };
-
-  class DriveStraightPIDOutput : public frc::PIDOutput {
-   public:
-    virtual ~DriveStraightPIDOutput() = default;
-    void PIDWrite(double d) override;
-  };
-
  private:
-  DriveStraightPIDSource m_source;
-  DriveStraightPIDOutput m_output;
-  frc::PIDController m_pid{4, 0, 0, &m_source, &m_output};
+  frc::experimental::PIDController m_pidController{
+      4, 0, 0, [&] { return Robot::drivetrain.GetDistance(); }};
+  frc::experimental::ControllerRunner m_pidRunner{
+      m_pidController,
+      [&](double output) { Robot::drivetrain.Drive(output, output); }};
 };

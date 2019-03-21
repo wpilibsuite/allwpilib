@@ -6,11 +6,11 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/AnalogInput.h>
-#include <frc/PIDController.h>
-#include <frc/PIDOutput.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/experimental/controller/ControllerRunner.h>
+#include <frc/experimental/controller/PIDController.h>
 
 /**
  * This is a sample program demonstrating how to use an ultrasonic sensor and
@@ -26,31 +26,16 @@ class Robot : public frc::TimedRobot {
     // Set expected range to 0-24 inches; e.g. at 24 inches from object go full
     // forward, at 0 inches from object go full backward.
     m_pidController.SetInputRange(0, 24 * kValueToInches);
+    m_pidController.SetPercentTolerance(5);
 
     // Set setpoint of the PID Controller
-    m_pidController.SetSetpoint(kHoldDistance * kValueToInches);
+    m_pidController.SetReference(kHoldDistance * kValueToInches);
 
     // Begin PID control
-    m_pidController.Enable();
+    m_pidRunner.Enable();
   }
 
  private:
-  // Internal class to write to robot drive using a PIDOutput
-  class MyPIDOutput : public frc::PIDOutput {
-   public:
-    explicit MyPIDOutput(frc::DifferentialDrive& r) : m_rd(r) {
-      m_rd.SetSafetyEnabled(false);
-    }
-
-    void PIDWrite(double output) override {
-      // Write to robot drive by reference
-      m_rd.ArcadeDrive(output, 0);
-    }
-
-   private:
-    frc::DifferentialDrive& m_rd;
-  };
-
   // Distance in inches the robot wants to stay from an object
   static constexpr int kHoldDistance = 12;
 
@@ -75,9 +60,12 @@ class Robot : public frc::TimedRobot {
   frc::PWMVictorSPX m_left{kLeftMotorPort};
   frc::PWMVictorSPX m_right{kRightMotorPort};
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
-  MyPIDOutput m_pidOutput{m_robotDrive};
 
-  frc::PIDController m_pidController{kP, kI, kD, m_ultrasonic, m_pidOutput};
+  frc::experimental::PIDController m_pidController{
+      kP, kI, kD, [&] { return m_ultrasonic.GetAverageVoltage(); }};
+  frc::experimental::ControllerRunner m_pidRunner{
+      m_pidController,
+      [&](double output) { m_robotDrive.ArcadeDrive(output, 0); }};
 };
 
 #ifndef RUNNING_FRC_TESTS

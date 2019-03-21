@@ -10,10 +10,10 @@
 #include "Robot.h"
 #include "commands/ExtendShooter.h"
 #include "commands/SetCollectionSpeed.h"
-#include "commands/SetPivotSetpoint.h"
+#include "commands/SetPivotReference.h"
 
 LowGoal::LowGoal() {
-  AddSequential(new SetPivotSetpoint(Pivot::kLowGoal));
+  AddSequential(new SetPivotReference(Pivot::kLowGoal));
   AddSequential(new SetCollectionSpeed(Collector::kReverse));
   AddSequential(new ExtendShooter());
 }

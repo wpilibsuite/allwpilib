@@ -10,7 +10,8 @@
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-Elevator::Elevator() : frc::PIDSubsystem("Elevator", kP_real, kI_real, 0.0) {
+Elevator::Elevator()
+    : frc::experimental::PIDSubsystem("Elevator", kP_real, kI_real, 0.0) {
 #ifdef SIMULATION  // Check for simulation and update PID values
   GetPIDController()->SetPID(kP_simulation, kI_simulation, 0, 0);
 #endif
@@ -27,6 +28,6 @@ void Elevator::Log() {
   // frc::SmartDashboard::PutData("Wrist Pot", &m_pot);
 }
 
-double Elevator::ReturnPIDInput() { return m_pot.Get(); }
+double Elevator::GetMeasurement() const { return m_pot.Get(); }
 
-void Elevator::UsePIDOutput(double d) { m_motor.Set(d); }
+void Elevator::SetOutput(double output) { m_motor.Set(output); }

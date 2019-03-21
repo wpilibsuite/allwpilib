@@ -17,8 +17,8 @@ public class Place extends CommandGroup {
    * Create a new place command.
    */
   public Place() {
-    addSequential(new SetElevatorSetpoint(0.25));
-    addSequential(new SetWristSetpoint(0));
+    addSequential(new SetElevatorReference(0.25));
+    addSequential(new SetWristReference(0));
     addSequential(new OpenClaw());
   }
 }

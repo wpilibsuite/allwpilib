@@ -19,6 +19,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
+import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
@@ -175,42 +177,44 @@ public class MotorEncoderTest extends AbstractComsSetup {
 
   @Test
   public void testPositionPIDController() {
-    me.getEncoder().setPIDSourceType(PIDSourceType.kDisplacement);
-    PIDController pid = new PIDController(0.001, 0.0005, 0, me.getEncoder(), me.getMotor());
-    pid.setAbsoluteTolerance(50.0);
-    pid.setOutputRange(-0.2, 0.2);
-    pid.setSetpoint(1000);
+    PIDController pidController = new PIDController(0.001, 0.0005, 0, me.getEncoder()::getDistance);
+    pidController.setAbsoluteTolerance(50.0);
+    pidController.setOutputRange(-0.2, 0.2);
+    pidController.setReference(1000);
 
-    pid.enable();
+    ControllerRunner pidRunner = new ControllerRunner(pidController,
+        output -> me.getMotor().set(output));
+    pidRunner.enable();
     Timer.delay(10.0);
-    pid.disable();
+    pidRunner.disable();
 
     assertTrue(
-        "PID loop did not reach setpoint within 10 seconds. The current error was" + pid
-            .getError(), pid.onTarget());
+        "PID loop did not reach reference within 10 seconds. The current error was" + pidController
+            .getError(), pidController.atReference());
 
-    pid.close();
+    pidController.close();
   }
 
   @Test
   public void testVelocityPIDController() {
     me.getEncoder().setPIDSourceType(PIDSourceType.kRate);
     LinearDigitalFilter filter = LinearDigitalFilter.movingAverage(me.getEncoder(), 50);
-    PIDController pid =
-        new PIDController(1e-5, 0.0, 3e-5, 8e-5, filter, me.getMotor());
-    pid.setAbsoluteTolerance(200);
-    pid.setOutputRange(-0.3, 0.3);
-    pid.setSetpoint(600);
+    PIDController pidController = new PIDController(1e-5, 0.0, 0.0006, () -> 8e-5, filter::pidGet);
+    pidController.setAbsoluteTolerance(200);
+    pidController.setOutputRange(-0.3, 0.3);
+    pidController.setReference(600);
 
-    pid.enable();
+    ControllerRunner pidRunner = new ControllerRunner(pidController,
+        output -> me.getMotor().set(output));
+    pidRunner.enable();
     Timer.delay(10.0);
-    pid.disable();
+    pidRunner.disable();
 
     assertTrue(
-        "PID loop did not reach setpoint within 10 seconds. The error was: " + pid.getError(),
-        pid.onTarget());
+        "PID loop did not reach reference within 10 seconds. The error was: "
+        + pidController.getError(), pidController.atReference());
 
-    pid.close();
+    pidController.close();
   }
 
   /**

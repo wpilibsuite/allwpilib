@@ -12,29 +12,28 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
 /**
- * Move the elevator to a given location. This command finishes when it is
- * within the tolerance, but leaves the PID loop running to maintain the
- * position. Other commands using the elevator should make sure they disable
- * PID!
+ * Move the wrist to a given angle. This command finishes when it is within the
+ * tolerance, but leaves the PID loop running to maintain the position. Other
+ * commands using the wrist should make sure they disable PID!
  */
-public class SetElevatorSetpoint extends Command {
-  private final double m_setpoint;
+public class SetWristReference extends Command {
+  private final double m_reference;
 
-  public SetElevatorSetpoint(double setpoint) {
-    m_setpoint = setpoint;
-    requires(Robot.m_elevator);
+  public SetWristReference(double reference) {
+    m_reference = reference;
+    requires(Robot.m_wrist);
   }
 
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
-    Robot.m_elevator.enable();
-    Robot.m_elevator.setSetpoint(m_setpoint);
+    Robot.m_wrist.enable();
+    Robot.m_wrist.setReference(m_reference);
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
-    return Robot.m_elevator.onTarget();
+    return Robot.m_wrist.atReference();
   }
 }

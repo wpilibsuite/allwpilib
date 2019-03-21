@@ -302,7 +302,7 @@ public abstract class Command extends SendableBase {
    * A shadow method called before {@link Command#initialize() initialize()}.
    */
   @SuppressWarnings("MethodName")
-  void _initialize() {
+  protected void _initialize() {
   }
 
   /**
@@ -315,7 +315,7 @@ public abstract class Command extends SendableBase {
    * A shadow method called before {@link Command#execute() execute()}.
    */
   @SuppressWarnings("MethodName")
-  void _execute() {
+  protected void _execute() {
   }
 
   /**
@@ -345,7 +345,7 @@ public abstract class Command extends SendableBase {
    * A shadow method called after {@link Command#end() end()}.
    */
   @SuppressWarnings("MethodName")
-  void _end() {
+  protected void _end() {
   }
 
   /**
@@ -366,7 +366,7 @@ public abstract class Command extends SendableBase {
    * A shadow method called after {@link Command#interrupted() interrupted()}.
    */
   @SuppressWarnings("MethodName")
-  void _interrupted() {}
+  protected void _interrupted() {}
 
   /**
    * Called to indicate that the timer should start. This is called right before {@link

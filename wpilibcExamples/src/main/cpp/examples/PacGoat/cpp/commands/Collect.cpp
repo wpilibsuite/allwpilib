@@ -10,12 +10,12 @@
 #include "Robot.h"
 #include "commands/CloseClaw.h"
 #include "commands/SetCollectionSpeed.h"
-#include "commands/SetPivotSetpoint.h"
+#include "commands/SetPivotReference.h"
 #include "commands/WaitForBall.h"
 
 Collect::Collect() {
   AddSequential(new SetCollectionSpeed(Collector::kForward));
   AddParallel(new CloseClaw());
-  AddSequential(new SetPivotSetpoint(Pivot::kCollect));
+  AddSequential(new SetPivotReference(Pivot::kCollect));
   AddSequential(new WaitForBall());
 }
