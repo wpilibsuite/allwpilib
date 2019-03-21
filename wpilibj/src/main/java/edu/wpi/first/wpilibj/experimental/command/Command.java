@@ -156,8 +156,9 @@ public interface Command {
   }
 
   /**
-   * Decorates this command with a set of commands to run parallel to it.  Often more
-   * convenient/less-verbose than constructing a new {@link ParallelCommandGroup} explicitly.
+   * Decorates this command with a set of commands to run parallel to it, ending when the calling
+   * command ends and interrupting all the others.  Often more convenient/less-verbose than
+   * constructing a new {@link ParallelDictatorGroup} explicitly.
    *
    * <p>Note: This decorator works by composing this command within a CommandGroup.  The command
    * cannot be used independently after being decorated, or be re-decorated with a different
@@ -169,8 +170,7 @@ public interface Command {
    * @return the decorated command
    */
   default Command alongWith(Command... parallel) {
-    return new ParallelCommandGroup(
-        (Command[]) Stream.concat(Stream.of(this), Arrays.stream(parallel)).toArray());
+    return new ParallelDictatorGroup(this, parallel);
   }
 
   /**
