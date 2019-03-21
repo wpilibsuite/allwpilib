@@ -10,17 +10,17 @@ import java.util.function.BooleanSupplier;
  */
 public class RunRunnableCommand extends SendableCommandBase {
 
-  protected Runnable m_runnable;
+  protected Runnable m_toRun;
 
   /**
    * Creates a new RunRunnableCommand.  The Runnable will be run continuously until the command
    * ends.
    *
-   * @param runnable     the Runnable to run
+   * @param toRun        the Runnable to run
    * @param requirements the subsystems to require
    */
-  public RunRunnableCommand(Runnable runnable, Subsystem... requirements) {
-    m_runnable = runnable;
+  public RunRunnableCommand(Runnable toRun, Subsystem... requirements) {
+    m_toRun = toRun;
     addRequirements(requirements);
   }
 
@@ -28,14 +28,14 @@ public class RunRunnableCommand extends SendableCommandBase {
    * Creates a new RunRunnableCommand.  The Runnable will be run continuously until the command
    * ends.  No subsystems will be required.
    *
-   * @param runnable the Runnable to run
+   * @param toRun the Runnable to run
    */
-  public RunRunnableCommand(Runnable runnable) {
-    this(runnable, new Subsystem[0]);
+  public RunRunnableCommand(Runnable toRun) {
+    this(toRun, new Subsystem[0]);
   }
 
   @Override
   public void execute() {
-    m_runnable.run();
+    m_toRun.run();
   }
 }
