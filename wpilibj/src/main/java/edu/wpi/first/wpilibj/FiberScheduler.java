@@ -79,12 +79,12 @@ public class FiberScheduler implements Closeable {
    * @param fiber The fiber to add.
    */
   public void add(Fiber fiber) {
-    fiber.m_startTime = RobotController.getFPGATime();
+    long startTime = RobotController.getFPGATime();
 
     m_queueMutex.lock();
     try {
       m_fibers.remove(fiber);
-      fiber.m_expirationTime = fiber.m_startTime + fiber.m_period;
+      fiber.m_expirationTime = startTime + fiber.m_period;
       m_fibers.add(fiber);
       m_schedulerWaiter.signalAll();
     } finally {
@@ -131,8 +131,7 @@ public class FiberScheduler implements Closeable {
             m_queueMutex.lock();
 
             // Reschedule Fiber
-            fiber.m_startTime = RobotController.getFPGATime();
-            fiber.m_expirationTime = fiber.m_startTime + fiber.m_period;
+            fiber.m_expirationTime = RobotController.getFPGATime() + fiber.m_period;
             m_fibers.add(fiber);
           }
           // Otherwise, a Fiber removed itself from the queue (it notifies the

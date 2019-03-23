@@ -13,7 +13,6 @@ package edu.wpi.first.wpilibj;
  * <p>FiberScheduler can be used to run it periodically.
  */
 public class Fiber implements Comparable<Fiber> {
-  long m_startTime; // us
   long m_period; // us
   long m_expirationTime; // us
   final Runnable m_callback;

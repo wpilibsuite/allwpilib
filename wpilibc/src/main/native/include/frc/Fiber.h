@@ -43,7 +43,6 @@ class Fiber {
   Fiber& operator=(Fiber&&) = default;
 
  private:
-  hal::fpga_clock::time_point m_startTime;
   std::chrono::microseconds m_period;
   hal::fpga_clock::time_point m_expirationTime;
   std::function<void()> m_callback;

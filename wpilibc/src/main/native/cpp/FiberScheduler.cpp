@@ -16,6 +16,12 @@
 
 using namespace frc;
 
+class FiberControlBlock {
+ public:
+  std::chrono::microseconds m_period;
+  hal::fpga_clock::time_point m_expirationTime;
+};
+
 class FiberScheduler::Thread : public wpi::SafeThread {
  public:
   template <typename T>
@@ -53,8 +59,7 @@ void FiberScheduler::Thread::Main() {
         lock.lock();
 
         // Reschedule Fiber
-        fiber.m_startTime = hal::fpga_clock::now();
-        fiber.m_expirationTime = fiber.m_startTime + fiber.m_period;
+        fiber.m_expirationTime = hal::fpga_clock::now() + fiber.m_period;
         m_fibers.emplace(&fiber);
       }
       // Otherwise, a Fiber removed itself from the queue (it notifies the
@@ -89,14 +94,14 @@ FiberScheduler::~FiberScheduler() {
 }
 
 void FiberScheduler::Add(Fiber& fiber) {
-  fiber.m_startTime = hal::fpga_clock::now();
+  auto startTime = hal::fpga_clock::now();
 
   // Locks mutex
   auto thr = m_owner.GetThread();
   if (!thr) return;
 
   thr->m_fibers.remove(&fiber);
-  fiber.m_expirationTime = fiber.m_startTime + fiber.m_period;
+  fiber.m_expirationTime = startTime + fiber.m_period;
   thr->m_fibers.emplace(&fiber);
   thr->m_cond.notify_all();
 }
