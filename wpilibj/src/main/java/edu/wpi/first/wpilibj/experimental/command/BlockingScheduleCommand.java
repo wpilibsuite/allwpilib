@@ -4,7 +4,8 @@ import java.util.Set;
 
 /**
  * Schedules the given commands with this command is initialized, and ends when all the commands are
- * no longer scheduled.  Useful for forking off from CommandGroups.
+ * no longer scheduled.  Useful for forking off from CommandGroups.  If this command is interrupted,
+ * it will cancel all of the commands.
  */
 public class BlockingScheduleCommand extends SendableCommandBase {
 
@@ -26,6 +27,13 @@ public class BlockingScheduleCommand extends SendableCommandBase {
     m_finished = false;
     for (Command command : m_toSchedule) {
       command.schedule();
+    }
+  }
+
+  @Override
+  public void interrupted() {
+    for (Command command : m_toSchedule) {
+      command.cancel();
     }
   }
 

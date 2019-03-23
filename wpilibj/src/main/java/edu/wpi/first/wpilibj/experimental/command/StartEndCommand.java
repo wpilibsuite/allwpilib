@@ -10,8 +10,7 @@ import java.util.function.BooleanSupplier;
  */
 public class StartEndCommand extends SendableCommandBase {
 
-  protected final Runnable m_onInit;
-  protected final Runnable m_onEnd;
+  protected final Runnable m_onInit, m_onEnd;
 
   /**
    * Creates a new StartEndCommand.  Will run the given runnables when the command starts and when
