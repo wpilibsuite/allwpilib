@@ -28,7 +28,7 @@ class EndOnConditionCommandTest extends CommandTestBase {
 
     ConditionHolder condition = new ConditionHolder();
 
-    Command command = new WaitCommand(10).withInterruptCondition(condition::getCondition);
+    Command command = new WaitCommand(10).interruptOn(condition::getCondition);
 
     scheduler.scheduleCommand(command, true);
     scheduler.run();

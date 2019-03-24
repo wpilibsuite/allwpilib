@@ -6,7 +6,7 @@ import java.util.function.BooleanSupplier;
  * A command that runs a given runnable when it is initalized, and another runnable when it ends.
  * Useful for running and then stopping a motor, or extending and then retracting a solenoid.
  * Has no end condition as-is; either subclass it or use {@link Command#withTimeout(double)} or
- * {@link Command#withInterruptCondition(BooleanSupplier)} to give it one.
+ * {@link Command#interruptOn(BooleanSupplier)} to give it one.
  */
 public class StartEndCommand extends SendableCommandBase {
 
