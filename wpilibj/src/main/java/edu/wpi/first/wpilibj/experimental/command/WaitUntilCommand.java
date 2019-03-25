@@ -1,27 +1,43 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
+
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * A command that does nothing but ends after a specified match time.  Useful for CommandGroups.
+ * A command that does nothing but ends after a specified match time or condition.  Useful for
+ * CommandGroups.
  */
 public class WaitUntilCommand extends SendableCommandBase {
 
-  private final double m_time;
+  private final BooleanSupplier m_condition;
 
   /**
-   * Creates a new WaitUntilCommand.  This command will do nothing, and will end when the current
-   * match time exceeds the specified time.
+   * Creates a new WaitUntilCommand that ends after a given condition becomes true.
    *
-   * @param seconds the match time at which to end the command.
+   * @param condition the condition to determine when to end
    */
-  public WaitUntilCommand(double seconds) {
-    m_time = seconds;
-    setName(m_name + ": " + seconds + " seconds");
+  public WaitUntilCommand(BooleanSupplier condition) {
+    m_condition = condition;
+  }
+
+  /**
+   * Creates a new WaitUntilCommand that ends after a given match time.
+   *
+   * @param time the match time after which to end, in seconds
+   */
+  public WaitUntilCommand(double time) {
+    this(() -> Timer.getMatchTime() - time > 0);
   }
 
   @Override
   public boolean isFinished() {
-    return Timer.getMatchTime() - m_time >= 0;
+    return m_condition.getAsBoolean();
+  }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
   }
 }

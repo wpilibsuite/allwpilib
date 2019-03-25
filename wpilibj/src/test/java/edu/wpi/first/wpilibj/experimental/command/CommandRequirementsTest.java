@@ -269,7 +269,7 @@ public class CommandRequirementsTest extends CommandTestBase {
 
     Subsystem system = new TestSubsystem();
 
-    Command missingRequirement = new EndOnConditionCommand(() -> false);
+    Command missingRequirement = new WaitUntilCommand(() -> false);
     Command ends = new InstantCommand(() -> { }, system);
 
     assertThrows(IllegalUseOfCommandException.class,
