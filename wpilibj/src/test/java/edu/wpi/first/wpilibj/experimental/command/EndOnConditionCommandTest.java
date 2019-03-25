@@ -12,7 +12,7 @@ class EndOnConditionCommandTest extends CommandTestBase {
 
     ConditionHolder condition = new ConditionHolder();
 
-    Command command = new EndOnConditionCommand(condition::getCondition);
+    Command command = new WaitUntilCommand(condition::getCondition);
 
     scheduler.scheduleCommand(command, true);
     scheduler.run();

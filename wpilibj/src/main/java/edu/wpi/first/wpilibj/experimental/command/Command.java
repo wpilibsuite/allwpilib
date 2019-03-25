@@ -95,7 +95,7 @@ public interface Command {
    * @return the command with the interrupt condition added
    */
   default Command interruptOn(BooleanSupplier condition) {
-    return new ParallelRaceGroup(this, new EndOnConditionCommand(condition));
+    return new ParallelRaceGroup(this, new WaitUntilCommand(condition));
   }
 
   /**
