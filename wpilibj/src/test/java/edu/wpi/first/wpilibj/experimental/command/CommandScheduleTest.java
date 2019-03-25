@@ -27,7 +27,7 @@ class CommandScheduleTest extends CommandTestBase {
     scheduler.run();
 
     verify(mockCommand).execute();
-    verify(mockCommand).end();
+    verify(mockCommand).end(false);
 
     assertFalse(scheduler.isScheduled(mockCommand));
   }
@@ -49,7 +49,7 @@ class CommandScheduleTest extends CommandTestBase {
 
     verify(mockCommand).initialize();
     verify(mockCommand, times(2)).execute();
-    verify(mockCommand).end();
+    verify(mockCommand).end(false);
 
     assertFalse(scheduler.isScheduled(mockCommand));
   }
@@ -99,8 +99,8 @@ class CommandScheduleTest extends CommandTestBase {
     scheduler.run();
 
     verify(mockCommand).execute();
-    verify(mockCommand).interrupted();
-    verify(mockCommand, never()).end();
+    verify(mockCommand).end(true);
+    verify(mockCommand, never()).end(false);
 
     assertFalse(scheduler.isScheduled(mockCommand));
   }

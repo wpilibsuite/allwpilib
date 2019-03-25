@@ -53,8 +53,8 @@ public class WaitCommandTest extends CommandTestBase {
     Timer.delay(3);
     scheduler.run();
 
-    verify(command1).interrupted();
-    verify(command1, never()).end();
+    verify(command1).end(true);
+    verify(command1, never()).end(false);
     assertFalse(scheduler.isScheduled(timeout));
   }
 }

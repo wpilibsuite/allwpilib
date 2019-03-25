@@ -64,17 +64,19 @@ public class ParallelCommandGroup extends CommandGroupBase {
       }
       commandRunning.getKey().execute();
       if (commandRunning.getKey().isFinished()) {
-        commandRunning.getKey().end();
+        commandRunning.getKey().end(false);
         commandRunning.setValue(false);
       }
     }
   }
 
   @Override
-  public void interrupted() {
-    for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
-      if (commandRunning.getValue()) {
-        commandRunning.getKey().interrupted();
+  public void end(boolean interrupted) {
+    if (interrupted) {
+      for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
+        if (commandRunning.getValue()) {
+          commandRunning.getKey().end(true);
+        }
       }
     }
   }

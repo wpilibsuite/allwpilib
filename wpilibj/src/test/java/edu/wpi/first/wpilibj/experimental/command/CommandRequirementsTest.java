@@ -32,8 +32,7 @@ public class CommandRequirementsTest extends CommandTestBase {
 
     verify(interrupted).initialize();
     verify(interrupted).execute();
-    verify(interrupted).interrupted();
-    verify(interrupted, never()).end();
+    verify(interrupted).end(true);
 
     verify(interrupter).initialize();
     verify(interrupter).execute();
@@ -234,9 +233,9 @@ public class CommandRequirementsTest extends CommandTestBase {
     assertTrue(scheduler.isScheduled(command2));
     assertFalse(scheduler.isScheduled(selectCommand));
 
-    verify(command1).interrupted();
-    verify(command2, never()).interrupted();
-    verify(command3, never()).interrupted();
+    verify(command1).end(true);
+    verify(command2, never()).end(true);
+    verify(command3, never()).end(true);
   }
 
   @Test
@@ -260,8 +259,8 @@ public class CommandRequirementsTest extends CommandTestBase {
     assertTrue(scheduler.isScheduled(command2));
     assertFalse(scheduler.isScheduled(conditionalCommand));
 
-    verify(command1).interrupted();
-    verify(command2, never()).interrupted();
+    verify(command1).end(true);
+    verify(command2, never()).end(true);
   }
 
   @Test

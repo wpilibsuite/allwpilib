@@ -33,7 +33,7 @@ public class StartEndCommand extends SendableCommandBase {
   }
 
   @Override
-  public void end() {
+  public void end(boolean interrupted) {
     m_onEnd.run();
   }
 }

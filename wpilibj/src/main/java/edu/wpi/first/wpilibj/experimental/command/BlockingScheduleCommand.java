@@ -31,9 +31,11 @@ public class BlockingScheduleCommand extends SendableCommandBase {
   }
 
   @Override
-  public void interrupted() {
-    for (Command command : m_toSchedule) {
-      command.cancel();
+  public void end(boolean interrupted) {
+    if (interrupted) {
+      for (Command command : m_toSchedule) {
+        command.cancel();
+      }
     }
   }
 

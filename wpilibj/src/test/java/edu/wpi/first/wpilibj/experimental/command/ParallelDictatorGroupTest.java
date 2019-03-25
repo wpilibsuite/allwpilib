@@ -35,18 +35,18 @@ public class ParallelDictatorGroupTest extends CommandTestBase {
 
     verify(command2).initialize();
     verify(command2).execute();
-    verify(command2).end();
-    verify(command2, never()).interrupted();
+    verify(command2).end(false);
+    verify(command2, never()).end(true);
 
     verify(command1).initialize();
     verify(command1, times(2)).execute();
-    verify(command1).end();
-    verify(command1, never()).interrupted();
+    verify(command1).end(false);
+    verify(command1, never()).end(true);
 
     verify(command3).initialize();
     verify(command3, times(2)).execute();
-    verify(command3, never()).end();
-    verify(command3).interrupted();
+    verify(command3, never()).end(false);
+    verify(command3).end(true);
   }
 
   @Test
@@ -68,12 +68,12 @@ public class ParallelDictatorGroupTest extends CommandTestBase {
     scheduler.cancelCommand(group);
 
     verify(command1, times(2)).execute();
-    verify(command1, never()).end();
-    verify(command1).interrupted();
+    verify(command1, never()).end(false);
+    verify(command1).end(true);
 
     verify(command2).execute();
-    verify(command2).end();
-    verify(command2, never()).interrupted();
+    verify(command2).end(false);
+    verify(command2, never()).end(true);
 
     assertFalse(scheduler.isScheduled(group));
   }

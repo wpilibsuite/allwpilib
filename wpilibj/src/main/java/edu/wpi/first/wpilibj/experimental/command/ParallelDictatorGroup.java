@@ -85,22 +85,17 @@ public class ParallelDictatorGroup extends CommandGroupBase {
       }
       commandRunning.getKey().execute();
       if (commandRunning.getKey().isFinished()) {
-        commandRunning.getKey().end();
+        commandRunning.getKey().end(false);
         commandRunning.setValue(false);
       }
     }
   }
 
   @Override
-  public void end() {
-    interrupted();
-  }
-
-  @Override
-  public void interrupted() {
+  public void end(boolean interrupted) {
     for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
       if (commandRunning.getValue()) {
-        commandRunning.getKey().interrupted();
+        commandRunning.getKey().end(true);
       }
     }
   }

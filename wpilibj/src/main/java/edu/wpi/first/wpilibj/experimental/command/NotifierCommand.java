@@ -37,7 +37,7 @@ public class NotifierCommand extends SendableCommandBase {
   }
 
   @Override
-  public void end() {
+  public void end(boolean interrupted) {
     m_notifier.stop();
   }
 }

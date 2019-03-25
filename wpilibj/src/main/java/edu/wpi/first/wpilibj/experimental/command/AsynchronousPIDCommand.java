@@ -49,7 +49,7 @@ public class AsynchronousPIDCommand extends SendableCommandBase {
   }
 
   @Override
-  public void end() {
+  public void end(boolean interrupted) {
     m_runner.disable();
   }
 

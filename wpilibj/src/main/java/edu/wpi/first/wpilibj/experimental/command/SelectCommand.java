@@ -46,13 +46,8 @@ public class SelectCommand<K> extends SendableCommandBase {
   }
 
   @Override
-  public void interrupted() {
-    m_selectedCommand.interrupted();
-  }
-
-  @Override
-  public void end() {
-    m_selectedCommand.end();
+  public void end(boolean interrupted) {
+    m_selectedCommand.end(interrupted);
   }
 
   @Override

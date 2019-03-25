@@ -32,15 +32,15 @@ public class SelectCommandTest extends CommandTestBase {
 
     verify(command1).initialize();
     verify(command1).execute();
-    verify(command1).end();
+    verify(command1).end(false);
 
     verify(command2, never()).initialize();
     verify(command2, never()).execute();
-    verify(command2, never()).end();
+    verify(command2, never()).end(false);
 
     verify(command3, never()).initialize();
     verify(command3, never()).execute();
-    verify(command3, never()).end();
+    verify(command3, never()).end(false);
   }
 
   @Test
@@ -60,10 +60,10 @@ public class SelectCommandTest extends CommandTestBase {
 
     verify(command1).initialize();
     verify(command1).execute();
-    verify(command1).end();
+    verify(command1).end(false);
 
     verify(command2, never()).initialize();
     verify(command2, never()).execute();
-    verify(command2, never()).end();
+    verify(command2, never()).end(false);
   }
 }
