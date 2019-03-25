@@ -14,7 +14,7 @@ class SchedulerTest extends CommandTestBase {
 
     scheduler.onCommandInitialize(command -> counter.increment());
     scheduler.onCommandExecute(command -> counter.increment());
-    scheduler.onCommandEnd(command -> counter.increment());
+    scheduler.onCommandFinished(command -> counter.increment());
 
     scheduler.scheduleCommand(new InstantCommand(), true);
     scheduler.run();

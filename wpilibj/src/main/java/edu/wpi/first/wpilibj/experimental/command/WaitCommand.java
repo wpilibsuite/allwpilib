@@ -32,7 +32,7 @@ public class WaitCommand extends SendableCommandBase {
   }
 
   @Override
-  public void end() {
+  public void end(boolean interrupted) {
     m_timer.stop();
   }
 

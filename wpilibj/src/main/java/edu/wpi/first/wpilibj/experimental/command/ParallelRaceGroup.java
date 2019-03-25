@@ -61,23 +61,16 @@ public class ParallelRaceGroup extends CommandGroupBase {
       command.execute();
       if (command.isFinished()) {
         m_finished = true;
-        command.end();
+        command.end(false);
       }
     }
   }
 
   @Override
-  public void interrupted() {
-    for (Command command : m_commands) {
-      command.interrupted();
-    }
-  }
-
-  @Override
-  public void end() {
+  public void end(boolean interrupted) {
     for (Command command : m_commands) {
       if (!command.isFinished()) {
-        command.interrupted();
+        command.end(true);
       }
     }
   }

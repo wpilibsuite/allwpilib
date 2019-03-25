@@ -31,10 +31,10 @@ public class ParallelRaceGroupTest extends CommandTestBase {
     scheduler.run();
 
     verify(command1).execute();
-    verify(command1).end();
+    verify(command1).end(false);
     verify(command2).execute();
-    verify(command2).interrupted();
-    verify(command2, never()).end();
+    verify(command2).end(true);
+    verify(command2, never()).end(false);
 
     assertFalse(scheduler.isScheduled(group));
   }
@@ -57,12 +57,12 @@ public class ParallelRaceGroupTest extends CommandTestBase {
     scheduler.cancelCommand(group);
 
     verify(command1, times(2)).execute();
-    verify(command1, never()).end();
-    verify(command1).interrupted();
+    verify(command1, never()).end(false);
+    verify(command1).end(true);
 
     verify(command2, times(2)).execute();
-    verify(command2, never()).end();
-    verify(command2).interrupted();
+    verify(command2, never()).end(false);
+    verify(command2).end(true);
 
     assertFalse(scheduler.isScheduled(group));
   }

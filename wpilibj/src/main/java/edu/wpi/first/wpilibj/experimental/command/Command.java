@@ -29,19 +29,12 @@ public interface Command {
   }
 
   /**
-   * The action to take when the command is forced to end early.  Called either when the command
-   * is interrupted by another command with a shared requirement, or when the command is explicitly
-   * canceled.  Defaults to call the ordinary end() method.
+   * The action to take when the command ends.  Called when either the command finishes normally,
+   * or when it interrupted/canceled.
+   *
+   * @param interrupted whether the command was interrupted/canceled
    */
-  default void interrupted() {
-    end();
-  }
-
-  /**
-   * The action to take when the command ends normally.  Called once after the command reports that
-   * it is finished, and called by default from interrupted().
-   */
-  default void end() {
+  default void end(boolean interrupted) {
   }
 
   /**
