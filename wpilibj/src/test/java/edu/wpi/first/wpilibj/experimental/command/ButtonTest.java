@@ -3,7 +3,6 @@ package edu.wpi.first.wpilibj.experimental.command;
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.experimental.buttons.InternalButton;
-import edu.wpi.first.wpilibj.experimental.buttons.Trigger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -158,7 +157,7 @@ class ButtonTest extends CommandTestBase {
   }
 
   @Test
-  void buttonCompositionTest(){
+  void buttonCompositionTest() {
     InternalButton button1 = new InternalButton();
     InternalButton button2 = new InternalButton();
 
