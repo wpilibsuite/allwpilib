@@ -36,7 +36,7 @@ public class WaitCommandTest extends CommandTestBase {
   void withTimeoutTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
     when(command1.withTimeout(anyDouble())).thenCallRealMethod();
 

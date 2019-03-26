@@ -17,7 +17,7 @@ class ButtonTest extends CommandTestBase {
   @Test
   void whenPressedTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
 
     InternalButton button = new InternalButton();
@@ -34,7 +34,7 @@ class ButtonTest extends CommandTestBase {
   @Test
   void whenReleasedTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
 
     InternalButton button = new InternalButton();
@@ -51,7 +51,7 @@ class ButtonTest extends CommandTestBase {
   @Test
   void whileHeldTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
 
     InternalButton button = new InternalButton();
@@ -71,7 +71,7 @@ class ButtonTest extends CommandTestBase {
   @Test
   void whenHeldTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
 
     InternalButton button = new InternalButton();
@@ -91,7 +91,7 @@ class ButtonTest extends CommandTestBase {
   @Test
   void toggleWhenPressedTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
 
     InternalButton button = new InternalButton();
@@ -115,7 +115,7 @@ class ButtonTest extends CommandTestBase {
   @Test
   void cancelWhenPressedTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
 
     InternalButton button = new InternalButton();

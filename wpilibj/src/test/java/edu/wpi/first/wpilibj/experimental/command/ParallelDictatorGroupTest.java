@@ -13,12 +13,12 @@ public class ParallelDictatorGroupTest extends CommandTestBase {
   void parallelDictatorScheduleTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
-    MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
     Command command2 = command2Holder.getMock();
     command2Holder.setFinished(true);
-    MockCommandHolder command3Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command3Holder = new MockCommandHolder(true);
     Command command3 = command3Holder.getMock();
 
     Command group = new ParallelDictatorGroup(command1, command2, command3);
@@ -53,9 +53,9 @@ public class ParallelDictatorGroupTest extends CommandTestBase {
   void parallelDictatorInterruptTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
-    MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
     Command command2 = command2Holder.getMock();
     command2Holder.setFinished(true);
 

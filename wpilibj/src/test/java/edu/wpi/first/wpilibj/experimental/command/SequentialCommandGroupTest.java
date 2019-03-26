@@ -12,9 +12,9 @@ public class SequentialCommandGroupTest extends CommandTestBase {
   void sequentialGroupScheduleTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
-    MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
     Command command2 = command2Holder.getMock();
 
     Command group = new SequentialCommandGroup(command1, command2);
@@ -48,11 +48,11 @@ public class SequentialCommandGroupTest extends CommandTestBase {
   void sequentialGroupInterruptTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
-    MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
     Command command2 = command2Holder.getMock();
-    MockCommandHolder command3Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command3Holder = new MockCommandHolder(true);
     Command command3 = command3Holder.getMock();
 
     Command group = new SequentialCommandGroup(command1, command2, command3);
@@ -82,9 +82,9 @@ public class SequentialCommandGroupTest extends CommandTestBase {
   void notScheduledCancelTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
-    MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
     Command command2 = command2Holder.getMock();
 
     Command group = new SequentialCommandGroup(command1, command2);

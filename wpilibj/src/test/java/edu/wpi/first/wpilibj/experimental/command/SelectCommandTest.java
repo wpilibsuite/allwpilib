@@ -12,12 +12,12 @@ public class SelectCommandTest extends CommandTestBase {
   void selectCommandTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
     command1Holder.setFinished(true);
-    MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
     Command command2 = command2Holder.getMock();
-    MockCommandHolder command3Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command3Holder = new MockCommandHolder(true);
     Command command3 = command3Holder.getMock();
 
     SelectCommand<String> selectCommand =
@@ -47,10 +47,10 @@ public class SelectCommandTest extends CommandTestBase {
   void conditionalCommandTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
     command1Holder.setFinished(true);
-    MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
     Command command2 = command2Holder.getMock();
 
     ConditionalCommand conditionalCommand = new ConditionalCommand(command1, command2, () -> true);

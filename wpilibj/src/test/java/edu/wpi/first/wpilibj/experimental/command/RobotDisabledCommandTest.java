@@ -16,7 +16,7 @@ public class RobotDisabledCommandTest extends CommandTestBase {
 
     CommandScheduler scheduler = new CommandScheduler();
 
-    MockCommandHolder holder = new MockCommandHolder(false, new Subsystem[0]);
+    MockCommandHolder holder = new MockCommandHolder(false);
     Command mockCommand = holder.getMock();
 
     scheduler.scheduleCommand(mockCommand, true);
@@ -57,7 +57,7 @@ public class RobotDisabledCommandTest extends CommandTestBase {
 
     CommandScheduler scheduler = new CommandScheduler();
 
-    MockCommandHolder holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder holder = new MockCommandHolder(true);
     Command mockCommand = holder.getMock();
 
     scheduler.scheduleCommand(mockCommand, true);
@@ -98,13 +98,13 @@ public class RobotDisabledCommandTest extends CommandTestBase {
 
     CommandScheduler scheduler = new CommandScheduler();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
-    MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
     Command command2 = command2Holder.getMock();
-    MockCommandHolder command3Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command3Holder = new MockCommandHolder(true);
     Command command3 = command3Holder.getMock();
-    MockCommandHolder command4Holder = new MockCommandHolder(false, new Subsystem[0]);
+    MockCommandHolder command4Holder = new MockCommandHolder(false);
     Command command4 = command4Holder.getMock();
 
     Command runWhenDisabled = new SequentialCommandGroup(command1, command2);
@@ -148,13 +148,13 @@ public class RobotDisabledCommandTest extends CommandTestBase {
 
     CommandScheduler scheduler = new CommandScheduler();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
-    MockCommandHolder command2Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
     Command command2 = command2Holder.getMock();
-    MockCommandHolder command3Holder = new MockCommandHolder(true, new Subsystem[0]);
+    MockCommandHolder command3Holder = new MockCommandHolder(true);
     Command command3 = command3Holder.getMock();
-    MockCommandHolder command4Holder = new MockCommandHolder(false, new Subsystem[0]);
+    MockCommandHolder command4Holder = new MockCommandHolder(false);
     Command command4 = command4Holder.getMock();
 
     Command runWhenDisabled = new ParallelCommandGroup(command1, command2);
