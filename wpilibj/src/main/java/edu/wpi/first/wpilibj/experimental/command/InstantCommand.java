@@ -21,15 +21,6 @@ public class InstantCommand extends SendableCommandBase {
   }
 
   /**
-   * Creates a new InstantCommand that runs the given Runnable with no requirements.
-   *
-   * @param toRun the Runnable to run
-   */
-  public InstantCommand(Runnable toRun) {
-    this(toRun, new Subsystem[0]);
-  }
-
-  /**
    * Creates a new InstantCommand with a Runnable that does nothing.  Useful only as a no-arg
    * constructor to call from subclass constructors.
    */
