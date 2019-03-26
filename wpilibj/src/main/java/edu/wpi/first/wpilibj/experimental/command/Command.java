@@ -162,7 +162,7 @@ public interface Command {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  default Command alongWith(Command... parallel) {
+  default Command dictating(Command... parallel) {
     return new ParallelDictatorGroup(this, parallel);
   }
 
@@ -180,7 +180,7 @@ public interface Command {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  default Command asWellAs(Command... parallel) {
+  default Command alongWith(Command... parallel) {
     return new ParallelCommandGroup(
         (Command[]) Stream.concat(Stream.of(this), Arrays.stream(parallel)).toArray());
   }
