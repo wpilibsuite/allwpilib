@@ -1,9 +1,7 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
-import java.util.Arrays;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
-import java.util.stream.Stream;
 
 /**
  * A state machine representing a complete action to be performed by the robot.  Commands are
@@ -144,8 +142,9 @@ public interface Command {
    * @return the decorated command
    */
   default Command andThen(Command... next) {
-    return new SequentialCommandGroup(
-        (Command[]) Stream.concat(Stream.of(this), Arrays.stream(next)).toArray());
+    SequentialCommandGroup group = new SequentialCommandGroup(this);
+    group.addCommands(next);
+    return group;
   }
 
   /**
@@ -181,8 +180,9 @@ public interface Command {
    * @return the decorated command
    */
   default Command alongWith(Command... parallel) {
-    return new ParallelCommandGroup(
-        (Command[]) Stream.concat(Stream.of(this), Arrays.stream(parallel)).toArray());
+    ParallelCommandGroup group = new ParallelCommandGroup(this);
+    group.addCommands(parallel);
+    return group;
   }
 
   /**
@@ -200,8 +200,9 @@ public interface Command {
    * @return the decorated command
    */
   default Command raceWith(Command... parallel) {
-    return new ParallelRaceGroup(
-        (Command[]) Stream.concat(Stream.of(this), Arrays.stream(parallel)).toArray());
+    ParallelRaceGroup group = new ParallelRaceGroup(this);
+    group.addCommands(parallel);
+    return group;
   }
 
   /**
