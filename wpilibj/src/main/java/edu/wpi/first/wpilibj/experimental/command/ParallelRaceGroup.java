@@ -7,7 +7,7 @@ import java.util.Set;
 import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
 /**
- * A CommandGroup that runs a set of commands in parallel, ending when the first command ends
+ * A CommandGroup that runs a set of commands in parallel, ending when any one of the commands ends
  * and interrupting all the others.
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
