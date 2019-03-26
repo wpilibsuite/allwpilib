@@ -2,6 +2,8 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import java.util.function.BooleanSupplier;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A command that runs a Runnable continuously.  Has no end condition as-is;
  * either subclass it or use {@link Command#withTimeout(double)} or
@@ -20,6 +22,7 @@ public class RunCommand extends SendableCommandBase {
    * @param requirements the subsystems to require
    */
   public RunCommand(Runnable toRun, Subsystem... requirements) {
+    requireNonNull(toRun);
     m_toRun = toRun;
     addRequirements(requirements);
   }
