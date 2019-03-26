@@ -2,6 +2,8 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import java.util.function.BooleanSupplier;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A command that runs a given runnable when it is initalized, and another runnable when it ends.
  * Useful for running and then stopping a motor, or extending and then retracting a solenoid.
@@ -22,6 +24,8 @@ public class StartEndCommand extends SendableCommandBase {
    * @param requirements the subsystems required by this command
    */
   public StartEndCommand(Runnable onInit, Runnable onEnd, Subsystem... requirements) {
+    requireNonNull(onInit);
+    requireNonNull(onEnd);
     m_onInit = onInit;
     m_onEnd = onEnd;
     addRequirements(requirements);
