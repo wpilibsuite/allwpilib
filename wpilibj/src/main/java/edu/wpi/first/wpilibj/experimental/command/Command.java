@@ -241,12 +241,15 @@ public interface Command {
   }
 
   /**
-   * Whether the command requires a given subsystem.
+   * Whether the command requires a given subsystem.  Named "hasRequirement" rather than "requires"
+   * to avoid confusion with
+   * {@link edu.wpi.first.wpilibj.command.Command#requires(edu.wpi.first.wpilibj.command.Subsystem)}
+   *  - this may be able to be changed in a few years.
    *
    * @param requirement the subsystem to inquire about
    * @return whether the subsystem is required
    */
-  default boolean requires(Subsystem requirement) {
+  default boolean hasRequirement(Subsystem requirement) {
     return getRequirements().contains(requirement);
   }
 
