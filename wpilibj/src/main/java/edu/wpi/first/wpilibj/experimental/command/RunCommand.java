@@ -24,16 +24,6 @@ public class RunCommand extends SendableCommandBase {
     addRequirements(requirements);
   }
 
-  /**
-   * Creates a new RunRunnableCommand.  The Runnable will be run continuously until the command
-   * ends.  No subsystems will be required.
-   *
-   * @param toRun the Runnable to run
-   */
-  public RunCommand(Runnable toRun) {
-    this(toRun, new Subsystem[0]);
-  }
-
   @Override
   public void execute() {
     m_toRun.run();
