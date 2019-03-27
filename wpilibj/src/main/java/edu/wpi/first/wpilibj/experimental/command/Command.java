@@ -150,7 +150,7 @@ public interface Command {
   /**
    * Decorates this command with a set of commands to run parallel to it, ending when the calling
    * command ends and interrupting all the others.  Often more convenient/less-verbose than
-   * constructing a new {@link ParallelDictatorGroup} explicitly.
+   * constructing a new {@link ParallelDeadlineGroup} explicitly.
    *
    * <p>Note: This decorator works by composing this command within a CommandGroup.  The command
    * cannot be used independently after being decorated, or be re-decorated with a different
@@ -161,8 +161,8 @@ public interface Command {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  default Command dictating(Command... parallel) {
-    return new ParallelDictatorGroup(this, parallel);
+  default Command deadlineWith(Command... parallel) {
+    return new ParallelDeadlineGroup(this, parallel);
   }
 
   /**

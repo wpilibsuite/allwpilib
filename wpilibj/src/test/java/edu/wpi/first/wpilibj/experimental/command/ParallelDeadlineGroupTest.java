@@ -8,9 +8,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-public class ParallelDictatorGroupTest extends CommandTestBase {
+public class ParallelDeadlineGroupTest extends CommandTestBase {
   @Test
-  void parallelDictatorScheduleTest() {
+  void parallelDeadlineScheduleTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
     MockCommandHolder command1Holder = new MockCommandHolder(true);
@@ -21,7 +21,7 @@ public class ParallelDictatorGroupTest extends CommandTestBase {
     MockCommandHolder command3Holder = new MockCommandHolder(true);
     Command command3 = command3Holder.getMock();
 
-    Command group = new ParallelDictatorGroup(command1, command2, command3);
+    Command group = new ParallelDeadlineGroup(command1, command2, command3);
 
     scheduler.scheduleCommand(group, true);
     scheduler.run();
@@ -50,7 +50,7 @@ public class ParallelDictatorGroupTest extends CommandTestBase {
   }
 
   @Test
-  void parallelDictatorInterruptTest() {
+  void parallelDeadlineInterruptTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
     MockCommandHolder command1Holder = new MockCommandHolder(true);
@@ -59,7 +59,7 @@ public class ParallelDictatorGroupTest extends CommandTestBase {
     Command command2 = command2Holder.getMock();
     command2Holder.setFinished(true);
 
-    Command group = new ParallelDictatorGroup(command1, command2);
+    Command group = new ParallelDeadlineGroup(command1, command2);
 
     scheduler.scheduleCommand(group, true);
 

@@ -96,7 +96,7 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
-  void dictatingTest() {
+  void deadlineWithTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
     ConditionHolder condition = new ConditionHolder();
@@ -106,7 +106,7 @@ class CommandDecoratorTest extends CommandTestBase {
     Command endsBefore = new InstantCommand();
     Command endsAfter = new WaitUntilCommand(() -> false);
 
-    Command group = dictator.dictating(endsBefore, endsAfter);
+    Command group = dictator.deadlineWith(endsBefore, endsAfter);
 
     scheduler.scheduleCommand(group, true);
     scheduler.run();

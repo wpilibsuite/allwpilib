@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.command;
 
+import edu.wpi.first.wpilibj.experimental.command.ParallelDeadlineGroup;
+
 /**
  * This command will only finish if whatever {@link CommandGroup} it is in has no active children.
  * If it is not a part of a {@link CommandGroup}, then it will finish immediately. If it is itself
@@ -19,7 +21,7 @@ package edu.wpi.first.wpilibj.command;
  *     {@link edu.wpi.first.wpilibj.experimental.command.SequentialCommandGroup},
  *     {@link edu.wpi.first.wpilibj.experimental.command.ParallelCommandGroup},
  *     {@link edu.wpi.first.wpilibj.experimental.command.ParallelRaceGroup},
- *     or {@link edu.wpi.first.wpilibj.experimental.command.ParallelDictatorGroup} instead.
+ *     or {@link ParallelDeadlineGroup} instead.
  */
 @Deprecated
 public class WaitForChildren extends Command {

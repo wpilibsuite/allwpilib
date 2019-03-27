@@ -10,6 +10,8 @@ package edu.wpi.first.wpilibj.command;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import edu.wpi.first.wpilibj.experimental.command.ParallelDeadlineGroup;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -34,7 +36,7 @@ import static java.util.Objects.requireNonNull;
  * @deprecated Use {@link edu.wpi.first.wpilibj.experimental.command.SequentialCommandGroup},
  *     {@link edu.wpi.first.wpilibj.experimental.command.ParallelCommandGroup},
  *     {@link edu.wpi.first.wpilibj.experimental.command.ParallelRaceGroup},
- *     or {@link edu.wpi.first.wpilibj.experimental.command.ParallelDictatorGroup} instead.
+ *     or {@link ParallelDeadlineGroup} instead.
  */
 @Deprecated
 @SuppressWarnings("PMD.TooManyMethods")
