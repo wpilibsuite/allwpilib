@@ -125,7 +125,7 @@ public class CommandRequirementsTest extends CommandTestBase {
     MockCommandHolder command3Holder = new MockCommandHolder(true, system3, system4);
     Command command3 = command3Holder.getMock();
 
-    Command group = new ParallelDictatorGroup(command1, command2);
+    Command group = new ParallelDeadlineGroup(command1, command2);
 
     scheduler.scheduleCommand(group, true);
     scheduler.scheduleCommand(command3, true);
@@ -165,7 +165,7 @@ public class CommandRequirementsTest extends CommandTestBase {
   }
 
   @Test
-  void parallelDictatorRequirementErrorTest() {
+  void parallelDeadlineRequirementErrorTest() {
     Subsystem system1 = new TestSubsystem();
     Subsystem system2 = new TestSubsystem();
     Subsystem system3 = new TestSubsystem();
@@ -176,7 +176,7 @@ public class CommandRequirementsTest extends CommandTestBase {
     Command command2 = command2Holder.getMock();
 
     assertThrows(IllegalUseOfCommandException.class,
-        () -> new ParallelDictatorGroup(command1, command2));
+        () -> new ParallelDeadlineGroup(command1, command2));
   }
 
   @Test
