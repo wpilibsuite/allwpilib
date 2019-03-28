@@ -16,7 +16,7 @@ public class ParallelRaceGroup extends CommandGroupBase {
 
   private final Set<Command> m_commands = new HashSet<>();
   private boolean m_runWhenDisabled = true;
-  private boolean m_finished;
+  private boolean m_finished = true;
 
   /**
    * Creates a new ParallelCommandRace.  The given commands will be executed simultaneously, and
@@ -35,6 +35,11 @@ public class ParallelRaceGroup extends CommandGroupBase {
       throw new IllegalUseOfCommandException("Commands cannot be added to multiple CommandGroups");
     }
 
+    if (!m_finished) {
+      throw new IllegalUseOfCommandException(
+          "Commands cannot be added to a CommandGroup while the group is running");
+    }
+
     registerGroupedCommands(commands);
 
     for (Command command : commands) {
@@ -50,6 +55,7 @@ public class ParallelRaceGroup extends CommandGroupBase {
 
   @Override
   public void initialize() {
+    m_finished = false;
     for (Command command : m_commands) {
       command.initialize();
     }

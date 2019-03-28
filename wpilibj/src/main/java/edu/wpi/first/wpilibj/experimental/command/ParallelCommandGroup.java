@@ -35,6 +35,11 @@ public class ParallelCommandGroup extends CommandGroupBase {
       throw new IllegalUseOfCommandException("Commands cannot be added to multiple CommandGroups");
     }
 
+    if (m_commands.containsValue(true)) {
+      throw new IllegalUseOfCommandException(
+          "Commands cannot be added to a CommandGroup while the group is running");
+    }
+
     registerGroupedCommands(commands);
 
     for (Command command : commands) {
@@ -42,7 +47,7 @@ public class ParallelCommandGroup extends CommandGroupBase {
         throw new IllegalUseOfCommandException("Multiple commands in a parallel group cannot"
             + "require the same subsystems");
       }
-      m_commands.put(command, true);
+      m_commands.put(command, false);
       m_requirements.addAll(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
     }
