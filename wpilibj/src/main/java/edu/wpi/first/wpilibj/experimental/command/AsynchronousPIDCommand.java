@@ -7,6 +7,8 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A command that controls an output with a PIDController.  Runs forever by default - to add
  * exit conditions and/or other behavior, subclass this class.  The controller calculation and
@@ -32,10 +34,28 @@ public class AsynchronousPIDCommand extends SendableCommandBase {
                                 DoubleSupplier referenceSource,
                                 DoubleConsumer useOutput,
                                 Subsystem... requirements) {
+    requireNonNull(controller);
+    requireNonNull(referenceSource);
+    requireNonNull(useOutput);
+
     m_controller = controller;
     m_reference = referenceSource;
     m_requirements.addAll(Set.of(requirements));
     m_runner = new ControllerRunner(m_controller, useOutput::accept);
+  }
+
+  /**
+   * Creates a new AsynchronousPIDCommand, which controls the given output with a PIDController.
+   *
+   * @param controller      the controller that controls the output.
+   * @param useOutput       the controller's output; should be a synchronized method to remain
+   *                        threadsafe
+   * @param requirements    the subsystems required by this command
+   */
+  public AsynchronousPIDCommand(PIDController controller,
+                                DoubleConsumer useOutput,
+                                Subsystem... requirements) {
+    this(controller, () -> 0, useOutput, requirements);
   }
 
   @Override
@@ -77,6 +97,14 @@ public class AsynchronousPIDCommand extends SendableCommandBase {
 
   public void setReference(DoubleSupplier referenceSource) {
     m_reference = referenceSource;
+  }
+
+  public void setReference(double reference) {
+    setReference(() -> reference);
+  }
+
+  public void setReferenceRelative(double relativeReference) {
+    setReference(m_controller.getReference() + relativeReference);
   }
 
   @Override

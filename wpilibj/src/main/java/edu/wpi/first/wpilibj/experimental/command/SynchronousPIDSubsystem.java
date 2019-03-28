@@ -2,6 +2,8 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A subsystem that uses a PIDController to control an output.  The controller is run synchronously
  * from the subsystem's periodic() method.
@@ -17,6 +19,7 @@ public abstract class SynchronousPIDSubsystem extends SendableSubsystemBase {
    * @param controller the PIDController to use
    */
   public SynchronousPIDSubsystem(PIDController controller) {
+    requireNonNull(controller);
     m_controller = controller;
   }
 

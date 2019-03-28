@@ -3,6 +3,8 @@ package edu.wpi.first.wpilibj.experimental.command;
 import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A subsystem uses a PIDController to control an output.  The controller is run asynchronously
  * by a separate thread with the period specified by the controller.
@@ -18,6 +20,7 @@ public abstract class AsynchronousPIDSubsystem extends SendableSubsystemBase {
    * @param controller the controller to use
    */
   public AsynchronousPIDSubsystem(PIDController controller) {
+    requireNonNull(controller);
     m_controller = controller;
     m_runner = new ControllerRunner(m_controller, this::useOutput);
   }

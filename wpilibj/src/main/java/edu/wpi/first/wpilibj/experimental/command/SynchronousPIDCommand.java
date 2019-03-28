@@ -6,6 +6,8 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A command that controls an output with a PIDController.  Runs forever by default - to add
  * exit conditions and/or other behavior, subclass this class.  The controller calculation and
@@ -29,10 +31,27 @@ public class SynchronousPIDCommand extends SendableCommandBase {
                                DoubleSupplier referenceSource,
                                DoubleConsumer useOutput,
                                Subsystem... requirements) {
+    requireNonNull(controller);
+    requireNonNull(referenceSource);
+    requireNonNull(useOutput);
+
     m_controller = controller;
     m_useOutput = useOutput;
     m_reference = referenceSource;
     m_requirements.addAll(Set.of(requirements));
+  }
+
+  /**
+   * Creates a new SynchronousPIDCommand, which controls the given output with a PIDController.
+   *
+   * @param controller      the controller that controls the output.
+   * @param useOutput       the controller's output
+   * @param requirements    the subsystems required by this command
+   */
+  public SynchronousPIDCommand(PIDController controller,
+                               DoubleConsumer useOutput,
+                               Subsystem... requirements) {
+    this(controller, () -> 0, useOutput, requirements);
   }
 
   @Override
@@ -51,6 +70,14 @@ public class SynchronousPIDCommand extends SendableCommandBase {
 
   public void setReference(DoubleSupplier referenceSource) {
     m_reference = referenceSource;
+  }
+
+  public void setReference(double reference) {
+    setReference(() -> reference);
+  }
+
+  public void setReferenceRelative(double relativeReference) {
+    setReference(m_controller.getReference() + relativeReference);
   }
 
   @Override
