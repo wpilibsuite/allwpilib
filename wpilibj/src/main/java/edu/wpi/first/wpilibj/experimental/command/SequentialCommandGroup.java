@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 public class SequentialCommandGroup extends CommandGroupBase {
 
   private final List<Command> m_commands = new ArrayList<>();
-  private int m_currentCommandIndex;
+  private int m_currentCommandIndex = -1;
   private boolean m_runWhenDisabled = true;
 
   /**
@@ -33,6 +33,11 @@ public class SequentialCommandGroup extends CommandGroupBase {
     if (!Collections.disjoint(Set.of(commands), getGroupedCommands())) {
       throw new IllegalUseOfCommandException(
           "Commands cannot be added to more than one CommandGroup");
+    }
+
+    if (m_currentCommandIndex != -1) {
+      throw new IllegalUseOfCommandException(
+          "Commands cannot be added to a CommandGroup while the group is running");
     }
 
     registerGroupedCommands(commands);
@@ -77,6 +82,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
     if (interrupted && !m_commands.isEmpty()) {
       m_commands.get(m_currentCommandIndex).end(true);
     }
+    m_currentCommandIndex = -1;
   }
 
   @Override
