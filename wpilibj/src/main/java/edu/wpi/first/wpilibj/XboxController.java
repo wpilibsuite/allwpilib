@@ -21,7 +21,7 @@ public class XboxController extends GenericHID {
   /**
    * Represents a digital button on an XboxController.
    */
-  private enum Button {
+  public enum Button {
     kBumperLeft(5),
     kBumperRight(6),
     kStickLeft(9),
@@ -34,7 +34,7 @@ public class XboxController extends GenericHID {
     kStart(8);
 
     @SuppressWarnings({"MemberName", "PMD.SingularField"})
-    private final int value;
+    public final int value;
 
     Button(int value) {
       this.value = value;

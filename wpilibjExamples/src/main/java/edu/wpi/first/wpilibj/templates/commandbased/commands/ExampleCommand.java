@@ -7,42 +7,55 @@
 
 package edu.wpi.first.wpilibj.templates.commandbased.commands;
 
-import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.templates.commandbased.Robot;
+import edu.wpi.first.wpilibj.experimental.command.SendableCommandBase;
+import edu.wpi.first.wpilibj.templates.commandbased.subsystems.ExampleSubsystem;
 
 /**
- * An example command.  You can replace me with your own command.
+ * An example command.  You can replace this with your own command.
  */
-public class ExampleCommand extends Command {
-  public ExampleCommand() {
-    // Use requires() here to declare subsystem dependencies
-    requires(Robot.m_subsystem);
+public class ExampleCommand extends SendableCommandBase {
+
+  // The subsystem this command runs on.  Should be passed in ("injected") through the command's
+  // constructor.
+  private ExampleSubsystem m_subsystem;
+
+  public ExampleCommand(ExampleSubsystem subsystem) {
+    // Use addRequirements here to declare subsystem dependencies
+    addRequirements(subsystem);
+    // Inject the subsystem.
+    m_subsystem = subsystem;
   }
 
-  // Called just before this Command runs the first time
+  /**
+   * This method is called once when the command is first scheduled to run.
+   */
   @Override
-  protected void initialize() {
+  public void initialize() {
   }
 
-  // Called repeatedly when this Command is scheduled to run
+  /**
+   * This method is called repeatedly while the command is scheduled to run.
+   */
   @Override
-  protected void execute() {
+  public void execute() {
   }
 
-  // Make this return true when this Command no longer needs to run execute()
+  /**
+   * This method should return true when the command is finished.
+   *
+   * @return whether the command has finished
+   */
   @Override
-  protected boolean isFinished() {
+  public boolean isFinished() {
     return false;
   }
 
-  // Called once after isFinished returns true
+  /**
+   * Called when the command ends.
+   *
+   * @param interrupted whether the command was interrupted/canceled
+   */
   @Override
-  protected void end() {
-  }
-
-  // Called when another command which requires one or more of the same
-  // subsystems is scheduled to run
-  @Override
-  protected void interrupted() {
+  public void end(boolean interrupted) {
   }
 }

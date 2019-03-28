@@ -7,18 +7,17 @@
 
 package edu.wpi.first.wpilibj.templates.commandbased.subsystems;
 
-import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.experimental.command.SendableSubsystemBase;
 
 /**
- * An example subsystem.  You can replace me with your own Subsystem.
+ * An example subsystem.  You can replace this with your own Subsystem.
  */
-public class ExampleSubsystem extends Subsystem {
+public class ExampleSubsystem extends SendableSubsystemBase {
   // Put methods for controlling this subsystem
   // here. Call these from Commands.
 
-  @Override
-  public void initDefaultCommand() {
-    // Set the default command for a subsystem here.
-    // setDefaultCommand(new MySpecialCommand());
+  // An example method that can be called from commands.
+  public void exampleMethod() {
   }
+
 }
