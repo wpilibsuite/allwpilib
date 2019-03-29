@@ -22,11 +22,12 @@ public class DriveSubsystem extends SendableSubsystemBase {
   private DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
 
   // The left-side drive encoder
-  private final Encoder m_leftEncoder = new Encoder(kLeftEncoderPorts[0], kLeftEncoderPorts[1]);
+  private final Encoder m_leftEncoder =
+      new Encoder(kLeftEncoderPorts[0], kLeftEncoderPorts[1], kLeftEncoderReversed);
 
   // The right-side drive encoder
   private final Encoder m_rightEncoder =
-      new Encoder(kRightEncoderPorts[0], kRightEncoderPorts[1],true);
+      new Encoder(kRightEncoderPorts[0], kRightEncoderPorts[1],kRightEncoderReversed);
 
   /**
    * Creates a new DriveSubsystem.
