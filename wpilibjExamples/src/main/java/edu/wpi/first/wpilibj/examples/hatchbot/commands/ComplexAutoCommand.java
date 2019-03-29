@@ -42,4 +42,5 @@ public class ComplexAutoCommand extends SequentialCommandGroup {
                 () -> driveSubsystem.getAverageEncoderDistance() <= -kAutoBackupDistanceInches)
     );
   }
+
 }
