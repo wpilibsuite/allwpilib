@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.kAutoBackupDistanceInches;
 import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.kAutoDriveDistanceInches;
 
 /**
