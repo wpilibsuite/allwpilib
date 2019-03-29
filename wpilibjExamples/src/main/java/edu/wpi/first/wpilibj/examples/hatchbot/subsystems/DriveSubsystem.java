@@ -59,8 +59,8 @@ public class DriveSubsystem extends SendableSubsystemBase {
    *
    * @return the average of the two encoder readings
    */
-  public double getAverangeEncoderDistance() {
-    return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance())/2.;
+  public double getAverageEncoderDistance() {
+    return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.;
   }
 
   /**
@@ -87,6 +87,6 @@ public class DriveSubsystem extends SendableSubsystemBase {
    * @param maxOutput the maximum output to which the drive will be constrained
    */
   public void setMaxOutput(double maxOutput) {
-   m_drive.setMaxOutput(maxOutput);
+    m_drive.setMaxOutput(maxOutput);
   }
 }
