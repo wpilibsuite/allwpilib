@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.experimental.command.SendableSubsystemBase;
 
 import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.HatchConstants.*;
+import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 
 /**
  * A hatch mechanism actuated by a single {@link edu.wpi.first.wpilibj.DoubleSolenoid}.
@@ -24,13 +25,13 @@ public class HatchSubsystem extends SendableSubsystemBase {
    * Grabs the hatch.
    */
   public void grabHatch() {
-    m_hatchSolenoid.set(DoubleSolenoid.Value.kForward);
+    m_hatchSolenoid.set(kForward);
   }
 
   /**
    * Releases the hatch.
    */
   public void releaseHatch() {
-    m_hatchSolenoid.set(DoubleSolenoid.Value.kReverse);
+    m_hatchSolenoid.set(kReverse);
   }
 }
