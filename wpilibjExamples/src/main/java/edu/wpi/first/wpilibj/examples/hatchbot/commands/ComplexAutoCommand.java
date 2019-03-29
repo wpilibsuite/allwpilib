@@ -6,9 +6,7 @@ import edu.wpi.first.wpilibj.experimental.command.InstantCommand;
 import edu.wpi.first.wpilibj.experimental.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj.experimental.command.StartEndCommand;
 
-import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.kAutoBackupDistanceInches;
-import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.kAutoDriveDistanceInches;
-
+import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.AutoConstants.*;
 /**
  * A complex auto command that drives forward, releases a hatch, and then drives backward.
  */

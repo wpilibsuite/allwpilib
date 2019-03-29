@@ -13,7 +13,8 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.kAutoDriveDistanceInches;
+import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.AutoConstants.*;
+import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.OIConstants.*;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -51,7 +52,7 @@ public class RobotContainer {
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   // The driver's controller
-  XboxController driverController = new XboxController(Constants.kDriverControllerPort);
+  XboxController driverController = new XboxController(kDriverControllerPort);
 
   public RobotContainer() {
     // Configure the button bindings
