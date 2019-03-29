@@ -4,9 +4,19 @@ package edu.wpi.first.wpilibj.templates.commandbased;
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants.  This class should not be used for any other purpose.  All constants should be
  * declared globally (i.e. public static).  Do not put anything functional in this class.
+ *
+ * It is advised to statically import this class (or one of its inner classes) wherever the
+ * constants are needed, to reduce verbosity.
  */
-public class Constants {
+public final class Constants {
 
-  // Example: the port of the driver's controller
-  public static final int kDriverControllerPort = 1;
+  /**
+   * Example of an inner class.  One can "import static [...].Constants.OIConstants.*" to gain
+   * access to the constants contained within without having to preface the names with the class,
+   * greatly reducing the amount of text required.
+   */
+  public static final class OIConstants {
+    // Example: the port of the driver's controller
+    public static final int kDriverControllerPort = 1;
+  }
 }

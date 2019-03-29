@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.templates.commandbased.commands.ExampleCommand;
 import edu.wpi.first.wpilibj.templates.commandbased.subsystems.ExampleSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
+import static edu.wpi.first.wpilibj.templates.commandbased.Constants.OIConstants.*;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -47,7 +48,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Here's an example HID (in this case, an Xbox controller):
-    XboxController driverController = new XboxController(Constants.kDriverControllerPort);
+    XboxController driverController = new XboxController(kDriverControllerPort);
     // Binding a command to run when the 'A' button is held:
     driverController.getButton(Button.kA.value)
         .whenHeld(new RunCommand(exampleSubsystem::exampleMethod, exampleSubsystem));
