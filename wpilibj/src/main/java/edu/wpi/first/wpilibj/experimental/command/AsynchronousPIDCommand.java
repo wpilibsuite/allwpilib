@@ -38,6 +38,7 @@ public class AsynchronousPIDCommand extends SendableCommandBase {
     requireNonNull(referenceSource);
     requireNonNull(useOutput);
 
+    //TODO: Change this when measurement source is no longer injected into controller
     m_controller = controller;
     m_reference = referenceSource;
     m_requirements.addAll(Set.of(requirements));

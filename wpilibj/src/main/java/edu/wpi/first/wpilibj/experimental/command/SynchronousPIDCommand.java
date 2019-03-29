@@ -35,6 +35,7 @@ public class SynchronousPIDCommand extends SendableCommandBase {
     requireNonNull(referenceSource);
     requireNonNull(useOutput);
 
+    //TODO: Change this when measurement source is no longer injected into controller
     m_controller = controller;
     m_useOutput = useOutput;
     m_reference = referenceSource;

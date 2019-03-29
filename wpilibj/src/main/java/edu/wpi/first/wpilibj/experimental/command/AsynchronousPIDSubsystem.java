@@ -21,6 +21,7 @@ public abstract class AsynchronousPIDSubsystem extends SendableSubsystemBase {
    */
   public AsynchronousPIDSubsystem(PIDController controller) {
     requireNonNull(controller);
+    //TODO: Change this when measurement source is no longer injected into controller
     m_controller = controller;
     m_runner = new ControllerRunner(m_controller, this::useOutput);
   }

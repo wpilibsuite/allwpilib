@@ -15,6 +15,8 @@ public class ShooterSubsystem extends SynchronousPIDSubsystem {
   private double m_reference;
 
   public ShooterSubsystem() {
+
+    //TODO: Fix this to actually use encoder distance per pulse; requires changes to PIDController
     super(new PIDController(kP, kI, kD,
         new Encoder(kEncoderPorts[0], kEncoderPorts[1], kEncoderReversed)::getRate));
   }

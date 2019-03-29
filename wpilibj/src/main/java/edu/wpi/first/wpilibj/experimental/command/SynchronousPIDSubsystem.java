@@ -20,6 +20,7 @@ public abstract class SynchronousPIDSubsystem extends SendableSubsystemBase {
    */
   public SynchronousPIDSubsystem(PIDController controller) {
     requireNonNull(controller);
+    //TODO: Change this when measurement source is no longer injected into controller
     m_controller = controller;
   }
 
