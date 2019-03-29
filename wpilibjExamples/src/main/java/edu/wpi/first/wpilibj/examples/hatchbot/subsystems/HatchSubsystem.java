@@ -10,8 +10,7 @@ package edu.wpi.first.wpilibj.examples.hatchbot.subsystems;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.experimental.command.SendableSubsystemBase;
 
-import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.kHatchSolenoidModule;
-import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.kHatchSolenoidPorts;
+import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.HatchConstants.*;
 
 /**
  * A hatch mechanism actuated by a single {@link edu.wpi.first.wpilibj.DoubleSolenoid}.
