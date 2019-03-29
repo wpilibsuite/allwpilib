@@ -2,6 +2,7 @@ package edu.wpi.first.wpilibj.examples.hatchbot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.examples.hatchbot.commands.ComplexAutoCommand;
 import edu.wpi.first.wpilibj.examples.hatchbot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.examples.hatchbot.subsystems.HatchSubsystem;
 import edu.wpi.first.wpilibj.experimental.command.Command;
@@ -11,8 +12,9 @@ import edu.wpi.first.wpilibj.experimental.command.StartEndCommand;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
-import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.*;
 import static edu.wpi.first.wpilibj.XboxController.Button;
+import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.kAutoBackupDistanceInches;
+import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.kAutoDriveDistanceInches;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -44,31 +46,7 @@ public class RobotContainer {
           .interruptOn(() -> m_robotDrive.getAverageEncoderDistance() >= kAutoDriveDistanceInches);
 
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
-  private final Command m_complexAuto =
-      new StartEndCommand(
-          // Start driving forward at the start of the command
-          () -> m_robotDrive.arcadeDrive(.5, 0),
-          // Stop driving at the end of the command
-          () -> m_robotDrive.arcadeDrive(0, 0), m_robotDrive
-      )
-          // End the command when the robot's driven distance exceeds the desired value
-          .interruptOn(() -> m_robotDrive.getAverageEncoderDistance() >= kAutoDriveDistanceInches)
-          // Reset the encoders before starting
-          .beforeStarting(m_robotDrive::resetEncoders)
-          // Then...
-          .andThen(
-              // Release the hatch
-              new InstantCommand(m_hatchSubsystem::releaseHatch, m_hatchSubsystem),
-              // And drive backwards for the specified distance
-              new StartEndCommand(
-                  () -> m_robotDrive.arcadeDrive(-.5, 0),
-                  () -> m_robotDrive.arcadeDrive(0, 0),
-                  m_robotDrive
-              )
-                  .beforeStarting(m_robotDrive::resetEncoders)
-                  .interruptOn(
-                      () -> m_robotDrive.getAverageEncoderDistance() <= -kAutoBackupDistanceInches)
-          );
+  private final Command m_complexAuto = new ComplexAutoCommand(m_robotDrive, m_hatchSubsystem);
 
   // A chooser for autonomous commands
   SendableChooser<Command> m_chooser = new SendableChooser<>();
