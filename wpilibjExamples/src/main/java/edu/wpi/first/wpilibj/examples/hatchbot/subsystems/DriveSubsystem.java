@@ -25,7 +25,8 @@ public class DriveSubsystem extends SendableSubsystemBase {
   private final Encoder m_leftEncoder = new Encoder(kLeftEncoderPorts[0], kLeftEncoderPorts[1]);
 
   // The right-side drive encoder
-  private final Encoder m_rightEncoder = new Encoder(kRightEncoderPorts[0], kRightEncoderPorts[1]);
+  private final Encoder m_rightEncoder =
+      new Encoder(kRightEncoderPorts[0], kRightEncoderPorts[1],true);
 
   /**
    * Creates a new DriveSubsystem.
