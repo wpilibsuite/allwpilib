@@ -11,8 +11,8 @@ import static java.util.Objects.requireNonNull;
  */
 public abstract class AsynchronousPIDSubsystem extends SendableSubsystemBase {
 
-  private final PIDController m_controller;
-  private final ControllerRunner m_runner;
+  protected final PIDController m_controller;
+  protected final ControllerRunner m_runner;
 
   /**
    * Creates a new AsynchronousPIDSubsystem.

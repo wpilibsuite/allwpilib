@@ -17,9 +17,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class AsynchronousPIDCommand extends SendableCommandBase {
 
-  private final PIDController m_controller;
-  private DoubleSupplier m_reference;
-  private ControllerRunner m_runner;
+  protected final PIDController m_controller;
+  protected DoubleSupplier m_reference;
+  protected ControllerRunner m_runner;
 
   /**
    * Creates a new AsynchronousPIDCommand, which controls the given output with a PIDController.

@@ -15,9 +15,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class SynchronousPIDCommand extends SendableCommandBase {
 
-  private final PIDController m_controller;
-  private DoubleSupplier m_reference;
-  private DoubleConsumer m_useOutput;
+  protected final PIDController m_controller;
+  protected DoubleSupplier m_reference;
+  protected DoubleConsumer m_useOutput;
 
   /**
    * Creates a new SynchronousPIDCommand, which controls the given output with a PIDController.

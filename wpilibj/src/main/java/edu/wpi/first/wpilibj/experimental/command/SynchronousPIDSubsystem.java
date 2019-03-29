@@ -10,8 +10,8 @@ import static java.util.Objects.requireNonNull;
  */
 public abstract class SynchronousPIDSubsystem extends SendableSubsystemBase {
 
-  private final PIDController m_controller;
-  private boolean m_enabled;
+  protected final PIDController m_controller;
+  protected boolean m_enabled;
 
   /**
    * Creates a new SynchronousPIDSubsystem.
