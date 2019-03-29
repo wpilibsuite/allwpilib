@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 public class ParallelDeadlineGroupTest extends CommandTestBase {
@@ -22,6 +21,38 @@ public class ParallelDeadlineGroupTest extends CommandTestBase {
     Command command3 = command3Holder.getMock();
 
     Command group = new ParallelDeadlineGroup(command1, command2, command3);
+
+    scheduler.scheduleCommand(group, true);
+    scheduler.run();
+
+    assertTrue(scheduler.isScheduled(group));
+
+    command1Holder.setFinished(true);
+    scheduler.run();
+
+    assertFalse(scheduler.isScheduled(group));
+
+    verify(command2).initialize();
+    verify(command2).execute();
+    verify(command2).end(false);
+    verify(command2, never()).end(true);
+
+    verify(command1).initialize();
+    verify(command1, times(2)).execute();
+    verify(command1).end(false);
+    verify(command1, never()).end(true);
+
+    verify(command3).initialize();
+    verify(command3, times(2)).execute();
+    verify(command3, never()).end(false);
+    verify(command3).end(true);
+
+    reset(command1);
+    reset(command2);
+    reset(command3);
+
+    command1Holder.setFinished(false);
+    command2Holder.setFinished(true);
 
     scheduler.scheduleCommand(group, true);
     scheduler.run();

@@ -4,9 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class ParallelCommandGroupTest extends CommandTestBase {
 
@@ -20,6 +18,29 @@ public class ParallelCommandGroupTest extends CommandTestBase {
     Command command2 = command2Holder.getMock();
 
     Command group = new ParallelCommandGroup(command1, command2);
+
+    scheduler.scheduleCommand(group, true);
+
+    verify(command1).initialize();
+    verify(command2).initialize();
+
+    command1Holder.setFinished(true);
+    scheduler.run();
+    command2Holder.setFinished(true);
+    scheduler.run();
+
+    verify(command1).execute();
+    verify(command1).end(false);
+    verify(command2, times(2)).execute();
+    verify(command2).end(false);
+
+    assertFalse(scheduler.isScheduled(group));
+
+    reset(command1);
+    reset(command2);
+
+    command1Holder.setFinished(false);
+    command2Holder.setFinished(false);
 
     scheduler.scheduleCommand(group, true);
 

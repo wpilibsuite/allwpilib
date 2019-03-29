@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.experimental.command.SendableSubsystemBase;
 
-import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.DriveConstants.*;
+import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.DriveConstants.*;
 
 public class DriveSubsystem extends SendableSubsystemBase {
 

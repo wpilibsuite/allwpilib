@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class SequentialCommandGroupTest extends CommandTestBase {
   @Test
@@ -42,6 +41,34 @@ public class SequentialCommandGroupTest extends CommandTestBase {
     verify(command2).end(false);
 
     assertFalse(scheduler.isScheduled(group));
+
+    reset(command1);
+    reset(command2);
+
+    command1Holder.setFinished(false);
+    command2Holder.setFinished(false);
+
+    scheduler.scheduleCommand(group, true);
+
+    verify(command1).initialize();
+    verify(command2, never()).initialize();
+
+    command1Holder.setFinished(true);
+    scheduler.run();
+
+    verify(command1).execute();
+    verify(command1).end(false);
+    verify(command2).initialize();
+    verify(command2, never()).execute();
+    verify(command2, never()).end(false);
+
+    command2Holder.setFinished(true);
+    scheduler.run();
+
+    verify(command1).execute();
+    verify(command1).end(false);
+    verify(command2).execute();
+    verify(command2).end(false);
   }
 
   @Test
