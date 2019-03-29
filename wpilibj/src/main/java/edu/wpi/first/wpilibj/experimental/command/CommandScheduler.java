@@ -80,7 +80,7 @@ public final class CommandScheduler extends SendableBase {
   private final List<Consumer<Command>> m_initActions = new ArrayList<>();
   private final List<Consumer<Command>> m_executeActions = new ArrayList<>();
   private final List<Consumer<Command>> m_interruptActions = new ArrayList<>();
-  private final List<Consumer<Command>> m_finishedActions = new ArrayList<>();
+  private final List<Consumer<Command>> m_finishActions = new ArrayList<>();
 
   CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
@@ -230,7 +230,7 @@ public final class CommandScheduler extends SendableBase {
       }
       if (command.isFinished()) {
         command.end(false);
-        for (Consumer<Command> action : m_finishedActions) {
+        for (Consumer<Command> action : m_finishActions) {
           action.accept(command);
         }
         iterator.remove();
@@ -413,7 +413,7 @@ public final class CommandScheduler extends SendableBase {
    *
    * @param action the action to perform
    */
-  public void onCommandInterrupted(Consumer<Command> action) {
+  public void onCommandInterrupt(Consumer<Command> action) {
     m_interruptActions.add(action);
   }
 
@@ -422,8 +422,8 @@ public final class CommandScheduler extends SendableBase {
    *
    * @param action the action to perform
    */
-  public void onCommandFinished(Consumer<Command> action) {
-    m_finishedActions.add(action);
+  public void onCommandFinish(Consumer<Command> action) {
+    m_finishActions.add(action);
   }
 
   @Override
