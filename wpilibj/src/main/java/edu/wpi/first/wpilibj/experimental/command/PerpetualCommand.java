@@ -2,9 +2,9 @@ package edu.wpi.first.wpilibj.experimental.command;
 
 /**
  * A command that runs another command in perpetuity, ignoring that command's end conditions.  While
- * this class does not extend {@link CommandGroupBase}, it is still considered a CommandGroup, as
- * it allows one to compose another command within it; that command is added to the list of grouped
- * commands, and the ordinary restrictions apply.
+ * this class does not extend {@link CommandGroupBase}, it is still considered a CommandGroup, as it
+ * allows one to compose another command within it; the command instances that are passed to it
+ * cannot be added to any other groups, or scheduled individually.
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
  */

@@ -220,17 +220,16 @@ public class CommandRequirementsTest extends CommandTestBase {
     MockCommandHolder command3Holder = new MockCommandHolder(true, system3, system4);
     Command command3 = command3Holder.getMock();
 
-    SelectCommand<String> selectCommand =
-        new SelectCommand<>(Map.ofEntries(
+    SelectCommand selectCommand =
+        new SelectCommand(Map.ofEntries(
             Map.entry("one", command1),
             Map.entry("two", command2),
             Map.entry("three", command3)),
             () -> "one");
 
     scheduler.scheduleCommand(selectCommand, true);
-    scheduler.scheduleCommand(command2, true);
+    scheduler.scheduleCommand(new InstantCommand(() -> { }, system3), true);
 
-    assertTrue(scheduler.isScheduled(command2));
     assertFalse(scheduler.isScheduled(selectCommand));
 
     verify(command1).end(true);
@@ -254,9 +253,8 @@ public class CommandRequirementsTest extends CommandTestBase {
     ConditionalCommand conditionalCommand = new ConditionalCommand(command1, command2, () -> true);
 
     scheduler.scheduleCommand(conditionalCommand, true);
-    scheduler.scheduleCommand(command2, true);
+    scheduler.scheduleCommand(new InstantCommand(() -> { }, system3), true);
 
-    assertTrue(scheduler.isScheduled(command2));
     assertFalse(scheduler.isScheduled(conditionalCommand));
 
     verify(command1).end(true);
@@ -270,7 +268,8 @@ public class CommandRequirementsTest extends CommandTestBase {
     Subsystem system = new TestSubsystem();
 
     Command missingRequirement = new WaitUntilCommand(() -> false);
-    Command ends = new InstantCommand(() -> { }, system);
+    Command ends = new InstantCommand(() -> {
+    }, system);
 
     assertThrows(IllegalUseOfCommandException.class,
         () -> scheduler.setDefaultCommand(system, missingRequirement));
