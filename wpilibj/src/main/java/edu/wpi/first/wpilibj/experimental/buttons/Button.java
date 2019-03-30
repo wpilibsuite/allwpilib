@@ -93,8 +93,9 @@ public abstract class Button extends Trigger {
    * @param toRun the runnable to run
    * @return this button, so calls can be chained
    */
-  public void whileHeld(final Runnable toRun) {
+  public Button whileHeld(final Runnable toRun) {
     whileActiveContinuous(toRun);
+    return this;
   }
 
   /**

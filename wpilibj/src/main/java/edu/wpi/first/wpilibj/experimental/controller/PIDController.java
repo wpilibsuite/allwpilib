@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj.experimental.controller;
 
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;

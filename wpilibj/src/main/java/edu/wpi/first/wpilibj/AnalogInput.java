@@ -99,8 +99,8 @@ public class AnalogInput extends SendableBase implements PIDSource {
    * Get a scaled sample from the output of the oversample and average engine for this channel. The
    * value is scaled to units of Volts using the calibrated scaling data from getLSBWeight() and
    * getOffset(). Using oversampling will cause this value to be higher resolution, but it will
-   * calculate more slowly. Using averaging will cause this value to be more stable, but it will calculate
-   * more slowly.
+   * calculate more slowly. Using averaging will cause this value to be more stable, but it will
+   * calculate more slowly.
    *
    * @return A scaled sample from the output of the oversample and average engine for this channel.
    */
@@ -304,7 +304,8 @@ public class AnalogInput extends SendableBase implements PIDSource {
   /**
    * Set the sample rate per channel.
    *
-   * <p>This is a global setting for all channels. The maximum rate is 500kS/s divided by the number
+   * <p>This is a global setting for all channels. The maximum rate is 500kS/s divided by the
+   * number
    * of channels in use. This is 62500 samples/s per channel if all 8 channels are used.
    *
    * @param samplesPerSecond The number of samples per second.

@@ -135,7 +135,7 @@ public class AsynchronousPIDCommand extends SendableCommandBase {
    * Uses the output of the controller.  Wraps the passed-in function so that changes to the
    * function by a subclass are seen by the runner.
    *
-   * @param output
+   * @param output the output to use
    */
   private synchronized void useOutput(double output) {
     m_useOutput.accept(output);
