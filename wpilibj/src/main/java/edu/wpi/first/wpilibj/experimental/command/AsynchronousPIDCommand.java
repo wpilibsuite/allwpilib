@@ -18,8 +18,8 @@ import static java.util.Objects.requireNonNull;
  * <p>While this class does more than {@link AsynchronousPIDSubsystem} to ensure
  * thread-safety (as it is a fully usable implementation rather than a base for a user
  * implementation), care should still be taken when using this class to ensure code remains
- * thread-safe.  If you are unfamiliar with thread-safety, consider using
- * {@link SynchronousPIDSubsystem}.
+ * thread-safe.  If you are unfamiliar with thread-safety, consider using {@link
+ * SynchronousPIDSubsystem}.
  */
 public class AsynchronousPIDCommand extends SendableCommandBase {
 
@@ -62,15 +62,17 @@ public class AsynchronousPIDCommand extends SendableCommandBase {
    *
    * @param controller        the controller that controls the output.
    * @param measurementSource the measurement of the process variable
+   * @param reference         the controller's reference (aka setpoint)
    * @param useOutput         the controller's output; should be a synchronized method to remain
    *                          threadsafe
    * @param requirements      the subsystems required by this command
    */
   public AsynchronousPIDCommand(PIDController controller,
                                 DoubleSupplier measurementSource,
+                                double reference,
                                 DoubleConsumer useOutput,
                                 Subsystem... requirements) {
-    this(controller, measurementSource, () -> 0, useOutput, requirements);
+    this(controller, measurementSource, () -> reference, useOutput, requirements);
   }
 
   @Override

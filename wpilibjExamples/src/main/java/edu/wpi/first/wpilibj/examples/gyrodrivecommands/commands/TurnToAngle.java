@@ -15,6 +15,8 @@ public class TurnToAngle extends SynchronousPIDCommand {
     super(new PIDController(kTurnP, kTurnI, kTurnD),
         // Close loop on heading
         drive::getHeading,
+        // Set reference to target
+        targetAngleDegrees,
         // Pipe output to turn robot
         (output) -> drive.arcadeDrive(0, output));
 
@@ -23,9 +25,6 @@ public class TurnToAngle extends SynchronousPIDCommand {
     // Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
     // setpoint before it is considered as having reached the reference
     getController().setAbsoluteTolerance(kTurnToleranceDeg, kTurnRateToleranceDegPerS);
-    // Set the reference to the target angle
-    setReference(targetAngleDegrees);
-
     // Require the drive
     addRequirements(drive);
   }

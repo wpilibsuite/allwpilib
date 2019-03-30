@@ -52,14 +52,16 @@ public class SynchronousPIDCommand extends SendableCommandBase {
    *
    * @param controller        the controller that controls the output.
    * @param measurementSource the measurement of the process variable
+   * @param reference         the controller's reference (aka setpoint)
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
    */
   public SynchronousPIDCommand(PIDController controller,
                                DoubleSupplier measurementSource,
+                               double reference,
                                DoubleConsumer useOutput,
                                Subsystem... requirements) {
-    this(controller, measurementSource, () -> 0, useOutput, requirements);
+    this(controller, measurementSource, () -> reference, useOutput, requirements);
   }
 
   @Override

@@ -59,8 +59,9 @@ public class RobotContainer {
         .whenHeld(new SynchronousPIDCommand(
                 new PIDController(kStabilizationP, kStabilizationI, kStabilizationD),
                 // Close the loop on the turn rate
-                // Reference (setpoint) is implicitly 0
                 m_robotDrive::getTurnRate,
+                // Setpoint is 0
+                0,
                 // Pipe the output to the turning controls
                 (output) ->
                     m_robotDrive.arcadeDrive(driverController.getY(GenericHID.Hand.kLeft), output),
