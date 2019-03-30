@@ -1,4 +1,4 @@
-package edu.wpi.first.wpilibj.examples.gyrostabilization;
+package edu.wpi.first.wpilibj.examples.gyrodrivecommands;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -30,6 +30,16 @@ public final class Constants {
     public static final double kStabilizationP = 1;
     public static final double kStabilizationI = .5;
     public static final double kStabilizationD = 0;
+
+    public static final double kTurnP = 1;
+    public static final double kTurnI = 0;
+    public static final double kTurnD = 0;
+
+    public static final double kTurnToleranceDegrees = 5;
+    public static final double kTurnRateTolerance = 10; // degrees per second
+    public static final double kTurnDeltaToleranceDegrees =
+        // .02 second main loop timing
+        kTurnRateTolerance * .02;
   }
 
   public static final class OIConstants {

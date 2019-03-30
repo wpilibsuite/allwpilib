@@ -1,4 +1,4 @@
-package edu.wpi.first.wpilibj.examples.gyrostabilization.subsystems;
+package edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.experimental.command.SendableSubsystemBase;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
-import static edu.wpi.first.wpilibj.examples.gyrostabilization.Constants.DriveConstants.*;
+import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.*;
 
 public class DriveSubsystem extends SendableSubsystemBase {
 

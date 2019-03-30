@@ -1,14 +1,15 @@
-package edu.wpi.first.wpilibj.examples.gyrostabilization;
+package edu.wpi.first.wpilibj.examples.gyrodrivecommands;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.examples.gyrostabilization.subsystems.DriveSubsystem;
+import edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands.TurnToAngle;
+import edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.experimental.command.*;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.gyrostabilization.Constants.DriveConstants.*;
-import static edu.wpi.first.wpilibj.examples.gyrostabilization.Constants.OIConstants.*;
+import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.*;
+import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.OIConstants.*;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -67,6 +68,10 @@ public class RobotContainer {
                 m_robotDrive
             )
         );
+
+    // Turn to 90 degrees when the 'X' button is pressed, with a 5 second timeout
+    driverController.getButton(Button.kX.value)
+        .whenPressed(new TurnToAngle(90, m_robotDrive).withTimeout(5));
   }
 
 
