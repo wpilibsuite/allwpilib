@@ -5,16 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.hatchbot.subsystems;
+package edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.experimental.command.SendableSubsystemBase;
 
-import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.HatchConstants.*;
-import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
+import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kForward;
+import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kReverse;
+import static edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.HatchConstants.*;
 
 /**
- * A hatch mechanism actuated by a single {@link edu.wpi.first.wpilibj.DoubleSolenoid}.
+ * A hatch mechanism actuated by a single {@link DoubleSolenoid}.
  */
 public class HatchSubsystem extends SendableSubsystemBase {
 

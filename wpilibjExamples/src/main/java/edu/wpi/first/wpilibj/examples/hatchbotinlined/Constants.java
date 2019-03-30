@@ -1,4 +1,4 @@
-package edu.wpi.first.wpilibj.examples.hatchbot;
+package edu.wpi.first.wpilibj.examples.hatchbotinlined;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -36,6 +36,7 @@ public final class Constants {
   public static final class AutoConstants {
     public static final double kAutoDriveDistanceInches = 60;
     public static final double kAutoBackupDistanceInches = 20;
+    public static final double kAutoDriveSpeed = .5;
   }
 
   public static final class OIConstants {

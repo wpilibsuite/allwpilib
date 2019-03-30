@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.hatchbot;
+package edu.wpi.first.wpilibj.examples.hatchbotinlined;
 
 import edu.wpi.first.wpilibj.RobotBase;
 

@@ -1,4 +1,4 @@
-package edu.wpi.first.wpilibj.examples.hatchbot.subsystems;
+package edu.wpi.first.wpilibj.examples.hatchbotinlined.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.experimental.command.SendableSubsystemBase;
 
-import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.DriveConstants.*;
+import static edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.DriveConstants.*;
 
 public class DriveSubsystem extends SendableSubsystemBase {
 
