@@ -11,14 +11,13 @@ public class ShooterSubsystem extends SynchronousPIDSubsystem {
 
   private Spark m_shooterMotor = new Spark(kShooterMotorPort);
   private Spark m_feederMotor = new Spark(kFeederMotorPort);
-
-  private double m_reference;
+  private Encoder m_shooterEncoder = new Encoder(kEncoderPorts[0], kEncoderPorts[1],
+      kEncoderReversed);
 
   public ShooterSubsystem() {
-
-    //TODO: Fix this to actually use encoder distance per pulse; requires changes to PIDController
-    super(new PIDController(kP, kI, kD,
-        new Encoder(kEncoderPorts[0], kEncoderPorts[1], kEncoderReversed)::getRate));
+    super(new PIDController(kP, kI, kD));
+    getController().setAbsoluteTolerance(kShooterToleranceRPS);
+    m_shooterEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
   }
 
   @Override
@@ -29,6 +28,11 @@ public class ShooterSubsystem extends SynchronousPIDSubsystem {
   @Override
   public double getReference() {
     return kShooterRPS;
+  }
+
+  @Override
+  public double getMeasurement() {
+    return m_shooterEncoder.getRate();
   }
 
   public boolean atReference() {

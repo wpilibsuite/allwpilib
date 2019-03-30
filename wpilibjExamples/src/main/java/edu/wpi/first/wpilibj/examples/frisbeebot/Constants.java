@@ -44,6 +44,8 @@ public final class Constants {
     public static final int kFeederMotorPort = 5;
 
     public static final double kShooterRPS = 5000;
+    public static final double kShooterToleranceRPS = 50;
+
     public static final double kFeederSpeed = .5;
   }
 

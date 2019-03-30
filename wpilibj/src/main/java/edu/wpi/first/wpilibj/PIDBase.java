@@ -316,7 +316,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
    * <p>If a velocity PID controller is being used, the F term should be set to 1 over the maximum
    * setpoint for the output. If a position PID controller is being used, the F term should be set
    * to 1 over the maximum speed for the output measured in setpoint units per this controller's
-   * update period (see the default period in this class's constructor).
+   * calculate period (see the default period in this class's constructor).
    */
   protected double calculateFeedForward() {
     if (m_pidInput.getPIDSourceType().equals(PIDSourceType.kRate)) {

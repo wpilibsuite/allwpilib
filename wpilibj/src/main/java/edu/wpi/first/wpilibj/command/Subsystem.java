@@ -177,7 +177,7 @@ public abstract class Subsystem extends SendableBase {
 
   /**
    * Associate a {@link Sendable} with this Subsystem.
-   * Also update the child's name.
+   * Also calculate the child's name.
    *
    * @param name name to give child
    * @param child sendable

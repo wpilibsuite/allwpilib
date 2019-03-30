@@ -5,8 +5,8 @@ import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 import static java.util.Objects.requireNonNull;
 
 /**
- * A subsystem that uses a PIDController to control an output.  The controller is run synchronously
- * from the subsystem's periodic() method.
+ * A subsystem that uses a {@link PIDController} to control an output.  The controller is run
+ * synchronously from the subsystem's periodic() method.
  */
 public abstract class SynchronousPIDSubsystem extends SendableSubsystemBase {
 
@@ -20,7 +20,6 @@ public abstract class SynchronousPIDSubsystem extends SendableSubsystemBase {
    */
   public SynchronousPIDSubsystem(PIDController controller) {
     requireNonNull(controller);
-    //TODO: Change this when measurement source is no longer injected into controller
     m_controller = controller;
   }
 
@@ -29,7 +28,7 @@ public abstract class SynchronousPIDSubsystem extends SendableSubsystemBase {
     m_controller.setReference(getReference());
 
     if (m_enabled) {
-      useOutput(m_controller.update());
+      useOutput(m_controller.calculate(getReference(), getMeasurement()));
     }
   }
 
@@ -50,6 +49,13 @@ public abstract class SynchronousPIDSubsystem extends SendableSubsystemBase {
    * @return the reference (setpoint) to be used by the controller
    */
   public abstract double getReference();
+
+  /**
+   * Returns the measurement of the process variable used by the PIDController.
+   *
+   * @return the measurement of the process variable
+   */
+  public abstract double getMeasurement();
 
   /**
    * Enable or disable the PIDController.

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
+import edu.wpi.first.wpilibj.experimental.controller.AsynchronousControllerRunner;
 import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 
 /**
@@ -46,8 +46,10 @@ public class Robot extends TimedRobot {
       = new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort),
       new PWMVictorSPX(kRightMotorPort));
   private final PIDController m_pidController
-      = new PIDController(kP, kI, kD, m_ultrasonic::getAverageVoltage);
-  private final ControllerRunner m_pidRunner = new ControllerRunner(m_pidController,
+      = new PIDController(kP, kI, kD);
+  private final AsynchronousControllerRunner m_pidRunner = new AsynchronousControllerRunner(m_pidController,
+      () -> kHoldDistance * kValueToInches,
+      m_ultrasonic::getAverageVoltage,
       output -> m_robotDrive.arcadeDrive(output, 0));
 
   /**
@@ -61,8 +63,6 @@ public class Robot extends TimedRobot {
     m_pidController.setInputRange(0, kMaxDistance * kValueToInches);
     m_pidController.setPercentTolerance(5);
 
-    // Set reference of the pid controller
-    m_pidController.setReference(kHoldDistance * kValueToInches);
     m_pidRunner.enable(); // begin PID control
   }
 }

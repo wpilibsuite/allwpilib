@@ -107,7 +107,7 @@ public class Notifier implements AutoCloseable {
             m_expirationTime += m_period;
             updateAlarm();
           } else {
-            // need to update the alarm to cause it to wait again
+            // need to calculate the alarm to cause it to wait again
             updateAlarm((long) -1);
           }
         } finally {
