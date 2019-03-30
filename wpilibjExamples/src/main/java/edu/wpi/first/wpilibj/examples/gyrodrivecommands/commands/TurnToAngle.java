@@ -22,7 +22,7 @@ public class TurnToAngle extends SynchronousPIDCommand {
     getController().setContinuous();
     // Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
     // setpoint before it is considered as having reached the reference
-    getController().setAbsoluteTolerance(kTurnToleranceDegrees, kTurnDeltaToleranceDegrees);
+    getController().setAbsoluteTolerance(kTurnToleranceDeg, kTurnRateToleranceDegPerS);
     // Set the reference to the target angle
     setReference(targetAngleDegrees);
 

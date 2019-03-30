@@ -35,11 +35,8 @@ public final class Constants {
     public static final double kTurnI = 0;
     public static final double kTurnD = 0;
 
-    public static final double kTurnToleranceDegrees = 5;
-    public static final double kTurnRateTolerance = 10; // degrees per second
-    public static final double kTurnDeltaToleranceDegrees =
-        // .02 second main loop timing
-        kTurnRateTolerance * .02;
+    public static final double kTurnToleranceDeg = 5;
+    public static final double kTurnRateToleranceDegPerS = 10; // degrees per second
   }
 
   public static final class OIConstants {
