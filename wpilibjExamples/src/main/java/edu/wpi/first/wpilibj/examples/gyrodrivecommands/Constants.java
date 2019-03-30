@@ -27,6 +27,8 @@ public final class Constants {
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterInches * Math.PI) / (double) kEncoderCPR;
 
+    public static final boolean kGyroReversed = false;
+
     public static final double kStabilizationP = 1;
     public static final double kStabilizationI = .5;
     public static final double kStabilizationD = 0;
