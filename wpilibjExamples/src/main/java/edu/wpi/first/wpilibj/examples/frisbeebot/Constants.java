@@ -29,22 +29,28 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final int[] kEncoderPorts = new int[]{4,5};
+    public static final int[] kEncoderPorts = new int[]{4, 5};
     public static final boolean kEncoderReversed = false;
     public static final int kEncoderCPR = 1024;
     public static final double kEncoderDistancePerPulse =
         // Distance units will be rotations
         1. / (double) kEncoderCPR;
 
+    public static final int kShooterMotorPort = 4;
+    public static final int kFeederMotorPort = 5;
+
+    public static final double kShooterFreeRPS = 5300;
+    public static final double kShooterTargetRPS = 4000;
+    public static final double kShooterToleranceRPS = 50;
+
     public static final double kP = 1;
     public static final double kI = 0;
     public static final double kD = 0;
 
-    public static final int kShooterMotorPort = 4;
-    public static final int kFeederMotorPort = 5;
-
-    public static final double kShooterRPS = 5000;
-    public static final double kShooterToleranceRPS = 50;
+    public static final double kSFractional = .05;
+    public static final double kVFractional =
+        // Should have value 1 at free speed...
+        1. / kShooterFreeRPS;
 
     public static final double kFeederSpeed = .5;
   }

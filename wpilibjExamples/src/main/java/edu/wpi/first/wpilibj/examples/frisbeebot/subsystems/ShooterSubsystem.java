@@ -22,12 +22,13 @@ public class ShooterSubsystem extends SynchronousPIDSubsystem {
 
   @Override
   public void useOutput(double output) {
-    m_shooterMotor.set(output);
+    // Use a feedforward of the form kS + kV * velocity
+    m_shooterMotor.set(output + kSFractional + kVFractional * kShooterTargetRPS);
   }
 
   @Override
   public double getReference() {
-    return kShooterRPS;
+    return kShooterTargetRPS;
   }
 
   @Override
@@ -45,5 +46,13 @@ public class ShooterSubsystem extends SynchronousPIDSubsystem {
 
   public void stopFeeder() {
     m_feederMotor.set(0);
+  }
+
+  @Override
+  public void disable() {
+    super.disable();
+    // Turn off motor when we disable, since useOutput(0) doesn't stop the motor due to our
+    // feedforward
+    m_shooterMotor.set(0);
   }
 }
