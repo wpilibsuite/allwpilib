@@ -1,10 +1,10 @@
-package edu.wpi.first.wpilibj.examples.hatchbot;
+package edu.wpi.first.wpilibj.examples.hatchbotinlined;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.examples.hatchbot.commands.ComplexAutoCommand;
-import edu.wpi.first.wpilibj.examples.hatchbot.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj.examples.hatchbot.subsystems.HatchSubsystem;
+import edu.wpi.first.wpilibj.examples.hatchbotinlined.commands.ComplexAutoCommand;
+import edu.wpi.first.wpilibj.examples.hatchbotinlined.subsystems.DriveSubsystem;
+import edu.wpi.first.wpilibj.examples.hatchbotinlined.subsystems.HatchSubsystem;
 import edu.wpi.first.wpilibj.experimental.command.Command;
 import edu.wpi.first.wpilibj.experimental.command.InstantCommand;
 import edu.wpi.first.wpilibj.experimental.command.RunCommand;
@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.AutoConstants.*;
-import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.OIConstants.*;
+import static edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.AutoConstants.*;
+import static edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.OIConstants.*;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -34,7 +34,7 @@ public class RobotContainer {
   private final Command m_simpleAuto =
       new StartEndCommand(
           // Start driving forward at the start of the command
-          () -> m_robotDrive.arcadeDrive(.5, 0),
+          () -> m_robotDrive.arcadeDrive(kAutoDriveSpeed, 0),
           // Stop driving at the end of the command
           () -> m_robotDrive.arcadeDrive(0, 0),
           // Requires the drive subsystem

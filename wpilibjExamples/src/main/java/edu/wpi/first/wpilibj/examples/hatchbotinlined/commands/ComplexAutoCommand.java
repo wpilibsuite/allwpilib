@@ -1,12 +1,12 @@
-package edu.wpi.first.wpilibj.examples.hatchbot.commands;
+package edu.wpi.first.wpilibj.examples.hatchbotinlined.commands;
 
-import edu.wpi.first.wpilibj.examples.hatchbot.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj.examples.hatchbot.subsystems.HatchSubsystem;
+import edu.wpi.first.wpilibj.examples.hatchbotinlined.subsystems.DriveSubsystem;
+import edu.wpi.first.wpilibj.examples.hatchbotinlined.subsystems.HatchSubsystem;
 import edu.wpi.first.wpilibj.experimental.command.InstantCommand;
 import edu.wpi.first.wpilibj.experimental.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj.experimental.command.StartEndCommand;
 
-import static edu.wpi.first.wpilibj.examples.hatchbot.Constants.AutoConstants.*;
+import static edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.AutoConstants.*;
 /**
  * A complex auto command that drives forward, releases a hatch, and then drives backward.
  */
@@ -17,7 +17,7 @@ public class ComplexAutoCommand extends SequentialCommandGroup {
         // Drive forward up to the front of the cargo ship
         new StartEndCommand(
             // Start driving forward at the start of the command
-            () -> driveSubsystem.arcadeDrive(.5, 0),
+            () -> driveSubsystem.arcadeDrive(kAutoDriveSpeed, 0),
             // Stop driving at the end of the command
             () -> driveSubsystem.arcadeDrive(0, 0), driveSubsystem
         )
@@ -31,7 +31,7 @@ public class ComplexAutoCommand extends SequentialCommandGroup {
 
         // Drive backward the specified distance
         new StartEndCommand(
-            () -> driveSubsystem.arcadeDrive(-.5, 0),
+            () -> driveSubsystem.arcadeDrive(-kAutoDriveSpeed, 0),
             () -> driveSubsystem.arcadeDrive(0, 0),
             driveSubsystem
         )
