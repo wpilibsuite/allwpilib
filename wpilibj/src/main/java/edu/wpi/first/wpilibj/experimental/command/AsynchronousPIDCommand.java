@@ -75,6 +75,7 @@ public class AsynchronousPIDCommand extends SendableCommandBase {
 
   @Override
   public void initialize() {
+    m_controller.reset();
     m_runner.enable();
   }
 

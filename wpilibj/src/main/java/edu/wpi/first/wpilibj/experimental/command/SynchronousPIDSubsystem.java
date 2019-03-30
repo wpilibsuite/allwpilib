@@ -58,10 +58,11 @@ public abstract class SynchronousPIDSubsystem extends SendableSubsystemBase {
   public abstract double getMeasurement();
 
   /**
-   * Enables the PID control.
+   * Enables the PID control.  Resets the controller.
    */
   public void enable() {
     m_enabled = true;
+    m_controller.reset();
   }
 
   /**

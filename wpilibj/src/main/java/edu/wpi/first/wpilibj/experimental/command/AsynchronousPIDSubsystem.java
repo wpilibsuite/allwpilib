@@ -53,9 +53,10 @@ public abstract class AsynchronousPIDSubsystem extends SendableSubsystemBase {
   public abstract double getMeasurement();
 
   /**
-   * Enables the PID control.
+   * Enables the PID control.  Resets the controller.
    */
   public void enable() {
+    m_controller.reset();
     m_runner.enable();
   }
 

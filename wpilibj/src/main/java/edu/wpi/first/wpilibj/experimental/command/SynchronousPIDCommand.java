@@ -63,6 +63,11 @@ public class SynchronousPIDCommand extends SendableCommandBase {
   }
 
   @Override
+  public void initialize() {
+    m_controller.reset();
+  }
+
+  @Override
   public void execute() {
     useOutput(m_controller.calculate(getReference(), getMeasurement()));
   }
