@@ -67,6 +67,11 @@ public class SynchronousPIDCommand extends SendableCommandBase {
     useOutput(m_controller.calculate(getReference(), getMeasurement()));
   }
 
+  @Override
+  public void end(boolean interrupted) {
+    useOutput(0);
+  }
+
   public final void setOutput(DoubleConsumer useOutput) {
     m_useOutput = useOutput;
   }

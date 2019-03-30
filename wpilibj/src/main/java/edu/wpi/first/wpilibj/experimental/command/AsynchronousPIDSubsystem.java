@@ -53,15 +53,16 @@ public abstract class AsynchronousPIDSubsystem extends SendableSubsystemBase {
   public abstract double getMeasurement();
 
   /**
-   * Enable or disable the PIDController.
-   *
-   * @param enabled whether the controller is enabled
+   * Enables the PID control.
    */
-  public void setEnabled(boolean enabled) {
-    if (enabled) {
-      m_runner.enable();
-    } else {
-      m_runner.disable();
-    }
+  public void enable() {
+    m_runner.enable();
+  }
+
+  /**
+   * Disables the PID control.  Sets the output to zero.
+   */
+  public void disable() {
+    m_runner.disable();
   }
 }

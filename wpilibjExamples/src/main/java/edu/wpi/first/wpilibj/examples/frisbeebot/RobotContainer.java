@@ -25,7 +25,7 @@ public class RobotContainer {
   // A simple autonomous routine that shoots the loaded frisbees
   private Command m_autoCommand =
       // Start the command by spinning up the shooter...
-      new InstantCommand(() -> m_shooter.setEnabled(true), m_shooter)
+      new InstantCommand(m_shooter::enable, m_shooter)
           .andThen(
               // Wait until the shooter is at speed before feeding the frisbees
               new WaitUntilCommand(m_shooter::atReference),
@@ -39,7 +39,7 @@ public class RobotContainer {
           .withTimeout(kAutoTimeoutSeconds)
           // When the command ends, turn off the shooter and the feeder
           .whenFinished(() -> {
-            m_shooter.setEnabled(false);
+            m_shooter.disable();
             m_shooter.stopFeeder();
           });
 
@@ -72,11 +72,11 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Spin up the shooter when the 'A' button is pressed
     driverController.getButton(Button.kA.value)
-        .whenPressed(new InstantCommand(() -> m_shooter.setEnabled(true), m_shooter));
+        .whenPressed(new InstantCommand(m_shooter::enable, m_shooter));
 
     // Turn off the shooter when the 'B' button is pressed
     driverController.getButton(Button.kB.value)
-        .whenPressed(new InstantCommand(() -> m_shooter.setEnabled(false), m_shooter));
+        .whenPressed(new InstantCommand(m_shooter::disable, m_shooter));
 
     // Run the feeder when the 'X' button is held, but only if the shooter is at speed
     driverController.getButton(Button.kX.value)

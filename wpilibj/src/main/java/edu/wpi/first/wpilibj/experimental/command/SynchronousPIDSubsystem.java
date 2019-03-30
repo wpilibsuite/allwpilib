@@ -58,11 +58,17 @@ public abstract class SynchronousPIDSubsystem extends SendableSubsystemBase {
   public abstract double getMeasurement();
 
   /**
-   * Enable or disable the PIDController.
-   *
-   * @param enabled whether the controller is enabled
+   * Enables the PID control.
    */
-  public void setEnabled(boolean enabled) {
-    m_enabled = enabled;
+  public void enable() {
+    m_enabled = true;
+  }
+
+  /**
+   * Disables the PID control.  Sets output to zero.
+   */
+  public void disable() {
+    m_enabled = false;
+    useOutput(0);
   }
 }
