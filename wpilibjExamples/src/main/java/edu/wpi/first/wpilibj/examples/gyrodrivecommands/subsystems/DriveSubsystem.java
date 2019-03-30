@@ -96,14 +96,27 @@ public class DriveSubsystem extends SendableSubsystemBase {
     m_drive.setMaxOutput(maxOutput);
   }
 
+  /**
+   * Zeroes the heading of the robot.
+   */
   public void zeroHeading() {
     gyro.reset();
   }
 
+  /**
+   * Returns the heading of the robot.
+   *
+   * @return the robot's heading in degrees, from 180 to 180
+   */
   public double getHeading() {
-    return gyro.getAngle();
+    return Math.IEEEremainder(gyro.getAngle(), 360);
   }
 
+  /**
+   * Returns the turn rate of the robot.
+   *
+   * @return The turn rate of the robot, in degrees per second
+   */
   public double getTurnRate() {
     return gyro.getRate();
   }

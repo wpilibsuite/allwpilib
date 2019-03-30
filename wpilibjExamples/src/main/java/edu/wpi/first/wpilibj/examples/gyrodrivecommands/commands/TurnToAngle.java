@@ -20,6 +20,8 @@ public class TurnToAngle extends SynchronousPIDCommand {
         // Pipe output to turn robot
         (output) -> drive.arcadeDrive(0, output));
 
+    // Set the input range of the controller to match the gyro output
+    getController().setInputRange(-180, 180);
     // Set the controller to be continuous (because it is an angle controller)
     getController().setContinuous();
     // Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
