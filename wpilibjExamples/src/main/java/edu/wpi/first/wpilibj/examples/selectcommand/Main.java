@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.SelectCommand;
+package edu.wpi.first.wpilibj.examples.selectcommand;
 
 import edu.wpi.first.wpilibj.RobotBase;
 
