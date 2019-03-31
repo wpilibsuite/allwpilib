@@ -335,7 +335,7 @@ public final class CameraServer {
             table.getEntry("mode").setDefaultString(videoModeToString(mode));
             table.getEntry("modes").setStringArray(getSourceModeValues(event.sourceHandle));
           } catch (VideoException ignored) {
-            // Do nothing. Let the other event handlers calculate this if there is an error.
+            // Do nothing. Let the other event handlers update this if there is an error.
           }
           break;
         }
