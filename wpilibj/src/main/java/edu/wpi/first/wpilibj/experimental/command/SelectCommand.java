@@ -21,7 +21,7 @@ public class SelectCommand<K> extends SendableCommandBase {
   private Command m_selectedCommand;
 
   /**
-   * Creates a new SelectCommand.
+   * Creates a new selectcommand.
    *
    * @param commands the map of commands to choose from
    * @param selector the selector to determine which command to run

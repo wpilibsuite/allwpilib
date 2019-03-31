@@ -1,17 +1,12 @@
-package edu.wpi.first.wpilibj.examples.SelectCommand;
+package edu.wpi.first.wpilibj.examples.selectcommand;
 
 import java.util.Map;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.experimental.command.Command;
 import edu.wpi.first.wpilibj.experimental.command.PrintCommand;
-import edu.wpi.first.wpilibj.experimental.command.RunCommand;
 import edu.wpi.first.wpilibj.experimental.command.SelectCommand;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
-import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.templates.commandbased.Constants.OIConstants.kDriverControllerPort;
 import static java.util.Map.entry;
 
 /**
@@ -27,14 +22,14 @@ public class RobotContainer {
     one, two, three
   }
 
-  // An example selector method for the SelectCommand.  Returns the selector that will select
+  // An example selector method for the selectcommand.  Returns the selector that will select
   // which command to run.  Can base this choice on logical conditions evaluated at runtime.
   private CommandSelector select() {
     return CommandSelector.one;
   }
 
-  // An example SelectCommand.  Will select from the three commands based on the value returned
-  // by the selector method at runtime.  Note that SelectCommand takes a generic type, so the
+  // An example selectcommand.  Will select from the three commands based on the value returned
+  // by the selector method at runtime.  Note that selectcommand takes a generic type, so the
   // selector does not have to be an enum; it could be any desired type (string, integer,
   // boolean, double...)
   private Command exampleSelectCommand =
