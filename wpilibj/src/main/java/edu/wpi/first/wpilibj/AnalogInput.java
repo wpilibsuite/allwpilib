@@ -99,8 +99,8 @@ public class AnalogInput extends SendableBase implements PIDSource {
    * Get a scaled sample from the output of the oversample and average engine for this channel. The
    * value is scaled to units of Volts using the calibrated scaling data from getLSBWeight() and
    * getOffset(). Using oversampling will cause this value to be higher resolution, but it will
-   * calculate more slowly. Using averaging will cause this value to be more stable, but it will
-   * calculate more slowly.
+   * update more slowly. Using averaging will cause this value to be more stable, but it will
+   * update more slowly.
    *
    * @return A scaled sample from the output of the oversample and average engine for this channel.
    */

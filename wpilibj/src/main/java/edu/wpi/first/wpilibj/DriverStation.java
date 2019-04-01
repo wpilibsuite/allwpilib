@@ -1044,7 +1044,7 @@ public class DriverStation {
 
     HAL.getMatchInfo(m_matchInfoCache);
 
-    // Force a control word calculate, to make sure the data is the newest.
+    // Force a control word update, to make sure the data is the newest.
     updateControlWord(true);
 
     // lock joystick mutex to swap cache data
@@ -1147,9 +1147,9 @@ public class DriverStation {
 
   /**
    * Updates the data in the control word cache. Updates if the force parameter is set, or if
-   * 50ms have passed since the last calculate.
+   * 50ms have passed since the last update.
    *
-   * @param force True to force an calculate to the cache, otherwise calculate if 50ms have passed.
+   * @param force True to force an update to the cache, otherwise update if 50ms have passed.
    */
   private void updateControlWord(boolean force) {
     long now = System.currentTimeMillis();

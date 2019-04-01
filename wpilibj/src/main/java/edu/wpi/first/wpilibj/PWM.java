@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  *
  * <p>The values supplied as arguments for PWM outputs range from -1.0 to 1.0. They are mapped to
  * the hardware dependent values, in this case 0-2000 for the FPGA. Changes are immediately sent to
- * the FPGA, and the calculate occurs at the next FPGA cycle (5.005ms). There is no delay.
+ * the FPGA, and the update occurs at the next FPGA cycle (5.005ms). There is no delay.
  *
  * <p>As of revision 0.1.10 of the FPGA, the FPGA interprets the 0-2000 values as follows: - 2000 =
  * maximum pulse width - 1999 to 1001 = linear scaling from "full forward" to "center" - 1000 =

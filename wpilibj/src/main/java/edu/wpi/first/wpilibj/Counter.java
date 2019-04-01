@@ -420,9 +420,9 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
    * Select whether you want to continue updating the event timer output when there are no samples
    * captured. The output of the event timer has a buffer of periods that are averaged and posted to
    * a register on the FPGA. When the timer detects that the event source has stopped (based on the
-   * MaxPeriod) the buffer of samples to be averaged is emptied. If you enable the calculate when
+   * MaxPeriod) the buffer of samples to be averaged is emptied. If you enable the update when
    * empty, you will be notified of the stopped source and the event time will report 0 samples. If
-   * you disable calculate when empty, the most recent average will remain on the output until a new
+   * you disable update when empty, the most recent average will remain on the output until a new
    * sample is acquired. You will never see 0 samples output (except when there have been no events
    * since an FPGA reset) and you will likely not see the stopped bit become true (since it is
    * updated at the end of an average and there are no samples to average).

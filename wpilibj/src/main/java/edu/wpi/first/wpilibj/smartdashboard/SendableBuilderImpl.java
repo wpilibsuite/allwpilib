@@ -181,7 +181,7 @@ public class SendableBuilderImpl implements SendableBuilder {
   }
 
   /**
-   * Set the function that should be called to calculate the network table
+   * Set the function that should be called to update the network table
    * for things other than properties.  Note this function is not passed
    * the network table object; instead it should use the entry handles
    * returned by getEntry().

@@ -351,7 +351,7 @@ public final class CameraServer {
         case kSourceConnected: {
           NetworkTable table = m_tables.get(event.sourceHandle);
           if (table != null) {
-            // calculate the description too (as it may have changed)
+            // update the description too (as it may have changed)
             table.getEntry("description").setString(
                 CameraServerJNI.getSourceDescription(event.sourceHandle));
             table.getEntry("connected").setBoolean(true);
@@ -420,7 +420,7 @@ public final class CameraServer {
 
     // Listener for NetworkTable events
     // We don't currently support changing settings via NT due to
-    // synchronization issues, so just calculate to current setting if someone
+    // synchronization issues, so just update to current setting if someone
     // else tries to change it.
     m_tableListener = NetworkTableInstance.getDefault().addEntryListener(kPublishName + "/",
       event -> {
