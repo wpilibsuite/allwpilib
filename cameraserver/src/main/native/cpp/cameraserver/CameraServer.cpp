@@ -56,21 +56,21 @@ static wpi::StringRef MakeSourceValue(CS_Source source,
   CS_Status status = 0;
   buf.clear();
   switch (cs::GetSourceKind(source, &status)) {
-    case CS_SourceKind::CS_SOURCE_USB: {
+    case CS_SOURCE_USB: {
       wpi::StringRef prefix{"usb:"};
       buf.append(prefix.begin(), prefix.end());
       auto path = cs::GetUsbCameraPath(source, &status);
       buf.append(path.begin(), path.end());
       break;
     }
-    case CS_SourceKind::CS_SOURCE_HTTP: {
+    case CS_SOURCE_HTTP: {
       wpi::StringRef prefix{"ip:"};
       buf.append(prefix.begin(), prefix.end());
       auto urls = cs::GetHttpCameraUrls(source, &status);
       if (!urls.empty()) buf.append(urls[0].begin(), urls[0].end());
       break;
     }
-    case CS_SourceKind::CS_SOURCE_CV:
+    case CS_SOURCE_CV:
       return "cv:";
     default:
       return "unknown:";
@@ -239,14 +239,14 @@ static void PutSourcePropertyValue(nt::NetworkTable* table,
   CS_Status status = 0;
   nt::NetworkTableEntry entry = table->GetEntry(name);
   switch (event.propertyKind) {
-    case CS_PropertyKind::CS_PROP_BOOLEAN:
+    case CS_PROP_BOOLEAN:
       if (isNew)
         entry.SetDefaultBoolean(event.value != 0);
       else
         entry.SetBoolean(event.value != 0);
       break;
-    case CS_PropertyKind::CS_PROP_INTEGER:
-    case CS_PropertyKind::CS_PROP_ENUM:
+    case CS_PROP_INTEGER:
+    case CS_PROP_ENUM:
       if (isNew) {
         entry.SetDefaultDouble(event.value);
         table->GetEntry(infoName + "/min")
@@ -261,7 +261,7 @@ static void PutSourcePropertyValue(nt::NetworkTable* table,
         entry.SetDouble(event.value);
       }
       break;
-    case CS_PropertyKind::CS_PROP_STRING:
+    case CS_PROP_STRING:
       if (isNew)
         entry.SetDefaultString(event.valueStr);
       else
