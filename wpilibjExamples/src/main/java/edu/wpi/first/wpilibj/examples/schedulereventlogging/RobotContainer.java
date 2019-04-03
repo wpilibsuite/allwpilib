@@ -17,12 +17,12 @@ import static edu.wpi.first.wpilibj.XboxController.*;
 public class RobotContainer {
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(kDriverControllerPort);
+  private XboxController m_driverController = new XboxController(kDriverControllerPort);
 
   // A few commands that do nothing, but will demonstrate the scheduler functionality
-  SendableCommandBase m_instantCommand1 = new InstantCommand();
-  SendableCommandBase m_instantCommand2 = new InstantCommand();
-  SendableCommandBase m_waitCommand = new WaitCommand(5);
+  private SendableCommandBase m_instantCommand1 = new InstantCommand();
+  private SendableCommandBase m_instantCommand2 = new InstantCommand();
+  private SendableCommandBase m_waitCommand = new WaitCommand(5);
 
   public RobotContainer() {
     // Set names of commands
