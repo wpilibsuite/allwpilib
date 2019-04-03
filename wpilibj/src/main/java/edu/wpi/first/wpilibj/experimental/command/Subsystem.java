@@ -30,7 +30,8 @@ public interface Subsystem {
    * Sets the default {@link Command} of the subsystem.  The default command will be
    * automatically scheduled when no other commands are scheduled that require the subsystem.
    * Default commands should generally not end on their own, i.e. their {@link Command#isFinished()}
-   * method should always return false.
+   * method should always return false.  Will automatically register this subsystem with the
+   * {@link CommandScheduler}.
    *
    * @param defaultCommand the default command to associate with this subsystem
    */
@@ -56,6 +57,14 @@ public interface Subsystem {
    */
   default Command getCurrentCommand() {
     return CommandScheduler.getInstance().requiring(this);
+  }
+
+  /**
+   * Registers this subsystem with the {@link CommandScheduler}, allowing its
+   * {@link Subsystem#periodic()} method to be called when the scheduler runs.
+   */
+  default void register() {
+    CommandScheduler.getInstance().registerSubsystem(this);
   }
 
 }
