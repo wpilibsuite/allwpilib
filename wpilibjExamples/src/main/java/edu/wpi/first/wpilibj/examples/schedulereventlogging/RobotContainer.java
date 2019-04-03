@@ -33,9 +33,9 @@ public class RobotContainer {
     // Set the scheduler to log Shuffleboard events for command initialize, interrupt, finish
     CommandScheduler.getInstance().onCommandInitialize(command -> Shuffleboard.addEventMarker(
         "Command initialized", command.getName(), EventImportance.kNormal));
-    CommandScheduler.getInstance().onCommandInterrupted(command -> Shuffleboard.addEventMarker(
+    CommandScheduler.getInstance().onCommandInterrupt(command -> Shuffleboard.addEventMarker(
         "Command interrupted", command.getName(), EventImportance.kNormal));
-    CommandScheduler.getInstance().onCommandFinished(command -> Shuffleboard.addEventMarker(
+    CommandScheduler.getInstance().onCommandFinish(command -> Shuffleboard.addEventMarker(
         "Command finished", command.getName(), EventImportance.kNormal));
 
     // Configure the button bindings
