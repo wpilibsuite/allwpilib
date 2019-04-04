@@ -15,7 +15,6 @@
 #include "wpi/StringExtras.h"
 #include "wpi/Compiler.h"
 #include "wpi/MathExtras.h"
-#include "wpi/memory.h"
 #include <cassert>
 
 using namespace wpi;
@@ -59,7 +58,7 @@ void StringMapImpl::init(unsigned InitSize) {
   NumTombstones = 0;
 
   TheTable = static_cast<StringMapEntryBase **>(
-      CheckedCalloc(NewNumBuckets+1,
+      safe_calloc(NewNumBuckets+1,
                   sizeof(StringMapEntryBase **) + sizeof(unsigned)));
 
   // Set the member only if TheTable was successfully allocated
@@ -128,7 +127,6 @@ unsigned StringMapImpl::LookupBucketFor(StringRef Name) {
     ++ProbeAmt;
   }
 }
-
 
 /// FindKey - Look up the bucket that contains the specified key. If it exists
 /// in the map, return the bucket number of the key.  Otherwise return -1.
@@ -219,7 +217,7 @@ unsigned StringMapImpl::RehashTable(unsigned BucketNo) {
   // Allocate one extra bucket which will always be non-empty.  This allows the
   // iterators to stop at end.
   auto NewTableArray = static_cast<StringMapEntryBase **>(
-      CheckedCalloc(NewSize+1, sizeof(StringMapEntryBase *) + sizeof(unsigned)));
+      safe_calloc(NewSize+1, sizeof(StringMapEntryBase *) + sizeof(unsigned)));
 
   unsigned *NewHashArray = (unsigned *)(NewTableArray + NewSize + 1);
   NewTableArray[NewSize] = (StringMapEntryBase*)2;

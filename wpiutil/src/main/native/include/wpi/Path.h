@@ -20,6 +20,7 @@
 #include "wpi/iterator.h"
 #include <cstdint>
 #include <iterator>
+#include <system_error>
 
 namespace wpi {
 namespace sys {
@@ -360,22 +361,6 @@ void system_temp_directory(bool erasedOnReboot, SmallVectorImpl<char> &result);
 /// @result True if a home directory is set, false otherwise.
 bool home_directory(SmallVectorImpl<char> &result);
 
-/// Get the user's cache directory.
-///
-/// Expect the resulting path to be a directory shared with other
-/// applications/services used by the user. Params \p Path1 to \p Path3 can be
-/// used to append additional directory names to the resulting path. Recommended
-/// pattern is <user_cache_directory>/<vendor>/<application>.
-///
-/// @param Result Holds the resulting path.
-/// @param Path1 Additional path to be appended to the user's cache directory
-/// path. "" can be used to append nothing.
-/// @param Path2 Second additional path to be appended.
-/// @param Path3 Third additional path to be appended.
-/// @result True if a cache directory path is set, false otherwise.
-bool user_cache_directory(SmallVectorImpl<char> &Result, const Twine &Path1,
-                          const Twine &Path2 = "", const Twine &Path3 = "");
-
 /// Has root name?
 ///
 /// root_name != ""
@@ -466,6 +451,10 @@ StringRef remove_leading_dotslash(StringRef path, Style style = Style::native);
 /// @result True if path was changed
 bool remove_dots(SmallVectorImpl<char> &path, bool remove_dot_dot = false,
                  Style style = Style::native);
+
+#if defined(_WIN32)
+std::error_code widenPath(const Twine &Path8, SmallVectorImpl<wchar_t> &Path16);
+#endif
 
 } // end namespace path
 } // end namespace sys

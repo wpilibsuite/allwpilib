@@ -78,6 +78,26 @@ inline bool isAlpha(char C) {
 /// lowercase letter as classified by "C" locale.
 inline bool isAlnum(char C) { return isAlpha(C) || isDigit(C); }
 
+/// Checks whether character \p C is valid ASCII (high bit is zero).
+inline bool isASCII(char C) { return static_cast<unsigned char>(C) <= 127; }
+
+/// Checks whether all characters in S are ASCII.
+inline bool isASCII(wpi::StringRef S) {
+  for (char C : S)
+    if (LLVM_UNLIKELY(!isASCII(C)))
+      return false;
+  return true;
+}
+
+/// Checks whether character \p C is printable.
+///
+/// Locale-independent version of the C standard library isprint whose results
+/// may differ on different platforms.
+inline bool isPrint(char C) {
+  unsigned char UC = static_cast<unsigned char>(C);
+  return (0x20 <= UC) && (UC <= 0x7E);
+}
+
 /// Returns the corresponding lowercase character if \p x is uppercase.
 inline char toLower(char x) {
   if (x >= 'A' && x <= 'Z')
@@ -109,22 +129,23 @@ inline std::string utohexstr(uint64_t X, bool LowerCase = false) {
 
 /// Convert buffer \p Input to its hexadecimal representation.
 /// The returned string is double the size of \p Input.
-inline std::string toHex(StringRef Input) {
+inline std::string toHex(StringRef Input, bool LowerCase = false) {
   static const char *const LUT = "0123456789ABCDEF";
+  const uint8_t Offset = LowerCase ? 32 : 0;
   size_t Length = Input.size();
 
   std::string Output;
   Output.reserve(2 * Length);
   for (size_t i = 0; i < Length; ++i) {
     const unsigned char c = Input[i];
-    Output.push_back(LUT[c >> 4]);
-    Output.push_back(LUT[c & 15]);
+    Output.push_back(LUT[c >> 4] | Offset);
+    Output.push_back(LUT[c & 15] | Offset);
   }
   return Output;
 }
 
-inline std::string toHex(ArrayRef<uint8_t> Input) {
-  return toHex(toStringRef(Input));
+inline std::string toHex(ArrayRef<uint8_t> Input, bool LowerCase = false) {
+  return toHex(toStringRef(Input), LowerCase);
 }
 
 inline uint8_t hexFromNibbles(char MSB, char LSB) {
@@ -264,9 +285,13 @@ inline StringRef getOrdinalSuffix(unsigned Val) {
   }
 }
 
-/// PrintEscapedString - Print each character of the specified string, escaping
-/// it if it is not printable or if it is an escape char.
-void PrintEscapedString(StringRef Name, raw_ostream &Out);
+/// Print each character of the specified string, escaping it if it is not
+/// printable or if it is an escape char.
+void printEscapedString(StringRef Name, raw_ostream &Out);
+
+/// Print each character of the specified string, escaping HTML special
+/// characters.
+void printHTMLEscaped(StringRef String, raw_ostream &Out);
 
 /// printLowerCase - Print each character as lowercase if it is uppercase.
 void printLowerCase(StringRef String, raw_ostream &Out);
@@ -377,4 +402,4 @@ inline std::string join_items(Sep Separator, Args &&... Items) {
 
 } // end namespace wpi
 
-#endif // LLVM_ADT_STRINGEXTRAS_H
+#endif // WPIUTIL_WPI_STRINGEXTRAS_H
