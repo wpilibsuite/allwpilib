@@ -10,8 +10,7 @@ package edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.experimental.command.SendableSubsystemBase;
 
-import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kForward;
-import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kReverse;
+import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 import static edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.HatchConstants.*;
 
 /**
