@@ -52,7 +52,7 @@ public abstract class CommandGroupBase extends SendableCommandBase implements Co
    * @param commands the commands to include
    * @return the command group
    */
-  public static Command sequence(Command... commands) {
+  public static CommandGroupBase sequence(Command... commands) {
     return new SequentialCommandGroup(commands);
   }
 
@@ -62,7 +62,7 @@ public abstract class CommandGroupBase extends SendableCommandBase implements Co
    * @param commands the commands to include
    * @return the command group
    */
-  public static Command parallel(Command... commands) {
+  public static CommandGroupBase parallel(Command... commands) {
     return new ParallelCommandGroup(commands);
   }
 
@@ -72,7 +72,7 @@ public abstract class CommandGroupBase extends SendableCommandBase implements Co
    * @param commands the commands to include
    * @return the command group
    */
-  public static Command race(Command... commands) {
+  public static CommandGroupBase race(Command... commands) {
     return new ParallelRaceGroup(commands);
   }
 
@@ -83,7 +83,7 @@ public abstract class CommandGroupBase extends SendableCommandBase implements Co
    * @param commands the commands to include
    * @return the command group
    */
-  public static Command deadline(Command deadline, Command... commands) {
+  public static CommandGroupBase deadline(Command deadline, Command... commands) {
     return new ParallelDeadlineGroup(deadline, commands);
   }
 }
