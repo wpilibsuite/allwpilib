@@ -19,6 +19,7 @@ public class TurnToAngle extends SynchronousPIDCommand {
         targetAngleDegrees,
         // Pipe output to turn robot
         (output) -> drive.arcadeDrive(0, output),
+        // Require the drive
         drive);
 
     // Set the input range of the controller to match the gyro output
