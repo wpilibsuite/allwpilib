@@ -55,20 +55,20 @@ public class RobotContainer {
         .whenReleased(() -> m_robotDrive.setMaxOutput(1));
 
     // Stabilize robot to drive straight with gyro when left bumper is held
-    driverController.getButton(Button.kBumperLeft.value)
-        .whenHeld(new SynchronousPIDCommand(
-                new PIDController(kStabilizationP, kStabilizationI, kStabilizationD),
-                // Close the loop on the turn rate
-                m_robotDrive::getTurnRate,
-                // Setpoint is 0
-                0,
-                // Pipe the output to the turning controls
-                (output) ->
-                    m_robotDrive.arcadeDrive(driverController.getY(GenericHID.Hand.kLeft), output),
-                // Require the robot drive
-                m_robotDrive
-            )
-        );
+    driverController.getButton(Button.kBumperLeft.value).whenHeld(
+        new SynchronousPIDCommand(
+            new PIDController(kStabilizationP, kStabilizationI, kStabilizationD),
+            // Close the loop on the turn rate
+            m_robotDrive::getTurnRate,
+            // Setpoint is 0
+            0,
+            // Pipe the output to the turning controls
+            (output) ->
+                m_robotDrive.arcadeDrive(driverController.getY(GenericHID.Hand.kLeft), output),
+            // Require the robot drive
+            m_robotDrive
+        )
+    );
 
     // Turn to 90 degrees when the 'X' button is pressed, with a 5 second timeout
     driverController.getButton(Button.kX.value)
