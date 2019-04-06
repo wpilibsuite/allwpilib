@@ -34,7 +34,7 @@ class ParallelRepeatTCPConnector
 
  public:
   ParallelRepeatTCPConnector(Loop& loop, bool disconnectOnNewAddresses,
-                          Timer::Time reconnectTime, const private_init&)
+                             Timer::Time reconnectTime, const private_init&)
       : m_loop{loop},
         m_disconnectOnNewAddresses{disconnectOnNewAddresses},
         m_reconnectTime{reconnectTime} {}

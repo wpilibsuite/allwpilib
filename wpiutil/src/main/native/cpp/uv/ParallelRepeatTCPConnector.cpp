@@ -54,7 +54,6 @@ void ParallelRepeatTCPConnector::Connect() {
   }
 
   auto timer = Timer::Create(m_loop);
-  auto timerLocal = timer.get();
 
   m_attemptingConnections.reserve(m_connectingAddresses.size());
   for (auto&& attempt : m_connectingAddresses) {
@@ -76,6 +75,9 @@ void ParallelRepeatTCPConnector::Connect() {
             lock->Cancel();
           }
           if (self->m_attemptingConnections.empty()) {
+            if (!timer->IsClosing()) {
+              timer->Close();
+            }
             self->Disconnect();
           }
         });
@@ -87,7 +89,9 @@ void ParallelRepeatTCPConnector::Connect() {
       uv_ip4_name(reinterpret_cast<struct sockaddr_in*>(info.ai_addr),
                   name.data(), 16);
       tcp->Connect(*info.ai_addr, [ self, timer, tcpLocal = tcp.get(), name ] {
-        timer->Close();
+        if (!timer->IsClosing()) {
+          timer->Close();
+        }
         for (auto&& toClose : self->m_attemptingConnections) {
           if (toClose != tcpLocal) {
             toClose->Close();
@@ -109,7 +113,11 @@ void ParallelRepeatTCPConnector::Connect() {
                 &hints);
   }
 
-  timer->timeout.connect([self = shared_from_this()] { self->Disconnect(); });
+  timer->timeout.connect(
+      [ self = shared_from_this(), timerLocal = timer.get() ] {
+        timerLocal->Close();
+        self->Disconnect();
+      });
 
   timer->Start(m_reconnectTime);
 }
