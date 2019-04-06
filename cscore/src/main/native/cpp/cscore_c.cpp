@@ -193,8 +193,8 @@ CS_Sink* CS_EnumerateSourceSinks(CS_Source source, int* count,
                                  CS_Status* status) {
   wpi::SmallVector<CS_Sink, 32> buf;
   auto handles = cs::EnumerateSourceSinks(source, buf, status);
-  CS_Sink* sinks = static_cast<CS_Sink*>(
-      wpi::safe_malloc(handles.size() * sizeof(CS_Sink)));
+  CS_Sink* sinks =
+      static_cast<CS_Sink*>(wpi::safe_malloc(handles.size() * sizeof(CS_Sink)));
   *count = handles.size();
   std::copy(handles.begin(), handles.end(), sinks);
   return sinks;
@@ -390,8 +390,8 @@ void CS_ReleaseEnumeratedSources(CS_Source* sources, int count) {
 CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status) {
   wpi::SmallVector<CS_Sink, 32> buf;
   auto handles = cs::EnumerateSinkHandles(buf, status);
-  CS_Sink* sinks = static_cast<CS_Sink*>(
-      wpi::safe_malloc(handles.size() * sizeof(CS_Sink)));
+  CS_Sink* sinks =
+      static_cast<CS_Sink*>(wpi::safe_malloc(handles.size() * sizeof(CS_Sink)));
   *count = handles.size();
   std::copy(handles.begin(), handles.end(), sinks);
   return sinks;
@@ -426,8 +426,8 @@ char* CS_GetHostname() { return cs::ConvertToC(cs::GetHostname()); }
 
 char** CS_GetNetworkInterfaces(int* count) {
   auto interfaces = cs::GetNetworkInterfaces();
-  char** out = static_cast<char**>(
-      wpi::safe_malloc(interfaces.size() * sizeof(char*)));
+  char** out =
+      static_cast<char**>(wpi::safe_malloc(interfaces.size() * sizeof(char*)));
   *count = interfaces.size();
   for (size_t i = 0; i < interfaces.size(); ++i)
     out[i] = cs::ConvertToC(interfaces[i]);

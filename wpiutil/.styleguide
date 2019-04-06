@@ -13,6 +13,7 @@ generatedFileExclude {
   src/main/native/include/llvm/
   src/main/native/include/wpi/AlignOf\.h$
   src/main/native/include/wpi/ArrayRef\.h$
+  src/main/native/include/wpi/Chrono\.h$
   src/main/native/include/wpi/Compiler\.h$
   src/main/native/include/wpi/ConvertUTF\.h$
   src/main/native/include/wpi/DenseMap\.h$

@@ -173,8 +173,8 @@ static void CopyNtString(const struct NT_String* copy_from,
 struct NT_RpcParamDef* NT_GetRpcParamDefForTesting(const char* name,
                                                    const struct NT_Value* val,
                                                    int* struct_size) {
-  struct NT_RpcParamDef* def = static_cast<NT_RpcParamDef*>(
-      wpi::safe_calloc(1, sizeof(NT_RpcParamDef)));
+  struct NT_RpcParamDef* def =
+      static_cast<NT_RpcParamDef*>(wpi::safe_calloc(1, sizeof(NT_RpcParamDef)));
   nt::ConvertToC(wpi::StringRef(name), &def->name);
   CopyNtValue(val, &def->def_value);
   *struct_size = sizeof(NT_RpcParamDef);
