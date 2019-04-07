@@ -46,6 +46,8 @@
 #include <system_error>
 #include <windows.h>
 
+#include <ntdef.h>
+
 namespace wpi {
 
 /// Returns the Windows version as Major.Minor.0.BuildNumber. Uses

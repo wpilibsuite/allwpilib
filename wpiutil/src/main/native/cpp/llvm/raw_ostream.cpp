@@ -17,6 +17,7 @@
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
 #include "wpi/Compiler.h"
+#include "wpi/ErrorHandling.h"
 #include "wpi/FileSystem.h"
 #include "wpi/Format.h"
 #include "wpi/MathExtras.h"
@@ -56,6 +57,7 @@
 #endif
 
 #ifdef _WIN32
+#include "wpi/ConvertUTF.h"
 #include "Windows/WindowsSupport.h"
 #endif
 
@@ -335,7 +337,7 @@ raw_ostream &raw_ostream::operator<<(const FormattedString &FS) {
     break;
   }
   default:
-    assert(false && "Bad Justification");
+    wpi_unreachable("Bad Justification");
   }
   return *this;
 }
