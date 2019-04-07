@@ -27,6 +27,10 @@
 #include <unistd.h>
 #endif
 
+#if defined(_MSC_VER)
+#include <io.h>
+#endif
+
 using namespace wpi;
 
 static fatal_error_handler_t ErrorHandler = nullptr;
