@@ -1,8 +1,11 @@
 package edu.wpi.first.wpilibj.experimental.command;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+
+import edu.wpi.first.wpilibj.command.IllegalUseOfCommandException;
 
 /**
  * Runs one of a selection of commands, depending on the value of the selector when this command is
@@ -11,6 +14,12 @@ import java.util.function.Supplier;
  * part of a CommandGroup.  Requires the requirements of all included commands, again to ensure
  * proper functioning when used in a CommandGroup.  If this is undesired, consider using
  * {@link ScheduleCommand}.
+ *
+ * <p>As this command contains multiple component commands within it, it is technically a command
+ * group; the command instances that are passed to it cannot be added to any other groups, or
+ * scheduled individually.
+ *
+ * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
  *
  * @param <K> the type of the selector to use, e.g. String or enum
  */
@@ -27,6 +36,12 @@ public class SelectCommand<K> extends SendableCommandBase {
    * @param selector the selector to determine which command to run
    */
   public SelectCommand(Map<K, Command> commands, Supplier<K> selector) {
+    if (!Collections.disjoint(CommandGroupBase.getGroupedCommands(), commands.values())) {
+      throw new IllegalUseOfCommandException("Commands cannot be added to multiple CommandGroups");
+    }
+
+    CommandGroupBase.registerGroupedCommands((Command[]) commands.values().toArray());
+
     m_commands = commands;
     m_selector = selector;
     for (Command command : m_commands.values()) {
