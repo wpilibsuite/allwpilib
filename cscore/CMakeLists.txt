@@ -51,6 +51,7 @@ foreach(example ${cscore_examples})
     if(cscore_example_src)
         add_executable(cscore_${example} ${cscore_example_src})
         target_link_libraries(cscore_${example} cscore)
+        set_property(TARGET cscore_${example} PROPERTY FOLDER "examples")
     endif()
 endforeach()
 

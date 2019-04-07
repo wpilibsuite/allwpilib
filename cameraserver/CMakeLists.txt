@@ -55,3 +55,5 @@ install(EXPORT cameraserver DESTINATION ${cameraserver_config_dir})
 file(GLOB multiCameraServer_src multiCameraServer/src/main/native/cpp/*.cpp)
 add_executable(multiCameraServer ${multiCameraServer_src})
 target_link_libraries(multiCameraServer cameraserver)
+
+set_property(TARGET multiCameraServer PROPERTY FOLDER "examples")
