@@ -44,9 +44,11 @@
 #include <cassert>
 #include <string>
 #include <system_error>
+#define WIN32_NO_STATUS
 #include <windows.h>
-
-#include <ntdef.h>
+#undef WIN32_NO_STATUS
+#include <winternl.h>
+#include <ntstatus.h>
 
 namespace wpi {
 
