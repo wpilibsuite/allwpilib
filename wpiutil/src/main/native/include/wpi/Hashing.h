@@ -45,10 +45,12 @@
 #ifndef WPIUTIL_WPI_HASHING_H
 #define WPIUTIL_WPI_HASHING_H
 
+#include "wpi/Endian.h"
+#include "wpi/SwapByteOrder.h"
 #include "wpi/type_traits.h"
+#include <stdint.h>
 #include <algorithm>
 #include <cassert>
-#include <cstdint>
 #include <cstring>
 #include <string>
 #include <utility>
@@ -143,16 +145,16 @@ namespace detail {
 inline uint64_t fetch64(const char *p) {
   uint64_t result;
   memcpy(&result, p, sizeof(result));
-  //if (sys::IsBigEndianHost)
-  //  sys::swapByteOrder(result);
+  if (support::endian::system_endianness() == support::big)
+    sys::swapByteOrder(result);
   return result;
 }
 
 inline uint32_t fetch32(const char *p) {
   uint32_t result;
   memcpy(&result, p, sizeof(result));
-  //if (sys::IsBigEndianHost)
-  //  sys::swapByteOrder(result);
+  if (support::endian::system_endianness() == support::big)
+    sys::swapByteOrder(result);
   return result;
 }
 

@@ -19,6 +19,7 @@ generatedFileExclude {
   src/main/native/include/wpi/DenseMap\.h$
   src/main/native/include/wpi/DenseMapInfo\.h$
   src/main/native/include/wpi/EpochTracker\.h$
+  src/main/native/include/wpi/Endian\.h$
   src/main/native/include/wpi/Errc\.h$
   src/main/native/include/wpi/Errno\.h$
   src/main/native/include/wpi/Error\.h$
@@ -44,7 +45,9 @@ generatedFileExclude {
   src/main/native/include/wpi/StringExtras\.h$
   src/main/native/include/wpi/StringMap\.h$
   src/main/native/include/wpi/StringRef\.h$
+  src/main/native/include/wpi/SwapByteOrder\.h$
   src/main/native/include/wpi/Twine\.h$
+  src/main/native/include/wpi/VersionTuple\.h$
   src/main/native/include/wpi/WindowsError\.h$
   src/main/native/include/wpi/http_parser\.h$
   src/main/native/include/wpi/iterator\.h$

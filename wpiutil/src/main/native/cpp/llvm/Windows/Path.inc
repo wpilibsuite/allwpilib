@@ -32,6 +32,12 @@
 
 #undef max
 
+// MinGW doesn't define this.
+#ifndef _ERRNO_T_DEFINED
+#define _ERRNO_T_DEFINED
+typedef int errno_t;
+#endif
+
 #ifdef _MSC_VER
 # pragma comment(lib, "shell32.lib")
 # pragma comment(lib, "ole32.lib")
@@ -168,6 +174,51 @@ std::error_code current_path(SmallVectorImpl<char> &result) {
   return UTF16ToUTF8(cur_path.begin(), cur_path.size(), result);
 }
 
+static std::error_code realPathFromHandle(HANDLE H,
+                                          SmallVectorImpl<wchar_t> &Buffer) {
+  DWORD CountChars = ::GetFinalPathNameByHandleW(
+      H, Buffer.begin(), Buffer.capacity() - 1, FILE_NAME_NORMALIZED);
+  if (CountChars > Buffer.capacity()) {
+    // The buffer wasn't big enough, try again.  In this case the return value
+    // *does* indicate the size of the null terminator.
+    Buffer.reserve(CountChars);
+    CountChars = ::GetFinalPathNameByHandleW(
+        H, Buffer.data(), Buffer.capacity() - 1, FILE_NAME_NORMALIZED);
+  }
+  if (CountChars == 0)
+    return mapWindowsError(GetLastError());
+  Buffer.set_size(CountChars);
+  return std::error_code();
+}
+
+static std::error_code realPathFromHandle(HANDLE H,
+                                          SmallVectorImpl<char> &RealPath) {
+  RealPath.clear();
+  SmallVector<wchar_t, MAX_PATH> Buffer;
+  if (std::error_code EC = realPathFromHandle(H, Buffer))
+    return EC;
+
+  const wchar_t *Data = Buffer.data();
+  DWORD CountChars = Buffer.size();
+  if (CountChars >= 4) {
+    if (0 == ::memcmp(Data, L"\\\\?\\", 8)) {
+      CountChars -= 4;
+      Data += 4;
+    }
+  }
+
+  // Convert the result from UTF-16 to UTF-8.
+  return UTF16ToUTF8(Data, CountChars, RealPath);
+}
+
+static std::error_code setDeleteDisposition(HANDLE Handle, bool Delete) {
+  FILE_DISPOSITION_INFO Disposition;
+  Disposition.DeleteFile = Delete;
+  if (!SetFileInformationByHandle(Handle, FileDispositionInfo, &Disposition,
+                                  sizeof(Disposition)))
+    return mapWindowsError(::GetLastError());
+  return std::error_code();
+}
 
 std::error_code access(const Twine &Path, AccessMode Mode) {
   SmallVector<wchar_t, 128> PathUtf16;
@@ -415,7 +466,7 @@ mapped_file_region::mapped_file_region(int fd, mapmode mode, size_t length,
 }
 
 static bool hasFlushBufferKernelBug() {
-  static bool Ret{GetWindowsOSVersion() < llvm::VersionTuple(10, 0, 0, 17763)};
+  static bool Ret{GetWindowsOSVersion() < wpi::VersionTuple(10, 0, 0, 17763)};
   return Ret;
 }
 
@@ -625,7 +676,7 @@ static DWORD nativeDisposition(CreationDisposition Disp, OpenFlags Flags) {
   case CD_OpenExisting:
     return OPEN_EXISTING;
   }
-  llvm_unreachable("unreachable!");
+  wpi_unreachable("unreachable!");
 }
 
 static DWORD nativeAccess(FileAccess Access, OpenFlags Flags) {
