@@ -43,6 +43,7 @@ void ParallelRepeatTCPConnector::Close() {
   } else {
     // Async is closed. Do the equivelent but make sure to hold this.
     auto localThis = shared_from_this();
+    closed();
     m_this = nullptr;
     Disconnect();
   }
