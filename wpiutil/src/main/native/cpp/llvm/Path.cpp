@@ -28,6 +28,7 @@
 #endif
 
 using namespace wpi;
+using namespace wpi::support::endian;
 
 namespace {
   using wpi::StringRef;
