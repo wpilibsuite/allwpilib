@@ -50,7 +50,7 @@ void RepeatPipeConnector::Connect() {
   auto pipeLocal = pipe.get();
   m_connectingPipe = pipeLocal;
 
-  pipe->closed.connect([ self = shared_from_this(), timer, pipeLocal ] {
+  pipe->closed.connect([ self = shared_from_this(), timer ] {
     self->m_connectingPipe = nullptr;
     if (!timer->IsClosing()) {
       timer->Close();
