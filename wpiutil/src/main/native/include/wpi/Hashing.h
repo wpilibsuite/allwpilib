@@ -53,6 +53,11 @@
 #include <string>
 #include <utility>
 
+#ifdef _WIN32
+#pragma warning( push )
+#pragma warning(disable : 26495)
+#endif
+
 namespace wpi {
 
 /// An opaque object representing a hash code.
@@ -502,7 +507,7 @@ public:
   /// This sets up the state for a recursive hash combine, including getting
   /// the seed and buffer setup.
  hash_combine_recursive_helper()
-     : buffer{0}, state{0}, seed(get_execution_seed()) {}
+     : seed(get_execution_seed()) {}
 
   /// Combine one chunk of data into the current in-flight hash.
   ///
@@ -655,5 +660,9 @@ hash_code hash_value(const std::basic_string<T> &arg) {
 }
 
 } // namespace wpi
+
+#ifdef _WIN32
+#pragma warning( pop )
+#endif
 
 #endif
