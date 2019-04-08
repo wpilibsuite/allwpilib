@@ -10,9 +10,10 @@
 
 #include "ntcore_cpp.h"
 
+
 namespace nt {
 
-inline RpcCall::RpcCall(RpcCall&& other) : RpcCall() {
+inline RpcCall::RpcCall(RpcCall&& other) noexcept : RpcCall() {
   swap(*this, other);
 }
 

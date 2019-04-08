@@ -16,6 +16,11 @@
 #include <cstdint>
 #include <string>
 
+#if _WIN32
+#pragma warning(push)
+#pragma warning(disable : 26495)
+#endif
+
 namespace wpi {
 
   class raw_ostream;
@@ -529,5 +534,9 @@ namespace wpi {
   /// @}
 
 } // end namespace wpi
+
+#if _WIN32
+#pragma warning(pop)
+#endif
 
 #endif // LLVM_ADT_TWINE_H

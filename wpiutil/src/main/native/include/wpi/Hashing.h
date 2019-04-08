@@ -190,7 +190,7 @@ inline uint64_t hash_1to3_bytes(const char *s, size_t len, uint64_t seed) {
   uint8_t b = s[len >> 1];
   uint8_t c = s[len - 1];
   uint32_t y = static_cast<uint32_t>(a) + (static_cast<uint32_t>(b) << 8);
-  uint32_t z = len + (static_cast<uint32_t>(c) << 2);
+  uint32_t z = len + (static_cast<uint64_t>(c) << 2);
   return shift_mix(y * k2 ^ z * k3 ^ seed) * k2;
 }
 
@@ -501,8 +501,8 @@ public:
   ///
   /// This sets up the state for a recursive hash combine, including getting
   /// the seed and buffer setup.
-  hash_combine_recursive_helper()
-    : seed(get_execution_seed()) {}
+ hash_combine_recursive_helper()
+     : buffer{0}, state{0}, seed(get_execution_seed()) {}
 
   /// Combine one chunk of data into the current in-flight hash.
   ///

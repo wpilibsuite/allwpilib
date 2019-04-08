@@ -54,9 +54,9 @@ struct Interrupt {
 };
 
 struct SynchronousWaitData {
-  HAL_InterruptHandle interruptHandle;
+  HAL_InterruptHandle interruptHandle{HAL_kInvalidHandle};
   wpi::condition_variable waitCond;
-  HAL_Bool waitPredicate;
+  HAL_Bool waitPredicate{false};
 };
 }  // namespace
 
@@ -231,7 +231,7 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
 
   // Cancel our callback
   SimDIOData[digitalIndex].value.CancelCallback(uid);
-  synchronousInterruptHandles->Free(dataHandle);
+  (void)synchronousInterruptHandles->Free(dataHandle);
 
   // Check for what to return
   if (timedOut) return WaitResult::Timeout;
@@ -239,10 +239,10 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
   if (interrupt->previousState) {
     // Set our return value and our timestamps
     interrupt->fallingTimestamp = hal::GetFPGATime();
-    return 1 << (8 + interrupt->index);
+    return 1ull << (8 + interrupt->index);
   } else {
     interrupt->risingTimestamp = hal::GetFPGATime();
-    return 1 << (interrupt->index);
+    return 1ull << (interrupt->index);
   }
 }
 
@@ -295,7 +295,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
 
   // Cancel our callback
   SimAnalogInData[analogIndex].voltage.CancelCallback(uid);
-  synchronousInterruptHandles->Free(dataHandle);
+  (void)synchronousInterruptHandles->Free(dataHandle);
 
   // Check for what to return
   if (timedOut) return WaitResult::Timeout;
@@ -303,10 +303,10 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
   if (interrupt->previousState) {
     // Set our return value and our timestamps
     interrupt->fallingTimestamp = hal::GetFPGATime();
-    return 1 << (8 + interrupt->index);
+    return 1ull << (8 + interrupt->index);
   } else {
     interrupt->risingTimestamp = hal::GetFPGATime();
-    return 1 << (interrupt->index);
+    return 1ull << (interrupt->index);
   }
 }
 

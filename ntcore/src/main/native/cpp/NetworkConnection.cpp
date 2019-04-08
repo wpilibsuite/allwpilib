@@ -46,7 +46,7 @@ void NetworkConnection::Start() {
   m_active = true;
   set_state(kInit);
   // clear queue
-  while (!m_outgoing.empty()) m_outgoing.pop();
+  while (!m_outgoing.empty()) (void)m_outgoing.pop();
   // reset shutdown flags
   {
     std::lock_guard<wpi::mutex> lock(m_shutdown_mutex);
@@ -88,7 +88,7 @@ void NetworkConnection::Stop() {
       m_read_thread.detach();  // timed out, detach it
   }
   // clear queue
-  while (!m_outgoing.empty()) m_outgoing.pop();
+  while (!m_outgoing.empty()) (void)m_outgoing.pop();
 }
 
 ConnectionInfo NetworkConnection::info() const {
@@ -248,7 +248,7 @@ void NetworkConnection::QueueOutgoing(std::shared_ptr<Message> msg) {
         // new, but remember it
         size_t pos = m_pending_outgoing.size();
         m_pending_outgoing.push_back(msg);
-        if (id >= m_pending_update.size()) m_pending_update.resize(id + 1);
+        if (id >= m_pending_update.size()) m_pending_update.resize(static_cast<uint64_t>(id) + 1);
         m_pending_update[id].first = pos + 1;
       }
       break;
@@ -291,7 +291,7 @@ void NetworkConnection::QueueOutgoing(std::shared_ptr<Message> msg) {
         // new, but remember it
         size_t pos = m_pending_outgoing.size();
         m_pending_outgoing.push_back(msg);
-        if (id >= m_pending_update.size()) m_pending_update.resize(id + 1);
+        if (id >= m_pending_update.size()) m_pending_update.resize(static_cast<uint64_t>(id) + 1);
         m_pending_update[id].second = pos + 1;
       }
       break;

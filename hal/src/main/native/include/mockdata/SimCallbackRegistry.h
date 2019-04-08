@@ -30,7 +30,7 @@ class SimCallbackRegistryBase {
  public:
   void Cancel(int32_t uid) {
     std::lock_guard<wpi::recursive_spinlock> lock(m_mutex);
-    if (m_callbacks) m_callbacks->erase(uid - 1);
+    if (m_callbacks) m_callbacks->erase(static_cast<size_t>(uid) - 1);
   }
 
   void Reset() {

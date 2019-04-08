@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "hal/Extensions.h"
 
 #include <wpi/SmallString.h>

@@ -21,6 +21,8 @@ using namespace nt;
 
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif _WIN32
+#pragma warning(disable : 4996)
 #endif
 
 const char NetworkTable::PATH_SEPARATOR_CHAR = '/';
