@@ -73,6 +73,8 @@ endif()
 
 add_subdirectory(wpiutil)
 add_subdirectory(ntcore)
+add_subdirectory(hal)
+set (HAL_DEP_REPLACE "find_dependency(hal)")
 
 if (NOT WITHOUT_CSCORE)
     add_subdirectory(cscore)
@@ -80,10 +82,10 @@ if (NOT WITHOUT_CSCORE)
     set (CSCORE_DEP_REPLACE "find_dependency(cscore)")
     set (CAMERASERVER_DEP_REPLACE "find_dependency(cameraserver)")
     if (NOT WITHOUT_ALLWPILIB)
-        add_subdirectory(hal)
+
         add_subdirectory(wpilibj)
         add_subdirectory(wpilibc)
-        set (HAL_DEP_REPLACE "find_dependency(hal)")
+
         set (WPILIBC_DEP_REPLACE "find_dependency(wpilibc)")
     endif()
 endif()

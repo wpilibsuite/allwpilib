@@ -278,14 +278,14 @@ class Value final {
     return val;
   }
 
-/**
- * Creates a string entry value.
- *
- * @param value the value
- * @param time if nonzero, the creation time to use (instead of the current
- *             time)
- * @return The entry value
- */
+  /**
+   * Creates a string entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
   template <typename T,
             typename std::enable_if<std::is_same<T, std::string>::value>::type>
   static std::shared_ptr<Value> MakeString(T&& value, uint64_t time = 0) {
@@ -312,14 +312,14 @@ class Value final {
     return val;
   }
 
-/**
- * Creates a raw entry value.
- *
- * @param value the value
- * @param time if nonzero, the creation time to use (instead of the current
- *             time)
- * @return The entry value
- */
+  /**
+   * Creates a raw entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
   template <typename T,
             typename std::enable_if<std::is_same<T, std::string>::value>::type>
   static std::shared_ptr<Value> MakeRaw(T&& value, uint64_t time = 0) {

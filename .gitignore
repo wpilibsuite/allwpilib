@@ -3,6 +3,7 @@
 dependency-reduced-pom.xml
 doxygen.log
 buildcmake/
+buildcmakex86/
 
 # Created by the jenkins test script
 test-reports
