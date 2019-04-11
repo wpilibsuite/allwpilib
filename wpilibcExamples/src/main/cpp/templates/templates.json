@@ -27,21 +27,21 @@
     "gradlebase": "cpp"
   },
   {
+    "name": "RobotBase Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for RobotBase",
+    "tags": [
+      "RobotBase", "Skeleton"
+    ],
+    "foldername": "robotbaseskeleton",
+    "gradlebase": "cpp"
+  },
+  {
     "name": "Command Robot",
     "description": "Command style",
     "tags": [
       "Command"
     ],
     "foldername": "commandbased",
-    "gradlebase": "cpp"
-  },
-  {
-    "name": "Sample Robot",
-    "description": "Sample style",
-    "tags": [
-      "Sample"
-    ],
-    "foldername": "sample",
     "gradlebase": "cpp"
   }
 ]

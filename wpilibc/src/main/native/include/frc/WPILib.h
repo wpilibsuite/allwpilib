@@ -56,7 +56,6 @@
 #include "frc/RobotDrive.h"
 #include "frc/SD540.h"
 #include "frc/SPI.h"
-#include "frc/SampleRobot.h"
 #include "frc/SensorUtil.h"
 #include "frc/SerialPort.h"
 #include "frc/Servo.h"
