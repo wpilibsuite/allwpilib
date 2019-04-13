@@ -27,7 +27,9 @@
 
 #include <stdlib.h>
 
+#ifdef _WIN32
 #pragma warning(disable: 6001 6011)
+#endif
 
 #define MAX_THREADPOOL_SIZE 128
 

@@ -27,7 +27,9 @@
 #include "uv.h"
 #include "uv-common.h"
 
+#ifdef _WIN32
 #pragma warning(disable : 6001)
+#endif
 
 #define UV__INET_ADDRSTRLEN         16
 #define UV__INET6_ADDRSTRLEN        46
