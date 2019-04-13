@@ -100,6 +100,10 @@ void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
   m_ntFlushEnabled = enabled;
 }
 
+units::second_t IterativeRobotBase::GetPeriod() const {
+  return m_period;
+}
+
 void IterativeRobotBase::LoopFunc() {
   m_watchdog.Reset();
 

@@ -69,10 +69,6 @@ void TimedRobot::EndCompetition() {
   HAL_StopNotifier(m_notifier, &status);
 }
 
-units::second_t TimedRobot::GetPeriod() const {
-  return units::second_t(m_period);
-}
-
 TimedRobot::TimedRobot(double period) : TimedRobot(units::second_t(period)) {}
 
 TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
