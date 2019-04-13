@@ -3,7 +3,7 @@ import org.gradle.internal.os.OperatingSystem
 
 //4244 4267 4146
 
-def windowsCompilerArgs = ['/EHsc', '/DNOMINMAX', '/Zi', '/FS', '/Zc:inline', '/MP4', '/W3', '/Wd4244', '/Wd4267', '/Wd4146', '/std:c++17', '/permissive-', '/Wx']
+def windowsCompilerArgs = ['/EHsc', '/DNOMINMAX', '/Zi', '/FS', '/Zc:inline', '/MP4', '/W3', '/Wd"4244"', '/Wd"4267"', '/Wd"4146"', '/std:c++17', '/permissive-', '/Wx']
 def windowsCCompilerArgs = ['/Zi', '/FS', '/Zc:inline', '/W3']
 def windowsReleaseCompilerArgs = ['/O2', '/MD']
 def windowsDebugCompilerArgs = ['/Od', '/MDd']
