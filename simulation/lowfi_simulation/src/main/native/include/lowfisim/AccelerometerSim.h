@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include "lowfisim/SimulatorComponent.h"
+#include "lowfisim/SimulatorComponentBase.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class AccelerometerSim : public virtual SimulatorComponent {
+class AccelerometerSim : public SimulatorComponentBase {
  public:
   virtual double GetAcceleration() = 0;
   virtual void SetAcceleration(double acceleration) = 0;

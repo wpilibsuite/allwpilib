@@ -9,13 +9,12 @@
 
 #include "ADXRS450_SpiGyroWrapperData.h"
 #include "lowfisim/GyroSim.h"
-#include "lowfisim/SimulatorComponentBase.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class ADXRS450_SpiGyroSim : public SimulatorComponentBase, public GyroSim {
+class ADXRS450_SpiGyroSim : public GyroSim {
  public:
   explicit ADXRS450_SpiGyroSim(int spiPort);
 
