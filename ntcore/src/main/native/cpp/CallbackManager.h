@@ -138,7 +138,8 @@ void CallbackThread<Derived, TUserInfo, TListenerData, TNotifierData>::Main() {
           if (!listener) continue;
           if (!static_cast<Derived*>(this)->Matches(listener, item.second))
             continue;
-          static_cast<Derived*>(this)->SetListener(&item.second, static_cast<unsigned>(i));
+          static_cast<Derived*>(this)->SetListener(&item.second,
+                                                   static_cast<unsigned>(i));
           if (listener.callback) {
             lock.unlock();
             static_cast<Derived*>(this)->DoCallback(listener.callback,

@@ -54,7 +54,7 @@
 #pragma comment(lib, "Mfreadwrite.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
-#pragma warning(disable: 4996)
+#pragma warning(disable : 4996)
 
 static constexpr int NewImageMessage = 0x0400 + 4488;
 static constexpr int SetCameraMessage = 0x0400 + 254;
