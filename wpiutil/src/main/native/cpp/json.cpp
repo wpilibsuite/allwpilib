@@ -142,24 +142,24 @@ void json::json_value::destroy(value_t t) noexcept
         case value_t::object:
         {
             std::allocator<object_t> alloc;
-			std::allocator_traits<decltype(alloc)>::destroy(alloc, object);
-			std::allocator_traits<decltype(alloc)>::deallocate(alloc, object, 1);
-			break;
-		}
+            std::allocator_traits<decltype(alloc)>::destroy(alloc, object);
+            std::allocator_traits<decltype(alloc)>::deallocate(alloc, object, 1);
+            break;
+        }
 
-		case value_t::array:
-		{
-			std::allocator<array_t> alloc;
-			std::allocator_traits<decltype(alloc)>::destroy(alloc, array);
-			std::allocator_traits<decltype(alloc)>::deallocate(alloc, array, 1);
-			break;
-		}
+        case value_t::array:
+        {
+            std::allocator<array_t> alloc;
+            std::allocator_traits<decltype(alloc)>::destroy(alloc, array);
+            std::allocator_traits<decltype(alloc)>::deallocate(alloc, array, 1);
+            break;
+        }
 
-		case value_t::string:
-		{
-			std::allocator<std::string> alloc;
-			std::allocator_traits<decltype(alloc)>::destroy(alloc, string);
-			std::allocator_traits<decltype(alloc)>::deallocate(alloc, string, 1);
+        case value_t::string:
+        {
+            std::allocator<std::string> alloc;
+            std::allocator_traits<decltype(alloc)>::destroy(alloc, string);
+            std::allocator_traits<decltype(alloc)>::deallocate(alloc, string, 1);
             break;
         }
 
@@ -621,8 +621,8 @@ json::size_type json::max_size() const noexcept
 
         case value_t::object:
         {
-			// delegate call to std::allocator<json>::max_size()
-			return std::allocator_traits<json>::max_size(*this);
+            // delegate call to std::allocator<object_t>::max_size()
+            return std::allocator_traits<object_t>::max_size(*m_value.object);
         }
 
         default:
