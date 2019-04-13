@@ -26,7 +26,9 @@
 #include "mockdata/DIODataInternal.h"
 #include "mockdata/HAL_Value.h"
 
+#ifdef _WIN32
 #pragma warning(disable : 4996 4018 6297 26451 4334)
+#endif
 
 using namespace hal;
 
