@@ -32,8 +32,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * disabledPeriodic() - autonomousPeriodic() - teleopPeriodic() - testPeriodic()
  */
 public abstract class IterativeRobotBase extends RobotBase {
-  protected double m_period;
-
   private enum Mode {
     kNone,
     kDisabled,
@@ -43,6 +41,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   private Mode m_lastMode = Mode.kNone;
+  private final double m_period;
   private final Watchdog m_watchdog;
   private boolean m_ntFlushEnabled;
 
@@ -202,6 +201,11 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   public void setNetworkTablesFlushEnabled(boolean enabled) {
     m_ntFlushEnabled = enabled;
+  }
+
+  /** Gets time period between calls to Periodic() functions. */
+  public double getPeriod() {
+    return m_period;
   }
 
   @SuppressWarnings("PMD.CyclomaticComplexity")

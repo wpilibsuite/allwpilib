@@ -43,11 +43,6 @@ class TimedRobot : public IterativeRobotBase {
   void EndCompetition() override;
 
   /**
-   * Get the time period between calls to Periodic() functions.
-   */
-  units::second_t GetPeriod() const;
-
-  /**
    * Constructor for TimedRobot.
    *
    * @deprecated use unit safe constructor instead.
