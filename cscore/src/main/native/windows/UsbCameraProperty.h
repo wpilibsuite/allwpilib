@@ -68,8 +68,10 @@ class UsbCameraProperty : public PropertyImpl {
   bool isAutoProp{true};
 
   bool isControlProperty{false};
-  tagVideoProcAmpProperty tagVideoProc{tagVideoProcAmpProperty::VideoProcAmp_Brightness};
-  tagCameraControlProperty tagCameraControl{tagCameraControlProperty::CameraControl_Pan};
+  tagVideoProcAmpProperty tagVideoProc{
+      tagVideoProcAmpProperty::VideoProcAmp_Brightness};
+  tagCameraControlProperty tagCameraControl{
+      tagCameraControlProperty::CameraControl_Pan};
 
   // If this is a percentage (rather than raw) property
   bool percentage{false};

@@ -179,7 +179,7 @@ class RpcAnswer {
 /** NetworkTables Entry Notification */
 class EntryNotification {
  public:
-	 EntryNotification() : listener(0), entry(0), flags(0) {}
+  EntryNotification() : listener(0), entry(0), flags(0) {}
   EntryNotification(NT_EntryListener listener_, NT_Entry entry_,
                     StringRef name_, std::shared_ptr<Value> value_,
                     unsigned int flags_)

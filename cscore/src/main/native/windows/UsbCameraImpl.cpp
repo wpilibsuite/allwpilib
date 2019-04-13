@@ -1020,7 +1020,6 @@ done:
     }
   }
 
-
   CoTaskMemFree(ppDevices);
   return retval;
 }

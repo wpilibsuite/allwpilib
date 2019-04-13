@@ -56,9 +56,9 @@ struct Interrupt {
 };
 
 struct SynchronousWaitData {
-  HAL_InterruptHandle interruptHandle{ HAL_kInvalidHandle };
+  HAL_InterruptHandle interruptHandle{HAL_kInvalidHandle};
   wpi::condition_variable waitCond;
-  HAL_Bool waitPredicate{ false };
+  HAL_Bool waitPredicate{false};
 };
 }  // namespace
 

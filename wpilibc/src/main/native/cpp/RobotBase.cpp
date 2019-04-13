@@ -118,7 +118,8 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   LiveWindow::GetInstance()->SetEnabled(false);
 }
 
-RobotBase::RobotBase(RobotBase&&) noexcept : m_ds(DriverStation::GetInstance()) {}
+RobotBase::RobotBase(RobotBase&&) noexcept
+    : m_ds(DriverStation::GetInstance()) {}
 
 RobotBase::~RobotBase() { cs::Shutdown(); }
 
