@@ -4,6 +4,7 @@ ext {
     nativeName = 'wpiutil'
     devMain = 'edu.wpi.first.wpiutil.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
+
     extraSetup = {
         it.tasks.withType(CppCompile) {
             dependsOn generateTask
@@ -137,7 +138,23 @@ cppHeadersZip {
     }
 }
 
+        // it.component.sources.each {
+        //     it.exportedHeaders {
+        //         srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
+        //     }
+        // }
+
 model {
+    components {
+        all {
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
+                }
+            }
+        }
+    }
+
     // Exports config is a utility to enable exporting all symbols in a C++ library on windows to a DLL.
     // This removes the need for DllExport on a library. However, the gradle C++ builder has a bug
     // where some extra symbols are added that cannot be resolved at link time. This configuration

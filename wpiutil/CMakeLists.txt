@@ -90,8 +90,10 @@ if (NOT USE_VCPKG_LIBUV)
     target_sources(wpiutil PRIVATE ${uv_native_src})
     install(DIRECTORY src/main/native/libuv/include/ DESTINATION "${include_dest}/wpiutil")
     target_include_directories(wpiutil PRIVATE
-        src/main/native/libuv/src
-        src/main/native/libuv/include)
+        src/main/native/libuv/src)
+    target_include_directories(wpiutil PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/libuv/include>
+                            $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
     if(NOT MSVC)
         target_sources(wpiutil PRIVATE ${uv_unix_src})
         if (APPLE)
