@@ -11,11 +11,11 @@ ext {
         it.sources {
             libuvCpp(CppSourceSet) {
                 source {
-                    srcDirs 'src/main/native/libuv'
+                    srcDirs 'src/main/native/libuv/src'
                     include '*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/include/uv-private', 'src/main/native/libuv'
+                    srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
                 }
             }
             resourcesCpp(CppSourceSet) {
@@ -33,7 +33,7 @@ ext {
             it.sources {
                 libuvUnixCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/libuv/unix'
+                        srcDirs 'src/main/native/libuv/src/unix'
                         includes = [
                             'async.cpp',
                             'core.cpp',
@@ -56,7 +56,7 @@ ext {
                         ]
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/include/uv-private', 'src/main/native/libuv'
+                        srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
                     }
                 }
             }
@@ -68,11 +68,11 @@ ext {
             it.sources {
                 libuvWindowsCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/libuv/win'
+                        srcDirs 'src/main/native/libuv/src/win'
                         include '*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/include/uv-private', 'src/main/native/libuv'
+                        srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
                     }
                 }
             }
@@ -80,7 +80,7 @@ ext {
             it.sources {
                 libuvMacCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/libuv/unix'
+                        srcDirs 'src/main/native/libuv/src/unix'
                         includes = [
                             'bsd-ifaddrs.cpp',
                             'darwin.cpp',
@@ -91,7 +91,7 @@ ext {
                         ]
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/include/uv-private', 'src/main/native/libuv'
+                        srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
                     }
                 }
             }
@@ -99,7 +99,7 @@ ext {
             it.sources {
                 libuvLinuxCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/libuv/unix'
+                        srcDirs 'src/main/native/libuv/src/unix'
                         includes = [
                             'linux-core.cpp',
                             'linux-inotify.cpp',
@@ -111,7 +111,7 @@ ext {
                         ]
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/include/uv-private', 'src/main/native/libuv'
+                        srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
                     }
                 }
             }
@@ -130,6 +130,12 @@ file("$projectDir/examples").list(new FilenameFilter() {
 }
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
+
+cppHeadersZip {
+    from('src/main/native/libuv/include') {
+        into '/'
+    }
+}
 
 model {
     // Exports config is a utility to enable exporting all symbols in a C++ library on windows to a DLL.

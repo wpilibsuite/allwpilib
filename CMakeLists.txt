@@ -50,6 +50,7 @@ option(WITHOUT_CSCORE "Don't build cscore (removes OpenCV requirement)" OFF)
 option(WITHOUT_ALLWPILIB "Don't build allwpilib (removes OpenCV requirement)" ON)
 option(USE_EXTERNAL_HAL "Use a separately built HAL" OFF)
 set(EXTERNAL_HAL_FILE "" CACHE FILEPATH "Location to look for an external HAL CMake File")
+option(USE_VCPKG_LIBUV "Use vcpkg libuv" OFF)
 
 if (NOT WITHOUT_JAVA AND NOT BUILD_SHARED_LIBS)
     message(FATAL_ERROR "
