@@ -25,6 +25,8 @@
 #include <string.h>
 #include <limits.h>
 
+#pragma warning(disable : 4018 26451)
+
 #ifndef ULLONG_MAX
 # define ULLONG_MAX ((uint64_t) -1) /* 2^64-1 */
 #endif

@@ -16,6 +16,11 @@
 #include "frc/shuffleboard/ShuffleboardContainer.h"
 #include "frc/smartdashboard/Sendable.h"
 
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 4250)
+#endif
+
 namespace frc {
 
 /**
@@ -33,3 +38,7 @@ class ShuffleboardLayout : public ShuffleboardComponent<ShuffleboardLayout>,
 };
 
 }  // namespace frc
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif

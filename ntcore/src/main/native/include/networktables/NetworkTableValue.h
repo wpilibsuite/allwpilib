@@ -286,13 +286,8 @@ class Value final {
  *             time)
  * @return The entry value
  */
-#ifdef _MSC_VER
-  template <typename T,
-            typename = std::enable_if_t<std::is_same<T, std::string>>>
-#else
   template <typename T,
             typename std::enable_if<std::is_same<T, std::string>::value>::type>
-#endif
   static std::shared_ptr<Value> MakeString(T&& value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_STRING, time, private_init());
     val->m_string = std::move(value);
@@ -325,13 +320,8 @@ class Value final {
  *             time)
  * @return The entry value
  */
-#ifdef _MSC_VER
-  template <typename T,
-            typename = std::enable_if_t<std::is_same<T, std::string>>>
-#else
   template <typename T,
             typename std::enable_if<std::is_same<T, std::string>::value>::type>
-#endif
   static std::shared_ptr<Value> MakeRaw(T&& value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_RAW, time, private_init());
     val->m_string = std::move(value);
