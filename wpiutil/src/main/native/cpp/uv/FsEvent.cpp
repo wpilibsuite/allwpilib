@@ -11,6 +11,7 @@
 
 #include "wpi/SmallString.h"
 #include "wpi/uv/Loop.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace wpi {
 namespace uv {

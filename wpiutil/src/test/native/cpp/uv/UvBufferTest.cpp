@@ -8,6 +8,7 @@
 #include "wpi/uv/Buffer.h"  // NOLINT(build/include_order)
 
 #include "gtest/gtest.h"  // NOLINT(build/include_order)
+#pragma warning(disable: 4244 4267 4146)
 
 namespace wpi {
 namespace uv {

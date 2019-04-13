@@ -12,6 +12,7 @@
 #include "wpi/ErrorHandling.h"
 #include "wpi/ManagedStatic.h"
 #include <system_error>
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi;
 

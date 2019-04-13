@@ -12,6 +12,7 @@
 #include "commands/SetCollectionSpeed.h"
 #include "commands/SetPivotSetpoint.h"
 #include "commands/WaitForBall.h"
+#pragma warning(disable: 4244 4267 4146)
 
 Collect::Collect() {
   AddSequential(new SetCollectionSpeed(Collector::kForward));

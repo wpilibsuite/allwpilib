@@ -8,6 +8,7 @@
 #include <frc/Encoder.h>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#pragma warning(disable: 4244 4267 4146)
 
 /**
  * Sample program displaying the value of a quadrature encoder on the

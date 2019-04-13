@@ -17,6 +17,7 @@
 #include "hal/HAL.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/UnlimitedHandleResource.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace {
 struct Notifier {

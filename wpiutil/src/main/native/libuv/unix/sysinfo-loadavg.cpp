@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 #include <sys/sysinfo.h>
+#pragma warning(disable: 4244 4267 4146)
 
 void uv_loadavg(double avg[3]) {
   struct sysinfo info;

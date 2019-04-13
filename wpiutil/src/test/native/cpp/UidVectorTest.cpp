@@ -8,6 +8,7 @@
 #include "wpi/UidVector.h"  // NOLINT(build/include_order)
 
 #include "gtest/gtest.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace wpi {
 

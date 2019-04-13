@@ -20,6 +20,7 @@
  */
 
 #include "uv.h"
+#pragma warning(disable: 4244 4267 4146)
 
 #define UV_STRINGIFY(v) UV_STRINGIFY_HELPER(v)
 #define UV_STRINGIFY_HELPER(v) #v

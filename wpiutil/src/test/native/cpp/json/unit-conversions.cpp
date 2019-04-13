@@ -44,6 +44,7 @@ using wpi::JsonTest;
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
+#pragma warning(disable: 4244 4267 4146)
 
 template <typename T>
 class JsonGetObjectTest : public ::testing::Test {

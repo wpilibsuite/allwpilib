@@ -12,6 +12,7 @@
 #include "ConstBufferCallbackStore.h"
 #include "edu_wpi_first_hal_sim_mockdata_I2CDataJNI.h"
 #include "mockdata/I2CData.h"
+#pragma warning(disable: 4244 4267 4146)
 
 extern "C" {
 

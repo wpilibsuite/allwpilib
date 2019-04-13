@@ -42,6 +42,7 @@ using wpi::json;
 #include "wpi/raw_ostream.h"
 
 #include <fstream>
+#pragma warning(disable: 4244 4267 4146)
 
 // create and check a JSON string with up to four UTF-8 bytes
 ::testing::AssertionResult check_utf8string(bool success_expected, int byte1, int byte2 = -1, int byte3 = -1, int byte4 = -1)

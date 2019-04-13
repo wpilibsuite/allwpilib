@@ -10,6 +10,7 @@
 #include <hal/HAL.h>
 #include <wpi/Format.h>
 #include <wpi/raw_ostream.h>
+#pragma warning(disable: 4244 4267 4146)
 
 extern "C" int HALSIM_InitExtension(void);
 

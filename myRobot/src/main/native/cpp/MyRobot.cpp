@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/TimedRobot.h>
+#pragma warning(disable: 4244 4267 4146)
 
 class MyRobot : public frc::TimedRobot {
   /**

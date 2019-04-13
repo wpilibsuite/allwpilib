@@ -10,6 +10,7 @@
 #include "commands/CloseClaw.h"
 #include "commands/SetElevatorSetpoint.h"
 #include "commands/SetWristSetpoint.h"
+#pragma warning(disable: 4244 4267 4146)
 
 Pickup::Pickup() : frc::CommandGroup("Pickup") {
   AddSequential(new CloseClaw());

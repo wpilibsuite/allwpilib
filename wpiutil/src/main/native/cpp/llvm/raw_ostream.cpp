@@ -11,6 +11,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#ifdef _WIN32
+#define _CRT_NONSTDC_NO_WARNINGS
+#endif
+
 #include "wpi/raw_ostream.h"
 #include "wpi/STLExtras.h"
 #include "wpi/SmallString.h"
@@ -59,6 +63,7 @@
 #ifdef _WIN32
 #include "wpi/ConvertUTF.h"
 #include "Windows/WindowsSupport.h"
+#pragma warning(disable: 4244 4267 4146)
 #endif
 
 using namespace wpi;

@@ -13,6 +13,7 @@
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <wpi/raw_ostream.h>
+#pragma warning(disable: 4244 4267 4146)
 
 /**
  * This is a demo program showing the use of OpenCV to do vision processing. The

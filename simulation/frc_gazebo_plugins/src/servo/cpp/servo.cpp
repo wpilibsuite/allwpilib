@@ -15,6 +15,7 @@
 // Ensure that Winsock2.h is included before Windows.h, which can get
 // pulled in by anybody (e.g., Boost).
 #include <Winsock2.h>
+#pragma warning(disable: 4244 4267 4146)
 #endif
 
 GZ_REGISTER_MODEL_PLUGIN(Servo)

@@ -8,6 +8,7 @@
 #include "frc/interfaces/Potentiometer.h"
 
 #include "frc/Utility.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

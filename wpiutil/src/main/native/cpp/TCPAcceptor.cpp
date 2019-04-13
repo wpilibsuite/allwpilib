@@ -27,6 +27,7 @@
 #include <cstring>
 
 #ifdef _WIN32
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
 #pragma comment(lib, "Ws2_32.lib")
@@ -40,6 +41,7 @@
 #include "wpi/Logger.h"
 #include "wpi/SmallString.h"
 #include "wpi/SocketError.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi;
 
@@ -53,7 +55,7 @@ TCPAcceptor::TCPAcceptor(int port, const char* address, Logger& logger)
 #ifdef _WIN32
   WSAData wsaData;
   WORD wVersionRequested = MAKEWORD(2, 2);
-  WSAStartup(wVersionRequested, &wsaData);
+  (void)WSAStartup(wVersionRequested, &wsaData);
 #endif
 }
 
@@ -151,9 +153,7 @@ void TCPAcceptor::shutdown() {
     return;
   address.sin_port = htons(m_port);
 
-  fd_set sdset;
-  struct timeval tv;
-  int result = -1, valopt, sd = socket(AF_INET, SOCK_STREAM, 0);
+  int result = -1, sd = socket(AF_INET, SOCK_STREAM, 0);
   if (sd < 0) return;
 
   // Set socket to non-blocking

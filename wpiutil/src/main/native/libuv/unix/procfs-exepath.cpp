@@ -24,6 +24,7 @@
 
 #include <stddef.h>
 #include <unistd.h>
+#pragma warning(disable: 4244 4267 4146)
 
 int uv_exepath(char* buffer, size_t* size) {
   ssize_t n;

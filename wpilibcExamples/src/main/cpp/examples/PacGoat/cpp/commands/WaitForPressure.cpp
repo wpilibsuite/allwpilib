@@ -8,6 +8,7 @@
 #include "commands/WaitForPressure.h"
 
 #include "Robot.h"
+#pragma warning(disable: 4244 4267 4146)
 
 WaitForPressure::WaitForPressure() { Requires(&Robot::pneumatics); }
 

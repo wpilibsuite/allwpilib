@@ -31,6 +31,8 @@
 #include <io.h>
 #endif
 
+#pragma warning(disable: 4244 4267 4146)
+
 using namespace wpi;
 
 static fatal_error_handler_t ErrorHandler = nullptr;
@@ -202,6 +204,7 @@ void wpi::wpi_unreachable_internal(const char *msg, const char *file,
 
 #include <system_error>
 #include <winerror.h>
+#pragma warning(disable: 4244 4267 4146)
 
 // I'd rather not double the line count of the following.
 #define MAP_ERR_TO_COND(x, y)                                                  \

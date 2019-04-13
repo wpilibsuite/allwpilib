@@ -40,11 +40,11 @@ class Buffer : public uv_buf_t {
       : Buffer{reinterpret_cast<const char*>(arr.data()), arr.size()} {}
   Buffer(char* base_, size_t len_) {
     base = base_;
-    len = len_;
+    len = static_cast<decltype(len)>(len_);
   }
   Buffer(const char* base_, size_t len_) {
     base = const_cast<char*>(base_);
-    len = len_;
+    len = static_cast<decltype(len)>(len_);
   }
 
   ArrayRef<char> data() const { return ArrayRef<char>{base, len}; }

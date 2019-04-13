@@ -19,6 +19,8 @@
  * IN THE SOFTWARE.
  */
 
+#define _CRT_NONSTDC_NO_WARNINGS
+
 #include <assert.h>
 #include <io.h>
 #include <string.h>
@@ -39,6 +41,7 @@
 #include "handle-inl.h"
 #include "stream-inl.h"
 #include "req-inl.h"
+#pragma warning(disable: 4244 4267 4146)
 
 #pragma comment(lib, "User32.lib")
 

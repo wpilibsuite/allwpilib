@@ -10,6 +10,7 @@
 #include <cmath>
 
 #include "Robot.h"
+#pragma warning(disable: 4244 4267 4146)
 
 SetElevatorSetpoint::SetElevatorSetpoint(double setpoint)
     : frc::Command("SetElevatorSetpoint") {

@@ -10,6 +10,7 @@
 #include "wpi/ConvertUTF.h"
 #include <string>
 #include <vector>
+#pragma warning(disable: 4244 4267 4146)
 
 namespace wpi {
 

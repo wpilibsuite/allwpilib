@@ -13,6 +13,7 @@
 #include <support/json.h>
 
 #include "ntcore.h"
+#pragma warning(disable: 4244 4267 4146)
 
 void callback1(const nt::RpcAnswer& answer) {
   wpi::json params;

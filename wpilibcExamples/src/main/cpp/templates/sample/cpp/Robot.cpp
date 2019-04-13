@@ -11,6 +11,7 @@
 
 #include <frc/Timer.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#pragma warning(disable: 4244 4267 4146)
 
 Robot::Robot() {
   // Note SmartDashboard is not initialized here, wait until RobotInit() to make

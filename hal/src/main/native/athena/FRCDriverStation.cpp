@@ -19,6 +19,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "hal/DriverStation.h"
+#pragma warning(disable: 4244 4267 4146)
 
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");

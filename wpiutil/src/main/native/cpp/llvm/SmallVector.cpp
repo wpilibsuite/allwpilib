@@ -13,6 +13,7 @@
 
 #include "wpi/SmallVector.h"
 #include "wpi/MemAlloc.h"
+#pragma warning(disable: 4244 4267 4146)
 using namespace wpi;
 
 /// grow_pod - This is an implementation of the grow() method which only works

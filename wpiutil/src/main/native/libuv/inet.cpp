@@ -26,6 +26,7 @@
 
 #include "uv.h"
 #include "uv-common.h"
+#pragma warning(disable: 4244 4267 4146)
 
 #define UV__INET_ADDRSTRLEN         16
 #define UV__INET6_ADDRSTRLEN        46

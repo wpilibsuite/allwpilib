@@ -16,6 +16,7 @@
 #include "hal/handles/UnlimitedHandleResource.h"
 #include "mockdata/HAL_Value.h"
 #include "mockdata/NotifyListener.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi::java;
 using namespace sim;

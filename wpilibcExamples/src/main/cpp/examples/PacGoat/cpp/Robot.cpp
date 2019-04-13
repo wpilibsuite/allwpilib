@@ -12,6 +12,7 @@
 #include <frc/commands/Scheduler.h>
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#pragma warning(disable: 4244 4267 4146)
 
 DriveTrain Robot::drivetrain;
 Pivot Robot::pivot;

@@ -8,6 +8,7 @@
 #include "frc/shuffleboard/Shuffleboard.h"
 #include "frc/shuffleboard/ShuffleboardTab.h"
 #include "gtest/gtest.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

@@ -8,6 +8,7 @@
 #include <uv.h>
 
 #include "cscore_cpp.h"
+#pragma warning(disable: 4244 4267 4146)
 
 #pragma comment(lib, "Ws2_32.lib")
 

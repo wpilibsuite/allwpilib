@@ -10,6 +10,7 @@
 #include "gtest/gtest.h"  // NOLINT(build/include_order)
 
 #include <thread>
+#pragma warning(disable: 4244 4267 4146)
 
 namespace wpi {
 

@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "subsystems/Pivot.h"
+#pragma warning(disable: 4244 4267 4146)
 
 Pivot::Pivot() : frc::PIDSubsystem("Pivot", 7.0, 0.0, 8.0) {
   SetAbsoluteTolerance(0.005);

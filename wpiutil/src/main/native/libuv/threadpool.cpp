@@ -26,6 +26,7 @@
 #endif
 
 #include <stdlib.h>
+#pragma warning(disable: 4244 4267 4146)
 
 #define MAX_THREADPOOL_SIZE 128
 

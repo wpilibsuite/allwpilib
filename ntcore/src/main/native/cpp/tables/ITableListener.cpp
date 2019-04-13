@@ -8,6 +8,7 @@
 #include "tables/ITableListener.h"
 
 #include "ntcore_c.h"
+#pragma warning(disable: 4244 4267 4146)
 
 void ITableListener::ValueChangedEx(ITable* source, wpi::StringRef key,
                                     std::shared_ptr<nt::Value> value,

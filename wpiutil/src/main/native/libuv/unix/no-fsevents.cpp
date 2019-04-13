@@ -23,6 +23,7 @@
 #include "internal.h"
 
 #include <errno.h>
+#pragma warning(disable: 4244 4267 4146)
 
 int uv_fs_event_init(uv_loop_t* loop, uv_fs_event_t* handle) {
   return UV_ENOSYS;

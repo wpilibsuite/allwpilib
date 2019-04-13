@@ -14,6 +14,7 @@
 #include <bitset>
 #include <climits>
 #include <ostream>
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi;
 

@@ -15,6 +15,7 @@
 #include "wpi/mutex.h"
 #include <cassert>
 #include <mutex>
+#pragma warning(disable: 4244 4267 4146)
 using namespace wpi;
 
 static const ManagedStaticBase *StaticList = nullptr;

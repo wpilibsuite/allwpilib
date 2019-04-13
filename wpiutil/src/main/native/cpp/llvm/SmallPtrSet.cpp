@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdlib>
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi;
 

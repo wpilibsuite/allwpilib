@@ -19,6 +19,7 @@
 #pragma comment(lib, "ws2_32.lib")
 #else
 #include <arpa/inet.h>
+#pragma warning(disable: 4244 4267 4146)
 #endif
 
 using namespace hal;

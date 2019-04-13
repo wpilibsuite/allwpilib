@@ -21,6 +21,7 @@
 
 #include "uv.h"
 #include "internal.h"
+#pragma warning(disable: 4244 4267 4146)
 
 static int uv__dlerror(uv_lib_t* lib, const char* filename, DWORD errorno);
 
@@ -76,7 +77,7 @@ const char* uv_dlerror(const uv_lib_t* lib) {
 
 static void uv__format_fallback_error(uv_lib_t* lib, int errorno){
   DWORD_PTR args[1] = { (DWORD_PTR) errorno };
-  LPSTR fallback_error = "error: %1!d!";
+  LPCSTR fallback_error = "error: %1!d!";
 
   FormatMessageA(FORMAT_MESSAGE_FROM_STRING |
                  FORMAT_MESSAGE_ARGUMENT_ARRAY |

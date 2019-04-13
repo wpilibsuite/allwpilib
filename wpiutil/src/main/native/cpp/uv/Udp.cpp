@@ -12,6 +12,7 @@
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/uv/util.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace {
 

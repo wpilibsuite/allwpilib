@@ -16,6 +16,7 @@
 #include "commands/Place.h"
 #include "commands/PrepareToPickup.h"
 #include "commands/SetElevatorSetpoint.h"
+#pragma warning(disable: 4244 4267 4146)
 
 OI::OI() {
   frc::SmartDashboard::PutData("Open Claw", new OpenClaw());

@@ -10,6 +10,7 @@
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
 #include "wpi/hostname.h"
+#pragma warning(disable: 4244 4267 4146)
 
 int main() {
   wpi::StringRef v1("Hello");

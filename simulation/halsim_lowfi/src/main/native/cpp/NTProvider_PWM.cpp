@@ -9,6 +9,7 @@
 
 #include <hal/Ports.h>
 #include <mockdata/PWMData.h>
+#pragma warning(disable: 4244 4267 4146)
 
 void HALSimNTProviderPWM::Initialize() {
   InitializeDefault(HAL_GetNumPWMChannels(), HALSIM_RegisterPWMAllCallbacks);

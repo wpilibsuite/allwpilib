@@ -33,6 +33,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <signal.h>
+#pragma warning(disable: 4244 4267 4146)
 
 int uv__pthread_sigmask(int how, const sigset_t* set, sigset_t* oset) {
   static int workaround;

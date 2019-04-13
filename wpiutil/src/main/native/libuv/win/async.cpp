@@ -26,6 +26,7 @@
 #include "atomicops-inl.h"
 #include "handle-inl.h"
 #include "req-inl.h"
+#pragma warning(disable: 4244 4267 4146)
 
 
 void uv_async_endgame(uv_loop_t* loop, uv_async_t* handle) {

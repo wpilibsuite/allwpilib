@@ -11,6 +11,7 @@
 #include <ifaddrs.h>
 #include <sys/types.h>
 #include <unistd.h>
+#pragma warning(disable: 4244 4267 4146)
 
 namespace cs {
 

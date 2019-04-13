@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <poll.h>
+#pragma warning(disable: 4244 4267 4146)
 
 #if defined(__APPLE__) && !TARGET_OS_IPHONE
 # include <crt_externs.h>

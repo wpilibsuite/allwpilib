@@ -11,6 +11,7 @@
 
 #include <hal/HAL.h>
 #include <hal/SerialPort.h>
+#pragma warning(disable: 4244 4267 4146)
 
 // static ViStatus _VI_FUNCH ioCompleteHandler (ViSession vi, ViEventType
 // eventType, ViEvent event, ViAddr userHandle);

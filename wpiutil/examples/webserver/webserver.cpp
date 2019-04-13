@@ -13,6 +13,7 @@
 #include "wpi/raw_ostream.h"
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/Tcp.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace uv = wpi::uv;
 

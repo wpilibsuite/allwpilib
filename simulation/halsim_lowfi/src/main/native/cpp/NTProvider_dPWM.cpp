@@ -9,6 +9,7 @@
 
 #include <hal/Ports.h>
 #include <mockdata/DigitalPWMData.h>
+#pragma warning(disable: 4244 4267 4146)
 
 void HALSimNTProviderDigitalPWM::Initialize() {
   InitializeDefault(HAL_GetNumDigitalPWMOutputs(),

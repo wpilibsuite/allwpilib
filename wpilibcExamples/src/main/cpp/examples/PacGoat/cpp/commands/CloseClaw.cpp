@@ -8,6 +8,7 @@
 #include "commands/CloseClaw.h"
 
 #include "Robot.h"
+#pragma warning(disable: 4244 4267 4146)
 
 CloseClaw::CloseClaw() { Requires(&Robot::collector); }
 

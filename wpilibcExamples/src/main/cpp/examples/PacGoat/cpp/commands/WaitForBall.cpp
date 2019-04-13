@@ -8,6 +8,7 @@
 #include "commands/WaitForBall.h"
 
 #include "Robot.h"
+#pragma warning(disable: 4244 4267 4146)
 
 WaitForBall::WaitForBall() { Requires(&Robot::collector); }
 

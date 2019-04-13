@@ -11,6 +11,7 @@
 #include <sched.h>
 
 #include "hal/Errors.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 namespace init {

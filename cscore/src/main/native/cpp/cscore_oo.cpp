@@ -8,6 +8,7 @@
 #include "cscore_oo.h"
 
 #include <wpi/json.h>
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace cs;
 

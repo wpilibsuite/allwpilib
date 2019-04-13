@@ -8,6 +8,7 @@
 #include <cameraserver/CameraServer.h>
 #include <frc/TimedRobot.h>
 #include <wpi/raw_ostream.h>
+#pragma warning(disable: 4244 4267 4146)
 
 /**
  * Uses the CameraServer class to automatically capture video from a USB webcam

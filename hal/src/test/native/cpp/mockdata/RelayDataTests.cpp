@@ -10,6 +10,7 @@
 #include "hal/Relay.h"
 #include "hal/handles/HandlesInternal.h"
 #include "mockdata/RelayData.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 

@@ -39,6 +39,7 @@
 
 #ifdef __GLIBC__
 #include <gnu/libc-version.h>  /* gnu_get_libc_version() */
+#pragma warning(disable: 4244 4267 4146)
 #endif
 
 #undef NANOSEC

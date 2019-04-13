@@ -15,6 +15,7 @@
 #include "wpi/SmallSet.h"
 #include "wpi/condition_variable.h"
 #include "wpi/mutex.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi;
 

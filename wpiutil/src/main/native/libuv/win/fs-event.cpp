@@ -19,6 +19,8 @@
  * IN THE SOFTWARE.
  */
 
+#define _CRT_NONSTDC_NO_WARNINGS
+
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
@@ -28,6 +30,7 @@
 #include "internal.h"
 #include "handle-inl.h"
 #include "req-inl.h"
+#pragma warning(disable: 4244 4267 4146)
 
 
 const unsigned int uv_directory_watcher_buffer_size = 4096;

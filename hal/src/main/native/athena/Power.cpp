@@ -11,6 +11,7 @@
 
 #include "HALInitializer.h"
 #include "hal/ChipObject.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace hal;
 

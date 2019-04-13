@@ -38,6 +38,7 @@ SOFTWARE.
 using wpi::json;
 
 #include <fstream>
+#pragma warning(disable: 4244 4267 4146)
 
 TEST(CborDiscardedTest, Case)
 {

@@ -8,6 +8,7 @@
 #include "commands/SetCollectionSpeed.h"
 
 #include "Robot.h"
+#pragma warning(disable: 4244 4267 4146)
 
 SetCollectionSpeed::SetCollectionSpeed(double speed) {
   Requires(&Robot::collector);

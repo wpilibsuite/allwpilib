@@ -55,6 +55,11 @@
 #include <string>
 #include <utility>
 
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 26495)
+#endif
+
 namespace wpi {
 
 /// An opaque object representing a hash code.
@@ -192,7 +197,7 @@ inline uint64_t hash_1to3_bytes(const char *s, size_t len, uint64_t seed) {
   uint8_t b = s[len >> 1];
   uint8_t c = s[len - 1];
   uint32_t y = static_cast<uint32_t>(a) + (static_cast<uint32_t>(b) << 8);
-  uint32_t z = len + (static_cast<uint32_t>(c) << 2);
+  uint32_t z = static_cast<uint32_t>(len + (static_cast<uint64_t>(c) << 2));
   return shift_mix(y * k2 ^ z * k3 ^ seed) * k2;
 }
 
@@ -656,5 +661,9 @@ hash_code hash_value(const std::basic_string<T> &arg) {
 }
 
 } // namespace wpi
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
 
 #endif

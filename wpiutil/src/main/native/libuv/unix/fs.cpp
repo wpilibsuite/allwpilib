@@ -45,6 +45,7 @@
 #include <fcntl.h>
 #include <utime.h>
 #include <poll.h>
+#pragma warning(disable: 4244 4267 4146)
 
 #if defined(__DragonFly__)        ||                                      \
     defined(__FreeBSD__)          ||                                      \

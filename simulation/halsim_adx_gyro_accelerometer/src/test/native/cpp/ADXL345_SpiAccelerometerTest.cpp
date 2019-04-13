@@ -8,6 +8,7 @@
 #include "ADXL345_SpiAccelerometerData.h"
 #include "frc/ADXL345_SPI.h"
 #include "gtest/gtest.h"
+#pragma warning(disable: 4244 4267 4146)
 
 class ADXL345_SpiAccelerometerTest
     : public ::testing::TestWithParam<frc::SPI::Port> {};

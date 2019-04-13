@@ -23,6 +23,14 @@
 
 namespace wpi {
 
+#ifdef _WIN32
+#pragma warning(push)
+// Warning on NONNULL, report is not known to abort
+#pragma warning(disable : 6387)
+#pragma warning(disable : 28196)
+#pragma warning(disable : 28183)
+#endif
+
 LLVM_ATTRIBUTE_RETURNS_NONNULL inline void *safe_malloc(size_t Sz) {
   void *Result = std::malloc(Sz);
   if (Result == nullptr)
@@ -44,6 +52,10 @@ LLVM_ATTRIBUTE_RETURNS_NONNULL inline void *safe_realloc(void *Ptr, size_t Sz) {
     report_bad_alloc_error("Allocation failed");
   return Result;
 }
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
 
 }
 #endif

@@ -26,6 +26,7 @@
 
 #include "uv.h"
 #include "internal.h"
+#pragma warning(disable: 4244 4267 4146)
 
 
 static void uv__getnameinfo_work(struct uv__work* w) {

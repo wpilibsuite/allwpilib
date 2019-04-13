@@ -35,6 +35,7 @@ SOFTWARE.
 #include "gtest/gtest.h"
 
 #include "unit-json.h"
+#pragma warning(disable: 4244 4267 4146)
 using wpi::json;
 
 TEST(JsonIteratorTest, Comparisons)

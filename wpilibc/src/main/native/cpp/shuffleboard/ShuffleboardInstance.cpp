@@ -12,6 +12,7 @@
 #include <wpi/StringMap.h>
 
 #include "frc/shuffleboard/Shuffleboard.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc::detail;
 

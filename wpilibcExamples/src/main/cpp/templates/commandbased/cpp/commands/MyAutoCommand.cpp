@@ -8,6 +8,7 @@
 #include "commands/MyAutoCommand.h"
 
 #include "Robot.h"
+#pragma warning(disable: 4244 4267 4146)
 
 MyAutoCommand::MyAutoCommand() {
   // Use Requires() here to declare subsystem dependencies

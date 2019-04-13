@@ -9,6 +9,7 @@
 
 #include "edu_wpi_first_hal_AccelerometerJNI.h"
 #include "hal/Accelerometer.h"
+#pragma warning(disable: 4244 4267 4146)
 
 extern "C" {
 

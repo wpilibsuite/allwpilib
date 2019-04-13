@@ -8,6 +8,7 @@
 #include "subsystems/Collector.h"
 
 #include <frc/livewindow/LiveWindow.h>
+#pragma warning(disable: 4244 4267 4146)
 
 Collector::Collector() : frc::Subsystem("Collector") {
   // Put everything to the LiveWindow for testing.

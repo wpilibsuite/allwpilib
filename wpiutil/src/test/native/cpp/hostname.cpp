@@ -10,6 +10,7 @@
 #include "gtest/gtest.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace wpi {
 TEST(HostNameTest, HostNameNotEmpty) { ASSERT_NE(GetHostname(), ""); }

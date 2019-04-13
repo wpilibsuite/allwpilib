@@ -23,6 +23,7 @@
 
 #include "uv.h"
 #include "internal.h"
+#pragma warning(disable: 4244 4267 4146)
 
 
 /* Ntdll function pointers */

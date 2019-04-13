@@ -25,6 +25,7 @@
 #include "uv.h"
 #include "internal.h"
 #include "req-inl.h"
+#pragma warning(disable: 4244 4267 4146)
 
 #ifndef GetNameInfo
 int WSAAPI GetNameInfoW(

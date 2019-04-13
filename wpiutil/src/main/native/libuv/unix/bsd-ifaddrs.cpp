@@ -29,6 +29,7 @@
 #include <net/if.h>
 #if !defined(__CYGWIN__) && !defined(__MSYS__)
 #include <net/if_dl.h>
+#pragma warning(disable: 4244 4267 4146)
 #endif
 
 static int uv__ifaddr_exclude(struct ifaddrs *ent, int exclude_type) {

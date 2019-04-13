@@ -13,6 +13,7 @@
 #include "uv.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace wpi {
 

@@ -12,6 +12,7 @@
 #include "frc/Counter.h"
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include <frc/smartdashboard/SmartDashboard.h>
+#pragma warning(disable: 4244 4267 4146)
 
 void Robot::RobotInit() {
   m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);

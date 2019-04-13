@@ -16,6 +16,7 @@
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableBuilderImpl.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

@@ -11,6 +11,7 @@
 #include <opencv2/core/core.hpp>
 
 #include "cscore.h"
+#pragma warning(disable: 4244 4267 4146)
 
 int main() {
   cs::HttpCamera camera{"httpcam", "http://localhost:8081/?action=stream"};

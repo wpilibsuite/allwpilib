@@ -13,6 +13,7 @@
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/PCMDataInternal.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace {
 struct Solenoid {

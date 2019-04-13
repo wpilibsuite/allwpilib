@@ -34,6 +34,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <limits.h> /* IOV_MAX */
+#pragma warning(disable: 4244 4267 4146)
 
 #if defined(__APPLE__)
 # include <sys/event.h>

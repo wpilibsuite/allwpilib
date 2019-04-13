@@ -11,6 +11,7 @@
 #include <frc/Timer.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/livewindow/LiveWindow.h>
+#pragma warning(disable: 4244 4267 4146)
 
 class Robot : public frc::TimedRobot {
  public:

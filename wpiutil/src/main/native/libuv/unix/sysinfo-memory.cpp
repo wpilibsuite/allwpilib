@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 #include <sys/sysinfo.h>
+#pragma warning(disable: 4244 4267 4146)
 
 uint64_t uv_get_free_memory(void) {
   struct sysinfo info;

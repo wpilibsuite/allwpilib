@@ -89,6 +89,7 @@
 
 #if !defined(__MVS__)
 #include <sys/param.h> /* MAXHOSTNAMELEN on Linux and the BSDs */
+#pragma warning(disable: 4244 4267 4146)
 #endif
 
 /* Fallback for the maximum hostname length */

@@ -14,6 +14,7 @@
 
 #include "frc/DriverStation.h"
 #include "frc/RobotController.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace frc {
 

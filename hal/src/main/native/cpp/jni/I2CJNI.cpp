@@ -15,6 +15,7 @@
 #include "edu_wpi_first_hal_I2CJNI.h"
 #include "hal/I2C.h"
 #include "hal/cpp/Log.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 using namespace wpi::java;

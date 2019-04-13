@@ -9,6 +9,7 @@
 
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#pragma warning(disable: 4244 4267 4146)
 
 Elevator::Elevator() : frc::PIDSubsystem("Elevator", kP_real, kI_real, 0.0) {
 #ifdef SIMULATION  // Check for simulation and update PID values

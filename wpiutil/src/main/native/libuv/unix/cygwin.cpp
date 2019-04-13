@@ -24,6 +24,7 @@
 
 #include <sys/sysinfo.h>
 #include <unistd.h>
+#pragma warning(disable: 4244 4267 4146)
 
 int uv_uptime(double* uptime) {
   struct sysinfo info;

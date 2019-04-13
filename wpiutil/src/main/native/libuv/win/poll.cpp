@@ -26,6 +26,7 @@
 #include "internal.h"
 #include "handle-inl.h"
 #include "req-inl.h"
+#pragma warning(disable: 4244 4267 4146)
 
 
 static const GUID uv_msafd_provider_ids[UV_MSAFD_PROVIDER_COUNT] = {

@@ -25,6 +25,7 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <errno.h>
+#pragma warning(disable: 4244 4267 4146)
 
 #if defined(__has_feature)
 # if __has_feature(memory_sanitizer)

@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "lowfisim/wpisimulators/WpiEncoderSim.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace frc {
 namespace sim {

@@ -8,6 +8,7 @@
 #include <frc/GenericHID.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
+#pragma warning(disable: 4244 4267 4146)
 
 /**
  * This is a demo program showing the use of GenericHID's rumble feature.

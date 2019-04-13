@@ -41,6 +41,8 @@ typedef int errno_t;
 #ifdef _MSC_VER
 # pragma comment(lib, "shell32.lib")
 # pragma comment(lib, "ole32.lib")
+#pragma warning(push)
+#pragma warning(disable: 4244 4267 4146)
 #endif
 
 using namespace wpi;
@@ -963,3 +965,7 @@ std::error_code UTF16ToCurCP(const wchar_t *utf16, size_t utf16_len,
 } // end namespace windows
 } // end namespace sys
 } // end namespace wpi
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif

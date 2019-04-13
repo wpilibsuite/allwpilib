@@ -25,6 +25,7 @@
 #include "internal.h"
 #include "handle-inl.h"
 #include "req-inl.h"
+#pragma warning(disable: 4244 4267 4146)
 
 
 int uv_listen(uv_stream_t* stream, int backlog, uv_connection_cb cb) {

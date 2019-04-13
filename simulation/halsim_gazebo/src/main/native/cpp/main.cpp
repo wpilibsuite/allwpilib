@@ -15,6 +15,7 @@
 #include "GazeboPCM.h"
 #include "GazeboPWM.h"
 #include "HALSimGazebo.h"
+#pragma warning(disable: 4244 4267 4146)
 
 /* Currently, robots never terminate, so we keep a single static object
    to access Gazebo with and it is never properly released or cleaned up. */

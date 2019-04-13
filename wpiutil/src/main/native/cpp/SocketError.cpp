@@ -12,6 +12,7 @@
 #else
 #include <cerrno>
 #include <cstring>
+#pragma warning(disable: 4244 4267 4146)
 #endif
 
 namespace wpi {

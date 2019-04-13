@@ -8,6 +8,7 @@
 #include "ADXL345_I2CAccelerometerData.h"
 #include "frc/ADXL345_I2C.h"
 #include "gtest/gtest.h"
+#pragma warning(disable: 4244 4267 4146)
 
 class ADXL345_I2CAccelerometerTest
     : public ::testing::TestWithParam<frc::I2C::Port> {};

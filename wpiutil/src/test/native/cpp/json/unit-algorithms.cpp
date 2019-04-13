@@ -38,6 +38,7 @@ SOFTWARE.
 using wpi::json;
 
 #include <algorithm>
+#pragma warning(disable: 4244 4267 4146)
 
 class JsonAlgorithmsTest : public ::testing::Test {
  protected:

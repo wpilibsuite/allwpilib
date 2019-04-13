@@ -9,6 +9,7 @@
 
 #include <hal/Ports.h>
 #include <mockdata/DriverStationData.h>
+#pragma warning(disable: 4244 4267 4146)
 
 void HALSimNTProviderDriverStation::Initialize() {
   InitializeDefaultSingle(HALSIM_RegisterDriverStationAllCallbacks);

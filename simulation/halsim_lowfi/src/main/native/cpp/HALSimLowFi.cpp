@@ -8,6 +8,7 @@
 #include "HALSimLowFi.h"
 
 #include <wpi/Twine.h>
+#pragma warning(disable: 4244 4267 4146)
 
 void HALSimLowFi::Initialize() {
   table = nt::NetworkTableInstance::GetDefault().GetTable("sim");

@@ -10,6 +10,7 @@
 #include "hal/I2C.h"
 #include "hal/handles/HandlesInternal.h"
 #include "mockdata/I2CData.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 

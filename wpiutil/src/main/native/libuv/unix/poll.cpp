@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h>
+#pragma warning(disable: 4244 4267 4146)
 
 
 static void uv__poll_io(uv_loop_t* loop, uv__io_t* w, unsigned int events) {

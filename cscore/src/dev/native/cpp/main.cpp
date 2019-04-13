@@ -8,5 +8,6 @@
 #include <iostream>
 
 #include "cscore.h"
+#pragma warning(disable: 4244 4267 4146)
 
 int main() { std::cout << cs::GetHostname() << std::endl; }

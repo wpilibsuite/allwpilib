@@ -8,6 +8,7 @@
 #include <hal/HAL.h>
 
 #include "gtest/gtest.h"
+#pragma warning(disable: 4244 4267 4146)
 
 int main(int argc, char** argv) {
   HAL_Initialize(500, 0);

@@ -9,6 +9,7 @@
 
 #include <frc/commands/Scheduler.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#pragma warning(disable: 4244 4267 4146)
 
 ExampleSubsystem Robot::m_subsystem;
 OI Robot::m_oi;

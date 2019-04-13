@@ -31,6 +31,7 @@
 #include <sys/resource.h>
 #include <sys/sysctl.h>
 #include <unistd.h>  /* sysconf */
+#pragma warning(disable: 4244 4267 4146)
 
 
 int uv__platform_loop_init(uv_loop_t* loop) {

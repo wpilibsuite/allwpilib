@@ -8,6 +8,7 @@
 #include <frc/Joystick.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
+#pragma warning(disable: 4244 4267 4146)
 
 /**
  * This sample program shows how to control a motor using a joystick. In the

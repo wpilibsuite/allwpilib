@@ -47,6 +47,7 @@ void uv__fsevents_loop_delete(uv_loop_t* loop) {
 
 #include <CoreFoundation/CFRunLoop.h>
 #include <CoreServices/CoreServices.h>
+#pragma warning(disable: 4244 4267 4146)
 
 /* These are macros to avoid "initializer element is not constant" errors
  * with old versions of gcc.

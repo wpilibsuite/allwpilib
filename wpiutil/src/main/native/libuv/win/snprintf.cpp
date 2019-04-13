@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#pragma warning(disable: 4244 4267 4146)
 
 /* Emulate snprintf() on MSVC<2015, _snprintf() doesn't zero-terminate the buffer
  * on overflow...

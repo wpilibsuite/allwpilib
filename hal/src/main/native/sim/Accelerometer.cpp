@@ -8,6 +8,7 @@
 #include "hal/Accelerometer.h"
 
 #include "mockdata/AccelerometerDataInternal.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace hal;
 

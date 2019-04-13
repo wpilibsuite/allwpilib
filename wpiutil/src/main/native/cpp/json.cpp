@@ -35,6 +35,7 @@ SOFTWARE.
 #include "wpi/json.h"
 
 #include "wpi/raw_ostream.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace wpi {
 namespace detail {
@@ -142,24 +143,24 @@ void json::json_value::destroy(value_t t) noexcept
         case value_t::object:
         {
             std::allocator<object_t> alloc;
-            alloc.destroy(object);
-            alloc.deallocate(object, 1);
-            break;
-        }
+			std::allocator_traits<decltype(alloc)>::destroy(alloc, object);
+			std::allocator_traits<decltype(alloc)>::deallocate(alloc, object, 1);
+			break;
+		}
 
-        case value_t::array:
-        {
-            std::allocator<array_t> alloc;
-            alloc.destroy(array);
-            alloc.deallocate(array, 1);
-            break;
-        }
+		case value_t::array:
+		{
+			std::allocator<array_t> alloc;
+			std::allocator_traits<decltype(alloc)>::destroy(alloc, array);
+			std::allocator_traits<decltype(alloc)>::deallocate(alloc, array, 1);
+			break;
+		}
 
-        case value_t::string:
-        {
-            std::allocator<std::string> alloc;
-            alloc.destroy(string);
-            alloc.deallocate(string, 1);
+		case value_t::string:
+		{
+			std::allocator<std::string> alloc;
+			std::allocator_traits<decltype(alloc)>::destroy(alloc, string);
+			std::allocator_traits<decltype(alloc)>::deallocate(alloc, string, 1);
             break;
         }
 
@@ -621,8 +622,8 @@ json::size_type json::max_size() const noexcept
 
         case value_t::object:
         {
-            // delegate call to std::allocator<json>::max_size()
-            return std::allocator<json>().max_size();
+			// delegate call to std::allocator<json>::max_size()
+			return std::allocator_traits<json>::max_size(*this);
         }
 
         default:

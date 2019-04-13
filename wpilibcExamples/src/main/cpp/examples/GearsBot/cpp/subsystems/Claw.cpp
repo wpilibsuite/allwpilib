@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "subsystems/Claw.h"
+#pragma warning(disable: 4244 4267 4146)
 
 Claw::Claw() : frc::Subsystem("Claw") {
   // Let's show everything on the LiveWindow

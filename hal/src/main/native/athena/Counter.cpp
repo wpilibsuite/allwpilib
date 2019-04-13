@@ -13,6 +13,7 @@
 #include "PortsInternal.h"
 #include "hal/HAL.h"
 #include "hal/handles/LimitedHandleResource.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace hal;
 

@@ -14,6 +14,7 @@
 #include "commands/PrepareToPickup.h"
 #include "commands/SetDistanceToBox.h"
 #include "commands/SetWristSetpoint.h"
+#pragma warning(disable: 4244 4267 4146)
 
 Autonomous::Autonomous() : frc::CommandGroup("Autonomous") {
   AddSequential(new PrepareToPickup());

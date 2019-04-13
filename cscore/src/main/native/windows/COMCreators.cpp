@@ -25,6 +25,7 @@
 
 #include "COMCreators.h"
 #include "ComPtr.h"
+#pragma warning(disable: 4244 4267 4146)
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")

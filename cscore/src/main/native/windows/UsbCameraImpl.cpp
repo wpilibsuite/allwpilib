@@ -45,6 +45,7 @@
 #include "WindowsMessagePump.h"
 #include "c_util.h"
 #include "cscore_cpp.h"
+#pragma warning(disable: 4244 4267 4146)
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")
@@ -53,6 +54,8 @@
 #pragma comment(lib, "User32.lib")
 #pragma comment(lib, "Mfreadwrite.lib")
 #pragma comment(lib, "Shlwapi.lib")
+
+#pragma warning(disable: 4996)
 
 static constexpr int NewImageMessage = 0x0400 + 4488;
 static constexpr int SetCameraMessage = 0x0400 + 254;

@@ -13,6 +13,7 @@
 #include "edu_wpi_first_hal_PortsJNI.h"
 #include "hal/Ports.h"
 #include "hal/cpp/Log.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

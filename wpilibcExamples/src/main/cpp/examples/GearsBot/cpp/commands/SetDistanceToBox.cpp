@@ -10,6 +10,7 @@
 #include <frc/PIDController.h>
 
 #include "Robot.h"
+#pragma warning(disable: 4244 4267 4146)
 
 SetDistanceToBox::SetDistanceToBox(double distance) {
   Requires(&Robot::drivetrain);

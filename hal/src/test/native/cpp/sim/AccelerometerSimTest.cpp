@@ -9,6 +9,7 @@
 #include "hal/Accelerometer.h"
 #include "hal/HAL.h"
 #include "simulation/AccelerometerSim.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc::sim;
 

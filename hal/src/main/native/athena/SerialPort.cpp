@@ -12,6 +12,7 @@
 #include "HALInitializer.h"
 #include "hal/cpp/SerialHelper.h"
 #include "visa/visa.h"
+#pragma warning(disable: 4244 4267 4146)
 
 static int32_t resourceManagerHandle{0};
 static HAL_SerialPort portHandles[4];

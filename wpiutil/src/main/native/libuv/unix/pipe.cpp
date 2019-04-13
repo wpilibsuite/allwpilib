@@ -28,6 +28,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <stdlib.h>
+#pragma warning(disable: 4244 4267 4146)
 
 
 int uv_pipe_init(uv_loop_t* loop, uv_pipe_t* handle, int ipc) {

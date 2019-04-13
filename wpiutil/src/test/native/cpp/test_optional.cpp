@@ -1488,6 +1488,7 @@ namespace InitList
 
 
 #include <string>
+#pragma warning(disable: 4244 4267 4146)
 
 
 struct VEC

@@ -24,6 +24,7 @@
 
 #include <assert.h>
 #include <limits.h>
+#pragma warning(disable: 4244 4267 4146)
 
 
 static int timer_less_than(const struct heap_node* ha,

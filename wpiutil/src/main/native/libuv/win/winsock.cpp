@@ -24,6 +24,7 @@
 
 #include "uv.h"
 #include "internal.h"
+#pragma warning(disable: 4244 4267 4146)
 
 
 #pragma comment(lib, "Ws2_32.lib")

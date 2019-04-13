@@ -14,6 +14,7 @@
 #include "TestPrinters.h"
 #include "WireEncoder.h"
 #include "gtest/gtest.h"
+#pragma warning(disable: 4244 4267 4146)
 
 #define BUFSIZE 1024
 

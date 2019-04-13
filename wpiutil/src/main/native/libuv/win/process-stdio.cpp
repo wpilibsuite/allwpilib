@@ -27,6 +27,7 @@
 #include "uv.h"
 #include "internal.h"
 #include "handle-inl.h"
+#pragma warning(disable: 4244 4267 4146)
 
 
 /*
@@ -116,6 +117,8 @@ static int uv__create_stdio_pipe_pair(uv_loop_t* loop,
     client_access |= GENERIC_WRITE | FILE_READ_ATTRIBUTES;
   }
 
+  BOOL overlap;
+
   /* Create server pipe handle. */
   err = uv_stdio_pipe_server(loop,
                              server_pipe,
@@ -130,7 +133,7 @@ static int uv__create_stdio_pipe_pair(uv_loop_t* loop,
   sa.lpSecurityDescriptor = NULL;
   sa.bInheritHandle = TRUE;
 
-  BOOL overlap = server_pipe->ipc || (flags & UV_OVERLAPPED_PIPE);
+  overlap = server_pipe->ipc || (flags & UV_OVERLAPPED_PIPE);
   child_pipe = CreateFileA(pipe_name,
                            client_access,
                            0,

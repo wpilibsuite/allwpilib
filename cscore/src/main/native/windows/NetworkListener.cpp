@@ -22,6 +22,7 @@
 #include "Instance.h"
 #include "Log.h"
 #include "Notifier.h"
+#pragma warning(disable: 4244 4267 4146)
 
 #pragma comment(lib, "Iphlpapi.lib")
 

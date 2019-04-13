@@ -10,6 +10,7 @@
 #include <cmath>
 
 #include "Robot.h"
+#pragma warning(disable: 4244 4267 4146)
 
 void DriveForward::init(double dist, double maxSpeed) {
   Requires(&Robot::drivetrain);

@@ -8,6 +8,7 @@
 #include "commands/DriveStraight.h"
 
 #include "Robot.h"
+#pragma warning(disable: 4244 4267 4146)
 
 DriveStraight::DriveStraight(double distance) {
   Requires(&Robot::drivetrain);

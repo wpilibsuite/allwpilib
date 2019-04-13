@@ -18,6 +18,7 @@
 #include "Notifier.h"
 #include "c_util.h"
 #include "cscore_cpp.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace cs;
 

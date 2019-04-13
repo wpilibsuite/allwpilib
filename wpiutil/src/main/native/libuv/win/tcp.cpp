@@ -27,6 +27,7 @@
 #include "handle-inl.h"
 #include "stream-inl.h"
 #include "req-inl.h"
+#pragma warning(disable: 4244 4267 4146)
 
 
 /*

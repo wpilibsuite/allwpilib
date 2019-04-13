@@ -11,6 +11,7 @@
 
 #include "DriverStationDataInternal.h"
 #include "hal/DriverStation.h"
+#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 struct JoystickOutputStore {

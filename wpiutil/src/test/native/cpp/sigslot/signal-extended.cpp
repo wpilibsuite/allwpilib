@@ -37,6 +37,7 @@ SOFTWARE.
 #include "wpi/Signal.h"  // NOLINT(build/include_order)
 
 #include "gtest/gtest.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi::sig;
 

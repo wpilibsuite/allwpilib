@@ -8,6 +8,7 @@
 #include "gtest/gtest.h"
 #include "hal/HAL.h"
 #include "hal/handles/IndexedClassedHandleResource.h"
+#pragma warning(disable: 4244 4267 4146)
 
 #define HAL_TestHandle HAL_Handle
 

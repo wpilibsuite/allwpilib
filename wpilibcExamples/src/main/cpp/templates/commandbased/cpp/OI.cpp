@@ -8,6 +8,7 @@
 #include "OI.h"
 
 #include <frc/WPILib.h>
+#pragma warning(disable: 4244 4267 4146)
 
 OI::OI() {
   // Process operator interface input here.

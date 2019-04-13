@@ -23,6 +23,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#pragma warning(disable: 4244 4267 4146)
 
 extern void uv__set_process_title(const char* title);
 

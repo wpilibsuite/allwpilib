@@ -38,6 +38,7 @@
 #include <windows.h>
 #include <userenv.h>
 #include <math.h>
+#pragma warning(disable: 4244 4267 4146)
 
 /*
  * Max title length; the only thing MSDN tells us about the maximum length

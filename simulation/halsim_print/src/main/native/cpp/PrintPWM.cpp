@@ -12,6 +12,7 @@
 #include <mockdata/HAL_Value.h>
 #include <mockdata/NotifyListener.h>
 #include <mockdata/PWMData.h>
+#pragma warning(disable: 4244 4267 4146)
 
 static void PWMCallback(const char* name, void* param,
                         const struct HAL_Value* value) {

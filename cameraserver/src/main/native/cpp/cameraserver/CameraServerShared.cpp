@@ -8,6 +8,7 @@
 #include "cameraserver/CameraServerShared.h"
 
 #include <wpi/mutex.h>
+#pragma warning(disable: 4244 4267 4146)
 
 namespace {
 class DefaultCameraServerShared : public frc::CameraServerShared {

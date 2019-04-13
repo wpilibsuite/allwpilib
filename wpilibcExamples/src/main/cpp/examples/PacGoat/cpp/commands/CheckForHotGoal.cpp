@@ -8,6 +8,7 @@
 #include "commands/CheckForHotGoal.h"
 
 #include "Robot.h"
+#pragma warning(disable: 4244 4267 4146)
 
 CheckForHotGoal::CheckForHotGoal(double time) { SetTimeout(time); }
 

@@ -8,6 +8,7 @@
 #include "wpi/raw_socket_ostream.h"
 
 #include "wpi/NetworkStream.h"
+#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi;
 

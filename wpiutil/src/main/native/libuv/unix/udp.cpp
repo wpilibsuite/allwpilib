@@ -29,6 +29,7 @@
 #include <unistd.h>
 #if defined(__MVS__)
 #include <xti.h>
+#pragma warning(disable: 4244 4267 4146)
 #endif
 
 #if defined(IPV6_JOIN_GROUP) && !defined(IPV6_ADD_MEMBERSHIP)

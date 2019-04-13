@@ -8,6 +8,7 @@
 #include "hal/CAN.h"
 
 #include <FRC_NetworkCommunication/CANSessionMux.h>
+#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 namespace init {
