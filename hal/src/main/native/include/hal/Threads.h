@@ -7,8 +7,6 @@
 
 #pragma once
 
-#define NativeThreadHandle const void*
-
 #include "hal/Types.h"
 
 /**
@@ -17,7 +15,12 @@
  * @{
  */
 
+typedef const void* NativeThreadHandle;
+
+#ifdef __cplusplus
 extern "C" {
+#endif
+
 /**
  * Gets the thread priority for the specified thread.
  *
@@ -68,5 +71,8 @@ HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
  */
 HAL_Bool HAL_SetCurrentThreadPriority(HAL_Bool realTime, int32_t priority,
                                       int32_t* status);
+
+#ifdef __cplusplus
 }  // extern "C"
+#endif
 /** @} */
