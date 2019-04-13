@@ -25,7 +25,6 @@
 
 #include "uv.h"
 #include "internal.h"
-#pragma warning(disable: 4244 4267 4146)
 
 static int uv_cond_condvar_init(uv_cond_t* cond);
 static void uv_cond_condvar_destroy(uv_cond_t* cond);

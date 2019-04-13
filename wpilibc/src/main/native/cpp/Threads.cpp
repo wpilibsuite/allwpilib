@@ -11,7 +11,6 @@
 #include <hal/Threads.h>
 
 #include "frc/ErrorBase.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace frc {
 

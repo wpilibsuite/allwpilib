@@ -67,7 +67,6 @@
 
 #ifdef __FRC_ROBORIO__
 #include "wpi/timestamp.h"
-#pragma warning(disable: 4244 4267 4146)
 #endif
 
 /* This is rather annoying: CLOCK_BOOTTIME lives in <linux/time.h> but we can't

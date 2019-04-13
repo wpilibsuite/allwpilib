@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#pragma warning(disable: 4244 4267 4146)
 
 struct poll_ctx {
   uv_fs_poll_t* parent_handle; /* NULL if parent has been stopped or closed */
@@ -248,7 +247,6 @@ static int statbuf_eq(const uv_stat_t* a, const uv_stat_t* b) {
 
 #include "win/internal.h"
 #include "win/handle-inl.h"
-#pragma warning(disable: 4244 4267 4146)
 
 void uv__fs_poll_endgame(uv_loop_t* loop, uv_fs_poll_t* handle) {
   assert(handle->flags & UV__HANDLE_CLOSING);

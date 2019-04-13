@@ -39,7 +39,6 @@ SOFTWARE.
 using wpi::json;
 
 #include <valarray>
-#pragma warning(disable: 4244 4267 4146)
 
 TEST(JsonDeserializationTest, SuccessfulStream)
 {

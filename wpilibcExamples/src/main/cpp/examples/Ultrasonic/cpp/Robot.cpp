@@ -9,7 +9,6 @@
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
-#pragma warning(disable: 4244 4267 4146)
 
 /**
  * This is a sample program demonstrating how to use an ultrasonic sensor and

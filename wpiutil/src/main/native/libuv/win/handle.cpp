@@ -26,7 +26,6 @@
 #include "uv.h"
 #include "internal.h"
 #include "handle-inl.h"
-#pragma warning(disable: 4244 4267 4146)
 
 
 uv_handle_type uv_guess_handle(uv_file file) {

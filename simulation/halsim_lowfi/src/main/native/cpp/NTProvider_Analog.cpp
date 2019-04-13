@@ -10,7 +10,6 @@
 #include <hal/Ports.h>
 #include <mockdata/AnalogInData.h>
 #include <mockdata/AnalogOutData.h>
-#pragma warning(disable: 4244 4267 4146)
 
 void HALSimNTProviderAnalogIn::Initialize() {
   InitializeDefault(HAL_GetNumAnalogInputs(),

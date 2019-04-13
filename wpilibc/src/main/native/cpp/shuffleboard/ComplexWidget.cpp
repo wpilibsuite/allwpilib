@@ -8,7 +8,6 @@
 #include "frc/shuffleboard/ComplexWidget.h"
 
 #include "frc/smartdashboard/Sendable.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

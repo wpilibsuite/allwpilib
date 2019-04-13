@@ -8,7 +8,6 @@
 #include "internal_limit_switch.h"
 
 #include <string>
-#pragma warning(disable: 4244 4267 4146)
 
 InternalLimitSwitch::InternalLimitSwitch(gazebo::physics::ModelPtr model,
                                          sdf::ElementPtr sdf) {

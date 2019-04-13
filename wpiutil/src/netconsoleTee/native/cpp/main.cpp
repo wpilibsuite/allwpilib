@@ -15,7 +15,6 @@
 #include "wpi/uv/Tty.h"
 #include "wpi/uv/Udp.h"
 #include "wpi/uv/util.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace uv = wpi::uv;
 

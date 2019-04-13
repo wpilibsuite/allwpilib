@@ -11,7 +11,6 @@
 
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
-#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 static wpi::SmallVector<HandleBase*, 32>* globalHandles = nullptr;

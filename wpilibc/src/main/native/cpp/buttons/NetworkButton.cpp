@@ -9,7 +9,6 @@
 
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

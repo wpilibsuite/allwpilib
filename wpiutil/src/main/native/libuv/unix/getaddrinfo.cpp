@@ -36,7 +36,6 @@
 
 /* EAI_* constants. */
 #include <netdb.h>
-#pragma warning(disable: 4244 4267 4146)
 
 
 int uv__getaddrinfo_translate_error(int sys_err) {

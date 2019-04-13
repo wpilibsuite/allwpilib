@@ -9,7 +9,6 @@
 #include "hal/CANAPI.h"
 #include "hal/HAL.h"
 #include "mockdata/CanData.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 struct CANTestStore {

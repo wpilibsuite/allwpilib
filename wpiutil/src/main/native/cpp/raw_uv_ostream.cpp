@@ -8,7 +8,6 @@
 #include "wpi/raw_uv_ostream.h"
 
 #include <cstring>
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi;
 

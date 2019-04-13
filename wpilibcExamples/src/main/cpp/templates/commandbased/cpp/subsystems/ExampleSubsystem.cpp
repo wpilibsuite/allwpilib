@@ -8,7 +8,6 @@
 #include "subsystems/ExampleSubsystem.h"
 
 #include "RobotMap.h"
-#pragma warning(disable: 4244 4267 4146)
 
 ExampleSubsystem::ExampleSubsystem() : frc::Subsystem("ExampleSubsystem") {}
 

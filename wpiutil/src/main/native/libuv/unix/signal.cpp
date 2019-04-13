@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#pragma warning(disable: 4244 4267 4146)
 
 #ifndef SA_RESTART
 # define SA_RESTART 0

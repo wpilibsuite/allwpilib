@@ -7,7 +7,6 @@
 
 #include "DSCommPacket.h"
 #include "gtest/gtest.h"
-#pragma warning(disable: 4244 4267 4146)
 
 class DSCommPacketTest : public ::testing::Test {
  public:

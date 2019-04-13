@@ -63,7 +63,6 @@
 #ifdef _WIN32
 #include "wpi/ConvertUTF.h"
 #include "Windows/WindowsSupport.h"
-#pragma warning(disable: 4244 4267 4146)
 #endif
 
 using namespace wpi;

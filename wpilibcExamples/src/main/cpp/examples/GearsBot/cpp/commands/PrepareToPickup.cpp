@@ -10,7 +10,6 @@
 #include "commands/OpenClaw.h"
 #include "commands/SetElevatorSetpoint.h"
 #include "commands/SetWristSetpoint.h"
-#pragma warning(disable: 4244 4267 4146)
 
 PrepareToPickup::PrepareToPickup() : frc::CommandGroup("PrepareToPickup") {
   AddParallel(new OpenClaw());

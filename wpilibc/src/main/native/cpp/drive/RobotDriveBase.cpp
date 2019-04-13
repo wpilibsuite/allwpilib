@@ -15,7 +15,6 @@
 
 #include "frc/Base.h"
 #include "frc/SpeedController.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

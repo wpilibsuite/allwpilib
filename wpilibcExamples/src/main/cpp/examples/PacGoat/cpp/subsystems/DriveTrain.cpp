@@ -12,7 +12,6 @@
 #include <frc/Joystick.h>
 
 #include "commands/DriveWithJoystick.h"
-#pragma warning(disable: 4244 4267 4146)
 
 DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
   // AddChild("Front Left CIM", m_frontLeftCIM);

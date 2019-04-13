@@ -24,7 +24,6 @@
 
 #include <errno.h>
 #include <stddef.h>
-#pragma warning(disable: 4244 4267 4146)
 
 char** uv_setup_args(int argc, char** argv) {
   return argv;

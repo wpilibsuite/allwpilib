@@ -11,7 +11,6 @@
 
 #include "cscore_cpp.h"
 #include "edu_wpi_cscore_CameraServerJNI.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi::java;
 

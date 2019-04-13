@@ -8,7 +8,6 @@
 #include "commands/OpenClaw.h"
 
 #include "Robot.h"
-#pragma warning(disable: 4244 4267 4146)
 
 OpenClaw::OpenClaw() { Requires(&Robot::collector); }
 

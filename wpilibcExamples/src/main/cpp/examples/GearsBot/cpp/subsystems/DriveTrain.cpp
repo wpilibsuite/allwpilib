@@ -11,7 +11,6 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 #include "commands/TankDriveWithJoystick.h"
-#pragma warning(disable: 4244 4267 4146)
 
 DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
 // Encoders may measure differently in the real world and in

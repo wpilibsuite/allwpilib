@@ -8,7 +8,6 @@
 #include <iostream>
 
 #include <HALSimDsNt.h>
-#pragma warning(disable: 4244 4267 4146)
 
 static HALSimDSNT dsnt;
 

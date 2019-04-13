@@ -8,7 +8,6 @@
 #include "Robot.h"
 
 #include <iostream>
-#pragma warning(disable: 4244 4267 4146)
 
 DriveTrain Robot::drivetrain;
 Elevator Robot::elevator;

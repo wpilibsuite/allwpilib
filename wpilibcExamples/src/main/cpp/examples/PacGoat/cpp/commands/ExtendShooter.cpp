@@ -8,7 +8,6 @@
 #include "commands/ExtendShooter.h"
 
 #include "Robot.h"
-#pragma warning(disable: 4244 4267 4146)
 
 ExtendShooter::ExtendShooter() : frc::TimedCommand(1.0) {
   Requires(&Robot::shooter);

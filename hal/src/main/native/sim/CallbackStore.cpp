@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "simulation/CallbackStore.h"
-#pragma warning(disable: 4244 4267 4146)
 
 void frc::sim::CallbackStoreThunk(const char* name, void* param,
                                   const HAL_Value* value) {

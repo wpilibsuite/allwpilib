@@ -11,7 +11,6 @@
 #include "PortsInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/RelayDataInternal.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace hal;
 

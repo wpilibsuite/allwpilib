@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#pragma warning(disable: 4244 4267 4146)
 
 static void uv__async_send(uv_loop_t* loop);
 static int uv__async_start(uv_loop_t* loop);

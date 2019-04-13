@@ -15,7 +15,6 @@
 #include <wpi/SmallVector.h>
 #include <wpi/UDPClient.h>
 #include <wpi/raw_ostream.h>
-#pragma warning(disable: 4244 4267 4146)
 
 static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
                        const char* msg) {

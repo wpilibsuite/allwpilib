@@ -9,7 +9,6 @@
 #include "frc/ADXL345_I2C.h"
 #include "gtest/gtest.h"
 #include "lowfisim/wpisimulators/ADXLThreeAxisAccelerometerSim.h"
-#pragma warning(disable: 4244 4267 4146)
 
 TEST(AccelerometerTests, TestADXL345_I2CAccelerometerWrapper) {
   const double EPSILON = 1 / 256.0;

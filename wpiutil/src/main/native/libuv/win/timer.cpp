@@ -26,7 +26,6 @@
 #include "internal.h"
 #include "uv/tree.h"
 #include "handle-inl.h"
-#pragma warning(disable: 4244 4267 4146)
 
 
 /* The number of milliseconds in one second. */

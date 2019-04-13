@@ -10,7 +10,6 @@
 #include <wpi/raw_ostream.h>
 
 #include "hal/HAL.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 const fpga_clock::time_point fpga_clock::min_time =

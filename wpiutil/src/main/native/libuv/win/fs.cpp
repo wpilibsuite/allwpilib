@@ -38,7 +38,6 @@
 #include "handle-inl.h"
 
 #include <wincrypt.h>
-#pragma warning(disable: 4244 4267 4146)
 
 #pragma comment(lib, "Advapi32.lib")
 

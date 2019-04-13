@@ -28,7 +28,6 @@
 #include <wpi/uv/Timer.h>
 #include <wpi/uv/Udp.h>
 #include <wpi/uv/util.h>
-#pragma warning(disable: 4244 4267 4146)
 
 #if defined(Win32) || defined(_WIN32)
 #pragma comment(lib, "Ws2_32.lib")

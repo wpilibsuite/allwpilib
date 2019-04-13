@@ -10,7 +10,6 @@
 #include "hal/HAL.h"
 #include "hal/handles/HandlesInternal.h"
 #include "mockdata/AnalogInData.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 

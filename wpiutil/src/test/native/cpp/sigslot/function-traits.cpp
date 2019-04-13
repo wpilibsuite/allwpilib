@@ -39,7 +39,6 @@ SOFTWARE.
 #include "gtest/gtest.h"  // NOLINT(build/include_order)
 
 #include <type_traits>
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi::sig::trait;
 

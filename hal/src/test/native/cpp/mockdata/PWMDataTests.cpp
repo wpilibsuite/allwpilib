@@ -10,7 +10,6 @@
 #include "hal/PWM.h"
 #include "hal/handles/HandlesInternal.h"
 #include "mockdata/PWMData.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 

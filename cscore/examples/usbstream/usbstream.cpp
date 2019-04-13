@@ -10,7 +10,6 @@
 #include <wpi/raw_ostream.h>
 
 #include "cscore.h"
-#pragma warning(disable: 4244 4267 4146)
 
 int main() {
   wpi::outs() << "hostname: " << cs::GetHostname() << '\n';

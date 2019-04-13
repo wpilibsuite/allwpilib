@@ -16,7 +16,6 @@
 #include <frc/shuffleboard/ShuffleboardTab.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
-#pragma warning(disable: 4244 4267 4146)
 
 /**
  * This sample program provides an example for ShuffleBoard, an alternative

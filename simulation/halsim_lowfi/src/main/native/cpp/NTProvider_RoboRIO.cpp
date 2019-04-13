@@ -9,7 +9,6 @@
 
 #include <hal/Ports.h>
 #include <mockdata/RoboRioData.h>
-#pragma warning(disable: 4244 4267 4146)
 
 void HALSimNTProviderRoboRIO::Initialize() {
   InitializeDefault(1, HALSIM_RegisterRoboRioAllCallbacks);

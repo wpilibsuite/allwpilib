@@ -9,7 +9,6 @@
 #include <thread>
 
 #include <hal/HAL.h>
-#pragma warning(disable: 4244 4267 4146)
 
 int main() {
   HAL_Initialize(500, 0);

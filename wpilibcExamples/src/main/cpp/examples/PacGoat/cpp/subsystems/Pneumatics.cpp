@@ -8,7 +8,6 @@
 #include "subsystems/Pneumatics.h"
 
 #include <frc/smartdashboard/SmartDashboard.h>
-#pragma warning(disable: 4244 4267 4146)
 
 Pneumatics::Pneumatics() : frc::Subsystem("Pneumatics") {
   AddChild("Pressure Sensor", m_pressureSensor);

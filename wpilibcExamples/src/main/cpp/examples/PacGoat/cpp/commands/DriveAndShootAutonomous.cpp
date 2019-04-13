@@ -14,7 +14,6 @@
 #include "commands/SetPivotSetpoint.h"
 #include "commands/Shoot.h"
 #include "commands/WaitForPressure.h"
-#pragma warning(disable: 4244 4267 4146)
 
 DriveAndShootAutonomous::DriveAndShootAutonomous() {
   AddSequential(new CloseClaw());

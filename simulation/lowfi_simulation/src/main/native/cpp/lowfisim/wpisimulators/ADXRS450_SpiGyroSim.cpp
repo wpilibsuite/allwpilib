@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "lowfisim/wpisimulators/ADXRS450_SpiGyroSim.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace frc {
 namespace sim {

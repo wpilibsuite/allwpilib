@@ -16,7 +16,6 @@
 #include <wpi/raw_ostream.h>
 
 #include "cameraserver/CameraServer.h"
-#pragma warning(disable: 4244 4267 4146)
 
 /*
    JSON format:

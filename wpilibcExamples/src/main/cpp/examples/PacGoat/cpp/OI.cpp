@@ -17,7 +17,6 @@
 #include "commands/Shoot.h"
 #include "subsystems/Collector.h"
 #include "subsystems/Pivot.h"
-#pragma warning(disable: 4244 4267 4146)
 
 OI::OI() {
   m_r1.WhenPressed(new LowGoal());

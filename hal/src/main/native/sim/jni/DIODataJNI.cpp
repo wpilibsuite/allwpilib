@@ -10,7 +10,6 @@
 #include "CallbackStore.h"
 #include "edu_wpi_first_hal_sim_mockdata_DIODataJNI.h"
 #include "mockdata/DIOData.h"
-#pragma warning(disable: 4244 4267 4146)
 
 extern "C" {
 

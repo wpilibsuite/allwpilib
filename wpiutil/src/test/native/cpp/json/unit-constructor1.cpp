@@ -44,7 +44,6 @@ SOFTWARE.
 #include <unordered_set>
 
 #include "unit-json.h"
-#pragma warning(disable: 4244 4267 4146)
 using wpi::json;
 using wpi::JsonTest;
 

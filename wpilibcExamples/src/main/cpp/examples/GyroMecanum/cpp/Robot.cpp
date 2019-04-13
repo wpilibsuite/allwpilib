@@ -10,7 +10,6 @@
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/MecanumDrive.h>
-#pragma warning(disable: 4244 4267 4146)
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to

@@ -21,7 +21,6 @@
 #include "wpi/FileSystem.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
-#pragma warning(disable: 4244 4267 4146)
 
 #if defined(_MSC_VER)
 #ifndef STDIN_FILENO

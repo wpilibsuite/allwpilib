@@ -8,7 +8,6 @@
 #include "drive_motor.h"
 
 #include <boost/algorithm/string/replace.hpp>
-#pragma warning(disable: 4244 4267 4146)
 
 GZ_REGISTER_MODEL_PLUGIN(DriveMotor)
 

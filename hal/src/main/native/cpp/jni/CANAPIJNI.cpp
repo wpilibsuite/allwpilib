@@ -19,7 +19,6 @@
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
 #include "hal/cpp/Log.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 using namespace wpi::java;

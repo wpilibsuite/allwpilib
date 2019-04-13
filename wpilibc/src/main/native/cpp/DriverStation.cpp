@@ -23,7 +23,6 @@
 #include "frc/Timer.h"
 #include "frc/Utility.h"
 #include "frc/WPIErrors.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace frc {
 

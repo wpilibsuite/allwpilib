@@ -10,7 +10,6 @@
 #include <wpi/MemAlloc.h>
 
 #include "Value_internal.h"
-#pragma warning(disable: 4244 4267 4146)
 
 extern "C" {
 struct NT_String* NT_GetStringForTesting(const char* string, int* struct_size) {

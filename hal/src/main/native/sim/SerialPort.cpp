@@ -8,7 +8,6 @@
 #include "hal/SerialPort.h"
 
 #include "HALInitializer.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 namespace init {

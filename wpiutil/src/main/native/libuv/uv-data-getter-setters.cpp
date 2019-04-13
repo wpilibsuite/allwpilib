@@ -1,5 +1,4 @@
 #include "uv.h"
-#pragma warning(disable: 4244 4267 4146)
 
 const char* uv_handle_type_name(uv_handle_type type) {
   switch (type) {

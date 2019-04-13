@@ -11,7 +11,6 @@
 #include "hal/HAL.h"
 #include "hal/Solenoid.h"
 #include "mockdata/DriverStationData.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 

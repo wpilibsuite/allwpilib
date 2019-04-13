@@ -830,5 +830,4 @@ ErrorOr<perms> getPermissions(const Twine &Path) {
 #include "Windows/Path.inc"
 #else
 #include "Unix/Path.inc"
-#pragma warning(disable: 4244 4267 4146)
 #endif

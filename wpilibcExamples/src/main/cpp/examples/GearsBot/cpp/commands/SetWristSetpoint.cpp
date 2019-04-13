@@ -8,7 +8,6 @@
 #include "commands/SetWristSetpoint.h"
 
 #include "Robot.h"
-#pragma warning(disable: 4244 4267 4146)
 
 SetWristSetpoint::SetWristSetpoint(double setpoint)
     : frc::Command("SetWristSetpoint") {

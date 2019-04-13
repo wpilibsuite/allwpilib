@@ -8,7 +8,6 @@
 #include <frc/Joystick.h>
 #include <frc/Relay.h>
 #include <frc/TimedRobot.h>
-#pragma warning(disable: 4244 4267 4146)
 
 /**
  * This is a sample program which uses joystick buttons to control a relay.

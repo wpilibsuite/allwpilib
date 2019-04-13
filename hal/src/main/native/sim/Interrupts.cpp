@@ -25,7 +25,6 @@
 #include "mockdata/AnalogInDataInternal.h"
 #include "mockdata/DIODataInternal.h"
 #include "mockdata/HAL_Value.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace hal;
 

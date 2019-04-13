@@ -16,7 +16,6 @@
 #include <exception>
 #else
 #include <chrono>
-#pragma warning(disable: 4244 4267 4146)
 #endif
 
 // offset in microseconds

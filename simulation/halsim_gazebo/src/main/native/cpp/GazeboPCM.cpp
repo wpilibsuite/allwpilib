@@ -14,7 +14,6 @@
 #include <mockdata/PCMData.h>
 
 #include "simulation/gz_msgs/msgs.h"
-#pragma warning(disable: 4244 4267 4146)
 
 static void init_callback(const char* name, void* param,
                           const struct HAL_Value* value) {

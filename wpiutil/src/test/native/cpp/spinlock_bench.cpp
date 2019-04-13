@@ -14,7 +14,6 @@
 
 #include "gtest/gtest.h"
 #include "wpi/mutex.h"
-#pragma warning(disable: 4244 4267 4146)
 
 static std::mutex std_mutex;
 static std::recursive_mutex std_recursive_mutex;

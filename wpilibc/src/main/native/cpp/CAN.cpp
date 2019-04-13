@@ -14,7 +14,6 @@
 #include <hal/Errors.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

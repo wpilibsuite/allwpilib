@@ -16,7 +16,6 @@
 #include <windows.h>
 #else
 #include <dlfcn.h>
-#pragma warning(disable: 4244 4267 4146)
 #endif
 
 #if defined(WIN32) || defined(_WIN32)

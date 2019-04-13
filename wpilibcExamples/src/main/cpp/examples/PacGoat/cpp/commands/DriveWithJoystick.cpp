@@ -8,7 +8,6 @@
 #include "commands/DriveWithJoystick.h"
 
 #include "Robot.h"
-#pragma warning(disable: 4244 4267 4146)
 
 DriveWithJoystick::DriveWithJoystick() { Requires(&Robot::drivetrain); }
 

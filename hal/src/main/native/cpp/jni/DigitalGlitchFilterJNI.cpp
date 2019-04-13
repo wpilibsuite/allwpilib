@@ -10,7 +10,6 @@
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_DigitalGlitchFilterJNI.h"
 #include "hal/DIO.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

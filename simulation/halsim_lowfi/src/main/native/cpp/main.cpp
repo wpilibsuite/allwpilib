@@ -16,7 +16,6 @@
 #include <NTProvider_Relay.h>
 #include <NTProvider_RoboRIO.h>
 #include <NTProvider_dPWM.h>
-#pragma warning(disable: 4244 4267 4146)
 
 static HALSimLowFi halsim_lowfi;
 

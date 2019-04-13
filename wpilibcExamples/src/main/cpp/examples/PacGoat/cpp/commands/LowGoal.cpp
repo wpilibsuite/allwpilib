@@ -11,7 +11,6 @@
 #include "commands/ExtendShooter.h"
 #include "commands/SetCollectionSpeed.h"
 #include "commands/SetPivotSetpoint.h"
-#pragma warning(disable: 4244 4267 4146)
 
 LowGoal::LowGoal() {
   AddSequential(new SetPivotSetpoint(Pivot::kLowGoal));

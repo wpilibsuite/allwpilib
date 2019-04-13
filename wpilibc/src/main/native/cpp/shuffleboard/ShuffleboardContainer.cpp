@@ -15,7 +15,6 @@
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 #include "frc/shuffleboard/ShuffleboardLayout.h"
 #include "frc/shuffleboard/SimpleWidget.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

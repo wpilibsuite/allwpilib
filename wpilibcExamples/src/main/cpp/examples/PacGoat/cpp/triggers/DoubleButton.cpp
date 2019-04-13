@@ -8,7 +8,6 @@
 #include "triggers/DoubleButton.h"
 
 #include <frc/Joystick.h>
-#pragma warning(disable: 4244 4267 4146)
 
 DoubleButton::DoubleButton(frc::Joystick* joy, int button1, int button2)
     : m_joy(*joy) {

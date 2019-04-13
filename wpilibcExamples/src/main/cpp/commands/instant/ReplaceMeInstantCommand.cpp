@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ReplaceMeInstantCommand.h"
-#pragma warning(disable: 4244 4267 4146)
 
 ReplaceMeInstantCommand::ReplaceMeInstantCommand() {
   // Use Requires() here to declare subsystem dependencies

@@ -31,7 +31,6 @@
 #include "gtest/gtest.h"  // NOLINT(build/include_order)
 
 #include "wpi/uv/Loop.h"
-#pragma warning(disable: 4244 4267 4146)
 
 #define CONCURRENT_COUNT 10
 

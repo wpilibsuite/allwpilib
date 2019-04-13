@@ -8,7 +8,6 @@
 #include "commands/ExampleCommand.h"
 
 #include "Robot.h"
-#pragma warning(disable: 4244 4267 4146)
 
 ExampleCommand::ExampleCommand() {
   // Use Requires() here to declare subsystem dependencies

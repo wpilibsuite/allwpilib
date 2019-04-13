@@ -11,7 +11,6 @@
 #include "TestPrinters.h"
 #include "gtest/gtest.h"
 #include "ntcore_cpp.h"
-#pragma warning(disable: 4244 4267 4146)
 
 class ConnectionListenerTest : public ::testing::Test {
  public:

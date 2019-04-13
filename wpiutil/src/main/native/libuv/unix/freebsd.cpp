@@ -35,7 +35,6 @@
 #include <stdlib.h>
 #include <unistd.h> /* sysconf */
 #include <fcntl.h>
-#pragma warning(disable: 4244 4267 4146)
 
 #ifndef CPUSTATES
 # define CPUSTATES 5U

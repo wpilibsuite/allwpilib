@@ -10,7 +10,6 @@
 #include "hal/PDP.h"
 #include "hal/handles/HandlesInternal.h"
 #include "mockdata/PDPData.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 

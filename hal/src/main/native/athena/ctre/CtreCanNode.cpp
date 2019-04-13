@@ -3,7 +3,6 @@
 #include "CtreCanNode.h"
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include <string.h> // memset
-#pragma warning(disable: 4244 4267 4146)
 
 static const UINT32 kFullMessageIDMask = 0x1fffffff;
 

@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HALSimDsNt.h"
-#pragma warning(disable: 4244 4267 4146)
 
 void HALSimDSNT::Initialize() {
   rootTable =

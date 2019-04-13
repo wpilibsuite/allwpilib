@@ -21,7 +21,6 @@
 
 #include "uv.h"
 #include "internal.h"
-#pragma warning(disable: 4244 4267 4146)
 
 #define UV_LOOP_WATCHER_DEFINE(name, type)                                    \
   int uv_##name##_init(uv_loop_t* loop, uv_##name##_t* handle) {              \

@@ -12,7 +12,6 @@
 #include "hal/AnalogTrigger.h"
 #include "hal/HAL.h"
 #include "hal/Ports.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 

@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ReplaceMeCommandGroup.h"
-#pragma warning(disable: 4244 4267 4146)
 
 ReplaceMeCommandGroup::ReplaceMeCommandGroup() {
   // Add Commands here:

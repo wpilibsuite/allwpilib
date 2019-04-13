@@ -8,7 +8,6 @@
 #include "ADXRS450_SpiGyroWrapperData.h"
 #include "frc/ADXRS450_Gyro.h"
 #include "gtest/gtest.h"
-#pragma warning(disable: 4244 4267 4146)
 
 class ADXRS450_SpiGyroWrapperTest
     : public ::testing::TestWithParam<frc::SPI::Port> {};

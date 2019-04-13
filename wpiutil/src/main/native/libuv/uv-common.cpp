@@ -29,7 +29,6 @@
 #include <stdio.h>
 #include <stdlib.h> /* malloc */
 #include <string.h> /* memset */
-#pragma warning(disable: 4244 4267 4146)
 
 #if defined(_WIN32)
 # include <malloc.h> /* malloc */

@@ -9,7 +9,6 @@
 
 #include <hal/Ports.h>
 #include <mockdata/DIOData.h>
-#pragma warning(disable: 4244 4267 4146)
 
 void HALSimNTProviderDIO::Initialize() {
   InitializeDefault(HAL_GetNumDigitalChannels(),

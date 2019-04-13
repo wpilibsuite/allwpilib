@@ -16,7 +16,6 @@
 #include "hal/handles/LimitedHandleResource.h"
 #include "mockdata/AnalogInDataInternal.h"
 #include "mockdata/AnalogTriggerDataInternal.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace {
 struct AnalogTrigger {

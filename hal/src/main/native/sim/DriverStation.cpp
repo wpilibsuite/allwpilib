@@ -22,7 +22,6 @@
 #include "HALInitializer.h"
 #include "mockdata/DriverStationDataInternal.h"
 #include "mockdata/MockHooks.h"
-#pragma warning(disable: 4244 4267 4146)
 
 static wpi::mutex msgMutex;
 static wpi::condition_variable* newDSDataAvailableCond;

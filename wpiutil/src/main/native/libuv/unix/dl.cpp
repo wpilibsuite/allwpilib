@@ -26,7 +26,6 @@
 #include <errno.h>
 #include <string.h>
 #include <locale.h>
-#pragma warning(disable: 4244 4267 4146)
 
 static int uv__dlerror(uv_lib_t* lib);
 

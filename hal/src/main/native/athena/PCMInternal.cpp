@@ -11,7 +11,6 @@
 #include "PortsInternal.h"
 #include "hal/Errors.h"
 #include "hal/Solenoid.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 

@@ -15,7 +15,6 @@
 
 #include "frc/Base.h"
 #include "gtest/gtest.h"
-#pragma warning(disable: 4244 4267 4146)
 
 /* Filter constants */
 static constexpr double kFilterStep = 0.005;

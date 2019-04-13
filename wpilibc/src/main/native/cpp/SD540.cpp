@@ -8,7 +8,6 @@
 #include "frc/SD540.h"
 
 #include <hal/HAL.h>
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

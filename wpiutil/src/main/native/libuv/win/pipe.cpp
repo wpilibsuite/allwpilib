@@ -36,7 +36,6 @@
 
 #include <aclapi.h>
 #include <accctrl.h>
-#pragma warning(disable: 4244 4267 4146)
 
 /* A zero-size buffer for use by uv_pipe_read */
 static char uv_zero_[] = "";

@@ -34,7 +34,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#pragma warning(disable: 4244 4267 4146)
 
 
 static uv_mutex_t process_title_mutex;

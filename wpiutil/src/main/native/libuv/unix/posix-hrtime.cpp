@@ -24,7 +24,6 @@
 
 #include <stdint.h>
 #include <time.h>
-#pragma warning(disable: 4244 4267 4146)
 
 #undef NANOSEC
 #define NANOSEC ((uint64_t) 1e9)

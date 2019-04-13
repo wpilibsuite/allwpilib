@@ -14,7 +14,6 @@
 #include <gazebo/transport/transport.hh>
 
 #include "gtest/gtest.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace testing;
 

@@ -8,7 +8,6 @@
 #include "subsystems/Wrist.h"
 
 #include <frc/smartdashboard/SmartDashboard.h>
-#pragma warning(disable: 4244 4267 4146)
 
 Wrist::Wrist() : frc::PIDSubsystem("Wrist", kP_real, 0.0, 0.0) {
 #ifdef SIMULATION  // Check for simulation and update PID values

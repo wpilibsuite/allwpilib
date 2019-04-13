@@ -12,7 +12,6 @@
 #include "lowfisim/motormodel/SimpleMotorModel.h"
 #include "lowfisim/wpisimulators/WpiEncoderSim.h"
 #include "lowfisim/wpisimulators/WpiMotorSim.h"
-#pragma warning(disable: 4244 4267 4146)
 
 TEST(MotorEncoderConnectorTest, TestWithoutDistancePerPulseFullSpeed) {
   frc::sim::lowfi::SimpleMotorModel motorModelSim(6000);

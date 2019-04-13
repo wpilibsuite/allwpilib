@@ -21,7 +21,6 @@
 
 #include "uv.h"
 #include "internal.h"
-#pragma warning(disable: 4244 4267 4146)
 
 static int uv__dlerror(uv_lib_t* lib, const char* filename, DWORD errorno);
 

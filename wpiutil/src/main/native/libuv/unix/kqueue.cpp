@@ -33,7 +33,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <time.h>
-#pragma warning(disable: 4244 4267 4146)
 
 /*
  * Required on

@@ -16,7 +16,6 @@
 #include "wpi/Compiler.h"
 #include "wpi/MathExtras.h"
 #include <cassert>
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi;
 

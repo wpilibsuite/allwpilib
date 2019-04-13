@@ -41,7 +41,6 @@ SOFTWARE.
 #include <array>
 #include <atomic>
 #include <thread>
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi::sig;
 

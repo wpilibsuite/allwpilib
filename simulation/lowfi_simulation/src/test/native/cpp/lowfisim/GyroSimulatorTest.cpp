@@ -11,7 +11,6 @@
 #include "gtest/gtest.h"
 #include "lowfisim/wpisimulators/ADXRS450_SpiGyroSim.h"
 #include "lowfisim/wpisimulators/WpiAnalogGyroSim.h"
-#pragma warning(disable: 4244 4267 4146)
 
 void TestGyro(frc::sim::lowfi::GyroSim& sim, frc::Gyro& gyro) {
   const double EPSILON = .00001;

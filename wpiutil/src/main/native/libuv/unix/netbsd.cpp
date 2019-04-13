@@ -39,7 +39,6 @@
 
 #include <unistd.h>
 #include <time.h>
-#pragma warning(disable: 4244 4267 4146)
 
 static uv_mutex_t process_title_mutex;
 static uv_once_t process_title_mutex_once = UV_ONCE_INIT;

@@ -13,7 +13,6 @@
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/AnalogOutDataInternal.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace hal;
 

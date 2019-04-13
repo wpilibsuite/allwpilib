@@ -12,7 +12,6 @@
 #include "commands/OpenClaw.h"
 #include "commands/SetCollectionSpeed.h"
 #include "commands/WaitForPressure.h"
-#pragma warning(disable: 4244 4267 4146)
 
 Shoot::Shoot() {
   AddSequential(new WaitForPressure());

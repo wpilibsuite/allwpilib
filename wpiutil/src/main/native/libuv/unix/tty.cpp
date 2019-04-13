@@ -29,7 +29,6 @@
 #include <termios.h>
 #include <errno.h>
 #include <sys/ioctl.h>
-#pragma warning(disable: 4244 4267 4146)
 
 #if defined(__MVS__) && !defined(IMAXBEL)
 #define IMAXBEL 0

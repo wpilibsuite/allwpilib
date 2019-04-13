@@ -10,7 +10,6 @@
 #include <networktables/NetworkTableInstance.h>
 
 #include "frc/shuffleboard/ShuffleboardTab.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

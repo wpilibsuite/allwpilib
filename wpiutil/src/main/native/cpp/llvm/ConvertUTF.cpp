@@ -51,7 +51,6 @@
 #include <stdio.h>
 #endif
 #include <assert.h>
-#pragma warning(disable: 4244 4267 4146)
 
 /*
  * This code extensively uses fall-through switches.

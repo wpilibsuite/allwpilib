@@ -16,7 +16,6 @@
 
 #include "../visa/visa.h"
 #include "hal/Errors.h"
-#pragma warning(disable: 4244 4267 4146)
 
 constexpr const char* OnboardResourceVISA = "ASRL1::INSTR";
 constexpr const char* MxpResourceVISA = "ASRL2::INSTR";

@@ -9,7 +9,6 @@
 
 #include <hal/Ports.h>
 #include <mockdata/EncoderData.h>
-#pragma warning(disable: 4244 4267 4146)
 
 void HALSimNTProviderEncoder::Initialize() {
   InitializeDefault(HAL_GetNumEncoders(), HALSIM_RegisterEncoderAllCallbacks);

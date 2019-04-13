@@ -1,7 +1,6 @@
 #include "uv.h"
 #include "internal.h"
 #include "winapi.h"
-#pragma warning(disable: 4244 4267 4146)
 
 static void uv__register_system_resume_callback(void);
 

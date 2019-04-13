@@ -7,7 +7,6 @@
 
 #include "gtest/gtest.h"
 #include "lowfisim/motormodel/SimpleMotorModel.h"
-#pragma warning(disable: 4244 4267 4146)
 
 TEST(SimpleMotorModelSimulationTest, TestSimpleModel) {
   frc::sim::lowfi::SimpleMotorModel motorModelSim(200);

@@ -26,7 +26,6 @@
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h>
-#pragma warning(disable: 4244 4267 4146)
 
 
 static int new_socket(uv_tcp_t* handle, int domain, unsigned long flags) {

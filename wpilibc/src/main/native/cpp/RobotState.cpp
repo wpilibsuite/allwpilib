@@ -8,7 +8,6 @@
 #include "frc/RobotState.h"
 
 #include "frc/DriverStation.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

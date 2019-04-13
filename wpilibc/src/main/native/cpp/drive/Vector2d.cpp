@@ -8,7 +8,6 @@
 #include "frc/drive/Vector2d.h"
 
 #include <cmath>
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace frc;
 

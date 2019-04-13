@@ -8,7 +8,6 @@
 #include <frc/PowerDistributionPanel.h>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#pragma warning(disable: 4244 4267 4146)
 
 /**
  * This is a sample program showing how to retrieve information from the Power

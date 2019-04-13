@@ -9,7 +9,6 @@
 
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#pragma warning(disable: 4244 4267 4146)
 
 ReplaceMePIDSubsystem::ReplaceMePIDSubsystem()
     : PIDSubsystem("ReplaceMePIDSubsystem", 1.0, 0.0, 0.0) {

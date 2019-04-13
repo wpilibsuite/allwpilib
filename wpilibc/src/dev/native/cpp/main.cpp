@@ -10,7 +10,6 @@
 #include <hal/HAL.h>
 
 #include "WPILibVersion.h"
-#pragma warning(disable: 4244 4267 4146)
 
 int main() {
   std::cout << "Hello World" << std::endl;

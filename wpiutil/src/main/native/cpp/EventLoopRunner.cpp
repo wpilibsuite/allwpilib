@@ -12,7 +12,6 @@
 #include "wpi/mutex.h"
 #include "wpi/uv/AsyncFunction.h"
 #include "wpi/uv/Loop.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi;
 

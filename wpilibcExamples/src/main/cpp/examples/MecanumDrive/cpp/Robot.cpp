@@ -9,7 +9,6 @@
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/MecanumDrive.h>
-#pragma warning(disable: 4244 4267 4146)
 
 /**
  * This is a demo program showing how to use Mecanum control with the

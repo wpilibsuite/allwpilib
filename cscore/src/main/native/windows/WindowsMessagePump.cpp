@@ -17,7 +17,6 @@
 #include <memory>
 
 #include <Dbt.h>
-#pragma warning(disable: 4244 4267 4146)
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")

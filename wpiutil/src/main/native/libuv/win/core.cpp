@@ -34,7 +34,6 @@
 #include "queue.h"
 #include "handle-inl.h"
 #include "req-inl.h"
-#pragma warning(disable: 4244 4267 4146)
 
 /* uv_once initialization guards */
 static uv_once_t uv_init_guard_ = UV_ONCE_INIT;

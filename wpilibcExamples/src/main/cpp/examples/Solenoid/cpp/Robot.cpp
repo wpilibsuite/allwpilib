@@ -9,7 +9,6 @@
 #include <frc/Joystick.h>
 #include <frc/Solenoid.h>
 #include <frc/TimedRobot.h>
-#pragma warning(disable: 4244 4267 4146)
 
 /**
  * This is a sample program showing the use of the solenoid classes during

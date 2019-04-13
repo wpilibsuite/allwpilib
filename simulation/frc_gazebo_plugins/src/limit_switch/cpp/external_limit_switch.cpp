@@ -8,7 +8,6 @@
 #include "external_limit_switch.h"
 
 #include <string>
-#pragma warning(disable: 4244 4267 4146)
 
 ExternalLimitSwitch::ExternalLimitSwitch(sdf::ElementPtr sdf) {
   sensor = std::dynamic_pointer_cast<gazebo::sensors::ContactSensor>(

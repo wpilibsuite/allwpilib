@@ -54,7 +54,6 @@
 #include <limits.h>
 #include <strings.h>
 #include <sys/vnode.h>
-#pragma warning(disable: 4244 4267 4146)
 
 uint64_t uv_get_free_memory(void) {
   return (uint64_t) sysconf(_SC_PAGESIZE) * sysconf(_SC_AVPHYS_PAGES);

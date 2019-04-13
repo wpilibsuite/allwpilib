@@ -8,7 +8,6 @@
 #include "EntryNotifier.h"
 
 #include "Log.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace nt;
 

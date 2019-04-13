@@ -15,7 +15,6 @@
 
 #include <wpi/MathExtras.h>
 #include <wpi/leb128.h>
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace nt;
 

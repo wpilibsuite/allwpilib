@@ -11,7 +11,6 @@
 #include <wpi/Path.h>
 
 #include "frc/RobotBase.h"
-#pragma warning(disable: 4244 4267 4146)
 
 void frc::filesystem::GetLaunchDirectory(wpi::SmallVectorImpl<char>& result) {
   wpi::sys::fs::current_path(result);

@@ -8,7 +8,6 @@
 #include "commands/TankDriveWithJoystick.h"
 
 #include "Robot.h"
-#pragma warning(disable: 4244 4267 4146)
 
 TankDriveWithJoystick::TankDriveWithJoystick()
     : frc::Command("TankDriveWithJoystick") {

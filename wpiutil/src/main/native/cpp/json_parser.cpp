@@ -42,7 +42,6 @@ SOFTWARE.
 #include "wpi/SmallString.h"
 #include "wpi/raw_istream.h"
 #include "wpi/raw_ostream.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace wpi {
 

@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "GazeboNode.h"
-#pragma warning(disable: 4244 4267 4146)
 
 bool GazeboNode::Connect() {
   bool success = gazebo::client::setup();

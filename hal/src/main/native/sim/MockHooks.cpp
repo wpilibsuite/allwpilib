@@ -13,7 +13,6 @@
 #include <wpi/timestamp.h>
 
 #include "MockHooksInternal.h"
-#pragma warning(disable: 4244 4267 4146)
 
 static std::atomic<bool> programStarted{false};
 

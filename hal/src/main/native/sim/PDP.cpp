@@ -13,7 +13,6 @@
 #include "hal/CANAPI.h"
 #include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/PDPDataInternal.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace hal;
 

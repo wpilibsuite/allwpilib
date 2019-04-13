@@ -21,7 +21,6 @@
 #include "hal/HAL.h"
 #include "hal/Ports.h"
 #include "hal/cpp/UnsafeDIO.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace hal {
 

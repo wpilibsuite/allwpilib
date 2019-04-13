@@ -14,7 +14,6 @@
 #include "CallbackStore.h"
 #include "edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI.h"
 #include "mockdata/DriverStationData.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace wpi::java;
 

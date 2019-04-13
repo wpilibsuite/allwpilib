@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "subsystems/Shooter.h"
-#pragma warning(disable: 4244 4267 4146)
 
 Shooter::Shooter() : Subsystem("Shooter") {
   // Put everything to the LiveWindow for testing.

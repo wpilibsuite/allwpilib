@@ -26,7 +26,6 @@
 
 #include "gtest/gtest.h"
 #include "wpi/sha1.h"
-#pragma warning(disable: 4244 4267 4146)
 
 namespace wpi {
 

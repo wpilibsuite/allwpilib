@@ -12,7 +12,6 @@
 #include <wpi/raw_ostream.h>
 
 #include "UsbUtil.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace cs;
 

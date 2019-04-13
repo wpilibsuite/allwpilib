@@ -13,7 +13,6 @@
 #include "ctre/PCM.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
-#pragma warning(disable: 4244 4267 4146)
 
 using namespace hal;
 
