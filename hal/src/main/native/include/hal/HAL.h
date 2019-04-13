@@ -37,6 +37,7 @@
 #include "hal/SPI.h"
 #include "hal/SerialPort.h"
 #include "hal/Solenoid.h"
+#include "hal/Threads.h"
 
 #endif  // HAL_USE_LABVIEW
 
