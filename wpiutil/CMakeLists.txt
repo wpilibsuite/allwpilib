@@ -124,13 +124,14 @@ if (NOT WITHOUT_JAVA AND MSVC)
     install(TARGETS wpiutil RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
 endif()
 
-if (MSVC)
+if (MSVC OR FLAT_INSTALL_WPILIB)
     set (wpiutil_config_dir ${wpilib_dest})
 else()
     set (wpiutil_config_dir share/wpiutil)
 endif()
 
-install(FILES wpiutil-config.cmake DESTINATION ${wpiutil_config_dir})
+configure_file(wpiutil-config.cmake.in ${CMAKE_BINARY_DIR}/wpiutil-config.cmake )
+install(FILES ${CMAKE_BINARY_DIR}/wpiutil-config.cmake DESTINATION ${wpiutil_config_dir})
 install(EXPORT wpiutil DESTINATION ${wpiutil_config_dir})
 
 SUBDIR_LIST(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")

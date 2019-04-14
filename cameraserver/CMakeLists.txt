@@ -43,13 +43,14 @@ if (NOT WITHOUT_JAVA AND MSVC)
     install(TARGETS cameraserver RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
 endif()
 
-if (MSVC)
+if (MSVC OR FLAT_INSTALL_WPILIB)
     set (cameraserver_config_dir ${wpilib_dest})
 else()
     set (cameraserver_config_dir share/cameraserver)
 endif()
 
-install(FILES cameraserver-config.cmake DESTINATION ${cameraserver_config_dir})
+configure_file(cameraserver-config.cmake.in ${CMAKE_BINARY_DIR}/cameraserver-config.cmake )
+install(FILES ${CMAKE_BINARY_DIR}/cameraserver-config.cmake DESTINATION ${cameraserver_config_dir})
 install(EXPORT cameraserver DESTINATION ${cameraserver_config_dir})
 
 file(GLOB multiCameraServer_src multiCameraServer/src/main/native/cpp/*.cpp)
