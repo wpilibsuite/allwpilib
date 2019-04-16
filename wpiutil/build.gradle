@@ -138,12 +138,6 @@ cppHeadersZip {
     }
 }
 
-        // it.component.sources.each {
-        //     it.exportedHeaders {
-        //         srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
-        //     }
-        // }
-
 model {
     components {
         all {

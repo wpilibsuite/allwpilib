@@ -6,4 +6,3 @@ include(CMakeFindDependencyMacro)
 find_dependency(OpenCV)
 
 include(${SELF_DIR}/cameraserver.cmake)
-
