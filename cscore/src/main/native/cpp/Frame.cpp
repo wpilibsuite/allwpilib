@@ -361,7 +361,7 @@ Image* Frame::ConvertBGRToGray(Image* image) {
 }
 
 Image* Frame::ConvertGrayToBGR(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kBGR) return nullptr;
+  if (!image || image->pixelFormat != VideoMode::kGray) return nullptr;
 
   // Allocate a BGR image
   auto newImage =
