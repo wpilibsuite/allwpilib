@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_CVSOURCEIMPL_H_
-#define CSCORE_CVSOURCEIMPL_H_
+#ifndef CSCORE_RAWSOURCEIMPL_H_
+#define CSCORE_RAWSOURCEIMPL_H_
 
 #include <atomic>
 #include <functional>
@@ -14,7 +14,6 @@
 #include <string>
 #include <vector>
 
-#include <opencv2/core/core.hpp>
 #include <wpi/ArrayRef.h>
 #include <wpi/Twine.h>
 
@@ -23,14 +22,14 @@
 
 namespace cs {
 
-class CvSourceImpl : public ConfigurableSourceImpl {
+class RawSourceImpl : public ConfigurableSourceImpl {
  public:
-  CvSourceImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
-               Telemetry& telemetry, const VideoMode& mode);
-  ~CvSourceImpl() override;
+  RawSourceImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+                Telemetry& telemetry, const VideoMode& mode);
+  ~RawSourceImpl() override;
 
-  // OpenCV-specific functions
-  void PutFrame(cv::Mat& image);
+  // Raw-specific functions
+  void PutFrame(const CS_RawFrame& image);
 
  private:
   std::atomic_bool m_connected{true};
@@ -38,4 +37,4 @@ class CvSourceImpl : public ConfigurableSourceImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_CVSOURCEIMPL_H_
+#endif  // CSCORE_RAWSOURCEIMPL_H_

@@ -7,6 +7,51 @@
 
 #include <iostream>
 
+#include <opencv/cv.hpp>
+
 #include "cscore.h"
 
-int main() { std::cout << cs::GetHostname() << std::endl; }
+using namespace cv;
+
+int main() {
+  CS_Status status = 0;
+
+  auto usbSource = CS_CreateUsbCameraDev("Camera", 0, &status);
+
+  auto sinkHandle = CS_CreateRawSink("RawSink", &status);
+
+  CS_VideoMode videoMode;
+  videoMode.fps = 30;
+  videoMode.width = 640;
+  videoMode.height = 360;
+  videoMode.pixelFormat = CS_PixelFormat::CS_PIXFMT_GRAY;
+
+  auto sourceHandle = CS_CreateRawSource("RawSource", &videoMode, &status);
+
+  auto mjpegHandle = CS_CreateMjpegServer("Server", "", 1181, &status);
+
+  CS_SetSinkSource(mjpegHandle, sourceHandle, &status);
+
+  CS_SetSinkSource(sinkHandle, usbSource, &status);
+
+  namedWindow("window", WINDOW_AUTOSIZE);
+
+  auto frame = CS_AllocateRawFrame();
+  frame->pixelFormat = CS_PixelFormat::CS_PIXFMT_BGR;
+
+  while (true) {
+    auto timeout =
+        CS_GrabRawSinkFrameTimeout(sinkHandle, frame, 0.225, &status);
+
+    if (timeout > 0) {
+      CS_PutRawSourceFrame(sourceHandle, frame, &status);
+
+      cv::Mat mat{frame->height, frame->width, CV_8UC3, frame->data};
+      imshow("window", mat);
+      waitKey(1);
+    }
+    std::cout << timeout << std::endl;
+  }
+
+  std::cout << cs::GetHostname() << std::endl;
+}

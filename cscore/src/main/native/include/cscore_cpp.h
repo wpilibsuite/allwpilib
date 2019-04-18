@@ -287,6 +287,8 @@ std::vector<std::string> GetHttpCameraUrls(CS_Source source, CS_Status* status);
  * @{
  */
 void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status);
+void PutSourceFrame(CS_Source source, const CS_RawFrame& image,
+                    CS_Status* status);
 void NotifySourceError(CS_Source source, const wpi::Twine& msg,
                        CS_Status* status);
 void SetSourceConnected(CS_Source source, bool connected, CS_Status* status);
@@ -312,6 +314,11 @@ CS_Sink CreateCvSink(const wpi::Twine& name, CS_Status* status);
 CS_Sink CreateCvSinkCallback(const wpi::Twine& name,
                              std::function<void(uint64_t time)> processFrame,
                              CS_Status* status);
+
+CS_Sink CreateRawSink(const wpi::Twine& name, CS_Status* status);
+CS_Sink CreateRawSinkCallback(const wpi::Twine& name,
+                              std::function<void(uint64_t time)> processFrame,
+                              CS_Status* status);
 /** @} */
 
 /**
@@ -359,6 +366,9 @@ void SetSinkDescription(CS_Sink sink, const wpi::Twine& description,
 uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status);
 uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
                               CS_Status* status);
+uint64_t GrabRawSinkFrame(CS_Sink sink, CS_RawFrame& image, CS_Status* status);
+uint64_t GrabRawSinkFrameTimeout(CS_Sink sink, CS_RawFrame& image,
+                                 double timeout, CS_Status* status);
 std::string GetSinkError(CS_Sink sink, CS_Status* status);
 wpi::StringRef GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                             CS_Status* status);

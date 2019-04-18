@@ -138,10 +138,16 @@ CS_Sink CreateCvSinkCallback(const wpi::Twine& name,
                                                inst.telemetry, processFrame));
 }
 
+static constexpr unsigned SinkMask = 0xFFFFFFFC;
+static_assert((SinkMask & CS_SINK_MJPEG) == 0, "MJPEG must not be masked");
+static_assert((SinkMask & CS_SINK_UNKNOWN) == 0, "Unknown must not be masked");
+static_assert((SinkMask & CS_SINK_CV) != 0, "CV must be masked");
+static_assert((SinkMask & CS_SINK_RAW) != 0, "RAW must be masked");
+
 void SetSinkDescription(CS_Sink sink, const wpi::Twine& description,
                         CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || data->kind != CS_SINK_CV) {
+  if (!data || (data->kind & SinkMask) == 0) {
     *status = CS_INVALID_HANDLE;
     return;
   }
@@ -169,7 +175,7 @@ uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
 
 std::string GetSinkError(CS_Sink sink, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || data->kind != CS_SINK_CV) {
+  if (!data || (data->kind & SinkMask) == 0) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
   }
@@ -179,7 +185,7 @@ std::string GetSinkError(CS_Sink sink, CS_Status* status) {
 wpi::StringRef GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                             CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || data->kind != CS_SINK_CV) {
+  if (!data || (data->kind & SinkMask) == 0) {
     *status = CS_INVALID_HANDLE;
     return wpi::StringRef{};
   }
@@ -188,7 +194,7 @@ wpi::StringRef GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
 
 void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || data->kind != CS_SINK_CV) {
+  if (!data || (data->kind & SinkMask) == 0) {
     *status = CS_INVALID_HANDLE;
     return;
   }

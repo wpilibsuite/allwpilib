@@ -110,6 +110,15 @@ typedef struct CS_VideoMode {
   int fps;
 } CS_VideoMode;
 
+typedef struct CS_RawFrame {
+  char* data;
+  int dataLength;
+  int pixelFormat;
+  int width;
+  int height;
+  int totalData;
+} CS_RawFrame;
+
 /**
  * Property kinds
  */
@@ -128,7 +137,8 @@ enum CS_SourceKind {
   CS_SOURCE_UNKNOWN = 0,
   CS_SOURCE_USB = 1,
   CS_SOURCE_HTTP = 2,
-  CS_SOURCE_CV = 4
+  CS_SOURCE_CV = 4,
+  CS_SOURCE_RAW = 8,
 };
 
 /**
@@ -144,7 +154,12 @@ enum CS_HttpCameraKind {
 /**
  * Sink kinds
  */
-enum CS_SinkKind { CS_SINK_UNKNOWN = 0, CS_SINK_MJPEG = 2, CS_SINK_CV = 4 };
+enum CS_SinkKind {
+  CS_SINK_UNKNOWN = 0,
+  CS_SINK_MJPEG = 2,
+  CS_SINK_CV = 4,
+  CS_SINK_RAW = 8
+};
 
 /**
  * Listener event kinds
@@ -268,6 +283,9 @@ CS_Source CS_CreateHttpCameraMulti(const char* name, const char** urls,
                                    CS_Status* status);
 CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
                             CS_Status* status);
+
+CS_Source CS_CreateRawSource(const char* name, const CS_VideoMode* mode,
+                             CS_Status* status);
 /** @} */
 
 /**
@@ -353,6 +371,8 @@ char** CS_GetHttpCameraUrls(CS_Source source, int* count, CS_Status* status);
  */
 void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
                        CS_Status* status);
+void CS_PutRawSourceFrame(CS_Source source, const struct CS_RawFrame* image,
+                          CS_Status* status);
 void CS_NotifySourceError(CS_Source source, const char* msg, CS_Status* status);
 void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
                            CS_Status* status);
@@ -377,6 +397,13 @@ CS_Sink CS_CreateCvSink(const char* name, CS_Status* status);
 CS_Sink CS_CreateCvSinkCallback(const char* name, void* data,
                                 void (*processFrame)(void* data, uint64_t time),
                                 CS_Status* status);
+
+CS_Sink CS_CreateRawSink(const char* name, CS_Status* status);
+
+CS_Sink CS_CreateRawSinkCallback(const char* name, void* data,
+                                 void (*processFrame)(void* data,
+                                                      uint64_t time),
+                                 CS_Status* status);
 /** @} */
 
 /**
@@ -418,6 +445,10 @@ void CS_SetSinkDescription(CS_Sink sink, const char* description,
 uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image, CS_Status* status);
 uint64_t CS_GrabSinkFrameTimeout(CS_Sink sink, struct CvMat* image,
                                  double timeout, CS_Status* status);
+uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct CS_RawFrame* rawImage,
+                             CS_Status* status);
+uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct CS_RawFrame* rawImage,
+                                    double timeout, CS_Status* status);
 char* CS_GetSinkError(CS_Sink sink, CS_Status* status);
 void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status);
 /** @} */
@@ -470,6 +501,10 @@ void CS_Shutdown(void);
  * @defgroup cscore_utility_cfunc Utility Functions
  * @{
  */
+
+CS_RawFrame* CS_AllocateRawFrame(void);
+void CS_AllocateRawFrameData(CS_RawFrame* frame, int requestedSize);
+void CS_FreeRawFrame(CS_RawFrame* frame);
 
 CS_UsbCameraInfo* CS_EnumerateUsbCameras(int* count, CS_Status* status);
 void CS_FreeEnumeratedUsbCameras(CS_UsbCameraInfo* cameras, int count);
