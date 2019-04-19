@@ -19,6 +19,7 @@
 
 #include "Frame.h"
 #include "SinkImpl.h"
+#include "cscore_raw.h"
 
 namespace cs {
 class SourceImpl;

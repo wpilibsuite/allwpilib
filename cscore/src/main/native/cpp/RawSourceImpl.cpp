@@ -13,6 +13,7 @@
 #include "Instance.h"
 #include "Log.h"
 #include "Notifier.h"
+#include "cscore_raw.h"
 
 using namespace cs;
 

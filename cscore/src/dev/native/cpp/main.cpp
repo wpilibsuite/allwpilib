@@ -10,6 +10,7 @@
 #include <opencv/cv.hpp>
 
 #include "cscore.h"
+#include "cscore_raw.h"
 
 using namespace cv;
 

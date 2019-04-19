@@ -19,6 +19,7 @@
 
 #include "ConfigurableSourceImpl.h"
 #include "SourceImpl.h"
+#include "cscore_raw.h"
 
 namespace cs {
 

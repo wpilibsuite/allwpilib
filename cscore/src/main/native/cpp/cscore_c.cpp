@@ -16,6 +16,7 @@
 
 #include "c_util.h"
 #include "cscore_cpp.h"
+#include "cscore_raw.h"
 
 extern "C" {
 

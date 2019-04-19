@@ -9,6 +9,7 @@
 
 #include "Instance.h"
 #include "cscore.h"
+#include "cscore_raw.h"
 
 using namespace cs;
 

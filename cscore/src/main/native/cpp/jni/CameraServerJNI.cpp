@@ -10,6 +10,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "cscore_cpp.h"
+#include "cscore_raw.h"
 #include "edu_wpi_cscore_CameraServerJNI.h"
 
 using namespace wpi::java;
