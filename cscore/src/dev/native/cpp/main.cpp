@@ -37,7 +37,8 @@ int main() {
   namedWindow("window", WINDOW_AUTOSIZE);
 
   auto frame = CS_AllocateRawFrame();
-  frame->pixelFormat = CS_PixelFormat::CS_PIXFMT_BGR;
+  frame->pixelFormat = CS_PIXFMT_UNKNOWN;
+  //frame->pixelFormat = CS_PixelFormat::CS_PIXFMT_BGR;
 
   while (true) {
     auto timeout =
@@ -46,7 +47,7 @@ int main() {
     if (timeout > 0) {
       CS_PutRawSourceFrame(sourceHandle, frame, &status);
 
-      cv::Mat mat{frame->height, frame->width, CV_8UC3, frame->data};
+      cv::Mat mat{frame->height, frame->width, CV_8UC1, frame->data};
       imshow("window", mat);
       waitKey(1);
     }

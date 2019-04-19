@@ -8,6 +8,7 @@
 package edu.wpi.cscore;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 
 import org.opencv.core.Core;
@@ -71,6 +72,7 @@ public class CameraServerJNI {
   public static native int createHttpCamera(String name, String url, int kind);
   public static native int createHttpCameraMulti(String name, String[] urls, int kind);
   public static native int createCvSource(String name, int pixelFormat, int width, int height, int fps);
+  public static native int createRawSource(String name, int pixelFormat, int width, int height, int fps);
 
   //
   // Source Functions
@@ -125,6 +127,8 @@ public class CameraServerJNI {
   // OpenCV Source Functions
   //
   public static native void putSourceFrame(int source, long imageNativeObj);
+  public static native void putRawSourceFrameBB(int source, ByteBuffer data, int width, int height, int pixelFormat, int totalData);
+  public static native void putRawSourceFrame(int source, long data, int width, int height, int pixelFormat, int totalData);
   public static native void notifySourceError(int source, String msg);
   public static native void setSourceConnected(int source, boolean connected);
   public static native void setSourceDescription(int source, String description);
@@ -136,6 +140,7 @@ public class CameraServerJNI {
   //
   public static native int createMjpegServer(String name, String listenAddress, int port);
   public static native int createCvSink(String name);
+  public static native int createRawSink(String name);
   //public static native int createCvSinkCallback(String name,
   //                            void (*processFrame)(long time));
 
@@ -167,6 +172,16 @@ public class CameraServerJNI {
   public static native void setSinkDescription(int sink, String description);
   public static native long grabSinkFrame(int sink, long imageNativeObj);
   public static native long grabSinkFrameTimeout(int sink, long imageNativeObj, double timeout);
+
+  private static native long grabRawSinkFrameImpl(int sink, RawFrame rawFrame, long rawFramePtr, ByteBuffer byteBuffer, int width, int height, int pixelFormat);
+  private static native long grabRawSinkFrameTimeoutImpl(int sink, RawFrame rawFrame, long rawFramePtr, ByteBuffer byteBuffer, int width, int height, int pixelFormat, double timeout);
+
+  public static long grabSinkFrame(int sink, RawFrame rawFrame) {
+    return grabRawSinkFrameImpl(sink, rawFrame, rawFrame.m_framePtr, rawFrame.getDataByteBuffer(), rawFrame.getWidth(), rawFrame.getHeight(), rawFrame.getPixelFormat());
+  }
+  public static long grabSinkFrameTimeout(int sink, RawFrame rawFrame, double timeout) {
+    return grabRawSinkFrameTimeoutImpl(sink, rawFrame, rawFrame.m_framePtr, rawFrame.getDataByteBuffer(), rawFrame.getWidth(), rawFrame.getHeight(), rawFrame.getPixelFormat(), timeout);
+  }
   public static native String getSinkError(int sink);
   public static native void setSinkEnabled(int sink, boolean enabled);
 
@@ -228,4 +243,8 @@ public class CameraServerJNI {
   public static native String getHostname();
 
   public static native String[] getNetworkInterfaces();
+
+  public static native long allocateRawFrame();
+
+  public static native void freeRawFrame(long frame);
 }

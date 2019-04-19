@@ -201,6 +201,8 @@ CS_Source CreateHttpCamera(const wpi::Twine& name,
                            CS_HttpCameraKind kind, CS_Status* status);
 CS_Source CreateCvSource(const wpi::Twine& name, const VideoMode& mode,
                          CS_Status* status);
+CS_Source CreateRawSource(const wpi::Twine& name, const VideoMode& mode,
+	CS_Status* status);
 /** @} */
 
 /**
