@@ -22,10 +22,12 @@
 namespace cs {
 
 class ConfigurableSourceImpl : public SourceImpl {
- public:
+ protected:
   ConfigurableSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
                          Notifier& notifier, Telemetry& telemetry,
                          const VideoMode& mode);
+
+ public:
   ~ConfigurableSourceImpl() override;
 
   void Start() override;
