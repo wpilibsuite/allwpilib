@@ -34,7 +34,7 @@ static const JClassInit classes[] = {
     {"edu/wpi/cscore/UsbCameraInfo", &usbCameraInfoCls},
     {"edu/wpi/cscore/VideoMode", &videoModeCls},
     {"edu/wpi/cscore/VideoEvent", &videoEventCls},
-    {"edu/wpi/cscore/RawFrame", &rawFrameCls}};
+    {"edu/wpi/cscore/raw/RawFrame", &rawFrameCls}};
 
 static const JExceptionInit exceptions[] = {
     {"edu/wpi/cscore/VideoException", &videoEx},
@@ -508,12 +508,12 @@ Java_edu_wpi_cscore_CameraServerJNI_createHttpCameraMulti
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_cscore_CameraServerCvJNI
  * Method:    createCvSource
  * Signature: (Ljava/lang/String;IIII)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_createCvSource
+Java_edu_wpi_cscore_CameraServerCvJNI_createCvSource
   (JNIEnv* env, jclass, jstring name, jint pixelFormat, jint width, jint height,
    jint fps)
 {
@@ -1081,12 +1081,12 @@ Java_edu_wpi_cscore_CameraServerJNI_getHttpCameraUrls
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_cscore_CameraServerCvJNI
  * Method:    putSourceFrame
  * Signature: (IJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_putSourceFrame
+Java_edu_wpi_cscore_CameraServerCvJNI_putSourceFrame
   (JNIEnv* env, jclass, jint source, jlong imageNativeObj)
 {
   cv::Mat& image = *((cv::Mat*)imageNativeObj);
@@ -1264,12 +1264,12 @@ Java_edu_wpi_cscore_CameraServerJNI_createMjpegServer
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_cscore_CameraServerCvJNI
  * Method:    createCvSink
  * Signature: (Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_createCvSink
+Java_edu_wpi_cscore_CameraServerCvJNI_createCvSink
   (JNIEnv* env, jclass, jstring name)
 {
   if (!name) {
@@ -1540,12 +1540,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setSinkDescription
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_cscore_CameraServerCvJNI
  * Method:    grabSinkFrame
  * Signature: (IJ)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_grabSinkFrame
+Java_edu_wpi_cscore_CameraServerCvJNI_grabSinkFrame
   (JNIEnv* env, jclass, jint sink, jlong imageNativeObj)
 {
   cv::Mat& image = *((cv::Mat*)imageNativeObj);
@@ -1556,12 +1556,12 @@ Java_edu_wpi_cscore_CameraServerJNI_grabSinkFrame
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerJNI
+ * Class:     edu_wpi_cscore_CameraServerCvJNI
  * Method:    grabSinkFrameTimeout
  * Signature: (IJD)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_grabSinkFrameTimeout
+Java_edu_wpi_cscore_CameraServerCvJNI_grabSinkFrameTimeout
   (JNIEnv* env, jclass, jint sink, jlong imageNativeObj, jdouble timeout)
 {
   cv::Mat& image = *((cv::Mat*)imageNativeObj);

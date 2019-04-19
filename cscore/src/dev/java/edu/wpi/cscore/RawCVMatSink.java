@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.cscore;
 
 import java.nio.ByteBuffer;
@@ -6,8 +13,9 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
 import edu.wpi.cscore.VideoMode.PixelFormat;
+import edu.wpi.cscore.raw.RawFrame;
 
-public class RawCVMatSink extends VideoSink {
+public class RawCVMatSink extends ImageSink {
   RawFrame frame = new RawFrame();
   Mat tmpMat;
   ByteBuffer origByteBuffer;

@@ -5,12 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.cscore;
+package edu.wpi.cscore.raw;
 
 import java.nio.ByteBuffer;
 
+import edu.wpi.cscore.CameraServerJNI;
+
 public class RawFrame implements AutoCloseable {
-  long m_framePtr;
+  private final long m_framePtr;
   private ByteBuffer m_dataByteBuffer;
   private long m_dataPtr;
   private int m_totalData;
@@ -27,7 +29,11 @@ public class RawFrame implements AutoCloseable {
     CameraServerJNI.freeRawFrame(m_framePtr);
   }
 
-  public void setData(ByteBuffer dataByteBuffer, long dataPtr, int totalData, int width, int height, int pixelFormat) {
+  /**
+   * Called from JNI to set data in class.
+   */
+  public void setData(ByteBuffer dataByteBuffer, long dataPtr, int totalData,
+                      int width, int height, int pixelFormat) {
     m_dataByteBuffer = dataByteBuffer;
     m_dataPtr = dataPtr;
     m_totalData = totalData;
@@ -37,63 +43,76 @@ public class RawFrame implements AutoCloseable {
   }
 
   /**
-   * @return the dataPtr
+   * Get the pointer to native representation of this frame.
+   */
+  public long getFramePtr() {
+    return m_framePtr;
+  }
+
+  /**
+   * Get a ByteBuffer pointing to the frame data.
+   * This ByteBuffer is backed by the frame directly. Its lifetime is controled by
+   * the frame. If a new frame gets read, it will overwrite the current one.
    */
   public ByteBuffer getDataByteBuffer() {
     return m_dataByteBuffer;
   }
 
+  /**
+   * Get a long (is a char* in native code) pointing to the frame data.
+   * This pointer is backed by the frame directly. Its lifetime is controled by
+   * the frame. If a new frame gets read, it will overwrite the current one.
+   */
   public long getDataPtr() {
     return m_dataPtr;
   }
 
   /**
-   * @return the totalData
+   * Get the total length of the data stored in the frame.
    */
   public int getTotalData() {
     return m_totalData;
   }
 
   /**
-   * @return the width
+   * Get the width of the frame.
    */
   public int getWidth() {
     return m_width;
   }
 
   /**
-   * @param width the width to set
+   * Set the width of the frame.
    */
   public void setWidth(int width) {
     this.m_width = width;
   }
 
   /**
-   * @return the height
+   * Get the height of the frame.
    */
   public int getHeight() {
     return m_height;
   }
 
   /**
-   * @param height the height to set
+   * Set the height of the frame.
    */
   public void setHeight(int height) {
     this.m_height = height;
   }
 
   /**
-   * @return the pixelFormat
+   * Get the PixelFormat of the frame.
    */
   public int getPixelFormat() {
     return m_pixelFormat;
   }
 
   /**
-   * @param pixelFormat the pixelFormat to set
+   * Set the PixelFormat of the frame.
    */
   public void setPixelFormat(int pixelFormat) {
     this.m_pixelFormat = pixelFormat;
   }
-
 }
