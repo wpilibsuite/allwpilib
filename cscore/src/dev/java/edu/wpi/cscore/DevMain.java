@@ -45,6 +45,8 @@ public final class DevMain {
 
     UsbCamera usbCameraObj = new UsbCamera("Cam", 0);
 
+    CameraServerCvJNI.forceLoad();
+
 
     usbCameraObj.setPixelFormat(PixelFormat.kYUYV);
 
@@ -52,7 +54,7 @@ public final class DevMain {
 
     MjpegServer server = new MjpegServer("Hello", 1181);
 
-    CvSource cvSource = new CvSource("CvSource", PixelFormat.kGray, 640, 360, 30);
+    RawCVMatSource cvSource = new RawCVMatSource("CvSource", PixelFormat.kGray, 640, 360, 30);
 
     server.setSource(cvSource);
 
