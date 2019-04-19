@@ -28,7 +28,7 @@ namespace cs {
  */
 
 // Forward declarations so friend declarations work correctly
-class CvSource;
+class ImageSource;
 class VideoEvent;
 class VideoSink;
 class VideoSource;
@@ -37,7 +37,7 @@ class VideoSource;
  * A source or sink property.
  */
 class VideoProperty {
-  friend class CvSource;
+  friend class ImageSource;
   friend class VideoEvent;
   friend class VideoSink;
   friend class VideoSource;
@@ -617,43 +617,13 @@ class AxisCamera : public HttpCamera {
 };
 
 /**
- * A source for user code to provide OpenCV images as video frames.
+ * A base class for single image providing sources.
  */
-class CvSource : public VideoSource {
+class ImageSource : public VideoSource {
+ protected:
+  ImageSource() = default;
+
  public:
-  CvSource() = default;
-
-  /**
-   * Create an OpenCV source.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param mode Video mode being generated
-   */
-  CvSource(const wpi::Twine& name, const VideoMode& mode);
-
-  /**
-   * Create an OpenCV source.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param pixelFormat Pixel format
-   * @param width width
-   * @param height height
-   * @param fps fps
-   */
-  CvSource(const wpi::Twine& name, VideoMode::PixelFormat pixelFormat,
-           int width, int height, int fps);
-
-  /**
-   * Put an OpenCV image and notify sinks.
-   *
-   * <p>Only 8-bit single-channel or 3-channel (with BGR channel order) images
-   * are supported. If the format, depth or channel order is different, use
-   * cv::Mat::convertTo() and/or cv::cvtColor() to convert it first.
-   *
-   * @param image OpenCV image
-   */
-  void PutFrame(cv::Mat& image);
-
   /**
    * Signal sinks that an error has occurred.  This should be called instead
    * of NotifyFrame when an error occurs.
@@ -745,6 +715,45 @@ class CvSource : public VideoSource {
   template <typename T>
   void SetEnumPropertyChoices(const VideoProperty& property,
                               std::initializer_list<T> choices);
+};
+
+/**
+ * A source for user code to provide OpenCV images as video frames.
+ */
+class CvSource : public ImageSource {
+ public:
+  CvSource() = default;
+
+  /**
+   * Create an OpenCV source.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param mode Video mode being generated
+   */
+  CvSource(const wpi::Twine& name, const VideoMode& mode);
+
+  /**
+   * Create an OpenCV source.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param pixelFormat Pixel format
+   * @param width width
+   * @param height height
+   * @param fps fps
+   */
+  CvSource(const wpi::Twine& name, VideoMode::PixelFormat pixelFormat,
+           int width, int height, int fps);
+
+  /**
+   * Put an OpenCV image and notify sinks.
+   *
+   * <p>Only 8-bit single-channel or 3-channel (with BGR channel order) images
+   * are supported. If the format, depth or channel order is different, use
+   * cv::Mat::convertTo() and/or cv::cvtColor() to convert it first.
+   *
+   * @param image OpenCV image
+   */
+  void PutFrame(cv::Mat& image);
 };
 
 /**
@@ -979,9 +988,40 @@ class MjpegServer : public VideoSink {
 };
 
 /**
+ * A base class for single image reading sinks.
+ */
+class ImageSink : public VideoSink {
+ protected:
+  ImageSink() = default;
+
+ public:
+  /**
+   * Set sink description.
+   *
+   * @param description Description
+   */
+  void SetDescription(const wpi::Twine& description);
+
+  /**
+   * Get error string.  Call this if WaitForFrame() returns 0 to determine
+   * what the error is.
+   */
+  std::string GetError() const;
+
+  /**
+   * Enable or disable getting new frames.
+   *
+   * <p>Disabling will cause processFrame (for callback-based CvSinks) to not
+   * be called and WaitForFrame() to not return.  This can be used to save
+   * processor resources when frames are not needed.
+   */
+  void SetEnabled(bool enabled);
+};
+
+/**
  * A sink for user code to accept video frames as OpenCV images.
  */
-class CvSink : public VideoSink {
+class CvSink : public ImageSink {
  public:
   CvSink() = default;
 
@@ -1011,13 +1051,6 @@ class CvSink : public VideoSink {
          std::function<void(uint64_t time)> processFrame);
 
   /**
-   * Set sink description.
-   *
-   * @param description Description
-   */
-  void SetDescription(const wpi::Twine& description);
-
-  /**
    * Wait for the next frame and get the image.
    * Times out (returning 0) after timeout seconds.
    * The provided image will have three 8-bit channels stored in BGR order.
@@ -1037,21 +1070,6 @@ class CvSink : public VideoSink {
    *         and is in 1 us increments.
    */
   uint64_t GrabFrameNoTimeout(cv::Mat& image) const;
-
-  /**
-   * Get error string.  Call this if WaitForFrame() returns 0 to determine
-   * what the error is.
-   */
-  std::string GetError() const;
-
-  /**
-   * Enable or disable getting new frames.
-   *
-   * <p>Disabling will cause processFrame (for callback-based CvSinks) to not
-   * be called and WaitForFrame() to not return.  This can be used to save
-   * processor resources when frames are not needed.
-   */
-  void SetEnabled(bool enabled);
 };
 
 /**

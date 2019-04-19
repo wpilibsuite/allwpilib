@@ -393,22 +393,22 @@ inline void CvSource::PutFrame(cv::Mat& image) {
   PutSourceFrame(m_handle, image, &m_status);
 }
 
-inline void CvSource::NotifyError(const wpi::Twine& msg) {
+inline void ImageSource::NotifyError(const wpi::Twine& msg) {
   m_status = 0;
   NotifySourceError(m_handle, msg, &m_status);
 }
 
-inline void CvSource::SetConnected(bool connected) {
+inline void ImageSource::SetConnected(bool connected) {
   m_status = 0;
   SetSourceConnected(m_handle, connected, &m_status);
 }
 
-inline void CvSource::SetDescription(const wpi::Twine& description) {
+inline void ImageSource::SetDescription(const wpi::Twine& description) {
   m_status = 0;
   SetSourceDescription(m_handle, description, &m_status);
 }
 
-inline VideoProperty CvSource::CreateProperty(const wpi::Twine& name,
+inline VideoProperty ImageSource::CreateProperty(const wpi::Twine& name,
                                               VideoProperty::Kind kind,
                                               int minimum, int maximum,
                                               int step, int defaultValue,
@@ -419,7 +419,7 @@ inline VideoProperty CvSource::CreateProperty(const wpi::Twine& name,
       minimum, maximum, step, defaultValue, value, &m_status)};
 }
 
-inline VideoProperty CvSource::CreateIntegerProperty(const wpi::Twine& name,
+inline VideoProperty ImageSource::CreateIntegerProperty(const wpi::Twine& name,
                                                     int minimum, int maximum,
                                                     int step, int defaultValue,
                                                     int value) {
@@ -429,7 +429,7 @@ inline VideoProperty CvSource::CreateIntegerProperty(const wpi::Twine& name,
       minimum, maximum, step, defaultValue, value, &m_status)};
 }
 
-inline VideoProperty CvSource::CreateBooleanProperty(const wpi::Twine& name,
+inline VideoProperty ImageSource::CreateBooleanProperty(const wpi::Twine& name,
                                                      bool defaultValue,
                                                      bool value) {
   m_status = 0;
@@ -438,7 +438,7 @@ inline VideoProperty CvSource::CreateBooleanProperty(const wpi::Twine& name,
       0, 1, 1, defaultValue ? 1 : 0, value ? 1 : 0, &m_status)};
 }
 
-inline VideoProperty CvSource::CreateStringProperty(const wpi::Twine& name,
+inline VideoProperty ImageSource::CreateStringProperty(const wpi::Twine& name,
                                                     const wpi::Twine& value) {
   m_status = 0;
   auto prop = VideoProperty{CreateSourceProperty(
@@ -449,14 +449,14 @@ inline VideoProperty CvSource::CreateStringProperty(const wpi::Twine& name,
 }
 
 
-inline void CvSource::SetEnumPropertyChoices(
+inline void ImageSource::SetEnumPropertyChoices(
     const VideoProperty& property, wpi::ArrayRef<std::string> choices) {
   m_status = 0;
   SetSourceEnumPropertyChoices(m_handle, property.m_handle, choices, &m_status);
 }
 
 template <typename T>
-inline void CvSource::SetEnumPropertyChoices(const VideoProperty& property,
+inline void ImageSource::SetEnumPropertyChoices(const VideoProperty& property,
                                              std::initializer_list<T> choices) {
   std::vector<std::string> vec;
   vec.reserve(choices.size());
@@ -584,7 +584,7 @@ inline CvSink::CvSink(const wpi::Twine& name,
   m_handle = CreateCvSinkCallback(name, processFrame, &m_status);
 }
 
-inline void CvSink::SetDescription(const wpi::Twine& description) {
+inline void ImageSink::SetDescription(const wpi::Twine& description) {
   m_status = 0;
   SetSinkDescription(m_handle, description, &m_status);
 }
@@ -599,12 +599,12 @@ inline uint64_t CvSink::GrabFrameNoTimeout(cv::Mat& image) const {
   return GrabSinkFrame(m_handle, image, &m_status);
 }
 
-inline std::string CvSink::GetError() const {
+inline std::string ImageSink::GetError() const {
   m_status = 0;
   return GetSinkError(m_handle, &m_status);
 }
 
-inline void CvSink::SetEnabled(bool enabled) {
+inline void ImageSink::SetEnabled(bool enabled) {
   m_status = 0;
   SetSinkEnabled(m_handle, enabled, &m_status);
 }
