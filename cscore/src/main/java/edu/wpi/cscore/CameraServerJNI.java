@@ -129,6 +129,9 @@ public class CameraServerJNI {
   public static native void putSourceFrame(int source, long imageNativeObj);
   public static native void putRawSourceFrameBB(int source, ByteBuffer data, int width, int height, int pixelFormat, int totalData);
   public static native void putRawSourceFrame(int source, long data, int width, int height, int pixelFormat, int totalData);
+  public static void putRawSourceFrame(int source, RawFrame raw) {
+    putRawSourceFrame(source, raw.getDataPtr(), raw.getWidth(), raw.getHeight(), raw.getPixelFormat(), raw.getTotalData());
+  }
   public static native void notifySourceError(int source, String msg);
   public static native void setSourceConnected(int source, boolean connected);
   public static native void setSourceDescription(int source, String description);

@@ -17,6 +17,25 @@ import edu.wpi.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.wpiutil.RuntimeDetector;
 
 public final class DevMain {
+  public static int GetCVFormat(PixelFormat pixelFormat) {
+    int type = 0;
+    switch (pixelFormat) {
+    case kYUYV:
+    case kRGB565:
+      type = CvType.CV_8UC2;
+      break;
+    case kBGR:
+      type = CvType.CV_8UC3;
+      break;
+    case kGray:
+    case kMJPEG:
+    default:
+      type = CvType.CV_8UC1;
+      break;
+    }
+    return type;
+  }
+
   /**
    * Main method.
    */
@@ -25,14 +44,22 @@ public final class DevMain {
     System.out.println(RuntimeDetector.getPlatformPath());
     System.out.println(CameraServerJNI.getHostname());
 
-    int usbCamera = CameraServerJNI.createUsbCameraDev("Camera", 0);
+    UsbCamera usbCameraObj = new UsbCamera("Cam", 0);
+
+
+      usbCameraObj.setPixelFormat(PixelFormat.kYUYV);
+
+
+
+    int usbCamera = usbCameraObj.m_handle;
+
+    //int usbCamera = CameraServerJNI.createUsbCameraDev("Camera", 0);
 
     int rawSink = CameraServerJNI.createRawSink("Raw Sink");
 
     int mjpeg = CameraServerJNI.createMjpegServer("Camera", "", 1181);
 
     int cvSource = CameraServerJNI.createCvSource("Raw Sink", PixelFormat.kGray.getValue(), 640, 360, 30);
-
 
     int mjpeg2 = CameraServerJNI.createMjpegServer("Camera", "", 1182);
 
@@ -45,6 +72,8 @@ public final class DevMain {
 
     System.out.println(cvSource);
 
+    //CameraServerJNI.setSourceVideoMode(usbCamera, PixelFormat.kBGR.getValue(), 640, 360, 30);
+
 
     RawFrame raw = new RawFrame();
 
@@ -52,20 +81,27 @@ public final class DevMain {
 
     Mat mat = null;
 
+    int width = 0;
+    int height = 0;
+    int pixelFormat = 0;
+
 
     while (true) {
-      raw.setPixelFormat(PixelFormat.kUnknown.getValue());
+      raw.setPixelFormat(PixelFormat.kBGR.getValue());
       raw.setWidth(0);
       raw.setHeight(0);
       long timeout = CameraServerJNI.grabSinkFrame(rawSink, raw);
       if (timeout > 0) {
-        if (raw.getDataByteBuffer() != origByteBuffer) {
+        if (raw.getDataByteBuffer() != origByteBuffer || width != raw.getWidth() || height != raw.getHeight() || pixelFormat != raw.getPixelFormat()) {
           origByteBuffer = raw.getDataByteBuffer();
-          mat = new Mat(raw.getHeight(), raw.getWidth(), CvType.CV_8UC1, origByteBuffer);
+          height = raw.getHeight();
+          width = raw.getWidth();
+          pixelFormat = raw.getPixelFormat();
+          mat = new Mat(raw.getHeight(), raw.getWidth(), GetCVFormat(VideoMode.getPixelFormatFromInt(pixelFormat)), origByteBuffer);
         }
         CameraServerJNI.putSourceFrame(cvSource, mat.nativeObj);
 
-        CameraServerJNI.putRawSourceFrame(rawSource, raw.getDataPtr(), raw.getWidth(), raw.getHeight(), raw.getPixelFormat(), raw.getTotalData());
+        CameraServerJNI.putRawSourceFrame(rawSource, raw);
       }
     }
 

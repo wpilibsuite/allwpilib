@@ -36,18 +36,17 @@ int main() {
 
   namedWindow("window", WINDOW_AUTOSIZE);
 
-  auto frame = CS_AllocateRawFrame();
-  frame->pixelFormat = CS_PIXFMT_UNKNOWN;
-  //frame->pixelFormat = CS_PixelFormat::CS_PIXFMT_BGR;
+  cs::RawFrame frame;
+  frame.pixelFormat = CS_PIXFMT_UNKNOWN;
+  // frame->pixelFormat = CS_PixelFormat::CS_PIXFMT_BGR;
 
   while (true) {
-    auto timeout =
-        CS_GrabRawSinkFrameTimeout(sinkHandle, frame, 0.225, &status);
+    auto timeout = cs::GrabSinkFrameTimeout(sinkHandle, frame, 0.225, &status);
 
     if (timeout > 0) {
-      CS_PutRawSourceFrame(sourceHandle, frame, &status);
+      cs::PutSourceFrame(sourceHandle, frame, &status);
 
-      cv::Mat mat{frame->height, frame->width, CV_8UC1, frame->data};
+      cv::Mat mat{frame.height, frame.width, CV_8UC1, frame.data};
       imshow("window", mat);
       waitKey(1);
     }

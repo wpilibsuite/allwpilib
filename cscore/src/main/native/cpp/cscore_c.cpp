@@ -440,17 +440,6 @@ void CS_FreeNetworkInterfaces(char** interfaces, int count) {
   std::free(interfaces);
 }
 
-CS_RawFrame* CS_AllocateRawFrame(void) {
-  auto frame =
-      static_cast<CS_RawFrame*>(wpi::CheckedMalloc(sizeof(CS_RawFrame)));
-  frame->data = nullptr;
-  frame->pixelFormat = 0;
-  frame->height = 0;
-  frame->width = 0;
-  frame->dataLength = 0;
-  return frame;
-}
-
 void CS_AllocateRawFrameData(CS_RawFrame* frame, int requestedSize) {
   if (frame->dataLength >= requestedSize) return;
   if (frame->data) {
@@ -462,13 +451,12 @@ void CS_AllocateRawFrameData(CS_RawFrame* frame, int requestedSize) {
   frame->dataLength = requestedSize;
 }
 
-void CS_FreeRawFrame(CS_RawFrame* frame) {
+void CS_FreeRawFrameData(CS_RawFrame* frame) {
   if (frame->data) {
     std::free(frame->data);
     frame->data = nullptr;
     frame->dataLength = 0;
   }
-  std::free(frame);
 }
 
 }  // extern "C"

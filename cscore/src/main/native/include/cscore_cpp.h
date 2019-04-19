@@ -56,6 +56,19 @@ struct UsbCameraInfo {
   std::vector<std::string> otherPaths;
 };
 
+struct RawFrame : public CS_RawFrame {
+  RawFrame() {
+    data = nullptr;
+    dataLength = 0;
+    pixelFormat = CS_PIXFMT_UNKNOWN;
+    width = 0;
+    height = 0;
+    totalData = 0;
+  }
+
+  ~RawFrame() { CS_FreeRawFrameData(this); }
+};
+
 /**
  * Video mode
  */
@@ -202,7 +215,7 @@ CS_Source CreateHttpCamera(const wpi::Twine& name,
 CS_Source CreateCvSource(const wpi::Twine& name, const VideoMode& mode,
                          CS_Status* status);
 CS_Source CreateRawSource(const wpi::Twine& name, const VideoMode& mode,
-	CS_Status* status);
+                          CS_Status* status);
 /** @} */
 
 /**
@@ -368,9 +381,9 @@ void SetSinkDescription(CS_Sink sink, const wpi::Twine& description,
 uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status);
 uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
                               CS_Status* status);
-uint64_t GrabRawSinkFrame(CS_Sink sink, CS_RawFrame& image, CS_Status* status);
-uint64_t GrabRawSinkFrameTimeout(CS_Sink sink, CS_RawFrame& image,
-                                 double timeout, CS_Status* status);
+uint64_t GrabSinkFrame(CS_Sink sink, CS_RawFrame& image, CS_Status* status);
+uint64_t GrabSinkFrameTimeout(CS_Sink sink, CS_RawFrame& image, double timeout,
+                              CS_Status* status);
 std::string GetSinkError(CS_Sink sink, CS_Status* status);
 wpi::StringRef GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                             CS_Status* status);

@@ -502,9 +502,8 @@ void CS_Shutdown(void);
  * @{
  */
 
-CS_RawFrame* CS_AllocateRawFrame(void);
 void CS_AllocateRawFrameData(CS_RawFrame* frame, int requestedSize);
-void CS_FreeRawFrame(CS_RawFrame* frame);
+void CS_FreeRawFrameData(CS_RawFrame* frame);
 
 CS_UsbCameraInfo* CS_EnumerateUsbCameras(int* count, CS_Status* status);
 void CS_FreeEnumeratedUsbCameras(CS_UsbCameraInfo* cameras, int count);
