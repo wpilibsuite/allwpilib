@@ -15,7 +15,6 @@ import edu.wpi.first.wpiutil.RuntimeLoader;
  * Base class for all JNI wrappers.
  */
 public class JNIWrapper {
-  static boolean libraryLoaded = false;
   static RuntimeLoader<JNIWrapper> loader = null;
 
   static {
