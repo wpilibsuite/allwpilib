@@ -10,8 +10,8 @@
 #include "frc/buttons/HeldButtonScheduler.h"
 #include "frc/buttons/PressedButtonScheduler.h"
 #include "frc/buttons/ReleasedButtonScheduler.h"
-#include "frc/buttons/ToggleButtonScheduler.h"
 #include "frc/buttons/StartWhilePressedButtonScheduler.h"
+#include "frc/buttons/ToggleButtonScheduler.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
