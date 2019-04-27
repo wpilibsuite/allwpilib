@@ -12,8 +12,8 @@
 
 using namespace frc;
 
-StartWhilePressedButtonScheduler::StartWhilePressedButtonScheduler(bool last, Trigger* button,
-                                                                  Command* orders)
+StartWhilePressedButtonScheduler::StartWhilePressedButtonScheduler(
+    bool last, Trigger* button, Command* orders)
     : ButtonScheduler(last, button, orders) {}
 
 void StartWhilePressedButtonScheduler::Execute() {

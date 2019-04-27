@@ -19,8 +19,10 @@ class StartWhilePressedButtonScheduler : public ButtonScheduler {
   StartWhilePressedButtonScheduler(bool last, Trigger* button, Command* orders);
   virtual ~StartWhilePressedButtonScheduler() = default;
 
-  StartWhilePressedButtonScheduler(StartWhilePressedButtonScheduler&&) = default;
-  StartWhilePressedButtonScheduler& operator=(StartWhilePressedButtonScheduler&&) = default;
+  StartWhilePressedButtonScheduler(StartWhilePressedButtonScheduler&&) =
+      default;
+  StartWhilePressedButtonScheduler& operator=(
+      StartWhilePressedButtonScheduler&&) = default;
 
   virtual void Execute();
 };
