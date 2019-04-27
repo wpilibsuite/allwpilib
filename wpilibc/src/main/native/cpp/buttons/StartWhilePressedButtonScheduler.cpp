@@ -5,18 +5,23 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "frc/buttons/StartWhilePressedButtonScheduler.h"
+
 #include "frc/buttons/Button.h"
+#include "frc/commands/Command.h"
 
 using namespace frc;
 
-void Button::WhenPressed(Command* command) { WhenActive(command); }
+StartWhilePressedButtonScheduler::StartWhilePressedButtonScheduler(bool last, Trigger* button,
+                                                                  Command* orders)
+    : ButtonScheduler(last, button, orders) {}
 
-void Button::WhileHeld(Command* command) { WhileActive(command); }
+void StartWhilePressedButtonScheduler::Execute() {
+  bool pressed = m_button->Grab();
 
-void Button::StartWhileHeld(Command* command) { StartWhileActive(command); }
+  if (pressed) {
+    m_command->Start();
+  }
 
-void Button::WhenReleased(Command* command) { WhenInactive(command); }
-
-void Button::CancelWhenPressed(Command* command) { CancelWhenActive(command); }
-
-void Button::ToggleWhenPressed(Command* command) { ToggleWhenActive(command); }
+  m_pressedLast = pressed;
+}

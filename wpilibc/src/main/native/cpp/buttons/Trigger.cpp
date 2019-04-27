@@ -8,6 +8,7 @@
 #include "frc/buttons/Button.h"
 #include "frc/buttons/CancelButtonScheduler.h"
 #include "frc/buttons/HeldButtonScheduler.h"
+#include "frc/buttons/StartWhilePressedButtonScheduler.h"
 #include "frc/buttons/PressedButtonScheduler.h"
 #include "frc/buttons/ReleasedButtonScheduler.h"
 #include "frc/buttons/ToggleButtonScheduler.h"
@@ -24,6 +25,11 @@ void Trigger::WhenActive(Command* command) {
 
 void Trigger::WhileActive(Command* command) {
   auto hbs = new HeldButtonScheduler(Grab(), this, command);
+  hbs->Start();
+}
+
+void Trigger::StartWhileActive(Command* command) {
+  auto hbs = new StartWhilePressedButtonScheduler(Grab(), this, command);
   hbs->Start();
 }
 

@@ -47,6 +47,16 @@ class Button : public Trigger {
   virtual void WhileHeld(Command* command);
 
   /**
+   * Specifies the command to run when a button is pressed.
+   *
+   * The command will be scheduled repeatedly while the button is pressed and
+   * will not be canceled until the command finishes .
+   *
+   * @param command The pointer to the command to run
+   */
+  virtual void StartWhileHeld(Command* command);
+
+  /**
    * Specifies the command to run when the button is released.
    *
    * The command will be scheduled a single time.

@@ -40,6 +40,7 @@ class Trigger : public SendableBase {
   virtual bool Get() = 0;
   void WhenActive(Command* command);
   void WhileActive(Command* command);
+  void StartWhileActive(Command* command);
   void WhenInactive(Command* command);
   void CancelWhenActive(Command* command);
   void ToggleWhenActive(Command* command);
