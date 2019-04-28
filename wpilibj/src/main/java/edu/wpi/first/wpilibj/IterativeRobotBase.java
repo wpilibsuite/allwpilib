@@ -257,11 +257,14 @@ public abstract class IterativeRobotBase extends RobotBase {
 
     robotPeriodic();
     m_watchdog.addEpoch("robotPeriodic()");
-    m_watchdog.disable();
-    SmartDashboard.updateValues();
 
+    SmartDashboard.updateValues();
+    m_watchdog.addEpoch("SmartDashboard.updateValues()");
     LiveWindow.updateValues();
+    m_watchdog.addEpoch("LiveWindow.updateValues()");
     Shuffleboard.update();
+    m_watchdog.addEpoch("Shuffleboard.update()");
+    m_watchdog.disable();
 
     // Warn on loop time overruns
     if (m_watchdog.isExpired()) {
