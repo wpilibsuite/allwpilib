@@ -25,9 +25,9 @@
 #include <algorithm>
 
 #include <wpi/FileSystem.h>
+#include <wpi/MemAlloc.h>
 #include <wpi/Path.h>
 #include <wpi/SmallString.h>
-#include <wpi/memory.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 

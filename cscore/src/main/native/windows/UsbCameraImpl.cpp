@@ -28,8 +28,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <wpi/MemAlloc.h>
 #include <wpi/SmallString.h>
-#include <wpi/memory.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 

@@ -16,23 +16,43 @@
 //===          is guaranteed to work on *all* UNIX variants.
 //===----------------------------------------------------------------------===//
 
+#include "wpi/Errno.h"
 #include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
 #include <dirent.h>
-#define NAMLEN(dirent) strlen((dirent)->d_name)
+#include <pwd.h>
 #include <sys/param.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+using namespace wpi;
+
 namespace wpi {
 namespace sys  {
 namespace fs {
+
+const file_t kInvalidFile = -1;
+
+TimePoint<> basic_file_status::getLastAccessedTime() const {
+  return toTimePoint(fs_st_atime, fs_st_atime_nsec);
+}
+
+TimePoint<> basic_file_status::getLastModificationTime() const {
+  return toTimePoint(fs_st_mtime, fs_st_mtime_nsec);
+}
+
 UniqueID file_status::getUniqueID() const {
   return UniqueID(fs_st_dev, fs_st_ino);
+}
+
+uint32_t file_status::getLinkCount() const {
+  return fs_st_nlinks;
 }
 
 std::error_code current_path(SmallVectorImpl<char> &result) {
@@ -93,9 +113,9 @@ std::error_code access(const Twine &Path, AccessMode Mode) {
     // Don't say that directories are executable.
     struct stat buf;
     if (0 != stat(P.begin(), &buf))
-      return std::make_error_code(std::errc::permission_denied);
+      return errc::permission_denied;
     if (!S_ISREG(buf.st_mode))
-      return std::make_error_code(std::errc::permission_denied);
+      return errc::permission_denied;
   }
 
   return std::error_code();
@@ -117,37 +137,48 @@ std::error_code equivalent(const Twine &A, const Twine &B, bool &result) {
   return std::error_code();
 }
 
+static file_type typeForMode(mode_t Mode) {
+  if (S_ISDIR(Mode))
+    return file_type::directory_file;
+  else if (S_ISREG(Mode))
+    return file_type::regular_file;
+  else if (S_ISBLK(Mode))
+    return file_type::block_file;
+  else if (S_ISCHR(Mode))
+    return file_type::character_file;
+  else if (S_ISFIFO(Mode))
+    return file_type::fifo_file;
+  else if (S_ISSOCK(Mode))
+    return file_type::socket_file;
+  else if (S_ISLNK(Mode))
+    return file_type::symlink_file;
+  return file_type::type_unknown;
+}
+
 static std::error_code fillStatus(int StatRet, const struct stat &Status,
-                             file_status &Result) {
+                                  file_status &Result) {
   if (StatRet != 0) {
-    std::error_code ec(errno, std::generic_category());
-    if (ec == std::errc::no_such_file_or_directory)
+    std::error_code EC(errno, std::generic_category());
+    if (EC == errc::no_such_file_or_directory)
       Result = file_status(file_type::file_not_found);
     else
       Result = file_status(file_type::status_error);
-    return ec;
+    return EC;
   }
 
-  file_type Type = file_type::type_unknown;
-
-  if (S_ISDIR(Status.st_mode))
-    Type = file_type::directory_file;
-  else if (S_ISREG(Status.st_mode))
-    Type = file_type::regular_file;
-  else if (S_ISBLK(Status.st_mode))
-    Type = file_type::block_file;
-  else if (S_ISCHR(Status.st_mode))
-    Type = file_type::character_file;
-  else if (S_ISFIFO(Status.st_mode))
-    Type = file_type::fifo_file;
-  else if (S_ISSOCK(Status.st_mode))
-    Type = file_type::socket_file;
-  else if (S_ISLNK(Status.st_mode))
-    Type = file_type::symlink_file;
+  uint32_t atime_nsec, mtime_nsec;
+#if defined(__APPLE__)
+  atime_nsec = Status.st_atimespec.tv_nsec;
+  mtime_nsec = Status.st_mtimespec.tv_nsec;
+#else
+  atime_nsec = Status.st_atim.tv_nsec;
+  mtime_nsec = Status.st_mtim.tv_nsec;
+#endif
 
   perms Perms = static_cast<perms>(Status.st_mode) & all_perms;
-  Result = file_status(Type, Perms, Status.st_dev, Status.st_nlink,
-                       Status.st_ino, Status.st_atime, Status.st_mtime,
+  Result = file_status(typeForMode(Status.st_mode), Perms, Status.st_dev,
+                       Status.st_nlink, Status.st_ino,
+                       Status.st_atime, atime_nsec, Status.st_mtime, mtime_nsec,
                        Status.st_uid, Status.st_gid, Status.st_size);
 
   return std::error_code();
@@ -166,6 +197,71 @@ std::error_code status(int FD, file_status &Result) {
   struct stat Status;
   int StatRet = ::fstat(FD, &Status);
   return fillStatus(StatRet, Status, Result);
+}
+
+std::error_code mapped_file_region::init(int FD, uint64_t Offset,
+                                         mapmode Mode) {
+  assert(Size != 0);
+
+  int flags = (Mode == readwrite) ? MAP_SHARED : MAP_PRIVATE;
+  int prot = (Mode == readonly) ? PROT_READ : (PROT_READ | PROT_WRITE);
+#if defined(__APPLE__)
+  //----------------------------------------------------------------------
+  // Newer versions of MacOSX have a flag that will allow us to read from
+  // binaries whose code signature is invalid without crashing by using
+  // the MAP_RESILIENT_CODESIGN flag. Also if a file from removable media
+  // is mapped we can avoid crashing and return zeroes to any pages we try
+  // to read if the media becomes unavailable by using the
+  // MAP_RESILIENT_MEDIA flag.  These flags are only usable when mapping
+  // with PROT_READ, so take care not to specify them otherwise.
+  //----------------------------------------------------------------------
+  if (Mode == readonly) {
+#if defined(MAP_RESILIENT_CODESIGN)
+    flags |= MAP_RESILIENT_CODESIGN;
+#endif
+#if defined(MAP_RESILIENT_MEDIA)
+    flags |= MAP_RESILIENT_MEDIA;
+#endif
+  }
+#endif // #if defined (__APPLE__)
+
+  Mapping = ::mmap(nullptr, Size, prot, flags, FD, Offset);
+  if (Mapping == MAP_FAILED)
+    return std::error_code(errno, std::generic_category());
+  return std::error_code();
+}
+
+mapped_file_region::mapped_file_region(int fd, mapmode mode, size_t length,
+                                       uint64_t offset, std::error_code &ec)
+    : Size(length), Mapping(), Mode(mode) {
+  (void)Mode;
+  ec = init(fd, offset, mode);
+  if (ec)
+    Mapping = nullptr;
+}
+
+mapped_file_region::~mapped_file_region() {
+  if (Mapping)
+    ::munmap(Mapping, Size);
+}
+
+size_t mapped_file_region::size() const {
+  assert(Mapping && "Mapping failed but used anyway!");
+  return Size;
+}
+
+char *mapped_file_region::data() const {
+  assert(Mapping && "Mapping failed but used anyway!");
+  return reinterpret_cast<char*>(Mapping);
+}
+
+const char *mapped_file_region::const_data() const {
+  assert(Mapping && "Mapping failed but used anyway!");
+  return reinterpret_cast<const char*>(Mapping);
+}
+
+int mapped_file_region::alignment() {
+  return ::sysconf(_SC_PAGE_SIZE);
 }
 
 std::error_code detail::directory_iterator_construct(detail::DirIterState &it,
@@ -191,19 +287,25 @@ std::error_code detail::directory_iterator_destruct(detail::DirIterState &it) {
   return std::error_code();
 }
 
-std::error_code detail::directory_iterator_increment(detail::DirIterState &it) {
+static file_type direntType(dirent* Entry) {
+  // Most platforms provide the file type in the dirent: Linux/BSD/Mac.
+  // The DTTOIF macro lets us reuse our status -> type conversion.
+  return typeForMode(DTTOIF(Entry->d_type));
+}
+
+std::error_code detail::directory_iterator_increment(detail::DirIterState &It) {
   errno = 0;
-  dirent *cur_dir = ::readdir(reinterpret_cast<DIR *>(it.IterationHandle));
-  if (cur_dir == nullptr && errno != 0) {
+  dirent *CurDir = ::readdir(reinterpret_cast<DIR *>(It.IterationHandle));
+  if (CurDir == nullptr && errno != 0) {
     return std::error_code(errno, std::generic_category());
-  } else if (cur_dir != nullptr) {
-    StringRef name(cur_dir->d_name, NAMLEN(cur_dir));
-    if ((name.size() == 1 && name[0] == '.') ||
-        (name.size() == 2 && name[0] == '.' && name[1] == '.'))
-      return directory_iterator_increment(it);
-    it.CurrentEntry.replace_filename(name);
+  } else if (CurDir != nullptr) {
+    StringRef Name(CurDir->d_name);
+    if ((Name.size() == 1 && Name[0] == '.') ||
+        (Name.size() == 2 && Name[0] == '.' && Name[1] == '.'))
+      return directory_iterator_increment(It);
+    It.CurrentEntry.replace_filename(Name, direntType(CurDir));
   } else
-    return directory_iterator_destruct(it);
+    return directory_iterator_destruct(It);
 
   return std::error_code();
 }
@@ -224,14 +326,85 @@ static bool hasProcSelfFD() {
 }
 #endif
 
-std::error_code openFileForRead(const Twine &Name, int &ResultFD,
-                                SmallVectorImpl<char> *RealPath) {
+static int nativeOpenFlags(CreationDisposition Disp, OpenFlags Flags,
+                           FileAccess Access) {
+  int Result = 0;
+  if (Access == FA_Read)
+    Result |= O_RDONLY;
+  else if (Access == FA_Write)
+    Result |= O_WRONLY;
+  else if (Access == (FA_Read | FA_Write))
+    Result |= O_RDWR;
+
+  // This is for compatibility with old code that assumed F_Append implied
+  // would open an existing file.  See Windows/Path.inc for a longer comment.
+  if (Flags & F_Append)
+    Disp = CD_OpenAlways;
+
+  if (Disp == CD_CreateNew) {
+    Result |= O_CREAT; // Create if it doesn't exist.
+    Result |= O_EXCL;  // Fail if it does.
+  } else if (Disp == CD_CreateAlways) {
+    Result |= O_CREAT; // Create if it doesn't exist.
+    Result |= O_TRUNC; // Truncate if it does.
+  } else if (Disp == CD_OpenAlways) {
+    Result |= O_CREAT; // Create if it doesn't exist.
+  } else if (Disp == CD_OpenExisting) {
+    // Nothing special, just don't add O_CREAT and we get these semantics.
+  }
+
+  if (Flags & F_Append)
+    Result |= O_APPEND;
+
+#ifdef O_CLOEXEC
+  if (!(Flags & OF_ChildInherit))
+    Result |= O_CLOEXEC;
+#endif
+
+  return Result;
+}
+
+std::error_code openFile(const Twine &Name, int &ResultFD,
+                         CreationDisposition Disp, FileAccess Access,
+                         OpenFlags Flags, unsigned Mode) {
+  int OpenFlags = nativeOpenFlags(Disp, Flags, Access);
+
   SmallString<128> Storage;
   StringRef P = Name.toNullTerminatedStringRef(Storage);
-  while ((ResultFD = open(P.begin(), O_RDONLY)) < 0) {
-    if (errno != EINTR)
-      return std::error_code(errno, std::generic_category());
+  // Call ::open in a lambda to avoid overload resolution in RetryAfterSignal
+  // when open is overloaded, such as in Bionic.
+  auto Open = [&]() { return ::open(P.begin(), OpenFlags, Mode); };
+  if ((ResultFD = sys::RetryAfterSignal(-1, Open)) < 0)
+    return std::error_code(errno, std::generic_category());
+#ifndef O_CLOEXEC
+  if (!(Flags & OF_ChildInherit)) {
+    int r = fcntl(ResultFD, F_SETFD, FD_CLOEXEC);
+    (void)r;
+    assert(r == 0 && "fcntl(F_SETFD, FD_CLOEXEC) failed");
   }
+#endif
+  return std::error_code();
+}
+
+Expected<int> openNativeFile(const Twine &Name, CreationDisposition Disp,
+                             FileAccess Access, OpenFlags Flags,
+                             unsigned Mode) {
+
+  int FD;
+  std::error_code EC = openFile(Name, FD, Disp, Access, Flags, Mode);
+  if (EC)
+    return errorCodeToError(EC);
+  return FD;
+}
+
+std::error_code openFileForRead(const Twine &Name, int &ResultFD,
+                                OpenFlags Flags,
+                                SmallVectorImpl<char> *RealPath) {
+  std::error_code EC =
+      openFile(Name, ResultFD, CD_OpenExisting, FA_Read, Flags, 0666);
+  if (EC)
+    return EC;
+
   // Attempt to get the real name of the file, if the user asked
   if(!RealPath)
     return std::error_code();
@@ -251,6 +424,9 @@ std::error_code openFileForRead(const Twine &Name, int &ResultFD,
     if (CharCount > 0)
       RealPath->append(Buffer, Buffer + CharCount);
   } else {
+    SmallString<128> Storage;
+    StringRef P = Name.toNullTerminatedStringRef(Storage);
+
     // Use ::realpath to get the real path name
     if (::realpath(P.begin(), Buffer) != nullptr)
       RealPath->append(Buffer, Buffer + strlen(Buffer));
@@ -259,38 +435,18 @@ std::error_code openFileForRead(const Twine &Name, int &ResultFD,
   return std::error_code();
 }
 
-std::error_code openFileForWrite(const Twine &Name, int &ResultFD,
-                                 OpenFlags Flags, unsigned Mode) {
-  // Verify that we don't have both "append" and "excl".
-  assert((!(Flags & F_Excl) || !(Flags & F_Append)) &&
-         "Cannot specify both 'excl' and 'append' file creation flags!");
+Expected<file_t> openNativeFileForRead(const Twine &Name, OpenFlags Flags,
+                                       SmallVectorImpl<char> *RealPath) {
+  file_t ResultFD;
+  std::error_code EC = openFileForRead(Name, ResultFD, Flags, RealPath);
+  if (EC)
+    return errorCodeToError(EC);
+  return ResultFD;
+}
 
-  int OpenFlags = O_CREAT;
-
-#ifdef O_CLOEXEC
-  OpenFlags |= O_CLOEXEC;
-#endif
-
-  if (Flags & F_RW)
-    OpenFlags |= O_RDWR;
-  else
-    OpenFlags |= O_WRONLY;
-
-  if (Flags & F_Append)
-    OpenFlags |= O_APPEND;
-  else if (!(Flags & F_NoTrunc))
-    OpenFlags |= O_TRUNC;
-
-  if (Flags & F_Excl)
-    OpenFlags |= O_EXCL;
-
-  SmallString<128> Storage;
-  StringRef P = Name.toNullTerminatedStringRef(Storage);
-  while ((ResultFD = open(P.begin(), OpenFlags, Mode)) < 0) {
-    if (errno != EINTR)
-      return std::error_code(errno, std::generic_category());
-  }
-  return std::error_code();
+void closeFile(file_t &F) {
+  ::close(F);
+  F = kInvalidFile;
 }
 
 } // end namespace fs
@@ -298,13 +454,18 @@ std::error_code openFileForWrite(const Twine &Name, int &ResultFD,
 namespace path {
 
 bool home_directory(SmallVectorImpl<char> &result) {
-  if (char *RequestedDir = std::getenv("HOME")) {
-    result.clear();
-    result.append(RequestedDir, RequestedDir + strlen(RequestedDir));
-    return true;
+  char *RequestedDir = getenv("HOME");
+  if (!RequestedDir) {
+    struct passwd *pw = getpwuid(getuid());
+    if (pw && pw->pw_dir)
+      RequestedDir = pw->pw_dir;
   }
+  if (!RequestedDir)
+    return false;
 
-  return false;
+  result.clear();
+  result.append(RequestedDir, RequestedDir + strlen(RequestedDir));
+  return true;
 }
 
 static bool getDarwinConfDir(bool TempDir, SmallVectorImpl<char> &Result) {
@@ -329,29 +490,6 @@ static bool getDarwinConfDir(bool TempDir, SmallVectorImpl<char> &Result) {
     Result.clear();
   }
   #endif
-  return false;
-}
-
-static bool getUserCacheDir(SmallVectorImpl<char> &Result) {
-  // First try using XDG_CACHE_HOME env variable,
-  // as specified in XDG Base Directory Specification at
-  // http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
-  if (const char *XdgCacheDir = std::getenv("XDG_CACHE_HOME")) {
-    Result.clear();
-    Result.append(XdgCacheDir, XdgCacheDir + strlen(XdgCacheDir));
-    return true;
-  }
-
-  // Try Darwin configuration query
-  if (getDarwinConfDir(false, Result))
-    return true;
-
-  // Use "$HOME/.cache" if $HOME is available
-  if (home_directory(Result)) {
-    append(Result, ".cache");
-    return true;
-  }
-
   return false;
 }
 

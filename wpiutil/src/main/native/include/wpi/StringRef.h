@@ -130,7 +130,7 @@ namespace wpi {
     /// empty - Check if the string is empty.
     LLVM_NODISCARD
     LLVM_ATTRIBUTE_ALWAYS_INLINE
-    bool empty() const noexcept { return size() == 0; }
+    bool empty() const noexcept { return Length == 0; }
 
     /// size - Get the string size.
     LLVM_NODISCARD
@@ -683,10 +683,7 @@ namespace wpi {
     /// \returns The split substrings.
     LLVM_NODISCARD
     std::pair<StringRef, StringRef> split(char Separator) const {
-      size_t Idx = find(Separator);
-      if (Idx == npos)
-        return std::make_pair(*this, StringRef());
-      return std::make_pair(slice(0, Idx), slice(Idx+1, npos));
+      return split(StringRef(&Separator, 1));
     }
 
     /// Split into two substrings around the first occurrence of a separator
@@ -702,6 +699,24 @@ namespace wpi {
     LLVM_NODISCARD
     std::pair<StringRef, StringRef> split(StringRef Separator) const {
       size_t Idx = find(Separator);
+      if (Idx == npos)
+        return std::make_pair(*this, StringRef());
+      return std::make_pair(slice(0, Idx), slice(Idx + Separator.size(), npos));
+    }
+
+    /// Split into two substrings around the last occurrence of a separator
+    /// string.
+    ///
+    /// If \p Separator is in the string, then the result is a pair (LHS, RHS)
+    /// such that (*this == LHS + Separator + RHS) is true and RHS is
+    /// minimal. If \p Separator is not in the string, then the result is a
+    /// pair (LHS, RHS) where (*this == LHS) and (RHS == "").
+    ///
+    /// \param Separator - The string to split on.
+    /// \return - The split substrings.
+    LLVM_NODISCARD
+    std::pair<StringRef, StringRef> rsplit(StringRef Separator) const {
+      size_t Idx = rfind(Separator);
       if (Idx == npos)
         return std::make_pair(*this, StringRef());
       return std::make_pair(slice(0, Idx), slice(Idx + Separator.size(), npos));
@@ -754,10 +769,7 @@ namespace wpi {
     /// \return - The split substrings.
     LLVM_NODISCARD
     std::pair<StringRef, StringRef> rsplit(char Separator) const {
-      size_t Idx = rfind(Separator);
-      if (Idx == npos)
-        return std::make_pair(*this, StringRef());
-      return std::make_pair(slice(0, Idx), slice(Idx+1, npos));
+      return rsplit(StringRef(&Separator, 1));
     }
 
     /// Return string with consecutive \p Char characters starting from the
