@@ -132,7 +132,9 @@ std::vector<std::string> CameraServer::Impl::GetSourceStreamValues(
   auto values = cs::GetHttpCameraUrls(source, &status);
   for (auto& value : values) value = "mjpg:" + value;
 
+#ifdef __FRC_ROBORIO__
   // Look to see if we have a passthrough server for this source
+  // Only do this on the roboRIO
   for (const auto& i : m_sinks) {
     CS_Sink sink = i.second.GetHandle();
     CS_Source sinkSource = cs::GetSinkSource(sink, &status);
@@ -144,6 +146,7 @@ std::vector<std::string> CameraServer::Impl::GetSourceStreamValues(
       break;
     }
   }
+#endif
 
   // Set table value
   return values;
