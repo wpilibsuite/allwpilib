@@ -379,8 +379,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     uint64_t rv = HAL_GetFPGATime(&status);
     if (status != 0) {
       wpi::errs()
-          << "Call to HAL_GetFPGATime failed."
-          << "Initialization might have failed. Time will not be correct\n";
+          << "Call to HAL_GetFPGATime failed in wpi::Now() with status "
+          << status
+          << ". Initialization might have failed. Time will not be correct\n";
       wpi::errs().flush();
       return 0u;
     }
