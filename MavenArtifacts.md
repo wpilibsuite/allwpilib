@@ -25,7 +25,6 @@ WPILib builds four different types of artifacts.
 ##### C++ Only Libraries
 When we publish C++ only libraries, they are published with the base artifact name as their artifact name, with a `-cpp` extension. All dependencies for the library are linked as shared libraries to the binary.
 
-
 Example:
 ```
 edu.wpi.first.wpilibc:wpilibc-cpp:version:classifier@zip
