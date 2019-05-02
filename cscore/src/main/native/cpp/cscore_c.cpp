@@ -445,9 +445,9 @@ void CS_AllocateRawFrameData(CS_RawFrame* frame, int requestedSize) {
   if (frame->dataLength >= requestedSize) return;
   if (frame->data) {
     frame->data =
-        static_cast<char*>(wpi::CheckedRealloc(frame->data, requestedSize));
+        static_cast<char*>(wpi::safe_realloc(frame->data, requestedSize));
   } else {
-    frame->data = static_cast<char*>(wpi::CheckedMalloc(requestedSize));
+    frame->data = static_cast<char*>(wpi::safe_malloc(requestedSize));
   }
   frame->dataLength = requestedSize;
 }
