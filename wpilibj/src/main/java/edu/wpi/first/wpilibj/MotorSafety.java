@@ -22,15 +22,13 @@ public abstract class MotorSafety {
   private double m_expiration = kDefaultSafetyExpiration;
   private boolean m_enabled;
   private double m_stopTime = Timer.getFPGATimestamp();
-  private final Object m_thisMutex = new Object();
   private static final Set<MotorSafety> m_instanceList = new LinkedHashSet<>();
-  private static final Object m_listMutex = new Object();
 
   /**
    * MotorSafety constructor.
    */
   public MotorSafety() {
-    synchronized (m_listMutex) {
+    synchronized (m_instanceList) {
       m_instanceList.add(this);
     }
   }
@@ -40,10 +38,8 @@ public abstract class MotorSafety {
    *
    * <p>Resets the timer on this object that is used to do the timeouts.
    */
-  public void feed() {
-    synchronized (m_thisMutex) {
-      m_stopTime = Timer.getFPGATimestamp() + m_expiration;
-    }
+  public synchronized void feed() {
+    m_stopTime = Timer.getFPGATimestamp() + m_expiration;
   }
 
   /**
@@ -51,10 +47,8 @@ public abstract class MotorSafety {
    *
    * @param expirationTime The timeout value in seconds.
    */
-  public void setExpiration(double expirationTime) {
-    synchronized (m_thisMutex) {
-      m_expiration = expirationTime;
-    }
+  public synchronized void setExpiration(double expirationTime) {
+    m_expiration = expirationTime;
   }
 
   /**
@@ -62,10 +56,8 @@ public abstract class MotorSafety {
    *
    * @return the timeout value in seconds.
    */
-  public double getExpiration() {
-    synchronized (m_thisMutex) {
-      return m_expiration;
-    }
+  public synchronized double getExpiration() {
+    return m_expiration;
   }
 
   /**
@@ -73,10 +65,8 @@ public abstract class MotorSafety {
    *
    * @return a true value if the motor is still operating normally and hasn't timed out.
    */
-  public boolean isAlive() {
-    synchronized (m_thisMutex) {
-      return !m_enabled || m_stopTime > Timer.getFPGATimestamp();
-    }
+  public synchronized boolean isAlive() {
+    return !m_enabled || m_stopTime > Timer.getFPGATimestamp();
   }
 
   /**
@@ -88,7 +78,7 @@ public abstract class MotorSafety {
     boolean enabled;
     double stopTime;
 
-    synchronized (m_thisMutex) {
+    synchronized (this) {
       enabled = m_enabled;
       stopTime = m_stopTime;
     }
@@ -111,10 +101,8 @@ public abstract class MotorSafety {
    *
    * @param enabled True if motor safety is enforced for this object
    */
-  public void setSafetyEnabled(boolean enabled) {
-    synchronized (m_thisMutex) {
-      m_enabled = enabled;
-    }
+  public synchronized void setSafetyEnabled(boolean enabled) {
+    m_enabled = enabled;
   }
 
   /**
@@ -124,10 +112,8 @@ public abstract class MotorSafety {
    *
    * @return True if motor safety is enforced for this device
    */
-  public boolean isSafetyEnabled() {
-    synchronized (m_thisMutex) {
-      return m_enabled;
-    }
+  public synchronized boolean isSafetyEnabled() {
+    return m_enabled;
   }
 
   /**
@@ -137,7 +123,7 @@ public abstract class MotorSafety {
    * timed out.
    */
   public static void checkMotors() {
-    synchronized (m_listMutex) {
+    synchronized (m_instanceList) {
       for (MotorSafety elem : m_instanceList) {
         elem.check();
       }
