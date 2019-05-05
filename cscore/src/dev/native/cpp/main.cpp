@@ -11,6 +11,4 @@
 
 using namespace cv;
 
-int main() {
-  std::cout << cs::GetHostname() << std::endl;
-}
+int main() { std::cout << cs::GetHostname() << std::endl; }
