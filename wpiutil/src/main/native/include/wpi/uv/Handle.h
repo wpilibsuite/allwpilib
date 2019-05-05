@@ -140,7 +140,7 @@ class Handle : public std::enable_shared_from_this<Handle> {
    *
    * @return true if the loop is closing, otherwise false.
    */
-  bool GetLoopClosing() const noexcept { return m_loopClosing; }
+  bool IsLoopClosing() const noexcept { return m_loopClosing; }
 
   /**
    * Reference the given handle.
