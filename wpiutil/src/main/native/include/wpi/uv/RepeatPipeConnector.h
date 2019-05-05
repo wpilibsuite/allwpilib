@@ -28,7 +28,7 @@ class RepeatPipeConnector
  public:
   RepeatPipeConnector(Loop& loop, Timer::Time reconnectTime, bool ipc,
                       const private_init&)
-      : m_reconnectTime{reconnectTime}, m_loop{loop},  m_ipc{ipc} {}
+      : m_reconnectTime{reconnectTime}, m_loop{loop}, m_ipc{ipc} {}
 
   static std::shared_ptr<RepeatPipeConnector> Create(Loop& loop,
                                                      Timer::Time reconnectTime,
