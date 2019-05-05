@@ -62,7 +62,11 @@ TEST(WatchdogTest, Reset) {
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 }
 
+#ifdef __APPLE__
+TEST(WatchdogTest, DISABLED_SetTimeout) {
+#else
 TEST(WatchdogTest, SetTimeout) {
+#endif
   uint32_t watchdogCounter = 0;
 
   Watchdog watchdog(1.0, [&] { watchdogCounter++; });
