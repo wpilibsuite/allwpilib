@@ -52,6 +52,18 @@ class SingleNativeBuild implements Plugin<Project> {
     static class Rules extends RuleSource {
         @Mutate
         @CompileStatic
+        void removeMacSystemIncludes(ModelMap<Task>, BinaryContainer binaries) {
+            binaries.each {
+                if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.tasks.withType(AbstractNativeSourceCompileTask) {
+                        it.getSystemIncludeRoots().clear()
+                    }
+                }
+            }
+        }
+
+        @Mutate
+        @CompileStatic
         void setupSingleNativeBuild(ModelMap<Task> tasks, ComponentSpecContainer components, BinaryContainer binaryContainer, ProjectLayout projectLayout) {
             Project project = (Project) projectLayout.projectIdentifier;
 
