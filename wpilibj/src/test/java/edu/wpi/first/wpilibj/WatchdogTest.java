@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@DisabledOnOs(OS.MAC)
 class WatchdogTest {
   @Test
   void enableDisableTest() {
@@ -189,7 +190,6 @@ class WatchdogTest {
   }
 
   @Test
-  @DisabledOnOs(OS.MAC)
   void multiWatchdogTest() {
     final AtomicInteger watchdogCounter1 = new AtomicInteger(0);
     final AtomicInteger watchdogCounter2 = new AtomicInteger(0);
