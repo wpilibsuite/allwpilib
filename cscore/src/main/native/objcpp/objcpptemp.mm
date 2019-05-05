@@ -1,12 +1,12 @@
-// #import <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
-// @interface XYZPerson : NSObject
-// - (void)sayHello;
-// @end
+@interface XYZPerson : NSObject
+- (void)sayHello;
+@end
 
 
-// @implementation XYZPerson
-// - (void)sayHello {
-//     NSLog(@"Hello, World!");
-// }
-// @end
+@implementation XYZPerson
+- (void)sayHello {
+    NSLog(@"Hello, World!");
+}
+@end
