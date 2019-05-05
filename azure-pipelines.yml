@@ -30,6 +30,18 @@ jobs:
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
 
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/athena.zip'
+        replaceExistingArchive: true
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        ArtifactName: 'Athena'
+
  - job: Linux_Raspbian
    pool:
      vmImage: 'Ubuntu 16.04'
@@ -49,6 +61,18 @@ jobs:
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
 
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/raspbian.zip'
+        replaceExistingArchive: true
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        ArtifactName: 'Raspbian'
+
  - job: Linux
    pool:
      vmImage: 'Ubuntu 16.04'
@@ -67,6 +91,18 @@ jobs:
         options: '-PskipAthena'
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
+
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/linux.zip'
+        replaceExistingArchive: true
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        ArtifactName: 'Linux'
 
  - job: Styleguide
    pool:
@@ -130,6 +166,18 @@ jobs:
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
 
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/win64.zip'
+        replaceExistingArchive: true
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        ArtifactName: 'Win64'
+
  - job: Windows_32_Bit
    pool:
      vmImage: 'vs2017-win2016'
@@ -155,6 +203,17 @@ jobs:
         tasks: 'build'
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/win32.zip'
+        replaceExistingArchive: true
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        ArtifactName: 'Win32'
 
  - job: Mac
    pool:
@@ -181,3 +240,15 @@ jobs:
         tasks: 'build'
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
+
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/mac.zip'
+        replaceExistingArchive: true
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        ArtifactName: 'Mac'
