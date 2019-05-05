@@ -179,11 +179,5 @@ jobs:
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
-        options: '--info'
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
-    - script: |
-        cat cscore/build/tmp/compileCscoreBaseReleaseStaticLibraryCscoreBaseReleaseStaticLibraryMacObjCpp/options.txt
-        cat cscore/build/tmp/compileCscoreBaseReleaseStaticLibraryCscoreBaseReleaseStaticLibraryMacObjCpp/output.txt
-      displayName: 'Print Compile Files'
-      condition: always()
