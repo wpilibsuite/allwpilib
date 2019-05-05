@@ -17,7 +17,11 @@
 
 using namespace frc;
 
+#ifdef __APPLE__
+TEST(WatchdogTest, DISABLED_EnableDisable) {
+#else
 TEST(WatchdogTest, EnableDisable) {
+#endif
   uint32_t watchdogCounter = 0;
 
   Watchdog watchdog(0.4, [&] { watchdogCounter++; });
@@ -48,7 +52,11 @@ TEST(WatchdogTest, EnableDisable) {
       << "Watchdog either didn't trigger or triggered more than once";
 }
 
+#ifdef __APPLE__
+TEST(WatchdogTest, DISABLED_Reset) {
+#else
 TEST(WatchdogTest, Reset) {
+#endif
   uint32_t watchdogCounter = 0;
 
   Watchdog watchdog(0.4, [&] { watchdogCounter++; });
@@ -85,7 +93,11 @@ TEST(WatchdogTest, SetTimeout) {
       << "Watchdog either didn't trigger or triggered more than once";
 }
 
+#ifdef __APPLE__
+TEST(WatchdogTest, DISABLED_IsExpired) {
+#else
 TEST(WatchdogTest, IsExpired) {
+#endif
   Watchdog watchdog(0.2, [] {});
   EXPECT_FALSE(watchdog.IsExpired());
   watchdog.Enable();
@@ -101,7 +113,11 @@ TEST(WatchdogTest, IsExpired) {
   EXPECT_FALSE(watchdog.IsExpired());
 }
 
+#ifdef __APPLE__
+TEST(WatchdogTest, DISABLED_Epochs) {
+#else
 TEST(WatchdogTest, Epochs) {
+#endif
   uint32_t watchdogCounter = 0;
 
   Watchdog watchdog(0.4, [&] { watchdogCounter++; });
