@@ -186,3 +186,4 @@ jobs:
         cat cscore/build/tmp/compileCscoreBaseReleaseStaticLibraryCscoreBaseReleaseStaticLibraryMacObjCpp/options.txt
         cat cscore/build/tmp/compileCscoreBaseReleaseStaticLibraryCscoreBaseReleaseStaticLibraryMacObjCpp/output.txt
       displayName: 'Print Compile Files'
+      condition: always()
