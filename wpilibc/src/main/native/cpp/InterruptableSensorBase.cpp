@@ -26,7 +26,8 @@ InterruptableSensorBase::~InterruptableSensorBase() {
 }
 
 InterruptableSensorBase::InterruptableSensorBase(InterruptableSensorBase&& rhs)
-    : ErrorBase(std::move(rhs)), m_interrupt(rhs.m_interrupt.load()) {
+    : ErrorBase(std::move(rhs)),
+      m_interrupt(rhs.m_interrupt.exchange(HAL_kInvalidHandle)) {
   rhs.m_interrupt = HAL_kInvalidHandle;
 }
 
@@ -34,8 +35,7 @@ InterruptableSensorBase& InterruptableSensorBase::operator=(
     InterruptableSensorBase&& rhs) {
   ErrorBase::operator=(std::move(rhs));
 
-  m_interrupt = rhs.m_interrupt.load();
-  rhs.m_interrupt = HAL_kInvalidHandle;
+  m_interrupt = rhs.m_interrupt.exchange(HAL_kInvalidHandle);
 
   return *this;
 }
