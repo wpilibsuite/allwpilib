@@ -76,12 +76,15 @@ UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
     : SourceImpl{name, logger, notifier, telemetry}, m_path{path.str()} {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
+  StartMessagePump();
 }
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              int deviceId)
-    : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {}
+    : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {
+  StartMessagePump();
+}
 
 UsbCameraImpl::~UsbCameraImpl() { m_messagePump = nullptr; }
 
@@ -192,11 +195,14 @@ void UsbCameraImpl::NumSinksEnabledChanged() {
       SetCameraMessage, Message::kNumSinksEnabledChanged, nullptr);
 }
 
-void UsbCameraImpl::Start() {
+void UsbCameraImpl::StartMessagePump() {
   m_messagePump = std::make_unique<WindowsMessagePump>(
       [this](HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
         return this->PumpMain(hwnd, uiMsg, wParam, lParam);
       });
+}
+
+void UsbCameraImpl::Start() {
   m_messagePump->PostWindowMessage(PumpReadyMessage, nullptr, nullptr);
 }
 
@@ -354,6 +360,7 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
       DeviceConnect();
       break;
     case WaitForStartupMessage:
+      DeviceConnect();
       return CS_OK;
     case WM_DEVICECHANGE: {
       // Device potentially changed
