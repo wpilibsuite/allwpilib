@@ -133,7 +133,8 @@ static void SetupUdp(wpi::uv::Loop& loop) {
     outAddr.sin_port = htons(1150);
 
     wpi::SmallVector<wpi::uv::Buffer, 4> sendBufs;
-    wpi::raw_uv_ostream stream{sendBufs, GetBufferPool()};
+    wpi::raw_uv_ostream stream{sendBufs,
+                               [] { return GetBufferPool().Allocate(); }};
     ds->SetupSendBuffer(stream);
 
     udpLocal->Send(outAddr, sendBufs, [](auto bufs, Error err) {
