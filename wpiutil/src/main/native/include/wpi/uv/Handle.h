@@ -120,6 +120,29 @@ class Handle : public std::enable_shared_from_this<Handle> {
   void Close() noexcept;
 
   /**
+   * Set if the loop is closing.
+   *
+   * This is set during EventLoopRunner.Stop(), and can be used for other cases
+   * to indicate the loop should be closing. For instance for a uv_walk loop can
+   * use this to close existing handles.
+   *
+   * @param loopClosing true to set the loop currently in closing stages.
+   */
+  void SetLoopClosing(bool loopClosing) noexcept {
+    m_loopClosing = loopClosing;
+  }
+
+  /**
+   * Get the loop closing status.
+   *
+   * This can be used from closed() in order to tell if a closing loop is the
+   * reason for the close, or another reason.
+   *
+   * @return true if the loop is closing, otherwise false.
+   */
+  bool IsLoopClosing() const noexcept { return m_loopClosing; }
+
+  /**
    * Reference the given handle.
    *
    * References are idempotent, that is, if a handle is already referenced
@@ -237,6 +260,7 @@ class Handle : public std::enable_shared_from_this<Handle> {
   std::shared_ptr<Handle> m_self;
   uv_handle_t* m_uv_handle;
   bool m_closed = false;
+  bool m_loopClosing = false;
   std::function<Buffer(size_t)> m_allocBuf{&Buffer::Allocate};
   std::function<void(Buffer&)> m_freeBuf{&DefaultFreeBuf};
   std::shared_ptr<void> m_data;

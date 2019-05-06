@@ -25,7 +25,15 @@
 #include <type_traits>
 
 #ifdef _MSC_VER
-#include <intrin.h>
+// Declare these intrinsics manually rather including intrin.h. It's very
+// expensive, and MathExtras.h is popular.
+// #include <intrin.h>
+extern "C" {
+unsigned char _BitScanForward(unsigned long *_Index, unsigned long _Mask);
+unsigned char _BitScanForward64(unsigned long *_Index, unsigned __int64 _Mask);
+unsigned char _BitScanReverse(unsigned long *_Index, unsigned long _Mask);
+unsigned char _BitScanReverse64(unsigned long *_Index, unsigned __int64 _Mask);
+}
 #endif
 
 namespace wpi {

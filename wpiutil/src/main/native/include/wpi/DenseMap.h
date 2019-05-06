@@ -46,9 +46,10 @@ struct DenseMapPair : public std::pair<KeyT, ValueT> {
 
 } // end namespace detail
 
-template <
-    typename KeyT, typename ValueT, typename KeyInfoT = DenseMapInfo<KeyT>,
-    typename Bucket = detail::DenseMapPair<KeyT, ValueT>, bool IsConst = false>
+template <typename KeyT, typename ValueT,
+          typename KeyInfoT = DenseMapInfo<KeyT>,
+          typename Bucket = wpi::detail::DenseMapPair<KeyT, ValueT>,
+          bool IsConst = false>
 class DenseMapIterator;
 
 template <typename DerivedT, typename KeyT, typename ValueT, typename KeyInfoT,
@@ -389,7 +390,7 @@ protected:
     setNumTombstones(other.getNumTombstones());
 
     if (isPodLike<KeyT>::value && isPodLike<ValueT>::value)
-      memcpy(getBuckets(), other.getBuckets(),
+      memcpy(reinterpret_cast<void *>(getBuckets()), other.getBuckets(),
              getNumBuckets() * sizeof(BucketT));
     else
       for (size_t i = 0; i < getNumBuckets(); ++i) {
@@ -627,9 +628,43 @@ public:
   }
 };
 
+/// Equality comparison for DenseMap.
+///
+/// Iterates over elements of LHS confirming that each (key, value) pair in LHS
+/// is also in RHS, and that no additional pairs are in RHS.
+/// Equivalent to N calls to RHS.find and N value comparisons. Amortized
+/// complexity is linear, worst case is O(N^2) (if every hash collides).
+template <typename DerivedT, typename KeyT, typename ValueT, typename KeyInfoT,
+          typename BucketT>
+bool operator==(
+    const DenseMapBase<DerivedT, KeyT, ValueT, KeyInfoT, BucketT> &LHS,
+    const DenseMapBase<DerivedT, KeyT, ValueT, KeyInfoT, BucketT> &RHS) {
+  if (LHS.size() != RHS.size())
+    return false;
+
+  for (auto &KV : LHS) {
+    auto I = RHS.find(KV.first);
+    if (I == RHS.end() || I->second != KV.second)
+      return false;
+  }
+
+  return true;
+}
+
+/// Inequality comparison for DenseMap.
+///
+/// Equivalent to !(LHS == RHS). See operator== for performance notes.
+template <typename DerivedT, typename KeyT, typename ValueT, typename KeyInfoT,
+          typename BucketT>
+bool operator!=(
+    const DenseMapBase<DerivedT, KeyT, ValueT, KeyInfoT, BucketT> &LHS,
+    const DenseMapBase<DerivedT, KeyT, ValueT, KeyInfoT, BucketT> &RHS) {
+  return !(LHS == RHS);
+}
+
 template <typename KeyT, typename ValueT,
           typename KeyInfoT = DenseMapInfo<KeyT>,
-          typename BucketT = detail::DenseMapPair<KeyT, ValueT>>
+          typename BucketT = wpi::detail::DenseMapPair<KeyT, ValueT>>
 class DenseMap : public DenseMapBase<DenseMap<KeyT, ValueT, KeyInfoT, BucketT>,
                                      KeyT, ValueT, KeyInfoT, BucketT> {
   friend class DenseMapBase<DenseMap, KeyT, ValueT, KeyInfoT, BucketT>;
@@ -662,6 +697,11 @@ public:
   DenseMap(const InputIt &I, const InputIt &E) {
     init(std::distance(I, E));
     this->insert(I, E);
+  }
+
+  DenseMap(std::initializer_list<typename BaseT::value_type> Vals) {
+    init(Vals.size());
+    this->insert(Vals.begin(), Vals.end());
   }
 
   ~DenseMap() {
@@ -786,7 +826,7 @@ private:
 
 template <typename KeyT, typename ValueT, unsigned InlineBuckets = 4,
           typename KeyInfoT = DenseMapInfo<KeyT>,
-          typename BucketT = detail::DenseMapPair<KeyT, ValueT>>
+          typename BucketT = wpi::detail::DenseMapPair<KeyT, ValueT>>
 class SmallDenseMap
     : public DenseMapBase<
           SmallDenseMap<KeyT, ValueT, InlineBuckets, KeyInfoT, BucketT>, KeyT,

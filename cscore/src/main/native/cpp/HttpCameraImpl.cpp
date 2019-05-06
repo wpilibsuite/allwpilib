@@ -7,9 +7,9 @@
 
 #include "HttpCameraImpl.h"
 
+#include <wpi/MemAlloc.h>
 #include <wpi/STLExtras.h>
 #include <wpi/TCPConnector.h>
-#include <wpi/memory.h>
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
@@ -611,7 +611,7 @@ void CS_SetHttpCameraUrls(CS_Source source, const char** urls, int count,
 char** CS_GetHttpCameraUrls(CS_Source source, int* count, CS_Status* status) {
   auto urls = cs::GetHttpCameraUrls(source, status);
   char** out =
-      static_cast<char**>(wpi::CheckedMalloc(urls.size() * sizeof(char*)));
+      static_cast<char**>(wpi::safe_malloc(urls.size() * sizeof(char*)));
   *count = urls.size();
   for (size_t i = 0; i < urls.size(); ++i) out[i] = cs::ConvertToC(urls[i]);
   return out;

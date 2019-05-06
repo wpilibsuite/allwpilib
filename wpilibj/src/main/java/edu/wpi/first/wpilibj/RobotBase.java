@@ -67,6 +67,11 @@ public abstract class RobotBase implements AutoCloseable {
       public Long getRobotMainThreadId() {
         return MAIN_THREAD_ID;
       }
+
+      @Override
+      public boolean isRoboRIO() {
+        return RobotBase.isReal();
+      }
     };
 
     CameraServerSharedStore.setCameraServerShared(shared);

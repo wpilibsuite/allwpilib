@@ -28,8 +28,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <wpi/MemAlloc.h>
 #include <wpi/SmallString.h>
-#include <wpi/memory.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
@@ -76,12 +76,15 @@ UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
     : SourceImpl{name, logger, notifier, telemetry}, m_path{path.str()} {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
+  StartMessagePump();
 }
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              int deviceId)
-    : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {}
+    : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {
+  StartMessagePump();
+}
 
 UsbCameraImpl::~UsbCameraImpl() { m_messagePump = nullptr; }
 
@@ -192,11 +195,14 @@ void UsbCameraImpl::NumSinksEnabledChanged() {
       SetCameraMessage, Message::kNumSinksEnabledChanged, nullptr);
 }
 
-void UsbCameraImpl::Start() {
+void UsbCameraImpl::StartMessagePump() {
   m_messagePump = std::make_unique<WindowsMessagePump>(
       [this](HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
         return this->PumpMain(hwnd, uiMsg, wParam, lParam);
       });
+}
+
+void UsbCameraImpl::Start() {
   m_messagePump->PostWindowMessage(PumpReadyMessage, nullptr, nullptr);
 }
 
@@ -354,6 +360,7 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
       DeviceConnect();
       break;
     case WaitForStartupMessage:
+      DeviceConnect();
       return CS_OK;
     case WM_DEVICECHANGE: {
       // Device potentially changed
@@ -413,16 +420,16 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
 
 static cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
   // Compare GUID to one of the supported ones
-  if (guid == MFVideoFormat_NV12) {
+  if (IsEqualGUID(guid, MFVideoFormat_NV12)) {
     // GrayScale
     return cs::VideoMode::PixelFormat::kGray;
-  } else if (guid == MFVideoFormat_YUY2) {
+  } else if (IsEqualGUID(guid, MFVideoFormat_YUY2)) {
     return cs::VideoMode::PixelFormat::kYUYV;
-  } else if (guid == MFVideoFormat_RGB24) {
+  } else if (IsEqualGUID(guid, MFVideoFormat_RGB24)) {
     return cs::VideoMode::PixelFormat::kBGR;
-  } else if (guid == MFVideoFormat_MJPG) {
+  } else if (IsEqualGUID(guid, MFVideoFormat_MJPG)) {
     return cs::VideoMode::PixelFormat::kMJPEG;
-  } else if (guid == MFVideoFormat_RGB565) {
+  } else if (IsEqualGUID(guid, MFVideoFormat_RGB565)) {
     return cs::VideoMode::PixelFormat::kRGB565;
   } else {
     return cs::VideoMode::PixelFormat::kUnknown;

@@ -95,8 +95,8 @@ void HAL_CleanCAN(HAL_CANHandle handle) {
 
   for (auto&& i : data->periodicSends) {
     int32_t s = 0;
-    HAL_CAN_SendMessage(i.first, nullptr, 0, HAL_CAN_SEND_PERIOD_STOP_REPEATING,
-                        &s);
+    auto id = CreateCANId(data.get(), i.first);
+    HAL_CAN_SendMessage(id, nullptr, 0, HAL_CAN_SEND_PERIOD_STOP_REPEATING, &s);
     i.second = -1;
   }
 }

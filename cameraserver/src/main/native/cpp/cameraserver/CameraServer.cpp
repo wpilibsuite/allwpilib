@@ -56,21 +56,21 @@ static wpi::StringRef MakeSourceValue(CS_Source source,
   CS_Status status = 0;
   buf.clear();
   switch (cs::GetSourceKind(source, &status)) {
-    case cs::VideoSource::kUsb: {
+    case CS_SOURCE_USB: {
       wpi::StringRef prefix{"usb:"};
       buf.append(prefix.begin(), prefix.end());
       auto path = cs::GetUsbCameraPath(source, &status);
       buf.append(path.begin(), path.end());
       break;
     }
-    case cs::VideoSource::kHttp: {
+    case CS_SOURCE_HTTP: {
       wpi::StringRef prefix{"ip:"};
       buf.append(prefix.begin(), prefix.end());
       auto urls = cs::GetHttpCameraUrls(source, &status);
       if (!urls.empty()) buf.append(urls[0].begin(), urls[0].end());
       break;
     }
-    case cs::VideoSource::kCv:
+    case CS_SOURCE_CV:
       return "cv:";
     default:
       return "unknown:";
@@ -132,7 +132,9 @@ std::vector<std::string> CameraServer::Impl::GetSourceStreamValues(
   auto values = cs::GetHttpCameraUrls(source, &status);
   for (auto& value : values) value = "mjpg:" + value;
 
+#ifdef __FRC_ROBORIO__
   // Look to see if we have a passthrough server for this source
+  // Only do this on the roboRIO
   for (const auto& i : m_sinks) {
     CS_Sink sink = i.second.GetHandle();
     CS_Source sinkSource = cs::GetSinkSource(sink, &status);
@@ -144,6 +146,7 @@ std::vector<std::string> CameraServer::Impl::GetSourceStreamValues(
       break;
     }
   }
+#endif
 
   // Set table value
   return values;
@@ -239,14 +242,14 @@ static void PutSourcePropertyValue(nt::NetworkTable* table,
   CS_Status status = 0;
   nt::NetworkTableEntry entry = table->GetEntry(name);
   switch (event.propertyKind) {
-    case cs::VideoProperty::kBoolean:
+    case CS_PROP_BOOLEAN:
       if (isNew)
         entry.SetDefaultBoolean(event.value != 0);
       else
         entry.SetBoolean(event.value != 0);
       break;
-    case cs::VideoProperty::kInteger:
-    case cs::VideoProperty::kEnum:
+    case CS_PROP_INTEGER:
+    case CS_PROP_ENUM:
       if (isNew) {
         entry.SetDefaultDouble(event.value);
         table->GetEntry(infoName + "/min")
@@ -261,7 +264,7 @@ static void PutSourcePropertyValue(nt::NetworkTable* table,
         entry.SetDouble(event.value);
       }
       break;
-    case cs::VideoProperty::kString:
+    case CS_PROP_STRING:
       if (isNew)
         entry.SetDefaultString(event.valueStr);
       else
