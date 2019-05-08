@@ -12,6 +12,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.hal.NotifierJNI;
 
+import static java.util.Objects.requireNonNull;
+
 public class Notifier implements AutoCloseable {
   // The thread waiting on the HAL alarm.
   private Thread m_thread;
@@ -85,6 +87,8 @@ public class Notifier implements AutoCloseable {
    *            using StartSingle or StartPeriodic.
    */
   public Notifier(Runnable run) {
+    requireNonNull(run);
+
     m_handler = run;
     m_notifier.set(NotifierJNI.initializeNotifier());
 
