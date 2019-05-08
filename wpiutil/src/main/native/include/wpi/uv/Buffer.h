@@ -108,6 +108,9 @@ class SimpleBufferPool {
    */
   explicit SimpleBufferPool(size_t size = 4096) : m_size{size} {}
 
+  SimpleBufferPool(const SimpleBufferPool& other) = delete;
+  SimpleBufferPool& operator=(const SimpleBufferPool& other) = delete;
+
   /**
    * Allocate a buffer.
    */
