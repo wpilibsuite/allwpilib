@@ -53,11 +53,9 @@ public final class Shuffleboard {
   public static final String kBaseTableName = "/Shuffleboard";
 
   private static final ShuffleboardRoot root =
-      new ShuffleboardInstance(NetworkTableInstance.getDefault());
+      new ShuffleboardInstance(NetworkTableInstance.getDefault(), true);
   private static final RecordingController recordingController =
       new RecordingController(NetworkTableInstance.getDefault());
-
-  // TODO usage reporting
 
   private Shuffleboard() {
     throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");

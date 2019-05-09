@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -24,11 +26,29 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
   private final NetworkTable m_rootMetaTable;
   private final NetworkTableEntry m_selectedTabEntry;
 
+  /**
+   * Creates a new Shuffleboard instance. This constructor does not do usage reporting.
+   *
+   * @param ntInstance the NetworkTables instance to use
+   */
   ShuffleboardInstance(NetworkTableInstance ntInstance) {
+    this(ntInstance, false);
+  }
+
+  /**
+   * Creates a new Shuffleboard instance.
+   *
+   * @param ntInstance the NetworkTables instance to use
+   * @param report     if usage should be reported
+   */
+  ShuffleboardInstance(NetworkTableInstance ntInstance, boolean report) {
     Objects.requireNonNull(ntInstance, "NetworkTable instance cannot be null");
     m_rootTable = ntInstance.getTable(Shuffleboard.kBaseTableName);
     m_rootMetaTable = m_rootTable.getSubTable(".metadata");
     m_selectedTabEntry = m_rootMetaTable.getEntry("Selected");
+    if (report) {
+      HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
+    }
   }
 
   @Override
