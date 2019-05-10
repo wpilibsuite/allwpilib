@@ -81,13 +81,7 @@ void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status) {
   static_cast<CvSourceImpl&>(*data->source).PutFrame(image);
 }
 
-static constexpr unsigned SourceMask = 0xFFFFFFFC;
-static_assert((SourceMask & CS_SOURCE_USB) == 0, "USB must not be masked");
-static_assert((SourceMask & CS_SOURCE_HTTP) == 0, "HTTP must not be masked");
-static_assert((SourceMask & CS_SOURCE_UNKNOWN) == 0,
-              "Unknown must not be masked");
-static_assert((SourceMask & CS_SOURCE_CV) != 0, "CV must be masked");
-static_assert((SourceMask & CS_SOURCE_RAW) != 0, "Raw must be masked");
+static constexpr unsigned SourceMask = CS_SINK_CV | CS_SINK_RAW;
 
 void NotifySourceError(CS_Source source, const wpi::Twine& msg,
                        CS_Status* status) {

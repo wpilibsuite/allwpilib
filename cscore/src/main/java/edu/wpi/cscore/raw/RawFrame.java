@@ -51,7 +51,7 @@ public class RawFrame implements AutoCloseable {
 
   /**
    * Get a ByteBuffer pointing to the frame data.
-   * This ByteBuffer is backed by the frame directly. Its lifetime is controled by
+   * This ByteBuffer is backed by the frame directly. Its lifetime is controlled by
    * the frame. If a new frame gets read, it will overwrite the current one.
    */
   public ByteBuffer getDataByteBuffer() {
@@ -60,7 +60,7 @@ public class RawFrame implements AutoCloseable {
 
   /**
    * Get a long (is a char* in native code) pointing to the frame data.
-   * This pointer is backed by the frame directly. Its lifetime is controled by
+   * This pointer is backed by the frame directly. Its lifetime is controlled by
    * the frame. If a new frame gets read, it will overwrite the current one.
    */
   public long getDataPtr() {

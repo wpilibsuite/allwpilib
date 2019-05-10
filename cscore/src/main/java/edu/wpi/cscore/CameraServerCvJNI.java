@@ -21,6 +21,7 @@ public class CameraServerCvJNI {
   static {
     String opencvName = Core.NATIVE_LIBRARY_NAME;
     if (!cvLibraryLoaded) {
+      CameraServerJNI.forceLoad();
       try {
         cvLoader = new RuntimeLoader<>(opencvName, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
         cvLoader.loadLibraryHashed();

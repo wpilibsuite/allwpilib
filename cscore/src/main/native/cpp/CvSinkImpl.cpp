@@ -138,11 +138,7 @@ CS_Sink CreateCvSinkCallback(const wpi::Twine& name,
                                                inst.telemetry, processFrame));
 }
 
-static constexpr unsigned SinkMask = 0xFFFFFFFC;
-static_assert((SinkMask & CS_SINK_MJPEG) == 0, "MJPEG must not be masked");
-static_assert((SinkMask & CS_SINK_UNKNOWN) == 0, "Unknown must not be masked");
-static_assert((SinkMask & CS_SINK_CV) != 0, "CV must be masked");
-static_assert((SinkMask & CS_SINK_RAW) != 0, "RAW must be masked");
+static constexpr unsigned SinkMask = CS_SINK_CV | CS_SINK_RAW;
 
 void SetSinkDescription(CS_Sink sink, const wpi::Twine& description,
                         CS_Status* status) {
