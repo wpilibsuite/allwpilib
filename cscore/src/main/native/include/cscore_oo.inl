@@ -378,21 +378,6 @@ inline AxisCamera::AxisCamera(const wpi::Twine& name,
                               std::initializer_list<T> hosts)
     : HttpCamera(name, HostToUrl(hosts), kAxis) {}
 
-inline CvSource::CvSource(const wpi::Twine& name, const VideoMode& mode) {
-  m_handle = CreateCvSource(name, mode, &m_status);
-}
-
-inline CvSource::CvSource(const wpi::Twine& name, VideoMode::PixelFormat format,
-                          int width, int height, int fps) {
-  m_handle =
-      CreateCvSource(name, VideoMode{format, width, height, fps}, &m_status);
-}
-
-inline void CvSource::PutFrame(cv::Mat& image) {
-  m_status = 0;
-  PutSourceFrame(m_handle, image, &m_status);
-}
-
 inline void ImageSource::NotifyError(const wpi::Twine& msg) {
   m_status = 0;
   NotifySourceError(m_handle, msg, &m_status);
@@ -575,28 +560,9 @@ inline void MjpegServer::SetDefaultCompression(int quality) {
               quality, &m_status);
 }
 
-inline CvSink::CvSink(const wpi::Twine& name) {
-  m_handle = CreateCvSink(name, &m_status);
-}
-
-inline CvSink::CvSink(const wpi::Twine& name,
-                      std::function<void(uint64_t time)> processFrame) {
-  m_handle = CreateCvSinkCallback(name, processFrame, &m_status);
-}
-
 inline void ImageSink::SetDescription(const wpi::Twine& description) {
   m_status = 0;
   SetSinkDescription(m_handle, description, &m_status);
-}
-
-inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout) const {
-  m_status = 0;
-  return GrabSinkFrameTimeout(m_handle, image, timeout, &m_status);
-}
-
-inline uint64_t CvSink::GrabFrameNoTimeout(cv::Mat& image) const {
-  m_status = 0;
-  return GrabSinkFrame(m_handle, image, &m_status);
 }
 
 inline std::string ImageSink::GetError() const {

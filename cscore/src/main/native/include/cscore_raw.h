@@ -11,7 +11,7 @@
 #include "cscore_c.h"
 
 #ifdef __cplusplus
-#include "cscore_cpp.h"
+#include "cscore_oo.h"
 #endif
 
 /**
@@ -94,6 +94,130 @@ void PutSourceFrame(CS_Source source, const CS_RawFrame& image,
 uint64_t GrabSinkFrame(CS_Sink sink, CS_RawFrame& image, CS_Status* status);
 uint64_t GrabSinkFrameTimeout(CS_Sink sink, CS_RawFrame& image, double timeout,
                               CS_Status* status);
+
+/**
+ * A sink for user code to accept video frames as raw bytes.
+ */
+class RawSource : public ImageSource {
+ public:
+  RawSource() = default;
+
+  /**
+   * Create an OpenCV source.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param mode Video mode being generated
+   */
+  RawSource(const wpi::Twine& name, const VideoMode& mode);
+
+  /**
+   * Create an OpenCV source.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param pixelFormat Pixel format
+   * @param width width
+   * @param height height
+   * @param fps fps
+   */
+  RawSource(const wpi::Twine& name, VideoMode::PixelFormat pixelFormat,
+           int width, int height, int fps);
+protected:
+  /**
+   * Put an OpenCV image and notify sinks.
+   *
+   * <p>Only 8-bit single-channel or 3-channel (with BGR channel order) images
+   * are supported. If the format, depth or channel order is different, use
+   * cv::Mat::convertTo() and/or cv::cvtColor() to convert it first.
+   *
+   * @param image OpenCV image
+   */
+  void PutFrame(RawFrame& image);
+};
+
+class RawSink : public ImageSink {
+ public:
+  RawSink() = default;
+
+  /**
+   * Create a sink for accepting OpenCV images.
+   *
+   * <p>WaitForFrame() must be called on the created sink to get each new
+   * image.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   */
+  explicit RawSink(const wpi::Twine& name);
+
+  /**
+   * Create a sink for accepting OpenCV images in a separate thread.
+   *
+   * <p>A thread will be created that calls WaitForFrame() and calls the
+   * processFrame() callback each time a new frame arrives.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param processFrame Frame processing function; will be called with a
+   *        time=0 if an error occurred.  processFrame should call GetImage()
+   *        or GetError() as needed, but should not call (except in very
+   *        unusual circumstances) WaitForImage().
+   */
+  RawSink(const wpi::Twine& name,
+         std::function<void(uint64_t time)> processFrame);
+ protected:
+  /**
+   * Wait for the next frame and get the image.
+   * Times out (returning 0) after timeout seconds.
+   * The provided image will have three 8-bit channels stored in BGR order.
+   *
+   * @return Frame time, or 0 on error (call GetError() to obtain the error
+   *         message); the frame time is in the same time base as wpi::Now(),
+   *         and is in 1 us increments.
+   */
+  uint64_t GrabFrame(RawFrame& image, double timeout = 0.225) const;
+
+  /**
+   * Wait for the next frame and get the image.  May block forever.
+   * The provided image will have three 8-bit channels stored in BGR order.
+   *
+   * @return Frame time, or 0 on error (call GetError() to obtain the error
+   *         message); the frame time is in the same time base as wpi::Now(),
+   *         and is in 1 us increments.
+   */
+  uint64_t GrabFrameNoTimeout(RawFrame& image) const;
+};
+
+inline RawSource::RawSource(const wpi::Twine& name, const VideoMode& mode) {
+  m_handle = CreateRawSource(name, mode, &m_status);
+}
+
+inline RawSource::RawSource(const wpi::Twine& name, VideoMode::PixelFormat format,
+                          int width, int height, int fps) {
+  m_handle =
+      CreateRawSource(name, VideoMode{format, width, height, fps}, &m_status);
+}
+
+inline void RawSource::PutFrame(RawFrame& image) {
+  m_status = 0;
+  PutSourceFrame(m_handle, image, &m_status);
+}
+
+inline RawSink::RawSink(const wpi::Twine& name) {
+  m_handle = CreateRawSink(name, &m_status);
+}
+
+inline RawSink::RawSink(const wpi::Twine& name,
+                      std::function<void(uint64_t time)> processFrame) {
+  m_handle = CreateRawSinkCallback(name, processFrame, &m_status);
+}
+
+inline uint64_t RawSink::GrabFrame(RawFrame& image, double timeout) const {
+  m_status = 0;
+  return GrabSinkFrameTimeout(m_handle, image, timeout, &m_status);
+}
+
+inline uint64_t RawSink::GrabFrameNoTimeout(RawFrame& image) const {
+  m_status = 0;
+  return GrabSinkFrame(m_handle, image, &m_status);
+}
 
 }  // namespace cs
 

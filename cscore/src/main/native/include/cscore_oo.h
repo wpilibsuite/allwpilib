@@ -718,45 +718,6 @@ class ImageSource : public VideoSource {
 };
 
 /**
- * A source for user code to provide OpenCV images as video frames.
- */
-class CvSource : public ImageSource {
- public:
-  CvSource() = default;
-
-  /**
-   * Create an OpenCV source.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param mode Video mode being generated
-   */
-  CvSource(const wpi::Twine& name, const VideoMode& mode);
-
-  /**
-   * Create an OpenCV source.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param pixelFormat Pixel format
-   * @param width width
-   * @param height height
-   * @param fps fps
-   */
-  CvSource(const wpi::Twine& name, VideoMode::PixelFormat pixelFormat,
-           int width, int height, int fps);
-
-  /**
-   * Put an OpenCV image and notify sinks.
-   *
-   * <p>Only 8-bit single-channel or 3-channel (with BGR channel order) images
-   * are supported. If the format, depth or channel order is different, use
-   * cv::Mat::convertTo() and/or cv::cvtColor() to convert it first.
-   *
-   * @param image OpenCV image
-   */
-  void PutFrame(cv::Mat& image);
-};
-
-/**
  * A sink for video that accepts a sequence of frames.
  */
 class VideoSink {
@@ -1016,60 +977,6 @@ class ImageSink : public VideoSink {
    * processor resources when frames are not needed.
    */
   void SetEnabled(bool enabled);
-};
-
-/**
- * A sink for user code to accept video frames as OpenCV images.
- */
-class CvSink : public ImageSink {
- public:
-  CvSink() = default;
-
-  /**
-   * Create a sink for accepting OpenCV images.
-   *
-   * <p>WaitForFrame() must be called on the created sink to get each new
-   * image.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   */
-  explicit CvSink(const wpi::Twine& name);
-
-  /**
-   * Create a sink for accepting OpenCV images in a separate thread.
-   *
-   * <p>A thread will be created that calls WaitForFrame() and calls the
-   * processFrame() callback each time a new frame arrives.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param processFrame Frame processing function; will be called with a
-   *        time=0 if an error occurred.  processFrame should call GetImage()
-   *        or GetError() as needed, but should not call (except in very
-   *        unusual circumstances) WaitForImage().
-   */
-  CvSink(const wpi::Twine& name,
-         std::function<void(uint64_t time)> processFrame);
-
-  /**
-   * Wait for the next frame and get the image.
-   * Times out (returning 0) after timeout seconds.
-   * The provided image will have three 8-bit channels stored in BGR order.
-   *
-   * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::Now(),
-   *         and is in 1 us increments.
-   */
-  uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225) const;
-
-  /**
-   * Wait for the next frame and get the image.  May block forever.
-   * The provided image will have three 8-bit channels stored in BGR order.
-   *
-   * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::Now(),
-   *         and is in 1 us increments.
-   */
-  uint64_t GrabFrameNoTimeout(cv::Mat& image) const;
 };
 
 /**
