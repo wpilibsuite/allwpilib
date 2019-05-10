@@ -15,13 +15,11 @@
 #endif
 
 #ifdef __cplusplus
-
-#include "cscore_oo.h"
-
+extern "C" {
 #endif
 
 #ifdef __cplusplus
-extern "C" {
+#include "cscore_oo.h"
 #endif
 
 struct CvMat;
@@ -34,7 +32,7 @@ uint64_t CS_GrabSinkFrameTimeout(CS_Sink sink, struct CvMat* image,
                                  double timeout, CS_Status* status);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif
 
 #ifdef __cplusplus
@@ -52,7 +50,7 @@ uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status);
 uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
                               CS_Status* status);
 
-  /**
+/**
  * A source for user code to provide OpenCV images as video frames.
  */
 class CvSource : public ImageSource {
@@ -179,9 +177,8 @@ inline uint64_t CvSink::GrabFrameNoTimeout(cv::Mat& image) const {
   return GrabSinkFrame(m_handle, image, &m_status);
 }
 
-
-}
-
-#endif
+}  // namespace cs
 
 #endif
+
+#endif  // CSCORE_CSCORE_CV_H_

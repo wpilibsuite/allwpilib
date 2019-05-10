@@ -120,8 +120,9 @@ class RawSource : public ImageSource {
    * @param fps fps
    */
   RawSource(const wpi::Twine& name, VideoMode::PixelFormat pixelFormat,
-           int width, int height, int fps);
-protected:
+            int width, int height, int fps);
+
+ protected:
   /**
    * Put an OpenCV image and notify sinks.
    *
@@ -161,7 +162,8 @@ class RawSink : public ImageSink {
    *        unusual circumstances) WaitForImage().
    */
   RawSink(const wpi::Twine& name,
-         std::function<void(uint64_t time)> processFrame);
+          std::function<void(uint64_t time)> processFrame);
+
  protected:
   /**
    * Wait for the next frame and get the image.
@@ -189,8 +191,9 @@ inline RawSource::RawSource(const wpi::Twine& name, const VideoMode& mode) {
   m_handle = CreateRawSource(name, mode, &m_status);
 }
 
-inline RawSource::RawSource(const wpi::Twine& name, VideoMode::PixelFormat format,
-                          int width, int height, int fps) {
+inline RawSource::RawSource(const wpi::Twine& name,
+                            VideoMode::PixelFormat format, int width,
+                            int height, int fps) {
   m_handle =
       CreateRawSource(name, VideoMode{format, width, height, fps}, &m_status);
 }
@@ -205,7 +208,7 @@ inline RawSink::RawSink(const wpi::Twine& name) {
 }
 
 inline RawSink::RawSink(const wpi::Twine& name,
-                      std::function<void(uint64_t time)> processFrame) {
+                        std::function<void(uint64_t time)> processFrame) {
   m_handle = CreateRawSinkCallback(name, processFrame, &m_status);
 }
 
