@@ -422,18 +422,4 @@ std::vector<std::string> GetNetworkInterfaces();
 
 }  // namespace cs
 
-/**
- * @defgroup cscore_cpp_opencv_special cscore C functions taking a cv::Mat*
- *
- * These are needed for specific interop implementations.
- * @{
- */
-extern "C" {
-uint64_t CS_GrabSinkFrameCpp(CS_Sink sink, cv::Mat* image, CS_Status* status);
-uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image,
-                                    double timeout, CS_Status* status);
-void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, CS_Status* status);
-}  // extern "C"
-/** @} */
-
 #endif  // CSCORE_CSCORE_CPP_H_
