@@ -13,6 +13,10 @@
 #include "cscore_raw.h"
 #include "edu_wpi_cscore_CameraServerJNI.h"
 
+namespace cv {
+class cv::Mat;
+}
+
 using namespace wpi::java;
 
 //
