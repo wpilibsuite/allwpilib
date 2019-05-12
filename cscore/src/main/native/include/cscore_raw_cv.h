@@ -17,6 +17,10 @@
 namespace cs {
 /**
  * A source for using the raw frame API to provide opencv images.
+ *
+ * This is not dependent on any opencv binary ABI, and can be used
+ * with versions of OpenCV that are not 3. If using OpenCV 3, use
+ * CvSource.
  */
 class RawCvSource : public RawSource {
  public:
@@ -59,6 +63,10 @@ class RawCvSource : public RawSource {
 
 /**
  * A sink for user code to accept raw video frames as OpenCV images.
+ *
+ * This is not dependent on any opencv binary ABI, and can be used
+ * with versions of OpenCV that are not 3. If using OpenCV 3, use
+ * CvSink.
  */
 class RawCvSink : public RawSink {
  public:
