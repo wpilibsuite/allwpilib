@@ -35,6 +35,6 @@ public final class ErrorMessages {
             + "Make sure all objects passed to the method in question were properly initialized -"
             + " note that this may not be obvious if it is being called under "
             + "dynamically-changing conditions!  Please do not seek online technical assistance "
-            + "(on Chief Delphi or elsewhere) without doing this first!");
+            + " without doing this first!");
   }
 }
