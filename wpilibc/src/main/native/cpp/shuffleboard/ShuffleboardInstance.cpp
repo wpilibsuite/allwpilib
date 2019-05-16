@@ -24,14 +24,11 @@ struct ShuffleboardInstance::Impl {
   std::shared_ptr<nt::NetworkTable> rootMetaTable;
 };
 
-ShuffleboardInstance::ShuffleboardInstance(nt::NetworkTableInstance ntInstance,
-                                           bool report)
+ShuffleboardInstance::ShuffleboardInstance(nt::NetworkTableInstance ntInstance)
     : m_impl(new Impl) {
   m_impl->rootTable = ntInstance.GetTable(Shuffleboard::kBaseTableName);
   m_impl->rootMetaTable = m_impl->rootTable->GetSubTable(".metadata");
-  if (report) {
-    HAL_Report(HALUsageReporting::kResourceType_Shuffleboard, 0);
-  }
+  HAL_Report(HALUsageReporting::kResourceType_Shuffleboard, 0);
 }
 
 ShuffleboardInstance::~ShuffleboardInstance() {}

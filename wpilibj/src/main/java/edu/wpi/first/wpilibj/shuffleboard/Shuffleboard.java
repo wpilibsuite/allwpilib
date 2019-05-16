@@ -53,7 +53,7 @@ public final class Shuffleboard {
   public static final String kBaseTableName = "/Shuffleboard";
 
   private static final ShuffleboardRoot root =
-      new ShuffleboardInstance(NetworkTableInstance.getDefault(), true);
+      new ShuffleboardInstance(NetworkTableInstance.getDefault());
   private static final RecordingController recordingController =
       new RecordingController(NetworkTableInstance.getDefault());
 
