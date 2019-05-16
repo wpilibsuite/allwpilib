@@ -13,7 +13,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
 
 /**
  * Class to read quadrature encoders.
@@ -126,7 +126,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
    */
   public Encoder(final int channelA, final int channelB, boolean reverseDirection,
                  final EncodingType encodingType) {
-    requireNonNull(encodingType, "Given encoding type was null");
+    requireNonNullParam(encodingType, "encodingType", "Encoder");
 
     m_allocatedA = true;
     m_allocatedB = true;
@@ -223,9 +223,9 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
    */
   public Encoder(DigitalSource sourceA, DigitalSource sourceB, boolean reverseDirection,
                  final EncodingType encodingType) {
-    requireNonNull(sourceA, "Digital Source A was null");
-    requireNonNull(sourceB, "Digital Source B was null");
-    requireNonNull(encodingType, "Given encoding type was null");
+    requireNonNullParam(sourceA, "sourceA", "Encoder");
+    requireNonNullParam(sourceB, "sourceB", "Encoder");
+    requireNonNullParam(encodingType, "encodingType", "Encoder");
 
     m_allocatedA = false;
     m_allocatedB = false;

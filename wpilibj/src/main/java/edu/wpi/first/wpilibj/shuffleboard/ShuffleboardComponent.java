@@ -8,9 +8,10 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 import java.util.Map;
-import java.util.Objects;
 
 import edu.wpi.first.networktables.NetworkTable;
+
+import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
 
 /**
  * A generic component in Shuffleboard.
@@ -30,8 +31,8 @@ public abstract class ShuffleboardComponent<C extends ShuffleboardComponent<C>>
   private int m_height = -1;
 
   protected ShuffleboardComponent(ShuffleboardContainer parent, String title, String type) {
-    m_parent = Objects.requireNonNull(parent, "Parent cannot be null");
-    m_title = Objects.requireNonNull(title, "Title cannot be null");
+    m_parent = requireNonNullParam(parent, "parent", "ShuffleboardComponent");
+    m_title = requireNonNullParam(title, "title", "ShuffleboardComponent");
     m_type = type;
   }
 

@@ -9,10 +9,11 @@ package edu.wpi.first.wpilibj.shuffleboard;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Sendable;
+
+import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
 
 /**
  * A layout in a Shuffleboard tab. Layouts can contain widgets and other layouts.
@@ -22,7 +23,7 @@ public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout
   private final ContainerHelper m_helper = new ContainerHelper(this);
 
   ShuffleboardLayout(ShuffleboardContainer parent, String name, String type) {
-    super(parent, Objects.requireNonNull(type, "Layout type must be specified"), name);
+    super(parent, requireNonNullParam(type, "type", "ShuffleboardLayout"), name);
   }
 
   @Override

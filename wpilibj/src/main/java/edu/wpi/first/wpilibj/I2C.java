@@ -14,7 +14,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.I2CJNI;
 import edu.wpi.first.hal.util.BoundaryException;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
 
 /**
  * I2C bus interface class.
@@ -219,7 +219,7 @@ public class I2C implements AutoCloseable {
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public boolean read(int registerAddress, int count, byte[] buffer) {
-    requireNonNull(buffer, "Null return buffer was given");
+    requireNonNullParam(buffer, "buffer", "read");
 
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
@@ -284,7 +284,7 @@ public class I2C implements AutoCloseable {
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public boolean readOnly(byte[] buffer, int count) {
-    requireNonNull(buffer, "Null return buffer was given");
+    requireNonNullParam(buffer, "buffer", "readOnly");
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
     }

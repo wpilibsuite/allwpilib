@@ -15,7 +15,7 @@ import edu.wpi.first.hal.util.BoundaryException;
 import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
 
 /**
  * Class implements a PID Control Loop.
@@ -157,8 +157,8 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
   public PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource source,
                  PIDOutput output) {
     super(false);
-    requireNonNull(source, "Null PIDSource was given");
-    requireNonNull(output, "Null PIDOutput was given");
+    requireNonNullParam(source, "PIDSource", "PIDBase");
+    requireNonNullParam(output, "output", "PIDBase");
 
     m_setpointTimer = new Timer();
     m_setpointTimer.start();

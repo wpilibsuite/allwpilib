@@ -11,7 +11,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
 
 /**
  * Handle operation of an analog accelerometer. The accelerometer reads acceleration directly
@@ -59,7 +59,7 @@ public class AnalogAccelerometer extends SendableBase implements PIDSource {
   }
 
   private AnalogAccelerometer(final AnalogInput channel, final boolean allocatedChannel) {
-    requireNonNull(channel, "Analog Channel given was null");
+    requireNonNullParam(channel, "channel", "AnalogAccelerometer");
     m_allocatedChannel = allocatedChannel;
     m_analogChannel = channel;
     initAccelerometer();

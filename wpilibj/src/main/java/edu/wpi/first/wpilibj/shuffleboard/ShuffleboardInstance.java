@@ -9,12 +9,13 @@ package edu.wpi.first.wpilibj.shuffleboard;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+
+import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
 
 final class ShuffleboardInstance implements ShuffleboardRoot {
   private final Map<String, ShuffleboardTab> m_tabs = new LinkedHashMap<>();
@@ -25,7 +26,7 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
   private final NetworkTableEntry m_selectedTabEntry;
 
   ShuffleboardInstance(NetworkTableInstance ntInstance) {
-    Objects.requireNonNull(ntInstance, "NetworkTable instance cannot be null");
+    requireNonNullParam(ntInstance, "ntInstance", "ShuffleboardInstance");
     m_rootTable = ntInstance.getTable(Shuffleboard.kBaseTableName);
     m_rootMetaTable = m_rootTable.getSubTable(".metadata");
     m_selectedTabEntry = m_rootMetaTable.getEntry("Selected");
@@ -33,7 +34,7 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
 
   @Override
   public ShuffleboardTab getTab(String title) {
-    Objects.requireNonNull(title, "Tab title cannot be null");
+    requireNonNullParam(title, "title", "getTab");
     if (!m_tabs.containsKey(title)) {
       m_tabs.put(title, new ShuffleboardTab(this, title));
       m_tabsChanged = true;

@@ -12,7 +12,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
 
 /**
  * Class to represent a specific output from an analog trigger. This class is used to get the
@@ -68,8 +68,8 @@ public class AnalogTriggerOutput extends DigitalSource {
    * @param outputType An enum that specifies the output on the trigger to represent.
    */
   public AnalogTriggerOutput(AnalogTrigger trigger, final AnalogTriggerType outputType) {
-    requireNonNull(trigger, "Analog Trigger given was null");
-    requireNonNull(outputType, "Analog Trigger Type given was null");
+    requireNonNullParam(trigger, "trigger", "AnalogTriggerOutput");
+    requireNonNullParam(outputType, "outputType", "AnalogTriggerOutput");
 
     m_trigger = trigger;
     m_outputType = outputType;

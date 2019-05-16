@@ -17,6 +17,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.command.Command;
 
+import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -102,7 +103,7 @@ public class SendableChooser<V> extends SendableBase {
    * @param object the option
    */
   public void setDefaultOption(String name, V object) {
-    requireNonNull(name, "Provided name was null");
+    requireNonNullParam(name, "name", "setDefaultOption");
 
     m_defaultChoice = name;
     addOption(name, object);
