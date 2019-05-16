@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.command.Command;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
-import static java.util.Objects.requireNonNull;
 
 /**
  * The {@link SendableChooser} class is a useful tool for presenting a selection of options to the
