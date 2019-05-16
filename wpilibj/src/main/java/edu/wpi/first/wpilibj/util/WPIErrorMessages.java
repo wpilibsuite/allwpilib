@@ -1,8 +1,32 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj.util;
 
 import static java.util.Objects.requireNonNull;
 
-public class WPIErrorMessages {
+/**
+ * Utility class for common WPILib error messages.
+ */
+public final class WPIErrorMessages {
+  /**
+   * Utility class, so constructor is private.
+   */
+  private WPIErrorMessages() {
+  }
+
+  /**
+   * Requires that a parameter of a method not be null; prints an error message with
+   * helpful debugging instructions if the parameter is null.
+   *
+   * @param obj The parameter that must not be null.
+   * @param paramName The name of the parameter.
+   * @param methodName The name of the method.
+   */
   public static <T> T requireNonNullParam(T obj, String paramName, String methodName) {
     return requireNonNull(obj,
         "Parameter " + paramName + " in method " + methodName + "was null " + "when it"
