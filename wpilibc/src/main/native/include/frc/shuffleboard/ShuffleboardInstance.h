@@ -17,9 +17,8 @@ namespace detail {
 
 class ShuffleboardInstance final : public ShuffleboardRoot {
  public:
-  explicit ShuffleboardInstance(nt::NetworkTableInstance ntInstance);
-  explicit ShuffleboardInstance(nt::NetworkTableInstance ntInstance,
-                                bool report);
+  ShuffleboardInstance(nt::NetworkTableInstance ntInstance,
+                       bool report = false);
   virtual ~ShuffleboardInstance();
 
   frc::ShuffleboardTab& GetTab(wpi::StringRef title) override;
