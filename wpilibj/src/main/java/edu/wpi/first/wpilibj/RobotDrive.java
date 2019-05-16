@@ -11,7 +11,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 
-import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * Utility class for handling Robot drive based on a definition of the motor configuration. The

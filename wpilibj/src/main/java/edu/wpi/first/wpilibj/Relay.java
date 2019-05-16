@@ -16,7 +16,7 @@ import edu.wpi.first.hal.RelayJNI;
 import edu.wpi.first.hal.util.UncleanStatusException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * Class for VEX Robotics Spike style relay outputs. Relays are intended to be connected to Spikes

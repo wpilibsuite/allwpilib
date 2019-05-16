@@ -14,7 +14,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.I2CJNI;
 import edu.wpi.first.hal.util.BoundaryException;
 
-import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * I2C bus interface class.

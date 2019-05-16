@@ -16,7 +16,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import static java.util.Objects.requireNonNull;
 
 /**

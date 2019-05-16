@@ -11,7 +11,7 @@ import java.util.Map;
 
 import edu.wpi.first.networktables.NetworkTable;
 
-import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A generic component in Shuffleboard.

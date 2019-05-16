@@ -12,11 +12,11 @@ import static java.util.Objects.requireNonNull;
 /**
  * Utility class for common WPILib error messages.
  */
-public final class WPIErrorMessages {
+public final class ErrorMessages {
   /**
    * Utility class, so constructor is private.
    */
-  private WPIErrorMessages() {
+  private ErrorMessages() {
   }
 
   /**

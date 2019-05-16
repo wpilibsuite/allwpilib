@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Sendable;
 
-import static edu.wpi.first.wpilibj.util.WPIErrorMessages.requireNonNullParam;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A layout in a Shuffleboard tab. Layouts can contain widgets and other layouts.
