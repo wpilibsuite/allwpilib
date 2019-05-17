@@ -5,7 +5,7 @@
 #include <frc/Joystick.h>
 #include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
-#include <frc/drive/DifferentialDrive.h>
+#include <frc2/drive/DifferentialDrive.h>
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class.
@@ -14,7 +14,7 @@
 class Robot : public frc::TimedRobot {
   frc::PWMSparkMax m_leftMotor{0};
   frc::PWMSparkMax m_rightMotor{1};
-  frc::DifferentialDrive m_robotDrive{m_leftMotor, m_rightMotor};
+  frc2::DifferentialDrive m_robotDrive{m_leftMotor, m_rightMotor};
   frc::Joystick m_stick{0};
 
  public:

@@ -5,7 +5,7 @@
 #include <frc/Joystick.h>
 #include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
-#include <frc/drive/MecanumDrive.h>
+#include <frc2/drive/MecanumDrive.h>
 
 /**
  * This is a demo program showing how to use Mecanum control with the
@@ -39,8 +39,8 @@ class Robot : public frc::TimedRobot {
   frc::PWMSparkMax m_rearLeft{kRearLeftChannel};
   frc::PWMSparkMax m_frontRight{kFrontRightChannel};
   frc::PWMSparkMax m_rearRight{kRearRightChannel};
-  frc::MecanumDrive m_robotDrive{m_frontLeft, m_rearLeft, m_frontRight,
-                                 m_rearRight};
+  frc2::MecanumDrive m_robotDrive{m_frontLeft, m_rearLeft, m_frontRight,
+                                  m_rearRight};
 
   frc::Joystick m_stick{kJoystickChannel};
 };

@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.MedianFilter;
 import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj2.drive.DifferentialDrive;
 
 /**
  * This is a sample program to demonstrate the use of a PIDController with an ultrasonic sensor to

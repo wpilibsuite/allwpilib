@@ -193,12 +193,32 @@ class GenericHID : public ErrorBase {
    */
   void SetRumble(RumbleType type, double value);
 
+  /**
+   * Sets the deadband applied to the joystick axes.
+   *
+   * Inputs smaller than the deadband are set to 0.0 while inputs larger than
+   * the deadband are scaled from 0.0 to 1.0. The default deadband is 0.0.
+   *
+   * @param deadband The deadband to set.
+   */
+  void SetAxisDeadband(double deadband);
+
  private:
   DriverStation* m_ds;
   int m_port;
   int m_outputs = 0;
   uint16_t m_leftRumble = 0;
   uint16_t m_rightRumble = 0;
+  double m_deadband = 0.0;
+
+  /**
+   * Returns 0.0 if the given value is within the specified range around zero.
+   * The remaining range between the deadband and 1.0 is scaled from 0.0 to 1.0.
+   *
+   * @param value    Value to clip.
+   * @param deadband Range around zero.
+   */
+  static double ApplyDeadband(double value, double deadband);
 };
 
 }  // namespace frc

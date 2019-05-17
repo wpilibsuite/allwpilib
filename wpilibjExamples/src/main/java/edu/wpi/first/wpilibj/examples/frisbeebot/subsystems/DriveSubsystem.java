@@ -7,9 +7,9 @@ package edu.wpi.first.wpilibj.examples.frisbeebot.subsystems;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.drive.DifferentialDrive;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.

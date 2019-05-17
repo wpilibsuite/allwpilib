@@ -7,10 +7,10 @@
 #include <frc/Joystick.h>
 #include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
-#include <frc/drive/DifferentialDrive.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/shuffleboard/ShuffleboardLayout.h>
 #include <frc/shuffleboard/ShuffleboardTab.h>
+#include <frc2/drive/DifferentialDrive.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 
@@ -65,7 +65,7 @@ class Robot : public frc::TimedRobot {
   frc::PWMSparkMax m_right{1};
   frc::PWMSparkMax m_elevatorMotor{2};
 
-  frc::DifferentialDrive m_robotDrive{m_left, m_right};
+  frc2::DifferentialDrive m_robotDrive{m_left, m_right};
 
   frc::Joystick m_stick{0};
 

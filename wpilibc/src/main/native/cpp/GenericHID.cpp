@@ -4,6 +4,8 @@
 
 #include "frc/GenericHID.h"
 
+#include <cmath>
+
 #include <hal/DriverStation.h>
 
 #include "frc/DriverStation.h"
@@ -31,7 +33,7 @@ bool GenericHID::GetRawButtonReleased(int button) {
 }
 
 double GenericHID::GetRawAxis(int axis) const {
-  return m_ds->GetStickAxis(m_port, axis);
+  return ApplyDeadband(m_ds->GetStickAxis(m_port, axis), m_deadband);
 }
 
 int GenericHID::GetPOV(int pov) const {
@@ -94,4 +96,20 @@ void GenericHID::SetRumble(RumbleType type, double value) {
     m_rightRumble = value * 65535;
   }
   HAL_SetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
+}
+
+void GenericHID::SetAxisDeadband(double deadband) {
+  m_deadband = deadband;
+}
+
+double GenericHID::ApplyDeadband(double value, double deadband) {
+  if (std::abs(value) > deadband) {
+    if (value > 0.0) {
+      return (value - deadband) / (1.0 - deadband);
+    } else {
+      return (value + deadband) / (1.0 - deadband);
+    }
+  } else {
+    return 0.0;
+  }
 }

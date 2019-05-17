@@ -18,8 +18,10 @@ DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
 
   // Configure the DifferentialDrive to reflect the fact that all our
   // motors are wired backwards and our drivers sensitivity preferences.
-  m_robotDrive.SetSafetyEnabled(false);
-  m_robotDrive.SetExpiration(0.1);
+  m_frontLeftCIM.SetSafetyEnabled(false);
+  m_rearLeftCIM.SetSafetyEnabled(false);
+  m_frontRightCIM.SetSafetyEnabled(false);
+  m_rearRightCIM.SetSafetyEnabled(false);
   m_robotDrive.SetMaxOutput(1.0);
   m_leftCIMs.SetInverted(true);
   m_rightCIMs.SetInverted(true);

@@ -8,13 +8,12 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveWithJoystick;
+import edu.wpi.first.wpilibj2.drive.DifferentialDrive;
 
 /**
  * The DriveTrain subsystem controls the robot's chassis and reads in information about it's speed
@@ -22,10 +21,10 @@ import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveWithJoystick;
  */
 public class DriveTrain extends Subsystem {
   // Subsystem devices
-  private final SpeedController m_frontLeftCIM = new Victor(1);
-  private final SpeedController m_frontRightCIM = new Victor(2);
-  private final SpeedController m_rearLeftCIM = new Victor(3);
-  private final SpeedController m_rearRightCIM = new Victor(4);
+  private final Victor m_frontLeftCIM = new Victor(1);
+  private final Victor m_frontRightCIM = new Victor(2);
+  private final Victor m_rearLeftCIM = new Victor(3);
+  private final Victor m_rearRightCIM = new Victor(4);
   private final SpeedControllerGroup m_leftCIMs =
       new SpeedControllerGroup(m_frontLeftCIM, m_rearLeftCIM);
   private final SpeedControllerGroup m_rightCIMs =
@@ -46,9 +45,12 @@ public class DriveTrain extends Subsystem {
     // Configure the DifferentialDrive to reflect the fact that all motors
     // are wired backwards (right is inverted in DifferentialDrive).
     m_leftCIMs.setInverted(true);
+    m_rightCIMs.setInverted(true);
+    m_frontLeftCIM.setSafetyEnabled(false);
+    m_frontRightCIM.setSafetyEnabled(false);
+    m_rearLeftCIM.setSafetyEnabled(false);
+    m_rearRightCIM.setSafetyEnabled(false);
     m_drive = new DifferentialDrive(m_leftCIMs, m_rightCIMs);
-    m_drive.setSafetyEnabled(true);
-    m_drive.setExpiration(0.1);
     m_drive.setMaxOutput(1.0);
 
     if (Robot.isReal()) { // Converts to feet

@@ -2,13 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.drive;
+package edu.wpi.first.wpilibj2.drive;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.drive.Vector2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -33,8 +34,7 @@ import java.util.StringJoiner;
  * </pre>
  *
  * <p>Each drive() function provides different inverse kinematic relations for a Mecanum drive
- * robot. Motor outputs for the right side are negated, so motor direction inversion by the user is
- * usually unnecessary.
+ * robot. Note that motor direction inversion by the user is usually unnecessary.
  *
  * <p>This library uses the NED axes convention (North-East-Down as external reference in the world
  * frame): http://www.nuclearprojects.com/ins/images/axis_big.png.
@@ -42,12 +42,8 @@ import java.util.StringJoiner;
  * <p>The positive X axis points ahead, the positive Y axis points right, and the positive Z axis
  * points down. Rotations follow the right-hand rule, so clockwise rotation around the Z axis is
  * positive.
- *
- * <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband} will
- * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
- * value can be changed with {@link #setDeadband}.
  */
-public class MecanumDrive extends RobotDriveBase implements Sendable, AutoCloseable {
+public class MecanumDrive extends RobotDriveBase implements Sendable {
   private static int instances;
 
   private final SpeedController m_frontLeftMotor;
@@ -55,13 +51,17 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   private final SpeedController m_frontRightMotor;
   private final SpeedController m_rearRightMotor;
 
-  private double m_rightSideInvertMultiplier = -1.0;
   private boolean m_reported;
 
   /**
    * Construct a MecanumDrive.
    *
    * <p>If a motor needs to be inverted, do so before passing it in.
+   *
+   * @param frontLeftMotor The motor on the front-left corner.
+   * @param rearLeftMotor The motor on the rear-left corner.
+   * @param frontRightMotor The motor on the front-right corner.
+   * @param rearRightMotor The motor on the rear-right corner.
    */
   public MecanumDrive(
       SpeedController frontLeftMotor,
@@ -79,11 +79,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     SendableRegistry.addChild(this, m_rearRightMotor);
     instances++;
     SendableRegistry.addLW(this, "MecanumDrive", instances);
-  }
-
-  @Override
-  public void close() {
-    SendableRegistry.remove(this);
   }
 
   /**
@@ -152,15 +147,12 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
     if (!m_reported) {
       HAL.report(
-          tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_MecanumCartesian, 4);
+          tResourceType.kResourceType_RobotDrive, 4, tInstances.kRobotDrive2_MecanumCartesian);
       m_reported = true;
     }
 
     ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);
-    ySpeed = applyDeadband(ySpeed, m_deadband);
-
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
-    xSpeed = applyDeadband(xSpeed, m_deadband);
 
     // Compensate for gyro angle.
     Vector2d input = new Vector2d(ySpeed, xSpeed);
@@ -168,20 +160,16 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
 
     double[] wheelSpeeds = new double[4];
     wheelSpeeds[MotorType.kFrontLeft.value] = input.x + input.y + zRotation;
-    wheelSpeeds[MotorType.kFrontRight.value] = -input.x + input.y - zRotation;
-    wheelSpeeds[MotorType.kRearLeft.value] = -input.x + input.y + zRotation;
+    wheelSpeeds[MotorType.kFrontRight.value] = input.x - input.y - zRotation;
+    wheelSpeeds[MotorType.kRearLeft.value] = input.x - input.y + zRotation;
     wheelSpeeds[MotorType.kRearRight.value] = input.x + input.y - zRotation;
 
     normalize(wheelSpeeds);
 
     m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft.value] * m_maxOutput);
-    m_frontRightMotor.set(
-        wheelSpeeds[MotorType.kFrontRight.value] * m_maxOutput * m_rightSideInvertMultiplier);
+    m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight.value] * m_maxOutput);
     m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft.value] * m_maxOutput);
-    m_rearRightMotor.set(
-        wheelSpeeds[MotorType.kRearRight.value] * m_maxOutput * m_rightSideInvertMultiplier);
-
-    feed();
+    m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight.value] * m_maxOutput);
   }
 
   /**
@@ -198,64 +186,27 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   @SuppressWarnings("ParameterName")
   public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_MecanumPolar, 4);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 4, tInstances.kRobotDrive2_MecanumPolar);
       m_reported = true;
     }
 
     driveCartesian(
-        magnitude * Math.sin(angle * (Math.PI / 180.0)),
         magnitude * Math.cos(angle * (Math.PI / 180.0)),
+        magnitude * Math.sin(angle * (Math.PI / 180.0)),
         zRotation,
         0.0);
-  }
-
-  /**
-   * Gets if the power sent to the right side of the drivetrain is multiplied by -1.
-   *
-   * @return true if the right side is inverted
-   */
-  public boolean isRightSideInverted() {
-    return m_rightSideInvertMultiplier == -1.0;
-  }
-
-  /**
-   * Sets if the power sent to the right side of the drivetrain should be multiplied by -1.
-   *
-   * @param rightSideInverted true if right side power should be multiplied by -1
-   */
-  public void setRightSideInverted(boolean rightSideInverted) {
-    m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;
-  }
-
-  @Override
-  public void stopMotor() {
-    m_frontLeftMotor.stopMotor();
-    m_frontRightMotor.stopMotor();
-    m_rearLeftMotor.stopMotor();
-    m_rearRightMotor.stopMotor();
-    feed();
-  }
-
-  @Override
-  public String getDescription() {
-    return "MecanumDrive";
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("MecanumDrive");
     builder.setActuator(true);
-    builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty(
         "Front Left Motor Speed", m_frontLeftMotor::get, m_frontLeftMotor::set);
     builder.addDoubleProperty(
-        "Front Right Motor Speed",
-        () -> m_frontRightMotor.get() * m_rightSideInvertMultiplier,
-        value -> m_frontRightMotor.set(value * m_rightSideInvertMultiplier));
+        "Front Right Motor Speed", m_frontRightMotor::get, m_frontRightMotor::set);
     builder.addDoubleProperty("Rear Left Motor Speed", m_rearLeftMotor::get, m_rearLeftMotor::set);
     builder.addDoubleProperty(
-        "Rear Right Motor Speed",
-        () -> m_rearRightMotor.get() * m_rightSideInvertMultiplier,
-        value -> m_rearRightMotor.set(value * m_rightSideInvertMultiplier));
+        "Rear Right Motor Speed", m_rearRightMotor::get, m_rearRightMotor::set);
   }
 }

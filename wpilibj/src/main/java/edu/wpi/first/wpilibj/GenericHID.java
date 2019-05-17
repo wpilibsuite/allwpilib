@@ -72,6 +72,7 @@ public abstract class GenericHID {
   private int m_outputs;
   private short m_leftRumble;
   private short m_rightRumble;
+  private double m_deadband;
 
   public GenericHID(int port) {
     m_ds = DriverStation.getInstance();
@@ -163,7 +164,7 @@ public abstract class GenericHID {
    * @return The value of the axis.
    */
   public double getRawAxis(int axis) {
-    return m_ds.getStickAxis(m_port, axis);
+    return applyDeadband(m_ds.getStickAxis(m_port, axis), m_deadband);
   }
 
   /**
@@ -287,5 +288,36 @@ public abstract class GenericHID {
       m_rightRumble = (short) (value * 65535);
     }
     HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+  }
+
+  /**
+   * Sets the deadband applied to the joystick axes.
+   *
+   * <p>Inputs smaller than the deadband are set to 0.0 while inputs larger than the deadband are
+   * scaled from 0.0 to 1.0. The default deadband is 0.0.
+   *
+   * @param deadband The deadband to set.
+   */
+  public void setAxisDeadband(double deadband) {
+    m_deadband = deadband;
+  }
+
+  /**
+   * Returns 0.0 if the given value is within the specified range around zero. The remaining range
+   * between the deadband and 1.0 is scaled from 0.0 to 1.0.
+   *
+   * @param value Value to clip.
+   * @param deadband Range around zero.
+   */
+  public static double applyDeadband(double value, double deadband) {
+    if (Math.abs(value) > deadband) {
+      if (value > 0.0) {
+        return (value - deadband) / (1.0 - deadband);
+      } else {
+        return (value + deadband) / (1.0 - deadband);
+      }
+    } else {
+      return 0.0;
+    }
   }
 }

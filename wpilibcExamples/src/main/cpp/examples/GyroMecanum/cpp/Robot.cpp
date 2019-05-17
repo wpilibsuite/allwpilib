@@ -6,7 +6,7 @@
 #include <frc/Joystick.h>
 #include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
-#include <frc/drive/MecanumDrive.h>
+#include <frc2/drive/MecanumDrive.h>
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to
@@ -48,8 +48,8 @@ class Robot : public frc::TimedRobot {
   frc::PWMSparkMax m_rearLeft{kRearLeftMotorPort};
   frc::PWMSparkMax m_frontRight{kFrontRightMotorPort};
   frc::PWMSparkMax m_rearRight{kRearRightMotorPort};
-  frc::MecanumDrive m_robotDrive{m_frontLeft, m_rearLeft, m_frontRight,
-                                 m_rearRight};
+  frc2::MecanumDrive m_robotDrive{m_frontLeft, m_rearLeft, m_frontRight,
+                                  m_rearRight};
 
   frc::AnalogGyro m_gyro{kGyroPort};
   frc::Joystick m_joystick{kJoystickPort};

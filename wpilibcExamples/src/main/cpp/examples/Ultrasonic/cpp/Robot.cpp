@@ -6,7 +6,7 @@
 #include <frc/MedianFilter.h>
 #include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
-#include <frc/drive/DifferentialDrive.h>
+#include <frc2/drive/DifferentialDrive.h>
 
 /**
  * This is a sample program demonstrating how to use an ultrasonic sensor and
@@ -51,7 +51,7 @@ class Robot : public frc::TimedRobot {
 
   frc::PWMSparkMax m_left{kLeftMotorPort};
   frc::PWMSparkMax m_right{kRightMotorPort};
-  frc::DifferentialDrive m_robotDrive{m_left, m_right};
+  frc2::DifferentialDrive m_robotDrive{m_left, m_right};
 };
 
 #ifndef RUNNING_FRC_TESTS
