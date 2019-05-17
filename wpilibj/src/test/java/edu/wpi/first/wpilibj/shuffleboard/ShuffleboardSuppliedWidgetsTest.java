@@ -34,7 +34,7 @@ class ShuffleboardSuppliedWidgetsTest {
   void testAddString() {
     AtomicInteger count = new AtomicInteger(0);
     m_instance.getTab("Tab")
-        .add("Title", () -> Integer.toString(count.incrementAndGet()));
+        .addString("Title", () -> Integer.toString(count.incrementAndGet()));
     NetworkTableEntry entry = m_ntInstance.getEntry("/Shuffleboard/Tab/Title");
 
     m_instance.update();
@@ -48,7 +48,7 @@ class ShuffleboardSuppliedWidgetsTest {
   void testAddDouble() {
     AtomicInteger num = new AtomicInteger(0);
     m_instance.getTab("Tab")
-        .add("Title", num::incrementAndGet);
+        .addNumber("Title", num::incrementAndGet);
     NetworkTableEntry entry = m_ntInstance.getEntry("/Shuffleboard/Tab/Title");
 
     m_instance.update();
@@ -62,7 +62,7 @@ class ShuffleboardSuppliedWidgetsTest {
   void testAddBoolean() {
     boolean[] bool = {false};
     m_instance.getTab("Tab")
-        .add("Title", () -> bool[0] = !bool[0]);
+        .addBoolean("Title", () -> bool[0] = !bool[0]);
     NetworkTableEntry entry = m_ntInstance.getEntry("/Shuffleboard/Tab/Title");
 
     m_instance.update();
@@ -76,7 +76,7 @@ class ShuffleboardSuppliedWidgetsTest {
   void testAddStringArray() {
     String[] arr = {"foo", "bar"};
     m_instance.getTab("Tab")
-        .add("Title", () -> arr);
+        .addStringArray("Title", () -> arr);
     NetworkTableEntry entry = m_ntInstance.getEntry("/Shuffleboard/Tab/Title");
 
     m_instance.update();
@@ -87,7 +87,7 @@ class ShuffleboardSuppliedWidgetsTest {
   void testAddDoubleArray() {
     double[] arr = {0, 1};
     m_instance.getTab("Tab")
-        .add("Title", () -> arr);
+        .addDoubleArray("Title", () -> arr);
     NetworkTableEntry entry = m_ntInstance.getEntry("/Shuffleboard/Tab/Title");
 
     m_instance.update();
@@ -98,7 +98,7 @@ class ShuffleboardSuppliedWidgetsTest {
   void testAddBooleanArray() {
     boolean[] arr = {true, false};
     m_instance.getTab("Tab")
-        .add("Title", () -> arr);
+        .addBooleanArray("Title", () -> arr);
     NetworkTableEntry entry = m_ntInstance.getEntry("/Shuffleboard/Tab/Title");
 
     m_instance.update();
@@ -109,7 +109,7 @@ class ShuffleboardSuppliedWidgetsTest {
   void testAddRawBytes() {
     byte[] arr = {0, 1, 2, 3};
     m_instance.getTab("Tab")
-        .add("Title", () -> arr);
+        .addRaw("Title", () -> arr);
     NetworkTableEntry entry = m_ntInstance.getEntry("/Shuffleboard/Tab/Title");
 
     m_instance.update();

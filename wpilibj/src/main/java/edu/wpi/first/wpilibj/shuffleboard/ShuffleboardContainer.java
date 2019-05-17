@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.Sendable;
@@ -138,7 +139,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *                                  title
    */
-  SuppliedValueWidget<String> add(String title, StringSupplier valueSupplier)
+  SuppliedValueWidget<String> addString(String title, Supplier<String> valueSupplier)
       throws IllegalArgumentException;
 
   /**
@@ -152,7 +153,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *                                  title
    */
-  SuppliedValueWidget<Double> add(String title, DoubleSupplier valueSupplier)
+  SuppliedValueWidget<Double> addNumber(String title, DoubleSupplier valueSupplier)
       throws IllegalArgumentException;
 
   /**
@@ -166,7 +167,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *                                  title
    */
-  SuppliedValueWidget<Boolean> add(String title, BooleanSupplier valueSupplier)
+  SuppliedValueWidget<Boolean> addBoolean(String title, BooleanSupplier valueSupplier)
       throws IllegalArgumentException;
 
   /**
@@ -180,7 +181,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *                                  title
    */
-  SuppliedValueWidget<String[]> add(String title, StringArraySupplier valueSupplier)
+  SuppliedValueWidget<String[]> addStringArray(String title, Supplier<String[]> valueSupplier)
       throws IllegalArgumentException;
 
   /**
@@ -194,7 +195,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *                                  title
    */
-  SuppliedValueWidget<double[]> add(String title, DoubleArraySupplier valueSupplier)
+  SuppliedValueWidget<double[]> addDoubleArray(String title, Supplier<double[]> valueSupplier)
       throws IllegalArgumentException;
 
   /**
@@ -208,7 +209,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *                                  title
    */
-  SuppliedValueWidget<boolean[]> add(String title, BooleanArraySupplier valueSupplier)
+  SuppliedValueWidget<boolean[]> addBooleanArray(String title, Supplier<boolean[]> valueSupplier)
       throws IllegalArgumentException;
 
   /**
@@ -222,7 +223,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *                                  title
    */
-  SuppliedValueWidget<byte[]> add(String title, ByteArraySupplier valueSupplier)
+  SuppliedValueWidget<byte[]> addRaw(String title, Supplier<byte[]> valueSupplier)
       throws IllegalArgumentException;
 
   /**

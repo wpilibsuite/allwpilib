@@ -84,39 +84,39 @@ final class ContainerHelper {
     return widget;
   }
 
-  SuppliedValueWidget<String> add(String title, StringSupplier valueSupplier) {
+  SuppliedValueWidget<String> addString(String title, Supplier<String> valueSupplier) {
     precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier::get, NetworkTableEntry::setString);
+    return addSupplied(title, valueSupplier, NetworkTableEntry::setString);
   }
 
-  SuppliedValueWidget<Double> add(String title, DoubleSupplier valueSupplier) {
+  SuppliedValueWidget<Double> addNumber(String title, DoubleSupplier valueSupplier) {
     precheck(title, valueSupplier);
     return addSupplied(title, valueSupplier::getAsDouble, NetworkTableEntry::setDouble);
   }
 
-  SuppliedValueWidget<Boolean> add(String title, BooleanSupplier valueSupplier) {
+  SuppliedValueWidget<Boolean> addBoolean(String title, BooleanSupplier valueSupplier) {
     precheck(title, valueSupplier);
     return addSupplied(title, valueSupplier::getAsBoolean, NetworkTableEntry::setBoolean);
   }
 
-  SuppliedValueWidget<String[]> add(String title, StringArraySupplier valueSupplier) {
+  SuppliedValueWidget<String[]> addStringArray(String title, Supplier<String[]> valueSupplier) {
     precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier::get, NetworkTableEntry::setStringArray);
+    return addSupplied(title, valueSupplier, NetworkTableEntry::setStringArray);
   }
 
-  SuppliedValueWidget<double[]> add(String title, DoubleArraySupplier valueSupplier) {
+  SuppliedValueWidget<double[]> addDoubleArray(String title, Supplier<double[]> valueSupplier) {
     precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier::get, NetworkTableEntry::setDoubleArray);
+    return addSupplied(title, valueSupplier, NetworkTableEntry::setDoubleArray);
   }
 
-  SuppliedValueWidget<boolean[]> add(String title, BooleanArraySupplier valueSupplier) {
+  SuppliedValueWidget<boolean[]> addBooleanArray(String title, Supplier<boolean[]> valueSupplier) {
     precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier::get, NetworkTableEntry::setBooleanArray);
+    return addSupplied(title, valueSupplier, NetworkTableEntry::setBooleanArray);
   }
 
-  SuppliedValueWidget<byte[]> add(String title, ByteArraySupplier valueSupplier) {
+  SuppliedValueWidget<byte[]> addRaw(String title, Supplier<byte[]> valueSupplier) {
     precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier::get, NetworkTableEntry::setRaw);
+    return addSupplied(title, valueSupplier, NetworkTableEntry::setRaw);
   }
 
   private void precheck(String title, Object valueSupplier) {

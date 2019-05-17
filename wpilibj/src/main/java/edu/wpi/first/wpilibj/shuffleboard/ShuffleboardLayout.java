@@ -12,6 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Sendable;
@@ -59,45 +60,52 @@ public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout
   }
 
   @Override
-  public SuppliedValueWidget<String> add(String title, StringSupplier valueSupplier)
+  public SuppliedValueWidget<String> addString(String title,
+                                               Supplier<String> valueSupplier)
       throws IllegalArgumentException {
-    return m_helper.add(title, valueSupplier);
+    return m_helper.addString(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<Double> add(String title, DoubleSupplier valueSupplier)
+  public SuppliedValueWidget<Double> addNumber(String title,
+                                               DoubleSupplier valueSupplier)
       throws IllegalArgumentException {
-    return m_helper.add(title, valueSupplier);
+    return m_helper.addNumber(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<Boolean> add(String title, BooleanSupplier valueSupplier)
+  public SuppliedValueWidget<Boolean> addBoolean(String title,
+                                                 BooleanSupplier valueSupplier)
       throws IllegalArgumentException {
-    return m_helper.add(title, valueSupplier);
+    return m_helper.addBoolean(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<String[]> add(String title, StringArraySupplier valueSupplier)
+  public SuppliedValueWidget<String[]> addStringArray(String title,
+                                                      Supplier<String[]> valueSupplier)
       throws IllegalArgumentException {
-    return m_helper.add(title, valueSupplier);
+    return m_helper.addStringArray(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<double[]> add(String title, DoubleArraySupplier valueSupplier)
+  public SuppliedValueWidget<double[]> addDoubleArray(String title,
+                                                      Supplier<double[]> valueSupplier)
       throws IllegalArgumentException {
-    return m_helper.add(title, valueSupplier);
+    return m_helper.addDoubleArray(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<boolean[]> add(String title, BooleanArraySupplier valueSupplier)
+  public SuppliedValueWidget<boolean[]> addBooleanArray(String title,
+                                                        Supplier<boolean[]> valueSupplier)
       throws IllegalArgumentException {
-    return m_helper.add(title, valueSupplier);
+    return m_helper.addBooleanArray(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<byte[]> add(String title, ByteArraySupplier valueSupplier)
+  public SuppliedValueWidget<byte[]> addRaw(String title,
+                                            Supplier<byte[]> valueSupplier)
       throws IllegalArgumentException {
-    return m_helper.add(title, valueSupplier);
+    return m_helper.addRaw(title, valueSupplier);
   }
 
   @Override
