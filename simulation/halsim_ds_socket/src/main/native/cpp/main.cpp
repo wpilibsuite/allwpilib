@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -109,7 +109,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   auto simLoopTimer = Timer::Create(loop);
   struct sockaddr_in simAddr;
   NameToAddr("127.0.0.1", 1135, &simAddr);
-  simLoopTimer->timeout.connect([ udpLocal = udp.get(), simAddr ] {
+  simLoopTimer->timeout.connect([udpLocal = udp.get(), simAddr] {
     udpLocal->Send(simAddr, wpi::ArrayRef<Buffer>{singleByte.get(), 1},
                    [](auto buf, Error err) {
                      if (err) {
@@ -121,8 +121,9 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   simLoopTimer->Start(Timer::Time{100}, Timer::Time{100});
 
   // UDP Receive then send
-  udp->received.connect([udpLocal = udp.get()](
-      Buffer & buf, size_t len, const sockaddr& recSock, unsigned int port) {
+  udp->received.connect([udpLocal = udp.get()](Buffer& buf, size_t len,
+                                               const sockaddr& recSock,
+                                               unsigned int port) {
     auto ds = udpLocal->GetLoop()->GetData<halsim::DSCommPacket>();
     ds->DecodeUDP(
         wpi::ArrayRef<uint8_t>{reinterpret_cast<uint8_t*>(buf.base), len});
