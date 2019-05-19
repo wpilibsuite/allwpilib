@@ -132,5 +132,5 @@ TEST_P(SpeedControllerGroupTest, PIDWrite) {
   }
 }
 
-INSTANTIATE_TEST_CASE_P(Test, SpeedControllerGroupTest,
+INSTANTIATE_TEST_SUITE_P(Test, SpeedControllerGroupTest,
                         testing::Values(TEST_ONE, TEST_TWO, TEST_THREE));

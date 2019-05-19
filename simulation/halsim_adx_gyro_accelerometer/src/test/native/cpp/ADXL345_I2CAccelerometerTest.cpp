@@ -41,7 +41,7 @@ TEST_P(ADXL345_I2CAccelerometerTest, TestAccelerometer) {
   EXPECT_NEAR(0.11, accel.GetZ(), EPSILON);
 }
 
-INSTANTIATE_TEST_CASE_P(ADXL345_I2CAccelerometerTest,
+INSTANTIATE_TEST_SUITE_P(ADXL345_I2CAccelerometerTest,
                         ADXL345_I2CAccelerometerTest,
                         ::testing::Values(frc::I2C::kOnboard,
                                           frc::I2C::kMXP));

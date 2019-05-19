@@ -257,7 +257,7 @@ class WebSocketServerBadOpcodeTest
     : public WebSocketServerTest,
       public ::testing::WithParamInterface<uint8_t> {};
 
-INSTANTIATE_TEST_CASE_P(WebSocketServerBadOpcodeTests,
+INSTANTIATE_TEST_SUITE_P(WebSocketServerBadOpcodeTests,
                         WebSocketServerBadOpcodeTest,
                         ::testing::Values(3, 4, 5, 6, 7, 0xb, 0xc, 0xd, 0xe,
                                           0xf), );
@@ -289,7 +289,7 @@ class WebSocketServerControlFrameTest
     : public WebSocketServerTest,
       public ::testing::WithParamInterface<uint8_t> {};
 
-INSTANTIATE_TEST_CASE_P(WebSocketServerControlFrameTests,
+INSTANTIATE_TEST_SUITE_P(WebSocketServerControlFrameTests,
                         WebSocketServerControlFrameTest,
                         ::testing::Values(0x8, 0x9, 0xa), );
 
@@ -532,7 +532,7 @@ TEST_F(WebSocketServerTest, ReceiveTooLargeFragmented) {
 class WebSocketServerDataTest : public WebSocketServerTest,
                                 public ::testing::WithParamInterface<size_t> {};
 
-INSTANTIATE_TEST_CASE_P(WebSocketServerDataTests, WebSocketServerDataTest,
+INSTANTIATE_TEST_SUITE_P(WebSocketServerDataTests, WebSocketServerDataTest,
                         ::testing::Values(0, 1, 125, 126, 65535, 65536), );
 
 TEST_P(WebSocketServerDataTest, SendText) {

@@ -222,7 +222,7 @@ class WebSocketClientDataTest : public WebSocketClientTest,
   std::shared_ptr<WebSocket> ws;
 };
 
-INSTANTIATE_TEST_CASE_P(WebSocketClientDataTests, WebSocketClientDataTest,
+INSTANTIATE_TEST_SUITE_P(WebSocketClientDataTests, WebSocketClientDataTest,
                         ::testing::Values(0, 1, 125, 126, 65535, 65536), );
 
 TEST_P(WebSocketClientDataTest, SendBinary) {

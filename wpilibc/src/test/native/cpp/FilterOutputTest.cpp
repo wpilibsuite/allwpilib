@@ -152,6 +152,6 @@ TEST_P(FilterOutputTest, FilterOutput) {
       << "Filter output didn't match expected value";
 }
 
-INSTANTIATE_TEST_CASE_P(Test, FilterOutputTest,
+INSTANTIATE_TEST_SUITE_P(Test, FilterOutputTest,
                         testing::Values(TEST_SINGLE_POLE_IIR, TEST_HIGH_PASS,
                                         TEST_MOVAVG, TEST_PULSE));

@@ -41,7 +41,7 @@ TEST_P(ADXL345_SpiAccelerometerTest, TestAccelerometer) {
   EXPECT_NEAR(0.11, accel.GetZ(), EPSILON);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     ADXL345_SpiAccelerometerTest, ADXL345_SpiAccelerometerTest,
     ::testing::Values(frc::SPI::kOnboardCS0, frc::SPI::kOnboardCS1,
                       frc::SPI::kOnboardCS2, frc::SPI::kOnboardCS3,

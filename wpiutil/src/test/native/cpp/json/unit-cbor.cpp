@@ -139,7 +139,7 @@ static const int64_t neg8_numbers[] = {
     -4294967297,
 };
 
-INSTANTIATE_TEST_CASE_P(CborSignedNeg8Tests, CborSignedNeg8Test,
+INSTANTIATE_TEST_SUITE_P(CborSignedNeg8Tests, CborSignedNeg8Test,
                         ::testing::ValuesIn(neg8_numbers), );
 
 // -4294967296..-65537
@@ -189,7 +189,7 @@ static const int64_t neg4_numbers[] = {
     -4294967296,
 };
 
-INSTANTIATE_TEST_CASE_P(CborSignedNeg4Tests, CborSignedNeg4Test,
+INSTANTIATE_TEST_SUITE_P(CborSignedNeg4Tests, CborSignedNeg4Test,
                         ::testing::ValuesIn(neg4_numbers), );
 
 // -65536..-257
@@ -447,7 +447,7 @@ static const uint32_t pos4_numbers[] = {
     1048576u,
 };
 
-INSTANTIATE_TEST_CASE_P(CborSignedPos4Tests, CborSignedPos4Test,
+INSTANTIATE_TEST_SUITE_P(CborSignedPos4Tests, CborSignedPos4Test,
                         ::testing::ValuesIn(pos4_numbers), );
 
 // 4294967296..4611686018427387903
@@ -500,7 +500,7 @@ static const uint64_t pos8_numbers[] = {
     4611686018427387903ul
 };
 
-INSTANTIATE_TEST_CASE_P(CborSignedPos8Tests, CborSignedPos8Test,
+INSTANTIATE_TEST_SUITE_P(CborSignedPos8Tests, CborSignedPos8Test,
                         ::testing::ValuesIn(pos8_numbers), );
 
 /*
@@ -670,7 +670,7 @@ TEST_P(CborUnsignedPos4Test, Case)
     EXPECT_EQ(json::from_cbor(result), j);
 }
 
-INSTANTIATE_TEST_CASE_P(CborUnsignedPos4Tests, CborUnsignedPos4Test,
+INSTANTIATE_TEST_SUITE_P(CborUnsignedPos4Tests, CborUnsignedPos4Test,
                         ::testing::ValuesIn(pos4_numbers), );
 
 // 4294967296..4611686018427387903 (eight-byte uint64_t)
@@ -716,7 +716,7 @@ TEST_P(CborUnsignedPos8Test, Case)
     EXPECT_EQ(json::from_cbor(result), j);
 }
 
-INSTANTIATE_TEST_CASE_P(CborUnsignedPos8Tests, CborUnsignedPos8Test,
+INSTANTIATE_TEST_SUITE_P(CborUnsignedPos8Tests, CborUnsignedPos8Test,
                         ::testing::ValuesIn(pos8_numbers), );
 
 // 3.1415925
@@ -853,7 +853,7 @@ static size_t string3_lens[] = {
     65535u
 };
 
-INSTANTIATE_TEST_CASE_P(CborString3Tests, CborString3Test,
+INSTANTIATE_TEST_SUITE_P(CborString3Tests, CborString3Test,
                         ::testing::ValuesIn(string3_lens), );
 
 // N = 65536..4294967295
@@ -893,7 +893,7 @@ static size_t string5_lens[] = {
     1048576u
 };
 
-INSTANTIATE_TEST_CASE_P(CborString5Tests, CborString5Test,
+INSTANTIATE_TEST_SUITE_P(CborString5Tests, CborString5Test,
                         ::testing::ValuesIn(string5_lens), );
 
 TEST(CborArrayTest, Empty)
@@ -1236,7 +1236,7 @@ static const uint8_t unsupported_bytes_cases[] = {
     0xf8,
 };
 
-INSTANTIATE_TEST_CASE_P(CborUnsupportedBytesTests, CborUnsupportedBytesTest,
+INSTANTIATE_TEST_SUITE_P(CborUnsupportedBytesTests, CborUnsupportedBytesTest,
                         ::testing::ValuesIn(unsupported_bytes_cases), );
 #if 0
 // use this testcase outside [hide] to run it with Valgrind
@@ -1327,7 +1327,7 @@ static const char* fuzz_test_cases[] = {
     "test/data/cbor_regression/test21",
 };
 
-INSTANTIATE_TEST_CASE_P(CborRegressionFuzzTests, CborRegressionFuzzTest,
+INSTANTIATE_TEST_SUITE_P(CborRegressionFuzzTests, CborRegressionFuzzTest,
                         ::testing::ValuesIn(fuzz_test_cases));
 
 class CborRegressionFlynnTest : public ::testing::TestWithParam<const char*> {};
@@ -1497,7 +1497,7 @@ static const char* flynn_test_cases[] = {
     "test/data/nst_json_testsuite/test_parsing/y_structure_whitespace_array.json",
 };
 
-INSTANTIATE_TEST_CASE_P(CborRegressionFlynnTests, CborRegressionFlynnTest,
+INSTANTIATE_TEST_SUITE_P(CborRegressionFlynnTests, CborRegressionFlynnTest,
                         ::testing::ValuesIn(flynn_test_cases));
 
 #endif
@@ -1644,7 +1644,7 @@ static const internal::CborRoundtripTestParam rfc7049_appendix_a_numbers[] = {
     {"-4.1", {0xfb,0xc0,0x10,0x66,0x66,0x66,0x66,0x66,0x66}, true},
 };
 
-INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixANumberTests, CborRoundtripTest,
+INSTANTIATE_TEST_SUITE_P(CborRfc7049AppendixANumberTests, CborRoundtripTest,
                         ::testing::ValuesIn(rfc7049_appendix_a_numbers), );
 
 static const internal::CborRoundtripTestParam rfc7049_appendix_a_simple_values[] = {
@@ -1652,7 +1652,7 @@ static const internal::CborRoundtripTestParam rfc7049_appendix_a_simple_values[]
     {"true", {0xf5}, true},
 };
 
-INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixASimpleValueTests, CborRoundtripTest,
+INSTANTIATE_TEST_SUITE_P(CborRfc7049AppendixASimpleValueTests, CborRoundtripTest,
                         ::testing::ValuesIn(rfc7049_appendix_a_simple_values), );
 
 static const internal::CborRoundtripTestParam rfc7049_appendix_a_strings[] = {
@@ -1666,7 +1666,7 @@ static const internal::CborRoundtripTestParam rfc7049_appendix_a_strings[] = {
     {"\"streaming\"", {0x7f,0x65,0x73,0x74,0x72,0x65,0x61,0x64,0x6d,0x69,0x6e,0x67,0xff}, false},
 };
 
-INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixAStringTests, CborRoundtripTest,
+INSTANTIATE_TEST_SUITE_P(CborRfc7049AppendixAStringTests, CborRoundtripTest,
                         ::testing::ValuesIn(rfc7049_appendix_a_strings), );
 
 static const internal::CborRoundtripTestParam rfc7049_appendix_a_arrays[] = {
@@ -1683,7 +1683,7 @@ static const internal::CborRoundtripTestParam rfc7049_appendix_a_arrays[] = {
     {"[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]", {0x9f,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x18,0x18,0x19,0xff}, false},
 };
 
-INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixAArrayTests, CborRoundtripTest,
+INSTANTIATE_TEST_SUITE_P(CborRfc7049AppendixAArrayTests, CborRoundtripTest,
                         ::testing::ValuesIn(rfc7049_appendix_a_arrays), );
 
 static const internal::CborRoundtripTestParam rfc7049_appendix_a_objects[] = {
@@ -1697,5 +1697,5 @@ static const internal::CborRoundtripTestParam rfc7049_appendix_a_objects[] = {
     {"{\"Fun\": true, \"Amt\": -2}", {0xbf,0x63,0x46,0x75,0x6e,0xf5,0x63,0x41,0x6d,0x74,0x21,0xff}, false},
 };
 
-INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixAObjectTests, CborRoundtripTest,
+INSTANTIATE_TEST_SUITE_P(CborRfc7049AppendixAObjectTests, CborRoundtripTest,
                         ::testing::ValuesIn(rfc7049_appendix_a_objects), );

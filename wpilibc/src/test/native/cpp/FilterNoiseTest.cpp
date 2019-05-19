@@ -133,5 +133,5 @@ TEST_P(FilterNoiseTest, NoiseReduce) {
       << "Filter should have reduced noise accumulation but failed";
 }
 
-INSTANTIATE_TEST_CASE_P(Test, FilterNoiseTest,
+INSTANTIATE_TEST_SUITE_P(Test, FilterNoiseTest,
                         testing::Values(TEST_SINGLE_POLE_IIR, TEST_MOVAVG));

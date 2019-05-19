@@ -67,7 +67,7 @@ static const json::value_t construct_type_cases[] = {
     json::value_t::number_float,
 };
 
-INSTANTIATE_TEST_CASE_P(JsonConstructTypeTests, JsonConstructTypeTest,
+INSTANTIATE_TEST_SUITE_P(JsonConstructTypeTests, JsonConstructTypeTest,
                         ::testing::ValuesIn(construct_type_cases), );
 
 
