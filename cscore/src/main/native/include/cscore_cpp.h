@@ -21,6 +21,12 @@
 
 #include "cscore_c.h"
 
+#ifdef _WIN32
+// Disable uninitialized variable warnings
+#pragma warning(push)
+#pragma warning(disable : 26495)
+#endif
+
 namespace cv {
 class Mat;
 }  // namespace cv
@@ -442,5 +448,10 @@ uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image,
 void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, CS_Status* status);
 }  // extern "C"
 /** @} */
+
+#ifdef _WIN32
+// Disable uninitialized variable warnings
+#pragma warning(pop)
+#endif
 
 #endif  // CSCORE_CSCORE_CPP_H_

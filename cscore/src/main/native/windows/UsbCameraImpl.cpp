@@ -54,6 +54,8 @@
 #pragma comment(lib, "Mfreadwrite.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
+#pragma warning(disable : 4996 4018 26451)
+
 static constexpr int NewImageMessage = 0x0400 + 4488;
 static constexpr int SetCameraMessage = 0x0400 + 254;
 static constexpr int WaitForStartupMessage = 0x0400 + 294;
@@ -76,6 +78,7 @@ UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
     : SourceImpl{name, logger, notifier, telemetry}, m_path{path.str()} {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
+  m_deviceId = -1;
   StartMessagePump();
 }
 
@@ -679,7 +682,7 @@ void UsbCameraImpl::DeviceCacheProperty(
   }
 
   NotifyPropertyCreated(*rawIndex, *rawPropPtr);
-  if (perPropPtr) NotifyPropertyCreated(*perIndex, *perPropPtr);
+  if (perPropPtr && perIndex) NotifyPropertyCreated(*perIndex, *perPropPtr);
 }
 
 CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
@@ -815,7 +818,10 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
 
     m_currentMode = std::move(newModeType);
     m_mode = newMode;
+#pragma warning(push)
+#pragma warning(disable : 26110)
     lock.unlock();
+#pragma warning(pop)
     if (m_sourceReader) {
       DeviceDisconnect();
       DeviceConnect();
@@ -969,6 +975,7 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   ComPtr<IMFAttributes> pAttributes;
   IMFActivate** ppDevices = nullptr;
+  UINT32 count = 0;
 
   // Create an attribute store to specify the enumeration parameters.
   HRESULT hr = MFCreateAttributes(pAttributes.GetAddressOf(), 1);
@@ -984,7 +991,6 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   }
 
   // Enumerate devices.
-  UINT32 count;
   hr = MFEnumDeviceSources(pAttributes.Get(), &ppDevices, &count);
   if (FAILED(hr)) {
     goto done;
@@ -1000,11 +1006,11 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
     info.dev = i;
     WCHAR buf[512];
     ppDevices[i]->GetString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, buf,
-                            sizeof(buf), NULL);
+                            sizeof(buf) / sizeof(WCHAR), NULL);
     info.name = utf8_conv.to_bytes(buf);
     ppDevices[i]->GetString(
         MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, buf,
-        sizeof(buf), NULL);
+        sizeof(buf) / sizeof(WCHAR), NULL);
     info.path = utf8_conv.to_bytes(buf);
     retval.emplace_back(std::move(info));
   }
@@ -1012,12 +1018,15 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
 done:
   pAttributes.Reset();
 
-  for (DWORD i = 0; i < count; i++) {
-    if (ppDevices[i]) {
-      ppDevices[i]->Release();
-      ppDevices[i] = nullptr;
+  if (ppDevices) {
+    for (DWORD i = 0; i < count; i++) {
+      if (ppDevices[i]) {
+        ppDevices[i]->Release();
+        ppDevices[i] = nullptr;
+      }
     }
   }
+
   CoTaskMemFree(ppDevices);
   return retval;
 }

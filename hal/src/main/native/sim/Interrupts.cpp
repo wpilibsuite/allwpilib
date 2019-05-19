@@ -26,6 +26,10 @@
 #include "mockdata/DIODataInternal.h"
 #include "mockdata/HAL_Value.h"
 
+#ifdef _WIN32
+#pragma warning(disable : 4996 4018 6297 26451 4334)
+#endif
+
 using namespace hal;
 
 enum WaitResult {
@@ -54,9 +58,9 @@ struct Interrupt {
 };
 
 struct SynchronousWaitData {
-  HAL_InterruptHandle interruptHandle;
+  HAL_InterruptHandle interruptHandle{HAL_kInvalidHandle};
   wpi::condition_variable waitCond;
-  HAL_Bool waitPredicate;
+  HAL_Bool waitPredicate{false};
 };
 }  // namespace
 
@@ -231,7 +235,7 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
 
   // Cancel our callback
   SimDIOData[digitalIndex].value.CancelCallback(uid);
-  synchronousInterruptHandles->Free(dataHandle);
+  (void)synchronousInterruptHandles->Free(dataHandle);
 
   // Check for what to return
   if (timedOut) return WaitResult::Timeout;
@@ -295,7 +299,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
 
   // Cancel our callback
   SimAnalogInData[analogIndex].voltage.CancelCallback(uid);
-  synchronousInterruptHandles->Free(dataHandle);
+  (void)synchronousInterruptHandles->Free(dataHandle);
 
   // Check for what to return
   if (timedOut) return WaitResult::Timeout;

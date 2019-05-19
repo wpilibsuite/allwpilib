@@ -64,7 +64,7 @@ protected:
 protected:
   explicit StringMapImpl(unsigned itemSize)
       : ItemSize(itemSize) {}
-  StringMapImpl(StringMapImpl &&RHS)
+  StringMapImpl(StringMapImpl &&RHS) noexcept
       : TheTable(RHS.TheTable), NumBuckets(RHS.NumBuckets),
         NumItems(RHS.NumItems), NumTombstones(RHS.NumTombstones),
         ItemSize(RHS.ItemSize) {

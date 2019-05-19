@@ -8,14 +8,13 @@
 #pragma once
 
 #include "lowfisim/GyroSim.h"
-#include "lowfisim/SimulatorComponentBase.h"
 #include "simulation/AnalogGyroSim.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class WpiAnalogGyroSim : public SimulatorComponentBase, public GyroSim {
+class WpiAnalogGyroSim : public GyroSim {
  public:
   explicit WpiAnalogGyroSim(int index);
 

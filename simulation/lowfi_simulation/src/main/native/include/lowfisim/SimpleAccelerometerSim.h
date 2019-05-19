@@ -10,17 +10,13 @@
 #include <functional>
 
 #include "lowfisim/AccelerometerSim.h"
-#include "lowfisim/SimulatorComponentBase.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class SimpleAccelerometerSim : public SimulatorComponentBase,
-                               public AccelerometerSim {
+class SimpleAccelerometerSim : public AccelerometerSim {
  public:
-  using SimulatorComponentBase::GetDisplayName;
-
   SimpleAccelerometerSim(const std::function<bool(void)>& initializedFunction,
                          const std::function<void(double)>& setterFunction,
                          const std::function<double(void)>& getterFunction)

@@ -27,6 +27,10 @@
 
 #include <stdlib.h>
 
+#ifdef _WIN32
+#pragma warning(disable: 6001 6011)
+#endif
+
 #define MAX_THREADPOOL_SIZE 128
 
 static uv_once_t once = UV_ONCE_INIT;

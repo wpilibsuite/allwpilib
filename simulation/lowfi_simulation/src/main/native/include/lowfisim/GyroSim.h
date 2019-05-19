@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include "lowfisim/SimulatorComponent.h"
+#include "lowfisim/SimulatorComponentBase.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class GyroSim : public virtual SimulatorComponent {
+class GyroSim : public SimulatorComponentBase {
  public:
   virtual void SetAngle(double angle) = 0;
   virtual double GetAngle() = 0;

@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include "lowfisim/SimulatorComponent.h"
+#include "lowfisim/SimulatorComponentBase.h"
 
 namespace frc {
 namespace sim {
 namespace lowfi {
 
-class MotorSim : public virtual SimulatorComponent {
+class MotorSim : public SimulatorComponentBase {
  public:
   virtual double GetPosition() const = 0;
   virtual double GetVelocity() const = 0;

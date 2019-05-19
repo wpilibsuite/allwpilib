@@ -244,7 +244,8 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * @return Number of bytes sent.
    */
   int TrySend(const sockaddr& addr, ArrayRef<Buffer> bufs) {
-    int val = uv_udp_try_send(GetRaw(), bufs.data(), bufs.size(), &addr);
+    int val = uv_udp_try_send(GetRaw(), bufs.data(),
+                              static_cast<unsigned>(bufs.size()), &addr);
     if (val < 0) {
       this->ReportError(val);
       return 0;

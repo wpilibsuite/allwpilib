@@ -11,6 +11,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#ifdef _WIN32
+#define _CRT_NONSTDC_NO_WARNINGS
+#endif
+
 #include "wpi/raw_ostream.h"
 #include "wpi/STLExtras.h"
 #include "wpi/SmallString.h"
@@ -598,6 +602,56 @@ raw_fd_ostream::~raw_fd_ostream() {
     report_fatal_error("IO failure on output stream: " + error().message(),
                        /*GenCrashDiag=*/false);
 }
+
+#if defined(_WIN32)
+// The most reliable way to print unicode in a Windows console is with
+// WriteConsoleW. To use that, first transcode from UTF-8 to UTF-16. This
+// assumes that LLVM programs always print valid UTF-8 to the console. The data
+// might not be UTF-8 for two major reasons:
+// 1. The program is printing binary (-filetype=obj -o -), in which case it
+// would have been gibberish anyway.
+// 2. The program is printing text in a semi-ascii compatible codepage like
+// shift-jis or cp1252.
+//
+// Most LLVM programs don't produce non-ascii text unless they are quoting
+// user source input. A well-behaved LLVM program should either validate that
+// the input is UTF-8 or transcode from the local codepage to UTF-8 before
+// quoting it. If they don't, this may mess up the encoding, but this is still
+// probably the best compromise we can make.
+static bool write_console_impl(int FD, StringRef Data) {
+  SmallVector<wchar_t, 256> WideText;
+
+  // Fall back to ::write if it wasn't valid UTF-8.
+  if (auto EC = sys::windows::UTF8ToUTF16(Data, WideText))
+    return false;
+
+  // On Windows 7 and earlier, WriteConsoleW has a low maximum amount of data
+  // that can be written to the console at a time.
+  size_t MaxWriteSize = WideText.size();
+  if (!RunningWindows8OrGreater())
+    MaxWriteSize = 32767;
+
+  size_t WCharsWritten = 0;
+  do {
+    size_t WCharsToWrite =
+        std::min(MaxWriteSize, WideText.size() - WCharsWritten);
+    DWORD ActuallyWritten;
+    bool Success =
+        ::WriteConsoleW((HANDLE)::_get_osfhandle(FD), &WideText[WCharsWritten],
+                        WCharsToWrite, &ActuallyWritten,
+                        /*Reserved=*/nullptr);
+
+    // The most likely reason for WriteConsoleW to fail is that FD no longer
+    // points to a console. Fall back to ::write. If this isn't the first loop
+    // iteration, something is truly wrong.
+    if (!Success)
+      return false;
+
+    WCharsWritten += ActuallyWritten;
+  } while (WCharsWritten != WideText.size());
+  return true;
+}
+#endif
 
 #if defined(_WIN32)
 // The most reliable way to print unicode in a Windows console is with

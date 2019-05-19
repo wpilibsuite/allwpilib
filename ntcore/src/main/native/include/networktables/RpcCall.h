@@ -36,7 +36,7 @@ class RpcCall final {
    */
   RpcCall(NT_Entry entry, NT_RpcCall call) : m_entry(entry), m_call(call) {}
 
-  RpcCall(RpcCall&& other);
+  RpcCall(RpcCall&& other) noexcept;
   RpcCall(const RpcCall&) = delete;
   RpcCall& operator=(const RpcCall&) = delete;
 

@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#define _CRT_NONSTDC_NO_WARNINGS
+
 #include "wpi/raw_istream.h"
 
 #ifdef _WIN32

@@ -51,7 +51,7 @@ class VideoProperty {
     kEnum = CS_PROP_ENUM
   };
 
-  VideoProperty() : m_handle(0), m_kind(kNone) {}
+  VideoProperty() : m_status(0), m_handle(0), m_kind(kNone) {}
 
   std::string GetName() const;
 

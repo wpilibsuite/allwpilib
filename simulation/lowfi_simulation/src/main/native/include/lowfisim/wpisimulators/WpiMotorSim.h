@@ -8,7 +8,6 @@
 #pragma once
 
 #include "lowfisim/MotorSim.h"
-#include "lowfisim/SimulatorComponentBase.h"
 #include "lowfisim/motormodel/MotorModel.h"
 #include "simulation/PWMSim.h"
 
@@ -16,7 +15,7 @@ namespace frc {
 namespace sim {
 namespace lowfi {
 
-class WpiMotorSim : public SimulatorComponentBase, public MotorSim {
+class WpiMotorSim : public MotorSim {
  public:
   explicit WpiMotorSim(int index, MotorModel& motorModelSimulator);
   bool IsWrapperInitialized() const override;

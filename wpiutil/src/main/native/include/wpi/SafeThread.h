@@ -67,7 +67,7 @@ class SafeThreadOwnerBase {
       : SafeThreadOwnerBase() {
     swap(*this, other);
   }
-  SafeThreadOwnerBase& operator=(SafeThreadOwnerBase other) noexcept {
+  SafeThreadOwnerBase& operator=(SafeThreadOwnerBase&& other) noexcept {
     swap(*this, other);
     return *this;
   }
