@@ -15,7 +15,7 @@
 
 namespace cv {
 class cv::Mat;
-}
+}  // namespace cv
 
 using namespace wpi::java;
 
