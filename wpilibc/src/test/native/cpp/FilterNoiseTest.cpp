@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -134,4 +134,4 @@ TEST_P(FilterNoiseTest, NoiseReduce) {
 }
 
 INSTANTIATE_TEST_SUITE_P(Test, FilterNoiseTest,
-                        testing::Values(TEST_SINGLE_POLE_IIR, TEST_MOVAVG));
+                         testing::Values(TEST_SINGLE_POLE_IIR, TEST_MOVAVG));

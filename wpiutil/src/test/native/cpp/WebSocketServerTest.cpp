@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -258,9 +258,9 @@ class WebSocketServerBadOpcodeTest
       public ::testing::WithParamInterface<uint8_t> {};
 
 INSTANTIATE_TEST_SUITE_P(WebSocketServerBadOpcodeTests,
-                        WebSocketServerBadOpcodeTest,
-                        ::testing::Values(3, 4, 5, 6, 7, 0xb, 0xc, 0xd, 0xe,
-                                          0xf));
+                         WebSocketServerBadOpcodeTest,
+                         ::testing::Values(3, 4, 5, 6, 7, 0xb, 0xc, 0xd, 0xe,
+                                           0xf));
 
 TEST_P(WebSocketServerBadOpcodeTest, Receive) {
   int gotCallback = 0;
@@ -290,8 +290,8 @@ class WebSocketServerControlFrameTest
       public ::testing::WithParamInterface<uint8_t> {};
 
 INSTANTIATE_TEST_SUITE_P(WebSocketServerControlFrameTests,
-                        WebSocketServerControlFrameTest,
-                        ::testing::Values(0x8, 0x9, 0xa));
+                         WebSocketServerControlFrameTest,
+                         ::testing::Values(0x8, 0x9, 0xa));
 
 TEST_P(WebSocketServerControlFrameTest, ReceiveFragment) {
   int gotCallback = 0;
@@ -533,7 +533,7 @@ class WebSocketServerDataTest : public WebSocketServerTest,
                                 public ::testing::WithParamInterface<size_t> {};
 
 INSTANTIATE_TEST_SUITE_P(WebSocketServerDataTests, WebSocketServerDataTest,
-                        ::testing::Values(0, 1, 125, 126, 65535, 65536));
+                         ::testing::Values(0, 1, 125, 126, 65535, 65536));
 
 TEST_P(WebSocketServerDataTest, SendText) {
   int gotCallback = 0;
