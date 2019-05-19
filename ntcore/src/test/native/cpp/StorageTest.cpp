@@ -990,12 +990,12 @@ TEST_P(StorageTestPopulateOne, DeletedGetEntries) {
 }
 
 INSTANTIATE_TEST_CASE_P(StorageTestsEmpty, StorageTestEmpty,
-                        ::testing::Bool(), );
+                        ::testing::Bool());
 INSTANTIATE_TEST_CASE_P(StorageTestsPopulateOne, StorageTestPopulateOne,
-                        ::testing::Bool(), );
+                        ::testing::Bool());
 INSTANTIATE_TEST_CASE_P(StorageTestsPopulated, StorageTestPopulated,
-                        ::testing::Bool(), );
+                        ::testing::Bool());
 INSTANTIATE_TEST_CASE_P(StorageTestsPersistent, StorageTestPersistent,
-                        ::testing::Bool(), );
+                        ::testing::Bool());
 
 }  // namespace nt

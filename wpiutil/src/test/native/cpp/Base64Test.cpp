@@ -86,7 +86,7 @@ static Base64TestParam sample[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(Base64Sample, Base64Test,
-                        ::testing::ValuesIn(sample), );
+                        ::testing::ValuesIn(sample));
 
 static Base64TestParam standard[] = {
     {0, "", ""},
@@ -100,6 +100,6 @@ static Base64TestParam standard[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(Base64Standard, Base64Test,
-                        ::testing::ValuesIn(standard), );
+                        ::testing::ValuesIn(standard));
 
 }  // namespace wpi

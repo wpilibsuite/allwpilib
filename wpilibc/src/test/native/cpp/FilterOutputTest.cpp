@@ -154,4 +154,4 @@ TEST_P(FilterOutputTest, FilterOutput) {
 
 INSTANTIATE_TEST_CASE_P(Test, FilterOutputTest,
                         testing::Values(TEST_SINGLE_POLE_IIR, TEST_HIGH_PASS,
-                                        TEST_MOVAVG, TEST_PULSE), );
+                                        TEST_MOVAVG, TEST_PULSE));

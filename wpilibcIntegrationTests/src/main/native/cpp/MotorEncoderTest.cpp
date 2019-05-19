@@ -191,4 +191,4 @@ TEST_P(MotorEncoderTest, Reset) {
 
 INSTANTIATE_TEST_CASE_P(Test, MotorEncoderTest,
                         testing::Values(TEST_VICTOR, TEST_JAGUAR,
-                                        TEST_TALON), );
+                                        TEST_TALON));

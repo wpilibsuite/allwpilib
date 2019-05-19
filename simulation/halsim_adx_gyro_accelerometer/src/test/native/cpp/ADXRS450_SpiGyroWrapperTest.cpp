@@ -38,4 +38,4 @@ INSTANTIATE_TEST_CASE_P(
     ADXRS450_SpiGyroWrapperTest, ADXRS450_SpiGyroWrapperTest,
     ::testing::Values(frc::SPI::kOnboardCS0, frc::SPI::kOnboardCS1,
                       frc::SPI::kOnboardCS2, frc::SPI::kOnboardCS3,
-                      frc::SPI::kMXP), );
+                      frc::SPI::kMXP));

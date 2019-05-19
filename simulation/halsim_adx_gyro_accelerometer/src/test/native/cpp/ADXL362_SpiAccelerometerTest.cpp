@@ -45,4 +45,4 @@ INSTANTIATE_TEST_CASE_P(
     ADXL362_SpiAccelerometerTest, ADXL362_SpiAccelerometerTest,
     ::testing::Values(frc::SPI::kOnboardCS0, frc::SPI::kOnboardCS1,
                       frc::SPI::kOnboardCS2, frc::SPI::kOnboardCS3,
-                      frc::SPI::kMXP), );
+                      frc::SPI::kMXP));

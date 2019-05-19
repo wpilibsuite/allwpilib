@@ -134,4 +134,4 @@ TEST_P(FilterNoiseTest, NoiseReduce) {
 }
 
 INSTANTIATE_TEST_CASE_P(Test, FilterNoiseTest,
-                        testing::Values(TEST_SINGLE_POLE_IIR, TEST_MOVAVG), );
+                        testing::Values(TEST_SINGLE_POLE_IIR, TEST_MOVAVG));
