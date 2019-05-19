@@ -223,7 +223,7 @@ class WebSocketClientDataTest : public WebSocketClientTest,
 };
 
 INSTANTIATE_TEST_SUITE_P(WebSocketClientDataTests, WebSocketClientDataTest,
-                        ::testing::Values(0, 1, 125, 126, 65535, 65536), );
+                        ::testing::Values(0, 1, 125, 126, 65535, 65536));
 
 TEST_P(WebSocketClientDataTest, SendBinary) {
   int gotCallback = 0;
