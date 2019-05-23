@@ -94,7 +94,7 @@ model {
                     project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) {
+                    if (binary.targetPlatform.name != nativeUtils.wpi.platforms.roborio) {
                         lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
                         lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
                         lib project: ':simulation:halsim_print', library: 'halsim_print', linkage: 'shared'
