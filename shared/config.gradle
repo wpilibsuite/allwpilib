@@ -1,5 +1,3 @@
-import edu.wpi.first.nativeutils.*
-import edu.wpi.first.toolchain.NativePlatforms 
 import org.gradle.internal.os.OperatingSystem
 
 nativeUtils.addWpiNativeUtils()
@@ -162,5 +160,5 @@ ext.includeStandardZipFormat = { task, value ->
 }
 
 ext.getCurrentArch = {
-    return NativePlatforms.desktop
+    return edu.wpi.first.toolchain.NativePlatforms.desktop
 }
