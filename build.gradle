@@ -1,7 +1,7 @@
 plugins {
     id 'base'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.3'
-    id 'edu.wpi.first.NativeUtils' version '2.1.2'
+    id 'edu.wpi.first.NativeUtils' version '2019.5.1' apply false
     id 'edu.wpi.first.GradleJni' version '0.3.1'
     id 'edu.wpi.first.GradleVsCode' version '0.7.1'
     id 'idea'
@@ -100,5 +100,5 @@ subprojects {
 }
 
 wrapper {
-    gradleVersion = '5.0'
+    gradleVersion = '5.4.1'
 }
