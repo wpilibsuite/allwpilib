@@ -82,7 +82,7 @@ model {
         copyWpilibCTestLibrariesToOutput(Copy) {
             def task = it
             $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborios) {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     def installTask = it.tasks.install
                     task.dependsOn installTask
                     task.from(installTask.executableFile) {
