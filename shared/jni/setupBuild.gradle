@@ -243,7 +243,7 @@ model {
                 if (it in NativeExecutableSpec && it.name == "${nativeName}Dev") {
                     it.binaries.each {
                         if (!found) {
-                            def arch = it.targetPlatform.architecture.name
+                            def arch = it.targetPlatform.name
                             if (arch == systemArch) {
                                 dependsOn it.tasks.install
                                 commandLine it.tasks.install.runScriptFile.get().asFile.toString()
