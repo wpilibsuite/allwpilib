@@ -33,7 +33,7 @@ model {
             targetBuildTypes 'debug'
             baseName = 'FRCUserProgram'
             binaries.all { binary ->
-                if (binary.targetPlatform.architecture.name == 'athena') {
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     binary.sources {
                         athenaCpp(CppSourceSet) {
                             source {
@@ -82,7 +82,7 @@ model {
         copyWpilibCTestLibrariesToOutput(Copy) {
             def task = it
             $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.architecture.name == 'athena') {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborios) {
                     def installTask = it.tasks.install
                     task.dependsOn installTask
                     task.from(installTask.executableFile) {

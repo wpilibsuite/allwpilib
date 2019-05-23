@@ -20,7 +20,7 @@ ext {
     useJava = true
     useCpp = true
     splitSetup = {
-        if (it.targetPlatform.operatingSystem.name == 'osx') {
+        if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
                 macObjCpp(ObjectiveCppSourceSet) {
                     source {
@@ -43,7 +43,7 @@ ext {
                     }
                 }
             }
-        } else if (it.targetPlatform.operatingSystem.name == 'linux') {
+        } else if (it.targetPlatform.operatingSystem.isLinux()) {
             it.sources {
                 cscoreLinuxCpp(CppSourceSet) {
                     source {
@@ -56,7 +56,7 @@ ext {
                     }
                 }
             }
-        } else if (it.targetPlatform.operatingSystem.name == 'windows') {
+        } else if (it.targetPlatform.operatingSystem.isWindows()) {
             it.sources {
                 cscoreWindowsCpp(CppSourceSet) {
                     source {

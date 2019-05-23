@@ -28,7 +28,7 @@ ext {
                 }
             }
         }
-        if (it.targetPlatform.operatingSystem.name != 'windows') {
+        if (!it.targetPlatform.operatingSystem.isWindows()) {
             it.cppCompiler.define '_GNU_SOURCE'
             it.sources {
                 libuvUnixCpp(CppSourceSet) {
@@ -61,7 +61,7 @@ ext {
                 }
             }
         }
-        if (it.targetPlatform.operatingSystem.name == 'windows') {
+        if (it.targetPlatform.operatingSystem.isWindows()) {
             if (it in SharedLibraryBinarySpec) {
                 it.cppCompiler.define 'BUILDING_UV_SHARED'
             }
@@ -76,7 +76,7 @@ ext {
                     }
                 }
             }
-        } else if (it.targetPlatform.operatingSystem.name == 'osx') {
+        } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
                 libuvMacCpp(CppSourceSet) {
                     source {

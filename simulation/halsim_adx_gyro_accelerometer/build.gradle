@@ -11,7 +11,7 @@ ext {
 
 apply from: "${rootDir}/shared/config.gradle"
 
-if (!project.hasProperty('onlyAthena')) {
+if (!project.hasProperty('onlylinuxathena')) {
 
     ext {
         sharedCvConfigs = [halsim_adx_gyro_accelerometerTest: []]
@@ -60,7 +60,7 @@ if (!project.hasProperty('onlyAthena')) {
                         it.buildable = false
                         return
                     }
-                    if (it.targetPlatform.architecture.name == 'athena') {
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         it.buildable = false
                         return
                     }
@@ -81,7 +81,7 @@ if (!project.hasProperty('onlyAthena')) {
                     }
                 }
                 binaries.all {
-                    if (it.targetPlatform.architecture.name == 'athena') {
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         it.buildable = false
                         return
                     }
@@ -106,7 +106,7 @@ if (!project.hasProperty('onlyAthena')) {
                     }
                 }
                 binaries.all {
-                    if (it.targetPlatform.architecture.name == 'athena') {
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         it.buildable = false
                         return
                     }
@@ -118,7 +118,7 @@ if (!project.hasProperty('onlyAthena')) {
         }
         binaries {
             withType(GoogleTestTestSuiteBinarySpec) {
-                if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
+                if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian')) {
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
                     project(':hal').addHalDependency(it, 'shared')
@@ -139,7 +139,7 @@ if (!project.hasProperty('onlyAthena')) {
 model {
 
     testSuites {
-        if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
+        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian')) {
             "${nativeName}Test"(GoogleTestTestSuiteSpec) {
                 for(NativeComponentSpec c : $.components) {
                     if (c.name == nativeName) {

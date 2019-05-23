@@ -54,7 +54,7 @@ model {
             if (it in NativeExecutableSpec && it.name == "${nativeName}Dev") {
                 it.binaries.each {
                     if (!found) {
-                        def arch = it.targetPlatform.architecture.name
+                        def arch = it.targetPlatform.name
                         if (arch == systemArch) {
                             def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
 

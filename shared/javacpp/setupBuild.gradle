@@ -103,7 +103,7 @@ model {
     }
     binaries {
         withType(GoogleTestTestSuiteBinarySpec) {
-            if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
+            if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian')) {
                 lib library: nativeName, linkage: 'shared'
             } else {
                 it.buildable = false

@@ -67,7 +67,7 @@ ext {
         it.tasks.withType(AbstractNativeSourceCompileTask) {
             it.dependsOn generateUsageReporting
         }
-        if (it.targetPlatform.architecture.name == 'athena') {
+        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
             it.sources {
                 athenaJniCpp(CppSourceSet) {
                     source {
@@ -99,7 +99,7 @@ ext {
         it.tasks.withType(AbstractNativeSourceCompileTask) {
             it.dependsOn generateUsageReporting
         }
-        if (it.targetPlatform.architecture.name == 'athena') {
+        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
             it.sources {
                 athenaCpp(CppSourceSet) {
                     source {
