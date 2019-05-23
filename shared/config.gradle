@@ -158,7 +158,3 @@ ext.includeStandardZipFormat = { task, value ->
         }
     }
 }
-
-ext.getCurrentArch = {
-    return edu.wpi.first.toolchain.NativePlatforms.desktop
-}
