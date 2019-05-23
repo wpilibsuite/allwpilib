@@ -2,16 +2,19 @@ def opencvVersion = '3.4.4-5'
 
 if (project.hasProperty('useCpp') && project.useCpp) {
     model {
-        dependencyConfigs {
-            opencv(DependencyConfig) {
-                groupId = 'edu.wpi.first.thirdparty.frc2019.opencv'
-                artifactId = 'opencv-cpp'
-                headerClassifier = 'headers'
-                ext = 'zip'
-                version = opencvVersion
-                sharedConfigs = project.sharedCvConfigs
-                staticConfigs = project.staticCvConfigs
-                linkExcludes = ['**/*java*']
+        binaries {
+            withType(NativeBinarySpec).all {
+                def binary = it
+                project.sharedCvConfigs.each { 
+                    if (binary.component.name == it.key) {
+                        nativeUtils.useRequiredLibrary(binary, 'opencv_shared')
+                    }
+                }
+                project.staticCvConfigs.each { 
+                    if (binary.component.name == it.key) {
+                        nativeUtils.useRequiredLibrary(binary, 'opencv_static')
+                    }
+                }
             }
         }
     }

@@ -36,20 +36,12 @@ if (!project.hasProperty('onlyAthena')) {
     }
 
     apply from: "${rootDir}/shared/nilibraries.gradle"
+    
+    nativeUtils.exportsConfigs {
+        halsim_adx_gyro_accelerometer {}
+    }
 
     model {
-        exportsConfigs {
-            halsim_adx_gyro_accelerometer(ExportsConfig) {
-                x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                     '_CT??_R0?AVbad_cast',
-                                     '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                     '_TI5?AVfailure']
-                x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                     '_CT??_R0?AVbad_cast',
-                                     '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                     '_TI5?AVfailure']
-            }
-        }
         components {
             "${nativeName}Base"(NativeLibrarySpec) {
                 sources {
