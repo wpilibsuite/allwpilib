@@ -18,6 +18,8 @@ model {
     components {
         all {
             nativeUtils.useAllPlatforms(it)
+            nativeUtils.usePlatformArguments(it)
+
         }
     }
 }
