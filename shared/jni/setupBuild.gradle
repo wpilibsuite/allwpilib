@@ -144,8 +144,8 @@ model {
             }
             enableCheckTask true
             javaCompileTasks << compileJava
-            jniCrossCompileOptions << JniCrossCompileOptions()
-            jniCrossCompileOptions << JniCrossCompileOptions('raspbian')
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
             sources {
                 cpp {
                     source {
