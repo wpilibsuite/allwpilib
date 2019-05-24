@@ -83,7 +83,7 @@ model {
         copyWpilibCTestLibrariesToOutput(Copy) {
             def task = it
             $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.buildable) {
                     def installTask = it.tasks.install
                     task.dependsOn installTask
                     task.from(installTask.executableFile) {
@@ -100,7 +100,7 @@ model {
         }
         // This is in a separate if statement because of what I would assume is a bug in grade.
         // Will file an issue on their side.
-        if (!project.hasProperty('skipAthena')) {
+        if (!project.hasProperty('skiponlyathena')) {
             build.dependsOn copyWpilibCTestLibrariesToOutput
         }
     }
