@@ -5,12 +5,12 @@ if (project.hasProperty('useCpp') && project.useCpp) {
         binaries {
             withType(NativeBinarySpec).all {
                 def binary = it
-                project.sharedCvConfigs.each { 
+                project.sharedCvConfigs.each {
                     if (binary.component.name == it.key) {
                         nativeUtils.useRequiredLibrary(binary, 'opencv_shared')
                     }
                 }
-                project.staticCvConfigs.each { 
+                project.staticCvConfigs.each {
                     if (binary.component.name == it.key) {
                         nativeUtils.useRequiredLibrary(binary, 'opencv_static')
                     }
