@@ -190,7 +190,6 @@ class WatchdogTest {
   }
 
   @Test
-  @DisabledOnOs(OS.MAC)
   void multiWatchdogTest() {
     final AtomicInteger watchdogCounter1 = new AtomicInteger(0);
     final AtomicInteger watchdogCounter2 = new AtomicInteger(0);
