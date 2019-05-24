@@ -134,7 +134,7 @@ jobs:
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
-        options: '-Ptoolchain-optional-roboRio'
+        options: '-Ptoolchain-optional-roboRio -x pmd'
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
 
@@ -161,7 +161,7 @@ jobs:
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
-        options: '-Ptoolchain-optional-roboRio -Pbuildwin32'
+        options: '-Ptoolchain-optional-roboRio -Pbuildwin32 -x pmd'
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
 
