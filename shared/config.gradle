@@ -8,7 +8,7 @@ nativeUtils {
       wpiVersion = "-1"
       niLibVersion = "2019.12.1"
       opencvVersion = "3.4.4-5"
-      googleTestVersion = "1.8.0.4-4e4df22"
+      googleTestVersion = "1.8.0-4-4e4df22"
     }
   }
 }
@@ -17,8 +17,11 @@ model {
     components {
         all {
             nativeUtils.useAllPlatforms(it)
+        }
+    }
+    binaries {
+        withType(NativeBinarySpec).all {
             nativeUtils.usePlatformArguments(it)
-
         }
     }
 }
