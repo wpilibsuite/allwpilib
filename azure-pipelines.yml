@@ -259,9 +259,7 @@ stages:
   jobs:
   - job: Linux
     pool:
-      vmImage: 'Ubuntu 16.04'
-
-    container: wpilib2019
+      vmImage: 'vs2017-win2016'
 
     steps:
     - checkout: none
@@ -272,9 +270,6 @@ stages:
       inputs:
         artifactName: 'Mac'
         targetPath: 'build-tools/combiner/products'
-    - script: |
-        find build-tools/combiner/products
-        displayName: 'List products'
     - task: Gradle@2
       inputs:
         workingDirectory: 'build-tools/combiner'
@@ -283,16 +278,9 @@ stages:
         tasks: 'publish '
         options: '-Pallwpilib'
 
-    - task: ArchiveFiles@2
+    - task: PublishPipelineArtifact@0
       inputs:
-        rootFolderOrFile: '~/releases'
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/mac.zip'
-        replaceExistingArchive: true
-
-    - task: PublishBuildArtifacts@1
-      inputs:
-        ArtifactName: 'Maven'
+        artifactName: 'Maven'
+        targetPath: '~/releases'
 
 
