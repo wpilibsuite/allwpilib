@@ -9,6 +9,9 @@ resources:
     image: wpilib/roborio-cross-ubuntu:2019-18.04
   - container: raspbian
     image:  wpilib/raspbian-cross-ubuntu:18.04
+  - container: ubuntu18
+    image: ubuntu:18.04
+    options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
 
 stages:
 - stage: Build
@@ -110,22 +113,26 @@ stages:
     pool:
       vmImage: 'Ubuntu 16.04'
 
+    container: ubuntu18
+
     steps:
         - script: |
+            /tmp/docker exec -t -u 0 ci-container \
+            sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
+          displayName: Set up sudo
+        - script: |
             sudo apt-get update -y
-            sudo apt-get install clang-format-5.0 python3-setuptools -y
-            sudo pip3 install --upgrade pip
+            sudo apt-get install clang-format-6.0 python3-setuptools python3-pip git -y
             sudo pip3 install wpiformat
             git checkout -b master
           displayName: 'Install Dependencies'
         - script: |
-            wpiformat -y 2018 -clang 5.0
-          displayName: 'Run WPIFormat'
-          failOnStderr: 'true'
+            wpiformat -clang 6.0
+          displayName: 'Run wpiformat'
         - script: |
-            git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
-          displayName: 'Check WPIFormat Output'
-          failOnStderr: 'true'
+            # Ensure formatter made no changes
+            git --no-pager diff --exit-code HEAD
+          displayName: 'Check wpiformat Output'
 
   - job: CMakeBuild
     pool:

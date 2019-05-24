@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -26,7 +26,7 @@ std::shared_ptr<Timer> Timer::Create(Loop& loop) {
 void Timer::SingleShot(Loop& loop, Time timeout, std::function<void()> func) {
   auto h = Create(loop);
   if (!h) return;
-  h->timeout.connect([ theTimer = h.get(), func ]() {
+  h->timeout.connect([theTimer = h.get(), func]() {
     func();
     theTimer->Close();
   });

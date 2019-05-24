@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -96,7 +96,7 @@ WebSocketServer::WebSocketServer(uv::Stream& stream,
     auto ws = m_helper.Accept(m_stream, protocol);
 
     // Connect the websocket open event to our connected event.
-    ws->open.connect_extended([ self, s = ws.get() ](auto conn, StringRef) {
+    ws->open.connect_extended([self, s = ws.get()](auto conn, StringRef) {
       self->connected(self->m_req.GetUrl(), *s);
       conn.disconnect();  // one-shot
     });
