@@ -264,6 +264,7 @@ stages:
     container: wpilib2019
 
     steps:
+    - checkout: none
     - script: |
         git clone https://github.com/wpilibsuite/build-tools
       displayName: 'Clone Combiner'
