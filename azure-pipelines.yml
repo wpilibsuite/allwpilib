@@ -273,7 +273,7 @@ stages:
     - task: Gradle@2
       inputs:
         workingDirectory: 'build-tools/combiner'
-        gradleWrapperFile: 'gradlew'
+        gradleWrapperFile: 'build-tools/combiner/gradlew'
         gradleOptions: '-Xmx3072m'
         tasks: 'publish '
         options: '-Pallwpilib'
