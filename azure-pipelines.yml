@@ -10,245 +10,269 @@ resources:
   - container: raspbian
     image:  wpilib/raspbian-cross-ubuntu:18.04
 
-jobs:
- - job: Linux_Arm
-   pool:
-     vmImage: 'Ubuntu 16.04'
+stages:
+- stage: Build
+  jobs:
+  - job: Linux_Arm
+    pool:
+      vmImage: 'Ubuntu 16.04'
 
-   container: wpilib2019
+    container: wpilib2019
 
-   steps:
-    - task: Gradle@2
-      inputs:
-        workingDirectory: ''
-        gradleWrapperFile: 'gradlew'
-        gradleOptions: '-Xmx3072m'
-        publishJUnitResults: false
-        testResultsFiles: '**/TEST-*.xml'
-        tasks: 'build'
-        options: '-PonlyAthena'
-        # checkStyleRunAnalysis: true
-        # pmdRunAnalysis: true
-
-    - task: ArchiveFiles@2
-      inputs:
-        rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/athena.zip'
-        replaceExistingArchive: true
-
-    - task: PublishBuildArtifacts@1
-      inputs:
-        ArtifactName: 'Athena'
-
- - job: Linux_Raspbian
-   pool:
-     vmImage: 'Ubuntu 16.04'
-
-   container: raspbian
-
-   steps:
-    - task: Gradle@2
-      inputs:
-        workingDirectory: ''
-        gradleWrapperFile: 'gradlew'
-        gradleOptions: '-Xmx3072m'
-        publishJUnitResults: true
-        testResultsFiles: '**/TEST-*.xml'
-        tasks: 'build'
-        options: '-PonlyRaspbian'
-        # checkStyleRunAnalysis: true
-        # pmdRunAnalysis: true
-
-    - task: ArchiveFiles@2
-      inputs:
-        rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/raspbian.zip'
-        replaceExistingArchive: true
-
-    - task: PublishBuildArtifacts@1
-      inputs:
-        ArtifactName: 'Raspbian'
-
- - job: Linux
-   pool:
-     vmImage: 'Ubuntu 16.04'
-
-   container: wpilib2019
-
-   steps:
-    - task: Gradle@2
-      inputs:
-        workingDirectory: ''
-        gradleWrapperFile: 'gradlew'
-        gradleOptions: '-Xmx3072m'
-        publishJUnitResults: true
-        testResultsFiles: '**/TEST-*.xml'
-        tasks: 'build'
-        options: '-PskipAthena'
-        # checkStyleRunAnalysis: true
-        # pmdRunAnalysis: true
-
-    - task: ArchiveFiles@2
-      inputs:
-        rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/linux.zip'
-        replaceExistingArchive: true
-
-    - task: PublishBuildArtifacts@1
-      inputs:
-        ArtifactName: 'Linux'
-
- - job: Styleguide
-   pool:
-     vmImage: 'Ubuntu 16.04'
-
-   steps:
-      - script: |
-          sudo apt-get update -y
-          sudo apt-get install clang-format-5.0 python3-setuptools -y
-          sudo pip3 install --upgrade pip
-          sudo pip3 install wpiformat
-          git checkout -b master
-        displayName: 'Install Dependencies'
-      - script: |
-          wpiformat -y 2018 -clang 5.0
-        displayName: 'Run WPIFormat'
-        failOnStderr: true
-      - script: |
-          git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
-        displayName: 'Check WPIFormat Output'
-        failOnStderr: true
-
- - job: CMakeBuild
-   pool:
-     vmImage: 'Ubuntu 16.04'
-
-   container: wpilib2019
-
-   steps:
-      - task: CMake@1
+    steps:
+      - task: Gradle@2
         inputs:
-          cmakeArgs: '-DWITHOUT_ALLWPILIB=OFF ..'
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          gradleOptions: '-Xmx3072m'
+          publishJUnitResults: false
+          testResultsFiles: '**/TEST-*.xml'
+          tasks: 'build'
+          options: '-PonlyAthena'
+          # checkStyleRunAnalysis: true
+          # pmdRunAnalysis: true
+
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/athena.zip'
+          replaceExistingArchive: true
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          ArtifactName: 'Athena'
+
+  - job: Linux_Raspbian
+    pool:
+      vmImage: 'Ubuntu 16.04'
+
+    container: raspbian
+
+    steps:
+      - task: Gradle@2
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          gradleOptions: '-Xmx3072m'
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          tasks: 'build'
+          options: '-PonlyRaspbian'
+          # checkStyleRunAnalysis: true
+          # pmdRunAnalysis: true
+
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/raspbian.zip'
+          replaceExistingArchive: true
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          ArtifactName: 'Raspbian'
+
+  - job: Linux
+    pool:
+      vmImage: 'Ubuntu 16.04'
+
+    container: wpilib2019
+
+    steps:
+      - task: Gradle@2
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          gradleOptions: '-Xmx3072m'
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          tasks: 'build'
+          options: '-PskipAthena'
+          # checkStyleRunAnalysis: true
+          # pmdRunAnalysis: true
+
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/linux.zip'
+          replaceExistingArchive: true
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          ArtifactName: 'Linux'
+
+  - job: Styleguide
+    pool:
+      vmImage: 'Ubuntu 16.04'
+
+    steps:
+        - script: |
+            sudo apt-get update -y
+            sudo apt-get install clang-format-5.0 python3-setuptools -y
+            sudo pip3 install --upgrade pip
+            sudo pip3 install wpiformat
+            git checkout -b master
+          displayName: 'Install Dependencies'
+        - script: |
+            wpiformat -y 2018 -clang 5.0
+          displayName: 'Run WPIFormat'
+          failOnStderr: 'true'
+        - script: |
+            git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+          displayName: 'Check WPIFormat Output'
+          failOnStderr: 'true'
+
+  - job: CMakeBuild
+    pool:
+      vmImage: 'Ubuntu 16.04'
+
+    container: wpilib2019
+
+    steps:
+        - task: CMake@1
+          inputs:
+            cmakeArgs: '-DWITHOUT_ALLWPILIB=OFF ..'
+        - script: |
+            make -j3
+          workingDirectory: 'build'
+          displayName: 'Build'
+
+  - job: Windows_64_Bit
+    pool:
+      vmImage: 'vs2017-win2016'
+    steps:
+      - powershell: |
+          mkdir build
+          $ProgressPreference = 'SilentlyContinue'
+          wget "https://download.java.net/java/ga/jdk11/openjdk-11_windows-x64_bin.zip" -O "build\jdk.zip"
+        displayName: 'Download JDK'
+      - task: JavaToolInstaller@0
+        inputs:
+          jdkSourceOption: localDirectory
+          jdkFile: 'build/jdk.zip'
+          jdkDestinationDirectory: 'build/jdkinst'
+          jdkArchitectureOption: x64
+      - task: Gradle@2
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          gradleOptions: '-Xmx3072m'
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          tasks: 'build'
+          # checkStyleRunAnalysis: true
+          # pmdRunAnalysis: true
+
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/win64.zip'
+          replaceExistingArchive: true
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          ArtifactName: 'Win64'
+
+  - job: Windows_32_Bit
+    pool:
+      vmImage: 'vs2017-win2016'
+    steps:
+      - powershell: |
+          mkdir build
+          $ProgressPreference = 'SilentlyContinue'
+          wget "https://github.com/wpilibsuite/frc-openjdk-windows/releases/download/v11.0.0u28-1/jdk-x86-11.0.0u28-1.zip" -O "build\jdk.zip"
+        displayName: 'Download JDK'
+      - task: JavaToolInstaller@0
+        inputs:
+          jdkSourceOption: localDirectory
+          jdkFile: 'build/jdk.zip'
+          jdkDestinationDirectory: 'build/jdkinst'
+          jdkArchitectureOption: x86
+      - task: Gradle@2
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          gradleOptions: '-Xmx1024m'
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          tasks: 'build'
+          # checkStyleRunAnalysis: true
+          # pmdRunAnalysis: true
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/win32.zip'
+          replaceExistingArchive: true
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          ArtifactName: 'Win32'
+
+  - job: Mac
+    pool:
+      vmImage: 'xcode9-macos10.13'
+    steps:
       - script: |
-          make -j3
-        workingDirectory: 'build'
-        displayName: 'Build'
+          mkdir build
+          wget "https://download.java.net/java/ga/jdk11/openjdk-11_osx-x64_bin.tar.gz" -O "build/jdk.tar.gz"
+          sudo tar xvzf build/jdk.tar.gz -C /Library/Java/JavaVirtualMachines/
+          export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/
+        displayName: 'Setup JDK'
+      - script: |
+          rm /Users/vsts/.gradle/init.d/log-gradle-version-plugin.gradle
+        displayName: 'Delete Version init script'
+      - task: Gradle@2
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          gradleOptions: '-Xmx3072m'
+          javaHomeOption: 'path'
+          jdkDirectory: '/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/'
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          tasks: 'build'
+          # checkStyleRunAnalysis: true
+          # pmdRunAnalysis: true
 
- - job: Windows_64_Bit
-   pool:
-     vmImage: 'vs2017-win2016'
-   steps:
-    - powershell: |
-        mkdir build
-        $ProgressPreference = 'SilentlyContinue'
-        wget "https://download.java.net/java/ga/jdk11/openjdk-11_windows-x64_bin.zip" -O "build\jdk.zip"
-      displayName: 'Download JDK'
-    - task: JavaToolInstaller@0
-      inputs:
-        jdkSourceOption: localDirectory
-        jdkFile: 'build/jdk.zip'
-        jdkDestinationDirectory: 'build/jdkinst'
-        jdkArchitectureOption: x64
-    - task: Gradle@2
-      inputs:
-        workingDirectory: ''
-        gradleWrapperFile: 'gradlew'
-        gradleOptions: '-Xmx3072m'
-        publishJUnitResults: true
-        testResultsFiles: '**/TEST-*.xml'
-        tasks: 'build'
-        # checkStyleRunAnalysis: true
-        # pmdRunAnalysis: true
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/mac.zip'
+          replaceExistingArchive: true
 
-    - task: ArchiveFiles@2
-      inputs:
-        rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/win64.zip'
-        replaceExistingArchive: true
+      - task: PublishBuildArtifacts@1
+        inputs:
+          ArtifactName: 'Mac'
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        ArtifactName: 'Win64'
+- stage: Combine
+  jobs:
+  - job: Linux_Arm
+    pool:
+      vmImage: 'Ubuntu 16.04'
 
- - job: Windows_32_Bit
-   pool:
-     vmImage: 'vs2017-win2016'
-   steps:
-    - powershell: |
-        mkdir build
-        $ProgressPreference = 'SilentlyContinue'
-        wget "https://github.com/wpilibsuite/frc-openjdk-windows/releases/download/v11.0.0u28-1/jdk-x86-11.0.0u28-1.zip" -O "build\jdk.zip"
-      displayName: 'Download JDK'
-    - task: JavaToolInstaller@0
-      inputs:
-        jdkSourceOption: localDirectory
-        jdkFile: 'build/jdk.zip'
-        jdkDestinationDirectory: 'build/jdkinst'
-        jdkArchitectureOption: x86
-    - task: Gradle@2
-      inputs:
-        workingDirectory: ''
-        gradleWrapperFile: 'gradlew'
-        gradleOptions: '-Xmx1024m'
-        publishJUnitResults: true
-        testResultsFiles: '**/TEST-*.xml'
-        tasks: 'build'
-        # checkStyleRunAnalysis: true
-        # pmdRunAnalysis: true
-    - task: ArchiveFiles@2
-      inputs:
-        rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/win32.zip'
-        replaceExistingArchive: true
+    container: wpilib2019
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        ArtifactName: 'Win32'
-
- - job: Mac
-   pool:
-     vmImage: 'xcode9-macos10.13'
-   steps:
+    steps:
     - script: |
-        mkdir build
-        wget "https://download.java.net/java/ga/jdk11/openjdk-11_osx-x64_bin.tar.gz" -O "build/jdk.tar.gz"
-        sudo tar xvzf build/jdk.tar.gz -C /Library/Java/JavaVirtualMachines/
-        export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/
-      displayName: 'Setup JDK'
+        git clone https://github.com/wpilibsuite/build-tools
+      displayName: 'Clone Combiner'
+    - task: DownloadPipelineArtifact@0
+      inputs:
+        artifactName: 'Mac'
+        targetPath: 'build-tools/combiner/products'
     - script: |
-        rm /Users/vsts/.gradle/init.d/log-gradle-version-plugin.gradle
-      displayName: 'Delete Version init script'
-    - task: Gradle@2
-      inputs:
-        workingDirectory: ''
-        gradleWrapperFile: 'gradlew'
-        gradleOptions: '-Xmx3072m'
-        javaHomeOption: 'path'
-        jdkDirectory: '/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/'
-        publishJUnitResults: true
-        testResultsFiles: '**/TEST-*.xml'
-        tasks: 'build'
-        # checkStyleRunAnalysis: true
-        # pmdRunAnalysis: true
+        find build-tools/combiner/products
+        displayName: 'List products'
 
-    - task: ArchiveFiles@2
-      inputs:
-        rootFolderOrFile: $(Build.SourcesDirectory)/build/allOutputs
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/mac.zip'
-        replaceExistingArchive: true
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        ArtifactName: 'Mac'
