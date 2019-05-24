@@ -281,6 +281,6 @@ stages:
     - task: PublishPipelineArtifact@0
       inputs:
         artifactName: 'Maven'
-        targetPath: '~/releases'
+        targetPath: $(Agent.HomeDirectory)/releases
 
 

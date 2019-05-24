@@ -104,3 +104,4 @@ wrapper {
 }
 
 println System.getProperty('user.home')
+println System.getenv('AGENT_HOMEDIRECTORY')
