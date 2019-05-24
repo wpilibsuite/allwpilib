@@ -257,9 +257,9 @@ stages:
 
 - stage: Combine
   jobs:
-  - job: Linux
+  - job: CombineJob
     pool:
-      vmImage: 'vs2017-win2016'
+      vmImage: 'xcode9-macos10.13'
 
     steps:
     - checkout: none
