@@ -1,0 +1,9 @@
+repositories {
+    maven {
+        url "https://plugins.gradle.org/m2/"
+        mavenLocal()
+    }
+}
+dependencies {
+    compile "edu.wpi.first:native-utils:2019.5.2"
+}

@@ -40,6 +40,7 @@ import org.gradle.platform.base.ComponentType;
 import org.gradle.platform.base.TypeBuilder;
 import org.gradle.nativeplatform.tasks.ObjectFilesToBinary;
 import groovy.transform.CompileStatic;
+import edu.wpi.first.nativeutils.tasks.ExportsGenerationTask
 
 @CompileStatic
 class SingleNativeBuild implements Plugin<Project> {
@@ -104,6 +105,10 @@ class SingleNativeBuild implements Plugin<Project> {
                         if (binary instanceof SharedLibraryBinarySpec) {
                             def sBinary = (SharedLibraryBinarySpec) binary
                             ObjectFilesToBinary link = (ObjectFilesToBinary) sBinary.tasks.link
+                            ExportsGenerationTask exportsTask = binary.tasks.withType(ExportsGenerationTask)[0]
+                            if (exportsTask != null) {
+                                exportsTask.dependsOn compileTask
+                            }
                             link.dependsOn compileTask
                             link.inputs.dir compileTask.objectFileDir
                             def tree = project.fileTree(compileTask.objectFileDir)
