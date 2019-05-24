@@ -277,10 +277,12 @@ stages:
         gradleOptions: '-Xmx3072m'
         tasks: 'publish '
         options: '-Pallwpilib'
-
+    - script: |
+        echo "##vso[task.setvariable variable=UserHome]$HOME"
+      displayName: 'Set Home Variable'
     - task: PublishPipelineArtifact@0
       inputs:
         artifactName: 'Maven'
-        targetPath: $(Agent.HomeDirectory)/releases
+        targetPath: $(UserHome)/releases
 
 
