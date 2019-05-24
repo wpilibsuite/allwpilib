@@ -25,3 +25,9 @@ nativeUtils.exportsConfigs {
         }
     }
 }
+
+if (!project.hasProperty('skipPMD')) {
+    pmdMain {
+        pmdMain.enabled = false
+    }
+}
