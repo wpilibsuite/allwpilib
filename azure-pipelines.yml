@@ -67,7 +67,7 @@ jobs:
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
-        options: '-Pskiplinuxathena'
+        options: '-Pskiplinuxathena -Pskiplinuxraspbian'
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
 
@@ -134,7 +134,7 @@ jobs:
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
-        options: '-Ptoolchain-optional-roboRio'
+        options: '-Ptoolchain-optional-roboRio -Pskiplinuxathena -Pskiplinuraspbian'
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
 
@@ -161,7 +161,7 @@ jobs:
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
-        options: '-Ptoolchain-optional-roboRio -Pbuildwin32'
+        options: '-Ptoolchain-optional-roboRio -Pbuildwin32 -Pskiplinuxathena -Pskiplinuraspbian'
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
 
@@ -188,6 +188,6 @@ jobs:
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
-        options: '-Ptoolchain-optional-roboRio'
+        options: '-Ptoolchain-optional-roboRio -Pskiplinuxathena -Pskiplinuraspbian'
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
