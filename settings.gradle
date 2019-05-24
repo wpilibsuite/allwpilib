@@ -6,7 +6,7 @@ pluginManagement {
 }
 
 include 'wpiutil'
-// include 'ntcore'
+include 'ntcore'
 // include 'hal'
 // include 'cscore'
 // include 'wpilibc'

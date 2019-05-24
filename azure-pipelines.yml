@@ -269,7 +269,7 @@ stages:
     - task: DownloadPipelineArtifact@0
       inputs:
         artifactName: 'Mac'
-        targetPath: 'build-tools/combiner/products'
+        targetPath: 'build-tools/combiner/products/build/allOutputs'
     - task: Gradle@2
       inputs:
         workingDirectory: 'build-tools/combiner'
