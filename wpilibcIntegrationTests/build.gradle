@@ -32,6 +32,7 @@ model {
         wpilibcIntegrationTests(NativeExecutableSpec) {
             targetBuildTypes 'debug'
             baseName = 'FRCUserProgram'
+            nativeUtils.useRequiredLibrary(it, 'googletest_static')
             binaries.all { binary ->
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     binary.sources {
