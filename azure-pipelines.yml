@@ -281,5 +281,3 @@ stages:
     - script: |
         find build-tools/combiner/products
         displayName: 'List products'
-
-
