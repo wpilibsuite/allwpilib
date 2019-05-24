@@ -161,7 +161,7 @@ jobs:
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build'
-        options: '-Ptoolchain-optional-roboRio'
+        options: '-Ptoolchain-optional-roboRio -Pbuildwin32'
         # checkStyleRunAnalysis: true
         # pmdRunAnalysis: true
 
