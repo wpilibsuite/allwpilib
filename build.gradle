@@ -102,3 +102,5 @@ subprojects {
 wrapper {
     gradleVersion = '5.0'
 }
+
+println System.getProperty('user.home')
