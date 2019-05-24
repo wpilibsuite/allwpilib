@@ -269,5 +269,3 @@ stages:
       inputs:
         artifactName: 'Maven'
         targetPath: $(UserHome)/releases
-
-
