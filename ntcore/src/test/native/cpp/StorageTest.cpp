@@ -10,14 +10,6 @@
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 
-// TODO https://github.com/google/googletest/pull/1620
-// Merge above PR into gtest to remove this shim
-#ifdef _WIN32
-namespace std {
-inline void PrintTo(std::nullptr_t, ::std::ostream* os) { *os << "(nullptr)"; }
-}  // namespace std
-#endif
-
 #include "MessageMatcher.h"
 #include "MockNetworkConnection.h"
 #include "Storage.h"

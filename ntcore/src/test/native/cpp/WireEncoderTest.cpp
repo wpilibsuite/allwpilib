@@ -11,14 +11,6 @@
 
 #include <wpi/StringRef.h>
 
-// TODO https://github.com/google/googletest/pull/1620
-// Merge above PR into gtest to remove this shim
-#ifdef _WIN32
-namespace std {
-inline void PrintTo(std::nullptr_t, ::std::ostream* os) { *os << "(nullptr)"; }
-}  // namespace std
-#endif
-
 #include "TestPrinters.h"
 #include "WireEncoder.h"
 #include "gtest/gtest.h"
