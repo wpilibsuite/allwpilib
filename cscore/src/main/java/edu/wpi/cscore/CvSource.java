@@ -11,6 +11,9 @@ import org.opencv.core.Mat;
 
 /**
  * A source that represents a video camera.
+ * These sources require the WPILib OpenCV builds.
+ * For an alternate OpenCV, see the documentation how to build your own
+ * with RawSource.
  */
 public class CvSource extends ImageSource {
   /**

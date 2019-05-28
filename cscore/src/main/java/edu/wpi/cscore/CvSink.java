@@ -11,6 +11,9 @@ import org.opencv.core.Mat;
 
 /**
  * A sink for user code to accept video frames as OpenCV images.
+ * These sinks require the WPILib OpenCV builds.
+ * For an alternate OpenCV, see the documentation how to build your own
+ * with RawSink.
  */
 public class CvSink extends ImageSink {
   /**

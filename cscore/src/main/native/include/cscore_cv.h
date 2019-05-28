@@ -66,6 +66,9 @@ uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
 
 /**
  * A source for user code to provide OpenCV images as video frames.
+ * These sources require the WPILib OpenCV builds.
+ * For an alternate OpenCV, include "cscore_raw_cv.h" instead, and
+ * include your Mat header before that header.
  */
 class CvSource : public ImageSource {
  public:
@@ -105,6 +108,9 @@ class CvSource : public ImageSource {
 
 /**
  * A sink for user code to accept video frames as OpenCV images.
+ * These sinks require the WPILib OpenCV builds.
+ * For an alternate OpenCV, include "cscore_raw_cv.h" instead, and
+ * include your Mat header before that header.
  */
 class CvSink : public ImageSink {
  public:
