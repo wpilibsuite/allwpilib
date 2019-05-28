@@ -14,6 +14,12 @@
 #include "cscore.h"
 #include "vision/VisionPipeline.h"
 
+#ifdef USE_RAW_OPENCV
+#include "cscore_raw_cv.h"
+#else
+#include "cscore_cv.h"
+#endif
+
 namespace frc {
 
 /**
