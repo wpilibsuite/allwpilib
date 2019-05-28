@@ -97,7 +97,7 @@ ext {
 apply from: "${rootDir}/shared/opencv.gradle"
 
 task generateJavaDocs(type: Javadoc) {
-    options.links("https://docs.oracle.com/javase/8/docs/api/")
+    options.links("https://docs.oracle.com/en/java/javase/11/docs/api/")
     options.addStringOption "tag", "pre:a:Pre-Condition"
     options.addStringOption('Xdoclint:accessibility,html,missing,reference,syntax')
     options.addBooleanOption('html5', true)
