@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -35,7 +35,7 @@ TEST_F(WebSocketIntegrationTest, Open) {
       if (code != 1005 && code != 1006)
         FAIL() << "Code: " << code << " Reason: " << reason;
     });
-    ws->open.connect([&, s = ws.get() ](StringRef) {
+    ws->open.connect([&, s = ws.get()](StringRef) {
       ++gotClientOpen;
       s->Close();
     });
@@ -68,7 +68,7 @@ TEST_F(WebSocketIntegrationTest, Protocol) {
       if (code != 1005 && code != 1006)
         FAIL() << "Code: " << code << " Reason: " << reason;
     });
-    ws->open.connect([&, s = ws.get() ](StringRef protocol) {
+    ws->open.connect([&, s = ws.get()](StringRef protocol) {
       ++gotClientOpen;
       s->Close();
       ASSERT_EQ(protocol, "proto1");
@@ -134,7 +134,7 @@ TEST_F(WebSocketIntegrationTest, ClientSendText) {
       if (code != 1005 && code != 1006)
         FAIL() << "Code: " << code << " Reason: " << reason;
     });
-    ws->open.connect([&, s = ws.get() ](StringRef) {
+    ws->open.connect([&, s = ws.get()](StringRef) {
       s->SendText(uv::Buffer{"hello"}, [&](auto, uv::Error) {});
       s->Close();
     });
