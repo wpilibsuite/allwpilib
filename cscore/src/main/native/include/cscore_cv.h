@@ -15,11 +15,11 @@
 #endif
 
 #ifdef __cplusplus
-extern "C" {
+#include "cscore_oo.h"
 #endif
 
 #ifdef __cplusplus
-#include "cscore_oo.h"
+extern "C" {
 #endif
 
 struct CvMat;
