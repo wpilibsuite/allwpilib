@@ -11,6 +11,7 @@
 #include <opencv2/core/core.hpp>
 
 #include "cscore.h"
+#include "cscore_cv.h"
 
 int main() {
   cs::UsbCamera camera{"usbcam", 0};
