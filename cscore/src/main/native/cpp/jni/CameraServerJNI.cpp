@@ -15,7 +15,7 @@
 #include "edu_wpi_cscore_CameraServerJNI.h"
 
 namespace cv {
-class cv::Mat;
+class Mat;
 }  // namespace cv
 
 using namespace wpi::java;
