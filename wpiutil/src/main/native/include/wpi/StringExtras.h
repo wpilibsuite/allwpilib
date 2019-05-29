@@ -151,7 +151,7 @@ inline std::string toHex(ArrayRef<uint8_t> Input, bool LowerCase = false) {
 inline uint8_t hexFromNibbles(char MSB, char LSB) {
   unsigned U1 = hexDigitValue(MSB);
   unsigned U2 = hexDigitValue(LSB);
-  assert(U1 != ((std::numeric_limits<unsigned>::max)() && U2 != std::numeric_limits<unsigned>::max)());
+  assert(U1 != (std::numeric_limits<unsigned>::max)() && U2 != (std::numeric_limits<unsigned>::max)());
 
   return static_cast<uint8_t>((U1 << 4) | U2);
 }
