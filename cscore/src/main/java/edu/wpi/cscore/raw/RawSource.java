@@ -14,7 +14,7 @@ import edu.wpi.cscore.VideoMode;
 /**
  * A source for user code to provide video frames as raw bytes.
  *
- * This is a complex API, most cases should use CvSource.
+ * <p>This is a complex API, most cases should use CvSource.
  */
 public class RawSource extends ImageSource {
   /**

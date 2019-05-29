@@ -10,6 +10,11 @@ package edu.wpi.cscore.raw;
 import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.cscore.ImageSink;
 
+/**
+ * A sink for user code to accept video frames as raw bytes.
+ *
+ * <p>This is a complex API, most cases should use CvSink.
+ */
 public class RawSink extends ImageSink {
   /**
    * Create a sink for accepting raw images.
