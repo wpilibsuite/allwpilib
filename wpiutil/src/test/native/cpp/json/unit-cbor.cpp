@@ -948,7 +948,7 @@ TEST(CborArrayTest, UInt16)
 {
     json j(257, nullptr);
     std::vector<uint8_t> expected(j.size() + 3, 0xf6); // all null
-    expected[0] = static_cast<char>(0x99); // array 16 bit
+    expected[0] = static_cast<uint8_t>(0x99); // array 16 bit
     expected[1] = 0x01; // size (0x0101), byte 0
     expected[2] = 0x01; // size (0x0101), byte 1
     const auto result = json::to_cbor(j);
@@ -963,7 +963,7 @@ TEST(CborArrayTest, UInt32)
 {
     json j(65793, nullptr);
     std::vector<uint8_t> expected(j.size() + 5, 0xf6); // all null
-    expected[0] = static_cast<char>(0x9a); // array 32 bit
+    expected[0] = static_cast<uint8_t>(0x9a); // array 32 bit
     expected[1] = 0x00; // size (0x00010101), byte 0
     expected[2] = 0x01; // size (0x00010101), byte 1
     expected[3] = 0x01; // size (0x00010101), byte 2
