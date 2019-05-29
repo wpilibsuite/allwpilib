@@ -75,7 +75,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * Client connection options.
    */
   struct ClientOptions {
-    ClientOptions() : handshakeTimeout{uv::Timer::Time::max()} {}
+    ClientOptions() : handshakeTimeout{(uv::Timer::Time::max)()} {}
 
     /** Timeout for the handshake request. */
     uv::Timer::Time handshakeTimeout;

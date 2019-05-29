@@ -252,7 +252,7 @@ void SmallVectorTemplateBase<T, isPodLike>::grow(size_t MinSize) {
 
   // Always grow, even from zero.
   size_t NewCapacity = size_t(NextPowerOf2(this->capacity() + 2));
-  NewCapacity = std::min(std::max(NewCapacity, MinSize), size_t(UINT32_MAX));
+  NewCapacity = (std::min)((std::max)(NewCapacity, MinSize), size_t(UINT32_MAX));
   T *NewElts = static_cast<T*>(wpi::safe_malloc(NewCapacity*sizeof(T)));
 
   // Move the elements over.

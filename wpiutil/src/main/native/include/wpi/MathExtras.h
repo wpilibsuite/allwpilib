@@ -58,7 +58,7 @@ template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
     // Bisection method.
     std::size_t ZeroBits = 0;
     T Shift = std::numeric_limits<T>::digits >> 1;
-    T Mask = std::numeric_limits<T>::max() >> Shift;
+    T Mask = (std::numeric_limits<T>::max)() >> Shift;
     while (Shift) {
       if ((Val & Mask) == 0) {
         Val >>= Shift;
@@ -199,7 +199,7 @@ std::size_t countLeadingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
 ///   valid arguments.
 template <typename T> T findFirstSet(T Val, ZeroBehavior ZB = ZB_Max) {
   if (ZB == ZB_Max && Val == 0)
-    return std::numeric_limits<T>::max();
+    return (std::numeric_limits<T>::max)();
 
   return countTrailingZeros(Val, ZB_Undefined);
 }
@@ -240,7 +240,7 @@ template <typename T> T maskLeadingZeros(unsigned N) {
 ///   valid arguments.
 template <typename T> T findLastSet(T Val, ZeroBehavior ZB = ZB_Max) {
   if (ZB == ZB_Max && Val == 0)
-    return std::numeric_limits<T>::max();
+    return (std::numeric_limits<T>::max)();
 
   // Use ^ instead of - because both gcc and llvm can remove the associated ^
   // in the __builtin_clz intrinsic on x86.
@@ -756,7 +756,7 @@ inline int64_t SignExtend64(uint64_t X, unsigned B) {
 template <typename T>
 typename std::enable_if<std::is_unsigned<T>::value, T>::type
 AbsoluteDifference(T X, T Y) {
-  return std::max(X, Y) - std::min(X, Y);
+  return (std::max)(X, Y) - (std::min)(X, Y);
 }
 
 /// Add two unsigned integers, X and Y, of type T.  Clamp the result to the
@@ -771,7 +771,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
   T Z = X + Y;
   Overflowed = (Z < X || Z < Y);
   if (Overflowed)
-    return std::numeric_limits<T>::max();
+    return (std::numeric_limits<T>::max)();
   else
     return Z;
 }
@@ -796,7 +796,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
   // Special case: if X or Y is 0, Log2_64 gives -1, and Log2Z
   // will necessarily be less than Log2Max as desired.
   int Log2Z = Log2_64(X) + Log2_64(Y);
-  const T Max = std::numeric_limits<T>::max();
+  const T Max = (std::numeric_limits<T>::max)();
   int Log2Max = Log2_64(Max);
   if (Log2Z < Log2Max) {
     return X * Y;

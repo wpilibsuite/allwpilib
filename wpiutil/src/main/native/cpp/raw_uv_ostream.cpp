@@ -23,7 +23,7 @@ void raw_uv_ostream::write_impl(const char* data, size_t len) {
       assert(m_left != 0);
     }
 
-    size_t amt = std::min(m_left, len);
+    size_t amt = (std::min)(m_left, len);
     auto& buf = m_bufs.back();
     std::memcpy(buf.base + buf.len, data, amt);
     data += amt;

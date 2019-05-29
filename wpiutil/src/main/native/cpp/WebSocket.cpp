@@ -228,7 +228,7 @@ void WebSocket::StartClient(const Twine& uri, const Twine& host,
   });
 
   // Start handshake timer if a timeout was specified
-  if (options.handshakeTimeout != uv::Timer::Time::max()) {
+  if (options.handshakeTimeout != (uv::Timer::Time::max)()) {
     auto timer = uv::Timer::Create(m_stream.GetLoopRef());
     timer->timeout.connect(
         [this]() { Terminate(1006, "connection timed out"); });
@@ -335,7 +335,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
     if (m_frameSize == UINT64_MAX) {
       // Need at least two bytes to determine header length
       if (m_header.size() < 2u) {
-        size_t toCopy = std::min(2u - m_header.size(), data.size());
+        size_t toCopy = (std::min)(2u - m_header.size(), data.size());
         m_header.append(data.bytes_begin(), data.bytes_begin() + toCopy);
         data = data.drop_front(toCopy);
         if (m_header.size() < 2u) return;  // need more data
@@ -362,7 +362,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
 
       // Need to complete header to calculate message size
       if (m_header.size() < m_headerSize) {
-        size_t toCopy = std::min(m_headerSize - m_header.size(), data.size());
+        size_t toCopy = (std::min)(m_headerSize - m_header.size(), data.size());
         m_header.append(data.bytes_begin(), data.bytes_begin() + toCopy);
         data = data.drop_front(toCopy);
         if (m_header.size() < m_headerSize) return;  // need more data
@@ -394,7 +394,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
 
     if (m_frameSize != UINT64_MAX) {
       size_t need = m_frameStart + m_frameSize - m_payload.size();
-      size_t toCopy = std::min(need, data.size());
+      size_t toCopy = (std::min)(need, data.size());
       m_payload.append(data.bytes_begin(), data.bytes_begin() + toCopy);
       data = data.drop_front(toCopy);
       need -= toCopy;
