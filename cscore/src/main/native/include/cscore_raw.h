@@ -96,14 +96,16 @@ uint64_t GrabSinkFrameTimeout(CS_Sink sink, CS_RawFrame& image, double timeout,
                               CS_Status* status);
 
 /**
- * A sink for user code to accept video frames as raw bytes.
+ * A source for user code to provide video frames as raw bytes.
+ *
+ * This is a complex API, most cases should use CvSource.
  */
 class RawSource : public ImageSource {
  public:
   RawSource() = default;
 
   /**
-   * Create an OpenCV source.
+   * Create a raw frame source.
    *
    * @param name Source name (arbitrary unique identifier)
    * @param mode Video mode being generated
@@ -111,7 +113,7 @@ class RawSource : public ImageSource {
   RawSource(const wpi::Twine& name, const VideoMode& mode);
 
   /**
-   * Create an OpenCV source.
+   * Create a raw frame source.
    *
    * @param name Source name (arbitrary unique identifier)
    * @param pixelFormat Pixel format
@@ -124,25 +126,26 @@ class RawSource : public ImageSource {
 
  protected:
   /**
-   * Put an OpenCV image and notify sinks.
+   * Put a raw image and notify sinks.
    *
-   * <p>Only 8-bit single-channel or 3-channel (with BGR channel order) images
-   * are supported. If the format, depth or channel order is different, use
-   * cv::Mat::convertTo() and/or cv::cvtColor() to convert it first.
-   *
-   * @param image OpenCV image
+   * @param image raw frame image
    */
   void PutFrame(RawFrame& image);
 };
 
+/**
+ * A sink for user code to accept video frames as raw bytes.
+ *
+ * This is a complex API, most cases should use CvSource.
+ */
 class RawSink : public ImageSink {
  public:
   RawSink() = default;
 
   /**
-   * Create a sink for accepting OpenCV images.
+   * Create a sink for accepting raw images.
    *
-   * <p>WaitForFrame() must be called on the created sink to get each new
+   * <p>GrabFrame() must be called on the created sink to get each new
    * image.
    *
    * @param name Source name (arbitrary unique identifier)
@@ -150,7 +153,7 @@ class RawSink : public ImageSink {
   explicit RawSink(const wpi::Twine& name);
 
   /**
-   * Create a sink for accepting OpenCV images in a separate thread.
+   * Create a sink for accepting raws images in a separate thread.
    *
    * <p>A thread will be created that calls WaitForFrame() and calls the
    * processFrame() callback each time a new frame arrives.
