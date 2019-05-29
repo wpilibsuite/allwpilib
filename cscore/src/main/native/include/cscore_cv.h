@@ -15,11 +15,12 @@
 #endif
 
 #ifdef __cplusplus
-extern "C" {
+#include "cscore_oo.h"  // NOLINT(build/include_order)
+
 #endif
 
 #ifdef __cplusplus
-#include "cscore_oo.h"
+extern "C" {  // NOLINT(build/include_order)
 #endif
 
 struct CvMat;
