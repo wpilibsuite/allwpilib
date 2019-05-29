@@ -777,7 +777,7 @@ public:
     // Reduce the number of buckets.
     unsigned NewNumBuckets = 0;
     if (OldNumEntries)
-      NewNumBuckets = std::max(64, 1 << (Log2_32_Ceil(OldNumEntries) + 1));
+      NewNumBuckets = (std::max)(64, 1 << (Log2_32_Ceil(OldNumEntries) + 1));
     if (NewNumBuckets == NumBuckets) {
       this->BaseT::initEmpty();
       return;

@@ -31,7 +31,7 @@ const int ADXRS450_SpiGyroWrapper::kPacketSize = 4 + 1;  // +1 for timestamp
 
 template <class T>
 constexpr const T& clamp(const T& value, const T& low, const T& high) {
-  return std::max(low, std::min(value, high));
+  return (std::max)(low, (std::min)(value, high));
 }
 
 static void ADXRS450SPI_ReadBufferCallback(const char* name, void* param,

@@ -60,14 +60,14 @@ inline unsigned hexDigitValue(char C) {
   if (C >= '0' && C <= '9') return C-'0';
   if (C >= 'a' && C <= 'f') return C-'a'+10U;
   if (C >= 'A' && C <= 'F') return C-'A'+10U;
-  return std::numeric_limits<unsigned>::max();
+  return (std::numeric_limits<unsigned>::max)();
 }
 
 /// Checks if character \p C is one of the 10 decimal digits.
 inline bool isDigit(char C) { return C >= '0' && C <= '9'; }
 
 /// Checks if character \p C is a hexadecimal numeric character.
-inline bool isHexDigit(char C) { return hexDigitValue(C) != std::numeric_limits<unsigned>::max(); }
+inline bool isHexDigit(char C) { return hexDigitValue(C) != (std::numeric_limits<unsigned>::max)(); }
 
 /// Checks if character \p C is a valid letter as classified by "C" locale.
 inline bool isAlpha(char C) {
@@ -151,7 +151,7 @@ inline std::string toHex(ArrayRef<uint8_t> Input, bool LowerCase = false) {
 inline uint8_t hexFromNibbles(char MSB, char LSB) {
   unsigned U1 = hexDigitValue(MSB);
   unsigned U2 = hexDigitValue(LSB);
-  assert(U1 != std::numeric_limits<unsigned>::max() && U2 != std::numeric_limits<unsigned>::max());
+  assert(U1 != ((std::numeric_limits<unsigned>::max)() && U2 != std::numeric_limits<unsigned>::max)());
 
   return static_cast<uint8_t>((U1 << 4) | U2);
 }

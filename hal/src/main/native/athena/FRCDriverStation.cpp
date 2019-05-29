@@ -138,7 +138,7 @@ static int32_t HAL_GetJoystickButtonsInternal(int32_t joystickNum,
 static int32_t HAL_GetJoystickDescriptorInternal(int32_t joystickNum,
                                                  HAL_JoystickDescriptor* desc) {
   desc->isXbox = 0;
-  desc->type = std::numeric_limits<uint8_t>::max();
+  desc->type = (std::numeric_limits<uint8_t>::max)();
   desc->name[0] = '\0';
   desc->axisCount =
       HAL_kMaxJoystickAxes; /* set to the desc->axisTypes's capacity */

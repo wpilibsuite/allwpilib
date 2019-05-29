@@ -30,7 +30,7 @@ class EncoderData {
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
   SimDataValue<int32_t, MakeInt, GetCountName> count{0};
   SimDataValue<double, MakeDouble, GetPeriodName> period{
-      std::numeric_limits<double>::max()};
+      (std::numeric_limits<double>::max)()};
   SimDataValue<HAL_Bool, MakeBoolean, GetResetName> reset{false};
   SimDataValue<double, MakeDouble, GetMaxPeriodName> maxPeriod{0};
   SimDataValue<HAL_Bool, MakeBoolean, GetDirectionName> direction{false};
