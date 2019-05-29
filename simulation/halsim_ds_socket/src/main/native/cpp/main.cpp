@@ -40,7 +40,7 @@ static std::unique_ptr<Buffer> singleByte;
 namespace {
 struct DataStore {
   wpi::SmallVector<uint8_t, 128> m_frame;
-  size_t m_frameSize = std::numeric_limits<size_t>::max)();
+  size_t m_frameSize = (std::numeric_limits<size_t>::max)();
   halsim::DSCommPacket* dsPacket;
 };
 }  // namespace
@@ -53,16 +53,16 @@ static SimpleBufferPool<4>& GetBufferPool() {
 static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
   wpi::StringRef data{buf.base, size};
   while (!data.empty()) {
-    if (store.m_frameSize == std::numeric_limits<size_t>::max)()) {
-      if (store.m_frame.size() < 2u) {
-        size_t toCopy = (std::min)(2u - store.m_frame.size(), data.size());
-        store.m_frame.append(data.bytes_begin(), data.bytes_begin() + toCopy);
-        data = data.drop_front(toCopy);
-        if (store.m_frame.size() < 2u) return;  // need more data
+    if (store.m_frameSize == (std::numeric_limits<size_t>::max)()) {
+        if (store.m_frame.size() < 2u) {
+          size_t toCopy = (std::min)(2u - store.m_frame.size(), data.size());
+          store.m_frame.append(data.bytes_begin(), data.bytes_begin() + toCopy);
+          data = data.drop_front(toCopy);
+          if (store.m_frame.size() < 2u) return;  // need more data
+        }
+        store.m_frameSize = (static_cast<uint16_t>(store.m_frame[0]) << 8) |
+                            static_cast<uint16_t>(store.m_frame[1]);
       }
-      store.m_frameSize = (static_cast<uint16_t>(store.m_frame[0]) << 8) |
-                          static_cast<uint16_t>(store.m_frame[1]);
-    }
     if (store.m_frameSize != (std::numeric_limits<size_t>::max)()) {
       size_t need = store.m_frameSize - (store.m_frame.size() - 2);
       size_t toCopy = (std::min)(need, data.size());
@@ -73,7 +73,7 @@ static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
         auto ds = store.dsPacket;
         ds->DecodeTCP(store.m_frame);
         store.m_frame.clear();
-        store.m_frameSize = std::numeric_limits<size_t>::max)();
+        store.m_frameSize = (std::numeric_limits<size_t>::max)();
       }
     }
   }
