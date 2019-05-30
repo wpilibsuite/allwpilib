@@ -31,15 +31,15 @@ public abstract class InterruptableSensorBase extends SendableBase {
 
     public static WaitResult getValue(boolean rising, boolean falling)
     {
-        if (rising && falling) {
-          return kBoth;
-        } else if (rising) {
-          return kRisingEdge;
-        } else if (falling) {
-          return kFallingEdge;
-        } else {
-          return kTimeout;
-        }
+      if (rising && falling) {
+        return kBoth;
+      } else if (rising) {
+        return kRisingEdge;
+      } else if (falling) {
+        return kFallingEdge;
+      } else {
+        return kTimeout;
+      }
     }
   }
 
