@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,6 +15,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
@@ -22,6 +26,7 @@ import edu.wpi.first.wpilibj.Sendable;
 /**
  * A helper class for Shuffleboard containers to handle common child operations.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 final class ContainerHelper {
   private final ShuffleboardContainer m_container;
   private final Set<String> m_usedTitles = new HashSet<>();
@@ -76,6 +81,55 @@ final class ContainerHelper {
     SimpleWidget widget = new SimpleWidget(m_container, title);
     m_components.add(widget);
     widget.getEntry().setDefaultValue(defaultValue);
+    return widget;
+  }
+
+  SuppliedValueWidget<String> addString(String title, Supplier<String> valueSupplier) {
+    precheck(title, valueSupplier);
+    return addSupplied(title, valueSupplier, NetworkTableEntry::setString);
+  }
+
+  SuppliedValueWidget<Double> addNumber(String title, DoubleSupplier valueSupplier) {
+    precheck(title, valueSupplier);
+    return addSupplied(title, valueSupplier::getAsDouble, NetworkTableEntry::setDouble);
+  }
+
+  SuppliedValueWidget<Boolean> addBoolean(String title, BooleanSupplier valueSupplier) {
+    precheck(title, valueSupplier);
+    return addSupplied(title, valueSupplier::getAsBoolean, NetworkTableEntry::setBoolean);
+  }
+
+  SuppliedValueWidget<String[]> addStringArray(String title, Supplier<String[]> valueSupplier) {
+    precheck(title, valueSupplier);
+    return addSupplied(title, valueSupplier, NetworkTableEntry::setStringArray);
+  }
+
+  SuppliedValueWidget<double[]> addDoubleArray(String title, Supplier<double[]> valueSupplier) {
+    precheck(title, valueSupplier);
+    return addSupplied(title, valueSupplier, NetworkTableEntry::setDoubleArray);
+  }
+
+  SuppliedValueWidget<boolean[]> addBooleanArray(String title, Supplier<boolean[]> valueSupplier) {
+    precheck(title, valueSupplier);
+    return addSupplied(title, valueSupplier, NetworkTableEntry::setBooleanArray);
+  }
+
+  SuppliedValueWidget<byte[]> addRaw(String title, Supplier<byte[]> valueSupplier) {
+    precheck(title, valueSupplier);
+    return addSupplied(title, valueSupplier, NetworkTableEntry::setRaw);
+  }
+
+  private void precheck(String title, Object valueSupplier) {
+    Objects.requireNonNull(title, "Title cannot be null");
+    Objects.requireNonNull(valueSupplier, "Value supplier cannot be null");
+    checkTitle(title);
+  }
+
+  private <T> SuppliedValueWidget<T> addSupplied(String title,
+                                                 Supplier<T> supplier,
+                                                 BiConsumer<NetworkTableEntry, T> setter) {
+    SuppliedValueWidget<T> widget = new SuppliedValueWidget<>(m_container, title, supplier, setter);
+    m_components.add(widget);
     return widget;
   }
 
