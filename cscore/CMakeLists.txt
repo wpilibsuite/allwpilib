@@ -36,13 +36,14 @@ set_property(TARGET cscore PROPERTY FOLDER "libraries")
 install(TARGETS cscore EXPORT cscore DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cscore")
 
-if (MSVC)
+if (MSVC OR FLAT_INSTALL_WPILIB)
     set (cscore_config_dir ${wpilib_dest})
 else()
     set (cscore_config_dir share/cscore)
 endif()
 
-install(FILES cscore-config.cmake DESTINATION ${cscore_config_dir})
+configure_file(cscore-config.cmake.in ${CMAKE_BINARY_DIR}/cscore-config.cmake )
+install(FILES ${CMAKE_BINARY_DIR}/cscore-config.cmake DESTINATION ${cscore_config_dir})
 install(EXPORT cscore DESTINATION ${cscore_config_dir})
 
 SUBDIR_LIST(cscore_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
