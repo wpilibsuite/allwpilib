@@ -29,8 +29,7 @@ public abstract class InterruptableSensorBase extends SendableBase {
       this.value = value;
     }
 
-    public static WaitResult getValue(boolean rising, boolean falling)
-    {
+    public static WaitResult getValue(boolean rising, boolean falling) {
       if (rising && falling) {
         return kBoth;
       } else if (rising) {
