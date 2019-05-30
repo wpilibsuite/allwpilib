@@ -57,8 +57,6 @@ public final class Shuffleboard {
   private static final RecordingController recordingController =
       new RecordingController(NetworkTableInstance.getDefault());
 
-  // TODO usage reporting
-
   private Shuffleboard() {
     throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
   }
