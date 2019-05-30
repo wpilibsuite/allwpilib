@@ -59,7 +59,7 @@ void InterruptableSensorBase::RequestInterrupts(
 }
 
 void InterruptableSensorBase::RequestInterrupts(
-    InterruptEventHandler&& handler) {
+    InterruptEventHandler handler) {
   if (StatusIsFatal()) return;
 
   wpi_assert(m_interrupt == HAL_kInvalidHandle);

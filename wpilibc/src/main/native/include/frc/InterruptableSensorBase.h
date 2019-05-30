@@ -66,7 +66,7 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
    * thread priority should use the synchronous method with their own spawned
    * thread. The default is interrupt on rising edges only.
    */
-  virtual void RequestInterrupts(InterruptEventHandler&& handler);
+  virtual void RequestInterrupts(InterruptEventHandler handler);
 
   /**
    * Request one of the 8 interrupts synchronously on this digital input.
