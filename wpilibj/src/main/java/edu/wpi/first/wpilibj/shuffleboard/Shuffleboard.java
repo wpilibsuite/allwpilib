@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -56,8 +56,6 @@ public final class Shuffleboard {
       new ShuffleboardInstance(NetworkTableInstance.getDefault());
   private static final RecordingController recordingController =
       new RecordingController(NetworkTableInstance.getDefault());
-
-  // TODO usage reporting
 
   private Shuffleboard() {
     throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
