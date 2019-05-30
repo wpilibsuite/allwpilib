@@ -54,7 +54,7 @@ public class RawCVMatSink extends ImageSink {
     super(CameraServerJNI.createRawSink(name));
   }
 
-    /**
+  /**
    * Wait for the next frame and get the image.
    * Times out (returning 0) after 0.225 seconds.
    * The provided image will have three 3-bit channels stored in BGR order.

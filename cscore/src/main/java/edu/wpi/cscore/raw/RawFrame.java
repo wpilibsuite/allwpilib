@@ -11,6 +11,11 @@ import java.nio.ByteBuffer;
 
 import edu.wpi.cscore.CameraServerJNI;
 
+/**
+ * Class for storing raw frame data between image read call.
+ *
+ * <p>Data is reused for each frame read, rather then reallocating every frame.
+ */
 public class RawFrame implements AutoCloseable {
   private final long m_framePtr;
   private ByteBuffer m_dataByteBuffer;
@@ -20,10 +25,17 @@ public class RawFrame implements AutoCloseable {
   private int m_height;
   private int m_pixelFormat;
 
+  /**
+   * Construct a new RawFrame.
+   */
   public RawFrame() {
     m_framePtr = CameraServerJNI.allocateRawFrame();
   }
 
+  /**
+   * Close the RawFrame, releasing native resources.
+   * Any images currently using the data will be invalidated.
+   */
   @Override
   public void close() {
     CameraServerJNI.freeRawFrame(m_framePtr);
