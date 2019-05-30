@@ -18,13 +18,6 @@
 
 namespace frc {
 
-/**
- * Handler for interrupts.
- *
- * First parameter is if rising, 2nd is if falling.
- */
-using InterruptEventHandler = std::function<void(bool, bool)>;
-
 class InterruptableSensorBase : public ErrorBase, public SendableBase {
  public:
   enum WaitResult {
@@ -33,6 +26,13 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
     kFallingEdge = 0x100,
     kBoth = 0x101,
   };
+
+  /**
+   * Handler for interrupts.
+   *
+   * First parameter is if rising, 2nd is if falling.
+   */
+  using InterruptEventHandler = std::function<void(WaitResult)>;
 
   InterruptableSensorBase() = default;
 

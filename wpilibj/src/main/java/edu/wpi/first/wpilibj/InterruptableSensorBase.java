@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.function.Consumer;
+
 import edu.wpi.first.hal.InterruptJNI;
 import edu.wpi.first.hal.util.AllocationException;
 
@@ -25,6 +27,19 @@ public abstract class InterruptableSensorBase extends SendableBase {
 
     WaitResult(int value) {
       this.value = value;
+    }
+
+    public static WaitResult getValue(boolean rising, boolean falling)
+    {
+        if (rising && falling) {
+          return kBoth;
+        } else if (rising) {
+          return kRisingEdge;
+        } else if (falling) {
+          return kFallingEdge;
+        } else {
+          return kTimeout;
+        }
     }
   }
 
@@ -76,7 +91,7 @@ public abstract class InterruptableSensorBase extends SendableBase {
    *                mode where the user program interrupt handler will be called when an interrupt
    *                occurs. The default is interrupt on rising edges only.
    */
-  public void requestInterrupts(InterruptHandler handler) {
+  public void requestInterrupts(Consumer<WaitResult> handler) {
     if (m_interrupt != 0) {
       throw new AllocationException("The interrupt has already been allocated");
     }
@@ -93,7 +108,7 @@ public abstract class InterruptableSensorBase extends SendableBase {
       // Falling edge result is the interrupt bit set in the byte 0xFF00
       boolean rising = (mask & 0xFF) != 0;
       boolean falling = (mask & 0xFF00) != 0;
-      handler.onInterrupt(rising, falling);
+      handler.accept(WaitResult.getValue(rising, falling));
     }, null);
   }
 
@@ -184,16 +199,9 @@ public abstract class InterruptableSensorBase extends SendableBase {
     // Falling edge result is the interrupt bit set in the byte 0xFF00
     // Set any bit set to be true for that edge, and AND the 2 results
     // together to match the existing enum for all interrupts
-    int rising = ((result & 0xFF) != 0) ? 0x1 : 0x0;
-    int falling = ((result & 0xFF00) != 0) ? 0x0100 : 0x0;
-    result = rising | falling;
-
-    for (WaitResult mode : WaitResult.values()) {
-      if (mode.value == result) {
-        return mode;
-      }
-    }
-    return null;
+    boolean rising = (result & 0xFF) != 0;
+    boolean falling = (result & 0xFF00) != 0;
+    return WaitResult.getValue(rising, falling);
   }
 
   /**

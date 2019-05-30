@@ -58,8 +58,7 @@ void InterruptableSensorBase::RequestInterrupts(
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void InterruptableSensorBase::RequestInterrupts(
-    InterruptEventHandler handler) {
+void InterruptableSensorBase::RequestInterrupts(InterruptEventHandler handler) {
   if (StatusIsFatal()) return;
 
   wpi_assert(m_interrupt == HAL_kInvalidHandle);
@@ -78,9 +77,14 @@ void InterruptableSensorBase::RequestInterrupts(
       m_interrupt,
       [](uint32_t mask, void* param) {
         auto self = reinterpret_cast<InterruptEventHandler*>(param);
-        bool rising = (mask & 0xFF) != 0;
-        bool falling = (mask & 0xFF00) != 0;
-        (*self)(rising, falling);
+        // Rising edge result is the interrupt bit set in the byte 0xFF
+        // Falling edge result is the interrupt bit set in the byte 0xFF00
+        // Set any bit set to be true for that edge, and AND the 2 results
+        // together to match the existing enum for all interrupts
+        int32_t rising = (mask & 0xFF) ? 0x1 : 0x0;
+        int32_t falling = ((mask & 0xFF00) ? 0x0100 : 0x0);
+        WaitResult res = static_cast<WaitResult>(falling | rising);
+        (*self)(res);
       },
       handlerPtr, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
