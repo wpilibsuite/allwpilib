@@ -27,10 +27,6 @@
 #pragma warning(disable : 26495)
 #endif
 
-namespace cv {
-class Mat;
-}  // namespace cv
-
 namespace wpi {
 class json;
 }  // namespace wpi
@@ -292,7 +288,6 @@ std::vector<std::string> GetHttpCameraUrls(CS_Source source, CS_Status* status);
  * @defgroup cscore_opencv_source_func OpenCV Source Functions
  * @{
  */
-void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status);
 void NotifySourceError(CS_Source source, const wpi::Twine& msg,
                        CS_Status* status);
 void SetSourceConnected(CS_Source source, bool connected, CS_Status* status);
@@ -318,6 +313,7 @@ CS_Sink CreateCvSink(const wpi::Twine& name, CS_Status* status);
 CS_Sink CreateCvSinkCallback(const wpi::Twine& name,
                              std::function<void(uint64_t time)> processFrame,
                              CS_Status* status);
+
 /** @} */
 
 /**
@@ -362,9 +358,6 @@ int GetMjpegServerPort(CS_Sink sink, CS_Status* status);
  */
 void SetSinkDescription(CS_Sink sink, const wpi::Twine& description,
                         CS_Status* status);
-uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status);
-uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
-                              CS_Status* status);
 std::string GetSinkError(CS_Sink sink, CS_Status* status);
 wpi::StringRef GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                             CS_Status* status);
@@ -434,20 +427,6 @@ std::vector<std::string> GetNetworkInterfaces();
 /** @} */
 
 }  // namespace cs
-
-/**
- * @defgroup cscore_cpp_opencv_special cscore C functions taking a cv::Mat*
- *
- * These are needed for specific interop implementations.
- * @{
- */
-extern "C" {
-uint64_t CS_GrabSinkFrameCpp(CS_Sink sink, cv::Mat* image, CS_Status* status);
-uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image,
-                                    double timeout, CS_Status* status);
-void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, CS_Status* status);
-}  // extern "C"
-/** @} */
 
 #ifdef _WIN32
 // Disable uninitialized variable warnings

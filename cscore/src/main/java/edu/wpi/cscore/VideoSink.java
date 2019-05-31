@@ -14,7 +14,7 @@ package edu.wpi.cscore;
  */
 public class VideoSink implements AutoCloseable {
   public enum Kind {
-    kUnknown(0), kMjpeg(2), kCv(4);
+    kUnknown(0), kMjpeg(2), kCv(4), kRaw(8);
 
     @SuppressWarnings("MemberName")
     private final int value;
