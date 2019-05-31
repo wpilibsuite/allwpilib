@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,21 +9,17 @@ package edu.wpi.cscore;
 
 import org.opencv.core.Mat;
 
-/**
- * A source that represents a video camera.
- * These sources require the WPILib OpenCV builds.
- * For an alternate OpenCV, see the documentation how to build your own
- * with RawSource.
- */
-public class CvSource extends ImageSource {
+import edu.wpi.cscore.VideoMode.PixelFormat;
+
+public class RawCVMatSource extends ImageSource {
   /**
    * Create an OpenCV source.
    *
    * @param name Source name (arbitrary unique identifier)
    * @param mode Video mode being generated
    */
-  public CvSource(String name, VideoMode mode) {
-    super(CameraServerCvJNI.createCvSource(name,
+  public RawCVMatSource(String name, VideoMode mode) {
+    super(CameraServerJNI.createRawSource(name,
         mode.pixelFormat.getValue(),
         mode.width,
         mode.height,
@@ -39,8 +35,8 @@ public class CvSource extends ImageSource {
    * @param height height
    * @param fps fps
    */
-  public CvSource(String name, VideoMode.PixelFormat pixelFormat, int width, int height, int fps) {
-    super(CameraServerCvJNI.createCvSource(name, pixelFormat.getValue(), width, height, fps));
+  public RawCVMatSource(String name, VideoMode.PixelFormat pixelFormat, int width, int height, int fps) {
+    super(CameraServerJNI.createRawSource(name, pixelFormat.getValue(), width, height, fps));
   }
 
   /**
@@ -53,7 +49,11 @@ public class CvSource extends ImageSource {
    * @param image OpenCV image
    */
   public void putFrame(Mat image) {
-    CameraServerCvJNI.putSourceFrame(m_handle, image.nativeObj);
+    int channels = image.channels();
+    if (channels != 1 && channels != 3) {
+      throw new VideoException("Unsupported Image Type");
+    }
+    int imgType = channels == 1 ? PixelFormat.kGray.getValue() : PixelFormat.kBGR.getValue();
+    CameraServerJNI.putRawSourceFrame(m_handle, image.dataAddr(), image.width(), image.height(), imgType, (int)image.total() * channels);
   }
-
 }
