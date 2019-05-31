@@ -21,6 +21,12 @@
 
 #include "cscore_c.h"
 
+#ifdef _WIN32
+// Disable uninitialized variable warnings
+#pragma warning(push)
+#pragma warning(disable : 26495)
+#endif
+
 namespace wpi {
 class json;
 }  // namespace wpi
@@ -421,5 +427,10 @@ std::vector<std::string> GetNetworkInterfaces();
 /** @} */
 
 }  // namespace cs
+
+#ifdef _WIN32
+// Disable uninitialized variable warnings
+#pragma warning(pop)
+#endif
 
 #endif  // CSCORE_CSCORE_CPP_H_

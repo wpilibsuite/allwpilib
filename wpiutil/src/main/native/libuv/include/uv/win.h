@@ -181,10 +181,15 @@ typedef int (WSAAPI* LPFN_WSARECVFROM)
              LPWSAOVERLAPPED overlapped,
              LPWSAOVERLAPPED_COMPLETION_ROUTINE completion_routine);
 
+#pragma warning(push)
+#pragma warning(disable : 28251)
+
 #ifndef _NTDEF_
   typedef LONG NTSTATUS;
   typedef NTSTATUS *PNTSTATUS;
 #endif
+
+#pragma warning(pop)
 
 #ifndef RTL_CONDITION_VARIABLE_INIT
   typedef PVOID CONDITION_VARIABLE, *PCONDITION_VARIABLE;

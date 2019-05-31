@@ -76,7 +76,7 @@ inline VideoProperty::VideoProperty(CS_Property handle) : m_handle(handle) {
 }
 
 inline VideoProperty::VideoProperty(CS_Property handle, Kind kind)
-  : m_handle(handle), m_kind(kind) {}
+  : m_status(0), m_handle(handle), m_kind(kind) {}
 
 inline VideoSource::VideoSource(const VideoSource& source)
     : m_handle(source.m_handle == 0 ? 0

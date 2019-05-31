@@ -11,6 +11,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#ifdef _WIN32
+#define _CRT_NONSTDC_NO_WARNINGS
+#endif
+
 #include "wpi/raw_ostream.h"
 #include "wpi/STLExtras.h"
 #include "wpi/SmallString.h"

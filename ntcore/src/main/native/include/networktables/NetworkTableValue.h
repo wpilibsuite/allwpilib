@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -278,21 +278,16 @@ class Value final {
     return val;
   }
 
-/**
- * Creates a string entry value.
- *
- * @param value the value
- * @param time if nonzero, the creation time to use (instead of the current
- *             time)
- * @return The entry value
- */
-#ifdef _MSC_VER
-  template <typename T,
-            typename = std::enable_if_t<std::is_same<T, std::string>>>
-#else
+  /**
+   * Creates a string entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
   template <typename T,
             typename std::enable_if<std::is_same<T, std::string>::value>::type>
-#endif
   static std::shared_ptr<Value> MakeString(T&& value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_STRING, time, private_init());
     val->m_string = std::move(value);
@@ -317,21 +312,16 @@ class Value final {
     return val;
   }
 
-/**
- * Creates a raw entry value.
- *
- * @param value the value
- * @param time if nonzero, the creation time to use (instead of the current
- *             time)
- * @return The entry value
- */
-#ifdef _MSC_VER
-  template <typename T,
-            typename = std::enable_if_t<std::is_same<T, std::string>>>
-#else
+  /**
+   * Creates a raw entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
   template <typename T,
             typename std::enable_if<std::is_same<T, std::string>::value>::type>
-#endif
   static std::shared_ptr<Value> MakeRaw(T&& value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_RAW, time, private_init());
     val->m_string = std::move(value);
