@@ -84,7 +84,7 @@ public final class SensorUtil {
         .append(kPCMModules)
         .append(", Requested: ")
         .append(moduleNumber);
-      throw new IndexOutOfBoundsException(buf.toString());
+      throw new IllegalArgumentException(buf.toString());
     }
   }
 
