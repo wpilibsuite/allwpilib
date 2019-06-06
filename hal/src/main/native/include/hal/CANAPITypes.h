@@ -51,6 +51,8 @@ HAL_ENUM(HAL_CANManufacturer) {
   HAL_CAN_Man_kCTRE = 4,
   HAL_CAN_Man_kMS = 7,
   HAL_CAN_Man_kTeamUse = 8,
+  HAL_CAN_Man_kKauaiLabs = 9,
+  HAL_CAN_Man_kCopperforge = 10
 };
 // clang-format on
 /** @} */
