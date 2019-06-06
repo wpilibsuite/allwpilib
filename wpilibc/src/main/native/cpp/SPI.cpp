@@ -157,9 +157,7 @@ SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
   HAL_InitializeSPI(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  static int instances = 0;
-  instances++;
-  HAL_Report(HALUsageReporting::kResourceType_SPI, instances);
+  HAL_Report(HALUsageReporting::kResourceType_SPI, port);
 }
 
 SPI::~SPI() { HAL_CloseSPI(m_port); }

@@ -32,8 +32,6 @@ public class SPI implements AutoCloseable {
     }
   }
 
-  private static int devices;
-
   private int m_port;
   private int m_msbFirst;
   private int m_clockIdleHigh;
@@ -46,11 +44,10 @@ public class SPI implements AutoCloseable {
    */
   public SPI(Port port) {
     m_port = (byte) port.value;
-    devices++;
 
     SPIJNI.spiInitialize(m_port);
 
-    HAL.report(tResourceType.kResourceType_SPI, devices);
+    HAL.report(tResourceType.kResourceType_SPI, port.value);
   }
 
 
