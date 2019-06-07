@@ -1,7 +1,7 @@
 import edu.wpi.first.nativeutils.*
 import org.gradle.internal.os.OperatingSystem
 
-def windowsCompilerArgs = ['/EHsc', '/D_CRT_SECURE_NO_WARNINGS', '/Zi', '/FS', '/Zc:inline', '/MP4', '/W3', '/wd4244', '/wd4267', '/wd4146', '/std:c++17', '/permissive-', '/WX']
+def windowsCompilerArgs = ['/EHsc', '/D_CRT_SECURE_NO_WARNINGS', '/Zi', '/FS', '/Zc:inline', '/MP4', '/W3', '/wd4244', '/wd4267', '/wd4146', '/wd4996', '/std:c++17', '/permissive-', '/WX']
 def windowsCCompilerArgs = ['/Zi', '/FS', '/Zc:inline', '/W3', '/WX']
 def windowsReleaseCompilerArgs = ['/O2', '/MD']
 def windowsDebugCompilerArgs = ['/Od', '/MDd']
