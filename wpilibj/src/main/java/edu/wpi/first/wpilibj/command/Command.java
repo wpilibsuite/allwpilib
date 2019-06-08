@@ -7,7 +7,9 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import java.util.Enumeration;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SendableBase;
@@ -59,7 +61,7 @@ public abstract class Command extends SendableBase {
   /**
    * The required subsystems.
    */
-  private final Set m_requirements = new Set();
+  private final HashSet<Subsystem> m_requirements = new HashSet<Subsystem>();
 
   /**
    * Whether or not it is running.
@@ -394,8 +396,8 @@ public abstract class Command extends SendableBase {
    * @return the requirements (as an {@link Enumeration Enumeration} of {@link Subsystem
    * Subsystems}) of this command
    */
-  synchronized Enumeration getRequirements() {
-    return m_requirements.getElements();
+  synchronized Collection<Subsystem> getRequirements() {
+    return Collections.unmodifiableCollection(m_requirements);
   }
 
   /**

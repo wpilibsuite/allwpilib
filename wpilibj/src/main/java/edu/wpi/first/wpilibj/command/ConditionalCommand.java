@@ -49,14 +49,14 @@ public abstract class ConditionalCommand extends Command {
 
   private void requireAll() {
     if (m_onTrue != null) {
-      for (Enumeration e = m_onTrue.getRequirements(); e.hasMoreElements(); ) {
-        requires((Subsystem) e.nextElement());
+      for (Subsystem requirement : m_onTrue.getRequirements()) {
+        requires(requirement);
       }
     }
 
     if (m_onFalse != null) {
-      for (Enumeration e = m_onFalse.getRequirements(); e.hasMoreElements(); ) {
-        requires((Subsystem) e.nextElement());
+      for (Subsystem requirement : m_onFalse.getRequirements()) {
+        requires(requirement);
       }
     }
   }

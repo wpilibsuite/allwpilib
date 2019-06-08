@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import java.util.Enumeration;
 import java.util.Vector;
 
 import static java.util.Objects.requireNonNull;
@@ -92,8 +91,8 @@ public class CommandGroup extends Command {
     command.setParent(this);
 
     m_commands.addElement(new Entry(command, Entry.IN_SEQUENCE));
-    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
-      requires((Subsystem) e.nextElement());
+    for (Subsystem s : command.getRequirements()) {
+      requires(s);
     }
   }
 
@@ -130,8 +129,8 @@ public class CommandGroup extends Command {
     command.setParent(this);
 
     m_commands.addElement(new Entry(command, Entry.IN_SEQUENCE, timeout));
-    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
-      requires((Subsystem) e.nextElement());
+    for (Subsystem s : command.getRequirements()) {
+      requires(s);
     }
   }
 
@@ -163,8 +162,8 @@ public class CommandGroup extends Command {
     command.setParent(this);
 
     m_commands.addElement(new Entry(command, Entry.BRANCH_CHILD));
-    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
-      requires((Subsystem) e.nextElement());
+    for (Subsystem s : command.getRequirements()) {
+      requires(s);
     }
   }
 
@@ -204,8 +203,8 @@ public class CommandGroup extends Command {
     command.setParent(this);
 
     m_commands.addElement(new Entry(command, Entry.BRANCH_CHILD, timeout));
-    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
-      requires((Subsystem) e.nextElement());
+    for (Subsystem s : command.getRequirements()) {
+      requires(s);
     }
   }
 
@@ -294,9 +293,8 @@ public class CommandGroup extends Command {
       cmd.removed();
     }
 
-    Enumeration children = m_children.elements();
-    while (children.hasMoreElements()) {
-      Command cmd = ((Entry) children.nextElement()).m_command;
+    for (Entry e : m_children) {
+      Command cmd = e.m_command;
       cmd._cancel();
       cmd.removed();
     }
@@ -373,17 +371,13 @@ public class CommandGroup extends Command {
   }
 
   private void cancelConflicts(Command command) {
-    for (int i = 0; i < m_children.size(); i++) {
-      Command child = m_children.elementAt(i).m_command;
-
-      Enumeration requirements = command.getRequirements();
-
-      while (requirements.hasMoreElements()) {
-        Object requirement = requirements.nextElement();
-        if (child.doesRequire((Subsystem) requirement)) {
+    for (Entry e : m_children) {
+      Command child = e.m_command;
+      for (Subsystem s : command.getRequirements()) {
+        if (child.doesRequire(s)) {
           child._cancel();
           child.removed();
-          m_children.removeElementAt(i--);
+          m_children.remove(e);
           break;
         }
       }
