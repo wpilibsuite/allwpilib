@@ -107,4 +107,13 @@ public class InstantCommand extends Command {
       m_func.run();
     }
   }
+
+  @Override
+  protected void initialize() {}
+
+  @Override
+  protected void execute() {}
+
+  @Override
+  protected void end() {}
 }

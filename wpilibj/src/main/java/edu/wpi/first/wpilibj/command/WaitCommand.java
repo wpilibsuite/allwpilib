@@ -32,4 +32,13 @@ public class WaitCommand extends TimedCommand {
   public WaitCommand(String name, double timeout) {
     super(name, timeout);
   }
+
+  @Override
+  protected void initialize() {}
+
+  @Override
+  protected void execute() {}
+
+  @Override
+  protected void end() {}
 }

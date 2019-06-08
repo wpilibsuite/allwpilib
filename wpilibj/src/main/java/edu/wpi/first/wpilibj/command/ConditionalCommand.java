@@ -172,4 +172,13 @@ public abstract class ConditionalCommand extends Command {
 
     super._interrupted();
   }
+
+  @Override
+  protected void initialize() {}
+
+  @Override
+  protected void execute() {}
+
+  @Override
+  protected void end() {}
 }

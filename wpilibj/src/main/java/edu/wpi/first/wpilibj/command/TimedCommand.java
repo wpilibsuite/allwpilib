@@ -11,7 +11,7 @@ package edu.wpi.first.wpilibj.command;
  * A {@link TimedCommand} will wait for a timeout before finishing.
  * {@link TimedCommand} is used to execute a command for a given amount of time.
  */
-public class TimedCommand extends Command {
+public abstract class TimedCommand extends Command {
   /**
    * Instantiates a TimedCommand with the given name and timeout.
    *
@@ -53,8 +53,8 @@ public class TimedCommand extends Command {
   }
 
   /**
-  * Ends command when timed out.
-  */
+   * Ends command when timed out.
+   */
   @Override
   protected boolean isFinished() {
     return isTimedOut();

@@ -28,4 +28,13 @@ public class WaitUntilCommand extends Command {
   public boolean isFinished() {
     return Timer.getMatchTime() >= m_time;
   }
+
+  @Override
+  protected void initialize() {}
+
+  @Override
+  protected void execute() {}
+
+  @Override
+  protected void end() {}
 }

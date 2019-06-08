@@ -20,4 +20,13 @@ public class WaitForChildren extends Command {
   protected boolean isFinished() {
     return getGroup() == null || getGroup().m_children.isEmpty();
   }
+
+  @Override
+  protected void initialize() {}
+
+  @Override
+  protected void execute() {}
+
+  @Override
+  protected void end() {}
 }

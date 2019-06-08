@@ -298,7 +298,7 @@ public abstract class Command extends SendableBase {
   /**
    * The initialize method is called the first time this Command is run after being started.
    */
-  protected void initialize() {}
+  protected abstract void initialize();
 
   /**
    * A shadow method called before {@link Command#initialize() initialize()}.
@@ -311,7 +311,7 @@ public abstract class Command extends SendableBase {
    * The execute method is called repeatedly until this Command either finishes or is canceled.
    */
   @SuppressWarnings("MethodName")
-  protected void execute() {}
+  protected abstract void execute();
 
   /**
    * A shadow method called before {@link Command#execute() execute()}.
@@ -341,7 +341,7 @@ public abstract class Command extends SendableBase {
    * Called when the command ended peacefully. This is where you may want to wrap up loose ends,
    * like shutting off a motor that was being used in the command.
    */
-  protected void end() {}
+  protected abstract void end();
 
   /**
    * A shadow method called after {@link Command#end() end()}.
