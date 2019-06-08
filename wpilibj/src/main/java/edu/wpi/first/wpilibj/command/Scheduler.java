@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -283,14 +283,15 @@ public final class Scheduler extends SendableBase {
             }
           }
         }
-        if (toCancel.length > 0) m_cancelEntry.setDoubleArray(new double[0]);
-
+        if (toCancel.length > 0) {
+          m_cancelEntry.setDoubleArray(new double[0]);
+        } 
 
         if (m_runningCommandsChanged) {
           // Set the the running commands
           String[] commands = m_commands.stream().map(Command::getName).toArray(String[]::new);
           double[] ids = m_commands.stream().map(Command::hashCode).mapToDouble(i -> i).toArray();
-         
+
           m_namesEntry.setStringArray(commands);
           m_idsEntry.setDoubleArray(ids);
         }
