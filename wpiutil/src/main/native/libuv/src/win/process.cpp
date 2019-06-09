@@ -19,6 +19,8 @@
  * IN THE SOFTWARE.
  */
 
+#define _CRT_NONSTDC_NO_WARNINGS
+
 #include <assert.h>
 #include <io.h>
 #include <stdio.h>
@@ -32,7 +34,6 @@
 #include "internal.h"
 #include "handle-inl.h"
 #include "req-inl.h"
-
 
 #define SIGKILL         9
 

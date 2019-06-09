@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -24,11 +26,17 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
   private final NetworkTable m_rootMetaTable;
   private final NetworkTableEntry m_selectedTabEntry;
 
+  /**
+   * Creates a new Shuffleboard instance.
+   *
+   * @param ntInstance the NetworkTables instance to use
+   */
   ShuffleboardInstance(NetworkTableInstance ntInstance) {
     Objects.requireNonNull(ntInstance, "NetworkTable instance cannot be null");
     m_rootTable = ntInstance.getTable(Shuffleboard.kBaseTableName);
     m_rootMetaTable = m_rootTable.getSubTable(".metadata");
     m_selectedTabEntry = m_rootMetaTable.getEntry("Selected");
+    HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
   }
 
   @Override

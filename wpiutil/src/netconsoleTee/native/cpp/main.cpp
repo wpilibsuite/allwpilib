@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -66,8 +66,8 @@ static void CopyUdp(uv::Stream& in, std::shared_ptr<uv::Udp> out,
   }
 
   in.data.connect(
-      [ rem = std::make_shared<std::string>(), outPtr = out.get(), addr ](
-          uv::Buffer & buf, size_t len) {
+      [rem = std::make_shared<std::string>(), outPtr = out.get(), addr](
+          uv::Buffer& buf, size_t len) {
         // build buffers
         wpi::SmallVector<uv::Buffer, 4> bufs;
         if (!NewlineBuffer(*rem, buf, len, bufs, false, 0)) return;
@@ -85,18 +85,20 @@ static void CopyTcp(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
     std::string rem;
     uint16_t seq = 0;
   };
-  in.data.connect([ data = std::make_shared<StreamData>(), outPtr = out.get() ](
-                      uv::Buffer & buf, size_t len) {
-    // build buffers
-    wpi::SmallVector<uv::Buffer, 4> bufs;
-    if (!NewlineBuffer(data->rem, buf, len, bufs, true, data->seq++)) return;
+  in.data.connect(
+      [data = std::make_shared<StreamData>(), outPtr = out.get()](
+          uv::Buffer& buf, size_t len) {
+        // build buffers
+        wpi::SmallVector<uv::Buffer, 4> bufs;
+        if (!NewlineBuffer(data->rem, buf, len, bufs, true, data->seq++))
+          return;
 
-    // send output
-    outPtr->Write(bufs, [](auto bufs2, uv::Error) {
-      for (auto buf : bufs2) buf.Deallocate();
-    });
-  },
-                  out);
+        // send output
+        outPtr->Write(bufs, [](auto bufs2, uv::Error) {
+          for (auto buf : bufs2) buf.Deallocate();
+        });
+      },
+      out);
 }
 
 static void CopyStream(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
@@ -165,7 +167,7 @@ int main(int argc, char* argv[]) {
     tcp->Bind("", 1740);
 
     // when we get a connection, accept it
-    tcp->connection.connect([ srv = tcp.get(), stdinTty ] {
+    tcp->connection.connect([srv = tcp.get(), stdinTty] {
       auto tcp = srv->Accept();
       if (!tcp) return;
 

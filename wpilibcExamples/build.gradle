@@ -140,6 +140,8 @@ model {
                     binary.tasks.withType(CppCompile) {
                         if (!(binary.toolChain in VisualCpp)) {
                             cppCompiler.args "-Wno-error=deprecated-declarations"
+                        } else {
+                            cppCompiler.args "/wd4996"
                         }
                     }
                     if (binary.targetPlatform.architecture.name != 'athena') {

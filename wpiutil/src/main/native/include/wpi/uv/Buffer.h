@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -40,11 +40,11 @@ class Buffer : public uv_buf_t {
       : Buffer{reinterpret_cast<const char*>(arr.data()), arr.size()} {}
   Buffer(char* base_, size_t len_) {
     base = base_;
-    len = len_;
+    len = static_cast<decltype(len)>(len_);
   }
   Buffer(const char* base_, size_t len_) {
     base = const_cast<char*>(base_);
-    len = len_;
+    len = static_cast<decltype(len)>(len_);
   }
 
   ArrayRef<char> data() const { return ArrayRef<char>{base, len}; }
@@ -107,6 +107,9 @@ class SimpleBufferPool {
    * @param size Size of each buffer to allocate.
    */
   explicit SimpleBufferPool(size_t size = 4096) : m_size{size} {}
+
+  SimpleBufferPool(const SimpleBufferPool& other) = delete;
+  SimpleBufferPool& operator=(const SimpleBufferPool& other) = delete;
 
   /**
    * Allocate a buffer.

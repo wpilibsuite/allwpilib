@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -28,7 +28,7 @@ namespace cs {
  */
 
 // Forward declarations so friend declarations work correctly
-class CvSource;
+class ImageSource;
 class VideoEvent;
 class VideoSink;
 class VideoSource;
@@ -37,7 +37,7 @@ class VideoSource;
  * A source or sink property.
  */
 class VideoProperty {
-  friend class CvSource;
+  friend class ImageSource;
   friend class VideoEvent;
   friend class VideoSink;
   friend class VideoSource;
@@ -51,7 +51,7 @@ class VideoProperty {
     kEnum = CS_PROP_ENUM
   };
 
-  VideoProperty() : m_handle(0), m_kind(kNone) {}
+  VideoProperty() : m_status(0), m_handle(0), m_kind(kNone) {}
 
   std::string GetName() const;
 
@@ -617,43 +617,13 @@ class AxisCamera : public HttpCamera {
 };
 
 /**
- * A source for user code to provide OpenCV images as video frames.
+ * A base class for single image providing sources.
  */
-class CvSource : public VideoSource {
+class ImageSource : public VideoSource {
+ protected:
+  ImageSource() = default;
+
  public:
-  CvSource() = default;
-
-  /**
-   * Create an OpenCV source.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param mode Video mode being generated
-   */
-  CvSource(const wpi::Twine& name, const VideoMode& mode);
-
-  /**
-   * Create an OpenCV source.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param pixelFormat Pixel format
-   * @param width width
-   * @param height height
-   * @param fps fps
-   */
-  CvSource(const wpi::Twine& name, VideoMode::PixelFormat pixelFormat,
-           int width, int height, int fps);
-
-  /**
-   * Put an OpenCV image and notify sinks.
-   *
-   * <p>Only 8-bit single-channel or 3-channel (with BGR channel order) images
-   * are supported. If the format, depth or channel order is different, use
-   * cv::Mat::convertTo() and/or cv::cvtColor() to convert it first.
-   *
-   * @param image OpenCV image
-   */
-  void PutFrame(cv::Mat& image);
-
   /**
    * Signal sinks that an error has occurred.  This should be called instead
    * of NotifyFrame when an error occurs.
@@ -979,64 +949,19 @@ class MjpegServer : public VideoSink {
 };
 
 /**
- * A sink for user code to accept video frames as OpenCV images.
+ * A base class for single image reading sinks.
  */
-class CvSink : public VideoSink {
+class ImageSink : public VideoSink {
+ protected:
+  ImageSink() = default;
+
  public:
-  CvSink() = default;
-
-  /**
-   * Create a sink for accepting OpenCV images.
-   *
-   * <p>WaitForFrame() must be called on the created sink to get each new
-   * image.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   */
-  explicit CvSink(const wpi::Twine& name);
-
-  /**
-   * Create a sink for accepting OpenCV images in a separate thread.
-   *
-   * <p>A thread will be created that calls WaitForFrame() and calls the
-   * processFrame() callback each time a new frame arrives.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param processFrame Frame processing function; will be called with a
-   *        time=0 if an error occurred.  processFrame should call GetImage()
-   *        or GetError() as needed, but should not call (except in very
-   *        unusual circumstances) WaitForImage().
-   */
-  CvSink(const wpi::Twine& name,
-         std::function<void(uint64_t time)> processFrame);
-
   /**
    * Set sink description.
    *
    * @param description Description
    */
   void SetDescription(const wpi::Twine& description);
-
-  /**
-   * Wait for the next frame and get the image.
-   * Times out (returning 0) after timeout seconds.
-   * The provided image will have three 8-bit channels stored in BGR order.
-   *
-   * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::Now(),
-   *         and is in 1 us increments.
-   */
-  uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225) const;
-
-  /**
-   * Wait for the next frame and get the image.  May block forever.
-   * The provided image will have three 8-bit channels stored in BGR order.
-   *
-   * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::Now(),
-   *         and is in 1 us increments.
-   */
-  uint64_t GrabFrameNoTimeout(cv::Mat& image) const;
 
   /**
    * Get error string.  Call this if WaitForFrame() returns 0 to determine

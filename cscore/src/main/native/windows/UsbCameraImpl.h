@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -98,7 +98,7 @@ class UsbCameraImpl : public SourceImpl,
     };
 
     explicit Message(Kind kind_)
-        : kind(kind_), from(std::this_thread::get_id()) {}
+        : kind(kind_), data{0}, from(std::this_thread::get_id()) {}
 
     Kind kind;
     int data[4];
@@ -153,6 +153,8 @@ class UsbCameraImpl : public SourceImpl,
   // Property helper functions
   int RawToPercentage(const UsbCameraProperty& rawProp, int rawValue);
   int PercentageToRaw(const UsbCameraProperty& rawProp, int percentValue);
+
+  void StartMessagePump();
 
   //
   // Variables only used within camera thread

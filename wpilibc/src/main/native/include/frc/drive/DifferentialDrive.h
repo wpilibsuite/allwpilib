@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -121,7 +121,7 @@ class DifferentialDrive : public RobotDriveBase {
    * by negating the value passed for rotation.
    *
    * @param xSpeed        The speed at which the robot should drive along the X
-   *                      axis [-1.0..1.0]. Forward is negative.
+   *                      axis [-1.0..1.0]. Forward is positive.
    * @param zRotation     The rotation rate of the robot around the Z axis
    *                      [-1.0..1.0]. Clockwise is positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.

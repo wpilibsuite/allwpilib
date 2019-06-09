@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -49,7 +49,10 @@ EventLoopRunner::~EventLoopRunner() { Stop(); }
 void EventLoopRunner::Stop() {
   ExecAsync([](uv::Loop& loop) {
     // close all handles; this will (eventually) stop the loop
-    loop.Walk([](uv::Handle& h) { h.Close(); });
+    loop.Walk([](uv::Handle& h) {
+      h.SetLoopClosing(true);
+      h.Close();
+    });
   });
   m_owner.Join();
 }

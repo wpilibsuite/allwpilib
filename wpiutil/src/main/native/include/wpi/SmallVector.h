@@ -50,7 +50,7 @@ protected:
 
   SmallVectorBase() = delete;
   SmallVectorBase(void *FirstEl, size_t Capacity)
-      : BeginX(FirstEl), Capacity(Capacity) {}
+      : BeginX(FirstEl), Capacity(static_cast<unsigned>(Capacity)) {}
 
   /// This is an implementation of the grow() method which only works
   /// on POD-like data types and is out of line to reduce code duplication.
@@ -75,7 +75,7 @@ public:
   /// which will only be overwritten.
   void set_size(size_t Size) {
     assert(Size <= capacity());
-    this->Size = Size;
+    this->Size = static_cast<unsigned>(Size);
   }
 };
 
@@ -252,7 +252,7 @@ void SmallVectorTemplateBase<T, isPodLike>::grow(size_t MinSize) {
 
   // Always grow, even from zero.
   size_t NewCapacity = size_t(NextPowerOf2(this->capacity() + 2));
-  NewCapacity = std::min(std::max(NewCapacity, MinSize), size_t(UINT32_MAX));
+  NewCapacity = (std::min)((std::max)(NewCapacity, MinSize), size_t(UINT32_MAX));
   T *NewElts = static_cast<T*>(wpi::safe_malloc(NewCapacity*sizeof(T)));
 
   // Move the elements over.
@@ -266,7 +266,7 @@ void SmallVectorTemplateBase<T, isPodLike>::grow(size_t MinSize) {
     free(this->begin());
 
   this->BeginX = NewElts;
-  this->Capacity = NewCapacity;
+  this->Capacity = static_cast<unsigned>(NewCapacity);
 }
 
 

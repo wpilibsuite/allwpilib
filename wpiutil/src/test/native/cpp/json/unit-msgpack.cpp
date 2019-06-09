@@ -253,8 +253,8 @@ static const uint32_t pos4_numbers[] = {
     4294967295u,
 };
 
-INSTANTIATE_TEST_CASE_P(MessagePackSignedPos4Tests, MessagePackSignedPos4Test,
-                        ::testing::ValuesIn(pos4_numbers), );
+INSTANTIATE_TEST_SUITE_P(MessagePackSignedPos4Tests, MessagePackSignedPos4Test,
+                        ::testing::ValuesIn(pos4_numbers));
 
 // 4294967296..9223372036854775807 (int 64)
 class MessagePackSignedPos8Test : public ::testing::TestWithParam<uint64_t> {};
@@ -306,8 +306,8 @@ static const uint64_t pos8_numbers[] = {
     9223372036854775807lu,
 };
 
-INSTANTIATE_TEST_CASE_P(MessagePackSignedPos8Tests, MessagePackSignedPos8Test,
-                        ::testing::ValuesIn(pos8_numbers), );
+INSTANTIATE_TEST_SUITE_P(MessagePackSignedPos8Tests, MessagePackSignedPos8Test,
+                        ::testing::ValuesIn(pos8_numbers));
 
 // -128..-33 (int 8)
 TEST(MessagePackSignedTest, Neg1)
@@ -419,8 +419,8 @@ static const int32_t neg4_numbers[] = {
     -2147483648ll,
 };
 
-INSTANTIATE_TEST_CASE_P(MessagePackSignedNeg4Tests, MessagePackSignedNeg4Test,
-                        ::testing::ValuesIn(neg4_numbers), );
+INSTANTIATE_TEST_SUITE_P(MessagePackSignedNeg4Tests, MessagePackSignedNeg4Test,
+                        ::testing::ValuesIn(neg4_numbers));
 
 // -9223372036854775808..-2147483649 (int 64)
 class MessagePackSignedNeg8Test : public ::testing::TestWithParam<int64_t> {};
@@ -470,8 +470,8 @@ static const int64_t neg8_numbers[] = {
     -2147483649ll,
 };
 
-INSTANTIATE_TEST_CASE_P(MessagePackSignedNeg8Tests, MessagePackSignedNeg8Test,
-                        ::testing::ValuesIn(neg8_numbers), );
+INSTANTIATE_TEST_SUITE_P(MessagePackSignedNeg8Tests, MessagePackSignedNeg8Test,
+                        ::testing::ValuesIn(neg8_numbers));
 
 // 0..127 (positive fixnum)
 TEST(MessagePackUnsignedTest, Pos0)
@@ -605,9 +605,9 @@ TEST_P(MessagePackUnsignedPos4Test, Case)
     EXPECT_EQ(json::from_msgpack(result), j);
 }
 
-INSTANTIATE_TEST_CASE_P(MessagePackUnsignedPos4Tests,
+INSTANTIATE_TEST_SUITE_P(MessagePackUnsignedPos4Tests,
                         MessagePackUnsignedPos4Test,
-                        ::testing::ValuesIn(pos4_numbers), );
+                        ::testing::ValuesIn(pos4_numbers));
 
 // 4294967296..18446744073709551615 (uint 64)
 class MessagePackUnsignedPos8Test : public ::testing::TestWithParam<uint64_t> {};
@@ -652,9 +652,9 @@ TEST_P(MessagePackUnsignedPos8Test, Case)
     EXPECT_EQ(json::from_msgpack(result), j);
 }
 
-INSTANTIATE_TEST_CASE_P(MessagePackUnsignedPos8Tests,
+INSTANTIATE_TEST_SUITE_P(MessagePackUnsignedPos8Tests,
                         MessagePackUnsignedPos8Test,
-                        ::testing::ValuesIn(pos8_numbers), );
+                        ::testing::ValuesIn(pos8_numbers));
 
 // 3.1415925
 TEST(MessagePackFloatTest, Number)
@@ -786,8 +786,8 @@ static size_t string3_lens[] = {
     65535u
 };
 
-INSTANTIATE_TEST_CASE_P(MessagePackString3Tests, MessagePackString3Test,
-                        ::testing::ValuesIn(string3_lens), );
+INSTANTIATE_TEST_SUITE_P(MessagePackString3Tests, MessagePackString3Test,
+                        ::testing::ValuesIn(string3_lens));
 
 
 // N = 65536..4294967295
@@ -827,8 +827,8 @@ static size_t string5_lens[] = {
     1048576u
 };
 
-INSTANTIATE_TEST_CASE_P(MessagePackString5Tests, MessagePackString5Test,
-                        ::testing::ValuesIn(string5_lens), );
+INSTANTIATE_TEST_SUITE_P(MessagePackString5Tests, MessagePackString5Test,
+                        ::testing::ValuesIn(string5_lens));
 
 TEST(MessagePackArrayTest, Empty)
 {
@@ -1264,6 +1264,6 @@ static const char* regression_test_cases[] = {
     "test/data/nst_json_testsuite/test_parsing/y_structure_whitespace_array.json",
 };
 
-INSTANTIATE_TEST_CASE_P(MessagePackRegressionTests, MessagePackRegressionTest,
+INSTANTIATE_TEST_SUITE_P(MessagePackRegressionTests, MessagePackRegressionTest,
                         ::testing::ValuesIn(regression_test_cases));
 #endif

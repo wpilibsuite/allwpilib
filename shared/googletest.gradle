@@ -5,7 +5,7 @@ model {
             artifactId = 'googletest'
             headerClassifier = 'headers'
             ext = 'zip'
-            version = '1.8.0-4-4e4df22'
+            version = '1.8.1-1-f71fb4f'
             sharedConfigs = [:]
             staticConfigs = project.staticGtestConfigs
         }
