@@ -8,6 +8,7 @@
 package edu.wpi.first.hal;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.wpi.first.wpiutil.RuntimeLoader;
 
@@ -18,8 +19,20 @@ public class JNIWrapper {
   static boolean libraryLoaded = false;
   static RuntimeLoader<JNIWrapper> loader = null;
 
+  public static class Helper {
+    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
+
+    public static boolean getExtractOnStaticLoad() {
+      return extractOnStaticLoad.get();
+    }
+
+    public static void setExtractOnStaticLoad(boolean load) {
+      extractOnStaticLoad.set(load);
+    }
+  }
+
   static {
-    if (!libraryLoaded) {
+    if (Helper.getExtractOnStaticLoad()) {
       try {
         loader = new RuntimeLoader<>("wpiHaljni", RuntimeLoader.getDefaultExtractionRoot(), JNIWrapper.class);
         loader.loadLibrary();
@@ -28,7 +41,15 @@ public class JNIWrapper {
         System.exit(1);
       }
       libraryLoaded = true;
-      libraryLoaded = true;
     }
+  }
+
+  public static synchronized void forceLoad() throws IOException {
+    if (libraryLoaded) {
+      return;
+    }
+    loader = new RuntimeLoader<>("wpiHaljni", RuntimeLoader.getDefaultExtractionRoot(), JNIWrapper.class);
+    loader.loadLibrary();
+    libraryLoaded = true;
   }
 }

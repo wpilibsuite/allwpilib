@@ -9,6 +9,7 @@ package edu.wpi.cscore;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import edu.wpi.cscore.raw.RawFrame;
@@ -19,8 +20,20 @@ public class CameraServerJNI {
 
   static RuntimeLoader<CameraServerJNI> loader = null;
 
+  public static class Helper {
+    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
+
+    public static boolean getExtractOnStaticLoad() {
+      return extractOnStaticLoad.get();
+    }
+
+    public static void setExtractOnStaticLoad(boolean load) {
+      extractOnStaticLoad.set(load);
+    }
+  }
+
   static {
-    if (!libraryLoaded) {
+    if (Helper.getExtractOnStaticLoad()) {
       try {
         loader = new RuntimeLoader<>("cscorejni", RuntimeLoader.getDefaultExtractionRoot(), CameraServerJNI.class);
         loader.loadLibrary();
@@ -32,7 +45,14 @@ public class CameraServerJNI {
     }
   }
 
-  public static void forceLoad() {}
+  public static synchronized void forceLoad() throws IOException {
+    if (libraryLoaded) {
+      return;
+    }
+    loader = new RuntimeLoader<>("cscorejni", RuntimeLoader.getDefaultExtractionRoot(), CameraServerJNI.class);
+    loader.loadLibrary();
+    libraryLoaded = true;
+  }
 
   //
   // Property Functions
