@@ -80,7 +80,7 @@ set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
 if (NOT MSVC)
     target_compile_options(wpiutil PUBLIC -std=c++14 -Wall -pedantic -Wextra -Wno-unused-parameter)
 else()
-    target_compile_options(wpiutil PUBLIC /wd4244 /wd4267 /wd4146 /WX /permissive- /std:c++17)
+    target_compile_options(wpiutil PUBLIC /wd4244 /wd4267 /wd4146 /wd4996 /WX /permissive- /std:c++17)
     target_compile_options(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
