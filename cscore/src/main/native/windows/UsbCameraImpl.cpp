@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -28,8 +28,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <wpi/MemAlloc.h>
 #include <wpi/SmallString.h>
-#include <wpi/memory.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
@@ -54,6 +54,8 @@
 #pragma comment(lib, "Mfreadwrite.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
+#pragma warning(disable : 4996 4018 26451)
+
 static constexpr int NewImageMessage = 0x0400 + 4488;
 static constexpr int SetCameraMessage = 0x0400 + 254;
 static constexpr int WaitForStartupMessage = 0x0400 + 294;
@@ -76,12 +78,16 @@ UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
     : SourceImpl{name, logger, notifier, telemetry}, m_path{path.str()} {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
+  m_deviceId = -1;
+  StartMessagePump();
 }
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              int deviceId)
-    : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {}
+    : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {
+  StartMessagePump();
+}
 
 UsbCameraImpl::~UsbCameraImpl() { m_messagePump = nullptr; }
 
@@ -192,11 +198,14 @@ void UsbCameraImpl::NumSinksEnabledChanged() {
       SetCameraMessage, Message::kNumSinksEnabledChanged, nullptr);
 }
 
-void UsbCameraImpl::Start() {
+void UsbCameraImpl::StartMessagePump() {
   m_messagePump = std::make_unique<WindowsMessagePump>(
       [this](HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
         return this->PumpMain(hwnd, uiMsg, wParam, lParam);
       });
+}
+
+void UsbCameraImpl::Start() {
   m_messagePump->PostWindowMessage(PumpReadyMessage, nullptr, nullptr);
 }
 
@@ -354,6 +363,7 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
       DeviceConnect();
       break;
     case WaitForStartupMessage:
+      DeviceConnect();
       return CS_OK;
     case WM_DEVICECHANGE: {
       // Device potentially changed
@@ -413,16 +423,16 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
 
 static cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
   // Compare GUID to one of the supported ones
-  if (guid == MFVideoFormat_NV12) {
+  if (IsEqualGUID(guid, MFVideoFormat_NV12)) {
     // GrayScale
     return cs::VideoMode::PixelFormat::kGray;
-  } else if (guid == MFVideoFormat_YUY2) {
+  } else if (IsEqualGUID(guid, MFVideoFormat_YUY2)) {
     return cs::VideoMode::PixelFormat::kYUYV;
-  } else if (guid == MFVideoFormat_RGB24) {
+  } else if (IsEqualGUID(guid, MFVideoFormat_RGB24)) {
     return cs::VideoMode::PixelFormat::kBGR;
-  } else if (guid == MFVideoFormat_MJPG) {
+  } else if (IsEqualGUID(guid, MFVideoFormat_MJPG)) {
     return cs::VideoMode::PixelFormat::kMJPEG;
-  } else if (guid == MFVideoFormat_RGB565) {
+  } else if (IsEqualGUID(guid, MFVideoFormat_RGB565)) {
     return cs::VideoMode::PixelFormat::kRGB565;
   } else {
     return cs::VideoMode::PixelFormat::kUnknown;
@@ -672,7 +682,7 @@ void UsbCameraImpl::DeviceCacheProperty(
   }
 
   NotifyPropertyCreated(*rawIndex, *rawPropPtr);
-  if (perPropPtr) NotifyPropertyCreated(*perIndex, *perPropPtr);
+  if (perPropPtr && perIndex) NotifyPropertyCreated(*perIndex, *perPropPtr);
 }
 
 CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
@@ -808,7 +818,10 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
 
     m_currentMode = std::move(newModeType);
     m_mode = newMode;
+#pragma warning(push)
+#pragma warning(disable : 26110)
     lock.unlock();
+#pragma warning(pop)
     if (m_sourceReader) {
       DeviceDisconnect();
       DeviceConnect();
@@ -962,6 +975,7 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   ComPtr<IMFAttributes> pAttributes;
   IMFActivate** ppDevices = nullptr;
+  UINT32 count = 0;
 
   // Create an attribute store to specify the enumeration parameters.
   HRESULT hr = MFCreateAttributes(pAttributes.GetAddressOf(), 1);
@@ -977,7 +991,6 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   }
 
   // Enumerate devices.
-  UINT32 count;
   hr = MFEnumDeviceSources(pAttributes.Get(), &ppDevices, &count);
   if (FAILED(hr)) {
     goto done;
@@ -993,11 +1006,11 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
     info.dev = i;
     WCHAR buf[512];
     ppDevices[i]->GetString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, buf,
-                            sizeof(buf), NULL);
+                            sizeof(buf) / sizeof(WCHAR), NULL);
     info.name = utf8_conv.to_bytes(buf);
     ppDevices[i]->GetString(
         MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, buf,
-        sizeof(buf), NULL);
+        sizeof(buf) / sizeof(WCHAR), NULL);
     info.path = utf8_conv.to_bytes(buf);
     retval.emplace_back(std::move(info));
   }
@@ -1005,12 +1018,15 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
 done:
   pAttributes.Reset();
 
-  for (DWORD i = 0; i < count; i++) {
-    if (ppDevices[i]) {
-      ppDevices[i]->Release();
-      ppDevices[i] = nullptr;
+  if (ppDevices) {
+    for (DWORD i = 0; i < count; i++) {
+      if (ppDevices[i]) {
+        ppDevices[i]->Release();
+        ppDevices[i] = nullptr;
+      }
     }
   }
+
   CoTaskMemFree(ppDevices);
   return retval;
 }

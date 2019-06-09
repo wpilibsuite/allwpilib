@@ -11,12 +11,17 @@
 //
 //===----------------------------------------------------------------------===//
 
+#ifdef _WIN32
+#define _CRT_NONSTDC_NO_WARNINGS
+#endif
+
 #include "wpi/raw_ostream.h"
 #include "wpi/STLExtras.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
 #include "wpi/Compiler.h"
+#include "wpi/ErrorHandling.h"
 #include "wpi/FileSystem.h"
 #include "wpi/Format.h"
 #include "wpi/MathExtras.h"
@@ -56,6 +61,7 @@
 #endif
 
 #ifdef _WIN32
+#include "wpi/ConvertUTF.h"
 #include "Windows/WindowsSupport.h"
 #endif
 
@@ -149,7 +155,7 @@ raw_ostream &raw_ostream::write_escaped(StringRef Str,
       *this << '\\' << '"';
       break;
     default:
-      if (std::isprint(c)) {
+      if (isPrint(c)) {
         *this << c;
         break;
       }
@@ -335,7 +341,7 @@ raw_ostream &raw_ostream::operator<<(const FormattedString &FS) {
     break;
   }
   default:
-    assert(false && "Bad Justification");
+    wpi_unreachable("Bad Justification");
   }
   return *this;
 }
@@ -419,7 +425,7 @@ raw_ostream &raw_ostream::operator<<(const FormattedBytes &FB) {
 
       // Print the ASCII char values for each byte on this line
       for (uint8_t Byte : Line) {
-        if (isprint(Byte))
+        if (isPrint(Byte))
           *this << static_cast<char>(Byte);
         else
           *this << '.';
@@ -481,14 +487,18 @@ void format_object_base::home() {
 //===----------------------------------------------------------------------===//
 
 static int getFD(StringRef Filename, std::error_code &EC,
+                 sys::fs::CreationDisposition Disp, sys::fs::FileAccess Access,
                  sys::fs::OpenFlags Flags) {
+  assert((Access & sys::fs::FA_Write) &&
+         "Cannot make a raw_ostream from a read-only descriptor!");
+
   // Handle "-" as stdout. Note that when we do this, we consider ourself
   // the owner of stdout and may set the "binary" flag globally based on Flags.
   if (Filename == "-") {
     EC = std::error_code();
     // If user requested binary then put stdout into binary mode if
     // possible.
-    if (!(Flags & sys::fs::F_Text)) {
+    if (!(Flags & sys::fs::OF_Text)) {
 #if defined(_WIN32)
       _setmode(_fileno(stdout), _O_BINARY);
 #endif
@@ -497,16 +507,39 @@ static int getFD(StringRef Filename, std::error_code &EC,
   }
 
   int FD;
-  EC = sys::fs::openFileForWrite(Filename, FD, Flags);
+  if (Access & sys::fs::FA_Read)
+    EC = sys::fs::openFileForReadWrite(Filename, FD, Disp, Flags);
+  else
+    EC = sys::fs::openFileForWrite(Filename, FD, Disp, Flags);
   if (EC)
     return -1;
 
   return FD;
 }
 
+raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC)
+    : raw_fd_ostream(Filename, EC, sys::fs::CD_CreateAlways, sys::fs::FA_Write,
+                     sys::fs::OF_None) {}
+
+raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC,
+                               sys::fs::CreationDisposition Disp)
+    : raw_fd_ostream(Filename, EC, Disp, sys::fs::FA_Write, sys::fs::OF_None) {}
+
+raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC,
+                               sys::fs::FileAccess Access)
+    : raw_fd_ostream(Filename, EC, sys::fs::CD_CreateAlways, Access,
+                     sys::fs::OF_None) {}
+
 raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC,
                                sys::fs::OpenFlags Flags)
-    : raw_fd_ostream(getFD(Filename, EC, Flags), true) {}
+    : raw_fd_ostream(Filename, EC, sys::fs::CD_CreateAlways, sys::fs::FA_Write,
+                     Flags) {}
+
+raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC,
+                               sys::fs::CreationDisposition Disp,
+                               sys::fs::FileAccess Access,
+                               sys::fs::OpenFlags Flags)
+    : raw_fd_ostream(getFD(Filename, EC, Disp, Access, Flags), true) {}
 
 /// FD is the file descriptor that this writes to.  If ShouldClose is true, this
 /// closes the file when the stream is destroyed.
@@ -525,6 +558,12 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered)
   // users must simply be aware that mixed output and remarks is a possibility.
   if (FD <= STDERR_FILENO)
     ShouldClose = false;
+
+#ifdef _WIN32
+  // Check if this is a console device. This is not equivalent to isatty.
+  IsWindowsConsole =
+      ::GetFileType((HANDLE)::_get_osfhandle(fd)) == FILE_TYPE_CHAR;
+#endif
 
   // Get the starting position.
   off_t loc = ::lseek(FD, 0, SEEK_CUR);
@@ -554,27 +593,87 @@ raw_fd_ostream::~raw_fd_ostream() {
   // on FD == 2.
   if (FD == 2) return;
 #endif
+
+  // If there are any pending errors, report them now. Clients wishing
+  // to avoid report_fatal_error calls should check for errors with
+  // has_error() and clear the error flag with clear_error() before
+  // destructing raw_ostream objects which may have errors.
+  if (has_error())
+    report_fatal_error("IO failure on output stream: " + error().message(),
+                       /*GenCrashDiag=*/false);
 }
+
+#if defined(_WIN32)
+// The most reliable way to print unicode in a Windows console is with
+// WriteConsoleW. To use that, first transcode from UTF-8 to UTF-16. This
+// assumes that LLVM programs always print valid UTF-8 to the console. The data
+// might not be UTF-8 for two major reasons:
+// 1. The program is printing binary (-filetype=obj -o -), in which case it
+// would have been gibberish anyway.
+// 2. The program is printing text in a semi-ascii compatible codepage like
+// shift-jis or cp1252.
+//
+// Most LLVM programs don't produce non-ascii text unless they are quoting
+// user source input. A well-behaved LLVM program should either validate that
+// the input is UTF-8 or transcode from the local codepage to UTF-8 before
+// quoting it. If they don't, this may mess up the encoding, but this is still
+// probably the best compromise we can make.
+static bool write_console_impl(int FD, StringRef Data) {
+  SmallVector<wchar_t, 256> WideText;
+
+  // Fall back to ::write if it wasn't valid UTF-8.
+  if (auto EC = sys::windows::UTF8ToUTF16(Data, WideText))
+    return false;
+
+  // On Windows 7 and earlier, WriteConsoleW has a low maximum amount of data
+  // that can be written to the console at a time.
+  size_t MaxWriteSize = WideText.size();
+  if (!RunningWindows8OrGreater())
+    MaxWriteSize = 32767;
+
+  size_t WCharsWritten = 0;
+  do {
+    size_t WCharsToWrite =
+        std::min(MaxWriteSize, WideText.size() - WCharsWritten);
+    DWORD ActuallyWritten;
+    bool Success =
+        ::WriteConsoleW((HANDLE)::_get_osfhandle(FD), &WideText[WCharsWritten],
+                        WCharsToWrite, &ActuallyWritten,
+                        /*Reserved=*/nullptr);
+
+    // The most likely reason for WriteConsoleW to fail is that FD no longer
+    // points to a console. Fall back to ::write. If this isn't the first loop
+    // iteration, something is truly wrong.
+    if (!Success)
+      return false;
+
+    WCharsWritten += ActuallyWritten;
+  } while (WCharsWritten != WideText.size());
+  return true;
+}
+#endif
 
 void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
   assert(FD >= 0 && "File already closed.");
   pos += Size;
 
-  // The maximum write size is limited to SSIZE_MAX because a write
-  // greater than SSIZE_MAX is implementation-defined in POSIX.
-  // Since SSIZE_MAX is not portable, we use SIZE_MAX >> 1 instead.
-  size_t MaxWriteSize = SIZE_MAX >> 1;
+#if defined(_WIN32)
+  // If this is a Windows console device, try re-encoding from UTF-8 to UTF-16
+  // and using WriteConsoleW. If that fails, fall back to plain write().
+  if (IsWindowsConsole)
+    if (write_console_impl(FD, StringRef(Ptr, Size)))
+      return;
+#endif
+
+  // The maximum write size is limited to INT32_MAX. A write
+  // greater than SSIZE_MAX is implementation-defined in POSIX,
+  // and Windows _write requires 32 bit input.
+  size_t MaxWriteSize = INT32_MAX;
 
 #if defined(__linux__)
   // It is observed that Linux returns EINVAL for a very large write (>2G).
   // Make it a reasonably small value.
   MaxWriteSize = 1024 * 1024 * 1024;
-#elif defined(_WIN32)
-  // Writing a large size of output to Windows console returns ENOMEM. It seems
-  // that, prior to Windows 8, WriteFile() is redirecting to WriteConsole(), and
-  // the latter has a size limit (66000 bytes or less, depending on heap usage).
-  if (::_isatty(FD) && !RunningWindows8OrGreater())
-    MaxWriteSize = 32767;
 #endif
 
   do {
@@ -645,8 +744,17 @@ void raw_fd_ostream::pwrite_impl(const char *Ptr, size_t Size,
 }
 
 size_t raw_fd_ostream::preferred_buffer_size() const {
-#if !defined(_MSC_VER) && !defined(__MINGW32__) && !defined(__minix)
-  // Windows and Minix have no st_blksize.
+#if defined(_WIN32)
+  // Disable buffering for console devices. Console output is re-encoded from
+  // UTF-8 to UTF-16 on Windows, and buffering it would require us to split the
+  // buffer on a valid UTF-8 codepoint boundary. Terminal buffering is disabled
+  // below on most other OSs, so do the same thing on Windows and avoid that
+  // complexity.
+  if (IsWindowsConsole)
+    return 0;
+  return raw_ostream::preferred_buffer_size();
+#elif !defined(__minix)
+  // Minix has no st_blksize.
   assert(FD >= 0 && "File not yet open!");
   struct stat statbuf;
   if (fstat(FD, &statbuf) != 0)
@@ -791,3 +899,5 @@ void raw_null_ostream::pwrite_impl(const char * /*Ptr*/, size_t /*Size*/,
                                    uint64_t /*Offset*/) {}
 
 void raw_pwrite_stream::anchor() {}
+
+void buffer_ostream::anchor() {}

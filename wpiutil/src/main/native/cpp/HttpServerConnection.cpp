@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -77,7 +77,7 @@ void HttpServerConnection::BuildHeader(raw_ostream& os, int code,
 
 void HttpServerConnection::SendData(ArrayRef<uv::Buffer> bufs,
                                     bool closeAfter) {
-  m_stream.Write(bufs, [ closeAfter, stream = &m_stream ](
+  m_stream.Write(bufs, [closeAfter, stream = &m_stream](
                            MutableArrayRef<uv::Buffer> bufs, uv::Error) {
     for (auto&& buf : bufs) buf.Deallocate();
     if (closeAfter) stream->Close();
@@ -113,7 +113,7 @@ void HttpServerConnection::SendStaticResponse(int code, const Twine& codeText,
   // can send content without copying
   bufs.emplace_back(content);
 
-  m_stream.Write(bufs, [ closeAfter = !m_keepAlive, stream = &m_stream ](
+  m_stream.Write(bufs, [closeAfter = !m_keepAlive, stream = &m_stream](
                            MutableArrayRef<uv::Buffer> bufs, uv::Error) {
     // don't deallocate the static content
     for (auto&& buf : bufs.drop_back()) buf.Deallocate();

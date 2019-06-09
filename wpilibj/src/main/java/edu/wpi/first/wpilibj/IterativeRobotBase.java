@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -257,11 +257,14 @@ public abstract class IterativeRobotBase extends RobotBase {
 
     robotPeriodic();
     m_watchdog.addEpoch("robotPeriodic()");
-    m_watchdog.disable();
-    SmartDashboard.updateValues();
 
+    SmartDashboard.updateValues();
+    m_watchdog.addEpoch("SmartDashboard.updateValues()");
     LiveWindow.updateValues();
+    m_watchdog.addEpoch("LiveWindow.updateValues()");
     Shuffleboard.update();
+    m_watchdog.addEpoch("Shuffleboard.update()");
+    m_watchdog.disable();
 
     // Warn on loop time overruns
     if (m_watchdog.isExpired()) {

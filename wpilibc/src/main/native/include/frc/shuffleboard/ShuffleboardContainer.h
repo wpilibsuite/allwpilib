@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -24,6 +25,7 @@
 #include "frc/shuffleboard/LayoutType.h"
 #include "frc/shuffleboard/ShuffleboardComponentBase.h"
 #include "frc/shuffleboard/ShuffleboardValue.h"
+#include "frc/shuffleboard/SuppliedValueWidget.h"
 
 namespace cs {
 class VideoSource;
@@ -261,6 +263,98 @@ class ShuffleboardContainer : public virtual ShuffleboardValue,
    */
   SimpleWidget& Add(const wpi::Twine& title,
                     wpi::ArrayRef<std::string> defaultValue);
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided
+   * by the value supplier. Changes made on the dashboard will not propagate to
+   * the widget object, and will be overridden by values from the value
+   * supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   */
+  SuppliedValueWidget<std::string>& AddString(
+      const wpi::Twine& title, std::function<std::string()> supplier);
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided
+   * by the value supplier. Changes made on the dashboard will not propagate to
+   * the widget object, and will be overridden by values from the value
+   * supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   */
+  SuppliedValueWidget<double>& AddNumber(const wpi::Twine& title,
+                                         std::function<double()> supplier);
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided
+   * by the value supplier. Changes made on the dashboard will not propagate to
+   * the widget object, and will be overridden by values from the value
+   * supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   */
+  SuppliedValueWidget<bool>& AddBoolean(const wpi::Twine& title,
+                                        std::function<bool()> supplier);
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided
+   * by the value supplier. Changes made on the dashboard will not propagate to
+   * the widget object, and will be overridden by values from the value
+   * supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   */
+  SuppliedValueWidget<std::vector<std::string>>& AddStringArray(
+      const wpi::Twine& title,
+      std::function<std::vector<std::string>()> supplier);
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided
+   * by the value supplier. Changes made on the dashboard will not propagate to
+   * the widget object, and will be overridden by values from the value
+   * supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   */
+  SuppliedValueWidget<std::vector<double>>& AddNumberArray(
+      const wpi::Twine& title, std::function<std::vector<double>()> supplier);
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided
+   * by the value supplier. Changes made on the dashboard will not propagate to
+   * the widget object, and will be overridden by values from the value
+   * supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   */
+  SuppliedValueWidget<std::vector<int>>& AddBooleanArray(
+      const wpi::Twine& title, std::function<std::vector<int>()> supplier);
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided
+   * by the value supplier. Changes made on the dashboard will not propagate to
+   * the widget object, and will be overridden by values from the value
+   * supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   */
+  SuppliedValueWidget<wpi::StringRef>& AddRaw(
+      const wpi::Twine& title, std::function<wpi::StringRef()> supplier);
 
   /**
    * Adds a widget to this container to display a simple piece of data.

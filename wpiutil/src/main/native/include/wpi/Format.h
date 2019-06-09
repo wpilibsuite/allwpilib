@@ -94,7 +94,7 @@ class format_object final : public format_object_base {
   int snprint_tuple(char *Buffer, unsigned BufferSize,
                     index_sequence<Is...>) const {
 #ifdef _MSC_VER
-    return _snprintf(Buffer, BufferSize, Fmt, std::get<Is>(Vals)...);
+    return _snprintf_s(Buffer, BufferSize, BufferSize, Fmt, std::get<Is>(Vals)...);
 #else
 #ifdef __GNUC__
 #pragma GCC diagnostic push

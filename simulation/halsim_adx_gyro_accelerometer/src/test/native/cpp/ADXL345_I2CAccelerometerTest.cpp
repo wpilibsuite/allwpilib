@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -41,7 +41,6 @@ TEST_P(ADXL345_I2CAccelerometerTest, TestAccelerometer) {
   EXPECT_NEAR(0.11, accel.GetZ(), EPSILON);
 }
 
-INSTANTIATE_TEST_CASE_P(ADXL345_I2CAccelerometerTest,
-                        ADXL345_I2CAccelerometerTest,
-                        ::testing::Values(frc::I2C::kOnboard,
-                                          frc::I2C::kMXP), );
+INSTANTIATE_TEST_SUITE_P(ADXL345_I2CAccelerometerTest,
+                         ADXL345_I2CAccelerometerTest,
+                         ::testing::Values(frc::I2C::kOnboard, frc::I2C::kMXP));

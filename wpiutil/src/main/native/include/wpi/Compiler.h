@@ -117,6 +117,11 @@
 #ifndef LLVM_NODISCARD
 #if __cplusplus > 201402L && __has_cpp_attribute(nodiscard)
 #define LLVM_NODISCARD [[nodiscard]]
+// Detect MSVC directly, since __cplusplus still defaults to old version
+#elif _MSVC_LANG >= 201703L
+#define LLVM_NODISCARD [[nodiscard]]
+#elif _MSC_VER
+#define LLVM_NODISCARD
 #elif !__cplusplus
 // Workaround for llvm.org/PR23435, since clang 3.6 and below emit a spurious
 // error when __has_cpp_attribute is given a scoped attribute in C mode.
@@ -236,6 +241,11 @@
 #ifndef LLVM_FALLTHROUGH
 #if __cplusplus > 201402L && __has_cpp_attribute(fallthrough)
 #define LLVM_FALLTHROUGH [[fallthrough]]
+// Detect MSVC directly, since __cplusplus still defaults to old version
+#elif _MSVC_LANG >= 201703L
+#define LLVM_FALLTHROUGH [[fallthrough]]
+#elif _MSC_VER
+#define LLVM_FALLTHROUGH
 #elif __has_cpp_attribute(gnu::fallthrough)
 #define LLVM_FALLTHROUGH [[gnu::fallthrough]]
 #elif !__cplusplus
@@ -284,6 +294,41 @@
 # define LLVM_BUILTIN_UNREACHABLE __builtin_unreachable()
 #elif defined(_MSC_VER)
 # define LLVM_BUILTIN_UNREACHABLE __assume(false)
+#endif
+#endif
+
+/// LLVM_BUILTIN_TRAP - On compilers which support it, expands to an expression
+/// which causes the program to exit abnormally.
+#ifndef LLVM_BUILTIN_TRAP
+#if __has_builtin(__builtin_trap) || LLVM_GNUC_PREREQ(4, 3, 0)
+# define LLVM_BUILTIN_TRAP __builtin_trap()
+#elif defined(_MSC_VER)
+// The __debugbreak intrinsic is supported by MSVC, does not require forward
+// declarations involving platform-specific typedefs (unlike RaiseException),
+// results in a call to vectored exception handlers, and encodes to a short
+// instruction that still causes the trapping behavior we want.
+# define LLVM_BUILTIN_TRAP __debugbreak()
+#else
+# define LLVM_BUILTIN_TRAP *(volatile int*)0x11 = 0
+#endif
+#endif
+
+/// LLVM_BUILTIN_DEBUGTRAP - On compilers which support it, expands to
+/// an expression which causes the program to break while running
+/// under a debugger.
+#ifndef LLVM_BUILTIN_DEBUGTRAP
+#if __has_builtin(__builtin_debugtrap)
+# define LLVM_BUILTIN_DEBUGTRAP __builtin_debugtrap()
+#elif defined(_MSC_VER)
+// The __debugbreak intrinsic is supported by MSVC and breaks while
+// running under the debugger, and also supports invoking a debugger
+// when the OS is configured appropriately.
+# define LLVM_BUILTIN_DEBUGTRAP __debugbreak()
+#else
+// Just continue execution when built with compilers that have no
+// support. This is a debugging aid and not intended to force the
+// program to abort if encountered.
+# define LLVM_BUILTIN_DEBUGTRAP
 #endif
 #endif
 

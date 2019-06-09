@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,6 +7,7 @@
 
 #include "frc/shuffleboard/ShuffleboardInstance.h"
 
+#include <hal/HAL.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/StringMap.h>
@@ -27,6 +28,7 @@ ShuffleboardInstance::ShuffleboardInstance(nt::NetworkTableInstance ntInstance)
     : m_impl(new Impl) {
   m_impl->rootTable = ntInstance.GetTable(Shuffleboard::kBaseTableName);
   m_impl->rootMetaTable = m_impl->rootTable->GetSubTable(".metadata");
+  HAL_Report(HALUsageReporting::kResourceType_Shuffleboard, 0);
 }
 
 ShuffleboardInstance::~ShuffleboardInstance() {}

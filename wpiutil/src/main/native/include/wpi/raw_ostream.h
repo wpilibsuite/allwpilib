@@ -34,7 +34,9 @@ class FormattedBytes;
 
 namespace sys {
 namespace fs {
+enum FileAccess : unsigned;
 enum OpenFlags : unsigned;
+enum CreationDisposition : unsigned;
 } // end namespace fs
 } // end namespace sys
 
@@ -239,7 +241,7 @@ public:
   raw_ostream &write_hex(unsigned long long N);
 
   /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
-  /// satisfy std::isprint into an escape sequence.
+  /// satisfy wpi::isPrint into an escape sequence.
   raw_ostream &write_escaped(StringRef Str, bool UseHexEscapes = false);
 
   raw_ostream &write(unsigned char C);
@@ -389,11 +391,17 @@ class raw_fd_ostream : public raw_pwrite_stream {
   int FD;
   bool ShouldClose;
 
+  bool SupportsSeeking;
+
+#ifdef _WIN32
+  /// True if this fd refers to a Windows console device. Mintty and other
+  /// terminal emulators are TTYs, but they are not consoles.
+  bool IsWindowsConsole = false;
+#endif
+
   std::error_code EC;
 
   uint64_t pos;
-
-  bool SupportsSeeking;
 
   /// See raw_ostream::write_impl.
   void write_impl(const char *Ptr, size_t Size) override;
@@ -419,15 +427,22 @@ public:
   /// \p Flags allows optional flags to control how the file will be opened.
   ///
   /// As a special case, if Filename is "-", then the stream will use
-  /// STDOUT_FILENO instead of opening a file. Note that it will still consider
-  /// itself to own the file descriptor. In particular, it will close the
-  /// file descriptor when it is done (this is necessary to detect
-  /// output errors).
+  /// STDOUT_FILENO instead of opening a file. This will not close the stdout
+  /// descriptor.
+  raw_fd_ostream(StringRef Filename, std::error_code &EC);
   raw_fd_ostream(StringRef Filename, std::error_code &EC,
+                 sys::fs::CreationDisposition Disp);
+  raw_fd_ostream(StringRef Filename, std::error_code &EC,
+                 sys::fs::FileAccess Access);
+  raw_fd_ostream(StringRef Filename, std::error_code &EC,
+                 sys::fs::OpenFlags Flags);
+  raw_fd_ostream(StringRef Filename, std::error_code &EC,
+                 sys::fs::CreationDisposition Disp, sys::fs::FileAccess Access,
                  sys::fs::OpenFlags Flags);
 
   /// FD is the file descriptor that this writes to.  If ShouldClose is true,
-  /// this closes the file when the stream is destroyed.
+  /// this closes the file when the stream is destroyed. If FD is for stdout or
+  /// stderr, it will not be closed.
   raw_fd_ostream(int fd, bool shouldClose, bool unbuffered=false);
 
   ~raw_fd_ostream() override;
@@ -652,6 +667,8 @@ public:
 class buffer_ostream : public raw_svector_ostream {
   raw_ostream &OS;
   SmallVector<char, 0> Buffer;
+
+  virtual void anchor() override;
 
 public:
   buffer_ostream(raw_ostream &OS) : raw_svector_ostream(Buffer), OS(OS) {}

@@ -130,7 +130,7 @@ namespace wpi {
     /// empty - Check if the string is empty.
     LLVM_NODISCARD
     LLVM_ATTRIBUTE_ALWAYS_INLINE
-    bool empty() const noexcept { return size() == 0; }
+    bool empty() const noexcept { return Length == 0; }
 
     /// size - Get the string size.
     LLVM_NODISCARD
@@ -183,7 +183,7 @@ namespace wpi {
     LLVM_ATTRIBUTE_ALWAYS_INLINE
     int compare(StringRef RHS) const noexcept {
       // Check the prefix for a mismatch.
-      if (int Res = compareMemory(Data, RHS.Data, std::min(Length, RHS.Length)))
+      if (int Res = compareMemory(Data, RHS.Data, (std::min)(Length, RHS.Length)))
         return Res < 0 ? -1 : 1;
 
       // Otherwise the prefixes match, so we only need to check the lengths.
@@ -274,7 +274,7 @@ namespace wpi {
     LLVM_NODISCARD
     LLVM_ATTRIBUTE_ALWAYS_INLINE
     size_t find(char C, size_t From = 0) const noexcept {
-      size_t FindBegin = std::min(From, Length);
+      size_t FindBegin = (std::min)(From, Length);
       if (FindBegin < Length) { // Avoid calling memchr with nullptr.
         // Just forward to memchr, which is faster than a hand-rolled loop.
         if (const void *P = ::memchr(Data + FindBegin, C, Length - FindBegin))
@@ -336,7 +336,7 @@ namespace wpi {
     /// found.
     LLVM_NODISCARD
     size_t rfind(char C, size_t From = npos) const noexcept {
-      From = std::min(From, Length);
+      From = (std::min)(From, Length);
       size_t i = From;
       while (i != 0) {
         --i;
@@ -554,8 +554,8 @@ namespace wpi {
     LLVM_NODISCARD
     LLVM_ATTRIBUTE_ALWAYS_INLINE
     StringRef substr(size_t Start, size_t N = npos) const noexcept {
-      Start = std::min(Start, Length);
-      return StringRef(Data + Start, std::min(N, Length - Start));
+      Start = (std::min)(Start, Length);
+      return StringRef(Data + Start, (std::min)(N, Length - Start));
     }
 
     /// Return a StringRef equal to 'this' but with only the first \p N
@@ -666,8 +666,8 @@ namespace wpi {
     LLVM_NODISCARD
     LLVM_ATTRIBUTE_ALWAYS_INLINE
     StringRef slice(size_t Start, size_t End) const noexcept {
-      Start = std::min(Start, Length);
-      End = std::min(std::max(Start, End), Length);
+      Start = (std::min)(Start, Length);
+      End = (std::min)((std::max)(Start, End), Length);
       return StringRef(Data + Start, End - Start);
     }
 
@@ -683,10 +683,7 @@ namespace wpi {
     /// \returns The split substrings.
     LLVM_NODISCARD
     std::pair<StringRef, StringRef> split(char Separator) const {
-      size_t Idx = find(Separator);
-      if (Idx == npos)
-        return std::make_pair(*this, StringRef());
-      return std::make_pair(slice(0, Idx), slice(Idx+1, npos));
+      return split(StringRef(&Separator, 1));
     }
 
     /// Split into two substrings around the first occurrence of a separator
@@ -702,6 +699,24 @@ namespace wpi {
     LLVM_NODISCARD
     std::pair<StringRef, StringRef> split(StringRef Separator) const {
       size_t Idx = find(Separator);
+      if (Idx == npos)
+        return std::make_pair(*this, StringRef());
+      return std::make_pair(slice(0, Idx), slice(Idx + Separator.size(), npos));
+    }
+
+    /// Split into two substrings around the last occurrence of a separator
+    /// string.
+    ///
+    /// If \p Separator is in the string, then the result is a pair (LHS, RHS)
+    /// such that (*this == LHS + Separator + RHS) is true and RHS is
+    /// minimal. If \p Separator is not in the string, then the result is a
+    /// pair (LHS, RHS) where (*this == LHS) and (RHS == "").
+    ///
+    /// \param Separator - The string to split on.
+    /// \return - The split substrings.
+    LLVM_NODISCARD
+    std::pair<StringRef, StringRef> rsplit(StringRef Separator) const {
+      size_t Idx = rfind(Separator);
       if (Idx == npos)
         return std::make_pair(*this, StringRef());
       return std::make_pair(slice(0, Idx), slice(Idx + Separator.size(), npos));
@@ -754,38 +769,35 @@ namespace wpi {
     /// \return - The split substrings.
     LLVM_NODISCARD
     std::pair<StringRef, StringRef> rsplit(char Separator) const {
-      size_t Idx = rfind(Separator);
-      if (Idx == npos)
-        return std::make_pair(*this, StringRef());
-      return std::make_pair(slice(0, Idx), slice(Idx+1, npos));
+      return rsplit(StringRef(&Separator, 1));
     }
 
     /// Return string with consecutive \p Char characters starting from the
     /// the left removed.
     LLVM_NODISCARD
     StringRef ltrim(char Char) const noexcept {
-      return drop_front(std::min(Length, find_first_not_of(Char)));
+      return drop_front((std::min)(Length, find_first_not_of(Char)));
     }
 
     /// Return string with consecutive characters in \p Chars starting from
     /// the left removed.
     LLVM_NODISCARD
     StringRef ltrim(StringRef Chars = " \t\n\v\f\r") const noexcept {
-      return drop_front(std::min(Length, find_first_not_of(Chars)));
+      return drop_front((std::min)(Length, find_first_not_of(Chars)));
     }
 
     /// Return string with consecutive \p Char characters starting from the
     /// right removed.
     LLVM_NODISCARD
     StringRef rtrim(char Char) const noexcept {
-      return drop_back(size() - std::min(Length, find_last_not_of(Char) + 1));
+      return drop_back(size() - (std::min)(Length, find_last_not_of(Char) + 1));
     }
 
     /// Return string with consecutive characters in \p Chars starting from
     /// the right removed.
     LLVM_NODISCARD
     StringRef rtrim(StringRef Chars = " \t\n\v\f\r") const noexcept {
-      return drop_back(size() - std::min(Length, find_last_not_of(Chars) + 1));
+      return drop_back(size() - (std::min)(Length, find_last_not_of(Chars) + 1));
     }
 
     /// Return string with consecutive \p Char characters starting from the
