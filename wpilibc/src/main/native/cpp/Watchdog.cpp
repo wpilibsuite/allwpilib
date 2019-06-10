@@ -17,6 +17,8 @@
 using namespace frc;
 
 constexpr std::chrono::milliseconds Watchdog::kMinPrintPeriod;
+std::condition_variable Watchdog::m_testCond;
+wpi::mutex Watchdog::m_testMutex;
 
 class Watchdog::Thread : public wpi::SafeThread {
  public:
@@ -41,6 +43,8 @@ void Watchdog::Thread::Main() {
     if (m_watchdogs.size() > 0) {
       if (m_cond.wait_until(lock, m_watchdogs.top()->m_expirationTime) ==
           std::cv_status::timeout) {
+        std::lock_guard<wpi::mutex> testLock(m_testMutex);
+        m_testCond.notify_all();
         if (m_watchdogs.size() == 0 ||
             m_watchdogs.top()->m_expirationTime > hal::fpga_clock::now()) {
           continue;
@@ -76,6 +80,8 @@ void Watchdog::Thread::Main() {
       // Otherwise, a Watchdog removed itself from the queue (it notifies the
       // scheduler of this) or a spurious wakeup occurred, so just rewait with
       // the soonest watchdog timeout.
+      std::lock_guard<wpi::mutex> testLock(m_testMutex);
+      m_testCond.notify_all();
     } else {
       m_cond.wait(lock, [&] { return m_watchdogs.size() > 0 || !m_active; });
     }
@@ -183,4 +189,15 @@ wpi::SafeThreadOwner<Watchdog::Thread>& Watchdog::GetThreadOwner() {
     return inst;
   }();
   return inst;
+}
+
+void Watchdog::Notify() {
+  // Locks mutex
+  auto thr = GetThreadOwner().GetThread();
+  if (!thr) return;
+
+  std::unique_lock<wpi::mutex> lock(m_testMutex);
+  thr->m_cond.notify_all();
+  thr->m_mutex.unlock();
+  m_testCond.wait(lock);
 }

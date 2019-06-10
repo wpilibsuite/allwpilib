@@ -165,9 +165,21 @@ class Watchdog {
   class Thread;
   wpi::SafeThreadOwner<Thread>* m_owner;
 
+  // These are for use by WatchdogTest.cpp only
+  friend class WatchdogTest;
+  static std::condition_variable m_testCond;
+  static wpi::mutex m_testMutex;
+
   bool operator>(const Watchdog& rhs);
 
   static wpi::SafeThreadOwner<Thread>& GetThreadOwner();
+
+  /**
+   * Notifies thread's condition variable and returns after it wakes up.
+   *
+   * This is for use by WatchdogTest.cpp only.
+   */
+  static void Notify();
 };
 
 }  // namespace frc
