@@ -42,6 +42,9 @@ public final class NetworkTablesJNI {
     }
   }
 
+  /**
+   * Force load the library.
+   */
   public static synchronized void forceLoad() throws IOException {
     if (libraryLoaded) {
       return;
