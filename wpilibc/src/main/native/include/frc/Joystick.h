@@ -31,17 +31,6 @@ class Joystick : public GenericHID {
   static constexpr int kDefaultTwistChannel = 2;
   static constexpr int kDefaultThrottleChannel = 3;
 
-  WPI_DEPRECATED("Use kDefaultXChannel instead.")
-  static constexpr int kDefaultXAxis = 0;
-  WPI_DEPRECATED("Use kDefaultYChannel instead.")
-  static constexpr int kDefaultYAxis = 1;
-  WPI_DEPRECATED("Use kDefaultZChannel instead.")
-  static constexpr int kDefaultZAxis = 2;
-  WPI_DEPRECATED("Use kDefaultTwistChannel instead.")
-  static constexpr int kDefaultTwistAxis = 2;
-  WPI_DEPRECATED("Use kDefaultThrottleChannel instead.")
-  static constexpr int kDefaultThrottleAxis = 3;
-
   enum AxisType { kXAxis, kYAxis, kZAxis, kTwistAxis, kThrottleAxis };
   enum ButtonType { kTriggerButton, kTopButton };
 
