@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,7 +13,7 @@
 
 using namespace frc;
 
-class RobotDriveTest : public testing::Test {
+class DriveTest : public testing::Test {
  protected:
   MockSpeedController m_rdFrontLeft;
   MockSpeedController m_rdRearLeft;
@@ -36,7 +36,7 @@ class RobotDriveTest : public testing::Test {
                                  -225, -270, -305, -360, -540};
 };
 
-TEST_F(RobotDriveTest, TankDrive) {
+TEST_F(DriveTest, TankDrive) {
   int joystickSize = sizeof(m_testJoystickValues) / sizeof(double);
   double leftJoystick, rightJoystick;
   m_differentialDrive.SetDeadband(0.0);
@@ -55,7 +55,7 @@ TEST_F(RobotDriveTest, TankDrive) {
   }
 }
 
-TEST_F(RobotDriveTest, TankDriveSquared) {
+TEST_F(DriveTest, TankDriveSquared) {
   int joystickSize = sizeof(m_testJoystickValues) / sizeof(double);
   double leftJoystick, rightJoystick;
   m_differentialDrive.SetDeadband(0.0);
@@ -74,7 +74,7 @@ TEST_F(RobotDriveTest, TankDriveSquared) {
   }
 }
 
-TEST_F(RobotDriveTest, ArcadeDriveSquared) {
+TEST_F(DriveTest, ArcadeDriveSquared) {
   int joystickSize = sizeof(m_testJoystickValues) / sizeof(double);
   double moveJoystick, rotateJoystick;
   m_differentialDrive.SetDeadband(0.0);
@@ -93,7 +93,7 @@ TEST_F(RobotDriveTest, ArcadeDriveSquared) {
   }
 }
 
-TEST_F(RobotDriveTest, ArcadeDrive) {
+TEST_F(DriveTest, ArcadeDrive) {
   int joystickSize = sizeof(m_testJoystickValues) / sizeof(double);
   double moveJoystick, rotateJoystick;
   m_differentialDrive.SetDeadband(0.0);
@@ -112,7 +112,7 @@ TEST_F(RobotDriveTest, ArcadeDrive) {
   }
 }
 
-TEST_F(RobotDriveTest, MecanumCartesian) {
+TEST_F(DriveTest, MecanumCartesian) {
   int joystickSize = sizeof(m_testJoystickValues) / sizeof(double);
   int gyroSize = sizeof(m_testGyroValues) / sizeof(double);
   double xJoystick, yJoystick, rotateJoystick, gyroValue;
@@ -150,7 +150,7 @@ TEST_F(RobotDriveTest, MecanumCartesian) {
   }
 }
 
-TEST_F(RobotDriveTest, MecanumPolar) {
+TEST_F(DriveTest, MecanumPolar) {
   int joystickSize = sizeof(m_testJoystickValues) / sizeof(double);
   int gyroSize = sizeof(m_testGyroValues) / sizeof(double);
   double magnitudeJoystick, directionJoystick, rotateJoystick;
