@@ -14,6 +14,7 @@ resources:
     options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
   - container: staticlibcpp
     image: wpilib/toolchain-builder:14.04
+    options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
 
 stages:
 - stage: Build
