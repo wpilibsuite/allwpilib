@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -157,9 +157,7 @@ SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
   HAL_InitializeSPI(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  static int instances = 0;
-  instances++;
-  HAL_Report(HALUsageReporting::kResourceType_SPI, instances);
+  HAL_Report(HALUsageReporting::kResourceType_SPI, port);
 }
 
 SPI::~SPI() { HAL_CloseSPI(m_port); }
