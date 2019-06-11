@@ -41,7 +41,7 @@ stages:
             jdkArchitectureOption: 'x64'
             jdkSourceOption: 'localDirectory'
             jdkFile: 'openjdk-11.0.1_linux-x64_bin.tar.gz'
-            jdkDestinationDirectory: '/usr/lib/jvm'
+            jdkDestinationDirectory: '~/jdk'
 
         - script: |
             sudo apt-get update -y &&
