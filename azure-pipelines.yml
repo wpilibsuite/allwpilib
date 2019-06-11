@@ -31,7 +31,6 @@ stages:
             sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
           displayName: Set up sudo
         - script: |
-            sudo add-apt-repository ppa:openjdk-r/ppa
             sudo apt-get update -y &&
             sudo apt-get upgrade -y &&
             sudo apt-get dist-upgrade -y &&
@@ -41,7 +40,9 @@ stages:
             sudo apt-get install gcc-9 g++-9 -y &&
             sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9 &&
             sudo update-alternatives --config gcc
-            sudo apt install openjdk-11-jdk
+            curl -s "https://get.sdkman.io" | bash
+            source "$HOME/.sdkman/bin/sdkman-init.sh"
+            sdk install java
           displayName: 'Install Dependencies'
 
         - task: Gradle@2
