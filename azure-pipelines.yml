@@ -32,6 +32,7 @@ stages:
           displayName: Set up sudo
 
         - script: |
+            sudo apt-get update -y && sudo apt-get install curl
             curl -SL https://download.java.net/java/GA/jdk11/13/GPL/openjdk-11.0.1_linux-x64_bin.tar.gz
             ls
           displayName: 'Download JDK'  
