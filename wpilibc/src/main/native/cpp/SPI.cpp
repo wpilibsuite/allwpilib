@@ -183,7 +183,7 @@ SPI& SPI::operator=(SPI&& rhs) {
   return *this;
 }
 
-void SPI::SetClockRate(double hz) { HAL_SetSPISpeed(m_port, hz); }
+void SPI::SetClockRate(int hz) { HAL_SetSPISpeed(m_port, hz); }
 
 void SPI::SetMSBFirst() {
   m_msbFirst = true;
