@@ -19,6 +19,8 @@
  * IN THE SOFTWARE.
  */
 
+#define _CRT_NONSTDC_NO_WARNINGS
+
 #include <assert.h>
 #include <stdlib.h>
 #include <direct.h>

@@ -1310,7 +1310,7 @@ template <typename R> struct result_pair {
   ValueOfRange<R> &value() { return *Iter; }
 
 private:
-  std::size_t Index = std::numeric_limits<std::size_t>::max();
+  std::size_t Index = (std::numeric_limits<std::size_t>::max)();
   IterOfRange<R> Iter;
 };
 
@@ -1325,7 +1325,7 @@ class enumerator_iter
 
 public:
   explicit enumerator_iter(IterOfRange<R> EndIter)
-      : Result(std::numeric_limits<size_t>::max(), EndIter) {}
+      : Result((std::numeric_limits<size_t>::max)(), EndIter) {}
 
   enumerator_iter(std::size_t Index, IterOfRange<R> Iter)
       : Result(Index, Iter) {}
@@ -1334,7 +1334,7 @@ public:
   const result_type &operator*() const { return Result; }
 
   enumerator_iter<R> &operator++() {
-    assert(Result.Index != std::numeric_limits<size_t>::max());
+    assert(Result.Index != (std::numeric_limits<size_t>::max)());
     ++Result.Iter;
     ++Result.Index;
     return *this;

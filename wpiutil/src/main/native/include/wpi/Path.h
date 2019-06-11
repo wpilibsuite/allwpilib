@@ -22,6 +22,12 @@
 #include <iterator>
 #include <system_error>
 
+#ifdef _WIN32
+// Disable iterator deprecation warning
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+
 namespace wpi {
 namespace sys {
 namespace path {
@@ -459,5 +465,9 @@ std::error_code widenPath(const Twine &Path8, SmallVectorImpl<wchar_t> &Path16);
 } // end namespace path
 } // end namespace sys
 } // end namespace wpi
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
 
 #endif

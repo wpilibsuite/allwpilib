@@ -23,7 +23,7 @@ if (NOT WITHOUT_JAVA)
 
     set_property(TARGET wpilibj_jar PROPERTY FOLDER "java")
 
-    if (MSVC)
+    if (MSVC OR FLAT_INSTALL_WPILIB)
         set (wpilibj_config_dir ${wpilib_dest})
     else()
         set (wpilibj_config_dir share/wpilibj)

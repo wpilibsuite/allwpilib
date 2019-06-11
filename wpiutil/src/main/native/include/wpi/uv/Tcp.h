@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -130,7 +130,8 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
    * @return True in case of success, false otherwise.
    */
   bool SetKeepAlive(bool enable, Time time = Time{0}) {
-    return uv_tcp_keepalive(GetRaw(), enable, time.count()) == 0;
+    return uv_tcp_keepalive(GetRaw(), enable,
+                            static_cast<unsigned>(time.count())) == 0;
   }
 
   /**

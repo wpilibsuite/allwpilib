@@ -8,10 +8,13 @@ nativeUtils {
       wpiVersion = "-1"
       niLibVersion = "2019.12.1"
       opencvVersion = "3.4.4-5"
-      googleTestVersion = "1.8.0-4-4e4df22"
+      googleTestVersion = "1.8.1-1-f71fb4f"
     }
   }
 }
+
+nativeUtils.wpi.addWarnings()
+nativeUtils.wpi.addWarningsAsErrors()
 
 model {
     components {
