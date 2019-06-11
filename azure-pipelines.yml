@@ -30,6 +30,19 @@ stages:
             /tmp/docker exec -t -u 0 ci-container \
             sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
           displayName: Set up sudo
+
+        - script: |
+            curl -SL https://download.java.net/java/GA/jdk11/13/GPL/openjdk-11.0.1_linux-x64_bin.tar.gz
+            ls
+          displayName: 'Download JDK'  
+
+        - task: JavaToolInstaller@0
+          inputs:
+            jdkArchitectureOption: 'x64'
+            jdkSourceOption: 'localDirectory'
+            jdkFile: 'openjdk-11.0.1_linux-x64_bin.tar.gz'
+            jdkDestinationDirectory: '/usr/lib/jvm'
+
         - script: |
             sudo apt-get update -y &&
             sudo apt-get upgrade -y &&
@@ -40,9 +53,6 @@ stages:
             sudo apt-get install gcc-9 g++-9 -y &&
             sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9 &&
             sudo update-alternatives --config gcc
-            curl -s "https://get.sdkman.io" | bash
-            source "$HOME/.sdkman/bin/sdkman-init.sh"
-            sdk install java
           displayName: 'Install Dependencies'
 
         - task: Gradle@2
