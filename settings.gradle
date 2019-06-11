@@ -5,6 +5,9 @@ pluginManagement {
     }
 }
 
+Properties props = System.getProperties();
+props.setProperty("org.gradle.internal.native.headers.unresolved.dependencies.ignore", "true");
+
 include 'wpiutil'
 include 'ntcore'
 include 'hal'
