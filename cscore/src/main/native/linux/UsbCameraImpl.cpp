@@ -447,8 +447,7 @@ void UsbCameraImpl::DeviceDisconnect() {
   if (fd < 0) return;  // already disconnected
 
   // Unmap buffers
-  for (int i = 0; i < kNumBuffers; ++i)
-    m_buffers[i] = UsbCameraBuffer{};
+  for (int i = 0; i < kNumBuffers; ++i) m_buffers[i] = UsbCameraBuffer{};
 
   // Close device
   close(fd);
