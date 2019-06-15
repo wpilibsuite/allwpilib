@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #include "wpi/uv/Loop.h"
+
+#include "wpi/uv/AsyncExecutor.h"
 
 using namespace wpi::uv;
 
@@ -44,6 +46,10 @@ std::shared_ptr<Loop> Loop::GetDefault() {
 }
 
 void Loop::Close() {
+  if (m_execHandle) {
+    m_execHandle->Close();
+    Run(kOnce);
+  }
   int err = uv_loop_close(m_loop);
   if (err < 0) ReportError(err);
 }
@@ -61,4 +67,14 @@ void Loop::Walk(std::function<void(Handle&)> callback) {
 void Loop::Fork() {
   int err = uv_loop_fork(m_loop);
   if (err < 0) ReportError(err);
+}
+
+AsyncExecutor Loop::GetExecutor() {
+  std::scoped_lock lock(m_executorMutex);
+  if (!m_executor) {
+    m_execHandle = detail::AsyncExecutorHandle::Create(*this);
+    m_execHandle->Unreference();
+    m_executor = std::make_unique<AsyncExecutor>(m_execHandle->GetExecutor());
+  }
+  return *m_executor;
 }

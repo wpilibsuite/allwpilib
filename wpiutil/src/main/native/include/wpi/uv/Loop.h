@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,11 +18,17 @@
 #include <utility>
 
 #include "wpi/Signal.h"
+#include "wpi/mutex.h"
 #include "wpi/uv/Error.h"
 
 namespace wpi {
 namespace uv {
 
+namespace detail {
+class AsyncExecutorHandle;
+}  // namespace detail
+
+class AsyncExecutor;
 class Handle;
 
 /**
@@ -206,6 +212,12 @@ class Loop final : public std::enable_shared_from_this<Loop> {
   void Fork();
 
   /**
+   * Get an asynchronous executor for use with wpi::async() or
+   * wpi::future::via() to run a continuation on the event loop.
+   */
+  AsyncExecutor GetExecutor();
+
+  /**
    * Get the underlying event loop data structure.
    *
    * @return The underlying event loop data structure.
@@ -249,6 +261,9 @@ class Loop final : public std::enable_shared_from_this<Loop> {
   uv_loop_t* m_loop;
   uv_loop_t m_loopStruct;
   std::atomic<std::thread::id> m_tid;
+  wpi::mutex m_executorMutex;
+  std::shared_ptr<detail::AsyncExecutorHandle> m_execHandle;
+  std::unique_ptr<AsyncExecutor> m_executor;
 };
 
 }  // namespace uv

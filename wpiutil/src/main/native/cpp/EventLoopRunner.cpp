@@ -10,6 +10,7 @@
 #include "wpi/SmallVector.h"
 #include "wpi/condition_variable.h"
 #include "wpi/mutex.h"
+#include "wpi/uv/AsyncExecutor.h"
 #include "wpi/uv/AsyncFunction.h"
 #include "wpi/uv/Loop.h"
 
@@ -27,7 +28,7 @@ class EventLoopRunner::Thread : public SafeThread {
     m_doExec = UvExecFunc::Create(
         m_loop, [loop = m_loop.get()](auto out, LoopFunc func) {
           func(*loop);
-          out.set_value();
+          std::move(out).set_value();
         });
   }
 
@@ -72,10 +73,15 @@ void EventLoopRunner::ExecSync(LoopFunc func) {
       f = doExec->Call(func);
     }
   }
-  if (f.valid()) f.wait();
+  if (f.valid()) wpi::future_wait(f);
 }
 
 std::shared_ptr<uv::Loop> EventLoopRunner::GetLoop() {
   if (auto thr = m_owner.GetThread()) return thr->m_loop;
   return nullptr;
+}
+
+uv::AsyncExecutor EventLoopRunner::GetExecutor() {
+  if (auto thr = m_owner.GetThread()) return thr->m_loop->GetExecutor();
+  return uv::AsyncExecutor{nullptr};
 }

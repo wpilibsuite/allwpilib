@@ -51,17 +51,21 @@ void PromiseFactory<void>::SetValue(uint64_t request) {
   auto it = std::find_if(m_thens.begin(), m_thens.end(),
                          [=](const auto& x) { return x.request == request; });
   if (it != m_thens.end()) {
+    void* outFactory = it->outFactory;
     uint64_t outRequest = it->outRequest;
+    std::shared_ptr<void> executor = std::move(it->executor);
     ThenFunction func = std::move(it->func);
     m_thens.erase(it);
     lock.unlock();
-    return func(outRequest);
+    return func(outFactory, outRequest, std::move(executor));
   }
   m_results.emplace_back(request);
   Notify();
 }
 
-void PromiseFactory<void>::SetThen(uint64_t request, uint64_t outRequest,
+void PromiseFactory<void>::SetThen(uint64_t request, void* outFactory,
+                                   uint64_t outRequest,
+                                   std::shared_ptr<void> executor,
                                    ThenFunction func) {
   std::unique_lock lock(GetResultMutex());
   auto it = std::find_if(m_results.begin(), m_results.end(),
@@ -69,9 +73,10 @@ void PromiseFactory<void>::SetThen(uint64_t request, uint64_t outRequest,
   if (it != m_results.end()) {
     m_results.erase(it);
     lock.unlock();
-    return func(outRequest);
+    return func(outFactory, outRequest, std::move(executor));
   }
-  m_thens.emplace_back(request, outRequest, func);
+  m_thens.emplace_back(request, outFactory, outRequest, std::move(executor),
+                       std::move(func));
 }
 
 bool PromiseFactory<void>::IsReady(uint64_t request) noexcept {

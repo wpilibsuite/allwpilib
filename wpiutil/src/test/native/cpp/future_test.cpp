@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,71 +14,143 @@
 namespace wpi {
 
 TEST(Future, Then) {
-  promise<bool> inPromise;
+  inline_executor exe;
+  auto [inPromise, inFuture] = make_promise_contract<bool>(exe);
   future<int> outFuture =
-      inPromise.get_future().then([](bool v) { return v ? 5 : 6; });
+      std::move(inFuture).then([](bool v) { return v ? 5 : 6; });
 
-  inPromise.set_value(true);
-  ASSERT_EQ(outFuture.get(), 5);
+  std::move(inPromise).set_value(true);
+  ASSERT_EQ(future_get(std::move(outFuture)), 5);
 }
 
 TEST(Future, ThenSame) {
-  promise<bool> inPromise;
-  future<bool> outFuture =
-      inPromise.get_future().then([](bool v) { return !v; });
+  inline_executor exe;
+  auto [inPromise, inFuture] = make_promise_contract<bool>(exe);
+  future<bool> outFuture = std::move(inFuture).then([](bool v) { return !v; });
 
-  inPromise.set_value(true);
-  ASSERT_EQ(outFuture.get(), false);
+  std::move(inPromise).set_value(true);
+  ASSERT_EQ(future_get(std::move(outFuture)), false);
 }
 
 TEST(Future, ThenFromVoid) {
-  promise<void> inPromise;
-  future<int> outFuture = inPromise.get_future().then([] { return 5; });
+  inline_executor exe;
+  auto [inPromise, inFuture] = make_promise_contract<void>(exe);
+  future<int> outFuture = std::move(inFuture).then([] { return 5; });
 
-  inPromise.set_value();
-  ASSERT_EQ(outFuture.get(), 5);
+  std::move(inPromise).set_value();
+  ASSERT_EQ(future_get(std::move(outFuture)), 5);
 }
 
 TEST(Future, ThenToVoid) {
-  promise<bool> inPromise;
-  future<void> outFuture = inPromise.get_future().then([](bool v) {});
+  inline_executor exe;
+  auto [inPromise, inFuture] = make_promise_contract<bool>(exe);
+  future<void> outFuture = std::move(inFuture).then([](bool v) {});
 
-  inPromise.set_value(true);
+  std::move(inPromise).set_value(true);
   ASSERT_TRUE(outFuture.is_ready());
 }
 
 TEST(Future, ThenVoidVoid) {
-  promise<void> inPromise;
-  future<void> outFuture = inPromise.get_future().then([] {});
+  inline_executor exe;
+  auto [inPromise, inFuture] = make_promise_contract<void>(exe);
+  future<void> outFuture = std::move(inFuture).then([] {});
 
-  inPromise.set_value();
+  std::move(inPromise).set_value();
   ASSERT_TRUE(outFuture.is_ready());
 }
 
 TEST(Future, Implicit) {
-  promise<bool> inPromise;
-  future<int> outFuture = inPromise.get_future();
+  inline_executor exe;
+  auto [inPromise, inFuture] = make_promise_contract<bool>(exe);
+  future<int> outFuture = std::move(inFuture);
 
-  inPromise.set_value(true);
-  ASSERT_EQ(outFuture.get(), 1);
+  std::move(inPromise).set_value(true);
+  ASSERT_EQ(future_get(std::move(outFuture)), 1);
 }
 
 TEST(Future, MoveSame) {
-  promise<bool> inPromise;
-  future<bool> outFuture1 = inPromise.get_future();
+  auto [inPromise, outFuture1] = make_promise_contract<bool>();
   future<bool> outFuture(std::move(outFuture1));
 
-  inPromise.set_value(true);
-  ASSERT_EQ(outFuture.get(), true);
+  std::move(inPromise).set_value(true);
+  ASSERT_EQ(future_get(std::move(outFuture)), true);
 }
 
 TEST(Future, MoveVoid) {
-  promise<void> inPromise;
-  future<void> outFuture1 = inPromise.get_future();
+  auto [inPromise, outFuture1] = make_promise_contract<void>();
   future<void> outFuture(std::move(outFuture1));
 
-  inPromise.set_value();
+  std::move(inPromise).set_value();
   ASSERT_TRUE(outFuture.is_ready());
+}
+
+TEST(Future, ThenContinuationVoid) {
+  inline_executor exe;
+  auto [inPromise, inFuture] = make_promise_contract<void>(exe);
+  wpi::promise<void> inPromise2;
+  int gotThen = 0;
+
+  future<void> outFuture =
+      std::move(inFuture)
+          .then([&] {
+            wpi::continuable_future<void, inline_executor> inFuture2;
+            std::tie(inPromise2, inFuture2) = make_promise_contract<void>(exe);
+            return inFuture2;
+          })
+          .then([&] { ++gotThen; });
+
+  ASSERT_EQ(gotThen, 0);
+
+  std::move(inPromise).set_value();
+  ASSERT_FALSE(outFuture.is_ready());
+  ASSERT_EQ(gotThen, 0);
+
+  std::move(inPromise2).set_value();
+  ASSERT_TRUE(outFuture.is_ready());
+  ASSERT_EQ(gotThen, 1);
+}
+
+TEST(Future, ThenContinuation) {
+  inline_executor exe;
+  auto [inPromise, inFuture] = make_promise_contract<double>(exe);
+  auto [inPromise2, inFuture2] = make_promise_contract<int>();
+  int gotThen = 0;
+
+  future<float> outFuture = std::move(inFuture)
+                                .then([&, f = std::ref(inFuture2)](double) {
+                                  return std::move(f.get());
+                                })
+                                .via(exe)
+                                .then([&](int val) {
+                                  ++gotThen;
+                                  return val;
+                                });
+
+  ASSERT_EQ(gotThen, 0);
+
+  std::move(inPromise2).set_value(5);
+  ASSERT_FALSE(outFuture.is_ready());
+  ASSERT_EQ(gotThen, 0);
+
+  std::move(inPromise).set_value(0.3);
+  ASSERT_TRUE(outFuture.is_ready());
+  ASSERT_EQ(static_cast<int>(wpi::future_get(std::move(outFuture))), 5);
+  ASSERT_EQ(gotThen, 1);
+}
+
+TEST(Future, Async) {
+  inline_executor exe;
+  future<int> f = wpi::async(exe, [] { return 5; });
+  ASSERT_EQ(wpi::future_get(std::move(f)), 5);
+}
+
+TEST(Future, AsyncContinuation) {
+  inline_executor exe;
+  auto [inPromise, inFuture] = make_promise_contract<int>();
+  future<int> f =
+      wpi::async(exe, [f = std::ref(inFuture)] { return std::move(f.get()); });
+  std::move(inPromise).set_value(5);
+  ASSERT_EQ(wpi::future_get(std::move(f)), 5);
 }
 
 }  // namespace wpi

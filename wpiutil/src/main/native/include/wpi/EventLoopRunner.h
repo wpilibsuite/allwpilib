@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -54,6 +54,12 @@ class EventLoopRunner {
    * @return The loop
    */
   std::shared_ptr<uv::Loop> GetLoop();
+
+  /**
+   * Get an asynchronous executor for use with wpi::async() or
+   * wpi::future::via() to run a continuation on the event loop.
+   */
+  uv::AsyncExecutor GetExecutor();
 
  private:
   class Thread;
