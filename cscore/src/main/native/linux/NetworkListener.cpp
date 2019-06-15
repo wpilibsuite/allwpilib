@@ -132,8 +132,9 @@ void NetworkListener::Impl::Thread::Main() {
       break;  // XXX: is this the right thing to do here?
     }
     if (len == 0) continue;  // EOF?
+    unsigned int ulen = static_cast<unsigned int>(len);
     for (struct nlmsghdr* nh = reinterpret_cast<struct nlmsghdr*>(buf);
-         NLMSG_OK(nh, len); nh = NLMSG_NEXT(nh, len)) {
+         NLMSG_OK(nh, ulen); nh = NLMSG_NEXT(nh, ulen)) {
       if (nh->nlmsg_type == NLMSG_DONE) break;
       if (nh->nlmsg_type == RTM_NEWLINK || nh->nlmsg_type == RTM_DELLINK ||
           nh->nlmsg_type == RTM_NEWADDR || nh->nlmsg_type == RTM_DELADDR) {
