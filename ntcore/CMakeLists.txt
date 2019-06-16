@@ -1,5 +1,7 @@
 project(ntcore)
 
+include(CompileWarnings)
+
 file(GLOB
     ntcore_native_src src/main/native/cpp/*.cpp
     ntcore_native_src src/main/native/cpp/networktables/*.cpp
@@ -9,6 +11,7 @@ set_target_properties(ntcore PROPERTIES DEBUG_POSTFIX "d")
 target_include_directories(ntcore PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/ntcore>)
+wpilib_target_warnings(ntcore)
 target_link_libraries(ntcore PUBLIC wpiutil)
 
 set_property(TARGET ntcore PROPERTY FOLDER "libraries")
@@ -52,6 +55,7 @@ if (NOT WITHOUT_JAVA)
     set_property(TARGET ntcore_jar PROPERTY FOLDER "java")
 
     add_library(ntcorejni ${ntcore_jni_src})
+    wpilib_target_warnings(ntcorejni)
     target_link_libraries(ntcorejni PUBLIC ntcore wpiutil)
 
     set_property(TARGET ntcorejni PROPERTY FOLDER "libraries")
@@ -70,4 +74,14 @@ if (NOT WITHOUT_JAVA)
 
     install(TARGETS ntcorejni EXPORT ntcorejni DESTINATION "${main_lib_dest}")
 
+endif()
+
+if (WITH_TESTS)
+    file(GLOB_RECURSE ntcore_test_src src/test/native/cpp/*.cpp)
+    add_executable(ntcore_test ${ntcore_test_src})
+    wpilib_target_warnings(ntcore_test)
+    target_include_directories(ntcore_test PRIVATE src/main/native/cpp)
+    target_link_libraries(ntcore_test ntcore gmock_main)
+    #gtest_discover_tests(ntcore_test)
+    add_test(NAME ntcore COMMAND ntcore_test)
 endif()

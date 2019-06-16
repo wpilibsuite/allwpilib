@@ -8,7 +8,7 @@ endif()
 
 
 project(allwpilib)
-cmake_minimum_required(VERSION 3.3.0)
+cmake_minimum_required(VERSION 3.10.0)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
 
 INCLUDE(CPack)
@@ -48,6 +48,7 @@ option(WITHOUT_JAVA "don't include java and JNI in the build" OFF)
 option(BUILD_SHARED_LIBS "build with shared libs (needed for JNI)" ON)
 option(WITHOUT_CSCORE "Don't build cscore (removes OpenCV requirement)" OFF)
 option(WITHOUT_ALLWPILIB "Don't build allwpilib (removes OpenCV requirement)" ON)
+option(WITH_TESTS "build unit tests (requires internet connection)" OFF)
 option(USE_EXTERNAL_HAL "Use a separately built HAL" OFF)
 set(EXTERNAL_HAL_FILE "" CACHE FILEPATH "Location to look for an external HAL CMake File")
 option(USE_VCPKG_LIBUV "Use vcpkg libuv" OFF)
@@ -95,6 +96,12 @@ endif()
 
 set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
 set(SELF_DIR "$\{SELF_DIR\}")
+
+if (WITH_TESTS)
+    enable_testing()
+    add_subdirectory(googletest)
+    include(GoogleTest)
+endif()
 
 add_subdirectory(wpiutil)
 add_subdirectory(ntcore)

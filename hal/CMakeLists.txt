@@ -1,5 +1,6 @@
 project(hal)
 
+include(CompileWarnings)
 
 file(STRINGS src/generate/Instances.txt RAW_INSTANCES)
 file(STRINGS src/generate/ResourceType.txt RAW_RESOURCE_TYPES)
@@ -28,6 +29,7 @@ file(GLOB
     hal_sim_native_src src/main/native/sim/*.cpp
     hal_sim_native_src src/main/native/sim/mockdata/*.cpp)
 add_library(hal ${hal_shared_native_src})
+wpilib_target_warnings(hal)
 set_target_properties(hal PROPERTIES DEBUG_POSTFIX "d")
 
 if(USE_EXTERNAL_HAL)
@@ -105,6 +107,7 @@ if (NOT WITHOUT_JAVA)
 
     set_target_properties(haljni PROPERTIES OUTPUT_NAME "wpiHaljni")
 
+    wpilib_target_warnings(haljni)
     target_link_libraries(haljni PUBLIC hal wpiutil)
 
     set_property(TARGET haljni PROPERTY FOLDER "libraries")
@@ -123,4 +126,13 @@ if (NOT WITHOUT_JAVA)
 
     install(TARGETS haljni EXPORT haljni DESTINATION "${main_lib_dest}")
 
+endif()
+
+if (WITH_TESTS)
+    file(GLOB_RECURSE hal_test_src src/test/native/cpp/*.cpp)
+    add_executable(hal_test ${hal_test_src})
+    wpilib_target_warnings(hal_test)
+    target_link_libraries(hal_test hal gtest)
+    #gtest_discover_tests(hal_test)
+    add_test(NAME hal COMMAND hal_test)
 endif()

@@ -1,6 +1,7 @@
 project(cscore)
 
 include(SubDirList)
+include(CompileWarnings)
 
 find_package( OpenCV REQUIRED )
 
@@ -21,14 +22,15 @@ if(NOT MSVC)
     endif()
 else()
     target_sources(cscore PRIVATE ${cscore_windows_src})
-    target_compile_options(cscore PUBLIC -DNOMINMAX)
-    target_compile_options(cscore PRIVATE -D_CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(cscore PUBLIC -DNOMINMAX)
+    target_compile_definitions(cscore PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 target_include_directories(cscore PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/cscore>)
 target_include_directories(cscore PRIVATE src/main/native/cpp)
+wpilib_target_warnings(cscore)
 target_link_libraries(cscore PUBLIC wpiutil ${OpenCV_LIBS})
 
 set_property(TARGET cscore PROPERTY FOLDER "libraries")
@@ -51,6 +53,7 @@ foreach(example ${cscore_examples})
     file(GLOB cscore_example_src examples/${example}/*.cpp)
     if(cscore_example_src)
         add_executable(cscore_${example} ${cscore_example_src})
+        wpilib_target_warnings(cscore_${example})
         target_link_libraries(cscore_${example} cscore)
         set_property(TARGET cscore_${example} PROPERTY FOLDER "examples")
     endif()
@@ -103,6 +106,7 @@ if (NOT WITHOUT_JAVA)
     set_property(TARGET cscore_jar PROPERTY FOLDER "java")
 
     add_library(cscorejni ${cscore_jni_src})
+    wpilib_target_warnings(cscorejni)
     target_link_libraries(cscorejni PUBLIC cscore wpiutil ${OpenCV_LIBS})
 
     set_property(TARGET cscorejni PROPERTY FOLDER "libraries")
@@ -121,4 +125,13 @@ if (NOT WITHOUT_JAVA)
 
     install(TARGETS cscorejni EXPORT cscorejni DESTINATION "${main_lib_dest}")
 
+endif()
+
+if (WITH_TESTS)
+    file(GLOB_RECURSE cscore_test_src src/test/native/cpp/*.cpp)
+    add_executable(cscore_test ${cscore_test_src})
+    wpilib_target_warnings(cscore_test)
+    target_link_libraries(cscore_test cscore gmock)
+    #gtest_discover_tests(cscore_test)
+    add_test(NAME cscore COMMAND cscore_test)
 endif()
