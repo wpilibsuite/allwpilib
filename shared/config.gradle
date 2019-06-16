@@ -16,6 +16,12 @@ nativeUtils {
 nativeUtils.wpi.addWarnings()
 nativeUtils.wpi.addWarningsAsErrors()
 
+nativeUtils.setSinglePrintPerPlatform()
+
+toolchainsPlugin.crossCompilers.named(nativeUtils.wpi.platforms.roborio) {
+    optional.set(true)
+}
+
 model {
     components {
         all {

@@ -151,7 +151,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Ptoolchain-optional-roboRio -PskipPMD'
+          options: '-PskipPMD'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
@@ -183,7 +183,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Ptoolchain-optional-roboRio -Pbuildwin32 -PskipPMD'
+          options: '-PskipPMD'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
       - task: PublishPipelineArtifact@0
@@ -214,7 +214,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Ptoolchain-optional-roboRio'
+          #options: ''
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 

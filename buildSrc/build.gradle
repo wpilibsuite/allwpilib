@@ -5,5 +5,5 @@ repositories {
     }
 }
 dependencies {
-    compile "edu.wpi.first:native-utils:2019.5.10"
+    compile "edu.wpi.first:native-utils:2019.5.11"
 }
