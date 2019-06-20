@@ -27,6 +27,7 @@ class SafeThread {
   mutable wpi::mutex m_mutex;
   std::atomic_bool m_active{true};
   wpi::condition_variable m_cond;
+  std::thread::id m_threadId;
 };
 
 namespace detail {
@@ -108,6 +109,11 @@ class SafeThreadOwner : public detail::SafeThreadOwnerBase {
   using Proxy = typename detail::SafeThreadProxy<T>;
   Proxy GetThread() const {
     return Proxy(detail::SafeThreadOwnerBase::GetThread());
+  }
+
+  std::shared_ptr<T> GetThreadSharedPtr() const {
+    return std::static_pointer_cast<T>(
+        detail::SafeThreadOwnerBase::GetThread());
   }
 };
 
