@@ -81,7 +81,8 @@ detail::SafeThreadOwnerBase::GetNativeThreadHandle() {
   return m_stdThread.native_handle();
 }
 
-std::shared_ptr<SafeThread> detail::SafeThreadOwnerBase::GetThread() const {
+std::shared_ptr<SafeThread> detail::SafeThreadOwnerBase::GetThreadSharedPtr()
+    const {
   std::lock_guard<wpi::mutex> lock(m_mutex);
   return m_thread.lock();
 }

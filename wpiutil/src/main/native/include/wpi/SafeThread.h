@@ -84,7 +84,7 @@ class SafeThreadOwnerBase {
 
  protected:
   void Start(std::shared_ptr<SafeThread> thr);
-  std::shared_ptr<SafeThread> GetThread() const;
+  std::shared_ptr<SafeThread> GetThreadSharedPtr() const;
 
  private:
   mutable wpi::mutex m_mutex;
@@ -108,12 +108,12 @@ class SafeThreadOwner : public detail::SafeThreadOwnerBase {
 
   using Proxy = typename detail::SafeThreadProxy<T>;
   Proxy GetThread() const {
-    return Proxy(detail::SafeThreadOwnerBase::GetThread());
+    return Proxy(detail::SafeThreadOwnerBase::GetThreadSharedPtr());
   }
 
   std::shared_ptr<T> GetThreadSharedPtr() const {
     return std::static_pointer_cast<T>(
-        detail::SafeThreadOwnerBase::GetThread());
+        detail::SafeThreadOwnerBase::GetThreadSharedPtr());
   }
 };
 
