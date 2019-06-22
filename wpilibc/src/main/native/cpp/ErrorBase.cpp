@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -132,8 +132,8 @@ void ErrorBase::SetGlobalError(Error::Code code,
     std::lock_guard<wpi::mutex> mutex(globalErrorsMutex);
 
     // Set the current error information for this object.
-    globalErrors.emplace(code, contextMessage, filename, function, lineNumber,
-                         nullptr);
+    globalErrors.emplace(
+        Error(code, contextMessage, filename, function, lineNumber, nullptr));
   }
 }
 
@@ -142,8 +142,8 @@ void ErrorBase::SetGlobalWPIError(const wpi::Twine& errorMessage,
                                   wpi::StringRef filename,
                                   wpi::StringRef function, int lineNumber) {
   std::lock_guard<wpi::mutex> mutex(globalErrorsMutex);
-  globalErrors.emplace(-1, errorMessage + ": " + contextMessage, filename,
-                       function, lineNumber, nullptr);
+  globalErrors.emplace(Error(-1, errorMessage + ": " + contextMessage, filename,
+                             function, lineNumber, nullptr));
 }
 
 const Error& ErrorBase::GetGlobalError() {
