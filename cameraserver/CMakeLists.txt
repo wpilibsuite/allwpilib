@@ -1,6 +1,7 @@
 project(cameraserver)
 
 include(CompileWarnings)
+include(AddTest)
 
 find_package( OpenCV REQUIRED )
 
@@ -63,10 +64,5 @@ target_link_libraries(multiCameraServer cameraserver)
 
 set_property(TARGET multiCameraServer PROPERTY FOLDER "examples")
 
-if (WITH_TESTS)
-    file(GLOB_RECURSE cameraserver_test_src src/test/native/cpp/*.cpp)
-    add_executable(cameraserver_test ${cameraserver_test_src})
-    wpilib_target_warnings(cameraserver_test)
-    target_link_libraries(cameraserver_test cameraserver gtest)
-    add_test(NAME cameraserver COMMAND cameraserver_test)
-endif()
+wpilib_add_test(cameraserver src/test/native/cpp)
+target_link_libraries(cameraserver_test cameraserver gtest)

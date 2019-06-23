@@ -1,6 +1,7 @@
 project(hal)
 
 include(CompileWarnings)
+include(AddTest)
 
 file(STRINGS src/generate/Instances.txt RAW_INSTANCES)
 file(STRINGS src/generate/ResourceType.txt RAW_RESOURCE_TYPES)
@@ -128,10 +129,5 @@ if (NOT WITHOUT_JAVA)
 
 endif()
 
-if (WITH_TESTS)
-    file(GLOB_RECURSE hal_test_src src/test/native/cpp/*.cpp)
-    add_executable(hal_test ${hal_test_src})
-    wpilib_target_warnings(hal_test)
-    target_link_libraries(hal_test hal gtest)
-    add_test(NAME hal COMMAND hal_test)
-endif()
+wpilib_add_test(hal src/test/native/cpp)
+target_link_libraries(hal_test hal gtest)

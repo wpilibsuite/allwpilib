@@ -1,6 +1,7 @@
 project(wpilibc)
 
 include(CompileWarnings)
+include(AddTest)
 
 find_package( OpenCV REQUIRED )
 
@@ -33,16 +34,11 @@ configure_file(wpilibc-config.cmake.in ${CMAKE_BINARY_DIR}/wpilibc-config.cmake 
 install(FILES ${CMAKE_BINARY_DIR}/wpilibc-config.cmake DESTINATION ${wpilibc_config_dir})
 install(EXPORT wpilibc DESTINATION ${wpilibc_config_dir})
 
-if (WITH_TESTS)
-    file(GLOB_RECURSE wpilibc_test_src src/test/native/cpp/*.cpp src/test/native/c/*.c)
-    add_executable(wpilibc_test ${wpilibc_test_src})
-    target_include_directories(wpilibc_test PRIVATE src/test/native/include)
-    target_link_libraries(wpilibc_test wpilibc gmock_main)
-    wpilib_target_warnings(wpilibc_test)
-    if (NOT MSVC)
-        target_compile_options(wpilibc_test PRIVATE -Wno-error)
-    else()
-        target_compile_options(wpilibc_test PRIVATE /WX-)
-    endif()
-    add_test(NAME wpilibc COMMAND wpilibc_test)
+wpilib_add_test(wpilibc src/test/native/cpp)
+target_include_directories(wpilibc_test PRIVATE src/test/native/include)
+target_link_libraries(wpilibc_test wpilibc gmock_main)
+if (NOT MSVC)
+    target_compile_options(wpilibc_test PRIVATE -Wno-error)
+else()
+    target_compile_options(wpilibc_test PRIVATE /WX-)
 endif()

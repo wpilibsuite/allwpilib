@@ -1,6 +1,7 @@
 project(ntcore)
 
 include(CompileWarnings)
+include(AddTest)
 
 file(GLOB
     ntcore_native_src src/main/native/cpp/*.cpp
@@ -76,11 +77,6 @@ if (NOT WITHOUT_JAVA)
 
 endif()
 
-if (WITH_TESTS)
-    file(GLOB_RECURSE ntcore_test_src src/test/native/cpp/*.cpp)
-    add_executable(ntcore_test ${ntcore_test_src})
-    wpilib_target_warnings(ntcore_test)
-    target_include_directories(ntcore_test PRIVATE src/main/native/cpp)
-    target_link_libraries(ntcore_test ntcore gmock_main)
-    add_test(NAME ntcore COMMAND ntcore_test)
-endif()
+wpilib_add_test(ntcore src/test/native/cpp)
+target_include_directories(ntcore_test PRIVATE src/main/native/cpp)
+target_link_libraries(ntcore_test ntcore gmock_main)

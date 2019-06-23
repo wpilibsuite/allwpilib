@@ -2,6 +2,7 @@ project(cscore)
 
 include(SubDirList)
 include(CompileWarnings)
+include(AddTest)
 
 find_package( OpenCV REQUIRED )
 
@@ -127,10 +128,5 @@ if (NOT WITHOUT_JAVA)
 
 endif()
 
-if (WITH_TESTS)
-    file(GLOB_RECURSE cscore_test_src src/test/native/cpp/*.cpp)
-    add_executable(cscore_test ${cscore_test_src})
-    wpilib_target_warnings(cscore_test)
-    target_link_libraries(cscore_test cscore gmock)
-    add_test(NAME cscore COMMAND cscore_test)
-endif()
+wpilib_add_test(cscore src/test/native/cpp)
+target_link_libraries(cscore_test cscore gmock)
