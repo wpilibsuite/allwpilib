@@ -26,6 +26,7 @@ namespace {
 struct GlobalErrors {
   wpi::mutex mutex;
   std::set<Error> errors;
+  const Error* lastError{nullptr};
 
   static GlobalErrors& GetInstance();
   static void Insert(const Error& error);
@@ -41,13 +42,13 @@ GlobalErrors& GlobalErrors::GetInstance() {
 void GlobalErrors::Insert(const Error& error) {
   GlobalErrors& inst = GetInstance();
   std::lock_guard<wpi::mutex> lock(inst.mutex);
-  inst.errors.insert(error);
+  inst.lastError = &(*inst.errors.insert(error).first);
 }
 
 void GlobalErrors::Insert(Error&& error) {
   GlobalErrors& inst = GetInstance();
   std::lock_guard<wpi::mutex> lock(inst.mutex);
-  inst.errors.insert(std::move(error));
+  inst.lastError = &(*inst.errors.insert(std::move(error)).first);
 }
 
 ErrorBase::ErrorBase() { HAL_Initialize(500, 0); }
@@ -163,8 +164,24 @@ void ErrorBase::SetGlobalWPIError(const wpi::Twine& errorMessage,
                              function, lineNumber, nullptr));
 }
 
-const Error& ErrorBase::GetGlobalError() {
+Error ErrorBase::GetGlobalError() {
   auto& inst = GlobalErrors::GetInstance();
   std::lock_guard<wpi::mutex> mutex(inst.mutex);
-  return *inst.errors.begin();
+  if (!inst.lastError) return Error{};
+  return *inst.lastError;
+}
+
+std::vector<Error> ErrorBase::GetGlobalErrors() {
+  auto& inst = GlobalErrors::GetInstance();
+  std::lock_guard<wpi::mutex> mutex(inst.mutex);
+  std::vector<Error> rv;
+  for (auto&& error : inst.errors) rv.push_back(error);
+  return rv;
+}
+
+void ErrorBase::ClearGlobalErrors() {
+  auto& inst = GlobalErrors::GetInstance();
+  std::lock_guard<wpi::mutex> mutex(inst.mutex);
+  inst.errors.clear();
+  inst.lastError = nullptr;
 }

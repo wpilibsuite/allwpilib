@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
 #include <wpi/mutex.h>
@@ -191,9 +193,19 @@ class ErrorBase {
                                 wpi::StringRef function, int lineNumber);
 
   /**
-   * Retrieve the current global error.
+   * Retrieve the last global error.
    */
-  static const Error& GetGlobalError();
+  static Error GetGlobalError();
+
+  /**
+   * Retrieve all global errors.
+   */
+  static std::vector<Error> GetGlobalErrors();
+
+  /**
+   * Clear global errors.
+   */
+  void ClearGlobalErrors();
 
  protected:
   mutable Error m_error;
