@@ -17,7 +17,6 @@
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
-#define WPI_ERRORS_DEFINE_STRINGS
 #include "frc/WPIErrors.h"
 
 using namespace frc;

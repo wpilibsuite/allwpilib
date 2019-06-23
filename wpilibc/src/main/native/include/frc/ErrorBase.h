@@ -51,16 +51,16 @@
   } while (0)
 #define wpi_setGlobalError(code) wpi_setGlobalErrorWithContext(code, "")
 #define wpi_setWPIErrorWithContext(error, context)                    \
-  this->SetWPIError((wpi_error_s_##error), (wpi_error_value_##error), \
+  this->SetWPIError(wpi_error_s_##error(), wpi_error_value_##error(), \
                     (context), __FILE__, __FUNCTION__, __LINE__)
 #define wpi_setWPIError(error) (wpi_setWPIErrorWithContext(error, ""))
 #define wpi_setStaticWPIErrorWithContext(object, error, context)  \
-  object->SetWPIError((wpi_error_s_##error), (context), __FILE__, \
+  object->SetWPIError(wpi_error_s_##error(), (context), __FILE__, \
                       __FUNCTION__, __LINE__)
 #define wpi_setStaticWPIError(object, error) \
   wpi_setStaticWPIErrorWithContext(object, error, "")
 #define wpi_setGlobalWPIErrorWithContext(error, context)                \
-  ::frc::ErrorBase::SetGlobalWPIError((wpi_error_s_##error), (context), \
+  ::frc::ErrorBase::SetGlobalWPIError(wpi_error_s_##error(), (context), \
                                       __FILE__, __FUNCTION__, __LINE__)
 #define wpi_setGlobalWPIError(error) wpi_setGlobalWPIErrorWithContext(error, "")
 
