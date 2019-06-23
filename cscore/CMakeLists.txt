@@ -128,5 +128,7 @@ if (NOT WITHOUT_JAVA)
 
 endif()
 
-wpilib_add_test(cscore src/test/native/cpp)
-target_link_libraries(cscore_test cscore gmock)
+if (WITH_TESTS)
+    wpilib_add_test(cscore src/test/native/cpp)
+    target_link_libraries(cscore_test cscore gmock)
+endif()

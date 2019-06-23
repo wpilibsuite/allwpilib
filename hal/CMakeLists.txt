@@ -129,5 +129,7 @@ if (NOT WITHOUT_JAVA)
 
 endif()
 
-wpilib_add_test(hal src/test/native/cpp)
-target_link_libraries(hal_test hal gtest)
+if (WITH_TESTS)
+    wpilib_add_test(hal src/test/native/cpp)
+    target_link_libraries(hal_test hal gtest)
+endif()
