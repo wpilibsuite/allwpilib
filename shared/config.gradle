@@ -281,6 +281,14 @@ ext.appendDebugPathToBinaries = { binaries->
 }
 
 ext.createComponentZipTasks = { components, names, base, type, project, func ->
+    return createComponentZipTasksInternal(components, names, base, type, project, func, false)
+}
+
+ext.createComponentJniTasks = { components, names, base, type, project, func ->
+    return createComponentZipTasksInternal(components, names, base, type, project, func, true)
+}
+
+ext.createComponentZipTasksInternal = { components, names, base, type, project, func, isJni ->
     def stringNames = names.collect {it.toString()}
     def configMap = [:]
     components.each {
@@ -320,7 +328,11 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
         project.artifacts {
             task
         }
-        addTaskToCopyAllOutputs(task)
+        if (isJni) {
+            addTaskToJniOutputs(task)
+        } else {
+            addTaskToCopyAllOutputs(task)
+        }
     }
     return taskList
 }

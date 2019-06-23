@@ -66,13 +66,26 @@ task copyAllOutputs(type: Copy) {
     destinationDir outputsFolder
 }
 
+task copyJniOutputs(type: Copy) {
+    destinationDir outputsFolder
+}
+
 build.dependsOn copyAllOutputs
+build.dependsOn copyJniOutputs
+
 copyAllOutputs.dependsOn outputVersions
+copyJniOutputs.dependsOn outputVersions
 
 ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.dependsOn task
     copyAllOutputs.inputs.file task.archivePath
     copyAllOutputs.from task.archivePath
+}
+
+ext.addTaskToJniOutputs = { task ->
+    copyJniOutputs.dependsOn task
+    copyJniOutputs.inputs.file task.archivePath
+    copyJniOutputs.from task.archivePath
 }
 
 subprojects {
