@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -28,6 +28,7 @@ static wpi::condition_variable* newDSDataAvailableCond;
 static wpi::mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
 static std::atomic_bool isFinalized{false};
+static HALSIM_SendErrorHandler sendErrorHandler{nullptr};
 
 namespace hal {
 namespace init {
@@ -44,6 +45,9 @@ extern "C" {
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg) {
+  if (sendErrorHandler)
+    return sendErrorHandler(isError, errorCode, isLVCode, details, location,
+                            callStack, printMsg);
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
