@@ -135,9 +135,8 @@ TEST_F(WebSocketClientTest, ProtocolGood) {
   mockProtocol = "myProtocol";
 
   clientPipe->Connect(pipeName, [&] {
-    auto ws = WebSocket::CreateClient(
-        *clientPipe, "/test", pipeName,
-        ArrayRef<StringRef>{"myProtocol", "myProtocol2"});
+    auto ws = WebSocket::CreateClient(*clientPipe, "/test", pipeName,
+                                      {"myProtocol", "myProtocol2"});
     ws->closed.connect([&](uint16_t code, StringRef msg) {
       Finish();
       if (code != 1005 && code != 1006)

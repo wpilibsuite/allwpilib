@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <initializer_list>
 #include <vector>
 
 #include <wpi/ArrayRef.h>
@@ -74,6 +75,17 @@ class LinearFilter {
    * @param fbGains The "feed back" or IIR gains.
    */
   LinearFilter(wpi::ArrayRef<double> ffGains, wpi::ArrayRef<double> fbGains);
+
+  /**
+   * Create a linear FIR or IIR filter.
+   *
+   * @param ffGains The "feed forward" or FIR gains.
+   * @param fbGains The "feed back" or IIR gains.
+   */
+  LinearFilter(std::initializer_list<double> ffGains,
+               std::initializer_list<double> fbGains)
+      : LinearFilter(wpi::makeArrayRef(ffGains.begin(), ffGains.end()),
+                     wpi::makeArrayRef(fbGains.begin(), fbGains.end())) {}
 
   LinearFilter(LinearFilter&&) = default;
   LinearFilter& operator=(LinearFilter&&) = default;

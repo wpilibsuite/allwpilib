@@ -11,6 +11,7 @@
 #include <stdint.h>
 
 #include <cassert>
+#include <initializer_list>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -382,8 +383,36 @@ class Value final {
    *             time)
    * @return The entry value
    */
+  static std::shared_ptr<Value> MakeBooleanArray(
+      std::initializer_list<bool> value, uint64_t time = 0) {
+    return MakeBooleanArray(wpi::makeArrayRef(value.begin(), value.end()),
+                            time);
+  }
+
+  /**
+   * Creates a boolean array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
   static std::shared_ptr<Value> MakeBooleanArray(ArrayRef<int> value,
                                                  uint64_t time = 0);
+
+  /**
+   * Creates a boolean array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  static std::shared_ptr<Value> MakeBooleanArray(
+      std::initializer_list<int> value, uint64_t time = 0) {
+    return MakeBooleanArray(wpi::makeArrayRef(value.begin(), value.end()),
+                            time);
+  }
 
   /**
    * Creates a double array entry value.
@@ -397,6 +426,19 @@ class Value final {
                                                 uint64_t time = 0);
 
   /**
+   * Creates a double array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  static std::shared_ptr<Value> MakeDoubleArray(
+      std::initializer_list<double> value, uint64_t time = 0) {
+    return MakeDoubleArray(wpi::makeArrayRef(value.begin(), value.end()), time);
+  }
+
+  /**
    * Creates a string array entry value.
    *
    * @param value the value
@@ -406,6 +448,19 @@ class Value final {
    */
   static std::shared_ptr<Value> MakeStringArray(ArrayRef<std::string> value,
                                                 uint64_t time = 0);
+
+  /**
+   * Creates a string array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  static std::shared_ptr<Value> MakeStringArray(
+      std::initializer_list<std::string> value, uint64_t time = 0) {
+    return MakeStringArray(wpi::makeArrayRef(value.begin(), value.end()), time);
+  }
 
   /**
    * Creates a string array entry value.

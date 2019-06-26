@@ -11,6 +11,7 @@
 #include <stdint.h>
 
 #include <functional>
+#include <initializer_list>
 #include <memory>
 #include <string>
 #include <utility>
@@ -98,6 +99,25 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
       uv::Stream& stream, const Twine& uri, const Twine& host,
       ArrayRef<StringRef> protocols = ArrayRef<StringRef>{},
       const ClientOptions& options = ClientOptions{});
+
+  /**
+   * Starts a client connection by performing the initial client handshake.
+   * An open event is emitted when the handshake completes.
+   * This sets the stream user data to the websocket.
+   * @param stream Connection stream
+   * @param uri The Request-URI to send
+   * @param host The host or host:port to send
+   * @param protocols The list of subprotocols
+   * @param options Handshake options
+   */
+  static std::shared_ptr<WebSocket> CreateClient(
+      uv::Stream& stream, const Twine& uri, const Twine& host,
+      std::initializer_list<StringRef> protocols,
+      const ClientOptions& options = ClientOptions{}) {
+    return CreateClient(stream, uri, host,
+                        makeArrayRef(protocols.begin(), protocols.end()),
+                        options);
+  }
 
   /**
    * Starts a server connection by performing the initial server side handshake.

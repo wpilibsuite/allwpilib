@@ -286,8 +286,9 @@ void WebSocket::SendClose(uint16_t code, const Twine& reason) {
   SmallVector<uv::Buffer, 4> bufs;
   if (code != 1005) {
     raw_uv_ostream os{bufs, 4096};
-    os << ArrayRef<uint8_t>{static_cast<uint8_t>((code >> 8) & 0xff),
-                            static_cast<uint8_t>(code & 0xff)};
+    const uint8_t codeMsb[] = {static_cast<uint8_t>((code >> 8) & 0xff),
+                               static_cast<uint8_t>(code & 0xff)};
+    os << ArrayRef<uint8_t>(codeMsb);
     reason.print(os);
   }
   Send(kFlagFin | kOpClose, bufs, [](auto bufs, uv::Error) {
@@ -520,18 +521,20 @@ void WebSocket::Send(
     os << static_cast<unsigned char>((m_server ? 0x00 : kFlagMasking) | size);
   } else if (size <= 0xffff) {
     os << static_cast<unsigned char>((m_server ? 0x00 : kFlagMasking) | 126);
-    os << ArrayRef<uint8_t>{static_cast<uint8_t>((size >> 8) & 0xff),
-                            static_cast<uint8_t>(size & 0xff)};
+    const uint8_t sizeMsb[] = {static_cast<uint8_t>((size >> 8) & 0xff),
+                               static_cast<uint8_t>(size & 0xff)};
+    os << ArrayRef<uint8_t>(sizeMsb);
   } else {
     os << static_cast<unsigned char>((m_server ? 0x00 : kFlagMasking) | 127);
-    os << ArrayRef<uint8_t>{static_cast<uint8_t>((size >> 56) & 0xff),
-                            static_cast<uint8_t>((size >> 48) & 0xff),
-                            static_cast<uint8_t>((size >> 40) & 0xff),
-                            static_cast<uint8_t>((size >> 32) & 0xff),
-                            static_cast<uint8_t>((size >> 24) & 0xff),
-                            static_cast<uint8_t>((size >> 16) & 0xff),
-                            static_cast<uint8_t>((size >> 8) & 0xff),
-                            static_cast<uint8_t>(size & 0xff)};
+    const uint8_t sizeMsb[] = {static_cast<uint8_t>((size >> 56) & 0xff),
+                               static_cast<uint8_t>((size >> 48) & 0xff),
+                               static_cast<uint8_t>((size >> 40) & 0xff),
+                               static_cast<uint8_t>((size >> 32) & 0xff),
+                               static_cast<uint8_t>((size >> 24) & 0xff),
+                               static_cast<uint8_t>((size >> 16) & 0xff),
+                               static_cast<uint8_t>((size >> 8) & 0xff),
+                               static_cast<uint8_t>(size & 0xff)};
+    os << ArrayRef<uint8_t>(sizeMsb);
   }
 
   // clients need to mask the input data

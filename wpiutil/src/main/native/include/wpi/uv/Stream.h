@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,7 @@
 #include <uv.h>
 
 #include <functional>
+#include <initializer_list>
 #include <memory>
 
 #include "wpi/ArrayRef.h"
@@ -135,6 +136,27 @@ class Stream : public Handle {
    *
    * Data are written in order. The lifetime of the data pointers passed in
    * the `bufs` parameter must exceed the lifetime of the write request.
+   * An easy way to ensure this is to have the write request keep track of
+   * the data and use either its Complete() function or destructor to free the
+   * data.
+   *
+   * The finish signal will be emitted on the request object when the data
+   * has been written (or if an error occurs).
+   * The error signal will be emitted on the request object in case of errors.
+   *
+   * @param bufs The buffers to be written to the stream.
+   * @param req write request
+   */
+  void Write(std::initializer_list<Buffer> bufs,
+             const std::shared_ptr<WriteReq>& req) {
+    Write(makeArrayRef(bufs.begin(), bufs.end()), req);
+  }
+
+  /**
+   * Write data to the stream.
+   *
+   * Data are written in order. The lifetime of the data pointers passed in
+   * the `bufs` parameter must exceed the lifetime of the write request.
    * The callback can be used to free data after the request completes.
    *
    * The callback will be called when the data has been written (even if an
@@ -147,6 +169,24 @@ class Stream : public Handle {
              std::function<void(MutableArrayRef<Buffer>, Error)> callback);
 
   /**
+   * Write data to the stream.
+   *
+   * Data are written in order. The lifetime of the data pointers passed in
+   * the `bufs` parameter must exceed the lifetime of the write request.
+   * The callback can be used to free data after the request completes.
+   *
+   * The callback will be called when the data has been written (even if an
+   * error occurred).  Errors will be reported to the stream error handler.
+   *
+   * @param bufs The buffers to be written to the stream.
+   * @param callback Callback function to call when the write completes
+   */
+  void Write(std::initializer_list<Buffer> bufs,
+             std::function<void(MutableArrayRef<Buffer>, Error)> callback) {
+    Write(makeArrayRef(bufs.begin(), bufs.end()), callback);
+  }
+
+  /**
    * Queue a write request if it can be completed immediately.
    *
    * Same as `Write()`, but won’t queue a write request if it can’t be
@@ -157,6 +197,20 @@ class Stream : public Handle {
    * @return Number of bytes written.
    */
   int TryWrite(ArrayRef<Buffer> bufs);
+
+  /**
+   * Queue a write request if it can be completed immediately.
+   *
+   * Same as `Write()`, but won’t queue a write request if it can’t be
+   * completed immediately.
+   * An error signal will be emitted in case of errors.
+   *
+   * @param bufs The buffers to be written to the stream.
+   * @return Number of bytes written.
+   */
+  int TryWrite(std::initializer_list<Buffer> bufs) {
+    return TryWrite(makeArrayRef(bufs.begin(), bufs.end()));
+  }
 
   /**
    * Check if the stream is readable.

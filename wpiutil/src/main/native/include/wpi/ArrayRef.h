@@ -98,11 +98,6 @@ namespace wpi {
     template <size_t N>
     /*implicit*/ constexpr ArrayRef(const T (&Arr)[N]) : Data(Arr), Length(N) {}
 
-    /// Construct an ArrayRef from a std::initializer_list.
-    /*implicit*/ ArrayRef(const std::initializer_list<T> &Vec)
-    : Data(Vec.begin() == Vec.end() ? (T*)nullptr : Vec.begin()),
-      Length(Vec.size()) {}
-
     /// Construct an ArrayRef<const T*> from ArrayRef<T*>. This uses SFINAE to
     /// ensure that only ArrayRefs of pointers can be converted.
     template <typename U>
