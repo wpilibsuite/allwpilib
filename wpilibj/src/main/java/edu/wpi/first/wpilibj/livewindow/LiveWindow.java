@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -82,90 +82,6 @@ public class LiveWindow {
       }
       enabledEntry.setBoolean(enabled);
     }
-  }
-
-  /**
-   * The run method is called repeatedly to keep the values refreshed on the screen in test mode.
-   * @deprecated No longer required
-   */
-  @Deprecated
-  public static void run() {
-    updateValues();
-  }
-
-  /**
-   * Add a Sensor associated with the subsystem and with call it by the given name.
-   *
-   * @param subsystem The subsystem this component is part of.
-   * @param name      The name of this component.
-   * @param component A LiveWindowSendable component that represents a sensor.
-   * @deprecated Use {@link Sendable#setName(String, String)} instead.
-   */
-  @Deprecated
-  public static synchronized void addSensor(String subsystem, String name, Sendable component) {
-    add(component);
-    component.setName(subsystem, name);
-  }
-
-  /**
-   * Add Sensor to LiveWindow. The components are shown with the type and channel like this: Gyro[1]
-   * for a gyro object connected to the first analog channel.
-   *
-   * @param moduleType A string indicating the type of the module used in the naming (above)
-   * @param channel    The channel number the device is connected to
-   * @param component  A reference to the object being added
-   * @deprecated Use {@link edu.wpi.first.wpilibj.SendableBase#setName(String, int)} instead.
-   */
-  @Deprecated
-  public static void addSensor(String moduleType, int channel, Sendable component) {
-    add(component);
-    component.setName("Ungrouped", moduleType + "[" + channel + "]");
-  }
-
-  /**
-   * Add an Actuator associated with the subsystem and with call it by the given name.
-   *
-   * @param subsystem The subsystem this component is part of.
-   * @param name      The name of this component.
-   * @param component A LiveWindowSendable component that represents a actuator.
-   * @deprecated Use {@link Sendable#setName(String, String)} instead.
-   */
-  @Deprecated
-  public static synchronized void addActuator(String subsystem, String name, Sendable component) {
-    add(component);
-    component.setName(subsystem, name);
-  }
-
-  /**
-   * Add Actuator to LiveWindow. The components are shown with the module type, slot and channel
-   * like this: Servo[1,2] for a servo object connected to the first digital module and PWM port 2.
-   *
-   * @param moduleType A string that defines the module name in the label for the value
-   * @param channel    The channel number the device is plugged into (usually PWM)
-   * @param component  The reference to the object being added
-   * @deprecated Use {@link edu.wpi.first.wpilibj.SendableBase#setName(String, int)} instead.
-   */
-  @Deprecated
-  public static void addActuator(String moduleType, int channel, Sendable component) {
-    add(component);
-    component.setName("Ungrouped", moduleType + "[" + channel + "]");
-  }
-
-  /**
-   * Add Actuator to LiveWindow. The components are shown with the module type, slot and channel
-   * like this: Servo[1,2] for a servo object connected to the first digital module and PWM port 2.
-   *
-   * @param moduleType   A string that defines the module name in the label for the value
-   * @param moduleNumber The number of the particular module type
-   * @param channel      The channel number the device is plugged into (usually PWM)
-   * @param component    The reference to the object being added
-   * @deprecated Use {@link edu.wpi.first.wpilibj.SendableBase#setName(String, int, int)} instead.
-   */
-  @Deprecated
-  public static void addActuator(String moduleType, int moduleNumber, int channel,
-                                 Sendable component) {
-    add(component);
-    component.setName("Ungrouped", moduleType + "[" + moduleNumber + "," + channel + "]");
   }
 
   /**
