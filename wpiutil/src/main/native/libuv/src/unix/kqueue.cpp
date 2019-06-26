@@ -258,7 +258,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
       /* Skip invalidated events, see uv__platform_invalidate_fd */
       if (fd == -1)
         continue;
-      w = loop->watchers[fd];
+      w = (uv__io_t*)loop->watchers[fd];
 
       if (w == NULL) {
         /* File descriptor that we've stopped watching, disarm it.
