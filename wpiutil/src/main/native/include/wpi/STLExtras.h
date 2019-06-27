@@ -20,7 +20,6 @@
 #include "wpi/SmallVector.h"
 #include "wpi/iterator.h"
 #include "wpi/iterator_range.h"
-#include "wpi/optional.h"
 #include "wpi/ErrorHandling.h"
 #include <algorithm>
 #include <cassert>
@@ -31,6 +30,7 @@
 #include <initializer_list>
 #include <iterator>
 #include <limits>
+#include <optional>
 #include <memory>
 #include <tuple>
 #include <type_traits>
@@ -595,16 +595,16 @@ static Iter next_or_end(const Iter &I, const Iter &End) {
 
 template <typename Iter>
 static auto deref_or_none(const Iter &I, const Iter &End)
-    -> wpi::optional<typename std::remove_const<
+    -> std::optional<typename std::remove_const<
         typename std::remove_reference<decltype(*I)>::type>::type> {
   if (I == End)
-    return nullopt;
+    return std::nullopt;
   return *I;
 }
 
 template <typename Iter> struct ZipLongestItemType {
   using type =
-      wpi::optional<typename std::remove_const<typename std::remove_reference<
+      std::optional<typename std::remove_const<typename std::remove_reference<
           decltype(*std::declval<Iter>())>::type>::type>;
 };
 
@@ -702,7 +702,7 @@ public:
 } // namespace detail
 
 /// Iterate over two or more iterators at the same time. Iteration continues
-/// until all iterators reach the end. The wpi::optional only contains a value
+/// until all iterators reach the end. The std::optional only contains a value
 /// if the iterator has not reached the end.
 template <typename T, typename U, typename... Args>
 detail::zip_longest_range<T, U, Args...> zip_longest(T &&t, U &&u,
