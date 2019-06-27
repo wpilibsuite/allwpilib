@@ -24,17 +24,6 @@ public class Joystick extends GenericHID {
   static final byte kDefaultTwistChannel = 2;
   static final byte kDefaultThrottleChannel = 3;
 
-  @Deprecated
-  static final byte kDefaultXAxis = 0;
-  @Deprecated
-  static final byte kDefaultYAxis = 1;
-  @Deprecated
-  static final byte kDefaultZAxis = 2;
-  @Deprecated
-  static final byte kDefaultTwistAxis = 2;
-  @Deprecated
-  static final byte kDefaultThrottleAxis = 3;
-
   /**
    * Represents an analog axis on a joystick.
    */
