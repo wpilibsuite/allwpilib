@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -243,27 +243,6 @@ class DriverStation : public ErrorBase {
    *         Field Management System
    */
   bool IsFMSAttached() const;
-
-  /**
-   * Check if the FPGA outputs are enabled.
-   *
-   * The outputs may be disabled if the robot is disabled or e-stopped, the
-   * watchdog has expired, or if the roboRIO browns out.
-   *
-   * @return True if the FPGA outputs are enabled.
-   * @deprecated Use RobotController static class method
-   */
-  WPI_DEPRECATED("Use RobotController static class method")
-  bool IsSysActive() const;
-
-  /**
-   * Check if the system is browned out.
-   *
-   * @return True if the system is browned out
-   * @deprecated Use RobotController static class method
-   */
-  WPI_DEPRECATED("Use RobotController static class method")
-  bool IsBrownedOut() const;
 
   /**
    * Returns the game specific message provided by the FMS.

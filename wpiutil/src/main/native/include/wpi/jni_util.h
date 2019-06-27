@@ -38,15 +38,6 @@ namespace java {
 std::string GetJavaStackTrace(JNIEnv* env, std::string* func = nullptr,
                               StringRef excludeFuncPrefix = StringRef());
 
-// Shim for backwards compatibility
-template <const char* excludeFuncPrefix>
-WPI_DEPRECATED("use StringRef function instead")
-std::string GetJavaStackTrace(JNIEnv* env, std::string* func) {
-  return GetJavaStackTrace(
-      env, func,
-      excludeFuncPrefix == nullptr ? StringRef() : excludeFuncPrefix);
-}
-
 // Finds a class and keep it as a global reference.
 // Use with caution, as the destructor does NOT call DeleteGlobalRef due
 // to potential shutdown issues with doing so.

@@ -1,5 +1,8 @@
 project(cameraserver)
 
+include(CompileWarnings)
+include(AddTest)
+
 find_package( OpenCV REQUIRED )
 
 # Java bindings
@@ -32,6 +35,7 @@ set_target_properties(cameraserver PROPERTIES DEBUG_POSTFIX "d")
 target_include_directories(cameraserver PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/cameraserver>)
+wpilib_target_warnings(cameraserver)
 target_link_libraries(cameraserver PUBLIC ntcore cscore wpiutil ${OpenCV_LIBS})
 
 set_property(TARGET cameraserver PROPERTY FOLDER "libraries")
@@ -55,6 +59,12 @@ install(EXPORT cameraserver DESTINATION ${cameraserver_config_dir})
 
 file(GLOB multiCameraServer_src multiCameraServer/src/main/native/cpp/*.cpp)
 add_executable(multiCameraServer ${multiCameraServer_src})
+wpilib_target_warnings(multiCameraServer)
 target_link_libraries(multiCameraServer cameraserver)
 
 set_property(TARGET multiCameraServer PROPERTY FOLDER "examples")
+
+if (WITH_TESTS)
+    wpilib_add_test(cameraserver src/test/native/cpp)
+    target_link_libraries(cameraserver_test cameraserver gtest)
+endif()

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -23,17 +23,6 @@ public class Joystick extends GenericHID {
   static final byte kDefaultZChannel = 2;
   static final byte kDefaultTwistChannel = 2;
   static final byte kDefaultThrottleChannel = 3;
-
-  @Deprecated
-  static final byte kDefaultXAxis = 0;
-  @Deprecated
-  static final byte kDefaultYAxis = 1;
-  @Deprecated
-  static final byte kDefaultZAxis = 2;
-  @Deprecated
-  static final byte kDefaultTwistAxis = 2;
-  @Deprecated
-  static final byte kDefaultThrottleAxis = 3;
 
   /**
    * Represents an analog axis on a joystick.
@@ -157,18 +146,6 @@ public class Joystick extends GenericHID {
   }
 
   /**
-   * Set the channel associated with a specified axis.
-   *
-   * @deprecated    Use the more specific axis channel setter functions.
-   * @param axis    The axis to set the channel for.
-   * @param channel The channel to set the axis to.
-   */
-  @Deprecated
-  public void setAxisChannel(AxisType axis, int channel) {
-    m_axes[axis.value] = (byte) channel;
-  }
-
-  /**
    * Get the channel currently associated with the X axis.
    *
    * @return The channel for the axis.
@@ -211,18 +188,6 @@ public class Joystick extends GenericHID {
    */
   public int getThrottleChannel() {
     return m_axes[Axis.kThrottle.value];
-  }
-
-  /**
-   * Get the channel currently associated with the specified axis.
-   *
-   * @deprecated Use the more specific axis channel getter functions.
-   * @param axis The axis to look up the channel for.
-   * @return The channel for the axis.
-   */
-  @Deprecated
-  public int getAxisChannel(AxisType axis) {
-    return m_axes[axis.value];
   }
 
   /**
@@ -279,34 +244,6 @@ public class Joystick extends GenericHID {
   }
 
   /**
-   * For the current joystick, return the axis determined by the argument.
-   *
-   * <p>This is for cases where the joystick axis is returned programmatically, otherwise one of the
-   * previous functions would be preferable (for example getX()).
-   *
-   * @deprecated Use the more specific axis getter functions.
-   * @param axis The axis to read.
-   * @return The value of the axis.
-   */
-  @Deprecated
-  public double getAxis(final AxisType axis) {
-    switch (axis) {
-      case kX:
-        return getX();
-      case kY:
-        return getY();
-      case kZ:
-        return getZ();
-      case kTwist:
-        return getTwist();
-      case kThrottle:
-        return getThrottle();
-      default:
-        return 0.0;
-    }
-  }
-
-  /**
    * Read the state of the trigger on the joystick.
    *
    * @return The state of the trigger.
@@ -358,20 +295,6 @@ public class Joystick extends GenericHID {
    */
   public boolean getTopReleased() {
     return getRawButtonReleased(Button.kTop.value);
-  }
-
-  /**
-   * Get buttons based on an enumerated type.
-   *
-   * <p>The button type will be looked up in the list of buttons and then read.
-   *
-   * @deprecated Use Button enum values instead of ButtonType.
-   * @param button The type of button to read.
-   * @return The state of the button.
-   */
-  @Deprecated
-  public boolean getButton(ButtonType button) {
-    return getRawButton(button.value);
   }
 
   /**

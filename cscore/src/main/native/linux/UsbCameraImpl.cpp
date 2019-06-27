@@ -447,8 +447,7 @@ void UsbCameraImpl::DeviceDisconnect() {
   if (fd < 0) return;  // already disconnected
 
   // Unmap buffers
-  for (int i = 0; i < kNumBuffers; ++i)
-    m_buffers[i] = std::move(UsbCameraBuffer{});
+  for (int i = 0; i < kNumBuffers; ++i) m_buffers[i] = UsbCameraBuffer{};
 
   // Close device
   close(fd);
@@ -534,11 +533,11 @@ void UsbCameraImpl::DeviceConnect() {
     SDEBUG4("buf " << i << " length=" << buf.length
                    << " offset=" << buf.m.offset);
 
-    m_buffers[i] = std::move(UsbCameraBuffer(fd, buf.length, buf.m.offset));
+    m_buffers[i] = UsbCameraBuffer(fd, buf.length, buf.m.offset);
     if (!m_buffers[i].m_data) {
       SWARNING("could not map buffer " << i);
       // release other buffers
-      for (int j = 0; j < i; ++j) m_buffers[j] = std::move(UsbCameraBuffer{});
+      for (int j = 0; j < i; ++j) m_buffers[j] = UsbCameraBuffer{};
       close(fd);
       m_fd = -1;
       return;

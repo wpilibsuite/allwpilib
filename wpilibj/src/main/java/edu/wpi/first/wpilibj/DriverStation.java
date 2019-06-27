@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,7 +17,6 @@ import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.MatchInfoData;
-import edu.wpi.first.hal.PowerJNI;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -697,29 +696,6 @@ public class DriverStation {
   }
 
   /**
-   * Gets a value indicating whether the FPGA outputs are enabled. The outputs may be disabled if
-   * the robot is disabled or e-stopped, the watchdog has expired, or if the roboRIO browns out.
-   *
-   * @return True if the FPGA outputs are enabled.
-   * @deprecated Use RobotController.isSysActive()
-   */
-  @Deprecated
-  public boolean isSysActive() {
-    return HAL.getSystemActive();
-  }
-
-  /**
-   * Check if the system is browned out.
-   *
-   * @return True if the system is browned out
-   * @deprecated Use RobotController.isBrownedOut()
-   */
-  @Deprecated
-  public boolean isBrownedOut() {
-    return HAL.getBrownedOut();
-  }
-
-  /**
    * Get the game specific message.
    *
    * @return the game specific message
@@ -915,17 +891,6 @@ public class DriverStation {
    */
   public double getMatchTime() {
     return HAL.getMatchTime();
-  }
-
-  /**
-   * Read the battery voltage.
-   *
-   * @return The battery voltage in Volts.
-   * @deprecated Use RobotController.getBatteryVoltage
-   */
-  @Deprecated
-  public double getBatteryVoltage() {
-    return PowerJNI.getVinVoltage();
   }
 
   /**

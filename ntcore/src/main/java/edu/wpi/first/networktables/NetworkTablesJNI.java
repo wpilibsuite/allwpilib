@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,6 +9,7 @@ package edu.wpi.first.networktables;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.wpi.first.wpiutil.RuntimeLoader;
 
@@ -16,8 +17,20 @@ public final class NetworkTablesJNI {
   static boolean libraryLoaded = false;
   static RuntimeLoader<NetworkTablesJNI> loader = null;
 
+  public static class Helper {
+    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
+
+    public static boolean getExtractOnStaticLoad() {
+      return extractOnStaticLoad.get();
+    }
+
+    public static void setExtractOnStaticLoad(boolean load) {
+      extractOnStaticLoad.set(load);
+    }
+  }
+
   static {
-    if (!libraryLoaded) {
+    if (Helper.getExtractOnStaticLoad()) {
       try {
         loader = new RuntimeLoader<>("ntcorejni", RuntimeLoader.getDefaultExtractionRoot(), NetworkTablesJNI.class);
         loader.loadLibrary();
@@ -27,6 +40,18 @@ public final class NetworkTablesJNI {
       }
       libraryLoaded = true;
     }
+  }
+
+  /**
+   * Force load the library.
+   */
+  public static synchronized void forceLoad() throws IOException {
+    if (libraryLoaded) {
+      return;
+    }
+    loader = new RuntimeLoader<>("ntcorejni", RuntimeLoader.getDefaultExtractionRoot(), NetworkTablesJNI.class);
+    loader.loadLibrary();
+    libraryLoaded = true;
   }
 
   public static native int getDefaultInstance();

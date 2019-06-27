@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -49,8 +49,12 @@ HAL_ENUM(HAL_CANManufacturer) {
   HAL_CAN_Man_kLM = 2,
   HAL_CAN_Man_kDEKA = 3,
   HAL_CAN_Man_kCTRE = 4,
+  HAL_CAN_Man_kREV = 5,
+  HAL_CAN_Man_kGrapple = 6,
   HAL_CAN_Man_kMS = 7,
   HAL_CAN_Man_kTeamUse = 8,
+  HAL_CAN_Man_kKauaiLabs = 9,
+  HAL_CAN_Man_kCopperforge = 10
 };
 // clang-format on
 /** @} */

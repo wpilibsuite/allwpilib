@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2012-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2012-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -58,66 +58,6 @@ LiveWindow::Impl::Impl()
 LiveWindow* LiveWindow::GetInstance() {
   static LiveWindow instance;
   return &instance;
-}
-
-void LiveWindow::Run() { UpdateValues(); }
-
-void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
-                           Sendable* component) {
-  Add(component);
-  component->SetName(subsystem, name);
-}
-
-void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
-                           Sendable& component) {
-  Add(&component);
-  component.SetName(subsystem, name);
-}
-
-void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
-                           std::shared_ptr<Sendable> component) {
-  Add(component);
-  component->SetName(subsystem, name);
-}
-
-void LiveWindow::AddActuator(const wpi::Twine& subsystem,
-                             const wpi::Twine& name, Sendable* component) {
-  Add(component);
-  component->SetName(subsystem, name);
-}
-
-void LiveWindow::AddActuator(const wpi::Twine& subsystem,
-                             const wpi::Twine& name, Sendable& component) {
-  Add(&component);
-  component.SetName(subsystem, name);
-}
-
-void LiveWindow::AddActuator(const wpi::Twine& subsystem,
-                             const wpi::Twine& name,
-                             std::shared_ptr<Sendable> component) {
-  Add(component);
-  component->SetName(subsystem, name);
-}
-
-void LiveWindow::AddSensor(const wpi::Twine& type, int channel,
-                           Sendable* component) {
-  Add(component);
-  component->SetName("Ungrouped",
-                     type + Twine('[') + Twine(channel) + Twine(']'));
-}
-
-void LiveWindow::AddActuator(const wpi::Twine& type, int channel,
-                             Sendable* component) {
-  Add(component);
-  component->SetName("Ungrouped",
-                     type + Twine('[') + Twine(channel) + Twine(']'));
-}
-
-void LiveWindow::AddActuator(const wpi::Twine& type, int module, int channel,
-                             Sendable* component) {
-  Add(component);
-  component->SetName("Ungrouped", type + Twine('[') + Twine(module) +
-                                      Twine(',') + Twine(channel) + Twine(']'));
 }
 
 void LiveWindow::Add(std::shared_ptr<Sendable> sendable) {
