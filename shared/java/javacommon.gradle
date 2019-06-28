@@ -86,6 +86,7 @@ test {
         events "failed"
         exceptionFormat "full"
     }
+    finalizedBy jacocoTestReport
 }
 
 if (project.hasProperty('onlyAthena') || project.hasProperty('onlyRaspbian')) {
