@@ -38,7 +38,8 @@ stages:
       - task: PublishCodeCoverageResults@1
         inputs:
           codeCoverageTool: 'JaCoCo'
-          summaryFileLocation: '**/jacocoTestReport.xml'
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/reports/jacoco/test/jacocoTestReport.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/**/reports/jacoco/test/html'
 
       - task: PublishPipelineArtifact@0
         inputs:
@@ -64,6 +65,12 @@ stages:
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: 'JaCoCo'
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/reports/jacoco/test/jacocoTestReport.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/**/reports/jacoco/test/html'
+
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'Raspbian'
@@ -87,6 +94,12 @@ stages:
           options: '-PskipAthena'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
+
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: 'JaCoCo'
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/reports/jacoco/test/jacocoTestReport.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/**/reports/jacoco/test/html'
 
       - task: PublishPipelineArtifact@0
         inputs:
@@ -159,6 +172,12 @@ stages:
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: 'JaCoCo'
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/reports/jacoco/test/jacocoTestReport.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/**/reports/jacoco/test/html'
+
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'Win64'
@@ -219,6 +238,12 @@ stages:
           tasks: 'build'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
+
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: 'JaCoCo'
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/reports/jacoco/test/jacocoTestReport.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/**/reports/jacoco/test/html'
 
       - task: PublishPipelineArtifact@0
         inputs:
