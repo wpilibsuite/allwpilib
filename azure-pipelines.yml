@@ -130,7 +130,7 @@ stages:
 
   - job: Windows_64_Bit
     pool:
-      vmImage: 'vs2017-win2016'
+      vmImage: 'windows-2019'
     steps:
       - powershell: |
           mkdir build
@@ -162,7 +162,7 @@ stages:
 
   - job: Windows_32_Bit
     pool:
-      vmImage: 'vs2017-win2016'
+      vmImage: 'windows-2019'
     steps:
       - powershell: |
           mkdir build
