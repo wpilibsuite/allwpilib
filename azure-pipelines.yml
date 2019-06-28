@@ -35,6 +35,11 @@ stages:
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: 'JaCoCo'
+          summaryFileLocation: '**/jacocoTestReport.xml'
+
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'Athena'
