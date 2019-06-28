@@ -33,13 +33,13 @@ import java.util.Arrays;
  * strain isn't put on electrical or mechanical components - If you use clever gains, you can make a
  * PID controller out of this class!
  *
- * <p>For more on filters, I highly recommend the following articles: http://en.wikipedia
- * .org/wiki/Linear_filter http://en.wikipedia.org/wiki/Iir_filter http://en.wikipedia
- * .org/wiki/Fir_filter
+ * <p>For more on filters, we highly recommend the following articles:<br>
+ * https://en.wikipedia.org/wiki/Linear_filter<br>
+ * https://en.wikipedia.org/wiki/Iir_filter<br>
+ * https://en.wikipedia.org/wiki/Fir_filter<br>
  *
- * <p>Note 1: calculate() should be called by the user on a known, regular period. You can set up a
- * Notifier to do this (look at the WPILib PIDController class), or do it "inline" with code in a
- * periodic function.
+ * <p>Note 1: calculate() should be called by the user on a known, regular period. You can use a
+ * Notifier for this or do it "inline" with code in a periodic function.
  *
  * <p>Note 2: For ALL filters, gains are necessarily a function of frequency. If you make a filter
  * that works well for you at, say, 100Hz, you will most definitely need to adjust the gains if you

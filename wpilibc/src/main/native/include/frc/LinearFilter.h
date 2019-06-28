@@ -50,14 +50,14 @@ namespace frc {
  *    electrical or mechanical components
  *  - If you use clever gains, you can make a PID controller out of this class!
  *
- * For more on filters, I highly recommend the following articles:<br>
- *  http://en.wikipedia.org/wiki/Linear_filter<br>
- *  http://en.wikipedia.org/wiki/Iir_filter<br>
- *  http://en.wikipedia.org/wiki/Fir_filter<br>
+ * For more on filters, we highly recommend the following articles:<br>
+ * https://en.wikipedia.org/wiki/Linear_filter<br>
+ * https://en.wikipedia.org/wiki/Iir_filter<br>
+ * https://en.wikipedia.org/wiki/Fir_filter<br>
  *
  * Note 1: Calculate() should be called by the user on a known, regular period.
- * You can set up a Notifier to do this (look at the WPILib PIDController
- * class), or do it "inline" with code in a periodic function.
+ * You can use a Notifier for this or do it "inline" with code in a
+ * periodic function.
  *
  * Note 2: For ALL filters, gains are necessarily a function of frequency. If
  * you make a filter that works well for you at, say, 100Hz, you will most
