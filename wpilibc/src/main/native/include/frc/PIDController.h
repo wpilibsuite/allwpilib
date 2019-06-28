@@ -19,7 +19,6 @@
 #include "frc/PIDBase.h"
 #include "frc/PIDSource.h"
 #include "frc/Timer.h"
-#include "frc/filters/LinearDigitalFilter.h"
 
 namespace frc {
 
