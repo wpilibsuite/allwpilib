@@ -87,7 +87,7 @@ test {
     }
 }
 
-if (project.hasProperty('onlyAthena') || project.hasProperty('onlyRaspbian')) {
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxraspbian')) {
     test.enabled = false
 }
 

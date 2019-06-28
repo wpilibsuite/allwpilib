@@ -31,7 +31,7 @@ stages:
           publishJUnitResults: false
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PonlyAthena'
+          options: '-Ponlylinuxathena'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
@@ -55,7 +55,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PonlyRaspbian'
+          options: '-Ponlylinuxraspbian'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
@@ -79,7 +79,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PskipAthena'
+          options: '-Pskiplinuxathena -Pskiplinuxraspbian'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
@@ -130,7 +130,7 @@ stages:
 
   - job: Windows_64_Bit
     pool:
-      vmImage: 'vs2017-win2016'
+      vmImage: 'windows-2019'
     steps:
       - powershell: |
           mkdir build
@@ -151,6 +151,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
+          options: '-PskipPMD'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
@@ -161,7 +162,7 @@ stages:
 
   - job: Windows_32_Bit
     pool:
-      vmImage: 'vs2017-win2016'
+      vmImage: 'windows-2019'
     steps:
       - powershell: |
           mkdir build
@@ -182,6 +183,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
+          options: '-PskipPMD'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
       - task: PublishPipelineArtifact@0
@@ -212,6 +214,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
+          #options: ''
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
