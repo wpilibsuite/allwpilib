@@ -47,16 +47,6 @@ class MultiBuilds implements Plugin<Project> {
 
   @CompileStatic
   static class Rules extends RuleSource {
-    @Mutate
-    void setupBuildTypes(BuildTypeContainer buildTypes, ProjectLayout projectLayout) {
-        def project = (Project) projectLayout.projectIdentifier
-        if (project.hasProperty('releaseBuild')) {
-            buildTypes.create('debug')
-        } else {
-            buildTypes.create('release')
-        }
-    }
-
     @CompileDynamic
     private static void setBuildableFalseDynamically(NativeBinarySpec binary) {
         binary.buildable = false

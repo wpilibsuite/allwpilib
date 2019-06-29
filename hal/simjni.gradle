@@ -12,7 +12,7 @@ task generateAthenaSimFiles() {
             it.all { component ->
                 if (component in getJniSpecClass()) {
                     component.binaries.all { binary ->
-                        if (binary.targetPlatform.architecture.name == 'athena') {
+                        if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                             binary.tasks.withType(CppCompile) {
                                 it.dependsOn createdTask
                             }
