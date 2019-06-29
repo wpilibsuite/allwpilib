@@ -95,9 +95,10 @@ stages:
 
     steps:
         - script: |
-            git checkout -b master
-          displayName: 'Checkout sources'
+            pip3 install wpiformat
+          displayName: 'Install wpiformat'
         - script: |
+            git checkout -b master
             wpiformat -clang 6.0
           displayName: 'Run wpiformat'
         - script: |
