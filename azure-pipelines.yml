@@ -5,8 +5,8 @@
 
 resources:
   containers:
-  - container: wpilib2019
-    image: wpilib/roborio-cross-ubuntu:2019-18.04
+  - container: wpilib2020
+    image: wpilib/roborio-cross-ubuntu:2020-18.04
   - container: raspbian
     image:  wpilib/raspbian-cross-ubuntu:18.04
   - container: ubuntu18
@@ -20,7 +20,7 @@ stages:
     pool:
       vmImage: 'Ubuntu 16.04'
 
-    container: wpilib2019
+    container: wpilib2020
 
     steps:
       - task: Gradle@2
@@ -68,7 +68,7 @@ stages:
     pool:
       vmImage: 'Ubuntu 16.04'
 
-    container: wpilib2019
+    container: wpilib2020
 
     steps:
       - task: Gradle@2
@@ -117,7 +117,7 @@ stages:
     pool:
       vmImage: 'Ubuntu 16.04'
 
-    container: wpilib2019
+    container: wpilib2020
 
     steps:
         - task: CMake@1
@@ -132,22 +132,12 @@ stages:
     pool:
       vmImage: 'windows-2019'
     steps:
-      - powershell: |
-          mkdir build
-          $ProgressPreference = 'SilentlyContinue'
-          wget "https://download.java.net/java/ga/jdk11/openjdk-11_windows-x64_bin.zip" -O "build\jdk.zip"
-        displayName: 'Download JDK'
-      - task: JavaToolInstaller@0
-        inputs:
-          jdkSourceOption: localDirectory
-          jdkFile: 'build/jdk.zip'
-          jdkDestinationDirectory: 'build/jdkinst'
-          jdkArchitectureOption: x64
       - task: Gradle@2
         inputs:
           workingDirectory: ''
           gradleWrapperFile: 'gradlew'
           gradleOptions: '-Xmx3072m'
+          jdkVersionOption: '1.11'
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
@@ -193,13 +183,11 @@ stages:
 
   - job: Mac
     pool:
-      vmImage: 'xcode9-macos10.13'
+      vmImage: 'macOS-10.14'
     steps:
       - script: |
           mkdir build
-          wget "https://download.java.net/java/ga/jdk11/openjdk-11_osx-x64_bin.tar.gz" -O "build/jdk.tar.gz"
-          sudo tar xvzf build/jdk.tar.gz -C /Library/Java/JavaVirtualMachines/
-          export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/
+          export JAVA_HOME=`/usr/libexec/java_home -v 11`
         displayName: 'Setup JDK'
       - script: |
           rm /Users/vsts/.gradle/init.d/log-gradle-version-plugin.gradle
@@ -209,8 +197,7 @@ stages:
           workingDirectory: ''
           gradleWrapperFile: 'gradlew'
           gradleOptions: '-Xmx3072m'
-          javaHomeOption: 'path'
-          jdkDirectory: '/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/'
+          jdkVersionOption: '1.11'
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
@@ -227,7 +214,7 @@ stages:
   jobs:
   - job: CombineJob
     pool:
-      vmImage: 'xcode9-macos10.13'
+      vmImage: 'macOS-10.14'
 
     steps:
     - checkout: none
