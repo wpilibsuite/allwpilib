@@ -8,26 +8,21 @@
 package edu.wpi.first.wpilibj;
 
 import java.util.Random;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
-public class LinearFilterNoiseTest {
-  public enum TestType {
-    kSinglePoleIIR, kMovAvg
-  }
-
-  // Filter constants
-  public static final double kFilterStep = 0.005;
-  public static final double kFilterTime = 2.0;
-  public static final double kSinglePoleIIRTimeConstant = 0.015915;
-  public static final int kMovAvgTaps = 6;
+class LinearFilterNoiseTest {
+  private static final double kFilterStep = 0.005;
+  private static final double kFilterTime = 2.0;
+  private static final double kSinglePoleIIRTimeConstant = 0.015915;
+  private static final int kMovAvgTaps = 6;
 
   @SuppressWarnings("ParameterName")
-  public static double getData(double t) {
+  private static double getData(double t) {
     return 100.0 * Math.sin(2.0 * Math.PI * t);
   }
 
@@ -35,16 +30,8 @@ public class LinearFilterNoiseTest {
    * Test if the filter reduces the noise produced by a signal generator.
    */
   @ParameterizedTest
-  @EnumSource(TestType.class)
-  public void testNoiseReduce(TestType type) {
-    final LinearFilter filter;
-
-    if (type == TestType.kSinglePoleIIR) {
-      filter = LinearFilter.singlePoleIIR(kSinglePoleIIRTimeConstant, kFilterStep);
-    } else {
-      filter = LinearFilter.movingAverage(kMovAvgTaps);
-    }
-
+  @MethodSource("filterProvider")
+  void testNoiseReduce(final LinearFilter filter) {
     double noiseGenError = 0.0;
     double filterError = 0.0;
 
@@ -60,6 +47,13 @@ public class LinearFilterNoiseTest {
 
     assertTrue(noiseGenError > filterError,
         "Filter should have reduced noise accumulation from " + noiseGenError
-        + " but failed. The filter error was " + filterError);
+            + " but failed. The filter error was " + filterError);
+  }
+
+  static Stream<LinearFilter> filterProvider() {
+    return Stream.of(
+        LinearFilter.singlePoleIIR(kSinglePoleIIRTimeConstant, kFilterStep),
+        LinearFilter.movingAverage(kMovAvgTaps)
+    );
   }
 }
