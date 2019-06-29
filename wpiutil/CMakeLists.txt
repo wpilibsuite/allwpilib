@@ -26,6 +26,13 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+if (NOT MSVC)
+    find_library(ATOMIC NAMES atomic libatomic.so.1)
+    if (ATOMIC)
+        message(STATUS "Found libatomic: ${ATOMIC}")
+    endif()
+endif()
+
 GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpiutil_resources_src)
 
 file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp)
@@ -85,7 +92,7 @@ if (MSVC)
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)
-target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS})
+target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS} ${ATOMIC})
 
 if (NOT USE_VCPKG_LIBUV)
     target_sources(wpiutil PRIVATE ${uv_native_src})

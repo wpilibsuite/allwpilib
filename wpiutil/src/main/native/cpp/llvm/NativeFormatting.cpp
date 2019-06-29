@@ -132,7 +132,7 @@ void wpi::write_integer(raw_ostream &S, long long N, size_t MinDigits,
 }
 
 void wpi::write_hex(raw_ostream &S, uint64_t N, HexPrintStyle Style,
-                     optional<size_t> Width) {
+                     std::optional<size_t> Width) {
   const size_t kMaxWidth = 128u;
 
   size_t W = std::min(kMaxWidth, Width.value_or(0u));
@@ -162,7 +162,7 @@ void wpi::write_hex(raw_ostream &S, uint64_t N, HexPrintStyle Style,
 }
 
 void wpi::write_double(raw_ostream &S, double N, FloatStyle Style,
-                        optional<size_t> Precision) {
+                        std::optional<size_t> Precision) {
   size_t Prec = Precision.value_or(getDefaultPrecision(Style));
 
   if (std::isnan(N)) {

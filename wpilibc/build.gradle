@@ -203,16 +203,12 @@ model {
             }
         }
         withType(GoogleTestTestSuiteBinarySpec) {
-            if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian')) {
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
-                lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                project(':hal').addHalDependency(it, 'shared')
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-                lib library: nativeName, linkage: 'shared'
-            } else {
-                it.buildable = false
-            }
+            lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+            lib project: ':cscore', library: 'cscore', linkage: 'shared'
+            project(':hal').addHalDependency(it, 'shared')
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+            lib library: nativeName, linkage: 'shared'
         }
     }
     tasks {

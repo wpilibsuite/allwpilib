@@ -1,5 +1,5 @@
 set(GCC_COMPILER_VERSION "" CACHE STRING "GCC Compiler version")
-set(GNU_MACHINE "arm-raspbian9-linux-gnueabi" CACHE STRING "GNU compiler triple")
+set(GNU_MACHINE "arm-raspbian10-linux-gnueabi" CACHE STRING "GNU compiler triple")
 
 if(COMMAND toolchain_save_config)
   return() # prevent recursive call
