@@ -1,6 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java'
 //apply plugin: 'net.ltgt.errorprone'
+apply plugin: 'jacoco'
 
 def pubVersion
 if (project.hasProperty("publishVersion")) {
@@ -85,6 +86,7 @@ test {
         events "failed"
         exceptionFormat "full"
     }
+    finalizedBy jacocoTestReport
 }
 
 if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxraspbian')) {
@@ -122,3 +124,14 @@ task run(type: JavaExec) {
 }
 
 build.dependsOn devClasses
+
+jacoco {
+    toolVersion = "0.8.4"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
+}
