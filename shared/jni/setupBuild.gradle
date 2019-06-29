@@ -104,7 +104,11 @@ model {
             } else {
                 baseName = nativeName + 'jni'
             }
-            enableCheckTask true
+            if (project.hasProperty('skipJniCheck')) {
+                enableCheckTask false
+            } else {
+                enableCheckTask true
+            }
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
@@ -142,7 +146,11 @@ model {
             } else {
                 baseName = nativeName + 'jni'
             }
-            enableCheckTask true
+            if (project.hasProperty('skipJniCheck')) {
+                enableCheckTask false
+            } else {
+                enableCheckTask true
+            }
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
