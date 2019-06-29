@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,138 +7,207 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.logging.Logger;
+import java.util.Set;
+import java.util.stream.Stream;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
-/**
- * Tests the {@link Preferences}.
- */
-public class PreferencesTest extends AbstractComsSetup {
-  private static final Logger logger = Logger.getLogger(PreferencesTest.class.getName());
+class PreferencesTest {
 
-  private NetworkTable m_prefTable;
-  private Preferences m_pref;
-  private long m_check;
+  private final Preferences m_prefs = Preferences.getInstance();
+  private final NetworkTable m_table = NetworkTableInstance.getDefault().getTable("Preferences");
 
-  @Override
-  protected Logger getClassLogger() {
-    return logger;
+  private static final String kFilename = "networktables.ini";
+
+  @BeforeAll
+  static void setupAll() {
+    NetworkTableInstance.getDefault().stopServer();
   }
 
+  @BeforeEach
+  void setup(@TempDir Path tempDir) {
+    m_table.getKeys().forEach(m_table::delete);
 
-  @Before
-  public void setUp() throws Exception {
-    NetworkTable.shutdown();
-    try {
-      File file = new File("networktables.ini");
-      file.mkdirs();
-      if (file.exists()) {
-        file.delete();
-      }
-      file.createNewFile();
-      OutputStream output = new FileOutputStream(file);
-      output
-          .write(("[NetworkTables Storage 3.0]\ndouble \"/Preferences/checkedValueInt\"=2\ndouble "
-              + "\"/Preferences/checkedValueDouble\"=.2\ndouble "
-              + "\"/Preferences/checkedValueFloat\"=3.14\ndouble "
-              + "\"/Preferences/checkedValueLong\"=172\nstring "
-              + "\"/Preferences/checkedValueString\"=\"hello \\nHow are you ?\"\nboolean "
-              + "\"/Preferences/checkedValueBoolean\"=false\n")
-              .getBytes());
-
+    Path filepath = tempDir.resolve(kFilename);
+    try (InputStream is = getClass().getResource("PreferencesTestDefault.ini").openStream()) {
+      Files.copy(is, filepath);
     } catch (IOException ex) {
-      ex.printStackTrace();
+      fail(ex);
     }
-    NetworkTable.initialize();
 
-    m_pref = Preferences.getInstance();
-    m_prefTable = NetworkTable.getTable("Preferences");
-    m_check = System.currentTimeMillis();
+    NetworkTableInstance.getDefault().startServer(filepath.toUri().getPath());
   }
 
-
-  protected void remove() {
-    m_pref.remove("checkedValueLong");
-    m_pref.remove("checkedValueDouble");
-    m_pref.remove("checkedValueString");
-    m_pref.remove("checkedValueInt");
-    m_pref.remove("checkedValueFloat");
-    m_pref.remove("checkedValueBoolean");
+  @AfterEach
+  void cleanup() {
+    NetworkTableInstance.getDefault().stopServer();
   }
 
-  protected void addCheckedValue() {
-    m_pref.putLong("checkedValueLong", m_check);
-    m_pref.putDouble("checkedValueDouble", 1);
-    m_pref.putString("checkedValueString", "checked");
-    m_pref.putInt("checkedValueInt", 1);
-    m_pref.putFloat("checkedValueFloat", 1);
-    m_pref.putBoolean("checkedValueBoolean", true);
-  }
-
-  /**
-   * Just checking to make sure our helper method works.
-   */
-  @Test
-  public void testRemove() {
-    remove();
-    assertEquals("Preferences was not empty!  Preferences in table: "
-        + Arrays.toString(m_pref.getKeys().toArray()),
-        1, m_pref.getKeys().size());
+  @AfterAll
+  static void cleanupAll() {
+    NetworkTableInstance.getDefault().startServer();
   }
 
   @Test
-  public void testRemoveAll() {
-    m_pref.removeAll();
-    assertEquals("Preferences was not empty!  Preferences in table: "
-        + Arrays.toString(m_pref.getKeys().toArray()),
-        1, m_pref.getKeys().size());
+  void removeAllTest() {
+    m_prefs.removeAll();
+
+    Set<String> keys = m_table.getKeys();
+    keys.remove(".type");
+
+    assertTrue(keys.isEmpty(), "Preferences was not empty!  Preferences in table: "
+        + Arrays.toString(keys.toArray()));
+  }
+
+  @ParameterizedTest
+  @MethodSource("defaultKeyProvider")
+  void defaultKeysTest(String key) {
+    assertTrue(m_prefs.containsKey(key));
+  }
+
+  @ParameterizedTest
+  @MethodSource("defaultKeyProvider")
+  void defaultKeysAllTest(String key) {
+    assertTrue(m_prefs.getKeys().contains(key));
   }
 
   @Test
-  public void testAddRemoveSave() {
-    assertEquals(m_pref.getLong("checkedValueLong", 0), 172L);
-    assertEquals(m_pref.getDouble("checkedValueDouble", 0), .2, 0);
-    assertEquals(m_pref.getString("checkedValueString", ""), "hello \nHow are you ?");
-    assertEquals(m_pref.getInt("checkedValueInt", 0), 2);
-    assertEquals(m_pref.getFloat("checkedValueFloat", 0), 3.14, .001);
-    assertFalse(m_pref.getBoolean("checkedValueBoolean", true));
-    remove();
-    assertEquals(m_pref.getLong("checkedValueLong", 0), 0);
-    assertEquals(m_pref.getDouble("checkedValueDouble", 0), 0, 0);
-    assertEquals(m_pref.getString("checkedValueString", ""), "");
-    assertEquals(m_pref.getInt("checkedValueInt", 0), 0);
-    assertEquals(m_pref.getFloat("checkedValueFloat", 0), 0, 0);
-    assertFalse(m_pref.getBoolean("checkedValueBoolean", false));
-    addCheckedValue();
-    assertEquals(m_check, m_pref.getLong("checkedValueLong", 0));
-    assertEquals(m_pref.getDouble("checkedValueDouble", 0), 1, 0);
-    assertEquals(m_pref.getString("checkedValueString", ""), "checked");
-    assertEquals(m_pref.getInt("checkedValueInt", 0), 1);
-    assertEquals(m_pref.getFloat("checkedValueFloat", 0), 1, 0);
-    assertTrue(m_pref.getBoolean("checkedValueBoolean", false));
+  void defaultValueTest() {
+    assertAll(
+        () -> assertEquals(172L, m_prefs.getLong("checkedValueLong", 0)),
+        () -> assertEquals(0.2, m_prefs.getDouble("checkedValueDouble", 0), 1e-6),
+        () -> assertEquals("Hello. How are you?", m_prefs.getString("checkedValueString", "")),
+        () -> assertEquals(2, m_prefs.getInt("checkedValueInt", 0)),
+        () -> assertEquals(3.14, m_prefs.getFloat("checkedValueFloat", 0), 1e-6),
+        () -> assertFalse(m_prefs.getBoolean("checkedValueBoolean", true))
+    );
   }
 
   @Test
-  public void testPreferencesToNetworkTables() {
-    String networkedNumber = "networkCheckedValue";
-    int networkNumberValue = 100;
-    m_pref.putInt(networkedNumber, networkNumberValue);
-    assertEquals(networkNumberValue, (int) (m_prefTable.getNumber(networkedNumber, 9999999)));
-    m_pref.remove(networkedNumber);
+  void backupTest() {
+    m_prefs.removeAll();
+
+    assertAll(
+        () -> assertEquals(0, m_prefs.getLong("checkedValueLong", 0)),
+        () -> assertEquals(0, m_prefs.getDouble("checkedValueDouble", 0), 1e-6),
+        () -> assertEquals("", m_prefs.getString("checkedValueString", "")),
+        () -> assertEquals(0, m_prefs.getInt("checkedValueInt", 0)),
+        () -> assertEquals(0, m_prefs.getFloat("checkedValueFloat", 0), 1e-6),
+        () -> assertTrue(m_prefs.getBoolean("checkedValueBoolean", true))
+    );
   }
 
+  @Nested
+  class PutGetTests {
+    @Test
+    void intTest() {
+      final String key = "test";
+      final int value = 123;
+
+      m_prefs.putInt(key, value);
+
+      assertAll(
+          () -> assertEquals(value, m_prefs.getInt(key, -1)),
+          () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).intValue())
+      );
+    }
+
+    @Test
+    void longTest() {
+      final String key = "test";
+      final long value = 190L;
+
+      m_prefs.putLong(key, value);
+
+      assertAll(
+          () -> assertEquals(value, m_prefs.getLong(key, -1)),
+          () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).longValue())
+      );
+    }
+
+    @Test
+    void floatTest() {
+      final String key = "test";
+      final float value = 9.42f;
+
+      m_prefs.putFloat(key, value);
+
+      assertAll(
+          () -> assertEquals(value, m_prefs.getFloat(key, -1), 1e-6),
+          () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).floatValue(), 1e-6)
+      );
+    }
+
+    @Test
+    void doubleTest() {
+      final String key = "test";
+      final double value = 6.28;
+
+      m_prefs.putDouble(key, value);
+
+      assertAll(
+          () -> assertEquals(value, m_prefs.getDouble(key, -1), 1e-6),
+          () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).doubleValue(), 1e-6)
+      );
+    }
+
+    @Test
+    void stringTest() {
+      final String key = "test";
+      final String value = "value";
+
+      m_prefs.putString(key, value);
+
+      assertAll(
+          () -> assertEquals(value, m_prefs.getString(key, "")),
+          () -> assertEquals(value, m_table.getEntry(key).getString(""))
+      );
+    }
+
+    @Test
+    void booleanTest() {
+      final String key = "test";
+      final boolean value = true;
+
+      m_prefs.putBoolean(key, value);
+
+      assertAll(
+          () -> assertEquals(value, m_prefs.getBoolean(key, false)),
+          () -> assertEquals(value, m_table.getEntry(key).getBoolean(false))
+      );
+    }
+  }
+
+  static Stream<String> defaultKeyProvider() {
+    return Stream.of(
+        "checkedValueLong",
+        "checkedValueDouble",
+        "checkedValueString",
+        "checkedValueInt",
+        "checkedValueFloat",
+        "checkedValueBoolean"
+    );
+  }
 }
