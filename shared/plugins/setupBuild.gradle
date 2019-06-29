@@ -11,7 +11,7 @@ ext {
 apply from: "${rootDir}/shared/nilibraries.gradle"
 
 if (!project.hasProperty('onlylinuxathena')) {
-    ext.skipAthena = true
+    ext.skiplinuxathena = true
     apply from: "${rootDir}/shared/config.gradle"
 
     model {

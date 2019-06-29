@@ -4,8 +4,8 @@ apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: 'cpp'
 apply plugin: "google-test"
 
-ext.skipAthena = true
-ext.skipRaspbian = true
+ext.skiplinuxathena = true
+ext.skiplinuxraspbian = true
 
 apply from: "${rootDir}/shared/config.gradle"
 
