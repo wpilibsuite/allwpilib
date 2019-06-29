@@ -5,8 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-# ifndef WPIUTIL_WPI_OPTIONAL_H
-# define WPIUTIL_WPI_OPTIONAL_H
+#ifndef WPIUTIL_WPI_OPTIONAL_H_
+#define WPIUTIL_WPI_OPTIONAL_H_
+
+// clang-format off
 
 #ifdef _MSC_VER
 #pragma message("warning: wpi/optional.h is deprecated; include <optional> instead")
@@ -28,4 +30,6 @@ using nullopt_t [[deprecated("use std::nullopt_t")]] = std::nullopt_t;
 
 }  // namespace wpi
 
-# endif //WPIUTIL_WPI_OPTIONAL_H
+// clang-format on
+
+#endif  // WPIUTIL_WPI_OPTIONAL_H_
