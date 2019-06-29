@@ -9,7 +9,9 @@ import org.gradle.language.base.internal.ProjectLayout;
 import org.gradle.language.base.plugins.ComponentModelBasePlugin;
 import org.gradle.language.nativeplatform.tasks.AbstractNativeSourceCompileTask;
 import org.gradle.model.ModelMap;
+import edu.wpi.first.toolchain.ToolchainExtension
 import org.gradle.model.Mutate;
+import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.nativeplatform.test.googletest.GoogleTestTestSuiteBinarySpec;
 import org.gradle.model.RuleSource;
 import org.gradle.model.Validate;
@@ -51,6 +53,20 @@ class MultiBuilds implements Plugin<Project> {
     private static void setBuildableFalseDynamically(NativeBinarySpec binary) {
         binary.buildable = false
     }
+
+    @Validate
+    @CompileStatic
+    // TODO: Move this to tc plugin
+    void disableCrossTests(BinaryContainer binaries, ExtensionContainer extContainer) {
+        final ToolchainExtension ext = extContainer.getByType(ToolchainExtension.class);
+
+        for (GoogleTestTestSuiteBinarySpec binary : binaries.withType(GoogleTestTestSuiteBinarySpec.class)) {
+            if (ext.getCrossCompilers().findByName(binary.getTargetPlatform().getName()) != null) {
+              setBuildableFalseDynamically(binary)
+            }
+        }
+    }
+
 
     @Mutate
     @CompileStatic

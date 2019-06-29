@@ -232,12 +232,8 @@ model {
     }
     binaries {
         withType(GoogleTestTestSuiteBinarySpec) {
-            if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian')) {
-                lib library: nativeName, linkage: 'shared'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-            } else {
-                it.buildable = false
-            }
+            lib library: nativeName, linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }
     }
     tasks {
