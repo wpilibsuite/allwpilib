@@ -8,9 +8,9 @@ resources:
   - container: wpilib2020
     image: wpilib/roborio-cross-ubuntu:2020-18.04
   - container: raspbian
-    image:  wpilib/raspbian-cross-ubuntu:18.04
-  - container: styleguide
-    image:  wpilib/styleguide:18.04
+    image:  wpilib/raspbian-cross-ubuntu:10-18.04
+  - container: ubuntu
+    image:  wpilib/ubuntu-base:18.04
 
 stages:
 - stage: Build
@@ -91,7 +91,7 @@ stages:
     pool:
       vmImage: 'Ubuntu 16.04'
 
-    container: styleguide
+    container: ubuntu
 
     steps:
         - script: |
