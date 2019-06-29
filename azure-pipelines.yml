@@ -95,7 +95,7 @@ stages:
 
     steps:
         - script: |
-            pip3 install wpiformat
+            sudo pip3 install wpiformat
           displayName: 'Install wpiformat'
         - script: |
             git checkout -b master
