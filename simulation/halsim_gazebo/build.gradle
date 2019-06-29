@@ -7,6 +7,8 @@ ext.skiplinuxathena = true
 ext.skiplinuxraspbian = true
 ext.pluginName = 'halsim_gazebo'
 
+apply from: "${rootDir}/shared/config.gradle"
+
 /* If gz_msgs or gazebo is not available, do not attempt a build */
 def gazebo_version = ""
 def gazebo_cppflags = ""
@@ -34,10 +36,8 @@ if (!gazebo_version?.trim()) {
 evaluationDependsOn(":simulation:gz_msgs")
 def gz_msgs_project = project(":simulation:gz_msgs")
 
-if (!gz_msgs_project.hasProperty('skip_gz_msgs') && !project.hasProperty('skip_frc_plugins')) {
-
-    apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
-
+tasks.whenTaskAdded { task ->
+    task.onlyIf { !gz_msgs_project.hasProperty('skip_gz_msgs') && !project.hasProperty('skip_frc_plugins') }
 }
 
 model {
