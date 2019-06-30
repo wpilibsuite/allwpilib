@@ -1,7 +1,6 @@
 model {
     binaries {
         withType(GoogleTestTestSuiteBinarySpec).all {
-            if (it.targetPlatform.name != nativeUtils.wpi.platforms.raspbian)
             nativeUtils.useRequiredLibrary(it, 'googletest_static')
         }
     }
