@@ -67,7 +67,7 @@ stages:
     pool:
       vmImage: 'Ubuntu 16.04'
 
-    container: wpilib2020
+    container: ubuntu
 
     steps:
       - task: Gradle@2
@@ -78,7 +78,6 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Pskiplinuxathena -Pskiplinuxraspbian'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
