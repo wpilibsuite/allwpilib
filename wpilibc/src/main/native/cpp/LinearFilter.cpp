@@ -26,8 +26,7 @@ LinearFilter LinearFilter::SinglePoleIIR(double timeConstant, double period) {
 
 LinearFilter LinearFilter::HighPass(double timeConstant, double period) {
   double gain = std::exp(-period / timeConstant);
-  const double ffGains[] = {gain, -gain};
-  return LinearFilter(ffGains, -gain);
+  return LinearFilter({gain, -gain}, {-gain});
 }
 
 LinearFilter LinearFilter::MovingAverage(int taps) {

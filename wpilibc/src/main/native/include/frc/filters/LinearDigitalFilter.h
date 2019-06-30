@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <initializer_list>
 #include <memory>
 #include <vector>
 
@@ -89,9 +90,32 @@ class LinearDigitalFilter : public Filter {
    * @param fbGains The "feed back" or IIR gains
    */
   WPI_DEPRECATED("Use LinearFilter class instead.")
+  LinearDigitalFilter(PIDSource& source, std::initializer_list<double> ffGains,
+                      std::initializer_list<double> fbGains);
+
+  /**
+   * Create a linear FIR or IIR filter.
+   *
+   * @param source  The PIDSource object that is used to get values
+   * @param ffGains The "feed forward" or FIR gains
+   * @param fbGains The "feed back" or IIR gains
+   */
+  WPI_DEPRECATED("Use LinearFilter class instead.")
   LinearDigitalFilter(std::shared_ptr<PIDSource> source,
                       wpi::ArrayRef<double> ffGains,
                       wpi::ArrayRef<double> fbGains);
+
+  /**
+   * Create a linear FIR or IIR filter.
+   *
+   * @param source  The PIDSource object that is used to get values
+   * @param ffGains The "feed forward" or FIR gains
+   * @param fbGains The "feed back" or IIR gains
+   */
+  WPI_DEPRECATED("Use LinearFilter class instead.")
+  LinearDigitalFilter(std::shared_ptr<PIDSource> source,
+                      std::initializer_list<double> ffGains,
+                      std::initializer_list<double> fbGains);
 
   LinearDigitalFilter(LinearDigitalFilter&&) = default;
   LinearDigitalFilter& operator=(LinearDigitalFilter&&) = default;

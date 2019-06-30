@@ -141,14 +141,15 @@ TEST_F(WebSocketServerTest, CloseCode) {
     });
   };
   // need to respond with close for server to finish shutdown
-  auto message = BuildMessage(0x08, true, true, {0x03u, 0xe8u});
+  const uint8_t contents[] = {0x03u, 0xe8u};
+  auto message = BuildMessage(0x08, true, true, contents);
   handleData = [&](StringRef) {
     clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
   };
 
   loop->Run();
 
-  auto expectData = BuildMessage(0x08, true, false, {0x03u, 0xe8u});
+  auto expectData = BuildMessage(0x08, true, false, contents);
   ASSERT_EQ(wireData, expectData);
   ASSERT_EQ(gotClosed, 1);
 }
@@ -164,16 +165,15 @@ TEST_F(WebSocketServerTest, CloseReason) {
     });
   };
   // need to respond with close for server to finish shutdown
-  auto message = BuildMessage(0x08, true, true,
-                              {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'});
+  const uint8_t contents[] = {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'};
+  auto message = BuildMessage(0x08, true, true, contents);
   handleData = [&](StringRef) {
     clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
   };
 
   loop->Run();
 
-  auto expectData = BuildMessage(0x08, true, false,
-                                 {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'});
+  auto expectData = BuildMessage(0x08, true, false, contents);
   ASSERT_EQ(wireData, expectData);
   ASSERT_EQ(gotClosed, 1);
 }
@@ -211,7 +211,8 @@ TEST_F(WebSocketServerTest, ReceiveCloseCode) {
       ASSERT_EQ(code, 1000) << "reason: " << reason;
     });
   };
-  auto message = BuildMessage(0x08, true, true, {0x03u, 0xe8u});
+  const uint8_t contents[] = {0x03u, 0xe8u};
+  auto message = BuildMessage(0x08, true, true, contents);
   resp.headersComplete.connect([&](bool) {
     clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
   });
@@ -219,7 +220,7 @@ TEST_F(WebSocketServerTest, ReceiveCloseCode) {
   loop->Run();
 
   // the endpoint should echo the message
-  auto expectData = BuildMessage(0x08, true, false, {0x03u, 0xe8u});
+  auto expectData = BuildMessage(0x08, true, false, contents);
   ASSERT_EQ(wireData, expectData);
   ASSERT_EQ(gotClosed, 1);
 }
@@ -233,8 +234,8 @@ TEST_F(WebSocketServerTest, ReceiveCloseReason) {
       ASSERT_EQ(reason, "hangup");
     });
   };
-  auto message = BuildMessage(0x08, true, true,
-                              {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'});
+  const uint8_t contents[] = {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'};
+  auto message = BuildMessage(0x08, true, true, contents);
   resp.headersComplete.connect([&](bool) {
     clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
   });
@@ -242,8 +243,7 @@ TEST_F(WebSocketServerTest, ReceiveCloseReason) {
   loop->Run();
 
   // the endpoint should echo the message
-  auto expectData = BuildMessage(0x08, true, false,
-                                 {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'});
+  auto expectData = BuildMessage(0x08, true, false, contents);
   ASSERT_EQ(wireData, expectData);
   ASSERT_EQ(gotClosed, 1);
 }
