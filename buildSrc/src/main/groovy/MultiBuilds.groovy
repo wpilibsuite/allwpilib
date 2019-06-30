@@ -15,6 +15,7 @@ import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.nativeplatform.test.googletest.GoogleTestTestSuiteBinarySpec;
 import org.gradle.model.RuleSource;
 import org.gradle.model.Validate;
+import org.gradle.nativeplatform.test.tasks.RunTestExecutable
 import org.gradle.nativeplatform.NativeExecutableBinarySpec
 import org.gradle.nativeplatform.NativeBinarySpec;
 import org.gradle.nativeplatform.NativeComponentSpec;
@@ -62,7 +63,9 @@ class MultiBuilds implements Plugin<Project> {
 
         for (GoogleTestTestSuiteBinarySpec binary : binaries.withType(GoogleTestTestSuiteBinarySpec.class)) {
             if (ext.getCrossCompilers().findByName(binary.getTargetPlatform().getName()) != null) {
-              setBuildableFalseDynamically(binary)
+              binary.tasks.withType(RunTestExecutable).each {
+                it.onlyIf { false }
+              }
             }
         }
     }
@@ -81,21 +84,6 @@ class MultiBuilds implements Plugin<Project> {
           Rules.setBuildableFalseDynamically(spec)
         }
       }
-        // def crossCompileConfigs = []
-        // for (BuildConfig config : configs) {
-        //     if (!BuildConfigRulesBase.isCrossCompile(config)) {
-        //         continue
-        //     }
-        //     crossCompileConfigs << config.architecture
-        // }
-        // if (!crossCompileConfigs.empty) {
-        //     binaries.withType(GoogleTestTestSuiteBinarySpec) { oSpec ->
-        //         GoogleTestTestSuiteBinarySpec spec = (GoogleTestTestSuiteBinarySpec) oSpec
-        //         if (crossCompileConfigs.contains(spec.targetPlatform.architecture.name)) {
-        //             setBuildableFalseDynamically(spec)
-        //         }
-        //     }
-        // }
     }
   }
 }
