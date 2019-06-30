@@ -11,6 +11,8 @@ resources:
     image:  wpilib/raspbian-cross-ubuntu:10-18.04
   - container: ubuntu
     image:  wpilib/ubuntu-base:18.04
+  - container: gazebo
+    image:  wpilib/gazebo-ubuntu:18.04
 
 stages:
 - stage: Build
@@ -84,6 +86,29 @@ stages:
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'Linux'
+          targetPath: 'build/allOutputs'
+
+  - job: Gazebo
+    pool:
+      vmImage: 'Ubuntu 16.04'
+
+    container: gazebo
+
+    steps:
+      - task: Gradle@2
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          gradleOptions: '-Xmx3072m'
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          tasks: 'build'
+          # checkStyleRunAnalysis: true
+          # pmdRunAnalysis: true
+
+      - task: PublishPipelineArtifact@0
+        inputs:
+          artifactName: 'Gazebo'
           targetPath: 'build/allOutputs'
 
   - job: Styleguide
