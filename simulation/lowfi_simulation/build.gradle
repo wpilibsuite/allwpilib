@@ -13,7 +13,7 @@ ext {
 apply from: "${rootDir}/shared/config.gradle"
 
 if (!project.hasProperty('onlylinuxathena')) {
-
+    ext.skiplinuxathena = true
     ext {
         sharedCvConfigs = [lowfi_simTest: []]
         staticCvConfigs = [:]
