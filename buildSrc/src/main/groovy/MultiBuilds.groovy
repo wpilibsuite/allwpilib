@@ -55,21 +55,6 @@ class MultiBuilds implements Plugin<Project> {
         binary.buildable = false
     }
 
-    @Validate
-    @CompileStatic
-    // TODO: Move this to tc plugin
-    void disableCrossTests(BinaryContainer binaries, ExtensionContainer extContainer) {
-        final ToolchainExtension ext = extContainer.getByType(ToolchainExtension.class);
-
-        for (GoogleTestTestSuiteBinarySpec binary : binaries.withType(GoogleTestTestSuiteBinarySpec.class)) {
-            if (ext.getCrossCompilers().findByName(binary.getTargetPlatform().getName()) != null) {
-              binary.tasks.withType(RunTestExecutable).each {
-                it.onlyIf { false }
-              }
-            }
-        }
-    }
-
 
     @Mutate
     @CompileStatic
