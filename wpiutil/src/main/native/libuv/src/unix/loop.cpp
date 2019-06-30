@@ -129,7 +129,7 @@ int uv_loop_fork(uv_loop_t* loop) {
 
   /* Rearm all the watchers that aren't re-queued by the above. */
   for (i = 0; i < loop->nwatchers; i++) {
-    w = loop->watchers[i];
+    w = (uv__io_t*)loop->watchers[i];
     if (w == NULL)
       continue;
 
