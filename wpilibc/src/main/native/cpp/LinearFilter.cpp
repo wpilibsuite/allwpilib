@@ -10,6 +10,8 @@
 #include <cassert>
 #include <cmath>
 
+#include <hal/HAL.h>
+
 using namespace frc;
 
 LinearFilter::LinearFilter(wpi::ArrayRef<double> ffGains,
@@ -17,7 +19,11 @@ LinearFilter::LinearFilter(wpi::ArrayRef<double> ffGains,
     : m_inputs(ffGains.size()),
       m_outputs(fbGains.size()),
       m_inputGains(ffGains),
-      m_outputGains(fbGains) {}
+      m_outputGains(fbGains) {
+  static int instances = 0;
+  instances++;
+  HAL_Report(HALUsageReporting::kResourceType_LinearFilter, instances);
+}
 
 LinearFilter LinearFilter::SinglePoleIIR(double timeConstant, double period) {
   double gain = std::exp(-period / timeConstant);
