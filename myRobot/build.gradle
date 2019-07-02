@@ -110,7 +110,7 @@ model {
                 if (it in NativeExecutableSpec && it.name == "myRobotCpp") {
                     it.binaries.each {
                         if (!found) {
-                            def arch = it.targetPlatform.architecture.name
+                            def arch = it.targetPlatform.name
                             if (arch == systemArch) {
                                 dependsOn it.tasks.install
                                 commandLine it.tasks.install.runScriptFile.get().asFile.toString()
@@ -129,14 +129,14 @@ model {
         }
         installAthena(Task) {
             $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.architecture.name == 'athena' && it.component.name == 'myRobotCpp') {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'myRobotCpp') {
                     dependsOn it.tasks.install
                 }
             }
         }
         installAthenaStatic(Task) {
             $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.architecture.name == 'athena' && it.component.name == 'myRobotCppStatic') {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'myRobotCppStatic') {
                     dependsOn it.tasks.install
                 }
             }

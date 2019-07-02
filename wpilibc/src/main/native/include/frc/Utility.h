@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -73,49 +73,6 @@ bool wpi_assertNotEqual_impl(int valueA, int valueB,
                              int lineNumber, wpi::StringRef funcName);
 
 namespace frc {
-
-/**
- * Return the FPGA Version number.
- *
- * For now, expect this to be competition year.
- *
- * @return FPGA Version number.
- * @deprecated Use RobotController static class method
- */
-WPI_DEPRECATED("Use RobotController static class method")
-int GetFPGAVersion();
-
-/**
- * Return the FPGA Revision number.
- *
- * The format of the revision is 3 numbers. The 12 most significant bits are the
- * Major Revision. The next 8 bits are the Minor Revision. The 12 least
- * significant bits are the Build Number.
- *
- * @return FPGA Revision number.
- * @deprecated Use RobotController static class method
- */
-WPI_DEPRECATED("Use RobotController static class method")
-int64_t GetFPGARevision();
-
-/**
- * Read the microsecond-resolution timer on the FPGA.
- *
- * @return The current time in microseconds according to the FPGA (since FPGA
- *         reset).
- * @deprecated Use RobotController static class method
- */
-WPI_DEPRECATED("Use RobotController static class method")
-uint64_t GetFPGATime();
-
-/**
- * Get the state of the "USER" button on the roboRIO.
- *
- * @return True if the button is currently pressed down
- * @deprecated Use RobotController static class method
- */
-WPI_DEPRECATED("Use RobotController static class method")
-bool GetUserButton();
 
 /**
  * Get a stack trace, ignoring the first "offset" symbols.

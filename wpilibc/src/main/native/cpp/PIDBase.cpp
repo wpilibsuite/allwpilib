@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -34,12 +34,8 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
   m_D = Kd;
   m_F = Kf;
 
-  // Save original source
-  m_origSource = std::shared_ptr<PIDSource>(&source, NullDeleter<PIDSource>());
-
-  // Create LinearDigitalFilter with original source as its source argument
-  m_filter = LinearDigitalFilter::MovingAverage(m_origSource, 1);
-  m_pidInput = &m_filter;
+  m_pidInput = &source;
+  m_filter = LinearFilter::MovingAverage(1);
 
   m_pidOutput = &output;
 
@@ -200,10 +196,7 @@ void PIDBase::SetPercentTolerance(double percent) {
 
 void PIDBase::SetToleranceBuffer(int bufLength) {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
-
-  // Create LinearDigitalFilter with original source as its source argument
-  m_filter = LinearDigitalFilter::MovingAverage(m_origSource, bufLength);
-  m_pidInput = &m_filter;
+  m_filter = LinearFilter::MovingAverage(bufLength);
 }
 
 bool PIDBase::OnTarget() const {
@@ -249,7 +242,7 @@ void PIDBase::InitSendable(SendableBuilder& builder) {
 }
 
 void PIDBase::Calculate() {
-  if (m_origSource == nullptr || m_pidOutput == nullptr) return;
+  if (m_pidInput == nullptr || m_pidOutput == nullptr) return;
 
   bool enabled;
   {
@@ -277,7 +270,7 @@ void PIDBase::Calculate() {
     {
       std::lock_guard<wpi::mutex> lock(m_thisMutex);
 
-      input = m_pidInput->PIDGet();
+      input = m_filter.Calculate(m_pidInput->PIDGet());
 
       pidSourceType = m_pidInput->GetPIDSourceType();
       P = m_P;

@@ -29,7 +29,7 @@ ext {
                 }
             }
         }
-        if (it.targetPlatform.operatingSystem.name != 'windows') {
+        if (!it.targetPlatform.operatingSystem.isWindows()) {
             it.cppCompiler.define '_GNU_SOURCE'
             it.sources {
                 libuvUnixCpp(CppSourceSet) {
@@ -62,7 +62,7 @@ ext {
                 }
             }
         }
-        if (it.targetPlatform.operatingSystem.name == 'windows') {
+        if (it.targetPlatform.operatingSystem.isWindows()) {
             if (it in SharedLibraryBinarySpec) {
                 it.cppCompiler.define 'BUILDING_UV_SHARED'
             }
@@ -77,7 +77,7 @@ ext {
                     }
                 }
             }
-        } else if (it.targetPlatform.operatingSystem.name == 'osx') {
+        } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
                 libuvMacCpp(CppSourceSet) {
                     source {
@@ -132,6 +132,19 @@ file("$projectDir/examples").list(new FilenameFilter() {
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
+nativeUtils.exportsConfigs {
+    wpiutil {
+        x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+        x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+    }
+}
+
 cppHeadersZip {
     from('src/main/native/libuv/include') {
         into '/'
@@ -148,23 +161,9 @@ model {
             }
         }
     }
+}
 
-    // Exports config is a utility to enable exporting all symbols in a C++ library on windows to a DLL.
-    // This removes the need for DllExport on a library. However, the gradle C++ builder has a bug
-    // where some extra symbols are added that cannot be resolved at link time. This configuration
-    // lets you specify specific symbols to exlude from exporting.
-    exportsConfigs {
-        wpiutil(ExportsConfig) {
-            x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                 '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                 '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
-                                 '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
-            x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                 '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                 '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
-                                 '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
-        }
-    }
+model {
     components {
         examplesMap.each { key, value ->
             "${key}"(NativeExecutableSpec) {

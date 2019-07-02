@@ -344,8 +344,8 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
     nevents = 0;
 
     assert(loop->watchers != NULL);
-    loop->watchers[loop->nwatchers] = (uv__io_t*) events;
-    loop->watchers[loop->nwatchers + 1] = (uv__io_t*) (uintptr_t) nfds;
+    loop->watchers[loop->nwatchers] = events;
+    loop->watchers[loop->nwatchers + 1] = (void*) (uintptr_t) nfds;
     for (i = 0; i < nfds; i++) {
       pe = events + i;
       fd = pe->data;
@@ -357,7 +357,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
       assert(fd >= 0);
       assert((unsigned) fd < loop->nwatchers);
 
-      w = loop->watchers[fd];
+      w = (uv__io_t*)loop->watchers[fd];
 
       if (w == NULL) {
         /* File descriptor that we've stopped watching, disarm it.

@@ -1,15 +1,15 @@
 plugins {
     id 'cpp'
     id 'java'
-    id 'com.google.protobuf' version '0.8.6'
+    id 'com.google.protobuf' version '0.8.8'
     id 'edu.wpi.first.NativeUtils'
 }
 
 description = "A C++ and Java library to pass FRC Simulation Messages in and out of Gazebo."
 
 /* The simulation does not run on real hardware; so we always skip Athena */
-ext.skipAthena = true
-ext.skipRaspbian = true
+ext.skiplinuxathena = true
+ext.skiplinuxraspbian = true
 apply from: "${rootDir}/shared/config.gradle"
 
 /* Use a sort of poor man's autoconf to find the protobuf development

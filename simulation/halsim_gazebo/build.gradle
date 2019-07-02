@@ -3,8 +3,8 @@ description = "A shared object library that will interface between a robot and t
 apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: 'cpp'
 
-ext.skipAthena = true
-ext.skipRaspbian = true
+ext.skiplinuxathena = true
+ext.skiplinuxraspbian = true
 ext.pluginName = 'halsim_gazebo'
 
 /* If gz_msgs or gazebo is not available, do not attempt a build */

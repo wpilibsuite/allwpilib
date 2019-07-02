@@ -16,8 +16,8 @@
 #define WPIUTIL_WPI_VERSIONTUPLE_H
 
 #include "wpi/StringRef.h"
-#include "wpi/optional.h"
 #include "wpi/raw_ostream.h"
+#include <optional>
 #include <string>
 #include <tuple>
 
@@ -68,23 +68,23 @@ public:
   unsigned getMajor() const { return Major; }
 
   /// Retrieve the minor version number, if provided.
-  optional<unsigned> getMinor() const {
+  std::optional<unsigned> getMinor() const {
     if (!HasMinor)
-      return nullopt;
+      return std::nullopt;
     return Minor;
   }
 
   /// Retrieve the subminor version number, if provided.
-  optional<unsigned> getSubminor() const {
+  std::optional<unsigned> getSubminor() const {
     if (!HasSubminor)
-      return nullopt;
+      return std::nullopt;
     return Subminor;
   }
 
   /// Retrieve the build version number, if provided.
-  optional<unsigned> getBuild() const {
+  std::optional<unsigned> getBuild() const {
     if (!HasBuild)
-      return nullopt;
+      return std::nullopt;
     return Build;
   }
 
