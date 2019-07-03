@@ -8,10 +8,9 @@ resources:
   - container: wpilib2020
     image: wpilib/roborio-cross-ubuntu:2020-18.04
   - container: raspbian
-    image:  wpilib/raspbian-cross-ubuntu:18.04
-  - container: ubuntu18
-    image: ubuntu:18.04
-    options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
+    image:  wpilib/raspbian-cross-ubuntu:10-18.04
+  - container: ubuntu
+    image:  wpilib/ubuntu-base:18.04
 
 stages:
 - stage: Build
@@ -68,7 +67,7 @@ stages:
     pool:
       vmImage: 'Ubuntu 16.04'
 
-    container: wpilib2020
+    container: ubuntu
 
     steps:
       - task: Gradle@2
@@ -79,7 +78,6 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Pskiplinuxathena -Pskiplinuxraspbian'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
@@ -92,20 +90,14 @@ stages:
     pool:
       vmImage: 'Ubuntu 16.04'
 
-    container: ubuntu18
+    container: ubuntu
 
     steps:
         - script: |
-            /tmp/docker exec -t -u 0 ci-container \
-            sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
-          displayName: Set up sudo
-        - script: |
-            sudo apt-get update -y
-            sudo apt-get install clang-format-6.0 python3-setuptools python3-pip git -y
             sudo pip3 install wpiformat
-            git checkout -b master
-          displayName: 'Install Dependencies'
+          displayName: 'Install wpiformat'
         - script: |
+            git checkout -b master
             wpiformat -clang 6.0
           displayName: 'Run wpiformat'
         - script: |

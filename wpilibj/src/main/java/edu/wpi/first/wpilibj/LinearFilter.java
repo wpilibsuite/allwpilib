@@ -9,6 +9,9 @@ package edu.wpi.first.wpilibj;
 
 import java.util.Arrays;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+
 /**
  * This class implements a linear, digital filter. All types of FIR and IIR filters are supported.
  * Static factory methods are provided to create commonly used types of filters.
@@ -52,6 +55,8 @@ public class LinearFilter {
   private final double[] m_inputGains;
   private final double[] m_outputGains;
 
+  private static int instances;
+
   /**
    * Create a linear FIR or IIR filter.
    *
@@ -63,6 +68,9 @@ public class LinearFilter {
     m_outputs = new CircularBuffer(fbGains.length);
     m_inputGains = Arrays.copyOf(ffGains, ffGains.length);
     m_outputGains = Arrays.copyOf(fbGains, fbGains.length);
+
+    instances++;
+    HAL.report(tResourceType.kResourceType_LinearFilter, instances);
   }
 
   /**

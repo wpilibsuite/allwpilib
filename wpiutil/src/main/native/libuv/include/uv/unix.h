@@ -191,7 +191,7 @@ typedef struct {
   int backend_fd;                                                             \
   void* pending_queue[2];                                                     \
   void* watcher_queue[2];                                                     \
-  uv__io_t** watchers;                                                        \
+  void** watchers;                                                            \
   unsigned int nwatchers;                                                     \
   unsigned int nfds;                                                          \
   void* wq[2];                                                                \

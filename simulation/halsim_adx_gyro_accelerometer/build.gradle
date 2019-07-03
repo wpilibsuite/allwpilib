@@ -12,7 +12,7 @@ ext {
 apply from: "${rootDir}/shared/config.gradle"
 
 if (!project.hasProperty('onlylinuxathena')) {
-
+    ext.skiplinuxathena = true
     ext {
         sharedCvConfigs = [halsim_adx_gyro_accelerometerTest: []]
         staticCvConfigs = [:]

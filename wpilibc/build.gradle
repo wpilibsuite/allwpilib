@@ -81,6 +81,8 @@ ext {
 
 apply from: "${rootDir}/shared/nilibraries.gradle"
 
+apply plugin: DisableBuildingGTest
+
 nativeUtils.exportsConfigs {
     wpilibc {
         x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
