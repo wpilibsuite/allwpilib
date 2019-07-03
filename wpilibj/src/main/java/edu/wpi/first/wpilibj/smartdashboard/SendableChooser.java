@@ -147,7 +147,7 @@ public class SendableChooser<V> extends SendableBase {
 
   /**
    * Adds a listener to be called when the selected option is changed.
-   * 
+   *
    * @param listener The listener to be called with the new value
    */
   public void addSelectionChangedListener(final BiConsumer<String, V> listener) {
@@ -158,7 +158,7 @@ public class SendableChooser<V> extends SendableBase {
 
   /**
    * Removes a listener to be called when the selected option is changed.
-   * 
+   *
    * @param listener The listener to remove
    * @return true if the remove was successful
    */
