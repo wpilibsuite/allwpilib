@@ -64,7 +64,7 @@ int ConfigurableSourceImpl::CreateProperty(const wpi::Twine& name,
   std::lock_guard<wpi::mutex> lock(m_mutex);
   int ndx = CreateOrUpdateProperty(name,
                                    [=] {
-                                     return wpi::make_unique<PropertyImpl>(
+                                     return std::make_unique<PropertyImpl>(
                                          name, kind, minimum, maximum, step,
                                          defaultValue, value);
                                    },

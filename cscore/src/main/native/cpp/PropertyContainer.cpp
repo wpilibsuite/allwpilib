@@ -201,7 +201,7 @@ std::vector<std::string> PropertyContainer::GetEnumPropertyChoices(
 
 std::unique_ptr<PropertyImpl> PropertyContainer::CreateEmptyProperty(
     const wpi::Twine& name) const {
-  return wpi::make_unique<PropertyImpl>(name);
+  return std::make_unique<PropertyImpl>(name);
 }
 
 bool PropertyContainer::CacheProperties(CS_Status* status) const {

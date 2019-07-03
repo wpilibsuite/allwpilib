@@ -907,7 +907,7 @@ void UsbCameraImpl::DeviceCacheProperty(
   std::unique_ptr<UsbCameraProperty> perProp;
   if (IsPercentageProperty(rawProp->name)) {
     perProp =
-        wpi::make_unique<UsbCameraProperty>(rawProp->name, 0, *rawProp, 0, 0);
+        std::make_unique<UsbCameraProperty>(rawProp->name, 0, *rawProp, 0, 0);
     rawProp->name = "raw_" + perProp->name;
   }
 
@@ -1130,7 +1130,7 @@ void UsbCameraImpl::Send(Message&& msg) const {
 
 std::unique_ptr<PropertyImpl> UsbCameraImpl::CreateEmptyProperty(
     const wpi::Twine& name) const {
-  return wpi::make_unique<UsbCameraProperty>(name);
+  return std::make_unique<UsbCameraProperty>(name);
 }
 
 bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
