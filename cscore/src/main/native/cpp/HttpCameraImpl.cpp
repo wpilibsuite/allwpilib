@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,9 +7,9 @@
 
 #include "HttpCameraImpl.h"
 
+#include <wpi/MemAlloc.h>
 #include <wpi/STLExtras.h>
 #include <wpi/TCPConnector.h>
-#include <wpi/memory.h>
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
@@ -29,6 +29,12 @@ HttpCameraImpl::HttpCameraImpl(const wpi::Twine& name, CS_HttpCameraKind kind,
 
 HttpCameraImpl::~HttpCameraImpl() {
   m_active = false;
+
+  // force wakeup of monitor thread
+  m_monitorCond.notify_one();
+
+  // join monitor thread
+  if (m_monitorThread.joinable()) m_monitorThread.join();
 
   // Close file if it's open
   {
@@ -54,6 +60,31 @@ void HttpCameraImpl::Start() {
   // Kick off the stream and settings threads
   m_streamThread = std::thread(&HttpCameraImpl::StreamThreadMain, this);
   m_settingsThread = std::thread(&HttpCameraImpl::SettingsThreadMain, this);
+  m_monitorThread = std::thread(&HttpCameraImpl::MonitorThreadMain, this);
+}
+
+void HttpCameraImpl::MonitorThreadMain() {
+  while (m_active) {
+    std::unique_lock<wpi::mutex> lock(m_mutex);
+    // sleep for 1 second between checks
+    m_monitorCond.wait_for(lock, std::chrono::seconds(1),
+                           [=] { return !m_active; });
+
+    if (!m_active) break;
+
+    // check to see if we got any frames, and close the stream if not
+    // (this will result in an error at the read point, and ultimately
+    // a reconnect attempt)
+    if (m_streamConn && m_frameCount == 0) {
+      SWARNING("Monitor detected stream hung, disconnecting");
+      m_streamConn->stream->close();
+    }
+
+    // reset the frame counter
+    m_frameCount = 0;
+  }
+
+  SDEBUG("Monitor Thread exiting");
 }
 
 void HttpCameraImpl::StreamThreadMain() {
@@ -86,6 +117,10 @@ void HttpCameraImpl::StreamThreadMain() {
 
     // stream
     DeviceStream(conn->is, boundary);
+    {
+      std::unique_lock<wpi::mutex> lock(m_mutex);
+      m_streamConn = nullptr;
+    }
   }
 
   SDEBUG("Camera Thread exiting");
@@ -120,6 +155,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   // update m_streamConn
   {
     std::lock_guard<wpi::mutex> lock(m_mutex);
+    m_frameCount = 1;  // avoid a race with monitor thread
     m_streamConn = std::move(connPtr);
   }
 
@@ -153,6 +189,9 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
     std::tie(key, value) = keyvalue.split('=');
     if (key.trim() == "boundary") {
       value = value.trim().trim('"');  // value may be quoted
+      if (value.startswith("--")) {
+        value = value.substr(2);
+      }
       boundary.append(value.begin(), value.end());
     }
   }
@@ -183,11 +222,16 @@ void HttpCameraImpl::DeviceStream(wpi::raw_istream& is,
     if (!FindMultipartBoundary(is, boundary, nullptr)) break;
 
     // Read the next two characters after the boundary (normally \r\n)
+    // Handle just \n for LabVIEW however
     char eol[2];
-    is.read(eol, 2);
+    is.read(eol, 1);
     if (!m_active || is.has_error()) break;
-    // End-of-stream is indicated with trailing --
-    if (eol[0] == '-' && eol[1] == '-') break;
+    if (eol[0] != '\n') {
+      is.read(eol + 1, 1);
+      if (!m_active || is.has_error()) break;
+      // End-of-stream is indicated with trailing --
+      if (eol[0] == '-' && eol[1] == '-') break;
+    }
 
     if (!DeviceStreamFrame(is, imageBuf))
       ++numErrors;
@@ -229,6 +273,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
     }
     PutFrame(VideoMode::PixelFormat::kMJPEG, width, height, imageBuf,
              wpi::Now());
+    ++m_frameCount;
     return true;
   }
 
@@ -246,6 +291,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
   image->width = width;
   image->height = height;
   PutFrame(std::move(image), wpi::Now());
+  ++m_frameCount;
   return true;
 }
 
@@ -565,7 +611,7 @@ void CS_SetHttpCameraUrls(CS_Source source, const char** urls, int count,
 char** CS_GetHttpCameraUrls(CS_Source source, int* count, CS_Status* status) {
   auto urls = cs::GetHttpCameraUrls(source, status);
   char** out =
-      static_cast<char**>(wpi::CheckedMalloc(urls.size() * sizeof(char*)));
+      static_cast<char**>(wpi::safe_malloc(urls.size() * sizeof(char*)));
   *count = urls.size();
   for (size_t i = 0; i < urls.size(); ++i) out[i] = cs::ConvertToC(urls[i]);
   return out;

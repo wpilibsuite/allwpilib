@@ -2962,12 +2962,14 @@ class json
     {
         std::allocator<T> alloc;
 
-        auto deleter = [&](T * object)
-        {
-            alloc.deallocate(object, 1);
-        };
-        std::unique_ptr<T, decltype(deleter)> object(alloc.allocate(1), deleter);
-        alloc.construct(object.get(), std::forward<Args>(args)...);
+		using AllocatorTraits = std::allocator_traits<std::allocator<T>>;
+
+		auto deleter = [&](T * object)
+		{
+			AllocatorTraits::deallocate(alloc, object, 1);
+		};
+		std::unique_ptr<T, decltype(deleter)> object(AllocatorTraits::allocate(alloc, 1), deleter);
+		AllocatorTraits::construct(alloc, object.get(), std::forward<Args>(args)...);
         assert(object != nullptr);
         return object.release();
     }
@@ -5318,8 +5320,8 @@ class json
                 if (is_string())
                 {
                     std::allocator<std::string> alloc;
-                    alloc.destroy(m_value.string);
-                    alloc.deallocate(m_value.string, 1);
+					std::allocator_traits<decltype(alloc)>::destroy(alloc, m_value.string);
+					std::allocator_traits<decltype(alloc)>::deallocate(alloc, m_value.string, 1);
                     m_value.string = nullptr;
                 }
 
@@ -5422,8 +5424,8 @@ class json
                 if (is_string())
                 {
                     std::allocator<std::string> alloc;
-                    alloc.destroy(m_value.string);
-                    alloc.deallocate(m_value.string, 1);
+					std::allocator_traits<decltype(alloc)>::destroy(alloc, m_value.string);
+					std::allocator_traits<decltype(alloc)>::deallocate(alloc, m_value.string, 1);
                     m_value.string = nullptr;
                 }
 
@@ -8077,7 +8079,7 @@ namespace std
 @since version 1.0.0
 */
 template<>
-inline void swap(wpi::json& j1,
+inline void swap<wpi::json>(wpi::json& j1,
                  wpi::json& j2) noexcept(
                      is_nothrow_move_constructible<wpi::json>::value and
                      is_nothrow_move_assignable<wpi::json>::value

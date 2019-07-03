@@ -12,9 +12,15 @@
 
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
+#include "wpi/ErrorHandling.h"
 #include <cassert>
 #include <cstdint>
 #include <string>
+
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 26495)
+#endif
 
 namespace wpi {
 
@@ -529,5 +535,9 @@ namespace wpi {
   /// @}
 
 } // end namespace wpi
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
 
 #endif // LLVM_ADT_TWINE_H

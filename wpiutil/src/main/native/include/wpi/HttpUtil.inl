@@ -36,9 +36,9 @@ void HttpRequest::SetPath(StringRef path_, const T& params) {
       pathOs << '&';
     }
     SmallString<64> escapeBuf;
-    pathOs << EscapeURI(GetFirst(param), escapeBuf);
+    pathOs << EscapeURI(GetFirst(param), escapeBuf, false);
     if (!GetSecond(param).empty()) {
-      pathOs << '=' << EscapeURI(GetSecond(param), escapeBuf);
+      pathOs << '=' << EscapeURI(GetSecond(param), escapeBuf, false);
     }
   }
 }

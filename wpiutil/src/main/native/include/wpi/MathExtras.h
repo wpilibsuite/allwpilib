@@ -25,7 +25,15 @@
 #include <type_traits>
 
 #ifdef _MSC_VER
-#include <intrin.h>
+// Declare these intrinsics manually rather including intrin.h. It's very
+// expensive, and MathExtras.h is popular.
+// #include <intrin.h>
+extern "C" {
+unsigned char _BitScanForward(unsigned long *_Index, unsigned long _Mask);
+unsigned char _BitScanForward64(unsigned long *_Index, unsigned __int64 _Mask);
+unsigned char _BitScanReverse(unsigned long *_Index, unsigned long _Mask);
+unsigned char _BitScanReverse64(unsigned long *_Index, unsigned __int64 _Mask);
+}
 #endif
 
 namespace wpi {
@@ -50,7 +58,7 @@ template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
     // Bisection method.
     std::size_t ZeroBits = 0;
     T Shift = std::numeric_limits<T>::digits >> 1;
-    T Mask = std::numeric_limits<T>::max() >> Shift;
+    T Mask = (std::numeric_limits<T>::max)() >> Shift;
     while (Shift) {
       if ((Val & Mask) == 0) {
         Val >>= Shift;
@@ -191,7 +199,7 @@ std::size_t countLeadingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
 ///   valid arguments.
 template <typename T> T findFirstSet(T Val, ZeroBehavior ZB = ZB_Max) {
   if (ZB == ZB_Max && Val == 0)
-    return std::numeric_limits<T>::max();
+    return (std::numeric_limits<T>::max)();
 
   return countTrailingZeros(Val, ZB_Undefined);
 }
@@ -232,7 +240,7 @@ template <typename T> T maskLeadingZeros(unsigned N) {
 ///   valid arguments.
 template <typename T> T findLastSet(T Val, ZeroBehavior ZB = ZB_Max) {
   if (ZB == ZB_Max && Val == 0)
-    return std::numeric_limits<T>::max();
+    return (std::numeric_limits<T>::max)();
 
   // Use ^ instead of - because both gcc and llvm can remove the associated ^
   // in the __builtin_clz intrinsic on x86.
@@ -362,12 +370,21 @@ inline uint64_t maxUIntN(uint64_t N) {
   return UINT64_MAX >> (64 - N);
 }
 
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 4146)
+#endif
+
 /// Gets the minimum value for a N-bit signed integer.
 inline int64_t minIntN(int64_t N) {
   assert(N > 0 && N <= 64 && "integer width out of range");
 
   return -(UINT64_C(1)<<(N-1));
 }
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
 
 /// Gets the maximum value for a N-bit signed integer.
 inline int64_t maxIntN(int64_t N) {
@@ -511,26 +528,26 @@ inline double Log2(double Value) {
 /// (32 bit edition.)
 /// Ex. Log2_32(32) == 5, Log2_32(1) == 0, Log2_32(0) == -1, Log2_32(6) == 2
 inline unsigned Log2_32(uint32_t Value) {
-  return 31 - countLeadingZeros(Value);
+  return static_cast<unsigned>(31 - countLeadingZeros(Value));
 }
 
 /// Return the floor log base 2 of the specified value, -1 if the value is zero.
 /// (64 bit edition.)
 inline unsigned Log2_64(uint64_t Value) {
-  return 63 - countLeadingZeros(Value);
+  return static_cast<unsigned>(63 - countLeadingZeros(Value));
 }
 
 /// Return the ceil log base 2 of the specified value, 32 if the value is zero.
 /// (32 bit edition).
 /// Ex. Log2_32_Ceil(32) == 5, Log2_32_Ceil(1) == 0, Log2_32_Ceil(6) == 3
 inline unsigned Log2_32_Ceil(uint32_t Value) {
-  return 32 - countLeadingZeros(Value - 1);
+  return static_cast<unsigned>(32 - countLeadingZeros(Value - 1));
 }
 
 /// Return the ceil log base 2 of the specified value, 64 if the value is zero.
 /// (64 bit edition.)
 inline unsigned Log2_64_Ceil(uint64_t Value) {
-  return 64 - countLeadingZeros(Value - 1);
+  return static_cast<unsigned>(64 - countLeadingZeros(Value - 1));
 }
 
 /// Return the greatest common divisor of the values using Euclid's algorithm.
@@ -739,7 +756,7 @@ inline int64_t SignExtend64(uint64_t X, unsigned B) {
 template <typename T>
 typename std::enable_if<std::is_unsigned<T>::value, T>::type
 AbsoluteDifference(T X, T Y) {
-  return std::max(X, Y) - std::min(X, Y);
+  return (std::max)(X, Y) - (std::min)(X, Y);
 }
 
 /// Add two unsigned integers, X and Y, of type T.  Clamp the result to the
@@ -754,7 +771,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
   T Z = X + Y;
   Overflowed = (Z < X || Z < Y);
   if (Overflowed)
-    return std::numeric_limits<T>::max();
+    return (std::numeric_limits<T>::max)();
   else
     return Z;
 }
@@ -779,7 +796,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
   // Special case: if X or Y is 0, Log2_64 gives -1, and Log2Z
   // will necessarily be less than Log2Max as desired.
   int Log2Z = Log2_64(X) + Log2_64(Y);
-  const T Max = std::numeric_limits<T>::max();
+  const T Max = (std::numeric_limits<T>::max)();
   int Log2Max = Log2_64(Max);
   if (Log2Z < Log2Max) {
     return X * Y;

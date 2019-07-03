@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -55,6 +55,18 @@ class Pipe final : public NetworkStreamImpl<Pipe, uv_pipe_t> {
                                       bool ipc = false) {
     return Create(*loop, ipc);
   }
+
+  /**
+   * Reuse this handle.  This closes the handle, and after the close completes,
+   * reinitializes it (identically to Create) and calls the provided callback.
+   * Unlike Close(), it does NOT emit the closed signal, however, IsClosing()
+   * will return true until the callback is called.  This does nothing if
+   * IsClosing() is true (e.g. if Close() was called).
+   *
+   * @param ipc IPC
+   * @param callback Callback
+   */
+  void Reuse(std::function<void()> callback, bool ipc = false);
 
   /**
    * Accept incoming connection.
@@ -176,6 +188,12 @@ class Pipe final : public NetworkStreamImpl<Pipe, uv_pipe_t> {
 
  private:
   Pipe* DoAccept() override;
+
+  struct ReuseData {
+    std::function<void()> callback;
+    bool ipc;
+  };
+  std::unique_ptr<ReuseData> m_reuseData;
 };
 
 /**

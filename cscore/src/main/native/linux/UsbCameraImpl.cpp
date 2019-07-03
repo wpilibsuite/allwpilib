@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,8 +24,10 @@
 
 #include <algorithm>
 
+#include <wpi/FileSystem.h>
+#include <wpi/MemAlloc.h>
+#include <wpi/Path.h>
 #include <wpi/SmallString.h>
-#include <wpi/memory.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
@@ -445,8 +447,7 @@ void UsbCameraImpl::DeviceDisconnect() {
   if (fd < 0) return;  // already disconnected
 
   // Unmap buffers
-  for (int i = 0; i < kNumBuffers; ++i)
-    m_buffers[i] = std::move(UsbCameraBuffer{});
+  for (int i = 0; i < kNumBuffers; ++i) m_buffers[i] = UsbCameraBuffer{};
 
   // Close device
   close(fd);
@@ -532,11 +533,11 @@ void UsbCameraImpl::DeviceConnect() {
     SDEBUG4("buf " << i << " length=" << buf.length
                    << " offset=" << buf.m.offset);
 
-    m_buffers[i] = std::move(UsbCameraBuffer(fd, buf.length, buf.m.offset));
+    m_buffers[i] = UsbCameraBuffer(fd, buf.length, buf.m.offset);
     if (!m_buffers[i].m_data) {
       SWARNING("could not map buffer " << i);
       // release other buffers
-      for (int j = 0; j < i; ++j) m_buffers[j] = std::move(UsbCameraBuffer{});
+      for (int j = 0; j < i; ++j) m_buffers[j] = UsbCameraBuffer{};
       close(fd);
       m_fd = -1;
       return;
@@ -1278,17 +1279,79 @@ std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {
   return static_cast<UsbCameraImpl&>(*data->source).GetPath();
 }
 
+static const char* symlinkDirs[] = {"/dev/v4l/by-id", "/dev/v4l/by-path"};
+
+UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status) {
+  UsbCameraInfo info;
+  auto data = Instance::GetInstance().GetSource(source);
+  if (!data || data->kind != CS_SOURCE_USB) {
+    *status = CS_INVALID_HANDLE;
+    return info;
+  }
+  std::string keypath = static_cast<UsbCameraImpl&>(*data->source).GetPath();
+  info.path = keypath;
+
+  // it might be a symlink; if so, find the symlink target (e.g. /dev/videoN),
+  // add that to the list and make it the keypath
+  if (wpi::sys::fs::is_symlink_file(keypath)) {
+    char* target = ::realpath(keypath.c_str(), nullptr);
+    if (target) {
+      keypath.assign(target);
+      info.otherPaths.emplace_back(keypath);
+      std::free(target);
+    }
+  }
+
+  // device number
+  wpi::StringRef fname = wpi::sys::path::filename(keypath);
+  if (fname.startswith("video")) fname.substr(5).getAsInteger(10, info.dev);
+
+  // description
+  info.name = GetDescriptionImpl(keypath.c_str());
+
+  // look through /dev/v4l/by-id and /dev/v4l/by-path for symlinks to the
+  // keypath
+  wpi::SmallString<128> path;
+  for (auto symlinkDir : symlinkDirs) {
+    if (DIR* dp = ::opendir(symlinkDir)) {
+      while (struct dirent* ep = ::readdir(dp)) {
+        if (ep->d_type == DT_LNK) {
+          path = symlinkDir;
+          path += '/';
+          path += ep->d_name;
+          char* target = ::realpath(path.c_str(), nullptr);
+          if (target) {
+            if (keypath == target) info.otherPaths.emplace_back(path.str());
+            std::free(target);
+          }
+        }
+      }
+      ::closedir(dp);
+    }
+  }
+
+  // eliminate any duplicates
+  std::sort(info.otherPaths.begin(), info.otherPaths.end());
+  info.otherPaths.erase(
+      std::unique(info.otherPaths.begin(), info.otherPaths.end()),
+      info.otherPaths.end());
+  return info;
+}
+
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   std::vector<UsbCameraInfo> retval;
 
-  if (DIR* dp = opendir("/dev")) {
-    while (struct dirent* ep = readdir(dp)) {
+  if (DIR* dp = ::opendir("/dev")) {
+    while (struct dirent* ep = ::readdir(dp)) {
       wpi::StringRef fname{ep->d_name};
       if (!fname.startswith("video")) continue;
 
+      unsigned int dev = 0;
+      if (fname.substr(5).getAsInteger(10, dev)) continue;
+
       UsbCameraInfo info;
-      info.dev = -1;
-      fname.substr(5).getAsInteger(10, info.dev);
+      info.dev = dev;
+
       wpi::SmallString<32> path{"/dev/"};
       path += fname;
       info.path = path.str();
@@ -1296,20 +1359,47 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
       info.name = GetDescriptionImpl(path.c_str());
       if (info.name.empty()) continue;
 
-      retval.emplace_back(std::move(info));
+      if (dev >= retval.size()) retval.resize(info.dev + 1);
+      retval[info.dev] = std::move(info);
     }
-    closedir(dp);
+    ::closedir(dp);
   } else {
     // *status = ;
     WPI_ERROR(Instance::GetInstance().logger, "Could not open /dev");
     return retval;
   }
 
-  // sort by device number
-  std::sort(retval.begin(), retval.end(),
-            [](const UsbCameraInfo& a, const UsbCameraInfo& b) {
-              return a.dev < b.dev;
-            });
+  // look through /dev/v4l/by-id and /dev/v4l/by-path for symlinks to
+  // /dev/videoN
+  wpi::SmallString<128> path;
+  for (auto symlinkDir : symlinkDirs) {
+    if (DIR* dp = ::opendir(symlinkDir)) {
+      while (struct dirent* ep = ::readdir(dp)) {
+        if (ep->d_type == DT_LNK) {
+          path = symlinkDir;
+          path += '/';
+          path += ep->d_name;
+          char* target = ::realpath(path.c_str(), nullptr);
+          if (target) {
+            wpi::StringRef fname = wpi::sys::path::filename(target);
+            unsigned int dev = 0;
+            if (fname.startswith("video") &&
+                !fname.substr(5).getAsInteger(10, dev) && dev < retval.size()) {
+              retval[dev].otherPaths.emplace_back(path.str());
+            }
+            std::free(target);
+          }
+        }
+      }
+      ::closedir(dp);
+    }
+  }
+
+  // remove devices with empty names
+  retval.erase(
+      std::remove_if(retval.begin(), retval.end(),
+                     [](const UsbCameraInfo& x) { return x.name.empty(); }),
+      retval.end());
 
   return retval;
 }

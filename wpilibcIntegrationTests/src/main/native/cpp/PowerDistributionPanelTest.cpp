@@ -7,6 +7,10 @@
 
 #include "frc/PowerDistributionPanel.h"  // NOLINT(build/include_order)
 
+#include <thread>
+
+#include <hal/Ports.h>
+
 #include "TestBench.h"
 #include "frc/Jaguar.h"
 #include "frc/Talon.h"
@@ -39,6 +43,20 @@ class PowerDistributionPanelTest : public testing::Test {
     delete m_jaguar;
   }
 };
+
+TEST_F(PowerDistributionPanelTest, CheckRepeatedCalls) {
+  auto numChannels = HAL_GetNumPDPChannels();
+  // 1 second
+  for (int i = 0; i < 50; i++) {
+    for (int j = 0; j < numChannels; j++) {
+      m_pdp->GetCurrent(j);
+      ASSERT_TRUE(m_pdp->GetError().GetCode() == 0);
+    }
+    m_pdp->GetVoltage();
+    ASSERT_TRUE(m_pdp->GetError().GetCode() == 0);
+  }
+  std::this_thread::sleep_for(std::chrono::milliseconds(20));
+}
 
 /**
  * Test if the current changes when the motor is driven using a talon

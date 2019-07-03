@@ -15,6 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -112,16 +114,17 @@ class ConnectionListenerTest {
 
   }
 
-  @Test
+  @ParameterizedTest
   @DisabledOnOs(OS.WINDOWS)
   @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
-  void testThreaded() {
-    m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
+  @ValueSource(strings = { "127.0.0.1", "127.0.0.1 ", " 127.0.0.1 " })
+  void testThreaded(String address) {
+    m_serverInst.startServer("connectionlistenertest.ini", address, 10000);
     List<ConnectionNotification> events = new ArrayList<>();
     final int handle = m_serverInst.addConnectionListener(events::add, false);
 
     // trigger a connect event
-    m_clientInst.startClient("127.0.0.1", 10000);
+    m_clientInst.startClient(address, 10000);
 
     // wait for client to report it's started, then wait another 0.1 sec
     try {

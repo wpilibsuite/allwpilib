@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -228,7 +228,7 @@ void WebSocket::StartClient(const Twine& uri, const Twine& host,
   });
 
   // Start handshake timer if a timeout was specified
-  if (options.handshakeTimeout != uv::Timer::Time::max()) {
+  if (options.handshakeTimeout != (uv::Timer::Time::max)()) {
     auto timer = uv::Timer::Create(m_stream.GetLoopRef());
     timer->timeout.connect(
         [this]() { Terminate(1006, "connection timed out"); });
@@ -286,8 +286,9 @@ void WebSocket::SendClose(uint16_t code, const Twine& reason) {
   SmallVector<uv::Buffer, 4> bufs;
   if (code != 1005) {
     raw_uv_ostream os{bufs, 4096};
-    os << ArrayRef<uint8_t>{static_cast<uint8_t>((code >> 8) & 0xff),
-                            static_cast<uint8_t>(code & 0xff)};
+    const uint8_t codeMsb[] = {static_cast<uint8_t>((code >> 8) & 0xff),
+                               static_cast<uint8_t>(code & 0xff)};
+    os << ArrayRef<uint8_t>(codeMsb);
     reason.print(os);
   }
   Send(kFlagFin | kOpClose, bufs, [](auto bufs, uv::Error) {
@@ -335,7 +336,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
     if (m_frameSize == UINT64_MAX) {
       // Need at least two bytes to determine header length
       if (m_header.size() < 2u) {
-        size_t toCopy = std::min(2u - m_header.size(), data.size());
+        size_t toCopy = (std::min)(2u - m_header.size(), data.size());
         m_header.append(data.bytes_begin(), data.bytes_begin() + toCopy);
         data = data.drop_front(toCopy);
         if (m_header.size() < 2u) return;  // need more data
@@ -362,7 +363,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
 
       // Need to complete header to calculate message size
       if (m_header.size() < m_headerSize) {
-        size_t toCopy = std::min(m_headerSize - m_header.size(), data.size());
+        size_t toCopy = (std::min)(m_headerSize - m_header.size(), data.size());
         m_header.append(data.bytes_begin(), data.bytes_begin() + toCopy);
         data = data.drop_front(toCopy);
         if (m_header.size() < m_headerSize) return;  // need more data
@@ -394,7 +395,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
 
     if (m_frameSize != UINT64_MAX) {
       size_t need = m_frameStart + m_frameSize - m_payload.size();
-      size_t toCopy = std::min(need, data.size());
+      size_t toCopy = (std::min)(need, data.size());
       m_payload.append(data.bytes_begin(), data.bytes_begin() + toCopy);
       data = data.drop_front(toCopy);
       need -= toCopy;
@@ -520,18 +521,20 @@ void WebSocket::Send(
     os << static_cast<unsigned char>((m_server ? 0x00 : kFlagMasking) | size);
   } else if (size <= 0xffff) {
     os << static_cast<unsigned char>((m_server ? 0x00 : kFlagMasking) | 126);
-    os << ArrayRef<uint8_t>{static_cast<uint8_t>((size >> 8) & 0xff),
-                            static_cast<uint8_t>(size & 0xff)};
+    const uint8_t sizeMsb[] = {static_cast<uint8_t>((size >> 8) & 0xff),
+                               static_cast<uint8_t>(size & 0xff)};
+    os << ArrayRef<uint8_t>(sizeMsb);
   } else {
     os << static_cast<unsigned char>((m_server ? 0x00 : kFlagMasking) | 127);
-    os << ArrayRef<uint8_t>{static_cast<uint8_t>((size >> 56) & 0xff),
-                            static_cast<uint8_t>((size >> 48) & 0xff),
-                            static_cast<uint8_t>((size >> 40) & 0xff),
-                            static_cast<uint8_t>((size >> 32) & 0xff),
-                            static_cast<uint8_t>((size >> 24) & 0xff),
-                            static_cast<uint8_t>((size >> 16) & 0xff),
-                            static_cast<uint8_t>((size >> 8) & 0xff),
-                            static_cast<uint8_t>(size & 0xff)};
+    const uint8_t sizeMsb[] = {static_cast<uint8_t>((size >> 56) & 0xff),
+                               static_cast<uint8_t>((size >> 48) & 0xff),
+                               static_cast<uint8_t>((size >> 40) & 0xff),
+                               static_cast<uint8_t>((size >> 32) & 0xff),
+                               static_cast<uint8_t>((size >> 24) & 0xff),
+                               static_cast<uint8_t>((size >> 16) & 0xff),
+                               static_cast<uint8_t>((size >> 8) & 0xff),
+                               static_cast<uint8_t>(size & 0xff)};
+    os << ArrayRef<uint8_t>(sizeMsb);
   }
 
   // clients need to mask the input data

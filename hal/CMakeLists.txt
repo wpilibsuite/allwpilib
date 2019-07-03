@@ -1,5 +1,7 @@
 project(hal)
 
+include(CompileWarnings)
+include(AddTest)
 
 file(STRINGS src/generate/Instances.txt RAW_INSTANCES)
 file(STRINGS src/generate/ResourceType.txt RAW_RESOURCE_TYPES)
@@ -26,8 +28,9 @@ file(GLOB
     hal_shared_native_src src/main/native/cpp/cpp/*.cpp
     hal_shared_native_src src/main/native/cpp/handles/*.cpp
     hal_sim_native_src src/main/native/sim/*.cpp
-    hal_sim_native_src src/main/native/sim/MockData/*.cpp)
+    hal_sim_native_src src/main/native/sim/mockdata/*.cpp)
 add_library(hal ${hal_shared_native_src})
+wpilib_target_warnings(hal)
 set_target_properties(hal PROPERTIES DEBUG_POSTFIX "d")
 
 if(USE_EXTERNAL_HAL)
@@ -55,13 +58,14 @@ install(TARGETS hal EXPORT hal DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gen DESTINATION "${include_dest}/hal")
 
-if (MSVC)
+if (MSVC OR FLAT_INSTALL_WPILIB)
     set (hal_config_dir ${wpilib_dest})
 else()
     set (hal_config_dir share/hal)
 endif()
 
-install(FILES hal-config.cmake DESTINATION ${hal_config_dir})
+configure_file(hal-config.cmake.in ${CMAKE_BINARY_DIR}/hal-config.cmake )
+install(FILES ${CMAKE_BINARY_DIR}/hal-config.cmake DESTINATION ${hal_config_dir})
 install(EXPORT hal DESTINATION ${hal_config_dir})
 
 # Java bindings
@@ -104,6 +108,7 @@ if (NOT WITHOUT_JAVA)
 
     set_target_properties(haljni PROPERTIES OUTPUT_NAME "wpiHaljni")
 
+    wpilib_target_warnings(haljni)
     target_link_libraries(haljni PUBLIC hal wpiutil)
 
     set_property(TARGET haljni PROPERTY FOLDER "libraries")
@@ -122,4 +127,9 @@ if (NOT WITHOUT_JAVA)
 
     install(TARGETS haljni EXPORT haljni DESTINATION "${main_lib_dest}")
 
+endif()
+
+if (WITH_TESTS)
+    wpilib_add_test(hal src/test/native/cpp)
+    target_link_libraries(hal_test hal gtest)
 endif()

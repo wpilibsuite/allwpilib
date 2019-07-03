@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -562,6 +562,43 @@ wpi::ArrayRef<CS_Property> EnumerateSinkProperties(
   for (auto property : data->sink->EnumerateProperties(properties_buf, status))
     vec.push_back(Handle{sink, property, Handle::kSinkProperty});
   return vec;
+}
+
+bool SetSinkConfigJson(CS_Sink sink, wpi::StringRef config, CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return false;
+  }
+  return data->sink->SetConfigJson(config, status);
+}
+
+bool SetSinkConfigJson(CS_Sink sink, const wpi::json& config,
+                       CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return false;
+  }
+  return data->sink->SetConfigJson(config, status);
+}
+
+std::string GetSinkConfigJson(CS_Sink sink, CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return std::string{};
+  }
+  return data->sink->GetConfigJson(status);
+}
+
+wpi::json GetSinkConfigJsonObject(CS_Sink sink, CS_Status* status) {
+  auto data = Instance::GetInstance().GetSink(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return wpi::json{};
+  }
+  return data->sink->GetConfigJsonObject(status);
 }
 
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {

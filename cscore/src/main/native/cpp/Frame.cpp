@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -361,7 +361,7 @@ Image* Frame::ConvertBGRToGray(Image* image) {
 }
 
 Image* Frame::ConvertGrayToBGR(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kBGR) return nullptr;
+  if (!image || image->pixelFormat != VideoMode::kGray) return nullptr;
 
   // Allocate a BGR image
   auto newImage =

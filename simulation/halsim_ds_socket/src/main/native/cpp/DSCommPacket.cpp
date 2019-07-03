@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -26,6 +26,7 @@ DSCommPacket::DSCommPacket() {
     i.ResetTcp();
     i.ResetUdp();
   }
+  matchInfo.gameSpecificMessageSize = 0;
 }
 
 /*----------------------------------------------------------------------------
@@ -95,7 +96,7 @@ void DSCommPacket::ReadJoystickTag(wpi::ArrayRef<uint8_t> dataInput,
   int numBytes = (buttonCount + 7) / 8;
   stick.buttons.buttons = 0;
   for (int i = 0; i < numBytes; i++) {
-    stick.buttons.buttons |= dataInput[1 + i] << (8 * (i));
+    stick.buttons.buttons |= dataInput[numBytes - i] << (8 * (i));
   }
   stick.buttons.count = buttonCount;
 

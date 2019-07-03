@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -109,10 +109,6 @@ static wpi::StringRef UnescapeString(wpi::StringRef source,
       continue;
     }
     switch (*++s) {
-      case '\\':
-      case '"':
-        buf.push_back(s[-1]);
-        break;
       case 't':
         buf.push_back('\t');
         break;
@@ -133,7 +129,7 @@ static wpi::StringRef UnescapeString(wpi::StringRef source,
         break;
       }
       default:
-        buf.push_back(s[-1]);
+        buf.push_back(*s);
         break;
     }
   }

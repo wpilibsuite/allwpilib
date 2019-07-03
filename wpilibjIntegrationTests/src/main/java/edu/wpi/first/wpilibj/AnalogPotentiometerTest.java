@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -60,7 +60,7 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
   public void testRangeValues() {
     for (double i = 0.0; i < 360.0; i = i + 1.0) {
       m_potSource.setAngle(i);
-      m_potSource.setMaxVoltage(ControllerPower.getVoltage5V());
+      m_potSource.setMaxVoltage(RobotController.getVoltage5V());
       Timer.delay(.02);
       assertEquals(i, m_pot.get(), DOUBLE_COMPARISON_DELTA);
     }

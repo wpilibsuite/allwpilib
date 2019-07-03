@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #include "SinkImpl.h"
+
+#include <wpi/json.h>
 
 #include "Instance.h"
 #include "Notifier.h"
@@ -100,6 +102,43 @@ wpi::StringRef SinkImpl::GetError(wpi::SmallVectorImpl<char>& buf) const {
   buf.clear();
   buf.append(error.data(), error.data() + error.size());
   return wpi::StringRef{buf.data(), buf.size()};
+}
+
+bool SinkImpl::SetConfigJson(wpi::StringRef config, CS_Status* status) {
+  wpi::json j;
+  try {
+    j = wpi::json::parse(config);
+  } catch (const wpi::json::parse_error& e) {
+    SWARNING("SetConfigJson: parse error at byte " << e.byte << ": "
+                                                   << e.what());
+    *status = CS_PROPERTY_WRITE_FAILED;
+    return false;
+  }
+  return SetConfigJson(j, status);
+}
+
+bool SinkImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
+  if (config.count("properties") != 0)
+    SetPropertiesJson(config.at("properties"), m_logger, GetName(), status);
+
+  return true;
+}
+
+std::string SinkImpl::GetConfigJson(CS_Status* status) {
+  std::string rv;
+  wpi::raw_string_ostream os(rv);
+  GetConfigJsonObject(status).dump(os, 4);
+  os.flush();
+  return rv;
+}
+
+wpi::json SinkImpl::GetConfigJsonObject(CS_Status* status) {
+  wpi::json j;
+
+  wpi::json props = GetPropertiesJsonObject(status);
+  if (props.is_array()) j.emplace("properties", props);
+
+  return j;
 }
 
 void SinkImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {

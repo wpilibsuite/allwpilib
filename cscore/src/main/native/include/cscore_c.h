@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,8 +19,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-struct CvMat;
 
 /**
  * @defgroup cscore_c_api cscore C API
@@ -128,7 +126,8 @@ enum CS_SourceKind {
   CS_SOURCE_UNKNOWN = 0,
   CS_SOURCE_USB = 1,
   CS_SOURCE_HTTP = 2,
-  CS_SOURCE_CV = 4
+  CS_SOURCE_CV = 4,
+  CS_SOURCE_RAW = 8,
 };
 
 /**
@@ -144,7 +143,12 @@ enum CS_HttpCameraKind {
 /**
  * Sink kinds
  */
-enum CS_SinkKind { CS_SINK_UNKNOWN = 0, CS_SINK_MJPEG = 2, CS_SINK_CV = 4 };
+enum CS_SinkKind {
+  CS_SINK_UNKNOWN = 0,
+  CS_SINK_MJPEG = 2,
+  CS_SINK_CV = 4,
+  CS_SINK_RAW = 8
+};
 
 /**
  * Listener event kinds
@@ -222,6 +226,17 @@ struct CS_Event {
   int value;
   const char* valueStr;
 };
+
+/**
+ * USB camera infomation
+ */
+typedef struct CS_UsbCameraInfo {
+  int dev;
+  char* path;
+  char* name;
+  int otherPathsCount;
+  char** otherPaths;
+} CS_UsbCameraInfo;
 
 /**
  * @defgroup cscore_property_cfunc Property Functions
@@ -322,6 +337,7 @@ void CS_SetCameraExposureManual(CS_Source source, int value, CS_Status* status);
  * @{
  */
 char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status);
+CS_UsbCameraInfo* CS_GetUsbCameraInfo(CS_Source source, CS_Status* status);
 /** @} */
 
 /**
@@ -339,8 +355,6 @@ char** CS_GetHttpCameraUrls(CS_Source source, int* count, CS_Status* status);
  * @defgroup cscore_opencv_source_cfunc OpenCV Source Functions
  * @{
  */
-void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
-                       CS_Status* status);
 void CS_NotifySourceError(CS_Source source, const char* msg, CS_Status* status);
 void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
                            CS_Status* status);
@@ -381,6 +395,9 @@ CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
 void CS_SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
 CS_Property CS_GetSinkSourceProperty(CS_Sink sink, const char* name,
                                      CS_Status* status);
+CS_Bool CS_SetSinkConfigJson(CS_Sink sink, const char* config,
+                             CS_Status* status);
+char* CS_GetSinkConfigJson(CS_Sink sink, CS_Status* status);
 CS_Source CS_GetSinkSource(CS_Sink sink, CS_Status* status);
 CS_Sink CS_CopySink(CS_Sink sink, CS_Status* status);
 void CS_ReleaseSink(CS_Sink sink, CS_Status* status);
@@ -400,9 +417,6 @@ int CS_GetMjpegServerPort(CS_Sink sink, CS_Status* status);
  */
 void CS_SetSinkDescription(CS_Sink sink, const char* description,
                            CS_Status* status);
-uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image, CS_Status* status);
-uint64_t CS_GrabSinkFrameTimeout(CS_Sink sink, struct CvMat* image,
-                                 double timeout, CS_Status* status);
 char* CS_GetSinkError(CS_Sink sink, CS_Status* status);
 void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status);
 /** @} */
@@ -456,15 +470,6 @@ void CS_Shutdown(void);
  * @{
  */
 
-/**
- * USB camera infomation
- */
-typedef struct CS_UsbCameraInfo {
-  int dev;
-  char* path;
-  char* name;
-} CS_UsbCameraInfo;
-
 CS_UsbCameraInfo* CS_EnumerateUsbCameras(int* count, CS_Status* status);
 void CS_FreeEnumeratedUsbCameras(CS_UsbCameraInfo* cameras, int count);
 
@@ -476,6 +481,7 @@ void CS_ReleaseEnumeratedSinks(CS_Sink* sinks, int count);
 
 void CS_FreeString(char* str);
 void CS_FreeEnumPropertyChoices(char** choices, int count);
+void CS_FreeUsbCameraInfo(CS_UsbCameraInfo* info);
 void CS_FreeHttpCameraUrls(char** urls, int count);
 
 void CS_FreeEnumeratedProperties(CS_Property* properties, int count);

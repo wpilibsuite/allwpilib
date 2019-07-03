@@ -10,8 +10,8 @@
 #include <string>
 
 #include <frc/Joystick.h>
+#include <frc/PWMVictorSPX.h>
 #include <frc/SampleRobot.h>
-#include <frc/Spark.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/smartdashboard/SendableChooser.h>
 
@@ -37,8 +37,8 @@ class Robot : public frc::SampleRobot {
 
  private:
   // Robot drive system
-  frc::Spark m_leftMotor{0};
-  frc::Spark m_rightMotor{1};
+  frc::PWMVictorSPX m_leftMotor{0};
+  frc::PWMVictorSPX m_rightMotor{1};
   frc::DifferentialDrive m_robotDrive{m_leftMotor, m_rightMotor};
 
   frc::Joystick m_stick{0};

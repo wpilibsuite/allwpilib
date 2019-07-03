@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -138,7 +138,7 @@ static int32_t HAL_GetJoystickButtonsInternal(int32_t joystickNum,
 static int32_t HAL_GetJoystickDescriptorInternal(int32_t joystickNum,
                                                  HAL_JoystickDescriptor* desc) {
   desc->isXbox = 0;
-  desc->type = std::numeric_limits<uint8_t>::max();
+  desc->type = (std::numeric_limits<uint8_t>::max)();
   desc->name[0] = '\0';
   desc->axisCount =
       HAL_kMaxJoystickAxes; /* set to the desc->axisTypes's capacity */
@@ -292,8 +292,43 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   }
   int retval = 0;
   if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
-    retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
-                                                details, location, callStack);
+    wpi::StringRef detailsRef{details};
+    wpi::StringRef locationRef{location};
+    wpi::StringRef callStackRef{callStack};
+
+    // 1 tag, 4 timestamp, 2 seqnum
+    // 2 numOccur, 4 error code, 1 flags, 6 strlen
+    // 1 extra needed for padding on Netcomm end.
+    size_t baseLength = 21;
+
+    if (baseLength + detailsRef.size() + locationRef.size() +
+            callStackRef.size() <=
+        65536) {
+      // Pass through
+      retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
+                                                  details, location, callStack);
+    } else if (baseLength + detailsRef.size() > 65536) {
+      // Details too long, cut both location and stack
+      auto newLen = 65536 - baseLength;
+      std::string newDetails{details, newLen};
+      char empty = '\0';
+      retval = FRC_NetworkCommunication_sendError(
+          isError, errorCode, isLVCode, newDetails.c_str(), &empty, &empty);
+    } else if (baseLength + detailsRef.size() + locationRef.size() > 65536) {
+      // Location too long, cut stack
+      auto newLen = 65536 - baseLength - detailsRef.size();
+      std::string newLocation{location, newLen};
+      char empty = '\0';
+      retval = FRC_NetworkCommunication_sendError(
+          isError, errorCode, isLVCode, details, newLocation.c_str(), &empty);
+    } else {
+      // Stack too long
+      auto newLen = 65536 - baseLength - detailsRef.size() - locationRef.size();
+      std::string newCallStack{callStack, newLen};
+      retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
+                                                  details, location,
+                                                  newCallStack.c_str());
+    }
     if (printMsg) {
       if (location && location[0] != '\0') {
         wpi::errs() << (isError ? "Error" : "Warning") << " at " << location

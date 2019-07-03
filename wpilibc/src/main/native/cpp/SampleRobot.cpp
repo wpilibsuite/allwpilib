@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -59,23 +59,23 @@ void SampleRobot::StartCompetition() {
 }
 
 void SampleRobot::RobotInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
 }
 
 void SampleRobot::Disabled() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
 }
 
 void SampleRobot::Autonomous() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
 }
 
 void SampleRobot::OperatorControl() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
 }
 
 void SampleRobot::Test() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
 }
 
 void SampleRobot::RobotMain() { m_robotMainOverridden = false; }

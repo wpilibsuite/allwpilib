@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,6 +19,7 @@
 #include <wpi/StringRef.h>
 
 #include "frc/AnalogInput.h"
+#include "frc/MotorSafety.h"
 #include "frc/Timer.h"
 #include "frc/Utility.h"
 #include "frc/WPIErrors.h"
@@ -367,20 +368,6 @@ bool DriverStation::IsFMSAttached() const {
   return controlWord.fmsAttached;
 }
 
-bool DriverStation::IsSysActive() const {
-  int32_t status = 0;
-  bool retVal = HAL_GetSystemActive(&status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-  return retVal;
-}
-
-bool DriverStation::IsBrownedOut() const {
-  int32_t status = 0;
-  bool retVal = HAL_GetBrownedOut(&status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-  return retVal;
-}
-
 std::string DriverStation::GetGameSpecificMessage() const {
   HAL_MatchInfo info;
   HAL_GetMatchInfo(&info);
@@ -548,10 +535,17 @@ void DriverStation::ReportJoystickUnpluggedWarning(const wpi::Twine& message) {
 
 void DriverStation::Run() {
   m_isRunning = true;
+  int safetyCounter = 0;
   while (m_isRunning) {
     HAL_WaitForDSData();
     GetData();
 
+    if (IsDisabled()) safetyCounter = 0;
+
+    if (++safetyCounter >= 4) {
+      MotorSafety::CheckMotors();
+      safetyCounter = 0;
+    }
     if (m_userInDisabled) HAL_ObserveUserProgramDisabled();
     if (m_userInAutonomous) HAL_ObserveUserProgramAutonomous();
     if (m_userInTeleop) HAL_ObserveUserProgramTeleop();

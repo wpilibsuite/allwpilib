@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/AnalogInput.h>
-#include <frc/Spark.h>
+#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
 
@@ -45,8 +45,8 @@ class Robot : public frc::TimedRobot {
 
   frc::AnalogInput m_ultrasonic{kUltrasonicPort};
 
-  frc::Spark m_left{kLeftMotorPort};
-  frc::Spark m_right{kRightMotorPort};
+  frc::PWMVictorSPX m_left{kLeftMotorPort};
+  frc::PWMVictorSPX m_right{kRightMotorPort};
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
 };
 

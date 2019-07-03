@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -23,6 +23,11 @@
 
 #include "PropertyImpl.h"
 #include "cscore_cpp.h"
+
+namespace wpi {
+class Logger;
+class json;
+}  // namespace wpi
 
 namespace cs {
 
@@ -49,6 +54,10 @@ class PropertyContainer {
                                  CS_Status* status);
   std::vector<std::string> GetEnumPropertyChoices(int property,
                                                   CS_Status* status) const;
+
+  bool SetPropertiesJson(const wpi::json& config, wpi::Logger& logger,
+                         wpi::StringRef logName, CS_Status* status);
+  wpi::json GetPropertiesJsonObject(CS_Status* status);
 
  protected:
   // Get a property; must be called with m_mutex held.

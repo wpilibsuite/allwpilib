@@ -133,6 +133,6 @@ static const char* error_cases[] = {
     "\"\x7F\xF4\x7F",
 };
 
-INSTANTIATE_TEST_CASE_P(JsonDeserializationErrorTests,
+INSTANTIATE_TEST_SUITE_P(JsonDeserializationErrorTests,
                         JsonDeserializationErrorTest,
-                        ::testing::ValuesIn(error_cases), );
+                        ::testing::ValuesIn(error_cases));

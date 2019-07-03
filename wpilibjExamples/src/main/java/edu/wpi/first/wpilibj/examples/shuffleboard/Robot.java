@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.examples.shuffleboard;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -18,11 +18,12 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public class Robot extends TimedRobot {
-  private final DifferentialDrive m_tankDrive = new DifferentialDrive(new Spark(0), new Spark(1));
+  private final DifferentialDrive m_tankDrive = new DifferentialDrive(new PWMVictorSPX(0),
+                                                                      new PWMVictorSPX(1));
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
 
-  private final Spark m_elevatorMotor = new Spark(2);
+  private final PWMVictorSPX m_elevatorMotor = new PWMVictorSPX(2);
   private final AnalogPotentiometer m_elevatorPot = new AnalogPotentiometer(0);
   private NetworkTableEntry m_maxSpeed;
 

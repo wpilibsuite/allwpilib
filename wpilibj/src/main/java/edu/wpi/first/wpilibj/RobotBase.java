@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -66,6 +66,11 @@ public abstract class RobotBase implements AutoCloseable {
       @Override
       public Long getRobotMainThreadId() {
         return MAIN_THREAD_ID;
+      }
+
+      @Override
+      public boolean isRoboRIO() {
+        return RobotBase.isReal();
       }
     };
 
@@ -237,23 +242,25 @@ public abstract class RobotBase implements AutoCloseable {
       return;
     }
 
-    try {
-      final File file = new File("/tmp/frc_versions/FRC_Lib_Version.ini");
+    if (isReal()) {
+      try {
+        final File file = new File("/tmp/frc_versions/FRC_Lib_Version.ini");
 
-      if (file.exists()) {
-        file.delete();
+        if (file.exists()) {
+          file.delete();
+        }
+
+        file.createNewFile();
+
+        try (OutputStream output = Files.newOutputStream(file.toPath())) {
+          output.write("Java ".getBytes(StandardCharsets.UTF_8));
+          output.write(WPILibVersion.Version.getBytes(StandardCharsets.UTF_8));
+        }
+
+      } catch (IOException ex) {
+        DriverStation.reportError("Could not write FRC_Lib_Version.ini: " + ex.toString(),
+                ex.getStackTrace());
       }
-
-      file.createNewFile();
-
-      try (OutputStream output = Files.newOutputStream(file.toPath())) {
-        output.write("Java ".getBytes(StandardCharsets.UTF_8));
-        output.write(WPILibVersion.Version.getBytes(StandardCharsets.UTF_8));
-      }
-
-    } catch (IOException ex) {
-      DriverStation.reportError("Could not write FRC_Lib_Version.ini: " + ex.toString(),
-          ex.getStackTrace());
     }
 
     boolean errorOnExit = false;

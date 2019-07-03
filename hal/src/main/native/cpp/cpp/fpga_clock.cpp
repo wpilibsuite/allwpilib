@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -21,8 +21,9 @@ fpga_clock::time_point fpga_clock::now() noexcept {
   uint64_t currentTime = HAL_GetFPGATime(&status);
   if (status != 0) {
     wpi::errs()
-        << "Call to HAL_GetFPGATime failed."
-        << "Initialization might have failed. Time will not be correct\n";
+        << "Call to HAL_GetFPGATime failed in fpga_clock::now() with status "
+        << status
+        << ". Initialization might have failed. Time will not be correct\n";
     wpi::errs().flush();
     return epoch();
   }

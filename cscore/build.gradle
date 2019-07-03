@@ -20,7 +20,7 @@ ext {
     useJava = true
     useCpp = true
     splitSetup = {
-        if (it.targetPlatform.operatingSystem.name == 'osx') {
+        if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
                 macObjCpp(ObjectiveCppSourceSet) {
                     source {
@@ -43,7 +43,7 @@ ext {
                     }
                 }
             }
-        } else if (it.targetPlatform.operatingSystem.name == 'linux') {
+        } else if (it.targetPlatform.operatingSystem.isLinux()) {
             it.sources {
                 cscoreLinuxCpp(CppSourceSet) {
                     source {
@@ -56,7 +56,7 @@ ext {
                     }
                 }
             }
-        } else if (it.targetPlatform.operatingSystem.name == 'windows') {
+        } else if (it.targetPlatform.operatingSystem.isWindows()) {
             it.sources {
                 cscoreWindowsCpp(CppSourceSet) {
                     source {
@@ -88,43 +88,28 @@ examplesTree.list(new FilenameFilter() {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-model {
-    // Exports config is a utility to enable exporting all symbols in a C++ library on windows to a DLL.
-    // This removes the need for DllExport on a library. However, the gradle C++ builder has a bug
-    // where some extra symbols are added that cannot be resolved at link time. This configuration
-    // lets you specify specific symbols to exlude from exporting.
-    exportsConfigs {
-        cscore(ExportsConfig) {
-            x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                 '_CT??_R0?AVbad_cast',
-                                 '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                 '_TI5?AVfailure', '==']
-            x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                 '_CT??_R0?AVbad_cast',
-                                 '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                 '_TI5?AVfailure', '==']
+nativeUtils.exportsConfigs {
+    cscore {
+        x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+        x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+    }
+    cscoreJNI {
+        x86SymbolFilter = { symbols ->
+            symbols.removeIf({ !it.startsWith('CS_') })
         }
-        cscoreJNI(ExportsConfig) {
-            x86SymbolFilter = { symbols ->
-                def retList = []
-                symbols.each { symbol ->
-                    if (symbol.startsWith('CS_')) {
-                        retList << symbol
-                    }
-                }
-                return retList
-            }
-            x64SymbolFilter = { symbols ->
-                def retList = []
-                symbols.each { symbol ->
-                    if (symbol.startsWith('CS_')) {
-                        retList << symbol
-                    }
-                }
-                return retList
-            }
+        x64SymbolFilter = { symbols ->
+            symbols.removeIf({ !it.startsWith('CS_') })
         }
     }
+}
+
+model {
     components {
         examplesMap.each { key, value ->
             "${key}"(NativeExecutableSpec) {

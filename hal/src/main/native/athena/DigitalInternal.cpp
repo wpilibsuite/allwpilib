@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -145,7 +145,7 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
     return true;
   } else if (isHandleType(digitalSourceHandle, HAL_HandleEnum::DIO)) {
     int32_t index = getHandleIndex(digitalSourceHandle);
-    if (index > kNumDigitalHeaders + kNumDigitalMXPChannels) {
+    if (index >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
       // channels 10-15, so need to add headers to remap index
       channel = remapSPIChannel(index) + kNumDigitalHeaders;
       module = 0;

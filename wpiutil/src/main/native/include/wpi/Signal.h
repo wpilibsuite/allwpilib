@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -570,7 +570,7 @@ public:
      * @param a... arguments to emit
      */
     template <typename... A>
-    void operator()(A && ... a) {
+    void operator()(A && ... a) const {
         lock_type lock(m_mutex);
         if (!m_block && m_func) m_func(std::forward<A>(a)...);
     }
@@ -799,7 +799,7 @@ private:
 
 private:
     std::function<void(T...)> m_func;
-    Lockable m_mutex;
+    mutable Lockable m_mutex;
     std::atomic<bool> m_block;
 };
 

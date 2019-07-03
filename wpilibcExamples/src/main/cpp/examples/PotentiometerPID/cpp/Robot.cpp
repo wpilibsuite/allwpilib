@@ -10,7 +10,7 @@
 #include <frc/AnalogInput.h>
 #include <frc/Joystick.h>
 #include <frc/PIDController.h>
-#include <frc/Spark.h>
+#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 
 /**
@@ -62,7 +62,7 @@ class Robot : public frc::TimedRobot {
 
   frc::AnalogInput m_potentiometer{kPotChannel};
   frc::Joystick m_joystick{kJoystickChannel};
-  frc::Spark m_elevatorMotor{kMotorChannel};
+  frc::PWMVictorSPX m_elevatorMotor{kMotorChannel};
 
   /* Potentiometer (AnalogInput) and elevatorMotor (Victor) can be used as a
    * PIDSource and PIDOutput respectively.

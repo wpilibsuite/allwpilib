@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -195,8 +195,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   public void disable() {
     m_queueMutex.lock();
     try {
-      m_isExpired = false;
-
       m_watchdogs.remove(this);
       m_schedulerWaiter.signalAll();
     } finally {
@@ -247,10 +245,15 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
                 System.out.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout / 1.0e6);
               }
             }
+
+            // Set expiration flag before calling the callback so any
+            // manipulation of the flag in the callback (e.g., calling
+            // Disable()) isn't clobbered.
+            watchdog.m_isExpired = true;
+
             m_queueMutex.unlock();
             watchdog.m_callback.run();
             m_queueMutex.lock();
-            watchdog.m_isExpired = true;
           }
           // Otherwise, a Watchdog removed itself from the queue (it notifies
           // the scheduler of this) or a spurious wakeup occurred, so just

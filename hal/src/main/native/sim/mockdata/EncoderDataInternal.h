@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -30,7 +30,7 @@ class EncoderData {
   SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
   SimDataValue<int32_t, MakeInt, GetCountName> count{0};
   SimDataValue<double, MakeDouble, GetPeriodName> period{
-      std::numeric_limits<double>::max()};
+      (std::numeric_limits<double>::max)()};
   SimDataValue<HAL_Bool, MakeBoolean, GetResetName> reset{false};
   SimDataValue<double, MakeDouble, GetMaxPeriodName> maxPeriod{0};
   SimDataValue<HAL_Bool, MakeBoolean, GetDirectionName> direction{false};

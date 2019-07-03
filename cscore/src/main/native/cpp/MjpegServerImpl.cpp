@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -111,13 +111,13 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
 
   void StartStream() {
     std::lock_guard<wpi::mutex> lock(m_mutex);
-    m_source->EnableSink();
+    if (m_source) m_source->EnableSink();
     m_streaming = true;
   }
 
   void StopStream() {
     std::lock_guard<wpi::mutex> lock(m_mutex);
-    m_source->DisableSink();
+    if (m_source) m_source->DisableSink();
     m_streaming = false;
   }
 };
@@ -335,7 +335,8 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
 
 void MjpegServerImpl::ConnThread::SendHTMLHeadTitle(
     wpi::raw_ostream& os) const {
-  os << "<html><head><title>" << m_name << " CameraServer</title>";
+  os << "<html><head><title>" << m_name << " CameraServer</title>"
+     << "<meta charset=\"UTF-8\">";
 }
 
 // Send the root html file with controls for all the settable properties.
@@ -411,6 +412,15 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
       default:
         break;
     }
+  }
+
+  status = 0;
+  auto info = GetUsbCameraInfo(Instance::GetInstance().FindSource(source).first,
+                               &status);
+  if (status == CS_OK) {
+    os << "<p>USB device path: " << info.path << '\n';
+    for (auto&& path : info.otherPaths)
+      os << "<p>Alternate device path: " << path << '\n';
   }
 
   os << "<p>Supported Video Modes:</p>\n";
@@ -633,8 +643,9 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
   Frame::Time lastFrameTime = 0;
   Frame::Time timePerFrame = 0;
   if (m_fps != 0) timePerFrame = 1000000.0 / m_fps;
-  // Allow fudge factor of 1 ms in frame rate
-  if (timePerFrame >= 1000) timePerFrame -= 1000;
+  Frame::Time averageFrameTime = 0;
+  Frame::Time averagePeriod = 1000000;  // 1 second window
+  if (averagePeriod < timePerFrame) averagePeriod = timePerFrame * 10;
 
   StartStream();
   while (m_active && !os.has_error()) {
@@ -655,10 +666,26 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
       continue;
     }
 
-    if (frame.GetTime() < (lastFrameTime + timePerFrame)) {
-      // Limit FPS; sleep for 10 ms so we don't consume all processor time
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
-      continue;
+    auto thisFrameTime = frame.GetTime();
+    if (thisFrameTime != 0 && timePerFrame != 0 && lastFrameTime != 0) {
+      Frame::Time deltaTime = thisFrameTime - lastFrameTime;
+
+      // drop frame if it is early compared to the desired frame rate AND
+      // the current average is higher than the desired average
+      if (deltaTime < timePerFrame && averageFrameTime < timePerFrame) {
+        // sleep for 1 ms so we don't consume all processor time
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        continue;
+      }
+
+      // update average
+      if (averageFrameTime != 0) {
+        averageFrameTime =
+            averageFrameTime * (averagePeriod - timePerFrame) / averagePeriod +
+            deltaTime * timePerFrame / averagePeriod;
+      } else {
+        averageFrameTime = deltaTime;
+      }
     }
 
     int width = m_width != 0 ? m_width : frame.GetOriginalWidth();
@@ -695,7 +722,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
     // print the individual mimetype and the length
     // sending the content-length fixes random stream disruption observed
     // with firefox
-    lastFrameTime = frame.GetTime();
+    lastFrameTime = thisFrameTime;
     double timestamp = lastFrameTime / 1000000.0;
     header.clear();
     oss << "\r\n--" BOUNDARY "\r\n"

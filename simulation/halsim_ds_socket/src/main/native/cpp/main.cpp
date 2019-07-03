@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -40,7 +40,7 @@ static std::unique_ptr<Buffer> singleByte;
 namespace {
 struct DataStore {
   wpi::SmallVector<uint8_t, 128> m_frame;
-  size_t m_frameSize = std::numeric_limits<size_t>::max();
+  size_t m_frameSize = (std::numeric_limits<size_t>::max)();
   halsim::DSCommPacket* dsPacket;
 };
 }  // namespace
@@ -53,9 +53,9 @@ static SimpleBufferPool<4>& GetBufferPool() {
 static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
   wpi::StringRef data{buf.base, size};
   while (!data.empty()) {
-    if (store.m_frameSize == std::numeric_limits<size_t>::max()) {
+    if (store.m_frameSize == (std::numeric_limits<size_t>::max)()) {
       if (store.m_frame.size() < 2u) {
-        size_t toCopy = std::min(2u - store.m_frame.size(), data.size());
+        size_t toCopy = (std::min)(2u - store.m_frame.size(), data.size());
         store.m_frame.append(data.bytes_begin(), data.bytes_begin() + toCopy);
         data = data.drop_front(toCopy);
         if (store.m_frame.size() < 2u) return;  // need more data
@@ -63,9 +63,9 @@ static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
       store.m_frameSize = (static_cast<uint16_t>(store.m_frame[0]) << 8) |
                           static_cast<uint16_t>(store.m_frame[1]);
     }
-    if (store.m_frameSize != std::numeric_limits<size_t>::max()) {
+    if (store.m_frameSize != (std::numeric_limits<size_t>::max)()) {
       size_t need = store.m_frameSize - (store.m_frame.size() - 2);
-      size_t toCopy = std::min(need, data.size());
+      size_t toCopy = (std::min)(need, data.size());
       store.m_frame.append(data.bytes_begin(), data.bytes_begin() + toCopy);
       data = data.drop_front(toCopy);
       need -= toCopy;
@@ -73,7 +73,7 @@ static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
         auto ds = store.dsPacket;
         ds->DecodeTCP(store.m_frame);
         store.m_frame.clear();
-        store.m_frameSize = std::numeric_limits<size_t>::max();
+        store.m_frameSize = (std::numeric_limits<size_t>::max)();
       }
     }
   }
@@ -109,7 +109,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   auto simLoopTimer = Timer::Create(loop);
   struct sockaddr_in simAddr;
   NameToAddr("127.0.0.1", 1135, &simAddr);
-  simLoopTimer->timeout.connect([ udpLocal = udp.get(), simAddr ] {
+  simLoopTimer->timeout.connect([udpLocal = udp.get(), simAddr] {
     udpLocal->Send(simAddr, wpi::ArrayRef<Buffer>{singleByte.get(), 1},
                    [](auto buf, Error err) {
                      if (err) {
@@ -121,8 +121,9 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   simLoopTimer->Start(Timer::Time{100}, Timer::Time{100});
 
   // UDP Receive then send
-  udp->received.connect([udpLocal = udp.get()](
-      Buffer & buf, size_t len, const sockaddr& recSock, unsigned int port) {
+  udp->received.connect([udpLocal = udp.get()](Buffer& buf, size_t len,
+                                               const sockaddr& recSock,
+                                               unsigned int port) {
     auto ds = udpLocal->GetLoop()->GetData<halsim::DSCommPacket>();
     ds->DecodeUDP(
         wpi::ArrayRef<uint8_t>{reinterpret_cast<uint8_t*>(buf.base), len});
@@ -133,7 +134,8 @@ static void SetupUdp(wpi::uv::Loop& loop) {
     outAddr.sin_port = htons(1150);
 
     wpi::SmallVector<wpi::uv::Buffer, 4> sendBufs;
-    wpi::raw_uv_ostream stream{sendBufs, GetBufferPool()};
+    wpi::raw_uv_ostream stream{sendBufs,
+                               [] { return GetBufferPool().Allocate(); }};
     ds->SetupSendBuffer(stream);
 
     udpLocal->Send(outAddr, sendBufs, [](auto bufs, Error err) {

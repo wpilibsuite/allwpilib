@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,7 @@
 #include <cassert>
 #include <cstdlib>
 
-#include <wpi/memory.h>
+#include <wpi/MemAlloc.h>
 #include <wpi/timestamp.h>
 
 #include "Value_internal.h"
@@ -21,7 +21,7 @@ using namespace nt;
 // Conversion helpers
 
 static void ConvertToC(wpi::StringRef in, char** out) {
-  *out = static_cast<char*>(wpi::CheckedMalloc(in.size() + 1));
+  *out = static_cast<char*>(wpi::safe_malloc(in.size() + 1));
   std::memmove(*out, in.data(), in.size());
   (*out)[in.size()] = '\0';
 }
@@ -58,13 +58,13 @@ static void ConvertToC(const RpcDefinition& in, NT_RpcDefinition* out) {
 
   out->num_params = in.params.size();
   out->params = static_cast<NT_RpcParamDef*>(
-      wpi::CheckedMalloc(in.params.size() * sizeof(NT_RpcParamDef)));
+      wpi::safe_malloc(in.params.size() * sizeof(NT_RpcParamDef)));
   for (size_t i = 0; i < in.params.size(); ++i)
     ConvertToC(in.params[i], &out->params[i]);
 
   out->num_results = in.results.size();
   out->results = static_cast<NT_RpcResultDef*>(
-      wpi::CheckedMalloc(in.results.size() * sizeof(NT_RpcResultDef)));
+      wpi::safe_malloc(in.results.size() * sizeof(NT_RpcResultDef)));
   for (size_t i = 0; i < in.results.size(); ++i)
     ConvertToC(in.results[i], &out->results[i]);
 }
@@ -105,7 +105,7 @@ static O* ConvertToC(const std::vector<I>& in, size_t* out_len) {
   if (!out_len) return nullptr;
   *out_len = in.size();
   if (in.empty()) return nullptr;
-  O* out = static_cast<O*>(wpi::CheckedMalloc(sizeof(O) * in.size()));
+  O* out = static_cast<O*>(wpi::safe_malloc(sizeof(O) * in.size()));
   for (size_t i = 0; i < in.size(); ++i) ConvertToC(in[i], &out[i]);
   return out;
 }
@@ -188,7 +188,7 @@ NT_Entry* NT_GetEntries(NT_Inst inst, const char* prefix, size_t prefix_len,
 
   // create array and copy into it
   NT_Entry* info = static_cast<NT_Entry*>(
-      wpi::CheckedMalloc(info_v.size() * sizeof(NT_Entry)));
+      wpi::safe_malloc(info_v.size() * sizeof(NT_Entry)));
   std::memcpy(info, info_v.data(), info_v.size() * sizeof(NT_Entry));
   return info;
 }
@@ -519,9 +519,9 @@ NT_Value** NT_UnpackRpcValues(const char* packed, size_t packed_len,
 
   // create array and copy into it
   NT_Value** values = static_cast<NT_Value**>(
-      wpi::CheckedMalloc(values_v.size() * sizeof(NT_Value*)));
+      wpi::safe_malloc(values_v.size() * sizeof(NT_Value*)));
   for (size_t i = 0; i < values_v.size(); ++i) {
-    values[i] = static_cast<NT_Value*>(wpi::CheckedMalloc(sizeof(NT_Value)));
+    values[i] = static_cast<NT_Value*>(wpi::safe_malloc(sizeof(NT_Value)));
     ConvertToC(*values_v[i], values[i]);
   }
   return values;
@@ -802,27 +802,27 @@ void NT_DisposeRpcAnswer(NT_RpcAnswer* call_info) {
 
 /* Allocates a char array of the specified size.*/
 char* NT_AllocateCharArray(size_t size) {
-  char* retVal = static_cast<char*>(wpi::CheckedMalloc(size * sizeof(char)));
+  char* retVal = static_cast<char*>(wpi::safe_malloc(size * sizeof(char)));
   return retVal;
 }
 
 /* Allocates an integer or boolean array of the specified size. */
 int* NT_AllocateBooleanArray(size_t size) {
-  int* retVal = static_cast<int*>(wpi::CheckedMalloc(size * sizeof(int)));
+  int* retVal = static_cast<int*>(wpi::safe_malloc(size * sizeof(int)));
   return retVal;
 }
 
 /* Allocates a double array of the specified size. */
 double* NT_AllocateDoubleArray(size_t size) {
   double* retVal =
-      static_cast<double*>(wpi::CheckedMalloc(size * sizeof(double)));
+      static_cast<double*>(wpi::safe_malloc(size * sizeof(double)));
   return retVal;
 }
 
 /* Allocates an NT_String array of the specified size. */
 struct NT_String* NT_AllocateStringArray(size_t size) {
   NT_String* retVal =
-      static_cast<NT_String*>(wpi::CheckedMalloc(size * sizeof(NT_String)));
+      static_cast<NT_String*>(wpi::safe_malloc(size * sizeof(NT_String)));
   return retVal;
 }
 
@@ -944,7 +944,7 @@ char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
   *last_change = value->last_change;
   *str_len = value->data.v_string.len;
   char* str =
-      static_cast<char*>(wpi::CheckedMalloc(value->data.v_string.len + 1));
+      static_cast<char*>(wpi::safe_malloc(value->data.v_string.len + 1));
   std::memcpy(str, value->data.v_string.str, value->data.v_string.len + 1);
   return str;
 }
@@ -955,7 +955,7 @@ char* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
   *last_change = value->last_change;
   *raw_len = value->data.v_string.len;
   char* raw =
-      static_cast<char*>(wpi::CheckedMalloc(value->data.v_string.len + 1));
+      static_cast<char*>(wpi::safe_malloc(value->data.v_string.len + 1));
   std::memcpy(raw, value->data.v_string.str, value->data.v_string.len + 1);
   return raw;
 }
@@ -966,7 +966,7 @@ NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
   *last_change = value->last_change;
   *arr_size = value->data.arr_boolean.size;
   NT_Bool* arr = static_cast<int*>(
-      wpi::CheckedMalloc(value->data.arr_boolean.size * sizeof(NT_Bool)));
+      wpi::safe_malloc(value->data.arr_boolean.size * sizeof(NT_Bool)));
   std::memcpy(arr, value->data.arr_boolean.arr,
               value->data.arr_boolean.size * sizeof(NT_Bool));
   return arr;
@@ -978,7 +978,7 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
   *last_change = value->last_change;
   *arr_size = value->data.arr_double.size;
   double* arr = static_cast<double*>(
-      wpi::CheckedMalloc(value->data.arr_double.size * sizeof(double)));
+      wpi::safe_malloc(value->data.arr_double.size * sizeof(double)));
   std::memcpy(arr, value->data.arr_double.arr,
               value->data.arr_double.size * sizeof(double));
   return arr;
@@ -990,11 +990,11 @@ NT_String* NT_GetValueStringArray(const struct NT_Value* value,
   *last_change = value->last_change;
   *arr_size = value->data.arr_string.size;
   NT_String* arr = static_cast<NT_String*>(
-      wpi::CheckedMalloc(value->data.arr_string.size * sizeof(NT_String)));
+      wpi::safe_malloc(value->data.arr_string.size * sizeof(NT_String)));
   for (size_t i = 0; i < value->data.arr_string.size; ++i) {
     size_t len = value->data.arr_string.arr[i].len;
     arr[i].len = len;
-    arr[i].str = static_cast<char*>(wpi::CheckedMalloc(len + 1));
+    arr[i].str = static_cast<char*>(wpi::safe_malloc(len + 1));
     std::memcpy(arr[i].str, value->data.arr_string.arr[i].str, len + 1);
   }
   return arr;
@@ -1099,7 +1099,7 @@ NT_Bool* NT_GetEntryBooleanArray(NT_Entry entry, uint64_t* last_change,
   *last_change = v->last_change();
   auto vArr = v->GetBooleanArray();
   NT_Bool* arr =
-      static_cast<int*>(wpi::CheckedMalloc(vArr.size() * sizeof(NT_Bool)));
+      static_cast<int*>(wpi::safe_malloc(vArr.size() * sizeof(NT_Bool)));
   *arr_size = vArr.size();
   std::copy(vArr.begin(), vArr.end(), arr);
   return arr;
@@ -1112,7 +1112,7 @@ double* NT_GetEntryDoubleArray(NT_Entry entry, uint64_t* last_change,
   *last_change = v->last_change();
   auto vArr = v->GetDoubleArray();
   double* arr =
-      static_cast<double*>(wpi::CheckedMalloc(vArr.size() * sizeof(double)));
+      static_cast<double*>(wpi::safe_malloc(vArr.size() * sizeof(double)));
   *arr_size = vArr.size();
   std::copy(vArr.begin(), vArr.end(), arr);
   return arr;
@@ -1125,7 +1125,7 @@ NT_String* NT_GetEntryStringArray(NT_Entry entry, uint64_t* last_change,
   *last_change = v->last_change();
   auto vArr = v->GetStringArray();
   NT_String* arr = static_cast<NT_String*>(
-      wpi::CheckedMalloc(vArr.size() * sizeof(NT_String)));
+      wpi::safe_malloc(vArr.size() * sizeof(NT_String)));
   for (size_t i = 0; i < vArr.size(); ++i) {
     ConvertToC(vArr[i], &arr[i]);
   }

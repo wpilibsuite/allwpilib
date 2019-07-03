@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -48,14 +48,16 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
     // Header is 2 byte len, 1 byte type, 4 byte timestamp, 2 byte sequence num
     uint32_t ts = wpi::FloatToBits((wpi::Now() - startTime) * 1.0e-6);
     uint16_t len = rem.size() + toCopy.size() + 1 + 4 + 2;
-    out << wpi::ArrayRef<uint8_t>({static_cast<uint8_t>((len >> 8) & 0xff),
-                                   static_cast<uint8_t>(len & 0xff), 12,
-                                   static_cast<uint8_t>((ts >> 24) & 0xff),
-                                   static_cast<uint8_t>((ts >> 16) & 0xff),
-                                   static_cast<uint8_t>((ts >> 8) & 0xff),
-                                   static_cast<uint8_t>(ts & 0xff),
-                                   static_cast<uint8_t>((tcpSeq >> 8) & 0xff),
-                                   static_cast<uint8_t>(tcpSeq & 0xff)});
+    const uint8_t header[] = {static_cast<uint8_t>((len >> 8) & 0xff),
+                              static_cast<uint8_t>(len & 0xff),
+                              12,
+                              static_cast<uint8_t>((ts >> 24) & 0xff),
+                              static_cast<uint8_t>((ts >> 16) & 0xff),
+                              static_cast<uint8_t>((ts >> 8) & 0xff),
+                              static_cast<uint8_t>(ts & 0xff),
+                              static_cast<uint8_t>((tcpSeq >> 8) & 0xff),
+                              static_cast<uint8_t>(tcpSeq & 0xff)};
+    out << wpi::ArrayRef<uint8_t>(header);
   }
   out << rem << toCopy;
 
@@ -75,8 +77,8 @@ static void CopyUdp(uv::Stream& in, std::shared_ptr<uv::Udp> out,
   }
 
   in.data.connect(
-      [ rem = std::make_shared<std::string>(), outPtr = out.get(), addr ](
-          uv::Buffer & buf, size_t len) {
+      [rem = std::make_shared<std::string>(), outPtr = out.get(), addr](
+          uv::Buffer& buf, size_t len) {
         // build buffers
         wpi::SmallVector<uv::Buffer, 4> bufs;
         if (!NewlineBuffer(*rem, buf, len, bufs, false, 0)) return;
@@ -94,18 +96,20 @@ static void CopyTcp(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
     std::string rem;
     uint16_t seq = 0;
   };
-  in.data.connect([ data = std::make_shared<StreamData>(), outPtr = out.get() ](
-                      uv::Buffer & buf, size_t len) {
-    // build buffers
-    wpi::SmallVector<uv::Buffer, 4> bufs;
-    if (!NewlineBuffer(data->rem, buf, len, bufs, true, data->seq++)) return;
+  in.data.connect(
+      [data = std::make_shared<StreamData>(), outPtr = out.get()](
+          uv::Buffer& buf, size_t len) {
+        // build buffers
+        wpi::SmallVector<uv::Buffer, 4> bufs;
+        if (!NewlineBuffer(data->rem, buf, len, bufs, true, data->seq++))
+          return;
 
-    // send output
-    outPtr->Write(bufs, [](auto bufs2, uv::Error) {
-      for (auto buf : bufs2) buf.Deallocate();
-    });
-  },
-                  out);
+        // send output
+        outPtr->Write(bufs, [](auto bufs2, uv::Error) {
+          for (auto buf : bufs2) buf.Deallocate();
+        });
+      },
+      out);
 }
 
 static void CopyStream(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
@@ -183,7 +187,7 @@ int main(int argc, char* argv[]) {
     tcp->Bind("", 1740);
 
     // when we get a connection, accept it
-    tcp->connection.connect([ srv = tcp.get(), stdoutPipe, stderrPipe ] {
+    tcp->connection.connect([srv = tcp.get(), stdoutPipe, stderrPipe] {
       auto tcp = srv->Accept();
       if (!tcp) return;
 

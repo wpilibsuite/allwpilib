@@ -8,8 +8,8 @@
 package edu.wpi.first.wpilibj.templates.sample;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.SampleRobot;
-import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -37,7 +37,7 @@ public class Robot extends SampleRobot {
   private static final String kCustomAuto = "My Auto";
 
   private final DifferentialDrive m_robotDrive
-      = new DifferentialDrive(new Spark(0), new Spark(1));
+      = new DifferentialDrive(new PWMVictorSPX(0), new PWMVictorSPX(1));
   private final Joystick m_stick = new Joystick(0);
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 

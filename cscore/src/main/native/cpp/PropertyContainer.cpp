@@ -1,11 +1,16 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #include "PropertyContainer.h"
+
+#include <wpi/Logger.h>
+#include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
+#include <wpi/json.h>
 
 using namespace cs;
 
@@ -203,4 +208,75 @@ bool PropertyContainer::CacheProperties(CS_Status* status) const {
   // Doesn't need to do anything.
   m_properties_cached = true;
   return true;
+}
+
+bool PropertyContainer::SetPropertiesJson(const wpi::json& config,
+                                          wpi::Logger& logger,
+                                          wpi::StringRef logName,
+                                          CS_Status* status) {
+  for (auto&& prop : config) {
+    std::string name;
+    try {
+      name = prop.at("name").get<std::string>();
+    } catch (const wpi::json::exception& e) {
+      WPI_WARNING(logger,
+                  logName << ": SetConfigJson: could not read property name: "
+                          << e.what());
+      continue;
+    }
+    int n = GetPropertyIndex(name);
+    try {
+      auto& v = prop.at("value");
+      if (v.is_string()) {
+        std::string val = v.get<std::string>();
+        WPI_INFO(logger, logName << ": SetConfigJson: setting property '"
+                                 << name << "' to '" << val << '\'');
+        SetStringProperty(n, val, status);
+      } else if (v.is_boolean()) {
+        bool val = v.get<bool>();
+        WPI_INFO(logger, logName << ": SetConfigJson: setting property '"
+                                 << name << "' to " << val);
+        SetProperty(n, val, status);
+      } else {
+        int val = v.get<int>();
+        WPI_INFO(logger, logName << ": SetConfigJson: setting property '"
+                                 << name << "' to " << val);
+        SetProperty(n, val, status);
+      }
+    } catch (const wpi::json::exception& e) {
+      WPI_WARNING(logger,
+                  logName << ": SetConfigJson: could not read property value: "
+                          << e.what());
+      continue;
+    }
+  }
+
+  return true;
+}
+
+wpi::json PropertyContainer::GetPropertiesJsonObject(CS_Status* status) {
+  wpi::json j;
+  wpi::SmallVector<int, 32> propVec;
+  for (int p : EnumerateProperties(propVec, status)) {
+    wpi::json prop;
+    wpi::SmallString<128> strBuf;
+    prop.emplace("name", GetPropertyName(p, strBuf, status));
+    switch (GetPropertyKind(p)) {
+      case CS_PROP_BOOLEAN:
+        prop.emplace("value", static_cast<bool>(GetProperty(p, status)));
+        break;
+      case CS_PROP_INTEGER:
+      case CS_PROP_ENUM:
+        prop.emplace("value", GetProperty(p, status));
+        break;
+      case CS_PROP_STRING:
+        prop.emplace("value", GetStringProperty(p, strBuf, status));
+        break;
+      default:
+        continue;
+    }
+    j.emplace_back(prop);
+  }
+
+  return j;
 }
