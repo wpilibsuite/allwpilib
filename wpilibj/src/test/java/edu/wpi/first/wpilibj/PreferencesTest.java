@@ -35,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class PreferencesTest {
-
   private final Preferences m_prefs = Preferences.getInstance();
   private final NetworkTable m_table = NetworkTableInstance.getDefault().getTable("Preferences");
 
