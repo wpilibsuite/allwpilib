@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,7 +18,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/STLExtras.h"
 #include "wpi/future.h"
 #include "wpi/mutex.h"
 #include "wpi/uv/Handle.h"
@@ -91,9 +90,9 @@ class AsyncFunction<R(T...)> final
             for (auto&& v : h.m_params) {
               auto p = h.m_promises.CreatePromise(v.first);
               if (h.wakeup)
-                apply_tuple(h.wakeup,
-                            std::tuple_cat(std::make_tuple(std::move(p)),
-                                           std::move(v.second)));
+                std::apply(h.wakeup,
+                           std::tuple_cat(std::make_tuple(std::move(p)),
+                                          std::move(v.second)));
             }
             h.m_params.clear();
             // wake up any threads that might be waiting for the result
