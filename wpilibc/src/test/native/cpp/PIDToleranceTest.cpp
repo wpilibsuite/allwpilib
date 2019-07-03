@@ -14,7 +14,7 @@ using namespace frc;
 
 class PIDToleranceTest : public testing::Test {
  protected:
-  const double reference = 50.0;
+  const double setpoint = 50.0;
   const double range = 200;
   const double tolerance = 10.0;
 
@@ -57,21 +57,21 @@ TEST_F(PIDToleranceTest, Absolute) {
   Reset();
 
   pidController->SetAbsoluteTolerance(tolerance);
-  pidController->SetSetpoint(reference);
+  pidController->SetSetpoint(setpoint);
   pidRunner->Enable();
 
   EXPECT_FALSE(pidController->AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
       << pidController->GetError();
 
-  inp.val = reference + tolerance / 2;
+  inp.val = setpoint + tolerance / 2;
   Wait(1.0);
 
   EXPECT_TRUE(pidController->AtSetpoint())
       << "Error was not in tolerance when it should have been. Error was "
       << pidController->GetError();
 
-  inp.val = reference + 10 * tolerance;
+  inp.val = setpoint + 10 * tolerance;
   Wait(1.0);
 
   EXPECT_FALSE(pidController->AtSetpoint())
@@ -83,7 +83,7 @@ TEST_F(PIDToleranceTest, Percent) {
   Reset();
 
   pidController->SetPercentTolerance(tolerance);
-  pidController->SetSetpoint(reference);
+  pidController->SetSetpoint(setpoint);
   pidRunner->Enable();
 
   EXPECT_FALSE(pidController->AtSetpoint())
@@ -91,8 +91,8 @@ TEST_F(PIDToleranceTest, Percent) {
       << pidController->GetError();
 
   inp.val =
-      reference + (tolerance) / 200 *
-                      range;  // half of percent tolerance away from reference
+      setpoint + (tolerance) / 200 *
+                     range;  // half of percent tolerance away from setpoint
   Wait(1.0);
 
   EXPECT_TRUE(pidController->AtSetpoint())
@@ -100,7 +100,7 @@ TEST_F(PIDToleranceTest, Percent) {
       << pidController->GetError();
 
   inp.val =
-      reference +
+      setpoint +
       (tolerance) / 50 * range;  // double percent tolerance away from setPoint
 
   Wait(1.0);
