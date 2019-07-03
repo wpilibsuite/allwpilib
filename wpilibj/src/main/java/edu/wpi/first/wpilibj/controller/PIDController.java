@@ -15,11 +15,7 @@ import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
- * Class implements a PID Control Loop.
- *
- * <p>This feedback controller runs in discrete time, so time deltas are not used in the integral
- * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
- * given set of PID constants.
+ * Implements a PID control loop.
  */
 @SuppressWarnings("PMD.TooManyFields")
 public class PIDController extends SendableBase {
@@ -321,7 +317,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Set the PID controller to consider the input to be continuous,
+   * Set the PID controller to consider the input to be continuous.
    *
    * <p>Rather then using the max and min input range as constraints, it considers them to be the
    * same point and automatically calculates the shortest route to the setpoint.

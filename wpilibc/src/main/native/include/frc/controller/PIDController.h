@@ -17,19 +17,8 @@
 namespace frc {
 namespace experimental {
 
-// TODO: remove when this class is moved into frc namespace
-using frc::SendableBase;
-using frc::SendableBuilder;
-
 /**
- * Class implements a PID Control Loop.
- *
- * Creates a separate thread which reads the given PIDSource and takes care of
- * the integral calculations, as well as writing the given PIDOutput.
- *
- * This feedback controller runs in discrete time, so time deltas are not used
- * in the integral and derivative calculations. Therefore, the sample rate
- * affects the controller's behavior for a given set of PID constants.
+ * Implements a PID control loop.
  */
 class PIDController : public SendableBase {
  public:
@@ -161,7 +150,7 @@ class PIDController : public SendableBase {
   bool AtSetpoint() const;
 
   /**
-   * Sets the PID controller to consider the input to be continuous,
+   * Sets the PID controller to consider the input to be continuous.
    *
    * Rather then using the max and min input range as constraints, it considers
    * them to be the same point and automatically calculates the shortest route
