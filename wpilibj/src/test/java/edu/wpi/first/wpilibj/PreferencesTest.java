@@ -56,7 +56,7 @@ class PreferencesTest {
       fail(ex);
     }
 
-    NetworkTableInstance.getDefault().startServer(filepath.toUri().getPath());
+    NetworkTableInstance.getDefault().startServer(filepath.toString());
   }
 
   @AfterEach
