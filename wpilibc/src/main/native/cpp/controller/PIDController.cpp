@@ -208,7 +208,7 @@ void PIDController::Reset() {
   m_output = 0;
 }
 
-void PIDController::InitSendable(SendableBuilder& builder) {
+void PIDController::InitSendable(frc::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
   builder.AddDoubleProperty("p", [this] { return GetP(); },
                             [this](double value) { SetP(value); });
