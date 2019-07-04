@@ -57,7 +57,7 @@ void PIDControllerRunner::Run() {
   }
 }
 
-void PIDControllerRunner::InitSendable(SendableBuilder& builder) {
+void PIDControllerRunner::InitSendable(frc::SendableBuilder& builder) {
   m_controller.InitSendable(builder);
   builder.SetSafeState([this]() { Disable(); });
   builder.AddBooleanProperty("enabled", [this]() { return IsEnabled(); },
