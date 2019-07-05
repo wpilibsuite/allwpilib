@@ -79,7 +79,7 @@ public class PIDController extends SendableBase {
   private double m_output;
 
   /**
-   * Allocates a PID object with the given constants for Kp, Ki, and Kd and a default period of
+   * Allocates a PIDController with the given constants for Kp, Ki, and Kd and a default period of
    * 0.02 seconds.
    *
    * @param Kp The proportional coefficient.
@@ -92,7 +92,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Allocates a PID object with the given constants for Kp, Ki, and Kd.
+   * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
    *
    * @param Kp     The proportional coefficient.
    * @param Ki     The integral coefficient.
@@ -116,9 +116,9 @@ public class PIDController extends SendableBase {
    *
    * <p>Set the proportional, integral, and differential coefficients.
    *
-   * @param Kp Proportional coefficient
-   * @param Ki Integral coefficient
-   * @param Kd Differential coefficient
+   * @param Kp The proportional coefficient.
+   * @param Ki The integral coefficient.
+   * @param Kd The derivative coefficient.
    */
   @SuppressWarnings("ParameterName")
   public void setPID(double Kp, double Ki, double Kd) {

@@ -25,13 +25,13 @@ class PIDController : public SendableBase {
   enum class Tolerance { kAbsolute, kPercent };
 
   /**
-   * Allocates a PID object with the given constants for Kp, Ki, and Kd.
+   * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
    *
-   * @param Kp          The proportional coefficient.
-   * @param Ki          The integral coefficient.
-   * @param Kd          The derivative coefficient.
-   * @param period      The period between controller updates in seconds. The
-   *                    default is 0.02 seconds.
+   * @param Kp     The proportional coefficient.
+   * @param Ki     The integral coefficient.
+   * @param Kd     The derivative coefficient.
+   * @param period The period between controller updates in seconds. The
+   *               default is 0.02 seconds.
    */
   PIDController(double Kp, double Ki, double Kd, double period = 0.02);
 
