@@ -112,7 +112,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Set the PID Controller gain parameters.
+   * Sets the PID Controller gain parameters.
    *
    * <p>Set the proportional, integral, and differential coefficients.
    *
@@ -133,7 +133,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Set the Proportional coefficient of the PID controller gain.
+   * Sets the Proportional coefficient of the PID controller gain.
    *
    * @param Kp proportional coefficient
    */
@@ -148,7 +148,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Set the Integral coefficient of the PID controller gain.
+   * Sets the Integral coefficient of the PID controller gain.
    *
    * @param Ki integral coefficient
    */
@@ -163,7 +163,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Set the Differential coefficient of the PID controller gain.
+   * Sets the Differential coefficient of the PID controller gain.
    *
    * @param Kd differential coefficient
    */
@@ -229,7 +229,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Return the current controller output.
+   * Returns the current controller output.
    *
    * <p>This is always centered around zero and constrained to the min and max outputs.
    *
@@ -245,7 +245,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Set the setpoint for the PIDController.
+   * Sets the setpoint for the PIDController.
    *
    * @param setpoint The desired setpoint.
    */
@@ -277,7 +277,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Return true if the error is within the percentage of the total input range,
+   * Returns true if the error is within the percentage of the total input range,
    * determined by SetTolerance. This asssumes that the maximum and minimum
    * input were set using SetInput.
    *
@@ -290,7 +290,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Return true if the error and change in error are below the specified tolerances.
+   * Returns true if the error and change in error are below the specified tolerances.
    *
    * @param tolerance The maximum allowable error.
    * @param deltaTolerance The maximum allowable change in error from the previous iteration.
@@ -317,7 +317,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Set the PID controller to consider the input to be continuous.
+   * Sets the PID controller to consider the input to be continuous.
    *
    * <p>Rather then using the max and min input range as constraints, it considers them to be the
    * same point and automatically calculates the shortest route to the setpoint.
@@ -327,7 +327,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Set the PID controller to consider the input to be continuous,
+   * Sets the PID controller to consider the input to be continuous,
    *
    * <p>Rather then using the max and min input range as constraints, it considers them to be the
    * same point and automatically calculates the shortest route to the setpoint.
@@ -382,7 +382,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Set the absolute error which is considered tolerable for use with atSetpoint().
+   * Sets the absolute error which is considered tolerable for use with atSetpoint().
    *
    * @param tolerance Absolute error which is tolerable.
    */
@@ -391,7 +391,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Set the absolute error which is considered tolerable for use with atSetpoint().
+   * Sets the absolute error which is considered tolerable for use with atSetpoint().
    *
    * @param tolerance      Absolute error which is tolerable.
    * @param deltaTolerance Change in absolute error per second which is tolerable.
@@ -408,7 +408,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Set the percent error which is considered tolerable for use with atSetpoint().
+   * Sets the percent error which is considered tolerable for use with atSetpoint().
    *
    * @param tolerance Percent error which is tolerable.
    */
@@ -417,7 +417,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Set the percent error which is considered tolerable for use with atSetpoint().
+   * Sets the percent error which is considered tolerable for use with atSetpoint().
    *
    * @param tolerance      Percent error which is tolerable.
    * @param deltaTolerance Change in percent error per second which is tolerable.
@@ -515,7 +515,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Read the input, calculate the output accordingly, and return the output.
+   * Reads the input, calculate the output accordingly, and return the output.
    *
    * @param measurement The current measurement of the process variable.
    * @param setpoint The setpoint of the controller.
@@ -527,7 +527,7 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Reset the previous error, the integral term, and disable the controller.
+   * Resets the previous error and the integral term. Also disables the controller.
    */
   public void reset() {
     m_thisMutex.lock();
