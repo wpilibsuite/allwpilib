@@ -30,8 +30,8 @@ class PIDInputOutputTest {
     m_controller.setOutputRange(-50, 50);
 
     assertAll(
-      () -> assertEquals(-50, m_controller.calculate(100, 0), 1e-5),
-      () -> assertEquals(50, m_controller.calculate(0, 100), 1e-5)
+        () -> assertEquals(-50, m_controller.calculate(100, 0), 1e-5),
+        () -> assertEquals(50, m_controller.calculate(0, 100), 1e-5)
     );
   }
 
@@ -42,8 +42,8 @@ class PIDInputOutputTest {
     m_controller.setInputRange(-50, 50);
 
     assertAll(
-      () -> assertEquals(-100, m_controller.calculate(100, 0), 1e-5),
-      () -> assertEquals(50, m_controller.calculate(0, 100), 1e-5)
+        () -> assertEquals(-100, m_controller.calculate(100, 0), 1e-5),
+        () -> assertEquals(50, m_controller.calculate(0, 100), 1e-5)
     );
   }
 
