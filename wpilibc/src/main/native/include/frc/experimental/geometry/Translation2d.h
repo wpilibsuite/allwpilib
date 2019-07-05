@@ -19,8 +19,8 @@ class Translation2d {
 
   double Distance(const Translation2d& other) const;
 
-  double X() const { return m_X; }
-  double Y() const { return m_Y; }
+  double X() const { return m_x; }
+  double Y() const { return m_y; }
   double Norm() const;
 
   Translation2d RotateBy(const Rotation2d& other) const;
@@ -40,8 +40,8 @@ class Translation2d {
   void operator/=(double scalar);
 
  private:
-  double m_X;
-  double m_Y;
+  double m_x;
+  double m_y;
 };
 }  // namespace experimental
 }  // namespace frc

@@ -10,19 +10,19 @@
 
 using namespace frc::experimental;
 
-Translation2d::Translation2d() : m_X(0.0), m_Y(0.0) {}
+Translation2d::Translation2d() : m_x(0.0), m_y(0.0) {}
 
-Translation2d::Translation2d(const double x, const double y) : m_X(x), m_Y(y) {}
+Translation2d::Translation2d(const double x, const double y) : m_x(x), m_y(y) {}
 
 double Translation2d::Distance(const Translation2d& other) const {
-  return std::hypot(other.m_X - m_X, other.m_Y - m_Y);
+  return std::hypot(other.m_x - m_x, other.m_y - m_y);
 }
 
-double Translation2d::Norm() const { return std::hypot(m_X, m_Y); }
+double Translation2d::Norm() const { return std::hypot(m_x, m_y); }
 
 Translation2d Translation2d::RotateBy(const Rotation2d& other) const {
-  return {m_X * other.Cos() - m_Y * other.Sin(),
-          m_X * other.Sin() + m_Y * other.Cos()};
+  return {m_x * other.Cos() - m_y * other.Sin(),
+          m_x * other.Sin() + m_y * other.Cos()};
 }
 
 Translation2d Translation2d::operator+(const Translation2d& other) const {
@@ -30,8 +30,8 @@ Translation2d Translation2d::operator+(const Translation2d& other) const {
 }
 
 void Translation2d::operator+=(const Translation2d& other) {
-  m_X += other.m_X;
-  m_Y += other.m_Y;
+  m_x += other.m_x;
+  m_y += other.m_y;
 }
 
 Translation2d Translation2d::operator-(const Translation2d& other) const {
@@ -42,15 +42,15 @@ void Translation2d::operator-=(const Translation2d& other) {
   *this += -other;
 }
 
-Translation2d Translation2d::operator-() const { return {-m_X, -m_Y}; }
+Translation2d Translation2d::operator-() const { return {-m_x, -m_y}; }
 
 Translation2d Translation2d::operator*(const double scalar) const {
-  return {scalar * m_X, scalar * m_Y};
+  return {scalar * m_x, scalar * m_y};
 }
 
 void Translation2d::operator*=(const double scalar) {
-  m_X *= scalar;
-  m_Y *= scalar;
+  m_x *= scalar;
+  m_y *= scalar;
 }
 
 Translation2d Translation2d::operator/(const double scalar) const {
