@@ -287,6 +287,3 @@ class PIDController : public SendableBase {
 
 }  // namespace experimental
 }  // namespace frc
-
-// TODO: remove when deprecated class is removed
-#include "frc/PIDController.h"
