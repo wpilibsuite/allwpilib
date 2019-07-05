@@ -469,49 +469,23 @@ public class PIDController extends SendableBase {
    */
   @SuppressWarnings("LocalVariableName")
   public double calculate(double measurement) {
-    // Storage for function inputs
-    final double Kp;
-    final double Ki;
-    final double Kd;
-    final double minimumOutput;
-    final double maximumOutput;
-
-    // Storage for function input-outputs
-    double totalError;
-
     m_thisMutex.lock();
     try {
-      Kp = m_Kp;
-      Ki = m_Ki;
-      Kd = m_Kd;
-      minimumOutput = m_minimumOutput;
-      maximumOutput = m_maximumOutput;
-
       m_prevError = m_currError;
       m_currError = getContinuousError(m_setpoint - measurement);
-      totalError = m_totalError;
+
+      if (m_Ki != 0) {
+        m_totalError = clamp(m_totalError + m_currError * getPeriod(), m_minimumOutput / m_Ki,
+            m_maximumOutput / m_Ki);
+      }
+
+      m_output = clamp(m_Kp * m_currError + m_Ki * m_totalError
+          + m_Kd * (m_currError - m_prevError) / getPeriod(), m_minimumOutput, m_maximumOutput);
+
+      return m_output;
     } finally {
       m_thisMutex.unlock();
     }
-
-    if (Ki != 0) {
-      totalError = clamp(totalError + m_currError * getPeriod(), minimumOutput / Ki,
-          maximumOutput / Ki);
-    }
-
-    double output =
-        clamp(Kp * m_currError + Ki * totalError + Kd * (m_currError - m_prevError) / getPeriod(),
-            minimumOutput, maximumOutput);
-
-    m_thisMutex.lock();
-    try {
-      m_totalError = totalError;
-      m_output = output;
-    } finally {
-      m_thisMutex.unlock();
-    }
-
-    return output;
   }
 
   /**
@@ -522,8 +496,30 @@ public class PIDController extends SendableBase {
    * @return The controller output.
    */
   public double calculate(double measurement, double setpoint) {
-    setSetpoint(setpoint);
-    return calculate(measurement);
+    m_thisMutex.lock();
+    try {
+      // Set setpoint to provided value
+      if (m_maximumInput > m_minimumInput) {
+        m_setpoint = clamp(setpoint, m_minimumInput, m_maximumInput);
+      } else {
+        m_setpoint = setpoint;
+      }
+
+      m_prevError = m_currError;
+      m_currError = getContinuousError(m_setpoint - measurement);
+
+      if (m_Ki != 0) {
+        m_totalError = clamp(m_totalError + m_currError * getPeriod(), m_minimumOutput / m_Ki,
+            m_maximumOutput / m_Ki);
+      }
+
+      m_output = clamp(m_Kp * m_currError + m_Ki * m_totalError
+          + m_Kd * (m_currError - m_prevError) / getPeriod(), m_minimumOutput, m_maximumOutput);
+
+      return m_output;
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**

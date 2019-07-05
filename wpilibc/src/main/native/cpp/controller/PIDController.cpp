@@ -16,11 +16,6 @@
 
 using namespace frc::experimental;
 
-template <class T>
-constexpr const T& clamp(const T& value, const T& low, const T& high) {
-  return std::max(low, std::min(value, high));
-}
-
 PIDController::PIDController(double Kp, double Ki, double Kd, double period)
     : SendableBase(false), m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
   static int instances = 0;
@@ -70,7 +65,7 @@ void PIDController::SetSetpoint(double setpoint) {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
 
   if (m_maximumInput > m_minimumInput) {
-    m_setpoint = clamp(setpoint, m_minimumInput, m_maximumInput);
+    m_setpoint = std::clamp(setpoint, m_minimumInput, m_maximumInput);
   } else {
     m_setpoint = setpoint;
   }
@@ -112,7 +107,7 @@ void PIDController::SetInputRange(double minimumInput, double maximumInput) {
 
   // Clamp setpoint to new input range
   if (m_maximumInput > m_minimumInput) {
-    m_setpoint = clamp(m_setpoint, m_minimumInput, m_maximumInput);
+    m_setpoint = std::clamp(m_setpoint, m_minimumInput, m_maximumInput);
   }
 }
 
@@ -154,51 +149,46 @@ double PIDController::GetDeltaError() const {
 }
 
 double PIDController::Calculate(double measurement) {
-  // Storage for function inputs
-  double Kp;
-  double Ki;
-  double Kd;
-  double minimumOutput;
-  double maximumOutput;
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
 
-  // Storage for function input-outputs
-  double totalError;
+  m_prevError = m_currError;
+  m_currError = GetContinuousError(m_setpoint - measurement);
 
-  {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
-
-    Kp = m_Kp;
-    Ki = m_Ki;
-    Kd = m_Kd;
-    minimumOutput = m_minimumOutput;
-    maximumOutput = m_maximumOutput;
-
-    m_prevError = m_currError;
-    m_currError = GetContinuousError(m_setpoint - measurement);
-    totalError = m_totalError;
+  if (m_Ki != 0) {
+    m_totalError = std::clamp(m_totalError + m_currError * GetPeriod(),
+                              m_minimumOutput / m_Ki, m_maximumOutput / m_Ki);
   }
 
-  if (Ki != 0) {
-    totalError = clamp(totalError + m_currError * GetPeriod(),
-                       minimumOutput / Ki, maximumOutput / Ki);
-  }
+  m_output = std::clamp(m_Kp * m_currError + m_Ki * m_totalError +
+                            m_Kd * (m_currError - m_prevError) / GetPeriod(),
+                        m_minimumOutput, m_maximumOutput);
 
-  double output = clamp(Kp * m_currError + Ki * totalError +
-                            Kd * (m_currError - m_prevError) / GetPeriod(),
-                        minimumOutput, maximumOutput);
-
-  {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
-    m_totalError = totalError;
-    m_output = output;
-  }
-
-  return output;
+  return m_output;
 }
 
 double PIDController::Calculate(double measurement, double setpoint) {
-  SetSetpoint(setpoint);
-  return Calculate(measurement);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+
+  // Set setpoint to provided value
+  if (m_maximumInput > m_minimumInput) {
+    m_setpoint = std::clamp(setpoint, m_minimumInput, m_maximumInput);
+  } else {
+    m_setpoint = setpoint;
+  }
+
+  m_prevError = m_currError;
+  m_currError = GetContinuousError(m_setpoint - measurement);
+
+  if (m_Ki != 0) {
+    m_totalError = std::clamp(m_totalError + m_currError * GetPeriod(),
+                              m_minimumOutput / m_Ki, m_maximumOutput / m_Ki);
+  }
+
+  m_output = std::clamp(m_Kp * m_currError + m_Ki * m_totalError +
+                            m_Kd * (m_currError - m_prevError) / GetPeriod(),
+                        m_minimumOutput, m_maximumOutput);
+
+  return m_output;
 }
 
 void PIDController::Reset() {
