@@ -39,7 +39,7 @@ Translation2d Translation2d::operator-(const Translation2d& other) const {
 }
 
 void Translation2d::operator-=(const Translation2d& other) {
-  return *this += -other;
+  *this += -other;
 }
 
 Translation2d Translation2d::operator-() const { return {-m_X, -m_Y}; }
@@ -58,5 +58,5 @@ Translation2d Translation2d::operator/(const double scalar) const {
 }
 
 void Translation2d::operator/=(const double scalar) {
-  return *this *= (1.0 / scalar);
+  *this *= (1.0 / scalar);
 }
