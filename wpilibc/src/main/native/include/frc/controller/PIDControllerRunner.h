@@ -16,7 +16,6 @@
 #include "frc/smartdashboard/SendableBase.h"
 
 namespace frc {
-namespace experimental {
 
 class PIDControllerRunner : SendableBase {
  public:
@@ -27,7 +26,7 @@ class PIDControllerRunner : SendableBase {
    * @param controllerOutput The function which updates the plant using the
    *                         controller output passed as the argument.
    */
-  PIDControllerRunner(PIDController& controller,
+  PIDControllerRunner(frc2::PIDController& controller,
                       std::function<double(void)> measurementSource,
                       std::function<void(double)> controllerOutput);
 
@@ -57,7 +56,7 @@ class PIDControllerRunner : SendableBase {
 
  private:
   Notifier m_notifier{&PIDControllerRunner::Run, this};
-  PIDController& m_controller;
+  frc2::PIDController& m_controller;
   std::function<double(void)> m_measurementSource;
   std::function<void(double)> m_controllerOutput;
   bool m_enabled = false;
@@ -71,5 +70,4 @@ class PIDControllerRunner : SendableBase {
   void Run();
 };
 
-}  // namespace experimental
 }  // namespace frc

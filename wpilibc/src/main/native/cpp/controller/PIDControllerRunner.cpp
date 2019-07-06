@@ -10,10 +10,10 @@
 #include "frc/controller/PIDController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 
-using namespace frc::experimental;
+using namespace frc;
 
 PIDControllerRunner::PIDControllerRunner(
-    PIDController& controller, std::function<double(void)> measurementSource,
+    frc2::PIDController& controller, std::function<double(void)> measurementSource,
     std::function<void(double)> controllerOutput)
     : m_controller(controller),
       m_measurementSource(measurementSource),

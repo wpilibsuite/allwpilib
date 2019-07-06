@@ -14,10 +14,10 @@
 
 #include "frc/smartdashboard/SendableBuilder.h"
 
-using namespace frc::experimental;
+using namespace frc2;
 
 PIDController::PIDController(double Kp, double Ki, double Kd, double period)
-    : SendableBase(false), m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
+    : frc::SendableBase(false), m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);

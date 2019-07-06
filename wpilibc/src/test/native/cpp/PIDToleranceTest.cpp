@@ -32,13 +32,13 @@ class PIDToleranceTest : public testing::Test {
 
   FakeInput inp;
   FakeOutput out;
-  frc::experimental::PIDController* pidController;
-  frc::experimental::PIDControllerRunner* pidRunner;
+  frc2::PIDController* pidController;
+  frc::PIDControllerRunner* pidRunner;
 
   void SetUp() override {
-    pidController = new frc::experimental::PIDController(0.5, 0.0, 0.0);
+    pidController = new frc2::PIDController(0.5, 0.0, 0.0);
     pidController->SetInputRange(-range / 2, range / 2);
-    pidRunner = new frc::experimental::PIDControllerRunner(
+    pidRunner = new frc::PIDControllerRunner(
         *pidController, [&] { return inp.Get(); },
         [&](double output) { out.Set(output); });
   }

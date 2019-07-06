@@ -14,13 +14,12 @@
 
 #include "frc/smartdashboard/SendableBase.h"
 
-namespace frc {
-namespace experimental {
+namespace frc2 {
 
 /**
  * Implements a PID control loop.
  */
-class PIDController : public SendableBase {
+class PIDController : public frc::SendableBase {
  public:
   enum class Tolerance { kAbsolute, kPercent };
 
@@ -220,7 +219,7 @@ class PIDController : public SendableBase {
    */
   void Reset();
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(frc::SendableBuilder& builder) override;
 
  protected:
   mutable wpi::mutex m_thisMutex;
@@ -285,5 +284,4 @@ class PIDController : public SendableBase {
   double m_output = 0;
 };
 
-}  // namespace experimental
-}  // namespace frc
+}  // namespace frc2

@@ -10,10 +10,10 @@
 
 class PIDInputOutputTest : public testing::Test {
  protected:
-  frc::experimental::PIDController* controller;
+  frc2::PIDController* controller;
 
   void SetUp() override {
-    controller = new frc::experimental::PIDController(0, 0, 0);
+    controller = new frc2::PIDController(0, 0, 0);
   }
 
   void TearDown() override { delete controller; }

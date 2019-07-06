@@ -20,7 +20,7 @@ namespace frc {
  */
 class Controller {
  public:
-  WPI_DEPRECATED("The experimental PIDController doesn't use this.")
+  WPI_DEPRECATED("None of the 2020 FRC controllers use this.")
   Controller() = default;
   virtual ~Controller() = default;
 

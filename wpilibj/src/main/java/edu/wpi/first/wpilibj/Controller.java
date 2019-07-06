@@ -12,7 +12,7 @@ package edu.wpi.first.wpilibj;
  * and there variants, but this includes anything that is controlling an actuator in a separate
  * thread.
  *
- * @deprecated The experimental PIDController doesn't use this.
+ * @deprecated None of the 2020 FRC controllers use this.
  */
 @Deprecated(since = "2020", forRemoval = true)
 public interface Controller {
