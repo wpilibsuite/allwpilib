@@ -13,7 +13,8 @@
 using namespace frc;
 
 PIDControllerRunner::PIDControllerRunner(
-    frc2::PIDController& controller, std::function<double(void)> measurementSource,
+    frc2::PIDController& controller,
+    std::function<double(void)> measurementSource,
     std::function<void(double)> controllerOutput)
     : m_controller(controller),
       m_measurementSource(measurementSource),

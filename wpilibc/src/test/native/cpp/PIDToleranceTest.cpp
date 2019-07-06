@@ -38,9 +38,9 @@ class PIDToleranceTest : public testing::Test {
   void SetUp() override {
     pidController = new frc2::PIDController(0.5, 0.0, 0.0);
     pidController->SetInputRange(-range / 2, range / 2);
-    pidRunner = new frc::PIDControllerRunner(
-        *pidController, [&] { return inp.Get(); },
-        [&](double output) { out.Set(output); });
+    pidRunner =
+        new frc::PIDControllerRunner(*pidController, [&] { return inp.Get(); },
+                                     [&](double output) { out.Set(output); });
   }
 
   void TearDown() override {
