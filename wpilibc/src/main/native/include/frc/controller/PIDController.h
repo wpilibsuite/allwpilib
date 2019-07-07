@@ -36,8 +36,8 @@ class PIDController : public frc::SendableBase {
 
   ~PIDController() override = default;
 
-  PIDController(PIDController&&) = default;
-  PIDController& operator=(PIDController&&) = default;
+  PIDController(PIDController&& rhs);
+  PIDController& operator=(PIDController&& rhs);
 
   /**
    * Sets the PID Controller gain parameters.

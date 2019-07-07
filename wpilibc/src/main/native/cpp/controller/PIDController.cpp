@@ -24,6 +24,54 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double period)
   SetName("PIDController", instances);
 }
 
+PIDController::PIDController(PIDController&& rhs)
+    : SendableBase(std::move(rhs)),
+      m_Kp(std::move(rhs.m_Kp)),
+      m_Ki(std::move(rhs.m_Ki)),
+      m_Kd(std::move(rhs.m_Kd)),
+      m_period(std::move(rhs.m_period)),
+      m_maximumOutput(std::move(rhs.m_maximumOutput)),
+      m_minimumOutput(std::move(rhs.m_minimumOutput)),
+      m_maximumInput(std::move(rhs.m_maximumInput)),
+      m_minimumInput(std::move(rhs.m_minimumInput)),
+      m_inputRange(std::move(rhs.m_inputRange)),
+      m_continuous(std::move(rhs.m_continuous)),
+      m_currError(std::move(rhs.m_currError)),
+      m_prevError(std::move(rhs.m_prevError)),
+      m_totalError(std::move(rhs.m_totalError)),
+      m_toleranceType(std::move(rhs.m_toleranceType)),
+      m_tolerance(std::move(rhs.m_tolerance)),
+      m_deltaTolerance(std::move(rhs.m_deltaTolerance)),
+      m_setpoint(std::move(rhs.m_setpoint)),
+      m_output(std::move(rhs.m_output)) {}
+
+PIDController& PIDController::operator=(PIDController&& rhs) {
+  std::scoped_lock lock(m_thisMutex, rhs.m_thisMutex);
+
+  SendableBase::operator=(std::move(rhs));
+
+  m_Kp = std::move(rhs.m_Kp);
+  m_Ki = std::move(rhs.m_Ki);
+  m_Kd = std::move(rhs.m_Kd);
+  m_period = std::move(rhs.m_period);
+  m_maximumOutput = std::move(rhs.m_maximumOutput);
+  m_minimumOutput = std::move(rhs.m_minimumOutput);
+  m_maximumInput = std::move(rhs.m_maximumInput);
+  m_minimumInput = std::move(rhs.m_minimumInput);
+  m_inputRange = std::move(rhs.m_inputRange);
+  m_continuous = std::move(rhs.m_continuous);
+  m_currError = std::move(rhs.m_currError);
+  m_prevError = std::move(rhs.m_prevError);
+  m_totalError = std::move(rhs.m_totalError);
+  m_toleranceType = std::move(rhs.m_toleranceType);
+  m_tolerance = std::move(rhs.m_tolerance);
+  m_deltaTolerance = std::move(rhs.m_deltaTolerance);
+  m_setpoint = std::move(rhs.m_setpoint);
+  m_output = std::move(rhs.m_output);
+
+  return *this;
+}
+
 void PIDController::SetP(double Kp) {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
   m_Kp = Kp;
