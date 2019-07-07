@@ -210,8 +210,19 @@ class PIDController : public frc::SendableBase {
    */
   double GetDeltaError() const;
 
+  /**
+   * Returns the next output of the PID controller.
+   *
+   * @param measurement The current measurement of the process variable.
+   */
   double Calculate(double measurement);
 
+  /**
+   * Returns the next output of the PID controller.
+   *
+   * @param measurement The current measurement of the process variable.
+   * @param setpoint The new setpoint of the controller.
+   */
   double Calculate(double measurement, double setpoint);
 
   /**
@@ -282,6 +293,15 @@ class PIDController : public frc::SendableBase {
 
   double m_setpoint = 0;
   double m_output = 0;
+
+  /**
+   * Returns the next output of the PID controller.
+   *
+   * Unlike the public functions above, this function doesn't lock the mutex.
+   *
+   * @param measurement The current measurement of the process variable.
+   */
+  double CalculateUnsafe(double measurement);
 };
 
 }  // namespace frc2

@@ -150,20 +150,7 @@ double PIDController::GetDeltaError() const {
 
 double PIDController::Calculate(double measurement) {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
-
-  m_prevError = m_currError;
-  m_currError = GetContinuousError(m_setpoint - measurement);
-
-  if (m_Ki != 0) {
-    m_totalError = std::clamp(m_totalError + m_currError * GetPeriod(),
-                              m_minimumOutput / m_Ki, m_maximumOutput / m_Ki);
-  }
-
-  m_output = std::clamp(m_Kp * m_currError + m_Ki * m_totalError +
-                            m_Kd * (m_currError - m_prevError) / GetPeriod(),
-                        m_minimumOutput, m_maximumOutput);
-
-  return m_output;
+  return CalculateUnsafe(measurement);
 }
 
 double PIDController::Calculate(double measurement, double setpoint) {
@@ -176,19 +163,7 @@ double PIDController::Calculate(double measurement, double setpoint) {
     m_setpoint = setpoint;
   }
 
-  m_prevError = m_currError;
-  m_currError = GetContinuousError(m_setpoint - measurement);
-
-  if (m_Ki != 0) {
-    m_totalError = std::clamp(m_totalError + m_currError * GetPeriod(),
-                              m_minimumOutput / m_Ki, m_maximumOutput / m_Ki);
-  }
-
-  m_output = std::clamp(m_Kp * m_currError + m_Ki * m_totalError +
-                            m_Kd * (m_currError - m_prevError) / GetPeriod(),
-                        m_minimumOutput, m_maximumOutput);
-
-  return m_output;
+  return CalculateUnsafe(measurement);
 }
 
 void PIDController::Reset() {
@@ -223,4 +198,20 @@ double PIDController::GetContinuousError(double error) const {
   }
 
   return error;
+}
+
+double PIDController::CalculateUnsafe(double measurement) {
+  m_prevError = m_currError;
+  m_currError = GetContinuousError(m_setpoint - measurement);
+
+  if (m_Ki != 0) {
+    m_totalError = std::clamp(m_totalError + m_currError * GetPeriod(),
+                              m_minimumOutput / m_Ki, m_maximumOutput / m_Ki);
+  }
+
+  m_output = std::clamp(m_Kp * m_currError + m_Ki * m_totalError +
+                            m_Kd * (m_currError - m_prevError) / GetPeriod(),
+                        m_minimumOutput, m_maximumOutput);
+
+  return m_output;
 }

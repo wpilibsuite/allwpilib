@@ -462,38 +462,24 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Calculates the output of the PID controller.
+   * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.
-   * @return The controller output.
    */
-  @SuppressWarnings("LocalVariableName")
   public double calculate(double measurement) {
     m_thisMutex.lock();
     try {
-      m_prevError = m_currError;
-      m_currError = getContinuousError(m_setpoint - measurement);
-
-      if (m_Ki != 0) {
-        m_totalError = clamp(m_totalError + m_currError * getPeriod(), m_minimumOutput / m_Ki,
-            m_maximumOutput / m_Ki);
-      }
-
-      m_output = clamp(m_Kp * m_currError + m_Ki * m_totalError
-          + m_Kd * (m_currError - m_prevError) / getPeriod(), m_minimumOutput, m_maximumOutput);
-
-      return m_output;
+      return calculateUnsafe(measurement);
     } finally {
       m_thisMutex.unlock();
     }
   }
 
   /**
-   * Reads the input, calculate the output accordingly, and return the output.
+   * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.
-   * @param setpoint The setpoint of the controller.
-   * @return The controller output.
+   * @param setpoint The new setpoint of the controller.
    */
   public double calculate(double measurement, double setpoint) {
     m_thisMutex.lock();
@@ -505,18 +491,7 @@ public class PIDController extends SendableBase {
         m_setpoint = setpoint;
       }
 
-      m_prevError = m_currError;
-      m_currError = getContinuousError(m_setpoint - measurement);
-
-      if (m_Ki != 0) {
-        m_totalError = clamp(m_totalError + m_currError * getPeriod(), m_minimumOutput / m_Ki,
-            m_maximumOutput / m_Ki);
-      }
-
-      m_output = clamp(m_Kp * m_currError + m_Ki * m_totalError
-          + m_Kd * (m_currError - m_prevError) / getPeriod(), m_minimumOutput, m_maximumOutput);
-
-      return m_output;
+      return calculateUnsafe(measurement);
     } finally {
       m_thisMutex.unlock();
     }
@@ -565,6 +540,28 @@ public class PIDController extends SendableBase {
     }
 
     return error;
+  }
+
+  /**
+   * Returns the next output of the PID controller.
+   *
+   * <p>Unlike the public functions above, this function doesn't lock the mutex.
+   *
+   * @param measurement The current measurement of the process variable.
+   */
+  private double calculateUnsafe(double measurement) {
+    m_prevError = m_currError;
+    m_currError = getContinuousError(m_setpoint - measurement);
+
+    if (m_Ki != 0) {
+      m_totalError = clamp(m_totalError + m_currError * getPeriod(), m_minimumOutput / m_Ki,
+          m_maximumOutput / m_Ki);
+    }
+
+    m_output = clamp(m_Kp * m_currError + m_Ki * m_totalError
+        + m_Kd * (m_currError - m_prevError) / getPeriod(), m_minimumOutput, m_maximumOutput);
+
+    return m_output;
   }
 
   private static double clamp(double value, double low, double high) {
