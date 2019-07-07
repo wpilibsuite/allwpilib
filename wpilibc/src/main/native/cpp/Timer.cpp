@@ -39,6 +39,21 @@ const double Timer::kRolloverTime = (1ll << 32) / 1e6;
 
 Timer::Timer() { Reset(); }
 
+Timer::Timer(Timer&& rhs)
+    : m_startTime(std::move(rhs.m_startTime)),
+      m_accumulatedTime(std::move(rhs.m_accumulatedTime)),
+      m_running(std::move(rhs.m_running)) {}
+
+Timer& Timer::operator=(Timer&& rhs) {
+  std::scoped_lock lock(m_mutex, rhs.m_mutex);
+
+  m_startTime = std::move(rhs.m_startTime);
+  m_accumulatedTime = std::move(rhs.m_accumulatedTime);
+  m_running = std::move(rhs.m_running);
+
+  return *this;
+}
+
 double Timer::Get() const {
   double result;
   double currentTime = GetFPGATimestamp();
