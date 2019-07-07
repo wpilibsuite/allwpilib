@@ -8,7 +8,6 @@
 #include "HttpCameraImpl.h"
 
 #include <wpi/MemAlloc.h>
-#include <wpi/STLExtras.h>
 #include <wpi/TCPConnector.h>
 #include <wpi/timestamp.h>
 
@@ -149,7 +148,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
 
   if (!m_active || !stream) return nullptr;
 
-  auto connPtr = wpi::make_unique<wpi::HttpConnection>(std::move(stream), 1);
+  auto connPtr = std::make_unique<wpi::HttpConnection>(std::move(stream), 1);
   wpi::HttpConnection* conn = connPtr.get();
 
   // update m_streamConn
@@ -322,7 +321,7 @@ void HttpCameraImpl::DeviceSendSettings(wpi::HttpRequest& req) {
 
   if (!m_active || !stream) return;
 
-  auto connPtr = wpi::make_unique<wpi::HttpConnection>(std::move(stream), 1);
+  auto connPtr = std::make_unique<wpi::HttpConnection>(std::move(stream), 1);
   wpi::HttpConnection* conn = connPtr.get();
 
   // update m_settingsConn
@@ -377,7 +376,7 @@ void HttpCameraImpl::CreateProperty(const wpi::Twine& name,
                                     int minimum, int maximum, int step,
                                     int defaultValue, int value) const {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  m_propertyData.emplace_back(wpi::make_unique<PropertyData>(
+  m_propertyData.emplace_back(std::make_unique<PropertyData>(
       name, httpParam, viaSettings, kind, minimum, maximum, step, defaultValue,
       value));
 
@@ -391,7 +390,7 @@ void HttpCameraImpl::CreateEnumProperty(
     const wpi::Twine& name, const wpi::Twine& httpParam, bool viaSettings,
     int defaultValue, int value, std::initializer_list<T> choices) const {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  m_propertyData.emplace_back(wpi::make_unique<PropertyData>(
+  m_propertyData.emplace_back(std::make_unique<PropertyData>(
       name, httpParam, viaSettings, CS_PROP_ENUM, 0, choices.size() - 1, 1,
       defaultValue, value));
 
@@ -409,7 +408,7 @@ void HttpCameraImpl::CreateEnumProperty(
 
 std::unique_ptr<PropertyImpl> HttpCameraImpl::CreateEmptyProperty(
     const wpi::Twine& name) const {
-  return wpi::make_unique<PropertyData>(name);
+  return std::make_unique<PropertyData>(name);
 }
 
 bool HttpCameraImpl::CacheProperties(CS_Status* status) const {

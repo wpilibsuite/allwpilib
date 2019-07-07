@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <cstring>
 
-#include <wpi/STLExtras.h>
 #include <wpi/json.h>
 #include <wpi/timestamp.h>
 
@@ -514,7 +513,7 @@ void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
 std::unique_ptr<Frame::Impl> SourceImpl::AllocFrameImpl() {
   std::lock_guard<wpi::mutex> lock{m_poolMutex};
 
-  if (m_framesAvail.empty()) return wpi::make_unique<Frame::Impl>(*this);
+  if (m_framesAvail.empty()) return std::make_unique<Frame::Impl>(*this);
 
   auto impl = std::move(m_framesAvail.back());
   m_framesAvail.pop_back();
