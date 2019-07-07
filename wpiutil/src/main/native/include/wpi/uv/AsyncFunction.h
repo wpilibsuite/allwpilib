@@ -81,7 +81,7 @@ class AsyncFunction<R(T...)> final
     int err =
         uv_async_init(loop->GetRaw(), h->GetRaw(), [](uv_async_t* handle) {
           auto& h = *static_cast<AsyncFunction*>(handle->data);
-          std::unique_lock<wpi::mutex> lock(h.m_mutex);
+          std::unique_lock lock(h.m_mutex);
 
           if (!h.m_params.empty()) {
             // for each set of parameters in the input queue, call the wakeup
@@ -132,7 +132,7 @@ class AsyncFunction<R(T...)> final
 
     // add the parameters to the input queue
     {
-      std::lock_guard<wpi::mutex> lock(m_mutex);
+      std::lock_guard lock(m_mutex);
       m_params.emplace_back(std::piecewise_construct,
                             std::forward_as_tuple(req),
                             std::forward_as_tuple(std::forward<U>(u)...));

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -53,7 +53,7 @@ void Telemetry::Start() { m_owner.Start(m_notifier); }
 void Telemetry::Stop() { m_owner.Stop(); }
 
 void Telemetry::Thread::Main() {
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
   auto prevTime = std::chrono::steady_clock::now();
   while (m_active) {
     double period = m_period;

@@ -43,7 +43,7 @@ double Timer::Get() const {
   double result;
   double currentTime = GetFPGATimestamp();
 
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::lock_guard lock(m_mutex);
   if (m_running) {
     // If the current time is before the start time, then the FPGA clock rolled
     // over. Compensate by adding the ~71 minutes that it takes to roll over to
@@ -61,13 +61,13 @@ double Timer::Get() const {
 }
 
 void Timer::Reset() {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::lock_guard lock(m_mutex);
   m_accumulatedTime = 0;
   m_startTime = GetFPGATimestamp();
 }
 
 void Timer::Start() {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::lock_guard lock(m_mutex);
   if (!m_running) {
     m_startTime = GetFPGATimestamp();
     m_running = true;
@@ -77,7 +77,7 @@ void Timer::Start() {
 void Timer::Stop() {
   double temp = Get();
 
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::lock_guard lock(m_mutex);
   if (m_running) {
     m_accumulatedTime = temp;
     m_running = false;
@@ -86,7 +86,7 @@ void Timer::Stop() {
 
 bool Timer::HasPeriodPassed(double period) {
   if (Get() > period) {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::lock_guard lock(m_mutex);
     // Advance the start time by the period.
     m_startTime += period;
     // Don't set it to the current time... we want to avoid drift.

@@ -130,7 +130,7 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status) {
     return HAL_kInvalidHandle;
   }
 
-  std::lock_guard<wpi::mutex> lock(pdpHandleMutex);
+  std::lock_guard lock(pdpHandleMutex);
 
   if (pdpHandles[module] != HAL_kInvalidHandle) {
     *status = 0;

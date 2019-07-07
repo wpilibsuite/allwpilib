@@ -146,7 +146,7 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
         "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
-  std::unique_lock<wpi::mutex> lock(m_buttonEdgeMutex);
+  std::unique_lock lock(m_buttonEdgeMutex);
   // If button was pressed, clear flag and return true
   if (m_joystickButtonsPressed[stick] & 1 << (button - 1)) {
     m_joystickButtonsPressed[stick] &= ~(1 << (button - 1));
@@ -175,7 +175,7 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
         "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
-  std::unique_lock<wpi::mutex> lock(m_buttonEdgeMutex);
+  std::unique_lock lock(m_buttonEdgeMutex);
   // If button was released, clear flag and return true
   if (m_joystickButtonsReleased[stick] & 1 << (button - 1)) {
     m_joystickButtonsReleased[stick] &= ~(1 << (button - 1));
@@ -440,7 +440,7 @@ bool DriverStation::WaitForData(double timeout) {
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  std::unique_lock<wpi::mutex> lock(m_waitForDataMutex);
+  std::unique_lock lock(m_waitForDataMutex);
   int currentCount = m_waitForDataCounter;
   while (m_waitForDataCounter == currentCount) {
     if (timeout > 0) {
@@ -472,7 +472,7 @@ void DriverStation::GetData() {
   {
     // Compute the pressed and released buttons
     HAL_JoystickButtons currentButtons;
-    std::unique_lock<wpi::mutex> lock(m_buttonEdgeMutex);
+    std::unique_lock lock(m_buttonEdgeMutex);
 
     for (int32_t i = 0; i < kJoystickPorts; i++) {
       HAL_GetJoystickButtons(i, &currentButtons);
@@ -490,7 +490,7 @@ void DriverStation::GetData() {
   }
 
   {
-    std::lock_guard<wpi::mutex> waitLock(m_waitForDataMutex);
+    std::lock_guard waitLock(m_waitForDataMutex);
     // Nofify all threads
     m_waitForDataCounter++;
     m_waitForDataCond.notify_all();

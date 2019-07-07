@@ -411,7 +411,7 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
       {
         Message* msg = reinterpret_cast<Message*>(lParam);
         Message::Kind msgKind = static_cast<Message::Kind>(wParam);
-        std::unique_lock<wpi::mutex> lock(m_mutex);
+        std::unique_lock lock(m_mutex);
         auto retVal = DeviceProcessCommand(lock, msgKind, msg);
         return retVal;
       }
@@ -599,7 +599,7 @@ void UsbCameraImpl::DeviceCacheProperty(
     rawProp->name = "raw_" + perProp->name;
   }
 
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
   int* rawIndex = &m_properties[rawProp->name];
   bool newRaw = *rawIndex == 0;
   UsbCameraProperty* oldRawProp =
@@ -875,10 +875,10 @@ void UsbCameraImpl::DeviceCacheMode() {
         // Default mode is not supported. Grab first supported image
         auto&& firstSupported = m_windowsVideoModes[0];
         m_currentMode = firstSupported.second;
-        std::lock_guard<wpi::mutex> lock(m_mutex);
+        std::lock_guard lock(m_mutex);
         m_mode = firstSupported.first;
       } else {
-        std::lock_guard<wpi::mutex> lock(m_mutex);
+        std::lock_guard lock(m_mutex);
         m_mode = result->first;
       }
     }
@@ -960,7 +960,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     count++;
   }
   {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::lock_guard lock(m_mutex);
     m_videoModes.swap(modes);
   }
   m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);

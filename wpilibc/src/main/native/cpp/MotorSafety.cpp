@@ -23,12 +23,12 @@ static wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
 static wpi::mutex listMutex;
 
 MotorSafety::MotorSafety() {
-  std::lock_guard<wpi::mutex> lock(listMutex);
+  std::lock_guard lock(listMutex);
   instanceList.insert(this);
 }
 
 MotorSafety::~MotorSafety() {
-  std::lock_guard<wpi::mutex> lock(listMutex);
+  std::lock_guard lock(listMutex);
   instanceList.erase(this);
 }
 
@@ -49,32 +49,32 @@ MotorSafety& MotorSafety::operator=(MotorSafety&& rhs) {
 }
 
 void MotorSafety::Feed() {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::lock_guard lock(m_thisMutex);
   m_stopTime = Timer::GetFPGATimestamp() + m_expiration;
 }
 
 void MotorSafety::SetExpiration(double expirationTime) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::lock_guard lock(m_thisMutex);
   m_expiration = expirationTime;
 }
 
 double MotorSafety::GetExpiration() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::lock_guard lock(m_thisMutex);
   return m_expiration;
 }
 
 bool MotorSafety::IsAlive() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::lock_guard lock(m_thisMutex);
   return !m_enabled || m_stopTime > Timer::GetFPGATimestamp();
 }
 
 void MotorSafety::SetSafetyEnabled(bool enabled) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::lock_guard lock(m_thisMutex);
   m_enabled = enabled;
 }
 
 bool MotorSafety::IsSafetyEnabled() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::lock_guard lock(m_thisMutex);
   return m_enabled;
 }
 
@@ -83,7 +83,7 @@ void MotorSafety::Check() {
   double stopTime;
 
   {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+    std::lock_guard lock(m_thisMutex);
     enabled = m_enabled;
     stopTime = m_stopTime;
   }
@@ -104,7 +104,7 @@ void MotorSafety::Check() {
 }
 
 void MotorSafety::CheckMotors() {
-  std::lock_guard<wpi::mutex> lock(listMutex);
+  std::lock_guard lock(listMutex);
   for (auto elem : instanceList) {
     elem->Check();
   }

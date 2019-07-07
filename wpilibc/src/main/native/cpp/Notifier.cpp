@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -35,7 +35,7 @@ Notifier::Notifier(TimerEventHandler handler) {
 
       TimerEventHandler handler;
       {
-        std::lock_guard<wpi::mutex> lock(m_processMutex);
+        std::lock_guard lock(m_processMutex);
         handler = m_handler;
         if (m_periodic) {
           m_expirationTime += m_period;
@@ -91,12 +91,12 @@ Notifier& Notifier::operator=(Notifier&& rhs) {
 }
 
 void Notifier::SetHandler(TimerEventHandler handler) {
-  std::lock_guard<wpi::mutex> lock(m_processMutex);
+  std::lock_guard lock(m_processMutex);
   m_handler = handler;
 }
 
 void Notifier::StartSingle(double delay) {
-  std::lock_guard<wpi::mutex> lock(m_processMutex);
+  std::lock_guard lock(m_processMutex);
   m_periodic = false;
   m_period = delay;
   m_expirationTime = Timer::GetFPGATimestamp() + m_period;
@@ -104,7 +104,7 @@ void Notifier::StartSingle(double delay) {
 }
 
 void Notifier::StartPeriodic(double period) {
-  std::lock_guard<wpi::mutex> lock(m_processMutex);
+  std::lock_guard lock(m_processMutex);
   m_periodic = true;
   m_period = period;
   m_expirationTime = Timer::GetFPGATimestamp() + m_period;
