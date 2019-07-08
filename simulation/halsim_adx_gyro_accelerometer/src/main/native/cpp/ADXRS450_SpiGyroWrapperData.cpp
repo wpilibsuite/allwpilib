@@ -65,7 +65,7 @@ bool ADXRS450_SpiGyroWrapper::GetInitialized() const {
 }
 
 void ADXRS450_SpiGyroWrapper::ResetData() {
-  std::lock_guard<wpi::recursive_spinlock> lock(m_angle.GetMutex());
+  std::lock_guard lock(m_angle.GetMutex());
   m_angle.Reset(0.0);
   m_angleDiff = 0;
 }
@@ -78,7 +78,7 @@ void ADXRS450_SpiGyroWrapper::HandleRead(uint8_t* buffer, uint32_t count) {
 void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint32_t* buffer,
                                                     int32_t numToRead,
                                                     int32_t& outputCount) {
-  std::lock_guard<wpi::recursive_spinlock> lock(m_angle.GetMutex());
+  std::lock_guard lock(m_angle.GetMutex());
   int32_t messagesToSend =
       1 + std::abs(m_angleDiff > 0
                        ? std::ceil(m_angleDiff / kMaxAngleDeltaPerMessage)
@@ -124,7 +124,7 @@ void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint32_t* buffer,
 }
 
 void ADXRS450_SpiGyroWrapper::SetAngle(double angle) {
-  std::lock_guard<wpi::recursive_spinlock> lock(m_angle.GetMutex());
+  std::lock_guard lock(m_angle.GetMutex());
   if (m_angle != angle) {
     m_angleDiff += angle - m_angle;
     m_angle = angle;

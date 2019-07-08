@@ -223,7 +223,7 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
   {
-    std::unique_lock<wpi::mutex> lock(waitMutex);
+    std::unique_lock lock(waitMutex);
     while (!data->waitPredicate) {
       if (data->waitCond.wait_until(lock, timeoutTime) ==
           std::cv_status::timeout) {
@@ -287,7 +287,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
   {
-    std::unique_lock<wpi::mutex> lock(waitMutex);
+    std::unique_lock lock(waitMutex);
     while (!data->waitPredicate) {
       if (data->waitCond.wait_until(lock, timeoutTime) ==
           std::cv_status::timeout) {

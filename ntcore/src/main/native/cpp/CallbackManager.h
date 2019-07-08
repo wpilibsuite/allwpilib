@@ -74,7 +74,7 @@ class CallbackThread : public wpi::SafeThread {
   struct Poller {
     void Terminate() {
       {
-        std::lock_guard<wpi::mutex> lock(poll_mutex);
+        std::lock_guard lock(poll_mutex);
         terminating = true;
       }
       poll_cond.notify_all();
@@ -94,7 +94,7 @@ class CallbackThread : public wpi::SafeThread {
     auto poller = m_pollers[poller_uid];
     if (!poller) return;
     {
-      std::lock_guard<wpi::mutex> lock(poller->poll_mutex);
+      std::lock_guard lock(poller->poll_mutex);
       poller->poll_queue.emplace(std::forward<Args>(args)...);
     }
     poller->poll_cond.notify_one();
@@ -104,7 +104,7 @@ class CallbackThread : public wpi::SafeThread {
 template <typename Derived, typename TUserInfo, typename TListenerData,
           typename TNotifierData>
 void CallbackThread<Derived, TUserInfo, TListenerData, TNotifierData>::Main() {
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
   while (m_active) {
     while (m_queue.empty()) {
       m_cond.wait(lock);
@@ -241,7 +241,7 @@ class CallbackManager {
       if (!poller) return infos;
     }
 
-    std::unique_lock<wpi::mutex> lock(poller->poll_mutex);
+    std::unique_lock lock(poller->poll_mutex);
     auto timeout_time = std::chrono::steady_clock::now() +
                         std::chrono::duration<double>(timeout);
     *timed_out = false;
@@ -286,7 +286,7 @@ class CallbackManager {
     }
 
     {
-      std::lock_guard<wpi::mutex> lock(poller->poll_mutex);
+      std::lock_guard lock(poller->poll_mutex);
       poller->cancelling = true;
     }
     poller->poll_cond.notify_one();

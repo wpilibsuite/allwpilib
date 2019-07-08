@@ -61,7 +61,7 @@ LiveWindow* LiveWindow::GetInstance() {
 }
 
 void LiveWindow::Add(std::shared_ptr<Sendable> sendable) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::lock_guard lock(m_impl->mutex);
   auto& comp = m_impl->components[sendable.get()];
   comp.sendable = sendable;
 }
@@ -75,19 +75,19 @@ void LiveWindow::AddChild(Sendable* parent, std::shared_ptr<Sendable> child) {
 }
 
 void LiveWindow::AddChild(Sendable* parent, void* child) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::lock_guard lock(m_impl->mutex);
   auto& comp = m_impl->components[child];
   comp.parent = parent;
   comp.telemetryEnabled = false;
 }
 
 void LiveWindow::Remove(Sendable* sendable) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::lock_guard lock(m_impl->mutex);
   m_impl->components.erase(sendable);
 }
 
 void LiveWindow::EnableTelemetry(Sendable* sendable) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::lock_guard lock(m_impl->mutex);
   // Re-enable global setting in case DisableAllTelemetry() was called.
   m_impl->telemetryEnabled = true;
   auto i = m_impl->components.find(sendable);
@@ -95,24 +95,24 @@ void LiveWindow::EnableTelemetry(Sendable* sendable) {
 }
 
 void LiveWindow::DisableTelemetry(Sendable* sendable) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::lock_guard lock(m_impl->mutex);
   auto i = m_impl->components.find(sendable);
   if (i != m_impl->components.end()) i->getSecond().telemetryEnabled = false;
 }
 
 void LiveWindow::DisableAllTelemetry() {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::lock_guard lock(m_impl->mutex);
   m_impl->telemetryEnabled = false;
   for (auto& i : m_impl->components) i.getSecond().telemetryEnabled = false;
 }
 
 bool LiveWindow::IsEnabled() const {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::lock_guard lock(m_impl->mutex);
   return m_impl->liveWindowEnabled;
 }
 
 void LiveWindow::SetEnabled(bool enabled) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::lock_guard lock(m_impl->mutex);
   if (m_impl->liveWindowEnabled == enabled) return;
   Scheduler* scheduler = Scheduler::GetInstance();
   m_impl->startLiveWindow = enabled;
@@ -132,7 +132,7 @@ void LiveWindow::SetEnabled(bool enabled) {
 }
 
 void LiveWindow::UpdateValues() {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::lock_guard lock(m_impl->mutex);
   UpdateValuesUnsafe();
 }
 

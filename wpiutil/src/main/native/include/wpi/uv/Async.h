@@ -68,7 +68,7 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
     int err =
         uv_async_init(loop->GetRaw(), h->GetRaw(), [](uv_async_t* handle) {
           auto& h = *static_cast<Async*>(handle->data);
-          std::lock_guard<wpi::mutex> lock(h.m_mutex);
+          std::lock_guard lock(h.m_mutex);
           for (auto&& v : h.m_data) std::apply(h.wakeup, v);
           h.m_data.clear();
         });
@@ -96,7 +96,7 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
     }
 
     {
-      std::lock_guard<wpi::mutex> lock(m_mutex);
+      std::lock_guard lock(m_mutex);
       m_data.emplace_back(std::forward_as_tuple(std::forward<U>(u)...));
     }
     if (loop) this->Invoke(&uv_async_send, this->GetRaw());

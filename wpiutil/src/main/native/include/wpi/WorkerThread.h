@@ -131,7 +131,7 @@ template <typename R, typename... T>
 void WorkerThreadThread<R, T...>::Main() {
   std::vector<Request> requests;
   while (m_active) {
-    std::unique_lock<wpi::mutex> lock(m_mutex);
+    std::unique_lock lock(m_mutex);
     m_cond.wait(lock, [&] { return !m_active || !m_requests.empty(); });
     if (!m_active) break;
 

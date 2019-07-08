@@ -74,7 +74,7 @@ void initializeDigital(int32_t* status) {
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  std::lock_guard lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
 

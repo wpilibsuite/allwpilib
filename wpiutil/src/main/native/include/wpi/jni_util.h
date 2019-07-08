@@ -508,7 +508,7 @@ void JCallbackThread<T>::Main() {
       reinterpret_cast<void**>(&env), &args);
   if (rs != JNI_OK) return;
 
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
   while (m_active) {
     m_cond.wait(lock, [&] { return !(m_active && m_queue.empty()); });
     if (!m_active) break;

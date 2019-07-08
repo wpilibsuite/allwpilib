@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -119,7 +119,7 @@ void DispatcherBase::StartServer(
     const Twine& persist_filename,
     std::unique_ptr<wpi::NetworkAcceptor> acceptor) {
   {
-    std::lock_guard<wpi::mutex> lock(m_user_mutex);
+    std::lock_guard lock(m_user_mutex);
     if (m_active) return;
     m_active = true;
   }
@@ -151,7 +151,7 @@ void DispatcherBase::StartServer(
 
 void DispatcherBase::StartClient() {
   {
-    std::lock_guard<wpi::mutex> lock(m_user_mutex);
+    std::lock_guard lock(m_user_mutex);
     if (m_active) return;
     m_active = true;
   }
@@ -170,7 +170,7 @@ void DispatcherBase::Stop() {
 
   // wake up client thread with a reconnect
   {
-    std::lock_guard<wpi::mutex> lock(m_user_mutex);
+    std::lock_guard lock(m_user_mutex);
     m_client_connector = nullptr;
   }
   ClientReconnect();
@@ -184,7 +184,7 @@ void DispatcherBase::Stop() {
 
   std::vector<std::shared_ptr<INetworkConnection>> conns;
   {
-    std::lock_guard<wpi::mutex> lock(m_user_mutex);
+    std::lock_guard lock(m_user_mutex);
     conns.swap(m_connections);
   }
 
@@ -202,14 +202,14 @@ void DispatcherBase::SetUpdateRate(double interval) {
 }
 
 void DispatcherBase::SetIdentity(const Twine& name) {
-  std::lock_guard<wpi::mutex> lock(m_user_mutex);
+  std::lock_guard lock(m_user_mutex);
   m_identity = name.str();
 }
 
 void DispatcherBase::Flush() {
   auto now = std::chrono::steady_clock::now();
   {
-    std::lock_guard<wpi::mutex> lock(m_flush_mutex);
+    std::lock_guard lock(m_flush_mutex);
     // don't allow flushes more often than every 10 ms
     if ((now - m_last_flush) < std::chrono::milliseconds(10)) return;
     m_last_flush = now;
@@ -222,7 +222,7 @@ std::vector<ConnectionInfo> DispatcherBase::GetConnections() const {
   std::vector<ConnectionInfo> conns;
   if (!m_active) return conns;
 
-  std::lock_guard<wpi::mutex> lock(m_user_mutex);
+  std::lock_guard lock(m_user_mutex);
   for (auto& conn : m_connections) {
     if (conn->state() != NetworkConnection::kActive) continue;
     conns.emplace_back(conn->info());
@@ -234,7 +234,7 @@ std::vector<ConnectionInfo> DispatcherBase::GetConnections() const {
 bool DispatcherBase::IsConnected() const {
   if (!m_active) return false;
 
-  std::lock_guard<wpi::mutex> lock(m_user_mutex);
+  std::lock_guard lock(m_user_mutex);
   for (auto& conn : m_connections) {
     if (conn->state() == NetworkConnection::kActive) return true;
   }
@@ -245,7 +245,7 @@ bool DispatcherBase::IsConnected() const {
 unsigned int DispatcherBase::AddListener(
     std::function<void(const ConnectionNotification& event)> callback,
     bool immediate_notify) const {
-  std::lock_guard<wpi::mutex> lock(m_user_mutex);
+  std::lock_guard lock(m_user_mutex);
   unsigned int uid = m_notifier.Add(callback);
   // perform immediate notifications
   if (immediate_notify) {
@@ -259,7 +259,7 @@ unsigned int DispatcherBase::AddListener(
 
 unsigned int DispatcherBase::AddPolledListener(unsigned int poller_uid,
                                                bool immediate_notify) const {
-  std::lock_guard<wpi::mutex> lock(m_user_mutex);
+  std::lock_guard lock(m_user_mutex);
   unsigned int uid = m_notifier.AddPolled(poller_uid);
   // perform immediate notifications
   if (immediate_notify) {
@@ -272,17 +272,17 @@ unsigned int DispatcherBase::AddPolledListener(unsigned int poller_uid,
 }
 
 void DispatcherBase::SetConnector(Connector connector) {
-  std::lock_guard<wpi::mutex> lock(m_user_mutex);
+  std::lock_guard lock(m_user_mutex);
   m_client_connector = std::move(connector);
 }
 
 void DispatcherBase::SetConnectorOverride(Connector connector) {
-  std::lock_guard<wpi::mutex> lock(m_user_mutex);
+  std::lock_guard lock(m_user_mutex);
   m_client_connector_override = std::move(connector);
 }
 
 void DispatcherBase::ClearConnectorOverride() {
-  std::lock_guard<wpi::mutex> lock(m_user_mutex);
+  std::lock_guard lock(m_user_mutex);
   m_client_connector_override = nullptr;
 }
 
@@ -319,7 +319,7 @@ void DispatcherBase::DispatchThreadMain() {
     }
 
     {
-      std::lock_guard<wpi::mutex> user_lock(m_user_mutex);
+      std::lock_guard user_lock(m_user_mutex);
       bool reconnect = false;
 
       if (++count > 10) {
@@ -350,7 +350,7 @@ void DispatcherBase::DispatchThreadMain() {
 void DispatcherBase::QueueOutgoing(std::shared_ptr<Message> msg,
                                    INetworkConnection* only,
                                    INetworkConnection* except) {
-  std::lock_guard<wpi::mutex> user_lock(m_user_mutex);
+  std::lock_guard user_lock(m_user_mutex);
   for (auto& conn : m_connections) {
     if (conn.get() == except) continue;
     if (only && conn.get() != only) continue;
@@ -392,7 +392,7 @@ void DispatcherBase::ServerThreadMain() {
         std::bind(&IStorage::ProcessIncoming, &m_storage, _1, _2,
                   std::weak_ptr<NetworkConnection>(conn)));
     {
-      std::lock_guard<wpi::mutex> lock(m_user_mutex);
+      std::lock_guard lock(m_user_mutex);
       // reuse dead connection slots
       bool placed = false;
       for (auto& c : m_connections) {
@@ -417,7 +417,7 @@ void DispatcherBase::ClientThreadMain() {
 
     // get next server to connect to
     {
-      std::lock_guard<wpi::mutex> lock(m_user_mutex);
+      std::lock_guard lock(m_user_mutex);
       if (m_client_connector_override) {
         connect = m_client_connector_override;
       } else {
@@ -439,7 +439,7 @@ void DispatcherBase::ClientThreadMain() {
     DEBUG("client connected");
     m_networkMode = NT_NET_MODE_CLIENT;
 
-    std::unique_lock<wpi::mutex> lock(m_user_mutex);
+    std::unique_lock lock(m_user_mutex);
     using namespace std::placeholders;
     auto conn = std::make_shared<NetworkConnection>(
         ++m_connections_uid, std::move(stream), m_notifier, m_logger,
@@ -469,7 +469,7 @@ bool DispatcherBase::ClientHandshake(
   // get identity
   std::string self_id;
   {
-    std::lock_guard<wpi::mutex> lock(m_user_mutex);
+    std::lock_guard lock(m_user_mutex);
     self_id = m_identity;
   }
 
@@ -576,7 +576,7 @@ bool DispatcherBase::ServerHandshake(
 
   // Start with server hello.  TODO: initial connection flag
   if (proto_rev >= 0x0300) {
-    std::lock_guard<wpi::mutex> lock(m_user_mutex);
+    std::lock_guard lock(m_user_mutex);
     outgoing.emplace_back(Message::ServerHello(0u, m_identity));
   }
 
@@ -633,7 +633,7 @@ bool DispatcherBase::ServerHandshake(
 void DispatcherBase::ClientReconnect(unsigned int proto_rev) {
   if ((m_networkMode & NT_NET_MODE_SERVER) != 0) return;
   {
-    std::lock_guard<wpi::mutex> lock(m_user_mutex);
+    std::lock_guard lock(m_user_mutex);
     m_reconnect_proto_rev = proto_rev;
     m_do_reconnect = true;
   }

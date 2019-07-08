@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -28,7 +28,7 @@ std::array<bool, 3> DigitalGlitchFilter::m_filterAllocated = {
 wpi::mutex DigitalGlitchFilter::m_mutex;
 
 DigitalGlitchFilter::DigitalGlitchFilter() {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::lock_guard lock(m_mutex);
   auto index =
       std::find(m_filterAllocated.begin(), m_filterAllocated.end(), false);
   wpi_assert(index != m_filterAllocated.end());
@@ -43,7 +43,7 @@ DigitalGlitchFilter::DigitalGlitchFilter() {
 
 DigitalGlitchFilter::~DigitalGlitchFilter() {
   if (m_channelIndex >= 0) {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::lock_guard lock(m_mutex);
     m_filterAllocated[m_channelIndex] = false;
   }
 }
