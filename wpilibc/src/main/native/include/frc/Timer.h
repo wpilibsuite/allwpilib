@@ -56,8 +56,8 @@ class Timer {
 
   virtual ~Timer() = default;
 
-  Timer(Timer&&) = default;
-  Timer& operator=(Timer&&) = default;
+  Timer(Timer&& rhs);
+  Timer& operator=(Timer&& rhs);
 
   /**
    * Get the current time from the timer. If the clock is running it is derived

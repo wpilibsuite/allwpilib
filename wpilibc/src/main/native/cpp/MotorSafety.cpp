@@ -39,6 +39,8 @@ MotorSafety::MotorSafety(MotorSafety&& rhs)
       m_stopTime(std::move(rhs.m_stopTime)) {}
 
 MotorSafety& MotorSafety::operator=(MotorSafety&& rhs) {
+  std::scoped_lock lock(m_thisMutex, rhs.m_thisMutex);
+
   ErrorBase::operator=(std::move(rhs));
 
   m_expiration = std::move(rhs.m_expiration);
