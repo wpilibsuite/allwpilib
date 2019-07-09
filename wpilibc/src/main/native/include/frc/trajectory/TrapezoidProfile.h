@@ -68,6 +68,9 @@ class TrapezoidProfile {
   TrapezoidProfile(Constraints constraints, State goal,
                    State initial = State{0_m, 0_mps});
 
+  TrapezoidProfile(TrapezoidProfile&&) = default;
+  TrapezoidProfile& operator=(TrapezoidProfile&&) = default;
+
   /**
    * Calculate the correct position and velocity for the profile at a time t
    * where the beginning of the profile was at time t = 0.
