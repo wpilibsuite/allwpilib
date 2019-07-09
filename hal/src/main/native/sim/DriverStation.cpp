@@ -51,7 +51,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
-  std::lock_guard lock(msgMutex);
+  std::scoped_lock lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
   static std::chrono::time_point<std::chrono::steady_clock>
       prevMsgTime[KEEP_MSGS];
@@ -262,7 +262,7 @@ static int32_t newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
   if (refNum != refNumber) return 0;
-  std::lock_guard lock(newDSDataAvailableMutex);
+  std::scoped_lock lock(newDSDataAvailableMutex);
   // Nofify all threads
   newDSDataAvailableCounter++;
   newDSDataAvailableCond->notify_all();
@@ -276,7 +276,7 @@ void HAL_InitializeDriverStation(void) {
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard lock(initializeMutex);
+  std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
 

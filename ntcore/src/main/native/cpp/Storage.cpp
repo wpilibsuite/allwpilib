@@ -30,7 +30,7 @@ Storage::~Storage() {
 }
 
 void Storage::SetDispatcher(IDispatcher* dispatcher, bool server) {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   m_dispatcher = dispatcher;
   m_server = server;
 }
@@ -38,7 +38,7 @@ void Storage::SetDispatcher(IDispatcher* dispatcher, bool server) {
 void Storage::ClearDispatcher() { m_dispatcher = nullptr; }
 
 NT_Type Storage::GetMessageEntryType(unsigned int id) const {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   if (id >= m_idmap.size()) return NT_UNASSIGNED;
   Entry* entry = m_idmap[id];
   if (!entry || !entry->value) return NT_UNASSIGNED;
@@ -374,7 +374,7 @@ void Storage::ProcessIncomingRpcResponse(std::shared_ptr<Message> msg,
 
 void Storage::GetInitialAssignments(
     INetworkConnection& conn, std::vector<std::shared_ptr<Message>>* msgs) {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   conn.set_state(INetworkConnection::kSynchronized);
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
@@ -476,14 +476,14 @@ void Storage::ApplyInitialAssignments(
 }
 
 std::shared_ptr<Value> Storage::GetEntryValue(StringRef name) const {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) return nullptr;
   return i->getValue()->value;
 }
 
 std::shared_ptr<Value> Storage::GetEntryValue(unsigned int local_id) const {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   if (local_id >= m_localmap.size()) return nullptr;
   return m_localmap[local_id]->value;
 }
@@ -654,14 +654,14 @@ void Storage::SetEntryFlagsImpl(Entry* entry, unsigned int flags,
 }
 
 unsigned int Storage::GetEntryFlags(StringRef name) const {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) return 0;
   return i->getValue()->flags;
 }
 
 unsigned int Storage::GetEntryFlags(unsigned int local_id) const {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   if (local_id >= m_localmap.size()) return 0;
   return m_localmap[local_id]->flags;
 }
@@ -781,7 +781,7 @@ std::vector<unsigned int> Storage::GetEntries(const Twine& prefix,
                                               unsigned int types) {
   wpi::SmallString<128> prefixBuf;
   StringRef prefixStr = prefix.toStringRef(prefixBuf);
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   std::vector<unsigned int> ids;
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
@@ -839,7 +839,7 @@ std::vector<EntryInfo> Storage::GetEntryInfo(int inst, const Twine& prefix,
                                              unsigned int types) {
   wpi::SmallString<128> prefixBuf;
   StringRef prefixStr = prefix.toStringRef(prefixBuf);
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   std::vector<EntryInfo> infos;
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
@@ -863,7 +863,7 @@ unsigned int Storage::AddListener(
     unsigned int flags) const {
   wpi::SmallString<128> prefixBuf;
   StringRef prefixStr = prefix.toStringRef(prefixBuf);
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   unsigned int uid = m_notifier.Add(callback, prefixStr, flags);
   // perform immediate notifications
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
@@ -881,7 +881,7 @@ unsigned int Storage::AddListener(
     unsigned int local_id,
     std::function<void(const EntryNotification& event)> callback,
     unsigned int flags) const {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   unsigned int uid = m_notifier.Add(callback, local_id, flags);
   // perform immediate notifications
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0 &&
@@ -900,7 +900,7 @@ unsigned int Storage::AddPolledListener(unsigned int poller,
                                         unsigned int flags) const {
   wpi::SmallString<128> prefixBuf;
   StringRef prefixStr = prefix.toStringRef(prefixBuf);
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   unsigned int uid = m_notifier.AddPolled(poller, prefixStr, flags);
   // perform immediate notifications
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
@@ -918,7 +918,7 @@ unsigned int Storage::AddPolledListener(unsigned int poller,
 unsigned int Storage::AddPolledListener(unsigned int poller,
                                         unsigned int local_id,
                                         unsigned int flags) const {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   unsigned int uid = m_notifier.AddPolled(poller, local_id, flags);
   // perform immediate notifications
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0 &&
@@ -939,7 +939,7 @@ bool Storage::GetPersistentEntries(
     const {
   // copy values out of storage as quickly as possible so lock isn't held
   {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     // for periodic, don't re-save unless something has changed
     if (periodic && !m_persistent_dirty) return false;
     m_persistent_dirty = false;
@@ -969,7 +969,7 @@ bool Storage::GetEntries(
   StringRef prefixStr = prefix.toStringRef(prefixBuf);
   // copy values out of storage as quickly as possible so lock isn't held
   {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     entries->reserve(m_entries.size());
     for (auto& i : m_entries) {
       Entry* entry = i.getValue();
@@ -1055,7 +1055,7 @@ unsigned int Storage::CallRpc(unsigned int local_id, StringRef params) {
     unsigned int call_uid = msg->seq_num_uid();
     m_rpc_server.ProcessRpc(local_id, call_uid, name, msg->str(), conn_info,
                             [=](StringRef result) {
-                              std::lock_guard lock(m_mutex);
+                              std::scoped_lock lock(m_mutex);
                               m_rpc_results.insert(std::make_pair(
                                   RpcIdPair{local_id, call_uid}, result));
                               m_rpc_results_cond.notify_all();

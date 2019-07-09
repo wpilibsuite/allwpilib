@@ -48,7 +48,7 @@ class SinkImpl : public PropertyContainer {
   void SetSource(std::shared_ptr<SourceImpl> source);
 
   std::shared_ptr<SourceImpl> GetSource() const {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     return m_source;
   }
 

@@ -35,7 +35,7 @@ Notifier::Notifier(TimerEventHandler handler) {
 
       TimerEventHandler handler;
       {
-        std::lock_guard lock(m_processMutex);
+        std::scoped_lock lock(m_processMutex);
         handler = m_handler;
         if (m_periodic) {
           m_expirationTime += m_period;
@@ -91,12 +91,12 @@ Notifier& Notifier::operator=(Notifier&& rhs) {
 }
 
 void Notifier::SetHandler(TimerEventHandler handler) {
-  std::lock_guard lock(m_processMutex);
+  std::scoped_lock lock(m_processMutex);
   m_handler = handler;
 }
 
 void Notifier::StartSingle(double delay) {
-  std::lock_guard lock(m_processMutex);
+  std::scoped_lock lock(m_processMutex);
   m_periodic = false;
   m_period = delay;
   m_expirationTime = Timer::GetFPGATimestamp() + m_period;
@@ -104,7 +104,7 @@ void Notifier::StartSingle(double delay) {
 }
 
 void Notifier::StartPeriodic(double period) {
-  std::lock_guard lock(m_processMutex);
+  std::scoped_lock lock(m_processMutex);
   m_periodic = true;
   m_period = period;
   m_expirationTime = Timer::GetFPGATimestamp() + m_period;

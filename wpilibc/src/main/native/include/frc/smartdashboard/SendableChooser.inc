@@ -62,7 +62,7 @@ auto SendableChooser<T>::GetSelected()
     -> decltype(_unwrap_smart_ptr(m_choices[""])) {
   std::string selected = m_defaultChoice;
   {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     if (m_haveSelected) selected = m_selected;
   }
   if (selected.empty()) {
@@ -99,7 +99,7 @@ void SendableChooser<T>::InitSendable(SendableBuilder& builder) {
   builder.AddSmallStringProperty(
       kActive,
       [=](wpi::SmallVectorImpl<char>& buf) -> wpi::StringRef {
-        std::lock_guard lock(m_mutex);
+        std::scoped_lock lock(m_mutex);
         if (m_haveSelected) {
           buf.assign(m_selected.begin(), m_selected.end());
           return wpi::StringRef(buf.data(), buf.size());
@@ -109,11 +109,11 @@ void SendableChooser<T>::InitSendable(SendableBuilder& builder) {
       },
       nullptr);
   {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_activeEntries.emplace_back(builder.GetEntry(kActive));
   }
   builder.AddStringProperty(kSelected, nullptr, [=](wpi::StringRef val) {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_haveSelected = true;
     m_selected = val;
     for (auto& entry : m_activeEntries) entry.SetString(val);

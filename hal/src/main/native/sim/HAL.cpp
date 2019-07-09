@@ -231,7 +231,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   // Initial check, as if it's true initialization has finished
   if (initialized) return true;
 
-  std::lock_guard lock(initializeMutex);
+  std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return true;
 

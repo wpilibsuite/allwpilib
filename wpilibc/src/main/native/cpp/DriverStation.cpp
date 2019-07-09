@@ -490,7 +490,7 @@ void DriverStation::GetData() {
   }
 
   {
-    std::lock_guard waitLock(m_waitForDataMutex);
+    std::scoped_lock waitLock(m_waitForDataMutex);
     // Nofify all threads
     m_waitForDataCounter++;
     m_waitForDataCond.notify_all();

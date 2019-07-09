@@ -74,7 +74,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
     // don't start a new worker if we had a previously still-active connection
     // attempt to the same server
     {
-      std::lock_guard lock(local->mtx);
+      std::scoped_lock lock(local->mtx);
       if (local->active.count(active_tracker) > 0) continue;  // already in set
     }
 
@@ -85,7 +85,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
       if (!result->done) {
         // add to global state
         {
-          std::lock_guard lock(local->mtx);
+          std::scoped_lock lock(local->mtx);
           local->active.insert(active_tracker);
         }
 
@@ -95,13 +95,13 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
 
         // remove from global state
         {
-          std::lock_guard lock(local->mtx);
+          std::scoped_lock lock(local->mtx);
           local->active.erase(active_tracker);
         }
 
         // successful connection
         if (stream) {
-          std::lock_guard lock(result->mtx);
+          std::scoped_lock lock(result->mtx);
           if (!result->done.exchange(true)) result->stream = std::move(stream);
         }
       }

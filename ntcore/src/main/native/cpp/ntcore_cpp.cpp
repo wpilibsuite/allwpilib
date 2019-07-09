@@ -959,7 +959,7 @@ void SetLogger(LogFunc func, unsigned int min_level) {
   auto ii = InstanceImpl::GetDefault();
   static wpi::mutex mutex;
   static unsigned int logger = 0;
-  std::lock_guard lock(mutex);
+  std::scoped_lock lock(mutex);
   if (logger != 0) ii->logger_impl.Remove(logger);
   logger = ii->logger_impl.Add(
       [=](const LogMessage& msg) {

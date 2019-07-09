@@ -43,7 +43,7 @@ InstanceImpl* InstanceImpl::Get(int inst) {
   }
 
   // slow path
-  std::lock_guard lock(s_mutex);
+  std::scoped_lock lock(s_mutex);
 
   // static fast-path block
   if (static_cast<unsigned int>(inst) <
@@ -66,7 +66,7 @@ int InstanceImpl::GetDefaultIndex() {
   if (inst >= 0) return inst;
 
   // slow path
-  std::lock_guard lock(s_mutex);
+  std::scoped_lock lock(s_mutex);
 
   // double-check
   inst = s_default;
@@ -79,7 +79,7 @@ int InstanceImpl::GetDefaultIndex() {
 }
 
 int InstanceImpl::Alloc() {
-  std::lock_guard lock(s_mutex);
+  std::scoped_lock lock(s_mutex);
   return AllocImpl();
 }
 
@@ -96,7 +96,7 @@ int InstanceImpl::AllocImpl() {
 }
 
 void InstanceImpl::Destroy(int inst) {
-  std::lock_guard lock(s_mutex);
+  std::scoped_lock lock(s_mutex);
   if (inst < 0 || static_cast<unsigned int>(inst) >= s_instances.size()) return;
 
   if (static_cast<unsigned int>(inst) <

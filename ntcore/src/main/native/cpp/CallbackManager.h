@@ -74,7 +74,7 @@ class CallbackThread : public wpi::SafeThread {
   struct Poller {
     void Terminate() {
       {
-        std::lock_guard lock(poll_mutex);
+        std::scoped_lock lock(poll_mutex);
         terminating = true;
       }
       poll_cond.notify_all();
@@ -94,7 +94,7 @@ class CallbackThread : public wpi::SafeThread {
     auto poller = m_pollers[poller_uid];
     if (!poller) return;
     {
-      std::lock_guard lock(poller->poll_mutex);
+      std::scoped_lock lock(poller->poll_mutex);
       poller->poll_queue.emplace(std::forward<Args>(args)...);
     }
     poller->poll_cond.notify_one();
@@ -286,7 +286,7 @@ class CallbackManager {
     }
 
     {
-      std::lock_guard lock(poller->poll_mutex);
+      std::scoped_lock lock(poller->poll_mutex);
       poller->cancelling = true;
     }
     poller->poll_cond.notify_one();
