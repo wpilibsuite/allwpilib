@@ -38,7 +38,7 @@ class NotifierHandleContainer
   ~NotifierHandleContainer() {
     ForEach([](HAL_NotifierHandle handle, Notifier* notifier) {
       {
-        std::lock_guard lock(notifier->mutex);
+        std::scoped_lock lock(notifier->mutex);
         notifier->active = false;
         notifier->running = false;
       }
@@ -76,7 +76,7 @@ void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   if (!notifier) return;
 
   {
-    std::lock_guard lock(notifier->mutex);
+    std::scoped_lock lock(notifier->mutex);
     notifier->active = false;
     notifier->running = false;
   }
@@ -89,7 +89,7 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
 
   // Just in case HAL_StopNotifier() wasn't called...
   {
-    std::lock_guard lock(notifier->mutex);
+    std::scoped_lock lock(notifier->mutex);
     notifier->active = false;
     notifier->running = false;
   }
@@ -102,7 +102,7 @@ void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
   if (!notifier) return;
 
   {
-    std::lock_guard lock(notifier->mutex);
+    std::scoped_lock lock(notifier->mutex);
     notifier->waitTime = triggerTime;
     notifier->running = true;
     notifier->updatedAlarm = true;
@@ -118,7 +118,7 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
   if (!notifier) return;
 
   {
-    std::lock_guard lock(notifier->mutex);
+    std::scoped_lock lock(notifier->mutex);
     notifier->running = false;
   }
 }

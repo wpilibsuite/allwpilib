@@ -27,14 +27,14 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
   LLVM_ATTRIBUTE_ALWAYS_INLINE void CancelCallback(int32_t uid) { Cancel(uid); }
 
   T Get() const {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     return m_value;
   }
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE operator T() const { return Get(); }
 
   void Reset(T value) {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     DoReset();
     m_value = value;
   }
@@ -57,7 +57,7 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
   }
 
   void DoSet(T value, const char* name) {
-    std::lock_guard lock(this->m_mutex);
+    std::scoped_lock lock(this->m_mutex);
     if (m_value != value) {
       m_value = value;
       if (m_callbacks) {

@@ -49,7 +49,7 @@ void NetworkConnection::Start() {
   while (!m_outgoing.empty()) m_outgoing.pop();
   // reset shutdown flags
   {
-    std::lock_guard lock(m_shutdown_mutex);
+    std::scoped_lock lock(m_shutdown_mutex);
     m_read_shutdown = false;
     m_write_shutdown = false;
   }
@@ -104,12 +104,12 @@ void NetworkConnection::set_proto_rev(unsigned int proto_rev) {
 }
 
 NetworkConnection::State NetworkConnection::state() const {
-  std::lock_guard lock(m_state_mutex);
+  std::scoped_lock lock(m_state_mutex);
   return m_state;
 }
 
 void NetworkConnection::set_state(State state) {
-  std::lock_guard lock(m_state_mutex);
+  std::scoped_lock lock(m_state_mutex);
   // Don't update state any more once we've died
   if (m_state == kDead) return;
   // One-shot notify state changes
@@ -121,12 +121,12 @@ void NetworkConnection::set_state(State state) {
 }
 
 std::string NetworkConnection::remote_id() const {
-  std::lock_guard lock(m_remote_id_mutex);
+  std::scoped_lock lock(m_remote_id_mutex);
   return m_remote_id;
 }
 
 void NetworkConnection::set_remote_id(StringRef remote_id) {
-  std::lock_guard lock(m_remote_id_mutex);
+  std::scoped_lock lock(m_remote_id_mutex);
   m_remote_id = remote_id;
 }
 
@@ -177,7 +177,7 @@ void NetworkConnection::ReadThreadMain() {
 done:
   // use condition variable to signal thread shutdown
   {
-    std::lock_guard lock(m_shutdown_mutex);
+    std::scoped_lock lock(m_shutdown_mutex);
     m_read_shutdown = true;
     m_read_shutdown_cv.notify_one();
   }
@@ -214,14 +214,14 @@ void NetworkConnection::WriteThreadMain() {
 
   // use condition variable to signal thread shutdown
   {
-    std::lock_guard lock(m_shutdown_mutex);
+    std::scoped_lock lock(m_shutdown_mutex);
     m_write_shutdown = true;
     m_write_shutdown_cv.notify_one();
   }
 }
 
 void NetworkConnection::QueueOutgoing(std::shared_ptr<Message> msg) {
-  std::lock_guard lock(m_pending_mutex);
+  std::scoped_lock lock(m_pending_mutex);
 
   // Merge with previous.  One case we don't combine: delete/assign loop.
   switch (msg->type()) {
@@ -317,7 +317,7 @@ void NetworkConnection::QueueOutgoing(std::shared_ptr<Message> msg) {
 }
 
 void NetworkConnection::PostOutgoing(bool keep_alive) {
-  std::lock_guard lock(m_pending_mutex);
+  std::scoped_lock lock(m_pending_mutex);
   auto now = std::chrono::steady_clock::now();
   if (m_pending_outgoing.empty()) {
     if (!keep_alive) return;

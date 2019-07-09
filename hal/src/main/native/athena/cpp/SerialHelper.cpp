@@ -275,7 +275,7 @@ done:
 
 int32_t SerialHelper::GetIndexForPort(HAL_SerialPort port, int32_t* status) {
   // Hold lock whenever we're using the names array
-  std::lock_guard lock(m_nameMutex);
+  std::scoped_lock lock(m_nameMutex);
 
   std::string portString = m_usbNames[port - 2];
 

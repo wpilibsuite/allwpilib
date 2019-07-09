@@ -53,7 +53,7 @@ class NotifierHandleContainer
   ~NotifierHandleContainer() {
     ForEach([](HAL_NotifierHandle handle, Notifier* notifier) {
       {
-        std::lock_guard lock(notifier->mutex);
+        std::scoped_lock lock(notifier->mutex);
         notifier->triggerTime = UINT64_MAX;
         notifier->triggeredTime = 0;
         notifier->active = false;
@@ -66,7 +66,7 @@ class NotifierHandleContainer
 static NotifierHandleContainer* notifierHandles;
 
 static void alarmCallback(uint32_t, void*) {
-  std::lock_guard lock(notifierMutex);
+  std::scoped_lock lock(notifierMutex);
   int32_t status = 0;
   uint64_t currentTime = 0;
 
@@ -119,7 +119,7 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
     std::atexit(cleanupNotifierAtExit);
 
   if (notifierRefCount.fetch_add(1) == 0) {
-    std::lock_guard lock(notifierMutex);
+    std::scoped_lock lock(notifierMutex);
     // create manager and alarm if not already created
     if (!notifierManager) {
       notifierManager = std::make_unique<tInterruptManager>(
@@ -144,7 +144,7 @@ void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   if (!notifier) return;
 
   {
-    std::lock_guard lock(notifier->mutex);
+    std::scoped_lock lock(notifier->mutex);
     notifier->triggerTime = UINT64_MAX;
     notifier->triggeredTime = 0;
     notifier->active = false;
@@ -158,7 +158,7 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
 
   // Just in case HAL_StopNotifier() wasn't called...
   {
-    std::lock_guard lock(notifier->mutex);
+    std::scoped_lock lock(notifier->mutex);
     notifier->triggerTime = UINT64_MAX;
     notifier->triggeredTime = 0;
     notifier->active = false;
@@ -177,7 +177,7 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
     // if (notifierAlarm) notifierAlarm->writeEnable(false, status);
     // if (notifierManager) notifierManager->disable(status);
 
-    // std::lock_guard lock(notifierMutex);
+    // std::scoped_lock lock(notifierMutex);
     // notifierAlarm = nullptr;
     // notifierManager = nullptr;
     // closestTrigger = UINT64_MAX;
@@ -190,12 +190,12 @@ void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
   if (!notifier) return;
 
   {
-    std::lock_guard lock(notifier->mutex);
+    std::scoped_lock lock(notifier->mutex);
     notifier->triggerTime = triggerTime;
     notifier->triggeredTime = UINT64_MAX;
   }
 
-  std::lock_guard lock(notifierMutex);
+  std::scoped_lock lock(notifierMutex);
   // Update alarm time if closer than current.
   if (triggerTime < closestTrigger) {
     bool wasActive = (closestTrigger != UINT64_MAX);
@@ -214,7 +214,7 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
   if (!notifier) return;
 
   {
-    std::lock_guard lock(notifier->mutex);
+    std::scoped_lock lock(notifier->mutex);
     notifier->triggerTime = UINT64_MAX;
   }
 }

@@ -41,7 +41,7 @@ PIDController::~PIDController() {
 
 void PIDController::Enable() {
   {
-    std::lock_guard lock(m_thisMutex);
+    std::scoped_lock lock(m_thisMutex);
     m_enabled = true;
   }
 }
@@ -49,9 +49,9 @@ void PIDController::Enable() {
 void PIDController::Disable() {
   {
     // Ensures m_enabled modification and PIDWrite() call occur atomically
-    std::lock_guard pidWriteLock(m_pidWriteMutex);
+    std::scoped_lock pidWriteLock(m_pidWriteMutex);
     {
-      std::lock_guard mainLock(m_thisMutex);
+      std::scoped_lock mainLock(m_thisMutex);
       m_enabled = false;
     }
 
@@ -68,7 +68,7 @@ void PIDController::SetEnabled(bool enable) {
 }
 
 bool PIDController::IsEnabled() const {
-  std::lock_guard lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   return m_enabled;
 }
 

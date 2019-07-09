@@ -17,7 +17,7 @@ static wpi::SmallVector<HandleBase*, 32>* globalHandles = nullptr;
 static wpi::mutex globalHandleMutex;
 HandleBase::HandleBase() {
   static wpi::SmallVector<HandleBase*, 32> gH;
-  std::lock_guard lock(globalHandleMutex);
+  std::scoped_lock lock(globalHandleMutex);
   if (!globalHandles) {
     globalHandles = &gH;
   }
@@ -30,7 +30,7 @@ HandleBase::HandleBase() {
   }
 }
 HandleBase::~HandleBase() {
-  std::lock_guard lock(globalHandleMutex);
+  std::scoped_lock lock(globalHandleMutex);
   auto index = std::find(globalHandles->begin(), globalHandles->end(), this);
   if (index != globalHandles->end()) {
     *index = nullptr;

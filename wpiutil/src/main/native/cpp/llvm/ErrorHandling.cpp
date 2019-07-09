@@ -55,14 +55,14 @@ static std::mutex BadAllocErrorHandlerMutex;
 
 void wpi::install_fatal_error_handler(fatal_error_handler_t handler,
                                       void *user_data) {
-  std::lock_guard Lock(ErrorHandlerMutex);
+  std::scoped_lock Lock(ErrorHandlerMutex);
   assert(!ErrorHandler && "Error handler already registered!\n");
   ErrorHandler = handler;
   ErrorHandlerUserData = user_data;
 }
 
 void wpi::remove_fatal_error_handler() {
-  std::lock_guard Lock(ErrorHandlerMutex);
+  std::scoped_lock Lock(ErrorHandlerMutex);
   ErrorHandler = nullptr;
   ErrorHandlerUserData = nullptr;
 }
@@ -85,7 +85,7 @@ void wpi::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
   {
     // Only acquire the mutex while reading the handler, so as not to invoke a
     // user-supplied callback under a lock.
-    std::lock_guard Lock(ErrorHandlerMutex);
+    std::scoped_lock Lock(ErrorHandlerMutex);
     handler = ErrorHandler;
     handlerData = ErrorHandlerUserData;
   }
@@ -113,14 +113,14 @@ void wpi::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
 
 void wpi::install_bad_alloc_error_handler(fatal_error_handler_t handler,
                                           void *user_data) {
-  std::lock_guard Lock(BadAllocErrorHandlerMutex);
+  std::scoped_lock Lock(BadAllocErrorHandlerMutex);
   assert(!ErrorHandler && "Bad alloc error handler already registered!\n");
   BadAllocErrorHandler = handler;
   BadAllocErrorHandlerUserData = user_data;
 }
 
 void wpi::remove_bad_alloc_error_handler() {
-  std::lock_guard Lock(BadAllocErrorHandlerMutex);
+  std::scoped_lock Lock(BadAllocErrorHandlerMutex);
   BadAllocErrorHandler = nullptr;
   BadAllocErrorHandlerUserData = nullptr;
 }
@@ -131,7 +131,7 @@ void wpi::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
   {
     // Only acquire the mutex while reading the handler, so as not to invoke a
     // user-supplied callback under a lock.
-    std::lock_guard Lock(BadAllocErrorHandlerMutex);
+    std::scoped_lock Lock(BadAllocErrorHandlerMutex);
     Handler = BadAllocErrorHandler;
     HandlerData = BadAllocErrorHandlerUserData;
   }

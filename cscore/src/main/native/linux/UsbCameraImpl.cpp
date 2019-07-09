@@ -815,7 +815,7 @@ void UsbCameraImpl::DeviceCacheMode() {
   vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   if (DoIoctl(fd, VIDIOC_G_FMT, &vfmt) != 0) {
     SERROR("could not read current video mode");
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_mode = VideoMode{VideoMode::kMJPEG, 320, 240, 30};
     return;
   }
@@ -881,7 +881,7 @@ void UsbCameraImpl::DeviceCacheMode() {
 
   // Save to global mode
   {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_mode.pixelFormat = pixelFormat;
     m_mode.width = width;
     m_mode.height = height;
@@ -1070,7 +1070,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   }
 
   {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_videoModes.swap(modes);
   }
   m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
@@ -1085,7 +1085,7 @@ CS_StatusValue UsbCameraImpl::SendAndWait(Message&& msg) const {
 
   // Add the message to the command queue
   {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_commands.emplace_back(std::move(msg));
   }
 
@@ -1120,7 +1120,7 @@ void UsbCameraImpl::Send(Message&& msg) const {
 
   // Add the message to the command queue
   {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_commands.emplace_back(std::move(msg));
   }
 

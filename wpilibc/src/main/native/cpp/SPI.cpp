@@ -28,7 +28,7 @@ class SPI::Accumulator {
   Accumulator(HAL_SPIPort port, int xferSize, int validMask, int validValue,
               int dataShift, int dataSize, bool isSigned, bool bigEndian)
       : m_notifier([=]() {
-          std::lock_guard lock(m_mutex);
+          std::scoped_lock lock(m_mutex);
           Update();
         }),
         m_buf(new uint32_t[(xferSize + 1) * kAccumulateDepth]),
@@ -356,7 +356,7 @@ void SPI::FreeAccumulator() {
 
 void SPI::ResetAccumulator() {
   if (!m_accum) return;
-  std::lock_guard lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->m_value = 0;
   m_accum->m_count = 0;
   m_accum->m_lastValue = 0;
@@ -366,40 +366,40 @@ void SPI::ResetAccumulator() {
 
 void SPI::SetAccumulatorCenter(int center) {
   if (!m_accum) return;
-  std::lock_guard lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->m_center = center;
 }
 
 void SPI::SetAccumulatorDeadband(int deadband) {
   if (!m_accum) return;
-  std::lock_guard lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->m_deadband = deadband;
 }
 
 int SPI::GetAccumulatorLastValue() const {
   if (!m_accum) return 0;
-  std::lock_guard lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   return m_accum->m_lastValue;
 }
 
 int64_t SPI::GetAccumulatorValue() const {
   if (!m_accum) return 0;
-  std::lock_guard lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   return m_accum->m_value;
 }
 
 int64_t SPI::GetAccumulatorCount() const {
   if (!m_accum) return 0;
-  std::lock_guard lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   return m_accum->m_count;
 }
 
 double SPI::GetAccumulatorAverage() const {
   if (!m_accum) return 0;
-  std::lock_guard lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   if (m_accum->m_count == 0) return 0.0;
   return static_cast<double>(m_accum->m_value) / m_accum->m_count;
@@ -411,7 +411,7 @@ void SPI::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
     count = 0;
     return;
   }
-  std::lock_guard lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   value = m_accum->m_value;
   count = m_accum->m_count;
@@ -419,20 +419,20 @@ void SPI::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
 
 void SPI::SetAccumulatorIntegratedCenter(double center) {
   if (!m_accum) return;
-  std::lock_guard lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->m_integratedCenter = center;
 }
 
 double SPI::GetAccumulatorIntegratedValue() const {
   if (!m_accum) return 0;
-  std::lock_guard lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   return m_accum->m_integratedValue;
 }
 
 double SPI::GetAccumulatorIntegratedAverage() const {
   if (!m_accum) return 0;
-  std::lock_guard lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   if (m_accum->m_count <= 1) return 0.0;
   // count-1 due to not integrating the first value received

@@ -64,7 +64,7 @@ class RpcServerThread
     RpcIdPair lookup_uid{local_id, call_uid};
     callback(data);
     {
-      std::lock_guard lock(m_mutex);
+      std::scoped_lock lock(m_mutex);
       auto i = m_response_map.find(lookup_uid);
       if (i != m_response_map.end()) {
         // post an empty response and erase it

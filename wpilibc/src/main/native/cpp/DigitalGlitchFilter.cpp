@@ -28,7 +28,7 @@ std::array<bool, 3> DigitalGlitchFilter::m_filterAllocated = {
 wpi::mutex DigitalGlitchFilter::m_mutex;
 
 DigitalGlitchFilter::DigitalGlitchFilter() {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto index =
       std::find(m_filterAllocated.begin(), m_filterAllocated.end(), false);
   wpi_assert(index != m_filterAllocated.end());
@@ -43,7 +43,7 @@ DigitalGlitchFilter::DigitalGlitchFilter() {
 
 DigitalGlitchFilter::~DigitalGlitchFilter() {
   if (m_channelIndex >= 0) {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_filterAllocated[m_channelIndex] = false;
   }
 }

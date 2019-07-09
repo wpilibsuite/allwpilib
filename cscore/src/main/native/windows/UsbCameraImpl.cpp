@@ -875,10 +875,10 @@ void UsbCameraImpl::DeviceCacheMode() {
         // Default mode is not supported. Grab first supported image
         auto&& firstSupported = m_windowsVideoModes[0];
         m_currentMode = firstSupported.second;
-        std::lock_guard lock(m_mutex);
+        std::scoped_lock lock(m_mutex);
         m_mode = firstSupported.first;
       } else {
-        std::lock_guard lock(m_mutex);
+        std::scoped_lock lock(m_mutex);
         m_mode = result->first;
       }
     }
@@ -960,7 +960,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     count++;
   }
   {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_videoModes.swap(modes);
   }
   m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);

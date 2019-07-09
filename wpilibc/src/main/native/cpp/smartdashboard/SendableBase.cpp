@@ -34,22 +34,22 @@ SendableBase& SendableBase::operator=(SendableBase&& rhs) {
 }
 
 std::string SendableBase::GetName() const {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   return m_name;
 }
 
 void SendableBase::SetName(const wpi::Twine& name) {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   m_name = name.str();
 }
 
 std::string SendableBase::GetSubsystem() const {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   return m_subsystem;
 }
 
 void SendableBase::SetSubsystem(const wpi::Twine& subsystem) {
-  std::lock_guard lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   m_subsystem = subsystem.str();
 }
 

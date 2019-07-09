@@ -33,7 +33,7 @@ static wpi::mutex* getManagedStaticMutex() {
 void ManagedStaticBase::RegisterManagedStatic(void *(*Creator)(),
                                               void (*Deleter)(void*)) const {
   assert(Creator);
-  std::lock_guard Lock(*getManagedStaticMutex());
+  std::scoped_lock Lock(*getManagedStaticMutex());
 
   if (!Ptr.load(std::memory_order_relaxed)) {
     void *Tmp = Creator();
@@ -65,7 +65,7 @@ void ManagedStaticBase::destroy() const {
 
 /// wpi_shutdown - Deallocate and destroy all ManagedStatic variables.
 void wpi::wpi_shutdown() {
-  std::lock_guard Lock(*getManagedStaticMutex());
+  std::scoped_lock Lock(*getManagedStaticMutex());
 
   while (StaticList)
     StaticList->destroy();

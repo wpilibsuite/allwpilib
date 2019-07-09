@@ -67,7 +67,7 @@ void HALSimDSNT::Initialize() {
 
   enabled.AddListener(
       [this](const nt::EntryNotification& ev) -> void {
-        std::lock_guard lock(modeMutex);
+        std::scoped_lock lock(modeMutex);
         if (!this->isEstop) {
           this->isEnabled = ev.value->GetBoolean();
         } else {
@@ -80,7 +80,7 @@ void HALSimDSNT::Initialize() {
 
   estop.AddListener(
       [this](const nt::EntryNotification& ev) -> void {
-        std::lock_guard lock(modeMutex);
+        std::scoped_lock lock(modeMutex);
         this->isEstop = ev.value->GetBoolean();
         if (this->isEstop) {
           this->isEnabled = false;
@@ -136,7 +136,7 @@ void HALSimDSNT::Initialize() {
 void HALSimDSNT::HandleModePress(enum HALSimDSNT_Mode mode, bool isPressed) {
   if (isPressed) {
     if (mode != currentMode) {
-      std::lock_guard lock(modeMutex);
+      std::scoped_lock lock(modeMutex);
       currentMode = mode;
       isEnabled = false;
       this->DoModeUpdate();

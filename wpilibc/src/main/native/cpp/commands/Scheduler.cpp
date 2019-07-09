@@ -51,7 +51,7 @@ Scheduler* Scheduler::GetInstance() {
 }
 
 void Scheduler::AddCommand(Command* command) {
-  std::lock_guard lock(m_impl->additionsMutex);
+  std::scoped_lock lock(m_impl->additionsMutex);
   if (std::find(m_impl->additions.begin(), m_impl->additions.end(), command) !=
       m_impl->additions.end())
     return;
@@ -59,7 +59,7 @@ void Scheduler::AddCommand(Command* command) {
 }
 
 void Scheduler::AddButton(ButtonScheduler* button) {
-  std::lock_guard lock(m_impl->buttonsMutex);
+  std::scoped_lock lock(m_impl->buttonsMutex);
   m_impl->buttons.emplace_back(button);
 }
 
@@ -76,7 +76,7 @@ void Scheduler::Run() {
   {
     if (!m_impl->enabled) return;
 
-    std::lock_guard lock(m_impl->buttonsMutex);
+    std::scoped_lock lock(m_impl->buttonsMutex);
     for (auto& button : m_impl->buttons) {
       button->Execute();
     }
@@ -103,7 +103,7 @@ void Scheduler::Run() {
 
   // Add the new things
   {
-    std::lock_guard lock(m_impl->additionsMutex);
+    std::scoped_lock lock(m_impl->additionsMutex);
     for (auto& addition : m_impl->additions) {
       // Check to make sure no adding during adding
       if (m_impl->adding) {

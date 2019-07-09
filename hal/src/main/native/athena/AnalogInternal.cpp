@@ -44,7 +44,7 @@ void InitializeAnalogInternal() {
 void initializeAnalog(int32_t* status) {
   hal::init::CheckInit();
   if (analogSystemInitialized) return;
-  std::lock_guard lock(analogRegisterWindowMutex);
+  std::scoped_lock lock(analogRegisterWindowMutex);
   if (analogSystemInitialized) return;
   analogInputSystem.reset(tAI::create(status));
   analogOutputSystem.reset(tAO::create(status));

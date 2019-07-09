@@ -180,7 +180,7 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
 static void UpdateDriverStationControlWord(bool force,
                                            HAL_ControlWord& controlWord) {
   auto now = std::chrono::steady_clock::now();
-  std::lock_guard lock(m_controlWordMutex);
+  std::scoped_lock lock(m_controlWordMutex);
   // Update every 50 ms or on force.
   if ((now - m_lastControlWordUpdate > std::chrono::milliseconds(50)) ||
       force) {
@@ -207,7 +207,7 @@ static void UpdateDriverStationDataCaches() {
 
   {
     // Obtain a lock on the data, swap the cached data into the main data arrays
-    std::lock_guard lock(m_cacheDataMutex);
+    std::scoped_lock lock(m_cacheDataMutex);
 
     m_joystickAxes.swap(m_joystickAxesCache);
     m_joystickPOVs.swap(m_joystickPOVsCache);
@@ -272,7 +272,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
-  std::lock_guard lock(msgMutex);
+  std::scoped_lock lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
   static std::chrono::time_point<std::chrono::steady_clock>
       prevMsgTime[KEEP_MSGS];
@@ -545,7 +545,7 @@ void HAL_InitializeDriverStation(void) {
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard lock(initializeMutex);
+  std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
 

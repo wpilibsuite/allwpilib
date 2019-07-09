@@ -25,16 +25,16 @@ PIDControllerRunner::PIDControllerRunner(
 PIDControllerRunner::~PIDControllerRunner() { Disable(); }
 
 void PIDControllerRunner::Enable() {
-  std::lock_guard lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_enabled = true;
 }
 
 void PIDControllerRunner::Disable() {
   // Ensures m_enabled modification and m_controllerOutput() call occur
   // atomically
-  std::lock_guard outputLock(m_outputMutex);
+  std::scoped_lock outputLock(m_outputMutex);
   {
-    std::lock_guard mainLock(m_thisMutex);
+    std::scoped_lock mainLock(m_thisMutex);
     m_enabled = false;
   }
 
@@ -42,13 +42,13 @@ void PIDControllerRunner::Disable() {
 }
 
 bool PIDControllerRunner::IsEnabled() const {
-  std::lock_guard lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   return m_enabled;
 }
 
 void PIDControllerRunner::Run() {
   // Ensures m_enabled check and m_controllerOutput() call occur atomically
-  std::lock_guard outputLock(m_outputMutex);
+  std::scoped_lock outputLock(m_outputMutex);
   std::unique_lock mainLock(m_thisMutex);
   if (m_enabled) {
     // Don't block other PIDControllerRunner operations on output

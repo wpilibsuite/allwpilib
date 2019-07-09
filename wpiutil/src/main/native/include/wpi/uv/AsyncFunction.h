@@ -132,7 +132,7 @@ class AsyncFunction<R(T...)> final
 
     // add the parameters to the input queue
     {
-      std::lock_guard lock(m_mutex);
+      std::scoped_lock lock(m_mutex);
       m_params.emplace_back(std::piecewise_construct,
                             std::forward_as_tuple(req),
                             std::forward_as_tuple(std::forward<U>(u)...));

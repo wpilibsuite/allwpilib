@@ -16,7 +16,7 @@ wpi::mutex Resource::m_createMutex;
 
 void Resource::CreateResourceObject(std::unique_ptr<Resource>& r,
                                     uint32_t elements) {
-  std::lock_guard lock(m_createMutex);
+  std::scoped_lock lock(m_createMutex);
   if (!r) {
     r = std::make_unique<Resource>(elements);
   }
@@ -27,7 +27,7 @@ Resource::Resource(uint32_t elements) {
 }
 
 uint32_t Resource::Allocate(const std::string& resourceDesc) {
-  std::lock_guard lock(m_allocateMutex);
+  std::scoped_lock lock(m_allocateMutex);
   for (uint32_t i = 0; i < m_isAllocated.size(); i++) {
     if (!m_isAllocated[i]) {
       m_isAllocated[i] = true;
@@ -39,7 +39,7 @@ uint32_t Resource::Allocate(const std::string& resourceDesc) {
 }
 
 uint32_t Resource::Allocate(uint32_t index, const std::string& resourceDesc) {
-  std::lock_guard lock(m_allocateMutex);
+  std::scoped_lock lock(m_allocateMutex);
   if (index >= m_isAllocated.size()) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, resourceDesc);
     return std::numeric_limits<uint32_t>::max();
