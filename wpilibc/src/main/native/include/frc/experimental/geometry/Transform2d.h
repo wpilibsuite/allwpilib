@@ -8,27 +8,22 @@
 #pragma once
 
 #include "Translation2d.h"
-#include "Transform2d.h"
-#include "Twist2d.h"
 
 namespace frc {
 namespace experimental {
-class Pose2d {
- public:
-  Pose2d();
-  Pose2d(Translation2d translation, Rotation2d rotation);
-  Pose2d(double x, double y, Rotation2d rotation);
 
-  Pose2d operator+(const Transform2d& other) const;
-  void operator+=(const Transform2d& other);
+class Pose2d;
+
+class Transform2d {
+ public:
+  Transform2d(Pose2d initial, Pose2d final);
+  Transform2d(Translation2d translation, Rotation2d rotation);
+  Transform2d();
+
+  Transform2d Inverse() const;
 
   const Translation2d& Translation() const { return m_translation; }
   const Rotation2d& Rotation() const { return m_rotation; }
-
-  Pose2d TransformBy(const Transform2d& other) const;
-  Pose2d RelativeTo(const Pose2d& other) const;
-
-  Pose2d Exp(const Twist2d& twist) const;
 
  private:
   Translation2d m_translation;
