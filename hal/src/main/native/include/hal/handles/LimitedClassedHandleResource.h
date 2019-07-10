@@ -94,9 +94,8 @@ void LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Free(
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
   if (index < 0 || index >= size) return;
-  // lock and deallocated handle
-  std::scoped_lock allocateLock(m_allocateMutex);
-  std::scoped_lock handleLock(m_handleMutexes[index]);
+  // lock and deallocate handle
+  std::scoped_lock lock(m_allocateMutex, m_handleMutexes[index]);
   m_structures[index].reset();
 }
 
