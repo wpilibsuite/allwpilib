@@ -491,7 +491,7 @@ void UsbCameraImpl::DeviceConnect() {
 
     // Restore settings
     SDEBUG3("restoring settings");
-    std::unique_lock<wpi::mutex> lock2(m_mutex);
+    std::unique_lock lock2(m_mutex);
     for (size_t i = 0; i < m_propertyData.size(); ++i) {
       const auto prop =
           static_cast<const UsbCameraProperty*>(m_propertyData[i].get());
@@ -736,7 +736,7 @@ CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
 }
 
 void UsbCameraImpl::DeviceProcessCommands() {
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
   if (m_commands.empty()) return;
   while (!m_commands.empty()) {
     auto msg = std::move(m_commands.back());
@@ -815,7 +815,7 @@ void UsbCameraImpl::DeviceCacheMode() {
   vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   if (DoIoctl(fd, VIDIOC_G_FMT, &vfmt) != 0) {
     SERROR("could not read current video mode");
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_mode = VideoMode{VideoMode::kMJPEG, 320, 240, 30};
     return;
   }
@@ -881,7 +881,7 @@ void UsbCameraImpl::DeviceCacheMode() {
 
   // Save to global mode
   {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_mode.pixelFormat = pixelFormat;
     m_mode.width = width;
     m_mode.height = height;
@@ -907,11 +907,11 @@ void UsbCameraImpl::DeviceCacheProperty(
   std::unique_ptr<UsbCameraProperty> perProp;
   if (IsPercentageProperty(rawProp->name)) {
     perProp =
-        wpi::make_unique<UsbCameraProperty>(rawProp->name, 0, *rawProp, 0, 0);
+        std::make_unique<UsbCameraProperty>(rawProp->name, 0, *rawProp, 0, 0);
     rawProp->name = "raw_" + perProp->name;
   }
 
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
   int* rawIndex = &m_properties[rawProp->name];
   bool newRaw = *rawIndex == 0;
   UsbCameraProperty* oldRawProp =
@@ -1070,7 +1070,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   }
 
   {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_videoModes.swap(modes);
   }
   m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
@@ -1085,14 +1085,14 @@ CS_StatusValue UsbCameraImpl::SendAndWait(Message&& msg) const {
 
   // Add the message to the command queue
   {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_commands.emplace_back(std::move(msg));
   }
 
   // Signal the camera thread
   if (eventfd_write(fd, 1) < 0) return CS_SOURCE_IS_DISCONNECTED;
 
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
   while (m_active) {
     // Did we get a response to *our* request?
     auto it =
@@ -1120,7 +1120,7 @@ void UsbCameraImpl::Send(Message&& msg) const {
 
   // Add the message to the command queue
   {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_commands.emplace_back(std::move(msg));
   }
 
@@ -1130,7 +1130,7 @@ void UsbCameraImpl::Send(Message&& msg) const {
 
 std::unique_ptr<PropertyImpl> UsbCameraImpl::CreateEmptyProperty(
     const wpi::Twine& name) const {
-  return wpi::make_unique<UsbCameraProperty>(name);
+  return std::make_unique<UsbCameraProperty>(name);
 }
 
 bool UsbCameraImpl::CacheProperties(CS_Status* status) const {

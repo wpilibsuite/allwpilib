@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -35,7 +35,7 @@ TEST(SpinlockTest, Benchmark) {
 
     auto start = high_resolution_clock::now();
     for (int i = 0; i < 10000000; i++) {
-      std::lock_guard<std::mutex> lock(std_mutex);
+      std::scoped_lock lock(std_mutex);
       ++value;
     }
     auto stop = high_resolution_clock::now();
@@ -49,7 +49,7 @@ TEST(SpinlockTest, Benchmark) {
 
     auto start = high_resolution_clock::now();
     for (int i = 0; i < 1000000; i++) {
-      std::lock_guard<std::mutex> lock(std_mutex);
+      std::scoped_lock lock(std_mutex);
       ++value;
     }
     auto stop = high_resolution_clock::now();
@@ -64,7 +64,7 @@ TEST(SpinlockTest, Benchmark) {
 
     auto start = high_resolution_clock::now();
     for (int i = 0; i < 1000000; i++) {
-      std::lock_guard<std::recursive_mutex> lock(std_recursive_mutex);
+      std::scoped_lock lock(std_recursive_mutex);
       ++value;
     }
     auto stop = high_resolution_clock::now();
@@ -79,7 +79,7 @@ TEST(SpinlockTest, Benchmark) {
 
     auto start = high_resolution_clock::now();
     for (int i = 0; i < 1000000; i++) {
-      std::lock_guard<wpi::mutex> lock(wpi_mutex);
+      std::scoped_lock lock(wpi_mutex);
       ++value;
     }
     auto stop = high_resolution_clock::now();
@@ -94,7 +94,7 @@ TEST(SpinlockTest, Benchmark) {
 
     auto start = high_resolution_clock::now();
     for (int i = 0; i < 1000000; i++) {
-      std::lock_guard<wpi::recursive_mutex> lock(wpi_recursive_mutex);
+      std::scoped_lock lock(wpi_recursive_mutex);
       ++value;
     }
     auto stop = high_resolution_clock::now();
@@ -109,7 +109,7 @@ TEST(SpinlockTest, Benchmark) {
 
     auto start = high_resolution_clock::now();
     for (int i = 0; i < 1000000; i++) {
-      std::lock_guard<wpi::spinlock> lock(spinlock);
+      std::scoped_lock lock(spinlock);
       ++value;
     }
     auto stop = high_resolution_clock::now();
@@ -124,7 +124,7 @@ TEST(SpinlockTest, Benchmark) {
 
     auto start = high_resolution_clock::now();
     for (int i = 0; i < 1000000; i++) {
-      std::lock_guard<wpi::recursive_spinlock1> lock(recursive_spinlock1);
+      std::scoped_lock lock(recursive_spinlock1);
       ++value;
     }
     auto stop = high_resolution_clock::now();
@@ -139,7 +139,7 @@ TEST(SpinlockTest, Benchmark) {
 
     auto start = high_resolution_clock::now();
     for (int i = 0; i < 1000000; i++) {
-      std::lock_guard<wpi::recursive_spinlock2> lock(recursive_spinlock2);
+      std::scoped_lock lock(recursive_spinlock2);
       ++value;
     }
     auto stop = high_resolution_clock::now();
@@ -154,7 +154,7 @@ TEST(SpinlockTest, Benchmark) {
 
     auto start = high_resolution_clock::now();
     for (int i = 0; i < 1000000; i++) {
-      std::lock_guard<wpi::recursive_spinlock> lock(recursive_spinlock);
+      std::scoped_lock lock(recursive_spinlock);
       ++value;
     }
     auto stop = high_resolution_clock::now();

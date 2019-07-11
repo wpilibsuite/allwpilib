@@ -48,18 +48,18 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
 }
 
 double PIDBase::Get() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   return m_result;
 }
 
 void PIDBase::SetContinuous(bool continuous) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_continuous = continuous;
 }
 
 void PIDBase::SetInputRange(double minimumInput, double maximumInput) {
   {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+    std::scoped_lock lock(m_thisMutex);
     m_minimumInput = minimumInput;
     m_maximumInput = maximumInput;
     m_inputRange = maximumInput - minimumInput;
@@ -69,14 +69,14 @@ void PIDBase::SetInputRange(double minimumInput, double maximumInput) {
 }
 
 void PIDBase::SetOutputRange(double minimumOutput, double maximumOutput) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_minimumOutput = minimumOutput;
   m_maximumOutput = maximumOutput;
 }
 
 void PIDBase::SetPID(double p, double i, double d) {
   {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+    std::scoped_lock lock(m_thisMutex);
     m_P = p;
     m_I = i;
     m_D = d;
@@ -84,7 +84,7 @@ void PIDBase::SetPID(double p, double i, double d) {
 }
 
 void PIDBase::SetPID(double p, double i, double d, double f) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_P = p;
   m_I = i;
   m_D = d;
@@ -92,48 +92,48 @@ void PIDBase::SetPID(double p, double i, double d, double f) {
 }
 
 void PIDBase::SetP(double p) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_P = p;
 }
 
 void PIDBase::SetI(double i) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_I = i;
 }
 
 void PIDBase::SetD(double d) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_D = d;
 }
 
 void PIDBase::SetF(double f) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_F = f;
 }
 
 double PIDBase::GetP() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   return m_P;
 }
 
 double PIDBase::GetI() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   return m_I;
 }
 
 double PIDBase::GetD() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   return m_D;
 }
 
 double PIDBase::GetF() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   return m_F;
 }
 
 void PIDBase::SetSetpoint(double setpoint) {
   {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+    std::scoped_lock lock(m_thisMutex);
 
     if (m_maximumInput > m_minimumInput) {
       if (setpoint > m_maximumInput)
@@ -149,19 +149,19 @@ void PIDBase::SetSetpoint(double setpoint) {
 }
 
 double PIDBase::GetSetpoint() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   return m_setpoint;
 }
 
 double PIDBase::GetDeltaSetpoint() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   return (m_setpoint - m_prevSetpoint) / m_setpointTimer.Get();
 }
 
 double PIDBase::GetError() const {
   double setpoint = GetSetpoint();
   {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+    std::scoped_lock lock(m_thisMutex);
     return GetContinuousError(setpoint - m_pidInput->PIDGet());
   }
 }
@@ -177,32 +177,32 @@ PIDSourceType PIDBase::GetPIDSourceType() const {
 }
 
 void PIDBase::SetTolerance(double percent) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_toleranceType = kPercentTolerance;
   m_tolerance = percent;
 }
 
 void PIDBase::SetAbsoluteTolerance(double absTolerance) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_toleranceType = kAbsoluteTolerance;
   m_tolerance = absTolerance;
 }
 
 void PIDBase::SetPercentTolerance(double percent) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_toleranceType = kPercentTolerance;
   m_tolerance = percent;
 }
 
 void PIDBase::SetToleranceBuffer(int bufLength) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_filter = LinearFilter::MovingAverage(bufLength);
 }
 
 bool PIDBase::OnTarget() const {
   double error = GetError();
 
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   switch (m_toleranceType) {
     case kPercentTolerance:
       return std::fabs(error) < m_tolerance / 100 * m_inputRange;
@@ -218,7 +218,7 @@ bool PIDBase::OnTarget() const {
 }
 
 void PIDBase::Reset() {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_prevError = 0;
   m_totalError = 0;
   m_result = 0;
@@ -246,7 +246,7 @@ void PIDBase::Calculate() {
 
   bool enabled;
   {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+    std::scoped_lock lock(m_thisMutex);
     enabled = m_enabled;
   }
 
@@ -268,7 +268,7 @@ void PIDBase::Calculate() {
     double totalError;
 
     {
-      std::lock_guard<wpi::mutex> lock(m_thisMutex);
+      std::scoped_lock lock(m_thisMutex);
 
       input = m_filter.Calculate(m_pidInput->PIDGet());
 
@@ -308,8 +308,8 @@ void PIDBase::Calculate() {
 
     {
       // Ensures m_enabled check and PIDWrite() call occur atomically
-      std::lock_guard<wpi::mutex> pidWriteLock(m_pidWriteMutex);
-      std::unique_lock<wpi::mutex> mainLock(m_thisMutex);
+      std::scoped_lock pidWriteLock(m_pidWriteMutex);
+      std::unique_lock mainLock(m_thisMutex);
       if (m_enabled) {
         // Don't block other PIDBase operations on PIDWrite()
         mainLock.unlock();
@@ -318,7 +318,7 @@ void PIDBase::Calculate() {
       }
     }
 
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+    std::scoped_lock lock(m_thisMutex);
     m_prevError = m_error;
     m_error = error;
     m_totalError = totalError;

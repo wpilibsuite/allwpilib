@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,7 +18,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>This feedback controller runs in discrete time, so time deltas are not used in the integral
  * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
  * given set of PID constants.
+ *
+ * @deprecated Use {@link edu.wpi.first.wpilibj.controller.PIDController} instead.
  */
+@Deprecated(since = "2020", forRemoval = true)
 public class PIDController extends PIDBase implements Controller {
   Notifier m_controlLoop = new Notifier(this::calculate);
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -34,22 +34,22 @@ SendableBase& SendableBase::operator=(SendableBase&& rhs) {
 }
 
 std::string SendableBase::GetName() const {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   return m_name;
 }
 
 void SendableBase::SetName(const wpi::Twine& name) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   m_name = name.str();
 }
 
 std::string SendableBase::GetSubsystem() const {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   return m_subsystem;
 }
 
 void SendableBase::SetSubsystem(const wpi::Twine& subsystem) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   m_subsystem = subsystem.str();
 }
 

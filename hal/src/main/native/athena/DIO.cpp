@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -69,7 +69,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
 
   port->channel = static_cast<uint8_t>(channel);
 
-  std::lock_guard<wpi::mutex> lock(digitalDIOMutex);
+  std::scoped_lock lock(digitalDIOMutex);
 
   tDIO::tOutputEnable outputEnable = digitalSystem->readOutputEnable(status);
 
@@ -143,7 +143,7 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   }
 
   int32_t status = 0;
-  std::lock_guard<wpi::mutex> lock(digitalDIOMutex);
+  std::scoped_lock lock(digitalDIOMutex);
   if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
     // Unset the SPI flag
     int32_t bitToUnset = 1 << remapSPIChannel(port->channel);
@@ -205,7 +205,7 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
   double rawDutyCycle = 256.0 * dutyCycle;
   if (rawDutyCycle > 255.5) rawDutyCycle = 255.5;
   {
-    std::lock_guard<wpi::mutex> lock(digitalPwmMutex);
+    std::scoped_lock lock(digitalPwmMutex);
     uint16_t pwmPeriodPower = digitalSystem->readPWMPeriodPower(status);
     if (pwmPeriodPower < 4) {
       // The resolution of the duty cycle drops close to the highest
@@ -251,7 +251,7 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
     if (value != 0) value = 1;
   }
   {
-    std::lock_guard<wpi::mutex> lock(digitalDIOMutex);
+    std::scoped_lock lock(digitalDIOMutex);
     tDIO::tDO currentDIO = digitalSystem->readDO(status);
 
     if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
@@ -289,7 +289,7 @@ void HAL_SetDIODirection(HAL_DigitalHandle dioPortHandle, HAL_Bool input,
     return;
   }
   {
-    std::lock_guard<wpi::mutex> lock(digitalDIOMutex);
+    std::scoped_lock lock(digitalDIOMutex);
     tDIO::tOutputEnable currentDIO = digitalSystem->readOutputEnable(status);
 
     if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
@@ -421,7 +421,7 @@ void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
     return;
   }
 
-  std::lock_guard<wpi::mutex> lock(digitalDIOMutex);
+  std::scoped_lock lock(digitalDIOMutex);
   if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
     // Channels 10-15 are SPI channels, so subtract our MXP channels
     digitalSystem->writeFilterSelectHdr(port->channel - kNumDigitalMXPChannels,
@@ -441,7 +441,7 @@ int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
     return 0;
   }
 
-  std::lock_guard<wpi::mutex> lock(digitalDIOMutex);
+  std::scoped_lock lock(digitalDIOMutex);
   if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
     // Channels 10-15 are SPI channels, so subtract our MXP channels
     return digitalSystem->readFilterSelectHdr(
@@ -457,7 +457,7 @@ int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
 void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
   initializeDigital(status);
   if (*status != 0) return;
-  std::lock_guard<wpi::mutex> lock(digitalDIOMutex);
+  std::scoped_lock lock(digitalDIOMutex);
   digitalSystem->writeFilterPeriodHdr(filterIndex, value, status);
   if (*status == 0) {
     digitalSystem->writeFilterPeriodMXP(filterIndex, value, status);
@@ -470,7 +470,7 @@ int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status) {
   uint32_t hdrPeriod = 0;
   uint32_t mxpPeriod = 0;
   {
-    std::lock_guard<wpi::mutex> lock(digitalDIOMutex);
+    std::scoped_lock lock(digitalDIOMutex);
     hdrPeriod = digitalSystem->readFilterPeriodHdr(filterIndex, status);
     if (*status == 0) {
       mxpPeriod = digitalSystem->readFilterPeriodMXP(filterIndex, status);
