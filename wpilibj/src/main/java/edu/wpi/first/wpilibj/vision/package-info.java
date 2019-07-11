@@ -85,4 +85,5 @@
  * }
  * </code></pre>
  */
+@java.lang.Deprecated
 package edu.wpi.first.wpilibj.vision;

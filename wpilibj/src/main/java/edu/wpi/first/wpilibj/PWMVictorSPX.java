@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-//import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-//import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 
 /**
  * Cross the Road Electronics (CTRE) Victor SPX Speed Controller with PWM control.
@@ -39,7 +39,7 @@ public class PWMVictorSPX extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    //HAL.report(tResourceType.kResourceType_PWMVictorSPX, getChannel());
+    HAL.report(tResourceType.kResourceType_PWMVictorSPX, getChannel());
     setName("PWMVictorSPX", getChannel());
   }
 }

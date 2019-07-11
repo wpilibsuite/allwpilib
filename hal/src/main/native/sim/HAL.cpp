@@ -1,35 +1,36 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/HAL.h"
+#include "hal/HAL.h"
 
-#include <llvm/raw_ostream.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
 
 #include "ErrorsInternal.h"
-#include "HAL/DriverStation.h"
-#include "HAL/Errors.h"
-#include "HAL/Extensions.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
-#include "MockData/RoboRioDataInternal.h"
 #include "MockHooksInternal.h"
+#include "hal/DriverStation.h"
+#include "hal/Errors.h"
+#include "hal/Extensions.h"
+#include "hal/handles/HandlesInternal.h"
+#include "mockdata/RoboRioDataInternal.h"
 
 using namespace hal;
 
 namespace hal {
 namespace init {
 void InitializeHAL() {
-  InitializeHandlesInternal();
   InitializeAccelerometerData();
   InitializeAnalogGyroData();
   InitializeAnalogInData();
   InitializeAnalogOutData();
   InitializeAnalogTriggerData();
   InitializeCanData();
+  InitializeCANAPI();
   InitializeDigitalPWMData();
   InitializeDIOData();
   InitializeDriverStationData();
@@ -61,7 +62,6 @@ void InitializeHAL() {
   InitializeInterrupts();
   InitializeMockHooks();
   InitializeNotifier();
-  InitializeOSSerialPort();
   InitializePDP();
   InitializePorts();
   InitializePower();
@@ -83,9 +83,6 @@ HAL_PortHandle HAL_GetPort(int32_t channel) {
   return createPortHandle(channel, 1);
 }
 
-/**
- * @deprecated Uses module numbers
- */
 HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel) {
   // Dont allow a number that wouldn't fit in a uint8_t
   if (channel < 0 || channel >= 255) return HAL_kInvalidHandle;
@@ -197,51 +194,27 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return VI_ERROR_INV_PARAMETER_MESSAGE;
     case HAL_PWM_SCALE_ERROR:
       return HAL_PWM_SCALE_ERROR_MESSAGE;
+    case HAL_CAN_TIMEOUT:
+      return HAL_CAN_TIMEOUT_MESSAGE;
     default:
       return "Unknown error status";
   }
 }
 
-/**
- * Returns the runtime type of this HAL
- */
 HAL_RuntimeType HAL_GetRuntimeType(void) { return HAL_Mock; }
 
-/**
- * Return the FPGA Version number.
- * For now, expect this to be competition year.
- * @return FPGA Version number.
- */
 int32_t HAL_GetFPGAVersion(int32_t* status) {
   return 2018;  // Automatically script this at some point
 }
 
-/**
- * Return the FPGA Revision number.
- * The format of the revision is 3 numbers.
- * The 12 most significant bits are the Major Revision.
- * the next 8 bits are the Minor Revision.
- * The 12 least significant bits are the Build Number.
- * @return FPGA Revision number.
- */
 int64_t HAL_GetFPGARevision(int32_t* status) {
   return 0;  // TODO: Find a better number to return;
 }
 
-/**
- * Read the microsecond-resolution timer on the FPGA.
- *
- * @return The current time in microseconds according to the FPGA (since FPGA
- * reset).
- */
 uint64_t HAL_GetFPGATime(int32_t* status) { return hal::GetFPGATime(); }
 
-/**
- * Get the state of the "USER" button on the roboRIO
- * @return true if the button is currently pressed down
- */
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
-  return SimRoboRioData[0].GetFPGAButton();
+  return SimRoboRioData[0].fpgaButton;
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
@@ -258,13 +231,15 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   // Initial check, as if it's true initialization has finished
   if (initialized) return true;
 
-  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return true;
 
   hal::init::InitializeHAL();
 
-  llvm::outs().SetUnbuffered();
+  hal::init::HAL_IsInitialized.store(true);
+
+  wpi::outs().SetUnbuffered();
   if (HAL_LoadExtensions() < 0) return false;
   hal::RestartTiming();
   HAL_InitializeDriverStation();

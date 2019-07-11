@@ -5,24 +5,40 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Error.h"
+#include "frc/Error.h"
 
-#include <llvm/Path.h>
+#include <wpi/Path.h>
 
-#include "DriverStation.h"
-#include "Timer.h"
-#include "Utility.h"
+#include "frc/DriverStation.h"
+#include "frc/Timer.h"
+#include "frc/Utility.h"
 
 using namespace frc;
 
-void Error::Clone(const Error& error) {
-  m_code = error.m_code;
-  m_message = error.m_message;
-  m_filename = error.m_filename;
-  m_function = error.m_function;
-  m_lineNumber = error.m_lineNumber;
-  m_originatingObject = error.m_originatingObject;
-  m_timestamp = error.m_timestamp;
+Error::Error(Code code, const wpi::Twine& contextMessage,
+             wpi::StringRef filename, wpi::StringRef function, int lineNumber,
+             const ErrorBase* originatingObject) {
+  Set(code, contextMessage, filename, function, lineNumber, originatingObject);
+}
+
+bool Error::operator<(const Error& rhs) const {
+  if (m_code < rhs.m_code) {
+    return true;
+  } else if (m_message < rhs.m_message) {
+    return true;
+  } else if (m_filename < rhs.m_filename) {
+    return true;
+  } else if (m_function < rhs.m_function) {
+    return true;
+  } else if (m_lineNumber < rhs.m_lineNumber) {
+    return true;
+  } else if (m_originatingObject < rhs.m_originatingObject) {
+    return true;
+  } else if (m_timestamp < rhs.m_timestamp) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 Error::Code Error::GetCode() const { return m_code; }
@@ -41,8 +57,8 @@ const ErrorBase* Error::GetOriginatingObject() const {
 
 double Error::GetTimestamp() const { return m_timestamp; }
 
-void Error::Set(Code code, const llvm::Twine& contextMessage,
-                llvm::StringRef filename, llvm::StringRef function,
+void Error::Set(Code code, const wpi::Twine& contextMessage,
+                wpi::StringRef filename, wpi::StringRef function,
                 int lineNumber, const ErrorBase* originatingObject) {
   bool report = true;
 
@@ -66,8 +82,8 @@ void Error::Set(Code code, const llvm::Twine& contextMessage,
 void Error::Report() {
   DriverStation::ReportError(
       true, m_code, m_message,
-      m_function + llvm::Twine(" [") + llvm::sys::path::filename(m_filename) +
-          llvm::Twine(':') + llvm::Twine(m_lineNumber) + llvm::Twine(']'),
+      m_function + wpi::Twine(" [") + wpi::sys::path::filename(m_filename) +
+          wpi::Twine(':') + wpi::Twine(m_lineNumber) + wpi::Twine(']'),
       GetStackTrace(4));
 }
 

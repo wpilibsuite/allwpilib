@@ -11,9 +11,9 @@
 #include <memory>
 #include <thread>
 
-#include <MockData/DriverStationData.h>
+#include <mockdata/DriverStationData.h>
 #include <networktables/NetworkTableInstance.h>
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 enum HALSimDSNT_Mode { teleop, auton, test };
 

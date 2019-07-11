@@ -11,9 +11,10 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.HLUsageReporting;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -30,7 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  *
  * @see Command
  */
-public class Scheduler extends SendableBase implements Sendable {
+public final class Scheduler extends SendableBase {
   /**
    * The Singleton Instance.
    */
@@ -51,11 +52,12 @@ public class Scheduler extends SendableBase implements Sendable {
   /**
    * A hashtable of active {@link Command Commands} to their {@link LinkedListElement}.
    */
-  private Hashtable<Command, LinkedListElement> m_commandTable = new Hashtable<>();
+  @SuppressWarnings("PMD.LooseCoupling")
+  private final Hashtable<Command, LinkedListElement> m_commandTable = new Hashtable<>();
   /**
    * The {@link Set} of all {@link Subsystem Subsystems}.
    */
-  private Set m_subsystems = new Set();
+  private final Set m_subsystems = new Set();
   /**
    * The first {@link Command} in the list.
    */
@@ -67,15 +69,16 @@ public class Scheduler extends SendableBase implements Sendable {
   /**
    * Whether or not we are currently adding a command.
    */
-  private boolean m_adding = false;
+  private boolean m_adding;
   /**
    * Whether or not we are currently disabled.
    */
-  private boolean m_disabled = false;
+  private boolean m_disabled;
   /**
    * A list of all {@link Command Commands} which need to be added.
    */
-  private Vector<Command> m_additions = new Vector<>();
+  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
+  private final Vector<Command> m_additions = new Vector<>();
   private NetworkTableEntry m_namesEntry;
   private NetworkTableEntry m_idsEntry;
   private NetworkTableEntry m_cancelEntry;
@@ -83,6 +86,7 @@ public class Scheduler extends SendableBase implements Sendable {
    * A list of all {@link edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler Buttons}. It is
    * created lazily.
    */
+  @SuppressWarnings("PMD.LooseCoupling")
   private Vector<ButtonScheduler> m_buttons;
   private boolean m_runningCommandsChanged;
 
@@ -90,7 +94,7 @@ public class Scheduler extends SendableBase implements Sendable {
    * Instantiates a {@link Scheduler}.
    */
   private Scheduler() {
-    HLUsageReporting.reportScheduler();
+    HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
     setName("Scheduler");
   }
 
@@ -116,6 +120,7 @@ public class Scheduler extends SendableBase implements Sendable {
    *
    * @param button the button to add
    */
+  @SuppressWarnings("PMD.UseArrayListInsteadOfVector")
   public void addButton(ButtonScheduler button) {
     if (m_buttons == null) {
       m_buttons = new Vector<>();
@@ -130,7 +135,7 @@ public class Scheduler extends SendableBase implements Sendable {
    *
    * @param command the {@link Command} to add
    */
-  @SuppressWarnings("MethodName")
+  @SuppressWarnings({"MethodName", "PMD.CyclomaticComplexity"})
   private void _add(Command command) {
     if (command == null) {
       return;
@@ -144,7 +149,6 @@ public class Scheduler extends SendableBase implements Sendable {
 
     // Only add if not already in
     if (!m_commandTable.containsKey(command)) {
-
       // Check that the requirements can be had
       Enumeration requirements = command.getRequirements();
       while (requirements.hasMoreElements()) {
@@ -191,8 +195,8 @@ public class Scheduler extends SendableBase implements Sendable {
    * <ol> <li>Poll the Buttons</li> <li>Execute/Remove the Commands</li> <li>Send values to
    * SmartDashboard</li> <li>Add Commands</li> <li>Add Defaults</li> </ol>
    */
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   public void run() {
-
     m_runningCommandsChanged = false;
 
     if (m_disabled) {

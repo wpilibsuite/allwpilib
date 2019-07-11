@@ -99,8 +99,8 @@ public class FakeCounterFixture implements ITestFixture {
   @Override
   public boolean teardown() {
     logger.log(Level.FINE, "Begining teardown");
-    m_counter.free();
-    m_source.free();
+    m_counter.close();
+    m_source.close();
     if (m_allocated) { // Only tear down the dio if this class allocated it
       m_dio.teardown();
       m_allocated = false;

@@ -5,13 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Solenoid.h"
+#include "hal/Solenoid.h"
 
-#include "HAL/Errors.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "HAL/handles/IndexedHandleResource.h"
-#include "MockData/PCMDataInternal.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/Errors.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/IndexedHandleResource.h"
+#include "mockdata/PCMDataInternal.h"
 
 namespace {
 struct Solenoid {
@@ -41,6 +42,7 @@ void InitializeSolenoid() {
 extern "C" {
 HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
                                               int32_t* status) {
+  hal::init::CheckInit();
   int16_t channel = getPortHandleChannel(portHandle);
   int16_t module = getPortHandleModule(portHandle);
   if (channel == InvalidHandleIndex) {

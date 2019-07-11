@@ -1,6 +1,6 @@
 # WPILib Project
 
-[![Build Status](https://travis-ci.org/wpilibsuite/allwpilib.svg?branch=master)](https://travis-ci.org/wpilibsuite/allwpilib)
+[![Build Status](https://dev.azure.com/wpilib/wpilib/_apis/build/status/wpilibsuite.allwpilib)](https://dev.azure.com/wpilib/wpilib/_build/latest?definitionId=1)
 
 Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibC projects. These are the core libraries for creating robot programs for the roboRIO.
 
@@ -15,7 +15,7 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
 
 ## WPILib Mission
 
-The WPILib Mission is to enable FIRST Robotics teams to focus on writing game-specific software rather than focussing on hardware details - "raise the floor, don't lower the ceiling". We work to enable teams with limited programming knowledge and/or mentor experience to be as successful as possible, while not hampering the abilities of teams with more advanced programming capabilities. We support Kit of Parts control system components directly in the library. We also strive to keep parity between major features of each language (Java, C++, and NI's LabVIEW), so that teams aren't at a disadvantage for choosing a specific programming language. WPILib is an open source project, licensed under the BSD 3-clause license. You can find a copy of the license [here](license.txt).
+The WPILib Mission is to enable FIRST Robotics teams to focus on writing game-specific software rather than focusing on hardware details - "raise the floor, don't lower the ceiling". We work to enable teams with limited programming knowledge and/or mentor experience to be as successful as possible, while not hampering the abilities of teams with more advanced programming capabilities. We support Kit of Parts control system components directly in the library. We also strive to keep parity between major features of each language (Java, C++, and NI's LabVIEW), so that teams aren't at a disadvantage for choosing a specific programming language. WPILib is an open source project, licensed under the BSD 3-clause license. You can find a copy of the license [here](LICENSE.txt).
 
 # Building WPILib
 
@@ -24,11 +24,11 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 ## Requirements
 
 - A C++ compiler
-    - On Linux, gcc works fine
-    - On Windows, you need Visual Studio 2015 (the free community edition works fine).
+    - On Linux, GCC works fine
+    - On Windows, you need Visual Studio 2017 (the free community edition works fine).
       Make sure to select the C++ Programming Language for installation
-- [ARM Compiler Toolchain](http://first.wpi.edu/FRC/roborio/toolchains/)
-  * Note that for 2017-2018 and beyond, you will need version 5 or greater of gcc
+- [ARM Compiler Toolchain](https://github.com/wpilibsuite/toolchain-builder/releases)
+  * Note that for 2019 and beyond, you should use version 6 or greater of GCC
 - Doxygen (Only required if you want to build the C++ documentation)
 
 ## Setup
@@ -79,23 +79,18 @@ There are a few tasks other than `build` available. To see them, run the meta-ta
 
 wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
 
+CMake is also supported for building. See [README-CMAKE.md](README-CMAKE.md).
+
 ## Publishing
 
-If you are building to test with the Eclipse plugins or just want to export the build as a Maven-style dependency, simply run the `publish` task. This task will publish all available packages to ~/releases/maven/development. If you need to publish the project to a different repo, you can specify it with `-Prepo=repo_name`. Valid options are:
+If you are building to test with other dependencies or just want to export the build as a Maven-style dependency, simply run the `publish` task. This task will publish all available packages to ~/releases/maven/development. If you need to publish the project to a different repo, you can specify it with `-Prepo=repo_name`. Valid options are:
 
 - development - The default repo.
 - beta - Publishes to ~/releases/maven/beta.
 - stable - Publishes to ~/releases/maven/stable.
 - release - Publishes to ~/releases/maven/release.
 
-The following maven targets a published by this task:
-
-- edu.wpi.first.wpilib.cmake:cpp-root:1.0.0 - roboRIO C++
-- edu.wpi.first.wpilibc.simulation:WPILibCSim:0.1.0 - Simulation C++
-- edu.wpi.first.wpilibj:wpilibJavaFinal:0.1.0-SNAPSHOT - roboRIO Java
-- edu.wpi.first.wpilibj:wpilibJavaSim:0.1.0-SNAPSHOT - Simulation Java
-- edu.wpi.first.wpilibj.simulation:SimDS:0.1.0-SNAPSHOT - The driverstation for controlling simulation.
-- org.gazebosim:JavaGazebo:0.1.0-SNAPSHOT - Gazebo protocol for Java.
+The maven artifacts are described in [MavenArtifacts.md](MavenArtifacts.md)
 
 ## Structure and Organization
 

@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@link Command} library.
@@ -17,21 +17,13 @@ public class DefaultCommandTest extends AbstractCommandTest {
    * Testing of default commands where the interrupting command ends itself.
    */
   @Test
-  public void testDefaultCommandWhereTheInteruptingCommandEndsItself() {
+  void defaultCommandWhereTheInteruptingCommandEndsItselfTest() {
     final ASubsystem subsystem = new ASubsystem();
 
 
-    final MockCommand defaultCommand = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
+    final MockCommand defaultCommand = new MockCommand(subsystem);
 
-    final MockCommand anotherCommand = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
+    final MockCommand anotherCommand = new MockCommand(subsystem);
     assertCommandState(defaultCommand, 0, 0, 0, 0, 0);
     subsystem.init(defaultCommand);
 
@@ -74,21 +66,11 @@ public class DefaultCommandTest extends AbstractCommandTest {
    * Testing of default commands where the interrupting command is canceled.
    */
   @Test
-  public void testDefaultCommandsInterruptingCommandCanceled() {
+  void defaultCommandsInterruptingCommandCanceledTest() {
     final ASubsystem subsystem = new ASubsystem();
+    final MockCommand defaultCommand = new MockCommand(subsystem);
+    final MockCommand anotherCommand = new MockCommand(subsystem);
 
-
-    final MockCommand defaultCommand = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
-
-    final MockCommand anotherCommand = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
     assertCommandState(defaultCommand, 0, 0, 0, 0, 0);
     subsystem.init(defaultCommand);
     subsystem.initDefaultCommand();

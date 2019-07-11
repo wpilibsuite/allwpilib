@@ -7,16 +7,6 @@
 
 package edu.wpi.first.wpilibj.test;
 
-import junit.framework.JUnit4TestAdapter;
-import junit.runner.Version;
-
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
-import org.junit.runner.RunWith;
-import org.junit.runner.notification.Failure;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -27,8 +17,17 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.RunWith;
+import org.junit.runner.notification.Failure;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+
+import junit.framework.JUnit4TestAdapter;
+import junit.runner.Version;
+
 import edu.wpi.first.wpilibj.WpiLibJTestSuite;
-import edu.wpi.first.wpilibj.command.CommandTestSuite;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTestSuite;
 
 /**
@@ -38,7 +37,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTestSuite;
  */
 @RunWith(Suite.class)
 // These are listed on separate lines to prevent merge conflicts
-@SuiteClasses({WpiLibJTestSuite.class, CommandTestSuite.class, SmartDashboardTestSuite.class})
+@SuiteClasses({WpiLibJTestSuite.class, SmartDashboardTestSuite.class})
 public class TestSuite extends AbstractTestSuite {
   static {
     // Sets up the logging output

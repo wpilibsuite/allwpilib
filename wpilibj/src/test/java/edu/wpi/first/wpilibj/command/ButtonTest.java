@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.buttons.InternalButton;
 
@@ -17,12 +17,12 @@ import edu.wpi.first.wpilibj.buttons.InternalButton;
  * Test that covers the {@link edu.wpi.first.wpilibj.buttons.Button} with the {@link Command}
  * library.
  */
-public class ButtonTest extends AbstractCommandTest {
+class ButtonTest extends AbstractCommandTest {
   private InternalButton m_button1;
   private InternalButton m_button2;
 
-  @Before
-  public void setUp() throws Exception {
+  @BeforeEach
+  void setUp() {
     m_button1 = new InternalButton();
     m_button2 = new InternalButton();
   }
@@ -31,7 +31,7 @@ public class ButtonTest extends AbstractCommandTest {
    * Simple Button Test.
    */
   @Test
-  public void test() {
+  void buttonTest() {
     final MockCommand command1 = new MockCommand();
     final MockCommand command2 = new MockCommand();
     final MockCommand command3 = new MockCommand();

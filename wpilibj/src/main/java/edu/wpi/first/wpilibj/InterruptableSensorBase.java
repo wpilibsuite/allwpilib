@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,14 +7,17 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.InterruptJNI;
-import edu.wpi.first.wpilibj.util.AllocationException;
+import java.util.function.Consumer;
+
+import edu.wpi.first.hal.InterruptJNI;
+import edu.wpi.first.hal.util.AllocationException;
 
 
 /**
  * Base for sensors to be used with interrupts.
  */
-public abstract class InterruptableSensorBase extends SensorBase {
+@SuppressWarnings("PMD.TooManyMethods")
+public abstract class InterruptableSensorBase extends SendableBase {
   @SuppressWarnings("JavadocMethod")
   public enum WaitResult {
     kTimeout(0x0), kRisingEdge(0x1), kFallingEdge(0x100), kBoth(0x101);
@@ -24,6 +27,18 @@ public abstract class InterruptableSensorBase extends SensorBase {
 
     WaitResult(int value) {
       this.value = value;
+    }
+
+    public static WaitResult getValue(boolean rising, boolean falling) {
+      if (rising && falling) {
+        return kBoth;
+      } else if (rising) {
+        return kRisingEdge;
+      } else if (falling) {
+        return kFallingEdge;
+      } else {
+        return kTimeout;
+      }
     }
   }
 
@@ -35,7 +50,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
   /**
    * Flags if the interrupt being allocated is synchronous.
    */
-  protected boolean m_isSynchronousInterrupt = false;
+  protected boolean m_isSynchronousInterrupt;
 
   /**
    * Create a new InterrupatableSensorBase.
@@ -44,12 +59,9 @@ public abstract class InterruptableSensorBase extends SensorBase {
     m_interrupt = 0;
   }
 
-  /**
-   * Frees the resources for this output.
-   */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_interrupt != 0) {
       cancelInterrupts();
     }
@@ -68,6 +80,36 @@ public abstract class InterruptableSensorBase extends SensorBase {
    * @return channel routing number
    */
   public abstract int getPortHandleForRouting();
+
+  /**
+   * Request one of the 8 interrupts asynchronously on this digital input.
+   *
+   * @param handler The {@link InterruptHandler} that contains the method {@link
+   *                InterruptHandlerFunction#onInterrupt(boolean, boolean)} that will be called
+   *                whenever there is an interrupt on this device. Request interrupts in synchronous
+   *                mode where the user program interrupt handler will be called when an interrupt
+   *                occurs. The default is interrupt on rising edges only.
+   */
+  public void requestInterrupts(Consumer<WaitResult> handler) {
+    if (m_interrupt != 0) {
+      throw new AllocationException("The interrupt has already been allocated");
+    }
+
+    allocateInterrupts(false);
+
+    assert m_interrupt != 0;
+
+    InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
+        getAnalogTriggerTypeForRouting());
+    setUpSourceEdge(true, false);
+    InterruptJNI.attachInterruptHandler(m_interrupt, (mask, obj) -> {
+      // Rising edge result is the interrupt bit set in the byte 0xFF
+      // Falling edge result is the interrupt bit set in the byte 0xFF00
+      boolean rising = (mask & 0xFF) != 0;
+      boolean falling = (mask & 0xFF00) != 0;
+      handler.accept(WaitResult.getValue(rising, falling));
+    }, null);
+  }
 
   /**
    * Request one of the 8 interrupts asynchronously on this digital input.
@@ -156,16 +198,9 @@ public abstract class InterruptableSensorBase extends SensorBase {
     // Falling edge result is the interrupt bit set in the byte 0xFF00
     // Set any bit set to be true for that edge, and AND the 2 results
     // together to match the existing enum for all interrupts
-    int rising = ((result & 0xFF) != 0) ? 0x1 : 0x0;
-    int falling = ((result & 0xFF00) != 0) ? 0x0100 : 0x0;
-    result = rising | falling;
-
-    for (WaitResult mode : WaitResult.values()) {
-      if (mode.value == result) {
-        return mode;
-      }
-    }
-    return null;
+    boolean rising = (result & 0xFF) != 0;
+    boolean falling = (result & 0xFF00) != 0;
+    return WaitResult.getValue(rising, falling);
   }
 
   /**
@@ -217,7 +252,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     if (m_interrupt == 0) {
       throw new IllegalStateException("The interrupt is not allocated.");
     }
-    return InterruptJNI.readInterruptRisingTimestamp(m_interrupt);
+    return InterruptJNI.readInterruptRisingTimestamp(m_interrupt) * 1e-6;
   }
 
   /**
@@ -231,7 +266,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     if (m_interrupt == 0) {
       throw new IllegalStateException("The interrupt is not allocated.");
     }
-    return InterruptJNI.readInterruptFallingTimestamp(m_interrupt);
+    return InterruptJNI.readInterruptFallingTimestamp(m_interrupt) * 1e-6;
   }
 
   /**

@@ -1,0 +1,15 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Float64
+/// \brief A message for floating point data
+/// \verbatim
+
+option java_outer_classname = "GzFloat64";
+
+message Float64
+{
+  required double data = 1;
+}
+
+/// \endverbatim

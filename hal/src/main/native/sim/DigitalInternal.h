@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,12 +11,12 @@
 
 #include <memory>
 
-#include "HAL/AnalogTrigger.h"
-#include "HAL/Ports.h"
-#include "HAL/Types.h"
-#include "HAL/handles/DigitalHandleResource.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "PortsInternal.h"
+#include "hal/AnalogTrigger.h"
+#include "hal/Ports.h"
+#include "hal/Types.h"
+#include "hal/handles/DigitalHandleResource.h"
+#include "hal/handles/HandlesInternal.h"
 
 namespace hal {
 /**
@@ -44,11 +44,11 @@ constexpr int32_t kExpectedLoopTiming = 40;
  * scaling is implemented as an output squelch to get longer periods for old
  * devices.
  */
-constexpr float kDefaultPwmPeriod = 5.05;
+constexpr float kDefaultPwmPeriod = 5.05f;
 /**
  * kDefaultPwmCenter is the PWM range center in ms
  */
-constexpr float kDefaultPwmCenter = 1.5;
+constexpr float kDefaultPwmCenter = 1.5f;
 /**
  * kDefaultPWMStepsDown is the number of PWM steps below the centerpoint
  */
@@ -70,11 +70,24 @@ extern DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                              kNumDigitalChannels + kNumPWMHeaders>*
     digitalChannelHandles;
 
+/**
+ * Remap the digital source channel and set the module.
+ *
+ * If it's an analog trigger, determine the module from the high order routing
+ * channel else do normal digital input remapping based on channel number
+ * (MXP).
+ */
 bool remapDigitalSource(HAL_Handle digitalSourceHandle,
                         HAL_AnalogTriggerType analogTriggerType,
                         uint8_t& channel, uint8_t& module, bool& analogTrigger);
-int32_t remapMXPPWMChannel(int32_t channel);
+
+/**
+ * Map DIO channel numbers from their physical number (10 to 26) to their
+ * position in the bit field.
+ */
 int32_t remapMXPChannel(int32_t channel);
+
+int32_t remapMXPPWMChannel(int32_t channel);
 
 int32_t GetDigitalInputChannel(HAL_DigitalHandle handle, int32_t* status);
 }  // namespace hal

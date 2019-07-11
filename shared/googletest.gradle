@@ -1,0 +1,7 @@
+model {
+    binaries {
+        withType(GoogleTestTestSuiteBinarySpec).all {
+            nativeUtils.useRequiredLibrary(it, 'googletest_static')
+        }
+    }
+}

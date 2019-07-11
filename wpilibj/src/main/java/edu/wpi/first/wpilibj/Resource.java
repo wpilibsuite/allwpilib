@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.util.AllocationException;
-import edu.wpi.first.wpilibj.util.CheckedAllocationException;
+import edu.wpi.first.hal.util.AllocationException;
+import edu.wpi.first.hal.util.CheckedAllocationException;
 
 /**
  * Track resources in the program. The Resource class is a convenient way of keeping track of
@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  * unload/reload.
  */
 public final class Resource {
-  private static Resource resourceList = null;
+  private static Resource resourceList;
   private final boolean[] m_numAllocated;
   private final int m_size;
   private final Resource m_nextResource;

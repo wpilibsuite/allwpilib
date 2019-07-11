@@ -7,14 +7,14 @@
 
 package edu.wpi.first.wpilibj.test;
 
+import java.io.File;
+
 import org.apache.tools.ant.BuildLogger;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.optional.junit.FormatterElement;
 import org.apache.tools.ant.taskdefs.optional.junit.JUnitTask;
 import org.apache.tools.ant.taskdefs.optional.junit.JUnitTest;
-
-import java.io.File;
 
 /**
  * Provides an entry point for tests to run with ANT. This allows ant to output JUnit XML test

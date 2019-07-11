@@ -7,15 +7,24 @@
 
 #pragma once
 
+#include <atomic>
+
 namespace hal {
 namespace init {
-extern void InitializeHandlesInternal();
+extern std::atomic_bool HAL_IsInitialized;
+extern void RunInitialize();
+static inline void CheckInit() {
+  if (HAL_IsInitialized.load(std::memory_order_relaxed)) return;
+  RunInitialize();
+}
+
 extern void InitializeAccelerometerData();
 extern void InitializeAnalogGyroData();
 extern void InitializeAnalogInData();
 extern void InitializeAnalogOutData();
 extern void InitializeAnalogTriggerData();
 extern void InitializeCanData();
+extern void InitializeCANAPI();
 extern void InitializeDigitalPWMData();
 extern void InitializeDIOData();
 extern void InitializeDriverStationData();
@@ -48,7 +57,6 @@ extern void InitializeI2C();
 extern void InitializeInterrupts();
 extern void InitializeMockHooks();
 extern void InitializeNotifier();
-extern void InitializeOSSerialPort();
 extern void InitializePDP();
 extern void InitializePorts();
 extern void InitializePower();

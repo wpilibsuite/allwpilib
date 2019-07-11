@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.Timer;
 /**
  * Emulates a quadrature encoder.
  */
-public class FakeEncoderSource {
+public class FakeEncoderSource implements AutoCloseable {
   private Thread m_task;
   private int m_count;
   private int m_milliSec;
@@ -32,8 +32,8 @@ public class FakeEncoderSource {
       m_encoder = encode;
     }
 
+    @Override
     public void run() {
-
       final DigitalOutput lead;
       final DigitalOutput lag;
 
@@ -94,11 +94,12 @@ public class FakeEncoderSource {
   /**
    * Frees the resource.
    */
-  public void free() {
+  @Override
+  public void close() {
     m_task = null;
     if (m_allocatedOutputs) {
-      m_outputA.free();
-      m_outputB.free();
+      m_outputA.close();
+      m_outputB.close();
     }
   }
 

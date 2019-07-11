@@ -3,59 +3,102 @@
          xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
-    <rule ref="rulesets/java/basic.xml" />
-    <rule ref="rulesets/java/braces.xml" />
-    <rule ref="rulesets/java/empty.xml" />
-    <rule ref="rulesets/java/empty.xml/EmptyCatchBlock">
-        <properties>
-            <property name="allowCommentedBlocks" value="true"/>
-        </properties>
-    </rule>
-    <rule ref="rulesets/java/imports.xml" />
-    <rule ref="rulesets/java/junit.xml">
-        <exclude name="JUnitTestContainsTooManyAsserts" />
-    </rule>
-    <rule ref="rulesets/java/strings.xml">
-        <exclude name="AvoidDuplicateLiterals" />
-    </rule>
-    <rule ref="rulesets/java/unnecessary.xml" />
-    <rule ref="rulesets/java/unusedcode.xml" />
-    <rule ref="rulesets/java/unusedcode.xml/UnusedFormalParameter">
-        <properties>
-            <property name="checkAll" value="true"/>
-        </properties>
-    </rule>
 
-    <!-- Custom Rules -->
+  <description>PMD Ruleset for WPILib</description>
 
-    <rule name="UseRequireNonNull"
-          message="Use Objects.requireNonNull() instead of throwing a NullPointerException yourself."
-          language="java"
-          class="net.sourceforge.pmd.lang.rule.XPathRule">
-        <description>
-           Use Objects.requireNonNull() instead of throwing a NullPointerException yourself.
-        </description>
-        <properties>
-            <property name="xpath">
-                <value>
-                    <![CDATA[
-                        //IfStatement[child::Expression//NullLiteral]/Statement//ThrowStatement/Expression/PrimaryExpression/PrimaryPrefix/AllocationExpression/ClassOrInterfaceType[@Image='NullPointerException']
-                    ]]>
-                </value>
-            </property>
-        </properties>
-        <priority>3</priority>
-        <example>
-            <![CDATA[
+  <exclude-pattern>.*/*JNI.*</exclude-pattern>
+  <exclude-pattern>.*/*IntegrationTests.*</exclude-pattern>
+
+  <rule ref="category/java/bestpractices.xml">
+    <exclude name="AccessorClassGeneration" />
+    <exclude name="AccessorMethodGeneration" />
+    <exclude name="AvoidPrintStackTrace" />
+    <exclude name="AvoidReassigningParameters" />
+    <exclude name="JUnitAssertionsShouldIncludeMessage" />
+    <exclude name="JUnitTestContainsTooManyAsserts" />
+    <exclude name="JUnit4TestShouldUseAfterAnnotation" />
+    <exclude name="JUnit4TestShouldUseBeforeAnnotation" />
+    <exclude name="JUnit4TestShouldUseTestAnnotation" />
+    <exclude name="ReplaceHashtableWithMap" />
+    <exclude name="ReplaceVectorWithList" />
+    <exclude name="SwitchStmtsShouldHaveDefault" />
+    <exclude name="SystemPrintln" />
+    <exclude name="UseVarargs" />
+  </rule>
+  <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod">
+    <properties>
+      <property name="violationSuppressRegex"
+                value=".*'.*Arguments\(\)'.*" />
+    </properties>
+  </rule>
+
+  <rule ref="category/java/design.xml">
+    <exclude name="DataClass" />
+    <exclude name="LawOfDemeter" />
+    <exclude name="LoosePackageCoupling" />
+    <exclude name="NcssConstructorCount" />
+    <exclude name="NcssCount" />
+    <exclude name="NcssMethodCount" />
+  </rule>
+
+  <rule ref="category/java/errorprone.xml">
+    <exclude name="AssignmentToNonFinalStatic" />
+    <exclude name="AvoidDuplicateLiterals" />
+    <exclude name="AvoidLiteralsInIfCondition" />
+    <exclude name="BeanMembersShouldSerialize" />
+    <exclude name="ConstructorCallsOverridableMethod" />
+    <exclude name="DataflowAnomalyAnalysis" />
+    <exclude name="DoNotCallSystemExit" />
+    <exclude name="FinalizeDoesNotCallSuperFinalize" />
+    <exclude name="JUnitSpelling" />
+    <exclude name="MissingSerialVersionUID" />
+    <exclude name="NullAssignment" />
+  </rule>
+
+  <rule ref="category/java/multithreading.xml">
+    <exclude name="AvoidSynchronizedAtMethodLevel" />
+    <exclude name="AvoidUsingVolatile" />
+    <exclude name="DoNotUseThreads" />
+    <exclude name="UseConcurrentHashMap" />
+  </rule>
+
+  <rule ref="category/java/performance.xml">
+    <exclude name="AvoidUsingShortType" />
+  </rule>
+
+  <rule name="UnnecessaryCastRule"
+        language="java"
+        message="Avoid unnecessary casts"
+        class="net.sourceforge.pmd.lang.java.rule.migrating.UnnecessaryCastRule"
+        externalInfoUrl="https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/migrating/UnnecessaryCastRule.java" />
+
+  <!-- Custom Rules -->
+  <rule name="UseRequireNonNull"
+        message="Use Objects.requireNonNull() instead of throwing a NullPointerException yourself."
+        language="java"
+        class="net.sourceforge.pmd.lang.rule.XPathRule">
+    <description>Use Objects.requireNonNull() instead of throwing a
+    NullPointerException yourself.</description>
+    <properties>
+      <property name="xpath">
+        <value>
+          <![CDATA[
+            //IfStatement[child::Expression//NullLiteral]/Statement//ThrowStatement/Expression/PrimaryExpression/PrimaryPrefix/AllocationExpression/ClassOrInterfaceType[@Image='NullPointerException']
+          ]]>
+        </value>
+      </property>
+    </properties>
+    <priority>3</priority>
+    <example>
+<![CDATA[
                 public class Example {
-	                public Example(Object example) {
-		                if (example == null) {
-			                throw new NullPointerException();
-		                }
-	                }
+                    public Example(Object example) {
+                        if (example == null) {
+                            throw new NullPointerException();
+                        }
+                    }
                 }
             ]]>
-        </example>
-    </rule>
-
+    </example>
+  </rule>
 </ruleset>

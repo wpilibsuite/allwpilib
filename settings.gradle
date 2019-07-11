@@ -1,14 +1,37 @@
-include 'gmock'
-include 'ni-libraries'
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+
+// Set the flag to tell gradle to ignore unresolved headers
+// Libraries like eigen and opencv use macro includes, which
+// Gradle doesn't properly ignore, and completely disables
+// Incremental includes. This flag makes those includes be ignored.
+Properties props = System.getProperties();
+props.setProperty("org.gradle.internal.native.headers.unresolved.dependencies.ignore", "true");
+
+include 'wpiutil'
+include 'ntcore'
 include 'hal'
+include 'cscore'
 include 'wpilibc'
-include 'wpilibcIntegrationTests'
 include 'wpilibcExamples'
-include 'wpilibj'
-include 'wpilibjIntegrationTests'
+include 'wpilibcIntegrationTests'
 include 'wpilibjExamples'
-include 'myRobot'
+include 'wpilibjIntegrationTests'
+include 'wpilibj'
 include 'simulation:halsim_print'
 include 'simulation:halsim_lowfi'
-include 'simulation:adx_gyro_accelerometer'
+include 'simulation:halsim_adx_gyro_accelerometer'
 include 'simulation:halsim_ds_nt'
+include 'simulation:gz_msgs'
+include 'simulation:frc_gazebo_plugins'
+include 'simulation:halsim_gazebo'
+include 'simulation:lowfi_simulation'
+include 'simulation:halsim_ds_socket'
+include 'cameraserver'
+include 'cameraserver:multiCameraServer'
+include 'myRobot'
+include 'docs'

@@ -7,14 +7,14 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Before;
-//import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ConditionalCommandTest extends AbstractCommandTest {
+class ConditionalCommandTest extends AbstractCommandTest {
   MockConditionalCommand m_command;
   MockConditionalCommand m_commandNull;
   MockCommand m_onTrue;
@@ -22,8 +22,8 @@ public class ConditionalCommandTest extends AbstractCommandTest {
   MockSubsystem m_subsys;
   Boolean m_condition;
 
-  @Before
-  public void initCommands() {
+  @BeforeEach
+  void initCommands() {
     m_subsys = new MockSubsystem();
     m_onTrue = new MockCommand(m_subsys);
     m_onFalse = new MockCommand(m_subsys);
@@ -42,7 +42,7 @@ public class ConditionalCommandTest extends AbstractCommandTest {
   }
 
   @Test
-  public void testOnTrue() {
+  void onTrueTest() {
     m_command.setCondition(true);
 
     Scheduler.getInstance().add(m_command);
@@ -75,12 +75,12 @@ public class ConditionalCommandTest extends AbstractCommandTest {
     assertCommandState(m_onFalse, 0, 0, 0, 0, 0);
     assertConditionalCommandState(m_command, 1, 5, 5, 1, 0);
 
-    assertTrue("Did not initialize the true command", m_onTrue.getInitializeCount() > 0);
-    assertTrue("Initialized the false command", m_onFalse.getInitializeCount() == 0);
+    assertTrue(m_onTrue.getInitializeCount() > 0, "Did not initialize the true command");
+    assertSame(m_onFalse.getInitializeCount(), 0, "Initialized the false command");
   }
 
   @Test
-  public void testOnFalse() {
+  void onFalseTest() {
     m_command.setCondition(false);
 
     Scheduler.getInstance().add(m_command);
@@ -113,12 +113,12 @@ public class ConditionalCommandTest extends AbstractCommandTest {
     assertCommandState(m_onTrue, 0, 0, 0, 0, 0);
     assertConditionalCommandState(m_command, 1, 5, 5, 1, 0);
 
-    assertTrue("Did not initialize the false command", m_onFalse.getInitializeCount() > 0);
-    assertTrue("Initialized the true command", m_onTrue.getInitializeCount() == 0);
+    assertTrue(m_onFalse.getInitializeCount() > 0, "Did not initialize the false command");
+    assertSame(m_onTrue.getInitializeCount(), 0, "Initialized the true command");
   }
 
   @Test
-  public void testCancelSubCommand() {
+  void cancelSubCommandTest() {
     m_command.setCondition(true);
 
     Scheduler.getInstance().add(m_command);
@@ -157,7 +157,7 @@ public class ConditionalCommandTest extends AbstractCommandTest {
   }
 
   @Test
-  public void testCancelRequires() {
+  void cancelRequiresTest() {
     m_command.setCondition(true);
 
     Scheduler.getInstance().add(m_command);
@@ -192,7 +192,7 @@ public class ConditionalCommandTest extends AbstractCommandTest {
   }
 
   @Test
-  public void testCancelCondCommand() {
+  void cancelCondCommandTest() {
     m_command.setCondition(true);
 
     Scheduler.getInstance().add(m_command);
@@ -227,7 +227,7 @@ public class ConditionalCommandTest extends AbstractCommandTest {
   }
 
   @Test
-  public void testOnTrueTwice() {
+  void onTrueTwiceTest() {
     m_command.setCondition(true);
 
     Scheduler.getInstance().add(m_command);
@@ -295,7 +295,7 @@ public class ConditionalCommandTest extends AbstractCommandTest {
   }
 
   @Test
-  public void testOnTrueInstant() {
+  void onTrueInstantTest() {
     m_command.setCondition(true);
     m_onTrue.setHasFinished(true);
 
@@ -326,7 +326,7 @@ public class ConditionalCommandTest extends AbstractCommandTest {
   }
 
   @Test
-  public void testOnFalseNull() {
+  void onFalseNullTest() {
     m_commandNull.setCondition(false);
 
     Scheduler.getInstance().add(m_commandNull);

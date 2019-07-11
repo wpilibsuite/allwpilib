@@ -7,11 +7,13 @@
 
 package edu.wpi.first.wpilibj.drive;
 
+import java.util.StringJoiner;
+
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-// import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
-// import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-// import edu.wpi.first.wpilibj.hal.HAL;
 
 /**
  * A class for driving Killough drive platforms.
@@ -42,7 +44,7 @@ public class KilloughDrive extends RobotDriveBase {
   public static final double kDefaultRightMotorAngle = 120.0;
   public static final double kDefaultBackMotorAngle = 270.0;
 
-  private static int instances = 0;
+  private static int instances;
 
   private SpeedController m_leftMotor;
   private SpeedController m_rightMotor;
@@ -52,7 +54,7 @@ public class KilloughDrive extends RobotDriveBase {
   private Vector2d m_rightVec;
   private Vector2d m_backVec;
 
-  private boolean m_reported = false;
+  private boolean m_reported;
 
   /**
    * Construct a Killough drive with the given motors and default motor angles.
@@ -87,6 +89,7 @@ public class KilloughDrive extends RobotDriveBase {
   public KilloughDrive(SpeedController leftMotor, SpeedController rightMotor,
                        SpeedController backMotor, double leftMotorAngle, double rightMotorAngle,
                        double backMotorAngle) {
+    verify(leftMotor, rightMotor, backMotor);
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
     m_backMotor = backMotor;
@@ -101,6 +104,33 @@ public class KilloughDrive extends RobotDriveBase {
     addChild(m_backMotor);
     instances++;
     setName("KilloughDrive", instances);
+  }
+
+  /**
+   * Verifies that all motors are nonnull, throwing a NullPointerException if any of them are.
+   * The exception's error message will specify all null motors, e.g. {@code
+   * NullPointerException("leftMotor, rightMotor")}, to give as much information as possible to
+   * the programmer.
+   *
+   * @throws NullPointerException if any of the given motors are null
+   */
+  @SuppressWarnings("PMD.AvoidThrowingNullPointerException")
+  private void verify(SpeedController leftMotor, SpeedController rightMotor,
+                      SpeedController backMotor) {
+    if (leftMotor != null && rightMotor != null && backMotor != null) {
+      return;
+    }
+    StringJoiner joiner = new StringJoiner(", ");
+    if (leftMotor == null) {
+      joiner.add("leftMotor");
+    }
+    if (rightMotor == null) {
+      joiner.add("rightMotor");
+    }
+    if (backMotor == null) {
+      joiner.add("backMotor");
+    }
+    throw new NullPointerException(joiner.toString());
   }
 
   /**
@@ -136,8 +166,8 @@ public class KilloughDrive extends RobotDriveBase {
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation,
                              double gyroAngle) {
     if (!m_reported) {
-      // HAL.report(tResourceType.kResourceType_RobotDrive, 3,
-      //            tInstances.kRobotDrive_KilloughCartesian);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 3,
+                 tInstances.kRobotDrive2_KilloughCartesian);
       m_reported = true;
     }
 
@@ -162,7 +192,7 @@ public class KilloughDrive extends RobotDriveBase {
     m_rightMotor.set(wheelSpeeds[MotorType.kRight.value] * m_maxOutput);
     m_backMotor.set(wheelSpeeds[MotorType.kBack.value] * m_maxOutput);
 
-    m_safetyHelper.feed();
+    feed();
   }
 
   /**
@@ -179,8 +209,8 @@ public class KilloughDrive extends RobotDriveBase {
   @SuppressWarnings("ParameterName")
   public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
-      // HAL.report(tResourceType.kResourceType_RobotDrive, 3,
-      //            tInstances.kRobotDrive_KilloughPolar);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 3,
+                 tInstances.kRobotDrive2_KilloughPolar);
       m_reported = true;
     }
 
@@ -193,7 +223,7 @@ public class KilloughDrive extends RobotDriveBase {
     m_leftMotor.stopMotor();
     m_rightMotor.stopMotor();
     m_backMotor.stopMotor();
-    m_safetyHelper.feed();
+    feed();
   }
 
   @Override
@@ -204,6 +234,8 @@ public class KilloughDrive extends RobotDriveBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("KilloughDrive");
+    builder.setActuator(true);
+    builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Left Motor Speed", m_leftMotor::get, m_leftMotor::set);
     builder.addDoubleProperty("Right Motor Speed", m_rightMotor::get, m_rightMotor::set);
     builder.addDoubleProperty("Back Motor Speed", m_backMotor::get, m_backMotor::set);

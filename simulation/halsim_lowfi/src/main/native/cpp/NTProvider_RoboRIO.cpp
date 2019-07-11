@@ -7,8 +7,8 @@
 
 #include "NTProvider_RoboRIO.h"
 
-#include <HAL/Ports.h>
-#include <MockData/RoboRioData.h>
+#include <hal/Ports.h>
+#include <mockdata/RoboRioData.h>
 
 void HALSimNTProviderRoboRIO::Initialize() {
   InitializeDefault(1, HALSIM_RegisterRoboRioAllCallbacks);

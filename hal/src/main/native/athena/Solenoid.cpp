@@ -5,18 +5,19 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Solenoid.h"
+#include "hal/Solenoid.h"
 
 #include <FRC_NetworkCommunication/LoadOut.h>
 
-#include "HAL/ChipObject.h"
-#include "HAL/Errors.h"
-#include "HAL/Ports.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "HAL/handles/IndexedHandleResource.h"
+#include "HALInitializer.h"
 #include "PCMInternal.h"
 #include "PortsInternal.h"
 #include "ctre/PCM.h"
+#include "hal/ChipObject.h"
+#include "hal/Errors.h"
+#include "hal/Ports.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/IndexedHandleResource.h"
 
 namespace {
 
@@ -49,6 +50,7 @@ extern "C" {
 
 HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
                                               int32_t* status) {
+  hal::init::CheckInit();
   int16_t channel = getPortHandleChannel(portHandle);
   int16_t module = getPortHandleModule(portHandle);
   if (channel == InvalidHandleIndex) {

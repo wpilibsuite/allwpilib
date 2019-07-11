@@ -7,10 +7,13 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -28,7 +31,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @param <V> The type of the values to be stored
  */
-public class SendableChooser<V> extends SendableBase implements Sendable {
+public class SendableChooser<V> extends SendableBase {
   /**
    * The key for the default value.
    */
@@ -38,19 +41,32 @@ public class SendableChooser<V> extends SendableBase implements Sendable {
    */
   private static final String SELECTED = "selected";
   /**
+   * The key for the active option.
+   */
+  private static final String ACTIVE = "active";
+  /**
    * The key for the option array.
    */
   private static final String OPTIONS = "options";
   /**
+   * The key for the instance number.
+   */
+  private static final String INSTANCE = ".instance";
+  /**
    * A map linking strings to the objects the represent.
    */
+  @SuppressWarnings("PMD.LooseCoupling")
   private final LinkedHashMap<String, V> m_map = new LinkedHashMap<>();
   private String m_defaultChoice = "";
+  private final int m_instance;
+  private static final AtomicInteger s_instances = new AtomicInteger();
 
   /**
    * Instantiates a {@link SendableChooser}.
    */
   public SendableChooser() {
+    super(false);
+    m_instance = s_instances.getAndIncrement();
   }
 
   /**
@@ -60,23 +76,49 @@ public class SendableChooser<V> extends SendableBase implements Sendable {
    * @param name   the name of the option
    * @param object the option
    */
-  public void addObject(String name, V object) {
+  public void addOption(String name, V object) {
     m_map.put(name, object);
   }
 
   /**
-   * Add the given object to the list of options and marks it as the default. Functionally, this is
-   * very close to {@link #addObject(String, Object)} except that it will use this as the default
+   * Adds the given object to the list of options.
+   *
+   * @deprecated Use {@link #addOption(String, Object)} instead.
+   *
+   * @param name   the name of the option
+   * @param object the option
+   */
+  @Deprecated
+  public void addObject(String name, V object) {
+    addOption(name, object);
+  }
+
+  /**
+   * Adds the given object to the list of options and marks it as the default. Functionally, this is
+   * very close to {@link #addOption(String, Object)} except that it will use this as the default
    * option if none other is explicitly selected.
    *
    * @param name   the name of the option
    * @param object the option
    */
-  public void addDefault(String name, V object) {
+  public void setDefaultOption(String name, V object) {
     requireNonNull(name, "Provided name was null");
 
     m_defaultChoice = name;
-    addObject(name, object);
+    addOption(name, object);
+  }
+
+  /**
+   * Adds the given object to the list of options and marks it as the default.
+   *
+   * @deprecated Use {@link #setDefaultOption(String, Object)} instead.
+   *
+   * @param name   the name of the option
+   * @param object the option
+   */
+  @Deprecated
+  public void addDefault(String name, V object) {
+    setDefaultOption(name, object);
   }
 
   /**
@@ -86,24 +128,60 @@ public class SendableChooser<V> extends SendableBase implements Sendable {
    * @return the option selected
    */
   public V getSelected() {
-    String selected = m_defaultChoice;
-    if (m_tableSelected != null) {
-      selected = m_tableSelected.getString(m_defaultChoice);
+    m_mutex.lock();
+    try {
+      if (m_selected != null) {
+        return m_map.get(m_selected);
+      } else {
+        return m_map.get(m_defaultChoice);
+      }
+    } finally {
+      m_mutex.unlock();
     }
-    return m_map.get(selected);
   }
 
-  private NetworkTableEntry m_tableSelected;
+  private String m_selected;
+  private final List<NetworkTableEntry> m_activeEntries = new ArrayList<>();
+  private final ReentrantLock m_mutex = new ReentrantLock();
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("String Chooser");
+    builder.getEntry(INSTANCE).setDouble(m_instance);
     builder.addStringProperty(DEFAULT, () -> {
       return m_defaultChoice;
     }, null);
     builder.addStringArrayProperty(OPTIONS, () -> {
       return m_map.keySet().toArray(new String[0]);
     }, null);
-    m_tableSelected = builder.getEntry(SELECTED);
+    builder.addStringProperty(ACTIVE, () -> {
+      m_mutex.lock();
+      try {
+        if (m_selected != null) {
+          return m_selected;
+        } else {
+          return m_defaultChoice;
+        }
+      } finally {
+        m_mutex.unlock();
+      }
+    }, null);
+    m_mutex.lock();
+    try {
+      m_activeEntries.add(builder.getEntry(ACTIVE));
+    } finally {
+      m_mutex.unlock();
+    }
+    builder.addStringProperty(SELECTED, null, val -> {
+      m_mutex.lock();
+      try {
+        m_selected = val;
+        for (NetworkTableEntry entry : m_activeEntries) {
+          entry.setString(val);
+        }
+      } finally {
+        m_mutex.unlock();
+      }
+    });
   }
 }

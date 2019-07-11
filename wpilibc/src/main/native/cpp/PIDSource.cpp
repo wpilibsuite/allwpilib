@@ -5,15 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PIDSource.h"
+#include "frc/PIDSource.h"
 
 using namespace frc;
 
-/**
- * Set which parameter you are using as a process control variable.
- *
- * @param pidSource An enum to select the parameter.
- */
 void PIDSource::SetPIDSourceType(PIDSourceType pidSource) {
   m_pidSource = pidSource;
 }

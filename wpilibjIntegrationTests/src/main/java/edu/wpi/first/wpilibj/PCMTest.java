@@ -7,12 +7,12 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.logging.Logger;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
@@ -63,13 +63,13 @@ public class PCMTest extends AbstractComsSetup {
 
   @AfterClass
   public static void tearDownAfterClass() throws Exception {
-    compressor.free();
+    compressor.close();
 
-    fakePressureSwitch.free();
-    fakeCompressor.free();
+    fakePressureSwitch.close();
+    fakeCompressor.close();
 
-    fakeSolenoid1.free();
-    fakeSolenoid2.free();
+    fakeSolenoid1.close();
+    fakeSolenoid2.close();
   }
 
   @Before
@@ -145,8 +145,8 @@ public class PCMTest extends AbstractComsSetup {
     assertTrue("Solenoid #1 did not report on", solenoid1.get());
     assertTrue("Solenoid #2 did not report on", solenoid2.get());
 
-    solenoid1.free();
-    solenoid2.free();
+    solenoid1.close();
+    solenoid2.close();
   }
 
   /**
@@ -177,7 +177,7 @@ public class PCMTest extends AbstractComsSetup {
     assertTrue("DoubleSolenoid did not report Reverse", solenoid.get() == DoubleSolenoid.Value
         .kReverse);
 
-    solenoid.free();
+    solenoid.close();
   }
 
   /**
@@ -265,10 +265,11 @@ public class PCMTest extends AbstractComsSetup {
     assertFalse("Solenoid #1 did not report off", solenoid1.get());
     assertFalse("Solenoid #2 did not report off", solenoid2.get());
 
-    solenoid1.free();
-    solenoid2.free();
+    solenoid1.close();
+    solenoid2.close();
   }
 
+  @Override
   protected Logger getClassLogger() {
     return logger;
   }

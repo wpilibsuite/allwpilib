@@ -14,10 +14,10 @@ public class CircularBuffer {
   private double[] m_data;
 
   // Index of element at front of buffer
-  private int m_front = 0;
+  private int m_front;
 
   // Number of elements used in buffer
-  private int m_length = 0;
+  private int m_length;
 
   /**
    * Create a CircularBuffer with the provided size.

@@ -7,16 +7,16 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.logging.Logger;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;

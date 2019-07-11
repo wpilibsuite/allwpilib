@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.AnalogJNI;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.AnalogJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 import static java.util.Objects.requireNonNull;
@@ -44,7 +44,7 @@ public class AnalogTriggerOutput extends DigitalSource {
   /**
    * Exceptions dealing with improper operation of the Analog trigger output.
    */
-  public class AnalogTriggerOutputException extends RuntimeException {
+  public static class AnalogTriggerOutputException extends RuntimeException {
     /**
      * Create a new exception with the given message.
      *

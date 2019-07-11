@@ -7,12 +7,12 @@
 
 package edu.wpi.first.wpilibj;
 
-import org.junit.After;
-import org.junit.Test;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.junit.After;
+import org.junit.Test;
 
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 

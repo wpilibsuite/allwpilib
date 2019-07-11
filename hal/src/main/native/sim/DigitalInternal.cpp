@@ -8,10 +8,10 @@
 #include "DigitalInternal.h"
 
 #include "ConstantsInternal.h"
-#include "HAL/AnalogTrigger.h"
-#include "HAL/HAL.h"
-#include "HAL/Ports.h"
 #include "PortsInternal.h"
+#include "hal/AnalogTrigger.h"
+#include "hal/HAL.h"
+#include "hal/Ports.h"
 
 namespace hal {
 
@@ -28,26 +28,6 @@ void InitializeDigitalInternal() {
 }
 }  // namespace init
 
-/**
- * Map DIO channel numbers from their physical number (10 to 26) to their
- * position in the bit field.
- */
-int32_t remapMXPChannel(int32_t channel) { return channel - 10; }
-
-int32_t remapMXPPWMChannel(int32_t channel) {
-  if (channel < 14) {
-    return channel - 10;  // first block of 4 pwms (MXP 0-3)
-  } else {
-    return channel - 6;  // block of PWMs after SPI
-  }
-}
-
-/**
- * remap the digital source channel and set the module.
- * If it's an analog trigger, determine the module from the high order routing
- * channel else do normal digital input remapping based on channel number
- * (MXP)
- */
 bool remapDigitalSource(HAL_Handle digitalSourceHandle,
                         HAL_AnalogTriggerType analogTriggerType,
                         uint8_t& channel, uint8_t& module,
@@ -72,6 +52,16 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
     return true;
   } else {
     return false;
+  }
+}
+
+int32_t remapMXPChannel(int32_t channel) { return channel - 10; }
+
+int32_t remapMXPPWMChannel(int32_t channel) {
+  if (channel < 14) {
+    return channel - 10;  // first block of 4 pwms (MXP 0-3)
+  } else {
+    return channel - 6;  // block of PWMs after SPI
   }
 }
 

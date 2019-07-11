@@ -7,17 +7,17 @@
 
 package edu.wpi.first.wpilibj.test;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.Request;
-import org.junit.runners.Suite.SuiteClasses;
-
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.Request;
+import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * Allows tests suites and tests to be run selectively from the command line using a regex text

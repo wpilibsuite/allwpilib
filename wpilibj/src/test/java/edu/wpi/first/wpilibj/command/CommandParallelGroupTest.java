@@ -7,17 +7,17 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Ported from the old CrioTest Classes.
  */
-public class CommandParallelGroupTest extends AbstractCommandTest {
+class CommandParallelGroupTest extends AbstractCommandTest {
   /**
    * Simple Parallel Command Group With 2 commands one command terminates first.
    */
   @Test
-  public void testParallelCommandGroupWithTwoCommands() {
+  void parallelCommandGroupWithTwoCommandsTest() {
     final MockCommand command1 = new MockCommand();
     final MockCommand command2 = new MockCommand();
 

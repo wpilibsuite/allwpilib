@@ -7,21 +7,21 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.DIOJNI;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.DIOJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Class to write digital outputs. This class will write digital outputs. Other devices that are
  * implemented elsewhere will automatically allocate digital inputs and outputs as required.
  */
-public class DigitalOutput extends SendableBase implements Sendable {
+public class DigitalOutput extends SendableBase {
   private static final int invalidPwmGenerator = 0;
   private int m_pwmGenerator = invalidPwmGenerator;
 
-  private int m_channel = 0;
-  private int m_handle = 0;
+  private final int m_channel;
+  private int m_handle;
 
   /**
    * Create an instance of a digital output. Create an instance of a digital output given a
@@ -31,22 +31,19 @@ public class DigitalOutput extends SendableBase implements Sendable {
    *                the MXP
    */
   public DigitalOutput(int channel) {
-    SensorBase.checkDigitalChannel(channel);
+    SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
 
-    m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte) channel), false);
+    m_handle = DIOJNI.initializeDIOPort(HAL.getPort((byte) channel), false);
 
     HAL.report(tResourceType.kResourceType_DigitalOutput, channel);
     setName("DigitalOutput", channel);
   }
 
-  /**
-   * Free the resources associated with a digital output.
-   */
   @Override
-  public void free() {
-    super.free();
-    // disable the pwm only if we have allocated it
+  public void close() {
+    super.close();
+    // Disable the pwm only if we have allocated it
     if (m_pwmGenerator != invalidPwmGenerator) {
       disablePWM();
     }
@@ -143,7 +140,7 @@ public class DigitalOutput extends SendableBase implements Sendable {
       return;
     }
     // Disable the output by routing to a dead bit.
-    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, SensorBase.kDigitalChannels);
+    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, SensorUtil.kDigitalChannels);
     DIOJNI.freeDigitalPWM(m_pwmGenerator);
     m_pwmGenerator = invalidPwmGenerator;
   }

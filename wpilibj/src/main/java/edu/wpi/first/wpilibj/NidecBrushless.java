@@ -7,20 +7,22 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Nidec Brushless Motor.
  */
-public class NidecBrushless extends SendableBase implements SpeedController, MotorSafety, Sendable {
-  private final MotorSafetyHelper m_safetyHelper;
-  private boolean m_isInverted = false;
-  private DigitalOutput m_dio;
-  private PWM m_pwm;
-  private volatile double m_speed = 0.0;
-  private volatile boolean m_disabled = false;
+public class NidecBrushless extends MotorSafety implements SpeedController, Sendable,
+    AutoCloseable {
+  private boolean m_isInverted;
+  private final DigitalOutput m_dio;
+  private final PWM m_pwm;
+  private volatile double m_speed;
+  private volatile boolean m_disabled;
+
+  private final SendableImpl m_sendableImpl;
 
   /**
    * Constructor.
@@ -31,9 +33,9 @@ public class NidecBrushless extends SendableBase implements SpeedController, Mot
    *                   0-9 are on-board, 10-25 are on the MXP port
    */
   public NidecBrushless(final int pwmChannel, final int dioChannel) {
-    m_safetyHelper = new MotorSafetyHelper(this);
-    m_safetyHelper.setExpiration(0.0);
-    m_safetyHelper.setSafetyEnabled(false);
+    m_sendableImpl = new SendableImpl(true);
+
+    setSafetyEnabled(false);
 
     // the dio controls the output (in PWM mode)
     m_dio = new DigitalOutput(dioChannel);
@@ -49,14 +51,61 @@ public class NidecBrushless extends SendableBase implements SpeedController, Mot
     setName("Nidec Brushless", pwmChannel);
   }
 
-  /**
-   * Free the resources used by this object.
-   */
   @Override
-  public void free() {
-    super.free();
-    m_dio.free();
-    m_pwm.free();
+  public void close() {
+    m_sendableImpl.close();
+    m_dio.close();
+    m_pwm.close();
+  }
+
+  @Override
+  public final synchronized String getName() {
+    return m_sendableImpl.getName();
+  }
+
+  @Override
+  public final synchronized void setName(String name) {
+    m_sendableImpl.setName(name);
+  }
+
+  /**
+   * Sets the name of the sensor with a channel number.
+   *
+   * @param moduleType A string that defines the module name in the label for the value
+   * @param channel    The channel number the device is plugged into
+   */
+  protected final void setName(String moduleType, int channel) {
+    m_sendableImpl.setName(moduleType, channel);
+  }
+
+  /**
+   * Sets the name of the sensor with a module and channel number.
+   *
+   * @param moduleType   A string that defines the module name in the label for the value
+   * @param moduleNumber The number of the particular module type
+   * @param channel      The channel number the device is plugged into (usually PWM)
+   */
+  protected final void setName(String moduleType, int moduleNumber, int channel) {
+    m_sendableImpl.setName(moduleType, moduleNumber, channel);
+  }
+
+  @Override
+  public final synchronized String getSubsystem() {
+    return m_sendableImpl.getSubsystem();
+  }
+
+  @Override
+  public final synchronized void setSubsystem(String subsystem) {
+    m_sendableImpl.setSubsystem(subsystem);
+  }
+
+  /**
+   * Add a child component.
+   *
+   * @param child child component
+   */
+  protected final void addChild(Object child) {
+    m_sendableImpl.addChild(child);
   }
 
   /**
@@ -74,7 +123,8 @@ public class NidecBrushless extends SendableBase implements SpeedController, Mot
       m_dio.updateDutyCycle(0.5 + 0.5 * (m_isInverted ? -speed : speed));
       m_pwm.setRaw(0xffff);
     }
-    m_safetyHelper.feed();
+
+    feed();
   }
 
   /**
@@ -108,59 +158,13 @@ public class NidecBrushless extends SendableBase implements SpeedController, Mot
   }
 
   /**
-   * Set the safety expiration time.
-   *
-   * @param timeout The timeout (in seconds) for this motor object
-   */
-  @Override
-  public void setExpiration(double timeout) {
-    m_safetyHelper.setExpiration(timeout);
-  }
-
-  /**
-   * Return the safety expiration time.
-   *
-   * @return The expiration time value.
-   */
-  @Override
-  public double getExpiration() {
-    return m_safetyHelper.getExpiration();
-  }
-
-  /**
-   * Check if the motor is currently alive or stopped due to a timeout.
-   *
-   * @return a bool value that is true if the motor has NOT timed out and should still be running.
-   */
-  @Override
-  public boolean isAlive() {
-    return m_safetyHelper.isAlive();
-  }
-
-  /**
-   * Stop the motor. This is called by the MotorSafetyHelper object
-   * when it has a timeout for this PWM and needs to stop it from running.
-   * Calling set() will re-enable the motor.
+   * Stop the motor. This is called by the MotorSafety object when it has a timeout for this PWM and
+   * needs to stop it from running. Calling set() will re-enable the motor.
    */
   @Override
   public void stopMotor() {
     m_dio.updateDutyCycle(0.5);
     m_pwm.setDisabled();
-  }
-
-  /**
-   * Check if motor safety is enabled.
-   *
-   * @return True if motor safety is enforced for this object
-   */
-  @Override
-  public boolean isSafetyEnabled() {
-    return m_safetyHelper.isSafetyEnabled();
-  }
-
-  @Override
-  public void setSafetyEnabled(boolean enabled) {
-    m_safetyHelper.setSafetyEnabled(enabled);
   }
 
   @Override
@@ -199,6 +203,7 @@ public class NidecBrushless extends SendableBase implements SpeedController, Mot
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Nidec Brushless");
+    builder.setActuator(true);
     builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Value", this::get, this::set);
   }

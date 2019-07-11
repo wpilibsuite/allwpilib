@@ -8,10 +8,11 @@
 package edu.wpi.first.wpilibj;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.SerialPortJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SerialPortJNI;
 
 /**
  * Driver for the RS-232 serial port on the roboRIO.
@@ -24,14 +25,15 @@ import edu.wpi.first.wpilibj.hal.SerialPortJNI;
  * .com/pdf/manuals/370423a.pdf and the NI-VISA Programmer's Reference Manual here:
  * http://www.ni.com/pdf/manuals/370132c.pdf
  */
-public class SerialPort {
+@SuppressWarnings("PMD.TooManyMethods")
+public class SerialPort implements AutoCloseable {
   private byte m_port;
 
   public enum Port {
     kOnboard(0), kMXP(1), kUSB(2), kUSB1(2), kUSB2(3);
 
     @SuppressWarnings("MemberName")
-    public int value;
+    public final int value;
 
     Port(int value) {
       this.value = value;
@@ -99,6 +101,42 @@ public class SerialPort {
    *
    * @param baudRate The baud rate to configure the serial port.
    * @param port     The Serial port to use
+   * @param portName The direct portName to use
+   * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
+   * @param parity   Select the type of parity checking to use.
+   * @param stopBits The number of stop bits to use as defined by the enum StopBits.
+   * @deprecated     Will be removed for 2019
+   */
+  @Deprecated
+  public SerialPort(final int baudRate, String portName, Port port, final int dataBits,
+                    Parity parity, StopBits stopBits) {
+    m_port = (byte) port.value;
+
+    SerialPortJNI.serialInitializePortDirect(m_port, portName);
+    SerialPortJNI.serialSetBaudRate(m_port, baudRate);
+    SerialPortJNI.serialSetDataBits(m_port, (byte) dataBits);
+    SerialPortJNI.serialSetParity(m_port, (byte) parity.value);
+    SerialPortJNI.serialSetStopBits(m_port, (byte) stopBits.value);
+
+    // Set the default read buffer size to 1 to return bytes immediately
+    setReadBufferSize(1);
+
+    // Set the default timeout to 5 seconds.
+    setTimeout(5.0);
+
+    // Don't wait until the buffer is full to transmit.
+    setWriteBufferMode(WriteBufferMode.kFlushOnAccess);
+
+    disableTermination();
+
+    HAL.report(tResourceType.kResourceType_SerialPort, 0);
+  }
+
+  /**
+   * Create an instance of a Serial Port class.
+   *
+   * @param baudRate The baud rate to configure the serial port.
+   * @param port     The Serial port to use
    * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
    * @param parity   Select the type of parity checking to use.
    * @param stopBits The number of stop bits to use as defined by the enum StopBits.
@@ -158,10 +196,8 @@ public class SerialPort {
     this(baudRate, port, 8, Parity.kNone, StopBits.kOne);
   }
 
-  /**
-   * Destructor.
-   */
-  public void free() {
+  @Override
+  public void close() {
     SerialPortJNI.serialClose(m_port);
   }
 
@@ -281,7 +317,7 @@ public class SerialPort {
    * @return The number of bytes actually written into the port.
    */
   public int writeString(String data) {
-    return write(data.getBytes(), data.length());
+    return write(data.getBytes(StandardCharsets.UTF_8), data.length());
   }
 
   /**

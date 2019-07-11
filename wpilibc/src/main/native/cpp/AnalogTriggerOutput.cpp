@@ -5,32 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "AnalogTriggerOutput.h"
+#include "frc/AnalogTriggerOutput.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "AnalogTrigger.h"
-#include "WPIErrors.h"
+#include "frc/AnalogTrigger.h"
+#include "frc/WPIErrors.h"
 
 using namespace frc;
-
-/**
- * Create an object that represents one of the four outputs from an analog
- * trigger.
- *
- * Because this class derives from DigitalSource, it can be passed into routing
- * functions for Counter, Encoder, etc.
- *
- * @param trigger    A pointer to the trigger for which this is an output.
- * @param outputType An enum that specifies the output on the trigger to
- *                   represent.
- */
-AnalogTriggerOutput::AnalogTriggerOutput(const AnalogTrigger& trigger,
-                                         AnalogTriggerType outputType)
-    : m_trigger(trigger), m_outputType(outputType) {
-  HAL_Report(HALUsageReporting::kResourceType_AnalogTriggerOutput,
-             trigger.GetIndex(), static_cast<uint8_t>(outputType));
-}
 
 AnalogTriggerOutput::~AnalogTriggerOutput() {
   if (m_interrupt != HAL_kInvalidHandle) {
@@ -41,11 +23,6 @@ AnalogTriggerOutput::~AnalogTriggerOutput() {
   }
 }
 
-/**
- * Get the state of the analog trigger output.
- *
- * @return The state of the analog trigger output.
- */
 bool AnalogTriggerOutput::Get() const {
   int32_t status = 0;
   bool result = HAL_GetAnalogTriggerOutput(
@@ -55,28 +32,23 @@ bool AnalogTriggerOutput::Get() const {
   return result;
 }
 
-/**
- * @return The HAL Handle to the specified source.
- */
 HAL_Handle AnalogTriggerOutput::GetPortHandleForRouting() const {
   return m_trigger.m_trigger;
 }
 
-/**
- * Is source an AnalogTrigger
- */
-bool AnalogTriggerOutput::IsAnalogTrigger() const { return true; }
-
-/**
- * @return The type of analog trigger output to be used.
- */
 AnalogTriggerType AnalogTriggerOutput::GetAnalogTriggerTypeForRouting() const {
   return m_outputType;
 }
 
-/**
- * @return The channel of the source.
- */
+bool AnalogTriggerOutput::IsAnalogTrigger() const { return true; }
+
 int AnalogTriggerOutput::GetChannel() const { return m_trigger.m_index; }
 
 void AnalogTriggerOutput::InitSendable(SendableBuilder&) {}
+
+AnalogTriggerOutput::AnalogTriggerOutput(const AnalogTrigger& trigger,
+                                         AnalogTriggerType outputType)
+    : m_trigger(trigger), m_outputType(outputType) {
+  HAL_Report(HALUsageReporting::kResourceType_AnalogTriggerOutput,
+             trigger.GetIndex(), static_cast<uint8_t>(outputType));
+}

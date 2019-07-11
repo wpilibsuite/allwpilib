@@ -7,26 +7,20 @@
 
 package edu.wpi.first.wpilibj;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CircularBufferTest {
-  private double[] m_values = {751.848, 766.366, 342.657, 234.252, 716.126,
+class CircularBufferTest {
+  private final double[] m_values = {751.848, 766.366, 342.657, 234.252, 716.126,
       132.344, 445.697, 22.727, 421.125, 799.913};
-  private double[] m_addFirstOut = {799.913, 421.125, 22.727, 445.697, 132.344,
+  private final double[] m_addFirstOut = {799.913, 421.125, 22.727, 445.697, 132.344,
       716.126, 234.252, 342.657};
-  private double[] m_addLastOut = {342.657, 234.252, 716.126, 132.344, 445.697,
+  private final double[] m_addLastOut = {342.657, 234.252, 716.126, 132.344, 445.697,
       22.727, 421.125, 799.913};
 
-  @BeforeClass
-  public static void before() {
-    UnitTestUtility.setupMockBase();
-  }
-
   @Test
-  public void addFirstTest() {
+  void addFirstTest() {
     CircularBuffer queue = new CircularBuffer(8);
 
     for (double value : m_values) {
@@ -39,7 +33,7 @@ public class CircularBufferTest {
   }
 
   @Test
-  public void addLastTest() {
+  void addLastTest() {
     CircularBuffer queue = new CircularBuffer(8);
 
     for (double value : m_values) {
@@ -52,7 +46,7 @@ public class CircularBufferTest {
   }
 
   @Test
-  public void pushPopTest() {
+  void pushPopTest() {
     CircularBuffer queue = new CircularBuffer(3);
 
     // Insert three elements into the buffer
@@ -96,7 +90,7 @@ public class CircularBufferTest {
   }
 
   @Test
-  public void resetTest() {
+  void resetTest() {
     CircularBuffer queue = new CircularBuffer(5);
 
     for (int i = 0; i < 6; i++) {
@@ -111,7 +105,8 @@ public class CircularBufferTest {
   }
 
   @Test
-  public void resizeTest() {
+  @SuppressWarnings("PMD.ExcessiveMethodLength")
+  void resizeTest() {
     CircularBuffer queue = new CircularBuffer(5);
 
     /* Buffer contains {1, 2, 3, _, _}

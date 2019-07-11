@@ -1,222 +1,187 @@
-apply plugin: 'cpp'
-apply plugin: 'google-test'
-apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
+def javaResourceFile = file("$buildDir/generated/java/edu/wpi/first/hal/FRCNetComm.java")
+def cppResourceFile = file("$buildDir/generated/headers/hal/FRCUsageReporting.h")
 
-apply from: '../config.gradle'
+def generateUsageReporting = tasks.register('generateUsageReporting') {
+    def javaBase = file('src/generate/FRCNetComm.java.in')
+    def cppBase = file('src/generate/FRCUsageReporting.h.in')
 
-ext.addHalToLinker = { binary->
-    if (binary.targetPlatform.architecture.name == 'athena') {
-        binary.lib project: ':hal', library: 'halAthena', linkage: 'shared'
-    } else {
-        binary.lib project: ':hal', library: 'halSim', linkage: 'shared'
+    def instances = file('src/generate/Instances.txt')
+    def resourceType = file('src/generate/ResourceType.txt')
+
+    inputs.file(javaBase)
+    inputs.file(cppBase)
+    inputs.file(instances)
+    inputs.file(resourceType)
+
+    outputs.file(javaResourceFile)
+    outputs.file(cppResourceFile)
+
+    doLast {
+        def instanceTextJava = instances as String[]
+        def instanceTextCpp = instances as String[]
+        def resourceTextJava = resourceType as String[]
+        def resourceTextCpp = resourceType as String[]
+
+        instanceTextJava = instanceTextJava.collect {
+            "    public static final int ${it};"
+        }.join('\n')
+
+        instanceTextCpp = instanceTextCpp.collect {
+            "    ${it},"
+        }.join('\n')
+
+        resourceTextJava = resourceTextJava.collect {
+            "    public static final int ${it};"
+        }.join('\n')
+
+        resourceTextCpp = resourceTextCpp.collect {
+            "    ${it},"
+        }.join('\n')
+
+        javaResourceFile.text = javaBase.text.replace('${usage_reporting_types}', resourceTextJava).replace('${usage_reporting_instances}', instanceTextJava)
+        cppResourceFile.text = cppBase.text.replace('${usage_reporting_types_cpp}', resourceTextCpp).replace('${usage_reporting_instances_cpp}', instanceTextCpp)
     }
 }
 
-model {
-    dependencyConfigs {
-        wpiutil(DependencyConfig) {
-            groupId = 'edu.wpi.first.wpiutil'
-            artifactId = 'wpiutil-cpp'
-            headerClassifier = 'headers'
-            ext = 'zip'
-            version = '3.+'
-            sharedConfigs = [ halAthena: [], halSim: [], halDev: [], halSimTestingBaseTest: [] ]
-            staticConfigs = [ halSimStaticDeps: [] ]
+apply plugin: DisableBuildingGTest
+
+ext {
+    addHalDependency = { binary, shared->
+        binary.tasks.withType(AbstractNativeSourceCompileTask) {
+            it.dependsOn generateUsageReporting
         }
+        binary.lib project: ':hal', library: 'hal', linkage: shared
     }
-    // Exports config is a utility to enable exporting all symbols in a C++ library on windows to a DLL.
-    // This removes the need for DllExport on a library. However, the gradle C++ builder has a bug
-    // where some extra symbols are added that cannot be resolved at link time. This configuration
-    // lets you specify specific symbols to exlude from exporting.
-    exportsConfigs {
-        halSim(ExportsConfig) {
-            x86ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                  '_CT??_R0?AVbad_cast',
-                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                  '_TI5?AVfailure' ]
-            x64ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                  '_CT??_R0?AVbad_cast',
-                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                  '_TI5?AVfailure' ]
+
+    addHalJniDependency = { binary->
+        binary.tasks.withType(AbstractNativeSourceCompileTask) {
+            it.dependsOn generateUsageReporting
         }
-        halSimStaticDeps(ExportsConfig) {
-            x86SymbolFilter = { symbols->
-                def retList = []
-                symbols.each { symbol->
-                    if (symbol.startsWith('HAL_')) {
-                        retList << symbol
-                    }
-                }
-                return retList
-            }
-            x64SymbolFilter = { symbols->
-                def retList = []
-                symbols.each { symbol->
-                    if (symbol.startsWith('HAL_')) {
-                        retList << symbol
-                    }
-                }
-                return retList
-            }
-        }
+        binary.lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
     }
-    components {
-        if (!project.hasProperty('skipAthena')) {
-            halAthena(NativeLibrarySpec) {
-                baseName = 'wpiHal'
-                sources {
-                    cpp {
-                        source {
-                            srcDirs = [ 'src/main/native/shared', 'src/main/native/athena' ]
-                            includes = ["**/*.cpp"]
-                        }
-                        exportedHeaders {
-                            srcDirs = ["src/main/native/include"]
-                        }
-                    }
-                }
-                binaries.all { binary->
-                    if (binary.targetPlatform.architecture.name != 'athena') {
-                        binary.buildable = false
-                    }
-                }
-            }
+
+    nativeName = 'hal'
+    setBaseName = 'wpiHal'
+    devMain = 'DevMain'
+    niLibraries = true
+    generatedHeaders = "$buildDir/generated/headers"
+    jniSplitSetup = {
+        it.tasks.withType(AbstractNativeSourceCompileTask) {
+            it.dependsOn generateUsageReporting
         }
-        if (!project.hasProperty('onlyAthena')) {
-            halSim(NativeLibrarySpec) {
-                baseName = 'wpiHal'
-                sources {
-                    cpp {
-                        source {
-                            srcDirs = [ 'src/main/native/shared', 'src/main/native/sim' ]
-                            includes = ["**/*.cpp"]
-                        }
-                        exportedHeaders {
-                            srcDirs = ["src/main/native/include"]
-                        }
+        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+            it.sources {
+                athenaJniCpp(CppSourceSet) {
+                    source {
+                        srcDirs = ["${rootDir}/shared/singlelib", "$buildDir/generated/cpp"]
+                        include '**/*.cpp'
                     }
-                }
-                binaries.all { binary ->
-                    if (binary.targetPlatform.operatingSystem.linux) {
-                        linker.args "-ldl"
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        srcDir generatedHeaders
                     }
                 }
             }
-            if (project.hasProperty('buildHalStaticDeps')) {
-                halSimStaticDeps(NativeLibrarySpec) {
-                    baseName = 'wpiHal'
-                    binaries {
-                        withType(StaticLibraryBinarySpec) {
-                            buildable = false
-                        }
+        } else {
+            it.sources {
+                simJniCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/sim'
+                        include '**/jni/*.cpp'
                     }
-                    sources {
-                        cpp {
-                            source {
-                                srcDirs = [ 'src/main/native/shared', 'src/main/native/sim' ]
-                                includes = ["**/*.cpp"]
-                            }
-                            exportedHeaders {
-                                srcDirs = ["src/main/native/include"]
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        // The TestingBase library is a workaround for an issue with the GoogleTest plugin.
-        // The plugin by default will rebuild the entire test source set, which increases
-        // build time. By testing an empty library, and then just linking the already built component
-        // into the test, we save the extra build
-        halSimTestingBase(NativeLibrarySpec) { }
-        // By default, a development executable will be generated. This is to help the case of
-        // testing specific functionality of the library.
-        if (!project.hasProperty('skipDevExe')) {
-            halDev(NativeExecutableSpec) {
-                binaries.all {
-                    project.addHalToLinker(it)
-                }
-                sources {
-                    cpp {
-                        source {
-                            srcDirs 'src/dev/native/cpp'
-                            include '**/*.cpp'
-                        }
-                        exportedHeaders {
-                            srcDirs 'src/dev/native/include'
-                        }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        srcDir generatedHeaders
                     }
                 }
             }
         }
     }
-    testSuites {
-        halSimTestingBaseTest {
-            sources {
-                cpp.source.srcDir 'src/test/native/cpp'
-                cpp.exportedHeaders.srcDir 'src/test/native/include'
-            }
+    splitSetup = {
+        it.tasks.withType(AbstractNativeSourceCompileTask) {
+            it.dependsOn generateUsageReporting
         }
-    }
-    binaries {
-        all {
-            project(':ni-libraries').addNiLibrariesToLinker(it)
-        }
-        withType(GoogleTestTestSuiteBinarySpec) {
-            if (it.component.testedComponent.name.contains('TestingBase') && !project.hasProperty('onlyAthena')) {
-                project(':gmock').addGmockToLinker(it)
-                project.addHalToLinker(it)
-            } else {
-                it.buildable = false
-            }
-        }
-    }
-    tasks {
-        runCpp(Exec) {
-            def found = false
-            $.components.each {
-                if (it in NativeExecutableSpec && it.name == 'halDev') {
-                    it.binaries.each {
-                        if (!found) {
-                            def arch = it.targetPlatform.architecture.name
-                            if (arch == 'x86-64' || arch == 'x86') {
-                                dependsOn it.tasks.install
-                                commandLine it.tasks.install.runScript
-                                found = true
-                            }
-                        }
+        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+            it.sources {
+                athenaCpp(CppSourceSet) {
+                    source {
+                        srcDirs = ['src/main/native/athena']
+                        include '**/*.cpp'
+                        exclude '**/jni/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        srcDir generatedHeaders
                     }
                 }
             }
-        }
-        getHeaders(Task) {
-            def list = []
-            $.components.each {
-                if (it in NativeLibrarySpec && (it.name == 'halAthena' || it.name == 'halSim')) {
-                    it.sources.each {
-                        it.exportedHeaders.srcDirs.each {
-                            list.add(it)
-                        }
+        } else {
+            it.sources {
+                simCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/sim'
+                        include '**/*.cpp'
+                        exclude '**/jni/*.cpp'
                     }
-                    it.binaries.each {
-                        it.libs.each {
-                            it.includeRoots.each {
-                                list.add(it)
-                            }
-                        }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        srcDir generatedHeaders
                     }
-                }
-            }
-            list = list.unique(false)
-            doLast {
-                list.each {
-                    print "WPIHEADER: "
-                    println it
                 }
             }
         }
     }
 }
 
-apply from: 'publish.gradle'
+apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+apply from: 'simjni.gradle'
+
+sourceSets.main.java.srcDir "${buildDir}/generated/java/"
+
+compileJava {
+    dependsOn generateUsageReporting
+}
+
+cppSourcesZip {
+    from('src/main/native/athena') {
+        into '/athena'
+    }
+
+    from('src/main/native/sim') {
+        into '/sim'
+    }
+
+    from("$buildDir/generated/cpp") {
+        into '/athena/jni'
+    }
+
+    dependsOn generateAthenaSimFiles
+}
+
+cppHeadersZip {
+    dependsOn generateUsageReporting
+    from(generatedHeaders) {
+        into '/'
+    }
+}
+
+nativeUtils.exportsConfigs {
+    hal {
+        x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+        x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+    }
+    halJNI {
+        x86SymbolFilter = { symbols ->
+            symbols.removeIf({ !it.startsWith('HAL_') && !it.startsWith('HALSIM_') })
+        }
+        x64SymbolFilter = { symbols ->
+            symbols.removeIf({ !it.startsWith('HAL_') && !it.startsWith('HALSIM_') })
+        }
+    }
+}

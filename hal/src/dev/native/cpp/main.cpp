@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "HAL/HAL.h"
+#include "hal/HAL.h"
 
 int main() {
   std::cout << "Hello World" << std::endl;

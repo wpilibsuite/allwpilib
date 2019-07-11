@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.DIOJNI;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.DIOJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -18,9 +18,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * elsewhere will automatically allocate digital inputs and outputs as required. This class is only
  * for devices like switches etc. that aren't implemented anywhere else.
  */
-public class DigitalInput extends DigitalSource implements Sendable {
-  private int m_channel = 0;
-  private int m_handle = 0;
+public class DigitalInput extends DigitalSource {
+  private final int m_channel;
+  private int m_handle;
 
   /**
    * Create an instance of a Digital Input class. Creates a digital input given a channel.
@@ -28,25 +28,23 @@ public class DigitalInput extends DigitalSource implements Sendable {
    * @param channel the DIO channel for the digital input 0-9 are on-board, 10-25 are on the MXP
    */
   public DigitalInput(int channel) {
-    checkDigitalChannel(channel);
+    SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
 
-    m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte) channel), true);
+    m_handle = DIOJNI.initializeDIOPort(HAL.getPort((byte) channel), true);
 
     HAL.report(tResourceType.kResourceType_DigitalInput, channel);
     setName("DigitalInput", channel);
   }
 
-  /**
-   * Frees the resources for this output.
-   */
-  public void free() {
-    super.free();
+  @Override
+  public void close() {
+    super.close();
     if (m_interrupt != 0) {
       cancelInterrupts();
     }
-
     DIOJNI.freeDIOPort(m_handle);
+    m_handle = 0;
   }
 
   /**

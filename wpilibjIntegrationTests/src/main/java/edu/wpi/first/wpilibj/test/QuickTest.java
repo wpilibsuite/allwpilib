@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj.test;
 
-import org.junit.Test;
-
 import java.util.logging.Logger;
+
+import org.junit.Test;
 
 /**
  * This class is designated to allow for simple testing of the library without the overlying testing
@@ -33,6 +33,5 @@ public class QuickTest extends AbstractComsSetup {
 
   @Test
   public void test() {
-
   }
 }

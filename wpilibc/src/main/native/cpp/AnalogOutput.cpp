@@ -5,30 +5,24 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "AnalogOutput.h"
+#include "frc/AnalogOutput.h"
 
 #include <limits>
+#include <utility>
 
-#include <HAL/HAL.h>
-#include <HAL/Ports.h>
+#include <hal/HAL.h>
+#include <hal/Ports.h>
 
-#include "SensorBase.h"
-#include "SmartDashboard/SendableBuilder.h"
-#include "WPIErrors.h"
+#include "frc/SensorUtil.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
-/**
- * Construct an analog output on the given channel.
- *
- * All analog outputs are located on the MXP port.
- *
- * @param channel The channel number on the roboRIO to represent.
- */
 AnalogOutput::AnalogOutput(int channel) {
-  if (!SensorBase::CheckAnalogOutputChannel(channel)) {
+  if (!SensorUtil::CheckAnalogOutputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "analog output " + llvm::Twine(channel));
+                               "analog output " + wpi::Twine(channel));
     m_channel = std::numeric_limits<int>::max();
     m_port = HAL_kInvalidHandle;
     return;
@@ -51,23 +45,25 @@ AnalogOutput::AnalogOutput(int channel) {
   SetName("AnalogOutput", m_channel);
 }
 
-/**
- * Destructor.
- *
- * Frees analog output resource.
- */
 AnalogOutput::~AnalogOutput() { HAL_FreeAnalogOutputPort(m_port); }
 
-/**
- * Get the channel of this AnalogOutput.
- */
-int AnalogOutput::GetChannel() { return m_channel; }
+AnalogOutput::AnalogOutput(AnalogOutput&& rhs)
+    : ErrorBase(std::move(rhs)),
+      SendableBase(std::move(rhs)),
+      m_channel(std::move(rhs.m_channel)) {
+  std::swap(m_port, rhs.m_port);
+}
 
-/**
- * Set the value of the analog output.
- *
- * @param voltage The output value in Volts, from 0.0 to +5.0
- */
+AnalogOutput& AnalogOutput::operator=(AnalogOutput&& rhs) {
+  ErrorBase::operator=(std::move(rhs));
+  SendableBase::operator=(std::move(rhs));
+
+  m_channel = std::move(rhs.m_channel);
+  std::swap(m_port, rhs.m_port);
+
+  return *this;
+}
+
 void AnalogOutput::SetVoltage(double voltage) {
   int32_t status = 0;
   HAL_SetAnalogOutput(m_port, voltage, &status);
@@ -75,11 +71,6 @@ void AnalogOutput::SetVoltage(double voltage) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-/**
- * Get the voltage of the analog output
- *
- * @return The value in Volts, from 0.0 to +5.0
- */
 double AnalogOutput::GetVoltage() const {
   int32_t status = 0;
   double voltage = HAL_GetAnalogOutput(m_port, &status);
@@ -88,6 +79,8 @@ double AnalogOutput::GetVoltage() const {
 
   return voltage;
 }
+
+int AnalogOutput::GetChannel() { return m_channel; }
 
 void AnalogOutput::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Output");

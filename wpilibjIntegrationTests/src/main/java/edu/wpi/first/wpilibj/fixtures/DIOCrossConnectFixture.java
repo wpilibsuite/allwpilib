@@ -80,8 +80,8 @@ public class DIOCrossConnectFixture implements ITestFixture {
   public boolean teardown() {
     logger.log(Level.FINE, "Begining teardown");
     if (m_allocated) {
-      m_input.free();
-      m_output.free();
+      m_input.close();
+      m_output.close();
       m_allocated = false;
     }
     return true;

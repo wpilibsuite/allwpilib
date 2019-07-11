@@ -5,21 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ADXL345_I2C.h"
+#include "frc/ADXL345_I2C.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "SmartDashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
-/**
- * Constructs the ADXL345 Accelerometer over I2C.
- *
- * @param port          The I2C port the accelerometer is attached to
- * @param range         The range (+ or -) that the accelerometer will measure
- * @param deviceAddress The I2C address of the accelerometer (0x1D or 0x53)
- */
 ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
     : m_i2c(port, deviceAddress) {
   // Turn on the measurements
@@ -43,12 +36,6 @@ double ADXL345_I2C::GetY() { return GetAcceleration(kAxis_Y); }
 
 double ADXL345_I2C::GetZ() { return GetAcceleration(kAxis_Z); }
 
-/**
- * Get the acceleration of one axis in Gs.
- *
- * @param axis The axis to read from.
- * @return Acceleration of the ADXL345 in Gs.
- */
 double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
   int16_t rawAccel = 0;
   m_i2c.Read(kDataRegister + static_cast<int>(axis), sizeof(rawAccel),
@@ -56,12 +43,6 @@ double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
   return rawAccel * kGsPerLSB;
 }
 
-/**
- * Get the acceleration of all axes in Gs.
- *
- * @return An object containing the acceleration measured on each axis of the
- *         ADXL345 in Gs.
- */
 ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() {
   AllAxes data = AllAxes();
   int16_t rawData[3];

@@ -7,35 +7,22 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import org.junit.Test;
-
-import java.util.logging.Logger;
+import org.junit.jupiter.api.Test;
 
 /**
  * Ported from the old CrioTest Classes.
  */
-public class CommandSupersedeTest extends AbstractCommandTest {
-  private static final Logger logger = Logger.getLogger(CommandSupersedeTest.class.getName());
-
-
+class CommandSupersedeTest extends AbstractCommandTest {
   /**
    * Testing one command superseding another because of dependencies.
    */
   @Test
-  public void testOneCommandSupersedingAnotherBecauseOfDependencies() {
+  void oneCommandSupersedingAnotherBecauseOfDependenciesTest() {
     final ASubsystem subsystem = new ASubsystem();
 
-    final MockCommand command1 = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
+    final MockCommand command1 = new MockCommand(subsystem);
 
-    final MockCommand command2 = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
+    final MockCommand command2 = new MockCommand(subsystem);
 
     assertCommandState(command1, 0, 0, 0, 0, 0);
     assertCommandState(command2, 0, 0, 0, 0, 0);
@@ -76,21 +63,17 @@ public class CommandSupersedeTest extends AbstractCommandTest {
    * command cannot be interrupted.
    */
   @Test
-  public void testCommandFailingSupersedingBecauseFirstCanNotBeInterrupted() {
+  @SuppressWarnings("PMD.NonStaticInitializer")
+  void commandFailingSupersedingBecauseFirstCanNotBeInterruptedTest() {
     final ASubsystem subsystem = new ASubsystem();
 
-    final MockCommand command1 = new MockCommand() {
+    final MockCommand command1 = new MockCommand(subsystem) {
       {
-        requires(subsystem);
         setInterruptible(false);
       }
     };
 
-    final MockCommand command2 = new MockCommand() {
-      {
-        requires(subsystem);
-      }
-    };
+    final MockCommand command2 = new MockCommand(subsystem);
 
     assertCommandState(command1, 0, 0, 0, 0, 0);
     assertCommandState(command2, 0, 0, 0, 0, 0);
@@ -116,5 +99,4 @@ public class CommandSupersedeTest extends AbstractCommandTest {
     assertCommandState(command1, 1, 4, 4, 0, 0);
     assertCommandState(command2, 0, 0, 0, 0, 0);
   }
-
 }

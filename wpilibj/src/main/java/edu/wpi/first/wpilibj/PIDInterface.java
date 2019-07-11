@@ -8,8 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 @SuppressWarnings("SummaryJavadoc")
-public interface PIDInterface extends Controller {
-
+public interface PIDInterface {
   @SuppressWarnings("ParameterName")
   void setPID(double p, double i, double d);
 
@@ -24,12 +23,6 @@ public interface PIDInterface extends Controller {
   double getSetpoint();
 
   double getError();
-
-  void enable();
-
-  void disable();
-
-  boolean isEnabled();
 
   void reset();
 }

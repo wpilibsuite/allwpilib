@@ -1,78 +1,74 @@
 import org.gradle.language.base.internal.ProjectLayout
 
-if (!project.hasProperty('skipAthena')) {
-    apply plugin: 'cpp'
-    apply plugin: 'visual-studio'
-    apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'cpp'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: ExtraTasks
 
-    apply from: '../config.gradle'
+apply from: '../shared/config.gradle'
 
-    model {
-        dependencyConfigs {
-            wpiutil(DependencyConfig) {
-                groupId = 'edu.wpi.first.wpiutil'
-                artifactId = 'wpiutil-cpp'
-                headerClassifier = 'headers'
-                ext = 'zip'
-                version = '3.+'
-                sharedConfigs = [ wpilibcIntegrationTests: [] ]
-            }
-            ntcore(DependencyConfig) {
-                groupId = 'edu.wpi.first.ntcore'
-                artifactId = 'ntcore-cpp'
-                headerClassifier = 'headers'
-                ext = 'zip'
-                version = '4.+'
-                sharedConfigs = [ wpilibcIntegrationTests: [] ]
-            }
-            opencv(DependencyConfig) {
-                groupId = 'org.opencv'
-                artifactId = 'opencv-cpp'
-                headerClassifier = 'headers'
-                ext = 'zip'
-                version = '3.2.0'
-                sharedConfigs = [ wpilibcIntegrationTests: [] ]
-            }
-            cscore(DependencyConfig) {
-                groupId = 'edu.wpi.first.cscore'
-                artifactId = 'cscore-cpp'
-                headerClassifier = 'headers'
-                ext = 'zip'
-                version = '1.+'
-                sharedConfigs = [ wpilibcIntegrationTests: [] ]
-            }
-        }
-    }
+ext {
+    sharedCvConfigs = [wpilibcIntegrationTests: []]
+    staticCvConfigs = [:]
+    useJava = false
+    useCpp = true
+    staticGtestConfigs = [wpilibcIntegrationTests: []]
+}
 
-    model {
-        components {
-            wpilibcIntegrationTests(NativeExecutableSpec) {
-                baseName = 'FRCUserProgram'
-                sources {
-                    cpp {
-                        source {
-                            srcDirs = ["${rootDir}/gmock/gtest/src", 'src/FRCUserProgram/cpp']
-                            includes = ['*-all.cc', '*_main.cc', '**/*.cpp']
-                        }
-                        exportedHeaders {
-                            srcDirs = ["${rootDir}/gmock/gtest/include", "${rootDir}/gmock/gtest", 'src/FRCUserProgram/headers']
-                            includes = ['**/*.h', '**/*.cc']
+apply from: "${rootDir}/shared/opencv.gradle"
+
+apply from: "${rootDir}/shared/googletest.gradle"
+
+ext {
+    chipObjectComponents = ['wpilibcIntegrationTests']
+    netCommComponents = ['wpilibcIntegrationTests']
+    useNiJava = false
+}
+
+apply from: "${rootDir}/shared/nilibraries.gradle"
+
+model {
+    components {
+        wpilibcIntegrationTests(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
+            baseName = 'FRCUserProgram'
+            nativeUtils.useRequiredLibrary(it, 'googletest_static')
+            binaries.all { binary ->
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    binary.sources {
+                        athenaCpp(CppSourceSet) {
+                            source {
+                                srcDirs = ['src/main/native/cpp']
+                                includes = ['**/*.cpp']
+                            }
+                            exportedHeaders {
+                                srcDirs = ['src/main/native/include']
+                                includes = ['**/*.h']
+                            }
                         }
                     }
-                }
-                binaries.all { binary->
-                    if (binary.targetPlatform.architecture.name == 'athena') {
-                        binary.tasks.withType(CppCompile) {
-                            cppCompiler.args "-Wno-missing-field-initializers"
-                            cppCompiler.args "-Wno-unused-variable"
-                            cppCompiler.args "-Wno-error=deprecated-declarations"
+                    binary.tasks.withType(CppCompile) {
+                        cppCompiler.args "-Wno-missing-field-initializers"
+                        cppCompiler.args "-Wno-unused-variable"
+                        cppCompiler.args "-Wno-error=deprecated-declarations"
+                    }
+                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                    lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
+                    lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
+                    project(':hal').addHalDependency(binary, 'shared')
+                    project(':hal').addHalJniDependency(binary)
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                } else {
+                    binary.sources {
+                        simCpp(CppSourceSet) {
+                            source {
+                                srcDirs 'src/main/native/dt'
+                                includes = ['**/*.cpp']
+                            }
                         }
-                        project(':ni-libraries').addNiLibrariesToLinker(binary)
-                        project(':hal').addHalToLinker(binary)
-                        project(':wpilibc').addWpilibCCompilerArguments(binary)
-                        project(':wpilibc').addWpilibCToLinker(binary)
-                    } else {
-                        binary.buildable = false
                     }
                 }
             }
@@ -82,43 +78,29 @@ if (!project.hasProperty('skipAthena')) {
 
 def testOutputFolder = file("${project(':').buildDir}/integrationTestFiles")
 
-
 model {
     tasks {
-        copyWpilibCTestLibrariesToOutput(Task) {
+        copyWpilibCTestLibrariesToOutput(Copy) {
+            def task = it
             $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.architecture.name == 'athena') {
-                    def spec = it
-                    dependsOn spec.buildTask
-                }
-            }
-            outputs.file testOutputFolder
-            outputs.upToDateWhen { false }
-
-            def bin = $.binaries
-            doLast {
-                bin.each {
-                    if (it in NativeExecutableBinarySpec && it.targetPlatform.architecture.name == 'athena') {
-                        def spec = it
-                        spec.libs.each {
-                            it.runtimeFiles.each { f ->
-                                copy {
-                                    from file(f)
-                                    into testOutputFolder.toString() + '/libs'
-                                }
-                            }
-                        }
-                        copy {
-                            from spec.executable.file
-                            into testOutputFolder.toString() + '/cpp'
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.buildable) {
+                    def installTask = it.tasks.install
+                    task.dependsOn installTask
+                    task.from(installTask.executableFile) {
+                        into '/cpp'
+                    }
+                    installTask.libs.each {
+                        task.from(it) {
+                            into '/libs'
                         }
                     }
                 }
             }
+            destinationDir testOutputFolder
         }
         // This is in a separate if statement because of what I would assume is a bug in grade.
         // Will file an issue on their side.
-        if (!project.hasProperty('skipAthena')) {
+        if (!project.hasProperty('skiponlyathena')) {
             build.dependsOn copyWpilibCTestLibrariesToOutput
         }
     }

@@ -5,9 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/I2C.h"
+#include "hal/I2C.h"
 
-#include "MockData/I2CDataInternal.h"
+#include "HALInitializer.h"
+#include "mockdata/I2CDataInternal.h"
 
 using namespace hal;
 
@@ -19,7 +20,8 @@ void InitializeI2C() {}
 
 extern "C" {
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
-  SimI2CData[port].SetInitialized(true);
+  hal::init::CheckInit();
+  SimI2CData[port].initialized = true;
 }
 int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
                            const uint8_t* dataToSend, int32_t sendSize,
@@ -38,5 +40,5 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
   SimI2CData[port].Read(deviceAddress, buffer, count);
   return 0;
 }
-void HAL_CloseI2C(HAL_I2CPort port) { SimI2CData[port].SetInitialized(false); }
+void HAL_CloseI2C(HAL_I2CPort port) { SimI2CData[port].initialized = false; }
 }  // extern "C"

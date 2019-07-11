@@ -1,0 +1,123 @@
+[
+  {
+    "name": "Empty Class",
+    "description": "Create an empty command",
+    "tags": [
+      "class"
+    ],
+    "foldername": "emptyclass",
+    "headers": [
+      "ReplaceMeEmptyClass.h"
+    ],
+    "source": [
+      "ReplaceMeEmptyClass.cpp"
+    ],
+    "replacename": "ReplaceMeEmptyClass"
+  },
+  {
+    "name": "Command",
+    "description": "Create a base command",
+    "tags": [
+      "command"
+    ],
+    "foldername": "command",
+    "headers": [
+      "ReplaceMeCommand.h"
+    ],
+    "source": [
+      "ReplaceMeCommand.cpp"
+    ],
+    "replacename": "ReplaceMeCommand"
+  },
+  {
+    "name": "Command Group",
+    "description": "Create a command group",
+    "tags": [
+      "commandgroup"
+    ],
+    "foldername": "commandgroup",
+    "headers": [
+      "ReplaceMeCommandGroup.h"
+    ],
+    "source": [
+      "ReplaceMeCommandGroup.cpp"
+    ],
+    "replacename": "ReplaceMeCommandGroup"
+  },
+  {
+    "name": "Instant Command",
+    "description": "A command that runs immediately",
+    "tags": [
+      "instantcommand"
+    ],
+    "foldername": "instant",
+    "headers": [
+      "ReplaceMeInstantCommand.h"
+    ],
+    "source": [
+      "ReplaceMeInstantCommand.cpp"
+    ],
+    "replacename": "ReplaceMeInstantCommand"
+  },
+  {
+    "name": "Subsystem",
+    "description": "A subsystem",
+    "tags": [
+      "subsystem"
+    ],
+    "foldername": "subsystem",
+    "headers": [
+      "ReplaceMeSubsystem.h"
+    ],
+    "source": [
+      "ReplaceMeSubsystem.cpp"
+    ],
+    "replacename": "ReplaceMeSubsystem"
+  },
+  {
+    "name": "PID Subsystem",
+    "description": "A subsystem that runs a PID loop",
+    "tags": [
+      "pidsubsystem",
+      "pid"
+    ],
+    "foldername": "pidsubsystem",
+    "headers": [
+      "ReplaceMePIDSubsystem.h"
+    ],
+    "source": [
+      "ReplaceMePIDSubsystem.cpp"
+    ],
+    "replacename": "ReplaceMePIDSubsystem"
+  },
+  {
+    "name": "Timed Command",
+    "description": "A command that runs for a specified time",
+    "tags": [
+      "timedcommand"
+    ],
+    "foldername": "timed",
+    "headers": [
+      "ReplaceMeTimedCommand.h"
+    ],
+    "source": [
+      "ReplaceMeTimedCommand.cpp"
+    ],
+    "replacename": "ReplaceMeTimedCommand"
+  },
+  {
+    "name": "Trigger",
+    "description": "A command that runs off of a trigger",
+    "tags": [
+      "trigger"
+    ],
+    "foldername": "trigger",
+    "headers": [
+      "ReplaceMeTrigger.h"
+    ],
+    "source": [
+      "ReplaceMeTrigger.cpp"
+    ],
+    "replacename": "ReplaceMeTrigger"
+  }
+]

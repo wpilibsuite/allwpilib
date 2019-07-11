@@ -5,21 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Jaguar.h"
+#include "frc/Jaguar.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
 using namespace frc;
 
-/**
- * Constructor for a Jaguar connected via PWM.
- *
- * @param channel The PWM channel that the Jaguar is attached to. 0-9 are
- *                on-board, 10-19 are on the MXP port
- */
 Jaguar::Jaguar(int channel) : PWMSpeedController(channel) {
-  /**
-   * Input profile defined by Luminary Micro.
+  /* Input profile defined by Luminary Micro.
    *
    * Full reverse ranges from 0.671325ms to 0.6972211ms
    * Proportional reverse ranges from 0.6972211ms to 1.4482078ms

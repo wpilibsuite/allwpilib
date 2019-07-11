@@ -16,7 +16,6 @@ package edu.wpi.first.wpilibj;
  * before use.
  */
 public interface CounterBase {
-
   /**
    * The number of edges for the counterbase to increment or decrement on.
    */

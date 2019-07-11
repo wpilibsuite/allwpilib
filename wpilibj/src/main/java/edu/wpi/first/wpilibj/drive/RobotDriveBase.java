@@ -8,19 +8,20 @@
 package edu.wpi.first.wpilibj.drive;
 
 import edu.wpi.first.wpilibj.MotorSafety;
-import edu.wpi.first.wpilibj.MotorSafetyHelper;
-import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.SendableImpl;
 
 /**
  * Common base class for drive platforms.
  */
-public abstract class RobotDriveBase extends SendableBase implements MotorSafety {
+public abstract class RobotDriveBase extends MotorSafety implements Sendable, AutoCloseable {
   public static final double kDefaultDeadband = 0.02;
   public static final double kDefaultMaxOutput = 1.0;
 
   protected double m_deadband = kDefaultDeadband;
   protected double m_maxOutput = kDefaultMaxOutput;
-  protected MotorSafetyHelper m_safetyHelper = new MotorSafetyHelper(this);
+
+  private final SendableImpl m_sendableImpl;
 
   /**
    * The location of a motor on the robot for the purpose of driving.
@@ -37,15 +38,77 @@ public abstract class RobotDriveBase extends SendableBase implements MotorSafety
     }
   }
 
+  /**
+   * RobotDriveBase constructor.
+   */
   public RobotDriveBase() {
-    m_safetyHelper.setSafetyEnabled(true);
+    m_sendableImpl = new SendableImpl(true);
+
+    setSafetyEnabled(true);
     setName("RobotDriveBase");
   }
 
+  @Override
+  public void close() {
+    m_sendableImpl.close();
+  }
+
+  @Override
+  public final synchronized String getName() {
+    return m_sendableImpl.getName();
+  }
+
+  @Override
+  public final synchronized void setName(String name) {
+    m_sendableImpl.setName(name);
+  }
+
   /**
-   * Change the default value for deadband scaling. The default value is
-   * {@value #kDefaultDeadband}. Values smaller then the deadband are set to 0, while values
-   * larger then the deadband are scaled from 0.0 to 1.0. See {@link #applyDeadband}.
+   * Sets the name of the sensor with a channel number.
+   *
+   * @param moduleType A string that defines the module name in the label for the value
+   * @param channel    The channel number the device is plugged into
+   */
+  protected final void setName(String moduleType, int channel) {
+    m_sendableImpl.setName(moduleType, channel);
+  }
+
+  /**
+   * Sets the name of the sensor with a module and channel number.
+   *
+   * @param moduleType   A string that defines the module name in the label for the value
+   * @param moduleNumber The number of the particular module type
+   * @param channel      The channel number the device is plugged into (usually PWM)
+   */
+  protected final void setName(String moduleType, int moduleNumber, int channel) {
+    m_sendableImpl.setName(moduleType, moduleNumber, channel);
+  }
+
+  @Override
+  public final synchronized String getSubsystem() {
+    return m_sendableImpl.getSubsystem();
+  }
+
+  @Override
+  public final synchronized void setSubsystem(String subsystem) {
+    m_sendableImpl.setSubsystem(subsystem);
+  }
+
+  /**
+   * Add a child component.
+   *
+   * @param child child component
+   */
+  protected final void addChild(Object child) {
+    m_sendableImpl.addChild(child);
+  }
+
+  /**
+   * Sets the deadband applied to the drive inputs (e.g., joystick values).
+   *
+   * <p>The default value is {@value #kDefaultDeadband}. Inputs smaller than the deadband are set to
+   * 0.0 while inputs larger than the deadband are scaled from 0.0 to 1.0. See
+   * {@link #applyDeadband}.
    *
    * @param deadband The deadband to set.
    */
@@ -65,33 +128,17 @@ public abstract class RobotDriveBase extends SendableBase implements MotorSafety
     m_maxOutput = maxOutput;
   }
 
-  @Override
-  public void setExpiration(double timeout) {
-    m_safetyHelper.setExpiration(timeout);
-  }
-
-  @Override
-  public double getExpiration() {
-    return m_safetyHelper.getExpiration();
-  }
-
-  @Override
-  public boolean isAlive() {
-    return m_safetyHelper.isAlive();
+  /**
+   * Feed the motor safety object. Resets the timer that will stop the motors if it completes.
+   *
+   * @see MotorSafety#feed()
+   */
+  public void feedWatchdog() {
+    feed();
   }
 
   @Override
   public abstract void stopMotor();
-
-  @Override
-  public boolean isSafetyEnabled() {
-    return m_safetyHelper.isSafetyEnabled();
-  }
-
-  @Override
-  public void setSafetyEnabled(boolean enabled) {
-    m_safetyHelper.setSafetyEnabled(enabled);
-  }
 
   @Override
   public abstract String getDescription();

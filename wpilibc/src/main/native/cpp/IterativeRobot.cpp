@@ -5,25 +5,21 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "IterativeRobot.h"
+#include "frc/IterativeRobot.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "DriverStation.h"
+#include "frc/DriverStation.h"
 
 using namespace frc;
 
-IterativeRobot::IterativeRobot() {
+static constexpr double kPacketPeriod = 0.02;
+
+IterativeRobot::IterativeRobot() : IterativeRobotBase(kPacketPeriod) {
   HAL_Report(HALUsageReporting::kResourceType_Framework,
              HALUsageReporting::kFramework_Iterative);
 }
 
-/**
- * Provide an alternate "main loop" via StartCompetition().
- *
- * This specific StartCompetition() implements "main loop" behaviour synced with
- * the DS packets.
- */
 void IterativeRobot::StartCompetition() {
   RobotInit();
 

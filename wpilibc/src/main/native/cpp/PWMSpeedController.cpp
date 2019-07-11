@@ -5,35 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PWMSpeedController.h"
+#include "frc/PWMSpeedController.h"
+
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
-/**
- * Constructor for a PWM Speed Controller connected via PWM.
- *
- * @param channel The PWM channel that the controller is attached to. 0-9 are
- *                on-board, 10-19 are on the MXP port
- */
-PWMSpeedController::PWMSpeedController(int channel) : SafePWM(channel) {}
-
-/**
- * Set the PWM value.
- *
- * The PWM value is set using a range of -1.0 to 1.0, appropriately
- * scaling the value for the FPGA.
- *
- * @param speed The speed value between -1.0 and 1.0 to set.
- */
 void PWMSpeedController::Set(double speed) {
   SetSpeed(m_isInverted ? -speed : speed);
 }
 
-/**
- * Get the recently set value of the PWM.
- *
- * @return The most recently set value for the PWM between -1.0 and 1.0.
- */
 double PWMSpeedController::Get() const { return GetSpeed(); }
 
 void PWMSpeedController::SetInverted(bool isInverted) {
@@ -44,11 +25,16 @@ bool PWMSpeedController::GetInverted() const { return m_isInverted; }
 
 void PWMSpeedController::Disable() { SetDisabled(); }
 
-void PWMSpeedController::StopMotor() { SafePWM::StopMotor(); }
+void PWMSpeedController::StopMotor() { PWM::StopMotor(); }
 
-/**
- * Write out the PID value as seen in the PIDOutput base object.
- *
- * @param output Write out the PWM value as was found in the PIDController
- */
 void PWMSpeedController::PIDWrite(double output) { Set(output); }
+
+PWMSpeedController::PWMSpeedController(int channel) : PWM(channel) {}
+
+void PWMSpeedController::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Speed Controller");
+  builder.SetActuator(true);
+  builder.SetSafeState([=]() { SetDisabled(); });
+  builder.AddDoubleProperty("Value", [=]() { return GetSpeed(); },
+                            [=](double value) { SetSpeed(value); });
+}

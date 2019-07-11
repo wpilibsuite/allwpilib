@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.SolenoidJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SolenoidJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>The Solenoid class is typically used for pneumatic solenoids, but could be used for any
  * device within the current spec of the PCM.
  */
-public class Solenoid extends SolenoidBase implements Sendable {
+public class Solenoid extends SolenoidBase {
   private final int m_channel; // The channel to control.
   private int m_solenoidHandle;
 
@@ -28,7 +28,7 @@ public class Solenoid extends SolenoidBase implements Sendable {
    * @param channel The channel on the PCM to control (0..7).
    */
   public Solenoid(final int channel) {
-    this(SensorBase.getDefaultSolenoidModule(), channel);
+    this(SensorUtil.getDefaultSolenoidModule(), channel);
   }
 
   /**
@@ -41,22 +41,19 @@ public class Solenoid extends SolenoidBase implements Sendable {
     super(moduleNumber);
     m_channel = channel;
 
-    SensorBase.checkSolenoidModule(m_moduleNumber);
-    SensorBase.checkSolenoidChannel(m_channel);
+    SensorUtil.checkSolenoidModule(m_moduleNumber);
+    SensorUtil.checkSolenoidChannel(m_channel);
 
-    int portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
+    int portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
     m_solenoidHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
 
     HAL.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
     setName("Solenoid", m_moduleNumber, m_channel);
   }
 
-  /**
-   * Destructor.
-   */
   @Override
-  public synchronized void free() {
-    super.free();
+  public void close() {
+    super.close();
     SolenoidJNI.freeSolenoidPort(m_solenoidHandle);
     m_solenoidHandle = 0;
   }
@@ -118,6 +115,7 @@ public class Solenoid extends SolenoidBase implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Solenoid");
+    builder.setActuator(true);
     builder.setSafeState(() -> set(false));
     builder.addBooleanProperty("Value", this::get, this::set);
   }

@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "HAL/handles/HandlesInternal.h"
-#include "HAL/handles/LimitedHandleResource.h"
 #include "PortsInternal.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/LimitedHandleResource.h"
 
 namespace hal {
 

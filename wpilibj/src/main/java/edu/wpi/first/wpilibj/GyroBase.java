@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 /**
  * GyroBase is the common base class for Gyro implementations such as AnalogGyro.
  */
-public abstract class GyroBase extends SensorBase implements Gyro, PIDSource, Sendable {
+public abstract class GyroBase extends SendableBase implements Gyro, PIDSource {
   private PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,30 +13,32 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.hal.ControlWord;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.MatchInfoData;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.hal.AllianceStationID;
-import edu.wpi.first.wpilibj.hal.ControlWord;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.MatchInfoData;
-import edu.wpi.first.wpilibj.hal.PowerJNI;
 
 /**
  * Provide access to the network communication data to / from the Driver Station.
  */
-public class DriverStation implements RobotState.Interface {
+@SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveClassLength",
+                   "PMD.ExcessivePublicCount", "PMD.GodClass", "PMD.TooManyFields",
+                   "PMD.TooManyMethods"})
+public class DriverStation {
   /**
    * Number of Joystick Ports.
    */
   public static final int kJoystickPorts = 6;
 
-  private class HALJoystickButtons {
+  private static class HALJoystickButtons {
     public int m_buttons;
     public byte m_count;
   }
 
-  private class HALJoystickAxes {
+  private static class HALJoystickAxes {
     public float[] m_axes;
     public short m_count;
 
@@ -45,7 +47,7 @@ public class DriverStation implements RobotState.Interface {
     }
   }
 
-  private class HALJoystickPOVs {
+  private static class HALJoystickPOVs {
     public short[] m_povs;
     public short m_count;
 
@@ -66,15 +68,16 @@ public class DriverStation implements RobotState.Interface {
   }
 
   private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
-  private double m_nextMessageTime = 0.0;
+  private double m_nextMessageTime;
 
   private static class DriverStationTask implements Runnable {
-    private DriverStation m_ds;
+    private final DriverStation m_ds;
 
     DriverStationTask(DriverStation ds) {
       m_ds = ds;
     }
 
+    @Override
     public void run() {
       m_ds.run();
     }
@@ -140,33 +143,34 @@ public class DriverStation implements RobotState.Interface {
   private MatchInfoData m_matchInfoCache = new MatchInfoData();
 
   // Joystick button rising/falling edge flags
-  HALJoystickButtons[] m_joystickButtonsPressed = new HALJoystickButtons[kJoystickPorts];
-  HALJoystickButtons[] m_joystickButtonsReleased = new HALJoystickButtons[kJoystickPorts];
+  private int[] m_joystickButtonsPressed = new int[kJoystickPorts];
+  private int[] m_joystickButtonsReleased = new int[kJoystickPorts];
 
   // preallocated byte buffer for button count
-  private ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1);
+  private final ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1);
 
-  private MatchDataSender m_matchDataSender;
+  private final MatchDataSender m_matchDataSender;
 
   // Internal Driver Station thread
-  private Thread m_thread;
+  @SuppressWarnings("PMD.SingularField")
+  private final Thread m_thread;
   private volatile boolean m_threadKeepAlive = true;
 
-  private final Object m_cacheDataMutex;
+  private final ReentrantLock m_cacheDataMutex = new ReentrantLock();
 
   private final Lock m_waitForDataMutex;
   private final Condition m_waitForDataCond;
   private int m_waitForDataCount;
 
   // Robot state status variables
-  private boolean m_userInDisabled = false;
-  private boolean m_userInAutonomous = false;
-  private boolean m_userInTeleop = false;
-  private boolean m_userInTest = false;
+  private boolean m_userInDisabled;
+  private boolean m_userInAutonomous;
+  private boolean m_userInTeleop;
+  private boolean m_userInTest;
 
   // Control word variables
   private final Object m_controlWordMutex;
-  private ControlWord m_controlWordCache;
+  private final ControlWord m_controlWordCache;
   private long m_lastControlWordUpdate;
 
   /**
@@ -184,12 +188,13 @@ public class DriverStation implements RobotState.Interface {
    * <p>The single DriverStation instance is created statically with the instance static member
    * variable.
    */
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   private DriverStation() {
+    HAL.initialize(500, 0);
     m_waitForDataCount = 0;
     m_waitForDataMutex = new ReentrantLock();
     m_waitForDataCond = m_waitForDataMutex.newCondition();
 
-    m_cacheDataMutex = new Object();
     for (int i = 0; i < kJoystickPorts; i++) {
       m_joystickButtons[i] = new HALJoystickButtons();
       m_joystickAxes[i] = new HALJoystickAxes(HAL.kMaxJoystickAxes);
@@ -198,9 +203,6 @@ public class DriverStation implements RobotState.Interface {
       m_joystickButtonsCache[i] = new HALJoystickButtons();
       m_joystickAxesCache[i] = new HALJoystickAxes(HAL.kMaxJoystickAxes);
       m_joystickPOVsCache[i] = new HALJoystickPOVs(HAL.kMaxJoystickPOVs);
-
-      m_joystickButtonsPressed[i] = new HALJoystickButtons();
-      m_joystickButtonsReleased[i] = new HALJoystickButtons();
     }
 
     m_controlWordMutex = new Object();
@@ -280,12 +282,12 @@ public class DriverStation implements RobotState.Interface {
     } else {
       locString = "";
     }
-    String traceString = "";
+    StringBuilder traceString = new StringBuilder("");
     if (printTrace) {
       boolean haveLoc = false;
       for (int i = stackTraceFirst; i < stackTrace.length; i++) {
         String loc = stackTrace[i].toString();
-        traceString += "\tat " + loc + "\n";
+        traceString.append("\tat ").append(loc).append('\n');
         // get first user function
         if (!haveLoc && !loc.startsWith("edu.wpi.first")) {
           locString = loc;
@@ -293,7 +295,7 @@ public class DriverStation implements RobotState.Interface {
         }
       }
     }
-    HAL.sendError(isError, code, false, error, locString, traceString, true);
+    HAL.sendError(isError, code, false, error, locString, traceString.toString(), true);
   }
 
   /**
@@ -304,28 +306,28 @@ public class DriverStation implements RobotState.Interface {
    * @return The state of the joystick button.
    */
   public boolean getStickButton(final int stick, final int button) {
+    if (stick < 0 || stick >= kJoystickPorts) {
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
+    }
     if (button <= 0) {
       reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
       return false;
     }
-    if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-3");
-    }
-    boolean error = false;
-    boolean retVal = false;
-    synchronized (m_cacheDataMutex) {
+    m_cacheDataMutex.lock();
+    try {
       if (button > m_joystickButtons[stick].m_count) {
-        error = true;
-        retVal = false;
-      } else {
-        retVal = (m_joystickButtons[stick].m_buttons & 1 << (button - 1)) != 0;
+        // Unlock early so error printing isn't locked.
+        m_cacheDataMutex.unlock();
+        reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+            + " not available, check if controller is plugged in");
+      }
+
+      return (m_joystickButtons[stick].m_buttons & 1 << (button - 1)) != 0;
+    } finally {
+      if (m_cacheDataMutex.isHeldByCurrentThread()) {
+        m_cacheDataMutex.unlock();
       }
     }
-    if (error) {
-      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
-          + " not available, check if controller is plugged in");
-    }
-    return retVal;
   }
 
   /**
@@ -341,16 +343,29 @@ public class DriverStation implements RobotState.Interface {
       return false;
     }
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
-
-    // If button was pressed, clear flag and return true
-    if ((m_joystickButtonsPressed[stick].m_buttons & 1 << (button - 1)) != 0) {
-      m_joystickButtonsPressed[stick].m_buttons &= ~(1 << (button - 1));
-      return true;
-    } else {
-      return false;
+    boolean error = false;
+    boolean retVal = false;
+    synchronized (m_cacheDataMutex) {
+      if (button > m_joystickButtons[stick].m_count) {
+        error = true;
+        retVal = false;
+      } else {
+        // If button was pressed, clear flag and return true
+        if ((m_joystickButtonsPressed[stick] & 1 << (button - 1)) != 0) {
+          m_joystickButtonsPressed[stick] &= ~(1 << (button - 1));
+          retVal = true;
+        } else {
+          retVal = false;
+        }
+      }
     }
+    if (error) {
+      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+          + " not available, check if controller is plugged in");
+    }
+    return retVal;
   }
 
   /**
@@ -367,16 +382,29 @@ public class DriverStation implements RobotState.Interface {
       return false;
     }
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
-
-    // If button was released, clear flag and return true
-    if ((m_joystickButtonsReleased[stick].m_buttons & 1 << (button - 1)) != 0) {
-      m_joystickButtonsReleased[stick].m_buttons &= ~(1 << (button - 1));
-      return true;
-    } else {
-      return false;
+    boolean error = false;
+    boolean retVal = false;
+    synchronized (m_cacheDataMutex) {
+      if (button > m_joystickButtons[stick].m_count) {
+        error = true;
+        retVal = false;
+      } else {
+        // If button was released, clear flag and return true
+        if ((m_joystickButtonsReleased[stick] & 1 << (button - 1)) != 0) {
+          m_joystickButtonsReleased[stick] &= ~(1 << (button - 1));
+          retVal = true;
+        } else {
+          retVal = false;
+        }
+      }
     }
+    if (error) {
+      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+          + " not available, check if controller is plugged in");
+    }
+    return retVal;
   }
 
   /**
@@ -389,28 +417,28 @@ public class DriverStation implements RobotState.Interface {
    */
   public double getStickAxis(int stick, int axis) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
     if (axis < 0 || axis >= HAL.kMaxJoystickAxes) {
-      throw new RuntimeException("Joystick axis is out of range");
+      throw new IllegalArgumentException("Joystick axis is out of range");
     }
 
-    boolean error = false;
-    double retVal = 0.0;
-    synchronized (m_cacheDataMutex) {
+    m_cacheDataMutex.lock();
+    try {
       if (axis >= m_joystickAxes[stick].m_count) {
-        // set error
-        error = true;
-        retVal = 0.0;
-      } else {
-        retVal =  m_joystickAxes[stick].m_axes[axis];
+        // Unlock early so error printing isn't locked.
+        m_cacheDataMutex.unlock();
+        reportJoystickUnpluggedWarning("Joystick axis " + axis + " on port " + stick
+            + " not available, check if controller is plugged in");
+        return 0.0;
+      }
+
+      return m_joystickAxes[stick].m_axes[axis];
+    } finally {
+      if (m_cacheDataMutex.isHeldByCurrentThread()) {
+        m_cacheDataMutex.unlock();
       }
     }
-    if (error) {
-      reportJoystickUnpluggedWarning("Joystick axis " + axis + " on port " + stick
-          + " not available, check if controller is plugged in");
-    }
-    return retVal;
   }
 
   /**
@@ -420,26 +448,27 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getStickPOV(int stick, int pov) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
     if (pov < 0 || pov >= HAL.kMaxJoystickPOVs) {
-      throw new RuntimeException("Joystick POV is out of range");
+      throw new IllegalArgumentException("Joystick POV is out of range");
     }
-    boolean error = false;
-    int retVal = -1;
-    synchronized (m_cacheDataMutex) {
+
+    m_cacheDataMutex.lock();
+    try {
       if (pov >= m_joystickPOVs[stick].m_count) {
-        error = true;
-        retVal = -1;
-      } else {
-        retVal = m_joystickPOVs[stick].m_povs[pov];
+        // Unlock early so error printing isn't locked.
+        m_cacheDataMutex.unlock();
+        reportJoystickUnpluggedWarning("Joystick POV " + pov + " on port " + stick
+            + " not available, check if controller is plugged in");
+      }
+    } finally {
+      if (m_cacheDataMutex.isHeldByCurrentThread()) {
+        m_cacheDataMutex.unlock();
       }
     }
-    if (error) {
-      reportJoystickUnpluggedWarning("Joystick POV " + pov + " on port " + stick
-          + " not available, check if controller is plugged in");
-    }
-    return retVal;
+
+    return m_joystickPOVs[stick].m_povs[pov];
   }
 
   /**
@@ -450,10 +479,14 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getStickButtons(final int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
-    synchronized (m_cacheDataMutex) {
+
+    m_cacheDataMutex.lock();
+    try {
       return m_joystickButtons[stick].m_buttons;
+    } finally {
+      m_cacheDataMutex.unlock();
     }
   }
 
@@ -465,10 +498,14 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getStickAxisCount(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    synchronized (m_cacheDataMutex) {
+
+    m_cacheDataMutex.lock();
+    try {
       return m_joystickAxes[stick].m_count;
+    } finally {
+      m_cacheDataMutex.unlock();
     }
   }
 
@@ -480,10 +517,14 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getStickPOVCount(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    synchronized (m_cacheDataMutex) {
+
+    m_cacheDataMutex.lock();
+    try {
       return m_joystickPOVs[stick].m_count;
+    } finally {
+      m_cacheDataMutex.unlock();
     }
   }
 
@@ -495,10 +536,14 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getStickButtonCount(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    synchronized (m_cacheDataMutex) {
+
+    m_cacheDataMutex.lock();
+    try {
       return m_joystickButtons[stick].m_count;
+    } finally {
+      m_cacheDataMutex.unlock();
     }
   }
 
@@ -510,25 +555,10 @@ public class DriverStation implements RobotState.Interface {
    */
   public boolean getJoystickIsXbox(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    boolean error = false;
-    boolean retVal = false;
-    synchronized (m_cacheDataMutex) {
-      // TODO: Remove this when calling for descriptor on empty stick no longer
-      // crashes
-      if (1 > m_joystickButtons[stick].m_count && 1 > m_joystickAxes[stick].m_count) {
-        error = true;
-        retVal = false;
-      } else if (HAL.getJoystickIsXbox((byte) stick) == 1) {
-        retVal = true;
-      }
-    }
-    if (error) {
-      reportJoystickUnpluggedWarning("Joystick on port " + stick
-          + " not available, check if controller is plugged in");
-    }
-    return retVal;
+
+    return HAL.getJoystickIsXbox((byte) stick) == 1;
   }
 
   /**
@@ -539,25 +569,10 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getJoystickType(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    boolean error = false;
-    int retVal = -1;
-    synchronized (m_cacheDataMutex) {
-      // TODO: Remove this when calling for descriptor on empty stick no longer
-      // crashes
-      if (1 > m_joystickButtons[stick].m_count && 1 > m_joystickAxes[stick].m_count) {
-        error = true;
-        retVal = -1;
-      } else {
-        retVal = HAL.getJoystickType((byte) stick);
-      }
-    }
-    if (error) {
-      reportJoystickUnpluggedWarning("Joystick on port " + stick
-          + " not available, check if controller is plugged in");
-    }
-    return retVal;
+
+    return HAL.getJoystickType((byte) stick);
   }
 
   /**
@@ -568,25 +583,10 @@ public class DriverStation implements RobotState.Interface {
    */
   public String getJoystickName(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    boolean error = false;
-    String retVal = "";
-    synchronized (m_cacheDataMutex) {
-      // TODO: Remove this when calling for descriptor on empty stick no longer
-      // crashes
-      if (1 > m_joystickButtons[stick].m_count && 1 > m_joystickAxes[stick].m_count) {
-        error = true;
-        retVal = "";
-      } else {
-        retVal = HAL.getJoystickName((byte) stick);
-      }
-    }
-    if (error) {
-      reportJoystickUnpluggedWarning("Joystick on port " + stick
-          + " not available, check if controller is plugged in");
-    }
-    return retVal;
+
+    return HAL.getJoystickName((byte) stick);
   }
 
   /**
@@ -598,14 +598,10 @@ public class DriverStation implements RobotState.Interface {
    */
   public int getJoystickAxisType(int stick, int axis) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    int retVal = -1;
-    synchronized (m_cacheDataMutex) {
-      retVal = HAL.getJoystickAxisType((byte) stick, (byte) axis);
-    }
-    return retVal;
+    return HAL.getJoystickAxisType((byte) stick, (byte) axis);
   }
 
   /**
@@ -700,36 +696,16 @@ public class DriverStation implements RobotState.Interface {
   }
 
   /**
-   * Gets a value indicating whether the FPGA outputs are enabled. The outputs may be disabled if
-   * the robot is disabled or e-stopped, the watchdog has expired, or if the roboRIO browns out.
-   *
-   * @return True if the FPGA outputs are enabled.
-   * @deprecated Use RobotController.isSysActive()
-   */
-  @Deprecated
-  public boolean isSysActive() {
-    return HAL.getSystemActive();
-  }
-
-  /**
-   * Check if the system is browned out.
-   *
-   * @return True if the system is browned out
-   * @deprecated Use RobotController.isBrownedOut()
-   */
-  @Deprecated
-  public boolean isBrownedOut() {
-    return HAL.getBrownedOut();
-  }
-
-  /**
    * Get the game specific message.
    *
    * @return the game specific message
    */
   public String getGameSpecificMessage() {
-    synchronized (m_cacheDataMutex) {
+    m_cacheDataMutex.lock();
+    try {
       return m_matchInfo.gameSpecificMessage;
+    } finally {
+      m_cacheDataMutex.unlock();
     }
   }
 
@@ -739,8 +715,11 @@ public class DriverStation implements RobotState.Interface {
    * @return the event name
    */
   public String getEventName() {
-    synchronized (m_cacheDataMutex) {
+    m_cacheDataMutex.lock();
+    try {
       return m_matchInfo.eventName;
+    } finally {
+      m_cacheDataMutex.unlock();
     }
   }
 
@@ -751,8 +730,11 @@ public class DriverStation implements RobotState.Interface {
    */
   public MatchType getMatchType() {
     int matchType;
-    synchronized (m_cacheDataMutex) {
+    m_cacheDataMutex.lock();
+    try {
       matchType = m_matchInfo.matchType;
+    } finally {
+      m_cacheDataMutex.unlock();
     }
     switch (matchType) {
       case 1:
@@ -772,8 +754,11 @@ public class DriverStation implements RobotState.Interface {
    * @return the match number
    */
   public int getMatchNumber() {
-    synchronized (m_cacheDataMutex) {
+    m_cacheDataMutex.lock();
+    try {
       return m_matchInfo.matchNumber;
+    } finally {
+      m_cacheDataMutex.unlock();
     }
   }
 
@@ -783,8 +768,11 @@ public class DriverStation implements RobotState.Interface {
    * @return the replay number
    */
   public int getReplayNumber() {
-    synchronized (m_cacheDataMutex) {
+    m_cacheDataMutex.lock();
+    try {
       return m_matchInfo.replayNumber;
+    } finally {
+      m_cacheDataMutex.unlock();
     }
   }
 
@@ -903,17 +891,6 @@ public class DriverStation implements RobotState.Interface {
    */
   public double getMatchTime() {
     return HAL.getMatchTime();
-  }
-
-  /**
-   * Read the battery voltage.
-   *
-   * @return The battery voltage in Volts.
-   * @deprecated Use RobotController.getBatteryVoltage
-   */
-  @Deprecated
-  public double getBatteryVoltage() {
-    return PowerJNI.getVinVoltage();
   }
 
   /**
@@ -1036,14 +1013,15 @@ public class DriverStation implements RobotState.Interface {
     updateControlWord(true);
 
     // lock joystick mutex to swap cache data
-    synchronized (m_cacheDataMutex) {
+    m_cacheDataMutex.lock();
+    try {
       for (int i = 0; i < kJoystickPorts; i++) {
         // If buttons weren't pressed and are now, set flags in m_buttonsPressed
-        m_joystickButtonsPressed[i].m_buttons |=
+        m_joystickButtonsPressed[i] |=
             ~m_joystickButtons[i].m_buttons & m_joystickButtonsCache[i].m_buttons;
 
         // If buttons were pressed and aren't now, set flags in m_buttonsReleased
-        m_joystickButtonsReleased[i].m_buttons |=
+        m_joystickButtonsReleased[i] |=
             m_joystickButtons[i].m_buttons & ~m_joystickButtonsCache[i].m_buttons;
       }
 
@@ -1063,6 +1041,8 @@ public class DriverStation implements RobotState.Interface {
       MatchInfoData currentInfo = m_matchInfo;
       m_matchInfo = m_matchInfoCache;
       m_matchInfoCache = currentInfo;
+    } finally {
+      m_cacheDataMutex.unlock();
     }
 
     m_waitForDataMutex.lock();
@@ -1110,8 +1090,9 @@ public class DriverStation implements RobotState.Interface {
         safetyCounter = 0;
       }
 
-      if (++safetyCounter >= 4) {
-        MotorSafetyHelper.checkMotors();
+      safetyCounter++;
+      if (safetyCounter >= 4) {
+        MotorSafety.checkMotors();
         safetyCounter = 0;
       }
       if (m_userInDisabled) {

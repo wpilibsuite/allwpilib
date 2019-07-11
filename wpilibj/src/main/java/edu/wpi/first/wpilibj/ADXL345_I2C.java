@@ -10,10 +10,10 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * ADXL345 I2C Accelerometer.
  */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_I2C extends SensorBase implements Accelerometer, Sendable {
+public class ADXL345_I2C extends SendableBase implements Accelerometer {
   private static final byte kAddress = 0x1D;
   private static final byte kPowerCtlRegister = 0x2D;
   private static final byte kDataFormatRegister = 0x31;
@@ -93,9 +93,9 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, Sendable {
   }
 
   @Override
-  public void free() {
-    super.free();
-    m_i2c.free();
+  public void close() {
+    super.close();
+    m_i2c.close();
   }
 
   @Override

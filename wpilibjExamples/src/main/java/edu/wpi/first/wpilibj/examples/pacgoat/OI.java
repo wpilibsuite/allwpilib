@@ -7,6 +7,10 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat;
 
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.Collect;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveForward;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.LowGoal;
@@ -17,41 +21,40 @@ import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Collector;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Pivot;
 import edu.wpi.first.wpilibj.examples.pacgoat.triggers.DoubleButton;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.buttons.JoystickButton;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 /**
  * The operator interface of the robot, it has been simplified from the real
  * robot to allow control with a single PS3 joystick. As a result, not all
  * functionality from the real robot is available.
  */
 public class OI {
-	public Joystick m_joystick = new Joystick(0);
+  public Joystick m_joystick = new Joystick(0);
 
-	public OI() {
-		new JoystickButton(m_joystick, 12).whenPressed(new LowGoal());
-		new JoystickButton(m_joystick, 10).whenPressed(new Collect());
+  /**
+   * Create a new OI and all of the buttons on it.
+   */
+  public OI() {
+    new JoystickButton(m_joystick, 12).whenPressed(new LowGoal());
+    new JoystickButton(m_joystick, 10).whenPressed(new Collect());
 
-		new JoystickButton(m_joystick, 11).whenPressed(
-				new SetPivotSetpoint(Pivot.kShoot));
-		new JoystickButton(m_joystick, 9).whenPressed(
-				new SetPivotSetpoint(Pivot.kShootNear));
+    new JoystickButton(m_joystick, 11).whenPressed(
+        new SetPivotSetpoint(Pivot.kShoot));
+    new JoystickButton(m_joystick, 9).whenPressed(
+        new SetPivotSetpoint(Pivot.kShootNear));
 
-		new DoubleButton(m_joystick, 2, 3).whenActive(new Shoot());
+    new DoubleButton(m_joystick, 2, 3).whenActive(new Shoot());
 
-		// SmartDashboard Buttons
-		SmartDashboard.putData("Drive Forward", new DriveForward(2.25));
-		SmartDashboard.putData("Drive Backward", new DriveForward(-2.25));
-		SmartDashboard.putData("Start Rollers",
-				new SetCollectionSpeed(Collector.kForward));
-		SmartDashboard.putData("Stop Rollers",
-				new SetCollectionSpeed(Collector.kStop));
-		SmartDashboard.putData("Reverse Rollers",
-				new SetCollectionSpeed(Collector.kReverse));
-	}
+    // SmartDashboard Buttons
+    SmartDashboard.putData("Drive Forward", new DriveForward(2.25));
+    SmartDashboard.putData("Drive Backward", new DriveForward(-2.25));
+    SmartDashboard.putData("Start Rollers",
+        new SetCollectionSpeed(Collector.kForward));
+    SmartDashboard.putData("Stop Rollers",
+        new SetCollectionSpeed(Collector.kStop));
+    SmartDashboard.putData("Reverse Rollers",
+        new SetCollectionSpeed(Collector.kReverse));
+  }
 
-	public Joystick getJoystick() {
-		return m_joystick;
-	}
+  public Joystick getJoystick() {
+    return m_joystick;
+  }
 }

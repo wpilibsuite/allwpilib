@@ -5,16 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/AnalogGyro.h"
+#include "hal/AnalogGyro.h"
 
 #include <chrono>
 #include <thread>
 
 #include "AnalogInternal.h"
-#include "HAL/AnalogAccumulator.h"
-#include "HAL/AnalogInput.h"
-#include "HAL/handles/IndexedHandleResource.h"
-#include "MockData/AnalogGyroDataInternal.h"
+#include "HALInitializer.h"
+#include "hal/AnalogAccumulator.h"
+#include "hal/AnalogInput.h"
+#include "hal/handles/IndexedHandleResource.h"
+#include "mockdata/AnalogGyroDataInternal.h"
 
 namespace {
 struct AnalogGyro {
@@ -42,6 +43,7 @@ void InitializeAnalogGyro() {
 extern "C" {
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
                                         int32_t* status) {
+  hal::init::CheckInit();
   if (!HAL_IsAccumulatorChannel(analogHandle, status)) {
     if (*status == 0) {
       *status = HAL_INVALID_ACCUMULATOR_CHANNEL;
@@ -67,7 +69,7 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
   gyro->handle = analogHandle;
   gyro->index = channel;
 
-  SimAnalogGyroData[channel].SetInitialized(true);
+  SimAnalogGyroData[channel].initialized = true;
 
   return handle;
 }
@@ -80,7 +82,7 @@ void HAL_FreeAnalogGyro(HAL_GyroHandle handle) {
   auto gyro = analogGyroHandles->Get(handle);
   analogGyroHandles->Free(handle);
   if (gyro == nullptr) return;
-  SimAnalogGyroData[gyro->index].SetInitialized(false);
+  SimAnalogGyroData[gyro->index].initialized = false;
 }
 
 void HAL_SetAnalogGyroParameters(HAL_GyroHandle handle,
@@ -102,7 +104,7 @@ void HAL_ResetAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
     return;
   }
 
-  SimAnalogGyroData[gyro->index].SetAngle(0.0);
+  SimAnalogGyroData[gyro->index].angle = 0.0;
 }
 
 void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
@@ -122,7 +124,7 @@ double HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status) {
     return 0;
   }
 
-  return SimAnalogGyroData[gyro->index].GetAngle();
+  return SimAnalogGyroData[gyro->index].angle;
 }
 
 double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status) {
@@ -132,7 +134,7 @@ double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status) {
     return 0;
   }
 
-  return SimAnalogGyroData[gyro->index].GetRate();
+  return SimAnalogGyroData[gyro->index].rate;
 }
 
 double HAL_GetAnalogGyroOffset(HAL_GyroHandle handle, int32_t* status) {

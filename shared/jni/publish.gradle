@@ -1,0 +1,130 @@
+import java.security.MessageDigest
+apply plugin: 'maven-publish'
+
+def pubVersion
+if (project.hasProperty("publishVersion")) {
+    pubVersion = project.publishVersion
+} else {
+    pubVersion = WPILibVersion.version
+}
+
+def outputsFolder = file("$buildDir/outputs")
+
+def baseArtifactId = nativeName
+def artifactGroupId = "edu.wpi.first.${nativeName}"
+def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
+def jniBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-jni_CLS"
+
+def licenseFile = file("$rootDir/license.txt")
+
+task cppSourcesZip(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = zipBaseName
+    classifier = "sources"
+    duplicatesStrategy = 'exclude'
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/cpp') {
+        into '/'
+    }
+
+    model {
+        components {
+            it.all {
+                if (it in getJniSpecClass()) {
+                    it.jniHeaderLocations.each {
+                        dependsOn it.key
+                        from(it.value) {
+                            into '/jni'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+task cppHeadersZip(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = zipBaseName
+    classifier = "headers"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/include') {
+        into '/'
+    }
+}
+
+artifacts {
+    archives cppHeadersZip
+    archives cppSourcesZip
+}
+
+addTaskToCopyAllOutputs(cppSourcesZip)
+addTaskToCopyAllOutputs(cppHeadersZip)
+
+model {
+    publishing {
+        def taskList = createComponentZipTasks($.components, [nativeName, "${nativeName}JNIShared"], zipBaseName, Zip, project, includeStandardZipFormat)
+
+        def jniTaskList = createComponentZipTasks($.components, ["${nativeName}JNI"], jniBaseName, Jar, project, { task, value ->
+            value.each { binary ->
+                if (binary.buildable) {
+                    if (binary instanceof SharedLibraryBinarySpec) {
+                        task.dependsOn binary.tasks.link
+                        def hashFile = new File(binary.sharedLibraryFile.parentFile.absolutePath, "${binary.component.baseName}.hash")
+                        task.outputs.file(hashFile)
+                        task.inputs.file(binary.sharedLibraryFile)
+                        task.from(hashFile) {
+                            into nativeUtils.getPlatformPath(binary)
+                        }
+                        task.doFirst {
+                            hashFile.text = MessageDigest.getInstance("MD5").digest(binary.sharedLibraryFile.bytes).encodeHex().toString()
+                        }
+                        task.from(binary.sharedLibraryFile) {
+                            into nativeUtils.getPlatformPath(binary)
+                        }
+                    }
+                }
+            }
+        })
+
+        def allJniTask
+        if (!project.hasProperty('jenkinsBuild')) {
+            allJniTask = createAllCombined(jniTaskList, "${nativeName}JNI", jniBaseName, Jar, project)
+        }
+
+        publications {
+            cpp(MavenPublication) {
+                taskList.each {
+                    artifact it
+                }
+                artifact cppHeadersZip
+                artifact cppSourcesZip
+
+                artifactId = "${baseArtifactId}-cpp"
+                groupId artifactGroupId
+                version pubVersion
+            }
+            jni(MavenPublication) {
+                jniTaskList.each {
+                    artifact it
+                }
+
+                if (!project.hasProperty('jenkinsBuild')) {
+                    artifact allJniTask
+                }
+
+                artifactId = "${baseArtifactId}-jni"
+                groupId artifactGroupId
+                version pubVersion
+            }
+        }
+    }
+}

@@ -5,20 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DMC60.h"
+#include "frc/DMC60.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
 using namespace frc;
 
-/**
- * Constructor for a Digilent DMC 60.
- *
- * @param channel The PWM channel that the DMC 60 is attached to. 0-9 are
- *                on-board, 10-19 are on the MXP port
- */
 DMC60::DMC60(int channel) : PWMSpeedController(channel) {
-  /**
+  /*
    * Note that the DMC 60 uses the following bounds for PWM values. These
    * values should work reasonably well for most controllers, but if users
    * experience issues such as asymmetric behavior around the deadband or
@@ -37,6 +31,6 @@ DMC60::DMC60(int channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  // HAL_Report(HALUsageReporting::kResourceType_VictorSP, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_DigilentDMC60, GetChannel());
   SetName("DMC60", GetChannel());
 }

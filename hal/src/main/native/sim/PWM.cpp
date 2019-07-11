@@ -5,13 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/PWM.h"
+#include "hal/PWM.h"
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "MockData/PWMDataInternal.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/handles/HandlesInternal.h"
+#include "mockdata/PWMDataInternal.h"
 
 using namespace hal;
 
@@ -25,6 +26,7 @@ extern "C" {
 
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
                                         int32_t* status) {
+  hal::init::CheckInit();
   if (*status != 0) return HAL_kInvalidHandle;
 
   int16_t channel = getPortHandleChannel(portHandle);
@@ -55,7 +57,10 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 
   port->channel = origChannel;
 
-  SimPWMData[origChannel].SetInitialized(true);
+  SimPWMData[origChannel].initialized = true;
+
+  // Defaults to allow an always valid config.
+  HAL_SetPWMConfig(handle, 2.0, 1.501, 1.5, 1.499, 1.0, status);
 
   return handle;
 }
@@ -66,7 +71,7 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return;
   }
 
-  SimPWMData[port->channel].SetInitialized(false);
+  SimPWMData[port->channel].initialized = false;
 
   digitalChannelHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
 }
@@ -161,14 +166,6 @@ HAL_Bool HAL_GetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
   return port->eliminateDeadband;
 }
 
-/**
- * Set a PWM channel to the desired value. The values range from 0 to 255 and
- * the period is controlled
- * by the PWM Period and MinHigh registers.
- *
- * @param channel The PWM channel to set.
- * @param value The PWM value to set.
- */
 void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value,
                    int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
@@ -177,18 +174,9 @@ void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value,
     return;
   }
 
-  SimPWMData[port->channel].SetRawValue(value);
+  SimPWMData[port->channel].rawValue = value;
 }
 
-/**
- * Set a PWM channel to the desired scaled value. The values range from -1 to 1
- * and
- * the period is controlled
- * by the PWM Period and MinHigh registers.
- *
- * @param channel The PWM channel to set.
- * @param value The scaled PWM value to set.
- */
 void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
                      int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
@@ -207,18 +195,9 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
     speed = 1.0;
   }
 
-  SimPWMData[port->channel].SetSpeed(speed);
+  SimPWMData[port->channel].speed = speed;
 }
 
-/**
- * Set a PWM channel to the desired position value. The values range from 0 to 1
- * and
- * the period is controlled
- * by the PWM Period and MinHigh registers.
- *
- * @param channel The PWM channel to set.
- * @param value The scaled PWM value to set.
- */
 void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double pos,
                         int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
@@ -237,7 +216,7 @@ void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double pos,
     pos = 1.0;
   }
 
-  SimPWMData[port->channel].SetPosition(pos);
+  SimPWMData[port->channel].position = pos;
 }
 
 void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
@@ -246,17 +225,11 @@ void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  SimPWMData[port->channel].SetRawValue(0);
-  SimPWMData[port->channel].SetPosition(0);
-  SimPWMData[port->channel].SetSpeed(0);
+  SimPWMData[port->channel].rawValue = 0;
+  SimPWMData[port->channel].position = 0;
+  SimPWMData[port->channel].speed = 0;
 }
 
-/**
- * Get a value from a PWM channel. The values range from 0 to 255.
- *
- * @param channel The PWM channel to read from.
- * @return The raw PWM value.
- */
 int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
@@ -264,15 +237,9 @@ int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return 0;
   }
 
-  return SimPWMData[port->channel].GetRawValue();
+  return SimPWMData[port->channel].rawValue;
 }
 
-/**
- * Get a scaled value from a PWM channel. The values range from -1 to 1.
- *
- * @param channel The PWM channel to read from.
- * @return The scaled PWM value.
- */
 double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
@@ -284,18 +251,12 @@ double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return 0;
   }
 
-  double speed = SimPWMData[port->channel].GetSpeed();
+  double speed = SimPWMData[port->channel].speed;
   if (speed > 1) speed = 1;
   if (speed < -1) speed = -1;
   return speed;
 }
 
-/**
- * Get a position value from a PWM channel. The values range from 0 to 1.
- *
- * @param channel The PWM channel to read from.
- * @return The scaled PWM value.
- */
 double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
@@ -307,7 +268,7 @@ double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return 0;
   }
 
-  double position = SimPWMData[port->channel].GetPosition();
+  double position = SimPWMData[port->channel].position;
   if (position > 1) position = 1;
   if (position < 0) position = 0;
   return position;
@@ -320,16 +281,10 @@ void HAL_LatchPWMZero(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return;
   }
 
-  SimPWMData[port->channel].SetZeroLatch(true);
-  SimPWMData[port->channel].SetZeroLatch(false);
+  SimPWMData[port->channel].zeroLatch = true;
+  SimPWMData[port->channel].zeroLatch = false;
 }
 
-/**
- * Set how how often the PWM signal is squelched, thus scaling the period.
- *
- * @param channel The PWM channel to configure.
- * @param squelchMask The 2-bit mask of outputs to squelch.
- */
 void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
                            int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
@@ -338,20 +293,10 @@ void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
     return;
   }
 
-  SimPWMData[port->channel].SetPeriodScale(squelchMask);
+  SimPWMData[port->channel].periodScale = squelchMask;
 }
 
-/**
- * Get the loop timing of the PWM system
- *
- * @return The loop time
- */
 int32_t HAL_GetPWMLoopTiming(int32_t* status) { return kExpectedLoopTiming; }
 
-/**
- * Get the pwm starting cycle time
- *
- * @return The pwm cycle start time.
- */
 uint64_t HAL_GetPWMCycleStartTime(int32_t* status) { return 0; }
 }  // extern "C"

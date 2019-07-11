@@ -7,108 +7,103 @@
 
 package edu.wpi.first.wpilibj;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class SpeedControllerGroupTest {
-  private final SpeedController[] m_speedControllers;
-  private final SpeedControllerGroup m_group;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-  /**
-   * Returns a Collection of ArrayLists with various MockSpeedController configurations.
-   */
-  @Parameterized.Parameters
-  public static Collection<Object[][]> data() {
-    return Arrays.asList((Object[][][]) new SpeedController[][][] {
-        {{new MockSpeedController()}},
-        {{new MockSpeedController(),
-            new MockSpeedController()}},
-        {{new MockSpeedController(),
-            new MockSpeedController(),
-            new MockSpeedController()}}
+class SpeedControllerGroupTest {
+  private static Stream<Arguments> speedControllerArguments() {
+    return IntStream.of(1, 2, 3).mapToObj(number -> {
+      SpeedController[] speedControllers = Stream.generate(MockSpeedController::new)
+          .limit(number)
+          .toArray(SpeedController[]::new);
+      SpeedControllerGroup group = new SpeedControllerGroup(speedControllers[0],
+          Arrays.copyOfRange(speedControllers, 1, speedControllers.length));
+      return Arguments.of(group, speedControllers);
     });
   }
 
-  /**
-   * Construct SpeedControllerGroupTest.
-   */
-  public SpeedControllerGroupTest(SpeedController[] speedControllers) {
-    m_group = new SpeedControllerGroup(speedControllers[0],
-        Arrays.copyOfRange(speedControllers, 1, speedControllers.length));
-    m_speedControllers = speedControllers;
+  @ParameterizedTest
+  @MethodSource("speedControllerArguments")
+  void setTest(final SpeedControllerGroup group, final SpeedController[] speedControllers) {
+    group.set(1.0);
+
+    assertArrayEquals(DoubleStream.generate(() -> 1.0).limit(speedControllers.length).toArray(),
+        Arrays.stream(speedControllers).mapToDouble(SpeedController::get).toArray(),
+        0.00005);
   }
 
-  @Test
-  public void testSet() {
-    m_group.set(1.0);
+  @ParameterizedTest
+  @MethodSource("speedControllerArguments")
+  void getInvertedTest(final SpeedControllerGroup group,
+                       final SpeedController[] speedControllers) {
+    group.setInverted(true);
 
-    assertArrayEquals(Arrays.stream(m_speedControllers).mapToDouble(__ -> 1.0).toArray(),
-        Arrays.stream(m_speedControllers).mapToDouble(SpeedController::get).toArray(),
-        0.0);
+    assertTrue(group.getInverted());
   }
 
-  @Test
-  public void testGetInverted() {
-    m_group.setInverted(true);
+  @ParameterizedTest
+  @MethodSource("speedControllerArguments")
+  void setInvertedDoesNotModifySpeedControllersTest(final SpeedControllerGroup group,
+                                                    final SpeedController[] speedControllers) {
+    group.setInverted(true);
 
-    assertTrue(m_group.getInverted());
+    assertArrayEquals(Stream.generate(() -> false).limit(speedControllers.length).toArray(),
+        Arrays.stream(speedControllers).map(SpeedController::getInverted).toArray());
   }
 
-  @Test
-  public void testSetInvertedDoesNotModifySpeedControllers() {
-    for (SpeedController speedController : m_speedControllers) {
-      speedController.setInverted(false);
-    }
-    m_group.setInverted(true);
+  @ParameterizedTest
+  @MethodSource("speedControllerArguments")
+  void setInvertedDoesInvertTest(final SpeedControllerGroup group,
+                                 final SpeedController[] speedControllers) {
+    group.setInverted(true);
+    group.set(1.0);
 
-    assertArrayEquals(Arrays.stream(m_speedControllers).map(__ -> false).toArray(),
-        Arrays.stream(m_speedControllers).map(SpeedController::getInverted).toArray());
+    assertArrayEquals(DoubleStream.generate(() -> -1.0).limit(speedControllers.length).toArray(),
+        Arrays.stream(speedControllers).mapToDouble(SpeedController::get).toArray(),
+        0.00005);
   }
 
-  @Test
-  public void testSetInvertedDoesInvert() {
-    m_group.setInverted(true);
-    m_group.set(1.0);
+  @ParameterizedTest
+  @MethodSource("speedControllerArguments")
+  void disableTest(final SpeedControllerGroup group,
+                   final SpeedController[] speedControllers) {
+    group.set(1.0);
+    group.disable();
 
-    assertArrayEquals(Arrays.stream(m_speedControllers).mapToDouble(__ -> -1.0).toArray(),
-        Arrays.stream(m_speedControllers).mapToDouble(SpeedController::get).toArray(),
-        0.0);
+    assertArrayEquals(DoubleStream.generate(() -> 0.0).limit(speedControllers.length).toArray(),
+        Arrays.stream(speedControllers).mapToDouble(SpeedController::get).toArray(),
+        0.00005);
   }
 
-  @Test
-  public void testDisable() {
-    m_group.set(1.0);
-    m_group.disable();
+  @ParameterizedTest
+  @MethodSource("speedControllerArguments")
+  void stopMotorTest(final SpeedControllerGroup group,
+                     final SpeedController[] speedControllers) {
+    group.set(1.0);
+    group.stopMotor();
 
-    assertArrayEquals(Arrays.stream(m_speedControllers).mapToDouble(__ -> 0.0).toArray(),
-        Arrays.stream(m_speedControllers).mapToDouble(SpeedController::get).toArray(),
-        0.0);
+    assertArrayEquals(DoubleStream.generate(() -> 0.0).limit(speedControllers.length).toArray(),
+        Arrays.stream(speedControllers).mapToDouble(SpeedController::get).toArray(),
+        0.00005);
   }
 
-  @Test
-  public void testStopMotor() {
-    m_group.set(1.0);
-    m_group.stopMotor();
+  @ParameterizedTest
+  @MethodSource("speedControllerArguments")
+  void pidWriteTest(final SpeedControllerGroup group,
+                    final SpeedController[] speedControllers) {
+    group.pidWrite(1.0);
 
-    assertArrayEquals(Arrays.stream(m_speedControllers).mapToDouble(__ -> 0.0).toArray(),
-        Arrays.stream(m_speedControllers).mapToDouble(SpeedController::get).toArray(),
-        0.0);
-  }
-
-  @Test
-  public void testPidWrite() {
-    m_group.pidWrite(1.0);
-
-    assertArrayEquals(Arrays.stream(m_speedControllers).mapToDouble(__ -> 1.0).toArray(),
-        Arrays.stream(m_speedControllers).mapToDouble(SpeedController::get).toArray(),
-        0.0);
+    assertArrayEquals(DoubleStream.generate(() -> 1.0).limit(speedControllers.length).toArray(),
+        Arrays.stream(speedControllers).mapToDouble(SpeedController::get).toArray(),
+        0.00005);
   }
 }

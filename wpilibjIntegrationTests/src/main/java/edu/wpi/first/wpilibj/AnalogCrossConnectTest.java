@@ -7,12 +7,12 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.logging.Logger;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
@@ -78,7 +78,7 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
     assertFalse("Analog trigger is in the window (2V, 3V)", trigger.getInWindow());
     assertFalse("Analog trigger is on", trigger.getTriggerState());
 
-    trigger.free();
+    trigger.close();
   }
 
   @Test
@@ -95,7 +95,7 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
     assertTrue("Analog trigger is not in the window (2V, 3V)", trigger.getInWindow());
     assertFalse("Analog trigger is on", trigger.getTriggerState());
 
-    trigger.free();
+    trigger.close();
   }
 
   @Test
@@ -112,7 +112,7 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
     assertFalse("Analog trigger is in the window (2V, 3V)", trigger.getInWindow());
     assertTrue("Analog trigger is not on", trigger.getTriggerState());
 
-    trigger.free();
+    trigger.close();
   }
 
   @Test
@@ -167,9 +167,9 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
   @Override
   void freeInterruptableSensorBase() {
     m_interruptTriggerOutput.cancelInterrupts();
-    m_interruptTriggerOutput.free();
+    m_interruptTriggerOutput.close();
     m_interruptTriggerOutput = null;
-    m_interruptTrigger.free();
+    m_interruptTrigger.close();
     m_interruptTrigger = null;
   }
 

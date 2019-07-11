@@ -15,7 +15,7 @@ public class StartCommand extends InstantCommand {
   /**
    * The command to fork.
    */
-  private Command m_commandToFork;
+  private final Command m_commandToFork;
 
   /**
    * Instantiates a {@link StartCommand} which will start the given command whenever its {@link
@@ -28,6 +28,7 @@ public class StartCommand extends InstantCommand {
     m_commandToFork = commandToStart;
   }
 
+  @Override
   protected void initialize() {
     m_commandToFork.start();
   }

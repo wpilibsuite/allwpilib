@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Iterative Robot",
+    "description": "Iterative style",
+    "tags": [
+      "Iterative"
+    ],
+    "foldername": "iterative",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Timed Robot",
+    "description": "Timed style",
+    "tags": [
+      "Timed"
+    ],
+    "foldername": "timed",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Timed Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for TimedRobot",
+    "tags": [
+      "Timed", "Skeleton"
+    ],
+    "foldername": "timedskeleton",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Command Robot",
+    "description": "Command style",
+    "tags": [
+      "Command"
+    ],
+    "foldername": "commandbased",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Sample Robot",
+    "description": "Sample style",
+    "tags": [
+      "Sample"
+    ],
+    "foldername": "sample",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  }
+]

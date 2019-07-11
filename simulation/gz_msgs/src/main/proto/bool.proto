@@ -1,0 +1,15 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Bool
+/// \brief A message for boolean data
+/// \verbatim
+
+option java_outer_classname = "GzBool";
+
+message Bool
+{
+  required bool data = 1;
+}
+
+/// \endverbatim

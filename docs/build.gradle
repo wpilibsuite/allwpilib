@@ -1,0 +1,163 @@
+plugins {
+    id 'java'
+    id "org.ysb33r.doxygen" version "0.5"
+}
+
+evaluationDependsOn(':wpiutil')
+evaluationDependsOn(':ntcore')
+evaluationDependsOn(':cscore')
+evaluationDependsOn(':hal')
+evaluationDependsOn(':cameraserver')
+evaluationDependsOn(':wpilibc')
+evaluationDependsOn(':wpilibj')
+
+def pubVersion = ''
+if (project.hasProperty("publishVersion")) {
+    pubVersion = project.publishVersion
+} else {
+    pubVersion = WPILibVersion.version
+}
+
+def baseArtifactIdCpp = 'documentation'
+def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
+def zipBaseNameCpp = '_GROUP_edu_wpi_first_wpilibc_ID_documentation_CLS'
+
+def baseArtifactIdJava = 'documentation'
+def artifactGroupIdJava = 'edu.wpi.first.wpilibj'
+def zipBaseNameJava = '_GROUP_edu_wpi_first_wpilibj_ID_documentation_CLS'
+
+def outputsFolder = file("$project.buildDir/outputs")
+
+def cppProjectZips = []
+
+cppProjectZips.add(project(':hal').cppHeadersZip)
+cppProjectZips.add(project(':wpiutil').cppHeadersZip)
+cppProjectZips.add(project(':ntcore').cppHeadersZip)
+cppProjectZips.add(project(':cscore').cppHeadersZip)
+cppProjectZips.add(project(':cameraserver').cppHeadersZip)
+cppProjectZips.add(project(':wpilibc').cppHeadersZip)
+
+doxygen {
+  executables {
+     doxygen version : '1.8.8'
+  }
+}
+
+doxygen {
+    generate_html true
+
+    cppProjectZips.each {
+        dependsOn it
+        source it.source
+    }
+
+    extension_mapping 'inc=C++'
+    project_name 'WPILibC++'
+    project_number pubVersion
+    javadoc_autobrief true
+    recursive true
+    quiet true
+    warnings false
+    warn_if_doc_error false
+    warn_no_paramdoc false
+    warn_format false
+    warn_logfile false
+    warn_if_undocumented false
+    generate_latex false
+    use_mathjax true
+    html_timestamp true
+    generate_treeview true
+}
+
+tasks.register("zipCppDocs", Zip) {
+    baseName = zipBaseNameCpp
+    destinationDir = outputsFolder
+    dependsOn doxygen
+    from ("$buildDir/docs/doxygen/html")
+    into '/'
+}
+
+
+// Java
+configurations {
+    javaSource {
+        transitive false
+    }
+}
+
+ext {
+    sharedCvConfigs = [:]
+    staticCvConfigs = [:]
+    useJava = true
+    useCpp = false
+    skipDev = true
+    useDocumentation = true
+}
+
+apply from: "${rootDir}/shared/opencv.gradle"
+
+task generateJavaDocs(type: Javadoc) {
+    options.links("https://docs.oracle.com/en/java/javase/11/docs/api/")
+    options.addStringOption "tag", "pre:a:Pre-Condition"
+    options.addStringOption('Xdoclint:accessibility,html,missing,reference,syntax')
+    options.addBooleanOption('html5', true)
+    dependsOn project(':wpilibj').generateJavaVersion
+    dependsOn project(':hal').generateUsageReporting
+    source project(':hal').sourceSets.main.java
+    source project(':wpiutil').sourceSets.main.java
+    source project(':cscore').sourceSets.main.java
+    source project(':ntcore').sourceSets.main.java
+    source project(':wpilibj').sourceSets.main.java
+    source project(':cameraserver').sourceSets.main.java
+    source configurations.javaSource.collect { zipTree(it) }
+    include '**/*.java'
+    failOnError = true
+
+    title = "WPILib API $pubVersion"
+    ext.entryPoint = "$destinationDir/index.html"
+
+    if (JavaVersion.current().isJava11Compatible()) {
+        options.addBooleanOption('-no-module-directories', true)
+        doLast {
+            // This is a work-around for https://bugs.openjdk.java.net/browse/JDK-8211194. Can be removed once that issue is fixed on JDK's side
+            // Since JDK 11, package-list is missing from javadoc output files and superseded by element-list file, but a lot of external tools still need it
+            // Here we generate this file manually
+            new File(destinationDir, 'package-list').text = new File(destinationDir, 'element-list').text
+        }
+    }
+}
+
+tasks.register("zipJavaDocs", Zip) {
+    baseName = zipBaseNameJava
+    destinationDir = outputsFolder
+    dependsOn generateJavaDocs
+    from ("$buildDir/docs/javadoc")
+    into '/'
+}
+
+addTaskToCopyAllOutputs(zipCppDocs)
+addTaskToCopyAllOutputs(zipJavaDocs)
+
+build.dependsOn zipCppDocs
+build.dependsOn zipJavaDocs
+
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        java(MavenPublication) {
+            artifact zipJavaDocs
+
+            artifactId = "${baseArtifactIdJava}"
+            groupId artifactGroupIdJava
+            version pubVersion
+        }
+        cpp(MavenPublication) {
+            artifact zipCppDocs
+
+            artifactId = "${baseArtifactIdCpp}"
+            groupId artifactGroupIdCpp
+            version pubVersion
+        }
+    }
+}

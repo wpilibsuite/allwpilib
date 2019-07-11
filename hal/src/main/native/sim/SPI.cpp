@@ -5,9 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/SPI.h"
+#include "hal/SPI.h"
 
-#include "MockData/SPIDataInternal.h"
+#include "HALInitializer.h"
+#include "mockdata/SPIDataInternal.h"
 
 using namespace hal;
 
@@ -18,7 +19,8 @@ void InitializeSPI() {}
 }  // namespace hal
 
 void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
-  SimSPIData[port].SetInitialized(true);
+  hal::init::CheckInit();
+  SimSPIData[port].initialized = true;
 }
 int32_t HAL_TransactionSPI(HAL_SPIPort port, const uint8_t* dataToSend,
                            uint8_t* dataReceived, int32_t size) {
@@ -31,7 +33,7 @@ int32_t HAL_WriteSPI(HAL_SPIPort port, const uint8_t* dataToSend,
 int32_t HAL_ReadSPI(HAL_SPIPort port, uint8_t* buffer, int32_t count) {
   return SimSPIData[port].Read(buffer, count);
 }
-void HAL_CloseSPI(HAL_SPIPort port) { SimSPIData[port].SetInitialized(false); }
+void HAL_CloseSPI(HAL_SPIPort port) { SimSPIData[port].initialized = false; }
 void HAL_SetSPISpeed(HAL_SPIPort port, int32_t speed) {}
 void HAL_SetSPIOpts(HAL_SPIPort port, HAL_Bool msbFirst,
                     HAL_Bool sampleOnTrailing, HAL_Bool clkIdleHigh) {}
@@ -52,7 +54,7 @@ void HAL_SetSPIAutoTransmitData(HAL_SPIPort port, const uint8_t* dataToSend,
                                 int32_t dataSize, int32_t zeroSize,
                                 int32_t* status) {}
 void HAL_ForceSPIAutoRead(HAL_SPIPort port, int32_t* status) {}
-int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint8_t* buffer,
+int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint32_t* buffer,
                                     int32_t numToRead, double timeout,
                                     int32_t* status) {
   return SimSPIData[port].ReadAutoReceivedData(buffer, numToRead, timeout,

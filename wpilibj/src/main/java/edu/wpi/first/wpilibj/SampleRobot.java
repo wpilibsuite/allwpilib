@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,10 +7,11 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 /**
  * A simple robot base class that knows the standard FRC competition states (disabled, autonomous,
@@ -54,7 +55,7 @@ public class SampleRobot extends RobotBase {
   }
 
   /**
-   * Disabled should go here. Users should overload this method to run code that should run while
+   * Disabled should go here. Users should override this method to run code that should run while
    * the field is disabled.
    *
    * <p>Called once each time the robot enters the disabled state.
@@ -114,6 +115,8 @@ public class SampleRobot extends RobotBase {
    * state to change, either the other mode starts or the robot is disabled. Then go back and wait
    * for the robot to be enabled again.
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
+  @Override
   public void startCompetition() {
     robotInit();
 
@@ -140,6 +143,7 @@ public class SampleRobot extends RobotBase {
           }
         } else if (isTest()) {
           LiveWindow.setEnabled(true);
+          Shuffleboard.enableActuatorWidgets();
           m_ds.InTest(true);
           test();
           m_ds.InTest(false);
@@ -147,6 +151,7 @@ public class SampleRobot extends RobotBase {
             Timer.delay(0.01);
           }
           LiveWindow.setEnabled(false);
+          Shuffleboard.disableActuatorWidgets();
         } else {
           m_ds.InOperatorControl(true);
           operatorControl();

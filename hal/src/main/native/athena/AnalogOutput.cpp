@@ -5,13 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/AnalogOutput.h"
+#include "hal/AnalogOutput.h"
 
 #include "AnalogInternal.h"
-#include "HAL/Errors.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "HAL/handles/IndexedHandleResource.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/Errors.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/IndexedHandleResource.h"
 
 using namespace hal;
 
@@ -40,11 +41,9 @@ void InitializeAnalogOutput() {
 
 extern "C" {
 
-/**
- * Initialize the analog output port using the given port object.
- */
 HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
                                                       int32_t* status) {
+  hal::init::CheckInit();
   initializeAnalog(status);
 
   if (*status != 0) return HAL_kInvalidHandle;
@@ -76,17 +75,6 @@ void HAL_FreeAnalogOutputPort(HAL_AnalogOutputHandle analogOutputHandle) {
   analogOutputHandles->Free(analogOutputHandle);
 }
 
-/**
- * Check that the analog output channel number is value.
- * Verify that the analog channel number is one of the legal channel numbers.
- * Channel numbers are 0-based.
- *
- * @return Analog channel is valid
- */
-HAL_Bool HAL_CheckAnalogOutputChannel(int32_t channel) {
-  return channel < kNumAnalogOutputs && channel >= 0;
-}
-
 void HAL_SetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
                          double voltage, int32_t* status) {
   auto port = analogOutputHandles->Get(analogOutputHandle);
@@ -116,6 +104,10 @@ double HAL_GetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
   uint16_t rawValue = analogOutputSystem->readMXP(port->channel, status);
 
   return rawValue * 5.0 / 0x1000;
+}
+
+HAL_Bool HAL_CheckAnalogOutputChannel(int32_t channel) {
+  return channel < kNumAnalogOutputs && channel >= 0;
 }
 
 }  // extern "C"

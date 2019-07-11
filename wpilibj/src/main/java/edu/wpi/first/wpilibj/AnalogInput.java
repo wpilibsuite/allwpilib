@@ -7,11 +7,13 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.AnalogJNI;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.AccumulatorResult;
+import edu.wpi.first.hal.AnalogJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.sim.AnalogInSim;
+import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.util.AllocationException;
 
 /**
  * Analog channel class.
@@ -25,7 +27,7 @@ import edu.wpi.first.wpilibj.util.AllocationException;
  * accumulated effectively increasing the resolution, while the averaged samples are divided by the
  * number of samples to retain the resolution, but get more stable values.
  */
-public class AnalogInput extends SensorBase implements PIDSource, Sendable {
+public class AnalogInput extends SendableBase implements PIDSource {
   private static final int kAccumulatorSlot = 1;
   int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;
@@ -39,22 +41,19 @@ public class AnalogInput extends SensorBase implements PIDSource, Sendable {
    * @param channel The channel number to represent. 0-3 are on-board 4-7 are on the MXP port.
    */
   public AnalogInput(final int channel) {
-    checkAnalogInputChannel(channel);
+    AnalogJNI.checkAnalogInputChannel(channel);
     m_channel = channel;
 
-    final int portHandle = AnalogJNI.getPort((byte) channel);
+    final int portHandle = HAL.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogInputPort(portHandle);
 
     HAL.report(tResourceType.kResourceType_AnalogChannel, channel);
     setName("AnalogInput", channel);
   }
 
-  /**
-   * Channel destructor.
-   */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     AnalogJNI.freeAnalogInputPort(m_port);
     m_port = 0;
     m_channel = 0;
@@ -349,5 +348,9 @@ public class AnalogInput extends SensorBase implements PIDSource, Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Analog Input");
     builder.addDoubleProperty("Value", this::getAverageVoltage, null);
+  }
+
+  public AnalogInSim getSimObject() {
+    return new AnalogInSim(m_channel);
   }
 }

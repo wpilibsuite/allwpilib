@@ -7,20 +7,18 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
-import edu.wpi.first.wpilibj.UnitTestUtility;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * The basic test for all {@link Command} tests.
  */
 public abstract class AbstractCommandTest {
-  @Before
-  public void commandSetup() {
-    UnitTestUtility.setupMockBase();
+  @BeforeEach
+  void commandSetup() {
     Scheduler.getInstance().removeAll();
     Scheduler.getInstance().enable();
   }
@@ -28,6 +26,7 @@ public abstract class AbstractCommandTest {
   public class ASubsystem extends Subsystem {
     Command m_command;
 
+    @Override
     protected void initDefaultCommand() {
       if (m_command != null) {
         setDefaultCommand(m_command);
@@ -42,18 +41,16 @@ public abstract class AbstractCommandTest {
 
   protected void assertCommandState(MockCommand command, int initialize, int execute,
                                     int isFinished, int end, int interrupted) {
-    assertEquals(initialize, command.getInitializeCount());
-    assertEquals(execute, command.getExecuteCount());
-    assertEquals(isFinished, command.getIsFinishedCount());
-    assertEquals(end, command.getEndCount());
-    assertEquals(interrupted, command.getInterruptedCount());
+    assertAll(
+        () -> assertEquals(initialize, command.getInitializeCount()),
+        () -> assertEquals(execute, command.getExecuteCount()),
+        () -> assertEquals(isFinished, command.getIsFinishedCount()),
+        () -> assertEquals(end, command.getEndCount()),
+        () -> assertEquals(interrupted, command.getInterruptedCount())
+    );
   }
 
   protected void sleep(int time) {
-    try {
-      Thread.sleep(time);
-    } catch (InterruptedException ex) {
-      fail("Sleep Interrupted!?!?!?!?");
-    }
+    assertDoesNotThrow(() -> Thread.sleep(time));
   }
 }

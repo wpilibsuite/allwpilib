@@ -7,10 +7,10 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
+import java.util.logging.Logger;
+
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
@@ -24,6 +24,7 @@ public class SmartDashboardTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(SmartDashboardTest.class.getName());
   private static final NetworkTable table = NetworkTable.getTable("SmartDashboard");
 
+  @Override
   protected Logger getClassLogger() {
     return logger;
   }

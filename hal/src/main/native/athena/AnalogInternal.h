@@ -11,12 +11,12 @@
 
 #include <memory>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
-#include "HAL/ChipObject.h"
-#include "HAL/Ports.h"
-#include "HAL/handles/IndexedHandleResource.h"
 #include "PortsInternal.h"
+#include "hal/ChipObject.h"
+#include "hal/Ports.h"
+#include "hal/handles/IndexedHandleResource.h"
 
 namespace hal {
 
@@ -40,10 +40,49 @@ extern IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
                              kNumAnalogInputs, HAL_HandleEnum::AnalogInput>*
     analogInputHandles;
 
-int32_t getAnalogNumActiveChannels(int32_t* status);
-int32_t getAnalogNumChannelsToActivate(int32_t* status);
-void setAnalogNumChannelsToActivate(int32_t channels);
-void setAnalogSampleRate(double samplesPerSecond, int32_t* status);
+/**
+ * Initialize the analog System.
+ */
 void initializeAnalog(int32_t* status);
+
+/**
+ * Return the number of channels on the module in use.
+ *
+ * @return Active channels.
+ */
+int32_t getAnalogNumActiveChannels(int32_t* status);
+
+/**
+ * Set the number of active channels.
+ *
+ * Store the number of active channels to set.  Don't actually commit to
+ * hardware
+ * until SetSampleRate().
+ *
+ * @param channels Number of active channels.
+ */
+void setAnalogNumChannelsToActivate(int32_t channels);
+
+/**
+ * Get the number of active channels.
+ *
+ * This is an internal function to allow the atomic update of both the
+ * number of active channels and the sample rate.
+ *
+ * When the number of channels changes, use the new value.  Otherwise,
+ * return the curent value.
+ *
+ * @return Value to write to the active channels field.
+ */
+int32_t getAnalogNumChannelsToActivate(int32_t* status);
+
+/**
+ * Set the sample rate.
+ *
+ * This is a global setting for the Athena and effects all channels.
+ *
+ * @param samplesPerSecond The number of samples per channel per second.
+ */
+void setAnalogSampleRate(double samplesPerSecond, int32_t* status);
 
 }  // namespace hal

@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Threads.h"
+#include "hal/Threads.h"
 
 namespace hal {
 namespace init {

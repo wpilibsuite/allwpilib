@@ -5,13 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Counter.h"
+#include "hal/Counter.h"
 
 #include "CounterInternal.h"
-#include "HAL/Errors.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "HAL/handles/LimitedHandleResource.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/Errors.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/LimitedHandleResource.h"
 
 namespace hal {
 
@@ -33,6 +34,7 @@ void InitializeCounter() {
 extern "C" {
 HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
                                         int32_t* status) {
+  hal::init::CheckInit();
   return 0;
 }
 void HAL_FreeCounter(HAL_CounterHandle counterHandle, int32_t* status) {}

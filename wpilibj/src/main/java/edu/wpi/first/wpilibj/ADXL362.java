@@ -10,9 +10,9 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
 @SuppressWarnings("PMD.UnusedPrivateField")
-public class ADXL362 extends SensorBase implements Accelerometer, Sendable {
+public class ADXL362 extends SendableBase implements Accelerometer {
   private static final byte kRegWrite = 0x0A;
   private static final byte kRegRead = 0x0B;
 
@@ -83,7 +83,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, Sendable {
 
     m_spi.setClockRate(3000000);
     m_spi.setMSBFirst();
-    m_spi.setSampleDataOnFalling();
+    m_spi.setSampleDataOnTrailingEdge();
     m_spi.setClockActiveLow();
     m_spi.setChipSelectActiveLow();
 
@@ -93,7 +93,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, Sendable {
     transferBuffer.put(1, kPartIdRegister);
     m_spi.transaction(transferBuffer, transferBuffer, 3);
     if (transferBuffer.get(2) != (byte) 0xF2) {
-      m_spi.free();
+      m_spi.close();
       m_spi = null;
       DriverStation.reportError("could not find ADXL362 on SPI port " + port.value, false);
       return;
@@ -112,10 +112,10 @@ public class ADXL362 extends SensorBase implements Accelerometer, Sendable {
   }
 
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_spi != null) {
-      m_spi.free();
+      m_spi.close();
       m_spi = null;
     }
   }

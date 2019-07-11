@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.AnalogOutput;
 /**
  * A fake source to provide output to a {@link edu.wpi.first.wpilibj.interfaces.Potentiometer}.
  */
-public class FakePotentiometerSource {
+public class FakePotentiometerSource implements AutoCloseable {
   private AnalogOutput m_output;
   private boolean m_initOutput;
   private double m_potMaxAngle;
@@ -83,9 +83,10 @@ public class FakePotentiometerSource {
   /**
    * Frees the resouce.
    */
-  public void free() {
+  @Override
+  public void close() {
     if (m_initOutput) {
-      m_output.free();
+      m_output.close();
       m_output = null;
       m_initOutput = false;
     }

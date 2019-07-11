@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "IterativeRobot.h"
+#include <frc/TimedRobot.h>
 
-class MyRobot : public frc::IterativeRobot {
+class MyRobot : public frc::TimedRobot {
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -45,4 +45,4 @@ class MyRobot : public frc::IterativeRobot {
   void RobotPeriodic() override {}
 };
 
-START_ROBOT_CLASS(MyRobot)
+int main() { return frc::StartRobot<MyRobot>(); }

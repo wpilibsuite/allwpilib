@@ -64,8 +64,8 @@ public abstract class AnalogCrossConnectFixture implements ITestFixture {
    */
   @Override
   public boolean teardown() {
-    m_input.free();
-    m_output.free();
+    m_input.close();
+    m_output.close();
     return true;
   }
 

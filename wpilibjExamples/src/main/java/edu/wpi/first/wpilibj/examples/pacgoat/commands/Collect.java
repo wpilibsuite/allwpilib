@@ -16,10 +16,13 @@ import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Pivot;
  * Get the robot set to collect balls.
  */
 public class Collect extends CommandGroup {
-	public Collect() {
-		addSequential(new SetCollectionSpeed(Collector.kForward));
-		addParallel(new CloseClaw());
-		addSequential(new SetPivotSetpoint(Pivot.kCollect));
-		addSequential(new WaitForBall());
-	}
+  /**
+   * Create a new collect command.
+   */
+  public Collect() {
+    addSequential(new SetCollectionSpeed(Collector.kForward));
+    addParallel(new CloseClaw());
+    addSequential(new SetPivotSetpoint(Pivot.kCollect));
+    addSequential(new WaitForBall());
+  }
 }

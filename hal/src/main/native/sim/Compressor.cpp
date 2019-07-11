@@ -5,12 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Compressor.h"
+#include "hal/Compressor.h"
 
-#include "HAL/Errors.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "MockData/PCMDataInternal.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/Errors.h"
+#include "hal/handles/HandlesInternal.h"
+#include "mockdata/PCMDataInternal.h"
 
 using namespace hal;
 
@@ -23,10 +24,11 @@ void InitializeCompressor() {}
 extern "C" {
 
 HAL_CompressorHandle HAL_InitializeCompressor(int32_t module, int32_t* status) {
+  hal::init::CheckInit();
   // As compressors can have unlimited objects, just create a
   // handle with the module number as the index.
 
-  SimPCMData[module].SetCompressorInitialized(true);
+  SimPCMData[module].compressorInitialized = true;
   return (HAL_CompressorHandle)createHandle(static_cast<int16_t>(module),
                                             HAL_HandleEnum::Compressor, 0);
 }
@@ -44,7 +46,7 @@ HAL_Bool HAL_GetCompressor(HAL_CompressorHandle compressorHandle,
     return false;
   }
 
-  return SimPCMData[index].GetCompressorOn();
+  return SimPCMData[index].compressorOn;
 }
 
 void HAL_SetCompressorClosedLoopControl(HAL_CompressorHandle compressorHandle,
@@ -56,7 +58,7 @@ void HAL_SetCompressorClosedLoopControl(HAL_CompressorHandle compressorHandle,
     return;
   }
 
-  SimPCMData[index].SetClosedLoopEnabled(value);
+  SimPCMData[index].closedLoopEnabled = value;
 }
 
 HAL_Bool HAL_GetCompressorClosedLoopControl(
@@ -68,7 +70,7 @@ HAL_Bool HAL_GetCompressorClosedLoopControl(
     return false;
   }
 
-  return SimPCMData[index].GetClosedLoopEnabled();
+  return SimPCMData[index].closedLoopEnabled;
 }
 
 HAL_Bool HAL_GetCompressorPressureSwitch(HAL_CompressorHandle compressorHandle,
@@ -80,7 +82,7 @@ HAL_Bool HAL_GetCompressorPressureSwitch(HAL_CompressorHandle compressorHandle,
     return false;
   }
 
-  return SimPCMData[index].GetPressureSwitch();
+  return SimPCMData[index].pressureSwitch;
 }
 
 double HAL_GetCompressorCurrent(HAL_CompressorHandle compressorHandle,
@@ -92,7 +94,7 @@ double HAL_GetCompressorCurrent(HAL_CompressorHandle compressorHandle,
     return 0;
   }
 
-  return SimPCMData[index].GetCompressorCurrent();
+  return SimPCMData[index].compressorCurrent;
 }
 HAL_Bool HAL_GetCompressorCurrentTooHighFault(
     HAL_CompressorHandle compressorHandle, int32_t* status) {

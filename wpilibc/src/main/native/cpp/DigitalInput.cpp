@@ -5,30 +5,25 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DigitalInput.h"
+#include "frc/DigitalInput.h"
 
 #include <limits>
+#include <utility>
 
-#include <HAL/DIO.h>
-#include <HAL/HAL.h>
-#include <HAL/Ports.h>
+#include <hal/DIO.h>
+#include <hal/HAL.h>
+#include <hal/Ports.h>
 
-#include "SmartDashboard/SendableBuilder.h"
-#include "WPIErrors.h"
+#include "frc/SensorUtil.h"
+#include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
-/**
- * Create an instance of a Digital Input class.
- *
- * Creates a digital input given a channel.
- *
- * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
- */
 DigitalInput::DigitalInput(int channel) {
-  if (!CheckDigitalChannel(channel)) {
+  if (!SensorUtil::CheckDigitalChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "Digital Channel " + llvm::Twine(channel));
+                               "Digital Channel " + wpi::Twine(channel));
     m_channel = std::numeric_limits<int>::max();
     return;
   }
@@ -48,9 +43,6 @@ DigitalInput::DigitalInput(int channel) {
   SetName("DigitalInput", channel);
 }
 
-/**
- * Free resources associated with the Digital Input class.
- */
 DigitalInput::~DigitalInput() {
   if (StatusIsFatal()) return;
   if (m_interrupt != HAL_kInvalidHandle) {
@@ -63,11 +55,20 @@ DigitalInput::~DigitalInput() {
   HAL_FreeDIOPort(m_handle);
 }
 
-/**
- * Get the value from a digital input channel.
- *
- * Retrieve the value of a single digital input channel from the FPGA.
- */
+DigitalInput::DigitalInput(DigitalInput&& rhs)
+    : DigitalSource(std::move(rhs)), m_channel(std::move(rhs.m_channel)) {
+  std::swap(m_handle, rhs.m_handle);
+}
+
+DigitalInput& DigitalInput::operator=(DigitalInput&& rhs) {
+  DigitalSource::operator=(std::move(rhs));
+
+  m_channel = std::move(rhs.m_channel);
+  std::swap(m_handle, rhs.m_handle);
+
+  return *this;
+}
+
 bool DigitalInput::Get() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
@@ -76,27 +77,15 @@ bool DigitalInput::Get() const {
   return value;
 }
 
-/**
- * @return The GPIO channel number that this object represents.
- */
-int DigitalInput::GetChannel() const { return m_channel; }
-
-/**
- * @return The HAL Handle to the specified source.
- */
 HAL_Handle DigitalInput::GetPortHandleForRouting() const { return m_handle; }
 
-/**
- * Is source an AnalogTrigger
- */
-bool DigitalInput::IsAnalogTrigger() const { return false; }
-
-/**
- * @return The type of analog trigger output to be used. 0 for Digitals
- */
 AnalogTriggerType DigitalInput::GetAnalogTriggerTypeForRouting() const {
   return (AnalogTriggerType)0;
 }
+
+bool DigitalInput::IsAnalogTrigger() const { return false; }
+
+int DigitalInput::GetChannel() const { return m_channel; }
 
 void DigitalInput::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Input");

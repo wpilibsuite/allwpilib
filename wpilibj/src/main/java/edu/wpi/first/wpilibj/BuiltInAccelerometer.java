@@ -7,9 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.AccelerometerJNI;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.AccelerometerJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.sim.AccelerometerSim;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
@@ -18,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  *
  * <p>This class allows access to the roboRIO's internal accelerometer.
  */
-public class BuiltInAccelerometer extends SensorBase implements Accelerometer, Sendable {
+public class BuiltInAccelerometer extends SendableBase implements Accelerometer {
   /**
    * Constructor.
    *
@@ -96,5 +97,9 @@ public class BuiltInAccelerometer extends SensorBase implements Accelerometer, S
     builder.addDoubleProperty("X", this::getX, null);
     builder.addDoubleProperty("Y", this::getY, null);
     builder.addDoubleProperty("Z", this::getZ, null);
+  }
+
+  public AccelerometerSim getSimObject() {
+    return new AccelerometerSim();
   }
 }

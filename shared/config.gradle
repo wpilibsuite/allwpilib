@@ -1,0 +1,176 @@
+import org.gradle.internal.os.OperatingSystem
+
+nativeUtils.addWpiNativeUtils()
+nativeUtils.withRaspbian()
+nativeUtils {
+  wpi {
+    configureDependencies {
+      wpiVersion = "-1"
+      niLibVersion = "2019.12.1"
+      opencvVersion = "3.4.4-5"
+      googleTestVersion = "1.8.1-1-f71fb4f"
+    }
+  }
+}
+
+nativeUtils.wpi.addWarnings()
+nativeUtils.wpi.addWarningsAsErrors()
+
+nativeUtils.setSinglePrintPerPlatform()
+
+toolchainsPlugin.crossCompilers.named(nativeUtils.wpi.platforms.roborio) {
+    optional.set(true)
+}
+
+nativeUtils.configurePlatform(nativeUtils.wpi.platforms.raspbian) {
+  linker.args << '-latomic'
+}
+
+model {
+    components {
+        all {
+            nativeUtils.useAllPlatforms(it)
+        }
+    }
+    binaries {
+        withType(NativeBinarySpec).all {
+            nativeUtils.usePlatformArguments(it)
+        }
+    }
+}
+
+ext.appendDebugPathToBinaries = { binaries->
+    binaries.withType(StaticLibraryBinarySpec) {
+        if (it.buildType.name.contains('debug')) {
+            def staticFileDir = it.staticLibraryFile.parentFile
+            def staticFileName = it.staticLibraryFile.name
+            def staticFileExtension = staticFileName.substring(staticFileName.lastIndexOf('.'))
+            staticFileName = staticFileName.substring(0, staticFileName.lastIndexOf('.'))
+            staticFileName = staticFileName + 'd' + staticFileExtension
+            def newStaticFile = new File(staticFileDir, staticFileName)
+            it.staticLibraryFile = newStaticFile
+        }
+    }
+    binaries.withType(SharedLibraryBinarySpec) {
+        if (it.buildType.name.contains('debug')) {
+            def sharedFileDir = it.sharedLibraryFile.parentFile
+            def sharedFileName = it.sharedLibraryFile.name
+            def sharedFileExtension = sharedFileName.substring(sharedFileName.lastIndexOf('.'))
+            sharedFileName = sharedFileName.substring(0, sharedFileName.lastIndexOf('.'))
+            sharedFileName = sharedFileName + 'd' + sharedFileExtension
+            def newSharedFile = new File(sharedFileDir, sharedFileName)
+
+            def sharedLinkFileDir = it.sharedLibraryLinkFile.parentFile
+            def sharedLinkFileName = it.sharedLibraryLinkFile.name
+            def sharedLinkFileExtension = sharedLinkFileName.substring(sharedLinkFileName.lastIndexOf('.'))
+            sharedLinkFileName = sharedLinkFileName.substring(0, sharedLinkFileName.lastIndexOf('.'))
+            sharedLinkFileName = sharedLinkFileName + 'd' + sharedLinkFileExtension
+            def newLinkFile = new File(sharedLinkFileDir, sharedLinkFileName)
+
+            it.sharedLibraryLinkFile = newLinkFile
+            it.sharedLibraryFile = newSharedFile
+        }
+    }
+}
+
+ext.createComponentZipTasks = { components, names, base, type, project, func ->
+    def stringNames = names.collect {it.toString()}
+    def configMap = [:]
+    components.each {
+        if (it in NativeLibrarySpec && stringNames.contains(it.name)) {
+            it.binaries.each {
+                if (!it.buildable) return
+                def target = nativeUtils.getPublishClassifier(it)
+                if (configMap.containsKey(target)) {
+                    configMap.get(target).add(it)
+                } else {
+                    configMap.put(target, [])
+                    configMap.get(target).add(it)
+                }
+            }
+        }
+    }
+    def taskList = []
+    def outputsFolder = file("$project.buildDir/outputs")
+    configMap.each { key, value ->
+        def task = project.tasks.create(base + "-${key}", type) {
+            description = 'Creates component archive for platform ' + key
+            destinationDir = outputsFolder
+            classifier = key
+            baseName = '_M_' + base
+            duplicatesStrategy = 'exclude'
+
+            from(licenseFile) {
+                into '/'
+            }
+
+            func(it, value)
+        }
+        taskList.add(task)
+
+        project.build.dependsOn task
+
+        project.artifacts {
+            task
+        }
+        addTaskToCopyAllOutputs(task)
+    }
+    return taskList
+}
+
+ext.createAllCombined = { list, name, base, type, project ->
+    def outputsFolder = file("$project.buildDir/outputs")
+
+    def task = project.tasks.create(base + "-all", type) {
+        description = "Creates component archive for all classifiers"
+        destinationDir = outputsFolder
+        classifier = "all"
+        baseName = base
+        duplicatesStrategy = 'exclude'
+
+        list.each {
+            if (it.name.endsWith('debug')) return
+            from project.zipTree(it.archivePath)
+            dependsOn it
+        }
+    }
+
+    project.build.dependsOn task
+
+    project.artifacts {
+        task
+    }
+
+    return task
+
+}
+
+ext.includeStandardZipFormat = { task, value ->
+    value.each { binary ->
+        if (binary.buildable) {
+            if (binary instanceof SharedLibraryBinarySpec) {
+                task.dependsOn binary.tasks.link
+                task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
+                    into nativeUtils.getPlatformPath(binary) + '/shared'
+                }
+                def sharedPath = binary.sharedLibraryFile.absolutePath
+                sharedPath = sharedPath.substring(0, sharedPath.length() - 4)
+
+                task.from(new File(sharedPath + '.pdb')) {
+                    into nativeUtils.getPlatformPath(binary) + '/shared'
+                }
+                task.from(binary.sharedLibraryFile) {
+                    into nativeUtils.getPlatformPath(binary) + '/shared'
+                }
+                task.from(binary.sharedLibraryLinkFile) {
+                    into nativeUtils.getPlatformPath(binary) + '/shared'
+                }
+            } else  if (binary instanceof StaticLibraryBinarySpec) {
+                task.dependsOn binary.tasks.createStaticLib
+                task.from(binary.staticLibraryFile) {
+                    into nativeUtils.getPlatformPath(binary) + '/static'
+                }
+            }
+        }
+    }
+}

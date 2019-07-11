@@ -40,6 +40,7 @@ public class InternalButton extends Button {
     m_pressed = pressed;
   }
 
+  @Override
   public boolean get() {
     return m_pressed ^ m_inverted;
   }

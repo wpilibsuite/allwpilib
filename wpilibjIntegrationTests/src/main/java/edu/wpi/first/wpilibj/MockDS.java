@@ -27,7 +27,6 @@ public class MockDS {
 
   @SuppressWarnings("JavadocMethod")
   public void start() {
-
     m_thread = new Thread(() -> {
       DatagramSocket socket;
       try {

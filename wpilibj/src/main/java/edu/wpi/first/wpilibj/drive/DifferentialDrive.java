@@ -7,10 +7,13 @@
 
 package edu.wpi.first.wpilibj.drive;
 
+import java.util.StringJoiner;
+
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -94,15 +97,16 @@ public class DifferentialDrive extends RobotDriveBase {
   public static final double kDefaultQuickStopThreshold = 0.2;
   public static final double kDefaultQuickStopAlpha = 0.1;
 
-  private static int instances = 0;
+  private static int instances;
 
-  private SpeedController m_leftMotor;
-  private SpeedController m_rightMotor;
+  private final SpeedController m_leftMotor;
+  private final SpeedController m_rightMotor;
 
   private double m_quickStopThreshold = kDefaultQuickStopThreshold;
   private double m_quickStopAlpha = kDefaultQuickStopAlpha;
-  private double m_quickStopAccumulator = 0.0;
-  private boolean m_reported = false;
+  private double m_quickStopAccumulator;
+  private double m_rightSideInvertMultiplier = -1.0;
+  private boolean m_reported;
 
   /**
    * Construct a DifferentialDrive.
@@ -111,12 +115,36 @@ public class DifferentialDrive extends RobotDriveBase {
    * inverted, do so before passing it in.
    */
   public DifferentialDrive(SpeedController leftMotor, SpeedController rightMotor) {
+    verify(leftMotor, rightMotor);
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
     addChild(m_leftMotor);
     addChild(m_rightMotor);
     instances++;
     setName("DifferentialDrive", instances);
+  }
+
+  /**
+   * Verifies that all motors are nonnull, throwing a NullPointerException if any of them are.
+   * The exception's error message will specify all null motors, e.g. {@code
+   * NullPointerException("leftMotor, rightMotor")}, to give as much information as possible to
+   * the programmer.
+   *
+   * @throws NullPointerException if any of the given motors are null
+   */
+  @SuppressWarnings("PMD.AvoidThrowingNullPointerException")
+  private void verify(SpeedController leftMotor, SpeedController rightMotor) {
+    if (leftMotor != null && rightMotor != null) {
+      return;
+    }
+    StringJoiner joiner = new StringJoiner(", ");
+    if (leftMotor == null) {
+      joiner.add("leftMotor");
+    }
+    if (rightMotor == null) {
+      joiner.add("rightMotor");
+    }
+    throw new NullPointerException(joiner.toString());
   }
 
   /**
@@ -138,12 +166,13 @@ public class DifferentialDrive extends RobotDriveBase {
    * @param xSpeed        The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param zRotation     The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
    *                      positive.
-   * @param squaredInputs If set, decreases the input sensitivity at low speeds.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
   @SuppressWarnings("ParameterName")
-  public void arcadeDrive(double xSpeed, double zRotation, boolean squaredInputs) {
+  public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 2, tInstances.kRobotDrive_ArcadeStandard);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
+                 tInstances.kRobotDrive2_DifferentialArcade);
       m_reported = true;
     }
 
@@ -155,7 +184,7 @@ public class DifferentialDrive extends RobotDriveBase {
 
     // Square the inputs (while preserving the sign) to increase fine control
     // while permitting full power.
-    if (squaredInputs) {
+    if (squareInputs) {
       xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
       zRotation = Math.copySign(zRotation * zRotation, zRotation);
     }
@@ -186,9 +215,9 @@ public class DifferentialDrive extends RobotDriveBase {
     }
 
     m_leftMotor.set(limit(leftMotorOutput) * m_maxOutput);
-    m_rightMotor.set(-limit(rightMotorOutput) * m_maxOutput);
+    m_rightMotor.set(limit(rightMotorOutput) * m_maxOutput * m_rightSideInvertMultiplier);
 
-    m_safetyHelper.feed();
+    feed();
   }
 
   /**
@@ -205,10 +234,11 @@ public class DifferentialDrive extends RobotDriveBase {
    * @param isQuickTurn If set, overrides constant-curvature turning for
    *                    turn-in-place maneuvers.
    */
-  @SuppressWarnings("ParameterName")
+  @SuppressWarnings({"ParameterName", "PMD.CyclomaticComplexity"})
   public void curvatureDrive(double xSpeed, double zRotation, boolean isQuickTurn) {
     if (!m_reported) {
-      // HAL.report(tResourceType.kResourceType_RobotDrive, 2, tInstances.kRobotDrive_Curvature);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
+                 tInstances.kRobotDrive2_DifferentialCurvature);
       m_reported = true;
     }
 
@@ -269,9 +299,9 @@ public class DifferentialDrive extends RobotDriveBase {
     }
 
     m_leftMotor.set(leftMotorOutput * m_maxOutput);
-    m_rightMotor.set(-rightMotorOutput * m_maxOutput);
+    m_rightMotor.set(rightMotorOutput * m_maxOutput * m_rightSideInvertMultiplier);
 
-    m_safetyHelper.feed();
+    feed();
   }
 
   /**
@@ -294,11 +324,12 @@ public class DifferentialDrive extends RobotDriveBase {
    *                      positive.
    * @param rightSpeed    The robot right side's speed along the X axis [-1.0..1.0]. Forward is
    *                      positive.
-   * @param squaredInputs If set, decreases the input sensitivity at low speeds.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
-  public void tankDrive(double leftSpeed, double rightSpeed, boolean squaredInputs) {
+  public void tankDrive(double leftSpeed, double rightSpeed, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 2, tInstances.kRobotDrive_Tank);
+      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
+                 tInstances.kRobotDrive2_DifferentialTank);
       m_reported = true;
     }
 
@@ -310,15 +341,15 @@ public class DifferentialDrive extends RobotDriveBase {
 
     // Square the inputs (while preserving the sign) to increase fine control
     // while permitting full power.
-    if (squaredInputs) {
+    if (squareInputs) {
       leftSpeed = Math.copySign(leftSpeed * leftSpeed, leftSpeed);
       rightSpeed = Math.copySign(rightSpeed * rightSpeed, rightSpeed);
     }
 
     m_leftMotor.set(leftSpeed * m_maxOutput);
-    m_rightMotor.set(-rightSpeed * m_maxOutput);
+    m_rightMotor.set(rightSpeed * m_maxOutput * m_rightSideInvertMultiplier);
 
-    m_safetyHelper.feed();
+    feed();
   }
 
   /**
@@ -352,11 +383,29 @@ public class DifferentialDrive extends RobotDriveBase {
     m_quickStopAlpha = alpha;
   }
 
+  /**
+   * Gets if the power sent to the right side of the drivetrain is multipled by -1.
+   *
+   * @return true if the right side is inverted
+   */
+  public boolean isRightSideInverted() {
+    return m_rightSideInvertMultiplier == -1.0;
+  }
+
+  /**
+   * Sets if the power sent to the right side of the drivetrain should be multipled by -1.
+   *
+   * @param rightSideInverted true if right side power should be multipled by -1
+   */
+  public void setRightSideInverted(boolean rightSideInverted) {
+    m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;
+  }
+
   @Override
   public void stopMotor() {
     m_leftMotor.stopMotor();
     m_rightMotor.stopMotor();
-    m_safetyHelper.feed();
+    feed();
   }
 
   @Override
@@ -367,10 +416,12 @@ public class DifferentialDrive extends RobotDriveBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("DifferentialDrive");
+    builder.setActuator(true);
+    builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Left Motor Speed", m_leftMotor::get, m_leftMotor::set);
     builder.addDoubleProperty(
         "Right Motor Speed",
-        () -> -m_rightMotor.get(),
-        x -> m_rightMotor.set(-x));
+        () -> m_rightMotor.get() * m_rightSideInvertMultiplier,
+        x -> m_rightMotor.set(x * m_rightSideInvertMultiplier));
   }
 }

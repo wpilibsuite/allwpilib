@@ -9,12 +9,12 @@ package edu.wpi.first.wpilibj;
 
 import java.util.Vector;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
 
 import static java.util.Objects.requireNonNull;
 
@@ -31,7 +31,7 @@ import static java.util.Objects.requireNonNull;
  * <p> This will also interact with {@link NetworkTable} by creating a table called "Preferences"
  * with all the key-value pairs. </p>
  */
-public class Preferences {
+public final class Preferences {
   /**
    * The Preferences table name.
    */
@@ -75,6 +75,7 @@ public class Preferences {
    * Gets the vector of keys.
    * @return a vector of the keys
    */
+  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
   public Vector<String> getKeys() {
     return new Vector<>(m_table.getKeys());
   }
@@ -171,6 +172,17 @@ public class Preferences {
    */
   public void remove(String key) {
     m_table.delete(key);
+  }
+
+  /**
+   * Remove all preferences.
+   */
+  public void removeAll() {
+    for (String key : m_table.getKeys()) {
+      if (!".type".equals(key)) {
+        remove(key);
+      }
+    }
   }
 
   /**

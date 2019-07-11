@@ -7,6 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.logging.Logger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -15,11 +19,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.logging.Logger;
-
-import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
+import edu.wpi.first.hal.can.CANMessageNotFoundException;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
@@ -47,7 +47,7 @@ public class PDPTest extends AbstractComsSetup {
 
   @AfterClass
   public static void tearDownAfterClass() throws Exception {
-    pdp.free();
+    pdp.close();
     pdp = null;
     me.teardown();
     me = null;
@@ -96,7 +96,6 @@ public class PDPTest extends AbstractComsSetup {
    */
   @Test
   public void checkRunningCurrentForSpeedController() throws CANMessageNotFoundException {
-
     /* Set the motor to full forward */
     me.getMotor().set(1.0);
     Timer.delay(2);

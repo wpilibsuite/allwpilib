@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
+
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
 /**
@@ -16,23 +17,23 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * commands using the wrist should make sure they disable PID!
  */
 public class SetWristSetpoint extends Command {
-	private double m_setpoint;
+  private final double m_setpoint;
 
-	public SetWristSetpoint(double setpoint) {
-		m_setpoint = setpoint;
-		requires(Robot.m_wrist);
-	}
+  public SetWristSetpoint(double setpoint) {
+    m_setpoint = setpoint;
+    requires(Robot.m_wrist);
+  }
 
-	// Called just before this Command runs the first time
-	@Override
-	protected void initialize() {
-		Robot.m_wrist.enable();
-		Robot.m_wrist.setSetpoint(m_setpoint);
-	}
+  // Called just before this Command runs the first time
+  @Override
+  protected void initialize() {
+    Robot.m_wrist.enable();
+    Robot.m_wrist.setSetpoint(m_setpoint);
+  }
 
-	// Make this return true when this Command no longer needs to run execute()
-	@Override
-	protected boolean isFinished() {
-		return Robot.m_wrist.onTarget();
-	}
+  // Make this return true when this Command no longer needs to run execute()
+  @Override
+  protected boolean isFinished() {
+    return Robot.m_wrist.onTarget();
+  }
 }

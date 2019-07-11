@@ -1,88 +1,125 @@
-import org.gradle.language.base.internal.ProjectLayout
+plugins {
+    id 'java'
+    id 'application'
+    id 'cpp'
+    id 'visual-studio'
+}
+
+apply plugin: 'edu.wpi.first.NativeUtils'
+
+apply from: '../shared/config.gradle'
+
+ext {
+    sharedCvConfigs = [myRobotCpp: []]
+    staticCvConfigs = [myRobotCppStatic: []]
+    useJava = true
+    useCpp = true
+    skipDev = true
+}
+
+ext {
+    chipObjectComponents = ['myRobotCpp', 'myRobotCppStatic']
+    netCommComponents = ['myRobotCpp', 'myRobotCppStatic']
+    useNiJava = true
+}
+
+apply from: "${rootDir}/shared/nilibraries.gradle"
+
+apply from: "${rootDir}/shared/opencv.gradle"
+
+mainClassName = 'Main'
+
+apply plugin: 'com.github.johnrengelman.shadow'
 
 repositories {
     mavenCentral()
 }
 
-apply plugin: 'cpp'
-apply plugin: 'java'
-apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
-
-apply from: '../config.gradle'
-
 dependencies {
     compile project(':wpilibj')
-    compile 'edu.wpi.first.wpiutil:wpiutil-java:+'
-    compile 'edu.wpi.first.ntcore:ntcore-java:+'
+    compile project(':hal')
+    compile project(':wpiutil')
+    compile project(':ntcore')
+    compile project(':cscore')
+    compile project(':cameraserver')
+}
+
+jar {
+    manifest { attributes 'Robot-Class': 'MyRobot' }
 }
 
 model {
-    dependencyConfigs {
-        wpiutil(DependencyConfig) {
-            groupId = 'edu.wpi.first.wpiutil'
-            artifactId = 'wpiutil-cpp'
-            headerClassifier = 'headers'
-            ext = 'zip'
-            version = '+'
-            sharedConfigs = [ FRCUserProgram: [] ]
-        }
-        ntcore(DependencyConfig) {
-            groupId = 'edu.wpi.first.ntcore'
-            artifactId = 'ntcore-cpp'
-            headerClassifier = 'headers'
-            ext = 'zip'
-            version = '+'
-            sharedConfigs = [ FRCUserProgram: [] ]
-        }
-        cscore(DependencyConfig) {
-            groupId = 'edu.wpi.first.cscore'
-            artifactId = 'cscore-cpp'
-            headerClassifier = 'headers'
-            ext = 'zip'
-            version = '+'
-            sharedConfigs = [ FRCUserProgram: [] ]
-        }
-        opencv(DependencyConfig) {
-            groupId = 'org.opencv'
-            artifactId = 'opencv-cpp'
-            headerClassifier = 'headers'
-            ext = 'zip'
-            version = '3.2.0'
-            sharedConfigs = [ FRCUserProgram: [] ]
-        }
-    }
     components {
-        FRCUserProgram(NativeExecutableSpec) {
+        myRobotCpp(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
+            baseName = 'FRCUserProgram'
             sources {
                 cpp {
                     source {
                         srcDirs = ['src/main/native/cpp']
+                        includes = ['**/*.cpp']
                     }
                     exportedHeaders {
-                        srcDirs = ['src/main/native/headers']
+                        srcDirs = ['src/main/native/include']
+                        includes = ['**/*.h']
                     }
                 }
             }
-            binaries.all { binary->
-                project(':ni-libraries').addNiLibrariesToLinker(binary)
-                project(':hal').addHalToLinker(binary)
-                project(':wpilibc').addWpilibCCompilerArguments(binary)
-                project(':wpilibc').addWpilibCToLinker(binary)
+            binaries.all { binary ->
+                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                    project(':hal').addHalDependency(binary, 'shared')
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+            }
+        }
+        myRobotCppStatic(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
+            baseName = 'FRCUserProgram'
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src/main/native/cpp']
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        srcDirs = ['src/main/native/include']
+                        includes = ['**/*.h']
+                    }
+                }
+            }
+            binaries.all { binary ->
+                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
+                    lib project: ':ntcore', library: 'ntcore', linkage: 'static'
+                    lib project: ':cscore', library: 'cscore', linkage: 'static'
+                    project(':hal').addHalDependency(binary, 'static')
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
             }
         }
     }
     tasks {
-        runCpp(Exec) {
+        def c = $.components
+        project.tasks.create('runCpp', Exec) {
+            group = 'WPILib'
+            description = "Run the myRobotCpp executable"
             def found = false
-            $.components.each {
-                if (it in NativeExecutableSpec && it.name == 'FRCUserProgram') {
+            def systemArch = getCurrentArch()
+            c.each {
+                if (it in NativeExecutableSpec && it.name == "myRobotCpp") {
                     it.binaries.each {
                         if (!found) {
-                            def arch = it.targetPlatform.architecture.name
-                            if (arch == 'x86-64' || arch == 'x86') {
+                            def arch = it.targetPlatform.name
+                            if (arch == systemArch) {
                                 dependsOn it.tasks.install
-                                commandLine it.tasks.install.runScript
+                                commandLine it.tasks.install.runScriptFile.get().asFile.toString()
+                                def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
+                                run.dependsOn it.tasks.install
+                                run.systemProperty 'java.library.path', filePath
+                                run.environment 'LD_LIBRARY_PATH', filePath
+                                run.workingDir filePath
+
                                 found = true
                             }
                         }
@@ -92,7 +129,14 @@ model {
         }
         installAthena(Task) {
             $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.architecture.name == 'athena') {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'myRobotCpp') {
+                    dependsOn it.tasks.install
+                }
+            }
+        }
+        installAthenaStatic(Task) {
+            $.binaries.each {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'myRobotCppStatic') {
                     dependsOn it.tasks.install
                 }
             }

@@ -45,7 +45,7 @@ public abstract class ConditionalCommand extends Command {
   /**
    * Stores command chosen by condition.
    */
-  private Command m_chosenCommand = null;
+  private Command m_chosenCommand;
 
   private void requireAll() {
     if (m_onTrue != null) {
@@ -147,7 +147,7 @@ public abstract class ConditionalCommand extends Command {
   }
 
   @Override
-  protected void _cancel() {
+  protected synchronized void _cancel() {
     if (m_chosenCommand != null && m_chosenCommand.isRunning()) {
       m_chosenCommand.cancel();
     }

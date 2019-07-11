@@ -1,114 +1,235 @@
 import org.gradle.language.base.internal.ProjectLayout
 
-if (!project.hasProperty('skipAthena')) {
-    apply plugin: 'cpp'
-    apply plugin: 'visual-studio'
-    apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'cpp'
+apply plugin: 'c'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: ExtraTasks
 
-    apply from: '../config.gradle'
+apply from: '../shared/config.gradle'
 
-    ext.examplesMap = [:]
-    ext.templatesMap = [:]
+ext.examplesMap = [:]
+ext.templatesMap = [:]
 
-    File examplesTree = file("$projectDir/src/main/cpp/examples")
-    examplesTree.list(new FilenameFilter() {
-      @Override
-      public boolean accept(File current, String name) {
+File examplesTree = file("$projectDir/src/main/cpp/examples")
+examplesTree.list(new FilenameFilter() {
+    @Override
+    public boolean accept(File current, String name) {
         return new File(current, name).isDirectory();
-      }
-    }).each {
-        examplesMap.put(it, [])
     }
-    File templatesTree = file("$projectDir/src/main/cpp/templates")
-    templatesTree.list(new FilenameFilter() {
-      @Override
-      public boolean accept(File current, String name) {
-        return new File(current, name).isDirectory();
-      }
-    }).each {
-        templatesMap.put(it, [])
-    }
-
-    model {
-        dependencyConfigs {
-            wpiutil(DependencyConfig) {
-                groupId = 'edu.wpi.first.wpiutil'
-                artifactId = 'wpiutil-cpp'
-                headerClassifier = 'headers'
-                ext = 'zip'
-                version = '3.+'
-                sharedConfigs = examplesMap + templatesMap
-            }
-            ntcore(DependencyConfig) {
-                groupId = 'edu.wpi.first.ntcore'
-                artifactId = 'ntcore-cpp'
-                headerClassifier = 'headers'
-                ext = 'zip'
-                version = '4.+'
-                sharedConfigs = examplesMap + templatesMap
-            }
-            opencv(DependencyConfig) {
-                groupId = 'org.opencv'
-                artifactId = 'opencv-cpp'
-                headerClassifier = 'headers'
-                ext = 'zip'
-                version = '3.2.0'
-                sharedConfigs = examplesMap + templatesMap
-            }
-            cscore(DependencyConfig) {
-                groupId = 'edu.wpi.first.cscore'
-                artifactId = 'cscore-cpp'
-                headerClassifier = 'headers'
-                ext = 'zip'
-                version = '1.+'
-                sharedConfigs = examplesMap + templatesMap
-            }
-        }
-
-        components {
-            examplesMap.each { key, value->
-                "${key}"(NativeExecutableSpec) {
-                    binaries.all { binary->
-                        if (binary.targetPlatform.architecture.name == 'athena') {
-                            project(':ni-libraries').addNiLibrariesToLinker(binary)
-                            project(':hal').addHalToLinker(binary)
-                            project(':wpilibc').addWpilibCToLinker(binary)
-                        } else {
-                            binary.buildable = false
-                        }
-                    }
-                    sources {
-                        cpp {
-                            source {
-                                srcDirs 'src/main/cpp/examples/' + "${key}"
-                                include '**/*.cpp'
-                            }
-                        }
-                    }
-                }
-            }
-            templatesMap.each { key, value->
-                "${key}"(NativeExecutableSpec) {
-                    binaries.all { binary->
-                        if (binary.targetPlatform.architecture.name == 'athena') {
-                            project(':ni-libraries').addNiLibrariesToLinker(binary)
-                            project(':hal').addHalToLinker(binary)
-                            project(':wpilibc').addWpilibCToLinker(binary)
-                        } else {
-                            binary.buildable = false
-                        }
-                    }
-                    sources {
-                        cpp {
-                            source {
-                                srcDirs 'src/main/cpp/templates/' + "${key}"
-                                include '**/*.cpp'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    apply from: 'publish.gradle'
+}).each {
+    examplesMap.put(it, [])
 }
+File templatesTree = file("$projectDir/src/main/cpp/templates")
+templatesTree.list(new FilenameFilter() {
+    @Override
+    public boolean accept(File current, String name) {
+        return new File(current, name).isDirectory();
+    }
+}).each {
+    templatesMap.put(it, [])
+}
+
+
+ext {
+    sharedCvConfigs = examplesMap + templatesMap + [commands: []]
+    staticCvConfigs = [:]
+    useJava = false
+    useCpp = true
+}
+
+apply from: "${rootDir}/shared/opencv.gradle"
+
+ext {
+    chipObjectComponents = ['commands']
+    netCommComponents = ['commands']
+    examplesMap.each { key, value ->
+        chipObjectComponents << key.toString()
+        netCommComponents << key.toString()
+    }
+    templatesMap.each { key, value ->
+        chipObjectComponents << key.toString()
+        netCommComponents << key.toString()
+    }
+}
+
+apply from: "${rootDir}/shared/nilibraries.gradle"
+
+model {
+    components {
+        commands(NativeLibrarySpec) {
+            binaries.all { binary ->
+                if (binary in StaticLibraryBinarySpec) {
+                    binary.buildable = false
+                    return
+                }
+                lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                project(':hal').addHalDependency(binary, 'shared')
+                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src/main/cpp/commands']
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/cpp/commands'
+                        include '**/*.h'
+                    }
+                }
+            }
+        }
+
+        examplesMap.each { key, value ->
+            "${key}"(NativeExecutableSpec) {
+                targetBuildTypes 'debug'
+                binaries.all { binary ->
+                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                    project(':hal').addHalDependency(binary, 'shared')
+                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    if (binary.targetPlatform.name != nativeUtils.wpi.platforms.roborio) {
+                        lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
+                        lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
+                        lib project: ':simulation:halsim_print', library: 'halsim_print', linkage: 'shared'
+                        lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
+                    }
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'src/main/cpp/examples/' + "${key}" + "/cpp"
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/main/cpp/examples/' + "${key}" + "/include"
+                            include '**/*.h'
+                        }
+                    }
+                }
+                sources {
+                    c {
+                        source {
+                            srcDirs 'src/main/cpp/examples/' + "${key}" + "/c"
+                            include '**/*.c'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/main/cpp/examples/' + "${key}" + "/include"
+                            include '**/*.h'
+                        }
+                    }
+                }
+            }
+        }
+        templatesMap.each { key, value ->
+            "${key}"(NativeExecutableSpec) {
+                targetBuildTypes 'debug'
+                binaries.all { binary ->
+                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                    project(':hal').addHalDependency(binary, 'shared')
+                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    binary.tasks.withType(CppCompile) {
+                        if (!(binary.toolChain in VisualCpp)) {
+                            cppCompiler.args "-Wno-error=deprecated-declarations"
+                        } else {
+                            cppCompiler.args "/wd4996"
+                        }
+                    }
+                    if (binary.targetPlatform.name != nativeUtils.wpi.platforms.roborio) {
+                        lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
+                        lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
+                        lib project: ':simulation:halsim_print', library: 'halsim_print', linkage: 'shared'
+                        lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
+                    }
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'src/main/cpp/templates/' + "${key}" + "/cpp"
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/main/cpp/templates/' + "${key}" + "/include"
+                            include '**/*.h'
+                        }
+                    }
+                }
+            }
+        }
+    }
+    tasks {
+        def b = $.binaries
+        b.each { binary->
+            if (binary in NativeExecutableBinarySpec) {
+                def installDir = binary.tasks.install.installDirectory.get().toString() + File.separatorChar
+                def runFile = binary.tasks.install.runScriptFile.get().asFile.toString()
+
+                binary.tasks.install.doLast {
+                    if (binary.targetPlatform.operatingSystem.isWindows()) {
+                        // Windows batch scripts
+                        def fileName = binary.component.name + 'LowFi.bat'
+                        def file = new File(installDir + fileName)
+                        file.withWriter { out ->
+                            out.println '@ECHO OFF'
+                            out.print 'SET HALSIM_EXTENSIONS='
+                            out.print '"' + new File(installDir + 'lib\\halsim_lowfi.dll').toString() + '";'
+                            out.println '"' + new File(installDir + 'lib\\halsim_ds_nt.dll').toString() + '"'
+                            out.println runFile + ' %*'
+                        }
+
+                        fileName = binary.component.name + 'LowFiRealDS.bat'
+                        file = new File(installDir + fileName)
+                        file.withWriter { out ->
+                            out.println '@ECHO OFF'
+                            out.print 'SET HALSIM_EXTENSIONS='
+                            out.print '"' + new File(installDir + 'lib\\halsim_lowfi.dll').toString() + '";'
+                            out.println '"' + new File(installDir + 'lib\\halsim_ds_socket.dll').toString() + '"'
+                            out.println runFile + ' %*'
+                        }
+                    } else {
+                        def fileName = binary.component.name + 'LowFi.sh'
+                        def file = new File(installDir + fileName)
+
+                        file.withWriter { out ->
+                            out.print 'export HALSIM_EXTENSIONS='
+                            out.print '"' + new File(installDir + '/lib/libhalsim_lowfi.so').toString() + '";'
+                            out.println '"' + new File(installDir + '/lib/libhalsim_ds_nt.so').toString() + '"'
+                            out.println runFile + ' "$@"'
+                        }
+
+                        fileName = binary.component.name + 'LowFiRealDS.sh'
+                        file = new File(installDir + fileName)
+                        file.withWriter { out ->
+                            out.print 'export HALSIM_EXTENSIONS='
+                            out.print '"' + new File(installDir + '/lib/libhalsim_lowfi.so').toString() + '":'
+                            out.println '"' + new File(installDir + '/lib/libhalsim_ds_socket.so').toString() + '"'
+                            out.println runFile + ' "$@"'
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+}
+apply from: 'publish.gradle'
+
+ext {
+    templateDirectory = new File("$projectDir/src/main/cpp/templates/")
+    templateFile = new File("$projectDir/src/main/cpp/templates/templates.json")
+    exampleDirectory = new File("$projectDir/src/main/cpp/examples/")
+    exampleFile = new File("$projectDir/src/main/cpp/examples/examples.json")
+    commandDirectory = new File("$projectDir/src/main/cpp/commands/")
+    commandFile = new File("$projectDir/src/main/cpp/commands/commands.json")
+}
+
+apply from: "${rootDir}/shared/examplecheck.gradle"

@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.ThreadsJNI;
+import edu.wpi.first.hal.ThreadsJNI;
 
-public class Threads {
+public final class Threads {
   /**
   * Get the thread priority for the current thread.
   * @return The current thread priority. Scaled 1-99.
@@ -38,5 +38,8 @@ public class Threads {
   */
   public static boolean setCurrentThreadPriority(boolean realTime, int priority) {
     return ThreadsJNI.setCurrentThreadPriority(realTime, priority);
+  }
+
+  private Threads() {
   }
 }

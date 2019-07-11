@@ -17,50 +17,54 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * don't stall.
  */
 public class Claw extends Subsystem {
-	private Victor m_motor = new Victor(7);
-	private DigitalInput m_contact = new DigitalInput(5);
+  private final Victor m_motor = new Victor(7);
+  private final DigitalInput m_contact = new DigitalInput(5);
 
-	public Claw() {
-		super();
+  /**
+   * Create a new claw subsystem.
+   */
+  public Claw() {
+    super();
 
-		// Let's name everything on the LiveWindow
-		addChild("Motor", m_motor);
-		addChild("Limit Switch", m_contact);
-	}
+    // Let's name everything on the LiveWindow
+    addChild("Motor", m_motor);
+    addChild("Limit Switch", m_contact);
+  }
 
-	@Override
-	public void initDefaultCommand() {
-	}
+  @Override
+  public void initDefaultCommand() {
+  }
 
-	public void log() {
-	}
+  public void log() {
+  }
 
-	/**
-	 * Set the claw motor to move in the open direction.
-	 */
-	public void open() {
-		m_motor.set(-1);
-	}
+  /**
+   * Set the claw motor to move in the open direction.
+   */
+  public void open() {
+    m_motor.set(-1);
+  }
 
-	/**
-	 * Set the claw motor to move in the close direction.
-	 */
-	public void close() {
-		m_motor.set(1);
-	}
+  /**
+   * Set the claw motor to move in the close direction.
+   */
+  @Override
+  public void close() {
+    m_motor.set(1);
+  }
 
-	/**
-	 * Stops the claw motor from moving.
-	 */
-	public void stop() {
-		m_motor.set(0);
-	}
+  /**
+   * Stops the claw motor from moving.
+   */
+  public void stop() {
+    m_motor.set(0);
+  }
 
-	/**
-	 * Return true when the robot is grabbing an object hard enough to trigger
-	 * the limit switch.
-	 */
-	public boolean isGrabbing() {
-		return m_contact.get();
-	}
+  /**
+   * Return true when the robot is grabbing an object hard enough to trigger
+   * the limit switch.
+   */
+  public boolean isGrabbing() {
+    return m_contact.get();
+  }
 }

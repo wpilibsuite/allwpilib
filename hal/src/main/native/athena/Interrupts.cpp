@@ -1,38 +1,32 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Interrupts.h"
+#include "hal/Interrupts.h"
 
 #include <memory>
 
-#include <support/SafeThread.h>
+#include <wpi/SafeThread.h>
 
 #include "DigitalInternal.h"
-#include "HAL/ChipObject.h"
-#include "HAL/Errors.h"
-#include "HAL/cpp/make_unique.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "HAL/handles/LimitedHandleResource.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/ChipObject.h"
+#include "hal/Errors.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/LimitedHandleResource.h"
 
 using namespace hal;
 
 namespace {
-
-struct Interrupt {
-  std::unique_ptr<tInterrupt> anInterrupt;
-  std::unique_ptr<tInterruptManager> manager;
-};
-
 // Safe thread to allow callbacks to run on their own thread
 class InterruptThread : public wpi::SafeThread {
  public:
   void Main() {
-    std::unique_lock<wpi::mutex> lock(m_mutex);
+    std::unique_lock lock(m_mutex);
     while (m_active) {
       m_cond.wait(lock, [&] { return !m_active || m_notify; });
       if (!m_active) break;
@@ -76,6 +70,13 @@ static void threadedInterruptHandler(uint32_t mask, void* param) {
   static_cast<InterruptThreadOwner*>(param)->Notify(mask);
 }
 
+struct Interrupt {
+  std::unique_ptr<tInterrupt> anInterrupt;
+  std::unique_ptr<tInterruptManager> manager;
+  std::unique_ptr<InterruptThreadOwner> threadOwner = nullptr;
+  void* param = nullptr;
+};
+
 static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                              HAL_HandleEnum::Interrupt>* interruptHandles;
 
@@ -94,6 +95,7 @@ extern "C" {
 
 HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
                                              int32_t* status) {
+  hal::init::CheckInit();
   HAL_InterruptHandle handle = interruptHandles->Allocate();
   if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
@@ -109,17 +111,18 @@ HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
   return handle;
 }
 
-void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status) {
+void* HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle,
+                          int32_t* status) {
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
   interruptHandles->Free(interruptHandle);
+  if (anInterrupt == nullptr) {
+    return nullptr;
+  }
+  anInterrupt->manager->enable(status);
+  void* param = anInterrupt->param;
+  return param;
 }
 
-/**
- * In synchronous mode, wait for the defined interrupt to occur.
- * @param timeout Timeout in seconds
- * @param ignorePrevious If true, ignore interrupts that happened before
- * waitForInterrupt was called.
- * @return The mask of interrupts that fired.
- */
 int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
                              double timeout, HAL_Bool ignorePrevious,
                              int32_t* status) {
@@ -142,12 +145,6 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
   return result;
 }
 
-/**
- * Enable interrupts to occur on this input.
- * Interrupts are disabled when the RequestInterrupt call is made. This gives
- * time to do the setup of the other options before starting to field
- * interrupts.
- */
 void HAL_EnableInterrupts(HAL_InterruptHandle interruptHandle,
                           int32_t* status) {
   auto anInterrupt = interruptHandles->Get(interruptHandle);
@@ -158,9 +155,6 @@ void HAL_EnableInterrupts(HAL_InterruptHandle interruptHandle,
   anInterrupt->manager->enable(status);
 }
 
-/**
- * Disable Interrupts without without deallocating structures.
- */
 void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
                            int32_t* status) {
   auto anInterrupt = interruptHandles->Get(interruptHandle);
@@ -171,36 +165,26 @@ void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
   anInterrupt->manager->disable(status);
 }
 
-/**
- * Return the timestamp for the rising interrupt that occurred most recently.
- * This is in the same time domain as GetClock().
- * @return Timestamp in seconds since boot.
- */
-double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
-                                        int32_t* status) {
-  auto anInterrupt = interruptHandles->Get(interruptHandle);
-  if (anInterrupt == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-  uint32_t timestamp = anInterrupt->anInterrupt->readRisingTimeStamp(status);
-  return timestamp * 1e-6;
-}
-
-/**
- * Return the timestamp for the falling interrupt that occurred most recently.
- * This is in the same time domain as GetClock().
- * @return Timestamp in seconds since boot.
- */
-double HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
+int64_t HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
                                          int32_t* status) {
   auto anInterrupt = interruptHandles->Get(interruptHandle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
+  uint32_t timestamp = anInterrupt->anInterrupt->readRisingTimeStamp(status);
+  return timestamp;
+}
+
+int64_t HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
+                                          int32_t* status) {
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
+  if (anInterrupt == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
   uint32_t timestamp = anInterrupt->anInterrupt->readFallingTimeStamp(status);
-  return timestamp * 1e-6;
+  return timestamp;
 }
 
 void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,
@@ -238,21 +222,29 @@ void HAL_AttachInterruptHandler(HAL_InterruptHandle interruptHandle,
     return;
   }
   anInterrupt->manager->registerHandler(handler, param, status);
+  anInterrupt->param = param;
 }
 
 void HAL_AttachInterruptHandlerThreaded(HAL_InterruptHandle interrupt_handle,
                                         HAL_InterruptHandlerFunction handler,
                                         void* param, int32_t* status) {
-  InterruptThreadOwner* intr = new InterruptThreadOwner;
-  intr->Start();
-  intr->SetFunc(handler, param);
+  auto anInterrupt = interruptHandles->Get(interrupt_handle);
+  if (anInterrupt == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
 
-  HAL_AttachInterruptHandler(interrupt_handle, threadedInterruptHandler, intr,
-                             status);
+  anInterrupt->threadOwner = std::make_unique<InterruptThreadOwner>();
+  anInterrupt->threadOwner->Start();
+  anInterrupt->threadOwner->SetFunc(handler, param);
+
+  HAL_AttachInterruptHandler(interrupt_handle, threadedInterruptHandler,
+                             anInterrupt->threadOwner.get(), status);
 
   if (*status != 0) {
-    delete intr;
+    anInterrupt->threadOwner = nullptr;
   }
+  anInterrupt->param = param;
 }
 
 void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,

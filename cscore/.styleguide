@@ -1,0 +1,37 @@
+cHeaderFileInclude {
+  _c\.h$
+}
+
+cppHeaderFileInclude {
+  (?<!_c)\.h$
+  \.hpp$
+  \.inc$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+licenseUpdateExclude {
+  src/main/native/cpp/default_init_allocator\.h$
+}
+
+includeGuardRoots {
+  cscore/src/main/native/cpp/
+  cscore/src/main/native/include/
+  cscore/src/main/native/linux/
+  cscore/src/main/native/osx/
+  cscore/src/main/native/windows/
+  cscore/src/main/test/native/cpp/
+}
+
+repoRootNameOverride {
+  cscore
+}
+
+includeOtherLibs {
+  ^opencv2/
+  ^support/
+  ^tcpsockets/
+  ^wpi/
+}

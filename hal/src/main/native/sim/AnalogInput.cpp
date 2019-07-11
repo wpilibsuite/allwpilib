@@ -5,12 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/AnalogInput.h"
+#include "hal/AnalogInput.h"
 
 #include "AnalogInternal.h"
-#include "HAL/handles/HandlesInternal.h"
-#include "MockData/AnalogInDataInternal.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/AnalogAccumulator.h"
+#include "hal/handles/HandlesInternal.h"
+#include "mockdata/AnalogInDataInternal.h"
 
 using namespace hal;
 
@@ -23,6 +25,7 @@ void InitializeAnalogInput() {}
 extern "C" {
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
                                                     int32_t* status) {
+  hal::init::CheckInit();
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;
@@ -48,8 +51,8 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
     analog_port->isAccumulator = false;
   }
 
-  SimAnalogInData[channel].SetInitialized(true);
-  SimAnalogInData[channel].SetAccumulatorInitialized(false);
+  SimAnalogInData[channel].initialized = true;
+  SimAnalogInData[channel].accumulatorInitialized = false;
 
   return handle;
 }
@@ -58,8 +61,8 @@ void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {
   // no status, so no need to check for a proper free.
   analogInputHandles->Free(analogPortHandle);
   if (port == nullptr) return;
-  SimAnalogInData[port->channel].SetInitialized(false);
-  SimAnalogInData[port->channel].SetAccumulatorInitialized(false);
+  SimAnalogInData[port->channel].initialized = false;
+  SimAnalogInData[port->channel].accumulatorInitialized = false;
 }
 
 HAL_Bool HAL_CheckAnalogModule(int32_t module) { return module == 1; }
@@ -80,7 +83,7 @@ void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
     return;
   }
 
-  SimAnalogInData[port->channel].SetAverageBits(bits);
+  SimAnalogInData[port->channel].averageBits = bits;
 }
 int32_t HAL_GetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
                                  int32_t* status) {
@@ -90,7 +93,7 @@ int32_t HAL_GetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
     return 0;
   }
 
-  return SimAnalogInData[port->channel].GetAverageBits();
+  return SimAnalogInData[port->channel].averageBits;
 }
 void HAL_SetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
                                  int32_t bits, int32_t* status) {
@@ -100,7 +103,7 @@ void HAL_SetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
     return;
   }
 
-  SimAnalogInData[port->channel].SetOversampleBits(bits);
+  SimAnalogInData[port->channel].oversampleBits = bits;
 }
 int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
                                     int32_t* status) {
@@ -110,7 +113,7 @@ int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
     return 0;
   }
 
-  return SimAnalogInData[port->channel].GetOversampleBits();
+  return SimAnalogInData[port->channel].oversampleBits;
 }
 int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
                            int32_t* status) {
@@ -120,7 +123,7 @@ int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
     return 0;
   }
 
-  double voltage = SimAnalogInData[port->channel].GetVoltage();
+  double voltage = SimAnalogInData[port->channel].voltage;
   return HAL_GetAnalogVoltsToValue(analogPortHandle, voltage, status);
 }
 int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analogPortHandle,
@@ -152,7 +155,7 @@ double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
     return 0.0;
   }
 
-  return SimAnalogInData[port->channel].GetVoltage();
+  return SimAnalogInData[port->channel].voltage;
 }
 double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
                                    int32_t* status) {
@@ -163,8 +166,7 @@ double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
   }
 
   // No averaging supported
-  double voltage = SimAnalogInData[port->channel].GetVoltage();
-  return voltage;
+  return SimAnalogInData[port->channel].voltage;
 }
 int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
                                int32_t* status) {

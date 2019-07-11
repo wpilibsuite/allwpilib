@@ -5,14 +5,19 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/PWM.h"
+#include "hal/PWM.h"
 
 #include <cmath>
+#include <thread>
+
+#include <wpi/raw_ostream.h>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
-#include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/cpp/fpga_clock.h"
+#include "hal/handles/HandlesInternal.h"
 
 using namespace hal;
 
@@ -66,6 +71,7 @@ extern "C" {
 
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
                                         int32_t* status) {
+  hal::init::CheckInit();
   initializeDigital(status);
 
   if (*status != 0) return HAL_kInvalidHandle;
@@ -98,11 +104,16 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 
   port->channel = origChannel;
 
-  int32_t bitToSet = 1 << remapMXPPWMChannel(port->channel);
-  uint16_t specialFunctions =
-      digitalSystem->readEnableMXPSpecialFunction(status);
-  digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet,
-                                               status);
+  if (port->channel > tPWM::kNumHdrRegisters - 1) {
+    int32_t bitToSet = 1 << remapMXPPWMChannel(port->channel);
+    uint16_t specialFunctions =
+        digitalSystem->readEnableMXPSpecialFunction(status);
+    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet,
+                                                 status);
+  }
+
+  // Defaults to allow an always valid config.
+  HAL_SetPWMConfig(handle, 2.0, 1.501, 1.5, 1.499, 1.0, status);
 
   return handle;
 }
@@ -113,6 +124,20 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     return;
   }
 
+  digitalChannelHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
+
+  // Wait for no other object to hold this handle.
+  auto start = hal::fpga_clock::now();
+  while (port.use_count() != 1) {
+    auto current = hal::fpga_clock::now();
+    if (start + std::chrono::seconds(1) < current) {
+      wpi::outs() << "PWM handle free timeout\n";
+      wpi::outs().flush();
+      break;
+    }
+    std::this_thread::yield();
+  }
+
   if (port->channel > tPWM::kNumHdrRegisters - 1) {
     int32_t bitToUnset = 1 << remapMXPPWMChannel(port->channel);
     uint16_t specialFunctions =
@@ -120,8 +145,6 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToUnset,
                                                  status);
   }
-
-  digitalChannelHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
 }
 
 HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
@@ -214,14 +237,6 @@ HAL_Bool HAL_GetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
   return port->eliminateDeadband;
 }
 
-/**
- * Set a PWM channel to the desired value. The values range from 0 to 255 and
- * the period is controlled
- * by the PWM Period and MinHigh registers.
- *
- * @param channel The PWM channel to set.
- * @param value The PWM value to set.
- */
 void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value,
                    int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
@@ -237,15 +252,6 @@ void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value,
   }
 }
 
-/**
- * Set a PWM channel to the desired scaled value. The values range from -1 to 1
- * and
- * the period is controlled
- * by the PWM Period and MinHigh registers.
- *
- * @param channel The PWM channel to set.
- * @param value The scaled PWM value to set.
- */
 void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
                      int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
@@ -292,15 +298,6 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
   HAL_SetPWMRaw(pwmPortHandle, rawValue, status);
 }
 
-/**
- * Set a PWM channel to the desired position value. The values range from 0 to 1
- * and
- * the period is controlled
- * by the PWM Period and MinHigh registers.
- *
- * @param channel The PWM channel to set.
- * @param value The scaled PWM value to set.
- */
 void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double pos,
                         int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
@@ -338,12 +335,6 @@ void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   HAL_SetPWMRaw(pwmPortHandle, kPwmDisabled, status);
 }
 
-/**
- * Get a value from a PWM channel. The values range from 0 to 255.
- *
- * @param channel The PWM channel to read from.
- * @return The raw PWM value.
- */
 int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
@@ -358,12 +349,6 @@ int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   }
 }
 
-/**
- * Get a scaled value from a PWM channel. The values range from -1 to 1.
- *
- * @param channel The PWM channel to read from.
- * @return The scaled PWM value.
- */
 double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
@@ -396,12 +381,6 @@ double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   }
 }
 
-/**
- * Get a position value from a PWM channel. The values range from 0 to 1.
- *
- * @param channel The PWM channel to read from.
- * @return The scaled PWM value.
- */
 double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
@@ -438,12 +417,6 @@ void HAL_LatchPWMZero(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   pwmSystem->writeZeroLatch(port->channel, false, status);
 }
 
-/**
- * Set how how often the PWM signal is squelched, thus scaling the period.
- *
- * @param channel The PWM channel to configure.
- * @param squelchMask The 2-bit mask of outputs to squelch.
- */
 void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
                            int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
@@ -460,22 +433,12 @@ void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
   }
 }
 
-/**
- * Get the loop timing of the PWM system
- *
- * @return The loop time
- */
 int32_t HAL_GetPWMLoopTiming(int32_t* status) {
   initializeDigital(status);
   if (*status != 0) return 0;
   return pwmSystem->readLoopTiming(status);
 }
 
-/**
- * Get the pwm starting cycle time
- *
- * @return The pwm cycle start time.
- */
 uint64_t HAL_GetPWMCycleStartTime(int32_t* status) {
   initializeDigital(status);
   if (*status != 0) return 0;

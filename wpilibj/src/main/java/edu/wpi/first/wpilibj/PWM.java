@@ -7,10 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.DIOJNI;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.PWMJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.PWMConfigDataResult;
+import edu.wpi.first.hal.PWMJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * center value - 999 to 2 = linear scaling from "center" to "full reverse" - 1 = minimum pulse
  * width (currently .5ms) - 0 = disabled (i.e. PWM output is held low)
  */
-public class PWM extends SendableBase implements Sendable {
+public class PWM extends MotorSafety implements Sendable, AutoCloseable {
   /**
    * Represents the amount to multiply the minimum servo-pulse pwm period by.
    */
@@ -44,8 +44,10 @@ public class PWM extends SendableBase implements Sendable {
     k4X
   }
 
-  private int m_channel;
+  private final int m_channel;
   private int m_handle;
+
+  private final SendableImpl m_sendableImpl;
 
   /**
    * Allocate a PWM given a channel.
@@ -53,10 +55,12 @@ public class PWM extends SendableBase implements Sendable {
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
    */
   public PWM(final int channel) {
-    SensorBase.checkPWMChannel(channel);
+    m_sendableImpl = new SendableImpl(true);
+
+    SensorUtil.checkPWMChannel(channel);
     m_channel = channel;
 
-    m_handle = PWMJNI.initializePWMPort(DIOJNI.getPort((byte) channel));
+    m_handle = PWMJNI.initializePWMPort(HAL.getPort((byte) channel));
 
     setDisabled();
 
@@ -64,22 +68,83 @@ public class PWM extends SendableBase implements Sendable {
 
     HAL.report(tResourceType.kResourceType_PWM, channel);
     setName("PWM", channel);
+
+    setSafetyEnabled(false);
   }
 
   /**
-   * Free the PWM channel.
-   *
-   * <p>Free the resource associated with the PWM channel and set the value to 0.
+   * Free the resource associated with the PWM channel and set the value to 0.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    m_sendableImpl.close();
+
     if (m_handle == 0) {
       return;
     }
     setDisabled();
     PWMJNI.freePWMPort(m_handle);
     m_handle = 0;
+  }
+
+  @Override
+  public final synchronized String getName() {
+    return m_sendableImpl.getName();
+  }
+
+  @Override
+  public final synchronized void setName(String name) {
+    m_sendableImpl.setName(name);
+  }
+
+  /**
+   * Sets the name of the sensor with a channel number.
+   *
+   * @param moduleType A string that defines the module name in the label for the value
+   * @param channel    The channel number the device is plugged into
+   */
+  protected final void setName(String moduleType, int channel) {
+    m_sendableImpl.setName(moduleType, channel);
+  }
+
+  /**
+   * Sets the name of the sensor with a module and channel number.
+   *
+   * @param moduleType   A string that defines the module name in the label for the value
+   * @param moduleNumber The number of the particular module type
+   * @param channel      The channel number the device is plugged into (usually PWM)
+   */
+  protected final void setName(String moduleType, int moduleNumber, int channel) {
+    m_sendableImpl.setName(moduleType, moduleNumber, channel);
+  }
+
+  @Override
+  public final synchronized String getSubsystem() {
+    return m_sendableImpl.getSubsystem();
+  }
+
+  @Override
+  public final synchronized void setSubsystem(String subsystem) {
+    m_sendableImpl.setSubsystem(subsystem);
+  }
+
+  /**
+   * Add a child component.
+   *
+   * @param child child component
+   */
+  protected final void addChild(Object child) {
+    m_sendableImpl.addChild(child);
+  }
+
+  @Override
+  public void stopMotor() {
+    setDisabled();
+  }
+
+  @Override
+  public String getDescription() {
+    return "PWM " + getChannel();
   }
 
   /**
@@ -244,8 +309,9 @@ public class PWM extends SendableBase implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Speed Controller");
+    builder.setSmartDashboardType("PWM");
+    builder.setActuator(true);
     builder.setSafeState(this::setDisabled);
-    builder.addDoubleProperty("Value", this::getSpeed, this::setSpeed);
+    builder.addDoubleProperty("Value", this::getRaw, value -> setRaw((int) value));
   }
 }

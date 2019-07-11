@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
-import edu.wpi.first.wpilibj.Sendable;
 
 /**
  * This class is designed to handle the case where there is a {@link Subsystem} which uses a single
@@ -22,7 +21,7 @@ import edu.wpi.first.wpilibj.Sendable;
  * allows access to the internal {@link PIDController} in order to give total control to the
  * programmer.
  */
-public abstract class PIDSubsystem extends Subsystem implements Sendable {
+public abstract class PIDSubsystem extends Subsystem {
   /**
    * The internal {@link PIDController}.
    */
@@ -36,13 +35,16 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
    * A source which calls {@link PIDCommand#returnPIDInput()}.
    */
   private final PIDSource m_source = new PIDSource() {
+    @Override
     public void setPIDSourceType(PIDSourceType pidSource) {
     }
 
+    @Override
     public PIDSourceType getPIDSourceType() {
       return PIDSourceType.kDisplacement;
     }
 
+    @Override
     public double pidGet() {
       return returnPIDInput();
     }
@@ -87,6 +89,7 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
    * @param p      the proportional value
    * @param i      the integral value
    * @param d      the derivative value
+   * @param f      the feed forward value
    * @param period the time (in seconds) between calculations
    */
   @SuppressWarnings("ParameterName")
@@ -122,7 +125,7 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
    * @param period the time (in seconds) between calculations
    */
   @SuppressWarnings("ParameterName")
-  public PIDSubsystem(double p, double i, double d, double period, double f) {
+  public PIDSubsystem(double p, double i, double d, double f, double period) {
     m_controller = new PIDController(p, i, d, f, m_source, m_output, period);
     addChild("PIDController", m_controller);
   }

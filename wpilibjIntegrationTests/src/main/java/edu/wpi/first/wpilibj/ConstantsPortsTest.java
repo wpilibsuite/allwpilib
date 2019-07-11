@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import org.junit.Test;
-
 import java.util.logging.Logger;
+
+import org.junit.Test;
 
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 public class ConstantsPortsTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(ConstantsPortsTest.class.getName());
 
+  @Override
   protected Logger getClassLogger() {
     return logger;
   }
@@ -30,7 +31,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
    */
   @Test
   public void testDigitalChannels() {
-    assertEquals(31, SensorBase.kDigitalChannels);
+    assertEquals(31, SensorUtil.kDigitalChannels);
   }
 
   /**
@@ -38,7 +39,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
    */
   @Test
   public void testAnalogInputChannels() {
-    assertEquals(8, SensorBase.kAnalogInputChannels);
+    assertEquals(8, SensorUtil.kAnalogInputChannels);
   }
 
   /**
@@ -46,7 +47,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
    */
   @Test
   public void testAnalogOutputChannels() {
-    assertEquals(2, SensorBase.kAnalogOutputChannels);
+    assertEquals(2, SensorUtil.kAnalogOutputChannels);
   }
 
   /**
@@ -54,7 +55,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
    */
   @Test
   public void testSolenoidChannels() {
-    assertEquals(8, SensorBase.kSolenoidChannels);
+    assertEquals(8, SensorUtil.kSolenoidChannels);
   }
 
   /**
@@ -62,7 +63,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
    */
   @Test
   public void testPwmChannels() {
-    assertEquals(20, SensorBase.kPwmChannels);
+    assertEquals(20, SensorUtil.kPwmChannels);
   }
 
   /**
@@ -70,7 +71,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
    */
   @Test
   public void testRelayChannels() {
-    assertEquals(4, SensorBase.kRelayChannels);
+    assertEquals(4, SensorUtil.kRelayChannels);
   }
 
   /**
@@ -78,7 +79,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
    */
   @Test
   public void testPDPChannels() {
-    assertEquals(16, SensorBase.kPDPChannels);
+    assertEquals(16, SensorUtil.kPDPChannels);
   }
 
   /**
@@ -86,7 +87,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
    */
   @Test
   public void testPDPModules() {
-    assertEquals(63, SensorBase.kPDPModules);
+    assertEquals(63, SensorUtil.kPDPModules);
   }
 
   /**
@@ -94,6 +95,6 @@ public class ConstantsPortsTest extends AbstractComsSetup {
    */
   @Test
   public void testPCMModules() {
-    assertEquals(63, SensorBase.kPCMModules);
+    assertEquals(63, SensorUtil.kPCMModules);
   }
 }

@@ -7,8 +7,8 @@
 
 #include "NTProvider_DIO.h"
 
-#include <HAL/Ports.h>
-#include <MockData/DIOData.h>
+#include <hal/Ports.h>
+#include <mockdata/DIOData.h>
 
 void HALSimNTProviderDIO::Initialize() {
   InitializeDefault(HAL_GetNumDigitalChannels(),

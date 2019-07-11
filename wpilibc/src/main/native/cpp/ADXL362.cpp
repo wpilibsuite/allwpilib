@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ADXL362.h"
+#include "frc/ADXL362.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "DriverStation.h"
-#include "SmartDashboard/SendableBuilder.h"
+#include "frc/DriverStation.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -31,23 +31,12 @@ static constexpr int kPowerCtl_UltraLowNoise = 0x20;
 // static constexpr int kPowerCtl_AutoSleep = 0x04;
 static constexpr int kPowerCtl_Measure = 0x02;
 
-/**
- * Constructor.  Uses the onboard CS1.
- *
- * @param range The range (+ or -) that the accelerometer will measure.
- */
 ADXL362::ADXL362(Range range) : ADXL362(SPI::Port::kOnboardCS1, range) {}
 
-/**
- * Constructor.
- *
- * @param port  The SPI port the accelerometer is attached to
- * @param range The range (+ or -) that the accelerometer will measure.
- */
 ADXL362::ADXL362(SPI::Port port, Range range) : m_spi(port) {
   m_spi.SetClockRate(3000000);
   m_spi.SetMSBFirst();
-  m_spi.SetSampleDataOnFalling();
+  m_spi.SetSampleDataOnTrailingEdge();
   m_spi.SetClockActiveLow();
   m_spi.SetChipSelectActiveLow();
 
@@ -108,12 +97,6 @@ double ADXL362::GetY() { return GetAcceleration(kAxis_Y); }
 
 double ADXL362::GetZ() { return GetAcceleration(kAxis_Z); }
 
-/**
- * Get the acceleration of one axis in Gs.
- *
- * @param axis The axis to read from.
- * @return Acceleration of the ADXL362 in Gs.
- */
 double ADXL362::GetAcceleration(ADXL362::Axes axis) {
   if (m_gsPerLSB == 0.0) return 0.0;
 
@@ -128,12 +111,6 @@ double ADXL362::GetAcceleration(ADXL362::Axes axis) {
   return rawAccel * m_gsPerLSB;
 }
 
-/**
- * Get the acceleration of all axes in Gs.
- *
- * @return An object containing the acceleration measured on each axis of the
- *         ADXL362 in Gs.
- */
 ADXL362::AllAxes ADXL362::GetAccelerations() {
   AllAxes data = AllAxes();
   if (m_gsPerLSB == 0.0) {

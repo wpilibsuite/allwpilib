@@ -17,23 +17,23 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * commands using the pivot should make sure they disable PID!
  */
 public class SetPivotSetpoint extends Command {
-	private double m_setpoint;
+  private final double m_setpoint;
 
-	public SetPivotSetpoint(double setpoint) {
-		this.m_setpoint = setpoint;
-		requires(Robot.pivot);
-	}
+  public SetPivotSetpoint(double setpoint) {
+    this.m_setpoint = setpoint;
+    requires(Robot.pivot);
+  }
 
-	// Called just before this Command runs the first time
-	@Override
-	protected void initialize() {
-		Robot.pivot.enable();
-		Robot.pivot.setSetpoint(m_setpoint);
-	}
+  // Called just before this Command runs the first time
+  @Override
+  protected void initialize() {
+    Robot.pivot.enable();
+    Robot.pivot.setSetpoint(m_setpoint);
+  }
 
-	// Make this return true when this Command no longer needs to run execute()
-	@Override
-	protected boolean isFinished() {
-		return Robot.pivot.onTarget();
-	}
+  // Make this return true when this Command no longer needs to run execute()
+  @Override
+  protected boolean isFinished() {
+    return Robot.pivot.onTarget();
+  }
 }

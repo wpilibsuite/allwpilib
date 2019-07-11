@@ -5,18 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PWMVictorSPX.h"
+#include "frc/PWMVictorSPX.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
 using namespace frc;
 
-/**
- * Construct a PWMVictorSPX connected via PWM.
- *
- * @param channel The PWM channel that the PWMVictorSPX is attached to. 0-9 are
- *                on-board, 10-19 are on the MXP port
- */
 PWMVictorSPX::PWMVictorSPX(int channel) : PWMSpeedController(channel) {
   /* Note that the PWMVictorSPX uses the following bounds for PWM values. These
    * values should work reasonably well for most controllers, but if users
@@ -35,6 +29,6 @@ PWMVictorSPX::PWMVictorSPX(int channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  // HAL_Report(HALUsageReporting::kResourceType_PWMVictorSPX, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_PWMVictorSPX, GetChannel());
   SetName("PWMVictorSPX", GetChannel());
 }

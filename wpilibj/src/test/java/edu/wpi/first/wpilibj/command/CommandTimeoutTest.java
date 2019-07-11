@@ -7,26 +7,21 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test a {@link Command} that times out.
  */
-public class CommandTimeoutTest extends AbstractCommandTest {
+class CommandTimeoutTest extends AbstractCommandTest {
   /**
    * Command 2 second Timeout Test.
    */
   @Test
-  public void testTwoSecondTimeout() {
+  void twoSecondTimeoutTest() {
     final ASubsystem subsystem = new ASubsystem();
 
 
-    final MockCommand command = new MockCommand() {
-      {
-        requires(subsystem);
-        setTimeout(2);
-      }
-
+    final MockCommand command = new MockCommand(subsystem, 2) {
       @Override
       public boolean isFinished() {
         return super.isFinished() || isTimedOut();
@@ -43,11 +38,10 @@ public class CommandTimeoutTest extends AbstractCommandTest {
     assertCommandState(command, 1, 2, 2, 0, 0);
     Scheduler.getInstance().run();
     assertCommandState(command, 1, 3, 3, 0, 0);
-    sleep(2000);
+    sleep(2500);
     Scheduler.getInstance().run();
     assertCommandState(command, 1, 4, 4, 1, 0);
     Scheduler.getInstance().run();
     assertCommandState(command, 1, 4, 4, 1, 0);
   }
-
 }

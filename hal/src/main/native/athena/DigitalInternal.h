@@ -11,15 +11,15 @@
 
 #include <memory>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
-#include "HAL/AnalogTrigger.h"
-#include "HAL/ChipObject.h"
-#include "HAL/Ports.h"
-#include "HAL/Types.h"
-#include "HAL/handles/DigitalHandleResource.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "PortsInternal.h"
+#include "hal/AnalogTrigger.h"
+#include "hal/ChipObject.h"
+#include "hal/Ports.h"
+#include "hal/Types.h"
+#include "hal/handles/DigitalHandleResource.h"
+#include "hal/handles/HandlesInternal.h"
 
 namespace hal {
 
@@ -81,12 +81,33 @@ extern DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
 
 extern wpi::mutex digitalDIOMutex;
 
+/**
+ * Initialize the digital system.
+ */
 void initializeDigital(int32_t* status);
+
+/**
+ * remap the digital source channel and set the module.
+ * If it's an analog trigger, determine the module from the high order routing
+ * channel else do normal digital input remapping based on channel number
+ * (MXP)
+ */
 bool remapDigitalSource(HAL_Handle digitalSourceHandle,
                         HAL_AnalogTriggerType analogTriggerType,
                         uint8_t& channel, uint8_t& module, bool& analogTrigger);
-int32_t remapSPIChannel(int32_t channel);
-int32_t remapMXPPWMChannel(int32_t channel);
+
+/**
+ * Map DIO channel numbers from their physical number (10 to 26) to their
+ * position in the bit field.
+ */
 int32_t remapMXPChannel(int32_t channel);
+
+int32_t remapMXPPWMChannel(int32_t channel);
+
+/**
+ * Map SPI channel numbers from their physical number (27 to 31) to their
+ * position in the bit field.
+ */
+int32_t remapSPIChannel(int32_t channel);
 
 }  // namespace hal

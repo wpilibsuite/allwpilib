@@ -7,9 +7,9 @@
 
 #include "NTProvider_Analog.h"
 
-#include <HAL/Ports.h>
-#include <MockData/AnalogInData.h>
-#include <MockData/AnalogOutData.h>
+#include <hal/Ports.h>
+#include <mockdata/AnalogInData.h>
+#include <mockdata/AnalogOutData.h>
 
 void HALSimNTProviderAnalogIn::Initialize() {
   InitializeDefault(HAL_GetNumAnalogInputs(),

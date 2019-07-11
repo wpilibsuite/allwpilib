@@ -7,16 +7,19 @@
 
 package edu.wpi.first.wpilibj.can;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.can.CANJNI;
+import edu.wpi.first.hal.can.CANStatus;
 
-public class CANStatusTest {
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
+class CANStatusTest {
   @Test
-  public void canStatusGetDoesntThrow() {
+  void canStatusGetDoesntThrow() {
     HAL.initialize(500, 0);
     CANStatus status = new CANStatus();
-    CANJNI.GetCANStatus(status);
-    // Nothing we can assert, so just make sure it didn't throw.
+    assertDoesNotThrow(() -> CANJNI.GetCANStatus(status));
   }
 }
