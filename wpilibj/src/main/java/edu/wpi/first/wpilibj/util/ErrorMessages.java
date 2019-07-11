@@ -17,6 +17,7 @@ public final class ErrorMessages {
    * Utility class, so constructor is private.
    */
   private ErrorMessages() {
+    throw new UnsupportedOperationException("This is a utility class!");
   }
 
   /**
