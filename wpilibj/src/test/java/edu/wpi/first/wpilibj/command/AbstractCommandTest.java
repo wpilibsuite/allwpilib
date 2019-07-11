@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,6 +8,9 @@
 package edu.wpi.first.wpilibj.command;
 
 import org.junit.jupiter.api.BeforeEach;
+
+import edu.wpi.first.hal.sim.DriverStationSim;
+import edu.wpi.first.wpilibj.SimDs;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -18,7 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public abstract class AbstractCommandTest {
   @BeforeEach
-  void commandSetup() {
+  void commandSetup(@SimDs DriverStationSim ds) {
+    ds.setEnabled(true);
+
     Scheduler.getInstance().removeAll();
     Scheduler.getInstance().enable();
   }
