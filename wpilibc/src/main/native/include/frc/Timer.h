@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -29,16 +29,6 @@ using TimerInterruptHandler = void (*)(void* param);
 void Wait(double seconds);
 
 /**
- * Return the FPGA system clock time in seconds.
- *
- * This is deprecated and just forwards to Timer::GetFPGATimestamp().
- *
- * @return Robot running time in seconds.
- */
-WPI_DEPRECATED("Use Timer::GetFPGATimestamp() instead.")
-double GetClock();
-
-/**
  * @brief  Gives real-time clock system time with nanosecond resolution
  * @return The time, just in case you want the robot to start autonomous at 8pm
  *         on Saturday.
@@ -66,8 +56,8 @@ class Timer {
 
   virtual ~Timer() = default;
 
-  Timer(Timer&&) = default;
-  Timer& operator=(Timer&&) = default;
+  Timer(Timer&& rhs);
+  Timer& operator=(Timer&& rhs);
 
   /**
    * Get the current time from the timer. If the clock is running it is derived

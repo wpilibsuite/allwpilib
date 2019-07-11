@@ -55,6 +55,11 @@
 #include <string>
 #include <utility>
 
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 26495)
+#endif
+
 namespace wpi {
 
 /// An opaque object representing a hash code.
@@ -192,7 +197,7 @@ inline uint64_t hash_1to3_bytes(const char *s, size_t len, uint64_t seed) {
   uint8_t b = s[len >> 1];
   uint8_t c = s[len - 1];
   uint32_t y = static_cast<uint32_t>(a) + (static_cast<uint32_t>(b) << 8);
-  uint32_t z = len + (static_cast<uint32_t>(c) << 2);
+  uint32_t z = static_cast<uint32_t>(len + (static_cast<uint64_t>(c) << 2));
   return shift_mix(y * k2 ^ z * k3 ^ seed) * k2;
 }
 
@@ -568,7 +573,7 @@ public:
     // Check whether the entire set of values fit in the buffer. If so, we'll
     // use the optimized short hashing routine and skip state entirely.
     if (length == 0)
-      return hash_short(buffer, buffer_ptr - buffer, seed);
+      return static_cast<size_t>(hash_short(buffer, buffer_ptr - buffer, seed));
 
     // Mix the final buffer, rotating it if we did a partial fill in order to
     // simulate doing a mix of the last 64-bytes. That is how the algorithm
@@ -580,7 +585,7 @@ public:
     state.mix(buffer);
     length += buffer_ptr - buffer;
 
-    return state.finalize(length);
+    return static_cast<size_t>(state.finalize(length));
   }
 };
 
@@ -619,7 +624,7 @@ inline hash_code hash_integer_value(uint64_t value) {
   const uint64_t seed = get_execution_seed();
   const char *s = reinterpret_cast<const char *>(&value);
   const uint64_t a = fetch32(s);
-  return hash_16_bytes(seed + (a << 3), fetch32(s + 4));
+  return static_cast<size_t>(hash_16_bytes(seed + (a << 3), fetch32(s + 4)));
 }
 
 } // namespace detail
@@ -656,5 +661,9 @@ hash_code hash_value(const std::basic_string<T> &arg) {
 }
 
 } // namespace wpi
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
 
 #endif

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2012-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2012-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -60,68 +60,8 @@ LiveWindow* LiveWindow::GetInstance() {
   return &instance;
 }
 
-void LiveWindow::Run() { UpdateValues(); }
-
-void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
-                           Sendable* component) {
-  Add(component);
-  component->SetName(subsystem, name);
-}
-
-void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
-                           Sendable& component) {
-  Add(&component);
-  component.SetName(subsystem, name);
-}
-
-void LiveWindow::AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
-                           std::shared_ptr<Sendable> component) {
-  Add(component);
-  component->SetName(subsystem, name);
-}
-
-void LiveWindow::AddActuator(const wpi::Twine& subsystem,
-                             const wpi::Twine& name, Sendable* component) {
-  Add(component);
-  component->SetName(subsystem, name);
-}
-
-void LiveWindow::AddActuator(const wpi::Twine& subsystem,
-                             const wpi::Twine& name, Sendable& component) {
-  Add(&component);
-  component.SetName(subsystem, name);
-}
-
-void LiveWindow::AddActuator(const wpi::Twine& subsystem,
-                             const wpi::Twine& name,
-                             std::shared_ptr<Sendable> component) {
-  Add(component);
-  component->SetName(subsystem, name);
-}
-
-void LiveWindow::AddSensor(const wpi::Twine& type, int channel,
-                           Sendable* component) {
-  Add(component);
-  component->SetName("Ungrouped",
-                     type + Twine('[') + Twine(channel) + Twine(']'));
-}
-
-void LiveWindow::AddActuator(const wpi::Twine& type, int channel,
-                             Sendable* component) {
-  Add(component);
-  component->SetName("Ungrouped",
-                     type + Twine('[') + Twine(channel) + Twine(']'));
-}
-
-void LiveWindow::AddActuator(const wpi::Twine& type, int module, int channel,
-                             Sendable* component) {
-  Add(component);
-  component->SetName("Ungrouped", type + Twine('[') + Twine(module) +
-                                      Twine(',') + Twine(channel) + Twine(']'));
-}
-
 void LiveWindow::Add(std::shared_ptr<Sendable> sendable) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->components[sendable.get()];
   comp.sendable = sendable;
 }
@@ -135,19 +75,19 @@ void LiveWindow::AddChild(Sendable* parent, std::shared_ptr<Sendable> child) {
 }
 
 void LiveWindow::AddChild(Sendable* parent, void* child) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->components[child];
   comp.parent = parent;
   comp.telemetryEnabled = false;
 }
 
 void LiveWindow::Remove(Sendable* sendable) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
   m_impl->components.erase(sendable);
 }
 
 void LiveWindow::EnableTelemetry(Sendable* sendable) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
   // Re-enable global setting in case DisableAllTelemetry() was called.
   m_impl->telemetryEnabled = true;
   auto i = m_impl->components.find(sendable);
@@ -155,24 +95,24 @@ void LiveWindow::EnableTelemetry(Sendable* sendable) {
 }
 
 void LiveWindow::DisableTelemetry(Sendable* sendable) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
   auto i = m_impl->components.find(sendable);
   if (i != m_impl->components.end()) i->getSecond().telemetryEnabled = false;
 }
 
 void LiveWindow::DisableAllTelemetry() {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
   m_impl->telemetryEnabled = false;
   for (auto& i : m_impl->components) i.getSecond().telemetryEnabled = false;
 }
 
 bool LiveWindow::IsEnabled() const {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
   return m_impl->liveWindowEnabled;
 }
 
 void LiveWindow::SetEnabled(bool enabled) {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
   if (m_impl->liveWindowEnabled == enabled) return;
   Scheduler* scheduler = Scheduler::GetInstance();
   m_impl->startLiveWindow = enabled;
@@ -192,7 +132,7 @@ void LiveWindow::SetEnabled(bool enabled) {
 }
 
 void LiveWindow::UpdateValues() {
-  std::lock_guard<wpi::mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
   UpdateValuesUnsafe();
 }
 

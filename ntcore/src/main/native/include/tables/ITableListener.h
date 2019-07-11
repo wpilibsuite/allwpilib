@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,6 +18,9 @@
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif _WIN32
+#pragma warning(push)
+#pragma warning(disable : 4996)
 #endif
 
 class ITable;
@@ -58,6 +61,8 @@ class WPI_DEPRECATED(
 
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
+#elif _WIN32
+#pragma warning(pop)
 #endif
 
 #endif  // NTCORE_TABLES_ITABLELISTENER_H_

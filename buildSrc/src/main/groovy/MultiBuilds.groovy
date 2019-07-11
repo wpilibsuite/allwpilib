@@ -9,10 +9,13 @@ import org.gradle.language.base.internal.ProjectLayout;
 import org.gradle.language.base.plugins.ComponentModelBasePlugin;
 import org.gradle.language.nativeplatform.tasks.AbstractNativeSourceCompileTask;
 import org.gradle.model.ModelMap;
+import edu.wpi.first.toolchain.ToolchainExtension
 import org.gradle.model.Mutate;
+import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.nativeplatform.test.googletest.GoogleTestTestSuiteBinarySpec;
 import org.gradle.model.RuleSource;
 import org.gradle.model.Validate;
+import org.gradle.nativeplatform.test.tasks.RunTestExecutable
 import org.gradle.nativeplatform.NativeExecutableBinarySpec
 import org.gradle.nativeplatform.NativeBinarySpec;
 import org.gradle.nativeplatform.NativeComponentSpec;
@@ -47,20 +50,11 @@ class MultiBuilds implements Plugin<Project> {
 
   @CompileStatic
   static class Rules extends RuleSource {
-    @Mutate
-    void setupBuildTypes(BuildTypeContainer buildTypes, ProjectLayout projectLayout) {
-        def project = (Project) projectLayout.projectIdentifier
-        if (project.hasProperty('releaseBuild')) {
-            buildTypes.create('debug')
-        } else {
-            buildTypes.create('release')
-        }
-    }
-
     @CompileDynamic
     private static void setBuildableFalseDynamically(NativeBinarySpec binary) {
         binary.buildable = false
     }
+
 
     @Mutate
     @CompileStatic
@@ -75,21 +69,6 @@ class MultiBuilds implements Plugin<Project> {
           Rules.setBuildableFalseDynamically(spec)
         }
       }
-        // def crossCompileConfigs = []
-        // for (BuildConfig config : configs) {
-        //     if (!BuildConfigRulesBase.isCrossCompile(config)) {
-        //         continue
-        //     }
-        //     crossCompileConfigs << config.architecture
-        // }
-        // if (!crossCompileConfigs.empty) {
-        //     binaries.withType(GoogleTestTestSuiteBinarySpec) { oSpec ->
-        //         GoogleTestTestSuiteBinarySpec spec = (GoogleTestTestSuiteBinarySpec) oSpec
-        //         if (crossCompileConfigs.contains(spec.targetPlatform.architecture.name)) {
-        //             setBuildableFalseDynamically(spec)
-        //         }
-        //     }
-        // }
     }
   }
 }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -30,11 +30,11 @@ static std::unique_ptr<CameraServerShared> cameraServerShared = nullptr;
 static wpi::mutex setLock;
 
 void SetCameraServerShared(std::unique_ptr<CameraServerShared> shared) {
-  std::unique_lock<wpi::mutex> lock(setLock);
+  std::unique_lock lock(setLock);
   cameraServerShared = std::move(shared);
 }
 CameraServerShared* GetCameraServerShared() {
-  std::unique_lock<wpi::mutex> lock(setLock);
+  std::unique_lock lock(setLock);
   if (!cameraServerShared) {
     cameraServerShared = std::make_unique<DefaultCameraServerShared>();
   }

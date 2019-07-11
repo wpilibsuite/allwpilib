@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Modifications Copyright (c) 2017-2018 FIRST. All Rights Reserved.          */
+/* Modifications Copyright (c) 2017-2019 FIRST. All Rights Reserved.          */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -163,14 +163,6 @@ class json;
     #define JSON_UNLIKELY(x)    x
 #endif
 
-// C++ language standard detection
-#if (defined(__cplusplus) && __cplusplus >= 201703L) || (defined(_HAS_CXX17) && _HAS_CXX17 == 1) // fix for issue #464
-    #define JSON_HAS_CPP_17
-    #define JSON_HAS_CPP_14
-#elif (defined(__cplusplus) && __cplusplus >= 201402L) || (defined(_HAS_CXX14) && _HAS_CXX14 == 1)
-    #define JSON_HAS_CPP_14
-#endif
-
 /*!
 @brief Helper to determine whether there's a key_type for T.
 
@@ -219,57 +211,6 @@ using enable_if_t = typename std::enable_if<B, T>::type;
 template<typename T>
 using uncvref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 
-// implementation of C++14 index_sequence and affiliates
-// source: https://stackoverflow.com/a/32223343
-template<std::size_t... Ints>
-struct index_sequence
-{
-    using type = index_sequence;
-    using value_type = std::size_t;
-    static constexpr std::size_t size() noexcept
-    {
-        return sizeof...(Ints);
-    }
-};
-
-template<class Sequence1, class Sequence2>
-struct merge_and_renumber;
-
-template<std::size_t... I1, std::size_t... I2>
-struct merge_and_renumber<index_sequence<I1...>, index_sequence<I2...>>
-        : index_sequence < I1..., (sizeof...(I1) + I2)... > {};
-
-template<std::size_t N>
-struct make_index_sequence
-    : merge_and_renumber < typename make_index_sequence < N / 2 >::type,
-      typename make_index_sequence < N - N / 2 >::type > {};
-
-template<> struct make_index_sequence<0> : index_sequence<> {};
-template<> struct make_index_sequence<1> : index_sequence<0> {};
-
-template<typename... Ts>
-using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
-
-/*
-Implementation of two C++17 constructs: conjunction, negation. This is needed
-to avoid evaluating all the traits in a condition
-
-For example: not std::is_same<void, T>::value and has_value_type<T>::value
-will not compile when T = void (on MSVC at least). Whereas
-conjunction<negation<std::is_same<void, T>>, has_value_type<T>>::value will
-stop evaluating if negation<...>::value == false
-
-Please note that those constructs must be used with caution, since symbols can
-become very long quickly (which can slow down compilation and cause MSVC
-internal compiler errors). Only use it when you have to (see example ahead).
-*/
-template<class...> struct conjunction : std::true_type {};
-template<class B1> struct conjunction<B1> : B1 {};
-template<class B1, class... Bn>
-struct conjunction<B1, Bn...> : std::conditional<bool(B1::value), conjunction<Bn...>, B1>::type {};
-
-template<class B> struct negation : std::integral_constant<bool, not B::value> {};
-
 // dispatch utility (taken from ranges-v3)
 template<unsigned N> struct priority_tag : priority_tag < N - 1 > {};
 template<> struct priority_tag<0> {};
@@ -306,7 +247,7 @@ template<class BasicJsonType, class CompatibleObjectType>
 struct is_compatible_object_type
 {
     static auto constexpr value = is_compatible_object_type_impl <
-                                  conjunction<negation<std::is_same<void, CompatibleObjectType>>,
+                                  std::conjunction<std::negation<std::is_same<void, CompatibleObjectType>>,
                                   has_mapped_type<CompatibleObjectType>,
                                   has_key_type<CompatibleObjectType>>::value,
                                   typename BasicJsonType::object_t, CompatibleObjectType >::value;
@@ -325,12 +266,12 @@ template<class BasicJsonType, class CompatibleArrayType>
 struct is_compatible_array_type
 {
     static auto constexpr value =
-        conjunction<negation<std::is_same<void, CompatibleArrayType>>,
-        negation<is_compatible_object_type<
+        std::conjunction<std::negation<std::is_same<void, CompatibleArrayType>>,
+        std::negation<is_compatible_object_type<
         BasicJsonType, CompatibleArrayType>>,
-        negation<std::is_constructible<StringRef,
+        std::negation<std::is_constructible<StringRef,
         CompatibleArrayType>>,
-        negation<is_json_nested_type<BasicJsonType, CompatibleArrayType>>,
+        std::negation<is_json_nested_type<BasicJsonType, CompatibleArrayType>>,
         has_value_type<CompatibleArrayType>,
         has_iterator<CompatibleArrayType>>::value;
 };
@@ -422,7 +363,7 @@ struct is_compatible_complete_type
 
 template <typename BasicJsonType, typename CompatibleType>
 struct is_compatible_type
-    : conjunction<is_complete_type<CompatibleType>,
+    : std::conjunction<is_complete_type<CompatibleType>,
       is_compatible_complete_type<BasicJsonType, CompatibleType>>
 {
 };
@@ -1035,7 +976,7 @@ void from_json(const BasicJsonType& j, std::pair<A1, A2>& p)
 }
 
 template<typename BasicJsonType, typename Tuple, std::size_t... Idx>
-void from_json_tuple_impl(const BasicJsonType& j, Tuple& t, index_sequence<Idx...>)
+void from_json_tuple_impl(const BasicJsonType& j, Tuple& t, std::index_sequence<Idx...>)
 {
     t = std::make_tuple(j.at(Idx).template get<typename std::tuple_element<Idx, Tuple>::type>()...);
 }
@@ -1043,7 +984,7 @@ void from_json_tuple_impl(const BasicJsonType& j, Tuple& t, index_sequence<Idx..
 template<typename BasicJsonType, typename... Args>
 void from_json(const BasicJsonType& j, std::tuple<Args...>& t)
 {
-    from_json_tuple_impl(j, t, index_sequence_for<Args...> {});
+    from_json_tuple_impl(j, t, std::index_sequence_for<Args...> {});
 }
 
 struct from_json_fn
@@ -1355,7 +1296,7 @@ void to_json(BasicJsonType& j, const std::pair<Args...>& p)
 }
 
 template<typename BasicJsonType, typename Tuple, std::size_t... Idx>
-void to_json_tuple_impl(BasicJsonType& j, const Tuple& t, index_sequence<Idx...>)
+void to_json_tuple_impl(BasicJsonType& j, const Tuple& t, std::index_sequence<Idx...>)
 {
     j = {std::get<Idx>(t)...};
 }
@@ -1363,7 +1304,7 @@ void to_json_tuple_impl(BasicJsonType& j, const Tuple& t, index_sequence<Idx...>
 template<typename BasicJsonType, typename... Args>
 void to_json(BasicJsonType& j, const std::tuple<Args...>& t)
 {
-    to_json_tuple_impl(j, t, index_sequence_for<Args...> {});
+    to_json_tuple_impl(j, t, std::index_sequence_for<Args...> {});
 }
 
 struct to_json_fn
@@ -2860,13 +2801,9 @@ class json
     /// the template arguments passed to class @ref json.
     /// @{
 
-#if defined(JSON_HAS_CPP_14)
     // Use transparent comparator if possible, combined with perfect forwarding
     // on find() and count() calls prevents unnecessary string construction.
     using object_comparator_t = std::less<>;
-#else
-    using object_comparator_t = std::less<std::string>;
-#endif
 
     /*!
     @brief a type for an object
@@ -2962,12 +2899,14 @@ class json
     {
         std::allocator<T> alloc;
 
-        auto deleter = [&](T * object)
-        {
-            alloc.deallocate(object, 1);
-        };
-        std::unique_ptr<T, decltype(deleter)> object(alloc.allocate(1), deleter);
-        alloc.construct(object.get(), std::forward<Args>(args)...);
+		using AllocatorTraits = std::allocator_traits<std::allocator<T>>;
+
+		auto deleter = [&](T * object)
+		{
+			AllocatorTraits::deallocate(alloc, object, 1);
+		};
+		std::unique_ptr<T, decltype(deleter)> object(AllocatorTraits::allocate(alloc, 1), deleter);
+		AllocatorTraits::construct(alloc, object.get(), std::forward<Args>(args)...);
         assert(object != nullptr);
         return object.release();
     }
@@ -4672,9 +4611,7 @@ class json
 #ifndef _MSC_VER  // fix for issue #167 operator<< ambiguity under VS2015
                    and not std::is_same<ValueType, std::initializer_list<std::string::value_type>>::value
 #endif
-#if defined(JSON_HAS_CPP_17)
                    and not std::is_same<ValueType, typename std::string_view>::value
-#endif
                    , int >::type = 0 >
     operator ValueType() const
     {
@@ -5318,8 +5255,8 @@ class json
                 if (is_string())
                 {
                     std::allocator<std::string> alloc;
-                    alloc.destroy(m_value.string);
-                    alloc.deallocate(m_value.string, 1);
+					std::allocator_traits<decltype(alloc)>::destroy(alloc, m_value.string);
+					std::allocator_traits<decltype(alloc)>::deallocate(alloc, m_value.string, 1);
                     m_value.string = nullptr;
                 }
 
@@ -5422,8 +5359,8 @@ class json
                 if (is_string())
                 {
                     std::allocator<std::string> alloc;
-                    alloc.destroy(m_value.string);
-                    alloc.deallocate(m_value.string, 1);
+					std::allocator_traits<decltype(alloc)>::destroy(alloc, m_value.string);
+					std::allocator_traits<decltype(alloc)>::deallocate(alloc, m_value.string, 1);
                     m_value.string = nullptr;
                 }
 
@@ -8077,7 +8014,7 @@ namespace std
 @since version 1.0.0
 */
 template<>
-inline void swap(wpi::json& j1,
+inline void swap<wpi::json>(wpi::json& j1,
                  wpi::json& j2) noexcept(
                      is_nothrow_move_constructible<wpi::json>::value and
                      is_nothrow_move_assignable<wpi::json>::value
@@ -8174,8 +8111,6 @@ inline wpi::json::json_pointer operator "" _json_pointer(const char* s, std::siz
 #undef JSON_TRY
 #undef JSON_LIKELY
 #undef JSON_UNLIKELY
-#undef JSON_HAS_CPP_14
-#undef JSON_HAS_CPP_17
 #undef NLOHMANN_BASIC_JSON_TPL_DECLARATION
 #undef NLOHMANN_BASIC_JSON_TPL
 #undef NLOHMANN_JSON_HAS_HELPER

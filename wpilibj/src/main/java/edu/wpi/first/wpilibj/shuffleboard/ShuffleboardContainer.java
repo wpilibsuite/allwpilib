@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,6 +9,9 @@ package edu.wpi.first.wpilibj.shuffleboard;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.Sendable;
@@ -16,6 +19,7 @@ import edu.wpi.first.wpilibj.Sendable;
 /**
  * Common interface for objects that can contain shuffleboard components.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public interface ShuffleboardContainer extends ShuffleboardValue {
 
   /**
@@ -80,8 +84,8 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
   /**
    * Adds a widget to this container to display the given video stream.
    *
-   * @param title    the title of the widget
-   * @param video    the video stream to display
+   * @param title the title of the widget
+   * @param video the video stream to display
    * @return a widget to display the sendable data
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *                                  title
@@ -123,6 +127,104 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
   SimpleWidget add(String title, Object defaultValue) throws IllegalArgumentException;
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided by the value
+   * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
+   * overridden by values from the value supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *                                  title
+   */
+  SuppliedValueWidget<String> addString(String title, Supplier<String> valueSupplier)
+      throws IllegalArgumentException;
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided by the value
+   * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
+   * overridden by values from the value supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *                                  title
+   */
+  SuppliedValueWidget<Double> addNumber(String title, DoubleSupplier valueSupplier)
+      throws IllegalArgumentException;
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided by the value
+   * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
+   * overridden by values from the value supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *                                  title
+   */
+  SuppliedValueWidget<Boolean> addBoolean(String title, BooleanSupplier valueSupplier)
+      throws IllegalArgumentException;
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided by the value
+   * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
+   * overridden by values from the value supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *                                  title
+   */
+  SuppliedValueWidget<String[]> addStringArray(String title, Supplier<String[]> valueSupplier)
+      throws IllegalArgumentException;
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided by the value
+   * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
+   * overridden by values from the value supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *                                  title
+   */
+  SuppliedValueWidget<double[]> addDoubleArray(String title, Supplier<double[]> valueSupplier)
+      throws IllegalArgumentException;
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided by the value
+   * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
+   * overridden by values from the value supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *                                  title
+   */
+  SuppliedValueWidget<boolean[]> addBooleanArray(String title, Supplier<boolean[]> valueSupplier)
+      throws IllegalArgumentException;
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided by the value
+   * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
+   * overridden by values from the value supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *                                  title
+   */
+  SuppliedValueWidget<byte[]> addRaw(String title, Supplier<byte[]> valueSupplier)
+      throws IllegalArgumentException;
 
   /**
    * Adds a widget to this container to display a simple piece of data. Unlike

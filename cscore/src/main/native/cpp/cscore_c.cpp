@@ -16,6 +16,7 @@
 
 #include "c_util.h"
 #include "cscore_cpp.h"
+#include "cscore_raw.h"
 
 extern "C" {
 
@@ -438,6 +439,25 @@ void CS_FreeNetworkInterfaces(char** interfaces, int count) {
   if (!interfaces) return;
   for (int i = 0; i < count; ++i) std::free(interfaces[i]);
   std::free(interfaces);
+}
+
+void CS_AllocateRawFrameData(CS_RawFrame* frame, int requestedSize) {
+  if (frame->dataLength >= requestedSize) return;
+  if (frame->data) {
+    frame->data =
+        static_cast<char*>(wpi::safe_realloc(frame->data, requestedSize));
+  } else {
+    frame->data = static_cast<char*>(wpi::safe_malloc(requestedSize));
+  }
+  frame->dataLength = requestedSize;
+}
+
+void CS_FreeRawFrameData(CS_RawFrame* frame) {
+  if (frame->data) {
+    std::free(frame->data);
+    frame->data = nullptr;
+    frame->dataLength = 0;
+  }
 }
 
 }  // extern "C"

@@ -16,6 +16,7 @@
 #include <wpi/Twine.h>
 
 #include "cscore.h"
+#include "cscore_cv.h"
 
 namespace frc {
 

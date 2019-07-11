@@ -54,6 +54,8 @@
 #pragma comment(lib, "Mfreadwrite.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
+#pragma warning(disable : 4996 4018 26451)
+
 static constexpr int NewImageMessage = 0x0400 + 4488;
 static constexpr int SetCameraMessage = 0x0400 + 254;
 static constexpr int WaitForStartupMessage = 0x0400 + 294;
@@ -76,6 +78,7 @@ UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
     : SourceImpl{name, logger, notifier, telemetry}, m_path{path.str()} {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
+  m_deviceId = -1;
   StartMessagePump();
 }
 
@@ -408,7 +411,7 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
       {
         Message* msg = reinterpret_cast<Message*>(lParam);
         Message::Kind msgKind = static_cast<Message::Kind>(wParam);
-        std::unique_lock<wpi::mutex> lock(m_mutex);
+        std::unique_lock lock(m_mutex);
         auto retVal = DeviceProcessCommand(lock, msgKind, msg);
         return retVal;
       }
@@ -592,11 +595,11 @@ void UsbCameraImpl::DeviceCacheProperty(
   std::unique_ptr<UsbCameraProperty> perProp;
   if (IsPercentageProperty(rawProp->name)) {
     perProp =
-        wpi::make_unique<UsbCameraProperty>(rawProp->name, 0, *rawProp, 0, 0);
+        std::make_unique<UsbCameraProperty>(rawProp->name, 0, *rawProp, 0, 0);
     rawProp->name = "raw_" + perProp->name;
   }
 
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
   int* rawIndex = &m_properties[rawProp->name];
   bool newRaw = *rawIndex == 0;
   UsbCameraProperty* oldRawProp =
@@ -679,7 +682,7 @@ void UsbCameraImpl::DeviceCacheProperty(
   }
 
   NotifyPropertyCreated(*rawIndex, *rawPropPtr);
-  if (perPropPtr) NotifyPropertyCreated(*perIndex, *perPropPtr);
+  if (perPropPtr && perIndex) NotifyPropertyCreated(*perIndex, *perPropPtr);
 }
 
 CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
@@ -815,7 +818,10 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
 
     m_currentMode = std::move(newModeType);
     m_mode = newMode;
+#pragma warning(push)
+#pragma warning(disable : 26110)
     lock.unlock();
+#pragma warning(pop)
     if (m_sourceReader) {
       DeviceDisconnect();
       DeviceConnect();
@@ -869,10 +875,10 @@ void UsbCameraImpl::DeviceCacheMode() {
         // Default mode is not supported. Grab first supported image
         auto&& firstSupported = m_windowsVideoModes[0];
         m_currentMode = firstSupported.second;
-        std::lock_guard<wpi::mutex> lock(m_mutex);
+        std::scoped_lock lock(m_mutex);
         m_mode = firstSupported.first;
       } else {
-        std::lock_guard<wpi::mutex> lock(m_mutex);
+        std::scoped_lock lock(m_mutex);
         m_mode = result->first;
       }
     }
@@ -954,7 +960,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     count++;
   }
   {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_videoModes.swap(modes);
   }
   m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
@@ -969,6 +975,7 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   ComPtr<IMFAttributes> pAttributes;
   IMFActivate** ppDevices = nullptr;
+  UINT32 count = 0;
 
   // Create an attribute store to specify the enumeration parameters.
   HRESULT hr = MFCreateAttributes(pAttributes.GetAddressOf(), 1);
@@ -984,7 +991,6 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   }
 
   // Enumerate devices.
-  UINT32 count;
   hr = MFEnumDeviceSources(pAttributes.Get(), &ppDevices, &count);
   if (FAILED(hr)) {
     goto done;
@@ -1000,11 +1006,11 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
     info.dev = i;
     WCHAR buf[512];
     ppDevices[i]->GetString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, buf,
-                            sizeof(buf), NULL);
+                            sizeof(buf) / sizeof(WCHAR), NULL);
     info.name = utf8_conv.to_bytes(buf);
     ppDevices[i]->GetString(
         MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, buf,
-        sizeof(buf), NULL);
+        sizeof(buf) / sizeof(WCHAR), NULL);
     info.path = utf8_conv.to_bytes(buf);
     retval.emplace_back(std::move(info));
   }
@@ -1012,12 +1018,15 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
 done:
   pAttributes.Reset();
 
-  for (DWORD i = 0; i < count; i++) {
-    if (ppDevices[i]) {
-      ppDevices[i]->Release();
-      ppDevices[i] = nullptr;
+  if (ppDevices) {
+    for (DWORD i = 0; i < count; i++) {
+      if (ppDevices[i]) {
+        ppDevices[i]->Release();
+        ppDevices[i] = nullptr;
+      }
     }
   }
+
   CoTaskMemFree(ppDevices);
   return retval;
 }

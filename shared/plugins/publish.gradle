@@ -56,7 +56,7 @@ model {
                     if (binary instanceof SharedLibraryBinarySpec) {
                         task.dependsOn binary.buildTask
                         task.from(binary.sharedLibraryFile) {
-                            into getPlatformPath(binary) + '/shared'
+                            into nativeUtils.getPlatformPath(binary) + '/shared'
                         }
                     }
                 }

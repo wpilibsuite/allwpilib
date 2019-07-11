@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -959,7 +959,7 @@ void SetLogger(LogFunc func, unsigned int min_level) {
   auto ii = InstanceImpl::GetDefault();
   static wpi::mutex mutex;
   static unsigned int logger = 0;
-  std::lock_guard<wpi::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
   if (logger != 0) ii->logger_impl.Remove(logger);
   logger = ii->logger_impl.Add(
       [=](const LogMessage& msg) {

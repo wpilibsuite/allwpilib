@@ -1,5 +1,8 @@
 project(ntcore)
 
+include(CompileWarnings)
+include(AddTest)
+
 file(GLOB
     ntcore_native_src src/main/native/cpp/*.cpp
     ntcore_native_src src/main/native/cpp/networktables/*.cpp
@@ -9,6 +12,7 @@ set_target_properties(ntcore PROPERTIES DEBUG_POSTFIX "d")
 target_include_directories(ntcore PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/ntcore>)
+wpilib_target_warnings(ntcore)
 target_link_libraries(ntcore PUBLIC wpiutil)
 
 set_property(TARGET ntcore PROPERTY FOLDER "libraries")
@@ -16,13 +20,14 @@ set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 install(TARGETS ntcore EXPORT ntcore DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
 
-if (MSVC)
+if (MSVC OR FLAT_INSTALL_WPILIB)
     set (ntcore_config_dir ${wpilib_dest})
 else()
     set (ntcore_config_dir share/ntcore)
 endif()
 
-install(FILES ntcore-config.cmake DESTINATION ${ntcore_config_dir})
+configure_file(ntcore-config.cmake.in ${CMAKE_BINARY_DIR}/ntcore-config.cmake )
+install(FILES ${CMAKE_BINARY_DIR}/ntcore-config.cmake DESTINATION ${ntcore_config_dir})
 install(EXPORT ntcore DESTINATION ${ntcore_config_dir})
 
 # Java bindings
@@ -51,6 +56,7 @@ if (NOT WITHOUT_JAVA)
     set_property(TARGET ntcore_jar PROPERTY FOLDER "java")
 
     add_library(ntcorejni ${ntcore_jni_src})
+    wpilib_target_warnings(ntcorejni)
     target_link_libraries(ntcorejni PUBLIC ntcore wpiutil)
 
     set_property(TARGET ntcorejni PROPERTY FOLDER "libraries")
@@ -69,4 +75,10 @@ if (NOT WITHOUT_JAVA)
 
     install(TARGETS ntcorejni EXPORT ntcorejni DESTINATION "${main_lib_dest}")
 
+endif()
+
+if (WITH_TESTS)
+    wpilib_add_test(ntcore src/test/native/cpp)
+    target_include_directories(ntcore_test PRIVATE src/main/native/cpp)
+    target_link_libraries(ntcore_test ntcore gmock_main)
 endif()

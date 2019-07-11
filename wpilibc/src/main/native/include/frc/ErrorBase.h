@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+
+#include <vector>
 
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
@@ -49,16 +51,16 @@
   } while (0)
 #define wpi_setGlobalError(code) wpi_setGlobalErrorWithContext(code, "")
 #define wpi_setWPIErrorWithContext(error, context)                    \
-  this->SetWPIError((wpi_error_s_##error), (wpi_error_value_##error), \
+  this->SetWPIError(wpi_error_s_##error(), wpi_error_value_##error(), \
                     (context), __FILE__, __FUNCTION__, __LINE__)
 #define wpi_setWPIError(error) (wpi_setWPIErrorWithContext(error, ""))
 #define wpi_setStaticWPIErrorWithContext(object, error, context)  \
-  object->SetWPIError((wpi_error_s_##error), (context), __FILE__, \
+  object->SetWPIError(wpi_error_s_##error(), (context), __FILE__, \
                       __FUNCTION__, __LINE__)
 #define wpi_setStaticWPIError(object, error) \
   wpi_setStaticWPIErrorWithContext(object, error, "")
 #define wpi_setGlobalWPIErrorWithContext(error, context)                \
-  ::frc::ErrorBase::SetGlobalWPIError((wpi_error_s_##error), (context), \
+  ::frc::ErrorBase::SetGlobalWPIError(wpi_error_s_##error(), (context), \
                                       __FILE__, __FUNCTION__, __LINE__)
 #define wpi_setGlobalWPIError(error) wpi_setGlobalWPIErrorWithContext(error, "")
 
@@ -191,9 +193,19 @@ class ErrorBase {
                                 wpi::StringRef function, int lineNumber);
 
   /**
-   * Retrieve the current global error.
+   * Retrieve the last global error.
    */
-  static const Error& GetGlobalError();
+  static Error GetGlobalError();
+
+  /**
+   * Retrieve all global errors.
+   */
+  static std::vector<Error> GetGlobalErrors();
+
+  /**
+   * Clear global errors.
+   */
+  void ClearGlobalErrors();
 
  protected:
   mutable Error m_error;

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -21,6 +21,8 @@ using namespace nt;
 
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif _WIN32
+#pragma warning(disable : 4996)
 #endif
 
 const char NetworkTable::PATH_SEPARATOR_CHAR = '/';
@@ -204,7 +206,7 @@ NetworkTableInstance NetworkTable::GetInstance() const {
 NetworkTableEntry NetworkTable::GetEntry(const Twine& key) const {
   wpi::SmallString<128> keyBuf;
   StringRef keyStr = key.toStringRef(keyBuf);
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   NT_Entry& entry = m_entries[keyStr];
   if (entry == 0) {
     entry = nt::GetEntry(m_inst, m_path + Twine(PATH_SEPARATOR_CHAR) + keyStr);
@@ -257,7 +259,7 @@ void NetworkTable::AddTableListener(ITableListener* listener,
 
 void NetworkTable::AddTableListenerEx(ITableListener* listener,
                                       unsigned int flags) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   wpi::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   size_t prefix_len = path.size();
@@ -281,7 +283,7 @@ void NetworkTable::AddTableListener(StringRef key, ITableListener* listener,
 
 void NetworkTable::AddTableListenerEx(StringRef key, ITableListener* listener,
                                       unsigned int flags) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   size_t prefix_len = m_path.size() + 1;
   auto entry = GetEntry(key);
   NT_EntryListener id = nt::AddEntryListener(
@@ -334,7 +336,7 @@ void NetworkTable::RemoveTableListener(NT_EntryListener listener) {
 
 void NetworkTable::AddSubTableListener(ITableListener* listener,
                                        bool localNotify) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   size_t prefix_len = m_path.size() + 1;
 
   // The lambda needs to be copyable, but StringMap is not, so use
@@ -360,7 +362,7 @@ void NetworkTable::AddSubTableListener(ITableListener* listener,
 }
 
 void NetworkTable::RemoveTableListener(ITableListener* listener) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto matches_begin =
       std::remove_if(m_listeners.begin(), m_listeners.end(),
                      [=](const Listener& x) { return x.first == listener; });
@@ -395,7 +397,7 @@ std::vector<std::string> NetworkTable::GetKeys(int types) const {
   std::vector<std::string> keys;
   size_t prefix_len = m_path.size() + 1;
   auto infos = GetEntryInfo(m_inst, m_path + Twine(PATH_SEPARATOR_CHAR), types);
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   for (auto& info : infos) {
     auto relative_key = StringRef(info.name).substr(prefix_len);
     if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos) continue;

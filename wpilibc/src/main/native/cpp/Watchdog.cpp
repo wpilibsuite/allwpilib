@@ -32,7 +32,7 @@ class Watchdog::Thread : public wpi::SafeThread {
 };
 
 void Watchdog::Thread::Main() {
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
 
   while (m_active) {
     if (m_watchdogs.size() > 0) {

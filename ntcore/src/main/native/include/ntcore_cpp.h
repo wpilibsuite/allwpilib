@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -79,19 +79,19 @@ struct ConnectionInfo {
   std::string remote_ip;
 
   /** The port number of the remote node. */
-  unsigned int remote_port;
+  unsigned int remote_port{0};
 
   /**
    * The last time any update was received from the remote node (same scale as
    * returned by nt::Now()).
    */
-  uint64_t last_update;
+  uint64_t last_update{0};
 
   /**
    * The protocol version being used for this connection.  This in protocol
    * layer format, so 0x0200 = 2.0, 0x0300 = 3.0).
    */
-  unsigned int protocol_version;
+  unsigned int protocol_version{0};
 
   friend void swap(ConnectionInfo& first, ConnectionInfo& second) {
     using std::swap;
@@ -179,7 +179,7 @@ class RpcAnswer {
 /** NetworkTables Entry Notification */
 class EntryNotification {
  public:
-  EntryNotification() : listener(0), entry(0) {}
+  EntryNotification() : listener(0), entry(0), flags(0) {}
   EntryNotification(NT_EntryListener listener_, NT_Entry entry_,
                     StringRef name_, std::shared_ptr<Value> value_,
                     unsigned int flags_)

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -117,36 +117,6 @@ bool wpi_assertNotEqual_impl(int valueA, int valueB,
 }
 
 namespace frc {
-
-int GetFPGAVersion() {
-  int32_t status = 0;
-  int version = HAL_GetFPGAVersion(&status);
-  wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
-  return version;
-}
-
-int64_t GetFPGARevision() {
-  int32_t status = 0;
-  int64_t revision = HAL_GetFPGARevision(&status);
-  wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
-  return revision;
-}
-
-uint64_t GetFPGATime() {
-  int32_t status = 0;
-  uint64_t time = HAL_GetFPGATime(&status);
-  wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
-  return time;
-}
-
-bool GetUserButton() {
-  int32_t status = 0;
-
-  bool value = HAL_GetFPGAButton(&status);
-  wpi_setGlobalError(status);
-
-  return value;
-}
 
 #ifndef _WIN32
 

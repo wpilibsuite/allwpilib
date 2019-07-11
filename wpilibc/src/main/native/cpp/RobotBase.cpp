@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -118,8 +118,9 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   LiveWindow::GetInstance()->SetEnabled(false);
 }
 
-RobotBase::RobotBase(RobotBase&&) : m_ds(DriverStation::GetInstance()) {}
+RobotBase::RobotBase(RobotBase&&) noexcept
+    : m_ds(DriverStation::GetInstance()) {}
 
 RobotBase::~RobotBase() { cs::Shutdown(); }
 
-RobotBase& RobotBase::operator=(RobotBase&&) { return *this; }
+RobotBase& RobotBase::operator=(RobotBase&&) noexcept { return *this; }
