@@ -17,10 +17,10 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionConfigurationException;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.platform.commons.util.ExceptionUtils;
 import org.junit.platform.commons.util.ReflectionUtils;
 
@@ -31,7 +31,8 @@ import static org.junit.platform.commons.util.AnnotationUtils.findAnnotatedField
 import static org.junit.platform.commons.util.ReflectionUtils.isPrivate;
 import static org.junit.platform.commons.util.ReflectionUtils.makeAccessible;
 
-public final class MockHardwareExtension implements BeforeAllCallback, BeforeEachCallback, ParameterResolver {
+public final class MockHardwareExtension implements BeforeAllCallback, BeforeEachCallback,
+    ParameterResolver {
   private static final Namespace NAMESPACE = Namespace.create(MockHardwareExtension.class);
   private static final String KEY = "wpilib.simds";
 
@@ -60,7 +61,8 @@ public final class MockHardwareExtension implements BeforeAllCallback, BeforeEac
    * is annotated with {@link SimDs @SimDs}.
    */
   @Override
-  public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+  public boolean supportsParameter(ParameterContext parameterContext,
+      ExtensionContext extensionContext) {
     boolean annotated = parameterContext.isAnnotated(SimDs.class);
     if (annotated && parameterContext.getDeclaringExecutable() instanceof Constructor) {
       throw new ParameterResolutionException(
@@ -74,19 +76,21 @@ public final class MockHardwareExtension implements BeforeAllCallback, BeforeEac
    * supplied {@link ParameterContext}.
    */
   @Override
-  public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+  public Object resolveParameter(ParameterContext parameterContext,
+      ExtensionContext extensionContext) {
     Class<?> parameterType = parameterContext.getParameter().getType();
     assertSupportedType("parameter", parameterType);
-    return getSimDs(parameterType, extensionContext);
+    return getSimDs(extensionContext);
   }
 
-  private void injectFields(ExtensionContext context, Object testInstance, Predicate<Field> predicate) {
+  private void injectFields(ExtensionContext context, Object testInstance,
+      Predicate<Field> predicate) {
     findAnnotatedFields(context.getRequiredTestClass(), SimDs.class, predicate).forEach(field -> {
       assertValidFieldCandidate(field);
       try {
-        makeAccessible(field).set(testInstance, getSimDs(field.getType(), context));
-      } catch (Throwable throwable) {
-        ExceptionUtils.throwAsUncheckedException(throwable);
+        makeAccessible(field).set(testInstance, getSimDs(context));
+      } catch (IllegalArgumentException | IllegalAccessException ex) {
+        ExceptionUtils.throwAsUncheckedException(ex);
       }
     });
   }
@@ -94,7 +98,9 @@ public final class MockHardwareExtension implements BeforeAllCallback, BeforeEac
   private void assertValidFieldCandidate(Field field) {
     assertSupportedType("field", field.getType());
     if (isPrivate(field)) {
-      throw new ExtensionConfigurationException("@SimDs field [" + field + "] must not be private.");
+      throw new ExtensionConfigurationException("@SimDs field ["
+        + field
+        + "] must not be private.");
     }
   }
 
@@ -105,7 +111,7 @@ public final class MockHardwareExtension implements BeforeAllCallback, BeforeEac
     }
   }
 
-  private DriverStationSim getSimDs(Class<?> type, ExtensionContext extensionContext) {
+  private DriverStationSim getSimDs(ExtensionContext extensionContext) {
     return extensionContext.getStore(NAMESPACE)
         .getOrComputeIfAbsent(KEY, key -> initializeHardware(), DriverStationSim.class);
   }

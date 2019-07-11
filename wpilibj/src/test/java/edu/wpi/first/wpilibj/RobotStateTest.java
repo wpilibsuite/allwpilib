@@ -7,12 +7,12 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.hal.sim.DriverStationSim;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RobotStateTest extends UtilityClassTest {
   RobotStateTest() {

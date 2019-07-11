@@ -7,10 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * {@code @SimDs} can be used to annotate a non-private field in a test class
