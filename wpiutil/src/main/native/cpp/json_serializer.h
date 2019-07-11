@@ -52,10 +52,8 @@ class json::serializer
     @param[in] ichar  indentation character to use
     */
     serializer(raw_ostream& s, const char ichar)
-        : o(s), loc(std::localeconv()),
-          thousands_sep(loc->thousands_sep == nullptr ? '\0' : * (loc->thousands_sep)),
-          decimal_point(loc->decimal_point == nullptr ? '\0' : * (loc->decimal_point)),
-          indent_char(ichar), indent_string(512, indent_char)
+        : o(s), loc(std::localeconv()), indent_char(ichar),
+          indent_string(512, indent_char)
     {}
 
     // delete because of pointer members
@@ -189,13 +187,6 @@ class json::serializer
 
     /// the locale
     const std::lconv* loc = nullptr;
-    /// the locale's thousand separator character
-    const char thousands_sep = '\0';
-    /// the locale's decimal point character
-    const char decimal_point = '\0';
-
-    /// string buffer
-    std::array<char, 512> string_buffer{{}};
 
     /// the indentation character
     const char indent_char;

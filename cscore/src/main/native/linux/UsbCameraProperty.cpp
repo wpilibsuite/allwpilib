@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,7 +7,6 @@
 
 #include "UsbCameraProperty.h"
 
-#include <wpi/STLExtras.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
@@ -224,7 +223,7 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
     *id = qc_ext.id;  // copy back
     // We don't support array types
     if (qc_ext.elems > 1 || qc_ext.nr_of_dims > 0) return nullptr;
-    prop = wpi::make_unique<UsbCameraProperty>(qc_ext);
+    prop = std::make_unique<UsbCameraProperty>(qc_ext);
   }
 #endif
   if (!prop) {
@@ -235,7 +234,7 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
     rc = TryIoctl(fd, VIDIOC_QUERYCTRL, &qc);
     *id = qc.id;  // copy back
     if (rc != 0) return nullptr;
-    prop = wpi::make_unique<UsbCameraProperty>(qc);
+    prop = std::make_unique<UsbCameraProperty>(qc);
   }
 
   // Cache enum property choices

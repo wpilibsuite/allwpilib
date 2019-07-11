@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,7 +14,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/STLExtras.h"
 #include "wpi/SafeThread.h"
 #include "wpi/future.h"
 #include "wpi/uv/Async.h"
@@ -107,7 +106,7 @@ class WorkerThreadThread : public SafeThread {
 template <typename R, typename... T>
 void RunWorkerThreadRequest(WorkerThreadThread<R, T...>& thr,
                             WorkerThreadRequest<R, T...>& req) {
-  R result = apply_tuple(req.work, std::move(req.params));
+  R result = std::apply(req.work, std::move(req.params));
   if (req.afterWork) {
     if (auto async = thr.m_async.m_async.lock())
       async->Send(std::move(req.afterWork), std::move(result));
@@ -119,7 +118,7 @@ void RunWorkerThreadRequest(WorkerThreadThread<R, T...>& thr,
 template <typename... T>
 void RunWorkerThreadRequest(WorkerThreadThread<void, T...>& thr,
                             WorkerThreadRequest<void, T...>& req) {
-  apply_tuple(req.work, req.params);
+  std::apply(req.work, req.params);
   if (req.afterWork) {
     if (auto async = thr.m_async.m_async.lock())
       async->Send(std::move(req.afterWork));
@@ -132,7 +131,7 @@ template <typename R, typename... T>
 void WorkerThreadThread<R, T...>::Main() {
   std::vector<Request> requests;
   while (m_active) {
-    std::unique_lock<wpi::mutex> lock(m_mutex);
+    std::unique_lock lock(m_mutex);
     m_cond.wait(lock, [&] { return !m_active || !m_requests.empty(); });
     if (!m_active) break;
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,7 +8,6 @@
 #include "HttpCameraImpl.h"
 
 #include <wpi/MemAlloc.h>
-#include <wpi/STLExtras.h>
 #include <wpi/TCPConnector.h>
 #include <wpi/timestamp.h>
 
@@ -38,7 +37,7 @@ HttpCameraImpl::~HttpCameraImpl() {
 
   // Close file if it's open
   {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     if (m_streamConn) m_streamConn->stream->close();
     if (m_settingsConn) m_settingsConn->stream->close();
   }
@@ -65,7 +64,7 @@ void HttpCameraImpl::Start() {
 
 void HttpCameraImpl::MonitorThreadMain() {
   while (m_active) {
-    std::unique_lock<wpi::mutex> lock(m_mutex);
+    std::unique_lock lock(m_mutex);
     // sleep for 1 second between checks
     m_monitorCond.wait_for(lock, std::chrono::seconds(1),
                            [=] { return !m_active; });
@@ -96,7 +95,7 @@ void HttpCameraImpl::StreamThreadMain() {
 
     // disconnect if not enabled
     if (!IsEnabled()) {
-      std::unique_lock<wpi::mutex> lock(m_mutex);
+      std::unique_lock lock(m_mutex);
       if (m_streamConn) m_streamConn->stream->close();
       // Wait for enable
       m_sinkEnabledCond.wait(lock, [=] { return !m_active || IsEnabled(); });
@@ -118,7 +117,7 @@ void HttpCameraImpl::StreamThreadMain() {
     // stream
     DeviceStream(conn->is, boundary);
     {
-      std::unique_lock<wpi::mutex> lock(m_mutex);
+      std::unique_lock lock(m_mutex);
       m_streamConn = nullptr;
     }
   }
@@ -132,7 +131,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   // Build the request
   wpi::HttpRequest req;
   {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     if (m_locations.empty()) {
       SERROR("locations array is empty!?");
       std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -149,12 +148,12 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
 
   if (!m_active || !stream) return nullptr;
 
-  auto connPtr = wpi::make_unique<wpi::HttpConnection>(std::move(stream), 1);
+  auto connPtr = std::make_unique<wpi::HttpConnection>(std::move(stream), 1);
   wpi::HttpConnection* conn = connPtr.get();
 
   // update m_streamConn
   {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_frameCount = 1;  // avoid a race with monitor thread
     m_streamConn = std::move(connPtr);
   }
@@ -162,7 +161,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   std::string warn;
   if (!conn->Handshake(req, &warn)) {
     SWARNING(GetName() << ": " << warn);
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_streamConn = nullptr;
     return nullptr;
   }
@@ -174,7 +173,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   if (mediaType != "multipart/x-mixed-replace") {
     SWARNING("\"" << req.host << "\": unrecognized Content-Type \"" << mediaType
                   << "\"");
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_streamConn = nullptr;
     return nullptr;
   }
@@ -199,7 +198,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   if (boundary.empty()) {
     SWARNING("\"" << req.host
                   << "\": empty multi-part boundary or no Content-Type");
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_streamConn = nullptr;
     return nullptr;
   }
@@ -299,7 +298,7 @@ void HttpCameraImpl::SettingsThreadMain() {
   for (;;) {
     wpi::HttpRequest req;
     {
-      std::unique_lock<wpi::mutex> lock(m_mutex);
+      std::unique_lock lock(m_mutex);
       m_settingsCond.wait(lock, [=] {
         return !m_active || (m_prefLocation != -1 && !m_settings.empty());
       });
@@ -322,12 +321,12 @@ void HttpCameraImpl::DeviceSendSettings(wpi::HttpRequest& req) {
 
   if (!m_active || !stream) return;
 
-  auto connPtr = wpi::make_unique<wpi::HttpConnection>(std::move(stream), 1);
+  auto connPtr = std::make_unique<wpi::HttpConnection>(std::move(stream), 1);
   wpi::HttpConnection* conn = connPtr.get();
 
   // update m_settingsConn
   {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_settingsConn = std::move(connPtr);
   }
 
@@ -339,7 +338,7 @@ void HttpCameraImpl::DeviceSendSettings(wpi::HttpRequest& req) {
 }
 
 CS_HttpCameraKind HttpCameraImpl::GetKind() const {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   return m_kind;
 }
 
@@ -357,7 +356,7 @@ bool HttpCameraImpl::SetUrls(wpi::ArrayRef<std::string> urls,
     }
   }
 
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   m_locations.swap(locations);
   m_nextLocation = 0;
   m_streamSettingsUpdated = true;
@@ -365,7 +364,7 @@ bool HttpCameraImpl::SetUrls(wpi::ArrayRef<std::string> urls,
 }
 
 std::vector<std::string> HttpCameraImpl::GetUrls() const {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   std::vector<std::string> urls;
   for (const auto& loc : m_locations) urls.push_back(loc.url);
   return urls;
@@ -376,8 +375,8 @@ void HttpCameraImpl::CreateProperty(const wpi::Twine& name,
                                     bool viaSettings, CS_PropertyKind kind,
                                     int minimum, int maximum, int step,
                                     int defaultValue, int value) const {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  m_propertyData.emplace_back(wpi::make_unique<PropertyData>(
+  std::scoped_lock lock(m_mutex);
+  m_propertyData.emplace_back(std::make_unique<PropertyData>(
       name, httpParam, viaSettings, kind, minimum, maximum, step, defaultValue,
       value));
 
@@ -390,8 +389,8 @@ template <typename T>
 void HttpCameraImpl::CreateEnumProperty(
     const wpi::Twine& name, const wpi::Twine& httpParam, bool viaSettings,
     int defaultValue, int value, std::initializer_list<T> choices) const {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
-  m_propertyData.emplace_back(wpi::make_unique<PropertyData>(
+  std::scoped_lock lock(m_mutex);
+  m_propertyData.emplace_back(std::make_unique<PropertyData>(
       name, httpParam, viaSettings, CS_PROP_ENUM, 0, choices.size() - 1, 1,
       defaultValue, value));
 
@@ -409,11 +408,11 @@ void HttpCameraImpl::CreateEnumProperty(
 
 std::unique_ptr<PropertyImpl> HttpCameraImpl::CreateEmptyProperty(
     const wpi::Twine& name) const {
-  return wpi::make_unique<PropertyData>(name);
+  return std::make_unique<PropertyData>(name);
 }
 
 bool HttpCameraImpl::CacheProperties(CS_Status* status) const {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
 
   // Pretty typical set of video modes
   m_videoModes.clear();
@@ -469,7 +468,7 @@ void HttpCameraImpl::SetExposureManual(int value, CS_Status* status) {
 
 bool HttpCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   if (mode.pixelFormat != VideoMode::kMJPEG) return false;
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   m_mode = mode;
   m_streamSettingsUpdated = true;
   return true;
@@ -498,7 +497,7 @@ bool AxisCameraImpl::CacheProperties(CS_Status* status) const {
                  true, CS_PROP_INTEGER, 0, 100, 1, 50, 50);
 
   // TODO: get video modes from device
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   m_videoModes.clear();
   m_videoModes.emplace_back(VideoMode::kMJPEG, 640, 480, 30);
   m_videoModes.emplace_back(VideoMode::kMJPEG, 480, 360, 30);

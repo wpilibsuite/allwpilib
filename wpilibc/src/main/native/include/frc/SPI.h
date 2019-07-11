@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -52,7 +52,7 @@ class SPI : public ErrorBase {
    *
    * @param hz The clock rate in Hertz.
    */
-  void SetClockRate(double hz);
+  void SetClockRate(int hz);
 
   /**
    * Configure the order that bits are sent and received on the wire

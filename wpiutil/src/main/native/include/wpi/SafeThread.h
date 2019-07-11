@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,6 +27,7 @@ class SafeThread {
   mutable wpi::mutex m_mutex;
   std::atomic_bool m_active{true};
   wpi::condition_variable m_cond;
+  std::thread::id m_threadId;
 };
 
 namespace detail {
@@ -67,7 +68,7 @@ class SafeThreadOwnerBase {
       : SafeThreadOwnerBase() {
     swap(*this, other);
   }
-  SafeThreadOwnerBase& operator=(SafeThreadOwnerBase other) noexcept {
+  SafeThreadOwnerBase& operator=(SafeThreadOwnerBase&& other) noexcept {
     swap(*this, other);
     return *this;
   }
@@ -83,7 +84,7 @@ class SafeThreadOwnerBase {
 
  protected:
   void Start(std::shared_ptr<SafeThread> thr);
-  std::shared_ptr<SafeThread> GetThread() const;
+  std::shared_ptr<SafeThread> GetThreadSharedPtr() const;
 
  private:
   mutable wpi::mutex m_mutex;
@@ -107,7 +108,12 @@ class SafeThreadOwner : public detail::SafeThreadOwnerBase {
 
   using Proxy = typename detail::SafeThreadProxy<T>;
   Proxy GetThread() const {
-    return Proxy(detail::SafeThreadOwnerBase::GetThread());
+    return Proxy(detail::SafeThreadOwnerBase::GetThreadSharedPtr());
+  }
+
+  std::shared_ptr<T> GetThreadSharedPtr() const {
+    return std::static_pointer_cast<T>(
+        detail::SafeThreadOwnerBase::GetThreadSharedPtr());
   }
 };
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -25,6 +25,10 @@
 #include "mockdata/AnalogInDataInternal.h"
 #include "mockdata/DIODataInternal.h"
 #include "mockdata/HAL_Value.h"
+
+#ifdef _WIN32
+#pragma warning(disable : 4996 4018 6297 26451 4334)
+#endif
 
 using namespace hal;
 
@@ -54,9 +58,9 @@ struct Interrupt {
 };
 
 struct SynchronousWaitData {
-  HAL_InterruptHandle interruptHandle;
+  HAL_InterruptHandle interruptHandle{HAL_kInvalidHandle};
   wpi::condition_variable waitCond;
-  HAL_Bool waitPredicate;
+  HAL_Bool waitPredicate{false};
 };
 }  // namespace
 
@@ -219,7 +223,7 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
   {
-    std::unique_lock<wpi::mutex> lock(waitMutex);
+    std::unique_lock lock(waitMutex);
     while (!data->waitPredicate) {
       if (data->waitCond.wait_until(lock, timeoutTime) ==
           std::cv_status::timeout) {
@@ -231,7 +235,7 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
 
   // Cancel our callback
   SimDIOData[digitalIndex].value.CancelCallback(uid);
-  synchronousInterruptHandles->Free(dataHandle);
+  (void)synchronousInterruptHandles->Free(dataHandle);
 
   // Check for what to return
   if (timedOut) return WaitResult::Timeout;
@@ -283,7 +287,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
   {
-    std::unique_lock<wpi::mutex> lock(waitMutex);
+    std::unique_lock lock(waitMutex);
     while (!data->waitPredicate) {
       if (data->waitCond.wait_until(lock, timeoutTime) ==
           std::cv_status::timeout) {
@@ -295,7 +299,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
 
   // Cancel our callback
   SimAnalogInData[analogIndex].voltage.CancelCallback(uid);
-  synchronousInterruptHandles->Free(dataHandle);
+  (void)synchronousInterruptHandles->Free(dataHandle);
 
   // Check for what to return
   if (timedOut) return WaitResult::Timeout;

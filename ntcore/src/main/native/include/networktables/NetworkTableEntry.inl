@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2017. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2017-2019. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -76,6 +76,12 @@ inline std::vector<int> NetworkTableEntry::GetBooleanArray(
   return value->GetBooleanArray();
 }
 
+inline std::vector<int> NetworkTableEntry::GetBooleanArray(
+    std::initializer_list<int> defaultValue) const {
+  return GetBooleanArray(
+      wpi::makeArrayRef(defaultValue.begin(), defaultValue.end()));
+}
+
 inline std::vector<double> NetworkTableEntry::GetDoubleArray(
     ArrayRef<double> defaultValue) const {
   auto value = GetEntryValue(m_handle);
@@ -83,11 +89,23 @@ inline std::vector<double> NetworkTableEntry::GetDoubleArray(
   return value->GetDoubleArray();
 }
 
+inline std::vector<double> NetworkTableEntry::GetDoubleArray(
+    std::initializer_list<double> defaultValue) const {
+  return GetDoubleArray(
+      wpi::makeArrayRef(defaultValue.begin(), defaultValue.end()));
+}
+
 inline std::vector<std::string> NetworkTableEntry::GetStringArray(
     ArrayRef<std::string> defaultValue) const {
   auto value = GetEntryValue(m_handle);
   if (!value || value->type() != NT_STRING_ARRAY) return defaultValue;
   return value->GetStringArray();
+}
+
+inline std::vector<std::string> NetworkTableEntry::GetStringArray(
+    std::initializer_list<std::string> defaultValue) const {
+  return GetStringArray(
+      wpi::makeArrayRef(defaultValue.begin(), defaultValue.end()));
 }
 
 inline bool NetworkTableEntry::SetDefaultValue(std::shared_ptr<Value> value) {
@@ -145,7 +163,21 @@ inline bool NetworkTableEntry::SetRaw(StringRef value) {
   return SetEntryValue(m_handle, Value::MakeRaw(value));
 }
 
+inline bool NetworkTableEntry::SetBooleanArray(ArrayRef<bool> value) {
+  return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
+}
+
+inline bool NetworkTableEntry::SetBooleanArray(
+    std::initializer_list<bool> value) {
+  return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
+}
+
 inline bool NetworkTableEntry::SetBooleanArray(ArrayRef<int> value) {
+  return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
+}
+
+inline bool NetworkTableEntry::SetBooleanArray(
+    std::initializer_list<int> value) {
   return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
 }
 
@@ -153,7 +185,17 @@ inline bool NetworkTableEntry::SetDoubleArray(ArrayRef<double> value) {
   return SetEntryValue(m_handle, Value::MakeDoubleArray(value));
 }
 
+inline bool NetworkTableEntry::SetDoubleArray(
+    std::initializer_list<double> value) {
+  return SetEntryValue(m_handle, Value::MakeDoubleArray(value));
+}
+
 inline bool NetworkTableEntry::SetStringArray(ArrayRef<std::string> value) {
+  return SetEntryValue(m_handle, Value::MakeStringArray(value));
+}
+
+inline bool NetworkTableEntry::SetStringArray(
+    std::initializer_list<std::string> value) {
   return SetEntryValue(m_handle, Value::MakeStringArray(value));
 }
 
@@ -177,7 +219,21 @@ inline void NetworkTableEntry::ForceSetRaw(StringRef value) {
   SetEntryTypeValue(m_handle, Value::MakeRaw(value));
 }
 
+inline void NetworkTableEntry::ForceSetBooleanArray(ArrayRef<bool> value) {
+  SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
+}
+
+inline void NetworkTableEntry::ForceSetBooleanArray(
+    std::initializer_list<bool> value) {
+  SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
+}
+
 inline void NetworkTableEntry::ForceSetBooleanArray(ArrayRef<int> value) {
+  SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
+}
+
+inline void NetworkTableEntry::ForceSetBooleanArray(
+    std::initializer_list<int> value) {
   SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
 }
 
@@ -185,8 +241,18 @@ inline void NetworkTableEntry::ForceSetDoubleArray(ArrayRef<double> value) {
   SetEntryTypeValue(m_handle, Value::MakeDoubleArray(value));
 }
 
+inline void NetworkTableEntry::ForceSetDoubleArray(
+    std::initializer_list<double> value) {
+  SetEntryTypeValue(m_handle, Value::MakeDoubleArray(value));
+}
+
 inline void NetworkTableEntry::ForceSetStringArray(
     ArrayRef<std::string> value) {
+  SetEntryTypeValue(m_handle, Value::MakeStringArray(value));
+}
+
+inline void NetworkTableEntry::ForceSetStringArray(
+    std::initializer_list<std::string> value) {
   SetEntryTypeValue(m_handle, Value::MakeStringArray(value));
 }
 

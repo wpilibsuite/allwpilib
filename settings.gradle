@@ -5,6 +5,13 @@ pluginManagement {
     }
 }
 
+// Set the flag to tell gradle to ignore unresolved headers
+// Libraries like eigen and opencv use macro includes, which
+// Gradle doesn't properly ignore, and completely disables
+// Incremental includes. This flag makes those includes be ignored.
+Properties props = System.getProperties();
+props.setProperty("org.gradle.internal.native.headers.unresolved.dependencies.ignore", "true");
+
 include 'wpiutil'
 include 'ntcore'
 include 'hal'

@@ -1,5 +1,8 @@
 project(wpilibc)
 
+include(CompileWarnings)
+include(AddTest)
+
 find_package( OpenCV REQUIRED )
 
 configure_file(src/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
@@ -13,6 +16,7 @@ set_target_properties(wpilibc PROPERTIES DEBUG_POSTFIX "d")
 target_include_directories(wpilibc PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpilibc>)
+wpilib_target_warnings(wpilibc)
 target_link_libraries(wpilibc PUBLIC cameraserver hal ntcore cscore wpiutil ${OpenCV_LIBS})
 
 set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
@@ -20,11 +24,23 @@ set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
 install(TARGETS wpilibc EXPORT wpilibc DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibc")
 
-if (MSVC)
+if (MSVC OR FLAT_INSTALL_WPILIB)
     set (wpilibc_config_dir ${wpilib_dest})
 else()
     set (wpilibc_config_dir share/wpilibc)
 endif()
 
-install(FILES wpilibc-config.cmake DESTINATION ${wpilibc_config_dir})
+configure_file(wpilibc-config.cmake.in ${CMAKE_BINARY_DIR}/wpilibc-config.cmake )
+install(FILES ${CMAKE_BINARY_DIR}/wpilibc-config.cmake DESTINATION ${wpilibc_config_dir})
 install(EXPORT wpilibc DESTINATION ${wpilibc_config_dir})
+
+if (WITH_TESTS)
+    wpilib_add_test(wpilibc src/test/native/cpp)
+    target_include_directories(wpilibc_test PRIVATE src/test/native/include)
+    target_link_libraries(wpilibc_test wpilibc gmock_main)
+    if (NOT MSVC)
+        target_compile_options(wpilibc_test PRIVATE -Wno-error)
+    else()
+        target_compile_options(wpilibc_test PRIVATE /WX-)
+    endif()
+endif()

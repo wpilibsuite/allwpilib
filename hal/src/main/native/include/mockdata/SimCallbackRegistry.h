@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -29,12 +29,12 @@ class SimCallbackRegistryBase {
 
  public:
   void Cancel(int32_t uid) {
-    std::lock_guard<wpi::recursive_spinlock> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     if (m_callbacks) m_callbacks->erase(uid - 1);
   }
 
   void Reset() {
-    std::lock_guard<wpi::recursive_spinlock> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     DoReset();
   }
 
@@ -68,13 +68,13 @@ template <typename CallbackFunction, const char* (*GetName)()>
 class SimCallbackRegistry : public impl::SimCallbackRegistryBase {
  public:
   int32_t Register(CallbackFunction callback, void* param) {
-    std::lock_guard<wpi::recursive_spinlock> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     return DoRegister(reinterpret_cast<RawFunctor>(callback), param);
   }
 
   template <typename... U>
   void Invoke(U&&... u) const {
-    std::lock_guard<wpi::recursive_spinlock> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     if (m_callbacks) {
       const char* name = GetName();
       for (auto&& cb : *m_callbacks)

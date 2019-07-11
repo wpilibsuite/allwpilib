@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -130,7 +130,7 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status) {
     return HAL_kInvalidHandle;
   }
 
-  std::lock_guard<wpi::mutex> lock(pdpHandleMutex);
+  std::scoped_lock lock(pdpHandleMutex);
 
   if (pdpHandles[module] != HAL_kInvalidHandle) {
     *status = 0;

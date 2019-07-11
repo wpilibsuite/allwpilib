@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -97,7 +97,7 @@ void SmartDashboard::PutData(wpi::StringRef key, Sendable* data) {
     return;
   }
   auto& inst = Singleton::GetInstance();
-  std::lock_guard<wpi::mutex> lock(inst.tablesToDataMutex);
+  std::scoped_lock lock(inst.tablesToDataMutex);
   auto& sddata = inst.tablesToData[key];
   if (!sddata.sendable || sddata.sendable != data) {
     sddata = SmartDashboardData(data);
@@ -120,7 +120,7 @@ void SmartDashboard::PutData(Sendable* value) {
 
 Sendable* SmartDashboard::GetData(wpi::StringRef key) {
   auto& inst = Singleton::GetInstance();
-  std::lock_guard<wpi::mutex> lock(inst.tablesToDataMutex);
+  std::scoped_lock lock(inst.tablesToDataMutex);
   auto data = inst.tablesToData.find(key);
   if (data == inst.tablesToData.end()) {
     wpi_setGlobalWPIErrorWithContext(SmartDashboardMissingKey, key);
@@ -256,7 +256,7 @@ std::shared_ptr<nt::Value> SmartDashboard::GetValue(wpi::StringRef keyName) {
 
 void SmartDashboard::UpdateValues() {
   auto& inst = Singleton::GetInstance();
-  std::lock_guard<wpi::mutex> lock(inst.tablesToDataMutex);
+  std::scoped_lock lock(inst.tablesToDataMutex);
   for (auto& i : inst.tablesToData) {
     i.getValue().builder.UpdateTable();
   }

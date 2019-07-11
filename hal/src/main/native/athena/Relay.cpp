@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -100,7 +100,7 @@ void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  std::lock_guard<wpi::mutex> lock(digitalRelayMutex);
+  std::scoped_lock lock(digitalRelayMutex);
   uint8_t relays = 0;
   if (port->fwd) {
     relays = relaySystem->readValue_Forward(status);

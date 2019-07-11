@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,7 +18,7 @@ int PropertyContainer::GetPropertyIndex(const wpi::Twine& name) const {
   // We can't fail, so instead we create a new index if caching fails.
   CS_Status status = 0;
   if (!m_properties_cached) CacheProperties(&status);
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   wpi::SmallVector<char, 64> nameBuf;
   int& ndx = m_properties[name.toStringRef(nameBuf)];
   if (ndx == 0) {
@@ -33,7 +33,7 @@ wpi::ArrayRef<int> PropertyContainer::EnumerateProperties(
     wpi::SmallVectorImpl<int>& vec, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status))
     return wpi::ArrayRef<int>{};
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   for (int i = 0; i < static_cast<int>(m_propertyData.size()); ++i) {
     if (m_propertyData[i]) vec.push_back(i + 1);
   }
@@ -43,7 +43,7 @@ wpi::ArrayRef<int> PropertyContainer::EnumerateProperties(
 CS_PropertyKind PropertyContainer::GetPropertyKind(int property) const {
   CS_Status status = 0;
   if (!m_properties_cached && !CacheProperties(&status)) return CS_PROP_NONE;
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) return CS_PROP_NONE;
   return prop->propKind;
@@ -52,7 +52,7 @@ CS_PropertyKind PropertyContainer::GetPropertyKind(int property) const {
 wpi::StringRef PropertyContainer::GetPropertyName(
     int property, wpi::SmallVectorImpl<char>& buf, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return wpi::StringRef{};
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -64,7 +64,7 @@ wpi::StringRef PropertyContainer::GetPropertyName(
 
 int PropertyContainer::GetProperty(int property, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -80,7 +80,7 @@ int PropertyContainer::GetProperty(int property, CS_Status* status) const {
 
 void PropertyContainer::SetProperty(int property, int value,
                                     CS_Status* status) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -101,7 +101,7 @@ void PropertyContainer::SetProperty(int property, int value,
 
 int PropertyContainer::GetPropertyMin(int property, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -112,7 +112,7 @@ int PropertyContainer::GetPropertyMin(int property, CS_Status* status) const {
 
 int PropertyContainer::GetPropertyMax(int property, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -123,7 +123,7 @@ int PropertyContainer::GetPropertyMax(int property, CS_Status* status) const {
 
 int PropertyContainer::GetPropertyStep(int property, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -135,7 +135,7 @@ int PropertyContainer::GetPropertyStep(int property, CS_Status* status) const {
 int PropertyContainer::GetPropertyDefault(int property,
                                           CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -147,7 +147,7 @@ int PropertyContainer::GetPropertyDefault(int property,
 wpi::StringRef PropertyContainer::GetStringProperty(
     int property, wpi::SmallVectorImpl<char>& buf, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return wpi::StringRef{};
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -164,7 +164,7 @@ wpi::StringRef PropertyContainer::GetStringProperty(
 
 void PropertyContainer::SetStringProperty(int property, const wpi::Twine& value,
                                           CS_Status* status) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -186,7 +186,7 @@ std::vector<std::string> PropertyContainer::GetEnumPropertyChoices(
     int property, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status))
     return std::vector<std::string>{};
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -201,7 +201,7 @@ std::vector<std::string> PropertyContainer::GetEnumPropertyChoices(
 
 std::unique_ptr<PropertyImpl> PropertyContainer::CreateEmptyProperty(
     const wpi::Twine& name) const {
-  return wpi::make_unique<PropertyImpl>(name);
+  return std::make_unique<PropertyImpl>(name);
 }
 
 bool PropertyContainer::CacheProperties(CS_Status* status) const {

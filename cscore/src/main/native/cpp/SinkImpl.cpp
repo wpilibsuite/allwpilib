@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -30,18 +30,18 @@ SinkImpl::~SinkImpl() {
 }
 
 void SinkImpl::SetDescription(const wpi::Twine& description) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   m_description = description.str();
 }
 
 wpi::StringRef SinkImpl::GetDescription(wpi::SmallVectorImpl<char>& buf) const {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
   return wpi::StringRef{buf.data(), buf.size()};
 }
 
 void SinkImpl::Enable() {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   ++m_enabledCount;
   if (m_enabledCount == 1) {
     if (m_source) m_source->EnableSink();
@@ -50,7 +50,7 @@ void SinkImpl::Enable() {
 }
 
 void SinkImpl::Disable() {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   --m_enabledCount;
   if (m_enabledCount == 0) {
     if (m_source) m_source->DisableSink();
@@ -59,7 +59,7 @@ void SinkImpl::Disable() {
 }
 
 void SinkImpl::SetEnabled(bool enabled) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   if (enabled && m_enabledCount == 0) {
     if (m_source) m_source->EnableSink();
     m_enabledCount = 1;
@@ -73,7 +73,7 @@ void SinkImpl::SetEnabled(bool enabled) {
 
 void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
   {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     if (m_source == source) return;
     if (m_source) {
       if (m_enabledCount > 0) m_source->DisableSink();
@@ -89,13 +89,13 @@ void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
 }
 
 std::string SinkImpl::GetError() const {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   if (!m_source) return "no source connected";
   return m_source->GetCurFrame().GetError();
 }
 
 wpi::StringRef SinkImpl::GetError(wpi::SmallVectorImpl<char>& buf) const {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   if (!m_source) return "no source connected";
   // Make a copy as it's shared data
   wpi::StringRef error = m_source->GetCurFrame().GetError();

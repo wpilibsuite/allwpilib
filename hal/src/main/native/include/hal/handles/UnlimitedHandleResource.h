@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -63,7 +63,7 @@ class UnlimitedHandleResource : public HandleBase {
 template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 THandle UnlimitedHandleResource<THandle, TStruct, enumValue>::Allocate(
     std::shared_ptr<TStruct> structure) {
-  std::lock_guard<wpi::mutex> lock(m_handleMutex);
+  std::scoped_lock lock(m_handleMutex);
   size_t i;
   for (i = 0; i < m_structures.size(); i++) {
     if (m_structures[i] == nullptr) {
@@ -82,7 +82,7 @@ template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 std::shared_ptr<TStruct>
 UnlimitedHandleResource<THandle, TStruct, enumValue>::Get(THandle handle) {
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
-  std::lock_guard<wpi::mutex> lock(m_handleMutex);
+  std::scoped_lock lock(m_handleMutex);
   if (index < 0 || index >= static_cast<int16_t>(m_structures.size()))
     return nullptr;
   return m_structures[index];
@@ -92,7 +92,7 @@ template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 std::shared_ptr<TStruct>
 UnlimitedHandleResource<THandle, TStruct, enumValue>::Free(THandle handle) {
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
-  std::lock_guard<wpi::mutex> lock(m_handleMutex);
+  std::scoped_lock lock(m_handleMutex);
   if (index < 0 || index >= static_cast<int16_t>(m_structures.size()))
     return nullptr;
   return std::move(m_structures[index]);
@@ -101,7 +101,7 @@ UnlimitedHandleResource<THandle, TStruct, enumValue>::Free(THandle handle) {
 template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 void UnlimitedHandleResource<THandle, TStruct, enumValue>::ResetHandles() {
   {
-    std::lock_guard<wpi::mutex> lock(m_handleMutex);
+    std::scoped_lock lock(m_handleMutex);
     for (size_t i = 0; i < m_structures.size(); i++) {
       m_structures[i].reset();
     }
@@ -113,7 +113,7 @@ template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 template <typename Functor>
 void UnlimitedHandleResource<THandle, TStruct, enumValue>::ForEach(
     Functor func) {
-  std::lock_guard<wpi::mutex> lock(m_handleMutex);
+  std::scoped_lock lock(m_handleMutex);
   size_t i;
   for (i = 0; i < m_structures.size(); i++) {
     if (m_structures[i] != nullptr) {

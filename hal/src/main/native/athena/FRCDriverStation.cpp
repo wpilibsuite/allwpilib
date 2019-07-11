@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -138,7 +138,7 @@ static int32_t HAL_GetJoystickButtonsInternal(int32_t joystickNum,
 static int32_t HAL_GetJoystickDescriptorInternal(int32_t joystickNum,
                                                  HAL_JoystickDescriptor* desc) {
   desc->isXbox = 0;
-  desc->type = std::numeric_limits<uint8_t>::max();
+  desc->type = (std::numeric_limits<uint8_t>::max)();
   desc->name[0] = '\0';
   desc->axisCount =
       HAL_kMaxJoystickAxes; /* set to the desc->axisTypes's capacity */
@@ -180,7 +180,7 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
 static void UpdateDriverStationControlWord(bool force,
                                            HAL_ControlWord& controlWord) {
   auto now = std::chrono::steady_clock::now();
-  std::lock_guard<wpi::mutex> lock(m_controlWordMutex);
+  std::scoped_lock lock(m_controlWordMutex);
   // Update every 50 ms or on force.
   if ((now - m_lastControlWordUpdate > std::chrono::milliseconds(50)) ||
       force) {
@@ -207,7 +207,7 @@ static void UpdateDriverStationDataCaches() {
 
   {
     // Obtain a lock on the data, swap the cached data into the main data arrays
-    std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
+    std::scoped_lock lock(m_cacheDataMutex);
 
     m_joystickAxes.swap(m_joystickAxesCache);
     m_joystickPOVs.swap(m_joystickPOVsCache);
@@ -220,7 +220,7 @@ static void UpdateDriverStationDataCaches() {
 class DriverStationThread : public wpi::SafeThread {
  public:
   void Main() {
-    std::unique_lock<wpi::mutex> lock(m_mutex);
+    std::unique_lock lock(m_mutex);
     while (m_active) {
       m_cond.wait(lock, [&] { return !m_active || m_notify; });
       if (!m_active) break;
@@ -272,7 +272,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
-  std::lock_guard<wpi::mutex> lock(msgMutex);
+  std::scoped_lock lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
   static std::chrono::time_point<std::chrono::steady_clock>
       prevMsgTime[KEEP_MSGS];
@@ -363,33 +363,33 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
-  std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
+  std::unique_lock lock(m_cacheDataMutex);
   *axes = m_joystickAxes[joystickNum];
   return 0;
 }
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
-  std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
+  std::unique_lock lock(m_cacheDataMutex);
   *povs = m_joystickPOVs[joystickNum];
   return 0;
 }
 
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
-  std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
+  std::unique_lock lock(m_cacheDataMutex);
   *buttons = m_joystickButtons[joystickNum];
   return 0;
 }
 
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc) {
-  std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
+  std::unique_lock lock(m_cacheDataMutex);
   *desc = m_joystickDescriptor[joystickNum];
   return 0;
 }
 
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
-  std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
+  std::unique_lock lock(m_cacheDataMutex);
   *info = *m_matchInfo;
   return 0;
 }
@@ -545,7 +545,7 @@ void HAL_InitializeDriverStation(void) {
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
 

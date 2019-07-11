@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -235,7 +235,7 @@ class Handle : public std::enable_shared_from_this<Handle> {
    * Report an error.
    * @param err Error code
    */
-  void ReportError(int err) { error(Error(err)); }
+  void ReportError(int err) const { error(Error(err)); }
 
  protected:
   explicit Handle(uv_handle_t* uv_handle) : m_uv_handle{uv_handle} {
@@ -250,7 +250,7 @@ class Handle : public std::enable_shared_from_this<Handle> {
   static void DefaultFreeBuf(Buffer& buf);
 
   template <typename F, typename... Args>
-  bool Invoke(F&& f, Args&&... args) {
+  bool Invoke(F&& f, Args&&... args) const {
     auto err = std::forward<F>(f)(std::forward<Args>(args)...);
     if (err < 0) ReportError(err);
     return err == 0;

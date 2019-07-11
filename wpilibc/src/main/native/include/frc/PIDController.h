@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,7 +19,6 @@
 #include "frc/PIDBase.h"
 #include "frc/PIDSource.h"
 #include "frc/Timer.h"
-#include "frc/filters/LinearDigitalFilter.h"
 
 namespace frc {
 
@@ -49,6 +48,7 @@ class PIDController : public PIDBase, public Controller {
    *               particularly affects calculations of the integral and
    *               differental terms. The default is 0.05 (50ms).
    */
+  WPI_DEPRECATED("Use frc2::PIDController class instead.")
   PIDController(double p, double i, double d, PIDSource* source,
                 PIDOutput* output, double period = 0.05);
 
@@ -64,6 +64,7 @@ class PIDController : public PIDBase, public Controller {
    *               particularly affects calculations of the integral and
    *               differental terms. The default is 0.05 (50ms).
    */
+  WPI_DEPRECATED("Use frc2::PIDController class instead.")
   PIDController(double p, double i, double d, double f, PIDSource* source,
                 PIDOutput* output, double period = 0.05);
 
@@ -79,6 +80,7 @@ class PIDController : public PIDBase, public Controller {
    *               particularly affects calculations of the integral and
    *               differental terms. The default is 0.05 (50ms).
    */
+  WPI_DEPRECATED("Use frc2::PIDController class instead.")
   PIDController(double p, double i, double d, PIDSource& source,
                 PIDOutput& output, double period = 0.05);
 
@@ -94,6 +96,7 @@ class PIDController : public PIDBase, public Controller {
    *               particularly affects calculations of the integral and
    *               differental terms. The default is 0.05 (50ms).
    */
+  WPI_DEPRECATED("Use frc2::PIDController class instead.")
   PIDController(double p, double i, double d, double f, PIDSource& source,
                 PIDOutput& output, double period = 0.05);
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,7 +24,7 @@ TEST(UvTimer, StartAndStop) {
   handleRepeat->error.connect([](Error) { FAIL(); });
 
   handleNoRepeat->timeout.connect(
-      [&checkTimerNoRepeatEvent, handle = handleNoRepeat.get() ] {
+      [&checkTimerNoRepeatEvent, handle = handleNoRepeat.get()] {
         ASSERT_FALSE(checkTimerNoRepeatEvent);
         checkTimerNoRepeatEvent = true;
         handle->Stop();
@@ -33,7 +33,7 @@ TEST(UvTimer, StartAndStop) {
       });
 
   handleRepeat->timeout.connect(
-      [&checkTimerRepeatEvent, handle = handleRepeat.get() ] {
+      [&checkTimerRepeatEvent, handle = handleRepeat.get()] {
         if (checkTimerRepeatEvent) {
           handle->Stop();
           handle->Close();

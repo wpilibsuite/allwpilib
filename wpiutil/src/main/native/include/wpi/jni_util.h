@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -37,15 +37,6 @@ namespace java {
 // finding the first user call to a series of library functions).
 std::string GetJavaStackTrace(JNIEnv* env, std::string* func = nullptr,
                               StringRef excludeFuncPrefix = StringRef());
-
-// Shim for backwards compatibility
-template <const char* excludeFuncPrefix>
-WPI_DEPRECATED("use StringRef function instead")
-std::string GetJavaStackTrace(JNIEnv* env, std::string* func) {
-  return GetJavaStackTrace(
-      env, func,
-      excludeFuncPrefix == nullptr ? StringRef() : excludeFuncPrefix);
-}
 
 // Finds a class and keep it as a global reference.
 // Use with caution, as the destructor does NOT call DeleteGlobalRef due
@@ -419,7 +410,7 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<bool> arr) {
   return jarr;
 }
 
-  // Other MakeJ*Array conversions.
+// Other MakeJ*Array conversions.
 
 #define WPI_JNI_MAKEJARRAY(T, F)                                  \
   inline T##Array MakeJ##F##Array(JNIEnv* env, ArrayRef<T> arr) { \
@@ -517,7 +508,7 @@ void JCallbackThread<T>::Main() {
       reinterpret_cast<void**>(&env), &args);
   if (rs != JNI_OK) return;
 
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
   while (m_active) {
     m_cond.wait(lock, [&] { return !(m_active && m_queue.empty()); });
     if (!m_active) break;

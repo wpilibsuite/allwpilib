@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -74,7 +74,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
     // don't start a new worker if we had a previously still-active connection
     // attempt to the same server
     {
-      std::lock_guard<wpi::mutex> lock(local->mtx);
+      std::scoped_lock lock(local->mtx);
       if (local->active.count(active_tracker) > 0) continue;  // already in set
     }
 
@@ -85,7 +85,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
       if (!result->done) {
         // add to global state
         {
-          std::lock_guard<wpi::mutex> lock(local->mtx);
+          std::scoped_lock lock(local->mtx);
           local->active.insert(active_tracker);
         }
 
@@ -95,13 +95,13 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
 
         // remove from global state
         {
-          std::lock_guard<wpi::mutex> lock(local->mtx);
+          std::scoped_lock lock(local->mtx);
           local->active.erase(active_tracker);
         }
 
         // successful connection
         if (stream) {
-          std::lock_guard<wpi::mutex> lock(result->mtx);
+          std::scoped_lock lock(result->mtx);
           if (!result->done.exchange(true)) result->stream = std::move(stream);
         }
       }
@@ -112,7 +112,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
   }
 
   // wait for a result, timeout, or all finished
-  std::unique_lock<wpi::mutex> lock(result->mtx);
+  std::unique_lock lock(result->mtx);
   if (timeout == 0) {
     result->cv.wait(
         lock, [&] { return result->stream || result->count >= num_workers; });

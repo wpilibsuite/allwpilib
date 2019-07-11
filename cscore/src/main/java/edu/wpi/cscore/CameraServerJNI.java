@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,21 +8,32 @@
 package edu.wpi.cscore;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-import org.opencv.core.Core;
-
+import edu.wpi.cscore.raw.RawFrame;
 import edu.wpi.first.wpiutil.RuntimeLoader;
 
 public class CameraServerJNI {
   static boolean libraryLoaded = false;
-  static boolean cvLibraryLoaded = false;
 
   static RuntimeLoader<CameraServerJNI> loader = null;
-  static RuntimeLoader<Core> cvLoader = null;
+
+  public static class Helper {
+    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
+
+    public static boolean getExtractOnStaticLoad() {
+      return extractOnStaticLoad.get();
+    }
+
+    public static void setExtractOnStaticLoad(boolean load) {
+      extractOnStaticLoad.set(load);
+    }
+  }
 
   static {
-    if (!libraryLoaded) {
+    if (Helper.getExtractOnStaticLoad()) {
       try {
         loader = new RuntimeLoader<>("cscorejni", RuntimeLoader.getDefaultExtractionRoot(), CameraServerJNI.class);
         loader.loadLibrary();
@@ -32,21 +43,19 @@ public class CameraServerJNI {
       }
       libraryLoaded = true;
     }
-
-    String opencvName = Core.NATIVE_LIBRARY_NAME;
-    if (!cvLibraryLoaded) {
-      try {
-        cvLoader = new RuntimeLoader<>(opencvName, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
-        cvLoader.loadLibraryHashed();
-      } catch (IOException ex) {
-        ex.printStackTrace();
-        System.exit(1);
-      }
-      cvLibraryLoaded = true;
-    }
   }
 
-  public static void forceLoad() {}
+  /**
+   * Force load the library.
+   */
+  public static synchronized void forceLoad() throws IOException {
+    if (libraryLoaded) {
+      return;
+    }
+    loader = new RuntimeLoader<>("cscorejni", RuntimeLoader.getDefaultExtractionRoot(), CameraServerJNI.class);
+    loader.loadLibrary();
+    libraryLoaded = true;
+  }
 
   //
   // Property Functions
@@ -70,7 +79,7 @@ public class CameraServerJNI {
   public static native int createUsbCameraPath(String name, String path);
   public static native int createHttpCamera(String name, String url, int kind);
   public static native int createHttpCameraMulti(String name, String[] urls, int kind);
-  public static native int createCvSource(String name, int pixelFormat, int width, int height, int fps);
+  public static native int createRawSource(String name, int pixelFormat, int width, int height, int fps);
 
   //
   // Source Functions
@@ -122,9 +131,13 @@ public class CameraServerJNI {
   public static native String[] getHttpCameraUrls(int source);
 
   //
-  // OpenCV Source Functions
+  // Image Source Functions
   //
-  public static native void putSourceFrame(int source, long imageNativeObj);
+  public static native void putRawSourceFrameBB(int source, ByteBuffer data, int width, int height, int pixelFormat, int totalData);
+  public static native void putRawSourceFrame(int source, long data, int width, int height, int pixelFormat, int totalData);
+  public static void putRawSourceFrame(int source, RawFrame raw) {
+    putRawSourceFrame(source, raw.getDataPtr(), raw.getWidth(), raw.getHeight(), raw.getPixelFormat(), raw.getTotalData());
+  }
   public static native void notifySourceError(int source, String msg);
   public static native void setSourceConnected(int source, boolean connected);
   public static native void setSourceDescription(int source, String description);
@@ -135,9 +148,8 @@ public class CameraServerJNI {
   // Sink Creation Functions
   //
   public static native int createMjpegServer(String name, String listenAddress, int port);
-  public static native int createCvSink(String name);
-  //public static native int createCvSinkCallback(String name,
-  //                            void (*processFrame)(long time));
+
+  public static native int createRawSink(String name);
 
   //
   // Sink Functions
@@ -162,11 +174,19 @@ public class CameraServerJNI {
   public static native int getMjpegServerPort(int sink);
 
   //
-  // OpenCV Sink Functions
+  // Image Sink Functions
   //
   public static native void setSinkDescription(int sink, String description);
-  public static native long grabSinkFrame(int sink, long imageNativeObj);
-  public static native long grabSinkFrameTimeout(int sink, long imageNativeObj, double timeout);
+
+  private static native long grabRawSinkFrameImpl(int sink, RawFrame rawFrame, long rawFramePtr, ByteBuffer byteBuffer, int width, int height, int pixelFormat);
+  private static native long grabRawSinkFrameTimeoutImpl(int sink, RawFrame rawFrame, long rawFramePtr, ByteBuffer byteBuffer, int width, int height, int pixelFormat, double timeout);
+
+  public static long grabSinkFrame(int sink, RawFrame rawFrame) {
+    return grabRawSinkFrameImpl(sink, rawFrame, rawFrame.getFramePtr(), rawFrame.getDataByteBuffer(), rawFrame.getWidth(), rawFrame.getHeight(), rawFrame.getPixelFormat());
+  }
+  public static long grabSinkFrameTimeout(int sink, RawFrame rawFrame, double timeout) {
+    return grabRawSinkFrameTimeoutImpl(sink, rawFrame, rawFrame.getFramePtr(), rawFrame.getDataByteBuffer(), rawFrame.getWidth(), rawFrame.getHeight(), rawFrame.getPixelFormat(), timeout);
+  }
   public static native String getSinkError(int sink);
   public static native void setSinkEnabled(int sink, boolean enabled);
 
@@ -228,4 +248,8 @@ public class CameraServerJNI {
   public static native String getHostname();
 
   public static native String[] getNetworkInterfaces();
+
+  public static native long allocateRawFrame();
+
+  public static native void freeRawFrame(long frame);
 }

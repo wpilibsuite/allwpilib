@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,14 +27,14 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
   LLVM_ATTRIBUTE_ALWAYS_INLINE void CancelCallback(int32_t uid) { Cancel(uid); }
 
   T Get() const {
-    std::lock_guard<wpi::recursive_spinlock> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     return m_value;
   }
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE operator T() const { return Get(); }
 
   void Reset(T value) {
-    std::lock_guard<wpi::recursive_spinlock> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     DoReset();
     m_value = value;
   }
@@ -44,7 +44,7 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
  protected:
   int32_t DoRegisterCallback(HAL_NotifyCallback callback, void* param,
                              HAL_Bool initialNotify, const char* name) {
-    std::unique_lock<wpi::recursive_spinlock> lock(m_mutex);
+    std::unique_lock lock(m_mutex);
     int32_t newUid = DoRegister(reinterpret_cast<RawFunctor>(callback), param);
     if (newUid == -1) return -1;
     if (initialNotify) {
@@ -57,7 +57,7 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
   }
 
   void DoSet(T value, const char* name) {
-    std::lock_guard<wpi::recursive_spinlock> lock(this->m_mutex);
+    std::scoped_lock lock(this->m_mutex);
     if (m_value != value) {
       m_value = value;
       if (m_callbacks) {

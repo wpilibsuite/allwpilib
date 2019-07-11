@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -23,12 +23,12 @@ static wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
 static wpi::mutex listMutex;
 
 MotorSafety::MotorSafety() {
-  std::lock_guard<wpi::mutex> lock(listMutex);
+  std::scoped_lock lock(listMutex);
   instanceList.insert(this);
 }
 
 MotorSafety::~MotorSafety() {
-  std::lock_guard<wpi::mutex> lock(listMutex);
+  std::scoped_lock lock(listMutex);
   instanceList.erase(this);
 }
 
@@ -39,6 +39,8 @@ MotorSafety::MotorSafety(MotorSafety&& rhs)
       m_stopTime(std::move(rhs.m_stopTime)) {}
 
 MotorSafety& MotorSafety::operator=(MotorSafety&& rhs) {
+  std::scoped_lock lock(m_thisMutex, rhs.m_thisMutex);
+
   ErrorBase::operator=(std::move(rhs));
 
   m_expiration = std::move(rhs.m_expiration);
@@ -49,32 +51,32 @@ MotorSafety& MotorSafety::operator=(MotorSafety&& rhs) {
 }
 
 void MotorSafety::Feed() {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_stopTime = Timer::GetFPGATimestamp() + m_expiration;
 }
 
 void MotorSafety::SetExpiration(double expirationTime) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_expiration = expirationTime;
 }
 
 double MotorSafety::GetExpiration() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   return m_expiration;
 }
 
 bool MotorSafety::IsAlive() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   return !m_enabled || m_stopTime > Timer::GetFPGATimestamp();
 }
 
 void MotorSafety::SetSafetyEnabled(bool enabled) {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   m_enabled = enabled;
 }
 
 bool MotorSafety::IsSafetyEnabled() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   return m_enabled;
 }
 
@@ -83,7 +85,7 @@ void MotorSafety::Check() {
   double stopTime;
 
   {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+    std::scoped_lock lock(m_thisMutex);
     enabled = m_enabled;
     stopTime = m_stopTime;
   }
@@ -104,7 +106,7 @@ void MotorSafety::Check() {
 }
 
 void MotorSafety::CheckMotors() {
-  std::lock_guard<wpi::mutex> lock(listMutex);
+  std::scoped_lock lock(listMutex);
   for (auto elem : instanceList) {
     elem->Check();
   }

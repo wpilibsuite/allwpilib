@@ -183,7 +183,7 @@ public:
   /// Move-construct an error value. The newly constructed error is considered
   /// unchecked, even if the source error had been checked. The original error
   /// becomes a checked Success value, regardless of its original state.
-  Error(Error &&Other) {
+  Error(Error &&Other) noexcept {
     setChecked(true);
     *this = std::move(Other);
   }
@@ -202,7 +202,7 @@ public:
   /// you cannot overwrite an unhandled error. The current error is then
   /// considered unchecked. The source error becomes a checked success value,
   /// regardless of its original state.
-  Error &operator=(Error &&Other) {
+  Error &operator=(Error &&Other) noexcept {
     // Don't allow overwriting of unchecked values.
     assertIsChecked();
     setPtr(Other.getPtr());
@@ -298,7 +298,7 @@ inline ErrorSuccess Error::success() { return ErrorSuccess(); }
 /// Make a Error instance representing failure using the given error info
 /// type.
 template <typename ErrT, typename... ArgTs> Error make_error(ArgTs &&... Args) {
-  return Error(wpi::make_unique<ErrT>(std::forward<ArgTs>(Args)...));
+  return Error(std::make_unique<ErrT>(std::forward<ArgTs>(Args)...));
 }
 
 /// Base class for user error types. Users should declare their error types
