@@ -486,7 +486,9 @@ static int& GetThreadLocalLastCount() {
   return lastCount;
 }
 
-void HAL_WaitForCachedControlData(void) {HAL_WaitForCachedControlDataTimeout(0);}
+void HAL_WaitForCachedControlData(void) {
+  HAL_WaitForCachedControlDataTimeout(0);
+}
 
 HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
   int& lastCount = GetThreadLocalLastCount();

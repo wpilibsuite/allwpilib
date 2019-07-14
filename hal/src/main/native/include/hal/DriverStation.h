@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2013-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2013-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -196,14 +196,17 @@ int32_t HAL_GetMatchInfo(HAL_MatchInfo* info);
 void HAL_ReleaseDSMutex(void);
 
 /**
- * Checks if new control data has arrived since the last HAL_WaitForCachedControlData or HAL_IsNewControlData call.
- * If new data has not arrived, waits for new data to arrive. Otherwise, returns immediately.
+ * Checks if new control data has arrived since the last
+ * HAL_WaitForCachedControlData or HAL_IsNewControlData call. If new data has
+ * not arrived, waits for new data to arrive. Otherwise, returns immediately.
  */
 void HAL_WaitForCachedControlData(void);
 
 /**
- * Checks if new control data has arrived since the last HAL_WaitForCachedControlData or HAL_IsNewControlData call.
- * If new data has not arrived, waits for new data to arrive, or a timeout. Otherwise, returns immediately.
+ * Checks if new control data has arrived since the last
+ * HAL_WaitForCachedControlData or HAL_IsNewControlData call. If new data has
+ * not arrived, waits for new data to arrive, or a timeout. Otherwise, returns
+ * immediately.
  * 
  * @param timeout timeout in seconds
  * @return        true for new data, false for timeout
