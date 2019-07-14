@@ -23,16 +23,16 @@
 
 #include <assert.h>
 #include <io.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "uv.h"
-#include "internal.h"
 #include "handle-inl.h"
-#include "stream-inl.h"
+#include "internal.h"
 #include "req-inl.h"
+#include "stream-inl.h"
+#include "uv-common.h"
+#include "uv.h"
 
 #include <aclapi.h>
 #include <accctrl.h>
@@ -55,18 +55,35 @@ static const int pipe_prefix_len = sizeof(pipe_prefix) - 1;
 
 /* IPC incoming xfer queue item. */
 typedef struct {
+  uv__ipc_socket_xfer_type_t xfer_type;
   uv__ipc_socket_xfer_info_t xfer_info;
   QUEUE member;
 } uv__ipc_xfer_queue_item_t;
 
-/* IPC frame types. */
-enum { UV__IPC_DATA_FRAME = 0, UV__IPC_XFER_FRAME = 1 };
+/* IPC frame header flags. */
+/* clang-format off */
+enum {
+  UV__IPC_FRAME_HAS_DATA                = 0x01,
+  UV__IPC_FRAME_HAS_SOCKET_XFER         = 0x02,
+  UV__IPC_FRAME_XFER_IS_TCP_CONNECTION  = 0x04,
+  /* These are combinations of the flags above. */
+  UV__IPC_FRAME_XFER_FLAGS              = 0x06,
+  UV__IPC_FRAME_VALID_FLAGS             = 0x07
+};
+/* clang-format on */
 
 /* IPC frame header. */
 typedef struct {
-  uint32_t type;
-  uint32_t payload_length;
+  uint32_t flags;
+  uint32_t reserved1;   /* Ignored. */
+  uint32_t data_length; /* Must be zero if there is no data. */
+  uint32_t reserved2;   /* Must be zero. */
 } uv__ipc_frame_header_t;
+
+/* To implement the IPC protocol correctly, these structures must have exactly
+ * the right size. */
+STATIC_ASSERT(sizeof(uv__ipc_frame_header_t) == 16);
+STATIC_ASSERT(sizeof(uv__ipc_socket_xfer_info_t) == 632);
 
 /* Coalesced write request. */
 typedef struct {
@@ -349,7 +366,7 @@ void uv_pipe_endgame(uv_loop_t* loop, uv_pipe_t* handle) {
     /* Clear the shutdown_req field so we don't go here again. */
     handle->stream.conn.shutdown_req = NULL;
 
-    if (handle->flags & UV__HANDLE_CLOSING) {
+    if (handle->flags & UV_HANDLE_CLOSING) {
       UNREGISTER_HANDLE_REQ(loop, handle, req);
 
       /* Already closing. Cancel the shutdown. */
@@ -410,7 +427,7 @@ void uv_pipe_endgame(uv_loop_t* loop, uv_pipe_t* handle) {
     }
   }
 
-  if (handle->flags & UV__HANDLE_CLOSING &&
+  if (handle->flags & UV_HANDLE_CLOSING &&
       handle->reqs_pending == 0) {
     assert(!(handle->flags & UV_HANDLE_CLOSED));
 
@@ -881,7 +898,8 @@ int uv_pipe_accept(uv_pipe_t* server, uv_stream_t* client) {
     server->pipe.conn.ipc_xfer_queue_length--;
     item = QUEUE_DATA(q, uv__ipc_xfer_queue_item_t, member);
 
-    err = uv__tcp_xfer_import((uv_tcp_t*) client, &item->xfer_info);
+    err = uv__tcp_xfer_import(
+        (uv_tcp_t*) client, item->xfer_type, &item->xfer_info);
     if (err != 0)
       return err;
 
@@ -909,7 +927,7 @@ int uv_pipe_accept(uv_pipe_t* server, uv_stream_t* client) {
     req->next_pending = NULL;
     req->pipeHandle = INVALID_HANDLE_VALUE;
 
-    if (!(server->flags & UV__HANDLE_CLOSING)) {
+    if (!(server->flags & UV_HANDLE_CLOSING)) {
       uv_pipe_queue_accept(loop, server, req, FALSE);
     }
   }
@@ -1294,9 +1312,8 @@ static int uv__pipe_write_data(uv_loop_t* loop,
                                uv_pipe_t* handle,
                                const uv_buf_t bufs[],
                                size_t nbufs,
-                               uv_stream_t* send_handle,
                                uv_write_cb cb,
-                               bool copy_always) {
+                               int copy_always) {
   int err;
   int result;
   uv_buf_t write_buf;
@@ -1305,7 +1322,7 @@ static int uv__pipe_write_data(uv_loop_t* loop,
 
   UV_REQ_INIT(req, UV_WRITE);
   req->handle = (uv_stream_t*) handle;
-  req->send_handle = send_handle;
+  req->send_handle = NULL;
   req->cb = cb;
   /* Private fields. */
   req->coalesced = 0;
@@ -1461,10 +1478,10 @@ int uv__pipe_write_ipc(uv_loop_t* loop,
   uv_buf_t stack_bufs[6];
   uv_buf_t* bufs;
   size_t buf_count, buf_index;
-  uv__ipc_frame_header_t xfer_frame_header;
+  uv__ipc_frame_header_t frame_header;
+  uv__ipc_socket_xfer_type_t xfer_type = UV__IPC_SOCKET_XFER_NONE;
   uv__ipc_socket_xfer_info_t xfer_info;
-  uv__ipc_frame_header_t data_frame_header;
-  size_t data_length;
+  uint64_t data_length;
   size_t i;
   int err;
 
@@ -1475,8 +1492,8 @@ int uv__pipe_write_ipc(uv_loop_t* loop,
   if (data_length > UINT32_MAX)
     return WSAENOBUFS; /* Maps to UV_ENOBUFS. */
 
-  /* Prepare xfer frame payload. */
-  if (send_handle) {
+  /* Prepare the frame's socket xfer payload. */
+  if (send_handle != NULL) {
     uv_tcp_t* send_tcp_handle = (uv_tcp_t*) send_handle;
 
     /* Verify that `send_handle` it is indeed a tcp handle. */
@@ -1484,20 +1501,18 @@ int uv__pipe_write_ipc(uv_loop_t* loop,
       return ERROR_NOT_SUPPORTED;
 
     /* Export the tcp handle. */
-    err = uv__tcp_xfer_export(
-        send_tcp_handle, uv__pipe_get_ipc_remote_pid(handle), &xfer_info);
+    err = uv__tcp_xfer_export(send_tcp_handle,
+                              uv__pipe_get_ipc_remote_pid(handle),
+                              &xfer_type,
+                              &xfer_info);
     if (err != 0)
       return err;
   }
 
   /* Compute the number of uv_buf_t's required. */
-  buf_count = 0;
-  if (send_handle != NULL) {
-    buf_count += 2; /* One for the frame header, one for the payload. */
-  }
-  if (data_buf_count > 0) {
-    buf_count += 1 + data_buf_count; /* One extra for the frame header. */
-  }
+  buf_count = 1 + data_buf_count; /* Frame header and data buffers. */
+  if (send_handle != NULL)
+    buf_count += 1; /* One extra for the socket xfer information. */
 
   /* Use the on-stack buffer array if it is big enough; otherwise allocate
    * space for it on the heap. */
@@ -1512,33 +1527,39 @@ int uv__pipe_write_ipc(uv_loop_t* loop,
   }
   buf_index = 0;
 
-  if (send_handle != NULL) {
-    /* Add xfer frame header. */
-    xfer_frame_header.type = UV__IPC_XFER_FRAME;
-    xfer_frame_header.payload_length = sizeof xfer_info;
-    bufs[buf_index++] =
-        uv_buf_init((char*) &xfer_frame_header, sizeof xfer_frame_header);
+  /* Initialize frame header and add it to the buffers list. */
+  memset(&frame_header, 0, sizeof frame_header);
+  bufs[buf_index++] = uv_buf_init((char*) &frame_header, sizeof frame_header);
 
-    /* Add xfer frame payload. */
+  if (send_handle != NULL) {
+    /* Add frame header flags. */
+    switch (xfer_type) {
+      case UV__IPC_SOCKET_XFER_TCP_CONNECTION:
+        frame_header.flags |= UV__IPC_FRAME_HAS_SOCKET_XFER |
+                              UV__IPC_FRAME_XFER_IS_TCP_CONNECTION;
+        break;
+      case UV__IPC_SOCKET_XFER_TCP_SERVER:
+        frame_header.flags |= UV__IPC_FRAME_HAS_SOCKET_XFER;
+        break;
+      default:
+        assert(0);  /* Unreachable. */
+    }
+    /* Add xfer info buffer. */
     bufs[buf_index++] = uv_buf_init((char*) &xfer_info, sizeof xfer_info);
   }
 
   if (data_length > 0) {
-    /* Add data frame header. */
-    data_frame_header.type = UV__IPC_DATA_FRAME;
-    data_frame_header.payload_length = (uint32_t) data_length;
-    bufs[buf_index++] =
-        uv_buf_init((char*) &data_frame_header, sizeof data_frame_header);
-
-    /* Add data buffers. */
+    /* Update frame header. */
+    frame_header.flags |= UV__IPC_FRAME_HAS_DATA;
+    frame_header.data_length = (uint32_t) data_length;
+    /* Add data buffers to buffers list. */
     for (i = 0; i < data_buf_count; i++)
       bufs[buf_index++] = data_bufs[i];
   }
 
   /* Write buffers. We set the `always_copy` flag, so it is not a problem that
    * some of the written data lives on the stack. */
-  err = uv__pipe_write_data(
-      loop, req, handle, bufs, buf_count, send_handle, cb, true);
+  err = uv__pipe_write_data(loop, req, handle, bufs, buf_count, cb, 1);
 
   /* If we had to heap-allocate the bufs array, free it now. */
   if (bufs != stack_bufs) {
@@ -1562,8 +1583,7 @@ int uv__pipe_write(uv_loop_t* loop,
   } else {
     /* Non-IPC pipe write: put data on the wire directly. */
     assert(send_handle == NULL);
-    return uv__pipe_write_data(
-        loop, req, handle, bufs, nbufs, NULL, cb, false);
+    return uv__pipe_write_data(loop, req, handle, bufs, nbufs, cb, 0);
   }
 }
 
@@ -1604,14 +1624,18 @@ static void uv_pipe_read_error_or_eof(uv_loop_t* loop, uv_pipe_t* handle,
 
 
 static void uv__pipe_queue_ipc_xfer_info(
-    uv_pipe_t* handle, uv__ipc_socket_xfer_info_t* xfer_info) {
+    uv_pipe_t* handle,
+    uv__ipc_socket_xfer_type_t xfer_type,
+    uv__ipc_socket_xfer_info_t* xfer_info) {
   uv__ipc_xfer_queue_item_t* item;
 
   item = (uv__ipc_xfer_queue_item_t*) uv__malloc(sizeof(*item));
   if (item == NULL)
     uv_fatal_error(ERROR_OUTOFMEMORY, "uv__malloc");
 
-  memcpy(&item->xfer_info, xfer_info, sizeof(item->xfer_info));
+  item->xfer_type = xfer_type;
+  item->xfer_info = *xfer_info;
+
   QUEUE_INSERT_TAIL(&handle->pipe.conn.ipc_xfer_queue, &item->member);
   handle->pipe.conn.ipc_xfer_queue_length++;
 }
@@ -1677,12 +1701,11 @@ static DWORD uv__pipe_read_data(uv_loop_t* loop,
 
 
 static DWORD uv__pipe_read_ipc(uv_loop_t* loop, uv_pipe_t* handle) {
-  DWORD* data_remaining =
-      (DWORD*)&handle->pipe.conn.ipc_data_frame.payload_remaining;
+  uint32_t* data_remaining = &handle->pipe.conn.ipc_data_frame.payload_remaining;
   int err;
 
   if (*data_remaining > 0) {
-    /* Read data frame payload. */
+    /* Read frame data payload. */
     DWORD bytes_read =
         uv__pipe_read_data(loop, handle, *data_remaining, *data_remaining);
     *data_remaining -= bytes_read;
@@ -1691,6 +1714,8 @@ static DWORD uv__pipe_read_ipc(uv_loop_t* loop, uv_pipe_t* handle) {
   } else {
     /* Start of a new IPC frame. */
     uv__ipc_frame_header_t frame_header;
+    uint32_t xfer_flags;
+    uv__ipc_socket_xfer_type_t xfer_type;
     uv__ipc_socket_xfer_info_t xfer_info;
 
     /* Read the IPC frame header. */
@@ -1699,32 +1724,56 @@ static DWORD uv__pipe_read_ipc(uv_loop_t* loop, uv_pipe_t* handle) {
     if (err)
       goto error;
 
-    if (frame_header.type == UV__IPC_DATA_FRAME) {
-      /* Data frame: capture payload length. Actual data will be read in
-       * subsequent call to uv__pipe_read_ipc(). */
-      *data_remaining = frame_header.payload_length;
+    /* Validate that flags are valid. */
+    if ((frame_header.flags & ~UV__IPC_FRAME_VALID_FLAGS) != 0)
+      goto invalid;
+    /* Validate that reserved2 is zero. */
+    if (frame_header.reserved2 != 0)
+      goto invalid;
 
-      /* Return number of bytes read. */
-      return sizeof frame_header;
-
-    } else if (frame_header.type == UV__IPC_XFER_FRAME) {
-      /* Xfer frame: read the payload. */
-      assert(frame_header.payload_length == sizeof xfer_info);
-      err =
-          uv__pipe_read_exactly(handle->handle, &xfer_info, sizeof xfer_info);
-      if (err)
-        goto error;
-
-      /* Store the pending socket info. */
-      uv__pipe_queue_ipc_xfer_info(handle, &xfer_info);
-
-      /* Return number of bytes read. */
-      return sizeof frame_header + sizeof xfer_info;
+    /* Parse xfer flags. */
+    xfer_flags = frame_header.flags & UV__IPC_FRAME_XFER_FLAGS;
+    if (xfer_flags & UV__IPC_FRAME_HAS_SOCKET_XFER) {
+      /* Socket coming -- determine the type. */
+      xfer_type = xfer_flags & UV__IPC_FRAME_XFER_IS_TCP_CONNECTION
+                      ? UV__IPC_SOCKET_XFER_TCP_CONNECTION
+                      : UV__IPC_SOCKET_XFER_TCP_SERVER;
+    } else if (xfer_flags == 0) {
+      /* No socket. */
+      xfer_type = UV__IPC_SOCKET_XFER_NONE;
+    } else {
+      /* Invalid flags. */
+      goto invalid;
     }
 
-    /* Invalid frame. */
-    err = WSAECONNABORTED; /* Maps to UV_ECONNABORTED. */
+    /* Parse data frame information. */
+    if (frame_header.flags & UV__IPC_FRAME_HAS_DATA) {
+      *data_remaining = frame_header.data_length;
+    } else if (frame_header.data_length != 0) {
+      /* Data length greater than zero but data flag not set -- invalid. */
+      goto invalid;
+    }
+
+    /* If no socket xfer info follows, return here. Data will be read in a
+     * subsequent invocation of uv__pipe_read_ipc(). */
+    if (xfer_type == UV__IPC_SOCKET_XFER_NONE)
+      return sizeof frame_header; /* Number of bytes read. */
+
+    /* Read transferred socket information. */
+    err = uv__pipe_read_exactly(handle->handle, &xfer_info, sizeof xfer_info);
+    if (err)
+      goto error;
+
+    /* Store the pending socket info. */
+    uv__pipe_queue_ipc_xfer_info(handle, xfer_type, &xfer_info);
+
+    /* Return number of bytes read. */
+    return sizeof frame_header + sizeof xfer_info;
   }
+
+invalid:
+  /* Invalid frame. */
+  err = WSAECONNABORTED; /* Maps to UV_ECONNABORTED. */
 
 error:
   uv_pipe_read_error_or_eof(loop, handle, err, uv_null_buf_);
@@ -1859,7 +1908,7 @@ void uv_process_pipe_accept_req(uv_loop_t* loop, uv_pipe_t* handle,
 
   assert(handle->type == UV_NAMED_PIPE);
 
-  if (handle->flags & UV__HANDLE_CLOSING) {
+  if (handle->flags & UV_HANDLE_CLOSING) {
     /* The req->pipeHandle should be freed already in uv_pipe_cleanup(). */
     assert(req->pipeHandle == INVALID_HANDLE_VALUE);
     DECREASE_PENDING_REQ_COUNT(handle);
@@ -1879,7 +1928,7 @@ void uv_process_pipe_accept_req(uv_loop_t* loop, uv_pipe_t* handle,
       CloseHandle(req->pipeHandle);
       req->pipeHandle = INVALID_HANDLE_VALUE;
     }
-    if (!(handle->flags & UV__HANDLE_CLOSING)) {
+    if (!(handle->flags & UV_HANDLE_CLOSING)) {
       uv_pipe_queue_accept(loop, handle, req, FALSE);
     }
   }
@@ -2091,7 +2140,7 @@ int uv_pipe_open(uv_pipe_t* pipe, uv_file file) {
   if (pipe->ipc) {
     assert(!(pipe->flags & UV_HANDLE_NON_OVERLAPPED_PIPE));
     pipe->pipe.conn.ipc_remote_pid = uv_os_getppid();
-    assert(pipe->pipe.conn.ipc_remote_pid != -1);
+    assert(pipe->pipe.conn.ipc_remote_pid != (DWORD) -1);
   }
   return 0;
 }
@@ -2262,7 +2311,7 @@ uv_handle_type uv_pipe_pending_type(uv_pipe_t* handle) {
 }
 
 int uv_pipe_chmod(uv_pipe_t* handle, int mode) {
-  SID_IDENTIFIER_AUTHORITY sid_world = SECURITY_WORLD_SID_AUTHORITY;
+  SID_IDENTIFIER_AUTHORITY sid_world = { SECURITY_WORLD_SID_AUTHORITY };
   PACL old_dacl, new_dacl;
   PSECURITY_DESCRIPTOR sd;
   EXPLICIT_ACCESS ea;
@@ -2297,7 +2346,7 @@ int uv_pipe_chmod(uv_pipe_t* handle, int mode) {
     error = GetLastError();
     goto clean_sid;
   }
- 
+
   memset(&ea, 0, sizeof(EXPLICIT_ACCESS));
   if (mode & UV_READABLE)
     ea.grfAccessPermissions |= GENERIC_READ | FILE_WRITE_ATTRIBUTES;

@@ -57,7 +57,6 @@ set(uv_unix_src
     src/main/native/libuv/src/unix/stream.cpp
     src/main/native/libuv/src/unix/tcp.cpp
     src/main/native/libuv/src/unix/thread.cpp
-    src/main/native/libuv/src/unix/timer.cpp
     src/main/native/libuv/src/unix/tty.cpp
     src/main/native/libuv/src/unix/udp.cpp
 )
@@ -78,7 +77,6 @@ set(uv_linux_src
     src/main/native/libuv/src/unix/procfs-exepath.cpp
     src/main/native/libuv/src/unix/proctitle.cpp
     src/main/native/libuv/src/unix/sysinfo-loadavg.cpp
-    src/main/native/libuv/src/unix/sysinfo-memory.cpp
 )
 
 add_library(wpiutil ${wpiutil_native_src} ${wpiutil_resources_src})
