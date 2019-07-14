@@ -246,7 +246,6 @@ HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  int currentCount = newDSDataAvailableCounter;
   while (newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
       auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
