@@ -31,13 +31,14 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
-#include <netdb.h>
+#include <netdb.h>  /* MAXHOSTNAMELEN on Solaris */
 
 #include <termios.h>
 #include <pwd.h>
 
 #if !defined(__MVS__)
 #include <semaphore.h>
+#include <sys/param.h> /* MAXHOSTNAMELEN on Linux and the BSDs */
 #endif
 #include <pthread.h>
 #include <signal.h>
@@ -46,8 +47,6 @@
 
 #if defined(__linux__)
 # include "uv/linux.h"
-#elif defined(__PASE__)
-# include "uv/posix.h"
 #elif defined(__APPLE__)
 # include "uv/darwin.h"
 #elif defined(__DragonFly__)       || \
@@ -56,12 +55,13 @@
       defined(__OpenBSD__)         || \
       defined(__NetBSD__)
 # include "uv/bsd.h"
-#elif defined(__CYGWIN__) || defined(__MSYS__)
+#elif defined(__PASE__)   || \
+      defined(__CYGWIN__) || \
+      defined(__MSYS__)   || \
+      defined(__GNU__)
 # include "uv/posix.h"
-#endif
-
-#ifndef PTHREAD_BARRIER_SERIAL_THREAD
-# include "uv/pthread-barrier.h"
+#elif defined(__HAIKU__)
+# include "uv/posix.h"
 #endif
 
 #ifndef NI_MAXHOST
@@ -130,14 +130,39 @@ typedef pthread_rwlock_t uv_rwlock_t;
 typedef UV_PLATFORM_SEM_T uv_sem_t;
 typedef pthread_cond_t uv_cond_t;
 typedef pthread_key_t uv_key_t;
-typedef pthread_barrier_t uv_barrier_t;
 
+/* Note: guard clauses should match uv_barrier_init's in src/unix/thread.c. */
+#if defined(_AIX) || \
+    defined(__OpenBSD__) || \
+    !defined(PTHREAD_BARRIER_SERIAL_THREAD)
+/* TODO(bnoordhuis) Merge into uv_barrier_t in v2. */
+struct _uv_barrier {
+  uv_mutex_t mutex;
+  uv_cond_t cond;
+  unsigned threshold;
+  unsigned in;
+  unsigned out;
+};
+
+typedef struct {
+  struct _uv_barrier* b;
+# if defined(PTHREAD_BARRIER_SERIAL_THREAD)
+  /* TODO(bnoordhuis) Remove padding in v2. */
+  char pad[sizeof(pthread_barrier_t) - sizeof(struct _uv_barrier*)];
+# endif
+} uv_barrier_t;
+#else
+typedef pthread_barrier_t uv_barrier_t;
+#endif
 
 /* Platform-specific definitions for uv_spawn support. */
 typedef gid_t uv_gid_t;
 typedef uid_t uv_uid_t;
 
 typedef struct dirent uv__dirent_t;
+
+#define UV_DIR_PRIVATE_FIELDS \
+  DIR* dir;
 
 #if defined(DT_UNKNOWN)
 # define HAVE_DIRENT_TYPES
