@@ -477,12 +477,46 @@ void HAL_ObserveUserProgramTest(void) {
   FRC_NetworkCommunication_observeUserProgramTest();
 }
 
-HAL_Bool HAL_IsNewControlData(void) {
+static int& GetThreadLocalLastCount() {
   // There is a rollover error condition here. At Packet# = n * (uintmax), this
   // will return false when instead it should return true. However, this at a
   // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
   // worth the cycles to check.
   thread_local int lastCount{-1};
+  return lastCount;
+}
+
+void HAL_WaitForCachedControlData(void) {HAL_WaitForCachedControlDataTimeout(0);}
+
+HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
+  int& lastCount = GetThreadLocalLastCount();
+  if (!dsThread) return false;
+  auto thr = dsThread->GetThread();
+  if (!thr) return false;
+  int currentCount = thr->newDSDataAvailableCounter;
+  if (lastCount != currentCount) {
+    lastCount = currentCount;
+    return true;
+  }
+  auto timeoutTime =
+      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
+
+  while (thr->newDSDataAvailableCounter == currentCount) {
+    if (timeout > 0) {
+      auto timedOut =
+          thr->newDSDataAvailableCond.wait_until(thr.GetLock(), timeoutTime);
+      if (timedOut == std::cv_status::timeout) {
+        return false;
+      }
+    } else {
+      thr->newDSDataAvailableCond.wait(thr.GetLock());
+    }
+  }
+  return true;
+}
+
+HAL_Bool HAL_IsNewControlData(void) {
+  int& lastCount = GetThreadLocalLastCount();
   if (!dsThread) return false;
   auto thr = dsThread->GetThread();
   if (!thr) return false;
