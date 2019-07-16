@@ -626,6 +626,18 @@ public class DriverStation {
   }
 
   /**
+   * Gets a value indicating whether the Robot is e-stopped.
+   *
+   * @return True if the robot is e-stopped, false otherwise.
+   */
+  public boolean isEStopped() {
+    synchronized (m_controlWordMutex) {
+      updateControlWord(false);
+      return m_controlWordCache.getEStop();
+    }
+  }
+
+  /**
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * autonomous mode.
    *

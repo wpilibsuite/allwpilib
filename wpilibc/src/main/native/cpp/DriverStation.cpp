@@ -336,6 +336,12 @@ bool DriverStation::IsDisabled() const {
   return !(controlWord.enabled && controlWord.dsAttached);
 }
 
+bool DriverStation::IsEStopped() const {
+  HAL_ControlWord controlWord;
+  HAL_GetControlWord(&controlWord);
+  return controlWord.eStop;
+}
+
 bool DriverStation::IsAutonomous() const {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);

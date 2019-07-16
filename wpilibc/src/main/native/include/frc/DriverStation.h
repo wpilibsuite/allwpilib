@@ -198,6 +198,13 @@ class DriverStation : public ErrorBase {
   bool IsDisabled() const;
 
   /**
+   * Check if the robot is e-stopped.
+   *
+   * @return True if the robot is e-stopped
+   */
+  bool IsEStopped() const;
+
+  /**
    * Check if the DS is commanding autonomous mode.
    *
    * @return True if the robot is being commanded to be in autonomous mode
