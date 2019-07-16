@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,7 +13,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * Class to read quadrature encoders.
@@ -126,7 +126,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
    */
   public Encoder(final int channelA, final int channelB, boolean reverseDirection,
                  final EncodingType encodingType) {
-    requireNonNull(encodingType, "Given encoding type was null");
+    requireNonNullParam(encodingType, "encodingType", "Encoder");
 
     m_allocatedA = true;
     m_allocatedB = true;
@@ -223,9 +223,9 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
    */
   public Encoder(DigitalSource sourceA, DigitalSource sourceB, boolean reverseDirection,
                  final EncodingType encodingType) {
-    requireNonNull(sourceA, "Digital Source A was null");
-    requireNonNull(sourceB, "Digital Source B was null");
-    requireNonNull(encodingType, "Given encoding type was null");
+    requireNonNullParam(sourceA, "sourceA", "Encoder");
+    requireNonNullParam(sourceB, "sourceB", "Encoder");
+    requireNonNullParam(encodingType, "encodingType", "Encoder");
 
     m_allocatedA = false;
     m_allocatedB = false;

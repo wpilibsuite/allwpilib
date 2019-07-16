@@ -108,7 +108,6 @@ ext {
                             'procfs-exepath.cpp',
                             'proctitle.cpp',
                             'sysinfo-loadavg.cpp',
-                            'sysinfo-memory.cpp',
                         ]
                     }
                     exportedHeaders {
