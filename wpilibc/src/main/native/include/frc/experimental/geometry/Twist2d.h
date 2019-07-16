@@ -7,8 +7,27 @@
 
 #pragma once
 
+/**
+ * A movement along an arc at constant curvature and velocity. We can use ideas
+ * from differential calculus to create new Pose2ds from a Twist2d and vise
+ * versa.
+ *
+ * A Twist can be used to represent a difference between two poses, a velocity,
+ * an acceleration, etc.
+ */
 struct Twist2d {
+  /**
+   * Linear "dx" component
+   */
   double dx;
+
+  /**
+   * Linear "dy" component
+   */
   double dy;
+
+  /**
+   * Angular "dtheta" component (radians)
+   */
   double dtheta;
 };
