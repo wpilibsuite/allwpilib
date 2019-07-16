@@ -30,22 +30,22 @@
     "mainclass": "Main"
   },
   {
+    "name": "RobotBase Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for RobotBase",
+    "tags": [
+      "RobotBase", "Skeleton"
+    ],
+    "foldername": "robotbaseskeleton",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
     "name": "Command Robot",
     "description": "Command style",
     "tags": [
       "Command"
     ],
     "foldername": "commandbased",
-    "gradlebase": "java",
-    "mainclass": "Main"
-  },
-  {
-    "name": "Sample Robot",
-    "description": "Sample style",
-    "tags": [
-      "Sample"
-    ],
-    "foldername": "sample",
     "gradlebase": "java",
     "mainclass": "Main"
   }
