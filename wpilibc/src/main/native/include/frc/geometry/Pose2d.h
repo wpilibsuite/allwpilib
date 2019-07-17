@@ -83,6 +83,11 @@ class Pose2d {
    *
    * See <https://file.tavsys.net/control/state-space-guide.pdf> section on
    * nonlinear pose estimation for derivation.
+   *
+   * The twist is a change in pose in the robot's coordinate frame since the
+   * previous pose update. When the user runs exp() on the previous known
+   * field-relative pose with the argument being the twist, the user will
+   * receive the new field-relative pose.
    */
   Pose2d Exp(const Twist2d& twist) const;
 

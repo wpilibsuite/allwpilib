@@ -9,12 +9,11 @@
 
 namespace frc {
 /**
- * A movement along an arc at constant curvature and velocity. We can use ideas
+ * A change in distance along arc since the last pose update. We can use ideas
  * from differential calculus to create new Pose2ds from a Twist2d and vise
  * versa.
  *
- * A Twist can be used to represent a difference between two poses, a velocity,
- * an acceleration, etc.
+ * A Twist can be used to represent a difference between two poses.
  */
 struct Twist2d {
   /**
