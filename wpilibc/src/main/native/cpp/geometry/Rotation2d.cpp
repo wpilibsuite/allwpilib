@@ -12,10 +12,10 @@ using namespace frc;
 
 Rotation2d::Rotation2d() : m_value(0.0), m_cos(1.0), m_sin(0.0) {}
 
-Rotation2d::Rotation2d(const double value)
+Rotation2d::Rotation2d(double value)
     : m_value(value), m_cos(std::cos(value)), m_sin(std::sin(value)) {}
 
-Rotation2d::Rotation2d(const double x, const double y) {
+Rotation2d::Rotation2d(double x, double y) {
   const auto magnitude = std::hypot(x, y);
   if (magnitude > 1e-6) {
     m_sin = y / magnitude;
@@ -27,7 +27,7 @@ Rotation2d::Rotation2d(const double x, const double y) {
   m_value = std::atan2(m_sin, m_cos);
 }
 
-Rotation2d Rotation2d::FromDegrees(const double degrees) {
+Rotation2d Rotation2d::FromDegrees(double degrees) {
   return Rotation2d(Deg2Rad(degrees));
 }
 

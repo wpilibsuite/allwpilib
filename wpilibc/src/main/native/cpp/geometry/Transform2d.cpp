@@ -10,7 +10,7 @@
 
 using namespace frc;
 
-Transform2d::Transform2d(const Pose2d initial, const Pose2d final) {
+Transform2d::Transform2d(Pose2d initial, Pose2d final) {
   m_translation = (final.Translation() - initial.Translation())
                       .RotateBy(-initial.Rotation());
 

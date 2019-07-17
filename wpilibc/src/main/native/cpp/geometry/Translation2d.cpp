@@ -12,7 +12,7 @@ using namespace frc;
 
 Translation2d::Translation2d() : m_x(0.0), m_y(0.0) {}
 
-Translation2d::Translation2d(const double x, const double y) : m_x(x), m_y(y) {}
+Translation2d::Translation2d(double x, double y) : m_x(x), m_y(y) {}
 
 double Translation2d::Distance(const Translation2d& other) const {
   return std::hypot(other.m_x - m_x, other.m_y - m_y);
@@ -46,21 +46,21 @@ Translation2d& Translation2d::operator-=(const Translation2d& other) {
 
 Translation2d Translation2d::operator-() const { return {-m_x, -m_y}; }
 
-Translation2d Translation2d::operator*(const double scalar) const {
+Translation2d Translation2d::operator*(double scalar) const {
   return {scalar * m_x, scalar * m_y};
 }
 
-Translation2d& Translation2d::operator*=(const double scalar) {
+Translation2d& Translation2d::operator*=(double scalar) {
   m_x *= scalar;
   m_y *= scalar;
   return *this;
 }
 
-Translation2d Translation2d::operator/(const double scalar) const {
+Translation2d Translation2d::operator/(double scalar) const {
   return *this * (1.0 / scalar);
 }
 
-Translation2d& Translation2d::operator/=(const double scalar) {
+Translation2d& Translation2d::operator/=(double scalar) {
   *this *= (1.0 / scalar);
   return *this;
 }

@@ -10,10 +10,10 @@
 
 using namespace frc;
 
-Pose2d::Pose2d(const Translation2d translation, const Rotation2d rotation)
+Pose2d::Pose2d(Translation2d translation, Rotation2d rotation)
     : m_translation(translation), m_rotation(rotation) {}
 
-Pose2d::Pose2d(const double x, const double y, const Rotation2d rotation)
+Pose2d::Pose2d(double x, double y, Rotation2d rotation)
     : m_translation(Translation2d(x, y)), m_rotation(rotation) {}
 
 Pose2d Pose2d::operator+(const Transform2d& other) const {
