@@ -24,7 +24,7 @@ class Translation2d {
   /**
    * Constructs a Translation2d with X and Y components equal to zero.
    */
-  Translation2d();
+  Translation2d() = default;
 
   /**
    * Constructs a Translation2d with the X and Y components equal to the

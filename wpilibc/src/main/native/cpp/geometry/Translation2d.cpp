@@ -10,8 +10,6 @@
 
 using namespace frc;
 
-Translation2d::Translation2d() : m_x(0.0), m_y(0.0) {}
-
 Translation2d::Translation2d(double x, double y) : m_x(x), m_y(y) {}
 
 double Translation2d::Distance(const Translation2d& other) const {

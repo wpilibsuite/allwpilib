@@ -19,6 +19,3 @@ Transform2d::Transform2d(Pose2d initial, Pose2d final) {
 
 Transform2d::Transform2d(Translation2d translation, Rotation2d rotation)
     : m_translation(translation), m_rotation(rotation) {}
-
-Transform2d::Transform2d()
-    : m_translation(Translation2d()), m_rotation(Rotation2d()) {}
