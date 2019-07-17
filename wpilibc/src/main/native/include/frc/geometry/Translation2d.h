@@ -10,7 +10,6 @@
 #include "Rotation2d.h"
 
 namespace frc {
-namespace experimental {
 
 /**
  * Represents a translation in 2d space.
@@ -143,5 +142,4 @@ class Translation2d {
   double m_x;
   double m_y;
 };
-}  // namespace experimental
 }  // namespace frc

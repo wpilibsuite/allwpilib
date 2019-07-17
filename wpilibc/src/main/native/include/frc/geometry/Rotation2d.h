@@ -8,7 +8,6 @@
 #pragma once
 
 namespace frc {
-namespace experimental {
 
 constexpr double kPi = 3.14159265358979323846;
 
@@ -93,7 +92,7 @@ class Rotation2d {
   /*
    * Returns the radian value of the rotation.
    */
-  double Radians() const { return m_value; };
+  double Radians() const { return m_value; }
 
   /**
    * Returns the degree value of the rotation.
@@ -103,17 +102,17 @@ class Rotation2d {
   /**
    * Returns the cosine of the rotation.
    */
-  double Cos() const { return m_cos; };
+  double Cos() const { return m_cos; }
 
   /**
    * Returns the sine of the rotation.
    */
-  double Sin() const { return m_sin; };
+  double Sin() const { return m_sin; }
 
   /**
    * Returns the tangent of the rotation.
    */
-  double Tan() const { return m_sin / m_cos; };
+  double Tan() const { return m_sin / m_cos; }
 
  private:
   double m_value;
@@ -130,5 +129,4 @@ class Rotation2d {
     return deg * kPi / 180.0;
   }
 };
-}  // namespace experimental
 }  // namespace frc

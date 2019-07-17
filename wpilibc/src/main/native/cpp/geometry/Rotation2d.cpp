@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc/experimental/geometry/Rotation2d.h"
+#include "frc/geometry/Rotation2d.h"
 #include <cmath>
 
-using namespace frc::experimental;
+using namespace frc;
 
 Rotation2d::Rotation2d() : m_value(0.0), m_cos(1.0), m_sin(0.0) {}
 

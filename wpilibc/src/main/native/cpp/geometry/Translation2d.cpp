@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc/experimental/geometry/Translation2d.h"
+#include "frc/geometry/Translation2d.h"
 #include <cmath>
 
-using namespace frc::experimental;
+using namespace frc;
 
 Translation2d::Translation2d() : m_x(0.0), m_y(0.0) {}
 
@@ -38,9 +38,7 @@ Translation2d Translation2d::operator-(const Translation2d& other) const {
   return *this + -other;
 }
 
-void Translation2d::operator-=(const Translation2d& other) {
-  *this += -other;
-}
+void Translation2d::operator-=(const Translation2d& other) { *this += -other; }
 
 Translation2d Translation2d::operator-() const { return {-m_x, -m_y}; }
 
@@ -57,6 +55,4 @@ Translation2d Translation2d::operator/(const double scalar) const {
   return *this * (1.0 / scalar);
 }
 
-void Translation2d::operator/=(const double scalar) {
-  *this *= (1.0 / scalar);
-}
+void Translation2d::operator/=(const double scalar) { *this *= (1.0 / scalar); }

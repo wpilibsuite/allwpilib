@@ -10,7 +10,6 @@
 #include "Translation2d.h"
 
 namespace frc {
-namespace experimental {
 
 class Pose2d;
 
@@ -48,5 +47,4 @@ class Transform2d {
   Translation2d m_translation;
   Rotation2d m_rotation;
 };
-}  // namespace experimental
 }  // namespace frc

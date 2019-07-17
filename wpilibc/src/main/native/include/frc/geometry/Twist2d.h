@@ -7,6 +7,7 @@
 
 #pragma once
 
+namespace frc {
 /**
  * A movement along an arc at constant curvature and velocity. We can use ideas
  * from differential calculus to create new Pose2ds from a Twist2d and vise
@@ -31,3 +32,4 @@ struct Twist2d {
    */
   double dtheta;
 };
+}  // namespace frc

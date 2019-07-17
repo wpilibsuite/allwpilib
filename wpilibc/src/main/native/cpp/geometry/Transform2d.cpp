@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc/experimental/geometry/Transform2d.h"
-#include "frc/experimental/geometry/Pose2d.h"
+#include "frc/geometry/Transform2d.h"
+#include "frc/geometry/Pose2d.h"
 
-using namespace frc::experimental;
+using namespace frc;
 
 Transform2d::Transform2d(const Pose2d initial, const Pose2d final) {
   m_translation = (final.Translation() - initial.Translation())

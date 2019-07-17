@@ -5,15 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc/experimental/geometry/Transform2d.h"
-#include "frc/experimental/geometry/Pose2d.h"
+#include "frc/geometry/Transform2d.h"
+#include "frc/geometry/Pose2d.h"
 #include "gtest/gtest.h"
 
 TEST(GeometryTest, TransformTests) {
-  const frc::experimental::Pose2d initial{
-      0.0, 0.0, frc::experimental::Rotation2d::FromDegrees(45.0)};
-  const frc::experimental::Pose2d final{
-      5.0, 5.0, frc::experimental::Rotation2d::FromDegrees(45.0)};
+  const frc::Pose2d initial{
+      0.0, 0.0, frc::Rotation2d::FromDegrees(45.0)};
+  const frc::Pose2d final{
+      5.0, 5.0, frc::Rotation2d::FromDegrees(45.0)};
   const auto finalRelativeToInitial = final.RelativeTo(initial);
 
   EXPECT_EQ(finalRelativeToInitial.Translation().X(), 5.0 * std::sqrt(2.0));

@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc/experimental/geometry/Pose2d.h"
+#include "frc/geometry/Pose2d.h"
 #include <cmath>
 
-using namespace frc::experimental;
+using namespace frc;
 
 Pose2d::Pose2d() : m_translation(Translation2d()), m_rotation(Rotation2d()) {}
 

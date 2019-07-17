@@ -12,7 +12,6 @@
 #include "Twist2d.h"
 
 namespace frc {
-namespace experimental {
 
 /**
  * Represents a 2d pose containing translational and rotational elements.
@@ -91,5 +90,4 @@ class Pose2d {
   Translation2d m_translation;
   Rotation2d m_rotation;
 };
-}  // namespace experimental
 }  // namespace frc
