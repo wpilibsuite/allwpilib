@@ -9,6 +9,8 @@
 #include "frc/geometry/Transform2d.h"
 #include "gtest/gtest.h"
 
+#include <cmath>
+
 TEST(GeometryTest, TransformTests) {
   const frc::Pose2d initial{
       0.0, 0.0, frc::Rotation2d::FromDegrees(45.0)};
