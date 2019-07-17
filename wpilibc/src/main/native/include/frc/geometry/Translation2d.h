@@ -84,7 +84,7 @@ class Translation2d {
    * This is similar to the + operator, except that the current object is
    * mutated.
    */
-  void operator+=(const Translation2d& other);
+  Translation2d& operator+=(const Translation2d& other);
 
   /**
    * Subtracts the other translation from the other translation and returns the
@@ -101,7 +101,7 @@ class Translation2d {
    * This is similar to the - operator, except that the current object is
    * mutated.
    */
-  void operator-=(const Translation2d& other);
+  Translation2d& operator-=(const Translation2d& other);
 
   /**
    * Returns the inverse of the current translation. This is equivalent to
@@ -122,7 +122,7 @@ class Translation2d {
    *
    * This is similar to the * operator, except that current object is mutated.
    */
-  void operator*=(double scalar);
+  Translation2d& operator*=(double scalar);
 
   /**
    * Divides the translation by a scalar and returns the new translation.
@@ -136,7 +136,7 @@ class Translation2d {
    *
    * This is similar to the / operator, except that current object is mutated.
    */
-  void operator/=(double scalar);
+  Translation2d& operator/=(double scalar);
 
  private:
   double m_x;

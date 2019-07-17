@@ -22,9 +22,10 @@ Pose2d Pose2d::operator+(const Transform2d& other) const {
   return TransformBy(other);
 }
 
-void Pose2d::operator+=(const Transform2d& other) {
+Pose2d& Pose2d::operator+=(const Transform2d& other) {
   m_translation += other.Translation().RotateBy(m_rotation);
   m_rotation += other.Rotation();
+  return *this;
 }
 
 Pose2d Pose2d::TransformBy(const Transform2d& other) const {

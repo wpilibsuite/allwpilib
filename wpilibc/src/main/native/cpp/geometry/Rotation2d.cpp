@@ -35,17 +35,21 @@ Rotation2d Rotation2d::operator+(const Rotation2d& other) const {
   return RotateBy(other);
 }
 
-void Rotation2d::operator+=(const Rotation2d& other) {
+Rotation2d& Rotation2d::operator+=(const Rotation2d& other) {
   m_cos = Cos() * other.Cos() - Sin() * other.Sin();
   m_sin = Cos() * other.Sin() + Sin() * other.Cos();
   m_value = std::atan2(m_sin, m_cos);
+  return *this;
 }
 
 Rotation2d Rotation2d::operator-(const Rotation2d& other) const {
   return *this + -other;
 }
 
-void Rotation2d::operator-=(const Rotation2d& other) { *this += -other; }
+Rotation2d& Rotation2d::operator-=(const Rotation2d& other) {
+  *this += -other;
+  return *this;
+}
 
 Rotation2d Rotation2d::operator-() const { return Rotation2d(-m_value); }
 

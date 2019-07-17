@@ -29,16 +29,20 @@ Translation2d Translation2d::operator+(const Translation2d& other) const {
   return {X() + other.X(), Y() + other.Y()};
 }
 
-void Translation2d::operator+=(const Translation2d& other) {
+Translation2d& Translation2d::operator+=(const Translation2d& other) {
   m_x += other.m_x;
   m_y += other.m_y;
+  return *this;
 }
 
 Translation2d Translation2d::operator-(const Translation2d& other) const {
   return *this + -other;
 }
 
-void Translation2d::operator-=(const Translation2d& other) { *this += -other; }
+Translation2d& Translation2d::operator-=(const Translation2d& other) {
+  *this += -other;
+  return *this;
+}
 
 Translation2d Translation2d::operator-() const { return {-m_x, -m_y}; }
 
@@ -46,13 +50,17 @@ Translation2d Translation2d::operator*(const double scalar) const {
   return {scalar * m_x, scalar * m_y};
 }
 
-void Translation2d::operator*=(const double scalar) {
+Translation2d& Translation2d::operator*=(const double scalar) {
   m_x *= scalar;
   m_y *= scalar;
+  return *this;
 }
 
 Translation2d Translation2d::operator/(const double scalar) const {
   return *this * (1.0 / scalar);
 }
 
-void Translation2d::operator/=(const double scalar) { *this *= (1.0 / scalar); }
+Translation2d& Translation2d::operator/=(const double scalar) {
+  *this *= (1.0 / scalar);
+  return *this;
+}

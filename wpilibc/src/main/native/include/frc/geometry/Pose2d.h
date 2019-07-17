@@ -51,7 +51,7 @@ class Pose2d {
    * This is similar to the + operator, except that it mutates the current
    * object.
    */
-  void operator+=(const Transform2d& other);
+  Pose2d& operator+=(const Transform2d& other);
 
   /**
    * Returns the underlying translation.

@@ -53,7 +53,7 @@ class Rotation2d {
    * This is similar to the + operator except that it mutates the current
    * object.
    */
-  void operator+=(const Rotation2d& other);
+  Rotation2d& operator+=(const Rotation2d& other);
 
   /**
    * Subtracts the new rotation from the current rotation and returns the new
@@ -70,7 +70,7 @@ class Rotation2d {
    * This is similar to the - operator except that it mutates the current
    * object.
    */
-  void operator-=(const Rotation2d& other);
+  Rotation2d& operator-=(const Rotation2d& other);
 
   /**
    * Takes the inverse of the current rotation. This is simply the negative of
