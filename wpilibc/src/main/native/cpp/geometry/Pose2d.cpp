@@ -33,7 +33,7 @@ Pose2d Pose2d::TransformBy(const Transform2d& other) const {
 }
 
 Pose2d Pose2d::RelativeTo(const Pose2d& other) const {
-  const auto transform = Transform2d(other, *this);
+  const Transform2d transform{other, *this};
   return {transform.Translation(), transform.Rotation()};
 }
 
