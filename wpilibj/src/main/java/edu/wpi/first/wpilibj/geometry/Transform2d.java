@@ -18,7 +18,10 @@ public class Transform2d {
    * Constructs the transform that maps the initial pose to the final pose.
    */
   public Transform2d(Pose2d initial, Pose2d last) {
+    m_translation = (last.getTranslation().minus(initial.getTranslation())
+            .RotateBy(initial.getRotation().unaryMinus()));
 
+    m_rotation = last.getRotation().minus(initial.getRotation());
   }
 
   /**
@@ -44,7 +47,7 @@ public class Transform2d {
     return m_translation;
   }
 
-   /**
+  /**
    * Returns the rotational component of the transformation.
    */
   public Rotation2d getRotation() {
