@@ -22,7 +22,7 @@ class Pose2d {
    * Constructs a pose at the origin facing toward the positive X axis.
    * (Translation2d{0, 0} and Rotation{0})
    */
-  Pose2d();
+  Pose2d() = default;
 
   /**
    * Constructs a pose with the specified translation and rotation.
