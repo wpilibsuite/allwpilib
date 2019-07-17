@@ -35,6 +35,7 @@ public class Pose2d {
    * Convenience constructors that takes in x and y values directly instead of
    * having to construct a Translation2d.
    */
+  @SuppressWarnings("ParameterName")
   public Pose2d(double x, double y, Rotation2d rotation) {
     m_translation = new Translation2d(x, y);
     m_rotation = rotation;
@@ -43,7 +44,8 @@ public class Pose2d {
   /**
    * Transforms the pose by the given transformation and returns the new
    * transformed pose.
-   * <p>
+   *
+   * <p>The matrix multiplication is as follows
    * [x_new] += [cos, -sin, 0][transform.x]
    * [y_new] += [sin,  cos, 0][transform.y]
    * [t_new] += [0,    0,   1][transform.t]
@@ -71,14 +73,14 @@ public class Pose2d {
    * See + operator for the matrix multiplication performed.
    */
   Pose2d transformBy(Transform2d other) {
-    return new Pose2d(m_translation.plus(other.getTranslation().RotateBy(m_rotation)),
+    return new Pose2d(m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
             m_rotation.plus(other.getRotation()));
   }
 
   /**
    * Returns the other pose relative to the current pose.
-   * <p>
-   * This function can often be used for trajectory tracking or pose
+   *
+   * <p>This function can often be used for trajectory tracking or pose
    * stabilization algorithms to get the error between the reference and the
    * current pose.
    */
@@ -89,17 +91,21 @@ public class Pose2d {
 
   /**
    * Obtain a new Pose2d from a (constant curvature) velocity.
-   * <p>
-   * See <https://file.tavsys.net/control/state-space-guide.pdf> section on
-   * nonlinear pose estimation for derivation.
+   *
+   * <p>See <a href="https://file.tavsys.net/control/state-space-guide.pdf"></a>
+   * section on nonlinear pose estimation for derivation.
    */
+  @SuppressWarnings("LocalVariableName")
   Pose2d exp(Twist2d twist) {
-    double dx = twist.dx, dy = twist.dy, dtheta = twist.dtheta;
+    double dx = twist.dx;
+    double dy = twist.dy;
+    double dtheta = twist.dtheta;
 
     double sinTheta = Math.sin(dtheta);
     double cosTheta = Math.cos(dtheta);
 
-    double s, c;
+    double s;
+    double c;
     if (Math.abs(dtheta) < 1E-9) {
       s = 1.0 - 1.0 / 6.0 * dtheta * dtheta;
       c = 0.5 * dtheta;
@@ -107,7 +113,8 @@ public class Pose2d {
       s = sinTheta / dtheta;
       c = (1 - cosTheta) / dtheta;
     }
-    Transform2d transform = new Transform2d(new Translation2d(dx * s - dy * c, dx * c + dy * s), new Rotation2d(cosTheta, sinTheta));
+    Transform2d transform = new Transform2d(new Translation2d(dx * s - dy * c, dx * c + dy * s),
+            new Rotation2d(cosTheta, sinTheta));
 
     return this.plus(transform);
   }

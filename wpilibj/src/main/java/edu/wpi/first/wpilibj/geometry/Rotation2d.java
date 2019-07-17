@@ -38,6 +38,7 @@ public class Rotation2d {
    * Constructs a Rotation2d with the given x and y (cosine and sine)
    * components.
    */
+  @SuppressWarnings("ParameterName")
   public Rotation2d(double x, double y) {
     double magnitude = Math.hypot(x, y);
     if (magnitude > 1e-6) {
@@ -53,15 +54,15 @@ public class Rotation2d {
   /**
    * Constructs and returns a Rotation2d with the given degree value.
    */
-  static Rotation2d FromDegrees(double degrees) {
+  static Rotation2d fromDegrees(double degrees) {
     return new Rotation2d(Math.toDegrees(degrees));
   }
 
   /**
    * Adds two rotations together, with the result being bounded between -kPi and
    * kPi.
-   * <p>
-   * For example, Rotation2d.FromDegrees(30) + Rotation2d.FromDegrees(60) =
+   *
+   * <p>For example, Rotation2d.fromDegrees(30) + Rotation2d.fromDegrees(60) =
    * Rotation2d{-kPi/2}
    */
   Rotation2d plus(Rotation2d other) {
@@ -71,8 +72,8 @@ public class Rotation2d {
   /**
    * Subtracts the new rotation from the current rotation and returns the new
    * rotation.
-   * <p>
-   * For example, Rotation2d.FromDegrees(10) - Rotation2d.FromDegrees(100) =
+   *
+   * <p>For example, Rotation2d.fromDegrees(10) - Rotation2d.fromDegrees(100) =
    * Rotation2d{-kPi/2}
    */
   Rotation2d minus(Rotation2d other) {
@@ -89,10 +90,10 @@ public class Rotation2d {
 
   /**
    * Adds the new rotation to the current rotation using a rotation matrix.
-   * <p>
+   *
+   * <p>The matrix multiplication is as follows:
    * [cos_new] = [other.cos, -other.sin][cos]
    * [sin_new] = [other.sin,  other.cos][sin]
-   * <p>
    * value_new = atan2(cos_new, sin_new)
    */
   Rotation2d rotateBy(Rotation2d other) {
