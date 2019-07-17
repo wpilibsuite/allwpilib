@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "Translation2d.h"
 #include "Transform2d.h"
+#include "Translation2d.h"
 #include "Twist2d.h"
 
 namespace frc {

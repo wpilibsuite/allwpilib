@@ -84,7 +84,7 @@ class Rotation2d {
    * [cos_new] = [other.cos, -other.sin][cos]
    * [sin_new] = [other.sin,  other.cos][sin]
    *
-   * value_new = atan2(cos_new, sin_new)
+   * value_new = std::atan2(cos_new, sin_new)
    *
    */
   Rotation2d RotateBy(const Rotation2d& other) const;

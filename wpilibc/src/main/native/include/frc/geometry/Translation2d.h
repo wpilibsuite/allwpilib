@@ -36,7 +36,7 @@ class Translation2d {
    * Calculates the distance between two translations in 2d space.
    *
    * This function uses the pythagorean theorem to calculate the distance.
-   * distance = sqrt((x2 - x1)^2 + (y2 - y1)^2)
+   * distance = std::sqrt((x2 - x1)^2 + (y2 - y1)^2)
    */
   double Distance(const Translation2d& other) const;
 
