@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <cmath>
+
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform2d.h"
 #include "gtest/gtest.h"
-
-#include <cmath>
 
 TEST(GeometryTest, TransformTests) {
   const frc::Pose2d initial{

@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "frc/geometry/Rotation2d.h"
+
 #include <cmath>
 
 using namespace frc;

@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "frc/geometry/Translation2d.h"
+
 #include <cmath>
 
 using namespace frc;
