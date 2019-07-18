@@ -37,8 +37,10 @@ Rotation2d Rotation2d::operator+(const Rotation2d& other) const {
 }
 
 Rotation2d& Rotation2d::operator+=(const Rotation2d& other) {
-  m_cos = Cos() * other.Cos() - Sin() * other.Sin();
-  m_sin = Cos() * other.Sin() + Sin() * other.Cos();
+  double cos = Cos() * other.Cos() - Sin() * other.Sin();
+  double sin = Cos() * other.Sin() + Sin() * other.Cos();
+  m_cos = cos;
+  m_sin = sin;
   m_value = std::atan2(m_sin, m_cos);
   return *this;
 }
