@@ -99,5 +99,7 @@ public class GeometryTest {
     assertNear(diagonalPose.getTranslation().getX(), 2.0, kEpsilon);
     assertNear(diagonalPose.getTranslation().getY(), 2.0, kEpsilon);
     assertNear(diagonalPose.getRotation().getDegrees(), 0.0, kEpsilon);
+
+    assertNear(diagonalPose.getTranslation().getNorm(), 2.0 * Math.sqrt(2.0), kEpsilon);
   }
 }
