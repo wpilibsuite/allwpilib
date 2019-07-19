@@ -12,9 +12,9 @@ package edu.wpi.first.wpilibj.geometry;
  * (cosine and sine).
  */
 public class Rotation2d {
-  private double m_value;
-  private double m_cos;
-  private double m_sin;
+  private final double m_value;
+  private final double m_cos;
+  private final double m_sin;
 
   /**
    * Constructs a Rotation2d with a default angle of 0 degrees.

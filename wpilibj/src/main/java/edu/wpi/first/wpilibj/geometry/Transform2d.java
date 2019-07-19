@@ -11,8 +11,8 @@ package edu.wpi.first.wpilibj.geometry;
  * Represents a transformation for a Pose2d.
  */
 public class Transform2d {
-  private Translation2d m_translation;
-  private Rotation2d m_rotation;
+  private final Translation2d m_translation;
+  private final Rotation2d m_rotation;
 
   /**
    * Constructs the transform that maps the initial pose to the final pose.

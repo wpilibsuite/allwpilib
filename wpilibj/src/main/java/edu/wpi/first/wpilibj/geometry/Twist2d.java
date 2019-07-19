@@ -19,15 +19,15 @@ public class Twist2d {
   /**
    * Linear "dx" component.
    */
-  public double dx = 0.0;
+  public double dx;
 
   /**
    * Linear "dy" component.
    */
-  public double dy = 0.0;
+  public double dy;
 
   /**
    * Angular "dtheta" component (radians).
    */
-  public double dtheta = 0.0;
+  public double dtheta;
 }
