@@ -42,7 +42,7 @@ class Translation2d {
    * distance = std::sqrt((x2 - x1)^2 + (y2 - y1)^2)
    *
    * @param other The translation to compute the distance to.
-   * 
+   *
    * @return The distance between the two translations.
    */
   double Distance(const Translation2d& other) const;
