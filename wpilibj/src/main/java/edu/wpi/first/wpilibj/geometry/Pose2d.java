@@ -25,6 +25,9 @@ public class Pose2d {
 
   /**
    * Constructs a pose with the specified translation and rotation.
+   *
+   * @param translation The translational component of the pose.
+   * @param rotation    The rotational component of the pose.
    */
   public Pose2d(Translation2d translation, Rotation2d rotation) {
     m_translation = translation;
@@ -34,6 +37,10 @@ public class Pose2d {
   /**
    * Convenience constructors that takes in x and y values directly instead of
    * having to construct a Translation2d.
+   *
+   * @param x        The x component of the translational component of the pose.
+   * @param y        The y component of the translational component of the pose.
+   * @param rotation The rotational component of the pose.
    */
   @SuppressWarnings("ParameterName")
   public Pose2d(double x, double y, Rotation2d rotation) {
@@ -49,6 +56,9 @@ public class Pose2d {
    * [x_new] += [cos, -sin, 0][transform.x]
    * [y_new] += [sin,  cos, 0][transform.y]
    * [t_new] += [0,    0,   1][transform.t]
+   *
+   * @param other The transform to transform the pose by.
+   * @return The transformed pose.
    */
   public Pose2d plus(Transform2d other) {
     return transformBy(other);
@@ -56,6 +66,8 @@ public class Pose2d {
 
   /**
    * Returns the translation component of the transformation.
+   *
+   * @return The translational component of the pose.
    */
   public Translation2d getTranslation() {
     return m_translation;
@@ -63,6 +75,8 @@ public class Pose2d {
 
   /**
    * Returns the rotational component of the transformation.
+   *
+   * @return The rotational component of the pose.
    */
   public Rotation2d getRotation() {
     return m_rotation;
@@ -71,6 +85,9 @@ public class Pose2d {
   /**
    * Transforms the pose by the given transformation and returns the new pose.
    * See + operator for the matrix multiplication performed.
+   *
+   * @param other The transform to transform the pose by.
+   * @return The transformed pose.
    */
   public Pose2d transformBy(Transform2d other) {
     return new Pose2d(m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
@@ -83,6 +100,10 @@ public class Pose2d {
    * <p>This function can often be used for trajectory tracking or pose
    * stabilization algorithms to get the error between the reference and the
    * current pose.
+   *
+   * @param other The pose that is the origin of the new coordinate frame that
+   *              the current pose will be converted into.
+   * @return The current pose relative to the new origin pose.
    */
   public Pose2d relativeTo(Pose2d other) {
     var transform = new Transform2d(other, this);
@@ -94,6 +115,17 @@ public class Pose2d {
    *
    * <p>See <a href="https://file.tavsys.net/control/state-space-guide.pdf"></a>
    * section on nonlinear pose estimation for derivation.
+   *
+   * <p>The twist is a change in pose in the robot's coordinate frame since the
+   * previous pose update. When the user runs exp() on the previous known
+   * field-relative pose with the argument being the twist, the user will
+   * receive the new field-relative pose.
+   *
+   * @param twist The change in pose in the robot's coordinate frame since the
+   *              previous pose update. For example, if a non-holonomic robot moves forward
+   *              0.01 meters and changes angle by .5 degrees since the previous pose update,
+   *              the twist would be Twist2d{0.01, 0.0, toRadians(0.5)}
+   * @return The new pose of the robot.
    */
   @SuppressWarnings("LocalVariableName")
   public Pose2d exp(Twist2d twist) {

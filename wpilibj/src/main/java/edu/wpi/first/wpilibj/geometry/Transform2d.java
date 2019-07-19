@@ -16,6 +16,9 @@ public class Transform2d {
 
   /**
    * Constructs the transform that maps the initial pose to the final pose.
+   *
+   * @param initial The initial pose for the transformation.
+   * @param last    The final pose for the transformation.
    */
   public Transform2d(Pose2d initial, Pose2d last) {
     m_translation = last.getTranslation().minus(initial.getTranslation())
@@ -26,6 +29,9 @@ public class Transform2d {
 
   /**
    * Constructs a transform with the given translation and rotation components.
+   *
+   * @param translation Translational component of the transform.
+   * @param rotation    Rotational component of the transform.
    */
   public Transform2d(Translation2d translation, Rotation2d rotation) {
     m_translation = translation;
@@ -42,6 +48,8 @@ public class Transform2d {
 
   /**
    * Returns the translation component of the transformation.
+   *
+   * @return The translational component of the transform.
    */
   public Translation2d getTranslation() {
     return m_translation;
@@ -49,6 +57,8 @@ public class Transform2d {
 
   /**
    * Returns the rotational component of the transformation.
+   *
+   * @return Reference to the rotational component of the transform.
    */
   public Rotation2d getRotation() {
     return m_rotation;

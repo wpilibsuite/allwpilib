@@ -27,6 +27,9 @@ public class Rotation2d {
 
   /**
    * Constructs a Rotation2d with the given radian value.
+   * The x and y don't have to be normalized.
+   *
+   * @param value The value of the angle in radians.
    */
   public Rotation2d(double value) {
     m_value = value;
@@ -37,6 +40,9 @@ public class Rotation2d {
   /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)
    * components.
+   *
+   * @param x The x component or cosine of the rotation.
+   * @param y The y component or sine of the rotation.
    */
   @SuppressWarnings("ParameterName")
   public Rotation2d(double x, double y) {
@@ -53,6 +59,9 @@ public class Rotation2d {
 
   /**
    * Constructs and returns a Rotation2d with the given degree value.
+   *
+   * @param degrees The value of the angle in degrees.
+   * @return The rotation object with the desired angle value.
    */
   public static Rotation2d fromDegrees(double degrees) {
     return new Rotation2d(Math.toRadians(degrees));
@@ -64,6 +73,9 @@ public class Rotation2d {
    *
    * <p>For example, Rotation2d.fromDegrees(30) + Rotation2d.fromDegrees(60) =
    * Rotation2d{-kPi/2}
+   *
+   * @param other The rotation to add.
+   * @return The sum of the two rotations.
    */
   public Rotation2d plus(Rotation2d other) {
     return rotateBy(other);
@@ -75,6 +87,9 @@ public class Rotation2d {
    *
    * <p>For example, Rotation2d.fromDegrees(10) - Rotation2d.fromDegrees(100) =
    * Rotation2d{-kPi/2}
+   *
+   * @param other The rotation to subtract.
+   * @return The difference between the two rotations.
    */
   public Rotation2d minus(Rotation2d other) {
     return rotateBy(other.unaryMinus());
@@ -83,6 +98,8 @@ public class Rotation2d {
   /**
    * Takes the inverse of the current rotation. This is simply the negative of
    * the current angular value.
+   *
+   * @return The inverse of the current rotation.
    */
   public Rotation2d unaryMinus() {
     return new Rotation2d(-m_value);
@@ -95,6 +112,9 @@ public class Rotation2d {
    * [cos_new] = [other.cos, -other.sin][cos]
    * [sin_new] = [other.sin,  other.cos][sin]
    * value_new = atan2(cos_new, sin_new)
+   *
+   * @param other The rotation to rotate by.
+   * @return The new rotated Rotation2d.
    */
   public Rotation2d rotateBy(Rotation2d other) {
     return new Rotation2d(
@@ -105,6 +125,8 @@ public class Rotation2d {
 
   /*
    * Returns the radian value of the rotation.
+   *
+   * @return The radian value of the rotation.
    */
   public double getRadians() {
     return m_value;
@@ -112,6 +134,8 @@ public class Rotation2d {
 
   /**
    * Returns the degree value of the rotation.
+   *
+   * @return The degree value of the rotation.
    */
   public double getDegrees() {
     return Math.toDegrees(m_value);
@@ -119,6 +143,8 @@ public class Rotation2d {
 
   /**
    * Returns the cosine of the rotation.
+   *
+   * @return The cosine of the rotation.
    */
   public double getCos() {
     return m_cos;
@@ -126,6 +152,8 @@ public class Rotation2d {
 
   /**
    * Returns the sine of the rotation.
+   *
+   * @return The sine of the rotation.
    */
   public double getSin() {
     return m_sin;
@@ -133,6 +161,8 @@ public class Rotation2d {
 
   /**
    * Returns the tangent of the rotation.
+   *
+   * @return The tangent of the rotation.
    */
   public double getTan() {
     return m_sin / m_cos;
