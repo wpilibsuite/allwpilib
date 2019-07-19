@@ -19,16 +19,16 @@ struct Twist2d {
   /**
    * Linear "dx" component
    */
-  double dx;
+  double dx = 0;
 
   /**
    * Linear "dy" component
    */
-  double dy;
+  double dy = 0;
 
   /**
    * Angular "dtheta" component (radians)
    */
-  double dtheta;
+  double dtheta = 0;
 };
 }  // namespace frc
