@@ -18,7 +18,7 @@ class Rotation2d {
   /**
    * Constructs a Rotation2d with a default angle of 0 degrees.
    */
-  Rotation2d();
+  constexpr Rotation2d() = default;
 
   /**
    * Constructs a Rotation2d with the given radian value.
@@ -153,9 +153,9 @@ class Rotation2d {
   double Tan() const { return m_sin / m_cos; }
 
  private:
-  double m_value;
-  double m_cos;
-  double m_sin;
+  double m_value = 0;
+  double m_cos = 1;
+  double m_sin = 0;
 
   constexpr static double kPi = 3.14159265358979323846;
 

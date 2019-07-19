@@ -24,7 +24,7 @@ class Translation2d {
   /**
    * Constructs a Translation2d with X and Y components equal to zero.
    */
-  Translation2d() = default;
+  constexpr Translation2d() = default;
 
   /**
    * Constructs a Translation2d with the X and Y components equal to the
@@ -190,7 +190,7 @@ class Translation2d {
   Translation2d& operator/=(double scalar);
 
  private:
-  double m_x;
-  double m_y;
+  double m_x = 0;
+  double m_y = 0;
 };
 }  // namespace frc

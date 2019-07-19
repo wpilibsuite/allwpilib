@@ -11,8 +11,6 @@
 
 using namespace frc;
 
-Rotation2d::Rotation2d() : m_value(0.0), m_cos(1.0), m_sin(0.0) {}
-
 Rotation2d::Rotation2d(double value)
     : m_value(value), m_cos(std::cos(value)), m_sin(std::sin(value)) {}
 

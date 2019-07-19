@@ -37,7 +37,7 @@ class Transform2d {
   /**
    * Constructs the identity transform -- maps an initial pose to itself.
    */
-  Transform2d() = default;
+  constexpr Transform2d() = default;
 
   /**
    * Returns the translation component of the transformation.
