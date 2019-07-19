@@ -54,7 +54,7 @@ public class Rotation2d {
   /**
    * Constructs and returns a Rotation2d with the given degree value.
    */
-  static Rotation2d fromDegrees(double degrees) {
+  public static Rotation2d fromDegrees(double degrees) {
     return new Rotation2d(Math.toDegrees(degrees));
   }
 
@@ -65,7 +65,7 @@ public class Rotation2d {
    * <p>For example, Rotation2d.fromDegrees(30) + Rotation2d.fromDegrees(60) =
    * Rotation2d{-kPi/2}
    */
-  Rotation2d plus(Rotation2d other) {
+  public Rotation2d plus(Rotation2d other) {
     return rotateBy(other);
   }
 
@@ -76,7 +76,7 @@ public class Rotation2d {
    * <p>For example, Rotation2d.fromDegrees(10) - Rotation2d.fromDegrees(100) =
    * Rotation2d{-kPi/2}
    */
-  Rotation2d minus(Rotation2d other) {
+  public Rotation2d minus(Rotation2d other) {
     return rotateBy(other.unaryMinus());
   }
 
@@ -84,7 +84,7 @@ public class Rotation2d {
    * Takes the inverse of the current rotation. This is simply the negative of
    * the current angular value.
    */
-  Rotation2d unaryMinus() {
+  public Rotation2d unaryMinus() {
     return new Rotation2d(-m_value);
   }
 
@@ -96,7 +96,7 @@ public class Rotation2d {
    * [sin_new] = [other.sin,  other.cos][sin]
    * value_new = atan2(cos_new, sin_new)
    */
-  Rotation2d rotateBy(Rotation2d other) {
+  public Rotation2d rotateBy(Rotation2d other) {
     return new Rotation2d(
             m_cos * other.m_cos - m_sin * other.m_sin,
             m_cos * other.m_sin + m_sin * other.m_cos
@@ -106,35 +106,35 @@ public class Rotation2d {
   /*
    * Returns the radian value of the rotation.
    */
-  double getRadians() {
+  public double getRadians() {
     return m_value;
   }
 
   /**
    * Returns the degree value of the rotation.
    */
-  double getDegrees() {
+  public double getDegrees() {
     return Math.toDegrees(m_value);
   }
 
   /**
    * Returns the cosine of the rotation.
    */
-  double getCos() {
+  public double getCos() {
     return m_cos;
   }
 
   /**
    * Returns the sine of the rotation.
    */
-  double getSin() {
+  public double getSin() {
     return m_sin;
   }
 
   /**
    * Returns the tangent of the rotation.
    */
-  double getTan() {
+  public double getTan() {
     return m_sin / m_cos;
   }
 }

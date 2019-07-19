@@ -50,7 +50,7 @@ public class Pose2d {
    * [y_new] += [sin,  cos, 0][transform.y]
    * [t_new] += [0,    0,   1][transform.t]
    */
-  Pose2d plus(Transform2d other) {
+  public Pose2d plus(Transform2d other) {
     return transformBy(other);
   }
 
@@ -72,7 +72,7 @@ public class Pose2d {
    * Transforms the pose by the given transformation and returns the new pose.
    * See + operator for the matrix multiplication performed.
    */
-  Pose2d transformBy(Transform2d other) {
+  public Pose2d transformBy(Transform2d other) {
     return new Pose2d(m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
             m_rotation.plus(other.getRotation()));
   }
@@ -84,7 +84,7 @@ public class Pose2d {
    * stabilization algorithms to get the error between the reference and the
    * current pose.
    */
-  Pose2d relativeTo(Pose2d other) {
+  public Pose2d relativeTo(Pose2d other) {
     var transform = new Transform2d(other, this);
     return new Pose2d(transform.getTranslation(), transform.getRotation());
   }
@@ -96,7 +96,7 @@ public class Pose2d {
    * section on nonlinear pose estimation for derivation.
    */
   @SuppressWarnings("LocalVariableName")
-  Pose2d exp(Twist2d twist) {
+  public Pose2d exp(Twist2d twist) {
     double dx = twist.dx;
     double dy = twist.dy;
     double dtheta = twist.dtheta;

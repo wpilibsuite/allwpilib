@@ -41,28 +41,28 @@ public class Translation2d {
    * <p>This function uses the pythagorean theorem to calculate the distance.
    * distance = sqrt((x2 - x1)^2 + (y2 - y1)^2)
    */
-  double getDistance(Translation2d other) {
+  public double getDistance(Translation2d other) {
     return Math.hypot(other.m_x - m_x, other.m_y - m_y);
   }
 
   /*
    * Returns the X component of the translation.
    */
-  double getX() {
+  public double getX() {
     return m_x;
   }
 
   /*
    * Returns the Y component of the translation.
    */
-  double getY() {
+  public double getY() {
     return m_y;
   }
 
   /*
    * Returns the norm, or distance from the origin to the translation.
    */
-  double getNorm() {
+  public double getNorm() {
     return Math.hypot(m_x, m_y);
   }
 
@@ -78,7 +78,7 @@ public class Translation2d {
    * For example, rotating a Translation2d of {2, 0} by 90 degrees will return a
    * Translation2d of {0, 2}.
    */
-  Translation2d rotateBy(Rotation2d other) {
+  public Translation2d rotateBy(Rotation2d other) {
     return new Translation2d(
             m_x * other.getCos() - m_y * other.getSin(),
             m_x * other.getSin() + m_y * other.getCos()
@@ -92,7 +92,7 @@ public class Translation2d {
    * For example, Translation2d{1.0, 2.5} + Translation2d{2.0, 5.5} =
    * Translation2d{3.0, 8.0}
    */
-  Translation2d plus(Translation2d other) {
+  public Translation2d plus(Translation2d other) {
     return new Translation2d(m_x + other.m_x, m_y + other.m_y);
   }
 
@@ -103,7 +103,7 @@ public class Translation2d {
    * <p>For example, Translation2d{5.0, 4.0} - Translation2d{1.0, 2.0} =
    * Translation2d{4.0, 2.0}
    */
-  Translation2d minus(Translation2d other) {
+  public Translation2d minus(Translation2d other) {
     return new Translation2d(m_x - other.m_x, m_y - other.m_y);
   }
 
@@ -112,7 +112,7 @@ public class Translation2d {
    * rotating by 180 degrees, flipping the point over both axes, or simply
    * negating both components of the translation.
    */
-  Translation2d unaryMinus() {
+  public Translation2d unaryMinus() {
     return new Translation2d(-m_x, m_y);
   }
 
@@ -121,7 +121,7 @@ public class Translation2d {
    *
    * <p>For example, Translation2d{2.0, 2.5} * 2 = Translation2d{4.0, 5.0}
    */
-  Translation2d times(double scalar) {
+  public Translation2d times(double scalar) {
     return new Translation2d(m_x * scalar, m_y * scalar);
   }
 
@@ -130,7 +130,7 @@ public class Translation2d {
    *
    * <p>For example, Translation2d{2.0, 2.5} / 2 = Translation2d{1.0, 1.25}
    */
-  Translation2d div(double scalar) {
+  public Translation2d div(double scalar) {
     return new Translation2d(m_x / scalar, m_y / scalar);
   }
 }
