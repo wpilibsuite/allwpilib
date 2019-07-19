@@ -160,12 +160,12 @@ class Rotation2d {
   constexpr static double kPi = 3.14159265358979323846;
 
   template <typename T>
-  static constexpr T Rad2Deg(const T& rad) {
+  static T Rad2Deg(const T& rad) {
     return rad * 180.0 / kPi;
   }
 
   template <typename T>
-  static constexpr T Deg2Rad(const T& deg) {
+  static T Deg2Rad(const T& deg) {
     return deg * kPi / 180.0;
   }
 };
