@@ -30,4 +30,19 @@ public class Twist2d {
    * Angular "dtheta" component (radians).
    */
   public double dtheta;
+
+  public Twist2d() {
+  }
+
+  /**
+   * Constructs a Twist2d with the given values.
+   * @param dx Change in x direction relative to robot.
+   * @param dy Change in y direction relative to robot.
+   * @param dtheta Change in angle relative to robot.
+   */
+  public Twist2d(double dx, double dy, double dtheta) {
+    this.dx = dx;
+    this.dy = dy;
+    this.dtheta = dtheta;
+  }
 }
