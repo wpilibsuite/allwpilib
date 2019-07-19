@@ -24,7 +24,7 @@ class Rotation2d {
 
   /**
    * Constructs a Rotation2d with the given radian value.
-   * 
+   *
    * @param value The value of the angle in radians.
    */
   explicit Rotation2d(double value);
@@ -32,7 +32,7 @@ class Rotation2d {
   /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)
    * components. The x and y don't have to be normalized.
-   * 
+   *
    * @param x The x component or cosine of the rotation.
    * @param y The y component or sine of the rotation.
    */
@@ -40,9 +40,9 @@ class Rotation2d {
 
   /**
    * Constructs and returns a Rotation2d with the given degree value.
-   * 
+   *
    * @param degrees The value of the angle in degrees.
-   * 
+   *
    * @return The rotation object with the desired angle value.
    */
   static Rotation2d FromDegrees(double degrees);
@@ -53,9 +53,9 @@ class Rotation2d {
    *
    * For example, Rotation2d.FromDegrees(30) + Rotation2d.FromDegrees(60) =
    * Rotation2d{-kPi/2}
-   * 
+   *
    * @param other The rotation to add.
-   * 
+   *
    * @return The sum of the two rotations.
    */
   Rotation2d operator+(const Rotation2d& other) const;
@@ -65,9 +65,9 @@ class Rotation2d {
    *
    * This is similar to the + operator except that it mutates the current
    * object.
-   * 
+   *
    * @param other The rotation to add.
-   * 
+   *
    * @return The reference to the new mutated object.
    */
   Rotation2d& operator+=(const Rotation2d& other);
@@ -78,9 +78,9 @@ class Rotation2d {
    *
    * For example, Rotation2d.FromDegrees(10) - Rotation2d.FromDegrees(100) =
    * Rotation2d{-kPi/2}
-   * 
+   *
    * @param other The rotation to subtract.
-   * 
+   *
    * @return The difference between the two rotations.
    */
   Rotation2d operator-(const Rotation2d& other) const;
@@ -90,9 +90,9 @@ class Rotation2d {
    *
    * This is similar to the - operator except that it mutates the current
    * object.
-   * 
+   *
    * @param other The rotation to subtract.
-   * 
+   *
    * @return The reference to the new mutated object.
    */
   Rotation2d& operator-=(const Rotation2d& other);
@@ -100,7 +100,7 @@ class Rotation2d {
   /**
    * Takes the inverse of the current rotation. This is simply the negative of
    * the current angular value.
-   * 
+   *
    * @return The inverse of the current rotation.
    */
   Rotation2d operator-() const;
@@ -112,44 +112,44 @@ class Rotation2d {
    * [sin_new] = [other.sin,  other.cos][sin]
    *
    * value_new = std::atan2(cos_new, sin_new)
-   * 
+   *
    * @param other The rotation to rotate by.
-   * 
+   *
    * @return The new rotated Rotation2d.
    */
   Rotation2d RotateBy(const Rotation2d& other) const;
 
   /**
    * Returns the radian value of the rotation.
-   * 
+   *
    * @return The radian value of the rotation.
    */
   double Radians() const { return m_value; }
 
   /**
    * Returns the degree value of the rotation.
-   * 
+   *
    * @return The degree value of the rotation.
    */
   double Degrees() const { return Rad2Deg(m_value); }
 
   /**
    * Returns the cosine of the rotation.
-   * 
+   *
    * @return The cosine of the rotation.
    */
   double Cos() const { return m_cos; }
 
   /**
    * Returns the sine of the rotation.
-   * 
+   *
    * @return The sine of the rotation.
    */
   double Sin() const { return m_sin; }
 
   /**
    * Returns the tangent of the rotation.
-   * 
+   *
    * @return The tangent of the rotation.
    */
   double Tan() const { return m_sin / m_cos; }

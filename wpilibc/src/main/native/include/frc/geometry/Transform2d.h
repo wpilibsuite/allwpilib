@@ -20,7 +20,7 @@ class Transform2d {
  public:
   /**
    * Constructs the transform that maps the initial pose to the final pose.
-   * 
+   *
    * @param initial The initial pose for the transformation.
    * @param final The final pose for the transformation.
    */
@@ -28,7 +28,7 @@ class Transform2d {
 
   /**
    * Constructs a transform with the given translation and rotation components.
-   * 
+   *
    * @param translation Translational component of the transform.
    * @param rotation Rotational component of the transform.
    */
@@ -41,14 +41,14 @@ class Transform2d {
 
   /**
    * Returns the translation component of the transformation.
-   * 
+   *
    * @return Reference to the translational component of the transform.
    */
   const Translation2d& Translation() const { return m_translation; }
 
   /**
    * Returns the rotational component of the transformation.
-   * 
+   *
    * @return Reference to the rotational component of the transform.
    */
   const Rotation2d& Rotation() const { return m_rotation; }

@@ -17,7 +17,6 @@ package edu.wpi.first.wpilibj.geometry;
  */
 @SuppressWarnings({"ParameterName", "MemberName"})
 public class Translation2d {
-
   private double m_x;
   private double m_y;
 

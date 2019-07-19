@@ -51,11 +51,10 @@ TEST(GeometryTest, RotationTests) {
   EXPECT_NEAR(rot1.Radians(), 3.14159265358979323846 / 2.0, kTestEpsilon);
 
   auto sum = rot0 + rot1;
-  
+
   EXPECT_NEAR(sum.Degrees(), 90.0, kTestEpsilon);
 
   sum += frc::Rotation2d::FromDegrees(30.0);
 
   EXPECT_NEAR(sum.Degrees(), 120.0, kTestEpsilon);
-
 }
