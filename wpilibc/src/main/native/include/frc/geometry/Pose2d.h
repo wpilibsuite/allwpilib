@@ -117,6 +117,9 @@ class Pose2d {
    * field-relative pose with the argument being the twist, the user will
    * receive the new field-relative pose.
    *
+   * "Exp" represents the pose exponential, which is solving a differential
+   * equation moving the pose forward in time.
+   *
    * @param twist The change in pose in the robot's coordinate frame since the
    * previous pose update. For example, if a non-holonomic robot moves forward
    * 0.01 meters and changes angle by .5 degrees since the previous pose update,
