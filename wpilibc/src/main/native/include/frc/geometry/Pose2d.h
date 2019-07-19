@@ -26,12 +26,19 @@ class Pose2d {
 
   /**
    * Constructs a pose with the specified translation and rotation.
+   *
+   * @param translation The translational component of the pose.
+   * @param rotation The rotational component of the pose.
    */
   Pose2d(Translation2d translation, Rotation2d rotation);
 
   /**
    * Convenience constructors that takes in x and y values directly instead of
    * having to construct a Translation2d.
+   *
+   * @param x The x component of the translational component of the pose.
+   * @param y The y component of the translational component of the pose.
+   * @param rotation The rotational component of the pose.
    */
   Pose2d(double x, double y, Rotation2d rotation);
 
@@ -42,6 +49,10 @@ class Pose2d {
    * [x_new] += [cos, -sin, 0][transform.x]
    * [y_new] += [sin,  cos, 0][transform.y]
    * [t_new] += [0,    0,   1][transform.t]
+   *
+   * @param other The transform to transform the pose by.
+   *
+   * @return The transformed pose.
    */
   Pose2d operator+(const Transform2d& other) const;
 
@@ -50,22 +61,34 @@ class Pose2d {
    *
    * This is similar to the + operator, except that it mutates the current
    * object.
+   *
+   * @param other The transform to transform the pose by.
+   *
+   * @return Reference to the new mutated object.
    */
   Pose2d& operator+=(const Transform2d& other);
 
   /**
    * Returns the underlying translation.
+   *
+   * @return Reference to the translational component of the pose.
    */
   const Translation2d& Translation() const { return m_translation; }
 
   /**
    * Returns the underlying rotation.
+   *
+   * @return Reference to the rotational component of the pose.
    */
   const Rotation2d& Rotation() const { return m_rotation; }
 
   /**
    * Transforms the pose by the given transformation and returns the new pose.
    * See + operator for the matrix multiplication performed.
+   *
+   * @param other The transform to transform the pose by.
+   *
+   * @return The transformed pose.
    */
   Pose2d TransformBy(const Transform2d& other) const;
 
@@ -75,6 +98,11 @@ class Pose2d {
    * This function can often be used for trajectory tracking or pose
    * stabilization algorithms to get the error between the reference and the
    * current pose.
+   *
+   * @param other The pose that is the origin of the new coordinate frame that
+   * the current pose will be converted into.
+   *
+   * @return The current pose relative to the new origin pose.
    */
   Pose2d RelativeTo(const Pose2d& other) const;
 
@@ -88,6 +116,13 @@ class Pose2d {
    * previous pose update. When the user runs exp() on the previous known
    * field-relative pose with the argument being the twist, the user will
    * receive the new field-relative pose.
+   *
+   * @param twist The change in pose in the robot's coordinate frame since the
+   * previous pose update. For example, if a non-holonomic robot moves forward
+   * 0.01 meters and changes angle by .5 degrees since the previous pose update,
+   * the twist would be Twist2d{0.01, 0.0, toRadians(0.5)}
+   * 
+   * @return The new pose of the robot.
    */
   Pose2d Exp(const Twist2d& twist) const;
 

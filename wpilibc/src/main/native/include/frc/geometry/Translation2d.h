@@ -29,6 +29,9 @@ class Translation2d {
   /**
    * Constructs a Translation2d with the X and Y components equal to the
    * provided values.
+   *
+   * @param x The x component of the translation.
+   * @param y The y component of the translation.
    */
   Translation2d(double x, double y);
 
@@ -37,25 +40,33 @@ class Translation2d {
    *
    * This function uses the pythagorean theorem to calculate the distance.
    * distance = std::sqrt((x2 - x1)^2 + (y2 - y1)^2)
+   *
+   * @param other The translation to compute the distance to.
    */
   double Distance(const Translation2d& other) const;
 
-  /*
+  /**
    * Returns the X component of the translation.
+   *
+   * @return The x component of the translation.
    */
   double X() const { return m_x; }
 
-  /*
+  /**
    * Returns the Y component of the translation.
+   *
+   * @return The y component of the translation.
    */
   double Y() const { return m_y; }
 
-  /*
+  /**
    * Returns the norm, or distance from the origin to the translation.
+   *
+   * @return The norm of the translation.
    */
   double Norm() const;
 
-  /*
+  /**
    * Apply a rotation to the translation in 2d space.
    *
    * This multiplies the translation vector by a counterclockwise rotation
@@ -66,15 +77,23 @@ class Translation2d {
    *
    * For example, rotating a Translation2d of {2, 0} by 90 degrees will return a
    * Translation2d of {0, 2}.
+   *
+   * @param other The rotation to rotate the translation by.
+   *
+   * @return The new rotated translation.
    */
   Translation2d RotateBy(const Rotation2d& other) const;
 
-  /*
+  /**
    * Adds two translations in 2d space and returns the sum. This is similar to
    * vector addition.
    *
    * For example, Translation2d{1.0, 2.5} + Translation2d{2.0, 5.5} =
    * Translation2d{3.0, 8.0}
+   *
+   * @param other The translation to add.
+   *
+   * @return The sum of the translations.
    */
   Translation2d operator+(const Translation2d& other) const;
 
@@ -83,6 +102,10 @@ class Translation2d {
    *
    * This is similar to the + operator, except that the current object is
    * mutated.
+   * 
+   * @param other The translation to add.
+   * 
+   * @return The reference to the new mutated object.
    */
   Translation2d& operator+=(const Translation2d& other);
 
@@ -92,6 +115,10 @@ class Translation2d {
    *
    * For example, Translation2d{5.0, 4.0} - Translation2d{1.0, 2.0} =
    * Translation2d{4.0, 2.0}
+   * 
+   * @param other The translation to subtract.
+   * 
+   * @return The difference between the two translations.
    */
   Translation2d operator-(const Translation2d& other) const;
 
@@ -100,6 +127,10 @@ class Translation2d {
    *
    * This is similar to the - operator, except that the current object is
    * mutated.
+   * 
+   * @param other The translation to subtract.
+   * 
+   * @return The reference to the new mutated object.
    */
   Translation2d& operator-=(const Translation2d& other);
 
@@ -107,6 +138,8 @@ class Translation2d {
    * Returns the inverse of the current translation. This is equivalent to
    * rotating by 180 degrees, flipping the point over both axes, or simply
    * negating both components of the translation.
+   * 
+   * @return The inverse of the current translation.
    */
   Translation2d operator-() const;
 
@@ -114,13 +147,21 @@ class Translation2d {
    * Multiplies the translation by a scalar and returns the new translation.
    *
    * For example, Translation2d{2.0, 2.5} * 2 = Translation2d{4.0, 5.0}
+   * 
+   * @param scalar The scalar to multiply by.
+   * 
+   * @return The scaled translation.
    */
   Translation2d operator*(double scalar) const;
 
-  /*
+  /**
    * Multiplies the current translation by a scalar.
    *
    * This is similar to the * operator, except that current object is mutated.
+   * 
+   * @param scalar The scalar to multiply by.
+   * 
+   * @return The reference to the new mutated object.
    */
   Translation2d& operator*=(double scalar);
 
@@ -128,6 +169,10 @@ class Translation2d {
    * Divides the translation by a scalar and returns the new translation.
    *
    * For example, Translation2d{2.0, 2.5} / 2 = Translation2d{1.0, 1.25}
+   * 
+   * @param scalar The scalar to divide by.
+   * 
+   * @return The scaled translation.
    */
   Translation2d operator/(double scalar) const;
 
@@ -135,6 +180,10 @@ class Translation2d {
    * Divides the current translation by a scalar.
    *
    * This is similar to the / operator, except that current object is mutated.
+   * 
+   * @param scalar The scalar to divide by.
+   * 
+   * @return The reference to the new mutated object.
    */
   Translation2d& operator/=(double scalar);
 
