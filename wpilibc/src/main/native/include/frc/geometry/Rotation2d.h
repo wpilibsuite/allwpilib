@@ -9,8 +9,6 @@
 
 namespace frc {
 
-constexpr double kPi = 3.14159265358979323846;
-
 /**
  * A rotation in a 2d coordinate frame represented a point on the unit circle
  * (cosine and sine).
@@ -158,6 +156,8 @@ class Rotation2d {
   double m_value;
   double m_cos;
   double m_sin;
+
+  constexpr static double kPi = 3.14159265358979323846;
 
   template <typename T>
   static constexpr T Rad2Deg(const T& rad) {
