@@ -27,7 +27,7 @@ class Translation2dTest {
         () -> assertEquals(sum.getX(), 3.0, kEpsilon),
         () -> assertEquals(sum.getY(), 8.0, kEpsilon),
         () -> assertEquals(difference.getX(), -1.0, kEpsilon),
-        () -> assertEquals(difference.getX(), -1.0, kEpsilon)
+        () -> assertEquals(difference.getY(), -2.0, kEpsilon)
     );
   }
 

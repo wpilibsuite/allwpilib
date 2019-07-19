@@ -29,8 +29,7 @@ class Twist2dTest {
 
   @Test
   void testQuarterCirleTwist() {
-    Twist2d quarterCircle = new Twist2d(5.0 / 2.0 * 3.14159265358979323846, 0,
-        3.14159265358979323846 / 2.0);
+    Twist2d quarterCircle = new Twist2d(5.0 / 2.0 * Math.PI, 0, Math.PI / 2.0);
     var quarterCirclePose = new Pose2d().exp(quarterCircle);
 
     assertAll(
