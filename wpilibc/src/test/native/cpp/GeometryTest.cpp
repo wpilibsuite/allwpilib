@@ -58,3 +58,30 @@ TEST(GeometryTest, RotationTests) {
 
   EXPECT_NEAR(sum.Degrees(), 120.0, kTestEpsilon);
 }
+
+TEST(GeometryTest, TwistTests) {
+  const frc::Twist2d straight{5.0, 0.0, 0.0};
+  const auto straightPose = frc::Pose2d().Exp(straight);
+
+  EXPECT_NEAR(straightPose.Translation().X(), 5.0, kTestEpsilon);
+  EXPECT_NEAR(straightPose.Translation().Y(), 0.0, kTestEpsilon);
+  EXPECT_NEAR(straightPose.Rotation().Radians(), 0.0, kTestEpsilon);
+
+  const frc::Twist2d quarterCircle{5.0 / 2.0 * 3.14159265358979323846, 0,
+                                   3.14159265358979323846 / 2.0};
+  const auto quarterCirclePose = frc::Pose2d().Exp(quarterCircle);
+
+  EXPECT_NEAR(quarterCirclePose.Translation().X(), 5.0, kTestEpsilon);
+  EXPECT_NEAR(quarterCirclePose.Translation().Y(), 5.0, kTestEpsilon);
+  EXPECT_NEAR(quarterCirclePose.Rotation().Degrees(), 90.0, kTestEpsilon);
+
+  const frc::Twist2d diagonal{2.0, 2.0, 0.0};
+  const auto diagonalPose = frc::Pose2d().Exp(diagonal);
+
+  EXPECT_NEAR(diagonalPose.Translation().X(), 2.0, kTestEpsilon);
+  EXPECT_NEAR(diagonalPose.Translation().Y(), 2.0, kTestEpsilon);
+  EXPECT_NEAR(diagonalPose.Rotation().Degrees(), 0.0, kTestEpsilon);
+
+  EXPECT_NEAR(diagonalPose.Translation().Norm(), 2.0 * std::sqrt(2.0),
+              kTestEpsilon);
+}
