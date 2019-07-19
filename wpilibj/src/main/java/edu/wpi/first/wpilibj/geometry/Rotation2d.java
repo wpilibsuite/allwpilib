@@ -55,7 +55,7 @@ public class Rotation2d {
    * Constructs and returns a Rotation2d with the given degree value.
    */
   public static Rotation2d fromDegrees(double degrees) {
-    return new Rotation2d(Math.toDegrees(degrees));
+    return new Rotation2d(Math.toRadians(degrees));
   }
 
   /**
