@@ -135,7 +135,7 @@ public class Translation2d {
    * @return The inverse of the current translation.
    */
   public Translation2d unaryMinus() {
-    return new Translation2d(-m_x, m_y);
+    return new Translation2d(-m_x, -m_y);
   }
 
   /**
