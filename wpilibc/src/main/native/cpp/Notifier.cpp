@@ -17,7 +17,7 @@
 
 using namespace frc;
 
-Notifier::Notifier(TimerEventHandler handler) {
+Notifier::Notifier(std::function<void()> handler) {
   if (handler == nullptr)
     wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
   m_handler = handler;
@@ -33,7 +33,7 @@ Notifier::Notifier(TimerEventHandler handler) {
       uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
       if (curTime == 0 || status != 0) break;
 
-      TimerEventHandler handler;
+      std::function<void()> handler;
       {
         std::scoped_lock lock(m_processMutex);
         handler = m_handler;
@@ -90,7 +90,7 @@ Notifier& Notifier::operator=(Notifier&& rhs) {
   return *this;
 }
 
-void Notifier::SetHandler(TimerEventHandler handler) {
+void Notifier::SetHandler(std::function<void()> handler) {
   std::scoped_lock lock(m_processMutex);
   m_handler = handler;
 }
