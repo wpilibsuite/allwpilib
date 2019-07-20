@@ -16,16 +16,26 @@ class Translation2dTest {
   private static final double kEpsilon = 1E-9;
 
   @Test
-  void testSumAndDifference() {
+  void testSum() {
     Translation2d one = new Translation2d(1.0, 3.0);
     Translation2d two = new Translation2d(2.0, 5.0);
 
     var sum = one.plus(two);
-    var difference = one.minus(two);
 
     assertAll(
         () -> assertEquals(sum.getX(), 3.0, kEpsilon),
-        () -> assertEquals(sum.getY(), 8.0, kEpsilon),
+        () -> assertEquals(sum.getY(), 8.0, kEpsilon)
+    );
+  }
+
+  @Test
+  void testDifference() {
+    Translation2d one = new Translation2d(1.0, 3.0);
+    Translation2d two = new Translation2d(2.0, 5.0);
+
+    var difference = one.minus(two);
+
+    assertAll(
         () -> assertEquals(difference.getX(), -1.0, kEpsilon),
         () -> assertEquals(difference.getY(), -2.0, kEpsilon)
     );
@@ -43,14 +53,22 @@ class Translation2dTest {
   }
 
   @Test
-  void testScaling() {
+  void testMultiplication() {
     Translation2d original = new Translation2d(3.0, 5.0);
     var mult = original.times(3);
-    var div = original.div(2);
 
     assertAll(
         () -> assertEquals(mult.getX(), 9.0, kEpsilon),
-        () -> assertEquals(mult.getY(), 15.0, kEpsilon),
+        () -> assertEquals(mult.getY(), 15.0, kEpsilon)
+    );
+  }
+
+  @Test
+  void testDivision() {
+    Translation2d original = new Translation2d(3.0, 5.0);
+    var div = original.div(2);
+
+    assertAll(
         () -> assertEquals(div.getX(), 1.5, kEpsilon),
         () -> assertEquals(div.getY(), 2.5, kEpsilon)
     );

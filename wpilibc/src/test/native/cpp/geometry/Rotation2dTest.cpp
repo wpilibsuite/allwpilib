@@ -15,12 +15,20 @@ using namespace frc;
 static constexpr double kEpsilon = 1E-9;
 static constexpr double kPi = 3.14159265358979323846;
 
-TEST(Rotation2dTest, RadiansAndDegrees) {
+TEST(Rotation2dTest, RadiansToDegrees) {
+  const Rotation2d one{kPi / 3};
+  const Rotation2d two{kPi / 4};
+
+  EXPECT_NEAR(one.Degrees(), 60.0, kEpsilon);
+  EXPECT_NEAR(two.Degrees(), 45.0, kEpsilon);
+}
+
+TEST(Rotation2dTest, DegreesToRadians) {
   const auto one = Rotation2d::FromDegrees(45.0);
-  const Rotation2d two{kPi / 4.0};
+  const auto two = Rotation2d::FromDegrees(30.0);
 
   EXPECT_NEAR(one.Radians(), kPi / 4.0, kEpsilon);
-  EXPECT_NEAR(two.Degrees(), 45.0, kEpsilon);
+  EXPECT_NEAR(two.Radians(), kPi / 6.0, kEpsilon);
 }
 
 TEST(Rotation2dTest, RotateByFromZero) {

@@ -14,15 +14,22 @@ using namespace frc;
 
 static constexpr double kEpsilon = 1E-9;
 
-TEST(Translation2dTest, SumAndDifference) {
+TEST(Translation2dTest, Sum) {
   const Translation2d one{1.0, 3.0};
   const Translation2d two{2.0, 5.0};
 
   const auto sum = one + two;
-  const auto difference = one - two;
 
   EXPECT_NEAR(sum.X(), 3.0, kEpsilon);
   EXPECT_NEAR(sum.Y(), 8.0, kEpsilon);
+}
+
+TEST(Translation2dTest, Difference) {
+  const Translation2d one{1.0, 3.0};
+  const Translation2d two{2.0, 5.0};
+
+  const auto difference = one - two;
+
   EXPECT_NEAR(difference.X(), -1.0, kEpsilon);
   EXPECT_NEAR(difference.Y(), -2.0, kEpsilon);
 }
@@ -35,13 +42,18 @@ TEST(Translation2dTest, RotateBy) {
   EXPECT_NEAR(rotated.Y(), 3.0, kEpsilon);
 }
 
-TEST(Translation2dTest, Scaling) {
+TEST(Translation2dTest, Multiplication) {
   const Translation2d original{3.0, 5.0};
   const auto mult = original * 3;
-  const auto div = original / 2;
 
   EXPECT_NEAR(mult.X(), 9.0, kEpsilon);
   EXPECT_NEAR(mult.Y(), 15.0, kEpsilon);
+}
+
+TEST(Translation2d, Division) {
+  const Translation2d original{3.0, 5.0};
+  const auto div = original / 2;
+
   EXPECT_NEAR(div.X(), 1.5, kEpsilon);
   EXPECT_NEAR(div.Y(), 2.5, kEpsilon);
 }

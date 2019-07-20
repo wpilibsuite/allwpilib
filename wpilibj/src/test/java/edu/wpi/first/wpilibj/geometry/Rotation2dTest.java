@@ -16,13 +16,24 @@ class Rotation2dTest {
   private static final double kEpsilon = 1E-9;
 
   @Test
-  void testRadiansAndDegrees() {
-    Rotation2d one = Rotation2d.fromDegrees(45.0);
+  void testRadiansToDegrees() {
+    Rotation2d one = new Rotation2d(Math.PI / 3);
     Rotation2d two = new Rotation2d(Math.PI / 4);
 
     assertAll(
-        () -> assertEquals(one.getRadians(), Math.PI / 4, kEpsilon),
+        () -> assertEquals(one.getDegrees(), 60.0, kEpsilon),
         () -> assertEquals(two.getDegrees(), 45.0, kEpsilon)
+    );
+  }
+
+  @Test
+  void testRadiansAndDegrees() {
+    Rotation2d one = Rotation2d.fromDegrees(45.0);
+    Rotation2d two = Rotation2d.fromDegrees(30.0);
+
+    assertAll(
+        () -> assertEquals(one.getRadians(), Math.PI / 4, kEpsilon),
+        () -> assertEquals(two.getDegrees(), Math.PI / 6, kEpsilon)
     );
   }
 
