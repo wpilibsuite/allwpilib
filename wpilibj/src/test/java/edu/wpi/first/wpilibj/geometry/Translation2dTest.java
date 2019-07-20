@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class Translation2dTest {
-  private static double kEpsilon = 1E-9;
+  private static final double kEpsilon = 1E-9;
 
   @Test
   void testSumAndDifference() {
