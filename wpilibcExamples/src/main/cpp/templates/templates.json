@@ -43,5 +43,14 @@
     ],
     "foldername": "commandbased",
     "gradlebase": "cpp"
+  },
+  {
+    "name": "Command Robot (New)",
+    "description": "Command style",
+    "tags": [
+      "Command"
+    ],
+    "foldername": "commandbasednew",
+    "gradlebase": "cpp"
   }
 ]
