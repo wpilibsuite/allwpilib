@@ -69,7 +69,7 @@ class Translation2d {
   double Norm() const;
 
   /**
-   * Apply a rotation to the translation in 2d space.
+   * Applies a rotation to the translation in 2d space.
    *
    * This multiplies the translation vector by a counterclockwise rotation
    * matrix of the given angle.
