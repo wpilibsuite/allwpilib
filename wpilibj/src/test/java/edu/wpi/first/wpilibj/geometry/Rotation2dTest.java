@@ -33,7 +33,7 @@ class Rotation2dTest {
 
     assertAll(
         () -> assertEquals(one.getRadians(), Math.PI / 4, kEpsilon),
-        () -> assertEquals(two.getDegrees(), Math.PI / 6, kEpsilon)
+        () -> assertEquals(two.getRadians(), Math.PI / 6, kEpsilon)
     );
   }
 
