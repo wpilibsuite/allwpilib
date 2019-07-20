@@ -55,4 +55,12 @@ class Rotation2dTest {
 
     assertEquals(rot.getDegrees(), 120.0, kEpsilon);
   }
+
+  @Test
+  void testMinus() {
+    Rotation2d one = Rotation2d.fromDegrees(70.0);
+    Rotation2d two = Rotation2d.fromDegrees(30.0);
+
+    assertEquals(one.minus(two).getDegrees(), 40.0, kEpsilon);
+  }
 }

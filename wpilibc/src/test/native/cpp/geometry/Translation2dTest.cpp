@@ -68,3 +68,11 @@ TEST(Translation2dTest, Distance) {
   const Translation2d two{6, 6};
   EXPECT_NEAR(one.Distance(two), 5 * std::sqrt(2), kEpsilon);
 }
+
+TEST(Translation2dTest, UnaryMinus) {
+  const Translation2d original{-4.5, 7};
+  const auto inverted = -original;
+
+  EXPECT_NEAR(inverted.X(), 4.5, kEpsilon);
+  EXPECT_NEAR(inverted.Y(), -7, kEpsilon);
+}

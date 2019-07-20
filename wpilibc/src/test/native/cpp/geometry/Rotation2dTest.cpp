@@ -45,3 +45,10 @@ TEST(Rotation2dTest, RotateByNonZero) {
 
   EXPECT_NEAR(rot.Degrees(), 120.0, kEpsilon);
 }
+
+TEST(Rotation2dTest, Minus) {
+  const auto one = Rotation2d::FromDegrees(70.0);
+  const auto two = Rotation2d::FromDegrees(30.0);
+
+  EXPECT_NEAR((one - two).Degrees(), 40.0, kEpsilon);
+}

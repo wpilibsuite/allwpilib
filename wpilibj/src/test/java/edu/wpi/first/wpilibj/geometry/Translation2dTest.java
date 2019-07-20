@@ -86,4 +86,15 @@ class Translation2dTest {
     Translation2d two = new Translation2d(6, 6);
     assertEquals(one.getDistance(two), 5 * Math.sqrt(2), kEpsilon);
   }
+
+  @Test
+  void testUnaryMinus() {
+    Translation2d original = new Translation2d(-4.5, 7);
+    var inverted = original.unaryMinus();
+
+    assertAll(
+        () -> assertEquals(inverted.getX(), 4.5, kEpsilon),
+        () -> assertEquals(inverted.getY(), -7, kEpsilon)
+    );
+  }
 }
