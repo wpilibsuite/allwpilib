@@ -86,6 +86,8 @@ template<typename Derived> class MapBase<Derived, ReadOnlyAccessors>
 
     typedef typename Base::CoeffReturnType CoeffReturnType;
 
+    MapBase(const MapBase&) = default;
+
     /** \copydoc DenseBase::rows() */
     EIGEN_DEVICE_FUNC inline Index rows() const { return m_rows.value(); }
     /** \copydoc DenseBase::cols() */
@@ -246,6 +248,8 @@ template<typename Derived> class MapBase<Derived, WriteAccessors>
                     Scalar,
                     const Scalar
                   >::type ScalarWithConstIfNotLvalue;
+
+    MapBase(const MapBase&) = default;
 
     EIGEN_DEVICE_FUNC
     inline const Scalar* data() const { return this->m_data; }

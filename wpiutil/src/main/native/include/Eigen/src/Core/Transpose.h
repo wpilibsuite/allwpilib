@@ -60,6 +60,9 @@ template<typename MatrixType> class Transpose
     EIGEN_GENERIC_PUBLIC_INTERFACE(Transpose)
     typedef typename internal::remove_all<MatrixType>::type NestedExpression;
 
+    constexpr Transpose() = default;
+    constexpr Transpose(const Transpose&) = default;
+
     EIGEN_DEVICE_FUNC
     explicit inline Transpose(MatrixType& matrix) : m_matrix(matrix) {}
 
@@ -109,6 +112,8 @@ class TransposeImpl
   : public internal::generic_xpr_base<Transpose<XprType> >::type
 {
 public:
+  constexpr TransposeImpl() = default;
+  constexpr TransposeImpl(const TransposeImpl&) = default;
   typedef typename internal::generic_xpr_base<Transpose<XprType> >::type Base;
 };
 
@@ -117,6 +122,8 @@ template<typename MatrixType> class TransposeImpl<MatrixType,Dense>
 {
   public:
 
+    constexpr TransposeImpl() = default;
+    constexpr TransposeImpl(const TransposeImpl&) = default;
     typedef typename internal::TransposeImpl_base<MatrixType>::type Base;
     using Base::coeffRef;
     EIGEN_DENSE_PUBLIC_INTERFACE(Transpose<MatrixType>)

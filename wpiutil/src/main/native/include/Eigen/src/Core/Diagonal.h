@@ -69,6 +69,8 @@ template<typename MatrixType, int _DiagIndex> class Diagonal
     typedef typename internal::dense_xpr_base<Diagonal>::type Base;
     EIGEN_DENSE_PUBLIC_INTERFACE(Diagonal)
 
+    Diagonal(const Diagonal&) = default;
+
     EIGEN_DEVICE_FUNC
     explicit inline Diagonal(MatrixType& matrix, Index a_index = DiagIndex) : m_matrix(matrix), m_index(a_index)
     {
