@@ -14,7 +14,6 @@ import org.ejml.simple.SimpleBase;
 import org.ejml.simple.SimpleMatrix;
 
 public class SimpleMatrixUtils {
-
   private SimpleMatrixUtils() {}
 
   /**
