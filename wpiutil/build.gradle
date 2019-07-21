@@ -219,7 +219,7 @@ model {
 }
 
 dependencies {
-    compile "org.ejml:ejml-all:0.37"
+    compile "org.ejml:ejml-all:0.38"
 }
 
 def wpilibNumberFileInput = file("src/generate/GenericNumber.java.in")

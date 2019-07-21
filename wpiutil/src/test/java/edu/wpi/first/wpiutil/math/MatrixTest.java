@@ -7,14 +7,17 @@
 
 package edu.wpi.first.wpiutil.math;
 
+import org.ejml.data.SingularMatrixException;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
+import org.junit.jupiter.api.Test;
+
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import edu.wpi.first.wpiutil.math.numbers.N3;
 import edu.wpi.first.wpiutil.math.numbers.N4;
-import org.ejml.data.SingularMatrixException;
-import org.ejml.dense.row.MatrixFeatures_DDRM;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MatrixTest {
   @Test
@@ -27,7 +30,8 @@ public class MatrixTest {
             0.0, 2.5);
 
     Matrix<N2, N2> result = mat1.times(mat2);
-    Assertions.assertTrue(MatrixFeatures_DDRM.isEquals(
+
+    assertTrue(MatrixFeatures_DDRM.isEquals(
         MatrixUtils.mat(Nat.N2(), Nat.N2())
         .fill(6.0, 2.5,
             0.0, 2.5).getStorage().getDDRM(),
@@ -44,7 +48,7 @@ public class MatrixTest {
 
     Matrix<N2, N4> result2 = mat3.times(mat4);
 
-    Assertions.assertTrue(MatrixFeatures_DDRM.isIdentical(
+    assertTrue(MatrixFeatures_DDRM.isIdentical(
         MatrixUtils.mat(Nat.N2(), Nat.N4())
         .fill(12.5, 5.55, 7.8, 14.3,
             22.13, 9.82, 13.28, 23.53).getStorage().getDDRM(),
@@ -64,7 +68,7 @@ public class MatrixTest {
             2.0);
 
     Matrix<N2, N1> result = mat.times(vec);
-    Assertions.assertTrue(MatrixFeatures_DDRM.isEquals(
+    assertTrue(MatrixFeatures_DDRM.isEquals(
         MatrixUtils.vec(Nat.N2())
         .fill(5.0,
             2.0).getStorage().getDDRM(),
@@ -81,7 +85,7 @@ public class MatrixTest {
 
     Matrix<N1, N3> transpose = vec.transpose();
 
-    Assertions.assertTrue(MatrixFeatures_DDRM.isEquals(
+    assertTrue(MatrixFeatures_DDRM.isEquals(
         MatrixUtils.mat(Nat.N1(), Nat.N3()).fill(1.0, 2.0, 3.0).getStorage()
         .getDDRM(),
         transpose.getStorage().getDDRM()
@@ -97,13 +101,13 @@ public class MatrixTest {
 
     var inv = mat.inv();
 
-    Assertions.assertTrue(MatrixFeatures_DDRM.isIdentical(
+    assertTrue(MatrixFeatures_DDRM.isIdentical(
         MatrixUtils.eye(Nat.N3()).getStorage().getDDRM(),
         mat.times(inv).getStorage().getDDRM(),
         1E-9
     ));
 
-    Assertions.assertTrue(MatrixFeatures_DDRM.isIdentical(
+    assertTrue(MatrixFeatures_DDRM.isIdentical(
         MatrixUtils.eye(Nat.N3()).getStorage().getDDRM(),
         inv.times(mat).getStorage().getDDRM(),
         1E-9
@@ -116,7 +120,7 @@ public class MatrixTest {
         .fill(2.0, 1.0,
             2.0, 1.0);
 
-    Assertions.assertThrows(SingularMatrixException.class, singularMatrix::inv);
+    assertThrows(SingularMatrixException.class, singularMatrix::inv);
   }
 
   @Test
@@ -126,28 +130,28 @@ public class MatrixTest {
             3.0, 4.0);
 
 
-    Assertions.assertTrue(MatrixFeatures_DDRM.isEquals(
+    assertTrue(MatrixFeatures_DDRM.isEquals(
         MatrixUtils.mat(Nat.N2(), Nat.N2())
         .fill(3.0, 4.0,
             5.0, 6.0).getStorage().getDDRM(),
         mat.plus(2.0).getStorage().getDDRM()
     ));
 
-    Assertions.assertTrue(MatrixFeatures_DDRM.isEquals(
+    assertTrue(MatrixFeatures_DDRM.isEquals(
         MatrixUtils.mat(Nat.N2(), Nat.N2())
         .fill(0.0, 1.0,
             2.0, 3.0).getStorage().getDDRM(),
         mat.minus(1.0).getStorage().getDDRM()
     ));
 
-    Assertions.assertTrue(MatrixFeatures_DDRM.isEquals(
+    assertTrue(MatrixFeatures_DDRM.isEquals(
         MatrixUtils.mat(Nat.N2(), Nat.N2())
         .fill(2.0, 4.0,
             6.0, 8.0).getStorage().getDDRM(),
         mat.times(2.0).getStorage().getDDRM()
     ));
 
-    Assertions.assertTrue(MatrixFeatures_DDRM.isIdentical(
+    assertTrue(MatrixFeatures_DDRM.isIdentical(
         MatrixUtils.mat(Nat.N2(), Nat.N2())
         .fill(0.5, 1.0,
             1.5, 2.0).getStorage().getDDRM(),
@@ -166,14 +170,14 @@ public class MatrixTest {
         .fill(5.0, 6.0,
             7.0, 8.0);
 
-    Assertions.assertTrue(MatrixFeatures_DDRM.isEquals(
+    assertTrue(MatrixFeatures_DDRM.isEquals(
         MatrixUtils.mat(Nat.N2(), Nat.N2())
         .fill(-4.0, -4.0,
             -4.0, -4.0).getStorage().getDDRM(),
         mat1.minus(mat2).getStorage().getDDRM()
     ));
 
-    Assertions.assertTrue(MatrixFeatures_DDRM.isEquals(
+    assertTrue(MatrixFeatures_DDRM.isEquals(
         MatrixUtils.mat(Nat.N2(), Nat.N2())
         .fill(6.0, 8.0,
             10.0, 12.0).getStorage().getDDRM(),
