@@ -17,13 +17,14 @@ package edu.wpi.first.wpilibj.geometry;
  */
 @SuppressWarnings({"ParameterName", "MemberName"})
 public class Translation2d {
-  private double m_x;
-  private double m_y;
+  private final double m_x;
+  private final double m_y;
 
   /**
    * Constructs a Translation2d with X and Y components equal to zero.
    */
   public Translation2d() {
+    this(0.0, 0.0);
   }
 
   /**
