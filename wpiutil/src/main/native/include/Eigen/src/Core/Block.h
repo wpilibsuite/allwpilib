@@ -111,6 +111,9 @@ template<typename XprType, int BlockRows, int BlockCols, bool InnerPanel> class 
     EIGEN_INHERIT_ASSIGNMENT_OPERATORS(Block)
     
     typedef typename internal::remove_all<XprType>::type NestedExpression;
+
+    constexpr Block() = default;
+    constexpr Block(const Block&) = default;
   
     /** Column or Row constructor
       */
@@ -158,6 +161,8 @@ class BlockImpl<XprType, BlockRows, BlockCols, InnerPanel, Dense>
     typedef typename XprType::StorageIndex StorageIndex;
   public:
     typedef Impl Base;
+    constexpr BlockImpl() = default;
+    constexpr BlockImpl(const BlockImpl&) = default;
     EIGEN_INHERIT_ASSIGNMENT_OPERATORS(BlockImpl)
     EIGEN_DEVICE_FUNC inline BlockImpl(XprType& xpr, Index i) : Impl(xpr,i) {}
     EIGEN_DEVICE_FUNC inline BlockImpl(XprType& xpr, Index startRow, Index startCol) : Impl(xpr, startRow, startCol) {}
@@ -181,6 +186,9 @@ template<typename XprType, int BlockRows, int BlockCols, bool InnerPanel, bool H
     EIGEN_INHERIT_ASSIGNMENT_OPERATORS(BlockImpl_dense)
 
     // class InnerIterator; // FIXME apparently never used
+
+    BlockImpl_dense() = default;
+    BlockImpl_dense(const BlockImpl_dense&) = default;
 
     /** Column or Row constructor
       */
@@ -335,6 +343,9 @@ class BlockImpl_dense<XprType,BlockRows,BlockCols, InnerPanel,true>
       XprTypeIsRowMajor = (int(traits<XprType>::Flags)&RowMajorBit) != 0
     };
   public:
+
+    BlockImpl_dense() = default;
+    BlockImpl_dense(const BlockImpl_dense&) = default;
 
     typedef MapBase<BlockType> Base;
     EIGEN_DENSE_PUBLIC_INTERFACE(BlockType)

@@ -88,8 +88,10 @@ struct promote_scalar_arg_unsupported<S,T,S,false,true> {};
 //classes inheriting no_assignment_operator don't generate a default operator=.
 class no_assignment_operator
 {
-  private:
-    no_assignment_operator& operator=(const no_assignment_operator&);
+  public:
+    constexpr no_assignment_operator() = default;
+    constexpr no_assignment_operator(const no_assignment_operator&) = default;
+    no_assignment_operator& operator=(const no_assignment_operator&) = delete;
 };
 
 /** \internal return the index type with the largest number of bits */
