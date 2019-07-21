@@ -82,13 +82,13 @@ model {
                         task.outputs.file(hashFile)
                         task.inputs.file(binary.sharedLibraryFile)
                         task.from(hashFile) {
-                            into getPlatformPath(binary)
+                            into nativeUtils.getPlatformPath(binary)
                         }
                         task.doFirst {
                             hashFile.text = MessageDigest.getInstance("MD5").digest(binary.sharedLibraryFile.bytes).encodeHex().toString()
                         }
                         task.from(binary.sharedLibraryFile) {
-                            into getPlatformPath(binary)
+                            into nativeUtils.getPlatformPath(binary)
                         }
                     }
                 }

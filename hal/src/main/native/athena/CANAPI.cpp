@@ -91,7 +91,7 @@ HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
 void HAL_CleanCAN(HAL_CANHandle handle) {
   auto data = canHandles->Free(handle);
 
-  std::lock_guard<wpi::mutex> lock(data->mapMutex);
+  std::scoped_lock lock(data->mapMutex);
 
   for (auto&& i : data->periodicSends) {
     int32_t s = 0;
@@ -115,7 +115,7 @@ void HAL_WriteCANPacket(HAL_CANHandle handle, const uint8_t* data,
   if (*status != 0) {
     return;
   }
-  std::lock_guard<wpi::mutex> lock(can->mapMutex);
+  std::scoped_lock lock(can->mapMutex);
   can->periodicSends[apiId] = -1;
 }
 
@@ -134,7 +134,7 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, const uint8_t* data,
   if (*status != 0) {
     return;
   }
-  std::lock_guard<wpi::mutex> lock(can->mapMutex);
+  std::scoped_lock lock(can->mapMutex);
   can->periodicSends[apiId] = repeatMs;
 }
 
@@ -153,7 +153,7 @@ void HAL_StopCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
   if (*status != 0) {
     return;
   }
-  std::lock_guard<wpi::mutex> lock(can->mapMutex);
+  std::scoped_lock lock(can->mapMutex);
   can->periodicSends[apiId] = -1;
 }
 
@@ -172,7 +172,7 @@ void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
   if (*status == 0) {
-    std::lock_guard<wpi::mutex> lock(can->mapMutex);
+    std::scoped_lock lock(can->mapMutex);
     auto& msg = can->receives[messageId];
     msg.length = dataSize;
     msg.lastTimeStamp = ts;
@@ -197,7 +197,7 @@ void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
   uint32_t ts = 0;
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
-  std::lock_guard<wpi::mutex> lock(can->mapMutex);
+  std::scoped_lock lock(can->mapMutex);
   if (*status == 0) {
     // fresh update
     auto& msg = can->receives[messageId];
@@ -234,7 +234,7 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
   uint32_t ts = 0;
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
-  std::lock_guard<wpi::mutex> lock(can->mapMutex);
+  std::scoped_lock lock(can->mapMutex);
   if (*status == 0) {
     // fresh update
     auto& msg = can->receives[messageId];
@@ -276,7 +276,7 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
   uint32_t messageId = CreateCANId(can.get(), apiId);
 
   {
-    std::lock_guard<wpi::mutex> lock(can->mapMutex);
+    std::scoped_lock lock(can->mapMutex);
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
@@ -296,7 +296,7 @@ void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
   uint32_t ts = 0;
   HAL_CAN_ReceiveMessage(&messageId, 0x1FFFFFFF, data, &dataSize, &ts, status);
 
-  std::lock_guard<wpi::mutex> lock(can->mapMutex);
+  std::scoped_lock lock(can->mapMutex);
   if (*status == 0) {
     // fresh update
     auto& msg = can->receives[messageId];

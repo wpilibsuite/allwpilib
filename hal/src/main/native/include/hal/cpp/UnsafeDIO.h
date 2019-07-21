@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -77,7 +77,7 @@ void UnsafeManipulateDIO(HAL_DigitalHandle handle, int32_t* status,
   tDIO* dSys = detail::UnsafeGetDigialSystem();
   auto mask = detail::ComputeDigitalMask(handle, status);
   if (status != 0) return;
-  std::lock_guard<wpi::mutex> lock(dioMutex);
+  std::scoped_lock lock(dioMutex);
 
   tDIO::tOutputEnable enableOE = dSys->readOutputEnable(status);
   enableOE.value |= mask;

@@ -282,7 +282,7 @@ void HAL_BaseInitialize(int32_t* status) {
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
   // image 4; Fixes errors caused by multiple processes. Talk to NI about this
@@ -341,7 +341,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   // Initial check, as if it's true initialization has finished
   if (initialized) return true;
 
-  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return true;
 

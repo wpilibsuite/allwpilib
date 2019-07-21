@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,7 +11,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * Utility class for handling Robot drive based on a definition of the motor configuration. The
@@ -111,8 +111,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * @param rightMotor the right SpeedController object used to drive the robot.
    */
   public RobotDrive(SpeedController leftMotor, SpeedController rightMotor) {
-    requireNonNull(leftMotor, "Provided left motor was null");
-    requireNonNull(rightMotor, "Provided right motor was null");
+    requireNonNullParam(leftMotor, "leftMotor", "RobotDrive");
+    requireNonNullParam(rightMotor, "rightMotor", "RobotDrive");
 
     m_frontLeftMotor = null;
     m_rearLeftMotor = leftMotor;
@@ -136,10 +136,10 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    */
   public RobotDrive(SpeedController frontLeftMotor, SpeedController rearLeftMotor,
                     SpeedController frontRightMotor, SpeedController rearRightMotor) {
-    m_frontLeftMotor = requireNonNull(frontLeftMotor, "frontLeftMotor cannot be null");
-    m_rearLeftMotor = requireNonNull(rearLeftMotor, "rearLeftMotor cannot be null");
-    m_frontRightMotor = requireNonNull(frontRightMotor, "frontRightMotor cannot be null");
-    m_rearRightMotor = requireNonNull(rearRightMotor, "rearRightMotor cannot be null");
+    m_frontLeftMotor = requireNonNullParam(frontLeftMotor, "frontLeftMotor", "RobotDrive");
+    m_rearLeftMotor = requireNonNullParam(rearLeftMotor, "rearLeftMotor", "RobotDrive");
+    m_frontRightMotor = requireNonNullParam(frontRightMotor, "frontRightMotor", "RobotDrive");
+    m_rearRightMotor = requireNonNullParam(rearRightMotor, "rearRightMotor", "RobotDrive");
     m_sensitivity = kDefaultSensitivity;
     m_maxOutput = kDefaultMaxOutput;
     m_allocatedSpeedControllers = false;
@@ -206,8 +206,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * @param rightStick The joystick to control the right side of the robot.
    */
   public void tankDrive(GenericHID leftStick, GenericHID rightStick) {
-    requireNonNull(leftStick, "Provided left stick was null");
-    requireNonNull(rightStick, "Provided right stick was null");
+    requireNonNullParam(leftStick, "leftStick", "tankDrive");
+    requireNonNullParam(rightStick, "rightStick", "tankDrive");
 
     tankDrive(leftStick.getY(), rightStick.getY(), true);
   }
@@ -221,8 +221,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * @param squaredInputs Setting this parameter to true decreases the sensitivity at lower speeds
    */
   public void tankDrive(GenericHID leftStick, GenericHID rightStick, boolean squaredInputs) {
-    requireNonNull(leftStick, "Provided left stick was null");
-    requireNonNull(rightStick, "Provided right stick was null");
+    requireNonNullParam(leftStick, "leftStick", "tankDrive");
+    requireNonNullParam(rightStick, "rightStick", "tankDrive");
 
     tankDrive(leftStick.getY(), rightStick.getY(), squaredInputs);
   }
@@ -239,8 +239,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    */
   public void tankDrive(GenericHID leftStick, final int leftAxis, GenericHID rightStick,
                         final int rightAxis) {
-    requireNonNull(leftStick, "Provided left stick was null");
-    requireNonNull(rightStick, "Provided right stick was null");
+    requireNonNullParam(leftStick, "leftStick", "tankDrive");
+    requireNonNullParam(rightStick, "rightStick", "tankDrive");
 
     tankDrive(leftStick.getRawAxis(leftAxis), rightStick.getRawAxis(rightAxis), true);
   }
@@ -257,8 +257,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    */
   public void tankDrive(GenericHID leftStick, final int leftAxis, GenericHID rightStick,
                         final int rightAxis, boolean squaredInputs) {
-    requireNonNull(leftStick, "Provided left stick was null");
-    requireNonNull(rightStick, "Provided right stick was null");
+    requireNonNullParam(leftStick, "leftStick", "tankDrive");
+    requireNonNullParam(rightStick, "rightStick", "tankDrive");
 
     tankDrive(leftStick.getRawAxis(leftAxis), rightStick.getRawAxis(rightAxis), squaredInputs);
   }
@@ -547,8 +547,6 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * @param rightOutput The speed to send to the right side of the robot.
    */
   public void setLeftRightMotorOutputs(double leftOutput, double rightOutput) {
-    requireNonNull(m_rearLeftMotor, "Provided left motor was null");
-    requireNonNull(m_rearRightMotor, "Provided right motor was null");
 
     if (m_frontLeftMotor != null) {
       m_frontLeftMotor.set(limit(leftOutput) * m_maxOutput);

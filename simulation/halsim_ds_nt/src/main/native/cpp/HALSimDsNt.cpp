@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -67,7 +67,7 @@ void HALSimDSNT::Initialize() {
 
   enabled.AddListener(
       [this](const nt::EntryNotification& ev) -> void {
-        std::lock_guard<wpi::mutex> lock(modeMutex);
+        std::scoped_lock lock(modeMutex);
         if (!this->isEstop) {
           this->isEnabled = ev.value->GetBoolean();
         } else {
@@ -80,7 +80,7 @@ void HALSimDSNT::Initialize() {
 
   estop.AddListener(
       [this](const nt::EntryNotification& ev) -> void {
-        std::lock_guard<wpi::mutex> lock(modeMutex);
+        std::scoped_lock lock(modeMutex);
         this->isEstop = ev.value->GetBoolean();
         if (this->isEstop) {
           this->isEnabled = false;
@@ -136,7 +136,7 @@ void HALSimDSNT::Initialize() {
 void HALSimDSNT::HandleModePress(enum HALSimDSNT_Mode mode, bool isPressed) {
   if (isPressed) {
     if (mode != currentMode) {
-      std::lock_guard<wpi::mutex> lock(modeMutex);
+      std::scoped_lock lock(modeMutex);
       currentMode = mode;
       isEnabled = false;
       this->DoModeUpdate();

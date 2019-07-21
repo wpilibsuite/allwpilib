@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -80,42 +80,42 @@ class Frame {
 
   int GetOriginalWidth() const {
     if (!m_impl) return 0;
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     if (m_impl->images.empty()) return 0;
     return m_impl->images[0]->width;
   }
 
   int GetOriginalHeight() const {
     if (!m_impl) return 0;
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     if (m_impl->images.empty()) return 0;
     return m_impl->images[0]->height;
   }
 
   int GetOriginalPixelFormat() const {
     if (!m_impl) return 0;
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     if (m_impl->images.empty()) return 0;
     return m_impl->images[0]->pixelFormat;
   }
 
   int GetOriginalJpegQuality() const {
     if (!m_impl) return 0;
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     if (m_impl->images.empty()) return 0;
     return m_impl->images[0]->jpegQuality;
   }
 
   Image* GetExistingImage(size_t i = 0) const {
     if (!m_impl) return nullptr;
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     if (i >= m_impl->images.size()) return nullptr;
     return m_impl->images[i];
   }
 
   Image* GetExistingImage(int width, int height) const {
     if (!m_impl) return nullptr;
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     for (auto i : m_impl->images) {
       if (i->Is(width, height)) return i;
     }
@@ -125,7 +125,7 @@ class Frame {
   Image* GetExistingImage(int width, int height,
                           VideoMode::PixelFormat pixelFormat) const {
     if (!m_impl) return nullptr;
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     for (auto i : m_impl->images) {
       if (i->Is(width, height, pixelFormat)) return i;
     }
@@ -136,7 +136,7 @@ class Frame {
                           VideoMode::PixelFormat pixelFormat,
                           int jpegQuality) const {
     if (!m_impl) return nullptr;
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     for (auto i : m_impl->images) {
       if (i->Is(width, height, pixelFormat, jpegQuality)) return i;
     }

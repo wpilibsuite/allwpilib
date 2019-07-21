@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -44,7 +44,7 @@ void InitializeAnalogInternal() {
 void initializeAnalog(int32_t* status) {
   hal::init::CheckInit();
   if (analogSystemInitialized) return;
-  std::lock_guard<wpi::mutex> lock(analogRegisterWindowMutex);
+  std::scoped_lock lock(analogRegisterWindowMutex);
   if (analogSystemInitialized) return;
   analogInputSystem.reset(tAI::create(status));
   analogOutputSystem.reset(tAO::create(status));

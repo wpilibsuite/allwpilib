@@ -352,7 +352,7 @@ protected:
       return 0;
     // +1 is required because of the strict equality.
     // For example if NumEntries is 48, we need to return 401.
-    return NextPowerOf2(NumEntries * 4 / 3 + 1);
+    return static_cast<unsigned>(NextPowerOf2(NumEntries * 4 / 3 + 1));
   }
 
   void moveFromOldBuckets(BucketT *OldBucketsBegin, BucketT *OldBucketsEnd) {
@@ -777,7 +777,7 @@ public:
     // Reduce the number of buckets.
     unsigned NewNumBuckets = 0;
     if (OldNumEntries)
-      NewNumBuckets = std::max(64, 1 << (Log2_32_Ceil(OldNumEntries) + 1));
+      NewNumBuckets = (std::max)(64, 1 << (Log2_32_Ceil(OldNumEntries) + 1));
     if (NewNumBuckets == NumBuckets) {
       this->BaseT::initEmpty();
       return;

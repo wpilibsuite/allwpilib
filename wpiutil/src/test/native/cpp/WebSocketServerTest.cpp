@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -141,14 +141,15 @@ TEST_F(WebSocketServerTest, CloseCode) {
     });
   };
   // need to respond with close for server to finish shutdown
-  auto message = BuildMessage(0x08, true, true, {0x03u, 0xe8u});
+  const uint8_t contents[] = {0x03u, 0xe8u};
+  auto message = BuildMessage(0x08, true, true, contents);
   handleData = [&](StringRef) {
     clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
   };
 
   loop->Run();
 
-  auto expectData = BuildMessage(0x08, true, false, {0x03u, 0xe8u});
+  auto expectData = BuildMessage(0x08, true, false, contents);
   ASSERT_EQ(wireData, expectData);
   ASSERT_EQ(gotClosed, 1);
 }
@@ -164,16 +165,15 @@ TEST_F(WebSocketServerTest, CloseReason) {
     });
   };
   // need to respond with close for server to finish shutdown
-  auto message = BuildMessage(0x08, true, true,
-                              {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'});
+  const uint8_t contents[] = {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'};
+  auto message = BuildMessage(0x08, true, true, contents);
   handleData = [&](StringRef) {
     clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
   };
 
   loop->Run();
 
-  auto expectData = BuildMessage(0x08, true, false,
-                                 {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'});
+  auto expectData = BuildMessage(0x08, true, false, contents);
   ASSERT_EQ(wireData, expectData);
   ASSERT_EQ(gotClosed, 1);
 }
@@ -211,7 +211,8 @@ TEST_F(WebSocketServerTest, ReceiveCloseCode) {
       ASSERT_EQ(code, 1000) << "reason: " << reason;
     });
   };
-  auto message = BuildMessage(0x08, true, true, {0x03u, 0xe8u});
+  const uint8_t contents[] = {0x03u, 0xe8u};
+  auto message = BuildMessage(0x08, true, true, contents);
   resp.headersComplete.connect([&](bool) {
     clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
   });
@@ -219,7 +220,7 @@ TEST_F(WebSocketServerTest, ReceiveCloseCode) {
   loop->Run();
 
   // the endpoint should echo the message
-  auto expectData = BuildMessage(0x08, true, false, {0x03u, 0xe8u});
+  auto expectData = BuildMessage(0x08, true, false, contents);
   ASSERT_EQ(wireData, expectData);
   ASSERT_EQ(gotClosed, 1);
 }
@@ -233,8 +234,8 @@ TEST_F(WebSocketServerTest, ReceiveCloseReason) {
       ASSERT_EQ(reason, "hangup");
     });
   };
-  auto message = BuildMessage(0x08, true, true,
-                              {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'});
+  const uint8_t contents[] = {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'};
+  auto message = BuildMessage(0x08, true, true, contents);
   resp.headersComplete.connect([&](bool) {
     clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
   });
@@ -242,8 +243,7 @@ TEST_F(WebSocketServerTest, ReceiveCloseReason) {
   loop->Run();
 
   // the endpoint should echo the message
-  auto expectData = BuildMessage(0x08, true, false,
-                                 {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'});
+  auto expectData = BuildMessage(0x08, true, false, contents);
   ASSERT_EQ(wireData, expectData);
   ASSERT_EQ(gotClosed, 1);
 }
@@ -257,10 +257,10 @@ class WebSocketServerBadOpcodeTest
     : public WebSocketServerTest,
       public ::testing::WithParamInterface<uint8_t> {};
 
-INSTANTIATE_TEST_CASE_P(WebSocketServerBadOpcodeTests,
-                        WebSocketServerBadOpcodeTest,
-                        ::testing::Values(3, 4, 5, 6, 7, 0xb, 0xc, 0xd, 0xe,
-                                          0xf), );
+INSTANTIATE_TEST_SUITE_P(WebSocketServerBadOpcodeTests,
+                         WebSocketServerBadOpcodeTest,
+                         ::testing::Values(3, 4, 5, 6, 7, 0xb, 0xc, 0xd, 0xe,
+                                           0xf));
 
 TEST_P(WebSocketServerBadOpcodeTest, Receive) {
   int gotCallback = 0;
@@ -289,9 +289,9 @@ class WebSocketServerControlFrameTest
     : public WebSocketServerTest,
       public ::testing::WithParamInterface<uint8_t> {};
 
-INSTANTIATE_TEST_CASE_P(WebSocketServerControlFrameTests,
-                        WebSocketServerControlFrameTest,
-                        ::testing::Values(0x8, 0x9, 0xa), );
+INSTANTIATE_TEST_SUITE_P(WebSocketServerControlFrameTests,
+                         WebSocketServerControlFrameTest,
+                         ::testing::Values(0x8, 0x9, 0xa));
 
 TEST_P(WebSocketServerControlFrameTest, ReceiveFragment) {
   int gotCallback = 0;
@@ -532,8 +532,8 @@ TEST_F(WebSocketServerTest, ReceiveTooLargeFragmented) {
 class WebSocketServerDataTest : public WebSocketServerTest,
                                 public ::testing::WithParamInterface<size_t> {};
 
-INSTANTIATE_TEST_CASE_P(WebSocketServerDataTests, WebSocketServerDataTest,
-                        ::testing::Values(0, 1, 125, 126, 65535, 65536), );
+INSTANTIATE_TEST_SUITE_P(WebSocketServerDataTests, WebSocketServerDataTest,
+                         ::testing::Values(0, 1, 125, 126, 65535, 65536));
 
 TEST_P(WebSocketServerDataTest, SendText) {
   int gotCallback = 0;

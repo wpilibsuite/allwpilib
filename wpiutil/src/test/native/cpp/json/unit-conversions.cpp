@@ -62,7 +62,7 @@ typedef ::testing::Types<
     , std::unordered_map<std::string, json>
     , std::unordered_multimap<std::string, json>
     > JsonGetObjectTestTypes;
-TYPED_TEST_CASE(JsonGetObjectTest, JsonGetObjectTestTypes);
+TYPED_TEST_SUITE(JsonGetObjectTest, JsonGetObjectTestTypes, );
 
 TYPED_TEST(JsonGetObjectTest, Explicit)
 {
@@ -109,7 +109,7 @@ typedef ::testing::Types<json::array_t, std::list<json>,
                          /*std::forward_list<json>,*/ std::vector<json>,
                          std::deque<json>>
     JsonGetArrayTestTypes;
-TYPED_TEST_CASE(JsonGetArrayTest, JsonGetArrayTestTypes);
+TYPED_TEST_SUITE(JsonGetArrayTest, JsonGetArrayTestTypes, );
 
 TYPED_TEST(JsonGetArrayTest, Explicit)
 {
@@ -200,7 +200,7 @@ class JsonGetStringTest : public ::testing::Test {
 };
 
 typedef ::testing::Types<std::string, std::string> JsonGetStringTestTypes;
-TYPED_TEST_CASE(JsonGetStringTest, JsonGetStringTestTypes);
+TYPED_TEST_SUITE(JsonGetStringTest, JsonGetStringTestTypes, );
 
 TYPED_TEST(JsonGetStringTest, Explicit)
 {
@@ -244,7 +244,7 @@ class JsonGetBooleanTest : public ::testing::Test {
 };
 
 typedef ::testing::Types<bool, bool> JsonGetBooleanTestTypes;
-TYPED_TEST_CASE(JsonGetBooleanTest, JsonGetBooleanTestTypes);
+TYPED_TEST_SUITE(JsonGetBooleanTest, JsonGetBooleanTestTypes, );
 
 TYPED_TEST(JsonGetBooleanTest, Explicit)
 {
@@ -328,7 +328,7 @@ typedef ::testing::Types<
 #endif
     > JsonGetIntegerTestTypes;
 
-TYPED_TEST_CASE(JsonGetIntegerTest, JsonGetIntegerTestTypes);
+TYPED_TEST_SUITE(JsonGetIntegerTest, JsonGetIntegerTestTypes, );
 
 TYPED_TEST(JsonGetIntegerTest, Explicit)
 {
@@ -381,7 +381,7 @@ class JsonGetFloatTest : public ::testing::Test {
 typedef ::testing::Types<double, float, double>
     JsonGetFloatTestTypes;
 
-TYPED_TEST_CASE(JsonGetFloatTest, JsonGetFloatTestTypes);
+TYPED_TEST_SUITE(JsonGetFloatTest, JsonGetFloatTestTypes, );
 
 TYPED_TEST(JsonGetFloatTest, Explicit)
 {

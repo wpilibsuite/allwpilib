@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,6 +9,7 @@
 #define WPIUTIL_WPI_WEBSOCKETSERVER_H_
 
 #include <functional>
+#include <initializer_list>
 #include <memory>
 #include <string>
 #include <utility>
@@ -55,6 +56,20 @@ class WebSocketServerHelper {
    *         is empty.
    */
   std::pair<bool, StringRef> MatchProtocol(ArrayRef<StringRef> protocols);
+
+  /**
+   * Try to find a match to the list of sub-protocols provided by the client.
+   * The list is priority ordered, so the first match wins.
+   * Only valid during and after the upgrade event.
+   * @param protocols Acceptable protocols
+   * @return Pair; first item is true if a match was made, false if not.
+   *         Second item is the matched protocol if a match was made, otherwise
+   *         is empty.
+   */
+  std::pair<bool, StringRef> MatchProtocol(
+      std::initializer_list<StringRef> protocols) {
+    return MatchProtocol(makeArrayRef(protocols.begin(), protocols.end()));
+  }
 
   /**
    * Accept the upgrade.  Disconnect other readers (such as the HttpParser
@@ -124,6 +139,22 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
   static std::shared_ptr<WebSocketServer> Create(
       uv::Stream& stream, ArrayRef<StringRef> protocols = ArrayRef<StringRef>{},
       const ServerOptions& options = ServerOptions{});
+
+  /**
+   * Starts a dedicated WebSocket server on the provided connection.  The
+   * connection should be an accepted client stream.
+   * This also sets the stream user data to the socket server.
+   * A connected event is emitted when the connection is opened.
+   * @param stream Connection stream
+   * @param protocols Acceptable subprotocols
+   * @param options Handshake options
+   */
+  static std::shared_ptr<WebSocketServer> Create(
+      uv::Stream& stream, std::initializer_list<StringRef> protocols,
+      const ServerOptions& options = ServerOptions{}) {
+    return Create(stream, makeArrayRef(protocols.begin(), protocols.end()),
+                  options);
+  }
 
   /**
    * Connected event.  First parameter is the URL, second is the websocket.

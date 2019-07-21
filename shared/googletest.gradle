@@ -1,13 +1,7 @@
 model {
-    dependencyConfigs {
-        googletest(DependencyConfig) {
-            groupId = 'edu.wpi.first.thirdparty.frc2019'
-            artifactId = 'googletest'
-            headerClassifier = 'headers'
-            ext = 'zip'
-            version = '1.8.0-4-4e4df22'
-            sharedConfigs = [:]
-            staticConfigs = project.staticGtestConfigs
+    binaries {
+        withType(GoogleTestTestSuiteBinarySpec).all {
+            nativeUtils.useRequiredLibrary(it, 'googletest_static')
         }
     }
 }

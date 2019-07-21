@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -116,6 +116,49 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
   void Bind6(const Twine& ip, unsigned int port, unsigned int flags = 0);
 
   /**
+   * Associate the handle to a remote address and port, so every message sent
+   * by this handle is automatically sent to that destination.
+   *
+   * @param addr Initialized `sockaddr_in` or `sockaddr_in6` data structure.
+   */
+  void Connect(const sockaddr& addr) {
+    Invoke(&uv_udp_connect, GetRaw(), &addr);
+  }
+
+  void Connect(const sockaddr_in& addr) {
+    Connect(reinterpret_cast<const sockaddr&>(addr));
+  }
+
+  void Connect(const sockaddr_in6& addr) {
+    Connect(reinterpret_cast<const sockaddr&>(addr));
+  }
+
+  /**
+   * Associate the handle to an IPv4 address and port, so every message sent
+   * by this handle is automatically sent to that destination.
+   *
+   * @param ip The address to which to bind.
+   * @param port The port to which to bind.
+   */
+  void Connect(const Twine& ip, unsigned int port);
+
+  /**
+   * Associate the handle to an IPv6 address and port, so every message sent
+   * by this handle is automatically sent to that destination.
+   *
+   * @param ip The address to which to bind.
+   * @param port The port to which to bind.
+   * @param flags Optional additional flags.
+   */
+  void Connect6(const Twine& ip, unsigned int port);
+
+  /**
+   * Get the remote IP and port on connected UDP handles.
+   * @return The address (will be zeroed if an error occurred).
+   */
+  sockaddr_storage GetPeer();
+
+  /**
    * Get the current address to which the handle is bound.
    * @return The address (will be zeroed if an error occurred).
    */
@@ -205,6 +248,15 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
   }
 
   /**
+   * Variant of Send() for connected sockets.  Cannot be used with
+   * connectionless sockets.
+   *
+   * @param bufs The buffers to be written to the stream.
+   * @param req write request
+   */
+  void Send(ArrayRef<Buffer> bufs, const std::shared_ptr<UdpSendReq>& req);
+
+  /**
    * Send data over the UDP socket.  If the socket has not previously been bound
    * with Bind() it will be bound to 0.0.0.0 (the "all interfaces" IPv4 address)
    * and a random port number.
@@ -235,6 +287,16 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
   }
 
   /**
+   * Variant of Send() for connected sockets.  Cannot be used with
+   * connectionless sockets.
+   *
+   * @param bufs The buffers to be written to the stream.
+   * @param callback Callback function to call when the data has been sent.
+   */
+  void Send(ArrayRef<Buffer> bufs,
+            std::function<void(MutableArrayRef<Buffer>, Error)> callback);
+
+  /**
    * Same as Send(), but won't queue a send request if it can't be completed
    * immediately.
    *
@@ -244,7 +306,8 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * @return Number of bytes sent.
    */
   int TrySend(const sockaddr& addr, ArrayRef<Buffer> bufs) {
-    int val = uv_udp_try_send(GetRaw(), bufs.data(), bufs.size(), &addr);
+    int val = uv_udp_try_send(GetRaw(), bufs.data(),
+                              static_cast<unsigned>(bufs.size()), &addr);
     if (val < 0) {
       this->ReportError(val);
       return 0;
@@ -258,6 +321,23 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
 
   int TrySend(const sockaddr_in6& addr, ArrayRef<Buffer> bufs) {
     return TrySend(reinterpret_cast<const sockaddr&>(addr), bufs);
+  }
+
+  /**
+   * Variant of TrySend() for connected sockets.  Cannot be used with
+   * connectionless sockets.
+   *
+   * @param bufs The buffers to be written to the stream.
+   * @return Number of bytes sent.
+   */
+  int TrySend(ArrayRef<Buffer> bufs) {
+    int val = uv_udp_try_send(GetRaw(), bufs.data(),
+                              static_cast<unsigned>(bufs.size()), nullptr);
+    if (val < 0) {
+      this->ReportError(val);
+      return 0;
+    }
+    return val;
   }
 
   /**

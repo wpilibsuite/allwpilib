@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -695,7 +695,7 @@ inline future<T> PromiseFactory<T>::CreateFuture(uint64_t request) {
 
 template <typename T>
 future<T> PromiseFactory<T>::MakeReadyFuture(T&& value) {
-  std::unique_lock<wpi::mutex> lock(GetResultMutex());
+  std::unique_lock lock(GetResultMutex());
   uint64_t req = CreateErasedRequest();
   m_results.emplace_back(std::piecewise_construct, std::forward_as_tuple(req),
                          std::forward_as_tuple(std::move(value)));
@@ -709,7 +709,7 @@ inline promise<T> PromiseFactory<T>::CreatePromise(uint64_t request) {
 
 template <typename T>
 void PromiseFactory<T>::SetValue(uint64_t request, const T& value) {
-  std::unique_lock<wpi::mutex> lock(GetResultMutex());
+  std::unique_lock lock(GetResultMutex());
   if (!EraseRequest(request)) return;
   auto it = std::find_if(m_thens.begin(), m_thens.end(),
                          [=](const auto& x) { return x.request == request; });
@@ -728,7 +728,7 @@ void PromiseFactory<T>::SetValue(uint64_t request, const T& value) {
 
 template <typename T>
 void PromiseFactory<T>::SetValue(uint64_t request, T&& value) {
-  std::unique_lock<wpi::mutex> lock(GetResultMutex());
+  std::unique_lock lock(GetResultMutex());
   if (!EraseRequest(request)) return;
   auto it = std::find_if(m_thens.begin(), m_thens.end(),
                          [=](const auto& x) { return x.request == request; });
@@ -748,7 +748,7 @@ void PromiseFactory<T>::SetValue(uint64_t request, T&& value) {
 template <typename T>
 void PromiseFactory<T>::SetThen(uint64_t request, uint64_t outRequest,
                                 ThenFunction func) {
-  std::unique_lock<wpi::mutex> lock(GetResultMutex());
+  std::unique_lock lock(GetResultMutex());
   auto it = std::find_if(m_results.begin(), m_results.end(),
                          [=](const auto& r) { return r.first == request; });
   if (it != m_results.end()) {
@@ -762,7 +762,7 @@ void PromiseFactory<T>::SetThen(uint64_t request, uint64_t outRequest,
 
 template <typename T>
 bool PromiseFactory<T>::IsReady(uint64_t request) noexcept {
-  std::unique_lock<wpi::mutex> lock(GetResultMutex());
+  std::unique_lock lock(GetResultMutex());
   auto it = std::find_if(m_results.begin(), m_results.end(),
                          [=](const auto& r) { return r.first == request; });
   return it != m_results.end();
@@ -771,7 +771,7 @@ bool PromiseFactory<T>::IsReady(uint64_t request) noexcept {
 template <typename T>
 T PromiseFactory<T>::GetResult(uint64_t request) {
   // wait for response
-  std::unique_lock<wpi::mutex> lock(GetResultMutex());
+  std::unique_lock lock(GetResultMutex());
   while (IsActive()) {
     // Did we get a response to *our* request?
     auto it = std::find_if(m_results.begin(), m_results.end(),
@@ -791,7 +791,7 @@ T PromiseFactory<T>::GetResult(uint64_t request) {
 template <typename T>
 void PromiseFactory<T>::WaitResult(uint64_t request) {
   // wait for response
-  std::unique_lock<wpi::mutex> lock(GetResultMutex());
+  std::unique_lock lock(GetResultMutex());
   while (IsActive()) {
     // Did we get a response to *our* request?
     auto it = std::find_if(m_results.begin(), m_results.end(),
@@ -807,7 +807,7 @@ template <class Clock, class Duration>
 bool PromiseFactory<T>::WaitResultUntil(
     uint64_t request,
     const std::chrono::time_point<Clock, Duration>& timeout_time) {
-  std::unique_lock<wpi::mutex> lock(GetResultMutex());
+  std::unique_lock lock(GetResultMutex());
   bool timeout = false;
   while (IsActive()) {
     // Did we get a response to *our* request?
@@ -839,7 +839,7 @@ template <class Clock, class Duration>
 bool PromiseFactory<void>::WaitResultUntil(
     uint64_t request,
     const std::chrono::time_point<Clock, Duration>& timeout_time) {
-  std::unique_lock<wpi::mutex> lock(GetResultMutex());
+  std::unique_lock lock(GetResultMutex());
   bool timeout = false;
   while (IsActive()) {
     // Did we get a response to *our* request?

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -21,8 +21,6 @@
 
 namespace frc {
 
-using TimerEventHandler = std::function<void()>;
-
 class Notifier : public ErrorBase {
  public:
   /**
@@ -31,7 +29,7 @@ class Notifier : public ErrorBase {
    * @param handler The handler is called at the notification time which is set
    *                using StartSingle or StartPeriodic.
    */
-  explicit Notifier(TimerEventHandler handler);
+  explicit Notifier(std::function<void()> handler);
 
   template <typename Callable, typename Arg, typename... Args>
   Notifier(Callable&& f, Arg&& arg, Args&&... args)
@@ -51,7 +49,7 @@ class Notifier : public ErrorBase {
    *
    * @param handler Handler
    */
-  void SetHandler(TimerEventHandler handler);
+  void SetHandler(std::function<void()> handler);
 
   /**
    * Register for single event notification.
@@ -108,7 +106,7 @@ class Notifier : public ErrorBase {
   std::atomic<HAL_NotifierHandle> m_notifier{0};
 
   // Address of the handler
-  TimerEventHandler m_handler;
+  std::function<void()> m_handler;
 
   // The absolute expiration time
   double m_expirationTime = 0;

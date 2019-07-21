@@ -5,13 +5,12 @@
 
 resources:
   containers:
-  - container: wpilib2019
-    image: wpilib/roborio-cross-ubuntu:2019-18.04
+  - container: wpilib2020
+    image: wpilib/roborio-cross-ubuntu:2020-18.04
   - container: raspbian
-    image:  wpilib/raspbian-cross-ubuntu:18.04
-  - container: ubuntu18
-    image: ubuntu:18.04
-    options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
+    image:  wpilib/raspbian-cross-ubuntu:10-18.04
+  - container: ubuntu
+    image:  wpilib/ubuntu-base:18.04
 
 stages:
 - stage: Build
@@ -20,7 +19,7 @@ stages:
     pool:
       vmImage: 'Ubuntu 16.04'
 
-    container: wpilib2019
+    container: wpilib2020
 
     steps:
       - task: Gradle@2
@@ -31,7 +30,7 @@ stages:
           publishJUnitResults: false
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PonlyAthena'
+          options: '-Ponlylinuxathena'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
@@ -55,7 +54,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PonlyRaspbian'
+          options: '-Ponlylinuxraspbian'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
@@ -68,7 +67,7 @@ stages:
     pool:
       vmImage: 'Ubuntu 16.04'
 
-    container: wpilib2019
+    container: ubuntu
 
     steps:
       - task: Gradle@2
@@ -79,7 +78,6 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PskipAthena'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
@@ -92,20 +90,14 @@ stages:
     pool:
       vmImage: 'Ubuntu 16.04'
 
-    container: ubuntu18
+    container: ubuntu
 
     steps:
         - script: |
-            /tmp/docker exec -t -u 0 ci-container \
-            sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
-          displayName: Set up sudo
-        - script: |
-            sudo apt-get update -y
-            sudo apt-get install clang-format-6.0 python3-setuptools python3-pip git -y
             sudo pip3 install wpiformat
-            git checkout -b master
-          displayName: 'Install Dependencies'
+          displayName: 'Install wpiformat'
         - script: |
+            git checkout -b master
             wpiformat -clang 6.0
           displayName: 'Run wpiformat'
         - script: |
@@ -117,7 +109,7 @@ stages:
     pool:
       vmImage: 'Ubuntu 16.04'
 
-    container: wpilib2019
+    container: wpilib2020
 
     steps:
         - task: CMake@1
@@ -130,27 +122,18 @@ stages:
 
   - job: Windows_64_Bit
     pool:
-      vmImage: 'vs2017-win2016'
+      vmImage: 'windows-2019'
     steps:
-      - powershell: |
-          mkdir build
-          $ProgressPreference = 'SilentlyContinue'
-          wget "https://download.java.net/java/ga/jdk11/openjdk-11_windows-x64_bin.zip" -O "build\jdk.zip"
-        displayName: 'Download JDK'
-      - task: JavaToolInstaller@0
-        inputs:
-          jdkSourceOption: localDirectory
-          jdkFile: 'build/jdk.zip'
-          jdkDestinationDirectory: 'build/jdkinst'
-          jdkArchitectureOption: x64
       - task: Gradle@2
         inputs:
           workingDirectory: ''
           gradleWrapperFile: 'gradlew'
           gradleOptions: '-Xmx3072m'
+          jdkVersionOption: '1.11'
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
+          options: '-PskipPMD'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
@@ -161,7 +144,7 @@ stages:
 
   - job: Windows_32_Bit
     pool:
-      vmImage: 'vs2017-win2016'
+      vmImage: 'windows-2019'
     steps:
       - powershell: |
           mkdir build
@@ -182,6 +165,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
+          options: '-PskipPMD'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
       - task: PublishPipelineArtifact@0
@@ -191,13 +175,11 @@ stages:
 
   - job: Mac
     pool:
-      vmImage: 'xcode9-macos10.13'
+      vmImage: 'macOS-10.14'
     steps:
       - script: |
           mkdir build
-          wget "https://download.java.net/java/ga/jdk11/openjdk-11_osx-x64_bin.tar.gz" -O "build/jdk.tar.gz"
-          sudo tar xvzf build/jdk.tar.gz -C /Library/Java/JavaVirtualMachines/
-          export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/
+          export JAVA_HOME=`/usr/libexec/java_home -v 11`
         displayName: 'Setup JDK'
       - script: |
           rm /Users/vsts/.gradle/init.d/log-gradle-version-plugin.gradle
@@ -207,11 +189,11 @@ stages:
           workingDirectory: ''
           gradleWrapperFile: 'gradlew'
           gradleOptions: '-Xmx3072m'
-          javaHomeOption: 'path'
-          jdkDirectory: '/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/'
+          jdkVersionOption: '1.11'
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
+          #options: ''
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
@@ -224,7 +206,7 @@ stages:
   jobs:
   - job: CombineJob
     pool:
-      vmImage: 'xcode9-macos10.13'
+      vmImage: 'macOS-10.14'
 
     steps:
     - checkout: none

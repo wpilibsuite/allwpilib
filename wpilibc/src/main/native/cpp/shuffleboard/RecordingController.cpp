@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -44,7 +44,6 @@ void RecordingController::AddEventMarker(
     DriverStation::ReportError("Shuffleboard event name was not specified");
     return;
   }
-  auto arr = wpi::ArrayRef<std::string>{
-      description, ShuffleboardEventImportanceName(importance)};
-  m_eventsTable->GetSubTable(name)->GetEntry("Info").SetStringArray(arr);
+  m_eventsTable->GetSubTable(name)->GetEntry("Info").SetStringArray(
+      {description, ShuffleboardEventImportanceName(importance)});
 }

@@ -981,13 +981,13 @@ TEST_P(StorageTestPopulateOne, DeletedGetEntries) {
   EXPECT_TRUE(storage.GetEntries("", 0).empty());
 }
 
-INSTANTIATE_TEST_CASE_P(StorageTestsEmpty, StorageTestEmpty,
-                        ::testing::Bool(), );
-INSTANTIATE_TEST_CASE_P(StorageTestsPopulateOne, StorageTestPopulateOne,
-                        ::testing::Bool(), );
-INSTANTIATE_TEST_CASE_P(StorageTestsPopulated, StorageTestPopulated,
-                        ::testing::Bool(), );
-INSTANTIATE_TEST_CASE_P(StorageTestsPersistent, StorageTestPersistent,
-                        ::testing::Bool(), );
+INSTANTIATE_TEST_SUITE_P(StorageTestsEmpty, StorageTestEmpty,
+                         ::testing::Bool());
+INSTANTIATE_TEST_SUITE_P(StorageTestsPopulateOne, StorageTestPopulateOne,
+                         ::testing::Bool());
+INSTANTIATE_TEST_SUITE_P(StorageTestsPopulated, StorageTestPopulated,
+                         ::testing::Bool());
+INSTANTIATE_TEST_SUITE_P(StorageTestsPersistent, StorageTestPersistent,
+                         ::testing::Bool());
 
 }  // namespace nt

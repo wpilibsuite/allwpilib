@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -31,7 +31,7 @@ const int ADXRS450_SpiGyroWrapper::kPacketSize = 4 + 1;  // +1 for timestamp
 
 template <class T>
 constexpr const T& clamp(const T& value, const T& low, const T& high) {
-  return std::max(low, std::min(value, high));
+  return (std::max)(low, (std::min)(value, high));
 }
 
 static void ADXRS450SPI_ReadBufferCallback(const char* name, void* param,
@@ -65,7 +65,7 @@ bool ADXRS450_SpiGyroWrapper::GetInitialized() const {
 }
 
 void ADXRS450_SpiGyroWrapper::ResetData() {
-  std::lock_guard<wpi::recursive_spinlock> lock(m_angle.GetMutex());
+  std::scoped_lock lock(m_angle.GetMutex());
   m_angle.Reset(0.0);
   m_angleDiff = 0;
 }
@@ -78,7 +78,7 @@ void ADXRS450_SpiGyroWrapper::HandleRead(uint8_t* buffer, uint32_t count) {
 void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint32_t* buffer,
                                                     int32_t numToRead,
                                                     int32_t& outputCount) {
-  std::lock_guard<wpi::recursive_spinlock> lock(m_angle.GetMutex());
+  std::scoped_lock lock(m_angle.GetMutex());
   int32_t messagesToSend =
       1 + std::abs(m_angleDiff > 0
                        ? std::ceil(m_angleDiff / kMaxAngleDeltaPerMessage)
@@ -124,7 +124,7 @@ void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint32_t* buffer,
 }
 
 void ADXRS450_SpiGyroWrapper::SetAngle(double angle) {
-  std::lock_guard<wpi::recursive_spinlock> lock(m_angle.GetMutex());
+  std::scoped_lock lock(m_angle.GetMutex());
   if (m_angle != angle) {
     m_angleDiff += angle - m_angle;
     m_angle = angle;

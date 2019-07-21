@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -74,7 +74,7 @@ class CallbackThread : public wpi::SafeThread {
   struct Poller {
     void Terminate() {
       {
-        std::lock_guard<wpi::mutex> lock(poll_mutex);
+        std::scoped_lock lock(poll_mutex);
         terminating = true;
       }
       poll_cond.notify_all();
@@ -94,7 +94,7 @@ class CallbackThread : public wpi::SafeThread {
     auto poller = m_pollers[poller_uid];
     if (!poller) return;
     {
-      std::lock_guard<wpi::mutex> lock(poller->poll_mutex);
+      std::scoped_lock lock(poller->poll_mutex);
       poller->poll_queue.emplace(std::forward<Args>(args)...);
     }
     poller->poll_cond.notify_one();
@@ -104,7 +104,7 @@ class CallbackThread : public wpi::SafeThread {
 template <typename Derived, typename TUserInfo, typename TListenerData,
           typename TNotifierData>
 void CallbackThread<Derived, TUserInfo, TListenerData, TNotifierData>::Main() {
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
   while (m_active) {
     while (m_queue.empty()) {
       m_cond.wait(lock);
@@ -138,7 +138,8 @@ void CallbackThread<Derived, TUserInfo, TListenerData, TNotifierData>::Main() {
           if (!listener) continue;
           if (!static_cast<Derived*>(this)->Matches(listener, item.second))
             continue;
-          static_cast<Derived*>(this)->SetListener(&item.second, i);
+          static_cast<Derived*>(this)->SetListener(&item.second,
+                                                   static_cast<unsigned>(i));
           if (listener.callback) {
             lock.unlock();
             static_cast<Derived*>(this)->DoCallback(listener.callback,
@@ -240,7 +241,7 @@ class CallbackManager {
       if (!poller) return infos;
     }
 
-    std::unique_lock<wpi::mutex> lock(poller->poll_mutex);
+    std::unique_lock lock(poller->poll_mutex);
     auto timeout_time = std::chrono::steady_clock::now() +
                         std::chrono::duration<double>(timeout);
     *timed_out = false;
@@ -285,7 +286,7 @@ class CallbackManager {
     }
 
     {
-      std::lock_guard<wpi::mutex> lock(poller->poll_mutex);
+      std::scoped_lock lock(poller->poll_mutex);
       poller->cancelling = true;
     }
     poller->poll_cond.notify_one();

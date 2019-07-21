@@ -11,6 +11,7 @@ generatedFileExclude {
   src/main/native/cpp/http_parser\.cpp$
   src/main/native/cpp/llvm/
   src/main/native/include/llvm/
+  src/main/native/include/units/units\.h$
   src/main/native/include/wpi/AlignOf\.h$
   src/main/native/include/wpi/ArrayRef\.h$
   src/main/native/include/wpi/Chrono\.h$
@@ -27,6 +28,7 @@ generatedFileExclude {
   src/main/native/include/wpi/ErrorOr\.h$
   src/main/native/include/wpi/FileSystem\.h$
   src/main/native/include/wpi/Format\.h$
+  src/main/native/include/wpi/FunctionExtras\.h$
   src/main/native/include/wpi/Hashing\.h$
   src/main/native/include/wpi/IntrusiveRefCntPtr\.h$
   src/main/native/include/wpi/ManagedStatic\.h$
@@ -35,7 +37,9 @@ generatedFileExclude {
   src/main/native/include/wpi/MemAlloc\.h$
   src/main/native/include/wpi/NativeFormatting\.h$
   src/main/native/include/wpi/Path\.h$
+  src/main/native/include/wpi/PointerIntPair\.h$
   src/main/native/include/wpi/PointerLikeTypeTraits\.h$
+  src/main/native/include/wpi/PointerUnion\.h$
   src/main/native/include/wpi/STLExtras\.h$
   src/main/native/include/wpi/Signal\.h$
   src/main/native/include/wpi/SmallPtrSet\.h$
@@ -61,9 +65,9 @@ generatedFileExclude {
   src/main/native/include/uv\.h$
   src/main/native/include/uv/
   src/main/native/libuv/
-  src/main/native/include/wpi/optional\.h$
-  src/test/native/cpp/test_optional\.cpp$
   src/main/native/resources/
+  src/test/native/cpp/UnitsTest\.cpp$
+  src/test/native/cpp/llvm/
 }
 
 licenseUpdateExclude {
