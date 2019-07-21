@@ -10,8 +10,10 @@ cppSrcFileInclude {
 generatedFileExclude {
   src/main/native/cpp/http_parser\.cpp$
   src/main/native/cpp/llvm/
+  src/main/native/include/Eigen/
   src/main/native/include/llvm/
   src/main/native/include/units/units\.h$
+  src/main/native/include/unsupported/
   src/main/native/include/wpi/AlignOf\.h$
   src/main/native/include/wpi/ArrayRef\.h$
   src/main/native/include/wpi/Chrono\.h$
