@@ -17,8 +17,8 @@ class Rotation2dTest {
 
   @Test
   void testRadiansToDegrees() {
-    Rotation2d one = new Rotation2d(Math.PI / 3);
-    Rotation2d two = new Rotation2d(Math.PI / 4);
+    var one = new Rotation2d(Math.PI / 3);
+    var two = new Rotation2d(Math.PI / 4);
 
     assertAll(
         () -> assertEquals(one.getDegrees(), 60.0, kEpsilon),
@@ -28,8 +28,8 @@ class Rotation2dTest {
 
   @Test
   void testRadiansAndDegrees() {
-    Rotation2d one = Rotation2d.fromDegrees(45.0);
-    Rotation2d two = Rotation2d.fromDegrees(30.0);
+    var one = Rotation2d.fromDegrees(45.0);
+    var two = Rotation2d.fromDegrees(30.0);
 
     assertAll(
         () -> assertEquals(one.getRadians(), Math.PI / 4, kEpsilon),
@@ -39,7 +39,7 @@ class Rotation2dTest {
 
   @Test
   void testRotateByFromZero() {
-    Rotation2d zero = new Rotation2d();
+    var zero = new Rotation2d();
     var rotated = zero.rotateBy(Rotation2d.fromDegrees(90.0));
 
     assertAll(
@@ -50,7 +50,7 @@ class Rotation2dTest {
 
   @Test
   void testRotateByNonZero() {
-    Rotation2d rot = Rotation2d.fromDegrees(90.0);
+    var rot = Rotation2d.fromDegrees(90.0);
     rot = rot.plus(Rotation2d.fromDegrees(30.0));
 
     assertEquals(rot.getDegrees(), 120.0, kEpsilon);
@@ -58,8 +58,8 @@ class Rotation2dTest {
 
   @Test
   void testMinus() {
-    Rotation2d one = Rotation2d.fromDegrees(70.0);
-    Rotation2d two = Rotation2d.fromDegrees(30.0);
+    var one = Rotation2d.fromDegrees(70.0);
+    var two = Rotation2d.fromDegrees(30.0);
 
     assertEquals(one.minus(two).getDegrees(), 40.0, kEpsilon);
   }

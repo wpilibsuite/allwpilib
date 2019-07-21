@@ -17,8 +17,8 @@ class Pose2dTest {
 
   @Test
   void testTransformBy() {
-    Pose2d initial = new Pose2d(new Translation2d(1.0, 2.0), Rotation2d.fromDegrees(45.0));
-    Transform2d transformation = new Transform2d(new Translation2d(5.0, 0.0),
+    var initial = new Pose2d(new Translation2d(1.0, 2.0), Rotation2d.fromDegrees(45.0));
+    var transformation = new Transform2d(new Translation2d(5.0, 0.0),
         Rotation2d.fromDegrees(5.0));
 
     var transformed = initial.plus(transformation);
@@ -32,10 +32,10 @@ class Pose2dTest {
 
   @Test
   void testRelativeTo() {
-    Pose2d initial = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(45.0));
-    Pose2d last = new Pose2d(5.0, 5.0, Rotation2d.fromDegrees(45.0));
+    var initial = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(45.0));
+    var last = new Pose2d(5.0, 5.0, Rotation2d.fromDegrees(45.0));
 
-    Pose2d finalRelativeToInitial = last.relativeTo(initial);
+    var finalRelativeToInitial = last.relativeTo(initial);
 
     assertAll(
         () -> assertEquals(finalRelativeToInitial.getTranslation().getX(), 5.0 * Math.sqrt(2.0),

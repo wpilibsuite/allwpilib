@@ -17,7 +17,7 @@ class Twist2dTest {
 
   @Test
   void testStraightLineTwist() {
-    Twist2d straight = new Twist2d(5.0, 0.0, 0.0);
+    var straight = new Twist2d(5.0, 0.0, 0.0);
     var straightPose = new Pose2d().exp(straight);
 
     assertAll(
@@ -29,7 +29,7 @@ class Twist2dTest {
 
   @Test
   void testQuarterCirleTwist() {
-    Twist2d quarterCircle = new Twist2d(5.0 / 2.0 * Math.PI, 0, Math.PI / 2.0);
+    var quarterCircle = new Twist2d(5.0 / 2.0 * Math.PI, 0, Math.PI / 2.0);
     var quarterCirclePose = new Pose2d().exp(quarterCircle);
 
     assertAll(
@@ -41,7 +41,7 @@ class Twist2dTest {
 
   @Test
   void testDiagonalNoDtheta() {
-    Twist2d diagonal = new Twist2d(2.0, 2.0, 0.0);
+    var diagonal = new Twist2d(2.0, 2.0, 0.0);
     var diagonalPose = new Pose2d().exp(diagonal);
 
     assertAll(

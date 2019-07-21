@@ -17,8 +17,8 @@ class Translation2dTest {
 
   @Test
   void testSum() {
-    Translation2d one = new Translation2d(1.0, 3.0);
-    Translation2d two = new Translation2d(2.0, 5.0);
+    var one = new Translation2d(1.0, 3.0);
+    var two = new Translation2d(2.0, 5.0);
 
     var sum = one.plus(two);
 
@@ -30,8 +30,8 @@ class Translation2dTest {
 
   @Test
   void testDifference() {
-    Translation2d one = new Translation2d(1.0, 3.0);
-    Translation2d two = new Translation2d(2.0, 5.0);
+    var one = new Translation2d(1.0, 3.0);
+    var two = new Translation2d(2.0, 5.0);
 
     var difference = one.minus(two);
 
@@ -43,7 +43,7 @@ class Translation2dTest {
 
   @Test
   void testRotateBy() {
-    Translation2d another = new Translation2d(3.0, 0.0);
+    var another = new Translation2d(3.0, 0.0);
     var rotated = another.rotateBy(Rotation2d.fromDegrees(90.0));
 
     assertAll(
@@ -54,7 +54,7 @@ class Translation2dTest {
 
   @Test
   void testMultiplication() {
-    Translation2d original = new Translation2d(3.0, 5.0);
+    var original = new Translation2d(3.0, 5.0);
     var mult = original.times(3);
 
     assertAll(
@@ -65,7 +65,7 @@ class Translation2dTest {
 
   @Test
   void testDivision() {
-    Translation2d original = new Translation2d(3.0, 5.0);
+    var original = new Translation2d(3.0, 5.0);
     var div = original.div(2);
 
     assertAll(
@@ -76,20 +76,20 @@ class Translation2dTest {
 
   @Test
   void testNorm() {
-    Translation2d one = new Translation2d(3.0, 5.0);
+    var one = new Translation2d(3.0, 5.0);
     assertEquals(one.getNorm(), Math.hypot(3.0, 5.0), kEpsilon);
   }
 
   @Test
   void testDistance() {
-    Translation2d one = new Translation2d(1, 1);
-    Translation2d two = new Translation2d(6, 6);
+    var one = new Translation2d(1, 1);
+    var two = new Translation2d(6, 6);
     assertEquals(one.getDistance(two), 5 * Math.sqrt(2), kEpsilon);
   }
 
   @Test
   void testUnaryMinus() {
-    Translation2d original = new Translation2d(-4.5, 7);
+    var original = new Translation2d(-4.5, 7);
     var inverted = original.unaryMinus();
 
     assertAll(
