@@ -21,6 +21,9 @@ public class Transform2d {
    * @param last    The final pose for the transformation.
    */
   public Transform2d(Pose2d initial, Pose2d last) {
+    // We are rotating the difference between the translations
+    // using a clockwise rotation matrix. This transforms the global
+    // delta into a local delta (relative to the initial pose).
     m_translation = last.getTranslation().minus(initial.getTranslation())
             .rotateBy(initial.getRotation().unaryMinus());
 

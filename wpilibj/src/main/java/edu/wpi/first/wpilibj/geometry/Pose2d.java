@@ -149,7 +149,7 @@ public class Pose2d {
       s = sinTheta / dtheta;
       c = (1 - cosTheta) / dtheta;
     }
-    Transform2d transform = new Transform2d(new Translation2d(dx * s - dy * c, dx * c + dy * s),
+    var transform = new Transform2d(new Translation2d(dx * s - dy * c, dx * c + dy * s),
             new Rotation2d(cosTheta, sinTheta));
 
     return this.plus(transform);

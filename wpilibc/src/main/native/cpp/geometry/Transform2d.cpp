@@ -12,6 +12,9 @@
 using namespace frc;
 
 Transform2d::Transform2d(Pose2d initial, Pose2d final) {
+  // We are rotating the difference between the translations
+  // using a clockwise rotation matrix. This transforms the global
+  // delta into a local delta (relative to the initial pose).
   m_translation = (final.Translation() - initial.Translation())
                       .RotateBy(-initial.Rotation());
 

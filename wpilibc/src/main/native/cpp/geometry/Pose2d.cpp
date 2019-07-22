@@ -15,7 +15,7 @@ Pose2d::Pose2d(Translation2d translation, Rotation2d rotation)
     : m_translation(translation), m_rotation(rotation) {}
 
 Pose2d::Pose2d(double x, double y, Rotation2d rotation)
-    : m_translation(Translation2d(x, y)), m_rotation(rotation) {}
+    : m_translation(x, y), m_rotation(rotation) {}
 
 Pose2d Pose2d::operator+(const Transform2d& other) const {
   return TransformBy(other);
@@ -38,7 +38,9 @@ Pose2d Pose2d::RelativeTo(const Pose2d& other) const {
 }
 
 Pose2d Pose2d::Exp(const Twist2d& twist) const {
-  const auto dx = twist.dx, dy = twist.dy, dtheta = twist.dtheta;
+  const auto dx = twist.dx;
+  const auto dy = twist.dy;
+  const auto dtheta = twist.dtheta;
 
   const auto sinTheta = std::sin(dtheta);
   const auto cosTheta = std::cos(dtheta);
