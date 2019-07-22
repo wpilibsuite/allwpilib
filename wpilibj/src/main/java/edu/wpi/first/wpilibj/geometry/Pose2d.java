@@ -53,9 +53,9 @@ public class Pose2d {
    * transformed pose.
    *
    * <p>The matrix multiplication is as follows
-   * [x_new] += [cos, -sin, 0][transform.x]
+   * [x_new]    [cos, -sin, 0][transform.x]
    * [y_new] += [sin,  cos, 0][transform.y]
-   * [t_new] += [0,    0,   1][transform.t]
+   * [t_new]    [0,    0,   1][transform.t]
    *
    * @param other The transform to transform the pose by.
    * @return The transformed pose.

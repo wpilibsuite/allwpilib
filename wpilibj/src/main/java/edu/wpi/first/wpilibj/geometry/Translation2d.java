@@ -84,7 +84,7 @@ public class Translation2d {
    *
    * <p>This multiplies the translation vector by a counterclockwise rotation
    * matrix of the given angle.
-   * [x_new] = [other.cos, -other.sin][x]
+   * [x_new]   [other.cos, -other.sin][x]
    * [y_new] = [other.sin,  other.cos][y]
    *
    * <p>For example, rotating a Translation2d of {2, 0} by 90 degrees will return a
