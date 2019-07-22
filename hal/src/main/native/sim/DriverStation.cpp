@@ -28,7 +28,7 @@ static wpi::condition_variable* newDSDataAvailableCond;
 static wpi::mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
 static std::atomic_bool isFinalized{false};
-static HALSIM_SendErrorHandler sendErrorHandler{nullptr};
+static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 
 namespace hal {
 namespace init {
@@ -42,11 +42,17 @@ void InitializeDriverStation() {
 using namespace hal;
 
 extern "C" {
+
+void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {
+  sendErrorHandler.store(handler);
+}
+
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg) {
-  if (sendErrorHandler)
-    return sendErrorHandler(isError, errorCode, isLVCode, details, location,
+  auto errorHandler = sendErrorHandler.load();
+  if (errorHandler)
+    return errorHandler(isError, errorCode, isLVCode, details, location,
                             callStack, printMsg);
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
