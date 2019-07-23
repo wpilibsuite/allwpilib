@@ -53,7 +53,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   auto errorHandler = sendErrorHandler.load();
   if (errorHandler)
     return errorHandler(isError, errorCode, isLVCode, details, location,
-                            callStack, printMsg);
+                        callStack, printMsg);
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
