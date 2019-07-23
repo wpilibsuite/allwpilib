@@ -13,7 +13,7 @@
 #include "frc/Victor.h"
 #include "frc/controller/PIDController.h"
 #include "frc/controller/PIDControllerRunner.h"
-#include "frc/filters/LinearFilter.h"
+#include "frc/LinearFilter.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -68,8 +68,7 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
                                 TestBench::kTalonEncoderChannelB);
         break;
     }
-    m_filter = new LinearFilter(
-        LinearFilter::MovingAverage(50));
+    m_filter = new LinearFilter(LinearFilter::MovingAverage(50));
   }
 
   void TearDown() override {
