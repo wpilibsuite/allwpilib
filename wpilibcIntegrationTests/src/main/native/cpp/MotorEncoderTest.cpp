@@ -13,7 +13,7 @@
 #include "frc/Victor.h"
 #include "frc/controller/PIDController.h"
 #include "frc/controller/PIDControllerRunner.h"
-#include "frc/filters/LinearDigitalFilter.h"
+#include "frc/filters/LinearFilter.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -46,7 +46,7 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
  protected:
   SpeedController* m_speedController;
   Encoder* m_encoder;
-  LinearDigitalFilter* m_filter;
+  LinearFilter* m_filter;
 
   void SetUp() override {
     switch (GetParam()) {
@@ -68,8 +68,8 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
                                 TestBench::kTalonEncoderChannelB);
         break;
     }
-    m_filter = new LinearDigitalFilter(
-        LinearDigitalFilter::MovingAverage(*m_encoder, 50));
+    m_filter = new LinearFilter(
+        LinearFilter::MovingAverage(50));
   }
 
   void TearDown() override {
@@ -166,7 +166,6 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
 TEST_P(MotorEncoderTest, VelocityPIDController) {
   Reset();
 
-  m_encoder->SetPIDSourceType(PIDSourceType::kRate);
   frc2::PIDController pidController(1e-5, 0.0, 0.0006);
   pidController.SetAbsoluteTolerance(200.0);
   pidController.SetOutputRange(-0.3, 0.3);
@@ -174,7 +173,7 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
 
   /* 10 seconds should be plenty time to get to the reference */
   frc::PIDControllerRunner pidRunner(
-      pidController, [&] { return m_filter->PIDGet(); },
+      pidController, [&] { return m_filter->Calculate(m_encoder->GetRate()); },
       [&](double output) { m_speedController->Set(output + 8e-5); });
   pidRunner.Enable();
   Wait(10.0);
