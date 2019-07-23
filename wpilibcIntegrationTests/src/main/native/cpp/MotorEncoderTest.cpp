@@ -8,12 +8,12 @@
 #include "TestBench.h"
 #include "frc/Encoder.h"
 #include "frc/Jaguar.h"
+#include "frc/LinearFilter.h"
 #include "frc/Talon.h"
 #include "frc/Timer.h"
 #include "frc/Victor.h"
 #include "frc/controller/PIDController.h"
 #include "frc/controller/PIDControllerRunner.h"
-#include "frc/LinearFilter.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
