@@ -21,7 +21,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.PIDControllerRunner;
-import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
@@ -197,15 +196,16 @@ public class MotorEncoderTest extends AbstractComsSetup {
 
   @Test
   public void testVelocityPIDController() {
-    me.getEncoder().setPIDSourceType(PIDSourceType.kRate);
-    LinearDigitalFilter filter = LinearDigitalFilter.movingAverage(me.getEncoder(), 50);
+    LinearFilter filter = LinearFilter.movingAverage(50);
     PIDController pidController = new PIDController(1e-5, 0.0, 0.0006);
     pidController.setAbsoluteTolerance(200);
     pidController.setOutputRange(-0.3, 0.3);
     pidController.setSetpoint(600);
 
-    PIDControllerRunner pidRunner = new PIDControllerRunner(pidController, filter::pidGet,
+    PIDControllerRunner pidRunner = new PIDControllerRunner(pidController,
+        () -> filter.calculate(me.getEncoder().getRate()),
         output -> me.getMotor().set(output + 8e-5));
+
     pidRunner.enable();
     Timer.delay(10.0);
     pidRunner.disable();
