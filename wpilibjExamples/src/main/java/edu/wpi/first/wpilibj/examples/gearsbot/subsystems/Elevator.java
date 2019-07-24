@@ -61,7 +61,7 @@ public class Elevator extends PIDSubsystem {
    * The log method puts interesting information to the SmartDashboard.
    */
   public void log() {
-    SmartDashboard.putData("Elevator Pot", (AnalogPotentiometer) m_pot);
+    SmartDashboard.putData("Elevator Pot", m_pot);
   }
 
   /**

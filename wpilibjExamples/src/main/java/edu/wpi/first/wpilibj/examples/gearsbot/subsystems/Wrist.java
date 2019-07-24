@@ -58,7 +58,7 @@ public class Wrist extends PIDSubsystem {
    * The log method puts interesting information to the SmartDashboard.
    */
   public void log() {
-    SmartDashboard.putData("Wrist Angle", (AnalogPotentiometer) m_pot);
+    SmartDashboard.putData("Wrist Angle", m_pot);
   }
 
   /**
