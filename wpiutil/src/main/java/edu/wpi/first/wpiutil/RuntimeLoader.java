@@ -69,7 +69,6 @@ public final class RuntimeLoader<T> {
     try {
       // First, try loading path
       System.loadLibrary(m_libraryName);
-      return;
     } catch (UnsatisfiedLinkError ule) {
       // Then load the hash from the resources
       String hashName = RuntimeDetector.getHashLibraryResource(m_libraryName);
@@ -115,7 +114,6 @@ public final class RuntimeLoader<T> {
     try {
       // First, try loading path
       System.loadLibrary(m_libraryName);
-      return;
     } catch (UnsatisfiedLinkError ule) {
       // Then load the hash from the input file
       String resname = RuntimeDetector.getLibraryResource(m_libraryName);
