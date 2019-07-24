@@ -94,18 +94,18 @@ public class PIDTest extends AbstractComsSetup {
   }
 
   @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
+  public static void setUpBeforeClass() {
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
+  public static void tearDownAfterClass() {
     logger.fine("TearDownAfterClass: " + me.getType());
     me.teardown();
     me = null;
   }
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     logger.fine("Setup: " + me.getType());
     me.setup();
     m_table = NetworkTableInstance.getDefault().getTable("TEST_PID");
@@ -118,7 +118,7 @@ public class PIDTest extends AbstractComsSetup {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     logger.fine("Teardown: " + me.getType());
     m_runner.disable();
     m_controller.close();

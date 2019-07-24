@@ -40,12 +40,12 @@ public class AbstractTestSuiteTest {
   TestForAbstractTestSuite m_testSuite;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     m_testSuite = new TestForAbstractTestSuite();
   }
 
   @Test
-  public void testGetTestsMatchingAll() throws InitializationError {
+  public void testGetTestsMatchingAll() {
     // when
     List<Class<?>> collectedTests = m_testSuite.getAllClassMatching(".*");
     // then
@@ -53,7 +53,7 @@ public class AbstractTestSuiteTest {
   }
 
   @Test
-  public void testGetTestsMatchingSample() throws InitializationError {
+  public void testGetTestsMatchingSample() {
     // when
     List<Class<?>> collectedTests = m_testSuite.getAllClassMatching(".*Sample.*");
     // then
@@ -61,7 +61,7 @@ public class AbstractTestSuiteTest {
   }
 
   @Test
-  public void testGetTestsMatchingUnusual() throws InitializationError {
+  public void testGetTestsMatchingUnusual() {
     // when
     List<Class<?>> collectedTests = m_testSuite.getAllClassMatching(".*Unusual.*");
     // then
@@ -70,7 +70,7 @@ public class AbstractTestSuiteTest {
   }
 
   @Test
-  public void testGetTestsFromSuiteMatchingAll() throws InitializationError {
+  public void testGetTestsFromSuiteMatchingAll() {
     // when
     List<Class<?>> collectedTests = m_testSuite.getSuiteOrTestMatchingRegex(".*");
     // then
@@ -78,7 +78,7 @@ public class AbstractTestSuiteTest {
   }
 
   @Test
-  public void testGetTestsFromSuiteMatchingTest() throws InitializationError {
+  public void testGetTestsFromSuiteMatchingTest() {
     // when
     List<Class<?>> collectedTests = m_testSuite.getSuiteOrTestMatchingRegex(".*Test.*");
     // then

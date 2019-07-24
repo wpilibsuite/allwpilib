@@ -20,7 +20,7 @@ public final class MockHardwareExtension implements BeforeAllCallback {
   }
 
   @Override
-  public void beforeAll(ExtensionContext context) throws Exception {
+  public void beforeAll(ExtensionContext context) {
     getRoot(context).getStore(Namespace.GLOBAL).getOrComputeIfAbsent("HAL Initalized", key -> {
       initializeHardware();
       return true;

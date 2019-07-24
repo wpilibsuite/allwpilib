@@ -76,7 +76,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     me.reset();
     encodersResetCheck(me);
   }

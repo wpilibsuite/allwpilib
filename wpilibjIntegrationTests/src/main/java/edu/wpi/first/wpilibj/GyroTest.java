@@ -35,14 +35,14 @@ public class GyroTest extends AbstractComsSetup {
   }
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     logger.fine("Setup: TiltPan camera");
     m_tpcam = TestBench.getInstance().getTiltPanCam();
     m_tpcam.setup();
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     m_tpcam.teardown();
   }
 

@@ -41,12 +41,12 @@ public class PDPTest extends AbstractComsSetup {
   private final double m_expectedStoppedCurrentDraw;
 
   @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
+  public static void setUpBeforeClass() {
     pdp = new PowerDistributionPanel();
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
+  public static void tearDownAfterClass() {
     pdp.close();
     pdp = null;
     me.teardown();
@@ -74,7 +74,7 @@ public class PDPTest extends AbstractComsSetup {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     me.reset();
   }
 

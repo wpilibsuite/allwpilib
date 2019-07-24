@@ -78,17 +78,17 @@ public class CounterTest extends AbstractComsSetup {
 
 
   @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
+  public static void setUpBeforeClass() {
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
+  public static void tearDownAfterClass() {
     counter.teardown();
     counter = null;
   }
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     counter.setup();
   }
 

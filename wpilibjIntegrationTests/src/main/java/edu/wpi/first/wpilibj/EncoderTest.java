@@ -79,7 +79,7 @@ public class EncoderTest extends AbstractComsSetup {
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
+  public static void tearDownAfterClass() {
     encoder.teardown();
     encoder = null;
   }
@@ -88,13 +88,13 @@ public class EncoderTest extends AbstractComsSetup {
    * Sets up the test and verifies that the test was reset to the default state.
    */
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     encoder.setup();
     testDefaultState();
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     encoder.reset();
   }
 

@@ -39,7 +39,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
 
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     m_relayFixture = TestBench.getRelayCrossConnectFixture();
     m_relayFixture.setup();
     m_builder = new SendableBuilderImpl();
@@ -48,7 +48,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     m_relayFixture.reset();
     m_relayFixture.teardown();
   }

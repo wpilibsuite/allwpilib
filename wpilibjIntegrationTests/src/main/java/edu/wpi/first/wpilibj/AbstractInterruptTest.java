@@ -161,7 +161,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
   }
 
   @Test(timeout = 2000)
-  public void testMultipleInterruptsTriggering() throws Exception {
+  public void testMultipleInterruptsTriggering() {
     // Given
     final InterruptCounter counter = new InterruptCounter();
     TestInterruptHandlerFunction function = new TestInterruptHandlerFunction(counter);

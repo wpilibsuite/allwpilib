@@ -70,13 +70,13 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
+  public static void tearDownAfterClass() {
     dio.teardown();
     dio = null;
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     dio.reset();
   }
 

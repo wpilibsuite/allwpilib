@@ -51,7 +51,7 @@ public class PCMTest extends AbstractComsSetup {
   private static DigitalInput fakeSolenoid2;
 
   @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
+  public static void setUpBeforeClass() {
     compressor = new Compressor();
 
     fakePressureSwitch = new DigitalOutput(11);
@@ -62,7 +62,7 @@ public class PCMTest extends AbstractComsSetup {
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
+  public static void tearDownAfterClass() {
     compressor.close();
 
     fakePressureSwitch.close();
@@ -73,7 +73,7 @@ public class PCMTest extends AbstractComsSetup {
   }
 
   @Before
-  public void reset() throws Exception {
+  public void reset() {
     compressor.stop();
     fakePressureSwitch.set(false);
   }

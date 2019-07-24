@@ -39,18 +39,18 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
 
 
   @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
+  public static void setUpBeforeClass() {
     analogIO = TestBench.getAnalogCrossConnectFixture();
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
+  public static void tearDownAfterClass() {
     analogIO.teardown();
     analogIO = null;
   }
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     analogIO.setup();
   }
 
