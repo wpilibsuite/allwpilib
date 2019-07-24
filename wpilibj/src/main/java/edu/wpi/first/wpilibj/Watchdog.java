@@ -225,7 +225,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     m_queueMutex.lock();
 
     try {
-      while (true) {
+      while (!Thread.currentThread().isInterrupted()) {
         if (m_watchdogs.size() > 0) {
           boolean timedOut = !awaitUntil(m_schedulerWaiter, m_watchdogs.peek().m_expirationTime);
           if (timedOut) {

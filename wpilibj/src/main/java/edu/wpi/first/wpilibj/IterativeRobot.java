@@ -46,7 +46,7 @@ public class IterativeRobot extends IterativeRobotBase {
     HAL.observeUserProgramStarting();
 
     // Loop forever, calling the appropriate mode-dependent function
-    while (true) {
+    while (!Thread.currentThread().isInterrupted()) {
       // Wait for new data to arrive
       m_ds.waitForData();
 
