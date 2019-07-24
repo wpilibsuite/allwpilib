@@ -282,7 +282,7 @@ public class DriverStation {
     } else {
       locString = "";
     }
-    StringBuilder traceString = new StringBuilder("");
+    StringBuilder traceString = new StringBuilder();
     if (printTrace) {
       boolean haveLoc = false;
       for (int i = stackTraceFirst; i < stackTrace.length; i++) {
