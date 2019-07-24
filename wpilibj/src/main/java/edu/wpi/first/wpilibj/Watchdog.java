@@ -69,13 +69,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   public int compareTo(Watchdog rhs) {
     // Elements with sooner expiration times are sorted as lesser. The head of
     // Java's PriorityQueue is the least element.
-    if (m_expirationTime < rhs.m_expirationTime) {
-      return -1;
-    } else if (m_expirationTime > rhs.m_expirationTime) {
-      return 1;
-    } else {
-      return 0;
-    }
+    return Long.compare(m_expirationTime, rhs.m_expirationTime);
   }
 
   /**
