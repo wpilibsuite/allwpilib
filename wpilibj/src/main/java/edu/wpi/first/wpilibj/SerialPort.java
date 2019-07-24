@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;

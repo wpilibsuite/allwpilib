@@ -15,7 +15,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.junit.runners.model.InitializationError;
 
 import edu.wpi.first.wpilibj.test.AbstractTestSuite.ClassMethodPair;
 

@@ -213,6 +213,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
 
+  @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
   private static void schedulerFunc() {
     m_queueMutex.lock();
 

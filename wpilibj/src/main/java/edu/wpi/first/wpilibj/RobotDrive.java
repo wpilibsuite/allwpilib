@@ -455,7 +455,9 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
           tInstances.kRobotDrive_MecanumCartesian);
       kMecanumCartesian_Reported = true;
     }
+    @SuppressWarnings("LocalVariableName")
     double xIn = x;
+    @SuppressWarnings("LocalVariableName")
     double yIn = y;
     // Negate y for the joystick.
     yIn = -yIn;

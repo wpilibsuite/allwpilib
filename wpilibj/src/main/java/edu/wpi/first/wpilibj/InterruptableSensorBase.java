@@ -84,10 +84,10 @@ public abstract class InterruptableSensorBase extends SendableBase {
   /**
    * Request one of the 8 interrupts asynchronously on this digital input.
    *
-   * @param handler The {@link Consumer<WaitResult>} that will be called whenever there is an
-   *                interrupt on this device. Request interrupts in synchronous mode where the user
-   *                program interrupt handler will be called when an interrupt occurs. The default
-   *                is interrupt on rising edges only.
+   * @param handler The {@link Consumer} that will be called whenever there is an interrupt on this
+   *                device. Request interrupts in synchronous mode where the user program interrupt
+   *                handler will be called when an interrupt occurs. The default is interrupt on
+   *                rising edges only.
    */
   public void requestInterrupts(Consumer<WaitResult> handler) {
     if (m_interrupt != 0) {
