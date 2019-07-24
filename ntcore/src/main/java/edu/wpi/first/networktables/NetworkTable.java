@@ -358,7 +358,7 @@ public final class NetworkTable {
    *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists with a different type
+   * @return False if the table key exists with a different type
    */
   boolean setDefaultValue(String key, NetworkTableValue defaultValue) {
     return getEntry(key).setDefaultValue(defaultValue);
