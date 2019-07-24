@@ -280,7 +280,7 @@ public final class NetworkTableEntry {
       switch (((NetworkTableValue) defaultValue).getType()) {
         case kBoolean:
           return NetworkTablesJNI.setDefaultBoolean(m_handle, time,
-              ((Boolean) otherValue).booleanValue());
+              (Boolean) otherValue);
         case kDouble:
           return NetworkTablesJNI.setDefaultDouble(m_handle, time,
               ((Number) otherValue).doubleValue());
@@ -438,7 +438,7 @@ public final class NetworkTableEntry {
       Object otherValue = ((NetworkTableValue) value).getValue();
       switch (((NetworkTableValue) value).getType()) {
         case kBoolean:
-          return NetworkTablesJNI.setBoolean(m_handle, time, ((Boolean) otherValue).booleanValue(),
+          return NetworkTablesJNI.setBoolean(m_handle, time, (Boolean) otherValue,
               false);
         case kDouble:
           return NetworkTablesJNI.setDouble(m_handle, time, ((Number) otherValue).doubleValue(),
@@ -612,7 +612,7 @@ public final class NetworkTableEntry {
       Object otherValue = ((NetworkTableValue) value).getValue();
       switch (((NetworkTableValue) value).getType()) {
         case kBoolean:
-          NetworkTablesJNI.setBoolean(m_handle, time, ((Boolean) otherValue).booleanValue(), true);
+          NetworkTablesJNI.setBoolean(m_handle, time, (Boolean) otherValue, true);
           return;
         case kDouble:
           NetworkTablesJNI.setDouble(m_handle, time, ((Number) otherValue).doubleValue(), true);

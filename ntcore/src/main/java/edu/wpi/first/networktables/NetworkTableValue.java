@@ -153,7 +153,7 @@ public final class NetworkTableValue {
     if (m_type != NetworkTableType.kBoolean) {
       throw new ClassCastException("cannot convert " + m_type + " to boolean");
     }
-    return ((Boolean) m_value).booleanValue();
+    return (Boolean) m_value;
   }
 
   /**
