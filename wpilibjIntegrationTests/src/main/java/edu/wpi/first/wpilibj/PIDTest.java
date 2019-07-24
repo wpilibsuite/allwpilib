@@ -174,12 +174,12 @@ public class PIDTest extends AbstractComsSetup {
   public void testSetSetpoint() {
     setupAbsoluteTolerance();
     setupOutputRange();
-    Double reference = 2500.0;
+    double reference = 2500.0;
     m_runner.disable();
     m_controller.setSetpoint(reference);
     m_runner.enable();
-    assertEquals("Did not correctly set reference", reference, new Double(m_controller
-        .getSetpoint()));
+    assertEquals("Did not correctly set reference", reference, m_controller
+        .getSetpoint(), 1e-3);
   }
 
   @Test(timeout = 10000)
