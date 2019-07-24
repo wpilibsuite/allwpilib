@@ -8,6 +8,7 @@
 package edu.wpi.first.networktables;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -65,8 +66,8 @@ class NetworkTableTest {
 
   private static Stream<Arguments> getHierarchyArguments() {
     return Stream.of(
-        Arguments.of(Arrays.asList("/"), ""),
-        Arguments.of(Arrays.asList("/"), "/"),
+        Arguments.of(Collections.singletonList("/"), ""),
+        Arguments.of(Collections.singletonList("/"), "/"),
         Arguments.of(Arrays.asList("/", "/foo", "/foo/bar", "/foo/bar/baz"), "/foo/bar/baz"),
         Arguments.of(Arrays.asList("/", "/foo", "/foo/bar", "/foo/bar/"), "/foo/bar/")
     );
