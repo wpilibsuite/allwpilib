@@ -66,7 +66,7 @@ public class PIDController extends SendableBase {
   private double m_totalError;
 
   enum Tolerance {
-    kAbsolute, kPercent;
+    kAbsolute, kPercent
   }
 
   private Tolerance m_toleranceType = Tolerance.kAbsolute;
