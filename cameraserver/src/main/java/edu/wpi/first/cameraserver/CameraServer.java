@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.wpi.cscore.AxisCamera;
@@ -170,13 +171,9 @@ public final class CameraServer {
       int sink = i.getHandle();
 
       // Get the source's subtable (if none exists, we're done)
-      int source;
-      Integer fixedSource = m_fixedSources.get(sink);
-      if (fixedSource != null) {
-        source = fixedSource;
-      } else {
-        source = CameraServerJNI.getSinkSource(sink);
-      }
+      int source = Objects.requireNonNullElseGet(m_fixedSources.get(sink),
+          () -> CameraServerJNI.getSinkSource(sink));
+
       if (source == 0) {
         continue;
       }
