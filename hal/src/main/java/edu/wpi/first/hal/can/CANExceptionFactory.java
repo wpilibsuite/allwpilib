@@ -32,13 +32,12 @@ public final class CANExceptionFactory {
         throw new CANMessageNotFoundException();
       case ERR_CANSessionMux_NotAllowed:
       case NIRioStatus.kRIOStatusFeatureNotSupported:
-        throw new CANMessageNotAllowedException("MessageID = " + Integer.toString(messageID));
+        throw new CANMessageNotAllowedException("MessageID = " + messageID);
       case ERR_CANSessionMux_NotInitialized:
       case NIRioStatus.kRIOStatusResourceNotInitialized:
         throw new CANNotInitializedException();
       default:
-        throw new UncleanStatusException("Fatal status code detected:  " + Integer.toString(
-            status));
+        throw new UncleanStatusException("Fatal status code detected:  " + status);
     }
   }
 
