@@ -100,8 +100,7 @@ public class Timer {
    * clock.
    */
   public synchronized void stop() {
-    final double temp = get();
-    m_accumulatedTime = temp;
+    m_accumulatedTime = get();
     m_running = false;
   }
 

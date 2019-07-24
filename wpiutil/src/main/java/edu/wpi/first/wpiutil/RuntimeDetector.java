@@ -96,8 +96,7 @@ public final class RuntimeDetector {
   public static synchronized String getLibraryResource(String libName) {
     computePlatform();
 
-    String toReturn = filePath + filePrefix + libName + fileExtension;
-    return toReturn;
+    return filePath + filePrefix + libName + fileExtension;
   }
 
   /**
@@ -106,8 +105,7 @@ public final class RuntimeDetector {
   public static synchronized String getHashLibraryResource(String libName) {
     computePlatform();
 
-    String toReturn = filePath + libName + ".hash";
-    return toReturn;
+    return filePath + libName + ".hash";
   }
 
   public static boolean isAthena() {
