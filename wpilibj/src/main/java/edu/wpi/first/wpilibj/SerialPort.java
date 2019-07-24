@@ -271,12 +271,7 @@ public class SerialPort implements AutoCloseable {
    */
   public String readString(int count) {
     byte[] out = read(count);
-    try {
-      return new String(out, 0, out.length, "US-ASCII");
-    } catch (UnsupportedEncodingException ex) {
-      ex.printStackTrace();
-      return "";
-    }
+    return new String(out, 0, out.length, StandardCharsets.US_ASCII);
   }
 
   /**
