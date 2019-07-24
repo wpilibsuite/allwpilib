@@ -32,9 +32,7 @@ class UsbCameraTest {
         camera.setConnectVerbose(1);
 
         CompletableFuture<String> result = new CompletableFuture<>();
-        CameraServerJNI.setLogger((level, file, line, message) -> {
-          result.complete(message);
-        }, 20);
+        CameraServerJNI.setLogger((level, file, line, message) -> result.complete(message), 20);
 
         assertTimeoutPreemptively(Duration.ofSeconds(5),
             () -> assertTrue(result.get().contains("Connecting to USB camera on ")));
@@ -47,9 +45,7 @@ class UsbCameraTest {
         camera.setConnectVerbose(0);
 
         CompletableFuture<String> result = new CompletableFuture<>();
-        CameraServerJNI.setLogger((level, file, line, message) -> {
-          result.complete(message);
-        }, 20);
+        CameraServerJNI.setLogger((level, file, line, message) -> result.complete(message), 20);
 
         assertThrows(TimeoutException.class,
             () -> result.get(3, TimeUnit.SECONDS));

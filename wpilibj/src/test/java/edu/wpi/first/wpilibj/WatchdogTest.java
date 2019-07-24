@@ -23,9 +23,7 @@ class WatchdogTest {
   void enableDisableTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    final Watchdog watchdog = new Watchdog(0.4, () -> {
-      watchdogCounter.addAndGet(1);
-    });
+    final Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1));
 
     System.out.println("Run 1");
     watchdog.enable();
@@ -69,9 +67,7 @@ class WatchdogTest {
   void resetTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    final Watchdog watchdog = new Watchdog(0.4, () -> {
-      watchdogCounter.addAndGet(1);
-    });
+    final Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1));
 
     watchdog.enable();
     try {
@@ -94,9 +90,7 @@ class WatchdogTest {
   void setTimeoutTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    final Watchdog watchdog = new Watchdog(1.0, () -> {
-      watchdogCounter.addAndGet(1);
-    });
+    final Watchdog watchdog = new Watchdog(1.0, () -> watchdogCounter.addAndGet(1));
 
     watchdog.enable();
     try {
@@ -146,9 +140,7 @@ class WatchdogTest {
   void epochsTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    final Watchdog watchdog = new Watchdog(0.4, () -> {
-      watchdogCounter.addAndGet(1);
-    });
+    final Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1));
 
     System.out.println("Run 1");
     watchdog.enable();
@@ -194,12 +186,8 @@ class WatchdogTest {
     final AtomicInteger watchdogCounter1 = new AtomicInteger(0);
     final AtomicInteger watchdogCounter2 = new AtomicInteger(0);
 
-    final Watchdog watchdog1 = new Watchdog(0.2, () -> {
-      watchdogCounter1.addAndGet(1);
-    });
-    final Watchdog watchdog2 = new Watchdog(0.6, () -> {
-      watchdogCounter2.addAndGet(1);
-    });
+    final Watchdog watchdog1 = new Watchdog(0.2, () -> watchdogCounter1.addAndGet(1));
+    final Watchdog watchdog2 = new Watchdog(0.6, () -> watchdogCounter2.addAndGet(1));
 
     watchdog2.enable();
     try {

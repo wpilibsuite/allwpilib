@@ -154,9 +154,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     long now = RobotController.getFPGATime();
     if (now  - m_lastEpochsPrintTime > kMinPrintPeriod) {
       m_lastEpochsPrintTime = now;
-      m_epochs.forEach((key, value) -> {
-        System.out.format("\t%s: %.6fs\n", key, value / 1.0e6);
-      });
+      m_epochs.forEach((key, value) -> System.out.format("\t%s: %.6fs\n", key, value / 1.0e6));
     }
   }
 
