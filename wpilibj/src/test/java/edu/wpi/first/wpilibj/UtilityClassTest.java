@@ -48,7 +48,7 @@ public abstract class UtilityClassTest {
   public void constructorReflectionTest() {
     Constructor constructor = m_clazz.getDeclaredConstructors()[0];
     constructor.setAccessible(true);
-    assertThrows(InvocationTargetException.class, () -> constructor.newInstance());
+    assertThrows(InvocationTargetException.class, constructor::newInstance);
   }
 
   @TestFactory

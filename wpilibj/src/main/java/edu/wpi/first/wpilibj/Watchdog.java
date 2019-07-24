@@ -42,7 +42,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   boolean m_suppressTimeoutMessage;
 
   static {
-    startDaemonThread(() -> schedulerFunc());
+    startDaemonThread(Watchdog::schedulerFunc);
   }
 
   private static final PriorityQueue<Watchdog> m_watchdogs = new PriorityQueue<>();
