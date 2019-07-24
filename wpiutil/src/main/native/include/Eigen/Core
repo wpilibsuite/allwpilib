@@ -97,7 +97,7 @@
 
 // this include file manages BLAS and MKL related macros
 // and inclusion of their respective header files
-#include "src/Core/util/MKL_support.h"
+// #include "src/Core/util/MKL_support.h"
 
 // if alignment is disabled, then disable vectorization. Note: EIGEN_MAX_ALIGN_BYTES is the proper check, it takes into
 // account both the user's will (EIGEN_MAX_ALIGN_BYTES,EIGEN_DONT_ALIGN) and our own platform checks
@@ -408,9 +408,9 @@ using std::ptrdiff_t;
 #endif
 
 // Half float support
-#include "src/Core/arch/CUDA/Half.h"
-#include "src/Core/arch/CUDA/PacketMathHalf.h"
-#include "src/Core/arch/CUDA/TypeCasting.h"
+// #include "src/Core/arch/CUDA/Half.h"
+// #include "src/Core/arch/CUDA/PacketMathHalf.h"
+// #include "src/Core/arch/CUDA/TypeCasting.h"
 
 #if defined EIGEN_VECTORIZE_CUDA
   #include "src/Core/arch/CUDA/PacketMath.h"
@@ -428,7 +428,7 @@ using std::ptrdiff_t;
 
 // Specialized functors to enable the processing of complex numbers
 // on CUDA devices
-#include "src/Core/arch/CUDA/Complex.h"
+// #include "src/Core/arch/CUDA/Complex.h"
 
 #include "src/Core/IO.h"
 #include "src/Core/DenseCoeffsBase.h"
