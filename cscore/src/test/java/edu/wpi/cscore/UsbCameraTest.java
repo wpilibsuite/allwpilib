@@ -56,6 +56,6 @@ class UsbCameraTest {
   private static int getNonexistentCameraDev() {
     return Arrays.stream(CameraServerJNI.enumerateUsbCameras())
         .mapToInt(info -> info.dev)
-        .max().orElseGet(() -> -1) + 1;
+        .max().orElse(-1) + 1;
   }
 }
