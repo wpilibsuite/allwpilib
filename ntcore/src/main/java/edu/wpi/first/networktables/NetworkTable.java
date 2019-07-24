@@ -218,7 +218,7 @@ public final class NetworkTable {
     final int prefixLen = m_path.length() + 1;
     final NetworkTable parent = this;
 
-    return m_inst.addEntryListener(m_pathWithSep, new Consumer<EntryNotification>() {
+    return m_inst.addEntryListener(m_pathWithSep, new Consumer<>() {
       final Set<String> m_notifiedTables = new HashSet<>();
 
       @Override

@@ -61,7 +61,7 @@ public class Robot extends TimedRobot {
     oi = new OI();
 
     // instantiate the command used for the autonomous period
-    m_autoChooser = new SendableChooser<Command>();
+    m_autoChooser = new SendableChooser<>();
     m_autoChooser.setDefaultOption("Drive and Shoot", new DriveAndShootAutonomous());
     m_autoChooser.addOption("Drive Forward", new DriveForward());
     SmartDashboard.putData("Auto Mode", m_autoChooser);
@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = (Command) m_autoChooser.getSelected();
+    m_autonomousCommand = m_autoChooser.getSelected();
     m_autonomousCommand.start();
   }
 
