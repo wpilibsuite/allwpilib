@@ -5,8 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Eigen/Core"
-#include "Eigen/LU"
+#include <Eigen/Core>
+#include <Eigen/LU>
+
 #include "gtest/gtest.h"
 
 TEST(EigenTest, MultiplicationTest) {
