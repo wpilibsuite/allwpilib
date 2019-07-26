@@ -2,7 +2,7 @@ import os
 import shutil
 import sys
 
-MAX_NUM=20
+MAX_NUM = 20
 
 dirname, _ = os.path.split(os.path.abspath(__file__))
 cmake_binary_dir = sys.argv[1]
@@ -19,4 +19,3 @@ with open(f"{dirname}/src/generate/GenericNumber.java.in", "r") as templateFile:
         f = open(f"{rootPath}/N{i}.java", "w")
         f.write(template.replace("${num}", str(i)))
         f.close()
-
