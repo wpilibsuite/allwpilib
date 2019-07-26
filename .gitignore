@@ -72,7 +72,8 @@ Temporary Items
 .mtj.tmp/
 
 # Package Files #
-*.jar
+build/*.jar
+out/*.jar
 *.war
 *.ear
 

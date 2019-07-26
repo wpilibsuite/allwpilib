@@ -11,7 +11,7 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 
 /**
- * A class representing the number {0}.
+ * A class representing the number ${num}.
 */
 public final class N${num} extends Num implements Nat<N${num}> {
   private N${num}() {

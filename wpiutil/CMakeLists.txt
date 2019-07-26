@@ -11,10 +11,18 @@ if (NOT WITHOUT_JAVA)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
 
-  set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar)
 
-  file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-  add_jar(wpiutil_jar ${JAVA_SOURCES} OUTPUT_NAME wpiutil)
+  message(STATUS "Bin dir ${CMAKE_BINARY_DIR}")
+  file(GLOB EJML_JARS
+      ${CMAKE_SOURCE_DIR}/wpiutil/thirdparty/*.jar)
+
+  set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${EJML_JARS})
+
+
+  execute_process(COMMAND python3 ${CMAKE_SOURCE_DIR}/wpiutil/generate_numbers.py ${CMAKE_BINARY_DIR}/wpiutil)
+
+  file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${CMAKE_BINARY_DIR}/wpiutil/generated/*.java)
+  add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} OUTPUT_NAME wpiutil)
 
   get_property(WPIUTIL_JAR_FILE TARGET wpiutil_jar PROPERTY JAR_FILE)
   install(FILES ${WPIUTIL_JAR_FILE} DESTINATION "${java_lib_dest}")
