@@ -7,6 +7,9 @@
 
 #pragma once
 
+#pragma warning( \
+    "Including this header drastically increases compilation times and is bad style. Include only what you use instead.")
+
 #include <cameraserver/CameraServer.h>
 #include <vision/VisionRunner.h>
 
