@@ -7,8 +7,14 @@
 
 #pragma once
 
-#pragma warning( \
-    "Including this header drastically increases compilation times and is bad style. Include only what you use instead.")
+// clang-format off
+#ifdef _MSC_VER
+#pragma message "warning: Including this header drastically increases compilation times and is bad style. Include only what you use instead."
+#else
+#warning "Including this header drastically increases compilation times and is bad style. Include only what you use instead."
+#endif
+
+// clang-format on
 
 #include <cameraserver/CameraServer.h>
 #include <vision/VisionRunner.h>
