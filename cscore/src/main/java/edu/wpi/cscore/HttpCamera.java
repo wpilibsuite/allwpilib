@@ -14,7 +14,6 @@ public class HttpCamera extends VideoCamera {
   public enum HttpCameraKind {
     kUnknown(0), kMJPGStreamer(1), kCSCore(2), kAxis(3);
 
-    @SuppressWarnings("MemberName")
     private final int value;
 
     HttpCameraKind(int value) {

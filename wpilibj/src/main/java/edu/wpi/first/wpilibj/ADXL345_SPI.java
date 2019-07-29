@@ -49,7 +49,6 @@ public class ADXL345_SPI extends SendableBase implements Accelerometer {
     /**
      * The integer value representing this enumeration.
      */
-    @SuppressWarnings("MemberName")
     public final byte value;
 
     Axes(byte value) {

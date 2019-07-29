@@ -114,7 +114,6 @@ public class AnalogTriggerOutput extends DigitalSource {
     kRisingPulse(AnalogJNI.AnalogTriggerType.kRisingPulse),
     kFallingPulse(AnalogJNI.AnalogTriggerType.kFallingPulse);
 
-    @SuppressWarnings("MemberName")
     private final int value;
 
     AnalogTriggerType(int value) {

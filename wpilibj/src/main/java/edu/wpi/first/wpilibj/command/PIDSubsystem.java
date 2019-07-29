@@ -58,7 +58,6 @@ public abstract class PIDSubsystem extends Subsystem {
    * @param i    the integral value
    * @param d    the derivative value
    */
-  @SuppressWarnings("ParameterName")
   public PIDSubsystem(String name, double p, double i, double d) {
     super(name);
     m_controller = new PIDController(p, i, d, m_source, m_output);
@@ -74,7 +73,6 @@ public abstract class PIDSubsystem extends Subsystem {
    * @param d    the derivative value
    * @param f    the feed forward value
    */
-  @SuppressWarnings("ParameterName")
   public PIDSubsystem(String name, double p, double i, double d, double f) {
     super(name);
     m_controller = new PIDController(p, i, d, f, m_source, m_output);
@@ -92,7 +90,6 @@ public abstract class PIDSubsystem extends Subsystem {
    * @param f      the feed forward value
    * @param period the time (in seconds) between calculations
    */
-  @SuppressWarnings("ParameterName")
   public PIDSubsystem(String name, double p, double i, double d, double f, double period) {
     super(name);
     m_controller = new PIDController(p, i, d, f, m_source, m_output, period);
@@ -107,7 +104,6 @@ public abstract class PIDSubsystem extends Subsystem {
    * @param i the integral value
    * @param d the derivative value
    */
-  @SuppressWarnings("ParameterName")
   public PIDSubsystem(double p, double i, double d) {
     m_controller = new PIDController(p, i, d, m_source, m_output);
     addChild("PIDController", m_controller);
@@ -124,7 +120,6 @@ public abstract class PIDSubsystem extends Subsystem {
    * @param f      the feed forward coefficient
    * @param period the time (in seconds) between calculations
    */
-  @SuppressWarnings("ParameterName")
   public PIDSubsystem(double p, double i, double d, double f, double period) {
     m_controller = new PIDController(p, i, d, f, m_source, m_output, period);
     addChild("PIDController", m_controller);
@@ -140,7 +135,6 @@ public abstract class PIDSubsystem extends Subsystem {
    * @param d      the derivative value
    * @param period the time (in seconds) between calculations
    */
-  @SuppressWarnings("ParameterName")
   public PIDSubsystem(double p, double i, double d, double period) {
     m_controller = new PIDController(p, i, d, m_source, m_output, period);
     addChild("PIDController", m_controller);
@@ -222,7 +216,6 @@ public abstract class PIDSubsystem extends Subsystem {
    *
    * @param t the absolute tolerance
    */
-  @SuppressWarnings("ParameterName")
   public void setAbsoluteTolerance(double t) {
     m_controller.setAbsoluteTolerance(t);
   }
@@ -233,7 +226,6 @@ public abstract class PIDSubsystem extends Subsystem {
    *
    * @param p the percent tolerance
    */
-  @SuppressWarnings("ParameterName")
   public void setPercentTolerance(double p) {
     m_controller.setPercentTolerance(p);
   }

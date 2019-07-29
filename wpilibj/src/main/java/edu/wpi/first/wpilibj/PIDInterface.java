@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj;
 
 @SuppressWarnings("SummaryJavadoc")
 public interface PIDInterface {
-  @SuppressWarnings("ParameterName")
   void setPID(double p, double i, double d);
 
   double getP();

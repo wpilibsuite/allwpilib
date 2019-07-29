@@ -42,7 +42,6 @@ public class Pose2d {
    * @param y        The y component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  @SuppressWarnings("ParameterName")
   public Pose2d(double x, double y, Rotation2d rotation) {
     m_translation = new Translation2d(x, y);
     m_rotation = rotation;
@@ -131,7 +130,6 @@ public class Pose2d {
    *              the twist would be Twist2d{0.01, 0.0, toRadians(0.5)}
    * @return The new pose of the robot.
    */
-  @SuppressWarnings("LocalVariableName")
   public Pose2d exp(Twist2d twist) {
     double dx = twist.dx;
     double dy = twist.dy;

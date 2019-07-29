@@ -33,7 +33,6 @@ public class VideoEvent {
     kSinkPropertyValueUpdated(0x20000),
     kSinkPropertyChoicesUpdated(0x40000);
 
-    @SuppressWarnings("MemberName")
     private final int value;
 
     Kind(int value) {

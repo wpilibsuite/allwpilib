@@ -14,7 +14,6 @@ public class VideoProperty {
   public enum Kind {
     kNone(0), kBoolean(1), kInteger(2), kString(4), kEnum(8);
 
-    @SuppressWarnings("MemberName")
     private final int value;
 
     Kind(int value) {

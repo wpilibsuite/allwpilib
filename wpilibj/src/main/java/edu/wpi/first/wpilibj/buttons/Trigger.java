@@ -40,7 +40,6 @@ public abstract class Trigger extends SendableBase {
    *
    * @return whether get() return true or the internal table for SmartDashboard use is pressed.
    */
-  @SuppressWarnings("PMD.UselessParentheses")
   private boolean grab() {
     return get() || m_sendablePressed;
   }

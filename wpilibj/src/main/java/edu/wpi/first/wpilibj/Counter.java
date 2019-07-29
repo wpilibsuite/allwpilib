@@ -51,7 +51,6 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
      */
     kExternalDirection(3);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Mode(int value) {

@@ -45,7 +45,6 @@ public class ADXL362 extends SendableBase implements Accelerometer {
     kY((byte) 0x02),
     kZ((byte) 0x04);
 
-    @SuppressWarnings("MemberName")
     public final byte value;
 
     Axes(byte value) {

@@ -160,7 +160,6 @@ public class TrapezoidProfile {
    *
    * @param t The time since the beginning of the profile.
    */
-  @SuppressWarnings("ParameterName")
   public State calculate(double t) {
     State result = m_initial;
 
@@ -266,7 +265,6 @@ public class TrapezoidProfile {
    *
    * @param t The time since the beginning of the profile.
    */
-  @SuppressWarnings("ParameterName")
   public boolean isFinished(double t) {
     return t >= totalTime();
   }
@@ -279,7 +277,6 @@ public class TrapezoidProfile {
    * @param initial     The initial state (usually the current state).
    * @param goal        The desired state when the profile is complete.
    */
-  @SuppressWarnings("LocalVariableName")
   private static boolean shouldFlipAcceleration(State initial, State goal) {
     return initial.position > goal.position;
   }

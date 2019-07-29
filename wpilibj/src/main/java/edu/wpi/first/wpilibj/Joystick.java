@@ -30,7 +30,6 @@ public class Joystick extends GenericHID {
   public enum AxisType {
     kX(0), kY(1), kZ(2), kTwist(3), kThrottle(4);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     AxisType(int value) {
@@ -44,7 +43,6 @@ public class Joystick extends GenericHID {
   public enum ButtonType {
     kTrigger(1), kTop(2);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     ButtonType(int value) {
@@ -58,7 +56,6 @@ public class Joystick extends GenericHID {
   private enum Button {
     kTrigger(1), kTop(2);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Button(int value) {
@@ -72,7 +69,6 @@ public class Joystick extends GenericHID {
   private enum Axis {
     kX(0), kY(1), kZ(2), kTwist(3), kThrottle(4), kNumAxes(5);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Axis(int value) {

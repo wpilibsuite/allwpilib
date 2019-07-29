@@ -24,16 +24,13 @@ public class PIDController extends SendableBase {
   private static int instances;
 
   // Factor for "proportional" control
-  @SuppressWarnings("MemberName")
-  private double m_Kp;
+  private double m_kp;
 
   // Factor for "integral" control
-  @SuppressWarnings("MemberName")
-  private double m_Ki;
+  private double m_ki;
 
   // Factor for "derivative" control
-  @SuppressWarnings("MemberName")
-  private double m_Kd;
+  private double m_kd;
 
   // The period (in seconds) of the loop that calls the controller
   private final double m_period;
@@ -79,31 +76,29 @@ public class PIDController extends SendableBase {
   private double m_output;
 
   /**
-   * Allocates a PIDController with the given constants for Kp, Ki, and Kd and a default period of
+   * Allocates a PIDController with the given constants for kp, ki, and kd and a default period of
    * 0.02 seconds.
    *
-   * @param Kp The proportional coefficient.
-   * @param Ki The integral coefficient.
-   * @param Kd The derivative coefficient.
+   * @param kp The proportional coefficient.
+   * @param ki The integral coefficient.
+   * @param kd The derivative coefficient.
    */
-  @SuppressWarnings("ParameterName")
-  public PIDController(double Kp, double Ki, double Kd) {
-    this(Kp, Ki, Kd, 0.02);
+  public PIDController(double kp, double ki, double kd) {
+    this(kp, ki, kd, 0.02);
   }
 
   /**
-   * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
+   * Allocates a PIDController with the given constants for kp, ki, and kd.
    *
-   * @param Kp     The proportional coefficient.
-   * @param Ki     The integral coefficient.
-   * @param Kd     The derivative coefficient.
+   * @param kp     The proportional coefficient.
+   * @param ki     The integral coefficient.
+   * @param kd     The derivative coefficient.
    * @param period The period between controller updates in seconds.
    */
-  @SuppressWarnings("ParameterName")
-  public PIDController(double Kp, double Ki, double Kd, double period) {
-    m_Kp = Kp;
-    m_Ki = Ki;
-    m_Kd = Kd;
+  public PIDController(double kp, double ki, double kd, double period) {
+    m_kp = kp;
+    m_ki = ki;
+    m_kd = kd;
 
     m_period = period;
 
@@ -116,17 +111,16 @@ public class PIDController extends SendableBase {
    *
    * <p>Set the proportional, integral, and differential coefficients.
    *
-   * @param Kp The proportional coefficient.
-   * @param Ki The integral coefficient.
-   * @param Kd The derivative coefficient.
+   * @param kp The proportional coefficient.
+   * @param ki The integral coefficient.
+   * @param kd The derivative coefficient.
    */
-  @SuppressWarnings("ParameterName")
-  public void setPID(double Kp, double Ki, double Kd) {
+  public void setPID(double kp, double ki, double kd) {
     m_thisMutex.lock();
     try {
-      m_Kp = Kp;
-      m_Ki = Ki;
-      m_Kd = Kd;
+      m_kp = kp;
+      m_ki = ki;
+      m_kd = kd;
     } finally {
       m_thisMutex.unlock();
     }
@@ -135,13 +129,12 @@ public class PIDController extends SendableBase {
   /**
    * Sets the Proportional coefficient of the PID controller gain.
    *
-   * @param Kp proportional coefficient
+   * @param kp proportional coefficient
    */
-  @SuppressWarnings("ParameterName")
-  public void setP(double Kp) {
+  public void setP(double kp) {
     m_thisMutex.lock();
     try {
-      m_Kp = Kp;
+      m_kp = kp;
     } finally {
       m_thisMutex.unlock();
     }
@@ -150,13 +143,12 @@ public class PIDController extends SendableBase {
   /**
    * Sets the Integral coefficient of the PID controller gain.
    *
-   * @param Ki integral coefficient
+   * @param ki integral coefficient
    */
-  @SuppressWarnings("ParameterName")
-  public void setI(double Ki) {
+  public void setI(double ki) {
     m_thisMutex.lock();
     try {
-      m_Ki = Ki;
+      m_ki = ki;
     } finally {
       m_thisMutex.unlock();
     }
@@ -165,13 +157,12 @@ public class PIDController extends SendableBase {
   /**
    * Sets the Differential coefficient of the PID controller gain.
    *
-   * @param Kd differential coefficient
+   * @param kd differential coefficient
    */
-  @SuppressWarnings("ParameterName")
-  public void setD(double Kd) {
+  public void setD(double kd) {
     m_thisMutex.lock();
     try {
-      m_Kd = Kd;
+      m_kd = kd;
     } finally {
       m_thisMutex.unlock();
     }
@@ -185,7 +176,7 @@ public class PIDController extends SendableBase {
   public double getP() {
     m_thisMutex.lock();
     try {
-      return m_Kp;
+      return m_kp;
     } finally {
       m_thisMutex.unlock();
     }
@@ -199,7 +190,7 @@ public class PIDController extends SendableBase {
   public double getI() {
     m_thisMutex.lock();
     try {
-      return m_Ki;
+      return m_ki;
     } finally {
       m_thisMutex.unlock();
     }
@@ -213,7 +204,7 @@ public class PIDController extends SendableBase {
   public double getD() {
     m_thisMutex.lock();
     try {
-      return m_Kd;
+      return m_kd;
     } finally {
       m_thisMutex.unlock();
     }
@@ -553,13 +544,13 @@ public class PIDController extends SendableBase {
     m_prevError = m_currError;
     m_currError = getContinuousError(m_setpoint - measurement);
 
-    if (m_Ki != 0) {
-      m_totalError = clamp(m_totalError + m_currError * getPeriod(), m_minimumOutput / m_Ki,
-          m_maximumOutput / m_Ki);
+    if (m_ki != 0) {
+      m_totalError = clamp(m_totalError + m_currError * getPeriod(), m_minimumOutput / m_ki,
+          m_maximumOutput / m_ki);
     }
 
-    m_output = clamp(m_Kp * m_currError + m_Ki * m_totalError
-        + m_Kd * (m_currError - m_prevError) / getPeriod(), m_minimumOutput, m_maximumOutput);
+    m_output = clamp(m_kp * m_currError + m_ki * m_totalError
+        + m_kd * (m_currError - m_prevError) / getPeriod(), m_minimumOutput, m_maximumOutput);
 
     return m_output;
   }
