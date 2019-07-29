@@ -16,13 +16,35 @@ PIDControllerRunner::PIDControllerRunner(
     frc2::PIDController& controller,
     std::function<double(void)> measurementSource,
     std::function<void(double)> controllerOutput)
-    : m_controller(controller),
+    : m_controller(&controller),
       m_measurementSource(measurementSource),
       m_controllerOutput(controllerOutput) {
-  m_notifier.StartPeriodic(m_controller.GetPeriod());
+  m_notifier.StartPeriodic(m_controller->GetPeriod());
 }
 
 PIDControllerRunner::~PIDControllerRunner() { Disable(); }
+
+PIDControllerRunner::PIDControllerRunner(PIDControllerRunner&& rhs) : PIDControllerRunner(std::move(rhs), std::scoped_lock(rhs.m_thisMutex, rhs.m_outputMutex)) {}
+
+PIDControllerRunner::PIDControllerRunner(PIDControllerRunner&& rhs, std::scoped_lock<wpi::mutex, wpi::mutex> lock) :
+  SendableBase(std::move(rhs)),
+  m_controller(std::move(rhs.m_controller)),
+  m_measurementSource(std::move(rhs.m_measurementSource)),
+  m_controllerOutput(std::move(rhs.m_controllerOutput)),
+  m_enabled(std::move(m_enabled)) {};
+
+PIDControllerRunner& PIDControllerRunner::operator=(PIDControllerRunner&& rhs) {
+  std::scoped_lock lock(m_thisMutex, m_outputMutex, rhs.m_thisMutex, rhs.m_outputMutex);
+
+  SendableBase::operator=(std::move(rhs));
+
+  m_controller = std::move(rhs.m_controller);
+  m_measurementSource = std::move(rhs.m_measurementSource);
+  m_controllerOutput = std::move(rhs.m_controllerOutput);
+  m_enabled = std::move(m_enabled);
+
+  return *this;
+}
 
 void PIDControllerRunner::Enable() {
   std::scoped_lock lock(m_thisMutex);
@@ -54,12 +76,12 @@ void PIDControllerRunner::Run() {
     // Don't block other PIDControllerRunner operations on output
     mainLock.unlock();
 
-    m_controllerOutput(m_controller.Calculate(m_measurementSource()));
+    m_controllerOutput(m_controller->Calculate(m_measurementSource()));
   }
 }
 
 void PIDControllerRunner::InitSendable(frc::SendableBuilder& builder) {
-  m_controller.InitSendable(builder);
+  m_controller->InitSendable(builder);
   builder.SetSafeState([this]() { Disable(); });
   builder.AddBooleanProperty("enabled", [this]() { return IsEnabled(); },
                              [this](bool enabled) {

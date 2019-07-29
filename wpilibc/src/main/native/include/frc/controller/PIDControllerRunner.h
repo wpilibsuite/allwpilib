@@ -32,8 +32,8 @@ class PIDControllerRunner : SendableBase {
 
   ~PIDControllerRunner();
 
-  PIDControllerRunner(PIDControllerRunner&&) = default;
-  PIDControllerRunner& operator=(PIDControllerRunner&&) = default;
+  PIDControllerRunner(PIDControllerRunner&& rhs);
+  PIDControllerRunner& operator=(PIDControllerRunner&& rhs);
 
   /**
    * Begins running the controller.
@@ -54,9 +54,12 @@ class PIDControllerRunner : SendableBase {
 
   void InitSendable(SendableBuilder& builder) override;
 
+ protected:
+  PIDControllerRunner(PIDControllerRunner&& rhs, std::scoped_lock<wpi::mutex, wpi::mutex> lock);
+
  private:
   Notifier m_notifier{&PIDControllerRunner::Run, this};
-  frc2::PIDController& m_controller;
+  frc2::PIDController* m_controller;
   std::function<double(void)> m_measurementSource;
   std::function<void(double)> m_controllerOutput;
   bool m_enabled = false;

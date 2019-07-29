@@ -24,7 +24,9 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double period)
   SetName("PIDController", instances);
 }
 
-PIDController::PIDController(PIDController&& rhs)
+PIDController::PIDController(PIDController&& rhs) : PIDController(std::move(rhs), std::scoped_lock(rhs.m_thisMutex)) {}
+
+PIDController::PIDController(PIDController&& rhs, std::scoped_lock<wpi::mutex> lock)
     : SendableBase(std::move(rhs)),
       m_Kp(std::move(rhs.m_Kp)),
       m_Ki(std::move(rhs.m_Ki)),
@@ -44,6 +46,23 @@ PIDController::PIDController(PIDController&& rhs)
       m_deltaTolerance(std::move(rhs.m_deltaTolerance)),
       m_setpoint(std::move(rhs.m_setpoint)),
       m_output(std::move(rhs.m_output)) {}
+
+PIDController::PIDController(const PIDController& other) : PIDController(other, std::scoped_lock(other.m_thisMutex)) {}
+
+PIDController::PIDController(const PIDController& other, std::scoped_lock<wpi::mutex> lock)
+    : PIDController(other.m_Kp, other.m_Ki, other.m_Kd, other.m_period) {
+  m_maximumInput = other.m_maximumInput;
+  m_minimumInput = other.m_minimumInput;
+  m_maximumOutput = other.m_maximumOutput;
+  m_minimumOutput = other.m_minimumOutput;
+  m_inputRange = other.m_inputRange;
+  m_continuous = other.m_continuous;
+  m_tolerance = other.m_tolerance;
+  m_toleranceType = other.m_toleranceType;
+  m_deltaTolerance = other.m_deltaTolerance;
+  m_setpoint = other.m_setpoint;
+  m_output = other.m_output;
+}
 
 PIDController& PIDController::operator=(PIDController&& rhs) {
   std::scoped_lock lock(m_thisMutex, rhs.m_thisMutex);
@@ -68,6 +87,28 @@ PIDController& PIDController::operator=(PIDController&& rhs) {
   m_deltaTolerance = std::move(rhs.m_deltaTolerance);
   m_setpoint = std::move(rhs.m_setpoint);
   m_output = std::move(rhs.m_output);
+
+  return *this;
+}
+
+PIDController& PIDController::operator=(const PIDController& other) {
+  std::scoped_lock lock(m_thisMutex, other.m_thisMutex);
+
+  m_Kp = other.m_Kp;
+  m_Ki = other.m_Ki;
+  m_Kd = other.m_Kd;
+  m_period = other.m_period;
+  m_maximumInput = other.m_maximumInput;
+  m_minimumInput = other.m_minimumInput;
+  m_maximumOutput = other.m_maximumOutput;
+  m_minimumOutput = other.m_minimumOutput;
+  m_inputRange = other.m_inputRange;
+  m_continuous = other.m_continuous;
+  m_tolerance = other.m_tolerance;
+  m_toleranceType = other.m_toleranceType;
+  m_deltaTolerance = other.m_deltaTolerance;
+  m_setpoint = other.m_setpoint;
+  m_output = other.m_output;
 
   return *this;
 }

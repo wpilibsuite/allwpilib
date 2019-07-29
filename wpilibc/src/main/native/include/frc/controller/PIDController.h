@@ -33,11 +33,13 @@ class PIDController : public frc::SendableBase {
    *               default is 0.02 seconds.
    */
   PIDController(double Kp, double Ki, double Kd, double period = 0.02);
-
   ~PIDController() override = default;
 
   PIDController(PIDController&& rhs);
   PIDController& operator=(PIDController&& rhs);
+
+  PIDController(const PIDController& other);
+  PIDController& operator=(const PIDController& other);
 
   /**
    * Sets the PID Controller gain parameters.
@@ -234,6 +236,8 @@ class PIDController : public frc::SendableBase {
 
  protected:
   mutable wpi::mutex m_thisMutex;
+  PIDController(PIDController&& rhs, std::scoped_lock<wpi::mutex> lock);
+  PIDController(const PIDController& rhs, std::scoped_lock<wpi::mutex> lock);
 
   /**
    * Wraps error around for continuous inputs. The original error is returned if
