@@ -55,7 +55,8 @@ class PIDControllerRunner : SendableBase {
   void InitSendable(SendableBuilder& builder) override;
 
  protected:
-  PIDControllerRunner(PIDControllerRunner&& rhs, std::scoped_lock<wpi::mutex, wpi::mutex> lock);
+  PIDControllerRunner(PIDControllerRunner&& rhs,
+                      std::scoped_lock<wpi::mutex, wpi::mutex> lock);
 
  private:
   Notifier m_notifier{&PIDControllerRunner::Run, this};

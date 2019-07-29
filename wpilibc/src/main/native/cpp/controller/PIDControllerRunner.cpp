@@ -24,24 +24,29 @@ PIDControllerRunner::PIDControllerRunner(
 
 PIDControllerRunner::~PIDControllerRunner() { Disable(); }
 
-PIDControllerRunner::PIDControllerRunner(PIDControllerRunner&& rhs) : PIDControllerRunner(std::move(rhs), std::scoped_lock(rhs.m_thisMutex, rhs.m_outputMutex)) {}
+PIDControllerRunner::PIDControllerRunner(PIDControllerRunner&& rhs)
+    : PIDControllerRunner(std::move(rhs), std::scoped_lock(rhs.m_thisMutex,
+                                                           rhs.m_outputMutex)) {
+}
 
-PIDControllerRunner::PIDControllerRunner(PIDControllerRunner&& rhs, std::scoped_lock<wpi::mutex, wpi::mutex> lock) :
-  SendableBase(std::move(rhs)),
-  m_controller(std::move(rhs.m_controller)),
-  m_measurementSource(std::move(rhs.m_measurementSource)),
-  m_controllerOutput(std::move(rhs.m_controllerOutput)),
-  m_enabled(std::move(m_enabled)) {};
+PIDControllerRunner::PIDControllerRunner(
+    PIDControllerRunner&& rhs, std::scoped_lock<wpi::mutex, wpi::mutex> lock)
+    : SendableBase(std::move(rhs)),
+      m_controller(std::move(rhs.m_controller)),
+      m_measurementSource(std::move(rhs.m_measurementSource)),
+      m_controllerOutput(std::move(rhs.m_controllerOutput)),
+      m_enabled(std::move(rhs.m_enabled)) {}
 
 PIDControllerRunner& PIDControllerRunner::operator=(PIDControllerRunner&& rhs) {
-  std::scoped_lock lock(m_thisMutex, m_outputMutex, rhs.m_thisMutex, rhs.m_outputMutex);
+  std::scoped_lock lock(m_thisMutex, m_outputMutex, rhs.m_thisMutex,
+                        rhs.m_outputMutex);
 
   SendableBase::operator=(std::move(rhs));
 
   m_controller = std::move(rhs.m_controller);
   m_measurementSource = std::move(rhs.m_measurementSource);
   m_controllerOutput = std::move(rhs.m_controllerOutput);
-  m_enabled = std::move(m_enabled);
+  m_enabled = std::move(rhs.m_enabled);
 
   return *this;
 }

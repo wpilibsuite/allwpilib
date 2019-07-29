@@ -24,9 +24,11 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double period)
   SetName("PIDController", instances);
 }
 
-PIDController::PIDController(PIDController&& rhs) : PIDController(std::move(rhs), std::scoped_lock(rhs.m_thisMutex)) {}
+PIDController::PIDController(PIDController&& rhs)
+    : PIDController(std::move(rhs), std::scoped_lock(rhs.m_thisMutex)) {}
 
-PIDController::PIDController(PIDController&& rhs, std::scoped_lock<wpi::mutex> lock)
+PIDController::PIDController(PIDController&& rhs,
+                             std::scoped_lock<wpi::mutex> lock)
     : SendableBase(std::move(rhs)),
       m_Kp(std::move(rhs.m_Kp)),
       m_Ki(std::move(rhs.m_Ki)),
@@ -47,9 +49,11 @@ PIDController::PIDController(PIDController&& rhs, std::scoped_lock<wpi::mutex> l
       m_setpoint(std::move(rhs.m_setpoint)),
       m_output(std::move(rhs.m_output)) {}
 
-PIDController::PIDController(const PIDController& other) : PIDController(other, std::scoped_lock(other.m_thisMutex)) {}
+PIDController::PIDController(const PIDController& other)
+    : PIDController(other, std::scoped_lock(other.m_thisMutex)) {}
 
-PIDController::PIDController(const PIDController& other, std::scoped_lock<wpi::mutex> lock)
+PIDController::PIDController(const PIDController& other,
+                             std::scoped_lock<wpi::mutex> lock)
     : PIDController(other.m_Kp, other.m_Ki, other.m_Kd, other.m_period) {
   m_maximumInput = other.m_maximumInput;
   m_minimumInput = other.m_minimumInput;
