@@ -120,8 +120,6 @@ template<typename PlainObjectType, int MapOptions, typename StrideType> class Ma
            : (this->rows() * innerStride());
     }
 
-    Map(const Map&) = default;
-
     /** Constructor in the fixed-size case.
       *
       * \param dataPtr pointer to the array to map
