@@ -22,10 +22,6 @@ toolchainsPlugin.crossCompilers.named(nativeUtils.wpi.platforms.roborio) {
     optional.set(true)
 }
 
-nativeUtils.configurePlatform(nativeUtils.wpi.platforms.raspbian) {
-  linker.args << '-latomic'
-}
-
 model {
     components {
         all {
