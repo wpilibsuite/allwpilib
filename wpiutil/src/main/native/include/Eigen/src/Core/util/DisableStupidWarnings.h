@@ -57,6 +57,9 @@
   #if __GNUC__>=6
     #pragma GCC diagnostic ignored "-Wignored-attributes"
   #endif
+  #if __GNUC__>=9
+    #pragma GCC diagnostic ignored "-Wdeprecated-copy"
+  #endif
 
 #endif
 
