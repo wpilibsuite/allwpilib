@@ -132,8 +132,6 @@ template<typename Derived> class MatrixBase
 #undef EIGEN_CURRENT_STORAGE_BASE_CLASS
 #undef EIGEN_DOC_UNARY_ADDONS
 
-    constexpr MatrixBase(const MatrixBase& other) = default;
-
     /** Special case of the template operator=, in order to prevent the compiler
       * from generating a default operator= (issue hit with g++ 4.1)
       */

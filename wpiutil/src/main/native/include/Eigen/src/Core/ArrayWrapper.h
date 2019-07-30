@@ -47,9 +47,6 @@ class ArrayWrapper : public ArrayBase<ArrayWrapper<ExpressionType> >
     EIGEN_INHERIT_ASSIGNMENT_OPERATORS(ArrayWrapper)
     typedef typename internal::remove_all<ExpressionType>::type NestedExpression;
 
-    ArrayWrapper() = default;
-    ArrayWrapper(const ArrayWrapper&) = default;
-
     typedef typename internal::conditional<
                        internal::is_lvalue<ExpressionType>::value,
                        Scalar,
