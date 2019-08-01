@@ -24,94 +24,23 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double period)
   SetName("PIDController", instances);
 }
 
-PIDController::PIDController(PIDController&& rhs)
-    : SendableBase(std::move(rhs)),
-      m_Kp(std::move(rhs.m_Kp)),
-      m_Ki(std::move(rhs.m_Ki)),
-      m_Kd(std::move(rhs.m_Kd)),
-      m_period(std::move(rhs.m_period)),
-      m_maximumOutput(std::move(rhs.m_maximumOutput)),
-      m_minimumOutput(std::move(rhs.m_minimumOutput)),
-      m_maximumInput(std::move(rhs.m_maximumInput)),
-      m_minimumInput(std::move(rhs.m_minimumInput)),
-      m_inputRange(std::move(rhs.m_inputRange)),
-      m_continuous(std::move(rhs.m_continuous)),
-      m_currError(std::move(rhs.m_currError)),
-      m_prevError(std::move(rhs.m_prevError)),
-      m_totalError(std::move(rhs.m_totalError)),
-      m_toleranceType(std::move(rhs.m_toleranceType)),
-      m_tolerance(std::move(rhs.m_tolerance)),
-      m_deltaTolerance(std::move(rhs.m_deltaTolerance)),
-      m_setpoint(std::move(rhs.m_setpoint)),
-      m_output(std::move(rhs.m_output)) {}
+void PIDController::SetP(double Kp) { m_Kp = Kp; }
 
-PIDController& PIDController::operator=(PIDController&& rhs) {
-  std::scoped_lock lock(m_thisMutex, rhs.m_thisMutex);
+void PIDController::SetI(double Ki) { m_Ki = Ki; }
 
-  SendableBase::operator=(std::move(rhs));
+void PIDController::SetD(double Kd) { m_Kd = Kd; }
 
-  m_Kp = std::move(rhs.m_Kp);
-  m_Ki = std::move(rhs.m_Ki);
-  m_Kd = std::move(rhs.m_Kd);
-  m_period = std::move(rhs.m_period);
-  m_maximumOutput = std::move(rhs.m_maximumOutput);
-  m_minimumOutput = std::move(rhs.m_minimumOutput);
-  m_maximumInput = std::move(rhs.m_maximumInput);
-  m_minimumInput = std::move(rhs.m_minimumInput);
-  m_inputRange = std::move(rhs.m_inputRange);
-  m_continuous = std::move(rhs.m_continuous);
-  m_currError = std::move(rhs.m_currError);
-  m_prevError = std::move(rhs.m_prevError);
-  m_totalError = std::move(rhs.m_totalError);
-  m_toleranceType = std::move(rhs.m_toleranceType);
-  m_tolerance = std::move(rhs.m_tolerance);
-  m_deltaTolerance = std::move(rhs.m_deltaTolerance);
-  m_setpoint = std::move(rhs.m_setpoint);
-  m_output = std::move(rhs.m_output);
+double PIDController::GetP() const { return m_Kp; }
 
-  return *this;
-}
+double PIDController::GetI() const { return m_Ki; }
 
-void PIDController::SetP(double Kp) {
-  std::scoped_lock lock(m_thisMutex);
-  m_Kp = Kp;
-}
-
-void PIDController::SetI(double Ki) {
-  std::scoped_lock lock(m_thisMutex);
-  m_Ki = Ki;
-}
-
-void PIDController::SetD(double Kd) {
-  std::scoped_lock lock(m_thisMutex);
-  m_Kd = Kd;
-}
-
-double PIDController::GetP() const {
-  std::scoped_lock lock(m_thisMutex);
-  return m_Kp;
-}
-
-double PIDController::GetI() const {
-  std::scoped_lock lock(m_thisMutex);
-  return m_Ki;
-}
-
-double PIDController::GetD() const {
-  std::scoped_lock lock(m_thisMutex);
-  return m_Kd;
-}
+double PIDController::GetD() const { return m_Kd; }
 
 double PIDController::GetPeriod() const { return m_period; }
 
-double PIDController::GetOutput() const {
-  std::scoped_lock lock(m_thisMutex);
-  return m_output;
-}
+double PIDController::GetOutput() const { return m_output; }
 
 void PIDController::SetSetpoint(double setpoint) {
-  std::scoped_lock lock(m_thisMutex);
-
   if (m_maximumInput > m_minimumInput) {
     m_setpoint = std::clamp(setpoint, m_minimumInput, m_maximumInput);
   } else {
@@ -119,16 +48,12 @@ void PIDController::SetSetpoint(double setpoint) {
   }
 }
 
-double PIDController::GetSetpoint() const {
-  std::scoped_lock lock(m_thisMutex);
-  return m_setpoint;
-}
+double PIDController::GetSetpoint() const { return m_setpoint; }
 
 bool PIDController::AtSetpoint(double tolerance, double deltaTolerance,
                                Tolerance toleranceType) const {
   double deltaError = GetDeltaError();
 
-  std::scoped_lock lock(m_thisMutex);
   if (toleranceType == Tolerance::kPercent) {
     return std::abs(m_currError) < tolerance / 100 * m_inputRange &&
            std::abs(deltaError) < deltaTolerance / 100 * m_inputRange;
@@ -143,12 +68,10 @@ bool PIDController::AtSetpoint() const {
 }
 
 void PIDController::SetContinuous(bool continuous) {
-  std::scoped_lock lock(m_thisMutex);
   m_continuous = continuous;
 }
 
 void PIDController::SetInputRange(double minimumInput, double maximumInput) {
-  std::scoped_lock lock(m_thisMutex);
   m_minimumInput = minimumInput;
   m_maximumInput = maximumInput;
   m_inputRange = maximumInput - minimumInput;
@@ -160,14 +83,12 @@ void PIDController::SetInputRange(double minimumInput, double maximumInput) {
 }
 
 void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
-  std::scoped_lock lock(m_thisMutex);
   m_minimumOutput = minimumOutput;
   m_maximumOutput = maximumOutput;
 }
 
 void PIDController::SetAbsoluteTolerance(double tolerance,
                                          double deltaTolerance) {
-  std::scoped_lock lock(m_thisMutex);
   m_toleranceType = Tolerance::kAbsolute;
   m_tolerance = tolerance;
   m_deltaTolerance = deltaTolerance;
@@ -175,14 +96,12 @@ void PIDController::SetAbsoluteTolerance(double tolerance,
 
 void PIDController::SetPercentTolerance(double tolerance,
                                         double deltaTolerance) {
-  std::scoped_lock lock(m_thisMutex);
   m_toleranceType = Tolerance::kPercent;
   m_tolerance = tolerance;
   m_deltaTolerance = deltaTolerance;
 }
 
 double PIDController::GetError() const {
-  std::scoped_lock lock(m_thisMutex);
   return GetContinuousError(m_currError);
 }
 
@@ -192,18 +111,10 @@ double PIDController::GetError() const {
  * @return The change in error per second.
  */
 double PIDController::GetDeltaError() const {
-  std::scoped_lock lock(m_thisMutex);
   return (m_currError - m_prevError) / GetPeriod();
 }
 
-double PIDController::Calculate(double measurement) {
-  std::scoped_lock lock(m_thisMutex);
-  return CalculateUnsafe(measurement);
-}
-
 double PIDController::Calculate(double measurement, double setpoint) {
-  std::scoped_lock lock(m_thisMutex);
-
   // Set setpoint to provided value
   if (m_maximumInput > m_minimumInput) {
     m_setpoint = std::clamp(setpoint, m_minimumInput, m_maximumInput);
@@ -211,11 +122,10 @@ double PIDController::Calculate(double measurement, double setpoint) {
     m_setpoint = setpoint;
   }
 
-  return CalculateUnsafe(measurement);
+  return Calculate(measurement);
 }
 
 void PIDController::Reset() {
-  std::scoped_lock lock(m_thisMutex);
   m_prevError = 0;
   m_totalError = 0;
   m_output = 0;
@@ -248,7 +158,7 @@ double PIDController::GetContinuousError(double error) const {
   return error;
 }
 
-double PIDController::CalculateUnsafe(double measurement) {
+double PIDController::Calculate(double measurement) {
   m_prevError = m_currError;
   m_currError = GetContinuousError(m_setpoint - measurement);
 

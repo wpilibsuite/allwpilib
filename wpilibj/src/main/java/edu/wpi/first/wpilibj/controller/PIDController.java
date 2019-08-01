@@ -7,8 +7,6 @@
 
 package edu.wpi.first.wpilibj.controller;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.SendableBase;
@@ -19,7 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  */
 @SuppressWarnings("PMD.TooManyFields")
 public class PIDController extends SendableBase {
-
   private static int instances;
 
   // Factor for "proportional" control
@@ -389,16 +386,6 @@ public class PIDController extends SendableBase {
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.
-   */
-  public double calculate(double measurement) {
-
-    return calculateUnsafe(measurement);
-  }
-
-  /**
-   * Returns the next output of the PID controller.
-   *
-   * @param measurement The current measurement of the process variable.
    * @param setpoint    The new setpoint of the controller.
    */
   public double calculate(double measurement, double setpoint) {
@@ -410,7 +397,30 @@ public class PIDController extends SendableBase {
       m_setpoint = setpoint;
     }
 
-    return calculateUnsafe(measurement);
+    return calculate(measurement);
+  }
+
+  /**
+   * Returns the next output of the PID controller.
+   *
+   * <p>Unlike the public functions above, this function doesn't lock the mutex.
+   *
+   * @param measurement The current measurement of the process variable.
+   */
+  public double calculate(double measurement) {
+    m_prevError = m_currError;
+    m_currError = getContinuousError(m_setpoint - measurement);
+
+    if (m_Ki != 0) {
+      m_totalError = clamp(m_totalError + m_currError * getPeriod(), m_minimumOutput / m_Ki,
+          m_maximumOutput / m_Ki);
+    }
+
+    m_output = clamp(
+        m_Kp * m_currError + m_Ki * m_totalError + m_Kd * (m_currError - m_prevError) / getPeriod(),
+        m_minimumOutput, m_maximumOutput);
+
+    return m_output;
   }
 
   /**
@@ -452,29 +462,6 @@ public class PIDController extends SendableBase {
     }
 
     return error;
-  }
-
-  /**
-   * Returns the next output of the PID controller.
-   *
-   * <p>Unlike the public functions above, this function doesn't lock the mutex.
-   *
-   * @param measurement The current measurement of the process variable.
-   */
-  private double calculateUnsafe(double measurement) {
-    m_prevError = m_currError;
-    m_currError = getContinuousError(m_setpoint - measurement);
-
-    if (m_Ki != 0) {
-      m_totalError = clamp(m_totalError + m_currError * getPeriod(), m_minimumOutput / m_Ki,
-          m_maximumOutput / m_Ki);
-    }
-
-    m_output = clamp(
-        m_Kp * m_currError + m_Ki * m_totalError + m_Kd * (m_currError - m_prevError) / getPeriod(),
-        m_minimumOutput, m_maximumOutput);
-
-    return m_output;
   }
 
   private static double clamp(double value, double low, double high) {
