@@ -219,7 +219,8 @@ model {
 }
 
 dependencies {
-    compile fileTree(dir: "thirdparty", includes: ["*.jar"])
+    compile "org.ejml:ejml-simple:0.38"
+    //compile fileTree(dir: "thirdparty", includes: ["*.jar"])
 }
 
 def wpilibNumberFileInput = file("src/generate/GenericNumber.java.in")

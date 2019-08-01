@@ -11,8 +11,31 @@ if (NOT WITHOUT_JAVA)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
 
+  if(NOT EXISTS "${CMAKE_SOURCE_DIR}/wpiutil/thirdparty/ejml-simple-0.38.jar")
+      set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
+      set(JAR_ROOT "${CMAKE_SOURCE_DIR}/wpiutil/thirdparty")
 
-  message(STATUS "Bin dir ${CMAKE_BINARY_DIR}")
+      message(STATUS "Downloading EJML jarfiles...")
+
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-cdense/0.38/ejml-cdense-0.38.jar"
+          "${JAR_ROOT}/ejml-cdense-0.38.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-core/0.38/ejml-core-0.38.jar"
+          "${JAR_ROOT}/ejml-core-0.38.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-ddense/0.38/ejml-ddense-0.38.jar"
+          "${JAR_ROOT}/ejml-ddense-0.38.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-dsparse/0.38/ejml-dsparse-0.38.jar"
+          "${JAR_ROOT}/ejml-dsparse-0.38.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-fdense/0.38/ejml-fdense-0.38.jar"
+          "${JAR_ROOT}/ejml-fdense-0.38.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-simple/0.38/ejml-simple-0.38.jar"
+          "${JAR_ROOT}/ejml-simple-0.38.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-zdense/0.38/ejml-zdense-0.38.jar"
+          "${JAR_ROOT}/ejml-zdense-0.38.jar")
+
+      message(STATUS "All files downloaded.")
+  endif()
+
+
   file(GLOB EJML_JARS
       ${CMAKE_SOURCE_DIR}/wpiutil/thirdparty/*.jar)
 
