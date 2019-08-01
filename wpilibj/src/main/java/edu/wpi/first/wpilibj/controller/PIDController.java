@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  */
 @SuppressWarnings("PMD.TooManyFields")
 public class PIDController extends SendableBase {
-  protected final ReentrantLock m_thisMutex = new ReentrantLock();
 
   private static int instances;
 
@@ -122,14 +121,10 @@ public class PIDController extends SendableBase {
    */
   @SuppressWarnings("ParameterName")
   public void setPID(double Kp, double Ki, double Kd) {
-    m_thisMutex.lock();
-    try {
-      m_Kp = Kp;
-      m_Ki = Ki;
-      m_Kd = Kd;
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    m_Kp = Kp;
+    m_Ki = Ki;
+    m_Kd = Kd;
   }
 
   /**
@@ -139,12 +134,7 @@ public class PIDController extends SendableBase {
    */
   @SuppressWarnings("ParameterName")
   public void setP(double Kp) {
-    m_thisMutex.lock();
-    try {
-      m_Kp = Kp;
-    } finally {
-      m_thisMutex.unlock();
-    }
+    m_Kp = Kp;
   }
 
   /**
@@ -154,12 +144,8 @@ public class PIDController extends SendableBase {
    */
   @SuppressWarnings("ParameterName")
   public void setI(double Ki) {
-    m_thisMutex.lock();
-    try {
-      m_Ki = Ki;
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    m_Ki = Ki;
   }
 
   /**
@@ -169,12 +155,8 @@ public class PIDController extends SendableBase {
    */
   @SuppressWarnings("ParameterName")
   public void setD(double Kd) {
-    m_thisMutex.lock();
-    try {
-      m_Kd = Kd;
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    m_Kd = Kd;
   }
 
   /**
@@ -183,12 +165,8 @@ public class PIDController extends SendableBase {
    * @return proportional coefficient
    */
   public double getP() {
-    m_thisMutex.lock();
-    try {
-      return m_Kp;
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    return m_Kp;
   }
 
   /**
@@ -197,12 +175,8 @@ public class PIDController extends SendableBase {
    * @return integral coefficient
    */
   public double getI() {
-    m_thisMutex.lock();
-    try {
-      return m_Ki;
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    return m_Ki;
   }
 
   /**
@@ -211,12 +185,8 @@ public class PIDController extends SendableBase {
    * @return differential coefficient
    */
   public double getD() {
-    m_thisMutex.lock();
-    try {
-      return m_Kd;
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    return m_Kd;
   }
 
   /**
@@ -236,12 +206,8 @@ public class PIDController extends SendableBase {
    * @return The latest calculated output.
    */
   public double getOutput() {
-    m_thisMutex.lock();
-    try {
-      return m_output;
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    return m_output;
   }
 
   /**
@@ -250,15 +216,11 @@ public class PIDController extends SendableBase {
    * @param setpoint The desired setpoint.
    */
   public void setSetpoint(double setpoint) {
-    m_thisMutex.lock();
-    try {
-      if (m_maximumInput > m_minimumInput) {
-        m_setpoint = clamp(setpoint, m_minimumInput, m_maximumInput);
-      } else {
-        m_setpoint = setpoint;
-      }
-    } finally {
-      m_thisMutex.unlock();
+
+    if (m_maximumInput > m_minimumInput) {
+      m_setpoint = clamp(setpoint, m_minimumInput, m_maximumInput);
+    } else {
+      m_setpoint = setpoint;
     }
   }
 
@@ -268,18 +230,13 @@ public class PIDController extends SendableBase {
    * @return The current setpoint.
    */
   public double getSetpoint() {
-    m_thisMutex.lock();
-    try {
-      return m_setpoint;
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    return m_setpoint;
   }
 
   /**
-   * Returns true if the error is within the percentage of the total input range,
-   * determined by SetTolerance. This asssumes that the maximum and minimum
-   * input were set using SetInput.
+   * Returns true if the error is within the percentage of the total input range, determined by
+   * SetTolerance. This asssumes that the maximum and minimum input were set using SetInput.
    *
    * <p>This will return false until at least one input value has been computed.
    *
@@ -292,27 +249,22 @@ public class PIDController extends SendableBase {
   /**
    * Returns true if the error and change in error are below the specified tolerances.
    *
-   * @param tolerance The maximum allowable error.
+   * @param tolerance      The maximum allowable error.
    * @param deltaTolerance The maximum allowable change in error from the previous iteration.
-   * @param toleranceType Whether the given tolerance values are absolute, or percentages of the
-   *                      total input range.
+   * @param toleranceType  Whether the given tolerance values are absolute, or percentages of the
+   *                       total input range.
    * @return Whether the error is within the acceptable bounds.
    */
   public boolean atSetpoint(double tolerance, double deltaTolerance, Tolerance toleranceType) {
     double error = getError();
 
-    m_thisMutex.lock();
-    try {
-      double deltaError = (error - m_prevError) / getPeriod();
-      if (toleranceType == Tolerance.kPercent) {
-        return Math.abs(error) < tolerance / 100 * m_inputRange
-            && Math.abs(deltaError) < deltaTolerance / 100 * m_inputRange;
-      } else {
-        return Math.abs(error) < tolerance
-            && Math.abs(deltaError) < deltaTolerance;
-      }
-    } finally {
-      m_thisMutex.unlock();
+
+    double deltaError = (error - m_prevError) / getPeriod();
+    if (toleranceType == Tolerance.kPercent) {
+      return Math.abs(error) < tolerance / 100 * m_inputRange
+          && Math.abs(deltaError) < deltaTolerance / 100 * m_inputRange;
+    } else {
+      return Math.abs(error) < tolerance && Math.abs(deltaError) < deltaTolerance;
     }
   }
 
@@ -335,12 +287,8 @@ public class PIDController extends SendableBase {
    * @param continuous true turns on continuous, false turns off continuous
    */
   public void setContinuous(boolean continuous) {
-    m_thisMutex.lock();
-    try {
-      m_continuous = continuous;
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    m_continuous = continuous;
   }
 
   /**
@@ -350,18 +298,14 @@ public class PIDController extends SendableBase {
    * @param maximumInput The maximum value expected from the input.
    */
   public void setInputRange(double minimumInput, double maximumInput) {
-    m_thisMutex.lock();
-    try {
-      m_minimumInput = minimumInput;
-      m_maximumInput = maximumInput;
-      m_inputRange = maximumInput - minimumInput;
 
-      // Clamp setpoint to new input
-      if (m_maximumInput > m_minimumInput) {
-        m_setpoint = clamp(m_setpoint, m_minimumInput, m_maximumInput);
-      }
-    } finally {
-      m_thisMutex.unlock();
+    m_minimumInput = minimumInput;
+    m_maximumInput = maximumInput;
+    m_inputRange = maximumInput - minimumInput;
+
+    // Clamp setpoint to new input
+    if (m_maximumInput > m_minimumInput) {
+      m_setpoint = clamp(m_setpoint, m_minimumInput, m_maximumInput);
     }
   }
 
@@ -372,13 +316,9 @@ public class PIDController extends SendableBase {
    * @param maximumOutput the maximum value to write to the output
    */
   public void setOutputRange(double minimumOutput, double maximumOutput) {
-    m_thisMutex.lock();
-    try {
-      m_minimumOutput = minimumOutput;
-      m_maximumOutput = maximumOutput;
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    m_minimumOutput = minimumOutput;
+    m_maximumOutput = maximumOutput;
   }
 
   /**
@@ -397,14 +337,10 @@ public class PIDController extends SendableBase {
    * @param deltaTolerance Change in absolute error per second which is tolerable.
    */
   public void setAbsoluteTolerance(double tolerance, double deltaTolerance) {
-    m_thisMutex.lock();
-    try {
-      m_toleranceType = Tolerance.kAbsolute;
-      m_tolerance = tolerance;
-      m_deltaTolerance = deltaTolerance;
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    m_toleranceType = Tolerance.kAbsolute;
+    m_tolerance = tolerance;
+    m_deltaTolerance = deltaTolerance;
   }
 
   /**
@@ -423,14 +359,10 @@ public class PIDController extends SendableBase {
    * @param deltaTolerance Change in percent error per second which is tolerable.
    */
   public void setPercentTolerance(double tolerance, double deltaTolerance) {
-    m_thisMutex.lock();
-    try {
-      m_toleranceType = Tolerance.kPercent;
-      m_tolerance = tolerance;
-      m_deltaTolerance = deltaTolerance;
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    m_toleranceType = Tolerance.kPercent;
+    m_tolerance = tolerance;
+    m_deltaTolerance = deltaTolerance;
   }
 
   /**
@@ -439,12 +371,8 @@ public class PIDController extends SendableBase {
    * @return The error.
    */
   public double getError() {
-    m_thisMutex.lock();
-    try {
-      return getContinuousError(m_currError);
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    return getContinuousError(m_currError);
   }
 
   /**
@@ -453,12 +381,8 @@ public class PIDController extends SendableBase {
   public double getDeltaError() {
     double error = getError();
 
-    m_thisMutex.lock();
-    try {
-      return (error - m_prevError) / getPeriod();
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    return (error - m_prevError) / getPeriod();
   }
 
   /**
@@ -467,48 +391,36 @@ public class PIDController extends SendableBase {
    * @param measurement The current measurement of the process variable.
    */
   public double calculate(double measurement) {
-    m_thisMutex.lock();
-    try {
-      return calculateUnsafe(measurement);
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    return calculateUnsafe(measurement);
   }
 
   /**
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.
-   * @param setpoint The new setpoint of the controller.
+   * @param setpoint    The new setpoint of the controller.
    */
   public double calculate(double measurement, double setpoint) {
-    m_thisMutex.lock();
-    try {
-      // Set setpoint to provided value
-      if (m_maximumInput > m_minimumInput) {
-        m_setpoint = clamp(setpoint, m_minimumInput, m_maximumInput);
-      } else {
-        m_setpoint = setpoint;
-      }
 
-      return calculateUnsafe(measurement);
-    } finally {
-      m_thisMutex.unlock();
+    // Set setpoint to provided value
+    if (m_maximumInput > m_minimumInput) {
+      m_setpoint = clamp(setpoint, m_minimumInput, m_maximumInput);
+    } else {
+      m_setpoint = setpoint;
     }
+
+    return calculateUnsafe(measurement);
   }
 
   /**
    * Resets the previous error and the integral term. Also disables the controller.
    */
   public void reset() {
-    m_thisMutex.lock();
-    try {
-      m_prevError = 0;
-      m_totalError = 0;
-      m_output = 0;
-    } finally {
-      m_thisMutex.unlock();
-    }
+
+    m_prevError = 0;
+    m_totalError = 0;
+    m_output = 0;
   }
 
   @Override
@@ -522,7 +434,7 @@ public class PIDController extends SendableBase {
 
   /**
    * Wraps error around for continuous inputs. The original error is returned if continuous mode is
-   * disabled. This is an unsynchronized function.
+   * disabled.
    *
    * @param error The current error of the PID controller.
    * @return Error for continuous inputs.
@@ -558,8 +470,9 @@ public class PIDController extends SendableBase {
           m_maximumOutput / m_Ki);
     }
 
-    m_output = clamp(m_Kp * m_currError + m_Ki * m_totalError
-        + m_Kd * (m_currError - m_prevError) / getPeriod(), m_minimumOutput, m_maximumOutput);
+    m_output = clamp(
+        m_Kp * m_currError + m_Ki * m_totalError + m_Kd * (m_currError - m_prevError) / getPeriod(),
+        m_minimumOutput, m_maximumOutput);
 
     return m_output;
   }
