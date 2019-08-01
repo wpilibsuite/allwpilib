@@ -79,6 +79,12 @@ ComplexWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
   return Add(title, SendableCameraWrapper::Wrap(video));
 }
 
+ComplexWidget& ShuffleboardContainer::Add(
+    const wpi::Twine& title, const std::string cameraName,
+    wpi::ArrayRef<std::string> cameraUrls) {
+  return Add(title, SendableCameraWrapper::Wrap(cameraName, cameraUrls));
+}
+
 ComplexWidget& ShuffleboardContainer::Add(Sendable& sendable) {
   if (sendable.GetName().empty()) {
     wpi::outs() << "Sendable must have a name\n";
