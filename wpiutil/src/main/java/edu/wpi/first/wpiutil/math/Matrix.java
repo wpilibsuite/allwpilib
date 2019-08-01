@@ -47,25 +47,23 @@ public class Matrix<R extends Num, C extends Num> {
   /**
    * Get an element of this matrix.
    *
-   * @param i The row of the element.
-   * @param j The column of the element.
-   * @return The element in this matrix at ij.
+   * @param row The row of the element.
+   * @param col The column of the element.
+   * @return The element in this matrix at row,col.
    */
-  @SuppressWarnings("ParameterName")
-  public final double get(int i, int j) {
-    return this.m_storage.get(i, j);
+  public final double get(int row, int col) {
+    return this.m_storage.get(row, col);
   }
 
   /**
    * Sets the value at the given indices.
    *
-   * @param i     The row of the element.
-   * @param j     The column of the element.
+   * @param row     The row of the element.
+   * @param col     The column of the element.
    * @param value The value to insert at the given location.
    */
-  @SuppressWarnings("ParameterName")
-  public final void set(int i, int j, double value) {
-    this.m_storage.set(i, j, value);
+  public final void set(int row, int col, double value) {
+    this.m_storage.set(row, col, value);
   }
 
   /**
