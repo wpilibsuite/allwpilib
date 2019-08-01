@@ -2,6 +2,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'java-library'
 //apply plugin: 'net.ltgt.errorprone'
 apply plugin: 'jacoco'
+apply plugin: 'com.github.spotbugs'
 
 def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
@@ -132,4 +133,9 @@ jacocoTestReport {
         xml.required = true
         html.required = true
     }
+}
+
+spotbugs {
+    ignoreFailures = false
+    effort = 'max'
 }
