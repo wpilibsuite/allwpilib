@@ -11,6 +11,8 @@
 #include <memory>
 #include <random>
 
+#include <wpi/math>
+
 #include "gtest/gtest.h"
 
 // Filter constants
@@ -36,8 +38,7 @@ std::ostream& operator<<(std::ostream& os,
 }
 
 static double GetData(double t) {
-  constexpr double kPi = 3.14159265358979323846;
-  return 100.0 * std::sin(2.0 * kPi * t);
+  return 100.0 * std::sin(2.0 * wpi::math::pi * t);
 }
 
 class LinearFilterNoiseTest

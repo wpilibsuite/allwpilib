@@ -68,11 +68,11 @@ public class Rotation2d {
   }
 
   /**
-   * Adds two rotations together, with the result being bounded between -kPi and
-   * kPi.
+   * Adds two rotations together, with the result being bounded between -pi and
+   * pi.
    *
    * <p>For example, Rotation2d.fromDegrees(30) + Rotation2d.fromDegrees(60) =
-   * Rotation2d{-kPi/2}
+   * Rotation2d{-pi/2}
    *
    * @param other The rotation to add.
    * @return The sum of the two rotations.
@@ -86,7 +86,7 @@ public class Rotation2d {
    * rotation.
    *
    * <p>For example, Rotation2d.fromDegrees(10) - Rotation2d.fromDegrees(100) =
-   * Rotation2d{-kPi/2}
+   * Rotation2d{-pi/2}
    *
    * @param other The rotation to subtract.
    * @return The difference between the two rotations.

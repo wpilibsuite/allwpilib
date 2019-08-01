@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,14 +11,13 @@
 #include <cmath>
 
 #include <hal/HAL.h>
+#include <wpi/math>
 
 #include "frc/SpeedController.h"
 #include "frc/drive/Vector2d.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
-
-constexpr double kPi = 3.14159265358979323846;
 
 MecanumDrive::MecanumDrive(SpeedController& frontLeftMotor,
                            SpeedController& rearLeftMotor,
@@ -81,8 +80,9 @@ void MecanumDrive::DrivePolar(double magnitude, double angle,
     reported = true;
   }
 
-  DriveCartesian(magnitude * std::sin(angle * (kPi / 180.0)),
-                 magnitude * std::cos(angle * (kPi / 180.0)), zRotation, 0.0);
+  DriveCartesian(magnitude * std::sin(angle * (wpi::math::pi / 180.0)),
+                 magnitude * std::cos(angle * (wpi::math::pi / 180.0)),
+                 zRotation, 0.0);
 }
 
 bool MecanumDrive::IsRightSideInverted() const {

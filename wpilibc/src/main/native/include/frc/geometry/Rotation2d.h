@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <wpi/math>
+
 namespace frc {
 
 /**
@@ -46,11 +48,11 @@ class Rotation2d {
   static Rotation2d FromDegrees(double degrees);
 
   /**
-   * Adds two rotations together, with the result being bounded between -kPi and
-   * kPi.
+   * Adds two rotations together, with the result being bounded between -pi and
+   * pi.
    *
    * For example, Rotation2d.FromDegrees(30) + Rotation2d.FromDegrees(60) =
-   * Rotation2d{-kPi/2}
+   * Rotation2d{-pi/2}
    *
    * @param other The rotation to add.
    *
@@ -75,7 +77,7 @@ class Rotation2d {
    * rotation.
    *
    * For example, Rotation2d.FromDegrees(10) - Rotation2d.FromDegrees(100) =
-   * Rotation2d{-kPi/2}
+   * Rotation2d{-pi/2}
    *
    * @param other The rotation to subtract.
    *
@@ -157,16 +159,14 @@ class Rotation2d {
   double m_cos = 1;
   double m_sin = 0;
 
-  constexpr static double kPi = 3.14159265358979323846;
-
   template <typename T>
   static T Rad2Deg(const T& rad) {
-    return rad * 180.0 / kPi;
+    return rad * 180.0 / wpi::math::pi;
   }
 
   template <typename T>
   static T Deg2Rad(const T& deg) {
-    return deg * kPi / 180.0;
+    return deg * wpi::math::pi / 180.0;
   }
 };
 }  // namespace frc
