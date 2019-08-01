@@ -95,7 +95,7 @@ class PreferencesTest {
         () -> assertEquals(0.2, m_prefs.getDouble("checkedValueDouble", 0), 1e-6),
         () -> assertEquals("Hello. How are you?", m_prefs.getString("checkedValueString", "")),
         () -> assertEquals(2, m_prefs.getInt("checkedValueInt", 0)),
-        () -> assertEquals(3.14, m_prefs.getFloat("checkedValueFloat", 0), 1e-6),
+        () -> assertEquals(3.4, m_prefs.getFloat("checkedValueFloat", 0), 1e-6),
         () -> assertFalse(m_prefs.getBoolean("checkedValueBoolean", true)));
   }
 

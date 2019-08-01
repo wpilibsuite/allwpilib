@@ -69,9 +69,9 @@ FieldObject2d* Field2d::GetRobotObject() {
 
 void Field2d::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("Field2d");
-  m_table = builder.GetTable();
 
   std::scoped_lock lock(m_mutex);
+  m_table = builder.GetTable();
   for (auto&& obj : m_objects) {
     std::scoped_lock lock2(obj->m_mutex);
     obj->m_entry = m_table->GetEntry(obj->m_name);

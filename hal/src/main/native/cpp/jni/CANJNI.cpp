@@ -69,11 +69,11 @@ Java_edu_wpi_first_hal_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage
 
 /*
  * Class:     edu_wpi_first_hal_can_CANJNI
- * Method:    GetCANStatus
+ * Method:    getCANStatus
  * Signature: (Ljava/lang/Object;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_can_CANJNI_GetCANStatus
+Java_edu_wpi_first_hal_can_CANJNI_getCANStatus
   (JNIEnv* env, jclass, jobject canStatus)
 {
   float percentBusUtilization = 0;

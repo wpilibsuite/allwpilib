@@ -77,7 +77,7 @@ public class Tracer {
       m_lastEpochsPrintTime = now;
       m_epochs.forEach(
           (key, value) -> {
-            sb.append(String.format("\t%s: %.6fs\n", key, value / 1.0e6));
+            sb.append(String.format("\t%s: %.6fs%n", key, value / 1.0e6));
           });
       if (sb.length() > 0) {
         output.accept(sb.toString());

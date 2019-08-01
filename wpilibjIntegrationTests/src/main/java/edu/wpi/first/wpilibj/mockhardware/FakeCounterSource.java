@@ -16,7 +16,7 @@ public class FakeCounterSource implements AutoCloseable {
   private boolean m_allocated;
 
   /** Thread object that allows emulation of an encoder. */
-  private class EncoderThread extends Thread {
+  private static class EncoderThread extends Thread {
     FakeCounterSource m_encoder;
 
     EncoderThread(FakeCounterSource encode) {

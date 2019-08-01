@@ -161,7 +161,7 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
   @Override
   public String toString() {
     return String.format(
-        "Linear System: A\n%s\n\nB:\n%s\n\nC:\n%s\n\nD:\n%s\n",
+        "Linear System: A%n%s%n%nB:%n%s%n%nC:%n%s%n%nD:%n%s%n",
         m_A.toString(), m_B.toString(), m_C.toString(), m_D.toString());
   }
 }

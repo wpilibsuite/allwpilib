@@ -394,7 +394,7 @@ public class Trajectory {
   @Override
   public String toString() {
     String stateList = m_states.stream().map(State::toString).collect(Collectors.joining(", \n"));
-    return String.format("Trajectory - Seconds: %.2f, States:\n%s", m_totalTimeSeconds, stateList);
+    return String.format("Trajectory - Seconds: %.2f, States:%n%s", m_totalTimeSeconds, stateList);
   }
 
   @Override
