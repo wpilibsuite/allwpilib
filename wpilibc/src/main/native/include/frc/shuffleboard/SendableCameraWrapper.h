@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,6 +10,8 @@
 #include <string>
 
 #include <cscore_c.h>
+#include <wpi/ArrayRef.h>
+#include <wpi/StringMap.h>
 
 #include "frc/smartdashboard/SendableBase.h"
 
@@ -31,9 +33,9 @@ class SendableCameraWrapper : public SendableBase {
    * Creates a new sendable wrapper. Private constructor to avoid direct
    * instantiation with multiple wrappers floating around for the same camera.
    *
-   * @param source the source to wrap
+   * @param cameraName the name of the camera to wrap
    */
-  SendableCameraWrapper(CS_Source source, const private_init&);
+  SendableCameraWrapper(std::string cameraName, const private_init&);
 
   /**
    * Gets a sendable wrapper object for the given video source, creating the
@@ -45,6 +47,9 @@ class SendableCameraWrapper : public SendableBase {
    */
   static SendableCameraWrapper& Wrap(const cs::VideoSource& source);
   static SendableCameraWrapper& Wrap(CS_Source source);
+
+  static SendableCameraWrapper& Wrap(std::string cameraName,
+                                     wpi::ArrayRef<std::string> cameraUrls);
 
   void InitSendable(SendableBuilder& builder) override;
 

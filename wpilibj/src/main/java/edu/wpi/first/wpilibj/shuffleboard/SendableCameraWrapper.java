@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,9 +8,11 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.WeakHashMap;
 
 import edu.wpi.cscore.VideoSource;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -21,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 public final class SendableCameraWrapper extends SendableBase {
   private static final String kProtocol = "camera_server://";
 
-  private static Map<VideoSource, SendableCameraWrapper> m_wrappers = new WeakHashMap<>();
+  private static Map<String, SendableCameraWrapper> m_wrappers = new WeakHashMap<>();
 
   private final String m_uri;
 
@@ -32,10 +34,21 @@ public final class SendableCameraWrapper extends SendableBase {
    * @param source the source to wrap
    */
   private SendableCameraWrapper(VideoSource source) {
+    this(source.getName());
+  }
+
+  private SendableCameraWrapper(String cameraName) {
     super(false);
-    String name = source.getName();
-    setName(name);
-    m_uri = kProtocol + name;
+    setName(cameraName);
+    m_uri = kProtocol + cameraName;
+  }
+
+  /**
+   * Clears all cached wrapper objects. This should only be used in tests.
+   */
+  @SuppressWarnings("PMD.DefaultPackage")
+  static void clearWrappers() {
+    m_wrappers.clear();
   }
 
   /**
@@ -47,7 +60,54 @@ public final class SendableCameraWrapper extends SendableBase {
    * {@link ShuffleboardTab#add(Sendable)} and {@link ShuffleboardLayout#add(Sendable)}
    */
   public static SendableCameraWrapper wrap(VideoSource source) {
-    return m_wrappers.computeIfAbsent(source, SendableCameraWrapper::new);
+    return m_wrappers.computeIfAbsent(source.getName(), name -> new SendableCameraWrapper(source));
+  }
+
+  /**
+   * Creates a wrapper for an arbitrary camera stream. The stream URLs <i>must</i> be specified
+   * using a host resolvable by a program running on a different host (such as a dashboard);
+   * prefer using static IP addresses (if known) or DHCP identifiers such as
+   * {@code "raspberrypi.local"}.
+   *
+   * <p>If a wrapper already exists for the given camera, that wrapper is returned and the
+   * specified URLs are ignored.
+   *
+   * @param cameraName the name of the camera. Cannot be null or empty
+   * @param cameraUrls the URLs with which the camera stream may be accessed. At least one URL must
+   *                   be specified
+   * @return
+   */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
+  public static SendableCameraWrapper wrap(String cameraName, String... cameraUrls) {
+    if (m_wrappers.containsKey(cameraName)) {
+      return m_wrappers.get(cameraName);
+    }
+
+    Objects.requireNonNull(cameraName, "cameraName");
+    Objects.requireNonNull(cameraUrls, "cameraUrls");
+    if (cameraName.isEmpty()) {
+      throw new IllegalArgumentException("Camera name not specified");
+    }
+    if (cameraUrls.length == 0) {
+      throw new IllegalArgumentException("No camera URLs specified");
+    }
+    for (int i = 0; i < cameraUrls.length; i++) {
+      Objects.requireNonNull(cameraUrls[i], "Camera URL at index " + i + " was null");
+    }
+
+    String streams = "/CameraPublisher/" + cameraName + "/streams";
+    if (NetworkTableInstance.getDefault().getEntries(streams, 0).length != 0) {
+      throw new IllegalStateException(
+          "A camera is already being streamed with the name '" + cameraName + "'");
+    }
+
+    NetworkTableInstance.getDefault()
+        .getEntry(streams)
+        .setStringArray(cameraUrls);
+
+    SendableCameraWrapper wrapper = new SendableCameraWrapper(cameraName);
+    m_wrappers.put(cameraName, wrapper);
+    return wrapper;
   }
 
   @Override
