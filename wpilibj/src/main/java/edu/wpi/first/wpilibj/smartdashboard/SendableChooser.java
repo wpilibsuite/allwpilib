@@ -148,12 +148,8 @@ public class SendableChooser<V> extends SendableBase {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("String Chooser");
     builder.getEntry(INSTANCE).setDouble(m_instance);
-    builder.addStringProperty(DEFAULT, () -> {
-      return m_defaultChoice;
-    }, null);
-    builder.addStringArrayProperty(OPTIONS, () -> {
-      return m_map.keySet().toArray(new String[0]);
-    }, null);
+    builder.addStringProperty(DEFAULT, () -> m_defaultChoice, null);
+    builder.addStringArrayProperty(OPTIONS, () -> m_map.keySet().toArray(new String[0]), null);
     builder.addStringProperty(ACTIVE, () -> {
       m_mutex.lock();
       try {

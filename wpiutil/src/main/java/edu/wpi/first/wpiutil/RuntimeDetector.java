@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -96,8 +96,7 @@ public final class RuntimeDetector {
   public static synchronized String getLibraryResource(String libName) {
     computePlatform();
 
-    String toReturn = filePath + filePrefix + libName + fileExtension;
-    return toReturn;
+    return filePath + filePrefix + libName + fileExtension;
   }
 
   /**
@@ -106,8 +105,7 @@ public final class RuntimeDetector {
   public static synchronized String getHashLibraryResource(String libName) {
     computePlatform();
 
-    String toReturn = filePath + libName + ".hash";
-    return toReturn;
+    return filePath + libName + ".hash";
   }
 
   public static boolean isAthena() {

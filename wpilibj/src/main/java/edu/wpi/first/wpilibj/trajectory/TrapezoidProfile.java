@@ -279,7 +279,6 @@ public class TrapezoidProfile {
    * @param initial     The initial state (usually the current state).
    * @param goal        The desired state when the profile is complete.
    */
-  @SuppressWarnings("LocalVariableName")
   private static boolean shouldFlipAcceleration(State initial, State goal) {
     return initial.position > goal.position;
   }

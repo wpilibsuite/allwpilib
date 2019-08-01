@@ -41,7 +41,7 @@ public class Robot extends RobotBase {
     // Tell the DS that the robot is ready to be enabled
     HAL.observeUserProgramStarting();
 
-    while (true) {
+    while (!Thread.currentThread().isInterrupted()) {
       if (isDisabled()) {
         m_ds.InDisabled(true);
         disabled();

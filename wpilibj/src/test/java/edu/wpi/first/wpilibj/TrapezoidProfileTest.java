@@ -26,7 +26,7 @@ class TrapezoidProfileTest {
    * @param val2 Second operand in comparison.
    */
   private static void assertLessThanOrEquals(double val1, double val2) {
-    assertTrue(val1 <= val2, Double.toString(val1) + " is greater than " + val2);
+    assertTrue(val1 <= val2, val1 + " is greater than " + val2);
   }
 
   /**
