@@ -122,7 +122,6 @@ ext {
     }
 }
 
-
 def examplesMap = [:];
 file("$projectDir/examples").list(new FilenameFilter() {
     @Override
