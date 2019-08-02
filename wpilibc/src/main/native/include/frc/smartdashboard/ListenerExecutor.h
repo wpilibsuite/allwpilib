@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <vector>
+
 #include <wpi/mutex.h>
 
 namespace frc {
