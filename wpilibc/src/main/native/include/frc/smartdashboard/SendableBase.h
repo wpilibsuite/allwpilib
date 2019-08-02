@@ -10,8 +10,6 @@
 #include <memory>
 #include <string>
 
-#include <wpi/mutex.h>
-
 #include "frc/smartdashboard/Sendable.h"
 
 namespace frc {
