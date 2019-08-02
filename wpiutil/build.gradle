@@ -221,30 +221,3 @@ model {
 dependencies {
     compile "org.ejml:ejml-simple:0.38"
 }
-
-def wpilibNumberFileInput = file("src/generate/GenericNumber.java.in")
-def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/wpiutil/math/numbers")
-def maxNum = 20
-
-task generateNumbers() {
-    description = "Generates generic number classes from template"
-    group = "WPILib"
-
-    inputs.file wpilibNumberFileInput
-
-    doLast {
-        if(wpilibNumberFileOutputDir.exists()) {
-            wpilibNumberFileOutputDir.delete()
-        }
-        wpilibNumberFileOutputDir.mkdirs()
-
-        for(i in 0..maxNum) {
-            def outputFile = new File(wpilibNumberFileOutputDir, "N${i}.java")
-            def read = wpilibNumberFileInput.text.replace('${num}', i.toString())
-            outputFile.write(read)
-        }
-    }
-}
-
-sourceSets.main.java.srcDir "${buildDir}/generated/java"
-compileJava.dependsOn generateNumbers
