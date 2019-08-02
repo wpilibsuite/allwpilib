@@ -35,13 +35,12 @@ if (NOT WITHOUT_JAVA)
       message(STATUS "All files downloaded.")
   endif()
 
-
   file(GLOB EJML_JARS
       ${CMAKE_SOURCE_DIR}/wpiutil/thirdparty/*.jar)
 
   set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${EJML_JARS})
 
-  file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${CMAKE_BINARY_DIR}/wpiutil/generated/*.java)
+  file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
   add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} OUTPUT_NAME wpiutil)
 
   get_property(WPIUTIL_JAR_FILE TARGET wpiutil_jar PROPERTY JAR_FILE)
