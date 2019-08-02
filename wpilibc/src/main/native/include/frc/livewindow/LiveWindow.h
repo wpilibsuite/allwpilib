@@ -68,7 +68,7 @@ class LiveWindow {
    *
    * @param sendable component to remove
    */
-  void Remove(Sendable* component);
+  bool Remove(Sendable* component);
 
   /**
    * Enable telemetry for a single component.

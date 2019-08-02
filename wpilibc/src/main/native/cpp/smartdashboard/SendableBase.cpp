@@ -17,17 +17,22 @@ SendableBase::SendableBase(bool addLiveWindow) {
   if (addLiveWindow) LiveWindow::GetInstance()->Add(this);
 }
 
-SendableBase::SendableBase(SendableBase&& other) {
-  LiveWindow::GetInstance()->Remove(&other);
-  LiveWindow::GetInstance()->Add(this);
+SendableBase::SendableBase(SendableBase&& other)
+    : m_name(other.m_name), m_subsystem(other.m_subsystem) {
+  auto&& lw = LiveWindow::GetInstance();
+  if (lw->Remove(&other)) {
+    lw->Add(this);
+  }
 }
 
 SendableBase& SendableBase::operator=(SendableBase&& other) {
   m_name = other.m_name;
   m_subsystem = other.m_subsystem;
-  LiveWindow::GetInstance()->Remove(&other);
-  LiveWindow::GetInstance()->Add(this);
-  
+  auto&& lw = LiveWindow::GetInstance();
+  if (lw->Remove(&other)) {
+    lw->Add(this);
+  }
+
   return *this;
 }
 
