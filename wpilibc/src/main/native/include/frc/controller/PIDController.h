@@ -10,8 +10,6 @@
 #include <functional>
 #include <limits>
 
-#include <wpi/mutex.h>
-
 #include "frc/smartdashboard/SendableBase.h"
 
 namespace frc2 {
@@ -237,7 +235,7 @@ class PIDController : public frc::SendableBase {
  protected:
   /**
    * Wraps error around for continuous inputs. The original error is returned if
-   * continuous mode is disabled. This is an unsynchronized function.
+   * continuous mode is disabled.
    *
    * @param error The current error of the PID controller.
    * @return Error for continuous inputs.

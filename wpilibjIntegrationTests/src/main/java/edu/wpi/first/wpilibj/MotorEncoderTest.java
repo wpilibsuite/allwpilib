@@ -181,9 +181,8 @@ public class MotorEncoderTest extends AbstractComsSetup {
     pidController.setOutputRange(-0.2, 0.2);
     pidController.setSetpoint(1000);
 
-    Notifier pidRunner = new Notifier(() -> {
-      me.getMotor().set(pidController.calculate(me.getEncoder().getDistance()));
-    });
+    Notifier pidRunner = new Notifier(() ->
+      me.getMotor().set(pidController.calculate(me.getEncoder().getDistance())));
 
     pidRunner.startPeriodic(pidController.getPeriod());
     Timer.delay(10.0);
@@ -204,9 +203,8 @@ public class MotorEncoderTest extends AbstractComsSetup {
     pidController.setOutputRange(-0.3, 0.3);
     pidController.setSetpoint(600);
 
-    Notifier pidRunner = new Notifier(() -> {
-      me.getMotor().set(pidController.calculate(me.getEncoder().getDistance()) + 8e-5);
-    });
+    Notifier pidRunner = new Notifier(() ->
+      me.getMotor().set(filter.calculate(me.getEncoder().getRate()) + 8e-5));
 
     pidRunner.startPeriodic(pidController.getPeriod());
     Timer.delay(10.0);
