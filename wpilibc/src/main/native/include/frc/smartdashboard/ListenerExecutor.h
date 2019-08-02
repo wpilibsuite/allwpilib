@@ -8,8 +8,8 @@
 #pragma once
 
 #include <functional>
-#include <mutex>
 #include <vector>
+#include <wpi/mutex.h>
 
 namespace frc {
 /**
@@ -35,6 +35,6 @@ class ListenerExecutor {
  private:
   std::vector<std::function<void()>> m_tasks;
   std::vector<std::function<void()>> m_runningTasks;
-  std::mutex m_lock;
+  wpi::mutex m_lock;
 };
 }  // namespace frc
