@@ -11,13 +11,13 @@
 #include <mutex>
 #include <vector>
 
+namespace frc {
 /**
  * An executor for running listener tasks posted by Sendable listeners
  * synchronously from the main application thread.
  *
  * @see Sendable
  */
-namespace frc {
 class ListenerExecutor {
  public:
   /**
