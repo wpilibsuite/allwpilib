@@ -34,6 +34,7 @@ class ListenerExecutor {
 
  private:
   std::vector<std::function<void()>> m_tasks;
+  std::vector<std::function<void()>> m_runningTasks;
   std::mutex m_lock;
 };
 }  // namespace frc

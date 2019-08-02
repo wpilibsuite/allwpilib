@@ -16,12 +16,13 @@ void ListenerExecutor::Execute(std::function<void()> task) {
 
 void ListenerExecutor::RunListenerTasks() {
   // Locally copy tasks from internal list; minimizes blocking time
-  m_lock.lock();
-  std::vector<std::function<void()>> tasks(m_tasks);
-  m_tasks.clear();
-  m_lock.unlock();
+  {
+    std::scoped_lock lock(m_lock);
+    std::swap(m_tasks, m_runningTasks);
+  }
 
-  for (auto&& task : tasks) {
+  for (auto&& task : m_runningTasks) {
     task();
   }
+  m_runningTasks.clear();
 }
