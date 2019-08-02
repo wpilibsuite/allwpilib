@@ -19,17 +19,11 @@ SendableBase::SendableBase(bool addLiveWindow) {
 
 SendableBase::~SendableBase() { LiveWindow::GetInstance()->Remove(this); }
 
-std::string SendableBase::GetName() const {
-  return m_name;
-}
+std::string SendableBase::GetName() const { return m_name; }
 
-void SendableBase::SetName(const wpi::Twine& name) {
-  m_name = name.str();
-}
+void SendableBase::SetName(const wpi::Twine& name) { m_name = name.str(); }
 
-std::string SendableBase::GetSubsystem() const {
-  return m_subsystem;
-}
+std::string SendableBase::GetSubsystem() const { return m_subsystem; }
 
 void SendableBase::SetSubsystem(const wpi::Twine& subsystem) {
   m_subsystem = subsystem.str();
