@@ -67,6 +67,7 @@ class LiveWindow {
    * Remove the component from the LiveWindow.
    *
    * @param sendable component to remove
+   * @return true if the component was removed; false if it was not present
    */
   bool Remove(Sendable* component);
 
