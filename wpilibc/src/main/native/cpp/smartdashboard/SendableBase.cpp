@@ -18,7 +18,8 @@ SendableBase::SendableBase(bool addLiveWindow) {
 }
 
 SendableBase::SendableBase(SendableBase&& other)
-    : m_name(other.m_name), m_subsystem(other.m_subsystem) {
+    : m_name(std::move(other.m_name)),
+      m_subsystem(std::move(other.m_subsystem)) {
   auto&& lw = LiveWindow::GetInstance();
   if (lw->Remove(&other)) {
     lw->Add(this);
@@ -26,8 +27,8 @@ SendableBase::SendableBase(SendableBase&& other)
 }
 
 SendableBase& SendableBase::operator=(SendableBase&& other) {
-  m_name = other.m_name;
-  m_subsystem = other.m_subsystem;
+  m_name = std::move(other.m_name);
+  m_subsystem = std::move(other.m_subsystem);
   auto&& lw = LiveWindow::GetInstance();
   if (lw->Remove(&other)) {
     lw->Add(this);
