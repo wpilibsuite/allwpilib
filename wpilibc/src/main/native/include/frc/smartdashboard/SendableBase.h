@@ -27,8 +27,10 @@ class SendableBase : public Sendable {
 
   ~SendableBase() override;
 
-  SendableBase(SendableBase&& rhs);
-  SendableBase& operator=(SendableBase&& rhs);
+  SendableBase(const SendableBase&) = default;
+  SendableBase& operator=(const SendableBase&) = default;
+  SendableBase(SendableBase&&) = default;
+  SendableBase& operator=(SendableBase&&) = default;
 
   using Sendable::SetName;
 
@@ -73,7 +75,6 @@ class SendableBase : public Sendable {
   void SetName(const wpi::Twine& moduleType, int moduleNumber, int channel);
 
  private:
-  mutable wpi::mutex m_mutex;
   std::string m_name;
   std::string m_subsystem = "Ungrouped";
 };

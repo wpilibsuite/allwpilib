@@ -46,12 +46,12 @@ public abstract class SendableBase implements Sendable, AutoCloseable {
   }
 
   @Override
-  public final synchronized String getName() {
+  public final String getName() {
     return m_name;
   }
 
   @Override
-  public final synchronized void setName(String name) {
+  public final void setName(String name) {
     m_name = name;
   }
 
@@ -77,12 +77,12 @@ public abstract class SendableBase implements Sendable, AutoCloseable {
   }
 
   @Override
-  public final synchronized String getSubsystem() {
+  public final String getSubsystem() {
     return m_subsystem;
   }
 
   @Override
-  public final synchronized void setSubsystem(String subsystem) {
+  public final void setSubsystem(String subsystem) {
     m_subsystem = subsystem;
   }
 
