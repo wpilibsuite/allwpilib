@@ -9,11 +9,11 @@
 #include "frc/Encoder.h"
 #include "frc/Jaguar.h"
 #include "frc/LinearFilter.h"
+#include "frc/Notifier.h"
 #include "frc/Talon.h"
 #include "frc/Timer.h"
 #include "frc/Victor.h"
 #include "frc/controller/PIDController.h"
-#include "frc/controller/PIDControllerRunner.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -145,12 +145,13 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
   pidController.SetSetpoint(goal);
 
   /* 10 seconds should be plenty time to get to the reference */
-  frc::PIDControllerRunner pidRunner(
-      pidController, [&] { return m_encoder->GetDistance(); },
-      [&](double output) { m_speedController->Set(output); });
-  pidRunner.Enable();
+
+  frc::Notifier pidRunner{[this, &pidController] {
+    m_speedController->Set(pidController.Calculate(m_encoder->GetDistance()));
+  }};
+  pidRunner.StartPeriodic(pidController.GetPeriod());
   Wait(10.0);
-  pidRunner.Disable();
+  pidRunner.Stop();
 
   RecordProperty("PIDError", pidController.GetError());
 
@@ -171,12 +172,15 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
   pidController.SetSetpoint(600);
 
   /* 10 seconds should be plenty time to get to the reference */
-  frc::PIDControllerRunner pidRunner(
-      pidController, [&] { return m_filter->Calculate(m_encoder->GetRate()); },
-      [&](double output) { m_speedController->Set(output + 8e-5); });
-  pidRunner.Enable();
+
+  frc::Notifier pidRunner{[this, &pidController] {
+    m_speedController->Set(pidController.Calculate(m_encoder->GetDistance()) +
+                           8e-5);
+  }};
+  pidRunner.StartPeriodic(pidController.GetPeriod());
   Wait(10.0);
-  pidRunner.Disable();
+  pidRunner.Stop();
+
   RecordProperty("PIDError", pidController.GetError());
 
   EXPECT_TRUE(pidController.AtSetpoint())

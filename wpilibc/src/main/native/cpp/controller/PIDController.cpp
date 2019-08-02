@@ -116,12 +116,7 @@ double PIDController::GetDeltaError() const {
 
 double PIDController::Calculate(double measurement, double setpoint) {
   // Set setpoint to provided value
-  if (m_maximumInput > m_minimumInput) {
-    m_setpoint = std::clamp(setpoint, m_minimumInput, m_maximumInput);
-  } else {
-    m_setpoint = setpoint;
-  }
-
+  SetSetpoint(setpoint);
   return Calculate(measurement);
 }
 

@@ -389,14 +389,8 @@ public class PIDController extends SendableBase {
    * @param setpoint    The new setpoint of the controller.
    */
   public double calculate(double measurement, double setpoint) {
-
     // Set setpoint to provided value
-    if (m_maximumInput > m_minimumInput) {
-      m_setpoint = clamp(setpoint, m_minimumInput, m_maximumInput);
-    } else {
-      m_setpoint = setpoint;
-    }
-
+    setSetpoint(setpoint);
     return calculate(measurement);
   }
 
