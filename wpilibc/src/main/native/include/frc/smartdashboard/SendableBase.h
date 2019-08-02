@@ -27,8 +27,8 @@ class SendableBase : public Sendable {
 
   SendableBase(const SendableBase&) = default;
   SendableBase& operator=(const SendableBase&) = default;
-  SendableBase(SendableBase&&) = default;
-  SendableBase& operator=(SendableBase&&) = default;
+  SendableBase(SendableBase&&);
+  SendableBase& operator=(SendableBase&&);
 
   using Sendable::SetName;
 

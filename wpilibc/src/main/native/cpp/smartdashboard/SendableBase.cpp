@@ -17,6 +17,20 @@ SendableBase::SendableBase(bool addLiveWindow) {
   if (addLiveWindow) LiveWindow::GetInstance()->Add(this);
 }
 
+SendableBase::SendableBase(SendableBase&& other) {
+  LiveWindow::GetInstance()->Remove(&other);
+  LiveWindow::GetInstance()->Add(this);
+}
+
+SendableBase& SendableBase::operator=(SendableBase&& other) {
+  m_name = other.m_name;
+  m_subsystem = other.m_subsystem;
+  LiveWindow::GetInstance()->Remove(&other);
+  LiveWindow::GetInstance()->Add(this);
+  
+  return *this;
+}
+
 SendableBase::~SendableBase() { LiveWindow::GetInstance()->Remove(this); }
 
 std::string SendableBase::GetName() const { return m_name; }
