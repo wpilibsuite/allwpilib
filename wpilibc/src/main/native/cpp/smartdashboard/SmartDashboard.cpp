@@ -254,10 +254,17 @@ std::shared_ptr<nt::Value> SmartDashboard::GetValue(wpi::StringRef keyName) {
   return Singleton::GetInstance().table->GetEntry(keyName).GetValue();
 }
 
+ListenerExecutor SmartDashboard::listenerExecutor;
+
+void SmartDashboard::PostListenerTask(std::function<void()> task) {
+  listenerExecutor.Execute(task);
+}
+
 void SmartDashboard::UpdateValues() {
   auto& inst = Singleton::GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
   for (auto& i : inst.tablesToData) {
     i.getValue().builder.UpdateTable();
   }
+  listenerExecutor.RunListenerTasks();
 }
