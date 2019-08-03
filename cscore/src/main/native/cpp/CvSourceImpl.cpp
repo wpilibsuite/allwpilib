@@ -178,11 +178,13 @@ CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
                             status);
 }
 
+#if CV_VERSION_MAJOR < 4
 void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
                        CS_Status* status) {
   auto mat = cv::cvarrToMat(image);
   return cs::PutSourceFrame(source, mat, status);
 }
+#endif  // CV_VERSION_MAJOR < 4
 
 void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, CS_Status* status) {
   return cs::PutSourceFrame(source, *image, status);
