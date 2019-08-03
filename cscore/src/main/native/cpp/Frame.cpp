@@ -397,7 +397,7 @@ Image* Frame::ConvertBGRToMJPEG(Image* image, int quality) {
 
   // Compress
   if (m_impl->compressionParams.empty()) {
-    m_impl->compressionParams.push_back(CV_IMWRITE_JPEG_QUALITY);
+    m_impl->compressionParams.push_back(cv::IMWRITE_JPEG_QUALITY);
     m_impl->compressionParams.push_back(quality);
   } else {
     m_impl->compressionParams[1] = quality;
@@ -428,7 +428,7 @@ Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
 
   // Compress
   if (m_impl->compressionParams.empty()) {
-    m_impl->compressionParams.push_back(CV_IMWRITE_JPEG_QUALITY);
+    m_impl->compressionParams.push_back(cv::IMWRITE_JPEG_QUALITY);
     m_impl->compressionParams.push_back(quality);
   } else {
     m_impl->compressionParams[1] = quality;
