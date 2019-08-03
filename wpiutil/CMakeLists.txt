@@ -36,7 +36,7 @@ if (NOT WITHOUT_JAVA)
   endif()
 
   file(GLOB EJML_JARS
-      ${CMAKE_SOURCE_DIR}/wpiutil/thirdparty/*.jar)
+      ${CMAKE_BINARY_DIR}/wpiutil/thirdparty/*.jar)
 
   set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${EJML_JARS})
 
