@@ -70,7 +70,6 @@ generatedFileExclude {
   src/main/native/resources/
   src/test/native/cpp/UnitsTest\.cpp$
   src/test/native/cpp/llvm/
-  thirdparty/
 }
 
 licenseUpdateExclude {
