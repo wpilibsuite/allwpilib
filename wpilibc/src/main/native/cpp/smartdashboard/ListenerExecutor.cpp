@@ -7,7 +7,7 @@
 
 #include "frc/smartdashboard/ListenerExecutor.h"
 
-using namespace frc;
+using namespace frc::detail;
 
 void ListenerExecutor::Execute(std::function<void()> task) {
   std::scoped_lock lock(m_lock);

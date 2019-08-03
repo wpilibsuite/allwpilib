@@ -12,7 +12,7 @@
 
 #include <wpi/mutex.h>
 
-namespace frc {
+namespace frc::detail {
 /**
  * An executor for running listener tasks posted by Sendable listeners
  * synchronously from the main application thread.
@@ -38,4 +38,4 @@ class ListenerExecutor {
   std::vector<std::function<void()>> m_runningTasks;
   wpi::mutex m_lock;
 };
-}  // namespace frc
+}  // namespace frc::detail

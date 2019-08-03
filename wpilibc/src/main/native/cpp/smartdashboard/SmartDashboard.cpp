@@ -254,7 +254,7 @@ std::shared_ptr<nt::Value> SmartDashboard::GetValue(wpi::StringRef keyName) {
   return Singleton::GetInstance().table->GetEntry(keyName).GetValue();
 }
 
-ListenerExecutor SmartDashboard::listenerExecutor;
+detail::ListenerExecutor SmartDashboard::listenerExecutor;
 
 void SmartDashboard::PostListenerTask(std::function<void()> task) {
   listenerExecutor.Execute(task);

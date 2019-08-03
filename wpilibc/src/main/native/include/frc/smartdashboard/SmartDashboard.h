@@ -419,7 +419,7 @@ class SmartDashboard : public ErrorBase, public SendableBase {
  private:
   virtual ~SmartDashboard() = default;
 
-  static ListenerExecutor listenerExecutor;
+  static detail::ListenerExecutor listenerExecutor;
 };
 
 }  // namespace frc
