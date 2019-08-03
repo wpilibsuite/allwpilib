@@ -1,6 +1,9 @@
 apply from: "${rootDir}/shared/resources.gradle"
 
 ext {
+    baseId = 'wpiutil'
+    groupId = 'edu.wpi.first.wpiutil'
+
     nativeName = 'wpiutil'
     devMain = 'edu.wpi.first.wpiutil.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
@@ -212,4 +215,8 @@ model {
             }
         }
     }
+}
+
+dependencies {
+    compile "org.ejml:ejml-simple:0.38"
 }
