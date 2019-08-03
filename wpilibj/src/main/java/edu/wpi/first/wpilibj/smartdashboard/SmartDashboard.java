@@ -50,6 +50,11 @@ public class SmartDashboard {
   @SuppressWarnings("PMD.UseConcurrentHashMap")
   private static final Map<String, Data> tablesToData = new HashMap<>();
 
+  /**
+   * The executor for listener tasks; calls listener tasks synchronously from main thread.
+   */
+  private static final ListenerExecutor listenerExecutor = new ListenerExecutor();
+
   static {
     HAL.report(tResourceType.kResourceType_SmartDashboard, 0);
   }
@@ -522,11 +527,23 @@ public class SmartDashboard {
   }
 
   /**
+   * Posts a task from a listener to the ListenerExecutor, so that it can be run synchronously
+   * from the main loop on the next call to {@link SmartDashboard#updateValues()}.
+   *
+   * @param task The task to run synchronously from the main thread.
+   */
+  public static void postListenerTask(Runnable task) {
+    listenerExecutor.execute(task);
+  }
+
+  /**
    * Puts all sendable data to the dashboard.
    */
   public static synchronized void updateValues() {
     for (Data data : tablesToData.values()) {
       data.m_builder.updateTable();
     }
+    // Execute posted listener tasks
+    listenerExecutor.runListenerTasks();
   }
 }

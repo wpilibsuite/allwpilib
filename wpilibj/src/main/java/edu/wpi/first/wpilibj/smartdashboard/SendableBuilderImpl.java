@@ -222,7 +222,7 @@ public class SendableBuilderImpl implements SendableBuilder {
     if (setter != null) {
       property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isBoolean()) {
-          setter.accept(event.value.getBoolean());
+          SmartDashboard.postListenerTask(() -> setter.accept(event.value.getBoolean()));
         }
       }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
     }
@@ -245,7 +245,7 @@ public class SendableBuilderImpl implements SendableBuilder {
     if (setter != null) {
       property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isDouble()) {
-          setter.accept(event.value.getDouble());
+          SmartDashboard.postListenerTask(() -> setter.accept(event.value.getDouble()));
         }
       }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
     }
@@ -268,7 +268,7 @@ public class SendableBuilderImpl implements SendableBuilder {
     if (setter != null) {
       property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isString()) {
-          setter.accept(event.value.getString());
+          SmartDashboard.postListenerTask(() -> setter.accept(event.value.getString()));
         }
       }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
     }
@@ -292,7 +292,7 @@ public class SendableBuilderImpl implements SendableBuilder {
     if (setter != null) {
       property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isBooleanArray()) {
-          setter.accept(event.value.getBooleanArray());
+          SmartDashboard.postListenerTask(() -> setter.accept(event.value.getBooleanArray()));
         }
       }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
     }
@@ -316,7 +316,7 @@ public class SendableBuilderImpl implements SendableBuilder {
     if (setter != null) {
       property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isDoubleArray()) {
-          setter.accept(event.value.getDoubleArray());
+          SmartDashboard.postListenerTask(() -> setter.accept(event.value.getDoubleArray()));
         }
       }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
     }
@@ -340,7 +340,7 @@ public class SendableBuilderImpl implements SendableBuilder {
     if (setter != null) {
       property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isStringArray()) {
-          setter.accept(event.value.getStringArray());
+          SmartDashboard.postListenerTask(() -> setter.accept(event.value.getStringArray()));
         }
       }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
     }
@@ -363,7 +363,7 @@ public class SendableBuilderImpl implements SendableBuilder {
     if (setter != null) {
       property.m_createListener = entry -> entry.addListener(event -> {
         if (event.value.isRaw()) {
-          setter.accept(event.value.getRaw());
+          SmartDashboard.postListenerTask(() -> setter.accept(event.value.getRaw()));
         }
       }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
     }
@@ -386,7 +386,7 @@ public class SendableBuilderImpl implements SendableBuilder {
     }
     if (setter != null) {
       property.m_createListener = entry -> entry.addListener(event -> {
-        setter.accept(event.value);
+        SmartDashboard.postListenerTask(() -> setter.accept(event.value));
       }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
