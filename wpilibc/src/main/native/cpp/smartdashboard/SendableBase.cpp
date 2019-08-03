@@ -17,39 +17,35 @@ SendableBase::SendableBase(bool addLiveWindow) {
   if (addLiveWindow) LiveWindow::GetInstance()->Add(this);
 }
 
-SendableBase::~SendableBase() { LiveWindow::GetInstance()->Remove(this); }
-
-SendableBase::SendableBase(SendableBase&& rhs) {
-  m_name = std::move(rhs.m_name);
-  m_subsystem = std::move(rhs.m_subsystem);
+SendableBase::SendableBase(SendableBase&& other)
+    : m_name(std::move(other.m_name)),
+      m_subsystem(std::move(other.m_subsystem)) {
+  auto&& lw = LiveWindow::GetInstance();
+  if (lw->Remove(&other)) {
+    lw->Add(this);
+  }
 }
 
-SendableBase& SendableBase::operator=(SendableBase&& rhs) {
-  Sendable::operator=(std::move(rhs));
-
-  m_name = std::move(rhs.m_name);
-  m_subsystem = std::move(rhs.m_subsystem);
+SendableBase& SendableBase::operator=(SendableBase&& other) {
+  m_name = std::move(other.m_name);
+  m_subsystem = std::move(other.m_subsystem);
+  auto&& lw = LiveWindow::GetInstance();
+  if (lw->Remove(&other)) {
+    lw->Add(this);
+  }
 
   return *this;
 }
 
-std::string SendableBase::GetName() const {
-  std::scoped_lock lock(m_mutex);
-  return m_name;
-}
+SendableBase::~SendableBase() { LiveWindow::GetInstance()->Remove(this); }
 
-void SendableBase::SetName(const wpi::Twine& name) {
-  std::scoped_lock lock(m_mutex);
-  m_name = name.str();
-}
+std::string SendableBase::GetName() const { return m_name; }
 
-std::string SendableBase::GetSubsystem() const {
-  std::scoped_lock lock(m_mutex);
-  return m_subsystem;
-}
+void SendableBase::SetName(const wpi::Twine& name) { m_name = name.str(); }
+
+std::string SendableBase::GetSubsystem() const { return m_subsystem; }
 
 void SendableBase::SetSubsystem(const wpi::Twine& subsystem) {
-  std::scoped_lock lock(m_mutex);
   m_subsystem = subsystem.str();
 }
 
