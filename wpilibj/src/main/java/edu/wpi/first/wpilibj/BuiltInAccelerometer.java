@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,15 +11,13 @@ import edu.wpi.first.hal.AccelerometerJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.sim.AccelerometerSim;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Built-in accelerometer.
  *
  * <p>This class allows access to the roboRIO's internal accelerometer.
  */
-public class BuiltInAccelerometer extends SendableBase implements Accelerometer {
+public class BuiltInAccelerometer extends AccelerometerBase {
   /**
    * Constructor.
    *
@@ -89,14 +87,6 @@ public class BuiltInAccelerometer extends SendableBase implements Accelerometer 
   @Override
   public double getZ() {
     return AccelerometerJNI.getAccelerometerZ();
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("3AxisAccelerometer");
-    builder.addDoubleProperty("X", this::getX, null);
-    builder.addDoubleProperty("Y", this::getY, null);
-    builder.addDoubleProperty("Z", this::getZ, null);
   }
 
   public AccelerometerSim getSimObject() {

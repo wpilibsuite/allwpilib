@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,10 +7,9 @@
 
 #pragma once
 
+#include "frc/AccelerometerBase.h"
 #include "frc/ErrorBase.h"
 #include "frc/SPI.h"
-#include "frc/interfaces/Accelerometer.h"
-#include "frc/smartdashboard/SendableBase.h"
 
 namespace frc {
 
@@ -20,9 +19,7 @@ namespace frc {
  * This class allows access to an Analog Devices ADXL345 3-axis accelerometer
  * via SPI. This class assumes the sensor is wired in 4-wire SPI mode.
  */
-class ADXL345_SPI : public ErrorBase,
-                    public SendableBase,
-                    public Accelerometer {
+class ADXL345_SPI : public ErrorBase, public AccelerometerBase {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 
