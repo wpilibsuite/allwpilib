@@ -55,7 +55,6 @@ class PIDControllerRunner : SendableBase {
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  Notifier m_notifier{&PIDControllerRunner::Run, this};
   frc2::PIDController& m_controller;
   std::function<double(void)> m_measurementSource;
   std::function<void(double)> m_controllerOutput;
@@ -66,6 +65,12 @@ class PIDControllerRunner : SendableBase {
   // Ensures when Disable() is called, m_controllerOutput() won't run if
   // Controller::Update() is already running at that time.
   mutable wpi::mutex m_outputMutex;
+
+  // This is declared after all other member variables so that during
+  // PIDControllerRunner destruction, the Notifier is stopped before any member
+  // variables its callable uses are destructed. This avoids use-after-free
+  // bugs like crashes when locking is attempted on deallocated mutexes.
+  Notifier m_notifier{&PIDControllerRunner::Run, this};
 
   void Run();
 };
