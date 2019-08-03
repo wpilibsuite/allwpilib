@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class PIDControllerRunner extends SendableBase {
-  private final Notifier m_notifier = new Notifier(this::run);
   private final PIDController m_controller;
   private final DoubleConsumer m_controllerOutput;
   private final DoubleSupplier m_measurementSource;
@@ -27,6 +26,12 @@ public class PIDControllerRunner extends SendableBase {
   // Ensures when disable() is called, m_controllerOutput() won't run if
   // Controller.update() is already running at that time.
   private final ReentrantLock m_outputMutex = new ReentrantLock();
+
+  // This is declared after all other member variables so that during
+  // PIDControllerRunner destruction, the Notifier is stopped before any member
+  // variables its callable uses are destructed. This avoids use-after-free
+  // bugs like crashes when locking is attempted on deallocated mutexes.
+  private final Notifier m_notifier = new Notifier(this::run);
 
   /**
    * Allocates a PIDControllerRunner.
