@@ -79,7 +79,7 @@ ComplexWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
   return Add(title, SendableCameraWrapper::Wrap(video));
 }
 
-ComplexWidget& ShuffleboardContainer::Add(
+ComplexWidget& ShuffleboardContainer::AddCamera(
     const wpi::Twine& title, const std::string cameraName,
     wpi::ArrayRef<std::string> cameraUrls) {
   return Add(title, SendableCameraWrapper::Wrap(cameraName, cameraUrls));

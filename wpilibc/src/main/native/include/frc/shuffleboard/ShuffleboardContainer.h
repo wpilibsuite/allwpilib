@@ -141,8 +141,9 @@ class ShuffleboardContainer : public virtual ShuffleboardValue,
    * stream
    * @return a widget to display the camera stream
    */
-  ComplexWidget& Add(const wpi::Twine& title, const std::string cameraName,
-                     wpi::ArrayRef<std::string> cameraUrls);
+  ComplexWidget& AddCamera(const wpi::Twine& title,
+                           const std::string cameraName,
+                           wpi::ArrayRef<std::string> cameraUrls);
 
   /**
    * Adds a widget to this container to display the given sendable.
