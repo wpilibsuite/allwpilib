@@ -145,7 +145,6 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
   pidController.SetSetpoint(goal);
 
   /* 10 seconds should be plenty time to get to the reference */
-
   frc::Notifier pidRunner{[this, &pidController] {
     m_speedController->Set(pidController.Calculate(m_encoder->GetDistance()));
   }};
