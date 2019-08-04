@@ -248,8 +248,8 @@ public class PIDController extends SendableBase {
    */
   public boolean atSetpoint(double tolerance, double deltaTolerance, Tolerance toleranceType) {
     double error = getError();
-
     double deltaError = (error - m_prevError) / getPeriod();
+
     if (toleranceType == Tolerance.kPercent) {
       return Math.abs(error) < tolerance / 100 * m_inputRange
           && Math.abs(deltaError) < deltaTolerance / 100 * m_inputRange;
@@ -364,7 +364,6 @@ public class PIDController extends SendableBase {
    */
   public double getDeltaError() {
     double error = getError();
-
     return (error - m_prevError) / getPeriod();
   }
 
@@ -382,8 +381,6 @@ public class PIDController extends SendableBase {
 
   /**
    * Returns the next output of the PID controller.
-   *
-   * <p>Unlike the public functions above, this function doesn't lock the mutex.
    *
    * @param measurement The current measurement of the process variable.
    */
@@ -439,7 +436,6 @@ public class PIDController extends SendableBase {
         }
       }
     }
-
     return error;
   }
 
