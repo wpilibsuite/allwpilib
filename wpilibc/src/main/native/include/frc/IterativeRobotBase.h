@@ -44,6 +44,12 @@ namespace frc {
  */
 class IterativeRobotBase : public RobotBase {
  public:
+
+  /**
+   * An enum representing the robot's mode. Can be None, Disabled, Autonomous, Teleop or Test.
+   */
+  enum class Mode { kNone, kDisabled, kAutonomous, kTeleop, kTest };
+
   /**
    * Robot-wide initialization code should go here.
    *
@@ -135,6 +141,12 @@ class IterativeRobotBase : public RobotBase {
    */
   virtual void TestPeriodic();
 
+  /**
+   * Get the last mode of the robot.
+   * @return the last mode of the robot.
+   */
+  virtual Mode GetLastMode();
+
  protected:
   /**
    * Constructor for IterativeRobotBase.
@@ -153,7 +165,6 @@ class IterativeRobotBase : public RobotBase {
   double m_period;
 
  private:
-  enum class Mode { kNone, kDisabled, kAutonomous, kTeleop, kTest };
 
   Mode m_lastMode = Mode::kNone;
   Watchdog m_watchdog;

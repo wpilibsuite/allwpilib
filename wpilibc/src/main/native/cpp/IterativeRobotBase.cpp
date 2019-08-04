@@ -87,6 +87,10 @@ void IterativeRobotBase::TestPeriodic() {
   }
 }
 
+IterativeRobotBase::Mode IterativeRobotBase::GetLastMode() {
+  return m_lastMode;
+}
+
 void IterativeRobotBase::LoopFunc() {
   m_watchdog.Reset();
 

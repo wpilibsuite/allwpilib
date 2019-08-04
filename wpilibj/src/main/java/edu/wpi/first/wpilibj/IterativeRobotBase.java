@@ -46,7 +46,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public abstract class IterativeRobotBase extends RobotBase {
   protected double m_period;
 
-  private enum Mode {
+  public enum Mode {
     kNone,
     kDisabled,
     kAutonomous,
@@ -191,6 +191,14 @@ public abstract class IterativeRobotBase extends RobotBase {
       System.out.println("Default testPeriodic() method... Override me!");
       m_tmpFirstRun = false;
     }
+  }
+
+  /**
+   * Get the last mode of the robot.
+   * @return the last mode of the robot.
+   */
+  public Mode getLastMode() {
+    return m_lastMode;
   }
 
   protected void loopFunc() {
