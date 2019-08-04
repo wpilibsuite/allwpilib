@@ -1,22 +1,16 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PWMTalonSRX.h"
+#include "frc/PWMTalonSRX.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
 using namespace frc;
 
-/**
- * Construct a PWMTalonSRX connected via PWM.
- *
- * @param channel The PWM channel that the PWMTalonSRX is attached to. 0-9 are
- *                on-board, 10-19 are on the MXP port
- */
 PWMTalonSRX::PWMTalonSRX(int channel) : PWMSpeedController(channel) {
   /* Note that the PWMTalonSRX uses the following bounds for PWM values. These
    * values should work reasonably well for most controllers, but if users

@@ -1,21 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 package edu.wpi.first.wpilibj.test;
-
-import junit.framework.JUnit4TestAdapter;
-import junit.runner.Version;
-
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
-import org.junit.runner.RunWith;
-import org.junit.runner.notification.Failure;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,9 +17,17 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.RunWith;
+import org.junit.runner.notification.Failure;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+
+import junit.framework.JUnit4TestAdapter;
+import junit.runner.Version;
+
 import edu.wpi.first.wpilibj.WpiLibJTestSuite;
-import edu.wpi.first.wpilibj.command.CommandTestSuite;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTestSuite;
 
 /**
  * The WPILibJ Integeration Test Suite collects all of the tests to be run by junit. In order for a
@@ -37,8 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTestSuite;
  * order they are listed in the suite classes annotation.
  */
 @RunWith(Suite.class)
-// These are listed on separate lines to prevent merge conflicts
-@SuiteClasses({WpiLibJTestSuite.class, CommandTestSuite.class, SmartDashboardTestSuite.class})
+@SuiteClasses(WpiLibJTestSuite.class)
 public class TestSuite extends AbstractTestSuite {
   static {
     // Sets up the logging output

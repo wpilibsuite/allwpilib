@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,12 +13,10 @@ import java.util.Vector;
  * A vector that is sorted.
  */
 public class SortedVector<E> extends Vector<E> {
-
   /**
    * Interface used to determine the order to place sorted objects.
    */
   public interface Comparator {
-
     /**
      * Compare the given two objects.
      *
@@ -49,7 +47,8 @@ public class SortedVector<E> extends Vector<E> {
    *
    * @param element The element to add to the Vector
    */
-  public void addElement(E element) {
+  @Override
+  public synchronized void addElement(E element) {
     int highBound = size();
     int lowBound = 0;
     while (highBound - lowBound > 0) {
@@ -71,7 +70,7 @@ public class SortedVector<E> extends Vector<E> {
    * Sort the vector.
    */
   @SuppressWarnings("unchecked")
-  public void sort() {
+  public synchronized void sort() {
     Object[] array = new Object[size()];
     copyInto(array);
     removeAllElements();

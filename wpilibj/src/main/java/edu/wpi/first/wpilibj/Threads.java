@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,10 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.ThreadsJNI;
+import edu.wpi.first.hal.ThreadsJNI;
 
-public class Threads {
-
+public final class Threads {
   /**
   * Get the thread priority for the current thread.
   * @return The current thread priority. Scaled 1-99.
@@ -39,5 +38,8 @@ public class Threads {
   */
   public static boolean setCurrentThreadPriority(boolean realTime, int priority) {
     return ThreadsJNI.setCurrentThreadPriority(realTime, priority);
+  }
+
+  private Threads() {
   }
 }

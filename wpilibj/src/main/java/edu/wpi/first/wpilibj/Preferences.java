@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,14 +9,14 @@ package edu.wpi.first.wpilibj;
 
 import java.util.Vector;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * The preferences class provides a relatively simple way to save important values to the roboRIO to
@@ -31,8 +31,7 @@ import static java.util.Objects.requireNonNull;
  * <p> This will also interact with {@link NetworkTable} by creating a table called "Preferences"
  * with all the key-value pairs. </p>
  */
-public class Preferences {
-
+public final class Preferences {
   /**
    * The Preferences table name.
    */
@@ -76,6 +75,7 @@ public class Preferences {
    * Gets the vector of keys.
    * @return a vector of the keys
    */
+  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
   public Vector<String> getKeys() {
     return new Vector<>(m_table.getKeys());
   }
@@ -88,7 +88,7 @@ public class Preferences {
    * @throws NullPointerException if value is null
    */
   public void putString(String key, String value) {
-    requireNonNull(value, "Provided value was null");
+    requireNonNullParam(value, "value", "putString");
 
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setString(value);
@@ -172,6 +172,17 @@ public class Preferences {
    */
   public void remove(String key) {
     m_table.delete(key);
+  }
+
+  /**
+   * Remove all preferences.
+   */
+  public void removeAll() {
+    for (String key : m_table.getKeys()) {
+      if (!".type".equals(key)) {
+        remove(key);
+      }
+    }
   }
 
   /**

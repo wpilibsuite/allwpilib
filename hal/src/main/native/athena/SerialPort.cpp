@@ -1,15 +1,16 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/SerialPort.h"
+#include "hal/SerialPort.h"
 
 #include <string>
 
-#include "HAL/cpp/SerialHelper.h"
+#include "HALInitializer.h"
+#include "hal/cpp/SerialHelper.h"
 #include "visa/visa.h"
 
 static int32_t resourceManagerHandle{0};
@@ -24,6 +25,7 @@ void InitializeSerialPort() {}
 extern "C" {
 
 void HAL_InitializeSerialPort(HAL_SerialPort port, int32_t* status) {
+  hal::init::CheckInit();
   std::string portName;
 
   if (resourceManagerHandle == 0)
@@ -40,6 +42,13 @@ void HAL_InitializeSerialPort(HAL_SerialPort port, int32_t* status) {
   *status = viOpen(resourceManagerHandle, const_cast<char*>(portName.c_str()),
                    VI_NULL, VI_NULL,
                    reinterpret_cast<ViSession*>(&portHandles[port]));
+  if (*status > 0) *status = 0;
+}
+
+void HAL_InitializeSerialPortDirect(HAL_SerialPort port, const char* portName,
+                                    int32_t* status) {
+  *status = viOpen(resourceManagerHandle, const_cast<char*>(portName), VI_NULL,
+                   VI_NULL, reinterpret_cast<ViSession*>(&portHandles[port]));
   if (*status > 0) *status = 0;
 }
 

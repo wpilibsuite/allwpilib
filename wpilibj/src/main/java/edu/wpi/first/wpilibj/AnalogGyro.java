@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,12 +7,12 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.AnalogGyroJNI;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.AnalogGyroJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position. The Gyro class
@@ -24,12 +24,11 @@ import static java.util.Objects.requireNonNull;
  * <p>This class is for gyro sensors that connect to an analog input.
  */
 public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable {
-
   private static final double kDefaultVoltsPerDegreePerSecond = 0.007;
   protected AnalogInput m_analog;
-  private boolean m_channelAllocated = false;
+  private boolean m_channelAllocated;
 
-  private int m_gyroHandle = 0;
+  private int m_gyroHandle;
 
   /**
    * Initialize the gyro. Calibration is handled by calibrate().
@@ -70,7 +69,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable {
    *                on-board channels 0-1.
    */
   public AnalogGyro(AnalogInput channel) {
-    requireNonNull(channel, "AnalogInput supplied to Gyro constructor is null");
+    requireNonNullParam(channel, "channel", "AnalogGyro");
 
     m_analog = channel;
     initGyro();
@@ -102,7 +101,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable {
    * @param offset  Preset uncalibrated value to use as the gyro offset.
    */
   public AnalogGyro(AnalogInput channel, int center, double offset) {
-    requireNonNull(channel, "AnalogInput supplied to Gyro constructor is null");
+    requireNonNullParam(channel, "channel", "AnalogGyro");
 
     m_analog = channel;
     initGyro();
@@ -120,10 +119,10 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable {
    * Delete (free) the accumulator and the analog components used for the gyro.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_analog != null && m_channelAllocated) {
-      m_analog.free();
+      m_analog.close();
     }
     m_analog = null;
     AnalogGyroJNI.freeAnalogGyro(m_gyroHandle);

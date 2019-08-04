@@ -1,11 +1,8 @@
 # WPIlib Specific
 
 dependency-reduced-pom.xml
-/wpilibj/src/shared/java/edu/wpi/first/wpilibj/util/WPILibVersion.java
-/wpilibc/shared/src/WPILibVersion.cpp
-/wpilibj/src/main/java/edu/wpi/first/wpilibj/util/WPILibVersion.java
-/wpilibc/src/main/native/cpp/WPILibVersion.cpp
 doxygen.log
+buildcmake/
 
 # Created by the jenkins test script
 test-reports
@@ -15,6 +12,7 @@ test-reports
 *.ipr
 *.iws
 .idea/
+out/
 
 # Created by http://www.gitignore.io
 
@@ -204,7 +202,6 @@ ipch/
 *.ncb
 *.opendb
 *.opensdf
-*.sdf
 *.cachefile
 *.VC.db
 *.VC.VC.opendb

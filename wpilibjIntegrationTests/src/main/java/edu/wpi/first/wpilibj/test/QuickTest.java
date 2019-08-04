@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj.test;
 
-import org.junit.Test;
-
 import java.util.logging.Logger;
+
+import org.junit.Test;
 
 /**
  * This class is designated to allow for simple testing of the library without the overlying testing
@@ -33,6 +33,5 @@ public class QuickTest extends AbstractComsSetup {
 
   @Test
   public void test() {
-
   }
 }

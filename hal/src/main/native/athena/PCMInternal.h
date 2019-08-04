@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,11 +11,11 @@
 
 #include <memory>
 
-#include "HAL/Errors.h"
-#include "HAL/Ports.h"
-#include "HAL/Solenoid.h"
 #include "PortsInternal.h"
 #include "ctre/PCM.h"
+#include "hal/Errors.h"
+#include "hal/Ports.h"
+#include "hal/Solenoid.h"
 
 namespace hal {
 

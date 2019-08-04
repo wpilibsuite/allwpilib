@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 
 /**
  * Handle input from Xbox 360 or Xbox One controllers connected to the Driver Station.
@@ -33,8 +33,8 @@ public class XboxController extends GenericHID {
     kBack(7),
     kStart(8);
 
-    @SuppressWarnings("MemberName")
-    private int value;
+    @SuppressWarnings({"MemberName", "PMD.SingularField"})
+    private final int value;
 
     Button(int value) {
       this.value = value;
@@ -50,8 +50,7 @@ public class XboxController extends GenericHID {
   public XboxController(final int port) {
     super(port);
 
-    // HAL.report(tResourceType.kResourceType_XboxController, port);
-    HAL.report(tResourceType.kResourceType_Joystick, port);
+    HAL.report(tResourceType.kResourceType_XboxController, port);
   }
 
   /**

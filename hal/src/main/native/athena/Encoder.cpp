@@ -1,19 +1,20 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Encoder.h"
+#include "hal/Encoder.h"
 
 #include "EncoderInternal.h"
 #include "FPGAEncoder.h"
-#include "HAL/ChipObject.h"
-#include "HAL/Counter.h"
-#include "HAL/Errors.h"
-#include "HAL/handles/LimitedClassedHandleResource.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/ChipObject.h"
+#include "hal/Counter.h"
+#include "hal/Errors.h"
+#include "hal/handles/LimitedClassedHandleResource.h"
 
 using namespace hal;
 
@@ -243,6 +244,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(
     HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
     HAL_Bool reverseDirection, HAL_EncoderEncodingType encodingType,
     int32_t* status) {
+  hal::init::CheckInit();
   auto encoder = std::make_shared<Encoder>(
       digitalSourceHandleA, analogTriggerTypeA, digitalSourceHandleB,
       analogTriggerTypeB, reverseDirection, encodingType, status);

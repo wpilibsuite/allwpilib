@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,14 +7,13 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.SolenoidJNI;
+import edu.wpi.first.hal.SolenoidJNI;
 
 /**
  * SolenoidBase class is the common base class for the {@link Solenoid} and {@link DoubleSolenoid}
  * classes.
  */
 public abstract class SolenoidBase extends SendableBase {
-
   protected final int m_moduleNumber; // The number of the solenoid module being used.
 
   /**

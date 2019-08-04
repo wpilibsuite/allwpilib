@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,8 +10,8 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 /**
@@ -58,13 +58,13 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
     m_spi.setClockRate(3000000);
     m_spi.setMSBFirst();
-    m_spi.setSampleDataOnRising();
+    m_spi.setSampleDataOnLeadingEdge();
     m_spi.setClockActiveHigh();
     m_spi.setChipSelectActiveLow();
 
     // Validate the part ID
     if ((readRegister(kPIDRegister) & 0xff00) != 0x5200) {
-      m_spi.free();
+      m_spi.close();
       m_spi = null;
       DriverStation.reportError("could not find ADXRS450 gyro on SPI port " + port.value,
           false);
@@ -80,6 +80,10 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
     setName("ADXRS450_Gyro", port.value);
   }
 
+  public boolean isConnected() {
+    return m_spi != null;
+  }
+
   @Override
   public void calibrate() {
     if (m_spi == null) {
@@ -88,12 +92,12 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
     Timer.delay(0.1);
 
-    m_spi.setAccumulatorCenter(0);
+    m_spi.setAccumulatorIntegratedCenter(0);
     m_spi.resetAccumulator();
 
     Timer.delay(kCalibrationSampleTime);
 
-    m_spi.setAccumulatorCenter((int) m_spi.getAccumulatorAverage());
+    m_spi.setAccumulatorIntegratedCenter(m_spi.getAccumulatorIntegratedAverage());
     m_spi.resetAccumulator();
   }
 
@@ -128,17 +132,19 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
   @Override
   public void reset() {
-    m_spi.resetAccumulator();
+    if (m_spi != null) {
+      m_spi.resetAccumulator();
+    }
   }
 
   /**
    * Delete (free) the spi port used for the gyro and stop accumulating.
    */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_spi != null) {
-      m_spi.free();
+      m_spi.close();
       m_spi = null;
     }
   }
@@ -148,7 +154,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
     if (m_spi == null) {
       return 0.0;
     }
-    return m_spi.getAccumulatorValue() * kDegreePerSecondPerLSB * kSamplePeriod;
+    return m_spi.getAccumulatorIntegratedValue() * kDegreePerSecondPerLSB;
   }
 
   @Override

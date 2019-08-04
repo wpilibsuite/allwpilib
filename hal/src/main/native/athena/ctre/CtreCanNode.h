@@ -4,6 +4,7 @@
 #include <map>
 #include <string.h> // memcpy
 #include <sys/time.h>
+#include <wpi/mutex.h>
 class CtreCanNode
 {
 public:
@@ -108,7 +109,7 @@ private:
 	class rxEvent_t{
 		public:
 			uint8_t bytes[8];
-			struct timespec time;
+			int64_t time;
 			rxEvent_t()
 			{
 				bytes[0] = 0;
@@ -127,5 +128,7 @@ private:
 
 	typedef std::map<uint32_t,rxEvent_t> rxRxEvents_t;
 	rxRxEvents_t _rxRxEvents;
+
+	wpi::mutex _lck;
 };
 #endif

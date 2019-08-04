@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,7 +12,6 @@ package edu.wpi.first.wpilibj.buttons;
  * Also includes a setting for whether or not it should invert its value.
  */
 public class InternalButton extends Button {
-
   private boolean m_pressed;
   private boolean m_inverted;
 
@@ -41,6 +40,7 @@ public class InternalButton extends Button {
     m_pressed = pressed;
   }
 
+  @Override
   public boolean get() {
     return m_pressed ^ m_inverted;
   }

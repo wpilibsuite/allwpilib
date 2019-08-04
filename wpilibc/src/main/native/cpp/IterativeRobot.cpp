@@ -1,29 +1,25 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "IterativeRobot.h"
+#include "frc/IterativeRobot.h"
 
-#include <HAL/HAL.h>
+#include <hal/HAL.h>
 
-#include "DriverStation.h"
+#include "frc/DriverStation.h"
 
 using namespace frc;
 
-IterativeRobot::IterativeRobot() {
+static constexpr double kPacketPeriod = 0.02;
+
+IterativeRobot::IterativeRobot() : IterativeRobotBase(kPacketPeriod) {
   HAL_Report(HALUsageReporting::kResourceType_Framework,
              HALUsageReporting::kFramework_Iterative);
 }
 
-/**
- * Provide an alternate "main loop" via StartCompetition().
- *
- * This specific StartCompetition() implements "main loop" behaviour synced with
- * the DS packets.
- */
 void IterativeRobot::StartCompetition() {
   RobotInit();
 

@@ -1,0 +1,110 @@
+apply plugin: 'cpp'
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: ExtraTasks
+
+ext {
+    chipObjectComponents = ["$pluginName".toString(), "${pluginName}Dev".toString(), "${pluginName}Test".toString()]
+    netCommComponents = ["$pluginName".toString(), "${pluginName}Dev".toString(), "${pluginName}Test".toString()]
+    useNiJava = false
+}
+
+apply from: "${rootDir}/shared/nilibraries.gradle"
+
+if (!project.hasProperty('onlylinuxathena')) {
+    ext.skiplinuxathena = true
+    apply from: "${rootDir}/shared/config.gradle"
+
+    model {
+        components {
+            "${pluginName}"(NativeLibrarySpec) {
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = ['src/main/native/cpp']
+                            includes = ["**/*.cpp"]
+                        }
+                        exportedHeaders {
+                            srcDirs = ["src/main/native/include"]
+                        }
+                    }
+                }
+                binaries.all {
+                    if (it instanceof StaticLibraryBinarySpec) {
+                        it.buildable = false
+                        return
+                    }
+                    project(':hal').addHalDependency(it, 'shared')
+                    if (project.hasProperty('includeNtCore')) {
+                        lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    }
+                    if (project.hasProperty('includeWpiutil')) {
+                        lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    }
+                }
+                appendDebugPathToBinaries(binaries)
+            }
+            "${pluginName}Dev"(NativeExecutableSpec) {
+                targetBuildTypes 'debug'
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = ['src/dev/native/cpp']
+                            includes = ["**/*.cpp"]
+                        }
+                        exportedHeaders {
+                            srcDirs = ["src/dev/native/include"]
+                        }
+                    }
+                }
+                binaries.all {
+                    if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian')) {
+                        project(':hal').addHalDependency(it, 'shared')
+                        lib library: pluginName
+                        if (project.hasProperty('includeNtCore')) {
+                            lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                        }
+                        lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    } else {
+                        it.buildable = false
+                    }
+                }
+            }
+        }
+    }
+
+    apply from: "${rootDir}/shared/plugins/publish.gradle"
+}
+
+model {
+    tasks {
+        def c = $.components
+        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian')) {
+            project.tasks.create('runCpp', Exec) {
+                group = 'WPILib'
+                description = "Run the ${pluginName}Dev executable"
+                def found = false
+                def systemArch = getCurrentArch()
+                c.each {
+                    if (it in NativeExecutableSpec && it.name == "${pluginName}Dev") {
+                        it.binaries.each {
+                            if (!found) {
+                                def arch = it.targetPlatform.name
+                                if (arch == systemArch) {
+                                    dependsOn it.tasks.install
+                                    commandLine it.tasks.install.runScriptFile.get().asFile.toString()
+                                    // it.tasks.install.libs.each { lib ->
+                                    //     if (lib.name.contains(pluginName)) {
+                                    //         def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib' + File.separatorChar + lib.name
+                                    //         environment('HALSIM_EXTENSIONS', filePath)
+                                    //     }
+                                    // }
+                                    found = true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,10 +10,10 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * ADXL345 SPI Accelerometer.
  */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_SPI extends SensorBase implements Accelerometer, Sendable {
+public class ADXL345_SPI extends SendableBase implements Accelerometer {
   private static final int kPowerCtlRegister = 0x2D;
   private static final int kDataFormatRegister = 0x31;
   private static final int kDataRegister = 0x32;
@@ -59,7 +59,6 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, Sendable {
 
   @SuppressWarnings("MemberName")
   public static class AllAxes {
-
     public double XAxis;
     public double YAxis;
     public double ZAxis;
@@ -80,9 +79,9 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, Sendable {
   }
 
   @Override
-  public void free() {
-    super.free();
-    m_spi.free();
+  public void close() {
+    super.close();
+    m_spi.close();
   }
 
   /**
@@ -93,7 +92,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, Sendable {
   private void init(Range range) {
     m_spi.setClockRate(500000);
     m_spi.setMSBFirst();
-    m_spi.setSampleDataOnFalling();
+    m_spi.setSampleDataOnTrailingEdge();
     m_spi.setClockActiveLow();
     m_spi.setChipSelectActiveHigh();
 

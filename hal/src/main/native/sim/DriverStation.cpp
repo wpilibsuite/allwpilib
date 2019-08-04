@@ -1,11 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/DriverStation.h"
+#include "hal/DriverStation.h"
 
 #ifdef __APPLE__
 #include <pthread.h>
@@ -16,16 +16,19 @@
 #include <cstring>
 #include <string>
 
-#include <support/condition_variable.h>
-#include <support/mutex.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
 
-#include "MockData/DriverStationDataInternal.h"
-#include "MockData/MockHooks.h"
+#include "HALInitializer.h"
+#include "mockdata/DriverStationDataInternal.h"
+#include "mockdata/MockHooks.h"
 
 static wpi::mutex msgMutex;
 static wpi::condition_variable* newDSDataAvailableCond;
 static wpi::mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
+static std::atomic_bool isFinalized{false};
+static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 
 namespace hal {
 namespace init {
@@ -39,13 +42,22 @@ void InitializeDriverStation() {
 using namespace hal;
 
 extern "C" {
+
+void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {
+  sendErrorHandler.store(handler);
+}
+
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg) {
+  auto errorHandler = sendErrorHandler.load();
+  if (errorHandler)
+    return errorHandler(isError, errorCode, isLVCode, details, location,
+                        callStack, printMsg);
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
-  std::lock_guard<wpi::mutex> lock(msgMutex);
+  std::scoped_lock lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
   static std::chrono::time_point<std::chrono::steady_clock>
       prevMsgTime[KEEP_MSGS];
@@ -94,18 +106,18 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
-  controlWord->enabled = SimDriverStationData->GetEnabled();
-  controlWord->autonomous = SimDriverStationData->GetAutonomous();
-  controlWord->test = SimDriverStationData->GetTest();
-  controlWord->eStop = SimDriverStationData->GetEStop();
-  controlWord->fmsAttached = SimDriverStationData->GetFmsAttached();
-  controlWord->dsAttached = SimDriverStationData->GetDsAttached();
+  controlWord->enabled = SimDriverStationData->enabled;
+  controlWord->autonomous = SimDriverStationData->autonomous;
+  controlWord->test = SimDriverStationData->test;
+  controlWord->eStop = SimDriverStationData->eStop;
+  controlWord->fmsAttached = SimDriverStationData->fmsAttached;
+  controlWord->dsAttached = SimDriverStationData->dsAttached;
   return 0;
 }
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   *status = 0;
-  return SimDriverStationData->GetAllianceStationId();
+  return SimDriverStationData->allianceStationId;
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
@@ -123,17 +135,7 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
   SimDriverStationData->GetJoystickButtons(joystickNum, buttons);
   return 0;
 }
-/**
- * Retrieve the Joystick Descriptor for particular slot
- * @param desc [out] descriptor (data transfer object) to fill in.  desc is
- * filled in regardless of success. In other words, if descriptor is not
- * available, desc is filled in with default values matching the init-values in
- * Java and C++ Driverstation for when caller requests a too-large joystick
- * index.
- *
- * @return error code reported from Network Comm back-end.  Zero is good,
- * nonzero is bad.
- */
+
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc) {
   SimDriverStationData->GetJoystickDescriptor(joystickNum, desc);
@@ -157,8 +159,7 @@ char* HAL_GetJoystickName(int32_t joystickNum) {
   SimDriverStationData->GetJoystickDescriptor(joystickNum, &desc);
   size_t len = std::strlen(desc.name);
   char* name = static_cast<char*>(std::malloc(len + 1));
-  std::strncpy(name, desc.name, len);
-  name[len] = '\0';
+  std::memcpy(name, desc.name, len + 1);
   return name;
 }
 
@@ -174,16 +175,12 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
 }
 
 double HAL_GetMatchTime(int32_t* status) {
-  return SimDriverStationData->GetMatchTime();
+  return SimDriverStationData->matchTime;
 }
 
-int HAL_GetMatchInfo(HAL_MatchInfo* info) {
+int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
   SimDriverStationData->GetMatchInfo(info);
   return 0;
-}
-
-void HAL_FreeMatchInfo(HAL_MatchInfo* info) {
-  SimDriverStationData->FreeMatchInfo(info);
 }
 
 void HAL_ObserveUserProgramStarting(void) { HALSIM_SetProgramStarted(); }
@@ -213,7 +210,7 @@ static void InitLastCountKey(void) {
 }
 #endif
 
-bool HAL_IsNewControlData(void) {
+HAL_Bool HAL_IsNewControlData(void) {
 #ifdef __APPLE__
   pthread_once(&lastCountKeyOnce, InitLastCountKey);
   int* lastCountPtr = static_cast<int*>(pthread_getspecific(lastCountKey));
@@ -232,7 +229,7 @@ bool HAL_IsNewControlData(void) {
   // worth the cycles to check.
   int currentCount = 0;
   {
-    std::unique_lock<wpi::mutex> lock(newDSDataAvailableMutex);
+    std::unique_lock lock(newDSDataAvailableMutex);
     currentCount = newDSDataAvailableCounter;
   }
   if (lastCount == currentCount) return false;
@@ -240,21 +237,16 @@ bool HAL_IsNewControlData(void) {
   return true;
 }
 
-/**
- * Waits for the newest DS packet to arrive. Note that this is a blocking call.
- */
 void HAL_WaitForDSData(void) { HAL_WaitForDSDataTimeout(0); }
 
-/**
- * Waits for the newest DS packet to arrive. If timeout is <= 0, this will wait
- * forever. Otherwise, it will wait until either a new packet, or the timeout
- * time has passed. Returns true on new data, false on timeout.
- */
 HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
+  if (isFinalized.load()) {
+    return false;
+  }
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  std::unique_lock<wpi::mutex> lock(newDSDataAvailableMutex);
+  std::unique_lock lock(newDSDataAvailableMutex);
   int currentCount = newDSDataAvailableCounter;
   while (newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
@@ -276,37 +268,34 @@ static int32_t newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
   if (refNum != refNumber) return 0;
-  std::lock_guard<wpi::mutex> lock(newDSDataAvailableMutex);
+  std::scoped_lock lock(newDSDataAvailableMutex);
   // Nofify all threads
   newDSDataAvailableCounter++;
   newDSDataAvailableCond->notify_all();
   return 0;
 }
 
-/*
- * Call this to initialize the driver station communication. This will properly
- * handle multiple calls. However note that this CANNOT be called from a library
- * that interfaces with LabVIEW.
- */
 void HAL_InitializeDriverStation(void) {
+  hal::init::CheckInit();
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
 
   SimDriverStationData->ResetData();
 
+  std::atexit([]() {
+    isFinalized.store(true);
+    HAL_ReleaseDSMutex();
+  });
+
   initialized = true;
 }
 
-/*
- * Releases the DS Mutex to allow proper shutdown of any threads that are
- * waiting on it.
- */
 void HAL_ReleaseDSMutex(void) { newDataOccur(refNumber); }
 
 }  // extern "C"

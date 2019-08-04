@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,14 +7,13 @@
 
 package edu.wpi.first.wpilibj;
 
-//import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-//import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 
 /**
  * Cross the Road Electronics (CTRE) Victor SPX Speed Controller with PWM control.
  */
 public class PWMVictorSPX extends PWMSpeedController {
-
   /**
    * Constructor for a PWMVictorSPX connected via PWM.
    *
@@ -40,7 +39,7 @@ public class PWMVictorSPX extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    //HAL.report(tResourceType.kResourceType_PWMVictorSPX, getChannel());
+    HAL.report(tResourceType.kResourceType_PWMVictorSPX, getChannel());
     setName("PWMVictorSPX", getChannel());
   }
 }

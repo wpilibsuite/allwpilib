@@ -1,11 +1,4 @@
 apply plugin: 'maven-publish'
-apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
-
-if (!hasProperty('releaseType')) {
-    WPILibVersion {
-        releaseType = 'dev'
-    }
-}
 
 def pubVersion = ''
 if (project.hasProperty("publishVersion")) {
@@ -14,14 +7,15 @@ if (project.hasProperty("publishVersion")) {
     pubVersion = WPILibVersion.version
 }
 
-def baseArtifactId = 'wpilibc'
+def baseArtifactId = 'wpilibc-cpp'
 def artifactGroupId = 'edu.wpi.first.wpilibc'
+def zipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_wpilibc-cpp_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
 task cppSourcesZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'wpilibc'
+    baseName = zipBaseName
     classifier = "sources"
 
     from(licenseFile) {
@@ -31,11 +25,16 @@ task cppSourcesZip(type: Zip) {
     from('src/main/native/cpp') {
         into '/'
     }
+    from("$buildDir/generated/cpp") {
+        into '/'
+    }
 }
+
+cppSourcesZip.dependsOn generateCppVersion
 
 task cppHeadersZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'wpilibc'
+    baseName = zipBaseName
     classifier = "headers"
 
     from(licenseFile) {
@@ -50,96 +49,23 @@ task cppHeadersZip(type: Zip) {
 build.dependsOn cppHeadersZip
 build.dependsOn cppSourcesZip
 
-def linkFile = project.file("${buildDir}/libwpi.so")
-
-task linkScriptZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = 'wpilibclinkscript-classifier'
-    classifier = "linuxathena"
-
-    from(licenseFile) {
-        into '/'
-    }
-    from (linkFile) {
-        into '/linux/athena/shared'
-    }
-}
-
-build.dependsOn linkScriptZip
+addTaskToCopyAllOutputs(cppHeadersZip)
+addTaskToCopyAllOutputs(cppSourcesZip)
 
 model {
     publishing {
-        def wpilibCTaskList = createComponentZipTasks($.components, 'wpilibc', 'zipcpp', Zip, project, includeStandardZipFormat)
-        def allTask
-        if (!project.hasProperty('jenkinsBuild')) {
-            allTask = createAllCombined(wpilibCTaskList, 'wpilibc', 'zipcpp', Zip, project)
-        }
-
-        $.components.each {
-            if (it in NativeLibrarySpec && it.name == 'wpilibc') {
-                def libSpec = it
-                tasks.create('generateWpilibLinkScript', Task) {
-                    build.dependsOn it
-                    linkScriptZip.dependsOn it
-                    libSpec.binaries.each {
-                        if (getClassifier(it) == 'linuxathena' && it in SharedLibraryBinarySpec) {
-                            dependsOn it.buildTask
-                        }
-                    }
-
-                    outputs.file linkFile
-                    outputs.upToDateWhen { false }
-
-                    doLast {
-                        def libs = []
-                        libSpec.binaries.each {
-                            if (getClassifier(it) == 'linuxathena' && it in SharedLibraryBinarySpec) {
-                                it.libs.each {
-                                    it.linkFiles.each {
-                                        libs.add it.name
-                                    }
-
-                                }
-                                libs.add it.sharedLibraryFile.name
-                            }
-                        }
-
-                        linkFile.withWriter { out ->
-                            out.println '/* GNU ld script */'
-                            out.println 'OUTPUT_FORMAT(elf32-littlearm)'
-                            out.print 'GROUP ( AS_NEEDED ( '
-                            libs.each {
-                                out.print it
-                                out.print ' '
-                            }
-                            out.println ') )'
-                        }
-                    }
-                }
-            }
-        }
-
-
+        def wpilibCTaskList = createComponentZipTasks($.components, ['wpilibc'], zipBaseName, Zip, project, includeStandardZipFormat)
 
         publications {
             cpp(MavenPublication) {
                 wpilibCTaskList.each {
                     artifact it
                 }
-                if (!project.hasProperty('jenkinsBuild')) {
-                    artifact allTask
-                }
+
                 artifact cppHeadersZip
                 artifact cppSourcesZip
 
                 artifactId = baseArtifactId
-                groupId artifactGroupId
-                version pubVersion
-            }
-            linkscripts(MavenPublication) {
-                artifact linkScriptZip
-
-                artifactId = "${baseArtifactId}-linkscripts"
                 groupId artifactGroupId
                 version pubVersion
             }

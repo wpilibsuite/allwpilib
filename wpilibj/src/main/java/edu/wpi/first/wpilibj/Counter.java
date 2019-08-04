@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,12 +10,13 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import edu.wpi.first.hal.CounterJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
-import edu.wpi.first.wpilibj.hal.CounterJNI;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -28,8 +29,7 @@ import static java.util.Objects.requireNonNull;
  * <p>All counters will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Counter extends SensorBase implements CounterBase, Sendable, PIDSource {
-
+public class Counter extends SendableBase implements CounterBase, PIDSource {
   /**
    * Mode determines how and what the counter counts.
    */
@@ -111,7 +111,7 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
   public Counter(DigitalSource source) {
     this();
 
-    requireNonNull(source, "Digital Source given was null");
+    requireNonNullParam(source, "source", "Counter");
     setUpSource(source);
   }
 
@@ -142,12 +142,12 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
                  boolean inverted) {
     this(Mode.kExternalDirection);
 
-    requireNonNull(encodingType, "Encoding type given was null");
-    requireNonNull(upSource, "Up Source given was null");
-    requireNonNull(downSource, "Down Source given was null");
+    requireNonNullParam(encodingType, "encodingType", "Counter");
+    requireNonNullParam(upSource, "upSource", "Counter");
+    requireNonNullParam(downSource, "downSource", "Counter");
 
     if (encodingType != EncodingType.k1X && encodingType != EncodingType.k2X) {
-      throw new RuntimeException("Counters only support 1X and 2X quadrature decoding!");
+      throw new IllegalArgumentException("Counters only support 1X and 2X quadrature decoding!");
     }
 
     setUpSource(upSource);
@@ -175,14 +175,14 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
   public Counter(AnalogTrigger trigger) {
     this();
 
-    requireNonNull(trigger, "The Analog Trigger given was null");
+    requireNonNullParam(trigger, "trigger", "Counter");
 
     setUpSource(trigger.createOutput(AnalogTriggerType.kState));
   }
 
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     setUpdateWhenEmpty(true);
 
     clearUpSource();
@@ -223,7 +223,7 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
    */
   public void setUpSource(DigitalSource source) {
     if (m_upSource != null && m_allocatedUpSource) {
-      m_upSource.free();
+      m_upSource.close();
       m_allocatedUpSource = false;
     }
     m_upSource = source;
@@ -238,8 +238,8 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
    * @param triggerType   The analog trigger output that will trigger the counter.
    */
   public void setUpSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
-    requireNonNull(analogTrigger, "Analog Trigger given was null");
-    requireNonNull(triggerType, "Analog Trigger Type given was null");
+    requireNonNullParam(analogTrigger, "analogTrigger", "setUpSource");
+    requireNonNullParam(triggerType, "triggerType", "setUpSource");
 
     setUpSource(analogTrigger.createOutput(triggerType));
     m_allocatedUpSource = true;
@@ -254,7 +254,7 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
    */
   public void setUpSourceEdge(boolean risingEdge, boolean fallingEdge) {
     if (m_upSource == null) {
-      throw new RuntimeException("Up Source must be set before setting the edge!");
+      throw new IllegalStateException("Up Source must be set before setting the edge!");
     }
     CounterJNI.setCounterUpSourceEdge(m_counter, risingEdge, fallingEdge);
   }
@@ -264,7 +264,7 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
    */
   public void clearUpSource() {
     if (m_upSource != null && m_allocatedUpSource) {
-      m_upSource.free();
+      m_upSource.close();
       m_allocatedUpSource = false;
     }
     m_upSource = null;
@@ -293,7 +293,7 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
     requireNonNull(source, "The Digital Source given was null");
 
     if (m_downSource != null && m_allocatedDownSource) {
-      m_downSource.free();
+      m_downSource.close();
       m_allocatedDownSource = false;
     }
     CounterJNI.setCounterDownSource(m_counter, source.getPortHandleForRouting(),
@@ -308,8 +308,8 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
    * @param triggerType   The analog trigger output that will trigger the counter.
    */
   public void setDownSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
-    requireNonNull(analogTrigger, "Analog Trigger given was null");
-    requireNonNull(triggerType, "Analog Trigger Type given was null");
+    requireNonNullParam(analogTrigger, "analogTrigger", "setDownSource");
+    requireNonNullParam(triggerType, "analogTrigger", "setDownSource");
 
     setDownSource(analogTrigger.createOutput(triggerType));
     m_allocatedDownSource = true;
@@ -333,7 +333,7 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
    */
   public void clearDownSource() {
     if (m_downSource != null && m_allocatedDownSource) {
-      m_downSource.free();
+      m_downSource.close();
       m_allocatedDownSource = false;
     }
     m_downSource = null;
@@ -529,8 +529,9 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
    *
    * @param pidSource An enum to select the parameter.
    */
+  @Override
   public void setPIDSourceType(PIDSourceType pidSource) {
-    requireNonNull(pidSource, "PID Source Parameter given was null");
+    requireNonNullParam(pidSource, "pidSource", "setPIDSourceType");
     if (pidSource != PIDSourceType.kDisplacement && pidSource != PIDSourceType.kRate) {
       throw new IllegalArgumentException("PID Source parameter was not valid type: " + pidSource);
     }
@@ -538,6 +539,7 @@ public class Counter extends SensorBase implements CounterBase, Sendable, PIDSou
     m_pidSource = pidSource;
   }
 
+  @Override
   public PIDSourceType getPIDSourceType() {
     return m_pidSource;
   }

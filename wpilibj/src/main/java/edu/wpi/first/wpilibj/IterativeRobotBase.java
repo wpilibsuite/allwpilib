@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,8 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * IterativeRobotBase implements a specific type of robot program framework, extending the RobotBase
@@ -24,7 +26,8 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  *
  * <p>init() functions -- each of the following functions is called once when the
  * appropriate mode is entered:
- *   - disabledInit()   -- called only when first disabled
+ *   - disabledInit()   -- called each and every time disabled is entered from
+ *                         another mode
  *   - autonomousInit() -- called each and every time autonomous is entered from
  *                         another mode
  *   - teleopInit()     -- called each and every time teleop is entered from
@@ -39,7 +42,10 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  *   - teleopPeriodic()
  *   - testPeriodic()
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public abstract class IterativeRobotBase extends RobotBase {
+  protected double m_period;
+
   private enum Mode {
     kNone,
     kDisabled,
@@ -49,10 +55,22 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   private Mode m_lastMode = Mode.kNone;
+  private final Watchdog m_watchdog;
+
+  /**
+   * Constructor for IterativeRobotBase.
+   *
+   * @param period Period in seconds.
+   */
+  protected IterativeRobotBase(double period) {
+    m_period = period;
+    m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
+  }
 
   /**
    * Provide an alternate "main loop" via startCompetition().
    */
+  @Override
   public abstract void startCompetition();
 
   /* ----------- Overridable initialization code ----------------- */
@@ -68,7 +86,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * never indicate that the code is ready, causing the robot to be bypassed in a match.
    */
   public void robotInit() {
-    System.out.println("Default robotInit() method... Overload me!");
+    System.out.println("Default robotInit() method... Override me!");
   }
 
   /**
@@ -78,7 +96,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * robot enters disabled mode.
    */
   public void disabledInit() {
-    System.out.println("Default disabledInit() method... Overload me!");
+    System.out.println("Default disabledInit() method... Override me!");
   }
 
   /**
@@ -88,7 +106,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * robot enters autonomous mode.
    */
   public void autonomousInit() {
-    System.out.println("Default autonomousInit() method... Overload me!");
+    System.out.println("Default autonomousInit() method... Override me!");
   }
 
   /**
@@ -98,7 +116,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * robot enters teleop mode.
    */
   public void teleopInit() {
-    System.out.println("Default teleopInit() method... Overload me!");
+    System.out.println("Default teleopInit() method... Override me!");
   }
 
   /**
@@ -109,7 +127,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
   public void testInit() {
-    System.out.println("Default testInit() method... Overload me!");
+    System.out.println("Default testInit() method... Override me!");
   }
 
   /* ----------- Overridable periodic code ----------------- */
@@ -121,7 +139,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   public void robotPeriodic() {
     if (m_rpFirstRun) {
-      System.out.println("Default robotPeriodic() method... Overload me!");
+      System.out.println("Default robotPeriodic() method... Override me!");
       m_rpFirstRun = false;
     }
   }
@@ -133,7 +151,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   public void disabledPeriodic() {
     if (m_dpFirstRun) {
-      System.out.println("Default disabledPeriodic() method... Overload me!");
+      System.out.println("Default disabledPeriodic() method... Override me!");
       m_dpFirstRun = false;
     }
   }
@@ -145,7 +163,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   public void autonomousPeriodic() {
     if (m_apFirstRun) {
-      System.out.println("Default autonomousPeriodic() method... Overload me!");
+      System.out.println("Default autonomousPeriodic() method... Override me!");
       m_apFirstRun = false;
     }
   }
@@ -157,7 +175,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   public void teleopPeriodic() {
     if (m_tpFirstRun) {
-      System.out.println("Default teleopPeriodic() method... Overload me!");
+      System.out.println("Default teleopPeriodic() method... Override me!");
       m_tpFirstRun = false;
     }
   }
@@ -170,58 +188,91 @@ public abstract class IterativeRobotBase extends RobotBase {
   @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
   public void testPeriodic() {
     if (m_tmpFirstRun) {
-      System.out.println("Default testPeriodic() method... Overload me!");
+      System.out.println("Default testPeriodic() method... Override me!");
       m_tmpFirstRun = false;
     }
   }
 
   protected void loopFunc() {
+    m_watchdog.reset();
+
     // Call the appropriate function depending upon the current robot mode
     if (isDisabled()) {
-      // call DisabledInit() if we are now just entering disabled mode from
-      // either a different mode or from power-on
+      // Call DisabledInit() if we are now just entering disabled mode from either a different mode
+      // or from power-on.
       if (m_lastMode != Mode.kDisabled) {
         LiveWindow.setEnabled(false);
+        Shuffleboard.disableActuatorWidgets();
         disabledInit();
+        m_watchdog.addEpoch("disabledInit()");
         m_lastMode = Mode.kDisabled;
       }
+
       HAL.observeUserProgramDisabled();
       disabledPeriodic();
+      m_watchdog.addEpoch("disablePeriodic()");
     } else if (isAutonomous()) {
-      // call Autonomous_Init() if this is the first time
-      // we've entered autonomous_mode
+      // Call AutonomousInit() if we are now just entering autonomous mode from either a different
+      // mode or from power-on.
       if (m_lastMode != Mode.kAutonomous) {
         LiveWindow.setEnabled(false);
-        // KBS NOTE: old code reset all PWMs and relays to "safe values"
-        // whenever entering autonomous mode, before calling
-        // "Autonomous_Init()"
+        Shuffleboard.disableActuatorWidgets();
         autonomousInit();
+        m_watchdog.addEpoch("autonomousInit()");
         m_lastMode = Mode.kAutonomous;
       }
+
       HAL.observeUserProgramAutonomous();
       autonomousPeriodic();
+      m_watchdog.addEpoch("autonomousPeriodic()");
     } else if (isOperatorControl()) {
-      // call Teleop_Init() if this is the first time
-      // we've entered teleop_mode
+      // Call TeleopInit() if we are now just entering teleop mode from either a different mode or
+      // from power-on.
       if (m_lastMode != Mode.kTeleop) {
         LiveWindow.setEnabled(false);
+        Shuffleboard.disableActuatorWidgets();
         teleopInit();
+        m_watchdog.addEpoch("teleopInit()");
         m_lastMode = Mode.kTeleop;
       }
+
       HAL.observeUserProgramTeleop();
       teleopPeriodic();
+      m_watchdog.addEpoch("teleopPeriodic()");
     } else {
-      // call TestInit() if we are now just entering test mode from either
-      // a different mode or from power-on
+      // Call TestInit() if we are now just entering test mode from either a different mode or from
+      // power-on.
       if (m_lastMode != Mode.kTest) {
         LiveWindow.setEnabled(true);
+        Shuffleboard.enableActuatorWidgets();
         testInit();
+        m_watchdog.addEpoch("testInit()");
         m_lastMode = Mode.kTest;
       }
+
       HAL.observeUserProgramTest();
       testPeriodic();
+      m_watchdog.addEpoch("testPeriodic()");
     }
+
     robotPeriodic();
+    m_watchdog.addEpoch("robotPeriodic()");
+
+    SmartDashboard.updateValues();
+    m_watchdog.addEpoch("SmartDashboard.updateValues()");
     LiveWindow.updateValues();
+    m_watchdog.addEpoch("LiveWindow.updateValues()");
+    Shuffleboard.update();
+    m_watchdog.addEpoch("Shuffleboard.update()");
+    m_watchdog.disable();
+
+    // Warn on loop time overruns
+    if (m_watchdog.isExpired()) {
+      m_watchdog.printEpochs();
+    }
+  }
+
+  private void printLoopOverrunMessage() {
+    DriverStation.reportWarning("Loop time of " + m_period + "s overrun\n", false);
   }
 }

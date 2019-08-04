@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,13 +7,14 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableValue;
 
 public interface SendableBuilder {
   /**
@@ -23,6 +24,14 @@ public interface SendableBuilder {
    * @param type    data type
    */
   void setSmartDashboardType(String type);
+
+  /**
+   * Set a flag indicating if this sendable should be treated as an actuator.
+   * By default this flag is false.
+   *
+   * @param value   true if actuator, false if not
+   */
+  void setActuator(boolean value);
 
   /**
    * Set the function that should be called to set the Sendable into a safe

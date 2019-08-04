@@ -1,11 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/HAL.h"
+#include "hal/HAL.h"
 
 #include <signal.h>  // linux for kill
 #include <sys/prctl.h>
@@ -18,17 +18,18 @@
 
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/LoadOut.h>
-#include <llvm/raw_ostream.h>
-#include <support/mutex.h>
-#include <support/timestamp.h>
+#include <FRC_NetworkCommunication/UsageReporting.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
+#include <wpi/timestamp.h>
 
-#include "HAL/ChipObject.h"
-#include "HAL/DriverStation.h"
-#include "HAL/Errors.h"
-#include "HAL/Notifier.h"
-#include "HAL/handles/HandlesInternal.h"
 #include "HALInitializer.h"
 #include "ctre/ctre.h"
+#include "hal/ChipObject.h"
+#include "hal/DriverStation.h"
+#include "hal/Errors.h"
+#include "hal/Notifier.h"
+#include "hal/handles/HandlesInternal.h"
 #include "visa/visa.h"
 
 using namespace hal;
@@ -41,7 +42,6 @@ using namespace hal;
 namespace hal {
 namespace init {
 void InitializeHAL() {
-  InitializeHandlesInternal();
   InitializeAccelerometer();
   InitializeAnalogAccumulator();
   InitializeAnalogGyro();
@@ -50,6 +50,7 @@ void InitializeHAL() {
   InitializeAnalogOutput();
   InitializeAnalogTrigger();
   InitializeCAN();
+  InitializeCANAPI();
   InitializeCompressor();
   InitializeConstants();
   InitializeCounter();
@@ -61,7 +62,6 @@ void InitializeHAL() {
   InitializeI2C();
   InitialzeInterrupts();
   InitializeNotifier();
-  InitializeOSSerialPort();
   InitializePCMInternal();
   InitializePDP();
   InitializePorts();
@@ -84,9 +84,6 @@ HAL_PortHandle HAL_GetPort(int32_t channel) {
   return createPortHandle(channel, 1);
 }
 
-/**
- * @deprecated Uses module numbers
- */
 HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel) {
   // Dont allow a number that wouldn't fit in a uint8_t
   if (channel < 0 || channel >= 255) return HAL_kInvalidHandle;
@@ -208,21 +205,19 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_SERIAL_PORT_OPEN_ERROR_MESSAGE;
     case HAL_SERIAL_PORT_ERROR:
       return HAL_SERIAL_PORT_ERROR_MESSAGE;
+    case HAL_CAN_TIMEOUT:
+      return HAL_CAN_TIMEOUT_MESSAGE;
+    case ERR_FRCSystem_NetCommNotResponding:
+      return ERR_FRCSystem_NetCommNotResponding_MESSAGE;
+    case ERR_FRCSystem_NoDSConnection:
+      return ERR_FRCSystem_NoDSConnection_MESSAGE;
     default:
       return "Unknown error status";
   }
 }
 
-/**
- * Returns the runtime type of this HAL
- */
 HAL_RuntimeType HAL_GetRuntimeType(void) { return HAL_Athena; }
 
-/**
- * Return the FPGA Version number.
- * For now, expect this to be competition year.
- * @return FPGA Version number.
- */
 int32_t HAL_GetFPGAVersion(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
@@ -231,14 +226,6 @@ int32_t HAL_GetFPGAVersion(int32_t* status) {
   return global->readVersion(status);
 }
 
-/**
- * Return the FPGA Revision number.
- * The format of the revision is 3 numbers.
- * The 12 most significant bits are the Major Revision.
- * the next 8 bits are the Minor Revision.
- * The 12 least significant bits are the Build Number.
- * @return FPGA Revision number.
- */
 int64_t HAL_GetFPGARevision(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
@@ -247,18 +234,12 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
   return global->readRevision(status);
 }
 
-/**
- * Read the microsecond-resolution timer on the FPGA.
- *
- * @return The current time in microseconds according to the FPGA (since FPGA
- * reset).
- */
 uint64_t HAL_GetFPGATime(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
   }
-
+  *status = 0;
   uint64_t upper1 = global->readLocalTimeUpper(status);
   uint32_t lower = global->readLocalTime(status);
   uint64_t upper2 = global->readLocalTimeUpper(status);
@@ -271,10 +252,6 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
   return (upper2 << 32) + lower;
 }
 
-/**
- * Get the state of the "USER" button on the roboRIO
- * @return true if the button is currently pressed down
- */
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
@@ -305,7 +282,7 @@ void HAL_BaseInitialize(int32_t* status) {
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
   // image 4; Fixes errors caused by multiple processes. Talk to NI about this
@@ -330,21 +307,21 @@ static bool killExistingProgram(int timeout, int mode) {
     // see if the pid is around, but we don't want to mess with init id=1, or
     // ourselves
     if (pid >= 2 && kill(pid, 0) == 0 && pid != getpid()) {
-      llvm::outs() << "Killing previously running FRC program...\n";
+      wpi::outs() << "Killing previously running FRC program...\n";
       kill(pid, SIGTERM);  // try to kill it
       std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
       if (kill(pid, 0) == 0) {
         // still not successfull
-        if (mode == 0) {
-          llvm::outs() << "FRC pid " << pid << " did not die within " << timeout
-                       << "ms. Aborting\n";
-          return 0;              // just fail
-        } else if (mode == 1) {  // kill -9 it
-          kill(pid, SIGKILL);
-        } else {
-          llvm::outs() << "WARNING: FRC pid " << pid << " did not die within "
-                       << timeout << "ms.\n";
+        wpi::outs() << "FRC pid " << pid << " did not die within " << timeout
+                    << "ms. Force killing with kill -9\n";
+        // Force kill -9
+        auto forceKill = kill(pid, SIGKILL);
+        if (forceKill != 0) {
+          auto errorMsg = std::strerror(forceKill);
+          wpi::outs() << "Kill -9 error: " << errorMsg << "\n";
         }
+        // Give a bit of time for the kill to take place
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
       }
     }
   }
@@ -358,24 +335,23 @@ static bool killExistingProgram(int timeout, int mode) {
   return true;
 }
 
-/**
- * Call this to start up HAL. This is required for robot programs.
- */
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
   if (initialized) return true;
 
-  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return true;
 
   hal::init::InitializeHAL();
 
+  hal::init::HAL_IsInitialized.store(true);
+
   setlinebuf(stdin);
   setlinebuf(stdout);
-  llvm::outs().SetUnbuffered();
+  wpi::outs().SetUnbuffered();
 
   prctl(PR_SET_PDEATHSIG, SIGTERM);
 
@@ -402,10 +378,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     int32_t status = 0;
     uint64_t rv = HAL_GetFPGATime(&status);
     if (status != 0) {
-      llvm::errs()
-          << "Call to HAL_GetFPGATime failed."
-          << "Initialization might have failed. Time will not be correct\n";
-      llvm::errs().flush();
+      wpi::errs()
+          << "Call to HAL_GetFPGATime failed in wpi::Now() with status "
+          << status
+          << ". Initialization might have failed. Time will not be correct\n";
+      wpi::errs().flush();
       return 0u;
     }
     return rv;

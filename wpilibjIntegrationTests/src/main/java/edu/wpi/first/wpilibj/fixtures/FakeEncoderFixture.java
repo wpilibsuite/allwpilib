@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -101,9 +101,9 @@ public class FakeEncoderFixture implements ITestFixture {
   @Override
   public boolean teardown() {
     logger.fine("Begining teardown");
-    m_source.free();
+    m_source.close();
     logger.finer("Source freed " + m_sourcePort[0] + ",  " + m_sourcePort[1]);
-    m_encoder.free();
+    m_encoder.close();
     logger.finer("Encoder freed " + m_encoderPort[0] + ", " + m_encoderPort[1]);
     if (m_allocated) {
       m_dio1.teardown();

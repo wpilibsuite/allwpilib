@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,15 +7,14 @@
 
 package edu.wpi.first.wpilibj.test;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.junit.runners.model.InitializationError;
-
-import java.util.List;
 
 import edu.wpi.first.wpilibj.test.AbstractTestSuite.ClassMethodPair;
 
@@ -30,7 +29,6 @@ import static org.junit.Assert.assertEquals;
  */
 @SuppressWarnings("MultipleTopLevelClasses")
 public class AbstractTestSuiteTest {
-
   @Ignore("Prevents ANT from trying to run these as tests")
   @RunWith(Suite.class)
   @SuiteClasses({FirstSampleTest.class, SecondSampleTest.class, ThirdSampleTest.class,
@@ -41,12 +39,12 @@ public class AbstractTestSuiteTest {
   TestForAbstractTestSuite m_testSuite;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     m_testSuite = new TestForAbstractTestSuite();
   }
 
   @Test
-  public void testGetTestsMatchingAll() throws InitializationError {
+  public void testGetTestsMatchingAll() {
     // when
     List<Class<?>> collectedTests = m_testSuite.getAllClassMatching(".*");
     // then
@@ -54,7 +52,7 @@ public class AbstractTestSuiteTest {
   }
 
   @Test
-  public void testGetTestsMatchingSample() throws InitializationError {
+  public void testGetTestsMatchingSample() {
     // when
     List<Class<?>> collectedTests = m_testSuite.getAllClassMatching(".*Sample.*");
     // then
@@ -62,7 +60,7 @@ public class AbstractTestSuiteTest {
   }
 
   @Test
-  public void testGetTestsMatchingUnusual() throws InitializationError {
+  public void testGetTestsMatchingUnusual() {
     // when
     List<Class<?>> collectedTests = m_testSuite.getAllClassMatching(".*Unusual.*");
     // then
@@ -71,7 +69,7 @@ public class AbstractTestSuiteTest {
   }
 
   @Test
-  public void testGetTestsFromSuiteMatchingAll() throws InitializationError {
+  public void testGetTestsFromSuiteMatchingAll() {
     // when
     List<Class<?>> collectedTests = m_testSuite.getSuiteOrTestMatchingRegex(".*");
     // then
@@ -79,7 +77,7 @@ public class AbstractTestSuiteTest {
   }
 
   @Test
-  public void testGetTestsFromSuiteMatchingTest() throws InitializationError {
+  public void testGetTestsFromSuiteMatchingTest() {
     // when
     List<Class<?>> collectedTests = m_testSuite.getSuiteOrTestMatchingRegex(".*Test.*");
     // then

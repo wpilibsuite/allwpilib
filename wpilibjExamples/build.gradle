@@ -1,24 +1,34 @@
 apply plugin: 'java'
-apply plugin: 'pmd'
+
+ext {
+    useJava = true
+    useCpp = false
+    skipDev = true
+}
+
+apply from: "${rootDir}/shared/opencv.gradle"
+
+
 
 dependencies {
     compile project(':wpilibj')
 
-    compile 'edu.wpi.first.wpiutil:wpiutil-java:3.+'
-    compile 'edu.wpi.first.ntcore:ntcore-java:4.+'
-    compile 'org.opencv:opencv-java:3.2.0'
-    compile 'edu.wpi.first.cscore:cscore-java:1.+'
+    compile project(':hal')
+    compile project(':wpiutil')
+    compile project(':ntcore')
+    compile project(':cscore')
+    compile project(':cameraserver')
 }
 
-checkstyle {
-    configFile = new File(rootDir, "styleguide/checkstyleEclipse.xml")
-}
+if (!project.hasProperty('skipPMD')) {
+    apply plugin: 'pmd'
 
-pmd {
-    consoleOutput = true
-    reportsDir = file("$project.buildDir/reports/pmd")
-    ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
-    ruleSets = []
+    pmd {
+        consoleOutput = true
+        reportsDir = file("$project.buildDir/reports/pmd")
+        ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
+        ruleSets = []
+    }
 }
 
 gradle.projectsEvaluated {
@@ -28,3 +38,14 @@ gradle.projectsEvaluated {
 }
 
 apply from: 'publish.gradle'
+
+ext {
+    templateDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/templates/")
+    templateFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/templates/templates.json")
+    exampleDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/examples/")
+    exampleFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/examples/examples.json")
+    commandDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/")
+    commandFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/commands.json")
+}
+
+apply from: "${rootDir}/shared/examplecheck.gradle"

@@ -1,14 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/AnalogAccumulator.h"
+#include "hal/AnalogAccumulator.h"
 
 #include "AnalogInternal.h"
-#include "MockData/AnalogInDataInternal.h"
+#include "mockdata/AnalogInDataInternal.h"
 
 using namespace hal;
 
@@ -44,7 +44,7 @@ void HAL_InitAccumulator(HAL_AnalogInputHandle analogPortHandle,
     return;
   }
 
-  SimAnalogInData[port->channel].SetAccumulatorInitialized(true);
+  SimAnalogInData[port->channel].accumulatorInitialized = true;
 }
 void HAL_ResetAccumulator(HAL_AnalogInputHandle analogPortHandle,
                           int32_t* status) {
@@ -54,9 +54,9 @@ void HAL_ResetAccumulator(HAL_AnalogInputHandle analogPortHandle,
     return;
   }
 
-  SimAnalogInData[port->channel].SetAccumulatorCenter(0);
-  SimAnalogInData[port->channel].SetAccumulatorCount(0);
-  SimAnalogInData[port->channel].SetAccumulatorValue(0);
+  SimAnalogInData[port->channel].accumulatorCenter = 0;
+  SimAnalogInData[port->channel].accumulatorCount = 0;
+  SimAnalogInData[port->channel].accumulatorValue = 0;
 }
 void HAL_SetAccumulatorCenter(HAL_AnalogInputHandle analogPortHandle,
                               int32_t center, int32_t* status) {
@@ -66,7 +66,7 @@ void HAL_SetAccumulatorCenter(HAL_AnalogInputHandle analogPortHandle,
     return;
   }
 
-  SimAnalogInData[port->channel].SetAccumulatorCenter(center);
+  SimAnalogInData[port->channel].accumulatorCenter = center;
 }
 void HAL_SetAccumulatorDeadband(HAL_AnalogInputHandle analogPortHandle,
                                 int32_t deadband, int32_t* status) {
@@ -76,7 +76,7 @@ void HAL_SetAccumulatorDeadband(HAL_AnalogInputHandle analogPortHandle,
     return;
   }
 
-  SimAnalogInData[port->channel].SetAccumulatorDeadband(deadband);
+  SimAnalogInData[port->channel].accumulatorDeadband = deadband;
 }
 int64_t HAL_GetAccumulatorValue(HAL_AnalogInputHandle analogPortHandle,
                                 int32_t* status) {
@@ -86,7 +86,7 @@ int64_t HAL_GetAccumulatorValue(HAL_AnalogInputHandle analogPortHandle,
     return 0;
   }
 
-  return SimAnalogInData[port->channel].GetAccumulatorValue();
+  return SimAnalogInData[port->channel].accumulatorValue;
 }
 int64_t HAL_GetAccumulatorCount(HAL_AnalogInputHandle analogPortHandle,
                                 int32_t* status) {
@@ -96,7 +96,7 @@ int64_t HAL_GetAccumulatorCount(HAL_AnalogInputHandle analogPortHandle,
     return 0;
   }
 
-  return SimAnalogInData[port->channel].GetAccumulatorCount();
+  return SimAnalogInData[port->channel].accumulatorCount;
 }
 void HAL_GetAccumulatorOutput(HAL_AnalogInputHandle analogPortHandle,
                               int64_t* value, int64_t* count, int32_t* status) {
@@ -106,7 +106,7 @@ void HAL_GetAccumulatorOutput(HAL_AnalogInputHandle analogPortHandle,
     return;
   }
 
-  *count = SimAnalogInData[port->channel].GetAccumulatorCount();
-  *value = SimAnalogInData[port->channel].GetAccumulatorValue();
+  *count = SimAnalogInData[port->channel].accumulatorCount;
+  *value = SimAnalogInData[port->channel].accumulatorValue;
 }
 }  // extern "C"

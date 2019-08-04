@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.CompressorJNI;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.CompressorJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * the safety provided by using the pressure switch and closed loop control. You can only turn off
  * closed loop control, thereby stopping the compressor from operating.
  */
-public class Compressor extends SendableBase implements Sendable {
+public class Compressor extends SendableBase {
   private int m_compressorHandle;
   private byte m_module;
 
@@ -49,7 +49,7 @@ public class Compressor extends SendableBase implements Sendable {
    * specifying the CAN ID.}
    */
   public Compressor() {
-    this(SensorBase.getDefaultSolenoidModule());
+    this(SensorUtil.getDefaultSolenoidModule());
   }
 
   /**
@@ -193,7 +193,7 @@ public class Compressor extends SendableBase implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Compressor");
-    builder.addBooleanProperty("Enabled", this::enabled, (value) -> {
+    builder.addBooleanProperty("Enabled", this::enabled, value -> {
       if (value) {
         start();
       } else {

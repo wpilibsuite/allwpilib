@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/SerialPort.h"
+#include "hal/SerialPort.h"
+
+#include "HALInitializer.h"
 
 namespace hal {
 namespace init {
@@ -14,7 +16,12 @@ void InitializeSerialPort() {}
 }  // namespace hal
 
 extern "C" {
-void HAL_InitializeSerialPort(HAL_SerialPort port, int32_t* status) {}
+void HAL_InitializeSerialPort(HAL_SerialPort port, int32_t* status) {
+  hal::init::CheckInit();
+}
+
+void HAL_InitializeSerialPortDirect(HAL_SerialPort port, const char* portName,
+                                    int32_t* status) {}
 
 void HAL_SetSerialBaudRate(HAL_SerialPort port, int32_t baud, int32_t* status) {
 }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,16 +13,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * Allows multiple {@link SpeedController} objects to be linked together.
  */
 public class SpeedControllerGroup extends SendableBase implements SpeedController {
-
-  private boolean m_isInverted = false;
+  private boolean m_isInverted;
   private final SpeedController[] m_speedControllers;
-  private static int instances = 0;
+  private static int instances;
 
   /**
    * Create a new SpeedControllerGroup with the provided SpeedControllers.
    *
    * @param speedControllers The SpeedControllers to add
    */
+  @SuppressWarnings("PMD.AvoidArrayLoops")
   public SpeedControllerGroup(SpeedController speedController,
                               SpeedController... speedControllers) {
     m_speedControllers = new SpeedController[speedControllers.length + 1];
@@ -46,7 +46,7 @@ public class SpeedControllerGroup extends SendableBase implements SpeedControlle
   @Override
   public double get() {
     if (m_speedControllers.length > 0) {
-      return m_speedControllers[0].get();
+      return m_speedControllers[0].get() * (m_isInverted ? -1 : 1);
     }
     return 0.0;
   }
@@ -77,14 +77,13 @@ public class SpeedControllerGroup extends SendableBase implements SpeedControlle
 
   @Override
   public void pidWrite(double output) {
-    for (SpeedController speedController : m_speedControllers) {
-      speedController.pidWrite(output);
-    }
+    set(output);
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Speed Controller");
+    builder.setActuator(true);
     builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Value", this::get, this::set);
   }

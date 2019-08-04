@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,12 +9,12 @@ package edu.wpi.first.wpilibj;
 
 import java.nio.ByteBuffer;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.I2CJNI;
-import edu.wpi.first.wpilibj.util.BoundaryException;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.I2CJNI;
+import edu.wpi.first.hal.util.BoundaryException;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * I2C bus interface class.
@@ -22,7 +22,8 @@ import static java.util.Objects.requireNonNull;
  * <p>This class is intended to be used by sensor (and other I2C device) drivers. It probably should
  * not be used directly.
  */
-public class I2C {
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
+public class I2C implements AutoCloseable {
   public enum Port {
     kOnboard(0), kMXP(1);
 
@@ -52,10 +53,13 @@ public class I2C {
     HAL.report(tResourceType.kResourceType_I2C, deviceAddress);
   }
 
-  /**
-   * Destructor.
-   */
+  @Deprecated
   public void free() {
+    close();
+  }
+
+  @Override
+  public void close() {
     I2CJNI.i2CClose(m_port);
   }
 
@@ -63,7 +67,9 @@ public class I2C {
    * Generic transaction.
    *
    * <p>This is a lower-level interface to the I2C hardware giving you more control over each
-   * transaction.
+   * transaction. If you intend to write multiple bytes in the same transaction and do not
+   * plan to receive anything back, use writeBulk() instead. Calling this with a receiveSize
+   * of 0 will result in an error.
    *
    * @param dataToSend   Buffer of data to send as part of the transaction.
    * @param sendSize     Number of bytes to send as part of the transaction.
@@ -96,6 +102,7 @@ public class I2C {
    * @param receiveSize  Number of bytes to read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "ByteBufferBackingArray"})
   public synchronized boolean transaction(ByteBuffer dataToSend, int sendSize,
                                           ByteBuffer dataReceived, int receiveSize) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {
@@ -186,6 +193,7 @@ public class I2C {
    * @param size The number of data bytes to write.
    * @return Transfer Aborted... false for success, true for aborted.
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public synchronized boolean writeBulk(ByteBuffer data, int size) {
     if (data.hasArray()) {
       return writeBulk(data.array(), size);
@@ -213,7 +221,7 @@ public class I2C {
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public boolean read(int registerAddress, int count, byte[] buffer) {
-    requireNonNull(buffer, "Null return buffer was given");
+    requireNonNullParam(buffer, "buffer", "read");
 
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
@@ -228,7 +236,7 @@ public class I2C {
     return transaction(registerAddressArray, registerAddressArray.length, buffer, count);
   }
 
-  private ByteBuffer m_readDataToSendBuffer = null;
+  private ByteBuffer m_readDataToSendBuffer;
 
   /**
    * Execute a read transaction with the device.
@@ -241,6 +249,7 @@ public class I2C {
    * @param buffer          A buffer to store the data read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public boolean read(int registerAddress, int count, ByteBuffer buffer) {
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
@@ -277,7 +286,7 @@ public class I2C {
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public boolean readOnly(byte[] buffer, int count) {
-    requireNonNull(buffer, "Null return buffer was given");
+    requireNonNullParam(buffer, "buffer", "readOnly");
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
     }
@@ -298,6 +307,7 @@ public class I2C {
    * @param count  The number of bytes to read in the transaction.
    * @return Transfer Aborted... false for success, true for aborted.
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public boolean readOnly(ByteBuffer buffer, int count) {
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count
@@ -349,12 +359,11 @@ public class I2C {
     byte[] dataToSend = new byte[1];
 
     byte[] deviceData = new byte[4];
-    for (int i = 0, curRegisterAddress = registerAddress;
-         i < count; i += 4, curRegisterAddress += 4) {
+    for (int i = 0; i < count; i += 4) {
       int toRead = count - i < 4 ? count - i : 4;
       // Read the chunk of data. Return false if the sensor does not
       // respond.
-      dataToSend[0] = (byte) curRegisterAddress;
+      dataToSend[0] = (byte) (registerAddress + i);
       if (transaction(dataToSend, 1, deviceData, toRead)) {
         return false;
       }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <thread>
 
-#include <support/timestamp.h>
+#include <wpi/timestamp.h>
 
 #include "MockHooksInternal.h"
 
@@ -36,6 +36,7 @@ int64_t GetFPGATime() {
 double GetFPGATimestamp() { return GetFPGATime() * 1.0e-6; }
 
 void SetProgramStarted() { programStarted = true; }
+bool GetProgramStarted() { return programStarted; }
 }  // namespace hal
 
 using namespace hal;
@@ -51,6 +52,8 @@ void HALSIM_WaitForProgramStart(void) {
 }
 
 void HALSIM_SetProgramStarted(void) { SetProgramStarted(); }
+
+HAL_Bool HALSIM_GetProgramStarted(void) { return GetProgramStarted(); }
 
 void HALSIM_RestartTiming(void) { RestartTiming(); }
 }  // extern "C"

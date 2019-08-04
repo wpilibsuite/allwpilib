@@ -1,0 +1,132 @@
+import org.gradle.internal.os.OperatingSystem
+
+ext {
+    nativeName = 'cscore'
+    devMain = 'edu.wpi.cscore.DevMain'
+}
+
+if (OperatingSystem.current().isMacOsX()) {
+    apply plugin: 'objective-cpp'
+}
+
+apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+
+ext {
+    sharedCvConfigs = [cscore    : [],
+                       cscoreBase: [],
+                       cscoreDev : [],
+                       cscoreTest: []]
+    staticCvConfigs = [cscoreJNI: []]
+    useJava = true
+    useCpp = true
+    splitSetup = {
+        if (it.targetPlatform.operatingSystem.isMacOsX()) {
+            it.sources {
+                macObjCpp(ObjectiveCppSourceSet) {
+                    source {
+                        srcDirs = ['src/main/native/objcpp']
+                        include '**/*.mm'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                        include '**/*.h'
+                    }
+                }
+                cscoreMacCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/osx'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
+                    }
+                }
+            }
+        } else if (it.targetPlatform.operatingSystem.isLinux()) {
+            it.sources {
+                cscoreLinuxCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/linux'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
+                    }
+                }
+            }
+        } else if (it.targetPlatform.operatingSystem.isWindows()) {
+            it.sources {
+                cscoreWindowsCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/windows'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
+                    }
+                }
+            }
+        }
+    }
+}
+
+def examplesMap = [:];
+
+File examplesTree = file("$projectDir/examples")
+examplesTree.list(new FilenameFilter() {
+    @Override
+    public boolean accept(File current, String name) {
+        return new File(current, name).isDirectory();
+    }
+}).each {
+    sharedCvConfigs.put(it, [])
+    examplesMap.put(it, [])
+}
+
+apply from: "${rootDir}/shared/opencv.gradle"
+
+nativeUtils.exportsConfigs {
+    cscore {
+        x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+        x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+    }
+    cscoreJNI {
+        x86SymbolFilter = { symbols ->
+            symbols.removeIf({ !it.startsWith('CS_') })
+        }
+        x64SymbolFilter = { symbols ->
+            symbols.removeIf({ !it.startsWith('CS_') })
+        }
+    }
+}
+
+model {
+    components {
+        examplesMap.each { key, value ->
+            "${key}"(NativeExecutableSpec) {
+                targetBuildTypes 'debug'
+                binaries.all {
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib library: 'cscore', linkage: 'shared'
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'examples/' + "${key}"
+                            include '**/*.cpp'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

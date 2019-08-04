@@ -1,58 +1,34 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "RobotState.h"
+#include "frc/RobotState.h"
 
-#include "Base.h"
+#include "frc/DriverStation.h"
 
 using namespace frc;
 
-std::shared_ptr<RobotStateInterface> RobotState::impl;
-
-void RobotState::SetImplementation(RobotStateInterface& i) {
-  impl = std::shared_ptr<RobotStateInterface>(
-      &i, NullDeleter<RobotStateInterface>());
-}
-
-void RobotState::SetImplementation(std::shared_ptr<RobotStateInterface> i) {
-  impl = i;
-}
-
 bool RobotState::IsDisabled() {
-  if (impl != nullptr) {
-    return impl->IsDisabled();
-  }
-  return true;
+  return DriverStation::GetInstance().IsDisabled();
 }
 
 bool RobotState::IsEnabled() {
-  if (impl != nullptr) {
-    return impl->IsEnabled();
-  }
-  return false;
+  return DriverStation::GetInstance().IsEnabled();
+}
+
+bool RobotState::IsEStopped() {
+  return DriverStation::GetInstance().IsEStopped();
 }
 
 bool RobotState::IsOperatorControl() {
-  if (impl != nullptr) {
-    return impl->IsOperatorControl();
-  }
-  return true;
+  return DriverStation::GetInstance().IsOperatorControl();
 }
 
 bool RobotState::IsAutonomous() {
-  if (impl != nullptr) {
-    return impl->IsAutonomous();
-  }
-  return false;
+  return DriverStation::GetInstance().IsAutonomous();
 }
 
-bool RobotState::IsTest() {
-  if (impl != nullptr) {
-    return impl->IsTest();
-  }
-  return false;
-}
+bool RobotState::IsTest() { return DriverStation::GetInstance().IsTest(); }

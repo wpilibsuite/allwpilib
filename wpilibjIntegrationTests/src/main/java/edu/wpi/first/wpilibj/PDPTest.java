@@ -1,11 +1,15 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 package edu.wpi.first.wpilibj;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.logging.Logger;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -15,11 +19,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.logging.Logger;
-
-import edu.wpi.first.wpilibj.can.CANMessageNotFoundException;
+import edu.wpi.first.hal.can.CANMessageNotFoundException;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
@@ -41,13 +41,13 @@ public class PDPTest extends AbstractComsSetup {
   private final double m_expectedStoppedCurrentDraw;
 
   @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
+  public static void setUpBeforeClass() {
     pdp = new PowerDistributionPanel();
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
-    pdp.free();
+  public static void tearDownAfterClass() {
+    pdp.close();
     pdp = null;
     me.teardown();
     me = null;
@@ -74,7 +74,7 @@ public class PDPTest extends AbstractComsSetup {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     me.reset();
   }
 
@@ -96,7 +96,6 @@ public class PDPTest extends AbstractComsSetup {
    */
   @Test
   public void checkRunningCurrentForSpeedController() throws CANMessageNotFoundException {
-
     /* Set the motor to full forward */
     me.getMotor().set(1.0);
     Timer.delay(2);

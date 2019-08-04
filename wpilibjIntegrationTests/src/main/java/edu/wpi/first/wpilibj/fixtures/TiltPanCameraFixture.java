@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -92,22 +92,22 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
   }
 
   public void freeGyro() {
-    m_gyro.free();
+    m_gyro.close();
     m_gyro = null;
   }
 
   @Override
   public boolean teardown() {
-    m_tilt.free();
+    m_tilt.close();
     m_tilt = null;
-    m_pan.free();
+    m_pan.close();
     m_pan = null;
     if (m_gyro != null) { //in case not freed during gyro tests
-      m_gyro.free();
+      m_gyro.close();
       m_gyro = null;
     }
     if (m_gyroParam != null) { //in case gyro tests failed before getting to this point
-      m_gyroParam.free();
+      m_gyroParam.close();
       m_gyroParam = null;
     }
     return true;

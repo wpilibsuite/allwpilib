@@ -1,11 +1,4 @@
 apply plugin: 'maven-publish'
-apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
-
-if (!hasProperty('releaseType')) {
-    WPILibVersion {
-        releaseType = 'dev'
-    }
-}
 
 def pubVersion
 if (project.hasProperty("publishVersion")) {
@@ -16,13 +9,18 @@ if (project.hasProperty("publishVersion")) {
 
 def baseExamplesArtifactId = 'examples'
 def baseTemplatesArtifactId = 'templates'
+def baseCommandsArtifactId = 'commands'
 def artifactGroupId = 'edu.wpi.first.wpilibc'
+
+def examplesZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_examples_CLS'
+def templatesZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_templates_CLS'
+def commandsZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_commands_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
 task cppExamplesZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'wpilibc-examples'
+    baseName = examplesZipBaseName
 
     from(licenseFile) {
         into '/'
@@ -31,15 +29,11 @@ task cppExamplesZip(type: Zip) {
     from('src/main/cpp/examples') {
         into 'examples'
     }
-
-    from ('examples.xml') {
-        into 'examples'
-    }
 }
 
 task cppTemplatesZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'wpilibc-templates'
+    baseName = templatesZipBaseName
 
     from(licenseFile) {
         into '/'
@@ -50,8 +44,26 @@ task cppTemplatesZip(type: Zip) {
     }
 }
 
+task cppCommandsZip(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = commandsZipBaseName
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/cpp/commands') {
+        into 'commands'
+    }
+}
+
 build.dependsOn cppTemplatesZip
 build.dependsOn cppExamplesZip
+build.dependsOn cppCommandsZip
+
+addTaskToCopyAllOutputs(cppTemplatesZip)
+addTaskToCopyAllOutputs(cppExamplesZip)
+addTaskToCopyAllOutputs(cppCommandsZip)
 
 publishing {
     publications {
@@ -67,6 +79,14 @@ publishing {
             artifact cppTemplatesZip
 
             artifactId = baseTemplatesArtifactId
+            groupId artifactGroupId
+            version pubVersion
+        }
+
+        commands(MavenPublication) {
+            artifact cppCommandsZip
+
+            artifactId = baseCommandsArtifactId
             groupId artifactGroupId
             version pubVersion
         }

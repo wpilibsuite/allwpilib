@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,15 +7,16 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.RelayJNI;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-
 import java.util.Arrays;
 import java.util.Optional;
 
-import static java.util.Objects.requireNonNull;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.RelayJNI;
+import edu.wpi.first.hal.util.UncleanStatusException;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * Class for VEX Robotics Spike style relay outputs. Relays are intended to be connected to Spikes
@@ -26,15 +27,12 @@ import static java.util.Objects.requireNonNull;
  * channels (forward and reverse) to be used independently for something that does not care about
  * voltage polarity (like a solenoid).
  */
-public class Relay extends SendableBase implements MotorSafety, Sendable {
-  private MotorSafetyHelper m_safetyHelper;
-
+public class Relay extends MotorSafety implements Sendable, AutoCloseable {
   /**
    * This class represents errors in trying to set relay values contradictory to the direction to
    * which the relay is set.
    */
-  public class InvalidValueException extends RuntimeException {
-
+  public static class InvalidValueException extends RuntimeException {
     /**
      * Create a new exception with the given message.
      *
@@ -90,10 +88,12 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
 
   private final int m_channel;
 
-  private int m_forwardHandle = 0;
-  private int m_reverseHandle = 0;
+  private int m_forwardHandle;
+  private int m_reverseHandle;
 
   private Direction m_direction;
+
+  private final SendableImpl m_sendableImpl;
 
   /**
    * Common relay initialization method. This code is common to all Relay constructors and
@@ -101,9 +101,9 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
    * set to both lines at 0v.
    */
   private void initRelay() {
-    SensorBase.checkRelayChannel(m_channel);
+    SensorUtil.checkRelayChannel(m_channel);
 
-    int portHandle = RelayJNI.getPort((byte) m_channel);
+    int portHandle = HAL.getPort((byte) m_channel);
     if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
       m_forwardHandle = RelayJNI.initializeRelayPort(portHandle, true);
       HAL.report(tResourceType.kResourceType_Relay, m_channel);
@@ -113,8 +113,7 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
       HAL.report(tResourceType.kResourceType_Relay, m_channel + 128);
     }
 
-    m_safetyHelper = new MotorSafetyHelper(this);
-    m_safetyHelper.setSafetyEnabled(false);
+    setSafetyEnabled(false);
 
     setName("Relay", m_channel);
   }
@@ -126,8 +125,10 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
    * @param direction The direction that the Relay object will control.
    */
   public Relay(final int channel, Direction direction) {
+    m_sendableImpl = new SendableImpl(true);
+
     m_channel = channel;
-    m_direction = requireNonNull(direction, "Null Direction was given");
+    m_direction = requireNonNullParam(direction, "direction", "Relay");
     initRelay();
     set(Value.kOff);
   }
@@ -142,20 +143,20 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
   }
 
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    m_sendableImpl.close();
     freeRelay();
   }
 
   private void freeRelay() {
     try {
       RelayJNI.setRelay(m_forwardHandle, false);
-    } catch (RuntimeException ex) {
+    } catch (UncleanStatusException ignored) {
       // do nothing. Ignore
     }
     try {
       RelayJNI.setRelay(m_reverseHandle, false);
-    } catch (RuntimeException ex) {
+    } catch (UncleanStatusException ignored) {
       // do nothing. Ignore
     }
 
@@ -164,6 +165,56 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
 
     m_forwardHandle = 0;
     m_reverseHandle = 0;
+  }
+
+  @Override
+  public final synchronized String getName() {
+    return m_sendableImpl.getName();
+  }
+
+  @Override
+  public final synchronized void setName(String name) {
+    m_sendableImpl.setName(name);
+  }
+
+  /**
+   * Sets the name of the sensor with a channel number.
+   *
+   * @param moduleType A string that defines the module name in the label for the value
+   * @param channel    The channel number the device is plugged into
+   */
+  protected final void setName(String moduleType, int channel) {
+    m_sendableImpl.setName(moduleType, channel);
+  }
+
+  /**
+   * Sets the name of the sensor with a module and channel number.
+   *
+   * @param moduleType   A string that defines the module name in the label for the value
+   * @param moduleNumber The number of the particular module type
+   * @param channel      The channel number the device is plugged into (usually PWM)
+   */
+  protected final void setName(String moduleType, int moduleNumber, int channel) {
+    m_sendableImpl.setName(moduleType, moduleNumber, channel);
+  }
+
+  @Override
+  public final synchronized String getSubsystem() {
+    return m_sendableImpl.getSubsystem();
+  }
+
+  @Override
+  public final synchronized void setSubsystem(String subsystem) {
+    m_sendableImpl.setSubsystem(subsystem);
+  }
+
+  /**
+   * Add a child component.
+   *
+   * @param child child component
+   */
+  protected final void addChild(Object child) {
+    m_sendableImpl.addChild(child);
   }
 
   /**
@@ -179,6 +230,7 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
    *
    * @param value The state to set the relay.
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   public void set(Value value) {
     switch (value) {
       case kOff:
@@ -276,33 +328,8 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
   }
 
   @Override
-  public void setExpiration(double timeout) {
-    m_safetyHelper.setExpiration(timeout);
-  }
-
-  @Override
-  public double getExpiration() {
-    return m_safetyHelper.getExpiration();
-  }
-
-  @Override
-  public boolean isAlive() {
-    return m_safetyHelper.isAlive();
-  }
-
-  @Override
   public void stopMotor() {
     set(Value.kOff);
-  }
-
-  @Override
-  public boolean isSafetyEnabled() {
-    return m_safetyHelper.isSafetyEnabled();
-  }
-
-  @Override
-  public void setSafetyEnabled(boolean enabled) {
-    m_safetyHelper.setSafetyEnabled(enabled);
   }
 
   @Override
@@ -320,7 +347,7 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
    * @param direction The direction for the relay to operate in
    */
   public void setDirection(Direction direction) {
-    requireNonNull(direction, "Null Direction was given");
+    requireNonNullParam(direction, "direction", "setDirection");
     if (m_direction == direction) {
       return;
     }
@@ -333,8 +360,9 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Relay");
+    builder.setActuator(true);
     builder.setSafeState(() -> set(Value.kOff));
     builder.addStringProperty("Value", () -> get().getPrettyValue(),
-        (value) -> set(Value.getValueOf(value).orElse(Value.kOff)));
+        value -> set(Value.getValueOf(value).orElse(Value.kOff)));
   }
 }

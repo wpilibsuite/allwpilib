@@ -1,11 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 package edu.wpi.first.wpilibj;
+
+import java.util.Collection;
+import java.util.logging.Logger;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -14,9 +17,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import java.util.Collection;
-import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.fixtures.FakeCounterFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
@@ -78,17 +78,17 @@ public class CounterTest extends AbstractComsSetup {
 
 
   @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
+  public static void setUpBeforeClass() {
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
+  public static void tearDownAfterClass() {
     counter.teardown();
     counter = null;
   }
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     counter.setup();
   }
 

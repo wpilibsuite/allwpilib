@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,13 +7,13 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.EncoderJNI;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.EncoderJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.util.AllocationException;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * Class to read quadrature encoders.
@@ -28,8 +28,7 @@ import static java.util.Objects.requireNonNull;
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Encoder extends SensorBase implements CounterBase, PIDSource, Sendable {
-
+public class Encoder extends SendableBase implements CounterBase, PIDSource {
   public enum IndexingType {
     kResetWhileHigh(0), kResetWhileLow(1), kResetOnFallingEdge(2), kResetOnRisingEdge(3);
 
@@ -54,7 +53,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
   /**
    * The index source.
    */
-  protected DigitalSource m_indexSource = null; // Index on some encoders
+  protected DigitalSource m_indexSource; // Index on some encoders
   private boolean m_allocatedA;
   private boolean m_allocatedB;
   private boolean m_allocatedI;
@@ -127,7 +126,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
    */
   public Encoder(final int channelA, final int channelB, boolean reverseDirection,
                  final EncodingType encodingType) {
-    requireNonNull(encodingType, "Given encoding type was null");
+    requireNonNullParam(encodingType, "encodingType", "Encoder");
 
     m_allocatedA = true;
     m_allocatedB = true;
@@ -224,9 +223,9 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
    */
   public Encoder(DigitalSource sourceA, DigitalSource sourceB, boolean reverseDirection,
                  final EncodingType encodingType) {
-    requireNonNull(sourceA, "Digital Source A was null");
-    requireNonNull(sourceB, "Digital Source B was null");
-    requireNonNull(encodingType, "Given encoding type was null");
+    requireNonNullParam(sourceA, "sourceA", "Encoder");
+    requireNonNullParam(sourceB, "sourceB", "Encoder");
+    requireNonNullParam(encodingType, "encodingType", "Encoder");
 
     m_allocatedA = false;
     m_allocatedB = false;
@@ -291,22 +290,19 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
     return EncoderJNI.getEncoderEncodingScale(m_encoder);
   }
 
-  /**
-   * Free the resources used by this object.
-   */
   @Override
-  public void free() {
-    super.free();
+  public void close() {
+    super.close();
     if (m_aSource != null && m_allocatedA) {
-      m_aSource.free();
+      m_aSource.close();
       m_allocatedA = false;
     }
     if (m_bSource != null && m_allocatedB) {
-      m_bSource.free();
+      m_bSource.close();
       m_allocatedB = false;
     }
     if (m_indexSource != null && m_allocatedI) {
-      m_indexSource.free();
+      m_indexSource.close();
       m_allocatedI = false;
     }
 
@@ -333,6 +329,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
    *
    * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale factor.
    */
+  @Override
   public int get() {
     return EncoderJNI.getEncoder(m_encoder);
   }
@@ -340,6 +337,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
   /**
    * Reset the Encoder distance to zero. Resets the current count to zero on the encoder.
    */
+  @Override
   public void reset() {
     EncoderJNI.resetEncoder(m_encoder);
   }
@@ -354,6 +352,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
    * @return Period in seconds of the most recent pulse.
    * @deprecated Use getRate() in favor of this method.
    */
+  @Override
   @Deprecated
   public double getPeriod() {
     return EncoderJNI.getEncoderPeriod(m_encoder);
@@ -368,6 +367,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
    * @param maxPeriod The maximum time between rising and falling edges before the FPGA will report
    *                  the device stopped. This is expressed in seconds.
    */
+  @Override
   public void setMaxPeriod(double maxPeriod) {
     EncoderJNI.setEncoderMaxPeriod(m_encoder, maxPeriod);
   }
@@ -379,6 +379,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
    *
    * @return True if the encoder is considered stopped.
    */
+  @Override
   public boolean getStopped() {
     return EncoderJNI.getEncoderStopped(m_encoder);
   }
@@ -388,6 +389,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
    *
    * @return The last direction the encoder value changed.
    */
+  @Override
   public boolean getDirection() {
     return EncoderJNI.getEncoderDirection(m_encoder);
   }
@@ -482,6 +484,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
    *
    * @param pidSource An enum to select the parameter.
    */
+  @Override
   public void setPIDSourceType(PIDSourceType pidSource) {
     m_pidSource = pidSource;
   }
@@ -496,6 +499,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
    *
    * @return The current value of the selected source parameter.
    */
+  @Override
   public double pidGet() {
     switch (m_pidSource) {
       case kDisplacement:
@@ -540,6 +544,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
     }
     m_indexSource = new DigitalInput(channel);
     m_allocatedI = true;
+    addChild(m_indexSource);
     setIndexSource(m_indexSource, type);
   }
 

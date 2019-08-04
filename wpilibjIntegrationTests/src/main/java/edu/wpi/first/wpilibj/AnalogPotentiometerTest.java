@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,11 +7,11 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.logging.Logger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
@@ -32,7 +32,7 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
   private static final double DOUBLE_COMPARISON_DELTA = 2.0;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     m_analogIO = TestBench.getAnalogCrossConnectFixture();
     m_potSource = new FakePotentiometerSource(m_analogIO.getOutput(), 360);
     m_pot = new AnalogPotentiometer(m_analogIO.getInput(), 360.0, 0);
@@ -40,9 +40,9 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     m_potSource.reset();
-    m_pot.free();
+    m_pot.close();
     m_analogIO.teardown();
   }
 
@@ -60,7 +60,7 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
   public void testRangeValues() {
     for (double i = 0.0; i < 360.0; i = i + 1.0) {
       m_potSource.setAngle(i);
-      m_potSource.setMaxVoltage(ControllerPower.getVoltage5V());
+      m_potSource.setMaxVoltage(RobotController.getVoltage5V());
       Timer.delay(.02);
       assertEquals(i, m_pot.get(), DOUBLE_COMPARISON_DELTA);
     }

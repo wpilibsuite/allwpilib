@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,12 +7,12 @@
 
 package edu.wpi.first.wpilibj;
 
-import org.junit.After;
-import org.junit.Test;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.junit.After;
+import org.junit.Test;
 
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
@@ -161,7 +161,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
   }
 
   @Test(timeout = 2000)
-  public void testMultipleInterruptsTriggering() throws Exception {
+  public void testMultipleInterruptsTriggering() {
     // Given
     final InterruptCounter counter = new InterruptCounter();
     TestInterruptHandlerFunction function = new TestInterruptHandlerFunction(counter);

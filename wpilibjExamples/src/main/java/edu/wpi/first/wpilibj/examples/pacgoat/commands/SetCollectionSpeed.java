@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,16 +17,16 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * the spinners may still be adjusting their speed.
  */
 public class SetCollectionSpeed extends InstantCommand {
-	private double m_speed;
+  private final double m_speed;
 
-	public SetCollectionSpeed(double speed) {
-		requires(Robot.collector);
-		this.m_speed = speed;
-	}
+  public SetCollectionSpeed(double speed) {
+    requires(Robot.collector);
+    this.m_speed = speed;
+  }
 
-	// Called just before this Command runs the first time
-	@Override
-	protected void initialize() {
-		Robot.collector.setSpeed(m_speed);
-	}
+  // Called just before this Command runs the first time
+  @Override
+  protected void initialize() {
+    Robot.collector.setSpeed(m_speed);
+  }
 }

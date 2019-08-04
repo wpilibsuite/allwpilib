@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,11 +7,11 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * Utility class for handling Robot drive based on a definition of the motor configuration. The
@@ -21,13 +21,12 @@ import static java.util.Objects.requireNonNull;
  * function (intended for hand created drive code, such as autonomous) or with the Tank/Arcade
  * functions intended to be used for Operator Control driving.
  *
- * @deprecated Use DifferentialDrive or MecanumDrive classes instead.
+ * @deprecated Use {@link edu.wpi.first.wpilibj.drive.DifferentialDrive}
+ *             or {@link edu.wpi.first.wpilibj.drive.MecanumDrive} classes instead.
  */
 @Deprecated
-public class RobotDrive implements MotorSafety {
-
-  protected MotorSafetyHelper m_safetyHelper;
-
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
+public class RobotDrive extends MotorSafety implements AutoCloseable {
   /**
    * The location of a motor on the robot for the purpose of driving.
    */
@@ -53,11 +52,11 @@ public class RobotDrive implements MotorSafety {
   protected SpeedController m_rearLeftMotor;
   protected SpeedController m_rearRightMotor;
   protected boolean m_allocatedSpeedControllers;
-  protected static boolean kArcadeRatioCurve_Reported = false;
-  protected static boolean kTank_Reported = false;
-  protected static boolean kArcadeStandard_Reported = false;
-  protected static boolean kMecanumCartesian_Reported = false;
-  protected static boolean kMecanumPolar_Reported = false;
+  protected static boolean kArcadeRatioCurve_Reported;
+  protected static boolean kTank_Reported;
+  protected static boolean kArcadeStandard_Reported;
+  protected static boolean kMecanumCartesian_Reported;
+  protected static boolean kMecanumPolar_Reported;
 
   /**
    * Constructor for RobotDrive with 2 motors specified with channel numbers. Set up parameters for
@@ -75,7 +74,7 @@ public class RobotDrive implements MotorSafety {
     m_frontRightMotor = null;
     m_rearRightMotor = new Talon(rightMotorChannel);
     m_allocatedSpeedControllers = true;
-    setupMotorSafety();
+    setSafetyEnabled(true);
     drive(0, 0);
   }
 
@@ -98,7 +97,7 @@ public class RobotDrive implements MotorSafety {
     m_frontLeftMotor = new Talon(frontLeftMotor);
     m_frontRightMotor = new Talon(frontRightMotor);
     m_allocatedSpeedControllers = true;
-    setupMotorSafety();
+    setSafetyEnabled(true);
     drive(0, 0);
   }
 
@@ -112,8 +111,8 @@ public class RobotDrive implements MotorSafety {
    * @param rightMotor the right SpeedController object used to drive the robot.
    */
   public RobotDrive(SpeedController leftMotor, SpeedController rightMotor) {
-    requireNonNull(leftMotor, "Provided left motor was null");
-    requireNonNull(rightMotor, "Provided right motor was null");
+    requireNonNullParam(leftMotor, "leftMotor", "RobotDrive");
+    requireNonNullParam(rightMotor, "rightMotor", "RobotDrive");
 
     m_frontLeftMotor = null;
     m_rearLeftMotor = leftMotor;
@@ -122,7 +121,7 @@ public class RobotDrive implements MotorSafety {
     m_sensitivity = kDefaultSensitivity;
     m_maxOutput = kDefaultMaxOutput;
     m_allocatedSpeedControllers = false;
-    setupMotorSafety();
+    setSafetyEnabled(true);
     drive(0, 0);
   }
 
@@ -137,14 +136,14 @@ public class RobotDrive implements MotorSafety {
    */
   public RobotDrive(SpeedController frontLeftMotor, SpeedController rearLeftMotor,
                     SpeedController frontRightMotor, SpeedController rearRightMotor) {
-    m_frontLeftMotor = requireNonNull(frontLeftMotor, "frontLeftMotor cannot be null");
-    m_rearLeftMotor = requireNonNull(rearLeftMotor, "rearLeftMotor cannot be null");
-    m_frontRightMotor = requireNonNull(frontRightMotor, "frontRightMotor cannot be null");
-    m_rearRightMotor = requireNonNull(rearRightMotor, "rearRightMotor cannot be null");
+    m_frontLeftMotor = requireNonNullParam(frontLeftMotor, "frontLeftMotor", "RobotDrive");
+    m_rearLeftMotor = requireNonNullParam(rearLeftMotor, "rearLeftMotor", "RobotDrive");
+    m_frontRightMotor = requireNonNullParam(frontRightMotor, "frontRightMotor", "RobotDrive");
+    m_rearRightMotor = requireNonNullParam(rearRightMotor, "rearRightMotor", "RobotDrive");
     m_sensitivity = kDefaultSensitivity;
     m_maxOutput = kDefaultMaxOutput;
     m_allocatedSpeedControllers = false;
-    setupMotorSafety();
+    setSafetyEnabled(true);
     drive(0, 0);
   }
 
@@ -207,8 +206,8 @@ public class RobotDrive implements MotorSafety {
    * @param rightStick The joystick to control the right side of the robot.
    */
   public void tankDrive(GenericHID leftStick, GenericHID rightStick) {
-    requireNonNull(leftStick, "Provided left stick was null");
-    requireNonNull(rightStick, "Provided right stick was null");
+    requireNonNullParam(leftStick, "leftStick", "tankDrive");
+    requireNonNullParam(rightStick, "rightStick", "tankDrive");
 
     tankDrive(leftStick.getY(), rightStick.getY(), true);
   }
@@ -222,8 +221,8 @@ public class RobotDrive implements MotorSafety {
    * @param squaredInputs Setting this parameter to true decreases the sensitivity at lower speeds
    */
   public void tankDrive(GenericHID leftStick, GenericHID rightStick, boolean squaredInputs) {
-    requireNonNull(leftStick, "Provided left stick was null");
-    requireNonNull(rightStick, "Provided right stick was null");
+    requireNonNullParam(leftStick, "leftStick", "tankDrive");
+    requireNonNullParam(rightStick, "rightStick", "tankDrive");
 
     tankDrive(leftStick.getY(), rightStick.getY(), squaredInputs);
   }
@@ -240,8 +239,8 @@ public class RobotDrive implements MotorSafety {
    */
   public void tankDrive(GenericHID leftStick, final int leftAxis, GenericHID rightStick,
                         final int rightAxis) {
-    requireNonNull(leftStick, "Provided left stick was null");
-    requireNonNull(rightStick, "Provided right stick was null");
+    requireNonNullParam(leftStick, "leftStick", "tankDrive");
+    requireNonNullParam(rightStick, "rightStick", "tankDrive");
 
     tankDrive(leftStick.getRawAxis(leftAxis), rightStick.getRawAxis(rightAxis), true);
   }
@@ -258,8 +257,8 @@ public class RobotDrive implements MotorSafety {
    */
   public void tankDrive(GenericHID leftStick, final int leftAxis, GenericHID rightStick,
                         final int rightAxis, boolean squaredInputs) {
-    requireNonNull(leftStick, "Provided left stick was null");
-    requireNonNull(rightStick, "Provided right stick was null");
+    requireNonNullParam(leftStick, "leftStick", "tankDrive");
+    requireNonNullParam(rightStick, "rightStick", "tankDrive");
 
     tankDrive(leftStick.getRawAxis(leftAxis), rightStick.getRawAxis(rightAxis), squaredInputs);
   }
@@ -273,7 +272,6 @@ public class RobotDrive implements MotorSafety {
    * @param squaredInputs Setting this parameter to true decreases the sensitivity at lower speeds
    */
   public void tankDrive(double leftValue, double rightValue, boolean squaredInputs) {
-
     if (!kTank_Reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
           tInstances.kRobotDrive_Tank);
@@ -480,9 +478,7 @@ public class RobotDrive implements MotorSafety {
     m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft.value] * m_maxOutput);
     m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight.value] * m_maxOutput);
 
-    if (m_safetyHelper != null) {
-      m_safetyHelper.feed();
-    }
+    feed();
   }
 
   /**
@@ -524,9 +520,7 @@ public class RobotDrive implements MotorSafety {
     m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft.value] * m_maxOutput);
     m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight.value] * m_maxOutput);
 
-    if (m_safetyHelper != null) {
-      m_safetyHelper.feed();
-    }
+    feed();
   }
 
   /**
@@ -553,8 +547,6 @@ public class RobotDrive implements MotorSafety {
    * @param rightOutput The speed to send to the right side of the robot.
    */
   public void setLeftRightMotorOutputs(double leftOutput, double rightOutput) {
-    requireNonNull(m_rearLeftMotor, "Provided left motor was null");
-    requireNonNull(m_rearRightMotor, "Provided right motor was null");
 
     if (m_frontLeftMotor != null) {
       m_frontLeftMotor.set(limit(leftOutput) * m_maxOutput);
@@ -566,9 +558,7 @@ public class RobotDrive implements MotorSafety {
     }
     m_rearRightMotor.set(-limit(rightOutput) * m_maxOutput);
 
-    if (m_safetyHelper != null) {
-      m_safetyHelper.feed();
-    }
+    feed();
   }
 
   /**
@@ -663,49 +653,30 @@ public class RobotDrive implements MotorSafety {
     m_maxOutput = maxOutput;
   }
 
+  @Deprecated
+  public void free() {
+    close();
+  }
+
   /**
    * Free the speed controllers if they were allocated locally.
    */
-  public void free() {
+  @Override
+  public void close() {
     if (m_allocatedSpeedControllers) {
       if (m_frontLeftMotor != null) {
-        ((PWM) m_frontLeftMotor).free();
+        ((PWM) m_frontLeftMotor).close();
       }
       if (m_frontRightMotor != null) {
-        ((PWM) m_frontRightMotor).free();
+        ((PWM) m_frontRightMotor).close();
       }
       if (m_rearLeftMotor != null) {
-        ((PWM) m_rearLeftMotor).free();
+        ((PWM) m_rearLeftMotor).close();
       }
       if (m_rearRightMotor != null) {
-        ((PWM) m_rearRightMotor).free();
+        ((PWM) m_rearRightMotor).close();
       }
     }
-  }
-
-  @Override
-  public void setExpiration(double timeout) {
-    m_safetyHelper.setExpiration(timeout);
-  }
-
-  @Override
-  public double getExpiration() {
-    return m_safetyHelper.getExpiration();
-  }
-
-  @Override
-  public boolean isAlive() {
-    return m_safetyHelper.isAlive();
-  }
-
-  @Override
-  public boolean isSafetyEnabled() {
-    return m_safetyHelper.isSafetyEnabled();
-  }
-
-  @Override
-  public void setSafetyEnabled(boolean enabled) {
-    m_safetyHelper.setSafetyEnabled(enabled);
   }
 
   @Override
@@ -727,15 +698,8 @@ public class RobotDrive implements MotorSafety {
     if (m_rearRightMotor != null) {
       m_rearRightMotor.stopMotor();
     }
-    if (m_safetyHelper != null) {
-      m_safetyHelper.feed();
-    }
-  }
 
-  private void setupMotorSafety() {
-    m_safetyHelper = new MotorSafetyHelper(this);
-    m_safetyHelper.setExpiration(kDefaultExpirationTime);
-    m_safetyHelper.setSafetyEnabled(true);
+    feed();
   }
 
   protected int getNumMotors() {

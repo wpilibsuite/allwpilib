@@ -1,0 +1,201 @@
+[
+  {
+    "name": "Getting Started",
+    "description": "An example program which demonstrates the simplest autonomous and teleoperated routines.",
+    "tags": [
+      "Getting Started with Java"
+    ],
+    "foldername": "gettingstarted",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Tank Drive",
+    "description": "Demonstrate the use of the RobotDrive class doing teleop driving with tank steering",
+    "tags": [
+      "Actuators",
+      "Joystick",
+      "Robot and Motor",
+      "Safety"
+    ],
+    "foldername": "tankdrive",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Mecanum Drive",
+    "description": "Demonstrate the use of the RobotDrive class doing teleop driving with Mecanum steering",
+    "tags": [
+      "Actuators",
+      "Joystick",
+      "Robot and Motor",
+      "Safety"
+    ],
+    "foldername": "mecanumdrive",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Ultrasonic",
+    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor.",
+    "tags": [
+      "Sensors",
+      "Robot and Motor",
+      "Analog"
+    ],
+    "foldername": "ultrasonic",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Ultrasonic PID",
+    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor and PID Control.",
+    "tags": [
+      "Sensors",
+      "Robot and Motor",
+      "Analog"
+    ],
+    "foldername": "ultrasonicpid",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Potentiometer PID",
+    "description": "An example to demonstrate the use of a potentiometer and PID control to reach elevator position setpoints.",
+    "tags": [
+      "Sensors",
+      "Actuators",
+      "Analog",
+      "Joystick"
+    ],
+    "foldername": "potentiometerpid",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Gyro",
+    "description": "An example program showing how to drive straight with using a gyro sensor.",
+    "tags": [
+      "Sensors",
+      "Robot and Motor",
+      "Analog",
+      "Joystick"
+    ],
+    "foldername": "gyro",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Gyro Mecanum",
+    "description": "An example program showing how to perform mecanum drive with field oriented controls.",
+    "tags": [
+      "Sensors",
+      "Robot and Motor",
+      "Analog",
+      "Joystick"
+    ],
+    "foldername": "gyromecanum",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "HID Rumble",
+    "description": "An example program showing how to make human interface devices rumble.",
+    "tags": [
+      "Joystick"
+    ],
+    "foldername": "hidrumble",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Motor Controller",
+    "description": "Demonstrate controlling a single motor with a joystick",
+    "tags": [
+      "Actuators",
+      "Joystick",
+      "Robot and Motor"
+    ],
+    "foldername": "motorcontrol",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Motor Control With Encoder",
+    "description": "Demonstrate controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.",
+    "tags": [
+      "Robot and Motor",
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick",
+      "Complete List"
+    ],
+    "foldername": "motorcontrolencoder",
+    "gradlebase": "java"
+    ,"mainclass": "Main"
+  },
+  {
+    "name": "GearsBot",
+    "description": "A fully functional example CommandBased program for WPIs GearsBot robot. This code can run on your computer if it supports simulation.",
+    "tags": [
+      "Complete Robot"
+    ],
+    "foldername": "gearsbot",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "PacGoat",
+    "description": "A fully functional example CommandBased program for FRC Team 190's 2014 robot. This code can run on your computer if it supports simulation.",
+    "tags": [
+      "Complete Robot"
+    ],
+    "foldername": "pacgoat",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Simple Vision",
+    "description": "Demonstrate the use of the CameraServer class to stream from a USB Webcam without processing the images.",
+    "tags": [
+      "Vision",
+      "Complete List"
+    ],
+    "foldername": "quickvision",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Intermediate Vision",
+    "description": "Demonstrate the use of the NIVision class to capture image from a Webcam, process them, and then send them to the dashboard.",
+    "tags": [
+      "Vision",
+      "Complete List"
+    ],
+    "foldername": "intermediatevision",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Axis Camera Sample",
+    "description": "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class.",
+    "tags": [
+      "Vision"
+    ],
+    "foldername": "axiscamera",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Shuffleboard Sample",
+    "description": "An example program that adds data to various Shuffleboard tabs that demonstrates the Shuffleboard API",
+    "tags": [
+      "Shuffleboard",
+      "Dashboards"
+    ],
+    "foldername": "shuffleboard",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  }
+]

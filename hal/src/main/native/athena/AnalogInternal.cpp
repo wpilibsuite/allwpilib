@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,11 +9,12 @@
 
 #include <atomic>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
-#include "HAL/AnalogInput.h"
-#include "HAL/ChipObject.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/AnalogInput.h"
+#include "hal/ChipObject.h"
 
 namespace hal {
 
@@ -40,12 +41,10 @@ void InitializeAnalogInternal() {
 }
 }  // namespace init
 
-/**
- * Initialize the analog System.
- */
 void initializeAnalog(int32_t* status) {
+  hal::init::CheckInit();
   if (analogSystemInitialized) return;
-  std::lock_guard<wpi::mutex> lock(analogRegisterWindowMutex);
+  std::scoped_lock lock(analogRegisterWindowMutex);
   if (analogSystemInitialized) return;
   analogInputSystem.reset(tAI::create(status));
   analogOutputSystem.reset(tAO::create(status));
@@ -54,41 +53,22 @@ void initializeAnalog(int32_t* status) {
   analogSystemInitialized = true;
 }
 
-/**
- * Return the number of channels on the module in use.
- *
- * @return Active channels.
- */
 int32_t getAnalogNumActiveChannels(int32_t* status) {
   int32_t scanSize = analogInputSystem->readConfig_ScanSize(status);
   if (scanSize == 0) return 8;
   return scanSize;
 }
 
-/**
- * Get the number of active channels.
- *
- * This is an internal function to allow the atomic update of both the
- * number of active channels and the sample rate.
- *
- * When the number of channels changes, use the new value.  Otherwise,
- * return the curent value.
- *
- * @return Value to write to the active channels field.
- */
+void setAnalogNumChannelsToActivate(int32_t channels) {
+  analogNumChannelsToActivate = channels;
+}
+
 int32_t getAnalogNumChannelsToActivate(int32_t* status) {
   if (analogNumChannelsToActivate == 0)
     return getAnalogNumActiveChannels(status);
   return analogNumChannelsToActivate;
 }
 
-/**
- * Set the sample rate.
- *
- * This is a global setting for the Athena and effects all channels.
- *
- * @param samplesPerSecond The number of samples per channel per second.
- */
 void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // TODO: This will change when variable size scan lists are implemented.
   // TODO: Need double comparison with epsilon.
@@ -115,19 +95,6 @@ void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
 
   // Indicate that the scan size has been commited to hardware.
   setAnalogNumChannelsToActivate(0);
-}
-
-/**
- * Set the number of active channels.
- *
- * Store the number of active channels to set.  Don't actually commit to
- * hardware
- * until SetSampleRate().
- *
- * @param channels Number of active channels.
- */
-void setAnalogNumChannelsToActivate(int32_t channels) {
-  analogNumChannelsToActivate = channels;
 }
 
 }  // namespace hal

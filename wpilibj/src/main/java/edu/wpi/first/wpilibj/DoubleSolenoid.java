@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,9 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.SolenoidJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SolenoidJNI;
+import edu.wpi.first.hal.util.UncleanStatusException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -18,8 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>The DoubleSolenoid class is typically used for pneumatics solenoids that have two positions
  * controlled by two separate channels.
  */
-public class DoubleSolenoid extends SolenoidBase implements Sendable {
-
+public class DoubleSolenoid extends SolenoidBase {
   /**
    * Possible values for a DoubleSolenoid.
    */
@@ -31,8 +31,8 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable {
 
   private byte m_forwardMask; // The mask for the forward channel.
   private byte m_reverseMask; // The mask for the reverse channel.
-  private int m_forwardHandle = 0;
-  private int m_reverseHandle = 0;
+  private int m_forwardHandle;
+  private int m_reverseHandle;
 
   /**
    * Constructor. Uses the default PCM ID (defaults to 0).
@@ -41,7 +41,7 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable {
    * @param reverseChannel The reverse channel number on the PCM (0..7).
    */
   public DoubleSolenoid(final int forwardChannel, final int reverseChannel) {
-    this(SensorBase.getDefaultSolenoidModule(), forwardChannel, reverseChannel);
+    this(SensorUtil.getDefaultSolenoidModule(), forwardChannel, reverseChannel);
   }
 
   /**
@@ -55,17 +55,17 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable {
                         final int reverseChannel) {
     super(moduleNumber);
 
-    SensorBase.checkSolenoidModule(m_moduleNumber);
-    SensorBase.checkSolenoidChannel(forwardChannel);
-    SensorBase.checkSolenoidChannel(reverseChannel);
+    SensorUtil.checkSolenoidModule(m_moduleNumber);
+    SensorUtil.checkSolenoidChannel(forwardChannel);
+    SensorUtil.checkSolenoidChannel(reverseChannel);
 
-    int portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) forwardChannel);
+    int portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) forwardChannel);
     m_forwardHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
 
     try {
-      portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) reverseChannel);
+      portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) reverseChannel);
       m_reverseHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
-    } catch (RuntimeException ex) {
+    } catch (UncleanStatusException ex) {
       // free the forward handle on exception, then rethrow
       SolenoidJNI.freeSolenoidPort(m_forwardHandle);
       m_forwardHandle = 0;
@@ -83,15 +83,11 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable {
     setName("DoubleSolenoid", m_moduleNumber, forwardChannel);
   }
 
-  /**
-   * Destructor.
-   */
   @Override
-  public synchronized void free() {
-    super.free();
+  public synchronized void close() {
+    super.close();
     SolenoidJNI.freeSolenoidPort(m_forwardHandle);
     SolenoidJNI.freeSolenoidPort(m_reverseHandle);
-    super.free();
   }
 
   /**
@@ -170,8 +166,9 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Double Solenoid");
+    builder.setActuator(true);
     builder.setSafeState(() -> set(Value.kOff));
-    builder.addStringProperty("Value", () -> get().name().substring(1), (value) -> {
+    builder.addStringProperty("Value", () -> get().name().substring(1), value -> {
       if ("Forward".equals(value)) {
         set(Value.kForward);
       } else if ("Reverse".equals(value)) {

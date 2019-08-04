@@ -1,132 +1,30 @@
-import edu.wpi.first.nativeutils.NativeUtils
-import edu.wpi.first.nativeutils.tasks.JNIHeaders
-
-buildscript {
-    repositories {
-        mavenLocal()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath 'gradle.plugin.edu.wpi.first:native-utils:1.5.1'
-    }
-}
+import edu.wpi.first.toolchain.*
 
 plugins {
-    id 'net.ltgt.errorprone' version '0.0.10'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.0'
+    id 'base'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.3'
+    id 'edu.wpi.first.NativeUtils' apply false
+    id 'edu.wpi.first.GradleJni' version '0.9.0'
+    id 'edu.wpi.first.GradleVsCode' version '0.9.4'
     id 'idea'
+    id 'visual-studio'
+    id 'com.gradle.build-scan' version '2.3'
+    id 'net.ltgt.errorprone' version '0.6' apply false
+    id 'com.github.johnrengelman.shadow' version '4.0.3' apply false
 }
 
-ext.licenseFile = file("$rootDir/LICENSE.txt")
-
-ext.getJNIHeadersClass = {
-    return JNIHeaders
+repositories {
+    mavenCentral()
 }
 
-ext.getClassifier = { binary->
-    return NativeUtils.getClassifier(binary)
+buildScan {
+    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+    termsOfServiceAgree = 'yes'
+
+    publishAlways()
 }
 
-ext.getPlatformPath = { binary->
-    return NativeUtils.getPlatformPath(binary)
-}
-
-ext.createComponentZipTasks = { components, name, base, type, project, func ->
-    def configMap = [:]
-    components.each {
-        if (it in NativeLibrarySpec && it.name == name) {
-            it.binaries.each {
-                def target = getClassifier(it)
-                if (configMap.containsKey(target)) {
-                    configMap.get(target).add(it)
-                } else {
-                    configMap.put(target, [])
-                    configMap.get(target).add(it)
-                }
-            }
-        }
-    }
-    def taskList = []
-    def outputsFolder = file("$project.buildDir/outputs")
-    def baseN = base + name
-    configMap.each { key, value ->
-        def task = project.tasks.create(baseN + "-${key}", type) {
-            description = 'Creates component archive for platform ' + key
-            destinationDir =  outputsFolder
-            classifier = key
-            baseName = baseN + '-classifier'
-            duplicatesStrategy = 'exclude'
-
-            from(licenseFile) {
-                into '/'
-            }
-
-            func(it, value)
-        }
-        taskList.add(task)
-
-        project.build.dependsOn task
-
-        project.artifacts {
-            task
-        }
-    }
-    return taskList
-}
-
-ext.createAllCombined = { list, name, base, type, project ->
-    def outputsFolder = file("$project.buildDir/outputs")
-    def baseN = base + name
-    def task = project.tasks.create(baseN + '-all', type) {
-        description = 'Creates component archive for all classifiers'
-        destinationDir = outputsFolder
-        classifier = 'all'
-        baseName = baseN + '-classifier'
-        duplicatesStrategy = 'exclude'
-
-        list.each {
-            it.outputs.files.each {
-                from project.zipTree(it)
-            }
-            dependsOn it
-        }
-    }
-
-    project.build.dependsOn task
-
-    project.artifacts {
-        task
-    }
-
-    return task
-
-}
-
-ext.includeStandardZipFormat = { task, value ->
-    value.each { binary->
-        if (binary.buildable) {
-            if (binary instanceof SharedLibraryBinarySpec) {
-                task.dependsOn binary.buildTask
-                task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
-                    into getPlatformPath(binary) + '/shared'
-                }
-                task.from (binary.sharedLibraryFile) {
-                    into getPlatformPath(binary) + '/shared'
-                }
-                task.from (binary.sharedLibraryLinkFile) {
-                    into getPlatformPath(binary) + '/shared'
-                }
-            } else if (binary instanceof StaticLibraryBinarySpec) {
-                task.dependsOn binary.buildTask
-                task.from (binary.staticLibraryFile) {
-                    into getPlatformPath(binary) + '/static'
-                }
-            }
-        }
-    }
-}
+ext.licenseFile = files("$rootDir/LICENSE.txt", "$rootDir/ThirdPartyNotices.txt")
 
 // Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
 // already specified on the command line
@@ -143,7 +41,7 @@ if (project.hasProperty("publishVersion")) {
     pubVersion = WPILibVersion.version
 }
 
-def outputsFolder = file("$buildDir/outputs")
+def outputsFolder = file("$buildDir/allOutputs")
 
 def versionFile = file("$outputsFolder/version.txt")
 
@@ -162,26 +60,37 @@ task outputVersions() {
     }
 }
 
-task build() {}
+task libraryBuild() {}
 
 build.dependsOn outputVersions
 
-task clean(type: Delete) {
-    delete buildDir
+task copyAllOutputs(type: Copy) {
+    destinationDir outputsFolder
+}
+
+build.dependsOn copyAllOutputs
+copyAllOutputs.dependsOn outputVersions
+
+ext.addTaskToCopyAllOutputs = { task ->
+    copyAllOutputs.dependsOn task
+    copyAllOutputs.inputs.file task.archivePath
+    copyAllOutputs.from task.archivePath
 }
 
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
-    apply plugin: 'checkstyle'
+
+    def subproj = it
+
+    plugins.withType(NativeComponentPlugin) {
+        subproj.apply plugin: MultiBuilds
+    }
+
+    apply from: "${rootDir}/shared/java/javastyle.gradle"
 
     repositories {
         mavenCentral()
-    }
-
-    checkstyle {
-        toolVersion = "8.1"
-        configFile = new File(rootDir, "styleguide/checkstyle.xml")
     }
 
     // Disables doclint in java 8.
@@ -190,13 +99,12 @@ subprojects {
             options.addStringOption('Xdoclint:none', '-quiet')
         }
     }
-    ext.setupWpilibRepo = { publishing ->
-        publishing.repositories.maven {
-            url = WPILibVersion.mavenLocalUrl
-        }
-    }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.1'
+ext.getCurrentArch = {
+    return NativePlatforms.desktop
+}
+
+wrapper {
+    gradleVersion = '5.4.1'
 }

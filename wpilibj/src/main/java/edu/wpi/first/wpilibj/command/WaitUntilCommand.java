@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,8 +14,7 @@ import edu.wpi.first.wpilibj.Timer;
  * some value, then continue to the next command.
  */
 public class WaitUntilCommand extends Command {
-
-  private double m_time;
+  private final double m_time;
 
   public WaitUntilCommand(double time) {
     super("WaitUntil(" + time + ")");
@@ -25,6 +24,7 @@ public class WaitUntilCommand extends Command {
   /**
    * Check if we've reached the actual finish time.
    */
+  @Override
   public boolean isFinished() {
     return Timer.getMatchTime() >= m_time;
   }

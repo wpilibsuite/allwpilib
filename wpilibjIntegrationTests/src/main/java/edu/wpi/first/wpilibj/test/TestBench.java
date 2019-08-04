@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,16 +18,12 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Jaguar;
-import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
-import edu.wpi.first.wpilibj.fixtures.FilterNoiseFixture;
-import edu.wpi.first.wpilibj.fixtures.FilterOutputFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
@@ -38,7 +34,6 @@ import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
  * TestBench}.
  */
 public final class TestBench {
-
   /**
    * The time that it takes to have a motor go from rotating at full speed to completely stopped.
    */
@@ -66,17 +61,6 @@ public final class TestBench {
   public static final int DIOCrossConnectA2 = 7;
   public static final int DIOCrossConnectA1 = 6;
 
-  // Filter constants
-  public static final double kStdDev = 10.0;
-  public static final double kFilterStep = 0.005;
-  public static final double kFilterTime = 2.0;
-  public static final double kSinglePoleIIRTimeConstant = 0.015915;
-  public static final double kSinglePoleIIRExpectedOutput = -3.2172003;
-  public static final double kHighPassTimeConstant = 0.006631;
-  public static final double kHighPassExpectedOutput = 10.074717;
-  public static final int kMovAvgTaps = 6;
-  public static final double kMovAvgExpectedOutput = -10.191644;
-
   /**
    * The Singleton instance of the Test Bench.
    */
@@ -96,8 +80,7 @@ public final class TestBench {
    * @return a freshly allocated Talon, Encoder pair
    */
   public MotorEncoderFixture<Talon> getTalonPair() {
-
-    MotorEncoderFixture<Talon> talonPair = new MotorEncoderFixture<Talon>() {
+    return new MotorEncoderFixture<Talon>() {
       @Override
       protected Talon giveSpeedController() {
         return new Talon(kTalonChannel);
@@ -118,7 +101,6 @@ public final class TestBench {
         return kTalonPDPChannel;
       }
     };
-    return talonPair;
   }
 
   /**
@@ -128,8 +110,7 @@ public final class TestBench {
    * @return a freshly allocated Victor, Encoder pair
    */
   public MotorEncoderFixture<Victor> getVictorPair() {
-
-    MotorEncoderFixture<Victor> vicPair = new MotorEncoderFixture<Victor>() {
+    return new MotorEncoderFixture<Victor>() {
       @Override
       protected Victor giveSpeedController() {
         return new Victor(kVictorChannel);
@@ -150,7 +131,6 @@ public final class TestBench {
         return kVictorPDPChannel;
       }
     };
-    return vicPair;
   }
 
   /**
@@ -160,7 +140,7 @@ public final class TestBench {
    * @return a freshly allocated Jaguar, Encoder pair
    */
   public MotorEncoderFixture<Jaguar> getJaguarPair() {
-    MotorEncoderFixture<Jaguar> jagPair = new MotorEncoderFixture<Jaguar>() {
+    return new MotorEncoderFixture<Jaguar>() {
       @Override
       protected Jaguar giveSpeedController() {
         return new Jaguar(kJaguarChannel);
@@ -181,7 +161,6 @@ public final class TestBench {
         return kJaguarPDPChannel;
       }
     };
-    return jagPair;
   }
 
   /**
@@ -190,7 +169,8 @@ public final class TestBench {
    * @return a freshly allocated Servo's and a freshly allocated Gyroscope
    */
   public TiltPanCameraFixture getTiltPanCam() {
-    TiltPanCameraFixture tpcam = new TiltPanCameraFixture() {
+
+    return new TiltPanCameraFixture() {
       @Override
       protected AnalogGyro giveGyro() {
         AnalogGyro gyro = new AnalogGyro(kGyroChannel);
@@ -215,13 +195,10 @@ public final class TestBench {
         return new Servo(kPanServoChannel);
       }
     };
-
-    return tpcam;
   }
 
   public DIOCrossConnectFixture getDIOCrossConnectFixture(int inputPort, int outputPort) {
-    DIOCrossConnectFixture dio = new DIOCrossConnectFixture(inputPort, outputPort);
-    return dio;
+    return new DIOCrossConnectFixture(inputPort, outputPort);
   }
 
   /**
@@ -246,7 +223,7 @@ public final class TestBench {
 
   @SuppressWarnings("JavadocMethod")
   public static AnalogCrossConnectFixture getAnalogCrossConnectFixture() {
-    AnalogCrossConnectFixture analogIO = new AnalogCrossConnectFixture() {
+    return new AnalogCrossConnectFixture() {
       @Override
       protected AnalogOutput giveAnalogOutput() {
         return new AnalogOutput(0);
@@ -257,13 +234,11 @@ public final class TestBench {
         return new AnalogInput(2);
       }
     };
-    return analogIO;
   }
 
   @SuppressWarnings("JavadocMethod")
   public static RelayCrossConnectFixture getRelayCrossConnectFixture() {
-    RelayCrossConnectFixture relay = new RelayCrossConnectFixture() {
-
+    return new RelayCrossConnectFixture() {
       @Override
       protected Relay giveRelay() {
         return new Relay(0);
@@ -279,7 +254,6 @@ public final class TestBench {
         return new DigitalInput(19);
       }
     };
-    return relay;
   }
 
   /**
@@ -345,103 +319,6 @@ public final class TestBench {
         false));
     assert encoderPortPairs.size() == 8;
     return encoderPortPairs;
-  }
-
-  /**
-   * Constructs a new set of objects representing a single-pole IIR filter with a noisy data source.
-   *
-   * @return a single-pole IIR filter with a noisy data source
-   */
-  public FilterNoiseFixture<LinearDigitalFilter> getSinglePoleIIRNoiseFixture() {
-    return new FilterNoiseFixture<LinearDigitalFilter>() {
-      @Override
-      protected LinearDigitalFilter giveFilter(PIDSource source) {
-        return LinearDigitalFilter.singlePoleIIR(source,
-            kSinglePoleIIRTimeConstant,
-            kFilterStep);
-      }
-    };
-  }
-
-  /**
-   * Constructs a new set of objects representing a moving average filter with a noisy data source
-   * using a linear digital filter.
-   *
-   * @return a moving average filter with a noisy data source
-   */
-  public FilterNoiseFixture<LinearDigitalFilter> getMovAvgNoiseFixture() {
-    return new FilterNoiseFixture<LinearDigitalFilter>() {
-      @Override
-      protected LinearDigitalFilter giveFilter(PIDSource source) {
-        return LinearDigitalFilter.movingAverage(source, kMovAvgTaps);
-      }
-    };
-  }
-
-  /**
-   * Constructs a new set of objects representing a single-pole IIR filter with a repeatable data
-   * source.
-   *
-   * @return a single-pole IIR filter with a repeatable data source
-   */
-  public FilterOutputFixture<LinearDigitalFilter> getSinglePoleIIROutputFixture() {
-    return new FilterOutputFixture<LinearDigitalFilter>(kSinglePoleIIRExpectedOutput) {
-      @Override
-      protected LinearDigitalFilter giveFilter() {
-        m_data = new DataWrapper(getData);
-        return LinearDigitalFilter.singlePoleIIR(m_data,
-            kSinglePoleIIRTimeConstant,
-            kFilterStep);
-      }
-    };
-  }
-
-  /**
-   * Constructs a new set of objects representing a high-pass filter with a repeatable data source.
-   *
-   * @return a high-pass filter with a repeatable data source
-   */
-  public FilterOutputFixture<LinearDigitalFilter> getHighPassOutputFixture() {
-    return new FilterOutputFixture<LinearDigitalFilter>(kHighPassExpectedOutput) {
-      @Override
-      protected LinearDigitalFilter giveFilter() {
-        m_data = new DataWrapper(getData);
-        return LinearDigitalFilter.highPass(m_data, kHighPassTimeConstant,
-            kFilterStep);
-      }
-    };
-  }
-
-  /**
-   * Constructs a new set of objects representing a moving average filter with a repeatable data
-   * source using a linear digital filter.
-   *
-   * @return a moving average filter with a repeatable data source
-   */
-  public FilterOutputFixture<LinearDigitalFilter> getMovAvgOutputFixture() {
-    return new FilterOutputFixture<LinearDigitalFilter>(kMovAvgExpectedOutput) {
-      @Override
-      protected LinearDigitalFilter giveFilter() {
-        m_data = new DataWrapper(getData);
-        return LinearDigitalFilter.movingAverage(m_data, kMovAvgTaps);
-      }
-    };
-  }
-
-  /**
-   * Constructs a new set of objects representing a moving average filter with a repeatable data
-   * source using a linear digital filter.
-   *
-   * @return a moving average filter with a repeatable data source
-   */
-  public FilterOutputFixture<LinearDigitalFilter> getPulseFixture() {
-    return new FilterOutputFixture<LinearDigitalFilter>(0.0) {
-      @Override
-      protected LinearDigitalFilter giveFilter() {
-        m_data = new DataWrapper(getPulseData);
-        return LinearDigitalFilter.movingAverage(m_data, kMovAvgTaps);
-      }
-    };
   }
 
   /**

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,33 +8,34 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.SPIJNI;
+import edu.wpi.first.hal.AccumulatorResult;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SPIJNI;
 
 /**
  * Represents a SPI bus port.
  */
-public class SPI {
-
+@SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.TooManyMethods"})
+public class SPI implements AutoCloseable {
   public enum Port {
     kOnboardCS0(0), kOnboardCS1(1), kOnboardCS2(2), kOnboardCS3(3), kMXP(4);
 
     @SuppressWarnings("MemberName")
-    public int value;
+    public final int value;
 
     Port(int value) {
       this.value = value;
     }
   }
 
-  private static int devices = 0;
-
   private int m_port;
-  private int m_bitOrder;
-  private int m_clockPolarity;
-  private int m_dataOnTrailing;
+  private int m_msbFirst;
+  private int m_clockIdleHigh;
+  private int m_sampleOnTrailing;
 
   /**
    * Constructor.
@@ -43,19 +44,22 @@ public class SPI {
    */
   public SPI(Port port) {
     m_port = (byte) port.value;
-    devices++;
 
     SPIJNI.spiInitialize(m_port);
 
-    HAL.report(tResourceType.kResourceType_SPI, devices);
+    HAL.report(tResourceType.kResourceType_SPI, port.value);
   }
 
-  /**
-   * Free the resources used by this object.
-   */
+
+  @Deprecated
   public void free() {
+    close();
+  }
+
+  @Override
+  public void close() {
     if (m_accum != null) {
-      m_accum.free();
+      m_accum.close();
       m_accum = null;
     }
     SPIJNI.spiClose(m_port);
@@ -76,8 +80,8 @@ public class SPI {
    * first.
    */
   public final void setMSBFirst() {
-    m_bitOrder = 1;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_msbFirst = 1;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -85,8 +89,8 @@ public class SPI {
    * first.
    */
   public final void setLSBFirst() {
-    m_bitOrder = 0;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_msbFirst = 0;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -94,8 +98,8 @@ public class SPI {
    * or clock idle high.
    */
   public final void setClockActiveLow() {
-    m_clockPolarity = 1;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_clockIdleHigh = 1;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
@@ -103,25 +107,51 @@ public class SPI {
    * or clock idle low.
    */
   public final void setClockActiveHigh() {
-    m_clockPolarity = 0;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_clockIdleHigh = 0;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  }
+
+  /**
+   * Configure that the data is stable on the leading edge and the data changes on the trailing
+   * edge.
+   */
+  public final void setSampleDataOnLeadingEdge() {
+    m_sampleOnTrailing = 0;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  }
+
+  /**
+   * Configure that the data is stable on the trailing edge and the data changes on the leading
+   * edge.
+   */
+  public final void setSampleDataOnTrailingEdge() {
+    m_sampleOnTrailing = 1;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
    * Configure that the data is stable on the falling edge and the data changes on the rising edge.
+   * Note this gets reversed is setClockActiveLow is set.
+   * @deprecated use {@link #setSampleDataOnTrailingEdge()} in most cases.
    */
+  @Deprecated
   public final void setSampleDataOnFalling() {
-    m_dataOnTrailing = 1;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_sampleOnTrailing = 1;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
   /**
    * Configure that the data is stable on the rising edge and the data changes on the falling edge.
+   * Note this gets reversed is setClockActiveLow is set.
+   * @deprecated use {@link #setSampleDataOnLeadingEdge()} in most cases.
    */
+  @Deprecated
   public final void setSampleDataOnRising() {
-    m_dataOnTrailing = 0;
-    SPIJNI.spiSetOpts(m_port, m_bitOrder, m_dataOnTrailing, m_clockPolarity);
+    m_sampleOnTrailing = 0;
+    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
+
+
 
   /**
    * Configure the chip select line to be active high.
@@ -158,6 +188,7 @@ public class SPI {
    *
    * @param dataToSend The buffer containing the data to send.
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public int write(ByteBuffer dataToSend, int size) {
     if (dataToSend.hasArray()) {
       return write(dataToSend.array(), size);
@@ -202,6 +233,7 @@ public class SPI {
    * @param dataReceived The buffer to be filled with the received data.
    * @param size         The length of the transaction, in bytes
    */
+  @SuppressWarnings("ByteBufferBackingArray")
   public int read(boolean initiate, ByteBuffer dataReceived, int size) {
     if (dataReceived.hasArray()) {
       return read(initiate, dataReceived.array(), size);
@@ -239,6 +271,7 @@ public class SPI {
    * @param dataReceived Buffer to receive data from the device.
    * @param size         The length of the transaction, in bytes
    */
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "ByteBufferBackingArray"})
   public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, int size) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {
       return transaction(dataToSend.array(), dataReceived.array(), size);
@@ -337,23 +370,26 @@ public class SPI {
    * <p>Transfers may be made a byte at a time, so it's necessary for the caller
    * to handle cases where an entire transfer has not been completed.
    *
-   * <p>Blocks until numToRead bytes have been read or timeout expires.
-   * May be called with numToRead=0 to retrieve how many bytes are available.
+   * <p>Each received data sequence consists of a timestamp followed by the
+   * received data bytes, one byte per word (in the least significant byte).
+   * The length of each received data sequence is the same as the combined
+   * size of the data and zeroSize set in setAutoTransmitData().
    *
-   * @param buffer buffer where read bytes are stored
-   * @param numToRead number of bytes to read
+   * <p>Blocks until numToRead words have been read or timeout expires.
+   * May be called with numToRead=0 to retrieve how many words are available.
+   *
+   * @param buffer buffer where read words are stored
+   * @param numToRead number of words to read
    * @param timeout timeout in seconds (ms resolution)
-   * @return Number of bytes remaining to be read
+   * @return Number of words remaining to be read
    */
   public int readAutoReceivedData(ByteBuffer buffer, int numToRead, double timeout) {
-    if (buffer.hasArray()) {
-      return readAutoReceivedData(buffer.array(), numToRead, timeout);
-    }
     if (!buffer.isDirect()) {
       throw new IllegalArgumentException("must be a direct buffer");
     }
-    if (buffer.capacity() < numToRead) {
-      throw new IllegalArgumentException("buffer is too small, must be at least " + numToRead);
+    if (buffer.capacity() < numToRead * 4) {
+      throw new IllegalArgumentException("buffer is too small, must be at least "
+          + (numToRead * 4));
     }
     return SPIJNI.spiReadAutoReceivedData(m_port, buffer, numToRead, timeout);
   }
@@ -364,15 +400,20 @@ public class SPI {
    * <p>Transfers may be made a byte at a time, so it's necessary for the caller
    * to handle cases where an entire transfer has not been completed.
    *
-   * <p>Blocks until numToRead bytes have been read or timeout expires.
-   * May be called with numToRead=0 to retrieve how many bytes are available.
+   * <p>Each received data sequence consists of a timestamp followed by the
+   * received data bytes, one byte per word (in the least significant byte).
+   * The length of each received data sequence is the same as the combined
+   * size of the data and zeroSize set in setAutoTransmitData().
    *
-   * @param buffer array where read bytes are stored
-   * @param numToRead number of bytes to read
+   * <p>Blocks until numToRead words have been read or timeout expires.
+   * May be called with numToRead=0 to retrieve how many words are available.
+   *
+   * @param buffer array where read words are stored
+   * @param numToRead number of words to read
    * @param timeout timeout in seconds (ms resolution)
-   * @return Number of bytes remaining to be read
+   * @return Number of words remaining to be read
    */
-  public int readAutoReceivedData(byte[] buffer, int numToRead, double timeout) {
+  public int readAutoReceivedData(int[] buffer, int numToRead, double timeout) {
     if (buffer.length < numToRead) {
       throw new IllegalArgumentException("buffer is too small, must be at least " + numToRead);
     }
@@ -391,12 +432,15 @@ public class SPI {
 
   private static final int kAccumulateDepth = 2048;
 
-  private static class Accumulator {
+  @SuppressWarnings("PMD.TooManyFields")
+  private static class Accumulator implements AutoCloseable {
     Accumulator(int port, int xferSize, int validMask, int validValue, int dataShift,
                 int dataSize, boolean isSigned, boolean bigEndian) {
       m_notifier = new Notifier(this::update);
-      m_buf = ByteBuffer.allocateDirect(xferSize * kAccumulateDepth);
-      m_xferSize = xferSize;
+      m_buf = ByteBuffer.allocateDirect((xferSize + 1) * kAccumulateDepth * 4)
+          .order(ByteOrder.nativeOrder());
+      m_intBuf = m_buf.asIntBuffer();
+      m_xferSize = xferSize + 1;  // +1 for timestamp
       m_validMask = validMask;
       m_validValue = validValue;
       m_dataShift = dataShift;
@@ -407,20 +451,25 @@ public class SPI {
       m_port = port;
     }
 
-    void free() {
-      m_notifier.stop();
+    @Override
+    public void close() {
+      m_notifier.close();
     }
 
     final Notifier m_notifier;
     final ByteBuffer m_buf;
+    final IntBuffer m_intBuf;
     final Object m_mutex = new Object();
 
     long m_value;
     int m_count;
     int m_lastValue;
+    long m_lastTimestamp;
+    double m_integratedValue;
 
     int m_center;
     int m_deadband;
+    double m_integratedCenter;
 
     final int m_validMask;
     final int m_validValue;
@@ -432,6 +481,7 @@ public class SPI {
     final boolean m_bigEndian;  // is response big endian?
     final int m_port;
 
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     void update() {
       synchronized (m_mutex) {
         boolean done = false;
@@ -456,17 +506,20 @@ public class SPI {
 
           // loop over all responses
           for (int off = 0; off < numToRead; off += m_xferSize) {
+            // get timestamp from first word
+            long timestamp = m_intBuf.get(off) & 0xffffffffL;
+
             // convert from bytes
             int resp = 0;
             if (m_bigEndian) {
-              for (int i = 0; i < m_xferSize; ++i) {
+              for (int i = 1; i < m_xferSize; ++i) {
                 resp <<= 8;
-                resp |= ((int) m_buf.get(off + i)) & 0xff;
+                resp |= m_intBuf.get(off + i) & 0xff;
               }
             } else {
-              for (int i = m_xferSize - 1; i >= 0; --i) {
+              for (int i = m_xferSize - 1; i >= 1; --i) {
                 resp <<= 8;
-                resp |= ((int) m_buf.get(off + i)) & 0xff;
+                resp |= m_intBuf.get(off + i) & 0xff;
               }
             }
 
@@ -480,10 +533,21 @@ public class SPI {
                 data -= m_dataMax;
               }
               // center offset
+              int dataNoCenter = data;
               data -= m_center;
               // only accumulate if outside deadband
               if (data < -m_deadband || data > m_deadband) {
                 m_value += data;
+                if (m_count != 0) {
+                  // timestamps use the 1us FPGA clock; also handle rollover
+                  if (timestamp >= m_lastTimestamp) {
+                    m_integratedValue += dataNoCenter * (timestamp - m_lastTimestamp)
+                        * 1e-6 - m_integratedCenter;
+                  } else {
+                    m_integratedValue += dataNoCenter * ((1L << 32) - m_lastTimestamp + timestamp)
+                        * 1e-6 - m_integratedCenter;
+                  }
+                }
               }
               ++m_count;
               m_lastValue = data;
@@ -491,13 +555,14 @@ public class SPI {
               // no data from the sensor; just clear the last value
               m_lastValue = 0;
             }
+            m_lastTimestamp = timestamp;
           }
         }
       }
     }
   }
 
-  private Accumulator m_accum = null;
+  private Accumulator m_accum;
 
   /**
    * Initialize the accumulator.
@@ -544,8 +609,10 @@ public class SPI {
    * Frees the accumulator.
    */
   public void freeAccumulator() {
-    m_accum.free();
-    m_accum = null;
+    if (m_accum != null) {
+      m_accum.close();
+      m_accum = null;
+    }
     freeAuto();
   }
 
@@ -560,6 +627,8 @@ public class SPI {
       m_accum.m_value = 0;
       m_accum.m_count = 0;
       m_accum.m_lastValue = 0;
+      m_accum.m_lastTimestamp = 0;
+      m_accum.m_integratedValue = 0;
     }
   }
 
@@ -674,6 +743,59 @@ public class SPI {
       m_accum.update();
       result.value = m_accum.m_value;
       result.count = m_accum.m_count;
+    }
+  }
+
+  /**
+   * Set the center value of the accumulator integrator.
+   *
+   * <p>The center value is subtracted from each value*dt before it is added to the
+   * integrated value. This is used for the center value of devices like gyros
+   * and accelerometers to take the device offset into account when integrating.
+   */
+  public void setAccumulatorIntegratedCenter(double center) {
+    if (m_accum == null) {
+      return;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.m_integratedCenter = center;
+    }
+  }
+
+  /**
+   * Read the integrated value.  This is the sum of (each value * time between
+   * values).
+   *
+   * @return The integrated value accumulated since the last Reset().
+   */
+  public double getAccumulatorIntegratedValue() {
+    if (m_accum == null) {
+      return 0;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.update();
+      return m_accum.m_integratedValue;
+    }
+  }
+
+  /**
+   * Read the average of the integrated value.  This is the sum of (each value
+   * times the time between values), divided by the count.
+   *
+   * @return The average of the integrated value accumulated since the last
+   *         Reset().
+   */
+  public double getAccumulatorIntegratedAverage() {
+    if (m_accum == null) {
+      return 0;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.update();
+      if (m_accum.m_count <= 1) {
+        return 0.0;
+      }
+      // count-1 due to not integrating the first value received
+      return m_accum.m_integratedValue / (m_accum.m_count - 1);
     }
   }
 }

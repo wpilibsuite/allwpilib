@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,11 +7,11 @@
 
 package edu.wpi.first.wpilibj.vision;
 
+import org.opencv.core.Mat;
+
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.VideoSource;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
-import org.opencv.core.Mat;
+import edu.wpi.first.cameraserver.CameraServerSharedStore;
 
 /**
  * A vision runner is a convenient wrapper object to make it easy to run vision pipelines
@@ -20,10 +20,12 @@ import org.opencv.core.Mat;
  *
  * @see VisionPipeline
  * @see VisionThread
- * @see edu.wpi.first.wpilibj.vision
+ * @see <a href="package-summary.html">vision</a>
+ *
+ * @deprecated Replaced with edu.wpi.first.vision.VisionRunner
  */
+@Deprecated
 public class VisionRunner<P extends VisionPipeline> {
-
   private final CvSink m_cvSink = new CvSink("VisionRunner CvSink");
   private final P m_pipeline;
   private final Mat m_image = new Mat();
@@ -37,7 +39,6 @@ public class VisionRunner<P extends VisionPipeline> {
    */
   @FunctionalInterface
   public interface Listener<P extends VisionPipeline> {
-
     /**
      * Called when the pipeline has run. This shouldn't take much time to run because it will delay
      * later calls to the pipeline's {@link VisionPipeline#process process} method. Copying the
@@ -77,15 +78,21 @@ public class VisionRunner<P extends VisionPipeline> {
    * thread using a {@link VisionThread}.</p>
    */
   public void runOnce() {
-    if (Thread.currentThread().getId() == RobotBase.MAIN_THREAD_ID) {
+    Long id = CameraServerSharedStore.getCameraServerShared().getRobotMainThreadId();
+
+    if (id != null && Thread.currentThread().getId() == id) {
       throw new IllegalStateException(
           "VisionRunner.runOnce() cannot be called from the main robot thread");
     }
+    runOnceInternal();
+  }
+
+  private void runOnceInternal() {
     long frameTime = m_cvSink.grabFrame(m_image);
     if (frameTime == 0) {
       // There was an error, report it
       String error = m_cvSink.getError();
-      DriverStation.reportError(error, true);
+      CameraServerSharedStore.getCameraServerShared().reportDriverStationError(error);
     } else {
       // No errors, process the image
       m_pipeline.process(m_image);
@@ -104,12 +111,14 @@ public class VisionRunner<P extends VisionPipeline> {
    * @see VisionThread
    */
   public void runForever() {
-    if (Thread.currentThread().getId() == RobotBase.MAIN_THREAD_ID) {
+    Long id = CameraServerSharedStore.getCameraServerShared().getRobotMainThreadId();
+
+    if (id != null && Thread.currentThread().getId() == id) {
       throw new IllegalStateException(
           "VisionRunner.runForever() cannot be called from the main robot thread");
     }
     while (m_enabled && !Thread.interrupted()) {
-      runOnce();
+      runOnceInternal();
     }
   }
 

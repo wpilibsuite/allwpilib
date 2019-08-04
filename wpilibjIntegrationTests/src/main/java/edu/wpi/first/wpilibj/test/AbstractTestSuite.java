@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,17 +7,17 @@
 
 package edu.wpi.first.wpilibj.test;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.Request;
-import org.junit.runners.Suite.SuiteClasses;
-
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.Request;
+import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * Allows tests suites and tests to be run selectively from the command line using a regex text

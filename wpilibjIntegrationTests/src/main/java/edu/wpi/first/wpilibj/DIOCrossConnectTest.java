@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,15 +7,15 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.Collection;
+import java.util.logging.Logger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import java.util.Collection;
-import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.test.TestBench;
@@ -70,13 +70,13 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
+  public static void tearDownAfterClass() {
     dio.teardown();
     dio = null;
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     dio.reset();
   }
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,9 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.NotifierJNI;
 
 /**
  * TimedRobot implements the IterativeRobotBase robot program framework.
@@ -19,53 +20,80 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * <p>periodic() functions from the base class are called on an interval by a Notifier instance.
  */
 public class TimedRobot extends IterativeRobotBase {
-  public static final double DEFAULT_PERIOD = 0.02;
+  public static final double kDefaultPeriod = 0.02;
 
-  private double m_period = DEFAULT_PERIOD;
+  // The C pointer to the notifier object. We don't use it directly, it is
+  // just passed to the JNI bindings.
+  private final int m_notifier = NotifierJNI.initializeNotifier();
 
-  // Prevents loop from starting if user calls setPeriod() in robotInit()
-  private boolean m_startLoop = false;
+  // The absolute expiration time
+  private double m_expirationTime;
 
-  private Notifier m_loop = new Notifier(() -> {
-    loopFunc();
-  });
+  /**
+   * Constructor for TimedRobot.
+   */
+  protected TimedRobot() {
+    this(kDefaultPeriod);
+  }
 
-  public TimedRobot() {
-    // HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Periodic);
-    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Iterative);
+  /**
+   * Constructor for TimedRobot.
+   *
+   * @param period Period in seconds.
+   */
+  protected TimedRobot(double period) {
+    super(period);
+
+    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
+  }
+
+  @Override
+  @SuppressWarnings("NoFinalizer")
+  protected void finalize() {
+    NotifierJNI.stopNotifier(m_notifier);
+    NotifierJNI.cleanNotifier(m_notifier);
   }
 
   /**
    * Provide an alternate "main loop" via startCompetition().
    */
+  @Override
+  @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
     robotInit();
 
     // Tell the DS that the robot is ready to be enabled
     HAL.observeUserProgramStarting();
 
+    m_expirationTime = RobotController.getFPGATime() * 1e-6 + m_period;
+    updateAlarm();
+
     // Loop forever, calling the appropriate mode-dependent function
-    m_startLoop = true;
-    m_loop.startPeriodic(m_period);
     while (true) {
-      try {
-        Thread.sleep(1000 * 60 * 60 * 24);
-      } catch (InterruptedException ex) {
-        Thread.currentThread().interrupt();
+      long curTime = NotifierJNI.waitForNotifierAlarm(m_notifier);
+      if (curTime == 0) {
+        break;
       }
+
+      m_expirationTime += m_period;
+      updateAlarm();
+
+      loopFunc();
     }
   }
 
   /**
-   * Set time period between calls to Periodic() functions.
-   *
-   * @param period Period in seconds.
+   * Get time period between calls to Periodic() functions.
    */
-  public void setPeriod(double period) {
-    m_period = period;
+  public double getPeriod() {
+    return m_period;
+  }
 
-    if (m_startLoop) {
-      m_loop.startPeriodic(m_period);
-    }
+  /**
+   * Update the alarm hardware to reflect the next alarm.
+   */
+  @SuppressWarnings("UnsafeFinalization")
+  private void updateAlarm() {
+    NotifierJNI.updateNotifierAlarm(m_notifier, (long) (m_expirationTime * 1e6));
   }
 }

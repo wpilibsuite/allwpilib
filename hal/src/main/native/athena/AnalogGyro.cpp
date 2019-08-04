@@ -1,18 +1,21 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/AnalogGyro.h"
+#include "hal/AnalogGyro.h"
 
 #include <thread>
 
+#include <wpi/raw_ostream.h>
+
 #include "AnalogInternal.h"
-#include "HAL/AnalogAccumulator.h"
-#include "HAL/AnalogInput.h"
-#include "HAL/handles/IndexedHandleResource.h"
+#include "HALInitializer.h"
+#include "hal/AnalogAccumulator.h"
+#include "hal/AnalogInput.h"
+#include "hal/handles/IndexedHandleResource.h"
 
 namespace {
 
@@ -56,6 +59,7 @@ extern "C" {
 
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
                                         int32_t* status) {
+  hal::init::CheckInit();
   if (!HAL_IsAccumulatorChannel(analogHandle, status)) {
     if (*status == 0) {
       *status = HAL_INVALID_ACCUMULATOR_CHANNEL;
@@ -167,6 +171,8 @@ void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
 
   HAL_InitAccumulator(gyro->handle, status);
   if (*status != 0) return;
+  wpi::outs() << "Calibrating analog gyro for " << kCalibrationSampleTime
+              << " seconds." << '\n';
   Wait(kCalibrationSampleTime);
 
   int64_t value;

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj.command;
 import java.util.Enumeration;
 
 import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -40,7 +39,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @see CommandGroup
  * @see IllegalUseOfCommandException
  */
-public abstract class Command extends SendableBase implements Sendable {
+@SuppressWarnings("PMD.TooManyMethods")
+public abstract class Command extends SendableBase {
   /**
    * The time since this command was initialized.
    */
@@ -54,7 +54,7 @@ public abstract class Command extends SendableBase implements Sendable {
   /**
    * Whether or not this command has been initialized.
    */
-  private boolean m_initialized = false;
+  private boolean m_initialized;
 
   /**
    * The required subsystems.
@@ -64,7 +64,7 @@ public abstract class Command extends SendableBase implements Sendable {
   /**
    * Whether or not it is running.
    */
-  private boolean m_running = false;
+  private boolean m_running;
 
   /**
    * Whether or not it is interruptible.
@@ -74,17 +74,22 @@ public abstract class Command extends SendableBase implements Sendable {
   /**
    * Whether or not it has been canceled.
    */
-  private boolean m_canceled = false;
+  private boolean m_canceled;
 
   /**
    * Whether or not it has been locked.
    */
-  private boolean m_locked = false;
+  private boolean m_locked;
 
   /**
    * Whether this command should run when the robot is disabled.
    */
-  private boolean m_runWhenDisabled = false;
+  private boolean m_runWhenDisabled;
+
+  /**
+   * Whether or not this command has completed running.
+   */
+  private boolean m_completed;
 
   /**
    * The {@link CommandGroup} this is in.
@@ -131,6 +136,45 @@ public abstract class Command extends SendableBase implements Sendable {
   }
 
   /**
+   * Creates a new command with the given timeout and a default name. The default name is the name
+   * of the class.
+   *
+   * @param subsystem the subsystem that this command requires
+   * @throws IllegalArgumentException if given a negative timeout
+   * @see Command#isTimedOut() isTimedOut()
+   */
+  public Command(Subsystem subsystem) {
+    this();
+    requires(subsystem);
+  }
+
+  /**
+   * Creates a new command with the given name.
+   *
+   * @param name      the name for this command
+   * @param subsystem the subsystem that this command requires
+   * @throws IllegalArgumentException if name is null
+   */
+  public Command(String name, Subsystem subsystem) {
+    this(name);
+    requires(subsystem);
+  }
+
+  /**
+   * Creates a new command with the given timeout and a default name. The default name is the name
+   * of the class.
+   *
+   * @param timeout   the time (in seconds) before this command "times out"
+   * @param subsystem the subsystem that this command requires
+   * @throws IllegalArgumentException if given a negative timeout
+   * @see Command#isTimedOut() isTimedOut()
+   */
+  public Command(double timeout, Subsystem subsystem) {
+    this(timeout);
+    requires(subsystem);
+  }
+
+  /**
    * Creates a new command with the given name and timeout.
    *
    * @param name    the name of the command
@@ -144,6 +188,21 @@ public abstract class Command extends SendableBase implements Sendable {
       throw new IllegalArgumentException("Timeout must not be negative.  Given:" + timeout);
     }
     m_timeout = timeout;
+  }
+
+  /**
+   * Creates a new command with the given name and timeout.
+   *
+   * @param name      the name of the command
+   * @param timeout   the time (in seconds) before this command "times out"
+   * @param subsystem the subsystem that this command requires
+   * @throws IllegalArgumentException if given a negative timeout
+   * @throws IllegalArgumentException if given a negative timeout or name was null.
+   * @see Command#isTimedOut() isTimedOut()
+   */
+  public Command(String name, double timeout, Subsystem subsystem) {
+    this(name, timeout);
+    requires(subsystem);
   }
 
   /**
@@ -208,6 +267,7 @@ public abstract class Command extends SendableBase implements Sendable {
     m_initialized = false;
     m_canceled = false;
     m_running = false;
+    m_completed = true;
   }
 
   /**
@@ -375,7 +435,7 @@ public abstract class Command extends SendableBase implements Sendable {
   /**
    * Returns whether the command has a parent.
    *
-   * @param True if the command has a parent.
+   * @return true if the command has a parent.
    */
   synchronized boolean isParented() {
     return m_parent != null;
@@ -404,6 +464,7 @@ public abstract class Command extends SendableBase implements Sendable {
           "Can not start a command that is a part of a command group");
     }
     Scheduler.getInstance().add(this);
+    m_completed = false;
   }
 
   /**
@@ -465,6 +526,15 @@ public abstract class Command extends SendableBase implements Sendable {
    */
   public synchronized boolean isCanceled() {
     return m_canceled;
+  }
+
+  /**
+   * Whether or not this command has completed running.
+   *
+   * @return whether or not this command has completed running.
+   */
+  public synchronized boolean isCompleted() {
+    return m_completed;
   }
 
   /**
@@ -540,7 +610,7 @@ public abstract class Command extends SendableBase implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Command");
     builder.addStringProperty(".name", this::getName, null);
-    builder.addBooleanProperty("running", this::isRunning, (value) -> {
+    builder.addBooleanProperty("running", this::isRunning, value -> {
       if (value) {
         if (!isRunning()) {
           start();

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,8 +13,7 @@ import edu.wpi.first.wpilibj.Timer;
 /**
  * Simulates an encoder for testing purposes.
  */
-public class FakeCounterSource {
-
+public class FakeCounterSource implements AutoCloseable {
   private Thread m_task;
   private int m_count;
   private int m_milliSec;
@@ -25,13 +24,13 @@ public class FakeCounterSource {
    * Thread object that allows emulation of an encoder.
    */
   private class EncoderThread extends Thread {
-
     FakeCounterSource m_encoder;
 
     EncoderThread(FakeCounterSource encode) {
       m_encoder = encode;
     }
 
+    @Override
     public void run() {
       m_encoder.m_output.set(false);
       try {
@@ -72,10 +71,11 @@ public class FakeCounterSource {
   /**
    * Destroy Object with minimum memory leak.
    */
-  public void free() {
+  @Override
+  public void close() {
     m_task = null;
     if (m_allocated) {
-      m_output.free();
+      m_output.close();
       m_output = null;
       m_allocated = false;
     }

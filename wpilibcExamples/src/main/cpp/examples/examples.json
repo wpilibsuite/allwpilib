@@ -1,0 +1,247 @@
+[
+  {
+    "name": "Motor Controller",
+    "description": "Demonstrate controlling a single motor with a Joystick.",
+    "tags": [
+      "Robot and Motor",
+      "Actuators",
+      "Joystick",
+      "Complete List"
+    ],
+    "foldername": "MotorControl",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Motor Control With Encoder",
+    "description": "Demonstrate controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.",
+    "tags": [
+      "Robot and Motor",
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick",
+      "Complete List"
+    ],
+    "foldername": "MotorControlEncoder",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Relay",
+    "description": "Demonstrate controlling a Relay from Joystick buttons.",
+    "tags": [
+      "Actuators",
+      "Joystick",
+      "Complete List"
+    ],
+    "foldername": "Relay",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "PDP CAN Monitoring",
+    "description": "Demonstrate using CAN to monitor the voltage, current, and temperature in the Power Distribution Panel.",
+    "tags": [
+      "Complete List",
+      "CAN",
+      "Sensors"
+    ],
+    "foldername": "CANPDP",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Solenoids",
+    "description": "Demonstrate controlling a single and double solenoid from Joystick buttons.",
+    "tags": [
+      "Actuators",
+      "Joystick",
+      "Pneumatics",
+      "Complete List"
+    ],
+    "foldername": "Solenoid",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Encoder",
+    "description": "Demonstrate displaying the value of a quadrature encoder on the SmartDashboard.",
+    "tags": [
+      "Complete List",
+      "Digital",
+      "Sensors"
+    ],
+    "foldername": "Encoder",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Arcade Drive",
+    "description": "An example program which demonstrates the use of Arcade Drive with the DifferentialDrive class",
+    "tags": [
+      "Getting Started with C++",
+      "Robot and Motor",
+      "Joystick",
+      "Complete List"
+    ],
+    "foldername": "ArcadeDrive",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Mecanum Drive",
+    "description": "An example program which demonstrates the use of Mecanum Drive with the MecanumDrive class",
+    "tags": [
+      "Getting Started with C++",
+      "Robot and Motor",
+      "Joystick",
+      "Complete List"
+    ],
+    "foldername": "MecanumDrive",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Ultrasonic",
+    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor.",
+    "tags": [
+      "Robot and Motor",
+      "Complete List",
+      "Sensors",
+      "Analog"
+    ],
+    "foldername": "Ultrasonic",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "UltrasonicPID",
+    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor and PID control.",
+    "tags": [
+      "Robot and Motor",
+      "Complete List",
+      "Sensors",
+      "Analog"
+    ],
+    "foldername": "UltrasonicPID",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Gyro",
+    "description": "An example program showing how to drive straight with using a gyro sensor.",
+    "tags": [
+      "Robot and Motor",
+      "Complete List",
+      "Sensors",
+      "Analog",
+      "Joystick"
+    ],
+    "foldername": "Gyro",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Gyro Mecanum",
+    "description": "An example program showing how to perform mecanum drive with field oriented controls.",
+    "tags": [
+      "Robot and Motor",
+      "Complete List",
+      "Sensors",
+      "Analog",
+      "Joysitck"
+    ],
+    "foldername": "GyroMecanum",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "HID Rumble",
+    "description": "An example program showing how to make human interface devices rumble.",
+    "tags": [
+      "Joystick"
+    ],
+    "foldername": "HidRumble",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "PotentiometerPID",
+    "description": "An example to demonstrate the use of a potentiometer and PID control to reach elevator position setpoints.",
+    "tags": [
+      "Joystick",
+      "Actuators",
+      "Complete List",
+      "Sensors",
+      "Analog"
+    ],
+    "foldername": "PotentiometerPID",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Getting Started",
+    "description": "An example program which demonstrates the simplest autonomous and teleoperated routines.",
+    "tags": [
+      "Getting Started with C++",
+      "Complete List"
+    ],
+    "foldername": "GettingStarted",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Simple Vision",
+    "description": "The minimal program to acquire images from an attached USB camera on the robot and send them to the dashboard.",
+    "tags": [
+      "Vision",
+      "Complete List"
+    ],
+    "foldername": "QuickVision",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Intermediate Vision",
+    "description": "An example program that acquires images from an attached USB camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display.",
+    "tags": [
+      "Vision",
+      "Complete List"
+    ],
+    "foldername": "IntermediateVision",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Axis Camera Sample",
+    "description": "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class.",
+    "tags": [
+      "Vision",
+      "Complete List"
+    ],
+    "foldername": "AxisCameraSample",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "GearsBot",
+    "description": "A fully functional example CommandBased program for WPIs GearsBot robot. This code can run on your computer if it supports simulation.",
+    "tags": [
+      "CommandBased Robot",
+      "Complete List"
+    ],
+    "foldername": "GearsBot",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "PacGoat",
+    "description": "A fully functional example CommandBased program for FRC Team 190&#39;s 2014 robot. This code can run on your computer if it supports simulation.",
+    "tags": [
+      "CommandBased Robot",
+      "Complete List"
+    ],
+    "foldername": "PacGoat",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "HAL",
+    "description": "A program created using the HAL exclusively. This example is for advanced users",
+    "tags": [
+      "HAL"
+    ],
+    "foldername": "HAL",
+    "gradlebase": "c"
+  },
+  {
+    "name": "ShuffleBoard",
+    "description": "An example program that uses ShuffleBoard with its Widgets and Tabs.",
+    "tags": [
+      "ShuffleBoard"
+    ],
+    "foldername": "ShuffleBoard",
+    "gradlebase": "cpp"
+  }
+]

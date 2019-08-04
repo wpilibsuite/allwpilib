@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  * Base class for all sensors. Stores most recent status information as well as containing utility
  * functions for checking channels and error processing.
  */
-public abstract class SendableBase implements Sendable {
+public abstract class SendableBase implements Sendable, AutoCloseable {
   private String m_name = "";
   private String m_subsystem = "Ungrouped";
 
@@ -35,20 +35,23 @@ public abstract class SendableBase implements Sendable {
     }
   }
 
-  /**
-   * Free the resources used by this object.
-   */
+  @Deprecated
   public void free() {
+    close();
+  }
+
+  @Override
+  public void close() {
     LiveWindow.remove(this);
   }
 
   @Override
-  public final synchronized String getName() {
+  public final String getName() {
     return m_name;
   }
 
   @Override
-  public final synchronized void setName(String name) {
+  public final void setName(String name) {
     m_name = name;
   }
 
@@ -74,12 +77,12 @@ public abstract class SendableBase implements Sendable {
   }
 
   @Override
-  public final synchronized String getSubsystem() {
+  public final String getSubsystem() {
     return m_subsystem;
   }
 
   @Override
-  public final synchronized void setSubsystem(String subsystem) {
+  public final void setSubsystem(String subsystem) {
     m_subsystem = subsystem;
   }
 

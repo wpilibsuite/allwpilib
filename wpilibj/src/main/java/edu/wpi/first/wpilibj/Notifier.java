@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,12 +10,13 @@ package edu.wpi.first.wpilibj;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
-import edu.wpi.first.wpilibj.hal.NotifierJNI;
+import edu.wpi.first.hal.NotifierJNI;
 
-public class Notifier {
+import static java.util.Objects.requireNonNull;
 
+public class Notifier implements AutoCloseable {
   // The thread waiting on the HAL alarm.
-  private final Thread m_thread;
+  private Thread m_thread;
   // The lock for the process information.
   private final ReentrantLock m_processLock = new ReentrantLock();
   // The C pointer to the notifier object. We don't use it directly, it is
@@ -23,20 +24,28 @@ public class Notifier {
   private final AtomicInteger m_notifier = new AtomicInteger();
   // The time, in microseconds, at which the corresponding handler should be
   // called. Has the same zero as Utility.getFPGATime().
-  private double m_expirationTime = 0;
+  private double m_expirationTime;
   // The handler passed in by the user which should be called at the
   // appropriate interval.
   private Runnable m_handler;
   // Whether we are calling the handler just once or periodically.
-  private boolean m_periodic = false;
+  private boolean m_periodic;
   // If periodic, the period of the calling; if just once, stores how long it
   // is until we call the handler.
-  private double m_period = 0;
+  private double m_period;
 
   @Override
   @SuppressWarnings("NoFinalizer")
   protected void finalize() {
+    close();
+  }
+
+  @Override
+  public void close() {
     int handle = m_notifier.getAndSet(0);
+    if (handle == 0) {
+      return;
+    }
     NotifierJNI.stopNotifier(handle);
     // Join the thread to ensure the handler has exited.
     if (m_thread.isAlive()) {
@@ -48,26 +57,38 @@ public class Notifier {
       }
     }
     NotifierJNI.cleanNotifier(handle);
+    m_thread = null;
+  }
+
+  /**
+   * Update the alarm hardware to reflect the next alarm.
+   *
+   * @param triggerTime the time at which the next alarm will be triggered
+   */
+  private void updateAlarm(long triggerTime) {
+    int notifier = m_notifier.get();
+    if (notifier == 0) {
+      return;
+    }
+    NotifierJNI.updateNotifierAlarm(notifier, triggerTime);
   }
 
   /**
    * Update the alarm hardware to reflect the next alarm.
    */
   private void updateAlarm() {
-    int notifier = m_notifier.get();
-    if (notifier == 0) {
-      return;
-    }
-    NotifierJNI.updateNotifierAlarm(notifier, (long) (m_expirationTime * 1e6));
+    updateAlarm((long) (m_expirationTime * 1e6));
   }
 
   /**
    * Create a Notifier for timer event notification.
    *
-   * @param run The handler that is called at the notification time which is set using StartSingle
-   *            or StartPeriodic.
+   * @param run The handler that is called at the notification time which is set
+   *            using StartSingle or StartPeriodic.
    */
   public Notifier(Runnable run) {
+    requireNonNull(run);
+
     m_handler = run;
     m_notifier.set(NotifierJNI.initializeNotifier());
 
@@ -89,6 +110,9 @@ public class Notifier {
           if (m_periodic) {
             m_expirationTime += m_period;
             updateAlarm();
+          } else {
+            // need to update the alarm to cause it to wait again
+            updateAlarm((long) -1);
           }
         } finally {
           m_processLock.unlock();
@@ -99,7 +123,18 @@ public class Notifier {
         }
       }
     });
+    m_thread.setName("Notifier");
     m_thread.setDaemon(true);
+    m_thread.setUncaughtExceptionHandler((thread, error) -> {
+      Throwable cause = error.getCause();
+      if (cause != null) {
+        error = cause;
+      }
+      DriverStation.reportError("Unhandled exception: " + error.toString(), error.getStackTrace());
+      DriverStation.reportError(
+          "The loopFunc() method (or methods called by it) should have handled "
+              + "the exception above.", false);
+    });
     m_thread.start();
   }
 
@@ -118,8 +153,8 @@ public class Notifier {
   }
 
   /**
-   * Register for single event notification. A timer event is queued for a single event after the
-   * specified delay.
+   * Register for single event notification. A timer event is queued for a single
+   * event after the specified delay.
    *
    * @param delay Seconds to wait before the handler is called.
    */
@@ -136,12 +171,12 @@ public class Notifier {
   }
 
   /**
-   * Register for periodic event notification. A timer event is queued for periodic event
-   * notification. Each time the interrupt occurs, the event will be immediately requeued for the
-   * same time interval.
+   * Register for periodic event notification. A timer event is queued for
+   * periodic event notification. Each time the interrupt occurs, the event will
+   * be immediately requeued for the same time interval.
    *
-   * @param period Period in seconds to call the handler starting one period after the call to this
-   *               method.
+   * @param period Period in seconds to call the handler starting one period after
+   *               the call to this method.
    */
   public void startPeriodic(double period) {
     m_processLock.lock();
@@ -156,9 +191,10 @@ public class Notifier {
   }
 
   /**
-   * Stop timer events from occurring. Stop any repeating timer events from occurring. This will
-   * also remove any single notification events from the queue. If a timer-based call to the
-   * registered handler is in progress, this function will block until the handler call is complete.
+   * Stop timer events from occurring. Stop any repeating timer events from
+   * occurring. This will also remove any single notification events from the
+   * queue. If a timer-based call to the registered handler is in progress, this
+   * function will block until the handler call is complete.
    */
   public void stop() {
     NotifierJNI.cancelNotifierAlarm(m_notifier.get());

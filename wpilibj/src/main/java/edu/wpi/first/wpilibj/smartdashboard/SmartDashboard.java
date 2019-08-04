@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,10 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.HLUsageReporting;
 import edu.wpi.first.wpilibj.Sendable;
 
 /**
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj.Sendable;
  * <p>When a value is put into the SmartDashboard here, it pops up on the SmartDashboard on the
  * laptop. Users can put values into and get values from the SmartDashboard.
  */
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public class SmartDashboard {
   /**
    * The {@link NetworkTable} used by {@link SmartDashboard}.
@@ -33,7 +35,11 @@ public class SmartDashboard {
       NetworkTableInstance.getDefault().getTable("SmartDashboard");
 
   private static class Data {
-    Sendable m_sendable;
+    Data(Sendable sendable) {
+      m_sendable = sendable;
+    }
+
+    final Sendable m_sendable;
     final SendableBuilderImpl m_builder = new SendableBuilderImpl();
   }
 
@@ -41,10 +47,20 @@ public class SmartDashboard {
    * A table linking tables in the SmartDashboard to the {@link Sendable} objects they
    * came from.
    */
+  @SuppressWarnings("PMD.UseConcurrentHashMap")
   private static final Map<String, Data> tablesToData = new HashMap<>();
 
+  /**
+   * The executor for listener tasks; calls listener tasks synchronously from main thread.
+   */
+  private static final ListenerExecutor listenerExecutor = new ListenerExecutor();
+
   static {
-    HLUsageReporting.reportSmartDashboard();
+    HAL.report(tResourceType.kResourceType_SmartDashboard, 0);
+  }
+
+  private SmartDashboard() {
+    throw new UnsupportedOperationException("This is a utility class!");
   }
 
   /**
@@ -57,20 +73,23 @@ public class SmartDashboard {
    */
   public static synchronized void putData(String key, Sendable data) {
     Data sddata = tablesToData.get(key);
-    if (sddata == null) {
-      sddata = new Data();
+    if (sddata == null || sddata.m_sendable != data) {
+      if (sddata != null) {
+        sddata.m_builder.stopListeners();
+      }
+      sddata = new Data(data);
       tablesToData.put(key, sddata);
-    }
-    if (sddata.m_sendable == null || sddata.m_sendable != data) {
-      sddata.m_sendable = data;
-      sddata.m_builder.setTable(table.getSubTable(key));
+      NetworkTable dataTable = table.getSubTable(key);
+      sddata.m_builder.setTable(dataTable);
       data.initSendable(sddata.m_builder);
+      sddata.m_builder.updateTable();
+      sddata.m_builder.startListeners();
+      dataTable.getEntry(".name").setString(key);
     }
-    sddata.m_builder.updateTable();
   }
 
   /**
-   * Maps the specified key (where the key is the name of the {@link NamedSendable}
+   * Maps the specified key (where the key is the name of the {@link Sendable}
    * to the specified value in this table. The value can be retrieved by
    * calling the get method with a key that is equal to the original key.
    *
@@ -505,5 +524,26 @@ public class SmartDashboard {
    */
   public static byte[] getRaw(String key, byte[] defaultValue) {
     return getEntry(key).getRaw(defaultValue);
+  }
+
+  /**
+   * Posts a task from a listener to the ListenerExecutor, so that it can be run synchronously
+   * from the main loop on the next call to {@link SmartDashboard#updateValues()}.
+   *
+   * @param task The task to run synchronously from the main thread.
+   */
+  public static void postListenerTask(Runnable task) {
+    listenerExecutor.execute(task);
+  }
+
+  /**
+   * Puts all sendable data to the dashboard.
+   */
+  public static synchronized void updateValues() {
+    for (Data data : tablesToData.values()) {
+      data.m_builder.updateTable();
+    }
+    // Execute posted listener tasks
+    listenerExecutor.runListenerTasks();
   }
 }

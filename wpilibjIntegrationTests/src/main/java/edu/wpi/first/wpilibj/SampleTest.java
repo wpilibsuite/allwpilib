@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,12 +7,12 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.logging.Logger;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.fixtures.SampleFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
@@ -30,6 +30,7 @@ public class SampleTest extends AbstractComsSetup {
 
   static SampleFixture fixture = new SampleFixture();
 
+  @Override
   protected Logger getClassLogger() {
     return logger;
   }

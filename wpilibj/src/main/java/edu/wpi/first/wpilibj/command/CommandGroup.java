@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -31,11 +31,12 @@ import static java.util.Objects.requireNonNull;
  * @see Subsystem
  * @see IllegalUseOfCommandException
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class CommandGroup extends Command {
-
   /**
    * The commands in this group (stored in entries).
    */
+  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
   private final Vector<Entry> m_commands = new Vector<>();
   /*
    * Intentionally package private
@@ -43,6 +44,7 @@ public class CommandGroup extends Command {
   /**
    * The active children in this group (stored in entries).
    */
+  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
   final Vector<Entry> m_children = new Vector<>();
   /**
    * The current command, -1 signifies that none have been run.
@@ -207,12 +209,14 @@ public class CommandGroup extends Command {
     }
   }
 
+  @Override
   @SuppressWarnings("MethodName")
   void _initialize() {
     m_currentCommandIndex = -1;
   }
 
-  @SuppressWarnings("MethodName")
+  @Override
+  @SuppressWarnings({"MethodName", "PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   void _execute() {
     Entry entry = null;
     Command cmd = null;
@@ -223,7 +227,6 @@ public class CommandGroup extends Command {
     }
 
     while (m_currentCommandIndex < m_commands.size()) {
-
       if (cmd != null) {
         if (entry.isTimedOut()) {
           cmd._cancel();
@@ -280,6 +283,7 @@ public class CommandGroup extends Command {
     }
   }
 
+  @Override
   @SuppressWarnings("MethodName")
   void _end() {
     // Theoretically, we don't have to check this, but we do if teams override
@@ -299,6 +303,7 @@ public class CommandGroup extends Command {
     m_children.removeAllElements();
   }
 
+  @Override
   @SuppressWarnings("MethodName")
   void _interrupted() {
     _end();
@@ -313,23 +318,28 @@ public class CommandGroup extends Command {
    *
    * @return whether this {@link CommandGroup} is finished
    */
+  @Override
   protected boolean isFinished() {
     return m_currentCommandIndex >= m_commands.size() && m_children.isEmpty();
   }
 
   // Can be overwritten by teams
+  @Override
   protected void initialize() {
   }
 
   // Can be overwritten by teams
+  @Override
   protected void execute() {
   }
 
   // Can be overwritten by teams
+  @Override
   protected void end() {
   }
 
   // Can be overwritten by teams
+  @Override
   protected void interrupted() {
   }
 
@@ -340,6 +350,7 @@ public class CommandGroup extends Command {
    *
    * @return whether or not this {@link CommandGroup} is interruptible.
    */
+  @Override
   public synchronized boolean isInterruptible() {
     if (!super.isInterruptible()) {
       return false;
@@ -380,7 +391,6 @@ public class CommandGroup extends Command {
   }
 
   private static class Entry {
-
     private static final int IN_SEQUENCE = 0;
     private static final int BRANCH_PEER = 1;
     private static final int BRANCH_CHILD = 2;

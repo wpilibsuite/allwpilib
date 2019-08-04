@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,10 +7,10 @@
 
 #include "PCMInternal.h"
 
-#include "HAL/Errors.h"
-#include "HAL/Solenoid.h"
-#include "HAL/cpp/make_unique.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
+#include "hal/Errors.h"
+#include "hal/Solenoid.h"
 
 namespace hal {
 
@@ -25,6 +25,7 @@ void InitializePCMInternal() {
 }  // namespace init
 
 void initializePCM(int32_t module, int32_t* status) {
+  hal::init::CheckInit();
   if (!HAL_CheckSolenoidModule(module)) {
     *status = RESOURCE_OUT_OF_RANGE;
     return;

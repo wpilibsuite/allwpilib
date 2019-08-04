@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,13 +17,13 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * condition.
  */
 public class WaitForBall extends Command {
-	public WaitForBall() {
-		requires(Robot.collector);
-	}
+  public WaitForBall() {
+    requires(Robot.collector);
+  }
 
-	// Make this return true when this Command no longer needs to run execute()
-	@Override
-	protected boolean isFinished() {
-		return Robot.collector.hasBall();
-	}
+  // Make this return true when this Command no longer needs to run execute()
+  @Override
+  protected boolean isFinished() {
+    return Robot.collector.hasBall();
+  }
 }

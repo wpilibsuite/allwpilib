@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,17 +7,18 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.can.CANJNI;
-import edu.wpi.first.wpilibj.can.CANStatus;
-import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.HALUtil;
-import edu.wpi.first.wpilibj.hal.PowerJNI;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.hal.PowerJNI;
+import edu.wpi.first.hal.can.CANJNI;
+import edu.wpi.first.hal.can.CANStatus;
 
 /**
  * Contains functions for roboRIO functionality.
  */
 public final class RobotController {
   private RobotController() {
+    throw new UnsupportedOperationException("This is a utility class!");
   }
 
   /**
@@ -27,7 +28,7 @@ public final class RobotController {
    * @return FPGA Version number.
    */
   @SuppressWarnings("AbbreviationAsWordInName")
-  int getFPGAVersion() {
+  public static int getFPGAVersion() {
     return HALUtil.getFPGAVersion();
   }
 
@@ -39,7 +40,7 @@ public final class RobotController {
    * @return FPGA Revision number.
    */
   @SuppressWarnings("AbbreviationAsWordInName")
-  long getFPGARevision() {
+  public static long getFPGARevision() {
     return (long) HALUtil.getFPGARevision();
   }
 
@@ -66,7 +67,7 @@ public final class RobotController {
    *
    * @return The battery voltage in Volts.
    */
-  public double getBatteryVoltage() {
+  public static double getBatteryVoltage() {
     return PowerJNI.getVinVoltage();
   }
 

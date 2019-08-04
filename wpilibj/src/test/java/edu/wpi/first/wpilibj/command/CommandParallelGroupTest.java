@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,18 +7,17 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Ported from the old CrioTest Classes.
  */
-public class CommandParallelGroupTest extends AbstractCommandTest {
-
+class CommandParallelGroupTest extends AbstractCommandTest {
   /**
    * Simple Parallel Command Group With 2 commands one command terminates first.
    */
   @Test
-  public void testParallelCommandGroupWithTwoCommands() {
+  void parallelCommandGroupWithTwoCommandsTest() {
     final MockCommand command1 = new MockCommand();
     final MockCommand command2 = new MockCommand();
 

@@ -1,13 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "IterativeRobot.h"
+#include <frc/TimedRobot.h>
 
-class MyRobot : public frc::IterativeRobot {
+class MyRobot : public frc::TimedRobot {
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -45,4 +45,4 @@ class MyRobot : public frc::IterativeRobot {
   void RobotPeriodic() override {}
 };
 
-START_ROBOT_CLASS(MyRobot)
+int main() { return frc::StartRobot<MyRobot>(); }
