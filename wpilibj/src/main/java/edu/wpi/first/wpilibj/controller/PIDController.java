@@ -120,7 +120,6 @@ public class PIDController extends SendableBase {
    */
   @SuppressWarnings("ParameterName")
   public void setPID(double Kp, double Ki, double Kd) {
-
     m_Kp = Kp;
     m_Ki = Ki;
     m_Kd = Kd;
@@ -143,7 +142,6 @@ public class PIDController extends SendableBase {
    */
   @SuppressWarnings("ParameterName")
   public void setI(double Ki) {
-
     m_Ki = Ki;
   }
 
@@ -154,7 +152,6 @@ public class PIDController extends SendableBase {
    */
   @SuppressWarnings("ParameterName")
   public void setD(double Kd) {
-
     m_Kd = Kd;
   }
 
@@ -164,7 +161,6 @@ public class PIDController extends SendableBase {
    * @return proportional coefficient
    */
   public double getP() {
-
     return m_Kp;
   }
 
@@ -184,7 +180,6 @@ public class PIDController extends SendableBase {
    * @return differential coefficient
    */
   public double getD() {
-
     return m_Kd;
   }
 
@@ -205,7 +200,6 @@ public class PIDController extends SendableBase {
    * @return The latest calculated output.
    */
   public double getOutput() {
-
     return m_output;
   }
 
@@ -215,7 +209,6 @@ public class PIDController extends SendableBase {
    * @param setpoint The desired setpoint.
    */
   public void setSetpoint(double setpoint) {
-
     if (m_maximumInput > m_minimumInput) {
       m_setpoint = clamp(setpoint, m_minimumInput, m_maximumInput);
     } else {
@@ -229,7 +222,6 @@ public class PIDController extends SendableBase {
    * @return The current setpoint.
    */
   public double getSetpoint() {
-
     return m_setpoint;
   }
 
@@ -256,7 +248,6 @@ public class PIDController extends SendableBase {
    */
   public boolean atSetpoint(double tolerance, double deltaTolerance, Tolerance toleranceType) {
     double error = getError();
-
 
     double deltaError = (error - m_prevError) / getPeriod();
     if (toleranceType == Tolerance.kPercent) {
@@ -286,7 +277,6 @@ public class PIDController extends SendableBase {
    * @param continuous true turns on continuous, false turns off continuous
    */
   public void setContinuous(boolean continuous) {
-
     m_continuous = continuous;
   }
 
@@ -297,7 +287,6 @@ public class PIDController extends SendableBase {
    * @param maximumInput The maximum value expected from the input.
    */
   public void setInputRange(double minimumInput, double maximumInput) {
-
     m_minimumInput = minimumInput;
     m_maximumInput = maximumInput;
     m_inputRange = maximumInput - minimumInput;
@@ -315,7 +304,6 @@ public class PIDController extends SendableBase {
    * @param maximumOutput the maximum value to write to the output
    */
   public void setOutputRange(double minimumOutput, double maximumOutput) {
-
     m_minimumOutput = minimumOutput;
     m_maximumOutput = maximumOutput;
   }
@@ -336,7 +324,6 @@ public class PIDController extends SendableBase {
    * @param deltaTolerance Change in absolute error per second which is tolerable.
    */
   public void setAbsoluteTolerance(double tolerance, double deltaTolerance) {
-
     m_toleranceType = Tolerance.kAbsolute;
     m_tolerance = tolerance;
     m_deltaTolerance = deltaTolerance;
@@ -358,7 +345,6 @@ public class PIDController extends SendableBase {
    * @param deltaTolerance Change in percent error per second which is tolerable.
    */
   public void setPercentTolerance(double tolerance, double deltaTolerance) {
-
     m_toleranceType = Tolerance.kPercent;
     m_tolerance = tolerance;
     m_deltaTolerance = deltaTolerance;
@@ -370,7 +356,6 @@ public class PIDController extends SendableBase {
    * @return The error.
    */
   public double getError() {
-
     return getContinuousError(m_currError);
   }
 
@@ -379,7 +364,6 @@ public class PIDController extends SendableBase {
    */
   public double getDeltaError() {
     double error = getError();
-
 
     return (error - m_prevError) / getPeriod();
   }
@@ -423,7 +407,6 @@ public class PIDController extends SendableBase {
    * Resets the previous error and the integral term. Also disables the controller.
    */
   public void reset() {
-
     m_prevError = 0;
     m_totalError = 0;
     m_output = 0;
