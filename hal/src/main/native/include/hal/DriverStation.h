@@ -207,7 +207,7 @@ void HAL_WaitForCachedControlData(void);
  * HAL_WaitForCachedControlData or HAL_IsNewControlData call. If new data has
  * not arrived, waits for new data to arrive, or a timeout. Otherwise, returns
  * immediately.
- * 
+ *
  * @param timeout timeout in seconds
  * @return        true for new data, false for timeout
  */
