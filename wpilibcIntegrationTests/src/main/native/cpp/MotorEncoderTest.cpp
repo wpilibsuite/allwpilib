@@ -171,7 +171,6 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
   pidController.SetSetpoint(600);
 
   /* 10 seconds should be plenty time to get to the reference */
-
   frc::Notifier pidRunner{[this, &pidController] {
     m_speedController->Set(
         pidController.Calculate(m_filter->Calculate(m_encoder->GetRate())) +
