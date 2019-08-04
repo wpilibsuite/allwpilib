@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -42,7 +42,9 @@ class I2C : public ErrorBase {
    * Generic transaction.
    *
    * This is a lower-level interface to the I2C hardware giving you more control
-   * over each transaction.
+   * over each transaction. If you intend to write multiple bytes in the same
+   * transaction and do not plan to receive anything back, use writeBulk()
+   * instead. Calling this with a receiveSize of 0 will result in an error.
    *
    * @param dataToSend   Buffer of data to send as part of the transaction.
    * @param sendSize     Number of bytes to send as part of the transaction.
