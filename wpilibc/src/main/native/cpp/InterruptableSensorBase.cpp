@@ -19,8 +19,6 @@ InterruptableSensorBase::~InterruptableSensorBase() {
   int32_t status = 0;
   HAL_CleanInterrupts(m_interrupt, &status);
   // Ignore status, as an invalid handle just needs to be ignored.
-  m_interrupt = HAL_kInvalidHandle;
-  m_interruptHandler = nullptr;
 }
 
 InterruptableSensorBase::InterruptableSensorBase(InterruptableSensorBase&& rhs)
