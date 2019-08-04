@@ -104,6 +104,8 @@ public class PIDController extends SendableBase {
     m_period = period;
 
     instances++;
+    setName("PIDController", instances);
+
     HAL.report(tResourceType.kResourceType_PIDController, instances);
   }
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,6 +14,7 @@
 #include <networktables/NetworkTableValue.h>
 
 #include "frc/ErrorBase.h"
+#include "frc/smartdashboard/ListenerExecutor.h"
 #include "frc/smartdashboard/SendableBase.h"
 
 namespace frc {
@@ -402,12 +403,23 @@ class SmartDashboard : public ErrorBase, public SendableBase {
   static std::shared_ptr<nt::Value> GetValue(wpi::StringRef keyName);
 
   /**
+   * Posts a task from a listener to the ListenerExecutor, so that it can be run
+   * synchronously from the main loop on the next call to {@link
+   * SmartDashboard#updateValues()}.
+   *
+   * @param task The task to run synchronously from the main thread.
+   */
+  static void PostListenerTask(std::function<void()> task);
+
+  /**
    * Puts all sendable data to the dashboard.
    */
   static void UpdateValues();
 
  private:
   virtual ~SmartDashboard() = default;
+
+  static detail::ListenerExecutor listenerExecutor;
 };
 
 }  // namespace frc

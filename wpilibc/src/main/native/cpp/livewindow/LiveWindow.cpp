@@ -81,9 +81,9 @@ void LiveWindow::AddChild(Sendable* parent, void* child) {
   comp.telemetryEnabled = false;
 }
 
-void LiveWindow::Remove(Sendable* sendable) {
+bool LiveWindow::Remove(Sendable* sendable) {
   std::scoped_lock lock(m_impl->mutex);
-  m_impl->components.erase(sendable);
+  return m_impl->components.erase(sendable);
 }
 
 void LiveWindow::EnableTelemetry(Sendable* sendable) {
