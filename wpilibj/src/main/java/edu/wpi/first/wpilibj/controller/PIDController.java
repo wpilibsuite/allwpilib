@@ -170,7 +170,6 @@ public class PIDController extends SendableBase {
    * @return integral coefficient
    */
   public double getI() {
-
     return m_Ki;
   }
 
