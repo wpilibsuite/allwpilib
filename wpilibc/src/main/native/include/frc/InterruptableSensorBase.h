@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <atomic>
 #include <functional>
+#include <memory>
 
 #include <hal/Interrupts.h>
 
@@ -144,8 +144,8 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
   virtual void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
 
  protected:
-  // atomic for proper destruction
-  std::atomic<HAL_InterruptHandle> m_interrupt{HAL_kInvalidHandle};
+  HAL_InterruptHandle m_interrupt{HAL_kInvalidHandle};
+  std::unique_ptr<InterruptEventHandler> m_interruptHandler{nullptr};
 
   void AllocateInterrupts(bool watcher);
 };

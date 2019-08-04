@@ -17,25 +17,28 @@ using namespace frc;
 InterruptableSensorBase::~InterruptableSensorBase() {
   if (m_interrupt == HAL_kInvalidHandle) return;
   int32_t status = 0;
-  auto param = HAL_CleanInterrupts(m_interrupt, &status);
-  if (param) {
-    delete reinterpret_cast<InterruptEventHandler*>(param);
-  }
+  HAL_CleanInterrupts(m_interrupt, &status);
   // Ignore status, as an invalid handle just needs to be ignored.
   m_interrupt = HAL_kInvalidHandle;
+  m_interruptHandler = nullptr;
 }
 
 InterruptableSensorBase::InterruptableSensorBase(InterruptableSensorBase&& rhs)
     : ErrorBase(std::move(rhs)),
-      m_interrupt(rhs.m_interrupt.exchange(HAL_kInvalidHandle)) {
+      m_interrupt(rhs.m_interrupt),
+      m_interruptHandler{std::move(rhs.m_interruptHandler)} {
   rhs.m_interrupt = HAL_kInvalidHandle;
+  rhs.m_interruptHandler = nullptr;
 }
 
 InterruptableSensorBase& InterruptableSensorBase::operator=(
     InterruptableSensorBase&& rhs) {
   ErrorBase::operator=(std::move(rhs));
 
-  m_interrupt = rhs.m_interrupt.exchange(HAL_kInvalidHandle);
+  m_interrupt = rhs.m_interrupt;
+  m_interruptHandler = std::move(rhs.m_interruptHandler);
+  rhs.m_interrupt = HAL_kInvalidHandle;
+  rhs.m_interruptHandler = nullptr;
 
   return *this;
 }
@@ -65,7 +68,8 @@ void InterruptableSensorBase::RequestInterrupts(InterruptEventHandler handler) {
   AllocateInterrupts(false);
   if (StatusIsFatal()) return;  // if allocate failed, out of interrupts
 
-  auto handlerPtr = new InterruptEventHandler(std::move(handler));
+  m_interruptHandler =
+      std::make_unique<InterruptEventHandler>(std::move(handler));
 
   int32_t status = 0;
   HAL_RequestInterrupts(
@@ -86,7 +90,7 @@ void InterruptableSensorBase::RequestInterrupts(InterruptEventHandler handler) {
         WaitResult res = static_cast<WaitResult>(falling | rising);
         (*self)(res);
       },
-      handlerPtr, &status);
+      m_interruptHandler.get(), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -110,12 +114,10 @@ void InterruptableSensorBase::CancelInterrupts() {
   if (StatusIsFatal()) return;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
-  auto param = HAL_CleanInterrupts(m_interrupt, &status);
-  if (param) {
-    delete reinterpret_cast<InterruptEventHandler*>(param);
-  }
+  HAL_CleanInterrupts(m_interrupt, &status);
   // Ignore status, as an invalid handle just needs to be ignored.
   m_interrupt = HAL_kInvalidHandle;
+  m_interruptHandler = nullptr;
 }
 
 InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
