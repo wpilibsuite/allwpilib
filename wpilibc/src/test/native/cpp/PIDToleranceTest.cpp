@@ -7,7 +7,6 @@
 
 #include "frc/Timer.h"
 #include "frc/controller/PIDController.h"
-#include "frc/controller/PIDControllerRunner.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -33,20 +32,13 @@ class PIDToleranceTest : public testing::Test {
   FakeInput inp;
   FakeOutput out;
   frc2::PIDController* pidController;
-  frc::PIDControllerRunner* pidRunner;
 
   void SetUp() override {
     pidController = new frc2::PIDController(0.5, 0.0, 0.0);
     pidController->SetInputRange(-range / 2, range / 2);
-    pidRunner =
-        new frc::PIDControllerRunner(*pidController, [&] { return inp.Get(); },
-                                     [&](double output) { out.Set(output); });
   }
 
-  void TearDown() override {
-    delete pidRunner;
-    delete pidController;
-  }
+  void TearDown() override { delete pidController; }
 
   void Reset() { inp.val = 0; }
 };
@@ -58,21 +50,24 @@ TEST_F(PIDToleranceTest, Absolute) {
 
   pidController->SetAbsoluteTolerance(tolerance);
   pidController->SetSetpoint(setpoint);
-  pidRunner->Enable();
 
   EXPECT_FALSE(pidController->AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
       << pidController->GetError();
 
   inp.val = setpoint + tolerance / 2;
-  Wait(1.0);
+  for (int i = 0; i <= 50; i++) {
+    pidController->Calculate(inp.Get());
+  }
 
   EXPECT_TRUE(pidController->AtSetpoint())
       << "Error was not in tolerance when it should have been. Error was "
       << pidController->GetError();
 
   inp.val = setpoint + 10 * tolerance;
-  Wait(1.0);
+  for (int i = 0; i <= 50; i++) {
+    pidController->Calculate(inp.Get());
+  }
 
   EXPECT_FALSE(pidController->AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
@@ -84,7 +79,6 @@ TEST_F(PIDToleranceTest, Percent) {
 
   pidController->SetPercentTolerance(tolerance);
   pidController->SetSetpoint(setpoint);
-  pidRunner->Enable();
 
   EXPECT_FALSE(pidController->AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
@@ -93,7 +87,9 @@ TEST_F(PIDToleranceTest, Percent) {
   inp.val =
       setpoint + (tolerance) / 200 *
                      range;  // half of percent tolerance away from setpoint
-  Wait(1.0);
+  for (int i = 0; i <= 50; i++) {
+    pidController->Calculate(inp.Get());
+  }
 
   EXPECT_TRUE(pidController->AtSetpoint())
       << "Error was not in tolerance when it should have been. Error was "
@@ -103,7 +99,9 @@ TEST_F(PIDToleranceTest, Percent) {
       setpoint +
       (tolerance) / 50 * range;  // double percent tolerance away from setPoint
 
-  Wait(1.0);
+  for (int i = 0; i <= 50; i++) {
+    pidController->Calculate(inp.Get());
+  }
 
   EXPECT_FALSE(pidController->AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "

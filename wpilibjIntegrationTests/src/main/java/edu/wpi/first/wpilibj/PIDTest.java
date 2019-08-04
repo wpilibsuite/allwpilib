@@ -24,17 +24,13 @@ import org.junit.runners.Parameterized.Parameters;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.PIDControllerRunner;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 
@@ -52,7 +48,6 @@ public class PIDTest extends AbstractComsSetup {
   private static final double outputRange = 0.25;
 
   private PIDController m_controller = null;
-  private PIDControllerRunner m_runner = null;
   private static MotorEncoderFixture me = null;
 
   @SuppressWarnings({"MemberName", "EmptyLineSeparator", "MultipleVariableDeclarations"})
@@ -85,8 +80,7 @@ public class PIDTest extends AbstractComsSetup {
     double ki = 0.0005;
     double kd = 0.0;
     for (int i = 0; i < 1; i++) {
-      data.addAll(Arrays.asList(new Object[][]{
-          {kp, ki, kd, TestBench.getInstance().getTalonPair()},
+      data.addAll(Arrays.asList(new Object[][]{{kp, ki, kd, TestBench.getInstance().getTalonPair()},
           {kp, ki, kd, TestBench.getInstance().getVictorPair()},
           {kp, ki, kd, TestBench.getInstance().getJaguarPair()}}));
     }
@@ -112,18 +106,14 @@ public class PIDTest extends AbstractComsSetup {
     m_builder = new SendableBuilderImpl();
     m_builder.setTable(m_table);
     m_controller = new PIDController(k_p, k_i, k_d);
-    m_runner = new PIDControllerRunner(m_controller,
-        me.getEncoder()::getDistance, me.getMotor()::set);
     m_controller.initSendable(m_builder);
   }
 
   @After
   public void tearDown() {
     logger.fine("Teardown: " + me.getType());
-    m_runner.disable();
     m_controller.close();
     m_controller = null;
-    m_runner = null;
     me.reset();
   }
 
@@ -141,9 +131,8 @@ public class PIDTest extends AbstractComsSetup {
     setupOutputRange();
     double reference = 2500.0;
     m_controller.setSetpoint(reference);
-    assertFalse("PID did not begin disabled", m_runner.isEnabled());
-    assertEquals("PID.getError() did not start at " + reference, reference,
-        m_controller.getError(), 0);
+    assertEquals("PID.getError() did not start at " + reference, reference, m_controller.getError(),
+        0);
     m_builder.updateTable();
     assertEquals(k_p, m_table.getEntry("Kp").getDouble(9999999), 0);
     assertEquals(k_i, m_table.getEntry("Ki").getDouble(9999999), 0);
@@ -153,33 +142,12 @@ public class PIDTest extends AbstractComsSetup {
   }
 
   @Test
-  public void testRestartAfterEnable() {
-    setupAbsoluteTolerance();
-    setupOutputRange();
-    double reference = 2500.0;
-    m_controller.setSetpoint(reference);
-    m_runner.enable();
-    m_builder.updateTable();
-    assertTrue(m_table.getEntry("enabled").getBoolean(false));
-    assertTrue(m_runner.isEnabled());
-    assertThat(0.0, is(not(me.getMotor().get())));
-    m_controller.reset();
-    m_builder.updateTable();
-    assertFalse(m_table.getEntry("enabled").getBoolean(true));
-    assertFalse(m_runner.isEnabled());
-    assertEquals(0, me.getMotor().get(), 0);
-  }
-
-  @Test
   public void testSetSetpoint() {
     setupAbsoluteTolerance();
     setupOutputRange();
     double reference = 2500.0;
-    m_runner.disable();
     m_controller.setSetpoint(reference);
-    m_runner.enable();
-    assertEquals("Did not correctly set reference", reference, m_controller
-        .getSetpoint(), 1e-3);
+    assertEquals("Did not correctly set reference", reference, m_controller.getSetpoint(), 1e-3);
   }
 
   @Test(timeout = 10000)
@@ -191,9 +159,11 @@ public class PIDTest extends AbstractComsSetup {
     m_controller.setSetpoint(reference);
     assertEquals(pidData() + "did not have an error of " + reference, reference,
         m_controller.getError(), 0);
-    m_runner.enable();
+    Notifier pidRunner = new Notifier(
+        () -> me.getMotor().set(m_controller.calculate(me.getEncoder().getDistance())));
+    pidRunner.startPeriodic(m_controller.getPeriod());
     Timer.delay(5);
-    m_runner.disable();
+    pidRunner.stop();
     assertTrue(pidData() + "Was not on Target. Controller Error: " + m_controller.getError(),
         m_controller.atSetpoint());
   }

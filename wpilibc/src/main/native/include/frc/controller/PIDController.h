@@ -10,8 +10,6 @@
 #include <functional>
 #include <limits>
 
-#include <wpi/mutex.h>
-
 #include "frc/smartdashboard/SendableBase.h"
 
 namespace frc2 {
@@ -36,8 +34,10 @@ class PIDController : public frc::SendableBase {
 
   ~PIDController() override = default;
 
-  PIDController(PIDController&& rhs);
-  PIDController& operator=(PIDController&& rhs);
+  PIDController(const PIDController&) = default;
+  PIDController& operator=(const PIDController&) = default;
+  PIDController(PIDController&&) = default;
+  PIDController& operator=(PIDController&&) = default;
 
   /**
    * Sets the PID Controller gain parameters.
@@ -233,11 +233,9 @@ class PIDController : public frc::SendableBase {
   void InitSendable(frc::SendableBuilder& builder) override;
 
  protected:
-  mutable wpi::mutex m_thisMutex;
-
   /**
    * Wraps error around for continuous inputs. The original error is returned if
-   * continuous mode is disabled. This is an unsynchronized function.
+   * continuous mode is disabled.
    *
    * @param error The current error of the PID controller.
    * @return Error for continuous inputs.
@@ -293,15 +291,6 @@ class PIDController : public frc::SendableBase {
 
   double m_setpoint = 0;
   double m_output = 0;
-
-  /**
-   * Returns the next output of the PID controller.
-   *
-   * Unlike the public functions above, this function doesn't lock the mutex.
-   *
-   * @param measurement The current measurement of the process variable.
-   */
-  double CalculateUnsafe(double measurement);
 };
 
 }  // namespace frc2
