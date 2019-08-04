@@ -180,7 +180,6 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
   pidRunner.StartPeriodic(pidController.GetPeriod());
   Wait(10.0);
   pidRunner.Stop();
-
   RecordProperty("PIDError", pidController.GetError());
 
   EXPECT_TRUE(pidController.AtSetpoint())
