@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.solenoid;
+package edu.wpi.first.wpilibj.examples.arcadedrive;
 
 import edu.wpi.first.wpilibj.RobotBase;
 
