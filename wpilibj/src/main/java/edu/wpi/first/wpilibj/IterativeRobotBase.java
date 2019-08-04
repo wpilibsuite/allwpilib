@@ -46,6 +46,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public abstract class IterativeRobotBase extends RobotBase {
   protected double m_period;
 
+  /**
+   * An enum representing the robot's mode. Can be None, Disabled, 
+   * Autonomous, Teleop or Test.
+   */
   public enum Mode {
     kNone,
     kDisabled,

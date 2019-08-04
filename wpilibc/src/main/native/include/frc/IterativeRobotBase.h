@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -46,7 +46,8 @@ class IterativeRobotBase : public RobotBase {
  public:
 
   /**
-   * An enum representing the robot's mode. Can be None, Disabled, Autonomous, Teleop or Test.
+   * An enum representing the robot's mode. Can be None, Disabled, 
+   * Autonomous, Teleop or Test.
    */
   enum class Mode { kNone, kDisabled, kAutonomous, kTeleop, kTest };
 
@@ -165,7 +166,6 @@ class IterativeRobotBase : public RobotBase {
   double m_period;
 
  private:
-
   Mode m_lastMode = Mode::kNone;
   Watchdog m_watchdog;
 
