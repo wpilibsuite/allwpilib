@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,10 +8,9 @@
 package edu.wpi.first.wpilibj.examples.ultrasonicpid;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
@@ -45,27 +44,26 @@ public class Robot extends TimedRobot {
   private final DifferentialDrive m_robotDrive
       = new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort),
       new PWMVictorSPX(kRightMotorPort));
-  private final PIDController m_pidController
-      = new PIDController(kP, kI, kD, m_ultrasonic, new MyPidOutput());
+  private final PIDController m_pidController = new PIDController(kP, kI, kD);
 
-  /**
-   * Drives the robot a set distance from an object using PID control and the
-   * ultrasonic sensor.
-   */
   @Override
-  public void teleopInit() {
+  public void robotInit() {
     // Set expected range to 0-24 inches; e.g. at 24 inches from object go
     // full forward, at 0 inches from object go full backward.
     m_pidController.setInputRange(0, kMaxDistance * kValueToInches);
-    // Set setpoint of the pid controller
-    m_pidController.setSetpoint(kHoldDistance * kValueToInches);
-    m_pidController.enable(); // begin PID control
   }
 
-  private class MyPidOutput implements PIDOutput {
-    @Override
-    public void pidWrite(double output) {
-      m_robotDrive.arcadeDrive(output, 0);
-    }
+  @Override
+  public void teleopInit() {
+    // Set setpoint of the pid controller
+    m_pidController.setSetpoint(kHoldDistance * kValueToInches);
+  }
+
+  @Override
+  public void teleopPeriodic() {
+    double pidOutput
+        = m_pidController.calculate(m_ultrasonic.getAverageVoltage());
+
+    m_robotDrive.arcadeDrive(pidOutput, 0);
   }
 }
