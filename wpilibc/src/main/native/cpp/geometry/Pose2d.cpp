@@ -14,7 +14,7 @@ using namespace frc;
 Pose2d::Pose2d(Translation2d translation, Rotation2d rotation)
     : m_translation(translation), m_rotation(rotation) {}
 
-Pose2d::Pose2d(double x, double y, Rotation2d rotation)
+Pose2d::Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation)
     : m_translation(x, y), m_rotation(rotation) {}
 
 Pose2d Pose2d::operator+(const Transform2d& other) const {
@@ -40,7 +40,7 @@ Pose2d Pose2d::RelativeTo(const Pose2d& other) const {
 Pose2d Pose2d::Exp(const Twist2d& twist) const {
   const auto dx = twist.dx;
   const auto dy = twist.dy;
-  const auto dtheta = twist.dtheta;
+  const auto dtheta = twist.dtheta.to<double>();
 
   const auto sinTheta = std::sin(dtheta);
   const auto cosTheta = std::cos(dtheta);

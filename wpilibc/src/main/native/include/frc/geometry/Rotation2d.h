@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <units/units.h>
 #include <wpi/math>
 
 namespace frc {
@@ -27,7 +28,7 @@ class Rotation2d {
    *
    * @param value The value of the angle in radians.
    */
-  explicit Rotation2d(double value);
+  explicit Rotation2d(units::radian_t value);
 
   /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)
@@ -37,15 +38,6 @@ class Rotation2d {
    * @param y The y component or sine of the rotation.
    */
   Rotation2d(double x, double y);
-
-  /**
-   * Constructs and returns a Rotation2d with the given degree value.
-   *
-   * @param degrees The value of the angle in degrees.
-   *
-   * @return The rotation object with the desired angle value.
-   */
-  static Rotation2d FromDegrees(double degrees);
 
   /**
    * Adds two rotations together, with the result being bounded between -pi and
@@ -124,14 +116,14 @@ class Rotation2d {
    *
    * @return The radian value of the rotation.
    */
-  double Radians() const { return m_value; }
+  units::radian_t Radians() const { return m_value; }
 
   /**
    * Returns the degree value of the rotation.
    *
    * @return The degree value of the rotation.
    */
-  double Degrees() const { return Rad2Deg(m_value); }
+  units::degree_t Degrees() const { return m_value; }
 
   /**
    * Returns the cosine of the rotation.
@@ -155,18 +147,8 @@ class Rotation2d {
   double Tan() const { return m_sin / m_cos; }
 
  private:
-  double m_value = 0;
+  units::radian_t m_value = 0_deg;
   double m_cos = 1;
   double m_sin = 0;
-
-  template <typename T>
-  static T Rad2Deg(const T& rad) {
-    return rad * 180.0 / wpi::math::pi;
-  }
-
-  template <typename T>
-  static T Deg2Rad(const T& deg) {
-    return deg * wpi::math::pi / 180.0;
-  }
 };
 }  // namespace frc

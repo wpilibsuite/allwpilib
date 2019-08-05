@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <units/units.h>
+
 #include "Rotation2d.h"
 
 namespace frc {
@@ -33,7 +35,7 @@ class Translation2d {
    * @param x The x component of the translation.
    * @param y The y component of the translation.
    */
-  Translation2d(double x, double y);
+  Translation2d(units::meter_t x, units::meter_t y);
 
   /**
    * Calculates the distance between two translations in 2d space.
@@ -45,28 +47,28 @@ class Translation2d {
    *
    * @return The distance between the two translations.
    */
-  double Distance(const Translation2d& other) const;
+  units::meter_t Distance(const Translation2d& other) const;
 
   /**
    * Returns the X component of the translation.
    *
    * @return The x component of the translation.
    */
-  double X() const { return m_x; }
+  units::meter_t X() const { return m_x; }
 
   /**
    * Returns the Y component of the translation.
    *
    * @return The y component of the translation.
    */
-  double Y() const { return m_y; }
+  units::meter_t Y() const { return m_y; }
 
   /**
    * Returns the norm, or distance from the origin to the translation.
    *
    * @return The norm of the translation.
    */
-  double Norm() const;
+  units::meter_t Norm() const;
 
   /**
    * Applies a rotation to the translation in 2d space.
@@ -190,7 +192,7 @@ class Translation2d {
   Translation2d& operator/=(double scalar);
 
  private:
-  double m_x = 0;
-  double m_y = 0;
+  units::meter_t m_x = 0_m;
+  units::meter_t m_y = 0_m;
 };
 }  // namespace frc

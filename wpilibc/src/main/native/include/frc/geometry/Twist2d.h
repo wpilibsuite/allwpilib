@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+#include <units/units.h>
 
 namespace frc {
 /**
@@ -19,16 +20,16 @@ struct Twist2d {
   /**
    * Linear "dx" component
    */
-  double dx = 0;
+  units::meter_t dx = 0_m;
 
   /**
    * Linear "dy" component
    */
-  double dy = 0;
+  units::meter_t dy = 0_m;
 
   /**
    * Angular "dtheta" component (radians)
    */
-  double dtheta = 0;
+  units::radian_t dtheta = 0_rad;
 };
 }  // namespace frc
