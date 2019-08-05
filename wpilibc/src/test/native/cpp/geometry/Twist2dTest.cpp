@@ -7,6 +7,8 @@
 
 #include <cmath>
 
+#include <wpi/math>
+
 #include "frc/geometry/Pose2d.h"
 #include "gtest/gtest.h"
 
@@ -24,8 +26,8 @@ TEST(Twist2dTest, Straight) {
 }
 
 TEST(Twist2dTest, QuarterCircle) {
-  const Twist2d quarterCircle{5.0_m / 2.0 * 3.14159265358979323846, 0_m,
-                              3.14159265358979323846_rad / 2.0};
+  const Twist2d quarterCircle{5.0_m / 2.0 * wpi::math::pi, 0_m,
+                              units::radian_t(wpi::math::pi / 2.0)};
   const auto quarterCirclePose = Pose2d().Exp(quarterCircle);
 
   EXPECT_NEAR(quarterCirclePose.Translation().X().to<double>(), 5.0, kEpsilon);
