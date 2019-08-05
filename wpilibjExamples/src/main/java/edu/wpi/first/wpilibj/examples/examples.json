@@ -36,6 +36,55 @@
     "mainclass": "Main"
   },
   {
+    "name": "PDP CAN Monitoring",
+    "description": "Demonstrate using CAN to monitor the voltage, current, and temperature in the Power Distribution Panel.",
+    "tags": [
+      "Complete List",
+      "CAN",
+      "Sensors"
+    ],
+    "foldername": "canpdp",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Solenoids",
+    "description": "Demonstrate controlling a single and double solenoid from Joystick buttons.",
+    "tags": [
+      "Actuators",
+      "Joystick",
+      "Pneumatics",
+      "Complete List"
+    ],
+    "foldername": "solenoid",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Encoder",
+    "description": "Demonstrate displaying the value of a quadrature encoder on the SmartDashboard.",
+    "tags": [
+      "Complete List",
+      "Digital",
+      "Sensors"
+    ],
+    "foldername": "encoder",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Relay",
+    "description": "Demonstrate controlling a Relay from Joystick buttons.",
+    "tags": [
+      "Actuators",
+      "Joystick",
+      "Complete List"
+    ],
+    "foldername": "relay",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
     "name": "Ultrasonic",
     "description": "Demonstrate maintaining a set distance using an ultrasonic sensor.",
     "tags": [
