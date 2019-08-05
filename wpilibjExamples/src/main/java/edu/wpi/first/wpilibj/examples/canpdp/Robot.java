@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   private static final int kPDPId = 0;
 
-  private PowerDistributionPanel m_pdp = new PowerDistributionPanel(kPDPId);
+  private final PowerDistributionPanel m_pdp = new PowerDistributionPanel(kPDPId);
 
   @Override
   public void robotPeriodic() {

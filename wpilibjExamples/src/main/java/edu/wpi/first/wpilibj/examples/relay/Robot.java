@@ -20,8 +20,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
  */
 
 public class Robot extends TimedRobot {
-  private Joystick m_stick = new Joystick(0);
-  private Relay m_relay = new Relay(0);
+  private final Joystick m_stick = new Joystick(0);
+  private final Relay m_relay = new Relay(0);
 
   private static final int kRelayForwardButton = 1;
   private static final int kRelayReverseButton = 2;

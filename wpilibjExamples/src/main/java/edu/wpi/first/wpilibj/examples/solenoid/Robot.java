@@ -25,13 +25,13 @@ import edu.wpi.first.wpilibj.TimedRobot;
  */
 
 public class Robot extends TimedRobot {
-  private Joystick m_stick = new Joystick(0);
+  private final Joystick m_stick = new Joystick(0);
 
   // Solenoid corresponds to a single solenoid.
-  private Solenoid m_solenoid = new Solenoid(0);
+  private final Solenoid m_solenoid = new Solenoid(0);
 
   // DoubleSolenoid corresponds to a double solenoid.
-  private DoubleSolenoid m_doubleSolenoid = new DoubleSolenoid(1, 2);
+  private final DoubleSolenoid m_doubleSolenoid = new DoubleSolenoid(1, 2);
 
   private static final int kSolenoidButton = 1;
   private static final int kDoubleSolenoidForward = 2;
