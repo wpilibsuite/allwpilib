@@ -78,7 +78,7 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   // no status, so no need to check for a proper free.
   digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) return;
-  SimDIOData[port->channel].initialized = true;
+  SimDIOData[port->channel].initialized = false;
 }
 
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
