@@ -118,7 +118,7 @@ void* HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle,
   if (anInterrupt == nullptr) {
     return nullptr;
   }
-  anInterrupt->manager->enable(status);
+  anInterrupt->manager->disable(status);
   void* param = anInterrupt->param;
   return param;
 }
