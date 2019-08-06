@@ -10,6 +10,8 @@
 #include <functional>
 #include <limits>
 
+#include <units/units.h>
+
 #include "frc/smartdashboard/SendableBase.h"
 
 namespace frc2 {
@@ -30,7 +32,8 @@ class PIDController : public frc::SendableBase {
    * @param period The period between controller updates in seconds. The
    *               default is 0.02 seconds.
    */
-  PIDController(double Kp, double Ki, double Kd, double period = 0.02);
+  PIDController(double Kp, double Ki, double Kd,
+                units::second_t period = 20_ms);
 
   ~PIDController() override = default;
 
@@ -97,7 +100,7 @@ class PIDController : public frc::SendableBase {
    *
    * @return The period of the controller.
    */
-  double GetPeriod() const;
+  units::second_t GetPeriod() const;
 
   /**
    * Returns the current controller output.
