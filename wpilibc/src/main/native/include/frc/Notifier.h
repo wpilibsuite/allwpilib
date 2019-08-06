@@ -17,6 +17,8 @@
 #include <hal/Types.h>
 #include <wpi/mutex.h>
 
+#include <units/units.h>
+
 #include "frc/ErrorBase.h"
 
 namespace frc {
@@ -61,6 +63,15 @@ class Notifier : public ErrorBase {
   void StartSingle(double delay);
 
   /**
+   * Register for single event notification.
+   *
+   * A timer event is queued for a single event after the specified delay.
+   *
+   * @param delay Amount of time to wait before the handler is called.
+   */
+  void StartSingle(units::second_t delay);
+
+  /**
    * Register for periodic event notification.
    *
    * A timer event is queued for periodic event notification. Each time the
@@ -71,6 +82,18 @@ class Notifier : public ErrorBase {
    *               after the call to this method.
    */
   void StartPeriodic(double period);
+
+  /**
+   * Register for periodic event notification.
+   *
+   * A timer event is queued for periodic event notification. Each time the
+   * interrupt occurs, the event will be immediately requeued for the same time
+   * interval.
+   *
+   * @param period Period to call the handler starting one period
+   *               after the call to this method.
+   */
+  void StartPeriodic(units::second_t period);
 
   /**
    * Stop timer events from occuring.

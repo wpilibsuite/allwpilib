@@ -103,12 +103,20 @@ void Notifier::StartSingle(double delay) {
   UpdateAlarm();
 }
 
+void Notifier::StartSingle(units::second_t delay) {
+  StartSingle(delay.to<double>());
+}
+
 void Notifier::StartPeriodic(double period) {
   std::scoped_lock lock(m_processMutex);
   m_periodic = true;
   m_period = period;
   m_expirationTime = Timer::GetFPGATimestamp() + m_period;
   UpdateAlarm();
+}
+
+void Notifier::StartPeriodic(units::second_t period) {
+  StartPeriodic(period.to<double>());
 }
 
 void Notifier::Stop() {
