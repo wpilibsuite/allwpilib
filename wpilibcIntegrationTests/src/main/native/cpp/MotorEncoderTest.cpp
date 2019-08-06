@@ -148,7 +148,7 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
   frc::Notifier pidRunner{[this, &pidController] {
     m_speedController->Set(pidController.Calculate(m_encoder->GetDistance()));
   }};
-  pidRunner.StartPeriodic(pidController.GetPeriod());
+  pidRunner.StartPeriodic(pidController.GetPeriod().to<double>());
   Wait(10.0);
   pidRunner.Stop();
 
@@ -176,7 +176,7 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
         pidController.Calculate(m_filter->Calculate(m_encoder->GetRate())) +
         8e-5);
   }};
-  pidRunner.StartPeriodic(pidController.GetPeriod());
+  pidRunner.StartPeriodic(pidController.GetPeriod().to<double>());
   Wait(10.0);
   pidRunner.Stop();
   RecordProperty("PIDError", pidController.GetError());
