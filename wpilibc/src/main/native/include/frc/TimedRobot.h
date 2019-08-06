@@ -9,6 +9,8 @@
 
 #include <hal/Types.h>
 
+#include <units/units.h>
+
 #include "frc/ErrorBase.h"
 #include "frc/IterativeRobotBase.h"
 
@@ -43,6 +45,13 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
    * @param period Period in seconds.
    */
   explicit TimedRobot(double period = kDefaultPeriod);
+
+  /**
+   * Constructor for TimedRobot.
+   *
+   * @param period Period.
+   */
+  explicit TimedRobot(units::second_t period = units::second_t(kDefaultPeriod));
 
   ~TimedRobot() override;
 

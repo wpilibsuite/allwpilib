@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <units/units.h>
+
 #include "frc/RobotBase.h"
 #include "frc/Watchdog.h"
 
@@ -142,6 +144,13 @@ class IterativeRobotBase : public RobotBase {
    * @param period Period in seconds.
    */
   explicit IterativeRobotBase(double period);
+
+  /**
+   * Constructor for IterativeRobotBase.
+   *
+   * @param period Period.
+   */
+  explicit IterativeRobotBase(units::second_t period);
 
   virtual ~IterativeRobotBase() = default;
 

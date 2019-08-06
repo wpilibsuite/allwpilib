@@ -54,6 +54,15 @@ TimedRobot::TimedRobot(double period) : IterativeRobotBase(period) {
              HALUsageReporting::kFramework_Timed);
 }
 
+TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
+  int32_t status = 0;
+  m_notifier = HAL_InitializeNotifier(&status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+
+  HAL_Report(HALUsageReporting::kResourceType_Framework,
+             HALUsageReporting::kFramework_Timed);
+}
+
 TimedRobot::~TimedRobot() {
   int32_t status = 0;
 
