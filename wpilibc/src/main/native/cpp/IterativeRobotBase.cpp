@@ -29,8 +29,7 @@ IterativeRobotBase::IterativeRobotBase(double period)
 
 IterativeRobotBase::IterativeRobotBase(units::second_t period)
     : m_period(period.to<double>()),
-      m_watchdog(period.to<double>(), [this] { PrintLoopOverrunMessage()(); }) {
-}
+      m_watchdog(period.to<double>(), [this] { PrintLoopOverrunMessage(); }) {}
 
 void IterativeRobotBase::RobotInit() {
   wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
