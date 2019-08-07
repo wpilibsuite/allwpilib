@@ -102,6 +102,7 @@ class Timer {
    * @param period The period to check for (in seconds).
    * @return       True if the period has passed.
    */
+  WPI_DEPRECATED("Use unit-safe HasPeriodPassed method instead.")
   bool HasPeriodPassed(double period);
 
   /**

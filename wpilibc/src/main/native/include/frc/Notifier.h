@@ -16,8 +16,8 @@
 
 #include <hal/Types.h>
 #include <units/units.h>
-#include <wpi/mutex.h>
 #include <wpi/deprecated.h>
+#include <wpi/mutex.h>
 
 #include "frc/ErrorBase.h"
 
