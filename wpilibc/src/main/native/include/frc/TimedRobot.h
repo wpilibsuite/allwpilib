@@ -10,6 +10,8 @@
 #include <hal/Types.h>
 #include <units/units.h>
 
+#include <wpi/deprecated.h>
+
 #include "frc/ErrorBase.h"
 #include "frc/IterativeRobotBase.h"
 
@@ -43,7 +45,8 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
    *
    * @param period Period in seconds.
    */
-  explicit TimedRobot(double period = kDefaultPeriod);
+  WPI_DEPRECATED("Use constructor with unit-safety instead.")
+  explicit TimedRobot(double period);
 
   /**
    * Constructor for TimedRobot.

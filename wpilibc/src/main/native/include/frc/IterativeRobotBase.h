@@ -8,6 +8,7 @@
 #pragma once
 
 #include <units/units.h>
+#include <wpi/deprecated.h>
 
 #include "frc/RobotBase.h"
 #include "frc/Watchdog.h"
@@ -143,6 +144,7 @@ class IterativeRobotBase : public RobotBase {
    *
    * @param period Period in seconds.
    */
+  WPI_DEPRECATED("Use ctor with unit-safety instead.")
   explicit IterativeRobotBase(double period);
 
   /**
