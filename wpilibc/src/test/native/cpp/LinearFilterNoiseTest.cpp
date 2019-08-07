@@ -12,12 +12,13 @@
 #include <random>
 
 #include <wpi/math>
+#include <units/units.h>
 
 #include "gtest/gtest.h"
 
 // Filter constants
-static constexpr double kFilterStep = 0.005;
-static constexpr double kFilterTime = 2.0;
+static constexpr units::second_t kFilterStep = 0.005_s;
+static constexpr units::second_t kFilterTime = 2.0_s;
 static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
 static constexpr int32_t kMovAvgTaps = 6;
 
@@ -75,8 +76,8 @@ TEST_P(LinearFilterNoiseTest, NoiseReduce) {
   std::mt19937 gen{rd()};
   std::normal_distribution<double> distr{0.0, 10.0};
 
-  for (double t = 0; t < kFilterTime; t += kFilterStep) {
-    double theory = GetData(t);
+  for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
+    double theory = GetData(t.to<double>());
     double noise = distr(gen);
     filterError += std::abs(m_filter->Calculate(theory + noise) - theory);
     noiseGenError += std::abs(noise - theory);
