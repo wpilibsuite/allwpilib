@@ -12,8 +12,8 @@
 #include <memory>
 #include <random>
 
-#include <wpi/math>
 #include <units/units.h>
+#include <wpi/math>
 
 #include "gtest/gtest.h"
 

@@ -25,12 +25,14 @@ LinearFilter::LinearFilter(wpi::ArrayRef<double> ffGains,
   HAL_Report(HALUsageReporting::kResourceType_LinearFilter, instances);
 }
 
-LinearFilter LinearFilter::SinglePoleIIR(double timeConstant, units::second_t period) {
+LinearFilter LinearFilter::SinglePoleIIR(double timeConstant,
+                                         units::second_t period) {
   double gain = std::exp(-period.to<double>() / timeConstant);
   return LinearFilter(1.0 - gain, -gain);
 }
 
-LinearFilter LinearFilter::HighPass(double timeConstant, units::second_t period) {
+LinearFilter LinearFilter::HighPass(double timeConstant,
+                                    units::second_t period) {
   double gain = std::exp(-period.to<double>() / timeConstant);
   return LinearFilter({gain, -gain}, {-gain});
 }

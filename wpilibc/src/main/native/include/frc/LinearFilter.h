@@ -103,7 +103,8 @@ class LinearFilter {
    * @param period       The period in seconds between samples taken by the
    *                     user.
    */
-  static LinearFilter SinglePoleIIR(double timeConstant, units::second_t period);
+  static LinearFilter SinglePoleIIR(double timeConstant,
+                                    units::second_t period);
 
   /**
    * Creates a first-order high-pass filter of the form:<br>

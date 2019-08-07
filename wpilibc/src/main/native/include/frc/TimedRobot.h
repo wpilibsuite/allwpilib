@@ -9,7 +9,6 @@
 
 #include <hal/Types.h>
 #include <units/units.h>
-
 #include <wpi/deprecated.h>
 
 #include "frc/ErrorBase.h"
