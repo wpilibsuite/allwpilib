@@ -110,6 +110,10 @@ bool Timer::HasPeriodPassed(double period) {
   return false;
 }
 
+bool Timer::HasPeriodPassed(units::second_t period) {
+  return HasPeriodPassed(period.to<double>());
+}
+
 double Timer::GetFPGATimestamp() {
   // FPGA returns the timestamp in microseconds
   return RobotController::GetFPGATime() * 1.0e-6;

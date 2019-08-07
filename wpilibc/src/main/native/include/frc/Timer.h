@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <units/units.h>
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
@@ -102,6 +103,16 @@ class Timer {
    * @return       True if the period has passed.
    */
   bool HasPeriodPassed(double period);
+
+  /**
+   * Check if the period specified has passed and if it has, advance the start
+   * time by that period. This is useful to decide if it's time to do periodic
+   * work without drifting later by the time it took to get around to checking.
+   *
+   * @param period The period to check for.
+   * @return       True if the period has passed.
+   */
+  bool HasPeriodPassed(units::second_t period);
 
   /**
    * Return the FPGA system clock time in seconds.
