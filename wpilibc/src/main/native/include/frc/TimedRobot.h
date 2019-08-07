@@ -27,7 +27,7 @@ namespace frc {
  */
 class TimedRobot : public IterativeRobotBase, public ErrorBase {
  public:
-  static constexpr double kDefaultPeriod = 0.02;
+  static constexpr units::second_t kDefaultPeriod = 20_ms;
 
   /**
    * Provide an alternate "main loop" via StartCompetition().
@@ -37,7 +37,7 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
   /**
    * Get the time period between calls to Periodic() functions.
    */
-  double GetPeriod() const;
+  units::second_t GetPeriod() const;
 
   /**
    * Constructor for TimedRobot.
@@ -52,7 +52,7 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
    *
    * @param period Period.
    */
-  explicit TimedRobot(units::second_t period = units::second_t(kDefaultPeriod));
+  explicit TimedRobot(units::second_t period = kDefaultPeriod);
 
   ~TimedRobot() override;
 

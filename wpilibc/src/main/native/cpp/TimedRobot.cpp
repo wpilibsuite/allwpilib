@@ -43,7 +43,9 @@ void TimedRobot::StartCompetition() {
   }
 }
 
-double TimedRobot::GetPeriod() const { return m_period; }
+units::second_t TimedRobot::GetPeriod() const {
+  return units::second_t(m_period);
+}
 
 TimedRobot::TimedRobot(double period) : IterativeRobotBase(period) {
   int32_t status = 0;
