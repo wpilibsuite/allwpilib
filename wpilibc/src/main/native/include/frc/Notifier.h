@@ -17,6 +17,7 @@
 #include <hal/Types.h>
 #include <units/units.h>
 #include <wpi/mutex.h>
+#include <wpi/deprecated.h>
 
 #include "frc/ErrorBase.h"
 
@@ -59,6 +60,7 @@ class Notifier : public ErrorBase {
    *
    * @param delay Seconds to wait before the handler is called.
    */
+  WPI_DEPRECATED("Use unit-safe StartSingle method instead.")
   void StartSingle(double delay);
 
   /**
@@ -80,6 +82,7 @@ class Notifier : public ErrorBase {
    * @param period Period in seconds to call the handler starting one period
    *               after the call to this method.
    */
+  WPI_DEPRECATED("Use unit-safe StartPeriodic method instead.")
   void StartPeriodic(double period);
 
   /**
