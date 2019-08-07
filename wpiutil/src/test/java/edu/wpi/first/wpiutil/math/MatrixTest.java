@@ -9,6 +9,7 @@ package edu.wpi.first.wpiutil.math;
 
 import org.ejml.data.SingularMatrixException;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
+import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpiutil.math.numbers.N1;
@@ -182,6 +183,27 @@ public class MatrixTest {
         .fill(6.0, 8.0,
             10.0, 12.0).getStorage().getDDRM(),
         mat1.plus(mat2).getStorage().getDDRM()
+    ));
+  }
+
+  @Test
+  void testMatrixExponential() {
+    SimpleMatrix matrix = MatrixUtils.eye(Nat.N2()).getStorage();
+    var result = SimpleMatrixUtils.expm(matrix);
+
+    assertTrue(MatrixFeatures_DDRM.isIdentical(
+        result.getDDRM(),
+        new SimpleMatrix(2, 2, true, new double[]{Math.E, 0, 0, Math.E}).getDDRM(),
+        1E-9
+    ));
+
+    matrix = new SimpleMatrix(2, 2, true, new double[]{1, 2, 3, 4});
+    result = SimpleMatrixUtils.expm(matrix.scale(0.01));
+
+    assertTrue(MatrixFeatures_DDRM.isIdentical(
+        result.getDDRM(),
+        new SimpleMatrix(2, 2, true, new double[]{1.01035625, 0.02050912, 0.03076368, 1.04111993}).getDDRM(),
+        1E-8
     ));
   }
 }
