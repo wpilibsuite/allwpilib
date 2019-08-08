@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -37,7 +37,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  *
  * @see Subsystem
  * @see CommandGroup
- * @see IllegalUseOfCommandException
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public abstract class Command extends SendableBase {
@@ -237,7 +236,7 @@ public abstract class Command extends SendableBase {
    *
    * @param subsystem the {@link Subsystem} required
    * @throws IllegalArgumentException     if subsystem is null
-   * @throws IllegalUseOfCommandException if this command has started before or if it has been given
+   * @throws IllegalStateException        if this command has started before or if it has been given
    *                                      to a {@link CommandGroup}
    * @see Subsystem
    */
@@ -406,13 +405,13 @@ public abstract class Command extends SendableBase {
   }
 
   /**
-   * If changes are locked, then this will throw an {@link IllegalUseOfCommandException}.
+   * If changes are locked, then this will throw an {@link IllegalStateException}.
    *
    * @param message the message to say (it is appended by a default message)
    */
   synchronized void validate(String message) {
     if (m_locked) {
-      throw new IllegalUseOfCommandException(message
+      throw new IllegalStateException(message
           + " after being started or being added to a command group");
     }
   }
@@ -421,11 +420,11 @@ public abstract class Command extends SendableBase {
    * Sets the parent of this command. No actual change is made to the group.
    *
    * @param parent the parent
-   * @throws IllegalUseOfCommandException if this {@link Command} already is already in a group
+   * @throws IllegalArgumentException if this {@link Command} already is already in a group
    */
   synchronized void setParent(CommandGroup parent) {
     if (m_parent != null) {
-      throw new IllegalUseOfCommandException(
+      throw new IllegalArgumentException(
           "Can not give command to a command group after already being put in a command group");
     }
     lockChanges();
@@ -455,12 +454,12 @@ public abstract class Command extends SendableBase {
    * eventually start, however it will not necessarily do so immediately, and may in fact be
    * canceled before initialize is even called. </p>
    *
-   * @throws IllegalUseOfCommandException if the command is a part of a CommandGroup
+   * @throws IllegalStateException if the command is a part of a CommandGroup
    */
   public synchronized void start() {
     lockChanges();
     if (m_parent != null) {
-      throw new IllegalUseOfCommandException(
+      throw new IllegalStateException(
           "Can not start a command that is a part of a command group");
     }
     Scheduler.getInstance().add(this);
@@ -498,11 +497,11 @@ public abstract class Command extends SendableBase {
    * </p> <p> A command can not be canceled if it is a part of a command group, you must cancel the
    * command group instead. </p>
    *
-   * @throws IllegalUseOfCommandException if this command is a part of a command group
+   * @throws IllegalStateException if this command is a part of a command group
    */
   public synchronized void cancel() {
     if (m_parent != null) {
-      throw new IllegalUseOfCommandException("Can not manually cancel a command in a command "
+      throw new IllegalStateException("Can not manually cancel a command in a command "
           + "group");
     }
     _cancel();

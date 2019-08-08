@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -29,7 +29,6 @@ import static java.util.Objects.requireNonNull;
  *
  * @see Command
  * @see Subsystem
- * @see IllegalUseOfCommandException
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public class CommandGroup extends Command {
@@ -79,7 +78,7 @@ public class CommandGroup extends Command {
    * <p> It is recommended that this method be called in the constructor. </p>
    *
    * @param command The {@link Command Command} to be added
-   * @throws IllegalUseOfCommandException if the group has been started before or been given to
+   * @throws IllegalStateException        if the group has been started before or been given to
    *                                      another group
    * @throws IllegalArgumentException     if command is null
    */
@@ -113,7 +112,7 @@ public class CommandGroup extends Command {
    *
    * @param command The {@link Command Command} to be added
    * @param timeout The timeout (in seconds)
-   * @throws IllegalUseOfCommandException if the group has been started before or been given to
+   * @throws IllegalStateException        if the group has been started before or been given to
    *                                      another group or if the {@link Command Command} has been
    *                                      started before or been given to another group
    * @throws IllegalArgumentException     if command is null or timeout is negative
@@ -152,7 +151,7 @@ public class CommandGroup extends Command {
    * <p> It is recommended that this method be called in the constructor. </p>
    *
    * @param command The command to be added
-   * @throws IllegalUseOfCommandException if the group has been started before or been given to
+   * @throws IllegalStateException        if the group has been started before or been given to
    *                                      another command group
    * @throws IllegalArgumentException     if command is null
    */
@@ -190,7 +189,7 @@ public class CommandGroup extends Command {
    *
    * @param command The command to be added
    * @param timeout The timeout (in seconds)
-   * @throws IllegalUseOfCommandException if the group has been started before or been given to
+   * @throws IllegalStateException        if the group has been started before or been given to
    *                                      another command group
    * @throws IllegalArgumentException     if command is null
    */

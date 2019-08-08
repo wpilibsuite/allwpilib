@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -87,14 +87,14 @@ public abstract class Subsystem extends SendableBase {
    * singleton. </p>
    *
    * @param command the default command (or null if there should be none)
-   * @throws IllegalUseOfCommandException if the command does not require the subsystem
+   * @throws IllegalArgumentException if the command does not require the subsystem
    */
   public void setDefaultCommand(Command command) {
     if (command == null) {
       m_defaultCommand = null;
     } else {
       if (!Collections.list(command.getRequirements()).contains(this)) {
-        throw new IllegalUseOfCommandException("A default command must require the subsystem");
+        throw new IllegalArgumentException("A default command must require the subsystem");
       }
       m_defaultCommand = command;
     }
