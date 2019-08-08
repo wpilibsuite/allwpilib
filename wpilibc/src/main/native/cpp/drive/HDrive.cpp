@@ -19,10 +19,8 @@
 
 using namespace frc;
 
-HDrive::HDrive(SpeedController& leftMotor, 
-               SpeedController& rightMotor, 
-               SpeedController& strafeMotor,
-               double strafeRotationFactor)
+HDrive::HDrive(SpeedController& leftMotor, SpeedController& rightMotor,
+               SpeedController& strafeMotor, double strafeRotationFactor)
     : m_leftMotor(leftMotor),
       m_rightMotor(rightMotor),
       m_strafeMotor(strafeMotor),
@@ -35,8 +33,8 @@ HDrive::HDrive(SpeedController& leftMotor,
   SetName("HDrive", instances);
 }
 
-void HDrive::DriveCartesian(double ySpeed, double xSpeed,
-                            double zRotation, double gyroAngle) {
+void HDrive::DriveCartesian(double ySpeed, double xSpeed, double zRotation,
+                            double gyroAngle) {
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 4,
                HALUsageReporting::kRobotDrive2_HDriveCartesian);
@@ -65,15 +63,14 @@ void HDrive::DriveCartesian(double ySpeed, double xSpeed,
 
   m_leftMotor.Set(wheelSpeeds[kLeft] * m_maxOutput);
   m_rightMotor.Set(wheelSpeeds[kRight] * m_maxOutput *
-                        m_rightSideInvertMultiplier);
+                   m_rightSideInvertMultiplier);
   m_strafeMotor.Set(wheelSpeeds[kBack] * m_maxOutput *
-                        m_rightSideInvertMultiplier);
+                    m_rightSideInvertMultiplier);
 
   Feed();
 }
 
-void HDrive::DrivePolar(double magnitude, double angle,
-                              double zRotation) {
+void HDrive::DrivePolar(double magnitude, double angle, double zRotation) {
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 4,
                HALUsageReporting::kRobotDrive2_HDrivePolar);
@@ -94,7 +91,7 @@ void HDrive::SetRightSideInverted(bool rightSideInverted) {
 }
 
 bool HDrive::IsStrafeInverted() const {
-  return m_strafeInvertMultiplier == -1.0;
+  return m_strafeInvertMultiplier == 1.0;
 }
 
 void HDrive::SetStrafeInverted(bool strafeInverted) {
@@ -108,24 +105,25 @@ void HDrive::StopMotor() {
   Feed();
 }
 
-void HDrive::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "HDrive";
-}
+void HDrive::GetDescription(wpi::raw_ostream& desc) const { desc << "HDrive"; }
 
 void HDrive::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("HDrive");
   builder.SetActuator(true);
   builder.SetSafeState([=] { StopMotor(); });
-  builder.AddDoubleProperty("Left Motor Speed",
-                            [=]() { return m_leftMotor.Get(); },
-                            [=](double value) { m_leftMotor.Set(value); });
+  builder.AddDoubleProperty(
+      "Left Motor Speed", [=]() { return m_leftMotor.Get(); },
+      [=](double value) { m_leftMotor.Set(value); });
   builder.AddDoubleProperty(
       "Right Motor Speed",
       [=]() { return m_rightMotor.Get() * m_rightSideInvertMultiplier; },
       [=](double value) {
         m_rightMotor.Set(value * m_rightSideInvertMultiplier);
       });
-  builder.AddDoubleProperty("Strafe Motor Speed",
-                            [=]() { return m_strafeMotor.Get(); },
-                            [=](double value) { m_strafeMotor.Set(value); });
+  builder.AddDoubleProperty(
+      "Strafe Motor Speed",
+      [=]() { return m_strafeMotor.Get() * m_strafeInvertMultiplier; },
+      [=](double value) {
+        m_strafeMotor.Set(value * m_strafeInvertMultiplier);
+      });
 }
