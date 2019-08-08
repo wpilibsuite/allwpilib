@@ -17,7 +17,7 @@ class SpeedController;
 /**
  * A class for driving H-drive platforms.
  *
- * A typical H-drive has left and right sides like a differential drive, 
+ * A typical H-drive has left and right sides like a differential drive,
  * along with an additional strafe wheel or wheels in the center, oriented
  * 90 degrees from the other wheels. H-drives typically use omni wheels.
  *
@@ -48,20 +48,20 @@ class SpeedController;
  *
  */
 class HDrive : public RobotDriveBase {
- /**
+  /**
    * Construct an HDrive.
    *
    * If a motor needs to be inverted, do so before passing it in.
-   * 
+   *
    * The strafe rotation factor is the distance to the strafe wheel from the
-   * center of rotation relative to half the width of the drive base, such 
-   * that a positive rotation causes the strafe wheel to drive forwards. For example,
-   * if the strafe wheel is exactly in the center of the robot, then the strafe 
-   * rotation factor is 0. If the width between the side wheels is 2 feet and the
-   * strafe wheel is positioned 1 foot behind the center of rotation, then the strafe
-   * rotation factor is 1.
+   * center of rotation relative to half the width of the drive base, such
+   * that a positive rotation causes the strafe wheel to drive forwards. For
+   * example, if the strafe wheel is exactly in the center of the robot, then
+   * the strafe rotation factor is 0. If the width between the side wheels is 2
+   * feet and the strafe wheel is positioned 1 foot behind the center of
+   * rotation, then the strafe rotation factor is 1.
    */
-  HDrive(SpeedController& leftMotor, SpeedController& rightMotor, 
+  HDrive(SpeedController& leftMotor, SpeedController& rightMotor,
          SpeedController& strafeMotor, double strafeRotationFactor = 0.0);
 
   ~HDrive() override = default;
@@ -114,7 +114,8 @@ class HDrive : public RobotDriveBase {
    * Sets if the power sent to the right side of the drivetrain should be
    * multiplied by -1.
    *
-   * @param rightSideInverted true if right side power should be multiplied by -1
+   * @param rightSideInverted true if right side power should be multiplied by
+   * -1
    */
   void SetRightSideInverted(bool rightSideInverted);
 

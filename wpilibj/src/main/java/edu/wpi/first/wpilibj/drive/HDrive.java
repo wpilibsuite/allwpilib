@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 /**
  * A class for driving H-drive platforms.
  *
- * <p>A typical H-drive has left and right sides like a differential drive, 
+ * <p>A typical H-drive has left and right sides like a differential drive,
  * along with an additional strafe wheel or wheels in the center, oriented
  * 90 degrees from the other wheels. H-drives typically use omni wheels.</p>
  *
@@ -65,16 +65,16 @@ public class HDrive extends RobotDriveBase {
    * Construct an HDrive.
    *
    * <p>If a motor needs to be inverted, do so before passing it in.</p>
-   * 
+   *
    * <p>The strafe rotation factor is the distance to the strafe wheel from the
-   * center of rotation relative to half the width of the drive base, such 
+   * center of rotation relative to half the width of the drive base, such
    * that a positive rotation causes the strafe wheel to drive forwards. For example,
-   * if the strafe wheel is exactly in the center of the robot, then the strafe 
+   * if the strafe wheel is exactly in the center of the robot, then the strafe
    * rotation factor is 0. If the width between the side wheels is 2 feet and the
    * strafe wheel is positioned 1 foot behind the center of rotation, then the strafe
    * rotation factor is 1.</p>
    */
-  public HDrive(SpeedController leftMotor, SpeedController rightMotor, SpeedController strafeMotor, 
+  public HDrive(SpeedController leftMotor, SpeedController rightMotor, SpeedController strafeMotor,
                 double strafeRotationFactor) {
     verify(leftMotor, rightMotor, strafeMotor);
     m_leftMotor = leftMotor;
@@ -93,7 +93,7 @@ public class HDrive extends RobotDriveBase {
    *
    * <p>If a motor needs to be inverted, do so before passing it in.
    */
-  public HDrive(SpeedController leftMotor, SpeedController rightMotor, 
+  public HDrive(SpeedController leftMotor, SpeedController rightMotor,
                 SpeedController strafeMotor) {
     this(leftMotor, rightMotor, strafeMotor, 0);
   }
@@ -176,9 +176,9 @@ public class HDrive extends RobotDriveBase {
     input.rotate(-gyroAngle);
 
     double[] wheelSpeeds = new double[3];
-    wheelSpeeds[MotorType.kLeft.value] = input.x + zRotation;
-    wheelSpeeds[MotorType.kRight.value] = -input.x - zRotation;
-    wheelSpeeds[MotorType.kBack.value] = input.y + m_strafeRotationFactor * zRotation;
+    wheelSpeeds[MotorType.kLeft.value] = input.x + zRotation + m_strafeRotationFactor * input.y;
+    wheelSpeeds[MotorType.kRight.value] = input.x - zRotation - m_strafeRotationFactor * input.y;
+    wheelSpeeds[MotorType.kBack.value] = input.y - m_strafeRotationFactor * zRotation;
 
     normalize(wheelSpeeds);
 

@@ -55,9 +55,9 @@ void HDrive::DriveCartesian(double ySpeed, double xSpeed, double zRotation,
   input.Rotate(-gyroAngle);
 
   double wheelSpeeds[3];
-  wheelSpeeds[kLeft] = input.x + zRotation;
-  wheelSpeeds[kRight] = -input.x - zRotation;
-  wheelSpeeds[kBack] = input.y + m_strafeRotationFactor * zRotation;
+  wheelSpeeds[kLeft] = input.x + zRotation + m_strafeRotationFactor * input.y;
+  wheelSpeeds[kRight] = input.x - zRotation - m_strafeRotationFactor * input.y;
+  wheelSpeeds[kBack] = input.y - m_strafeRotationFactor * zRotation;
 
   Normalize(wheelSpeeds);
 
