@@ -20,15 +20,17 @@
 using namespace frc;
 
 HDrive::HDrive(SpeedController& leftMotor, SpeedController& rightMotor,
-               SpeedController& strafeMotor, double strafeRotationFactor)
+               SpeedController& strafeMotor, double trackWidth,
+               double strafeWheelDistance)
     : m_leftMotor(leftMotor),
       m_rightMotor(rightMotor),
-      m_strafeMotor(strafeMotor),
-      m_strafeRotationFactor(strafeRotationFactor) {
+      m_strafeMotor(strafeMotor) {
   AddChild(&m_leftMotor);
   AddChild(&m_rightMotor);
   AddChild(&m_strafeMotor);
   static int instances = 0;
+  m_strafeRotationFactor =
+      trackWidth == 0.0 ? 0.0 : strafeWheelDistance / (trackWidth / 2.0);
   ++instances;
   SetName("HDrive", instances);
 }
@@ -62,10 +64,8 @@ void HDrive::DriveCartesian(double ySpeed, double xSpeed, double zRotation,
   Normalize(wheelSpeeds);
 
   m_leftMotor.Set(wheelSpeeds[kLeft] * m_maxOutput);
-  m_rightMotor.Set(wheelSpeeds[kRight] * m_maxOutput *
-                   m_rightSideInvertMultiplier);
-  m_strafeMotor.Set(wheelSpeeds[kBack] * m_maxOutput *
-                    m_rightSideInvertMultiplier);
+  m_rightMotor.Set(wheelSpeeds[kRight] * m_maxOutput);
+  m_strafeMotor.Set(wheelSpeeds[kBack] * m_maxOutput);
 
   Feed();
 }
@@ -80,22 +80,6 @@ void HDrive::DrivePolar(double magnitude, double angle, double zRotation) {
   DriveCartesian(magnitude * std::sin(angle * (wpi::math::pi / 180.0)),
                  magnitude * std::cos(angle * (wpi::math::pi / 180.0)),
                  zRotation, 0.0);
-}
-
-bool HDrive::IsRightSideInverted() const {
-  return m_rightSideInvertMultiplier == -1.0;
-}
-
-void HDrive::SetRightSideInverted(bool rightSideInverted) {
-  m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;
-}
-
-bool HDrive::IsStrafeInverted() const {
-  return m_strafeInvertMultiplier == 1.0;
-}
-
-void HDrive::SetStrafeInverted(bool strafeInverted) {
-  m_strafeInvertMultiplier = strafeInverted ? -1.0 : 1.0;
 }
 
 void HDrive::StopMotor() {
@@ -115,15 +99,9 @@ void HDrive::InitSendable(SendableBuilder& builder) {
       "Left Motor Speed", [=]() { return m_leftMotor.Get(); },
       [=](double value) { m_leftMotor.Set(value); });
   builder.AddDoubleProperty(
-      "Right Motor Speed",
-      [=]() { return m_rightMotor.Get() * m_rightSideInvertMultiplier; },
-      [=](double value) {
-        m_rightMotor.Set(value * m_rightSideInvertMultiplier);
-      });
+      "Right Motor Speed", [=]() { return m_rightMotor.Get(); },
+      [=](double value) { m_rightMotor.Set(value); });
   builder.AddDoubleProperty(
-      "Strafe Motor Speed",
-      [=]() { return m_strafeMotor.Get() * m_strafeInvertMultiplier; },
-      [=](double value) {
-        m_strafeMotor.Set(value * m_strafeInvertMultiplier);
-      });
+      "Strafe Motor Speed", [=]() { return m_strafeMotor.Get(); },
+      [=](double value) { m_strafeMotor.Set(value); });
 }

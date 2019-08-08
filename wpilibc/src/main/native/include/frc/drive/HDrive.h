@@ -53,16 +53,13 @@ class HDrive : public RobotDriveBase {
    *
    * If a motor needs to be inverted, do so before passing it in.
    *
-   * The strafe rotation factor is the distance to the strafe wheel from the
-   * center of rotation relative to half the width of the drive base, such
-   * that a positive rotation causes the strafe wheel to drive forwards. For
-   * example, if the strafe wheel is exactly in the center of the robot, then
-   * the strafe rotation factor is 0. If the width between the side wheels is 2
-   * feet and the strafe wheel is positioned 1 foot behind the center of
-   * rotation, then the strafe rotation factor is 1.
+   * @param trackWidth the width between the robot's left and right sides
+   * @param strafeWheelDistance the distance between the center of rotation and
+   * the strafe wheel
    */
   HDrive(SpeedController& leftMotor, SpeedController& rightMotor,
-         SpeedController& strafeMotor, double strafeRotationFactor = 0.0);
+         SpeedController& strafeMotor, double trackWidth = 0.0,
+         double strafeWheelDistance = 0.0);
 
   ~HDrive() override = default;
 
@@ -102,39 +99,6 @@ class HDrive : public RobotDriveBase {
    */
   void DrivePolar(double magnitude, double angle, double zRotation);
 
-  /**
-   * Gets if the power sent to the right side of the drivetrain is multiplied by
-   * -1.
-   *
-   * @return true if the right side is inverted
-   */
-  bool IsRightSideInverted() const;
-
-  /**
-   * Sets if the power sent to the right side of the drivetrain should be
-   * multiplied by -1.
-   *
-   * @param rightSideInverted true if right side power should be multiplied by
-   * -1
-   */
-  void SetRightSideInverted(bool rightSideInverted);
-
-  /**
-   * Gets if the power sent to the strafe wheel is multiplied by
-   * -1.
-   *
-   * @return true if the strafe wheel is inverted
-   */
-  bool IsStrafeInverted() const;
-
-  /**
-   * Sets if the power sent to the strafe wheel should be
-   * multiplied by -1.
-   *
-   * @param strafeInverted true if strafe wheel power should be multiplied by -1
-   */
-  void SetStrafeInverted(bool strafeInverted);
-
   void StopMotor() override;
   void GetDescription(wpi::raw_ostream& desc) const override;
 
@@ -144,9 +108,6 @@ class HDrive : public RobotDriveBase {
   SpeedController& m_leftMotor;
   SpeedController& m_rightMotor;
   SpeedController& m_strafeMotor;
-
-  double m_rightSideInvertMultiplier = -1.0;
-  double m_strafeInvertMultiplier = 1.0;
 
   double m_strafeRotationFactor;
 

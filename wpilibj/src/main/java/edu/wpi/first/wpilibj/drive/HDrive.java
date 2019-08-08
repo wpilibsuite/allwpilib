@@ -57,8 +57,6 @@ public class HDrive extends RobotDriveBase {
 
   private final double m_strafeRotationFactor;
 
-  private double m_rightSideInvertMultiplier = -1.0;
-  private double m_strafeInvertMultiplier = 1.0;
   private boolean m_reported;
 
   /**
@@ -66,21 +64,16 @@ public class HDrive extends RobotDriveBase {
    *
    * <p>If a motor needs to be inverted, do so before passing it in.</p>
    *
-   * <p>The strafe rotation factor is the distance to the strafe wheel from the
-   * center of rotation relative to half the width of the drive base, such
-   * that a positive rotation causes the strafe wheel to drive forwards. For example,
-   * if the strafe wheel is exactly in the center of the robot, then the strafe
-   * rotation factor is 0. If the width between the side wheels is 2 feet and the
-   * strafe wheel is positioned 1 foot behind the center of rotation, then the strafe
-   * rotation factor is 1.</p>
+   * @param trackWidth the width between the robot's left and right sides
+   * @param strafeWheelDistance the distance between the center of rotation and the strafe wheel
    */
   public HDrive(SpeedController leftMotor, SpeedController rightMotor, SpeedController strafeMotor,
-                double strafeRotationFactor) {
+                double trackWidth, double strafeWheelDistance) {
     verify(leftMotor, rightMotor, strafeMotor);
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
     m_strafeMotor = strafeMotor;
-    m_strafeRotationFactor = strafeRotationFactor;
+    m_strafeRotationFactor = trackWidth == 0.0 ? 0.0 : strafeWheelDistance / (trackWidth / 2.0);
     addChild(m_leftMotor);
     addChild(m_rightMotor);
     addChild(m_strafeMotor);
@@ -95,7 +88,7 @@ public class HDrive extends RobotDriveBase {
    */
   public HDrive(SpeedController leftMotor, SpeedController rightMotor,
                 SpeedController strafeMotor) {
-    this(leftMotor, rightMotor, strafeMotor, 0);
+    this(leftMotor, rightMotor, strafeMotor, 1.0, 0.0);
   }
 
   /**
@@ -183,10 +176,8 @@ public class HDrive extends RobotDriveBase {
     normalize(wheelSpeeds);
 
     m_leftMotor.set(wheelSpeeds[MotorType.kLeft.value] * m_maxOutput);
-    m_rightMotor.set(wheelSpeeds[MotorType.kRight.value] * m_maxOutput
-        * m_rightSideInvertMultiplier);
-    m_strafeMotor.set(wheelSpeeds[MotorType.kBack.value] * m_maxOutput
-        * m_strafeInvertMultiplier);
+    m_rightMotor.set(wheelSpeeds[MotorType.kRight.value] * m_maxOutput);
+    m_strafeMotor.set(wheelSpeeds[MotorType.kBack.value] * m_maxOutput);
 
     feed();
   }
@@ -213,42 +204,6 @@ public class HDrive extends RobotDriveBase {
                    magnitude * Math.cos(angle * (Math.PI / 180.0)), zRotation, 0.0);
   }
 
-  /**
-   * Gets if the power sent to the right side of the drivetrain is multiplied by -1.
-   *
-   * @return true if the right side is inverted
-   */
-  public boolean isRightSideInverted() {
-    return m_rightSideInvertMultiplier == -1.0;
-  }
-
-  /**
-   * Sets if the power sent to the right side of the drivetrain should be multiplied by -1.
-   *
-   * @param rightSideInverted true if right side power should be multiplied by -1
-   */
-  public void setRightSideInverted(boolean rightSideInverted) {
-    m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;
-  }
-
-  /**
-   * Gets if the power sent to the strafe wheel is multiplied by -1.
-   *
-   * @return true if the strafe wheel is inverted
-   */
-  public boolean isStrafeInverted() {
-    return m_strafeInvertMultiplier == -1.0;
-  }
-
-  /**
-   * Sets if the power sent to the strafe wheel should be multiplied by -1.
-   *
-   * @param strafeInverted true if strafe wheel power should be multipled by -1
-   */
-  public void setStrafeInverted(boolean strafeInverted) {
-    m_strafeInvertMultiplier = strafeInverted ? -1.0 : 1.0;
-  }
-
   @Override
   public void stopMotor() {
     m_leftMotor.stopMotor();
@@ -271,10 +226,10 @@ public class HDrive extends RobotDriveBase {
         m_leftMotor::get,
         m_leftMotor::set);
     builder.addDoubleProperty("Right Motor Speed",
-        () -> m_rightMotor.get() * m_rightSideInvertMultiplier,
-        value -> m_rightMotor.set(value * m_rightSideInvertMultiplier));
+        () -> m_rightMotor.get(),
+        value -> m_rightMotor.set(value));
     builder.addDoubleProperty("Strafe Motor Speed",
-        () -> m_strafeMotor.get() * m_strafeInvertMultiplier,
-        value -> m_strafeMotor.set(value * m_strafeInvertMultiplier));
+        () -> m_strafeMotor.get(),
+        value -> m_strafeMotor.set(value));
   }
 }
