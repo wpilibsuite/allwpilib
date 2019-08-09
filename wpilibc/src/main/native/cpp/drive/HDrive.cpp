@@ -95,13 +95,13 @@ void HDrive::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("HDrive");
   builder.SetActuator(true);
   builder.SetSafeState([=] { StopMotor(); });
-  builder.AddDoubleProperty(
-      "Left Motor Speed", [=]() { return m_leftMotor.Get(); },
-      [=](double value) { m_leftMotor.Set(value); });
-  builder.AddDoubleProperty(
-      "Right Motor Speed", [=]() { return m_rightMotor.Get(); },
-      [=](double value) { m_rightMotor.Set(value); });
-  builder.AddDoubleProperty(
-      "Strafe Motor Speed", [=]() { return m_strafeMotor.Get(); },
-      [=](double value) { m_strafeMotor.Set(value); });
+  builder.AddDoubleProperty("Left Motor Speed",
+                            [=]() { return m_leftMotor.Get(); },
+                            [=](double value) { m_leftMotor.Set(value); });
+  builder.AddDoubleProperty("Right Motor Speed",
+                            [=]() { return m_rightMotor.Get(); },
+                            [=](double value) { m_rightMotor.Set(value); });
+  builder.AddDoubleProperty("Strafe Motor Speed",
+                            [=]() { return m_strafeMotor.Get(); },
+                            [=](double value) { m_strafeMotor.Set(value); });
 }
