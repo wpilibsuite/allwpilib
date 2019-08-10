@@ -19,7 +19,7 @@ public class Robot extends TimedRobot {
   private Encoder m_encoder = new Encoder(1, 2);
   private Spark m_motor = new Spark(1);
   private PIDController m_controller = new PIDController(1.3, 0.0, 0.7, 0.05);
-  private static kDt = 0.02;
+  private static double kDt = 0.02;
 
   private TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(1.75, 0.75);
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
