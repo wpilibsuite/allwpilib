@@ -87,9 +87,6 @@ class LinearFilter {
       : LinearFilter(wpi::makeArrayRef(ffGains.begin(), ffGains.end()),
                      wpi::makeArrayRef(fbGains.begin(), fbGains.end())) {}
 
-  LinearFilter(LinearFilter&&) = default;
-  LinearFilter& operator=(LinearFilter&&) = default;
-
   // Static methods to create commonly used filters
   /**
    * Creates a one-pole IIR low-pass filter of the form:<br>

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -78,7 +78,7 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   // no status, so no need to check for a proper free.
   digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) return;
-  SimDIOData[port->channel].initialized = true;
+  SimDIOData[port->channel].initialized = false;
 }
 
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {

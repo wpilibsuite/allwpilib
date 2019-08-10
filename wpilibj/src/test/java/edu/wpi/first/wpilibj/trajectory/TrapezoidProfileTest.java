@@ -5,11 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj;
+package edu.wpi.first.wpilibj.trajectory;
 
 import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
