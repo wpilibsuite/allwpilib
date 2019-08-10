@@ -14,6 +14,8 @@
 
 class Robot : public frc::TimedRobot {
  public:
+  static constexpr units::second_t kDt = 20_ms;
+
   Robot() { m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * 3.1415 * 1.5); }
 
   void TeleopPeriodic() override {
@@ -23,9 +25,16 @@ class Robot : public frc::TimedRobot {
       m_goal = {0_m, 0_mps};
     }
 
+    // Create a motion profile with the given maximum velocity and maximum
+    // acceleration constraints for the next setpoint, the desired goal, and the
+    // current setpoint.
     frc::TrapezoidProfile profile{m_constraints, m_goal, m_setpoint};
-    m_setpoint = profile.Calculate(0.05_s);
 
+    // Retrieve the profiled setpoint for the next timestep. This setpoint moves
+    // toward the goal while obeying the constraints.
+    m_setpoint = profile.Calculate(kDt);
+
+    // Run controller with profiled setpoint and update motor output
     double output = m_controller.Calculate(m_encoder.GetDistance(),
                                            m_setpoint.position.to<double>());
     m_motor.Set(output);
@@ -35,7 +44,7 @@ class Robot : public frc::TimedRobot {
   frc::Joystick m_joystick{1};
   frc::Encoder m_encoder{1, 2};
   frc::Spark m_motor{1};
-  frc2::PIDController m_controller{1.3, 0.0, 0.7, 0.05};
+  frc2::PIDController m_controller{1.3, 0.0, 0.7, kDt.to<double>()};
 
   frc::TrapezoidProfile::Constraints m_constraints{1.75_mps, 0.75_mps_sq};
   frc::TrapezoidProfile::State m_goal;

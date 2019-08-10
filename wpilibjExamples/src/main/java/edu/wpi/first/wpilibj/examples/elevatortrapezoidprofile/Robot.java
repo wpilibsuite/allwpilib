@@ -15,14 +15,15 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 public class Robot extends TimedRobot {
-  Joystick m_joystick = new Joystick(1);
-  Encoder m_encoder = new Encoder(1, 2);
-  Spark m_motor = new Spark(1);
-  PIDController m_controller = new PIDController(1.3, 0.0, 0.7, 0.05);
+  private Joystick m_joystick = new Joystick(1);
+  private Encoder m_encoder = new Encoder(1, 2);
+  private Spark m_motor = new Spark(1);
+  private PIDController m_controller = new PIDController(1.3, 0.0, 0.7, 0.05);
+  private static kDt = 0.02;
 
-  TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(1.75, 0.75);
-  TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
-  TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+  private TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(1.75, 0.75);
+  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
   @Override
   public void robotInit() {
@@ -37,11 +38,19 @@ public class Robot extends TimedRobot {
       m_goal = new TrapezoidProfile.State(0, 0);
     }
 
+    // Create a motion profile with the given maximum velocity and maximum
+    // acceleration constraints for the next setpoint, the desired goal, and the
+    // current setpoint.
     var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
+
+    // Retrieve the profiled setpoint for the next timestep. This setpoint moves
+    // toward the goal while obeying the constraints.
     m_setpoint = profile.calculate(0.05);
 
     double output = m_controller.calculate(m_encoder.getDistance(),
                                            m_setpoint.position);
+
+    // Run controller with profiled setpoint and update motor output
     m_motor.set(output);
   }
 }
