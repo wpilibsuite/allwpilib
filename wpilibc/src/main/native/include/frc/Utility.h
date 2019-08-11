@@ -71,14 +71,3 @@ bool wpi_assertNotEqual_impl(int valueA, int valueB,
                              const wpi::Twine& valueBString,
                              const wpi::Twine& message, wpi::StringRef fileName,
                              int lineNumber, wpi::StringRef funcName);
-
-namespace frc {
-
-/**
- * Get a stack trace, ignoring the first "offset" symbols.
- *
- * @param offset The number of symbols at the top of the stack to ignore
- */
-std::string GetStackTrace(int offset);
-
-}  // namespace frc
