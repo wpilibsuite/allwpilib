@@ -7,17 +7,13 @@
 
 #include "wpi/StackTrace.h"
 
-#ifndef _WIN32
 #include <execinfo.h>
-#endif
 
 #include "wpi/Demangle.h"
 #include "wpi/SmallString.h"
 #include "wpi/raw_ostream.h"
 
 namespace wpi {
-
-#ifndef _WIN32
 
 std::string GetStackTrace(int offset) {
   void* stackTrace[128];
@@ -37,11 +33,5 @@ std::string GetStackTrace(int offset) {
 
   return trace.str();
 }
-
-#else
-
-std::string GetStackTrace(int offset) { return "no stack trace on windows"; }
-
-#endif
 
 }  // namespace wpi

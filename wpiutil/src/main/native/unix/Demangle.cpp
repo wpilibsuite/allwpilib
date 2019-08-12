@@ -5,17 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "wpi/StackTrace.h"
-
-#ifndef _WIN32
-#include <cxxabi.h>
-#endif
-
 #include "wpi/Demangle.h"
 
-namespace wpi {
+#include <cstdio>
 
-#ifndef _WIN32
+#include <cxxabi.h>
+
+namespace wpi {
 
 std::string Demangle(char const* mangledSymbol) {
   char buffer[256];
@@ -36,13 +32,5 @@ std::string Demangle(char const* mangledSymbol) {
   // If everything else failed, just return the mangled symbol
   return mangledSymbol;
 }
-
-#else
-
-std::string Demangle(char const* mangledSymbol) {
-  return "no demangling on windows";
-}
-
-#endif
 
 }  // namespace wpi
