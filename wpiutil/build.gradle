@@ -8,35 +8,6 @@ ext {
     devMain = 'edu.wpi.first.wpiutil.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 
-    splitSetup = {
-        if (it.targetPlatform.operatingSystem.isWindows()) {
-            it.sources {
-                wpiutilWindowsCpp(CppSourceSet) {
-                    source {
-                        srcDirs 'src/main/native/windows'
-                        include '**/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
-                        include '**/*.h'
-                    }
-                }
-            }
-        } else {
-            it.sources {
-                wpiutilUnixCpp(CppSourceSet) {
-                    source {
-                        srcDirs 'src/main/native/unix'
-                        include '**/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
-                        include '**/*.h'
-                    }
-                }
-            }
-        }
-    }
     extraSetup = {
         it.tasks.withType(CppCompile) {
             dependsOn generateTask
@@ -92,6 +63,16 @@ ext {
                         srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
                     }
                 }
+                wpiutilUnixCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/unix'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
+                    }
+                }
             }
         }
         if (it.targetPlatform.operatingSystem.isWindows()) {
@@ -106,6 +87,16 @@ ext {
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
+                    }
+                }
+                wpiutilWindowsCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/windows'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
                     }
                 }
             }
