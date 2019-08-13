@@ -7,12 +7,14 @@
 
 #include "wpi/StackTrace.h"
 
+#include <atlstr.h>
+
 #include "StackWalker.h"
 
 namespace {
 class StackTraceWalker : public StackWalker {
  public:
-  StackTraceWalker(std::string& output) : m_output(output) {}
+  explicit StackTraceWalker(std::string& output) : m_output(output) {}
 
   void OnOutput(LPCTSTR szText) override;
 

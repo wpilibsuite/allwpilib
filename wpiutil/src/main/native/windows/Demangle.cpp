@@ -7,6 +7,7 @@
 
 #include "wpi/Demangle.h"
 
+#include <windows.h>
 #include <dbghelp.h>
 
 #include "wpi/mutex.h"
