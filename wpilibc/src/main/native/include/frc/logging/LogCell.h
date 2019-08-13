@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <mutex>
 #include <string>
 
 namespace frc {
@@ -25,8 +26,6 @@ class LogCell {
    * @param name The name of the column.
    */
   explicit LogCell(std::string name);
-
-  virtual ~LogCell();
 
   /**
    * Log any type of value that can be converted into a string.
@@ -72,7 +71,7 @@ class LogCell {
  private:
   std::string m_name;
   std::string m_content;
-  pthread_mutex_t m_mutex;
+  std::mutex m_mutex;
 };
 
 }  // namespace frc
