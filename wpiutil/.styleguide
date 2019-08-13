@@ -70,6 +70,7 @@ generatedFileExclude {
   src/main/native/resources/
   src/test/native/cpp/UnitsTest\.cpp$
   src/test/native/cpp/llvm/
+  src/main/native/windows/StackWalker
 }
 
 licenseUpdateExclude {
