@@ -7,10 +7,9 @@
 
 #include "wpi/StackTrace.h"
 
+#include "StackWalker.h"
 #include "wpi/ConvertUTF.h"
 #include "wpi/SmallString.h"
-
-#include "StackWalker.h"
 
 namespace {
 class StackTraceWalker : public StackWalker {
