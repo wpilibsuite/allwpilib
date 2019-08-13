@@ -7,9 +7,9 @@
 
 #include "wpi/Demangle.h"
 
-#include <cstdio>
-
 #include <cxxabi.h>
+
+#include <cstdio>
 
 namespace wpi {
 
