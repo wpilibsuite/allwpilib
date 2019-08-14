@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,15 +7,15 @@
 
 #pragma once
 
-#include "frc/PWM.h"
-#include "frc/SpeedController.h"
+#include "frc/PWMBase.h"
+#include "frc/SendableSpeedController.h"
 
 namespace frc {
 
 /**
  * Common base class for all PWM Speed Controllers.
  */
-class PWMSpeedController : public PWM, public SpeedController {
+class PWMSpeedController : public PWMBase, public SendableSpeedController {
  public:
   PWMSpeedController(PWMSpeedController&&) = default;
   PWMSpeedController& operator=(PWMSpeedController&&) = default;
@@ -60,8 +60,6 @@ class PWMSpeedController : public PWM, public SpeedController {
    *                on-board, 10-19 are on the MXP port
    */
   explicit PWMSpeedController(int channel);
-
-  void InitSendable(SendableBuilder& builder) override;
 
  private:
   bool m_isInverted = false;

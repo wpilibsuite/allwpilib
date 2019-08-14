@@ -10,14 +10,13 @@
 #include <functional>
 #include <vector>
 
-#include "frc/SpeedController.h"
+#include "frc/SendableSpeedController.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
-class SpeedControllerGroup : public Sendable,
-                             public SpeedController,
+class SpeedControllerGroup : public SendableSpeedController,
                              public SendableHelper<SpeedControllerGroup> {
  public:
   template <class... SpeedControllers>
@@ -36,8 +35,6 @@ class SpeedControllerGroup : public Sendable,
   void Disable() override;
   void StopMotor() override;
   void PIDWrite(double output) override;
-
-  void InitSendable(SendableBuilder& builder) override;
 
  private:
   bool m_isInverted = false;

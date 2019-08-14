@@ -9,13 +9,12 @@ package edu.wpi.first.wpilibj;
 
 import java.util.Arrays;
 
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Allows multiple {@link SpeedController} objects to be linked together.
  */
-public class SpeedControllerGroup implements SpeedController, Sendable, AutoCloseable {
+public class SpeedControllerGroup implements AutoCloseable, SendableSpeedController {
   private boolean m_isInverted;
   private final SpeedController[] m_speedControllers;
   private static int instances;
@@ -96,13 +95,5 @@ public class SpeedControllerGroup implements SpeedController, Sendable, AutoClos
   @Override
   public void pidWrite(double output) {
     set(output);
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Speed Controller");
-    builder.setActuator(true);
-    builder.setSafeState(this::stopMotor);
-    builder.addDoubleProperty("Value", this::get, this::set);
   }
 }
