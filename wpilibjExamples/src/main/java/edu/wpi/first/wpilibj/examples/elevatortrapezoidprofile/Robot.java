@@ -15,11 +15,12 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 public class Robot extends TimedRobot {
+  private static double kDt = 0.02;
+
   private final Joystick m_joystick = new Joystick(1);
   private final Encoder m_encoder = new Encoder(1, 2);
   private final Spark m_motor = new Spark(1);
   private final PIDController m_controller = new PIDController(1.3, 0.0, 0.7, kDt);
-  private static double kDt = 0.02;
 
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(1.75, 0.75);
