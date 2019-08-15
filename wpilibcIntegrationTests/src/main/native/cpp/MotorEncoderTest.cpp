@@ -152,11 +152,11 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
   Wait(10.0);
   pidRunner.Stop();
 
-  RecordProperty("PIDError", pidController.GetError());
+  RecordProperty("PIDError", pidController.GetPositionError());
 
   EXPECT_TRUE(pidController.AtSetpoint())
       << "PID loop did not converge within 10 seconds. Goal was: " << goal
-      << " Error was: " << pidController.GetError();
+      << " Error was: " << pidController.GetPositionError();
 }
 
 /**
@@ -179,11 +179,11 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
   pidRunner.StartPeriodic(pidController.GetPeriod());
   Wait(10.0);
   pidRunner.Stop();
-  RecordProperty("PIDError", pidController.GetError());
+  RecordProperty("PIDError", pidController.GetPositionError());
 
   EXPECT_TRUE(pidController.AtSetpoint())
       << "PID loop did not converge within 10 seconds. Goal was: " << 600
-      << " Error was: " << pidController.GetError();
+      << " Error was: " << pidController.GetPositionError();
 }
 
 /**

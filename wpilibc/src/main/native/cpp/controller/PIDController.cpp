@@ -18,11 +18,7 @@ using namespace frc2;
 
 PIDController::PIDController(double Kp, double Ki, double Kd,
                              units::second_t period)
-    : frc::SendableBase(false),
-      m_Kp(Kp),
-      m_Ki(Ki),
-      m_Kd(Kd),
-      m_period(period.to<double>()) {
+    : frc::SendableBase(false), m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
@@ -45,8 +41,6 @@ units::second_t PIDController::GetPeriod() const {
   return units::second_t(m_period);
 }
 
-double PIDController::GetOutput() const { return m_output; }
-
 void PIDController::SetSetpoint(double setpoint) {
   if (m_maximumInput > m_minimumInput) {
     m_setpoint = std::clamp(setpoint, m_minimumInput, m_maximumInput);
@@ -57,25 +51,20 @@ void PIDController::SetSetpoint(double setpoint) {
 
 double PIDController::GetSetpoint() const { return m_setpoint; }
 
-bool PIDController::AtSetpoint(double tolerance, double deltaTolerance,
+bool PIDController::AtSetpoint(double positionTolerance,
+                               double velocityTolerance,
                                Tolerance toleranceType) const {
-  double deltaError = GetDeltaError();
-
-  if (toleranceType == Tolerance::kPercent) {
-    return std::abs(m_currError) < tolerance / 100 * m_inputRange &&
-           std::abs(deltaError) < deltaTolerance / 100 * m_inputRange;
+  if (m_toleranceType == Tolerance::kPercent) {
+    return std::abs(m_positionError) < positionTolerance / 100 * m_inputRange &&
+           std::abs(m_velocityError) < velocityTolerance / 100 * m_inputRange;
   } else {
-    return std::abs(m_currError) < tolerance &&
-           std::abs(deltaError) < deltaTolerance;
+    return std::abs(m_positionError) < positionTolerance &&
+           std::abs(m_velocityError) < velocityTolerance;
   }
 }
 
 bool PIDController::AtSetpoint() const {
-  return AtSetpoint(m_tolerance, m_deltaTolerance, m_toleranceType);
-}
-
-void PIDController::SetContinuous(bool continuous) {
-  m_continuous = continuous;
+  return AtSetpoint(m_positionTolerance, m_velocityTolerance);
 }
 
 void PIDController::SetInputRange(double minimumInput, double maximumInput) {
@@ -89,36 +78,53 @@ void PIDController::SetInputRange(double minimumInput, double maximumInput) {
   }
 }
 
+void PIDController::EnableContinuousInput(double minimumInput,
+                                          double maximumInput) {
+  m_continuous = true;
+  SetInputRange(minimumInput, maximumInput);
+}
+
+void PIDController::DisableContinuousInput() { m_continuous = false; }
+
 void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
   m_minimumOutput = minimumOutput;
   m_maximumOutput = maximumOutput;
 }
 
-void PIDController::SetAbsoluteTolerance(double tolerance,
-                                         double deltaTolerance) {
+void PIDController::SetAbsoluteTolerance(double positionTolerance,
+                                         double velocityTolerance) {
   m_toleranceType = Tolerance::kAbsolute;
-  m_tolerance = tolerance;
-  m_deltaTolerance = deltaTolerance;
+  m_positionTolerance = positionTolerance;
+  m_velocityTolerance = velocityTolerance;
 }
 
-void PIDController::SetPercentTolerance(double tolerance,
-                                        double deltaTolerance) {
+void PIDController::SetPercentTolerance(double positionTolerance,
+                                        double velocityTolerance) {
   m_toleranceType = Tolerance::kPercent;
-  m_tolerance = tolerance;
-  m_deltaTolerance = deltaTolerance;
+  m_positionTolerance = positionTolerance;
+  m_velocityTolerance = velocityTolerance;
 }
 
-double PIDController::GetError() const {
-  return GetContinuousError(m_currError);
+double PIDController::GetPositionError() const {
+  return GetContinuousError(m_positionError);
 }
 
-/**
- * Returns the change in error per second of the PIDController.
- *
- * @return The change in error per second.
- */
-double PIDController::GetDeltaError() const {
-  return (m_currError - m_prevError) / m_period;
+double PIDController::GetVelocityError() const { return m_velocityError; }
+
+double PIDController::Calculate(double measurement) {
+  m_prevError = m_positionError;
+  m_positionError = GetContinuousError(m_setpoint - measurement);
+  m_velocityError = (m_positionError - m_prevError) / m_period.to<double>();
+
+  if (m_Ki != 0) {
+    m_totalError =
+        std::clamp(m_totalError + m_positionError * m_period.to<double>(),
+                   m_minimumOutput / m_Ki, m_maximumOutput / m_Ki);
+  }
+
+  return std::clamp(
+      m_Kp * m_positionError + m_Ki * m_totalError + m_Kd * m_velocityError,
+      m_minimumOutput, m_maximumOutput);
 }
 
 double PIDController::Calculate(double measurement, double setpoint) {
@@ -130,7 +136,6 @@ double PIDController::Calculate(double measurement, double setpoint) {
 void PIDController::Reset() {
   m_prevError = 0;
   m_totalError = 0;
-  m_output = 0;
 }
 
 void PIDController::InitSendable(frc::SendableBuilder& builder) {
@@ -158,20 +163,4 @@ double PIDController::GetContinuousError(double error) const {
   }
 
   return error;
-}
-
-double PIDController::Calculate(double measurement) {
-  m_prevError = m_currError;
-  m_currError = GetContinuousError(m_setpoint - measurement);
-
-  if (m_Ki != 0) {
-    m_totalError = std::clamp(m_totalError + m_currError * m_period,
-                              m_minimumOutput / m_Ki, m_maximumOutput / m_Ki);
-  }
-
-  m_output = std::clamp(m_Kp * m_currError + m_Ki * m_totalError +
-                            m_Kd * (m_currError - m_prevError) / m_period,
-                        m_minimumOutput, m_maximumOutput);
-
-  return m_output;
 }
