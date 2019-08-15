@@ -145,19 +145,6 @@
     "mainclass": "Main"
   },
   {
-    "name": "Elevator with trapezoid profiled PID",
-    "description": "An example to demonstrate the use of an encoder and trapezoid profiled PID control to reach elevator position setpoints.",
-    "tags": [
-      "Digital",
-      "Sensors",
-      "Actuators",
-      "Joystick"
-    ],
-    "foldername": "elevatortrapezoidprofile",
-    "gradlebase": "java",
-    "mainclass": "Main"
-  },
-  {
     "name": "Gyro",
     "description": "An example program showing how to drive straight with using a gyro sensor.",
     "tags": [
