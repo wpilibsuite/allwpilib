@@ -232,7 +232,6 @@ class XboxController : public GenericHID {
    */
   bool GetStartButtonReleased();
 
- private:
   enum class Button {
     kBumperLeft = 5,
     kBumperRight = 6,
