@@ -179,6 +179,18 @@
     "gradlebase": "cpp"
   },
   {
+    "name": "Elevator with profiled PID controller",
+    "description": "An example to demonstrate the use of an encoder and trapezoid profiled PID control to reach elevator position setpoints.",
+    "tags": [
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick"
+    ],
+    "foldername": "ElevatorProfiledPID",
+    "gradlebase": "cpp"
+  },
+  {
     "name": "Getting Started",
     "description": "An example program which demonstrates the simplest autonomous and teleoperated routines.",
     "tags": [
