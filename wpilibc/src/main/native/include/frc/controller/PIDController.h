@@ -30,7 +30,7 @@ class PIDController : public frc::SendableBase {
    * @param Ki     The integral coefficient.
    * @param Kd     The derivative coefficient.
    * @param period The period between controller updates in seconds. The
-   *               default is 0.02 seconds.
+   *               default is 20 milliseconds.
    */
   PIDController(double Kp, double Ki, double Kd,
                 units::second_t period = 20_ms);
@@ -103,16 +103,6 @@ class PIDController : public frc::SendableBase {
   units::second_t GetPeriod() const;
 
   /**
-   * Returns the current controller output.
-   *
-   * This is always centered around zero and constrained to the min and max
-   * outputs.
-   *
-   * @return The latest calculated output.
-   */
-  double GetOutput() const;
-
-  /**
    * Sets the setpoint for the PIDController.
    *
    * @param setpoint The desired setpoint.
@@ -131,36 +121,21 @@ class PIDController : public frc::SendableBase {
    *
    * This will return false until at least one input value has been computed.
    *
-   * @param tolerance The maximum allowable error.
-   * @param deltaTolerance The maximum allowable change in error.
-   * @param toleranceType The type of tolerances specified.
+   * @param positionTolerance The maximum allowable position error.
+   * @param velocityTolerance The maximum allowable velocity error.
+   * @param toleranceType     The type of tolerance specified.
    */
   bool AtSetpoint(
-      double tolerance,
-      double deltaTolerance = std::numeric_limits<double>::infinity(),
+      double positionTolerance,
+      double velocityTolerance = std::numeric_limits<double>::infinity(),
       Tolerance toleranceType = Tolerance::kAbsolute) const;
 
   /**
    * Returns true if the error is within the tolerance of the error.
    *
-   * Currently this just reports on target as the actual value passes through
-   * the setpoint. Ideally it should be based on being within the tolerance for
-   * some period of time.
-   *
    * This will return false until at least one input value has been computed.
    */
   bool AtSetpoint() const;
-
-  /**
-   * Sets the PID controller to consider the input to be continuous.
-   *
-   * Rather then using the max and min input range as constraints, it considers
-   * them to be the same point and automatically calculates the shortest route
-   * to the setpoint.
-   *
-   * @param continuous true turns on continuous, false turns off continuous
-   */
-  void SetContinuous(bool continuous = true);
 
   /**
    * Sets the minimum and maximum values expected from the input.
@@ -169,6 +144,23 @@ class PIDController : public frc::SendableBase {
    * @param maximumInput The maximum value expected from the input.
    */
   void SetInputRange(double minimumInput, double maximumInput);
+
+  /**
+   * Enables continuous input.
+   *
+   * Rather then using the max and min input range as constraints, it considers
+   * them to be the same point and automatically calculates the shortest route
+   * to the setpoint.
+   *
+   * @param minimumInput The minimum value expected from the input.
+   * @param maximumInput The maximum value expected from the input.
+   */
+  void EnableContinuousInput(double minimumInput, double maximumInput);
+
+  /**
+   * Disables continuous input.
+   */
+  void DisableContinuousInput();
 
   /**
    * Sets the minimum and maximum values to write.
@@ -182,36 +174,33 @@ class PIDController : public frc::SendableBase {
    * Sets the absolute error which is considered tolerable for use with
    * AtSetpoint().
    *
-   * @param tolerance      Error which is tolerable.
-   * @param deltaTolerance Change in error per second which is tolerable.
+   * @param positionTolerance Position error which is tolerable.
+   * @param velociytTolerance Velocity error which is tolerable.
    */
   void SetAbsoluteTolerance(
-      double tolerance,
-      double deltaTolerance = std::numeric_limits<double>::infinity());
+      double positionTolerance,
+      double velocityTolerance = std::numeric_limits<double>::infinity());
 
   /**
-   * Sets the percentage error which is considered tolerable for use with
+   * Sets the percent error which is considered tolerable for use with
    * AtSetpoint().
    *
-   * @param tolerance      Percent error which is tolerable.
-   * @param deltaTolerance Change in percent error per second which is
-   *                       tolerable.
+   * @param positionTolerance Position error which is tolerable.
+   * @param velociytTolerance Velocity error which is tolerable.
    */
   void SetPercentTolerance(
-      double tolerance,
-      double deltaTolerance = std::numeric_limits<double>::infinity());
+      double positionTolerance,
+      double velocityTolerance = std::numeric_limits<double>::infinity());
 
   /**
    * Returns the difference between the setpoint and the measurement.
-   *
-   * @return The error.
    */
-  double GetError() const;
+  double GetPositionError() const;
 
   /**
-   * Returns the change in error per second.
+   * Returns the velocity error.
    */
-  double GetDeltaError() const;
+  double GetVelocityError() const;
 
   /**
    * Returns the next output of the PID controller.
@@ -256,7 +245,7 @@ class PIDController : public frc::SendableBase {
   double m_Kd;
 
   // The period (in seconds) of the control loop running this controller
-  double m_period;
+  units::second_t m_period;
 
   // |maximum output|
   double m_maximumOutput = 1.0;
@@ -270,30 +259,30 @@ class PIDController : public frc::SendableBase {
   // Minimum input - limit setpoint to this
   double m_minimumInput = 0;
 
-  // input range - difference between maximum and minimum
+  // Input range - difference between maximum and minimum
   double m_inputRange = 0;
 
   // Do the endpoints wrap around? eg. Absolute encoder
   bool m_continuous = false;
 
-  // The error at the time of the most recent call to calculate()
-  double m_currError = 0;
+  // The error at the time of the most recent call to Calculate()
+  double m_positionError = 0;
+  double m_velocityError = 0;
 
-  // The error at the time of the second-most-recent call to calculate() (used
+  // The error at the time of the second-most-recent call to Calculate() (used
   // to compute velocity)
-  double m_prevError = std::numeric_limits<double>::infinity();
+  double m_prevError = 0;
 
   // The sum of the errors for use in the integral calc
   double m_totalError = 0;
 
   Tolerance m_toleranceType = Tolerance::kAbsolute;
 
-  // The percentage or absolute error that is considered at setpoint.
-  double m_tolerance = 0.05;
-  double m_deltaTolerance = std::numeric_limits<double>::infinity();
+  // The error that is considered at setpoint.
+  double m_positionTolerance = 0.05;
+  double m_velocityTolerance = std::numeric_limits<double>::infinity();
 
   double m_setpoint = 0;
-  double m_output = 0;
 };
 
 }  // namespace frc2

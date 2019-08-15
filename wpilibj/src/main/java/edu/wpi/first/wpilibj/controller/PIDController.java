@@ -46,17 +46,18 @@ public class PIDController extends SendableBase {
   // Minimum input - limit setpoint to this
   private double m_minimumInput;
 
-  // input range - difference between maximum and minimum
+  // Input range - difference between maximum and minimum
   private double m_inputRange;
 
   // Do the endpoints wrap around? eg. Absolute encoder
   private boolean m_continuous;
 
   // The error at the time of the most recent call to calculate()
-  private double m_currError;
+  private double m_positionError;
+  private double m_velocityError;
 
   // The error at the time of the second-most-recent call to calculate() (used to compute velocity)
-  private double m_prevError = Double.POSITIVE_INFINITY;
+  private double m_prevError;
 
   // The sum of the errors for use in the integral calc
   private double m_totalError;
@@ -68,11 +69,10 @@ public class PIDController extends SendableBase {
   private Tolerance m_toleranceType = Tolerance.kAbsolute;
 
   // The percentage or absolute error that is considered at setpoint.
-  private double m_tolerance = 0.05;
-  private double m_deltaTolerance = Double.POSITIVE_INFINITY;
+  private double m_positionTolerance = 0.05;
+  private double m_velocityTolerance = Double.POSITIVE_INFINITY;
 
   private double m_setpoint;
-  private double m_output;
 
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd and a default period of
@@ -192,17 +192,6 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Returns the current controller output.
-   *
-   * <p>This is always centered around zero and constrained to the min and max outputs.
-   *
-   * @return The latest calculated output.
-   */
-  public double getOutput() {
-    return m_output;
-  }
-
-  /**
    * Sets the setpoint for the PIDController.
    *
    * @param setpoint The desired setpoint.
@@ -233,50 +222,26 @@ public class PIDController extends SendableBase {
    * @return Whether the error is within the acceptable bounds.
    */
   public boolean atSetpoint() {
-    return atSetpoint(m_tolerance, m_deltaTolerance, m_toleranceType);
+    return atSetpoint(m_positionTolerance, m_velocityTolerance, m_toleranceType);
   }
 
   /**
    * Returns true if the error and change in error are below the specified tolerances.
    *
-   * @param tolerance      The maximum allowable error.
-   * @param deltaTolerance The maximum allowable change in error from the previous iteration.
-   * @param toleranceType  Whether the given tolerance values are absolute, or percentages of the
-   *                       total input range.
+   * @param positionTolerance The maximum allowable position error.
+   * @param velocityTolerance The maximum allowable velocity error.
+   * @param toleranceType     The type of tolerance specified.
    * @return Whether the error is within the acceptable bounds.
    */
-  public boolean atSetpoint(double tolerance, double deltaTolerance, Tolerance toleranceType) {
-    double error = getError();
-    double deltaError = (error - m_prevError) / getPeriod();
-
+  public boolean atSetpoint(double positionTolerance, double velocityTolerance,
+      Tolerance toleranceType) {
     if (toleranceType == Tolerance.kPercent) {
-      return Math.abs(error) < tolerance / 100 * m_inputRange
-          && Math.abs(deltaError) < deltaTolerance / 100 * m_inputRange;
+      return Math.abs(m_positionError) < positionTolerance / 100 * m_inputRange
+          && Math.abs(m_velocityError) < velocityTolerance / 100 * m_inputRange;
     } else {
-      return Math.abs(error) < tolerance && Math.abs(deltaError) < deltaTolerance;
+      return Math.abs(m_positionError) < positionTolerance
+          && Math.abs(m_velocityError) < velocityTolerance;
     }
-  }
-
-  /**
-   * Sets the PID controller to consider the input to be continuous.
-   *
-   * <p>Rather then using the max and min input range as constraints, it considers them to be the
-   * same point and automatically calculates the shortest route to the setpoint.
-   */
-  public void setContinuous() {
-    setContinuous(true);
-  }
-
-  /**
-   * Sets the PID controller to consider the input to be continuous,
-   *
-   * <p>Rather then using the max and min input range as constraints, it considers them to be the
-   * same point and automatically calculates the shortest route to the setpoint.
-   *
-   * @param continuous true turns on continuous, false turns off continuous
-   */
-  public void setContinuous(boolean continuous) {
-    m_continuous = continuous;
   }
 
   /**
@@ -297,6 +262,28 @@ public class PIDController extends SendableBase {
   }
 
   /**
+   * Enables continuous input.
+   *
+   * <p>Rather then using the max and min input range as constraints, it considers
+   * them to be the same point and automatically calculates the shortest route
+   * to the setpoint.
+   *
+   * @param minimumInput The minimum value expected from the input.
+   * @param maximumInput The maximum value expected from the input.
+   */
+  public void enableContinuousInput(double minimumInput, double maximumInput) {
+    m_continuous = true;
+    setInputRange(minimumInput, maximumInput);
+  }
+
+  /**
+   * Disables continuous input.
+   */
+  public void disableContinuousInput() {
+    m_continuous = false;
+  }
+
+  /**
    * Sets the minimum and maximum values to write.
    *
    * @param minimumOutput the minimum value to write to the output
@@ -310,43 +297,43 @@ public class PIDController extends SendableBase {
   /**
    * Sets the absolute error which is considered tolerable for use with atSetpoint().
    *
-   * @param tolerance Absolute error which is tolerable.
+   * @param positionTolerance Position error which is tolerable.
    */
-  public void setAbsoluteTolerance(double tolerance) {
-    setAbsoluteTolerance(tolerance, Double.POSITIVE_INFINITY);
+  public void setAbsoluteTolerance(double positionTolerance) {
+    setAbsoluteTolerance(positionTolerance, Double.POSITIVE_INFINITY);
   }
 
   /**
    * Sets the absolute error which is considered tolerable for use with atSetpoint().
    *
-   * @param tolerance      Absolute error which is tolerable.
-   * @param deltaTolerance Change in absolute error per second which is tolerable.
+   * @param positionTolerance Position error which is tolerable.
+   * @param velocityTolerance Velocity error which is tolerable.
    */
-  public void setAbsoluteTolerance(double tolerance, double deltaTolerance) {
+  public void setAbsoluteTolerance(double positionTolerance, double velocityTolerance) {
     m_toleranceType = Tolerance.kAbsolute;
-    m_tolerance = tolerance;
-    m_deltaTolerance = deltaTolerance;
+    m_positionTolerance = positionTolerance;
+    m_velocityTolerance = velocityTolerance;
   }
 
   /**
    * Sets the percent error which is considered tolerable for use with atSetpoint().
    *
-   * @param tolerance Percent error which is tolerable.
+   * @param positionTolerance Position error which is tolerable.
    */
-  public void setPercentTolerance(double tolerance) {
-    setPercentTolerance(tolerance, Double.POSITIVE_INFINITY);
+  public void setPercentTolerance(double positionTolerance) {
+    setPercentTolerance(positionTolerance, Double.POSITIVE_INFINITY);
   }
 
   /**
    * Sets the percent error which is considered tolerable for use with atSetpoint().
    *
-   * @param tolerance      Percent error which is tolerable.
-   * @param deltaTolerance Change in percent error per second which is tolerable.
+   * @param positionTolerance Position error which is tolerable.
+   * @param velocityTolerance Velocity error which is tolerable.
    */
-  public void setPercentTolerance(double tolerance, double deltaTolerance) {
+  public void setPercentTolerance(double positionTolerance, double velocityTolerance) {
     m_toleranceType = Tolerance.kPercent;
-    m_tolerance = tolerance;
-    m_deltaTolerance = deltaTolerance;
+    m_positionTolerance = positionTolerance;
+    m_velocityTolerance = velocityTolerance;
   }
 
   /**
@@ -354,16 +341,15 @@ public class PIDController extends SendableBase {
    *
    * @return The error.
    */
-  public double getError() {
-    return getContinuousError(m_currError);
+  public double getPositionError() {
+    return getContinuousError(m_positionError);
   }
 
   /**
-   * Returns the change in error per second.
+   * Returns the velocity error.
    */
-  public double getDeltaError() {
-    double error = getError();
-    return (error - m_prevError) / getPeriod();
+  public double getVelocityError() {
+    return m_velocityError;
   }
 
   /**
@@ -384,19 +370,18 @@ public class PIDController extends SendableBase {
    * @param measurement The current measurement of the process variable.
    */
   public double calculate(double measurement) {
-    m_prevError = m_currError;
-    m_currError = getContinuousError(m_setpoint - measurement);
+    m_prevError = m_positionError;
+    m_positionError = getContinuousError(m_setpoint - measurement);
+    m_velocityError = (m_positionError - m_prevError) / m_period;
 
     if (m_Ki != 0) {
-      m_totalError = clamp(m_totalError + m_currError * getPeriod(), m_minimumOutput / m_Ki,
+      m_totalError = clamp(m_totalError + m_positionError * m_period, m_minimumOutput / m_Ki,
           m_maximumOutput / m_Ki);
     }
 
-    m_output = clamp(
-        m_Kp * m_currError + m_Ki * m_totalError + m_Kd * (m_currError - m_prevError) / getPeriod(),
+    return clamp(
+        m_Kp * m_positionError + m_Ki * m_totalError + m_Kd * m_velocityError,
         m_minimumOutput, m_maximumOutput);
-
-    return m_output;
   }
 
   /**
@@ -405,7 +390,6 @@ public class PIDController extends SendableBase {
   public void reset() {
     m_prevError = 0;
     m_totalError = 0;
-    m_output = 0;
   }
 
   @Override

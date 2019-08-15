@@ -190,7 +190,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
 
     assertTrue(
         "PID loop did not reach reference within 10 seconds. The current error was" + pidController
-            .getError(), pidController.atSetpoint());
+            .getPositionError(), pidController.atSetpoint());
 
     pidController.close();
   }
@@ -211,7 +211,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     pidRunner.stop();
 
     assertTrue("PID loop did not reach reference within 10 seconds. The error was: " + pidController
-        .getError(), pidController.atSetpoint());
+        .getPositionError(), pidController.atSetpoint());
 
     pidController.close();
   }

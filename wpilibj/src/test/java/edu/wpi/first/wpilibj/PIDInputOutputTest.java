@@ -50,8 +50,7 @@ class PIDInputOutputTest {
   @Test
   void continuousInputTest() {
     m_controller.setP(1);
-    m_controller.setInputRange(-180, 180);
-    m_controller.setContinuous(true);
+    m_controller.enableContinuousInput(-180, 180);
 
     assertTrue(m_controller.calculate(-179, 179) < 0.0);
   }

@@ -5,105 +5,71 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc/Timer.h"
 #include "frc/controller/PIDController.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 class PIDToleranceTest : public testing::Test {
  protected:
-  const double setpoint = 50.0;
-  const double range = 200;
-  const double tolerance = 10.0;
+  static constexpr double kSetpoint = 50.0;
+  static constexpr double kRange = 200;
+  static constexpr double kTolerance = 10.0;
 
-  class FakeInput {
-   public:
-    double val = 0;
-
-    double Get() { return val; }
-  };
-
-  class FakeOutput {
-   public:
-    void Set(double output) {}
-  };
-
-  FakeInput inp;
-  FakeOutput out;
   frc2::PIDController* pidController;
 
   void SetUp() override {
     pidController = new frc2::PIDController(0.5, 0.0, 0.0);
-    pidController->SetInputRange(-range / 2, range / 2);
+    pidController->SetInputRange(-kRange / 2, kRange / 2);
   }
 
   void TearDown() override { delete pidController; }
-
-  void Reset() { inp.val = 0; }
 };
 
-TEST_F(PIDToleranceTest, Initial) { EXPECT_FALSE(pidController->AtSetpoint()); }
+TEST_F(PIDToleranceTest, Initial) { EXPECT_TRUE(pidController->AtSetpoint()); }
 
 TEST_F(PIDToleranceTest, Absolute) {
-  Reset();
+  pidController->SetAbsoluteTolerance(kTolerance);
+  pidController->SetSetpoint(kSetpoint);
 
-  pidController->SetAbsoluteTolerance(tolerance);
-  pidController->SetSetpoint(setpoint);
+  pidController->Calculate(0.0);
 
   EXPECT_FALSE(pidController->AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
-      << pidController->GetError();
+      << pidController->GetPositionError();
 
-  inp.val = setpoint + tolerance / 2;
-  for (int i = 0; i <= 50; i++) {
-    pidController->Calculate(inp.Get());
-  }
+  pidController->Calculate(kSetpoint + kTolerance / 2);
 
   EXPECT_TRUE(pidController->AtSetpoint())
       << "Error was not in tolerance when it should have been. Error was "
-      << pidController->GetError();
+      << pidController->GetPositionError();
 
-  inp.val = setpoint + 10 * tolerance;
-  for (int i = 0; i <= 50; i++) {
-    pidController->Calculate(inp.Get());
-  }
+  pidController->Calculate(kSetpoint + 10 * kTolerance);
 
   EXPECT_FALSE(pidController->AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
-      << pidController->GetError();
+      << pidController->GetPositionError();
 }
 
 TEST_F(PIDToleranceTest, Percent) {
-  Reset();
+  pidController->SetPercentTolerance(kTolerance);
+  pidController->SetSetpoint(kSetpoint);
 
-  pidController->SetPercentTolerance(tolerance);
-  pidController->SetSetpoint(setpoint);
+  pidController->Calculate(0.0);
 
   EXPECT_FALSE(pidController->AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
-      << pidController->GetError();
+      << pidController->GetPositionError();
 
-  inp.val =
-      setpoint + (tolerance) / 200 *
-                     range;  // half of percent tolerance away from setpoint
-  for (int i = 0; i <= 50; i++) {
-    pidController->Calculate(inp.Get());
-  }
+  // Half of percent tolerance away from setpoint
+  pidController->Calculate(kSetpoint + (kTolerance / 2) / 100 * kRange);
 
   EXPECT_TRUE(pidController->AtSetpoint())
       << "Error was not in tolerance when it should have been. Error was "
-      << pidController->GetError();
+      << pidController->GetPositionError();
 
-  inp.val =
-      setpoint +
-      (tolerance) / 50 * range;  // double percent tolerance away from setPoint
-
-  for (int i = 0; i <= 50; i++) {
-    pidController->Calculate(inp.Get());
-  }
+  // Double percent tolerance away from setpoint
+  pidController->Calculate(kSetpoint + (kTolerance * 2) / 100 * kRange);
 
   EXPECT_FALSE(pidController->AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
-      << pidController->GetError();
+      << pidController->GetPositionError();
 }
