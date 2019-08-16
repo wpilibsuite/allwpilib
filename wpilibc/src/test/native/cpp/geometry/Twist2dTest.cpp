@@ -56,3 +56,14 @@ TEST(Twist2dTest, Inequality) {
   const Twist2d two{5.0_m, 1.2_m, 3.0_rad};
   EXPECT_TRUE(one != two);
 }
+
+TEST(Twist2dTest, Pose2dLog) {
+  const Pose2d end{5_m, 5_m, Rotation2d(90_deg)};
+  const Pose2d start{};
+
+  const auto twist = Pose2d().Log(end);
+
+  EXPECT_NEAR(twist.dx.to<double>(), 5 / 2.0 * wpi::math::pi, kEpsilon);
+  EXPECT_NEAR(twist.dy.to<double>(), 0.0, kEpsilon);
+  EXPECT_NEAR(twist.dtheta.to<double>(), wpi::math::pi / 2.0, kEpsilon);
+}

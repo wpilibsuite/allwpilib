@@ -53,6 +53,17 @@ class Transform2d {
    */
   const Rotation2d& Rotation() const { return m_rotation; }
 
+    
+  /**
+   * Scales the transform by the scalar.
+   *
+   * @param scalar The scalar.
+   * @return The scaled Transform2d.
+   */
+  Transform2d operator*(double scalar) const {
+    return Transform2d(m_translation * scalar, m_rotation * scalar);
+  }
+
   /**
    * Checks equality between this Transform2d and another object.
    *

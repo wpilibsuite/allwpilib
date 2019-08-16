@@ -108,6 +108,16 @@ public class Rotation2d {
   }
 
   /**
+   * Multiplies the current rotation by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return The new scaled Rotation2d.
+   */
+  public Rotation2d times(double scalar) {
+    return new Rotation2d(m_value * scalar);
+  }
+
+  /**
    * Adds the new rotation to the current rotation using a rotation matrix.
    *
    * <p>The matrix multiplication is as follows:
