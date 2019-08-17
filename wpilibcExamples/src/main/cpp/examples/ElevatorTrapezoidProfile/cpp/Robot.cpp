@@ -44,7 +44,7 @@ class Robot : public frc::TimedRobot {
   frc::Joystick m_joystick{1};
   frc::Encoder m_encoder{1, 2};
   frc::Spark m_motor{1};
-  frc2::PIDController m_controller{1.3, 0.0, 0.7, kDt.to<double>()};
+  frc2::PIDController m_controller{1.3, 0.0, 0.7, kDt};
 
   frc::TrapezoidProfile::Constraints m_constraints{1.75_mps, 0.75_mps_sq};
   frc::TrapezoidProfile::State m_goal;
