@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -21,7 +21,7 @@ public class XboxController extends GenericHID {
   /**
    * Represents a digital button on an XboxController.
    */
-  private enum Button {
+  public enum Button {
     kBumperLeft(5),
     kBumperRight(6),
     kStickLeft(9),
@@ -34,7 +34,7 @@ public class XboxController extends GenericHID {
     kStart(8);
 
     @SuppressWarnings({"MemberName", "PMD.SingularField"})
-    private final int value;
+    public final int value;
 
     Button(int value) {
       this.value = value;
