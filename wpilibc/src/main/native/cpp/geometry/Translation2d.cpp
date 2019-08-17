@@ -7,17 +7,18 @@
 
 #include "frc/geometry/Translation2d.h"
 
-#include <cmath>
-
 using namespace frc;
 
-Translation2d::Translation2d(double x, double y) : m_x(x), m_y(y) {}
+Translation2d::Translation2d(units::meter_t x, units::meter_t y)
+    : m_x(x), m_y(y) {}
 
-double Translation2d::Distance(const Translation2d& other) const {
-  return std::hypot(other.m_x - m_x, other.m_y - m_y);
+units::meter_t Translation2d::Distance(const Translation2d& other) const {
+  return units::math::hypot(other.m_x - m_x, other.m_y - m_y);
 }
 
-double Translation2d::Norm() const { return std::hypot(m_x, m_y); }
+units::meter_t Translation2d::Norm() const {
+  return units::math::hypot(m_x, m_y);
+}
 
 Translation2d Translation2d::RotateBy(const Rotation2d& other) const {
   return {m_x * other.Cos() - m_y * other.Sin(),

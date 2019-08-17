@@ -40,7 +40,7 @@ class Pose2d {
    * @param y The y component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  Pose2d(double x, double y, Rotation2d rotation);
+  Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation);
 
   /**
    * Transforms the pose by the given transformation and returns the new
