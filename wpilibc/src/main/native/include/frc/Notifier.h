@@ -15,6 +15,8 @@
 #include <utility>
 
 #include <hal/Types.h>
+#include <units/units.h>
+#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
 #include "frc/ErrorBase.h"
@@ -58,7 +60,17 @@ class Notifier : public ErrorBase {
    *
    * @param delay Seconds to wait before the handler is called.
    */
+  WPI_DEPRECATED("Use unit-safe StartSingle method instead.")
   void StartSingle(double delay);
+
+  /**
+   * Register for single event notification.
+   *
+   * A timer event is queued for a single event after the specified delay.
+   *
+   * @param delay Amount of time to wait before the handler is called.
+   */
+  void StartSingle(units::second_t delay);
 
   /**
    * Register for periodic event notification.
@@ -70,7 +82,20 @@ class Notifier : public ErrorBase {
    * @param period Period in seconds to call the handler starting one period
    *               after the call to this method.
    */
+  WPI_DEPRECATED("Use unit-safe StartPeriodic method instead.")
   void StartPeriodic(double period);
+
+  /**
+   * Register for periodic event notification.
+   *
+   * A timer event is queued for periodic event notification. Each time the
+   * interrupt occurs, the event will be immediately requeued for the same time
+   * interval.
+   *
+   * @param period Period to call the handler starting one period
+   *               after the call to this method.
+   */
+  void StartPeriodic(units::second_t period);
 
   /**
    * Stop timer events from occuring.

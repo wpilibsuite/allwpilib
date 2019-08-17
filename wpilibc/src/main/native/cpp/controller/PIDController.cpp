@@ -16,8 +16,13 @@
 
 using namespace frc2;
 
-PIDController::PIDController(double Kp, double Ki, double Kd, double period)
-    : frc::SendableBase(false), m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
+PIDController::PIDController(double Kp, double Ki, double Kd,
+                             units::second_t period)
+    : frc::SendableBase(false),
+      m_Kp(Kp),
+      m_Ki(Ki),
+      m_Kd(Kd),
+      m_period(period.to<double>()) {
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
@@ -36,7 +41,9 @@ double PIDController::GetI() const { return m_Ki; }
 
 double PIDController::GetD() const { return m_Kd; }
 
-double PIDController::GetPeriod() const { return m_period; }
+units::second_t PIDController::GetPeriod() const {
+  return units::second_t(m_period);
+}
 
 double PIDController::GetOutput() const { return m_output; }
 
@@ -111,7 +118,7 @@ double PIDController::GetError() const {
  * @return The change in error per second.
  */
 double PIDController::GetDeltaError() const {
-  return (m_currError - m_prevError) / GetPeriod();
+  return (m_currError - m_prevError) / m_period;
 }
 
 double PIDController::Calculate(double measurement, double setpoint) {
@@ -158,12 +165,12 @@ double PIDController::Calculate(double measurement) {
   m_currError = GetContinuousError(m_setpoint - measurement);
 
   if (m_Ki != 0) {
-    m_totalError = std::clamp(m_totalError + m_currError * GetPeriod(),
+    m_totalError = std::clamp(m_totalError + m_currError * m_period,
                               m_minimumOutput / m_Ki, m_maximumOutput / m_Ki);
   }
 
   m_output = std::clamp(m_Kp * m_currError + m_Ki * m_totalError +
-                            m_Kd * (m_currError - m_prevError) / GetPeriod(),
+                            m_Kd * (m_currError - m_prevError) / m_period,
                         m_minimumOutput, m_maximumOutput);
 
   return m_output;

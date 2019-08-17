@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -43,9 +43,20 @@ void TimedRobot::StartCompetition() {
   }
 }
 
-double TimedRobot::GetPeriod() const { return m_period; }
+units::second_t TimedRobot::GetPeriod() const {
+  return units::second_t(m_period);
+}
 
 TimedRobot::TimedRobot(double period) : IterativeRobotBase(period) {
+  int32_t status = 0;
+  m_notifier = HAL_InitializeNotifier(&status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+
+  HAL_Report(HALUsageReporting::kResourceType_Framework,
+             HALUsageReporting::kFramework_Timed);
+}
+
+TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));

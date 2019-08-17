@@ -100,10 +100,14 @@ void Timer::Stop() {
 }
 
 bool Timer::HasPeriodPassed(double period) {
-  if (Get() > period) {
+  return HasPeriodPassed(units::second_t(period));
+}
+
+bool Timer::HasPeriodPassed(units::second_t period) {
+  if (Get() > period.to<double>()) {
     std::scoped_lock lock(m_mutex);
     // Advance the start time by the period.
-    m_startTime += period;
+    m_startTime += period.to<double>();
     // Don't set it to the current time... we want to avoid drift.
     return true;
   }

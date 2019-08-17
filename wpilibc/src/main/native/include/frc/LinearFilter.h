@@ -10,6 +10,7 @@
 #include <initializer_list>
 #include <vector>
 
+#include <units/units.h>
 #include <wpi/ArrayRef.h>
 
 #include "frc/circular_buffer.h"
@@ -99,7 +100,8 @@ class LinearFilter {
    * @param period       The period in seconds between samples taken by the
    *                     user.
    */
-  static LinearFilter SinglePoleIIR(double timeConstant, double period);
+  static LinearFilter SinglePoleIIR(double timeConstant,
+                                    units::second_t period);
 
   /**
    * Creates a first-order high-pass filter of the form:<br>
@@ -112,7 +114,7 @@ class LinearFilter {
    * @param period       The period in seconds between samples taken by the
    *                     user.
    */
-  static LinearFilter HighPass(double timeConstant, double period);
+  static LinearFilter HighPass(double timeConstant, units::second_t period);
 
   /**
    * Creates a K-tap FIR moving average filter of the form:<br>
