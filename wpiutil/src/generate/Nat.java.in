@@ -43,4 +43,3 @@ public interface Nat<T extends Num> {
    * @return The number backing this value.
    */
   int getNum();
-

@@ -252,15 +252,16 @@ task generateNat() {
     description = "Generates Nat.java"
     group = "WPILib"
     inputs.files([natFileInput, natGetterInput])
+    dependsOn generateNumbers
 
     doLast {
         if(wpilibNatFileOutput.exists()) {
             wpilibNatFileOutput.delete()
         }
 
-        def template = natFileInput.text
+        def template = natFileInput.text + "\n"
         for(i in 0..maxNum) {
-            template += natGetterInput.text.replace('${num}', i.toString())
+            template += natGetterInput.text.replace('${num}', i.toString()) + "\n"
         }
         template += "}\n" // Close the class body
 
@@ -269,5 +270,5 @@ task generateNat() {
 }
 
 sourceSets.main.java.srcDir "${buildDir}/generated/java"
-compileJava.dependsOn generateNat
 compileJava.dependsOn generateNumbers
+compileJava.dependsOn generateNat
