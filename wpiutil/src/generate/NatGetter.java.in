@@ -1,0 +1,4 @@
+  static Nat<N${num}> N${num}() {
+    return N${num}.instance;
+  }
+

@@ -35,7 +35,6 @@ if (NOT WITHOUT_JAVA)
       message(STATUS "All files downloaded.")
   endif()
 
-
   file(GLOB EJML_JARS
       ${CMAKE_BINARY_DIR}/wpiutil/thirdparty/*.jar)
 

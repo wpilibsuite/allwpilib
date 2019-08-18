@@ -202,7 +202,8 @@ public class MatrixTest {
 
     assertTrue(MatrixFeatures_DDRM.isIdentical(
         result.getDDRM(),
-        new SimpleMatrix(2, 2, true, new double[]{1.01035625, 0.02050912, 0.03076368, 1.04111993}).getDDRM(),
+        new SimpleMatrix(2, 2, true, new double[]{1.01035625, 0.02050912,
+            0.03076368, 1.04111993}).getDDRM(),
         1E-8
     ));
   }

@@ -122,7 +122,6 @@ ext {
     }
 }
 
-
 def examplesMap = [:];
 file("$projectDir/examples").list(new FilenameFilter() {
     @Override
@@ -223,7 +222,10 @@ dependencies {
 }
 
 def wpilibNumberFileInput = file("src/generate/GenericNumber.java.in")
+def natFileInput = file("src/generate/Nat.java.in")
+def natGetterInput = file("src/generate/NatGetter.java.in")
 def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/wpiutil/math/numbers")
+def wpilibNatFileOutput = file("$buildDir/generated/java/edu/wpi/first/wpiutil/math/Nat.java")
 def maxNum = 20
 
 task generateNumbers() {
@@ -246,5 +248,26 @@ task generateNumbers() {
     }
 }
 
+task generateNat() {
+    description = "Generates Nat.java"
+    group = "WPILib"
+    inputs.files([natFileInput, natGetterInput])
+
+    doLast {
+        if(wpilibNatFileOutput.exists()) {
+            wpilibNatFileOutput.delete()
+        }
+
+        def template = natFileInput.text
+        for(i in 0..maxNum) {
+            template += natGetterInput.text.replace('${num}', i.toString())
+        }
+        template += "}\n" // Close the class body
+
+        wpilibNatFileOutput.write(template)
+    }
+}
+
 sourceSets.main.java.srcDir "${buildDir}/generated/java"
+compileJava.dependsOn generateNat
 compileJava.dependsOn generateNumbers
