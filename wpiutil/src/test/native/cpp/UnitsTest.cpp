@@ -2947,6 +2947,14 @@ TEST_F(UnitMath, fma) {
   EXPECT_EQ(square_meter_t(7.0), fma(x, y, z));
 }
 
+TEST_F(UnitMath, clamp) {
+  meter_t val(5.0);
+  meter_t lo(2.0);
+  meter_t hi(3.0);
+  EXPECT_EQ(hi, clamp(val, lo, hi));
+  EXPECT_EQ(lo, clamp(val, lo, hi, std::greater<>()));
+}
+
 // Constexpr
 #if !defined(_MSC_VER) || _MSC_VER > 1800
 TEST_F(Constexpr, construction) {

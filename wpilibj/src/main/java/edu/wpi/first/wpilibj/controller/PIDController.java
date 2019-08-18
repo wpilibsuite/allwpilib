@@ -63,13 +63,7 @@ public class PIDController extends SendableBase {
   // The sum of the errors for use in the integral calc
   private double m_totalError;
 
-  enum Tolerance {
-    kAbsolute, kPercent
-  }
-
-  private Tolerance m_toleranceType = Tolerance.kAbsolute;
-
-  // The percentage or absolute error that is considered at setpoint.
+  // The error that is considered at setpoint.
   private double m_positionTolerance = 0.05;
   private double m_velocityTolerance = Double.POSITIVE_INFINITY;
 
@@ -223,43 +217,8 @@ public class PIDController extends SendableBase {
    * @return Whether the error is within the acceptable bounds.
    */
   public boolean atSetpoint() {
-    return atSetpoint(m_positionTolerance, m_velocityTolerance, m_toleranceType);
-  }
-
-  /**
-   * Returns true if the error and change in error are below the specified tolerances.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   * @param toleranceType     The type of tolerance specified.
-   * @return Whether the error is within the acceptable bounds.
-   */
-  public boolean atSetpoint(double positionTolerance, double velocityTolerance,
-      Tolerance toleranceType) {
-    if (toleranceType == Tolerance.kPercent) {
-      return Math.abs(m_positionError) < positionTolerance / 100 * m_inputRange
-          && Math.abs(m_velocityError) < velocityTolerance / 100 * m_inputRange;
-    } else {
-      return Math.abs(m_positionError) < positionTolerance
-          && Math.abs(m_velocityError) < velocityTolerance;
-    }
-  }
-
-  /**
-   * Sets the minimum and maximum values expected from the input.
-   *
-   * @param minimumInput The minimum value expected from the input.
-   * @param maximumInput The maximum value expected from the input.
-   */
-  public void setInputRange(double minimumInput, double maximumInput) {
-    m_minimumInput = minimumInput;
-    m_maximumInput = maximumInput;
-    m_inputRange = maximumInput - minimumInput;
-
-    // Clamp setpoint to new input
-    if (m_maximumInput > m_minimumInput) {
-      m_setpoint = MathUtils.clamp(m_setpoint, m_minimumInput, m_maximumInput);
-    }
+    return Math.abs(m_positionError) < m_positionTolerance
+        && Math.abs(m_velocityError) < m_velocityTolerance;
   }
 
   /**
@@ -274,7 +233,15 @@ public class PIDController extends SendableBase {
    */
   public void enableContinuousInput(double minimumInput, double maximumInput) {
     m_continuous = true;
-    setInputRange(minimumInput, maximumInput);
+
+    m_minimumInput = minimumInput;
+    m_maximumInput = maximumInput;
+    m_inputRange = maximumInput - minimumInput;
+
+    // Clamp setpoint to new input
+    if (m_maximumInput > m_minimumInput) {
+      m_setpoint = MathUtils.clamp(m_setpoint, m_minimumInput, m_maximumInput);
+    }
   }
 
   /**
@@ -296,43 +263,21 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Sets the absolute error which is considered tolerable for use with atSetpoint().
+   * Sets the error which is considered tolerable for use with atSetpoint().
    *
    * @param positionTolerance Position error which is tolerable.
    */
-  public void setAbsoluteTolerance(double positionTolerance) {
-    setAbsoluteTolerance(positionTolerance, Double.POSITIVE_INFINITY);
+  public void setTolerance(double positionTolerance) {
+    setTolerance(positionTolerance, Double.POSITIVE_INFINITY);
   }
 
   /**
-   * Sets the absolute error which is considered tolerable for use with atSetpoint().
+   * Sets the error which is considered tolerable for use with atSetpoint().
    *
    * @param positionTolerance Position error which is tolerable.
    * @param velocityTolerance Velocity error which is tolerable.
    */
-  public void setAbsoluteTolerance(double positionTolerance, double velocityTolerance) {
-    m_toleranceType = Tolerance.kAbsolute;
-    m_positionTolerance = positionTolerance;
-    m_velocityTolerance = velocityTolerance;
-  }
-
-  /**
-   * Sets the percent error which is considered tolerable for use with atSetpoint().
-   *
-   * @param positionTolerance Position error which is tolerable.
-   */
-  public void setPercentTolerance(double positionTolerance) {
-    setPercentTolerance(positionTolerance, Double.POSITIVE_INFINITY);
-  }
-
-  /**
-   * Sets the percent error which is considered tolerable for use with atSetpoint().
-   *
-   * @param positionTolerance Position error which is tolerable.
-   * @param velocityTolerance Velocity error which is tolerable.
-   */
-  public void setPercentTolerance(double positionTolerance, double velocityTolerance) {
-    m_toleranceType = Tolerance.kPercent;
+  public void setTolerance(double positionTolerance, double velocityTolerance) {
     m_positionTolerance = positionTolerance;
     m_velocityTolerance = velocityTolerance;
   }

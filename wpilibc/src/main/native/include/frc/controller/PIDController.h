@@ -19,9 +19,11 @@ namespace frc2 {
 /**
  * Implements a PID control loop.
  */
+template <typename Unit>
 class PIDController : public frc::SendableBase {
  public:
-  enum class Tolerance { kAbsolute, kPercent };
+  using UnitPerSec = typename units::unit_t<units::compound_unit<
+      typename Unit::unit_type, units::inverse<units::seconds>>>;
 
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
@@ -107,28 +109,14 @@ class PIDController : public frc::SendableBase {
    *
    * @param setpoint The desired setpoint.
    */
-  void SetSetpoint(double setpoint);
+  void SetSetpoint(Unit setpoint);
 
   /**
    * Returns the current setpoint of the PIDController.
    *
    * @return The current setpoint.
    */
-  double GetSetpoint() const;
-
-  /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   * @param toleranceType     The type of tolerance specified.
-   */
-  bool AtSetpoint(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity(),
-      Tolerance toleranceType = Tolerance::kAbsolute) const;
+  Unit GetSetpoint() const;
 
   /**
    * Returns true if the error is within the tolerance of the error.
@@ -143,7 +131,7 @@ class PIDController : public frc::SendableBase {
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
    */
-  void SetInputRange(double minimumInput, double maximumInput);
+  void SetInputRange(Unit minimumInput, Unit maximumInput);
 
   /**
    * Enables continuous input.
@@ -155,7 +143,7 @@ class PIDController : public frc::SendableBase {
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
    */
-  void EnableContinuousInput(double minimumInput, double maximumInput);
+  void EnableContinuousInput(Unit minimumInput, Unit maximumInput);
 
   /**
    * Disables continuous input.
@@ -171,43 +159,31 @@ class PIDController : public frc::SendableBase {
   void SetOutputRange(double minimumOutput, double maximumOutput);
 
   /**
-   * Sets the absolute error which is considered tolerable for use with
-   * AtSetpoint().
+   * Sets the error which is considered tolerable for use with AtSetpoint().
    *
    * @param positionTolerance Position error which is tolerable.
    * @param velociytTolerance Velocity error which is tolerable.
    */
-  void SetAbsoluteTolerance(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity());
-
-  /**
-   * Sets the percent error which is considered tolerable for use with
-   * AtSetpoint().
-   *
-   * @param positionTolerance Position error which is tolerable.
-   * @param velociytTolerance Velocity error which is tolerable.
-   */
-  void SetPercentTolerance(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity());
+  void SetTolerance(Unit positionTolerance,
+                    UnitPerSec velocityTolerance = UnitPerSec{
+                        std::numeric_limits<double>::infinity()});
 
   /**
    * Returns the difference between the setpoint and the measurement.
    */
-  double GetPositionError() const;
+  Unit GetPositionError() const;
 
   /**
    * Returns the velocity error.
    */
-  double GetVelocityError() const;
+  UnitPerSec GetVelocityError() const;
 
   /**
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.
    */
-  double Calculate(double measurement);
+  double Calculate(Unit measurement);
 
   /**
    * Returns the next output of the PID controller.
@@ -215,7 +191,7 @@ class PIDController : public frc::SendableBase {
    * @param measurement The current measurement of the process variable.
    * @param setpoint The new setpoint of the controller.
    */
-  double Calculate(double measurement, double setpoint);
+  double Calculate(Unit measurement, Unit setpoint);
 
   /**
    * Reset the previous error, the integral term, and disable the controller.
@@ -232,7 +208,7 @@ class PIDController : public frc::SendableBase {
    * @param error The current error of the PID controller.
    * @return Error for continuous inputs.
    */
-  double GetContinuousError(double error) const;
+  Unit GetContinuousPositionError(Unit error) const;
 
  private:
   // Factor for "proportional" control
@@ -254,35 +230,35 @@ class PIDController : public frc::SendableBase {
   double m_minimumOutput = -1.0;
 
   // Maximum input - limit setpoint to this
-  double m_maximumInput = 0;
+  Unit m_maximumInput{0.0};
 
   // Minimum input - limit setpoint to this
-  double m_minimumInput = 0;
+  Unit m_minimumInput{0.0};
 
   // Input range - difference between maximum and minimum
-  double m_inputRange = 0;
+  Unit m_inputRange{0.0};
 
   // Do the endpoints wrap around? eg. Absolute encoder
   bool m_continuous = false;
 
   // The error at the time of the most recent call to Calculate()
-  double m_positionError = 0;
-  double m_velocityError = 0;
+  Unit m_positionError{0.0};
+  UnitPerSec m_velocityError{0.0};
 
   // The error at the time of the second-most-recent call to Calculate() (used
   // to compute velocity)
-  double m_prevError = 0;
+  Unit m_prevError{0.0};
 
   // The sum of the errors for use in the integral calc
-  double m_totalError = 0;
-
-  Tolerance m_toleranceType = Tolerance::kAbsolute;
+  double m_totalError = 0.0;
 
   // The error that is considered at setpoint.
-  double m_positionTolerance = 0.05;
-  double m_velocityTolerance = std::numeric_limits<double>::infinity();
+  Unit m_positionTolerance{0.05};
+  UnitPerSec m_velocityTolerance{std::numeric_limits<double>::infinity()};
 
-  double m_setpoint = 0;
+  Unit m_setpoint{0.0};
 };
 
 }  // namespace frc2
+
+#include "frc/controller/PIDController.inc"

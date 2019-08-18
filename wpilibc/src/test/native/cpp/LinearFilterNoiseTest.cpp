@@ -45,20 +45,20 @@ static double GetData(double t) {
 class LinearFilterNoiseTest
     : public testing::TestWithParam<LinearFilterNoiseTestType> {
  protected:
-  std::unique_ptr<frc::LinearFilter> m_filter;
+  std::unique_ptr<frc::LinearFilter<double>> m_filter;
 
   void SetUp() override {
     switch (GetParam()) {
       case TEST_SINGLE_POLE_IIR: {
-        m_filter = std::make_unique<frc::LinearFilter>(
-            frc::LinearFilter::SinglePoleIIR(kSinglePoleIIRTimeConstant,
-                                             kFilterStep));
+        m_filter = std::make_unique<frc::LinearFilter<double>>(
+            frc::LinearFilter<double>::SinglePoleIIR(kSinglePoleIIRTimeConstant,
+                                                     kFilterStep));
         break;
       }
 
       case TEST_MOVAVG: {
-        m_filter = std::make_unique<frc::LinearFilter>(
-            frc::LinearFilter::MovingAverage(kMovAvgTaps));
+        m_filter = std::make_unique<frc::LinearFilter<double>>(
+            frc::LinearFilter<double>::MovingAverage(kMovAvgTaps));
         break;
       }
     }

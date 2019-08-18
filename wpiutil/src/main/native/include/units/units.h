@@ -73,6 +73,7 @@
 //	INCLUDES
 //--------------------
 
+#include <algorithm>
 #include <chrono>
 #include <ratio>
 #include <type_traits>
@@ -4791,6 +4792,39 @@ namespace units
 			using resultType = decltype(x * y);
 			static_assert(traits::is_convertible_unit_t<compound_unit<typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type, typename units::traits::unit_t_traits<UnitMultiply>::unit_type>, typename units::traits::unit_t_traits<UnitAdd>::unit_type>::value, "Unit types are not compatible.");
 			return resultType(std::fma(x(), y(), resultType(z)()));
+		}
+
+		/**
+		 * @ingroup		UnitMath
+		 * @brief		Clamp
+		 * @details		Returns value clamped between low and high.
+		 * @param[in]	v	Values to be multiplied.
+		 * @param[in]	lo	Lower bound.
+		 * @param[in]	hi	Upper bound.
+		 * @returns		The clamped result
+		 */
+		template<class UnitVal, class UnitLo, class UnitHi, class = std::enable_if_t<traits::is_unit_t<UnitVal>::value && traits::is_unit_t<UnitLo>::value && traits::is_unit_t<UnitHi>::value>>
+		UnitVal clamp(const UnitVal& v, const UnitLo& lo, const UnitHi& hi)
+		{
+			static_assert(traits::is_convertible_unit_t<compound_unit<typename units::traits::unit_t_traits<UnitVal>::unit_type, typename units::traits::unit_t_traits<UnitLo>::unit_type>, typename units::traits::unit_t_traits<UnitHi>::unit_type>::value, "Unit types are not compatible.");
+			return UnitVal(std::clamp(v(), lo(), hi()));
+		}
+
+		/**
+		 * @ingroup		UnitMath
+		 * @brief		Clamp
+		 * @details		Returns value clamped between low and high.
+		 * @param[in]	v	Values to be multiplied.
+		 * @param[in]	lo	Lower bound.
+		 * @param[in]	hi	Upper bound.
+		 * @param[in]	comp	Comparison function which returns true if the first argument is less than the second.
+		 * @returns		The clamped result
+		 */
+		template<class UnitVal, class UnitLo, class UnitHi, class Compare, class = std::enable_if_t<traits::is_unit_t<UnitVal>::value && traits::is_unit_t<UnitLo>::value && traits::is_unit_t<UnitHi>::value>>
+		UnitVal clamp(const UnitVal& v, const UnitLo& lo, const UnitHi& hi, Compare comp)
+		{
+			static_assert(traits::is_convertible_unit_t<compound_unit<typename units::traits::unit_t_traits<UnitVal>::unit_type, typename units::traits::unit_t_traits<UnitLo>::unit_type>, typename units::traits::unit_t_traits<UnitHi>::unit_type>::value, "Unit types are not compatible.");
+			return UnitVal(std::clamp(v(), lo(), hi(), comp));
 		}
 
 	}	// end namespace math

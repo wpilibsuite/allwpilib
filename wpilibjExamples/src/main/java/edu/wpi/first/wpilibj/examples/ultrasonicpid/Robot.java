@@ -21,9 +21,6 @@ public class Robot extends TimedRobot {
   // distance in inches the robot wants to stay from an object
   private static final double kHoldDistance = 12.0;
 
-  // maximum distance in inches we expect the robot to see
-  private static final double kMaxDistance = 24.0;
-
   // factor to convert sensor values to a distance in inches
   private static final double kValueToInches = 0.125;
 
@@ -45,13 +42,6 @@ public class Robot extends TimedRobot {
       = new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort),
       new PWMVictorSPX(kRightMotorPort));
   private final PIDController m_pidController = new PIDController(kP, kI, kD);
-
-  @Override
-  public void robotInit() {
-    // Set expected range to 0-24 inches; e.g. at 24 inches from object go
-    // full forward, at 0 inches from object go full backward.
-    m_pidController.setInputRange(0, kMaxDistance * kValueToInches);
-  }
 
   @Override
   public void teleopInit() {

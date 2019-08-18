@@ -12,7 +12,7 @@
 namespace wpi {
 
 template <class T>
-circular_buffer<T>::circular_buffer(size_t size) : m_data(size, 0) {}
+circular_buffer<T>::circular_buffer(size_t size) : m_data(size, T{}) {}
 
 /**
  * Returns number of elements in buffer

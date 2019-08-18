@@ -26,7 +26,8 @@ class Robot : public frc::TimedRobot {
     }
 
     // Run controller and update motor output
-    m_motor.Set(m_controller.Calculate(m_encoder.GetDistance()));
+    units::meter_t distance{m_encoder.GetDistance()};
+    m_motor.Set(m_controller.Calculate(distance));
   }
 
  private:
@@ -36,8 +37,10 @@ class Robot : public frc::TimedRobot {
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
-  frc::TrapezoidProfile::Constraints m_constraints{1.75_mps, 0.75_mps_sq};
-  frc::ProfiledPIDController m_controller{1.3, 0.0, 0.7, m_constraints, kDt};
+  frc::TrapezoidProfile<units::meter_t>::Constraints m_constraints{1.75_mps,
+                                                                   0.75_mps_sq};
+  frc::ProfiledPIDController<units::meter_t> m_controller{1.3, 0.0, 0.7,
+                                                          m_constraints, kDt};
 };
 
 #ifndef RUNNING_FRC_TESTS

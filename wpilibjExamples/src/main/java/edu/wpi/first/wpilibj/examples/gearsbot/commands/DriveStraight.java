@@ -34,7 +34,7 @@ public class DriveStraight extends PIDCommand {
     m_drivetrain = drivetrain;
     addRequirements(m_drivetrain);
 
-    getController().setAbsoluteTolerance(0.01);
+    getController().setTolerance(0.01);
   }
 
   // Called just before this Command runs the first time

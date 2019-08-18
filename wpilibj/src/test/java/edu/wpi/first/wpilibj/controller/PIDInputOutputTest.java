@@ -34,18 +34,6 @@ class PIDInputOutputTest {
   }
 
   @Test
-  void inputRangeTest() {
-    m_controller.setP(1);
-    m_controller.setOutputRange(-1000, 1000);
-    m_controller.setInputRange(-50, 50);
-
-    assertAll(
-        () -> assertEquals(-100, m_controller.calculate(100, 0), 1e-5),
-        () -> assertEquals(50, m_controller.calculate(0, 100), 1e-5)
-    );
-  }
-
-  @Test
   void continuousInputTest() {
     m_controller.setP(1);
     m_controller.enableContinuousInput(-180, 180);

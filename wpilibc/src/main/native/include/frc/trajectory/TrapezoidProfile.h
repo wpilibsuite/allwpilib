@@ -40,18 +40,37 @@ namespace frc {
  * `Calculate()` and to determine when the profile has completed via
  * `IsFinished()`.
  */
+template <typename Unit>
 class TrapezoidProfile {
  public:
-  class Constraints {
-   public:
-    units::meters_per_second_t maxVelocity = 0_mps;
-    units::meters_per_second_squared_t maxAcceleration = 0_mps_sq;
+  using UnitPerSec = typename units::unit_t<units::compound_unit<
+      typename Unit::unit_type, units::inverse<units::seconds>>>;
+  using UnitPerSecSq = typename units::unit_t<
+      units::compound_unit<typename Unit::unit_type,
+                           units::inverse<units::squared<units::seconds>>>>;
+
+  struct Constraints {
+    UnitPerSec maxVelocity{0};
+    UnitPerSecSq maxAcceleration{0};
+
+    constexpr Constraints() = default;
+    constexpr Constraints(UnitPerSec maxVelocity,
+                          UnitPerSecSq maxAcceleration) {
+      this->maxVelocity = maxVelocity;
+      this->maxAcceleration = maxAcceleration;
+    }
   };
 
-  class State {
-   public:
-    units::meter_t position = 0_m;
-    units::meters_per_second_t velocity = 0_mps;
+  struct State {
+    Unit position{0};
+    UnitPerSec velocity{0};
+
+    constexpr State() = default;
+    constexpr State(Unit position, UnitPerSec velocity) {
+      this->position = position;
+      this->velocity = velocity;
+    }
+
     bool operator==(const State& rhs) const {
       return position == rhs.position && velocity == rhs.velocity;
     }
@@ -66,7 +85,7 @@ class TrapezoidProfile {
    * @param initial     The initial state (usually the current state).
    */
   TrapezoidProfile(Constraints constraints, State goal,
-                   State initial = State{0_m, 0_mps});
+                   State initial = State{});
 
   TrapezoidProfile(TrapezoidProfile&&) = default;
   TrapezoidProfile& operator=(TrapezoidProfile&&) = default;
@@ -84,7 +103,7 @@ class TrapezoidProfile {
    *
    * @param target The target distance.
    */
-  units::second_t TimeLeftUntil(units::meter_t target) const;
+  units::second_t TimeLeftUntil(Unit target) const;
 
   /**
    * Returns the total time the profile takes to reach the goal.
@@ -135,3 +154,5 @@ class TrapezoidProfile {
 };
 
 }  // namespace frc
+
+#include "frc/trajectory/TrapezoidProfile.inc"

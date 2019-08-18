@@ -46,7 +46,6 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
  protected:
   SpeedController* m_speedController;
   Encoder* m_encoder;
-  LinearFilter* m_filter;
 
   void SetUp() override {
     switch (GetParam()) {
@@ -68,19 +67,16 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
                                 TestBench::kTalonEncoderChannelB);
         break;
     }
-    m_filter = new LinearFilter(LinearFilter::MovingAverage(50));
   }
 
   void TearDown() override {
     delete m_speedController;
     delete m_encoder;
-    delete m_filter;
   }
 
   void Reset() {
     m_speedController->Set(0.0);
     m_encoder->Reset();
-    m_filter->Reset();
   }
 };
 
@@ -138,24 +134,25 @@ TEST_P(MotorEncoderTest, ClampSpeed) {
  */
 TEST_P(MotorEncoderTest, PositionPIDController) {
   Reset();
-  double goal = 1000;
-  frc2::PIDController pidController(0.001, 0.01, 0.0);
-  pidController.SetAbsoluteTolerance(50.0);
+  constexpr units::meter_t kGoal = 1000_m;
+  frc2::PIDController<units::meter_t> pidController(0.001, 0.01, 0.0);
+  pidController.SetTolerance(50_m);
   pidController.SetOutputRange(-0.2, 0.2);
-  pidController.SetSetpoint(goal);
+  pidController.SetSetpoint(kGoal);
 
   /* 10 seconds should be plenty time to get to the reference */
   frc::Notifier pidRunner{[this, &pidController] {
-    m_speedController->Set(pidController.Calculate(m_encoder->GetDistance()));
+    units::meter_t distance{m_encoder->GetDistance()};
+    m_speedController->Set(pidController.Calculate(distance));
   }};
   pidRunner.StartPeriodic(pidController.GetPeriod());
   Wait(10.0);
   pidRunner.Stop();
 
-  RecordProperty("PIDError", pidController.GetPositionError());
+  RecordProperty("PIDError", pidController.GetPositionError().to<double>());
 
   EXPECT_TRUE(pidController.AtSetpoint())
-      << "PID loop did not converge within 10 seconds. Goal was: " << goal
+      << "PID loop did not converge within 10 seconds. Goal was: " << kGoal
       << " Error was: " << pidController.GetPositionError();
 }
 
@@ -163,23 +160,25 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
  * Test if velocity PID loop works
  */
 TEST_P(MotorEncoderTest, VelocityPIDController) {
+  using units::meters_per_second_t;
+
   Reset();
 
-  frc2::PIDController pidController(1e-5, 0.0, 0.0006);
-  pidController.SetAbsoluteTolerance(200.0);
+  frc2::PIDController<meters_per_second_t> pidController{1e-5, 0.0, 0.0006};
+  auto filter = LinearFilter<meters_per_second_t>::MovingAverage(50);
+  pidController.SetTolerance(200_mps);
   pidController.SetOutputRange(-0.3, 0.3);
-  pidController.SetSetpoint(600);
+  pidController.SetSetpoint(600_mps);
 
   /* 10 seconds should be plenty time to get to the reference */
-  frc::Notifier pidRunner{[this, &pidController] {
-    m_speedController->Set(
-        pidController.Calculate(m_filter->Calculate(m_encoder->GetRate())) +
-        8e-5);
+  frc::Notifier pidRunner{[this, &pidController, &filter] {
+    units::meters_per_second_t rate{m_encoder->GetRate()};
+    m_speedController->Set(pidController.Calculate(filter.Calculate(rate)));
   }};
   pidRunner.StartPeriodic(pidController.GetPeriod());
-  Wait(10.0);
+  frc::Wait(10.0);
   pidRunner.Stop();
-  RecordProperty("PIDError", pidController.GetPositionError());
+  RecordProperty("PIDError", pidController.GetPositionError().to<double>());
 
   EXPECT_TRUE(pidController.AtSetpoint())
       << "PID loop did not converge within 10 seconds. Goal was: " << 600

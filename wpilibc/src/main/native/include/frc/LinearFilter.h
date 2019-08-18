@@ -66,6 +66,7 @@ namespace frc {
  * Combining this with Note 1 - the impetus is on YOU as a developer to make
  * sure Calculate() gets called at the desired, constant frequency!
  */
+template <typename T>
 class LinearFilter {
  public:
   /**
@@ -138,13 +139,15 @@ class LinearFilter {
    *
    * @return The filtered value at this step
    */
-  double Calculate(double input);
+  T Calculate(T input);
 
  private:
-  wpi::circular_buffer<double> m_inputs{0};
-  wpi::circular_buffer<double> m_outputs{0};
+  wpi::circular_buffer<T> m_inputs{0};
+  wpi::circular_buffer<T> m_outputs{0};
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
 };
 
 }  // namespace frc
+
+#include "frc/LinearFilter.inc"

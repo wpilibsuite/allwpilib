@@ -22,8 +22,12 @@ namespace frc {
  * Implements a PID control loop whose setpoint is constrained by a trapezoid
  * profile.
  */
+template <typename Unit>
 class ProfiledPIDController : public SendableBase {
  public:
+  using UnitPerSec = typename units::unit_t<units::compound_unit<
+      typename Unit::unit_type, units::inverse<units::seconds>>>;
+
   /**
    * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and
    * Kd.
@@ -35,9 +39,10 @@ class ProfiledPIDController : public SendableBase {
    * @param period      The period between controller updates in seconds. The
    *                    default is 20 milliseconds.
    */
-  ProfiledPIDController(double Kp, double Ki, double Kd,
-                        frc::TrapezoidProfile::Constraints constraints,
-                        units::second_t period = 20_ms);
+  ProfiledPIDController(
+      double Kp, double Ki, double Kd,
+      typename TrapezoidProfile<Unit>::Constraints constraints,
+      units::second_t period = 20_ms);
 
   ~ProfiledPIDController() override = default;
 
@@ -111,27 +116,12 @@ class ProfiledPIDController : public SendableBase {
    *
    * @param goal The desired unprofiled setpoint.
    */
-  void SetGoal(units::meter_t goal);
+  void SetGoal(Unit goal);
 
   /**
    * Gets the goal for the ProfiledPIDController.
    */
-  units::meter_t GetGoal() const;
-
-  /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   * @param toleranceType     The type of tolerance specified.
-   */
-  bool AtGoal(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity(),
-      frc2::PIDController::Tolerance toleranceType =
-          frc2::PIDController::Tolerance::kAbsolute) const;
+  Unit GetGoal() const;
 
   /**
    * Returns true if the error is within the tolerance of the error.
@@ -145,29 +135,14 @@ class ProfiledPIDController : public SendableBase {
    *
    * @param constraints Velocity and acceleration constraints for goal.
    */
-  void SetConstraints(frc::TrapezoidProfile::Constraints constraints);
+  void SetConstraints(typename TrapezoidProfile<Unit>::Constraints constraints);
 
   /**
    * Returns the current setpoint of the ProfiledPIDController.
    *
    * @return The current setpoint.
    */
-  double GetSetpoint() const;
-
-  /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   * @param toleranceType     The type of tolerance specified.
-   */
-  bool AtSetpoint(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity(),
-      frc2::PIDController::Tolerance toleranceType =
-          frc2::PIDController::Tolerance::kAbsolute) const;
+  Unit GetSetpoint() const;
 
   /**
    * Returns true if the error is within the tolerance of the error.
@@ -186,7 +161,7 @@ class ProfiledPIDController : public SendableBase {
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
    */
-  void SetInputRange(double minimumInput, double maximumInput);
+  void SetInputRange(Unit minimumInput, Unit maximumInput);
 
   /**
    * Enables continuous input.
@@ -198,7 +173,7 @@ class ProfiledPIDController : public SendableBase {
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
    */
-  void EnableContinuousInput(double minimumInput, double maximumInput);
+  void EnableContinuousInput(Unit minimumInput, Unit maximumInput);
 
   /**
    * Disables continuous input.
@@ -220,39 +195,28 @@ class ProfiledPIDController : public SendableBase {
    * @param positionTolerance Position error which is tolerable.
    * @param velocityTolerance Velocity error which is tolerable.
    */
-  void SetAbsoluteTolerance(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity());
-
-  /**
-   * Sets the percent error which is considered tolerable for use with
-   * AtSetpoint().
-   *
-   * @param positionTolerance Position error which is tolerable.
-   * @param velocityTolerance Velocity error which is tolerable.
-   */
-  void SetPercentTolerance(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity());
+  void SetAbsoluteTolerance(Unit positionTolerance,
+                            UnitPerSec velocityTolerance = UnitPerSec{
+                                std::numeric_limits<double>::infinity()});
 
   /**
    * Returns the difference between the setpoint and the measurement.
    *
    * @return The error.
    */
-  double GetPositionError() const;
+  Unit GetPositionError() const;
 
   /**
    * Returns the change in error per second.
    */
-  double GetVelocityError() const;
+  UnitPerSec GetVelocityError() const;
 
   /**
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.
    */
-  double Calculate(double measurement);
+  double Calculate(Unit measurement);
 
   /**
    * Returns the next output of the PID controller.
@@ -260,7 +224,7 @@ class ProfiledPIDController : public SendableBase {
    * @param measurement The current measurement of the process variable.
    * @param goal The new goal of the controller.
    */
-  double Calculate(double measurement, units::meter_t goal);
+  double Calculate(Unit measurement, Unit goal);
 
   /**
    * Returns the next output of the PID controller.
@@ -269,21 +233,23 @@ class ProfiledPIDController : public SendableBase {
    * @param goal        The new goal of the controller.
    * @param constraints Velocity and acceleration constraints for goal.
    */
-  double Calculate(double measurement, units::meter_t goal,
-                   frc::TrapezoidProfile::Constraints constraints);
+  double Calculate(Unit measurement, Unit goal,
+                   typename TrapezoidProfile<Unit>::Constraints constraints);
 
   /**
    * Reset the previous error, the integral term, and disable the controller.
    */
   void Reset();
 
-  void InitSendable(frc::SendableBuilder& builder) override;
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
-  frc2::PIDController m_controller;
-  frc::TrapezoidProfile::State m_goal;
-  frc::TrapezoidProfile::State m_setpoint;
-  frc::TrapezoidProfile::Constraints m_constraints;
+  frc2::PIDController<Unit> m_controller;
+  typename TrapezoidProfile<Unit>::State m_goal;
+  typename TrapezoidProfile<Unit>::State m_setpoint;
+  typename TrapezoidProfile<Unit>::Constraints m_constraints;
 };
 
 }  // namespace frc
+
+#include "frc/controller/ProfiledPIDController.inc"

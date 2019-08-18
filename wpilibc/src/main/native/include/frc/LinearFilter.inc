@@ -5,17 +5,19 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc/LinearFilter.h"
+#pragma once
 
 #include <cassert>
 #include <cmath>
+#include <vector>
 
 #include <hal/HAL.h>
 
-using namespace frc;
+namespace frc {
 
-LinearFilter::LinearFilter(wpi::ArrayRef<double> ffGains,
-                           wpi::ArrayRef<double> fbGains)
+template <typename T>
+LinearFilter<T>::LinearFilter(wpi::ArrayRef<double> ffGains,
+                              wpi::ArrayRef<double> fbGains)
     : m_inputs(ffGains.size()),
       m_outputs(fbGains.size()),
       m_inputGains(ffGains),
@@ -25,32 +27,37 @@ LinearFilter::LinearFilter(wpi::ArrayRef<double> ffGains,
   HAL_Report(HALUsageReporting::kResourceType_LinearFilter, instances);
 }
 
-LinearFilter LinearFilter::SinglePoleIIR(double timeConstant,
-                                         units::second_t period) {
+template <typename T>
+LinearFilter<T> LinearFilter<T>::SinglePoleIIR(double timeConstant,
+                                               units::second_t period) {
   double gain = std::exp(-period.to<double>() / timeConstant);
-  return LinearFilter(1.0 - gain, -gain);
+  return LinearFilter<T>(1.0 - gain, -gain);
 }
 
-LinearFilter LinearFilter::HighPass(double timeConstant,
-                                    units::second_t period) {
+template <typename T>
+LinearFilter<T> LinearFilter<T>::HighPass(double timeConstant,
+                                          units::second_t period) {
   double gain = std::exp(-period.to<double>() / timeConstant);
-  return LinearFilter({gain, -gain}, {-gain});
+  return LinearFilter<T>({gain, -gain}, {-gain});
 }
 
-LinearFilter LinearFilter::MovingAverage(int taps) {
+template <typename T>
+LinearFilter<T> LinearFilter<T>::MovingAverage(int taps) {
   assert(taps > 0);
 
   std::vector<double> gains(taps, 1.0 / taps);
-  return LinearFilter(gains, {});
+  return LinearFilter<T>(gains, {});
 }
 
-void LinearFilter::Reset() {
+template <typename T>
+void LinearFilter<T>::Reset() {
   m_inputs.reset();
   m_outputs.reset();
 }
 
-double LinearFilter::Calculate(double input) {
-  double retVal = 0.0;
+template <typename T>
+T LinearFilter<T>::Calculate(T input) {
+  T retVal{0.0};
 
   // Rotate the inputs
   m_inputs.push_front(input);
@@ -68,3 +75,5 @@ double LinearFilter::Calculate(double input) {
 
   return retVal;
 }
+
+}  // namespace frc

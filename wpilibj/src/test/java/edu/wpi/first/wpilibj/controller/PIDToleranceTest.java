@@ -23,7 +23,7 @@ class PIDToleranceTest {
   @BeforeEach
   void setUp() {
     m_pidController = new PIDController(0.05, 0.0, 0.0);
-    m_pidController.setInputRange(-kRange / 2, kRange / 2);
+    m_pidController.enableContinuousInput(-kRange / 2, kRange / 2);
   }
 
   @AfterEach
@@ -39,7 +39,7 @@ class PIDToleranceTest {
 
   @Test
   void absoluteToleranceTest() {
-    m_pidController.setAbsoluteTolerance(kTolerance);
+    m_pidController.setTolerance(kTolerance);
     m_pidController.setSetpoint(kSetpoint);
 
     m_pidController.calculate(0.0);
@@ -55,32 +55,6 @@ class PIDToleranceTest {
             .getPositionError());
 
     m_pidController.calculate(kSetpoint + 10 * kTolerance);
-
-    assertFalse(m_pidController.atSetpoint(),
-        "Error was in tolerance when it should not have been. Error was " + m_pidController
-            .getPositionError());
-  }
-
-  @Test
-  void percentToleranceTest() {
-    m_pidController.setPercentTolerance(kTolerance);
-    m_pidController.setSetpoint(kSetpoint);
-
-    m_pidController.calculate(0.0);
-
-    assertFalse(m_pidController.atSetpoint(),
-        "Error was in tolerance when it should not have been. Error was " + m_pidController
-            .getPositionError());
-
-    // Half of percent tolerance away from setpoint
-    m_pidController.calculate(kSetpoint + (kTolerance / 2) / 100 * kRange);
-
-    assertTrue(m_pidController.atSetpoint(),
-        "Error was not in tolerance when it should have been. Error was " + m_pidController
-            .getPositionError());
-
-    // Double percent tolerance away from setpoint
-    m_pidController.calculate(kSetpoint + (kTolerance * 2) / 100 * kRange);
 
     assertFalse(m_pidController.atSetpoint(),
         "Error was in tolerance when it should not have been. Error was " + m_pidController
