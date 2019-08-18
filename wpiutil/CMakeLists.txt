@@ -40,7 +40,9 @@ if (NOT WITHOUT_JAVA)
 
   set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${EJML_JARS})
 
-  file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+  execute_process(COMMAND python3 ${CMAKE_SOURCE_DIR}/wpiutil/generate_numbers.py ${CMAKE_BINARY_DIR}/wpiutil)
+
+  file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${CMAKE_BINARY_DIR}/wpiutil/generated/*.java)
   add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} OUTPUT_NAME wpiutil)
 
   get_property(WPIUTIL_JAR_FILE TARGET wpiutil_jar PROPERTY JAR_FILE)
