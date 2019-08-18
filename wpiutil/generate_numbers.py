@@ -16,9 +16,9 @@ with open(f"{dirname}/src/generate/GenericNumber.java.in", "r") as templateFile:
     os.makedirs(rootPath)
 
     for i in range(MAX_NUM + 1):
-        f = open(f"{rootPath}/N{i}.java", "w")
-        f.write(template.replace("${num}", str(i)))
-        f.close()
+        with open(f"{rootPath}/N{i}.java", "w") as f:
+            f.write(template.replace("${num}", str(i)))
+            f.close()
 
 with open(f"{dirname}/src/generate/Nat.java.in", "r") as templateFile:
     template = templateFile.read()
@@ -34,6 +34,6 @@ with open(f"{dirname}/src/generate/Nat.java.in", "r") as templateFile:
 
     template += "}\n"
 
-    f = open(outputPath, "w")
-    f.write(template)
-    f.close()
+    with open(outputPath, "w") as f:
+        f.write(template)
+        f.close()
