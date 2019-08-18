@@ -23,9 +23,8 @@ with open(f"{dirname}/src/generate/GenericNumber.java.in", "r") as templateFile:
 with open(f"{dirname}/src/generate/Nat.java.in", "r") as templateFile:
     template = templateFile.read()
     outputPath = f"{cmake_binary_dir}/generated/main/java/edu/wpi/first/wpiutil/math/Nat.java"
-    getterFile = open(f"{dirname}/src/generate/NatGetter.java.in", "r")
-    getter = getterFile.read()
-    getterFile.close()
+    with open(f"{dirname}/src/generate/NatGetter.java.in", "r") as getterFile:
+        getter = getterFile.read()
 
     if os.path.exists(outputPath):
         os.remove(outputPath)
