@@ -253,6 +253,7 @@ task generateNumbers() {
     group = "WPILib"
 
     inputs.file wpilibNumberFileInput
+    outputs.dir wpilibNumberFileOutputDir
 
     doLast {
         if(wpilibNumberFileOutputDir.exists()) {
@@ -272,6 +273,7 @@ task generateNat() {
     description = "Generates Nat.java"
     group = "WPILib"
     inputs.files([natFileInput, natGetterInput])
+    outputs.file wpilibNatFileOutput
     dependsOn generateNumbers
 
     doLast {
