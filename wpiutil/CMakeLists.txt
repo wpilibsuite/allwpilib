@@ -132,7 +132,7 @@ if (NOT USE_VCPKG_LIBUV)
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/libuv/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
     if(NOT MSVC)
-        target_sources(wpiutil PRIVATE ${wpiutil_unix_src} ${uv_unix_src})
+        target_sources(wpiutil PRIVATE ${uv_unix_src})
         if (APPLE)
             target_sources(wpiutil PRIVATE ${uv_darwin_src})
         else()
@@ -152,6 +152,8 @@ endif()
 
 if (MSVC)
     target_sources(wpiutil PRIVATE ${wpiutil_windows_src})
+else ()
+    target_sources(wpiutil PRIVATE ${wpiutil_unix_src})
 endif()
 
 target_include_directories(wpiutil PUBLIC
