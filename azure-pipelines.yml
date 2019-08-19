@@ -41,8 +41,7 @@ stages:
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
           options: '-Ponlylinuxathena'
-
-    steps:
+          
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
         inputs:
