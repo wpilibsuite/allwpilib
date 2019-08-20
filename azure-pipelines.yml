@@ -40,7 +40,7 @@ stages:
           publishJUnitResults: false
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Ponlylinuxathena'
+          options: '-Ponlylinuxathena -PjenkinsBuild'
 
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
@@ -74,7 +74,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Ponlylinuxraspbian'
+          options: '-Ponlylinuxraspbian -PjenkinsBuild'
 
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
@@ -108,6 +108,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
+          options: '-PjenkinsBuild'
 
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
@@ -173,7 +174,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PskipPMD'
+          options: '-PskipPMD -PjenkinsBuild'
 
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
@@ -217,7 +218,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PskipPMD'
+          options: '-PskipPMD -PjenkinsBuild'
 
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
@@ -257,6 +258,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
+          options: '-PjenkinsBuild'
 
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
