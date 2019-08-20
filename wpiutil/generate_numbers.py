@@ -31,8 +31,7 @@ with open(f"{dirname}/src/generate/Nat.java.in", "r") as templateFile:
     importsString = ""
 
     for i in range(MAX_NUM + 1):
-        importsString += "import edu.wpi.first.wpiutil.math.numbers.N"
-        importsString += str(i) + ";\n"
+        importsString += f"import edu.wpi.first.wpiutil.math.numbers.N{i};\n"
         template += getter.replace("${num}", str(i))
 
     template += "}\n"
