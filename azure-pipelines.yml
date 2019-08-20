@@ -142,6 +142,7 @@ stages:
           artifactName: 'Win64'
           targetPath: 'build/allOutputs'
 
+# Rebuild 32 bit
   - job: Windows_32_Bit
     pool:
       vmImage: 'windows-2019'
