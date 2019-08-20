@@ -113,6 +113,7 @@ task generateJavaDocs(type: Javadoc) {
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true
+    options.encoding = 'UTF-8'
 
     title = "WPILib API $pubVersion"
     ext.entryPoint = "$destinationDir/index.html"
