@@ -2,7 +2,7 @@ import edu.wpi.first.toolchain.*
 
 plugins {
     id 'base'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.5'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '3.0'
     id 'edu.wpi.first.NativeUtils' apply false
     id 'edu.wpi.first.GradleJni' version '0.9.0'
     id 'edu.wpi.first.GradleVsCode' version '0.9.4'
