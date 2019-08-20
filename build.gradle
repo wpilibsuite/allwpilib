@@ -87,11 +87,11 @@ subprojects {
         subproj.apply plugin: MultiBuilds
     }
 
-    apply from: "${rootDir}/shared/java/javastyle.gradle"
-
     repositories {
         mavenCentral()
     }
+
+    apply from: "${rootDir}/shared/java/javastyle.gradle"
 
     // Disables doclint in java 8.
     if (JavaVersion.current().isJava8Compatible()) {
