@@ -142,7 +142,6 @@ stages:
           artifactName: 'Win64'
           targetPath: 'build/allOutputs'
 
-# Rebuild 32 bit
   - job: Windows_32_Bit
     pool:
       vmImage: 'windows-2019'
@@ -150,7 +149,7 @@ stages:
       - powershell: |
           mkdir build
           $ProgressPreference = 'SilentlyContinue'
-          wget "https://github.com/wpilibsuite/frc-openjdk-windows/releases/download/v11.0.0u28-1/jdk-x86-11.0.0u28-1.zip" -O "build\jdk.zip"
+          wget "https://github.com/wpilibsuite/frc-openjdk-windows/releases/download/v11.0.1u13-1/jdk-x86-11.0.1u13-1.zip" -O "build\jdk.zip"
         displayName: 'Download JDK'
       - task: JavaToolInstaller@0
         inputs:
