@@ -2,7 +2,7 @@ import edu.wpi.first.toolchain.*
 
 plugins {
     id 'base'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '3.0' apply false
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '3.0'
     id 'edu.wpi.first.NativeUtils' apply false
     id 'edu.wpi.first.GradleJni' version '0.9.0'
     id 'edu.wpi.first.GradleVsCode' version '0.9.4'
@@ -13,13 +13,9 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '4.0.3' apply false
 }
 
-allprojects {
-    repositories {
-        mavenCentral()
-    }
+repositories {
+    mavenCentral()
 }
-
-apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
 
 buildScan {
     termsOfServiceUrl = 'https://gradle.com/terms-of-service'
@@ -91,11 +87,11 @@ subprojects {
         subproj.apply plugin: MultiBuilds
     }
 
+    apply from: "${rootDir}/shared/java/javastyle.gradle"
+
     repositories {
         mavenCentral()
     }
-
-    apply from: "${rootDir}/shared/java/javastyle.gradle"
 
     // Disables doclint in java 8.
     if (JavaVersion.current().isJava8Compatible()) {
