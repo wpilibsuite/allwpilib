@@ -8,9 +8,8 @@
 #include "frc/logging/LogSpreadsheet.h"
 
 #include <chrono>
+#include <ctime>
 #include <iostream>
-
-#include "frc/RobotController.h"
 
 using namespace frc;
 
@@ -41,9 +40,7 @@ void LogSpreadsheet::Start() {
     return;
   }
 
-  std::string fileName = "log-" + m_name + "-" +
-                         std::to_string(RobotController::GetFPGATime()) +
-                         ".txt";
+  std::string fileName = "log-" + m_name + "-" + CurrentDateTime() + ".txt";
 
   m_logFile.open(fileName.c_str());
 
@@ -85,4 +82,15 @@ void LogSpreadsheet::WriteRow() {
     m_cells[i]->ReleaseLock();
   }
   m_logFile << std::endl;
+}
+
+std::string LogSpreadsheet::CurrentDateTime() {
+  // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
+  time_t now = time(0);
+  struct tm time;
+  char buf[80];
+  time = *localtime(&now);
+  strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &time);
+
+  return buf;
 }

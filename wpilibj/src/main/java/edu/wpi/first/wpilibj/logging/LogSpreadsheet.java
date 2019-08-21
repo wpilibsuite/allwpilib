@@ -11,10 +11,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
-import edu.wpi.first.wpilibj.RobotController;
+import java.util.Locale;
 
 /**
  * A LogSpreadsheet writes to a file the contents of each of its registered
@@ -79,7 +80,7 @@ public class LogSpreadsheet {
       return;
     }
 
-    String fileName = "log-" + m_name + "-" + RobotController.getFPGATime() + ".txt";
+    String fileName = "log-" + m_name + "-" + currentDateTime() + ".txt";
     try {
       m_logFile = Files.newOutputStream(Paths.get(fileName));
     } catch (IOException ex) {
@@ -131,5 +132,12 @@ public class LogSpreadsheet {
     } catch (IOException ex) {
       System.out.println(ex.getMessage());
     }
+  }
+
+  private String currentDateTime() {
+    // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
+    SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd.HH:mm:ss", Locale.getDefault());
+    Date time = new Date();
+    return formater.format(time);
   }
 }

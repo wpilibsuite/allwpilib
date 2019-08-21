@@ -65,6 +65,7 @@ class LogSpreadsheet {
 
  private:
   void WriteRow();
+  std::string CurrentDateTime();
 
   std::string m_name;
   std::vector<LogCell*> m_cells;
