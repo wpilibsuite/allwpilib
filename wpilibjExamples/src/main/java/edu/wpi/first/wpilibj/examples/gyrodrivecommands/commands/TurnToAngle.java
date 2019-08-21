@@ -39,10 +39,8 @@ public class TurnToAngle extends SynchronousPIDCommand {
         // Require the drive
         drive);
 
-    // Set the input range of the controller to match the gyro output
-    getController().setInputRange(-180, 180);
     // Set the controller to be continuous (because it is an angle controller)
-    getController().setContinuous();
+    getController().enableContinuousInput(-180, 180);
     // Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
     // setpoint before it is considered as having reached the reference
     getController().setAbsoluteTolerance(kTurnToleranceDeg, kTurnRateToleranceDegPerS);

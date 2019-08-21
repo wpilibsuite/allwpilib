@@ -48,15 +48,5 @@
     "foldername": "commandbased",
     "gradlebase": "java",
     "mainclass": "Main"
-  },
-  {
-    "name": "Command Robot (New)",
-    "description": "Command style",
-    "tags": [
-      "Command"
-    ],
-    "foldername": "commandbasednew",
-    "gradlebase": "java",
-    "mainclass": "Main"
   }
 ]

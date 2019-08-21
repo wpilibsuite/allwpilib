@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.templates.commandbasednew;
+package edu.wpi.first.wpilibj.templates.commandbased;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.templates.commandbasednew.commands.ExampleCommand;
-import edu.wpi.first.wpilibj.templates.commandbasednew.subsystems.ExampleSubsystem;
+import edu.wpi.first.wpilibj.templates.commandbased.commands.ExampleCommand;
+import edu.wpi.first.wpilibj.templates.commandbased.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
