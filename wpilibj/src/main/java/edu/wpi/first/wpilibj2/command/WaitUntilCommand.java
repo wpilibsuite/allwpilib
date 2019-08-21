@@ -12,7 +12,7 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.Timer;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A command that does nothing but ends after a specified match time or condition.  Useful for
@@ -27,7 +27,7 @@ public class WaitUntilCommand extends SendableCommandBase {
    * @param condition the condition to determine when to end
    */
   public WaitUntilCommand(BooleanSupplier condition) {
-    m_condition = requireNonNull(condition);
+    m_condition = requireNonNullParam(condition, "condition", "WaitUntilCommand");
   }
 
   /**

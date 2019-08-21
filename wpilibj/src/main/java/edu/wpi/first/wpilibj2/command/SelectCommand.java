@@ -10,8 +10,8 @@ package edu.wpi.first.wpilibj2.command;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Runs one of a selection of commands, either using a selector and a key to command mapping, or a
@@ -44,8 +44,8 @@ public class SelectCommand extends SendableCommandBase {
 
     CommandGroupBase.registerGroupedCommands(commands.values().toArray(new Command[]{}));
 
-    m_commands = requireNonNull(commands);
-    m_selector = requireNonNull(selector);
+    m_commands = requireNonNullParam(commands, "commands", "SelectCommand");
+    m_selector = requireNonNullParam(selector, "selector", "SelectCommand");
 
     m_toRun = null;
 
@@ -62,7 +62,7 @@ public class SelectCommand extends SendableCommandBase {
   public SelectCommand(Supplier<Command> toRun) {
     m_commands = null;
     m_selector = null;
-    m_toRun = requireNonNull(toRun);
+    m_toRun = requireNonNullParam(toRun, "toRun", "SelectCommand");
   }
 
   @Override

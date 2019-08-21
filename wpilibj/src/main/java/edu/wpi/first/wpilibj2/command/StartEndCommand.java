@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import java.util.function.BooleanSupplier;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A command that runs a given runnable when it is initalized, and another runnable when it ends.
@@ -30,8 +30,8 @@ public class StartEndCommand extends SendableCommandBase {
    * @param requirements the subsystems required by this command
    */
   public StartEndCommand(Runnable onInit, Runnable onEnd, Subsystem... requirements) {
-    m_onInit = requireNonNull(onInit);
-    m_onEnd = requireNonNull(onEnd);
+    m_onInit = requireNonNullParam(onInit, "onInit", "StartEndCommand");
+    m_onEnd = requireNonNullParam(onEnd, "onEnd", "StartEndCommand");
 
     addRequirements(requirements);
   }

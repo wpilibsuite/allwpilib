@@ -13,7 +13,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A command that controls an output with a {@link PIDController}.  Runs forever by default - to add
@@ -38,10 +38,10 @@ public class SynchronousPIDCommand extends SendableCommandBase {
   public SynchronousPIDCommand(PIDController controller, DoubleSupplier measurementSource,
                                DoubleSupplier setpointSource, DoubleConsumer useOutput,
                                Subsystem... requirements) {
-    requireNonNull(controller);
-    requireNonNull(measurementSource);
-    requireNonNull(setpointSource);
-    requireNonNull(useOutput);
+    requireNonNullParam(controller, "controller", "SynchronousPIDCommand");
+    requireNonNullParam(measurementSource, "measurementSource", "SynchronousPIDCommand");
+    requireNonNullParam(setpointSource, "setpointSource", "SynchronousPIDCommand");
+    requireNonNullParam(useOutput, "useOutput", "SynchronousPIDCommand");
 
     m_controller = controller;
     m_useOutput = useOutput;

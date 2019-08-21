@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * This class provides an easy way to link commands to inputs.
@@ -66,7 +66,7 @@ public class Trigger {
    * @return this trigger, so calls can be chained
    */
   public Trigger whenActive(final Command command, boolean interruptible) {
-    requireNonNull(command);
+    requireNonNullParam(command, "command", "whenActive");
 
     CommandScheduler.getInstance().addButton(new Runnable() {
       private boolean m_pressedLast = get();
@@ -118,7 +118,7 @@ public class Trigger {
    * @return this trigger, so calls can be chained
    */
   public Trigger whileActiveContinuous(final Command command, boolean interruptible) {
-    requireNonNull(command);
+    requireNonNullParam(command, "command", "whileActiveContinuous");
 
     CommandScheduler.getInstance().addButton(new Runnable() {
       private boolean m_pressedLast = get();
@@ -171,7 +171,7 @@ public class Trigger {
    * @return this trigger, so calls can be chained
    */
   public Trigger whileActiveOnce(final Command command, boolean interruptible) {
-    requireNonNull(command);
+    requireNonNullParam(command, "command", "whileActiveOnce");
 
     CommandScheduler.getInstance().addButton(new Runnable() {
       private boolean m_pressedLast = get();
@@ -211,7 +211,7 @@ public class Trigger {
    * @return this trigger, so calls can be chained
    */
   public Trigger whenInactive(final Command command, boolean interruptible) {
-    requireNonNull(command);
+    requireNonNullParam(command, "command", "whenInactive");
 
     CommandScheduler.getInstance().addButton(new Runnable() {
       private boolean m_pressedLast = get();
@@ -258,7 +258,7 @@ public class Trigger {
    * @return this trigger, so calls can be chained
    */
   public Trigger toggleWhenActive(final Command command, boolean interruptible) {
-    requireNonNull(command);
+    requireNonNullParam(command, "command", "toggleWhenActive");
 
     CommandScheduler.getInstance().addButton(new Runnable() {
       private boolean m_pressedLast = get();
@@ -298,7 +298,7 @@ public class Trigger {
    * @return this trigger, so calls can be chained
    */
   public Trigger cancelWhenActive(final Command command) {
-    requireNonNull(command);
+    requireNonNullParam(command, "command", "cancelWhenActive");
 
     CommandScheduler.getInstance().addButton(new Runnable() {
       private boolean m_pressedLast = get();

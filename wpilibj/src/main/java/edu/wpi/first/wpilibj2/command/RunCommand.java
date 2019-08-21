@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import java.util.function.BooleanSupplier;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A command that runs a Runnable continuously.  Has no end condition as-is;
@@ -28,7 +28,7 @@ public class RunCommand extends SendableCommandBase {
    * @param requirements the subsystems to require
    */
   public RunCommand(Runnable toRun, Subsystem... requirements) {
-    m_toRun = requireNonNull(toRun);
+    m_toRun = requireNonNullParam(toRun, "toRun", "RunCommand");
     addRequirements(requirements);
   }
 

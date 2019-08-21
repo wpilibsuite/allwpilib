@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A subsystem that uses a {@link PIDController} to control an output.  The controller is run
@@ -25,7 +25,7 @@ public abstract class SynchronousPIDSubsystem extends SendableSubsystemBase {
    * @param controller the PIDController to use
    */
   public SynchronousPIDSubsystem(PIDController controller) {
-    requireNonNull(controller);
+    requireNonNullParam(controller, "controller", "SynchronousPIDSubsystem");
     m_controller = controller;
   }
 

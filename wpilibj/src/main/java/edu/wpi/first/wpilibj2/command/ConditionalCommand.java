@@ -9,8 +9,8 @@ package edu.wpi.first.wpilibj2.command;
 
 import java.util.function.BooleanSupplier;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Runs one of two commands, depending on the value of the given condition when this command is
@@ -45,7 +45,7 @@ public class ConditionalCommand extends SendableCommandBase {
 
     m_onTrue = onTrue;
     m_onFalse = onFalse;
-    m_condition = requireNonNull(condition);
+    m_condition = requireNonNullParam(condition, "condition", "ConditionalCommand");
     m_requirements.addAll(m_onTrue.getRequirements());
     m_requirements.addAll(m_onFalse.getRequirements());
   }

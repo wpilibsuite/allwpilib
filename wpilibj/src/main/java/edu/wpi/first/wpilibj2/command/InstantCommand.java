@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A Command that runs instantly; it will initialize, execute once, and end on the same
@@ -24,7 +24,7 @@ public class InstantCommand extends SendableCommandBase {
    * @param requirements the subsystems required by this command
    */
   public InstantCommand(Runnable toRun, Subsystem... requirements) {
-    m_toRun = requireNonNull(toRun);
+    m_toRun = requireNonNullParam(toRun, "toRun", "InstantCommand");
 
     addRequirements(requirements);
   }

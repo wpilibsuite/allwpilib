@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj2.command;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A command that allows the user to pass in functions for each of the basic command methods through
@@ -35,10 +35,10 @@ public class FunctionalCommand extends SendableCommandBase {
    */
   public FunctionalCommand(Runnable onInit, Runnable onExecute, Consumer<Boolean> onEnd,
                            BooleanSupplier isFinished, Subsystem... requirements) {
-    m_onInit = requireNonNull(onInit);
-    m_onExecute = requireNonNull(onExecute);
-    m_onEnd = requireNonNull(onEnd);
-    m_isFinished = requireNonNull(isFinished);
+    m_onInit = requireNonNullParam(onInit, "onInit", "FunctionalCommand");
+    m_onExecute = requireNonNullParam(onExecute, "onExecute", "FunctionalCommand");
+    m_onEnd = requireNonNullParam(onEnd, "onEnd", "FunctionalCommand");
+    m_isFinished = requireNonNullParam(isFinished, "isFinished", "FunctionalCommand");
 
     addRequirements(requirements);
   }

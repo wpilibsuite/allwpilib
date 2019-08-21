@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj2.command.button;
 
 import edu.wpi.first.wpilibj.GenericHID;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A {@link Button} that gets its state from a {@link GenericHID}.
@@ -26,7 +26,7 @@ public class JoystickButton extends Button {
    * @param buttonNumber The button number (see {@link GenericHID#getRawButton(int) }
    */
   public JoystickButton(GenericHID joystick, int buttonNumber) {
-    requireNonNull(joystick);
+    requireNonNullParam(joystick, "joystick", "JoystickButton");
 
     m_joystick = joystick;
     m_buttonNumber = buttonNumber;
