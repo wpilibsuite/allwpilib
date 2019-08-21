@@ -21,12 +21,14 @@ TurnToAngle::TurnToAngle(double targetAngleDegrees, DriveSubsystem* drive)
                     [drive](double output) { drive->ArcadeDrive(0, output); },
                     // Require the drive
                     {drive}) {
-  // Set the controller to be continuous (because it is an angle controller)                    
+  // Set the controller to be continuous (because it is an angle controller)
   m_controller.EnableContinuousInput(-180, 180);
-  // Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
-  // setpoint before it is considered as having reached the reference
-  m_controller.SetAbsoluteTolerance(kTurnToleranceDeg, kTurnRateToleranceDegPerS);
-  
+  // Set the controller tolerance - the delta tolerance ensures the robot is
+  // stationary at the setpoint before it is considered as having reached the
+  // reference
+  m_controller.SetAbsoluteTolerance(kTurnToleranceDeg,
+                                    kTurnRateToleranceDegPerS);
+
   AddRequirements({drive});
 }
 
