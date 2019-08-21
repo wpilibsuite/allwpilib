@@ -253,6 +253,7 @@ task generateNumbers() {
     group = "WPILib"
 
     inputs.file wpilibNumberFileInput
+    outputs.dir wpilibNumberFileOutputDir
 
     doLast {
         if(wpilibNumberFileOutputDir.exists()) {
@@ -272,6 +273,7 @@ task generateNat() {
     description = "Generates Nat.java"
     group = "WPILib"
     inputs.files([natFileInput, natGetterInput])
+    outputs.file wpilibNatFileOutput
     dependsOn generateNumbers
 
     doLast {
@@ -280,10 +282,16 @@ task generateNat() {
         }
 
         def template = natFileInput.text + "\n"
+
+        def importsString = "";
+
         for(i in 0..maxNum) {
+            importsString += "import edu.wpi.first.wpiutil.math.numbers.N${i};\n"
             template += natGetterInput.text.replace('${num}', i.toString()) + "\n"
         }
         template += "}\n" // Close the class body
+
+        template = template.replace('{{REPLACEWITHIMPORTS}}', importsString)
 
         wpilibNatFileOutput.write(template)
     }
