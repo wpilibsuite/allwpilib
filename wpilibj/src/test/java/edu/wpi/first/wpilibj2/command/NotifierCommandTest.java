@@ -26,6 +26,6 @@ class NotifierCommandTest extends CommandTestBase {
     Timer.delay(.25);
     scheduler.cancel(command);
 
-    assertEquals(.25, 0.01 * counter.m_counter, .015);
+    assertEquals(.25, 0.01 * counter.m_counter, .055);
   }
 }
