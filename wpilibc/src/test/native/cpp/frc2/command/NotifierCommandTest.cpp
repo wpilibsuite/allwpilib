@@ -11,7 +11,11 @@
 using namespace frc2;
 class NotifierCommandTest : public CommandTestBase {};
 
+#ifdef __APPLE__
+TEST_F(NotifierCommandTest, DISABLED_NotifierCommandScheduleTest) {
+#else
 TEST_F(NotifierCommandTest, NotifierCommandScheduleTest) {
+#endif
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;
