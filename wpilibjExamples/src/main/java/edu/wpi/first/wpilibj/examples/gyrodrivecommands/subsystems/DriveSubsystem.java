@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
@@ -29,11 +29,13 @@ import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveCo
 public class DriveSubsystem extends SendableSubsystemBase {
   // The motors on the left side of the drive.
   private final SpeedControllerGroup m_leftMotors =
-      new SpeedControllerGroup(new Spark(kLeftMotor1Port), new Spark(kLeftMotor2Port));
+      new SpeedControllerGroup(new PWMVictorSPX(kLeftMotor1Port),
+          new PWMVictorSPX(kLeftMotor2Port));
 
   // The motors on the right side of the drive.
   private final SpeedControllerGroup m_rightMotors =
-      new SpeedControllerGroup(new Spark(kRightMotor1Port), new Spark(kRightMotor2Port));
+      new SpeedControllerGroup(new PWMVictorSPX(kRightMotor1Port),
+          new PWMVictorSPX(kRightMotor2Port));
 
   // The robot's drive
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
