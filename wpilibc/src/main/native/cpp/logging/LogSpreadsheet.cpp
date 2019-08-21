@@ -86,11 +86,11 @@ void LogSpreadsheet::WriteRow() {
 
 std::string LogSpreadsheet::CurrentDateTime() {
   // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
-  time_t now = time(0);
+  std::time_t now = std::time(0);
   struct tm time;
   char buf[80];
-  time = *localtime(&now);
-  strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &time);
+  time = *std::localtime(&now);
+  std::strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &time);
 
   return buf;
 }
