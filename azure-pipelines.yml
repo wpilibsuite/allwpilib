@@ -30,7 +30,7 @@ stages:
           publishJUnitResults: false
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Ponlylinuxathena --debug --stacktrace'
+          options: '-Ponlylinuxathena --info --stacktrace'
           # checkStyleRunAnalysis: true
           # pmdRunAnalysis: true
 
