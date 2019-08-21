@@ -1,12 +1,5 @@
 apply plugin: 'maven-publish'
 
-def pubVersion = ''
-if (project.hasProperty("publishVersion")) {
-    pubVersion = project.publishVersion
-} else {
-    pubVersion = WPILibVersion.version
-}
-
 def baseArtifactId = nativeName
 def artifactGroupId = 'edu.wpi.first.halsim'
 def zipBaseName = "_GROUP_edu_wpi_first_halsim_ID_${nativeName}_CLS"
@@ -64,7 +57,7 @@ model {
 
                 artifactId = baseArtifactId
                 groupId artifactGroupId
-                version pubVersion
+                version wpilibVersioning.version.get()
             }
         }
     }

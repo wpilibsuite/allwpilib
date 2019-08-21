@@ -1,13 +1,6 @@
 import java.security.MessageDigest
 apply plugin: 'maven-publish'
 
-def pubVersion
-if (project.hasProperty("publishVersion")) {
-    pubVersion = project.publishVersion
-} else {
-    pubVersion = WPILibVersion.version
-}
-
 def outputsFolder = file("$buildDir/outputs")
 
 def baseArtifactId = nativeName
@@ -110,7 +103,7 @@ model {
 
                 artifactId = "${baseArtifactId}-cpp"
                 groupId artifactGroupId
-                version pubVersion
+                version wpilibVersioning.version.get()
             }
             jni(MavenPublication) {
                 jniTaskList.each {
@@ -123,7 +116,7 @@ model {
 
                 artifactId = "${baseArtifactId}-jni"
                 groupId artifactGroupId
-                version pubVersion
+                version wpilibVersioning.version.get()
             }
         }
     }
