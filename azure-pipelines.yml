@@ -12,6 +12,15 @@ resources:
   - container: ubuntu
     image:  wpilib/ubuntu-base:18.04
 
+variables:
+- group: Artifactory-Package-Publish
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+
 stages:
 - stage: Build
   jobs:
@@ -23,6 +32,7 @@ stages:
 
     steps:
       - task: Gradle@2
+        condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
         inputs:
           workingDirectory: ''
           gradleWrapperFile: 'gradlew'
@@ -30,9 +40,18 @@ stages:
           publishJUnitResults: false
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Ponlylinuxathena --info --stacktrace'
-          # checkStyleRunAnalysis: true
-          # pmdRunAnalysis: true
+          options: '-Ponlylinuxathena -PjenkinsBuild --info --stacktrace'
+
+      - task: Gradle@2
+        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          gradleOptions: '-Xmx3072m'
+          publishJUnitResults: false
+          testResultsFiles: '**/TEST-*.xml'
+          tasks: 'build'
+          options: '-Ponlylinuxathena -PreleaseType=OFFICIAL -PjenkinsBuild'
 
       - task: PublishPipelineArtifact@0
         inputs:
@@ -47,6 +66,7 @@ stages:
 
 #     steps:
 #       - task: Gradle@2
+#         condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
 #         inputs:
 #           workingDirectory: ''
 #           gradleWrapperFile: 'gradlew'
@@ -54,9 +74,18 @@ stages:
 #           publishJUnitResults: true
 #           testResultsFiles: '**/TEST-*.xml'
 #           tasks: 'build'
-#           options: '-Ponlylinuxraspbian'
-#           # checkStyleRunAnalysis: true
-#           # pmdRunAnalysis: true
+#           options: '-Ponlylinuxraspbian -PjenkinsBuild'
+
+#       - task: Gradle@2
+#         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+#         inputs:
+#           workingDirectory: ''
+#           gradleWrapperFile: 'gradlew'
+#           gradleOptions: '-Xmx3072m'
+#           publishJUnitResults: true
+#           testResultsFiles: '**/TEST-*.xml'
+#           tasks: 'build'
+#           options: '-Ponlylinuxraspbian -PreleaseType=OFFICIAL -PjenkinsBuild'
 
 #       - task: PublishPipelineArtifact@0
 #         inputs:
@@ -71,6 +100,7 @@ stages:
 
 #     steps:
 #       - task: Gradle@2
+#         condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
 #         inputs:
 #           workingDirectory: ''
 #           gradleWrapperFile: 'gradlew'
@@ -78,8 +108,18 @@ stages:
 #           publishJUnitResults: true
 #           testResultsFiles: '**/TEST-*.xml'
 #           tasks: 'build'
-#           # checkStyleRunAnalysis: true
-#           # pmdRunAnalysis: true
+#           options: '-PjenkinsBuild'
+
+#       - task: Gradle@2
+#         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+#         inputs:
+#           workingDirectory: ''
+#           gradleWrapperFile: 'gradlew'
+#           gradleOptions: '-Xmx3072m'
+#           publishJUnitResults: true
+#           testResultsFiles: '**/TEST-*.xml'
+#           tasks: 'build'
+#           options: '-PreleaseType=OFFICIAL -PjenkinsBuild'
 
 #       - task: PublishPipelineArtifact@0
 #         inputs:
@@ -125,6 +165,7 @@ stages:
 #       vmImage: 'windows-2019'
 #     steps:
 #       - task: Gradle@2
+#         condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
 #         inputs:
 #           workingDirectory: ''
 #           gradleWrapperFile: 'gradlew'
@@ -133,9 +174,19 @@ stages:
 #           publishJUnitResults: true
 #           testResultsFiles: '**/TEST-*.xml'
 #           tasks: 'build'
-#           options: '-PskipPMD'
-#           # checkStyleRunAnalysis: true
-#           # pmdRunAnalysis: true
+#           options: '-PskipPMD -PjenkinsBuild'
+
+#       - task: Gradle@2
+#         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+#         inputs:
+#           workingDirectory: ''
+#           gradleWrapperFile: 'gradlew'
+#           gradleOptions: '-Xmx3072m'
+#           jdkVersionOption: '1.11'
+#           publishJUnitResults: true
+#           testResultsFiles: '**/TEST-*.xml'
+#           tasks: 'build'
+#           options: '-PskipPMD -PreleaseType=OFFICIAL -PjenkinsBuild'
 
 #       - task: PublishPipelineArtifact@0
 #         inputs:
@@ -149,7 +200,7 @@ stages:
 #       - powershell: |
 #           mkdir build
 #           $ProgressPreference = 'SilentlyContinue'
-#           wget "https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jdk_x86-32_windows_hotspot_11.0.4_11.zip" -O "build\jdk.zip"
+#           wget "https://github.com/wpilibsuite/frc-openjdk-windows/releases/download/v11.0.0u28-1/jdk-x86-11.0.0u28-1.zip" -O "build\jdk.zip"
 #         displayName: 'Download JDK'
 #       - task: JavaToolInstaller@0
 #         inputs:
@@ -157,7 +208,9 @@ stages:
 #           jdkFile: 'build/jdk.zip'
 #           jdkDestinationDirectory: 'build/jdkinst'
 #           jdkArchitectureOption: x86
+
 #       - task: Gradle@2
+#         condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
 #         inputs:
 #           workingDirectory: ''
 #           gradleWrapperFile: 'gradlew'
@@ -165,9 +218,19 @@ stages:
 #           publishJUnitResults: true
 #           testResultsFiles: '**/TEST-*.xml'
 #           tasks: 'build'
-#           options: '-PskipPMD'
-#           # checkStyleRunAnalysis: true
-#           # pmdRunAnalysis: true
+#           options: '-PskipPMD -PjenkinsBuild'
+
+#       - task: Gradle@2
+#         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+#         inputs:
+#           workingDirectory: ''
+#           gradleWrapperFile: 'gradlew'
+#           gradleOptions: '-Xmx1024m'
+#           publishJUnitResults: true
+#           testResultsFiles: '**/TEST-*.xml'
+#           tasks: 'build'
+#           options: '-PskipPMD -PreleaseType=OFFICIAL -PjenkinsBuild'
+
 #       - task: PublishPipelineArtifact@0
 #         inputs:
 #           artifactName: 'Win32'
@@ -184,7 +247,9 @@ stages:
 #       - script: |
 #           rm /Users/vsts/.gradle/init.d/log-gradle-version-plugin.gradle
 #         displayName: 'Delete Version init script'
+
 #       - task: Gradle@2
+#         condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
 #         inputs:
 #           workingDirectory: ''
 #           gradleWrapperFile: 'gradlew'
@@ -193,9 +258,19 @@ stages:
 #           publishJUnitResults: true
 #           testResultsFiles: '**/TEST-*.xml'
 #           tasks: 'build'
-#           #options: ''
-#           # checkStyleRunAnalysis: true
-#           # pmdRunAnalysis: true
+#           options: '-PjenkinsBuild'
+
+#       - task: Gradle@2
+#         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+#         inputs:
+#           workingDirectory: ''
+#           gradleWrapperFile: 'gradlew'
+#           gradleOptions: '-Xmx3072m'
+#           jdkVersionOption: '1.11'
+#           publishJUnitResults: true
+#           testResultsFiles: '**/TEST-*.xml'
+#           tasks: 'build'
+#           options: '-PreleaseType=OFFICIAL -PjenkinsBuild'
 
 #       - task: PublishPipelineArtifact@0
 #         inputs:
@@ -237,6 +312,8 @@ stages:
 #       inputs:
 #         artifactName: 'Athena'
 #         targetPath: 'build-tools/combiner/products/build/allOutputs'
+
+# # PR Builds
 #     - task: Gradle@2
 #       inputs:
 #         workingDirectory: 'build-tools/combiner'
@@ -244,6 +321,36 @@ stages:
 #         gradleOptions: '-Xmx3072m'
 #         tasks: 'publish '
 #         options: '-Pallwpilib'
+#       condition: and(succeeded(), and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))))
+
+# # Master Builds
+#     - task: Gradle@2
+#       inputs:
+#         workingDirectory: 'build-tools/combiner'
+#         gradleWrapperFile: 'build-tools/combiner/gradlew'
+#         gradleOptions: '-Xmx3072m'
+#         tasks: 'publish '
+#         options: '-Pallwpilib'
+#       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#       env:
+#         RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
+#         ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
+#         ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
+
+# # Tagged Builds
+#     - task: Gradle@2
+#       inputs:
+#         workingDirectory: 'build-tools/combiner'
+#         gradleWrapperFile: 'build-tools/combiner/gradlew'
+#         gradleOptions: '-Xmx3072m'
+#         tasks: 'publish '
+#         options: '-Pallwpilib -PreleaseRepoPublish'
+#       condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+#       env:
+#         RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
+#         ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
+#         ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
+
 #     - script: |
 #         echo "##vso[task.setvariable variable=UserHome]$HOME"
 #       displayName: 'Set Home Variable'

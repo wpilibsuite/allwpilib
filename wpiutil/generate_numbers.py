@@ -28,10 +28,15 @@ with open(f"{dirname}/src/generate/Nat.java.in", "r") as templateFile:
     if os.path.exists(outputPath):
         os.remove(outputPath)
 
+    importsString = ""
+
     for i in range(MAX_NUM + 1):
+        importsString += f"import edu.wpi.first.wpiutil.math.numbers.N{i};\n"
         template += getter.replace("${num}", str(i))
 
     template += "}\n"
+
+    template = template.replace('{{REPLACEWITHIMPORTS}}', importsString)
 
     with open(outputPath, "w") as f:
         f.write(template)
