@@ -13,12 +13,13 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
- * A base for CommandGroups.  Statically tracks commands that have been allocated to groups
- * to ensure those commands are not also used independently, which can result in inconsistent
- * command state and unpredictable execution.
+ * A base for CommandGroups.  Statically tracks commands that have been allocated to groups to
+ * ensure those commands are not also used independently, which can result in inconsistent command
+ * state and unpredictable execution.
  */
 public abstract class CommandGroupBase extends SendableCommandBase implements Command {
-  private static final Set<Command> m_groupedCommands = Collections.newSetFromMap(new WeakHashMap<>());
+  private static final Set<Command> m_groupedCommands =
+      Collections.newSetFromMap(new WeakHashMap<>());
 
   static void registerGroupedCommands(Command... commands) {
     m_groupedCommands.addAll(Set.of(commands));
@@ -35,8 +36,8 @@ public abstract class CommandGroupBase extends SendableCommandBase implements Co
   }
 
   /**
-   * Removes a single command from the list of grouped commands, allowing it to be freely
-   * used again.
+   * Removes a single command from the list of grouped commands, allowing it to be freely used
+   * again.
    *
    * <p>WARNING: Using this haphazardly can result in unexpected/undesirable behavior.  Do not
    * use this unless you fully understand what you are doing.
@@ -48,8 +49,8 @@ public abstract class CommandGroupBase extends SendableCommandBase implements Co
   }
 
   /**
-   * Requires that the specified commands not have been already allocated to a CommandGroup.
-   *   Throws an {@link IllegalArgumentException} if commands have been allocated.
+   * Requires that the specified commands not have been already allocated to a CommandGroup. Throws
+   * an {@link IllegalArgumentException} if commands have been allocated.
    *
    * @param commands The commands to check
    */
@@ -58,15 +59,14 @@ public abstract class CommandGroupBase extends SendableCommandBase implements Co
   }
 
   /**
-   * Requires that the specified commands not have been already allocated to a CommandGroup.
-   *   Throws an {@link IllegalArgumentException} if commands have been allocated.
+   * Requires that the specified commands not have been already allocated to a CommandGroup. Throws
+   * an {@link IllegalArgumentException} if commands have been allocated.
    *
    * @param commands The commands to check
    */
   public static void requireUngrouped(Collection<Command> commands) {
     if (!Collections.disjoint(commands, getGroupedCommands())) {
-      throw new IllegalArgumentException(
-          "Commands cannot be added to more than one CommandGroup");
+      throw new IllegalArgumentException("Commands cannot be added to more than one CommandGroup");
     }
   }
 
