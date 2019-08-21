@@ -27,7 +27,11 @@ public class LogCell {
    * @param name The name of the column.
    */
   public LogCell(String name) {
-    m_name = name;
+    if (isStringValid(name)) {
+      m_name = name;
+    } else {
+      m_name = "";
+    }
     m_mutex = new ReentrantLock();
   }
 
@@ -37,9 +41,11 @@ public class LogCell {
    * @param value The value to be logged in the cell.
    */
   public <T> void log(T value) {
-    acquireLock();
-    m_content = String.valueOf(value);
-    releaseLock();
+    if (isStringValid(String.valueOf(value))) {
+      acquireLock();
+      m_content = String.valueOf(value);
+      releaseLock();
+    }
   }
 
   /**
@@ -79,5 +85,16 @@ public class LogCell {
    */
   public void releaseLock() {
     m_mutex.unlock();
+  }
+
+  private boolean isStringValid(String string) {
+    if (string.contains("\"")) {
+      System.out.println("LogCell's name/content cannot contain double quotes");
+      return false;
+    } else if (string.contains("\n")) {
+      System.out.println("LogCell's name/content cannot contain newlines");
+      return false;
+    }
+    return true;
   }
 }

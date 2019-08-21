@@ -34,9 +34,11 @@ class LogCell {
    */
   template <typename T>
   void Log(T value) {
-    AcquireLock();
-    m_content = std::to_string(value);
-    ReleaseLock();
+    if (IsStringValid(std::to_string(value))) {
+      AcquireLock();
+      m_content = std::to_string(value);
+      ReleaseLock();
+    }
   }
 
   /**
@@ -69,6 +71,8 @@ class LogCell {
   void ReleaseLock();
 
  private:
+  bool IsStringValid(std::string string);
+
   std::string m_name;
   std::string m_content;
   std::mutex m_mutex;

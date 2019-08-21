@@ -7,9 +7,16 @@
 
 #include "frc/logging/LogCell.h"
 
+#include <algorithm>
+#include <iostream>
+
 using namespace frc;
 
-LogCell::LogCell(std::string name) : m_name(name) {}
+LogCell::LogCell(std::string name) {
+  if (IsStringValid(name)) {
+    m_name = name;
+  }
+}
 
 std::string LogCell::GetName() { return m_name; }
 
@@ -20,3 +27,15 @@ void LogCell::ClearCell() { m_content.clear(); }
 void LogCell::AcquireLock() { m_mutex.lock(); }
 
 void LogCell::ReleaseLock() { m_mutex.unlock(); }
+
+bool LogCell::IsStringValid(std::string string) {
+  if (string.find('\"') != std::string::npos) {
+    std::cout << "LogCell's name/content cannot contain double quotes"
+              << std::endl;
+    return false;
+  } else if (string.find('\n') != std::string::npos) {
+    std::cout << "LogCell's name/content cannot contain newlines" << std::endl;
+    return false;
+  }
+  return true;
+}
