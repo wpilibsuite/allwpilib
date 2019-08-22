@@ -21,11 +21,15 @@ Autonomous::Autonomous(Claw* claw, Wrist* wrist, Elevator* elevator,
                        DriveTrain* drivetrain) {
   SetName("Autonomous");
   AddCommands(
-      PrepareToPickup(claw, wrist, elevator), Pickup(claw, wrist, elevator),
+      // clang-format off
+      PrepareToPickup(claw, wrist, elevator),
+      Pickup(claw, wrist, elevator),
       SetDistanceToBox(0.10, drivetrain),
       // DriveStraight(4, drivetrain) // Use encoders if ultrasonic is broken
-      Place(claw, wrist, elevator), SetDistanceToBox(0.6, drivetrain),
+      Place(claw, wrist, elevator),
+      SetDistanceToBox(0.6, drivetrain),
       // DriveStraight(-2, drivetrain) // Use encoders if ultrasonic is broken
       frc2::ParallelCommandGroup(SetWristSetpoint(-45, wrist),
                                  CloseClaw(claw)));
+  // clang-format on
 }

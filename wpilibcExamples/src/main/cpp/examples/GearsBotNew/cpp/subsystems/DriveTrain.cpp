@@ -10,9 +10,7 @@
 #include <frc/Joystick.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-#include "commands/TankDriveWithJoystick.h"
-
-DriveTrain::DriveTrain() : frc2::SendableSubsystemBase() {
+DriveTrain::DriveTrain() {
 // Encoders may measure differently in the real world and in
 // simulation. In this example the robot moves 0.042 barleycorns
 // per tick in the real world, but the simulated encoders

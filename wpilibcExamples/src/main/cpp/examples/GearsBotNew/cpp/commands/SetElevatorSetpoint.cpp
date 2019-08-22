@@ -25,5 +25,5 @@ void SetElevatorSetpoint::Initialize() {
 
 // Make this return true when this Command no longer needs to run execute()
 bool SetElevatorSetpoint::IsFinished() {
-  return m_elevator->GetController.OnTarget();
+  return m_elevator->GetController().AtSetpoint();
 }

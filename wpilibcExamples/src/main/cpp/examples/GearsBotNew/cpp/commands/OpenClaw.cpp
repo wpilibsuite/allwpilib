@@ -9,13 +9,14 @@
 
 #include "Robot.h"
 
-OpenClaw::OpenClaw(Claw* claw) : frc2::WaitCommand(1), m_claw(claw) {
+OpenClaw::OpenClaw(Claw* claw)
+    : frc2::CommandHelper<frc2::WaitCommand, OpenClaw>(1), m_claw(claw) {
   SetName("OpenClaw");
   AddRequirements({m_claw});
 }
 
 // Called just before this Command runs the first time
-void OpenClaw::Initialize() { Robot::claw.Open(); }
+void OpenClaw::Initialize() { m_claw->Open(); }
 
 // Called once after isFinished returns true
-void OpenClaw::End(bool) { Robot::claw.Stop(); }
+void OpenClaw::End(bool) { m_claw->Stop(); }

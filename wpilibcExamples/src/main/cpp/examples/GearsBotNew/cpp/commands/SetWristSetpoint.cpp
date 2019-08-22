@@ -23,5 +23,5 @@ void SetWristSetpoint::Initialize() {
 
 // Make this return true when this Command no longer needs to run execute()
 bool SetWristSetpoint::IsFinished() {
-  return m_wrist->GetController().AtSetpoint;
+  return m_wrist->GetController().AtSetpoint();
 }

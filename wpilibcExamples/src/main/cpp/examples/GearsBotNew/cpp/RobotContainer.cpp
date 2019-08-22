@@ -17,6 +17,7 @@
 #include "commands/Place.h"
 #include "commands/PrepareToPickup.h"
 #include "commands/SetElevatorSetpoint.h"
+#include "commands/TankDrive.h"
 
 RobotContainer::RobotContainer()
     : m_autonomousCommand(&m_claw, &m_wrist, &m_elevator, &m_drivetrain) {
@@ -29,6 +30,13 @@ RobotContainer::RobotContainer()
   m_wrist.Log();
   m_elevator.Log();
   m_drivetrain.Log();
+
+  m_drivetrain.SetDefaultCommand(new TankDrive(
+      &m_drivetrain,
+      [this] { return m_joy.GetY(frc::GenericHID::JoystickHand::kLeftHand); },
+      [this] {
+        return m_joy.GetY(frc::GenericHID::JoystickHand::kRightHand);
+      }));
 
   // Configure the button bindings
   ConfigureButtonBindings();

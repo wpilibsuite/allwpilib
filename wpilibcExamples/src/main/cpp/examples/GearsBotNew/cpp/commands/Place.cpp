@@ -13,6 +13,9 @@
 
 Place::Place(Claw* claw, Wrist* wrist, Elevator* elevator) {
   SetName("Place");
-  AddCommands(SetElevatorSetpoint(0.25, elevator), SetWristSetpoint(0, wrist),
+  // clang-format off
+  AddCommands(SetElevatorSetpoint(0.25, elevator),
+              SetWristSetpoint(0, wrist),
               OpenClaw(claw));
+  // clang-format on
 }
