@@ -16,7 +16,10 @@ OpenClaw::OpenClaw(Claw* claw)
 }
 
 // Called just before this Command runs the first time
-void OpenClaw::Initialize() { m_claw->Open(); }
+void OpenClaw::Initialize() {
+   m_claw->Open();
+   frc2::WaitCommand::Initialize();
+}
 
 // Called once after isFinished returns true
 void OpenClaw::End(bool) { m_claw->Stop(); }
