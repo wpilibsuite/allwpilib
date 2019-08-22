@@ -8,6 +8,7 @@
 #include "frc/logging/LogSpreadsheet.h"
 
 #include <chrono>
+#include <cstdio>
 #include <ctime>
 #include <iostream>
 
@@ -17,6 +18,7 @@ LogSpreadsheet::LogSpreadsheet(std::string name)
     : m_name(name),
       m_cells(),
       m_timestampCell("Timestamp (ms)"),
+      m_time(0),
       m_active(false) {
   RegisterCell(m_timestampCell);
 }
@@ -40,12 +42,13 @@ void LogSpreadsheet::Start() {
     return;
   }
 
-  std::string fileName = "log-" + m_name + "-" + CurrentDateTime() + ".txt";
+  m_time = std::time(0);
+  std::string filename = CreateFilename(m_time);
 
-  m_logFile.open(fileName.c_str());
+  m_logFile.open(filename.c_str());
 
   if (m_logFile.fail()) {
-    std::cout << "Could not open file `" << fileName << "` for writing."
+    std::cout << "Could not open file `" << filename << "` for writing."
               << std::endl;
     return;
   }
@@ -67,6 +70,7 @@ void LogSpreadsheet::Stop() {
 
 void LogSpreadsheet::Periodic() {
   if (m_active) {
+    UpdateFilename();
     std::chrono::milliseconds timestamp =
         std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch());
@@ -82,13 +86,22 @@ void LogSpreadsheet::WriteRow() {
   m_logFile << std::endl;
 }
 
-std::string LogSpreadsheet::CurrentDateTime() {
-  // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
-  time_t now = time(0);
-  struct tm time;
-  char buf[80];
-  time = *localtime(&now);
-  strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &time);
+void LogSpreadsheet::UpdateFilename() {
+  std::time_t newTime = std::time(0);
+  // If the difference between the two timestamps is more than 24 hours
+  if (std::difftime(newTime, m_time) > 86400) {
+    std::rename(CreateFilename(m_time).c_str(),
+                CreateFilename(newTime).c_str());
+  }
 
-  return buf;
+  m_time = newTime;
+}
+
+std::string LogSpreadsheet::CreateFilename(std::time_t time) {
+  // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
+  struct tm localTime = *std::localtime(&time);
+  char datetime[80];
+  std::strftime(datetime, sizeof(datetime), "%Y-%m-%d.%X", &localTime);
+
+  return "log-" + m_name + "-" + datetime + ".txt";
 }

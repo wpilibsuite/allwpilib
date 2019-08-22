@@ -7,10 +7,12 @@
 
 package edu.wpi.first.wpilibj.logging;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,6 +31,7 @@ public class LogSpreadsheet {
   private final List<LogCell> m_cells;
   private final LogCell m_timestampCell;
   private OutputStream m_logFile;
+  private Date m_time;
   private boolean m_active;
 
   /**
@@ -40,6 +43,7 @@ public class LogSpreadsheet {
     m_name = name;
     m_cells = new ArrayList<LogCell>();
     m_timestampCell = new LogCell("Timestamp (ms)");
+    m_time = new Date(0);
     m_active = false;
     registerCell(m_timestampCell);
   }
@@ -80,7 +84,8 @@ public class LogSpreadsheet {
       return;
     }
 
-    String fileName = "log-" + m_name + "-" + currentDateTime() + ".txt";
+    m_time = new Date(0);
+    String fileName = createFilename(m_time);
     try {
       m_logFile = Files.newOutputStream(Paths.get(fileName));
     } catch (IOException ex) {
@@ -112,18 +117,17 @@ public class LogSpreadsheet {
    */
   public void periodic() {
     if (m_active) {
+      updateFilename();
       m_timestampCell.log(System.currentTimeMillis());
       writeRow();
     }
   }
 
-  private void writeRow() {
-    for (LogCell cell : m_cells) {
-      writeFile("\"" + cell.getContent() + "\",");
-    }
-    writeFile("\n");
-  }
-
+  /**
+   * Write a String to the logFile.
+   *
+   * @param text The text to be written.
+   */
   private void writeFile(String text) {
     try {
       m_logFile.write(text.getBytes());
@@ -132,10 +136,49 @@ public class LogSpreadsheet {
     }
   }
 
-  private String currentDateTime() {
+  /**
+   * Write a row of the spreadsheet.
+   */
+  private void writeRow() {
+    for (LogCell cell : m_cells) {
+      writeFile("\"" + cell.getContent() + "\",");
+    }
+    writeFile("\n");
+  }
+
+  /**
+   * Check if the time has changed of more than 24 hours.
+   * Change the filename if the condition is met.
+   */
+  private void updateFilename() {
+    Date newTime = new Date();
+    // If the difference between the two timestamps is more than 24 hours
+    if (newTime.getTime() - m_time.getTime() > 86400000) {
+      File oldName = new File(createFilename(m_time));
+      File newName = new File(createFilename(newTime));
+      oldName.renameTo(newName);
+
+      try {
+        m_logFile = Files.newOutputStream(newName.toPath(), StandardOpenOption.APPEND);
+      } catch (IOException ex) {
+        System.out.println(ex.getMessage());
+      }
+    }
+
+    m_time = newTime;
+  }
+
+  /**
+   * Create a filename with a time.
+   *
+   * @param time The time that is saved in the filename.
+   * @return The filename at the format "log-{name}-{date/time}.txt".
+   */
+  private String createFilename(Date time) {
     // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
     SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd.HH:mm:ss", Locale.getDefault());
-    Date time = new Date();
-    return formater.format(time);
+
+    return "log-" + m_name + "-" + formater.format(time) + ".txt";
   }
+
 }

@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <ctime>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -64,13 +65,30 @@ class LogSpreadsheet {
   void Periodic();
 
  private:
+  /**
+   * Write a row of the spreadsheet.
+   */
   void WriteRow();
-  std::string CurrentDateTime();
+
+  /**
+   * Check if the time has changed of more than 24 hours.
+   * Change the filename if the condition is met.
+   */
+  void UpdateFilename();
+
+  /**
+   * Create a filename with a time.
+   *
+   * @param time The time that is saved in the filename.
+   * @return The filename at the format "log-{name}-{date/time}.txt".
+   */
+  std::string CreateFilename(std::time_t time);
 
   std::string m_name;
   std::vector<LogCell*> m_cells;
   LogCell m_timestampCell;
   std::ofstream m_logFile;
+  std::time_t m_time;
   bool m_active;
 };
 
