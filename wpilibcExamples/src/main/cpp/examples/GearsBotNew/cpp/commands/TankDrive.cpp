@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,16 +9,15 @@
 
 #include "Robot.h"
 
-TankDrive::TankDrive(DriveTrain* drivetrain, std::function<double()> left, std::function<double()> right)
+TankDrive::TankDrive(DriveTrain* drivetrain, std::function<double()> left,
+                     std::function<double()> right)
     : m_drivetrain(drivetrain), m_left(left), m_right(right) {
   SetName("TankDrive");
   AddRequirements({m_drivetrain});
 }
 
 // Called repeatedly when this Command is scheduled to run
-void TankDrive::Execute() {
-  m_drivetrain->Drive(m_left(), m_right());
-}
+void TankDrive::Execute() { m_drivetrain->Drive(m_left(), m_right()); }
 
 // Make this return true when this Command no longer needs to run execute()
 bool TankDrive::IsFinished() { return false; }

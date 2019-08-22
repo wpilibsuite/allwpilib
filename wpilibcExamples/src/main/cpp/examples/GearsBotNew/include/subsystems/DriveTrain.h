@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,12 +7,13 @@
 
 #pragma once
 
+#include <frc2/command/SendableSubsystemBase.h>
+
 #include <frc/AnalogGyro.h>
 #include <frc/AnalogInput.h>
 #include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/SpeedControllerGroup.h>
-#include <frc2/command/SendableSubsystemBase.h>
 #include <frc/drive/DifferentialDrive.h>
 
 namespace frc {

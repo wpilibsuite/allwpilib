@@ -7,9 +7,15 @@
 
 #pragma once
 
-#include "commands/Autonomous.h"
-
 #include <frc2/command/Command.h>
+
+#include <frc/Joystick.h>
+
+#include "commands/Autonomous.h"
+#include "subsystems/Claw.h"
+#include "subsystems/DriveTrain.h"
+#include "subsystems/Elevator.h"
+#include "subsystems/Wrist.h"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -26,6 +32,13 @@ class RobotContainer {
 
  private:
   // The robot's subsystems and commands are defined here...
+  frc::Joystick m_joy{0};
+
+  Claw m_claw;
+  Wrist m_wrist;
+  Elevator m_elevator;
+  DriveTrain m_drivetrain;
+
   Autonomous m_autonomousCommand;
 
   void ConfigureButtonBindings();
