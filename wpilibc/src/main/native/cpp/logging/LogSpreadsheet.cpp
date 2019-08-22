@@ -77,9 +77,7 @@ void LogSpreadsheet::Periodic() {
 
 void LogSpreadsheet::WriteRow() {
   for (size_t i = 0; i < m_cells.size(); i++) {
-    m_cells[i]->AcquireLock();
     m_logFile << "\"" << m_cells[i]->GetContent() << "\",";
-    m_cells[i]->ReleaseLock();
   }
   m_logFile << std::endl;
 }

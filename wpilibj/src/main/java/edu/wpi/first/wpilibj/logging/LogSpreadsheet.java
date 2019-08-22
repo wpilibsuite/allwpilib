@@ -119,9 +119,7 @@ public class LogSpreadsheet {
 
   private void writeRow() {
     for (LogCell cell : m_cells) {
-      cell.acquireLock();
       writeFile("\"" + cell.getContent() + "\",");
-      cell.releaseLock();
     }
     writeFile("\n");
   }

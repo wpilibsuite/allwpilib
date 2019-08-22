@@ -7,9 +7,6 @@
 
 package edu.wpi.first.wpilibj.logging;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 /**
  * Represents a column in a LogSpreadsheet.
  *
@@ -18,7 +15,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class LogCell {
   private final String m_name;
-  private final Lock m_mutex;
   private String m_content;
 
   /**
@@ -32,7 +28,6 @@ public class LogCell {
     } else {
       m_name = "";
     }
-    m_mutex = new ReentrantLock();
   }
 
   /**
@@ -42,9 +37,7 @@ public class LogCell {
    */
   public <T> void log(T value) {
     if (isStringValid(String.valueOf(value))) {
-      acquireLock();
       m_content = String.valueOf(value);
-      releaseLock();
     }
   }
 
@@ -71,20 +64,6 @@ public class LogCell {
    */
   public void clearCell() {
     m_content = "";
-  }
-
-  /**
-   * Acquire the lock on the cell's content.
-   */
-  public void acquireLock() {
-    m_mutex.lock();
-  }
-
-  /**
-   * Release the lock on the cell's content.
-   */
-  public void releaseLock() {
-    m_mutex.unlock();
   }
 
   private boolean isStringValid(String string) {

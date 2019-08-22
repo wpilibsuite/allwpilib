@@ -24,10 +24,6 @@ std::string LogCell::GetContent() { return m_content; }
 
 void LogCell::ClearCell() { m_content.clear(); }
 
-void LogCell::AcquireLock() { m_mutex.lock(); }
-
-void LogCell::ReleaseLock() { m_mutex.unlock(); }
-
 bool LogCell::IsStringValid(std::string string) {
   if (string.find('\"') != std::string::npos) {
     std::cout << "LogCell's name/content cannot contain double quotes"

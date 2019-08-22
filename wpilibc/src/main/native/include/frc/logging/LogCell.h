@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <mutex>
 #include <string>
 
 namespace frc {
@@ -35,9 +34,7 @@ class LogCell {
   template <typename T>
   void Log(T value) {
     if (IsStringValid(std::to_string(value))) {
-      AcquireLock();
       m_content = std::to_string(value);
-      ReleaseLock();
     }
   }
 
@@ -60,22 +57,11 @@ class LogCell {
    */
   void ClearCell();
 
-  /**
-   * Acquire the lock on the cell's content.
-   */
-  void AcquireLock();
-
-  /**
-   * Release the lock on the cell's content.
-   */
-  void ReleaseLock();
-
  private:
   bool IsStringValid(std::string string);
 
   std::string m_name;
   std::string m_content;
-  std::mutex m_mutex;
 };
 
 }  // namespace frc
