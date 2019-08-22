@@ -84,6 +84,18 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
    * @param interruptible whether the commands should be interruptible
    * @param commands      the commands to schedule
    */
+  void Schedule(bool interruptible, wpi::ArrayRef<Command*> commands);
+
+  /**
+   * Schedules multiple commands for execution.  Does nothing if the command is
+   * already scheduled. If a command's requirements are not available, it will
+   * only be started if all the commands currently using those requirements have
+   * been scheduled as interruptible.  If this is the case, they will be
+   * interrupted and the command will be scheduled.
+   *
+   * @param interruptible whether the commands should be interruptible
+   * @param commands      the commands to schedule
+   */
   void Schedule(bool interruptible, std::initializer_list<Command*> commands);
 
   /**
@@ -92,30 +104,15 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
    *
    * @param commands the commands to schedule
    */
-  void Schedule(std::initializer_list<Command*> commands);
+  void Schedule(wpi::ArrayRef<Command*> commands);
 
   /**
-   * Schedules multiple commands for execution the next time the scheduler is
-   * run. Thread-safe. Does nothing if the command is already scheduled. If a
-   * command's requirements are not available, it will only be started if all
-   * the commands currently using those requirements have been scheduled as
-   * interruptible.  If this is the case, they will be interrupted and the
-   * command will be scheduled.
-   *
-   * @param interruptible whether the commands should be interruptible
-   * @param commands      the commands to schedule
-   */
-  void QueueSchedule(bool interruptible,
-                     std::initializer_list<Command*> commands);
-
-  /**
-   * Schedules multiple commands for execution the next time the scheduler is
-   * run, with interruptible defaulted to true.  Thread-safe.  Does nothing if
-   * the command is already scheduled.
+   * Schedules multiple commands for execution, with interruptible defaulted to
+   * true.  Does nothing if the command is already scheduled.
    *
    * @param commands the commands to schedule
    */
-  void QueueSchedule(std::initializer_list<Command*> commands);
+  void Schedule(std::initializer_list<Command*> commands);
 
   /**
    * Runs a single iteration of the scheduler.  The execution occurs in the
@@ -198,23 +195,22 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
    *
    * @param commands the commands to cancel
    */
+  void Cancel(wpi::ArrayRef<Command*> commands);
+
+  /**
+   * Cancels commands.  The scheduler will only call the interrupted method of a
+   * canceled command, not the end method (though the interrupted method may
+   * itself call the end method).  Commands will be canceled even if they are
+   * not scheduled as interruptible.
+   *
+   * @param commands the commands to cancel
+   */
   void Cancel(std::initializer_list<Command*> commands);
 
   /**
    * Cancels all commands that are currently scheduled.
    */
   void CancelAll();
-
-  /**
-   * Cancels commands on the next run of the scheduler.  Thread-safe.  The
-   * scheduler will only call the interrupted method of a canceled command, not
-   * the end method (though the interrupted method may itself call the end
-   * method).  Commands will be canceled even if they are not scheduled as
-   * interruptible.
-   *
-   * @param commands the commands to cancel
-   */
-  void QueueCancel(std::initializer_list<Command*> commands);
 
   /**
    * Returns the time since a given command was scheduled.  Note that this only
@@ -226,6 +222,16 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
    * @return the time since the command was scheduled, in seconds
    */
   double TimeSinceScheduled(const Command* command) const;
+
+  /**
+   * Whether the given commands are running.  Note that this only works on
+   * commands that are directly scheduled by the scheduler; it will not work on
+   * commands inside of CommandGroups, as the scheduler does not see them.
+   *
+   * @param commands the command to query
+   * @return whether the command is currently scheduled
+   */
+  bool IsScheduled(wpi::ArrayRef<const Command*> commands) const;
 
   /**
    * Whether the given commands are running.  Note that this only works on
@@ -331,13 +337,6 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
   wpi::SmallVector<Action, 4> m_executeActions;
   wpi::SmallVector<Action, 4> m_interruptActions;
   wpi::SmallVector<Action, 4> m_finishActions;
-
-  // Lists of commands to schedule/cancel, for asynchronous access methods.
-  wpi::DenseMap<Command*, bool> m_toSchedule;
-  wpi::SmallVector<Command*, 4> m_toCancel;
-
-  // Lock for async access
-  std::mutex m_lock;
 
   friend class CommandTestBase;
 };

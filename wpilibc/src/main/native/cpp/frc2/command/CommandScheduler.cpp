@@ -82,9 +82,22 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
 void CommandScheduler::Schedule(Command* command) { Schedule(true, command); }
 
 void CommandScheduler::Schedule(bool interruptible,
+                                wpi::ArrayRef<Command*> commands) {
+  for (auto command : commands) {
+    Schedule(interruptible, command);
+  }
+}
+
+void CommandScheduler::Schedule(bool interruptible,
                                 std::initializer_list<Command*> commands) {
   for (auto command : commands) {
     Schedule(interruptible, command);
+  }
+}
+
+void CommandScheduler::Schedule(wpi::ArrayRef<Command*> commands) {
+  for (auto command : commands) {
+    Schedule(true, command);
   }
 }
 
@@ -92,18 +105,6 @@ void CommandScheduler::Schedule(std::initializer_list<Command*> commands) {
   for (auto command : commands) {
     Schedule(true, command);
   }
-}
-
-void CommandScheduler::QueueSchedule(bool interruptible,
-                                     std::initializer_list<Command*> commands) {
-  std::scoped_lock lock(m_lock);
-  for (auto&& command : commands) {
-    m_toSchedule[command] = interruptible;
-  }
-}
-
-void CommandScheduler::QueueSchedule(std::initializer_list<Command*> commands) {
-  QueueSchedule(true, commands);
 }
 
 void CommandScheduler::Run() {
@@ -120,18 +121,6 @@ void CommandScheduler::Run() {
   for (auto&& button : m_buttons) {
     button();
   }
-
-  // add/cancel commands from async queues
-  m_lock.lock();
-  for (auto&& command : m_toSchedule) {
-    Schedule(command.second, command.first);
-  }
-  m_toSchedule.clear();
-  for (auto&& command : m_toCancel) {
-    Cancel(command);
-  }
-  m_toCancel.clear();
-  m_lock.unlock();
 
   // Run scheduled commands, remove finished commands.
   for (auto iterator = m_scheduledCommands.begin();
@@ -235,6 +224,12 @@ void CommandScheduler::Cancel(Command* command) {
   }
 }
 
+void CommandScheduler::Cancel(wpi::ArrayRef<Command*> commands) {
+  for (auto command : commands) {
+    Cancel(command);
+  }
+}
+
 void CommandScheduler::Cancel(std::initializer_list<Command*> commands) {
   for (auto command : commands) {
     Cancel(command);
@@ -247,13 +242,6 @@ void CommandScheduler::CancelAll() {
   }
 }
 
-void CommandScheduler::QueueCancel(std::initializer_list<Command*> commands) {
-  std::scoped_lock lock(m_lock);
-  for (auto&& command : commands) {
-    m_toCancel.emplace_back(command);
-  }
-}
-
 double CommandScheduler::TimeSinceScheduled(const Command* command) const {
   auto find = m_scheduledCommands.find(command);
   if (find != m_scheduledCommands.end()) {
@@ -262,6 +250,16 @@ double CommandScheduler::TimeSinceScheduled(const Command* command) const {
     return -1;
   }
 }
+bool CommandScheduler::IsScheduled(
+    wpi::ArrayRef<const Command*> commands) const {
+  for (auto command : commands) {
+    if (!IsScheduled(command)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 bool CommandScheduler::IsScheduled(
     std::initializer_list<const Command*> commands) const {
   for (auto command : commands) {
