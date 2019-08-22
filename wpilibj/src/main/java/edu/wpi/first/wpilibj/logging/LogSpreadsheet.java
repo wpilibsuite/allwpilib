@@ -43,7 +43,6 @@ public class LogSpreadsheet {
     m_name = name;
     m_cells = new ArrayList<LogCell>();
     m_timestampCell = new LogCell("Timestamp (ms)");
-    m_time = new Date(0);
     m_active = false;
     registerCell(m_timestampCell);
   }

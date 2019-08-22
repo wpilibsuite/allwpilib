@@ -18,7 +18,6 @@ LogSpreadsheet::LogSpreadsheet(std::string name)
     : m_name(name),
       m_cells(),
       m_timestampCell("Timestamp (ms)"),
-      m_time(0),
       m_active(false) {
   RegisterCell(m_timestampCell);
 }
@@ -99,9 +98,9 @@ void LogSpreadsheet::UpdateFilename() {
 
 std::string LogSpreadsheet::CreateFilename(std::time_t time) {
   // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
+  struct tm localTime = *std::localtime(&time);
   char datetime[80];
   std::strftime(datetime, sizeof(datetime), "%Y-%m-%d.%X", &localTime);
-  struct tm localTime = *std::localtime(&time);
 
   return "log-" + m_name + "-" + datetime + ".txt";
 }
