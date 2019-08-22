@@ -79,28 +79,30 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
   }
 }
 
+void CommandScheduler::Schedule(Command* command) { Schedule(true, command); }
+
 void CommandScheduler::Schedule(bool interruptible,
-                                wpi::ArrayRef<Command*> commands) {
+                                std::initializer_list<Command*> commands) {
   for (auto command : commands) {
     Schedule(interruptible, command);
   }
 }
 
-void CommandScheduler::Schedule(wpi::ArrayRef<Command*> commands) {
+void CommandScheduler::Schedule(std::initializer_list<Command*> commands) {
   for (auto command : commands) {
     Schedule(true, command);
   }
 }
 
 void CommandScheduler::QueueSchedule(bool interruptible,
-                                     wpi::ArrayRef<Command*> commands) {
+                                     std::initializer_list<Command*> commands) {
   std::scoped_lock lock(m_lock);
   for (auto&& command : commands) {
     m_toSchedule[command] = interruptible;
   }
 }
 
-void CommandScheduler::QueueSchedule(wpi::ArrayRef<Command*> commands) {
+void CommandScheduler::QueueSchedule(std::initializer_list<Command*> commands) {
   QueueSchedule(true, commands);
 }
 
@@ -164,7 +166,7 @@ void CommandScheduler::Run() {
   for (auto&& subsystem : m_subsystems) {
     auto s = m_requirements.find(subsystem.getFirst());
     if (s == m_requirements.end()) {
-      Schedule(subsystem.getSecond());
+      Schedule({subsystem.getSecond()});
     }
   }
 }
@@ -233,7 +235,7 @@ void CommandScheduler::Cancel(Command* command) {
   }
 }
 
-void CommandScheduler::Cancel(wpi::ArrayRef<Command*> commands) {
+void CommandScheduler::Cancel(std::initializer_list<Command*> commands) {
   for (auto command : commands) {
     Cancel(command);
   }
@@ -245,7 +247,7 @@ void CommandScheduler::CancelAll() {
   }
 }
 
-void CommandScheduler::QueueCancel(wpi::ArrayRef<Command*> commands) {
+void CommandScheduler::QueueCancel(std::initializer_list<Command*> commands) {
   std::scoped_lock lock(m_lock);
   for (auto&& command : commands) {
     m_toCancel.emplace_back(command);

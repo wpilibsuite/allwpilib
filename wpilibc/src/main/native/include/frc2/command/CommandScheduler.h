@@ -67,6 +67,14 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
   void Schedule(bool interruptible, Command* command);
 
   /**
+   * Schedules a command for execution, with interruptible defaulted to true.
+   * Does nothing if the command is already scheduled.
+   *
+   * @param command the command to schedule
+   */
+  void Schedule(Command* command);
+
+  /**
    * Schedules multiple commands for execution.  Does nothing if the command is
    * already scheduled. If a command's requirements are not available, it will
    * only be started if all the commands currently using those requirements have
@@ -76,7 +84,7 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
    * @param interruptible whether the commands should be interruptible
    * @param commands      the commands to schedule
    */
-  void Schedule(bool interruptible, wpi::ArrayRef<Command*> commands);
+  void Schedule(bool interruptible, std::initializer_list<Command*> commands);
 
   /**
    * Schedules multiple commands for execution, with interruptible defaulted to
@@ -84,7 +92,7 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
    *
    * @param commands the commands to schedule
    */
-  void Schedule(wpi::ArrayRef<Command*> commands);
+  void Schedule(std::initializer_list<Command*> commands);
 
   /**
    * Schedules multiple commands for execution the next time the scheduler is
@@ -97,7 +105,8 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
    * @param interruptible whether the commands should be interruptible
    * @param commands      the commands to schedule
    */
-  void QueueSchedule(bool interruptible, wpi::ArrayRef<Command*> commands);
+  void QueueSchedule(bool interruptible,
+                     std::initializer_list<Command*> commands);
 
   /**
    * Schedules multiple commands for execution the next time the scheduler is
@@ -106,7 +115,7 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
    *
    * @param commands the commands to schedule
    */
-  void QueueSchedule(wpi::ArrayRef<Command*> commands);
+  void QueueSchedule(std::initializer_list<Command*> commands);
 
   /**
    * Runs a single iteration of the scheduler.  The execution occurs in the
@@ -189,7 +198,7 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
    *
    * @param commands the commands to cancel
    */
-  void Cancel(wpi::ArrayRef<Command*> commands);
+  void Cancel(std::initializer_list<Command*> commands);
 
   /**
    * Cancels all commands that are currently scheduled.
@@ -205,7 +214,7 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
    *
    * @param commands the commands to cancel
    */
-  void QueueCancel(wpi::ArrayRef<Command*> commands);
+  void QueueCancel(std::initializer_list<Command*> commands);
 
   /**
    * Returns the time since a given command was scheduled.  Note that this only
