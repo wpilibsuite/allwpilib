@@ -67,13 +67,6 @@ public final class CommandScheduler extends SendableBase {
   //The set of currently-registered buttons that will be polled every iteration.
   private final Collection<Runnable> m_buttons = new LinkedHashSet<>();
 
-  //Lists of commands to schedule/cancel, for asynchronous access methods.
-  private final Map<Command, Boolean> m_toSchedule = new LinkedHashMap<>();
-  private final List<Command> m_toCancel = new ArrayList<>();
-
-  //Lock for async access
-  private final Object m_lock = new Object();
-
   private boolean m_disabled;
 
   //NetworkTable entries for use in Sendable impl
@@ -199,35 +192,6 @@ public final class CommandScheduler extends SendableBase {
   }
 
   /**
-   * Schedules multiple commands for execution the next time the scheduler is run. Thread-safe. Does
-   * nothing if the command is already scheduled. If a command's requirements are not available, it
-   * will only be started if all the commands currently using those requirements have been scheduled
-   * as interruptible.  If this is the case, they will be interrupted and the command will be
-   * scheduled.
-   *
-   * @param interruptible whether the commands should be interruptible
-   * @param commands      the commands to schedule
-   */
-  public synchronized void queueSchedule(boolean interruptible, Command... commands) {
-    synchronized (m_lock) {
-      for (Command command : commands) {
-        m_toSchedule.put(command, interruptible);
-      }
-    }
-  }
-
-  /**
-   * Schedules multiple commands for execution the next time the scheduler is run, with
-   * interruptible defaulted to true.  Thread-safe.  Does nothing if the command is already
-   * scheduled.
-   *
-   * @param commands the commands to schedule
-   */
-  public void queueSchedule(Command... commands) {
-    queueSchedule(true, commands);
-  }
-
-  /**
    * Runs a single iteration of the scheduler.  The execution occurs in the following order:
    *
    * <p>Subsystem periodic methods are called.
@@ -255,17 +219,6 @@ public final class CommandScheduler extends SendableBase {
     //Poll buttons for new commands to add.
     for (Runnable button : m_buttons) {
       button.run();
-    }
-
-    synchronized (m_lock) {
-      //Add commands from async queue
-      for (Map.Entry<Command, Boolean> command : m_toSchedule.entrySet()) {
-        schedule(command.getValue(), command.getKey());
-      }
-      m_toSchedule.clear();
-      //Cancel commands from async queue
-      cancel(m_toCancel.toArray(new Command[]{}));
-      m_toCancel.clear();
     }
 
     //Run scheduled commands, remove finished commands.
@@ -392,20 +345,6 @@ public final class CommandScheduler extends SendableBase {
   public void cancelAll() {
     for (Command command : m_scheduledCommands.keySet()) {
       cancel(command);
-    }
-  }
-
-  /**
-   * Cancels commands on the next run of the scheduler.  Thread-safe.  The scheduler will only call
-   * the interrupted method of a canceled command, not the end method (though the interrupted method
-   * may itself call the end method).  Commands will be canceled even if they are not scheduled as
-   * interruptible.
-   *
-   * @param commands the commands to cancel
-   */
-  public void queueCancel(Command... commands) {
-    synchronized (m_lock) {
-      m_toCancel.addAll(Set.of(commands));
     }
   }
 
