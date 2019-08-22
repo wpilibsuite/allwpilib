@@ -12,8 +12,7 @@
 
 #include <units/units.h>
 #include <wpi/ArrayRef.h>
-
-#include "frc/circular_buffer.h"
+#include <wpi/circular_buffer.h>
 
 namespace frc {
 
@@ -142,8 +141,8 @@ class LinearFilter {
   double Calculate(double input);
 
  private:
-  circular_buffer<double> m_inputs{0};
-  circular_buffer<double> m_outputs{0};
+  wpi::circular_buffer<double> m_inputs{0};
+  wpi::circular_buffer<double> m_outputs{0};
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
 };

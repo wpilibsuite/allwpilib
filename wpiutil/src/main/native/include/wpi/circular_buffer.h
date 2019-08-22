@@ -10,9 +10,7 @@
 #include <cstddef>
 #include <vector>
 
-#include <wpi/deprecated.h>
-
-namespace frc {
+namespace wpi {
 
 /**
  * This is a simple circular buffer so we don't need to "bucket brigade" copy
@@ -21,7 +19,6 @@ namespace frc {
 template <class T>
 class circular_buffer {
  public:
-  WPI_DEPRECATED("Use wpi::circular_buffer instead.")
   explicit circular_buffer(size_t size);
 
   using value_type = T;
@@ -60,6 +57,6 @@ class circular_buffer {
   size_t ModuloDec(size_t index);
 };
 
-}  // namespace frc
+}  // namespace wpi
 
-#include "frc/circular_buffer.inc"
+#include "wpi/circular_buffer.inc"

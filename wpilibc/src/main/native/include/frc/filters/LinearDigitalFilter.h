@@ -12,9 +12,9 @@
 #include <vector>
 
 #include <wpi/ArrayRef.h>
+#include <wpi/circular_buffer.h>
 #include <wpi/deprecated.h>
 
-#include "frc/circular_buffer.h"
 #include "frc/filters/Filter.h"
 
 namespace frc {
@@ -215,8 +215,8 @@ class LinearDigitalFilter : public Filter {
   double PIDGet() override;
 
  private:
-  circular_buffer<double> m_inputs;
-  circular_buffer<double> m_outputs;
+  wpi::circular_buffer<double> m_inputs;
+  wpi::circular_buffer<double> m_outputs;
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
 };

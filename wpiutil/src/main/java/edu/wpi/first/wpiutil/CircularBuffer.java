@@ -5,14 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj;
+package edu.wpi.first.wpiutil;
 
 /**
  * This is a simple circular buffer so we don't need to "bucket brigade" copy old values.
- *
- * @deprecated Use {@link edu.wpi.first.wpiutil.CircularBuffer} instead.
  */
-@Deprecated(since = "2020", forRemoval = true)
 public class CircularBuffer {
   private double[] m_data;
 
