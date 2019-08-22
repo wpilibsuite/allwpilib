@@ -30,6 +30,10 @@ templatesTree.list(new FilenameFilter() {
     templatesMap.put(it, [])
 }
 
+nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.roborio).configure {
+    cppCompiler.args.remove('-Wno-error=deprecated-declarations')
+    cppCompiler.args.add('-Werror=deprecated-declarations')
+}
 
 ext {
     sharedCvConfigs = examplesMap + templatesMap + [commands: []]
