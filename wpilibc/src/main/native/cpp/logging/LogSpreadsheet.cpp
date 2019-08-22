@@ -99,9 +99,9 @@ void LogSpreadsheet::UpdateFilename() {
 
 std::string LogSpreadsheet::CreateFilename(std::time_t time) {
   // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
-  struct tm localTime = *std::localtime(&time);
   char datetime[80];
   std::strftime(datetime, sizeof(datetime), "%Y-%m-%d.%X", &localTime);
+  struct tm localTime = *std::localtime(&time);
 
   return "log-" + m_name + "-" + datetime + ".txt";
 }
