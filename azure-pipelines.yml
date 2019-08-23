@@ -110,7 +110,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Ponlylinuxbionicaarch64 -PbuildServer'
+          options: '-Ponlylinuxaarch64bionic -PbuildServer'
 
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
@@ -121,7 +121,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Ponlylinuxbionicaarch64 -PreleaseMode -PbuildServer'
+          options: '-Ponlylinuxaarch64bionic -PreleaseMode -PbuildServer'
 
       - task: PublishPipelineArtifact@0
         inputs:
