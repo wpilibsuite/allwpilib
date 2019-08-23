@@ -9,6 +9,8 @@ resources:
     image: wpilib/roborio-cross-ubuntu:2020-18.04
   - container: raspbian
     image:  wpilib/raspbian-cross-ubuntu:10-18.04
+  - container: aarch64
+    image:  wpilib/aarch64-cross-ubuntu:bionic-18.04
   - container: ubuntu
     image:  wpilib/ubuntu-base:18.04
 
@@ -90,6 +92,40 @@ stages:
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'Raspbian'
+          targetPath: 'build/allOutputs'
+
+  - job: Linux_Aarch64
+    pool:
+      vmImage: 'Ubuntu 16.04'
+
+    container: aarch64
+
+    steps:
+      - task: Gradle@2
+        condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          gradleOptions: '-Xmx3072m'
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          tasks: 'build'
+          options: '-Ponlylinuxbionicaarch64 -PbuildServer'
+
+      - task: Gradle@2
+        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          gradleOptions: '-Xmx3072m'
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          tasks: 'build'
+          options: '-Ponlylinuxbionicaarch64 -PreleaseMode -PbuildServer'
+
+      - task: PublishPipelineArtifact@0
+        inputs:
+          artifactName: 'Aarch64'
           targetPath: 'build/allOutputs'
 
   - job: Linux
@@ -311,6 +347,10 @@ stages:
     - task: DownloadPipelineArtifact@0
       inputs:
         artifactName: 'Athena'
+        targetPath: 'build-tools/combiner/products/build/allOutputs'
+    - task: DownloadPipelineArtifact@0
+      inputs:
+        artifactName: 'Aarch64'
         targetPath: 'build-tools/combiner/products/build/allOutputs'
 
 # PR Builds
