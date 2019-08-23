@@ -27,7 +27,7 @@ public class DriveStraight extends SynchronousPIDCommand {
    */
   public DriveStraight(double distance, DriveTrain drivetrain) {
     super(new PIDController(4, 0, 0),
-        () -> drivetrain.getDistance(),
+        drivetrain::getDistance,
         distance,
         d -> drivetrain.drive(d, d));
 
