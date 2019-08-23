@@ -40,7 +40,7 @@ stages:
           publishJUnitResults: false
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Ponlylinuxathena -PjenkinsBuild'
+          options: '-Ponlylinuxathena -PbuildServer'
 
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
@@ -51,7 +51,7 @@ stages:
           publishJUnitResults: false
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Ponlylinuxathena -PreleaseType=OFFICIAL -PjenkinsBuild'
+          options: '-Ponlylinuxathena -PreleaseMode -PbuildServer'
 
       - task: PublishPipelineArtifact@0
         inputs:
@@ -74,7 +74,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Ponlylinuxraspbian -PjenkinsBuild'
+          options: '-Ponlylinuxraspbian -PbuildServer'
 
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
@@ -85,7 +85,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-Ponlylinuxraspbian -PreleaseType=OFFICIAL -PjenkinsBuild'
+          options: '-Ponlylinuxraspbian -PreleaseMode -PbuildServer'
 
       - task: PublishPipelineArtifact@0
         inputs:
@@ -108,7 +108,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PjenkinsBuild'
+          options: '-PbuildServer'
 
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
@@ -119,7 +119,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PreleaseType=OFFICIAL -PjenkinsBuild'
+          options: '-PreleaseMode -PbuildServer'
 
       - task: PublishPipelineArtifact@0
         inputs:
@@ -174,7 +174,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PskipPMD -PjenkinsBuild'
+          options: '-PskipPMD -PbuildServer'
 
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
@@ -186,7 +186,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PskipPMD -PreleaseType=OFFICIAL -PjenkinsBuild'
+          options: '-PskipPMD -PreleaseMode -PbuildServer'
 
       - task: PublishPipelineArtifact@0
         inputs:
@@ -200,7 +200,7 @@ stages:
       - powershell: |
           mkdir build
           $ProgressPreference = 'SilentlyContinue'
-          wget "https://github.com/wpilibsuite/frc-openjdk-windows/releases/download/v11.0.0u28-1/jdk-x86-11.0.0u28-1.zip" -O "build\jdk.zip"
+          wget "https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jdk_x86-32_windows_hotspot_11.0.4_11.zip" -O "build\jdk.zip"
         displayName: 'Download JDK'
       - task: JavaToolInstaller@0
         inputs:
@@ -218,7 +218,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PskipPMD -PjenkinsBuild'
+          options: '-PskipPMD -PbuildServer'
 
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
@@ -229,7 +229,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PskipPMD -PreleaseType=OFFICIAL -PjenkinsBuild'
+          options: '-PskipPMD -PreleaseMode -PbuildServer'
 
       - task: PublishPipelineArtifact@0
         inputs:
@@ -258,7 +258,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PjenkinsBuild'
+          options: '-PbuildServer'
 
       - task: Gradle@2
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
@@ -270,7 +270,7 @@ stages:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'build'
-          options: '-PreleaseType=OFFICIAL -PjenkinsBuild'
+          options: '-PreleaseMode -PbuildServer'
 
       - task: PublishPipelineArtifact@0
         inputs:
