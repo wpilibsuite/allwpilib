@@ -6,9 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #pragma once
-#include "Trigger.h"
-
 #include <utility>
+
+#include "Trigger.h"
 
 namespace frc2 {
 class Command;

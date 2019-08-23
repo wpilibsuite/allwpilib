@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include <frc/smartdashboard/SendableBase.h>
+#include <frc2/command/Command.h>
+#include <frc2/command/CommandScheduler.h>
 
 #include <atomic>
 #include <memory>
