@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj.examples.gearsbotnew.commands;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.SynchronousPIDCommand;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.DriveTrain;
 
@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.DriveTrain;
  * command is running. The input is the averaged values of the left and right
  * encoders.
  */
-public class DriveStraight extends SynchronousPIDCommand {
+public class DriveStraight extends PIDCommand {
   private final DriveTrain m_drivetrain;
 
   /**

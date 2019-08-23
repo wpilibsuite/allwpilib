@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.examples.frisbeebot.subsystems;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.SynchronousPIDSubsystem;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
 import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kD;
 import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kEncoderDistancePerPulse;
@@ -26,7 +26,7 @@ import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstan
 import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kShooterToleranceRPS;
 import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kVFractional;
 
-public class ShooterSubsystem extends SynchronousPIDSubsystem {
+public class ShooterSubsystem extends PIDSubsystem {
   private final PWMVictorSPX m_shooterMotor = new PWMVictorSPX(kShooterMotorPort);
   private final PWMVictorSPX m_feederMotor = new PWMVictorSPX(kFeederMotorPort);
   private final Encoder m_shooterEncoder =

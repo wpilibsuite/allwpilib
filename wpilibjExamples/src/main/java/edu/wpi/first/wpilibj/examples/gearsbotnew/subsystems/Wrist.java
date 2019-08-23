@@ -11,14 +11,14 @@ import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SynchronousPIDSubsystem;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
 /**
  * The wrist subsystem is like the elevator, but with a rotational joint instead of a linear joint.
  */
-public class Wrist extends SynchronousPIDSubsystem {
+public class Wrist extends PIDSubsystem {
   private final Victor m_motor;
   private final AnalogPotentiometer m_pot;
   private double m_setpoint;

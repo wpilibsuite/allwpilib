@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SynchronousPIDCommand;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands.TurnToAngle;
@@ -70,7 +70,7 @@ public class RobotContainer {
 
     // Stabilize robot to drive straight with gyro when left bumper is held
     new JoystickButton(m_driverController, Button.kBumperLeft.value).whenHeld(
-        new SynchronousPIDCommand(
+        new PIDCommand(
             new PIDController(kStabilizationP, kStabilizationI, kStabilizationD),
             // Close the loop on the turn rate
             m_robotDrive::getTurnRate,

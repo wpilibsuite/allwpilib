@@ -15,17 +15,17 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * A subsystem that uses a {@link PIDController} to control an output.  The controller is run
  * synchronously from the subsystem's periodic() method.
  */
-public abstract class SynchronousPIDSubsystem extends SendableSubsystemBase {
+public abstract class PIDSubsystem extends SendableSubsystemBase {
   protected final PIDController m_controller;
   protected boolean m_enabled;
 
   /**
-   * Creates a new SynchronousPIDSubsystem.
+   * Creates a new PIDSubsystem.
    *
    * @param controller the PIDController to use
    */
-  public SynchronousPIDSubsystem(PIDController controller) {
-    requireNonNullParam(controller, "controller", "SynchronousPIDSubsystem");
+  public PIDSubsystem(PIDController controller) {
+    requireNonNullParam(controller, "controller", "PIDSubsystem");
     m_controller = controller;
   }
 

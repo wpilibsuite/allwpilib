@@ -20,14 +20,14 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * exit conditions and/or other behavior, subclass this class.  The controller calculation and
  * output are performed synchronously in the command's execute() method.
  */
-public class SynchronousPIDCommand extends SendableCommandBase {
+public class PIDCommand extends SendableCommandBase {
   protected final PIDController m_controller;
   protected DoubleSupplier m_measurement;
   protected DoubleSupplier m_setpoint;
   protected DoubleConsumer m_useOutput;
 
   /**
-   * Creates a new SynchronousPIDCommand, which controls the given output with a PIDController.
+   * Creates a new PIDCommand, which controls the given output with a PIDController.
    *
    * @param controller        the controller that controls the output.
    * @param measurementSource the measurement of the process variable
@@ -35,9 +35,9 @@ public class SynchronousPIDCommand extends SendableCommandBase {
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
    */
-  public SynchronousPIDCommand(PIDController controller, DoubleSupplier measurementSource,
-                               DoubleSupplier setpointSource, DoubleConsumer useOutput,
-                               Subsystem... requirements) {
+  public PIDCommand(PIDController controller, DoubleSupplier measurementSource,
+                    DoubleSupplier setpointSource, DoubleConsumer useOutput,
+                    Subsystem... requirements) {
     requireNonNullParam(controller, "controller", "SynchronousPIDCommand");
     requireNonNullParam(measurementSource, "measurementSource", "SynchronousPIDCommand");
     requireNonNullParam(setpointSource, "setpointSource", "SynchronousPIDCommand");
@@ -51,7 +51,7 @@ public class SynchronousPIDCommand extends SendableCommandBase {
   }
 
   /**
-   * Creates a new SynchronousPIDCommand, which controls the given output with a PIDController.
+   * Creates a new PIDCommand, which controls the given output with a PIDController.
    *
    * @param controller        the controller that controls the output.
    * @param measurementSource the measurement of the process variable
@@ -59,9 +59,9 @@ public class SynchronousPIDCommand extends SendableCommandBase {
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
    */
-  public SynchronousPIDCommand(PIDController controller, DoubleSupplier measurementSource,
-                               double setpoint, DoubleConsumer useOutput,
-                               Subsystem... requirements) {
+  public PIDCommand(PIDController controller, DoubleSupplier measurementSource,
+                    double setpoint, DoubleConsumer useOutput,
+                    Subsystem... requirements) {
     this(controller, measurementSource, () -> setpoint, useOutput, requirements);
   }
 

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SynchronousPIDSubsystem;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * The elevator subsystem uses PID to go to a given height. Unfortunately, in it's current state PID
  * values for simulation are different than in the real world do to minor differences.
  */
-public class Elevator extends SynchronousPIDSubsystem {
+public class Elevator extends PIDSubsystem {
   private final Victor m_motor;
   private final AnalogPotentiometer m_pot;
   private double m_setpoint;

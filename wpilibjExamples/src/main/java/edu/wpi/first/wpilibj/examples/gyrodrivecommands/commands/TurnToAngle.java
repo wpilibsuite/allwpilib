@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.SynchronousPIDCommand;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems.DriveSubsystem;
 
@@ -21,7 +21,7 @@ import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveCo
 /**
  * A command that will turn the robot to the specified angle.
  */
-public class TurnToAngle extends SynchronousPIDCommand {
+public class TurnToAngle extends PIDCommand {
   /**
    * Turns to robot to the specified angle.
    *
