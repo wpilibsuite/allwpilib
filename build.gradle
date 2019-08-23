@@ -23,13 +23,13 @@ if (project.hasProperty('releaseMode')) {
 }
 
 allprojects {
-    repositories {
-        mavenCentral()
-    }
     if (project.hasProperty('releaseMode')) {
         wpilibRepositories.addAllReleaseRepositories(it)
     } else {
         wpilibRepositories.addAllDevelopmentRepositories(it)
+    }
+    repositories {
+        mavenCentral()
     }
 }
 
