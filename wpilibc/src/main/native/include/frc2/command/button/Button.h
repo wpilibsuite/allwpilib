@@ -19,6 +19,7 @@ class Button : public Trigger {
   Button() = default;
 
   Button WhenPressed(Command* command, bool interruptible = true);
+
   template <class T, typename = std::enable_if_t<std::is_base_of<
                          Command, std::remove_reference_t<T>>::value>>
   Button WhenPressed(T&& command, bool interruptible = true) {
@@ -28,15 +29,18 @@ class Button : public Trigger {
   Button WhenPressed(std::function<void()> toRun);
 
   Button WhileHeld(Command* command, bool interruptible = true);
+
   template <class T, typename = std::enable_if_t<std::is_base_of<
                          Command, std::remove_reference_t<T>>::value>>
   Button WhileHeld(T&& command, bool interruptible = true) {
     WhileActiveContinous(std::forward<T>(command), interruptible);
     return *this;
   }
+  
   Button WhileHeld(std::function<void()> toRun);
 
   Button WhenHeld(Command* command, bool interruptible = true);
+
   template <class T, typename = std::enable_if_t<std::is_base_of<
                          Command, std::remove_reference_t<T>>::value>>
   Button WhenHeld(T&& command, bool interruptible = true) {
@@ -45,15 +49,18 @@ class Button : public Trigger {
   }
 
   Button WhenReleased(Command* command, bool interruptible = true);
+
   template <class T, typename = std::enable_if_t<std::is_base_of<
                          Command, std::remove_reference_t<T>>::value>>
   Button WhenReleased(T&& command, bool interruptible = true) {
     WhenInactive(std::forward<T>(command), interruptible);
     return *this;
   }
+
   Button WhenReleased(std::function<void()> toRun);
 
   Button ToggleWhenPressed(Command* command, bool interruptible = true);
+
   template <class T, typename = std::enable_if_t<std::is_base_of<
                          Command, std::remove_reference_t<T>>::value>>
   Button ToggleWhenPressed(T&& command, bool interruptible = true) {

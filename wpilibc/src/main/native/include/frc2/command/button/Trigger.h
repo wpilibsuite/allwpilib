@@ -30,6 +30,7 @@ class Trigger {
   virtual bool Get() const { return m_isActive(); }
 
   Trigger WhenActive(Command* command, bool interruptible = true);
+
   template <class T, typename = std::enable_if_t<std::is_base_of<
                          Command, std::remove_reference_t<T>>::value>>
   Trigger WhenActive(T&& command, bool interruptible = true) {
@@ -49,8 +50,11 @@ class Trigger {
 
     return *this;
   }
+
   Trigger WhenActive(std::function<void()> toRun);
+
   Trigger WhileActiveContinous(Command* command, bool interruptible = true);
+
   template <class T, typename = std::enable_if_t<std::is_base_of<
                          Command, std::remove_reference_t<T>>::value>>
   Trigger WhileActiveContinous(T&& command, bool interruptible = true) {
@@ -71,8 +75,11 @@ class Trigger {
         });
     return *this;
   }
+
   Trigger WhileActiveContinous(std::function<void()> toRun);
+
   Trigger WhileActiveOnce(Command* command, bool interruptible = true);
+
   template <class T, typename = std::enable_if_t<std::is_base_of<
                          Command, std::remove_reference_t<T>>::value>>
   Trigger WhileActiveOnce(T&& command, bool interruptible = true) {
@@ -93,7 +100,9 @@ class Trigger {
         });
     return *this;
   }
+
   Trigger WhenInactive(Command* command, bool interruptible = true);
+
   template <class T, typename = std::enable_if_t<std::is_base_of<
                          Command, std::remove_reference_t<T>>::value>>
   Trigger WhenInactive(T&& command, bool interruptible = true) {
@@ -112,8 +121,11 @@ class Trigger {
         });
     return *this;
   }
+
   Trigger WhenInactive(std::function<void()> toRun);
+
   Trigger ToggleWhenActive(Command* command, bool interruptible = true);
+
   template <class T, typename = std::enable_if_t<std::is_base_of<
                          Command, std::remove_reference_t<T>>::value>>
   Trigger ToggleWhenActive(T&& command, bool interruptible = true) {
@@ -136,6 +148,7 @@ class Trigger {
         });
     return *this;
   }
+  
   Trigger CancelWhenActive(Command* command);
 
   Trigger operator&&(Trigger rhs) {
