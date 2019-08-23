@@ -148,7 +148,7 @@ class Trigger {
         });
     return *this;
   }
-  
+
   Trigger CancelWhenActive(Command* command);
 
   Trigger operator&&(Trigger rhs) {

@@ -36,7 +36,7 @@ class Button : public Trigger {
     WhileActiveContinous(std::forward<T>(command), interruptible);
     return *this;
   }
-  
+
   Button WhileHeld(std::function<void()> toRun);
 
   Button WhenHeld(Command* command, bool interruptible = true);
