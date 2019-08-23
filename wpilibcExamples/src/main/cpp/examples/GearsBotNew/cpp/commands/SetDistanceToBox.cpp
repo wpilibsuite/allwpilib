@@ -12,7 +12,7 @@
 #include "Robot.h"
 
 SetDistanceToBox::SetDistanceToBox(double distance, DriveTrain* drivetrain)
-    : frc2::CommandHelper<frc2::SynchronousPIDCommand, SetDistanceToBox>(
+    : frc2::CommandHelper<frc2::PIDCommand, SetDistanceToBox>(
           frc2::PIDController(-2, 0, 0),
           [this]() { return m_drivetrain->GetDistanceToObstacle(); }, distance,
           [this](double output) { m_drivetrain->Drive(output, output); },
@@ -25,7 +25,7 @@ SetDistanceToBox::SetDistanceToBox(double distance, DriveTrain* drivetrain)
 void SetDistanceToBox::Initialize() {
   // Get everything in a safe starting state.
   m_drivetrain->Reset();
-  frc2::SynchronousPIDCommand::Initialize();
+  frc2::PIDCommand::Initialize();
 }
 
 bool SetDistanceToBox::IsFinished() { return m_controller.AtSetpoint(); }

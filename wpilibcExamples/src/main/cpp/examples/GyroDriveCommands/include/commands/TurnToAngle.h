@@ -8,15 +8,14 @@
 #pragma once
 
 #include <frc2/command/CommandHelper.h>
-#include <frc2/command/SynchronousPIDCommand.h>
+#include <frc2/command/PIDCommand.h>
 
 #include "subsystems/DriveSubsystem.h"
 
 /**
  * A command that will turn the robot to the specified angle.
  */
-class TurnToAngle
-    : public frc2::CommandHelper<frc2::SynchronousPIDCommand, TurnToAngle> {
+class TurnToAngle : public frc2::CommandHelper<frc2::PIDCommand, TurnToAngle> {
  public:
   /**
    * Turns to robot to the specified angle.

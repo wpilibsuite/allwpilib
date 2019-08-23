@@ -12,7 +12,7 @@
 #include "Robot.h"
 
 DriveStraight::DriveStraight(double distance, DriveTrain* drivetrain)
-    : frc2::CommandHelper<frc2::SynchronousPIDCommand, DriveStraight>(
+    : frc2::CommandHelper<frc2::PIDCommand, DriveStraight>(
           frc2::PIDController(4, 0, 0),
           [this]() { return m_drivetrain->GetDistance(); }, distance,
           [this](double output) { m_drivetrain->Drive(output, output); },
@@ -25,7 +25,7 @@ DriveStraight::DriveStraight(double distance, DriveTrain* drivetrain)
 void DriveStraight::Initialize() {
   // Get everything in a safe starting state.
   m_drivetrain->Reset();
-  frc2::SynchronousPIDCommand::Initialize();
+  frc2::PIDCommand::Initialize();
 }
 
 bool DriveStraight::IsFinished() { return m_controller.AtSetpoint(); }

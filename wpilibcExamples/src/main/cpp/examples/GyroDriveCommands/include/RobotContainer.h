@@ -9,9 +9,9 @@
 
 #include <frc2/command/Command.h>
 #include <frc2/command/InstantCommand.h>
+#include <frc2/command/PIDCommand.h>
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
-#include <frc2/command/SynchronousPIDCommand.h>
 
 #include <frc/XboxController.h>
 #include <frc/controller/PIDController.h>
@@ -62,7 +62,7 @@ class RobotContainer {
   frc2::ParallelRaceGroup m_turnTo90 = TurnToAngle{90, &m_drive}.WithTimeout(5);
 
   // Stabilize the robot while driving
-  frc2::SynchronousPIDCommand m_stabilizeDriving{
+  frc2::PIDCommand m_stabilizeDriving{
       frc2::PIDController{dc::kStabilizationP, dc::kStabilizationI,
                           dc::kStabilizationD},
       // Close the loop on the turn rate

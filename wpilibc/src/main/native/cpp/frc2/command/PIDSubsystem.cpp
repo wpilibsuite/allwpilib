@@ -5,27 +5,27 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc2/command/SynchronousPIDSubsystem.h"
+#include "frc2/command/PIDSubsystem.h"
 
 using namespace frc2;
 
-SynchronousPIDSubsystem::SynchronousPIDSubsystem(PIDController controller)
+PIDSubsystem::PIDSubsystem(PIDController controller)
     : m_controller{controller} {}
 
-void SynchronousPIDSubsystem::Periodic() {
+void PIDSubsystem::Periodic() {
   if (m_enabled) {
     UseOutput(m_controller.Calculate(GetMeasurement(), GetSetpoint()));
   }
 }
 
-void SynchronousPIDSubsystem::Enable() {
+void PIDSubsystem::Enable() {
   m_controller.Reset();
   m_enabled = true;
 }
 
-void SynchronousPIDSubsystem::Disable() {
+void PIDSubsystem::Disable() {
   UseOutput(0);
   m_enabled = false;
 }
 
-PIDController& SynchronousPIDSubsystem::GetController() { return m_controller; }
+PIDController& PIDSubsystem::GetController() { return m_controller; }

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <frc2/command/SynchronousPIDSubsystem.h>
+#include <frc2/command/PIDSubsystem.h>
 
 #include <frc/AnalogPotentiometer.h>
 #include <frc/PWMVictorSPX.h>
@@ -16,7 +16,7 @@
  * The wrist subsystem is like the elevator, but with a rotational joint instead
  * of a linear joint.
  */
-class Wrist : public frc2::SynchronousPIDSubsystem {
+class Wrist : public frc2::PIDSubsystem {
  public:
   Wrist();
 

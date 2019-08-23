@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include <frc2/command/SynchronousPIDSubsystem.h>
+#include <frc2/command/PIDSubsystem.h>
 
 #include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
 
-class ShooterSubsystem : public frc2::SynchronousPIDSubsystem {
+class ShooterSubsystem : public frc2::PIDSubsystem {
  public:
   ShooterSubsystem();
 

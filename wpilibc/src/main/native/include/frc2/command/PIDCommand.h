@@ -20,11 +20,10 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class SynchronousPIDCommand
-    : public CommandHelper<SendableCommandBase, SynchronousPIDCommand> {
+class PIDCommand : public CommandHelper<SendableCommandBase, PIDCommand> {
  public:
   /**
-   * Creates a new SynchronousPIDCommand, which controls the given output with a
+   * Creates a new PIDCommand, which controls the given output with a
    * PIDController.
    *
    * @param controller        the controller that controls the output.
@@ -33,14 +32,14 @@ class SynchronousPIDCommand
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
    */
-  SynchronousPIDCommand(PIDController controller,
-                        std::function<double()> measurementSource,
-                        std::function<double()> setpointSource,
-                        std::function<void(double)> useOutput,
-                        std::initializer_list<Subsystem*> requirements);
+  PIDCommand(PIDController controller,
+             std::function<double()> measurementSource,
+             std::function<double()> setpointSource,
+             std::function<void(double)> useOutput,
+             std::initializer_list<Subsystem*> requirements);
 
   /**
-   * Creates a new SynchronousPIDCommand, which controls the given output with a
+   * Creates a new PIDCommand, which controls the given output with a
    * PIDController with a constant setpoint.
    *
    * @param controller        the controller that controls the output.
@@ -49,14 +48,14 @@ class SynchronousPIDCommand
    * @param useOutput         the controller's output
    * @param requirements      the subsystems required by this command
    */
-  SynchronousPIDCommand(PIDController controller,
-                        std::function<double()> measurementSource,
-                        double setpoint, std::function<void(double)> useOutput,
-                        std::initializer_list<Subsystem*> requirements);
+  PIDCommand(PIDController controller,
+             std::function<double()> measurementSource, double setpoint,
+             std::function<void(double)> useOutput,
+             std::initializer_list<Subsystem*> requirements);
 
-  SynchronousPIDCommand(SynchronousPIDCommand&& other) = default;
+  PIDCommand(PIDCommand&& other) = default;
 
-  SynchronousPIDCommand(const SynchronousPIDCommand& other) = default;
+  PIDCommand(const PIDCommand& other) = default;
 
   void Initialize() override;
 

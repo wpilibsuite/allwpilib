@@ -14,7 +14,7 @@
 using namespace ShooterConstants;
 
 ShooterSubsystem::ShooterSubsystem()
-    : SynchronousPIDSubsystem(frc2::PIDController(kP, kI, kD)),
+    : PIDSubsystem(frc2::PIDController(kP, kI, kD)),
       m_shooterMotor(kShooterMotorPort),
       m_feederMotor(kFeederMotorPort),
       m_shooterEncoder(kEncoderPorts[0], kEncoderPorts[1]) {
@@ -30,7 +30,7 @@ void ShooterSubsystem::UseOutput(double output) {
 void ShooterSubsystem::Disable() {
   // Turn off motor when we disable, since useOutput(0) doesn't stop the motor
   // due to our feedforward
-  frc2::SynchronousPIDSubsystem::Disable();
+  frc2::PIDSubsystem::Disable();
   m_shooterMotor.Set(0);
 }
 

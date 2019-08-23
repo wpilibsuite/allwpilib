@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <frc2/command/SynchronousPIDSubsystem.h>
+#include <frc2/command/PIDSubsystem.h>
 
 #include <frc/AnalogPotentiometer.h>
 #include <frc/PWMVictorSPX.h>
@@ -18,7 +18,7 @@
  * state PID values for simulation are different than in the real world do to
  * minor differences.
  */
-class Elevator : public frc2::SynchronousPIDSubsystem {
+class Elevator : public frc2::PIDSubsystem {
  public:
   Elevator();
 

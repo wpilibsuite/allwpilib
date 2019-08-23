@@ -8,7 +8,7 @@
 #pragma once
 
 #include <frc2/command/CommandHelper.h>
-#include <frc2/command/SynchronousPIDCommand.h>
+#include <frc2/command/PIDCommand.h>
 
 #include "subsystems/DriveTrain.h"
 
@@ -18,8 +18,8 @@
  * command is running. The input is the averaged values of the left and right
  * encoders.
  */
-class SetDistanceToBox : public frc2::CommandHelper<frc2::SynchronousPIDCommand,
-                                                    SetDistanceToBox> {
+class SetDistanceToBox
+    : public frc2::CommandHelper<frc2::PIDCommand, SetDistanceToBox> {
  public:
   explicit SetDistanceToBox(double distance, DriveTrain* drivetrain);
   void Initialize() override;

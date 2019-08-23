@@ -17,14 +17,14 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class SynchronousPIDSubsystem : public SendableSubsystemBase {
+class PIDSubsystem : public SendableSubsystemBase {
  public:
   /**
-   * Creates a new SynchronousPIDSubsystem.
+   * Creates a new PIDSubsystem.
    *
    * @param controller the PIDController to use
    */
-  explicit SynchronousPIDSubsystem(PIDController controller);
+  explicit PIDSubsystem(PIDController controller);
 
   void Periodic() override;
 

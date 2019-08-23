@@ -10,8 +10,7 @@
 #include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-Wrist::Wrist()
-    : frc2::SynchronousPIDSubsystem(frc2::PIDController(kP_real, 0, 0)) {
+Wrist::Wrist() : frc2::PIDSubsystem(frc2::PIDController(kP_real, 0, 0)) {
 #ifdef SIMULATION  // Check for simulation and update PID values
   GetPIDController()->SetPID(kP_simulation, 0, 0, 0);
 #endif
