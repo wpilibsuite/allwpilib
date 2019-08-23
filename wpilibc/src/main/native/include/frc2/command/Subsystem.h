@@ -7,6 +7,10 @@
 
 #pragma once
 
+#include <frc2/command/CommandScheduler.h>
+
+#include <utility>
+
 namespace frc2 {
 class Command;
 /**
@@ -52,7 +56,12 @@ class Subsystem {
    *
    * @param defaultCommand the default command to associate with this subsystem
    */
-  virtual void SetDefaultCommand(Command* defaultCommand);
+  template <class T, typename = std::enable_if_t<std::is_base_of<
+                         Command, std::remove_reference_t<T>>::value>>
+  void SetDefaultCommand(T&& defaultCommand) {
+    CommandScheduler::GetInstance().SetDefaultCommand(
+        this, std::forward<T>(defaultCommand));
+  }
 
   /**
    * Gets the default command for this subsystem.  Returns null if no default
@@ -60,7 +69,7 @@ class Subsystem {
    *
    * @return the default command associated with this subsystem
    */
-  virtual Command* GetDefaultCommand() const;
+  Command* GetDefaultCommand() const;
 
   /**
    * Returns the command currently running on this subsystem.  Returns null if
@@ -68,12 +77,12 @@ class Subsystem {
    *
    * @return the scheduled command currently requiring this subsystem
    */
-  virtual Command* GetCurrentCommand() const;
+  Command* GetCurrentCommand() const;
 
   /**
    * Registers this subsystem with the CommandScheduler, allowing its
    * Periodic() method to be called when the scheduler runs.
    */
-  virtual void Register();
+  void Register();
 };
 }  // namespace frc2

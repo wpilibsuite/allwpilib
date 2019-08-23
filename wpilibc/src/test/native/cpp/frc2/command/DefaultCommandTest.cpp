@@ -18,10 +18,11 @@ TEST_F(DefaultCommandTest, DefaultCommandScheduleTest) {
 
   RunCommand command1([] {}, {&subsystem});
 
-  scheduler.SetDefaultCommand(&subsystem, &command1);
+  scheduler.SetDefaultCommand(&subsystem, std::move(command1));
+  auto handle = scheduler.GetDefaultCommand(&subsystem);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(&command1));
+  EXPECT_TRUE(scheduler.IsScheduled(handle));
 }
 
 TEST_F(DefaultCommandTest, DefaultCommandInterruptResumeTest) {
@@ -32,15 +33,16 @@ TEST_F(DefaultCommandTest, DefaultCommandInterruptResumeTest) {
   RunCommand command1([] {}, {&subsystem});
   RunCommand command2([] {}, {&subsystem});
 
-  scheduler.SetDefaultCommand(&subsystem, &command1);
+  scheduler.SetDefaultCommand(&subsystem, std::move(command1));
+  auto handle = scheduler.GetDefaultCommand(&subsystem);
   scheduler.Run();
   scheduler.Schedule(&command2);
 
   EXPECT_TRUE(scheduler.IsScheduled(&command2));
-  EXPECT_FALSE(scheduler.IsScheduled(&command1));
+  EXPECT_FALSE(scheduler.IsScheduled(handle));
 
   scheduler.Cancel(&command2);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(&command1));
+  EXPECT_TRUE(scheduler.IsScheduled(handle));
 }

@@ -155,7 +155,7 @@ void CommandScheduler::Run() {
   for (auto&& subsystem : m_subsystems) {
     auto s = m_requirements.find(subsystem.getFirst());
     if (s == m_requirements.end()) {
-      Schedule({subsystem.getSecond()});
+      Schedule({subsystem.getSecond().get()});
     }
   }
 }
@@ -185,25 +185,10 @@ void CommandScheduler::UnregisterSubsystem(
   }
 }
 
-void CommandScheduler::SetDefaultCommand(Subsystem* subsystem,
-                                         Command* defaultCommand) {
-  if (!defaultCommand->HasRequirement(subsystem)) {
-    wpi_setWPIErrorWithContext(
-        CommandIllegalUse, "Default commands must require their subsystem!");
-    return;
-  }
-  if (defaultCommand->IsFinished()) {
-    wpi_setWPIErrorWithContext(CommandIllegalUse,
-                               "Default commands should not end!");
-    return;
-  }
-  m_subsystems[subsystem] = defaultCommand;
-}
-
 Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
-  auto find = m_subsystems.find(subsystem);
+  auto&& find = m_subsystems.find(subsystem);
   if (find != m_subsystems.end()) {
-    return find->second;
+    return find->second.get();
   } else {
     return nullptr;
   }

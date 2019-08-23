@@ -59,16 +59,6 @@ class RobotContainer {
           });
   ComplexAuto m_complexAuto{&m_drive, &m_hatch};
 
-  // The default drive command
-
-  frc2::RunCommand m_defaultDrive{
-      [this] {
-        m_drive.ArcadeDrive(
-            m_driverController.GetY(frc::GenericHID::kLeftHand),
-            m_driverController.GetX(frc::GenericHID::kRightHand));
-      },
-      {&m_drive}};
-
   // Assorted commands to be bound to buttons
 
   frc2::InstantCommand m_grabHatch{[this] { m_hatch.GrabHatch(); }, {&m_hatch}};

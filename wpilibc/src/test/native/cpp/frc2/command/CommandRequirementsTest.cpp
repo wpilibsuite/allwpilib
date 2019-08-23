@@ -78,7 +78,7 @@ TEST_F(CommandRequirementsTest, DefaultCommandRequirementErrorTest) {
 
   MockCommand command1;
 
-  requirement1.SetDefaultCommand(&command1);
+  requirement1.SetDefaultCommand(std::move(command1));
 
   EXPECT_TRUE(requirement1.GetDefaultCommand() == NULL);
 }

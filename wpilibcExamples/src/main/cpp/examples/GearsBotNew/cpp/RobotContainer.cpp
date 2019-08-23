@@ -31,7 +31,7 @@ RobotContainer::RobotContainer()
   m_elevator.Log();
   m_drivetrain.Log();
 
-  m_drivetrain.SetDefaultCommand(new TankDrive(
+  m_drivetrain.SetDefaultCommand(TankDrive(
       &m_drivetrain,
       [this] { return m_joy.GetY(frc::GenericHID::JoystickHand::kLeftHand); },
       [this] {
