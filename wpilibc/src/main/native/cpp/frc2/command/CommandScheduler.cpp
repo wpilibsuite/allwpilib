@@ -29,7 +29,7 @@ CommandScheduler& CommandScheduler::GetInstance() {
   return scheduler;
 }
 
-void CommandScheduler::AddButton(std::function<void()> button) {
+void CommandScheduler::AddButton(wpi::unique_function<void()> button) {
   m_buttons.emplace_back(std::move(button));
 }
 

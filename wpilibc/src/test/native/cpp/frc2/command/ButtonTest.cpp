@@ -7,32 +7,13 @@
 
 #include "CommandTestBase.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/RunCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
 #include "frc2/command/button/Trigger.h"
 #include "gtest/gtest.h"
 
 using namespace frc2;
 class ButtonTest : public CommandTestBase {};
-
-TEST_F(ButtonTest, FooTest) {
-  auto& scheduler = CommandScheduler::GetInstance();
-  bool finished = false;
-  bool pressed = false;
-
-  WaitUntilCommand command([&finished] { return finished; });
-
-  Trigger([&pressed] { return pressed; }).WhenActive(&command);
-
-  scheduler.Run();
-
-  EXPECT_FALSE(scheduler.IsScheduled(&command));
-
-  pressed = true;
-
-  scheduler.Run();
-
-  EXPECT_TRUE(scheduler.IsScheduled(&command));
-}
 
 TEST_F(ButtonTest, WhenPressedTest) {
   auto& scheduler = CommandScheduler::GetInstance();
@@ -196,4 +177,19 @@ TEST_F(ButtonTest, NegateTest) {
   pressed = false;
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(&command));
+}
+
+TEST_F(ButtonTest, RValueButtonTest) {
+  auto& scheduler = CommandScheduler::GetInstance();
+  int counter = 0;
+  bool pressed = false;
+
+  RunCommand command([&counter] { counter++; }, {});
+
+  Trigger([&pressed] { return pressed; }).WhenActive(std::move(command));
+  scheduler.Run();
+  EXPECT_EQ(counter, 0);
+  pressed = true;
+  scheduler.Run();
+  EXPECT_EQ(counter, 1);
 }

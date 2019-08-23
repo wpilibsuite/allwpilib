@@ -45,11 +45,15 @@ class ConditionalCommand
    * @param condition the condition to determine which command to run
    */
   template <class T1, class T2,
-            typename = std::enable_if_t<std::is_base_of<Command, T1>::value>,
-            typename = std::enable_if_t<std::is_base_of<Command, T2>::value>>
+            typename = std::enable_if_t<
+                std::is_base_of<Command, std::remove_reference_t<T1>>::value>,
+            typename = std::enable_if_t<
+                std::is_base_of<Command, std::remove_reference_t<T2>>::value>>
   ConditionalCommand(T1&& onTrue, T2&& onFalse, std::function<bool()> condition)
-      : ConditionalCommand(std::make_unique<T1>(std::forward<T1>(onTrue)),
-                           std::make_unique<T2>(std::forward<T2>(onFalse)),
+      : ConditionalCommand(std::make_unique<std::remove_reference_t<T1>>(
+                               std::forward<T1>(onTrue)),
+                           std::make_unique<std::remove_reference_t<T2>>(
+                               std::forward<T2>(onFalse)),
                            condition) {}
 
   /**

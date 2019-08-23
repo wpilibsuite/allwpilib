@@ -15,6 +15,7 @@
 
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/DenseMap.h>
+#include <wpi/FunctionExtras.h>
 #include <wpi/SmallSet.h>
 
 #include "CommandState.h"
@@ -47,7 +48,7 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
    *
    * @param button The button to add
    */
-  void AddButton(std::function<void()> button);
+  void AddButton(wpi::unique_function<void()> button);
 
   /**
    * Removes all button bindings from the scheduler.
@@ -322,7 +323,7 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
 
   // The set of currently-registered buttons that will be polled every
   // iteration.
-  wpi::SmallVector<std::function<void()>, 4> m_buttons;
+  wpi::SmallVector<wpi::unique_function<void()>, 4> m_buttons;
 
   bool m_disabled{false};
 

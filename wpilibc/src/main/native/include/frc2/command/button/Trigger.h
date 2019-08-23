@@ -10,6 +10,7 @@
 #include <frc/smartdashboard/SendableBase.h>
 
 #include <atomic>
+#include <memory>
 #include <utility>
 
 namespace frc2 {
@@ -27,32 +28,111 @@ class Trigger {
 
   virtual bool Get() const { return m_isActive(); }
 
-  Trigger WhenActive(Command* command, bool interruptible);
-  Trigger WhenActive(Command* command) {
-    WhenActive(command, true);
+  Trigger WhenActive(Command* command, bool interruptible = true);
+  template <class T, typename = std::enable_if_t<std::is_base_of<
+                         Command, std::remove_reference_t<T>>::value>>
+  Trigger WhenActive(T&& command, bool interruptible = true) {
+    CommandScheduler::GetInstance().AddButton(
+        [pressedLast = Get(), *this,
+         command = std::make_unique<std::remove_reference_t<T>>(
+             std::forward<T>(command)),
+         interruptible]() mutable {
+          bool pressed = Get();
+
+          if (!pressedLast && pressed) {
+            command->Schedule(interruptible);
+          }
+
+          pressedLast = pressed;
+        });
+
     return *this;
   }
   Trigger WhenActive(std::function<void()> toRun);
-  Trigger WhileActiveContinous(Command* command, bool interruptible);
-  Trigger WhileActiveContinous(Command* command) {
-    WhileActiveContinous(command, true);
+  Trigger WhileActiveContinous(Command* command, bool interruptible = true);
+  template <class T, typename = std::enable_if_t<std::is_base_of<
+                         Command, std::remove_reference_t<T>>::value>>
+  Trigger WhileActiveContinous(T&& command, bool interruptible = true) {
+    CommandScheduler::GetInstance().AddButton(
+        [pressedLast = Get(), *this,
+         command = std::make_unique<std::remove_reference_t<T>>(
+             std::forward<T>(command)),
+         interruptible]() mutable {
+          bool pressed = Get();
+
+          if (pressed) {
+            command->Schedule(interruptible);
+          } else if (pressedLast && !pressed) {
+            command->Cancel();
+          }
+
+          pressedLast = pressed;
+        });
     return *this;
   }
   Trigger WhileActiveContinous(std::function<void()> toRun);
-  Trigger WhileActiveOnce(Command* command, bool interruptible);
-  Trigger WhileActiveOnce(Command* command) {
-    WhileActiveOnce(command, true);
+  Trigger WhileActiveOnce(Command* command, bool interruptible = true);
+  template <class T, typename = std::enable_if_t<std::is_base_of<
+                         Command, std::remove_reference_t<T>>::value>>
+  Trigger WhileActiveOnce(T&& command, bool interruptible = true) {
+    CommandScheduler::GetInstance().AddButton(
+        [pressedLast = Get(), *this,
+         command = std::make_unique<std::remove_reference_t<T>>(
+             std::forward<T>(command)),
+         interruptible]() mutable {
+          bool pressed = Get();
+
+          if (!pressedLast && pressed) {
+            command->Schedule(interruptible);
+          } else if (pressedLast && !pressed) {
+            command->Cancel();
+          }
+
+          pressedLast = pressed;
+        });
     return *this;
   }
-  Trigger WhenInactive(Command* command, bool interruptible);
-  Trigger WhenInactive(Command* command) {
-    WhenInactive(command, true);
+  Trigger WhenInactive(Command* command, bool interruptible = true);
+  template <class T, typename = std::enable_if_t<std::is_base_of<
+                         Command, std::remove_reference_t<T>>::value>>
+  Trigger WhenInactive(T&& command, bool interruptible = true) {
+    CommandScheduler::GetInstance().AddButton(
+        [pressedLast = Get(), *this,
+         command = std::make_unique<std::remove_reference_t<T>>(
+             std::forward<T>(command)),
+         interruptible]() mutable {
+          bool pressed = Get();
+
+          if (pressedLast && !pressed) {
+            command->Schedule(interruptible);
+          }
+
+          pressedLast = pressed;
+        });
     return *this;
   }
   Trigger WhenInactive(std::function<void()> toRun);
-  Trigger ToggleWhenActive(Command* command, bool interruptible);
-  Trigger ToggleWhenActive(Command* command) {
-    ToggleWhenActive(command, true);
+  Trigger ToggleWhenActive(Command* command, bool interruptible = true);
+  template <class T, typename = std::enable_if_t<std::is_base_of<
+                         Command, std::remove_reference_t<T>>::value>>
+  Trigger ToggleWhenActive(T&& command, bool interruptible = true) {
+    CommandScheduler::GetInstance().AddButton(
+        [pressedLast = Get(), *this,
+         command = std::make_unique<std::remove_reference_t<T>>(
+             std::forward<T>(command)),
+         interruptible]() mutable {
+          bool pressed = Get();
+
+          if (!pressedLast && pressed) {
+            if (command->IsScheduled()) {
+              command->Cancel();
+            } else {
+              command->Schedule(interruptible);
+            }
+          }
+
+          pressedLast = pressed;
+        });
     return *this;
   }
   Trigger CancelWhenActive(Command* command);
