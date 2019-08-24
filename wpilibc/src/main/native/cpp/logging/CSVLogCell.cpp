@@ -5,32 +5,33 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc/logging/LogCell.h"
+#include "frc/logging/CSVLogCell.h"
 
 #include <algorithm>
 #include <iostream>
 
 using namespace frc;
 
-LogCell::LogCell(std::string name) {
+CSVLogCell::CSVLogCell(std::string name) {
   if (IsStringValid(name)) {
     m_name = name;
   }
 }
 
-std::string LogCell::GetName() { return m_name; }
+std::string CSVLogCell::GetName() { return m_name; }
 
-std::string LogCell::GetContent() { return m_content; }
+std::string CSVLogCell::GetContent() { return m_content; }
 
-void LogCell::ClearCell() { m_content.clear(); }
+void CSVLogCell::ClearCell() { m_content.clear(); }
 
-bool LogCell::IsStringValid(std::string string) {
+bool CSVLogCell::IsStringValid(std::string string) {
   if (string.find('\"') != std::string::npos) {
-    std::cout << "LogCell's name/content cannot contain double quotes"
+    std::cout << "CSVLogCell's name/content cannot contain double quotes"
               << std::endl;
     return false;
   } else if (string.find('\n') != std::string::npos) {
-    std::cout << "LogCell's name/content cannot contain newlines" << std::endl;
+    std::cout << "CSVLogCell's name/content cannot contain newlines"
+              << std::endl;
     return false;
   }
   return true;

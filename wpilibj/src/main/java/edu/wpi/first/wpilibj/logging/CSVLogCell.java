@@ -8,21 +8,21 @@
 package edu.wpi.first.wpilibj.logging;
 
 /**
- * Represents a column in a LogSpreadsheet.
+ * Represents a column in a CSVLogFile.
  *
- * <p>For the column to be printed, you must register the instance of a LogCell
- * in a LogSpreadsheet using {@link LogSpreadsheet#registerCell(LogCell cell)}.
+ * <p>For the column to be printed, you must register the instance of a CSVLogCell
+ * in a CSVLogFile using {@link CSVLogFile#registerCell(CSVLogCell cell)}.
  */
-public class LogCell {
+public class CSVLogCell {
   private final String m_name;
   private String m_content;
 
   /**
-   * Instantiate a LogCell passing in the name of the column.
+   * Instantiate a CSVLogCell passing in the name of the column.
    *
    * @param name The name of the column.
    */
-  public LogCell(String name) {
+  public CSVLogCell(String name) {
     if (isStringValid(name)) {
       m_name = name;
     } else {
@@ -68,10 +68,10 @@ public class LogCell {
 
   private boolean isStringValid(String string) {
     if (string.contains("\"")) {
-      System.out.println("LogCell's name/content cannot contain double quotes");
+      System.out.println("CSVLogCell's name/content cannot contain double quotes");
       return false;
     } else if (string.contains("\n")) {
-      System.out.println("LogCell's name/content cannot contain newlines");
+      System.out.println("CSVLogCell's name/content cannot contain newlines");
       return false;
     }
     return true;

@@ -12,19 +12,19 @@
 namespace frc {
 
 /**
- * Represents a column in a LogSpreadsheet.
+ * Represents a column in a CSVLogFile.
  *
- * For the column to be printed, you must register the instance of a LogCell
- * in a LogSpreadsheet using LogSpreadsheet.RegisterCell().
+ * For the column to be printed, you must register the instance of a
+ * CSVLogCell in a CSVLogFile using CSVLogFile.RegisterCell().
  */
-class LogCell {
+class CSVLogCell {
  public:
   /**
-   * Instantiate a LogCell passing in the name of the column.
+   * Instantiate a CSVLogCell passing in the name of the column.
    *
    * @param name The name of the column.
    */
-  explicit LogCell(std::string name);
+  explicit CSVLogCell(std::string name);
 
   /**
    * Log any type of value that can be converted into a string.
