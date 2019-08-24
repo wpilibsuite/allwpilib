@@ -30,7 +30,7 @@ class MatchDataSender;
  * Provide access to the network communication data to / from the Driver
  * Station.
  */
-class DriverStation : public ErrorBase {
+class DriverStation final : public ErrorBase {
  public:
   enum Alliance { kRed, kBlue, kInvalid };
   enum MatchType { kNone, kPractice, kQualification, kElimination };

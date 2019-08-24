@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.geometry;
 /**
  * Represents a 2d pose containing translational and rotational elements.
  */
-public class Pose2d {
+public final class Pose2d {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
 

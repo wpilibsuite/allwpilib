@@ -50,7 +50,7 @@ import edu.wpi.first.wpiutil.CircularBuffer;
  * then want to run it at 200Hz! Combining this with Note 1 - the impetus is on YOU as a developer
  * to make sure calculate() gets called at the desired, constant frequency!
  */
-public class LinearFilter {
+public final class LinearFilter {
   private final CircularBuffer m_inputs;
   private final CircularBuffer m_outputs;
   private final double[] m_inputGains;

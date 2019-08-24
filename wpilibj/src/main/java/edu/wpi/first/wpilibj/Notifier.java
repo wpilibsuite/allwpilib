@@ -14,7 +14,7 @@ import edu.wpi.first.hal.NotifierJNI;
 
 import static java.util.Objects.requireNonNull;
 
-public class Notifier implements AutoCloseable {
+public final class Notifier implements AutoCloseable {
   // The thread waiting on the HAL alarm.
   private Thread m_thread;
   // The lock for the process information.

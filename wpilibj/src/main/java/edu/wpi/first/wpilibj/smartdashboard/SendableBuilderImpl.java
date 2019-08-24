@@ -22,7 +22,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableValue;
 
 @SuppressWarnings("PMD.TooManyMethods")
-public class SendableBuilderImpl implements SendableBuilder {
+public final class SendableBuilderImpl implements SendableBuilder {
   private static class Property {
     Property(NetworkTable table, String key) {
       m_entry = table.getEntry(key);

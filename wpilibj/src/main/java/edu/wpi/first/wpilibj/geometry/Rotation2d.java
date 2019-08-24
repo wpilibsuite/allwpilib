@@ -11,7 +11,7 @@ package edu.wpi.first.wpilibj.geometry;
  * A rotation in a 2d coordinate frame represented a point on the unit circle
  * (cosine and sine).
  */
-public class Rotation2d {
+public final class Rotation2d {
   private final double m_value;
   private final double m_cos;
   private final double m_sin;

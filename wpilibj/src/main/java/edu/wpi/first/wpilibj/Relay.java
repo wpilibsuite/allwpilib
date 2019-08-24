@@ -27,7 +27,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * channels (forward and reverse) to be used independently for something that does not care about
  * voltage polarity (like a solenoid).
  */
-public class Relay extends MotorSafety implements Sendable, AutoCloseable {
+public final class Relay extends MotorSafety implements Sendable, AutoCloseable {
   /**
    * This class represents errors in trying to set relay values contradictory to the direction to
    * which the relay is set.

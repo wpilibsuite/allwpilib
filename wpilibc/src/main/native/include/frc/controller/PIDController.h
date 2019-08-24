@@ -19,7 +19,7 @@ namespace frc2 {
 /**
  * Implements a PID control loop.
  */
-class PIDController : public frc::SendableBase {
+class PIDController final : public frc::SendableBase {
  public:
   enum class Tolerance { kAbsolute, kPercent };
 

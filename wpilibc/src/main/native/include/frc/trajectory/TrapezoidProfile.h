@@ -40,7 +40,7 @@ namespace frc {
  * `Calculate()` and to determine when the profile has completed via
  * `IsFinished()`.
  */
-class TrapezoidProfile {
+class TrapezoidProfile final {
  public:
   class Constraints {
    public:

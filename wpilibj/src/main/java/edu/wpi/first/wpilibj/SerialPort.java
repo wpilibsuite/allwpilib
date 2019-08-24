@@ -25,7 +25,7 @@ import edu.wpi.first.hal.SerialPortJNI;
  * http://www.ni.com/pdf/manuals/370132c.pdf
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class SerialPort implements AutoCloseable {
+public final class SerialPort implements AutoCloseable {
   private byte m_port;
 
   public enum Port {

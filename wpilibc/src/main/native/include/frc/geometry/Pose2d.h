@@ -16,7 +16,7 @@ namespace frc {
 /**
  * Represents a 2d pose containing translational and rotational elements.
  */
-class Pose2d {
+class Pose2d final {
  public:
   /**
    * Constructs a pose at the origin facing toward the positive X axis.

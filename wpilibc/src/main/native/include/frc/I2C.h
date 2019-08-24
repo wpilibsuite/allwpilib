@@ -21,7 +21,7 @@ namespace frc {
  * This class is intended to be used by sensor (and other I2C device) drivers.
  * It probably should not be used directly.
  */
-class I2C : public ErrorBase {
+class I2C final : public ErrorBase {
  public:
   enum Port { kOnboard = 0, kMXP };
 

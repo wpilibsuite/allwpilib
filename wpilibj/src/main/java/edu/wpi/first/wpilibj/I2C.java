@@ -23,7 +23,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * not be used directly.
  */
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
-public class I2C implements AutoCloseable {
+public final class I2C implements AutoCloseable {
   public enum Port {
     kOnboard(0), kMXP(1);
 

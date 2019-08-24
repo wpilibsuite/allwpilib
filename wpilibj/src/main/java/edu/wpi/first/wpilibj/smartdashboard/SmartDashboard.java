@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.Sendable;
  * laptop. Users can put values into and get values from the SmartDashboard.
  */
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
-public class SmartDashboard {
+public final class SmartDashboard {
   /**
    * The {@link NetworkTable} used by {@link SmartDashboard}.
    */

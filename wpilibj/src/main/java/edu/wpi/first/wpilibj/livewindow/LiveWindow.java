@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
  * LiveWindow.
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class LiveWindow {
+public final class LiveWindow {
   private static class Component {
     Component(Sendable sendable, Sendable parent) {
       m_sendable = sendable;

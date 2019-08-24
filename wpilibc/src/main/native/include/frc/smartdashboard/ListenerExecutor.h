@@ -19,7 +19,7 @@ namespace frc::detail {
  *
  * @see Sendable
  */
-class ListenerExecutor {
+class ListenerExecutor final {
  public:
   /**
    * Posts a task to the executor to be run synchronously from the main thread.

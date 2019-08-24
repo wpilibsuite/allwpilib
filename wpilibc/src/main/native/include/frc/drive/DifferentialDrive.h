@@ -96,7 +96,7 @@ class SpeedController;
  * RobotDrive#Drive(double, double) with the addition of a quick turn
  * mode. However, it is not designed to give exactly the same response.
  */
-class DifferentialDrive : public RobotDriveBase {
+class DifferentialDrive final : public RobotDriveBase {
  public:
   static constexpr double kDefaultQuickStopThreshold = 0.2;
   static constexpr double kDefaultQuickStopAlpha = 0.1;

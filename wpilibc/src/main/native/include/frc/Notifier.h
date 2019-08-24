@@ -23,7 +23,7 @@
 
 namespace frc {
 
-class Notifier : public ErrorBase {
+class Notifier final : public ErrorBase {
  public:
   /**
    * Create a Notifier for timer event notification.

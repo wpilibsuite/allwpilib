@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-public class Timer {
+public final class Timer {
   /**
    * Return the system clock time in seconds. Return the time from the FPGA hardware clock in
    * seconds since the FPGA started.

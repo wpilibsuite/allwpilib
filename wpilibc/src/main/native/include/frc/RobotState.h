@@ -11,7 +11,7 @@
 
 namespace frc {
 
-class RobotState {
+class RobotState final {
  public:
   RobotState() = delete;
 

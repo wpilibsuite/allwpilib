@@ -16,7 +16,7 @@ package edu.wpi.first.wpilibj.geometry;
  * moving forward increases the X, whereas moving to the left increases the Y.
  */
 @SuppressWarnings({"ParameterName", "MemberName"})
-public class Translation2d {
+public final class Translation2d {
   private final double m_x;
   private final double m_y;
 

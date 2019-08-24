@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>The Solenoid class is typically used for pneumatic solenoids, but could be used for any
  * device within the current spec of the PCM.
  */
-public class Solenoid extends SolenoidBase {
+public final class Solenoid extends SolenoidBase {
   private final int m_channel; // The channel to control.
   private int m_solenoidHandle;
 

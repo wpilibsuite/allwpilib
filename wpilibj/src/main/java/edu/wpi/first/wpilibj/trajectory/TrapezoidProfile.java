@@ -40,7 +40,7 @@ import java.util.Objects;
  * `calculate()` and to determine when the profile has completed via
  * `isFinished()`.
  */
-public class TrapezoidProfile {
+public final class TrapezoidProfile {
   // The direction of the profile, either 1 for forwards or -1 for inverted
   private int m_direction;
 

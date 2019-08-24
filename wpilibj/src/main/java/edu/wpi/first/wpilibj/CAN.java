@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -25,7 +25,7 @@ import edu.wpi.first.hal.HAL;
  * read methods and the byte[] passed into the write methods need to not
  * be modified for the duration of their respective calls.
  */
-public class CAN implements Closeable {
+public final class CAN implements Closeable {
   public static final int kTeamManufacturer = 8;
   public static final int kTeamDeviceType = 10;
 

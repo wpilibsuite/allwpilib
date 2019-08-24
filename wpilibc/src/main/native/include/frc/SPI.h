@@ -28,7 +28,7 @@ class DigitalSource;
  * It probably should not be used directly.
  *
  */
-class SPI : public ErrorBase {
+class SPI final : public ErrorBase {
  public:
   enum Port { kOnboardCS0 = 0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP };
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -31,7 +31,7 @@ struct CANData {
  * All methods are thread save, however the buffer objects passed in
  * by the user need to not be modified for the duration of their calls.
  */
-class CAN : public ErrorBase {
+class CAN final : public ErrorBase {
  public:
   /**
    * Create a new CAN communication interface with the specific device ID.

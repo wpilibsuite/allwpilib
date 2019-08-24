@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -33,7 +33,7 @@ namespace frc {
  * This will also interact with {@link NetworkTable} by creating a table called
  * "Preferences" with all the key-value pairs.
  */
-class Preferences : public ErrorBase {
+class Preferences final : public ErrorBase {
  public:
   /**
    * Get the one and only {@link Preferences} object.

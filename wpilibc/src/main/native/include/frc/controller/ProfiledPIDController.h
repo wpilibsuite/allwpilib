@@ -22,7 +22,7 @@ namespace frc {
  * Implements a PID control loop whose setpoint is constrained by a trapezoid
  * profile.
  */
-class ProfiledPIDController : public SendableBase {
+class ProfiledPIDController final : public SendableBase {
  public:
   /**
    * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and

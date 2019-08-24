@@ -45,7 +45,7 @@ double GetTime();
  * the time when started and subtracts the current time whenever the value is
  * requested.
  */
-class Timer {
+class Timer final {
  public:
   /**
    * Create a new timer object.

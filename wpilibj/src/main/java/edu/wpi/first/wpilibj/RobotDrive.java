@@ -26,7 +26,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  */
 @Deprecated
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
-public class RobotDrive extends MotorSafety implements AutoCloseable {
+public final class RobotDrive extends MotorSafety implements AutoCloseable {
   /**
    * The location of a motor on the robot for the purpose of driving.
    */

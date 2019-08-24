@@ -18,7 +18,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * through the sensor. Many sensors have multiple axis and can be treated as multiple devices. Each
  * is calibrated by finding the center value over a period of time.
  */
-public class AnalogAccelerometer extends SendableBase implements PIDSource {
+public final class AnalogAccelerometer extends SendableBase implements PIDSource {
   private AnalogInput m_analogChannel;
   private double m_voltsPerG = 1.0;
   private double m_zeroGVoltage = 2.5;

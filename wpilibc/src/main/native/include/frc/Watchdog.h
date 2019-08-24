@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,7 +27,7 @@ namespace frc {
  * The watchdog is initialized disabled, so the user needs to call Enable()
  * before use.
  */
-class Watchdog {
+class Watchdog final {
  public:
   /**
    * Watchdog constructor.

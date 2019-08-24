@@ -31,7 +31,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  *
  * @param <V> The type of the values to be stored
  */
-public class SendableChooser<V> extends SendableBase {
+public final class SendableChooser<V> extends SendableBase {
   /**
    * The key for the default value.
    */

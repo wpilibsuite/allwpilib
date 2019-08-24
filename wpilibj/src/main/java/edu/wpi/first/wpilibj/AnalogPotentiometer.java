@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * corresponds to a position. The position is in whichever units you choose, by way of the scaling
  * and offset constants passed to the constructor.
  */
-public class AnalogPotentiometer extends SendableBase implements Potentiometer {
+public final class AnalogPotentiometer extends SendableBase implements Potentiometer {
   private AnalogInput m_analogInput;
   private boolean m_initAnalogInput;
   private double m_fullRange;

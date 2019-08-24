@@ -27,7 +27,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveClassLength",
                    "PMD.ExcessivePublicCount", "PMD.GodClass", "PMD.TooManyFields",
                    "PMD.TooManyMethods"})
-public class DriverStation {
+public final class DriverStation {
   /**
    * Number of Joystick Ports.
    */

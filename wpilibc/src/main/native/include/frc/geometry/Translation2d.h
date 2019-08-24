@@ -21,7 +21,7 @@ namespace frc {
  * When the robot is placed on the origin, facing toward the X direction,
  * moving forward increases the X, whereas moving to the left increases the Y.
  */
-class Translation2d {
+class Translation2d final {
  public:
   /**
    * Constructs a Translation2d with X and Y components equal to zero.

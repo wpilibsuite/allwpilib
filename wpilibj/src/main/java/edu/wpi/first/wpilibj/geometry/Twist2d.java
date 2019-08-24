@@ -15,7 +15,7 @@ package edu.wpi.first.wpilibj.geometry;
  * <p>A Twist can be used to represent a difference between two poses.
  */
 @SuppressWarnings("MemberName")
-public class Twist2d {
+public final class Twist2d {
   /**
    * Linear "dx" component.
    */

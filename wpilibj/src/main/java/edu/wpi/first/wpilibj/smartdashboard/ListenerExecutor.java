@@ -15,7 +15,7 @@ import java.util.concurrent.Executor;
  * An executor for running listener tasks posted by {@link edu.wpi.first.wpilibj.Sendable} listeners
  * synchronously from the main application thread.
  */
-class ListenerExecutor implements Executor {
+final class ListenerExecutor implements Executor {
   private final Collection<Runnable> m_tasks = new ArrayList<>();
   private final Object m_lock = new Object();
 

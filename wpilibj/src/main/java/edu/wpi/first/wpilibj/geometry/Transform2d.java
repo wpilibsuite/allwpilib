@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.geometry;
 /**
  * Represents a transformation for a Pose2d.
  */
-public class Transform2d {
+public final class Transform2d {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
 

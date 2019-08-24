@@ -16,7 +16,7 @@ class Pose2d;
 /**
  * Represents a transformation for a Pose2d.
  */
-class Transform2d {
+class Transform2d final {
  public:
   /**
    * Constructs the transform that maps the initial pose to the final pose.

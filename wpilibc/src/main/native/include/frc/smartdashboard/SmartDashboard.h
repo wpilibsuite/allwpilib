@@ -21,7 +21,7 @@ namespace frc {
 
 class Sendable;
 
-class SmartDashboard : public ErrorBase, public SendableBase {
+class SmartDashboard final : public ErrorBase, public SendableBase {
  public:
   static void init();
 
