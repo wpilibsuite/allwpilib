@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.trajectory.constraints;
+package edu.wpi.first.wpilibj.trajectory.constraint;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 

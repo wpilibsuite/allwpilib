@@ -9,7 +9,7 @@
 
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "frc/trajectory/constraints/TrajectoryConstraint.h"
+#include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.spline.PoseWithCurvature;
 import edu.wpi.first.wpilibj.spline.Spline;
 import edu.wpi.first.wpilibj.spline.SplineHelper;
-import edu.wpi.first.wpilibj.trajectory.constraints.TrajectoryConstraint;
+import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
 
 public class TrajectoryGenerator {
   public static Trajectory generateTrajectory(
