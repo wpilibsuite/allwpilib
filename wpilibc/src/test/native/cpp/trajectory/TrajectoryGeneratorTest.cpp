@@ -9,39 +9,11 @@
 
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
+#include "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
-
-class CentripetalAccelerationConstraint : public TrajectoryConstraint {
- public:
-  explicit CentripetalAccelerationConstraint(
-      units::meters_per_second_squared_t maxCentripetalAcceleration)
-      : m_maxCentripetalAcceleration(maxCentripetalAcceleration) {}
-
-  units::meters_per_second_t MaxVelocity(const Pose2d& pose,
-                                         curvature_t curvature) override {
-    // a_c = v^2 / r
-    // v^2 = a_c * r
-    // v^2 = a_c / curvature (1 / r = curvature)
-    // v = std::sqrt(a_c / curvature)
-
-    curvature_t absCurvature = units::math::abs(curvature);
-
-    // We need to multiply by 1 meter here because curvature has units of 1/m.
-    return units::math::sqrt(m_maxCentripetalAcceleration / absCurvature *
-                             1_rad);
-  }
-
-  struct MinMax MinMaxAcceleration(const Pose2d& pose, curvature_t curvature,
-                                   units::meters_per_second_t speed) override {
-    return MinMax();
-  }
-
- private:
-  units::meters_per_second_squared_t m_maxCentripetalAcceleration;
-};
 
 TEST(TrajectoryGenerationTest, ObeysConstraints) {
   units::meters_per_second_t startVelocity = 0_mps, endVelocity = 0_mps;

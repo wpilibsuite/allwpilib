@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.trajectory.constraint.CentripetalAccelerationConstraint;
 import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -85,32 +86,6 @@ class TrajectoryGeneratorTest {
 //      System.out.println(point.curvatureRadPerMeter);
       System.out.println(pose.getTranslation().getX() + ", " + pose.getTranslation().getY());
       t += dt;
-    }
-  }
-
-  private static class CentripetalAccelerationConstraint implements TrajectoryConstraint {
-    private double m_maxCentripetalAcceleration;
-
-    public CentripetalAccelerationConstraint(double maxCentripetalAcceleration) {
-      m_maxCentripetalAcceleration = maxCentripetalAcceleration;
-    }
-
-    @Override
-    public double getMaxVelocityMetersPerSecond(Pose2d pose, double curvatureRadPerMeter) {
-      // a_c = v^2 / r
-      // v^2 = a_c * r
-      // v^2 = a_c / curvature (1 / r = curvature)
-      // v = std::sqrt(a_c / curvature)
-      var absCurvature = Math.abs(curvatureRadPerMeter);
-
-      return Math.sqrt(m_maxCentripetalAcceleration / absCurvature);
-    }
-
-    @Override
-    public MinMax getMinMaxAccelerationMetersPerSecondSq(Pose2d pose,
-                                                         double curvatureRadPerMeter,
-                                                         double velocityMetersPerSecond) {
-      return new MinMax();
     }
   }
 }
