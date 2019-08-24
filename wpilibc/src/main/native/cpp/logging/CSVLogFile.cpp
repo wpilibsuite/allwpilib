@@ -13,12 +13,15 @@
 using namespace frc;
 
 CSVLogFile::CSVLogFile(std::string filePrefix)
-    : LogFile(filePrefix, "csv"), m_cells(), m_timestampCell("Timestamp (ms)") {
+    : LogFile(filePrefix, "csv"),
+      m_cells(),
+      m_timestampCell("Timestamp (ms)"),
+      m_active(false) {
   RegisterCell(m_timestampCell);
 }
 
 void CSVLogFile::RegisterCell(CSVLogCell& cell) {
-  if (IsActive()) {
+  if (m_active) {
     std::cout << "You can't add a new cell when the spreadsheet is active: "
               << cell.GetName() << std::endl;
   } else {
@@ -27,16 +30,21 @@ void CSVLogFile::RegisterCell(CSVLogCell& cell) {
 }
 
 void CSVLogFile::Start() {
-  LogFile::Start();
+  if (m_active) {
+    std::cout << "This table has already been initialized" << std::endl;
+    return;
+  }
 
   for (size_t i = 0; i < m_cells.size(); i++) {
     Log("\"" + m_cells[i]->GetName() + "\",");
   }
   Log("\n");
+
+  m_active = true;
 }
 
 void CSVLogFile::Periodic() {
-  if (IsActive()) {
+  if (m_active) {
     std::chrono::milliseconds timestamp =
         std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch());

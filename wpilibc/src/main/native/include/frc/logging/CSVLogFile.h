@@ -40,14 +40,14 @@ class CSVLogFile : public LogFile {
    * in CSVLogCell.GetContent().
    *
    * A CSVLogCell can only be registered if the spreadsheet is inactive:
-   * see Start() and Stop() to activate or inactivate it.
+   * see Start() to activate it.
    *
    * @param cell The CSVLogCell to register.
    */
   void RegisterCell(CSVLogCell& cell);
 
   /**
-   * Start the CSVLogFile: open a new file and write the column headers.
+   * Write the column headers.
    *
    * It causes the CSVLogFile to be "active".
    */
@@ -58,6 +58,13 @@ class CSVLogFile : public LogFile {
    */
   void Periodic();
 
+  /**
+   * Return true if the LogFile is active.
+   *
+   * @return true if the LogFile is active.
+   */
+  bool IsActive();
+
  private:
   /**
    * Write a row of the file.
@@ -66,6 +73,7 @@ class CSVLogFile : public LogFile {
 
   std::vector<CSVLogCell*> m_cells;
   CSVLogCell m_timestampCell;
+  bool m_active;
 };
 
 }  // namespace frc

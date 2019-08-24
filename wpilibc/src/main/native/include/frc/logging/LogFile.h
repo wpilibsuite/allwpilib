@@ -33,32 +33,11 @@ class LogFile {
   virtual ~LogFile();
 
   /**
-   * Open a new file.
-   *
-   * It causes the LogFile to be "active".
-   */
-  void Start();
-
-  /**
-   * Close the file.
-   *
-   * It causes the LogFile to be "inactive".
-   */
-  void Stop();
-
-  /**
    * Write text in the logFile.
    *
    * @param text The text to be logged in the file.
    */
   void Log(std::string text);
-
-  /**
-   * Return true if the LogFile is active.
-   *
-   * @return true if the LogFile is active.
-   */
-  bool IsActive();
 
  private:
   /**
@@ -79,7 +58,6 @@ class LogFile {
   std::string m_fileExtension;
   std::ofstream m_file;
   std::time_t m_time;
-  bool m_active;
 };
 
 }  // namespace frc

@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,7 +24,6 @@ public class LogFile {
   private final String m_fileExtension;
   private OutputStream m_file;
   private Date m_time;
-  private boolean m_active;
 
   /**
    * Instantiate a LogFile passing in its prefix and its extension.
@@ -40,7 +38,6 @@ public class LogFile {
   public LogFile(String filePrefix, String fileExtension) {
     m_filePrefix = filePrefix;
     m_fileExtension = fileExtension;
-    m_active = false;
   }
 
   /**
@@ -64,39 +61,6 @@ public class LogFile {
   }
 
   /**
-   * Open a new file.
-   *
-   * <p>It causes the LogFile to be "active".
-   */
-  public void start() {
-    if (m_active) {
-      System.out.println("This table has already been initialized");
-      return;
-    }
-
-    m_time = new Date(0);
-    String fileName = createFilename(m_time);
-    try {
-      m_file = Files.newOutputStream(Paths.get(fileName));
-    } catch (IOException ex) {
-      System.out.println(ex.getMessage());
-    }
-
-    m_active = true;
-  }
-
-  /**
-   * Close the file.
-   *
-   * <p>It causes the LogFile to be "inactive".
-   */
-  public void stop() {
-    if (m_active) {
-      m_active = false;
-    }
-  }
-
-  /**
    * Write text in the logFile.
    *
    * @param text The text to be logged in the file.
@@ -108,15 +72,6 @@ public class LogFile {
       System.out.println(ex.getMessage());
     }
     updateFilename();
-  }
-
-  /**
-   * Return true if the LogFile is active.
-   *
-   * @return true if the LogFile is active.
-   */
-  public boolean isActive() {
-    return m_active;
   }
 
   /**

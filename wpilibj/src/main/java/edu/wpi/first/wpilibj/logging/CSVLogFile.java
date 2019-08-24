@@ -20,6 +20,7 @@ import java.util.List;
 public class CSVLogFile extends LogFile {
   private final List<CSVLogCell> m_cells;
   private final CSVLogCell m_timestampCell;
+  private boolean m_active;
 
   /**
    * Instantiate a LogFile passing in its prefix and its extension.
@@ -34,6 +35,7 @@ public class CSVLogFile extends LogFile {
     super(filePrefix, "csv");
     m_cells = new ArrayList<CSVLogCell>();
     m_timestampCell = new CSVLogCell("Timestamp (ms)");
+    m_active = false;
     registerCell(m_timestampCell);
   }
 
@@ -49,12 +51,12 @@ public class CSVLogFile extends LogFile {
    * in {@link CSVLogCell#getContent()}.
    *
    * <p>A CSVLogCell can only be registered if the spreadsheet is inactive:
-   * see {@link #start()} and {@link #stop()} to activate or inactivate it.
+   * see {@link #start()} to activate it.
    *
    * @param cell The CSVLogCell to register.
    */
   public void registerCell(CSVLogCell cell) {
-    if (isActive()) {
+    if (m_active) {
       System.out.println("You can't add a new cell when the spreadsheet is active: "
           + cell.getName());
     } else {
@@ -63,28 +65,41 @@ public class CSVLogFile extends LogFile {
   }
 
   /**
-   * Start the CSVLogFile: open a new file and write the column headers.
+   * Write the column headers.
    *
    * <p>It causes the CSVLogFile to be "active".
    */
-  @Override
   public void start() {
-    super.start();
+    if (m_active) {
+      System.out.println("This table has already been initialized");
+      return;
+    }
 
     for (CSVLogCell cell : m_cells) {
       log("\"" + cell.getName() + "\",");
     }
     log("\n");
+
+    m_active = false;
   }
 
   /**
    * Call it regularly. If the CSVLogFile is active, write a row of the file.
    */
   public void periodic() {
-    if (isActive()) {
+    if (m_active) {
       m_timestampCell.log(System.currentTimeMillis());
       writeRow();
     }
+  }
+
+  /**
+   * Return true if the LogFile is active.
+   *
+   * @return true if the LogFile is active.
+   */
+  public boolean isActive() {
+    return m_active;
   }
 
   /**
