@@ -13,7 +13,7 @@
 #include <set>
 #include <vector>
 
-#include "SendableCommandBase.h"
+#include "CommandBase.h"
 
 namespace frc2 {
 
@@ -22,7 +22,7 @@ namespace frc2 {
  * allocated to groups to ensure those commands are not also used independently,
  * which can result in inconsistent command state and unpredictable execution.
  */
-class CommandGroupBase : public SendableCommandBase {
+class CommandGroupBase : public CommandBase {
  public:
   /**
    * Requires that the specified command not have been already allocated to a

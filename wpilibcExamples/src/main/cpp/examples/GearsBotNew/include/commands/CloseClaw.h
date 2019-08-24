@@ -8,7 +8,7 @@
 #pragma once
 
 #include <frc2/command/CommandHelper.h>
-#include <frc2/command/SendableCommandBase.h>
+#include <frc2/command/CommandBase.h>
 
 #include "subsystems/Claw.h"
 
@@ -17,7 +17,7 @@
  * motors is BAD!
  */
 class CloseClaw
-    : public frc2::CommandHelper<frc2::SendableCommandBase, CloseClaw> {
+    : public frc2::CommandHelper<frc2::CommandBase, CloseClaw> {
  public:
   explicit CloseClaw(Claw* claw);
   void Initialize() override;

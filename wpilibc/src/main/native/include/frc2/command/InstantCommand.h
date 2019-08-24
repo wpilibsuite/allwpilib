@@ -8,7 +8,7 @@
 #pragma once
 
 #include "CommandHelper.h"
-#include "SendableCommandBase.h"
+#include "CommandBase.h"
 
 namespace frc2 {
 /**
@@ -17,7 +17,7 @@ namespace frc2 {
  * a set of requirements, or else subclass this command if desired.
  */
 class InstantCommand
-    : public CommandHelper<SendableCommandBase, InstantCommand> {
+    : public CommandHelper<CommandBase, InstantCommand> {
  public:
   /**
    * Creates a new InstantCommand that runs the given Runnable with the given

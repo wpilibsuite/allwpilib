@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "SendableCommandBase.h"
+#include "CommandBase.h"
 #include "frc/Timer.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -17,7 +17,7 @@ namespace frc2 {
  * condition.  Useful for CommandGroups.
  */
 class WaitUntilCommand
-    : public CommandHelper<SendableCommandBase, WaitUntilCommand> {
+    : public CommandHelper<CommandBase, WaitUntilCommand> {
  public:
   /**
    * Creates a new WaitUntilCommand that ends after a given condition becomes

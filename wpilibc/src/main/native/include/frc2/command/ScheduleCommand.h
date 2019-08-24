@@ -10,7 +10,7 @@
 #include <wpi/SmallVector.h>
 
 #include "CommandHelper.h"
-#include "SendableCommandBase.h"
+#include "CommandBase.h"
 #include "SetUtilities.h"
 
 namespace frc2 {
@@ -21,7 +21,7 @@ namespace frc2 {
  * treat this command as finishing instantly.
  */
 class ScheduleCommand
-    : public CommandHelper<SendableCommandBase, ScheduleCommand> {
+    : public CommandHelper<CommandBase, ScheduleCommand> {
  public:
   /**
    * Creates a new ScheduleCommand that schedules the given commands when

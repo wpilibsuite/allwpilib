@@ -20,11 +20,11 @@ namespace frc2 {
 /**
  * A Sendable base class for Commands.
  */
-class SendableCommandBase : public frc::Sendable, public Command {
+class CommandBase : public frc::Sendable, public Command {
  public:
-  SendableCommandBase(SendableCommandBase&& other) = default;
+  CommandBase(CommandBase&& other) = default;
 
-  SendableCommandBase(const SendableCommandBase& other);
+  CommandBase(const CommandBase& other);
 
   /**
    * Adds the specified requirements to the command.
@@ -48,7 +48,7 @@ class SendableCommandBase : public frc::Sendable, public Command {
   void InitSendable(frc::SendableBuilder& builder) override;
 
  protected:
-  SendableCommandBase();
+  CommandBase();
   std::string m_name;
   std::string m_subsystem;
   wpi::SmallSet<Subsystem*, 4> m_requirements;

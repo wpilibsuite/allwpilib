@@ -8,7 +8,7 @@
 #pragma once
 
 #include "CommandHelper.h"
-#include "SendableCommandBase.h"
+#include "CommandBase.h"
 
 namespace frc2 {
 /**
@@ -17,7 +17,7 @@ namespace frc2 {
  * Command.InterruptOn() to give it one.  If you only wish
  * to execute a Runnable once, use InstantCommand.
  */
-class RunCommand : public CommandHelper<SendableCommandBase, RunCommand> {
+class RunCommand : public CommandHelper<CommandBase, RunCommand> {
  public:
   /**
    * Creates a new RunCommand.  The Runnable will be run continuously until the

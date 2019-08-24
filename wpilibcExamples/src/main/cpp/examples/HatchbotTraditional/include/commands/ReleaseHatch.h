@@ -8,7 +8,7 @@
 #pragma once
 
 #include <frc2/command/CommandHelper.h>
-#include <frc2/command/SendableCommandBase.h>
+#include <frc2/command/CommandBase.h>
 
 #include "subsystems/HatchSubsystem.h"
 
@@ -20,7 +20,7 @@
  * @see InstantCommand
  */
 class ReleaseHatch
-    : public frc2::CommandHelper<frc2::SendableCommandBase, ReleaseHatch> {
+    : public frc2::CommandHelper<frc2::CommandBase, ReleaseHatch> {
  public:
   explicit ReleaseHatch(HatchSubsystem* subsystem);
 

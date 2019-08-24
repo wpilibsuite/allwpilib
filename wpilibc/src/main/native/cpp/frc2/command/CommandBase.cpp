@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc2/command/SendableCommandBase.h"
+#include "frc2/command/CommandBase.h"
 
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <frc2/command/CommandScheduler.h>
@@ -13,45 +13,45 @@
 
 using namespace frc2;
 
-SendableCommandBase::SendableCommandBase() {
+CommandBase::CommandBase() {
   m_name = Command::GetName();
   m_subsystem = "Unknown";
 }
 
-SendableCommandBase::SendableCommandBase(const SendableCommandBase& other)
+CommandBase::CommandBase(const CommandBase& other)
     : Sendable{}, Command{} {
   m_name = other.m_name;
   m_subsystem = other.m_subsystem;
   m_requirements = other.m_requirements;
 }
 
-void SendableCommandBase::AddRequirements(
+void CommandBase::AddRequirements(
     std::initializer_list<Subsystem*> requirements) {
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
-void SendableCommandBase::AddRequirements(
+void CommandBase::AddRequirements(
     wpi::SmallSet<Subsystem*, 4> requirements) {
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
-wpi::SmallSet<Subsystem*, 4> SendableCommandBase::GetRequirements() const {
+wpi::SmallSet<Subsystem*, 4> CommandBase::GetRequirements() const {
   return m_requirements;
 }
 
-void SendableCommandBase::SetName(const wpi::Twine& name) {
+void CommandBase::SetName(const wpi::Twine& name) {
   m_name = name.str();
 }
 
-std::string SendableCommandBase::GetName() const { return m_name; }
+std::string CommandBase::GetName() const { return m_name; }
 
-std::string SendableCommandBase::GetSubsystem() const { return m_subsystem; }
+std::string CommandBase::GetSubsystem() const { return m_subsystem; }
 
-void SendableCommandBase::SetSubsystem(const wpi::Twine& subsystem) {
+void CommandBase::SetSubsystem(const wpi::Twine& subsystem) {
   m_subsystem = subsystem.str();
 }
 
-void SendableCommandBase::InitSendable(frc::SendableBuilder& builder) {
+void CommandBase::InitSendable(frc::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
   builder.AddStringProperty(".name", [this] { return GetName(); }, nullptr);
   builder.AddBooleanProperty("running", [this] { return IsScheduled(); },

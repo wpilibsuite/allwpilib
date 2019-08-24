@@ -8,12 +8,12 @@
 #pragma once
 
 #include <frc2/command/CommandHelper.h>
-#include <frc2/command/SendableCommandBase.h>
+#include <frc2/command/CommandBase.h>
 
 #include "subsystems/DriveSubsystem.h"
 
 class DriveDistance
-    : public frc2::CommandHelper<frc2::SendableCommandBase, DriveDistance> {
+    : public frc2::CommandHelper<frc2::CommandBase, DriveDistance> {
  public:
   /**
    * Creates a new DriveDistance.

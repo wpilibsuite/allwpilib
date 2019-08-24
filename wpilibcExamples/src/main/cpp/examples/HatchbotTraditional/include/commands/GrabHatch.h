@@ -8,7 +8,7 @@
 #pragma once
 
 #include <frc2/command/CommandHelper.h>
-#include <frc2/command/SendableCommandBase.h>
+#include <frc2/command/CommandBase.h>
 
 #include "subsystems/HatchSubsystem.h"
 
@@ -20,7 +20,7 @@
  * @see InstantCommand
  */
 class GrabHatch
-    : public frc2::CommandHelper<frc2::SendableCommandBase, GrabHatch> {
+    : public frc2::CommandHelper<frc2::CommandBase, GrabHatch> {
  public:
   explicit GrabHatch(HatchSubsystem* subsystem);
 

@@ -8,7 +8,7 @@
 #pragma once
 
 #include "CommandHelper.h"
-#include "SendableCommandBase.h"
+#include "CommandBase.h"
 
 namespace frc2 {
 /**
@@ -19,7 +19,7 @@ namespace frc2 {
  * one.
  */
 class StartEndCommand
-    : public CommandHelper<SendableCommandBase, StartEndCommand> {
+    : public CommandHelper<CommandBase, StartEndCommand> {
  public:
   /**
    * Creates a new StartEndCommand.  Will run the given runnables when the

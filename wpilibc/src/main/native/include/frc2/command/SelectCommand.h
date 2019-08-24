@@ -14,7 +14,7 @@
 
 #include "CommandGroupBase.h"
 #include "PrintCommand.h"
-#include "SendableCommandBase.h"
+#include "CommandBase.h"
 
 namespace frc2 {
 template <typename Key>
@@ -35,7 +35,7 @@ template <typename Key>
  * component commands.
  */
 class SelectCommand
-    : public CommandHelper<SendableCommandBase, SelectCommand<Key>> {
+    : public CommandHelper<CommandBase, SelectCommand<Key>> {
  public:
   /**
    * Creates a new selectcommand.

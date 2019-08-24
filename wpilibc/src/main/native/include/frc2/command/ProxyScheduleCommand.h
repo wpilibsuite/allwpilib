@@ -10,7 +10,7 @@
 #include <wpi/SmallVector.h>
 
 #include "CommandHelper.h"
-#include "SendableCommandBase.h"
+#include "CommandBase.h"
 #include "SetUtilities.h"
 
 namespace frc2 {
@@ -21,7 +21,7 @@ namespace frc2 {
  * commands.
  */
 class ProxyScheduleCommand
-    : public CommandHelper<SendableCommandBase, ProxyScheduleCommand> {
+    : public CommandHelper<CommandBase, ProxyScheduleCommand> {
  public:
   /**
    * Creates a new ProxyScheduleCommand that schedules the given commands when

@@ -9,7 +9,7 @@
 
 #include "frc/controller/PIDController.h"
 #include "frc2/command/CommandHelper.h"
-#include "frc2/command/SendableCommandBase.h"
+#include "frc2/command/CommandBase.h"
 
 namespace frc2 {
 /**
@@ -20,7 +20,7 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class PIDCommand : public CommandHelper<SendableCommandBase, PIDCommand> {
+class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
  public:
   /**
    * Creates a new PIDCommand, which controls the given output with a

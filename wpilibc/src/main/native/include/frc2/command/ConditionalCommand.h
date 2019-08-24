@@ -13,7 +13,7 @@
 
 #include "CommandGroupBase.h"
 #include "CommandHelper.h"
-#include "SendableCommandBase.h"
+#include "CommandBase.h"
 
 namespace frc2 {
 /**
@@ -35,7 +35,7 @@ namespace frc2 {
  * @see ScheduleCommand
  */
 class ConditionalCommand
-    : public CommandHelper<SendableCommandBase, ConditionalCommand> {
+    : public CommandHelper<CommandBase, ConditionalCommand> {
  public:
   /**
    * Creates a new ConditionalCommand.

@@ -12,7 +12,7 @@
 
 #include "CommandGroupBase.h"
 #include "CommandHelper.h"
-#include "SendableCommandBase.h"
+#include "CommandBase.h"
 
 namespace frc2 {
 /**
@@ -26,7 +26,7 @@ namespace frc2 {
  * component commands.
  */
 class PerpetualCommand
-    : public CommandHelper<SendableCommandBase, PerpetualCommand> {
+    : public CommandHelper<CommandBase, PerpetualCommand> {
  public:
   /**
    * Creates a new PerpetualCommand.  Will run another command in perpetuity,

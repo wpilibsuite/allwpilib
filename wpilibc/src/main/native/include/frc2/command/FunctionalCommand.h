@@ -8,7 +8,7 @@
 #pragma once
 
 #include "CommandHelper.h"
-#include "SendableCommandBase.h"
+#include "CommandBase.h"
 
 namespace frc2 {
 /**
@@ -19,7 +19,7 @@ namespace frc2 {
  * to inline it.
  */
 class FunctionalCommand
-    : public CommandHelper<SendableCommandBase, FunctionalCommand> {
+    : public CommandHelper<CommandBase, FunctionalCommand> {
  public:
   /**
    * Creates a new FunctionalCommand.

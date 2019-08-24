@@ -10,7 +10,7 @@
 #include <frc/Notifier.h>
 
 #include "CommandHelper.h"
-#include "SendableCommandBase.h"
+#include "CommandBase.h"
 
 namespace frc2 {
 /**
@@ -24,7 +24,7 @@ namespace frc2 {
  * means, that is a good sign that you should not use this class.
  */
 class NotifierCommand
-    : public CommandHelper<SendableCommandBase, NotifierCommand> {
+    : public CommandHelper<CommandBase, NotifierCommand> {
  public:
   /**
    * Creates a new NotifierCommand.

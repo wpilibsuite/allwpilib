@@ -12,7 +12,7 @@
 #include <wpi/Twine.h>
 
 #include "CommandHelper.h"
-#include "SendableCommandBase.h"
+#include "CommandBase.h"
 #include "frc/Timer.h"
 
 namespace frc2 {
@@ -21,7 +21,7 @@ namespace frc2 {
  * Useful for CommandGroups.  Can also be subclassed to make a command with an
  * internal timer.
  */
-class WaitCommand : public CommandHelper<SendableCommandBase, WaitCommand> {
+class WaitCommand : public CommandHelper<CommandBase, WaitCommand> {
  public:
   /**
    * Creates a new WaitCommand.  This command will do nothing, and end after the
