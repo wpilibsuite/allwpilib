@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <vector>
 
 #include <units/units.h>
 
@@ -19,15 +20,24 @@
 using namespace frc;
 
 namespace frc {
-class QuinticHermiteSplineTest : public ::testing::Test {
+class CubicHermiteSplineTest : public ::testing::Test {
  protected:
-  static void Run(const Pose2d& a, const Pose2d& b) {
+  static void Run(const Pose2d& a, const std::vector<Translation2d>& waypoints,
+                  const Pose2d& b) {
     // Start the timer.
     const auto start = std::chrono::high_resolution_clock::now();
 
     // Generate and parameterize the spline.
-    const auto spline = SplineHelper::QuinticSplinesFromWaypoints({a, b})[0];
-    const auto poses = spline.Parameterize();
+    const auto splines =
+        SplineHelper::CubicSplinesFromWaypoints(a, waypoints, b);
+    std::vector<Spline<3>::PoseWithCurvature> poses;
+
+    poses.push_back(splines[0].GetPoint(0.0));
+
+    for (auto&& spline : splines) {
+      auto x = spline.Parameterize();
+      poses.insert(std::end(poses), std::begin(x) + 1, std::end(x));
+    }
 
     // End timer.
     const auto finish = std::chrono::high_resolution_clock::now();
@@ -43,11 +53,11 @@ class QuinticHermiteSplineTest : public ::testing::Test {
       // Make sure the twist is under the tolerance defined by the Spline class.
       auto twist = p0.first.Log(p1.first);
       EXPECT_LT(std::abs(twist.dx.to<double>()),
-                Spline<5>::kMaxDx.to<double>());
+                Spline<3>::kMaxDx.to<double>());
       EXPECT_LT(std::abs(twist.dy.to<double>()),
-                Spline<5>::kMaxDy.to<double>());
+                Spline<3>::kMaxDy.to<double>());
       EXPECT_LT(std::abs(twist.dtheta.to<double>()),
-                Spline<5>::kMaxDtheta.to<double>());
+                Spline<3>::kMaxDtheta.to<double>());
     }
 
     // Check first point.
@@ -69,15 +79,14 @@ class QuinticHermiteSplineTest : public ::testing::Test {
 };
 }  // namespace frc
 
-TEST_F(QuinticHermiteSplineTest, StraightLine) {
-  Run(Pose2d(), Pose2d(3_m, 0_m, Rotation2d()));
+TEST_F(CubicHermiteSplineTest, StraightLine) {
+  Run(Pose2d(), std::vector<Translation2d>(), Pose2d(3_m, 0_m, Rotation2d()));
 }
 
-TEST_F(QuinticHermiteSplineTest, SimpleSCurve) {
-  Run(Pose2d(), Pose2d(1_m, 1_m, Rotation2d()));
-}
-
-TEST_F(QuinticHermiteSplineTest, SquigglyCurve) {
-  Run(Pose2d(0_m, 0_m, Rotation2d(90_deg)),
-      Pose2d(-1_m, 0_m, Rotation2d(90_deg)));
+TEST_F(CubicHermiteSplineTest, SCurve) {
+  Pose2d start{0_m, 0_m, Rotation2d(90_deg)};
+  std::vector<Translation2d> waypoints{Translation2d(1_m, 1_m),
+                                       Translation2d(2_m, -1_m)};
+  Pose2d end{3_m, 0_m, Rotation2d{90_deg}};
+  Run(start, waypoints, end);
 }

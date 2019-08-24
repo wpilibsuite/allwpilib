@@ -55,6 +55,11 @@ public abstract class Spline {
    */
   public List<PoseWithCurvature> parameterize(double t0, double t1) {
     var arr = new ArrayList<PoseWithCurvature>();
+
+    // The parameterization does not add the first initial point. Let's add
+    // that.
+    arr.add(getPoint(t0));
+
     getSegmentArc(arr, t0, t1);
     return arr;
   }

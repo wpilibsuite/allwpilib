@@ -52,6 +52,11 @@ class Spline {
   std::vector<PoseWithCurvature> Parameterize(double t0 = 0.0,
                                               double t1 = 1.0) const {
     std::vector<PoseWithCurvature> arr;
+
+    // The parameterization does not add the first initial point. Let's add
+    // that.
+    arr.push_back(GetPoint(t0));
+
     GetSegmentArc(&arr, t0, t1);
     return arr;
   }

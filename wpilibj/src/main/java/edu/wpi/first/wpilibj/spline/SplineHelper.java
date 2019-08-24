@@ -113,8 +113,6 @@ public class SplineHelper {
       newFy[newFy.length - 1] = yFinalControlVector[1];
 
       for (int i = 0; i < newFx.length - 1; i++) {
-        System.out.println("FX: " + newFx[i] + " " + newFx[i + 1]);
-        System.out.println("FY: " + newFy[i] + " " + newFy[i + 1]);
         splines[i] = new CubicHermiteSpline(
             new double[]{newWaypts[i].getX(), newFx[i]},
             new double[]{newWaypts[i + 1].getX(), newFx[i + 1]},
@@ -205,14 +203,12 @@ public class SplineHelper {
     // Create the c_star and d_star coefficients in the forward sweep
     for (int i = 1; i < N; i++) {
       double m = 1.0 / (b[i] - a[i] * cStar[i - 1]);
-      System.out.println("IN FOR: " + a[i] + " " + b[i] + " " + c[i]);
       cStar[i] = c[i] * m;
       dStar[i] = (d[i] - a[i] * dStar[i - 1]) * m;
     }
     solutionVector[N - 1] = dStar[N - 1];
     // This is the reverse sweep, used to update the solution vector f
     for (int i = N - 2; i >= 0; i--) {
-      System.out.println("IN FOR 2: " + dStar[i] + " " + d[i + 1] + " " + cStar[i]);
       solutionVector[i] = dStar[i] - cStar[i] * solutionVector[i + 1];
     }
   }

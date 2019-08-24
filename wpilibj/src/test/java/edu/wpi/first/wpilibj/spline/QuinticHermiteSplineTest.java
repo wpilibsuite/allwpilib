@@ -12,53 +12,74 @@ import org.junit.jupiter.api.Test;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 class QuinticHermiteSplineTest {
-  private double run(Pose2d a, Pose2d b) {
+  private static final double kMaxDx = 0.127;
+  private static final double kMaxDy = 0.00127;
+  private static final double kMaxDtheta = 0.0872;
+
+  private void run(Pose2d a, Pose2d b) {
+    // Start the timer.
     var start = System.nanoTime();
+
+    // Generate and parameterize the spline.
     var spline = SplineHelper.getQuinticSplinesFromWaypoints(new Pose2d[]{a, b})[0];
-    spline.parameterize();
+    var poses = spline.parameterize();
+
+    // End the timer.
     var end = System.nanoTime();
 
-    return (end - start) / 1000.0;
+    // Calculate the duration (used when benchmarking)
+    var durationMicroseconds = (end - start) / 1000.0;
+
+    for (int i = 0; i < poses.size() - 1; i++) {
+      var p0 = poses.get(i);
+      var p1 = poses.get(i + 1);
+
+      // Make sure the twist is under the tolerance defined by the Spline class.
+      var twist = p0.pose.log(p1.pose);
+      assertAll(
+          () -> assertTrue(Math.abs(twist.dx) < kMaxDx),
+          () -> assertTrue(Math.abs(twist.dy) < kMaxDy),
+          () -> assertTrue(Math.abs(twist.dtheta) < kMaxDtheta)
+      );
+    }
+
+    // Check first point
+    assertAll(
+        () -> assertEquals(a.getTranslation().getX(),
+            poses.get(0).pose.getTranslation().getX(), 1E-9),
+        () -> assertEquals(a.getTranslation().getY(),
+            poses.get(0).pose.getTranslation().getY(), 1E-9),
+        () -> assertEquals(a.getRotation().getRadians(),
+            poses.get(0).pose.getRotation().getRadians(), 1E-9)
+    );
+
+    // Check last point
+    assertAll(
+        () -> assertEquals(b.getTranslation().getX(),
+            poses.get(poses.size() - 1).pose.getTranslation().getX(), 1E-9),
+        () -> assertEquals(b.getTranslation().getY(),
+            poses.get(poses.size() - 1).pose.getTranslation().getY(), 1E-9),
+        () -> assertEquals(b.getRotation().getRadians(),
+            poses.get(poses.size() - 1).pose.getRotation().getRadians(), 1E-9)
+    );
   }
 
   @Test
   void testStraightLine() {
-    double time = 0.0;
-    for (int i = 0; i < 100; i++) {
-      time += run(new Pose2d(), new Pose2d(3, 0, new Rotation2d()));
-    }
-    System.out.println("Average Time: " + time / 100.0);
+    run(new Pose2d(), new Pose2d(3, 0, new Rotation2d()));
   }
 
   @Test
   void testSimpleSCurve() {
-    double time = 0.0;
-    for (int i = 0; i < 100; i++) {
-      time += run(new Pose2d(), new Pose2d(1, 1, new Rotation2d()));
-    }
-    System.out.println("Average Time: " + time / 100.0);
+    run(new Pose2d(), new Pose2d(1, 1, new Rotation2d()));
   }
 
   @Test
   void testSquiggly() {
-    double time = 0.0;
-    for (int i = 0; i < 100; i++) {
-      time += run(new Pose2d(0, 0, Rotation2d.fromDegrees(90)),
-          new Pose2d(-1, 0, Rotation2d.fromDegrees(90)));
-    }
-    System.out.println("Average Time: " + time / 100.0);
-  }
-
-  @Test
-  void printOutSquiggly() {
-    var a = new Pose2d(0, 0, Rotation2d.fromDegrees(90.0));
-    var b = new Pose2d(-1, 0, Rotation2d.fromDegrees(90.0));
-    var spline = SplineHelper.getQuinticSplinesFromWaypoints(new Pose2d[]{a, b})[0];
-    var points = spline.parameterize();
-    for (var point : points) {
-      System.out.println(point.pose.getTranslation().getX() + ", "
-          + point.pose.getTranslation().getY());
-    }
+    run(new Pose2d(0, 0, Rotation2d.fromDegrees(90)),
+        new Pose2d(-1, 0, Rotation2d.fromDegrees(90)));
   }
 }
