@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.PWMConfigDataResult;
 import edu.wpi.first.hal.PWMJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Class implements the PWM generation in the FPGA.
@@ -47,16 +48,12 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
   private final int m_channel;
   private int m_handle;
 
-  private final SendableImpl m_sendableImpl;
-
   /**
    * Allocate a PWM given a channel.
    *
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
    */
   public PWM(final int channel) {
-    m_sendableImpl = new SendableImpl(true);
-
     SensorUtil.checkPWMChannel(channel);
     m_channel = channel;
 
@@ -67,7 +64,7 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
     PWMJNI.setPWMEliminateDeadband(m_handle, false);
 
     HAL.report(tResourceType.kResourceType_PWM, channel);
-    setName("PWM", channel);
+    SendableRegistry.addLW(this, "PWM", channel);
 
     setSafetyEnabled(false);
   }
@@ -77,64 +74,12 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
    */
   @Override
   public void close() {
-    m_sendableImpl.close();
-
     if (m_handle == 0) {
       return;
     }
     setDisabled();
     PWMJNI.freePWMPort(m_handle);
     m_handle = 0;
-  }
-
-  @Override
-  public final synchronized String getName() {
-    return m_sendableImpl.getName();
-  }
-
-  @Override
-  public final synchronized void setName(String name) {
-    m_sendableImpl.setName(name);
-  }
-
-  /**
-   * Sets the name of the sensor with a channel number.
-   *
-   * @param moduleType A string that defines the module name in the label for the value
-   * @param channel    The channel number the device is plugged into
-   */
-  protected final void setName(String moduleType, int channel) {
-    m_sendableImpl.setName(moduleType, channel);
-  }
-
-  /**
-   * Sets the name of the sensor with a module and channel number.
-   *
-   * @param moduleType   A string that defines the module name in the label for the value
-   * @param moduleNumber The number of the particular module type
-   * @param channel      The channel number the device is plugged into (usually PWM)
-   */
-  protected final void setName(String moduleType, int moduleNumber, int channel) {
-    m_sendableImpl.setName(moduleType, moduleNumber, channel);
-  }
-
-  @Override
-  public final synchronized String getSubsystem() {
-    return m_sendableImpl.getSubsystem();
-  }
-
-  @Override
-  public final synchronized void setSubsystem(String subsystem) {
-    m_sendableImpl.setSubsystem(subsystem);
-  }
-
-  /**
-   * Add a child component.
-   *
-   * @param child child component
-   */
-  protected final void addChild(Object child) {
-    m_sendableImpl.addChild(child);
   }
 
   @Override

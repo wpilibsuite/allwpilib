@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * REV Robotics SparkMax Speed Controller.
@@ -36,6 +37,6 @@ public class PWMSparkMax extends PWMSpeedController {
     setZeroLatch();
 
     HAL.report(tResourceType.kResourceType_RevSparkMaxPWM, getChannel());
-    setName("PWMSparkMax", getChannel());
+    SendableRegistry.setName(this, "PWMSparkMax", getChannel());
   }
 }

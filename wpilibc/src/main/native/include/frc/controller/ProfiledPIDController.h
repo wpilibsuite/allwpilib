@@ -13,7 +13,8 @@
 #include <units/units.h>
 
 #include "frc/controller/PIDController.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 #include "frc/trajectory/TrapezoidProfile.h"
 
 namespace frc {
@@ -22,7 +23,8 @@ namespace frc {
  * Implements a PID control loop whose setpoint is constrained by a trapezoid
  * profile.
  */
-class ProfiledPIDController : public SendableBase {
+class ProfiledPIDController : public Sendable,
+                              public SendableHelper<ProfiledPIDController> {
  public:
   /**
    * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and

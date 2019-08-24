@@ -10,14 +10,19 @@
 #include <hal/Types.h>
 
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * MXP analog output class.
  */
-class AnalogOutput : public ErrorBase, public SendableBase {
+class AnalogOutput : public ErrorBase,
+                     public Sendable,
+                     public SendableHelper<AnalogOutput> {
  public:
   /**
    * Construct an analog output on the given channel.

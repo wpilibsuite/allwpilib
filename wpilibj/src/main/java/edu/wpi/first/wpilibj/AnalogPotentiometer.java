@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,13 +9,14 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Class for reading analog potentiometers. Analog potentiometers read in an analog voltage that
  * corresponds to a position. The position is in whichever units you choose, by way of the scaling
  * and offset constants passed to the constructor.
  */
-public class AnalogPotentiometer extends SendableBase implements Potentiometer {
+public class AnalogPotentiometer implements Potentiometer, Sendable, AutoCloseable {
   private AnalogInput m_analogInput;
   private boolean m_initAnalogInput;
   private double m_fullRange;
@@ -38,7 +39,7 @@ public class AnalogPotentiometer extends SendableBase implements Potentiometer {
   public AnalogPotentiometer(final int channel, double fullRange, double offset) {
     this(new AnalogInput(channel), fullRange, offset);
     m_initAnalogInput = true;
-    addChild(m_analogInput);
+    SendableRegistry.addChild(this, m_analogInput);
   }
 
   /**
@@ -55,7 +56,7 @@ public class AnalogPotentiometer extends SendableBase implements Potentiometer {
    * @param offset    The offset to add to the scaled value for controlling the zero value
    */
   public AnalogPotentiometer(final AnalogInput input, double fullRange, double offset) {
-    setName("AnalogPotentiometer", input.getChannel());
+    SendableRegistry.addLW(this, "AnalogPotentiometer", input.getChannel());
     m_analogInput = input;
     m_initAnalogInput = false;
 
@@ -156,7 +157,6 @@ public class AnalogPotentiometer extends SendableBase implements Potentiometer {
 
   @Override
   public void close() {
-    super.close();
     if (m_initAnalogInput) {
       m_analogInput.close();
       m_analogInput = null;

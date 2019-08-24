@@ -10,15 +10,20 @@
 #include <hal/Types.h>
 
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the
  * CAN PDP.
  */
-class PowerDistributionPanel : public ErrorBase, public SendableBase {
+class PowerDistributionPanel : public ErrorBase,
+                               public Sendable,
+                               public SendableHelper<PowerDistributionPanel> {
  public:
   PowerDistributionPanel();
   explicit PowerDistributionPanel(int module);

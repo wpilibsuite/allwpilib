@@ -14,8 +14,8 @@
 #include <wpi/mutex.h>
 
 #include "frc/WPIErrors.h"
-#include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableBuilderImpl.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -115,7 +115,8 @@ void SmartDashboard::PutData(Sendable* value) {
     wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
     return;
   }
-  PutData(value->GetName(), value);
+  auto name = SendableRegistry::GetInstance().GetName(value);
+  if (!name.empty()) PutData(name, value);
 }
 
 Sendable* SmartDashboard::GetData(wpi::StringRef key) {

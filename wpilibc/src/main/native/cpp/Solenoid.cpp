@@ -16,6 +16,7 @@
 #include "frc/SensorUtil.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -47,7 +48,8 @@ Solenoid::Solenoid(int moduleNumber, int channel)
 
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel,
              m_moduleNumber);
-  SetName("Solenoid", m_moduleNumber, m_channel);
+  SendableRegistry::GetInstance().AddLW(this, "Solenoid", m_moduleNumber,
+                                        m_channel);
 }
 
 Solenoid::~Solenoid() { HAL_FreeSolenoidPort(m_solenoidHandle); }

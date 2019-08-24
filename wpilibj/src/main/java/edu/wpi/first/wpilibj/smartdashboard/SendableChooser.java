@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.command.Command;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
@@ -32,7 +32,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  *
  * @param <V> The type of the values to be stored
  */
-public class SendableChooser<V> extends SendableBase {
+public class SendableChooser<V> implements Sendable {
   /**
    * The key for the default value.
    */
@@ -65,8 +65,8 @@ public class SendableChooser<V> extends SendableBase {
    * Instantiates a {@link SendableChooser}.
    */
   public SendableChooser() {
-    super(false);
     m_instance = s_instances.getAndIncrement();
+    SendableRegistry.add(this, "SendableChooser", m_instance);
   }
 
   /**

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Texas Instruments / Vex Robotics Jaguar Speed Controller as a PWM device.
@@ -37,6 +38,6 @@ public class Jaguar extends PWMSpeedController {
     setZeroLatch();
 
     HAL.report(tResourceType.kResourceType_Jaguar, getChannel());
-    setName("Jaguar", getChannel());
+    SendableRegistry.setName(this, "Jaguar", getChannel());
   }
 }

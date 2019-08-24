@@ -17,6 +17,7 @@
 #include "frc/Utility.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -46,7 +47,7 @@ PWM::PWM(int channel) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   HAL_Report(HALUsageReporting::kResourceType_PWM, channel);
-  SetName("PWM", channel);
+  SendableRegistry::GetInstance().AddLW(this, "PWM", channel);
 
   SetSafetyEnabled(false);
 }

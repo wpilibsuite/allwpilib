@@ -30,7 +30,5 @@ class NotifierCommandTest extends CommandTestBase {
     scheduler.cancel(command);
 
     assertEquals(.25, 0.01 * counter.m_counter, .025);
-
-    scheduler.close();
   }
 }

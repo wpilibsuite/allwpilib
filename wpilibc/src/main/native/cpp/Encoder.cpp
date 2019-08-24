@@ -16,6 +16,7 @@
 #include "frc/DigitalInput.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -24,8 +25,9 @@ Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
   m_aSource = std::make_shared<DigitalInput>(aChannel);
   m_bSource = std::make_shared<DigitalInput>(bChannel);
   InitEncoder(reverseDirection, encodingType);
-  AddChild(m_aSource);
-  AddChild(m_bSource);
+  auto& registry = SendableRegistry::GetInstance();
+  registry.AddChild(this, m_aSource.get());
+  registry.AddChild(this, m_bSource.get());
 }
 
 Encoder::Encoder(DigitalSource* aSource, DigitalSource* bSource,
@@ -201,7 +203,7 @@ double Encoder::PIDGet() {
 void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
   // Force digital input if just given an index
   m_indexSource = std::make_shared<DigitalInput>(channel);
-  AddChild(m_indexSource);
+  SendableRegistry::GetInstance().AddChild(this, m_indexSource.get());
   SetIndexSource(*m_indexSource.get(), type);
 }
 
@@ -250,7 +252,8 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
 
   HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex(),
              encodingType);
-  SetName("Encoder", m_aSource->GetChannel());
+  SendableRegistry::GetInstance().AddLW(this, "Encoder",
+                                        m_aSource->GetChannel());
 }
 
 double Encoder::DecodingScaleFactor() const {

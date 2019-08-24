@@ -7,16 +7,15 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Base class for all sensors. Stores most recent status information as well as containing utility
  * functions for checking channels and error processing.
+ * @deprecated Use Sendable and SendableRegistry
  */
+@Deprecated(since = "2020", forRemoval = true)
 public abstract class SendableBase implements Sendable, AutoCloseable {
-  private String m_name = "";
-  private String m_subsystem = "Ungrouped";
-
   /**
    * Creates an instance of the sensor base.
    */
@@ -31,67 +30,12 @@ public abstract class SendableBase implements Sendable, AutoCloseable {
    */
   public SendableBase(boolean addLiveWindow) {
     if (addLiveWindow) {
-      LiveWindow.add(this);
+      SendableRegistry.addLW(this, "");
+    } else {
+      SendableRegistry.add(this, "");
     }
   }
 
-  @Deprecated
-  public void free() {
-    close();
-  }
-
   @Override
-  public void close() {
-    LiveWindow.remove(this);
-  }
-
-  @Override
-  public final String getName() {
-    return m_name;
-  }
-
-  @Override
-  public final void setName(String name) {
-    m_name = name;
-  }
-
-  /**
-   * Sets the name of the sensor with a channel number.
-   *
-   * @param moduleType A string that defines the module name in the label for the value
-   * @param channel    The channel number the device is plugged into
-   */
-  protected final void setName(String moduleType, int channel) {
-    setName(moduleType + "[" + channel + "]");
-  }
-
-  /**
-   * Sets the name of the sensor with a module and channel number.
-   *
-   * @param moduleType   A string that defines the module name in the label for the value
-   * @param moduleNumber The number of the particular module type
-   * @param channel      The channel number the device is plugged into (usually PWM)
-   */
-  protected final void setName(String moduleType, int moduleNumber, int channel) {
-    setName(moduleType + "[" + moduleNumber + "," + channel + "]");
-  }
-
-  @Override
-  public final String getSubsystem() {
-    return m_subsystem;
-  }
-
-  @Override
-  public final void setSubsystem(String subsystem) {
-    m_subsystem = subsystem;
-  }
-
-  /**
-   * Add a child component.
-   *
-   * @param child child component
-   */
-  protected final void addChild(Object child) {
-    LiveWindow.addChild(this, child);
-  }
+  public void close() {}
 }

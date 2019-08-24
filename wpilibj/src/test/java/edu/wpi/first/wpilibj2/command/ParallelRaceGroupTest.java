@@ -46,8 +46,6 @@ class ParallelRaceGroupTest extends CommandTestBase {
     verify(command2, never()).end(false);
 
     assertFalse(scheduler.isScheduled(group));
-
-    scheduler.close();
   }
 
   @Test
@@ -76,8 +74,6 @@ class ParallelRaceGroupTest extends CommandTestBase {
     verify(command2).end(true);
 
     assertFalse(scheduler.isScheduled(group));
-
-    scheduler.close();
   }
 
   @Test
@@ -92,8 +88,6 @@ class ParallelRaceGroupTest extends CommandTestBase {
     Command group = new ParallelRaceGroup(command1, command2);
 
     assertDoesNotThrow(() -> scheduler.cancel(group));
-
-    scheduler.close();
   }
 
 
@@ -120,8 +114,6 @@ class ParallelRaceGroupTest extends CommandTestBase {
 
     assertFalse(scheduler.isScheduled(group));
     assertTrue(scheduler.isScheduled(command3));
-
-    scheduler.close();
   }
 
   @Test

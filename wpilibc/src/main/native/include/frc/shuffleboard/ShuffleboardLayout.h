@@ -14,7 +14,6 @@
 
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 #include "frc/shuffleboard/ShuffleboardContainer.h"
-#include "frc/smartdashboard/Sendable.h"
 
 #ifdef _WIN32
 #pragma warning(push)

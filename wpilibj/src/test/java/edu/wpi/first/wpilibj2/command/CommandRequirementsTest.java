@@ -41,8 +41,6 @@ class CommandRequirementsTest extends CommandTestBase {
 
     assertFalse(scheduler.isScheduled(interrupted));
     assertTrue(scheduler.isScheduled(interrupter));
-
-    scheduler.close();
   }
 
   @Test
@@ -61,8 +59,6 @@ class CommandRequirementsTest extends CommandTestBase {
 
     assertTrue(scheduler.isScheduled(notInterrupted));
     assertFalse(scheduler.isScheduled(interrupter));
-
-    scheduler.close();
   }
 
   @Test
@@ -79,7 +75,5 @@ class CommandRequirementsTest extends CommandTestBase {
         () -> scheduler.setDefaultCommand(system, missingRequirement));
     assertThrows(IllegalArgumentException.class,
         () -> scheduler.setDefaultCommand(system, ends));
-
-    scheduler.close();
   }
 }

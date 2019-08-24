@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,12 +16,13 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.BoundaryException;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 
 /**
  * Class for creating and configuring Analog Triggers.
  */
-public class AnalogTrigger extends SendableBase {
+public class AnalogTrigger implements Sendable, AutoCloseable {
   /**
    * Exceptions dealing with improper operation of the Analog trigger.
    */
@@ -53,7 +54,7 @@ public class AnalogTrigger extends SendableBase {
   public AnalogTrigger(final int channel) {
     this(new AnalogInput(channel));
     m_ownsAnalog = true;
-    addChild(m_analogInput);
+    SendableRegistry.addChild(this, m_analogInput);
   }
 
   /**
@@ -72,12 +73,11 @@ public class AnalogTrigger extends SendableBase {
     m_index = index.asIntBuffer().get(0);
 
     HAL.report(tResourceType.kResourceType_AnalogTrigger, channel.getChannel());
-    setName("AnalogTrigger", channel.getChannel());
+    SendableRegistry.addLW(this, "AnalogTrigger", channel.getChannel());
   }
 
   @Override
   public void close() {
-    super.close();
     AnalogJNI.cleanAnalogTrigger(m_port);
     m_port = 0;
     if (m_ownsAnalog && m_analogInput != null) {

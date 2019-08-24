@@ -11,6 +11,7 @@
 #include <frc/WPIErrors.h>
 #include <frc/commands/Scheduler.h>
 #include <frc/smartdashboard/SendableBuilder.h>
+#include <frc/smartdashboard/SendableRegistry.h>
 #include <frc2/command/CommandGroupBase.h>
 #include <frc2/command/Subsystem.h>
 
@@ -22,7 +23,9 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
   return map.find(keyToCheck) != map.end();
 }
 
-CommandScheduler::CommandScheduler() { SetName("Scheduler"); }
+CommandScheduler::CommandScheduler() {
+  frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
+}
 
 CommandScheduler& CommandScheduler::GetInstance() {
   static CommandScheduler scheduler;

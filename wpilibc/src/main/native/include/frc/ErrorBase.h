@@ -79,6 +79,8 @@ class ErrorBase {
   ErrorBase();
   virtual ~ErrorBase() = default;
 
+  ErrorBase(const ErrorBase&) = default;
+  ErrorBase& operator=(const ErrorBase&) = default;
   ErrorBase(ErrorBase&&) = default;
   ErrorBase& operator=(ErrorBase&&) = default;
 

@@ -24,6 +24,14 @@ using namespace frc2;
 
 Command::~Command() { CommandScheduler::GetInstance().Cancel(this); }
 
+Command::Command(const Command& rhs) : ErrorBase(rhs) {}
+
+Command& Command::operator=(const Command& rhs) {
+  ErrorBase::operator=(rhs);
+  m_isGrouped = false;
+  return *this;
+}
+
 void Command::Initialize() {}
 void Command::Execute() {}
 void Command::End(bool interrupted) {}

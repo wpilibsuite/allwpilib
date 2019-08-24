@@ -13,9 +13,12 @@
 #include <wpi/raw_ostream.h>
 
 #include "frc/MotorSafety.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Class implements the PWM generation in the FPGA.
@@ -34,7 +37,7 @@ namespace frc {
  *   - 1 = minimum pulse width (currently .5ms)
  *   - 0 = disabled (i.e. PWM output is held low)
  */
-class PWM : public MotorSafety, public SendableBase {
+class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
  public:
   /**
    * Represents the amount to multiply the minimum servo-pulse pwm period by.

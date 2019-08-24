@@ -33,8 +33,6 @@ class CommandDecoratorTest extends CommandTestBase {
     scheduler.run();
 
     assertFalse(scheduler.isScheduled(timeout));
-
-    scheduler.close();
   }
 
   @Test
@@ -51,8 +49,6 @@ class CommandDecoratorTest extends CommandTestBase {
     condition.setCondition(true);
     scheduler.run();
     assertFalse(scheduler.isScheduled(command));
-
-    scheduler.close();
   }
 
   @Test
@@ -67,8 +63,6 @@ class CommandDecoratorTest extends CommandTestBase {
     scheduler.schedule(command.beforeStarting(() -> condition.setCondition(true)));
 
     assertTrue(condition.getCondition());
-
-    scheduler.close();
   }
 
   @Test
@@ -87,8 +81,6 @@ class CommandDecoratorTest extends CommandTestBase {
     scheduler.run();
 
     assertTrue(condition.getCondition());
-
-    scheduler.close();
   }
 
   @Test
@@ -108,8 +100,6 @@ class CommandDecoratorTest extends CommandTestBase {
     scheduler.run();
 
     assertTrue(condition.getCondition());
-
-    scheduler.close();
   }
 
   @Test
@@ -134,8 +124,6 @@ class CommandDecoratorTest extends CommandTestBase {
     scheduler.run();
 
     assertFalse(scheduler.isScheduled(group));
-
-    scheduler.close();
   }
 
   @Test
@@ -159,8 +147,6 @@ class CommandDecoratorTest extends CommandTestBase {
     scheduler.run();
 
     assertFalse(scheduler.isScheduled(group));
-
-    scheduler.close();
   }
 
   @Test
@@ -176,8 +162,6 @@ class CommandDecoratorTest extends CommandTestBase {
     scheduler.run();
 
     assertFalse(scheduler.isScheduled(group));
-
-    scheduler.close();
   }
 
   @Test
@@ -194,7 +178,5 @@ class CommandDecoratorTest extends CommandTestBase {
     scheduler.run();
 
     assertTrue(scheduler.isScheduled(perpetual));
-
-    scheduler.close();
   }
 }

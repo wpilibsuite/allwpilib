@@ -50,8 +50,6 @@ class SelectCommandTest extends CommandTestBase {
     verify(command3, never()).initialize();
     verify(command3, never()).execute();
     verify(command3, never()).end(false);
-
-    scheduler.close();
   }
 
   @Test
@@ -74,8 +72,6 @@ class SelectCommandTest extends CommandTestBase {
             () -> "four");
 
     assertDoesNotThrow(() -> scheduler.schedule(selectCommand));
-
-    scheduler.close();
   }
 
 
@@ -108,7 +104,5 @@ class SelectCommandTest extends CommandTestBase {
     verify(command1).end(true);
     verify(command2, never()).end(true);
     verify(command3, never()).end(true);
-
-    scheduler.close();
   }
 }

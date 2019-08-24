@@ -16,6 +16,7 @@
 #include "frc/SensorUtil.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -75,7 +76,9 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
              m_moduleNumber);
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel,
              m_moduleNumber);
-  SetName("DoubleSolenoid", m_moduleNumber, m_forwardChannel);
+
+  SendableRegistry::GetInstance().AddLW(this, "DoubleSolenoid", m_moduleNumber,
+                                        m_forwardChannel);
 }
 
 DoubleSolenoid::~DoubleSolenoid() {

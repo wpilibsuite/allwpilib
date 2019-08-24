@@ -15,12 +15,14 @@
 #include "frc/CounterBase.h"
 #include "frc/ErrorBase.h"
 #include "frc/PIDSource.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalSource;
 class DigitalGlitchFilter;
+class SendableBuilder;
 
 /**
  * Class to read quad encoders.
@@ -38,9 +40,10 @@ class DigitalGlitchFilter;
  * to be zeroed before use.
  */
 class Encoder : public ErrorBase,
-                public SendableBase,
                 public CounterBase,
-                public PIDSource {
+                public PIDSource,
+                public Sendable,
+                public SendableHelper<Encoder> {
  public:
   enum IndexingType {
     kResetWhileHigh,

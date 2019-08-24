@@ -14,11 +14,13 @@
 #include "frc/AnalogTrigger.h"
 #include "frc/CounterBase.h"
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalGlitchFilter;
+class SendableBuilder;
 
 /**
  * Class for counting the number of ticks on a digital input channel.
@@ -30,7 +32,10 @@ class DigitalGlitchFilter;
  * All counters will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Counter : public ErrorBase, public SendableBase, public CounterBase {
+class Counter : public ErrorBase,
+                public CounterBase,
+                public Sendable,
+                public SendableHelper<Counter> {
  public:
   enum Mode {
     kTwoPulse = 0,

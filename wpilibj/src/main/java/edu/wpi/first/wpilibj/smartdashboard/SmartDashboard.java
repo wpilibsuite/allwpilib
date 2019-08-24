@@ -97,7 +97,10 @@ public class SmartDashboard {
    * @throws IllegalArgumentException If key is null
    */
   public static void putData(Sendable value) {
-    putData(value.getName(), value);
+    String name = SendableRegistry.getName(value);
+    if (!name.isEmpty()) {
+      putData(name, value);
+    }
   }
 
   /**

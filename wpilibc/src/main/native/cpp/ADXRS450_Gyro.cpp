@@ -11,6 +11,7 @@
 
 #include "frc/DriverStation.h"
 #include "frc/Timer.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -49,7 +50,8 @@ ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port) : m_spi(port) {
   Calibrate();
 
   HAL_Report(HALUsageReporting::kResourceType_ADXRS450, port);
-  SetName("ADXRS450_Gyro", port);
+
+  SendableRegistry::GetInstance().AddLW(this, "ADXRS450_Gyro", port);
 }
 
 static bool CalcParity(int v) {

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,7 @@ import edu.wpi.first.hal.CompressorJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Class for operating a compressor connected to a PCM (Pneumatic Control Module). The PCM will
@@ -23,7 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * the safety provided by using the pressure switch and closed loop control. You can only turn off
  * closed loop control, thereby stopping the compressor from operating.
  */
-public class Compressor extends SendableBase {
+public class Compressor implements Sendable {
   private int m_compressorHandle;
   private byte m_module;
 
@@ -39,7 +40,7 @@ public class Compressor extends SendableBase {
     m_compressorHandle = CompressorJNI.initializeCompressor((byte) module);
 
     HAL.report(tResourceType.kResourceType_Compressor, module);
-    setName("Compressor", module);
+    SendableRegistry.addLW(this, "Compressor", module);
   }
 
   /**

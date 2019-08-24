@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,7 +15,8 @@
 #include "frc/Counter.h"
 #include "frc/ErrorBase.h"
 #include "frc/PIDSource.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -34,7 +35,10 @@ class DigitalOutput;
  * received. The time that the line is high determines the round trip distance
  * (time of flight).
  */
-class Ultrasonic : public ErrorBase, public SendableBase, public PIDSource {
+class Ultrasonic : public ErrorBase,
+                   public Sendable,
+                   public PIDSource,
+                   public SendableHelper<Ultrasonic> {
  public:
   enum DistanceUnit { kInches = 0, kMilliMeters = 1 };
 

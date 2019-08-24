@@ -13,7 +13,6 @@
 #include <wpi/raw_ostream.h>
 
 #include "frc/MotorSafety.h"
-#include "frc/smartdashboard/SendableBase.h"
 
 namespace frc {
 
@@ -22,7 +21,7 @@ class SpeedController;
 /**
  * Common base class for drive platforms.
  */
-class RobotDriveBase : public MotorSafety, public SendableBase {
+class RobotDriveBase : public MotorSafety {
  public:
   /**
    * The location of a motor on the robot for the purpose of driving.

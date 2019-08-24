@@ -39,7 +39,5 @@ class FunctionalCommandTest extends CommandTestBase {
     assertTrue(cond1.getCondition());
     assertTrue(cond2.getCondition());
     assertTrue(cond3.getCondition());
-
-    scheduler.close();
   }
 }

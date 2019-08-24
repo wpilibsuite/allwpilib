@@ -23,8 +23,9 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * The scheduler responsible for running {@link Command}s.  A Command-based robot should call {@link
@@ -34,7 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * Subsystem#periodic()} methods to be called and for their default commands to be scheduled.
  */
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods", "PMD.TooManyFields"})
-public final class CommandScheduler extends SendableBase {
+public final class CommandScheduler implements Sendable {
   /**
    * The Singleton Instance.
    */
@@ -82,7 +83,7 @@ public final class CommandScheduler extends SendableBase {
 
   CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
-    setName("Scheduler");
+    SendableRegistry.addLW(this, "Scheduler");
   }
 
   /**

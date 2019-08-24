@@ -15,6 +15,7 @@
 #include "frc/DigitalInput.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -26,7 +27,7 @@ Counter::Counter(Mode mode) {
   SetMaxPeriod(.5);
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, m_index, mode);
-  SetName("Counter", m_index);
+  SendableRegistry::GetInstance().AddLW(this, "Counter", m_index);
 }
 
 Counter::Counter(int channel) : Counter(kTwoPulse) {
@@ -95,7 +96,7 @@ Counter::~Counter() {
 void Counter::SetUpSource(int channel) {
   if (StatusIsFatal()) return;
   SetUpSource(std::make_shared<DigitalInput>(channel));
-  AddChild(m_upSource);
+  SendableRegistry::GetInstance().AddChild(this, m_upSource.get());
 }
 
 void Counter::SetUpSource(AnalogTrigger* analogTrigger,
@@ -159,7 +160,7 @@ void Counter::ClearUpSource() {
 void Counter::SetDownSource(int channel) {
   if (StatusIsFatal()) return;
   SetDownSource(std::make_shared<DigitalInput>(channel));
-  AddChild(m_downSource);
+  SendableRegistry::GetInstance().AddChild(this, m_downSource.get());
 }
 
 void Counter::SetDownSource(AnalogTrigger* analogTrigger,

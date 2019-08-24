@@ -27,7 +27,5 @@ class WaitUntilCommandTest extends CommandTestBase {
     condition.setCondition(true);
     scheduler.run();
     assertFalse(scheduler.isScheduled(command));
-
-    scheduler.close();
   }
 }

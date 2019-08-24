@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,6 +15,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * ADXL362 SPI Accelerometer.
@@ -22,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
 @SuppressWarnings("PMD.UnusedPrivateField")
-public class ADXL362 extends SendableBase implements Accelerometer {
+public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
   private static final byte kRegWrite = 0x0A;
   private static final byte kRegRead = 0x0B;
 
@@ -108,12 +109,11 @@ public class ADXL362 extends SendableBase implements Accelerometer {
     m_spi.write(transferBuffer, 3);
 
     HAL.report(tResourceType.kResourceType_ADXL362, port.value);
-    setName("ADXL362", port.value);
+    SendableRegistry.addLW(this, "ADXL362", port.value);
   }
 
   @Override
   public void close() {
-    super.close();
     if (m_spi != null) {
       m_spi.close();
       m_spi = null;

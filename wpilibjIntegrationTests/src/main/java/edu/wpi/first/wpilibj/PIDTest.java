@@ -112,7 +112,6 @@ public class PIDTest extends AbstractComsSetup {
   @After
   public void tearDown() {
     logger.fine("Teardown: " + me.getType());
-    m_controller.close();
     m_controller = null;
     me.reset();
   }

@@ -8,11 +8,12 @@
 #pragma once
 
 #include <frc/smartdashboard/Sendable.h>
+#include <frc/smartdashboard/SendableHelper.h>
 
 #include <string>
 
 #include <wpi/SmallSet.h>
-#include <wpi/SmallVector.h>
+#include <wpi/Twine.h>
 
 #include "Command.h"
 
@@ -20,12 +21,10 @@ namespace frc2 {
 /**
  * A Sendable base class for Commands.
  */
-class CommandBase : public frc::Sendable, public Command {
+class CommandBase : public Command,
+                    public frc::Sendable,
+                    public frc::SendableHelper<CommandBase> {
  public:
-  CommandBase(CommandBase&& other) = default;
-
-  CommandBase(const CommandBase& other);
-
   /**
    * Adds the specified requirements to the command.
    *
@@ -37,20 +36,38 @@ class CommandBase : public frc::Sendable, public Command {
 
   wpi::SmallSet<Subsystem*, 4> GetRequirements() const override;
 
-  void SetName(const wpi::Twine& name) override;
+  /**
+   * Sets the name of this Command.
+   *
+   * @param name name
+   */
+  void SetName(const wpi::Twine& name);
 
+  /**
+   * Gets the name of this Command.
+   *
+   * @return Name
+   */
   std::string GetName() const override;
 
-  std::string GetSubsystem() const override;
+  /**
+   * Gets the subsystem name of this Command.
+   *
+   * @return Subsystem name
+   */
+  std::string GetSubsystem() const;
 
-  void SetSubsystem(const wpi::Twine& subsystem) override;
+  /**
+   * Sets the subsystem name of this Command.
+   *
+   * @param subsystem subsystem name
+   */
+  void SetSubsystem(const wpi::Twine& subsystem);
 
   void InitSendable(frc::SendableBuilder& builder) override;
 
  protected:
   CommandBase();
-  std::string m_name;
-  std::string m_subsystem;
   wpi::SmallSet<Subsystem*, 4> m_requirements;
 };
 }  // namespace frc2

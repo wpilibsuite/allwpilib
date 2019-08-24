@@ -10,8 +10,12 @@
 #include <hal/Types.h>
 
 #include "frc/SolenoidBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
@@ -20,7 +24,9 @@ namespace frc {
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
-class DoubleSolenoid : public SolenoidBase {
+class DoubleSolenoid : public SolenoidBase,
+                       public Sendable,
+                       public SendableHelper<DoubleSolenoid> {
  public:
   enum Value { kOff, kForward, kReverse };
 

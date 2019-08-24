@@ -9,6 +9,8 @@
 
 #include <hal/HAL.h>
 
+#include "frc/smartdashboard/SendableRegistry.h"
+
 using namespace frc;
 
 PWMSparkMax::PWMSparkMax(int channel) : PWMSpeedController(channel) {
@@ -26,5 +28,5 @@ PWMSparkMax::PWMSparkMax(int channel) : PWMSpeedController(channel) {
   SetZeroLatch();
 
   HAL_Report(HALUsageReporting::kResourceType_RevSparkMaxPWM, GetChannel());
-  SetName("PWMSparkMax", GetChannel());
+  SendableRegistry::GetInstance().SetName(this, "PWMSparkMax", GetChannel());
 }

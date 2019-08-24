@@ -8,10 +8,13 @@
 #pragma once
 
 #include "frc/DigitalSource.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalGlitchFilter;
+class SendableBuilder;
 
 /**
  * Class to read a digital input.
@@ -22,7 +25,9 @@ class DigitalGlitchFilter;
  * as required. This class is only for devices like switches etc. that aren't
  * implemented anywhere else.
  */
-class DigitalInput : public DigitalSource {
+class DigitalInput : public DigitalSource,
+                     public Sendable,
+                     public SendableHelper<DigitalInput> {
  public:
   /**
    * Create an instance of a Digital Input class.
