@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -58,8 +58,8 @@ class CAN : public ErrorBase {
    */
   ~CAN() override;
 
-  CAN(CAN&& rhs);
-  CAN& operator=(CAN&& rhs);
+  CAN(CAN&&) = default;
+  CAN& operator=(CAN&&) = default;
 
   /**
    * Write a packet to the CAN device with a specific ID. This ID is 10 bits.
@@ -144,6 +144,6 @@ class CAN : public ErrorBase {
       HAL_CAN_Dev_kMiscellaneous;
 
  private:
-  HAL_CANHandle m_handle = HAL_kInvalidHandle;
+  hal::Handle<HAL_CANHandle> m_handle;
 };
 }  // namespace frc

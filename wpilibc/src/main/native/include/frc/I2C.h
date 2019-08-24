@@ -35,8 +35,8 @@ class I2C : public ErrorBase {
 
   ~I2C() override;
 
-  I2C(I2C&& rhs);
-  I2C& operator=(I2C&& rhs);
+  I2C(I2C&&) = default;
+  I2C& operator=(I2C&&) = default;
 
   /**
    * Generic transaction.
@@ -137,7 +137,7 @@ class I2C : public ErrorBase {
   bool VerifySensor(int registerAddress, int count, const uint8_t* expected);
 
  private:
-  HAL_I2CPort m_port = HAL_I2C_kInvalid;
+  hal::I2CPort m_port;
   int m_deviceAddress;
 };
 

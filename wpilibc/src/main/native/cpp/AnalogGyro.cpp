@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -64,20 +64,6 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
 }
 
 AnalogGyro::~AnalogGyro() { HAL_FreeAnalogGyro(m_gyroHandle); }
-
-AnalogGyro::AnalogGyro(AnalogGyro&& rhs)
-    : GyroBase(std::move(rhs)), m_analog(std::move(rhs.m_analog)) {
-  std::swap(m_gyroHandle, rhs.m_gyroHandle);
-}
-
-AnalogGyro& AnalogGyro::operator=(AnalogGyro&& rhs) {
-  GyroBase::operator=(std::move(rhs));
-
-  m_analog = std::move(rhs.m_analog);
-  std::swap(m_gyroHandle, rhs.m_gyroHandle);
-
-  return *this;
-}
 
 double AnalogGyro::GetAngle() const {
   if (StatusIsFatal()) return 0.0;

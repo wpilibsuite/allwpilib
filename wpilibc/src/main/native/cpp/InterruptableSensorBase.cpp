@@ -21,26 +21,6 @@ InterruptableSensorBase::~InterruptableSensorBase() {
   // Ignore status, as an invalid handle just needs to be ignored.
 }
 
-InterruptableSensorBase::InterruptableSensorBase(InterruptableSensorBase&& rhs)
-    : ErrorBase(std::move(rhs)),
-      m_interrupt(rhs.m_interrupt),
-      m_interruptHandler{std::move(rhs.m_interruptHandler)} {
-  rhs.m_interrupt = HAL_kInvalidHandle;
-  rhs.m_interruptHandler = nullptr;
-}
-
-InterruptableSensorBase& InterruptableSensorBase::operator=(
-    InterruptableSensorBase&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-
-  m_interrupt = rhs.m_interrupt;
-  m_interruptHandler = std::move(rhs.m_interruptHandler);
-  rhs.m_interrupt = HAL_kInvalidHandle;
-  rhs.m_interruptHandler = nullptr;
-
-  return *this;
-}
-
 void InterruptableSensorBase::RequestInterrupts(
     HAL_InterruptHandlerFunction handler, void* param) {
   if (StatusIsFatal()) return;

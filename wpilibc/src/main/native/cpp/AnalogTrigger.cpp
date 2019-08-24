@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -51,8 +51,8 @@ AnalogTrigger::~AnalogTrigger() {
 AnalogTrigger::AnalogTrigger(AnalogTrigger&& rhs)
     : ErrorBase(std::move(rhs)),
       SendableBase(std::move(rhs)),
-      m_index(std::move(rhs.m_index)) {
-  std::swap(m_trigger, rhs.m_trigger);
+      m_index(std::move(rhs.m_index)),
+      m_trigger(std::move(rhs.m_trigger)) {
   std::swap(m_analogInput, rhs.m_analogInput);
   std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
 }
@@ -62,7 +62,7 @@ AnalogTrigger& AnalogTrigger::operator=(AnalogTrigger&& rhs) {
   SendableBase::operator=(std::move(rhs));
 
   m_index = std::move(rhs.m_index);
-  std::swap(m_trigger, rhs.m_trigger);
+  m_trigger = std::move(rhs.m_trigger);
   std::swap(m_analogInput, rhs.m_analogInput);
   std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
 

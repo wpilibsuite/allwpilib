@@ -41,8 +41,8 @@ class SPI : public ErrorBase {
 
   ~SPI() override;
 
-  SPI(SPI&& rhs);
-  SPI& operator=(SPI&& rhs);
+  SPI(SPI&&) = default;
+  SPI& operator=(SPI&&) = default;
 
   /**
    * Configure the rate of the generated clock signal.
@@ -345,7 +345,7 @@ class SPI : public ErrorBase {
   double GetAccumulatorIntegratedAverage() const;
 
  protected:
-  HAL_SPIPort m_port = HAL_SPI_kInvalid;
+  hal::SPIPort m_port;
   bool m_msbFirst = false;          // Default little-endian
   bool m_sampleOnTrailing = false;  // Default data updated on falling edge
   bool m_clockIdleHigh = false;     // Default clock active high

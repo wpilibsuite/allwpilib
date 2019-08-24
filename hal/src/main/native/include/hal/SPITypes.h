@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,4 +27,39 @@ HAL_ENUM(HAL_SPIPort) {
   HAL_SPI_kMXP
 };
 // clang-format on
+
+#ifdef __cplusplus
+namespace hal {
+
+/**
+ * A move-only C++ wrapper around HAL_SPIPort.
+ * Does not ensure destruction.
+ */
+class SPIPort {
+ public:
+  SPIPort() = default;
+  /*implicit*/ SPIPort(HAL_SPIPort val)  // NOLINT(runtime/explicit)
+      : m_value(val) {}
+
+  SPIPort(const SPIPort&) = delete;
+  SPIPort& operator=(const SPIPort&) = delete;
+
+  SPIPort(SPIPort&& rhs) : m_value(rhs.m_value) {
+    rhs.m_value = HAL_SPI_kInvalid;
+  }
+
+  SPIPort& operator=(SPIPort&& rhs) {
+    m_value = rhs.m_value;
+    rhs.m_value = HAL_SPI_kInvalid;
+    return *this;
+  }
+
+  operator HAL_SPIPort() const { return m_value; }
+
+ private:
+  HAL_SPIPort m_value = HAL_SPI_kInvalid;
+};
+
+}  // namespace hal
+#endif
 /** @} */
