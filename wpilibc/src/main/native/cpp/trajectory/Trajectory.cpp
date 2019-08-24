@@ -23,7 +23,7 @@ Trajectory::State Trajectory::State::Interpolate(State endValue,
   // Check whether the robot is reversing at this stage.
   const auto reversing =
       velocity < 0_mps ||
-      units::math::abs(velocity) < 1E-9_mps && acceleration < 0_mps_sq;
+      (units::math::abs(velocity) < 1E-9_mps && acceleration < 0_mps_sq);
 
   // Calculate the new velocity.
   // v = v_0 + at

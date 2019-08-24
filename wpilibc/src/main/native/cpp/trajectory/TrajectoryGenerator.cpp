@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <stdexcept>
 #include <utility>
 
 #include "frc/spline/SplineHelper.h"
@@ -92,7 +93,7 @@ Trajectory TrajectoryGenerator::TimeParameterizeTrajectory(
   constrainedStates[0] = predecessor;
 
   // Forward pass
-  for (int i = 0; i < points.size(); i++) {
+  for (unsigned int i = 0; i < points.size(); i++) {
     auto& constrainedState = constrainedStates[i];
     constrainedState.pose = points[i];
 
@@ -206,7 +207,7 @@ Trajectory TrajectoryGenerator::TimeParameterizeTrajectory(
   units::meter_t s = 0_m;
   units::meters_per_second_t v = 0_mps;
 
-  for (int i = 0; i < constrainedStates.size(); i++) {
+  for (unsigned int i = 0; i < constrainedStates.size(); i++) {
     auto state = constrainedStates[i];
 
     // Calculate the change in position between the current state and the
@@ -229,7 +230,7 @@ Trajectory TrajectoryGenerator::TimeParameterizeTrajectory(
         // delta_x = v * t
         dt = ds / v;
       } else {
-        throw std::exception(
+        throw std::runtime_error(
             "Something went wrong during trajectory generation.");
       }
     }

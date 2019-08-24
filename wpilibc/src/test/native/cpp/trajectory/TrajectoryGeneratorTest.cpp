@@ -117,8 +117,8 @@ TEST(ClampedSplineTest, ClampedSplineGenTest) {
 
   std::vector<std::unique_ptr<TrajectoryConstraint>> constraints;
 
-  /*constraints.emplace_back(std::make_unique<CentripetalAccelerationConstraint>(
-      maxCentripetalAcceleration));*/
+  constraints.emplace_back(std::make_unique<CentripetalAccelerationConstraint>(
+      maxCentripetalAcceleration));
 
   Pose2d start{0_m, 0_m, Rotation2d(90_deg)};
   std::vector<Translation2d> waypoints{Translation2d(1_m, 1_m),
@@ -133,8 +133,6 @@ TEST(ClampedSplineTest, ClampedSplineGenTest) {
   std::cout << "Duration: " << duration << std::endl;
   units::second_t t = 0_s;
   units::second_t dt = 20_ms;
-
-  auto theta = Rotation2d(90_deg).Radians().to<double>();
 
   while (t < duration) {
     auto state = trajectory.Sample(t);

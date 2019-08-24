@@ -53,7 +53,7 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromWaypoints(
         fy(waypoints.size() - 2, 0.0);
 
     a.emplace_back(0);
-    for (int i = 0; i < waypoints.size() - 3; i++) {
+    for (unsigned int i = 0; i < waypoints.size() - 3; i++) {
       a.emplace_back(1);
       c.emplace_back(1);
     }
@@ -66,7 +66,7 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromWaypoints(
         3 * (waypoints[2].Y().to<double>() - waypoints[0].Y().to<double>()) -
         startYControlVector[1]);
     if (waypoints.size() > 4) {
-      for (int i = 1; i <= waypoints.size() - 4; i++) {
+      for (unsigned int i = 1; i <= waypoints.size() - 4; i++) {
         dx.emplace_back(3 * (waypoints[i + 1].X().to<double>() -
                              waypoints[i - 1].X().to<double>()));
         dy.emplace_back(3 * (waypoints[i + 1].Y().to<double>() -
@@ -88,7 +88,7 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromWaypoints(
     fy.emplace(fy.begin(), startYControlVector[1]);
     fy.emplace_back(endYControlVector[1]);
 
-    for (int i = 0; i < fx.size() - 1; i++) {
+    for (unsigned int i = 0; i < fx.size() - 1; i++) {
       // Create the spline.
       const CubicHermiteSpline spline{
           {waypoints[i].X().to<double>(), fx[i]},
@@ -176,7 +176,7 @@ void SplineHelper::ThomasAlgorithm(const std::vector<double>& a,
   d_star[0] = d[0] / b[0];
 
   // Create the c_star and d_star coefficients in the forward sweep
-  for (int i = 1; i < N; i++) {
+  for (unsigned int i = 1; i < N; i++) {
     double m = 1.0 / (b[i] - a[i] * c_star[i - 1]);
     c_star[i] = c[i] * m;
     d_star[i] = (d[i] - a[i] * d_star[i - 1]) * m;
