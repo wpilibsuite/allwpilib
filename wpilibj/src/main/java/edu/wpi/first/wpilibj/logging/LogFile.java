@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,6 +39,14 @@ public class LogFile {
   public LogFile(String filePrefix, String fileExtension) {
     m_filePrefix = filePrefix;
     m_fileExtension = fileExtension;
+
+    m_time = new Date(0);
+    String fileName = createFilename(m_time);
+    try {
+      m_file = Files.newOutputStream(Paths.get(fileName));
+    } catch (IOException ex) {
+      System.out.println(ex.getMessage());
+    }
   }
 
   /**

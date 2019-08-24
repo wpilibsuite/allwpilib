@@ -80,7 +80,7 @@ public class CSVLogFile extends LogFile {
     }
     log("\n");
 
-    m_active = false;
+    m_active = true;
   }
 
   /**
