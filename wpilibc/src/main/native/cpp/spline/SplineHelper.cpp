@@ -131,7 +131,7 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromWaypoints(
 std::vector<QuinticHermiteSpline> SplineHelper::QuinticSplinesFromWaypoints(
     const std::vector<Pose2d>& waypoints) {
   std::vector<QuinticHermiteSpline> splines;
-  for (int i = 0; i < waypoints.size() - 1; i++) {
+  for (unsigned int i = 0; i < waypoints.size() - 1; i++) {
     auto& p0 = waypoints[i];
     auto& p1 = waypoints[i + 1];
 
