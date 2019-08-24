@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SendableCommandBase;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -32,9 +32,9 @@ public class RobotContainer {
   private final XboxController m_driverController = new XboxController(kDriverControllerPort);
 
   // A few commands that do nothing, but will demonstrate the scheduler functionality
-  private final SendableCommandBase m_instantCommand1 = new InstantCommand();
-  private final SendableCommandBase m_instantCommand2 = new InstantCommand();
-  private final SendableCommandBase m_waitCommand = new WaitCommand(5);
+  private final CommandBase m_instantCommand1 = new InstantCommand();
+  private final CommandBase m_instantCommand2 = new InstantCommand();
+  private final CommandBase m_waitCommand = new WaitCommand(5);
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.

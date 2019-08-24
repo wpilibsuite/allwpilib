@@ -14,7 +14,7 @@ import java.util.Set;
  * CommandGroups.  Note that if run from a CommandGroup, the group will not know about the status
  * of the scheduled commands, and will treat this command as finishing instantly.
  */
-public class ScheduleCommand extends SendableCommandBase {
+public class ScheduleCommand extends CommandBase {
   private final Set<Command> m_toSchedule;
 
   /**

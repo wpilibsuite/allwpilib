@@ -20,7 +20,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * exit conditions and/or other behavior, subclass this class.  The controller calculation and
  * output are performed synchronously in the command's execute() method.
  */
-public class PIDCommand extends SendableCommandBase {
+public class PIDCommand extends CommandBase {
   protected final PIDController m_controller;
   protected DoubleSupplier m_measurement;
   protected DoubleSupplier m_setpoint;

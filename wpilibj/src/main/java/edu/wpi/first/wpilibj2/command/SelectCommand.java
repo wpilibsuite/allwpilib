@@ -27,7 +27,7 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
  */
-public class SelectCommand extends SendableCommandBase {
+public class SelectCommand extends CommandBase {
   private final Map<Object, Command> m_commands;
   private final Supplier<Object> m_selector;
   private final Supplier<Command> m_toRun;

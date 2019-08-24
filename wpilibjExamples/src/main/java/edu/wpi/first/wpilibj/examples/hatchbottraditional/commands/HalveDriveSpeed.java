@@ -7,11 +7,11 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbottraditional.commands;
 
-import edu.wpi.first.wpilibj2.command.SendableCommandBase;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.DriveSubsystem;
 
-public class HalveDriveSpeed extends SendableCommandBase {
+public class HalveDriveSpeed extends CommandBase {
   private final DriveSubsystem m_drive;
 
   public HalveDriveSpeed(DriveSubsystem drive) {

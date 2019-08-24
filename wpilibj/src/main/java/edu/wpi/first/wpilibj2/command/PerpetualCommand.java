@@ -18,7 +18,7 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
  */
-public class PerpetualCommand extends SendableCommandBase {
+public class PerpetualCommand extends CommandBase {
   protected final Command m_command;
 
   /**

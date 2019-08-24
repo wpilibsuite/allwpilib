@@ -15,11 +15,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * A base for subsystems that handles registration in the constructor, and provides a more intuitive
  * method for setting the default command.
  */
-public abstract class SendableSubsystemBase implements Subsystem, Sendable {
+public abstract class SubsystemBase implements Subsystem, Sendable {
 
   protected String m_name = this.getClass().getSimpleName();
 
-  public SendableSubsystemBase() {
+  public SubsystemBase() {
     CommandScheduler.getInstance().registerSubsystem(this);
   }
 

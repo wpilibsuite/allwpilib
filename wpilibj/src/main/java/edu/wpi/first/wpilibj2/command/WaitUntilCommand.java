@@ -18,7 +18,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * A command that does nothing but ends after a specified match time or condition.  Useful for
  * CommandGroups.
  */
-public class WaitUntilCommand extends SendableCommandBase {
+public class WaitUntilCommand extends CommandBase {
   private final BooleanSupplier m_condition;
 
   /**

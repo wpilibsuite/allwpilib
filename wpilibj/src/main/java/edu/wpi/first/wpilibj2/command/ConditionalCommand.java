@@ -25,7 +25,7 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
  */
-public class ConditionalCommand extends SendableCommandBase {
+public class ConditionalCommand extends CommandBase {
   private final Command m_onTrue;
   private final Command m_onFalse;
   private final BooleanSupplier m_condition;

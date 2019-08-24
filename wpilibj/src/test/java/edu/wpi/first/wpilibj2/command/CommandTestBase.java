@@ -48,7 +48,7 @@ abstract class CommandTestBase {
     }
   }
 
-  class TestSubsystem extends SendableSubsystemBase {
+  class TestSubsystem extends SubsystemBase {
   }
 
   protected class MockCommandHolder {

@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.Notifier;
  * code thread-safe.  If you do not know what "thread-safe" means, that is a good sign that
  * you should not use this class.
  */
-public class NotifierCommand extends SendableCommandBase {
+public class NotifierCommand extends CommandBase {
   protected final Notifier m_notifier;
   protected final double m_period;
 

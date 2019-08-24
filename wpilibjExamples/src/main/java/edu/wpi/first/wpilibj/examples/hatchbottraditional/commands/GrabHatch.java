@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbottraditional.commands;
 
-import edu.wpi.first.wpilibj2.command.SendableCommandBase;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsystem;
 
@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsys
  * pedagogical purposes.  Actual code should inline a command this simple with {@link
  * edu.wpi.first.wpilibj2.command.InstantCommand}.
  */
-public class GrabHatch extends SendableCommandBase {
+public class GrabHatch extends CommandBase {
   // The subsystem the command runs on
   private final HatchSubsystem m_hatchSubsystem;
 

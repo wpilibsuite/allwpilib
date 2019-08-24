@@ -8,12 +8,12 @@
 package edu.wpi.first.wpilibj.templates.commandbased.commands;
 
 import edu.wpi.first.wpilibj.templates.commandbased.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj2.command.SendableCommandBase;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
  * An example command that uses an example subsystem.
  */
-public class ExampleCommand extends SendableCommandBase {
+public class ExampleCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final ExampleSubsystem m_subsystem;
 

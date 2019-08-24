@@ -10,14 +10,14 @@ package edu.wpi.first.wpilibj.examples.gearsbotnew.commands;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj2.command.SendableCommandBase;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.DriveTrain;
 
 /**
  * Have the robot drive tank style.
  */
-public class TankDrive extends SendableCommandBase {
+public class TankDrive extends CommandBase {
   private final DriveTrain m_drivetrain;
   private final DoubleSupplier m_left;
   private final DoubleSupplier m_right;

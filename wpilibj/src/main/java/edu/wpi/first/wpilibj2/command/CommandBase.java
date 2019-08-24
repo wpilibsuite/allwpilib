@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * A {@link Sendable} base class for {@link Command}s.
  */
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
-public abstract class SendableCommandBase implements Sendable, Command {
+public abstract class CommandBase implements Sendable, Command {
 
   protected String m_name = this.getClass().getSimpleName();
   protected String m_subsystem = "Ungrouped";

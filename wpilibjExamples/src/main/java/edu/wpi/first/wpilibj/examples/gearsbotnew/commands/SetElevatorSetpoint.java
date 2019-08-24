@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbotnew.commands;
 
-import edu.wpi.first.wpilibj2.command.SendableCommandBase;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Elevator;
 
@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Elevator;
  * leaves the PID loop running to maintain the position. Other commands using the elevator should
  * make sure they disable PID!
  */
-public class SetElevatorSetpoint extends SendableCommandBase {
+public class SetElevatorSetpoint extends CommandBase {
   private final Elevator m_elevator;
   private final double m_setpoint;
 

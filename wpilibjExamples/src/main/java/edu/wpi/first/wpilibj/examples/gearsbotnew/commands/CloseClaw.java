@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbotnew.commands;
 
-import edu.wpi.first.wpilibj2.command.SendableCommandBase;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.examples.gearsbotnew.Robot;
 import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Claw;
@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Claw;
 /**
  * Closes the claw for one second. Real robots should use sensors, stalling motors is BAD!
  */
-public class CloseClaw extends SendableCommandBase {
+public class CloseClaw extends CommandBase {
   private final Claw m_claw;
 
   public CloseClaw(Claw claw) {

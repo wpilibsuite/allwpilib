@@ -15,11 +15,11 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SendableSubsystemBase;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
-public class DriveTrain extends SendableSubsystemBase {
+public class DriveTrain extends SubsystemBase {
   /**
    * The DriveTrain subsystem incorporates the sensors and actuators attached to the robots chassis.
    * These include four drive motors, a left and right encoder and a gyro.

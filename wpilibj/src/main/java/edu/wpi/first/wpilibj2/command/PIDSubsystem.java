@@ -15,7 +15,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * A subsystem that uses a {@link PIDController} to control an output.  The controller is run
  * synchronously from the subsystem's periodic() method.
  */
-public abstract class PIDSubsystem extends SendableSubsystemBase {
+public abstract class PIDSubsystem extends SubsystemBase {
   protected final PIDController m_controller;
   protected boolean m_enabled;
 

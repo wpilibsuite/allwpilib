@@ -14,7 +14,7 @@ import java.util.Set;
  * no longer scheduled.  Useful for forking off from CommandGroups.  If this command is interrupted,
  * it will cancel all of the commands.
  */
-public class ProxyScheduleCommand extends SendableCommandBase {
+public class ProxyScheduleCommand extends CommandBase {
   private final Set<Command> m_toSchedule;
   private boolean m_finished;
 

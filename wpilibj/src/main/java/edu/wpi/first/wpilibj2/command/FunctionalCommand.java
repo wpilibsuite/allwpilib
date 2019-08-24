@@ -18,7 +18,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * command is beyond a certain complexity it is usually better practice to write a proper class for
  * it than to inline it.
  */
-public class FunctionalCommand extends SendableCommandBase {
+public class FunctionalCommand extends CommandBase {
   protected final Runnable m_onInit;
   protected final Runnable m_onExecute;
   protected final Consumer<Boolean> m_onEnd;

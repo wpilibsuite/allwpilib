@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbotnew.commands;
 
-import edu.wpi.first.wpilibj2.command.SendableCommandBase;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Wrist;
 
@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Wrist;
  * leaves the PID loop running to maintain the position. Other commands using the wrist should make
  * sure they disable PID!
  */
-public class SetWristSetpoint extends SendableCommandBase {
+public class SetWristSetpoint extends CommandBase {
   private final Wrist m_wrist;
   private final double m_setpoint;
 

@@ -17,7 +17,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * Has no end condition as-is; either subclass it or use {@link Command#withTimeout(double)} or
  * {@link Command#interruptOn(BooleanSupplier)} to give it one.
  */
-public class StartEndCommand extends SendableCommandBase {
+public class StartEndCommand extends CommandBase {
   protected final Runnable m_onInit;
   protected final Runnable m_onEnd;
 

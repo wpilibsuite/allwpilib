@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.wpilibj2.command.SendableSubsystemBase;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kEncoderDistancePerPulse;
 import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kGyroReversed;
@@ -26,7 +26,7 @@ import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveCo
 import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kRightMotor1Port;
 import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kRightMotor2Port;
 
-public class DriveSubsystem extends SendableSubsystemBase {
+public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
   private final SpeedControllerGroup m_leftMotors =
       new SpeedControllerGroup(new PWMVictorSPX(kLeftMotor1Port),

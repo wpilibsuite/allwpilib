@@ -17,7 +17,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * {@link Command#interruptOn(BooleanSupplier)} to give it one.  If you only wish
  * to execute a Runnable once, use {@link InstantCommand}.
  */
-public class RunCommand extends SendableCommandBase {
+public class RunCommand extends CommandBase {
   protected final Runnable m_toRun;
 
   /**

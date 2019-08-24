@@ -14,7 +14,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * iteration of the scheduler.  Users can either pass in a Runnable and a set of requirements,
  * or else subclass this command if desired.
  */
-public class InstantCommand extends SendableCommandBase {
+public class InstantCommand extends CommandBase {
   private final Runnable m_toRun;
 
   /**
