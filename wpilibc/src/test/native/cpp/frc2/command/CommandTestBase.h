@@ -16,7 +16,7 @@
 #include "ErrorConfirmer.h"
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandScheduler.h"
-#include "frc2/command/SendableSubsystemBase.h"
+#include "frc2/command/SubsystemBase.h"
 #include "frc2/command/SetUtilities.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -28,7 +28,7 @@ class CommandTestBase : public ::testing::Test {
  public:
   CommandTestBase();
 
-  class TestSubsystem : public SendableSubsystemBase {};
+  class TestSubsystem : public SubsystemBase {};
 
  protected:
   class MockCommand : public Command {

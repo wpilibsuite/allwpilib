@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc2/command/SendableSubsystemBase.h"
+#include "frc2/command/SubsystemBase.h"
 
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SendableBuilder.h>
@@ -14,12 +14,12 @@
 
 using namespace frc2;
 
-SendableSubsystemBase::SendableSubsystemBase() {
+SubsystemBase::SubsystemBase() {
   m_name = GetTypeName(*this);
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
-void SendableSubsystemBase::InitSendable(frc::SendableBuilder& builder) {
+void SubsystemBase::InitSendable(frc::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Subsystem");
   builder.AddBooleanProperty(".hasDefault",
                              [this] { return GetDefaultCommand() != nullptr; },
@@ -43,19 +43,19 @@ void SendableSubsystemBase::InitSendable(frc::SendableBuilder& builder) {
                             nullptr);
 }
 
-std::string SendableSubsystemBase::GetName() const { return m_name; }
+std::string SubsystemBase::GetName() const { return m_name; }
 
-void SendableSubsystemBase::SetName(const wpi::Twine& name) {
+void SubsystemBase::SetName(const wpi::Twine& name) {
   m_name = name.str();
 }
 
-std::string SendableSubsystemBase::GetSubsystem() const { return GetName(); }
+std::string SubsystemBase::GetSubsystem() const { return GetName(); }
 
-void SendableSubsystemBase::SetSubsystem(const wpi::Twine& name) {
+void SubsystemBase::SetSubsystem(const wpi::Twine& name) {
   SetName(name);
 }
 
-void SendableSubsystemBase::AddChild(std::string name, frc::Sendable* child) {
+void SubsystemBase::AddChild(std::string name, frc::Sendable* child) {
   child->SetName(name);
   frc::LiveWindow::GetInstance()->Add(child);
 }

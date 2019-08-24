@@ -8,7 +8,7 @@
 #pragma once
 
 #include "frc/controller/PIDController.h"
-#include "frc2/command/SendableSubsystemBase.h"
+#include "frc2/command/SubsystemBase.h"
 
 namespace frc2 {
 /**
@@ -17,7 +17,7 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class PIDSubsystem : public SendableSubsystemBase {
+class PIDSubsystem : public SubsystemBase {
  public:
   /**
    * Creates a new PIDSubsystem.

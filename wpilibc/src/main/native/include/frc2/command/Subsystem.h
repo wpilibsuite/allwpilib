@@ -28,12 +28,12 @@ class Command;
  * CommandScheduler.RegisterSubsystem() method in order for the
  * Periodic() method to be called.  It is recommended that this method be called
  * from the constructor of users' Subsystem implementations.  The
- * SendableSubsystemBase class offers a simple base for user implementations
+ * SubsystemBase class offers a simple base for user implementations
  * that handles this.
  *
  * @see Command
  * @see CommandScheduler
- * @see SendableSubsystemBase
+ * @see SubsystemBase
  */
 class Subsystem {
  public:

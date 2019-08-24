@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <frc2/command/SendableSubsystemBase.h>
+#include <frc2/command/SubsystemBase.h>
 
 #include <frc/AnalogGyro.h>
 #include <frc/AnalogInput.h>
@@ -25,7 +25,7 @@ class Joystick;
  * the robots chassis. These include four drive motors, a left and right encoder
  * and a gyro.
  */
-class DriveTrain : public frc2::SendableSubsystemBase {
+class DriveTrain : public frc2::SubsystemBase {
  public:
   DriveTrain();
 

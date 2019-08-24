@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <frc2/command/SendableSubsystemBase.h>
+#include <frc2/command/SubsystemBase.h>
 
-class ExampleSubsystem : public frc2::SendableSubsystemBase {
+class ExampleSubsystem : public frc2::SubsystemBase {
  public:
   ExampleSubsystem();
 

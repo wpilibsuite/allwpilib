@@ -18,7 +18,7 @@ namespace frc2 {
  * A base for subsystems that handles registration in the constructor, and
  * provides a more intuitive method for setting the default command.
  */
-class SendableSubsystemBase : public Subsystem, public frc::Sendable {
+class SubsystemBase : public Subsystem, public frc::Sendable {
  public:
   void InitSendable(frc::SendableBuilder& builder) override;
   std::string GetName() const override;
@@ -28,7 +28,7 @@ class SendableSubsystemBase : public Subsystem, public frc::Sendable {
   void AddChild(std::string name, frc::Sendable* child);
 
  protected:
-  SendableSubsystemBase();
+  SubsystemBase();
   std::string m_name;
 };
 }  // namespace frc2

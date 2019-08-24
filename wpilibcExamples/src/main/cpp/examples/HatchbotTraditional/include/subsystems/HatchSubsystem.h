@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include <frc2/command/SendableSubsystemBase.h>
+#include <frc2/command/SubsystemBase.h>
 
 #include <frc/DoubleSolenoid.h>
 
 #include "Constants.h"
 
-class HatchSubsystem : public frc2::SendableSubsystemBase {
+class HatchSubsystem : public frc2::SubsystemBase {
  public:
   HatchSubsystem();
 

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <frc2/command/SendableSubsystemBase.h>
+#include <frc2/command/SubsystemBase.h>
 
 #include <frc/DigitalInput.h>
 #include <frc/PWMVictorSPX.h>
@@ -17,7 +17,7 @@
  * If using stronger motors, you should probably use a sensor so that the
  * motors don't stall.
  */
-class Claw : public frc2::SendableSubsystemBase {
+class Claw : public frc2::SubsystemBase {
  public:
   Claw();
 
