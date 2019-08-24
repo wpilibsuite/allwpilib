@@ -11,10 +11,23 @@
 #include "Button.h"
 
 namespace frc2 {
+/**
+ * A class used to bind command scheduling to joystick button presses.  Can be
+ * composed with other buttons with the operators in Trigger.
+ *
+ * @see Trigger
+ */
 class JoystickButton : public Button {
  public:
+  /**
+   * Creates a JoystickButton that commands can be bound to.
+   *
+   * @param joystick The joystick on which the button is located.
+   * @param buttonNumber The number of the button on the joystic.
+   */
   explicit JoystickButton(frc::GenericHID* joystick, int buttonNumber)
       : m_joystick{joystick}, m_buttonNumber{buttonNumber} {}
+
   bool Get() const override { return m_joystick->GetRawButton(m_buttonNumber); }
 
  private:

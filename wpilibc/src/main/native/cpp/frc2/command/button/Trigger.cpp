@@ -29,7 +29,7 @@ Trigger Trigger::WhenActive(Command* command, bool interruptible) {
 }
 
 Trigger Trigger::WhenActive(std::function<void()> toRun) {
-  return WhenActive(new InstantCommand(std::move(toRun), {}));
+  return WhenActive(InstantCommand(std::move(toRun), {}));
 }
 
 Trigger Trigger::WhileActiveContinous(Command* command, bool interruptible) {
@@ -49,7 +49,7 @@ Trigger Trigger::WhileActiveContinous(Command* command, bool interruptible) {
 }
 
 Trigger Trigger::WhileActiveContinous(std::function<void()> toRun) {
-  return WhileActiveContinous(new InstantCommand(std::move(toRun), {}));
+  return WhileActiveContinous(InstantCommand(std::move(toRun), {}));
 }
 
 Trigger Trigger::WhileActiveOnce(Command* command, bool interruptible) {
@@ -83,7 +83,7 @@ Trigger Trigger::WhenInactive(Command* command, bool interruptible) {
 }
 
 Trigger Trigger::WhenInactive(std::function<void()> toRun) {
-  return WhenInactive(new InstantCommand(std::move(toRun), {}));
+  return WhenInactive(InstantCommand(std::move(toRun), {}));
 }
 
 Trigger Trigger::ToggleWhenActive(Command* command, bool interruptible) {
