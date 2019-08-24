@@ -11,8 +11,8 @@
 #include <utility>
 #include <vector>
 
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "frc/trajectory/Trajectory.h"
+#include "frc/trajectory/constraint/TrajectoryConstraint.h"
 
 namespace frc {
 /**
