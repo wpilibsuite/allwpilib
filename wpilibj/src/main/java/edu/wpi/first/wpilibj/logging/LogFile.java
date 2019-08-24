@@ -14,9 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -32,7 +30,7 @@ public class LogFile {
   /**
    * Instantiate a LogFile passing in its prefix and its extension.
    *
-   * If you want the file to be saved in a existing directory, you can add its
+   * <p>If you want the file to be saved in a existing directory, you can add its
    * path before the file prefix. Exemple : to save the file in a usb stick on
    * the roborio ("/media/sda1/") : LogFile("/media/sda1/log").
    *
@@ -40,7 +38,7 @@ public class LogFile {
    * @param fileExtension The extension of the LogFile (without dot).
    */
   public LogFile(String filePrefix, String fileExtension) {
-    m_name = name;
+    m_filePrefix = filePrefix;
     m_fileExtension = fileExtension;
     m_active = false;
   }
@@ -48,14 +46,14 @@ public class LogFile {
   /**
    * Instantiate a LogFile passing in its prefix.
    *
-   * If you want the file to be saved in a existing directory, you can add its
+   * <p>If you want the file to be saved in a existing directory, you can add its
    * path before the file prefix. Exemple : to save the file in a usb stick on
    * the roborio ("/media/sda1/") : LogFile("/media/sda1/log").
    *
    * @param filePrefix The prefix of the LogFile.
    */
   public LogFile(String filePrefix) {
-    this("", "txt");
+    this(filePrefix, "txt");
   }
 
   /**
@@ -113,9 +111,9 @@ public class LogFile {
   }
 
   /**
-   * Return true if the LogFile is active
+   * Return true if the LogFile is active.
    *
-   * @return true if the LogFile is active
+   * @return true if the LogFile is active.
    */
   public boolean isActive() {
     return m_active;

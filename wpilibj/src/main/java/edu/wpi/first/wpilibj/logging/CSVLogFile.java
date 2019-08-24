@@ -7,17 +7,8 @@
 
 package edu.wpi.first.wpilibj.logging;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * A CSVLogFile is a LogFile that writes to a file the contents of each of its
@@ -26,14 +17,14 @@ import java.util.Locale;
  * <p>For the CSVLogFile to write log informations, you must call
  * {@link #periodic()} periodically.
  */
-public class CSVLogFile extends LogFile{
+public class CSVLogFile extends LogFile {
   private final List<CSVLogCell> m_cells;
   private final CSVLogCell m_timestampCell;
 
   /**
    * Instantiate a LogFile passing in its prefix and its extension.
    *
-   * If you want the file to be saved in a existing directory, you can add its
+   * <p>If you want the file to be saved in a existing directory, you can add its
    * path before the file prefix. Exemple : to save the file in a usb stick on
    * the roborio ("/media/sda1/") : LogFile("/media/sda1/log").
    *
@@ -76,6 +67,7 @@ public class CSVLogFile extends LogFile{
    *
    * <p>It causes the CSVLogFile to be "active".
    */
+  @Override
   public void start() {
     super.start();
 

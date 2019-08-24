@@ -54,9 +54,9 @@ class LogFile {
   void Log(std::string text);
 
   /**
-   * Return true if the LogFile is active
+   * Return true if the LogFile is active.
    *
-   * @return true if the LogFile is active
+   * @return true if the LogFile is active.
    */
   bool IsActive();
 

@@ -7,10 +7,11 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 
-#include "frc/logging/LogFile.h"
 #include "frc/logging/CSVLogCell.h"
+#include "frc/logging/LogFile.h"
 
 namespace frc {
 
