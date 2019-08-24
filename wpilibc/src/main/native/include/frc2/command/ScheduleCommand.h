@@ -9,8 +9,8 @@
 
 #include <wpi/SmallVector.h>
 
-#include "CommandHelper.h"
 #include "CommandBase.h"
+#include "CommandHelper.h"
 #include "SetUtilities.h"
 
 namespace frc2 {
@@ -20,8 +20,7 @@ namespace frc2 {
  * group will not know about the status of the scheduled commands, and will
  * treat this command as finishing instantly.
  */
-class ScheduleCommand
-    : public CommandHelper<CommandBase, ScheduleCommand> {
+class ScheduleCommand : public CommandHelper<CommandBase, ScheduleCommand> {
  public:
   /**
    * Creates a new ScheduleCommand that schedules the given commands when

@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "CommandHelper.h"
 #include "CommandBase.h"
+#include "CommandHelper.h"
 
 namespace frc2 {
 /**
@@ -18,8 +18,7 @@ namespace frc2 {
  * subclass it or use Command.WithTimeout() or Command.InterruptOn() to give it
  * one.
  */
-class StartEndCommand
-    : public CommandHelper<CommandBase, StartEndCommand> {
+class StartEndCommand : public CommandHelper<CommandBase, StartEndCommand> {
  public:
   /**
    * Creates a new StartEndCommand.  Will run the given runnables when the

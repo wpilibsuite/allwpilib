@@ -12,9 +12,9 @@
 #include <utility>
 #include <vector>
 
+#include "CommandBase.h"
 #include "CommandGroupBase.h"
 #include "PrintCommand.h"
-#include "CommandBase.h"
 
 namespace frc2 {
 template <typename Key>
@@ -34,8 +34,7 @@ template <typename Key>
  * <p>As a rule, CommandGroups require the union of the requirements of their
  * component commands.
  */
-class SelectCommand
-    : public CommandHelper<CommandBase, SelectCommand<Key>> {
+class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
  public:
   /**
    * Creates a new selectcommand.

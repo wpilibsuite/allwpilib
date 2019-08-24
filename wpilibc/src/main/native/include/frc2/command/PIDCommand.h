@@ -8,8 +8,8 @@
 #pragma once
 
 #include "frc/controller/PIDController.h"
-#include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandBase.h"
+#include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**

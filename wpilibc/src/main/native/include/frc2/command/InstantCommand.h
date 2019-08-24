@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "CommandHelper.h"
 #include "CommandBase.h"
+#include "CommandHelper.h"
 
 namespace frc2 {
 /**
@@ -16,8 +16,7 @@ namespace frc2 {
  * the same iteration of the scheduler.  Users can either pass in a Runnable and
  * a set of requirements, or else subclass this command if desired.
  */
-class InstantCommand
-    : public CommandHelper<CommandBase, InstantCommand> {
+class InstantCommand : public CommandHelper<CommandBase, InstantCommand> {
  public:
   /**
    * Creates a new InstantCommand that runs the given Runnable with the given

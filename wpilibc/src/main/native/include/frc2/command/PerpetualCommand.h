@@ -10,9 +10,9 @@
 #include <memory>
 #include <utility>
 
+#include "CommandBase.h"
 #include "CommandGroupBase.h"
 #include "CommandHelper.h"
-#include "CommandBase.h"
 
 namespace frc2 {
 /**
@@ -25,8 +25,7 @@ namespace frc2 {
  * <p>As a rule, CommandGroups require the union of the requirements of their
  * component commands.
  */
-class PerpetualCommand
-    : public CommandHelper<CommandBase, PerpetualCommand> {
+class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
  public:
   /**
    * Creates a new PerpetualCommand.  Will run another command in perpetuity,

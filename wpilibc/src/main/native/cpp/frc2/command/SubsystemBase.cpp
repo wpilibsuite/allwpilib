@@ -45,15 +45,11 @@ void SubsystemBase::InitSendable(frc::SendableBuilder& builder) {
 
 std::string SubsystemBase::GetName() const { return m_name; }
 
-void SubsystemBase::SetName(const wpi::Twine& name) {
-  m_name = name.str();
-}
+void SubsystemBase::SetName(const wpi::Twine& name) { m_name = name.str(); }
 
 std::string SubsystemBase::GetSubsystem() const { return GetName(); }
 
-void SubsystemBase::SetSubsystem(const wpi::Twine& name) {
-  SetName(name);
-}
+void SubsystemBase::SetSubsystem(const wpi::Twine& name) { SetName(name); }
 
 void SubsystemBase::AddChild(std::string name, frc::Sendable* child) {
   child->SetName(name);

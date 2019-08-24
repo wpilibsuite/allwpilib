@@ -11,8 +11,8 @@
 
 #include <wpi/Twine.h>
 
-#include "CommandHelper.h"
 #include "CommandBase.h"
+#include "CommandHelper.h"
 #include "frc/Timer.h"
 
 namespace frc2 {

@@ -16,8 +16,7 @@ namespace frc2 {
  * A command that does nothing but ends after a specified match time or
  * condition.  Useful for CommandGroups.
  */
-class WaitUntilCommand
-    : public CommandHelper<CommandBase, WaitUntilCommand> {
+class WaitUntilCommand : public CommandHelper<CommandBase, WaitUntilCommand> {
  public:
   /**
    * Creates a new WaitUntilCommand that ends after a given condition becomes

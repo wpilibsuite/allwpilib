@@ -9,8 +9,8 @@
 
 #include <frc/Notifier.h>
 
-#include "CommandHelper.h"
 #include "CommandBase.h"
+#include "CommandHelper.h"
 
 namespace frc2 {
 /**
@@ -23,8 +23,7 @@ namespace frc2 {
  * make the executed code thread-safe.  If you do not know what "thread-safe"
  * means, that is a good sign that you should not use this class.
  */
-class NotifierCommand
-    : public CommandHelper<CommandBase, NotifierCommand> {
+class NotifierCommand : public CommandHelper<CommandBase, NotifierCommand> {
  public:
   /**
    * Creates a new NotifierCommand.

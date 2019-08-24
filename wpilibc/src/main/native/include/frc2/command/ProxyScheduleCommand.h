@@ -9,8 +9,8 @@
 
 #include <wpi/SmallVector.h>
 
-#include "CommandHelper.h"
 #include "CommandBase.h"
+#include "CommandHelper.h"
 #include "SetUtilities.h"
 
 namespace frc2 {

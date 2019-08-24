@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "CommandHelper.h"
 #include "CommandBase.h"
+#include "CommandHelper.h"
 
 namespace frc2 {
 /**
@@ -18,8 +18,7 @@ namespace frc2 {
  * complexity it is usually better practice to write a proper class for it than
  * to inline it.
  */
-class FunctionalCommand
-    : public CommandHelper<CommandBase, FunctionalCommand> {
+class FunctionalCommand : public CommandHelper<CommandBase, FunctionalCommand> {
  public:
   /**
    * Creates a new FunctionalCommand.

@@ -18,8 +18,7 @@ CommandBase::CommandBase() {
   m_subsystem = "Unknown";
 }
 
-CommandBase::CommandBase(const CommandBase& other)
-    : Sendable{}, Command{} {
+CommandBase::CommandBase(const CommandBase& other) : Sendable{}, Command{} {
   m_name = other.m_name;
   m_subsystem = other.m_subsystem;
   m_requirements = other.m_requirements;
@@ -30,8 +29,7 @@ void CommandBase::AddRequirements(
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
-void CommandBase::AddRequirements(
-    wpi::SmallSet<Subsystem*, 4> requirements) {
+void CommandBase::AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements) {
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
@@ -39,9 +37,7 @@ wpi::SmallSet<Subsystem*, 4> CommandBase::GetRequirements() const {
   return m_requirements;
 }
 
-void CommandBase::SetName(const wpi::Twine& name) {
-  m_name = name.str();
-}
+void CommandBase::SetName(const wpi::Twine& name) { m_name = name.str(); }
 
 std::string CommandBase::GetName() const { return m_name; }
 
