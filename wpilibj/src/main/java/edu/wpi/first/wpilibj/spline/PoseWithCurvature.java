@@ -9,17 +9,32 @@ package edu.wpi.first.wpilibj.spline;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 
+/**
+ * Represents a pair of a pose and a curvature.
+ */
 @SuppressWarnings("MemberName")
 public class PoseWithCurvature {
-  public Pose2d pose;
-  public double curvature;
+  // Represents the pose.
+  public Pose2d poseMeters;
 
-  public PoseWithCurvature(Pose2d pose, double curvature) {
-    this.pose = pose;
-    this.curvature = curvature;
+  // Represents the curvature.
+  public double curvatureRadPerMeter;
+
+  /**
+   * Constructs a PoseWithCurvature.
+   *
+   * @param poseMeters           The pose.
+   * @param curvatureRadPerMeter The curvature.
+   */
+  public PoseWithCurvature(Pose2d poseMeters, double curvatureRadPerMeter) {
+    this.poseMeters = poseMeters;
+    this.curvatureRadPerMeter = curvatureRadPerMeter;
   }
 
+  /**
+   * Constructs a PoseWithCurvature with default values.
+   */
   public PoseWithCurvature() {
-    pose = new Pose2d();
+    poseMeters = new Pose2d();
   }
 }

@@ -22,6 +22,7 @@ public class Trajectory {
 
   /**
    * Constructs a trajectory from a vector of states.
+   *
    * @param states A vector of states.
    */
   public Trajectory(final List<State> states) {
@@ -33,9 +34,8 @@ public class Trajectory {
    * Linearly interpolates between two values.
    *
    * @param startValue The start value.
-   * @param endValue The end value.
-   * @param t The fraction for interpolation.
-   *
+   * @param endValue   The end value.
+   * @param t          The fraction for interpolation.
    * @return The interpolated value.
    */
   @SuppressWarnings("ParameterName")
@@ -47,9 +47,8 @@ public class Trajectory {
    * Linearly interpolates between two poses.
    *
    * @param startValue The start pose.
-   * @param endValue The end pose.
-   * @param t The fraction for interpolation.
-   *
+   * @param endValue   The end pose.
+   * @param t          The fraction for interpolation.
    * @return The interpolated pose.
    */
   @SuppressWarnings("ParameterName")
@@ -59,6 +58,7 @@ public class Trajectory {
 
   /**
    * Returns the overall duration of the trajectory.
+   *
    * @return The duration of the trajectory.
    */
   public double getTotalTimeSeconds() {
@@ -67,6 +67,7 @@ public class Trajectory {
 
   /**
    * Return the states of the trajectory.
+   *
    * @return The states of the trajectory.
    */
   public List<State> getStates() {
@@ -153,6 +154,15 @@ public class Trajectory {
       poseMeters = new Pose2d();
     }
 
+    /**
+     * Constructs a State with the specified parameters.
+     *
+     * @param timeSeconds                   The time elapsed since the beginning of the trajectory.
+     * @param velocityMetersPerSecond       The speed at that point of the trajectory.
+     * @param accelerationMetersPerSecondSq The acceleration at that point of the trajectory.
+     * @param poseMeters                    The pose at that point of the trajectory.
+     * @param curvatureRadPerMeter          The curvature at that point of the trajectory.
+     */
     public State(double timeSeconds, double velocityMetersPerSecond,
                  double accelerationMetersPerSecondSq, Pose2d poseMeters,
                  double curvatureRadPerMeter) {
@@ -167,8 +177,7 @@ public class Trajectory {
      * Interpolates between two States.
      *
      * @param endValue The end value for the interpolation.
-     * @param i The interpolant (fraction).
-     *
+     * @param i        The interpolant (fraction).
      * @return The interpolated state.
      */
     @SuppressWarnings("ParameterName")

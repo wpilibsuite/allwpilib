@@ -12,7 +12,13 @@ import java.util.Arrays;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
-public class SplineHelper {
+public final class SplineHelper {
+  /**
+   * Private constructor because this is a utility class.
+   */
+  private SplineHelper() {
+  }
+
   /**
    * Returns a set of cubic splines corresponding to the provided waypoints. The
    * user is free to set the direction of the start and end point. The
@@ -23,11 +29,11 @@ public class SplineHelper {
    * @param waypoints The middle waypoints. This can be left blank if you only
    *                  wish to create a path with two waypoints.
    * @param end       The ending waypoint.
-   *
    * @return A vector of cubic hermite splines that interpolate through the
    *         provided waypoints.
    */
-  @SuppressWarnings("LocalVariableName")
+  @SuppressWarnings({"LocalVariableName", "PMD.ExcessiveMethodLength",
+      "PMD.AvoidInstantiatingObjectsInLoops"})
   public static CubicHermiteSpline[] getCubicSplinesFromWaypoints(
       Pose2d start, Translation2d[] waypoints, Pose2d end) {
 
@@ -153,7 +159,7 @@ public class SplineHelper {
    * @return A vector of quintic hermite splines that interpolate through the
    *         provided waypoints.
    */
-  @SuppressWarnings("LocalVariableName")
+  @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
   public static QuinticHermiteSpline[] getQuinticSplinesFromWaypoints(Pose2d[] waypoints) {
     QuinticHermiteSpline[] splines = new QuinticHermiteSpline[waypoints.length - 1];
     for (int i = 0; i < waypoints.length - 1; i++) {
@@ -181,10 +187,10 @@ public class SplineHelper {
   /**
    * Thomas algorithm for solving tridiagonal systems Af = d.
    *
-   * @param a the values of A above the diagonal
-   * @param b the values of A on the diagonal
-   * @param c the values of A below the diagonal
-   * @param d the vector on the rhs
+   * @param a              the values of A above the diagonal
+   * @param b              the values of A on the diagonal
+   * @param c              the values of A below the diagonal
+   * @param d              the vector on the rhs
    * @param solutionVector the unknown (solution) vector, modified in-place
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})

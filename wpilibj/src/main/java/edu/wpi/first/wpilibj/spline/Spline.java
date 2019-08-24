@@ -71,7 +71,13 @@ public abstract class Spline {
    */
   protected abstract SimpleMatrix getCoefficients();
 
-  @SuppressWarnings({"ParameterName", "MultipleVariableDeclarations"})
+  /**
+   * Gets the pose and curvature at some point t on the spline.
+   *
+   * @param t The point t
+   * @return The pose and curvature at that point.
+   */
+  @SuppressWarnings("ParameterName")
   public PoseWithCurvature getPoint(double t) {
     SimpleMatrix polynomialBases = new SimpleMatrix(m_degree + 1, 1);
     final var coefficients = getCoefficients();
@@ -89,7 +95,10 @@ public abstract class Spline {
     final double x = combined.get(0, 0);
     final double y = combined.get(1, 0);
 
-    double dx, dy, ddx, ddy;
+    double dx;
+    double dy;
+    double ddx;
+    double ddy;
 
     if (t == 0) {
       dx = coefficients.get(2, m_degree - 1);
@@ -124,11 +133,11 @@ public abstract class Spline {
    * @param t0     Starting point for arc.
    * @param t1     Ending point for arc.
    */
-  private void getSegmentArc(ArrayList<PoseWithCurvature> vector, double t0, double t1) {
+  private void getSegmentArc(List<PoseWithCurvature> vector, double t0, double t1) {
     final var start = getPoint(t0);
     final var end = getPoint(t1);
 
-    final var twist = start.pose.log(end.pose);
+    final var twist = start.poseMeters.log(end.poseMeters);
 
     if (Math.abs(twist.dy) > kMaxDy || Math.abs(twist.dx) > kMaxDx
         || Math.abs(twist.dtheta) > kMaxDtheta) {

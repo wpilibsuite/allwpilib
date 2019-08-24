@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.trajectory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -18,10 +19,32 @@ import edu.wpi.first.wpilibj.spline.Spline;
 import edu.wpi.first.wpilibj.spline.SplineHelper;
 import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
 
-public class TrajectoryGenerator {
+public final class TrajectoryGenerator {
+  /**
+   * Private constructor because this is a utility class.
+   */
+  private TrajectoryGenerator() {
+  }
+
+  /**
+   * Generates a trajectory with the given waypoints and constraints.
+   *
+   * @param waypoints                        A vector of points that the trajectory must go through.
+   * @param constraints                      A vector of various velocity and acceleration
+   *                                         constraints.
+   * @param startVelocityMetersPerSecond     The start velocity for the trajectory.
+   * @param endVelocityMetersPerSecond       The end velocity for the trajectory.
+   * @param maxVelocityMetersPerSecond       The max velocity for the trajectory.
+   * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
+   * @param reversed                         Whether the robot should move backwards. Note that the
+   *                                         robot will still move from a -> b -> ... -> z
+   *                                         as defined in the waypoints.
+   * @return The trajectory.
+   */
+
   public static Trajectory generateTrajectory(
-      ArrayList<Pose2d> waypoints,
-      ArrayList<TrajectoryConstraint> constraints,
+      List<Pose2d> waypoints,
+      List<TrajectoryConstraint> constraints,
       double startVelocityMetersPerSecond,
       double endVelocityMetersPerSecond,
       double maxVelocityMetersPerSecond,
@@ -44,8 +67,8 @@ public class TrajectoryGenerator {
     // field. Also fix curvature.
     if (reversed) {
       for (var point : points) {
-        point.pose = point.pose.plus(flip);
-        point.curvature *= -1;
+        point.poseMeters = point.poseMeters.plus(flip);
+        point.curvatureRadPerMeter *= -1;
       }
     }
 
@@ -54,11 +77,30 @@ public class TrajectoryGenerator {
         maxAccelerationMetersPerSecondSq, reversed);
   }
 
+  /**
+   * Generates a trajectory with the given waypoints and constraints.
+   *
+   * @param start                            The starting pose for the trajectory.
+   * @param waypoints                        The interior waypoints for the trajectory. The headings
+   *                                         will be determined automatically to ensure continuous
+   *                                         curvature.
+   * @param end                              The ending pose for the trajectory.
+   * @param constraints                      A vector of various velocity and acceleration
+   *                                         constraints.
+   * @param startVelocityMetersPerSecond     The start velocity for the trajectory.
+   * @param endVelocityMetersPerSecond       The end velocity for the trajectory.
+   * @param maxVelocityMetersPerSecond       The max velocity for the trajectory.
+   * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
+   * @param reversed                         Whether the robot should move backwards. Note that the
+   *                                         robot will still move from a -> b -> ... -> z as
+   *                                         defined in the waypoints.
+   * @return The trajectory.
+   */
   public static Trajectory generateTrajectory(
       Pose2d start,
-      ArrayList<Translation2d> waypoints,
+      List<Translation2d> waypoints,
       Pose2d end,
-      ArrayList<TrajectoryConstraint> constraints,
+      List<TrajectoryConstraint> constraints,
       double startVelocityMetersPerSecond,
       double endVelocityMetersPerSecond,
       double maxVelocityMetersPerSecond,
@@ -78,8 +120,8 @@ public class TrajectoryGenerator {
     // field. Also fix curvature.
     if (reversed) {
       for (var point : points) {
-        point.pose = point.pose.plus(flip);
-        point.curvature *= -1;
+        point.poseMeters = point.poseMeters.plus(flip);
+        point.curvatureRadPerMeter *= -1;
       }
     }
 
@@ -88,7 +130,7 @@ public class TrajectoryGenerator {
         maxAccelerationMetersPerSecondSq, reversed);
   }
 
-  private static ArrayList<PoseWithCurvature> splinePointsFromSplines(
+  private static List<PoseWithCurvature> splinePointsFromSplines(
       Spline[] splines) {
     // Create the vector of spline points.
     var splinePoints = new ArrayList<PoseWithCurvature>();
@@ -109,9 +151,12 @@ public class TrajectoryGenerator {
     return splinePoints;
   }
 
+  @SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.CyclomaticComplexity",
+      "PMD.NPathComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+      "PMD.AvoidThrowingRawExceptionTypes"})
   private static Trajectory timeParameterizeTrajectory(
-      ArrayList<PoseWithCurvature> points,
-      ArrayList<TrajectoryConstraint> constraints,
+      List<PoseWithCurvature> points,
+      List<TrajectoryConstraint> constraints,
       double startVelocityMetersPerSecond,
       double endVelocityMetersPerSecond,
       double maxVelocityMetersPerSecond,
@@ -129,8 +174,8 @@ public class TrajectoryGenerator {
       constrainedState.pose = points.get(i);
 
       // Begin constraining based on predecessor.
-      double ds = constrainedState.pose.pose.getTranslation().getDistance(
-          predecessor.pose.pose.getTranslation());
+      double ds = constrainedState.pose.poseMeters.getTranslation().getDistance(
+          predecessor.pose.poseMeters.getTranslation());
       constrainedState.distanceMeters = predecessor.distanceMeters + ds;
 
       // We may need to iterate to find the maximum end velocity and common
@@ -154,12 +199,8 @@ public class TrajectoryGenerator {
           constrainedState.maxVelocityMetersPerSecond = Math.min(
               constrainedState.maxVelocityMetersPerSecond,
               constraint.getMaxVelocityMetersPerSecond(
-                  constrainedState.pose.pose, constrainedState.pose.curvature)
+                  constrainedState.pose.poseMeters, constrainedState.pose.curvatureRadPerMeter)
           );
-        }
-
-        if (Double.isNaN(constrainedState.maxVelocityMetersPerSecond)) {
-          throw new RuntimeException();
         }
 
         // Now enforce all acceleration limits.
@@ -290,7 +331,7 @@ public class TrajectoryGenerator {
           timeSeconds,
           reversed ? -velocityMetersPerSecond : velocityMetersPerSecond,
           reversed ? -accel : accel,
-          state.pose.pose, state.pose.curvature
+          state.pose.poseMeters, state.pose.curvatureRadPerMeter
       ));
     }
 
@@ -298,13 +339,14 @@ public class TrajectoryGenerator {
   }
 
   private static void enforceAccelerationLimits(boolean reverse,
-                                                ArrayList<TrajectoryConstraint> constraints,
+                                                List<TrajectoryConstraint> constraints,
                                                 ConstrainedState state) {
 
     for (final var constraint : constraints) {
       double factor = reverse ? -1.0 : 1.0;
-      final var minMaxAccel = constraint.getMinMaxAccelerationMetersPerSecondSq(state.pose.pose,
-          state.pose.curvature, state.maxVelocityMetersPerSecond * factor);
+      final var minMaxAccel = constraint.getMinMaxAccelerationMetersPerSecondSq(
+          state.pose.poseMeters, state.pose.curvatureRadPerMeter,
+          state.maxVelocityMetersPerSecond * factor);
 
       state.minAccelerationMetersPerSecondSq = Math.max(state.minAccelerationMetersPerSecondSq,
           reverse ? -minMaxAccel.maxAccelerationMetersPerSecondSq

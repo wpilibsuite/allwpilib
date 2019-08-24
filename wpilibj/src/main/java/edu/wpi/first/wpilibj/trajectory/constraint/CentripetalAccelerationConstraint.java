@@ -23,14 +23,22 @@ public class CentripetalAccelerationConstraint implements TrajectoryConstraint {
 
   /**
    * Constructs a centripetal acceleration constraint.
+   *
    * @param maxCentripetalAccelerationMetersPerSecondSq The max centripetal acceleration.
    */
   public CentripetalAccelerationConstraint(double maxCentripetalAccelerationMetersPerSecondSq) {
     m_maxCentripetalAccelerationMetersPerSecondSq = maxCentripetalAccelerationMetersPerSecondSq;
   }
 
+  /**
+   * Returns the max velocity given the current pose and curvature.
+   *
+   * @param poseMeters           The pose at the current point in the trajectory.
+   * @param curvatureRadPerMeter The curvature at the current point in the trajectory.
+   * @return The absolute maximum velocity.
+   */
   @Override
-  public double getMaxVelocityMetersPerSecond(Pose2d pose, double curvatureRadPerMeter) {
+  public double getMaxVelocityMetersPerSecond(Pose2d poseMeters, double curvatureRadPerMeter) {
     // ac = v^2 / r
     // k (curvature) = 1 / r
 
@@ -42,8 +50,17 @@ public class CentripetalAccelerationConstraint implements TrajectoryConstraint {
         / Math.abs(curvatureRadPerMeter));
   }
 
+  /**
+   * Returns the minimum and maximum allowable acceleration for the trajectory
+   * given pose, curvature, and speed.
+   *
+   * @param poseMeters              The pose at the current point in the trajectory.
+   * @param curvatureRadPerMeter    The curvature at the current point in the trajectory.
+   * @param velocityMetersPerSecond The speed at the current point in the trajectory.
+   * @return The min and max acceleration bounds.
+   */
   @Override
-  public MinMax getMinMaxAccelerationMetersPerSecondSq(Pose2d pose,
+  public MinMax getMinMaxAccelerationMetersPerSecondSq(Pose2d poseMeters,
                                                        double curvatureRadPerMeter,
                                                        double velocityMetersPerSecond) {
     // The acceleration of the robot has no impact on the centripetal acceleration

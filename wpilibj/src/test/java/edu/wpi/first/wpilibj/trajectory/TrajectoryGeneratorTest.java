@@ -27,12 +27,13 @@ class TrajectoryGeneratorTest {
   }
 
   @Test
+  @SuppressWarnings("LocalVariableName")
   void testObeysConstraints() {
-    double startVelocity = 0;
-    double endVelocity = 0;
-    double maxVelocity = feetToMeters(12.0);
-    double maxAccel = feetToMeters(12);
-    double maxCentripetalAccel = feetToMeters(7);
+    final double startVelocity = 0;
+    final double endVelocity = 0;
+    final double maxVelocity = feetToMeters(12.0);
+    final double maxAccel = feetToMeters(12);
+    final double maxCentripetalAccel = feetToMeters(7);
 
     var constraints = new ArrayList<TrajectoryConstraint>();
     constraints.add(new CentripetalAccelerationConstraint(maxCentripetalAccel));
@@ -45,12 +46,12 @@ class TrajectoryGeneratorTest {
 
     var waypoints = new ArrayList<Pose2d>();
     waypoints.add(sideStart);
-    waypoints.add((sideStart.plus(
+    waypoints.add(sideStart.plus(
         new Transform2d(new Translation2d(feetToMeters(-13), feetToMeters(0)),
-            new Rotation2d()))));
-    waypoints.add((sideStart.plus(
+            new Rotation2d())));
+    waypoints.add(sideStart.plus(
         new Transform2d(new Translation2d(feetToMeters(-19.5), feetToMeters(5)),
-            Rotation2d.fromDegrees(-90)))));
+            Rotation2d.fromDegrees(-90))));
     waypoints.add(crossScale);
 
     var start = System.nanoTime();
@@ -77,13 +78,15 @@ class TrajectoryGeneratorTest {
 
       assertAll(
           () -> assertTrue(Math.abs(a_c) <= maxCentripetalAccel + 0.05),
-          () -> assertTrue(Math.abs(point.velocityMetersPerSecond) < maxVelocity + feetToMeters(0.01)),
-          () -> assertTrue(Math.abs(point.accelerationMetersPerSecondSq) < maxAccel + feetToMeters(0.01))
+          () -> assertTrue(Math.abs(point.velocityMetersPerSecond)
+              < maxVelocity + feetToMeters(0.01)),
+          () -> assertTrue(Math.abs(point.accelerationMetersPerSecondSq)
+              < maxAccel + feetToMeters(0.01))
       );
 
       var pose = point.poseMeters;
 
-//      System.out.println(point.curvatureRadPerMeter);
+      // System.out.println(point.curvatureRadPerMeter);
       System.out.println(pose.getTranslation().getX() + ", " + pose.getTranslation().getY());
       t += dt;
     }

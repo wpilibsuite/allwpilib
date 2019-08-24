@@ -10,9 +10,23 @@ package edu.wpi.first.wpilibj.spline;
 import org.ejml.simple.SimpleMatrix;
 
 public class CubicHermiteSpline extends Spline {
-  private static SimpleMatrix hermiteBasis = null;
-  private SimpleMatrix m_coefficients;
+  private static SimpleMatrix hermiteBasis;
+  private final SimpleMatrix m_coefficients;
 
+  /**
+   * Constructs a cubic hermite spline with the specified control vectors. Each
+   * control vector contains info about the location of the point and its first
+   * derivative.
+   *
+   * @param xInitialControlVector The control vector for the initial point in
+   *                              the x dimension.
+   * @param xFinalControlVector   The control vector for the final point in
+   *                              the x dimension.
+   * @param yInitialControlVector The control vector for the initial point in
+   *                              the y dimension.
+   * @param yFinalControlVector   The control vector for the final point in
+   *                              the y dimension.
+   */
   @SuppressWarnings("ParameterName")
   public CubicHermiteSpline(double[] xInitialControlVector, double[] xFinalControlVector,
                             double[] yInitialControlVector, double[] yFinalControlVector) {
@@ -44,11 +58,21 @@ public class CubicHermiteSpline extends Spline {
 
   }
 
+  /**
+   * Returns the coefficients matrix.
+   *
+   * @return The coefficients matrix.
+   */
   @Override
   protected SimpleMatrix getCoefficients() {
     return m_coefficients;
   }
 
+  /**
+   * Returns the hermite basis matrix for cubic hermite spline interpolation.
+   *
+   * @return The hermite basis matrix for cubic hermite spline interpolation.
+   */
   private SimpleMatrix makeHermiteBasis() {
     if (hermiteBasis == null) {
       hermiteBasis = new SimpleMatrix(4, 4, true, new double[]{
@@ -61,6 +85,14 @@ public class CubicHermiteSpline extends Spline {
     return hermiteBasis;
   }
 
+  /**
+   * Returns the control vector for each dimension as a matrix from the
+   * user-provided arrays in the constructor.
+   *
+   * @param initialVector The control vector for the initial point.
+   * @param finalVector   The control vector for the final point.
+   * @return The control vector matrix for a dimension.
+   */
   private SimpleMatrix getControlVectorFromArrays(double[] initialVector, double[] finalVector) {
     if (initialVector.length != 2 || finalVector.length != 2) {
       throw new IllegalArgumentException("Size of vectors must be 2");
