@@ -21,6 +21,16 @@ namespace frc {
  */
 class TrajectoryConstraint {
  public:
+  TrajectoryConstraint() = default;
+
+  TrajectoryConstraint(const TrajectoryConstraint&) = default;
+  TrajectoryConstraint& operator=(const TrajectoryConstraint&) = default;
+
+  TrajectoryConstraint(TrajectoryConstraint&&) = default;
+  TrajectoryConstraint& operator=(TrajectoryConstraint&&) = default;
+
+  virtual ~TrajectoryConstraint() = default;
+
   /**
    * Represents a minimum and maximum acceleration.
    */
