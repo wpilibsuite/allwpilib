@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,7 +13,7 @@
 
 using namespace frc;
 
-static constexpr double kPacketPeriod = 0.02;
+static constexpr auto kPacketPeriod = 0.02_s;
 
 IterativeRobot::IterativeRobot() : IterativeRobotBase(kPacketPeriod) {
   HAL_Report(HALUsageReporting::kResourceType_Framework,
