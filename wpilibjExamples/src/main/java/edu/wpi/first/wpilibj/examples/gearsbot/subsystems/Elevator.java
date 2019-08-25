@@ -37,7 +37,7 @@ public class Elevator extends PIDSubsystem {
     if (Robot.isSimulation()) { // Check for simulation and update PID values
       getController().setPID(kP_simulation, kI_simulation, 0);
     }
-    getController().setAbsoluteTolerance(0.005);
+    getController().setTolerance(0.005);
 
     m_motor = new Victor(5);
 

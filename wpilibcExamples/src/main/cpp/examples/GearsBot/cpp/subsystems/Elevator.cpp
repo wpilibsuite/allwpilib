@@ -16,7 +16,7 @@ Elevator::Elevator()
 #ifdef SIMULATION  // Check for simulation and update PID values
   GetPIDController()->SetPID(kP_simulation, kI_simulation, 0, 0);
 #endif
-  m_controller.SetAbsoluteTolerance(0.005);
+  m_controller.SetTolerance(0.005);
 
   SetName("Elevator");
   // Let's show everything on the LiveWindow

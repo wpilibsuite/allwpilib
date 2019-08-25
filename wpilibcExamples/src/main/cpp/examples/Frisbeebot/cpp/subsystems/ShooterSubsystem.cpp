@@ -18,7 +18,7 @@ ShooterSubsystem::ShooterSubsystem()
       m_shooterMotor(kShooterMotorPort),
       m_feederMotor(kFeederMotorPort),
       m_shooterEncoder(kEncoderPorts[0], kEncoderPorts[1]) {
-  m_controller.SetAbsoluteTolerance(kShooterToleranceRPS);
+  m_controller.SetTolerance(kShooterToleranceRPS);
   m_shooterEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
 }
 

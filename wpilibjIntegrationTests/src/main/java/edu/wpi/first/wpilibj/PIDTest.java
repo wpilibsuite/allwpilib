@@ -117,8 +117,8 @@ public class PIDTest extends AbstractComsSetup {
     me.reset();
   }
 
-  private void setupAbsoluteTolerance() {
-    m_controller.setAbsoluteTolerance(absoluteTolerance);
+  private void setupTolerance() {
+    m_controller.setTolerance(absoluteTolerance);
   }
 
   private void setupOutputRange() {
@@ -127,7 +127,7 @@ public class PIDTest extends AbstractComsSetup {
 
   @Test
   public void testInitialSettings() {
-    setupAbsoluteTolerance();
+    setupTolerance();
     setupOutputRange();
     double reference = 2500.0;
     m_controller.setSetpoint(reference);
@@ -143,7 +143,7 @@ public class PIDTest extends AbstractComsSetup {
 
   @Test
   public void testSetSetpoint() {
-    setupAbsoluteTolerance();
+    setupTolerance();
     setupOutputRange();
     double reference = 2500.0;
     m_controller.setSetpoint(reference);
@@ -152,7 +152,7 @@ public class PIDTest extends AbstractComsSetup {
 
   @Test(timeout = 10000)
   public void testRotateToTarget() {
-    setupAbsoluteTolerance();
+    setupTolerance();
     setupOutputRange();
     double reference = 1000.0;
     assertEquals(pidData() + "did not start at 0", 0, me.getMotor().get(), 0);

@@ -37,7 +37,7 @@ public class ShooterSubsystem extends PIDSubsystem {
    */
   public ShooterSubsystem() {
     super(new PIDController(kP, kI, kD));
-    getController().setAbsoluteTolerance(kShooterToleranceRPS);
+    getController().setTolerance(kShooterToleranceRPS);
     m_shooterEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
   }
 

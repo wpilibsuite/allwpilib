@@ -26,8 +26,7 @@ TurnToAngle::TurnToAngle(double targetAngleDegrees, DriveSubsystem* drive)
   // Set the controller tolerance - the delta tolerance ensures the robot is
   // stationary at the setpoint before it is considered as having reached the
   // reference
-  m_controller.SetAbsoluteTolerance(kTurnToleranceDeg,
-                                    kTurnRateToleranceDegPerS);
+  m_controller.SetTolerance(kTurnToleranceDeg, kTurnRateToleranceDegPerS);
 
   AddRequirements({drive});
 }

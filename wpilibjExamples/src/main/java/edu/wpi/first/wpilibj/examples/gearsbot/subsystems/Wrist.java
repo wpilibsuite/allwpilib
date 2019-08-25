@@ -34,7 +34,7 @@ public class Wrist extends PIDSubsystem {
     if (Robot.isSimulation()) { // Check for simulation and update PID values
       getController().setPID(kP_simulation, 0, 0);
     }
-    getController().setAbsoluteTolerance(2.5);
+    getController().setTolerance(2.5);
 
     m_motor = new Victor(6);
 

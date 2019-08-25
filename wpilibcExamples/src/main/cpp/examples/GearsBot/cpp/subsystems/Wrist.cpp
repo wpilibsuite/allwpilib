@@ -14,7 +14,7 @@ Wrist::Wrist() : frc2::PIDSubsystem(frc2::PIDController(kP_real, 0, 0)) {
 #ifdef SIMULATION  // Check for simulation and update PID values
   GetPIDController()->SetPID(kP_simulation, 0, 0, 0);
 #endif
-  m_controller.SetAbsoluteTolerance(2.5);
+  m_controller.SetTolerance(2.5);
 
   SetName("Wrist");
   // Let's show everything on the LiveWindow

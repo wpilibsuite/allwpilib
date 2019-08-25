@@ -8,68 +8,39 @@
 #include "frc/controller/PIDController.h"
 #include "gtest/gtest.h"
 
-class PIDToleranceTest : public testing::Test {
- protected:
-  static constexpr double kSetpoint = 50.0;
-  static constexpr double kRange = 200;
-  static constexpr double kTolerance = 10.0;
+static constexpr double kSetpoint = 50.0;
+static constexpr double kRange = 200;
+static constexpr double kTolerance = 10.0;
 
-  frc2::PIDController* pidController;
+TEST(PIDToleranceTest, InitialTolerance) {
+  frc2::PIDController controller{0.5, 0.0, 0.0};
+  controller.EnableContinuousInput(-kRange / 2, kRange / 2);
 
-  void SetUp() override {
-    pidController = new frc2::PIDController(0.5, 0.0, 0.0);
-    pidController->SetInputRange(-kRange / 2, kRange / 2);
-  }
-
-  void TearDown() override { delete pidController; }
-};
-
-TEST_F(PIDToleranceTest, Initial) { EXPECT_TRUE(pidController->AtSetpoint()); }
-
-TEST_F(PIDToleranceTest, Absolute) {
-  pidController->SetAbsoluteTolerance(kTolerance);
-  pidController->SetSetpoint(kSetpoint);
-
-  pidController->Calculate(0.0);
-
-  EXPECT_FALSE(pidController->AtSetpoint())
-      << "Error was in tolerance when it should not have been. Error was "
-      << pidController->GetPositionError();
-
-  pidController->Calculate(kSetpoint + kTolerance / 2);
-
-  EXPECT_TRUE(pidController->AtSetpoint())
-      << "Error was not in tolerance when it should have been. Error was "
-      << pidController->GetPositionError();
-
-  pidController->Calculate(kSetpoint + 10 * kTolerance);
-
-  EXPECT_FALSE(pidController->AtSetpoint())
-      << "Error was in tolerance when it should not have been. Error was "
-      << pidController->GetPositionError();
+  EXPECT_TRUE(controller.AtSetpoint());
 }
 
-TEST_F(PIDToleranceTest, Percent) {
-  pidController->SetPercentTolerance(kTolerance);
-  pidController->SetSetpoint(kSetpoint);
+TEST(PIDToleranceTest, AbsoluteTolerance) {
+  frc2::PIDController controller{0.5, 0.0, 0.0};
+  controller.EnableContinuousInput(-kRange / 2, kRange / 2);
 
-  pidController->Calculate(0.0);
+  controller.SetTolerance(kTolerance);
+  controller.SetSetpoint(kSetpoint);
 
-  EXPECT_FALSE(pidController->AtSetpoint())
+  controller.Calculate(0.0);
+
+  EXPECT_FALSE(controller.AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
-      << pidController->GetPositionError();
+      << controller.GetPositionError();
 
-  // Half of percent tolerance away from setpoint
-  pidController->Calculate(kSetpoint + (kTolerance / 2) / 100 * kRange);
+  controller.Calculate(kSetpoint + kTolerance / 2);
 
-  EXPECT_TRUE(pidController->AtSetpoint())
+  EXPECT_TRUE(controller.AtSetpoint())
       << "Error was not in tolerance when it should have been. Error was "
-      << pidController->GetPositionError();
+      << controller.GetPositionError();
 
-  // Double percent tolerance away from setpoint
-  pidController->Calculate(kSetpoint + (kTolerance * 2) / 100 * kRange);
+  controller.Calculate(kSetpoint + 10 * kTolerance);
 
-  EXPECT_FALSE(pidController->AtSetpoint())
+  EXPECT_FALSE(controller.AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
-      << pidController->GetPositionError();
+      << controller.GetPositionError();
 }

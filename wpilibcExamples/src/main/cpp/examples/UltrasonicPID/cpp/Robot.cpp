@@ -22,10 +22,6 @@ class Robot : public frc::TimedRobot {
    * ultrasonic sensor.
    */
   void TeleopInit() override {
-    // Set expected range to 0-24 inches; e.g. at 24 inches from object go full
-    // forward, at 0 inches from object go full backward.
-    m_pidController.SetInputRange(0, 24 * kValueToInches);
-
     // Set setpoint of the PID Controller
     m_pidController.SetSetpoint(kHoldDistance * kValueToInches);
   }

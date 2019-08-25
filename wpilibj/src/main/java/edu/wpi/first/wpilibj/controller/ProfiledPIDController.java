@@ -153,46 +153,6 @@ public class ProfiledPIDController extends SendableBase {
   }
 
   /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * <p>This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   */
-  public boolean atGoal(double positionTolerance) {
-    return atGoal(positionTolerance, Double.POSITIVE_INFINITY, PIDController.Tolerance.kAbsolute);
-  }
-
-  /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * <p>This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   */
-  public boolean atGoal(double positionTolerance, double velocityTolerance) {
-    return atGoal(positionTolerance, velocityTolerance, PIDController.Tolerance.kAbsolute);
-  }
-
-  /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * <p>This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   * @param toleranceType     The type of tolerance specified.
-   */
-  public boolean atGoal(
-      double positionTolerance,
-      double velocityTolerance,
-      PIDController.Tolerance toleranceType) {
-    return atSetpoint(positionTolerance, velocityTolerance, toleranceType)
-        && m_goal.equals(m_setpoint);
-  }
-
-  /**
    * Returns true if the error is within the tolerance of the error.
    *
    * <p>This will return false until at least one input value has been computed.
@@ -220,62 +180,12 @@ public class ProfiledPIDController extends SendableBase {
   }
 
   /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * <p>This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   */
-  public boolean atSetpoint(double positionTolerance) {
-    return atSetpoint(positionTolerance, Double.POSITIVE_INFINITY,
-        PIDController.Tolerance.kAbsolute);
-  }
-
-  /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * <p>This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   */
-  public boolean atSetpoint(double positionTolerance, double velocityTolerance) {
-    return atSetpoint(positionTolerance, velocityTolerance, PIDController.Tolerance.kAbsolute);
-  }
-
-  /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * <p>This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   * @param toleranceType     The type of tolerance specified.
-   */
-  public boolean atSetpoint(
-      double positionTolerance,
-      double velocityTolerance,
-      PIDController.Tolerance toleranceType) {
-    return m_controller.atSetpoint(positionTolerance, velocityTolerance, toleranceType);
-  }
-
-  /**
    * Returns true if the error is within the tolerance of the error.
    *
    * <p>This will return false until at least one input value has been computed.
    */
   public boolean atSetpoint() {
     return m_controller.atSetpoint();
-  }
-
-  /**
-   * Sets the minimum and maximum values expected from the input.
-   *
-   * @param minimumInput The minimum value expected from the input.
-   * @param maximumInput The maximum value expected from the input.
-   */
-  public void setInputRange(double minimumInput, double maximumInput) {
-    m_controller.setInputRange(minimumInput, maximumInput);
   }
 
   /**
@@ -310,47 +220,22 @@ public class ProfiledPIDController extends SendableBase {
   }
 
   /**
-   * Sets the absolute error which is considered tolerable for use with
-   * atSetpoint().
+   * Sets the error which is considered tolerable for use with atSetpoint().
    *
    * @param positionTolerance Position error which is tolerable.
    */
-  public void setAbsoluteTolerance(double positionTolerance) {
-    setAbsoluteTolerance(positionTolerance, Double.POSITIVE_INFINITY);
+  public void setTolerance(double positionTolerance) {
+    setTolerance(positionTolerance, Double.POSITIVE_INFINITY);
   }
 
   /**
-   * Sets the absolute error which is considered tolerable for use with
-   * atSetpoint().
+   * Sets the error which is considered tolerable for use with atSetpoint().
    *
    * @param positionTolerance Position error which is tolerable.
    * @param velocityTolerance Velocity error which is tolerable.
    */
-  public void setAbsoluteTolerance(double positionTolerance, double velocityTolerance) {
-    m_controller.setAbsoluteTolerance(positionTolerance, velocityTolerance);
-  }
-
-  /**
-   * Sets the percent error which is considered tolerable for use with
-   * atSetpoint().
-   *
-   * @param positionTolerance Position error which is tolerable.
-   */
-  public void setPercentTolerance(double positionTolerance) {
-    m_controller.setPercentTolerance(positionTolerance, Double.POSITIVE_INFINITY);
-  }
-
-  /**
-   * Sets the percent error which is considered tolerable for use with
-   * atSetpoint().
-   *
-   * @param positionTolerance Position error which is tolerable.
-   * @param velocityTolerance Velocity error which is tolerable.
-   */
-  public void setPercentTolerance(
-      double positionTolerance,
-      double velocityTolerance) {
-    m_controller.setPercentTolerance(positionTolerance, velocityTolerance);
+  public void setTolerance(double positionTolerance, double velocityTolerance) {
+    m_controller.setTolerance(positionTolerance, velocityTolerance);
   }
 
   /**

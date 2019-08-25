@@ -43,13 +43,6 @@ units::meter_t ProfiledPIDController::GetGoal() const {
   return m_goal.position;
 }
 
-bool ProfiledPIDController::AtGoal(
-    double positionTolerance, double velocityTolerance,
-    frc2::PIDController::Tolerance toleranceType) const {
-  return AtSetpoint(positionTolerance, velocityTolerance, toleranceType) &&
-         m_goal == m_setpoint;
-}
-
 bool ProfiledPIDController::AtGoal() const {
   return AtSetpoint() && m_goal == m_setpoint;
 }
@@ -63,20 +56,8 @@ double ProfiledPIDController::GetSetpoint() const {
   return m_controller.GetSetpoint();
 }
 
-bool ProfiledPIDController::AtSetpoint(
-    double positionTolerance, double velocityTolerance,
-    frc2::PIDController::Tolerance toleranceType) const {
-  return m_controller.AtSetpoint(positionTolerance, velocityTolerance,
-                                 toleranceType);
-}
-
 bool ProfiledPIDController::AtSetpoint() const {
   return m_controller.AtSetpoint();
-}
-
-void ProfiledPIDController::SetInputRange(double minimumInput,
-                                          double maximumInput) {
-  m_controller.SetInputRange(minimumInput, maximumInput);
 }
 
 void ProfiledPIDController::EnableContinuousInput(double minimumInput,
@@ -93,14 +74,9 @@ void ProfiledPIDController::SetOutputRange(double minimumOutput,
   m_controller.SetOutputRange(minimumOutput, maximumOutput);
 }
 
-void ProfiledPIDController::SetAbsoluteTolerance(double positionTolerance,
-                                                 double velocityTolerance) {
-  m_controller.SetAbsoluteTolerance(positionTolerance, velocityTolerance);
-}
-
-void ProfiledPIDController::SetPercentTolerance(double positionTolerance,
-                                                double velocityTolerance) {
-  m_controller.SetPercentTolerance(positionTolerance, velocityTolerance);
+void ProfiledPIDController::SetTolerance(double positionTolerance,
+                                         double velocityTolerance) {
+  m_controller.SetTolerance(positionTolerance, velocityTolerance);
 }
 
 double ProfiledPIDController::GetPositionError() const {

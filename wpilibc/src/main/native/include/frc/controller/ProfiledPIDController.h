@@ -119,21 +119,6 @@ class ProfiledPIDController : public SendableBase {
   units::meter_t GetGoal() const;
 
   /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   * @param toleranceType     The type of tolerance specified.
-   */
-  bool AtGoal(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity(),
-      frc2::PIDController::Tolerance toleranceType =
-          frc2::PIDController::Tolerance::kAbsolute) const;
-
-  /**
    * Returns true if the error is within the tolerance of the error.
    *
    * This will return false until at least one input value has been computed.
@@ -155,21 +140,6 @@ class ProfiledPIDController : public SendableBase {
   double GetSetpoint() const;
 
   /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   * @param toleranceType     The type of tolerance specified.
-   */
-  bool AtSetpoint(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity(),
-      frc2::PIDController::Tolerance toleranceType =
-          frc2::PIDController::Tolerance::kAbsolute) const;
-
-  /**
    * Returns true if the error is within the tolerance of the error.
    *
    * Currently this just reports on target as the actual value passes through
@@ -179,14 +149,6 @@ class ProfiledPIDController : public SendableBase {
    * This will return false until at least one input value has been computed.
    */
   bool AtSetpoint() const;
-
-  /**
-   * Sets the minimum and maximum values expected from the input.
-   *
-   * @param minimumInput The minimum value expected from the input.
-   * @param maximumInput The maximum value expected from the input.
-   */
-  void SetInputRange(double minimumInput, double maximumInput);
 
   /**
    * Enables continuous input.
@@ -214,24 +176,13 @@ class ProfiledPIDController : public SendableBase {
   void SetOutputRange(double minimumOutput, double maximumOutput);
 
   /**
-   * Sets the absolute error which is considered tolerable for use with
+   * Sets the error which is considered tolerable for use with
    * AtSetpoint().
    *
    * @param positionTolerance Position error which is tolerable.
    * @param velocityTolerance Velocity error which is tolerable.
    */
-  void SetAbsoluteTolerance(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity());
-
-  /**
-   * Sets the percent error which is considered tolerable for use with
-   * AtSetpoint().
-   *
-   * @param positionTolerance Position error which is tolerable.
-   * @param velocityTolerance Velocity error which is tolerable.
-   */
-  void SetPercentTolerance(
+  void SetTolerance(
       double positionTolerance,
       double velocityTolerance = std::numeric_limits<double>::infinity());
 

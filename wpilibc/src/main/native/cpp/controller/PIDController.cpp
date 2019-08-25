@@ -51,31 +51,9 @@ void PIDController::SetSetpoint(double setpoint) {
 
 double PIDController::GetSetpoint() const { return m_setpoint; }
 
-bool PIDController::AtSetpoint(double positionTolerance,
-                               double velocityTolerance,
-                               Tolerance toleranceType) const {
-  if (m_toleranceType == Tolerance::kPercent) {
-    return std::abs(m_positionError) < positionTolerance / 100 * m_inputRange &&
-           std::abs(m_velocityError) < velocityTolerance / 100 * m_inputRange;
-  } else {
-    return std::abs(m_positionError) < positionTolerance &&
-           std::abs(m_velocityError) < velocityTolerance;
-  }
-}
-
 bool PIDController::AtSetpoint() const {
-  return AtSetpoint(m_positionTolerance, m_velocityTolerance);
-}
-
-void PIDController::SetInputRange(double minimumInput, double maximumInput) {
-  m_minimumInput = minimumInput;
-  m_maximumInput = maximumInput;
-  m_inputRange = maximumInput - minimumInput;
-
-  // Clamp setpoint to new input range
-  if (m_maximumInput > m_minimumInput) {
-    m_setpoint = std::clamp(m_setpoint, m_minimumInput, m_maximumInput);
-  }
+  return std::abs(m_positionError) < m_positionTolerance &&
+         std::abs(m_velocityError) < m_velocityTolerance;
 }
 
 void PIDController::EnableContinuousInput(double minimumInput,
@@ -91,16 +69,8 @@ void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
   m_maximumOutput = maximumOutput;
 }
 
-void PIDController::SetAbsoluteTolerance(double positionTolerance,
-                                         double velocityTolerance) {
-  m_toleranceType = Tolerance::kAbsolute;
-  m_positionTolerance = positionTolerance;
-  m_velocityTolerance = velocityTolerance;
-}
-
-void PIDController::SetPercentTolerance(double positionTolerance,
-                                        double velocityTolerance) {
-  m_toleranceType = Tolerance::kPercent;
+void PIDController::SetTolerance(double positionTolerance,
+                                 double velocityTolerance) {
   m_positionTolerance = positionTolerance;
   m_velocityTolerance = velocityTolerance;
 }
@@ -163,4 +133,15 @@ double PIDController::GetContinuousError(double error) const {
   }
 
   return error;
+}
+
+void PIDController::SetInputRange(double minimumInput, double maximumInput) {
+  m_minimumInput = minimumInput;
+  m_maximumInput = maximumInput;
+  m_inputRange = maximumInput - minimumInput;
+
+  // Clamp setpoint to new input range
+  if (m_maximumInput > m_minimumInput) {
+    m_setpoint = std::clamp(m_setpoint, m_minimumInput, m_maximumInput);
+  }
 }
