@@ -47,14 +47,7 @@ units::second_t TimedRobot::GetPeriod() const {
   return units::second_t(m_period);
 }
 
-TimedRobot::TimedRobot(double period) : IterativeRobotBase(period) {
-  int32_t status = 0;
-  m_notifier = HAL_InitializeNotifier(&status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-
-  HAL_Report(HALUsageReporting::kResourceType_Framework,
-             HALUsageReporting::kFramework_Timed);
-}
+TimedRobot::TimedRobot(double period) : TimedRobot(units::second_t(period)) {}
 
 TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   int32_t status = 0;
