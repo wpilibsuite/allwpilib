@@ -33,6 +33,16 @@ class Spline {
  public:
   using PoseWithCurvature = std::pair<Pose2d, curvature_t>;
 
+  Spline() = default;
+
+  Spline(const Spline&) = default;
+  Spline& operator=(const Spline&) = default;
+
+  Spline(Spline&&) = default;
+  Spline& operator=(Spline&&) = default;
+
+  virtual ~Spline() = default;
+
   /**
    * Parameterizes the spline. This method breaks up the spline into various
    * arcs until their dx, dy, and dtheta are within specific tolerances.
