@@ -61,7 +61,7 @@ TEST(Twist2dTest, Pose2dLog) {
   const Pose2d end{5_m, 5_m, Rotation2d(90_deg)};
   const Pose2d start{};
 
-  const auto twist = Pose2d().Log(end);
+  const auto twist = start.Log(end);
 
   EXPECT_NEAR(twist.dx.to<double>(), 5 / 2.0 * wpi::math::pi, kEpsilon);
   EXPECT_NEAR(twist.dy.to<double>(), 0.0, kEpsilon);

@@ -75,6 +75,8 @@ class CubicHermiteSplineTest : public ::testing::Test {
                 b.Translation().Y().to<double>(), 1E-9);
     EXPECT_NEAR(poses.back().first.Rotation().Radians().to<double>(),
                 b.Rotation().Radians().to<double>(), 1E-9);
+
+    static_cast<void>(duration);
   }
 };
 }  // namespace frc
