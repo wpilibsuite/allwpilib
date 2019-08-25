@@ -50,7 +50,6 @@ public class Robot extends TimedRobot {
     m_joystick = new Joystick(kJoystickChannel);
 
     m_pidController = new PIDController(kP, kI, kD);
-    m_pidController.setInputRange(0, 5);
   }
 
   @Override

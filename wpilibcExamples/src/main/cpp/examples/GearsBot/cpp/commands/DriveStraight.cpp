@@ -18,7 +18,7 @@ DriveStraight::DriveStraight(double distance, DriveTrain* drivetrain)
           [this](double output) { m_drivetrain->Drive(output, output); },
           {drivetrain}),
       m_drivetrain(drivetrain) {
-  m_controller.SetAbsoluteTolerance(0.01);
+  m_controller.SetTolerance(0.01);
 }
 
 // Called just before this Command runs the first time

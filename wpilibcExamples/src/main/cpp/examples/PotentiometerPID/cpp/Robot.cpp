@@ -20,8 +20,6 @@
  */
 class Robot : public frc::TimedRobot {
  public:
-  void RobotInit() override { m_pidController.SetInputRange(0, 5); }
-
   void TeleopPeriodic() override {
     // When the button is pressed once, the selected elevator setpoint is
     // incremented.

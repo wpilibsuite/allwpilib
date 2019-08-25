@@ -25,15 +25,6 @@ TEST_F(PIDInputOutputTest, OutputRangeTest) {
   EXPECT_DOUBLE_EQ(50, controller->Calculate(0, 100));
 }
 
-TEST_F(PIDInputOutputTest, InputRangeTest) {
-  controller->SetP(1);
-  controller->SetOutputRange(-1000, 1000);
-  controller->SetInputRange(-50, 50);
-
-  EXPECT_DOUBLE_EQ(-100, controller->Calculate(100, 0));
-  EXPECT_DOUBLE_EQ(50, controller->Calculate(0, 100));
-}
-
 TEST_F(PIDInputOutputTest, ContinuousInputTest) {
   controller->SetP(1);
   controller->EnableContinuousInput(-180, 180);

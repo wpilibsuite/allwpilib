@@ -7,83 +7,48 @@
 
 package edu.wpi.first.wpilibj.controller;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PIDToleranceTest {
-  private PIDController m_pidController;
   private static final double kSetpoint = 50.0;
   private static final double kTolerance = 10.0;
   private static final double kRange = 200;
 
-  @BeforeEach
-  void setUp() {
-    m_pidController = new PIDController(0.05, 0.0, 0.0);
-    m_pidController.setInputRange(-kRange / 2, kRange / 2);
-  }
-
-  @AfterEach
-  void tearDown() {
-    m_pidController.close();
-    m_pidController = null;
-  }
-
   @Test
   void initialToleranceTest() {
-    assertTrue(m_pidController.atSetpoint());
+    var controller = new PIDController(0.05, 0.0, 0.0);
+    controller.enableContinuousInput(-kRange / 2, kRange / 2);
+
+    assertTrue(controller.atSetpoint());
   }
 
   @Test
   void absoluteToleranceTest() {
-    m_pidController.setAbsoluteTolerance(kTolerance);
-    m_pidController.setSetpoint(kSetpoint);
+    var controller = new PIDController(0.05, 0.0, 0.0);
+    controller.enableContinuousInput(-kRange / 2, kRange / 2);
 
-    m_pidController.calculate(0.0);
+    controller.setTolerance(kTolerance);
+    controller.setSetpoint(kSetpoint);
 
-    assertFalse(m_pidController.atSetpoint(),
-        "Error was in tolerance when it should not have been. Error was " + m_pidController
+    controller.calculate(0.0);
+
+    assertFalse(controller.atSetpoint(),
+        "Error was in tolerance when it should not have been. Error was " + controller
             .getPositionError());
 
-    m_pidController.calculate(kSetpoint + kTolerance / 2);
+    controller.calculate(kSetpoint + kTolerance / 2);
 
-    assertTrue(m_pidController.atSetpoint(),
-        "Error was not in tolerance when it should have been. Error was " + m_pidController
+    assertTrue(controller.atSetpoint(),
+        "Error was not in tolerance when it should have been. Error was " + controller
             .getPositionError());
 
-    m_pidController.calculate(kSetpoint + 10 * kTolerance);
+    controller.calculate(kSetpoint + 10 * kTolerance);
 
-    assertFalse(m_pidController.atSetpoint(),
-        "Error was in tolerance when it should not have been. Error was " + m_pidController
-            .getPositionError());
-  }
-
-  @Test
-  void percentToleranceTest() {
-    m_pidController.setPercentTolerance(kTolerance);
-    m_pidController.setSetpoint(kSetpoint);
-
-    m_pidController.calculate(0.0);
-
-    assertFalse(m_pidController.atSetpoint(),
-        "Error was in tolerance when it should not have been. Error was " + m_pidController
-            .getPositionError());
-
-    // Half of percent tolerance away from setpoint
-    m_pidController.calculate(kSetpoint + (kTolerance / 2) / 100 * kRange);
-
-    assertTrue(m_pidController.atSetpoint(),
-        "Error was not in tolerance when it should have been. Error was " + m_pidController
-            .getPositionError());
-
-    // Double percent tolerance away from setpoint
-    m_pidController.calculate(kSetpoint + (kTolerance * 2) / 100 * kRange);
-
-    assertFalse(m_pidController.atSetpoint(),
-        "Error was in tolerance when it should not have been. Error was " + m_pidController
+    assertFalse(controller.atSetpoint(),
+        "Error was in tolerance when it should not have been. Error was " + controller
             .getPositionError());
   }
 }

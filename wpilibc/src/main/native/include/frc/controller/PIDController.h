@@ -21,8 +21,6 @@ namespace frc2 {
  */
 class PIDController : public frc::SendableBase {
  public:
-  enum class Tolerance { kAbsolute, kPercent };
-
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
    *
@@ -117,33 +115,11 @@ class PIDController : public frc::SendableBase {
   double GetSetpoint() const;
 
   /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   * @param toleranceType     The type of tolerance specified.
-   */
-  bool AtSetpoint(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity(),
-      Tolerance toleranceType = Tolerance::kAbsolute) const;
-
-  /**
    * Returns true if the error is within the tolerance of the error.
    *
    * This will return false until at least one input value has been computed.
    */
   bool AtSetpoint() const;
-
-  /**
-   * Sets the minimum and maximum values expected from the input.
-   *
-   * @param minimumInput The minimum value expected from the input.
-   * @param maximumInput The maximum value expected from the input.
-   */
-  void SetInputRange(double minimumInput, double maximumInput);
 
   /**
    * Enables continuous input.
@@ -171,24 +147,12 @@ class PIDController : public frc::SendableBase {
   void SetOutputRange(double minimumOutput, double maximumOutput);
 
   /**
-   * Sets the absolute error which is considered tolerable for use with
-   * AtSetpoint().
+   * Sets the error which is considered tolerable for use with AtSetpoint().
    *
    * @param positionTolerance Position error which is tolerable.
    * @param velociytTolerance Velocity error which is tolerable.
    */
-  void SetAbsoluteTolerance(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity());
-
-  /**
-   * Sets the percent error which is considered tolerable for use with
-   * AtSetpoint().
-   *
-   * @param positionTolerance Position error which is tolerable.
-   * @param velociytTolerance Velocity error which is tolerable.
-   */
-  void SetPercentTolerance(
+  void SetTolerance(
       double positionTolerance,
       double velocityTolerance = std::numeric_limits<double>::infinity());
 
@@ -276,13 +240,19 @@ class PIDController : public frc::SendableBase {
   // The sum of the errors for use in the integral calc
   double m_totalError = 0;
 
-  Tolerance m_toleranceType = Tolerance::kAbsolute;
-
   // The error that is considered at setpoint.
   double m_positionTolerance = 0.05;
   double m_velocityTolerance = std::numeric_limits<double>::infinity();
 
   double m_setpoint = 0;
+
+  /**
+   * Sets the minimum and maximum values expected from the input.
+   *
+   * @param minimumInput The minimum value expected from the input.
+   * @param maximumInput The maximum value expected from the input.
+   */
+  void SetInputRange(double minimumInput, double maximumInput);
 };
 
 }  // namespace frc2
