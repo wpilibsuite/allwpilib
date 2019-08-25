@@ -70,7 +70,7 @@ namespace hal {
  * A move-only C++ wrapper around a HAL handle.
  * Does not ensure destruction.
  */
-template <typename CType>
+template <typename CType, int32_t CInvalid = HAL_kInvalidHandle>
 class Handle {
  public:
   Handle() = default;
@@ -80,19 +80,19 @@ class Handle {
   Handle& operator=(const Handle&) = delete;
 
   Handle(Handle&& rhs) : m_handle(rhs.m_handle) {
-    rhs.m_handle = HAL_kInvalidHandle;
+    rhs.m_handle = CInvalid;
   }
 
   Handle& operator=(Handle&& rhs) {
     m_handle = rhs.m_handle;
-    rhs.m_handle = HAL_kInvalidHandle;
+    rhs.m_handle = CInvalid;
     return *this;
   }
 
   operator CType() const { return m_handle; }
 
  private:
-  CType m_handle = HAL_kInvalidHandle;
+  CType m_handle = CInvalid;
 };
 
 }  // namespace hal

@@ -35,30 +35,7 @@ namespace hal {
  * A move-only C++ wrapper around HAL_SPIPort.
  * Does not ensure destruction.
  */
-class SPIPort {
- public:
-  SPIPort() = default;
-  /*implicit*/ SPIPort(HAL_SPIPort val)  // NOLINT(runtime/explicit)
-      : m_value(val) {}
-
-  SPIPort(const SPIPort&) = delete;
-  SPIPort& operator=(const SPIPort&) = delete;
-
-  SPIPort(SPIPort&& rhs) : m_value(rhs.m_value) {
-    rhs.m_value = HAL_SPI_kInvalid;
-  }
-
-  SPIPort& operator=(SPIPort&& rhs) {
-    m_value = rhs.m_value;
-    rhs.m_value = HAL_SPI_kInvalid;
-    return *this;
-  }
-
-  operator HAL_SPIPort() const { return m_value; }
-
- private:
-  HAL_SPIPort m_value = HAL_SPI_kInvalid;
-};
+using SPIPort = Handle<HAL_SPIPort, HAL_SPI_kInvalid>;
 
 }  // namespace hal
 #endif
