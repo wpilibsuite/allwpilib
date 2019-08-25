@@ -11,8 +11,8 @@ import java.util.Arrays;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.CircularBuffer;
 import edu.wpi.first.wpilibj.PIDSource;
+import edu.wpi.first.wpiutil.CircularBuffer;
 
 /**
  * This class implements a linear, digital filter. All types of FIR and IIR filters are supported.

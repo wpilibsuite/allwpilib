@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,7 @@
 #include <cstddef>
 #include <vector>
 
-namespace frc {
+namespace wpi {
 
 /**
  * This is a simple circular buffer so we don't need to "bucket brigade" copy
@@ -57,6 +57,6 @@ class circular_buffer {
   size_t ModuloDec(size_t index);
 };
 
-}  // namespace frc
+}  // namespace wpi
 
-#include "frc/circular_buffer.inc"
+#include "wpi/circular_buffer.inc"

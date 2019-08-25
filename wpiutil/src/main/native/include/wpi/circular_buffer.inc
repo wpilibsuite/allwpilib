@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,7 +9,7 @@
 
 #include <algorithm>
 
-namespace frc {
+namespace wpi {
 
 template <class T>
 circular_buffer<T>::circular_buffer(size_t size) : m_data(size, 0) {}
@@ -236,4 +236,4 @@ size_t circular_buffer<T>::ModuloDec(size_t index) {
   }
 }
 
-}  // namespace frc
+}  // namespace wpi
