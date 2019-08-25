@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,7 +14,7 @@
 
 using namespace frc;
 
-static constexpr double kSamplePeriod = 0.0005;
+static constexpr auto kSamplePeriod = 0.0005_s;
 static constexpr double kCalibrationSampleTime = 5.0;
 static constexpr double kDegreePerSecondPerLSB = 0.0125;
 
