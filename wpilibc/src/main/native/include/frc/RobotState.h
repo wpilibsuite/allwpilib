@@ -13,6 +13,8 @@ namespace frc {
 
 class RobotState {
  public:
+  RobotState() = delete;
+
   static bool IsDisabled();
   static bool IsEnabled();
   static bool IsEStopped();
