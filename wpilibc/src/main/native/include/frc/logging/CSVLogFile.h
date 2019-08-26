@@ -17,13 +17,13 @@
 namespace frc {
 
 /**
- * A CSVLogFile is a LogFile that writes to a file the contents of each of its
- * registered CSVLogCell's.
+ * A CSVLogFile writes to a csv file the contents of each of its registered
+ * CSVLogCell's.
  *
  * For the CSVLogFile to write log informations, you must call Periodic()
  * periodically.
  */
-class CSVLogFile : public LogFile {
+class CSVLogFile {
  public:
   /**
    * Instantiate a LogFile passing in its prefix and its extension.
@@ -72,6 +72,7 @@ class CSVLogFile : public LogFile {
    */
   void WriteRow();
 
+  LogFile m_logFile;
   std::vector<CSVLogCell*> m_cells;
   CSVLogCell m_timestampCell;
   bool m_active;

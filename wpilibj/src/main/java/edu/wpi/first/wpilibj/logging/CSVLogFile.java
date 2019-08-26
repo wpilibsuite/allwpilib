@@ -11,13 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A CSVLogFile is a LogFile that writes to a file the contents of each of its
- * registered {@link CSVLogCell}'s.
+ * A CSVLogFile writes to a csv file the contents of each of its registered
+ * {@link CSVLogCell}'s.
  *
  * <p>For the CSVLogFile to write log informations, you must call
  * {@link #periodic()} periodically.
  */
-public class CSVLogFile extends LogFile {
+public class CSVLogFile {
+  private LogFile m_logFile;
   private final List<CSVLogCell> m_cells;
   private final CSVLogCell m_timestampCell;
   private boolean m_active;
@@ -32,7 +33,7 @@ public class CSVLogFile extends LogFile {
    * @param filePrefix The prefix of the LogFile.
    */
   public CSVLogFile(String filePrefix) {
-    super(filePrefix, "csv");
+    m_logFile = new LogFile(filePrefix, "csv");
     m_cells = new ArrayList<CSVLogCell>();
     m_timestampCell = new CSVLogCell("Timestamp (ms)");
     m_active = false;
@@ -76,9 +77,9 @@ public class CSVLogFile extends LogFile {
     }
 
     for (CSVLogCell cell : m_cells) {
-      log("\"" + cell.getName() + "\",");
+      m_logFile.log("\"" + cell.getName() + "\",");
     }
-    log("\n");
+    m_logFile.log("\n");
 
     m_active = true;
   }
@@ -107,8 +108,8 @@ public class CSVLogFile extends LogFile {
    */
   private void writeRow() {
     for (CSVLogCell cell : m_cells) {
-      log("\"" + cell.getContent() + "\",");
+      m_logFile.log("\"" + cell.getContent() + "\",");
     }
-    log("\n");
+    m_logFile.log("\n");
   }
 }

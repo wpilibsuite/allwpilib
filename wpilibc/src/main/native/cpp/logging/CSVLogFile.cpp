@@ -13,7 +13,7 @@
 using namespace frc;
 
 CSVLogFile::CSVLogFile(wpi::StringRef filePrefix)
-    : LogFile(filePrefix, "csv"),
+    : m_logFile(filePrefix, "csv"),
       m_timestampCell("Timestamp (ms)"),
       m_active(false) {
   RegisterCell(m_timestampCell);
@@ -35,9 +35,9 @@ void CSVLogFile::Start() {
   }
 
   for (const auto& cell : m_cells) {
-    Log("\"" + cell->GetName() + "\",");
+    m_logFile.Log("\"" + cell->GetName() + "\",");
   }
-  Log("\n");
+  m_logFile.Log("\n");
 
   m_active = true;
 }
@@ -54,7 +54,7 @@ void CSVLogFile::Periodic() {
 
 void CSVLogFile::WriteRow() {
   for (const auto& cell : m_cells) {
-    Log("\"" + cell->GetContent() + "\",");
+    m_logFile.Log("\"" + cell->GetContent() + "\",");
   }
-  Log("\n");
+  m_logFile.Log("\n");
 }
