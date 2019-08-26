@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.hal.NotifierJNI;
+
+import static java.util.Objects.requireNonNull;
 
 public class Notifier implements AutoCloseable {
   // The thread waiting on the HAL alarm.
@@ -85,6 +87,8 @@ public class Notifier implements AutoCloseable {
    *            using StartSingle or StartPeriodic.
    */
   public Notifier(Runnable run) {
+    requireNonNull(run);
+
     m_handler = run;
     m_notifier.set(NotifierJNI.initializeNotifier());
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <cstring>
 
-#include <wpi/STLExtras.h>
 #include <wpi/json.h>
 #include <wpi/timestamp.h>
 
@@ -45,13 +44,13 @@ SourceImpl::~SourceImpl() {
 }
 
 void SourceImpl::SetDescription(const wpi::Twine& description) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   m_description = description.str();
 }
 
 wpi::StringRef SourceImpl::GetDescription(
     wpi::SmallVectorImpl<char>& buf) const {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
   return wpi::StringRef{buf.data(), buf.size()};
 }
@@ -65,24 +64,24 @@ void SourceImpl::SetConnected(bool connected) {
 }
 
 uint64_t SourceImpl::GetCurFrameTime() {
-  std::unique_lock<wpi::mutex> lock{m_frameMutex};
+  std::unique_lock lock{m_frameMutex};
   return m_frame.GetTime();
 }
 
 Frame SourceImpl::GetCurFrame() {
-  std::unique_lock<wpi::mutex> lock{m_frameMutex};
+  std::unique_lock lock{m_frameMutex};
   return m_frame;
 }
 
 Frame SourceImpl::GetNextFrame() {
-  std::unique_lock<wpi::mutex> lock{m_frameMutex};
+  std::unique_lock lock{m_frameMutex};
   auto oldTime = m_frame.GetTime();
   m_frameCv.wait(lock, [=] { return m_frame.GetTime() != oldTime; });
   return m_frame;
 }
 
 Frame SourceImpl::GetNextFrame(double timeout) {
-  std::unique_lock<wpi::mutex> lock{m_frameMutex};
+  std::unique_lock lock{m_frameMutex};
   auto oldTime = m_frame.GetTime();
   if (!m_frameCv.wait_for(
           lock, std::chrono::milliseconds(static_cast<int>(timeout * 1000)),
@@ -94,7 +93,7 @@ Frame SourceImpl::GetNextFrame(double timeout) {
 
 void SourceImpl::Wakeup() {
   {
-    std::lock_guard<wpi::mutex> lock{m_frameMutex};
+    std::scoped_lock lock{m_frameMutex};
     m_frame = Frame{*this, wpi::StringRef{}, 0};
   }
   m_frameCv.notify_all();
@@ -135,7 +134,7 @@ void SourceImpl::SetExposureManual(int value, CS_Status* status) {
 
 VideoMode SourceImpl::GetVideoMode(CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return VideoMode{};
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   return m_mode;
 }
 
@@ -381,7 +380,7 @@ std::vector<VideoMode> SourceImpl::EnumerateVideoModes(
     CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status))
     return std::vector<VideoMode>{};
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   return m_videoModes;
 }
 
@@ -389,7 +388,7 @@ std::unique_ptr<Image> SourceImpl::AllocImage(
     VideoMode::PixelFormat pixelFormat, int width, int height, size_t size) {
   std::unique_ptr<Image> image;
   {
-    std::lock_guard<wpi::mutex> lock{m_poolMutex};
+    std::scoped_lock lock{m_poolMutex};
     // find the smallest existing frame that is at least big enough.
     int found = -1;
     for (size_t i = 0; i < m_imagesAvail.size(); ++i) {
@@ -441,7 +440,7 @@ void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
 
   // Update frame
   {
-    std::lock_guard<wpi::mutex> lock{m_frameMutex};
+    std::scoped_lock lock{m_frameMutex};
     m_frame = Frame{*this, std::move(image), time};
   }
 
@@ -452,7 +451,7 @@ void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
 void SourceImpl::PutError(const wpi::Twine& msg, Frame::Time time) {
   // Update frame
   {
-    std::lock_guard<wpi::mutex> lock{m_frameMutex};
+    std::scoped_lock lock{m_frameMutex};
     m_frame = Frame{*this, msg, time};
   }
 
@@ -490,7 +489,7 @@ void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
 }
 
 void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
-  std::lock_guard<wpi::mutex> lock{m_poolMutex};
+  std::scoped_lock lock{m_poolMutex};
   if (m_destroyFrames) return;
   // Return the frame to the pool.  First try to find an empty slot, otherwise
   // add it to the end.
@@ -512,9 +511,9 @@ void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
 }
 
 std::unique_ptr<Frame::Impl> SourceImpl::AllocFrameImpl() {
-  std::lock_guard<wpi::mutex> lock{m_poolMutex};
+  std::scoped_lock lock{m_poolMutex};
 
-  if (m_framesAvail.empty()) return wpi::make_unique<Frame::Impl>(*this);
+  if (m_framesAvail.empty()) return std::make_unique<Frame::Impl>(*this);
 
   auto impl = std::move(m_framesAvail.back());
   m_framesAvail.pop_back();
@@ -522,7 +521,7 @@ std::unique_ptr<Frame::Impl> SourceImpl::AllocFrameImpl() {
 }
 
 void SourceImpl::ReleaseFrameImpl(std::unique_ptr<Frame::Impl> impl) {
-  std::lock_guard<wpi::mutex> lock{m_poolMutex};
+  std::scoped_lock lock{m_poolMutex};
   if (m_destroyFrames) return;
   m_framesAvail.push_back(std::move(impl));
 }

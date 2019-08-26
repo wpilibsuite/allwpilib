@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,10 +7,8 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.controller.PIDController;
 
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
@@ -21,7 +19,7 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * encoders.
  */
 public class SetDistanceToBox extends Command {
-  private final PIDController m_pid;
+  private final PIDController m_pid = new PIDController(-2, 0, 0);
 
   /**
    * Create a new set distance to box command.
@@ -29,24 +27,6 @@ public class SetDistanceToBox extends Command {
    */
   public SetDistanceToBox(double distance) {
     requires(Robot.m_drivetrain);
-    m_pid = new PIDController(-2, 0, 0, new PIDSource() {
-      PIDSourceType m_sourceType = PIDSourceType.kDisplacement;
-
-      @Override
-      public double pidGet() {
-        return Robot.m_drivetrain.getDistanceToObstacle();
-      }
-
-      @Override
-      public void setPIDSourceType(PIDSourceType pidSource) {
-        m_sourceType = pidSource;
-      }
-
-      @Override
-      public PIDSourceType getPIDSourceType() {
-        return m_sourceType;
-      }
-    }, d -> Robot.m_drivetrain.drive(d, d));
 
     m_pid.setAbsoluteTolerance(0.01);
     m_pid.setSetpoint(distance);
@@ -58,20 +38,25 @@ public class SetDistanceToBox extends Command {
     // Get everything in a safe starting state.
     Robot.m_drivetrain.reset();
     m_pid.reset();
-    m_pid.enable();
+  }
+
+  @Override
+  protected void execute() {
+    double pidOut = m_pid.calculate(Robot.m_drivetrain.getDistanceToObstacle());
+
+    Robot.m_drivetrain.drive(pidOut, pidOut);
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
-    return m_pid.onTarget();
+    return m_pid.atSetpoint();
   }
 
   // Called once after isFinished returns true
   @Override
   protected void end() {
-    // Stop PID and the wheels
-    m_pid.disable();
+    // Stop the wheels
     Robot.m_drivetrain.drive(0, 0);
   }
 }

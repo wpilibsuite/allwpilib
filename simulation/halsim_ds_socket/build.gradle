@@ -21,7 +21,7 @@ apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 model {
     testSuites {
         def comps = $.components
-        if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
+        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
             "${pluginName}Test"(GoogleTestTestSuiteSpec) {
                 for(NativeComponentSpec c : comps) {
                     if (c.name == pluginName) {

@@ -14,24 +14,123 @@
 #ifndef WPIUTIL_WPI_SMALLSET_H
 #define WPIUTIL_WPI_SMALLSET_H
 
-#include "wpi/optional.h"
 #include "wpi/SmallPtrSet.h"
 #include "wpi/SmallVector.h"
 #include "wpi/Compiler.h"
+#include "wpi/iterator.h"
+#include "wpi/type_traits.h"
 #include <cstddef>
 #include <functional>
+#include <optional>
 #include <set>
+#include <type_traits>
 #include <utility>
 
 namespace wpi {
+
+/// SmallSetIterator - This class implements a const_iterator for SmallSet by
+/// delegating to the underlying SmallVector or Set iterators.
+template <typename T, unsigned N, typename C>
+class SmallSetIterator
+    : public iterator_facade_base<SmallSetIterator<T, N, C>,
+                                  std::forward_iterator_tag, T> {
+private:
+  using SetIterTy = typename std::set<T, C>::const_iterator;
+  using VecIterTy = typename SmallVector<T, N>::const_iterator;
+  using SelfTy = SmallSetIterator<T, N, C>;
+
+  /// Iterators to the parts of the SmallSet containing the data. They are set
+  /// depending on isSmall.
+  union {
+    SetIterTy SetIter;
+    VecIterTy VecIter;
+  };
+
+  bool isSmall;
+
+public:
+  SmallSetIterator(SetIterTy SetIter) : SetIter(SetIter), isSmall(false) {}
+
+  SmallSetIterator(VecIterTy VecIter) : VecIter(VecIter), isSmall(true) {}
+
+  // Spell out destructor, copy/move constructor and assignment operators for
+  // MSVC STL, where set<T>::const_iterator is not trivially copy constructible.
+  ~SmallSetIterator() {
+    if (isSmall)
+      VecIter.~VecIterTy();
+    else
+      SetIter.~SetIterTy();
+  }
+
+  SmallSetIterator(const SmallSetIterator &Other) : isSmall(Other.isSmall) {
+    if (isSmall)
+      VecIter = Other.VecIter;
+    else
+      // Use placement new, to make sure SetIter is properly constructed, even
+      // if it is not trivially copy-able (e.g. in MSVC).
+      new (&SetIter) SetIterTy(Other.SetIter);
+  }
+
+  SmallSetIterator(SmallSetIterator &&Other) : isSmall(Other.isSmall) {
+    if (isSmall)
+      VecIter = std::move(Other.VecIter);
+    else
+      // Use placement new, to make sure SetIter is properly constructed, even
+      // if it is not trivially copy-able (e.g. in MSVC).
+      new (&SetIter) SetIterTy(std::move(Other.SetIter));
+  }
+
+  SmallSetIterator& operator=(const SmallSetIterator& Other) {
+    // Call destructor for SetIter, so it gets properly destroyed if it is
+    // not trivially destructible in case we are setting VecIter.
+    if (!isSmall)
+      SetIter.~SetIterTy();
+
+    isSmall = Other.isSmall;
+    if (isSmall)
+      VecIter = Other.VecIter;
+    else
+      new (&SetIter) SetIterTy(Other.SetIter);
+    return *this;
+  }
+
+  SmallSetIterator& operator=(SmallSetIterator&& Other) {
+    // Call destructor for SetIter, so it gets properly destroyed if it is
+    // not trivially destructible in case we are setting VecIter.
+    if (!isSmall)
+      SetIter.~SetIterTy();
+
+    isSmall = Other.isSmall;
+    if (isSmall)
+      VecIter = std::move(Other.VecIter);
+    else
+      new (&SetIter) SetIterTy(std::move(Other.SetIter));
+    return *this;
+  }
+
+  bool operator==(const SmallSetIterator &RHS) const {
+    if (isSmall != RHS.isSmall)
+      return false;
+    if (isSmall)
+      return VecIter == RHS.VecIter;
+    return SetIter == RHS.SetIter;
+  }
+
+  SmallSetIterator &operator++() { // Preincrement
+    if (isSmall)
+      VecIter++;
+    else
+      SetIter++;
+    return *this;
+  }
+
+  const T &operator*() const { return isSmall ? *VecIter : *SetIter; }
+};
 
 /// SmallSet - This maintains a set of unique values, optimizing for the case
 /// when the set is small (less than N).  In this case, the set can be
 /// maintained with no mallocs.  If the set gets large, we expand to using an
 /// std::set to maintain reasonable lookup times.
-///
-/// Note that this set does not provide a way to iterate over members in the
-/// set.
 template <typename T, unsigned N, typename C = std::less<T>>
 class SmallSet {
   /// Use a SmallVector to hold the elements here (even though it will never
@@ -50,6 +149,7 @@ class SmallSet {
 
 public:
   using size_type = size_t;
+  using const_iterator = SmallSetIterator<T, N, C>;
 
   SmallSet() = default;
 
@@ -78,16 +178,16 @@ public:
   /// concept.
   // FIXME: Add iterators that abstract over the small and large form, and then
   // return those here.
-  std::pair<nullopt_t, bool> insert(const T &V) {
+  std::pair<std::nullopt_t, bool> insert(const T &V) {
     if (!isSmall())
-      return std::make_pair(nullopt, Set.insert(V).second);
+      return std::make_pair(std::nullopt, Set.insert(V).second);
 
     VIterator I = vfind(V);
     if (I != Vector.end())    // Don't reinsert if it already exists.
-      return std::make_pair(nullopt, false);
+      return std::make_pair(std::nullopt, false);
     if (Vector.size() < N) {
       Vector.push_back(V);
-      return std::make_pair(nullopt, true);
+      return std::make_pair(std::nullopt, true);
     }
 
     // Otherwise, grow from vector to set.
@@ -96,7 +196,7 @@ public:
       Vector.pop_back();
     }
     Set.insert(V);
-    return std::make_pair(nullopt, true);
+    return std::make_pair(std::nullopt, true);
   }
 
   template <typename IterT>
@@ -119,6 +219,18 @@ public:
   void clear() {
     Vector.clear();
     Set.clear();
+  }
+
+  const_iterator begin() const {
+    if (isSmall())
+      return {Vector.begin()};
+    return {Set.begin()};
+  }
+
+  const_iterator end() const {
+    if (isSmall())
+      return {Vector.end()};
+    return {Set.end()};
   }
 
 private:

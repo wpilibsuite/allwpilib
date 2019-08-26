@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -48,7 +48,7 @@ class SinkImpl : public PropertyContainer {
   void SetSource(std::shared_ptr<SourceImpl> source);
 
   std::shared_ptr<SourceImpl> GetSource() const {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     return m_source;
   }
 

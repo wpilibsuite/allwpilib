@@ -15,15 +15,16 @@ if (NOT WITHOUT_JAVA)
     configure_file(src/generate/WPILibVersion.java.in WPILibVersion.java)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+    file(GLOB EJML_JARS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/*.jar")
 
-    add_jar(wpilibj_jar ${JAVA_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.java INCLUDE_JARS hal_jar ntcore_jar ${OPENCV_JAR_FILE} cscore_jar cameraserver_jar wpiutil_jar OUTPUT_NAME wpilibj)
+    add_jar(wpilibj_jar ${JAVA_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.java INCLUDE_JARS hal_jar ntcore_jar ${EJML_JARS} ${OPENCV_JAR_FILE} cscore_jar cameraserver_jar wpiutil_jar OUTPUT_NAME wpilibj)
 
     get_property(WPILIBJ_JAR_FILE TARGET wpilibj_jar PROPERTY JAR_FILE)
     install(FILES ${WPILIBJ_JAR_FILE} DESTINATION "${java_lib_dest}")
 
     set_property(TARGET wpilibj_jar PROPERTY FOLDER "java")
 
-    if (MSVC)
+    if (MSVC OR FLAT_INSTALL_WPILIB)
         set (wpilibj_config_dir ${wpilib_dest})
     else()
         set (wpilibj_config_dir share/wpilibj)

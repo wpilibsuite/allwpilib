@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -370,7 +370,7 @@ bool Storage::LoadEntries(
 
   // copy values into storage as quickly as possible so lock isn't held
   std::vector<std::shared_ptr<Message>> msgs;
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
   for (auto& i : entries) {
     Entry* entry = GetOrNew(i.first);
     auto old_value = entry->value;

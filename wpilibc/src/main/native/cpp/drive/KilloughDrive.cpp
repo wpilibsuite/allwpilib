@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,13 +11,12 @@
 #include <cmath>
 
 #include <hal/HAL.h>
+#include <wpi/math>
 
 #include "frc/SpeedController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
-
-constexpr double kPi = 3.14159265358979323846;
 
 KilloughDrive::KilloughDrive(SpeedController& leftMotor,
                              SpeedController& rightMotor,
@@ -30,12 +29,12 @@ KilloughDrive::KilloughDrive(SpeedController& leftMotor,
                              SpeedController& backMotor, double leftMotorAngle,
                              double rightMotorAngle, double backMotorAngle)
     : m_leftMotor(leftMotor), m_rightMotor(rightMotor), m_backMotor(backMotor) {
-  m_leftVec = {std::cos(leftMotorAngle * (kPi / 180.0)),
-               std::sin(leftMotorAngle * (kPi / 180.0))};
-  m_rightVec = {std::cos(rightMotorAngle * (kPi / 180.0)),
-                std::sin(rightMotorAngle * (kPi / 180.0))};
-  m_backVec = {std::cos(backMotorAngle * (kPi / 180.0)),
-               std::sin(backMotorAngle * (kPi / 180.0))};
+  m_leftVec = {std::cos(leftMotorAngle * (wpi::math::pi / 180.0)),
+               std::sin(leftMotorAngle * (wpi::math::pi / 180.0))};
+  m_rightVec = {std::cos(rightMotorAngle * (wpi::math::pi / 180.0)),
+                std::sin(rightMotorAngle * (wpi::math::pi / 180.0))};
+  m_backVec = {std::cos(backMotorAngle * (wpi::math::pi / 180.0)),
+               std::sin(backMotorAngle * (wpi::math::pi / 180.0))};
   AddChild(&m_leftMotor);
   AddChild(&m_rightMotor);
   AddChild(&m_backMotor);
@@ -84,8 +83,9 @@ void KilloughDrive::DrivePolar(double magnitude, double angle,
     reported = true;
   }
 
-  DriveCartesian(magnitude * std::sin(angle * (kPi / 180.0)),
-                 magnitude * std::cos(angle * (kPi / 180.0)), zRotation, 0.0);
+  DriveCartesian(magnitude * std::sin(angle * (wpi::math::pi / 180.0)),
+                 magnitude * std::cos(angle * (wpi::math::pi / 180.0)),
+                 zRotation, 0.0);
 }
 
 void KilloughDrive::StopMotor() {

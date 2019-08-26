@@ -67,8 +67,8 @@ static const json::value_t construct_type_cases[] = {
     json::value_t::number_float,
 };
 
-INSTANTIATE_TEST_CASE_P(JsonConstructTypeTests, JsonConstructTypeTest,
-                        ::testing::ValuesIn(construct_type_cases), );
+INSTANTIATE_TEST_SUITE_P(JsonConstructTypeTests, JsonConstructTypeTest,
+                        ::testing::ValuesIn(construct_type_cases));
 
 
 TEST(JsonConstructNullTest, NoParameter)
@@ -214,7 +214,7 @@ typedef ::testing::Types<std::list<json>, std::forward_list<json>,
                          std::array<json, 6>, std::vector<json>,
                          std::deque<json>>
     JsonConstructArrayTestTypes;
-TYPED_TEST_CASE(JsonConstructArrayTest, JsonConstructArrayTestTypes);
+TYPED_TEST_SUITE(JsonConstructArrayTest, JsonConstructArrayTestTypes, );
 
 // clang warns on missing braces on the TypeParam initializer line below.
 // Suppress this warning.
@@ -405,7 +405,7 @@ typedef ::testing::Types<
 #endif
     > JsonConstructIntegerTestTypes;
 
-TYPED_TEST_CASE(JsonConstructIntegerTest, JsonConstructIntegerTestTypes);
+TYPED_TEST_SUITE(JsonConstructIntegerTest, JsonConstructIntegerTestTypes, );
 
 TYPED_TEST(JsonConstructIntegerTest, Implicit)
 {
@@ -523,7 +523,7 @@ typedef ::testing::Types<float, double
                          >
     JsonConstructFloatTestTypes;
 
-TYPED_TEST_CASE(JsonConstructFloatTest, JsonConstructFloatTestTypes);
+TYPED_TEST_SUITE(JsonConstructFloatTest, JsonConstructFloatTestTypes, );
 
 TYPED_TEST(JsonConstructFloatTest, Implicit)
 {

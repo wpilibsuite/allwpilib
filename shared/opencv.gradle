@@ -1,17 +1,20 @@
-def opencvVersion = '3.4.4-4'
+def opencvVersion = '3.4.7-1'
 
 if (project.hasProperty('useCpp') && project.useCpp) {
     model {
-        dependencyConfigs {
-            opencv(DependencyConfig) {
-                groupId = 'edu.wpi.first.thirdparty.frc2019.opencv'
-                artifactId = 'opencv-cpp'
-                headerClassifier = 'headers'
-                ext = 'zip'
-                version = opencvVersion
-                sharedConfigs = project.sharedCvConfigs
-                staticConfigs = project.staticCvConfigs
-                linkExcludes = ['**/*java*']
+        binaries {
+            withType(NativeBinarySpec).all {
+                def binary = it
+                project.sharedCvConfigs.each {
+                    if (binary.component.name == it.key) {
+                        nativeUtils.useRequiredLibrary(binary, 'opencv_shared')
+                    }
+                }
+                project.staticCvConfigs.each {
+                    if (binary.component.name == it.key) {
+                        nativeUtils.useRequiredLibrary(binary, 'opencv_static')
+                    }
+                }
             }
         }
     }
@@ -19,12 +22,12 @@ if (project.hasProperty('useCpp') && project.useCpp) {
 
 if (project.hasProperty('useJava') && project.useJava) {
     dependencies {
-        compile "edu.wpi.first.thirdparty.frc2019.opencv:opencv-java:${opencvVersion}"
+        compile "edu.wpi.first.thirdparty.frc2020.opencv:opencv-java:${opencvVersion}"
         if (!project.hasProperty('skipDev') || !project.skipDev) {
-            devCompile "edu.wpi.first.thirdparty.frc2019.opencv:opencv-java:${opencvVersion}"
+            devCompile "edu.wpi.first.thirdparty.frc2020.opencv:opencv-java:${opencvVersion}"
         }
         if (project.hasProperty('useDocumentation') && project.useDocumentation) {
-            javaSource "edu.wpi.first.thirdparty.frc2019.opencv:opencv-java:${opencvVersion}:sources"
+            javaSource "edu.wpi.first.thirdparty.frc2020.opencv:opencv-java:${opencvVersion}:sources"
         }
     }
 }

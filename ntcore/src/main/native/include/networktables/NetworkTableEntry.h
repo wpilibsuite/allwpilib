@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,6 +10,7 @@
 
 #include <stdint.h>
 
+#include <initializer_list>
 #include <memory>
 #include <string>
 #include <vector>
@@ -177,6 +178,23 @@ class NetworkTableEntry final {
   std::vector<int> GetBooleanArray(ArrayRef<int> defaultValue) const;
 
   /**
+   * Gets the entry's value as a boolean array. If the entry does not exist
+   * or is of different type, it will return the default value.
+   *
+   * @param defaultValue the value to be returned if no value is found
+   * @return the entry's value or the given default value
+   *
+   * @note This makes a copy of the array.  If the overhead of this is a
+   *       concern, use GetValue() instead.
+   *
+   * @note The returned array is std::vector<int> instead of std::vector<bool>
+   *       because std::vector<bool> is special-cased in C++.  0 is false, any
+   *       non-zero value is true.
+   */
+  std::vector<int> GetBooleanArray(
+      std::initializer_list<int> defaultValue) const;
+
+  /**
    * Gets the entry's value as a double array. If the entry does not exist
    * or is of different type, it will return the default value.
    *
@@ -187,6 +205,19 @@ class NetworkTableEntry final {
    *       concern, use GetValue() instead.
    */
   std::vector<double> GetDoubleArray(ArrayRef<double> defaultValue) const;
+
+  /**
+   * Gets the entry's value as a double array. If the entry does not exist
+   * or is of different type, it will return the default value.
+   *
+   * @param defaultValue the value to be returned if no value is found
+   * @return the entry's value or the given default value
+   *
+   * @note This makes a copy of the array.  If the overhead of this is a
+   *       concern, use GetValue() instead.
+   */
+  std::vector<double> GetDoubleArray(
+      std::initializer_list<double> defaultValue) const;
 
   /**
    * Gets the entry's value as a string array. If the entry does not exist
@@ -200,6 +231,19 @@ class NetworkTableEntry final {
    */
   std::vector<std::string> GetStringArray(
       ArrayRef<std::string> defaultValue) const;
+
+  /**
+   * Gets the entry's value as a string array. If the entry does not exist
+   * or is of different type, it will return the default value.
+   *
+   * @param defaultValue the value to be returned if no value is found
+   * @return the entry's value or the given default value
+   *
+   * @note This makes a copy of the array.  If the overhead of this is a
+   *       concern, use GetValue() instead.
+   */
+  std::vector<std::string> GetStringArray(
+      std::initializer_list<std::string> defaultValue) const;
 
   /**
    * Sets the entry's value if it does not exist.
@@ -255,6 +299,14 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
+  bool SetDefaultBooleanArray(std::initializer_list<int> defaultValue);
+
+  /**
+   * Sets the entry's value if it does not exist.
+   *
+   * @param defaultValue the default value to set
+   * @return False if the entry exists with a different type
+   */
   bool SetDefaultDoubleArray(ArrayRef<double> defaultValue);
 
   /**
@@ -263,7 +315,23 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
+  bool SetDefaultDoubleArray(std::initializer_list<double> defaultValue);
+
+  /**
+   * Sets the entry's value if it does not exist.
+   *
+   * @param defaultValue the default value to set
+   * @return False if the entry exists with a different type
+   */
   bool SetDefaultStringArray(ArrayRef<std::string> defaultValue);
+
+  /**
+   * Sets the entry's value if it does not exist.
+   *
+   * @param defaultValue the default value to set
+   * @return False if the entry exists with a different type
+   */
+  bool SetDefaultStringArray(std::initializer_list<std::string> defaultValue);
 
   /**
    * Sets the entry's value.
@@ -311,7 +379,31 @@ class NetworkTableEntry final {
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
+  bool SetBooleanArray(ArrayRef<bool> value);
+
+  /**
+   * Sets the entry's value.
+   *
+   * @param value the value to set
+   * @return False if the entry exists with a different type
+   */
+  bool SetBooleanArray(std::initializer_list<bool> value);
+
+  /**
+   * Sets the entry's value.
+   *
+   * @param value the value to set
+   * @return False if the entry exists with a different type
+   */
   bool SetBooleanArray(ArrayRef<int> value);
+
+  /**
+   * Sets the entry's value.
+   *
+   * @param value the value to set
+   * @return False if the entry exists with a different type
+   */
+  bool SetBooleanArray(std::initializer_list<int> value);
 
   /**
    * Sets the entry's value.
@@ -327,7 +419,23 @@ class NetworkTableEntry final {
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
+  bool SetDoubleArray(std::initializer_list<double> value);
+
+  /**
+   * Sets the entry's value.
+   *
+   * @param value the value to set
+   * @return False if the entry exists with a different type
+   */
   bool SetStringArray(ArrayRef<std::string> value);
+
+  /**
+   * Sets the entry's value.
+   *
+   * @param value the value to set
+   * @return False if the entry exists with a different type
+   */
+  bool SetStringArray(std::initializer_list<std::string> value);
 
   /**
    * Sets the entry's value.  If the value is of different type, the type is
@@ -375,7 +483,31 @@ class NetworkTableEntry final {
    *
    * @param value the value to set
    */
+  void ForceSetBooleanArray(ArrayRef<bool> value);
+
+  /**
+   * Sets the entry's value.  If the value is of different type, the type is
+   * changed to match the new value.
+   *
+   * @param value the value to set
+   */
+  void ForceSetBooleanArray(std::initializer_list<bool> value);
+
+  /**
+   * Sets the entry's value.  If the value is of different type, the type is
+   * changed to match the new value.
+   *
+   * @param value the value to set
+   */
   void ForceSetBooleanArray(ArrayRef<int> value);
+
+  /**
+   * Sets the entry's value.  If the value is of different type, the type is
+   * changed to match the new value.
+   *
+   * @param value the value to set
+   */
+  void ForceSetBooleanArray(std::initializer_list<int> value);
 
   /**
    * Sets the entry's value.  If the value is of different type, the type is
@@ -391,7 +523,23 @@ class NetworkTableEntry final {
    *
    * @param value the value to set
    */
+  void ForceSetDoubleArray(std::initializer_list<double> value);
+
+  /**
+   * Sets the entry's value.  If the value is of different type, the type is
+   * changed to match the new value.
+   *
+   * @param value the value to set
+   */
   void ForceSetStringArray(ArrayRef<std::string> value);
+
+  /**
+   * Sets the entry's value.  If the value is of different type, the type is
+   * changed to match the new value.
+   *
+   * @param value the value to set
+   */
+  void ForceSetStringArray(std::initializer_list<std::string> value);
 
   /**
    * Sets flags.

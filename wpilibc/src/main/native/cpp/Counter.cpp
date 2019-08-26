@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -90,30 +90,6 @@ Counter::~Counter() {
   int32_t status = 0;
   HAL_FreeCounter(m_counter, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-  m_counter = HAL_kInvalidHandle;
-}
-
-Counter::Counter(Counter&& rhs)
-    : ErrorBase(std::move(rhs)),
-      SendableBase(std::move(rhs)),
-      CounterBase(std::move(rhs)),
-      m_upSource(std::move(rhs.m_upSource)),
-      m_downSource(std::move(rhs.m_downSource)),
-      m_index(std::move(rhs.m_index)) {
-  std::swap(m_counter, rhs.m_counter);
-}
-
-Counter& Counter::operator=(Counter&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-  SendableBase::operator=(std::move(rhs));
-  CounterBase::operator=(std::move(rhs));
-
-  m_upSource = std::move(rhs.m_upSource);
-  m_downSource = std::move(rhs.m_downSource);
-  std::swap(m_counter, rhs.m_counter);
-  m_index = std::move(rhs.m_index);
-
-  return *this;
 }
 
 void Counter::SetUpSource(int channel) {

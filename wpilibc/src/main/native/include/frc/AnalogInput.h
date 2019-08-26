@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -48,8 +48,8 @@ class AnalogInput : public ErrorBase, public SendableBase, public PIDSource {
 
   ~AnalogInput() override;
 
-  AnalogInput(AnalogInput&& rhs);
-  AnalogInput& operator=(AnalogInput&& rhs);
+  AnalogInput(AnalogInput&&) = default;
+  AnalogInput& operator=(AnalogInput&&) = default;
 
   /**
    * Get a sample straight from this channel.
@@ -284,7 +284,7 @@ class AnalogInput : public ErrorBase, public SendableBase, public PIDSource {
 
  private:
   int m_channel;
-  HAL_AnalogInputHandle m_port = HAL_kInvalidHandle;
+  hal::Handle<HAL_AnalogInputHandle> m_port;
   int64_t m_accumulatorOffset;
 };
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -105,18 +105,18 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
   wpi::StringRef GetName() { return m_name; }
 
   std::shared_ptr<SourceImpl> GetSource() {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     return m_source;
   }
 
   void StartStream() {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     if (m_source) m_source->EnableSink();
     m_streaming = true;
   }
 
   void StopStream() {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     if (m_source) m_source->DisableSink();
     m_streaming = false;
   }
@@ -865,7 +865,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
 
 // worker thread for clients that connected to this server
 void MjpegServerImpl::ConnThread::Main() {
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
   while (m_active) {
     while (!m_stream) {
       m_cond.wait(lock);
@@ -898,7 +898,7 @@ void MjpegServerImpl::ServerThreadMain() {
 
     auto source = GetSource();
 
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     // Find unoccupied worker thread, or create one if necessary
     auto it = std::find_if(m_connThreads.begin(), m_connThreads.end(),
                            [](const wpi::SafeThreadOwner<ConnThread>& owner) {
@@ -937,7 +937,7 @@ void MjpegServerImpl::ServerThreadMain() {
 }
 
 void MjpegServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   for (auto& connThread : m_connThreads) {
     if (auto thr = connThread.GetThread()) {
       if (thr->m_source != source) {

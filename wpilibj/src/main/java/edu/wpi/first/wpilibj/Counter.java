@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,6 +16,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -110,7 +111,7 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
   public Counter(DigitalSource source) {
     this();
 
-    requireNonNull(source, "Digital Source given was null");
+    requireNonNullParam(source, "source", "Counter");
     setUpSource(source);
   }
 
@@ -141,9 +142,9 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
                  boolean inverted) {
     this(Mode.kExternalDirection);
 
-    requireNonNull(encodingType, "Encoding type given was null");
-    requireNonNull(upSource, "Up Source given was null");
-    requireNonNull(downSource, "Down Source given was null");
+    requireNonNullParam(encodingType, "encodingType", "Counter");
+    requireNonNullParam(upSource, "upSource", "Counter");
+    requireNonNullParam(downSource, "downSource", "Counter");
 
     if (encodingType != EncodingType.k1X && encodingType != EncodingType.k2X) {
       throw new IllegalArgumentException("Counters only support 1X and 2X quadrature decoding!");
@@ -174,7 +175,7 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
   public Counter(AnalogTrigger trigger) {
     this();
 
-    requireNonNull(trigger, "The Analog Trigger given was null");
+    requireNonNullParam(trigger, "trigger", "Counter");
 
     setUpSource(trigger.createOutput(AnalogTriggerType.kState));
   }
@@ -237,8 +238,8 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
    * @param triggerType   The analog trigger output that will trigger the counter.
    */
   public void setUpSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
-    requireNonNull(analogTrigger, "Analog Trigger given was null");
-    requireNonNull(triggerType, "Analog Trigger Type given was null");
+    requireNonNullParam(analogTrigger, "analogTrigger", "setUpSource");
+    requireNonNullParam(triggerType, "triggerType", "setUpSource");
 
     setUpSource(analogTrigger.createOutput(triggerType));
     m_allocatedUpSource = true;
@@ -307,8 +308,8 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
    * @param triggerType   The analog trigger output that will trigger the counter.
    */
   public void setDownSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
-    requireNonNull(analogTrigger, "Analog Trigger given was null");
-    requireNonNull(triggerType, "Analog Trigger Type given was null");
+    requireNonNullParam(analogTrigger, "analogTrigger", "setDownSource");
+    requireNonNullParam(triggerType, "analogTrigger", "setDownSource");
 
     setDownSource(analogTrigger.createOutput(triggerType));
     m_allocatedDownSource = true;
@@ -530,7 +531,7 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
    */
   @Override
   public void setPIDSourceType(PIDSourceType pidSource) {
-    requireNonNull(pidSource, "PID Source Parameter given was null");
+    requireNonNullParam(pidSource, "pidSource", "setPIDSourceType");
     if (pidSource != PIDSourceType.kDisplacement && pidSource != PIDSourceType.kRate) {
       throw new IllegalArgumentException("PID Source parameter was not valid type: " + pidSource);
     }

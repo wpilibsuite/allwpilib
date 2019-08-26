@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,7 +17,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.NamedSendable;
 import edu.wpi.first.wpilibj.Sendable;
 
 /**
@@ -50,6 +49,11 @@ public class SmartDashboard {
    */
   @SuppressWarnings("PMD.UseConcurrentHashMap")
   private static final Map<String, Data> tablesToData = new HashMap<>();
+
+  /**
+   * The executor for listener tasks; calls listener tasks synchronously from main thread.
+   */
+  private static final ListenerExecutor listenerExecutor = new ListenerExecutor();
 
   static {
     HAL.report(tResourceType.kResourceType_SmartDashboard, 0);
@@ -85,7 +89,7 @@ public class SmartDashboard {
   }
 
   /**
-   * Maps the specified key (where the key is the name of the {@link NamedSendable}
+   * Maps the specified key (where the key is the name of the {@link Sendable}
    * to the specified value in this table. The value can be retrieved by
    * calling the get method with a key that is equal to the original key.
    *
@@ -523,11 +527,23 @@ public class SmartDashboard {
   }
 
   /**
+   * Posts a task from a listener to the ListenerExecutor, so that it can be run synchronously
+   * from the main loop on the next call to {@link SmartDashboard#updateValues()}.
+   *
+   * @param task The task to run synchronously from the main thread.
+   */
+  public static void postListenerTask(Runnable task) {
+    listenerExecutor.execute(task);
+  }
+
+  /**
    * Puts all sendable data to the dashboard.
    */
   public static synchronized void updateValues() {
     for (Data data : tablesToData.values()) {
       data.m_builder.updateTable();
     }
+    // Execute posted listener tasks
+    listenerExecutor.runListenerTasks();
   }
 }

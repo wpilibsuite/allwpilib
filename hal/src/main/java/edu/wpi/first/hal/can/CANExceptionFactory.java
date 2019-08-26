@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -32,13 +32,12 @@ public final class CANExceptionFactory {
         throw new CANMessageNotFoundException();
       case ERR_CANSessionMux_NotAllowed:
       case NIRioStatus.kRIOStatusFeatureNotSupported:
-        throw new CANMessageNotAllowedException("MessageID = " + Integer.toString(messageID));
+        throw new CANMessageNotAllowedException("MessageID = " + messageID);
       case ERR_CANSessionMux_NotInitialized:
       case NIRioStatus.kRIOStatusResourceNotInitialized:
         throw new CANNotInitializedException();
       default:
-        throw new UncleanStatusException("Fatal status code detected:  " + Integer.toString(
-            status));
+        throw new UncleanStatusException("Fatal status code detected:  " + status);
     }
   }
 

@@ -10,8 +10,8 @@ ext {
 
 apply from: "${rootDir}/shared/nilibraries.gradle"
 
-if (!project.hasProperty('onlyAthena')) {
-    ext.skipAthena = true
+if (!project.hasProperty('onlylinuxathena')) {
+    ext.skiplinuxathena = true
     apply from: "${rootDir}/shared/config.gradle"
 
     model {
@@ -57,7 +57,7 @@ if (!project.hasProperty('onlyAthena')) {
                     }
                 }
                 binaries.all {
-                    if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
+                    if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian')  && !project.hasProperty('onlylinuxaarch64bionic')) {
                         project(':hal').addHalDependency(it, 'shared')
                         lib library: pluginName
                         if (project.hasProperty('includeNtCore')) {
@@ -78,7 +78,7 @@ if (!project.hasProperty('onlyAthena')) {
 model {
     tasks {
         def c = $.components
-        if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
+        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
             project.tasks.create('runCpp', Exec) {
                 group = 'WPILib'
                 description = "Run the ${pluginName}Dev executable"
@@ -88,7 +88,7 @@ model {
                     if (it in NativeExecutableSpec && it.name == "${pluginName}Dev") {
                         it.binaries.each {
                             if (!found) {
-                                def arch = it.targetPlatform.architecture.name
+                                def arch = it.targetPlatform.name
                                 if (arch == systemArch) {
                                     dependsOn it.tasks.install
                                     commandLine it.tasks.install.runScriptFile.get().asFile.toString()

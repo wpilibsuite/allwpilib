@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -100,8 +100,7 @@ public class Timer {
    * clock.
    */
   public synchronized void stop() {
-    final double temp = get();
-    m_accumulatedTime = temp;
+    m_accumulatedTime = get();
     m_running = false;
   }
 

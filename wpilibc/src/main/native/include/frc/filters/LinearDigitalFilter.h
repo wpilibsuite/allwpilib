@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,12 +7,14 @@
 
 #pragma once
 
+#include <initializer_list>
 #include <memory>
 #include <vector>
 
 #include <wpi/ArrayRef.h>
+#include <wpi/circular_buffer.h>
+#include <wpi/deprecated.h>
 
-#include "frc/circular_buffer.h"
 #include "frc/filters/Filter.h"
 
 namespace frc {
@@ -76,6 +78,7 @@ class LinearDigitalFilter : public Filter {
    * @param ffGains The "feed forward" or FIR gains
    * @param fbGains The "feed back" or IIR gains
    */
+  WPI_DEPRECATED("Use LinearFilter class instead.")
   LinearDigitalFilter(PIDSource& source, wpi::ArrayRef<double> ffGains,
                       wpi::ArrayRef<double> fbGains);
 
@@ -86,9 +89,33 @@ class LinearDigitalFilter : public Filter {
    * @param ffGains The "feed forward" or FIR gains
    * @param fbGains The "feed back" or IIR gains
    */
+  WPI_DEPRECATED("Use LinearFilter class instead.")
+  LinearDigitalFilter(PIDSource& source, std::initializer_list<double> ffGains,
+                      std::initializer_list<double> fbGains);
+
+  /**
+   * Create a linear FIR or IIR filter.
+   *
+   * @param source  The PIDSource object that is used to get values
+   * @param ffGains The "feed forward" or FIR gains
+   * @param fbGains The "feed back" or IIR gains
+   */
+  WPI_DEPRECATED("Use LinearFilter class instead.")
   LinearDigitalFilter(std::shared_ptr<PIDSource> source,
                       wpi::ArrayRef<double> ffGains,
                       wpi::ArrayRef<double> fbGains);
+
+  /**
+   * Create a linear FIR or IIR filter.
+   *
+   * @param source  The PIDSource object that is used to get values
+   * @param ffGains The "feed forward" or FIR gains
+   * @param fbGains The "feed back" or IIR gains
+   */
+  WPI_DEPRECATED("Use LinearFilter class instead.")
+  LinearDigitalFilter(std::shared_ptr<PIDSource> source,
+                      std::initializer_list<double> ffGains,
+                      std::initializer_list<double> fbGains);
 
   LinearDigitalFilter(LinearDigitalFilter&&) = default;
   LinearDigitalFilter& operator=(LinearDigitalFilter&&) = default;
@@ -188,8 +215,8 @@ class LinearDigitalFilter : public Filter {
   double PIDGet() override;
 
  private:
-  circular_buffer<double> m_inputs;
-  circular_buffer<double> m_outputs;
+  wpi::circular_buffer<double> m_inputs;
+  wpi::circular_buffer<double> m_outputs;
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
 };

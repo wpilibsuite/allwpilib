@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -43,4 +43,13 @@ public interface CameraServerShared {
    * @param id the usage id
    */
   void reportAxisCamera(int id);
+
+  /**
+   * Get if running on a roboRIO.
+   *
+   * @return true if on roboRIO
+   */
+  default boolean isRoboRIO() {
+    return false;
+  }
 }

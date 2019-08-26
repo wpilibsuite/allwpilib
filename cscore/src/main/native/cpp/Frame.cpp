@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -36,7 +36,7 @@ Frame::Frame(SourceImpl& source, std::unique_ptr<Image> image, Time time)
 
 Image* Frame::GetNearestImage(int width, int height) const {
   if (!m_impl) return nullptr;
-  std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
   Image* found = nullptr;
 
   // Ideally we want the smallest image at least width/height in size
@@ -60,7 +60,7 @@ Image* Frame::GetNearestImage(int width, int height,
                               VideoMode::PixelFormat pixelFormat,
                               int jpegQuality) const {
   if (!m_impl) return nullptr;
-  std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
   Image* found = nullptr;
 
   // We want the smallest image at least width/height (or the next largest),
@@ -253,7 +253,7 @@ Image* Frame::ConvertMJPEGToBGR(Image* image) {
   // Save the result
   Image* rv = newImage.release();
   if (m_impl) {
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     m_impl->images.push_back(rv);
   }
   return rv;
@@ -274,7 +274,7 @@ Image* Frame::ConvertMJPEGToGray(Image* image) {
   // Save the result
   Image* rv = newImage.release();
   if (m_impl) {
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     m_impl->images.push_back(rv);
   }
   return rv;
@@ -294,7 +294,7 @@ Image* Frame::ConvertYUYVToBGR(Image* image) {
   // Save the result
   Image* rv = newImage.release();
   if (m_impl) {
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     m_impl->images.push_back(rv);
   }
   return rv;
@@ -314,7 +314,7 @@ Image* Frame::ConvertBGRToRGB565(Image* image) {
   // Save the result
   Image* rv = newImage.release();
   if (m_impl) {
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     m_impl->images.push_back(rv);
   }
   return rv;
@@ -334,7 +334,7 @@ Image* Frame::ConvertRGB565ToBGR(Image* image) {
   // Save the result
   Image* rv = newImage.release();
   if (m_impl) {
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     m_impl->images.push_back(rv);
   }
   return rv;
@@ -354,14 +354,14 @@ Image* Frame::ConvertBGRToGray(Image* image) {
   // Save the result
   Image* rv = newImage.release();
   if (m_impl) {
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     m_impl->images.push_back(rv);
   }
   return rv;
 }
 
 Image* Frame::ConvertGrayToBGR(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kBGR) return nullptr;
+  if (!image || image->pixelFormat != VideoMode::kGray) return nullptr;
 
   // Allocate a BGR image
   auto newImage =
@@ -374,7 +374,7 @@ Image* Frame::ConvertGrayToBGR(Image* image) {
   // Save the result
   Image* rv = newImage.release();
   if (m_impl) {
-    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+    std::scoped_lock lock(m_impl->mutex);
     m_impl->images.push_back(rv);
   }
   return rv;
@@ -383,7 +383,7 @@ Image* Frame::ConvertGrayToBGR(Image* image) {
 Image* Frame::ConvertBGRToMJPEG(Image* image, int quality) {
   if (!image || image->pixelFormat != VideoMode::kBGR) return nullptr;
   if (!m_impl) return nullptr;
-  std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
 
   // Allocate a JPEG image.  We don't actually know what the resulting size
   // will be; while the destination will automatically grow, doing so will
@@ -397,7 +397,7 @@ Image* Frame::ConvertBGRToMJPEG(Image* image, int quality) {
 
   // Compress
   if (m_impl->compressionParams.empty()) {
-    m_impl->compressionParams.push_back(CV_IMWRITE_JPEG_QUALITY);
+    m_impl->compressionParams.push_back(cv::IMWRITE_JPEG_QUALITY);
     m_impl->compressionParams.push_back(quality);
   } else {
     m_impl->compressionParams[1] = quality;
@@ -414,7 +414,7 @@ Image* Frame::ConvertBGRToMJPEG(Image* image, int quality) {
 Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
   if (!image || image->pixelFormat != VideoMode::kGray) return nullptr;
   if (!m_impl) return nullptr;
-  std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
 
   // Allocate a JPEG image.  We don't actually know what the resulting size
   // will be; while the destination will automatically grow, doing so will
@@ -428,7 +428,7 @@ Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
 
   // Compress
   if (m_impl->compressionParams.empty()) {
-    m_impl->compressionParams.push_back(CV_IMWRITE_JPEG_QUALITY);
+    m_impl->compressionParams.push_back(cv::IMWRITE_JPEG_QUALITY);
     m_impl->compressionParams.push_back(quality);
   } else {
     m_impl->compressionParams[1] = quality;
@@ -446,7 +446,7 @@ Image* Frame::GetImageImpl(int width, int height,
                            VideoMode::PixelFormat pixelFormat,
                            int requiredJpegQuality, int defaultJpegQuality) {
   if (!m_impl) return nullptr;
-  std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
+  std::scoped_lock lock(m_impl->mutex);
   Image* cur = GetNearestImage(width, height, pixelFormat, requiredJpegQuality);
   if (!cur || cur->Is(width, height, pixelFormat, requiredJpegQuality))
     return cur;

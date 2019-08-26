@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,7 +16,7 @@ import edu.wpi.first.hal.RelayJNI;
 import edu.wpi.first.hal.util.UncleanStatusException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * Class for VEX Robotics Spike style relay outputs. Relays are intended to be connected to Spikes
@@ -128,7 +128,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
     m_sendableImpl = new SendableImpl(true);
 
     m_channel = channel;
-    m_direction = requireNonNull(direction, "Null Direction was given");
+    m_direction = requireNonNullParam(direction, "direction", "Relay");
     initRelay();
     set(Value.kOff);
   }
@@ -347,7 +347,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * @param direction The direction for the relay to operate in
    */
   public void setDirection(Direction direction) {
-    requireNonNull(direction, "Null Direction was given");
+    requireNonNullParam(direction, "direction", "setDirection");
     if (m_direction == direction) {
       return;
     }

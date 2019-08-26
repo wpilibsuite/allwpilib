@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,8 +9,6 @@
 
 #include <memory>
 #include <string>
-
-#include <wpi/mutex.h>
 
 #include "frc/smartdashboard/Sendable.h"
 
@@ -27,8 +25,10 @@ class SendableBase : public Sendable {
 
   ~SendableBase() override;
 
-  SendableBase(SendableBase&& rhs);
-  SendableBase& operator=(SendableBase&& rhs);
+  SendableBase(const SendableBase&) = default;
+  SendableBase& operator=(const SendableBase&) = default;
+  SendableBase(SendableBase&&);
+  SendableBase& operator=(SendableBase&&);
 
   using Sendable::SetName;
 
@@ -73,7 +73,6 @@ class SendableBase : public Sendable {
   void SetName(const wpi::Twine& moduleType, int moduleNumber, int channel);
 
  private:
-  mutable wpi::mutex m_mutex;
   std::string m_name;
   std::string m_subsystem = "Ungrouped";
 };

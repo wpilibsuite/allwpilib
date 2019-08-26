@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -50,18 +50,6 @@ CAN::~CAN() {
     HAL_CleanCAN(m_handle);
     m_handle = HAL_kInvalidHandle;
   }
-}
-
-CAN::CAN(CAN&& rhs) : ErrorBase(std::move(rhs)) {
-  std::swap(m_handle, rhs.m_handle);
-}
-
-CAN& CAN::operator=(CAN&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-
-  std::swap(m_handle, rhs.m_handle);
-
-  return *this;
 }
 
 void CAN::WritePacket(const uint8_t* data, int length, int apiId) {

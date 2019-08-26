@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,9 +9,9 @@
 
 #include <cmath>
 
-using namespace frc;
+#include <wpi/math>
 
-constexpr double kPi = 3.14159265358979323846;
+using namespace frc;
 
 Vector2d::Vector2d(double x, double y) {
   this->x = x;
@@ -19,8 +19,8 @@ Vector2d::Vector2d(double x, double y) {
 }
 
 void Vector2d::Rotate(double angle) {
-  double cosA = std::cos(angle * (kPi / 180.0));
-  double sinA = std::sin(angle * (kPi / 180.0));
+  double cosA = std::cos(angle * (wpi::math::pi / 180.0));
+  double sinA = std::sin(angle * (wpi::math::pi / 180.0));
   double out[2];
   out[0] = x * cosA - y * sinA;
   out[1] = x * sinA + y * cosA;

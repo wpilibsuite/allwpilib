@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -23,6 +23,25 @@ std::shared_ptr<Pipe> Pipe::Create(Loop& loop, bool ipc) {
   }
   h->Keep();
   return h;
+}
+
+void Pipe::Reuse(std::function<void()> callback, bool ipc) {
+  if (IsClosing()) return;
+  if (!m_reuseData) m_reuseData = std::make_unique<ReuseData>();
+  m_reuseData->callback = callback;
+  m_reuseData->ipc = ipc;
+  uv_close(GetRawHandle(), [](uv_handle_t* handle) {
+    Pipe& h = *static_cast<Pipe*>(handle->data);
+    if (!h.m_reuseData) return;
+    auto data = std::move(h.m_reuseData);
+    auto err =
+        uv_pipe_init(h.GetLoopRef().GetRaw(), h.GetRaw(), data->ipc ? 1 : 0);
+    if (err < 0) {
+      h.ReportError(err);
+      return;
+    }
+    data->callback();
+  });
 }
 
 std::shared_ptr<Pipe> Pipe::Accept() {

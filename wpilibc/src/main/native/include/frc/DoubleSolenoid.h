@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -45,8 +45,8 @@ class DoubleSolenoid : public SolenoidBase {
 
   ~DoubleSolenoid() override;
 
-  DoubleSolenoid(DoubleSolenoid&& rhs);
-  DoubleSolenoid& operator=(DoubleSolenoid&& rhs);
+  DoubleSolenoid(DoubleSolenoid&&) = default;
+  DoubleSolenoid& operator=(DoubleSolenoid&&) = default;
 
   /**
    * Set the value of a solenoid.
@@ -91,8 +91,8 @@ class DoubleSolenoid : public SolenoidBase {
   int m_reverseChannel;  // The reverse channel on the module to control.
   int m_forwardMask;     // The mask for the forward channel.
   int m_reverseMask;     // The mask for the reverse channel.
-  HAL_SolenoidHandle m_forwardHandle = HAL_kInvalidHandle;
-  HAL_SolenoidHandle m_reverseHandle = HAL_kInvalidHandle;
+  hal::Handle<HAL_SolenoidHandle> m_forwardHandle;
+  hal::Handle<HAL_SolenoidHandle> m_reverseHandle;
 };
 
 }  // namespace frc

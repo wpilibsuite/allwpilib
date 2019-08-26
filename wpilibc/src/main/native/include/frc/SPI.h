@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,7 @@
 #include <memory>
 
 #include <hal/SPITypes.h>
+#include <units/units.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/deprecated.h>
 
@@ -41,8 +42,8 @@ class SPI : public ErrorBase {
 
   ~SPI() override;
 
-  SPI(SPI&& rhs);
-  SPI& operator=(SPI&& rhs);
+  SPI(SPI&&) = default;
+  SPI& operator=(SPI&&) = default;
 
   /**
    * Configure the rate of the generated clock signal.
@@ -52,7 +53,7 @@ class SPI : public ErrorBase {
    *
    * @param hz The clock rate in Hertz.
    */
-  void SetClockRate(double hz);
+  void SetClockRate(int hz);
 
   /**
    * Configure the order that bits are sent and received on the wire
@@ -179,8 +180,19 @@ class SPI : public ErrorBase {
    * InitAuto() and SetAutoTransmitData() must be called before calling this
    * function.
    *
+   * @param period period between transfers (us resolution)
+   */
+  void StartAutoRate(units::second_t period);
+
+  /**
+   * Start running the automatic SPI transfer engine at a periodic rate.
+   *
+   * InitAuto() and SetAutoTransmitData() must be called before calling this
+   * function.
+   *
    * @param period period between transfers, in seconds (us resolution)
    */
+  WPI_DEPRECATED("Use StartAutoRate with unit-safety instead")
   void StartAutoRate(double period);
 
   /**
@@ -221,9 +233,32 @@ class SPI : public ErrorBase {
    *
    * @param buffer buffer where read words are stored
    * @param numToRead number of words to read
+   * @param timeout timeout (ms resolution)
+   * @return Number of words remaining to be read
+   */
+  int ReadAutoReceivedData(uint32_t* buffer, int numToRead,
+                           units::second_t timeout);
+
+  /**
+   * Read data that has been transferred by the automatic SPI transfer engine.
+   *
+   * Transfers may be made a byte at a time, so it's necessary for the caller
+   * to handle cases where an entire transfer has not been completed.
+   *
+   * Each received data sequence consists of a timestamp followed by the
+   * received data bytes, one byte per word (in the least significant byte).
+   * The length of each received data sequence is the same as the combined
+   * size of the data and zeroSize set in SetAutoTransmitData().
+   *
+   * Blocks until numToRead words have been read or timeout expires.
+   * May be called with numToRead=0 to retrieve how many words are available.
+   *
+   * @param buffer buffer where read words are stored
+   * @param numToRead number of words to read
    * @param timeout timeout in seconds (ms resolution)
    * @return Number of words remaining to be read
    */
+  WPI_DEPRECATED("Use ReadAutoReceivedData with unit-safety instead")
   int ReadAutoReceivedData(uint32_t* buffer, int numToRead, double timeout);
 
   /**
@@ -249,6 +284,26 @@ class SPI : public ErrorBase {
    * @param isSigned  Is data field signed?
    * @param bigEndian Is device big endian?
    */
+  void InitAccumulator(units::second_t period, int cmd, int xferSize,
+                       int validMask, int validValue, int dataShift,
+                       int dataSize, bool isSigned, bool bigEndian);
+
+  /**
+   * Initialize the accumulator.
+   *
+   * @param period    Time between reads
+   * @param cmd       SPI command to send to request data
+   * @param xferSize  SPI transfer size, in bytes
+   * @param validMask Mask to apply to received data for validity checking
+   * @param validData After valid_mask is applied, required matching value for
+   *                  validity checking
+   * @param dataShift Bit shift to apply to received data to get actual data
+   *                  value
+   * @param dataSize  Size (in bits) of data field
+   * @param isSigned  Is data field signed?
+   * @param bigEndian Is device big endian?
+   */
+  WPI_DEPRECATED("Use InitAccumulator with unit-safety instead")
   void InitAccumulator(double period, int cmd, int xferSize, int validMask,
                        int validValue, int dataShift, int dataSize,
                        bool isSigned, bool bigEndian);
@@ -345,7 +400,7 @@ class SPI : public ErrorBase {
   double GetAccumulatorIntegratedAverage() const;
 
  protected:
-  HAL_SPIPort m_port = HAL_SPI_kInvalid;
+  hal::SPIPort m_port;
   bool m_msbFirst = false;          // Default little-endian
   bool m_sampleOnTrailing = false;  // Default data updated on falling edge
   bool m_clockIdleHigh = false;     // Default clock active high

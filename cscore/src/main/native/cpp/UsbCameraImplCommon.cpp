@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,7 +17,7 @@ static void ConvertToC(CS_UsbCameraInfo* out, const UsbCameraInfo& in) {
   out->path = ConvertToC(in.path);
   out->name = ConvertToC(in.name);
   out->otherPaths = static_cast<char**>(
-      wpi::CheckedMalloc(in.otherPaths.size() * sizeof(char*)));
+      wpi::safe_malloc(in.otherPaths.size() * sizeof(char*)));
   out->otherPathsCount = in.otherPaths.size();
   for (size_t i = 0; i < in.otherPaths.size(); ++i)
     out->otherPaths[i] = cs::ConvertToC(in.otherPaths[i]);
@@ -50,7 +50,7 @@ CS_UsbCameraInfo* CS_GetUsbCameraInfo(CS_Source source, CS_Status* status) {
   auto info = cs::GetUsbCameraInfo(source, status);
   if (*status != CS_OK) return nullptr;
   CS_UsbCameraInfo* out = static_cast<CS_UsbCameraInfo*>(
-      wpi::CheckedMalloc(sizeof(CS_UsbCameraInfo)));
+      wpi::safe_malloc(sizeof(CS_UsbCameraInfo)));
   ConvertToC(out, info);
   return out;
 }
@@ -58,7 +58,7 @@ CS_UsbCameraInfo* CS_GetUsbCameraInfo(CS_Source source, CS_Status* status) {
 CS_UsbCameraInfo* CS_EnumerateUsbCameras(int* count, CS_Status* status) {
   auto cameras = cs::EnumerateUsbCameras(status);
   CS_UsbCameraInfo* out = static_cast<CS_UsbCameraInfo*>(
-      wpi::CheckedMalloc(cameras.size() * sizeof(CS_UsbCameraInfo)));
+      wpi::safe_malloc(cameras.size() * sizeof(CS_UsbCameraInfo)));
   *count = cameras.size();
   for (size_t i = 0; i < cameras.size(); ++i) ConvertToC(&out[i], cameras[i]);
   return out;

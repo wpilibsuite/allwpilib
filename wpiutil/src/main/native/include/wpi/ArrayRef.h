@@ -11,7 +11,6 @@
 #define WPIUTIL_WPI_ARRAYREF_H
 
 #include "wpi/Hashing.h"
-#include "wpi/optional.h"
 #include "wpi/SmallVector.h"
 #include "wpi/STLExtras.h"
 #include "wpi/Compiler.h"
@@ -22,10 +21,12 @@
 #include <initializer_list>
 #include <iterator>
 #include <memory>
+#include <optional>
 #include <type_traits>
 #include <vector>
 
 namespace wpi {
+
   /// ArrayRef - Represent a constant reference to an array (0 or more elements
   /// consecutively in memory), i.e. a start pointer and a length.  It allows
   /// various APIs to take consecutive elements easily and conveniently.
@@ -61,7 +62,7 @@ namespace wpi {
     /*implicit*/ ArrayRef() = default;
 
     /// Construct an empty ArrayRef from nullopt.
-    /*implicit*/ ArrayRef(nullopt_t) {}
+    /*implicit*/ ArrayRef(std::nullopt_t) {}
 
     /// Construct an ArrayRef from a single element.
     /*implicit*/ ArrayRef(const T &OneElt)
@@ -96,11 +97,6 @@ namespace wpi {
     /// Construct an ArrayRef from a C array.
     template <size_t N>
     /*implicit*/ constexpr ArrayRef(const T (&Arr)[N]) : Data(Arr), Length(N) {}
-
-    /// Construct an ArrayRef from a std::initializer_list.
-    /*implicit*/ ArrayRef(const std::initializer_list<T> &Vec)
-    : Data(Vec.begin() == Vec.end() ? (T*)nullptr : Vec.begin()),
-      Length(Vec.size()) {}
 
     /// Construct an ArrayRef<const T*> from ArrayRef<T*>. This uses SFINAE to
     /// ensure that only ArrayRefs of pointers can be converted.
@@ -297,7 +293,7 @@ namespace wpi {
     /*implicit*/ MutableArrayRef() = default;
 
     /// Construct an empty MutableArrayRef from nullopt.
-    /*implicit*/ MutableArrayRef(nullopt_t) : ArrayRef<T>() {}
+    /*implicit*/ MutableArrayRef(std::nullopt_t) : ArrayRef<T>() {}
 
     /// Construct an MutableArrayRef from a single element.
     /*implicit*/ MutableArrayRef(T &OneElt) : ArrayRef<T>(OneElt) {}

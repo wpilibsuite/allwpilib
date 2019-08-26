@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -149,7 +149,7 @@ int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
   readSelect.Channel = port->channel;
   readSelect.Averaged = false;
 
-  std::lock_guard<wpi::mutex> lock(analogRegisterWindowMutex);
+  std::scoped_lock lock(analogRegisterWindowMutex);
   analogInputSystem->writeReadSelect(readSelect, status);
   analogInputSystem->strobeLatchOutput(status);
   return static_cast<int16_t>(analogInputSystem->readOutput(status));
@@ -166,7 +166,7 @@ int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analogPortHandle,
   readSelect.Channel = port->channel;
   readSelect.Averaged = true;
 
-  std::lock_guard<wpi::mutex> lock(analogRegisterWindowMutex);
+  std::scoped_lock lock(analogRegisterWindowMutex);
   analogInputSystem->writeReadSelect(readSelect, status);
   analogInputSystem->strobeLatchOutput(status);
   return static_cast<int32_t>(analogInputSystem->readOutput(status));

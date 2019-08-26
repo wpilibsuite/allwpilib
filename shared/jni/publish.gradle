@@ -1,13 +1,6 @@
 import java.security.MessageDigest
 apply plugin: 'maven-publish'
 
-def pubVersion
-if (project.hasProperty("publishVersion")) {
-    pubVersion = project.publishVersion
-} else {
-    pubVersion = WPILibVersion.version
-}
-
 def outputsFolder = file("$buildDir/outputs")
 
 def baseArtifactId = nativeName
@@ -82,13 +75,13 @@ model {
                         task.outputs.file(hashFile)
                         task.inputs.file(binary.sharedLibraryFile)
                         task.from(hashFile) {
-                            into getPlatformPath(binary)
+                            into nativeUtils.getPlatformPath(binary)
                         }
                         task.doFirst {
                             hashFile.text = MessageDigest.getInstance("MD5").digest(binary.sharedLibraryFile.bytes).encodeHex().toString()
                         }
                         task.from(binary.sharedLibraryFile) {
-                            into getPlatformPath(binary)
+                            into nativeUtils.getPlatformPath(binary)
                         }
                     }
                 }
@@ -110,7 +103,7 @@ model {
 
                 artifactId = "${baseArtifactId}-cpp"
                 groupId artifactGroupId
-                version pubVersion
+                version wpilibVersioning.version.get()
             }
             jni(MavenPublication) {
                 jniTaskList.each {
@@ -123,7 +116,7 @@ model {
 
                 artifactId = "${baseArtifactId}-jni"
                 groupId artifactGroupId
-                version pubVersion
+                version wpilibVersioning.version.get()
             }
         }
     }

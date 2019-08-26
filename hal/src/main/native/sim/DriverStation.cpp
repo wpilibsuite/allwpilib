@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -28,6 +28,7 @@ static wpi::condition_variable* newDSDataAvailableCond;
 static wpi::mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
 static std::atomic_bool isFinalized{false};
+static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 
 namespace hal {
 namespace init {
@@ -41,13 +42,22 @@ void InitializeDriverStation() {
 using namespace hal;
 
 extern "C" {
+
+void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {
+  sendErrorHandler.store(handler);
+}
+
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg) {
+  auto errorHandler = sendErrorHandler.load();
+  if (errorHandler)
+    return errorHandler(isError, errorCode, isLVCode, details, location,
+                        callStack, printMsg);
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
-  std::lock_guard<wpi::mutex> lock(msgMutex);
+  std::scoped_lock lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
   static std::chrono::time_point<std::chrono::steady_clock>
       prevMsgTime[KEEP_MSGS];
@@ -219,7 +229,7 @@ HAL_Bool HAL_IsNewControlData(void) {
   // worth the cycles to check.
   int currentCount = 0;
   {
-    std::unique_lock<wpi::mutex> lock(newDSDataAvailableMutex);
+    std::unique_lock lock(newDSDataAvailableMutex);
     currentCount = newDSDataAvailableCounter;
   }
   if (lastCount == currentCount) return false;
@@ -236,7 +246,7 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  std::unique_lock<wpi::mutex> lock(newDSDataAvailableMutex);
+  std::unique_lock lock(newDSDataAvailableMutex);
   int currentCount = newDSDataAvailableCounter;
   while (newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
@@ -258,7 +268,7 @@ static int32_t newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
   if (refNum != refNumber) return 0;
-  std::lock_guard<wpi::mutex> lock(newDSDataAvailableMutex);
+  std::scoped_lock lock(newDSDataAvailableMutex);
   // Nofify all threads
   newDSDataAvailableCounter++;
   newDSDataAvailableCond->notify_all();
@@ -272,7 +282,7 @@ void HAL_InitializeDriverStation(void) {
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
 

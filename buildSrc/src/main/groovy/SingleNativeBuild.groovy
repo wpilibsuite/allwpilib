@@ -40,6 +40,7 @@ import org.gradle.platform.base.ComponentType;
 import org.gradle.platform.base.TypeBuilder;
 import org.gradle.nativeplatform.tasks.ObjectFilesToBinary;
 import groovy.transform.CompileStatic;
+import edu.wpi.first.nativeutils.tasks.ExportsGenerationTask
 
 @CompileStatic
 class SingleNativeBuild implements Plugin<Project> {
@@ -50,6 +51,22 @@ class SingleNativeBuild implements Plugin<Project> {
 
     @CompileStatic
     static class Rules extends RuleSource {
+        @Mutate
+        @CompileStatic
+        void removeMacSystemIncludes(ModelMap<Task> tasks, BinaryContainer binaries) {
+            binaries.each {
+                if (!(it instanceof NativeBinarySpec)) {
+                    return
+                }
+                NativeBinarySpec nativeBin = (NativeBinarySpec)it
+                if (nativeBin.targetPlatform.operatingSystem.isMacOsX()) {
+                    nativeBin.tasks.withType(AbstractNativeSourceCompileTask) { AbstractNativeSourceCompileTask compileTask->
+                        compileTask.getSystemIncludes().setFrom()
+                    }
+                }
+            }
+        }
+
         @Mutate
         @CompileStatic
         void setupSingleNativeBuild(ModelMap<Task> tasks, ComponentSpecContainer components, BinaryContainer binaryContainer, ProjectLayout projectLayout) {
@@ -78,8 +95,7 @@ class SingleNativeBuild implements Plugin<Project> {
                             return
                         }
                         def tmpBaseBin = (NativeBinarySpec) oTmpBaseBin
-                        if (tmpBaseBin.targetPlatform.operatingSystem.name == binary.targetPlatform.operatingSystem.name &&
-                                tmpBaseBin.targetPlatform.architecture.name == binary.targetPlatform.architecture.name &&
+                        if (tmpBaseBin.targetPlatform.name == binary.targetPlatform.name &&
                                 tmpBaseBin.buildType == binary.buildType) {
                             baseBin = tmpBaseBin
                         }
@@ -89,6 +105,10 @@ class SingleNativeBuild implements Plugin<Project> {
                         if (binary instanceof SharedLibraryBinarySpec) {
                             def sBinary = (SharedLibraryBinarySpec) binary
                             ObjectFilesToBinary link = (ObjectFilesToBinary) sBinary.tasks.link
+                            ExportsGenerationTask exportsTask = binary.tasks.withType(ExportsGenerationTask)[0]
+                            if (exportsTask != null) {
+                                exportsTask.dependsOn compileTask
+                            }
                             link.dependsOn compileTask
                             link.inputs.dir compileTask.objectFileDir
                             def tree = project.fileTree(compileTask.objectFileDir)

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -59,31 +59,6 @@ Encoder::~Encoder() {
   int32_t status = 0;
   HAL_FreeEncoder(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-}
-
-Encoder::Encoder(Encoder&& rhs)
-    : ErrorBase(std::move(rhs)),
-      SendableBase(std::move(rhs)),
-      CounterBase(std::move(rhs)),
-      PIDSource(std::move(rhs)),
-      m_aSource(std::move(rhs.m_aSource)),
-      m_bSource(std::move(rhs.m_bSource)),
-      m_indexSource(std::move(rhs.m_indexSource)) {
-  std::swap(m_encoder, rhs.m_encoder);
-}
-
-Encoder& Encoder::operator=(Encoder&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-  SendableBase::operator=(std::move(rhs));
-  CounterBase::operator=(std::move(rhs));
-  PIDSource::operator=(std::move(rhs));
-
-  m_aSource = std::move(rhs.m_aSource);
-  m_bSource = std::move(rhs.m_bSource);
-  m_indexSource = std::move(rhs.m_indexSource);
-  std::swap(m_encoder, rhs.m_encoder);
-
-  return *this;
 }
 
 int Encoder::Get() const {

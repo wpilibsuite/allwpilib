@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,8 +10,7 @@
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-
-constexpr double kPi = 3.14159265358979;
+#include <wpi/math>
 
 /**
  * This sample program shows how to control a motor using a joystick. In the
@@ -39,7 +38,7 @@ class Robot : public frc::TimedRobot {
   void RobotInit() override {
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
-    m_encoder.SetDistancePerPulse((kPi * 6) / 360.0);
+    m_encoder.SetDistancePerPulse((wpi::math::pi * 6) / 360.0);
   }
 
  private:

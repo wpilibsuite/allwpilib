@@ -1,5 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'pmd'
 
 ext {
     useJava = true
@@ -21,16 +20,20 @@ dependencies {
     compile project(':cameraserver')
 }
 
-pmd {
-    consoleOutput = true
-    reportsDir = file("$project.buildDir/reports/pmd")
-    ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
-    ruleSets = []
+if (!project.hasProperty('skipPMD')) {
+    apply plugin: 'pmd'
+
+    pmd {
+        consoleOutput = true
+        reportsDir = file("$project.buildDir/reports/pmd")
+        ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
+        ruleSets = []
+    }
 }
 
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) {
-        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "-Werror"
     }
 }
 

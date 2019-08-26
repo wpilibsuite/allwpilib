@@ -1,13 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java'
 //apply plugin: 'net.ltgt.errorprone'
-
-def pubVersion
-if (project.hasProperty("publishVersion")) {
-    pubVersion = project.publishVersion
-} else {
-    pubVersion = WPILibVersion.version
-}
+apply plugin: 'jacoco'
 
 def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
@@ -73,7 +67,7 @@ publishing {
 
             artifactId = "${baseArtifactId}-java"
             groupId artifactGroupId
-            version pubVersion
+            version wpilibVersioning.version.get()
         }
     }
 }
@@ -85,9 +79,10 @@ test {
         events "failed"
         exceptionFormat "full"
     }
+    finalizedBy jacocoTestReport
 }
 
-if (project.hasProperty('onlyAthena') || project.hasProperty('onlyRaspbian')) {
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxraspbian') || project.hasProperty('onlylinuxaarch64bionic')) {
     test.enabled = false
 }
 
@@ -101,13 +96,13 @@ sourceSets {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs = ['--release', '8']
+    options.compilerArgs = ['--release', '11']
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.2.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
 
     devCompile sourceSets.main.output
 
@@ -122,3 +117,14 @@ task run(type: JavaExec) {
 }
 
 build.dependsOn devClasses
+
+jacoco {
+    toolVersion = "0.8.4"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
+}

@@ -31,7 +31,7 @@ DEFAULT_DESTINATION_CPP_TEST_RESULTS=${DEFAULT_DESTINATION_TEST_RESULTS_DIR}/${C
 DEFAULT_JAVA_TEST_NAME=FRCUserProgram.jar
 DEFAULT_JAVA_TEST_ARGS=""
 
-DEFAULT_LOCAL_JAVA_TEST_FILE=../build/integrationTestFiles/java/wpilibjIntegrationTests-all.jar
+DEFAULT_LOCAL_JAVA_TEST_FILE=../build/integrationTestFiles/java/wpilibjIntegrationTests.jar
 
 JAVA_REPORT=javareport.xml
 DEFAULT_LIBRARY_NATIVE_FILES=../build/integrationTestFiles/libs

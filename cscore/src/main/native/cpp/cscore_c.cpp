@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,11 +11,12 @@
 #include <cstdlib>
 
 #include <opencv2/core/core.hpp>
+#include <wpi/MemAlloc.h>
 #include <wpi/SmallString.h>
-#include <wpi/memory.h>
 
 #include "c_util.h"
 #include "cscore_cpp.h"
+#include "cscore_raw.h"
 
 extern "C" {
 
@@ -70,7 +71,7 @@ char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
                                  CS_Status* status) {
   auto choices = cs::GetEnumPropertyChoices(property, status);
   char** out =
-      static_cast<char**>(wpi::CheckedMalloc(choices.size() * sizeof(char*)));
+      static_cast<char**>(wpi::safe_malloc(choices.size() * sizeof(char*)));
   *count = choices.size();
   for (size_t i = 0; i < choices.size(); ++i)
     out[i] = cs::ConvertToC(choices[i]);
@@ -123,7 +124,7 @@ CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
   wpi::SmallVector<CS_Property, 32> buf;
   auto vec = cs::EnumerateSourceProperties(source, buf, status);
   CS_Property* out = static_cast<CS_Property*>(
-      wpi::CheckedMalloc(vec.size() * sizeof(CS_Property)));
+      wpi::safe_malloc(vec.size() * sizeof(CS_Property)));
   *count = vec.size();
   std::copy(vec.begin(), vec.end(), out);
   return out;
@@ -183,7 +184,7 @@ CS_VideoMode* CS_EnumerateSourceVideoModes(CS_Source source, int* count,
                                            CS_Status* status) {
   auto vec = cs::EnumerateSourceVideoModes(source, status);
   CS_VideoMode* out = static_cast<CS_VideoMode*>(
-      wpi::CheckedMalloc(vec.size() * sizeof(CS_VideoMode)));
+      wpi::safe_malloc(vec.size() * sizeof(CS_VideoMode)));
   *count = vec.size();
   std::copy(vec.begin(), vec.end(), out);
   return out;
@@ -193,8 +194,8 @@ CS_Sink* CS_EnumerateSourceSinks(CS_Source source, int* count,
                                  CS_Status* status) {
   wpi::SmallVector<CS_Sink, 32> buf;
   auto handles = cs::EnumerateSourceSinks(source, buf, status);
-  CS_Sink* sinks = static_cast<CS_Sink*>(
-      wpi::CheckedMalloc(handles.size() * sizeof(CS_Sink)));
+  CS_Sink* sinks =
+      static_cast<CS_Sink*>(wpi::safe_malloc(handles.size() * sizeof(CS_Sink)));
   *count = handles.size();
   std::copy(handles.begin(), handles.end(), sinks);
   return sinks;
@@ -271,7 +272,7 @@ CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
   wpi::SmallVector<CS_Property, 32> buf;
   auto vec = cs::EnumerateSinkProperties(sink, buf, status);
   CS_Property* out = static_cast<CS_Property*>(
-      wpi::CheckedMalloc(vec.size() * sizeof(CS_Property)));
+      wpi::safe_malloc(vec.size() * sizeof(CS_Property)));
   *count = vec.size();
   std::copy(vec.begin(), vec.end(), out);
   return out;
@@ -372,7 +373,7 @@ CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
   wpi::SmallVector<CS_Source, 32> buf;
   auto handles = cs::EnumerateSourceHandles(buf, status);
   CS_Source* sources = static_cast<CS_Source*>(
-      wpi::CheckedMalloc(handles.size() * sizeof(CS_Source)));
+      wpi::safe_malloc(handles.size() * sizeof(CS_Source)));
   *count = handles.size();
   std::copy(handles.begin(), handles.end(), sources);
   return sources;
@@ -390,8 +391,8 @@ void CS_ReleaseEnumeratedSources(CS_Source* sources, int count) {
 CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status) {
   wpi::SmallVector<CS_Sink, 32> buf;
   auto handles = cs::EnumerateSinkHandles(buf, status);
-  CS_Sink* sinks = static_cast<CS_Sink*>(
-      wpi::CheckedMalloc(handles.size() * sizeof(CS_Sink)));
+  CS_Sink* sinks =
+      static_cast<CS_Sink*>(wpi::safe_malloc(handles.size() * sizeof(CS_Sink)));
   *count = handles.size();
   std::copy(handles.begin(), handles.end(), sinks);
   return sinks;
@@ -426,8 +427,8 @@ char* CS_GetHostname() { return cs::ConvertToC(cs::GetHostname()); }
 
 char** CS_GetNetworkInterfaces(int* count) {
   auto interfaces = cs::GetNetworkInterfaces();
-  char** out = static_cast<char**>(
-      wpi::CheckedMalloc(interfaces.size() * sizeof(char*)));
+  char** out =
+      static_cast<char**>(wpi::safe_malloc(interfaces.size() * sizeof(char*)));
   *count = interfaces.size();
   for (size_t i = 0; i < interfaces.size(); ++i)
     out[i] = cs::ConvertToC(interfaces[i]);
@@ -438,6 +439,25 @@ void CS_FreeNetworkInterfaces(char** interfaces, int count) {
   if (!interfaces) return;
   for (int i = 0; i < count; ++i) std::free(interfaces[i]);
   std::free(interfaces);
+}
+
+void CS_AllocateRawFrameData(CS_RawFrame* frame, int requestedSize) {
+  if (frame->dataLength >= requestedSize) return;
+  if (frame->data) {
+    frame->data =
+        static_cast<char*>(wpi::safe_realloc(frame->data, requestedSize));
+  } else {
+    frame->data = static_cast<char*>(wpi::safe_malloc(requestedSize));
+  }
+  frame->dataLength = requestedSize;
+}
+
+void CS_FreeRawFrameData(CS_RawFrame* frame) {
+  if (frame->data) {
+    std::free(frame->data);
+    frame->data = nullptr;
+    frame->dataLength = 0;
+  }
 }
 
 }  // extern "C"

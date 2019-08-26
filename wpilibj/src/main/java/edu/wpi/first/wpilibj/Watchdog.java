@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -42,7 +42,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   boolean m_suppressTimeoutMessage;
 
   static {
-    startDaemonThread(() -> schedulerFunc());
+    startDaemonThread(Watchdog::schedulerFunc);
   }
 
   private static final PriorityQueue<Watchdog> m_watchdogs = new PriorityQueue<>();
@@ -69,13 +69,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   public int compareTo(Watchdog rhs) {
     // Elements with sooner expiration times are sorted as lesser. The head of
     // Java's PriorityQueue is the least element.
-    if (m_expirationTime < rhs.m_expirationTime) {
-      return -1;
-    } else if (m_expirationTime > rhs.m_expirationTime) {
-      return 1;
-    } else {
-      return 0;
-    }
+    return Long.compare(m_expirationTime, rhs.m_expirationTime);
   }
 
   /**
@@ -154,9 +148,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     long now = RobotController.getFPGATime();
     if (now  - m_lastEpochsPrintTime > kMinPrintPeriod) {
       m_lastEpochsPrintTime = now;
-      m_epochs.forEach((key, value) -> {
-        System.out.format("\t%s: %.6fs\n", key, value / 1.0e6);
-      });
+      m_epochs.forEach((key, value) -> System.out.format("\t%s: %.6fs\n", key, value / 1.0e6));
     }
   }
 
@@ -221,11 +213,12 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
 
+  @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
   private static void schedulerFunc() {
     m_queueMutex.lock();
 
     try {
-      while (true) {
+      while (!Thread.currentThread().isInterrupted()) {
         if (m_watchdogs.size() > 0) {
           boolean timedOut = !awaitUntil(m_schedulerWaiter, m_watchdogs.peek().m_expirationTime);
           if (timedOut) {

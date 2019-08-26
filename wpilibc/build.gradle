@@ -22,22 +22,23 @@ task generateCppVersion() {
     outputs.file wpilibVersionFileOutput
     inputs.file wpilibVersionFileInput
 
-    if (WPILibVersion.releaseType.toString().equalsIgnoreCase('official')) {
+    if (wpilibVersioning.releaseMode) {
         outputs.upToDateWhen { false }
     }
 
     // We follow a simple set of checks to determine whether we should generate a new version file:
-    // 1. If the release type is not development, we generate a new verison file
+    // 1. If the release type is not development, we generate a new version file
     // 2. If there is no generated version number, we generate a new version file
     // 3. If there is a generated build number, and the release type is development, then we will
     //    only generate if the publish task is run.
     doLast {
-        println "Writing version ${WPILibVersion.version} to $wpilibVersionFileOutput"
+        def version = wpilibVersioning.version.get()
+        println "Writing version ${version} to $wpilibVersionFileOutput"
 
         if (wpilibVersionFileOutput.exists()) {
             wpilibVersionFileOutput.delete()
         }
-        def read = wpilibVersionFileInput.text.replace('${wpilib_version}', WPILibVersion.version)
+        def read = wpilibVersionFileInput.text.replace('${wpilib_version}', version)
         wpilibVersionFileOutput.write(read)
     }
 }
@@ -81,19 +82,22 @@ ext {
 
 apply from: "${rootDir}/shared/nilibraries.gradle"
 
-model {
-    exportsConfigs {
-        wpilibc(ExportsConfig) {
-            x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                 '_CT??_R0?AVbad_cast',
-                                 '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                 '_TI5?AVfailure']
-            x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                 '_CT??_R0?AVbad_cast',
-                                 '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                 '_TI5?AVfailure']
-        }
+apply plugin: DisableBuildingGTest
+
+nativeUtils.exportsConfigs {
+    wpilibc {
+        x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+        x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
     }
+}
+
+model {
     components {
         "${nativeName}Base"(NativeLibrarySpec) {
             sources {
@@ -202,16 +206,12 @@ model {
             }
         }
         withType(GoogleTestTestSuiteBinarySpec) {
-            if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
-                lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                project(':hal').addHalDependency(it, 'shared')
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-                lib library: nativeName, linkage: 'shared'
-            } else {
-                it.buildable = false
-            }
+            lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+            lib project: ':cscore', library: 'cscore', linkage: 'shared'
+            project(':hal').addHalDependency(it, 'shared')
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+            lib library: nativeName, linkage: 'shared'
         }
     }
     tasks {

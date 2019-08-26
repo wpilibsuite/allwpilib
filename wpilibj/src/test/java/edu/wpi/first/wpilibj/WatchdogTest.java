@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,19 +10,20 @@ package edu.wpi.first.wpilibj;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@DisabledOnOs(OS.MAC)
 class WatchdogTest {
   @Test
   void enableDisableTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    final Watchdog watchdog = new Watchdog(0.4, () -> {
-      watchdogCounter.addAndGet(1);
-    });
+    final Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1));
 
     System.out.println("Run 1");
     watchdog.enable();
@@ -66,9 +67,7 @@ class WatchdogTest {
   void resetTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    final Watchdog watchdog = new Watchdog(0.4, () -> {
-      watchdogCounter.addAndGet(1);
-    });
+    final Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1));
 
     watchdog.enable();
     try {
@@ -91,9 +90,7 @@ class WatchdogTest {
   void setTimeoutTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    final Watchdog watchdog = new Watchdog(1.0, () -> {
-      watchdogCounter.addAndGet(1);
-    });
+    final Watchdog watchdog = new Watchdog(1.0, () -> watchdogCounter.addAndGet(1));
 
     watchdog.enable();
     try {
@@ -143,9 +140,7 @@ class WatchdogTest {
   void epochsTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    final Watchdog watchdog = new Watchdog(0.4, () -> {
-      watchdogCounter.addAndGet(1);
-    });
+    final Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1));
 
     System.out.println("Run 1");
     watchdog.enable();
@@ -191,12 +186,8 @@ class WatchdogTest {
     final AtomicInteger watchdogCounter1 = new AtomicInteger(0);
     final AtomicInteger watchdogCounter2 = new AtomicInteger(0);
 
-    final Watchdog watchdog1 = new Watchdog(0.2, () -> {
-      watchdogCounter1.addAndGet(1);
-    });
-    final Watchdog watchdog2 = new Watchdog(0.6, () -> {
-      watchdogCounter2.addAndGet(1);
-    });
+    final Watchdog watchdog1 = new Watchdog(0.2, () -> watchdogCounter1.addAndGet(1));
+    final Watchdog watchdog2 = new Watchdog(0.6, () -> watchdogCounter2.addAndGet(1));
 
     watchdog2.enable();
     try {

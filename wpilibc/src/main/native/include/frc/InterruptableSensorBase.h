@@ -1,11 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+
+#include <functional>
+#include <memory>
 
 #include <hal/Interrupts.h>
 
@@ -24,7 +27,19 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
     kBoth = 0x101,
   };
 
+  /**
+   * Handler for interrupts.
+   *
+   * First parameter is if rising, 2nd is if falling.
+   */
+  using InterruptEventHandler = std::function<void(WaitResult)>;
+
   InterruptableSensorBase() = default;
+
+  /**
+   * Free the resources for an interrupt event.
+   */
+  virtual ~InterruptableSensorBase();
 
   InterruptableSensorBase(InterruptableSensorBase&&) = default;
   InterruptableSensorBase& operator=(InterruptableSensorBase&&) = default;
@@ -42,6 +57,16 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
    */
   virtual void RequestInterrupts(HAL_InterruptHandlerFunction handler,
                                  void* param);
+
+  /**
+   * Request one of the 8 interrupts asynchronously on this digital input.
+   *
+   * Request interrupts in asynchronous mode where the user's interrupt handler
+   * will be called when the interrupt fires. Users that want control over the
+   * thread priority should use the synchronous method with their own spawned
+   * thread. The default is interrupt on rising edges only.
+   */
+  virtual void RequestInterrupts(InterruptEventHandler handler);
 
   /**
    * Request one of the 8 interrupts synchronously on this digital input.
@@ -119,7 +144,8 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
   virtual void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
 
  protected:
-  HAL_InterruptHandle m_interrupt = HAL_kInvalidHandle;
+  hal::Handle<HAL_InterruptHandle> m_interrupt;
+  std::unique_ptr<InterruptEventHandler> m_interruptHandler{nullptr};
 
   void AllocateInterrupts(bool watcher);
 };

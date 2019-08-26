@@ -1,11 +1,20 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+
+// clang-format off
+#ifdef _MSC_VER
+#pragma message "warning: Including this header drastically increases compilation times and is bad style. Include only what you use instead."
+#else
+#warning "Including this header drastically increases compilation times and is bad style. Include only what you use instead."
+#endif
+
+// clang-format on
 
 #include <cameraserver/CameraServer.h>
 #include <vision/VisionRunner.h>
@@ -23,7 +32,6 @@
 #include "frc/AnalogTriggerOutput.h"
 #include "frc/BuiltInAccelerometer.h"
 #include "frc/Compressor.h"
-#include "frc/ControllerPower.h"
 #include "frc/Counter.h"
 #include "frc/DMC60.h"
 #include "frc/DigitalInput.h"
@@ -57,7 +65,6 @@
 #include "frc/RobotDrive.h"
 #include "frc/SD540.h"
 #include "frc/SPI.h"
-#include "frc/SampleRobot.h"
 #include "frc/SensorUtil.h"
 #include "frc/SerialPort.h"
 #include "frc/Servo.h"

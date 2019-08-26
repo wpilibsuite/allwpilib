@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,7 +18,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.command.Command;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * The {@link SendableChooser} class is a useful tool for presenting a selection of options to the
@@ -102,7 +102,7 @@ public class SendableChooser<V> extends SendableBase {
    * @param object the option
    */
   public void setDefaultOption(String name, V object) {
-    requireNonNull(name, "Provided name was null");
+    requireNonNullParam(name, "name", "setDefaultOption");
 
     m_defaultChoice = name;
     addOption(name, object);
@@ -148,12 +148,8 @@ public class SendableChooser<V> extends SendableBase {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("String Chooser");
     builder.getEntry(INSTANCE).setDouble(m_instance);
-    builder.addStringProperty(DEFAULT, () -> {
-      return m_defaultChoice;
-    }, null);
-    builder.addStringArrayProperty(OPTIONS, () -> {
-      return m_map.keySet().toArray(new String[0]);
-    }, null);
+    builder.addStringProperty(DEFAULT, () -> m_defaultChoice, null);
+    builder.addStringArrayProperty(OPTIONS, () -> m_map.keySet().toArray(new String[0]), null);
     builder.addStringProperty(ACTIVE, () -> {
       m_mutex.lock();
       try {

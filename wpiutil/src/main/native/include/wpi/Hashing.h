@@ -45,13 +45,20 @@
 #ifndef WPIUTIL_WPI_HASHING_H
 #define WPIUTIL_WPI_HASHING_H
 
+#include "wpi/Endian.h"
+#include "wpi/SwapByteOrder.h"
 #include "wpi/type_traits.h"
+#include <stdint.h>
 #include <algorithm>
 #include <cassert>
-#include <cstdint>
 #include <cstring>
 #include <string>
 #include <utility>
+
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 26495)
+#endif
 
 namespace wpi {
 
@@ -131,7 +138,7 @@ hash_code hash_value(const std::basic_string<T> &arg);
 /// undone. This makes it thread-hostile and very hard to use outside of
 /// immediately on start of a simple program designed for reproducible
 /// behavior.
-void set_fixed_execution_hash_seed(size_t fixed_value);
+void set_fixed_execution_hash_seed(uint64_t fixed_value);
 
 
 // All of the implementation details of actually computing the various hash
@@ -143,16 +150,16 @@ namespace detail {
 inline uint64_t fetch64(const char *p) {
   uint64_t result;
   memcpy(&result, p, sizeof(result));
-  //if (sys::IsBigEndianHost)
-  //  sys::swapByteOrder(result);
+  if (support::endian::system_endianness() == support::big)
+    sys::swapByteOrder(result);
   return result;
 }
 
 inline uint32_t fetch32(const char *p) {
   uint32_t result;
   memcpy(&result, p, sizeof(result));
-  //if (sys::IsBigEndianHost)
-  //  sys::swapByteOrder(result);
+  if (support::endian::system_endianness() == support::big)
+    sys::swapByteOrder(result);
   return result;
 }
 
@@ -190,7 +197,7 @@ inline uint64_t hash_1to3_bytes(const char *s, size_t len, uint64_t seed) {
   uint8_t b = s[len >> 1];
   uint8_t c = s[len - 1];
   uint32_t y = static_cast<uint32_t>(a) + (static_cast<uint32_t>(b) << 8);
-  uint32_t z = len + (static_cast<uint32_t>(c) << 2);
+  uint32_t z = static_cast<uint32_t>(len + (static_cast<uint64_t>(c) << 2));
   return shift_mix(y * k2 ^ z * k3 ^ seed) * k2;
 }
 
@@ -314,9 +321,9 @@ struct hash_state {
 /// This variable can be set using the \see wpi::set_fixed_execution_seed
 /// function. See that function for details. Do not, under any circumstances,
 /// set or read this variable.
-extern size_t fixed_seed_override;
+extern uint64_t fixed_seed_override;
 
-inline size_t get_execution_seed() {
+inline uint64_t get_execution_seed() {
   // FIXME: This needs to be a per-execution seed. This is just a placeholder
   // implementation. Switching to a per-execution seed is likely to flush out
   // instability bugs and so will happen as its own commit.
@@ -324,8 +331,7 @@ inline size_t get_execution_seed() {
   // However, if there is a fixed seed override set the first time this is
   // called, return that instead of the per-execution seed.
   const uint64_t seed_prime = 0xff51afd7ed558ccdULL;
-  static size_t seed = fixed_seed_override ? fixed_seed_override
-                                           : (size_t)seed_prime;
+  static uint64_t seed = fixed_seed_override ? fixed_seed_override : seed_prime;
   return seed;
 }
 
@@ -400,7 +406,7 @@ bool store_and_advance(char *&buffer_ptr, char *buffer_end, const T& value,
 /// combining them, this (as an optimization) directly combines the integers.
 template <typename InputIteratorT>
 hash_code hash_combine_range_impl(InputIteratorT first, InputIteratorT last) {
-  const size_t seed = get_execution_seed();
+  const uint64_t seed = get_execution_seed();
   char buffer[64], *buffer_ptr = buffer;
   char *const buffer_end = std::end(buffer);
   while (first != last && store_and_advance(buffer_ptr, buffer_end,
@@ -444,7 +450,7 @@ hash_code hash_combine_range_impl(InputIteratorT first, InputIteratorT last) {
 template <typename ValueT>
 typename std::enable_if<is_hashable_data<ValueT>::value, hash_code>::type
 hash_combine_range_impl(ValueT *first, ValueT *last) {
-  const size_t seed = get_execution_seed();
+  const uint64_t seed = get_execution_seed();
   const char *s_begin = reinterpret_cast<const char *>(first);
   const char *s_end = reinterpret_cast<const char *>(last);
   const size_t length = std::distance(s_begin, s_end);
@@ -494,7 +500,7 @@ namespace detail {
 struct hash_combine_recursive_helper {
   char buffer[64];
   hash_state state;
-  const size_t seed;
+  const uint64_t seed;
 
 public:
   /// Construct a recursive hash combining helper.
@@ -567,7 +573,7 @@ public:
     // Check whether the entire set of values fit in the buffer. If so, we'll
     // use the optimized short hashing routine and skip state entirely.
     if (length == 0)
-      return hash_short(buffer, buffer_ptr - buffer, seed);
+      return static_cast<size_t>(hash_short(buffer, buffer_ptr - buffer, seed));
 
     // Mix the final buffer, rotating it if we did a partial fill in order to
     // simulate doing a mix of the last 64-bytes. That is how the algorithm
@@ -579,7 +585,7 @@ public:
     state.mix(buffer);
     length += buffer_ptr - buffer;
 
-    return state.finalize(length);
+    return static_cast<size_t>(state.finalize(length));
   }
 };
 
@@ -618,7 +624,7 @@ inline hash_code hash_integer_value(uint64_t value) {
   const uint64_t seed = get_execution_seed();
   const char *s = reinterpret_cast<const char *>(&value);
   const uint64_t a = fetch32(s);
-  return hash_16_bytes(seed + (a << 3), fetch32(s + 4));
+  return static_cast<size_t>(hash_16_bytes(seed + (a << 3), fetch32(s + 4)));
 }
 
 } // namespace detail
@@ -655,5 +661,9 @@ hash_code hash_value(const std::basic_string<T> &arg) {
 }
 
 } // namespace wpi
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
 
 #endif

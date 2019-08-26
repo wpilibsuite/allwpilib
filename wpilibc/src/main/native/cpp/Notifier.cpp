@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,7 +17,7 @@
 
 using namespace frc;
 
-Notifier::Notifier(TimerEventHandler handler) {
+Notifier::Notifier(std::function<void()> handler) {
   if (handler == nullptr)
     wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
   m_handler = handler;
@@ -33,9 +33,9 @@ Notifier::Notifier(TimerEventHandler handler) {
       uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
       if (curTime == 0 || status != 0) break;
 
-      TimerEventHandler handler;
+      std::function<void()> handler;
       {
-        std::lock_guard<wpi::mutex> lock(m_processMutex);
+        std::scoped_lock lock(m_processMutex);
         handler = m_handler;
         if (m_periodic) {
           m_expirationTime += m_period;
@@ -90,23 +90,31 @@ Notifier& Notifier::operator=(Notifier&& rhs) {
   return *this;
 }
 
-void Notifier::SetHandler(TimerEventHandler handler) {
-  std::lock_guard<wpi::mutex> lock(m_processMutex);
+void Notifier::SetHandler(std::function<void()> handler) {
+  std::scoped_lock lock(m_processMutex);
   m_handler = handler;
 }
 
 void Notifier::StartSingle(double delay) {
-  std::lock_guard<wpi::mutex> lock(m_processMutex);
+  StartSingle(units::second_t(delay));
+}
+
+void Notifier::StartSingle(units::second_t delay) {
+  std::scoped_lock lock(m_processMutex);
   m_periodic = false;
-  m_period = delay;
+  m_period = delay.to<double>();
   m_expirationTime = Timer::GetFPGATimestamp() + m_period;
   UpdateAlarm();
 }
 
 void Notifier::StartPeriodic(double period) {
-  std::lock_guard<wpi::mutex> lock(m_processMutex);
+  StartPeriodic(units::second_t(period));
+}
+
+void Notifier::StartPeriodic(units::second_t period) {
+  std::scoped_lock lock(m_processMutex);
   m_periodic = true;
-  m_period = period;
+  m_period = period.to<double>();
   m_expirationTime = Timer::GetFPGATimestamp() + m_period;
   UpdateAlarm();
 }

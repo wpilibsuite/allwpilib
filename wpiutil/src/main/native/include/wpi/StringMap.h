@@ -18,9 +18,10 @@
 #include "wpi/StringRef.h"
 #include "wpi/iterator.h"
 #include "wpi/iterator_range.h"
+#include "wpi/MemAlloc.h"
 #include "wpi/PointerLikeTypeTraits.h"
+#include "wpi/ErrorHandling.h"
 #include "wpi/deprecated.h"
-#include "wpi/memory.h"
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
@@ -63,7 +64,7 @@ protected:
 protected:
   explicit StringMapImpl(unsigned itemSize)
       : ItemSize(itemSize) {}
-  StringMapImpl(StringMapImpl &&RHS)
+  StringMapImpl(StringMapImpl &&RHS) noexcept
       : TheTable(RHS.TheTable), NumBuckets(RHS.NumBuckets),
         NumItems(RHS.NumItems), NumTombstones(RHS.NumTombstones),
         ItemSize(RHS.ItemSize) {
@@ -163,7 +164,7 @@ public:
     size_t AllocSize = sizeof(StringMapEntry) + KeyLength + 1;
 
     StringMapEntry *NewItem =
-      static_cast<StringMapEntry*>(CheckedMalloc(AllocSize));
+      static_cast<StringMapEntry*>(safe_malloc(AllocSize));
 
     // Construct the value.
     new (NewItem) StringMapEntry(KeyLength, std::forward<InitTy>(InitVals)...);
@@ -356,12 +357,6 @@ public:
   /// the pair points to the element with key equivalent to the key of the pair.
   std::pair<iterator, bool> insert(std::pair<StringRef, ValueTy> KV) {
     return try_emplace(KV.first, std::move(KV.second));
-  }
-
-  template <typename... ArgsTy>
-  WPI_DEPRECATED("use try_emplace instead")
-  std::pair<iterator, bool> emplace_second(StringRef Key, ArgsTy &&... Args) {
-    return try_emplace(Key, std::forward<ArgsTy>(Args)...);
   }
 
   /// Emplace a new element for the specified key into the map if the key isn't

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -28,7 +28,7 @@ class SPI::Accumulator {
   Accumulator(HAL_SPIPort port, int xferSize, int validMask, int validValue,
               int dataShift, int dataSize, bool isSigned, bool bigEndian)
       : m_notifier([=]() {
-          std::lock_guard<wpi::mutex> lock(m_mutex);
+          std::scoped_lock lock(m_mutex);
           Update();
         }),
         m_buf(new uint32_t[(xferSize + 1) * kAccumulateDepth]),
@@ -157,35 +157,12 @@ SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
   HAL_InitializeSPI(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  static int instances = 0;
-  instances++;
-  HAL_Report(HALUsageReporting::kResourceType_SPI, instances);
+  HAL_Report(HALUsageReporting::kResourceType_SPI, port);
 }
 
 SPI::~SPI() { HAL_CloseSPI(m_port); }
 
-SPI::SPI(SPI&& rhs)
-    : ErrorBase(std::move(rhs)),
-      m_msbFirst(std::move(rhs.m_msbFirst)),
-      m_sampleOnTrailing(std::move(rhs.m_sampleOnTrailing)),
-      m_clockIdleHigh(std::move(rhs.m_clockIdleHigh)),
-      m_accum(std::move(rhs.m_accum)) {
-  std::swap(m_port, rhs.m_port);
-}
-
-SPI& SPI::operator=(SPI&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-
-  std::swap(m_port, rhs.m_port);
-  m_msbFirst = std::move(rhs.m_msbFirst);
-  m_sampleOnTrailing = std::move(rhs.m_sampleOnTrailing);
-  m_clockIdleHigh = std::move(rhs.m_clockIdleHigh);
-  m_accum = std::move(rhs.m_accum);
-
-  return *this;
-}
-
-void SPI::SetClockRate(double hz) { HAL_SetSPISpeed(m_port, hz); }
+void SPI::SetClockRate(int hz) { HAL_SetSPISpeed(m_port, hz); }
 
 void SPI::SetMSBFirst() {
   m_msbFirst = true;
@@ -282,10 +259,14 @@ void SPI::SetAutoTransmitData(wpi::ArrayRef<uint8_t> dataToSend, int zeroSize) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void SPI::StartAutoRate(double period) {
+void SPI::StartAutoRate(units::second_t period) {
   int32_t status = 0;
-  HAL_StartSPIAutoRate(m_port, period, &status);
+  HAL_StartSPIAutoRate(m_port, period.to<double>(), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+void SPI::StartAutoRate(double period) {
+  StartAutoRate(units::second_t(period));
 }
 
 void SPI::StartAutoTrigger(DigitalSource& source, bool rising, bool falling) {
@@ -309,12 +290,17 @@ void SPI::ForceAutoRead() {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead, double timeout) {
+int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead,
+                              units::second_t timeout) {
   int32_t status = 0;
-  int32_t val =
-      HAL_ReadSPIAutoReceivedData(m_port, buffer, numToRead, timeout, &status);
+  int32_t val = HAL_ReadSPIAutoReceivedData(m_port, buffer, numToRead,
+                                            timeout.to<double>(), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return val;
+}
+
+int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead, double timeout) {
+  return ReadAutoReceivedData(buffer, numToRead, units::second_t(timeout));
 }
 
 int SPI::GetAutoDroppedCount() {
@@ -324,9 +310,9 @@ int SPI::GetAutoDroppedCount() {
   return val;
 }
 
-void SPI::InitAccumulator(double period, int cmd, int xferSize, int validMask,
-                          int validValue, int dataShift, int dataSize,
-                          bool isSigned, bool bigEndian) {
+void SPI::InitAccumulator(units::second_t period, int cmd, int xferSize,
+                          int validMask, int validValue, int dataShift,
+                          int dataSize, bool isSigned, bool bigEndian) {
   InitAuto(xferSize * kAccumulateDepth);
   uint8_t cmdBytes[4] = {0, 0, 0, 0};
   if (bigEndian) {
@@ -351,6 +337,13 @@ void SPI::InitAccumulator(double period, int cmd, int xferSize, int validMask,
   m_accum->m_notifier.StartPeriodic(period * kAccumulateDepth / 2);
 }
 
+void SPI::InitAccumulator(double period, int cmd, int xferSize, int validMask,
+                          int validValue, int dataShift, int dataSize,
+                          bool isSigned, bool bigEndian) {
+  InitAccumulator(units::second_t(period), cmd, xferSize, validMask, validValue,
+                  dataShift, dataSize, isSigned, bigEndian);
+}
+
 void SPI::FreeAccumulator() {
   m_accum.reset(nullptr);
   FreeAuto();
@@ -358,7 +351,7 @@ void SPI::FreeAccumulator() {
 
 void SPI::ResetAccumulator() {
   if (!m_accum) return;
-  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->m_value = 0;
   m_accum->m_count = 0;
   m_accum->m_lastValue = 0;
@@ -368,40 +361,40 @@ void SPI::ResetAccumulator() {
 
 void SPI::SetAccumulatorCenter(int center) {
   if (!m_accum) return;
-  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->m_center = center;
 }
 
 void SPI::SetAccumulatorDeadband(int deadband) {
   if (!m_accum) return;
-  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->m_deadband = deadband;
 }
 
 int SPI::GetAccumulatorLastValue() const {
   if (!m_accum) return 0;
-  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   return m_accum->m_lastValue;
 }
 
 int64_t SPI::GetAccumulatorValue() const {
   if (!m_accum) return 0;
-  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   return m_accum->m_value;
 }
 
 int64_t SPI::GetAccumulatorCount() const {
   if (!m_accum) return 0;
-  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   return m_accum->m_count;
 }
 
 double SPI::GetAccumulatorAverage() const {
   if (!m_accum) return 0;
-  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   if (m_accum->m_count == 0) return 0.0;
   return static_cast<double>(m_accum->m_value) / m_accum->m_count;
@@ -413,7 +406,7 @@ void SPI::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
     count = 0;
     return;
   }
-  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   value = m_accum->m_value;
   count = m_accum->m_count;
@@ -421,20 +414,20 @@ void SPI::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
 
 void SPI::SetAccumulatorIntegratedCenter(double center) {
   if (!m_accum) return;
-  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->m_integratedCenter = center;
 }
 
 double SPI::GetAccumulatorIntegratedValue() const {
   if (!m_accum) return 0;
-  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   return m_accum->m_integratedValue;
 }
 
 double SPI::GetAccumulatorIntegratedAverage() const {
   if (!m_accum) return 0;
-  std::lock_guard<wpi::mutex> lock(m_accum->m_mutex);
+  std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   if (m_accum->m_count <= 1) return 0.0;
   // count-1 due to not integrating the first value received

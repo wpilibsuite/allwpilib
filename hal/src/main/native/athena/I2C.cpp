@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -52,7 +52,7 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   }
 
   if (port == HAL_I2C_kOnboard) {
-    std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
+    std::scoped_lock lock(digitalI2COnBoardMutex);
     i2COnboardObjCount++;
     if (i2COnboardObjCount > 1) return;
     int handle = open("/dev/i2c-2", O_RDWR);
@@ -62,7 +62,7 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
     }
     i2COnBoardHandle = handle;
   } else {
-    std::lock_guard<wpi::mutex> lock(digitalI2CMXPMutex);
+    std::scoped_lock lock(digitalI2CMXPMutex);
     i2CMXPObjCount++;
     if (i2CMXPObjCount > 1) return;
     if ((i2CMXPDigitalHandle1 = HAL_InitializeDIOPort(
@@ -108,10 +108,10 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
   rdwr.nmsgs = 2;
 
   if (port == HAL_I2C_kOnboard) {
-    std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
+    std::scoped_lock lock(digitalI2COnBoardMutex);
     return ioctl(i2COnBoardHandle, I2C_RDWR, &rdwr);
   } else {
-    std::lock_guard<wpi::mutex> lock(digitalI2CMXPMutex);
+    std::scoped_lock lock(digitalI2CMXPMutex);
     return ioctl(i2CMXPHandle, I2C_RDWR, &rdwr);
   }
 }
@@ -134,10 +134,10 @@ int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
   rdwr.nmsgs = 1;
 
   if (port == HAL_I2C_kOnboard) {
-    std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
+    std::scoped_lock lock(digitalI2COnBoardMutex);
     return ioctl(i2COnBoardHandle, I2C_RDWR, &rdwr);
   } else {
-    std::lock_guard<wpi::mutex> lock(digitalI2CMXPMutex);
+    std::scoped_lock lock(digitalI2CMXPMutex);
     return ioctl(i2CMXPHandle, I2C_RDWR, &rdwr);
   }
 }
@@ -160,10 +160,10 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
   rdwr.nmsgs = 1;
 
   if (port == HAL_I2C_kOnboard) {
-    std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
+    std::scoped_lock lock(digitalI2COnBoardMutex);
     return ioctl(i2COnBoardHandle, I2C_RDWR, &rdwr);
   } else {
-    std::lock_guard<wpi::mutex> lock(digitalI2CMXPMutex);
+    std::scoped_lock lock(digitalI2CMXPMutex);
     return ioctl(i2CMXPHandle, I2C_RDWR, &rdwr);
   }
 }
@@ -175,12 +175,12 @@ void HAL_CloseI2C(HAL_I2CPort port) {
   }
 
   if (port == HAL_I2C_kOnboard) {
-    std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
+    std::scoped_lock lock(digitalI2COnBoardMutex);
     if (i2COnboardObjCount-- == 0) {
       close(i2COnBoardHandle);
     }
   } else {
-    std::lock_guard<wpi::mutex> lock(digitalI2CMXPMutex);
+    std::scoped_lock lock(digitalI2CMXPMutex);
     if (i2CMXPObjCount-- == 0) {
       close(i2CMXPHandle);
     }

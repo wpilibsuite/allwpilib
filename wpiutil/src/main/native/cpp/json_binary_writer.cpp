@@ -956,7 +956,7 @@ json::binary_writer::CharType json::binary_writer::ubjson_prefix(const json& j) 
 
         case value_t::number_unsigned:
         {
-            if (j.m_value.number_unsigned <= (std::numeric_limits<int8_t>::max)())
+            if (j.m_value.number_unsigned <= static_cast<uint64_t>((std::numeric_limits<int8_t>::max)()))
             {
                 return 'i';
             }
@@ -964,11 +964,11 @@ json::binary_writer::CharType json::binary_writer::ubjson_prefix(const json& j) 
             {
                 return 'U';
             }
-            else if (j.m_value.number_unsigned <= (std::numeric_limits<int16_t>::max)())
+            else if (j.m_value.number_unsigned <= static_cast<uint64_t>((std::numeric_limits<int16_t>::max)()))
             {
                 return 'I';
             }
-            else if (j.m_value.number_unsigned <= (std::numeric_limits<int32_t>::max)())
+            else if (j.m_value.number_unsigned <= static_cast<uint64_t>((std::numeric_limits<int32_t>::max)()))
             {
                 return 'l';
             }

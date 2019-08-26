@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -26,7 +26,7 @@ namespace {
 class InterruptThread : public wpi::SafeThread {
  public:
   void Main() {
-    std::unique_lock<wpi::mutex> lock(m_mutex);
+    std::unique_lock lock(m_mutex);
     while (m_active) {
       m_cond.wait(lock, [&] { return !m_active || m_notify; });
       if (!m_active) break;
@@ -118,7 +118,7 @@ void* HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle,
   if (anInterrupt == nullptr) {
     return nullptr;
   }
-  anInterrupt->manager->enable(status);
+  anInterrupt->manager->disable(status);
   void* param = anInterrupt->param;
   return param;
 }

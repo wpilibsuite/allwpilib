@@ -1,249 +1,35 @@
-import edu.wpi.first.nativeutils.*
 import org.gradle.internal.os.OperatingSystem
 
-def windowsCompilerArgs = ['/EHsc', '/DNOMINMAX', '/Zi', '/FS', '/Zc:inline', '/MP4']
-def windowsCCompilerArgs = ['/Zi', '/FS', '/Zc:inline']
-def windowsReleaseCompilerArgs = ['/O2', '/MD']
-def windowsDebugCompilerArgs = ['/Od', '/MDd']
-def windowsLinkerArgs = ['/DEBUG:FULL']
-def windowsReleaseLinkerArgs = ['/OPT:REF', '/OPT:ICF']
-
-def linuxCrossCompilerArgs = ['-std=c++14', '-Wformat=2', '-Wall', '-Wextra', '-Werror', '-pedantic', '-Wno-psabi', '-g',
-                         '-Wno-unused-parameter', '-Wno-error=deprecated-declarations', '-fPIC', '-rdynamic',
-                         '-pthread']
-def linuxCrossCCompilerArgs = ['-Wformat=2', '-Wall', '-Wextra', '-Werror', '-pedantic', '-Wno-psabi', '-g',
-                          '-Wno-unused-parameter', '-fPIC', '-rdynamic', '-pthread']
-def linuxCrossLinkerArgs = ['-rdynamic', '-pthread', '-ldl']
-def linuxCrossReleaseCompilerArgs = ['-O2']
-def linuxCrossDebugCompilerArgs = ['-Og']
-
-def linuxCompilerArgs = ['-std=c++14', '-Wformat=2', '-Wall', '-Wextra', '-Werror', '-pedantic', '-Wno-psabi', '-g',
-                         '-Wno-unused-parameter', '-Wno-error=deprecated-declarations', '-fPIC', '-rdynamic',
-                         '-pthread']
-def linuxCCompilerArgs = ['-Wformat=2', '-Wall', '-Wextra', '-Werror', '-pedantic', '-Wno-psabi', '-g',
-                          '-Wno-unused-parameter', '-fPIC', '-rdynamic', '-pthread']
-def linuxLinkerArgs = ['-rdynamic', '-pthread', '-ldl']
-def linuxReleaseCompilerArgs = ['-O2']
-def linuxDebugCompilerArgs = ['-O0']
-def linux32BitArg = '-m32'
-
-def macCompilerArgs = ['-std=c++14', '-Wall', '-Wextra', '-Werror', '-pedantic-errors', '-fPIC', '-g',
-                       '-Wno-unused-parameter', '-Wno-error=deprecated-declarations', '-Wno-missing-field-initializers',
-                       '-Wno-unused-private-field', '-Wno-unused-const-variable', '-pthread']
-def macCCompilerArgs = ['-Wall', '-Wextra', '-Werror', '-pedantic-errors', '-fPIC', '-g',
-                        '-Wno-unused-parameter', '-Wno-missing-field-initializers', '-Wno-unused-private-field']
-def macObjCLinkerArgs = ['-std=c++14', '-stdlib=libc++','-fobjc-arc', '-g', '-fPIC', '-Wall', '-Wextra', '-Werror']
-def macReleaseCompilerArgs = ['-O2']
-def macDebugCompilerArgs = ['-O0']
-def macLinkerArgs = ['-framework', 'CoreFoundation', '-framework', 'AVFoundation', '-framework', 'Foundation', '-framework', 'CoreMedia', '-framework', 'CoreVideo']
-def mac32BitArg = '-m32'
-
-def buildAll = project.hasProperty('buildAll')
-
-def windows64PlatformDetect = {
-    def arch = System.getProperty("os.arch")
-    def isWin = OperatingSystem.current().isWindows()
-    if (buildAll) {
-        return isWin
-    } else {
-        return isWin && arch == 'amd64'
+nativeUtils.addWpiNativeUtils()
+nativeUtils.withRaspbian()
+nativeUtils.withBionic()
+nativeUtils {
+  wpi {
+    configureDependencies {
+      wpiVersion = "-1"
+      niLibVersion = "2019.12.2"
+      opencvVersion = "3.4.7-1"
+      googleTestVersion = "1.9.0-3-437e100"
     }
+  }
 }
 
-def windows32PlatformDetect = {
-    def arch = System.getProperty("os.arch")
-    def isWin = OperatingSystem.current().isWindows()
-    if (buildAll) {
-        return isWin
-    } else {
-        return isWin && arch == 'x86'
-    }
-}
+nativeUtils.wpi.addWarnings()
+nativeUtils.wpi.addWarningsAsErrors()
 
-def linux32IntelPlatformDetect = {
-    def arch = System.getProperty("os.arch")
-    def isLinux = OperatingSystem.current().isLinux()
-    def isIntel = (arch == 'amd64' || arch == 'i386')
-    if (buildAll) {
-        return isLinux && isIntel
-    } else {
-        return isLinux && arch == 'i386'
-    }
-}
+nativeUtils.setSinglePrintPerPlatform()
 
-def linux64IntelPlatformDetect = {
-    def arch = System.getProperty("os.arch")
-    def isLinux = OperatingSystem.current().isLinux()
-    def isIntel = (arch == 'amd64' || arch == 'i386')
-    if (buildAll) {
-        return isLinux && isIntel
-    } else {
-        return isLinux && arch == 'amd64'
-    }
-}
-
-def linuxArmPlatformDetect = {
-    def arch = System.getProperty("os.arch")
-    def isIntel = (arch == 'amd64' || arch == 'i386')
-    return OperatingSystem.current().isLinux() && !isIntel
-}
-
-def mac64PlatformDetect = {
-    def arch = System.getProperty("os.arch")
-    def isMac = OperatingSystem.current().isMacOsX()
-    if (buildAll) {
-        return isMac
-    } else {
-        return isMac && arch == 'x86_64'
-    }
-}
-
-def mac32PlatformDetect = {
-    def arch = System.getProperty("os.arch")
-    def isMac = OperatingSystem.current().isMacOsX()
-    if (buildAll) {
-        return isMac
-    } else {
-        return isMac && arch == 'x86'
-    }
-}
-
-if (!project.hasProperty('skipAthena') && !project.hasProperty('onlyRaspbian')) {
-    model {
-        buildConfigs {
-            roboRio(CrossBuildConfig) {
-                architecture = 'athena'
-                operatingSystem = 'linux'
-                toolChainPrefix = 'arm-frc2019-linux-gnueabi-'
-                compilerArgs = linuxCrossCompilerArgs
-                CCompilerArgs = linuxCrossCCompilerArgs
-                linkerArgs = linuxCrossLinkerArgs
-                debugCompilerArgs = linuxCrossDebugCompilerArgs
-                releaseCompilerArgs = linuxCrossReleaseCompilerArgs
-                stripBuildTypes = ['debug', 'release']
-                compilerFamily = 'Gcc'
-            }
+model {
+    components {
+        all {
+            nativeUtils.useAllPlatforms(it)
         }
     }
-}
-
-if (!project.hasProperty('skipRaspbian') && !project.hasProperty('onlyAthena')) {
-    model {
-        buildConfigs {
-            raspbian(CrossBuildConfig) {
-                architecture = 'raspbian'
-                operatingSystem = 'linux'
-                toolChainPrefix = 'arm-raspbian9-linux-gnueabihf-'
-                compilerArgs = linuxCrossCompilerArgs
-                CCompilerArgs = linuxCrossCCompilerArgs
-                linkerArgs = linuxCrossLinkerArgs
-                debugCompilerArgs = linuxCrossDebugCompilerArgs
-                releaseCompilerArgs = linuxCrossReleaseCompilerArgs
-                stripBuildTypes = ['debug', 'release']
-                compilerFamily = 'Gcc'
-            }
+    binaries {
+        withType(NativeBinarySpec).all {
+            nativeUtils.usePlatformArguments(it)
         }
     }
-}
-
-if (!project.hasProperty('onlyAthena') && !hasProperty('onlyRaspbian')) {
-    model {
-        buildConfigs {
-            winX86(BuildConfig) {
-                architecture = 'x86'
-                operatingSystem = 'windows'
-                compilerArgs = windowsCompilerArgs
-                CCompilerArgs = windowsCCompilerArgs
-                linkerArgs = windowsLinkerArgs
-                releaseCompilerArgs = windowsReleaseCompilerArgs
-                releaseLinkerArgs = windowsReleaseLinkerArgs
-                debugCompilerArgs = windowsDebugCompilerArgs
-                compilerFamily = 'VisualCpp'
-                detectPlatform = windows32PlatformDetect
-            }
-            winX64(BuildConfig) {
-                architecture = 'x86-64'
-                operatingSystem = 'windows'
-                compilerArgs = windowsCompilerArgs
-                CCompilerArgs = windowsCCompilerArgs
-                linkerArgs = windowsLinkerArgs
-                releaseCompilerArgs = windowsReleaseCompilerArgs
-                releaseLinkerArgs = windowsReleaseLinkerArgs
-                debugCompilerArgs = windowsDebugCompilerArgs
-                compilerFamily = 'VisualCpp'
-                detectPlatform = windows64PlatformDetect
-            }
-            linuxX64(BuildConfig) {
-                architecture = 'x86-64'
-                operatingSystem = 'linux'
-                compilerArgs = linuxCompilerArgs
-                CCompilerArgs = linuxCCompilerArgs
-                linkerArgs = linuxLinkerArgs
-                debugCompilerArgs = linuxDebugCompilerArgs
-                releaseCompilerArgs = linuxReleaseCompilerArgs
-                stripBuildTypes = ['debug', 'release']
-                compilerFamily = 'Gcc'
-                detectPlatform = linux64IntelPlatformDetect
-            }
-            macX64(BuildConfig) {
-                architecture = 'x86-64'
-                operatingSystem = 'osx'
-                compilerArgs = macCompilerArgs
-                CCompilerArgs = macCCompilerArgs
-                debugCompilerArgs = macDebugCompilerArgs
-                releaseCompilerArgs = macReleaseCompilerArgs
-                objCppCompilerArgs = macObjCLinkerArgs
-                linkerArgs = macLinkerArgs
-                compilerFamily = 'Clang'
-                detectPlatform = mac64PlatformDetect
-            }
-        }
-    }
-}
-
-if (project.hasProperty('linuxCross')) {
-    model {
-        buildConfigs {
-            linuxArm(CrossBuildConfig) {
-                architecture = 'nativearm'
-                operatingSystem = 'linux'
-                toolChainPrefix = 'PLEASE_PROVIDE_A_COMPILER_NAME'
-                compilerArgs = linuxCompilerArgs
-                CCompilerArgs = linuxCCompilerArgs
-                linkerArgs = linuxLinkerArgs
-                debugCompilerArgs = linuxDebugCompilerArgs
-                releaseCompilerArgs = linuxReleaseCompilerArgs
-                stripBuildTypes = ['debug', 'release']
-                skipByDefault = true
-                compilerFamily = 'Gcc'
-            }
-        }
-    }
-} else {
-    model {
-        buildConfigs {
-            linuxArm(BuildConfig) {
-                architecture = 'nativearm'
-                operatingSystem = 'linux'
-                compilerArgs = linuxCompilerArgs
-                CCompilerArgs = linuxCCompilerArgs
-                linkerArgs = linuxLinkerArgs
-                debugCompilerArgs = linuxDebugCompilerArgs
-                releaseCompilerArgs = linuxReleaseCompilerArgs
-                stripBuildTypes = ['debug', 'release']
-                compilerFamily = 'Gcc'
-                detectPlatform = linuxArmPlatformDetect
-            }
-        }
-    }
-}
-
-ext.getPublishClassifier = { binary ->
-    return NativeUtils.getPublishClassifier(binary)
-}
-
-ext.getPlatformPath = { binary ->
-    return NativeUtils.getPlatformPath(binary)
 }
 
 ext.appendDebugPathToBinaries = { binaries->
@@ -287,7 +73,7 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
         if (it in NativeLibrarySpec && stringNames.contains(it.name)) {
             it.binaries.each {
                 if (!it.buildable) return
-                def target = getPublishClassifier(it)
+                def target = nativeUtils.getPublishClassifier(it)
                 if (configMap.containsKey(target)) {
                     configMap.get(target).add(it)
                 } else {
@@ -358,38 +144,26 @@ ext.includeStandardZipFormat = { task, value ->
             if (binary instanceof SharedLibraryBinarySpec) {
                 task.dependsOn binary.tasks.link
                 task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
-                    into getPlatformPath(binary) + '/shared'
+                    into nativeUtils.getPlatformPath(binary) + '/shared'
                 }
                 def sharedPath = binary.sharedLibraryFile.absolutePath
                 sharedPath = sharedPath.substring(0, sharedPath.length() - 4)
 
                 task.from(new File(sharedPath + '.pdb')) {
-                    into getPlatformPath(binary) + '/shared'
+                    into nativeUtils.getPlatformPath(binary) + '/shared'
                 }
                 task.from(binary.sharedLibraryFile) {
-                    into getPlatformPath(binary) + '/shared'
+                    into nativeUtils.getPlatformPath(binary) + '/shared'
                 }
                 task.from(binary.sharedLibraryLinkFile) {
-                    into getPlatformPath(binary) + '/shared'
+                    into nativeUtils.getPlatformPath(binary) + '/shared'
                 }
             } else  if (binary instanceof StaticLibraryBinarySpec) {
                 task.dependsOn binary.tasks.createStaticLib
                 task.from(binary.staticLibraryFile) {
-                    into getPlatformPath(binary) + '/static'
+                    into nativeUtils.getPlatformPath(binary) + '/static'
                 }
             }
         }
-    }
-}
-
-ext.getCurrentArch = {
-    def arch = System.getProperty('os.arch');
-
-    if (arch.equals("x86") || arch.equals("i386")) {
-        return 'x86'
-    } else if (arch.equals("amd64") || arch.equals("x86_64")) {
-        return 'x86-64'
-    } else {
-        return arch
     }
 }

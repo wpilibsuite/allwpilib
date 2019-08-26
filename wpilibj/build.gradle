@@ -21,22 +21,23 @@ task generateJavaVersion() {
     outputs.file wpilibVersionFileOutput
     inputs.file wpilibVersionFileInput
 
-    if (WPILibVersion.releaseType.toString().equalsIgnoreCase('official')) {
+    if (wpilibVersioning.releaseMode) {
         outputs.upToDateWhen { false }
     }
 
     // We follow a simple set of checks to determine whether we should generate a new version file:
-    // 1. If the release type is not development, we generate a new verison file
+    // 1. If the release type is not development, we generate a new version file
     // 2. If there is no generated version number, we generate a new version file
     // 3. If there is a generated build number, and the release type is development, then we will
     //    only generate if the publish task is run.
     doLast {
-        println "Writing version ${WPILibVersion.version} to $wpilibVersionFileOutput"
+        def version = wpilibVersioning.version.get()
+        println "Writing version ${version} to $wpilibVersionFileOutput"
 
         if (wpilibVersionFileOutput.exists()) {
             wpilibVersionFileOutput.delete()
         }
-        def read = wpilibVersionFileInput.text.replace('${wpilib_version}', WPILibVersion.version)
+        def read = wpilibVersionFileInput.text.replace('${wpilib_version}', version)
         wpilibVersionFileOutput.write(read)
     }
 }
@@ -54,6 +55,10 @@ compileJava {
     dependsOn generateJavaVersion
 }
 
+repositories {
+    jcenter()
+}
+
 dependencies {
     compile project(':hal')
     compile project(':wpiutil')
@@ -61,6 +66,7 @@ dependencies {
     compile project(':cscore')
     compile project(':cameraserver')
     testCompile 'com.google.guava:guava:19.0'
+    testCompile 'org.mockito:mockito-core:2.27.0'
     devCompile project(':hal')
     devCompile project(':wpiutil')
     devCompile project(':ntcore')
@@ -133,7 +139,7 @@ model {
                 if (it in NativeExecutableSpec && it.name == "wpilibjDev") {
                     it.binaries.each {
                         if (!found) {
-                            def arch = it.targetPlatform.architecture.name
+                            def arch = it.targetPlatform.name
                             if (arch == systemArch) {
                                 dependsOn it.tasks.install
                                 commandLine it.tasks.install.runScriptFile.get().asFile.toString()

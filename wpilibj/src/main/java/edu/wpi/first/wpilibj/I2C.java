@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,7 +14,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.I2CJNI;
 import edu.wpi.first.hal.util.BoundaryException;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * I2C bus interface class.
@@ -67,7 +67,9 @@ public class I2C implements AutoCloseable {
    * Generic transaction.
    *
    * <p>This is a lower-level interface to the I2C hardware giving you more control over each
-   * transaction.
+   * transaction. If you intend to write multiple bytes in the same transaction and do not
+   * plan to receive anything back, use writeBulk() instead. Calling this with a receiveSize
+   * of 0 will result in an error.
    *
    * @param dataToSend   Buffer of data to send as part of the transaction.
    * @param sendSize     Number of bytes to send as part of the transaction.
@@ -219,7 +221,7 @@ public class I2C implements AutoCloseable {
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public boolean read(int registerAddress, int count, byte[] buffer) {
-    requireNonNull(buffer, "Null return buffer was given");
+    requireNonNullParam(buffer, "buffer", "read");
 
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
@@ -284,7 +286,7 @@ public class I2C implements AutoCloseable {
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public boolean readOnly(byte[] buffer, int count) {
-    requireNonNull(buffer, "Null return buffer was given");
+    requireNonNullParam(buffer, "buffer", "readOnly");
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
     }

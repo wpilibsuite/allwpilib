@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <wpi/Twine.h>
+#include <wpi/StringRef.h>
 
 namespace frc {
 
@@ -20,7 +20,8 @@ namespace frc {
  */
 class WidgetType {
  public:
-  explicit WidgetType(const char* widgetName) : m_widgetName(widgetName) {}
+  explicit constexpr WidgetType(const char* widgetName)
+      : m_widgetName(widgetName) {}
   ~WidgetType() = default;
 
   /**
@@ -30,7 +31,7 @@ class WidgetType {
   wpi::StringRef GetWidgetName() const;
 
  private:
-  wpi::StringRef m_widgetName;
+  const char* m_widgetName;
 };
 
 }  // namespace frc

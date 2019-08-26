@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <units/units.h>
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
@@ -27,16 +28,6 @@ using TimerInterruptHandler = void (*)(void* param);
  * @param seconds Length of time to pause, in seconds.
  */
 void Wait(double seconds);
-
-/**
- * Return the FPGA system clock time in seconds.
- *
- * This is deprecated and just forwards to Timer::GetFPGATimestamp().
- *
- * @return Robot running time in seconds.
- */
-WPI_DEPRECATED("Use Timer::GetFPGATimestamp() instead.")
-double GetClock();
 
 /**
  * @brief  Gives real-time clock system time with nanosecond resolution
@@ -66,8 +57,8 @@ class Timer {
 
   virtual ~Timer() = default;
 
-  Timer(Timer&&) = default;
-  Timer& operator=(Timer&&) = default;
+  Timer(Timer&& rhs);
+  Timer& operator=(Timer&& rhs);
 
   /**
    * Get the current time from the timer. If the clock is running it is derived
@@ -111,7 +102,18 @@ class Timer {
    * @param period The period to check for (in seconds).
    * @return       True if the period has passed.
    */
+  WPI_DEPRECATED("Use unit-safe HasPeriodPassed method instead.")
   bool HasPeriodPassed(double period);
+
+  /**
+   * Check if the period specified has passed and if it has, advance the start
+   * time by that period. This is useful to decide if it's time to do periodic
+   * work without drifting later by the time it took to get around to checking.
+   *
+   * @param period The period to check for.
+   * @return       True if the period has passed.
+   */
+  bool HasPeriodPassed(units::second_t period);
 
   /**
    * Return the FPGA system clock time in seconds.

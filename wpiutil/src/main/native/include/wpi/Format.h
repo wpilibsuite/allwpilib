@@ -24,12 +24,13 @@
 #define WPIUTIL_WPI_FORMAT_H
 
 #include "wpi/ArrayRef.h"
-#include "wpi/STLExtras.h"
 #include "wpi/StringRef.h"
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
+#include <optional>
 #include <tuple>
+#include <utility>
 
 namespace wpi {
 
@@ -92,9 +93,9 @@ class format_object final : public format_object_base {
 
   template <std::size_t... Is>
   int snprint_tuple(char *Buffer, unsigned BufferSize,
-                    index_sequence<Is...>) const {
+                    std::index_sequence<Is...>) const {
 #ifdef _MSC_VER
-    return _snprintf(Buffer, BufferSize, Fmt, std::get<Is>(Vals)...);
+    return _snprintf_s(Buffer, BufferSize, BufferSize, Fmt, std::get<Is>(Vals)...);
 #else
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -114,7 +115,7 @@ public:
   }
 
   int snprint(char *Buffer, unsigned BufferSize) const override {
-    return snprint_tuple(Buffer, BufferSize, index_sequence_for<Ts...>());
+    return snprint_tuple(Buffer, BufferSize, std::index_sequence_for<Ts...>());
   }
 };
 
@@ -223,7 +224,7 @@ class FormattedBytes {
   ArrayRef<uint8_t> Bytes;
 
   // If not nullopt, display offsets for each line relative to starting value.
-  optional<uint64_t> FirstByteOffset;
+  std::optional<uint64_t> FirstByteOffset;
   uint32_t IndentLevel;  // Number of characters to indent each line.
   uint32_t NumPerLine;   // Number of bytes to show per line.
   uint8_t ByteGroupSize; // How many hex bytes are grouped without spaces
@@ -232,7 +233,7 @@ class FormattedBytes {
   friend class raw_ostream;
 
 public:
-  FormattedBytes(ArrayRef<uint8_t> B, uint32_t IL, optional<uint64_t> O,
+  FormattedBytes(ArrayRef<uint8_t> B, uint32_t IL, std::optional<uint64_t> O,
                  uint32_t NPL, uint8_t BGS, bool U, bool A)
       : Bytes(B), FirstByteOffset(O), IndentLevel(IL), NumPerLine(NPL),
         ByteGroupSize(BGS), Upper(U), ASCII(A) {
@@ -243,7 +244,7 @@ public:
 };
 
 inline FormattedBytes
-format_bytes(ArrayRef<uint8_t> Bytes, optional<uint64_t> FirstByteOffset = nullopt,
+format_bytes(ArrayRef<uint8_t> Bytes, std::optional<uint64_t> FirstByteOffset = std::nullopt,
              uint32_t NumPerLine = 16, uint8_t ByteGroupSize = 4,
              uint32_t IndentLevel = 0, bool Upper = false) {
   return FormattedBytes(Bytes, IndentLevel, FirstByteOffset, NumPerLine,
@@ -252,7 +253,7 @@ format_bytes(ArrayRef<uint8_t> Bytes, optional<uint64_t> FirstByteOffset = nullo
 
 inline FormattedBytes
 format_bytes_with_ascii(ArrayRef<uint8_t> Bytes,
-                        optional<uint64_t> FirstByteOffset = nullopt,
+                        std::optional<uint64_t> FirstByteOffset = std::nullopt,
                         uint32_t NumPerLine = 16, uint8_t ByteGroupSize = 4,
                         uint32_t IndentLevel = 0, bool Upper = false) {
   return FormattedBytes(Bytes, IndentLevel, FirstByteOffset, NumPerLine,

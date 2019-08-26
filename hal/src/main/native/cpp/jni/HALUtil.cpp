@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -127,7 +127,7 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
     ThrowUncleanStatusException(env, buf.c_str(), status);
   } else {
     std::string func;
-    auto stack = GetJavaStackTrace(env, &func, "edu.wpi.first.wpilibj");
+    auto stack = GetJavaStackTrace(env, &func, "edu.wpi.first");
     HAL_SendError(1, status, 0, message, func.c_str(), stack.c_str(), 1);
   }
 }

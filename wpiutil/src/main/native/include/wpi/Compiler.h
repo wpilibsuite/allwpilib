@@ -15,6 +15,9 @@
 #ifndef WPIUTIL_WPI_COMPILER_H
 #define WPIUTIL_WPI_COMPILER_H
 
+#include <new>
+#include <stddef.h>
+
 #if defined(_MSC_VER)
 #include <sal.h>
 #endif
@@ -117,6 +120,11 @@
 #ifndef LLVM_NODISCARD
 #if __cplusplus > 201402L && __has_cpp_attribute(nodiscard)
 #define LLVM_NODISCARD [[nodiscard]]
+// Detect MSVC directly, since __cplusplus still defaults to old version
+#elif _MSVC_LANG >= 201703L
+#define LLVM_NODISCARD [[nodiscard]]
+#elif _MSC_VER
+#define LLVM_NODISCARD
 #elif !__cplusplus
 // Workaround for llvm.org/PR23435, since clang 3.6 and below emit a spurious
 // error when __has_cpp_attribute is given a scoped attribute in C mode.
@@ -236,6 +244,11 @@
 #ifndef LLVM_FALLTHROUGH
 #if __cplusplus > 201402L && __has_cpp_attribute(fallthrough)
 #define LLVM_FALLTHROUGH [[fallthrough]]
+// Detect MSVC directly, since __cplusplus still defaults to old version
+#elif _MSVC_LANG >= 201703L
+#define LLVM_FALLTHROUGH [[fallthrough]]
+#elif _MSC_VER
+#define LLVM_FALLTHROUGH
 #elif __has_cpp_attribute(gnu::fallthrough)
 #define LLVM_FALLTHROUGH [[gnu::fallthrough]]
 #elif !__cplusplus
@@ -284,6 +297,41 @@
 # define LLVM_BUILTIN_UNREACHABLE __builtin_unreachable()
 #elif defined(_MSC_VER)
 # define LLVM_BUILTIN_UNREACHABLE __assume(false)
+#endif
+#endif
+
+/// LLVM_BUILTIN_TRAP - On compilers which support it, expands to an expression
+/// which causes the program to exit abnormally.
+#ifndef LLVM_BUILTIN_TRAP
+#if __has_builtin(__builtin_trap) || LLVM_GNUC_PREREQ(4, 3, 0)
+# define LLVM_BUILTIN_TRAP __builtin_trap()
+#elif defined(_MSC_VER)
+// The __debugbreak intrinsic is supported by MSVC, does not require forward
+// declarations involving platform-specific typedefs (unlike RaiseException),
+// results in a call to vectored exception handlers, and encodes to a short
+// instruction that still causes the trapping behavior we want.
+# define LLVM_BUILTIN_TRAP __debugbreak()
+#else
+# define LLVM_BUILTIN_TRAP *(volatile int*)0x11 = 0
+#endif
+#endif
+
+/// LLVM_BUILTIN_DEBUGTRAP - On compilers which support it, expands to
+/// an expression which causes the program to break while running
+/// under a debugger.
+#ifndef LLVM_BUILTIN_DEBUGTRAP
+#if __has_builtin(__builtin_debugtrap)
+# define LLVM_BUILTIN_DEBUGTRAP __builtin_debugtrap()
+#elif defined(_MSC_VER)
+// The __debugbreak intrinsic is supported by MSVC and breaks while
+// running under the debugger, and also supports invoking a debugger
+// when the OS is configured appropriately.
+# define LLVM_BUILTIN_DEBUGTRAP __debugbreak()
+#else
+// Just continue execution when built with compilers that have no
+// support. This is a debugging aid and not intended to force the
+// program to abort if encountered.
+# define LLVM_BUILTIN_DEBUGTRAP
 #endif
 #endif
 
@@ -422,5 +470,47 @@
 #define LLVM_THREAD_LOCAL __thread
 #endif
 #endif
+
+namespace wpi {
+
+/// Allocate a buffer of memory with the given size and alignment.
+///
+/// When the compiler supports aligned operator new, this will use it to to
+/// handle even over-aligned allocations.
+///
+/// However, this doesn't make any attempt to leverage the fancier techniques
+/// like posix_memalign due to portability. It is mostly intended to allow
+/// compatibility with platforms that, after aligned allocation was added, use
+/// reduced default alignment.
+inline void *allocate_buffer(size_t Size, size_t Alignment) {
+  return ::operator new(Size
+#ifdef __cpp_aligned_new
+                        ,
+                        std::align_val_t(Alignment)
+#endif
+  );
+}
+
+/// Deallocate a buffer of memory with the given size and alignment.
+///
+/// If supported, this will used the sized delete operator. Also if supported,
+/// this will pass the alignment to the delete operator.
+///
+/// The pointer must have been allocated with the corresponding new operator,
+/// most likely using the above helper.
+inline void deallocate_buffer(void *Ptr, size_t Size, size_t Alignment) {
+  ::operator delete(Ptr
+#ifdef __cpp_sized_deallocation
+                    ,
+                    Size
+#endif
+#ifdef __cpp_aligned_new
+                    ,
+                    std::align_val_t(Alignment)
+#endif
+  );
+}
+
+} // End namespace wpi
 
 #endif

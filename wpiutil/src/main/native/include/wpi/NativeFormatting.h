@@ -10,10 +10,10 @@
 #ifndef WPIUTIL_WPI_NATIVE_FORMATTING_H
 #define WPIUTIL_WPI_NATIVE_FORMATTING_H
 
-#include "wpi/optional.h"
 #include "wpi/raw_ostream.h"
 
 #include <cstdint>
+#include <optional>
 
 namespace wpi {
 enum class FloatStyle { Exponent, ExponentUpper, Fixed, Percent };
@@ -40,9 +40,9 @@ void write_integer(raw_ostream &S, long long N, size_t MinDigits,
                    IntegerStyle Style);
 
 void write_hex(raw_ostream &S, uint64_t N, HexPrintStyle Style,
-               optional<size_t> Width = nullopt);
+               std::optional<size_t> Width = std::nullopt);
 void write_double(raw_ostream &S, double D, FloatStyle Style,
-                  optional<size_t> Precision = nullopt);
+                  std::optional<size_t> Precision = std::nullopt);
 }
 
 #endif

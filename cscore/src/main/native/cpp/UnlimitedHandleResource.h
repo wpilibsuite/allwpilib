@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -78,7 +78,7 @@ template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename... Args>
 THandle UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Allocate(
     Args&&... args) {
-  std::lock_guard<TMutex> sync(m_handleMutex);
+  std::scoped_lock sync(m_handleMutex);
   size_t i;
   for (i = 0; i < m_structures.size(); i++) {
     if (m_structures[i] == nullptr) {
@@ -96,7 +96,7 @@ THandle UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Allocate(
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 THandle UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Allocate(
     std::shared_ptr<THandle> structure) {
-  std::lock_guard<TMutex> sync(m_handleMutex);
+  std::scoped_lock sync(m_handleMutex);
   size_t i;
   for (i = 0; i < m_structures.size(); i++) {
     if (m_structures[i] == nullptr) {
@@ -117,7 +117,7 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Get(
   auto index =
       handle.GetTypedIndex(static_cast<typename THandle::Type>(typeValue));
   if (index < 0) return nullptr;
-  std::lock_guard<TMutex> sync(m_handleMutex);
+  std::scoped_lock sync(m_handleMutex);
   if (index >= static_cast<int>(m_structures.size())) return nullptr;
   return m_structures[index];
 }
@@ -129,7 +129,7 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Free(
   auto index =
       handle.GetTypedIndex(static_cast<typename THandle::Type>(typeValue));
   if (index < 0) return nullptr;
-  std::lock_guard<TMutex> sync(m_handleMutex);
+  std::scoped_lock sync(m_handleMutex);
   if (index >= static_cast<int>(m_structures.size())) return nullptr;
   auto rv = std::move(m_structures[index]);
   m_structures[index].reset();
@@ -148,7 +148,7 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll(
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 inline std::vector<std::shared_ptr<TStruct>>
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::FreeAll() {
-  std::lock_guard<TMutex> sync(m_handleMutex);
+  std::scoped_lock sync(m_handleMutex);
   auto rv = std::move(m_structures);
   m_structures.clear();
   return rv;
@@ -158,7 +158,7 @@ template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename F>
 inline void
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::ForEach(F func) {
-  std::lock_guard<TMutex> sync(m_handleMutex);
+  std::scoped_lock sync(m_handleMutex);
   for (size_t i = 0; i < m_structures.size(); i++) {
     if (m_structures[i] != nullptr) func(MakeHandle(i), *(m_structures[i]));
   }
@@ -168,7 +168,7 @@ template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename F>
 inline std::pair<THandle, std::shared_ptr<TStruct>>
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::FindIf(F func) {
-  std::lock_guard<TMutex> sync(m_handleMutex);
+  std::scoped_lock sync(m_handleMutex);
   for (size_t i = 0; i < m_structures.size(); i++) {
     auto& structure = m_structures[i];
     if (structure != nullptr && func(*structure))

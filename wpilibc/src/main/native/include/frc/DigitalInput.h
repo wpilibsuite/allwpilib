@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -35,8 +35,8 @@ class DigitalInput : public DigitalSource {
 
   ~DigitalInput() override;
 
-  DigitalInput(DigitalInput&& rhs);
-  DigitalInput& operator=(DigitalInput&& rhs);
+  DigitalInput(DigitalInput&&) = default;
+  DigitalInput& operator=(DigitalInput&&) = default;
 
   /**
    * Get the value from a digital input channel.
@@ -70,7 +70,7 @@ class DigitalInput : public DigitalSource {
 
  private:
   int m_channel;
-  HAL_DigitalHandle m_handle = HAL_kInvalidHandle;
+  hal::Handle<HAL_DigitalHandle> m_handle;
 
   friend class DigitalGlitchFilter;
 };

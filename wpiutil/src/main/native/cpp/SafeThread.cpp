@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -29,14 +29,15 @@ detail::SafeThreadOwnerBase::~SafeThreadOwnerBase() {
 }
 
 void detail::SafeThreadOwnerBase::Start(std::shared_ptr<SafeThread> thr) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   if (auto thr = m_thread.lock()) return;
   m_stdThread = std::thread([=] { thr->Main(); });
+  thr->m_threadId = m_stdThread.get_id();
   m_thread = thr;
 }
 
 void detail::SafeThreadOwnerBase::Stop() {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   if (auto thr = m_thread.lock()) {
     thr->m_active = false;
     thr->m_cond.notify_all();
@@ -46,7 +47,7 @@ void detail::SafeThreadOwnerBase::Stop() {
 }
 
 void detail::SafeThreadOwnerBase::Join() {
-  std::unique_lock<wpi::mutex> lock(m_mutex);
+  std::unique_lock lock(m_mutex);
   if (auto thr = m_thread.lock()) {
     auto stdThread = std::move(m_stdThread);
     m_thread.reset();
@@ -62,25 +63,24 @@ void detail::SafeThreadOwnerBase::Join() {
 void detail::swap(SafeThreadOwnerBase& lhs, SafeThreadOwnerBase& rhs) noexcept {
   using std::swap;
   if (&lhs == &rhs) return;
-  std::lock(lhs.m_mutex, rhs.m_mutex);
-  std::lock_guard<wpi::mutex> lock_lhs(lhs.m_mutex, std::adopt_lock);
-  std::lock_guard<wpi::mutex> lock_rhs(rhs.m_mutex, std::adopt_lock);
+  std::scoped_lock lock(lhs.m_mutex, rhs.m_mutex);
   std::swap(lhs.m_stdThread, rhs.m_stdThread);
   std::swap(lhs.m_thread, rhs.m_thread);
 }
 
 detail::SafeThreadOwnerBase::operator bool() const {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   return !m_thread.expired();
 }
 
 std::thread::native_handle_type
 detail::SafeThreadOwnerBase::GetNativeThreadHandle() {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   return m_stdThread.native_handle();
 }
 
-std::shared_ptr<SafeThread> detail::SafeThreadOwnerBase::GetThread() const {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+std::shared_ptr<SafeThread> detail::SafeThreadOwnerBase::GetThreadSharedPtr()
+    const {
+  std::scoped_lock lock(m_mutex);
   return m_thread.lock();
 }

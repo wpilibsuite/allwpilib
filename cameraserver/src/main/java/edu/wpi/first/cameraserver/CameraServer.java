@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.wpi.cscore.AxisCamera;
@@ -65,6 +66,8 @@ public final class CameraServer {
   private final Map<String, VideoSource> m_sources;
   private final Map<String, VideoSink> m_sinks;
   private final Map<Integer, NetworkTable> m_tables;  // indexed by source handle
+  // source handle indexed by sink handle
+  private final Map<Integer, Integer> m_fixedSources;
   private final NetworkTable m_publishTable;
   private final VideoListener m_videoListener; //NOPMD
   private final int m_tableListener; //NOPMD
@@ -140,31 +143,37 @@ public final class CameraServer {
       values[j] = "mjpg:" + values[j];
     }
 
-    // Look to see if we have a passthrough server for this source
-    for (VideoSink i : m_sinks.values()) {
-      int sink = i.getHandle();
-      int sinkSource = CameraServerJNI.getSinkSource(sink);
-      if (source == sinkSource
-          && VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) == VideoSink.Kind.kMjpeg) {
-        // Add USB-only passthrough
-        String[] finalValues = Arrays.copyOf(values, values.length + 1);
-        int port = CameraServerJNI.getMjpegServerPort(sink);
-        finalValues[values.length] = makeStreamValue("172.22.11.2", port);
-        return finalValues;
+    if (CameraServerSharedStore.getCameraServerShared().isRoboRIO()) {
+      // Look to see if we have a passthrough server for this source
+      // Only do this on the roboRIO
+      for (VideoSink i : m_sinks.values()) {
+        int sink = i.getHandle();
+        int sinkSource = CameraServerJNI.getSinkSource(sink);
+        if (source == sinkSource
+            && VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink))
+            == VideoSink.Kind.kMjpeg) {
+          // Add USB-only passthrough
+          String[] finalValues = Arrays.copyOf(values, values.length + 1);
+          int port = CameraServerJNI.getMjpegServerPort(sink);
+          finalValues[values.length] = makeStreamValue("172.22.11.2", port);
+          return finalValues;
+        }
       }
     }
 
     return values;
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
+  @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP", "PMD.CyclomaticComplexity"})
   private synchronized void updateStreamValues() {
     // Over all the sinks...
     for (VideoSink i : m_sinks.values()) {
       int sink = i.getHandle();
 
       // Get the source's subtable (if none exists, we're done)
-      int source = CameraServerJNI.getSinkSource(sink);
+      int source = Objects.requireNonNullElseGet(m_fixedSources.get(sink),
+          () -> CameraServerJNI.getSinkSource(sink));
+
       if (source == 0) {
         continue;
       }
@@ -295,6 +304,7 @@ public final class CameraServer {
     m_defaultUsbDevice = new AtomicInteger();
     m_sources = new HashMap<>();
     m_sinks = new HashMap<>();
+    m_fixedSources = new HashMap<>();
     m_tables = new HashMap<>();
     m_publishTable = NetworkTableInstance.getDefault().getTable(kPublishName);
     m_nextPort = kBasePort;
@@ -594,6 +604,21 @@ public final class CameraServer {
     startAutomaticCapture(camera);
     CameraServerSharedStore.getCameraServerShared().reportAxisCamera(camera.getHandle());
     return camera;
+  }
+
+  /**
+   * Adds a virtual camera for switching between two streams.  Unlike the
+   * other addCamera methods, this returns a VideoSink rather than a
+   * VideoSource.  Calling setSource() on the returned object can be used
+   * to switch the actual source of the stream.
+   */
+  public MjpegServer addSwitchedCamera(String name) {
+    // create a dummy CvSource
+    CvSource source = new CvSource(name, VideoMode.PixelFormat.kMJPEG, 160, 120, 30);
+    MjpegServer server = startAutomaticCapture(source);
+    m_fixedSources.put(server.getHandle(), source.getHandle());
+
+    return server;
   }
 
   /**

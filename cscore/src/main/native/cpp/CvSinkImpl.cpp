@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -138,10 +138,12 @@ CS_Sink CreateCvSinkCallback(const wpi::Twine& name,
                                                inst.telemetry, processFrame));
 }
 
+static constexpr unsigned SinkMask = CS_SINK_CV | CS_SINK_RAW;
+
 void SetSinkDescription(CS_Sink sink, const wpi::Twine& description,
                         CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || data->kind != CS_SINK_CV) {
+  if (!data || (data->kind & SinkMask) == 0) {
     *status = CS_INVALID_HANDLE;
     return;
   }
@@ -169,7 +171,7 @@ uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
 
 std::string GetSinkError(CS_Sink sink, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || data->kind != CS_SINK_CV) {
+  if (!data || (data->kind & SinkMask) == 0) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
   }
@@ -179,7 +181,7 @@ std::string GetSinkError(CS_Sink sink, CS_Status* status) {
 wpi::StringRef GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
                             CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || data->kind != CS_SINK_CV) {
+  if (!data || (data->kind & SinkMask) == 0) {
     *status = CS_INVALID_HANDLE;
     return wpi::StringRef{};
   }
@@ -188,7 +190,7 @@ wpi::StringRef GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
 
 void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
-  if (!data || data->kind != CS_SINK_CV) {
+  if (!data || (data->kind & SinkMask) == 0) {
     *status = CS_INVALID_HANDLE;
     return;
   }
@@ -215,6 +217,7 @@ void CS_SetSinkDescription(CS_Sink sink, const char* description,
   return cs::SetSinkDescription(sink, description, status);
 }
 
+#if CV_VERSION_MAJOR < 4
 uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image,
                           CS_Status* status) {
   auto mat = cv::cvarrToMat(image);
@@ -226,6 +229,7 @@ uint64_t CS_GrabSinkFrameTimeout(CS_Sink sink, struct CvMat* image,
   auto mat = cv::cvarrToMat(image);
   return cs::GrabSinkFrameTimeout(sink, mat, timeout, status);
 }
+#endif  // CV_VERSION_MAJOR < 4
 
 uint64_t CS_GrabSinkFrameCpp(CS_Sink sink, cv::Mat* image, CS_Status* status) {
   return cs::GrabSinkFrame(sink, *image, status);

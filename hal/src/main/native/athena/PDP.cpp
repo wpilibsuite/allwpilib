@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,6 +8,8 @@
 #include "hal/PDP.h"
 
 #include <memory>
+
+#include <wpi/mutex.h>
 
 #include "HALInitializer.h"
 #include "PortsInternal.h"
@@ -106,9 +108,16 @@ union PdpStatusEnergy {
   } bits;
 };
 
+static wpi::mutex pdpHandleMutex;
+static HAL_PDPHandle pdpHandles[kNumPDPModules];
+
 namespace hal {
 namespace init {
-void InitializePDP() {}
+void InitializePDP() {
+  for (int i = 0; i < kNumPDPModules; i++) {
+    pdpHandles[i] = HAL_kInvalidHandle;
+  }
+}
 }  // namespace init
 }  // namespace hal
 
@@ -121,6 +130,13 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status) {
     return HAL_kInvalidHandle;
   }
 
+  std::scoped_lock lock(pdpHandleMutex);
+
+  if (pdpHandles[module] != HAL_kInvalidHandle) {
+    *status = 0;
+    return pdpHandles[module];
+  }
+
   auto handle = HAL_InitializeCAN(manufacturer, module, deviceType, status);
 
   if (*status != 0) {
@@ -128,10 +144,21 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status) {
     return HAL_kInvalidHandle;
   }
 
+  pdpHandles[module] = handle;
+
   return handle;
 }
 
-void HAL_CleanPDP(HAL_PDPHandle handle) { HAL_CleanCAN(handle); }
+void HAL_CleanPDP(HAL_PDPHandle handle) {
+  HAL_CleanCAN(handle);
+
+  for (int i = 0; i < kNumPDPModules; i++) {
+    if (pdpHandles[i] == handle) {
+      pdpHandles[i] = HAL_kInvalidHandle;
+      return;
+    }
+  }
+}
 
 HAL_Bool HAL_CheckPDPModule(int32_t module) {
   return module < kNumPDPModules && module >= 0;

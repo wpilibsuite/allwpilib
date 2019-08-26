@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,6 +16,7 @@
 #include <wpi/Twine.h>
 
 #include "cscore.h"
+#include "cscore_cv.h"
 
 namespace frc {
 
@@ -172,6 +173,14 @@ class CameraServer {
   template <typename T>
   cs::AxisCamera AddAxisCamera(const wpi::Twine& name,
                                std::initializer_list<T> hosts);
+
+  /**
+   * Adds a virtual camera for switching between two streams.  Unlike the
+   * other addCamera methods, this returns a VideoSink rather than a
+   * VideoSource.  Calling SetSource() on the returned object can be used
+   * to switch the actual source of the stream.
+   */
+  cs::MjpegServer AddSwitchedCamera(const wpi::Twine& name);
 
   /**
    * Get OpenCV access to the primary camera feed.  This allows you to

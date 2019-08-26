@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2012-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2012-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -32,103 +32,6 @@ class LiveWindow {
    * regardless of how many times GetInstance is called.
    */
   static LiveWindow* GetInstance();
-
-  WPI_DEPRECATED("no longer required")
-  void Run();
-
-  /**
-   * Add a Sensor associated with the subsystem and call it by the given name.
-   *
-   * @param subsystem The subsystem this component is part of.
-   * @param name      The name of this component.
-   * @param component A Sendable component that represents a sensor.
-   */
-  WPI_DEPRECATED("use Sendable::SetName() instead")
-  void AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
-                 Sendable* component);
-
-  /**
-   * Add a Sensor associated with the subsystem and call it by the given name.
-   *
-   * @param subsystem The subsystem this component is part of.
-   * @param name      The name of this component.
-   * @param component A Sendable component that represents a sensor.
-   */
-  WPI_DEPRECATED("use Sendable::SetName() instead")
-  void AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
-                 Sendable& component);
-
-  /**
-   * Add a Sensor associated with the subsystem and call it by the given name.
-   *
-   * @param subsystem The subsystem this component is part of.
-   * @param name      The name of this component.
-   * @param component A Sendable component that represents a sensor.
-   */
-  WPI_DEPRECATED("use Sendable::SetName() instead")
-  void AddSensor(const wpi::Twine& subsystem, const wpi::Twine& name,
-                 std::shared_ptr<Sendable> component);
-
-  /**
-   * Add an Actuator associated with the subsystem and call it by the given
-   * name.
-   *
-   * @param subsystem The subsystem this component is part of.
-   * @param name      The name of this component.
-   * @param component A Sendable component that represents a actuator.
-   */
-  WPI_DEPRECATED("use Sendable::SetName() instead")
-  void AddActuator(const wpi::Twine& subsystem, const wpi::Twine& name,
-                   Sendable* component);
-
-  /**
-   * Add an Actuator associated with the subsystem and call it by the given
-   * name.
-   *
-   * @param subsystem The subsystem this component is part of.
-   * @param name      The name of this component.
-   * @param component A Sendable component that represents a actuator.
-   */
-  WPI_DEPRECATED("use Sendable::SetName() instead")
-  void AddActuator(const wpi::Twine& subsystem, const wpi::Twine& name,
-                   Sendable& component);
-
-  /**
-   * Add an Actuator associated with the subsystem and call it by the given
-   * name.
-   *
-   * @param subsystem The subsystem this component is part of.
-   * @param name      The name of this component.
-   * @param component A Sendable component that represents a actuator.
-   */
-  WPI_DEPRECATED("use Sendable::SetName() instead")
-  void AddActuator(const wpi::Twine& subsystem, const wpi::Twine& name,
-                   std::shared_ptr<Sendable> component);
-
-  /**
-   * Meant for internal use in other WPILib classes.
-   *
-   * @deprecated Use SendableBase::SetName() instead.
-   */
-  WPI_DEPRECATED("use SensorUtil::SetName() instead")
-  void AddSensor(const wpi::Twine& type, int channel, Sendable* component);
-
-  /**
-   * Meant for internal use in other WPILib classes.
-   *
-   * @deprecated Use SendableBase::SetName() instead.
-   */
-  WPI_DEPRECATED("use SensorUtil::SetName() instead")
-  void AddActuator(const wpi::Twine& type, int channel, Sendable* component);
-
-  /**
-   * Meant for internal use in other WPILib classes.
-   *
-   * @deprecated Use SendableBase::SetName() instead.
-   */
-  WPI_DEPRECATED("use SensorUtil::SetName() instead")
-  void AddActuator(const wpi::Twine& type, int module, int channel,
-                   Sendable* component);
 
   /**
    * Add a component to the LiveWindow.
@@ -164,8 +67,9 @@ class LiveWindow {
    * Remove the component from the LiveWindow.
    *
    * @param sendable component to remove
+   * @return true if the component was removed; false if it was not present
    */
-  void Remove(Sendable* component);
+  bool Remove(Sendable* component);
 
   /**
    * Enable telemetry for a single component.

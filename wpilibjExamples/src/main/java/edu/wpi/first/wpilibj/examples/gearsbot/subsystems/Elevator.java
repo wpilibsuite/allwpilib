@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -61,7 +61,7 @@ public class Elevator extends PIDSubsystem {
    * The log method puts interesting information to the SmartDashboard.
    */
   public void log() {
-    SmartDashboard.putData("Elevator Pot", (AnalogPotentiometer) m_pot);
+    SmartDashboard.putData("Elevator Pot", m_pot);
   }
 
   /**

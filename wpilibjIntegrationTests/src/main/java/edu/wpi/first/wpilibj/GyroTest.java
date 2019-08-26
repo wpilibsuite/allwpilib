@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -35,14 +35,14 @@ public class GyroTest extends AbstractComsSetup {
   }
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     logger.fine("Setup: TiltPan camera");
     m_tpcam = TestBench.getInstance().getTiltPanCam();
     m_tpcam.setup();
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     m_tpcam.teardown();
   }
 

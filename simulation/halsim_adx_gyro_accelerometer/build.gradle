@@ -11,8 +11,8 @@ ext {
 
 apply from: "${rootDir}/shared/config.gradle"
 
-if (!project.hasProperty('onlyAthena')) {
-
+if (!project.hasProperty('onlylinuxathena')) {
+    ext.skiplinuxathena = true
     ext {
         sharedCvConfigs = [halsim_adx_gyro_accelerometerTest: []]
         staticCvConfigs = [:]
@@ -37,19 +37,20 @@ if (!project.hasProperty('onlyAthena')) {
 
     apply from: "${rootDir}/shared/nilibraries.gradle"
 
-    model {
-        exportsConfigs {
-            halsim_adx_gyro_accelerometer(ExportsConfig) {
-                x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                     '_CT??_R0?AVbad_cast',
-                                     '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                     '_TI5?AVfailure']
-                x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                     '_CT??_R0?AVbad_cast',
-                                     '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                     '_TI5?AVfailure']
-            }
+    nativeUtils.exportsConfigs {
+        halsim_adx_gyro_accelerometer {
+            x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                                '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+            x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                                '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
         }
+    }
+
+    model {
         components {
             "${nativeName}Base"(NativeLibrarySpec) {
                 sources {
@@ -68,7 +69,7 @@ if (!project.hasProperty('onlyAthena')) {
                         it.buildable = false
                         return
                     }
-                    if (it.targetPlatform.architecture.name == 'athena') {
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         it.buildable = false
                         return
                     }
@@ -89,7 +90,7 @@ if (!project.hasProperty('onlyAthena')) {
                     }
                 }
                 binaries.all {
-                    if (it.targetPlatform.architecture.name == 'athena') {
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         it.buildable = false
                         return
                     }
@@ -114,7 +115,7 @@ if (!project.hasProperty('onlyAthena')) {
                     }
                 }
                 binaries.all {
-                    if (it.targetPlatform.architecture.name == 'athena') {
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         it.buildable = false
                         return
                     }
@@ -126,7 +127,7 @@ if (!project.hasProperty('onlyAthena')) {
         }
         binaries {
             withType(GoogleTestTestSuiteBinarySpec) {
-                if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
+                if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') &&  !project.hasProperty('onlylinuxaarch64bionic')) {
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
                     project(':hal').addHalDependency(it, 'shared')
@@ -147,7 +148,7 @@ if (!project.hasProperty('onlyAthena')) {
 model {
 
     testSuites {
-        if (!project.hasProperty('onlyAthena') && !project.hasProperty('onlyRaspbian')) {
+        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
             "${nativeName}Test"(GoogleTestTestSuiteSpec) {
                 for(NativeComponentSpec c : $.components) {
                     if (c.name == nativeName) {

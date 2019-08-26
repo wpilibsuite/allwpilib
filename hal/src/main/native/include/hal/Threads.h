@@ -1,13 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
-
-#define NativeThreadHandle const void*
 
 #include "hal/Types.h"
 
@@ -17,7 +15,12 @@
  * @{
  */
 
+typedef const void* NativeThreadHandle;
+
+#ifdef __cplusplus
 extern "C" {
+#endif
+
 /**
  * Gets the thread priority for the specified thread.
  *
@@ -68,5 +71,8 @@ HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
  */
 HAL_Bool HAL_SetCurrentThreadPriority(HAL_Bool realTime, int32_t priority,
                                       int32_t* status);
+
+#ifdef __cplusplus
 }  // extern "C"
+#endif
 /** @} */

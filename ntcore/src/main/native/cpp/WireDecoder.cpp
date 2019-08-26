@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,8 +14,8 @@
 #include <cstring>
 
 #include <wpi/MathExtras.h>
+#include <wpi/MemAlloc.h>
 #include <wpi/leb128.h>
-#include <wpi/memory.h>
 
 using namespace nt;
 
@@ -53,7 +53,7 @@ WireDecoder::WireDecoder(wpi::raw_istream& is, unsigned int proto_rev,
   // Start with a 1K temporary buffer.  Use malloc instead of new so we can
   // realloc.
   m_allocated = 1024;
-  m_buf = static_cast<char*>(wpi::CheckedMalloc(m_allocated));
+  m_buf = static_cast<char*>(wpi::safe_malloc(m_allocated));
   m_proto_rev = proto_rev;
   m_error = nullptr;
 }
@@ -72,7 +72,7 @@ void WireDecoder::Realloc(size_t len) {
   if (m_allocated >= len) return;
   size_t newlen = m_allocated * 2;
   while (newlen < len) newlen *= 2;
-  m_buf = static_cast<char*>(wpi::CheckedRealloc(m_buf, newlen));
+  m_buf = static_cast<char*>(wpi::safe_realloc(m_buf, newlen));
   m_allocated = newlen;
 }
 

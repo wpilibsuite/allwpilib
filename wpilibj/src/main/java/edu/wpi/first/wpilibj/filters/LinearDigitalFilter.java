@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,8 +11,8 @@ import java.util.Arrays;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.CircularBuffer;
 import edu.wpi.first.wpilibj.PIDSource;
+import edu.wpi.first.wpiutil.CircularBuffer;
 
 /**
  * This class implements a linear, digital filter. All types of FIR and IIR filters are supported.
@@ -50,7 +50,10 @@ import edu.wpi.first.wpilibj.PIDSource;
  * that works well for you at, say, 100Hz, you will most definitely need to adjust the gains if you
  * then want to run it at 200Hz! Combining this with Note 1 - the impetus is on YOU as a developer
  * to make sure PIDGet() gets called at the desired, constant frequency!
+ *
+ * @deprecated Use LinearFilter class instead.
  */
+@Deprecated
 public class LinearDigitalFilter extends Filter {
   private static int instances;
 

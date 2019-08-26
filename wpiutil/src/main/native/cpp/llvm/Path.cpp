@@ -12,7 +12,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/Path.h"
-
+#include "wpi/ArrayRef.h"
+#include "wpi/Endian.h"
+#include "wpi/Errc.h"
+#include "wpi/ErrorHandling.h"
+#include "wpi/FileSystem.h"
+#include "wpi/SmallString.h"
 #include <cctype>
 #include <cstring>
 
@@ -22,10 +27,8 @@
 #include <io.h>
 #endif
 
-#include "wpi/FileSystem.h"
-#include "wpi/SmallString.h"
-
 using namespace wpi;
+using namespace wpi::support::endian;
 
 namespace {
   using wpi::StringRef;
@@ -444,7 +447,7 @@ void replace_path_prefix(SmallVectorImpl<char> &Path,
 
   // If prefixes have the same size we can simply copy the new one over.
   if (OldPrefix.size() == NewPrefix.size()) {
-    std::copy(NewPrefix.begin(), NewPrefix.end(), Path.begin());
+    wpi::copy(NewPrefix, Path.begin());
     return;
   }
 
@@ -674,9 +677,8 @@ std::error_code getUniqueID(const Twine Path, UniqueID &Result) {
   return std::error_code();
 }
 
-static std::error_code make_absolute(const Twine &current_directory,
-                                     SmallVectorImpl<char> &path,
-                                     bool use_current_directory) {
+void make_absolute(const Twine &current_directory,
+                   SmallVectorImpl<char> &path) {
   StringRef p(path.data(), path.size());
 
   bool rootDirectory = path::has_root_directory(p);
@@ -685,14 +687,11 @@ static std::error_code make_absolute(const Twine &current_directory,
 
   // Already absolute.
   if (rootName && rootDirectory)
-    return std::error_code();
+    return;
 
   // All of the following conditions will need the current directory.
   SmallString<128> current_dir;
-  if (use_current_directory)
-    current_directory.toVector(current_dir);
-  else if (std::error_code ec = current_path(current_dir))
-    return ec;
+  current_directory.toVector(current_dir);
 
   // Relative path. Prepend the current directory.
   if (!rootName && !rootDirectory) {
@@ -700,7 +699,7 @@ static std::error_code make_absolute(const Twine &current_directory,
     path::append(current_dir, p);
     // Set path to the result.
     path.swap(current_dir);
-    return std::error_code();
+    return;
   }
 
   if (!rootName && rootDirectory) {
@@ -709,7 +708,7 @@ static std::error_code make_absolute(const Twine &current_directory,
     path::append(curDirRootName, p);
     // Set path to the result.
     path.swap(curDirRootName);
-    return std::error_code();
+    return;
   }
 
   if (rootName && !rootDirectory) {
@@ -721,21 +720,23 @@ static std::error_code make_absolute(const Twine &current_directory,
     SmallString<128> res;
     path::append(res, pRootName, bRootDirectory, bRelativePath, pRelativePath);
     path.swap(res);
-    return std::error_code();
+    return;
   }
 
-  assert(false && "All rootName and rootDirectory combinations should have "
+  wpi_unreachable("All rootName and rootDirectory combinations should have "
                    "occurred above!");
-  return std::error_code();
-}
-
-std::error_code make_absolute(const Twine &current_directory,
-                              SmallVectorImpl<char> &path) {
-  return make_absolute(current_directory, path, true);
 }
 
 std::error_code make_absolute(SmallVectorImpl<char> &path) {
-  return make_absolute(Twine(), path, false);
+  if (path::is_absolute(path))
+    return {};
+
+  SmallString<128> current_dir;
+  if (std::error_code ec = current_path(current_dir))
+    return ec;
+
+  make_absolute(current_dir, path);
+  return {};
 }
 
 bool exists(const basic_file_status &status) {
@@ -803,12 +804,13 @@ std::error_code is_other(const Twine &Path, bool &Result) {
   return std::error_code();
 }
 
-void directory_entry::replace_filename(const Twine &filename,
-                                       basic_file_status st) {
-  SmallString<128> path = path::parent_path(Path);
-  path::append(path, filename);
-  Path = path.str();
-  Status = st;
+void directory_entry::replace_filename(const Twine &Filename, file_type Type,
+                                       basic_file_status Status) {
+  SmallString<128> PathStr = path::parent_path(Path);
+  path::append(PathStr, Filename);
+  this->Path = PathStr.str();
+  this->Type = Type;
+  this->Status = Status;
 }
 
 ErrorOr<perms> getPermissions(const Twine &Path) {
@@ -829,20 +831,3 @@ ErrorOr<perms> getPermissions(const Twine &Path) {
 #else
 #include "Unix/Path.inc"
 #endif
-
-namespace wpi {
-namespace sys {
-namespace path {
-
-bool user_cache_directory(SmallVectorImpl<char> &Result, const Twine &Path1,
-                          const Twine &Path2, const Twine &Path3) {
-  if (getUserCacheDir(Result)) {
-    append(Result, Path1, Path2, Path3);
-    return true;
-  }
-  return false;
-}
-
-} // end namespace path
-} // end namsspace sys
-} // end namespace wpi

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,6 +27,13 @@ LinearDigitalFilter::LinearDigitalFilter(PIDSource& source,
   HAL_Report(HALUsageReporting::kResourceType_LinearFilter, instances);
 }
 
+LinearDigitalFilter::LinearDigitalFilter(PIDSource& source,
+                                         std::initializer_list<double> ffGains,
+                                         std::initializer_list<double> fbGains)
+    : LinearDigitalFilter(source,
+                          wpi::makeArrayRef(ffGains.begin(), ffGains.end()),
+                          wpi::makeArrayRef(fbGains.begin(), fbGains.end())) {}
+
 LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
                                          wpi::ArrayRef<double> ffGains,
                                          wpi::ArrayRef<double> fbGains)
@@ -39,6 +46,13 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_LinearFilter, instances);
 }
+
+LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
+                                         std::initializer_list<double> ffGains,
+                                         std::initializer_list<double> fbGains)
+    : LinearDigitalFilter(source,
+                          wpi::makeArrayRef(ffGains.begin(), ffGains.end()),
+                          wpi::makeArrayRef(fbGains.begin(), fbGains.end())) {}
 
 LinearDigitalFilter LinearDigitalFilter::SinglePoleIIR(PIDSource& source,
                                                        double timeConstant,
