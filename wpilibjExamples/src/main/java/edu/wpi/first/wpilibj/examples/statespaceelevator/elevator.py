@@ -78,7 +78,6 @@ def main():
 
     refs = [np.array([[2.0], [0.0]]) for i in range(len(t))]
 
-
     # Generate references for simulation
     #for i in range(len(t)):
     #    if t[i] < l0:

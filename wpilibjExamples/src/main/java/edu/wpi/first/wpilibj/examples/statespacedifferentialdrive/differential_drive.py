@@ -95,7 +95,8 @@ def main():
     dt = 0.00505
     diff_drive = DifferentialDrive(dt)
     diff_drive.export_java_coeffs("DifferentialDrive")
-    os.rename("DifferentialDriveCoeffs.java", "subsystems/DifferentialDriveCoeffs.java")
+    os.rename("DifferentialDriveCoeffs.java",
+              "subsystems/DifferentialDriveCoeffs.java")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         try:
