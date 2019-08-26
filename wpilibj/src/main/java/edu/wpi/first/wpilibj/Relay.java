@@ -168,12 +168,12 @@ public final class Relay extends MotorSafety implements Sendable, AutoCloseable 
   }
 
   @Override
-  public final synchronized String getName() {
+  public synchronized String getName() {
     return m_sendableImpl.getName();
   }
 
   @Override
-  public final synchronized void setName(String name) {
+  public synchronized void setName(String name) {
     m_sendableImpl.setName(name);
   }
 
@@ -183,7 +183,7 @@ public final class Relay extends MotorSafety implements Sendable, AutoCloseable 
    * @param moduleType A string that defines the module name in the label for the value
    * @param channel    The channel number the device is plugged into
    */
-  protected final void setName(String moduleType, int channel) {
+  protected void setName(String moduleType, int channel) {
     m_sendableImpl.setName(moduleType, channel);
   }
 
@@ -194,17 +194,17 @@ public final class Relay extends MotorSafety implements Sendable, AutoCloseable 
    * @param moduleNumber The number of the particular module type
    * @param channel      The channel number the device is plugged into (usually PWM)
    */
-  protected final void setName(String moduleType, int moduleNumber, int channel) {
+  protected void setName(String moduleType, int moduleNumber, int channel) {
     m_sendableImpl.setName(moduleType, moduleNumber, channel);
   }
 
   @Override
-  public final synchronized String getSubsystem() {
+  public synchronized String getSubsystem() {
     return m_sendableImpl.getSubsystem();
   }
 
   @Override
-  public final synchronized void setSubsystem(String subsystem) {
+  public synchronized void setSubsystem(String subsystem) {
     m_sendableImpl.setSubsystem(subsystem);
   }
 
@@ -213,7 +213,7 @@ public final class Relay extends MotorSafety implements Sendable, AutoCloseable 
    *
    * @param child child component
    */
-  protected final void addChild(Object child) {
+  protected void addChild(Object child) {
     m_sendableImpl.addChild(child);
   }
 

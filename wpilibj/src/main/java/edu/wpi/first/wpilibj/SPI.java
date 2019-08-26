@@ -71,7 +71,7 @@ public final class SPI implements AutoCloseable {
    *
    * @param hz The clock rate in Hertz.
    */
-  public final void setClockRate(int hz) {
+  public void setClockRate(int hz) {
     SPIJNI.spiSetSpeed(m_port, hz);
   }
 
@@ -79,7 +79,7 @@ public final class SPI implements AutoCloseable {
    * Configure the order that bits are sent and received on the wire to be most significant bit
    * first.
    */
-  public final void setMSBFirst() {
+  public void setMSBFirst() {
     m_msbFirst = 1;
     SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
@@ -88,7 +88,7 @@ public final class SPI implements AutoCloseable {
    * Configure the order that bits are sent and received on the wire to be least significant bit
    * first.
    */
-  public final void setLSBFirst() {
+  public void setLSBFirst() {
     m_msbFirst = 0;
     SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
@@ -97,7 +97,7 @@ public final class SPI implements AutoCloseable {
    * Configure the clock output line to be active low. This is sometimes called clock polarity high
    * or clock idle high.
    */
-  public final void setClockActiveLow() {
+  public void setClockActiveLow() {
     m_clockIdleHigh = 1;
     SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
@@ -106,7 +106,7 @@ public final class SPI implements AutoCloseable {
    * Configure the clock output line to be active high. This is sometimes called clock polarity low
    * or clock idle low.
    */
-  public final void setClockActiveHigh() {
+  public void setClockActiveHigh() {
     m_clockIdleHigh = 0;
     SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
@@ -115,7 +115,7 @@ public final class SPI implements AutoCloseable {
    * Configure that the data is stable on the leading edge and the data changes on the trailing
    * edge.
    */
-  public final void setSampleDataOnLeadingEdge() {
+  public void setSampleDataOnLeadingEdge() {
     m_sampleOnTrailing = 0;
     SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
@@ -124,7 +124,7 @@ public final class SPI implements AutoCloseable {
    * Configure that the data is stable on the trailing edge and the data changes on the leading
    * edge.
    */
-  public final void setSampleDataOnTrailingEdge() {
+  public void setSampleDataOnTrailingEdge() {
     m_sampleOnTrailing = 1;
     SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
@@ -135,7 +135,7 @@ public final class SPI implements AutoCloseable {
    * @deprecated use {@link #setSampleDataOnTrailingEdge()} in most cases.
    */
   @Deprecated
-  public final void setSampleDataOnFalling() {
+  public void setSampleDataOnFalling() {
     m_sampleOnTrailing = 1;
     SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
@@ -146,7 +146,7 @@ public final class SPI implements AutoCloseable {
    * @deprecated use {@link #setSampleDataOnLeadingEdge()} in most cases.
    */
   @Deprecated
-  public final void setSampleDataOnRising() {
+  public void setSampleDataOnRising() {
     m_sampleOnTrailing = 0;
     SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
@@ -156,14 +156,14 @@ public final class SPI implements AutoCloseable {
   /**
    * Configure the chip select line to be active high.
    */
-  public final void setChipSelectActiveHigh() {
+  public void setChipSelectActiveHigh() {
     SPIJNI.spiSetChipSelectActiveHigh(m_port);
   }
 
   /**
    * Configure the chip select line to be active low.
    */
-  public final void setChipSelectActiveLow() {
+  public void setChipSelectActiveLow() {
     SPIJNI.spiSetChipSelectActiveLow(m_port);
   }
 
