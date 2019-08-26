@@ -2,6 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 
 nativeUtils.addWpiNativeUtils()
 nativeUtils.withRaspbian()
+nativeUtils.withBionic()
 nativeUtils {
   wpi {
     configureDependencies {
