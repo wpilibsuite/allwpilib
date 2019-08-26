@@ -241,6 +241,16 @@
     "gradlebase": "cpp"
   },
   {
+    "name": "GearsBotNew",
+    "description": "A fully functional example CommandBased program for WPIs GearsBot robot, using the new command-based framework. This code can run on your computer if it supports simulation.",
+    "tags": [
+      "CommandBased Robot",
+      "Complete List"
+    ],
+    "foldername": "GearsBotNew",
+    "gradlebase": "cpp"
+  },
+  {
     "name": "PacGoat",
     "description": "A fully functional example CommandBased program for FRC Team 190&#39;s 2014 robot. This code can run on your computer if it supports simulation.",
     "tags": [
@@ -267,5 +277,66 @@
     ],
     "foldername": "ShuffleBoard",
     "gradlebase": "cpp"
+  },
+  {
+    "name": "'Traditional' Hatchbot",
+    "description": "A fully-functional command-based hatchbot for the 2019 game using the new experimental command API.  Written in the 'traditional' style, i.e. commands are given their own classes.",
+    "tags": [
+      "Complete robot",
+      "Command-based"
+    ],
+    "foldername": "HatchbotTraditional",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "'Inlined' Hatchbot",
+    "description": "A fully-functional command-based hatchbot for the 2019 game using the new experimental command API.  Written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "tags": [
+      "Complete robot",
+      "Command-based",
+      "Lambdas"
+    ],
+    "foldername": "HatchbotInlined",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Select Command Example",
+    "description": "An example showing how to use the SelectCommand class from the experimental command framework rewrite.",
+    "tags": [
+      "Command-based"
+    ],
+    "foldername": "SelectCommand",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Scheduler Event Logging",
+    "description": "An example showing how to use Shuffleboard to log Command events from the CommandScheduler in the experimental command framework rewrite",
+    "tags": [
+      "Command-based",
+      "Shuffleboard"
+    ],
+    "foldername": "SchedulerEventLogging",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Frisbeebot",
+    "description": "An example robot project for a simple frisbee shooter for the 2013 FRC game, Ultimate Ascent, demonstrating use of PID functionality in the command framework",
+    "tags": [
+      "Command-based",
+      "PID"
+    ],
+    "foldername": "Frisbeebot",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Gyro Drive Commands",
+    "description": "An example command-based robot project demonstrating simple PID functionality utilizing a gyroscope to keep a robot driving straight and to turn to specified angles.",
+    "tags": [
+      "Command-based",
+      "PID",
+      "Gyro"
+    ],
+    "foldername": "GyroDriveCommands",
+    "mainclass": "Main"
   }
 ]
