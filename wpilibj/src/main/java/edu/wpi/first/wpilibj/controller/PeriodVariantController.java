@@ -235,4 +235,13 @@ public class PeriodVariantController<States extends Num, Inputs extends Num, Out
   public int getIndex() {
     return m_index;
   }
+
+  /**
+   * Returns whether this controller is enabled.
+   *
+   * @return Whether the output of this controller is enabled.
+   */
+  public boolean isEnabled() {
+    return m_enabled;
+  }
 }

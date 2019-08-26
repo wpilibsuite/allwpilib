@@ -6,16 +6,13 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Spark;
 
 public class SingleJointedArm {
-  private Spark m_motor = new Spark(1);
-  private Encoder m_encoder = new Encoder(1, 2);
+  private final Spark m_motor = new Spark(1);
+  private final Encoder m_encoder = new Encoder(1, 2);
 
-  private SingleJointedArmController m_singleJointedArm;
-  private Notifier m_thread;
+  private final SingleJointedArmController m_singleJointedArm = new SingleJointedArmController();
+  private final Notifier m_thread = new Notifier(this::iterate);
 
   public SingleJointedArm() {
-    m_singleJointedArm = new SingleJointedArmController();
-    m_thread = new Notifier(this::iterate);
-
     m_encoder.setDistancePerPulse(2.0 * Math.PI / 360.0);
   }
 
@@ -29,6 +26,12 @@ public class SingleJointedArm {
     m_thread.stop();
   }
 
+  /**
+   * Sets the references.
+   *
+   * @param angle           Angle of arm in radians.
+   * @param angularVelocity Velocity of arm in radians per second.
+   */
   public void setReferences(double angle, double angularVelocity) {
     m_singleJointedArm.setReferences(angle, angularVelocity);
   }
@@ -37,6 +40,9 @@ public class SingleJointedArm {
     return m_singleJointedArm.atReferences();
   }
 
+  /**
+   * Iterates the elevator control loop one cycle.
+   */
   public void iterate() {
     m_singleJointedArm.setMeasuredAngle(m_encoder.getDistance());
     m_singleJointedArm.update();

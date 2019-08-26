@@ -1,27 +1,30 @@
 package edu.wpi.first.wpilibj.examples.statespacedifferentialdrive.subsystems;
 
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
+@SuppressWarnings("PMD.UnusedPrivateField")
 public class Drivetrain {
-  private Spark m_leftFront = new Spark(1);
-  private Spark m_leftRear = new Spark(2);
-  private SpeedControllerGroup m_left = new SpeedControllerGroup(m_leftFront, m_leftRear);
-  private Encoder m_leftEncoder = new Encoder(1, 2);
+  private final Spark m_leftFront = new Spark(1);
+  private final Spark m_leftRear = new Spark(2);
+  private final SpeedControllerGroup m_left = new SpeedControllerGroup(m_leftFront, m_leftRear);
+  private final Encoder m_leftEncoder = new Encoder(1, 2);
 
-  private Spark m_rightFront = new Spark(3);
-  private Spark m_rightRear = new Spark(4);
-  private SpeedControllerGroup m_right = new SpeedControllerGroup(m_rightFront, m_rightRear);
-  private Encoder m_rightEncoder = new Encoder(3, 4);
+  private final Spark m_rightFront = new Spark(3);
+  private final Spark m_rightRear = new Spark(4);
+  private final SpeedControllerGroup m_right = new SpeedControllerGroup(m_rightFront, m_rightRear);
+  private final Encoder m_rightEncoder = new Encoder(3, 4);
 
-  private DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
+  private final DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
 
-  private DifferentialDriveController m_drivetrain;
-  private Notifier m_thread;
+  private final DifferentialDriveController m_drivetrain = new DifferentialDriveController();
+  private final Notifier m_thread = new Notifier(this::iterate);
 
   public Drivetrain() {
-    m_drivetrain = new DifferentialDriveController();
-    m_thread = new Notifier(this::iterate);
     m_leftEncoder.setDistancePerPulse(2.0 * Math.PI / 360.0);
     m_rightEncoder.setDistancePerPulse(2.0 * Math.PI / 360.0);
   }
@@ -36,6 +39,14 @@ public class Drivetrain {
     m_thread.stop();
   }
 
+  /**
+   * Sets the references.
+   *
+   * @param leftPosition  Position of left side in meters.
+   * @param leftVelocity  Velocity of left side in meters per second.
+   * @param rightPosition Position of right side in meters.
+   * @param rightVelocity Velocity of right side in meters per second.
+   */
   public void setReferences(double leftPosition, double leftVelocity,
                             double rightPosition, double rightVelocity) {
     m_drivetrain.setReferences(leftPosition, leftVelocity,
@@ -46,6 +57,9 @@ public class Drivetrain {
     return m_drivetrain.atReferences();
   }
 
+  /**
+   * Iterates the drivetrain control loop one cycle.
+   */
   public void iterate() {
     m_drivetrain.setMeasuredStates(m_leftEncoder.getDistance(),
         m_rightEncoder.getDistance());

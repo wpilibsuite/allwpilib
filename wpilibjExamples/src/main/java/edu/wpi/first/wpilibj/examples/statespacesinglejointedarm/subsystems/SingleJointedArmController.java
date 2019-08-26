@@ -7,13 +7,19 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 
+@SuppressWarnings("MemberName")
 public class SingleJointedArmController {
+  // State tolerances in meters and meters/sec respectively.
   public static final double kAngleTolerance = 0.05;
   public static final double kAngularVelocityTolerance = 2.0;
 
-  private Matrix<N1, N1> m_Y;
-  private StateSpaceLoop<N2, N1, N1> m_loop;
-  private boolean m_atReferences = false;
+  // The current sensor measurement.
+  private final Matrix<N1, N1> m_Y;
+
+  // The control loop
+  private final StateSpaceLoop<N2, N1, N1> m_loop;
+
+  private boolean m_atReferences;
 
   public SingleJointedArmController() {
     m_Y = MatrixUtils.zeros(Nat.N1());
@@ -28,6 +34,12 @@ public class SingleJointedArmController {
     m_loop.disable();
   }
 
+  /**
+   * Sets the references.
+   *
+   * @param angle           Angle of arm in radians.
+   * @param angularVelocity Angular velocity of arm in radians per second.
+   */
   public void setReferences(double angle, double angularVelocity) {
     Matrix<N2, N1> nextR = MatrixUtils.vec(Nat.N2()).fill(angle, angularVelocity);
     m_loop.setNextR(nextR);
@@ -37,6 +49,11 @@ public class SingleJointedArmController {
     return m_atReferences;
   }
 
+  /**
+   * Sets the current encoder measurement.
+   *
+   * @param measuredAngle Angle of arm in radians.
+   */
   public void setMeasuredAngle(double measuredAngle) {
     m_Y.set(0, 0, measuredAngle);
   }
@@ -61,6 +78,9 @@ public class SingleJointedArmController {
     return m_loop.getError().get(1, 0);
   }
 
+  /**
+   * Executes the control loop for a cycle.
+   */
   public void update() {
     m_loop.correct(m_Y);
 
@@ -71,6 +91,9 @@ public class SingleJointedArmController {
     m_loop.predict();
   }
 
+  /**
+   * Resets any internal state.
+   */
   public void reset() {
     m_loop.reset();
   }

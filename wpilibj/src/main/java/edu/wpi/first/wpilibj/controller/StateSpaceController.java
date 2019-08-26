@@ -221,4 +221,13 @@ public class StateSpaceController<States extends Num, Inputs extends Num, Output
   public StateSpaceControllerCoeffs<States, Inputs, Outputs> getCoefficients() {
     return getCoefficients(getIndex());
   }
+
+  /**
+   * Returns whether the controller is currently enabled.
+   *
+   * @return If the controller's output is enabled
+   */
+  public boolean isEnabled() {
+    return m_enabled;
+  }
 }

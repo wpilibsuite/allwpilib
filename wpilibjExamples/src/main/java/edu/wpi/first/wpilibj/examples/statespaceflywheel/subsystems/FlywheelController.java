@@ -6,13 +6,18 @@ import edu.wpi.first.wpiutil.math.MatrixUtils;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
+@SuppressWarnings("MemberName")
 public class FlywheelController {
   // Angular velocity tolerance in radians/sec.
   public static final double kTolerance = 10.0;
 
-  private Matrix<N1, N1> m_Y;
-  private StateSpaceLoop<N1, N1, N1> m_loop;
-  private boolean m_atReference = false;
+  // The current sensor measurement.
+  private final Matrix<N1, N1> m_Y;
+
+  // The control loop.
+  private final StateSpaceLoop<N1, N1, N1> m_loop;
+
+  private boolean m_atReference;
 
   public FlywheelController() {
     m_Y = MatrixUtils.zeros(Nat.N1());
@@ -27,6 +32,9 @@ public class FlywheelController {
     m_loop.disable();
   }
 
+  /**
+   * Sets the velocity reference in radians/sec.
+   */
   public void setVelocityReference(double angularVelocity) {
     Matrix<N1, N1> nextR = MatrixUtils.mat(Nat.N1(), Nat.N1()).fill(angularVelocity);
     m_loop.setNextR(nextR);
@@ -36,6 +44,9 @@ public class FlywheelController {
     return m_atReference;
   }
 
+  /**
+   * Sets the current encoder velocity in radians/sec.
+   */
   public void setMeasuredVelocity(double angularVelocity) {
     m_Y.set(0, 0, angularVelocity);
   }
@@ -52,8 +63,12 @@ public class FlywheelController {
     return m_loop.getError().get(0, 0);
   }
 
+
+  /**
+   * Executes the control loop for a cycle.
+   */
   public void update() {
-    if(Math.abs(m_loop.getNextR(0)) < 1.0) {
+    if (Math.abs(m_loop.getNextR(0)) < 1.0) {
       // Kill power at low angular velocities
       m_loop.disable();
     }
@@ -65,6 +80,9 @@ public class FlywheelController {
     m_loop.predict();
   }
 
+  /**
+   * Resets any internal state.
+   */
   public void reset() {
     m_loop.reset();
   }

@@ -11,9 +11,10 @@ import edu.wpi.first.wpiutil.math.numbers.N2;
 public class ElevatorController {
   public static final double kPositionTolerance = 0.05;
   public static final double kVelocityTolerance = 2.0;
-  private Matrix<N1, N1> m_Y;
-  private StateSpaceLoop<N2, N1, N1> m_loop;
-  private boolean m_atReferences = false;
+
+  private final Matrix<N1, N1> m_Y;
+  private final StateSpaceLoop<N2, N1, N1> m_loop;
+  private boolean m_atReferences;
 
   public ElevatorController() {
     m_Y = MatrixUtils.zeros(Nat.N1(), Nat.N1());

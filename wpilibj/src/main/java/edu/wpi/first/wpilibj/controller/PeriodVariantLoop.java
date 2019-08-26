@@ -235,7 +235,8 @@ public class PeriodVariantLoop<States extends Num, Inputs extends Num, Outputs e
    * @param dt Timestep for prediction. (in seconds)
    */
   public void predict(double dt) {
-    m_controller.update(m_nextR, m_observer.getXhat());
+    m_controller.update(getXhat(), m_nextR);
+
     m_observer.predict(m_controller.getU(), dt);
   }
 
@@ -256,5 +257,14 @@ public class PeriodVariantLoop<States extends Num, Inputs extends Num, Outputs e
    */
   public int getIndex() {
     return m_plant.getIndex();
+  }
+
+  /**
+   * Returns whether this loop is enabled.
+   *
+   * @return Whether the output of the loop is enabled.
+   */
+  public boolean isEnabled() {
+    return m_controller.isEnabled();
   }
 }

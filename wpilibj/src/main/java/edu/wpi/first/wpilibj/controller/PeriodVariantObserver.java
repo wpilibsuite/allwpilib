@@ -79,10 +79,10 @@ public class PeriodVariantObserver<States extends Num, Inputs extends Num, Outpu
     final SimpleMatrix Rtemp = (getCoefficients().getRcontinuous().plus(getCoefficients().getRcontinuous().transpose()))
         .div(2.0).getStorage();
 
-    Qtemp.concatRows(m_plant.getCoefficients().getAcontinuous().getStorage().transpose());
+    Qtemp = Qtemp.concatRows(m_plant.getCoefficients().getAcontinuous().getStorage().transpose());
 
-    SimpleMatrix Mgain = new SimpleMatrix(states * 2, states * 2);
-    Mgain.concatColumns(m_plant.getCoefficients().getAcontinuous().getStorage().negative(), Qtemp);
+    SimpleMatrix Mgain = new SimpleMatrix(0, 0);
+    Mgain = Mgain.concatColumns(m_plant.getCoefficients().getAcontinuous().getStorage().negative(), Qtemp);
 
     SimpleMatrix phi = SimpleMatrixUtils.expm(Mgain.scale(dt));
     SimpleMatrix phi12 = new SimpleMatrix(states, states);

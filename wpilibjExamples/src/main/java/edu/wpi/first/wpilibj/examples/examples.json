@@ -353,5 +353,85 @@
     ],
     "foldername": "gyrodrivecommands",
     "mainclass": "Main"
+  },
+  {
+    "name": "StateSpaceDifferentialDrive",
+    "description": "An example that demonstates a state-space controller for a differential drive.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "statespacedifferentialdrive",
+    "mainclass": "Main"
+  },
+  {
+    "name": "StateSpaceElevator",
+    "description": "An example that demonstates a state-space controller for an elevator.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "statespaceelevator",
+    "mainclass": "Main"
+  },
+  {
+    "name": "StateSpaceFlywheel",
+    "description": "An example that demonstates a state-space controller for a flywheel.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "statespaceflywheel",
+    "mainclass": "Main"
+  },
+  {
+    "name": "StateSpaceSingleJointedArm",
+    "description": "An example that demonstates a state-space controller for a single-jointed arm.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "statespacesinglejointedarm",
+    "mainclass": "Main"
+  },
+  {
+    "name": "PeriodVariantDifferentialDrive",
+    "description": "An example that demonstates a period-variant state-space controller for a differential drive.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "periodvariantdifferentialdrive",
+    "mainclass": "Main"
+  },
+  {
+    "name": "PeriodVariantElevator",
+    "description": "An example that demonstates a period-variant state-space controller for an elevator.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "periodvariantelevator",
+    "mainclass": "Main"
+  },
+  {
+    "name": "PeriodVariantFlywheel",
+    "description": "An example that demonstates a period-variant state-space controller for a flywheel.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "periodvariantflywheel",
+    "mainclass": "Main"
+  },
+  {
+    "name": "PeriodVariantSingleJointedArm",
+    "description": "An example that demonstates a period-variant state-space controller for a single-jointed arm.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "periodvariantsinglejointedarm",
+    "mainclass": "Main"
   }
 ]

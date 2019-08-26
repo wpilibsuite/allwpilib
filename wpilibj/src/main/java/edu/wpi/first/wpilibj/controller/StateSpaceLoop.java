@@ -245,4 +245,13 @@ public class StateSpaceLoop<States extends Num, Inputs extends Num, Outputs exte
   public int getIndex() {
     return m_plant.getIndex();
   }
+
+  /**
+   * Returns whether this loop is enabled.
+   *
+   * @return Whether the output of the loop is enabled.
+   */
+  public boolean isEnabled() {
+    return m_controller.isEnabled();
+  }
 }

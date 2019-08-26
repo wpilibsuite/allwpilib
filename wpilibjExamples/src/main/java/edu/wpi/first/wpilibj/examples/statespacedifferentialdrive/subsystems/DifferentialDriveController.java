@@ -8,13 +8,19 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import edu.wpi.first.wpiutil.math.numbers.N4;
 
+@SuppressWarnings("MemberName")
 public class DifferentialDriveController {
+  // State tolerances in meters and meters/sec respectively.
   public static final double kPositionTolerance = 0.05;
   public static final double kVelocityTolerance = 2.0;
 
-  private Matrix<N2, N1> m_Y;
-  private StateSpaceLoop<N4, N2, N2> m_loop;
-  private boolean m_atReferences = false;
+  // The current sensor measurements.
+  private final Matrix<N2, N1> m_Y;
+
+  // The control loop
+  private final StateSpaceLoop<N4, N2, N2> m_loop;
+
+  private boolean m_atReferences;
 
   public DifferentialDriveController() {
     m_Y = MatrixUtils.zeros(Nat.N2());
@@ -29,6 +35,14 @@ public class DifferentialDriveController {
     m_loop.disable();
   }
 
+  /**
+   * Sets the references.
+   *
+   * @param leftPosition  Position of left side in meters.
+   * @param leftVelocity  Velocity of left side in meters per second.
+   * @param rightPosition Position of right side in meters.
+   * @param rightVelocity Velocity of right side in meters per second.
+   */
   public void setReferences(double leftPosition, double leftVelocity,
                             double rightPosition, double rightVelocity) {
     Matrix<N4, N1> nextR = MatrixUtils.vec(Nat.N4())
@@ -41,6 +55,12 @@ public class DifferentialDriveController {
     return m_atReferences;
   }
 
+  /**
+   * Sets the current encoder measurements.
+   *
+   * @param leftPosition  Position of left side in meters.
+   * @param rightPosition Position of right side in meters.
+   */
   public void setMeasuredStates(double leftPosition, double rightPosition) {
     m_Y.set(0, 0, leftPosition);
     m_Y.set(1, 0, rightPosition);
@@ -86,6 +106,9 @@ public class DifferentialDriveController {
     return m_loop.getError().get(3, 0);
   }
 
+  /**
+   * Executes the control loop for a cycle.
+   */
   public void update() {
     m_loop.correct(m_Y);
 
@@ -98,6 +121,9 @@ public class DifferentialDriveController {
     m_loop.predict();
   }
 
+  /**
+   * Resets any internal state.
+   */
   public void reset() {
     m_loop.reset();
   }

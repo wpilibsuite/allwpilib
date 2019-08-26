@@ -1,6 +1,7 @@
 package edu.wpi.first.wpilibj.examples.statespacesinglejointedarm;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+
 import edu.wpi.first.wpilibj.examples.statespacesinglejointedarm.subsystems.SingleJointedArm;
 
 public class Robot extends TimedRobot {

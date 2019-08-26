@@ -6,15 +6,13 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Spark;
 
 public class Flywheel {
-  private Spark m_motor = new Spark(1);
-  private Encoder m_encoder = new Encoder(1, 2);
+  private final Spark m_motor = new Spark(1);
+  private final Encoder m_encoder = new Encoder(1, 2);
 
-  private FlywheelController m_wheel;
-  private Notifier m_thread;
+  private final FlywheelController m_wheel = new FlywheelController();
+  private final Notifier m_thread = new Notifier(this::iterate);
 
   public Flywheel() {
-    m_wheel = new FlywheelController();
-    m_thread = new Notifier(this::iterate);
     m_encoder.setDistancePerPulse(2.0 * Math.PI / 360.0);
   }
 
@@ -36,6 +34,9 @@ public class Flywheel {
     return m_wheel.atReference();
   }
 
+  /**
+   * Iterates the shooter control loop one cycle.
+   */
   public void iterate() {
     m_wheel.setMeasuredVelocity(m_encoder.getRate());
     m_wheel.update();

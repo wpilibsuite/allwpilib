@@ -6,18 +6,16 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Spark;
 
 public class Elevator {
-  private Spark m_motor = new Spark(1);
-  private Encoder m_encoder = new Encoder(1, 2);
-  private ElevatorController m_elevator;
-  private Notifier m_thread;
+  private final Spark m_motor = new Spark(1);
+  private final Encoder m_encoder = new Encoder(1, 2);
+  private final ElevatorController m_elevator = new ElevatorController();
+  private final Notifier m_thread = new Notifier(this::iterate);
 
   /**
    * Constructs a new Elevator, and prepares the notifier and controller to run.
    */
   public Elevator() {
-    m_elevator = new ElevatorController();
     m_encoder.setDistancePerPulse(2.0 * Math.PI / 360.0);
-    m_thread = new Notifier(this::iterate);
   }
 
   public void enable() {

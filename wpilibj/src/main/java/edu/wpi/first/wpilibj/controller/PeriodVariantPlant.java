@@ -320,6 +320,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
   @SuppressWarnings("ParameterName")
   public Matrix<States, N1> updateX(Matrix<States, N1> x, Matrix<Inputs, N1> u, double dt) {
     updateAB(dt);
+
     return getA().times(x).plus(getB().times(u));
   }
 
@@ -344,10 +345,11 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    */
   @SuppressWarnings({"LineLength", "LocalVariableName"})
   private void updateAB(double dt) {
-    SimpleMatrix MstateContinuous = new SimpleMatrix(kStates.getNum() + kInputs.getNum(), kStates.getNum() + kInputs.getNum());
+    SimpleMatrix MstateContinuous = new SimpleMatrix(0, 0);
 
-    MstateContinuous.concatColumns(getCoefficients().getAcontinuous().times(dt).getStorage());
-    MstateContinuous.concatColumns(getCoefficients().getBcontinuous().times(dt).getStorage());
+    MstateContinuous = MstateContinuous.concatColumns(getCoefficients().getAcontinuous().times(dt).getStorage());
+    MstateContinuous = MstateContinuous.concatColumns(getCoefficients().getBcontinuous().times(dt).getStorage());
+    MstateContinuous = MstateContinuous.concatRows(new SimpleMatrix(1, 3));
 
     SimpleMatrix Mstate = SimpleMatrixUtils.expm(MstateContinuous);
     CommonOps_DDRM.extract(Mstate.getDDRM(), 0, 0, m_A.getStorage().getDDRM());
