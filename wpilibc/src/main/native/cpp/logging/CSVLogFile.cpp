@@ -14,7 +14,7 @@
 using namespace frc;
 
 CSVLogFile::CSVLogFile(wpi::StringRef filePrefix)
-    : m_logFile(filePrefix, "csv"), m_timestampCell("Timestamp (ms)") {
+    : m_logFile(filePrefix, "csv") {
   RegisterCell(m_timestampCell);
 }
 

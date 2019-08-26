@@ -75,7 +75,7 @@ class CSVLogFile {
 
   LogFile m_logFile;
   std::vector<CSVLogCell*> m_cells;
-  CSVLogCell m_timestampCell;
+  CSVLogCell m_timestampCell{"Timestamp (ms)"};
   bool m_active = false;
 };
 
