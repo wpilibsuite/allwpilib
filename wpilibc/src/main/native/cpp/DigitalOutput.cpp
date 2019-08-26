@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -50,25 +50,6 @@ DigitalOutput::~DigitalOutput() {
   DisablePWM();
 
   HAL_FreeDIOPort(m_handle);
-}
-
-DigitalOutput::DigitalOutput(DigitalOutput&& rhs)
-    : ErrorBase(std::move(rhs)),
-      SendableBase(std::move(rhs)),
-      m_channel(std::move(rhs.m_channel)),
-      m_pwmGenerator(std::move(rhs.m_pwmGenerator)) {
-  std::swap(m_handle, rhs.m_handle);
-}
-
-DigitalOutput& DigitalOutput::operator=(DigitalOutput&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-  SendableBase::operator=(std::move(rhs));
-
-  m_channel = std::move(rhs.m_channel);
-  std::swap(m_handle, rhs.m_handle);
-  m_pwmGenerator = std::move(rhs.m_pwmGenerator);
-
-  return *this;
 }
 
 void DigitalOutput::Set(bool value) {

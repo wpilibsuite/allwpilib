@@ -162,27 +162,6 @@ SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
 
 SPI::~SPI() { HAL_CloseSPI(m_port); }
 
-SPI::SPI(SPI&& rhs)
-    : ErrorBase(std::move(rhs)),
-      m_msbFirst(std::move(rhs.m_msbFirst)),
-      m_sampleOnTrailing(std::move(rhs.m_sampleOnTrailing)),
-      m_clockIdleHigh(std::move(rhs.m_clockIdleHigh)),
-      m_accum(std::move(rhs.m_accum)) {
-  std::swap(m_port, rhs.m_port);
-}
-
-SPI& SPI::operator=(SPI&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-
-  std::swap(m_port, rhs.m_port);
-  m_msbFirst = std::move(rhs.m_msbFirst);
-  m_sampleOnTrailing = std::move(rhs.m_sampleOnTrailing);
-  m_clockIdleHigh = std::move(rhs.m_clockIdleHigh);
-  m_accum = std::move(rhs.m_accum);
-
-  return *this;
-}
-
 void SPI::SetClockRate(int hz) { HAL_SetSPISpeed(m_port, hz); }
 
 void SPI::SetMSBFirst() {

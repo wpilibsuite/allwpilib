@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -86,27 +86,6 @@ Relay::~Relay() {
   // ignore errors, as we want to make sure a free happens.
   if (m_forwardHandle != HAL_kInvalidHandle) HAL_FreeRelayPort(m_forwardHandle);
   if (m_reverseHandle != HAL_kInvalidHandle) HAL_FreeRelayPort(m_reverseHandle);
-}
-
-Relay::Relay(Relay&& rhs)
-    : MotorSafety(std::move(rhs)),
-      SendableBase(std::move(rhs)),
-      m_channel(std::move(rhs.m_channel)),
-      m_direction(std::move(rhs.m_direction)) {
-  std::swap(m_forwardHandle, rhs.m_forwardHandle);
-  std::swap(m_reverseHandle, rhs.m_reverseHandle);
-}
-
-Relay& Relay::operator=(Relay&& rhs) {
-  MotorSafety::operator=(std::move(rhs));
-  SendableBase::operator=(std::move(rhs));
-
-  m_channel = std::move(rhs.m_channel);
-  m_direction = std::move(rhs.m_direction);
-  std::swap(m_forwardHandle, rhs.m_forwardHandle);
-  std::swap(m_reverseHandle, rhs.m_reverseHandle);
-
-  return *this;
 }
 
 void Relay::Set(Relay::Value value) {
