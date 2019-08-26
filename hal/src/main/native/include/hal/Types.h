@@ -79,9 +79,7 @@ class Handle {
   Handle(const Handle&) = delete;
   Handle& operator=(const Handle&) = delete;
 
-  Handle(Handle&& rhs) : m_handle(rhs.m_handle) {
-    rhs.m_handle = CInvalid;
-  }
+  Handle(Handle&& rhs) : m_handle(rhs.m_handle) { rhs.m_handle = CInvalid; }
 
   Handle& operator=(Handle&& rhs) {
     m_handle = rhs.m_handle;
