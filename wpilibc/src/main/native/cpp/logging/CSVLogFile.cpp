@@ -43,9 +43,9 @@ void CSVLogFile::Start() {
 
 void CSVLogFile::Periodic() {
   if (m_active) {
-    std::chrono::milliseconds timestamp =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch());
+    using namespace std::chrono;
+    auto timestamp =
+        duration_cast<milliseconds>(system_clock::now().time_since_epoch());
     m_timestampCell.Log(timestamp.count());
     WriteRow();
   }
