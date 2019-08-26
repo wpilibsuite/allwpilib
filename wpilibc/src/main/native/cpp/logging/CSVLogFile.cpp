@@ -8,13 +8,12 @@
 #include "frc/logging/CSVLogFile.h"
 
 #include <chrono>
-#include <iostream>
+#include <wpi/raw_ostream.h>
 
 using namespace frc;
 
-CSVLogFile::CSVLogFile(std::string filePrefix)
+CSVLogFile::CSVLogFile(wpi::StringRef filePrefix)
     : LogFile(filePrefix, "csv"),
-      m_cells(),
       m_timestampCell("Timestamp (ms)"),
       m_active(false) {
   RegisterCell(m_timestampCell);
@@ -22,8 +21,8 @@ CSVLogFile::CSVLogFile(std::string filePrefix)
 
 void CSVLogFile::RegisterCell(CSVLogCell& cell) {
   if (m_active) {
-    std::cout << "You can't add a new cell when the spreadsheet is active: "
-              << cell.GetName() << std::endl;
+    wpi::outs() << "You can't add a new cell when the spreadsheet is active: "
+                << cell.GetName() << '\n';
   } else {
     m_cells.push_back(&cell);
   }
@@ -31,12 +30,12 @@ void CSVLogFile::RegisterCell(CSVLogCell& cell) {
 
 void CSVLogFile::Start() {
   if (m_active) {
-    std::cout << "This table has already been initialized" << std::endl;
+    wpi::outs() << "This table has already been initialized" << '\n';
     return;
   }
 
-  for (size_t i = 0; i < m_cells.size(); i++) {
-    Log("\"" + m_cells[i]->GetName() + "\",");
+  for (const auto& cell : m_cells) {
+    Log("\"" + cell->GetName() + "\",");
   }
   Log("\n");
 
@@ -54,8 +53,8 @@ void CSVLogFile::Periodic() {
 }
 
 void CSVLogFile::WriteRow() {
-  for (size_t i = 0; i < m_cells.size(); i++) {
-    Log("\"" + m_cells[i]->GetContent() + "\",");
+  for (const auto& cell : m_cells) {
+    Log("\"" + cell->GetContent() + "\",");
   }
   Log("\n");
 }

@@ -10,6 +10,7 @@
 #include <ctime>
 #include <fstream>
 #include <string>
+#include <wpi/StringRef.h>
 
 namespace frc {
 
@@ -28,16 +29,15 @@ class LogFile {
    * @param filePrefix The prefix of the LogFile.
    * @param fileExtension The extension of the LogFile (without dot).
    */
-  explicit LogFile(std::string filePrefix = "log",
-                   std::string fileExtension = "txt");
-  virtual ~LogFile();
+  explicit LogFile(wpi::StringRef filePrefix = "log",
+                   wpi::StringRef fileExtension = "txt");
 
   /**
    * Write text in the logFile.
    *
    * @param text The text to be logged in the file.
    */
-  void Log(std::string text);
+  void Log(wpi::StringRef text);
 
  private:
   /**

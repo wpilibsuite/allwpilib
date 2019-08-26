@@ -9,27 +9,25 @@
 
 #include <cstdio>
 #include <ctime>
-#include <iostream>
+#include <wpi/raw_ostream.h>
 
 using namespace frc;
 
-LogFile::LogFile(std::string filePrefix, std::string fileExtension)
+LogFile::LogFile(wpi::StringRef filePrefix, wpi::StringRef fileExtension)
     : m_filePrefix(filePrefix), m_fileExtension(fileExtension) {
   m_time = std::time(0);
   std::string filename = CreateFilename(m_time);
 
-  m_file.open(filename.c_str());
+  m_file.open(filename);
 
   if (m_file.fail()) {
-    std::cout << "Could not open file `" << filename << "` for writing."
-              << std::endl;
+    wpi::outs() << "Could not open file `" << filename << "` for writing."
+                << '\n';
     return;
   }
 }
 
-LogFile::~LogFile() { m_file.close(); }
-
-void LogFile::Log(std::string text) {
+void LogFile::Log(wpi::StringRef text) {
   m_file << text;
   UpdateFilename();
 }

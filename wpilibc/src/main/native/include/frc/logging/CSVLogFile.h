@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <wpi/StringRef.h>
 
 #include "frc/logging/CSVLogCell.h"
 #include "frc/logging/LogFile.h"
@@ -33,7 +34,7 @@ class CSVLogFile : public LogFile {
    *
    * @param filePrefix The prefix of the LogFile.
    */
-  explicit CSVLogFile(std::string filePrefix = "log");
+  explicit CSVLogFile(wpi::StringRef filePrefix = "log");
 
   /**
    * Register a new column to be logged. You will figure this value out

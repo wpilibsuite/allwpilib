@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include <wpi/StringRef.h>
 
 namespace frc {
 
@@ -24,7 +25,7 @@ class CSVLogCell {
    *
    * @param name The name of the column.
    */
-  explicit CSVLogCell(std::string name);
+  explicit CSVLogCell(wpi::StringRef name);
 
   /**
    * Log any type of value that can be converted into a string.
@@ -43,14 +44,14 @@ class CSVLogCell {
    *
    * @return The name of the cell.
    */
-  std::string GetName();
+  const std::string& GetName() const;
 
   /**
    * Get the content of the cell.
    *
    * @return The content of the cell.
    */
-  std::string GetContent();
+  const std::string& GetContent() const;
 
   /**
    * Clear the cell so its content is empty.
@@ -58,7 +59,7 @@ class CSVLogCell {
   void ClearCell();
 
  private:
-  bool IsStringValid(std::string string);
+  bool IsStringValid(wpi::StringRef string);
 
   std::string m_name;
   std::string m_content;
