@@ -8,6 +8,7 @@
 #include "frc/logging/CSVLogCell.h"
 
 #include <algorithm>
+
 #include <wpi/raw_ostream.h>
 
 using namespace frc;

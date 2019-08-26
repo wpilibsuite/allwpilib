@@ -8,14 +8,13 @@
 #include "frc/logging/CSVLogFile.h"
 
 #include <chrono>
+
 #include <wpi/raw_ostream.h>
 
 using namespace frc;
 
 CSVLogFile::CSVLogFile(wpi::StringRef filePrefix)
-    : m_logFile(filePrefix, "csv"),
-      m_timestampCell("Timestamp (ms)"),
-      m_active(false) {
+    : m_logFile(filePrefix, "csv"), m_timestampCell("Timestamp (ms)") {
   RegisterCell(m_timestampCell);
 }
 

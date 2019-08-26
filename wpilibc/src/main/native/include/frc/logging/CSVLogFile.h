@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+
 #include <wpi/StringRef.h>
 
 #include "frc/logging/CSVLogCell.h"
@@ -75,7 +76,7 @@ class CSVLogFile {
   LogFile m_logFile;
   std::vector<CSVLogCell*> m_cells;
   CSVLogCell m_timestampCell;
-  bool m_active;
+  bool m_active = false;
 };
 
 }  // namespace frc

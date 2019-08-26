@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+
 #include <wpi/StringRef.h>
 
 namespace frc {
