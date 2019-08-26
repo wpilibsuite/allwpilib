@@ -21,8 +21,10 @@ namespace frc {
 
 class Sendable;
 
-class SmartDashboard final : public ErrorBase, public SendableBase {
+class SmartDashboard final {
  public:
+  SmartDashboard() = delete;
+
   static void init();
 
   /**
@@ -417,8 +419,6 @@ class SmartDashboard final : public ErrorBase, public SendableBase {
   static void UpdateValues();
 
  private:
-  virtual ~SmartDashboard() = default;
-
   static detail::ListenerExecutor listenerExecutor;
 };
 
