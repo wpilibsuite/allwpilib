@@ -214,5 +214,3 @@ ipch/
 
 # Visual Studio 2015 cache/options directory
 .vs/
-compile_commands.json
-.clangd
