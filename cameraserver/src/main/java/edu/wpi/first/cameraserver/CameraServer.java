@@ -616,7 +616,7 @@ public final class CameraServer {
     // create a dummy CvSource
     CvSource source = new CvSource(name, VideoMode.PixelFormat.kMJPEG, 160, 120, 30);
     MjpegServer server = startAutomaticCapture(source);
-    synchronized(this) {
+    synchronized (this) {
       m_fixedSources.put(server.getHandle(), source.getHandle());
     }
 
