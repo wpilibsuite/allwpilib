@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Enumeration;
+import java.util.Vector;
 
 import static java.util.Objects.requireNonNull;
 
@@ -36,14 +36,16 @@ public class CommandGroup extends Command {
   /**
    * The commands in this group (stored in entries).
    */
-  private final List<Entry> m_commands = new ArrayList<>();
+  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
+  private final Vector<Entry> m_commands = new Vector<>();
   /*
    * Intentionally package private
    */
   /**
    * The active children in this group (stored in entries).
    */
-  final List<Entry> m_children = new ArrayList<>();
+  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
+  final Vector<Entry> m_children = new Vector<>();
   /**
    * The current command, -1 signifies that none have been run.
    */
@@ -89,9 +91,9 @@ public class CommandGroup extends Command {
 
     command.setParent(this);
 
-    m_commands.add(new Entry(command, Entry.IN_SEQUENCE));
-    for (Subsystem requirement : command.getRequirements()) {
-      requires(requirement);
+    m_commands.addElement(new Entry(command, Entry.IN_SEQUENCE));
+    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
+      requires((Subsystem) e.nextElement());
     }
   }
 
@@ -127,9 +129,9 @@ public class CommandGroup extends Command {
 
     command.setParent(this);
 
-    m_commands.add(new Entry(command, Entry.IN_SEQUENCE, timeout));
-    for (Subsystem requirement : command.getRequirements()) {
-      requires(requirement);
+    m_commands.addElement(new Entry(command, Entry.IN_SEQUENCE, timeout));
+    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
+      requires((Subsystem) e.nextElement());
     }
   }
 
@@ -160,9 +162,9 @@ public class CommandGroup extends Command {
 
     command.setParent(this);
 
-    m_commands.add(new Entry(command, Entry.BRANCH_CHILD));
-    for (Subsystem requirement : command.getRequirements()) {
-      requires(requirement);
+    m_commands.addElement(new Entry(command, Entry.BRANCH_CHILD));
+    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
+      requires((Subsystem) e.nextElement());
     }
   }
 
@@ -201,9 +203,9 @@ public class CommandGroup extends Command {
 
     command.setParent(this);
 
-    m_commands.add(new Entry(command, Entry.BRANCH_CHILD, timeout));
-    for (Subsystem requirement : command.getRequirements()) {
-      requires(requirement);
+    m_commands.addElement(new Entry(command, Entry.BRANCH_CHILD, timeout));
+    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
+      requires((Subsystem) e.nextElement());
     }
   }
 
@@ -240,7 +242,7 @@ public class CommandGroup extends Command {
         }
       }
 
-      entry = m_commands.get(m_currentCommandIndex);
+      entry = m_commands.elementAt(m_currentCommandIndex);
       cmd = null;
 
       switch (entry.m_state) {
@@ -260,7 +262,7 @@ public class CommandGroup extends Command {
           m_currentCommandIndex++;
           cancelConflicts(entry.m_command);
           entry.m_command.startRunning();
-          m_children.add(entry);
+          m_children.addElement(entry);
           break;
         default:
           break;
@@ -269,14 +271,14 @@ public class CommandGroup extends Command {
 
     // Run Children
     for (int i = 0; i < m_children.size(); i++) {
-      entry = m_children.get(i);
+      entry = m_children.elementAt(i);
       Command child = entry.m_command;
       if (entry.isTimedOut()) {
         child._cancel();
       }
       if (!child.run()) {
         child.removed();
-        m_children.remove(i--);
+        m_children.removeElementAt(i--);
       }
     }
   }
@@ -287,17 +289,18 @@ public class CommandGroup extends Command {
     // Theoretically, we don't have to check this, but we do if teams override
     // the isFinished method
     if (m_currentCommandIndex != -1 && m_currentCommandIndex < m_commands.size()) {
-      Command cmd = m_commands.get(m_currentCommandIndex).m_command;
+      Command cmd = m_commands.elementAt(m_currentCommandIndex).m_command;
       cmd._cancel();
       cmd.removed();
     }
 
-    for (Entry child : m_children) {
-      Command cmd = child.m_command;
+    Enumeration children = m_children.elements();
+    while (children.hasMoreElements()) {
+      Command cmd = ((Entry) children.nextElement()).m_command;
       cmd._cancel();
       cmd.removed();
     }
-    m_children.clear();
+    m_children.removeAllElements();
   }
 
   @Override
@@ -354,14 +357,14 @@ public class CommandGroup extends Command {
     }
 
     if (m_currentCommandIndex != -1 && m_currentCommandIndex < m_commands.size()) {
-      Command cmd = m_commands.get(m_currentCommandIndex).m_command;
+      Command cmd = m_commands.elementAt(m_currentCommandIndex).m_command;
       if (!cmd.isInterruptible()) {
         return false;
       }
     }
 
-    for (Entry child : m_children) {
-      if (!child.m_command.isInterruptible()) {
+    for (int i = 0; i < m_children.size(); i++) {
+      if (!m_children.elementAt(i).m_command.isInterruptible()) {
         return false;
       }
     }
@@ -371,14 +374,16 @@ public class CommandGroup extends Command {
 
   private void cancelConflicts(Command command) {
     for (int i = 0; i < m_children.size(); i++) {
-      Command child = m_children.get(i).m_command;
+      Command child = m_children.elementAt(i).m_command;
 
-      for (Subsystem requirement : command.getRequirements()) {
-        if (child.doesRequire(requirement)) {
+      Enumeration requirements = command.getRequirements();
+
+      while (requirements.hasMoreElements()) {
+        Object requirement = requirements.nextElement();
+        if (child.doesRequire((Subsystem) requirement)) {
           child._cancel();
           child.removed();
-          m_children.remove(i);
-          i--;
+          m_children.removeElementAt(i--);
           break;
         }
       }

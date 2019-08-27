@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 package edu.wpi.first.wpilibj.command;
+
+import java.util.Enumeration;
 
 /**
  * A {@link ConditionalCommand} is a {@link Command} that starts one of two commands.
@@ -47,14 +49,14 @@ public abstract class ConditionalCommand extends Command {
 
   private void requireAll() {
     if (m_onTrue != null) {
-      for (Subsystem requirement : m_onTrue.getRequirements()) {
-        requires(requirement);
+      for (Enumeration e = m_onTrue.getRequirements(); e.hasMoreElements(); ) {
+        requires((Subsystem) e.nextElement());
       }
     }
 
     if (m_onFalse != null) {
-      for (Subsystem requirement : m_onFalse.getRequirements()) {
-        requires(requirement);
+      for (Enumeration e = m_onFalse.getRequirements(); e.hasMoreElements(); ) {
+        requires((Subsystem) e.nextElement());
       }
     }
   }

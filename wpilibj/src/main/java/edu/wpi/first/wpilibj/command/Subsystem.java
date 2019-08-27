@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 package edu.wpi.first.wpilibj.command;
+
+import java.util.Collections;
 
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
@@ -91,7 +93,7 @@ public abstract class Subsystem extends SendableBase {
     if (command == null) {
       m_defaultCommand = null;
     } else {
-      if (!command.getRequirements().contains(this)) {
+      if (!Collections.list(command.getRequirements()).contains(this)) {
         throw new IllegalUseOfCommandException("A default command must require the subsystem");
       }
       m_defaultCommand = command;

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,8 +7,7 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.Enumeration;
 
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SendableBase;
@@ -60,7 +59,7 @@ public abstract class Command extends SendableBase {
   /**
    * The required subsystems.
    */
-  private final Set<Subsystem> m_requirements = new LinkedHashSet<>();
+  private final Set m_requirements = new Set();
 
   /**
    * Whether or not it is running.
@@ -389,14 +388,14 @@ public abstract class Command extends SendableBase {
   }
 
   /**
-   * Returns the requirements (as a {@link Set} of {@link Subsystem
+   * Returns the requirements (as an {@link Enumeration Enumeration} of {@link Subsystem
    * Subsystems}) of this command.
    *
-   * @return the requirements (as a {@link Set} of {@link Subsystem
+   * @return the requirements (as an {@link Enumeration Enumeration} of {@link Subsystem
    * Subsystems}) of this command
    */
-  synchronized Set<Subsystem> getRequirements() {
-    return m_requirements;
+  synchronized Enumeration getRequirements() {
+    return m_requirements.getElements();
   }
 
   /**
