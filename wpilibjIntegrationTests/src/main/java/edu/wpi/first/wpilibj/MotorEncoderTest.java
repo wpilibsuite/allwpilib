@@ -178,7 +178,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   public void testPositionPIDController() {
     PIDController pidController = new PIDController(0.001, 0.0005, 0);
     pidController.setTolerance(50.0);
-    pidController.setOutputRange(-0.2, 0.2);
+    pidController.setIntegratorRange(-0.2, 0.2);
     pidController.setSetpoint(1000);
 
     Notifier pidRunner = new Notifier(
@@ -200,7 +200,6 @@ public class MotorEncoderTest extends AbstractComsSetup {
     LinearFilter filter = LinearFilter.movingAverage(50);
     PIDController pidController = new PIDController(1e-5, 0.0, 0.0006);
     pidController.setTolerance(200);
-    pidController.setOutputRange(-0.3, 0.3);
     pidController.setSetpoint(600);
 
     Notifier pidRunner =

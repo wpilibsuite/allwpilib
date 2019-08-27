@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -20,17 +19,6 @@ class PIDInputOutputTest {
   @BeforeEach
   void setUp() {
     m_controller = new PIDController(0, 0, 0);
-  }
-
-  @Test
-  void outputRangeTest() {
-    m_controller.setP(1);
-    m_controller.setOutputRange(-50, 50);
-
-    assertAll(
-        () -> assertEquals(-50, m_controller.calculate(100, 0), 1e-5),
-        () -> assertEquals(50, m_controller.calculate(0, 100), 1e-5)
-    );
   }
 
   @Test

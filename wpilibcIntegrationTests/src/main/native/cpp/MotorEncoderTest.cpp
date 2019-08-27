@@ -141,7 +141,7 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
   double goal = 1000;
   frc2::PIDController pidController(0.001, 0.01, 0.0);
   pidController.SetTolerance(50.0);
-  pidController.SetOutputRange(-0.2, 0.2);
+  pidController.SetIntegratorRange(-0.2, 0.2);
   pidController.SetSetpoint(goal);
 
   /* 10 seconds should be plenty time to get to the reference */
@@ -167,7 +167,6 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
 
   frc2::PIDController pidController(1e-5, 0.0, 0.0006);
   pidController.SetTolerance(200.0);
-  pidController.SetOutputRange(-0.3, 0.3);
   pidController.SetSetpoint(600);
 
   /* 10 seconds should be plenty time to get to the reference */

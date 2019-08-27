@@ -45,7 +45,7 @@ public class PIDTest extends AbstractComsSetup {
   private SendableBuilderImpl m_builder;
 
   private static final double absoluteTolerance = 50;
-  private static final double outputRange = 0.25;
+  private static final double integratorRange = 0.25;
 
   private PIDController m_controller = null;
   private static MotorEncoderFixture me = null;
@@ -121,14 +121,14 @@ public class PIDTest extends AbstractComsSetup {
     m_controller.setTolerance(absoluteTolerance);
   }
 
-  private void setupOutputRange() {
-    m_controller.setOutputRange(-outputRange, outputRange);
+  private void setupIntegratorRange() {
+    m_controller.setIntegratorRange(-integratorRange, integratorRange);
   }
 
   @Test
   public void testInitialSettings() {
     setupTolerance();
-    setupOutputRange();
+    setupIntegratorRange();
     double reference = 2500.0;
     m_controller.setSetpoint(reference);
     assertEquals("PID.getPositionError() did not start at " + reference,
@@ -144,7 +144,7 @@ public class PIDTest extends AbstractComsSetup {
   @Test
   public void testSetSetpoint() {
     setupTolerance();
-    setupOutputRange();
+    setupIntegratorRange();
     double reference = 2500.0;
     m_controller.setSetpoint(reference);
     assertEquals("Did not correctly set reference", reference, m_controller.getSetpoint(), 1e-3);
@@ -153,7 +153,7 @@ public class PIDTest extends AbstractComsSetup {
   @Test(timeout = 10000)
   public void testRotateToTarget() {
     setupTolerance();
-    setupOutputRange();
+    setupIntegratorRange();
     double reference = 1000.0;
     assertEquals(pidData() + "did not start at 0", 0, me.getMotor().get(), 0);
     m_controller.setSetpoint(reference);
@@ -176,7 +176,7 @@ public class PIDTest extends AbstractComsSetup {
 
   @Test(expected = RuntimeException.class)
   public void testOnTargetNoToleranceSet() {
-    setupOutputRange();
+    setupIntegratorRange();
     m_controller.atSetpoint();
   }
 }

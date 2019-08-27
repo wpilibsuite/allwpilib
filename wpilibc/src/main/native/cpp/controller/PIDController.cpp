@@ -64,9 +64,10 @@ void PIDController::EnableContinuousInput(double minimumInput,
 
 void PIDController::DisableContinuousInput() { m_continuous = false; }
 
-void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
-  m_minimumOutput = minimumOutput;
-  m_maximumOutput = maximumOutput;
+void PIDController::SetIntegratorRange(double minimumIntegral,
+                                       double maximumIntegral) {
+  m_minimumIntegral = minimumIntegral;
+  m_maximumIntegral = maximumIntegral;
 }
 
 void PIDController::SetTolerance(double positionTolerance,
@@ -89,12 +90,10 @@ double PIDController::Calculate(double measurement) {
   if (m_Ki != 0) {
     m_totalError =
         std::clamp(m_totalError + m_positionError * m_period.to<double>(),
-                   m_minimumOutput / m_Ki, m_maximumOutput / m_Ki);
+                   m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
   }
 
-  return std::clamp(
-      m_Kp * m_positionError + m_Ki * m_totalError + m_Kd * m_velocityError,
-      m_minimumOutput, m_maximumOutput);
+  return m_Kp * m_positionError + m_Ki * m_totalError + m_Kd * m_velocityError;
 }
 
 double PIDController::Calculate(double measurement, double setpoint) {

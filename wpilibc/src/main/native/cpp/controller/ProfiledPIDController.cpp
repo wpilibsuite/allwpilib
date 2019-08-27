@@ -69,9 +69,9 @@ void ProfiledPIDController::DisableContinuousInput() {
   m_controller.DisableContinuousInput();
 }
 
-void ProfiledPIDController::SetOutputRange(double minimumOutput,
-                                           double maximumOutput) {
-  m_controller.SetOutputRange(minimumOutput, maximumOutput);
+void ProfiledPIDController::SetIntegratorRange(double minimumIntegral,
+                                               double maximumIntegral) {
+  m_controller.SetIntegratorRange(minimumIntegral, maximumIntegral);
 }
 
 void ProfiledPIDController::SetTolerance(double positionTolerance,

@@ -35,11 +35,9 @@ public class PIDController extends SendableBase {
   // The period (in seconds) of the loop that calls the controller
   private final double m_period;
 
-  // |maximum output|
-  private double m_maximumOutput = 1.0;
+  private double m_maximumIntegral = 1.0;
 
-  // |minimum output|
-  private double m_minimumOutput = -1.0;
+  private double m_minimumIntegral = -1.0;
 
   // Maximum input - limit setpoint to this
   private double m_maximumInput;
@@ -244,14 +242,17 @@ public class PIDController extends SendableBase {
   }
 
   /**
-   * Sets the minimum and maximum values to write.
+   * Sets the minimum and maximum values for the integrator.
    *
-   * @param minimumOutput the minimum value to write to the output
-   * @param maximumOutput the maximum value to write to the output
+   * <p>When the cap is reached, the integrator value is added to the controller
+   * output rather than the integrator value times the integral gain.
+   *
+   * @param minimumIntegral The minimum value of the integrator.
+   * @param maximumIntegral The maximum value of the integrator.
    */
-  public void setOutputRange(double minimumOutput, double maximumOutput) {
-    m_minimumOutput = minimumOutput;
-    m_maximumOutput = maximumOutput;
+  public void setIntegratorRange(double minimumIntegral, double maximumIntegral) {
+    m_minimumIntegral = minimumIntegral;
+    m_maximumIntegral = maximumIntegral;
   }
 
   /**
@@ -314,12 +315,10 @@ public class PIDController extends SendableBase {
 
     if (m_Ki != 0) {
       m_totalError = MathUtils.clamp(m_totalError + m_positionError * m_period,
-          m_minimumOutput / m_Ki, m_maximumOutput / m_Ki);
+          m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
     }
 
-    return MathUtils.clamp(
-        m_Kp * m_positionError + m_Ki * m_totalError + m_Kd * m_velocityError,
-        m_minimumOutput, m_maximumOutput);
+    return m_Kp * m_positionError + m_Ki * m_totalError + m_Kd * m_velocityError;
   }
 
   /**
