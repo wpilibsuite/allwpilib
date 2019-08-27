@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,7 +13,7 @@ import edu.wpi.first.hal.HAL;
 /**
  * REV Robotics SparkMax Speed Controller.
  */
-public class SparkMax extends PWMSpeedController {
+public class PWMSparkMax extends PWMSpeedController {
   /**
    * Common initialization code called by all constructors.
    *
@@ -27,7 +27,7 @@ public class SparkMax extends PWMSpeedController {
    * center of the deadband range (off) - 1.46ms = the "low end" of the deadband range - .999ms =
    * full "reverse"
    */
-  public SparkMax(final int channel) {
+  public PWMSparkMax(final int channel) {
     super(channel);
 
     setBounds(2.003, 1.55, 1.50, 1.46, .999);
@@ -36,6 +36,6 @@ public class SparkMax extends PWMSpeedController {
     setZeroLatch();
 
     HAL.report(tResourceType.kResourceType_RevSparkMaxPWM, getChannel());
-    setName("SparkMax", getChannel());
+    setName("PWMSparkMax", getChannel());
   }
 }

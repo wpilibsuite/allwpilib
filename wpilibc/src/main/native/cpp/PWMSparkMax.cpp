@@ -1,17 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc/SparkMax.h"
+#include "frc/PWMSparkMax.h"
 
 #include <hal/HAL.h>
 
 using namespace frc;
 
-SparkMax::SparkMax(int channel) : PWMSpeedController(channel) {
+PWMSparkMax::PWMSparkMax(int channel) : PWMSpeedController(channel) {
   /* Note that the SparkMax uses the following bounds for PWM values.
    *
    *   2.003ms = full "forward"
@@ -26,5 +26,5 @@ SparkMax::SparkMax(int channel) : PWMSpeedController(channel) {
   SetZeroLatch();
 
   HAL_Report(HALUsageReporting::kResourceType_RevSparkMaxPWM, GetChannel());
-  SetName("SparkMax", GetChannel());
+  SetName("PWMSparkMax", GetChannel());
 }
