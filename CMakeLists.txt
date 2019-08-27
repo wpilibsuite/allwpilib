@@ -80,7 +80,7 @@ set (LIBUV_VCPKG_REPLACE "find_package(unofficial-libuv CONFIG)")
 endif()
 
 if (USE_VCPKG_EIGEN)
-set (EIGEN_VCPKG_REPLACE "find_package(eigen3 CONFIG)")
+set (EIGEN_VCPKG_REPLACE "find_package(Eigen3 CONFIG)")
 endif()
 
 if (MSVC OR FLAT_INSTALL_WPILIB)
