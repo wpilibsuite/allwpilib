@@ -129,8 +129,8 @@ if (NOT USE_VCPKG_EIGEN)
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/eigen>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
 else()
-    find_package(eigen3 CONFIG REQUIRED)
-    target_include_directories (wpiutil PUBLIC ${EIGEN3_INCLUDE_DIRS})
+    find_package(Eigen3 CONFIG REQUIRED)
+    target_link_libraries (wpiutil Eigen3::Eigen)
 endif()
 
 if (NOT USE_VCPKG_LIBUV)
