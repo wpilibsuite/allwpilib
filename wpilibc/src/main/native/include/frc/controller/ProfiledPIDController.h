@@ -168,12 +168,15 @@ class ProfiledPIDController : public SendableBase {
   void DisableContinuousInput();
 
   /**
-   * Sets the minimum and maximum values to write.
+   * Sets the minimum and maximum values for the integrator.
    *
-   * @param minimumOutput the minimum value to write to the output
-   * @param maximumOutput the maximum value to write to the output
+   * When the cap is reached, the integrator value is added to the controller
+   * output rather than the integrator value times the integral gain.
+   *
+   * @param minimumIntegral The minimum value of the integrator.
+   * @param maximumIntegral The maximum value of the integrator.
    */
-  void SetOutputRange(double minimumOutput, double maximumOutput);
+  void SetIntegratorRange(double minimumIntegral, double maximumIntegral);
 
   /**
    * Sets the error which is considered tolerable for use with

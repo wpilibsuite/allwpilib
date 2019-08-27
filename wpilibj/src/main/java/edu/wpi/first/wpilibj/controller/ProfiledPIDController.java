@@ -210,13 +210,16 @@ public class ProfiledPIDController extends SendableBase {
   }
 
   /**
-   * Sets the minimum and maximum values to write.
+   * Sets the minimum and maximum values for the integrator.
    *
-   * @param minimumOutput the minimum value to write to the output
-   * @param maximumOutput the maximum value to write to the output
+   * <p>When the cap is reached, the integrator value is added to the controller
+   * output rather than the integrator value times the integral gain.
+   *
+   * @param minimumIntegral The minimum value of the integrator.
+   * @param maximumIntegral The maximum value of the integrator.
    */
-  public void setOutputRange(double minimumOutput, double maximumOutput) {
-    m_controller.setOutputRange(minimumOutput, maximumOutput);
+  public void setIntegratorRange(double minimumIntegral, double maximumIntegral) {
+    m_controller.setIntegratorRange(minimumIntegral, maximumIntegral);
   }
 
   /**
