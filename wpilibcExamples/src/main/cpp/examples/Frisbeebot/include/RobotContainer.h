@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <frc/XboxController.h>
+#include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/ConditionalCommand.h>
 #include <frc2/command/InstantCommand.h>
@@ -15,9 +17,6 @@
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/WaitCommand.h>
 #include <frc2/command/WaitUntilCommand.h>
-
-#include <frc/XboxController.h>
-#include <frc/smartdashboard/SendableChooser.h>
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"

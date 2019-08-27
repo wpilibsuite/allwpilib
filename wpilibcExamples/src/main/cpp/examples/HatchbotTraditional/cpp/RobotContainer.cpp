@@ -7,9 +7,8 @@
 
 #include "RobotContainer.h"
 
-#include <frc2/command/button/JoystickButton.h>
-
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <frc2/command/button/JoystickButton.h>
 
 #include "commands/DefaultDrive.h"
 #include "commands/GrabHatch.h"

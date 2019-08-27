@@ -7,14 +7,13 @@
 
 #pragma once
 
-#include <frc2/command/SubsystemBase.h>
-
 #include <frc/AnalogGyro.h>
 #include <frc/AnalogInput.h>
 #include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc2/command/SubsystemBase.h>
 
 namespace frc {
 class Joystick;
