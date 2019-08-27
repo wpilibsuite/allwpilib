@@ -14,46 +14,4 @@
 using namespace frc;
 
 CSVLogFile::CSVLogFile(wpi::StringRef filePrefix)
-    : m_logFile(filePrefix, "csv") {
-  RegisterCell(m_timestampCell);
-}
-
-void CSVLogFile::RegisterCell(CSVLogCell& cell) {
-  if (m_active) {
-    wpi::outs() << "You can't add a new cell when the spreadsheet is active: "
-                << cell.GetName() << '\n';
-  } else {
-    m_cells.push_back(&cell);
-  }
-}
-
-void CSVLogFile::Start() {
-  if (m_active) {
-    wpi::outs() << "This table has already been initialized" << '\n';
-    return;
-  }
-
-  for (const auto& cell : m_cells) {
-    m_logFile.Log("\"" + cell->GetName() + "\",");
-  }
-  m_logFile.Log("\n");
-
-  m_active = true;
-}
-
-void CSVLogFile::Periodic() {
-  if (m_active) {
-    using namespace std::chrono;
-    auto timestamp =
-        duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-    m_timestampCell.Log(timestamp.count());
-    WriteRow();
-  }
-}
-
-void CSVLogFile::WriteRow() {
-  for (const auto& cell : m_cells) {
-    m_logFile.Log("\"" + cell->GetContent() + "\",");
-  }
-  m_logFile.Log("\n");
-}
+    : m_logFile(filePrefix, "csv") {}

@@ -7,21 +7,14 @@
 
 package edu.wpi.first.wpilibj.logging;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * A CSVLogFile writes to a csv file the contents of each of its registered
- * {@link CSVLogCell}'s.
+ * A CSVLogFile writes to a csv file
  *
  * <p>For the CSVLogFile to write log informations, you must call
- * {@link #periodic()} periodically.
+ * {@link #log} periodically.
  */
 public class CSVLogFile {
   private LogFile m_logFile;
-  private final List<CSVLogCell> m_cells;
-  private final CSVLogCell m_timestampCell;
-  private boolean m_active;
 
   /**
    * Instantiate a LogFile passing in its prefix and its extension.
@@ -34,10 +27,6 @@ public class CSVLogFile {
    */
   public CSVLogFile(String filePrefix) {
     m_logFile = new LogFile(filePrefix, "csv");
-    m_cells = new ArrayList<CSVLogCell>();
-    m_timestampCell = new CSVLogCell("Timestamp (ms)");
-    m_active = false;
-    registerCell(m_timestampCell);
   }
 
   /**
@@ -47,69 +36,12 @@ public class CSVLogFile {
     this("log");
   }
 
-  /**
-   * Register a new column to be logged. You will figure this value out
-   * in {@link CSVLogCell#getContent()}.
-   *
-   * <p>A CSVLogCell can only be registered if the spreadsheet is inactive:
-   * see {@link #start()} to activate it.
-   *
-   * @param cell The CSVLogCell to register.
-   */
-  public void registerCell(CSVLogCell cell) {
-    if (m_active) {
-      System.out.println("You can't add a new cell when the spreadsheet is active: "
-          + cell.getName());
-    } else {
-      m_cells.add(cell);
-    }
+  public <ValueT> void log(ValueT value, ValueT... values) {
+    m_logFile.log(value + ", ");
+    log(values);
   }
 
-  /**
-   * Write the column headers.
-   *
-   * <p>It causes the CSVLogFile to be "active".
-   */
-  public void start() {
-    if (m_active) {
-      System.out.println("This table has already been initialized");
-      return;
-    }
-
-    for (CSVLogCell cell : m_cells) {
-      m_logFile.log("\"" + cell.getName() + "\",");
-    }
-    m_logFile.log("\n");
-
-    m_active = true;
-  }
-
-  /**
-   * Call it regularly. If the CSVLogFile is active, write a row of the file.
-   */
-  public void periodic() {
-    if (m_active) {
-      m_timestampCell.log(System.currentTimeMillis());
-      writeRow();
-    }
-  }
-
-  /**
-   * Return true if the LogFile is active.
-   *
-   * @return true if the LogFile is active.
-   */
-  public boolean isActive() {
-    return m_active;
-  }
-
-  /**
-   * Write a row of the file.
-   */
-  private void writeRow() {
-    for (CSVLogCell cell : m_cells) {
-      m_logFile.log("\"" + cell.getContent() + "\",");
-    }
-    m_logFile.log("\n");
+  private <ValueT> void log(ValueT value) {
+    m_logFile.log(value + "\n");
   }
 }

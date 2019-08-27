@@ -12,16 +12,14 @@
 
 #include <wpi/StringRef.h>
 
-#include "frc/logging/CSVLogCell.h"
 #include "frc/logging/LogFile.h"
 
 namespace frc {
 
 /**
- * A CSVLogFile writes to a csv file the contents of each of its registered
- * CSVLogCell's.
+ * A CSVLogFile writes to a csv file
  *
- * For the CSVLogFile to write log informations, you must call Periodic()
+ * For the CSVLogFile to write log informations, you must call Log()
  * periodically.
  */
 class CSVLogFile {
@@ -37,46 +35,19 @@ class CSVLogFile {
    */
   explicit CSVLogFile(wpi::StringRef filePrefix = "log");
 
-  /**
-   * Register a new column to be logged. You will figure this value out
-   * in CSVLogCell.GetContent().
-   *
-   * A CSVLogCell can only be registered if the spreadsheet is inactive:
-   * see Start() to activate it.
-   *
-   * @param cell The CSVLogCell to register.
-   */
-  void RegisterCell(CSVLogCell& cell);
-
-  /**
-   * Write the column headers.
-   *
-   * It causes the CSVLogFile to be "active".
-   */
-  void Start();
-
-  /**
-   * Call it regularly. If the CSVLogFile is active, write a row of the file.
-   */
-  void Periodic();
-
-  /**
-   * Return true if the LogFile is active.
-   *
-   * @return true if the LogFile is active.
-   */
-  bool IsActive();
+  template <typename Value, typename... Values>
+  void Log(Value value, Values... values) {
+    m_logFile.Log(std::to_string(value) + ", ");
+    Log(values);
+  }
 
  private:
-  /**
-   * Write a row of the file.
-   */
-  void WriteRow();
+  template <typename Value>
+  void Log(Value value) {
+    m_logFile.Log(std::to_string(value) + "\n");
+  }
 
   LogFile m_logFile;
-  std::vector<CSVLogCell*> m_cells;
-  CSVLogCell m_timestampCell{"Timestamp (ms)"};
-  bool m_active = false;
 };
 
 }  // namespace frc
