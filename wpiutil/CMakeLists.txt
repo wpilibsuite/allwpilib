@@ -123,6 +123,16 @@ endif()
 wpilib_target_warnings(wpiutil)
 target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS} ${ATOMIC})
 
+if (NOT USE_VCPKG_EIGEN)
+    install(DIRECTORY src/main/native/eigen/ DESTINATION "${include_dest}/wpiutil")
+    target_include_directories(wpiutil PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/eigen>
+                            $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
+else()
+    find_package(eigen3 CONFIG REQUIRED)
+    target_include_directories (wpiutil PUBLIC ${EIGEN3_INCLUDE_DIRS})
+endif()
+
 if (NOT USE_VCPKG_LIBUV)
     target_sources(wpiutil PRIVATE ${uv_native_src})
     install(DIRECTORY src/main/native/libuv/include/ DESTINATION "${include_dest}/wpiutil")
