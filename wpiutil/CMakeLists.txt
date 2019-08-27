@@ -55,7 +55,7 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-if (NOT MSVC)
+if (NOT MSVC AND NOT APPLE)
     find_library(ATOMIC NAMES atomic libatomic.so.1)
     if (ATOMIC)
         message(STATUS "Found libatomic: ${ATOMIC}")
