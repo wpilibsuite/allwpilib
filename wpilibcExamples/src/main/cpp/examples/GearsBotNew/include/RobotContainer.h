@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-
 #include <frc/Joystick.h>
+#include <frc2/command/Command.h>
 
 #include "commands/Autonomous.h"
 #include "subsystems/Claw.h"

@@ -7,10 +7,9 @@
 
 #include "RobotContainer.h"
 
+#include <frc/shuffleboard/Shuffleboard.h>
 #include <frc2/command/CommandScheduler.h>
 #include <frc2/command/button/JoystickButton.h>
-
-#include <frc/shuffleboard/Shuffleboard.h>
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here

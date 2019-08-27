@@ -7,10 +7,9 @@
 
 #pragma once
 
-#include <frc2/command/PIDSubsystem.h>
-
 #include <frc/AnalogPotentiometer.h>
 #include <frc/PWMVictorSPX.h>
+#include <frc2/command/PIDSubsystem.h>
 
 /**
  * The elevator subsystem uses PID to go to a given height. Unfortunately, in

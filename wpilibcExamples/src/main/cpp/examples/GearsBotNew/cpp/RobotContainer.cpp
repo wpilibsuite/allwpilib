@@ -7,9 +7,8 @@
 
 #include "RobotContainer.h"
 
-#include <frc2/command/button/JoystickButton.h>
-
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc2/command/button/JoystickButton.h>
 
 #include "commands/CloseClaw.h"
 #include "commands/OpenClaw.h"

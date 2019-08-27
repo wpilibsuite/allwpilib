@@ -7,11 +7,10 @@
 
 #pragma once
 
+#include <frc/XboxController.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/WaitCommand.h>
-
-#include <frc/XboxController.h>
 
 #include "Constants.h"
 

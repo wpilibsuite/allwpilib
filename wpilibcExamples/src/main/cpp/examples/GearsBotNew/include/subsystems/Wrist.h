@@ -7,10 +7,9 @@
 
 #pragma once
 
-#include <frc2/command/PIDSubsystem.h>
-
 #include <frc/AnalogPotentiometer.h>
 #include <frc/PWMVictorSPX.h>
+#include <frc2/command/PIDSubsystem.h>
 
 /**
  * The wrist subsystem is like the elevator, but with a rotational joint instead

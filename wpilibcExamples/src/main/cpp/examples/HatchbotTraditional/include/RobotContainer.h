@@ -7,10 +7,9 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-
 #include <frc/XboxController.h>
 #include <frc/smartdashboard/SendableChooser.h>
+#include <frc2/command/Command.h>
 
 #include "Constants.h"
 #include "commands/ComplexAuto.h"

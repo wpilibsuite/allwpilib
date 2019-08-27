@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include <frc2/command/SubsystemBase.h>
-
 #include <frc/DoubleSolenoid.h>
+#include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
 

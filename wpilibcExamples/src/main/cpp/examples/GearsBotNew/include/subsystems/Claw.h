@@ -7,10 +7,9 @@
 
 #pragma once
 
-#include <frc2/command/SubsystemBase.h>
-
 #include <frc/DigitalInput.h>
 #include <frc/PWMVictorSPX.h>
+#include <frc2/command/SubsystemBase.h>
 
 /**
  * The claw subsystem is a simple system with a motor for opening and closing.

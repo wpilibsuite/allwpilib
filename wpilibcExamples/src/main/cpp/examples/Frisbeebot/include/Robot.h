@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-
 #include <frc/TimedRobot.h>
+#include <frc2/command/Command.h>
 
 #include "RobotContainer.h"
 

@@ -7,12 +7,11 @@
 
 #pragma once
 
-#include <frc2/command/SubsystemBase.h>
-
 #include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
 

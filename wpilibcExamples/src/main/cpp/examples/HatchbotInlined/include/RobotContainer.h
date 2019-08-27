@@ -7,15 +7,14 @@
 
 #pragma once
 
+#include <frc/XboxController.h>
+#include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/StartEndCommand.h>
-
-#include <frc/XboxController.h>
-#include <frc/smartdashboard/SendableChooser.h>
 
 #include "Constants.h"
 #include "commands/ComplexAuto.h"
