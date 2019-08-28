@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
+import edu.wpi.first.wpilibj.examples.gearsbotnew.Robot;
 
 public class DriveTrain extends SubsystemBase {
   /**
