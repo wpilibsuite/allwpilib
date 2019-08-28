@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
-import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
+import edu.wpi.first.wpilibj.examples.gearsbotnew.Robot;
 
 /**
  * The elevator subsystem uses PID to go to a given height. Unfortunately, in it's current state PID

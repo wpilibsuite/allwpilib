@@ -231,16 +231,6 @@
     "gradlebase": "cpp"
   },
   {
-    "name": "GearsBot",
-    "description": "A fully functional example CommandBased program for WPIs GearsBot robot. This code can run on your computer if it supports simulation.",
-    "tags": [
-      "CommandBased Robot",
-      "Complete List"
-    ],
-    "foldername": "GearsBot",
-    "gradlebase": "cpp"
-  },
-  {
     "name": "GearsBotNew",
     "description": "A fully functional example CommandBased program for WPIs GearsBot robot, using the new command-based framework. This code can run on your computer if it supports simulation.",
     "tags": [
