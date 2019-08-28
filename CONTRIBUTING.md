@@ -20,7 +20,7 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
     - Substantial changes often need to have corresponding LabVIEW changes. To do this, we will work with NI on these large changes.
 - Changes should have tests.
 - Code should be well documented.
-    - This often involves ScreenSteps. To add content to ScreenSteps, we will work with you to get the appropriate articles written.
+    - This involves writing tutorials and/or usage guides for your submitted feature. These features are then hosted on the [WPILib](https://docs.wpilib.org/) documentation website. See the [frc-docs repository](https://github.com/wpilibsuite/frc-docs) for more information.
 
 ## What to Contribute
 
