@@ -7,8 +7,8 @@
 
 #pragma once
 
+#include <chrono>
 #include <string>
-#include <vector>
 
 #include <wpi/StringRef.h>
 
@@ -33,21 +33,35 @@ class CSVLogFile {
    *
    * @param filePrefix The prefix of the LogFile.
    */
-  explicit CSVLogFile(wpi::StringRef filePrefix = "log");
+  template <typename ValueT, typename... ValuesT>
+  CSVLogFile(wpi::StringRef filePrefix, ValueT value, ValuesT... values)
+      : m_logFile(filePrefix, "csv") {
+    m_logFile.Log("Timestamp (ms),");
+    LogValues(value, values...);
+  }
 
-  template <typename Value, typename... Values>
-  void Log(Value value, Values... values) {
-    m_logFile.Log(std::to_string(value) + ", ");
-    Log(values);
+  template <typename ValueT, typename... ValuesT>
+  void Log(ValueT value, ValuesT... values) {
+    using namespace std::chrono;
+    auto timestamp =
+        duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+    m_logFile.Log(std::to_string(timestamp.count()) + ",");
+
+    LogValues(value, values...);
   }
 
  private:
-  template <typename Value>
-  void Log(Value value) {
-    m_logFile.Log(std::to_string(value) + "\n");
+  template <typename ValueT, typename... ValuesT>
+  void LogValues(ValueT value, ValuesT... values) {
+    if constexpr (sizeof...(values) > 0) {
+      m_logFile.Log(std::to_string(value) + ",");
+      LogValues(values...);
+    } else {
+      m_logFile.Log(std::to_string(value) + "\n");
+    }
   }
 
   LogFile m_logFile;
-};
+};  // namespace frc
 
 }  // namespace frc

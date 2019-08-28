@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.logging;
 
+import java.util.Arrays;
+
 /**
  * A CSVLogFile writes to a csv file
  *
@@ -14,7 +16,7 @@ package edu.wpi.first.wpilibj.logging;
  * {@link #log} periodically.
  */
 public class CSVLogFile {
-  private LogFile m_logFile;
+  private final LogFile m_logFile;
 
   /**
    * Instantiate a LogFile passing in its prefix and its extension.
@@ -25,23 +27,25 @@ public class CSVLogFile {
    *
    * @param filePrefix The prefix of the LogFile.
    */
-  public CSVLogFile(String filePrefix) {
+  public CSVLogFile(String filePrefix, String... columnHeadings) {
     m_logFile = new LogFile(filePrefix, "csv");
+
+    m_logFile.log("Timestamp (ms),");
+    logValues(columnHeadings);
   }
 
-  /**
-   * Instantiate a CSVLogFile.
-   */
-  public CSVLogFile() {
-    this("log");
+  public <ValueT> void log(ValueT... values) {
+    m_logFile.log(System.currentTimeMillis() + ",");
+    logValues(values);
   }
 
-  public <ValueT> void log(ValueT value, ValueT... values) {
-    m_logFile.log(value + ", ");
-    log(values);
-  }
-
-  private <ValueT> void log(ValueT value) {
-    m_logFile.log(value + "\n");
+  private <ValueT> void logValues(ValueT... values) {
+    if (values.length > 1) {
+      m_logFile.log(values[0] + ",");
+      logValues(Arrays.copyOfRange(values, 1, values.length));
+    } else {
+      System.out.println("end");
+      m_logFile.log(values[0] + "\n");
+    }
   }
 }
