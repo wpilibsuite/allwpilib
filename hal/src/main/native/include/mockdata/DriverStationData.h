@@ -7,8 +7,6 @@
 
 #pragma once
 
-#ifndef __FRC_ROBORIO__
-
 #include "NotifyListener.h"
 #include "hal/DriverStationTypes.h"
 #include "hal/Types.h"
@@ -90,6 +88,4 @@ void HALSIM_NotifyDriverStationNewData(void);
 
 #ifdef __cplusplus
 }  // extern "C"
-#endif
-
 #endif

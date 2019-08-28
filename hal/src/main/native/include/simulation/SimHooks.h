@@ -7,8 +7,6 @@
 
 #pragma once
 
-#ifndef __FRC_ROBORIO__
-
 #include "mockdata/MockHooks.h"
 
 namespace frc {
@@ -24,5 +22,3 @@ void RestartTiming() { HALSIM_RestartTiming(); }
 
 }  // namespace sim
 }  // namespace frc
-
-#endif

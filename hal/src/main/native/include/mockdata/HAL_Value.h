@@ -7,8 +7,6 @@
 
 #pragma once
 
-#ifndef __FRC_ROBORIO__
-
 #include "hal/Types.h"
 
 /** HAL data types. */
@@ -67,5 +65,3 @@ inline HAL_Value MakeDouble(double v) {
   value.data.v_double = v;
   return value;
 }
-
-#endif

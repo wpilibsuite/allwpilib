@@ -7,8 +7,6 @@
 
 #pragma once
 
-#ifndef __FRC_ROBORIO__
-
 #include <memory>
 #include <utility>
 
@@ -114,4 +112,3 @@ class PWMSim {
 };
 }  // namespace sim
 }  // namespace frc
-#endif  // __FRC_ROBORIO__

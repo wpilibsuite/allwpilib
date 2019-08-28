@@ -7,8 +7,6 @@
 
 #pragma once
 
-#ifndef __FRC_ROBORIO__
-
 #include <functional>
 
 #include <wpi/StringRef.h>
@@ -89,5 +87,3 @@ class CallbackStore {
 };
 }  // namespace sim
 }  // namespace frc
-
-#endif

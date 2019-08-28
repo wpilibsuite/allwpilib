@@ -7,8 +7,6 @@
 
 #pragma once
 
-#ifndef __FRC_ROBORIO__
-
 #include "NotifyListener.h"
 #include "hal/Types.h"
 
@@ -60,6 +58,4 @@ void HALSIM_RegisterDIOAllCallbacks(int32_t index, HAL_NotifyCallback callback,
 
 #ifdef __cplusplus
 }  // extern "C"
-#endif
-
 #endif

@@ -7,8 +7,6 @@
 
 #pragma once
 
-#ifndef __FRC_ROBORIO__
-
 #include "NotifyListener.h"
 #include "hal/Types.h"
 
@@ -62,6 +60,4 @@ void HALSIM_RegisterSPIAccelerometerAllCallbcaks(int32_t index,
 
 #ifdef __cplusplus
 }  // extern "C"
-#endif
-
 #endif

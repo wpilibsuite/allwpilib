@@ -7,8 +7,6 @@
 
 #pragma once
 
-#ifndef __FRC_ROBORIO__
-
 #include "NotifyListener.h"
 #include "hal/Types.h"
 
@@ -48,6 +46,4 @@ void HALSIM_CancelSPIReadAutoReceivedDataCallback(int32_t index, int32_t uid);
 
 #ifdef __cplusplus
 }  // extern "C"
-#endif
-
 #endif
