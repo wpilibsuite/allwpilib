@@ -11,6 +11,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpiutil.math.MathUtils;
 
 /**
  * Implements a PID control loop.
@@ -198,7 +199,7 @@ public class PIDController extends SendableBase {
    */
   public void setSetpoint(double setpoint) {
     if (m_maximumInput > m_minimumInput) {
-      m_setpoint = clamp(setpoint, m_minimumInput, m_maximumInput);
+      m_setpoint = MathUtils.clamp(setpoint, m_minimumInput, m_maximumInput);
     } else {
       m_setpoint = setpoint;
     }
@@ -257,7 +258,7 @@ public class PIDController extends SendableBase {
 
     // Clamp setpoint to new input
     if (m_maximumInput > m_minimumInput) {
-      m_setpoint = clamp(m_setpoint, m_minimumInput, m_maximumInput);
+      m_setpoint = MathUtils.clamp(m_setpoint, m_minimumInput, m_maximumInput);
     }
   }
 
@@ -375,11 +376,11 @@ public class PIDController extends SendableBase {
     m_velocityError = (m_positionError - m_prevError) / m_period;
 
     if (m_Ki != 0) {
-      m_totalError = clamp(m_totalError + m_positionError * m_period, m_minimumOutput / m_Ki,
-          m_maximumOutput / m_Ki);
+      m_totalError = MathUtils.clamp(m_totalError + m_positionError * m_period,
+          m_minimumOutput / m_Ki, m_maximumOutput / m_Ki);
     }
 
-    return clamp(
+    return MathUtils.clamp(
         m_Kp * m_positionError + m_Ki * m_totalError + m_Kd * m_velocityError,
         m_minimumOutput, m_maximumOutput);
   }
@@ -420,9 +421,5 @@ public class PIDController extends SendableBase {
       }
     }
     return error;
-  }
-
-  private static double clamp(double value, double low, double high) {
-    return Math.max(low, Math.min(value, high));
   }
 }

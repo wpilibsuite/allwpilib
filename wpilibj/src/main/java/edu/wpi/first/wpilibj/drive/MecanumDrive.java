@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,6 +14,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpiutil.math.MathUtils;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -156,10 +157,10 @@ public class MecanumDrive extends RobotDriveBase {
       m_reported = true;
     }
 
-    ySpeed = limit(ySpeed);
+    ySpeed = MathUtils.clamp(ySpeed, -1.0, 1.0);
     ySpeed = applyDeadband(ySpeed, m_deadband);
 
-    xSpeed = limit(xSpeed);
+    xSpeed = MathUtils.clamp(xSpeed, -1.0, 1.0);
     xSpeed = applyDeadband(xSpeed, m_deadband);
 
     // Compensate for gyro angle.

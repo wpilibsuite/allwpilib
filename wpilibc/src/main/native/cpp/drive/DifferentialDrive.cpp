@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -36,10 +36,10 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
     reported = true;
   }
 
-  xSpeed = Limit(xSpeed);
+  xSpeed = std::clamp(xSpeed, -1.0, 1.0);
   xSpeed = ApplyDeadband(xSpeed, m_deadband);
 
-  zRotation = Limit(zRotation);
+  zRotation = std::clamp(zRotation, -1.0, 1.0);
   zRotation = ApplyDeadband(zRotation, m_deadband);
 
   // Square the inputs (while preserving the sign) to increase fine control
@@ -75,9 +75,9 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
     }
   }
 
-  m_leftMotor.Set(Limit(leftMotorOutput) * m_maxOutput);
-  m_rightMotor.Set(Limit(rightMotorOutput) * m_maxOutput *
-                   m_rightSideInvertMultiplier);
+  m_leftMotor.Set(std::clamp(leftMotorOutput, -1.0, 1.0) * m_maxOutput);
+  double maxOutput = m_maxOutput * m_rightSideInvertMultiplier;
+  m_rightMotor.Set(std::clamp(rightMotorOutput, -1.0, 1.0) * maxOutput);
 
   Feed();
 }
@@ -91,10 +91,10 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
     reported = true;
   }
 
-  xSpeed = Limit(xSpeed);
+  xSpeed = std::clamp(xSpeed, -1.0, 1.0);
   xSpeed = ApplyDeadband(xSpeed, m_deadband);
 
-  zRotation = Limit(zRotation);
+  zRotation = std::clamp(zRotation, -1.0, 1.0);
   zRotation = ApplyDeadband(zRotation, m_deadband);
 
   double angularPower;
@@ -102,8 +102,9 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
 
   if (isQuickTurn) {
     if (std::abs(xSpeed) < m_quickStopThreshold) {
-      m_quickStopAccumulator = (1 - m_quickStopAlpha) * m_quickStopAccumulator +
-                               m_quickStopAlpha * Limit(zRotation) * 2;
+      m_quickStopAccumulator =
+          (1 - m_quickStopAlpha) * m_quickStopAccumulator +
+          m_quickStopAlpha * std::clamp(zRotation, -1.0, 1.0) * 2;
     }
     overPower = true;
     angularPower = zRotation;
@@ -164,10 +165,10 @@ void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
     reported = true;
   }
 
-  leftSpeed = Limit(leftSpeed);
+  leftSpeed = std::clamp(leftSpeed, -1.0, 1.0);
   leftSpeed = ApplyDeadband(leftSpeed, m_deadband);
 
-  rightSpeed = Limit(rightSpeed);
+  rightSpeed = std::clamp(rightSpeed, -1.0, 1.0);
   rightSpeed = ApplyDeadband(rightSpeed, m_deadband);
 
   // Square the inputs (while preserving the sign) to increase fine control
