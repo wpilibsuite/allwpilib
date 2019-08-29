@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.gearsbotnew.commands;
+package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
 
 /**
  * Have the robot drive tank style.

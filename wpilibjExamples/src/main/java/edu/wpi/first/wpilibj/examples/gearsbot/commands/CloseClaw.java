@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.gearsbotnew.commands;
+package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import edu.wpi.first.wpilibj.examples.gearsbotnew.Robot;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Claw;
+import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
 
 /**
  * Closes the claw for one second. Real robots should use sensors, stalling motors is BAD!

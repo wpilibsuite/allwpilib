@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.gearsbotnew.commands;
+package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Wrist;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
 
 
 /**

@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.gearsbotnew;
+package edu.wpi.first.wpilibj.examples.gearsbot;
 
 import edu.wpi.first.wpilibj.RobotBase;
 
