@@ -51,10 +51,10 @@ void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
     reported = true;
   }
 
-  ySpeed = Limit(ySpeed);
+  ySpeed = std::clamp(ySpeed, -1.0, 1.0);
   ySpeed = ApplyDeadband(ySpeed, m_deadband);
 
-  xSpeed = Limit(xSpeed);
+  xSpeed = std::clamp(xSpeed, -1.0, 1.0);
   xSpeed = ApplyDeadband(xSpeed, m_deadband);
 
   // Compensate for gyro angle.

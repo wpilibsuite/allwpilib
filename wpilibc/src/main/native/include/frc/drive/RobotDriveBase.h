@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -75,11 +75,6 @@ class RobotDriveBase : public MotorSafety, public SendableBase {
   void GetDescription(wpi::raw_ostream& desc) const override = 0;
 
  protected:
-  /**
-   * Limit motor values to the -1.0 to +1.0 range.
-   */
-  double Limit(double number);
-
   /**
    * Returns 0.0 if the given value is within the specified range around zero.
    * The remaining range between the deadband and 1.0 is scaled from 0.0 to 1.0.
