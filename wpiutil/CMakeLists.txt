@@ -126,7 +126,7 @@ target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS} ${ATOMIC})
 if (NOT USE_VCPKG_EIGEN)
     install(DIRECTORY src/main/native/eigen/ DESTINATION "${include_dest}/wpiutil")
     target_include_directories(wpiutil PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/eigen>
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/eigeninclude>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
 else()
     find_package(Eigen3 CONFIG REQUIRED)
