@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.gearsbotnew.commands;
+package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 
-import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
 
 
 /**

@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.gearsbotnew;
+package edu.wpi.first.wpilibj.examples.gearsbot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -16,19 +16,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-import edu.wpi.first.wpilibj.examples.gearsbotnew.commands.Autonomous;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.commands.CloseClaw;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.commands.OpenClaw;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.commands.Pickup;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.commands.Place;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.commands.PrepareToPickup;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.commands.SetElevatorSetpoint;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.commands.SetWristSetpoint;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.commands.TankDrive;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Claw;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.DriveTrain;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Elevator;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Wrist;
+import edu.wpi.first.wpilibj.examples.gearsbot.commands.Autonomous;
+import edu.wpi.first.wpilibj.examples.gearsbot.commands.CloseClaw;
+import edu.wpi.first.wpilibj.examples.gearsbot.commands.OpenClaw;
+import edu.wpi.first.wpilibj.examples.gearsbot.commands.Pickup;
+import edu.wpi.first.wpilibj.examples.gearsbot.commands.Place;
+import edu.wpi.first.wpilibj.examples.gearsbot.commands.PrepareToPickup;
+import edu.wpi.first.wpilibj.examples.gearsbot.commands.SetElevatorSetpoint;
+import edu.wpi.first.wpilibj.examples.gearsbot.commands.SetWristSetpoint;
+import edu.wpi.first.wpilibj.examples.gearsbot.commands.TankDrive;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a

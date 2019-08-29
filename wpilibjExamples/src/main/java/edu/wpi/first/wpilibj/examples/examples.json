@@ -221,12 +221,12 @@
     ,"mainclass": "Main"
   },
   {
-    "name": "GearsBot (New)",
+    "name": "GearsBot",
     "description": "A fully functional example CommandBased program for WPIs GearsBot robot, ported to the new CommandBased library. This code can run on your computer if it supports simulation.",
     "tags": [
       "Complete Robot"
     ],
-    "foldername": "gearsbotnew",
+    "foldername": "gearsbot",
     "gradlebase": "java",
     "mainclass": "Main"
   },

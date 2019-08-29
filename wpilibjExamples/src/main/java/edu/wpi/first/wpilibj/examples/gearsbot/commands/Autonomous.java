@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.gearsbotnew.commands;
+package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Claw;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.DriveTrain;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Elevator;
-import edu.wpi.first.wpilibj.examples.gearsbotnew.subsystems.Wrist;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
 
 /**
  * The main autonomous command to pickup and deliver the soda to the box.
