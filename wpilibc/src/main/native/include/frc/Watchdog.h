@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,9 +12,11 @@
 #include <utility>
 
 #include <hal/cpp/fpga_clock.h>
+#include <units/units.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringMap.h>
 #include <wpi/StringRef.h>
+#include <wpi/deprecated.h>
 
 namespace frc {
 
@@ -36,10 +38,25 @@ class Watchdog {
    *                 resolution.
    * @param callback This function is called when the timeout expires.
    */
+  WPI_DEPRECATED("Use unit-safe version instead")
   Watchdog(double timeout, std::function<void()> callback);
 
+  /**
+   * Watchdog constructor.
+   *
+   * @param timeout  The watchdog's timeout in seconds with microsecond
+   *                 resolution.
+   * @param callback This function is called when the timeout expires.
+   */
+  Watchdog(units::second_t timeout, std::function<void()> callback);
+
   template <typename Callable, typename Arg, typename... Args>
+  WPI_DEPRECATED("Use unit-safe version instead")
   Watchdog(double timeout, Callable&& f, Arg&& arg, Args&&... args)
+      : Watchdog(units::second_t{timeout}, arg, args...) {}
+
+  template <typename Callable, typename Arg, typename... Args>
+  Watchdog(units::second_t timeout, Callable&& f, Arg&& arg, Args&&... args)
       : Watchdog(timeout,
                  std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
                            std::forward<Args>(args)...)) {}
@@ -60,7 +77,16 @@ class Watchdog {
    * @param timeout The watchdog's timeout in seconds with microsecond
    *                resolution.
    */
+  WPI_DEPRECATED("Use unit-safe version instead")
   void SetTimeout(double timeout);
+
+  /**
+   * Sets the watchdog's timeout.
+   *
+   * @param timeout The watchdog's timeout in seconds with microsecond
+   *                resolution.
+   */
+  void SetTimeout(units::second_t timeout);
 
   /**
    * Returns the watchdog's timeout in seconds.
@@ -119,13 +145,13 @@ class Watchdog {
   static constexpr std::chrono::milliseconds kMinPrintPeriod{1000};
 
   hal::fpga_clock::time_point m_startTime;
-  std::chrono::microseconds m_timeout;
+  std::chrono::nanoseconds m_timeout;
   hal::fpga_clock::time_point m_expirationTime;
   std::function<void()> m_callback;
   hal::fpga_clock::time_point m_lastTimeoutPrintTime = hal::fpga_clock::epoch();
   hal::fpga_clock::time_point m_lastEpochsPrintTime = hal::fpga_clock::epoch();
 
-  wpi::StringMap<std::chrono::microseconds> m_epochs;
+  wpi::StringMap<std::chrono::nanoseconds> m_epochs;
   bool m_isExpired = false;
 
   bool m_suppressTimeoutMessage = false;

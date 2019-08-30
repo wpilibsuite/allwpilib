@@ -63,7 +63,7 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
   hal::Handle<HAL_NotifierHandle> m_notifier;
 
   // The absolute expiration time
-  double m_expirationTime = 0;
+  units::second_t m_expirationTime{0};
 
   /**
    * Update the HAL alarm time.

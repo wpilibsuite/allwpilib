@@ -25,7 +25,7 @@ void TimedRobot::StartCompetition() {
   // Tell the DS that the robot is ready to be enabled
   HAL_ObserveUserProgramStarting();
 
-  m_expirationTime = Timer::GetFPGATimestamp() + m_period;
+  m_expirationTime = units::second_t{Timer::GetFPGATimestamp()} + m_period;
   UpdateAlarm();
 
   // Loop forever, calling the appropriate mode-dependent function
