@@ -136,19 +136,19 @@ public class Trajectory {
   @SuppressWarnings("MemberName")
   public static class State {
     // The time elapsed since the beginning of the trajectory.
-    double timeSeconds;
+    public double timeSeconds;
 
     // The speed at that point of the trajectory.
-    double velocityMetersPerSecond;
+    public double velocityMetersPerSecond;
 
     // The acceleration at that point of the trajectory.
-    double accelerationMetersPerSecondSq;
+    public double accelerationMetersPerSecondSq;
 
     // The pose at that point of the trajectory.
-    Pose2d poseMeters;
+    public Pose2d poseMeters;
 
     // The curvature at that point of the trajectory.
-    double curvatureRadPerMeter;
+    public double curvatureRadPerMeter;
 
     public State() {
       poseMeters = new Pose2d();
