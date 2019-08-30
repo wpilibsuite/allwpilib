@@ -12,9 +12,16 @@
 
 #include <units/units.h>
 
-#include "frc/spline/QuinticHermiteSpline.h"
+#include "frc/geometry/Pose2d.h"
 
 namespace frc {
+
+/**
+ * Define a unit for curvature.
+ */
+using curvature_t = units::unit_t<
+    units::compound_unit<units::radian, units::inverse<units::meter>>>;
+
 /**
  * Represents a time-parameterized trajectory. The trajectory contains of
  * various States that represent the pose, curvature, time elapsed, velocity,
