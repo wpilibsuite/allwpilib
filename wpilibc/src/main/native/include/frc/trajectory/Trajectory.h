@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <algorithm>
 #include <vector>
 
 #include <units/units.h>
@@ -99,7 +98,7 @@ class Trajectory {
    */
   template <typename T>
   static T Lerp(const T& startValue, const T& endValue, const double t) {
-    return startValue + (endValue - startValue) * std::clamp(t, 0.0, 1.0);
+    return startValue + (endValue - startValue) * t;
   }
 };
 }  // namespace frc
