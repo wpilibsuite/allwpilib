@@ -8,7 +8,8 @@
 #pragma once
 
 #include <chrono>
-#include <sstream>
+#include <string>
+#include <type_traits>
 
 #include <wpi/StringRef.h>
 
@@ -33,15 +34,16 @@ class CSVLogFile {
    *
    * @param filePrefix The prefix of the LogFile.
    */
-  template <typename ValueT, typename... ValuesT>
-  CSVLogFile(wpi::StringRef filePrefix, ValueT value, ValuesT... values)
+  template <typename Value, typename... Values>
+  CSVLogFile(wpi::StringRef filePrefix, Value columnHeading,
+             Values... columnHeadings)
       : m_logFile(filePrefix, "csv") {
     m_logFile.Log("Timestamp (ms),");
-    LogValues(value, values...);
+    LogValues(columnHeading, columnHeadings...);
   }
 
-  template <typename ValueT, typename... ValuesT>
-  void Log(ValueT value, ValuesT... values) {
+  template <typename Value, typename... Values>
+  void Log(Value value, Values... values) {
     using namespace std::chrono;
     auto timestamp =
         duration_cast<milliseconds>(system_clock::now().time_since_epoch());
@@ -51,15 +53,18 @@ class CSVLogFile {
   }
 
  private:
-  template <typename ValueT, typename... ValuesT>
-  void LogValues(ValueT value, ValuesT... values) {
-    std::stringstream stringConverter;
-    stringConverter << value;
+  template <typename Value, typename... Values>
+  void LogValues(Value value, Values... values) {
+    if constexpr (std::is_convertible_v<Value, wpi::StringRef>) {
+      m_logFile.Log(wpi::Twine("\"") + value + "\"");
+    } else {
+      m_logFile.Log(std::to_string(value));
+    }
     if constexpr (sizeof...(values) > 0) {
-      m_logFile.Log(stringConverter.str() + ",");
+      m_logFile.Log(",");
       LogValues(values...);
     } else {
-      m_logFile.Log(stringConverter.str() + "\n");
+      m_logFile.Log("\n");
     }
   }
 
