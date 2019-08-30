@@ -8,7 +8,7 @@
 #pragma once
 
 #include <chrono>
-#include <string>
+#include <sstream>
 
 #include <wpi/StringRef.h>
 
@@ -53,15 +53,17 @@ class CSVLogFile {
  private:
   template <typename ValueT, typename... ValuesT>
   void LogValues(ValueT value, ValuesT... values) {
+    std::stringstream stringConverter;
+    stringConverter << value;
     if constexpr (sizeof...(values) > 0) {
-      m_logFile.Log(std::to_string(value) + ",");
+      m_logFile.Log(stringConverter.str() + ",");
       LogValues(values...);
     } else {
-      m_logFile.Log(std::to_string(value) + "\n");
+      m_logFile.Log(stringConverter.str() + "\n");
     }
   }
 
   LogFile m_logFile;
-};  // namespace frc
+};
 
 }  // namespace frc
