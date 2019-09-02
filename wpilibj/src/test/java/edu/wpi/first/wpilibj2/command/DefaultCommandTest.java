@@ -27,6 +27,8 @@ class DefaultCommandTest extends CommandTestBase {
     scheduler.run();
 
     assertTrue(scheduler.isScheduled(defaultCommand));
+
+    scheduler.close();
   }
 
   @Test
@@ -52,6 +54,8 @@ class DefaultCommandTest extends CommandTestBase {
 
     assertTrue(scheduler.isScheduled(defaultCommand));
     assertFalse(scheduler.isScheduled(interrupter));
+
+    scheduler.close();
   }
 
   @Test
@@ -79,5 +83,7 @@ class DefaultCommandTest extends CommandTestBase {
     assertTrue(scheduler.isScheduled(defaultCommand));
 
     verify(defaultCommand).end(true);
+
+    scheduler.close();
   }
 }

@@ -100,16 +100,16 @@ class LinearFilterTest {
   static Stream<Arguments> outputFilterProvider() {
     return Stream.of(
         arguments(LinearFilter.singlePoleIIR(kSinglePoleIIRTimeConstant, kFilterStep),
-            (DoubleFunction) LinearFilterTest::getData,
+            (DoubleFunction<Double>) LinearFilterTest::getData,
             kSinglePoleIIRExpectedOutput),
         arguments(LinearFilter.highPass(kHighPassTimeConstant, kFilterStep),
-            (DoubleFunction) LinearFilterTest::getData,
+            (DoubleFunction<Double>) LinearFilterTest::getData,
             kHighPassExpectedOutput),
         arguments(LinearFilter.movingAverage(kMovAvgTaps),
-            (DoubleFunction) LinearFilterTest::getData,
+            (DoubleFunction<Double>) LinearFilterTest::getData,
             kMovAvgExpectedOutput),
         arguments(LinearFilter.movingAverage(kMovAvgTaps),
-            (DoubleFunction) LinearFilterTest::getPulseData,
+            (DoubleFunction<Double>) LinearFilterTest::getPulseData,
             0.0)
     );
   }

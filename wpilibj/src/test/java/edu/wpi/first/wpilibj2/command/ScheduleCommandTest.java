@@ -27,5 +27,7 @@ class ScheduleCommandTest extends CommandTestBase {
 
     verify(command1).schedule();
     verify(command2).schedule();
+
+    scheduler.close();
   }
 }

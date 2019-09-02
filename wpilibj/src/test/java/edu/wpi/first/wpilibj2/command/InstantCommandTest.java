@@ -26,5 +26,7 @@ class InstantCommandTest extends CommandTestBase {
 
     assertTrue(cond.getCondition());
     assertFalse(scheduler.isScheduled(command));
+
+    scheduler.close();
   }
 }

@@ -22,5 +22,7 @@ class PerpetualCommandTest extends CommandTestBase {
     scheduler.run();
 
     assertTrue(scheduler.isScheduled(command));
+
+    scheduler.close();
   }
 }

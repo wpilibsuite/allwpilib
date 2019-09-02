@@ -33,5 +33,7 @@ class PrintCommandTest extends CommandTestBase {
     assertEquals(testOut.toString(), "Test!" + System.lineSeparator());
 
     System.setOut(originalOut);
+
+    scheduler.close();
   }
 }

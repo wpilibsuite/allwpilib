@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.UtilityClassTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class SmartDashboardTest extends UtilityClassTest {
+class SmartDashboardTest extends UtilityClassTest<SmartDashboard> {
   private final NetworkTable m_table = NetworkTableInstance.getDefault().getTable("SmartDashboard");
 
   SmartDashboardTest() {

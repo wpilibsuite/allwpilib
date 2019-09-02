@@ -37,6 +37,8 @@ class WaitCommandTest extends CommandTestBase {
     scheduler.run();
 
     assertFalse(scheduler.isScheduled(waitCommand));
+
+    scheduler.close();
   }
 
   @Test
@@ -63,5 +65,7 @@ class WaitCommandTest extends CommandTestBase {
     verify(command1).end(true);
     verify(command1, never()).end(false);
     assertFalse(scheduler.isScheduled(timeout));
+
+    scheduler.close();
   }
 }

@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,11 +108,12 @@ public abstract class AbstractTestSuite {
       if (areAnySuperClassesOfTypeAbstractTestSuite(c)) {
         // Create a new instance of this class so that we can retrieve its data
         try {
-          AbstractTestSuite suite = (AbstractTestSuite) c.newInstance();
+          AbstractTestSuite suite = (AbstractTestSuite) c.getDeclaredConstructor().newInstance();
           // Add the tests from this suite that match the regex to the list of
           // tests to run
           runningList = suite.getAllContainedBaseTests(runningList);
-        } catch (InstantiationException | IllegalAccessException ex) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException
+            | IllegalAccessException ex) {
           // This shouldn't happen unless the constructor is changed in some
           // way.
           logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.",
@@ -200,13 +202,14 @@ public abstract class AbstractTestSuite {
           if (areAnySuperClassesOfTypeAbstractTestSuite(c)) {
             // Create a new instance of this class so that we can retrieve its
             // data.
-            suite = (AbstractTestSuite) c.newInstance();
+            suite = (AbstractTestSuite) c.getDeclaredConstructor().newInstance();
             // Add the tests from this suite that match the regex to the list of
             // tests to run
             runningList = suite.getSuiteOrTestMatchingRegex(regex, runningList);
           }
 
-        } catch (InstantiationException | IllegalAccessException ex) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException
+            | IllegalAccessException ex) {
           // This shouldn't happen unless the constructor is changed in some
           // way.
           logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.",

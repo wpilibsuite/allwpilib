@@ -41,6 +41,8 @@ class CommandGroupErrorTest extends CommandTestBase {
 
     assertThrows(IllegalArgumentException.class,
         () -> scheduler.schedule(command1));
+
+    scheduler.close();
   }
 
   @Test

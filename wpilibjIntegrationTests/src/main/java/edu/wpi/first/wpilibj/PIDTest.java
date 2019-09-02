@@ -48,7 +48,7 @@ public class PIDTest extends AbstractComsSetup {
   private static final double outputRange = 0.25;
 
   private PIDController m_controller = null;
-  private static MotorEncoderFixture me = null;
+  private static MotorEncoderFixture<?> me = null;
 
   @SuppressWarnings({"MemberName", "EmptyLineSeparator", "MultipleVariableDeclarations"})
   private final Double k_p, k_i, k_d;
@@ -60,7 +60,7 @@ public class PIDTest extends AbstractComsSetup {
 
 
   @SuppressWarnings({"ParameterName", "JavadocMethod"})
-  public PIDTest(Double p, Double i, Double d, MotorEncoderFixture mef) {
+  public PIDTest(Double p, Double i, Double d, MotorEncoderFixture<?> mef) {
     logger.fine("Constructor with: " + mef.getType());
     if (PIDTest.me != null && !PIDTest.me.equals(mef)) {
       PIDTest.me.teardown();
@@ -166,6 +166,8 @@ public class PIDTest extends AbstractComsSetup {
     pidRunner.stop();
     assertTrue(pidData() + "Was not on Target. Controller Error: "
         + m_controller.getPositionError(), m_controller.atSetpoint());
+
+    pidRunner.close();
   }
 
   private String pidData() {

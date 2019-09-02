@@ -36,6 +36,8 @@ class ConditionalCommandTest extends CommandTestBase {
     verify(command2, never()).initialize();
     verify(command2, never()).execute();
     verify(command2, never()).end(false);
+
+    scheduler.close();
   }
 
   @Test
@@ -61,5 +63,7 @@ class ConditionalCommandTest extends CommandTestBase {
 
     verify(command1).end(true);
     verify(command2, never()).end(true);
+
+    scheduler.close();
   }
 }

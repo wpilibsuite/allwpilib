@@ -15,7 +15,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class ErrorMessagesTest extends UtilityClassTest {
+class ErrorMessagesTest extends UtilityClassTest<ErrorMessages> {
   ErrorMessagesTest() {
     super(ErrorMessages.class);
   }
