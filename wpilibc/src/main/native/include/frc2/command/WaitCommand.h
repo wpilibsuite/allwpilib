@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include <memory>
-
+#include <units/units.h>
 #include <wpi/Twine.h>
 
 #include "CommandBase.h"
@@ -27,9 +26,9 @@ class WaitCommand : public CommandHelper<CommandBase, WaitCommand> {
    * Creates a new WaitCommand.  This command will do nothing, and end after the
    * specified duration.
    *
-   * @param seconds the time to wait, in seconds
+   * @param duration the time to wait
    */
-  explicit WaitCommand(double seconds);
+  explicit WaitCommand(units::second_t duration);
 
   WaitCommand(WaitCommand&& other) = default;
 
@@ -44,9 +43,9 @@ class WaitCommand : public CommandHelper<CommandBase, WaitCommand> {
   bool RunsWhenDisabled() const override;
 
  protected:
-  std::unique_ptr<frc::Timer> m_timer;
+  frc::Timer m_timer;
 
  private:
-  double m_duration;
+  units::second_t m_duration;
 };
 }  // namespace frc2

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <units/units.h>
+
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide
  * numerical or bool constants.  This should not be used for any other purpose.
@@ -64,8 +66,8 @@ const double kFeederSpeed = .5;
 }  // namespace ShooterConstants
 
 namespace AutoConstants {
-const double kAutoTimeoutSeconds = 12;
-const double kAutoShootTimeSeconds = 7;
+constexpr auto kAutoTimeoutSeconds = 12_s;
+constexpr auto kAutoShootTimeSeconds = 7_s;
 }  // namespace AutoConstants
 
 namespace OIConstants {

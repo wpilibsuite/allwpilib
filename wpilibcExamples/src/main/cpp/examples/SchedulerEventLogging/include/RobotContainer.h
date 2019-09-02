@@ -36,7 +36,7 @@ class RobotContainer {
   // Three commands that do nothing; for demonstration purposes.
   frc2::InstantCommand m_instantCommand1;
   frc2::InstantCommand m_instantCommand2;
-  frc2::WaitCommand m_waitCommand{5};
+  frc2::WaitCommand m_waitCommand{5_s};
 
   void ConfigureButtonBindings();
 };

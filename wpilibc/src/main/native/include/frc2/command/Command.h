@@ -14,6 +14,7 @@
 #include <memory>
 #include <string>
 
+#include <units/units.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
@@ -103,10 +104,10 @@ class Command : public frc::ErrorBase {
    * interrupted and un-scheduled.  Note that the timeout only applies to the
    * command returned by this method; the calling command is not itself changed.
    *
-   * @param seconds the timeout duration
+   * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  ParallelRaceGroup WithTimeout(double seconds) &&;
+  ParallelRaceGroup WithTimeout(units::second_t duration) &&;
 
   /**
    * Decorates this command with an interrupt condition.  If the specified
