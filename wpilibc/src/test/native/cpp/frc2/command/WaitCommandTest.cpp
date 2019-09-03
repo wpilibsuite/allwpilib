@@ -15,7 +15,7 @@ class WaitCommandTest : public CommandTestBase {};
 TEST_F(WaitCommandTest, WaitCommandScheduleTest) {
   CommandScheduler scheduler = GetScheduler();
 
-  WaitCommand command(.1);
+  WaitCommand command(.1_s);
 
   scheduler.Schedule(&command);
   scheduler.Run();

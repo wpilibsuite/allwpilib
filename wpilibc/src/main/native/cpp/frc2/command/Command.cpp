@@ -28,9 +28,9 @@ void Command::Initialize() {}
 void Command::Execute() {}
 void Command::End(bool interrupted) {}
 
-ParallelRaceGroup Command::WithTimeout(double seconds) && {
+ParallelRaceGroup Command::WithTimeout(units::second_t duration) && {
   std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(std::make_unique<WaitCommand>(seconds));
+  temp.emplace_back(std::make_unique<WaitCommand>(duration));
   temp.emplace_back(std::move(*this).TransferOwnership());
   return ParallelRaceGroup(std::move(temp));
 }
