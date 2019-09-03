@@ -161,7 +161,7 @@ class IterativeRobotBase : public RobotBase {
 
   void LoopFunc();
 
-  double m_period;
+  units::second_t m_period;
 
  private:
   enum class Mode { kNone, kDisabled, kAutonomous, kTeleop, kTest };
