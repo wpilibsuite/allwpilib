@@ -116,20 +116,3 @@ bool CAN::ReadPacketTimeout(int apiId, int timeoutMs, CANData* data) {
     return true;
   }
 }
-
-bool CAN::ReadPeriodicPacket(int apiId, int timeoutMs, int periodMs,
-                             CANData* data) {
-  int32_t status = 0;
-  HAL_ReadCANPeriodicPacket(m_handle, apiId, data->data, &data->length,
-                            &data->timestamp, timeoutMs, periodMs, &status);
-  if (status == HAL_CAN_TIMEOUT ||
-      status == HAL_ERR_CANSessionMux_MessageNotFound) {
-    return false;
-  }
-  if (status != 0) {
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-    return false;
-  } else {
-    return true;
-  }
-}
