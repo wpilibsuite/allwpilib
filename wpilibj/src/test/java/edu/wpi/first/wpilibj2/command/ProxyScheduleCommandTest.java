@@ -26,6 +26,8 @@ class ProxyScheduleCommandTest extends CommandTestBase {
     scheduler.schedule(scheduleCommand);
 
     verify(command1).schedule();
+
+    scheduler.close();
   }
 
   @Test
@@ -47,5 +49,7 @@ class ProxyScheduleCommandTest extends CommandTestBase {
     scheduler.run();
     scheduler.run();
     assertFalse(scheduler.isScheduled(scheduleCommand));
+
+    scheduler.close();
   }
 }

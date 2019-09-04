@@ -61,6 +61,8 @@ class WatchdogTest {
 
     assertEquals(1, watchdogCounter.get(),
         "Watchdog either didn't trigger or triggered more than once");
+
+    watchdog.close();
   }
 
   @Test
@@ -84,6 +86,8 @@ class WatchdogTest {
     watchdog.disable();
 
     assertEquals(0, watchdogCounter.get(), "Watchdog triggered early");
+
+    watchdog.close();
   }
 
   @Test
@@ -112,6 +116,8 @@ class WatchdogTest {
 
     assertEquals(1, watchdogCounter.get(),
         "Watchdog either didn't trigger or triggered more than once");
+
+    watchdog.close();
   }
 
   @Test
@@ -134,6 +140,8 @@ class WatchdogTest {
 
     watchdog.reset();
     assertFalse(watchdog.isExpired());
+
+    watchdog.close();
   }
 
   @Test
@@ -179,6 +187,8 @@ class WatchdogTest {
     watchdog.disable();
 
     assertEquals(0, watchdogCounter.get(), "Watchdog triggered early");
+
+    watchdog.close();
   }
 
   @Test
@@ -211,5 +221,8 @@ class WatchdogTest {
     assertEquals(1, watchdogCounter1.get(),
         "Watchdog either didn't trigger or triggered more than once");
     assertEquals(0, watchdogCounter2.get(), "Watchdog triggered early");
+
+    watchdog1.close();
+    watchdog2.close();
   }
 }

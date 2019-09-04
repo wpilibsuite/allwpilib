@@ -27,6 +27,8 @@ class SchedulerTest extends CommandTestBase {
     scheduler.run();
 
     assertEquals(counter.m_counter, 3);
+
+    scheduler.close();
   }
 
   @Test
@@ -43,6 +45,8 @@ class SchedulerTest extends CommandTestBase {
     scheduler.cancel(command);
 
     assertEquals(counter.m_counter, 1);
+
+    scheduler.close();
   }
 
   @Test
@@ -53,5 +57,7 @@ class SchedulerTest extends CommandTestBase {
 
     scheduler.registerSubsystem(system);
     assertDoesNotThrow(() -> scheduler.unregisterSubsystem(system));
+
+    scheduler.close();
   }
 }
