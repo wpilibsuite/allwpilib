@@ -111,33 +111,6 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
     return taskList
 }
 
-ext.createAllCombined = { list, name, base, type, project ->
-    def outputsFolder = file("$project.buildDir/outputs")
-
-    def task = project.tasks.create(base + "-all", type) {
-        description = "Creates component archive for all classifiers"
-        destinationDir = outputsFolder
-        classifier = "all"
-        baseName = base
-        duplicatesStrategy = 'exclude'
-
-        list.each {
-            if (it.name.endsWith('debug')) return
-            from project.zipTree(it.archivePath)
-            dependsOn it
-        }
-    }
-
-    project.build.dependsOn task
-
-    project.artifacts {
-        task
-    }
-
-    return task
-
-}
-
 ext.includeStandardZipFormat = { task, value ->
     value.each { binary ->
         if (binary.buildable) {

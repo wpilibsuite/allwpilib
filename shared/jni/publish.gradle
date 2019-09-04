@@ -88,11 +88,6 @@ model {
             }
         })
 
-        def allJniTask
-        if (!project.hasProperty('jenkinsBuild')) {
-            allJniTask = createAllCombined(jniTaskList, "${nativeName}JNI", jniBaseName, Jar, project)
-        }
-
         publications {
             cpp(MavenPublication) {
                 taskList.each {
@@ -108,10 +103,6 @@ model {
             jni(MavenPublication) {
                 jniTaskList.each {
                     artifact it
-                }
-
-                if (!project.hasProperty('jenkinsBuild')) {
-                    artifact allJniTask
                 }
 
                 artifactId = "${baseArtifactId}-jni"
