@@ -20,7 +20,7 @@ TEST_F(NotifierCommandTest, NotifierCommandScheduleTest) {
 
   int counter = 0;
 
-  NotifierCommand command([&counter] { counter++; }, 0.01, {});
+  NotifierCommand command([&counter] { counter++; }, 0.01_s, {});
 
   scheduler.Schedule(&command);
   std::this_thread::sleep_for(std::chrono::milliseconds(250));
