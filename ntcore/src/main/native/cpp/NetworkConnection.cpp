@@ -140,7 +140,7 @@ void NetworkConnection::ReadThreadMain() {
                      decoder.set_proto_rev(m_proto_rev);
                      auto msg = Message::Read(decoder, m_get_entry_type);
                      if (!msg && decoder.error())
-                       DEBUG("error reading in handshake: " << decoder.error());
+                       DEBUG0("error reading in handshake: " << decoder.error());
                      return msg;
                    },
                    [&](wpi::ArrayRef<std::shared_ptr<Message>> msgs) {

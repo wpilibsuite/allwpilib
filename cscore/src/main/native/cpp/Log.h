@@ -17,7 +17,7 @@
 #define WARNING(x) WPI_WARNING(m_logger, x)
 #define INFO(x) WPI_INFO(m_logger, x)
 
-#define DEBUG(x) WPI_DEBUG(m_logger, x)
+#define DEBUG0(x) WPI_DEBUG(m_logger, x)
 #define DEBUG1(x) WPI_DEBUG1(m_logger, x)
 #define DEBUG2(x) WPI_DEBUG2(m_logger, x)
 #define DEBUG3(x) WPI_DEBUG3(m_logger, x)
@@ -27,7 +27,7 @@
 #define SWARNING(x) WARNING(GetName() << ": " << x)
 #define SINFO(x) INFO(GetName() << ": " << x)
 
-#define SDEBUG(x) DEBUG(GetName() << ": " << x)
+#define SDEBUG(x) DEBUG0(GetName() << ": " << x)
 #define SDEBUG1(x) DEBUG1(GetName() << ": " << x)
 #define SDEBUG2(x) DEBUG2(GetName() << ": " << x)
 #define SDEBUG3(x) DEBUG3(GetName() << ": " << x)
