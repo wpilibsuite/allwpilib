@@ -9,6 +9,8 @@
 
 #include <frc/Notifier.h>
 
+#include <units/units.h>
+
 #include "CommandBase.h"
 #include "CommandHelper.h"
 
@@ -29,10 +31,10 @@ class NotifierCommand : public CommandHelper<CommandBase, NotifierCommand> {
    * Creates a new NotifierCommand.
    *
    * @param toRun        the runnable for the notifier to run
-   * @param period       the period at which the notifier should run, in seconds
+   * @param period       the period at which the notifier should run
    * @param requirements the subsystems required by this command
    */
-  NotifierCommand(std::function<void()> toRun, double period,
+  NotifierCommand(std::function<void()> toRun, units::second_t period,
                   std::initializer_list<Subsystem*> requirements);
 
   NotifierCommand(NotifierCommand&& other);
@@ -46,6 +48,6 @@ class NotifierCommand : public CommandHelper<CommandBase, NotifierCommand> {
  private:
   std::function<void()> m_toRun;
   frc::Notifier m_notifier;
-  double m_period;
+  units::second_t m_period;
 };
 }  // namespace frc2
