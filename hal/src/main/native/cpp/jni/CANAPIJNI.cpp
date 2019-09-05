@@ -18,7 +18,6 @@
 #include "hal/CAN.h"
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
-#include "hal/cpp/Log.h"
 
 using namespace frc;
 using namespace wpi::java;

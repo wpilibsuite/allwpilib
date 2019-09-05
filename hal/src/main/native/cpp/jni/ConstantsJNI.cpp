@@ -12,18 +12,8 @@
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_ConstantsJNI.h"
 #include "hal/Constants.h"
-#include "hal/cpp/Log.h"
 
 using namespace frc;
-
-// set the logging level
-TLogLevel constantsJNILogLevel = logWARNING;
-
-#define CONSTANTSJNI_LOG(level)     \
-  if (level > constantsJNILogLevel) \
-    ;                               \
-  else                              \
-    Log().Get(level)
 
 extern "C" {
 /*
@@ -35,10 +25,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_ConstantsJNI_getSystemClockTicksPerMicrosecond
   (JNIEnv* env, jclass)
 {
-  CONSTANTSJNI_LOG(logDEBUG)
-      << "Calling ConstantsJNI getSystemClockTicksPerMicrosecond";
   jint value = HAL_GetSystemClockTicksPerMicrosecond();
-  CONSTANTSJNI_LOG(logDEBUG) << "Value = " << value;
   return value;
 }
 }  // extern "C"

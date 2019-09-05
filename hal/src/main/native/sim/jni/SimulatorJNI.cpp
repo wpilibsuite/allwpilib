@@ -13,7 +13,6 @@
 #include "SpiReadAutoReceiveBufferCallbackStore.h"
 #include "edu_wpi_first_hal_sim_mockdata_SimulatorJNI.h"
 #include "hal/HAL.h"
-#include "hal/cpp/Log.h"
 #include "hal/handles/HandlesInternal.h"
 #include "mockdata/MockHooks.h"
 

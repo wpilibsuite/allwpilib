@@ -10,7 +10,6 @@
 #include "hal/Compressor.h"
 #include "hal/Ports.h"
 #include "hal/Solenoid.h"
-#include "hal/cpp/Log.h"
 
 using namespace frc;
 

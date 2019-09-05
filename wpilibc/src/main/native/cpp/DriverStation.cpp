@@ -11,7 +11,6 @@
 
 #include <hal/HAL.h>
 #include <hal/Power.h>
-#include <hal/cpp/Log.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
