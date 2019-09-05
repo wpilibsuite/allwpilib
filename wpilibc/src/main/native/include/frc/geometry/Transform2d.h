@@ -53,7 +53,6 @@ class Transform2d {
    */
   const Rotation2d& Rotation() const { return m_rotation; }
 
-    
   /**
    * Scales the transform by the scalar.
    *

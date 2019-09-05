@@ -51,7 +51,7 @@ public final class TrajectoryParameterizer {
    * Parameterize the trajectory by time. This is where the velocity profile is
    * generated.
    *
-   * <p>The derivation of the algorithm used can be found 
+   * <p>The derivation of the algorithm used can be found
    * <a href="http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf">
    * here</a>.
    *
@@ -62,8 +62,8 @@ public final class TrajectoryParameterizer {
    * @param endVelocityMetersPerSecond       The end velocity for the trajectory.
    * @param maxVelocityMetersPerSecond       The max velocity for the trajectory.
    * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
-   * @param reversed                         Whether the robot should move backwards. 
-   *                                         Note that the robot will still move from 
+   * @param reversed                         Whether the robot should move backwards.
+   *                                         Note that the robot will still move from
    *                                         a -> b -> ... -> z as defined in the waypoints.
    *
    * @return The trajectory.
