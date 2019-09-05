@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * Class used to parameterize a spline by its arc length.
  */
-public class SplineParameterizer {
+public final class SplineParameterizer {
   private static final double kMaxDx = 0.127;
   private static final double kMaxDy = 0.00127;
   private static final double kMaxDtheta = 0.0872;
