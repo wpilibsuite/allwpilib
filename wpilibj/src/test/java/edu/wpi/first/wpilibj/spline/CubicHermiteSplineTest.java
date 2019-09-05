@@ -39,7 +39,7 @@ class CubicHermiteSplineTest {
     poses.add(splines[0].getPoint(0.0));
 
     for (var spline : splines) {
-      poses.addAll(spline.parameterize());
+      poses.addAll(SplineParameterizer.parameterize(spline));
     }
 
     // End the timer.

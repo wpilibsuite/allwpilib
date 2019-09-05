@@ -14,6 +14,7 @@
 #include "frc/geometry/Rotation2d.h"
 #include "frc/spline/QuinticHermiteSpline.h"
 #include "frc/spline/SplineHelper.h"
+#include "frc/spline/SplineParameterizer.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -27,7 +28,7 @@ class QuinticHermiteSplineTest : public ::testing::Test {
 
     // Generate and parameterize the spline.
     const auto spline = SplineHelper::QuinticSplinesFromWaypoints({a, b})[0];
-    const auto poses = spline.Parameterize();
+    const auto poses = SplineParameterizer::Parameterize(spline);
 
     // End timer.
     const auto finish = std::chrono::high_resolution_clock::now();
@@ -43,11 +44,11 @@ class QuinticHermiteSplineTest : public ::testing::Test {
       // Make sure the twist is under the tolerance defined by the Spline class.
       auto twist = p0.first.Log(p1.first);
       EXPECT_LT(std::abs(twist.dx.to<double>()),
-                Spline<5>::kMaxDx.to<double>());
+                SplineParameterizer::kMaxDx.to<double>());
       EXPECT_LT(std::abs(twist.dy.to<double>()),
-                Spline<5>::kMaxDy.to<double>());
+                SplineParameterizer::kMaxDy.to<double>());
       EXPECT_LT(std::abs(twist.dtheta.to<double>()),
-                Spline<5>::kMaxDtheta.to<double>());
+                SplineParameterizer::kMaxDtheta.to<double>());
     }
 
     // Check first point.

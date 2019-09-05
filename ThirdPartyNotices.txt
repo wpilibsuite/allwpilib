@@ -39,10 +39,11 @@ popper.js             wpiutil/src/main/native/resources/popper-*
 units                 wpiutil/src/main/native/include/units/units.h
 Eigen                 wpiutil/src/main/native/eigeninclude/
 StackWalker           wpiutil/src/main/native/windows/StackWalker.*
-Team 254 Library      wpilibj/src/main/java/edu/wpi/first/wpilibj/spline/Spline.java
-                      wpilibj/src/main/java/edu/wpi/first/wpilibj/trajectory/TrajectoryGenerator.java
-                      wpilibc/src/main/native/include/frc/spline/Spline.h
-                      wpilibc/src/main/native/cpp/trajectory/TrajectoryGenerator.cpp
+Team 254 Library      wpilibj/src/main/java/edu/wpi/first/wpilibj/spline/SplineParameterizer.java
+                      wpilibj/src/main/java/edu/wpi/first/wpilibj/trajectory/TrajectoryParameterizer.java
+                      wpilibc/src/main/native/include/spline/SplineParameterizer.h
+                      wpilibc/src/main/native/include/trajectory/TrajectoryParameterizer.h
+                      wpilibc/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp
 
 
 ==============================================================================

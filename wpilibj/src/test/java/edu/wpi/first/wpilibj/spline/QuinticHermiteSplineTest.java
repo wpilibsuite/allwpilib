@@ -28,7 +28,7 @@ class QuinticHermiteSplineTest {
 
     // Generate and parameterize the spline.
     var spline = SplineHelper.getQuinticSplinesFromWaypoints(new Pose2d[]{a, b})[0];
-    var poses = spline.parameterize();
+    var poses = SplineParameterizer.parameterize(spline);
 
     // End the timer.
     var end = System.nanoTime();

@@ -15,6 +15,7 @@
 #include "frc/geometry/Rotation2d.h"
 #include "frc/spline/QuinticHermiteSpline.h"
 #include "frc/spline/SplineHelper.h"
+#include "frc/spline/SplineParameterizer.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -35,7 +36,7 @@ class CubicHermiteSplineTest : public ::testing::Test {
     poses.push_back(splines[0].GetPoint(0.0));
 
     for (auto&& spline : splines) {
-      auto x = spline.Parameterize();
+      auto x = SplineParameterizer::Parameterize(spline);
       poses.insert(std::end(poses), std::begin(x) + 1, std::end(x));
     }
 
@@ -53,11 +54,11 @@ class CubicHermiteSplineTest : public ::testing::Test {
       // Make sure the twist is under the tolerance defined by the Spline class.
       auto twist = p0.first.Log(p1.first);
       EXPECT_LT(std::abs(twist.dx.to<double>()),
-                Spline<3>::kMaxDx.to<double>());
+                SplineParameterizer::kMaxDx.to<double>());
       EXPECT_LT(std::abs(twist.dy.to<double>()),
-                Spline<3>::kMaxDy.to<double>());
+                SplineParameterizer::kMaxDy.to<double>());
       EXPECT_LT(std::abs(twist.dtheta.to<double>()),
-                Spline<3>::kMaxDtheta.to<double>());
+                SplineParameterizer::kMaxDtheta.to<double>());
     }
 
     // Check first point.

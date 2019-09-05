@@ -7,9 +7,6 @@
 
 package edu.wpi.first.wpilibj.spline;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -20,10 +17,6 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
  * points.
  */
 public abstract class Spline {
-  private static final double kMaxDx = 0.127;
-  private static final double kMaxDy = 0.00127;
-  private static final double kMaxDtheta = 0.0872;
-
   private final int m_degree;
 
   /**
@@ -33,35 +26,6 @@ public abstract class Spline {
    */
   Spline(int degree) {
     m_degree = degree;
-  }
-
-  /**
-   * Parameterizes the spline. This method breaks up the spline into various
-   * arcs until their dx, dy, and dtheta are within specific tolerances.
-   *
-   * @return A vector of poses and curvatures that represents various points on the spline.
-   */
-  public List<PoseWithCurvature> parameterize() {
-    return parameterize(0.0, 1.0);
-  }
-
-  /**
-   * Parameterizes the spline. This method breaks up the spline into various
-   * arcs until their dx, dy, and dtheta are within specific tolerances.
-   *
-   * @param t0 Starting internal spline parameter. It is recommended to use 0.0.
-   * @param t1 Ending internal spline parameter. It is recommended to use 1.0.
-   * @return A vector of poses and curvatures that represents various points on the spline.
-   */
-  public List<PoseWithCurvature> parameterize(double t0, double t1) {
-    var arr = new ArrayList<PoseWithCurvature>();
-
-    // The parameterization does not add the first initial point. Let's add
-    // that.
-    arr.add(getPoint(t0));
-
-    getSegmentArc(arr, t0, t1);
-    return arr;
   }
 
   /**
@@ -123,28 +87,5 @@ public abstract class Spline {
         new Pose2d(x, y, new Rotation2d(dx, dy)),
         curvature
     );
-  }
-
-  /**
-   * Breaks up the spline into arcs until the dx, dy, and theta of each arc is
-   * within tolerance.
-   *
-   * @param vector Pointer to vector of poses.
-   * @param t0     Starting point for arc.
-   * @param t1     Ending point for arc.
-   */
-  private void getSegmentArc(List<PoseWithCurvature> vector, double t0, double t1) {
-    final var start = getPoint(t0);
-    final var end = getPoint(t1);
-
-    final var twist = start.poseMeters.log(end.poseMeters);
-
-    if (Math.abs(twist.dy) > kMaxDy || Math.abs(twist.dx) > kMaxDx
-        || Math.abs(twist.dtheta) > kMaxDtheta) {
-      getSegmentArc(vector, t0, (t0 + t1) / 2);
-      getSegmentArc(vector, (t0 + t1) / 2, t1);
-    } else {
-      vector.add(getPoint(t1));
-    }
   }
 }

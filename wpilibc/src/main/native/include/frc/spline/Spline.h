@@ -44,34 +44,6 @@ class Spline {
   virtual ~Spline() = default;
 
   /**
-   * Parameterizes the spline. This method breaks up the spline into various
-   * arcs until their dx, dy, and dtheta are within specific tolerances.
-   *
-   * This parameterization technique was derived by Team 254. The original
-   * source is here:
-   * <https://github.com/Team254/FRC-2018-Public/blob/master/src/main/java/com/team254/lib/spline/SplineGenerator.java#L48>
-   *
-   * @param t0 Starting internal spline parameter. It is recommended to leave
-   * this as default.
-   * @param t1 Ending internal spline parameter. It is recommended to leave this
-   * as default.
-   *
-   * @return A vector of poses and curvatures that represents various points on
-   * the spline.
-   */
-  std::vector<PoseWithCurvature> Parameterize(double t0 = 0.0,
-                                              double t1 = 1.0) const {
-    std::vector<PoseWithCurvature> arr;
-
-    // The parameterization does not add the first initial point. Let's add
-    // that.
-    arr.push_back(GetPoint(t0));
-
-    GetSegmentArc(&arr, t0, t1);
-    return arr;
-  }
-
-  /**
    * Gets the pose and curvature at some point t on the spline.
    *
    * @param t The point t
@@ -146,39 +118,5 @@ class Spline {
   static Translation2d FromVector(const Eigen::Vector2d& vector) {
     return Translation2d(units::meter_t(vector(0)), units::meter_t(vector(1)));
   }
-
- private:
-  // Constraints for spline parameterization.
-  constexpr static units::meter_t kMaxDx = 5_in;
-  constexpr static units::meter_t kMaxDy = 0.05_in;
-  constexpr static units::radian_t kMaxDtheta = 0.0872_rad;
-
-  /**
-   * Breaks up the spline into arcs until the dx, dy, and theta of each arc is
-   * within tolerance.
-   *
-   * @param vector Pointer to vector of poses.
-   * @param t0 Starting point for arc.
-   * @param t1 Ending point for arc.
-   */
-  void GetSegmentArc(std::vector<PoseWithCurvature>* vector, double t0,
-                     double t1) const {
-    const auto start = GetPoint(t0);
-    const auto end = GetPoint(t1);
-
-    const auto twist = start.first.Log(end.first);
-
-    if (units::math::abs(twist.dy) > kMaxDy ||
-        units::math::abs(twist.dx) > kMaxDx ||
-        units::math::abs(twist.dtheta) > kMaxDtheta) {
-      GetSegmentArc(vector, t0, (t0 + t1) / 2);
-      GetSegmentArc(vector, (t0 + t1) / 2, t1);
-    } else {
-      vector->push_back(GetPoint(t1));
-    }
-  }
-
-  friend class QuinticHermiteSplineTest;
-  friend class CubicHermiteSplineTest;
 };
 }  // namespace frc
