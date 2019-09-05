@@ -42,7 +42,7 @@ StackWalker           wpiutil/src/main/native/windows/StackWalker.*
 Team 254 Library      wpilibj/src/main/java/edu/wpi/first/wpilibj/spline/Spline.java
                       wpilibj/src/main/java/edu/wpi/first/wpilibj/trajectory/TrajectoryGenerator.java
                       wpilibc/src/main/native/include/frc/spline/Spline.h
-                      wpilibc/src/main/native/include/cpp/trajectory/TrajectoryGenerator.cpp
+                      wpilibc/src/main/native/cpp/trajectory/TrajectoryGenerator.cpp
 
 
 ==============================================================================
