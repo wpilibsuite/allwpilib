@@ -380,7 +380,7 @@ void DispatcherBase::ServerThreadMain() {
       return;
     }
     DEBUG0("server: client connection from " << stream->getPeerIP() << " port "
-                                            << stream->getPeerPort());
+                                             << stream->getPeerPort());
 
     // add to connections list
     using namespace std::placeholders;
@@ -519,8 +519,8 @@ bool DispatcherBase::ClientHandshake(
     if (!msg->Is(Message::kEntryAssign)) {
       // unexpected message
       DEBUG0("client: received message ("
-            << msg->type()
-            << ") other than entry assignment during initial handshake");
+             << msg->type()
+             << ") other than entry assignment during initial handshake");
       return false;
     }
     incoming.emplace_back(std::move(msg));
@@ -613,8 +613,8 @@ bool DispatcherBase::ServerHandshake(
       if (!msg->Is(Message::kEntryAssign)) {
         // unexpected message
         DEBUG0("server: received message ("
-              << msg->type()
-              << ") other than entry assignment during initial handshake");
+               << msg->type()
+               << ") other than entry assignment during initial handshake");
         return false;
       }
       incoming.push_back(msg);
