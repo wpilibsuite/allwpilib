@@ -25,7 +25,7 @@ extern "C" {
  * Method:    serialInitializePort
  * Signature: (B)?
  */
-JNIEXPORT int JNICALL
+JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialInitializePort
   (JNIEnv* env, jclass, jbyte port)
 {
@@ -33,7 +33,7 @@ Java_edu_wpi_first_hal_SerialPortJNI_serialInitializePort
   auto handle =
       HAL_InitializeSerialPort(static_cast<HAL_SerialPort>(port), &status);
   CheckStatusForceThrow(env, status);
-  return handle;
+  return static_cast<jint>(handle);
 }
 
 /*
@@ -41,7 +41,7 @@ Java_edu_wpi_first_hal_SerialPortJNI_serialInitializePort
  * Method:    serialInitializePortDirect
  * Signature: (BLjava/lang/String;)?
  */
-JNIEXPORT int JNICALL
+JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialInitializePortDirect
   (JNIEnv* env, jclass, jbyte port, jstring portName)
 {
@@ -50,7 +50,7 @@ Java_edu_wpi_first_hal_SerialPortJNI_serialInitializePortDirect
   auto handle = HAL_InitializeSerialPortDirect(
       static_cast<HAL_SerialPort>(port), portNameRef.c_str(), &status);
   CheckStatusForceThrow(env, status);
-  return handle;
+  return static_cast<jint>(handle);
 }
 
 /*
