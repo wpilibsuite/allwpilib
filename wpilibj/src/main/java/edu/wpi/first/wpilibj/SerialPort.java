@@ -90,6 +90,9 @@ public class SerialPort implements AutoCloseable {
   /**
    * Create an instance of a Serial Port class.
    *
+   * Prefer to use the constructor that doesn't take a port name, but in some
+   * cases the automatic detection might not work correctly.
+   *
    * @param baudRate The baud rate to configure the serial port.
    * @param port     The Serial port to use
    * @param portName The direct portName to use
@@ -98,7 +101,6 @@ public class SerialPort implements AutoCloseable {
    * @param stopBits The number of stop bits to use as defined by the enum StopBits.
    * @deprecated     Will be removed for 2019
    */
-  @Deprecated
   public SerialPort(final int baudRate, String portName, Port port, final int dataBits,
                     Parity parity, StopBits stopBits) {
     m_portHandle = SerialPortJNI.serialInitializePortDirect((byte) port.value, portName);
