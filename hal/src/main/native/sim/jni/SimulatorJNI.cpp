@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,7 +13,6 @@
 #include "SpiReadAutoReceiveBufferCallbackStore.h"
 #include "edu_wpi_first_hal_sim_mockdata_SimulatorJNI.h"
 #include "hal/HAL.h"
-#include "hal/cpp/Log.h"
 #include "hal/handles/HandlesInternal.h"
 #include "mockdata/MockHooks.h"
 

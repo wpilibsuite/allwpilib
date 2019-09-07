@@ -24,18 +24,8 @@
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/HAL.h"
-#include "hal/cpp/Log.h"
 
 using namespace wpi::java;
-
-// set the logging level
-TLogLevel halUtilLogLevel = logWARNING;
-
-#define HALUTIL_LOG(level)     \
-  if (level > halUtilLogLevel) \
-    ;                          \
-  else                         \
-    Log().Get(level)
 
 #define kRioStatusOffset -63000
 #define kRioStatusSuccess 0
@@ -300,9 +290,6 @@ extern "C" {
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
 
-  // set our logging level
-  Log::ReportingLevel() = logDEBUG;
-
   JNIEnv* env;
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
     return JNI_ERR;
@@ -346,11 +333,8 @@ JNIEXPORT jshort JNICALL
 Java_edu_wpi_first_hal_HALUtil_getFPGAVersion
   (JNIEnv* env, jclass)
 {
-  HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGAVersion";
   int32_t status = 0;
   jshort returnValue = HAL_GetFPGAVersion(&status);
-  HALUTIL_LOG(logDEBUG) << "Status = " << status;
-  HALUTIL_LOG(logDEBUG) << "FPGAVersion = " << returnValue;
   CheckStatus(env, status);
   return returnValue;
 }
@@ -364,11 +348,8 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_HALUtil_getFPGARevision
   (JNIEnv* env, jclass)
 {
-  HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGARevision";
   int32_t status = 0;
   jint returnValue = HAL_GetFPGARevision(&status);
-  HALUTIL_LOG(logDEBUG) << "Status = " << status;
-  HALUTIL_LOG(logDEBUG) << "FPGARevision = " << returnValue;
   CheckStatus(env, status);
   return returnValue;
 }
@@ -382,11 +363,8 @@ JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_hal_HALUtil_getFPGATime
   (JNIEnv* env, jclass)
 {
-  // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
   int32_t status = 0;
   jlong returnValue = HAL_GetFPGATime(&status);
-  // HALUTIL_LOG(logDEBUG) << "Status = " << status;
-  // HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;
   CheckStatus(env, status);
   return returnValue;
 }
@@ -400,9 +378,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType
   (JNIEnv* env, jclass)
 {
-  // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALRuntimeType";
   jint returnValue = HAL_GetRuntimeType();
-  // HALUTIL_LOG(logDEBUG) << "RuntimeType = " << returnValue;
   return returnValue;
 }
 
@@ -415,11 +391,8 @@ JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_hal_HALUtil_getFPGAButton
   (JNIEnv* env, jclass)
 {
-  // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
   int32_t status = 0;
   jboolean returnValue = HAL_GetFPGAButton(&status);
-  // HALUTIL_LOG(logDEBUG) << "Status = " << status;
-  // HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;
   CheckStatus(env, status);
   return returnValue;
 }
@@ -434,8 +407,6 @@ Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage
   (JNIEnv* paramEnv, jclass, jint paramId)
 {
   const char* msg = HAL_GetErrorMessage(paramId);
-  HALUTIL_LOG(logDEBUG) << "Calling HALUtil HAL_GetErrorMessage id=" << paramId
-                        << " msg=" << msg;
   return MakeJString(paramEnv, msg);
 }
 
@@ -461,8 +432,6 @@ Java_edu_wpi_first_hal_HALUtil_getHALstrerror
   (JNIEnv* env, jclass, jint errorCode)
 {
   const char* msg = std::strerror(errno);
-  HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALstrerror errorCode="
-                        << errorCode << " msg=" << msg;
   return MakeJString(env, msg);
 }
 
