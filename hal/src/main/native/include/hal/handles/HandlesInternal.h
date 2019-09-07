@@ -65,6 +65,7 @@ enum class HAL_HandleEnum {
   Vendor = 17,
   SimulationJni = 18,
   CAN = 19,
+  SerialPort = 20,
 };
 
 /**

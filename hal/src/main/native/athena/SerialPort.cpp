@@ -1,174 +1,492 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 #include "hal/SerialPort.h"
 
 #include <string>
-
-#include "HALInitializer.h"
 #include "hal/cpp/SerialHelper.h"
-#include "visa/visa.h"
+#include "hal/SerialPort.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/IndexedHandleResource.h"
+#include <iostream>
 
-static int32_t resourceManagerHandle{0};
-static HAL_SerialPort portHandles[4];
+#include <stdio.h>
+#include <sys/ioctl.h>
+#include <stdlib.h>
+#include <string>
+#include <cstring>
+#include <unistd.h>
+#include <termios.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <iostream>
+#include <stdexcept>
+#include <thread>
+#include <chrono>
 
-namespace hal {
-namespace init {
-void InitializeSerialPort() {}
-}  // namespace init
-}  // namespace hal
+namespace
+{
+struct SerialPort
+{
+    int portId;
+    struct termios tty;
+    int baudRate;
 
-extern "C" {
+    double timeout = 0;
 
-void HAL_InitializeSerialPort(HAL_SerialPort port, int32_t* status) {
-  hal::init::CheckInit();
-  std::string portName;
+    bool termination = false;
+    char terminationChar = '\n';
+};
+} // namespace
 
-  if (resourceManagerHandle == 0)
-    viOpenDefaultRM(reinterpret_cast<ViSession*>(&resourceManagerHandle));
+namespace hal
+{
+IndexedHandleResource<HAL_SerialPortHandle, SerialPort, 4,
+                      HAL_HandleEnum::SerialPort> *serialPortHandles;
+} // namespace hal
 
-  hal::SerialHelper serialHelper;
+namespace hal
+{
+namespace init
+{
+void InitializeSerialPort()
+{
+    static IndexedHandleResource<HAL_SerialPortHandle, SerialPort,
+                                 4, HAL_HandleEnum::SerialPort>
+        spH;
+    serialPortHandles = &spH;
+}
+} // namespace init
+} // namespace hal
 
-  portName = serialHelper.GetVISASerialPortName(port, status);
+using namespace hal;
 
-  if (*status < 0) {
-    return;
-  }
+extern "C"
+{
+HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port, int32_t *status)
+{
+    //hal::init::CheckInit();
 
-  *status = viOpen(resourceManagerHandle, const_cast<char*>(portName.c_str()),
-                   VI_NULL, VI_NULL,
-                   reinterpret_cast<ViSession*>(&portHandles[port]));
-  if (*status > 0) *status = 0;
+    hal::SerialHelper serialHelper;
+
+    std::string portName = serialHelper.GetOSSerialPortName(port, status);
+
+    if (*status < 0)
+    {
+        return HAL_kInvalidHandle;
+    }
+
+    return HAL_InitializeSerialPortDirect(port, portName.c_str(), status);
+}
+HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port, const char *portName, int32_t *status)
+{
+    auto handle = serialPortHandles->Allocate(static_cast<int16_t>(port), status);
+
+    if (*status != 0)
+    {
+        return HAL_kInvalidHandle;
+    }
+
+    auto serialPort = serialPortHandles->Get(handle);
+
+    if (serialPort == nullptr)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return HAL_kInvalidHandle;
+    }
+
+    serialPort->portId = open(portName, O_RDWR | O_NOCTTY);
+    if (serialPort->portId < 0)
+    {
+        *status = HAL_SERIAL_PORT_OPEN_ERROR;
+        serialPortHandles->Free(handle);
+        return HAL_kInvalidHandle;
+    }
+
+    std::memset(&serialPort->tty, 0, sizeof(serialPort->tty));
+
+    serialPort->baudRate = B9600;
+    cfsetospeed(&serialPort->tty, static_cast<speed_t>(serialPort->baudRate));
+    cfsetispeed(&serialPort->tty, static_cast<speed_t>(serialPort->baudRate));
+
+    serialPort->tty.c_cflag &= ~PARENB;
+    serialPort->tty.c_cflag &= ~CSTOPB;
+    serialPort->tty.c_cflag &= ~CSIZE;
+    serialPort->tty.c_cflag |= CS8;
+
+    serialPort->tty.c_cc[VMIN] = 0;
+    serialPort->tty.c_cc[VTIME] = 10;
+
+    serialPort->tty.c_cflag |= CREAD | CLOCAL;
+
+    serialPort->tty.c_lflag &= ~(ICANON | ECHO | ISIG);
+    serialPort->tty.c_iflag &= ~(IXON | IXOFF | IXANY);
+    /* Raw output mode, sends the raw and unprocessed data  ( send as it is).
+    * If it is in canonical mode and sending new line char then CR
+    * will be added as prefix and send as CR LF
+    */
+    serialPort->tty.c_oflag = ~OPOST;
+
+    tcflush(serialPort->portId, TCIOFLUSH);
+    if (tcsetattr(serialPort->portId, TCSANOW, &serialPort->tty) != 0)
+    {
+        close(serialPort->portId);
+        *status = HAL_SERIAL_PORT_OPEN_ERROR;
+        serialPortHandles->Free(handle);
+        return HAL_kInvalidHandle;
+    }
+    return handle;
 }
 
-void HAL_InitializeSerialPortDirect(HAL_SerialPort port, const char* portName,
-                                    int32_t* status) {
-  *status = viOpen(resourceManagerHandle, const_cast<char*>(portName), VI_NULL,
-                   VI_NULL, reinterpret_cast<ViSession*>(&portHandles[port]));
-  if (*status > 0) *status = 0;
+void HAL_CloseSerial(HAL_SerialPortHandle handle, int32_t *status)
+{
+    auto port = serialPortHandles->Get(handle);
+    serialPortHandles->Free(handle);
+
+    if (port)
+    {
+        close(port->portId);
+    }
+    *status = 0;
 }
 
-void HAL_SetSerialBaudRate(HAL_SerialPort port, int32_t baud, int32_t* status) {
-  *status = viSetAttribute(portHandles[port], VI_ATTR_ASRL_BAUD, baud);
-  if (*status > 0) *status = 0;
+int HAL_GetSerialFD(HAL_SerialPortHandle handle, int32_t* status) {
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return -1;
+    }
+    return port->portId;
 }
 
-void HAL_SetSerialDataBits(HAL_SerialPort port, int32_t bits, int32_t* status) {
-  *status = viSetAttribute(portHandles[port], VI_ATTR_ASRL_DATA_BITS, bits);
-  if (*status > 0) *status = 0;
+#define BAUDCASE(BAUD) \
+        case BAUD:      \
+            port->baudRate = B##BAUD ; \
+            break; 
+
+void HAL_SetSerialBaudRate(HAL_SerialPortHandle handle, int32_t baud, int32_t *status)
+{
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return;
+    }
+
+    switch (baud) {
+        BAUDCASE(50)
+        BAUDCASE(75)
+        BAUDCASE(110)
+        BAUDCASE(134)
+        BAUDCASE(150)
+        BAUDCASE(200)
+        BAUDCASE(300)
+        BAUDCASE(600)
+        BAUDCASE(1200)
+        BAUDCASE(1800)
+        BAUDCASE(2400)
+        BAUDCASE(4800)
+        BAUDCASE(9600)
+        BAUDCASE(19200)
+        BAUDCASE(38400)
+        BAUDCASE(57600)
+        BAUDCASE(115200)
+        BAUDCASE(230400)
+        BAUDCASE(460800)
+        BAUDCASE(500000)
+        BAUDCASE(576000)
+        BAUDCASE(921600)
+        BAUDCASE(1000000)
+        BAUDCASE(1152000)
+        BAUDCASE(1500000)
+        BAUDCASE(2000000)
+        BAUDCASE(2500000)
+        BAUDCASE(3000000)
+        BAUDCASE(3500000)
+        BAUDCASE(4000000)
+        default:
+            *status = PARAMETER_OUT_OF_RANGE;
+            return;
+    }
+    cfsetospeed(&port->tty, static_cast<speed_t>(port->baudRate));
+    cfsetispeed(&port->tty, static_cast<speed_t>(port->baudRate));
+    tcsetattr(port->portId, TCSANOW, &port->tty);
 }
 
-void HAL_SetSerialParity(HAL_SerialPort port, int32_t parity, int32_t* status) {
-  *status = viSetAttribute(portHandles[port], VI_ATTR_ASRL_PARITY, parity);
-  if (*status > 0) *status = 0;
+void HAL_SetSerialDataBits(HAL_SerialPortHandle handle, int32_t bits, int32_t *status)
+{
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return;
+    }
+
+    int bitFlag = -1;
+    switch (bits) {
+        case 5:
+            bitFlag = CS5;
+            break;
+        case 6:
+            bitFlag = CS6;
+            break;
+        case 7:
+            bitFlag = CS7;
+            break;
+        case 8:
+            bitFlag = CS8;
+            break;
+        default:
+            *status = PARAMETER_OUT_OF_RANGE;
+            return;
+    }
+    
+    port->tty.c_cflag &= ~CSIZE;
+    port->tty.c_cflag |= bitFlag;
+
+    tcsetattr(port->portId, TCSANOW, &port->tty);
 }
 
-void HAL_SetSerialStopBits(HAL_SerialPort port, int32_t stopBits,
-                           int32_t* status) {
-  *status = viSetAttribute(portHandles[port], VI_ATTR_ASRL_STOP_BITS, stopBits);
-  if (*status > 0) *status = 0;
+void HAL_SetSerialParity(HAL_SerialPortHandle handle, int32_t parity, int32_t *status)
+{
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return;
+    }
+
+    switch (parity) {
+        case 0: // None
+            port->tty.c_cflag &= ~PARENB;
+            port->tty.c_cflag &= ~CMSPAR;
+            break;
+        case 1: // Odd
+            port->tty.c_cflag |= PARENB;
+            port->tty.c_cflag &= ~CMSPAR;
+            port->tty.c_cflag &= ~PARODD;
+            break;
+        case 2: // Even
+            port->tty.c_cflag |= PARENB;
+            port->tty.c_cflag &= ~CMSPAR;
+            port->tty.c_cflag |= PARODD;
+            break;
+        case 3: // Mark
+            port->tty.c_cflag |= PARENB;
+            port->tty.c_cflag |= CMSPAR;
+            port->tty.c_cflag |= PARODD;
+            break;
+        case 4: // Space
+            port->tty.c_cflag |= PARENB;
+            port->tty.c_cflag |= CMSPAR;
+            port->tty.c_cflag &= ~PARODD;
+            break;
+        default:
+            *status = PARAMETER_OUT_OF_RANGE;
+            return;
+    }
+
+    tcsetattr(port->portId, TCSANOW, &port->tty);
 }
 
-void HAL_SetSerialWriteMode(HAL_SerialPort port, int32_t mode,
-                            int32_t* status) {
-  *status = viSetAttribute(portHandles[port], VI_ATTR_WR_BUF_OPER_MODE, mode);
-  if (*status > 0) *status = 0;
+void HAL_SetSerialStopBits(HAL_SerialPortHandle handle, int32_t stopBits, int32_t *status)
+{
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return;
+    }
+
+    switch (stopBits) {
+        case 10: // 1
+            port->tty.c_cflag &= ~CSTOPB;
+            break;
+        case 15: // 1.5
+        case 20: // 2
+            port->tty.c_cflag |= CSTOPB;
+            break;
+        default:
+            *status = PARAMETER_OUT_OF_RANGE;
+            return;
+    }
+
+    tcsetattr(port->portId, TCSANOW, &port->tty);
 }
 
-void HAL_SetSerialFlowControl(HAL_SerialPort port, int32_t flow,
-                              int32_t* status) {
-  *status = viSetAttribute(portHandles[port], VI_ATTR_ASRL_FLOW_CNTRL, flow);
-  if (*status > 0) *status = 0;
+void HAL_SetSerialWriteMode(HAL_SerialPortHandle handle, int32_t mode, int32_t *status)
+{
+    // This seems to be a no op on the NI serial port driver
 }
 
-void HAL_SetSerialTimeout(HAL_SerialPort port, double timeout,
-                          int32_t* status) {
-  *status = viSetAttribute(portHandles[port], VI_ATTR_TMO_VALUE,
-                           static_cast<uint32_t>(timeout * 1e3));
-  if (*status > 0) *status = 0;
+void HAL_SetSerialFlowControl(HAL_SerialPortHandle handle, int32_t flow, int32_t *status)
+{
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return;
+    }
+
+    switch (flow) {
+        case 0:
+            port->tty.c_cflag &= ~CRTSCTS;
+            break;
+        case 1: 
+            port->tty.c_cflag &= ~CRTSCTS;
+            port->tty.c_iflag &= IXON | IXOFF;
+            break;
+        case 2:
+            port->tty.c_cflag |= CRTSCTS;
+            break;
+        default:
+            *status = PARAMETER_OUT_OF_RANGE;
+            return;
+    }
+
+    tcsetattr(port->portId, TCSANOW, &port->tty);
 }
 
-void HAL_EnableSerialTermination(HAL_SerialPort port, char terminator,
-                                 int32_t* status) {
-  viSetAttribute(portHandles[port], VI_ATTR_TERMCHAR_EN, VI_TRUE);
-  viSetAttribute(portHandles[port], VI_ATTR_TERMCHAR, terminator);
-  *status = viSetAttribute(portHandles[port], VI_ATTR_ASRL_END_IN,
-                           VI_ASRL_END_TERMCHAR);
-  if (*status > 0) *status = 0;
+void HAL_SetSerialTimeout(HAL_SerialPortHandle handle, double timeout, int32_t *status)
+{
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return;
+    }
+    port->timeout = timeout;
+    port->tty.c_cc[VTIME] = static_cast<int>(timeout * 10);
+    tcsetattr(port->portId, TCSANOW, &port->tty);
 }
 
-void HAL_DisableSerialTermination(HAL_SerialPort port, int32_t* status) {
-  viSetAttribute(portHandles[port], VI_ATTR_TERMCHAR_EN, VI_FALSE);
-  *status =
-      viSetAttribute(portHandles[port], VI_ATTR_ASRL_END_IN, VI_ASRL_END_NONE);
-  if (*status > 0) *status = 0;
+void HAL_EnableSerialTermination(HAL_SerialPortHandle handle, char terminator, int32_t *status)
+{
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return;
+    }
+    port->termination = true;
+    port->terminationChar = terminator;
 }
 
-void HAL_SetSerialReadBufferSize(HAL_SerialPort port, int32_t size,
-                                 int32_t* status) {
-  *status = viSetBuf(portHandles[port], VI_READ_BUF, size);
-  if (*status > 0) *status = 0;
+void HAL_DisableSerialTermination(HAL_SerialPortHandle handle, int32_t *status)
+{
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return;
+    }
+    port->termination = false;
 }
 
-void HAL_SetSerialWriteBufferSize(HAL_SerialPort port, int32_t size,
-                                  int32_t* status) {
-  *status = viSetBuf(portHandles[port], VI_WRITE_BUF, size);
-  if (*status > 0) *status = 0;
+void HAL_SetSerialReadBufferSize(HAL_SerialPortHandle handle, int32_t size, int32_t *status)
+{
+    // NO OP currently
 }
 
-int32_t HAL_GetSerialBytesReceived(HAL_SerialPort port, int32_t* status) {
-  int32_t bytes = 0;
-
-  *status = viGetAttribute(portHandles[port], VI_ATTR_ASRL_AVAIL_NUM, &bytes);
-  if (*status > 0) *status = 0;
-  return bytes;
+void HAL_SetSerialWriteBufferSize(HAL_SerialPortHandle handle, int32_t size, int32_t *status)
+{
+    // NO OP currently
 }
 
-int32_t HAL_ReadSerial(HAL_SerialPort port, char* buffer, int32_t count,
-                       int32_t* status) {
-  uint32_t retCount = 0;
-
-  *status =
-      viRead(portHandles[port], (ViPBuf)buffer, count, (ViPUInt32)&retCount);
-
-  if (*status == VI_ERROR_IO || *status == VI_ERROR_ASRL_OVERRUN ||
-      *status == VI_ERROR_ASRL_FRAMING || *status == VI_ERROR_ASRL_PARITY) {
-    int32_t localStatus = 0;
-    HAL_ClearSerial(port, &localStatus);
-  }
-
-  if (*status == VI_ERROR_TMO || *status > 0) *status = 0;
-  return static_cast<int32_t>(retCount);
+int32_t HAL_GetSerialBytesReceived(HAL_SerialPortHandle handle, int32_t *status)
+{
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return -1;
+    }
+    int bytes;
+    ioctl(port->portId, FIONREAD, &bytes);
+    return bytes;
 }
 
-int32_t HAL_WriteSerial(HAL_SerialPort port, const char* buffer, int32_t count,
-                        int32_t* status) {
-  uint32_t retCount = 0;
+int32_t HAL_ReadSerial(HAL_SerialPortHandle handle, char *buffer, int32_t count, int32_t *status)
+{
+    // Don't do anything if 0 bytes were requested
+    if (count == 0)
+        return 0;
 
-  *status =
-      viWrite(portHandles[port], (ViPBuf)buffer, count, (ViPUInt32)&retCount);
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return -1;
+    }
 
-  if (*status > 0) *status = 0;
-  return static_cast<int32_t>(retCount);
+    int n = 0, loc = 0;
+    char buf = '\0';
+    memset(buffer, '\0', count);
+    *status = 0;
+
+    do
+    {
+        n = read(port->portId, &buf, 1);
+        if (n == 1)
+        {
+            buffer[loc] = buf;
+            loc++;
+            // If buffer is full, return
+            if (loc == count) {
+                return loc;
+            }
+            // If terminating, and termination was hit return;
+            if (port->termination && buf == port->terminationChar) {
+                return loc;
+            }
+        }
+        else
+        {
+            // If nothing read, timeout
+            return loc;
+        }
+    } while (true);
 }
 
-void HAL_FlushSerial(HAL_SerialPort port, int32_t* status) {
-  *status = viFlush(portHandles[port], VI_WRITE_BUF);
-  if (*status > 0) *status = 0;
+int32_t HAL_WriteSerial(HAL_SerialPortHandle handle, const char *buffer, int32_t count, int32_t *status)
+{
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return -1;
+    }
+
+    // TODO Determine if we need to handle termination on write
+
+    int written = 0, spot = 0;
+    do
+    {
+        written = write(port->portId, buffer + spot, count - spot);
+        if (written > 0)
+        {
+            spot += written;
+        }
+    } while (spot < count);
+    return spot;
 }
 
-void HAL_ClearSerial(HAL_SerialPort port, int32_t* status) {
-  *status = viClear(portHandles[port]);
-  if (*status > 0) *status = 0;
+void HAL_FlushSerial(HAL_SerialPortHandle handle, int32_t *status)
+{
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return;
+    }
+    tcflush(port->portId, TCOFLUSH);
 }
-
-void HAL_CloseSerial(HAL_SerialPort port, int32_t* status) {
-  *status = viClose(portHandles[port]);
-  if (*status > 0) *status = 0;
+void HAL_ClearSerial(HAL_SerialPortHandle handle, int32_t *status)
+{
+    auto port = serialPortHandles->Get(handle);
+    if (!port)
+    {
+        *status = HAL_HANDLE_ERROR;
+        return;
+    }
+    tcflush(port->portId, TCIFLUSH);
 }
-
-}  // extern "C"
+}

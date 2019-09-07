@@ -12,6 +12,7 @@
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
 #include <wpi/deprecated.h>
+#include <hal/Types.h>
 
 #include "frc/ErrorBase.h"
 
@@ -72,6 +73,9 @@ class SerialPort : public ErrorBase {
 
   /**
    * Create an instance of a Serial Port class.
+   * 
+   * Prefer to use the constructor that doesn't take a port name, but in some
+   * cases the automatic detection might not work correctly.
    *
    * @param baudRate The baud rate to configure the serial port.
    * @param port     The physical port to use
@@ -82,15 +86,14 @@ class SerialPort : public ErrorBase {
    * @param stopBits The number of stop bits to use as defined by the enum
    *                 StopBits.
    */
-  WPI_DEPRECATED("Will be removed for 2020")
   SerialPort(int baudRate, const wpi::Twine& portName, Port port = kOnboard,
              int dataBits = 8, Parity parity = kParity_None,
              StopBits stopBits = kStopBits_One);
 
   ~SerialPort();
 
-  SerialPort(SerialPort&& rhs);
-  SerialPort& operator=(SerialPort&& rhs);
+  SerialPort(SerialPort&& rhs) = default;
+  SerialPort& operator=(SerialPort&& rhs) = default;
 
   /**
    * Set the type of flow control to enable on this port.
@@ -214,10 +217,7 @@ class SerialPort : public ErrorBase {
   void Reset();
 
  private:
-  int m_resourceManagerHandle = 0;
-  int m_portHandle = 0;
-  bool m_consoleModeEnabled = false;
-  Port m_port = kOnboard;
+  hal::Handle<HAL_SerialPortHandle> m_portHandle;
 };
 
 }  // namespace frc

@@ -23,142 +23,144 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialInitializePort
- * Signature: (B)V
+ * Signature: (B)I
  */
-JNIEXPORT void JNICALL
+JNIEXPORT int JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialInitializePort
   (JNIEnv* env, jclass, jbyte port)
 {
   int32_t status = 0;
-  HAL_InitializeSerialPort(static_cast<HAL_SerialPort>(port), &status);
+  auto handle = HAL_InitializeSerialPort(static_cast<HAL_SerialPort>(port), &status);
   CheckStatusForceThrow(env, status);
+  return handle;
 }
 
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialInitializePortDirect
- * Signature: (BLjava/lang/String;)V
+ * Signature: (BLjava/lang/String;)I
  */
-JNIEXPORT void JNICALL
+JNIEXPORT int JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialInitializePortDirect
   (JNIEnv* env, jclass, jbyte port, jstring portName)
 {
   JStringRef portNameRef{env, portName};
   int32_t status = 0;
-  HAL_InitializeSerialPortDirect(static_cast<HAL_SerialPort>(port),
+  auto handle = HAL_InitializeSerialPortDirect(static_cast<HAL_SerialPort>(port),
                                  portNameRef.c_str(), &status);
   CheckStatusForceThrow(env, status);
+  return handle;
 }
 
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialSetBaudRate
- * Signature: (BI)V
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialSetBaudRate
-  (JNIEnv* env, jclass, jbyte port, jint rate)
+  (JNIEnv* env, jclass, jint handle, jint rate)
 {
   int32_t status = 0;
-  HAL_SetSerialBaudRate(static_cast<HAL_SerialPort>(port), rate, &status);
+  HAL_SetSerialBaudRate(static_cast<HAL_SerialPortHandle(handle), rate, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialSetDataBits
- * Signature: (BB)V
+ * Signature: (IB)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialSetDataBits
-  (JNIEnv* env, jclass, jbyte port, jbyte bits)
+  (JNIEnv* env, jclass, jint handle, jbyte bits)
 {
   int32_t status = 0;
-  HAL_SetSerialDataBits(static_cast<HAL_SerialPort>(port), bits, &status);
+  HAL_SetSerialDataBits(static_cast<HAL_SerialPortHandle(handle), bits, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialSetParity
- * Signature: (BB)V
+ * Signature: (IB)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialSetParity
-  (JNIEnv* env, jclass, jbyte port, jbyte parity)
+  (JNIEnv* env, jclass, jint handle, jbyte parity)
 {
   int32_t status = 0;
-  HAL_SetSerialParity(static_cast<HAL_SerialPort>(port), parity, &status);
+  HAL_SetSerialParity(static_cast<HAL_SerialPortHandle(handle), parity, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialSetStopBits
- * Signature: (BB)V
+ * Signature: (IB)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialSetStopBits
-  (JNIEnv* env, jclass, jbyte port, jbyte bits)
+  (JNIEnv* env, jclass, jint handle, jbyte bits)
 {
   int32_t status = 0;
-  HAL_SetSerialStopBits(static_cast<HAL_SerialPort>(port), bits, &status);
+  HAL_SetSerialStopBits(static_cast<HAL_SerialPortHandle(handle), bits, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialSetWriteMode
- * Signature: (BB)V
+ * Signature: (IB)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialSetWriteMode
-  (JNIEnv* env, jclass, jbyte port, jbyte mode)
+  (JNIEnv* env, jclass, jint handle, jbyte mode)
 {
   int32_t status = 0;
-  HAL_SetSerialWriteMode(static_cast<HAL_SerialPort>(port), mode, &status);
+  HAL_SetSerialWriteMode(static_cast<HAL_SerialPortHandle(handle), mode, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialSetFlowControl
- * Signature: (BB)V
+ * Signature: (IB)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialSetFlowControl
-  (JNIEnv* env, jclass, jbyte port, jbyte flow)
+  (JNIEnv* env, jclass, jint handle, jbyte flow)
 {
   int32_t status = 0;
-  HAL_SetSerialFlowControl(static_cast<HAL_SerialPort>(port), flow, &status);
+  HAL_SetSerialFlowControl(static_cast<HAL_SerialPortHandle(handle), flow, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialSetTimeout
- * Signature: (BD)V
+ * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialSetTimeout
-  (JNIEnv* env, jclass, jbyte port, jdouble timeout)
+  (JNIEnv* env, jclass, jint handle, jdouble timeout)
 {
   int32_t status = 0;
-  HAL_SetSerialTimeout(static_cast<HAL_SerialPort>(port), timeout, &status);
+  HAL_SetSerialTimeout(static_cast<HAL_SerialPortHandle(handle), timeout, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialEnableTermination
- * Signature: (BC)V
+ * Signature: (IC)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialEnableTermination
-  (JNIEnv* env, jclass, jbyte port, jchar terminator)
+  (JNIEnv* env, jclass, jint handle, jchar terminator)
 {
   int32_t status = 0;
-  HAL_EnableSerialTermination(static_cast<HAL_SerialPort>(port), terminator,
+  HAL_EnableSerialTermination(static_cast<HAL_SerialPortHandle(handle), terminator,
                               &status);
   CheckStatus(env, status);
 }
@@ -166,42 +168,42 @@ Java_edu_wpi_first_hal_SerialPortJNI_serialEnableTermination
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialDisableTermination
- * Signature: (B)V
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialDisableTermination
-  (JNIEnv* env, jclass, jbyte port)
+  (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
-  HAL_DisableSerialTermination(static_cast<HAL_SerialPort>(port), &status);
+  HAL_DisableSerialTermination(static_cast<HAL_SerialPortHandle(handle), &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialSetReadBufferSize
- * Signature: (BI)V
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialSetReadBufferSize
-  (JNIEnv* env, jclass, jbyte port, jint size)
+  (JNIEnv* env, jclass, jint handle, jint size)
 {
   int32_t status = 0;
-  HAL_SetSerialReadBufferSize(static_cast<HAL_SerialPort>(port), size, &status);
+  HAL_SetSerialReadBufferSize(static_cast<HAL_SerialPortHandle(handle), size, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialSetWriteBufferSize
- * Signature: (BI)V
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialSetWriteBufferSize
-  (JNIEnv* env, jclass, jbyte port, jint size)
+  (JNIEnv* env, jclass, jint handle, jint size)
 {
   int32_t status = 0;
-  HAL_SetSerialWriteBufferSize(static_cast<HAL_SerialPort>(port), size,
+  HAL_SetSerialWriteBufferSize(static_cast<HAL_SerialPortHandle(handle), size,
                                &status);
   CheckStatus(env, status);
 }
@@ -209,15 +211,15 @@ Java_edu_wpi_first_hal_SerialPortJNI_serialSetWriteBufferSize
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialGetBytesReceived
- * Signature: (B)I
+ * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialGetBytesReceived
-  (JNIEnv* env, jclass, jbyte port)
+  (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
   jint retVal =
-      HAL_GetSerialBytesReceived(static_cast<HAL_SerialPort>(port), &status);
+      HAL_GetSerialBytesReceived(static_cast<HAL_SerialPortHandle(handle), &status);
   CheckStatus(env, status);
   return retVal;
 }
@@ -225,16 +227,16 @@ Java_edu_wpi_first_hal_SerialPortJNI_serialGetBytesReceived
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialRead
- * Signature: (B[BI)I
+ * Signature: (I[BI)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialRead
-  (JNIEnv* env, jclass, jbyte port, jbyteArray dataReceived, jint size)
+  (JNIEnv* env, jclass, jint handle, jbyteArray dataReceived, jint size)
 {
   wpi::SmallVector<char, 128> recvBuf;
   recvBuf.resize(size);
   int32_t status = 0;
-  jint retVal = HAL_ReadSerial(static_cast<HAL_SerialPort>(port),
+  jint retVal = HAL_ReadSerial(static_cast<HAL_SerialPortHandle(handle),
                                recvBuf.data(), size, &status);
   env->SetByteArrayRegion(dataReceived, 0, size,
                           reinterpret_cast<const jbyte*>(recvBuf.data()));
@@ -245,15 +247,15 @@ Java_edu_wpi_first_hal_SerialPortJNI_serialRead
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialWrite
- * Signature: (B[BI)I
+ * Signature: (I[BI)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialWrite
-  (JNIEnv* env, jclass, jbyte port, jbyteArray dataToSend, jint size)
+  (JNIEnv* env, jclass, jint handle, jbyteArray dataToSend, jint size)
 {
   int32_t status = 0;
   jint retVal =
-      HAL_WriteSerial(static_cast<HAL_SerialPort>(port),
+      HAL_WriteSerial(static_cast<HAL_SerialPortHandle(handle),
                       reinterpret_cast<const char*>(
                           JByteArrayRef(env, dataToSend).array().data()),
                       size, &status);
@@ -264,42 +266,42 @@ Java_edu_wpi_first_hal_SerialPortJNI_serialWrite
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialFlush
- * Signature: (B)V
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialFlush
-  (JNIEnv* env, jclass, jbyte port)
+  (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
-  HAL_FlushSerial(static_cast<HAL_SerialPort>(port), &status);
+  HAL_FlushSerial(static_cast<HAL_SerialPortHandle(handle), &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialClear
- * Signature: (B)V
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialClear
-  (JNIEnv* env, jclass, jbyte port)
+  (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
-  HAL_ClearSerial(static_cast<HAL_SerialPort>(port), &status);
+  HAL_ClearSerial(static_cast<HAL_SerialPortHandle(handle), &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialClose
- * Signature: (B)V
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialClose
-  (JNIEnv* env, jclass, jbyte port)
+  (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
-  HAL_CloseSerial(static_cast<HAL_SerialPort>(port), &status);
+  HAL_CloseSerial(static_cast<HAL_SerialPortHandle(handle), &status);
   CheckStatus(env, status);
 }
 
