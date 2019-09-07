@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,10 +9,10 @@
 
 #include <string>
 
+#include <hal/Types.h>
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
 #include <wpi/deprecated.h>
-#include <hal/Types.h>
 
 #include "frc/ErrorBase.h"
 
@@ -73,7 +73,7 @@ class SerialPort : public ErrorBase {
 
   /**
    * Create an instance of a Serial Port class.
-   * 
+   *
    * Prefer to use the constructor that doesn't take a port name, but in some
    * cases the automatic detection might not work correctly.
    *

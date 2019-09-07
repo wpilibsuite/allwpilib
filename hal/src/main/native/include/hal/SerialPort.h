@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -38,7 +38,8 @@ extern "C" {
  *
  * @param handle the serial port to initialize
  */
-HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port, int32_t* status);
+HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
+                                              int32_t* status);
 
 /**
  * Initializes a serial port with a direct name.
@@ -54,7 +55,7 @@ void HAL_InitializeSerialPortDirect(HAL_SerialPort port, const char* portName,
 
 /**
  * Gets the raw serial port file descriptor from a handle.
- * 
+ *
  * @param handle the serial port handle
  * @return the raw port descriptor
  */
@@ -68,7 +69,8 @@ int HAL_GetSerialFD(HAL_SerialPortHandle handle, int32_t* status);
  * @param handle the serial port handle
  * @param baud the baud rate to set
  */
-void HAL_SetSerialBaudRate(HAL_SerialPortHandle handle, int32_t baud, int32_t* status);
+void HAL_SetSerialBaudRate(HAL_SerialPortHandle handle, int32_t baud,
+                           int32_t* status);
 
 /**
  * Sets the number of data bits on a serial port.
@@ -78,7 +80,8 @@ void HAL_SetSerialBaudRate(HAL_SerialPortHandle handle, int32_t baud, int32_t* s
  * @param handle the serial port handle
  * @param bits the number of data bits (5-8)
  */
-void HAL_SetSerialDataBits(HAL_SerialPortHandle handle, int32_t bits, int32_t* status);
+void HAL_SetSerialDataBits(HAL_SerialPortHandle handle, int32_t bits,
+                           int32_t* status);
 
 /**
  * Sets the number of parity bits on a serial port.
@@ -93,7 +96,8 @@ void HAL_SetSerialDataBits(HAL_SerialPortHandle handle, int32_t bits, int32_t* s
  * @param handle   the serial port handle
  * @param parity the parity bit mode (see remarks for valid values)
  */
-void HAL_SetSerialParity(HAL_SerialPortHandle handle, int32_t parity, int32_t* status);
+void HAL_SetSerialParity(HAL_SerialPortHandle handle, int32_t parity,
+                         int32_t* status);
 
 /**
  * Sets the number of stop bits on a serial port.
@@ -119,7 +123,8 @@ void HAL_SetSerialStopBits(HAL_SerialPortHandle handle, int32_t stopBits,
  * @param handle the serial port handle
  * @param mode the mode to set (see remarks for valid values)
  */
-void HAL_SetSerialWriteMode(HAL_SerialPortHandle handle, int32_t mode, int32_t* status);
+void HAL_SetSerialWriteMode(HAL_SerialPortHandle handle, int32_t mode,
+                            int32_t* status);
 
 /**
  * Sets the flow control mode of a serial port.
@@ -142,7 +147,8 @@ void HAL_SetSerialFlowControl(HAL_SerialPortHandle handle, int32_t flow,
  * @param handle    the serial port
  * @param timeout the timeout in milliseconds
  */
-void HAL_SetSerialTimeout(HAL_SerialPortHandle handle, double timeout, int32_t* status);
+void HAL_SetSerialTimeout(HAL_SerialPortHandle handle, double timeout,
+                          int32_t* status);
 
 /**
  * Sets the termination character that terminates a read.
@@ -186,7 +192,8 @@ void HAL_SetSerialWriteBufferSize(HAL_SerialPortHandle handle, int32_t size,
  * @param handle the serial port handle
  * @return     the number of bytes in the read buffer
  */
-int32_t HAL_GetSerialBytesReceived(HAL_SerialPortHandle handle, int32_t* status);
+int32_t HAL_GetSerialBytesReceived(HAL_SerialPortHandle handle,
+                                   int32_t* status);
 
 /**
  * Reads data from the serial port.
@@ -209,8 +216,8 @@ int32_t HAL_ReadSerial(HAL_SerialPortHandle handle, char* buffer, int32_t count,
  * @param count  the number of bytes to write from the buffer
  * @return       the number of bytes actually written
  */
-int32_t HAL_WriteSerial(HAL_SerialPortHandle handle, const char* buffer, int32_t count,
-                        int32_t* status);
+int32_t HAL_WriteSerial(HAL_SerialPortHandle handle, const char* buffer,
+                        int32_t count, int32_t* status);
 
 /**
  * Flushes the serial write buffer out to the port.

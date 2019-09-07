@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,7 +19,8 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
                        SerialPort::StopBits stopBits) {
   int32_t status = 0;
 
-  m_portHandle = HAL_InitializeSerialPort(static_cast<HAL_SerialPort>(port), &status);
+  m_portHandle =
+      HAL_InitializeSerialPort(static_cast<HAL_SerialPort>(port), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   // Don't continue if initialization failed
   if (status < 0) return;
@@ -86,15 +87,13 @@ SerialPort::~SerialPort() {
 
 void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {
   int32_t status = 0;
-  HAL_SetSerialFlowControl(m_portHandle, flowControl,
-                           &status);
+  HAL_SetSerialFlowControl(m_portHandle, flowControl, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 void SerialPort::EnableTermination(char terminator) {
   int32_t status = 0;
-  HAL_EnableSerialTermination(m_portHandle, terminator,
-                              &status);
+  HAL_EnableSerialTermination(m_portHandle, terminator, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -106,16 +105,14 @@ void SerialPort::DisableTermination() {
 
 int SerialPort::GetBytesReceived() {
   int32_t status = 0;
-  int retVal =
-      HAL_GetSerialBytesReceived(m_portHandle, &status);
+  int retVal = HAL_GetSerialBytesReceived(m_portHandle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
 
 int SerialPort::Read(char* buffer, int count) {
   int32_t status = 0;
-  int retVal = HAL_ReadSerial(m_portHandle, buffer,
-                              count, &status);
+  int retVal = HAL_ReadSerial(m_portHandle, buffer, count, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -126,8 +123,8 @@ int SerialPort::Write(const char* buffer, int count) {
 
 int SerialPort::Write(wpi::StringRef buffer) {
   int32_t status = 0;
-  int retVal = HAL_WriteSerial(m_portHandle,
-                               buffer.data(), buffer.size(), &status);
+  int retVal =
+      HAL_WriteSerial(m_portHandle, buffer.data(), buffer.size(), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -140,15 +137,13 @@ void SerialPort::SetTimeout(double timeout) {
 
 void SerialPort::SetReadBufferSize(int size) {
   int32_t status = 0;
-  HAL_SetSerialReadBufferSize(m_portHandle, size,
-                              &status);
+  HAL_SetSerialReadBufferSize(m_portHandle, size, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 void SerialPort::SetWriteBufferSize(int size) {
   int32_t status = 0;
-  HAL_SetSerialWriteBufferSize(m_portHandle, size,
-                               &status);
+  HAL_SetSerialWriteBufferSize(m_portHandle, size, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
