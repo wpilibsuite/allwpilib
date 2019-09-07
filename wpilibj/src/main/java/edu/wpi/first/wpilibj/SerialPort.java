@@ -90,7 +90,7 @@ public class SerialPort implements AutoCloseable {
   /**
    * Create an instance of a Serial Port class.
    *
-   * Prefer to use the constructor that doesn't take a port name, but in some
+   * <p>Prefer to use the constructor that doesn't take a port name, but in some
    * cases the automatic detection might not work correctly.
    *
    * @param baudRate The baud rate to configure the serial port.
@@ -134,7 +134,7 @@ public class SerialPort implements AutoCloseable {
    */
   public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity,
                     StopBits stopBits) {
-    m_portHandle = SerialPortJNI.serialInitializePort((byte)port.value);
+    m_portHandle = SerialPortJNI.serialInitializePort((byte) port.value);
     SerialPortJNI.serialSetBaudRate(m_portHandle, baudRate);
     SerialPortJNI.serialSetDataBits(m_portHandle, (byte) dataBits);
     SerialPortJNI.serialSetParity(m_portHandle, (byte) parity.value);

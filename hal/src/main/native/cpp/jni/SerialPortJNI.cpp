@@ -23,7 +23,7 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialInitializePort
- * Signature: (B)?
+ * Signature: (B)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialInitializePort
@@ -39,7 +39,7 @@ Java_edu_wpi_first_hal_SerialPortJNI_serialInitializePort
 /*
  * Class:     edu_wpi_first_hal_SerialPortJNI
  * Method:    serialInitializePortDirect
- * Signature: (BLjava/lang/String;)?
+ * Signature: (BLjava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialInitializePortDirect
