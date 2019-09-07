@@ -448,7 +448,7 @@ void HAL_FlushSerial(HAL_SerialPortHandle handle, int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  tcflush(port->portId, TCOFLUSH);
+  tcdrain(port->portId);
 }
 void HAL_ClearSerial(HAL_SerialPortHandle handle, int32_t* status) {
   auto port = serialPortHandles->Get(handle);
@@ -456,6 +456,6 @@ void HAL_ClearSerial(HAL_SerialPortHandle handle, int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  tcflush(port->portId, TCIFLUSH);
+  tcflush(port->portId, TCIOFLUSH);
 }
 }  // extern "C"
