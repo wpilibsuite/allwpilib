@@ -52,8 +52,8 @@ SerialPort::SerialPort(int baudRate, const wpi::Twine& portName, Port port,
   wpi::SmallVector<char, 64> buf;
   const char* portNameC = portName.toNullTerminatedStringRef(buf).data();
 
-  m_portHandle = HAL_InitializeSerialPortDirect(static_cast<HAL_SerialPort>(port), portNameC,
-                                 &status);
+  m_portHandle = HAL_InitializeSerialPortDirect(
+      static_cast<HAL_SerialPort>(port), portNameC, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   // Don't continue if initialization failed
   if (status < 0) return;
