@@ -50,8 +50,9 @@ HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
  * @param handle     the serial port to initialize
  * @param handleName the dev port name
  */
-void HAL_InitializeSerialPortDirect(HAL_SerialPort port, const char* portName,
-                                    int32_t* status);
+HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port, 
+                                                    const char* portName,
+                                                    int32_t* status);
 
 /**
  * Gets the raw serial port file descriptor from a handle.
