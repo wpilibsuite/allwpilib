@@ -50,7 +50,7 @@ HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
  * @param handle     the serial port to initialize
  * @param handleName the dev port name
  */
-HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port, 
+HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
                                                     const char* portName,
                                                     int32_t* status);
 
