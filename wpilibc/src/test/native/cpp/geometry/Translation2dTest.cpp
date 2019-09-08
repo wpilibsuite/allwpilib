@@ -76,3 +76,15 @@ TEST(Translation2dTest, UnaryMinus) {
   EXPECT_NEAR(inverted.X().to<double>(), 4.5, kEpsilon);
   EXPECT_NEAR(inverted.Y().to<double>(), -7, kEpsilon);
 }
+
+TEST(Translation2dTest, Equality) {
+  const Translation2d one{9_m, 5.5_m};
+  const Translation2d two{9_m, 5.5_m};
+  EXPECT_TRUE(one == two);
+}
+
+TEST(Translation2dTest, Inequality) {
+  const Translation2d one{9_m, 5.5_m};
+  const Translation2d two{9_m, 5.7_m};
+  EXPECT_TRUE(one != two);
+}

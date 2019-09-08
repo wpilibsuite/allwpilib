@@ -53,3 +53,15 @@ TEST(Rotation2dTest, Minus) {
 
   EXPECT_NEAR((one - two).Degrees().to<double>(), 40.0, kEpsilon);
 }
+
+TEST(Rotation2dTest, Equality) {
+  const auto one = Rotation2d(43_deg);
+  const auto two = Rotation2d(43_deg);
+  EXPECT_TRUE(one == two);
+}
+
+TEST(Rotation2dTest, Inequality) {
+  const auto one = Rotation2d(43_deg);
+  const auto two = Rotation2d(43.5_deg);
+  EXPECT_TRUE(one != two);
+}

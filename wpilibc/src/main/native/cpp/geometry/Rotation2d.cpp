@@ -52,6 +52,14 @@ Rotation2d& Rotation2d::operator-=(const Rotation2d& other) {
 
 Rotation2d Rotation2d::operator-() const { return Rotation2d(-m_value); }
 
+bool Rotation2d::operator==(const Rotation2d& other) const {
+  return units::math::abs(m_value - other.m_value) < 1E-9_rad;
+}
+
+bool Rotation2d::operator!=(const Rotation2d& other) const {
+  return !operator==(other);
+}
+
 Rotation2d Rotation2d::RotateBy(const Rotation2d& other) const {
   return {Cos() * other.Cos() - Sin() * other.Sin(),
           Cos() * other.Sin() + Sin() * other.Cos()};

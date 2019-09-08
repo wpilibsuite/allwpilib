@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class Translation2dTest {
   private static final double kEpsilon = 1E-9;
@@ -96,5 +97,19 @@ class Translation2dTest {
         () -> assertEquals(inverted.getX(), 4.5, kEpsilon),
         () -> assertEquals(inverted.getY(), -7, kEpsilon)
     );
+  }
+
+  @Test
+  void testEquality() {
+    var one = new Translation2d(9, 5.5);
+    var two = new Translation2d(9, 5.5);
+    assertEquals(one, two);
+  }
+
+  @Test
+  void testInequality() {
+    var one = new Translation2d(9, 5.5);
+    var two = new Translation2d(9, 5.7);
+    assertNotEquals(one, two);
   }
 }

@@ -44,3 +44,15 @@ TEST(Twist2dTest, DiagonalNoDtheta) {
   EXPECT_NEAR(diagonalPose.Translation().Y().to<double>(), 2.0, kEpsilon);
   EXPECT_NEAR(diagonalPose.Rotation().Degrees().to<double>(), 0.0, kEpsilon);
 }
+
+TEST(Twist2dTest, Equality) {
+  const Twist2d one{5.0_m, 1.0_m, 3.0_rad};
+  const Twist2d two{5.0_m, 1.0_m, 3.0_rad};
+  EXPECT_TRUE(one == two);
+}
+
+TEST(Twist2dTest, Inequality) {
+  const Twist2d one{5.0_m, 1.0_m, 3.0_rad};
+  const Twist2d two{5.0_m, 1.2_m, 3.0_rad};
+  EXPECT_TRUE(one != two);
+}

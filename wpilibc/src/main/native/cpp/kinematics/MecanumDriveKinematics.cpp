@@ -12,8 +12,7 @@ using namespace frc;
 MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
     const ChassisSpeeds& chassisSpeeds, const Translation2d& centerOfRotation) {
   // We have a new center of rotation. We need to compute the matrix again.
-  if (centerOfRotation.X() != m_previousCoR.X() ||
-      centerOfRotation.Y() != m_previousCoR.Y()) {
+  if (centerOfRotation != m_previousCoR) {
     auto fl = m_frontLeftWheel - centerOfRotation;
     auto fr = m_frontRightWheel - centerOfRotation;
     auto rl = m_rearLeftWheel - centerOfRotation;

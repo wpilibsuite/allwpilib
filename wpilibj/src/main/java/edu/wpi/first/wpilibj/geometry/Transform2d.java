@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.geometry;
 
+import java.util.Objects;
+
 /**
  * Represents a transformation for a Pose2d.
  */
@@ -65,5 +67,25 @@ public class Transform2d {
    */
   public Rotation2d getRotation() {
     return m_rotation;
+  }
+
+  /**
+   * Checks equality between this Transform2d and another object.
+   *
+   * @param obj The other object.
+   * @return Whether the two objects are equal or not.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Transform2d) {
+      return ((Transform2d) obj).m_translation.equals(m_translation)
+          && ((Transform2d) obj).m_rotation.equals(m_rotation);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_translation, m_rotation);
   }
 }

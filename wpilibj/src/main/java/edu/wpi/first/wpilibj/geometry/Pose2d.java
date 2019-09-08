@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.geometry;
 
+import java.util.Objects;
+
 /**
  * Represents a 2d pose containing translational and rotational elements.
  */
@@ -153,5 +155,25 @@ public class Pose2d {
             new Rotation2d(cosTheta, sinTheta));
 
     return this.plus(transform);
+  }
+
+  /**
+   * Checks equality between this Pose2d and another object.
+   *
+   * @param obj The other object.
+   * @return Whether the two objects are equal or not.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Pose2d) {
+      return ((Pose2d) obj).m_translation.equals(m_translation)
+          && ((Pose2d) obj).m_rotation.equals(m_rotation);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_translation, m_rotation);
   }
 }

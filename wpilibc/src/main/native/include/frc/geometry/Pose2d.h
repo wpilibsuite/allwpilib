@@ -69,6 +69,22 @@ class Pose2d {
   Pose2d& operator+=(const Transform2d& other);
 
   /**
+   * Checks equality between this Pose2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
+  bool operator==(const Pose2d& other) const;
+
+  /**
+   * Checks inequality between this Pose2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are not equal.
+   */
+  bool operator!=(const Pose2d& other) const;
+
+  /**
    * Returns the underlying translation.
    *
    * @return Reference to the translational component of the pose.

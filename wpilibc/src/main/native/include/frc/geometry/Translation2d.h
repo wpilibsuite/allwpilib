@@ -180,6 +180,22 @@ class Translation2d {
    */
   Translation2d operator/(double scalar) const;
 
+  /**
+   * Checks equality between this Translation2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
+  bool operator==(const Translation2d& other) const;
+
+  /**
+   * Checks inequality between this Translation2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are not equal.
+   */
+  bool operator!=(const Translation2d& other) const;
+
   /*
    * Divides the current translation by a scalar.
    *
