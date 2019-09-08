@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.util;
 /**
  * Utility class that converts between commonly used units in FRC.
  */
-public class Units {
+public final class Units {
   private static final double kInchesInAFoot = 12.0;
   private static final double kMetersInAInch = 0.0254;
   private static final double kHalfAMinuteInSeconds = 30;
