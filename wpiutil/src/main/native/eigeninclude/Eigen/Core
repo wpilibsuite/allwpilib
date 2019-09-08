@@ -11,6 +11,10 @@
 #ifndef EIGEN_CORE_H
 #define EIGEN_CORE_H
 
+#if __GNUC__ >= 9
+#pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#endif
+
 // first thing Eigen does: stop the compiler from committing suicide
 #include "src/Core/util/DisableStupidWarnings.h"
 

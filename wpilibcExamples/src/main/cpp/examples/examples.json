@@ -328,5 +328,32 @@
     ],
     "foldername": "GyroDriveCommands",
     "mainclass": "Main"
+  },
+  {
+    "name": "SwerveBot",
+    "description": "An example program for a swerve drive that uses swerve drive kinematics and odometry.",
+    "tags": [
+      "SwerveBot"
+    ],
+    "foldername": "SwerveBot",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "MecanumBot",
+    "description": "An example program for a mecanum drive that uses mecanum drive kinematics and odometry.",
+    "tags": [
+      "MecanumBot"
+    ],
+    "foldername": "MecanumBot",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "DifferentialDriveBot",
+    "description": "An example program for a differential drive that uses differential drive kinematics and odometry.",
+    "tags": [
+      "DifferentialDriveBot"
+    ],
+    "foldername": "DifferentialDriveBot",
+    "gradlebase": "cpp"
   }
 ]
