@@ -26,7 +26,7 @@ public final class Units {
    * Converts given meters to feet.
    *
    * @param meters The meters to convert to feet.
-   * @return Inches converted from meters.
+   * @return Feet converted from meters.
    */
   public static double metersToFeet(double meters) {
     return metersToInches(meters) / kInchesInAFoot;
@@ -46,7 +46,7 @@ public final class Units {
    * Converts given meters to inches.
    *
    * @param meters The meters to convert to inches.
-   * @return Inches The inches converted from meters.
+   * @return Inches converted from meters.
    */
   public static double metersToInches(double meters) {
     return meters / kMetersInAInch;
