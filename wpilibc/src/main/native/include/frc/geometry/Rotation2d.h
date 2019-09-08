@@ -28,7 +28,7 @@ class Rotation2d {
    *
    * @param value The value of the angle in radians.
    */
-  explicit Rotation2d(units::radian_t value);
+  Rotation2d(units::radian_t value);  // NOLINT(runtime/explicit)
 
   /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)
