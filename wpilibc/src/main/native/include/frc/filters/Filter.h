@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,6 +8,8 @@
 #pragma once
 
 #include <memory>
+
+#include <wpi/deprecated.h>
 
 #include "frc/PIDSource.h"
 
@@ -18,7 +20,9 @@ namespace frc {
  */
 class Filter : public PIDSource {
  public:
+  WPI_DEPRECATED("This class is no longer used.")
   explicit Filter(PIDSource& source);
+  WPI_DEPRECATED("This class is no longer used.")
   explicit Filter(std::shared_ptr<PIDSource> source);
   virtual ~Filter() = default;
 
