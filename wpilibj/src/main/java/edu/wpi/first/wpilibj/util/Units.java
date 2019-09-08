@@ -11,9 +11,9 @@ package edu.wpi.first.wpilibj.util;
  * Utility class that converts between commonly used units in FRC.
  */
 public final class Units {
-  private static final double kInchesInAFoot = 12.0;
-  private static final double kMetersInAInch = 0.0254;
-  private static final double kHalfAMinuteInSeconds = 30;
+  private static final double kInchesPerFoot = 12.0;
+  private static final double kMetersPerInch = 0.0254;
+  private static final double kSecondsPerMinute = 60;
 
   /**
    * Utility class, so constructor is private.
@@ -29,7 +29,7 @@ public final class Units {
    * @return Feet converted from meters.
    */
   public static double metersToFeet(double meters) {
-    return metersToInches(meters) / kInchesInAFoot;
+    return metersToInches(meters) / kInchesPerFoot;
   }
 
   /**
@@ -39,7 +39,7 @@ public final class Units {
    * @return Meters converted from feet.
    */
   public static double feetToMeters(double feet) {
-    return inchesToMeters(feet * kInchesInAFoot);
+    return inchesToMeters(feet * kInchesPerFoot);
   }
 
   /**
@@ -49,7 +49,7 @@ public final class Units {
    * @return Inches converted from meters.
    */
   public static double metersToInches(double meters) {
-    return meters / kMetersInAInch;
+    return meters / kMetersPerInch;
   }
 
   /**
@@ -59,7 +59,7 @@ public final class Units {
    * @return Meters converted from inches.
    */
   public static double inchesToMeters(double inches) {
-    return inches * kMetersInAInch;
+    return inches * kMetersPerInch;
   }
 
   /**
@@ -89,7 +89,7 @@ public final class Units {
    * @return Radians per second converted from rotations per minute.
    */
   public static double rotationsPerMinuteToRadiansPerSecond(double rpm) {
-    return rpm * Math.PI / kHalfAMinuteInSeconds;
+    return rpm * Math.PI / (kSecondsPerMinute / 2);
   }
 
   /**
@@ -99,6 +99,6 @@ public final class Units {
    * @return Rotations per minute converted from radians per second.
    */
   public static double radiansPerSecondToRotationsPerMinute(double radiansPerSecond) {
-    return radiansPerSecond * kHalfAMinuteInSeconds / Math.PI;
+    return radiansPerSecond * (kSecondsPerMinute / 2) / Math.PI;
   }
 }
