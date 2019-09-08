@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+package edu.wpi.first.wpilibj.util;
+
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.UtilityClassTest;
