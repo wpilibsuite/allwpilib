@@ -20,8 +20,7 @@ std::array<SwerveModuleState, NumModules>
 SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
     const ChassisSpeeds& chassisSpeeds, const Translation2d& centerOfRotation) {
   // We have a new center of rotation. We need to compute the matrix again.
-  if (centerOfRotation.X() != m_previousCoR.X() ||
-      centerOfRotation.Y() != m_previousCoR.Y()) {
+  if (centerOfRotation != m_previousCoR) {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) <<

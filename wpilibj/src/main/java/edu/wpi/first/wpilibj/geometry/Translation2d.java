@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.geometry;
 
+import java.util.Objects;
+
 /**
  * Represents a translation in 2d space.
  * This object can be used to represent a point or a vector.
@@ -161,5 +163,25 @@ public class Translation2d {
    */
   public Translation2d div(double scalar) {
     return new Translation2d(m_x / scalar, m_y / scalar);
+  }
+
+  /**
+   * Checks equality between this Translation2d and another object.
+   *
+   * @param obj The other object.
+   * @return Whether the two objects are equal or not.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Translation2d) {
+      return Math.abs(((Translation2d) obj).m_x - m_x) < 1E-9
+          && Math.abs(((Translation2d) obj).m_y - m_y) < 1E-9;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_x, m_y);
   }
 }

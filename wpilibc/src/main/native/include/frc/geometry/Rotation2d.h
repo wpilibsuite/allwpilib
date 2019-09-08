@@ -98,6 +98,22 @@ class Rotation2d {
   Rotation2d operator-() const;
 
   /**
+   * Checks equality between this Rotation2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
+  bool operator==(const Rotation2d& other) const;
+
+  /**
+   * Checks inequality between this Rotation2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are not equal.
+   */
+  bool operator!=(const Rotation2d& other) const;
+
+  /**
    * Adds the new rotation to the current rotation using a rotation matrix.
    *
    * [cos_new]   [other.cos, -other.sin][cos]

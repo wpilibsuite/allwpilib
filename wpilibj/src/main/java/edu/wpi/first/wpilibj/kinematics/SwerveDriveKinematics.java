@@ -96,8 +96,7 @@ public class SwerveDriveKinematics {
   @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
   public SwerveModuleState[] toSwerveModuleStates(ChassisSpeeds chassisSpeeds,
                                                   Translation2d centerOfRotationMeters) {
-    if (centerOfRotationMeters.getX() != m_prevCoR.getX()
-        || centerOfRotationMeters.getY() != m_prevCoR.getY()) {
+    if (!centerOfRotationMeters.equals(m_prevCoR)) {
       for (int i = 0; i < m_numModules; i++) {
         m_inverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0,
             -m_modules[i].getY() + centerOfRotationMeters.getY());

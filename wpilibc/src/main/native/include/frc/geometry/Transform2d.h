@@ -53,6 +53,22 @@ class Transform2d {
    */
   const Rotation2d& Rotation() const { return m_rotation; }
 
+  /**
+   * Checks equality between this Transform2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
+  bool operator==(const Transform2d& other) const;
+
+  /**
+   * Checks inequality between this Transform2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are not equal.
+   */
+  bool operator!=(const Transform2d& other) const;
+
  private:
   Translation2d m_translation;
   Rotation2d m_rotation;

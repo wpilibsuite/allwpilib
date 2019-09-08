@@ -27,6 +27,14 @@ Pose2d& Pose2d::operator+=(const Transform2d& other) {
   return *this;
 }
 
+bool Pose2d::operator==(const Pose2d& other) const {
+  return m_translation == other.m_translation && m_rotation == other.m_rotation;
+}
+
+bool Pose2d::operator!=(const Pose2d& other) const {
+  return !operator==(other);
+}
+
 Pose2d Pose2d::TransformBy(const Transform2d& other) const {
   return {m_translation + (other.Translation().RotateBy(m_rotation)),
           m_rotation + other.Rotation()};

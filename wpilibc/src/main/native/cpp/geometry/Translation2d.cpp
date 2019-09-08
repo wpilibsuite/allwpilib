@@ -60,6 +60,15 @@ Translation2d Translation2d::operator/(double scalar) const {
   return *this * (1.0 / scalar);
 }
 
+bool Translation2d::operator==(const Translation2d& other) const {
+  return units::math::abs(m_x - other.m_x) < 1E-9_m &&
+         units::math::abs(m_y - other.m_y) < 1E-9_m;
+}
+
+bool Translation2d::operator!=(const Translation2d& other) const {
+  return !operator==(other);
+}
+
 Translation2d& Translation2d::operator/=(double scalar) {
   *this *= (1.0 / scalar);
   return *this;

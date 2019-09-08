@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class Rotation2dTest {
   private static final double kEpsilon = 1E-9;
@@ -62,5 +63,19 @@ class Rotation2dTest {
     var two = Rotation2d.fromDegrees(30.0);
 
     assertEquals(one.minus(two).getDegrees(), 40.0, kEpsilon);
+  }
+
+  @Test
+  void testEquality() {
+    var one = Rotation2d.fromDegrees(43.0);
+    var two = Rotation2d.fromDegrees(43.0);
+    assertEquals(one, two);
+  }
+
+  @Test
+  void testInequality() {
+    var one = Rotation2d.fromDegrees(43.0);
+    var two = Rotation2d.fromDegrees(43.5);
+    assertNotEquals(one, two);
   }
 }

@@ -40,3 +40,15 @@ TEST(Pose2dTest, RelativeTo) {
   EXPECT_NEAR(finalRelativeToInitial.Rotation().Degrees().to<double>(), 0.0,
               kEpsilon);
 }
+
+TEST(Pose2dTest, Equality) {
+  const Pose2d a{0_m, 5_m, Rotation2d(43_deg)};
+  const Pose2d b{0_m, 5_m, Rotation2d(43_deg)};
+  EXPECT_TRUE(a == b);
+}
+
+TEST(Pose2dTest, Inequality) {
+  const Pose2d a{0_m, 5_m, Rotation2d(43_deg)};
+  const Pose2d b{0_m, 5_ft, Rotation2d(43_deg)};
+  EXPECT_TRUE(a != b);
+}

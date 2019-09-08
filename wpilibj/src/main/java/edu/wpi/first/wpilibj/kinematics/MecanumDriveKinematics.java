@@ -94,8 +94,7 @@ public class MecanumDriveKinematics {
   public MecanumDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds,
                                                Translation2d centerOfRotationMeters) {
     // We have a new center of rotation. We need to compute the matrix again.
-    if (centerOfRotationMeters.getX() != m_prevCoR.getX()
-        || centerOfRotationMeters.getY() != m_prevCoR.getY()) {
+    if (!centerOfRotationMeters.equals(m_prevCoR)) {
       var fl = m_frontLeftWheelMeters.minus(centerOfRotationMeters);
       var fr = m_frontRightWheelMeters.minus(centerOfRotationMeters);
       var rl = m_rearLeftWheelMeters.minus(centerOfRotationMeters);

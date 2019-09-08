@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.geometry;
 
+import java.util.Objects;
+
 /**
  * A rotation in a 2d coordinate frame represented a point on the unit circle
  * (cosine and sine).
@@ -118,8 +120,8 @@ public class Rotation2d {
    */
   public Rotation2d rotateBy(Rotation2d other) {
     return new Rotation2d(
-            m_cos * other.m_cos - m_sin * other.m_sin,
-            m_cos * other.m_sin + m_sin * other.m_cos
+        m_cos * other.m_cos - m_sin * other.m_sin,
+        m_cos * other.m_sin + m_sin * other.m_cos
     );
   }
 
@@ -166,5 +168,24 @@ public class Rotation2d {
    */
   public double getTan() {
     return m_sin / m_cos;
+  }
+
+  /**
+   * Checks equality between this Rotation2d and another object.
+   *
+   * @param obj The other object.
+   * @return Whether the two objects are equal or not.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Rotation2d) {
+      return Math.abs(((Rotation2d) obj).m_value - m_value) < 1E-9;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_value);
   }
 }
