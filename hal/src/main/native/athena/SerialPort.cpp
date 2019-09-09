@@ -90,7 +90,7 @@ HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
 
   serialPort->portId = open(portName, O_RDWR | O_NOCTTY);
   if (serialPort->portId < 0) {
-    *status = HAL_SERIAL_PORT_OPEN_ERROR;
+    *status = errno;
     serialPortHandles->Free(handle);
     return HAL_kInvalidHandle;
   }
@@ -113,7 +113,7 @@ HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
 
   serialPort->tty.c_lflag &= ~(ICANON | ECHO | ISIG);
   serialPort->tty.c_iflag &= ~(IXON | IXOFF | IXANY);
-  /* Raw output mode, sends the raw and unprocessed data  ( send as it is).
+  /* Raw output mode, sends the raw and unprocessed data  (send as it is).
    * If it is in canonical mode and sending new line char then CR
    * will be added as prefix and send as CR LF
    */
@@ -121,8 +121,8 @@ HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
 
   tcflush(serialPort->portId, TCIOFLUSH);
   if (tcsetattr(serialPort->portId, TCSANOW, &serialPort->tty) != 0) {
+    *status = errno;
     close(serialPort->portId);
-    *status = HAL_SERIAL_PORT_OPEN_ERROR;
     serialPortHandles->Free(handle);
     return HAL_kInvalidHandle;
   }
@@ -136,7 +136,6 @@ void HAL_CloseSerial(HAL_SerialPortHandle handle, int32_t* status) {
   if (port) {
     close(port->portId);
   }
-  *status = 0;
 }
 
 int HAL_GetSerialFD(HAL_SerialPortHandle handle, int32_t* status) {
@@ -198,7 +197,10 @@ void HAL_SetSerialBaudRate(HAL_SerialPortHandle handle, int32_t baud,
   }
   cfsetospeed(&port->tty, static_cast<speed_t>(port->baudRate));
   cfsetispeed(&port->tty, static_cast<speed_t>(port->baudRate));
-  tcsetattr(port->portId, TCSANOW, &port->tty);
+  int err = tcsetattr(port->portId, TCSANOW, &port->tty);
+  if (err < 0) {
+    *status = errno;
+  }
 }
 
 void HAL_SetSerialDataBits(HAL_SerialPortHandle handle, int32_t bits,
@@ -231,7 +233,10 @@ void HAL_SetSerialDataBits(HAL_SerialPortHandle handle, int32_t bits,
   port->tty.c_cflag &= ~CSIZE;
   port->tty.c_cflag |= bitFlag;
 
-  tcsetattr(port->portId, TCSANOW, &port->tty);
+  int err = tcsetattr(port->portId, TCSANOW, &port->tty);
+  if (err < 0) {
+    *status = errno;
+  }
 }
 
 void HAL_SetSerialParity(HAL_SerialPortHandle handle, int32_t parity,
@@ -272,7 +277,10 @@ void HAL_SetSerialParity(HAL_SerialPortHandle handle, int32_t parity,
       return;
   }
 
-  tcsetattr(port->portId, TCSANOW, &port->tty);
+  int err = tcsetattr(port->portId, TCSANOW, &port->tty);
+  if (err < 0) {
+    *status = errno;
+  }
 }
 
 void HAL_SetSerialStopBits(HAL_SerialPortHandle handle, int32_t stopBits,
@@ -296,7 +304,10 @@ void HAL_SetSerialStopBits(HAL_SerialPortHandle handle, int32_t stopBits,
       return;
   }
 
-  tcsetattr(port->portId, TCSANOW, &port->tty);
+  int err = tcsetattr(port->portId, TCSANOW, &port->tty);
+  if (err < 0) {
+    *status = errno;
+  }
 }
 
 void HAL_SetSerialWriteMode(HAL_SerialPortHandle handle, int32_t mode,
@@ -328,7 +339,10 @@ void HAL_SetSerialFlowControl(HAL_SerialPortHandle handle, int32_t flow,
       return;
   }
 
-  tcsetattr(port->portId, TCSANOW, &port->tty);
+  int err = tcsetattr(port->portId, TCSANOW, &port->tty);
+  if (err < 0) {
+    *status = errno;
+  }
 }
 
 void HAL_SetSerialTimeout(HAL_SerialPortHandle handle, double timeout,
@@ -340,7 +354,10 @@ void HAL_SetSerialTimeout(HAL_SerialPortHandle handle, double timeout,
   }
   port->timeout = timeout;
   port->tty.c_cc[VTIME] = static_cast<int>(timeout * 10);
-  tcsetattr(port->portId, TCSANOW, &port->tty);
+  int err = tcsetattr(port->portId, TCSANOW, &port->tty);
+  if (err < 0) {
+    *status = errno;
+  }
 }
 
 void HAL_EnableSerialTermination(HAL_SerialPortHandle handle, char terminator,
@@ -381,8 +398,11 @@ int32_t HAL_GetSerialBytesReceived(HAL_SerialPortHandle handle,
     *status = HAL_HANDLE_ERROR;
     return -1;
   }
-  int bytes;
-  ioctl(port->portId, FIONREAD, &bytes);
+  int bytes = 0;
+  int err = ioctl(port->portId, FIONREAD, &bytes);
+  if (err < 0) {
+    *status = errno;
+  }
   return bytes;
 }
 
@@ -415,6 +435,10 @@ int32_t HAL_ReadSerial(HAL_SerialPortHandle handle, char* buffer, int32_t count,
       if (port->termination && buf == port->terminationChar) {
         return loc;
       }
+    } else if (n == -1) {
+      // ERROR
+      *status = errno;
+      return loc;
     } else {
       // If nothing read, timeout
       return loc;
@@ -430,13 +454,14 @@ int32_t HAL_WriteSerial(HAL_SerialPortHandle handle, const char* buffer,
     return -1;
   }
 
-  // TODO Determine if we need to handle termination on write
-
   int written = 0, spot = 0;
   do {
     written = write(port->portId, buffer + spot, count - spot);
     if (written > 0) {
       spot += written;
+    } else if (written < 0) {
+      *status = errno;
+      return spot;
     }
   } while (spot < count);
   return spot;
@@ -448,7 +473,10 @@ void HAL_FlushSerial(HAL_SerialPortHandle handle, int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  tcdrain(port->portId);
+  int err = tcdrain(port->portId);
+  if (err < 0) {
+    *status = errno;
+  }
 }
 void HAL_ClearSerial(HAL_SerialPortHandle handle, int32_t* status) {
   auto port = serialPortHandles->Get(handle);
@@ -456,6 +484,9 @@ void HAL_ClearSerial(HAL_SerialPortHandle handle, int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  tcflush(port->portId, TCIOFLUSH);
+  int err = tcflush(port->portId, TCIOFLUSH);
+  if (err < 0) {
+    *status = errno;
+  }
 }
 }  // extern "C"
