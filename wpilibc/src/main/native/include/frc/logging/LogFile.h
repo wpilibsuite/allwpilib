@@ -12,6 +12,7 @@
 #include <string>
 
 #include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 
 namespace frc {
 
@@ -39,6 +40,13 @@ class LogFile {
    * @param text The text to be logged in the file.
    */
   void Log(wpi::StringRef text);
+
+  /**
+   * Write text in the logFile.
+   *
+   * @param text The text to be logged in the file.
+   */
+  void LogTwine(const wpi::Twine& text);
 
  private:
   /**

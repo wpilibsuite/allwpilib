@@ -112,8 +112,8 @@ public class LogFile {
    * @return The filename at the format "{filePrefix}-{date/time}.txt".
    */
   private String createFilename(Date time) {
-    // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
-    SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd.HH:mm:ss", Locale.getDefault());
+    // Get current date/time, format is YYYY-MM-DD.HH_mm_ss
+    SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd.HH_mm_ss", Locale.getDefault());
 
     return m_filePrefix + "-" + formater.format(time) + "." + m_fileExtension;
   }

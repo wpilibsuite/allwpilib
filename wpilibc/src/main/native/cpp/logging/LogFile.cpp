@@ -33,6 +33,8 @@ void LogFile::Log(wpi::StringRef text) {
   UpdateFilename();
 }
 
+void LogFile::LogTwine(const wpi::Twine& text) { Log(text.str()); }
+
 void LogFile::UpdateFilename() {
   std::time_t newTime = std::time(0);
   // If the difference between the two timestamps is more than 24 hours
@@ -45,10 +47,10 @@ void LogFile::UpdateFilename() {
 }
 
 std::string LogFile::CreateFilename(std::time_t time) {
-  // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
+  // Get current date/time, format is YYYY-MM-DD.HH_mm_ss
   struct tm localTime = *std::localtime(&time);
   char datetime[80];
-  std::strftime(datetime, sizeof(datetime), "%Y-%m-%d.%X", &localTime);
+  std::strftime(datetime, sizeof(datetime), "%Y-%m-%d-%H_%M_%S", &localTime);
 
   return m_filePrefix + "-" + datetime + "." + m_fileExtension;
 }

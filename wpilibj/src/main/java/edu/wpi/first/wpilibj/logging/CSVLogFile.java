@@ -40,12 +40,17 @@ public class CSVLogFile {
   }
 
   private <ValueT> void logValues(ValueT... values) {
+    if (String.class.isAssignableFrom(values[0].getClass())) {
+      m_logFile.log("\"" + values[0] + "\"");
+    } else {
+      m_logFile.log(String.valueOf(values[0]));
+    }
+
     if (values.length > 1) {
-      m_logFile.log(values[0] + ",");
+      m_logFile.log(",");
       logValues(Arrays.copyOfRange(values, 1, values.length));
     } else {
-      System.out.println("end");
-      m_logFile.log(values[0] + "\n");
+      m_logFile.log("\n");
     }
   }
 }

@@ -12,6 +12,7 @@
 #include <type_traits>
 
 #include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 
 #include "frc/logging/LogFile.h"
 
@@ -56,7 +57,7 @@ class CSVLogFile {
   template <typename Value, typename... Values>
   void LogValues(Value value, Values... values) {
     if constexpr (std::is_convertible_v<Value, wpi::StringRef>) {
-      m_logFile.Log(wpi::Twine("\"") + value + "\"");
+      m_logFile.LogTwine(wpi::Twine("\"") + value + "\"");
     } else {
       m_logFile.Log(std::to_string(value));
     }
