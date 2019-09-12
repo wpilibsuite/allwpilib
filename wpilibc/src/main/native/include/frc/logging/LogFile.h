@@ -41,6 +41,16 @@ class LogFile {
    */
   void Log(const wpi::Twine& text);
 
+  template <typename Value>
+  friend LogFile& operator<<(LogFile& file, const Value& value) {
+    if constexpr (std::is_convertible_v<Value, wpi::StringRef>) {
+      file.Log(value);
+    } else {
+      file.Log(std::to_string(value));
+    }
+    return file;
+  }
+
  private:
   /**
    * Check if the time has changed of more than 24 hours.
