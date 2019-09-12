@@ -76,9 +76,9 @@ class SplineParameterizer {
 
  private:
   // Constraints for spline parameterization.
-  constexpr static units::meter_t kMaxDx = 5_in;
-  constexpr static units::meter_t kMaxDy = 0.05_in;
-  constexpr static units::radian_t kMaxDtheta = 0.0872_rad;
+  static constexpr units::meter_t kMaxDx = 5_in;
+  static constexpr units::meter_t kMaxDy = 0.05_in;
+  static constexpr units::radian_t kMaxDtheta = 0.0872_rad;
 
   /**
    * Breaks up the spline into arcs until the dx, dy, and theta of each arc is
