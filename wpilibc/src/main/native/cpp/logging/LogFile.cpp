@@ -28,12 +28,10 @@ LogFile::LogFile(wpi::StringRef filePrefix, wpi::StringRef fileExtension)
   }
 }
 
-void LogFile::Log(wpi::StringRef text) {
-  m_file << text;
+void LogFile::Log(const wpi::Twine& text) {
+  m_file << text.str();
   UpdateFilename();
 }
-
-void LogFile::LogTwine(const wpi::Twine& text) { Log(text.str()); }
 
 void LogFile::UpdateFilename() {
   std::time_t newTime = std::time(0);

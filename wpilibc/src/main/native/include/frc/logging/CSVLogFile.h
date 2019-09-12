@@ -57,7 +57,7 @@ class CSVLogFile {
   template <typename Value, typename... Values>
   void LogValues(Value value, Values... values) {
     if constexpr (std::is_convertible_v<Value, wpi::StringRef>) {
-      m_logFile.LogTwine(wpi::Twine("\"") + value + "\"");
+      m_logFile.Log(wpi::Twine("\"") + value + "\"");
     } else {
       m_logFile.Log(std::to_string(value));
     }
