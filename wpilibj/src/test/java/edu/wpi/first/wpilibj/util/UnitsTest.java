@@ -20,17 +20,17 @@ class UnitsTest extends UtilityClassTest<Units> {
 
   @Test
   void metersToFeetTest() {
-    assertEquals(3.28, Units.metersToFeet(1), 1e-3);
+    assertEquals(3.28, Units.metersToFeet(1), 1e-2);
   }
 
   @Test
   void feetToMetersTest() {
-    assertEquals(0.30, Units.feetToMeters(1), 1e-3);
+    assertEquals(0.30, Units.feetToMeters(1), 1e-2);
   }
 
   @Test
   void metersToInchesTest() {
-    assertEquals(39.37, Units.metersToInches(1), 1e-3);
+    assertEquals(39.37, Units.metersToInches(1), 1e-2);
   }
 
   @Test
@@ -45,16 +45,16 @@ class UnitsTest extends UtilityClassTest<Units> {
 
   @Test
   void radiansToDegreesTest() {
-    assertEquals(114.59, Units.radiansToDegrees(2), 1e-3);
+    assertEquals(114.59, Units.radiansToDegrees(2), 1e-2);
   }
 
   @Test
   void rotationsPerMinuteToRadiansPerSecondTest() {
-    assertEquals(6.28, Units.rotationsPerMinuteToRadiansPerSecond(60), 1e-3);
+    assertEquals(6.28, Units.rotationsPerMinuteToRadiansPerSecond(60), 1e-2);
   }
 
   @Test
   void radiansPerSecondToRotationsPerMinute() {
-    assertEquals(76.39, Units.radiansPerSecondToRotationsPerMinute(8), 1e-3);
+    assertEquals(76.39, Units.radiansPerSecondToRotationsPerMinute(8), 1e-2);
   }
 }
