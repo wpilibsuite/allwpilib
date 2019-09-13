@@ -32,6 +32,6 @@ class LogFileTest {
       ex.printStackTrace();
     }
 
-    assertEquals("First lineSecond Line", line);
+    assertEquals("First lineSecond line", line);
   }
 }
