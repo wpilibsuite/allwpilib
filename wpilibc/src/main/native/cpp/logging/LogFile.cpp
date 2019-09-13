@@ -32,6 +32,8 @@ void LogFile::Log(const wpi::StringRef& text) { *this << text; }
 
 void LogFile::Logln(const wpi::StringRef& text) { *this << text << '\n'; }
 
+std::string LogFile::GetFileName() { return CreateFilename(m_time); }
+
 void LogFile::UpdateFilename() {
   std::time_t newTime = std::time(0);
   // If the difference between the two timestamps is more than 24 hours

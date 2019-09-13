@@ -93,6 +93,15 @@ public class LogFile {
   }
 
   /**
+   * Get the name the file.
+   *
+   * @return The name of the file.
+   */
+  public String getFileName() {
+    return createFilename(m_time);
+  }
+
+  /**
    * Check if the time has changed of more than 24 hours.
    * Change the filename if the condition is met.
    */

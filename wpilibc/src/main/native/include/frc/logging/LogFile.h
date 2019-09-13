@@ -47,6 +47,13 @@ class LogFile {
    */
   void Logln(const wpi::StringRef& text);
 
+  /**
+   * Get the name the file.
+   *
+   * @return The name of the file.
+   */
+  std::string GetFileName();
+
   template <typename Value>
   friend LogFile& operator<<(LogFile& file, const Value& value) {
     file.m_file << value;

@@ -46,6 +46,15 @@ public class CSVLogFile {
   }
 
   /**
+   * Get the name the file.
+   *
+   * @return The name of the file.
+   */
+  public String getFileName() {
+    return m_logFile.getFileName();
+  }
+
+  /**
    * Print a new line of values in the CSVLogFile without timestamp.
    *
    * @param values Values to log in the file in the order.

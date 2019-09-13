@@ -61,6 +61,13 @@ class CSVLogFile {
     LogValues(value, values...);
   }
 
+  /**
+   * Get the name the file.
+   *
+   * @return The name of the file.
+   */
+  std::string GetFileName() { return m_logFile.GetFileName(); }
+
  private:
   /**
    * Print a new line of values in the CSVLogFile without timestamp.
