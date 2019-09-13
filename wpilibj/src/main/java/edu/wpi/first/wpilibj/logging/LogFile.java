@@ -70,7 +70,7 @@ public class LogFile {
   }
 
   /**
-   * Write text in the logFile.
+   * Write text in the LogFile.
    *
    * @param text The text to be logged in the file.
    */
@@ -81,6 +81,15 @@ public class LogFile {
       System.out.println(ex.getMessage());
     }
     updateFilename();
+  }
+
+  /**
+   * Write text in the LogFile and add a new line.
+   *
+   * @param text The text to be logged in the file.
+   */
+  public void logln(String text) {
+    log(text + "\n");
   }
 
   /**

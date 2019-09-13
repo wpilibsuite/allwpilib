@@ -19,7 +19,7 @@
 namespace frc {
 
 /**
- * A CSVLogFile writes to a csv file
+ * A CSVLogFile writes values to a csv file
  *
  * For the CSVLogFile to write log informations, you must call Log()
  * periodically.
@@ -27,13 +27,15 @@ namespace frc {
 class CSVLogFile {
  public:
   /**
-   * Instantiate a LogFile passing in its prefix and its extension.
+   * Instantiate a LogFile passing in its prefix and its column headings.
    *
    * If you want the file to be saved in a existing directory, you can add its
    * path before the file prefix. Exemple : to save the file in a usb stick on
    * the roborio ("/media/sda1/") : LogFile("/media/sda1/log").
    *
    * @param filePrefix The prefix of the LogFile.
+   * @param columnHeading Title of 1st CSVLogFile column.
+   * @param columnHeadings Titles of other CSVLogFile columns.
    */
   template <typename Value, typename... Values>
   CSVLogFile(wpi::StringRef filePrefix, Value columnHeading,
@@ -43,6 +45,12 @@ class CSVLogFile {
     LogValues(columnHeading, columnHeadings...);
   }
 
+  /**
+   * Print a new line of values in the CSVLogFile.
+   *
+   * @param value 1st value to log in the file.
+   * @param values Other values to log in the file in the order.
+   */
   template <typename Value, typename... Values>
   void Log(Value value, Values... values) {
     using namespace std::chrono;
@@ -54,6 +62,12 @@ class CSVLogFile {
   }
 
  private:
+  /**
+   * Print a new line of values in the CSVLogFile without timestamp.
+   *
+   * @param value 1st value to log in the file.
+   * @param values Other values to log in the file in the order.
+   */
   template <typename Value, typename... Values>
   void LogValues(Value value, Values... values) {
     if constexpr (std::is_convertible_v<Value, wpi::StringRef>) {
@@ -61,6 +75,7 @@ class CSVLogFile {
     } else {
       m_logFile << value;
     }
+
     if constexpr (sizeof...(values) > 0) {
       m_logFile << ',';
       LogValues(values...);

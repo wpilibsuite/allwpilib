@@ -34,12 +34,17 @@ class LogFile {
                    wpi::StringRef fileExtension = "txt");
 
   /**
-   * Write text in the logFile.
+   * Write text in the LogFile.
    *
    * @param text The text to be logged in the file.
    */
   void Log(const wpi::StringRef& text);
 
+  /**
+   * Write text in the LogFile and add a new line.
+   *
+   * @param text The text to be logged in the file.
+   */
   void Logln(const wpi::StringRef& text);
 
   template <typename Value>
