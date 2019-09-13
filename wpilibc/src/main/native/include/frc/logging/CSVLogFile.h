@@ -48,7 +48,7 @@ class CSVLogFile {
     using namespace std::chrono;
     auto timestamp =
         duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-    m_logFile << timestamp.count() << ",";
+    m_logFile << timestamp.count() << ',';
 
     LogValues(value, values...);
   }
@@ -57,15 +57,15 @@ class CSVLogFile {
   template <typename Value, typename... Values>
   void LogValues(Value value, Values... values) {
     if constexpr (std::is_convertible_v<Value, wpi::StringRef>) {
-      m_logFile << "\"" << value << "\"";
+      m_logFile << '\"' << value << '\"';
     } else {
       m_logFile << value;
     }
     if constexpr (sizeof...(values) > 0) {
-      m_logFile << ",";
+      m_logFile << ',';
       LogValues(values...);
     } else {
-      m_logFile << "\n";
+      m_logFile << '\n';
     }
   }
 

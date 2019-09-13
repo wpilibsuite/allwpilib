@@ -12,7 +12,6 @@
 #include <string>
 
 #include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 
 namespace frc {
 
@@ -39,15 +38,14 @@ class LogFile {
    *
    * @param text The text to be logged in the file.
    */
-  void Log(const wpi::Twine& text);
+  void Log(const wpi::StringRef& text);
+
+  void Logln(const wpi::StringRef& text);
 
   template <typename Value>
   friend LogFile& operator<<(LogFile& file, const Value& value) {
-    if constexpr (std::is_convertible_v<Value, wpi::StringRef>) {
-      file.Log(value);
-    } else {
-      file.Log(std::to_string(value));
-    }
+    file.m_file << value;
+    file.UpdateFilename();
     return file;
   }
 
