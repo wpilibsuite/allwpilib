@@ -56,8 +56,8 @@ class Subsystem {
    *
    * @param defaultCommand the default command to associate with this subsystem
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of<
-                         Command, std::remove_reference_t<T>>::value>>
+  template <class T, typename = std::enable_if_t<std::is_base_of_v<
+                         Command, std::remove_reference_t<T>>>>
   void SetDefaultCommand(T&& defaultCommand) {
     CommandScheduler::GetInstance().SetDefaultCommand(
         this, std::forward<T>(defaultCommand));

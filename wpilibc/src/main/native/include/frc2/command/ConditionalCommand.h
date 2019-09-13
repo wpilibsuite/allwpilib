@@ -46,9 +46,9 @@ class ConditionalCommand
    */
   template <class T1, class T2,
             typename = std::enable_if_t<
-                std::is_base_of<Command, std::remove_reference_t<T1>>::value>,
+                std::is_base_of_v<Command, std::remove_reference_t<T1>>>,
             typename = std::enable_if_t<
-                std::is_base_of<Command, std::remove_reference_t<T2>>::value>>
+                std::is_base_of_v<Command, std::remove_reference_t<T2>>>>
   ConditionalCommand(T1&& onTrue, T2&& onFalse, std::function<bool()> condition)
       : ConditionalCommand(std::make_unique<std::remove_reference_t<T1>>(
                                std::forward<T1>(onTrue)),

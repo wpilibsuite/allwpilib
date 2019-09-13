@@ -72,8 +72,8 @@ class Trigger {
    * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of<
-                         Command, std::remove_reference_t<T>>::value>>
+  template <class T, typename = std::enable_if_t<std::is_base_of_v<
+                         Command, std::remove_reference_t<T>>>>
   Trigger WhenActive(T&& command, bool interruptible = true) {
     CommandScheduler::GetInstance().AddButton(
         [pressedLast = Get(), *this,
@@ -120,8 +120,8 @@ class Trigger {
    * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of<
-                         Command, std::remove_reference_t<T>>::value>>
+  template <class T, typename = std::enable_if_t<std::is_base_of_v<
+                         Command, std::remove_reference_t<T>>>>
   Trigger WhileActiveContinous(T&& command, bool interruptible = true) {
     CommandScheduler::GetInstance().AddButton(
         [pressedLast = Get(), *this,
@@ -169,8 +169,8 @@ class Trigger {
    * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of<
-                         Command, std::remove_reference_t<T>>::value>>
+  template <class T, typename = std::enable_if_t<std::is_base_of_v<
+                         Command, std::remove_reference_t<T>>>>
   Trigger WhileActiveOnce(T&& command, bool interruptible = true) {
     CommandScheduler::GetInstance().AddButton(
         [pressedLast = Get(), *this,
@@ -211,8 +211,8 @@ class Trigger {
    * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of<
-                         Command, std::remove_reference_t<T>>::value>>
+  template <class T, typename = std::enable_if_t<std::is_base_of_v<
+                         Command, std::remove_reference_t<T>>>>
   Trigger WhenInactive(T&& command, bool interruptible = true) {
     CommandScheduler::GetInstance().AddButton(
         [pressedLast = Get(), *this,
@@ -258,8 +258,8 @@ class Trigger {
    * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of<
-                         Command, std::remove_reference_t<T>>::value>>
+  template <class T, typename = std::enable_if_t<std::is_base_of_v<
+                         Command, std::remove_reference_t<T>>>>
   Trigger ToggleWhenActive(T&& command, bool interruptible = true) {
     CommandScheduler::GetInstance().AddButton(
         [pressedLast = Get(), *this,
