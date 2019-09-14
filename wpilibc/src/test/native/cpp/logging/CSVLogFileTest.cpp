@@ -30,9 +30,8 @@ TEST(CSVLogFileTest, WriteLog) {
   EXPECT_EQ("\"Timestamp (ms)\",\"First column\",2", line);
 
   std::getline(testFile, line);
-  size_t pos =
-      line.find_first_of(',');  // find location of timestamp's end
-  line.erase(0, pos);           // delete everything prior to location found
+  size_t pos = line.find_first_of(',');  // find location of timestamp's end
+  line.erase(0, pos);  // delete everything prior to location found
   EXPECT_EQ(",1,\"Second column\"", line);
 
   std::getline(testFile, line);
