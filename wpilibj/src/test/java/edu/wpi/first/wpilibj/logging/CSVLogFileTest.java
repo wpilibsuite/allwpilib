@@ -15,17 +15,19 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class LogFileTest {
+class CSVLogFileTest {
   @Test
   void writeLogTest() {
-    LogFile logFile = new LogFile("logfile");
-    logFile.log("First line\n");
-    logFile.logln("Second line");
+    CSVLogFile csvLogFile = new CSVLogFile("csvlogfile", "First column", "2");
+    csvLogFile.log(1, "Second column");
 
     try {
-      Scanner testFileScanner = new Scanner(new File(logFile.getFileName()));
-      assertEquals("First line", testFileScanner.nextLine());
-      assertEquals("Second line", testFileScanner.nextLine());
+      Scanner testFileScanner = new Scanner(new File(csvLogFile.getFileName()));
+      assertEquals("\"Timestamp (ms)\",\"First column\",\"2\"", testFileScanner.nextLine());
+
+      String secondLine = testFileScanner.nextLine();
+      String timestamp = secondLine.substring(0, secondLine.indexOf(','));
+      assertEquals(",1,\"Second column\"", secondLine.replace(timestamp, ""));
     } catch (IOException ex) {
       ex.printStackTrace();
     }

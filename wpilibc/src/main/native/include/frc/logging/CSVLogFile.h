@@ -41,7 +41,7 @@ class CSVLogFile {
   CSVLogFile(wpi::StringRef filePrefix, Value columnHeading,
              Values... columnHeadings)
       : m_logFile(filePrefix, "csv") {
-    m_logFile << "Timestamp (ms),";
+    m_logFile << "\"Timestamp (ms)\",";
     LogValues(columnHeading, columnHeadings...);
   }
 

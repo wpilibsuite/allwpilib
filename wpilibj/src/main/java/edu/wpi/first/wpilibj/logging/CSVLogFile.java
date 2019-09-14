@@ -31,7 +31,7 @@ public class CSVLogFile {
   public CSVLogFile(String filePrefix, String... columnHeadings) {
     m_logFile = new LogFile(filePrefix, "csv");
 
-    m_logFile.log("Timestamp (ms),");
+    m_logFile.log("\"Timestamp (ms)\",");
     logValues(columnHeadings);
   }
 

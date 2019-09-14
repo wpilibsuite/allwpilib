@@ -5,22 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc/logging/LogFile.h"  // NOLINT(build/include_order)
+#include "frc/logging/CSVLogFile.h"  // NOLINT(build/include_order)
 
 #include <fstream>
 #include <string>
 
 #include "gtest/gtest.h"
 
-TEST(LogFileTest, WriteLog) {
+TEST(CSVLogFileTest, WriteLog) {
   std::string filename;
 
   {
-    frc::LogFile logFile("logfile");
+    frc::CSVLogFile logFile("csvlogfile", "First column", 2);
 
-    logFile.Log("First line\n");
-    logFile.Logln("Second line");
-    logFile << "Line " << 3;
+    logFile.Log(1, "Second column");
 
     filename = logFile.GetFileName();
   }
@@ -29,11 +27,14 @@ TEST(LogFileTest, WriteLog) {
 
   std::string line;
   std::getline(testFile, line);
-  EXPECT_EQ("First line", line);
+  EXPECT_EQ("\"Timestamp (ms)\",\"First column\",2", line);
 
   std::getline(testFile, line);
-  EXPECT_EQ("Second line", line);
+  std::size_t pos =
+      line.find_first_of(',');  // find location of timestamp's end
+  line.erase(0, pos);           // delete everything prior to location found
+  EXPECT_EQ(",1,\"Second column\"", line);
 
   std::getline(testFile, line);
-  EXPECT_EQ("Line 3", line);
+  EXPECT_EQ("", line);
 }
