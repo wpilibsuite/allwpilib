@@ -51,7 +51,7 @@ class ParallelDeadlineGroup
    */
   template <class T, class... Types,
             typename = std::enable_if_t<
-                std::is_base_of<Command, std::remove_reference_t<T>>::value>,
+                std::is_base_of_v<Command, std::remove_reference_t<T>>>,
             typename = std::enable_if_t<std::conjunction_v<
                 std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
   explicit ParallelDeadlineGroup(T&& deadline, Types&&... commands) {

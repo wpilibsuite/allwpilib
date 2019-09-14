@@ -54,8 +54,8 @@ class Button : public Trigger {
    * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of<
-                         Command, std::remove_reference_t<T>>::value>>
+  template <class T, typename = std::enable_if_t<std::is_base_of_v<
+                         Command, std::remove_reference_t<T>>>>
   Button WhenPressed(T&& command, bool interruptible = true) {
     WhenActive(std::forward<T>(command), interruptible);
     return *this;
@@ -89,8 +89,8 @@ class Button : public Trigger {
    * @param interruptible Whether the command should be interruptible.
    * @return The button, for chained calls.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of<
-                         Command, std::remove_reference_t<T>>::value>>
+  template <class T, typename = std::enable_if_t<std::is_base_of_v<
+                         Command, std::remove_reference_t<T>>>>
   Button WhileHeld(T&& command, bool interruptible = true) {
     WhileActiveContinous(std::forward<T>(command), interruptible);
     return *this;
@@ -124,8 +124,8 @@ class Button : public Trigger {
    * @param interruptible Whether the command should be interruptible.
    * @return The button, for chained calls.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of<
-                         Command, std::remove_reference_t<T>>::value>>
+  template <class T, typename = std::enable_if_t<std::is_base_of_v<
+                         Command, std::remove_reference_t<T>>>>
   Button WhenHeld(T&& command, bool interruptible = true) {
     WhileActiveOnce(std::forward<T>(command), interruptible);
     return *this;
@@ -152,8 +152,8 @@ class Button : public Trigger {
    * @param interruptible Whether the command should be interruptible.
    * @return The button, for chained calls.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of<
-                         Command, std::remove_reference_t<T>>::value>>
+  template <class T, typename = std::enable_if_t<std::is_base_of_v<
+                         Command, std::remove_reference_t<T>>>>
   Button WhenReleased(T&& command, bool interruptible = true) {
     WhenInactive(std::forward<T>(command), interruptible);
     return *this;
@@ -187,8 +187,8 @@ class Button : public Trigger {
    * @param interruptible Whether the command should be interruptible.
    * @return The button, for chained calls.
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of<
-                         Command, std::remove_reference_t<T>>::value>>
+  template <class T, typename = std::enable_if_t<std::is_base_of_v<
+                         Command, std::remove_reference_t<T>>>>
   Button ToggleWhenPressed(T&& command, bool interruptible = true) {
     ToggleWhenActive(std::forward<T>(command), interruptible);
     return *this;

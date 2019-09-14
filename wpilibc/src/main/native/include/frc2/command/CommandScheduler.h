@@ -170,8 +170,8 @@ class CommandScheduler final : public frc::SendableBase, frc::ErrorBase {
    * @param subsystem      the subsystem whose default command will be set
    * @param defaultCommand the default command to associate with the subsystem
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of<
-                         Command, std::remove_reference_t<T>>::value>>
+  template <class T, typename = std::enable_if_t<std::is_base_of_v<
+                         Command, std::remove_reference_t<T>>>>
   void SetDefaultCommand(Subsystem* subsystem, T&& defaultCommand) {
     if (!defaultCommand.HasRequirement(subsystem)) {
       wpi_setWPIErrorWithContext(
