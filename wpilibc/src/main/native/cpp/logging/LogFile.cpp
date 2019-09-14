@@ -32,7 +32,9 @@ void LogFile::Log(const wpi::StringRef& text) { *this << text; }
 
 void LogFile::Logln(const wpi::StringRef& text) { *this << text << '\n'; }
 
-std::string LogFile::GetFileName() { return CreateFilename(m_time); }
+const std::string LogFile::GetFileName() const {
+  return CreateFilename(m_time);
+}
 
 void LogFile::UpdateFilename() {
   std::time_t newTime = std::time(0);
@@ -45,7 +47,7 @@ void LogFile::UpdateFilename() {
   m_time = newTime;
 }
 
-std::string LogFile::CreateFilename(std::time_t time) {
+const std::string LogFile::CreateFilename(std::time_t time) const {
   // Get current date/time, format is YYYY-MM-DD.HH_mm_ss
   struct tm localTime = *std::localtime(&time);
   char datetime[80];

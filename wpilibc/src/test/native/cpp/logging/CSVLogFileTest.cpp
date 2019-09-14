@@ -12,11 +12,11 @@
 
 #include "gtest/gtest.h"
 
-TEST(CSVLogFileTest, WriteLog) {
+TEST(CSVLogFileTest, Logs) {
   std::string filename;
 
   {
-    frc::CSVLogFile logFile("csvlogfile", "First column", 2);
+    frc::CSVLogFile logFile("testCSVLog", "First column", 2);
 
     logFile.Log(1, "Second column");
 

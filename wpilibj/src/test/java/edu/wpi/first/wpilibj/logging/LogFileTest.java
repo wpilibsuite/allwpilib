@@ -9,16 +9,23 @@ package edu.wpi.first.wpilibj.logging;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Scanner;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LogFileTest {
   @Test
-  void writeLogTest() {
-    LogFile logFile = new LogFile("logfile");
+  void logsTest() {
+    LogFile logFile = new LogFile("testLog");
     logFile.log("First line\n");
     logFile.logln("Second line");
 
@@ -29,5 +36,17 @@ class LogFileTest {
     } catch (IOException ex) {
       ex.printStackTrace();
     }
+  }
+
+  @Test
+  void filename() {
+    String filenamePrefix = "testFilename";
+    LogFile logFile = new LogFile(filenamePrefix);
+    logFile.log("");
+
+    SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd.HH_mm_ss", Locale.getDefault());
+    Path filePath = Paths.get(filenamePrefix + "-" + formater.format(new Date()) + ".txt");
+
+    assertTrue(Files.exists(filePath));
   }
 }

@@ -52,7 +52,7 @@ class LogFile {
    *
    * @return The name of the file.
    */
-  std::string GetFileName();
+  const std::string GetFileName() const;
 
   template <typename Value>
   friend LogFile& operator<<(LogFile& file, const Value& value) {
@@ -74,7 +74,7 @@ class LogFile {
    * @param time The time that is saved in the filename.
    * @return The filename at the format "{filePrefix}-{date/time}.txt".
    */
-  std::string CreateFilename(std::time_t time);
+  const std::string CreateFilename(std::time_t time) const;
 
   std::string m_filePrefix;
   std::string m_fileExtension;

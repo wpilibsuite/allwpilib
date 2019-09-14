@@ -17,8 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CSVLogFileTest {
   @Test
-  void writeLogTest() {
-    CSVLogFile csvLogFile = new CSVLogFile("csvlogfile", "First column", "2");
+  void logsTest() {
+    CSVLogFile csvLogFile = new CSVLogFile("testCSVLog", "First column", "2");
     csvLogFile.log(1, "Second column");
 
     try {

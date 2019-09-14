@@ -66,7 +66,7 @@ class CSVLogFile {
    *
    * @return The name of the file.
    */
-  std::string GetFileName() { return m_logFile.GetFileName(); }
+  const std::string GetFileName() const { return m_logFile.GetFileName(); }
 
  private:
   /**
