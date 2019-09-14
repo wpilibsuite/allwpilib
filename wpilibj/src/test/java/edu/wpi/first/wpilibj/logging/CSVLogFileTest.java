@@ -19,7 +19,7 @@ class CSVLogFileTest {
   @Test
   void logsTest() {
     CSVLogFile csvLogFile = new CSVLogFile("testCSVLog", "First column", "2");
-    csvLogFile.log(1, "Second column");
+    csvLogFile.log(1, "Escaping \"double\" quotes.");
 
     try {
       Scanner testFileScanner = new Scanner(new File(csvLogFile.getFileName()));
@@ -27,7 +27,7 @@ class CSVLogFileTest {
 
       String secondLine = testFileScanner.nextLine();
       String timestamp = secondLine.substring(0, secondLine.indexOf(','));
-      assertEquals(",1,\"Second column\"", secondLine.replace(timestamp, ""));
+      assertEquals(",1,\"Escaping \"\"double\"\" quotes.\"", secondLine.replace(timestamp, ""));
     } catch (IOException ex) {
       ex.printStackTrace();
     }

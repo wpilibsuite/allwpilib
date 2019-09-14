@@ -18,7 +18,7 @@ TEST(CSVLogFileTest, Logs) {
   {
     frc::CSVLogFile logFile("testCSVLog", "First column", 2);
 
-    logFile.Log(1, "Second column");
+    logFile.Log(1, "Escaping \"double\" quotes.");
 
     filename = logFile.GetFileName();
   }
@@ -32,7 +32,7 @@ TEST(CSVLogFileTest, Logs) {
   std::getline(testFile, line);
   size_t pos = line.find_first_of(',');  // find location of timestamp's end
   line.erase(0, pos);  // delete everything prior to location found
-  EXPECT_EQ(",1,\"Second column\"", line);
+  EXPECT_EQ(",1,\"Escaping \"\"double\"\" quotes.\"", line);
 
   std::getline(testFile, line);
   EXPECT_EQ("", line);

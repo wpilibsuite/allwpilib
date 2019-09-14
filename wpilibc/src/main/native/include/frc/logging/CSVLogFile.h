@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <chrono>
 #include <string>
 #include <type_traits>
@@ -78,7 +79,7 @@ class CSVLogFile {
   template <typename Value, typename... Values>
   void LogValues(Value value, Values... values) {
     if constexpr (std::is_convertible_v<Value, wpi::StringRef>) {
-      m_logFile << '\"' << value << '\"';
+      m_logFile << '\"' << EscapeDoubleQuotes(value) << '\"';
     } else {
       m_logFile << value;
     }
@@ -89,6 +90,18 @@ class CSVLogFile {
     } else {
       m_logFile << '\n';
     }
+  }
+
+  const std::string EscapeDoubleQuotes(wpi::StringRef text) const {
+    std::string textString = text.str();
+    for (std::string::iterator it = textString.begin(); it != textString.end();
+         it++) {
+      if (*it == '\"') {
+        it++;
+        textString.insert(it, '\"');
+      }
+    }
+    return textString;
   }
 
   LogFile m_logFile;

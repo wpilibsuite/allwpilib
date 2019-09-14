@@ -61,7 +61,7 @@ public class CSVLogFile {
    */
   private <ValueT> void logValues(ValueT... values) {
     if (String.class.isAssignableFrom(values[0].getClass())) {
-      m_logFile.log("\"" + values[0] + "\"");
+      m_logFile.log("\"" + escapeDoubleQuotes(values[0].toString()) + "\"");
     } else {
       m_logFile.log(String.valueOf(values[0]));
     }
@@ -72,5 +72,9 @@ public class CSVLogFile {
     } else {
       m_logFile.log("\n");
     }
+  }
+
+  private String escapeDoubleQuotes(String text) {
+    return text.replace("\"", "\"\"");
   }
 }
