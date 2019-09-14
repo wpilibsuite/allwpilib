@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,12 +16,13 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * ADXL345 SPI Accelerometer.
  */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_SPI extends SendableBase implements Accelerometer {
+public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
   private static final int kPowerCtlRegister = 0x2D;
   private static final int kDataFormatRegister = 0x31;
   private static final int kDataRegister = 0x32;
@@ -75,12 +76,11 @@ public class ADXL345_SPI extends SendableBase implements Accelerometer {
   public ADXL345_SPI(SPI.Port port, Range range) {
     m_spi = new SPI(port);
     init(range);
-    setName("ADXL345_SPI", port.value);
+    SendableRegistry.addLW(this, "ADXL345_SPI", port.value);
   }
 
   @Override
   public void close() {
-    super.close();
     m_spi.close();
   }
 

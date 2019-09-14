@@ -17,6 +17,7 @@
 #include "frc/SensorUtil.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -41,7 +42,7 @@ DigitalOutput::DigitalOutput(int channel) {
   }
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalOutput, channel);
-  SetName("DigitalOutput", channel);
+  SendableRegistry::GetInstance().AddLW(this, "DigitalOutput", channel);
 }
 
 DigitalOutput::~DigitalOutput() {

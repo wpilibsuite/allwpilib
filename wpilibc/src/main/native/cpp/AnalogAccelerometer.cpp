@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,12 +11,13 @@
 
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 AnalogAccelerometer::AnalogAccelerometer(int channel)
     : AnalogAccelerometer(std::make_shared<AnalogInput>(channel)) {
-  AddChild(m_analogInput);
+  SendableRegistry::GetInstance().AddChild(this, m_analogInput.get());
 }
 
 AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
@@ -58,5 +59,7 @@ void AnalogAccelerometer::InitSendable(SendableBuilder& builder) {
 void AnalogAccelerometer::InitAccelerometer() {
   HAL_Report(HALUsageReporting::kResourceType_Accelerometer,
              m_analogInput->GetChannel());
-  SetName("Accelerometer", m_analogInput->GetChannel());
+
+  SendableRegistry::GetInstance().AddLW(this, "Accelerometer",
+                                        m_analogInput->GetChannel());
 }

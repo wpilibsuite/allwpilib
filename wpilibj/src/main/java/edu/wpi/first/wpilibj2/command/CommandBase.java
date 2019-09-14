@@ -12,6 +12,7 @@ import java.util.Set;
 
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * A {@link Sendable} base class for {@link Command}s.
@@ -19,9 +20,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class CommandBase implements Sendable, Command {
 
-  protected String m_name = this.getClass().getSimpleName();
-  protected String m_subsystem = "Ungrouped";
   protected Set<Subsystem> m_requirements = new HashSet<>();
+
+  protected CommandBase() {
+    String name = getClass().getName();
+    SendableRegistry.add(this, name.substring(name.lastIndexOf('.') + 1));
+  }
 
   /**
    * Adds the specified requirements to the command.
@@ -39,22 +43,37 @@ public abstract class CommandBase implements Sendable, Command {
 
   @Override
   public String getName() {
-    return this.getClass().getSimpleName();
+    return SendableRegistry.getName(this);
   }
 
+  /**
+   * Sets the name of this Command.
+   *
+   * @param name name
+   */
   @Override
   public void setName(String name) {
-    m_name = name;
+    SendableRegistry.setName(this, name);
   }
 
+  /**
+   * Gets the subsystem name of this Command.
+   *
+   * @return Subsystem name
+   */
   @Override
   public String getSubsystem() {
-    return m_subsystem;
+    return SendableRegistry.getSubsystem(this);
   }
 
+  /**
+   * Sets the subsystem name of this Command.
+   *
+   * @param subsystem subsystem name
+   */
   @Override
   public void setSubsystem(String subsystem) {
-    m_subsystem = subsystem;
+    SendableRegistry.setSubsystem(this, subsystem);
   }
 
   /**

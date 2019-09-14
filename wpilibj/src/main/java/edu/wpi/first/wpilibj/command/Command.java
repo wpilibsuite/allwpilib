@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,9 +10,10 @@ package edu.wpi.first.wpilibj.command;
 import java.util.Enumeration;
 
 import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * The Command class is at the very core of the entire command framework. Every command can be
@@ -40,7 +41,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @see IllegalUseOfCommandException
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public abstract class Command extends SendableBase {
+public abstract class Command implements Sendable {
   /**
    * The time since this command was initialized.
    */
@@ -100,9 +101,8 @@ public abstract class Command extends SendableBase {
    * Creates a new command. The name of this command will be set to its class name.
    */
   public Command() {
-    super(false);
     String name = getClass().getName();
-    setName(name.substring(name.lastIndexOf('.') + 1));
+    SendableRegistry.add(this, name.substring(name.lastIndexOf('.') + 1));
   }
 
   /**
@@ -112,11 +112,10 @@ public abstract class Command extends SendableBase {
    * @throws IllegalArgumentException if name is null
    */
   public Command(String name) {
-    super(false);
     if (name == null) {
       throw new IllegalArgumentException("Name must not be null.");
     }
-    setName(name);
+    SendableRegistry.add(this, name);
   }
 
   /**
@@ -594,6 +593,46 @@ public abstract class Command extends SendableBase {
    */
   public boolean willRunWhenDisabled() {
     return m_runWhenDisabled;
+  }
+
+  /**
+   * Gets the name of this Command.
+   *
+   * @return Name
+   */
+  @Override
+  public String getName() {
+    return SendableRegistry.getName(this);
+  }
+
+  /**
+   * Sets the name of this Command.
+   *
+   * @param name name
+   */
+  @Override
+  public void setName(String name) {
+    SendableRegistry.setName(this, name);
+  }
+
+  /**
+   * Gets the subsystem name of this Command.
+   *
+   * @return Subsystem name
+   */
+  @Override
+  public String getSubsystem() {
+    return SendableRegistry.getSubsystem(this);
+  }
+
+  /**
+   * Sets the subsystem name of this Command.
+   *
+   * @param subsystem subsystem name
+   */
+  @Override
+  public void setSubsystem(String subsystem) {
+    SendableRegistry.setSubsystem(this, subsystem);
   }
 
   /**

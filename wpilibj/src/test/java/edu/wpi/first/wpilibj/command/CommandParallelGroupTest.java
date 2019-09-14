@@ -50,8 +50,6 @@ class CommandParallelGroupTest extends AbstractCommandTest {
     Scheduler.getInstance().run();
     assertCommandState(command1, 1, 3, 3, 1, 0);
     assertCommandState(command2, 1, 5, 5, 1, 0);
-
-    commandGroup.close();
   }
 
 }

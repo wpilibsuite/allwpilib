@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,9 +10,12 @@
 #include "frc/ErrorBase.h"
 #include "frc/I2C.h"
 #include "frc/interfaces/Accelerometer.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * ADXL345 Accelerometer on I2C.
@@ -22,8 +25,9 @@ namespace frc {
  * 0x1D (7-bit address).
  */
 class ADXL345_I2C : public ErrorBase,
-                    public SendableBase,
-                    public Accelerometer {
+                    public Accelerometer,
+                    public Sendable,
+                    public SendableHelper<ADXL345_I2C> {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 

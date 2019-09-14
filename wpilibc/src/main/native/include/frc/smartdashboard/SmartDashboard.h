@@ -15,13 +15,14 @@
 
 #include "frc/ErrorBase.h"
 #include "frc/smartdashboard/ListenerExecutor.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
-class Sendable;
-
-class SmartDashboard : public ErrorBase, public SendableBase {
+class SmartDashboard : public ErrorBase,
+                       public Sendable,
+                       public SendableHelper<SmartDashboard> {
  public:
   static void init();
 
@@ -101,6 +102,9 @@ class SmartDashboard : public ErrorBase, public SendableBase {
    * The value can be retrieved by calling the get method with a key that is
    * equal to the original key.
    *
+   * In order for the value to appear in the dashboard, it must be registered
+   * with SendableRegistry.  WPILib components do this automatically.
+   *
    * @param keyName the key
    * @param value   the value
    */
@@ -112,6 +116,9 @@ class SmartDashboard : public ErrorBase, public SendableBase {
    *
    * The value can be retrieved by calling the get method with a key that is
    * equal to the original key.
+   *
+   * In order for the value to appear in the dashboard, it must be registered
+   * with SendableRegistry.  WPILib components do this automatically.
    *
    * @param value the value
    */

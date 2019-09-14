@@ -55,8 +55,6 @@ class ParallelDeadlineGroupTest extends CommandTestBase {
     verify(command3, times(2)).execute();
     verify(command3, never()).end(false);
     verify(command3).end(true);
-
-    scheduler.close();
   }
 
   @Test
@@ -86,8 +84,6 @@ class ParallelDeadlineGroupTest extends CommandTestBase {
     verify(command2, never()).end(true);
 
     assertFalse(scheduler.isScheduled(group));
-
-    scheduler.close();
   }
 
 
@@ -114,8 +110,6 @@ class ParallelDeadlineGroupTest extends CommandTestBase {
 
     assertFalse(scheduler.isScheduled(group));
     assertTrue(scheduler.isScheduled(command3));
-
-    scheduler.close();
   }
 
   @Test

@@ -13,9 +13,12 @@
 
 #include "frc/ErrorBase.h"
 #include "frc/PIDSource.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Analog input class.
@@ -29,7 +32,10 @@ namespace frc {
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-class AnalogInput : public ErrorBase, public SendableBase, public PIDSource {
+class AnalogInput : public ErrorBase,
+                    public PIDSource,
+                    public Sendable,
+                    public SendableHelper<AnalogInput> {
   friend class AnalogTrigger;
   friend class AnalogGyro;
 

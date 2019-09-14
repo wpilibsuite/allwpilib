@@ -7,15 +7,15 @@
 
 #include "frc2/command/SubsystemBase.h"
 
-#include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SendableBuilder.h>
+#include <frc/smartdashboard/SendableRegistry.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandScheduler.h>
 
 using namespace frc2;
 
 SubsystemBase::SubsystemBase() {
-  m_name = GetTypeName(*this);
+  frc::SendableRegistry::GetInstance().AddLW(this, GetTypeName(*this));
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
@@ -43,15 +43,24 @@ void SubsystemBase::InitSendable(frc::SendableBuilder& builder) {
                             nullptr);
 }
 
-std::string SubsystemBase::GetName() const { return m_name; }
+std::string SubsystemBase::GetName() const {
+  return frc::SendableRegistry::GetInstance().GetName(this);
+}
 
-void SubsystemBase::SetName(const wpi::Twine& name) { m_name = name.str(); }
+void SubsystemBase::SetName(const wpi::Twine& name) {
+  frc::SendableRegistry::GetInstance().SetName(this, name);
+}
 
-std::string SubsystemBase::GetSubsystem() const { return GetName(); }
+std::string SubsystemBase::GetSubsystem() const {
+  return frc::SendableRegistry::GetInstance().GetSubsystem(this);
+}
 
-void SubsystemBase::SetSubsystem(const wpi::Twine& name) { SetName(name); }
+void SubsystemBase::SetSubsystem(const wpi::Twine& name) {
+  frc::SendableRegistry::GetInstance().SetSubsystem(this, name);
+}
 
 void SubsystemBase::AddChild(std::string name, frc::Sendable* child) {
-  child->SetName(name);
-  frc::LiveWindow::GetInstance()->Add(child);
+  auto& registry = frc::SendableRegistry::GetInstance();
+  registry.AddLW(child, GetSubsystem(), name);
+  registry.AddChild(this, child);
 }

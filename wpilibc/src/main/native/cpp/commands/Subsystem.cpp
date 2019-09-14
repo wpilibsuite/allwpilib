@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,11 +12,12 @@
 #include "frc/commands/Scheduler.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 Subsystem::Subsystem(const wpi::Twine& name) {
-  SetName(name, name);
+  SendableRegistry::GetInstance().AddLW(this, name, name);
   Scheduler::GetInstance()->RegisterSubsystem(this);
 }
 
@@ -46,7 +47,7 @@ Command* Subsystem::GetDefaultCommand() {
 wpi::StringRef Subsystem::GetDefaultCommandName() {
   Command* defaultCommand = GetDefaultCommand();
   if (defaultCommand) {
-    return defaultCommand->GetName();
+    return SendableRegistry::GetInstance().GetName(defaultCommand);
   } else {
     return wpi::StringRef();
   }
@@ -62,7 +63,7 @@ Command* Subsystem::GetCurrentCommand() const { return m_currentCommand; }
 wpi::StringRef Subsystem::GetCurrentCommandName() const {
   Command* currentCommand = GetCurrentCommand();
   if (currentCommand) {
-    return currentCommand->GetName();
+    return SendableRegistry::GetInstance().GetName(currentCommand);
   } else {
     return wpi::StringRef();
   }
@@ -71,6 +72,22 @@ wpi::StringRef Subsystem::GetCurrentCommandName() const {
 void Subsystem::Periodic() {}
 
 void Subsystem::InitDefaultCommand() {}
+
+std::string Subsystem::GetName() const {
+  return SendableRegistry::GetInstance().GetName(this);
+}
+
+void Subsystem::SetName(const wpi::Twine& name) {
+  SendableRegistry::GetInstance().SetName(this, name);
+}
+
+std::string Subsystem::GetSubsystem() const {
+  return SendableRegistry::GetInstance().GetSubsystem(this);
+}
+
+void Subsystem::SetSubsystem(const wpi::Twine& name) {
+  SendableRegistry::GetInstance().SetSubsystem(this, name);
+}
 
 void Subsystem::AddChild(const wpi::Twine& name,
                          std::shared_ptr<Sendable> child) {
@@ -82,8 +99,9 @@ void Subsystem::AddChild(const wpi::Twine& name, Sendable* child) {
 }
 
 void Subsystem::AddChild(const wpi::Twine& name, Sendable& child) {
-  child.SetName(GetSubsystem(), name);
-  LiveWindow::GetInstance()->Add(&child);
+  auto& registry = SendableRegistry::GetInstance();
+  registry.AddLW(&child, registry.GetSubsystem(this), name);
+  registry.AddChild(this, &child);
 }
 
 void Subsystem::AddChild(std::shared_ptr<Sendable> child) { AddChild(*child); }
@@ -91,8 +109,10 @@ void Subsystem::AddChild(std::shared_ptr<Sendable> child) { AddChild(*child); }
 void Subsystem::AddChild(Sendable* child) { AddChild(*child); }
 
 void Subsystem::AddChild(Sendable& child) {
-  child.SetSubsystem(GetSubsystem());
-  LiveWindow::GetInstance()->Add(&child);
+  auto& registry = SendableRegistry::GetInstance();
+  registry.SetSubsystem(&child, registry.GetSubsystem(this));
+  registry.EnableLiveWindow(&child);
+  registry.AddChild(this, &child);
 }
 
 void Subsystem::ConfirmCommand() {

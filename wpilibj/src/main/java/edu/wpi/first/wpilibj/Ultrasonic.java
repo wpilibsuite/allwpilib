@@ -13,6 +13,7 @@ import java.util.List;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 import static java.util.Objects.requireNonNull;
 
@@ -25,7 +26,7 @@ import static java.util.Objects.requireNonNull;
  * echo is received. The time that the line is high determines the round trip distance (time of
  * flight).
  */
-public class Ultrasonic extends SendableBase implements PIDSource {
+public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
   /**
    * The units to return when PIDGet is called.
    */
@@ -101,7 +102,7 @@ public class Ultrasonic extends SendableBase implements PIDSource {
     m_sensors.add(this);
 
     m_counter = new Counter(m_echoChannel); // set up counter for this
-    addChild(m_counter);
+    SendableRegistry.addChild(this, m_counter);
     // sensor
     m_counter.setMaxPeriod(1.0);
     m_counter.setSemiPeriodMode(true);
@@ -111,7 +112,7 @@ public class Ultrasonic extends SendableBase implements PIDSource {
 
     m_instances++;
     HAL.report(tResourceType.kResourceType_Ultrasonic, m_instances);
-    setName("Ultrasonic", m_echoChannel.getChannel());
+    SendableRegistry.addLW(this, "Ultrasonic", m_echoChannel.getChannel());
   }
 
   /**
@@ -128,8 +129,8 @@ public class Ultrasonic extends SendableBase implements PIDSource {
   public Ultrasonic(final int pingChannel, final int echoChannel, Unit units) {
     m_pingChannel = new DigitalOutput(pingChannel);
     m_echoChannel = new DigitalInput(echoChannel);
-    addChild(m_pingChannel);
-    addChild(m_echoChannel);
+    SendableRegistry.addChild(this, m_pingChannel);
+    SendableRegistry.addChild(this, m_echoChannel);
     m_allocatedChannels = true;
     m_units = units;
     initialize();
@@ -191,7 +192,6 @@ public class Ultrasonic extends SendableBase implements PIDSource {
    */
   @Override
   public synchronized void close() {
-    super.close();
     final boolean wasAutomaticMode = m_automaticEnabled;
     setAutomaticMode(false);
     if (m_allocatedChannels) {

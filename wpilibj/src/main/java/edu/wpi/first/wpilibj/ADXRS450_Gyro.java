@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,6 +13,7 @@ import java.nio.ByteOrder;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position. The Gyro class
@@ -24,7 +25,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
  * <p>This class is for the digital ADXRS450 gyro sensor that connects via SPI.
  */
 @SuppressWarnings({"TypeName", "AbbreviationAsWordInName", "PMD.UnusedPrivateField"})
-public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable {
+public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable, AutoCloseable {
   private static final double kSamplePeriod = 0.0005;
   private static final double kCalibrationSampleTime = 5.0;
   private static final double kDegreePerSecondPerLSB = 0.0125;
@@ -77,7 +78,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
     calibrate();
 
     HAL.report(tResourceType.kResourceType_ADXRS450, port.value);
-    setName("ADXRS450_Gyro", port.value);
+    SendableRegistry.addLW(this, "ADXRS450_Gyro", port.value);
   }
 
   public boolean isConnected() {
@@ -142,7 +143,6 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
    */
   @Override
   public void close() {
-    super.close();
     if (m_spi != null) {
       m_spi.close();
       m_spi = null;

@@ -11,9 +11,12 @@
 
 #include "frc/ErrorBase.h"
 #include "frc/SensorUtil.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Class for operating a compressor connected to a %PCM (Pneumatic Control
@@ -30,7 +33,9 @@ namespace frc {
  * loop control. You can only turn off closed loop control, thereby stopping
  * the compressor from operating.
  */
-class Compressor : public ErrorBase, public SendableBase {
+class Compressor : public ErrorBase,
+                   public Sendable,
+                   public SendableHelper<Compressor> {
  public:
   /**
    * Constructor. The default PCM ID is 0.

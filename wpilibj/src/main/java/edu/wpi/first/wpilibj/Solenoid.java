@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SolenoidJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Solenoid class for running high voltage Digital Output on the PCM.
@@ -18,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>The Solenoid class is typically used for pneumatic solenoids, but could be used for any
  * device within the current spec of the PCM.
  */
-public class Solenoid extends SolenoidBase {
+public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
   private final int m_channel; // The channel to control.
   private int m_solenoidHandle;
 
@@ -48,12 +49,11 @@ public class Solenoid extends SolenoidBase {
     m_solenoidHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
 
     HAL.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
-    setName("Solenoid", m_moduleNumber, m_channel);
+    SendableRegistry.addLW(this, "Solenoid", m_moduleNumber, m_channel);
   }
 
   @Override
   public void close() {
-    super.close();
     SolenoidJNI.freeSolenoidPort(m_solenoidHandle);
     m_solenoidHandle = 0;
   }

@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.controller;
 
-import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
  * profile.
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class ProfiledPIDController extends SendableBase {
+public class ProfiledPIDController implements Sendable {
   private PIDController m_controller;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();

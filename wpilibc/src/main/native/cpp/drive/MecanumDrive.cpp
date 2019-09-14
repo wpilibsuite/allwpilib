@@ -16,6 +16,7 @@
 #include "frc/SpeedController.h"
 #include "frc/drive/Vector2d.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -27,13 +28,14 @@ MecanumDrive::MecanumDrive(SpeedController& frontLeftMotor,
       m_rearLeftMotor(rearLeftMotor),
       m_frontRightMotor(frontRightMotor),
       m_rearRightMotor(rearRightMotor) {
-  AddChild(&m_frontLeftMotor);
-  AddChild(&m_rearLeftMotor);
-  AddChild(&m_frontRightMotor);
-  AddChild(&m_rearRightMotor);
+  auto& registry = SendableRegistry::GetInstance();
+  registry.AddChild(this, &m_frontLeftMotor);
+  registry.AddChild(this, &m_rearLeftMotor);
+  registry.AddChild(this, &m_frontRightMotor);
+  registry.AddChild(this, &m_rearRightMotor);
   static int instances = 0;
   ++instances;
-  SetName("MecanumDrive", instances);
+  registry.AddLW(this, "MecanumDrive", instances);
 }
 
 void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,

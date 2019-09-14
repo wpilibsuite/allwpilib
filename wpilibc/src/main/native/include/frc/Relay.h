@@ -14,9 +14,12 @@
 
 #include "frc/ErrorBase.h"
 #include "frc/MotorSafety.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Class for Spike style relay outputs.
@@ -30,7 +33,9 @@ namespace frc {
  * independently for something that does not care about voltage polarity (like
  * a solenoid).
  */
-class Relay : public MotorSafety, public SendableBase {
+class Relay : public MotorSafety,
+              public Sendable,
+              public SendableHelper<Relay> {
  public:
   enum Value { kOff, kOn, kForward, kReverse };
   enum Direction { kBothDirections, kForwardOnly, kReverseOnly };

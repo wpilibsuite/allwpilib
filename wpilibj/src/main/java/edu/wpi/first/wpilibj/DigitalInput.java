@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,7 @@ import edu.wpi.first.hal.DIOJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Class to read a digital input. This class will read digital inputs and return the current value
@@ -18,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * elsewhere will automatically allocate digital inputs and outputs as required. This class is only
  * for devices like switches etc. that aren't implemented anywhere else.
  */
-public class DigitalInput extends DigitalSource {
+public class DigitalInput extends DigitalSource implements Sendable, AutoCloseable {
   private final int m_channel;
   private int m_handle;
 
@@ -34,7 +35,7 @@ public class DigitalInput extends DigitalSource {
     m_handle = DIOJNI.initializeDIOPort(HAL.getPort((byte) channel), true);
 
     HAL.report(tResourceType.kResourceType_DigitalInput, channel);
-    setName("DigitalInput", channel);
+    SendableRegistry.addLW(this, "DigitalInput", channel);
   }
 
   @Override

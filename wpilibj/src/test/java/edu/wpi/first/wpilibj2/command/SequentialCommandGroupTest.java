@@ -50,8 +50,6 @@ class SequentialCommandGroupTest extends CommandTestBase {
     verify(command2).end(false);
 
     assertFalse(scheduler.isScheduled(group));
-
-    scheduler.close();
   }
 
   @Test
@@ -86,8 +84,6 @@ class SequentialCommandGroupTest extends CommandTestBase {
     verify(command3, never()).end(false);
 
     assertFalse(scheduler.isScheduled(group));
-
-    scheduler.close();
   }
 
   @Test
@@ -102,8 +98,6 @@ class SequentialCommandGroupTest extends CommandTestBase {
     Command group = new SequentialCommandGroup(command1, command2);
 
     assertDoesNotThrow(() -> scheduler.cancel(group));
-
-    scheduler.close();
   }
 
 
@@ -130,7 +124,5 @@ class SequentialCommandGroupTest extends CommandTestBase {
 
     assertFalse(scheduler.isScheduled(group));
     assertTrue(scheduler.isScheduled(command3));
-
-    scheduler.close();
   }
 }

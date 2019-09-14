@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * A command that does nothing but takes a specified amount of time to finish.  Useful for
@@ -24,7 +25,7 @@ public class WaitCommand extends CommandBase {
    */
   public WaitCommand(double seconds) {
     m_duration = seconds;
-    setName(m_name + ": " + seconds + " seconds");
+    SendableRegistry.setName(this, getName() + ": " + seconds + " seconds");
   }
 
   @Override

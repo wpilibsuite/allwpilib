@@ -8,6 +8,7 @@
 #pragma once
 
 #include <frc/smartdashboard/Sendable.h>
+#include <frc/smartdashboard/SendableHelper.h>
 
 #include <string>
 
@@ -18,17 +19,50 @@ namespace frc2 {
  * A base for subsystems that handles registration in the constructor, and
  * provides a more intuitive method for setting the default command.
  */
-class SubsystemBase : public Subsystem, public frc::Sendable {
+class SubsystemBase : public Subsystem,
+                      public frc::Sendable,
+                      public frc::SendableHelper<SubsystemBase> {
  public:
   void InitSendable(frc::SendableBuilder& builder) override;
-  std::string GetName() const override;
-  void SetName(const wpi::Twine& name) override;
-  std::string GetSubsystem() const override;
-  void SetSubsystem(const wpi::Twine& name) override;
+
+  /**
+   * Gets the name of this Subsystem.
+   *
+   * @return Name
+   */
+  std::string GetName() const;
+
+  /**
+   * Sets the name of this Subsystem.
+   *
+   * @param name name
+   */
+  void SetName(const wpi::Twine& name);
+
+  /**
+   * Gets the subsystem name of this Subsystem.
+   *
+   * @return Subsystem name
+   */
+  std::string GetSubsystem() const;
+
+  /**
+   * Sets the subsystem name of this Subsystem.
+   *
+   * @param subsystem subsystem name
+   */
+  void SetSubsystem(const wpi::Twine& name);
+
+  /**
+   * Associate a Sendable with this Subsystem.
+   * Also update the child's name.
+   *
+   * @param name name to give child
+   * @param child sendable
+   */
   void AddChild(std::string name, frc::Sendable* child);
 
  protected:
   SubsystemBase();
-  std::string m_name;
 };
 }  // namespace frc2

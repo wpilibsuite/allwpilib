@@ -8,8 +8,8 @@
 package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * A base for subsystems that handles registration in the constructor, and provides a more intuitive
@@ -17,30 +17,54 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  */
 public abstract class SubsystemBase implements Subsystem, Sendable {
 
-  protected String m_name = this.getClass().getSimpleName();
-
+  /**
+   * Constructor.
+   */
   public SubsystemBase() {
+    String name = this.getClass().getSimpleName();
+    name = name.substring(name.lastIndexOf('.') + 1);
+    SendableRegistry.addLW(this, name, name);
     CommandScheduler.getInstance().registerSubsystem(this);
   }
 
+  /**
+   * Gets the name of this Subsystem.
+   *
+   * @return Name
+   */
   @Override
   public String getName() {
-    return m_name;
+    return SendableRegistry.getName(this);
   }
 
+  /**
+   * Sets the name of this Subsystem.
+   *
+   * @param name name
+   */
   @Override
   public void setName(String name) {
-    m_name = name;
+    SendableRegistry.setName(this, name);
   }
 
+  /**
+   * Gets the subsystem name of this Subsystem.
+   *
+   * @return Subsystem name
+   */
   @Override
   public String getSubsystem() {
-    return getName();
+    return SendableRegistry.getSubsystem(this);
   }
 
+  /**
+   * Sets the subsystem name of this Subsystem.
+   *
+   * @param subsystem subsystem name
+   */
   @Override
   public void setSubsystem(String subsystem) {
-    setName(subsystem);
+    SendableRegistry.setSubsystem(this, subsystem);
   }
 
   /**
@@ -51,8 +75,8 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    * @param child sendable
    */
   public void addChild(String name, Sendable child) {
-    child.setName(getSubsystem(), name);
-    LiveWindow.add(child);
+    SendableRegistry.addLW(child, getSubsystem(), name);
+    SendableRegistry.addChild(this, child);
   }
 
   @Override

@@ -12,6 +12,8 @@
 #include <hal/Types.h>
 
 #include "frc/GyroBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -100,7 +102,7 @@ class AnalogGyro : public GyroBase {
    */
   AnalogGyro(std::shared_ptr<AnalogInput> channel, int center, double offset);
 
-  virtual ~AnalogGyro();
+  ~AnalogGyro() override;
 
   AnalogGyro(AnalogGyro&& rhs);
   AnalogGyro& operator=(AnalogGyro&& rhs);

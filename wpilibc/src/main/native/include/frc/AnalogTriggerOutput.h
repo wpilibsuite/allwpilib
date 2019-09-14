@@ -8,6 +8,8 @@
 #pragma once
 
 #include "frc/DigitalSource.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -44,7 +46,9 @@ class AnalogTrigger;
  * rollover transition is not sharp / clean enough. Using the averaging engine
  * may help with this, but rotational speeds of the sensor will then be limited.
  */
-class AnalogTriggerOutput : public DigitalSource {
+class AnalogTriggerOutput : public DigitalSource,
+                            public Sendable,
+                            public SendableHelper<AnalogTriggerOutput> {
   friend class AnalogTrigger;
 
  public:

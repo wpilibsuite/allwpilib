@@ -26,7 +26,5 @@ class RunCommandTest extends CommandTestBase {
     scheduler.run();
 
     assertEquals(3, counter.m_counter);
-
-    scheduler.close();
   }
 }

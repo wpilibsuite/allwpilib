@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,9 +10,8 @@ package edu.wpi.first.wpilibj.command;
 import java.util.Collections;
 
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.SendableBase;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * This class defines a major component of the robot.
@@ -28,7 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  *
  * @see Command
  */
-public abstract class Subsystem extends SendableBase {
+public abstract class Subsystem implements Sendable {
   /**
    * Whether or not getDefaultCommand() was called.
    */
@@ -50,7 +49,7 @@ public abstract class Subsystem extends SendableBase {
    * @param name the name of the subsystem
    */
   public Subsystem(String name) {
-    setName(name, name);
+    SendableRegistry.addLW(this, name, name);
     Scheduler.getInstance().registerSubsystem(this);
   }
 
@@ -60,7 +59,7 @@ public abstract class Subsystem extends SendableBase {
   public Subsystem() {
     String name = getClass().getName();
     name = name.substring(name.lastIndexOf('.') + 1);
-    setName(name, name);
+    SendableRegistry.addLW(this, name, name);
     Scheduler.getInstance().registerSubsystem(this);
     m_currentCommandChanged = true;
   }
@@ -179,8 +178,8 @@ public abstract class Subsystem extends SendableBase {
    * @param child sendable
    */
   public void addChild(String name, Sendable child) {
-    child.setName(getSubsystem(), name);
-    LiveWindow.add(child);
+    SendableRegistry.addLW(child, getSubsystem(), name);
+    SendableRegistry.addChild(this, child);
   }
 
   /**
@@ -189,8 +188,49 @@ public abstract class Subsystem extends SendableBase {
    * @param child sendable
    */
   public void addChild(Sendable child) {
-    child.setSubsystem(getSubsystem());
-    LiveWindow.add(child);
+    SendableRegistry.setSubsystem(child, getSubsystem());
+    SendableRegistry.enableLiveWindow(child);
+    SendableRegistry.addChild(this, child);
+  }
+
+  /**
+   * Gets the name of this Subsystem.
+   *
+   * @return Name
+   */
+  @Override
+  public String getName() {
+    return SendableRegistry.getName(this);
+  }
+
+  /**
+   * Sets the name of this Subsystem.
+   *
+   * @param name name
+   */
+  @Override
+  public void setName(String name) {
+    SendableRegistry.setName(this, name);
+  }
+
+  /**
+   * Gets the subsystem name of this Subsystem.
+   *
+   * @return Subsystem name
+   */
+  @Override
+  public String getSubsystem() {
+    return SendableRegistry.getSubsystem(this);
+  }
+
+  /**
+   * Sets the subsystem name of this Subsystem.
+   *
+   * @param subsystem subsystem name
+   */
+  @Override
+  public void setSubsystem(String subsystem) {
+    SendableRegistry.setSubsystem(this, subsystem);
   }
 
   @Override

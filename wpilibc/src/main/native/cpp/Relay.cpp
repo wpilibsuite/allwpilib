@@ -17,6 +17,7 @@
 #include "frc/SensorUtil.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -76,7 +77,7 @@ Relay::Relay(int channel, Relay::Direction direction)
     }
   }
 
-  SetName("Relay", m_channel);
+  SendableRegistry::GetInstance().AddLW(this, "Relay", m_channel);
 }
 
 Relay::~Relay() {

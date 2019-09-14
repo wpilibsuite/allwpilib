@@ -298,6 +298,11 @@ public interface Command {
     return false;
   }
 
+  /**
+   * Gets the name of this Command.
+   *
+   * @return Name
+   */
   default String getName() {
     return this.getClass().getSimpleName();
   }

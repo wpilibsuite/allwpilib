@@ -193,7 +193,6 @@ public class MotorEncoderTest extends AbstractComsSetup {
             .getPositionError(), pidController.atSetpoint());
 
     pidRunner.close();
-    pidController.close();
   }
 
   @Test
@@ -214,7 +213,6 @@ public class MotorEncoderTest extends AbstractComsSetup {
         .getPositionError(), pidController.atSetpoint());
 
     pidRunner.close();
-    pidController.close();
   }
 
   /**

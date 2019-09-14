@@ -33,7 +33,5 @@ class StartEndCommandTest extends CommandTestBase {
     assertFalse(scheduler.isScheduled(command));
     assertTrue(cond1.getCondition());
     assertTrue(cond2.getCondition());
-
-    scheduler.close();
   }
 }

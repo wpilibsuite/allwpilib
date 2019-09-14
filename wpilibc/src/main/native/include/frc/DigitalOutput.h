@@ -10,9 +10,12 @@
 #include <hal/Types.h>
 
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Class to write to digital outputs.
@@ -21,7 +24,9 @@ namespace frc {
  * elsewhere will allocate channels automatically so for those devices it
  * shouldn't be done here.
  */
-class DigitalOutput : public ErrorBase, public SendableBase {
+class DigitalOutput : public ErrorBase,
+                      public Sendable,
+                      public SendableHelper<DigitalOutput> {
  public:
   /**
    * Create an instance of a digital output.

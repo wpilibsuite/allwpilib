@@ -13,13 +13,17 @@
 
 #include "frc/AnalogTriggerOutput.h"
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class AnalogInput;
+class SendableBuilder;
 
-class AnalogTrigger : public ErrorBase, public SendableBase {
+class AnalogTrigger : public ErrorBase,
+                      public Sendable,
+                      public SendableHelper<AnalogTrigger> {
   friend class AnalogTriggerOutput;
 
  public:

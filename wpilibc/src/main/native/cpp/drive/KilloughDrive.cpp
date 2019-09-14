@@ -15,6 +15,7 @@
 
 #include "frc/SpeedController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -35,12 +36,13 @@ KilloughDrive::KilloughDrive(SpeedController& leftMotor,
                 std::sin(rightMotorAngle * (wpi::math::pi / 180.0))};
   m_backVec = {std::cos(backMotorAngle * (wpi::math::pi / 180.0)),
                std::sin(backMotorAngle * (wpi::math::pi / 180.0))};
-  AddChild(&m_leftMotor);
-  AddChild(&m_rightMotor);
-  AddChild(&m_backMotor);
+  auto& registry = SendableRegistry::GetInstance();
+  registry.AddChild(this, &m_leftMotor);
+  registry.AddChild(this, &m_rightMotor);
+  registry.AddChild(this, &m_backMotor);
   static int instances = 0;
   ++instances;
-  SetName("KilloughDrive", instances);
+  registry.AddLW(this, "KilloughDrive", instances);
 }
 
 void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,

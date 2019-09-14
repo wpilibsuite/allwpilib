@@ -9,15 +9,16 @@ package edu.wpi.first.wpilibj.controller;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpiutil.math.MathUtils;
 
 /**
  * Implements a PID control loop.
  */
 @SuppressWarnings("PMD.TooManyFields")
-public class PIDController extends SendableBase {
+public class PIDController implements Sendable {
   private static int instances;
 
   // Factor for "proportional" control
@@ -97,7 +98,7 @@ public class PIDController extends SendableBase {
     m_period = period;
 
     instances++;
-    setName("PIDController", instances);
+    SendableRegistry.addLW(this, "PIDController", instances);
 
     HAL.report(tResourceType.kResourceType_PIDController, instances);
   }

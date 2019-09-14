@@ -12,8 +12,10 @@ import java.util.StringJoiner;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpiutil.math.MathUtils;
 
 /**
@@ -59,7 +61,7 @@ import edu.wpi.first.wpiutil.math.MathUtils;
  * {@link edu.wpi.first.wpilibj.RobotDrive#mecanumDrive_Polar(double, double, double)} if a
  * deadband of 0 is used.
  */
-public class MecanumDrive extends RobotDriveBase {
+public class MecanumDrive extends RobotDriveBase implements Sendable {
   private static int instances;
 
   private final SpeedController m_frontLeftMotor;
@@ -82,12 +84,12 @@ public class MecanumDrive extends RobotDriveBase {
     m_rearLeftMotor = rearLeftMotor;
     m_frontRightMotor = frontRightMotor;
     m_rearRightMotor = rearRightMotor;
-    addChild(m_frontLeftMotor);
-    addChild(m_rearLeftMotor);
-    addChild(m_frontRightMotor);
-    addChild(m_rearRightMotor);
+    SendableRegistry.addChild(this, m_frontLeftMotor);
+    SendableRegistry.addChild(this, m_rearLeftMotor);
+    SendableRegistry.addChild(this, m_frontRightMotor);
+    SendableRegistry.addChild(this, m_rearRightMotor);
     instances++;
-    setName("MecanumDrive", instances);
+    SendableRegistry.addLW(this, "MecanumDrive", instances);
   }
 
   /**

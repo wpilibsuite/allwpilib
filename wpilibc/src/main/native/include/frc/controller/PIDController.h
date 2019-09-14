@@ -12,14 +12,16 @@
 
 #include <units/units.h>
 
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc2 {
 
 /**
  * Implements a PID control loop.
  */
-class PIDController : public frc::SendableBase {
+class PIDController : public frc::Sendable,
+                      public frc::SendableHelper<PIDController> {
  public:
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.

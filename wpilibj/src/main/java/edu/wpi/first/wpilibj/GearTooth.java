@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Alias for counter class. Implement the gear tooth sensor supplied by FIRST. Currently there is no
@@ -59,7 +60,7 @@ public class GearTooth extends Counter {
     } else {
       HAL.report(tResourceType.kResourceType_GearTooth, channel, 0);
     }
-    setName("GearTooth", channel);
+    SendableRegistry.setName(this, "GearTooth", channel);
   }
 
   /**
@@ -78,7 +79,7 @@ public class GearTooth extends Counter {
     } else {
       HAL.report(tResourceType.kResourceType_GearTooth, source.getChannel(), 0);
     }
-    setName("GearTooth", source.getChannel());
+    SendableRegistry.setName(this, "GearTooth", source.getChannel());
   }
 
   /**

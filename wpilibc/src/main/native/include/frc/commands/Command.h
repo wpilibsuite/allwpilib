@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,7 +15,8 @@
 
 #include "frc/ErrorBase.h"
 #include "frc/commands/Subsystem.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -45,7 +46,9 @@ class CommandGroup;
  * @see CommandGroup
  * @see Subsystem
  */
-class Command : public ErrorBase, public SendableBase {
+class Command : public ErrorBase,
+                public Sendable,
+                public SendableHelper<Command> {
   friend class CommandGroup;
   friend class Scheduler;
 
@@ -384,6 +387,34 @@ class Command : public ErrorBase, public SendableBase {
   virtual void _Cancel();
 
   friend class ConditionalCommand;
+
+  /**
+   * Gets the name of this Command.
+   *
+   * @return Name
+   */
+  std::string GetName() const;
+
+  /**
+   * Sets the name of this Command.
+   *
+   * @param name name
+   */
+  void SetName(const wpi::Twine& name);
+
+  /**
+   * Gets the subsystem name of this Command.
+   *
+   * @return Subsystem name
+   */
+  std::string GetSubsystem() const;
+
+  /**
+   * Sets the subsystem name of this Command.
+   *
+   * @param subsystem subsystem name
+   */
+  void SetSubsystem(const wpi::Twine& subsystem);
 
  private:
   /**

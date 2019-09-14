@@ -14,11 +14,10 @@
 
 #include "frc/AnalogTriggerType.h"
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
 
 namespace frc {
 
-class InterruptableSensorBase : public ErrorBase, public SendableBase {
+class InterruptableSensorBase : public ErrorBase {
  public:
   enum WaitResult {
     kTimeout = 0x0,

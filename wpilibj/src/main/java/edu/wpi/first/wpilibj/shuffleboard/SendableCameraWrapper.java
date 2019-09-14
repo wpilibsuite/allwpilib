@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,13 +12,13 @@ import java.util.WeakHashMap;
 
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * A wrapper to make video sources sendable and usable from Shuffleboard.
  */
-public final class SendableCameraWrapper extends SendableBase {
+public final class SendableCameraWrapper implements Sendable {
   private static final String kProtocol = "camera_server://";
 
   private static Map<VideoSource, SendableCameraWrapper> m_wrappers = new WeakHashMap<>();
@@ -32,9 +32,8 @@ public final class SendableCameraWrapper extends SendableBase {
    * @param source the source to wrap
    */
   private SendableCameraWrapper(VideoSource source) {
-    super(false);
     String name = source.getName();
-    setName(name);
+    SendableRegistry.add(this, name);
     m_uri = kProtocol + name;
   }
 

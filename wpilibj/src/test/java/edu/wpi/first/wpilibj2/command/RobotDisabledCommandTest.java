@@ -34,8 +34,6 @@ class RobotDisabledCommandTest extends CommandTestBase {
     assertFalse(scheduler.isScheduled(mockCommand));
 
     setDSEnabled(true);
-
-    scheduler.close();
   }
 
   @Test
@@ -54,8 +52,6 @@ class RobotDisabledCommandTest extends CommandTestBase {
     scheduler.run();
 
     assertTrue(scheduler.isScheduled(mockCommand));
-
-    scheduler.close();
   }
 
   @Test
@@ -83,8 +79,6 @@ class RobotDisabledCommandTest extends CommandTestBase {
 
     assertTrue(scheduler.isScheduled(runWhenDisabled));
     assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
-
-    scheduler.close();
   }
 
   @Test
@@ -112,8 +106,6 @@ class RobotDisabledCommandTest extends CommandTestBase {
 
     assertTrue(scheduler.isScheduled(runWhenDisabled));
     assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
-
-    scheduler.close();
   }
 
   @Test
@@ -138,8 +130,6 @@ class RobotDisabledCommandTest extends CommandTestBase {
 
     assertTrue(scheduler.isScheduled(runWhenDisabled));
     assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
-
-    scheduler.close();
   }
 
   @Test
@@ -164,8 +154,6 @@ class RobotDisabledCommandTest extends CommandTestBase {
 
     assertTrue(scheduler.isScheduled(runWhenDisabled));
     assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
-
-    scheduler.close();
   }
 
   @Test
@@ -191,7 +179,5 @@ class RobotDisabledCommandTest extends CommandTestBase {
     scheduler.schedule(parallel);
 
     assertFalse(scheduler.isScheduled(runWhenDisabled));
-
-    scheduler.close();
   }
 }

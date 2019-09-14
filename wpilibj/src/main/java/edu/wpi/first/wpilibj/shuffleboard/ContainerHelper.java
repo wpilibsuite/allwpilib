@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * A helper class for Shuffleboard containers to handle common child operations.
@@ -66,10 +67,11 @@ final class ContainerHelper {
   }
 
   ComplexWidget add(Sendable sendable) throws IllegalArgumentException {
-    if (sendable.getName() == null || sendable.getName().isEmpty()) {
+    String name = SendableRegistry.getName(sendable);
+    if (name.isEmpty()) {
       throw new IllegalArgumentException("Sendable must have a name");
     }
-    return add(sendable.getName(), sendable);
+    return add(name, sendable);
   }
 
   SimpleWidget add(String title, Object defaultValue) {

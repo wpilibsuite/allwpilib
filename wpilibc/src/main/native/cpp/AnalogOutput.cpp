@@ -16,6 +16,7 @@
 #include "frc/SensorUtil.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -42,7 +43,7 @@ AnalogOutput::AnalogOutput(int channel) {
   }
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogOutput, m_channel);
-  SetName("AnalogOutput", m_channel);
+  SendableRegistry::GetInstance().AddLW(this, "AnalogOutput", m_channel);
 }
 
 AnalogOutput::~AnalogOutput() { HAL_FreeAnalogOutputPort(m_port); }

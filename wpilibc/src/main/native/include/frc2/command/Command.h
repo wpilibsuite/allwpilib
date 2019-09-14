@@ -52,8 +52,12 @@ class ProxyScheduleCommand;
 class Command : public frc::ErrorBase {
  public:
   Command() = default;
-  Command(Command&& other) = default;
   virtual ~Command();
+
+  Command(const Command&);
+  Command& operator=(const Command&);
+  Command(Command&&) = default;
+  Command& operator=(Command&&) = default;
 
   /**
    * The initial subroutine of a command.  Called once when the command is

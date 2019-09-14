@@ -14,17 +14,19 @@
 
 #include "frc/SpeedController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 DifferentialDrive::DifferentialDrive(SpeedController& leftMotor,
                                      SpeedController& rightMotor)
     : m_leftMotor(leftMotor), m_rightMotor(rightMotor) {
-  AddChild(&m_leftMotor);
-  AddChild(&m_rightMotor);
+  auto& registry = SendableRegistry::GetInstance();
+  registry.AddChild(this, &m_leftMotor);
+  registry.AddChild(this, &m_rightMotor);
   static int instances = 0;
   ++instances;
-  SetName("DifferentialDrive", instances);
+  registry.AddLW(this, "DifferentialDrive", instances);
 }
 
 void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,

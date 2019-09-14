@@ -10,8 +10,12 @@
 #include <hal/Types.h>
 
 #include "frc/SolenoidBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Solenoid class for running high voltage Digital Output (PCM).
@@ -19,7 +23,9 @@ namespace frc {
  * The Solenoid class is typically used for pneumatics solenoids, but could be
  * used for any device within the current spec of the PCM.
  */
-class Solenoid : public SolenoidBase {
+class Solenoid : public SolenoidBase,
+                 public Sendable,
+                 public SendableHelper<Solenoid> {
  public:
   /**
    * Constructor using the default PCM ID (0).

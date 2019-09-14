@@ -13,13 +13,14 @@
 
 #include "frc/AnalogInput.h"
 #include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 AnalogTrigger::AnalogTrigger(int channel)
     : AnalogTrigger(new AnalogInput(channel)) {
   m_ownsAnalog = true;
-  AddChild(m_analogInput);
+  SendableRegistry::GetInstance().AddChild(this, m_analogInput);
 }
 
 AnalogTrigger::AnalogTrigger(AnalogInput* input) {
@@ -36,7 +37,8 @@ AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   m_index = index;
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, input->m_channel);
-  SetName("AnalogTrigger", input->GetChannel());
+  SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger",
+                                        input->GetChannel());
 }
 
 AnalogTrigger::~AnalogTrigger() {
@@ -50,7 +52,7 @@ AnalogTrigger::~AnalogTrigger() {
 
 AnalogTrigger::AnalogTrigger(AnalogTrigger&& rhs)
     : ErrorBase(std::move(rhs)),
-      SendableBase(std::move(rhs)),
+      SendableHelper(std::move(rhs)),
       m_index(std::move(rhs.m_index)),
       m_trigger(std::move(rhs.m_trigger)) {
   std::swap(m_analogInput, rhs.m_analogInput);
@@ -59,7 +61,7 @@ AnalogTrigger::AnalogTrigger(AnalogTrigger&& rhs)
 
 AnalogTrigger& AnalogTrigger::operator=(AnalogTrigger&& rhs) {
   ErrorBase::operator=(std::move(rhs));
-  SendableBase::operator=(std::move(rhs));
+  SendableHelper::operator=(std::move(rhs));
 
   m_index = std::move(rhs.m_index);
   m_trigger = std::move(rhs.m_trigger);

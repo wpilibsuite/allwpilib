@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,7 @@
 
 #include "frc/DriverStation.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -62,7 +63,7 @@ ADXL362::ADXL362(SPI::Port port, Range range) : m_spi(port) {
 
   HAL_Report(HALUsageReporting::kResourceType_ADXL362, port);
 
-  SetName("ADXL362", port);
+  SendableRegistry::GetInstance().AddLW(this, "ADXL362", port);
 }
 
 void ADXL362::SetRange(Range range) {

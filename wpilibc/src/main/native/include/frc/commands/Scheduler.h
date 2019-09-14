@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,8 @@
 #include <memory>
 
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -18,7 +19,9 @@ class ButtonScheduler;
 class Command;
 class Subsystem;
 
-class Scheduler : public ErrorBase, public SendableBase {
+class Scheduler : public ErrorBase,
+                  public Sendable,
+                  public SendableHelper<Scheduler> {
  public:
   /**
    * Returns the Scheduler, creating it if one does not exist.

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,7 +9,8 @@
 
 #include <atomic>
 
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -28,7 +29,7 @@ class Command;
  * only have to write the {@link Trigger#Get()} method to get the full
  * functionality of the Trigger class.
  */
-class Trigger : public SendableBase {
+class Trigger : public Sendable, public SendableHelper<Trigger> {
  public:
   Trigger() = default;
   ~Trigger() override = default;

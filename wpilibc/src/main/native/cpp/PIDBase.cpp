@@ -14,6 +14,7 @@
 
 #include "frc/PIDOutput.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -27,8 +28,7 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, PIDSource& source,
     : PIDBase(Kp, Ki, Kd, 0.0, source, output) {}
 
 PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
-                 PIDOutput& output)
-    : SendableBase(false) {
+                 PIDOutput& output) {
   m_P = Kp;
   m_I = Ki;
   m_D = Kd;
@@ -44,7 +44,7 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
-  SetName("PIDController", instances);
+  SendableRegistry::GetInstance().Add(this, "PIDController", instances);
 }
 
 double PIDBase::Get() const {

@@ -13,16 +13,17 @@
 #include <hal/HAL.h>
 
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc2;
 
 PIDController::PIDController(double Kp, double Ki, double Kd,
                              units::second_t period)
-    : frc::SendableBase(false), m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
+    : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
-  SetName("PIDController", instances);
+  frc::SendableRegistry::GetInstance().Add(this, "PIDController", instances);
 }
 
 void PIDController::SetP(double Kp) { m_Kp = Kp; }
