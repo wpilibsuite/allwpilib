@@ -28,7 +28,7 @@ public class CSVLogFile {
    * @param filePrefix The prefix of the LogFile.
    * @param columnHeadings Titles of CSVLogFile columns.
    */
-  public CSVLogFile(String filePrefix, String... columnHeadings) {
+  public <ValueT> CSVLogFile(String filePrefix, ValueT... columnHeadings) {
     m_logFile = new LogFile(filePrefix, "csv");
 
     m_logFile.log("\"Timestamp (ms)\",");
@@ -74,6 +74,12 @@ public class CSVLogFile {
     }
   }
 
+  /**
+   * Escape double quotes in a text by duplicating them.
+   *
+   * @param text Text to escape.
+   * @return The text with all its double quotes escaped.
+   */
   private String escapeDoubleQuotes(String text) {
     return text.replace("\"", "\"\"");
   }

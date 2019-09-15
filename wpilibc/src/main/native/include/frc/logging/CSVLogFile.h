@@ -13,7 +13,6 @@
 #include <type_traits>
 
 #include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 
 #include "frc/logging/LogFile.h"
 
@@ -92,13 +91,18 @@ class CSVLogFile {
     }
   }
 
+  /**
+   * Escape double quotes in a text by duplicating them.
+   *
+   * @param text Text to escape.
+   * @return The text with all its double quotes escaped.
+   */
   const std::string EscapeDoubleQuotes(wpi::StringRef text) const {
     std::string textString = text.str();
-    for (std::string::iterator it = textString.begin(); it != textString.end();
-         it++) {
-      if (*it == '\"') {
-        it++;
-        textString.insert(it, '\"');
+    for (std::string::size_type i = 0; i < text.size(); i++) {
+      if (text[i] == '\"') {
+        i++;
+        textString.insert(i, "\"");
       }
     }
     return textString;
