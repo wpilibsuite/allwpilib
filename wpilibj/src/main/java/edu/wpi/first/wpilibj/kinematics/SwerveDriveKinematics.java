@@ -53,15 +53,15 @@ public class SwerveDriveKinematics {
    * pass in the module states in the same order when calling the forward
    * kinematics methods.
    *
-   * @param wheelsMetersPerSecond The locations of the wheels relative to the physical center
-   *               of the robot.
+   * @param wheelsMeters The locations of the wheels relative to the physical center
+   *                     of the robot.
    */
-  public SwerveDriveKinematics(Translation2d... wheelsMetersPerSecond) {
-    if (wheelsMetersPerSecond.length < 2) {
+  public SwerveDriveKinematics(Translation2d... wheelsMeters) {
+    if (wheelsMeters.length < 2) {
       throw new IllegalArgumentException("A swerve drive requires at least two modules");
     }
-    m_numModules = wheelsMetersPerSecond.length;
-    m_modules = Arrays.copyOf(wheelsMetersPerSecond, m_numModules);
+    m_numModules = wheelsMeters.length;
+    m_modules = Arrays.copyOf(wheelsMeters, m_numModules);
     m_inverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
 
     for (int i = 0; i < m_numModules; i++) {
