@@ -7,6 +7,7 @@
 
 #include "frc/logging/LogFile.h"  // NOLINT(build/include_order)
 
+#include <cstdio>
 #include <ctime>
 #include <fstream>
 #include <string>
@@ -39,16 +40,24 @@ TEST(LogFileTest, Logs) {
 
   std::getline(testFile, line);
   EXPECT_EQ("Line 3", line);
+
+  testFile.close();
+
+  std::remove(filename.c_str());
 }
 
 TEST(LogFileTest, Filename) {
   std::string filenamePrefix = "testFilename";
-  frc::LogFile logFile(filenamePrefix);
+
+  { frc::LogFile logFile(filenamePrefix); }
 
   std::time_t m_time = std::time(0);
   char datetime[80];
   std::strftime(datetime, sizeof(datetime), "%Y-%m-%d-%H_%M_%S",
                 std::localtime(&m_time));
+  std::string expectedFilename = filenamePrefix + "-" + datetime + ".txt";
 
-  EXPECT_TRUE(wpi::sys::fs::exists(filenamePrefix + "-" + datetime + ".txt"));
+  EXPECT_TRUE(wpi::sys::fs::exists(expectedFilename));
+
+  std::remove(expectedFilename.c_str());
 }

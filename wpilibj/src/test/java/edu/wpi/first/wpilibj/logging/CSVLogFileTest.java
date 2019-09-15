@@ -9,6 +9,8 @@ package edu.wpi.first.wpilibj.logging;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,14 @@ class CSVLogFileTest {
       String secondLine = testFileScanner.nextLine();
       String timestamp = secondLine.substring(0, secondLine.indexOf(','));
       assertEquals(",1,\"Escaping \"\"double\"\" quotes.\"", secondLine.replace(timestamp, ""));
+
+      testFileScanner.close();
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+
+    try {
+      Files.delete(Paths.get(csvLogFile.getFileName()));
     } catch (IOException ex) {
       ex.printStackTrace();
     }

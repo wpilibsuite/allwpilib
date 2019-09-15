@@ -7,6 +7,7 @@
 
 #include "frc/logging/CSVLogFile.h"  // NOLINT(build/include_order)
 
+#include <cstdio>
 #include <fstream>
 #include <string>
 
@@ -36,4 +37,8 @@ TEST(CSVLogFileTest, Logs) {
 
   std::getline(testFile, line);
   EXPECT_EQ("", line);
+
+  testFile.close();
+
+  std::remove(filename.c_str());
 }

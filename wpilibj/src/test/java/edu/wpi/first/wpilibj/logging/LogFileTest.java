@@ -33,6 +33,13 @@ class LogFileTest {
       Scanner testFileScanner = new Scanner(new File(logFile.getFileName()));
       assertEquals("First line", testFileScanner.nextLine());
       assertEquals("Second line", testFileScanner.nextLine());
+      testFileScanner.close();
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+
+    try {
+      Files.delete(Paths.get(logFile.getFileName()));
     } catch (IOException ex) {
       ex.printStackTrace();
     }
@@ -48,5 +55,11 @@ class LogFileTest {
     Path filePath = Paths.get(filenamePrefix + "-" + formater.format(new Date()) + ".txt");
 
     assertTrue(Files.exists(filePath));
+
+    try {
+      Files.delete(filePath);
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
   }
 }
