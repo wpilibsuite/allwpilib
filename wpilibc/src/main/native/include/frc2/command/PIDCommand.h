@@ -93,7 +93,8 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
   void SetSetpointRelative(double relativeSetpoint);
 
   /**
-   * Gets the measurement of the process variable. Wraps the passed-in function for readability.
+   * Gets the measurement of the process variable. Wraps the passed-in function
+   * for readability.
    *
    * @return The measurement of the process variable
    */
