@@ -93,6 +93,22 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
   void SetSetpointRelative(double relativeSetpoint);
 
   /**
+   * Gets the measurement of the process variable. Wraps the passed-in function
+   * for readability.
+   *
+   * @return The measurement of the process variable
+   */
+  virtual double GetMeasurement();
+
+  /**
+   * Gets the measurement of the process variable. Wraps the passed-in function
+   * for readability.
+   *
+   * @return The measurement of the process variable
+   */
+  virtual void UseOutput(double output);
+
+  /**
    * Returns the PIDController used by the command.
    *
    * @return The PIDController
