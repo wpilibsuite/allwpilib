@@ -1,6 +1,7 @@
 apply from: "${rootDir}/shared/resources.gradle"
 
 ext {
+    noWpiutil = true
     baseId = 'wpiutil'
     groupId = 'edu.wpi.first.wpiutil'
 
@@ -8,7 +9,7 @@ ext {
     devMain = 'edu.wpi.first.wpiutil.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 
-    extraSetup = {
+    splitSetup = {
         it.tasks.withType(CppCompile) {
             dependsOn generateTask
         }
@@ -152,7 +153,7 @@ file("$projectDir/examples").list(new FilenameFilter() {
     examplesMap.put(it, [])
 }
 
-apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
+apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 nativeUtils.exportsConfigs {
     wpiutil {

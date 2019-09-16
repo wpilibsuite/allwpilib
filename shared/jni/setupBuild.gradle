@@ -16,8 +16,10 @@ ext {
 apply from: "${rootDir}/shared/java/javacommon.gradle"
 
 dependencies {
-    compile project(':wpiutil')
-    devCompile project(':wpiutil')
+    if (!project.hasProperty('noWpiutil')) {
+        compile project(':wpiutil')
+        devCompile project(':wpiutil')
+    }
 }
 
 project(':').libraryBuild.dependsOn build
@@ -69,7 +71,9 @@ model {
                     it.buildable = false
                     return
                 }
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                if (!project.hasProperty('noWpiutil')) {
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                }
                 if (project.hasProperty('splitSetup')) {
                     splitSetup(it)
                 }
@@ -93,8 +97,10 @@ model {
                     }
                 }
             }
-            binaries.all {
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            if (!project.hasProperty('noWpiutil')) {
+                binaries.all {
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                }
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -132,7 +138,9 @@ model {
                     return
                 }
                 lib library: "${nativeName}", linkage: 'shared'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                if (!project.hasProperty('noWpiutil')) {
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                }
                 if (project.hasProperty('jniSplitSetup')) {
                     jniSplitSetup(it)
                 }
@@ -170,7 +178,9 @@ model {
                     it.buildable = false
                     return
                 }
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                if (!project.hasProperty('noWpiutil')) {
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                }
                 if (project.hasProperty('jniSplitSetup')) {
                     jniSplitSetup(it)
                 }
@@ -198,7 +208,9 @@ model {
             binaries.all {
                 lib library: nativeName, linkage: 'shared'
                 lib library: "${nativeName}JNIShared", linkage: 'shared'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                if (!project.hasProperty('noWpiutil')) {
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                }
             }
         }
     }
@@ -229,7 +241,9 @@ model {
     binaries {
         withType(GoogleTestTestSuiteBinarySpec) {
             lib library: nativeName, linkage: 'shared'
-            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            if (!project.hasProperty('noWpiutil')) {
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            }
         }
     }
     tasks {

@@ -5,9 +5,12 @@ include(GenResources)
 include(CompileWarnings)
 include(AddTest)
 
+file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp)
+
 # Java bindings
 if (NOT WITHOUT_JAVA)
-  find_package(Java)
+  find_package(Java REQUIRED)
+  find_package(JNI REQUIRED)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
 
@@ -42,13 +45,41 @@ if (NOT WITHOUT_JAVA)
 
   execute_process(COMMAND python3 ${CMAKE_SOURCE_DIR}/wpiutil/generate_numbers.py ${CMAKE_BINARY_DIR}/wpiutil)
 
+  set(CMAKE_JNI_TARGET true)
+
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${CMAKE_BINARY_DIR}/wpiutil/generated/*.java)
-  add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} OUTPUT_NAME wpiutil)
+
+  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
+    set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
+    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} OUTPUT_NAME wpiutil)
+  else()
+    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} OUTPUT_NAME wpiutil GENERATE_NATIVE_HEADERS wpiutil_jni_headers)
+  endif()
 
   get_property(WPIUTIL_JAR_FILE TARGET wpiutil_jar PROPERTY JAR_FILE)
   install(FILES ${WPIUTIL_JAR_FILE} DESTINATION "${java_lib_dest}")
 
   set_property(TARGET wpiutil_jar PROPERTY FOLDER "java")
+
+  add_library(wpiutiljni ${wpiutil_jni_src})
+  wpilib_target_warnings(wpiutiljni)
+  target_link_libraries(wpiutiljni PUBLIC wpiutil)
+
+  set_property(TARGET wpiutiljni PROPERTY FOLDER "libraries")
+
+  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
+    target_include_directories(wpiutiljni PRIVATE ${JNI_INCLUDE_DIRS})
+    target_include_directories(wpiutiljni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
+  else()
+    target_link_libraries(wpiutiljni PRIVATE wpiutil_jni_headers)
+  endif()
+  add_dependencies(wpiutiljni wpiutil_jar)
+
+  if (MSVC)
+    install(TARGETS wpiutiljni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
+  endif()
+
+  install(TARGETS wpiutiljni EXPORT wpiutiljni DESTINATION "${main_lib_dest}")
 
 endif()
 
@@ -65,6 +96,7 @@ endif()
 GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpiutil_resources_src)
 
 file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp)
+list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
 file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
