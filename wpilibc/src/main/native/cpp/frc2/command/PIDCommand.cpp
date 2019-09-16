@@ -31,10 +31,10 @@ PIDCommand::PIDCommand(PIDController controller,
 void PIDCommand::Initialize() { m_controller.Reset(); }
 
 void PIDCommand::Execute() {
-  m_useOutput(m_controller.Calculate(GetMeasurement(), m_setpoint()));
+  UseOutput(m_controller.Calculate(GetMeasurement(), m_setpoint()));
 }
 
-void PIDCommand::End(bool interrupted) { m_useOutput(0); }
+void PIDCommand::End(bool interrupted) { UseOutput(0); }
 
 void PIDCommand::SetOutput(std::function<void(double)> useOutput) {
   m_useOutput = useOutput;
