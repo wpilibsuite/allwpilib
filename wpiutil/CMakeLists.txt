@@ -124,7 +124,7 @@ wpilib_target_warnings(wpiutil)
 target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS} ${ATOMIC})
 
 if (NOT USE_VCPKG_EIGEN)
-    install(DIRECTORY src/main/native/eigen/ DESTINATION "${include_dest}/wpiutil")
+    install(DIRECTORY src/main/native/eigeninclude/ DESTINATION "${include_dest}/wpiutil")
     target_include_directories(wpiutil PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/eigeninclude>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
