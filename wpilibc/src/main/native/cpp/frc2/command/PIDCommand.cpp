@@ -54,4 +54,6 @@ void PIDCommand::SetSetpointRelative(double relativeSetpoint) {
 
 double PIDCommand::GetMeasurement() { return m_measurement(); }
 
+void PIDCommand::UseOutput(double output) { m_useOutput(output); }
+
 PIDController& PIDCommand::getController() { return m_controller; }
