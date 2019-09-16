@@ -101,7 +101,8 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
   virtual double GetMeasurement();
 
   /**
-   * Gets the measurement of the process variable. Wraps the passed-in function for readability.
+   * Gets the measurement of the process variable. Wraps the passed-in function 
+   * for readability.
    *
    * @return The measurement of the process variable
    */
