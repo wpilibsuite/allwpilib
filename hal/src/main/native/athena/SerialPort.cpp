@@ -195,9 +195,17 @@ void HAL_SetSerialBaudRate(HAL_SerialPortHandle handle, int32_t baud,
       *status = PARAMETER_OUT_OF_RANGE;
       return;
   }
-  cfsetospeed(&port->tty, static_cast<speed_t>(port->baudRate));
-  cfsetispeed(&port->tty, static_cast<speed_t>(port->baudRate));
-  int err = tcsetattr(port->portId, TCSANOW, &port->tty);
+  int err = cfsetospeed(&port->tty, static_cast<speed_t>(port->baudRate));
+  if (err < 0) {
+    *status = errno;
+    return;
+  }
+  err = cfsetispeed(&port->tty, static_cast<speed_t>(port->baudRate));
+  if (err < 0) {
+    *status = errno;
+    return;
+  }
+  err = tcsetattr(port->portId, TCSANOW, &port->tty);
   if (err < 0) {
     *status = errno;
   }
