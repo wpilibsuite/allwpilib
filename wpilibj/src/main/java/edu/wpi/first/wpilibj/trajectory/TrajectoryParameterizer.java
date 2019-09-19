@@ -65,7 +65,6 @@ public final class TrajectoryParameterizer {
    * @param reversed                         Whether the robot should move backwards.
    *                                         Note that the robot will still move from
    *                                         a -> b -> ... -> z as defined in the waypoints.
-   *
    * @return The trajectory.
    */
   @SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.CyclomaticComplexity",
@@ -116,7 +115,8 @@ public final class TrajectoryParameterizer {
           constrainedState.maxVelocityMetersPerSecond = Math.min(
               constrainedState.maxVelocityMetersPerSecond,
               constraint.getMaxVelocityMetersPerSecond(
-                  constrainedState.pose.poseMeters, constrainedState.pose.curvatureRadPerMeter)
+                  constrainedState.pose.poseMeters, constrainedState.pose.curvatureRadPerMeter,
+                  constrainedState.maxVelocityMetersPerSecond)
           );
         }
 

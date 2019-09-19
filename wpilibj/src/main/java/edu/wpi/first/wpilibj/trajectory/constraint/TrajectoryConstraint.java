@@ -18,11 +18,14 @@ public interface TrajectoryConstraint {
   /**
    * Returns the max velocity given the current pose and curvature.
    *
-   * @param poseMeters           The pose at the current point in the trajectory.
-   * @param curvatureRadPerMeter The curvature at the current point in the trajectory.
+   * @param poseMeters              The pose at the current point in the trajectory.
+   * @param curvatureRadPerMeter    The curvature at the current point in the trajectory.
+   * @param velocityMetersPerSecond The velocity at the current point in the trajectory before
+   *                                constraints are applied.
    * @return The absolute maximum velocity.
    */
-  double getMaxVelocityMetersPerSecond(Pose2d poseMeters, double curvatureRadPerMeter);
+  double getMaxVelocityMetersPerSecond(Pose2d poseMeters, double curvatureRadPerMeter,
+                                       double velocityMetersPerSecond);
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory

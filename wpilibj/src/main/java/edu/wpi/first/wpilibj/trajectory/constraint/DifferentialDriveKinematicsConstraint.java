@@ -8,27 +8,30 @@
 package edu.wpi.first.wpilibj.trajectory.constraint;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 
 /**
- * A constraint on the maximum absolute centripetal acceleration allowed when
- * traversing a trajectory. The centripetal acceleration of a robot is defined
- * as the velocity squared divided by the radius of curvature.
- *
- * <p>Effectively, limiting the maximum centripetal acceleration will cause the
- * robot to slow down around tight turns, making it easier to track trajectories
- * with sharp turns.
+ * A class that enforces constraints on the differential drive kinematics.
+ * This can be used to ensure that the trajectory is constructed so that the
+ * commanded velocities for both sides of the drivetrain stay below a certain
+ * limit.
  */
-public class CentripetalAccelerationConstraint implements TrajectoryConstraint {
-  private final double m_maxCentripetalAccelerationMetersPerSecondSq;
+public class DifferentialDriveKinematicsConstraint implements TrajectoryConstraint {
+  private final double m_maxSpeedMetersPerSecond;
+  private final DifferentialDriveKinematics m_kinematics;
 
   /**
-   * Constructs a centripetal acceleration constraint.
+   * Constructs a differential drive dynamics constraint.
    *
-   * @param maxCentripetalAccelerationMetersPerSecondSq The max centripetal acceleration.
+   * @param maxSpeedMetersPerSecond The max speed that a side of the robot can travel at.
    */
-  public CentripetalAccelerationConstraint(double maxCentripetalAccelerationMetersPerSecondSq) {
-    m_maxCentripetalAccelerationMetersPerSecondSq = maxCentripetalAccelerationMetersPerSecondSq;
+  public DifferentialDriveKinematicsConstraint(final DifferentialDriveKinematics kinematics,
+                                               double maxSpeedMetersPerSecond) {
+    m_maxSpeedMetersPerSecond = maxSpeedMetersPerSecond;
+    m_kinematics = kinematics;
   }
+
 
   /**
    * Returns the max velocity given the current pose and curvature.
@@ -42,15 +45,16 @@ public class CentripetalAccelerationConstraint implements TrajectoryConstraint {
   @Override
   public double getMaxVelocityMetersPerSecond(Pose2d poseMeters, double curvatureRadPerMeter,
                                               double velocityMetersPerSecond) {
-    // ac = v^2 / r
-    // k (curvature) = 1 / r
+    // Create an object to represent the current chassis speeds.
+    var chassisSpeeds = new ChassisSpeeds(velocityMetersPerSecond,
+        0, velocityMetersPerSecond * curvatureRadPerMeter);
 
-    // therefore, ac = v^2 * c
-    // ac / c = v^2
-    // v = std::sqrt(ac / c)
+    // Get the wheel speeds and normalize them to within the max velocity.
+    var wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
+    wheelSpeeds.normalize(m_maxSpeedMetersPerSecond);
 
-    return Math.sqrt(m_maxCentripetalAccelerationMetersPerSecondSq
-        / Math.abs(curvatureRadPerMeter));
+    // Return the new linear chassis speed.
+    return m_kinematics.toChassisSpeeds(wheelSpeeds).vxMetersPerSecond;
   }
 
   /**
@@ -66,8 +70,6 @@ public class CentripetalAccelerationConstraint implements TrajectoryConstraint {
   public MinMax getMinMaxAccelerationMetersPerSecondSq(Pose2d poseMeters,
                                                        double curvatureRadPerMeter,
                                                        double velocityMetersPerSecond) {
-    // The acceleration of the robot has no impact on the centripetal acceleration
-    // of the robot.
     return new MinMax();
   }
 }

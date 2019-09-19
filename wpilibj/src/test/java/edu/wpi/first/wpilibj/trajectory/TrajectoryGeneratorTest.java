@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.trajectory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,28 +16,18 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.trajectory.constraint.CentripetalAccelerationConstraint;
 import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
 
+import static edu.wpi.first.wpilibj.util.Units.feetToMeters;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TrajectoryGeneratorTest {
-  private static double feetToMeters(double feet) {
-    return feet * 0.3048;
-  }
-
-  @Test
-  @SuppressWarnings("LocalVariableName")
-  void testObeysConstraints() {
+  static Trajectory getTrajectory(List<TrajectoryConstraint> constraints) {
     final double startVelocity = 0;
     final double endVelocity = 0;
     final double maxVelocity = feetToMeters(12.0);
     final double maxAccel = feetToMeters(12);
-    final double maxCentripetalAccel = feetToMeters(7);
-
-    var constraints = new ArrayList<TrajectoryConstraint>();
-    constraints.add(new CentripetalAccelerationConstraint(maxCentripetalAccel));
 
     // 2018 cross scale auto waypoints.
     var sideStart = new Pose2d(feetToMeters(1.54), feetToMeters(23.23),
@@ -54,8 +45,7 @@ class TrajectoryGeneratorTest {
             Rotation2d.fromDegrees(-90))));
     waypoints.add(crossScale);
 
-    var start = System.nanoTime();
-    var trajectory = TrajectoryGenerator.generateTrajectory(
+    return TrajectoryGenerator.generateTrajectory(
         waypoints,
         constraints,
         startVelocity,
@@ -64,31 +54,25 @@ class TrajectoryGeneratorTest {
         maxAccel,
         true
     );
-    var end = System.nanoTime();
+  }
 
-    System.out.println("Generation Took: " + (end - start) / 1000.0 + " microseconds");
+  @Test
+  @SuppressWarnings("LocalVariableName")
+  void testGenerationAndConstraints() {
+    Trajectory trajectory = getTrajectory(new ArrayList<>());
 
+    double duration = trajectory.getTotalTimeSeconds();
     double t = 0.0;
     double dt = 0.02;
-    double duration = trajectory.getTotalTimeSeconds();
 
     while (t < duration) {
       var point = trajectory.sample(t);
-      double a_c = Math.pow(point.velocityMetersPerSecond, 2) * point.curvatureRadPerMeter;
-
-      assertAll(
-          () -> assertTrue(Math.abs(a_c) <= maxCentripetalAccel + 0.05),
-          () -> assertTrue(Math.abs(point.velocityMetersPerSecond)
-              < maxVelocity + feetToMeters(0.01)),
-          () -> assertTrue(Math.abs(point.accelerationMetersPerSecondSq)
-              < maxAccel + feetToMeters(0.01))
-      );
-
-      var pose = point.poseMeters;
-
-      // System.out.println(point.curvatureRadPerMeter);
-      System.out.println(pose.getTranslation().getX() + ", " + pose.getTranslation().getY());
       t += dt;
+      assertAll(
+          () -> assertTrue(Math.abs(point.velocityMetersPerSecond) < feetToMeters(12.0) + 0.05),
+          () -> assertTrue(Math.abs(point.accelerationMetersPerSecondSq) < feetToMeters(12.0)
+              + 0.05)
+      );
     }
   }
 }
