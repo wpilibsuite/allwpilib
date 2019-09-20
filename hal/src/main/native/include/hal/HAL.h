@@ -28,6 +28,7 @@
 #include "hal/Errors.h"
 #include "hal/I2C.h"
 #include "hal/Interrupts.h"
+#include "hal/Main.h"
 #include "hal/Notifier.h"
 #include "hal/PDP.h"
 #include "hal/PWM.h"

@@ -204,21 +204,11 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Starting point for the applications.
+   * Run the robot main loop.
    */
   @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.AvoidCatchingThrowable",
                      "PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
-  public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
-    if (!HAL.initialize(500, 0)) {
-      throw new IllegalStateException("Failed to initialize. Terminating");
-    }
-
-    // Call a CameraServer JNI function to force OpenCV native library loading
-    // Needed because all the OpenCV JNI functions don't have built in loading
-    CameraServerJNI.enumerateSinks();
-
-    HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
-
+  private static <T extends RobotBase> void runRobot(Supplier<T> robotSupplier) {
     System.out.println("********** Robot program starting **********");
 
     T robot;
@@ -238,7 +228,6 @@ public abstract class RobotBase implements AutoCloseable {
           + throwable.toString(), elements);
       DriverStation.reportWarning("Robots should not quit, but yours did!", false);
       DriverStation.reportError("Could not instantiate robot " + robotName + "!", false);
-      System.exit(1);
       return;
     }
 
@@ -285,6 +274,34 @@ public abstract class RobotBase implements AutoCloseable {
         DriverStation.reportError("Unexpected return from startCompetition() method.", false);
       }
     }
+  }
+
+  /**
+   * Starting point for the applications.
+   */
+  public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
+    if (!HAL.initialize(500, 0)) {
+      throw new IllegalStateException("Failed to initialize. Terminating");
+    }
+
+    // Call a CameraServer JNI function to force OpenCV native library loading
+    // Needed because all the OpenCV JNI functions don't have built in loading
+    CameraServerJNI.enumerateSinks();
+
+    HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
+
+    if (HAL.hasMain()) {
+      Thread thread = new Thread(() -> {
+        runRobot(robotSupplier);
+        HAL.exitMain();
+      }, "robot main");
+      thread.setDaemon(true);
+      thread.start();
+      HAL.runMain();
+    } else {
+      runRobot(robotSupplier);
+    }
+
     System.exit(1);
   }
 }

@@ -17,6 +17,7 @@
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_HAL.h"
 #include "hal/DriverStation.h"
+#include "hal/Main.h"
 
 using namespace frc;
 using namespace wpi::java;
@@ -33,6 +34,42 @@ Java_edu_wpi_first_hal_HAL_initialize
   (JNIEnv*, jclass, jint timeout, jint mode)
 {
   return HAL_Initialize(timeout, mode);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
+ * Method:    hasMain
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_HAL_hasMain
+  (JNIEnv*, jclass)
+{
+  return HAL_HasMain();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
+ * Method:    runMain
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_HAL_runMain
+  (JNIEnv*, jclass)
+{
+  HAL_RunMain();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
+ * Method:    exitMain
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_HAL_exitMain
+  (JNIEnv*, jclass)
+{
+  HAL_ExitMain();
 }
 
 /*
