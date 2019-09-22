@@ -128,6 +128,7 @@ if (NOT WITHOUT_CSCORE)
 endif()
 
 if (WITH_SIMULATION_MODULES AND NOT USE_EXTERNAL_HAL)
+    add_subdirectory(imgui)
     add_subdirectory(simulation)
 endif()
 
