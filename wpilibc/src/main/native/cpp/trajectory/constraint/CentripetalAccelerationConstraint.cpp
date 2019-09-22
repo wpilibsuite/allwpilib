@@ -19,9 +19,9 @@ units::meters_per_second_t CentripetalAccelerationConstraint::MaxVelocity(
   // ac = v^2 / r
   // k (curvature) = 1 / r
 
-  // therefore, ac = v^2 * c
-  // ac / c = v^2
-  // v = std::sqrt(ac / c)
+  // therefore, ac = v^2 * k
+  // ac / k = v^2
+  // v = std::sqrt(ac / k)
 
   // We have to multiply by 1_rad here to get the units to cancel out nicely.
   // The units library defines a unit for radians although it is technically

@@ -45,9 +45,9 @@ public class CentripetalAccelerationConstraint implements TrajectoryConstraint {
     // ac = v^2 / r
     // k (curvature) = 1 / r
 
-    // therefore, ac = v^2 * c
-    // ac / c = v^2
-    // v = std::sqrt(ac / c)
+    // therefore, ac = v^2 * k
+    // ac / k = v^2
+    // v = std::sqrt(ac / k)
 
     return Math.sqrt(m_maxCentripetalAccelerationMetersPerSecondSq
         / Math.abs(curvatureRadPerMeter));
