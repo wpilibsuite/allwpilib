@@ -53,11 +53,14 @@ class TrajectoryConstraint {
    *
    * @param pose The pose at the current point in the trajectory.
    * @param curvature The curvature at the current point in the trajectory.
+   * @param velocity The velocity at the current point in the trajectory before
+   *                                constraints are applied.
    *
    * @return The absolute maximum velocity.
    */
-  virtual units::meters_per_second_t MaxVelocity(const Pose2d& pose,
-                                                 curvature_t curvature) = 0;
+  virtual units::meters_per_second_t MaxVelocity(
+      const Pose2d& pose, curvature_t curvature,
+      units::meters_per_second_t velocity) = 0;
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory

@@ -5,10 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <memory>
 #include <vector>
 
-#include "frc/trajectory/Trajectory.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
+#include <units/units.h>
+
 #include "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "gtest/gtest.h"
@@ -16,9 +17,14 @@
 
 using namespace frc;
 
-TEST(TrajectoryGenerationTest, ObeysConstraints) {
-  auto trajectory = TestTrajectory::GetTrajectory(
-      std::vector<std::unique_ptr<TrajectoryConstraint>>());
+TEST(CentripetalAccelerationConstraintTest, Constraint) {
+  const auto maxCentripetalAcceleration = 7_fps_sq;
+
+  std::vector<std::unique_ptr<TrajectoryConstraint>> constraints;
+  constraints.emplace_back(std::make_unique<CentripetalAccelerationConstraint>(
+      maxCentripetalAcceleration));
+
+  auto trajectory = TestTrajectory::GetTrajectory(std::move(constraints));
 
   units::second_t time = 0_s;
   units::second_t dt = 20_ms;
@@ -28,8 +34,10 @@ TEST(TrajectoryGenerationTest, ObeysConstraints) {
     const Trajectory::State point = trajectory.Sample(time);
     time += dt;
 
-    EXPECT_TRUE(units::math::abs(point.velocity) <= 12_fps + 0.01_fps);
-    EXPECT_TRUE(units::math::abs(point.acceleration) <=
-                12_fps_sq + 0.01_fps_sq);
+    auto centripetalAcceleration =
+        units::math::pow<2>(point.velocity) * point.curvature / 1_rad;
+
+    EXPECT_TRUE(centripetalAcceleration <
+                maxCentripetalAcceleration + 0.05_mps_sq);
   }
 }

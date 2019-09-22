@@ -9,23 +9,20 @@
 
 #include <units/units.h>
 
+#include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 
-namespace frc {
-
 /**
- * A constraint on the maximum absolute centripetal acceleration allowed when
- * traversing a trajectory. The centripetal acceleration of a robot is defined
- * as the velocity squared divided by the radius of curvature.
- *
- * Effectively, limiting the maximum centripetal acceleration will cause the
- * robot to slow down around tight turns, making it easier to track trajectories
- * with sharp turns.
+ * A class that enforces constraints on the differential drive kinematics.
+ * This can be used to ensure that the trajectory is constructed so that the
+ * commanded velocities for both sides of the drivetrain stay below a certain
+ * limit.
  */
-class CentripetalAccelerationConstraint : public TrajectoryConstraint {
+namespace frc {
+class DifferentialDriveKinematicsConstraint : public TrajectoryConstraint {
  public:
-  explicit CentripetalAccelerationConstraint(
-      units::meters_per_second_squared_t maxCentripetalAcceleration);
+  DifferentialDriveKinematicsConstraint(DifferentialDriveKinematics kinematics,
+                                        units::meters_per_second_t maxSpeed);
 
   units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, curvature_t curvature,
@@ -35,6 +32,7 @@ class CentripetalAccelerationConstraint : public TrajectoryConstraint {
                             units::meters_per_second_t speed) override;
 
  private:
-  units::meters_per_second_squared_t m_maxCentripetalAcceleration;
+  DifferentialDriveKinematics m_kinematics;
+  units::meters_per_second_t m_maxSpeed;
 };
 }  // namespace frc

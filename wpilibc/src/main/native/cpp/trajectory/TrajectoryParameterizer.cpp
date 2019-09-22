@@ -77,7 +77,8 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
         constrainedState.maxVelocity = units::math::min(
             constrainedState.maxVelocity,
             constraint->MaxVelocity(constrainedState.pose.first,
-                                    constrainedState.pose.second));
+                                    constrainedState.pose.second,
+                                    constrainedState.maxVelocity));
       }
 
       // Now enforce all acceleration limits.

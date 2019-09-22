@@ -14,7 +14,8 @@ CentripetalAccelerationConstraint::CentripetalAccelerationConstraint(
     : m_maxCentripetalAcceleration(maxCentripetalAcceleration) {}
 
 units::meters_per_second_t CentripetalAccelerationConstraint::MaxVelocity(
-    const Pose2d& pose, curvature_t curvature) {
+    const Pose2d& pose, curvature_t curvature,
+    units::meters_per_second_t velocity) {
   // ac = v^2 / r
   // k (curvature) = 1 / r
 
