@@ -21,6 +21,7 @@ repoRootNameOverride {
 includeOtherLibs {
   ^cameraserver/
   ^cscore
+  ^drake/
   ^hal/
   ^imgui
   ^mockdata/
