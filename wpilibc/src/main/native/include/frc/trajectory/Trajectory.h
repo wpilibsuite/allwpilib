@@ -58,6 +58,8 @@ class Trajectory {
     State Interpolate(State endValue, double i) const;
   };
 
+  Trajectory() = default;
+
   /**
    * Constructs a trajectory from a vector of states.
    */
