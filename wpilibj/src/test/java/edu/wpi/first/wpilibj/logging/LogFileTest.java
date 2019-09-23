@@ -30,9 +30,16 @@ class LogFileTest {
     logFile.logln("Second line");
 
     try {
+      logFile.write("-----Third line-----", 5, 10);
+    } catch (IOException ex) {
+      System.out.println(ex.getMessage());
+    }
+
+    try {
       Scanner testFileScanner = new Scanner(new File(logFile.getFileName()));
       assertEquals("First line", testFileScanner.nextLine());
       assertEquals("Second line", testFileScanner.nextLine());
+      assertEquals("Third line", testFileScanner.nextLine());
       testFileScanner.close();
     } catch (IOException ex) {
       ex.printStackTrace();

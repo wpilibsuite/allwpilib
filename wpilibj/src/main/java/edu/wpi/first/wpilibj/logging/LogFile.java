@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj.logging;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -20,7 +21,7 @@ import java.util.Locale;
 /**
  * A LogFile writes text to log in a file.
  */
-public class LogFile {
+public class LogFile extends Writer {
   private final String m_filePrefix;
   private final String m_fileExtension;
   private OutputStream m_file;
@@ -102,6 +103,36 @@ public class LogFile {
   }
 
   /**
+   * Write text in the LogFile.
+   *
+   * @param text The array of chars to write from
+   * @param off The index into the array to start writing from
+   * @param len The number of chars to write
+   */
+  @Override
+  public void write(char[] text, int off, int len) throws IOException {
+    char[] textCopy = new char[len];
+    System.arraycopy(text, off, textCopy, 0, len);
+    logln(String.valueOf(textCopy));
+  }
+
+  /**
+   * Flush the stream.
+   */
+  @Override
+  public void flush() throws IOException {
+    m_file.flush();
+  }
+
+  /**
+   * Closes the stream.
+   */
+  @Override
+  public void close() throws IOException {
+    m_file.close();
+  }
+
+  /**
    * Check if the time has changed of more than 24 hours.
    * Change the filename if the condition is met.
    */
@@ -135,5 +166,4 @@ public class LogFile {
 
     return m_filePrefix + "-" + formater.format(time) + "." + m_fileExtension;
   }
-
 }
