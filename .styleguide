@@ -29,6 +29,7 @@ includeOtherLibs {
   ^cameraserver/
   ^cscore
   ^hal/
+  ^imgui
   ^mockdata/
   ^networktables/
   ^ntcore

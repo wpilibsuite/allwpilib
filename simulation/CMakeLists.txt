@@ -1,3 +1,4 @@
+add_subdirectory(halsim_gui)
 add_subdirectory(halsim_print)
 add_subdirectory(halsim_lowfi)
 add_subdirectory(halsim_ds_nt)

@@ -1,6 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
 nativeUtils.addWpiNativeUtils()
+nativeUtils.withRoboRIO()
 nativeUtils.withRaspbian()
 nativeUtils.withBionic()
 nativeUtils {
@@ -10,6 +11,7 @@ nativeUtils {
       niLibVersion = "2020.2.2"
       opencvVersion = "3.4.7-1"
       googleTestVersion = "1.9.0-3-437e100"
+      imguiVersion = "1.72b-1"
     }
   }
 }
