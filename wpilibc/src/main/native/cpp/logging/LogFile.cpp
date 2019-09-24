@@ -36,12 +36,19 @@ const std::string LogFile::GetFileName() const {
   return CreateFilename(m_time);
 }
 
+void LogFile::SetTimeIntervalBeforeRenaming(units::second_t duration) {
+  m_timeIntervalBeforeRenaming = duration;
+}
+
 void LogFile::UpdateFilename() {
   std::time_t newTime = std::time(0);
-  // If the difference between the two timestamps is more than 24 hours
-  if (std::difftime(newTime, m_time) > 86400) {
-    std::rename(CreateFilename(m_time).c_str(),
-                CreateFilename(newTime).c_str());
+  // If the difference between the two timestamps is too long
+  if (units::second_t{std::difftime(newTime, m_time)} >
+      m_timeIntervalBeforeRenaming) {
+    std::string newName = CreateFilename(newTime);
+    m_file.close();
+    std::rename(CreateFilename(m_time).c_str(), newName.c_str());
+    m_file.open(newName);
   }
 
   m_time = newTime;

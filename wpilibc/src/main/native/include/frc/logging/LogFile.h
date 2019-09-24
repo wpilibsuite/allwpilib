@@ -11,6 +11,7 @@
 #include <fstream>
 #include <string>
 
+#include <units/units.h>
 #include <wpi/StringRef.h>
 
 namespace frc {
@@ -54,6 +55,13 @@ class LogFile {
    */
   const std::string GetFileName() const;
 
+  /**
+   * Set the time interval after which the file will be renamed.
+   *
+   * @param duration The time interval after which the file will be renamed.
+   */
+  void SetTimeIntervalBeforeRenaming(units::second_t duration);
+
   template <typename Value>
   friend LogFile& operator<<(LogFile& file, const Value& value) {
     file.m_file << value;
@@ -80,6 +88,7 @@ class LogFile {
   std::string m_fileExtension;
   std::ofstream m_file;
   std::time_t m_time;
+  units::second_t m_timeIntervalBeforeRenaming = 1_d;
 };
 
 }  // namespace frc

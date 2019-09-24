@@ -26,6 +26,7 @@ public class LogFile extends Writer {
   private final String m_fileExtension;
   private OutputStream m_file;
   private Date m_time;
+  private int m_timeIntervalBeforeRenaming = 86400;
 
   /**
    * Instantiate a LogFile passing in its prefix and its extension.
@@ -103,6 +104,15 @@ public class LogFile extends Writer {
   }
 
   /**
+   * Set the time interval after which the file will be renamed in seconds.
+   *
+   * @param seconds The time interval after which the file will be renamed in seconds.
+   */
+  public void setTimeIntervalBeforeRenaming(int seconds) {
+    m_timeIntervalBeforeRenaming = seconds;
+  }
+
+  /**
    * Write text in the LogFile.
    *
    * @param text The array of chars to write from
@@ -138,8 +148,8 @@ public class LogFile extends Writer {
    */
   private void updateFilename() {
     Date newTime = new Date();
-    // If the difference between the two timestamps is more than 24 hours
-    if (newTime.getTime() - m_time.getTime() > 86400000) {
+    // If the difference between the two timestamps is too long
+    if (newTime.getTime() - m_time.getTime() > m_timeIntervalBeforeRenaming * 1000) {
       File oldName = new File(createFilename(m_time));
       File newName = new File(createFilename(newTime));
       oldName.renameTo(newName);

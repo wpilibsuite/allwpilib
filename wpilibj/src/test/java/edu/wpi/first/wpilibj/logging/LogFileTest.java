@@ -20,6 +20,7 @@ import java.util.Scanner;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LogFileTest {
@@ -55,12 +56,23 @@ class LogFileTest {
   @Test
   void filename() {
     String filenamePrefix = "testFilename";
+
     LogFile logFile = new LogFile(filenamePrefix);
+    logFile.setTimeIntervalBeforeRenaming(1);
     logFile.log("");
 
-    SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd.HH_mm_ss", Locale.getDefault());
-    Path filePath = Paths.get(filenamePrefix + "-" + formater.format(new Date()) + ".txt");
+    Path firstFilePath = getExpectedFilename(filenamePrefix);
+    assertTrue(Files.exists(firstFilePath));
 
+    try {
+      Thread.sleep(1100);
+    } catch (InterruptedException ex) {
+      ex.printStackTrace();
+    }
+    logFile.log("");
+
+    Path filePath = getExpectedFilename(filenamePrefix);
+    assertFalse(Files.exists(firstFilePath));
     assertTrue(Files.exists(filePath));
 
     try {
@@ -68,5 +80,10 @@ class LogFileTest {
     } catch (IOException ex) {
       ex.printStackTrace();
     }
+  }
+
+  Path getExpectedFilename(String filenamePrefix) {
+    SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd.HH_mm_ss", Locale.getDefault());
+    return Paths.get(filenamePrefix + "-" + formater.format(new Date()) + ".txt");
   }
 }

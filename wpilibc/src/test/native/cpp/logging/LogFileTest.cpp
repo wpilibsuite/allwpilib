@@ -7,14 +7,24 @@
 
 #include "frc/logging/LogFile.h"  // NOLINT(build/include_order)
 
+#include <chrono>
 #include <cstdio>
 #include <ctime>
 #include <fstream>
 #include <string>
+#include <thread>
 
 #include <wpi/FileSystem.h>
 
 #include "gtest/gtest.h"
+
+std::string GetExpectedFilename(std::string filenamePrefix) {
+  std::time_t m_time = std::time(0);
+  char datetime[80];
+  std::strftime(datetime, sizeof(datetime), "%Y-%m-%d-%H_%M_%S",
+                std::localtime(&m_time));
+  return filenamePrefix + "-" + datetime + ".txt";
+}
 
 TEST(LogFileTest, Logs) {
   std::string filename;
@@ -47,17 +57,24 @@ TEST(LogFileTest, Logs) {
 }
 
 TEST(LogFileTest, Filename) {
-  std::string filenamePrefix = "testFilename";
+  std::string filename;
 
-  { frc::LogFile logFile(filenamePrefix); }
+  {
+    std::string filenamePrefix = "testFilename";
 
-  std::time_t m_time = std::time(0);
-  char datetime[80];
-  std::strftime(datetime, sizeof(datetime), "%Y-%m-%d-%H_%M_%S",
-                std::localtime(&m_time));
-  std::string expectedFilename = filenamePrefix + "-" + datetime + ".txt";
+    frc::LogFile logFile(filenamePrefix);
+    logFile.SetTimeIntervalBeforeRenaming(0.9_s);
 
-  EXPECT_TRUE(wpi::sys::fs::exists(expectedFilename));
+    std::string firstFilename = GetExpectedFilename(filenamePrefix);
+    EXPECT_TRUE(wpi::sys::fs::exists(firstFilename));
 
-  std::remove(expectedFilename.c_str());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    logFile.Log("");
+
+    filename = GetExpectedFilename(filenamePrefix);
+    EXPECT_FALSE(wpi::sys::fs::exists(firstFilename));
+    EXPECT_TRUE(wpi::sys::fs::exists(filename));
+  }
+
+  std::remove(filename.c_str());
 }
