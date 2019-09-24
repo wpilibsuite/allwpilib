@@ -44,6 +44,13 @@ doxygen {
         source it.source
     }
 
+    exclude 'Eigen/**'
+    exclude 'unsupported/**'
+    exclude 'units/**'
+    exclude 'uv.h'
+    exclude 'uv/**'
+
+
     extension_mapping 'inc=C++'
     project_name 'WPILibC++'
     project_number wpilibVersioning.version.get()
