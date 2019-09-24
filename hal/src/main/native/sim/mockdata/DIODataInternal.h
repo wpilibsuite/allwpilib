@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,11 +19,12 @@ class DIOData {
   HAL_SIMDATAVALUE_DEFINE_NAME(FilterIndex)
 
  public:
-  SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetValueName> value{true};
-  SimDataValue<double, MakeDouble, GetPulseLengthName> pulseLength{0.0};
-  SimDataValue<HAL_Bool, MakeBoolean, GetIsInputName> isInput{true};
-  SimDataValue<int32_t, MakeInt, GetFilterIndexName> filterIndex{-1};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
+      false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetValueName> value{true};
+  SimDataValue<double, HAL_MakeDouble, GetPulseLengthName> pulseLength{0.0};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetIsInputName> isInput{true};
+  SimDataValue<int32_t, HAL_MakeInt, GetFilterIndexName> filterIndex{-1};
 
   virtual void ResetData();
 };

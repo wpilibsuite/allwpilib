@@ -19,12 +19,12 @@
 #include "PortsInternal.h"
 #include "hal/AnalogTrigger.h"
 #include "hal/Errors.h"
+#include "hal/Value.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 #include "hal/handles/UnlimitedHandleResource.h"
 #include "mockdata/AnalogInDataInternal.h"
 #include "mockdata/DIODataInternal.h"
-#include "mockdata/HAL_Value.h"
 
 #ifdef _WIN32
 #pragma warning(disable : 4996 4018 6297 26451 4334)
