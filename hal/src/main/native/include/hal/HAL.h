@@ -39,6 +39,7 @@
 #include "hal/Solenoid.h"
 #include "hal/Threads.h"
 #include "hal/Types.h"
+#include "hal/Value.h"
 
 #ifdef __cplusplus
 #include "hal/FRCUsageReporting.h"

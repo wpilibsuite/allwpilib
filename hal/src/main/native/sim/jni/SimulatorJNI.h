@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,8 +10,8 @@
 #include <wpi/jni_util.h>
 
 #include "hal/Types.h"
+#include "hal/Value.h"
 #include "jni.h"
-#include "mockdata/HAL_Value.h"
 
 typedef HAL_Handle SIM_JniHandle;
 
