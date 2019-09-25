@@ -121,9 +121,7 @@ public class LogFile extends Writer {
    */
   @Override
   public void write(char[] text, int off, int len) throws IOException {
-    char[] textCopy = new char[len];
-    System.arraycopy(text, off, textCopy, 0, len);
-    logln(String.valueOf(textCopy));
+    logln(String.valueOf(Arrays.copyOfRange(text, off, off + len)));
   }
 
   /**
