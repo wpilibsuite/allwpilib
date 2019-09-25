@@ -24,11 +24,11 @@ class LogFile {
   /**
    * Instantiate a LogFile passing in its prefix and its extension.
    *
-   * If you want the file to be saved in a existing directory, you can add its
-   * path before the file prefix. Exemple : to save the file in a usb stick on
-   * the roborio ("/media/sda1/") : LogFile("/media/sda1/log").
+   * If you want the file to be saved in a existing directory, you can add
+   * its path before the file prefix. Exemple : to save the file in a usb stick
+   * on the roborio ("/media/sda1/") : LogFile("/media/sda1/log").
    *
-   * @param filePrefix The prefix of the LogFile.
+   * @param filePrefix    The prefix of the LogFile.
    * @param fileExtension The extension of the LogFile (without dot).
    */
   explicit LogFile(wpi::StringRef filePrefix = "log",
@@ -56,9 +56,10 @@ class LogFile {
   const std::string GetFileName() const;
 
   /**
-   * Set the time interval after which the file will be renamed.
+   * Set the time interval after which the file will be renamed in seconds.
    *
-   * @param duration The time interval after which the file will be renamed.
+   * @param seconds The time interval after which the file will be renamed in
+   *                seconds.
    */
   void SetTimeIntervalBeforeRenaming(units::second_t duration);
 
@@ -71,8 +72,8 @@ class LogFile {
 
  private:
   /**
-   * Check if the time has changed of more than 24 hours.
-   * Change the filename if the condition is met.
+   * Check if the time has changed of more than 24 hours. Change the filename if
+   * the condition is met.
    */
   void UpdateFilename();
 

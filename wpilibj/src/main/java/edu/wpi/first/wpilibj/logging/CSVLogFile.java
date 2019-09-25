@@ -12,8 +12,8 @@ import java.util.Arrays;
 /**
  * A CSVLogFile writes values to a csv file
  *
- * <p>For the CSVLogFile to write log informations, you must call
- * {@link #log} periodically.
+ * <p>For the CSVLogFile to write log informations, you must call {@link #log}
+ * periodically.
  */
 public class CSVLogFile {
   private final LogFile m_logFile;
@@ -22,10 +22,10 @@ public class CSVLogFile {
    * Instantiate a LogFile passing in its prefix and its column headings.
    *
    * <p>If you want the file to be saved in a existing directory, you can add its
-   * path before the file prefix. Exemple : to save the file in a usb stick on
-   * the roborio ("/media/sda1/") : LogFile("/media/sda1/log").
+   * path before the file prefix. Exemple : to save the file in a usb stick on the
+   * roborio ("/media/sda1/") : LogFile("/media/sda1/log").
    *
-   * @param filePrefix The prefix of the LogFile.
+   * @param filePrefix     The prefix of the LogFile.
    * @param columnHeadings Titles of CSVLogFile columns.
    */
   public <ValueT> CSVLogFile(String filePrefix, ValueT... columnHeadings) {

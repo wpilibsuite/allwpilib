@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -32,10 +33,10 @@ public class LogFile extends Writer {
    * Instantiate a LogFile passing in its prefix and its extension.
    *
    * <p>If you want the file to be saved in a existing directory, you can add its
-   * path before the file prefix. Exemple : to save the file in a usb stick on
-   * the roborio ("/media/sda1/") : LogFile("/media/sda1/log").
+   * path before the file prefix. Exemple : to save the file in a usb stick on the
+   * roborio ("/media/sda1/") : LogFile("/media/sda1/log").
    *
-   * @param filePrefix The prefix of the LogFile.
+   * @param filePrefix    The prefix of the LogFile.
    * @param fileExtension The extension of the LogFile (without dot).
    */
   public LogFile(String filePrefix, String fileExtension) {
@@ -55,8 +56,8 @@ public class LogFile extends Writer {
    * Instantiate a LogFile passing in its prefix.
    *
    * <p>If you want the file to be saved in a existing directory, you can add its
-   * path before the file prefix. Exemple : to save the file in a usb stick on
-   * the roborio ("/media/sda1/") : LogFile("/media/sda1/log").
+   * path before the file prefix. Exemple : to save the file in a usb stick on the
+   * roborio ("/media/sda1/") : LogFile("/media/sda1/log").
    *
    * @param filePrefix The prefix of the LogFile.
    */
@@ -106,7 +107,8 @@ public class LogFile extends Writer {
   /**
    * Set the time interval after which the file will be renamed in seconds.
    *
-   * @param seconds The time interval after which the file will be renamed in seconds.
+   * @param seconds The time interval after which the file will be renamed in
+   *                seconds.
    */
   public void setTimeIntervalBeforeRenaming(int seconds) {
     m_timeIntervalBeforeRenaming = seconds;
@@ -116,8 +118,8 @@ public class LogFile extends Writer {
    * Write text in the LogFile.
    *
    * @param text The array of chars to write from
-   * @param off The index into the array to start writing from
-   * @param len The number of chars to write
+   * @param off  The index into the array to start writing from
+   * @param len  The number of chars to write
    */
   @Override
   public void write(char[] text, int off, int len) throws IOException {
@@ -141,8 +143,8 @@ public class LogFile extends Writer {
   }
 
   /**
-   * Check if the time has changed of more than 24 hours.
-   * Change the filename if the condition is met.
+   * Check if the time has changed of more than 24 hours. Change the filename if
+   * the condition is met.
    */
   private void updateFilename() {
     Date newTime = new Date();
