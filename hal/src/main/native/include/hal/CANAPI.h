@@ -74,6 +74,20 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, const uint8_t* data,
                                  int32_t repeatMs, int32_t* status);
 
 /**
+ * Writes an RTR frame of the specified length to the CAN device with the
+ * specific ID.
+ *
+ * By spec, the length must be equal to the length sent by the other device,
+ * otherwise behavior is unspecified.
+ *
+ * @param handle   the CAN handle
+ * @param length   the length of data to request (0-8)
+ * @param apiId    the ID to write (0-1023)
+ */
+void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t length, int32_t apiId,
+                          int32_t* status);
+
+/**
  * Stops a repeating packet with a specific ID.
  *
  * This ID is 10 bits.

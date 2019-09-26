@@ -147,6 +147,27 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, const uint8_t* data,
   can->periodicSends[apiId] = repeatMs;
 }
 
+void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t length, int32_t apiId,
+                          int32_t* status) {
+  auto can = canHandles->Get(handle);
+  if (!can) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  auto id = CreateCANId(can.get(), apiId);
+  id |= HAL_CAN_IS_FRAME_REMOTE;
+  uint8_t data[8];
+  std::memset(data, 0, sizeof(data) / sizeof(uint8_t));
+
+  HAL_CAN_SendMessage(id, data, length, HAL_CAN_SEND_PERIOD_NO_REPEAT, status);
+
+  if (*status != 0) {
+    return;
+  }
+  std::scoped_lock lock(can->mapMutex);
+  can->periodicSends[apiId] = -1;
+}
+
 void HAL_StopCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
                                 int32_t* status) {
   auto can = canHandles->Get(handle);

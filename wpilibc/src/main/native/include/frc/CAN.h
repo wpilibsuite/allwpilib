@@ -84,6 +84,16 @@ class CAN : public ErrorBase {
                             int repeatMs);
 
   /**
+   * Write an RTR frame to the CAN device with a specific ID. This ID is 10
+   * bits. The length by spec must match what is returned by the responding
+   * device
+   *
+   * @param length The length to request (0 to 8)
+   * @param apiId The API ID to write.
+   */
+  void WriteRTRFrame(int length, int apiId);
+
+  /**
    * Stop a repeating packet with a specific ID. This ID is 10 bits.
    *
    * @param apiId The API ID to stop repeating

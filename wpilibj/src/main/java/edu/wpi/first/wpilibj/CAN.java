@@ -90,6 +90,17 @@ public class CAN implements Closeable {
   }
 
   /**
+   * Write an RTR frame to the CAN device with a specific ID. This ID is 10 bits.
+   * The length by spec must match what is returned by the responding device
+   *
+   * @param length The length to request (0 to 8)
+   * @param apiId The API ID to write.
+   */
+  public void writeRTRFrame(int length, int apiId) {
+    CANAPIJNI.writeCANRTRFrame(m_handle, length, apiId);
+  }
+
+  /**
    * Stop a repeating packet with a specific ID. This ID is 10 bits.
    *
    * @param apiId The API ID to stop repeating

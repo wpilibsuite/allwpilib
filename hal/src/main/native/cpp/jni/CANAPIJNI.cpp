@@ -94,6 +94,21 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeating
 
 /*
  * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Method:    writeCANRTRFrame
+ * Signature: (III)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_CANAPIJNI_writeCANRTRFrame
+  (JNIEnv* env, jclass, jint handle, jint length, jint apiId)
+{
+  auto halHandle = static_cast<HAL_CANHandle>(handle);
+  int32_t status = 0;
+  HAL_WriteCANRTRFrame(halHandle, static_cast<int32_t>(length), apiId, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_CANAPIJNI
  * Method:    stopCANPacketRepeating
  * Signature: (II)V
  */
