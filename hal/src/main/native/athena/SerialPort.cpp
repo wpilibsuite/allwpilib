@@ -465,12 +465,11 @@ int32_t HAL_WriteSerial(HAL_SerialPortHandle handle, const char* buffer,
   int written = 0, spot = 0;
   do {
     written = write(port->portId, buffer + spot, count - spot);
-    if (written > 0) {
-      spot += written;
-    } else if (written < 0) {
+    if (written < 0) {
       *status = errno;
       return spot;
     }
+    spot += written;
   } while (spot < count);
   return spot;
 }
