@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,6 +17,12 @@ public final class HAL extends JNIWrapper {
   public static native void waitForDSData();
 
   public static native boolean initialize(int timeout, int mode);
+
+  public static native boolean hasMain();
+
+  public static native void runMain();
+
+  public static native void exitMain();
 
   public static native void observeUserProgramStarting();
 

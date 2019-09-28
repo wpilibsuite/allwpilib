@@ -9,6 +9,7 @@
 
 #include <thread>
 
+#include <hal/Main.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/Base.h"
@@ -19,14 +20,37 @@ class DriverStation;
 
 int RunHALInitialization();
 
+namespace impl {
+
+template <class Robot>
+void RunRobot() {
+  static Robot robot;
+  robot.StartCompetition();
+}
+
+}  // namespace impl
+
 template <class Robot>
 int StartRobot() {
   int halInit = RunHALInitialization();
   if (halInit != 0) {
     return halInit;
   }
-  static Robot robot;
-  robot.StartCompetition();
+  if (HAL_HasMain()) {
+    std::thread([] {
+      try {
+        impl::RunRobot<Robot>();
+      } catch (...) {
+        HAL_ExitMain();
+        throw;
+      }
+      HAL_ExitMain();
+    })
+        .detach();
+    HAL_RunMain();
+  } else {
+    impl::RunRobot<Robot>();
+  }
 
   return 0;
 }

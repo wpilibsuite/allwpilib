@@ -25,6 +25,7 @@ string(REPLACE ";" "\n" usage_reporting_types_cpp "${usage_reporting_types_cpp}"
 string(REPLACE ";" "\n" usage_reporting_instances_cpp "${usage_reporting_instances_cpp}")
 
 file(GLOB
+    hal_shared_native_src src/main/native/cpp/*.cpp
     hal_shared_native_src src/main/native/cpp/cpp/*.cpp
     hal_shared_native_src src/main/native/cpp/handles/*.cpp
     hal_sim_native_src src/main/native/sim/*.cpp
