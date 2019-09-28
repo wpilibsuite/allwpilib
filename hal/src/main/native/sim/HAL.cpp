@@ -60,6 +60,7 @@ void InitializeHAL() {
   InitializeExtensions();
   InitializeI2C();
   InitializeInterrupts();
+  InitializeMain();
   InitializeMockHooks();
   InitializeNotifier();
   InitializePDP();

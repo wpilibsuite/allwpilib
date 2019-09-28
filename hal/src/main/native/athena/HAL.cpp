@@ -61,6 +61,7 @@ void InitializeHAL() {
   InitializeFRCDriverStation();
   InitializeI2C();
   InitialzeInterrupts();
+  InitializeMain();
   InitializeNotifier();
   InitializePCMInternal();
   InitializePDP();

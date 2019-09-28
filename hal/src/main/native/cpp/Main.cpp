@@ -17,19 +17,32 @@ static bool gHasMain = false;
 static void (*gMainFunc)() = DefaultMain;
 static void (*gExitFunc)() = DefaultExit;
 static bool gExited = false;
-static wpi::mutex gExitMutex;
-static wpi::condition_variable gExitCv;
+struct MainObj {
+  wpi::mutex gExitMutex;
+  wpi::condition_variable gExitCv;
+};
+
+static MainObj* mainObj;
 
 static void DefaultMain() {
-  std::unique_lock lock{gExitMutex};
-  gExitCv.wait(lock, [] { return gExited; });
+  std::unique_lock lock{mainObj->gExitMutex};
+  mainObj->gExitCv.wait(lock, [] { return gExited; });
 }
 
 static void DefaultExit() {
-  std::lock_guard lock{gExitMutex};
+  std::lock_guard lock{mainObj->gExitMutex};
   gExited = true;
-  gExitCv.notify_all();
+  mainObj->gExitCv.notify_all();
 }
+
+namespace hal {
+namespace init {
+void InitializeMain() {
+  static MainObj mO;
+  mainObj = &mO;
+}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 
