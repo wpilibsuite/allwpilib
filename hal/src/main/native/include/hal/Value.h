@@ -14,9 +14,9 @@ enum HAL_Type {
   HAL_UNASSIGNED = 0,
   HAL_BOOLEAN = 0x01,
   HAL_DOUBLE = 0x02,
-  HAL_ENUM = 0x16,
-  HAL_INT = 0x32,
-  HAL_LONG = 0x64,
+  HAL_ENUM = 0x04,
+  HAL_INT = 0x08,
+  HAL_LONG = 0x10,
 };
 
 /** HAL Entry Value.  Note this is a typed union. */
