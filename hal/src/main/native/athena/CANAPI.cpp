@@ -148,7 +148,7 @@ void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t length, int32_t apiId,
   auto id = CreateCANId(can.get(), apiId);
   id |= HAL_CAN_IS_FRAME_REMOTE;
   uint8_t data[8];
-  std::memset(data, 0, sizeof(data) / sizeof(uint8_t));
+  std::memset(data, 0, sizeof(data));
 
   HAL_CAN_SendMessage(id, data, length, HAL_CAN_SEND_PERIOD_NO_REPEAT, status);
 
