@@ -65,6 +65,12 @@ void CAN::WritePacketRepeating(const uint8_t* data, int length, int apiId,
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
+void CAN::WriteRTRFrame(int length, int apiId) {
+  int32_t status = 0;
+  HAL_WriteCANRTRFrame(m_handle, length, apiId, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
 void CAN::StopPacketRepeating(int apiId) {
   int32_t status = 0;
   HAL_StopCANPacketRepeating(m_handle, apiId, &status);
