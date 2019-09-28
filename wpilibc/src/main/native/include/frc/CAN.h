@@ -122,23 +122,6 @@ class CAN : public ErrorBase {
    */
   bool ReadPacketTimeout(int apiId, int timeoutMs, CANData* data);
 
-  /**
-   * Read a CAN packet. The will return the last packet received until the
-   * packet is older then the requested timeout. Then it will return false. The
-   * period parameter is used when you know the packet is sent at specific
-   * intervals, so calls will not attempt to read a new packet from the network
-   * until that period has passed. We do not recommend users use this API unless
-   * they know the implications.
-   *
-   * @param apiId The API ID to read.
-   * @param timeoutMs The timeout time for the packet
-   * @param periodMs The usual period for the packet
-   * @param data Storage for the received data.
-   * @return True if the data is valid, otherwise false.
-   */
-  bool ReadPeriodicPacket(int apiId, int timeoutMs, int periodMs,
-                          CANData* data);
-
   static constexpr HAL_CANManufacturer kTeamManufacturer = HAL_CAN_Man_kTeamUse;
   static constexpr HAL_CANDeviceType kTeamDeviceType =
       HAL_CAN_Dev_kMiscellaneous;
