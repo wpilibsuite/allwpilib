@@ -49,13 +49,15 @@ static JClass canStatusCls;
 static JClass matchInfoDataCls;
 static JClass accumulatorResultCls;
 static JClass canDataCls;
+static JClass halValueCls;
 
 static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
     {"edu/wpi/first/hal/can/CANStatus", &canStatusCls},
     {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
     {"edu/wpi/first/hal/AccumulatorResult", &accumulatorResultCls},
-    {"edu/wpi/first/hal/CANData", &canDataCls}};
+    {"edu/wpi/first/hal/CANData", &canDataCls},
+    {"edu/wpi/first/hal/HALValue", &halValueCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
@@ -224,8 +226,9 @@ jobject CreatePWMConfigDataResult(JNIEnv* env, int32_t maxPwm,
                                   int32_t deadbandMinPwm, int32_t minPwm) {
   static jmethodID constructor =
       env->GetMethodID(pwmConfigDataResultCls, "<init>", "(IIIII)V");
-  return env->NewObject(pwmConfigDataResultCls, constructor, maxPwm,
-                        deadbandMaxPwm, centerPwm, deadbandMinPwm, minPwm);
+  return env->NewObject(pwmConfigDataResultCls, constructor, (jint)maxPwm,
+                        (jint)deadbandMaxPwm, (jint)centerPwm,
+                        (jint)deadbandMinPwm, (jint)minPwm);
 }
 
 void SetCanStatusObject(JNIEnv* env, jobject canStatus,
@@ -269,6 +272,34 @@ jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
   jbyteArray retVal = static_cast<jbyteArray>(
       env->CallObjectMethod(canData, func, (jint)length, (jlong)timestamp));
   return retVal;
+}
+
+jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
+  static jmethodID fromNative = env->GetStaticMethodID(
+      halValueCls, "fromNative", "(IJD)Ledu/wpi/first/hal/HALValue;");
+  jlong value1 = 0;
+  jdouble value2 = 0.0;
+  switch (value.type) {
+    case HAL_BOOLEAN:
+      value1 = value.data.v_boolean;
+      break;
+    case HAL_DOUBLE:
+      value2 = value.data.v_double;
+      break;
+    case HAL_ENUM:
+      value1 = value.data.v_enum;
+      break;
+    case HAL_INT:
+      value1 = value.data.v_int;
+      break;
+    case HAL_LONG:
+      value1 = value.data.v_long;
+      break;
+    default:
+      break;
+  }
+  return env->CallStaticObjectMethod(halValueCls, fromNative, (jint)value.type,
+                                     value1, value2);
 }
 
 JavaVM* GetJVM() { return jvm; }
