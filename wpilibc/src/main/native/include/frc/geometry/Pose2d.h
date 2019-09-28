@@ -69,6 +69,14 @@ class Pose2d {
   Pose2d& operator+=(const Transform2d& other);
 
   /**
+   * Returns the Transform2d that maps the one pose to another.
+   *
+   * @param other The initial pose of the transformation.
+   * @return The transform that maps the other pose to the current pose.
+   */
+  Transform2d operator-(const Pose2d& other) const;
+
+  /**
    * Checks equality between this Pose2d and another object.
    *
    * @param other The other object.
@@ -144,6 +152,16 @@ class Pose2d {
    * @return The new pose of the robot.
    */
   Pose2d Exp(const Twist2d& twist) const;
+
+  /**
+   * Returns a Twist2d that maps this pose to the end pose. If c is the output
+   * of a.Log(b), then a.Exp(c) would yield b.
+   *
+   * @param end The end pose for the transformation.
+   *
+   * @return The twist that maps this to end.
+   */
+  Twist2d Log(const Pose2d& end) const;
 
  private:
   Translation2d m_translation;

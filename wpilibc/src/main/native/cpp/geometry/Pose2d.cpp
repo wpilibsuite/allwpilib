@@ -27,6 +27,11 @@ Pose2d& Pose2d::operator+=(const Transform2d& other) {
   return *this;
 }
 
+Transform2d Pose2d::operator-(const Pose2d& other) const {
+  const auto pose = this->RelativeTo(other);
+  return Transform2d(pose.Translation(), pose.Rotation());
+}
+
 bool Pose2d::operator==(const Pose2d& other) const {
   return m_translation == other.m_translation && m_rotation == other.m_rotation;
 }
@@ -66,4 +71,28 @@ Pose2d Pose2d::Exp(const Twist2d& twist) const {
                               Rotation2d{cosTheta, sinTheta}};
 
   return *this + transform;
+}
+
+Twist2d Pose2d::Log(const Pose2d& end) const {
+  const auto transform = end.RelativeTo(*this);
+  const auto dtheta = transform.Rotation().Radians().to<double>();
+  const auto halfDtheta = dtheta / 2.0;
+
+  const auto cosMinusOne = transform.Rotation().Cos() - 1;
+
+  double halfThetaByTanOfHalfDtheta;
+
+  if (std::abs(cosMinusOne) < 1E-9) {
+    halfThetaByTanOfHalfDtheta = 1.0 - 1.0 / 12.0 * dtheta * dtheta;
+  } else {
+    halfThetaByTanOfHalfDtheta =
+        -(halfDtheta * transform.Rotation().Sin()) / cosMinusOne;
+  }
+
+  const Translation2d translationPart =
+      transform.Translation().RotateBy(
+          {halfThetaByTanOfHalfDtheta, -halfDtheta}) *
+      std::hypot(halfThetaByTanOfHalfDtheta, halfDtheta);
+
+  return {translationPart.X(), translationPart.Y(), units::radian_t(dtheta)};
 }
