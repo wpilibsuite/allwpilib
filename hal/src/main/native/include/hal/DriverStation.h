@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2013-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2013-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -187,8 +187,6 @@ double HAL_GetMatchTime(int32_t* status);
  */
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info);
 
-#ifndef HAL_USE_LABVIEW
-
 /**
  * Releases the DS Mutex to allow proper shutdown of any threads that are
  * waiting on it.
@@ -267,8 +265,6 @@ void HAL_ObserveUserProgramTeleop(void);
  * disabled by the DS.
  */
 void HAL_ObserveUserProgramTest(void);
-
-#endif  // HAL_USE_LABVIEW
 
 #ifdef __cplusplus
 }  // extern "C"

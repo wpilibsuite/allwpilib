@@ -9,8 +9,6 @@
 
 #include <stdint.h>
 
-#ifndef HAL_USE_LABVIEW
-
 #include "hal/Accelerometer.h"
 #include "hal/AnalogAccumulator.h"
 #include "hal/AnalogGyro.h"
@@ -26,6 +24,7 @@
 #include "hal/DriverStation.h"
 #include "hal/Encoder.h"
 #include "hal/Errors.h"
+#include "hal/HALBase.h"
 #include "hal/I2C.h"
 #include "hal/Interrupts.h"
 #include "hal/Notifier.h"
@@ -38,11 +37,7 @@
 #include "hal/SerialPort.h"
 #include "hal/Solenoid.h"
 #include "hal/Threads.h"
-
-#endif  // HAL_USE_LABVIEW
-
 #include "hal/Types.h"
-#include "hal/HALBase.h"
 
 #ifdef __cplusplus
 #include "hal/FRCUsageReporting.h"
