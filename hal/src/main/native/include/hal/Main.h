@@ -32,10 +32,11 @@ extern "C" {
  * To be effective, this function must be called before the robot code starts
  * the main loop (e.g. by frc::StartRobot()).
  *
+ * @param param parameter data to pass to mainFunc and exitFunc
  * @param mainFunc the function to be run when HAL_RunMain() is called.
  * @param exitFunc the function to be run when HAL_ExitMain() is called.
  */
-void HAL_SetMain(void (*mainFunc)(void), void (*exitFunc)(void));
+void HAL_SetMain(void* param, void (*mainFunc)(void*), void (*exitFunc)(void*));
 
 /**
  * Returns true if HAL_SetMain() has been called.

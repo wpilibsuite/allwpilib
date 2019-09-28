@@ -10,12 +10,13 @@
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
-static void DefaultMain();
-static void DefaultExit();
+static void DefaultMain(void*);
+static void DefaultExit(void*);
 
 static bool gHasMain = false;
-static void (*gMainFunc)() = DefaultMain;
-static void (*gExitFunc)() = DefaultExit;
+static void* gMainParam = nullptr;
+static void (*gMainFunc)(void*) = DefaultMain;
+static void (*gExitFunc)(void*) = DefaultExit;
 static bool gExited = false;
 struct MainObj {
   wpi::mutex gExitMutex;
@@ -24,12 +25,12 @@ struct MainObj {
 
 static MainObj* mainObj;
 
-static void DefaultMain() {
+static void DefaultMain(void*) {
   std::unique_lock lock{mainObj->gExitMutex};
   mainObj->gExitCv.wait(lock, [] { return gExited; });
 }
 
-static void DefaultExit() {
+static void DefaultExit(void*) {
   std::lock_guard lock{mainObj->gExitMutex};
   gExited = true;
   mainObj->gExitCv.notify_all();
@@ -46,16 +47,18 @@ void InitializeMain() {
 
 extern "C" {
 
-void HAL_SetMain(void (*mainFunc)(void), void (*exitFunc)(void)) {
+void HAL_SetMain(void* param, void (*mainFunc)(void*),
+                 void (*exitFunc)(void*)) {
   gHasMain = true;
+  gMainParam = param;
   gMainFunc = mainFunc;
   gExitFunc = exitFunc;
 }
 
 HAL_Bool HAL_HasMain(void) { return gHasMain; }
 
-void HAL_RunMain(void) { gMainFunc(); }
+void HAL_RunMain(void) { gMainFunc(gMainParam); }
 
-void HAL_ExitMain(void) { gExitFunc(); }
+void HAL_ExitMain(void) { gExitFunc(gMainParam); }
 
 }  // extern "C"
