@@ -13,6 +13,9 @@ import java.nio.ByteOrder;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.hal.SimEnum;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -64,6 +67,12 @@ public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
 
   protected I2C m_i2c;
 
+  protected SimDevice m_simDevice;
+  protected SimEnum m_simRange;
+  protected SimDouble m_simX;
+  protected SimDouble m_simY;
+  protected SimDouble m_simZ;
+
   /**
    * Constructs the ADXL345 Accelerometer with I2C address 0x1D.
    *
@@ -84,6 +93,15 @@ public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
   public ADXL345_I2C(I2C.Port port, Range range, int deviceAddress) {
     m_i2c = new I2C(port, deviceAddress);
 
+    // simulation
+    m_simDevice = SimDevice.create("ADXL345_I2C", port.value, deviceAddress);
+    if (m_simDevice != null) {
+      m_simRange = m_simDevice.createEnum("Range", true, new String[] {"2G", "4G", "8G", "16G"}, 0);
+      m_simX = m_simDevice.createDouble("X Accel", false, 0.0);
+      m_simX = m_simDevice.createDouble("Y Accel", false, 0.0);
+      m_simZ = m_simDevice.createDouble("Z Accel", false, 0.0);
+    }
+
     // Turn on the measurements
     m_i2c.write(kPowerCtlRegister, kPowerCtl_Measure);
 
@@ -95,7 +113,14 @@ public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
 
   @Override
   public void close() {
-    m_i2c.close();
+    if (m_i2c != null) {
+      m_i2c.close();
+      m_i2c = null;
+    }
+    if (m_simDevice != null) {
+      m_simDevice.close();
+      m_simDevice = null;
+    }
   }
 
   @Override
@@ -121,6 +146,10 @@ public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
 
     // Specify the data format to read
     m_i2c.write(kDataFormatRegister, kDataFormat_FullRes | value);
+
+    if (m_simRange != null) {
+      m_simRange.set(value);
+    }
   }
 
   @Override
@@ -145,6 +174,15 @@ public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
    * @return Acceleration of the ADXL345 in Gs.
    */
   public double getAcceleration(Axes axis) {
+    if (axis == Axes.kX && m_simX != null) {
+      return m_simX.get();
+    }
+    if (axis == Axes.kY && m_simY != null) {
+      return m_simY.get();
+    }
+    if (axis == Axes.kZ && m_simZ != null) {
+      return m_simZ.get();
+    }
     ByteBuffer rawAccel = ByteBuffer.allocate(2);
     m_i2c.read(kDataRegister + axis.value, 2, rawAccel);
 
@@ -160,6 +198,12 @@ public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
    */
   public AllAxes getAccelerations() {
     AllAxes data = new AllAxes();
+    if (m_simX != null && m_simY != null && m_simZ != null) {
+      data.XAxis = m_simX.get();
+      data.YAxis = m_simY.get();
+      data.ZAxis = m_simZ.get();
+      return data;
+    }
     ByteBuffer rawData = ByteBuffer.allocate(6);
     m_i2c.read(kDataRegister, 6, rawData);
 

@@ -98,7 +98,10 @@ void Ultrasonic::Ping() {
   m_pingChannel->Pulse(kPingTime);
 }
 
-bool Ultrasonic::IsRangeValid() const { return m_counter.Get() > 1; }
+bool Ultrasonic::IsRangeValid() const {
+  if (m_simRangeValid) return m_simRangeValid.Get();
+  return m_counter.Get() > 1;
+}
 
 void Ultrasonic::SetAutomaticMode(bool enabling) {
   if (enabling == m_automaticEnabled) return;  // ignore the case of no change
@@ -135,10 +138,12 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
 }
 
 double Ultrasonic::GetRangeInches() const {
-  if (IsRangeValid())
+  if (IsRangeValid()) {
+    if (m_simRange) return m_simRange.Get();
     return m_counter.GetPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
-  else
+  } else {
     return 0;
+  }
 }
 
 double Ultrasonic::GetRangeMM() const { return GetRangeInches() * 25.4; }
@@ -177,6 +182,14 @@ void Ultrasonic::InitSendable(SendableBuilder& builder) {
 }
 
 void Ultrasonic::Initialize() {
+  m_simDevice = hal::SimDevice("Ultrasonic", m_echoChannel->GetChannel());
+  if (m_simDevice) {
+    m_simRangeValid = m_simDevice.CreateBoolean("Range Valid", false, true);
+    m_simRange = m_simDevice.CreateDouble("Range (in)", false, 0.0);
+    m_pingChannel->SetSimDevice(m_simDevice);
+    m_echoChannel->SetSimDevice(m_simDevice);
+  }
+
   bool originalMode = m_automaticEnabled;
   SetAutomaticMode(false);  // Kill task when adding a new sensor
   // Link this instance on the list
