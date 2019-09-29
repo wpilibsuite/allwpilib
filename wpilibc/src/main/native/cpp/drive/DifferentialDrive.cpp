@@ -33,8 +33,8 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
                                     bool squareInputs) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 2,
-               HALUsageReporting::kRobotDrive2_DifferentialArcade);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive2_DifferentialArcade, 2);
     reported = true;
   }
 
@@ -88,8 +88,8 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
                                        bool isQuickTurn) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 2,
-               HALUsageReporting::kRobotDrive2_DifferentialCurvature);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive2_DifferentialCurvature, 2);
     reported = true;
   }
 
@@ -162,8 +162,8 @@ void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
                                   bool squareInputs) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 2,
-               HALUsageReporting::kRobotDrive2_DifferentialTank);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive2_DifferentialTank, 2);
     reported = true;
   }
 

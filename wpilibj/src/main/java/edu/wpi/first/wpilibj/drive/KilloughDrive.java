@@ -169,8 +169,8 @@ public class KilloughDrive extends RobotDriveBase implements Sendable {
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation,
                              double gyroAngle) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 3,
-                 tInstances.kRobotDrive2_KilloughCartesian);
+      HAL.report(tResourceType.kResourceType_RobotDrive,
+                 tInstances.kRobotDrive2_KilloughCartesian, 3);
       m_reported = true;
     }
 
@@ -212,8 +212,8 @@ public class KilloughDrive extends RobotDriveBase implements Sendable {
   @SuppressWarnings("ParameterName")
   public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 3,
-                 tInstances.kRobotDrive2_KilloughPolar);
+      HAL.report(tResourceType.kResourceType_RobotDrive,
+                 tInstances.kRobotDrive2_KilloughPolar, 3);
       m_reported = true;
     }
 
