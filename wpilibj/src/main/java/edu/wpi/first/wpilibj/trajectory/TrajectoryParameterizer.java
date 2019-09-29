@@ -64,7 +64,8 @@ public final class TrajectoryParameterizer {
    * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
    * @param reversed                         Whether the robot should move backwards.
    *                                         Note that the robot will still move from
-   *                                         a -> b -> ... -> z as defined in the waypoints.
+   *                                         a -&gt; b -&gt; ... -&gt; z as defined in the
+   *                                         waypoints.
    * @return The trajectory.
    */
   @SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.CyclomaticComplexity",

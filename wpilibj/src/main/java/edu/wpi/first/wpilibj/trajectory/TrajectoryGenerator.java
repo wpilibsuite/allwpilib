@@ -38,7 +38,7 @@ public final class TrajectoryGenerator {
    * @param maxVelocityMetersPerSecond       The max velocity for the trajectory.
    * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
    * @param reversed                         Whether the robot should move backwards. Note that the
-   *                                         robot will still move from a -> b -> ... -> z
+   *                                         robot will still move from a -&gt; b -&gt; ... -&gt; z
    *                                         as defined in the waypoints.
    * @return The trajectory.
    */
@@ -93,8 +93,8 @@ public final class TrajectoryGenerator {
    * @param maxVelocityMetersPerSecond       The max velocity for the trajectory.
    * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
    * @param reversed                         Whether the robot should move backwards. Note that the
-   *                                         robot will still move from a -> b -> ... -> z as
-   *                                         defined in the waypoints.
+   *                                         robot will still move from a -&gt; b -&gt; ... -&gt; z
+   *                                         as defined in the waypoints.
    * @return The trajectory.
    */
   public static Trajectory generateTrajectory(
