@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <hal/SimDevice.h>
+
 #include "frc/ErrorBase.h"
 #include "frc/SPI.h"
 #include "frc/interfaces/Accelerometer.h"
@@ -73,6 +75,12 @@ class ADXL345_SPI : public ErrorBase,
 
  protected:
   SPI m_spi;
+
+  hal::SimDevice m_simDevice;
+  hal::SimEnum m_simRange;
+  hal::SimDouble m_simX;
+  hal::SimDouble m_simY;
+  hal::SimDouble m_simZ;
 
   static constexpr int kPowerCtlRegister = 0x2D;
   static constexpr int kDataFormatRegister = 0x31;
