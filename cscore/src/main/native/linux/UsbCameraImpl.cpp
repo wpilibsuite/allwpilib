@@ -110,8 +110,8 @@ static constexpr const int quirkLifeCamHd3000[] = {
 
 static constexpr char const* quirkPS3EyePropExAuto = "auto_exposure";
 static constexpr char const* quirkPS3EyePropExValue = "exposure";
-static constexpr char const* quirkPS3EyePropExAutoOn = 0;
-static constexpr char const* quirkPS3EyePropExAutoOff = 1;
+static constexpr const int quirkPS3EyePropExAutoOn = 0;
+static constexpr const int quirkPS3EyePropExAutoOff = 1;
 
 int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
                                    int rawValue) {
@@ -1212,7 +1212,7 @@ void UsbCameraImpl::SetExposureAuto(CS_Status* status) {
 void UsbCameraImpl::SetExposureHoldCurrent(CS_Status* status) {
   if (m_ps3eyecam_exposure) {
     SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
-              quirkPS3EyePropExAutoOff, status);  // manual
+                quirkPS3EyePropExAutoOff, status);  // manual
   } else {
     SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
   }
