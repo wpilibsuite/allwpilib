@@ -1201,7 +1201,9 @@ void UsbCameraImpl::SetWhiteBalanceManual(int value, CS_Status* status) {
 void UsbCameraImpl::SetExposureAuto(CS_Status* status) {
   // auto; this is an enum value
   if (m_ps3eyecam_exposure) {
-    SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto), quirkPS3EyePropExAutoOn, status);
+    SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
+                quirkPS3EyePropExAutoOn, status);
+
   } else {
     SetProperty(GetPropertyIndex(kPropExAuto), 3, status);
   }
@@ -1209,7 +1211,8 @@ void UsbCameraImpl::SetExposureAuto(CS_Status* status) {
 
 void UsbCameraImpl::SetExposureHoldCurrent(CS_Status* status) {
   if (m_ps3eyecam_exposure) {
-	SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto), quirkPS3EyePropExAutoOff, status); // manual
+	SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
+              quirkPS3EyePropExAutoOff, status);  // manual
   } else {
     SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
   }
@@ -1218,9 +1221,10 @@ void UsbCameraImpl::SetExposureHoldCurrent(CS_Status* status) {
 
 void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
   if (m_ps3eyecam_exposure) {
-	SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto), quirkPS3EyePropExAutoOff, status); // manual
+    SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
+                quirkPS3EyePropExAutoOff, status);  // manual
   } else {
-	SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
+    SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
   }
   if (value > 100) {
     value = 100;
@@ -1228,7 +1232,7 @@ void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
     value = 0;
   }
   if (m_ps3eyecam_exposure) {
-	SetProperty(GetPropertyIndex(quirkPS3EyePropExValue), value, status);
+    SetProperty(GetPropertyIndex(quirkPS3EyePropExValue), value, status);
   } else {
     SetProperty(GetPropertyIndex(kPropExValue), value, status);
   }

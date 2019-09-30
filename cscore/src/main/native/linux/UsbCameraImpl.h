@@ -164,8 +164,8 @@ class UsbCameraImpl : public SourceImpl {
   std::thread m_cameraThread;
 
   // Quirks
-  bool m_lifecam_exposure{false};  // Microsoft LifeCam exposure
-  bool m_ps3eyecam_exposure{false}; // PS3 Eyecam exposure
+  bool m_lifecam_exposure{false};    // Microsoft LifeCam exposure
+  bool m_ps3eyecam_exposure{false};  // PS3 Eyecam exposure
 
   //
   // Variables protected by m_mutex
