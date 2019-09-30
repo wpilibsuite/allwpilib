@@ -1211,13 +1211,12 @@ void UsbCameraImpl::SetExposureAuto(CS_Status* status) {
 
 void UsbCameraImpl::SetExposureHoldCurrent(CS_Status* status) {
   if (m_ps3eyecam_exposure) {
-	SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
+    SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
               quirkPS3EyePropExAutoOff, status);  // manual
   } else {
     SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
   }
 }
-
 
 void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
   if (m_ps3eyecam_exposure) {
