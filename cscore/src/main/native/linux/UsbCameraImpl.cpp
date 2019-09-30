@@ -108,6 +108,11 @@ static bool IsPercentageProperty(wpi::StringRef name) {
 static constexpr const int quirkLifeCamHd3000[] = {
     5, 10, 20, 39, 78, 156, 312, 625, 1250, 2500, 5000, 10000, 20000};
 
+static constexpr char const* quirkPS3EyePropExAuto = "auto_exposure";
+static constexpr char const* quirkPS3EyePropExValue = "exposure";
+static constexpr const int quirkPS3EyePropExAutoOn = 0;
+static constexpr const int quirkPS3EyePropExAutoOff = 1;
+
 int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
                                    int rawValue) {
   // LifeCam exposure setting quirk
@@ -1149,6 +1154,7 @@ void UsbCameraImpl::SetQuirks() {
   wpi::StringRef desc = GetDescription(descbuf);
   m_lifecam_exposure =
       desc.endswith("LifeCam HD-3000") || desc.endswith("LifeCam Cinema (TM)");
+  m_ps3eyecam_exposure = desc.endswith("Camera-B4.04.27.1");
 }
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
@@ -1194,21 +1200,41 @@ void UsbCameraImpl::SetWhiteBalanceManual(int value, CS_Status* status) {
 
 void UsbCameraImpl::SetExposureAuto(CS_Status* status) {
   // auto; this is an enum value
-  SetProperty(GetPropertyIndex(kPropExAuto), 3, status);
+  if (m_ps3eyecam_exposure) {
+    SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
+                quirkPS3EyePropExAutoOn, status);
+
+  } else {
+    SetProperty(GetPropertyIndex(kPropExAuto), 3, status);
+  }
 }
 
 void UsbCameraImpl::SetExposureHoldCurrent(CS_Status* status) {
-  SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
+  if (m_ps3eyecam_exposure) {
+    SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
+                quirkPS3EyePropExAutoOff, status);  // manual
+  } else {
+    SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
+  }
 }
 
 void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
-  SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
+  if (m_ps3eyecam_exposure) {
+    SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
+                quirkPS3EyePropExAutoOff, status);  // manual
+  } else {
+    SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
+  }
   if (value > 100) {
     value = 100;
   } else if (value < 0) {
     value = 0;
   }
-  SetProperty(GetPropertyIndex(kPropExValue), value, status);
+  if (m_ps3eyecam_exposure) {
+    SetProperty(GetPropertyIndex(quirkPS3EyePropExValue), value, status);
+  } else {
+    SetProperty(GetPropertyIndex(kPropExValue), value, status);
+  }
 }
 
 bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
