@@ -122,6 +122,7 @@ if (NOT WITHOUT_CSCORE)
         add_subdirectory(hal)
         add_subdirectory(wpilibj)
         add_subdirectory(wpilibc)
+        add_subdirectory(myRobot)
     endif()
 endif()
 
