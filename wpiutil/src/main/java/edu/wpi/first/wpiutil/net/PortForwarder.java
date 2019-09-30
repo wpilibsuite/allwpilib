@@ -5,10 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpiutil;
+package edu.wpi.first.wpiutil.net;
+
+import edu.wpi.first.wpiutil.WPIUtilJNI;
 
 /**
- * Forward ports to another host.  This is primarily useful for accessing
+ * Forward ports to another host. This is primarily useful for accessing
  * Ethernet-connected devices from a computer tethered to the RoboRIO USB port.
  */
 public final class PortForwarder {
