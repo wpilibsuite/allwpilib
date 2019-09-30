@@ -26,7 +26,7 @@ namespace frc {
  * If no Command is specified for onFalse, the occurrence of that condition
  * will be a no-op.
  *
- * A CondtionalCommand will require the superset of subsystems of the onTrue
+ * A ConditionalCommand will require the superset of subsystems of the onTrue
  * and onFalse commands.
  *
  * @see Command

@@ -28,6 +28,11 @@ import java.util.Enumeration;
  * no-op.
  * </p>
  *
+ * <p>
+ * A ConditionalCommand will require the superset of subsystems of the onTrue
+ * and onFalse commands.
+ * </p>
+ *
  * @see Command
  * @see Scheduler
  */
