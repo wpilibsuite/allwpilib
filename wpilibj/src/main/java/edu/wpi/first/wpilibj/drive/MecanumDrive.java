@@ -154,8 +154,8 @@ public class MecanumDrive extends RobotDriveBase implements Sendable {
   @SuppressWarnings("ParameterName")
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 4,
-                 tInstances.kRobotDrive2_MecanumCartesian);
+      HAL.report(tResourceType.kResourceType_RobotDrive,
+                 tInstances.kRobotDrive2_MecanumCartesian, 4);
       m_reported = true;
     }
 
@@ -201,7 +201,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable {
   @SuppressWarnings("ParameterName")
   public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 4, tInstances.kRobotDrive2_MecanumPolar);
+      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_MecanumPolar, 4);
       m_reported = true;
     }
 

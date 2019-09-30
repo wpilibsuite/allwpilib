@@ -174,8 +174,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable {
   @SuppressWarnings("ParameterName")
   public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
-                 tInstances.kRobotDrive2_DifferentialArcade);
+      HAL.report(tResourceType.kResourceType_RobotDrive,
+                 tInstances.kRobotDrive2_DifferentialArcade, 2);
       m_reported = true;
     }
 
@@ -241,8 +241,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable {
   @SuppressWarnings({"ParameterName", "PMD.CyclomaticComplexity"})
   public void curvatureDrive(double xSpeed, double zRotation, boolean isQuickTurn) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
-                 tInstances.kRobotDrive2_DifferentialCurvature);
+      HAL.report(tResourceType.kResourceType_RobotDrive,
+                 tInstances.kRobotDrive2_DifferentialCurvature, 2);
       m_reported = true;
     }
 
@@ -332,8 +332,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable {
    */
   public void tankDrive(double leftSpeed, double rightSpeed, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
-                 tInstances.kRobotDrive2_DifferentialTank);
+      HAL.report(tResourceType.kResourceType_RobotDrive,
+                 tInstances.kRobotDrive2_DifferentialTank, 2);
       m_reported = true;
     }
 
