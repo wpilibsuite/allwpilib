@@ -399,10 +399,10 @@ stages:
         artifactName: 'Maven'
         targetPath: $(UserHome)/releases
 
-- stage: Hardware Tests
+- stage: HardwareTests
   dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
   jobs:
-  - job: Test Bench
+  - job: TestBench
     pool: RoboRioConnections
 
     steps:
