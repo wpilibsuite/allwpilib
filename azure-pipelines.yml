@@ -417,9 +417,9 @@ stages:
           tasks: 'copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput'
           options: '-Ponlylinuxathena -PbuildServer'
 
-      - script: |
-          ./jenkins-run-tests-get-results.sh
-        workingDirectory: test-scripts
+      - task: ShellScript@2
+        inputs:
+          scriptPath: test-scripts/jenkins-run-tests-get-results.sh
 
       - task: PublishTestResults@2
         inputs:
