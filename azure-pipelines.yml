@@ -416,6 +416,13 @@ stages:
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput'
           options: '-Ponlylinuxathena -PbuildServer'
+
       - script: |
           ./jenkins-run-tests-get-results.sh
         workingDirectory: test-scripts
+
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: '*.xml'
+          searchFolder: 'test-reports'
