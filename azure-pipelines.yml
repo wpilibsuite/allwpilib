@@ -399,10 +399,10 @@ stages:
         artifactName: 'Maven'
         targetPath: $(UserHome)/releases
 
-- stage: HardwareTests
+- stage: Hardware Tests
   dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
   jobs:
-  - job: TestBench
+  - job: Test Bench
     pool: RoboRioConnections
 
     steps:
@@ -416,3 +416,6 @@ stages:
           testResultsFiles: '**/TEST-*.xml'
           tasks: 'copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput'
           options: '-Ponlylinuxathena -PbuildServer'
+      - script: |
+          ./jenkins-run-tests-get-results.sh
+        workingDirectory: test-scripts
