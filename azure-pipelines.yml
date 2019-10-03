@@ -313,6 +313,23 @@ stages:
           artifactName: 'Mac'
           targetPath: 'build/allOutputs'
 
+# - stage: HardwareTests
+  # jobs:
+  - job: TestBench
+    pool: RoboRioConnections
+
+    steps:
+      - task: Gradle@2
+        condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          gradleOptions: '-Xmx3072m'
+          publishJUnitResults: false
+          testResultsFiles: '**/TEST-*.xml'
+          tasks: 'build'
+          options: '-Ponlylinuxathena -PbuildServer'
+
 - stage: Combine
   jobs:
   - job: CombineJob
