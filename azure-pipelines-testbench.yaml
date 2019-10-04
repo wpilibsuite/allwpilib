@@ -8,6 +8,8 @@ trigger:
 
 pool: RoboRioConnections
 
+timeoutInMinutes: 20
+
 steps:
   - task: Gradle@2
     condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
