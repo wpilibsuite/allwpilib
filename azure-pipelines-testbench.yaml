@@ -6,28 +6,28 @@ trigger:
     include:
     - master
 
-pool: RoboRioConnections
+jobs:
+- job: TestBench
+  pool: RoboRioConnections
+  timeoutInMinutes: 15
+  steps:
+    - task: Gradle@2
+      condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        publishJUnitResults: false
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput'
+        options: '-Ponlylinuxathena -PbuildServer'
 
-timeoutInMinutes: 15
+    - task: ShellScript@2
+      inputs:
+        scriptPath: test-scripts/jenkins-run-tests-get-results.sh
 
-steps:
-  - task: Gradle@2
-    condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
-    inputs:
-      workingDirectory: ''
-      gradleWrapperFile: 'gradlew'
-      gradleOptions: '-Xmx3072m'
-      publishJUnitResults: false
-      testResultsFiles: '**/TEST-*.xml'
-      tasks: 'copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput'
-      options: '-Ponlylinuxathena -PbuildServer'
-
-  - task: ShellScript@2
-    inputs:
-      scriptPath: test-scripts/jenkins-run-tests-get-results.sh
-
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFormat: 'JUnit'
-      testResultsFiles: '*.xml'
-      searchFolder: 'test-reports'
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '*.xml'
+        searchFolder: 'test-reports'
