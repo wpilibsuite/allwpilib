@@ -1,19 +1,31 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Testing steps for real hardware
 
 trigger:
-- master
+  batch: true
+  branches:
+    include:
+    - master
 
-pool:
-  vmImage: 'ubuntu-latest'
+pool: RoboRioConnections
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+  - task: Gradle@2
+    condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+    inputs:
+      workingDirectory: ''
+      gradleWrapperFile: 'gradlew'
+      gradleOptions: '-Xmx3072m'
+      publishJUnitResults: false
+      testResultsFiles: '**/TEST-*.xml'
+      tasks: 'copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput'
+      options: '-Ponlylinuxathena -PbuildServer'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  - task: ShellScript@2
+    inputs:
+      scriptPath: test-scripts/jenkins-run-tests-get-results.sh
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '*.xml'
+      searchFolder: 'test-reports'

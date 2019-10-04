@@ -398,31 +398,3 @@ stages:
       inputs:
         artifactName: 'Maven'
         targetPath: $(UserHome)/releases
-
-- stage: HardwareTests
-  dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
-  jobs:
-  - job: TestBench
-    pool: RoboRioConnections
-
-    steps:
-      - task: Gradle@2
-        condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx3072m'
-          publishJUnitResults: false
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput'
-          options: '-Ponlylinuxathena -PbuildServer'
-
-      - task: ShellScript@2
-        inputs:
-          scriptPath: test-scripts/jenkins-run-tests-get-results.sh
-
-      - task: PublishTestResults@2
-        inputs:
-          testResultsFormat: 'JUnit'
-          testResultsFiles: '*.xml'
-          searchFolder: 'test-reports'
