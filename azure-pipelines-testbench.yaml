@@ -9,7 +9,7 @@ trigger:
 jobs:
 - job: TestBench
   pool: RoboRioConnections
-  timeoutInMinutes: 15
+  timeoutInMinutes: 20
   steps:
     - task: Gradle@2
       condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
