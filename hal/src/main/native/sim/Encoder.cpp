@@ -82,6 +82,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(
   }
   int16_t index = getHandleIndex(handle);
   SimEncoderData[index].digitalChannelA = getHandleIndex(digitalSourceHandleA);
+  SimEncoderData[index].digitalChannelB = getHandleIndex(digitalSourceHandleB);
   SimEncoderData[index].initialized = true;
   SimEncoderData[index].reverseDirection = reverseDirection;
   SimEncoderData[index].simDevice = 0;

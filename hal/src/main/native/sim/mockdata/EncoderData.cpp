@@ -22,6 +22,7 @@ void InitializeEncoderData() {
 EncoderData* hal::SimEncoderData;
 void EncoderData::ResetData() {
   digitalChannelA = 0;
+  digitalChannelB = 0;
   initialized.Reset(false);
   simDevice = 0;
   count.Reset(0);
@@ -39,8 +40,12 @@ void HALSIM_ResetEncoderData(int32_t index) {
   SimEncoderData[index].ResetData();
 }
 
-int16_t HALSIM_GetDigitalChannelA(int32_t index) {
+int32_t HALSIM_GetEncoderDigitalChannelA(int32_t index) {
   return SimEncoderData[index].digitalChannelA;
+}
+
+int32_t HALSIM_GetEncoderDigitalChannelB(int32_t index) {
+  return SimEncoderData[index].digitalChannelB;
 }
 
 HAL_SimDeviceHandle HALSIM_GetEncoderSimDevice(int32_t index) {
