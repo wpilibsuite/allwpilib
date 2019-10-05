@@ -75,6 +75,9 @@ HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
   return channel < kNumAnalogInputs && channel >= 0;
 }
 
+void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,
+                                 HAL_SimDeviceHandle device) {}
+
 void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // TODO: This will change when variable size scan lists are implemented.
   // TODO: Need double comparison with epsilon.

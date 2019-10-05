@@ -25,6 +25,7 @@ class AnalogInData {
  public:
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
       false};
+  std::atomic<HAL_SimDeviceHandle> simDevice;
   SimDataValue<int32_t, HAL_MakeInt, GetAverageBitsName> averageBits{7};
   SimDataValue<int32_t, HAL_MakeInt, GetOversampleBitsName> oversampleBits{0};
   SimDataValue<double, HAL_MakeDouble, GetVoltageName> voltage{0.0};

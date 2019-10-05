@@ -23,6 +23,8 @@ void HALSIM_CancelDIOInitializedCallback(int32_t index, int32_t uid);
 HAL_Bool HALSIM_GetDIOInitialized(int32_t index);
 void HALSIM_SetDIOInitialized(int32_t index, HAL_Bool initialized);
 
+HAL_SimDeviceHandle HALSIM_GetDIOSimDevice(int32_t index);
+
 int32_t HALSIM_RegisterDIOValueCallback(int32_t index,
                                         HAL_NotifyCallback callback,
                                         void* param, HAL_Bool initialNotify);

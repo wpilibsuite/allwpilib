@@ -63,8 +63,8 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   port->channel = static_cast<uint8_t>(channel);
 
   SimDIOData[channel].initialized = true;
-
   SimDIOData[channel].isInput = input;
+  SimDIOData[channel].simDevice = 0;
 
   return handle;
 }
@@ -79,6 +79,12 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) return;
   SimDIOData[port->channel].initialized = false;
+}
+
+void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
+  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
+  if (port == nullptr) return;
+  SimDIOData[port->channel].simDevice = device;
 }
 
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {

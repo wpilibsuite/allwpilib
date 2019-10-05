@@ -217,6 +217,10 @@ void Encoder::SetIndexSource(const DigitalSource& source,
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
+void Encoder::SetSimDevice(HAL_SimDeviceHandle device) {
+  HAL_SetEncoderSimDevice(m_encoder, device);
+}
+
 int Encoder::GetFPGAIndex() const {
   int32_t status = 0;
   int val = HAL_GetEncoderFPGAIndex(m_encoder, &status);

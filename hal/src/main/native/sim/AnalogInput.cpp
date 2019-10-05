@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -53,6 +53,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
 
   SimAnalogInData[channel].initialized = true;
   SimAnalogInData[channel].accumulatorInitialized = false;
+  SimAnalogInData[channel].simDevice = 0;
 
   return handle;
 }
@@ -69,6 +70,13 @@ HAL_Bool HAL_CheckAnalogModule(int32_t module) { return module == 1; }
 
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
   return channel < kNumAnalogInputs && channel >= 0;
+}
+
+void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,
+                                 HAL_SimDeviceHandle device) {
+  auto port = analogInputHandles->Get(handle);
+  if (port == nullptr) return;
+  SimAnalogInData[port->channel].simDevice = device;
 }
 
 void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
