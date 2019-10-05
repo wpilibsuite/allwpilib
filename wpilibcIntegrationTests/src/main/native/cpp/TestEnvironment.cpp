@@ -34,7 +34,7 @@ class TestEnvironment : public testing::Environment {
       std::exit(-1);
     }
 
-    m_mockDS.start();
+    //m_mockDS.start();
 
     /* This sets up the network communications library to enable the driver
             station. After starting network coms, it will loop until the driver
