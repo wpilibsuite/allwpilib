@@ -29,6 +29,7 @@ class EncoderData {
   std::atomic<int16_t> digitalChannelA{0};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
       false};
+  std::atomic<HAL_SimDeviceHandle> simDevice;
   SimDataValue<int32_t, HAL_MakeInt, GetCountName> count{0};
   SimDataValue<double, HAL_MakeDouble, GetPeriodName> period{
       (std::numeric_limits<double>::max)()};

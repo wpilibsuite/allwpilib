@@ -63,6 +63,18 @@ Java_edu_wpi_first_hal_DIOJNI_freeDIOPort
 
 /*
  * Class:     edu_wpi_first_hal_DIOJNI
+ * Method:    setDIOSimDevice
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_DIOJNI_setDIOSimDevice
+  (JNIEnv* env, jclass, jint handle, jint device)
+{
+  HAL_SetDIOSimDevice((HAL_DigitalHandle)handle, (HAL_SimDeviceHandle)device);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DIOJNI
  * Method:    setDIO
  * Signature: (IS)V
  */

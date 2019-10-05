@@ -125,6 +125,13 @@ class DigitalOutput : public ErrorBase,
    */
   void UpdateDutyCycle(double dutyCycle);
 
+  /**
+   * Indicates this output is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  void SetSimDevice(HAL_SimDeviceHandle device);
+
   void InitSendable(SendableBuilder& builder) override;
 
  private:

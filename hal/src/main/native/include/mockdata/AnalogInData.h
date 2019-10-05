@@ -23,6 +23,8 @@ void HALSIM_CancelAnalogInInitializedCallback(int32_t index, int32_t uid);
 HAL_Bool HALSIM_GetAnalogInInitialized(int32_t index);
 void HALSIM_SetAnalogInInitialized(int32_t index, HAL_Bool initialized);
 
+HAL_SimDeviceHandle HALSIM_GetAnalogInSimDevice(int32_t index);
+
 int32_t HALSIM_RegisterAnalogInAverageBitsCallback(int32_t index,
                                                    HAL_NotifyCallback callback,
                                                    void* param,

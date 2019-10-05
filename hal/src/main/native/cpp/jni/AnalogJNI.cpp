@@ -120,6 +120,19 @@ Java_edu_wpi_first_hal_AnalogJNI_checkAnalogOutputChannel
 
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
+ * Method:    setAnalogInputSimDevice
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_AnalogJNI_setAnalogInputSimDevice
+  (JNIEnv* env, jclass, jint handle, jint device)
+{
+  HAL_SetAnalogInputSimDevice((HAL_AnalogInputHandle)handle,
+                              (HAL_SimDeviceHandle)device);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogOutput
  * Signature: (ID)V
  */

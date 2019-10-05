@@ -224,6 +224,10 @@ double AnalogInput::PIDGet() {
   return GetAverageVoltage();
 }
 
+void AnalogInput::SetSimDevice(HAL_SimDeviceHandle device) {
+  HAL_SetAnalogInputSimDevice(m_port, device);
+}
+
 void AnalogInput::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Input");
   builder.AddDoubleProperty("Value", [=]() { return GetAverageVoltage(); },

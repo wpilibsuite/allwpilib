@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.EncoderJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
@@ -558,6 +559,15 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
   public void setIndexSource(DigitalSource source, IndexingType type) {
     EncoderJNI.setEncoderIndexSource(m_encoder, source.getPortHandleForRouting(),
         source.getAnalogTriggerTypeForRouting(), type.value);
+  }
+
+  /**
+   * Indicates this input is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  public void setSimDevice(SimDevice device) {
+    EncoderJNI.setEncoderSimDevice(m_encoder, device.getNativeHandle());
   }
 
   @Override

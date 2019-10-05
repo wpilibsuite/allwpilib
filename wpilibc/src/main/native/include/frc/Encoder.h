@@ -332,6 +332,13 @@ class Encoder : public ErrorBase,
   void SetIndexSource(const DigitalSource& source,
                       IndexingType type = kResetOnRisingEdge);
 
+  /**
+   * Indicates this encoder is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  void SetSimDevice(HAL_SimDeviceHandle device);
+
   int GetFPGAIndex() const;
 
   void InitSendable(SendableBuilder& builder) override;

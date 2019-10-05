@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.DIOJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -96,6 +97,15 @@ public class DigitalInput extends DigitalSource implements Sendable, AutoCloseab
   @Override
   public int getPortHandleForRouting() {
     return m_handle;
+  }
+
+  /**
+   * Indicates this input is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  public void setSimDevice(SimDevice device) {
+    DIOJNI.setDIOSimDevice(m_handle, device.getNativeHandle());
   }
 
   @Override

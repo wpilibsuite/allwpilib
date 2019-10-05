@@ -140,6 +140,10 @@ void DigitalOutput::UpdateDutyCycle(double dutyCycle) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
+void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {
+  HAL_SetDIOSimDevice(m_handle, device);
+}
+
 void DigitalOutput::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Output");
   builder.AddBooleanProperty("Value", [=]() { return Get(); },
