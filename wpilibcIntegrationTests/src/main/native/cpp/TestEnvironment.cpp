@@ -47,7 +47,7 @@ class TestEnvironment : public testing::Environment {
 
     int enableCounter = 0;
     while (!DriverStation::GetInstance().IsEnabled()) {
-      if (enableCounter > 50) {
+      if (enableCounter > 500) {
         // Robot did not enable properly after 5 seconds.
         // Force exit
         wpi::errs() << " Failed to enable. Aborting\n";
