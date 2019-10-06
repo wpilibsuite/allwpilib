@@ -121,6 +121,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, A
    */
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     if (m_analog != null && m_channelAllocated) {
       m_analog.close();
     }

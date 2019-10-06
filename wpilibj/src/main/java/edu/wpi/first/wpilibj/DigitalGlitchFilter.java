@@ -43,6 +43,7 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     if (m_channelIndex >= 0) {
       synchronized (m_mutex) {
         m_filterAllocated[m_channelIndex] = false;

@@ -39,6 +39,7 @@ public class AnalogOutput implements Sendable, AutoCloseable {
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     AnalogJNI.freeAnalogOutputPort(m_port);
     m_port = 0;
     m_channel = 0;

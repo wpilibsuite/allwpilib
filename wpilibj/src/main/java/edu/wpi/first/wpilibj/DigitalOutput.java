@@ -44,6 +44,7 @@ public class DigitalOutput implements Sendable, AutoCloseable {
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     // Disable the pwm only if we have allocated it
     if (m_pwmGenerator != invalidPwmGenerator) {
       disablePWM();

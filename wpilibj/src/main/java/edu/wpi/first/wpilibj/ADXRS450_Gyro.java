@@ -175,6 +175,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
    */
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     if (m_spi != null) {
       m_spi.close();
       m_spi = null;

@@ -18,7 +18,7 @@ import edu.wpi.first.wpiutil.math.MathUtils;
  * Implements a PID control loop.
  */
 @SuppressWarnings("PMD.TooManyFields")
-public class PIDController implements Sendable {
+public class PIDController implements Sendable, AutoCloseable {
   private static int instances;
 
   // Factor for "proportional" control
@@ -101,6 +101,11 @@ public class PIDController implements Sendable {
     SendableRegistry.addLW(this, "PIDController", instances);
 
     HAL.report(tResourceType.kResourceType_PIDController, instances);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**

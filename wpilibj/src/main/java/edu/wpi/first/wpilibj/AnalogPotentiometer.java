@@ -157,6 +157,7 @@ public class AnalogPotentiometer implements Potentiometer, Sendable, AutoCloseab
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     if (m_initAnalogInput) {
       m_analogInput.close();
       m_analogInput = null;

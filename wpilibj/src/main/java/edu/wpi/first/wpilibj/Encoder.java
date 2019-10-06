@@ -294,6 +294,7 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     if (m_aSource != null && m_allocatedA) {
       m_aSource.close();
       m_allocatedA = false;

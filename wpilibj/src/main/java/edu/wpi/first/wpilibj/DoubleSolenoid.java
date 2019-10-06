@@ -86,6 +86,7 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
 
   @Override
   public synchronized void close() {
+    SendableRegistry.remove(this);
     SolenoidJNI.freeSolenoidPort(m_forwardHandle);
     SolenoidJNI.freeSolenoidPort(m_reverseHandle);
   }

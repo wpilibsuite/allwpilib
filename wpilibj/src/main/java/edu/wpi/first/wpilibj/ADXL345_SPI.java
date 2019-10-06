@@ -98,6 +98,7 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     if (m_spi != null) {
       m_spi.close();
       m_spi = null;

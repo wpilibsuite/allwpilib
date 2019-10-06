@@ -113,6 +113,7 @@ public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     if (m_i2c != null) {
       m_i2c.close();
       m_i2c = null;

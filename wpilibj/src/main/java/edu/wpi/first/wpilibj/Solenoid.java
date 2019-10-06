@@ -54,6 +54,7 @@ public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     SolenoidJNI.freeSolenoidPort(m_solenoidHandle);
     m_solenoidHandle = 0;
   }

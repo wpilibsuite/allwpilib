@@ -141,6 +141,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     freeRelay();
   }
 

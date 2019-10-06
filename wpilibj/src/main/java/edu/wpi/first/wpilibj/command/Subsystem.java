@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  *
  * @see Command
  */
-public abstract class Subsystem implements Sendable {
+public abstract class Subsystem implements Sendable, AutoCloseable {
   /**
    * Whether or not getDefaultCommand() was called.
    */
@@ -62,6 +62,11 @@ public abstract class Subsystem implements Sendable {
     SendableRegistry.addLW(this, name, name);
     Scheduler.getInstance().registerSubsystem(this);
     m_currentCommandChanged = true;
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**
