@@ -85,5 +85,6 @@ else
     eval ${SCP_TEST_SCRIPT}
     eval ${SSH_CHMOD_AND_MAKE_TEMP_TEST_DIR}
     eval ${SCP_TEST_PROGRAM}
+    sleep 5
     eval ${SSH_RUN_TESTS}
 fi
