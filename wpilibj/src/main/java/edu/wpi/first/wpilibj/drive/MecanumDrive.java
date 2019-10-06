@@ -61,7 +61,7 @@ import edu.wpi.first.wpiutil.math.MathUtils;
  * {@link edu.wpi.first.wpilibj.RobotDrive#mecanumDrive_Polar(double, double, double)} if a
  * deadband of 0 is used.
  */
-public class MecanumDrive extends RobotDriveBase implements Sendable {
+public class MecanumDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   private static int instances;
 
   private final SpeedController m_frontLeftMotor;
@@ -90,6 +90,11 @@ public class MecanumDrive extends RobotDriveBase implements Sendable {
     SendableRegistry.addChild(this, m_rearRightMotor);
     instances++;
     SendableRegistry.addLW(this, "MecanumDrive", instances);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**

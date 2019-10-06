@@ -42,7 +42,7 @@ import edu.wpi.first.wpiutil.math.MathUtils;
  * points down. Rotations follow the right-hand rule, so clockwise rotation around the Z axis is
  * positive.
  */
-public class KilloughDrive extends RobotDriveBase implements Sendable {
+public class KilloughDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   public static final double kDefaultLeftMotorAngle = 60.0;
   public static final double kDefaultRightMotorAngle = 120.0;
   public static final double kDefaultBackMotorAngle = 270.0;
@@ -107,6 +107,11 @@ public class KilloughDrive extends RobotDriveBase implements Sendable {
     SendableRegistry.addChild(this, m_backMotor);
     instances++;
     SendableRegistry.addLW(this, "KilloughDrive", instances);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**

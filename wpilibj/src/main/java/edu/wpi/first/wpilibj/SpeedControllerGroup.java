@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 /**
  * Allows multiple {@link SpeedController} objects to be linked together.
  */
-public class SpeedControllerGroup implements SpeedController, Sendable {
+public class SpeedControllerGroup implements SpeedController, Sendable, AutoCloseable {
   private boolean m_isInverted;
   private final SpeedController[] m_speedControllers;
   private static int instances;
@@ -35,6 +35,11 @@ public class SpeedControllerGroup implements SpeedController, Sendable {
     }
     instances++;
     SendableRegistry.addLW(this, "tSpeedControllerGroup", instances);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   @Override

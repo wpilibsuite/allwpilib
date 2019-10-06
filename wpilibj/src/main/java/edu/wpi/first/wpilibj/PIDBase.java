@@ -28,7 +28,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * given set of PID constants.
  */
 @SuppressWarnings("PMD.TooManyFields")
-public class PIDBase implements PIDInterface, PIDOutput, Sendable {
+public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable {
   public static final double kDefaultPeriod = 0.05;
   private static int instances;
 
@@ -189,6 +189,11 @@ public class PIDBase implements PIDInterface, PIDOutput, Sendable {
   @SuppressWarnings("ParameterName")
   public PIDBase(double Kp, double Ki, double Kd, PIDSource source, PIDOutput output) {
     this(Kp, Ki, Kd, 0.0, source, output);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**

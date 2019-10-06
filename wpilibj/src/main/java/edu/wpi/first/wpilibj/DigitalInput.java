@@ -42,6 +42,7 @@ public class DigitalInput extends DigitalSource implements Sendable, AutoCloseab
   @Override
   public void close() {
     super.close();
+    SendableRegistry.remove(this);
     if (m_interrupt != 0) {
       cancelInterrupts();
     }

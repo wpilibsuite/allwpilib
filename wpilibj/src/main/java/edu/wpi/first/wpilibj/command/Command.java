@@ -41,7 +41,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * @see IllegalUseOfCommandException
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public abstract class Command implements Sendable {
+public abstract class Command implements Sendable, AutoCloseable {
   /**
    * The time since this command was initialized.
    */
@@ -202,6 +202,11 @@ public abstract class Command implements Sendable {
   public Command(String name, double timeout, Subsystem subsystem) {
     this(name, timeout);
     requires(subsystem);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**

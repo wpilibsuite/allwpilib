@@ -206,6 +206,7 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    */
   @Override
   public synchronized void close() {
+    SendableRegistry.remove(this);
     final boolean wasAutomaticMode = m_automaticEnabled;
     setAutomaticMode(false);
     if (m_allocatedChannels) {
