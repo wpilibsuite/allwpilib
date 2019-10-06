@@ -12,6 +12,9 @@ import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.hal.SimEnum;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -62,6 +65,13 @@ public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
   }
 
   private SPI m_spi;
+
+  private SimDevice m_simDevice;
+  private SimEnum m_simRange;
+  private SimDouble m_simX;
+  private SimDouble m_simY;
+  private SimDouble m_simZ;
+
   private double m_gsPerLSB;
 
   /**
@@ -82,22 +92,33 @@ public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
   public ADXL362(SPI.Port port, Range range) {
     m_spi = new SPI(port);
 
+    // simulation
+    m_simDevice = SimDevice.create("ADXL362", port.value);
+    if (m_simDevice != null) {
+      m_simRange = m_simDevice.createEnum("Range", true, new String[] {"2G", "4G", "8G", "16G"}, 0);
+      m_simX = m_simDevice.createDouble("X Accel", false, 0.0);
+      m_simX = m_simDevice.createDouble("Y Accel", false, 0.0);
+      m_simZ = m_simDevice.createDouble("Z Accel", false, 0.0);
+    }
+
     m_spi.setClockRate(3000000);
     m_spi.setMSBFirst();
     m_spi.setSampleDataOnTrailingEdge();
     m_spi.setClockActiveLow();
     m_spi.setChipSelectActiveLow();
 
-    // Validate the part ID
     ByteBuffer transferBuffer = ByteBuffer.allocate(3);
-    transferBuffer.put(0, kRegRead);
-    transferBuffer.put(1, kPartIdRegister);
-    m_spi.transaction(transferBuffer, transferBuffer, 3);
-    if (transferBuffer.get(2) != (byte) 0xF2) {
-      m_spi.close();
-      m_spi = null;
-      DriverStation.reportError("could not find ADXL362 on SPI port " + port.value, false);
-      return;
+    if (m_simDevice == null) {
+      // Validate the part ID
+      transferBuffer.put(0, kRegRead);
+      transferBuffer.put(1, kPartIdRegister);
+      m_spi.transaction(transferBuffer, transferBuffer, 3);
+      if (transferBuffer.get(2) != (byte) 0xF2) {
+        m_spi.close();
+        m_spi = null;
+        DriverStation.reportError("could not find ADXL362 on SPI port " + port.value, false);
+        return;
+      }
     }
 
     setRange(range);
@@ -114,9 +135,14 @@ public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     if (m_spi != null) {
       m_spi.close();
       m_spi = null;
+    }
+    if (m_simDevice != null) {
+      m_simDevice.close();
+      m_simDevice = null;
     }
   }
 
@@ -150,6 +176,10 @@ public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
     byte[] commands = new byte[]{kRegWrite, kFilterCtlRegister, (byte) (kFilterCtl_ODR_100Hz
         | value)};
     m_spi.write(commands, commands.length);
+
+    if (m_simRange != null) {
+      m_simRange.set(value);
+    }
   }
 
 
@@ -175,6 +205,15 @@ public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
    * @return Acceleration of the ADXL362 in Gs.
    */
   public double getAcceleration(ADXL362.Axes axis) {
+    if (axis == Axes.kX && m_simX != null) {
+      return m_simX.get();
+    }
+    if (axis == Axes.kY && m_simY != null) {
+      return m_simY.get();
+    }
+    if (axis == Axes.kZ && m_simZ != null) {
+      return m_simZ.get();
+    }
     if (m_spi == null) {
       return 0.0;
     }
@@ -195,6 +234,12 @@ public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
    */
   public ADXL362.AllAxes getAccelerations() {
     ADXL362.AllAxes data = new ADXL362.AllAxes();
+    if (m_simX != null && m_simY != null && m_simZ != null) {
+      data.XAxis = m_simX.get();
+      data.YAxis = m_simY.get();
+      data.ZAxis = m_simZ.get();
+      return data;
+    }
     if (m_spi != null) {
       ByteBuffer dataBuffer = ByteBuffer.allocate(8);
       // Select the data address.

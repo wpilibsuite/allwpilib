@@ -71,6 +71,7 @@ public class AnalogAccelerometer implements PIDSource, Sendable, AutoCloseable {
    */
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     if (m_analogChannel != null && m_allocatedChannel) {
       m_analogChannel.close();
     }

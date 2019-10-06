@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "HAL_Value.h"
+#include "hal/Value.h"
 
 typedef void (*HAL_NotifyCallback)(const char* name, void* param,
                                    const struct HAL_Value* value);

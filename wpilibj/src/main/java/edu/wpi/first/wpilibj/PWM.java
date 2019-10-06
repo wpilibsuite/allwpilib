@@ -74,6 +74,7 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
    */
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     if (m_handle == 0) {
       return;
     }

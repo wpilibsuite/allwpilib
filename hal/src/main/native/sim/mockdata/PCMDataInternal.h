@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -31,21 +31,22 @@ class PCMData {
   }
 
  public:
-  SimDataValue<HAL_Bool, MakeBoolean, GetSolenoidInitializedName,
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetSolenoidInitializedName,
                GetSolenoidInitializedDefault>
       solenoidInitialized[kNumSolenoidChannels];
-  SimDataValue<HAL_Bool, MakeBoolean, GetSolenoidOutputName,
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetSolenoidOutputName,
                GetSolenoidOutputDefault>
       solenoidOutput[kNumSolenoidChannels];
-  SimDataValue<HAL_Bool, MakeBoolean, GetCompressorInitializedName>
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetCompressorInitializedName>
       compressorInitialized{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetCompressorOnName> compressorOn{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetClosedLoopEnabledName>
-      closedLoopEnabled{true};
-  SimDataValue<HAL_Bool, MakeBoolean, GetPressureSwitchName> pressureSwitch{
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetCompressorOnName> compressorOn{
       false};
-  SimDataValue<double, MakeDouble, GetCompressorCurrentName> compressorCurrent{
-      0.0};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetClosedLoopEnabledName>
+      closedLoopEnabled{true};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetPressureSwitchName> pressureSwitch{
+      false};
+  SimDataValue<double, HAL_MakeDouble, GetCompressorCurrentName>
+      compressorCurrent{0.0};
 
   virtual void ResetData();
 };

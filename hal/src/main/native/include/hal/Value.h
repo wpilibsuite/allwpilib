@@ -14,9 +14,9 @@ enum HAL_Type {
   HAL_UNASSIGNED = 0,
   HAL_BOOLEAN = 0x01,
   HAL_DOUBLE = 0x02,
-  HAL_ENUM = 0x16,
-  HAL_INT = 0x32,
-  HAL_LONG = 0x64,
+  HAL_ENUM = 0x04,
+  HAL_INT = 0x08,
+  HAL_LONG = 0x10,
 };
 
 /** HAL Entry Value.  Note this is a typed union. */
@@ -31,37 +31,45 @@ struct HAL_Value {
   enum HAL_Type type;
 };
 
-inline HAL_Value MakeBoolean(HAL_Bool v) {
-  HAL_Value value;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+inline struct HAL_Value HAL_MakeBoolean(HAL_Bool v) {
+  struct HAL_Value value;
   value.type = HAL_BOOLEAN;
   value.data.v_boolean = v;
   return value;
 }
 
-inline HAL_Value MakeEnum(int v) {
-  HAL_Value value;
+inline struct HAL_Value HAL_MakeEnum(int v) {
+  struct HAL_Value value;
   value.type = HAL_ENUM;
   value.data.v_enum = v;
   return value;
 }
 
-inline HAL_Value MakeInt(int v) {
-  HAL_Value value;
+inline struct HAL_Value HAL_MakeInt(int v) {
+  struct HAL_Value value;
   value.type = HAL_INT;
   value.data.v_int = v;
   return value;
 }
 
-inline HAL_Value MakeLong(int64_t v) {
-  HAL_Value value;
+inline struct HAL_Value HAL_MakeLong(int64_t v) {
+  struct HAL_Value value;
   value.type = HAL_LONG;
   value.data.v_long = v;
   return value;
 }
 
-inline HAL_Value MakeDouble(double v) {
-  HAL_Value value;
+inline struct HAL_Value HAL_MakeDouble(double v) {
+  struct HAL_Value value;
   value.type = HAL_DOUBLE;
   value.data.v_double = v;
   return value;
 }
+
+#ifdef __cplusplus
+}  // extern "C"
+#endif

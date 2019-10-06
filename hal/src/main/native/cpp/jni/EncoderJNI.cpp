@@ -56,6 +56,19 @@ Java_edu_wpi_first_hal_EncoderJNI_freeEncoder
 
 /*
  * Class:     edu_wpi_first_hal_EncoderJNI
+ * Method:    setEncoderSimDevice
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_EncoderJNI_setEncoderSimDevice
+  (JNIEnv* env, jclass, jint handle, jint device)
+{
+  HAL_SetEncoderSimDevice((HAL_EncoderHandle)handle,
+                          (HAL_SimDeviceHandle)device);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_EncoderJNI
  * Method:    getEncoder
  * Signature: (I)I
  */

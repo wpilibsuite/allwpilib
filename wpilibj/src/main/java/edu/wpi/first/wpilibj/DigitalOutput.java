@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.DIOJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -43,6 +44,7 @@ public class DigitalOutput implements Sendable, AutoCloseable {
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     // Disable the pwm only if we have allocated it
     if (m_pwmGenerator != invalidPwmGenerator) {
       disablePWM();
@@ -159,6 +161,15 @@ public class DigitalOutput implements Sendable, AutoCloseable {
       return;
     }
     DIOJNI.setDigitalPWMDutyCycle(m_pwmGenerator, dutyCycle);
+  }
+
+  /**
+   * Indicates this input is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  public void setSimDevice(SimDevice device) {
+    DIOJNI.setDIOSimDevice(m_handle, device.getNativeHandle());
   }
 
   @Override

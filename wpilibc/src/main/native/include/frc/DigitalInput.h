@@ -71,6 +71,13 @@ class DigitalInput : public DigitalSource,
    */
   int GetChannel() const override;
 
+  /**
+   * Indicates this input is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  void SetSimDevice(HAL_SimDeviceHandle device);
+
   void InitSendable(SendableBuilder& builder) override;
 
  private:

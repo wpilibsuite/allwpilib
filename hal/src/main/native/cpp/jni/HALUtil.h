@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,6 +14,7 @@
 #include <wpi/StringRef.h>
 
 struct HAL_MatchInfo;
+struct HAL_Value;
 
 namespace frc {
 
@@ -66,6 +67,8 @@ void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
 
 jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
                             uint64_t timestamp);
+
+jobject CreateHALValue(JNIEnv* env, const HAL_Value& value);
 
 JavaVM* GetJVM();
 

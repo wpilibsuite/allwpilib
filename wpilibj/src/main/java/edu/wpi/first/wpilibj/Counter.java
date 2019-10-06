@@ -183,6 +183,8 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
+
     setUpdateWhenEmpty(true);
 
     clearUpSource();

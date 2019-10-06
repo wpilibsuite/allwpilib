@@ -12,6 +12,8 @@
 #include <thread>
 #include <vector>
 
+#include <hal/SimDevice.h>
+
 #include "frc/Counter.h"
 #include "frc/ErrorBase.h"
 #include "frc/PIDSource.h"
@@ -230,6 +232,10 @@ class Ultrasonic : public ErrorBase,
   bool m_enabled = false;
   Counter m_counter;
   DistanceUnit m_units;
+
+  hal::SimDevice m_simDevice;
+  hal::SimBoolean m_simRangeValid;
+  hal::SimDouble m_simRange;
 };
 
 }  // namespace frc

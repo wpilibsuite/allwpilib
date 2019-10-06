@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -23,6 +23,7 @@ EncoderData* hal::SimEncoderData;
 void EncoderData::ResetData() {
   digitalChannelA = 0;
   initialized.Reset(false);
+  simDevice = 0;
   count.Reset(0);
   period.Reset(std::numeric_limits<double>::max());
   reset.Reset(false);
@@ -40,6 +41,10 @@ void HALSIM_ResetEncoderData(int32_t index) {
 
 int16_t HALSIM_GetDigitalChannelA(int32_t index) {
   return SimEncoderData[index].digitalChannelA;
+}
+
+HAL_SimDeviceHandle HALSIM_GetEncoderSimDevice(int32_t index) {
+  return SimEncoderData[index].simDevice;
 }
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                  \

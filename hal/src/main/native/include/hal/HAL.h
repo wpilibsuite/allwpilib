@@ -36,9 +36,11 @@
 #include "hal/Relay.h"
 #include "hal/SPI.h"
 #include "hal/SerialPort.h"
+#include "hal/SimDevice.h"
 #include "hal/Solenoid.h"
 #include "hal/Threads.h"
 #include "hal/Types.h"
+#include "hal/Value.h"
 
 #ifdef __cplusplus
 #include "hal/FRCUsageReporting.h"

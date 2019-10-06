@@ -96,7 +96,7 @@ import edu.wpi.first.wpiutil.math.MathUtils;
  * {@link edu.wpi.first.wpilibj.RobotDrive#drive(double, double)} with the addition of a quick turn
  * mode. However, it is not designed to give exactly the same response.
  */
-public class DifferentialDrive extends RobotDriveBase implements Sendable {
+public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   public static final double kDefaultQuickStopThreshold = 0.2;
   public static final double kDefaultQuickStopAlpha = 0.1;
 
@@ -125,6 +125,11 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable {
     SendableRegistry.addChild(this, m_rightMotor);
     instances++;
     SendableRegistry.addLW(this, "DifferentialDrive", instances);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**

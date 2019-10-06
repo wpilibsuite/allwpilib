@@ -24,6 +24,8 @@ void HALSIM_CancelEncoderInitializedCallback(int32_t index, int32_t uid);
 HAL_Bool HALSIM_GetEncoderInitialized(int32_t index);
 void HALSIM_SetEncoderInitialized(int32_t index, HAL_Bool initialized);
 
+HAL_SimDeviceHandle HALSIM_GetEncoderSimDevice(int32_t index);
+
 int32_t HALSIM_RegisterEncoderCountCallback(int32_t index,
                                             HAL_NotifyCallback callback,
                                             void* param,

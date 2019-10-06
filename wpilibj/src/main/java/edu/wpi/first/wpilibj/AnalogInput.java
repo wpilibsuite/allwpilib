@@ -11,6 +11,7 @@ import edu.wpi.first.hal.AccumulatorResult;
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.sim.AnalogInSim;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -54,6 +55,7 @@ public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     AnalogJNI.freeAnalogInputPort(m_port);
     m_port = 0;
     m_channel = 0;
@@ -342,6 +344,15 @@ public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
   @Override
   public double pidGet() {
     return getAverageVoltage();
+  }
+
+  /**
+   * Indicates this input is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  public void setSimDevice(SimDevice device) {
+    AnalogJNI.setAnalogInputSimDevice(m_port, device.getNativeHandle());
   }
 
   @Override

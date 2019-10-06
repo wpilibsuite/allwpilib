@@ -12,6 +12,9 @@ import java.util.List;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimBoolean;
+import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -59,6 +62,10 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
   private static int m_instances;
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
+  private SimDevice m_simDevice;
+  private SimBoolean m_simRangeValid;
+  private SimDouble m_simRange;
+
   /**
    * Background task that goes through the list of ultrasonic sensors and pings each one in turn.
    * The counter is configured to read the timing of the returned echo pulse.
@@ -94,6 +101,13 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    * then automatic mode is restored.
    */
   private synchronized void initialize() {
+    m_simDevice = SimDevice.create("Ultrasonic", m_echoChannel.getChannel());
+    if (m_simDevice != null) {
+      m_simRangeValid = m_simDevice.createBoolean("Range Valid", false, true);
+      m_simRange = m_simDevice.createDouble("Range (in)", false, 0.0);
+      m_pingChannel.setSimDevice(m_simDevice);
+      m_echoChannel.setSimDevice(m_simDevice);
+    }
     if (m_task == null) {
       m_task = new UltrasonicChecker();
     }
@@ -192,6 +206,7 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    */
   @Override
   public synchronized void close() {
+    SendableRegistry.remove(this);
     final boolean wasAutomaticMode = m_automaticEnabled;
     setAutomaticMode(false);
     if (m_allocatedChannels) {
@@ -215,6 +230,11 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
     }
     if (!m_sensors.isEmpty() && wasAutomaticMode) {
       setAutomaticMode(true);
+    }
+
+    if (m_simDevice != null) {
+      m_simDevice.close();
+      m_simDevice = null;
     }
   }
 
@@ -285,6 +305,9 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    * @return true if the range is valid
    */
   public boolean isRangeValid() {
+    if (m_simRangeValid != null) {
+      return m_simRangeValid.get();
+    }
     return m_counter.get() > 1;
   }
 
@@ -296,6 +319,9 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    */
   public double getRangeInches() {
     if (isRangeValid()) {
+      if (m_simRange != null) {
+        return m_simRange.get();
+      }
       return m_counter.getPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
     } else {
       return 0;

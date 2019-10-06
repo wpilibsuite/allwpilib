@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <hal/SimDevice.h>
+
 #include "frc/ErrorBase.h"
 #include "frc/I2C.h"
 #include "frc/interfaces/Accelerometer.h"
@@ -77,6 +79,12 @@ class ADXL345_I2C : public ErrorBase,
 
  protected:
   I2C m_i2c;
+
+  hal::SimDevice m_simDevice;
+  hal::SimEnum m_simRange;
+  hal::SimDouble m_simX;
+  hal::SimDouble m_simY;
+  hal::SimDouble m_simZ;
 
   static constexpr int kAddress = 0x1D;
   static constexpr int kPowerCtlRegister = 0x2D;

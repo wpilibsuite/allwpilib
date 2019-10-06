@@ -11,7 +11,7 @@
 
 #include <wpi/StringRef.h>
 
-#include "mockdata/HAL_Value.h"
+#include "hal/Value.h"
 
 namespace frc {
 namespace sim {

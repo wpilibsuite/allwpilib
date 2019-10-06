@@ -160,6 +160,9 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   }
 }
 
+void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
+}
+
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
   auto handle = digitalPWMHandles->Allocate();
   if (handle == HAL_kInvalidHandle) {

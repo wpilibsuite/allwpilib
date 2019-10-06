@@ -32,7 +32,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  *
  * @param <V> The type of the values to be stored
  */
-public class SendableChooser<V> implements Sendable {
+public class SendableChooser<V> implements Sendable, AutoCloseable {
   /**
    * The key for the default value.
    */
@@ -67,6 +67,11 @@ public class SendableChooser<V> implements Sendable {
   public SendableChooser() {
     m_instance = s_instances.getAndIncrement();
     SendableRegistry.add(this, "SendableChooser", m_instance);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**

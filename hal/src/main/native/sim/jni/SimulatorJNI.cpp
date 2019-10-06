@@ -7,9 +7,12 @@
 
 #include "SimulatorJNI.h"
 
+#include <wpi/jni_util.h>
+
 #include "BufferCallbackStore.h"
 #include "CallbackStore.h"
 #include "ConstBufferCallbackStore.h"
+#include "SimDeviceDataJNI.h"
 #include "SpiReadAutoReceiveBufferCallbackStore.h"
 #include "edu_wpi_first_hal_sim_mockdata_SimulatorJNI.h"
 #include "hal/HAL.h"
@@ -19,7 +22,6 @@
 using namespace wpi::java;
 
 static JavaVM* jvm = nullptr;
-static JClass simValueCls;
 static JClass notifyCallbackCls;
 static JClass bufferCallbackCls;
 static JClass constBufferCallbackCls;
@@ -36,9 +38,6 @@ jint SimOnLoad(JavaVM* vm, void* reserved) {
   JNIEnv* env;
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
     return JNI_ERR;
-
-  simValueCls = JClass(env, "edu/wpi/first/hal/sim/SimValue");
-  if (!simValueCls) return JNI_ERR;
 
   notifyCallbackCls = JClass(env, "edu/wpi/first/hal/sim/NotifyCallback");
   if (!notifyCallbackCls) return JNI_ERR;
@@ -75,6 +74,7 @@ jint SimOnLoad(JavaVM* vm, void* reserved) {
   InitializeBufferStore();
   InitializeConstBufferStore();
   InitializeSpiBufferStore();
+  if (!InitializeSimDeviceDataJNI(env)) return JNI_ERR;
 
   return JNI_VERSION_1_6;
 }
@@ -84,11 +84,11 @@ void SimOnUnload(JavaVM* vm, void* reserved) {
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
     return;
 
-  simValueCls.free(env);
   notifyCallbackCls.free(env);
   bufferCallbackCls.free(env);
   constBufferCallbackCls.free(env);
   spiReadAutoReceiveBufferCallbackCls.free(env);
+  FreeSimDeviceDataJNI(env);
   jvm = nullptr;
 }
 

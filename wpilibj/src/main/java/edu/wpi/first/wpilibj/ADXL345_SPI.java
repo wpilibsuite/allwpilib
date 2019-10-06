@@ -13,6 +13,9 @@ import java.nio.ByteOrder;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.hal.SimEnum;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -67,6 +70,12 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
 
   protected SPI m_spi;
 
+  protected SimDevice m_simDevice;
+  protected SimEnum m_simRange;
+  protected SimDouble m_simX;
+  protected SimDouble m_simY;
+  protected SimDouble m_simZ;
+
   /**
    * Constructor.
    *
@@ -75,13 +84,29 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
    */
   public ADXL345_SPI(SPI.Port port, Range range) {
     m_spi = new SPI(port);
+    // simulation
+    m_simDevice = SimDevice.create("ADXL345_SPI", port.value);
+    if (m_simDevice != null) {
+      m_simRange = m_simDevice.createEnum("Range", true, new String[] {"2G", "4G", "8G", "16G"}, 0);
+      m_simX = m_simDevice.createDouble("X Accel", false, 0.0);
+      m_simX = m_simDevice.createDouble("Y Accel", false, 0.0);
+      m_simZ = m_simDevice.createDouble("Z Accel", false, 0.0);
+    }
     init(range);
     SendableRegistry.addLW(this, "ADXL345_SPI", port.value);
   }
 
   @Override
   public void close() {
-    m_spi.close();
+    SendableRegistry.remove(this);
+    if (m_spi != null) {
+      m_spi.close();
+      m_spi = null;
+    }
+    if (m_simDevice != null) {
+      m_simDevice.close();
+      m_simDevice = null;
+    }
   }
 
   /**
@@ -131,6 +156,10 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
     // Specify the data format to read
     byte[] commands = new byte[]{kDataFormatRegister, (byte) (kDataFormat_FullRes | value)};
     m_spi.write(commands, commands.length);
+
+    if (m_simRange != null) {
+      m_simRange.set(value);
+    }
   }
 
   @Override
@@ -155,6 +184,15 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
    * @return Acceleration of the ADXL345 in Gs.
    */
   public double getAcceleration(ADXL345_SPI.Axes axis) {
+    if (axis == Axes.kX && m_simX != null) {
+      return m_simX.get();
+    }
+    if (axis == Axes.kY && m_simY != null) {
+      return m_simY.get();
+    }
+    if (axis == Axes.kZ && m_simZ != null) {
+      return m_simZ.get();
+    }
     ByteBuffer transferBuffer = ByteBuffer.allocate(3);
     transferBuffer.put(0,
         (byte) ((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value));
@@ -172,6 +210,12 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
    */
   public ADXL345_SPI.AllAxes getAccelerations() {
     ADXL345_SPI.AllAxes data = new ADXL345_SPI.AllAxes();
+    if (m_simX != null && m_simY != null && m_simZ != null) {
+      data.XAxis = m_simX.get();
+      data.YAxis = m_simY.get();
+      data.ZAxis = m_simZ.get();
+      return data;
+    }
     if (m_spi != null) {
       ByteBuffer dataBuffer = ByteBuffer.allocate(7);
       // Select the data address.
