@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  *
  * <p>This class allows access to the roboRIO's internal accelerometer.
  */
-public class BuiltInAccelerometer implements Accelerometer, Sendable {
+public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoCloseable {
   /**
    * Constructor.
    *
@@ -37,6 +37,11 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable {
    */
   public BuiltInAccelerometer() {
     this(Range.k8G);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   @Override

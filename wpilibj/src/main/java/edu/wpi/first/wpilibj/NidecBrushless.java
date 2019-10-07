@@ -50,6 +50,7 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
 
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     m_dio.close();
     m_pwm.close();
   }

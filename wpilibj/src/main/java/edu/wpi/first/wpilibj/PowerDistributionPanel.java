@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * Class for getting voltage, current, temperature, power and energy from the Power Distribution
  * Panel over CAN.
  */
-public class PowerDistributionPanel implements Sendable {
+public class PowerDistributionPanel implements Sendable, AutoCloseable {
   private final int m_handle;
 
   /**
@@ -38,6 +38,11 @@ public class PowerDistributionPanel implements Sendable {
    */
   public PowerDistributionPanel() {
     this(0);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**

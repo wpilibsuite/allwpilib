@@ -12,6 +12,9 @@ import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimBoolean;
+import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -42,6 +45,11 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
   private SPI m_spi;
 
+  private SimDevice m_simDevice;
+  private SimBoolean m_simConnected;
+  private SimDouble m_simAngle;
+  private SimDouble m_simRate;
+
   /**
    * Constructor.  Uses the onboard CS0.
    */
@@ -57,31 +65,49 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
   public ADXRS450_Gyro(SPI.Port port) {
     m_spi = new SPI(port);
 
+    // simulation
+    m_simDevice = SimDevice.create("ADXRS450_Gyro", port.value);
+    if (m_simDevice != null) {
+      m_simConnected = m_simDevice.createBoolean("Connected", false, true);
+      m_simAngle = m_simDevice.createDouble("Angle", false, 0.0);
+      m_simRate = m_simDevice.createDouble("Rate", false, 0.0);
+    }
+
     m_spi.setClockRate(3000000);
     m_spi.setMSBFirst();
     m_spi.setSampleDataOnLeadingEdge();
     m_spi.setClockActiveHigh();
     m_spi.setChipSelectActiveLow();
 
-    // Validate the part ID
-    if ((readRegister(kPIDRegister) & 0xff00) != 0x5200) {
-      m_spi.close();
-      m_spi = null;
-      DriverStation.reportError("could not find ADXRS450 gyro on SPI port " + port.value,
-          false);
-      return;
+    if (m_simDevice == null) {
+      // Validate the part ID
+      if ((readRegister(kPIDRegister) & 0xff00) != 0x5200) {
+        m_spi.close();
+        m_spi = null;
+        DriverStation.reportError("could not find ADXRS450 gyro on SPI port " + port.value,
+            false);
+        return;
+      }
+
+      m_spi.initAccumulator(kSamplePeriod, 0x20000000, 4, 0x0c00000e, 0x04000000, 10, 16,
+          true, true);
+
+      calibrate();
     }
-
-    m_spi.initAccumulator(kSamplePeriod, 0x20000000, 4, 0x0c00000e, 0x04000000, 10, 16,
-        true, true);
-
-    calibrate();
 
     HAL.report(tResourceType.kResourceType_ADXRS450, port.value);
     SendableRegistry.addLW(this, "ADXRS450_Gyro", port.value);
   }
 
+  /**
+   * Determine if the gyro is connected.
+   *
+   * @return true if it is connected, false otherwise.
+   */
   public boolean isConnected() {
+    if (m_simConnected != null) {
+      return m_simConnected.get();
+    }
     return m_spi != null;
   }
 
@@ -133,6 +159,12 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
   @Override
   public void reset() {
+    if (m_simAngle != null) {
+      m_simAngle.set(0.0);
+    }
+    if (m_simRate != null) {
+      m_simRate.set(0.0);
+    }
     if (m_spi != null) {
       m_spi.resetAccumulator();
     }
@@ -143,14 +175,22 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
    */
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     if (m_spi != null) {
       m_spi.close();
       m_spi = null;
+    }
+    if (m_simDevice != null) {
+      m_simDevice.close();
+      m_simDevice = null;
     }
   }
 
   @Override
   public double getAngle() {
+    if (m_simAngle != null) {
+      return m_simAngle.get();
+    }
     if (m_spi == null) {
       return 0.0;
     }
@@ -159,6 +199,9 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
   @Override
   public double getRate() {
+    if (m_simRate != null) {
+      return m_simRate.get();
+    }
     if (m_spi == null) {
       return 0.0;
     }

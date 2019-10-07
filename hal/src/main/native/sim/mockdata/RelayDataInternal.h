@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,12 +18,12 @@ class RelayData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Reverse)
 
  public:
-  SimDataValue<HAL_Bool, MakeBoolean, GetInitializedForwardName>
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedForwardName>
       initializedForward{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetInitializedReverseName>
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedReverseName>
       initializedReverse{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetForwardName> forward{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetReverseName> reverse{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetForwardName> forward{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetReverseName> reverse{false};
 
   virtual void ResetData();
 };

@@ -34,23 +34,34 @@ static constexpr int kPowerCtl_Measure = 0x02;
 
 ADXL362::ADXL362(Range range) : ADXL362(SPI::Port::kOnboardCS1, range) {}
 
-ADXL362::ADXL362(SPI::Port port, Range range) : m_spi(port) {
+ADXL362::ADXL362(SPI::Port port, Range range)
+    : m_spi(port), m_simDevice("ADXL362", port) {
+  if (m_simDevice) {
+    m_simRange =
+        m_simDevice.CreateEnum("Range", true, {"2G", "4G", "8G", "16G"}, 0);
+    m_simX = m_simDevice.CreateDouble("X Accel", false, 0.0);
+    m_simX = m_simDevice.CreateDouble("Y Accel", false, 0.0);
+    m_simZ = m_simDevice.CreateDouble("Z Accel", false, 0.0);
+  }
+
   m_spi.SetClockRate(3000000);
   m_spi.SetMSBFirst();
   m_spi.SetSampleDataOnTrailingEdge();
   m_spi.SetClockActiveLow();
   m_spi.SetChipSelectActiveLow();
 
-  // Validate the part ID
   uint8_t commands[3];
-  commands[0] = kRegRead;
-  commands[1] = kPartIdRegister;
-  commands[2] = 0;
-  m_spi.Transaction(commands, commands, 3);
-  if (commands[2] != 0xF2) {
-    DriverStation::ReportError("could not find ADXL362");
-    m_gsPerLSB = 0.0;
-    return;
+  if (!m_simDevice) {
+    // Validate the part ID
+    commands[0] = kRegRead;
+    commands[1] = kPartIdRegister;
+    commands[2] = 0;
+    m_spi.Transaction(commands, commands, 3);
+    if (commands[2] != 0xF2) {
+      DriverStation::ReportError("could not find ADXL362");
+      m_gsPerLSB = 0.0;
+      return;
+    }
   }
 
   SetRange(range);
@@ -90,6 +101,8 @@ void ADXL362::SetRange(Range range) {
   commands[2] =
       kFilterCtl_ODR_100Hz | static_cast<uint8_t>((range & 0x03) << 6);
   m_spi.Write(commands, 3);
+
+  if (m_simRange) m_simRange.Set(range);
 }
 
 double ADXL362::GetX() { return GetAcceleration(kAxis_X); }
@@ -100,6 +113,10 @@ double ADXL362::GetZ() { return GetAcceleration(kAxis_Z); }
 
 double ADXL362::GetAcceleration(ADXL362::Axes axis) {
   if (m_gsPerLSB == 0.0) return 0.0;
+
+  if (axis == kAxis_X && m_simX) return m_simX.Get();
+  if (axis == kAxis_Y && m_simY) return m_simY.Get();
+  if (axis == kAxis_Z && m_simZ) return m_simZ.Get();
 
   uint8_t buffer[4];
   uint8_t command[4] = {0, 0, 0, 0};
@@ -113,9 +130,15 @@ double ADXL362::GetAcceleration(ADXL362::Axes axis) {
 }
 
 ADXL362::AllAxes ADXL362::GetAccelerations() {
-  AllAxes data = AllAxes();
+  AllAxes data;
   if (m_gsPerLSB == 0.0) {
     data.XAxis = data.YAxis = data.ZAxis = 0.0;
+    return data;
+  }
+  if (m_simX && m_simY && m_simZ) {
+    data.XAxis = m_simX.Get();
+    data.YAxis = m_simY.Get();
+    data.ZAxis = m_simZ.Get();
     return data;
   }
 

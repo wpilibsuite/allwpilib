@@ -41,6 +41,7 @@ void InitializeHAL() {
   InitializePWMData();
   InitializeRelayData();
   InitializeRoboRioData();
+  InitializeSimDeviceData();
   InitializeSPIAccelerometerData();
   InitializeSPIData();
   InitializeAccelerometer();
@@ -69,6 +70,7 @@ void InitializeHAL() {
   InitializePWM();
   InitializeRelay();
   InitializeSerialPort();
+  InitializeSimDevice();
   InitializeSolenoid();
   InitializeSPI();
   InitializeThreads();

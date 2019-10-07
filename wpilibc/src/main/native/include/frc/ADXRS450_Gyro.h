@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+#include <hal/SimDevice.h>
+
 #include "frc/GyroBase.h"
 #include "frc/SPI.h"
 
@@ -93,6 +95,10 @@ class ADXRS450_Gyro : public GyroBase {
 
  private:
   SPI m_spi;
+
+  hal::SimDevice m_simDevice;
+  hal::SimDouble m_simAngle;
+  hal::SimDouble m_simRate;
 
   uint16_t ReadRegister(int reg);
 };

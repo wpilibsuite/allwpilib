@@ -54,6 +54,7 @@ set(EXTERNAL_HAL_FILE "" CACHE FILEPATH "Location to look for an external HAL CM
 option(USE_VCPKG_LIBUV "Use vcpkg libuv" OFF)
 option(USE_VCPKG_EIGEN "Use vcpkg eigen" OFF)
 option(FLAT_INSTALL_WPILIB "Use a flat install directory" OFF)
+option(WITH_SIMULATION_MODULES "build simulation modules" OFF)
 
 if (NOT WITHOUT_JAVA AND NOT BUILD_SHARED_LIBS)
     message(FATAL_ERROR "
@@ -124,6 +125,11 @@ if (NOT WITHOUT_CSCORE)
         add_subdirectory(wpilibc)
         add_subdirectory(myRobot)
     endif()
+endif()
+
+if (WITH_SIMULATION_MODULES AND NOT USE_EXTERNAL_HAL)
+    add_subdirectory(imgui)
+    add_subdirectory(simulation)
 endif()
 
 configure_file(wpilib-config.cmake.in ${CMAKE_BINARY_DIR}/wpilib-config.cmake )

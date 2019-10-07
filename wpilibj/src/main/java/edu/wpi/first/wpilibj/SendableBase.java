@@ -37,5 +37,7 @@ public abstract class SendableBase implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void close() {}
+  public void close() {
+    SendableRegistry.remove(this);
+  }
 }

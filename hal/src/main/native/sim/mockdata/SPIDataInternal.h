@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,7 +27,8 @@ class SPIData {
   int32_t ReadAutoReceivedData(uint32_t* buffer, int32_t numToRead,
                                double timeout, int32_t* status);
 
-  SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
+      false};
   SimCallbackRegistry<HAL_BufferCallback, GetReadName> read;
   SimCallbackRegistry<HAL_ConstBufferCallback, GetWriteName> write;
   SimCallbackRegistry<HAL_SpiReadAutoReceiveBufferCallback, GetAutoReceiveName>

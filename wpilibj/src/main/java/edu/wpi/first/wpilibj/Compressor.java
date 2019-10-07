@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * the safety provided by using the pressure switch and closed loop control. You can only turn off
  * closed loop control, thereby stopping the compressor from operating.
  */
-public class Compressor implements Sendable {
+public class Compressor implements Sendable, AutoCloseable {
   private int m_compressorHandle;
   private byte m_module;
 
@@ -51,6 +51,11 @@ public class Compressor implements Sendable {
    */
   public Compressor() {
     this(SensorUtil.getDefaultSolenoidModule());
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,8 +13,8 @@
 
 #include "SimulatorJNI.h"
 #include "hal/Types.h"
+#include "hal/Value.h"
 #include "hal/handles/UnlimitedHandleResource.h"
-#include "mockdata/HAL_Value.h"
 #include "mockdata/NotifyListener.h"
 
 using namespace wpi::java;
