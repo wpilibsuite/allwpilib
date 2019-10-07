@@ -133,7 +133,21 @@ public final class RuntimeDetector {
    * @return if os is bionic aarch64
    */
   public static boolean isAarch64Bionic() {
-    return false;
+    boolean isAarch64 = System.getProperty("os.arch").equals("aarch64");
+    try (BufferedReader reader = Files.newBufferedReader(Paths.get("/etc/os-release"))) {
+      String value = reader.readLine();
+      String version = "";
+      while (value != null) {
+        if (value.contains("VERSION=")) {
+          version = value;
+          break;
+        }
+        value = reader.readLine();
+      }
+      return version.contains("Bionic") && isAarch64;
+    } catch (IOException ex) {
+      return false;
+    }
   }
 
   public static boolean isLinux() {
