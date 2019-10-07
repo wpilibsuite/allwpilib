@@ -1154,7 +1154,8 @@ void UsbCameraImpl::SetQuirks() {
   wpi::StringRef desc = GetDescription(descbuf);
   m_lifecam_exposure =
       desc.endswith("LifeCam HD-3000") || desc.endswith("LifeCam Cinema (TM)");
-  m_ps3eyecam_exposure = desc.endswith("Camera-B4.04.27.1");
+  m_ps3eyecam_exposure =
+      desc.endswith("Camera-B4.04.27.1") || desc.endswith("Camera-B4.09.24.1");
 }
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
