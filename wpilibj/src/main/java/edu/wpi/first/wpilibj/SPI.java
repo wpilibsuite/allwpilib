@@ -50,12 +50,6 @@ public class SPI implements AutoCloseable {
     HAL.report(tResourceType.kResourceType_SPI, port.value);
   }
 
-
-  @Deprecated
-  public void free() {
-    close();
-  }
-
   @Override
   public void close() {
     if (m_accum != null) {

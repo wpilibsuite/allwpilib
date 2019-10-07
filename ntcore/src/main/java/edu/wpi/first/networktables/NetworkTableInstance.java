@@ -60,11 +60,6 @@ public final class NetworkTableInstance implements AutoCloseable {
     m_handle = handle;
   }
 
-  @Deprecated
-  public void free() {
-    close();
-  }
-
   /**
    * Destroys the instance (if created by {@link #create()}).
    */

@@ -653,11 +653,6 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
     m_maxOutput = maxOutput;
   }
 
-  @Deprecated
-  public void free() {
-    close();
-  }
-
   /**
    * Free the speed controllers if they were allocated locally.
    */

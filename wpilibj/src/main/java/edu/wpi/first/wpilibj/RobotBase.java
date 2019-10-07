@@ -105,10 +105,6 @@ public abstract class RobotBase implements AutoCloseable {
     return m_threadId;
   }
 
-  @Deprecated
-  public void free() {
-  }
-
   @Override
   public void close() {
   }

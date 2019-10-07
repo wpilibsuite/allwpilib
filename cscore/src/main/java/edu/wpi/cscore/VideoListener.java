@@ -27,11 +27,6 @@ public class VideoListener implements AutoCloseable {
     m_handle = CameraServerJNI.addListener(listener, eventMask, immediateNotify);
   }
 
-  @Deprecated
-  public void free() {
-    close();
-  }
-
   @Override
   public synchronized void close() {
     if (m_handle != 0) {

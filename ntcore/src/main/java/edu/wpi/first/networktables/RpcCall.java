@@ -22,11 +22,6 @@ public final class RpcCall implements AutoCloseable {
     m_call = call;
   }
 
-  @Deprecated
-  public void free() {
-    close();
-  }
-
   /**
    * Cancels the result if no other action taken.
    */
