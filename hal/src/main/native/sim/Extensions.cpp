@@ -89,7 +89,7 @@ int HAL_LoadExtensions(void) {
   const char* e = std::getenv("HALSIM_EXTENSIONS");
   if (!e) {
     wpi::outs() << "No extensions found\n";
-    wpi::outs().flush(); 
+    wpi::outs().flush();
     return rc;
   }
   wpi::StringRef env{e};
