@@ -431,7 +431,7 @@ public class SendableRegistry {
           if (cause != null) {
             throwable = cause;
           }
-          DriverStation.reportWarning(
+          DriverStation.reportError(
               "Unhandled exception calling LiveWindow for " + comp.m_name + ": "
                   + throwable.toString(), false);
           comp.m_liveWindow = false;
