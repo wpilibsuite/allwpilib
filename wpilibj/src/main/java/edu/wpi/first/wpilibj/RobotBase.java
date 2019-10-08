@@ -38,7 +38,7 @@ public abstract class RobotBase implements AutoCloseable {
    * The ID of the main Java thread.
    */
   // This is usually 1, but it is best to make sure
-  public static final long MAIN_THREAD_ID = Thread.currentThread().getId();
+  private static long m_threadId = -1;
 
   private static void setupCameraServerShared() {
     CameraServerShared shared = new CameraServerShared() {
@@ -65,7 +65,7 @@ public abstract class RobotBase implements AutoCloseable {
 
       @Override
       public Long getRobotMainThreadId() {
-        return MAIN_THREAD_ID;
+        return RobotBase.getMainThreadId();
       }
 
       @Override
@@ -90,6 +90,7 @@ public abstract class RobotBase implements AutoCloseable {
    */
   protected RobotBase() {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    m_threadId = Thread.currentThread().getId();
     setupCameraServerShared();
     inst.setNetworkIdentity("Robot");
     inst.startServer("/home/lvuser/networktables.ini");
@@ -98,6 +99,10 @@ public abstract class RobotBase implements AutoCloseable {
 
     LiveWindow.setEnabled(false);
     Shuffleboard.disableActuatorWidgets();
+  }
+
+  public static long getMainThreadId() {
+    return m_threadId;
   }
 
   @Deprecated
