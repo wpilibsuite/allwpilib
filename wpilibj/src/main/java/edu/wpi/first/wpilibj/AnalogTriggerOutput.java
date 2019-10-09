@@ -40,7 +40,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * the averaging engine may help with this, but rotational speeds of the sensor will then be
  * limited.
  */
-public class AnalogTriggerOutput extends DigitalSource {
+public class AnalogTriggerOutput extends DigitalSource implements Sendable {
   /**
    * Exceptions dealing with improper operation of the Analog trigger output.
    */

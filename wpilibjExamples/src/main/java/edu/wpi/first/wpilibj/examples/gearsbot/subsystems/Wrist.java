@@ -9,18 +9,19 @@ package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
 /**
- * The wrist subsystem is like the elevator, but with a rotational joint instead
- * of a linear joint.
+ * The wrist subsystem is like the elevator, but with a rotational joint instead of a linear joint.
  */
 public class Wrist extends PIDSubsystem {
   private final Victor m_motor;
   private final AnalogPotentiometer m_pot;
+  private double m_setpoint;
 
   private static final double kP_real = 1;
   private static final double kP_simulation = 0.05;
@@ -29,11 +30,11 @@ public class Wrist extends PIDSubsystem {
    * Create a new wrist subsystem.
    */
   public Wrist() {
-    super(kP_real, 0, 0);
+    super(new PIDController(kP_real, 0, 0));
     if (Robot.isSimulation()) { // Check for simulation and update PID values
-      getPIDController().setPID(kP_simulation, 0, 0, 0);
+      getController().setPID(kP_simulation, 0, 0);
     }
-    setAbsoluteTolerance(2.5);
+    getController().setTolerance(2.5);
 
     m_motor = new Victor(6);
 
@@ -50,10 +51,6 @@ public class Wrist extends PIDSubsystem {
     addChild("Pot", m_pot);
   }
 
-  @Override
-  public void initDefaultCommand() {
-  }
-
   /**
    * The log method puts interesting information to the SmartDashboard.
    */
@@ -62,20 +59,37 @@ public class Wrist extends PIDSubsystem {
   }
 
   /**
-   * Use the potentiometer as the PID sensor. This method is automatically
-   * called by the subsystem.
+   * Use the potentiometer as the PID sensor. This method is automatically called by the subsystem.
    */
   @Override
-  protected double returnPIDInput() {
+  public double getMeasurement() {
     return m_pot.get();
   }
 
   /**
-   * Use the motor as the PID output. This method is automatically called by
-   * the subsystem.
+   * Use the motor as the PID output. This method is automatically called by the subsystem.
    */
   @Override
-  protected void usePIDOutput(double power) {
-    m_motor.set(power);
+  public void useOutput(double output) {
+    m_motor.set(output);
+  }
+
+  /**
+   * Returns the setpoint used by the PIDController.
+   *
+   * @return The setpoint for the PIDController.
+   */
+  @Override
+  public double getSetpoint() {
+    return m_setpoint;
+  }
+
+  /**
+   * Sets the setpoint used by the PIDController.
+   *
+   * @param setpoint The setpoint for the PIDController.
+   */
+  public void setSetpoint(double setpoint) {
+    m_setpoint = setpoint;
   }
 }

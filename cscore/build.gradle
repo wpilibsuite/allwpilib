@@ -5,9 +5,13 @@ ext {
     devMain = 'edu.wpi.cscore.DevMain'
 }
 
-if (OperatingSystem.current().isMacOsX()) {
-    apply plugin: 'objective-cpp'
-}
+// Removed because having the objective-cpp plugin added breaks
+// embedded tools and its toolchain check. It causes an obj-cpp
+// source set to be added to all binaries, even cross binaries
+// with no support.
+// if (OperatingSystem.current().isMacOsX()) {
+//     apply plugin: 'objective-cpp'
+// }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
@@ -22,16 +26,16 @@ ext {
     splitSetup = {
         if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
-                macObjCpp(ObjectiveCppSourceSet) {
-                    source {
-                        srcDirs = ['src/main/native/objcpp']
-                        include '**/*.mm'
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/main/native/include'
-                        include '**/*.h'
-                    }
-                }
+                // macObjCpp(ObjectiveCppSourceSet) {
+                //     source {
+                //         srcDirs = ['src/main/native/objcpp']
+                //         include '**/*.mm'
+                //     }
+                //     exportedHeaders {
+                //         srcDirs 'src/main/native/include'
+                //         include '**/*.h'
+                //     }
+                // }
                 cscoreMacCpp(CppSourceSet) {
                     source {
                         srcDirs 'src/main/native/osx'

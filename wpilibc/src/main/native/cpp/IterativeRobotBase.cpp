@@ -24,6 +24,9 @@
 using namespace frc;
 
 IterativeRobotBase::IterativeRobotBase(double period)
+    : IterativeRobotBase(units::second_t(period)) {}
+
+IterativeRobotBase::IterativeRobotBase(units::second_t period)
     : m_period(period),
       m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
 
@@ -171,7 +174,8 @@ void IterativeRobotBase::PrintLoopOverrunMessage() {
   wpi::SmallString<128> str;
   wpi::raw_svector_ostream buf(str);
 
-  buf << "Loop time of " << wpi::format("%.6f", m_period) << "s overrun\n";
+  buf << "Loop time of " << wpi::format("%.6f", m_period.to<double>())
+      << "s overrun\n";
 
   DriverStation::ReportWarning(str);
 }

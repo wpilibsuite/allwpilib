@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+#include <units/units.h>
 
 namespace frc {
 /**
@@ -19,16 +20,36 @@ struct Twist2d {
   /**
    * Linear "dx" component
    */
-  double dx = 0;
+  units::meter_t dx = 0_m;
 
   /**
    * Linear "dy" component
    */
-  double dy = 0;
+  units::meter_t dy = 0_m;
 
   /**
    * Angular "dtheta" component (radians)
    */
-  double dtheta = 0;
+  units::radian_t dtheta = 0_rad;
+
+  /**
+   * Checks equality between this Twist2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
+  bool operator==(const Twist2d& other) const {
+    return units::math::abs(dx - other.dx) < 1E-9_m &&
+           units::math::abs(dy - other.dy) < 1E-9_m &&
+           units::math::abs(dtheta - other.dtheta) < 1E-9_rad;
+  }
+
+  /**
+   * Checks inequality between this Twist2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are not equal.
+   */
+  bool operator!=(const Twist2d& other) const { return !operator==(other); }
 };
 }  // namespace frc

@@ -9,12 +9,9 @@
 
 #include <memory>
 
-#include <wpi/Twine.h>
-#include <wpi/deprecated.h>
-
-#include "frc/smartdashboard/Sendable.h"
-
 namespace frc {
+
+class Sendable;
 
 /**
  * The LiveWindow class is the public interface for putting sensors and
@@ -32,44 +29,6 @@ class LiveWindow {
    * regardless of how many times GetInstance is called.
    */
   static LiveWindow* GetInstance();
-
-  /**
-   * Add a component to the LiveWindow.
-   *
-   * @param sendable component to add
-   */
-  void Add(std::shared_ptr<Sendable> component);
-
-  /**
-   * Add a component to the LiveWindow.
-   *
-   * @param sendable component to add
-   */
-  void Add(Sendable* component);
-
-  /**
-   * Add a child component to a component.
-   *
-   * @param parent parent component
-   * @param child child component
-   */
-  void AddChild(Sendable* parent, std::shared_ptr<Sendable> component);
-
-  /**
-   * Add a child component to a component.
-   *
-   * @param parent parent component
-   * @param child child component
-   */
-  void AddChild(Sendable* parent, void* component);
-
-  /**
-   * Remove the component from the LiveWindow.
-   *
-   * @param sendable component to remove
-   * @return true if the component was removed; false if it was not present
-   */
-  bool Remove(Sendable* component);
 
   /**
    * Enable telemetry for a single component.

@@ -4846,8 +4846,11 @@ namespace std
 using namespace units::literals;
 
 namespace units {
+using namespace acceleration;
+using namespace angular_velocity;
 using namespace length;
 using namespace time;
 using namespace velocity;
 using namespace acceleration;
+using namespace angle;
 }  // namespace units

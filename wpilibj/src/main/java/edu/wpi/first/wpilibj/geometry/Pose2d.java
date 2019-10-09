@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.geometry;
 
+import java.util.Objects;
+
 /**
  * Represents a 2d pose containing translational and rotational elements.
  */
@@ -65,6 +67,17 @@ public class Pose2d {
   }
 
   /**
+   * Returns the Transform2d that maps the one pose to another.
+   *
+   * @param other The initial pose of the transformation.
+   * @return The transform that maps the other pose to the current pose.
+   */
+  public Transform2d minus(Pose2d other) {
+    final var pose = this.relativeTo(other);
+    return new Transform2d(pose.getTranslation(), pose.getRotation());
+  }
+
+  /**
    * Returns the translation component of the transformation.
    *
    * @return The translational component of the pose.
@@ -91,7 +104,7 @@ public class Pose2d {
    */
   public Pose2d transformBy(Transform2d other) {
     return new Pose2d(m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
-            m_rotation.plus(other.getRotation()));
+        m_rotation.plus(other.getRotation()));
   }
 
   /**
@@ -150,8 +163,56 @@ public class Pose2d {
       c = (1 - cosTheta) / dtheta;
     }
     var transform = new Transform2d(new Translation2d(dx * s - dy * c, dx * c + dy * s),
-            new Rotation2d(cosTheta, sinTheta));
+        new Rotation2d(cosTheta, sinTheta));
 
     return this.plus(transform);
+  }
+
+  /**
+   * Returns a Twist2d that maps this pose to the end pose. If c is the output
+   * of a.Log(b), then a.Exp(c) would yield b.
+   *
+   * @param end The end pose for the transformation.
+   * @return The twist that maps this to end.
+   */
+  public Twist2d log(Pose2d end) {
+    final var transform = end.relativeTo(this);
+    final var dtheta = transform.getRotation().getRadians();
+    final var halfDtheta = dtheta / 2.0;
+
+    final var cosMinusOne = transform.getRotation().getCos() - 1;
+
+    double halfThetaByTanOfHalfDtheta;
+    if (Math.abs(cosMinusOne) < 1E-9) {
+      halfThetaByTanOfHalfDtheta = 1.0 - 1.0 / 12.0 * dtheta * dtheta;
+    } else {
+      halfThetaByTanOfHalfDtheta = -(halfDtheta * transform.getRotation().getSin()) / cosMinusOne;
+    }
+
+    Translation2d translationPart = transform.getTranslation().rotateBy(
+        new Rotation2d(halfThetaByTanOfHalfDtheta, -halfDtheta)
+    ).times(Math.hypot(halfThetaByTanOfHalfDtheta, halfDtheta));
+
+    return new Twist2d(translationPart.getX(), translationPart.getY(), dtheta);
+  }
+
+  /**
+   * Checks equality between this Pose2d and another object.
+   *
+   * @param obj The other object.
+   * @return Whether the two objects are equal or not.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Pose2d) {
+      return ((Pose2d) obj).m_translation.equals(m_translation)
+          && ((Pose2d) obj).m_rotation.equals(m_rotation);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_translation, m_rotation);
   }
 }

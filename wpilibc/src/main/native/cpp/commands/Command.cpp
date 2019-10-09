@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,6 +16,7 @@
 #include "frc/commands/Scheduler.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -31,7 +32,7 @@ Command::Command(Subsystem& subsystem) : Command("", -1.0) {
   Requires(&subsystem);
 }
 
-Command::Command(const wpi::Twine& name, double timeout) : SendableBase(false) {
+Command::Command(const wpi::Twine& name, double timeout) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0.0 && timeout != -1.0)
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
@@ -41,9 +42,10 @@ Command::Command(const wpi::Twine& name, double timeout) : SendableBase(false) {
   // If name contains an empty string
   if (name.isTriviallyEmpty() ||
       (name.isSingleStringRef() && name.getSingleStringRef().empty())) {
-    SetName("Command_" + wpi::Twine(typeid(*this).name()));
+    SendableRegistry::GetInstance().Add(
+        this, "Command_" + wpi::Twine(typeid(*this).name()));
   } else {
-    SetName(name);
+    SendableRegistry::GetInstance().Add(this, name);
   }
 }
 
@@ -228,9 +230,27 @@ void Command::StartRunning() {
 
 void Command::StartTiming() { m_startTime = Timer::GetFPGATimestamp(); }
 
+std::string Command::GetName() const {
+  return SendableRegistry::GetInstance().GetName(this);
+}
+
+void Command::SetName(const wpi::Twine& name) {
+  SendableRegistry::GetInstance().SetName(this, name);
+}
+
+std::string Command::GetSubsystem() const {
+  return SendableRegistry::GetInstance().GetSubsystem(this);
+}
+
+void Command::SetSubsystem(const wpi::Twine& name) {
+  SendableRegistry::GetInstance().SetSubsystem(this, name);
+}
+
 void Command::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
-  builder.AddStringProperty(".name", [=]() { return GetName(); }, nullptr);
+  builder.AddStringProperty(
+      ".name", [=]() { return SendableRegistry::GetInstance().GetName(this); },
+      nullptr);
   builder.AddBooleanProperty("running", [=]() { return IsRunning(); },
                              [=](bool value) {
                                if (value) {

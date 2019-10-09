@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class Pose2dTest {
   private static final double kEpsilon = 1E-9;
@@ -42,6 +43,33 @@ class Pose2dTest {
             kEpsilon),
         () -> assertEquals(finalRelativeToInitial.getTranslation().getY(), 0.0, kEpsilon),
         () -> assertEquals(finalRelativeToInitial.getRotation().getDegrees(), 0.0, kEpsilon)
+    );
+  }
+
+  @Test
+  void testEquality() {
+    var one = new Pose2d(0.0, 5.0, Rotation2d.fromDegrees(43.0));
+    var two = new Pose2d(0.0, 5.0, Rotation2d.fromDegrees(43.0));
+    assertEquals(one, two);
+  }
+
+  @Test
+  void testInequality() {
+    var one = new Pose2d(0.0, 5.0, Rotation2d.fromDegrees(43.0));
+    var two = new Pose2d(0.0, 1.524, Rotation2d.fromDegrees(43.0));
+    assertNotEquals(one, two);
+  }
+
+  void testMinus() {
+    var initial = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(45.0));
+    var last = new Pose2d(5.0, 5.0, Rotation2d.fromDegrees(45.0));
+
+    final var transform = last.minus(initial);
+
+    assertAll(
+        () -> assertEquals(transform.getTranslation().getX(), 5.0 * Math.sqrt(2.0), kEpsilon),
+        () -> assertEquals(transform.getTranslation().getY(), 0.0, kEpsilon),
+        () -> assertEquals(transform.getRotation().getDegrees(), 0.0, kEpsilon)
     );
   }
 }

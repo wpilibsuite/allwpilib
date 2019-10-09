@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,9 +10,7 @@
 #include <frc/Joystick.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-#include "commands/TankDriveWithJoystick.h"
-
-DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
+DriveTrain::DriveTrain() {
 // Encoders may measure differently in the real world and in
 // simulation. In this example the robot moves 0.042 barleycorns
 // per tick in the real world, but the simulated encoders
@@ -28,20 +26,16 @@ DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
   m_rightEncoder.SetDistancePerPulse(static_cast<double>(4.0 / 12.0 * M_PI) /
                                      360.0);
 #endif
-
+  SetName("DriveTrain");
   // Let's show everything on the LiveWindow
-  // AddChild("Front_Left Motor", m_frontLeft);
-  // AddChild("Rear Left Motor", m_rearLeft);
-  // AddChild("Front Right Motor", m_frontRight);
-  // AddChild("Rear Right Motor", m_rearRight);
-  AddChild("Left Encoder", m_leftEncoder);
-  AddChild("Right Encoder", m_rightEncoder);
-  AddChild("Rangefinder", m_rangefinder);
-  AddChild("Gyro", m_gyro);
-}
-
-void DriveTrain::InitDefaultCommand() {
-  SetDefaultCommand(new TankDriveWithJoystick());
+  AddChild("Front_Left Motor", &m_frontLeft);
+  AddChild("Rear Left Motor", &m_rearLeft);
+  AddChild("Front Right Motor", &m_frontRight);
+  AddChild("Rear Right Motor", &m_rearRight);
+  AddChild("Left Encoder", &m_leftEncoder);
+  AddChild("Right Encoder", &m_rightEncoder);
+  AddChild("Rangefinder", &m_rangefinder);
+  AddChild("Gyro", &m_gyro);
 }
 
 void DriveTrain::Log() {

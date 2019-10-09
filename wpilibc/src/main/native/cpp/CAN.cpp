@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -52,18 +52,6 @@ CAN::~CAN() {
   }
 }
 
-CAN::CAN(CAN&& rhs) : ErrorBase(std::move(rhs)) {
-  std::swap(m_handle, rhs.m_handle);
-}
-
-CAN& CAN::operator=(CAN&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-
-  std::swap(m_handle, rhs.m_handle);
-
-  return *this;
-}
-
 void CAN::WritePacket(const uint8_t* data, int length, int apiId) {
   int32_t status = 0;
   HAL_WriteCANPacket(m_handle, data, length, apiId, &status);
@@ -74,6 +62,12 @@ void CAN::WritePacketRepeating(const uint8_t* data, int length, int apiId,
                                int repeatMs) {
   int32_t status = 0;
   HAL_WriteCANPacketRepeating(m_handle, data, length, apiId, repeatMs, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+void CAN::WriteRTRFrame(int length, int apiId) {
+  int32_t status = 0;
+  HAL_WriteCANRTRFrame(m_handle, length, apiId, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -117,23 +111,6 @@ bool CAN::ReadPacketTimeout(int apiId, int timeoutMs, CANData* data) {
   int32_t status = 0;
   HAL_ReadCANPacketTimeout(m_handle, apiId, data->data, &data->length,
                            &data->timestamp, timeoutMs, &status);
-  if (status == HAL_CAN_TIMEOUT ||
-      status == HAL_ERR_CANSessionMux_MessageNotFound) {
-    return false;
-  }
-  if (status != 0) {
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-    return false;
-  } else {
-    return true;
-  }
-}
-
-bool CAN::ReadPeriodicPacket(int apiId, int timeoutMs, int periodMs,
-                             CANData* data) {
-  int32_t status = 0;
-  HAL_ReadCANPeriodicPacket(m_handle, apiId, data->data, &data->length,
-                            &data->timestamp, timeoutMs, periodMs, &status);
   if (status == HAL_CAN_TIMEOUT ||
       status == HAL_ERR_CANSessionMux_MessageNotFound) {
     return false;

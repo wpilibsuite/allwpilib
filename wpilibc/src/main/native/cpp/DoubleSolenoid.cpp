@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,6 +16,7 @@
 #include "frc/SensorUtil.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -75,35 +76,14 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
              m_moduleNumber);
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel,
              m_moduleNumber);
-  SetName("DoubleSolenoid", m_moduleNumber, m_forwardChannel);
+
+  SendableRegistry::GetInstance().AddLW(this, "DoubleSolenoid", m_moduleNumber,
+                                        m_forwardChannel);
 }
 
 DoubleSolenoid::~DoubleSolenoid() {
   HAL_FreeSolenoidPort(m_forwardHandle);
   HAL_FreeSolenoidPort(m_reverseHandle);
-}
-
-DoubleSolenoid::DoubleSolenoid(DoubleSolenoid&& rhs)
-    : SolenoidBase(std::move(rhs)),
-      m_forwardChannel(std::move(rhs.m_forwardChannel)),
-      m_reverseChannel(std::move(rhs.m_reverseChannel)),
-      m_forwardMask(std::move(rhs.m_forwardMask)),
-      m_reverseMask(std::move(rhs.m_reverseMask)) {
-  std::swap(m_forwardHandle, rhs.m_forwardHandle);
-  std::swap(m_reverseHandle, rhs.m_reverseHandle);
-}
-
-DoubleSolenoid& DoubleSolenoid::operator=(DoubleSolenoid&& rhs) {
-  SolenoidBase::operator=(std::move(rhs));
-
-  m_forwardChannel = std::move(rhs.m_forwardChannel);
-  m_reverseChannel = std::move(rhs.m_reverseChannel);
-  m_forwardMask = std::move(rhs.m_forwardMask);
-  m_reverseMask = std::move(rhs.m_reverseMask);
-  std::swap(m_forwardHandle, rhs.m_forwardHandle);
-  std::swap(m_reverseHandle, rhs.m_reverseHandle);
-
-  return *this;
 }
 
 void DoubleSolenoid::Set(Value value) {

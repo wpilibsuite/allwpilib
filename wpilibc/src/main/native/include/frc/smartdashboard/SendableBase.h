@@ -7,74 +7,22 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
+#include <wpi/deprecated.h>
 
 #include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
-class SendableBase : public Sendable {
+class SendableBase : public Sendable, public SendableHelper<SendableBase> {
  public:
   /**
    * Creates an instance of the sensor base.
    *
    * @param addLiveWindow if true, add this Sendable to LiveWindow
    */
+  WPI_DEPRECATED("use Sendable and SendableHelper")
   explicit SendableBase(bool addLiveWindow = true);
-
-  ~SendableBase() override;
-
-  SendableBase(const SendableBase&) = default;
-  SendableBase& operator=(const SendableBase&) = default;
-  SendableBase(SendableBase&&);
-  SendableBase& operator=(SendableBase&&);
-
-  using Sendable::SetName;
-
-  std::string GetName() const final;
-  void SetName(const wpi::Twine& name) final;
-  std::string GetSubsystem() const final;
-  void SetSubsystem(const wpi::Twine& subsystem) final;
-
- protected:
-  /**
-   * Add a child component.
-   *
-   * @param child child component
-   */
-  void AddChild(std::shared_ptr<Sendable> child);
-
-  /**
-   * Add a child component.
-   *
-   * @param child child component
-   */
-  void AddChild(void* child);
-
-  /**
-   * Sets the name of the sensor with a channel number.
-   *
-   * @param moduleType A string that defines the module name in the label for
-   *                   the value
-   * @param channel    The channel number the device is plugged into
-   */
-  void SetName(const wpi::Twine& moduleType, int channel);
-
-  /**
-   * Sets the name of the sensor with a module and channel number.
-   *
-   * @param moduleType   A string that defines the module name in the label for
-   *                     the value
-   * @param moduleNumber The number of the particular module type
-   * @param channel      The channel number the device is plugged into (usually
-   * PWM)
-   */
-  void SetName(const wpi::Twine& moduleType, int moduleNumber, int channel);
-
- private:
-  std::string m_name;
-  std::string m_subsystem = "Ungrouped";
 };
 
 }  // namespace frc

@@ -15,6 +15,7 @@
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 #include "frc/shuffleboard/ShuffleboardLayout.h"
 #include "frc/shuffleboard/SimpleWidget.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -80,10 +81,11 @@ ComplexWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
 }
 
 ComplexWidget& ShuffleboardContainer::Add(Sendable& sendable) {
-  if (sendable.GetName().empty()) {
+  auto name = SendableRegistry::GetInstance().GetName(&sendable);
+  if (name.empty()) {
     wpi::outs() << "Sendable must have a name\n";
   }
-  return Add(sendable.GetName(), sendable);
+  return Add(name, sendable);
 }
 
 ComplexWidget& ShuffleboardContainer::Add(const cs::VideoSource& video) {

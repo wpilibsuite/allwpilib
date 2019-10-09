@@ -1,13 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
-
-#ifndef __FRC_ROBORIO__
 
 #include "NotifyListener.h"
 #include "hal/Types.h"
@@ -24,6 +22,8 @@ int32_t HALSIM_RegisterDIOInitializedCallback(int32_t index,
 void HALSIM_CancelDIOInitializedCallback(int32_t index, int32_t uid);
 HAL_Bool HALSIM_GetDIOInitialized(int32_t index);
 void HALSIM_SetDIOInitialized(int32_t index, HAL_Bool initialized);
+
+HAL_SimDeviceHandle HALSIM_GetDIOSimDevice(int32_t index);
 
 int32_t HALSIM_RegisterDIOValueCallback(int32_t index,
                                         HAL_NotifyCallback callback,
@@ -60,6 +60,4 @@ void HALSIM_RegisterDIOAllCallbacks(int32_t index, HAL_NotifyCallback callback,
 
 #ifdef __cplusplus
 }  // extern "C"
-#endif
-
 #endif

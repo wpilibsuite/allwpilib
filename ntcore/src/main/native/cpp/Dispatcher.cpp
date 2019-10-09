@@ -323,7 +323,7 @@ void DispatcherBase::DispatchThreadMain() {
       bool reconnect = false;
 
       if (++count > 10) {
-        DEBUG("dispatch running " << m_connections.size() << " connections");
+        DEBUG0("dispatch running " << m_connections.size() << " connections");
         count = 0;
       }
 
@@ -379,8 +379,8 @@ void DispatcherBase::ServerThreadMain() {
       m_networkMode = NT_NET_MODE_NONE;
       return;
     }
-    DEBUG("server: client connection from " << stream->getPeerIP() << " port "
-                                            << stream->getPeerPort());
+    DEBUG0("server: client connection from " << stream->getPeerIP() << " port "
+                                             << stream->getPeerPort());
 
     // add to connections list
     using namespace std::placeholders;
@@ -430,13 +430,13 @@ void DispatcherBase::ClientThreadMain() {
     }
 
     // try to connect (with timeout)
-    DEBUG("client trying to connect");
+    DEBUG0("client trying to connect");
     auto stream = connect();
     if (!stream) {
       m_networkMode = NT_NET_MODE_CLIENT | NT_NET_MODE_FAILURE;
       continue;  // keep retrying
     }
-    DEBUG("client connected");
+    DEBUG0("client connected");
     m_networkMode = NT_NET_MODE_CLIENT;
 
     std::unique_lock lock(m_user_mutex);
@@ -474,14 +474,14 @@ bool DispatcherBase::ClientHandshake(
   }
 
   // send client hello
-  DEBUG("client: sending hello");
+  DEBUG0("client: sending hello");
   send_msgs(Message::ClientHello(self_id));
 
   // wait for response
   auto msg = get_msg();
   if (!msg) {
     // disconnected, retry
-    DEBUG("client: server disconnected before first response");
+    DEBUG0("client: server disconnected before first response");
     return false;
   }
 
@@ -505,7 +505,7 @@ bool DispatcherBase::ClientHandshake(
   for (;;) {
     if (!msg) {
       // disconnected, retry
-      DEBUG("client: server disconnected during initial entries");
+      DEBUG0("client: server disconnected during initial entries");
       return false;
     }
     DEBUG4("received init str=" << msg->str() << " id=" << msg->id()
@@ -518,9 +518,9 @@ bool DispatcherBase::ClientHandshake(
     }
     if (!msg->Is(Message::kEntryAssign)) {
       // unexpected message
-      DEBUG("client: received message ("
-            << msg->type()
-            << ") other than entry assignment during initial handshake");
+      DEBUG0("client: received message ("
+             << msg->type()
+             << ") other than entry assignment during initial handshake");
       return false;
     }
     incoming.emplace_back(std::move(msg));
@@ -549,18 +549,18 @@ bool DispatcherBase::ServerHandshake(
   // Wait for the client to send us a hello.
   auto msg = get_msg();
   if (!msg) {
-    DEBUG("server: client disconnected before sending hello");
+    DEBUG0("server: client disconnected before sending hello");
     return false;
   }
   if (!msg->Is(Message::kClientHello)) {
-    DEBUG("server: client initial message was not client hello");
+    DEBUG0("server: client initial message was not client hello");
     return false;
   }
 
   // Check that the client requested version is not too high.
   unsigned int proto_rev = msg->id();
   if (proto_rev > 0x0300) {
-    DEBUG("server: client requested proto > 0x0300");
+    DEBUG0("server: client requested proto > 0x0300");
     send_msgs(Message::ProtoUnsup());
     return false;
   }
@@ -568,7 +568,7 @@ bool DispatcherBase::ServerHandshake(
   if (proto_rev >= 0x0300) conn.set_remote_id(msg->str());
 
   // Set the proto version to the client requested version
-  DEBUG("server: client protocol " << proto_rev);
+  DEBUG0("server: client protocol " << proto_rev);
   conn.set_proto_rev(proto_rev);
 
   // Send initial set of assignments
@@ -587,7 +587,7 @@ bool DispatcherBase::ServerHandshake(
   outgoing.emplace_back(Message::ServerHelloDone());
 
   // Batch transmit
-  DEBUG("server: sending initial assignments");
+  DEBUG0("server: sending initial assignments");
   send_msgs(outgoing);
 
   // In proto rev 3.0 and later, the handshake concludes with a client hello
@@ -601,7 +601,7 @@ bool DispatcherBase::ServerHandshake(
     for (;;) {
       if (!msg) {
         // disconnected, retry
-        DEBUG("server: disconnected waiting for initial entries");
+        DEBUG0("server: disconnected waiting for initial entries");
         return false;
       }
       if (msg->Is(Message::kClientHelloDone)) break;
@@ -612,9 +612,9 @@ bool DispatcherBase::ServerHandshake(
       }
       if (!msg->Is(Message::kEntryAssign)) {
         // unexpected message
-        DEBUG("server: received message ("
-              << msg->type()
-              << ") other than entry assignment during initial handshake");
+        DEBUG0("server: received message ("
+               << msg->type()
+               << ") other than entry assignment during initial handshake");
         return false;
       }
       incoming.push_back(msg);

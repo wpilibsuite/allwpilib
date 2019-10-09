@@ -132,6 +132,8 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
 
     // Then the counter should be at 50
     assertEquals("Analog trigger counter did not count 50 ticks", 50, counter.get());
+
+    counter.close();
   }
 
   @Test(expected = RuntimeException.class)

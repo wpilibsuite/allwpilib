@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,7 @@
 #include <wpi/DenseMap.h>
 
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -33,10 +34,10 @@ SendableCameraWrapper& SendableCameraWrapper::Wrap(CS_Source source) {
 
 SendableCameraWrapper::SendableCameraWrapper(CS_Source source,
                                              const private_init&)
-    : SendableBase(false), m_uri(kProtocol) {
+    : m_uri(kProtocol) {
   CS_Status status = 0;
   auto name = cs::GetSourceName(source, &status);
-  SetName(name);
+  SendableRegistry::GetInstance().Add(this, name);
   m_uri += name;
 }
 

@@ -21,6 +21,7 @@
 #include "frc/commands/Command.h"
 #include "frc/commands/Subsystem.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -182,8 +183,9 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
     if (m_impl->runningCommandsChanged) {
       m_impl->commandsBuf.resize(0);
       m_impl->idsBuf.resize(0);
+      auto& registry = SendableRegistry::GetInstance();
       for (const auto& command : m_impl->commands) {
-        m_impl->commandsBuf.emplace_back(command->GetName());
+        m_impl->commandsBuf.emplace_back(registry.GetName(command));
         m_impl->idsBuf.emplace_back(command->GetID());
       }
       nt::NetworkTableEntry(namesEntry).SetStringArray(m_impl->commandsBuf);
@@ -195,7 +197,7 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
 Scheduler::Scheduler() : m_impl(new Impl) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand_Scheduler);
-  SetName("Scheduler");
+  SendableRegistry::GetInstance().AddLW(this, "Scheduler");
 }
 
 Scheduler::~Scheduler() {}

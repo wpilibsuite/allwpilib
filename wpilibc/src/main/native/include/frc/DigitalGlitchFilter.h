@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,7 +15,8 @@
 
 #include "frc/DigitalSource.h"
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -29,7 +30,9 @@ class Counter;
  * filter. The filter lets the user configure the time that an input must remain
  * high or low before it is classified as high or low.
  */
-class DigitalGlitchFilter : public ErrorBase, public SendableBase {
+class DigitalGlitchFilter : public ErrorBase,
+                            public Sendable,
+                            public SendableHelper<DigitalGlitchFilter> {
  public:
   DigitalGlitchFilter();
   ~DigitalGlitchFilter() override;

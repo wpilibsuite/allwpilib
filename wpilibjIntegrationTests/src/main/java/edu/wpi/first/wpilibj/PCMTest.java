@@ -63,8 +63,6 @@ public class PCMTest extends AbstractComsSetup {
 
   @AfterClass
   public static void tearDownAfterClass() {
-    compressor.close();
-
     fakePressureSwitch.close();
     fakeCompressor.close();
 

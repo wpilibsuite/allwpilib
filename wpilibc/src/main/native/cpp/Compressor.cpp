@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,6 +14,7 @@
 
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -28,7 +29,7 @@ Compressor::Compressor(int pcmID) : m_module(pcmID) {
   SetClosedLoopControl(true);
 
   HAL_Report(HALUsageReporting::kResourceType_Compressor, pcmID);
-  SetName("Compressor", pcmID);
+  SendableRegistry::GetInstance().AddLW(this, "Compressor", pcmID);
 }
 
 void Compressor::Start() {

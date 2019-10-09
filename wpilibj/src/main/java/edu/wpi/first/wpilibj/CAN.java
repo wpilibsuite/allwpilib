@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -90,6 +90,17 @@ public class CAN implements Closeable {
   }
 
   /**
+   * Write an RTR frame to the CAN device with a specific ID. This ID is 10 bits.
+   * The length by spec must match what is returned by the responding device
+   *
+   * @param length The length to request (0 to 8)
+   * @param apiId The API ID to write.
+   */
+  public void writeRTRFrame(int length, int apiId) {
+    CANAPIJNI.writeCANRTRFrame(m_handle, length, apiId);
+  }
+
+  /**
    * Stop a repeating packet with a specific ID. This ID is 10 bits.
    *
    * @param apiId The API ID to stop repeating
@@ -133,23 +144,5 @@ public class CAN implements Closeable {
    */
   public boolean readPacketTimeout(int apiId, int timeoutMs, CANData data) {
     return CANAPIJNI.readCANPacketTimeout(m_handle, apiId, timeoutMs, data);
-  }
-
-  /**
-   * Read a CAN packet. The will return the last packet received until the
-   * packet is older then the requested timeout. Then it will return false.
-   * The period parameter is used when you know the packet is sent at specific
-   * intervals, so calls will not attempt to read a new packet from the
-   * network until that period has passed. We do not recommend users use this
-   * API unless they know the implications.
-   *
-   * @param apiId The API ID to read.
-   * @param timeoutMs The timeout time for the packet
-   * @param periodMs The usual period for the packet
-   * @param data Storage for the received data.
-   * @return True if the data is valid, otherwise false.
-   */
-  public boolean readPeriodicPacket(int apiId, int timeoutMs, int periodMs, CANData data) {
-    return CANAPIJNI.readCANPeriodicPacket(m_handle, apiId, timeoutMs, periodMs, data);
   }
 }

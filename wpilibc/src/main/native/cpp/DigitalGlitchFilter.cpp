@@ -20,6 +20,7 @@
 #include "frc/SensorUtil.h"
 #include "frc/Utility.h"
 #include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -38,7 +39,8 @@ DigitalGlitchFilter::DigitalGlitchFilter() {
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalGlitchFilter,
              m_channelIndex);
-  SetName("DigitalGlitchFilter", m_channelIndex);
+  SendableRegistry::GetInstance().AddLW(this, "DigitalGlitchFilter",
+                                        m_channelIndex);
 }
 
 DigitalGlitchFilter::~DigitalGlitchFilter() {
@@ -49,13 +51,13 @@ DigitalGlitchFilter::~DigitalGlitchFilter() {
 }
 
 DigitalGlitchFilter::DigitalGlitchFilter(DigitalGlitchFilter&& rhs)
-    : ErrorBase(std::move(rhs)), SendableBase(std::move(rhs)) {
+    : ErrorBase(std::move(rhs)), SendableHelper(std::move(rhs)) {
   std::swap(m_channelIndex, rhs.m_channelIndex);
 }
 
 DigitalGlitchFilter& DigitalGlitchFilter::operator=(DigitalGlitchFilter&& rhs) {
   ErrorBase::operator=(std::move(rhs));
-  SendableBase::operator=(std::move(rhs));
+  SendableHelper::operator=(std::move(rhs));
 
   std::swap(m_channelIndex, rhs.m_channelIndex);
 

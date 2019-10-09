@@ -16,6 +16,7 @@
 #include "frc/SpeedController.h"
 #include "frc/drive/Vector2d.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -27,27 +28,28 @@ MecanumDrive::MecanumDrive(SpeedController& frontLeftMotor,
       m_rearLeftMotor(rearLeftMotor),
       m_frontRightMotor(frontRightMotor),
       m_rearRightMotor(rearRightMotor) {
-  AddChild(&m_frontLeftMotor);
-  AddChild(&m_rearLeftMotor);
-  AddChild(&m_frontRightMotor);
-  AddChild(&m_rearRightMotor);
+  auto& registry = SendableRegistry::GetInstance();
+  registry.AddChild(this, &m_frontLeftMotor);
+  registry.AddChild(this, &m_rearLeftMotor);
+  registry.AddChild(this, &m_frontRightMotor);
+  registry.AddChild(this, &m_rearRightMotor);
   static int instances = 0;
   ++instances;
-  SetName("MecanumDrive", instances);
+  registry.AddLW(this, "MecanumDrive", instances);
 }
 
 void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
                                   double zRotation, double gyroAngle) {
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 4,
-               HALUsageReporting::kRobotDrive2_MecanumCartesian);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive2_MecanumCartesian, 4);
     reported = true;
   }
 
-  ySpeed = Limit(ySpeed);
+  ySpeed = std::clamp(ySpeed, -1.0, 1.0);
   ySpeed = ApplyDeadband(ySpeed, m_deadband);
 
-  xSpeed = Limit(xSpeed);
+  xSpeed = std::clamp(xSpeed, -1.0, 1.0);
   xSpeed = ApplyDeadband(xSpeed, m_deadband);
 
   // Compensate for gyro angle.
@@ -75,8 +77,8 @@ void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
 void MecanumDrive::DrivePolar(double magnitude, double angle,
                               double zRotation) {
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 4,
-               HALUsageReporting::kRobotDrive2_MecanumPolar);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive2_MecanumPolar, 4);
     reported = true;
   }
 

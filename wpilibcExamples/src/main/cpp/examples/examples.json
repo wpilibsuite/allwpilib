@@ -167,6 +167,30 @@
     "gradlebase": "cpp"
   },
   {
+    "name": "Elevator with trapezoid profiled PID",
+    "description": "An example to demonstrate the use of an encoder and trapezoid profiled PID control to reach elevator position setpoints.",
+    "tags": [
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick"
+    ],
+    "foldername": "ElevatorTrapezoidProfile",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Elevator with profiled PID controller",
+    "description": "An example to demonstrate the use of an encoder and trapezoid profiled PID control to reach elevator position setpoints.",
+    "tags": [
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick"
+    ],
+    "foldername": "ElevatorProfiledPID",
+    "gradlebase": "cpp"
+  },
+  {
     "name": "Getting Started",
     "description": "An example program which demonstrates the simplest autonomous and teleoperated routines.",
     "tags": [
@@ -208,7 +232,7 @@
   },
   {
     "name": "GearsBot",
-    "description": "A fully functional example CommandBased program for WPIs GearsBot robot. This code can run on your computer if it supports simulation.",
+    "description": "A fully functional example CommandBased program for WPIs GearsBot robot, using the new command-based framework. This code can run on your computer if it supports simulation.",
     "tags": [
       "CommandBased Robot",
       "Complete List"
@@ -242,6 +266,94 @@
       "ShuffleBoard"
     ],
     "foldername": "ShuffleBoard",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "'Traditional' Hatchbot",
+    "description": "A fully-functional command-based hatchbot for the 2019 game using the new experimental command API.  Written in the 'traditional' style, i.e. commands are given their own classes.",
+    "tags": [
+      "Complete robot",
+      "Command-based"
+    ],
+    "foldername": "HatchbotTraditional",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "'Inlined' Hatchbot",
+    "description": "A fully-functional command-based hatchbot for the 2019 game using the new experimental command API.  Written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "tags": [
+      "Complete robot",
+      "Command-based",
+      "Lambdas"
+    ],
+    "foldername": "HatchbotInlined",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Select Command Example",
+    "description": "An example showing how to use the SelectCommand class from the experimental command framework rewrite.",
+    "tags": [
+      "Command-based"
+    ],
+    "foldername": "SelectCommand",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Scheduler Event Logging",
+    "description": "An example showing how to use Shuffleboard to log Command events from the CommandScheduler in the experimental command framework rewrite",
+    "tags": [
+      "Command-based",
+      "Shuffleboard"
+    ],
+    "foldername": "SchedulerEventLogging",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Frisbeebot",
+    "description": "An example robot project for a simple frisbee shooter for the 2013 FRC game, Ultimate Ascent, demonstrating use of PID functionality in the command framework",
+    "tags": [
+      "Command-based",
+      "PID"
+    ],
+    "foldername": "Frisbeebot",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Gyro Drive Commands",
+    "description": "An example command-based robot project demonstrating simple PID functionality utilizing a gyroscope to keep a robot driving straight and to turn to specified angles.",
+    "tags": [
+      "Command-based",
+      "PID",
+      "Gyro"
+    ],
+    "foldername": "GyroDriveCommands",
+    "mainclass": "Main"
+  },
+  {
+    "name": "SwerveBot",
+    "description": "An example program for a swerve drive that uses swerve drive kinematics and odometry.",
+    "tags": [
+      "SwerveBot"
+    ],
+    "foldername": "SwerveBot",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "MecanumBot",
+    "description": "An example program for a mecanum drive that uses mecanum drive kinematics and odometry.",
+    "tags": [
+      "MecanumBot"
+    ],
+    "foldername": "MecanumBot",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "DifferentialDriveBot",
+    "description": "An example program for a differential drive that uses differential drive kinematics and odometry.",
+    "tags": [
+      "DifferentialDriveBot"
+    ],
+    "foldername": "DifferentialDriveBot",
     "gradlebase": "cpp"
   }
 ]

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,12 +17,13 @@
 #include "frc/AnalogInput.h"
 #include "frc/Timer.h"
 #include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 AnalogGyro::AnalogGyro(int channel)
     : AnalogGyro(std::make_shared<AnalogInput>(channel)) {
-  AddChild(m_analog);
+  SendableRegistry::GetInstance().AddChild(this, m_analog.get());
 }
 
 AnalogGyro::AnalogGyro(AnalogInput* channel)
@@ -41,7 +42,7 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
 
 AnalogGyro::AnalogGyro(int channel, int center, double offset)
     : AnalogGyro(std::make_shared<AnalogInput>(channel), center, offset) {
-  AddChild(m_analog);
+  SendableRegistry::GetInstance().AddChild(this, m_analog.get());
 }
 
 AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
@@ -64,20 +65,6 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
 }
 
 AnalogGyro::~AnalogGyro() { HAL_FreeAnalogGyro(m_gyroHandle); }
-
-AnalogGyro::AnalogGyro(AnalogGyro&& rhs)
-    : GyroBase(std::move(rhs)), m_analog(std::move(rhs.m_analog)) {
-  std::swap(m_gyroHandle, rhs.m_gyroHandle);
-}
-
-AnalogGyro& AnalogGyro::operator=(AnalogGyro&& rhs) {
-  GyroBase::operator=(std::move(rhs));
-
-  m_analog = std::move(rhs.m_analog);
-  std::swap(m_gyroHandle, rhs.m_gyroHandle);
-
-  return *this;
-}
 
 double AnalogGyro::GetAngle() const {
   if (StatusIsFatal()) return 0.0;
@@ -162,7 +149,9 @@ void AnalogGyro::InitGyro() {
   }
 
   HAL_Report(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
-  SetName("AnalogGyro", m_analog->GetChannel());
+
+  SendableRegistry::GetInstance().AddLW(this, "AnalogGyro",
+                                        m_analog->GetChannel());
 }
 
 void AnalogGyro::Calibrate() {

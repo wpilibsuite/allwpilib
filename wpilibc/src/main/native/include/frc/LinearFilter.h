@@ -10,9 +10,9 @@
 #include <initializer_list>
 #include <vector>
 
+#include <units/units.h>
 #include <wpi/ArrayRef.h>
-
-#include "frc/circular_buffer.h"
+#include <wpi/circular_buffer.h>
 
 namespace frc {
 
@@ -87,9 +87,6 @@ class LinearFilter {
       : LinearFilter(wpi::makeArrayRef(ffGains.begin(), ffGains.end()),
                      wpi::makeArrayRef(fbGains.begin(), fbGains.end())) {}
 
-  LinearFilter(LinearFilter&&) = default;
-  LinearFilter& operator=(LinearFilter&&) = default;
-
   // Static methods to create commonly used filters
   /**
    * Creates a one-pole IIR low-pass filter of the form:<br>
@@ -102,7 +99,8 @@ class LinearFilter {
    * @param period       The period in seconds between samples taken by the
    *                     user.
    */
-  static LinearFilter SinglePoleIIR(double timeConstant, double period);
+  static LinearFilter SinglePoleIIR(double timeConstant,
+                                    units::second_t period);
 
   /**
    * Creates a first-order high-pass filter of the form:<br>
@@ -115,7 +113,7 @@ class LinearFilter {
    * @param period       The period in seconds between samples taken by the
    *                     user.
    */
-  static LinearFilter HighPass(double timeConstant, double period);
+  static LinearFilter HighPass(double timeConstant, units::second_t period);
 
   /**
    * Creates a K-tap FIR moving average filter of the form:<br>
@@ -143,8 +141,8 @@ class LinearFilter {
   double Calculate(double input);
 
  private:
-  circular_buffer<double> m_inputs{0};
-  circular_buffer<double> m_outputs{0};
+  wpi::circular_buffer<double> m_inputs{0};
+  wpi::circular_buffer<double> m_outputs{0};
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
 };

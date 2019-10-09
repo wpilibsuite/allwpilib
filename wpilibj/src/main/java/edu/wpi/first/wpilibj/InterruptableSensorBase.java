@@ -17,7 +17,7 @@ import edu.wpi.first.hal.util.AllocationException;
  * Base for sensors to be used with interrupts.
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public abstract class InterruptableSensorBase extends SendableBase {
+public abstract class InterruptableSensorBase implements AutoCloseable {
   @SuppressWarnings("JavadocMethod")
   public enum WaitResult {
     kTimeout(0x0), kRisingEdge(0x1), kFallingEdge(0x100), kBoth(0x101);
@@ -61,7 +61,6 @@ public abstract class InterruptableSensorBase extends SendableBase {
 
   @Override
   public void close() {
-    super.close();
     if (m_interrupt != 0) {
       cancelInterrupts();
     }

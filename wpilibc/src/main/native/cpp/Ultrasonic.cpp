@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,6 +16,7 @@
 #include "frc/Utility.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -31,8 +32,9 @@ Ultrasonic::Ultrasonic(int pingChannel, int echoChannel, DistanceUnit units)
       m_counter(m_echoChannel) {
   m_units = units;
   Initialize();
-  AddChild(m_pingChannel);
-  AddChild(m_echoChannel);
+  auto& registry = SendableRegistry::GetInstance();
+  registry.AddChild(this, m_pingChannel.get());
+  registry.AddChild(this, m_echoChannel.get());
 }
 
 Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel,
@@ -96,7 +98,10 @@ void Ultrasonic::Ping() {
   m_pingChannel->Pulse(kPingTime);
 }
 
-bool Ultrasonic::IsRangeValid() const { return m_counter.Get() > 1; }
+bool Ultrasonic::IsRangeValid() const {
+  if (m_simRangeValid) return m_simRangeValid.Get();
+  return m_counter.Get() > 1;
+}
 
 void Ultrasonic::SetAutomaticMode(bool enabling) {
   if (enabling == m_automaticEnabled) return;  // ignore the case of no change
@@ -133,10 +138,12 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
 }
 
 double Ultrasonic::GetRangeInches() const {
-  if (IsRangeValid())
+  if (IsRangeValid()) {
+    if (m_simRange) return m_simRange.Get();
     return m_counter.GetPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
-  else
+  } else {
     return 0;
+  }
 }
 
 double Ultrasonic::GetRangeMM() const { return GetRangeInches() * 25.4; }
@@ -175,6 +182,14 @@ void Ultrasonic::InitSendable(SendableBuilder& builder) {
 }
 
 void Ultrasonic::Initialize() {
+  m_simDevice = hal::SimDevice("Ultrasonic", m_echoChannel->GetChannel());
+  if (m_simDevice) {
+    m_simRangeValid = m_simDevice.CreateBoolean("Range Valid", false, true);
+    m_simRange = m_simDevice.CreateDouble("Range (in)", false, 0.0);
+    m_pingChannel->SetSimDevice(m_simDevice);
+    m_echoChannel->SetSimDevice(m_simDevice);
+  }
+
   bool originalMode = m_automaticEnabled;
   SetAutomaticMode(false);  // Kill task when adding a new sensor
   // Link this instance on the list
@@ -189,7 +204,8 @@ void Ultrasonic::Initialize() {
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_Ultrasonic, instances);
-  SetName("Ultrasonic", m_echoChannel->GetChannel());
+  SendableRegistry::GetInstance().AddLW(this, "Ultrasonic",
+                                        m_echoChannel->GetChannel());
 }
 
 void Ultrasonic::UltrasonicChecker() {

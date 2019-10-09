@@ -1,13 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
-
-#ifndef __FRC_ROBORIO__
 
 #include "NotifyListener.h"
 #include "hal/Types.h"
@@ -17,7 +15,8 @@ extern "C" {
 #endif
 
 void HALSIM_ResetEncoderData(int32_t index);
-int16_t HALSIM_GetDigitalChannelA(int32_t index);
+int32_t HALSIM_GetEncoderDigitalChannelA(int32_t index);
+int32_t HALSIM_GetEncoderDigitalChannelB(int32_t index);
 int32_t HALSIM_RegisterEncoderInitializedCallback(int32_t index,
                                                   HAL_NotifyCallback callback,
                                                   void* param,
@@ -25,6 +24,8 @@ int32_t HALSIM_RegisterEncoderInitializedCallback(int32_t index,
 void HALSIM_CancelEncoderInitializedCallback(int32_t index, int32_t uid);
 HAL_Bool HALSIM_GetEncoderInitialized(int32_t index);
 void HALSIM_SetEncoderInitialized(int32_t index, HAL_Bool initialized);
+
+HAL_SimDeviceHandle HALSIM_GetEncoderSimDevice(int32_t index);
 
 int32_t HALSIM_RegisterEncoderCountCallback(int32_t index,
                                             HAL_NotifyCallback callback,
@@ -94,6 +95,4 @@ void HALSIM_RegisterEncoderAllCallbacks(int32_t index,
 
 #ifdef __cplusplus
 }  // extern "C"
-#endif
-
 #endif

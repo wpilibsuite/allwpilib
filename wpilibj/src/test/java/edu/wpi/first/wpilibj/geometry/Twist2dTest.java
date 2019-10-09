@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class Twist2dTest {
   private static final double kEpsilon = 1E-9;
@@ -48,6 +49,33 @@ class Twist2dTest {
         () -> assertEquals(diagonalPose.getTranslation().getX(), 2.0, kEpsilon),
         () -> assertEquals(diagonalPose.getTranslation().getY(), 2.0, kEpsilon),
         () -> assertEquals(diagonalPose.getRotation().getDegrees(), 0.0, kEpsilon)
+    );
+  }
+
+  @Test
+  void testEquality() {
+    var one = new Twist2d(5, 1, 3);
+    var two = new Twist2d(5, 1, 3);
+    assertEquals(one, two);
+  }
+
+  @Test
+  void testInequality() {
+    var one = new Twist2d(5, 1, 3);
+    var two = new Twist2d(5, 1.2, 3);
+    assertNotEquals(one, two);
+  }
+
+  void testPose2dLog() {
+    final var start = new Pose2d();
+    final var end = new Pose2d(5.0, 5.0, Rotation2d.fromDegrees(90.0));
+
+    final var twist = start.log(end);
+
+    assertAll(
+        () -> assertEquals(twist.dx, 5.0 / 2.0 * Math.PI, kEpsilon),
+        () -> assertEquals(twist.dy, 0.0, kEpsilon),
+        () -> assertEquals(twist.dtheta, Math.PI / 2.0, kEpsilon)
     );
   }
 }

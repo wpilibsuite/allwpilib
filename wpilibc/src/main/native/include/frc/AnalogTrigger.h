@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,13 +13,17 @@
 
 #include "frc/AnalogTriggerOutput.h"
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class AnalogInput;
+class SendableBuilder;
 
-class AnalogTrigger : public ErrorBase, public SendableBase {
+class AnalogTrigger : public ErrorBase,
+                      public Sendable,
+                      public SendableHelper<AnalogTrigger> {
   friend class AnalogTriggerOutput;
 
  public:
@@ -136,7 +140,7 @@ class AnalogTrigger : public ErrorBase, public SendableBase {
 
  private:
   int m_index;
-  HAL_AnalogTriggerHandle m_trigger = HAL_kInvalidHandle;
+  hal::Handle<HAL_AnalogTriggerHandle> m_trigger;
   AnalogInput* m_analogInput = nullptr;
   bool m_ownsAnalog = false;
 };

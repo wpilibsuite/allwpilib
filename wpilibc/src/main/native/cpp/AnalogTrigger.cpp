@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,13 +13,14 @@
 
 #include "frc/AnalogInput.h"
 #include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 AnalogTrigger::AnalogTrigger(int channel)
     : AnalogTrigger(new AnalogInput(channel)) {
   m_ownsAnalog = true;
-  AddChild(m_analogInput);
+  SendableRegistry::GetInstance().AddChild(this, m_analogInput);
 }
 
 AnalogTrigger::AnalogTrigger(AnalogInput* input) {
@@ -36,7 +37,8 @@ AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   m_index = index;
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, input->m_channel);
-  SetName("AnalogTrigger", input->GetChannel());
+  SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger",
+                                        input->GetChannel());
 }
 
 AnalogTrigger::~AnalogTrigger() {
@@ -50,19 +52,19 @@ AnalogTrigger::~AnalogTrigger() {
 
 AnalogTrigger::AnalogTrigger(AnalogTrigger&& rhs)
     : ErrorBase(std::move(rhs)),
-      SendableBase(std::move(rhs)),
-      m_index(std::move(rhs.m_index)) {
-  std::swap(m_trigger, rhs.m_trigger);
+      SendableHelper(std::move(rhs)),
+      m_index(std::move(rhs.m_index)),
+      m_trigger(std::move(rhs.m_trigger)) {
   std::swap(m_analogInput, rhs.m_analogInput);
   std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
 }
 
 AnalogTrigger& AnalogTrigger::operator=(AnalogTrigger&& rhs) {
   ErrorBase::operator=(std::move(rhs));
-  SendableBase::operator=(std::move(rhs));
+  SendableHelper::operator=(std::move(rhs));
 
   m_index = std::move(rhs.m_index);
-  std::swap(m_trigger, rhs.m_trigger);
+  m_trigger = std::move(rhs.m_trigger);
   std::swap(m_analogInput, rhs.m_analogInput);
   std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
 

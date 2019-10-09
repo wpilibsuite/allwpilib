@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,9 +11,11 @@ import edu.wpi.first.hal.AccumulatorResult;
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.sim.AnalogInSim;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Analog channel class.
@@ -27,7 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * accumulated effectively increasing the resolution, while the averaged samples are divided by the
  * number of samples to retain the resolution, but get more stable values.
  */
-public class AnalogInput extends SendableBase implements PIDSource {
+public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
   private static final int kAccumulatorSlot = 1;
   int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;
@@ -48,12 +50,12 @@ public class AnalogInput extends SendableBase implements PIDSource {
     m_port = AnalogJNI.initializeAnalogInputPort(portHandle);
 
     HAL.report(tResourceType.kResourceType_AnalogChannel, channel);
-    setName("AnalogInput", channel);
+    SendableRegistry.addLW(this, "AnalogInput", channel);
   }
 
   @Override
   public void close() {
-    super.close();
+    SendableRegistry.remove(this);
     AnalogJNI.freeAnalogInputPort(m_port);
     m_port = 0;
     m_channel = 0;
@@ -342,6 +344,15 @@ public class AnalogInput extends SendableBase implements PIDSource {
   @Override
   public double pidGet() {
     return getAverageVoltage();
+  }
+
+  /**
+   * Indicates this input is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  public void setSimDevice(SimDevice device) {
+    AnalogJNI.setAnalogInputSimDevice(m_port, device.getNativeHandle());
   }
 
   @Override

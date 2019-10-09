@@ -11,8 +11,10 @@
 
 using namespace frc;
 
-Rotation2d::Rotation2d(double value)
-    : m_value(value), m_cos(std::cos(value)), m_sin(std::sin(value)) {}
+Rotation2d::Rotation2d(units::radian_t value)
+    : m_value(value),
+      m_cos(units::math::cos(value)),
+      m_sin(units::math::sin(value)) {}
 
 Rotation2d::Rotation2d(double x, double y) {
   const auto magnitude = std::hypot(x, y);
@@ -23,11 +25,7 @@ Rotation2d::Rotation2d(double x, double y) {
     m_sin = 0.0;
     m_cos = 1.0;
   }
-  m_value = std::atan2(m_sin, m_cos);
-}
-
-Rotation2d Rotation2d::FromDegrees(double degrees) {
-  return Rotation2d(Deg2Rad(degrees));
+  m_value = units::radian_t(std::atan2(m_sin, m_cos));
 }
 
 Rotation2d Rotation2d::operator+(const Rotation2d& other) const {
@@ -39,7 +37,7 @@ Rotation2d& Rotation2d::operator+=(const Rotation2d& other) {
   double sin = Cos() * other.Sin() + Sin() * other.Cos();
   m_cos = cos;
   m_sin = sin;
-  m_value = std::atan2(m_sin, m_cos);
+  m_value = units::radian_t(std::atan2(m_sin, m_cos));
   return *this;
 }
 
@@ -53,6 +51,18 @@ Rotation2d& Rotation2d::operator-=(const Rotation2d& other) {
 }
 
 Rotation2d Rotation2d::operator-() const { return Rotation2d(-m_value); }
+
+Rotation2d Rotation2d::operator*(double scalar) const {
+  return Rotation2d(m_value * scalar);
+}
+
+bool Rotation2d::operator==(const Rotation2d& other) const {
+  return units::math::abs(m_value - other.m_value) < 1E-9_rad;
+}
+
+bool Rotation2d::operator!=(const Rotation2d& other) const {
+  return !operator==(other);
+}
 
 Rotation2d Rotation2d::RotateBy(const Rotation2d& other) const {
   return {Cos() * other.Cos() - Sin() * other.Sin(),

@@ -23,6 +23,16 @@
     "mainclass": "Main"
   },
   {
+    "name": "Arcade Drive",
+    "description": "Demonstrates the use of the DifferentialDrive class to drive a robot with Arcade Drive.",
+    "tags": [
+      "Getting Started with Java"
+    ],
+    "foldername": "arcadedrive",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
     "name": "Mecanum Drive",
     "description": "Demonstrate the use of the RobotDrive class doing teleop driving with Mecanum steering",
     "tags": [
@@ -32,6 +42,55 @@
       "Safety"
     ],
     "foldername": "mecanumdrive",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "PDP CAN Monitoring",
+    "description": "Demonstrate using CAN to monitor the voltage, current, and temperature in the Power Distribution Panel.",
+    "tags": [
+      "Complete List",
+      "CAN",
+      "Sensors"
+    ],
+    "foldername": "canpdp",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Solenoids",
+    "description": "Demonstrate controlling a single and double solenoid from Joystick buttons.",
+    "tags": [
+      "Actuators",
+      "Joystick",
+      "Pneumatics",
+      "Complete List"
+    ],
+    "foldername": "solenoid",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Encoder",
+    "description": "Demonstrate displaying the value of a quadrature encoder on the SmartDashboard.",
+    "tags": [
+      "Complete List",
+      "Digital",
+      "Sensors"
+    ],
+    "foldername": "encoder",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Relay",
+    "description": "Demonstrate controlling a Relay from Joystick buttons.",
+    "tags": [
+      "Actuators",
+      "Joystick",
+      "Complete List"
+    ],
+    "foldername": "relay",
     "gradlebase": "java",
     "mainclass": "Main"
   },
@@ -69,6 +128,32 @@
       "Joystick"
     ],
     "foldername": "potentiometerpid",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Elevator with trapezoid profiled PID",
+    "description": "An example to demonstrate the use of an encoder and trapezoid profiled PID control to reach elevator position setpoints.",
+    "tags": [
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick"
+    ],
+    "foldername": "elevatortrapezoidprofile",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Elevator with profiled PID controller",
+    "description": "An example to demonstrate the use of an encoder and trapezoid profiled PID control to reach elevator position setpoints.",
+    "tags": [
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick"
+    ],
+    "foldername": "elevatorprofiledpid",
     "gradlebase": "java",
     "mainclass": "Main"
   },
@@ -137,7 +222,7 @@
   },
   {
     "name": "GearsBot",
-    "description": "A fully functional example CommandBased program for WPIs GearsBot robot. This code can run on your computer if it supports simulation.",
+    "description": "A fully functional example CommandBased program for WPIs GearsBot robot, ported to the new CommandBased library. This code can run on your computer if it supports simulation.",
     "tags": [
       "Complete Robot"
     ],
@@ -195,6 +280,97 @@
       "Dashboards"
     ],
     "foldername": "shuffleboard",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "'Traditional' Hatchbot",
+    "description": "A fully-functional command-based hatchbot for the 2019 game using the new experimental command API.  Written in the 'traditional' style, i.e. commands are given their own classes.",
+    "tags": [
+      "Complete robot",
+      "Command-based"
+    ],
+    "foldername": "hatchbottraditional",
+    "mainclass": "Main"
+  },
+  {
+    "name": "'Inlined' Hatchbot",
+    "description": "A fully-functional command-based hatchbot for the 2019 game using the new experimental command API.  Written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "tags": [
+      "Complete robot",
+      "Command-based",
+      "Lambdas"
+    ],
+    "foldername": "hatchbotinlined",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Select Command Example",
+    "description": "An example showing how to use the SelectCommand class from the experimental command framework rewrite.",
+    "tags": [
+      "Command-based"
+    ],
+    "foldername": "selectcommand",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Scheduler Event Logging",
+    "description": "An example showing how to use Shuffleboard to log Command events from the CommandScheduler in the experimental command framework rewrite",
+    "tags": [
+      "Command-based",
+      "Shuffleboard"
+    ],
+    "foldername": "schedulereventlogging",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Frisbeebot",
+    "description": "An example robot project for a simple frisbee shooter for the 2013 FRC game, Ultimate Ascent, demonstrating use of PID functionality in the command framework",
+    "tags": [
+      "Command-based",
+      "PID"
+    ],
+    "foldername": "frisbeebot",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Gyro Drive Commands",
+    "description": "An example command-based robot project demonstrating simple PID functionality utilizing a gyroscope to keep a robot driving straight and to turn to specified angles.",
+    "tags": [
+      "Command-based",
+      "PID",
+      "Gyro"
+    ],
+    "foldername": "gyrodrivecommands",
+    "mainclass": "Main"
+  },
+  {
+    "name": "SwerveBot",
+    "description": "An example program for a swerve drive that uses swerve drive kinematics and odometry.",
+    "tags": [
+      "SwerveBot"
+    ],
+    "foldername": "swervebot",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "MecanumBot",
+    "description": "An example program for a mecanum drive that uses mecanum drive kinematics and odometry.",
+    "tags": [
+      "MecanumBot"
+    ],
+    "foldername": "mecanumbot",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "DifferentialDriveBot",
+    "description": "An example program for a differential drive that uses differential drive kinematics and odometry.",
+    "tags": [
+      "MecanumBot"
+    ],
+    "foldername": "differentialdrivebot",
     "gradlebase": "java",
     "mainclass": "Main"
   }

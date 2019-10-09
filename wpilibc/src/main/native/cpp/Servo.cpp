@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,6 +10,7 @@
 #include <hal/HAL.h>
 
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -27,7 +28,7 @@ Servo::Servo(int channel) : PWM(channel) {
   SetPeriodMultiplier(kPeriodMultiplier_4X);
 
   HAL_Report(HALUsageReporting::kResourceType_Servo, channel);
-  SetName("Servo", channel);
+  SendableRegistry::GetInstance().SetName(this, "Servo", channel);
 }
 
 void Servo::Set(double value) { SetPosition(value); }

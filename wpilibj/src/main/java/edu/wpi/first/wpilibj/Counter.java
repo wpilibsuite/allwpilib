@@ -15,6 +15,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import static java.util.Objects.requireNonNull;
@@ -29,7 +30,7 @@ import static java.util.Objects.requireNonNull;
  * <p>All counters will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Counter extends SendableBase implements CounterBase, PIDSource {
+public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable {
   /**
    * Mode determines how and what the counter counts.
    */
@@ -86,7 +87,7 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
     setMaxPeriod(.5);
 
     HAL.report(tResourceType.kResourceType_Counter, m_index, mode.value);
-    setName("Counter", m_index);
+    SendableRegistry.addLW(this, "Counter", m_index);
   }
 
   /**
@@ -182,7 +183,8 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
 
   @Override
   public void close() {
-    super.close();
+    SendableRegistry.remove(this);
+
     setUpdateWhenEmpty(true);
 
     clearUpSource();
@@ -213,7 +215,7 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
   public void setUpSource(int channel) {
     setUpSource(new DigitalInput(channel));
     m_allocatedUpSource = true;
-    addChild(m_upSource);
+    SendableRegistry.addChild(this, m_upSource);
   }
 
   /**
@@ -280,7 +282,7 @@ public class Counter extends SendableBase implements CounterBase, PIDSource {
   public void setDownSource(int channel) {
     setDownSource(new DigitalInput(channel));
     m_allocatedDownSource = true;
-    addChild(m_downSource);
+    SendableRegistry.addChild(this, m_downSource);
   }
 
   /**

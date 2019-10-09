@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,7 +8,6 @@
 #pragma once
 
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
 
 namespace frc {
 
@@ -16,7 +15,7 @@ namespace frc {
  * SolenoidBase class is the common base class for the Solenoid and
  * DoubleSolenoid classes.
  */
-class SolenoidBase : public ErrorBase, public SendableBase {
+class SolenoidBase : public ErrorBase {
  public:
   /**
    * Read all 8 solenoids as a single byte

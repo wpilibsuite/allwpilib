@@ -162,27 +162,6 @@ SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
 
 SPI::~SPI() { HAL_CloseSPI(m_port); }
 
-SPI::SPI(SPI&& rhs)
-    : ErrorBase(std::move(rhs)),
-      m_msbFirst(std::move(rhs.m_msbFirst)),
-      m_sampleOnTrailing(std::move(rhs.m_sampleOnTrailing)),
-      m_clockIdleHigh(std::move(rhs.m_clockIdleHigh)),
-      m_accum(std::move(rhs.m_accum)) {
-  std::swap(m_port, rhs.m_port);
-}
-
-SPI& SPI::operator=(SPI&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-
-  std::swap(m_port, rhs.m_port);
-  m_msbFirst = std::move(rhs.m_msbFirst);
-  m_sampleOnTrailing = std::move(rhs.m_sampleOnTrailing);
-  m_clockIdleHigh = std::move(rhs.m_clockIdleHigh);
-  m_accum = std::move(rhs.m_accum);
-
-  return *this;
-}
-
 void SPI::SetClockRate(int hz) { HAL_SetSPISpeed(m_port, hz); }
 
 void SPI::SetMSBFirst() {
@@ -280,10 +259,14 @@ void SPI::SetAutoTransmitData(wpi::ArrayRef<uint8_t> dataToSend, int zeroSize) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void SPI::StartAutoRate(double period) {
+void SPI::StartAutoRate(units::second_t period) {
   int32_t status = 0;
-  HAL_StartSPIAutoRate(m_port, period, &status);
+  HAL_StartSPIAutoRate(m_port, period.to<double>(), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+void SPI::StartAutoRate(double period) {
+  StartAutoRate(units::second_t(period));
 }
 
 void SPI::StartAutoTrigger(DigitalSource& source, bool rising, bool falling) {
@@ -307,12 +290,17 @@ void SPI::ForceAutoRead() {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead, double timeout) {
+int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead,
+                              units::second_t timeout) {
   int32_t status = 0;
-  int32_t val =
-      HAL_ReadSPIAutoReceivedData(m_port, buffer, numToRead, timeout, &status);
+  int32_t val = HAL_ReadSPIAutoReceivedData(m_port, buffer, numToRead,
+                                            timeout.to<double>(), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return val;
+}
+
+int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead, double timeout) {
+  return ReadAutoReceivedData(buffer, numToRead, units::second_t(timeout));
 }
 
 int SPI::GetAutoDroppedCount() {
@@ -322,9 +310,9 @@ int SPI::GetAutoDroppedCount() {
   return val;
 }
 
-void SPI::InitAccumulator(double period, int cmd, int xferSize, int validMask,
-                          int validValue, int dataShift, int dataSize,
-                          bool isSigned, bool bigEndian) {
+void SPI::InitAccumulator(units::second_t period, int cmd, int xferSize,
+                          int validMask, int validValue, int dataShift,
+                          int dataSize, bool isSigned, bool bigEndian) {
   InitAuto(xferSize * kAccumulateDepth);
   uint8_t cmdBytes[4] = {0, 0, 0, 0};
   if (bigEndian) {
@@ -347,6 +335,13 @@ void SPI::InitAccumulator(double period, int cmd, int xferSize, int validMask,
   m_accum.reset(new Accumulator(m_port, xferSize, validMask, validValue,
                                 dataShift, dataSize, isSigned, bigEndian));
   m_accum->m_notifier.StartPeriodic(period * kAccumulateDepth / 2);
+}
+
+void SPI::InitAccumulator(double period, int cmd, int xferSize, int validMask,
+                          int validValue, int dataShift, int dataSize,
+                          bool isSigned, bool bigEndian) {
+  InitAccumulator(units::second_t(period), cmd, xferSize, validMask, validValue,
+                  dataShift, dataSize, isSigned, bigEndian);
 }
 
 void SPI::FreeAccumulator() {

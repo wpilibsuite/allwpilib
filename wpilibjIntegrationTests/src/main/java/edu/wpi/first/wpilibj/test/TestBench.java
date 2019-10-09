@@ -208,14 +208,14 @@ public final class TestBench {
     List<List<Integer[]>> pairs = new ArrayList<List<Integer[]>>();
     List<Integer[]> setA =
         Arrays.asList(new Integer[][]{
-            {new Integer(DIOCrossConnectA1), new Integer(DIOCrossConnectA2)},
-            {new Integer(DIOCrossConnectA2), new Integer(DIOCrossConnectA1)}});
+            {DIOCrossConnectA1, DIOCrossConnectA2},
+            {DIOCrossConnectA2, DIOCrossConnectA1}});
     pairs.add(setA);
 
     List<Integer[]> setB =
         Arrays.asList(new Integer[][]{
-            {new Integer(DIOCrossConnectB1), new Integer(DIOCrossConnectB2)},
-            {new Integer(DIOCrossConnectB2), new Integer(DIOCrossConnectB1)}});
+            {DIOCrossConnectB1, DIOCrossConnectB2},
+            {DIOCrossConnectB2, DIOCrossConnectB1}});
     pairs.add(setB);
     // NOTE: IF MORE DIOCROSSCONNECT PAIRS ARE ADDED ADD THEM HERE
     return pairs;

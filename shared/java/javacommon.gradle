@@ -3,13 +3,6 @@ apply plugin: 'java'
 //apply plugin: 'net.ltgt.errorprone'
 apply plugin: 'jacoco'
 
-def pubVersion
-if (project.hasProperty("publishVersion")) {
-    pubVersion = project.publishVersion
-} else {
-    pubVersion = WPILibVersion.version
-}
-
 def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
 def javaBaseName = "_GROUP_edu_wpi_first_${project.baseId}_ID_${project.baseId}-java_CLS"
@@ -74,7 +67,7 @@ publishing {
 
             artifactId = "${baseArtifactId}-java"
             groupId artifactGroupId
-            version pubVersion
+            version wpilibVersioning.version.get()
         }
     }
 }
@@ -89,7 +82,7 @@ test {
     finalizedBy jacocoTestReport
 }
 
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxraspbian')) {
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxraspbian') || project.hasProperty('onlylinuxaarch64bionic')) {
     test.enabled = false
 }
 

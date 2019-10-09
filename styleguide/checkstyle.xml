@@ -36,6 +36,11 @@ module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
   </module>
   <module name="SuppressWarningsFilter" />
   <module name="TreeWalker">
+    <module name="SuppressionCommentFilter">
+        <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)"/>
+        <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)"/>
+        <property name="checkFormat" value="$1"/>
+    </module>
     <module name="SuppressWarningsHolder" />
     <module name="OuterTypeFilename" />
     <module name="IllegalTokenText">

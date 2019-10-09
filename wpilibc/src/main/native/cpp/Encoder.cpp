@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,6 +16,7 @@
 #include "frc/DigitalInput.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -24,8 +25,9 @@ Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
   m_aSource = std::make_shared<DigitalInput>(aChannel);
   m_bSource = std::make_shared<DigitalInput>(bChannel);
   InitEncoder(reverseDirection, encodingType);
-  AddChild(m_aSource);
-  AddChild(m_bSource);
+  auto& registry = SendableRegistry::GetInstance();
+  registry.AddChild(this, m_aSource.get());
+  registry.AddChild(this, m_bSource.get());
 }
 
 Encoder::Encoder(DigitalSource* aSource, DigitalSource* bSource,
@@ -59,31 +61,6 @@ Encoder::~Encoder() {
   int32_t status = 0;
   HAL_FreeEncoder(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-}
-
-Encoder::Encoder(Encoder&& rhs)
-    : ErrorBase(std::move(rhs)),
-      SendableBase(std::move(rhs)),
-      CounterBase(std::move(rhs)),
-      PIDSource(std::move(rhs)),
-      m_aSource(std::move(rhs.m_aSource)),
-      m_bSource(std::move(rhs.m_bSource)),
-      m_indexSource(std::move(rhs.m_indexSource)) {
-  std::swap(m_encoder, rhs.m_encoder);
-}
-
-Encoder& Encoder::operator=(Encoder&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-  SendableBase::operator=(std::move(rhs));
-  CounterBase::operator=(std::move(rhs));
-  PIDSource::operator=(std::move(rhs));
-
-  m_aSource = std::move(rhs.m_aSource);
-  m_bSource = std::move(rhs.m_bSource);
-  m_indexSource = std::move(rhs.m_indexSource);
-  std::swap(m_encoder, rhs.m_encoder);
-
-  return *this;
 }
 
 int Encoder::Get() const {
@@ -226,7 +203,7 @@ double Encoder::PIDGet() {
 void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
   // Force digital input if just given an index
   m_indexSource = std::make_shared<DigitalInput>(channel);
-  AddChild(m_indexSource);
+  SendableRegistry::GetInstance().AddChild(this, m_indexSource.get());
   SetIndexSource(*m_indexSource.get(), type);
 }
 
@@ -238,6 +215,10 @@ void Encoder::SetIndexSource(const DigitalSource& source,
       (HAL_AnalogTriggerType)source.GetAnalogTriggerTypeForRouting(),
       (HAL_EncoderIndexingType)type, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+void Encoder::SetSimDevice(HAL_SimDeviceHandle device) {
+  HAL_SetEncoderSimDevice(m_encoder, device);
 }
 
 int Encoder::GetFPGAIndex() const {
@@ -275,7 +256,8 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
 
   HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex(),
              encodingType);
-  SetName("Encoder", m_aSource->GetChannel());
+  SendableRegistry::GetInstance().AddLW(this, "Encoder",
+                                        m_aSource->GetChannel());
 }
 
 double Encoder::DecodingScaleFactor() const {

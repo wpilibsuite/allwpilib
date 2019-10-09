@@ -52,7 +52,9 @@ option(WITH_TESTS "build unit tests (requires internet connection)" OFF)
 option(USE_EXTERNAL_HAL "Use a separately built HAL" OFF)
 set(EXTERNAL_HAL_FILE "" CACHE FILEPATH "Location to look for an external HAL CMake File")
 option(USE_VCPKG_LIBUV "Use vcpkg libuv" OFF)
+option(USE_VCPKG_EIGEN "Use vcpkg eigen" OFF)
 option(FLAT_INSTALL_WPILIB "Use a flat install directory" OFF)
+option(WITH_SIMULATION_MODULES "build simulation modules" OFF)
 
 if (NOT WITHOUT_JAVA AND NOT BUILD_SHARED_LIBS)
     message(FATAL_ERROR "
@@ -76,6 +78,10 @@ endif()
 
 if (USE_VCPKG_LIBUV)
 set (LIBUV_VCPKG_REPLACE "find_package(unofficial-libuv CONFIG)")
+endif()
+
+if (USE_VCPKG_EIGEN)
+set (EIGEN_VCPKG_REPLACE "find_package(Eigen3 CONFIG)")
 endif()
 
 if (MSVC OR FLAT_INSTALL_WPILIB)
@@ -117,7 +123,13 @@ if (NOT WITHOUT_CSCORE)
         add_subdirectory(hal)
         add_subdirectory(wpilibj)
         add_subdirectory(wpilibc)
+        add_subdirectory(myRobot)
     endif()
+endif()
+
+if (WITH_SIMULATION_MODULES AND NOT USE_EXTERNAL_HAL)
+    add_subdirectory(imgui)
+    add_subdirectory(simulation)
 endif()
 
 configure_file(wpilib-config.cmake.in ${CMAKE_BINARY_DIR}/wpilib-config.cmake )

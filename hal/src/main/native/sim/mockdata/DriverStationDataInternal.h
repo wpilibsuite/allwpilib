@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -29,7 +29,7 @@ class DriverStationData {
 
   static LLVM_ATTRIBUTE_ALWAYS_INLINE HAL_Value
   MakeAllianceStationIdValue(HAL_AllianceStationID value) {
-    return MakeEnum(value);
+    return HAL_MakeEnum(value);
   }
 
  public:
@@ -58,16 +58,17 @@ class DriverStationData {
 
   void NotifyNewData();
 
-  SimDataValue<HAL_Bool, MakeBoolean, GetEnabledName> enabled{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetAutonomousName> autonomous{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetTestName> test{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetEStopName> eStop{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetFmsAttachedName> fmsAttached{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetDsAttachedName> dsAttached{true};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetEnabledName> enabled{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetAutonomousName> autonomous{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetTestName> test{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetEStopName> eStop{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetFmsAttachedName> fmsAttached{
+      false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetDsAttachedName> dsAttached{true};
   SimDataValue<HAL_AllianceStationID, MakeAllianceStationIdValue,
                GetAllianceStationIdName>
       allianceStationId{static_cast<HAL_AllianceStationID>(0)};
-  SimDataValue<double, MakeDouble, GetMatchTimeName> matchTime{0.0};
+  SimDataValue<double, HAL_MakeDouble, GetMatchTimeName> matchTime{0.0};
 
  private:
   wpi::spinlock m_joystickDataMutex;

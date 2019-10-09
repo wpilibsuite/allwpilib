@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,10 +11,11 @@
 
 #include "frc/DriverStation.h"
 #include "frc/Timer.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
-static constexpr double kSamplePeriod = 0.0005;
+static constexpr auto kSamplePeriod = 0.0005_s;
 static constexpr double kCalibrationSampleTime = 5.0;
 static constexpr double kDegreePerSecondPerLSB = 0.0125;
 
@@ -30,26 +31,35 @@ static constexpr int kSNLowRegister = 0x10;
 
 ADXRS450_Gyro::ADXRS450_Gyro() : ADXRS450_Gyro(SPI::kOnboardCS0) {}
 
-ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port) : m_spi(port) {
+ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port)
+    : m_spi(port), m_simDevice("ADXRS450_Gyro", port) {
+  if (m_simDevice) {
+    m_simAngle = m_simDevice.CreateDouble("Angle", false, 0.0);
+    m_simRate = m_simDevice.CreateDouble("Rate", false, 0.0);
+  }
+
   m_spi.SetClockRate(3000000);
   m_spi.SetMSBFirst();
   m_spi.SetSampleDataOnLeadingEdge();
   m_spi.SetClockActiveHigh();
   m_spi.SetChipSelectActiveLow();
 
-  // Validate the part ID
-  if ((ReadRegister(kPIDRegister) & 0xff00) != 0x5200) {
-    DriverStation::ReportError("could not find ADXRS450 gyro");
-    return;
+  if (!m_simDevice) {
+    // Validate the part ID
+    if ((ReadRegister(kPIDRegister) & 0xff00) != 0x5200) {
+      DriverStation::ReportError("could not find ADXRS450 gyro");
+      return;
+    }
+
+    m_spi.InitAccumulator(kSamplePeriod, 0x20000000u, 4, 0x0c00000eu,
+                          0x04000000u, 10u, 16u, true, true);
+
+    Calibrate();
   }
 
-  m_spi.InitAccumulator(kSamplePeriod, 0x20000000u, 4, 0x0c00000eu, 0x04000000u,
-                        10u, 16u, true, true);
-
-  Calibrate();
-
   HAL_Report(HALUsageReporting::kResourceType_ADXRS450, port);
-  SetName("ADXRS450_Gyro", port);
+
+  SendableRegistry::GetInstance().AddLW(this, "ADXRS450_Gyro", port);
 }
 
 static bool CalcParity(int v) {
@@ -86,15 +96,21 @@ uint16_t ADXRS450_Gyro::ReadRegister(int reg) {
 }
 
 double ADXRS450_Gyro::GetAngle() const {
+  if (m_simAngle) return m_simAngle.Get();
   return m_spi.GetAccumulatorIntegratedValue() * kDegreePerSecondPerLSB;
 }
 
 double ADXRS450_Gyro::GetRate() const {
+  if (m_simRate) return m_simRate.Get();
   return static_cast<double>(m_spi.GetAccumulatorLastValue()) *
          kDegreePerSecondPerLSB;
 }
 
-void ADXRS450_Gyro::Reset() { m_spi.ResetAccumulator(); }
+void ADXRS450_Gyro::Reset() {
+  if (m_simAngle) m_simAngle.Set(0.0);
+  if (m_simRate) m_simRate.Set(0.0);
+  m_spi.ResetAccumulator();
+}
 
 void ADXRS450_Gyro::Calibrate() {
   Wait(0.1);

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,9 +10,12 @@
 #include <hal/Types.h>
 
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Class to write to digital outputs.
@@ -21,7 +24,9 @@ namespace frc {
  * elsewhere will allocate channels automatically so for those devices it
  * shouldn't be done here.
  */
-class DigitalOutput : public ErrorBase, public SendableBase {
+class DigitalOutput : public ErrorBase,
+                      public Sendable,
+                      public SendableHelper<DigitalOutput> {
  public:
   /**
    * Create an instance of a digital output.
@@ -35,8 +40,8 @@ class DigitalOutput : public ErrorBase, public SendableBase {
 
   ~DigitalOutput() override;
 
-  DigitalOutput(DigitalOutput&& rhs);
-  DigitalOutput& operator=(DigitalOutput&& rhs);
+  DigitalOutput(DigitalOutput&&) = default;
+  DigitalOutput& operator=(DigitalOutput&&) = default;
 
   /**
    * Set the value of a digital output.
@@ -120,12 +125,19 @@ class DigitalOutput : public ErrorBase, public SendableBase {
    */
   void UpdateDutyCycle(double dutyCycle);
 
+  /**
+   * Indicates this output is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  void SetSimDevice(HAL_SimDeviceHandle device);
+
   void InitSendable(SendableBuilder& builder) override;
 
  private:
   int m_channel;
-  HAL_DigitalHandle m_handle = HAL_kInvalidHandle;
-  HAL_DigitalPWMHandle m_pwmGenerator = HAL_kInvalidHandle;
+  hal::Handle<HAL_DigitalHandle> m_handle;
+  hal::Handle<HAL_DigitalPWMHandle> m_pwmGenerator;
 };
 
 }  // namespace frc

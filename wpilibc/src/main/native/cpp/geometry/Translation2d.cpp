@@ -7,17 +7,18 @@
 
 #include "frc/geometry/Translation2d.h"
 
-#include <cmath>
-
 using namespace frc;
 
-Translation2d::Translation2d(double x, double y) : m_x(x), m_y(y) {}
+Translation2d::Translation2d(units::meter_t x, units::meter_t y)
+    : m_x(x), m_y(y) {}
 
-double Translation2d::Distance(const Translation2d& other) const {
-  return std::hypot(other.m_x - m_x, other.m_y - m_y);
+units::meter_t Translation2d::Distance(const Translation2d& other) const {
+  return units::math::hypot(other.m_x - m_x, other.m_y - m_y);
 }
 
-double Translation2d::Norm() const { return std::hypot(m_x, m_y); }
+units::meter_t Translation2d::Norm() const {
+  return units::math::hypot(m_x, m_y);
+}
 
 Translation2d Translation2d::RotateBy(const Rotation2d& other) const {
   return {m_x * other.Cos() - m_y * other.Sin(),
@@ -57,6 +58,15 @@ Translation2d& Translation2d::operator*=(double scalar) {
 
 Translation2d Translation2d::operator/(double scalar) const {
   return *this * (1.0 / scalar);
+}
+
+bool Translation2d::operator==(const Translation2d& other) const {
+  return units::math::abs(m_x - other.m_x) < 1E-9_m &&
+         units::math::abs(m_y - other.m_y) < 1E-9_m;
+}
+
+bool Translation2d::operator!=(const Translation2d& other) const {
+  return !operator==(other);
 }
 
 Translation2d& Translation2d::operator/=(double scalar) {

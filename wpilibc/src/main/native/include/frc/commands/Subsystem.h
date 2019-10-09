@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,19 +8,22 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
 
 #include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class Command;
 
-class Subsystem : public ErrorBase, public SendableBase {
+class Subsystem : public ErrorBase,
+                  public Sendable,
+                  public SendableHelper<Subsystem> {
   friend class Scheduler;
 
  public:
@@ -96,6 +99,34 @@ class Subsystem : public ErrorBase, public SendableBase {
    * This should be overridden by a Subsystem that has a default Command
    */
   virtual void InitDefaultCommand();
+
+  /**
+   * Gets the name of this Subsystem.
+   *
+   * @return Name
+   */
+  std::string GetName() const;
+
+  /**
+   * Sets the name of this Subsystem.
+   *
+   * @param name name
+   */
+  void SetName(const wpi::Twine& name);
+
+  /**
+   * Gets the subsystem name of this Subsystem.
+   *
+   * @return Subsystem name
+   */
+  std::string GetSubsystem() const;
+
+  /**
+   * Sets the subsystem name of this Subsystem.
+   *
+   * @param subsystem subsystem name
+   */
+  void SetSubsystem(const wpi::Twine& subsystem);
 
   /**
    * Associate a Sendable with this Subsystem.

@@ -47,7 +47,6 @@ public class PDPTest extends AbstractComsSetup {
 
   @AfterClass
   public static void tearDownAfterClass() {
-    pdp.close();
     pdp = null;
     me.teardown();
     me = null;
@@ -70,7 +69,7 @@ public class PDPTest extends AbstractComsSetup {
   public static Collection<Object[]> generateData() {
     // logger.fine("Loading the MotorList");
     return Arrays.asList(new Object[][]{
-        {TestBench.getInstance().getTalonPair(), new Double(0.0)}});
+        {TestBench.getInstance().getTalonPair(), 0.0}});
   }
 
   @After

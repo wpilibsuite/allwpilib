@@ -23,3 +23,11 @@ Transform2d::Transform2d(Pose2d initial, Pose2d final) {
 
 Transform2d::Transform2d(Translation2d translation, Rotation2d rotation)
     : m_translation(translation), m_rotation(rotation) {}
+
+bool Transform2d::operator==(const Transform2d& other) const {
+  return m_translation == other.m_translation && m_rotation == other.m_rotation;
+}
+
+bool Transform2d::operator!=(const Transform2d& other) const {
+  return !operator==(other);
+}

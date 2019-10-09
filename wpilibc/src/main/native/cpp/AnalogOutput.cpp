@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,6 +16,7 @@
 #include "frc/SensorUtil.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -42,27 +43,10 @@ AnalogOutput::AnalogOutput(int channel) {
   }
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogOutput, m_channel);
-  SetName("AnalogOutput", m_channel);
+  SendableRegistry::GetInstance().AddLW(this, "AnalogOutput", m_channel);
 }
 
 AnalogOutput::~AnalogOutput() { HAL_FreeAnalogOutputPort(m_port); }
-
-AnalogOutput::AnalogOutput(AnalogOutput&& rhs)
-    : ErrorBase(std::move(rhs)),
-      SendableBase(std::move(rhs)),
-      m_channel(std::move(rhs.m_channel)) {
-  std::swap(m_port, rhs.m_port);
-}
-
-AnalogOutput& AnalogOutput::operator=(AnalogOutput&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-  SendableBase::operator=(std::move(rhs));
-
-  m_channel = std::move(rhs.m_channel);
-  std::swap(m_port, rhs.m_port);
-
-  return *this;
-}
 
 void AnalogOutput::SetVoltage(double voltage) {
   int32_t status = 0;

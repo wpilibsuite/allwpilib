@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,7 @@
 
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -20,7 +21,7 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
 
   HAL_Report(HALUsageReporting::kResourceType_Accelerometer, 0, 0,
              "Built-in accelerometer");
-  SetName("BuiltInAccel", 0);
+  SendableRegistry::GetInstance().AddLW(this, "BuiltInAccel");
 }
 
 void BuiltInAccelerometer::SetRange(Range range) {

@@ -30,6 +30,10 @@ templatesTree.list(new FilenameFilter() {
     templatesMap.put(it, [])
 }
 
+nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.roborio).configure {
+    cppCompiler.args.remove('-Wno-error=deprecated-declarations')
+    cppCompiler.args.add('-Werror=deprecated-declarations')
+}
 
 ext {
     sharedCvConfigs = examplesMap + templatesMap + [commands: []]
@@ -96,7 +100,6 @@ model {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     if (binary.targetPlatform.name != nativeUtils.wpi.platforms.roborio) {
                         lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
-                        lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
                         lib project: ':simulation:halsim_print', library: 'halsim_print', linkage: 'shared'
                         lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
                     }
@@ -146,7 +149,6 @@ model {
                     }
                     if (binary.targetPlatform.name != nativeUtils.wpi.platforms.roborio) {
                         lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
-                        lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
                         lib project: ':simulation:halsim_print', library: 'halsim_print', linkage: 'shared'
                         lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
                     }

@@ -15,25 +15,52 @@ using namespace frc;
 static constexpr double kEpsilon = 1E-9;
 
 TEST(Pose2dTest, TransformBy) {
-  const Pose2d initial{1.0, 2.0, Rotation2d::FromDegrees(45.0)};
-  const Transform2d transform{Translation2d{5.0, 0.0},
-                              Rotation2d::FromDegrees(5.0)};
+  const Pose2d initial{1_m, 2_m, Rotation2d(45.0_deg)};
+  const Transform2d transform{Translation2d{5.0_m, 0.0_m}, Rotation2d(5.0_deg)};
 
   const auto transformed = initial + transform;
 
-  EXPECT_NEAR(transformed.Translation().X(), 1 + 5 / std::sqrt(2.0), kEpsilon);
-  EXPECT_NEAR(transformed.Translation().Y(), 2 + 5 / std::sqrt(2.0), kEpsilon);
-  EXPECT_NEAR(transformed.Rotation().Degrees(), 50.0, kEpsilon);
+  EXPECT_NEAR(transformed.Translation().X().to<double>(),
+              1 + 5 / std::sqrt(2.0), kEpsilon);
+  EXPECT_NEAR(transformed.Translation().Y().to<double>(),
+              2 + 5 / std::sqrt(2.0), kEpsilon);
+  EXPECT_NEAR(transformed.Rotation().Degrees().to<double>(), 50.0, kEpsilon);
 }
 
 TEST(Pose2dTest, RelativeTo) {
-  const Pose2d initial{0.0, 0.0, Rotation2d::FromDegrees(45.0)};
-  const Pose2d final{5.0, 5.0, Rotation2d::FromDegrees(45.0)};
+  const Pose2d initial{0_m, 0_m, Rotation2d(45.0_deg)};
+  const Pose2d final{5_m, 5_m, Rotation2d(45.0_deg)};
 
   const auto finalRelativeToInitial = final.RelativeTo(initial);
 
-  EXPECT_NEAR(finalRelativeToInitial.Translation().X(), 5.0 * std::sqrt(2.0),
+  EXPECT_NEAR(finalRelativeToInitial.Translation().X().to<double>(),
+              5.0 * std::sqrt(2.0), kEpsilon);
+  EXPECT_NEAR(finalRelativeToInitial.Translation().Y().to<double>(), 0.0,
               kEpsilon);
-  EXPECT_NEAR(finalRelativeToInitial.Translation().Y(), 0.0, kEpsilon);
-  EXPECT_NEAR(finalRelativeToInitial.Rotation().Degrees(), 0.0, kEpsilon);
+  EXPECT_NEAR(finalRelativeToInitial.Rotation().Degrees().to<double>(), 0.0,
+              kEpsilon);
+}
+
+TEST(Pose2dTest, Equality) {
+  const Pose2d a{0_m, 5_m, Rotation2d(43_deg)};
+  const Pose2d b{0_m, 5_m, Rotation2d(43_deg)};
+  EXPECT_TRUE(a == b);
+}
+
+TEST(Pose2dTest, Inequality) {
+  const Pose2d a{0_m, 5_m, Rotation2d(43_deg)};
+  const Pose2d b{0_m, 5_ft, Rotation2d(43_deg)};
+  EXPECT_TRUE(a != b);
+}
+
+TEST(Pose2dTest, Minus) {
+  const Pose2d initial{0_m, 0_m, Rotation2d(45.0_deg)};
+  const Pose2d final{5_m, 5_m, Rotation2d(45.0_deg)};
+
+  const auto transform = final - initial;
+
+  EXPECT_NEAR(transform.Translation().X().to<double>(), 5.0 * std::sqrt(2.0),
+              kEpsilon);
+  EXPECT_NEAR(transform.Translation().Y().to<double>(), 0.0, kEpsilon);
+  EXPECT_NEAR(transform.Rotation().Degrees().to<double>(), 0.0, kEpsilon);
 }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -260,6 +260,9 @@ HAL_EncoderHandle HAL_InitializeEncoder(
 void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   encoderHandles->Free(encoderHandle);
 }
+
+void HAL_SetEncoderSimDevice(HAL_EncoderHandle handle,
+                             HAL_SimDeviceHandle device) {}
 
 int32_t HAL_GetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);

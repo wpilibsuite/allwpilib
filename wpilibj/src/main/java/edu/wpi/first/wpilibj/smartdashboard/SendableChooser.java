@@ -10,11 +10,12 @@ package edu.wpi.first.wpilibj.smartdashboard;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.command.Command;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
@@ -31,7 +32,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  *
  * @param <V> The type of the values to be stored
  */
-public class SendableChooser<V> extends SendableBase {
+public class SendableChooser<V> implements Sendable, AutoCloseable {
   /**
    * The key for the default value.
    */
@@ -55,8 +56,7 @@ public class SendableChooser<V> extends SendableBase {
   /**
    * A map linking strings to the objects the represent.
    */
-  @SuppressWarnings("PMD.LooseCoupling")
-  private final LinkedHashMap<String, V> m_map = new LinkedHashMap<>();
+  private final Map<String, V> m_map = new LinkedHashMap<>();
   private String m_defaultChoice = "";
   private final int m_instance;
   private static final AtomicInteger s_instances = new AtomicInteger();
@@ -65,8 +65,13 @@ public class SendableChooser<V> extends SendableBase {
    * Instantiates a {@link SendableChooser}.
    */
   public SendableChooser() {
-    super(false);
     m_instance = s_instances.getAndIncrement();
+    SendableRegistry.add(this, "SendableChooser", m_instance);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**

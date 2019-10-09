@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,6 +17,7 @@
 #include "frc/SensorUtil.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -40,33 +41,12 @@ DigitalInput::DigitalInput(int channel) {
   }
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalInput, channel);
-  SetName("DigitalInput", channel);
+  SendableRegistry::GetInstance().AddLW(this, "DigitalInput", channel);
 }
 
 DigitalInput::~DigitalInput() {
   if (StatusIsFatal()) return;
-  if (m_interrupt != HAL_kInvalidHandle) {
-    int32_t status = 0;
-    HAL_CleanInterrupts(m_interrupt, &status);
-    // Ignore status, as an invalid handle just needs to be ignored.
-    m_interrupt = HAL_kInvalidHandle;
-  }
-
   HAL_FreeDIOPort(m_handle);
-}
-
-DigitalInput::DigitalInput(DigitalInput&& rhs)
-    : DigitalSource(std::move(rhs)), m_channel(std::move(rhs.m_channel)) {
-  std::swap(m_handle, rhs.m_handle);
-}
-
-DigitalInput& DigitalInput::operator=(DigitalInput&& rhs) {
-  DigitalSource::operator=(std::move(rhs));
-
-  m_channel = std::move(rhs.m_channel);
-  std::swap(m_handle, rhs.m_handle);
-
-  return *this;
 }
 
 bool DigitalInput::Get() const {
@@ -84,6 +64,10 @@ AnalogTriggerType DigitalInput::GetAnalogTriggerTypeForRouting() const {
 }
 
 bool DigitalInput::IsAnalogTrigger() const { return false; }
+
+void DigitalInput::SetSimDevice(HAL_SimDeviceHandle device) {
+  HAL_SetDIOSimDevice(m_handle, device);
+}
 
 int DigitalInput::GetChannel() const { return m_channel; }
 

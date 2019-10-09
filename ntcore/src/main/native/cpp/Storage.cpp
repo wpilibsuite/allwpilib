@@ -110,7 +110,7 @@ void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
       // ignore arbitrary entry assignments
       // this can happen due to e.g. assignment to deleted entry
       lock.unlock();
-      DEBUG("server: received assignment to unknown entry");
+      DEBUG0("server: received assignment to unknown entry");
       return;
     }
     entry = m_idmap[id];
@@ -118,7 +118,7 @@ void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
     // clients simply accept new assignments
     if (id == 0xffff) {
       lock.unlock();
-      DEBUG("client: received entry assignment request?");
+      DEBUG0("client: received entry assignment request?");
       return;
     }
     if (id >= m_idmap.size()) m_idmap.resize(id + 1);
@@ -171,7 +171,7 @@ void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
   // sanity check: name should match id
   if (msg->str() != entry->name) {
     lock.unlock();
-    DEBUG("entry assignment for same id with different name?");
+    DEBUG0("entry assignment for same id with different name?");
     return;
   }
 
@@ -217,7 +217,7 @@ void Storage::ProcessIncomingEntryUpdate(std::shared_ptr<Message> msg,
     // ignore arbitrary entry updates;
     // this can happen due to deleted entries
     lock.unlock();
-    DEBUG("received update to unknown entry");
+    DEBUG0("received update to unknown entry");
     return;
   }
   Entry* entry = m_idmap[id];
@@ -254,7 +254,7 @@ void Storage::ProcessIncomingFlagsUpdate(std::shared_ptr<Message> msg,
     // ignore arbitrary entry updates;
     // this can happen due to deleted entries
     lock.unlock();
-    DEBUG("received flags update to unknown entry");
+    DEBUG0("received flags update to unknown entry");
     return;
   }
 
@@ -278,7 +278,7 @@ void Storage::ProcessIncomingEntryDelete(std::shared_ptr<Message> msg,
     // ignore arbitrary entry updates;
     // this can happen due to deleted entries
     lock.unlock();
-    DEBUG("received delete to unknown entry");
+    DEBUG0("received delete to unknown entry");
     return;
   }
 
@@ -319,13 +319,13 @@ void Storage::ProcessIncomingExecuteRpc(
     // ignore call to non-existent RPC
     // this can happen due to deleted entries
     lock.unlock();
-    DEBUG("received RPC call to unknown entry");
+    DEBUG0("received RPC call to unknown entry");
     return;
   }
   Entry* entry = m_idmap[id];
   if (!entry->value || !entry->value->IsRpc()) {
     lock.unlock();
-    DEBUG("received RPC call to non-RPC entry");
+    DEBUG0("received RPC call to non-RPC entry");
     return;
   }
   ConnectionInfo conn_info;
@@ -358,13 +358,13 @@ void Storage::ProcessIncomingRpcResponse(std::shared_ptr<Message> msg,
     // ignore response to non-existent RPC
     // this can happen due to deleted entries
     lock.unlock();
-    DEBUG("received rpc response to unknown entry");
+    DEBUG0("received rpc response to unknown entry");
     return;
   }
   Entry* entry = m_idmap[id];
   if (!entry->value || !entry->value->IsRpc()) {
     lock.unlock();
-    DEBUG("received RPC response to non-RPC entry");
+    DEBUG0("received RPC response to non-RPC entry");
     return;
   }
   m_rpc_results.insert(std::make_pair(
@@ -404,13 +404,13 @@ void Storage::ApplyInitialAssignments(
   // apply assignments
   for (auto& msg : msgs) {
     if (!msg->Is(Message::kEntryAssign)) {
-      DEBUG("client: received non-entry assignment request?");
+      DEBUG0("client: received non-entry assignment request?");
       continue;
     }
 
     unsigned int id = msg->id();
     if (id == 0xffff) {
-      DEBUG("client: received entry assignment request?");
+      DEBUG0("client: received entry assignment request?");
       continue;
     }
 

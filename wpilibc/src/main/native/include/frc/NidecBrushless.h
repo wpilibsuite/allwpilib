@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,16 +14,20 @@
 #include "frc/MotorSafety.h"
 #include "frc/PWM.h"
 #include "frc/SpeedController.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Nidec Brushless Motor.
  */
-class NidecBrushless : public SendableBase,
-                       public SpeedController,
-                       public MotorSafety {
+class NidecBrushless : public SpeedController,
+                       public MotorSafety,
+                       public Sendable,
+                       public SendableHelper<NidecBrushless> {
  public:
   /**
    * Constructor.
