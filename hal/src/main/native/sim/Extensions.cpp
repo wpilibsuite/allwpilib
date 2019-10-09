@@ -7,6 +7,7 @@
 
 #include "hal/Extensions.h"
 
+#include <wpi/Path.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
@@ -44,7 +45,8 @@ extern "C" {
 
 int HAL_LoadOneExtension(const char* library) {
   int rc = 1;  // It is expected and reasonable not to find an extra simulation
-  wpi::outs() << "Attempting to load: " << basename(library) << "\n";
+  wpi::outs() << "HAL Extensions: Attempting to load: "
+              << wpi::sys::path::stem(library) << "\n";
   wpi::outs().flush();
   HTYPE handle = DLOPEN(library);
 #if !defined(WIN32) && !defined(_WIN32)
@@ -56,13 +58,14 @@ int HAL_LoadOneExtension(const char* library) {
 #else
     libraryName += ".so";
 #endif
-    wpi::outs() << "Trying modified name: " << basename(libraryName.c_str());
+    wpi::outs() << "HAL Extensions: Trying modified name: "
+                << wpi::sys::path::stem(libraryName);
     wpi::outs().flush();
     handle = DLOPEN(libraryName.c_str());
   }
 #endif
   if (!handle) {
-    wpi::outs() << "Failed to load library\n";
+    wpi::outs() << "HAL Extensions: Failed to load library\n";
     wpi::outs().flush();
     return rc;
   }
@@ -73,11 +76,11 @@ int HAL_LoadOneExtension(const char* library) {
   if (init) rc = (*init)();
 
   if (rc != 0) {
-    wpi::outs() << "Failed to load extension\n";
+    wpi::outs() << "HAL Extensions: Failed to load extension\n";
     wpi::outs().flush();
     DLCLOSE(handle);
   } else {
-    wpi::outs() << "Successfully loaded extension\n";
+    wpi::outs() << "HAL Extensions: Successfully loaded extension\n";
     wpi::outs().flush();
   }
   return rc;
@@ -88,7 +91,7 @@ int HAL_LoadExtensions(void) {
   wpi::SmallVector<wpi::StringRef, 2> libraries;
   const char* e = std::getenv("HALSIM_EXTENSIONS");
   if (!e) {
-    wpi::outs() << "No extensions found\n";
+    wpi::outs() << "HAL Extensions: No extensions found\n";
     wpi::outs().flush();
     return rc;
   }
