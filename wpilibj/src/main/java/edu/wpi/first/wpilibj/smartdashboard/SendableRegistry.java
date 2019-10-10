@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Sendable;
 
 
@@ -408,7 +409,8 @@ public class SendableRegistry {
    * @param dataHandle data handle to get data pointer passed to callback
    * @param callback function to call for each object
    */
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+                     "PMD.AvoidCatchingThrowable"})
   public static synchronized void foreachLiveWindow(int dataHandle,
       LiveWindowForeachCallback callback) {
     for (Component comp : components.values()) {
@@ -422,7 +424,18 @@ public class SendableRegistry {
         if (comp.m_data != null && dataHandle < comp.m_data.length) {
           data = comp.m_data[dataHandle];
         }
-        data = callback.call(sendable, comp.m_name, comp.m_subsystem, parent, data);
+        try {
+          data = callback.call(sendable, comp.m_name, comp.m_subsystem, parent, data);
+        } catch (Throwable throwable) {
+          Throwable cause = throwable.getCause();
+          if (cause != null) {
+            throwable = cause;
+          }
+          DriverStation.reportError(
+              "Unhandled exception calling LiveWindow for " + comp.m_name + ": "
+                  + throwable.toString(), false);
+          comp.m_liveWindow = false;
+        }
         if (data != null) {
           if (comp.m_data == null) {
             comp.m_data = new Object[dataHandle + 1];
