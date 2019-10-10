@@ -46,11 +46,6 @@ public class VideoSink implements AutoCloseable {
     m_handle = handle;
   }
 
-  @Deprecated
-  public void free() {
-    close();
-  }
-
   @Override
   public synchronized void close() {
     if (m_handle != 0) {
@@ -186,7 +181,7 @@ public class VideoSink implements AutoCloseable {
    * @return Connected source; nullptr if no source connected.
    */
   public VideoSource getSource() {
-    // While VideoSource.free() will call releaseSource(), getSinkSource()
+    // While VideoSource.close() will call releaseSource(), getSinkSource()
     // increments the internal reference count so this is okay to do.
     return new VideoSource(CameraServerJNI.getSinkSource(m_handle));
   }

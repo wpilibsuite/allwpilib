@@ -32,6 +32,8 @@ stages:
 
     container: wpilib2020
 
+    timeoutInMinutes: 0
+
     steps:
       - task: Gradle@2
         condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
@@ -65,6 +67,8 @@ stages:
       vmImage: 'Ubuntu 16.04'
 
     container: raspbian
+
+    timeoutInMinutes: 0
 
     steps:
       - task: Gradle@2
@@ -100,6 +104,8 @@ stages:
 
     container: aarch64
 
+    timeoutInMinutes: 0
+
     steps:
       - task: Gradle@2
         condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
@@ -133,6 +139,8 @@ stages:
       vmImage: 'Ubuntu 16.04'
 
     container: ubuntu
+
+    timeoutInMinutes: 0
 
     steps:
       - task: Gradle@2
@@ -168,6 +176,8 @@ stages:
 
     container: ubuntu
 
+    timeoutInMinutes: 0
+
     steps:
         - script: |
             sudo pip3 install wpiformat
@@ -187,6 +197,8 @@ stages:
 
     container: wpilib2020
 
+    timeoutInMinutes: 0
+
     steps:
         - task: CMake@1
           inputs:
@@ -199,6 +211,8 @@ stages:
   - job: Windows_64_Bit
     pool:
       vmImage: 'windows-2019'
+
+    timeoutInMinutes: 0
     steps:
       - task: Gradle@2
         condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
@@ -232,6 +246,8 @@ stages:
   - job: Windows_32_Bit
     pool:
       vmImage: 'windows-2019'
+
+    timeoutInMinutes: 0
     steps:
       - powershell: |
           mkdir build
@@ -275,6 +291,8 @@ stages:
   - job: Mac
     pool:
       vmImage: 'macOS-10.14'
+
+    timeoutInMinutes: 0
     steps:
       - script: |
           mkdir build
@@ -318,6 +336,8 @@ stages:
   - job: CombineJob
     pool:
       vmImage: 'macOS-10.14'
+
+    timeoutInMinutes: 0
 
     steps:
     - checkout: none
