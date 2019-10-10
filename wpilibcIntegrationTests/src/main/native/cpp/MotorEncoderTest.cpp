@@ -175,7 +175,7 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
   /* 10 seconds should be plenty time to get to the reference */
   frc::Notifier pidRunner{[this, &pidController] {
     auto speed = pidController.Calculate(
-      m_filter->Calculate(m_encoder->GetRate()) + 8e-5);
+      m_filter->Calculate(m_encoder->GetRate()));
     m_speedController->Set(std::clamp(speed, -0.3, 0.3));
   }};
   pidRunner.StartPeriodic(pidController.GetPeriod());
