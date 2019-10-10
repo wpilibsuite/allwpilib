@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
+import edu.wpi.first.wpiutil.math.MathUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -181,8 +182,10 @@ public class MotorEncoderTest extends AbstractComsSetup {
     pidController.setIntegratorRange(-0.2, 0.2);
     pidController.setSetpoint(1000);
 
-    Notifier pidRunner = new Notifier(
-        () -> me.getMotor().set(pidController.calculate(me.getEncoder().getDistance())));
+    Notifier pidRunner = new Notifier(() -> {
+      var speed = pidController.calculate(me.getEncoder().getDistance());
+      me.getMotor().set(MathUtils.clamp(speed, -0.2, 0.2));
+    });
 
     pidRunner.startPeriodic(pidController.getPeriod());
     Timer.delay(10.0);
@@ -202,8 +205,10 @@ public class MotorEncoderTest extends AbstractComsSetup {
     pidController.setTolerance(200);
     pidController.setSetpoint(600);
 
-    Notifier pidRunner =
-        new Notifier(() -> me.getMotor().set(filter.calculate(me.getEncoder().getRate()) + 8e-5));
+    Notifier pidRunner = new Notifier(() -> {
+      var speed = filter.calculate(me.getEncoder().getRate());
+      me.getMotor().set(MathUtils.clamp(speed, -0.3, 0.3));
+    });
 
     pidRunner.startPeriodic(pidController.getPeriod());
     Timer.delay(10.0);

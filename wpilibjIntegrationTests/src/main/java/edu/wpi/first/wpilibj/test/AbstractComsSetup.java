@@ -52,7 +52,7 @@ public abstract class AbstractComsSetup {
         DriverStation.getInstance().getAlliance();
 
         ds = new MockDS();
-        //ds.start();
+        ds.start();
 
         LiveWindow.setEnabled(false);
         TestBench.out().println("Started coms");
