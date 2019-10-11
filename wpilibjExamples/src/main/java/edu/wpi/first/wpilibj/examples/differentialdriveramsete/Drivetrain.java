@@ -39,7 +39,7 @@ public class Drivetrain extends SubsystemBase {
 
   // Encoders
   private final Encoder m_leftEncoder = new Encoder(0, 1);
-  private final Encoder m_rightEncoder = new Encoder(0, 1);
+  private final Encoder m_rightEncoder = new Encoder(2, 3);
 
   // Speed Controller Groups
   private final SpeedControllerGroup m_leftGroup

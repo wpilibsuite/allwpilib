@@ -80,7 +80,7 @@ class Drivetrain : public frc2::SubsystemBase {
 
   // Encoders
   frc::Encoder m_leftEncoder{0, 1};
-  frc::Encoder m_rightEncoder{0, 1};
+  frc::Encoder m_rightEncoder{2, 3};
 
   // PID Controllers to track individual velocities
   frc2::PIDController m_leftPIDController{1.0, 0.0, 0.0};
