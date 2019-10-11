@@ -373,5 +373,15 @@
     "foldername": "differentialdrivebot",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "DifferentialDriveRamsete",
+    "description": "An example program for a differential drive that uses the Ramsete controller to track a trajectory.",
+    "tags": [
+      "DifferentialDriveRamsete"
+    ],
+    "foldername": "differentialdriveramsete",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
