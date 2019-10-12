@@ -9,6 +9,7 @@
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/WaitUntilCommand.h"
+#include "frc2/command/SequentialCommandGroup.h"
 
 using namespace frc2;
 class ParallelRaceGroupTest : public CommandTestBase {};
