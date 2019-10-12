@@ -69,7 +69,6 @@ public class ParallelRaceGroup extends CommandGroupBase {
       command.execute();
       if (command.isFinished()) {
         m_finished = true;
-        command.end(false);
       }
     }
   }
@@ -77,9 +76,7 @@ public class ParallelRaceGroup extends CommandGroupBase {
   @Override
   public void end(boolean interrupted) {
     for (Command command : m_commands) {
-      if (!command.isFinished()) {
-        command.end(true);
-      }
+      command.end(!command.isFinished());
     }
   }
 

@@ -77,7 +77,9 @@ public class SequentialCommandGroup extends CommandGroupBase {
 
   @Override
   public void end(boolean interrupted) {
-    if (interrupted && !m_commands.isEmpty()) {
+    if (interrupted && !m_commands.isEmpty() && m_currentCommandIndex > -1
+        && m_currentCommandIndex < m_commands.size()
+    ){
       m_commands.get(m_currentCommandIndex).end(true);
     }
     m_currentCommandIndex = -1;

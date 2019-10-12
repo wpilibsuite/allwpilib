@@ -9,10 +9,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -139,10 +136,12 @@ class ParallelRaceGroupTest extends CommandTestBase {
     Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, system2);
     Command command2 = command2Holder.getMock();
-    MockCommandHolder perpetualCommandHolder = new MockCommandHolder(true, system2);
-    Command command3 = perpetualCommandHolder.getMock().perpetually();
+    MockCommandHolder perpetualCommandHolder = new MockCommandHolder(true);
+    Command command3 = new PerpetualCommand(perpetualCommandHolder.getMock());
 
     Command group1 = new SequentialCommandGroup(command1, command2);
+    assertNotNull(group1);
+    assertNotNull(command3);
     Command group2 = new ParallelRaceGroup(group1, command3);
 
     CommandScheduler scheduler = new CommandScheduler();

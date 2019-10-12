@@ -129,3 +129,30 @@ TEST_F(ParallelRaceGroupTest, RaceGroupRequirementTest) {
   EXPECT_TRUE(scheduler.IsScheduled(&command3));
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
+
+TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnceTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  TestSubsystem requirement1;
+  TestSubsystem requirement2;
+
+  bool finished1 = false;
+  bool finished2 = false;
+
+  WaitUntilCommand command1([&finished] { return finished1; });
+  WaitUntilCommand command2([&finished] { return finished2; });
+  WaitUntilCommand command3([&finished] { return false; });
+
+  ParallelRaceGroup group1(command1, command2);
+  ParallelRaceGroup group2(group1, command3);
+
+  scheduler.Schedule(&group2);
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(&group2));
+  finished1 = true
+  scheduler.Run();
+  finished2 = true
+  scheduler.Run();
+  EXPECT_FALSE(scheduler.IsScheduled(&group2));
+
+}
