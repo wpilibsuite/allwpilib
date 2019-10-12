@@ -38,7 +38,7 @@ void SequentialCommandGroup::Execute() {
 }
 
 void SequentialCommandGroup::End(bool interrupted) {
-  if (interrupted && !m_commands.empty() && m_currentCommandIndex > -1 &&
+  if (interrupted && !m_commands.empty() && m_currentCommandIndex != invalid_index &&
       m_currentCommandIndex < m_commands.size()) {
     m_commands[m_currentCommandIndex]->End(interrupted);
   }
