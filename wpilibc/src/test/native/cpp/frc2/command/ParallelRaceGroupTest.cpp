@@ -154,5 +154,4 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnceTest) {
   finished2 = true;
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&group2));
-
 }
