@@ -129,4 +129,32 @@ class ParallelRaceGroupTest extends CommandTestBase {
 
     assertThrows(IllegalArgumentException.class, () -> new ParallelRaceGroup(command1, command2));
   }
+
+  @Test
+  void parallelRaceOnlyCallsEndOnceTest() {
+    Subsystem system1 = new TestSubsystem();
+    Subsystem system2 = new TestSubsystem();
+
+    MockCommandHolder command1Holder = new MockCommandHolder(true, system1);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true, system2);
+    Command command2 = command2Holder.getMock();
+    MockCommandHolder perpetualCommandHolder = new MockCommandHolder(true, system2);
+    Command command3 = perpetualCommandHolder.getMock().perpetually();
+
+    Command group1 = new SequentialCommandGroup(command1, command2);
+    Command group2 = new ParallelRaceGroup(group1, command3);
+
+    CommandScheduler scheduler = new CommandScheduler();
+
+    scheduler.schedule(group2);
+    scheduler.run();
+    command1Holder.setFinished(true);
+    scheduler.run();
+    command2Holder.setFinished(true);
+    // at this point the sequential group should be done
+    scheduler.run();
+
+  }
+
 }
