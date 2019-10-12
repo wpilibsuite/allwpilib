@@ -138,12 +138,13 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnceTest) {
 
   bool finished1 = false;
   bool finished2 = false;
+  bool finished3 = false;
 
-  WaitUntilCommand command1([&finished] { return finished1; });
-  WaitUntilCommand command2([&finished] { return finished2; });
-  WaitUntilCommand command3([&finished] { return false; });
+  WaitUntilCommand command1([&finished1] { return finished1; });
+  WaitUntilCommand command2([&finished2] { return finished2; });
+  WaitUntilCommand command3([&finished3] { return finished3; });
 
-  ParallelRaceGroup group1(command1, command2);
+  SequentialCommandGroup group1(command1, command2);
   ParallelRaceGroup group2(group1, command3);
 
   scheduler.Schedule(&group2);
