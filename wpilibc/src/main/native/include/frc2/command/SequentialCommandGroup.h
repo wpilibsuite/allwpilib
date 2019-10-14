@@ -5,8 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 4521)
+#endif
+
 #pragma once
-#pragma warning(disable:4521)
 
 #include <limits>
 #include <memory>
@@ -94,3 +98,7 @@ class SequentialCommandGroup
   bool m_runWhenDisabled{true};
 };
 }  // namespace frc2
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
