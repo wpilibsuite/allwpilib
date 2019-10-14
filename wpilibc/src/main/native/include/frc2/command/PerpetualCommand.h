@@ -54,6 +54,9 @@ class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
   // No copy constructors for command groups
   PerpetualCommand(const PerpetualCommand& other) = delete;
 
+  // Prevent template expansion from emulating copy ctor
+  PerpetualCommand(SequentialCommandGroup&) = delete;
+
   void Initialize() override;
 
   void Execute() override;

@@ -48,6 +48,9 @@ class ParallelRaceGroup
   // No copy constructors for command groups
   ParallelRaceGroup(const ParallelRaceGroup&) = delete;
 
+  // Prevent template expansion from emulating copy ctor
+  ParallelRaceGroup(SequentialCommandGroup&) = delete;
+
   template <class... Types>
   void AddCommands(Types&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;

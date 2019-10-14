@@ -61,6 +61,9 @@ class SequentialCommandGroup
   // No copy constructors for command groups
   SequentialCommandGroup(const SequentialCommandGroup&) = delete;
 
+  // Prevent template expansion from emulating copy ctor
+  SequentialCommandGroup(SequentialCommandGroup&) = delete;
+
   template <class... Types,
             typename = std::enable_if_t<std::conjunction_v<
                 std::is_base_of<Command, std::remove_reference_t<Types>>...>>>

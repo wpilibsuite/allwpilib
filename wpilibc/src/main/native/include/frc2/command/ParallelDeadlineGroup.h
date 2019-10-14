@@ -65,6 +65,9 @@ class ParallelDeadlineGroup
   // No copy constructors for command groups
   ParallelDeadlineGroup(const ParallelDeadlineGroup&) = delete;
 
+  // Prevent template expansion from emulating copy ctor
+  ParallelDeadlineGroup(SequentialCommandGroup&) = delete;
+
   template <class... Types,
             typename = std::enable_if_t<std::conjunction_v<
                 std::is_base_of<Command, std::remove_reference_t<Types>>...>>>

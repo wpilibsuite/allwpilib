@@ -88,6 +88,9 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
   // No copy constructors for command groups
   SelectCommand(const SelectCommand& other) = delete;
 
+  // Prevent template expansion from emulating copy ctor
+  SelectCommand(SequentialCommandGroup&) = delete;
+
   /**
    * Creates a new selectcommand.
    *
