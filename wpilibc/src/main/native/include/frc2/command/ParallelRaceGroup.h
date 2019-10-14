@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+#pragma warning(disable:4521)
 
 #include <memory>
 #include <set>
