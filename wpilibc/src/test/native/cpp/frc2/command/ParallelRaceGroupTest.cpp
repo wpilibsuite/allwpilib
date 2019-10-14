@@ -134,9 +134,6 @@ TEST_F(ParallelRaceGroupTest, RaceGroupRequirementTest) {
 TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnceTest) {
   CommandScheduler scheduler = GetScheduler();
 
-  TestSubsystem requirement1;
-  TestSubsystem requirement2;
-
   bool finished1 = false;
   bool finished2 = false;
   bool finished3 = false;
@@ -146,7 +143,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnceTest) {
   WaitUntilCommand command3([&finished3] { return finished3; });
 
   SequentialCommandGroup group1(command1, command2);
-  ParallelRaceGroup group2(group1, command3);
+  ParallelRaceGroup group2(std::move(group1), command3);
 
   scheduler.Schedule(&group2);
   scheduler.Run();
