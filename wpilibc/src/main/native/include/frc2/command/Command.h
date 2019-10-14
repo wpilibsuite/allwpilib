@@ -51,13 +51,7 @@ class ProxyScheduleCommand;
  */
 class Command : public frc::ErrorBase {
  public:
-  Command() = default;
   virtual ~Command();
-
-  Command(const Command&);
-  Command& operator=(const Command&);
-  Command(Command&&) = default;
-  Command& operator=(Command&&) = default;
 
   /**
    * The initial subroutine of a command.  Called once when the command is
@@ -222,6 +216,12 @@ class Command : public frc::ErrorBase {
   virtual std::string GetName() const;
 
  protected:
+  Command() = default;
+  Command(const Command&);
+  Command& operator=(const Command&);
+  Command(Command&&) = default;
+  Command& operator=(Command&&) = default;
+
   /**
    * Transfers ownership of this command to a unique pointer.  Used for
    * decorator methods.

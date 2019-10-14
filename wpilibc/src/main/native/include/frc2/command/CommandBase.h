@@ -68,6 +68,11 @@ class CommandBase : public Command,
 
  protected:
   CommandBase();
+  CommandBase(const CommandBase&) = default;
+  CommandBase& operator=(const CommandBase&) = default;
+  CommandBase(CommandBase&&) = default;
+  CommandBase& operator=(CommandBase&&) = default;
+
   wpi::SmallSet<Subsystem*, 4> m_requirements;
 };
 }  // namespace frc2
