@@ -26,10 +26,13 @@ template <typename Base, typename CRTP,
 class CommandHelper : public Base {
   using Base::Base;
 
- public:
-  CommandHelper() = default;
-
  protected:
+  CommandHelper() = default;
+  CommandHelper(const CommandHelper&) = default;
+  CommandHelper& operator=(const CommandHelper&) = default;
+  CommandHelper(CommandHelper&&) = default;
+  CommandHelper& operator=(CommandHelper&&) = default;
+
   std::unique_ptr<Command> TransferOwnership() && override {
     return std::make_unique<CRTP>(std::move(*static_cast<CRTP*>(this)));
   }
