@@ -55,7 +55,7 @@ class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
   PerpetualCommand(const PerpetualCommand& other) = delete;
 
   // Prevent template expansion from emulating copy ctor
-  PerpetualCommand(SequentialCommandGroup&) = delete;
+  PerpetualCommand(PerpetualCommand&) = delete;
 
   void Initialize() override;
 

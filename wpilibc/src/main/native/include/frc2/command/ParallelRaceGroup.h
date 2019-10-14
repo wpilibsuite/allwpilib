@@ -49,7 +49,7 @@ class ParallelRaceGroup
   ParallelRaceGroup(const ParallelRaceGroup&) = delete;
 
   // Prevent template expansion from emulating copy ctor
-  ParallelRaceGroup(SequentialCommandGroup&) = delete;
+  ParallelRaceGroup(ParallelRaceGroup&) = delete;
 
   template <class... Types>
   void AddCommands(Types&&... commands) {

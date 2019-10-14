@@ -66,7 +66,7 @@ class ParallelDeadlineGroup
   ParallelDeadlineGroup(const ParallelDeadlineGroup&) = delete;
 
   // Prevent template expansion from emulating copy ctor
-  ParallelDeadlineGroup(SequentialCommandGroup&) = delete;
+  ParallelDeadlineGroup(ParallelDeadlineGroup&) = delete;
 
   template <class... Types,
             typename = std::enable_if_t<std::conjunction_v<

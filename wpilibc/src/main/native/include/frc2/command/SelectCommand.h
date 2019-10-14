@@ -89,7 +89,7 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
   SelectCommand(const SelectCommand& other) = delete;
 
   // Prevent template expansion from emulating copy ctor
-  SelectCommand(SequentialCommandGroup&) = delete;
+  SelectCommand(SelectCommand&) = delete;
 
   /**
    * Creates a new selectcommand.

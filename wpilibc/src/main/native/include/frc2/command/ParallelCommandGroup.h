@@ -58,7 +58,7 @@ class ParallelCommandGroup
   ParallelCommandGroup(const ParallelCommandGroup&) = delete;
 
   // Prevent template expansion from emulating copy ctor
-  ParallelCommandGroup(SequentialCommandGroup&) = delete;
+  ParallelCommandGroup(ParallelCommandGroup&) = delete;
 
   template <class... Types,
             typename = std::enable_if_t<std::conjunction_v<
