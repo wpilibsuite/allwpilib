@@ -38,6 +38,6 @@ public class Robot extends TimedRobot {
     /*
      * Retrieves the temperature of the PDP, in degrees Celsius.
      */
-    SmartDashboard.putNumber("Temprature", m_pdp.getTemperature());
+    SmartDashboard.putNumber("Temperature", m_pdp.getTemperature());
   }
 }
