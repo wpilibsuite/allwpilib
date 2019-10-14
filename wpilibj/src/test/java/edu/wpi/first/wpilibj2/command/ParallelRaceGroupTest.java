@@ -156,7 +156,7 @@ class ParallelRaceGroupTest extends CommandTestBase {
     scheduler.run();
     command2Holder.setFinished(true);
     // at this point the sequential group should be done
-    scheduler.run();
+    assertDoesNotThrow(() -> scheduler.run());
 
   }
 
