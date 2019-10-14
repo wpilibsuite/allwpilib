@@ -351,7 +351,7 @@ static void DisplayFMS() {
   static const char* stations[] = {"Red 1",  "Red 2",  "Red 3",
                                    "Blue 1", "Blue 2", "Blue 3"};
   int allianceStationId = HALSIM_GetDriverStationAllianceStationId();
-  ImGui::SetNextItemWidth(100);
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   if (ImGui::Combo("Alliance Station", &allianceStationId, stations, 6))
     HALSIM_SetDriverStationAllianceStationId(
         static_cast<HAL_AllianceStationID>(allianceStationId));
@@ -362,7 +362,7 @@ static void DisplayFMS() {
 
   static double startMatchTime = 0.0;
   double matchTime = HALSIM_GetDriverStationMatchTime();
-  ImGui::SetNextItemWidth(100);
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   if (ImGui::InputDouble("Match Time", &matchTime, 0, 0, "%.1f",
                          ImGuiInputTextFlags_EnterReturnsTrue)) {
     HALSIM_SetDriverStationMatchTime(matchTime);
@@ -380,7 +380,7 @@ static void DisplayFMS() {
 
   // Game Specific Message
   static HAL_MatchInfo matchInfo;
-  ImGui::SetNextItemWidth(100);
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   if (ImGui::InputText("Game Specific",
                        reinterpret_cast<char*>(matchInfo.gameSpecificMessage),
                        sizeof(matchInfo.gameSpecificMessage),
@@ -420,7 +420,7 @@ static void DisplaySystemJoysticks() {
 
 static void DisplayJoysticks() {
   // imgui doesn't size columns properly with autoresize, so force it
-  ImGui::Dummy(ImVec2(14.0 * 9 * HAL_kMaxJoysticks, 0));
+  ImGui::Dummy(ImVec2(ImGui::GetFontSize() * 10 * HAL_kMaxJoysticks, 0));
 
   ImGui::Columns(HAL_kMaxJoysticks, "Joysticks", false);
   for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
