@@ -81,6 +81,13 @@ public final class CommandScheduler implements Sendable {
   private final List<Consumer<Command>> m_interruptActions = new ArrayList<>();
   private final List<Consumer<Command>> m_finishActions = new ArrayList<>();
 
+  // Flag and queues for avoiding ConcurrentModificationException if commands are
+  // scheduled/canceled during run
+  private boolean m_inRunLoop;
+  private final Map<Command, Boolean> m_toSchedule = new LinkedHashMap<>();
+  private final List<Command> m_toCancel = new ArrayList<>();
+
+
   CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
@@ -132,6 +139,11 @@ public final class CommandScheduler implements Sendable {
    */
   @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   private void schedule(boolean interruptible, Command command) {
+    if (m_inRunLoop) {
+      m_toSchedule.put(command, interruptible);
+      return;
+    }
+
     if (CommandGroupBase.getGroupedCommands().contains(command)) {
       throw new IllegalArgumentException(
           "A command that is part of a command group cannot be independently scheduled");
@@ -222,6 +234,7 @@ public final class CommandScheduler implements Sendable {
       button.run();
     }
 
+    m_inRunLoop = true;
     //Run scheduled commands, remove finished commands.
     for (Iterator<Command> iterator = m_scheduledCommands.keySet().iterator();
          iterator.hasNext(); ) {
@@ -251,6 +264,19 @@ public final class CommandScheduler implements Sendable {
         m_requirements.keySet().removeAll(command.getRequirements());
       }
     }
+    m_inRunLoop = false;
+
+    //Schedule/cancel commands from queues populated during loop
+    for (Map.Entry<Command, Boolean> commandInterruptible : m_toSchedule.entrySet()) {
+      schedule(commandInterruptible.getValue(), commandInterruptible.getKey());
+    }
+
+    for (Command command : m_toCancel) {
+      cancel(command);
+    }
+
+    m_toSchedule.clear();
+    m_toCancel.clear();
 
     //Add default commands for un-required registered subsystems.
     for (Map.Entry<Subsystem, Command> subsystemCommand : m_subsystems.entrySet()) {
@@ -326,6 +352,11 @@ public final class CommandScheduler implements Sendable {
    * @param commands the commands to cancel
    */
   public void cancel(Command... commands) {
+    if (m_inRunLoop) {
+      m_toCancel.addAll(List.of(commands));
+      return;
+    }
+
     for (Command command : commands) {
       if (!m_scheduledCommands.containsKey(command)) {
         continue;
