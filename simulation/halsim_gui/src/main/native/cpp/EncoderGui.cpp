@@ -54,7 +54,7 @@ static void EncodersWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
 static void DisplayEncoders() {
   bool hasAny = false;
   static int numEncoder = HAL_GetNumEncoders();
-  ImGui::PushItemWidth(100);
+  ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
   for (int i = 0; i < numEncoder; ++i) {
     if (HALSIM_GetEncoderInitialized(i)) {
       hasAny = true;
