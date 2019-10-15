@@ -51,6 +51,12 @@ class SwerveDriveOdometry {
   }
 
   /**
+   * Returns the position of the robot on the field.
+   * @return The pose of the robot.
+   */
+  const Pose2d& GetPose() const { return m_pose; }
+
+  /**
    * Updates the robot's position on the field using forward kinematics and
    * integration of the pose over time. This method takes in the current time as
    * a parameter to calculate period (difference between two timestamps). The
