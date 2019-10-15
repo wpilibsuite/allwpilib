@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#pragma once
+
 #ifdef _WIN32
 #pragma warning(push)
 #pragma warning(disable : 4521)
 #endif
-
-#pragma once
 
 #include <memory>
 #include <unordered_map>
