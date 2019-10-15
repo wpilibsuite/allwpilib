@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
@@ -23,7 +24,7 @@ import java.util.function.Supplier;
  */
 public class RamseteCommand extends CommandBase {
   private final Timer m_timer = new Timer();
-  private DifferentialDriveWheelSpeeds m_prevSpeeds = new DifferentialDriveWheelSpeeds();
+  private DifferentialDriveWheelSpeeds m_prevSpeeds;
   private double m_prevTime;
 
   private final Trajectory m_trajectory;
@@ -91,6 +92,13 @@ public class RamseteCommand extends CommandBase {
 
   @Override
   public void initialize() {
+    m_prevTime = 0;
+    var initialState = m_trajectory.sample(0);
+    m_prevSpeeds = m_kinematics.toWheelSpeeds(
+        new ChassisSpeeds(initialState.velocityMetersPerSecond,
+                          0,
+                          initialState.curvatureRadPerMeter
+                              * initialState.velocityMetersPerSecond));
     m_timer.reset();
     m_timer.start();
   }
@@ -100,31 +108,36 @@ public class RamseteCommand extends CommandBase {
     double curTime = m_timer.get();
     double dt = curTime - m_prevTime;
 
-    var wheelSpeeds = m_kinematics.toWheelSpeeds(
+    var targetWheelSpeeds = m_kinematics.toWheelSpeeds(
         m_follower.calculate(m_pose.get(), m_trajectory.sample(curTime)));
 
-    double leftFeedforward = m_ks * Math.signum(wheelSpeeds.leftMetersPerSecond)
-                             + m_kv * wheelSpeeds.leftMetersPerSecond
-                             + m_ka * (wheelSpeeds.leftMetersPerSecond
-                                       - m_prevSpeeds.leftMetersPerSecond) / dt;
+    var leftSpeedSetpoint = targetWheelSpeeds.leftMetersPerSecond;
+    var rightSpeedSetpoint = targetWheelSpeeds.rightMetersPerSecond;
 
-    double rightFeedforward = m_ks * Math.signum(wheelSpeeds.rightMetersPerSecond)
-                              + m_kv * wheelSpeeds.rightMetersPerSecond
-                              + m_ka * (wheelSpeeds.rightMetersPerSecond
-                                        - m_prevSpeeds.rightMetersPerSecond) / dt;
+    double leftFeedforward =
+        m_ks * Math.signum(leftSpeedSetpoint)
+            + m_kv * leftSpeedSetpoint
+            + m_ka * (leftSpeedSetpoint
+            - m_prevSpeeds.leftMetersPerSecond) / dt;
+
+    double rightFeedforward =
+        m_ks * Math.signum(rightSpeedSetpoint)
+            + m_kv * rightSpeedSetpoint
+            + m_ka * (rightSpeedSetpoint
+            - m_prevSpeeds.rightMetersPerSecond) / dt;
 
     double leftOutput = leftFeedforward / 12.
-                        + m_leftController.calculate(wheelSpeeds.leftMetersPerSecond,
-                                                     m_leftSpeed.getAsDouble());
+        + m_leftController.calculate(leftSpeedSetpoint,
+                                     m_leftSpeed.getAsDouble());
 
     double rightOutput = rightFeedforward / 12.
-                         + m_rightController.calculate(wheelSpeeds.rightMetersPerSecond,
-                                                       m_rightSpeed.getAsDouble());
+        + m_rightController.calculate(rightSpeedSetpoint,
+                                      m_rightSpeed.getAsDouble());
 
     m_output.accept(leftOutput, rightOutput);
 
     m_prevTime = curTime;
-    m_prevSpeeds = wheelSpeeds;
+    m_prevSpeeds = targetWheelSpeeds;
   }
 
   @Override
