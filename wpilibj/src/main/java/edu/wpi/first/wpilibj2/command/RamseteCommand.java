@@ -21,8 +21,12 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  *
  * <p>The command handles trajectory-following, PID calculations, and feedforwards internally.  This
  * is intended to be a more-or-less "complete solution" that can be used by teams without a great
- * deal of controls expertise - teams seeking more flexibility may want to write their own,
- * less-constrained version of this class.
+ * deal of controls expertise.
+ *
+ * <p>Advanced teams seeking more flexibility (for example, those who wish to use the onboard
+ * PID functionality of a "smart" motor controller) may use the secondary constructor that omits
+ * the PID and feedforward functionality, returning only the raw wheel speeds from the RAMSETE
+ * controller.
  */
 public class RamseteCommand extends CommandBase {
   private final Timer m_timer = new Timer();
