@@ -117,14 +117,12 @@ public class RamseteCommand extends CommandBase {
     double leftFeedforward =
         m_ks * Math.signum(leftSpeedSetpoint)
             + m_kv * leftSpeedSetpoint
-            + m_ka * (leftSpeedSetpoint
-            - m_prevSpeeds.leftMetersPerSecond) / dt;
+            + m_ka * (leftSpeedSetpoint - m_prevSpeeds.leftMetersPerSecond) / dt;
 
     double rightFeedforward =
         m_ks * Math.signum(rightSpeedSetpoint)
             + m_kv * rightSpeedSetpoint
-            + m_ka * (rightSpeedSetpoint
-            - m_prevSpeeds.rightMetersPerSecond) / dt;
+            + m_ka * (rightSpeedSetpoint - m_prevSpeeds.rightMetersPerSecond) / dt;
 
     double leftOutput = leftFeedforward / 12.
         + m_leftController.calculate(leftSpeedSetpoint,
