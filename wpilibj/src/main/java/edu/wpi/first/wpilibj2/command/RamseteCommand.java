@@ -141,7 +141,13 @@ public class RamseteCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     if (!interrupted) {
-      m_output.accept(0., 0.);
+      var finalState = m_trajectory.sample(m_trajectory.getTotalTimeSeconds());
+      var finalSpeeds = m_kinematics.toWheelSpeeds(
+          new ChassisSpeeds(finalState.velocityMetersPerSecond,
+                            0,
+                            finalState.curvatureRadPerMeter
+                                * finalState.velocityMetersPerSecond));
+      m_output.accept(finalSpeeds.leftMetersPerSecond, finalSpeeds.rightMetersPerSecond);
     }
     m_timer.stop();
   }
