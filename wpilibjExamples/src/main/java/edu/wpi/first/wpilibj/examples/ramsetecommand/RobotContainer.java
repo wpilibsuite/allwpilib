@@ -92,7 +92,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
 
     // An example trajectory to follow.  All units in meters.
-    Trajectory m_exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
@@ -117,8 +117,8 @@ public class RobotContainer {
         false
     );
 
-    RamseteCommand m_ramseteCommand = new RamseteCommand(
-        m_exampleTrajectory,
+    RamseteCommand ramseteCommand = new RamseteCommand(
+        exampleTrajectory,
         m_robotDrive::getPose,
         new RamseteController(kRamseteB, kRamseteZeta),
         ksVolts,
@@ -133,6 +133,6 @@ public class RobotContainer {
     );
 
     // Run path following command, then stop at the end.
-    return m_ramseteCommand.whenFinished(() -> m_robotDrive.tankDrive(0, 0));
+    return ramseteCommand.whenFinished(() -> m_robotDrive.tankDrive(0, 0));
   }
 }
