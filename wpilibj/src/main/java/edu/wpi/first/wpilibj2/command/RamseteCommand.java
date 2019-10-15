@@ -13,6 +13,8 @@ import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
 /**
  * A command that uses a RAMSETE controller ({@link RamseteController}) to follow a trajectory
  * with a differential drive.
@@ -42,19 +44,20 @@ public class RamseteCommand extends CommandBase {
 
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the provided trajectory.
+   * PID control and feedforward are handled internally, and outputs are scaled -1 to 1 for easy
+   * consumption by speed controllers.
    *
    * @param trajectory                     The trajectory to follow.
    * @param pose                           A function that supplies the robot pose - use one of
    *                                       the odometry classes to provide this.
-   * @param controller                     The RAMSETE controller used to follow the trajectory -
+   * @param follower                       The RAMSETE follower used to follow the trajectory -
    *                                       see {@link RamseteController}.
    * @param ksVolts                        Constant feedforward term for the robot drive.
    * @param kvVoltSecondsPerMeter          Velocity-proportional feedforward term for the robot
    *                                       drive.
    * @param kaVoltSecondsSquaredPerMeter   Acceleration-proportional feedforward term for the robot
    *                                       drive.
-   * @param trackwidthMeters               The trackwidth of the robot drive.  Should be
-   *                                       empirically measured.
+   * @param kinematics                     The kinematics for the robot drivetrain.
    * @param leftWheelSpeedMetersPerSecond  A function that supplies the speed of the left side of
    *                                       the robot drive.
    * @param rightWheelSpeedMetersPerSecond A function that supplies the speed of the right side of
@@ -66,28 +69,66 @@ public class RamseteCommand extends CommandBase {
    */
   public RamseteCommand(Trajectory trajectory,
                         Supplier<Pose2d> pose,
-                        RamseteController controller,
+                        RamseteController follower,
                         double ksVolts,
                         double kvVoltSecondsPerMeter,
                         double kaVoltSecondsSquaredPerMeter,
-                        double trackwidthMeters,
+                        DifferentialDriveKinematics kinematics,
                         DoubleSupplier leftWheelSpeedMetersPerSecond,
                         DoubleSupplier rightWheelSpeedMetersPerSecond,
                         PIDController leftController,
                         PIDController rightController,
                         BiConsumer<Double, Double> output) {
-    m_trajectory = trajectory;
-    m_pose = pose;
-    m_follower = controller;
+    m_trajectory = requireNonNullParam(trajectory, "trajectory", "RamseteCommand");
+    m_pose = requireNonNullParam(pose, "pose", "RamseteCommand");
+    m_follower = requireNonNullParam(follower, "follower", "RamseteCommand");
     m_ks = ksVolts;
     m_kv = kvVoltSecondsPerMeter;
     m_ka = kaVoltSecondsSquaredPerMeter;
-    m_kinematics = new DifferentialDriveKinematics(trackwidthMeters);
-    m_leftSpeed = leftWheelSpeedMetersPerSecond;
-    m_rightSpeed = rightWheelSpeedMetersPerSecond;
-    m_leftController = leftController;
-    m_rightController = rightController;
-    m_output = output;
+    m_kinematics = requireNonNullParam(kinematics, "kinematics", "RamseteCommand");
+    m_leftSpeed = requireNonNullParam(leftWheelSpeedMetersPerSecond,
+                                      "leftWheelSpeedMetersPerSecond",
+                                      "RamseteCommand");
+    m_rightSpeed = requireNonNullParam(rightWheelSpeedMetersPerSecond,
+                                       "rightWheelSpeedMetersPerSecond",
+                                       "RamseteCommand");
+    m_leftController = requireNonNullParam(leftController, "leftController", "RamseteCommand");
+    m_rightController = requireNonNullParam(rightController, "rightController", "RamseteCommand");
+    m_output = requireNonNullParam(output, "output", "RamseteCommand");
+  }
+
+  /**
+   * Constructs a new RamseteCommand that, when executed, will follow the provided trajectory.
+   * Performs no PID control and calculates no feedforwards; outputs are the raw wheel speeds
+   * from the RAMSETE controller, and will need to be converted into a usable form by the user.
+   *
+   * @param trajectory The trajectory to follow.
+   * @param pose       A function that supplies the robot pose - use one of
+   *                   the odometry classes to provide this.
+   * @param follower   The RAMSETE follower used to follow the trajectory -
+   *                   see {@link RamseteController}.
+   * @param kinematics The kinematics for the robot drivetrain.
+   * @param output     A function that consumes the computed left and right
+   *                   wheel speeds.
+   */
+  public RamseteCommand(Trajectory trajectory,
+                        Supplier<Pose2d> pose,
+                        RamseteController follower,
+                        DifferentialDriveKinematics kinematics,
+                        BiConsumer<Double, Double> output) {
+    m_trajectory = requireNonNullParam(trajectory, "trajectory", "RamseteCommand");
+    m_pose = requireNonNullParam(pose, "pose", "RamseteCommand");
+    m_follower = requireNonNullParam(follower, "follower", "RamseteCommand");
+    m_kinematics = requireNonNullParam(kinematics, "kinematics", "RamseteCommand");
+    m_output = requireNonNullParam(output, "output", "RamseteCommand");
+
+    m_ks = 0;
+    m_kv = 0;
+    m_ka = 0;
+    m_leftSpeed = null;
+    m_rightSpeed = null;
+    m_leftController = null;
+    m_rightController = null;
   }
 
   @Override
@@ -114,23 +155,31 @@ public class RamseteCommand extends CommandBase {
     var leftSpeedSetpoint = targetWheelSpeeds.leftMetersPerSecond;
     var rightSpeedSetpoint = targetWheelSpeeds.rightMetersPerSecond;
 
-    double leftFeedforward =
-        m_ks * Math.signum(leftSpeedSetpoint)
-            + m_kv * leftSpeedSetpoint
-            + m_ka * (leftSpeedSetpoint - m_prevSpeeds.leftMetersPerSecond) / dt;
+    double leftOutput;
+    double rightOutput;
 
-    double rightFeedforward =
-        m_ks * Math.signum(rightSpeedSetpoint)
-            + m_kv * rightSpeedSetpoint
-            + m_ka * (rightSpeedSetpoint - m_prevSpeeds.rightMetersPerSecond) / dt;
+    if (m_leftController != null) {
+      double leftFeedforward =
+          m_ks * Math.signum(leftSpeedSetpoint)
+              + m_kv * leftSpeedSetpoint
+              + m_ka * (leftSpeedSetpoint - m_prevSpeeds.leftMetersPerSecond) / dt;
 
-    double leftOutput = leftFeedforward / 12.
-        + m_leftController.calculate(leftSpeedSetpoint,
-                                     m_leftSpeed.getAsDouble());
+      double rightFeedforward =
+          m_ks * Math.signum(rightSpeedSetpoint)
+              + m_kv * rightSpeedSetpoint
+              + m_ka * (rightSpeedSetpoint - m_prevSpeeds.rightMetersPerSecond) / dt;
 
-    double rightOutput = rightFeedforward / 12.
-        + m_rightController.calculate(rightSpeedSetpoint,
-                                      m_rightSpeed.getAsDouble());
+      leftOutput = leftFeedforward / 12.
+          + m_leftController.calculate(leftSpeedSetpoint,
+                                       m_leftSpeed.getAsDouble());
+
+      rightOutput = rightFeedforward / 12.
+          + m_rightController.calculate(rightSpeedSetpoint,
+                                        m_rightSpeed.getAsDouble());
+    } else {
+      leftOutput = leftSpeedSetpoint;
+      rightOutput = rightSpeedSetpoint;
+    }
 
     m_output.accept(leftOutput, rightOutput);
 
