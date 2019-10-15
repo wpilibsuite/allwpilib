@@ -75,3 +75,34 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
       points, std::move(constraints), startVelocity, endVelocity, maxVelocity,
       maxAcceleration, reversed);
 }
+
+Trajectory TrajectoryGenerator::GenerateTrajectory(
+    const std::vector<Pose2d>& waypoints,
+    const DifferentialDriveKinematics& differentialDriveKinematics,
+    units::meters_per_second_t startVelocity,
+    units::meters_per_second_t endVelocity,
+    units::meters_per_second_t maxVelocity,
+    units::meters_per_second_squared_t maxAcceleration, bool reversed) {
+  std::vector<TrajectoryConstraint> constraints{
+      std::make_unique<DifferentialDriveKinematicsConstraint>(
+          differentialDriveKinematics, maxVelocity)};
+  return GenerateTrajectory(waypoints, std::move(constraints), startVelocity,
+                            endVelocity, maxVelocity, maxAcceleration,
+                            reversed);
+}
+
+Trajectory TrajectoryGenerator::GenerateTrajectory(
+    const Pose2d& start, const std::vector<Translation2d>& waypoints,
+    const Pose2d& end,
+    const DifferentialDriveKinematics& differentialDriveKinematics,
+    units::meters_per_second_t startVelocity,
+    units::meters_per_second_t endVelocity,
+    units::meters_per_second_t maxVelocity,
+    units::meters_per_second_squared_t maxAcceleration, bool reversed) {
+  std::vector<TrajectoryConstraint> constraints{
+      std::make_unique<DifferentialDriveKinematicsConstraint>(
+          differentialDriveKinematics, maxVelocity)};
+  return GenerateTrajectory(start, waypoints, end, std::move(constraints),
+                            startVelocity, endVelocity, maxVelocity,
+                            maxAcceleration, reversed);
+}
