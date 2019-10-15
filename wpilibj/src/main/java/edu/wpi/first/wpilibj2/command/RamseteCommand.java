@@ -46,7 +46,7 @@ public class RamseteCommand extends CommandBase {
    * @param pose                           A function that supplies the robot pose - use one of
    *                                       the odometry classes to provide this.
    * @param controller                     The RAMSETE controller used to follow the trajectory -
-   *                                      see {@link RamseteController}.
+   *                                       see {@link RamseteController}.
    * @param ksVolts                        Constant feedforward term for the robot drive.
    * @param kvVoltSecondsPerMeter          Velocity-proportional feedforward term for the robot
    *                                       drive.
@@ -56,8 +56,8 @@ public class RamseteCommand extends CommandBase {
    *                                       empirically measured.
    * @param leftWheelSpeedMetersPerSecond  A function that supplies the speed of the left side of
    *                                       the robot drive.
-   * @param rightWheelSpeedMetersPerSecond A function that supplies the speed of the right side
-   *                                       of the robot drive.
+   * @param rightWheelSpeedMetersPerSecond A function that supplies the speed of the right side of
+   *                                       the robot drive.
    * @param leftController                 The PIDController for the left side of the robot drive.
    * @param rightController                The PIDController for the right side of the robot drive.
    * @param output                         A function that consumes the computed left and right
