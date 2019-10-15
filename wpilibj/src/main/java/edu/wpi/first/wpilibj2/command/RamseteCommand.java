@@ -51,6 +51,9 @@ public class RamseteCommand extends CommandBase {
    * PID control and feedforward are handled internally, and outputs are scaled -1 to 1 for easy
    * consumption by speed controllers.
    *
+   * <p>Note: The controller will *not* set the output to zero upon completion of the path - this
+   * is left to the user, since it is not appropriate for paths with nonstationary endstates.
+   *
    * @param trajectory                     The trajectory to follow.
    * @param pose                           A function that supplies the robot pose - use one of
    *                                       the odometry classes to provide this.
@@ -193,15 +196,6 @@ public class RamseteCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    if (!interrupted) {
-      var finalState = m_trajectory.sample(m_trajectory.getTotalTimeSeconds());
-      var finalSpeeds = m_kinematics.toWheelSpeeds(
-          new ChassisSpeeds(finalState.velocityMetersPerSecond,
-                            0,
-                            finalState.curvatureRadPerMeter
-                                * finalState.velocityMetersPerSecond));
-      m_output.accept(finalSpeeds.leftMetersPerSecond, finalSpeeds.rightMetersPerSecond);
-    }
     m_timer.stop();
   }
 
