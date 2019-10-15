@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.examples.ramsetecommand.subsystems.DriveSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.OIConstants.kDriverControllerPort;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.AutoConstants.kAutoPathConstraints;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.AutoConstants.kMaxSpeedMetersPerSecond;
@@ -37,6 +36,7 @@ import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConst
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kaVoltSecondsSquaredPerMeter;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.ksVolts;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kvVoltSecondsPerMeter;
+import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.OIConstants.kDriverControllerPort;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
