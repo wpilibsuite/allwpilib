@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,7 +14,7 @@
 
 using namespace frc;
 
-GenericHID::GenericHID(int port) : m_ds(DriverStation::GetInstance()) {
+GenericHID::GenericHID(int port) : m_ds(&DriverStation::GetInstance()) {
   if (port >= DriverStation::kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
   }
@@ -22,39 +22,41 @@ GenericHID::GenericHID(int port) : m_ds(DriverStation::GetInstance()) {
 }
 
 bool GenericHID::GetRawButton(int button) const {
-  return m_ds.GetStickButton(m_port, button);
+  return m_ds->GetStickButton(m_port, button);
 }
 
 bool GenericHID::GetRawButtonPressed(int button) {
-  return m_ds.GetStickButtonPressed(m_port, button);
+  return m_ds->GetStickButtonPressed(m_port, button);
 }
 
 bool GenericHID::GetRawButtonReleased(int button) {
-  return m_ds.GetStickButtonReleased(m_port, button);
+  return m_ds->GetStickButtonReleased(m_port, button);
 }
 
 double GenericHID::GetRawAxis(int axis) const {
-  return m_ds.GetStickAxis(m_port, axis);
+  return m_ds->GetStickAxis(m_port, axis);
 }
 
-int GenericHID::GetPOV(int pov) const { return m_ds.GetStickPOV(m_port, pov); }
+int GenericHID::GetPOV(int pov) const { return m_ds->GetStickPOV(m_port, pov); }
 
-int GenericHID::GetAxisCount() const { return m_ds.GetStickAxisCount(m_port); }
+int GenericHID::GetAxisCount() const { return m_ds->GetStickAxisCount(m_port); }
 
-int GenericHID::GetPOVCount() const { return m_ds.GetStickPOVCount(m_port); }
+int GenericHID::GetPOVCount() const { return m_ds->GetStickPOVCount(m_port); }
 
 int GenericHID::GetButtonCount() const {
-  return m_ds.GetStickButtonCount(m_port);
+  return m_ds->GetStickButtonCount(m_port);
 }
 
 GenericHID::HIDType GenericHID::GetType() const {
-  return static_cast<HIDType>(m_ds.GetJoystickType(m_port));
+  return static_cast<HIDType>(m_ds->GetJoystickType(m_port));
 }
 
-std::string GenericHID::GetName() const { return m_ds.GetJoystickName(m_port); }
+std::string GenericHID::GetName() const {
+  return m_ds->GetJoystickName(m_port);
+}
 
 int GenericHID::GetAxisType(int axis) const {
-  return m_ds.GetJoystickAxisType(m_port, axis);
+  return m_ds->GetJoystickAxisType(m_port, axis);
 }
 
 int GenericHID::GetPort() const { return m_port; }

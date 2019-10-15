@@ -57,6 +57,8 @@ class Timer {
 
   virtual ~Timer() = default;
 
+  Timer(const Timer& rhs);
+  Timer& operator=(const Timer& rhs);
   Timer(Timer&& rhs);
   Timer& operator=(Timer&& rhs);
 

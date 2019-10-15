@@ -19,15 +19,15 @@ static constexpr auto kSamplePeriod = 0.0005_s;
 static constexpr double kCalibrationSampleTime = 5.0;
 static constexpr double kDegreePerSecondPerLSB = 0.0125;
 
-static constexpr int kRateRegister = 0x00;
-static constexpr int kTemRegister = 0x02;
-static constexpr int kLoCSTRegister = 0x04;
-static constexpr int kHiCSTRegister = 0x06;
-static constexpr int kQuadRegister = 0x08;
-static constexpr int kFaultRegister = 0x0A;
+// static constexpr int kRateRegister = 0x00;
+// static constexpr int kTemRegister = 0x02;
+// static constexpr int kLoCSTRegister = 0x04;
+// static constexpr int kHiCSTRegister = 0x06;
+// static constexpr int kQuadRegister = 0x08;
+// static constexpr int kFaultRegister = 0x0A;
 static constexpr int kPIDRegister = 0x0C;
-static constexpr int kSNHighRegister = 0x0E;
-static constexpr int kSNLowRegister = 0x10;
+// static constexpr int kSNHighRegister = 0x0E;
+// static constexpr int kSNLowRegister = 0x10;
 
 ADXRS450_Gyro::ADXRS450_Gyro() : ADXRS450_Gyro(SPI::kOnboardCS0) {}
 
