@@ -63,7 +63,7 @@ class RobotContainer {
           // speed)
           .WithTimeout(ac::kAutoTimeoutSeconds)
           // When the command ends, turn off the shooter and the feeder
-          .WhenFinished([this] {
+          .AndThen([this] {
             m_shooter.Disable();
             m_shooter.StopFeeder();
           });

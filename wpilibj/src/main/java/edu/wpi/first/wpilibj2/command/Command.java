@@ -99,7 +99,7 @@ public interface Command {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  default Command interruptOn(BooleanSupplier condition) {
+  default Command withInterrupt(BooleanSupplier condition) {
     return new ParallelRaceGroup(this, new WaitUntilCommand(condition));
   }
 
@@ -115,7 +115,7 @@ public interface Command {
    * @param toRun the Runnable to run
    * @return the decorated command
    */
-  default Command whenFinished(Runnable toRun) {
+  default Command andThen(Runnable toRun) {
     return new SequentialCommandGroup(this, new InstantCommand(toRun));
   }
 

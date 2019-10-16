@@ -52,7 +52,7 @@ class RobotContainer {
           [this] { m_drive.ArcadeDrive(ac::kAutoDriveSpeed, 0); },
           [this] { m_drive.ArcadeDrive(0, 0); }, {&m_drive})
           .BeforeStarting([this] { m_drive.ResetEncoders(); })
-          .InterruptOn([this] {
+          .WithInterrupt([this] {
             return m_drive.GetAverageEncoderDistance() >=
                    ac::kAutoDriveDistanceInches;
           });
