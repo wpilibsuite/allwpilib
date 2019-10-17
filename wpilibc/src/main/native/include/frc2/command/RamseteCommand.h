@@ -12,7 +12,8 @@
 
 #pragma once
 
-class RamseteCommand : public CommandHelper<RamseteCommand, CommandBase> {
+namespace frc2{
+class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
 using voltsecondspermeter = units::compound_unit<units::voltage::volt, units::second, units::inverse<units::meter>>;
 using voltsecondssquaredpermeter = units::compound_unit<units::voltage::volt, units::squared<units::second>, units::inverse<units::meter>>;
 
@@ -56,3 +57,4 @@ using voltsecondssquaredpermeter = units::compound_unit<units::voltage::volt, un
   units::second_t m_prevTime;
   frc::DifferentialDriveWheelSpeeds m_prevSpeeds;
 };
+}
