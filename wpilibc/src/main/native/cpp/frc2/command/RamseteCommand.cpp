@@ -1,7 +1,6 @@
 #include "frc2/command/RamseteCommand.h"
 
 using namespace frc2;
-using namespace units;
 using namespace units::literals;
 
 template <typename T>
