@@ -201,6 +201,6 @@ public class RamseteCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return m_timer.get() >= m_trajectory.getTotalTimeSeconds();
+    return m_timer.get() - m_trajectory.getTotalTimeSeconds() >= 0;
   }
 }
