@@ -152,23 +152,23 @@ public final class TrajectoryGenerator {
    * @return The trajectory.
    */
   public static Trajectory generateTrajectory(
-    List<Pose2d> waypoints,
-    DifferentialDriveKinematics differentialDriveKinematics,
-    double startVelocityMetersPerSecond,
-    double endVelocityMetersPerSecond,
-    double maxVelocityMetersPerSecond,
-    double maxAccelerationMetersPerSecondSq,
-    boolean reversed
+      List<Pose2d> waypoints,
+      DifferentialDriveKinematics differentialDriveKinematics,
+      double startVelocityMetersPerSecond,
+      double endVelocityMetersPerSecond,
+      double maxVelocityMetersPerSecond,
+      double maxAccelerationMetersPerSecondSq,
+      boolean reversed
   ) {
     return generateTrajectory(
-      waypoints,
-      List.of(new DifferentialDriveKinematicsConstraint(differentialDriveKinematics,
-        maxVelocityMetersPerSecond)),
-      startVelocityMetersPerSecond,
-      endVelocityMetersPerSecond,
-      maxVelocityMetersPerSecond,
-      maxAccelerationMetersPerSecondSq,
-      reversed
+        waypoints,
+        List.of(new DifferentialDriveKinematicsConstraint(differentialDriveKinematics,
+            maxVelocityMetersPerSecond)),
+        startVelocityMetersPerSecond,
+        endVelocityMetersPerSecond,
+        maxVelocityMetersPerSecond,
+        maxAccelerationMetersPerSecondSq,
+        reversed
     );
   }
 
@@ -195,25 +195,25 @@ public final class TrajectoryGenerator {
    * @return The trajectory.
    */
   public static Trajectory generateTrajectory(
-    Pose2d start,
-    List<Translation2d> waypoints,
-    Pose2d end,
-    DifferentialDriveKinematics differentialDriveKinematics,
-    double startVelocityMetersPerSecond,
-    double endVelocityMetersPerSecond,
-    double maxVelocityMetersPerSecond,
-    double maxAccelerationMetersPerSecondSq,
-    boolean reversed
+      Pose2d start,
+      List<Translation2d> waypoints,
+      Pose2d end,
+      DifferentialDriveKinematics differentialDriveKinematics,
+      double startVelocityMetersPerSecond,
+      double endVelocityMetersPerSecond,
+      double maxVelocityMetersPerSecond,
+      double maxAccelerationMetersPerSecondSq,
+      boolean reversed
   ) {
     return generateTrajectory(
-      start, waypoints, end,
-      List.of(new DifferentialDriveKinematicsConstraint(differentialDriveKinematics,
-        maxVelocityMetersPerSecond)),
-      startVelocityMetersPerSecond,
-      endVelocityMetersPerSecond,
-      maxVelocityMetersPerSecond,
-      maxAccelerationMetersPerSecondSq,
-      reversed
+        start, waypoints, end,
+        List.of(new DifferentialDriveKinematicsConstraint(differentialDriveKinematics,
+            maxVelocityMetersPerSecond)),
+        startVelocityMetersPerSecond,
+        endVelocityMetersPerSecond,
+        maxVelocityMetersPerSecond,
+        maxAccelerationMetersPerSecondSq,
+        reversed
     );
   }
 
