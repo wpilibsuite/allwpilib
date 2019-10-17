@@ -83,9 +83,11 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     units::meters_per_second_t endVelocity,
     units::meters_per_second_t maxVelocity,
     units::meters_per_second_squared_t maxAcceleration, bool reversed) {
-  std::vector<TrajectoryConstraint> constraints{
+  std::vector<std::unique_ptr<TrajectoryConstraint>> constraints;
+  constraints.emplace_back(
       std::make_unique<DifferentialDriveKinematicsConstraint>(
-          differentialDriveKinematics, maxVelocity)};
+          differentialDriveKinematics, maxVelocity));
+
   return GenerateTrajectory(waypoints, std::move(constraints), startVelocity,
                             endVelocity, maxVelocity, maxAcceleration,
                             reversed);
@@ -99,9 +101,11 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     units::meters_per_second_t endVelocity,
     units::meters_per_second_t maxVelocity,
     units::meters_per_second_squared_t maxAcceleration, bool reversed) {
-  std::vector<TrajectoryConstraint> constraints{
+  std::vector<std::unique_ptr<TrajectoryConstraint>> constraints;
+  constraints.emplace_back(
       std::make_unique<DifferentialDriveKinematicsConstraint>(
-          differentialDriveKinematics, maxVelocity)};
+          differentialDriveKinematics, maxVelocity));
+
   return GenerateTrajectory(start, waypoints, end, std::move(constraints),
                             startVelocity, endVelocity, maxVelocity,
                             maxAcceleration, reversed);
