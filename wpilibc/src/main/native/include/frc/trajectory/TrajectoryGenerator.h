@@ -13,6 +13,7 @@
 
 #include "frc/spline/SplineParameterizer.h"
 #include "frc/trajectory/Trajectory.h"
+#include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 
 namespace frc {
@@ -68,6 +69,62 @@ class TrajectoryGenerator {
       const Pose2d& start, const std::vector<Translation2d>& waypoints,
       const Pose2d& end,
       std::vector<std::unique_ptr<TrajectoryConstraint>>&& constraints,
+      units::meters_per_second_t startVelocity,
+      units::meters_per_second_t endVelocity,
+      units::meters_per_second_t maxVelocity,
+      units::meters_per_second_squared_t maxAcceleration, bool reversed);
+
+  /**
+   * Generates a trajectory with the given waypoints and differential drive
+   * constraints. Use this method if you just want a constraint such that none
+   * of the wheels on your differential drive exceed the specified max velocity.
+   * If you desire to impose more constraints, please use the other overloads.
+   *
+   * @param waypoints A vector of points that the trajectory must go through.
+   * @param differentialDriveKinematics The DifferentialDriveKinematics
+   * object that represents your drivetrain.
+   * @param startVelocity The start velocity for the trajectory.
+   * @param endVelocity The end velocity for the trajectory.
+   * @param maxVelocity The max velocity for the trajectory.
+   * @param maxAcceleration The max acceleration for the trajectory.
+   * @param reversed Whether the robot should move backwards. Note that the
+   * robot will still move from a -> b -> ... -> z as defined in the waypoints.
+   *
+   * @return The trajectory.
+   */
+  static Trajectory GenerateTrajectory(
+      const std::vector<Pose2d>& waypoints,
+      const DifferentialDriveKinematics& differentialDriveKinematics,
+      units::meters_per_second_t startVelocity,
+      units::meters_per_second_t endVelocity,
+      units::meters_per_second_t maxVelocity,
+      units::meters_per_second_squared_t maxAcceleration, bool reversed);
+
+  /**
+   * Generates a trajectory with the given waypoints and differential drive
+   * constraints. Use this method if you just want a constraint such that none
+   * of the wheels on your differential drive exceed the specified max velocity.
+   * If you desire to impose more constraints, please use the other overloads.
+   *
+   * @param start The starting pose for the trajectory.
+   * @param waypoints The interior waypoints for the trajectory. The headings
+   * will be determined automatically to ensure continuous curvature.
+   * @param end The ending pose for the trajectory.
+   * @param differentialDriveKinematics The DifferentialDriveKinematics
+   * object that represents your drivetrain.
+   * @param startVelocity The start velocity for the trajectory.
+   * @param endVelocity The end velocity for the trajectory.
+   * @param maxVelocity The max velocity for the trajectory.
+   * @param maxAcceleration The max acceleration for the trajectory.
+   * @param reversed Whether the robot should move backwards. Note that the
+   * robot will still move from a -> b -> ... -> z as defined in the waypoints.
+   *
+   * @return The trajectory.
+   */
+  static Trajectory GenerateTrajectory(
+      const Pose2d& start, const std::vector<Translation2d>& waypoints,
+      const Pose2d& end,
+      const DifferentialDriveKinematics& differentialDriveKinematics,
       units::meters_per_second_t startVelocity,
       units::meters_per_second_t endVelocity,
       units::meters_per_second_t maxVelocity,
