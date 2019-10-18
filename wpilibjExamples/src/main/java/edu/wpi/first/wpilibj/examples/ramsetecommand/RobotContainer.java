@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.examples.ramsetecommand.subsystems.DriveSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.AutoConstants.kAutoPathConstraints;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.AutoConstants.kMaxSpeedMetersPerSecond;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.AutoConstants.kRamseteB;
@@ -65,7 +64,7 @@ public class RobotContainer {
         // hand, and turning controlled by the right.
         new RunCommand(() -> m_robotDrive
             .arcadeDrive(m_driverController.getY(GenericHID.Hand.kLeft),
-                m_driverController.getX(GenericHID.Hand.kRight)), m_robotDrive));
+                         m_driverController.getX(GenericHID.Hand.kRight)), m_robotDrive));
 
   }
 
@@ -98,7 +97,7 @@ public class RobotContainer {
         // Pass through these two interior waypoints, making an 's' curve path
         List.of(
             new Translation2d(1, 1),
-            new Translation2d(2, -1)
+            new Translation2d(2, - 1)
         ),
         // End 3 meters straight ahead of where we started, facing forward
         new Pose2d(3, 0, new Rotation2d(0)),
@@ -125,10 +124,10 @@ public class RobotContainer {
         kDriveKinematics,
         () -> m_robotDrive.getLeftEncoder().getRate(),
         () -> m_robotDrive.getRightEncoder().getRate(),
-        new PIDController(kPDriveVel, 0,0),
-        new PIDController(kPDriveVel, 0,0),
+        new PIDController(kPDriveVel, 0, 0),
+        new PIDController(kPDriveVel, 0, 0),
         // RamseteCommand passes volts to the callback, so we have to rescale here
-        (left, right) -> m_robotDrive.tankDrive(left/12., right/12.)
+        (left, right) -> m_robotDrive.tankDrive(left / 12., right / 12.)
     );
 
     // Run path following command, then stop at the end.
