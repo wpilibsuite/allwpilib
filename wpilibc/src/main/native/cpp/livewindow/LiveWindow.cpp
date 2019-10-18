@@ -24,7 +24,6 @@ struct LiveWindow::Impl {
   Impl();
 
   struct Component {
-    SendableBuilderImpl builder;
     bool firstTime = true;
     bool telemetryEnabled = true;
   };
@@ -85,13 +84,11 @@ void LiveWindow::DisableTelemetry(Sendable* sendable) {
 void LiveWindow::DisableAllTelemetry() {
   std::scoped_lock lock(m_impl->mutex);
   m_impl->telemetryEnabled = false;
-  m_impl->registry.ForeachLiveWindow(
-      m_impl->dataHandle, [&](Sendable*, wpi::StringRef, wpi::StringRef,
-                              Sendable*, std::shared_ptr<void>& data) {
-        if (!data) data = std::make_shared<Impl::Component>();
-        std::static_pointer_cast<Impl::Component>(data)->telemetryEnabled =
-            false;
-      });
+  m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
+    if (!cbdata.data) cbdata.data = std::make_shared<Impl::Component>();
+    std::static_pointer_cast<Impl::Component>(cbdata.data)->telemetryEnabled =
+        false;
+  });
 }
 
 bool LiveWindow::IsEnabled() const {
@@ -111,13 +108,9 @@ void LiveWindow::SetEnabled(bool enabled) {
     scheduler->SetEnabled(false);
     scheduler->RemoveAll();
   } else {
-    m_impl->registry.ForeachLiveWindow(
-        m_impl->dataHandle, [&](Sendable*, wpi::StringRef, wpi::StringRef,
-                                Sendable*, std::shared_ptr<void>& data) {
-          if (data)
-            std::static_pointer_cast<Impl::Component>(data)
-                ->builder.StopLiveWindowMode();
-        });
+    m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
+      cbdata.builder.StopLiveWindowMode();
+    });
     scheduler->SetEnabled(true);
   }
   m_impl->enabledEntry.SetBoolean(enabled);
@@ -132,42 +125,39 @@ void LiveWindow::UpdateValuesUnsafe() {
   // Only do this if either LiveWindow mode or telemetry is enabled.
   if (!m_impl->liveWindowEnabled && !m_impl->telemetryEnabled) return;
 
-  m_impl->registry.ForeachLiveWindow(
-      m_impl->dataHandle,
-      [&](Sendable* sendable, wpi::StringRef name, wpi::StringRef subsystem,
-          Sendable* parent, std::shared_ptr<void>& data) {
-        if (!sendable || parent) return;
+  m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
+    if (!cbdata.sendable || cbdata.parent) return;
 
-        if (!data) data = std::make_shared<Impl::Component>();
+    if (!cbdata.data) cbdata.data = std::make_shared<Impl::Component>();
 
-        auto& comp = *std::static_pointer_cast<Impl::Component>(data);
+    auto& comp = *std::static_pointer_cast<Impl::Component>(cbdata.data);
 
-        if (!m_impl->liveWindowEnabled && !comp.telemetryEnabled) return;
+    if (!m_impl->liveWindowEnabled && !comp.telemetryEnabled) return;
 
-        if (comp.firstTime) {
-          // By holding off creating the NetworkTable entries, it allows the
-          // components to be redefined. This allows default sensor and actuator
-          // values to be created that are replaced with the custom names from
-          // users calling setName.
-          if (name.empty()) return;
-          auto ssTable = m_impl->liveWindowTable->GetSubTable(subsystem);
-          std::shared_ptr<NetworkTable> table;
-          // Treat name==subsystem as top level of subsystem
-          if (name == subsystem)
-            table = ssTable;
-          else
-            table = ssTable->GetSubTable(name);
-          table->GetEntry(".name").SetString(name);
-          comp.builder.SetTable(table);
-          sendable->InitSendable(comp.builder);
-          ssTable->GetEntry(".type").SetString("LW Subsystem");
+    if (comp.firstTime) {
+      // By holding off creating the NetworkTable entries, it allows the
+      // components to be redefined. This allows default sensor and actuator
+      // values to be created that are replaced with the custom names from
+      // users calling setName.
+      if (cbdata.name.empty()) return;
+      auto ssTable = m_impl->liveWindowTable->GetSubTable(cbdata.subsystem);
+      std::shared_ptr<NetworkTable> table;
+      // Treat name==subsystem as top level of subsystem
+      if (cbdata.name == cbdata.subsystem)
+        table = ssTable;
+      else
+        table = ssTable->GetSubTable(cbdata.name);
+      table->GetEntry(".name").SetString(cbdata.name);
+      cbdata.builder.SetTable(table);
+      cbdata.sendable->InitSendable(cbdata.builder);
+      ssTable->GetEntry(".type").SetString("LW Subsystem");
 
-          comp.firstTime = false;
-        }
+      comp.firstTime = false;
+    }
 
-        if (m_impl->startLiveWindow) comp.builder.StartLiveWindowMode();
-        comp.builder.UpdateTable();
-      });
+    if (m_impl->startLiveWindow) cbdata.builder.StartLiveWindowMode();
+    cbdata.builder.UpdateTable();
+  });
 
   m_impl->startLiveWindow = false;
 }
