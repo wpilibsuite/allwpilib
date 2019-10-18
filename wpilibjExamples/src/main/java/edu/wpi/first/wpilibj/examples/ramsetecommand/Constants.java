@@ -53,9 +53,6 @@ public final class Constants {
 
     // Example value only - as above, this must be tuned for your drive!
     public static final double kPDriveVel = .5;
-
-    public static final double kTurnToleranceDeg = 5;
-    public static final double kTurnRateToleranceDegPerS = 10; // degrees per second
   }
 
   public static final class OIConstants {
