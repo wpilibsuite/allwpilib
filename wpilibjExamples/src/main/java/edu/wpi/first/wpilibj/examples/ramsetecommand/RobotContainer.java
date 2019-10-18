@@ -127,7 +127,8 @@ public class RobotContainer {
         new PIDController(kPDriveVel, 0, 0),
         new PIDController(kPDriveVel, 0, 0),
         // RamseteCommand passes volts to the callback, so we have to rescale here
-        (left, right) -> m_robotDrive.tankDrive(left / 12., right / 12.)
+        (left, right) -> m_robotDrive.tankDrive(left / 12., right / 12.),
+        m_robotDrive
     );
 
     // Run path following command, then stop at the end.

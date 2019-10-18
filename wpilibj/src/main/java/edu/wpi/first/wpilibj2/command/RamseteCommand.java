@@ -80,6 +80,7 @@ public class RamseteCommand extends CommandBase {
    * @param rightController                The PIDController for the right side of the robot drive.
    * @param outputVolts                    A function that consumes the computed left and right
    *                                       outputs (in volts) for the robot drive.
+   * @param requirements                   The subsystems to require.
    */
   public RamseteCommand(Trajectory trajectory,
                         Supplier<Pose2d> pose,
@@ -92,7 +93,8 @@ public class RamseteCommand extends CommandBase {
                         DoubleSupplier rightWheelSpeedMetersPerSecond,
                         PIDController leftController,
                         PIDController rightController,
-                        BiConsumer<Double, Double> outputVolts) {
+                        BiConsumer<Double, Double> outputVolts,
+                        Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "RamseteCommand");
     m_pose = requireNonNullParam(pose, "pose", "RamseteCommand");
     m_follower = requireNonNullParam(follower, "follower", "RamseteCommand");
@@ -109,6 +111,8 @@ public class RamseteCommand extends CommandBase {
     m_leftController = requireNonNullParam(leftController, "leftController", "RamseteCommand");
     m_rightController = requireNonNullParam(rightController, "rightController", "RamseteCommand");
     m_output = requireNonNullParam(outputVolts, "outputVolts", "RamseteCommand");
+
+    addRequirements(requirements);
   }
 
   /**
@@ -123,12 +127,14 @@ public class RamseteCommand extends CommandBase {
    * @param kinematics            The kinematics for the robot drivetrain.
    * @param outputMetersPerSecond A function that consumes the computed left and right
    *                              wheel speeds.
+   * @param requirements          The subsystems to require.
    */
   public RamseteCommand(Trajectory trajectory,
                         Supplier<Pose2d> pose,
                         RamseteController follower,
                         DifferentialDriveKinematics kinematics,
-                        BiConsumer<Double, Double> outputMetersPerSecond) {
+                        BiConsumer<Double, Double> outputMetersPerSecond,
+                        Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "RamseteCommand");
     m_pose = requireNonNullParam(pose, "pose", "RamseteCommand");
     m_follower = requireNonNullParam(follower, "follower", "RamseteCommand");
@@ -142,6 +148,8 @@ public class RamseteCommand extends CommandBase {
     m_rightSpeed = null;
     m_leftController = null;
     m_rightController = null;
+
+    addRequirements(requirements);
   }
 
   @Override

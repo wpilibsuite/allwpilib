@@ -24,7 +24,8 @@ RamseteCommand::RamseteCommand(
     std::function<units::meters_per_second_t()> leftSpeed,
     std::function<units::meters_per_second_t()> rightSpeed,
     frc2::PIDController leftController, frc2::PIDController rightController,
-    std::function<void(voltage::volt_t, voltage::volt_t)> output)
+    std::function<void(voltage::volt_t, voltage::volt_t)> output,
+    std::initializer_list<Subsystem*> requirements)
     : m_trajectory(trajectory),
       m_pose(pose),
       m_follower(follower),
@@ -36,14 +37,17 @@ RamseteCommand::RamseteCommand(
       m_rightSpeed(rightSpeed),
       m_leftController(std::make_unique<frc2::PIDController>(leftController)),
       m_rightController(std::make_unique<frc2::PIDController>(rightController)),
-      m_outputVolts(output) {}
+      m_outputVolts(output) {
+  AddRequirements(requirements);
+}
 
 RamseteCommand::RamseteCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::RamseteController follower,
     frc::DifferentialDriveKinematics kinematics,
     std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
-        output)
+        output,
+    std::initializer_list<Subsystem*> requirements)
     : m_trajectory(trajectory),
       m_pose(pose),
       m_follower(follower),
@@ -51,7 +55,9 @@ RamseteCommand::RamseteCommand(
       m_kv(0),
       m_ka(0),
       m_kinematics(kinematics),
-      m_outputVel(output) {}
+      m_outputVel(output) {
+  AddRequirements(requirements);
+}
 
 void RamseteCommand::Initialize() {
   m_prevTime = 0_s;

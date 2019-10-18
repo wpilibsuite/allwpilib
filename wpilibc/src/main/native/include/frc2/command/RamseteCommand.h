@@ -80,6 +80,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * of the robot drive.
    * @param output                         A function that consumes the computed
    * left and right outputs (in volts) for the robot drive.
+   * @param requirements                   The subsystems to require.
    */
   RamseteCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
@@ -91,7 +92,8 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
       std::function<units::meters_per_second_t()> rightSpeed,
       frc2::PIDController leftController, frc2::PIDController rightController,
       std::function<void(units::voltage::volt_t, units::voltage::volt_t)>
-          output);
+          output,
+      std::initializer_list<Subsystem*> requirements);
 
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the
@@ -107,13 +109,15 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * @param kinematics            The kinematics for the robot drivetrain.
    * @param output                A function that consumes the computed left and
    * right wheel speeds.
+   * @param requirements          The subsystems to require.
    */
   RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
                  frc::RamseteController follower,
                  frc::DifferentialDriveKinematics kinematics,
                  std::function<void(units::meters_per_second_t,
                                     units::meters_per_second_t)>
-                     output);
+                     output,
+                 std::initializer_list<Subsystem*> requirements);
 
   void Initialize() override;
 
