@@ -102,17 +102,15 @@ public class RobotContainer {
         ),
         // End 3 meters straight ahead of where we started, facing forward
         new Pose2d(3, 0, new Rotation2d(0)),
-        // Apply the path constraints
-        List.of(
-            kAutoPathConstraints
-        ),
+        // Pass the drive kinematics to ensure constraints are obeyed
+        kDriveKinematics,
         // Start stationary
         0,
         // End stationary
         0,
-        // Apply max speed (a bit redundant given the path constraints, but still needed)
+        // Apply max speed constraint
         kMaxSpeedMetersPerSecond,
-        // Apply max acceleration
+        // Apply max acceleration constraint
         kMaxAccelerationMetersPerSecondSquared,
         false
     );

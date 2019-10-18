@@ -138,6 +138,4 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   // Odometry class for tracking robot pose
   frc::DifferentialDriveOdometry m_odometry;
-
-  frc::Pose2d m_curPose;
 };

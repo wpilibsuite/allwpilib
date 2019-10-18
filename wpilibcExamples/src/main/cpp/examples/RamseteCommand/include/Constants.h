@@ -60,9 +60,6 @@ namespace AutoConstants {
 const auto kMaxSpeed = 3_m / 1_s;
 const auto kMaxAcceleration = 3_m / (1_s * 1_s);
 
-const frc::DifferentialDriveKinematicsConstraint kAutoPathConstraint(
-    DriveConstants::kDriveKinematics, kMaxSpeed);
-
 // Reasonable baseline values for a RAMSETE follower in units of meters and
 // seconds
 const double kRamseteB = 2;

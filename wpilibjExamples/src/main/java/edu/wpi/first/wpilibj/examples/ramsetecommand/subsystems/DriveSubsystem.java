@@ -59,8 +59,6 @@ public class DriveSubsystem extends SubsystemBase {
   // Odometry class for tracking robot pose
   DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(kDriveKinematics);
 
-  private Pose2d m_curPose = new Pose2d();
-
   /**
    * Creates a new DriveSubsystem.
    */
@@ -73,7 +71,7 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_curPose = m_odometry.update(new Rotation2d(getHeading()),
+    m_odometry.update(new Rotation2d(getHeading()),
                                   new DifferentialDriveWheelSpeeds(
                                       m_leftEncoder.getRate(),
                                       m_rightEncoder.getRate()
@@ -86,7 +84,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_curPose;
+    return m_odometry.getPoseMeters();
   }
 
   /**
@@ -95,7 +93,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_curPose = pose;
     m_odometry.resetPosition(pose);
   }
 
