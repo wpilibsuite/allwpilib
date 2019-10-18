@@ -73,6 +73,7 @@ model {
                 project(':hal').addHalDependency(binary, 'shared')
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                cppCompiler.args '-Wno-defaulted-function-deleted'
             }
             sources {
                 cpp {
@@ -103,6 +104,7 @@ model {
                         lib project: ':simulation:halsim_print', library: 'halsim_print', linkage: 'shared'
                         lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
                     }
+                    cppCompiler.args '-Wno-defaulted-function-deleted'
                 }
                 sources {
                     cpp {
@@ -152,6 +154,7 @@ model {
                         lib project: ':simulation:halsim_print', library: 'halsim_print', linkage: 'shared'
                         lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
                     }
+                    cppCompiler.args '-Wno-defaulted-function-deleted'
                 }
                 sources {
                     cpp {
