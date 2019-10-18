@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
@@ -129,4 +130,34 @@ class ParallelRaceGroupTest extends CommandTestBase {
 
     assertThrows(IllegalArgumentException.class, () -> new ParallelRaceGroup(command1, command2));
   }
+
+  @Test
+  void parallelRaceOnlyCallsEndOnceTest() {
+    Subsystem system1 = new TestSubsystem();
+    Subsystem system2 = new TestSubsystem();
+
+    MockCommandHolder command1Holder = new MockCommandHolder(true, system1);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true, system2);
+    Command command2 = command2Holder.getMock();
+    MockCommandHolder perpetualCommandHolder = new MockCommandHolder(true);
+    Command command3 = new PerpetualCommand(perpetualCommandHolder.getMock());
+
+    Command group1 = new SequentialCommandGroup(command1, command2);
+    assertNotNull(group1);
+    assertNotNull(command3);
+    Command group2 = new ParallelRaceGroup(group1, command3);
+
+    CommandScheduler scheduler = new CommandScheduler();
+
+    scheduler.schedule(group2);
+    scheduler.run();
+    command1Holder.setFinished(true);
+    scheduler.run();
+    command2Holder.setFinished(true);
+    // at this point the sequential group should be done
+    assertDoesNotThrow(() -> scheduler.run());
+
+  }
+
 }

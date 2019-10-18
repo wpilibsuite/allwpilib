@@ -26,16 +26,13 @@ void ParallelRaceGroup::Execute() {
     commandRunning->Execute();
     if (commandRunning->IsFinished()) {
       m_finished = true;
-      commandRunning->End(false);
     }
   }
 }
 
 void ParallelRaceGroup::End(bool interrupted) {
   for (auto& commandRunning : m_commands) {
-    if (!commandRunning->IsFinished()) {
-      commandRunning->End(true);
-    }
+    commandRunning->End(!commandRunning->IsFinished());
   }
   isRunning = false;
 }
