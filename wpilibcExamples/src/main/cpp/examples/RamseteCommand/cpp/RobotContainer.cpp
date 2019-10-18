@@ -13,7 +13,9 @@
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h>
+#include <frc2/command/InstantCommand.h>
 #include <frc2/command/RamseteCommand.h>
+#include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/button/JoystickButton.h>
 
 #include "Constants.h"
@@ -65,7 +67,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       // Not reversed
       false);
 
-  frc2::RamseteCommand* ramseteCommand = new frc2::RamseteCommand(
+  frc2::RamseteCommand ramseteCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
       frc::RamseteController(ac::kRamseteB, ac::kRamseteZeta), dc::ks, dc::kv,
       dc::ka, dc::kDriveKinematics,
@@ -79,8 +81,11 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       frc2::PIDController(dc::kPDriveVel, 0, 0),
       [this](auto left, auto right) {
         m_drive.TankDrive(left / 12_V, right / 12_V);
-      });
+      },
+      {&m_drive});
 
   // no auto
-  return ramseteCommand;
+  return new frc2::SequentialCommandGroup(
+      std::move(ramseteCommand),
+      frc2::InstantCommand([this]() { m_drive.TankDrive(0, 0); }, {}));
 }
