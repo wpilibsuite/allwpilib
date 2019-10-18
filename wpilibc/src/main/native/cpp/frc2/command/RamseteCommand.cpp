@@ -79,17 +79,17 @@ void RamseteCommand::Execute() {
         m_ks * sgn(targetWheelSpeeds.right) + m_kv * targetWheelSpeeds.right +
         m_ka * (targetWheelSpeeds.right - m_prevSpeeds.right) / dt;
 
-    auto leftOutputVolts =
+    auto leftOutput =
         voltage::volt_t(m_leftController->Calculate(
             targetWheelSpeeds.left.to<double>(), m_leftSpeed().to<double>())) +
         leftFeedforward;
 
-    auto rightOutputVolts = voltage::volt_t(m_rightController->Calculate(
-                                targetWheelSpeeds.right.to<double>(),
-                                m_rightSpeed().to<double>())) +
-                            rightFeedforward;
+    auto rightOutput = voltage::volt_t(m_rightController->Calculate(
+                           targetWheelSpeeds.right.to<double>(),
+                           m_rightSpeed().to<double>())) +
+                       rightFeedforward;
 
-    m_outputVolts(leftOutputVolts, rightOutputVolts);
+    m_outputVolts(leftOutput, rightOutput);
   } else {
     m_outputVel(targetWheelSpeeds.left, targetWheelSpeeds.right);
   }
