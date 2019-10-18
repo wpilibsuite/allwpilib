@@ -24,7 +24,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A command that uses a RAMSETE controller ({@link RamseteController}) to follow a trajectory
- * with a differential drive.
+ * {@link Trajectory} with a differential drive.
  *
  * <p>The command handles trajectory-following, PID calculations, and feedforwards internally.  This
  * is intended to be a more-or-less "complete solution" that can be used by teams without a great
@@ -65,8 +65,7 @@ public class RamseteCommand extends CommandBase {
    * @param trajectory                     The trajectory to follow.
    * @param pose                           A function that supplies the robot pose - use one of
    *                                       the odometry classes to provide this.
-   * @param follower                       The RAMSETE follower used to follow the trajectory -
-   *                                       see {@link RamseteController}.
+   * @param follower                       The RAMSETE follower used to follow the trajectory.
    * @param ksVolts                        Constant feedforward term for the robot drive.
    * @param kvVoltSecondsPerMeter          Velocity-proportional feedforward term for the robot
    *                                       drive.
@@ -120,8 +119,7 @@ public class RamseteCommand extends CommandBase {
    * @param trajectory            The trajectory to follow.
    * @param pose                  A function that supplies the robot pose - use one of
    *                              the odometry classes to provide this.
-   * @param follower              The RAMSETE follower used to follow the trajectory -
-   *                              see {@link RamseteController}.
+   * @param follower              The RAMSETE follower used to follow the trajectory.
    * @param kinematics            The kinematics for the robot drivetrain.
    * @param outputMetersPerSecond A function that consumes the computed left and right
    *                              wheel speeds.
