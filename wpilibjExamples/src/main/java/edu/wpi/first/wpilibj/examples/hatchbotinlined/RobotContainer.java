@@ -52,7 +52,8 @@ public class RobotContainer {
           // Reset the encoders before starting
           .beforeStarting(m_robotDrive::resetEncoders)
           // End the command when the robot's driven distance exceeds the desired value
-          .withInterrupt(() -> m_robotDrive.getAverageEncoderDistance() >= kAutoDriveDistanceInches);
+          .withInterrupt(() -> m_robotDrive.getAverageEncoderDistance()
+              >= kAutoDriveDistanceInches);
 
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
   private final Command m_complexAuto = new ComplexAutoCommand(m_robotDrive, m_hatchSubsystem);
@@ -78,7 +79,7 @@ public class RobotContainer {
         new RunCommand(() -> m_robotDrive.arcadeDrive(
             m_driverController.getY(GenericHID.Hand.kLeft),
             m_driverController.getX(GenericHID.Hand.kRight)),
-            m_robotDrive)
+                       m_robotDrive)
     );
 
     // Add commands to the autonomous command chooser
