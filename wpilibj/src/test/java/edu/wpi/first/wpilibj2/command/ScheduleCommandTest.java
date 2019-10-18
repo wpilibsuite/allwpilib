@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.verify;
 
 class ScheduleCommandTest extends CommandTestBase {
@@ -27,5 +28,20 @@ class ScheduleCommandTest extends CommandTestBase {
 
     verify(command1).schedule();
     verify(command2).schedule();
+  }
+
+  @Test
+  void scheduleCommandDuringRunTest() {
+    CommandScheduler scheduler = CommandScheduler.getInstance();
+
+    InstantCommand toSchedule = new InstantCommand();
+    ScheduleCommand scheduleCommand = new ScheduleCommand(toSchedule);
+    SequentialCommandGroup group =
+        new SequentialCommandGroup(new InstantCommand(), scheduleCommand);
+
+    scheduler.schedule(group);
+    scheduler.schedule(new InstantCommand().perpetually());
+    scheduler.run();
+    assertDoesNotThrow(scheduler::run);
   }
 }
