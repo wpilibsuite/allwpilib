@@ -121,6 +121,7 @@ model {
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                cppCompiler.args '-Wno-defaulted-function-deleted'
             }
         }
         "${nativeName}"(NativeLibrarySpec) {
@@ -141,6 +142,7 @@ model {
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                cppCompiler.args '-Wno-defaulted-function-deleted'
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -166,6 +168,7 @@ model {
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                cppCompiler.args '-Wno-defaulted-function-deleted'
             }
         }
     }
@@ -204,6 +207,7 @@ model {
             tasks.withType(CppCompile) {
                 dependsOn generateCppVersion
             }
+            cppCompiler.args '-Wno-defaulted-function-deleted'
         }
         withType(GoogleTestTestSuiteBinarySpec) {
             lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
