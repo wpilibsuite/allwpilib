@@ -82,6 +82,7 @@ public class RamseteCommand extends CommandBase {
    *                                       outputs (in volts) for the robot drive.
    * @param requirements                   The subsystems to require.
    */
+  @SuppressWarnings("PMD.ExcessiveParameterList")
   public RamseteCommand(Trajectory trajectory,
                         Supplier<Pose2d> pose,
                         RamseteController follower,
