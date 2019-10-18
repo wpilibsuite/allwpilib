@@ -11,7 +11,9 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.function.Consumer;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Sendable;
 
@@ -30,6 +32,7 @@ public class SendableRegistry {
     }
 
     WeakReference<Sendable> m_sendable;
+    SendableBuilderImpl m_builder = new SendableBuilderImpl();
     String m_name;
     String m_subsystem = "Ungrouped";
     WeakReference<Sendable> m_parent;
@@ -384,21 +387,71 @@ public class SendableRegistry {
   }
 
   /**
-   * Functional interface for foreachLiveWindow().
+   * Publishes an object in the registry to a network table.
+   *
+   * @param sendable object
+   * @param table network table
    */
-  @FunctionalInterface
-  public interface LiveWindowForeachCallback {
+  public static synchronized void publish(Sendable sendable, NetworkTable table) {
+    Component comp = getOrAdd(sendable);
+    comp.m_builder.clearProperties();
+    comp.m_builder.setTable(table);
+    sendable.initSendable(comp.m_builder);
+    comp.m_builder.updateTable();
+    comp.m_builder.startListeners();
+  }
+
+  /**
+   * Updates network table information from an object.
+   *
+   * @param sendable object
+   */
+  public static synchronized void update(Sendable sendable) {
+    Component comp = components.get(sendable);
+    if (comp != null) {
+      comp.m_builder.updateTable();
+    }
+  }
+
+  /**
+   * Data passed to foreachLiveWindow() callback function.
+   */
+  public static class CallbackData {
     /**
-     * Callback.
-     *
-     * @param sendable sendable object
-     * @param name name
-     * @param subsystem subsystem
-     * @param parent parent sendable object
-     * @param data data stored in object with setData()
-     * @return data to be stored back into object, or null if none/don't modify
+     * Sendable object.
      */
-    Object call(Sendable sendable, String name, String subsystem, Sendable parent, Object data);
+    @SuppressWarnings("MemberName")
+    public Sendable sendable;
+
+    /**
+     * Name.
+     */
+    @SuppressWarnings("MemberName")
+    public String name;
+
+    /**
+     * Subsystem.
+     */
+    @SuppressWarnings("MemberName")
+    public String subsystem;
+
+    /**
+     * Parent sendable object.
+     */
+    @SuppressWarnings("MemberName")
+    public Sendable parent;
+
+    /**
+     * Data stored in object with setData().  Update this to change the data.
+     */
+    @SuppressWarnings("MemberName")
+    public Object data;
+
+    /**
+     * Sendable builder for the sendable.
+     */
+    @SuppressWarnings("MemberName")
+    public SendableBuilderImpl builder;
   }
 
   /**
@@ -406,26 +459,32 @@ public class SendableRegistry {
    * It is *not* safe to call other SendableRegistry functions from the
    * callback.
    *
-   * @param dataHandle data handle to get data pointer passed to callback
+   * @param dataHandle data handle to get data object passed to callback
    * @param callback function to call for each object
    */
   @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
                      "PMD.AvoidCatchingThrowable"})
   public static synchronized void foreachLiveWindow(int dataHandle,
-      LiveWindowForeachCallback callback) {
+      Consumer<CallbackData> callback) {
+    CallbackData cbdata = new CallbackData();
     for (Component comp : components.values()) {
-      Sendable sendable = comp.m_sendable.get();
-      if (sendable != null && comp.m_liveWindow) {
-        Sendable parent = null;
+      cbdata.sendable = comp.m_sendable.get();
+      if (cbdata.sendable != null && comp.m_liveWindow) {
+        cbdata.name = comp.m_name;
+        cbdata.subsystem = comp.m_subsystem;
         if (comp.m_parent != null) {
-          parent = comp.m_parent.get();
+          cbdata.parent = comp.m_parent.get();
+        } else {
+          cbdata.parent = null;
         }
-        Object data = null;
         if (comp.m_data != null && dataHandle < comp.m_data.length) {
-          data = comp.m_data[dataHandle];
+          cbdata.data = comp.m_data[dataHandle];
+        } else {
+          cbdata.data = null;
         }
+        cbdata.builder = comp.m_builder;
         try {
-          data = callback.call(sendable, comp.m_name, comp.m_subsystem, parent, data);
+          callback.accept(cbdata);
         } catch (Throwable throwable) {
           Throwable cause = throwable.getCause();
           if (cause != null) {
@@ -436,13 +495,13 @@ public class SendableRegistry {
                   + throwable.toString(), false);
           comp.m_liveWindow = false;
         }
-        if (data != null) {
+        if (cbdata.data != null) {
           if (comp.m_data == null) {
             comp.m_data = new Object[dataHandle + 1];
           } else if (dataHandle >= comp.m_data.length) {
             comp.m_data = Arrays.copyOf(comp.m_data, dataHandle + 1);
           }
-          comp.m_data[dataHandle] = data;
+          comp.m_data[dataHandle] = cbdata.data;
         }
       }
     }
