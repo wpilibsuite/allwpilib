@@ -12,9 +12,9 @@
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
+#include <frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h>
 #include <frc2/command/RamseteCommand.h>
 #include <frc2/command/button/JoystickButton.h>
-#include <frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h>
 
 #include "Constants.h"
 
@@ -44,11 +44,26 @@ void RobotContainer::ConfigureButtonBindings() {
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
+  // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
+      // Start at the origin facing the +X direction
       frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg)),
+      // Pass through these two interior waypoints, making an 's' curve path
       {frc::Translation2d(1_m, 1_m), frc::Translation2d(2_m, -1_m)},
-      frc::Pose2d(3_m, 0_m, frc::Rotation2d(0_deg)), {std::make_unique<frc::DifferentialDriveKinematicsConstraint>(ac::kAutoPathConstraint)},
-      0_m / 1_s, 0_m / 1_s, ac::kMaxSpeed, ac::kMaxAcceleration, false);
+      // End 3 meters straight ahead of where we started, facing forward
+      frc::Pose2d(3_m, 0_m, frc::Rotation2d(0_deg)),
+      // Pass the drive kinematics to ensure constraints are obeyed
+      dc::kDriveKinematics,
+      // Start stationary
+      0_m / 1_s,
+      // End stationary
+      0_m / 1_s,
+      // Apply max speed constraint
+      ac::kMaxSpeed,
+      // Apply max acceleration constraint
+      ac::kMaxAcceleration,
+      // Not reversed
+      false);
 
   frc2::RamseteCommand* ramseteCommand = new frc2::RamseteCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
