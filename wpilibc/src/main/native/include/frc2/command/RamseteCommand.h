@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <functional>
+#include <memory>
 
 #include <units/units.h>
 
@@ -42,6 +43,13 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
       std::function<void(units::voltage::volt_t, units::voltage::volt_t)>
           output);
 
+  RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+                 frc::RamseteController follower,
+                 frc::DifferentialDriveKinematics kinematics,
+                 std::function<void(units::meters_per_second_t,
+                                    units::meters_per_second_t)>
+                     output);
+
   void Initialize() override;
 
   void Execute() override;
@@ -60,9 +68,12 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
   frc::DifferentialDriveKinematics m_kinematics;
   std::function<units::meters_per_second_t()> m_leftSpeed;
   std::function<units::meters_per_second_t()> m_rightSpeed;
-  frc2::PIDController m_leftController;
-  frc2::PIDController m_rightController;
-  std::function<void(units::voltage::volt_t, units::voltage::volt_t)> m_output;
+  std::unique_ptr<frc2::PIDController> m_leftController;
+  std::unique_ptr<frc2::PIDController> m_rightController;
+  std::function<void(units::voltage::volt_t, units::voltage::volt_t)>
+      m_outputVolts;
+  std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
+      m_outputVel;
 
   frc::Timer m_timer;
   units::second_t m_prevTime;

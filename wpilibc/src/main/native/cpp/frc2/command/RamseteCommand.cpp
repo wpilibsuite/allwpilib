@@ -34,9 +34,24 @@ RamseteCommand::RamseteCommand(
       m_kinematics(kinematics),
       m_leftSpeed(leftSpeed),
       m_rightSpeed(rightSpeed),
-      m_leftController(leftController),
-      m_rightController(rightController),
-      m_output(output) {}
+      m_leftController(std::make_unique<frc2::PIDController>(leftController)),
+      m_rightController(std::make_unique<frc2::PIDController>(rightController)),
+      m_outputVolts(output) {}
+
+RamseteCommand::RamseteCommand(
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::RamseteController follower,
+    frc::DifferentialDriveKinematics kinematics,
+    std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
+        output)
+    : m_trajectory(trajectory),
+      m_pose(pose),
+      m_follower(follower),
+      m_ks(0),
+      m_kv(0),
+      m_ka(0),
+      m_kinematics(kinematics),
+      m_outputVel(output) {}
 
 void RamseteCommand::Initialize() {
   m_prevTime = 0_s;
@@ -55,25 +70,29 @@ void RamseteCommand::Execute() {
   auto targetWheelSpeeds = m_kinematics.ToWheelSpeeds(
       m_follower.Calculate(m_pose(), m_trajectory.Sample(curTime)));
 
-  auto leftFeedforward =
-      m_ks * sgn(targetWheelSpeeds.left) + m_kv * targetWheelSpeeds.left +
-      m_ka * (targetWheelSpeeds.left - m_prevSpeeds.left) / dt;
+  if (m_leftController.get() != nullptr) {
+    auto leftFeedforward =
+        m_ks * sgn(targetWheelSpeeds.left) + m_kv * targetWheelSpeeds.left +
+        m_ka * (targetWheelSpeeds.left - m_prevSpeeds.left) / dt;
 
-  auto rightFeedforward =
-      m_ks * sgn(targetWheelSpeeds.right) + m_kv * targetWheelSpeeds.right +
-      m_ka * (targetWheelSpeeds.right - m_prevSpeeds.right) / dt;
+    auto rightFeedforward =
+        m_ks * sgn(targetWheelSpeeds.right) + m_kv * targetWheelSpeeds.right +
+        m_ka * (targetWheelSpeeds.right - m_prevSpeeds.right) / dt;
 
-  auto leftOutput =
-      voltage::volt_t(m_leftController.Calculate(
-          targetWheelSpeeds.left.to<double>(), m_leftSpeed().to<double>())) +
-      leftFeedforward;
+    auto leftOutputVolts =
+        voltage::volt_t(m_leftController->Calculate(
+            targetWheelSpeeds.left.to<double>(), m_leftSpeed().to<double>())) +
+        leftFeedforward;
 
-  auto rightOutput =
-      voltage::volt_t(m_rightController.Calculate(
-          targetWheelSpeeds.right.to<double>(), m_rightSpeed().to<double>())) +
-      rightFeedforward;
+    auto rightOutputVolts = voltage::volt_t(m_rightController->Calculate(
+                                targetWheelSpeeds.right.to<double>(),
+                                m_rightSpeed().to<double>())) +
+                            rightFeedforward;
 
-  m_output(leftOutput, rightOutput);
+    m_outputVolts(leftOutputVolts, rightOutputVolts);
+  } else {
+    m_outputVel(targetWheelSpeeds.left, targetWheelSpeeds.right);
+  }
 
   m_prevTime = curTime;
   m_prevSpeeds = targetWheelSpeeds;
