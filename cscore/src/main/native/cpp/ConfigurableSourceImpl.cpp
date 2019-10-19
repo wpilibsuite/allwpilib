@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -62,21 +62,21 @@ int ConfigurableSourceImpl::CreateProperty(const wpi::Twine& name,
                                            int maximum, int step,
                                            int defaultValue, int value) {
   std::scoped_lock lock(m_mutex);
-  int ndx = CreateOrUpdateProperty(name,
-                                   [=] {
-                                     return std::make_unique<PropertyImpl>(
-                                         name, kind, minimum, maximum, step,
-                                         defaultValue, value);
-                                   },
-                                   [&](PropertyImpl& prop) {
-                                     // update all but value
-                                     prop.propKind = kind;
-                                     prop.minimum = minimum;
-                                     prop.maximum = maximum;
-                                     prop.step = step;
-                                     prop.defaultValue = defaultValue;
-                                     value = prop.value;
-                                   });
+  int ndx = CreateOrUpdateProperty(
+      name,
+      [=] {
+        return std::make_unique<PropertyImpl>(name, kind, minimum, maximum,
+                                              step, defaultValue, value);
+      },
+      [&](PropertyImpl& prop) {
+        // update all but value
+        prop.propKind = kind;
+        prop.minimum = minimum;
+        prop.maximum = maximum;
+        prop.step = step;
+        prop.defaultValue = defaultValue;
+        value = prop.value;
+      });
   m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, name, ndx,
                                   kind, value, wpi::Twine{});
   return ndx;

@@ -119,12 +119,13 @@ void PIDController::Reset() {
 
 void PIDController::InitSendable(frc::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
-  builder.AddDoubleProperty("p", [this] { return GetP(); },
-                            [this](double value) { SetP(value); });
-  builder.AddDoubleProperty("i", [this] { return GetI(); },
-                            [this](double value) { SetI(value); });
-  builder.AddDoubleProperty("d", [this] { return GetD(); },
-                            [this](double value) { SetD(value); });
-  builder.AddDoubleProperty("setpoint", [this] { return GetSetpoint(); },
-                            [this](double value) { SetSetpoint(value); });
+  builder.AddDoubleProperty(
+      "p", [this] { return GetP(); }, [this](double value) { SetP(value); });
+  builder.AddDoubleProperty(
+      "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
+  builder.AddDoubleProperty(
+      "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
+  builder.AddDoubleProperty(
+      "setpoint", [this] { return GetSetpoint(); },
+      [this](double value) { SetSetpoint(value); });
 }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -46,7 +46,8 @@ TEST(UvGetAddrInfo, BothNull) {
     fail_cb_called++;
   });
 
-  GetAddrInfo(loop, [](const addrinfo&) { FAIL(); }, Twine::createNull());
+  GetAddrInfo(
+      loop, [](const addrinfo&) { FAIL(); }, Twine::createNull());
   loop->Run();
   ASSERT_EQ(fail_cb_called, 1);
 }
@@ -62,7 +63,8 @@ TEST(UvGetAddrInfo, FailedLookup) {
   });
 
   // Use a FQDN by ending in a period
-  GetAddrInfo(loop, [](const addrinfo&) { FAIL(); }, "xyzzy.xyzzy.xyzzy.");
+  GetAddrInfo(
+      loop, [](const addrinfo&) { FAIL(); }, "xyzzy.xyzzy.xyzzy.");
   loop->Run();
   ASSERT_EQ(fail_cb_called, 1);
 }
@@ -73,7 +75,8 @@ TEST(UvGetAddrInfo, Basic) {
   auto loop = Loop::Create();
   loop->error.connect([](Error) { FAIL(); });
 
-  GetAddrInfo(loop, [&](const addrinfo&) { getaddrinfo_cbs++; }, "localhost");
+  GetAddrInfo(
+      loop, [&](const addrinfo&) { getaddrinfo_cbs++; }, "localhost");
 
   loop->Run();
 
@@ -90,12 +93,13 @@ TEST(UvGetAddrInfo, Concurrent) {
 
   for (int i = 0; i < CONCURRENT_COUNT; i++) {
     callback_counts[i] = 0;
-    GetAddrInfo(loop,
-                [i, &callback_counts, &getaddrinfo_cbs](const addrinfo&) {
-                  callback_counts[i]++;
-                  getaddrinfo_cbs++;
-                },
-                "localhost");
+    GetAddrInfo(
+        loop,
+        [i, &callback_counts, &getaddrinfo_cbs](const addrinfo&) {
+          callback_counts[i]++;
+          getaddrinfo_cbs++;
+        },
+        "localhost");
   }
 
   loop->Run();

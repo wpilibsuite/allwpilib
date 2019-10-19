@@ -580,7 +580,8 @@ void HALSIMGUI_AddExecute(void* param, void (*execute)(void*)) {
 void HALSIMGUI_AddWindow(const char* name, void* param, void (*display)(void*),
                          int32_t flags) {
   if (display) {
-    HALSimGui::AddWindow(name, [=] { display(param); }, flags);
+    HALSimGui::AddWindow(
+        name, [=] { display(param); }, flags);
   }
 }
 

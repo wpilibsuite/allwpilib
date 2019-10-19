@@ -339,12 +339,12 @@ class ProfiledPIDController
 
   void InitSendable(frc::SendableBuilder& builder) override {
     builder.SetSmartDashboardType("ProfiledPIDController");
-    builder.AddDoubleProperty("p", [this] { return GetP(); },
-                              [this](double value) { SetP(value); });
-    builder.AddDoubleProperty("i", [this] { return GetI(); },
-                              [this](double value) { SetI(value); });
-    builder.AddDoubleProperty("d", [this] { return GetD(); },
-                              [this](double value) { SetD(value); });
+    builder.AddDoubleProperty(
+        "p", [this] { return GetP(); }, [this](double value) { SetP(value); });
+    builder.AddDoubleProperty(
+        "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
+    builder.AddDoubleProperty(
+        "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
     builder.AddDoubleProperty(
         "goal", [this] { return GetGoal().position.template to<double>(); },
         [this](double value) { SetGoal(Distance_t{value}); });
