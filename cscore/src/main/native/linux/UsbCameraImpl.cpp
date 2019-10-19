@@ -143,10 +143,36 @@ int UsbCameraImpl::PercentageToRaw(const UsbCameraProperty& rawProp,
          (rawProp.maximum - rawProp.minimum) * (percentValue / 100.0);
 }
 
-static bool GetDescriptionSysV4L(wpi::StringRef path, std::string* desc) {
-  wpi::SmallString<64> ifpath{"/sys/class/video4linux/"};
-  ifpath += path.substr(5);
-  ifpath += "/device/interface";
+static bool GetVendorProduct(int dev, int* vendor, int* product) {
+  wpi::SmallString<64> ifpath;
+  {
+    wpi::raw_svector_ostream oss{ifpath};
+    oss << "/sys/class/video4linux/video" << dev << "/device/modalias";
+  }
+
+  int fd = open(ifpath.c_str(), O_RDONLY);
+  if (fd < 0) return false;
+
+  char readBuf[128];
+  ssize_t n = read(fd, readBuf, sizeof(readBuf));
+  close(fd);
+
+  if (n <= 0) return false;
+  wpi::StringRef readStr{readBuf};
+  if (readStr.substr(readStr.find('v')).substr(1, 4).getAsInteger(16, *vendor))
+    return false;
+  if (readStr.substr(readStr.find('p')).substr(1, 4).getAsInteger(16, *product))
+    return false;
+
+  return true;
+}
+
+static bool GetDescriptionSysV4L(int dev, std::string* desc) {
+  wpi::SmallString<64> ifpath;
+  {
+    wpi::raw_svector_ostream oss{ifpath};
+    oss << "/sys/class/video4linux/video" << dev << "/device/interface";
+  }
 
   int fd = open(ifpath.c_str(), O_RDONLY);
   if (fd < 0) return false;
@@ -192,23 +218,35 @@ static bool GetDescriptionIoctl(const char* cpath, std::string* desc) {
   return true;
 }
 
-static std::string GetDescriptionImpl(const char* cpath) {
+static int GetDeviceNum(const char* cpath) {
   wpi::StringRef path{cpath};
-  char pathBuf[128];
-  std::string rv;
+  std::string pathBuf;
 
-  // If trying to get by id or path, follow symlink
-  if (path.startswith("/dev/v4l/by-id/")) {
-    ssize_t n = readlink(cpath, pathBuf, sizeof(pathBuf));
-    if (n > 0) path = wpi::StringRef(pathBuf, n);
-  } else if (path.startswith("/dev/v4l/by-path/")) {
-    ssize_t n = readlink(cpath, pathBuf, sizeof(pathBuf));
-    if (n > 0) path = wpi::StringRef(pathBuf, n);
+  // it might be a symlink; if so, find the symlink target (e.g. /dev/videoN),
+  // add that to the list and make it the keypath
+  if (wpi::sys::fs::is_symlink_file(cpath)) {
+    char* target = ::realpath(cpath, nullptr);
+    if (target) {
+      pathBuf = target;
+      path = pathBuf;
+      std::free(target);
+    }
   }
 
-  if (path.startswith("/dev/video")) {
+  path = wpi::sys::path::filename(path);
+  if (!path.startswith("video")) return -1;
+  int dev = -1;
+  if (path.substr(5).getAsInteger(10, dev)) return -1;
+  return dev;
+}
+
+static std::string GetDescriptionImpl(const char* cpath) {
+  std::string rv;
+
+  int dev = GetDeviceNum(cpath);
+  if (dev >= 0) {
     // Sometimes the /sys tree gives a better name.
-    if (GetDescriptionSysV4L(path, &rv)) return rv;
+    if (GetDescriptionSysV4L(dev, &rv)) return rv;
   }
 
   // Otherwise use an ioctl to query the caps and get the card name
@@ -1318,23 +1356,14 @@ UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status) {
   std::string keypath = static_cast<UsbCameraImpl&>(*data->source).GetPath();
   info.path = keypath;
 
-  // it might be a symlink; if so, find the symlink target (e.g. /dev/videoN),
-  // add that to the list and make it the keypath
-  if (wpi::sys::fs::is_symlink_file(keypath)) {
-    char* target = ::realpath(keypath.c_str(), nullptr);
-    if (target) {
-      keypath.assign(target);
-      info.otherPaths.emplace_back(keypath);
-      std::free(target);
-    }
-  }
-
   // device number
-  wpi::StringRef fname = wpi::sys::path::filename(keypath);
-  if (fname.startswith("video")) fname.substr(5).getAsInteger(10, info.dev);
+  info.dev = GetDeviceNum(keypath.c_str());
 
   // description
   info.name = GetDescriptionImpl(keypath.c_str());
+
+  // vendor/product id
+  GetVendorProduct(info.dev, &info.vendorId, &info.productId);
 
   // look through /dev/v4l/by-id and /dev/v4l/by-path for symlinks to the
   // keypath
@@ -1385,6 +1414,8 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
 
       info.name = GetDescriptionImpl(path.c_str());
       if (info.name.empty()) continue;
+
+      GetVendorProduct(dev, &info.vendorId, &info.productId);
 
       if (dev >= retval.size()) retval.resize(info.dev + 1);
       retval[info.dev] = std::move(info);

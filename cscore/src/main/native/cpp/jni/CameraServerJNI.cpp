@@ -194,13 +194,14 @@ static inline bool CheckStatus(JNIEnv* env, CS_Status status) {
 static jobject MakeJObject(JNIEnv* env, const cs::UsbCameraInfo& info) {
   static jmethodID constructor = env->GetMethodID(
       usbCameraInfoCls, "<init>",
-      "(ILjava/lang/String;Ljava/lang/String;[Ljava/lang/String;)V");
+      "(ILjava/lang/String;Ljava/lang/String;[Ljava/lang/String;II)V");
   JLocal<jstring> path(env, MakeJString(env, info.path));
   JLocal<jstring> name(env, MakeJString(env, info.name));
   JLocal<jobjectArray> otherPaths(env, MakeJStringArray(env, info.otherPaths));
   return env->NewObject(usbCameraInfoCls, constructor,
                         static_cast<jint>(info.dev), path.obj(), name.obj(),
-                        otherPaths.obj());
+                        otherPaths.obj(), static_cast<jint>(info.vendorId),
+                        static_cast<jint>(info.productId));
 }
 
 static jobject MakeJObject(JNIEnv* env, const cs::VideoMode& videoMode) {
