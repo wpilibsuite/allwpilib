@@ -33,7 +33,7 @@ const double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     (kWheelDiameterInches * 3.142) / static_cast<double>(kEncoderCPR);
 
-const bool kGyroReversed = false;
+const bool kGyroReversed = true;
 
 const double kStabilizationP = 1;
 const double kStabilizationI = .5;

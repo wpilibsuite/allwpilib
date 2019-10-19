@@ -41,7 +41,7 @@ const double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     (kWheelDiameterInches * 3.142) / static_cast<double>(kEncoderCPR);
 
-const bool kGyroReversed = false;
+const bool kGyroReversed = true;
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or
