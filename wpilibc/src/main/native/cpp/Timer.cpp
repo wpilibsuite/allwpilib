@@ -39,6 +39,21 @@ const double Timer::kRolloverTime = (1ll << 32) / 1e6;
 
 Timer::Timer() { Reset(); }
 
+Timer::Timer(const Timer& rhs)
+    : m_startTime(rhs.m_startTime),
+      m_accumulatedTime(rhs.m_accumulatedTime),
+      m_running(rhs.m_running) {}
+
+Timer& Timer::operator=(const Timer& rhs) {
+  std::scoped_lock lock(m_mutex, rhs.m_mutex);
+
+  m_startTime = rhs.m_startTime;
+  m_accumulatedTime = rhs.m_accumulatedTime;
+  m_running = rhs.m_running;
+
+  return *this;
+}
+
 Timer::Timer(Timer&& rhs)
     : m_startTime(std::move(rhs.m_startTime)),
       m_accumulatedTime(std::move(rhs.m_accumulatedTime)),

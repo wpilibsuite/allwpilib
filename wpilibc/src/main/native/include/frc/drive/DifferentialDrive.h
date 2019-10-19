@@ -212,8 +212,8 @@ class DifferentialDrive : public RobotDriveBase,
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  SpeedController& m_leftMotor;
-  SpeedController& m_rightMotor;
+  SpeedController* m_leftMotor;
+  SpeedController* m_rightMotor;
 
   double m_quickStopThreshold = kDefaultQuickStopThreshold;
   double m_quickStopAlpha = kDefaultQuickStopAlpha;

@@ -66,9 +66,6 @@ class PIDBase : public PIDInterface,
 
   virtual ~PIDBase() = default;
 
-  PIDBase(PIDBase&&) = default;
-  PIDBase& operator=(PIDBase&&) = default;
-
   /**
    * Return the current PID result.
    *
