@@ -50,7 +50,7 @@ public class RobotContainer {
           // speed)
           .withTimeout(kAutoTimeoutSeconds)
           // When the command ends, turn off the shooter and the feeder
-          .whenFinished(() -> {
+          .andThen(() -> {
             m_shooter.disable();
             m_shooter.stopFeeder();
           });

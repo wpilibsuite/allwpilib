@@ -7,6 +7,11 @@
 
 #pragma once
 
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 4521)
+#endif
+
 #include <limits>
 #include <memory>
 #include <utility>
@@ -61,6 +66,9 @@ class SequentialCommandGroup
   // No copy constructors for command groups
   SequentialCommandGroup(const SequentialCommandGroup&) = delete;
 
+  // Prevent template expansion from emulating copy ctor
+  SequentialCommandGroup(SequentialCommandGroup&) = delete;
+
   template <class... Types,
             typename = std::enable_if_t<std::conjunction_v<
                 std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
@@ -90,3 +98,7 @@ class SequentialCommandGroup
   bool m_runWhenDisabled{true};
 };
 }  // namespace frc2
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif

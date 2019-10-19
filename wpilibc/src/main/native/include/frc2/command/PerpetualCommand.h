@@ -7,6 +7,11 @@
 
 #pragma once
 
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 4521)
+#endif
+
 #include <memory>
 #include <utility>
 
@@ -54,6 +59,9 @@ class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
   // No copy constructors for command groups
   PerpetualCommand(const PerpetualCommand& other) = delete;
 
+  // Prevent template expansion from emulating copy ctor
+  PerpetualCommand(PerpetualCommand&) = delete;
+
   void Initialize() override;
 
   void Execute() override;
@@ -64,3 +72,7 @@ class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
   std::unique_ptr<Command> m_command;
 };
 }  // namespace frc2
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif

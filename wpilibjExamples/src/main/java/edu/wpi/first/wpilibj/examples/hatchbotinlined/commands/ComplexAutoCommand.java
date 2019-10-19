@@ -40,7 +40,7 @@ public class ComplexAutoCommand extends SequentialCommandGroup {
             // Reset the encoders before starting
             .beforeStarting(driveSubsystem::resetEncoders)
             // End the command when the robot's driven distance exceeds the desired value
-            .interruptOn(
+            .withInterrupt(
                 () -> driveSubsystem.getAverageEncoderDistance() >= kAutoDriveDistanceInches),
 
         // Release the hatch
@@ -53,7 +53,7 @@ public class ComplexAutoCommand extends SequentialCommandGroup {
             driveSubsystem
         )
             .beforeStarting(driveSubsystem::resetEncoders)
-            .interruptOn(
+            .withInterrupt(
                 () -> driveSubsystem.getAverageEncoderDistance() <= -kAutoBackupDistanceInches)
     );
   }

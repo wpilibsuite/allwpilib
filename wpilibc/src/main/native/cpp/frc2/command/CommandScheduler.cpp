@@ -39,6 +39,11 @@ void CommandScheduler::AddButton(wpi::unique_function<void()> button) {
 void CommandScheduler::ClearButtons() { m_buttons.clear(); }
 
 void CommandScheduler::Schedule(bool interruptible, Command* command) {
+  if (m_inRunLoop) {
+    m_toSchedule.try_emplace(command, interruptible);
+    return;
+  }
+
   if (command->IsGrouped()) {
     wpi_setWPIErrorWithContext(CommandIllegalUse,
                                "A command that is part of a command group "
@@ -125,6 +130,7 @@ void CommandScheduler::Run() {
     button();
   }
 
+  m_inRunLoop = true;
   // Run scheduled commands, remove finished commands.
   for (auto iterator = m_scheduledCommands.begin();
        iterator != m_scheduledCommands.end(); iterator++) {
@@ -153,6 +159,18 @@ void CommandScheduler::Run() {
       m_scheduledCommands.erase(iterator);
     }
   }
+  m_inRunLoop = false;
+
+  for (auto&& commandInterruptible : m_toSchedule) {
+    Schedule(commandInterruptible.second, commandInterruptible.first);
+  }
+
+  for (auto&& command : m_toCancel) {
+    Cancel(command);
+  }
+
+  m_toSchedule.clear();
+  m_toCancel.clear();
 
   // Add default commands for un-required registered subsystems.
   for (auto&& subsystem : m_subsystems) {
@@ -198,6 +216,11 @@ Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
 }
 
 void CommandScheduler::Cancel(Command* command) {
+  if (m_inRunLoop) {
+    m_toCancel.emplace_back(command);
+    return;
+  }
+
   auto find = m_scheduledCommands.find(command);
   if (find == m_scheduledCommands.end()) return;
   command->End(true);

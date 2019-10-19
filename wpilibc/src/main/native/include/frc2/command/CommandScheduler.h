@@ -360,6 +360,13 @@ class CommandScheduler final : public frc::Sendable,
   wpi::SmallVector<Action, 4> m_interruptActions;
   wpi::SmallVector<Action, 4> m_finishActions;
 
+  // Flag and queues for avoiding concurrent modification if commands are
+  // scheduled/canceled during run
+
+  bool m_inRunLoop = false;
+  wpi::DenseMap<Command*, bool> m_toSchedule;
+  wpi::SmallVector<Command*, 4> m_toCancel;
+
   friend class CommandTestBase;
 };
 }  // namespace frc2

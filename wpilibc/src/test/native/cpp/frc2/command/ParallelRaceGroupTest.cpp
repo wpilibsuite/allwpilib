@@ -8,6 +8,7 @@
 #include "CommandTestBase.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelRaceGroup.h"
+#include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitUntilCommand.h"
 
 using namespace frc2;
@@ -128,4 +129,28 @@ TEST_F(ParallelRaceGroupTest, RaceGroupRequirementTest) {
 
   EXPECT_TRUE(scheduler.IsScheduled(&command3));
   EXPECT_FALSE(scheduler.IsScheduled(&group));
+}
+
+TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnceTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool finished1 = false;
+  bool finished2 = false;
+  bool finished3 = false;
+
+  WaitUntilCommand command1([&finished1] { return finished1; });
+  WaitUntilCommand command2([&finished2] { return finished2; });
+  WaitUntilCommand command3([&finished3] { return finished3; });
+
+  SequentialCommandGroup group1(command1, command2);
+  ParallelRaceGroup group2(std::move(group1), command3);
+
+  scheduler.Schedule(&group2);
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(&group2));
+  finished1 = true;
+  scheduler.Run();
+  finished2 = true;
+  EXPECT_NO_FATAL_FAILURE(scheduler.Run());
+  EXPECT_FALSE(scheduler.IsScheduled(&group2));
 }

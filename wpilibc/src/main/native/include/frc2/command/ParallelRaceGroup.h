@@ -7,6 +7,11 @@
 
 #pragma once
 
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 4521)
+#endif
+
 #include <memory>
 #include <set>
 #include <unordered_map>
@@ -48,6 +53,9 @@ class ParallelRaceGroup
   // No copy constructors for command groups
   ParallelRaceGroup(const ParallelRaceGroup&) = delete;
 
+  // Prevent template expansion from emulating copy ctor
+  ParallelRaceGroup(ParallelRaceGroup&) = delete;
+
   template <class... Types>
   void AddCommands(Types&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
@@ -76,3 +84,7 @@ class ParallelRaceGroup
   bool isRunning = false;
 };
 }  // namespace frc2
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif

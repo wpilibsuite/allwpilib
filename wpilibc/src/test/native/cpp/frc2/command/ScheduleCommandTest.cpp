@@ -10,6 +10,7 @@
 #include "CommandTestBase.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ScheduleCommand.h"
+#include "frc2/command/SequentialCommandGroup.h"
 
 using namespace frc2;
 class ScheduleCommandTest : public CommandTestBase {};

@@ -36,12 +36,12 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
-  void interruptOnTest() {
+  void withInterruptTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
     ConditionHolder condition = new ConditionHolder();
 
-    Command command = new WaitCommand(10).interruptOn(condition::getCondition);
+    Command command = new WaitCommand(10).withInterrupt(condition::getCondition);
 
     scheduler.schedule(command);
     scheduler.run();
@@ -66,7 +66,7 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
-  void whenFinishedTest() {
+  void andThenLambdaTest() {
     CommandScheduler scheduler = new CommandScheduler();
 
     ConditionHolder condition = new ConditionHolder();
@@ -74,7 +74,7 @@ class CommandDecoratorTest extends CommandTestBase {
 
     Command command = new InstantCommand();
 
-    scheduler.schedule(command.whenFinished(() -> condition.setCondition(true)));
+    scheduler.schedule(command.andThen(() -> condition.setCondition(true)));
 
     assertFalse(condition.getCondition());
 

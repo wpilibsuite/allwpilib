@@ -14,7 +14,7 @@ namespace frc2 {
 /**
  * A command that runs a Runnable continuously.  Has no end condition as-is;
  * either subclass it or use Command.WithTimeout() or
- * Command.InterruptOn() to give it one.  If you only wish
+ * Command.WithInterrupt() to give it one.  If you only wish
  * to execute a Runnable once, use InstantCommand.
  */
 class RunCommand : public CommandHelper<CommandBase, RunCommand> {

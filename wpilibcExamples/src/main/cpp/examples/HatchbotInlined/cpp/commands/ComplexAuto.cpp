@@ -19,7 +19,7 @@ ComplexAuto::ComplexAuto(DriveSubsystem* drive, HatchSubsystem* hatch) {
       frc2::StartEndCommand([drive] { drive->ArcadeDrive(kAutoDriveSpeed, 0); },
                             [drive] { drive->ArcadeDrive(0, 0); }, {drive})
           .BeforeStarting([drive] { drive->ResetEncoders(); })
-          .InterruptOn([drive] {
+          .WithInterrupt([drive] {
             return drive->GetAverageEncoderDistance() >=
                    kAutoDriveDistanceInches;
           }),
@@ -30,7 +30,7 @@ ComplexAuto::ComplexAuto(DriveSubsystem* drive, HatchSubsystem* hatch) {
           [drive] { drive->ArcadeDrive(-kAutoDriveSpeed, 0); },
           [drive] { drive->ArcadeDrive(0, 0); }, {drive})
           .BeforeStarting([drive] { drive->ResetEncoders(); })
-          .InterruptOn([drive] {
+          .WithInterrupt([drive] {
             return drive->GetAverageEncoderDistance() <=
                    kAutoBackupDistanceInches;
           }));
