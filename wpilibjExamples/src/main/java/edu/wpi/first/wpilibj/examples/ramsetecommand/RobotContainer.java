@@ -132,6 +132,6 @@ public class RobotContainer {
     );
 
     // Run path following command, then stop at the end.
-    return ramseteCommand.whenFinished(() -> m_robotDrive.tankDrive(0, 0));
+    return ramseteCommand.andThen(() -> m_robotDrive.tankDrive(0, 0));
   }
 }
