@@ -192,12 +192,12 @@ public class RamseteCommand extends CommandBase {
               + m_ka * (rightSpeedSetpoint - m_prevSpeeds.rightMetersPerSecond) / dt;
 
       leftOutput = leftFeedforward
-          + m_leftController.calculate(leftSpeedSetpoint,
-                                       m_leftSpeed.getAsDouble());
+          + m_leftController.calculate(m_leftSpeed.getAsDouble(),
+                                       leftSpeedSetpoint);
 
       rightOutput = rightFeedforward
-          + m_rightController.calculate(rightSpeedSetpoint,
-                                        m_rightSpeed.getAsDouble());
+          + m_rightController.calculate(m_rightSpeed.getAsDouble(),
+                                        rightSpeedSetpoint);
     } else {
       leftOutput = leftSpeedSetpoint;
       rightOutput = rightSpeedSetpoint;
