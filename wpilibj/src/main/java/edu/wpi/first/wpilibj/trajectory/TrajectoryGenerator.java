@@ -217,7 +217,15 @@ public final class TrajectoryGenerator {
     );
   }
 
-  private static List<PoseWithCurvature> splinePointsFromSplines(
+  /**
+   * Generate spline points from a vector of splines by parameterizing the
+   * splines.
+   *
+   * @param splines The splines to parameterize.
+   *
+   * @return The spline points for use in time parameterization of a trajectory.
+   */
+  public static List<PoseWithCurvature> splinePointsFromSplines(
       Spline[] splines) {
     // Create the vector of spline points.
     var splinePoints = new ArrayList<PoseWithCurvature>();

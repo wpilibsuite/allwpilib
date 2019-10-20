@@ -130,14 +130,13 @@ class TrajectoryGenerator {
       units::meters_per_second_t maxVelocity,
       units::meters_per_second_squared_t maxAcceleration, bool reversed);
 
- private:
   /**
    * Generate spline points from a vector of splines by parameterizing the
    * splines.
    *
    * @param splines The splines to parameterize.
    *
-   * @return The spline points.
+   * @return The spline points for use in time parameterization of a trajectory.
    */
   template <typename Spline>
   static std::vector<PoseWithCurvature> SplinePointsFromSplines(
