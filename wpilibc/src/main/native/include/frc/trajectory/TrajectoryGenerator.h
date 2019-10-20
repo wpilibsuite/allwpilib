@@ -136,7 +136,7 @@ class TrajectoryGenerator {
    *
    * @param splines The splines to parameterize.
    *
-   * @return The spline points.
+   * @return The spline points for use in time parametrization of a trajectory.
    */
   template <typename Spline>
   static std::vector<PoseWithCurvature> SplinePointsFromSplines(
