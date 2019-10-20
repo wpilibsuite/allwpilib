@@ -301,7 +301,7 @@ public final class TrajectoryGenerator {
     );
   }
 
-  /** 
+  /**
    * Generates a trajectory with the given waypoints and differential drive constraints. Use
    * this method if you just want a constraint such that none of the wheels on your differential
    * drive exceed the specified max velocity. If you desire to impose more constraints, please
