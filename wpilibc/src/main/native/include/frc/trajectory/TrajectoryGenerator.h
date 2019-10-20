@@ -130,7 +130,6 @@ class TrajectoryGenerator {
       units::meters_per_second_t maxVelocity,
       units::meters_per_second_squared_t maxAcceleration, bool reversed);
 
- private:
   /**
    * Generate spline points from a vector of splines by parameterizing the
    * splines.

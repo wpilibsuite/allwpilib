@@ -217,7 +217,7 @@ public final class TrajectoryGenerator {
     );
   }
 
-  private static List<PoseWithCurvature> splinePointsFromSplines(
+  public static List<PoseWithCurvature> splinePointsFromSplines(
       Spline[] splines) {
     // Create the vector of spline points.
     var splinePoints = new ArrayList<PoseWithCurvature>();
