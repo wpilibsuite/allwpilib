@@ -34,8 +34,8 @@ public class TrapezoidProfileCommand extends CommandBase {
    */
   public TrapezoidProfileCommand(TrapezoidProfile profile,
                                  Consumer<State> output) {
-    m_profile = requireNonNullParam(profile, "profile", "MotionProfileCommand");
-    m_output = requireNonNullParam(output, "output", "MotionProfileCommand");
+    m_profile = requireNonNullParam(profile, "profile", "TrapezoidProfileCommand");
+    m_output = requireNonNullParam(output, "output", "TrapezoidProfileCommand");
   }
 
   @Override
