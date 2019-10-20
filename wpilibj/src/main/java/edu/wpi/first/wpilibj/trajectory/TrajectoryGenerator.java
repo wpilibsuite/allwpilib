@@ -223,7 +223,7 @@ public final class TrajectoryGenerator {
    *
    * @param splines The splines to parameterize.
    *
-   * @return The spline points for use in time parametrization of a trajectory.
+   * @return The spline points for use in time parameterization of a trajectory.
    */
   public static List<PoseWithCurvature> splinePointsFromSplines(
       Spline[] splines) {
