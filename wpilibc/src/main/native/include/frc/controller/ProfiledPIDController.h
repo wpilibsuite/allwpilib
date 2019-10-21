@@ -146,7 +146,7 @@ class ProfiledPIDController : public Sendable,
    *
    * @return The current setpoint.
    */
-  TrapezoidProfile::State GetSetpoint() const;
+  const TrapezoidProfile::State GetSetpoint() const;
 
   /**
    * Returns true if the error is within the tolerance of the error.

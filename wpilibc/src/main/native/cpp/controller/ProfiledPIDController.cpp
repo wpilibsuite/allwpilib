@@ -56,7 +56,7 @@ void ProfiledPIDController::SetConstraints(
   m_constraints = constraints;
 }
 
-TrapezoidProfile::State ProfiledPIDController::GetSetpoint() const {
+const TrapezoidProfile::State ProfiledPIDController::GetSetpoint() const {
   return m_setpoint;
 }
 
