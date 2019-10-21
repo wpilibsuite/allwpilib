@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj2.command;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 
@@ -25,7 +26,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 public class ProfiledPIDCommand extends CommandBase {
   protected final ProfiledPIDController m_controller;
   protected DoubleSupplier m_measurement;
-  protected DoubleSupplier m_goal;
+  protected Supplier<State> m_goal;
   protected BiConsumer<Double, State> m_useOutput;
 
   /**
@@ -38,7 +39,7 @@ public class ProfiledPIDCommand extends CommandBase {
    * @param requirements      the subsystems required by this command
    */
   public ProfiledPIDCommand(ProfiledPIDController controller, DoubleSupplier measurementSource,
-                            DoubleSupplier goalSource, BiConsumer<Double, State> useOutput,
+                            Supplier<State> goalSource, BiConsumer<Double, State> useOutput,
                             Subsystem... requirements) {
     requireNonNullParam(controller, "controller", "SynchronousPIDCommand");
     requireNonNullParam(measurementSource, "measurementSource", "SynchronousPIDCommand");
@@ -62,7 +63,7 @@ public class ProfiledPIDCommand extends CommandBase {
    * @param requirements      the subsystems required by this command
    */
   public ProfiledPIDCommand(ProfiledPIDController controller, DoubleSupplier measurementSource,
-                            double goal, BiConsumer<Double, State> useOutput,
+                            State goal, BiConsumer<Double, State> useOutput,
                             Subsystem... requirements) {
     this(controller, measurementSource, () -> goal, useOutput, requirements);
   }
@@ -74,7 +75,7 @@ public class ProfiledPIDCommand extends CommandBase {
 
   @Override
   public void execute() {
-    useOutput(m_controller.calculate(getMeasurement(), getGoal()), m_controller.getGoalState());
+    useOutput(m_controller.calculate(getMeasurement(), getGoal()), m_controller.getSetpoint());
   }
 
   @Override
@@ -105,7 +106,7 @@ public class ProfiledPIDCommand extends CommandBase {
    *
    * @param goalSource The goal source
    */
-  public void setgoal(DoubleSupplier goalSource) {
+  public void setgoal(Supplier<State> goalSource) {
     m_goal = goalSource;
   }
 
@@ -114,7 +115,7 @@ public class ProfiledPIDCommand extends CommandBase {
    *
    * @param goal The goal
    */
-  public void setGoal(double goal) {
+  public void setGoal(State goal) {
     setgoal(() -> goal);
   }
 
@@ -124,8 +125,10 @@ public class ProfiledPIDCommand extends CommandBase {
    *
    * @param relativeReference The change in goal
    */
-  public void setGoalRelative(double relativeReference) {
-    setGoal(m_controller.getGoal() + relativeReference);
+  public void setGoalRelative(State relativeReference) {
+    var curGoal = getGoal();
+    setGoal(new State(curGoal.position + relativeReference.position,
+                      curGoal.velocity + relativeReference.velocity));
   }
 
   /**
@@ -133,8 +136,8 @@ public class ProfiledPIDCommand extends CommandBase {
    *
    * @return The goal for the controller
    */
-  private double getGoal() {
-    return m_goal.getAsDouble();
+  private State getGoal() {
+    return m_goal.get();
   }
 
   /**
