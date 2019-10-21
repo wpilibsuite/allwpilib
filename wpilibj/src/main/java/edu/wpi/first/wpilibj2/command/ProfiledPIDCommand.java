@@ -145,36 +145,6 @@ public class ProfiledPIDCommand extends CommandBase {
   }
 
   /**
-   * Sets the goal for the controller to track the given source.
-   *
-   * @param goalSource The goal source
-   */
-  public void setGoal(Supplier<State> goalSource) {
-    m_goal = goalSource;
-  }
-
-  /**
-   * Sets the goal for the controller to a constant value.
-   *
-   * @param goal The goal
-   */
-  public void setGoal(State goal) {
-    setGoal(() -> goal);
-  }
-
-  /**
-   * Sets the goal for the controller to a constant value relative (i.e. added to) the current
-   * goal.
-   *
-   * @param relativeReference The change in goal
-   */
-  public void setGoalRelative(State relativeReference) {
-    var curGoal = getGoal();
-    setGoal(new State(curGoal.position + relativeReference.position,
-                      curGoal.velocity + relativeReference.velocity));
-  }
-
-  /**
    * Gets the goal for the controller.  Wraps the passed-in function for readability.
    *
    * @return The goal for the controller
