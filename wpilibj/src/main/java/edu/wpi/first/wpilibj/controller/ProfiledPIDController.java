@@ -146,6 +146,15 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
+   * Sets the goal for the ProfiledPIDController.
+   *
+   * @param goal The desired goal position.
+   */
+  public void setGoal(double goal) {
+    m_goal = new TrapezoidProfile.State(goal, 0);
+  }
+
+  /**
    * Gets the goal for the ProfiledPIDController.
    */
   public TrapezoidProfile.State getGoal() {
@@ -280,6 +289,17 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
+   * Returns the next output of the PIDController.
+   *
+   * @param measurement The current measurement of the process variable.
+   * @param goal The new goal of the controller.
+   */
+  public double calculate(double measurement, double goal) {
+    setGoal(goal);
+    return calculate(measurement);
+  }
+
+  /**
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.
@@ -305,7 +325,6 @@ public class ProfiledPIDController implements Sendable {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
-    builder.addDoubleProperty("goal", () -> getGoal().position,
-                              (position) -> setGoal(new TrapezoidProfile.State(position, 0)));
+    builder.addDoubleProperty("goal", () -> getGoal().position, this::setGoal);
   }
 }
