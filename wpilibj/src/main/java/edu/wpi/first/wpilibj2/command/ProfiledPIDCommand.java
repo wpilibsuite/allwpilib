@@ -77,6 +77,11 @@ public class ProfiledPIDCommand extends CommandBase {
     useOutput(m_controller.calculate(getMeasurement(), getGoal()), m_controller.getGoalState());
   }
 
+  @Override
+  public void end(boolean interrupted) {
+    useOutput(0, new State());
+  }
+
   /**
    * Sets the function that uses the output of the ProfiledPIDController.
    *
