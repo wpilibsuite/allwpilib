@@ -292,8 +292,22 @@ bool HALSimGui::Initialize() {
 
   // Set initial window settings
   glfwWindowHint(GLFW_MAXIMIZED, gWindowMaximized ? GLFW_TRUE : GLFW_FALSE);
-  if (!gWindowLoadedWidthHeight)
+
+  float windowScale = 1.0;
+  if (!gWindowLoadedWidthHeight) {
     glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
+    // get the primary monitor work area to see if we have a reasonable initial
+    // window size; if not, maximize, and default scaling to smaller
+    if (GLFWmonitor* primary = glfwGetPrimaryMonitor()) {
+      int monWidth, monHeight;
+      glfwGetMonitorWorkarea(primary, nullptr, nullptr, &monWidth, &monHeight);
+      if (monWidth < gWindowWidth || monHeight < gWindowHeight) {
+        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+        windowScale = (std::min)(monWidth * 1.0 / gWindowWidth,
+                                 monHeight * 1.0 / gWindowHeight);
+      }
+    }
+  }
   if (gWindowXPos != -1 && gWindowYPos != -1)
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
@@ -301,6 +315,26 @@ bool HALSimGui::Initialize() {
   gWindow = glfwCreateWindow(gWindowWidth, gWindowHeight,
                              "Robot Simulation GUI", nullptr, nullptr);
   if (!gWindow) return false;
+
+  if (!gWindowLoadedWidthHeight) {
+    if (windowScale == 1.0)
+      glfwGetWindowContentScale(gWindow, &windowScale, nullptr);
+    wpi::outs() << "windowScale = " << windowScale;
+    // force user scale if window scale is smaller
+    if (windowScale <= 0.5)
+      gUserScale = 0;
+    else if (windowScale <= 0.75)
+      gUserScale = 1;
+    if (windowScale != 1.0) {
+      // scale default window positions
+      for (auto&& window : gWindows) {
+        if ((window.posCond & ImGuiCond_FirstUseEver) != 0) {
+          window.pos.x *= windowScale;
+          window.pos.y *= windowScale;
+        }
+      }
+    }
+  }
 
   // Update window settings
   if (gWindowXPos != -1 && gWindowYPos != -1) {
