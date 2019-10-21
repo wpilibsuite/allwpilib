@@ -127,15 +127,6 @@ public class ProfiledPIDCommand extends CommandBase {
   }
 
   /**
-   * Sets the function that uses the output of the ProfiledPIDController.
-   *
-   * @param useOutput The function that uses the output.
-   */
-  public final void setOutput(BiConsumer<Double, State> useOutput) {
-    m_useOutput = useOutput;
-  }
-
-  /**
    * Returns the ProfiledPIDController used by the command.
    *
    * @return The ProfiledPIDController
