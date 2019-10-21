@@ -162,6 +162,13 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
+   * Gets the goal state for the ProfiledPIDController.
+   */
+  public TrapezoidProfile.State getGoalState() {
+    return m_goal;
+  }
+
+  /**
    * Returns true if the error is within the tolerance of the error.
    *
    * <p>This will return false until at least one input value has been computed.
