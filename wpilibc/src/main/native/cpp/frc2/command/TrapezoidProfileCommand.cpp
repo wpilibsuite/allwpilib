@@ -13,8 +13,11 @@ using namespace frc2;
 
 TrapezoidProfileCommand::TrapezoidProfileCommand(
     frc::TrapezoidProfile profile,
-    std::function<void(frc::TrapezoidProfile::State)> output)
-    : m_profile(profile), m_output(output) {}
+    std::function<void(frc::TrapezoidProfile::State)> output,
+    std::initializer_list<Subsystem*> requirements)
+    : m_profile(profile), m_output(output) {
+  AddRequirements(requirements);
+}
 
 void TrapezoidProfileCommand::Initialize() {
   m_timer.Reset();

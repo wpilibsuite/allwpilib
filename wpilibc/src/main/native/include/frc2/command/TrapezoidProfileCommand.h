@@ -34,7 +34,8 @@ class TrapezoidProfileCommand
    */
   TrapezoidProfileCommand(
       frc::TrapezoidProfile profile,
-      std::function<void(frc::TrapezoidProfile::State)> output);
+      std::function<void(frc::TrapezoidProfile::State)> output,
+      std::initializer_list<Subsystem*> requirements);
 
   void Initialize() override;
 
