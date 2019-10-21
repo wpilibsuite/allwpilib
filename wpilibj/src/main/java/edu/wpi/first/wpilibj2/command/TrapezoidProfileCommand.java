@@ -29,13 +29,16 @@ public class TrapezoidProfileCommand extends CommandBase {
    * Creates a new TrapezoidProfileCommand that will execute the given {@link TrapezoidProfile}.
    * Output will be piped to the provided consumer function.
    *
-   * @param profile The motion profile to execute.
-   * @param output  The consumer for the profile output.
+   * @param profile      The motion profile to execute.
+   * @param output       The consumer for the profile output.
+   * @param requirements The subsystems required by this command.
    */
   public TrapezoidProfileCommand(TrapezoidProfile profile,
-                                 Consumer<State> output) {
+                                 Consumer<State> output,
+                                 Subsystem... requirements) {
     m_profile = requireNonNullParam(profile, "profile", "TrapezoidProfileCommand");
     m_output = requireNonNullParam(output, "output", "TrapezoidProfileCommand");
+    addRequirements(requirements);
   }
 
   @Override
