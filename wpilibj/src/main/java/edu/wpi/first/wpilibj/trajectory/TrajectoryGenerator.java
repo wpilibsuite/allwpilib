@@ -83,6 +83,31 @@ public final class TrajectoryGenerator {
   /**
    * Generates a trajectory with the given waypoints and constraints.
    *
+   * @param waypoints                        A vector of points that the trajectory must go through.
+   * @param constraints                      A vector of various velocity and acceleration
+   *                                         constraints.
+   * @param startVelocityMetersPerSecond     The start velocity for the trajectory.
+   * @param endVelocityMetersPerSecond       The end velocity for the trajectory.
+   * @param maxVelocityMetersPerSecond       The max velocity for the trajectory.
+   * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
+   * @return The trajectory.
+   */
+  public static Trajectory generateTrajectory(
+      List<Pose2d> waypoints,
+      List<TrajectoryConstraint> constraints,
+      double startVelocityMetersPerSecond,
+      double endVelocityMetersPerSecond,
+      double maxVelocityMetersPerSecond,
+      double maxAccelerationMetersPerSecondSq
+  ) {
+    return generateTrajectory(waypoints, constraints, startVelocityMetersPerSecond,
+        endVelocityMetersPerSecond, maxVelocityMetersPerSecond, maxAccelerationMetersPerSecondSq,
+        false);
+  }
+
+  /**
+   * Generates a trajectory with the given waypoints and constraints.
+   *
    * @param start                            The starting pose for the trajectory.
    * @param waypoints                        The interior waypoints for the trajectory. The headings
    *                                         will be determined automatically to ensure continuous
@@ -134,6 +159,37 @@ public final class TrajectoryGenerator {
   }
 
   /**
+   * Generates a trajectory with the given waypoints and constraints.
+   *
+   * @param start                            The starting pose for the trajectory.
+   * @param waypoints                        The interior waypoints for the trajectory. The headings
+   *                                         will be determined automatically to ensure continuous
+   *                                         curvature.
+   * @param end                              The ending pose for the trajectory.
+   * @param constraints                      A vector of various velocity and acceleration
+   *                                         constraints.
+   * @param startVelocityMetersPerSecond     The start velocity for the trajectory.
+   * @param endVelocityMetersPerSecond       The end velocity for the trajectory.
+   * @param maxVelocityMetersPerSecond       The max velocity for the trajectory.
+   * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
+   * @return The trajectory.
+   */
+  public static Trajectory generateTrajectory(
+      Pose2d start,
+      List<Translation2d> waypoints,
+      Pose2d end,
+      List<TrajectoryConstraint> constraints,
+      double startVelocityMetersPerSecond,
+      double endVelocityMetersPerSecond,
+      double maxVelocityMetersPerSecond,
+      double maxAccelerationMetersPerSecondSq
+  ) {
+    return generateTrajectory(start, waypoints, end, constraints,
+        startVelocityMetersPerSecond, endVelocityMetersPerSecond, maxVelocityMetersPerSecond,
+        maxAccelerationMetersPerSecondSq, false);
+  }
+
+  /**
    * Generates a trajectory with the given waypoints and differential drive constraints. Use
    * this method if you just want a constraint such that none of the wheels on your differential
    * drive exceed the specified max velocity. If you desire to impose more constraints, please
@@ -170,6 +226,34 @@ public final class TrajectoryGenerator {
         maxAccelerationMetersPerSecondSq,
         reversed
     );
+  }
+
+  /**
+   * Generates a trajectory with the given waypoints and differential drive constraints. Use
+   * this method if you just want a constraint such that none of the wheels on your differential
+   * drive exceed the specified max velocity. If you desire to impose more constraints, please
+   * use the other overloads.
+   *
+   * @param waypoints                        A vector of points that the trajectory must go through.
+   * @param differentialDriveKinematics      The DifferentialDriveKinematics object that represents
+   *                                         your drivetrain.
+   * @param startVelocityMetersPerSecond     The start velocity for the trajectory.
+   * @param endVelocityMetersPerSecond       The end velocity for the trajectory.
+   * @param maxVelocityMetersPerSecond       The max velocity for the trajectory.
+   * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
+   * @return The trajectory.
+   */
+  public static Trajectory generateTrajectory(
+      List<Pose2d> waypoints,
+      DifferentialDriveKinematics differentialDriveKinematics,
+      double startVelocityMetersPerSecond,
+      double endVelocityMetersPerSecond,
+      double maxVelocityMetersPerSecond,
+      double maxAccelerationMetersPerSecondSq
+  ) {
+    return generateTrajectory(waypoints, differentialDriveKinematics, startVelocityMetersPerSecond,
+        endVelocityMetersPerSecond, maxVelocityMetersPerSecond,
+        maxAccelerationMetersPerSecondSq, false);
   }
 
   /**
@@ -215,6 +299,40 @@ public final class TrajectoryGenerator {
         maxAccelerationMetersPerSecondSq,
         reversed
     );
+  }
+
+  /**
+   * Generates a trajectory with the given waypoints and differential drive constraints. Use
+   * this method if you just want a constraint such that none of the wheels on your differential
+   * drive exceed the specified max velocity. If you desire to impose more constraints, please
+   * use the other overloads.
+   *
+   * @param start                            The starting pose for the trajectory.
+   * @param waypoints                        The interior waypoints for the trajectory. The headings
+   *                                         will be determined automatically to ensure continuous
+   *                                         curvature.
+   * @param end                              The ending pose for the trajectory.
+   * @param differentialDriveKinematics      The DifferentialDriveKinematics object that represents
+   *                                         your drivetrain.
+   * @param startVelocityMetersPerSecond     The start velocity for the trajectory.
+   * @param endVelocityMetersPerSecond       The end velocity for the trajectory.
+   * @param maxVelocityMetersPerSecond       The max velocity for the trajectory.
+   * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
+   * @return The trajectory.
+   */
+  public static Trajectory generateTrajectory(
+      Pose2d start,
+      List<Translation2d> waypoints,
+      Pose2d end,
+      DifferentialDriveKinematics differentialDriveKinematics,
+      double startVelocityMetersPerSecond,
+      double endVelocityMetersPerSecond,
+      double maxVelocityMetersPerSecond,
+      double maxAccelerationMetersPerSecondSq
+  ) {
+    return generateTrajectory(start, waypoints, end, differentialDriveKinematics,
+        startVelocityMetersPerSecond, endVelocityMetersPerSecond,
+        maxVelocityMetersPerSecond, maxAccelerationMetersPerSecondSq, false);
   }
 
   /**

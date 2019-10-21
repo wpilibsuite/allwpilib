@@ -45,7 +45,8 @@ class TrajectoryGenerator {
       units::meters_per_second_t startVelocity,
       units::meters_per_second_t endVelocity,
       units::meters_per_second_t maxVelocity,
-      units::meters_per_second_squared_t maxAcceleration, bool reversed);
+      units::meters_per_second_squared_t maxAcceleration,
+      bool reversed = false);
 
   /**
    * Generates a trajectory with the given waypoints and constraints.
@@ -72,7 +73,8 @@ class TrajectoryGenerator {
       units::meters_per_second_t startVelocity,
       units::meters_per_second_t endVelocity,
       units::meters_per_second_t maxVelocity,
-      units::meters_per_second_squared_t maxAcceleration, bool reversed);
+      units::meters_per_second_squared_t maxAcceleration,
+      bool reversed = false);
 
   /**
    * Generates a trajectory with the given waypoints and differential drive
@@ -98,7 +100,8 @@ class TrajectoryGenerator {
       units::meters_per_second_t startVelocity,
       units::meters_per_second_t endVelocity,
       units::meters_per_second_t maxVelocity,
-      units::meters_per_second_squared_t maxAcceleration, bool reversed);
+      units::meters_per_second_squared_t maxAcceleration,
+      bool reversed = false);
 
   /**
    * Generates a trajectory with the given waypoints and differential drive
@@ -128,7 +131,8 @@ class TrajectoryGenerator {
       units::meters_per_second_t startVelocity,
       units::meters_per_second_t endVelocity,
       units::meters_per_second_t maxVelocity,
-      units::meters_per_second_squared_t maxAcceleration, bool reversed);
+      units::meters_per_second_squared_t maxAcceleration,
+      bool reversed = false);
 
   /**
    * Generate spline points from a vector of splines by parameterizing the
