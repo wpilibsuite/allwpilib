@@ -35,8 +35,12 @@ static void DisplayRelays() {
       else
         first = false;
 
-      bool forward = HALSIM_GetRelayForward(i);
-      bool reverse = HALSIM_GetRelayReverse(i);
+      bool forward = false;
+      bool reverse = false;
+      if (!HALSimGui::AreOutputsDisabled()) {
+        reverse = HALSIM_GetRelayReverse(i);
+        forward = HALSIM_GetRelayForward(i);
+      }
 
       ImGui::Text("Relay[%d]", i);
       ImGui::SameLine();

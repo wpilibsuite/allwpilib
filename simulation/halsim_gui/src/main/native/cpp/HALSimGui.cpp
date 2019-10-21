@@ -17,6 +17,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_internal.h>
+#include <mockdata/DriverStationData.h>
 #include <wpi/StringMap.h>
 #include <wpi/raw_ostream.h>
 
@@ -61,6 +62,7 @@ static int gUserScale = 2;
 static int gStyle = 0;
 static constexpr int kScaledFontLevels = 9;
 static ImFont* gScaledFont[kScaledFontLevels];
+static bool gDisableOutputsOnDSDisable = true;
 
 static void glfw_error_callback(int error, const char* description) {
   wpi::errs() << "GLFW Error " << error << ": " << description << '\n';
@@ -126,6 +128,8 @@ static void SimWindowsReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
       gUserScale = num;
     } else if (name == "style") {
       gStyle = num;
+    } else if (name == "disableOutputsOnDS") {
+      gDisableOutputsOnDSDisable = num;
     }
     return;
   }
@@ -146,9 +150,9 @@ static void SimWindowsWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
                                ImGuiTextBuffer* out_buf) {
   out_buf->appendf(
       "[SimWindow][GLOBAL]\nwidth=%d\nheight=%d\nmaximized=%d\n"
-      "xpos=%d\nypos=%d\nuserScale=%d\nstyle=%d\n\n",
+      "xpos=%d\nypos=%d\nuserScale=%d\nstyle=%d\ndisableOutputsOnDS=%d\n",
       gWindowWidth, gWindowHeight, gWindowMaximized, gWindowXPos, gWindowYPos,
-      gUserScale, gStyle);
+      gUserScale, gStyle, gDisableOutputsOnDSDisable ? 1 : 0);
   for (auto&& window : gWindows)
     out_buf->appendf("[SimWindow][%s]\nvisible=%d\nenabled=%d\n\n",
                      window.name.c_str(), window.visible ? 1 : 0,
@@ -242,6 +246,10 @@ void HALSimGui::SetDefaultWindowSize(const char* name, float width,
   auto& window = gWindows[it->second];
   window.sizeCond = ImGuiCond_FirstUseEver;
   window.size = ImVec2{width, height};
+}
+
+bool HALSimGui::AreOutputsDisabled() {
+  return gDisableOutputsOnDSDisable && !HALSIM_GetDriverStationEnabled();
 }
 
 bool HALSimGui::Initialize() {
@@ -432,6 +440,8 @@ void HALSimGui::Main(void*) {
       ImGui::BeginMainMenuBar();
 
       if (ImGui::BeginMenu("Options")) {
+        ImGui::MenuItem("Disable outputs on DS disable", nullptr,
+                        &gDisableOutputsOnDSDisable, true);
         for (auto&& menu : gOptionMenus) {
           if (menu) menu();
         }
@@ -579,6 +589,10 @@ void HALSIMGUI_SetDefaultWindowPos(const char* name, float x, float y) {
 void HALSIMGUI_SetDefaultWindowSize(const char* name, float width,
                                     float height) {
   HALSimGui::SetDefaultWindowSize(name, width, height);
+}
+
+int HALSIMGUI_AreOutputsDisabled(void) {
+  return HALSimGui::AreOutputsDisabled();
 }
 
 }  // extern "C"
