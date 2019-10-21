@@ -164,6 +164,8 @@ public class RamseteCommand extends CommandBase {
                               * initialState.velocityMetersPerSecond));
     m_timer.reset();
     m_timer.start();
+    m_leftController.reset();
+    m_rightController.reset();
   }
 
   @Override

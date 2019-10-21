@@ -122,8 +122,8 @@ public class RobotContainer {
         kvVoltSecondsPerMeter,
         kaVoltSecondsSquaredPerMeter,
         kDriveKinematics,
-        () -> m_robotDrive.getLeftEncoder().getRate(),
-        () -> m_robotDrive.getRightEncoder().getRate(),
+        m_robotDrive.getLeftEncoder()::getRate,
+        m_robotDrive.getRightEncoder()::getRate,
         new PIDController(kPDriveVel, 0, 0),
         new PIDController(kPDriveVel, 0, 0),
         // RamseteCommand passes volts to the callback, so we have to rescale here

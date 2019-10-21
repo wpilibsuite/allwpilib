@@ -67,6 +67,8 @@ void RamseteCommand::Initialize() {
                          initialState.velocity * initialState.curvature});
   m_timer.Reset();
   m_timer.Start();
+  m_leftController.Reset();
+  m_rightController.Reset();
 }
 
 void RamseteCommand::Execute() {
