@@ -184,7 +184,7 @@ public class MecanumFollowerCommand extends CommandBase {
 
     var targetChassisSpeeds = new ChassisSpeeds(targetXVel, targetYVel, targetAngularVel);
 
-    var targetWheelSpeeds= m_kinematics.toWheelSpeeds(targetChassisSpeeds);
+    var targetWheelSpeeds = m_kinematics.toWheelSpeeds(targetChassisSpeeds);
     
     var frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeftMetersPerSecond;
     var rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeftMetersPerSecond;
