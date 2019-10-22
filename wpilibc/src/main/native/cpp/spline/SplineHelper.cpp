@@ -11,39 +11,22 @@
 
 using namespace frc;
 
-std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromWaypoints(
-    const Pose2d& start, std::vector<Translation2d> waypoints,
-    const Pose2d& end) {
+std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
+    const Spline<3>::ControlVector& start, std::vector<Translation2d> waypoints,
+    const Spline<3>::ControlVector& end) {
   std::vector<CubicHermiteSpline> splines;
 
-  double scalar;
-  // This just makes the splines look better.
-  if (waypoints.empty()) {
-    scalar = 1.2 * start.Translation().Distance(end.Translation()).to<double>();
-  } else {
-    scalar = 1.2 * start.Translation().Distance(waypoints.front()).to<double>();
-  }
-
-  std::array<double, 2> startXControlVector{
-      start.Translation().X().to<double>(), start.Rotation().Cos() * scalar};
-
-  std::array<double, 2> startYControlVector{
-      start.Translation().Y().to<double>(), start.Rotation().Sin() * scalar};
-
-  // This just makes the splines look better.
-  if (!waypoints.empty()) {
-    scalar = 1.2 * end.Translation().Distance(waypoints.back()).to<double>();
-  }
-
-  std::array<double, 2> endXControlVector{end.Translation().X().to<double>(),
-                                          end.Rotation().Cos() * scalar};
-
-  std::array<double, 2> endYControlVector{end.Translation().Y().to<double>(),
-                                          end.Rotation().Sin() * scalar};
+  std::array<double, 2> xInitial = start.x;
+  std::array<double, 2> yInitial = start.y;
+  std::array<double, 2> xFinal = end.x;
+  std::array<double, 2> yFinal = end.y;
 
   if (waypoints.size() > 1) {
-    waypoints.emplace(waypoints.begin(), start.Translation());
-    waypoints.emplace_back(end.Translation());
+    waypoints.emplace(waypoints.begin(),
+                      Translation2d{units::meter_t(xInitial[0]),
+                                    units::meter_t(yInitial[0])});
+    waypoints.emplace_back(
+        Translation2d{units::meter_t(xFinal[0]), units::meter_t(yFinal[0])});
 
     std::vector<double> a;
     std::vector<double> b(waypoints.size() - 2, 4.0);
@@ -61,10 +44,10 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromWaypoints(
 
     dx.emplace_back(
         3 * (waypoints[2].X().to<double>() - waypoints[0].X().to<double>()) -
-        startXControlVector[1]);
+        xInitial[1]);
     dy.emplace_back(
         3 * (waypoints[2].Y().to<double>() - waypoints[0].Y().to<double>()) -
-        startYControlVector[1]);
+        yInitial[1]);
     if (waypoints.size() > 4) {
       for (unsigned int i = 1; i <= waypoints.size() - 4; i++) {
         dx.emplace_back(3 * (waypoints[i + 1].X().to<double>() -
@@ -75,18 +58,18 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromWaypoints(
     }
     dx.emplace_back(3 * (waypoints[waypoints.size() - 1].X().to<double>() -
                          waypoints[waypoints.size() - 3].X().to<double>()) -
-                    endXControlVector[1]);
+                    xFinal[1]);
     dy.emplace_back(3 * (waypoints[waypoints.size() - 1].Y().to<double>() -
                          waypoints[waypoints.size() - 3].Y().to<double>()) -
-                    endYControlVector[1]);
+                    yFinal[1]);
 
     ThomasAlgorithm(a, b, c, dx, &fx);
     ThomasAlgorithm(a, b, c, dy, &fy);
 
-    fx.emplace(fx.begin(), startXControlVector[1]);
-    fx.emplace_back(endXControlVector[1]);
-    fy.emplace(fy.begin(), startYControlVector[1]);
-    fy.emplace_back(endYControlVector[1]);
+    fx.emplace(fx.begin(), xInitial[1]);
+    fx.emplace_back(xFinal[1]);
+    fy.emplace(fy.begin(), yInitial[1]);
+    fy.emplace_back(yFinal[1]);
 
     for (unsigned int i = 0; i < fx.size() - 1; i++) {
       // Create the spline.
@@ -99,38 +82,68 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromWaypoints(
       splines.push_back(spline);
     }
   } else if (waypoints.size() == 1) {
-    const double xDeriv = (3 * (end.Translation().X().to<double>() -
-                                start.Translation().X().to<double>()) -
-                           endXControlVector[1] - startXControlVector[1]) /
-                          4.0;
-    const double yDeriv = (3 * (end.Translation().Y().to<double>() -
-                                start.Translation().Y().to<double>()) -
-                           endYControlVector[1] - startYControlVector[1]) /
-                          4.0;
+    const double xDeriv =
+        (3 * (xFinal[0] - xInitial[0]) - xFinal[1] - xInitial[1]) / 4.0;
+    const double yDeriv =
+        (3 * (yFinal[0] - yInitial[0]) - yFinal[1] - yInitial[1]) / 4.0;
 
     std::array<double, 2> midXControlVector{waypoints[0].X().to<double>(),
                                             xDeriv};
     std::array<double, 2> midYControlVector{waypoints[0].Y().to<double>(),
                                             yDeriv};
 
-    splines.emplace_back(startXControlVector, midXControlVector,
-                         startYControlVector, midYControlVector);
-    splines.emplace_back(midXControlVector, endXControlVector,
-                         midYControlVector, endYControlVector);
+    splines.emplace_back(xInitial, midXControlVector, yInitial,
+                         midYControlVector);
+    splines.emplace_back(midXControlVector, xFinal, midYControlVector, yFinal);
 
   } else {
     // Create the spline.
-    const CubicHermiteSpline spline{startXControlVector, endXControlVector,
-                                    startYControlVector, endYControlVector};
+    const CubicHermiteSpline spline{xInitial, xFinal, yInitial, yFinal};
     splines.push_back(spline);
   }
 
   return splines;
 }
 
-std::vector<QuinticHermiteSpline> SplineHelper::QuinticSplinesFromWaypoints(
-    const std::vector<Pose2d>& waypoints) {
+std::vector<QuinticHermiteSpline>
+SplineHelper::QuinticSplinesFromControlVectors(
+    const std::vector<Spline<5>::ControlVector>& controlVectors) {
   std::vector<QuinticHermiteSpline> splines;
+  for (unsigned int i = 0; i < controlVectors.size() - 1; i++) {
+    auto& xInitial = controlVectors[i].x;
+    auto& yInitial = controlVectors[i].y;
+    auto& xFinal = controlVectors[i + 1].x;
+    auto& yFinal = controlVectors[i + 1].y;
+    splines.emplace_back(xInitial, xFinal, yInitial, yFinal);
+  }
+  return splines;
+}
+
+std::array<Spline<3>::ControlVector, 2>
+SplineHelper::CubicControlVectorsFromWaypoints(
+    const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
+    const Pose2d& end) {
+  double scalar;
+  if (interiorWaypoints.empty()) {
+    scalar = 1.2 * start.Translation().Distance(end.Translation()).to<double>();
+  } else {
+    scalar =
+        1.2 *
+        start.Translation().Distance(interiorWaypoints.front()).to<double>();
+  }
+  const auto initialCV = CubicControlVector(scalar, start);
+  if (!interiorWaypoints.empty()) {
+    scalar =
+        1.2 * end.Translation().Distance(interiorWaypoints.back()).to<double>();
+  }
+  const auto finalCV = CubicControlVector(scalar, end);
+  return {initialCV, finalCV};
+}
+
+std::vector<Spline<5>::ControlVector>
+SplineHelper::QuinticControlVectorsFromWaypoints(
+    const std::vector<Pose2d>& waypoints) {
+  std::vector<Spline<5>::ControlVector> vectors;
   for (unsigned int i = 0; i < waypoints.size() - 1; i++) {
     auto& p0 = waypoints[i];
     auto& p1 = waypoints[i + 1];
@@ -139,19 +152,10 @@ std::vector<QuinticHermiteSpline> SplineHelper::QuinticSplinesFromWaypoints(
     const auto scalar =
         1.2 * p0.Translation().Distance(p1.Translation()).to<double>();
 
-    const std::array<double, 3> xInitialControlVector{
-        p0.Translation().X().to<double>(), p0.Rotation().Cos() * scalar, 0.0};
-    const std::array<double, 3> xFinalControlVector{
-        p1.Translation().X().to<double>(), p1.Rotation().Cos() * scalar, 0.0};
-    const std::array<double, 3> yInitialControlVector{
-        p0.Translation().Y().to<double>(), p0.Rotation().Sin() * scalar, 0.0};
-    const std::array<double, 3> yFinalControlVector{
-        p1.Translation().Y().to<double>(), p1.Rotation().Sin() * scalar, 0.0};
-
-    splines.emplace_back(xInitialControlVector, xFinalControlVector,
-                         yInitialControlVector, yFinalControlVector);
+    vectors.push_back(QuinticControlVector(scalar, p0));
+    vectors.push_back(QuinticControlVector(scalar, p1));
   }
-  return splines;
+  return vectors;
 }
 
 void SplineHelper::ThomasAlgorithm(const std::vector<double>& a,

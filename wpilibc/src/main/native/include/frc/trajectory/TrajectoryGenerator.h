@@ -13,6 +13,7 @@
 
 #include "frc/spline/SplineParameterizer.h"
 #include "frc/trajectory/Trajectory.h"
+#include "frc/trajectory/TrajectoryConfig.h"
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 
@@ -25,114 +26,63 @@ class TrajectoryGenerator {
   using PoseWithCurvature = std::pair<Pose2d, curvature_t>;
 
   /**
-   * Generates a trajectory with the given waypoints and constraints.
+   * Generates a trajectory from the given control vectors and config. This
+   * method uses clamped cubic splines -- a method in which the exterior control
+   * vectors and interior waypoints are provided. The headings are automatically
+   * determined at the interior points to ensure continuous curvature.
    *
-   * @param waypoints A vector of points that the trajectory must go through.
-   * @param constraints A vector of various velocity and acceleration
-   * constraints.
-   * @param startVelocity The start velocity for the trajectory.
-   * @param endVelocity The end velocity for the trajectory.
-   * @param maxVelocity The max velocity for the trajectory.
-   * @param maxAcceleration The max acceleration for the trajectory.
-   * @param reversed Whether the robot should move backwards. Note that the
-   * robot will still move from a -> b -> ... -> z as defined in the waypoints.
-   *
-   * @return The trajectory.
+   * @param initial           The initial control vector.
+   * @param interiorWaypoints The interior waypoints.
+   * @param end               The ending control vector.
+   * @param config            The configuration for the trajectory.
+   * @return The generated trajectory.
    */
   static Trajectory GenerateTrajectory(
-      const std::vector<Pose2d>& waypoints,
-      std::vector<std::unique_ptr<TrajectoryConstraint>>&& constraints,
-      units::meters_per_second_t startVelocity,
-      units::meters_per_second_t endVelocity,
-      units::meters_per_second_t maxVelocity,
-      units::meters_per_second_squared_t maxAcceleration,
-      bool reversed = false);
+      Spline<3>::ControlVector initial,
+      const std::vector<Translation2d>& interiorWaypoints,
+      Spline<3>::ControlVector end, const TrajectoryConfig& config);
 
   /**
-   * Generates a trajectory with the given waypoints and constraints.
+   * Generates a trajectory from the given waypoints and config. This method
+   * uses clamped cubic splines -- a method in which the initial pose, final
+   * pose, and interior waypoints are provided.  The headings are automatically
+   * determined at the interior points to ensure continuous curvature.
    *
-   * @param start The starting pose for the trajectory.
-   * @param waypoints The interior waypoints for the trajectory. The headings
-   * will be determined automatically to ensure continuous curvature.
-   * @param end The ending pose for the trajectory.
-   * @param constraints A vector of various velocity and acceleration
-   * constraints.
-   * @param startVelocity The start velocity for the trajectory.
-   * @param endVelocity The end velocity for the trajectory.
-   * @param maxVelocity The max velocity for the trajectory.
-   * @param maxAcceleration The max acceleration for the trajectory.
-   * @param reversed Whether the robot should move backwards. Note that the
-   * robot will still move from a -> b -> ... -> z as defined in the waypoints.
-   *
-   * @return The trajectory.
+   * @param start             The starting pose.
+   * @param interiorWaypoints The interior waypoints.
+   * @param end               The ending pose.
+   * @param config            The configuration for the trajectory.
+   * @return The generated trajectory.
    */
   static Trajectory GenerateTrajectory(
-      const Pose2d& start, const std::vector<Translation2d>& waypoints,
-      const Pose2d& end,
-      std::vector<std::unique_ptr<TrajectoryConstraint>>&& constraints,
-      units::meters_per_second_t startVelocity,
-      units::meters_per_second_t endVelocity,
-      units::meters_per_second_t maxVelocity,
-      units::meters_per_second_squared_t maxAcceleration,
-      bool reversed = false);
+      const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
+      const Pose2d& end, const TrajectoryConfig& config);
 
   /**
-   * Generates a trajectory with the given waypoints and differential drive
-   * constraints. Use this method if you just want a constraint such that none
-   * of the wheels on your differential drive exceed the specified max velocity.
-   * If you desire to impose more constraints, please use the other overloads.
+   * Generates a trajectory from the given quintic control vectors and config.
+   * This method uses quintic hermite splines -- therefore, all points must be
+   * represented by control vectors. Continuous curvature is guaranteed in this
+   * method.
    *
-   * @param waypoints A vector of points that the trajectory must go through.
-   * @param differentialDriveKinematics The DifferentialDriveKinematics
-   * object that represents your drivetrain.
-   * @param startVelocity The start velocity for the trajectory.
-   * @param endVelocity The end velocity for the trajectory.
-   * @param maxVelocity The max velocity for the trajectory.
-   * @param maxAcceleration The max acceleration for the trajectory.
-   * @param reversed Whether the robot should move backwards. Note that the
-   * robot will still move from a -> b -> ... -> z as defined in the waypoints.
-   *
-   * @return The trajectory.
+   * @param controlVectors List of quintic control vectors.
+   * @param config         The configuration for the trajectory.
+   * @return The generated trajectory.
    */
   static Trajectory GenerateTrajectory(
-      const std::vector<Pose2d>& waypoints,
-      const DifferentialDriveKinematics& differentialDriveKinematics,
-      units::meters_per_second_t startVelocity,
-      units::meters_per_second_t endVelocity,
-      units::meters_per_second_t maxVelocity,
-      units::meters_per_second_squared_t maxAcceleration,
-      bool reversed = false);
+      std::vector<Spline<5>::ControlVector> controlVectors,
+      const TrajectoryConfig& config);
 
   /**
-   * Generates a trajectory with the given waypoints and differential drive
-   * constraints. Use this method if you just want a constraint such that none
-   * of the wheels on your differential drive exceed the specified max velocity.
-   * If you desire to impose more constraints, please use the other overloads.
+   * Generates a trajectory from the given waypoints and config. This method
+   * uses quintic hermite splines -- therefore, all points must be represented
+   * by Pose2d objects. Continuous curvature is guaranteed in this method.
    *
-   * @param start The starting pose for the trajectory.
-   * @param waypoints The interior waypoints for the trajectory. The headings
-   * will be determined automatically to ensure continuous curvature.
-   * @param end The ending pose for the trajectory.
-   * @param differentialDriveKinematics The DifferentialDriveKinematics
-   * object that represents your drivetrain.
-   * @param startVelocity The start velocity for the trajectory.
-   * @param endVelocity The end velocity for the trajectory.
-   * @param maxVelocity The max velocity for the trajectory.
-   * @param maxAcceleration The max acceleration for the trajectory.
-   * @param reversed Whether the robot should move backwards. Note that the
-   * robot will still move from a -> b -> ... -> z as defined in the waypoints.
-   *
-   * @return The trajectory.
+   * @param waypoints List of waypoints..
+   * @param config    The configuration for the trajectory.
+   * @return The generated trajectory.
    */
-  static Trajectory GenerateTrajectory(
-      const Pose2d& start, const std::vector<Translation2d>& waypoints,
-      const Pose2d& end,
-      const DifferentialDriveKinematics& differentialDriveKinematics,
-      units::meters_per_second_t startVelocity,
-      units::meters_per_second_t endVelocity,
-      units::meters_per_second_t maxVelocity,
-      units::meters_per_second_squared_t maxAcceleration,
-      bool reversed = false);
+  static Trajectory GenerateTrajectory(const std::vector<Pose2d>& waypoints,
+                                       const TrajectoryConfig& config);
 
   /**
    * Generate spline points from a vector of splines by parameterizing the

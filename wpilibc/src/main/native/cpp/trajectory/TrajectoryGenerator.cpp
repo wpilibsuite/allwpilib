@@ -15,98 +15,78 @@
 using namespace frc;
 
 Trajectory TrajectoryGenerator::GenerateTrajectory(
-    const std::vector<Pose2d>& waypoints,
-    std::vector<std::unique_ptr<TrajectoryConstraint>>&& constraints,
-    units::meters_per_second_t startVelocity,
-    units::meters_per_second_t endVelocity,
-    units::meters_per_second_t maxVelocity,
-    units::meters_per_second_squared_t maxAcceleration, bool reversed) {
+    Spline<3>::ControlVector initial,
+    const std::vector<Translation2d>& interiorWaypoints,
+    Spline<3>::ControlVector end, const TrajectoryConfig& config) {
   const Transform2d flip{Translation2d(), Rotation2d(180_deg)};
 
   // Make theta normal for trajectory generation if path is reversed.
-  std::vector<Pose2d> newWaypoints;
-  newWaypoints.reserve(waypoints.size());
-  for (auto&& point : waypoints) {
-    newWaypoints.push_back(reversed ? point + flip : point);
+  // Flip the headings.
+  if (config.IsReversed()) {
+    initial.x[1] *= -1;
+    initial.y[1] *= -1;
+    end.x[1] *= -1;
+    end.y[1] *= -1;
   }
 
-  auto points = SplinePointsFromSplines(
-      SplineHelper::QuinticSplinesFromWaypoints(newWaypoints));
+  auto points =
+      SplinePointsFromSplines(SplineHelper::CubicSplinesFromControlVectors(
+          initial, interiorWaypoints, end));
 
   // After trajectory generation, flip theta back so it's relative to the
   // field. Also fix curvature.
-  if (reversed) {
+  if (config.IsReversed()) {
     for (auto& point : points) {
       point = {point.first + flip, -point.second};
     }
   }
 
   return TrajectoryParameterizer::TimeParameterizeTrajectory(
-      points, std::move(constraints), startVelocity, endVelocity, maxVelocity,
-      maxAcceleration, reversed);
+      points, config.Constraints(), config.StartVelocity(),
+      config.EndVelocity(), config.MaxVelocity(), config.MaxAcceleration(),
+      config.IsReversed());
 }
 
 Trajectory TrajectoryGenerator::GenerateTrajectory(
-    const Pose2d& start, const std::vector<Translation2d>& waypoints,
-    const Pose2d& end,
-    std::vector<std::unique_ptr<TrajectoryConstraint>>&& constraints,
-    units::meters_per_second_t startVelocity,
-    units::meters_per_second_t endVelocity,
-    units::meters_per_second_t maxVelocity,
-    units::meters_per_second_squared_t maxAcceleration, bool reversed) {
+    const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
+    const Pose2d& end, const TrajectoryConfig& config) {
+  auto [startCV, endCV] = SplineHelper::CubicControlVectorsFromWaypoints(
+      start, interiorWaypoints, end);
+  return GenerateTrajectory(startCV, interiorWaypoints, endCV, config);
+}
+
+Trajectory TrajectoryGenerator::GenerateTrajectory(
+    std::vector<Spline<5>::ControlVector> controlVectors,
+    const TrajectoryConfig& config) {
   const Transform2d flip{Translation2d(), Rotation2d(180_deg)};
   // Make theta normal for trajectory generation if path is reversed.
-
-  const Pose2d newStart = reversed ? start + flip : start;
-  const Pose2d newEnd = reversed ? end + flip : end;
+  if (config.IsReversed()) {
+    for (auto vector : controlVectors) {
+      // Flip the headings.
+      vector.x[1] *= -1;
+      vector.y[1] *= -1;
+    }
+  }
 
   auto points = SplinePointsFromSplines(
-      SplineHelper::CubicSplinesFromWaypoints(newStart, waypoints, newEnd));
+      SplineHelper::QuinticSplinesFromControlVectors(controlVectors));
 
   // After trajectory generation, flip theta back so it's relative to the
   // field. Also fix curvature.
-  if (reversed) {
+  if (config.IsReversed()) {
     for (auto& point : points) {
       point = {point.first + flip, -point.second};
     }
   }
 
   return TrajectoryParameterizer::TimeParameterizeTrajectory(
-      points, std::move(constraints), startVelocity, endVelocity, maxVelocity,
-      maxAcceleration, reversed);
+      points, config.Constraints(), config.StartVelocity(),
+      config.EndVelocity(), config.MaxVelocity(), config.MaxAcceleration(),
+      config.IsReversed());
 }
 
 Trajectory TrajectoryGenerator::GenerateTrajectory(
-    const std::vector<Pose2d>& waypoints,
-    const DifferentialDriveKinematics& differentialDriveKinematics,
-    units::meters_per_second_t startVelocity,
-    units::meters_per_second_t endVelocity,
-    units::meters_per_second_t maxVelocity,
-    units::meters_per_second_squared_t maxAcceleration, bool reversed) {
-  std::vector<std::unique_ptr<TrajectoryConstraint>> constraints;
-  constraints.emplace_back(
-      std::make_unique<DifferentialDriveKinematicsConstraint>(
-          differentialDriveKinematics, maxVelocity));
-
-  return GenerateTrajectory(waypoints, std::move(constraints), startVelocity,
-                            endVelocity, maxVelocity, maxAcceleration,
-                            reversed);
-}
-
-Trajectory TrajectoryGenerator::GenerateTrajectory(
-    const Pose2d& start, const std::vector<Translation2d>& waypoints,
-    const Pose2d& end,
-    const DifferentialDriveKinematics& differentialDriveKinematics,
-    units::meters_per_second_t startVelocity,
-    units::meters_per_second_t endVelocity,
-    units::meters_per_second_t maxVelocity,
-    units::meters_per_second_squared_t maxAcceleration, bool reversed) {
-  std::vector<std::unique_ptr<TrajectoryConstraint>> constraints;
-  constraints.emplace_back(
-      std::make_unique<DifferentialDriveKinematicsConstraint>(
-          differentialDriveKinematics, maxVelocity));
-
-  return GenerateTrajectory(start, waypoints, end, std::move(constraints),
-                            startVelocity, endVelocity, maxVelocity,
-                            maxAcceleration, reversed);
+    const std::vector<Pose2d>& waypoints, const TrajectoryConfig& config) {
+  return GenerateTrajectory(
+      SplineHelper::QuinticControlVectorsFromWaypoints(waypoints), config);
 }

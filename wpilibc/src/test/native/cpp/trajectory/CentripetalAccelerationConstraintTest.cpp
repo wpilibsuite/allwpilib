@@ -20,11 +20,11 @@ using namespace frc;
 TEST(CentripetalAccelerationConstraintTest, Constraint) {
   const auto maxCentripetalAcceleration = 7_fps_sq;
 
-  std::vector<std::unique_ptr<TrajectoryConstraint>> constraints;
-  constraints.emplace_back(std::make_unique<CentripetalAccelerationConstraint>(
-      maxCentripetalAcceleration));
+  auto config = TrajectoryConfig(12_fps, 12_fps_sq);
+  config.AddConstraint(
+      CentripetalAccelerationConstraint(maxCentripetalAcceleration));
 
-  auto trajectory = TestTrajectory::GetTrajectory(std::move(constraints));
+  auto trajectory = TestTrajectory::GetTrajectory(config);
 
   units::second_t time = 0_s;
   units::second_t dt = 20_ms;

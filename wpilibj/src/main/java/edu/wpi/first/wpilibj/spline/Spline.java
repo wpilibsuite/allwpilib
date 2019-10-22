@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.spline;
 
+import java.util.Arrays;
+
 import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -87,5 +89,30 @@ public abstract class Spline {
         new Pose2d(x, y, new Rotation2d(dx, dy)),
         curvature
     );
+  }
+
+  /**
+   * Represents a control vector for a spline.
+   *
+   * <p>Each element in each array represents the value of the derivative at the index. For
+   * example, the value of x[2] is the second derivative in the x dimension.
+   */
+  @SuppressWarnings("MemberName")
+  public static class ControlVector {
+    public double[] x;
+    public double[] y;
+
+    /**
+     * Instantiates a control vector.
+     * @param x The x dimension of the control vector.
+     * @param y The y dimension of the control vector.
+     */
+    @SuppressWarnings("ParameterName")
+    public ControlVector(double[] x, double[] y) {
+      this.x = new double[0];
+      this.y = new double[0];
+      this.x = Arrays.copyOf(x, x.length);
+      this.y = Arrays.copyOf(y, y.length);
+    }
   }
 }
