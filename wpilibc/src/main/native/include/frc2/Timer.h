@@ -131,7 +131,10 @@ class Timer {
   static const units::second_t kRolloverTime;
 
  private:
-  frc::Timer m_timer;
+  units::second_t m_startTime = 0_s;
+  units::second_t m_accumulatedTime = 0_s;
+  bool m_running = false;
+  mutable wpi::mutex m_mutex;
 };
 
 }  // namespace frc2
