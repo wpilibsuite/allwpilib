@@ -264,7 +264,7 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status) {
   // be.
 
   // Break it into lower and upper portions.
-  uint32_t lower = fpga_time & ((uint64_t)0xffffffff);
+  uint32_t lower = fpga_time & 0xffffffffull;
   uint64_t upper = (fpga_time >> 32) & 0xffffffff;
 
   // The time was sampled *before* the current time, so roll it back.
