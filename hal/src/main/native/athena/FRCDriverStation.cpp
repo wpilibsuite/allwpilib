@@ -252,7 +252,7 @@ int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
 }
 
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
-  return HAL_GetMatchInfoInternal(matchInfo);
+  return HAL_GetMatchInfoInternal(info);
 }
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
