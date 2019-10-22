@@ -13,8 +13,16 @@
 
 namespace hal {
 
+bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
+                                HAL_FPGAEncoderHandle* fpgaEncoderHandle,
+                                HAL_CounterHandle* counterHandle);
+
 class Encoder {
  public:
+  friend bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
+                                HAL_FPGAEncoderHandle* fpgaEncoderHandle,
+                                HAL_CounterHandle* counterHandle);
+
   Encoder(HAL_Handle digitalSourceHandleA,
           HAL_AnalogTriggerType analogTriggerTypeA,
           HAL_Handle digitalSourceHandleB,

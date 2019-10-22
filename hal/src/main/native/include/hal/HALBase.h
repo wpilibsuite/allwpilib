@@ -120,6 +120,20 @@ HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel);
 uint64_t HAL_GetFPGATime(int32_t* status);
 
 /**
+ * Given an 32 bit FPGA time, expand it to the nearest likely 64 bit FPGA time.
+ *
+ * Note: This is making the assumption that the timestamp being converted is
+ * always in the past.  If you call this with a future timestamp, it probably
+ * will make it in the past.  If you wait over 70 minutes between capturing the
+ * bottom 32 bits of the timestamp and expanding it, you will be off by
+ * multiples of 1<<32 microseconds.
+ *
+ * @return The current time in microseconds according to the FPGA (since FPGA
+ * reset) as a 64 bit number.
+ */
+uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status);
+
+/**
  * Call this to start up HAL. This is required for robot programs.
  *
  * This must be called before any other HAL functions. Failure to do so will

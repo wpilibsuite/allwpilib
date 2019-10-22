@@ -201,6 +201,13 @@ double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
   return voltage;
 }
 
+double HAL_GetAnalogValueToVolts(HAL_AnalogInputHandle analogPortHandle, int32_t rawValue, int32_t* status) {
+  int32_t LSBWeight = HAL_GetAnalogLSBWeight(analogPortHandle, status);
+  int32_t offset = HAL_GetAnalogOffset(analogPortHandle, status);
+  double voltage = LSBWeight * 1.0e-9 * rawValue - offset * 1.0e-9;
+  return voltage;
+}
+
 double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
                                    int32_t* status) {
   int32_t value = HAL_GetAnalogAverageValue(analogPortHandle, status);
