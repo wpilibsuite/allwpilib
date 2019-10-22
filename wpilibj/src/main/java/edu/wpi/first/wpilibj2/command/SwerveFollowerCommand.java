@@ -45,7 +45,7 @@ public class SwerveFollowerCommand extends CommandBase {
   private final SwerveDriveKinematics m_kinematics;
   private final PIDController m_xController;
   private final PIDController m_yController;
-  private final ProfiledPIDController m_thetaController;              
+  private final ProfiledPIDController m_thetaController;
   private final Consumer<SwerveModuleState[]> m_outputModuleStates;
 
   public SwerveFollowerCommand(int NumModules,
@@ -65,7 +65,7 @@ public class SwerveFollowerCommand extends CommandBase {
     m_xController = requireNonNullParam(xController, "xController", "SwerveFollowerCommand");
     m_yController = requireNonNullParam(yController, "xController", "SwerveFollowerCommand");
     m_thetaController = requireNonNullParam(thetaController, "thetaController", "SwerveFollowerCommand");
-    
+
     m_outputModuleStates = requireNonNullParam(outputModuleStates, "frontLeftOutput", "SwerveFollowerCommand");
     addRequirements(requirements);
   }
@@ -87,9 +87,17 @@ public class SwerveFollowerCommand extends CommandBase {
 
     var m_poseError = m_desiredPose.relativeTo(m_pose.get());
 
-    double targetXVel = m_xController.calculate(m_pose.get().getTranslation().getX(), m_desiredPose.getTranslation().getX());
-    double targetYVel = m_yController.calculate(m_pose.get().getTranslation().getY(), m_desiredPose.getTranslation().getY());
-    double targetAngularVel = m_thetaController.calculate(m_pose.get().getRotation().getRadians(), m_finalPose.getRotation().getRadians());
+    double targetXVel = m_xController.calculate(
+      m_pose.get().getTranslation().getX(),
+       m_desiredPose.getTranslation().getX());
+
+    double targetYVel = m_yController.calculate(
+      m_pose.get().getTranslation().getY(),
+       m_desiredPose.getTranslation().getY());
+
+    double targetAngularVel = m_thetaController.calculate(
+      m_pose.get().getRotation().getRadians(),
+       m_finalPose.getRotation().getRadians());
 
     double vRef = m_desiredState.velocityMetersPerSecond;
 

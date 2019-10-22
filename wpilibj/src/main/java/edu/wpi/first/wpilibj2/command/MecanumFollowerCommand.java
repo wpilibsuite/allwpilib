@@ -50,7 +50,7 @@ public class MecanumFollowerCommand extends CommandBase {
   private final MecanumDriveKinematics m_kinematics;
   private final PIDController m_xController;
   private final PIDController m_yController;
-  private final ProfiledPIDController m_thetaController;              
+  private final ProfiledPIDController m_thetaController;
   private final PIDController m_frontLeftController;
   private final PIDController m_rearLeftController;
   private final PIDController m_frontRightController;
@@ -72,7 +72,7 @@ public class MecanumFollowerCommand extends CommandBase {
                         PIDController xController,
                         PIDController yController,
                         ProfiledPIDController thetaController,
-                        
+
                         PIDController frontLeftController,
                         PIDController rearLeftController,
                         PIDController frontRightController,
@@ -102,9 +102,9 @@ public class MecanumFollowerCommand extends CommandBase {
     m_rearRightController = requireNonNullParam(rearRightController, "rearRightController", "MecanumFollowerCommand");
 
     m_currentWheelSpeeds = requireNonNullParam(currentWheelSpeeds, "currentWheelSpeeds", "MecanumFollowerCommand");
-    
+
     m_frontLeftOutput = requireNonNullParam(frontLeftOutputVolts, "frontLeftOutput", "MecanumFollowerCommand");
-    m_rearLeftOutput = requireNonNullParam(rearLeftOutputVolts, "rearLeftOutput", "MecanumFollowerCommand"); 
+    m_rearLeftOutput = requireNonNullParam(rearLeftOutputVolts, "rearLeftOutput", "MecanumFollowerCommand");
     m_frontRightOutput =  requireNonNullParam(frontRightOutputVolts, "frontRightOutput", "MecanumFollowerCommand");
     m_rearRightOutput = requireNonNullParam(rearRightOutputVolts, "rearRightOutput", "MecanumFollowerCommand");
     addRequirements(requirements);
@@ -141,9 +141,9 @@ public class MecanumFollowerCommand extends CommandBase {
     m_rearRightController = null;
 
     m_currentWheelSpeeds = requireNonNullParam(currentWheelSpeeds, "currentWheelSpeeds", "MecanumFollowerCommand");
-    
+
     m_frontLeftOutput = requireNonNullParam(frontLeftOutputMetersPerSecond, "frontLeftOutput", "MecanumFollowerCommand");
-    m_rearLeftOutput = requireNonNullParam(rearLeftOutputMetersPerSecond, "rearLeftOutput", "MecanumFollowerCommand"); 
+    m_rearLeftOutput = requireNonNullParam(rearLeftOutputMetersPerSecond, "rearLeftOutput", "MecanumFollowerCommand");
     m_frontRightOutput =  requireNonNullParam(frontRightOutputMetersPerSecond, "frontRightOutput", "MecanumFollowerCommand");
     m_rearRightOutput = requireNonNullParam(rearRightOutputMetersPerSecond, "rearRightOutput", "MecanumFollowerCommand");
     addRequirements(requirements);
@@ -156,7 +156,7 @@ public class MecanumFollowerCommand extends CommandBase {
 
     var initialXVelocity = initialState.velocityMetersPerSecond * Math.sin(initialState.poseMeters.getRotation().getRadians());
     var initialYVelocity = initialState.velocityMetersPerSecond * Math.cos(initialState.poseMeters.getRotation().getRadians());
-    
+
     m_prevSpeeds = m_kinematics.toWheelSpeeds( new ChassisSpeeds(initialXVelocity, initialYVelocity, initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
 
     m_timer.reset();
@@ -173,9 +173,17 @@ public class MecanumFollowerCommand extends CommandBase {
 
     var m_poseError = m_desiredPose.relativeTo(m_pose.get());
 
-    double targetXVel = m_xController.calculate(m_pose.get().getTranslation().getX(), m_desiredPose.getTranslation().getX());
-    double targetYVel = m_yController.calculate(m_pose.get().getTranslation().getY(), m_desiredPose.getTranslation().getY());
-    double targetAngularVel = m_thetaController.calculate(m_pose.get().getRotation().getRadians(), m_finalPose.getRotation().getRadians());
+    double targetXVel = m_xController.calculate(
+      m_pose.get().getTranslation().getX(),
+       m_desiredPose.getTranslation().getX());
+
+    double targetYVel = m_yController.calculate(
+      m_pose.get().getTranslation().getY(),
+       m_desiredPose.getTranslation().getY());
+       
+    double targetAngularVel = m_thetaController.calculate(
+      m_pose.get().getRotation().getRadians(),
+       m_finalPose.getRotation().getRadians());
 
     double vRef = m_desiredState.velocityMetersPerSecond;
 
@@ -185,7 +193,7 @@ public class MecanumFollowerCommand extends CommandBase {
     var targetChassisSpeeds = new ChassisSpeeds(targetXVel, targetYVel, targetAngularVel);
 
     var targetWheelSpeeds = m_kinematics.toWheelSpeeds(targetChassisSpeeds);
-    
+
     var frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeftMetersPerSecond;
     var rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeftMetersPerSecond;
     var frontRightSpeedSetpoint = targetWheelSpeeds.frontRightMetersPerSecond;
@@ -219,18 +227,26 @@ public class MecanumFollowerCommand extends CommandBase {
 
 
       frontLeftOutput = frontLeftFeedforward
-          + m_frontLeftController.calculate(m_currentWheelSpeeds.get().frontLeftMetersPerSecond, frontLeftSpeedSetpoint);
+          + m_frontLeftController.calculate(
+            m_currentWheelSpeeds.get().frontLeftMetersPerSecond,
+             frontLeftSpeedSetpoint);
 
       rearLeftOutput = rearLeftFeedforward
-          + m_rearLeftController.calculate(m_currentWheelSpeeds.get().rearLeftMetersPerSecond, rearLeftSpeedSetpoint);
-      
+          + m_rearLeftController.calculate(
+            m_currentWheelSpeeds.get().rearLeftMetersPerSecond,
+             rearLeftSpeedSetpoint);
+
       frontRightOutput = frontRightFeedforward
-          + m_frontRightController.calculate(m_currentWheelSpeeds.get().frontRightMetersPerSecond, frontRightSpeedSetpoint);
+          + m_frontRightController.calculate(
+            m_currentWheelSpeeds.get().frontRightMetersPerSecond,
+             frontRightSpeedSetpoint);
 
       rearRightOutput = rearRightFeedforward
-          + m_rearRightController.calculate(m_currentWheelSpeeds.get().rearRightMetersPerSecond, rearRightSpeedSetpoint);
+          + m_rearRightController.calculate(
+            m_currentWheelSpeeds.get().rearRightMetersPerSecond,
+             rearRightSpeedSetpoint);
 
-      
+
     } else {
       frontLeftOutput = frontLeftSpeedSetpoint;
       rearLeftOutput = rearLeftSpeedSetpoint;

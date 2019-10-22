@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <cmath>
 #include <functional>
 #include <memory>
 
 #include <units/units.h>
-#include <math.h>  
 
 #include "CommandBase.h"
 #include "CommandHelper.h"
@@ -42,7 +42,8 @@ namespace frc2 {
  * @see RamseteController
  * @see Trajectory
  */
-class MecanumFollowerCommand : public CommandHelper<CommandBase, MecanumFollowerCommand> {
+class MecanumFollowerCommand
+    : public CommandHelper<CommandBase, MecanumFollowerCommand> {
   using voltsecondspermeter =
       units::compound_unit<units::voltage::volt, units::second,
                            units::inverse<units::meter>>;
@@ -52,9 +53,10 @@ class MecanumFollowerCommand : public CommandHelper<CommandBase, MecanumFollower
 
  public:
   /**
-   * Constructs a new MecanumFollowerCommand that, when executed, will follow the
-   * provided trajectory. PID control and feedforward are handled internally,
-   * and outputs are scaled -1 to 1 for easy consumption by speed controllers.
+   * Constructs a new MecanumFollowerCommand that, when executed, will follow
+   * the provided trajectory. PID control and feedforward are handled
+   * internally, and outputs are scaled -1 to 1 for easy consumption by speed
+   * controllers.
    *
    * <p>Note: The controller will *not* set the outputVolts to zero upon
    * completion of the path - this is left to the user, since it is not
@@ -87,23 +89,24 @@ class MecanumFollowerCommand : public CommandHelper<CommandBase, MecanumFollower
    */
   MecanumFollowerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-      units::voltage::volt_t ks,
-      units::unit_t<voltsecondspermeter> kv,
+      units::voltage::volt_t ks, units::unit_t<voltsecondspermeter> kv,
       units::unit_t<voltsecondssquaredpermeter> ka,
-      frc::MecanumDriveKinematics kinematics,
-      frc2::PIDController xController, frc2::PIDController yController, frc::ProfiledPIDController thetaController,
+      frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
+      frc2::PIDController yController,
+      frc::ProfiledPIDController thetaController,
       std::function<frc::MecanumDriveWheelSpeeds()> currentWheelSpeeds,
-      frc2::PIDController frontLeftController, 
+      frc2::PIDController frontLeftController,
       frc2::PIDController rearLeftController,
-      frc2::PIDController frontRightController, 
+      frc2::PIDController frontRightController,
       frc2::PIDController rearRightController,
-      std::function<void(units::voltage::volt_t, units::voltage::volt_t, units::voltage::volt_t, units::voltage::volt_t)>
+      std::function<void(units::voltage::volt_t, units::voltage::volt_t,
+                         units::voltage::volt_t, units::voltage::volt_t)>
           output,
       std::initializer_list<Subsystem*> requirements);
 
   /**
-   * Constructs a new MecanumFollowerCommand that, when executed, will follow the
-   * provided trajectory. Performs no PID control and calculates no
+   * Constructs a new MecanumFollowerCommand that, when executed, will follow
+   * the provided trajectory. Performs no PID control and calculates no
    * feedforwards; outputs are the raw wheel speeds from the RAMSETE controller,
    * and will need to be converted into a usable form by the user.
    *
@@ -119,9 +122,12 @@ class MecanumFollowerCommand : public CommandHelper<CommandBase, MecanumFollower
    */
   MecanumFollowerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-      frc::MecanumDriveKinematics kinematics,
-      frc2::PIDController xController, frc2::PIDController yController, frc::ProfiledPIDController thetaController,
-      std::function<void(units::meters_per_second_t, units::meters_per_second_t, units::meters_per_second_t, units::meters_per_second_t)>
+      frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
+      frc2::PIDController yController,
+      frc::ProfiledPIDController thetaController,
+      std::function<void(units::meters_per_second_t, units::meters_per_second_t,
+                         units::meters_per_second_t,
+                         units::meters_per_second_t)>
           output,
       std::initializer_list<Subsystem*> requirements);
 
@@ -139,7 +145,6 @@ class MecanumFollowerCommand : public CommandHelper<CommandBase, MecanumFollower
   units::second_t m_prevTime;
   frc::Pose2d m_finalPose;
 
-
   frc::Trajectory m_trajectory;
   std::function<frc::Pose2d()> m_pose;
   const units::voltage::volt_t m_ks;
@@ -154,8 +159,11 @@ class MecanumFollowerCommand : public CommandHelper<CommandBase, MecanumFollower
   std::unique_ptr<frc2::PIDController> m_frontRightController;
   std::unique_ptr<frc2::PIDController> m_rearRightController;
   std::function<frc::MecanumDriveWheelSpeeds()> m_currentWheelSpeeds;
-  std::function<void(units::meters_per_second_t, units::meters_per_second_t, units::meters_per_second_t, units::meters_per_second_t)> m_outputVel;
-  std::function<void(units::voltage::volt_t, units::voltage::volt_t, units::voltage::volt_t, units::voltage::volt_t)> m_outputVolts;
-
+  std::function<void(units::meters_per_second_t, units::meters_per_second_t,
+                     units::meters_per_second_t, units::meters_per_second_t)>
+      m_outputVel;
+  std::function<void(units::voltage::volt_t, units::voltage::volt_t,
+                     units::voltage::volt_t, units::voltage::volt_t)>
+      m_outputVolts;
 };
 }  // namespace frc2
