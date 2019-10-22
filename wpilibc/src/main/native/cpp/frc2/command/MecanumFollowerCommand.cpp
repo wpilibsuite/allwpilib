@@ -92,14 +92,14 @@ void MecanumFollowerCommand::Execute() {
 
   auto targetXVel = velocity::meters_per_second_t(m_xController->Calculate((m_pose().Translation().X().to<double>()), (m_desiredPose.Translation().X().to<double>())));
   auto targetYVel = velocity::meters_per_second_t(m_yController->Calculate((m_pose().Translation().Y().to<double>()), (m_desiredPose.Translation().Y().to<double>())));
-  auto targetAngularVel = angular_velocity::radians_per_second_t(m_thetaController->Calculate((m_pose().Rotation().Radians().to<double>()), (m_finalPose.Rotation().Radians().to<double>())));
+  //auto targetAngularVel = angular_velocity::radians_per_second_t(m_thetaController->Calculate((m_pose().Rotation().Radians().to<double>()), (m_finalPose.Rotation().Radians().to<double>())));
 
   auto vRef = m_desiredState.velocity;
     
   targetXVel += vRef * sin (m_poseError.Rotation().Radians().to<double>());
   targetYVel += vRef * cos (m_poseError.Rotation().Radians().to<double>());
   
-  auto targetChassisSpeeds = frc::ChassisSpeeds{targetXVel, targetYVel, targetAngularVel};
+  auto targetChassisSpeeds = frc::ChassisSpeeds{targetXVel, targetYVel, angular_velocity::radians_per_second_t(0)/*targetAngularVel*/};
 
   auto targetWheelSpeeds = m_kinematics.ToWheelSpeeds(targetChassisSpeeds);
 
@@ -137,6 +137,7 @@ void MecanumFollowerCommand::Execute() {
 
   m_prevTime = curTime;
   m_prevSpeeds = targetWheelSpeeds;
+  }
 }
 
 void MecanumFollowerCommand::End(bool interrupted) { m_timer.Stop(); }

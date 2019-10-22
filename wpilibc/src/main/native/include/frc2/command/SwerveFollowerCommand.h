@@ -42,7 +42,8 @@ namespace frc2 {
  * @see RamseteController
  * @see Trajectory
  */
-class SwerveFollowerCommand : public CommandHelper<CommandBase, SwerveFollowerCommand> {
+template<int NumModules>
+class SwerveFollowerCommand : public CommandHelper<CommandBase, SwerveFollowerCommand<NumModules>> {
   using voltsecondspermeter =
       units::compound_unit<units::voltage::volt, units::second,
                            units::inverse<units::meter>>;
@@ -87,9 +88,9 @@ class SwerveFollowerCommand : public CommandHelper<CommandBase, SwerveFollowerCo
    */
   SwerveFollowerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-      frc::SwerveDriveKinematics<4> kinematics,
+      frc::SwerveDriveKinematics<NumModules> kinematics,
       frc2::PIDController xController, frc2::PIDController yController, frc::ProfiledPIDController thetaController,
-      std::function<void(frc::SwerveModuleState, frc::SwerveModuleState, frc::SwerveModuleState, frc::SwerveModuleState)>
+      std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
       std::initializer_list<Subsystem*> requirements);
 
@@ -126,11 +127,11 @@ class SwerveFollowerCommand : public CommandHelper<CommandBase, SwerveFollowerCo
 
   frc::Trajectory m_trajectory;
   std::function<frc::Pose2d()> m_pose;
-  frc::SwerveDriveKinematics <4> m_kinematics;
+  frc::SwerveDriveKinematics <NumModules> m_kinematics;
   std::unique_ptr<frc2::PIDController> m_xController;
   std::unique_ptr<frc2::PIDController> m_yController;
   std::unique_ptr<frc::ProfiledPIDController> m_thetaController;
-  std::function<void(frc::SwerveModuleState, frc::SwerveModuleState, frc::SwerveModuleState, frc::SwerveModuleState)> m_outputStates;
+  std::function<void(std::array<frc::SwerveModuleState, NumModules>)> m_outputStates;
 
 };
 }  // namespace frc2
