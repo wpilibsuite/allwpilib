@@ -468,6 +468,9 @@ public class SendableRegistry {
       Consumer<CallbackData> callback) {
     CallbackData cbdata = new CallbackData();
     for (Component comp : components.values()) {
+      if (comp.m_sendable == null) {
+        continue;
+      }
       cbdata.sendable = comp.m_sendable.get();
       if (cbdata.sendable != null && comp.m_liveWindow) {
         cbdata.name = comp.m_name;
