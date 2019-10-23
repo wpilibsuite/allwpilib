@@ -38,6 +38,8 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 
 public class SwerveFollowerCommand extends CommandBase {
   private final Timer m_timer = new Timer();
+  private SwerveModuleState[] m_prevStates;
+  private double m_prevTime;
   private Pose2d m_finalPose;
 
   private final Trajectory m_trajectory;
@@ -81,7 +83,13 @@ public class SwerveFollowerCommand extends CommandBase {
 
   @Override
   public void initialize() {
+    var initialState = m_trajectory.sample(0);
     m_finalPose = m_trajectory.sample(m_trajectory.getTotalTimeSeconds()).poseMeters;
+
+    var initialXVelocity = initialState.velocityMetersPerSecond * Math.sin(initialState.poseMeters.getRotation().getRadians());
+    var initialYVelocity = initialState.velocityMetersPerSecond * Math.cos(initialState.poseMeters.getRotation().getRadians());
+
+    m_prevStates = m_kinematics.toSwerveModuleStates( new ChassisSpeeds(initialXVelocity, initialYVelocity, initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
 
     m_timer.reset();
     m_timer.start();
@@ -90,6 +98,7 @@ public class SwerveFollowerCommand extends CommandBase {
   @Override
   public void execute() {
     double curTime = m_timer.get();
+    double dt = curTime - m_prevTime;
 
     var m_desiredState = m_trajectory.sample(curTime);
     var m_desiredPose = m_desiredState.poseMeters;
@@ -125,6 +134,8 @@ public class SwerveFollowerCommand extends CommandBase {
     m_frontRightOutput.accept(frontRightOutput);
     m_rearRightOutput.accept(rearRightOutput);
 
+    m_prevTime = curTime;
+    m_prevStates = targetModuleStates;
   }
 
   @Override
