@@ -15,12 +15,11 @@ int sgn(T val) {
   return (T(0) < val) - (val < T(0));
 }
 
-template<int NumModules>
-SwerveFollowerCommand<NumModules>::SwerveFollowerCommand(
+SwerveFollowerCommand::SwerveFollowerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-    frc::SwerveDriveKinematics <NumModules> kinematics,
+    frc::SwerveDriveKinematics <4> kinematics,
     frc2::PIDController xController, frc2::PIDController yController, frc::ProfiledPIDController thetaController,
-    std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
+    std::function<void(frc::SwerveModuleState, frc::SwerveModuleState, frc::SwerveModuleState, frc::SwerveModuleState)>
         output,
     std::initializer_list<Subsystem*> requirements)
     : m_trajectory(trajectory),
@@ -30,19 +29,18 @@ SwerveFollowerCommand<NumModules>::SwerveFollowerCommand(
       m_yController(std::make_unique<frc2::PIDController>(yController)),
       m_thetaController(std::make_unique<frc::ProfiledPIDController>(thetaController)),
       m_outputStates(output) {
-  this->AddRequirements(requirements);
+  AddRequirements(requirements);
 }
 
-template<int NumModules>
-void SwerveFollowerCommand<NumModules>::Initialize() {
+
+void SwerveFollowerCommand::Initialize() {
   auto m_finalPose = m_trajectory.Sample(m_trajectory.TotalTime).pose;
   
   m_timer.Reset();
   m_timer.Start();
 }
 
-template<int NumModules>
-void SwerveFollowerCommand<NumModules>::Execute() {
+void SwerveFollowerCommand::Execute() {
   auto curTime = second_t(m_timer.Get());
 
   auto m_desiredState = m_trajectory.Sample(curTime);
@@ -52,25 +50,29 @@ void SwerveFollowerCommand<NumModules>::Execute() {
 
   auto targetXVel = velocity::meters_per_second_t(m_xController->Calculate((m_pose().Translation().X().to<double>()), (m_desiredPose.Translation().X().to<double>())));
   auto targetYVel = velocity::meters_per_second_t(m_yController->Calculate((m_pose().Translation().Y().to<double>()), (m_desiredPose.Translation().Y().to<double>())));
-  //auto targetAngularVel = angular_velocity::radians_per_second_t(m_thetaController->Calculate((m_pose().Rotation().Radians().to<double>()), (m_finalPose.Rotation().Radians().to<double>())));
+  auto targetAngularVel = angular_velocity::radians_per_second_t(m_thetaController->Calculate((m_pose().Rotation().Radians().to<double>()), (m_finalPose.Rotation().Radians().to<double>())));
 
   auto vRef = m_desiredState.velocity;
     
   targetXVel += vRef * sin (m_poseError.Rotation().Radians().to<double>());
   targetYVel += vRef * cos (m_poseError.Rotation().Radians().to<double>());
   
-  auto targetChassisSpeeds = frc::ChassisSpeeds{targetXVel, targetYVel, angular_velocity::radians_per_second_t(0)/*targetAngularVel*/};
+  auto targetChassisSpeeds = frc::ChassisSpeeds{targetXVel, targetYVel, targetAngularVel};
 
   auto targetModuleStates = m_kinematics.ToSwerveModuleStates(targetChassisSpeeds);
-  
-  m_outputStates(targetModuleStates);
+
+  auto frontLeftOutput = targetModuleStates[0];
+  auto rearLeftOutput = targetModuleStates[1];
+  auto frontRightOutput = targetModuleStates[2];
+  auto rearRightOutput = targetModuleStates[3]; 
+
+
+  m_outputStates(frontLeftOutput, rearLeftOutput, frontRightOutput, rearRightOutput);
 
 }
 
-template<int NumModules>
-void SwerveFollowerCommand<NumModules>::End(bool interrupted) { m_timer.Stop(); }
+void SwerveFollowerCommand::End(bool interrupted) { m_timer.Stop(); }
 
-template<int NumModules>
-bool SwerveFollowerCommand<NumModules>::IsFinished() {
+bool SwerveFollowerCommand::IsFinished() {
   return second_t(m_timer.Get()) - m_trajectory.TotalTime() >= 0_s;
 }

@@ -46,17 +46,23 @@ public class SwerveFollowerCommand extends CommandBase {
   private final PIDController m_xController;
   private final PIDController m_yController;
   private final ProfiledPIDController m_thetaController;              
-  private final Consumer<SwerveModuleState[]> m_outputModuleStates;
+  private final Consumer<SwerveModuleState> m_frontLeftOutput;
+  private final Consumer<SwerveModuleState> m_rearLeftOutput;
+  private final Consumer<SwerveModuleState> m_frontRightOutput;
+  private final Consumer<SwerveModuleState> m_rearRightOutput;
 
-  public SwerveFollowerCommand(int NumModules,
-                        Trajectory trajectory,
+
+  public SwerveFollowerCommand(Trajectory trajectory,
                         Supplier<Pose2d> pose,
                         SwerveDriveKinematics kinematics,
                         PIDController xController,
                         PIDController yController,
                         ProfiledPIDController thetaController,
 
-                        Consumer<SwerveModuleState[]> outputModuleStates,
+                        Consumer<SwerveModuleState> frontLeftOutputModuleState,
+                        Consumer<SwerveModuleState> rearLeftOutputModuleState,
+                        Consumer<SwerveModuleState> frontRightOutputModuleState,
+                        Consumer<SwerveModuleState> rearRightOutputModuleState,
                         Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "SwerveFollowerCommand");
     m_pose = requireNonNullParam(pose, "pose", "SwerveFollowerCommand");
@@ -66,7 +72,10 @@ public class SwerveFollowerCommand extends CommandBase {
     m_yController = requireNonNullParam(yController, "xController", "SwerveFollowerCommand");
     m_thetaController = requireNonNullParam(thetaController, "thetaController", "SwerveFollowerCommand");
     
-    m_outputModuleStates = requireNonNullParam(outputModuleStates, "frontLeftOutput", "SwerveFollowerCommand");
+    m_frontLeftOutput = requireNonNullParam(frontLeftOutputModuleState, "frontLeftOutput", "SwerveFollowerCommand");
+    m_rearLeftOutput = requireNonNullParam(rearLeftOutputModuleState, "rearLeftOutput", "SwerveFollowerCommand"); 
+    m_frontRightOutput =  requireNonNullParam(frontRightOutputModuleState, "frontRightOutput", "SwerveFollowerCommand");
+    m_rearRightOutput = requireNonNullParam(rearRightOutputModuleState, "rearRightOutput", "SwerveFollowerCommand");
     addRequirements(requirements);
   }
 
@@ -100,7 +109,21 @@ public class SwerveFollowerCommand extends CommandBase {
 
     var targetModuleStates = m_kinematics.toSwerveModuleStates(targetChassisSpeeds);
 
-    m_outputModuleStates.accept(targetModuleStates);
+    SwerveModuleState frontLeftOutput;
+    SwerveModuleState rearLeftOutput;
+    SwerveModuleState frontRightOutput;
+    SwerveModuleState rearRightOutput;
+
+    
+    frontLeftOutput = targetModuleStates[0];
+    rearLeftOutput = targetModuleStates[1];
+    frontRightOutput = targetModuleStates[2];
+    rearRightOutput = targetModuleStates[3];
+
+    m_frontLeftOutput.accept(frontLeftOutput);
+    m_rearLeftOutput.accept(rearLeftOutput);
+    m_frontRightOutput.accept(frontRightOutput);
+    m_rearRightOutput.accept(rearRightOutput);
 
   }
 
