@@ -43,22 +43,23 @@ void HAL_SetDMARate(HAL_DMAHandle handle, int32_t cycles, int32_t* status);
 
 void HAL_AddDMAEncoder(HAL_DMAHandle handle, HAL_EncoderHandle encoderHandle,
                        int32_t* status);
-void HAL_AddDMAEncoderRate(HAL_DMAHandle handle, HAL_EncoderHandle encoderHandle,
-                       int32_t* status);
+void HAL_AddDMAEncoderRate(HAL_DMAHandle handle,
+                           HAL_EncoderHandle encoderHandle, int32_t* status);
 void HAL_AddDMACounter(HAL_DMAHandle handle, HAL_CounterHandle counterHandle,
                        int32_t* status);
-void HAL_AddDMACounterRate(HAL_DMAHandle handle, HAL_CounterHandle counterHandle,
-                       int32_t* status);
+void HAL_AddDMACounterRate(HAL_DMAHandle handle,
+                           HAL_CounterHandle counterHandle, int32_t* status);
 void HAL_AddDMADigitalSource(HAL_DMAHandle handle,
                              HAL_Handle digitalSourceHandle, int32_t* status);
 void HAL_AddDMAAnalogInput(HAL_DMAHandle handle,
                            HAL_AnalogInputHandle aInHandle, int32_t* status);
 
 void HAL_AddDMAAveragedAnalogInput(HAL_DMAHandle handle,
-                           HAL_AnalogInputHandle aInHandle, int32_t* status);
+                                   HAL_AnalogInputHandle aInHandle,
+                                   int32_t* status);
 
-void HAL_AddAnalogAccumulator(HAL_DMAHandle handle, HAL_AnalogInputHandle aInHandle, int32_t* status);
-
+void HAL_AddAnalogAccumulator(HAL_DMAHandle handle,
+                              HAL_AnalogInputHandle aInHandle, int32_t* status);
 
 void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
                                HAL_Handle digitalSourceHandle,
@@ -70,17 +71,15 @@ void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status);
 void HAL_StopDMA(HAL_DMAHandle handle, int32_t* status);
 
 enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
-                                   HAL_DMASample* dmaSample,
-                                   int32_t timeoutMs, int32_t* remainingOut,
-                                   int32_t* status);
+                                   HAL_DMASample* dmaSample, int32_t timeoutMs,
+                                   int32_t* remainingOut, int32_t* status);
 
 // Sampling Code
-uint64_t HAL_GetDMASampleTime(const HAL_DMASample* dmaSample,
-                              int32_t* status);
+uint64_t HAL_GetDMASampleTime(const HAL_DMASample* dmaSample, int32_t* status);
 
 int32_t HAL_GetDMASampleEncoder(const HAL_DMASample* dmaSample,
-                                   HAL_EncoderHandle encoderHandle,
-                                   int32_t* status);
+                                HAL_EncoderHandle encoderHandle,
+                                int32_t* status);
 
 int32_t HAL_GetDMASampleCounter(const HAL_DMASample* dmaSample,
                                 HAL_CounterHandle counterHandle,
@@ -89,16 +88,16 @@ HAL_Bool HAL_GetDMASampleDigitalSource(const HAL_DMASample* dmaSample,
                                        HAL_Handle dSourceHandle,
                                        int32_t* status);
 int32_t HAL_GetDMASampleAnalogInput(const HAL_DMASample* dmaSample,
-                                       HAL_AnalogInputHandle aInHandle,
-                                       int32_t* status);
+                                    HAL_AnalogInputHandle aInHandle,
+                                    int32_t* status);
 
 int32_t HAL_GetDMASampleAveragedAnalogInput(const HAL_DMASample* dmaSample,
-                                       HAL_AnalogInputHandle aInHandle,
-                                       int32_t* status);
+                                            HAL_AnalogInputHandle aInHandle,
+                                            int32_t* status);
 
 int32_t HAL_GetDMASampleAnalogAccumulator(const HAL_DMASample* dmaSample,
-                                       HAL_AnalogInputHandle aInHandle,
-                                       int32_t* status);
+                                          HAL_AnalogInputHandle aInHandle,
+                                          int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"
