@@ -23,6 +23,14 @@ HAL_ENUM(HAL_DMAReadStatus ) {
 };
 // clang-format on
 
+struct HAL_DMASample {
+  uint32_t readBuffer[64];
+  uint32_t channelOffsets[20];
+  uint64_t timeStamp;
+  uint32_t captureSize;
+  uint8_t triggerChannels;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,36 +59,33 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
 void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status);
 void HAL_StopDMA(HAL_DMAHandle handle, int32_t* status);
 
-HAL_DMASampleHandle HAL_MakeDMASample(int32_t* status);
-void HAL_FreeDMASample(HAL_DMASampleHandle handle);
-
 enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
-                                   HAL_DMASampleHandle dmaSampleHandle,
+                                   HAL_DMASample* dmaSample,
                                    int32_t timeoutMs, int32_t* remainingOut,
                                    int32_t* status);
 
 // Sampling Code
-double HAL_GetDMASampleTimestamp(HAL_DMASampleHandle dmaSampleHandle,
+double HAL_GetDMASampleTimestamp(const HAL_DMASample* dmaSample,
                                  int32_t* status);
-uint64_t HAL_GetDMASampleTime(HAL_DMASampleHandle dmaSampleHandle,
+uint64_t HAL_GetDMASampleTime(const HAL_DMASample* dmaSample,
                               int32_t* status);
 
-int32_t HAL_GetDMASampleEncoder(HAL_DMASampleHandle dmaSampleHandle,
+int32_t HAL_GetDMASampleEncoder(const HAL_DMASample* dmaSample,
                                 HAL_EncoderHandle encoderHandle,
                                 int32_t* status);
-int32_t HAL_GetDMASampleEncoderRaw(HAL_DMASampleHandle dmaSampleHandle,
+int32_t HAL_GetDMASampleEncoderRaw(const HAL_DMASample* dmaSample,
                                    HAL_EncoderHandle encoderHandle,
                                    int32_t* status);
-int32_t HAL_GetDMASampleCounter(HAL_DMASampleHandle dmaSampleHandle,
+int32_t HAL_GetDMASampleCounter(const HAL_DMASample* dmaSample,
                                 HAL_CounterHandle counterHandle,
                                 int32_t* status);
-HAL_Bool HAL_GetDMASampleDigitalSource(HAL_DMASampleHandle dmaSampleHandle,
+HAL_Bool HAL_GetDMASampleDigitalSource(const HAL_DMASample* dmaSample,
                                        HAL_Handle dSourceHandle,
                                        int32_t* status);
-int32_t HAL_GetDMASampleAnalogInputRaw(HAL_DMASampleHandle dmaSampleHandle,
+int32_t HAL_GetDMASampleAnalogInputRaw(const HAL_DMASample* dmaSample,
                                        HAL_AnalogInputHandle aInHandle,
                                        int32_t* status);
-double HAL_GetDMASampleAnalogInputVoltage(HAL_DMASampleHandle dmaSampleHandle,
+double HAL_GetDMASampleAnalogInputVoltage(const HAL_DMASample* dmaSample,
                                           HAL_AnalogInputHandle aInHandle,
                                           int32_t* status);
 

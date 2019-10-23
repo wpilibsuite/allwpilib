@@ -23,28 +23,15 @@
 
 using namespace hal;
 
-namespace {
-struct DMACaptureStore {
-  // The offsets into the sample structure for each DMA type, or -1 if it isn't
-  // in the set of values.
-  int32_t channel_offsets[20];
+static_assert(std::is_pod_v<HAL_DMASample>, "DMA Sample must be POD");
 
-  std::array<bool, 8> trigger_channels = {false, false, false, false,
-                                          false, false, false, false};
-  size_t capture_size;
-};
+namespace {
 
 struct DMA {
   std::unique_ptr<tDMAManager> manager;
   std::unique_ptr<tDMA> aDMA;
 
-  DMACaptureStore captureStore;
-};
-
-struct DMASample {
-  uint32_t readBuffer[64];
-  uint64_t timeStamp;
-  DMACaptureStore captureStore;
+  HAL_DMASample captureStore;
 };
 }  // namespace
 
@@ -75,22 +62,15 @@ enum DMAOffsetConstants {
   kEnable_EncoderTimers_High = 19,
 };
 
-static hal::UnlimitedHandleResource<HAL_DMASampleHandle, DMASample,
-                                    HAL_HandleEnum::DMASample>*
-    dmaSampleHandles;
 static hal::LimitedHandleResource<HAL_DMAHandle, DMA, 1,
-                                  HAL_HandleEnum::DMASample>* dmaHandles;
+                                  HAL_HandleEnum::DMA>* dmaHandles;
 
 namespace hal {
 namespace init {
 void InitializeDMA() {
-  static hal::UnlimitedHandleResource<HAL_DMASampleHandle, DMASample,
-                                      HAL_HandleEnum::DMASample>
-      dsH;
   static hal::LimitedHandleResource<HAL_DMAHandle, DMA, 1,
-                                    HAL_HandleEnum::DMASample>
+                                    HAL_HandleEnum::DMA>
       dH;
-  dmaSampleHandles = &dsH;
   dmaHandles = &dH;
 }
 }  // namespace init
@@ -283,10 +263,10 @@ void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
     size_t accum_size = 0;
 #define SET_SIZE(bit)                                       \
   if (config.bit) {                                         \
-    dma->captureStore.channel_offsets[k##bit] = accum_size; \
+    dma->captureStore.channelOffsets[k##bit] = accum_size; \
     accum_size += kChannelSize[k##bit];                     \
   } else {                                                  \
-    dma->captureStore.channel_offsets[k##bit] = -1;         \
+    dma->captureStore.channelOffsets[k##bit] = -1;         \
   }
     SET_SIZE(Enable_AI0_Low);
     SET_SIZE(Enable_AI0_High);
@@ -309,11 +289,11 @@ void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
     SET_SIZE(Enable_EncoderTimers_Low);
     SET_SIZE(Enable_EncoderTimers_High);
 #undef SET_SIZE
-    dma->captureStore.capture_size = accum_size + 1;
+    dma->captureStore.captureSize = accum_size + 1;
   }
 
   dma->manager = std::make_unique<tDMAManager>(
-      1, queueDepth * dma->captureStore.capture_size, status);
+      1, queueDepth * dma->captureStore.captureSize, status);
   if (*status != 0) {
     return;
   }
@@ -337,14 +317,9 @@ void HAL_StopDMA(HAL_DMAHandle handle, int32_t* status) {
 }
 
 enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
-                                   HAL_DMASampleHandle dmaSampleHandle,
+                                   HAL_DMASample* dmaSample,
                                    int32_t timeoutMs, int32_t* remainingOut,
                                    int32_t* status) {
-  auto dmaSample = dmaSampleHandles->Get(dmaSampleHandle);
-  if (!dmaSample) {
-    *status = HAL_HANDLE_ERROR;
-    return HAL_DMA_ERROR;
-  }
   auto dma = dmaHandles->Get(handle);
   if (!dma) {
     *status = HAL_HANDLE_ERROR;
@@ -359,19 +334,21 @@ enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
     return HAL_DMA_ERROR;
   }
 
-  dma->manager->read(dmaSample->readBuffer, dma->captureStore.capture_size,
+  dma->manager->read(dmaSample->readBuffer, dma->captureStore.captureSize,
                      timeoutMs, &remainingBytes, status);
 
-  *remainingOut = remainingBytes / dma->captureStore.capture_size;
+  *remainingOut = remainingBytes / dma->captureStore.captureSize;
 
   if (*status == 0) {
     uint32_t lower_sample =
-        dmaSample->readBuffer[dma->captureStore.capture_size - 1];
+        dmaSample->readBuffer[dma->captureStore.captureSize - 1];
     dmaSample->timeStamp = HAL_ExpandFPGATime(lower_sample, status);
     if (*status != 0) {
       return HAL_DMA_ERROR;
     }
-    dmaSample->captureStore = dma->captureStore;
+    dmaSample->triggerChannels = dma->captureStore.triggerChannels;
+    dmaSample->captureSize = dma->captureStore.captureSize;
+    std::memcpy(dmaSample->channelOffsets, dma->captureStore.channelOffsets, sizeof(dmaSample->channelOffsets));
     return HAL_DMA_OK;
   } else if (*status == NiFpga_Status_FifoTimeout) {
     *status = 0;
@@ -381,22 +358,9 @@ enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
   }
 }
 
-HAL_DMASampleHandle HAL_MakeDMASample(int32_t* status) {
-  auto dmaSample = std::make_shared<DMASample>();
-  auto sampleHandle = dmaSampleHandles->Allocate(dmaSample);
-  if (sampleHandle == HAL_kInvalidHandle) {
-    *status = NO_AVAILABLE_RESOURCES;
-  }
-  return sampleHandle;
-}
-
-void HAL_FreeDMASample(HAL_DMASampleHandle handle) {
-  dmaSampleHandles->Free(handle);
-}
-
-static uint32_t ReadDMAValue(const DMASample& dma, int valueType, int index,
+static uint32_t ReadDMAValue(const HAL_DMASample& dma, int valueType, int index,
                              int32_t* status) {
-  auto offset = dma.captureStore.channel_offsets[valueType];
+  auto offset = dma.channelOffsets[valueType];
   if (offset == -1) {
     *status = NiFpga_Status_ResourceNotFound;
     return 0;
@@ -405,23 +369,17 @@ static uint32_t ReadDMAValue(const DMASample& dma, int valueType, int index,
 }
 
 // Sampling Code
-double HAL_GetDMASampleTimestamp(HAL_DMASampleHandle dmaSampleHandle,
+double HAL_GetDMASampleTimestamp(const HAL_DMASample* dmaSample,
                                  int32_t* status) {
-  return static_cast<double>(HAL_GetDMASampleTime(dmaSampleHandle, status)) *
+  return static_cast<double>(HAL_GetDMASampleTime(dmaSample, status)) *
          0.000001;
 }
-uint64_t HAL_GetDMASampleTime(HAL_DMASampleHandle dmaSampleHandle,
+uint64_t HAL_GetDMASampleTime(const HAL_DMASample* dmaSample,
                               int32_t* status) {
-  auto dmaSample = dmaSampleHandles->Get(dmaSampleHandle);
-  if (!dmaSample) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-
   return dmaSample->timeStamp;
 }
 
-int32_t HAL_GetDMASampleEncoder(HAL_DMASampleHandle dmaSampleHandle,
+int32_t HAL_GetDMASampleEncoder(const HAL_DMASample* dmaSample,
                                 HAL_EncoderHandle encoderHandle,
                                 int32_t* status) {
   auto scale = HAL_GetEncoderEncodingScale(encoderHandle, status);
@@ -429,10 +387,10 @@ int32_t HAL_GetDMASampleEncoder(HAL_DMASampleHandle dmaSampleHandle,
     return 0;
   }
 
-  return HAL_GetDMASampleEncoderRaw(dmaSampleHandle, encoderHandle, status) /
+  return HAL_GetDMASampleEncoderRaw(dmaSample, encoderHandle, status) /
          scale;
 }
-int32_t HAL_GetDMASampleEncoderRaw(HAL_DMASampleHandle dmaSampleHandle,
+int32_t HAL_GetDMASampleEncoderRaw(const HAL_DMASample* dmaSample,
                                    HAL_EncoderHandle encoderHandle,
                                    int32_t* status) {
   HAL_FPGAEncoderHandle fpgaEncoderHandle = 0;
@@ -446,13 +404,7 @@ int32_t HAL_GetDMASampleEncoderRaw(HAL_DMASampleHandle dmaSampleHandle,
   }
 
   if (counterHandle != HAL_kInvalidHandle) {
-    return HAL_GetDMASampleCounter(dmaSampleHandle, counterHandle, status);
-  }
-
-  auto dmaSample = dmaSampleHandles->Get(dmaSampleHandle);
-  if (!dmaSample) {
-    *status = HAL_HANDLE_ERROR;
-    return -1;
+    return HAL_GetDMASampleCounter(dmaSample, counterHandle, status);
   }
 
   if (getHandleType(fpgaEncoderHandle) != HAL_HandleEnum::FPGAEncoder) {
@@ -483,15 +435,9 @@ int32_t HAL_GetDMASampleEncoderRaw(HAL_DMASampleHandle dmaSampleHandle,
   result = result << 1;
   return result;
 }
-int32_t HAL_GetDMASampleCounter(HAL_DMASampleHandle dmaSampleHandle,
+int32_t HAL_GetDMASampleCounter(const HAL_DMASample* dmaSample,
                                 HAL_CounterHandle counterHandle,
                                 int32_t* status) {
-  auto dmaSample = dmaSampleHandles->Get(dmaSampleHandle);
-  if (!dmaSample) {
-    *status = HAL_HANDLE_ERROR;
-    return -1;
-  }
-
   if (getHandleType(counterHandle) != HAL_HandleEnum::Counter) {
     *status = HAL_HANDLE_ERROR;
     return -1;
@@ -520,15 +466,9 @@ int32_t HAL_GetDMASampleCounter(HAL_DMASampleHandle dmaSampleHandle,
   result = result << 1;
   return result;
 }
-HAL_Bool HAL_GetDMASampleDigitalSource(HAL_DMASampleHandle dmaSampleHandle,
+HAL_Bool HAL_GetDMASampleDigitalSource(const HAL_DMASample* dmaSample,
                                        HAL_Handle dSourceHandle,
                                        int32_t* status) {
-  auto dmaSample = dmaSampleHandles->Get(dmaSampleHandle);
-  if (!dmaSample) {
-    *status = HAL_HANDLE_ERROR;
-    return -1;
-  }
-
   HAL_HandleEnum handleType = getHandleType(dSourceHandle);
   int32_t index = getHandleIndex(dSourceHandle);
 
@@ -552,15 +492,9 @@ HAL_Bool HAL_GetDMASampleDigitalSource(HAL_DMASampleHandle dmaSampleHandle,
   }
   return false;
 }
-int32_t HAL_GetDMASampleAnalogInputRaw(HAL_DMASampleHandle dmaSampleHandle,
+int32_t HAL_GetDMASampleAnalogInputRaw(const HAL_DMASample* dmaSample,
                                        HAL_AnalogInputHandle aInHandle,
                                        int32_t* status) {
-  auto dmaSample = dmaSampleHandles->Get(dmaSampleHandle);
-  if (!dmaSample) {
-    *status = HAL_HANDLE_ERROR;
-    return 0xFFFFFFFF;
-  }
-
   if (getHandleType(aInHandle) != HAL_HandleEnum::AnalogInput) {
     *status = HAL_HANDLE_ERROR;
     return 0xFFFFFFFF;
@@ -591,11 +525,11 @@ int32_t HAL_GetDMASampleAnalogInputRaw(HAL_DMASampleHandle dmaSampleHandle,
     return dmaWord & 0xffff;
   }
 }
-double HAL_GetDMASampleAnalogInputVoltage(HAL_DMASampleHandle dmaSampleHandle,
+double HAL_GetDMASampleAnalogInputVoltage(const HAL_DMASample* dmaSample,
                                           HAL_AnalogInputHandle aInHandle,
                                           int32_t* status) {
   auto value =
-      HAL_GetDMASampleAnalogInputRaw(dmaSampleHandle, aInHandle, status);
+      HAL_GetDMASampleAnalogInputRaw(dmaSample, aInHandle, status);
   if (*status != 0) {
     return 0.0;
   }

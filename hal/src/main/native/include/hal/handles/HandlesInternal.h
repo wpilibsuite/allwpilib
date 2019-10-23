@@ -67,7 +67,6 @@ enum class HAL_HandleEnum {
   CAN = 19,
   SerialPort = 20,
   DMA = 21,
-  DMASample = 22,
 };
 
 /**
