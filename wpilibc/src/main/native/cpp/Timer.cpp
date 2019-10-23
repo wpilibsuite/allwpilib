@@ -38,11 +38,7 @@ void Timer::Start() { m_timer.Start(); }
 void Timer::Stop() { m_timer.Stop(); }
 
 bool Timer::HasPeriodPassed(double period) {
-  return HasPeriodPassed(units::second_t(period));
-}
-
-bool Timer::HasPeriodPassed(units::second_t period) {
-  return m_timer.HasPeriodPassed(period);
+  return m_timer.HasPeriodPassed(units::second_t(period));
 }
 
 double Timer::GetFPGATimestamp() {
