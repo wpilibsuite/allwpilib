@@ -385,7 +385,7 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
   }
 
   digitalSystem->writePulseLength(
-      static_cast<unsigned short>(1.0e9 * pulseLength /
+      static_cast<uint16_t>(1.0e9 * pulseLength /
                            (pwmSystem->readLoopTiming(status) * 25)),
       status);
   digitalSystem->writePulse(pulse, status);
