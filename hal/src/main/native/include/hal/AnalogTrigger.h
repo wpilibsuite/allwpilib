@@ -90,6 +90,18 @@ void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analogTriggerHandle,
                                   HAL_Bool useAveragedValue, int32_t* status);
 
 /**
+ * Configures the analog trigger to use the duty cycle values.
+ *
+ * If the value is true, then the duty cycle value is selected for the analog
+ * trigger, otherwise the immediate value is used.
+ *
+ * @param analogTriggerHandle the trigger handle
+ * @param useAveragedValue    true to use duty cycle values, false for direct
+ */
+void HAL_SetAnalogTriggerDutyCycle(HAL_AnalogTriggerHandle analogTriggerHandle,
+                                   HAL_Bool useDutyCycleValue, int32_t* status);
+
+/**
  * Configures the analog trigger to use a filtered value.
  *
  * The analog trigger will operate with a 3 point average rejection filter. This

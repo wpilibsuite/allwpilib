@@ -107,6 +107,9 @@ public class AnalogJNI extends JNIWrapper {
   public static native void setAnalogTriggerAveraged(int analogTriggerHandle,
                                                      boolean useAveragedValue);
 
+  public static native void setAnalogTriggerDutyCycle(int analogTriggerHandle,
+                                                      boolean useDutyCycleValue);
+
   public static native void setAnalogTriggerFiltered(int analogTriggerHandle,
                                                      boolean useFilteredValue);
 

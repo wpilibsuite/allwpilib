@@ -121,12 +121,29 @@ void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analogTriggerHandle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  if (trigger->trigger->readSourceSelect_Filter(status) != 0) {
+  if (trigger->trigger->readSourceSelect_Filter(status) != 0
+      || trigger->trigger->readSourceSelect_DutyCycle(status) != 0) {
     *status = INCOMPATIBLE_STATE;
     // TODO: wpi_setWPIErrorWithContext(IncompatibleMode, "Hardware does not
     // support average and filtering at the same time.");
   }
   trigger->trigger->writeSourceSelect_Averaged(useAveragedValue, status);
+}
+
+void HAL_SetAnalogTriggerDutyCycle(HAL_AnalogTriggerHandle analogTriggerHandle,
+                                   HAL_Bool useDutyCycle, int32_t* status) {
+  auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
+  if (trigger == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  if (trigger->trigger->readSourceSelect_Filter(status) != 0
+      || trigger->trigger->readSourceSelect_Averaged(status) != 0) {
+    *status = INCOMPATIBLE_STATE;
+    // TODO: wpi_setWPIErrorWithContext(IncompatibleMode, "Hardware does not
+    // support average and filtering at the same time.");
+  }
+  trigger->trigger->writeSourceSelect_DutyCycle(useDutyCycle, status);
 }
 
 void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analogTriggerHandle,
@@ -136,7 +153,8 @@ void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analogTriggerHandle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  if (trigger->trigger->readSourceSelect_Averaged(status) != 0) {
+  if (trigger->trigger->readSourceSelect_Averaged(status) != 0 
+      || trigger->trigger->readSourceSelect_DutyCycle(status) != 0) {
     *status = INCOMPATIBLE_STATE;
     // TODO: wpi_setWPIErrorWithContext(IncompatibleMode, "Hardware does not "
     // "support average and filtering at the same time.");

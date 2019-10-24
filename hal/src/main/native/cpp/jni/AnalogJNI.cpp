@@ -562,6 +562,20 @@ Java_edu_wpi_first_hal_AnalogJNI_setAnalogTriggerAveraged
 
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
+ * Method:    setAnalogTriggerDutyCycle
+ * Signature: (IZ)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_AnalogJNI_setAnalogTriggerDutyCycle
+  (JNIEnv* env, jclass, jint id, jboolean dutyCycle)
+{
+  int32_t status = 0;
+  HAL_SetAnalogTriggerDutyCycle((HAL_AnalogTriggerHandle)id, dutyCycle, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogTriggerFiltered
  * Signature: (IZ)V
  */
