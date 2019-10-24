@@ -10,6 +10,8 @@
 #include "hal/DutyCycle.h"
 #include "hal/HALBase.h"
 #include "frc/smartdashboard/SmartDashboard.h"
+#include "hal/HALBase.h"
+#include "hal/CAN.h"
 
 HAL_DigitalHandle inputHandle;
 HAL_DutyCycleHandle dutyCycleHandle;
@@ -25,6 +27,20 @@ class MyRobot : public frc::TimedRobot {
     std::cout << "DIO Status: " << status << std::endl;
     dutyCycleHandle = HAL_InitializeDutyCycle(inputHandle, HAL_AnalogTriggerType::HAL_Trigger_kInWindow, &status);
     std::cout << "Duty Cycle Status: " << status << std::endl;
+
+      // float pbs = 0;
+      // uint32_t boc = 0;
+      // uint32_t txfc = 0;
+      // uint32_t rec = 0;
+      // uint32_t tec = 0;
+      status = 0;
+      auto start = HAL_GetFPGATime(&status);
+      //HAL_CAN_GetCANStatus(&pbs, &boc, &txfc, &rec, &tec, &status);
+      uint8_t data = 0;
+      HAL_CAN_SendMessage(0, &data, 1, HAL_CAN_SEND_PERIOD_NO_REPEAT, &status);
+      auto end = HAL_GetFPGATime(&status);
+      std::cout << "Start " << start << " end " << end << std::endl;
+
   }
 
   /**
@@ -59,10 +75,12 @@ class MyRobot : public frc::TimedRobot {
     int32_t status = 0;
     auto freq = HAL_ReadDutyCycleFrequency(dutyCycleHandle, &status);
     auto raw = HAL_ReadDutyCycleOutputRaw(dutyCycleHandle, &status);
-    auto percentage = HAL_ReadDutyCycleOutputPercentage(dutyCycleHandle, &status);
+    auto percentage = HAL_ReadDutyCycleOutputScaled(dutyCycleHandle, &status);
     frc::SmartDashboard::PutNumber("Freq", freq);
     frc::SmartDashboard::PutNumber("Raw", raw);
     frc::SmartDashboard::PutNumber("Percentage", percentage);
+
+
   }
 };
 

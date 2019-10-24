@@ -71,7 +71,7 @@ void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
   dutyCycleHandles->Free(dutyCycleHandle);
 }
 
-int32_t HAL_ReadDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
+int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
                                    int32_t* status) {
   auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
   if (!dutyCycle) {
@@ -82,7 +82,7 @@ int32_t HAL_ReadDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
   return dutyCycle->dutyCycle->readFrequency(status);
 }
 
-int64_t HAL_ReadDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
+int64_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
                                    int32_t* status) {
   auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
   if (!dutyCycle) {
@@ -93,7 +93,7 @@ int64_t HAL_ReadDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
   return dutyCycle->dutyCycle->readOutput(status);
 }
 
-double HAL_ReadDutyCycleOutputPercentage(HAL_DutyCycleHandle dutyCycleHandle,
+double HAL_GetDutyCycleOutputScaled(HAL_DutyCycleHandle dutyCycleHandle,
                                    int32_t* status) {
   return ((double)HAL_ReadDutyCycleOutputRaw(dutyCycleHandle, status) / (4e7 - 1));
 }
