@@ -5,6 +5,7 @@ public class DutyCycleJNI extends JNIWrapper {
   public static native void free(int handle);
 
   public static native int getFrequency(int handle);
-  public static native long getOutputRaw(int handle);
-  public static native double getOutputScaled(int handle);
+  public static native double getOutput(int handle);
+  public static native int getOutputRaw(int handle);
+  public static native int getOutputScaleFactor(int handle);
 }

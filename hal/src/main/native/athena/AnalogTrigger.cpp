@@ -14,6 +14,7 @@
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
+#include "DutyCycleInternal.h"
 
 using namespace hal;
 
@@ -21,7 +22,7 @@ namespace {
 
 struct AnalogTrigger {
   std::unique_ptr<tAnalogTrigger> trigger;
-  HAL_AnalogInputHandle analogHandle;
+  HAL_Handle handle;
   uint8_t index;
 };
 
@@ -64,7 +65,35 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
   }
-  trigger->analogHandle = portHandle;
+  trigger->handle = portHandle;
+  trigger->index = static_cast<uint8_t>(getHandleIndex(handle));
+  *index = trigger->index;
+
+  trigger->trigger.reset(tAnalogTrigger::create(trigger->index, status));
+  trigger->trigger->writeSourceSelect_Channel(analog_port->channel, status);
+  return handle;
+}
+
+HAL_AnalogTriggerHandle HAL_InitalizeAnalogTriggerDutyCycle(
+    HAL_DutyCycleHandle dutyCycleHandle, int32_t* index, int32_t* status) {
+  hal::init::CheckInit();
+  // ensure we are given a valid and active AnalogInput handle
+  auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
+  if (dutyCycle == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return HAL_kInvalidHandle;
+  }
+  HAL_AnalogTriggerHandle handle = analogTriggerHandles->Allocate();
+  if (handle == HAL_kInvalidHandle) {
+    *status = NO_AVAILABLE_RESOURCES;
+    return HAL_kInvalidHandle;
+  }
+  auto trigger = analogTriggerHandles->Get(handle);
+  if (trigger == nullptr) {  // would only occur on thread issue
+    *status = HAL_HANDLE_ERROR;
+    return HAL_kInvalidHandle;
+  }
+  trigger->handle = dutyCycleHandle;
   trigger->index = static_cast<uint8_t>(getHandleIndex(handle));
   *index = trigger->index;
 

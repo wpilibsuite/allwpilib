@@ -44,6 +44,13 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
     HAL_AnalogInputHandle portHandle, int32_t* index, int32_t* status);
 
 /**
+ * Initializes an analog trigger with a Duty Cycle input
+ *
+ */
+HAL_AnalogTriggerHandle HAL_InitalizeAnalogTriggerDutyCycle(
+    HAL_DutyCycleHandle dutyCycleHandle, int32_t* index, int32_t* status);
+
+/**
  * Frees an analog trigger.
  *
  * @param analogTriggerHandle the trigger handle
@@ -54,7 +61,8 @@ void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle,
 /**
  * Sets the raw ADC upper and lower limits of the analog trigger.
  *
- * HAL_SetAnalogTriggerLimitsVoltage is likely better in most cases.
+ * HAL_SetAnalogTriggerLimitsVoltage or HAL_SetAnalogTriggerLimitsDutyCycle
+ * is likely better in most cases.
  *
  * @param analogTriggerHandle the trigger handle
  * @param lower               the lower ADC value
@@ -77,11 +85,16 @@ void HAL_SetAnalogTriggerLimitsVoltage(
     HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper,
     int32_t* status);
 
+void HAL_SetAnalogTriggerLimitsDutyCycle(HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double higher, int32_t* status);
+
 /**
  * Configures the analog trigger to use the averaged vs. raw values.
  *
  * If the value is true, then the averaged value is selected for the analog
  * trigger, otherwise the immediate value is used.
+ *
+ * This is not allowed to be used if filtered mode is set.
+ * This is not allowed to be used with Duty Cycle based inputs.
  *
  * @param analogTriggerHandle the trigger handle
  * @param useAveragedValue    true to use averaged values, false for raw
@@ -90,23 +103,13 @@ void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analogTriggerHandle,
                                   HAL_Bool useAveragedValue, int32_t* status);
 
 /**
- * Configures the analog trigger to use the duty cycle values.
- *
- * If the value is true, then the duty cycle value is selected for the analog
- * trigger, otherwise the immediate value is used.
- *
- * @param analogTriggerHandle the trigger handle
- * @param useAveragedValue    true to use duty cycle values, false for direct
- */
-void HAL_SetAnalogTriggerDutyCycle(HAL_AnalogTriggerHandle analogTriggerHandle,
-                                   HAL_Bool useDutyCycleValue, int32_t* status);
-
-/**
  * Configures the analog trigger to use a filtered value.
  *
  * The analog trigger will operate with a 3 point average rejection filter. This
  * is designed to help with 360 degree pot applications for the period where the
  * pot crosses through zero.
+ *
+ * This is not allowed to be used if averaged mode is set.
  *
  * @param analogTriggerHandle the trigger handle
  * @param useFilteredValue    true to use filtered values, false for average or

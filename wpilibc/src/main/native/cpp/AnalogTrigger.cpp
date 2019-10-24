@@ -92,13 +92,6 @@ void AnalogTrigger::SetAveraged(bool useAveragedValue) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void AnalogTrigger::SetDutyCycle(bool useDutyCycle) {
-  if (StatusIsFatal()) return;
-  int32_t status = 0;
-  HAL_SetAnalogTriggerDutyCycle(m_trigger, useDutyCycle, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-}
-
 void AnalogTrigger::SetFiltered(bool useFilteredValue) {
   if (StatusIsFatal()) return;
   int32_t status = 0;

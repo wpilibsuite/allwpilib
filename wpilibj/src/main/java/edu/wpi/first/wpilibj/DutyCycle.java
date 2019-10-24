@@ -19,11 +19,15 @@ public class DutyCycle implements AutoClosable {
     return DutyCycleJNI.getFrequency(m_handle);
   }
 
+  public double getOutput() {
+    return DutyCycleJNI.getOutput(m_handle);
+  }
+
   public int getOutputRaw() {
     return DutyCycleJNI.getOutputRaw(m_handle);
   }
 
-  public int getOutputScaled() {
-    return DutyCycleJNI.getOutputScaled(m_handle);
+  public int getOutputScaleFactor() {
+    return DutyCycleJNI.getOutputScaleFactor(m_handle);
   }
 }

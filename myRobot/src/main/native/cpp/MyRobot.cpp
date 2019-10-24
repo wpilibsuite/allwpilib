@@ -73,9 +73,9 @@ class MyRobot : public frc::TimedRobot {
    */
   void RobotPeriodic() override {
     int32_t status = 0;
-    auto freq = HAL_ReadDutyCycleFrequency(dutyCycleHandle, &status);
-    auto raw = HAL_ReadDutyCycleOutputRaw(dutyCycleHandle, &status);
-    auto percentage = HAL_ReadDutyCycleOutputScaled(dutyCycleHandle, &status);
+    auto freq = HAL_GetDutyCycleFrequency(dutyCycleHandle, &status);
+    auto raw = HAL_GetDutyCycleOutputRaw(dutyCycleHandle, &status);
+    auto percentage = HAL_GetDutyCycleOutput(dutyCycleHandle, &status);
     frc::SmartDashboard::PutNumber("Freq", freq);
     frc::SmartDashboard::PutNumber("Raw", raw);
     frc::SmartDashboard::PutNumber("Percentage", percentage);

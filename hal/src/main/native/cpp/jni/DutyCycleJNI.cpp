@@ -45,10 +45,23 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DutyCycleJNI_getFrequency
 
 /*
  * Class:     edu_wpi_first_hal_DutyCycleJNI
- * Method:    getOutputRaw
- * Signature: (I)J
+ * Method:    getOutput
+ * Signature: (I)D
  */
-JNIEXPORT jlong JNICALL Java_edu_wpi_first_hal_DutyCycleJNI_getOutputRaw
+JNIEXPORT jdouble JNICALL Java_edu_wpi_first_hal_DutyCycleJNI_getOutput
+  (JNIEnv * env, jclass, jint handle) {
+    int32_t status = 0;
+    auto retVal = HAL_GetDutyCycleOutput(static_cast<HAL_DutyCycleHandle>(handle), &status);
+    CheckStatus(env, status);
+    return retVal;
+  }
+
+/*
+ * Class:     edu_wpi_first_hal_DutyCycleJNI
+ * Method:    getOutputRaw
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DutyCycleJNI_getOutput
   (JNIEnv * env, jclass, jint handle) {
     int32_t status = 0;
     auto retVal = HAL_GetDutyCycleOutputRaw(static_cast<HAL_DutyCycleHandle>(handle), &status);
@@ -59,13 +72,13 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_hal_DutyCycleJNI_getOutputRaw
 
 /*
  * Class:     edu_wpi_first_hal_DutyCycleJNI
- * Method:    getOutputScaled
- * Signature: (I)D
+ * Method:    getOutputScaleFactor
+ * Signature: (I)I
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_hal_DutyCycleJNI_getOutputScaled
+JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DutyCycleJNI_getOutputScaleFactor
   (JNIEnv * env, jclass, jint handle) {
     int32_t status = 0;
-    auto retVal = HAL_GetDutyCycleOutputScaled(static_cast<HAL_DutyCycleHandle>(handle), &status);
+    auto retVal = HAL_GetDutyCycleOutputScaleFactor(static_cast<HAL_DutyCycleHandle>(handle), &status);
     CheckStatus(env, status);
     return retVal;
   }

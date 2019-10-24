@@ -9,19 +9,13 @@
 #include "PortsInternal.h"
 #include "HALInitializer.h"
 #include "DigitalInternal.h"
+#include "DutyCycleInternal.h"
 
 using namespace hal;
 
-namespace {
-struct DutyCycle {
-  std::unique_ptr<tDutyCycle> dutyCycle;
-};
-}  // namespace
-
-static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
-                             HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
-
 namespace hal {
+LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
+                             HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
 namespace init {
 void InitializeDutyCycle() {
   static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
@@ -31,6 +25,8 @@ void InitializeDutyCycle() {
 }
 }  // namespace init
 }  // namespace hal
+
+static constexpr int32_t kScaleFactor = 4e7 - 1;
 
 extern "C" {
 HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_Handle digitalSourceHandle,
@@ -82,7 +78,12 @@ int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
   return dutyCycle->dutyCycle->readFrequency(status);
 }
 
-int64_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
+double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
+                                   int32_t* status) {
+  return HAL_GetDutyCycleOutputRaw(dutyCycleHandle, status) / kScaleFactor;
+}
+
+int32_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
                                    int32_t* status) {
   auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
   if (!dutyCycle) {
@@ -93,8 +94,8 @@ int64_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
   return dutyCycle->dutyCycle->readOutput(status);
 }
 
-double HAL_GetDutyCycleOutputScaled(HAL_DutyCycleHandle dutyCycleHandle,
+int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,
                                    int32_t* status) {
-  return ((double)HAL_GetDutyCycleOutputRaw(dutyCycleHandle, status) / (4e7 - 1));
+  return kScaleFactor;
 }
 }
