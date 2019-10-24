@@ -17,7 +17,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DutyCycleJNI_initialize
   int32_t status = 0;
   auto handle = HAL_InitializeDutyCycle(static_cast<HAL_Handle>(digitalSourceHandle), static_cast<HAL_AnalogTriggerType>(analogTriggerType), &status);
   CheckStatus(env, status);
-  return handle;  
+  return handle;
 }
 
 /*
