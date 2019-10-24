@@ -83,6 +83,17 @@ class AnalogTrigger : public ErrorBase,
   void SetAveraged(bool useAveragedValue);
 
   /**
+   * Configure the analog trigger to use the duty cycle vs. raw values.
+   *
+   * If the value is true, then the duty cycle value is selected for the analog
+   * trigger, otherwise the immediate value is used.
+   *
+   * @param useDutyCycle If true, use the duty cycle value, otherwise use the
+   *                         instantaneous reading
+   */
+  void SetDutyCycle(bool useDutyCycle);
+
+  /**
    * Configure the analog trigger to use a filtered value.
    *
    * The analog trigger will operate with a 3 point average rejection filter.

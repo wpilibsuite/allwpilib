@@ -144,6 +144,13 @@ int32_t HAL_GetNumPDPModules(void);
  * @return the number of PDP channels
  */
 int32_t HAL_GetNumPDPChannels(void);
+
+/**
+ * Gets the number of duty cycle inputs in the current system.
+ * 
+ * @return the number of Duty Cycle inputs
+ */
+int32_t HAL_GetNumDutyCycles(void);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

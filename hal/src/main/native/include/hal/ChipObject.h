@@ -24,6 +24,7 @@
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tCounter.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tDIO.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tDMA.h>
+#include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tDutyCycle.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tEncoder.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tGlobal.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tInterrupt.h>
