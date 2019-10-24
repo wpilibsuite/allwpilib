@@ -32,6 +32,7 @@ extern void InitializeConstants();
 extern void InitializeCounter();
 extern void InitializeDigitalInternal();
 extern void InitializeDIO();
+extern void InitializeDMA();
 extern void InitializeEncoder();
 extern void InitializeFPGAEncoder();
 extern void InitializeFRCDriverStation();

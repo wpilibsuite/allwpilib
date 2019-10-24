@@ -56,6 +56,7 @@ void InitializeHAL() {
   InitializeCounter();
   InitializeDigitalInternal();
   InitializeDIO();
+  InitializeDMA();
   InitializeEncoder();
   InitializeFPGAEncoder();
   InitializeFRCDriverStation();

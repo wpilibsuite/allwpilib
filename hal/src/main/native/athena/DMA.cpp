@@ -12,6 +12,8 @@
 #include <memory>
 #include <cstring>
 
+#include "DigitalInternal.h"
+
 #include "AnalogInternal.h"
 #include "EncoderInternal.h"
 #include "PortsInternal.h"
@@ -321,9 +323,25 @@ void HAL_AddDMACounterRate(HAL_DMAHandle handle,
 
 void HAL_AddDMADigitalSource(HAL_DMAHandle handle,
                              HAL_Handle digitalSourceHandle, int32_t* status) {
+  auto dma = dmaHandles->Get(handle);
+  if (!dma) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
 
-                             }
+  if (dma->manager) {
+    *status = HAL_INVALID_DMA_ADDITION;
+    return;
+  }
 
+  if (isHandleType(digitalSourceHandle, HAL_HandleEnum::AnalogTrigger)) {
+    dma->aDMA->writeConfig_Enable_AnalogTriggers(true, status);
+  } else if (isHandleType(digitalSourceHandle, HAL_HandleEnum::DIO)) {
+    dma->aDMA->writeConfig_Enable_DI(true, status);
+  } else {
+    *status = NiFpga_Status_InvalidParameter;
+  }
+}
 
 void HAL_AddDMAAnalogInput(HAL_DMAHandle handle,
                            HAL_AnalogInputHandle aInHandle, int32_t* status) {
@@ -431,8 +449,62 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
                                HAL_AnalogTriggerType analogTriggerType,
                                HAL_Bool rising, HAL_Bool falling,
                                int32_t* status) {
+auto dma = dmaHandles->Get(handle);
+  if (!dma) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
 
-                               }
+  if (dma->manager) {
+    *status = HAL_INVALID_DMA_ADDITION;
+    return;
+  }
+
+  int index = 0;
+  auto triggerChannels = dma->captureStore.triggerChannels;
+  do {
+    if ((triggerChannels >> index) & 0x1 == 0) {
+      break;
+    }
+    index++;
+  } while (index < 8);
+
+  if (index == 8) {
+    *status = NO_AVAILABLE_RESOURCES;
+    return;
+  }
+  
+  dma->captureStore.triggerChannels |= (1 << index);
+
+  auto channelIndex = index;
+
+  auto isExternalClock = dma->aDMA->readConfig_ExternalClock(status);
+  if (*status == 0 && !isExternalClock) {
+    dma->aDMA->writeConfig_ExternalClock(true, status);
+    if (*status != 0) return;
+  } else if (*status != 0) {
+    return;
+  }
+
+  uint8_t pin = 0;
+  uint8_t module = 0;
+  bool analogTrigger = false;
+  bool success = remapDigitalSource(digitalSourceHandle, analogTriggerType, pin, module, analogTrigger);
+
+  if (!success) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
+  tDMA::tExternalTriggers newTrigger;
+  newTrigger.FallingEdge = falling;
+  newTrigger.RisingEdge = rising;
+  newTrigger.ExternalClockSource_AnalogTrigger = analogTrigger;
+  newTrigger.ExternalClockSource_Channel = pin;
+  newTrigger.ExternalClockSource_Module = module;
+
+  dma->aDMA->writeExternalTriggers(channelIndex / 4, channelIndex % 4, newTrigger, status);
+}
 
 void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
   auto dma = dmaHandles->Get(handle);
