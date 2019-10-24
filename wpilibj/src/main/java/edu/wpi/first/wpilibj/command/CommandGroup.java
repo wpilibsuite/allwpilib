@@ -30,8 +30,10 @@ import static java.util.Objects.requireNonNull;
  * @see Command
  * @see Subsystem
  * @see IllegalUseOfCommandException
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
 @SuppressWarnings("PMD.TooManyMethods")
+@Deprecated
 public class CommandGroup extends Command {
   /**
    * The commands in this group (stored in entries).

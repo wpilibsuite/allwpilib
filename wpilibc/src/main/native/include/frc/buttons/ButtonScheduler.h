@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <wpi/deprecated.h>
+
 namespace frc {
 
 class Trigger;
@@ -14,6 +16,8 @@ class Command;
 
 class ButtonScheduler {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   ButtonScheduler(bool last, Trigger* button, Command* orders);
   virtual ~ButtonScheduler() = default;
 

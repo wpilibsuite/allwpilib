@@ -39,8 +39,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * @see Subsystem
  * @see CommandGroup
  * @see IllegalUseOfCommandException
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
 @SuppressWarnings("PMD.TooManyMethods")
+@Deprecated
 public abstract class Command implements Sendable, AutoCloseable {
   /**
    * The time since this command was initialized.

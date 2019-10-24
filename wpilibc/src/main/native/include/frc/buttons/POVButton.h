@@ -13,6 +13,8 @@
 namespace frc {
 class POVButton : public Button {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   /**
    * Creates a POV button for triggering commands.
    *

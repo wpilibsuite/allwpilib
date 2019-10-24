@@ -9,6 +9,8 @@
 
 #include <memory>
 
+#include <wpi/deprecated.h>
+
 #include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
@@ -23,6 +25,8 @@ class Scheduler : public ErrorBase,
                   public Sendable,
                   public SendableHelper<Scheduler> {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   /**
    * Returns the Scheduler, creating it if one does not exist.
    *

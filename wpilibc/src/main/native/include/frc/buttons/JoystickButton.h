@@ -14,6 +14,8 @@ namespace frc {
 
 class JoystickButton : public Button {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   JoystickButton(GenericHID* joystick, int buttonNumber);
   virtual ~JoystickButton() = default;
 

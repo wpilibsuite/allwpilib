@@ -17,6 +17,8 @@ namespace frc {
 
 class PrintCommand : public InstantCommand {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   explicit PrintCommand(const wpi::Twine& message);
   virtual ~PrintCommand() = default;
 

@@ -17,7 +17,10 @@ package edu.wpi.first.wpilibj.command;
  * <p> This exception should be thrown if (after a command has been locked) its requirements change,
  * it is put into multiple command groups, it is started from outside its command group, or it adds
  * a new child. </p>
+ *
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 public class IllegalUseOfCommandException extends RuntimeException {
   /**
    * Instantiates an {@link IllegalUseOfCommandException}.

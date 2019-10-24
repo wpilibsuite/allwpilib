@@ -15,6 +15,8 @@ namespace frc {
 
 class WaitUntilCommand : public Command {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   /**
    * A WaitCommand will wait until a certain match time before finishing.
    *

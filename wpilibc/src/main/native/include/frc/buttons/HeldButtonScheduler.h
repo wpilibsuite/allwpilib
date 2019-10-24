@@ -16,6 +16,8 @@ class Command;
 
 class HeldButtonScheduler : public ButtonScheduler {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   HeldButtonScheduler(bool last, Trigger* button, Command* orders);
   virtual ~HeldButtonScheduler() = default;
 

@@ -12,7 +12,10 @@ package edu.wpi.first.wpilibj.command;
  *
  * <p>Subclassing {@link InstantCommand} is shorthand for returning true from
  * {@link Command isFinished}.
+ *
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 public class InstantCommand extends Command {
   private Runnable m_func;
 

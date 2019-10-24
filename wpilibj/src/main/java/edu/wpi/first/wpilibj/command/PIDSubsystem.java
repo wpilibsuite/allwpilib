@@ -20,7 +20,10 @@ import edu.wpi.first.wpilibj.PIDSourceType;
  * <p>It provides some convenience methods to run an internal {@link PIDController} . It also
  * allows access to the internal {@link PIDController} in order to give total control to the
  * programmer.
+ *
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 public abstract class PIDSubsystem extends Subsystem {
   /**
    * The internal {@link PIDController}.

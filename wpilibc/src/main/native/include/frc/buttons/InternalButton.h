@@ -13,6 +13,8 @@ namespace frc {
 
 class InternalButton : public Button {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   InternalButton() = default;
   explicit InternalButton(bool inverted);
   virtual ~InternalButton() = default;

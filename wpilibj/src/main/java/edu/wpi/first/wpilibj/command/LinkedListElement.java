@@ -9,7 +9,10 @@ package edu.wpi.first.wpilibj.command;
 
 /**
  * An element that is in a LinkedList.
+ *
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 class LinkedListElement {
   private LinkedListElement m_next;
   private LinkedListElement m_previous;

@@ -31,7 +31,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * is already done for you if you use the CommandBased Robot template. </p>
  *
  * @see Command
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 @SuppressWarnings("PMD.TooManyMethods")
 public final class Scheduler implements Sendable, AutoCloseable {
   /**

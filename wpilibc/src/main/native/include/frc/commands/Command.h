@@ -12,6 +12,7 @@
 
 #include <wpi/SmallPtrSet.h>
 #include <wpi/Twine.h>
+#include <wpi/deprecated.h>
 
 #include "frc/ErrorBase.h"
 #include "frc/commands/Subsystem.h"
@@ -53,6 +54,8 @@ class Command : public ErrorBase,
   friend class Scheduler;
 
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   /**
    * Creates a new command.
    *

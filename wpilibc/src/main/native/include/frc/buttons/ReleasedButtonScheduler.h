@@ -16,6 +16,8 @@ class Command;
 
 class ReleasedButtonScheduler : public ButtonScheduler {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   ReleasedButtonScheduler(bool last, Trigger* button, Command* orders);
   virtual ~ReleasedButtonScheduler() = default;
 

@@ -13,7 +13,10 @@ import java.util.Vector;
 @SuppressWarnings("all")
 /**
  * A set.
+ *
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 class Set {
   private Vector m_set = new Vector();
 

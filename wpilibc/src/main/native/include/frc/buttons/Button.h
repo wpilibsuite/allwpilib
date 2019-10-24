@@ -25,6 +25,8 @@ namespace frc {
  */
 class Button : public Trigger {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   Button() = default;
   Button(Button&&) = default;
   Button& operator=(Button&&) = default;

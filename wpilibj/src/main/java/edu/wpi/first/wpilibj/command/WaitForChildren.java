@@ -14,7 +14,10 @@ package edu.wpi.first.wpilibj.command;
  *
  * <p>This class is useful for the situation where you want to allow anything running in parallel
  * to finish, before continuing in the main {@link CommandGroup} sequence.
+ *
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 public class WaitForChildren extends Command {
   @Override
   protected boolean isFinished() {

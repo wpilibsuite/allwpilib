@@ -12,6 +12,7 @@
 
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
+#include <wpi/deprecated.h>
 
 #include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
@@ -27,6 +28,8 @@ class Subsystem : public ErrorBase,
   friend class Scheduler;
 
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   /**
    * Creates a subsystem with the given name.
    *

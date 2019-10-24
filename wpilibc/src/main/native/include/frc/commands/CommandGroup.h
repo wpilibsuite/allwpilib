@@ -35,6 +35,8 @@ namespace frc {
  */
 class CommandGroup : public Command {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   CommandGroup() = default;
 
   /**

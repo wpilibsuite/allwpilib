@@ -19,6 +19,8 @@ namespace frc {
 
 class NetworkButton : public Button {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   NetworkButton(const wpi::Twine& tableName, const wpi::Twine& field);
   NetworkButton(std::shared_ptr<nt::NetworkTable> table,
                 const wpi::Twine& field);

@@ -15,6 +15,8 @@ namespace frc {
 
 class WaitForChildren : public Command {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   explicit WaitForChildren(double timeout);
   WaitForChildren(const wpi::Twine& name, double timeout);
   virtual ~WaitForChildren() = default;

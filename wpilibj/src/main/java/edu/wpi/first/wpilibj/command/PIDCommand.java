@@ -19,7 +19,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p> It provides some convenience methods to run an internal {@link PIDController} . It will also
  * start and stop said {@link PIDController} when the {@link PIDCommand} is first initialized and
  * ended/interrupted. </p>
+ *
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 public abstract class PIDCommand extends Command {
   /**
    * The internal {@link PIDController}.

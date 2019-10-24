@@ -9,6 +9,8 @@
 
 #include <atomic>
 
+#include <wpi/deprecated.h>
+
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -31,6 +33,8 @@ class Command;
  */
 class Trigger : public Sendable, public SendableHelper<Trigger> {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   Trigger() = default;
   ~Trigger() override = default;
 

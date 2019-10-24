@@ -22,7 +22,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * (for instance, if they want to react to the user holding a button while the robot is reading a
  * certain sensor input). For this, they only have to write the {@link Trigger#get()} method to get
  * the full functionality of the Trigger class.
+ *
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 public abstract class Trigger implements Sendable {
   private volatile boolean m_sendablePressed;
 

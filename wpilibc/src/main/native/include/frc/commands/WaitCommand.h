@@ -15,6 +15,8 @@ namespace frc {
 
 class WaitCommand : public TimedCommand {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   /**
    * Creates a new WaitCommand with the given name and timeout.
    *

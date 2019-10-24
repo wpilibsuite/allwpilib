@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <wpi/deprecated.h>
+
 namespace frc {
 
 class Command;
@@ -18,6 +20,8 @@ class CommandGroupEntry {
     kSequence_BranchPeer,
     kSequence_BranchChild
   };
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
 
   CommandGroupEntry() = default;
   CommandGroupEntry(Command* command, Sequence state, double timeout = -1.0);

@@ -26,7 +26,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * which are started if there is no command running which requires this subsystem. </p>
  *
  * @see Command
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 public abstract class Subsystem implements Sendable, AutoCloseable {
   /**
    * Whether or not getDefaultCommand() was called.

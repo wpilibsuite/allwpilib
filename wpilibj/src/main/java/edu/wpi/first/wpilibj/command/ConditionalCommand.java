@@ -35,7 +35,9 @@ import java.util.Enumeration;
  *
  * @see Command
  * @see Scheduler
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 public abstract class ConditionalCommand extends Command {
   /**
    * The Command to execute if {@link ConditionalCommand#condition()} returns true.

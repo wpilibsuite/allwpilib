@@ -13,7 +13,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * A {@link Button} that uses a {@link NetworkTable} boolean field.
+ *
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 public class NetworkButton extends Button {
   private final NetworkTableEntry m_entry;
 

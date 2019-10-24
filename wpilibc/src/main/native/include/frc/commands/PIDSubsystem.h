@@ -29,6 +29,8 @@ namespace frc {
  */
 class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   /**
    * Instantiates a PIDSubsystem that will use the given P, I, and D values.
    *

@@ -10,7 +10,10 @@ package edu.wpi.first.wpilibj.buttons;
 /**
  * This class is intended to be used within a program. The programmer can manually set its value.
  * Also includes a setting for whether or not it should invert its value.
+ *
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 public class InternalButton extends Button {
   private boolean m_pressed;
   private boolean m_inverted;

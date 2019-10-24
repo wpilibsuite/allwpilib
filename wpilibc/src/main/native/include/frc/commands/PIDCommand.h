@@ -20,6 +20,8 @@ namespace frc {
 
 class PIDCommand : public Command, public PIDOutput, public PIDSource {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   PIDCommand(const wpi::Twine& name, double p, double i, double d);
   PIDCommand(const wpi::Twine& name, double p, double i, double d,
              double period);

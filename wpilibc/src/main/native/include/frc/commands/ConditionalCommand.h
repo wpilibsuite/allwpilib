@@ -34,6 +34,8 @@ namespace frc {
  */
 class ConditionalCommand : public Command {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   /**
    * Creates a new ConditionalCommand with given onTrue and onFalse Commands.
    *

@@ -18,7 +18,10 @@ import edu.wpi.first.wpilibj.command.Command;
  * <p>This class represents a subclass of Trigger that is specifically aimed at buttons on an
  * operator interface as a common use case of the more generalized Trigger objects. This is a simple
  * wrapper around Trigger with the method names renamed to fit the Button object use.
+ *
+ * @deprecated Use the {@link edu.wpi.first.wpilibj2.command} framework, instead.
  */
+@Deprecated
 public abstract class Button extends Trigger {
   /**
    * Starts the given command whenever the button is newly pressed.

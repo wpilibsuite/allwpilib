@@ -23,6 +23,8 @@ namespace frc {
  */
 class InstantCommand : public Command {
  public:
+  WPI_DEPRECATED(
+      "Use the new command-based framework in the frc2 namespace, instead.")
   /**
    * Creates a new InstantCommand with the given name.
    *
