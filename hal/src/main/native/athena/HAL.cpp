@@ -389,6 +389,15 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return rv;
   });
 
+  // Read CAN status in order to initialize the CAN subsystem
+  float pbs = 0;
+  uint32_t boc = 0;
+  uint32_t txfc = 0;
+  uint32_t rec = 0;
+  uint32_t tec = 0;
+  status = 0;
+  HAL_CAN_GetCANStatus(&pbs, &boc, &txfc, &rec, &tec, &status);
+
   initialized = true;
   return true;
 }
