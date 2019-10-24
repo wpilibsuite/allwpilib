@@ -95,7 +95,6 @@ int64_t HAL_ReadDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
 
 double HAL_ReadDutyCycleOutputPercentage(HAL_DutyCycleHandle dutyCycleHandle,
                                    int32_t* status) {
-  // TODO: Confirm this scaling
-  return ((double)HAL_ReadDutyCycleOutputRaw(dutyCycleHandle, status) / (std::numeric_limits<uint32_t>::max)()) * 100.0;
+  return ((double)HAL_ReadDutyCycleOutputRaw(dutyCycleHandle, status) / (4e7 - 1));
 }
 }
