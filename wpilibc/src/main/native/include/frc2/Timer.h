@@ -15,8 +15,6 @@
 
 namespace frc2 {
 
-using TimerInterruptHandler = void (*)(void* param);
-
 /**
  * Pause the task for a specified time.
  *
