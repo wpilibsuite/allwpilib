@@ -1193,7 +1193,7 @@ void UsbCameraImpl::SetQuirks() {
   m_lifecam_exposure =
       desc.endswith("LifeCam HD-3000") || desc.endswith("LifeCam Cinema (TM)");
 
-  int deviceNum = GetDeviceNum(m_path);
+  int deviceNum = GetDeviceNum(m_path.c_str());
   if (deviceNum >= 0) {
     int vendorId, productId;
     if (GetVendorProduct(deviceNum, &vendorId, &productId)) {
