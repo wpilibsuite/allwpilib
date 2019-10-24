@@ -13,7 +13,7 @@ package edu.wpi.first.wpilibj;
  * just provides a channel, then a digital input will be constructed and freed when finished for the
  * source. The source can either be a digital input or analog trigger but not both.
  */
-public abstract class DigitalSource extends InterruptableSensorBase {
+public abstract class DigitalSource extends InterruptableSensorBase implements HandleBase {
   public abstract boolean isAnalogTrigger();
 
   public abstract int getChannel();

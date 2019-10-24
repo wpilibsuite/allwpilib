@@ -7,8 +7,7 @@
 
 package edu.wpi.first.hal;
 
-import java.nio.IntBuffer;
-
+@SuppressWarnings("AbbreviationAsWordInName")
 public class DMAJNI extends JNIWrapper {
   public static native int initialize();
   public static native void free(int handle);
@@ -37,5 +36,8 @@ public class DMAJNI extends JNIWrapper {
   // 64-83 channelOffsets
   // 84: capture size
   // 85: triggerChannels (bitflags)
-  public static native long readDMA(int handle, int[] sampleStore);
+  // 86: remaining
+  public static native long readDMA(int handle, int timeoutMs, int[] sampleStore);
+
+  public static native DMAJNISample.BaseStore getSensorReadData(int handle);
 }

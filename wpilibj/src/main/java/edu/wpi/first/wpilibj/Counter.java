@@ -30,7 +30,7 @@ import static java.util.Objects.requireNonNull;
  * <p>All counters will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable {
+public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable, HandleBase {
   /**
    * Mode determines how and what the counter counts.
    */
@@ -562,5 +562,10 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Counter");
     builder.addDoubleProperty("Value", this::get, null);
+  }
+
+  @Override
+  public int getHandle() {
+    return m_counter;
   }
 }

@@ -10,6 +10,7 @@
 #include <array>
 #include <cstddef>
 #include <memory>
+#include <cstring>
 
 #include "AnalogInternal.h"
 #include "EncoderInternal.h"
@@ -319,7 +320,11 @@ void HAL_AddDMACounterRate(HAL_DMAHandle handle,
 }
 
 void HAL_AddDMADigitalSource(HAL_DMAHandle handle,
-                             HAL_Handle digitalSourceHandle, int32_t* status);
+                             HAL_Handle digitalSourceHandle, int32_t* status) {
+
+                             }
+
+
 void HAL_AddDMAAnalogInput(HAL_DMAHandle handle,
                            HAL_AnalogInputHandle aInHandle, int32_t* status) {
   auto dma = dmaHandles->Get(handle);
@@ -387,7 +392,7 @@ void HAL_AddDMAAveragedAnalogInput(HAL_DMAHandle handle,
   }
 }
 
-void HAL_AddAnalogAccumulator(HAL_DMAHandle handle,
+void HAL_AddDMAAnalogAccumulator(HAL_DMAHandle handle,
                               HAL_AnalogInputHandle aInHandle,
                               int32_t* status) {
   auto dma = dmaHandles->Get(handle);
@@ -425,7 +430,9 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
                                HAL_Handle digitalSourceHandle,
                                HAL_AnalogTriggerType analogTriggerType,
                                HAL_Bool rising, HAL_Bool falling,
-                               int32_t* status);
+                               int32_t* status) {
+
+                               }
 
 void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
   auto dma = dmaHandles->Get(handle);
