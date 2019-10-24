@@ -153,7 +153,7 @@ void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analogTriggerHandle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  if (trigger->trigger->readSourceSelect_Averaged(status) != 0 
+  if (trigger->trigger->readSourceSelect_Averaged(status) != 0
       || trigger->trigger->readSourceSelect_DutyCycle(status) != 0) {
     *status = INCOMPATIBLE_STATE;
     // TODO: wpi_setWPIErrorWithContext(IncompatibleMode, "Hardware does not "

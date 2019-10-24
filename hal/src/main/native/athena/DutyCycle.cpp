@@ -95,6 +95,6 @@ int64_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
 
 double HAL_GetDutyCycleOutputScaled(HAL_DutyCycleHandle dutyCycleHandle,
                                    int32_t* status) {
-  return ((double)HAL_ReadDutyCycleOutputRaw(dutyCycleHandle, status) / (4e7 - 1));
+  return ((double)HAL_GetDutyCycleOutputRaw(dutyCycleHandle, status) / (4e7 - 1));
 }
 }

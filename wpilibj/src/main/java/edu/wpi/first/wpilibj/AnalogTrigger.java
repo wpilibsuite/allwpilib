@@ -125,8 +125,8 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
   }
 
   /**
-   * Configure the analog trigger to use the duty cycle vs. raw values. If the value is true, 
-   * then the duty cycle value is selected for the analog trigger, otherwise the immediate 
+   * Configure the analog trigger to use the duty cycle vs. raw values. If the value is true,
+   * then the duty cycle value is selected for the analog trigger, otherwise the immediate
    * value is used.
    *
    * @param useAveragedValue true to use an duty cycle value, false otherwise
