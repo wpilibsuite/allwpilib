@@ -71,8 +71,8 @@ class TrajectoryConfig {
    * Adds a user-defined constraint to the trajectory.
    * @param constraint The user-defined constraint.
    */
-  template <typename Constraint, typename = std::enable_if<std::is_base_of<
-                                     TrajectoryConstraint, Constraint>::value>>
+  template <typename Constraint, typename = std::enable_if_t<std::is_base_of_v<
+                                     TrajectoryConstraint, Constraint>>>
   void AddConstraint(Constraint constraint) {
     m_constraints.emplace_back(std::make_unique<Constraint>(constraint));
   }
