@@ -18,8 +18,6 @@
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/button/JoystickButton.h>
 
-#include "Constants.h"
-
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
@@ -55,30 +53,32 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       // End 3 meters straight ahead of where we started, facing forward
       frc::Pose2d(3_m, 0_m, frc::Rotation2d(0_deg)),
       // Pass the drive kinematics to ensure constraints are obeyed
-      dc::kDriveKinematics,
+      DriveConstants::kDriveKinematics,
       // Start stationary
-      0_m / 1_s,
+      0_mps,
       // End stationary
-      0_m / 1_s,
+      0_mps,
       // Apply max speed constraint
-      ac::kMaxSpeed,
+      AutoConstants::kMaxSpeed,
       // Apply max acceleration constraint
-      ac::kMaxAcceleration,
+      AutoConstants::kMaxAcceleration,
       // Not reversed
       false);
 
   frc2::RamseteCommand ramseteCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
-      frc::RamseteController(ac::kRamseteB, ac::kRamseteZeta), dc::ks, dc::kv,
-      dc::ka, dc::kDriveKinematics,
-      [this]() {
+      frc::RamseteController(AutoConstants::kRamseteB,
+                             AutoConstants::kRamseteZeta),
+      DriveConstants::ks, DriveConstants::kv, DriveConstants::ka,
+      DriveConstants::kDriveKinematics,
+      [this] {
         return units::meters_per_second_t(m_drive.GetLeftEncoder().GetRate());
       },
-      [this]() {
+      [this] {
         return units::meters_per_second_t(m_drive.GetRightEncoder().GetRate());
       },
-      frc2::PIDController(dc::kPDriveVel, 0, 0),
-      frc2::PIDController(dc::kPDriveVel, 0, 0),
+      frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
+      frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
       [this](auto left, auto right) {
         m_drive.TankDrive(left / 12_V, right / 12_V);
       },

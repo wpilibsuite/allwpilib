@@ -41,10 +41,10 @@ namespace frc2 {
  */
 class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
   using voltsecondspermeter =
-      units::compound_unit<units::voltage::volt, units::second,
+      units::compound_unit<units::volt, units::second,
                            units::inverse<units::meter>>;
   using voltsecondssquaredpermeter =
-      units::compound_unit<units::voltage::volt, units::squared<units::second>,
+      units::compound_unit<units::volt, units::squared<units::second>,
                            units::inverse<units::meter>>;
 
  public:
@@ -60,8 +60,8 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * @param trajectory                     The trajectory to follow.
    * @param pose                           A function that supplies the robot
    * pose - use one of the odometry classes to provide this.
-   * @param follower                       The RAMSETE follower used to follow
-   * the trajectory.
+   * @param controller                       The RAMSETE controller used to
+   * follow the trajectory.
    * @param ks                             Constant feedforward term for the
    * robot drive.
    * @param kv                             Velocity-proportional feedforward
@@ -82,18 +82,17 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * left and right outputs (in volts) for the robot drive.
    * @param requirements                   The subsystems to require.
    */
-  RamseteCommand(
-      frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-      frc::RamseteController follower, units::voltage::volt_t ks,
-      units::unit_t<voltsecondspermeter> kv,
-      units::unit_t<voltsecondssquaredpermeter> ka,
-      frc::DifferentialDriveKinematics kinematics,
-      std::function<units::meters_per_second_t()> leftSpeed,
-      std::function<units::meters_per_second_t()> rightSpeed,
-      frc2::PIDController leftController, frc2::PIDController rightController,
-      std::function<void(units::voltage::volt_t, units::voltage::volt_t)>
-          output,
-      std::initializer_list<Subsystem*> requirements);
+  RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+                 frc::RamseteController controller, units::volt_t ks,
+                 units::unit_t<voltsecondspermeter> kv,
+                 units::unit_t<voltsecondssquaredpermeter> ka,
+                 frc::DifferentialDriveKinematics kinematics,
+                 std::function<units::meters_per_second_t()> leftSpeed,
+                 std::function<units::meters_per_second_t()> rightSpeed,
+                 frc2::PIDController leftController,
+                 frc2::PIDController rightController,
+                 std::function<void(units::volt_t, units::volt_t)> output,
+                 std::initializer_list<Subsystem*> requirements);
 
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the
@@ -104,7 +103,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * @param trajectory            The trajectory to follow.
    * @param pose                  A function that supplies the robot pose - use
    * one of the odometry classes to provide this.
-   * @param follower              The RAMSETE follower used to follow the
+   * @param controller              The RAMSETE controller used to follow the
    * trajectory.
    * @param kinematics            The kinematics for the robot drivetrain.
    * @param output                A function that consumes the computed left and
@@ -112,7 +111,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * @param requirements          The subsystems to require.
    */
   RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-                 frc::RamseteController follower,
+                 frc::RamseteController controller,
                  frc::DifferentialDriveKinematics kinematics,
                  std::function<void(units::meters_per_second_t,
                                     units::meters_per_second_t)>
@@ -130,8 +129,8 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
  private:
   frc::Trajectory m_trajectory;
   std::function<frc::Pose2d()> m_pose;
-  frc::RamseteController m_follower;
-  const units::voltage::volt_t m_ks;
+  frc::RamseteController m_controller;
+  const units::volt_t m_ks;
   const units::unit_t<voltsecondspermeter> m_kv;
   const units::unit_t<voltsecondssquaredpermeter> m_ka;
   frc::DifferentialDriveKinematics m_kinematics;
@@ -139,8 +138,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
   std::function<units::meters_per_second_t()> m_rightSpeed;
   std::unique_ptr<frc2::PIDController> m_leftController;
   std::unique_ptr<frc2::PIDController> m_rightController;
-  std::function<void(units::voltage::volt_t, units::voltage::volt_t)>
-      m_outputVolts;
+  std::function<void(units::volt_t, units::volt_t)> m_outputVolts;
   std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
       m_outputVel;
 

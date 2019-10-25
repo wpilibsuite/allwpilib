@@ -4853,4 +4853,5 @@ using namespace time;
 using namespace velocity;
 using namespace acceleration;
 using namespace angle;
+using namespace voltage;
 }  // namespace units

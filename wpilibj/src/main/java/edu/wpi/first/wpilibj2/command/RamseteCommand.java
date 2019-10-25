@@ -65,7 +65,7 @@ public class RamseteCommand extends CommandBase {
    * @param trajectory                     The trajectory to follow.
    * @param pose                           A function that supplies the robot pose - use one of
    *                                       the odometry classes to provide this.
-   * @param follower                       The RAMSETE follower used to follow the trajectory.
+   * @param controller                       The RAMSETE controller used to follow the trajectory.
    * @param ksVolts                        Constant feedforward term for the robot drive.
    * @param kvVoltSecondsPerMeter          Velocity-proportional feedforward term for the robot
    *                                       drive.
@@ -85,7 +85,7 @@ public class RamseteCommand extends CommandBase {
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public RamseteCommand(Trajectory trajectory,
                         Supplier<Pose2d> pose,
-                        RamseteController follower,
+                        RamseteController controller,
                         double ksVolts,
                         double kvVoltSecondsPerMeter,
                         double kaVoltSecondsSquaredPerMeter,
@@ -98,7 +98,7 @@ public class RamseteCommand extends CommandBase {
                         Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "RamseteCommand");
     m_pose = requireNonNullParam(pose, "pose", "RamseteCommand");
-    m_follower = requireNonNullParam(follower, "follower", "RamseteCommand");
+    m_follower = requireNonNullParam(controller, "controller", "RamseteCommand");
     m_ks = ksVolts;
     m_kv = kvVoltSecondsPerMeter;
     m_ka = kaVoltSecondsSquaredPerMeter;
@@ -218,6 +218,6 @@ public class RamseteCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return m_timer.get() - m_trajectory.getTotalTimeSeconds() >= 0;
+    return m_timer.hasPeriodPassed(m_trajectory.getTotalTimeSeconds());
   }
 }

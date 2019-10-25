@@ -17,18 +17,18 @@ int sgn(T val) {
 
 RamseteCommand::RamseteCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-    frc::RamseteController follower, units::voltage::volt_t ks,
+    frc::RamseteController controller, volt_t ks,
     units::unit_t<voltsecondspermeter> kv,
     units::unit_t<voltsecondssquaredpermeter> ka,
     frc::DifferentialDriveKinematics kinematics,
     std::function<units::meters_per_second_t()> leftSpeed,
     std::function<units::meters_per_second_t()> rightSpeed,
     frc2::PIDController leftController, frc2::PIDController rightController,
-    std::function<void(voltage::volt_t, voltage::volt_t)> output,
+    std::function<void(volt_t, volt_t)> output,
     std::initializer_list<Subsystem*> requirements)
     : m_trajectory(trajectory),
       m_pose(pose),
-      m_follower(follower),
+      m_controller(controller),
       m_ks(ks),
       m_kv(kv),
       m_ka(ka),
@@ -43,14 +43,14 @@ RamseteCommand::RamseteCommand(
 
 RamseteCommand::RamseteCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-    frc::RamseteController follower,
+    frc::RamseteController controller,
     frc::DifferentialDriveKinematics kinematics,
     std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
         output,
     std::initializer_list<Subsystem*> requirements)
     : m_trajectory(trajectory),
       m_pose(pose),
-      m_follower(follower),
+      m_controller(controller),
       m_ks(0),
       m_kv(0),
       m_ka(0),
@@ -63,7 +63,7 @@ void RamseteCommand::Initialize() {
   m_prevTime = 0_s;
   auto initialState = m_trajectory.Sample(0_s);
   m_prevSpeeds = m_kinematics.ToWheelSpeeds(
-      frc::ChassisSpeeds{initialState.velocity, 0_m / 1_s,
+      frc::ChassisSpeeds{initialState.velocity, 0_mps,
                          initialState.velocity * initialState.curvature});
   m_timer.Reset();
   m_timer.Start();
@@ -76,7 +76,7 @@ void RamseteCommand::Execute() {
   auto dt = curTime - m_prevTime;
 
   auto targetWheelSpeeds = m_kinematics.ToWheelSpeeds(
-      m_follower.Calculate(m_pose(), m_trajectory.Sample(curTime)));
+      m_controller.Calculate(m_pose(), m_trajectory.Sample(curTime)));
 
   if (m_leftController.get() != nullptr) {
     auto leftFeedforward =
@@ -88,11 +88,11 @@ void RamseteCommand::Execute() {
         m_ka * (targetWheelSpeeds.right - m_prevSpeeds.right) / dt;
 
     auto leftOutput =
-        voltage::volt_t(m_leftController->Calculate(
+        volt_t(m_leftController->Calculate(
             m_leftSpeed().to<double>(), targetWheelSpeeds.left.to<double>())) +
         leftFeedforward;
 
-    auto rightOutput = voltage::volt_t(m_rightController->Calculate(
+    auto rightOutput = volt_t(m_rightController->Calculate(
                            m_rightSpeed().to<double>(),
                            targetWheelSpeeds.right.to<double>())) +
                        rightFeedforward;
@@ -109,5 +109,5 @@ void RamseteCommand::Execute() {
 void RamseteCommand::End(bool interrupted) { m_timer.Stop(); }
 
 bool RamseteCommand::IsFinished() {
-  return second_t(m_timer.Get()) - m_trajectory.TotalTime() >= 0_s;
+  return m_timer.HasPeriodPassed(m_trajectory.TotalTime());
 }

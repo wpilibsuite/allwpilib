@@ -57,7 +57,7 @@ const double kPDriveVel = .5;
 }  // namespace DriveConstants
 
 namespace AutoConstants {
-const auto kMaxSpeed = 3_m / 1_s;
+const auto kMaxSpeed = 3_mps;
 const auto kMaxAcceleration = 3_m / (1_s * 1_s);
 
 // Reasonable baseline values for a RAMSETE follower in units of meters and
