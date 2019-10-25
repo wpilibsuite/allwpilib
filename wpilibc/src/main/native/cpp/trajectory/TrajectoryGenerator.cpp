@@ -61,7 +61,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
   const Transform2d flip{Translation2d(), Rotation2d(180_deg)};
   // Make theta normal for trajectory generation if path is reversed.
   if (config.IsReversed()) {
-    for (auto vector : controlVectors) {
+    for (auto& vector : controlVectors) {
       // Flip the headings.
       vector.x[1] *= -1;
       vector.y[1] *= -1;
