@@ -109,8 +109,6 @@ public abstract class Spline {
      */
     @SuppressWarnings("ParameterName")
     public ControlVector(double[] x, double[] y) {
-      this.x = new double[0];
-      this.y = new double[0];
       this.x = Arrays.copyOf(x, x.length);
       this.y = Arrays.copyOf(y, y.length);
     }
