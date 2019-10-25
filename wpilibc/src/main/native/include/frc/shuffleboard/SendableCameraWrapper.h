@@ -7,18 +7,26 @@
 
 #pragma once
 
+#include <functional>
+#include <memory>
 #include <string>
 
-#include <cscore_c.h>
+#include <cscore_oo.h>
 
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
-namespace cs {
-class VideoSource;
-}  // namespace cs
-
 namespace frc {
+
+class SendableCameraWrapper;
+
+namespace detail {
+constexpr const char* kProtocol = "camera_server://";
+std::shared_ptr<SendableCameraWrapper>& GetSendableCameraWrapper(int source);
+void CreateSendableCameraWrapperSendable(std::function<std::string()> urlGetter,
+                                         SendableBuilder& builder);
+void AddToSendableRegistry(Sendable* sendable, std::string name);
+}  // namespace detail
 
 /**
  * A wrapper to make video sources sendable and usable from Shuffleboard.
@@ -35,7 +43,13 @@ class SendableCameraWrapper : public Sendable,
    *
    * @param source the source to wrap
    */
-  SendableCameraWrapper(CS_Source source, const private_init&);
+  SendableCameraWrapper(CS_Source source, const private_init&)
+      : m_uri(detail::kProtocol) {
+    CS_Status status = 0;
+    auto name = cs::GetSourceName(source, &status);
+    detail::AddToSendableRegistry(this, name);
+    m_uri += name;
+  }
 
   /**
    * Gets a sendable wrapper object for the given video source, creating the
@@ -45,10 +59,20 @@ class SendableCameraWrapper : public Sendable,
    * @return a sendable wrapper object for the video source, usable in
    * Shuffleboard via ShuffleboardTab::Add() and ShuffleboardLayout::Add()
    */
-  static SendableCameraWrapper& Wrap(const cs::VideoSource& source);
-  static SendableCameraWrapper& Wrap(CS_Source source);
+  static SendableCameraWrapper& Wrap(const cs::VideoSource& source) {
+    return Wrap(source.GetHandle());
+  }
+  static SendableCameraWrapper& Wrap(CS_Source source) {
+    auto& wrapper = detail::GetSendableCameraWrapper(static_cast<int>(source));
+    if (!wrapper)
+      wrapper = std::make_shared<SendableCameraWrapper>(source, private_init{});
+    return *wrapper;
+  }
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(SendableBuilder& builder) override {
+    detail::CreateSendableCameraWrapperSendable([this] { return m_uri; },
+                                                builder);
+  }
 
  private:
   std::string m_uri;

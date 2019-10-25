@@ -1,47 +1,34 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc/shuffleboard/SendableCameraWrapper.h"
+#include <functional>
+#include <memory>
+#include <string>
 
-#include <cscore_oo.h>
 #include <wpi/DenseMap.h>
 
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
-using namespace frc;
-
-namespace {
-constexpr const char* kProtocol = "camera_server://";
-wpi::DenseMap<int, std::unique_ptr<SendableCameraWrapper>> wrappers;
-}  // namespace
-
-SendableCameraWrapper& SendableCameraWrapper::Wrap(
-    const cs::VideoSource& source) {
-  return Wrap(source.GetHandle());
+namespace frc {
+class SendableCameraWrapper;
+namespace detail {
+std::shared_ptr<SendableCameraWrapper>& GetSendableCameraWrapper(int source) {
+  static wpi::DenseMap<int, std::shared_ptr<SendableCameraWrapper>> wrappers;
+  return wrappers[source];
 }
 
-SendableCameraWrapper& SendableCameraWrapper::Wrap(CS_Source source) {
-  auto& wrapper = wrappers[static_cast<int>(source)];
-  if (!wrapper)
-    wrapper = std::make_unique<SendableCameraWrapper>(source, private_init{});
-  return *wrapper;
+void CreateSendableCameraWrapperSendable(std::function<std::string()> urlGetter,
+                                         SendableBuilder& builder) {
+  builder.AddStringProperty(".ShuffleboardURI", std::move(urlGetter), nullptr);
 }
 
-SendableCameraWrapper::SendableCameraWrapper(CS_Source source,
-                                             const private_init&)
-    : m_uri(kProtocol) {
-  CS_Status status = 0;
-  auto name = cs::GetSourceName(source, &status);
-  SendableRegistry::GetInstance().Add(this, name);
-  m_uri += name;
+void AddToSendableRegistry(frc::Sendable* sendable, std::string name) {
+  SendableRegistry::GetInstance().Add(sendable, name);
 }
-
-void SendableCameraWrapper::InitSendable(SendableBuilder& builder) {
-  builder.AddStringProperty(".ShuffleboardURI", [this] { return m_uri; },
-                            nullptr);
-}
+}  // namespace detail
+}  // namespace frc

@@ -7,10 +7,13 @@
 
 #include "frc/RobotBase.h"
 
+#ifdef __FRC_ROBORIO__
+#include <dlfcn.h>
+#endif
+
 #include <cstdio>
 
 #include <cameraserver/CameraServerShared.h>
-#include <cscore.h>
 #include <hal/HAL.h>
 #include <networktables/NetworkTableInstance.h>
 
@@ -21,6 +24,8 @@
 #include "frc/WPIErrors.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
+
+typedef void (*SetCameraServerSharedFP)(frc::CameraServerShared* shared);
 
 using namespace frc;
 
@@ -65,7 +70,36 @@ class WPILibCameraServerShared : public frc::CameraServerShared {
 }  // namespace
 
 static void SetupCameraServerShared() {
-  SetCameraServerShared(std::make_unique<WPILibCameraServerShared>());
+#ifdef __FRC_ROBORIO__
+#ifdef DYNAMIC_CAMERA_SERVER
+#ifdef DYNAMIC_CAMERA_SERVER_DEBUG
+  auto cameraServerLib = dlopen("libcameraserverd.so", RTLD_NOW);
+#else
+  auto cameraServerLib = dlopen("libcameraserver.so", RTLD_NOW);
+#endif
+
+  if (!cameraServerLib) {
+    wpi::outs() << "Camera Server Library Not Found\n";
+    wpi::outs().flush();
+    return;
+  }
+  auto symbol = dlsym(cameraServerLib, "CameraServer_SetCameraServerShared");
+  if (symbol) {
+    auto setCameraServerShared = (SetCameraServerSharedFP)symbol;
+    setCameraServerShared(new WPILibCameraServerShared{});
+    wpi::outs() << "Set Camera Server Shared\n";
+    wpi::outs().flush();
+  } else {
+    wpi::outs() << "Camera Server Shared Symbol Missing\n";
+    wpi::outs().flush();
+  }
+#else
+  SetCameraServerShared(new WPILibCameraServerShared{});
+#endif
+#else
+  wpi::outs() << "Not loading CameraServerShared\n";
+  wpi::outs().flush();
+#endif
 }
 
 bool RobotBase::IsEnabled() const { return m_ds.IsEnabled(); }
@@ -121,6 +155,6 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 RobotBase::RobotBase(RobotBase&&) noexcept
     : m_ds(DriverStation::GetInstance()) {}
 
-RobotBase::~RobotBase() { cs::Shutdown(); }
+RobotBase::~RobotBase() {}
 
 RobotBase& RobotBase::operator=(RobotBase&&) noexcept { return *this; }
