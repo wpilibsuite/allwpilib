@@ -42,26 +42,8 @@ class TrajectoryConfig {
   TrajectoryConfig(const TrajectoryConfig&) = delete;
   TrajectoryConfig& operator=(const TrajectoryConfig&) = delete;
 
-  TrajectoryConfig(TrajectoryConfig&& rhs) {
-    m_startVelocity = rhs.m_startVelocity;
-    m_endVelocity = rhs.m_endVelocity;
-    m_maxVelocity = rhs.m_maxVelocity;
-    m_maxAcceleration = rhs.m_maxAcceleration;
-    m_reversed = rhs.m_reversed;
-    m_constraints = std::move(rhs.m_constraints);
-  }
-
-  TrajectoryConfig& operator=(TrajectoryConfig&& rhs) {
-    if (this != &rhs) {
-      m_startVelocity = rhs.m_startVelocity;
-      m_endVelocity = rhs.m_endVelocity;
-      m_maxVelocity = rhs.m_maxVelocity;
-      m_maxAcceleration = rhs.m_maxAcceleration;
-      m_reversed = rhs.m_reversed;
-      m_constraints = std::move(rhs.m_constraints);
-    }
-    return *this;
-  }
+  TrajectoryConfig(TrajectoryConfig&&) = default;
+  TrajectoryConfig& operator=(TrajectoryConfig&&) = default;
 
   /**
    * Sets the start velocity of the trajectory.
