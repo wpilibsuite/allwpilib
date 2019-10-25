@@ -121,7 +121,7 @@ class ProfiledPIDCommand
    *
    * @return The ProfiledPIDController
    */
-  frc::ProfiledPIDController& getController();
+  frc::ProfiledPIDController& GetController();
 
  protected:
   frc::ProfiledPIDController m_controller;

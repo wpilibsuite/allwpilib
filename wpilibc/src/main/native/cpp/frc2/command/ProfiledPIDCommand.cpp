@@ -68,6 +68,6 @@ void ProfiledPIDCommand::UseOutput(double output, State state) {
   m_useOutput(output, state);
 }
 
-frc::ProfiledPIDController& ProfiledPIDCommand::getController() {
+frc::ProfiledPIDController& ProfiledPIDCommand::GetController() {
   return m_controller;
 }
