@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <units/units.h>
+
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
 #include <frc/PWMVictorSPX.h>
@@ -26,7 +28,8 @@ class Robot : public frc::TimedRobot {
     }
 
     // Run controller and update motor output
-    m_motor.Set(m_controller.Calculate(m_encoder.GetDistance()));
+    m_motor.Set(
+        m_controller.Calculate(units::meter_t(m_encoder.GetDistance())));
   }
 
  private:
