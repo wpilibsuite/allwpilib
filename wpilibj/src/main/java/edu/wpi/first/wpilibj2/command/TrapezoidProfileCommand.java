@@ -59,6 +59,6 @@ public class TrapezoidProfileCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return m_timer.get() - m_profile.totalTime() >= 0;
+    return m_timer.hasPeriodPassed(m_profile.totalTime());
   }
 }

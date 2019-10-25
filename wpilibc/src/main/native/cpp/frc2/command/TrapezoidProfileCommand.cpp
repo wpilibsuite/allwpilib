@@ -31,5 +31,5 @@ void TrapezoidProfileCommand::Execute() {
 void TrapezoidProfileCommand::End(bool interrupted) { m_timer.Stop(); }
 
 bool TrapezoidProfileCommand::IsFinished() {
-  return m_timer.Get() - m_profile.TotalTime().to<double>() >= 0;
+  return m_timer.HasPeriodPassed(m_profile.TotalTime());
 }
