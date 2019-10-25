@@ -26,7 +26,10 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * <p>This feedback controller runs in discrete time, so time deltas are not used in the integral
  * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
  * given set of PID constants.
+ *
+ * @deprecated All APIs which use this have been deprecated.
  */
+@Deprecated(since = "2020", forRemoval = true)
 @SuppressWarnings("PMD.TooManyFields")
 public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable {
   public static final double kDefaultPeriod = 0.05;
