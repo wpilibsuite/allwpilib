@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <frc/Timer.h>
 #include <frc/trajectory/TrapezoidProfile.h>
+#include <frc2/Timer.h>
 
 #include <functional>
 
@@ -49,7 +49,7 @@ class TrapezoidProfileCommand
   frc::TrapezoidProfile m_profile;
   std::function<void(frc::TrapezoidProfile::State)> m_output;
 
-  frc::Timer m_timer;
+  Timer m_timer;
 };
 
 }  // namespace frc2
