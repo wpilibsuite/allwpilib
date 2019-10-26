@@ -12,7 +12,7 @@
 
 #include "CommandBase.h"
 #include "CommandHelper.h"
-#include "frc/Timer.h"
+#include "frc2/Timer.h"
 #include "frc/controller/PIDController.h"
 #include "frc/controller/RamseteController.h"
 #include "frc/geometry/Pose2d.h"
@@ -57,30 +57,28 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * completion of the path - this is left to the user, since it is not
    * appropriate for paths with nonstationary endstates.
    *
-   * @param trajectory                     The trajectory to follow.
-   * @param pose                           A function that supplies the robot
-   * pose - use one of the odometry classes to provide this.
-   * @param controller                       The RAMSETE controller used to
-   * follow the trajectory.
-   * @param ks                             Constant feedforward term for the
+   * @param trajectory      The trajectory to follow.
+   * @param pose            A function that supplies the robot pose - use one of
+   * the odometry classes to provide this.
+   * @param controller      The RAMSETE controller used to follow the
+   * trajectory.
+   * @param ks              Constant feedforward term for the robot drive.
+   * @param kv              Velocity-proportional feedforward term for the robot
+   * drive.
+   * @param ka              Acceleration-proportional feedforward term for the
    * robot drive.
-   * @param kv                             Velocity-proportional feedforward
-   * term for the robot drive.
-   * @param ka                             Acceleration-proportional feedforward
-   * term for the robot drive.
-   * @param kinematics                     The kinematics for the robot
-   * drivetrain.
-   * @param leftSpeed                      A function that supplies the speed of
-   * the left side of the robot drive.
-   * @param rightSpeed                     A function that supplies the speed of
-   * the right side of the robot drive.
-   * @param leftController                 The PIDController for the left side
+   * @param kinematics      The kinematics for the robot drivetrain.
+   * @param leftSpeed       A function that supplies the speed of the left side
    * of the robot drive.
-   * @param rightController                The PIDController for the right side
+   * @param rightSpeed      A function that supplies the speed of the right side
    * of the robot drive.
-   * @param output                         A function that consumes the computed
-   * left and right outputs (in volts) for the robot drive.
-   * @param requirements                   The subsystems to require.
+   * @param leftController  The PIDController for the left side of the robot
+   * drive.
+   * @param rightController The PIDController for the right side of the robot
+   * drive.
+   * @param output          A function that consumes the computed left and right
+   * outputs (in volts) for the robot drive.
+   * @param requirements    The subsystems to require.
    */
   RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
                  frc::RamseteController controller, units::volt_t ks,
@@ -100,15 +98,15 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * feedforwards; outputs are the raw wheel speeds from the RAMSETE controller,
    * and will need to be converted into a usable form by the user.
    *
-   * @param trajectory            The trajectory to follow.
-   * @param pose                  A function that supplies the robot pose - use
-   * one of the odometry classes to provide this.
-   * @param controller              The RAMSETE controller used to follow the
+   * @param trajectory      The trajectory to follow.
+   * @param pose            A function that supplies the robot pose - use one of
+   * the odometry classes to provide this.
+   * @param controller      The RAMSETE controller used to follow the
    * trajectory.
-   * @param kinematics            The kinematics for the robot drivetrain.
-   * @param output                A function that consumes the computed left and
-   * right wheel speeds.
-   * @param requirements          The subsystems to require.
+   * @param kinematics      The kinematics for the robot drivetrain.
+   * @param output          A function that consumes the computed left and right
+   * outputs (in volts) for the robot drive.
+   * @param requirements    The subsystems to require.
    */
   RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
                  frc::RamseteController controller,
@@ -142,7 +140,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
   std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
       m_outputVel;
 
-  frc::Timer m_timer;
+  Timer m_timer;
   units::second_t m_prevTime;
   frc::DifferentialDriveWheelSpeeds m_prevSpeeds;
 };

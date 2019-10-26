@@ -44,6 +44,14 @@ void RobotContainer::ConfigureButtonBindings() {
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
+  // Set up config for trajectory
+  frc::TrajectoryConfig config =
+      frc::TrajectoryConfig(AutoConstants::kMaxSpeed,
+                            AutoConstants::kMaxAcceleration)
+          // Add kinematics constraint to ensure max speed is actually obeyed
+          .AddConstraint(frc::DifferentialDriveKinematicsConstraint(
+              DriveConstants::kDriveKinematics, AutoConstants::kMaxSpeed));
+
   // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       // Start at the origin facing the +X direction
@@ -52,18 +60,8 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       {frc::Translation2d(1_m, 1_m), frc::Translation2d(2_m, -1_m)},
       // End 3 meters straight ahead of where we started, facing forward
       frc::Pose2d(3_m, 0_m, frc::Rotation2d(0_deg)),
-      // Pass the drive kinematics to ensure constraints are obeyed
-      DriveConstants::kDriveKinematics,
-      // Start stationary
-      0_mps,
-      // End stationary
-      0_mps,
-      // Apply max speed constraint
-      AutoConstants::kMaxSpeed,
-      // Apply max acceleration constraint
-      AutoConstants::kMaxAcceleration,
-      // Not reversed
-      false);
+      // Pass the config
+      config);
 
   frc2::RamseteCommand ramseteCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
