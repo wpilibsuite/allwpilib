@@ -72,7 +72,7 @@ void RamseteCommand::Initialize() {
 }
 
 void RamseteCommand::Execute() {
-  auto curTime = second_t(m_timer.Get());
+  auto curTime = m_timer.Get();
   auto dt = curTime - m_prevTime;
 
   auto targetWheelSpeeds = m_kinematics.ToWheelSpeeds(

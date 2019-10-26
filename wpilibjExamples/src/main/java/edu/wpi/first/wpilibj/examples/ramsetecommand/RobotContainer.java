@@ -17,7 +17,9 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -89,6 +91,11 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    // Create config for trajectory
+    TrajectoryConfig config = new TrajectoryConfig(0, 0)
+        // Add kinematics constraint to ensure max speed is actually obeyed
+        .addConstraint(
+            new DifferentialDriveKinematicsConstraint(kDriveKinematics, kMaxSpeedMetersPerSecond));
 
     // An example trajectory to follow.  All units in meters.
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
@@ -101,17 +108,8 @@ public class RobotContainer {
         ),
         // End 3 meters straight ahead of where we started, facing forward
         new Pose2d(3, 0, new Rotation2d(0)),
-        // Pass the drive kinematics to ensure constraints are obeyed
-        kDriveKinematics,
-        // Start stationary
-        0,
-        // End stationary
-        0,
-        // Apply max speed constraint
-        kMaxSpeedMetersPerSecond,
-        // Apply max acceleration constraint
-        kMaxAccelerationMetersPerSecondSquared,
-        false
+        // Pass config
+        config
     );
 
     RamseteCommand ramseteCommand = new RamseteCommand(
