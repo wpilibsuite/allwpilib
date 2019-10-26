@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (II)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DutyCycleJNI_initialize
-  (JNIEnv * env, jclass, jint digitalSoruceHandle, jint analogTriggerType) {
+  (JNIEnv * env, jclass, jint digitalSourceHandle, jint analogTriggerType) {
   int32_t status = 0;
   auto handle = HAL_InitializeDutyCycle(static_cast<HAL_Handle>(digitalSourceHandle), static_cast<HAL_AnalogTriggerType>(analogTriggerType), &status);
   CheckStatus(env, status);
@@ -61,7 +61,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_hal_DutyCycleJNI_getOutput
  * Method:    getOutputRaw
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DutyCycleJNI_getOutput
+JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DutyCycleJNI_getOutputRaw
   (JNIEnv * env, jclass, jint handle) {
     int32_t status = 0;
     auto retVal = HAL_GetDutyCycleOutputRaw(static_cast<HAL_DutyCycleHandle>(handle), &status);
