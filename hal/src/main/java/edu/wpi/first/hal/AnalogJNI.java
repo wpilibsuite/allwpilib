@@ -103,8 +103,8 @@ public class AnalogJNI extends JNIWrapper {
   public static native void setAnalogTriggerLimitsRaw(int analogTriggerHandle, int lower,
                                                       int upper);
 
-  public static native void setAnalogTriggerLimitsDutyCycle(int analogTriggerHandle, int lower,
-                                                            int higher);
+  public static native void setAnalogTriggerLimitsDutyCycle(int analogTriggerHandle, double lower,
+                                                            double higher);
 
   public static native void setAnalogTriggerLimitsVoltage(int analogTriggerHandle,
                                                           double lower, double upper);

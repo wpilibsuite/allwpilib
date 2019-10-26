@@ -2,8 +2,9 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DutyCycleJNI;
 
-public class DutyCycle implements AutoClosable {
-  private final int m_handle;
+public class DutyCycle implements AutoCloseable {
+  // Explicitly package private
+  final int m_handle;
 
   public DutyCycle(DigitalSource digitalSource) {
     m_handle = DutyCycleJNI.initialize(digitalSource.getPortHandleForRouting(),

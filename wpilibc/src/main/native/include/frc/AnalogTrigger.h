@@ -19,6 +19,7 @@
 namespace frc {
 
 class AnalogInput;
+class DutyCycle;
 class SendableBuilder;
 
 class AnalogTrigger : public ErrorBase,
@@ -45,6 +46,13 @@ class AnalogTrigger : public ErrorBase,
    */
   explicit AnalogTrigger(AnalogInput* channel);
 
+  /**
+   * Construct an analog trigger given a duty cycle input.
+   *
+   * @param channel The pointer to the existing DutyCycle object
+   */
+  explicit AnalogTrigger(DutyCycle* dutyCycle);
+
   ~AnalogTrigger() override;
 
   AnalogTrigger(AnalogTrigger&& rhs);
@@ -59,6 +67,16 @@ class AnalogTrigger : public ErrorBase,
    * @param upper The upper limit of the trigger in Volts.
    */
   void SetLimitsVoltage(double lower, double upper);
+
+  /**
+   * Set the upper and lower duty cycle limits of the analog trigger.
+   *
+   * The limits are given as floating point values between 0 and 1.
+   *
+   * @param lower The lower limit of the trigger in percentage.
+   * @param upper The upper limit of the trigger in percentage.
+   */
+  void SetLimitsDutyCycle(double lower, double upper);
 
   /**
    * Set the upper and lower limits of the analog trigger.
@@ -153,6 +171,7 @@ class AnalogTrigger : public ErrorBase,
   int m_index;
   hal::Handle<HAL_AnalogTriggerHandle> m_trigger;
   AnalogInput* m_analogInput = nullptr;
+  DutyCycle* m_dutyCycle = nullptr;
   bool m_ownsAnalog = false;
 };
 

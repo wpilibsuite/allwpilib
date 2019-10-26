@@ -92,7 +92,7 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
   return handle;
 }
 
-HAL_AnalogTriggerHandle HAL_InitalizeAnalogTriggerDutyCycle(
+HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
     HAL_DutyCycleHandle dutyCycleHandle, int32_t* index, int32_t* status) {
   *status = HAL_SIM_NOT_SUPPORTED;
   return HAL_kInvalidHandle;

@@ -10,8 +10,10 @@
 
 namespace frc {
 class DigitalSource;
+class AnalogTrigger;
 
 class DutyCycle : public ErrorBase, public Sendable, public SendableHelper<DutyCycle> {
+  friend class AnalogTrigger;
 public:
   DutyCycle(DigitalSource& source);
   DutyCycle(DigitalSource* source);

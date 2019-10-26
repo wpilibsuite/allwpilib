@@ -47,7 +47,7 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
  * Initializes an analog trigger with a Duty Cycle input
  *
  */
-HAL_AnalogTriggerHandle HAL_InitalizeAnalogTriggerDutyCycle(
+HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
     HAL_DutyCycleHandle dutyCycleHandle, int32_t* index, int32_t* status);
 
 /**

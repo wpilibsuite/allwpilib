@@ -504,6 +504,24 @@ Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTrigger
 
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
+ * Method:    initializeAnalogTriggerDutyCycle
+ * Signature: (ILjava/nio/IntBuffer;)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTriggerDutyCycle
+  (JNIEnv *, jclass, jint, jobject) {
+      jint* indexHandle =
+      reinterpret_cast<jint*>(env->GetDirectBufferAddress(index));
+  int32_t status = 0;
+  HAL_AnalogTriggerHandle analogTrigger = HAL_InitializeAnalogTriggerDutyCycle(
+      (HAL_DutyCycleHandle)id, reinterpret_cast<int32_t*>(indexHandle),
+      &status);
+  CheckStatus(env, status);
+  return (jint)analogTrigger;
+  }
+
+
+/*
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    cleanAnalogTrigger
  * Signature: (I)V
  */
@@ -519,7 +537,7 @@ Java_edu_wpi_first_hal_AnalogJNI_cleanAnalogTrigger
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogTriggerLimitsRaw
- * Signature: (III)V
+ * Signature: (IDD)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_AnalogJNI_setAnalogTriggerLimitsRaw
@@ -530,6 +548,19 @@ Java_edu_wpi_first_hal_AnalogJNI_setAnalogTriggerLimitsRaw
                                 &status);
   CheckStatus(env, status);
 }
+
+/*
+ * Class:     edu_wpi_first_hal_AnalogJNI
+ * Method:    setAnalogTriggerLimitsDutyCycle
+ * Signature: (III)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_AnalogJNI_setAnalogTriggerLimitsDutyCycle
+  (JNIEnv * env, jclass, jint id, jdouble lower, jdouble upper) {
+  int32_t status = 0;
+  HAL_SetAnalogTriggerLimitsDutyCycle((HAL_AnalogTriggerHandle)id, lower, upper,
+                                &status);
+  CheckStatus(env, status);
+  }
 
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
