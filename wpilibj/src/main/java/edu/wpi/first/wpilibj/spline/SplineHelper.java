@@ -7,7 +7,9 @@
 
 package edu.wpi.first.wpilibj.spline;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -20,55 +22,91 @@ public final class SplineHelper {
   }
 
   /**
-   * Returns a set of cubic splines corresponding to the provided waypoints. The
+   * Returns 2 cubic control vectors from a set of exterior waypoints and
+   * interior translations.
+   *
+   * @param start             The starting pose.
+   * @param interiorWaypoints The interior waypoints.
+   * @param end               The ending pose.
+   * @return 2 cubic control vectors.
+   */
+  public static Spline.ControlVector[] getCubicControlVectorsFromWaypoints(
+      Pose2d start, Translation2d[] interiorWaypoints, Pose2d end
+  ) {
+    // Generate control vectors from poses.
+    Spline.ControlVector initialCV;
+    Spline.ControlVector endCV;
+
+    // Chooses a magnitude automatically that makes the splines look better.
+    if (interiorWaypoints.length < 1) {
+      double scalar = start.getTranslation().getDistance(end.getTranslation()) * 1.2;
+      initialCV = getCubicControlVector(scalar, start);
+      endCV = getCubicControlVector(scalar, end);
+    } else {
+      double scalar = start.getTranslation().getDistance(interiorWaypoints[0]) * 1.2;
+      initialCV = getCubicControlVector(scalar, start);
+      scalar = end.getTranslation().getDistance(interiorWaypoints[interiorWaypoints.length - 1])
+          * 1.2;
+      endCV = getCubicControlVector(scalar, end);
+    }
+    return new Spline.ControlVector[]{initialCV, endCV};
+  }
+
+  /**
+   * Returns quintic control vectors from a set of waypoints.
+   *
+   * @param waypoints The waypoints
+   * @return List of control vectors
+   */
+  public static List<Spline.ControlVector> getQuinticControlVectorsFromWaypoints(
+      List<Pose2d> waypoints
+  ) {
+    List<Spline.ControlVector> vectors = new ArrayList<>();
+    for (int i = 0; i < waypoints.size() - 1; i++) {
+      var p0 = waypoints.get(i);
+      var p1 = waypoints.get(i + 1);
+
+      // This just makes the splines look better.
+      final var scalar = 1.2 * p0.getTranslation().getDistance(p1.getTranslation());
+
+      vectors.add(getQuinticControlVector(scalar, p0));
+      vectors.add(getQuinticControlVector(scalar, p1));
+    }
+    return vectors;
+  }
+
+  /**
+   * Returns a set of cubic splines corresponding to the provided control vectors. The
    * user is free to set the direction of the start and end point. The
    * directions for the middle waypoints are determined automatically to ensure
    * continuous curvature throughout the path.
    *
-   * @param start     The starting waypoint.
+   * @param start     The starting control vector.
    * @param waypoints The middle waypoints. This can be left blank if you only
    *                  wish to create a path with two waypoints.
-   * @param end       The ending waypoint.
+   * @param end       The ending control vector.
    * @return A vector of cubic hermite splines that interpolate through the
-   *         provided waypoints.
+   *         provided waypoints and control vectors.
    */
   @SuppressWarnings({"LocalVariableName", "PMD.ExcessiveMethodLength",
       "PMD.AvoidInstantiatingObjectsInLoops"})
-  public static CubicHermiteSpline[] getCubicSplinesFromWaypoints(
-      Pose2d start, Translation2d[] waypoints, Pose2d end) {
+  public static CubicHermiteSpline[] getCubicSplinesFromControlVectors(
+      Spline.ControlVector start, Translation2d[] waypoints, Spline.ControlVector end) {
 
     CubicHermiteSpline[] splines = new CubicHermiteSpline[waypoints.length + 1];
 
-    double scalar;
-    // This just makes the splines look better.
-    if (waypoints.length == 0) {
-      scalar = 1.2 * start.getTranslation().getDistance(end.getTranslation());
-    } else {
-      scalar = 1.2 * start.getTranslation().getDistance(waypoints[0]);
-    }
-
-    double[] xInitialControlVector
-        = {start.getTranslation().getX(), scalar * start.getRotation().getCos()};
-    double[] yInitialControlVector
-        = {start.getTranslation().getY(), scalar * start.getRotation().getSin()};
-
-    // This just makes the splines look better.
-    if (waypoints.length != 0) {
-      scalar = 1.2 * end.getTranslation().getDistance(waypoints[waypoints.length - 1]);
-    }
-
-    double[] xFinalControlVector
-        = {end.getTranslation().getX(), scalar * end.getRotation().getCos()};
-    double[] yFinalControlVector
-        = {end.getTranslation().getY(), scalar * end.getRotation().getSin()};
+    double[] xInitial = start.x;
+    double[] yInitial = start.y;
+    double[] xFinal = end.x;
+    double[] yFinal = end.y;
 
     if (waypoints.length > 1) {
       Translation2d[] newWaypts = new Translation2d[waypoints.length + 2];
 
       // Create an array of all waypoints, including the start and end.
-      newWaypts[0] = start.getTranslation();
+      newWaypts[0] = new Translation2d(xInitial[0], yInitial[0]);
       System.arraycopy(waypoints, 0, newWaypts, 1, waypoints.length);
-      newWaypts[newWaypts.length - 1] = end.getTranslation();
+      newWaypts[newWaypts.length - 1] = new Translation2d(xFinal[0], yFinal[0]);
 
       final double[] a = new double[1 + newWaypts.length - 3];
 
@@ -90,8 +128,8 @@ public final class SplineHelper {
       }
       c[c.length - 1] = 0.0;
 
-      dx[0] = 3 * (newWaypts[2].getX() - newWaypts[0].getX()) - xInitialControlVector[1];
-      dy[0] = 3 * (newWaypts[2].getY() - newWaypts[0].getY()) - yInitialControlVector[1];
+      dx[0] = 3 * (newWaypts[2].getX() - newWaypts[0].getX()) - xInitial[1];
+      dy[0] = 3 * (newWaypts[2].getY() - newWaypts[0].getY()) - yInitial[1];
 
       if (newWaypts.length > 4) {
         for (int i = 1; i <= newWaypts.length; i++) {
@@ -101,9 +139,9 @@ public final class SplineHelper {
       }
 
       dx[dx.length - 1] = 3 * (newWaypts[newWaypts.length - 1].getX()
-          - newWaypts[newWaypts.length - 3].getX()) - xFinalControlVector[1];
+          - newWaypts[newWaypts.length - 3].getX()) - xFinal[1];
       dy[dy.length - 1] = 3 * (newWaypts[newWaypts.length - 1].getY()
-          - newWaypts[newWaypts.length - 3].getY()) - yFinalControlVector[1];
+          - newWaypts[newWaypts.length - 3].getY()) - yFinal[1];
 
       thomasAlgorithm(a, b, c, dx, fx);
       thomasAlgorithm(a, b, c, dy, fy);
@@ -111,12 +149,12 @@ public final class SplineHelper {
       double[] newFx = new double[fx.length + 2];
       double[] newFy = new double[fy.length + 2];
 
-      newFx[0] = xInitialControlVector[1];
-      newFy[0] = yInitialControlVector[1];
+      newFx[0] = xInitial[1];
+      newFy[0] = yInitial[1];
       System.arraycopy(fx, 0, newFx, 1, fx.length);
       System.arraycopy(fy, 0, newFy, 1, fy.length);
-      newFx[newFx.length - 1] = xFinalControlVector[1];
-      newFy[newFy.length - 1] = yFinalControlVector[1];
+      newFx[newFx.length - 1] = xFinal[1];
+      newFy[newFy.length - 1] = yFinal[1];
 
       for (int i = 0; i < newFx.length - 1; i++) {
         splines[i] = new CubicHermiteSpline(
@@ -127,59 +165,49 @@ public final class SplineHelper {
         );
       }
     } else if (waypoints.length == 1) {
-      final var xDeriv = (3 * (end.getTranslation().getX()
-          - start.getTranslation().getX())
-          - xFinalControlVector[1] - xInitialControlVector[1])
+      final var xDeriv = (3 * (xFinal[0]
+          - xInitial[0])
+          - xFinal[1] - xInitial[1])
           / 4.0;
-      final var yDeriv = (3 * (end.getTranslation().getY()
-          - start.getTranslation().getY())
-          - yFinalControlVector[1] - yInitialControlVector[1])
+      final var yDeriv = (3 * (yFinal[0]
+          - yInitial[0])
+          - yFinal[1] - yInitial[1])
           / 4.0;
 
       double[] midXControlVector = {waypoints[0].getX(), xDeriv};
       double[] midYControlVector = {waypoints[0].getX(), yDeriv};
 
-      splines[0] = new CubicHermiteSpline(xInitialControlVector, midXControlVector,
-          yInitialControlVector, midYControlVector);
-      splines[1] = new CubicHermiteSpline(midXControlVector, xFinalControlVector,
-          midYControlVector, yFinalControlVector);
+      splines[0] = new CubicHermiteSpline(xInitial, midXControlVector,
+          yInitial, midYControlVector);
+      splines[1] = new CubicHermiteSpline(midXControlVector, xFinal,
+          midYControlVector, yFinal);
     } else {
-      splines[0] = new CubicHermiteSpline(xInitialControlVector, xFinalControlVector,
-          yInitialControlVector, yFinalControlVector);
+      splines[0] = new CubicHermiteSpline(xInitial, xFinal,
+          yInitial, yFinal);
     }
     return splines;
   }
 
   /**
-   * Returns a set of quintic splines corresponding to the provided waypoints.
-   * The user is free to set the direction of all waypoints. Continuous
+   * Returns a set of quintic splines corresponding to the provided control vectors.
+   * The user is free to set the direction of all control vectors. Continuous
    * curvature is guaranteed throughout the path.
    *
-   * @param waypoints The waypoints.
+   * @param controlVectors The control vectors.
    * @return A vector of quintic hermite splines that interpolate through the
    *         provided waypoints.
    */
   @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
-  public static QuinticHermiteSpline[] getQuinticSplinesFromWaypoints(Pose2d[] waypoints) {
-    QuinticHermiteSpline[] splines = new QuinticHermiteSpline[waypoints.length - 1];
-    for (int i = 0; i < waypoints.length - 1; i++) {
-      var p0 = waypoints[i];
-      var p1 = waypoints[i + 1];
-
-      // This just makes the splines look better.
-      final var scalar = 1.2 * p0.getTranslation().getDistance(p1.getTranslation());
-
-      double[] xInitialControlVector =
-          {p0.getTranslation().getX(), scalar * p0.getRotation().getCos(), 0.0};
-      double[] xFinalControlVector =
-          {p1.getTranslation().getX(), scalar * p1.getRotation().getCos(), 0.0};
-      double[] yInitialControlVector =
-          {p0.getTranslation().getY(), scalar * p0.getRotation().getSin(), 0.0};
-      double[] yFinalControlVector =
-          {p1.getTranslation().getY(), scalar * p1.getRotation().getSin(), 0.0};
-
-      splines[i] = new QuinticHermiteSpline(xInitialControlVector, xFinalControlVector,
-          yInitialControlVector, yFinalControlVector);
+  public static QuinticHermiteSpline[] getQuinticSplinesFromControlVectors(
+      Spline.ControlVector[] controlVectors) {
+    QuinticHermiteSpline[] splines = new QuinticHermiteSpline[controlVectors.length - 1];
+    for (int i = 0; i < controlVectors.length - 1; i++) {
+      var xInitial = controlVectors[i].x;
+      var xFinal = controlVectors[i + 1].x;
+      var yInitial = controlVectors[i].y;
+      var yFinal = controlVectors[i + 1].y;
+      splines[i] = new QuinticHermiteSpline(xInitial, xFinal,
+          yInitial, yFinal);
     }
     return splines;
   }
@@ -217,5 +245,19 @@ public final class SplineHelper {
     for (int i = N - 2; i >= 0; i--) {
       solutionVector[i] = dStar[i] - cStar[i] * solutionVector[i + 1];
     }
+  }
+
+  private static Spline.ControlVector getCubicControlVector(double scalar, Pose2d point) {
+    return new Spline.ControlVector(
+        new double[]{point.getTranslation().getX(), scalar * point.getRotation().getCos()},
+        new double[]{point.getTranslation().getY(), scalar * point.getRotation().getSin()}
+    );
+  }
+
+  private static Spline.ControlVector getQuinticControlVector(double scalar, Pose2d point) {
+    return new Spline.ControlVector(
+        new double[]{point.getTranslation().getX(), scalar * point.getRotation().getCos(), 0.0},
+        new double[]{point.getTranslation().getY(), scalar * point.getRotation().getSin(), 0.0}
+    );
   }
 }
