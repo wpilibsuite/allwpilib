@@ -73,8 +73,9 @@ public final class TrajectoryGenerator {
 
     // Generate and return trajectory.
     return TrajectoryParameterizer.timeParameterizeTrajectory(points, config.getConstraints(),
-        config.getStartVelocity(), config.getEndVelocity(), config.getMaxVelocity(),
-        config.getMaxAcceleration(), config.isReversed());
+        config.getStartVelocityMetersPerSecond(), config.getEndVelocityMetersPerSecond(),
+        config.getMaxVelocityMetersPerSecond(), config.getMaxAccelerationMetersPerSecondSq(),
+        config.isReversed());
   }
 
   /**
@@ -143,8 +144,9 @@ public final class TrajectoryGenerator {
 
     // Generate and return trajectory.
     return TrajectoryParameterizer.timeParameterizeTrajectory(points, config.getConstraints(),
-        config.getStartVelocity(), config.getEndVelocity(), config.getMaxVelocity(),
-        config.getMaxAcceleration(), config.isReversed());
+        config.getStartVelocityMetersPerSecond(), config.getEndVelocityMetersPerSecond(),
+        config.getMaxVelocityMetersPerSecond(), config.getMaxAccelerationMetersPerSecondSq(),
+        config.isReversed());
 
   }
 

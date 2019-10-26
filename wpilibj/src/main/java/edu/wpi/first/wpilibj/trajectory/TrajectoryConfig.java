@@ -79,9 +79,9 @@ public class TrajectoryConfig {
   /**
    * Returns the starting velocity of the trajectory.
    *
-   * @return The starting velocity of the trajectory.
+   * @return The starting velocity of the trajectory in meters per second.
    */
-  public double getStartVelocity() {
+  public double getStartVelocityMetersPerSecond() {
     return m_startVelocity;
   }
 
@@ -99,9 +99,9 @@ public class TrajectoryConfig {
   /**
    * Returns the starting velocity of the trajectory.
    *
-   * @return The starting velocity of the trajectory.
+   * @return The starting velocity of the trajectory in meters per second.
    */
-  public double getEndVelocity() {
+  public double getEndVelocityMetersPerSecond() {
     return m_endVelocity;
   }
 
@@ -119,18 +119,18 @@ public class TrajectoryConfig {
   /**
    * Returns the maximum velocity of the trajectory.
    *
-   * @return The maximum velocity of the trajectory.
+   * @return The maximum velocity of the trajectory in meters per second.
    */
-  public double getMaxVelocity() {
+  public double getMaxVelocityMetersPerSecond() {
     return m_maxVelocity;
   }
 
   /**
    * Returns the maximum acceleration of the trajectory.
    *
-   * @return The maximum acceleration of the trajectory.
+   * @return The maximum acceleration of the trajectory in meters per second squared.
    */
-  public double getMaxAcceleration() {
+  public double getMaxAccelerationMetersPerSecondSq() {
     return m_maxAcceleration;
   }
 
