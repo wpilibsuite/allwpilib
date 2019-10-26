@@ -25,7 +25,7 @@ void TrapezoidProfileCommand::Initialize() {
 }
 
 void TrapezoidProfileCommand::Execute() {
-  m_output(m_profile.Calculate(units::second_t(m_timer.Get())));
+  m_output(m_profile.Calculate(m_timer.Get()));
 }
 
 void TrapezoidProfileCommand::End(bool interrupted) { m_timer.Stop(); }
