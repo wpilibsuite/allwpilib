@@ -7,6 +7,7 @@
 namespace hal {
 struct DutyCycle {
   std::unique_ptr<tDutyCycle> dutyCycle;
+  int index;
 };
 
 extern LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,

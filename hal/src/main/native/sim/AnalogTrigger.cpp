@@ -92,6 +92,12 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
   return handle;
 }
 
+HAL_AnalogTriggerHandle HAL_InitalizeAnalogTriggerDutyCycle(
+    HAL_DutyCycleHandle dutyCycleHandle, int32_t* index, int32_t* status) {
+  *status = HAL_SIM_NOT_SUPPORTED;
+  return HAL_kInvalidHandle;
+}
+
 void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle,
                             int32_t* status) {
   auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
@@ -133,6 +139,11 @@ void HAL_SetAnalogTriggerLimitsRaw(HAL_AnalogTriggerHandle analogTriggerHandle,
   SimAnalogTriggerData[trigger->index].triggerUpperBound = trigUpper;
   SimAnalogTriggerData[trigger->index].triggerLowerBound = trigLower;
 }
+
+void HAL_SetAnalogTriggerLimitsDutyCycle(HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper, int32_t* status) {
+  *status = HAL_SIM_NOT_SUPPORTED;
+}
+
 void HAL_SetAnalogTriggerLimitsVoltage(
     HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper,
     int32_t* status) {

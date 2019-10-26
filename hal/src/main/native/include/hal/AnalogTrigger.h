@@ -85,7 +85,7 @@ void HAL_SetAnalogTriggerLimitsVoltage(
     HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper,
     int32_t* status);
 
-void HAL_SetAnalogTriggerLimitsDutyCycle(HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double higher, int32_t* status);
+void HAL_SetAnalogTriggerLimitsDutyCycle(HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper, int32_t* status);
 
 /**
  * Configures the analog trigger to use the averaged vs. raw values.

@@ -27,6 +27,7 @@ extern void InitializeCanData();
 extern void InitializeCANAPI();
 extern void InitializeDigitalPWMData();
 extern void InitializeDIOData();
+extern void InitializeDutyCycle();
 extern void InitializeDriverStationData();
 extern void InitializeEncoderData();
 extern void InitializeI2CData();
