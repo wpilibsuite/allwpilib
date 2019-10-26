@@ -508,7 +508,7 @@ Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTrigger
  * Signature: (ILjava/nio/IntBuffer;)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTriggerDutyCycle
-  (JNIEnv *, jclass, jint, jobject) {
+  (JNIEnv *env , jclass, jint id, jobject index) {
       jint* indexHandle =
       reinterpret_cast<jint*>(env->GetDirectBufferAddress(index));
   int32_t status = 0;
