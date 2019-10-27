@@ -94,7 +94,7 @@ static void SetupCameraServerShared() {
     wpi::outs().flush();
   }
 #else
-  SetCameraServerShared(new WPILibCameraServerShared{});
+  CameraServer_SetCameraServerShared(new WPILibCameraServerShared{});
 #endif
 #else
   wpi::outs() << "Not loading CameraServerShared\n";
