@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "frc/shuffleboard/SendableCameraWrapper.h"
+
 #include <functional>
 #include <memory>
 #include <string>
@@ -15,20 +17,20 @@
 #include "frc/smartdashboard/SendableRegistry.h"
 
 namespace frc {
-class SendableCameraWrapper;
 namespace detail {
-std::shared_ptr<SendableCameraWrapper>& GetSendableCameraWrapper(int source) {
+std::shared_ptr<SendableCameraWrapper>& GetSendableCameraWrapper(
+    CS_Source source) {
   static wpi::DenseMap<int, std::shared_ptr<SendableCameraWrapper>> wrappers;
-  return wrappers[source];
-}
-
-void CreateSendableCameraWrapperSendable(std::function<std::string()> urlGetter,
-                                         SendableBuilder& builder) {
-  builder.AddStringProperty(".ShuffleboardURI", std::move(urlGetter), nullptr);
+  return wrappers[static_cast<int>(source)];
 }
 
 void AddToSendableRegistry(frc::Sendable* sendable, std::string name) {
   SendableRegistry::GetInstance().Add(sendable, name);
 }
 }  // namespace detail
+
+void SendableCameraWrapper::InitSendable(SendableBuilder& builder) {
+  builder.AddStringProperty(".ShuffleboardURI", [this] { return m_uri; },
+                            nullptr);
+}
 }  // namespace frc
