@@ -1,21 +1,28 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include "hal/DutyCycle.h"
 
 #include <memory>
 
-#include "hal/handles/HandlesInternal.h"
-#include "hal/handles/LimitedHandleResource.h"
-#include "hal/Errors.h"
-#include "hal/ChipObject.h"
-#include "PortsInternal.h"
-#include "HALInitializer.h"
 #include "DigitalInternal.h"
 #include "DutyCycleInternal.h"
+#include "HALInitializer.h"
+#include "PortsInternal.h"
+#include "hal/ChipObject.h"
+#include "hal/Errors.h"
+#include "hal/handles/HandlesInternal.h"
+#include "hal/handles/LimitedHandleResource.h"
 
 using namespace hal;
 
 namespace hal {
 LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
-                             HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
+                      HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
 namespace init {
 void InitializeDutyCycle() {
   static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
@@ -68,7 +75,7 @@ void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
 }
 
 int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
-                                   int32_t* status) {
+                                  int32_t* status) {
   auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
   if (!dutyCycle) {
     *status = HAL_HANDLE_ERROR;
@@ -79,12 +86,12 @@ int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
 }
 
 double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
-                                   int32_t* status) {
+                              int32_t* status) {
   return HAL_GetDutyCycleOutputRaw(dutyCycleHandle, status) / kScaleFactor;
 }
 
 int32_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
-                                   int32_t* status) {
+                                  int32_t* status) {
   auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
   if (!dutyCycle) {
     *status = HAL_HANDLE_ERROR;
@@ -95,7 +102,7 @@ int32_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
 }
 
 int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,
-                                   int32_t* status) {
+                                          int32_t* status) {
   return kScaleFactor;
 }
-}
+}  // extern "C"

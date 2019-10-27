@@ -45,7 +45,8 @@ AnalogTrigger::AnalogTrigger(DutyCycle* input) {
   m_dutyCycle = input;
   int32_t status = 0;
   int index = 0;
-  m_trigger = HAL_InitializeAnalogTriggerDutyCycle(input->m_handle, &index, &status);
+  m_trigger =
+      HAL_InitializeAnalogTriggerDutyCycle(input->m_handle, &index, &status);
   if (status != 0) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
     m_index = std::numeric_limits<int>::max();

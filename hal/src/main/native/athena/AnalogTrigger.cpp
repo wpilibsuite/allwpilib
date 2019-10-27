@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,14 +8,14 @@
 #include "hal/AnalogTrigger.h"
 
 #include "AnalogInternal.h"
+#include "DutyCycleInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/AnalogInput.h"
+#include "hal/DutyCycle.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
-#include "DutyCycleInternal.h"
-#include "hal/DutyCycle.h"
 
 using namespace hal;
 
@@ -126,7 +126,9 @@ void HAL_SetAnalogTriggerLimitsRaw(HAL_AnalogTriggerHandle analogTriggerHandle,
   trigger->trigger->writeUpperLimit(upper, status);
 }
 
-void HAL_SetAnalogTriggerLimitsDutyCycle(HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper, int32_t* status) {
+void HAL_SetAnalogTriggerLimitsDutyCycle(
+    HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper,
+    int32_t* status) {
   auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
   if (trigger == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -146,13 +148,16 @@ void HAL_SetAnalogTriggerLimitsDutyCycle(HAL_AnalogTriggerHandle analogTriggerHa
     return;
   }
 
-  int32_t scaleFactor = HAL_GetDutyCycleOutputScaleFactor(trigger->handle, status);
+  int32_t scaleFactor =
+      HAL_GetDutyCycleOutputScaleFactor(trigger->handle, status);
   if (*status != 0) {
     return;
   }
 
-  trigger->trigger->writeLowerLimit(static_cast<int32_t>(scaleFactor * lower), status);
-  trigger->trigger->writeLowerLimit(static_cast<int32_t>(scaleFactor * upper), status);
+  trigger->trigger->writeLowerLimit(static_cast<int32_t>(scaleFactor * lower),
+                                    status);
+  trigger->trigger->writeLowerLimit(static_cast<int32_t>(scaleFactor * upper),
+                                    status);
 }
 
 void HAL_SetAnalogTriggerLimitsVoltage(
@@ -188,8 +193,8 @@ void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analogTriggerHandle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  if (trigger->trigger->readSourceSelect_Filter(status) != 0
-      || trigger->trigger->readSourceSelect_DutyCycle(status) != 0) {
+  if (trigger->trigger->readSourceSelect_Filter(status) != 0 ||
+      trigger->trigger->readSourceSelect_DutyCycle(status) != 0) {
     *status = INCOMPATIBLE_STATE;
     // TODO: wpi_setWPIErrorWithContext(IncompatibleMode, "Hardware does not
     // support average and filtering at the same time.");
@@ -204,8 +209,8 @@ void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analogTriggerHandle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  if (trigger->trigger->readSourceSelect_Averaged(status) != 0
-      || trigger->trigger->readSourceSelect_DutyCycle(status) != 0) {
+  if (trigger->trigger->readSourceSelect_Averaged(status) != 0 ||
+      trigger->trigger->readSourceSelect_DutyCycle(status) != 0) {
     *status = INCOMPATIBLE_STATE;
     // TODO: wpi_setWPIErrorWithContext(IncompatibleMode, "Hardware does not "
     // "support average and filtering at the same time.");

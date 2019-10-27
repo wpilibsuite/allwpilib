@@ -505,11 +505,13 @@ Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTrigger
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    initializeAnalogTriggerDutyCycle
- * Signature: (ILjava/nio/IntBuffer;)I
+ * Signature: (ILjava/lang/Object;)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTriggerDutyCycle
-  (JNIEnv *env , jclass, jint id, jobject index) {
-      jint* indexHandle =
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTriggerDutyCycle
+  (JNIEnv* env, jclass, jint id, jobject index)
+{
+  jint* indexHandle =
       reinterpret_cast<jint*>(env->GetDirectBufferAddress(index));
   int32_t status = 0;
   HAL_AnalogTriggerHandle analogTrigger = HAL_InitializeAnalogTriggerDutyCycle(
@@ -517,8 +519,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTriggerD
       &status);
   CheckStatus(env, status);
   return (jint)analogTrigger;
-  }
-
+}
 
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
@@ -537,7 +538,7 @@ Java_edu_wpi_first_hal_AnalogJNI_cleanAnalogTrigger
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogTriggerLimitsRaw
- * Signature: (IDD)V
+ * Signature: (III)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_AnalogJNI_setAnalogTriggerLimitsRaw
@@ -552,15 +553,17 @@ Java_edu_wpi_first_hal_AnalogJNI_setAnalogTriggerLimitsRaw
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    setAnalogTriggerLimitsDutyCycle
- * Signature: (III)V
+ * Signature: (IDD)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_AnalogJNI_setAnalogTriggerLimitsDutyCycle
-  (JNIEnv * env, jclass, jint id, jdouble lower, jdouble upper) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_AnalogJNI_setAnalogTriggerLimitsDutyCycle
+  (JNIEnv* env, jclass, jint id, jdouble lower, jdouble upper)
+{
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsDutyCycle((HAL_AnalogTriggerHandle)id, lower, upper,
-                                &status);
+                                      &status);
   CheckStatus(env, status);
-  }
+}
 
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI

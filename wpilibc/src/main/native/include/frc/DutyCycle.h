@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #pragma once
 
 #include <memory>
@@ -12,12 +19,15 @@ namespace frc {
 class DigitalSource;
 class AnalogTrigger;
 
-class DutyCycle : public ErrorBase, public Sendable, public SendableHelper<DutyCycle> {
+class DutyCycle : public ErrorBase,
+                  public Sendable,
+                  public SendableHelper<DutyCycle> {
   friend class AnalogTrigger;
-public:
-  DutyCycle(DigitalSource& source);
-  DutyCycle(DigitalSource* source);
-  DutyCycle(std::shared_ptr<DigitalSource> source);
+
+ public:
+  explicit DutyCycle(DigitalSource& source);
+  explicit DutyCycle(DigitalSource* source);
+  explicit DutyCycle(std::shared_ptr<DigitalSource> source);
 
   ~DutyCycle() override;
 
@@ -30,9 +40,10 @@ public:
   unsigned int GetOutputScaleFactor() const;
 
   void InitSendable(SendableBuilder& builder) override;
-private:
+
+ private:
   void InitDutyCycle();
   std::shared_ptr<DigitalSource> m_source;
   hal::Handle<HAL_DutyCycleHandle> m_handle;
 };
-}
+}  // namespace frc

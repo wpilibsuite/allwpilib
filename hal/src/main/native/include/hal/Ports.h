@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -147,7 +147,7 @@ int32_t HAL_GetNumPDPChannels(void);
 
 /**
  * Gets the number of duty cycle inputs in the current system.
- * 
+ *
  * @return the number of Duty Cycle inputs
  */
 int32_t HAL_GetNumDutyCycles(void);
