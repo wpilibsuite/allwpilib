@@ -16,6 +16,7 @@
 #include "SwerveDriveKinematics.h"
 #include "SwerveModuleState.h"
 #include "frc/geometry/Pose2d.h"
+#include "frc2/Timer.h"
 
 namespace frc {
 
@@ -95,9 +96,8 @@ class SwerveDriveOdometry {
   template <typename... ModuleStates>
   const Pose2d& Update(const Rotation2d& angle,
                        ModuleStates&&... moduleStates) {
-    const auto now = std::chrono::system_clock::now().time_since_epoch();
-    units::second_t time{now};
-    return UpdateWithTime(time, angle, moduleStates...);
+    return UpdateWithTime(frc2::Timer::GetFPGATimestamp(), angle,
+                          moduleStates...);
   }
 
  private:
