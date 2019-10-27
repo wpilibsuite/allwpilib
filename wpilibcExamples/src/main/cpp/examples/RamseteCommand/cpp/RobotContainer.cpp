@@ -45,11 +45,10 @@ void RobotContainer::ConfigureButtonBindings() {
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
-  frc::TrajectoryConfig config =
-      frc::TrajectoryConfig(AutoConstants::kMaxSpeed,
-                            AutoConstants::kMaxAcceleration)
-          // Add kinematics to ensure max speed is actually obeyed
-          .SetKinematics(DriveConstants::kDriveKinematics);
+  frc::TrajectoryConfig(AutoConstants::kMaxSpeed,
+                        AutoConstants::kMaxAcceleration);
+  // Add kinematics to ensure max speed is actually obeyed
+  config.SetKinematics(DriveConstants::kDriveKinematics);
 
   // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
