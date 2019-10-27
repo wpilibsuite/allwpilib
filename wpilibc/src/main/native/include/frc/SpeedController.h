@@ -7,7 +7,10 @@
 
 #pragma once
 
+#include <units/units.h>
+
 #include "frc/PIDOutput.h"
+#include "frc/RobotController.h"
 
 namespace frc {
 
@@ -24,6 +27,18 @@ class SpeedController : public PIDOutput {
    * @param speed The speed to set.  Value should be between -1.0 and 1.0.
    */
   virtual void Set(double speed) = 0;
+
+  /**
+   * Sets the voltage output of the SpeedController.  Compensates for
+   * fluctuations in the bus voltage to keep the output voltage constant even
+   * when battery voltage fluctuates - highly useful when the voltage outputs
+   * are "meaningful" (e.g. they come from a feedforward calculation).
+   *
+   * @param output The voltage to output.
+   */
+  virtual void SetVoltage(units::volt_t output) {
+    Set(output / units::volt_t(RobotController::GetInputVoltage()));
+  }
 
   /**
    * Common interface for getting the current set speed of a speed controller.

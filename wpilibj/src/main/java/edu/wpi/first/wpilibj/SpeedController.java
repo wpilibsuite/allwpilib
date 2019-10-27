@@ -19,6 +19,18 @@ public interface SpeedController extends PIDOutput {
   void set(double speed);
 
   /**
+   * Sets the voltage output of the SpeedController.  Compensates for fluctuations in the bus
+   * voltage to keep the output voltage constant even when battery voltage fluctuates - highly
+   * useful when the voltage outputs are "meaningful" (e.g. they come from a feedforward
+   * calculation).
+   *
+   * @param outputVolts The voltage to output.
+   */
+  default void setVoltage(double outputVolts) {
+    set(outputVolts / RobotController.getBatteryVoltage());
+  }
+
+  /**
    * Common interface for getting the current set speed of a speed controller.
    *
    * @return The current set speed. Value is between -1.0 and 1.0.

@@ -75,13 +75,11 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       },
       frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
       frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
-      [this](auto left, auto right) {
-        m_drive.TankDrive(left / 12_V, right / 12_V);
-      },
+      [this](auto left, auto right) { m_drive.TankDriveVolts(left, right); },
       {&m_drive});
 
   // no auto
   return new frc2::SequentialCommandGroup(
       std::move(ramseteCommand),
-      frc2::InstantCommand([this] { m_drive.TankDrive(0, 0); }, {}));
+      frc2::InstantCommand([this] { m_drive.TankDriveVolts(0_V, 0_V); }, {}));
 }

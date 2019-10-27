@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <units/units.h>
+
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
@@ -38,13 +40,12 @@ class DriveSubsystem : public frc2::SubsystemBase {
   void ArcadeDrive(double fwd, double rot);
 
   /**
-   * Drives the robot using tank controls.  Does not square inputs to enable
-   * composition with external controllers.
+   * Controls each side of the drive directly with a voltage.
    *
    * @param left the commanded left output
    * @param right the commanded right output
    */
-  void TankDrive(double left, double right);
+  void TankDriveVolts(units::volt_t left, units::volt_t right);
 
   /**
    * Resets the drive encoders to currently read a position of 0.
