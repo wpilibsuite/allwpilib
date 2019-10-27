@@ -83,5 +83,5 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   // no auto
   return new frc2::SequentialCommandGroup(
       std::move(ramseteCommand),
-      frc2::InstantCommand([this]() { m_drive.TankDrive(0, 0); }, {}));
+      frc2::InstantCommand([this] { m_drive.TankDrive(0, 0); }, {}));
 }
