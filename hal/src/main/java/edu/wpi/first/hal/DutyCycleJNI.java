@@ -15,4 +15,5 @@ public class DutyCycleJNI extends JNIWrapper {
   public static native double getOutput(int handle);
   public static native int getOutputRaw(int handle);
   public static native int getOutputScaleFactor(int handle);
+  public static native int getFPGAIndex(int handle);
 }

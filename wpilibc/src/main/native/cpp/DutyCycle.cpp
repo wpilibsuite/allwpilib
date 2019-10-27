@@ -9,6 +9,7 @@
 
 #include <hal/DutyCycle.h>
 #include <hal/HALBase.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/DigitalSource.h"
 #include "frc/WPIErrors.h"
@@ -40,6 +41,21 @@ DutyCycle::DutyCycle(std::shared_ptr<DigitalSource> source)
 }
 
 DutyCycle::~DutyCycle() { HAL_FreeDutyCycle(m_handle); }
+
+void DutyCycle::InitDutyCycle() {
+  int32_t status = 0;
+  m_handle = HAL_InitializeDutyCycle(m_source->GetPortHandleForRouting(), static_cast<HAL_AnalogTriggerType>(m_source->GetAnalogTriggerTypeForRouting()), &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  HAL_Report(HALUsageReporting::kResourceType_DutyCycle, GetFPGAIndex());
+  SendableRegistry::GetInstance().AddLW(this, "Duty Cycle", m_source->GetChannel());
+}
+
+int DutyCycle::GetFPGAIndex() const {
+  int32_t status = 0;
+  auto retVal = HAL_GetDutyCycleFPGAIndex(m_handle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  return retVal;
+}
 
 int DutyCycle::GetFrequency() const {
   int32_t status = 0;

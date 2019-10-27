@@ -37,18 +37,17 @@ extern "C" {
  * Initializes an analog trigger.
  *
  * @param portHandle the analog input to use for triggering
- * @param index      the trigger index value (output)
  * @return           the created analog trigger handle
  */
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
-    HAL_AnalogInputHandle portHandle, int32_t* index, int32_t* status);
+    HAL_AnalogInputHandle portHandle, int32_t* status);
 
 /**
  * Initializes an analog trigger with a Duty Cycle input
  *
  */
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
-    HAL_DutyCycleHandle dutyCycleHandle, int32_t* index, int32_t* status);
+    HAL_DutyCycleHandle dutyCycleHandle, int32_t* status);
 
 /**
  * Frees an analog trigger.
@@ -154,6 +153,8 @@ HAL_Bool HAL_GetAnalogTriggerTriggerState(
 HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
                                     HAL_AnalogTriggerType type,
                                     int32_t* status);
+
+int32_t HAL_GetAnalogTriggerFPGAIndex(HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

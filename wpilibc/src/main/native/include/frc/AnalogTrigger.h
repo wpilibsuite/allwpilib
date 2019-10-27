@@ -168,7 +168,6 @@ class AnalogTrigger : public ErrorBase,
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  int m_index;
   hal::Handle<HAL_AnalogTriggerHandle> m_trigger;
   AnalogInput* m_analogInput = nullptr;
   DutyCycle* m_dutyCycle = nullptr;

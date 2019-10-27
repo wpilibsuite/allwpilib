@@ -27,6 +27,7 @@ int32_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
                                   int32_t* status);
 int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,
                                           int32_t* status);
+int32_t HAL_GetDutyCycleFPGAIndex(HAL_DutyCycleHandle dutyCycleHandle, int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

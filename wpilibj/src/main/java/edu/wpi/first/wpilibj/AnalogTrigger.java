@@ -42,7 +42,6 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
    * Where the analog trigger is attached.
    */
   protected int m_port;
-  protected int m_index;
   protected AnalogInput m_analogInput;
   protected DutyCycle m_dutyCycle;
   protected boolean m_ownsAnalog;
@@ -66,15 +65,13 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
    */
   public AnalogTrigger(AnalogInput channel) {
     m_analogInput = channel;
-    ByteBuffer index = ByteBuffer.allocateDirect(4);
-    index.order(ByteOrder.LITTLE_ENDIAN);
 
-    m_port =
-        AnalogJNI.initializeAnalogTrigger(channel.m_port, index.asIntBuffer());
-    m_index = index.asIntBuffer().get(0);
+    m_port = AnalogJNI.initializeAnalogTrigger(channel.m_port);
 
-    HAL.report(tResourceType.kResourceType_AnalogTrigger, m_index);
-    SendableRegistry.addLW(this, "AnalogTrigger", m_index);
+    int index = getIndex();
+
+    HAL.report(tResourceType.kResourceType_AnalogTrigger, index);
+    SendableRegistry.addLW(this, "AnalogTrigger", index);
   }
 
   /**
@@ -84,15 +81,13 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
    */
   public AnalogTrigger(DutyCycle input) {
     m_dutyCycle = input;
-    ByteBuffer index = ByteBuffer.allocateDirect(4);
-    index.order(ByteOrder.LITTLE_ENDIAN);
 
-    m_port =
-        AnalogJNI.initializeAnalogTriggerDutyCycle(input.m_handle, index.asIntBuffer());
-    m_index = index.asIntBuffer().get(0);
+    m_port = AnalogJNI.initializeAnalogTriggerDutyCycle(input.m_handle);
 
-    HAL.report(tResourceType.kResourceType_AnalogTrigger, m_index);
-    SendableRegistry.addLW(this, "AnalogTrigger", m_index);
+    int index = getIndex();
+
+    HAL.report(tResourceType.kResourceType_AnalogTrigger, index);
+    SendableRegistry.addLW(this, "AnalogTrigger", index);
   }
 
   @Override
@@ -174,8 +169,8 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
    *
    * @return The index of the analog trigger.
    */
-  public int getIndex() {
-    return m_index;
+  public final int getIndex() {
+    return AnalogJNI.getAnalogTriggerFPGAIndex(m_port);
   }
 
   /**

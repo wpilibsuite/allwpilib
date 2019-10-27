@@ -39,6 +39,8 @@ class DutyCycle : public ErrorBase,
   unsigned int GetOutputRaw() const;
   unsigned int GetOutputScaleFactor() const;
 
+  int GetFPGAIndex() const;
+
   void InitSendable(SendableBuilder& builder) override;
 
  private:

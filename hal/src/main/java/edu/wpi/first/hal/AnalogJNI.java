@@ -7,8 +7,6 @@
 
 package edu.wpi.first.hal;
 
-import java.nio.IntBuffer;
-
 public class AnalogJNI extends JNIWrapper {
   /**
    * <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:58</i><br> enum values
@@ -94,9 +92,9 @@ public class AnalogJNI extends JNIWrapper {
 
   public static native void getAccumulatorOutput(int analogPortHandle, AccumulatorResult result);
 
-  public static native int initializeAnalogTrigger(int analogInputHandle, IntBuffer index);
+  public static native int initializeAnalogTrigger(int analogInputHandle);
 
-  public static native int initializeAnalogTriggerDutyCycle(int dutyCycleHandle, IntBuffer index);
+  public static native int initializeAnalogTriggerDutyCycle(int dutyCycleHandle);
 
   public static native void cleanAnalogTrigger(int analogTriggerHandle);
 
@@ -120,4 +118,6 @@ public class AnalogJNI extends JNIWrapper {
   public static native boolean getAnalogTriggerTriggerState(int analogTriggerHandle);
 
   public static native boolean getAnalogTriggerOutput(int analogTriggerHandle, int type);
+
+  public static native int getAnalogTriggerFPGAIndex(int analogTriggerHandle);
 }

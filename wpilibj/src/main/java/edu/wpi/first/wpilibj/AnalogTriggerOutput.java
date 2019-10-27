@@ -98,7 +98,7 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
 
   @Override
   public int getChannel() {
-    return m_trigger.m_index;
+    return m_trigger.getIndex();
   }
 
   @Override

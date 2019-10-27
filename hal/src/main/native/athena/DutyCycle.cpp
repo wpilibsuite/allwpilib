@@ -66,6 +66,7 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_Handle digitalSourceHandle,
   dutyCycle->dutyCycle->writeSource_AnalogTrigger(routingAnalogTrigger, status);
   dutyCycle->dutyCycle->writeSource_Channel(routingChannel, status);
   dutyCycle->dutyCycle->writeSource_Module(routingModule, status);
+  dutyCycle->index = index;
 
   return handle;
 }
@@ -104,5 +105,14 @@ int32_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
 int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,
                                           int32_t* status) {
   return kScaleFactor;
+}
+
+int32_t HAL_GetDutyCycleFPGAIndex(HAL_DutyCycleHandle dutyCycleHandle, int32_t* status) {
+  auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
+  if (!dutyCycle) {
+    *status = HAL_HANDLE_ERROR;
+    return -1;
+  }
+  return dutyCycle->index;
 }
 }  // extern "C"

@@ -76,7 +76,7 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
 }
 
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
-    HAL_DutyCycleHandle dutyCycleHandle, int32_t* index, int32_t* status) {
+    HAL_DutyCycleHandle dutyCycleHandle, int32_t* status) {
   hal::init::CheckInit();
   // ensure we are given a valid and active DutyCycle handle
   auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
@@ -96,7 +96,6 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
   }
   trigger->handle = dutyCycleHandle;
   trigger->index = static_cast<uint8_t>(getHandleIndex(handle));
-  *index = trigger->index;
 
   trigger->trigger.reset(tAnalogTrigger::create(trigger->index, status));
   trigger->trigger->writeSourceSelect_Channel(dutyCycle->index, status);
@@ -263,6 +262,15 @@ HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
       break;
   }
   return result;
+}
+
+int32_t HAL_GetAnalogTriggerFPGAIndex(HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status) {
+  auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
+  if (trigger == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return -1;
+  }
+  return trigger->index;
 }
 
 }  // extern "C"

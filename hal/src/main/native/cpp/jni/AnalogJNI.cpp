@@ -486,18 +486,15 @@ Java_edu_wpi_first_hal_AnalogJNI_getAccumulatorOutput
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    initializeAnalogTrigger
- * Signature: (ILjava/lang/Object;)I
+ * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTrigger
-  (JNIEnv* env, jclass, jint id, jobject index)
+  (JNIEnv* env, jclass, jint id)
 {
-  jint* indexHandle =
-      reinterpret_cast<jint*>(env->GetDirectBufferAddress(index));
   int32_t status = 0;
   HAL_AnalogTriggerHandle analogTrigger = HAL_InitializeAnalogTrigger(
-      (HAL_AnalogInputHandle)id, reinterpret_cast<int32_t*>(indexHandle),
-      &status);
+      (HAL_AnalogInputHandle)id, &status);
   CheckStatus(env, status);
   return (jint)analogTrigger;
 }
@@ -505,18 +502,15 @@ Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTrigger
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    initializeAnalogTriggerDutyCycle
- * Signature: (ILjava/lang/Object;)I
+ * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTriggerDutyCycle
-  (JNIEnv* env, jclass, jint id, jobject index)
+  (JNIEnv* env, jclass, jint id)
 {
-  jint* indexHandle =
-      reinterpret_cast<jint*>(env->GetDirectBufferAddress(index));
   int32_t status = 0;
   HAL_AnalogTriggerHandle analogTrigger = HAL_InitializeAnalogTriggerDutyCycle(
-      (HAL_DutyCycleHandle)id, reinterpret_cast<int32_t*>(indexHandle),
-      &status);
+      (HAL_DutyCycleHandle)id, &status);
   CheckStatus(env, status);
   return (jint)analogTrigger;
 }
@@ -652,6 +646,22 @@ Java_edu_wpi_first_hal_AnalogJNI_getAnalogTriggerOutput
   int32_t status = 0;
   jboolean val = HAL_GetAnalogTriggerOutput(
       (HAL_AnalogTriggerHandle)id, (HAL_AnalogTriggerType)type, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_AnalogJNI
+ * Method:    getAnalogTriggerFPGAIndex
+ * Signature: (I)Z
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogTriggerFPGAIndex
+  (JNIEnv* env, jclass, jint id)
+{
+  int32_t status = 0;
+  auto val = HAL_GetAnalogTriggerFPGAIndex(
+      (HAL_AnalogTriggerHandle)id, &status);
   CheckStatus(env, status);
   return val;
 }

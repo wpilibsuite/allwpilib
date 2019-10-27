@@ -107,4 +107,20 @@ Java_edu_wpi_first_hal_DutyCycleJNI_getOutputScaleFactor
   return retVal;
 }
 
+/*
+ * Class:     edu_wpi_first_hal_DutyCycleJNI
+ * Method:    getFPGAIndex
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_DutyCycleJNI_getFPGAIndex
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto retVal = HAL_GetDutyCycleFPGAIndex(
+      static_cast<HAL_DutyCycleHandle>(handle), &status);
+  CheckStatus(env, status);
+  return retVal;
+}
+
 }  // extern "C"
