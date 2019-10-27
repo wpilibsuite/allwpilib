@@ -48,9 +48,8 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   frc::TrajectoryConfig config =
       frc::TrajectoryConfig(AutoConstants::kMaxSpeed,
                             AutoConstants::kMaxAcceleration)
-          // Add kinematics constraint to ensure max speed is actually obeyed
-          .AddConstraint(frc::DifferentialDriveKinematicsConstraint(
-              DriveConstants::kDriveKinematics, AutoConstants::kMaxSpeed));
+          // Add kinematics to ensure max speed is actually obeyed
+          .SetKinematics(DriveConstants::kDriveKinematics);
 
   // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
