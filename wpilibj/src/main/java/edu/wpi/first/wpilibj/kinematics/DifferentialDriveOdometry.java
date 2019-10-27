@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.kinematics;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
@@ -116,7 +117,7 @@ public class DifferentialDriveOdometry {
    */
   public Pose2d update(Rotation2d angle,
                        DifferentialDriveWheelSpeeds wheelSpeeds) {
-    return updateWithTime(System.currentTimeMillis() / 1000.0,
+    return updateWithTime(Timer.getFPGATimestamp(),
         angle, wheelSpeeds);
   }
 }
