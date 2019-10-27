@@ -7,18 +7,33 @@
 
 #pragma once
 
+#include <functional>
+#include <memory>
 #include <string>
 
-#include <cscore_c.h>
+#ifndef DYNAMIC_CAMERA_SERVER
+#include <cscore_oo.h>
+#else
+namespace cs {
+class VideoSource;
+}  // namespace cs
+typedef int CS_Handle;
+typedef CS_Handle CS_Source;
+#endif
 
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
-namespace cs {
-class VideoSource;
-}  // namespace cs
-
 namespace frc {
+
+class SendableCameraWrapper;
+
+namespace detail {
+constexpr const char* kProtocol = "camera_server://";
+std::shared_ptr<SendableCameraWrapper>& GetSendableCameraWrapper(
+    CS_Source source);
+void AddToSendableRegistry(Sendable* sendable, std::string name);
+}  // namespace detail
 
 /**
  * A wrapper to make video sources sendable and usable from Shuffleboard.
@@ -53,5 +68,28 @@ class SendableCameraWrapper : public Sendable,
  private:
   std::string m_uri;
 };
+
+#ifndef DYNAMIC_CAMERA_SERVER
+inline SendableCameraWrapper::SendableCameraWrapper(CS_Source source,
+                                                    const private_init&)
+    : m_uri(detail::kProtocol) {
+  CS_Status status = 0;
+  auto name = cs::GetSourceName(source, &status);
+  detail::AddToSendableRegistry(this, name);
+  m_uri += name;
+}
+
+inline SendableCameraWrapper& SendableCameraWrapper::Wrap(
+    const cs::VideoSource& source) {
+  return Wrap(source.GetHandle());
+}
+
+inline SendableCameraWrapper& SendableCameraWrapper::Wrap(CS_Source source) {
+  auto& wrapper = detail::GetSendableCameraWrapper(source);
+  if (!wrapper)
+    wrapper = std::make_shared<SendableCameraWrapper>(source, private_init{});
+  return *wrapper;
+}
+#endif
 
 }  // namespace frc
