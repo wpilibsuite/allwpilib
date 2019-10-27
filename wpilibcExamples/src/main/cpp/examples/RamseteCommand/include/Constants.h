@@ -5,6 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <units/units.h>
+
+#include <frc/kinematics/DifferentialDriveKinematics.h>
+#include <frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h>
+
 #pragma once
 
 /**
@@ -27,6 +32,9 @@ const int kRightEncoderPorts[]{2, 3};
 const bool kLeftEncoderReversed = false;
 const bool kRightEncoderReversed = true;
 
+const auto kTrackwidth = .6_m;
+const frc::DifferentialDriveKinematics kDriveKinematics(kTrackwidth);
+
 const int kEncoderCPR = 1024;
 const double kWheelDiameterInches = 6;
 const double kEncoderDistancePerPulse =
@@ -35,22 +43,27 @@ const double kEncoderDistancePerPulse =
 
 const bool kGyroReversed = true;
 
-const double kStabilizationP = 1;
-const double kStabilizationI = .5;
-const double kStabilizationD = 0;
+// These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
+// These characterization values MUST be determined either experimentally or
+// theoretically for *your* robot's drive. The RobotPy Characterization
+// Toolsuite provides a convenient tool for obtaining these values for your
+// robot.
+const auto ks = 1_V;
+const auto kv = .8 * 1_V * 1_s / 1_m;
+const auto ka = .15 * 1_V * 1_s * 1_s / 1_m;
 
-const double kTurnP = 1;
-const double kTurnI = 0;
-const double kTurnD = 0;
-
-const double kTurnToleranceDeg = 5;
-const double kTurnRateToleranceDegPerS = 10;  // degrees per second
+// Example value only - as above, this must be tuned for your drive!
+const double kPDriveVel = .5;
 }  // namespace DriveConstants
 
 namespace AutoConstants {
-const double kAutoDriveDistanceInches = 60;
-const double kAutoBackupDistanceInches = 20;
-const double kAutoDriveSpeed = .5;
+const auto kMaxSpeed = 3_mps;
+const auto kMaxAcceleration = 3_mps_sq;
+
+// Reasonable baseline values for a RAMSETE follower in units of meters and
+// seconds
+const double kRamseteB = 2;
+const double kRamseteZeta = .7;
 }  // namespace AutoConstants
 
 namespace OIConstants {

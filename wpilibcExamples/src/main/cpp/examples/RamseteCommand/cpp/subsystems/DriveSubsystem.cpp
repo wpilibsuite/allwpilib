@@ -7,6 +7,11 @@
 
 #include "subsystems/DriveSubsystem.h"
 
+#include <units/units.h>
+
+#include <frc/geometry/Rotation2d.h>
+#include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
+
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
@@ -15,7 +20,8 @@ DriveSubsystem::DriveSubsystem()
       m_right1{kRightMotor1Port},
       m_right2{kRightMotor2Port},
       m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
-      m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]} {
+      m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]},
+      m_odometry{kDriveKinematics, frc::Pose2d()} {
   // Set the distance per pulse for the encoders
   m_leftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
@@ -23,10 +29,18 @@ DriveSubsystem::DriveSubsystem()
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
+  m_odometry.Update(frc::Rotation2d(units::degree_t(GetHeading())),
+                    frc::DifferentialDriveWheelSpeeds{
+                        units::meters_per_second_t(m_leftEncoder.GetRate()),
+                        units::meters_per_second_t(m_rightEncoder.GetRate())});
 }
 
 void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
   m_drive.ArcadeDrive(fwd, rot);
+}
+
+void DriveSubsystem::TankDrive(double left, double right) {
+  m_drive.TankDrive(left, right, false);
 }
 
 void DriveSubsystem::ResetEncoders() {
@@ -52,4 +66,10 @@ double DriveSubsystem::GetHeading() {
 
 double DriveSubsystem::GetTurnRate() {
   return m_gyro.GetRate() * (kGyroReversed ? -1. : 1.);
+}
+
+frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
+
+void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
+  m_odometry.ResetPosition(pose);
 }
