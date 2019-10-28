@@ -493,8 +493,8 @@ Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTrigger
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  HAL_AnalogTriggerHandle analogTrigger = HAL_InitializeAnalogTrigger(
-      (HAL_AnalogInputHandle)id, &status);
+  HAL_AnalogTriggerHandle analogTrigger =
+      HAL_InitializeAnalogTrigger((HAL_AnalogInputHandle)id, &status);
   CheckStatus(env, status);
   return (jint)analogTrigger;
 }
@@ -509,8 +509,8 @@ Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogTriggerDutyCycle
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  HAL_AnalogTriggerHandle analogTrigger = HAL_InitializeAnalogTriggerDutyCycle(
-      (HAL_DutyCycleHandle)id, &status);
+  HAL_AnalogTriggerHandle analogTrigger =
+      HAL_InitializeAnalogTriggerDutyCycle((HAL_DutyCycleHandle)id, &status);
   CheckStatus(env, status);
   return (jint)analogTrigger;
 }
@@ -653,15 +653,15 @@ Java_edu_wpi_first_hal_AnalogJNI_getAnalogTriggerOutput
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogTriggerFPGAIndex
- * Signature: (I)Z
+ * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_AnalogJNI_getAnalogTriggerFPGAIndex
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  auto val = HAL_GetAnalogTriggerFPGAIndex(
-      (HAL_AnalogTriggerHandle)id, &status);
+  auto val =
+      HAL_GetAnalogTriggerFPGAIndex((HAL_AnalogTriggerHandle)id, &status);
   CheckStatus(env, status);
   return val;
 }

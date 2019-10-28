@@ -290,7 +290,8 @@ HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
   }
 }
 
-int32_t HAL_GetAnalogTriggerFPGAIndex(HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status) {
+int32_t HAL_GetAnalogTriggerFPGAIndex(
+    HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status) {
   auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
   if (trigger == nullptr) {
     *status = HAL_HANDLE_ERROR;

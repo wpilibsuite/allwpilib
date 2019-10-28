@@ -8,8 +8,8 @@
 #include "frc/DutyCycle.h"
 
 #include <hal/DutyCycle.h>
-#include <hal/HALBase.h>
 #include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 
 #include "frc/DigitalSource.h"
 #include "frc/WPIErrors.h"
@@ -44,10 +44,15 @@ DutyCycle::~DutyCycle() { HAL_FreeDutyCycle(m_handle); }
 
 void DutyCycle::InitDutyCycle() {
   int32_t status = 0;
-  m_handle = HAL_InitializeDutyCycle(m_source->GetPortHandleForRouting(), static_cast<HAL_AnalogTriggerType>(m_source->GetAnalogTriggerTypeForRouting()), &status);
+  m_handle =
+      HAL_InitializeDutyCycle(m_source->GetPortHandleForRouting(),
+                              static_cast<HAL_AnalogTriggerType>(
+                                  m_source->GetAnalogTriggerTypeForRouting()),
+                              &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   HAL_Report(HALUsageReporting::kResourceType_DutyCycle, GetFPGAIndex());
-  SendableRegistry::GetInstance().AddLW(this, "Duty Cycle", m_source->GetChannel());
+  SendableRegistry::GetInstance().AddLW(this, "Duty Cycle",
+                                        m_source->GetChannel());
 }
 
 int DutyCycle::GetFPGAIndex() const {
@@ -73,4 +78,8 @@ unsigned int DutyCycle::GetOutputRaw() const {
 
 void DutyCycle::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Duty Cycle");
+  builder.AddDoubleProperty("Frequency",
+                            [this] { return this->GetFrequency(); }, nullptr);
+  builder.AddDoubleProperty("Output", [this] { return this->GetOutput(); },
+                            nullptr);
 }

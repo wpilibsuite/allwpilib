@@ -154,7 +154,14 @@ HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
                                     HAL_AnalogTriggerType type,
                                     int32_t* status);
 
-int32_t HAL_GetAnalogTriggerFPGAIndex(HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status);
+/**
+ * Get the FPGA index for the AnlogTrigger.
+ *
+ * @param analogTriggerHandle the trigger handle
+ * @return the FPGA index
+ */
+int32_t HAL_GetAnalogTriggerFPGAIndex(
+    HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

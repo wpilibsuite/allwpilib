@@ -42,8 +42,7 @@ AnalogTrigger::AnalogTrigger(AnalogInput* input) {
 AnalogTrigger::AnalogTrigger(DutyCycle* input) {
   m_dutyCycle = input;
   int32_t status = 0;
-  m_trigger =
-      HAL_InitializeAnalogTriggerDutyCycle(input->m_handle, &status);
+  m_trigger = HAL_InitializeAnalogTriggerDutyCycle(input->m_handle, &status);
   if (status != 0) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
     m_trigger = HAL_kInvalidHandle;

@@ -37,7 +37,8 @@ int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,
                                           int32_t* status) {
   return 0;
 }
-int32_t HAL_GetDutyCycleFPGAIndex(HAL_DutyCycleHandle dutyCycleHandle, int32_t* status) {
+int32_t HAL_GetDutyCycleFPGAIndex(HAL_DutyCycleHandle dutyCycleHandle,
+                                  int32_t* status) {
   return -1;
 }
 }  // extern "C"
