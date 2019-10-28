@@ -7,9 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -114,7 +111,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
     AnalogJNI.setAnalogTriggerLimitsRaw(m_port, lower, upper);
   }
 
-    /**
+  /**
    * Set the upper and lower limits of the analog trigger. The limits are given as floating point
    * values between 0 and 1.
    *
