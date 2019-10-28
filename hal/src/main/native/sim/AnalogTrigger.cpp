@@ -63,7 +63,7 @@ int32_t hal::GetAnalogTriggerInputIndex(HAL_AnalogTriggerHandle handle,
 extern "C" {
 
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
-    HAL_AnalogInputHandle portHandle, int32_t* index, int32_t* status) {
+    HAL_AnalogInputHandle portHandle, int32_t* status) {
   hal::init::CheckInit();
   // ensure we are given a valid and active AnalogInput handle
   auto analog_port = analogInputHandles->Get(portHandle);
@@ -83,7 +83,6 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
   }
   trigger->analogHandle = portHandle;
   trigger->index = static_cast<uint8_t>(getHandleIndex(handle));
-  *index = trigger->index;
 
   SimAnalogTriggerData[trigger->index].initialized = true;
 
@@ -93,7 +92,7 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
 }
 
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
-    HAL_DutyCycleHandle dutyCycleHandle, int32_t* index, int32_t* status) {
+    HAL_DutyCycleHandle dutyCycleHandle, int32_t* status) {
   *status = HAL_SIM_NOT_SUPPORTED;
   return HAL_kInvalidHandle;
 }
@@ -290,4 +289,14 @@ HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
     return false;
   }
 }
+
+int32_t HAL_GetAnalogTriggerFPGAIndex(HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status) {
+  auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
+  if (trigger == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return -1;
+  }
+  return trigger->index;
+}
+
 }  // extern "C"
