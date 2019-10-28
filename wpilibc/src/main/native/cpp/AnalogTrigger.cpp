@@ -42,7 +42,6 @@ AnalogTrigger::AnalogTrigger(AnalogInput* input) {
 AnalogTrigger::AnalogTrigger(DutyCycle* input) {
   m_dutyCycle = input;
   int32_t status = 0;
-  int index = 0;
   m_trigger =
       HAL_InitializeAnalogTriggerDutyCycle(input->m_handle, &status);
   if (status != 0) {
