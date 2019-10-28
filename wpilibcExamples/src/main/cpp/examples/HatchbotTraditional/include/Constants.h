@@ -17,34 +17,34 @@
  */
 
 namespace DriveConstants {
-const int kLeftMotor1Port = 0;
-const int kLeftMotor2Port = 1;
-const int kRightMotor1Port = 2;
-const int kRightMotor2Port = 3;
+constexpr int kLeftMotor1Port = 0;
+constexpr int kLeftMotor2Port = 1;
+constexpr int kRightMotor1Port = 2;
+constexpr int kRightMotor2Port = 3;
 
-const int kLeftEncoderPorts[]{0, 1};
-const int kRightEncoderPorts[]{2, 3};
-const bool kLeftEncoderReversed = false;
-const bool kRightEncoderReversed = true;
+constexpr int kLeftEncoderPorts[]{0, 1};
+constexpr int kRightEncoderPorts[]{2, 3};
+constexpr bool kLeftEncoderReversed = false;
+constexpr bool kRightEncoderReversed = true;
 
-const int kEncoderCPR = 1024;
-const double kWheelDiameterInches = 6;
-const double kEncoderDistancePerPulse =
+constexpr int kEncoderCPR = 1024;
+constexpr double kWheelDiameterInches = 6;
+constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     (kWheelDiameterInches * 3.142) / static_cast<double>(kEncoderCPR);
 }  // namespace DriveConstants
 
 namespace HatchConstants {
-const int kHatchSolenoidModule = 0;
-const int kHatchSolenoidPorts[]{0, 1};
+constexpr int kHatchSolenoidModule = 0;
+constexpr int kHatchSolenoidPorts[]{0, 1};
 }  // namespace HatchConstants
 
 namespace AutoConstants {
-const double kAutoDriveDistanceInches = 60;
-const double kAutoBackupDistanceInches = 20;
-const double kAutoDriveSpeed = .5;
+constexpr double kAutoDriveDistanceInches = 60;
+constexpr double kAutoBackupDistanceInches = 20;
+constexpr double kAutoDriveSpeed = .5;
 }  // namespace AutoConstants
 
 namespace OIConstants {
-const int kDriverControllerPort = 1;
+constexpr int kDriverControllerPort = 1;
 }  // namespace OIConstants
