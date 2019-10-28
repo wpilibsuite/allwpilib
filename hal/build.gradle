@@ -86,8 +86,8 @@ ext {
             it.sources {
                 simJniCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/sim'
-                        include '**/jni/*.cpp'
+                        srcDirs 'src/main/native/simjni'
+                        include '**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
