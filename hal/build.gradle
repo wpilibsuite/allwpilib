@@ -107,7 +107,6 @@ ext {
                     source {
                         srcDirs = ['src/main/native/athena']
                         include '**/*.cpp'
-                        exclude '**/jni/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -121,7 +120,6 @@ ext {
                     source {
                         srcDirs 'src/main/native/sim'
                         include '**/*.cpp'
-                        exclude '**/jni/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
