@@ -69,9 +69,23 @@ int DutyCycle::GetFrequency() const {
   return retVal;
 }
 
+double DutyCycle::GetOutput() const {
+  int32_t status = 0;
+  auto retVal = HAL_GetDutyCycleOutput(m_handle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  return retVal;
+}
+
 unsigned int DutyCycle::GetOutputRaw() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleOutput(m_handle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  return retVal;
+}
+
+unsigned int DutyCycle::GetOutputScaleFactor() const {
+  int32_t status = 0;
+  auto retVal = HAL_GetDutyCycleOutputScaleFactor(m_handle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
