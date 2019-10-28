@@ -55,7 +55,6 @@ model {
                     source {
                         srcDirs 'src/main/native/cpp'
                         include '**/*.cpp'
-                        exclude '**/jni/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -119,8 +118,8 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp'
-                        include '**/jni/*.cpp'
+                        srcDirs 'src/main/native/jni'
+                        include '**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -161,8 +160,8 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp'
-                        include '**/jni/*.cpp'
+                        srcDirs 'src/main/native/jni'
+                        include '**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'

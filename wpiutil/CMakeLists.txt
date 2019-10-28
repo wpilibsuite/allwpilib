@@ -5,7 +5,7 @@ include(GenResources)
 include(CompileWarnings)
 include(AddTest)
 
-file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp)
+file(GLOB wpiutil_jni_src src/main/native/jni/WPIUtilJNI.cpp)
 
 # Java bindings
 if (NOT WITHOUT_JAVA)
@@ -96,7 +96,6 @@ endif()
 GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpiutil_resources_src)
 
 file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp)
-list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
 file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 

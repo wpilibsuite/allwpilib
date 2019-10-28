@@ -24,6 +24,10 @@ task cppSourcesZip(type: Zip) {
         into '/'
     }
 
+    from('src/main/native/jni') {
+        into '/jni'
+    }
+
     model {
         components {
             it.all {

@@ -38,7 +38,7 @@ if (NOT WITHOUT_JAVA)
     set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
 
     file(GLOB
-        ntcore_jni_src src/main/native/cpp/jni/NetworkTablesJNI.cpp)
+        ntcore_jni_src src/main/native/jni/NetworkTablesJNI.cpp)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     set(CMAKE_JNI_TARGET true)

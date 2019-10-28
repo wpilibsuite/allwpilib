@@ -79,8 +79,8 @@ if (NOT WITHOUT_JAVA)
     configure_file(src/generate/FRCNetComm.java.in FRCNetComm.java)
 
     file(GLOB
-        hal_shared_jni_src src/main/native/cpp/jni/*.cpp
-        hal_sim_jni_src src/main/native/sim/jni/*.cpp)
+        hal_shared_jni_src src/main/native/jni/*.cpp
+        hal_sim_jni_src src/main/native/simjni/*.cpp)
 
     file(GLOB_RECURSE JAVA_SOURCES
         ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java

@@ -78,7 +78,7 @@ if (NOT WITHOUT_JAVA)
                                     PATHS ${OPENCV_JAVA_INSTALL_DIR} ${OpenCV_INSTALL_PATH}/bin ${OpenCV_INSTALL_PATH}/bin/Release ${OpenCV_INSTALL_PATH}/bin/Debug ${OpenCV_INSTALL_PATH}/lib NO_DEFAULT_PATH)
 
     file(GLOB
-        cscore_jni_src src/main/native/cpp/jni/CameraServerJNI.cpp)
+        cscore_jni_src src/main/native/jni/CameraServerJNI.cpp)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
