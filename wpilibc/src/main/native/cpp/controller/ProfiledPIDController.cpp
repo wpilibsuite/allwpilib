@@ -35,12 +35,16 @@ units::second_t ProfiledPIDController::GetPeriod() const {
   return m_controller.GetPeriod();
 }
 
+void ProfiledPIDController::SetGoal(TrapezoidProfile::State goal) {
+  m_goal = goal;
+}
+
 void ProfiledPIDController::SetGoal(units::meter_t goal) {
   m_goal = {goal, 0_mps};
 }
 
-units::meter_t ProfiledPIDController::GetGoal() const {
-  return m_goal.position;
+TrapezoidProfile::State ProfiledPIDController::GetGoal() const {
+  return m_goal;
 }
 
 bool ProfiledPIDController::AtGoal() const {
@@ -52,8 +56,8 @@ void ProfiledPIDController::SetConstraints(
   m_constraints = constraints;
 }
 
-double ProfiledPIDController::GetSetpoint() const {
-  return m_controller.GetSetpoint();
+TrapezoidProfile::State ProfiledPIDController::GetSetpoint() const {
+  return m_setpoint;
 }
 
 bool ProfiledPIDController::AtSetpoint() const {
@@ -87,20 +91,27 @@ double ProfiledPIDController::GetVelocityError() const {
   return m_controller.GetVelocityError();
 }
 
-double ProfiledPIDController::Calculate(double measurement) {
+double ProfiledPIDController::Calculate(units::meter_t measurement) {
   frc::TrapezoidProfile profile{m_constraints, m_goal, m_setpoint};
   m_setpoint = profile.Calculate(GetPeriod());
-  return m_controller.Calculate(measurement, m_setpoint.position.to<double>());
+  return m_controller.Calculate(measurement.to<double>(),
+                                m_setpoint.position.to<double>());
 }
 
-double ProfiledPIDController::Calculate(double measurement,
+double ProfiledPIDController::Calculate(units::meter_t measurement,
+                                        TrapezoidProfile::State goal) {
+  SetGoal(goal);
+  return Calculate(measurement);
+}
+
+double ProfiledPIDController::Calculate(units::meter_t measurement,
                                         units::meter_t goal) {
   SetGoal(goal);
   return Calculate(measurement);
 }
 
 double ProfiledPIDController::Calculate(
-    double measurement, units::meter_t goal,
+    units::meter_t measurement, units::meter_t goal,
     frc::TrapezoidProfile::Constraints constraints) {
   SetConstraints(constraints);
   return Calculate(measurement, goal);
@@ -117,6 +128,6 @@ void ProfiledPIDController::InitSendable(frc::SendableBuilder& builder) {
   builder.AddDoubleProperty("d", [this] { return GetD(); },
                             [this](double value) { SetD(value); });
   builder.AddDoubleProperty(
-      "goal", [this] { return GetGoal().to<double>(); },
+      "goal", [this] { return GetGoal().position.to<double>(); },
       [this](double value) { SetGoal(units::meter_t{value}); });
 }

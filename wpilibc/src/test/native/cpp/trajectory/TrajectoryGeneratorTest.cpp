@@ -17,8 +17,8 @@
 using namespace frc;
 
 TEST(TrajectoryGenerationTest, ObeysConstraints) {
-  auto trajectory = TestTrajectory::GetTrajectory(
-      std::vector<std::unique_ptr<TrajectoryConstraint>>());
+  TrajectoryConfig config{12_fps, 12_fps_sq};
+  auto trajectory = TestTrajectory::GetTrajectory(config);
 
   units::second_t time = 0_s;
   units::second_t dt = 20_ms;

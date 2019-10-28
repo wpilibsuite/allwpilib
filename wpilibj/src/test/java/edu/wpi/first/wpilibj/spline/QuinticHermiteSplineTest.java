@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.spline;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -27,7 +29,9 @@ class QuinticHermiteSplineTest {
     var start = System.nanoTime();
 
     // Generate and parameterize the spline.
-    var spline = SplineHelper.getQuinticSplinesFromWaypoints(new Pose2d[]{a, b})[0];
+    var controlVectors = SplineHelper.getQuinticControlVectorsFromWaypoints(List.of(a, b));
+    var spline = SplineHelper.getQuinticSplinesFromControlVectors(
+        controlVectors.toArray(new Spline.ControlVector[0]))[0];
     var poses = SplineParameterizer.parameterize(spline);
 
     // End the timer.

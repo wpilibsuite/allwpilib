@@ -165,6 +165,11 @@ public class Translation2d {
     return new Translation2d(m_x / scalar, m_y / scalar);
   }
 
+  @Override
+  public String toString() {
+    return String.format("Translation2d(X: %.2f, Y: %.2f)", m_x, m_y);
+  }
+
   /**
    * Checks equality between this Translation2d and another object.
    *

@@ -116,31 +116,39 @@ model {
                     it.buildable = false
                     return
                 }
+                cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
-                lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
             }
         }
         "${nativeName}"(NativeLibrarySpec) {
             sources {
                 cpp {
                     source {
-                        srcDirs "${rootDir}/shared/singlelib"
+                        srcDirs "src/main/native/cppcs"
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDirs 'src/main/native/include', '../cameraserver/src/main/native/include'
                     }
                 }
             }
             binaries.all {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
-                lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+
+                if (it instanceof SharedLibraryBinarySpec) {
+                    cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
+                    if (buildType == buildTypes.debug) {
+                        cppCompiler.define 'DYNAMIC_CAMERA_SERVER_DEBUG'
+                    }
+                } else {
+                    lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                }
+
             }
             appendDebugPathToBinaries(binaries)
         }

@@ -31,7 +31,8 @@ class DifferentialDriveKinematics {
    * empirical value may be larger than the physical measured value due to
    * scrubbing effects.
    */
-  explicit DifferentialDriveKinematics(units::meter_t trackWidth);
+  constexpr explicit DifferentialDriveKinematics(units::meter_t trackWidth)
+      : m_trackWidth(trackWidth) {}
 
   /**
    * Returns a chassis speed from left and right component velocities using
@@ -40,8 +41,11 @@ class DifferentialDriveKinematics {
    * @param wheelSpeeds The left and right velocities.
    * @return The chassis speed.
    */
-  ChassisSpeeds ToChassisSpeeds(
-      const DifferentialDriveWheelSpeeds& wheelSpeeds) const;
+  constexpr ChassisSpeeds ToChassisSpeeds(
+      const DifferentialDriveWheelSpeeds& wheelSpeeds) const {
+    return {(wheelSpeeds.left + wheelSpeeds.right) / 2.0, 0_mps,
+            (wheelSpeeds.right - wheelSpeeds.left) / m_trackWidth * 1_rad};
+  }
 
   /**
    * Returns left and right component velocities from a chassis speed using
@@ -51,8 +55,11 @@ class DifferentialDriveKinematics {
    * represent the chassis' speed.
    * @return The left and right velocities.
    */
-  DifferentialDriveWheelSpeeds ToWheelSpeeds(
-      const ChassisSpeeds& chassisSpeeds) const;
+  constexpr DifferentialDriveWheelSpeeds ToWheelSpeeds(
+      const ChassisSpeeds& chassisSpeeds) const {
+    return {chassisSpeeds.vx - m_trackWidth / 2 * chassisSpeeds.omega / 1_rad,
+            chassisSpeeds.vx + m_trackWidth / 2 * chassisSpeeds.omega / 1_rad};
+  }
 
  private:
   units::meter_t m_trackWidth;

@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <array>
 #include <utility>
 #include <vector>
 
@@ -42,6 +43,18 @@ class Spline {
   Spline& operator=(Spline&&) = default;
 
   virtual ~Spline() = default;
+
+  /**
+   * Represents a control vector for a spline.
+   *
+   * Each element in each array represents the value of the derivative at the
+   * index. For example, the value of x[2] is the second derivative in the x
+   * dimension.
+   */
+  struct ControlVector {
+    std::array<double, (Degree + 1) / 2> x;
+    std::array<double, (Degree + 1) / 2> y;
+  };
 
   /**
    * Gets the pose and curvature at some point t on the spline.

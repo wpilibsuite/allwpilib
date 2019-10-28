@@ -9,9 +9,9 @@
 
 #include "Robot.h"
 
-TankDrive::TankDrive(DriveTrain* drivetrain, std::function<double()> left,
-                     std::function<double()> right)
-    : m_drivetrain(drivetrain), m_left(left), m_right(right) {
+TankDrive::TankDrive(std::function<double()> left,
+                     std::function<double()> right, DriveTrain* drivetrain)
+    : m_left(left), m_right(right), m_drivetrain(drivetrain) {
   SetName("TankDrive");
   AddRequirements({m_drivetrain});
 }

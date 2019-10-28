@@ -34,7 +34,7 @@ TEST(RamseteControllerTest, ReachesReference) {
   auto waypoints = std::vector{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
                                frc::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      waypoints, {}, 0_mps, 0_mps, 8.8_mps, 0.1_mps_sq, false);
+      waypoints, {8.8_mps, 0.1_mps_sq});
 
   constexpr auto kDt = 0.02_s;
   auto totalTime = trajectory.TotalTime();

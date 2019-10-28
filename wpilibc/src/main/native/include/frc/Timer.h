@@ -12,10 +12,9 @@
 #include <wpi/mutex.h>
 
 #include "frc/Base.h"
+#include "frc2/Timer.h"
 
 namespace frc {
-
-using TimerInterruptHandler = void (*)(void* param);
 
 /**
  * Pause the task for a specified time.
@@ -57,10 +56,10 @@ class Timer {
 
   virtual ~Timer() = default;
 
-  Timer(const Timer& rhs);
-  Timer& operator=(const Timer& rhs);
-  Timer(Timer&& rhs);
-  Timer& operator=(Timer&& rhs);
+  Timer(const Timer& rhs) = default;
+  Timer& operator=(const Timer& rhs) = default;
+  Timer(Timer&& rhs) = default;
+  Timer& operator=(Timer&& rhs) = default;
 
   /**
    * Get the current time from the timer. If the clock is running it is derived
@@ -104,18 +103,7 @@ class Timer {
    * @param period The period to check for (in seconds).
    * @return       True if the period has passed.
    */
-  WPI_DEPRECATED("Use unit-safe HasPeriodPassed method instead.")
   bool HasPeriodPassed(double period);
-
-  /**
-   * Check if the period specified has passed and if it has, advance the start
-   * time by that period. This is useful to decide if it's time to do periodic
-   * work without drifting later by the time it took to get around to checking.
-   *
-   * @param period The period to check for.
-   * @return       True if the period has passed.
-   */
-  bool HasPeriodPassed(units::second_t period);
 
   /**
    * Return the FPGA system clock time in seconds.
@@ -148,10 +136,7 @@ class Timer {
   static const double kRolloverTime;
 
  private:
-  double m_startTime = 0.0;
-  double m_accumulatedTime = 0.0;
-  bool m_running = false;
-  mutable wpi::mutex m_mutex;
+  frc2::Timer m_timer;
 };
 
 }  // namespace frc

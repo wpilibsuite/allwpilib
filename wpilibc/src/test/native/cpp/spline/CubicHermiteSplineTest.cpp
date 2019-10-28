@@ -29,8 +29,12 @@ class CubicHermiteSplineTest : public ::testing::Test {
     const auto start = std::chrono::high_resolution_clock::now();
 
     // Generate and parameterize the spline.
+
+    const auto [startCV, endCV] =
+        SplineHelper::CubicControlVectorsFromWaypoints(a, waypoints, b);
+
     const auto splines =
-        SplineHelper::CubicSplinesFromWaypoints(a, waypoints, b);
+        SplineHelper::CubicSplinesFromControlVectors(startCV, waypoints, endCV);
     std::vector<Spline<3>::PoseWithCurvature> poses;
 
     poses.push_back(splines[0].GetPoint(0.0));
