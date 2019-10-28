@@ -48,4 +48,7 @@ ext {
     commandFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/commands.json")
 }
 
+ext {
+    isCppCommands = false
+}
 apply from: "${rootDir}/shared/examplecheck.gradle"

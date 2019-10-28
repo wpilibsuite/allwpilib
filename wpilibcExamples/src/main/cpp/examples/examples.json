@@ -357,7 +357,7 @@
     "gradlebase": "cpp"
   },
   {
-    "name:": "RamseteCommand",
+    "name": "RamseteCommand",
     "description": "An example command-based robot demonstrating the use of a RamseteCommand to follow a pregenerated trajectory.",
     "tags": [
       "RamseteCommand",
