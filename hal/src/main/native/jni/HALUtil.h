@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef HAL_HAL_SRC_MAIN_NATIVE_CPP_JNI_HALUTIL_H_
-#define HAL_HAL_SRC_MAIN_NATIVE_CPP_JNI_HALUTIL_H_
+#ifndef HAL_HAL_SRC_MAIN_NATIVE_JNI_HALUTIL_H_
+#define HAL_HAL_SRC_MAIN_NATIVE_JNI_HALUTIL_H_
 
 #include <jni.h>
 #include <stdint.h>
@@ -74,4 +74,4 @@ JavaVM* GetJVM();
 
 }  // namespace frc
 
-#endif  // HAL_HAL_SRC_MAIN_NATIVE_CPP_JNI_HALUTIL_H_
+#endif  // HAL_HAL_SRC_MAIN_NATIVE_JNI_HALUTIL_H_
