@@ -122,7 +122,7 @@ void HAL_SetSolenoid(HAL_SolenoidHandle solenoidPortHandle, HAL_Bool value,
 }
 
 void HAL_SetAllSolenoids(int32_t module, int32_t state, int32_t* status) {
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < kNumSolenoidChannels; i++) {
     int set = state & 1;
     HALSIM_SetPCMSolenoidOutput(module, i, set);
     state >>= 1;
