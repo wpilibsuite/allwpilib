@@ -104,7 +104,7 @@ class SwerveDriveKinematics {
    */
   std::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
       const ChassisSpeeds& chassisSpeeds,
-      const Translation2d& centerOfRotation = Translation2d());
+      const Translation2d& centerOfRotation = Translation2d()) const;
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the
@@ -119,7 +119,7 @@ class SwerveDriveKinematics {
    * @return The resulting chassis speed.
    */
   template <typename... ModuleStates>
-  ChassisSpeeds ToChassisSpeeds(ModuleStates&&... wheelStates);
+  ChassisSpeeds ToChassisSpeeds(ModuleStates&&... wheelStates) const;
 
   /**
    * Normalizes the wheel speeds using some max attainable speed. Sometimes,
@@ -138,12 +138,12 @@ class SwerveDriveKinematics {
       units::meters_per_second_t attainableMaxSpeed);
 
  private:
-  Eigen::Matrix<double, NumModules * 2, 3> m_inverseKinematics;
+  mutable Eigen::Matrix<double, NumModules * 2, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Eigen::Matrix<double, NumModules * 2, 3>>
       m_forwardKinematics;
   std::array<Translation2d, NumModules> m_modules;
 
-  Translation2d m_previousCoR;
+  mutable Translation2d m_previousCoR;
 };
 }  // namespace frc
 

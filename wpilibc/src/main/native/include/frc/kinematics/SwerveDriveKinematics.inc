@@ -18,7 +18,8 @@ SwerveDriveKinematics(Translation2d, Wheels...)
 template <size_t NumModules>
 std::array<SwerveModuleState, NumModules>
 SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
-    const ChassisSpeeds& chassisSpeeds, const Translation2d& centerOfRotation) {
+    const ChassisSpeeds& chassisSpeeds,
+    const Translation2d& centerOfRotation) const {
   // We have a new center of rotation. We need to compute the matrix again.
   if (centerOfRotation != m_previousCoR) {
     for (size_t i = 0; i < NumModules; i++) {
@@ -57,7 +58,7 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
 template <size_t NumModules>
 template <typename... ModuleStates>
 ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
-    ModuleStates&&... wheelStates) {
+    ModuleStates&&... wheelStates) const {
   static_assert(sizeof...(wheelStates) == NumModules,
                 "Number of modules is not consistent with number of wheel "
                 "locations provided in constructor.");
