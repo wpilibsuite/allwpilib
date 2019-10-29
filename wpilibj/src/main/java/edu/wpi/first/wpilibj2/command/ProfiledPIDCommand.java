@@ -136,7 +136,7 @@ public class ProfiledPIDCommand extends CommandBase {
   }
 
   /**
-   * Gets the goal for the controller.  Wraps the passed-in function for readability.
+   * Wraps the goal supplier field so that changes to it are visible to the controller.
    *
    * @return The goal for the controller
    */
@@ -145,7 +145,7 @@ public class ProfiledPIDCommand extends CommandBase {
   }
 
   /**
-   * Gets the measurement of the process variable. Wraps the passed-in function for readability.
+   * Wraps the measurement supplier field so that changes to it are visible to the controller.
    *
    * @return The measurement of the process variable
    */
@@ -154,9 +154,9 @@ public class ProfiledPIDCommand extends CommandBase {
   }
 
   /**
-   * Uses the output of the controller.  Wraps the passed-in function for readability.
+   * Wraps the output consumer field so that changes to it are visible to the controller.
    *
-   * @param output The output value to use
+   * @param output The output from the controller
    */
   private void useOutput(double output, State state) {
     m_useOutput.accept(output, state);

@@ -110,7 +110,7 @@ public class PIDCommand extends CommandBase {
   /**
    * Wraps the output consumer field so that changes to it are visible to the controller.
    *
-   * @param output The output value to use
+   * @param output The output from the controller
    */
   private void useOutput(double output) {
     m_useOutput.accept(output);
