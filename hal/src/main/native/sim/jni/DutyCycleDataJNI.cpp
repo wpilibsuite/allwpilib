@@ -175,4 +175,4 @@ Java_edu_wpi_first_hal_sim_mockdata_DutyCycleDataJNI_resetData
   HALSIM_ResetDutyCycleData(index);
 }
 
-}
+}  // extern "C"

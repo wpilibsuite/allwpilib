@@ -41,7 +41,7 @@ void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle);
  * @param device simulated device handle
  */
 void HAL_SetDutyCycleSimDevice(HAL_DutyCycleHandle handle,
-                             HAL_SimDeviceHandle device);
+                               HAL_SimDeviceHandle device);
 
 /**
  * Get the frequency of the duty cycle signal.

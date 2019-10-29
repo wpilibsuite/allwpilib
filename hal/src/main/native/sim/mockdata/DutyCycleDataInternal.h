@@ -21,7 +21,7 @@ class DutyCycleData {
 
  public:
   std::atomic<int32_t> digitalChannel{0};
-    SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
       false};
   std::atomic<HAL_SimDeviceHandle> simDevice;
   SimDataValue<int32_t, HAL_MakeInt, GetFrequencyName> frequency{0};
@@ -30,4 +30,4 @@ class DutyCycleData {
   virtual void ResetData();
 };
 extern DutyCycleData* SimDutyCycleData;
-}
+}  // namespace hal

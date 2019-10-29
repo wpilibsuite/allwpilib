@@ -7,12 +7,12 @@
 
 #include "hal/DutyCycle.h"
 
-#include "mockdata/DutyCycleDataInternal.h"
 #include "HALInitializer.h"
-#include "hal/Errors.h"
 #include "PortsInternal.h"
+#include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
+#include "mockdata/DutyCycleDataInternal.h"
 
 using namespace hal;
 
@@ -24,7 +24,7 @@ struct Empty {};
 }  // namespace
 
 static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
-                      HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
+                             HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
 
 namespace hal {
 namespace init {
@@ -70,12 +70,11 @@ void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
 }
 
 void HAL_SetDutyCycleSimDevice(HAL_EncoderHandle handle,
-                             HAL_SimDeviceHandle device) {
+                               HAL_SimDeviceHandle device) {
   auto dutyCycle = dutyCycleHandles->Get(handle);
   if (dutyCycle == nullptr) return;
   SimDutyCycleData[dutyCycle->index].simDevice = device;
 }
-
 
 int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
                                   int32_t* status) {
@@ -102,7 +101,8 @@ int32_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
-  return SimDutyCycleData[dutyCycle->index].output * HAL_GetDutyCycleOutputScaleFactor(dutyCycleHandle, status);
+  return SimDutyCycleData[dutyCycle->index].output *
+         HAL_GetDutyCycleOutputScaleFactor(dutyCycleHandle, status);
 }
 int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,
                                           int32_t* status) {

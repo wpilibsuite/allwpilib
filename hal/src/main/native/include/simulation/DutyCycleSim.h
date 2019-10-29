@@ -28,14 +28,16 @@ class DutyCycleSim {
     return store;
   }
 
-  bool GetInitialized() const { return HALSIM_GetDutyCycleInitialized(m_index); }
+  bool GetInitialized() const {
+    return HALSIM_GetDutyCycleInitialized(m_index);
+  }
 
   void SetInitialized(bool initialized) {
     HALSIM_SetDutyCycleInitialized(m_index, initialized);
   }
 
-  std::unique_ptr<CallbackStore> RegisterFrequencyCallback(NotifyCallback callback,
-                                                       bool initialNotify) {
+  std::unique_ptr<CallbackStore> RegisterFrequencyCallback(
+      NotifyCallback callback, bool initialNotify) {
     auto store = std::make_unique<CallbackStore>(
         m_index, -1, callback, &HALSIM_CancelDutyCycleFrequencyCallback);
     store->SetUid(HALSIM_RegisterDutyCycleFrequencyCallback(
@@ -65,5 +67,5 @@ class DutyCycleSim {
  private:
   int m_index;
 };
-}
-}
+}  // namespace sim
+}  // namespace frc

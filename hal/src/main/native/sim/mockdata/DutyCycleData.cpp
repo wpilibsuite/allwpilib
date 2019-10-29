@@ -41,7 +41,7 @@ HAL_SimDeviceHandle HALSIM_GetDutyCycleSimDevice(int32_t index) {
   return SimDutyCycleData[index].simDevice;
 }
 
-#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                  \
+#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                    \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, DutyCycle##CAPINAME, \
                                SimDutyCycleData, LOWERNAME)
 
@@ -52,13 +52,12 @@ DEFINE_CAPI(double, Output, output)
 #define REGISTER(NAME) \
   SimDutyCycleData[index].NAME.RegisterCallback(callback, param, initialNotify)
 
-
 void HALSIM_RegisterDutyCycleAllCallbacks(int32_t index,
-                                        HAL_NotifyCallback callback,
-                                        void* param, HAL_Bool initialNotify) {
+                                          HAL_NotifyCallback callback,
+                                          void* param, HAL_Bool initialNotify) {
   REGISTER(initialized);
   REGISTER(frequency);
   REGISTER(output);
 }
 
-}
+}  // extern "C"
