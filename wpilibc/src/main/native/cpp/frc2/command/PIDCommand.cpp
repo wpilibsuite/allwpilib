@@ -31,15 +31,9 @@ PIDCommand::PIDCommand(PIDController controller,
 void PIDCommand::Initialize() { m_controller.Reset(); }
 
 void PIDCommand::Execute() {
-  UseOutput(m_controller.Calculate(GetMeasurement(), GetSetpoint()));
+  m_useOutput(m_controller.Calculate(m_measurement(), m_setpoint()));
 }
 
-void PIDCommand::End(bool interrupted) { UseOutput(0); }
-
-double PIDCommand::GetSetpoint() { return m_setpoint(); }
-
-double PIDCommand::GetMeasurement() { return m_measurement(); }
-
-void PIDCommand::UseOutput(double output) { m_useOutput(output); }
+void PIDCommand::End(bool interrupted) { m_useOutput(0); }
 
 PIDController& PIDCommand::getController() { return m_controller; }

@@ -54,20 +54,12 @@ ProfiledPIDCommand::ProfiledPIDCommand(
 void ProfiledPIDCommand::Initialize() { m_controller.Reset(); }
 
 void ProfiledPIDCommand::Execute() {
-  UseOutput(m_controller.Calculate(GetMeasurement(), GetGoal()),
-            m_controller.GetSetpoint());
+  m_useOutput(m_controller.Calculate(m_measurement(), m_goal()),
+              m_controller.GetSetpoint());
 }
 
 void ProfiledPIDCommand::End(bool interrupted) {
-  UseOutput(0, State{0_m, 0_mps});
-}
-
-State ProfiledPIDCommand::GetGoal() { return m_goal(); }
-
-units::meter_t ProfiledPIDCommand::GetMeasurement() { return m_measurement(); }
-
-void ProfiledPIDCommand::UseOutput(double output, State state) {
-  m_useOutput(output, state);
+  m_useOutput(0, State{0_m, 0_mps});
 }
 
 frc::ProfiledPIDController& ProfiledPIDCommand::GetController() {

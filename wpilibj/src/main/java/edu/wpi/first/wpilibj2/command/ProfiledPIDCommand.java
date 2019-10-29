@@ -118,12 +118,13 @@ public class ProfiledPIDCommand extends CommandBase {
 
   @Override
   public void execute() {
-    useOutput(m_controller.calculate(getMeasurement(), getGoal()), m_controller.getSetpoint());
+    m_useOutput.accept(m_controller.calculate(m_measurement.getAsDouble(), m_goal.get()),
+                       m_controller.getSetpoint());
   }
 
   @Override
   public void end(boolean interrupted) {
-    useOutput(0, new State());
+    m_useOutput.accept(0., new State());
   }
 
   /**
@@ -133,32 +134,5 @@ public class ProfiledPIDCommand extends CommandBase {
    */
   public ProfiledPIDController getController() {
     return m_controller;
-  }
-
-  /**
-   * Wraps the goal supplier field so that changes to it are visible to the controller.
-   *
-   * @return The goal for the controller
-   */
-  private State getGoal() {
-    return m_goal.get();
-  }
-
-  /**
-   * Wraps the measurement supplier field so that changes to it are visible to the controller.
-   *
-   * @return The measurement of the process variable
-   */
-  private double getMeasurement() {
-    return m_measurement.getAsDouble();
-  }
-
-  /**
-   * Wraps the output consumer field so that changes to it are visible to the controller.
-   *
-   * @param output The output from the controller
-   */
-  private void useOutput(double output, State state) {
-    m_useOutput.accept(output, state);
   }
 }

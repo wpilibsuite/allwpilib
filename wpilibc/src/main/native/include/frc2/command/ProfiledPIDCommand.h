@@ -112,30 +112,5 @@ class ProfiledPIDCommand
   std::function<units::meter_t()> m_measurement;
   std::function<State()> m_goal;
   std::function<void(double, State)> m_useOutput;
-
- private:
-  /**
-   * Wraps the goal supplier field so that changes to it are visible to the
-   * controller.
-   *
-   * @return The goal for the controller
-   */
-  State GetGoal();
-
-  /**
-   * Wraps the measurement supplier field so that changes to it are visible to
-   * the controller.
-   *
-   * @return The measurement for the controller
-   */
-  units::meter_t GetMeasurement();
-
-  /**
-   * Wraps the output consumer field so that changes to it are visible to the
-   * controller.
-   *
-   * @return The output from the controller
-   */
-  void UseOutput(double output, State state);
 };
 }  // namespace frc2
