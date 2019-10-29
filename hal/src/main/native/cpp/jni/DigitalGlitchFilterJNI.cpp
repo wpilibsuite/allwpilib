@@ -13,6 +13,8 @@
 
 using namespace frc;
 
+extern "C" {
+
 /*
  * Class:     edu_wpi_first_hal_DigitalGlitchFilterJNI
  * Method:    setFilterSelect
@@ -76,3 +78,5 @@ Java_edu_wpi_first_hal_DigitalGlitchFilterJNI_getFilterPeriod
   CheckStatus(env, status);
   return result;
 }
+
+}  // extern "C"
