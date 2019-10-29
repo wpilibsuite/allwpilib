@@ -40,7 +40,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
         digitalSource.getAnalogTriggerTypeForRouting());
 
     int index = getFPGAIndex();
-    HAL.report(tResourceType.kResourceType_DutyCycle, index);
+    HAL.report(tResourceType.kResourceType_DutyCycle, index + 1);
     SendableRegistry.addLW(this, "Duty Cycle", index);
   }
 

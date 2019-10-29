@@ -50,9 +50,9 @@ void DutyCycle::InitDutyCycle() {
                                   m_source->GetAnalogTriggerTypeForRouting()),
                               &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-  HAL_Report(HALUsageReporting::kResourceType_DutyCycle, GetFPGAIndex());
-  SendableRegistry::GetInstance().AddLW(this, "Duty Cycle",
-                                        m_source->GetChannel());
+  int index = GetFPGAIndex();
+  HAL_Report(HALUsageReporting::kResourceType_DutyCycle, index + 1);
+  SendableRegistry::GetInstance().AddLW(this, "Duty Cycle", index);
 }
 
 int DutyCycle::GetFPGAIndex() const {

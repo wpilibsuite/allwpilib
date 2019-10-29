@@ -35,7 +35,7 @@ AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   }
   int index = GetIndex();
 
-  HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index);
+  HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
   SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
 }
 
@@ -50,7 +50,7 @@ AnalogTrigger::AnalogTrigger(DutyCycle* input) {
   }
   int index = GetIndex();
 
-  HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index);
+  HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
   SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
 }
 
