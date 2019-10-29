@@ -234,4 +234,7 @@ ext {
     commandFile = new File("$projectDir/src/main/cpp/commands/commands.json")
 }
 
+ext {
+    isCppCommands = true
+}
 apply from: "${rootDir}/shared/examplecheck.gradle"
