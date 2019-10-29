@@ -90,7 +90,7 @@ public class PIDCommand extends CommandBase {
   }
 
   /**
-   * Gets the setpoint for the controller.  Wraps the passed-in function for readability.
+   * Wraps the setpoint supplier field so that changes to it are visible to the controller.
    *
    * @return The setpoint for the controller
    */
@@ -99,7 +99,7 @@ public class PIDCommand extends CommandBase {
   }
 
   /**
-   * Gets the measurement of the process variable. Wraps the passed-in function for readability.
+   * Wraps the measurement supplier field so that changes to it are visible to the controller.
    *
    * @return The measurement of the process variable
    */
@@ -108,7 +108,7 @@ public class PIDCommand extends CommandBase {
   }
 
   /**
-   * Uses the output of the controller.  Wraps the passed-in function for readability.
+   * Wraps the output consumer field so that changes to it are visible to the controller.
    *
    * @param output The output value to use
    */
