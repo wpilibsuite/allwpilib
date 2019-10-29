@@ -80,7 +80,7 @@ public interface Command {
    * @param seconds the timeout duration
    * @return the command with the timeout added
    */
-  default Command withTimeout(double seconds) {
+  default ParallelRaceGroup withTimeout(double seconds) {
     return new ParallelRaceGroup(this, new WaitCommand(seconds));
   }
 
@@ -99,7 +99,7 @@ public interface Command {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  default Command withInterrupt(BooleanSupplier condition) {
+  default ParallelRaceGroup withInterrupt(BooleanSupplier condition) {
     return new ParallelRaceGroup(this, new WaitUntilCommand(condition));
   }
 
@@ -115,7 +115,7 @@ public interface Command {
    * @param toRun the Runnable to run
    * @return the decorated command
    */
-  default Command beforeStarting(Runnable toRun) {
+  default SequentialCommandGroup beforeStarting(Runnable toRun) {
     return new SequentialCommandGroup(new InstantCommand(toRun), this);
   }
 
@@ -131,7 +131,7 @@ public interface Command {
    * @param toRun the Runnable to run
    * @return the decorated command
    */
-  default Command andThen(Runnable toRun) {
+  default SequentialCommandGroup andThen(Runnable toRun) {
     return new SequentialCommandGroup(this, new InstantCommand(toRun));
   }
 
@@ -148,7 +148,7 @@ public interface Command {
    * @param next the commands to run next
    * @return the decorated command
    */
-  default Command andThen(Command... next) {
+  default SequentialCommandGroup andThen(Command... next) {
     SequentialCommandGroup group = new SequentialCommandGroup(this);
     group.addCommands(next);
     return group;
@@ -168,7 +168,7 @@ public interface Command {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  default Command deadlineWith(Command... parallel) {
+  default ParallelDeadlineGroup deadlineWith(Command... parallel) {
     return new ParallelDeadlineGroup(this, parallel);
   }
 
@@ -186,7 +186,7 @@ public interface Command {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  default Command alongWith(Command... parallel) {
+  default ParallelCommandGroup alongWith(Command... parallel) {
     ParallelCommandGroup group = new ParallelCommandGroup(this);
     group.addCommands(parallel);
     return group;
@@ -206,7 +206,7 @@ public interface Command {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  default Command raceWith(Command... parallel) {
+  default ParallelRaceGroup raceWith(Command... parallel) {
     ParallelRaceGroup group = new ParallelRaceGroup(this);
     group.addCommands(parallel);
     return group;
@@ -224,7 +224,7 @@ public interface Command {
    *
    * @return the decorated command
    */
-  default Command perpetually() {
+  default PerpetualCommand perpetually() {
     return new PerpetualCommand(this);
   }
 
@@ -235,7 +235,7 @@ public interface Command {
    *
    * @return the decorated command
    */
-  default Command asProxy() {
+  default ProxyScheduleCommand asProxy() {
     return new ProxyScheduleCommand(this);
   }
 
