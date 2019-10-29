@@ -41,7 +41,7 @@ public class Victor extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    HAL.report(tResourceType.kResourceType_Victor, getChannel());
+    HAL.report(tResourceType.kResourceType_Victor, getChannel() + 1);
     SendableRegistry.setName(this, "Victor", getChannel());
   }
 }

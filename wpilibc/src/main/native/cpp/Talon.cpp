@@ -32,6 +32,6 @@ Talon::Talon(int channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_Talon, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_Talon, GetChannel() + 1);
   SendableRegistry::GetInstance().SetName(this, "Talon", GetChannel());
 }

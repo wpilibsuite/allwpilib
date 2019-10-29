@@ -97,7 +97,7 @@ public class Joystick extends GenericHID {
     m_axes[Axis.kTwist.value] = kDefaultTwistChannel;
     m_axes[Axis.kThrottle.value] = kDefaultThrottleChannel;
 
-    HAL.report(tResourceType.kResourceType_Joystick, port);
+    HAL.report(tResourceType.kResourceType_Joystick, port + 1);
   }
 
   /**

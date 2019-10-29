@@ -95,7 +95,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
       calibrate();
     }
 
-    HAL.report(tResourceType.kResourceType_ADXRS450, port.value);
+    HAL.report(tResourceType.kResourceType_ADXRS450, port.value + 1);
     SendableRegistry.addLW(this, "ADXRS450_Gyro", port.value);
   }
 

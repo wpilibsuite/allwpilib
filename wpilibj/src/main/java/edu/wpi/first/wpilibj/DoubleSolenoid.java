@@ -77,10 +77,10 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
     m_forwardMask = (byte) (1 << forwardChannel);
     m_reverseMask = (byte) (1 << reverseChannel);
 
-    HAL.report(tResourceType.kResourceType_Solenoid, forwardChannel,
-                                   m_moduleNumber);
-    HAL.report(tResourceType.kResourceType_Solenoid, reverseChannel,
-                                   m_moduleNumber);
+    HAL.report(tResourceType.kResourceType_Solenoid, forwardChannel + 1,
+                                   m_moduleNumber + 1);
+    HAL.report(tResourceType.kResourceType_Solenoid, reverseChannel + 1,
+                                   m_moduleNumber + 1);
     SendableRegistry.addLW(this, "DoubleSolenoid", m_moduleNumber, forwardChannel);
   }
 

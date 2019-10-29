@@ -26,7 +26,7 @@ Counter::Counter(Mode mode) {
 
   SetMaxPeriod(.5);
 
-  HAL_Report(HALUsageReporting::kResourceType_Counter, m_index, mode);
+  HAL_Report(HALUsageReporting::kResourceType_Counter, m_index + 1, mode + 1);
   SendableRegistry::GetInstance().AddLW(this, "Counter", m_index);
 }
 

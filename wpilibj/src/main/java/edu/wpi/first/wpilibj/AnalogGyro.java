@@ -41,7 +41,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, A
 
     AnalogGyroJNI.setupAnalogGyro(m_gyroHandle);
 
-    HAL.report(tResourceType.kResourceType_Gyro, m_analog.getChannel());
+    HAL.report(tResourceType.kResourceType_Gyro, m_analog.getChannel() + 1);
     SendableRegistry.addLW(this, "AnalogGyro", m_analog.getChannel());
   }
 

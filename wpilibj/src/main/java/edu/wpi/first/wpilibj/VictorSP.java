@@ -39,7 +39,7 @@ public class VictorSP extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    HAL.report(tResourceType.kResourceType_VictorSP, getChannel());
+    HAL.report(tResourceType.kResourceType_VictorSP, getChannel() + 1);
     SendableRegistry.setName(this, "VictorSP", getChannel());
   }
 }

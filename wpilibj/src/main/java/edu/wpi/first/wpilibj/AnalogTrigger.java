@@ -72,7 +72,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
         AnalogJNI.initializeAnalogTrigger(channel.m_port, index.asIntBuffer());
     m_index = index.asIntBuffer().get(0);
 
-    HAL.report(tResourceType.kResourceType_AnalogTrigger, channel.getChannel());
+    HAL.report(tResourceType.kResourceType_AnalogTrigger, m_index + 1);
     SendableRegistry.addLW(this, "AnalogTrigger", channel.getChannel());
   }
 

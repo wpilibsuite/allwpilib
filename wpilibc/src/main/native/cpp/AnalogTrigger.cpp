@@ -36,7 +36,7 @@ AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   }
   m_index = index;
 
-  HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, input->m_channel);
+  HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, m_index + 1);
   SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger",
                                         input->GetChannel());
 }
