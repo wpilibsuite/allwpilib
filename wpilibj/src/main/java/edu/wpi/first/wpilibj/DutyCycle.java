@@ -8,8 +8,8 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DutyCycleJNI;
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -33,8 +33,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
   /**
    * Constructs a DutyCycle input from a DigitalSource input.
    *
-   * <p>
-   * This class does not own the inputted source.
+   * <p>This class does not own the inputted source.
    *
    * @param digitalSource The DigitalSource to use.
    */
@@ -67,8 +66,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
   /**
    * Get the output ratio of the duty cycle signal.
    *
-   * <p>
-   * 0 means always low, 1 means always high.
+   * <p>0 means always low, 1 means always high.
    *
    * @return output ratio between 0 and 1
    */
@@ -79,8 +77,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
   /**
    * Get the raw output ratio of the duty cycle signal.
    *
-   * <p>
-   * 0 means always low, an output equal to getOutputScaleFactor() means always
+   * <p>0 means always low, an output equal to getOutputScaleFactor() means always
    * high.
    *
    * @return output ratio in raw units
@@ -92,8 +89,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
   /**
    * Get the scale factor of the output.
    *
-   * <p>
-   * An output equal to this value is always high, and then linearly scales down
+   * <p>An output equal to this value is always high, and then linearly scales down
    * to 0. Divide the result of getOutputRaw by this in order to get the
    * percentage between 0 and 1.
    *
