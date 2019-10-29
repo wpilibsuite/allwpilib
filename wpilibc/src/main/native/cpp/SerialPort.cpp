@@ -75,7 +75,8 @@ SerialPort::SerialPort(int baudRate, const wpi::Twine& portName, Port port,
 
   DisableTermination();
 
-  HAL_Report(HALUsageReporting::kResourceType_SerialPort, static_cast<uint8_t>(port) + 1);
+  HAL_Report(HALUsageReporting::kResourceType_SerialPort,
+             static_cast<uint8_t>(port) + 1);
 }
 
 SerialPort::~SerialPort() {
