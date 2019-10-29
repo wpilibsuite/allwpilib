@@ -75,30 +75,5 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
   std::function<double()> m_measurement;
   std::function<double()> m_setpoint;
   std::function<void(double)> m_useOutput;
-
- private:
-  /**
-   * Wraps the setpoint supplier field so that changes to it are visible to the
-   * controller.
-   *
-   * @return The setpoint for the controller
-   */
-  double GetSetpoint();
-
-  /**
-   * Wraps the measurement supplier field so that changes to it are visible to
-   * the controller.
-   *
-   * @return The measurement of the process variable
-   */
-  double GetMeasurement();
-
-  /**
-   * Wraps the output consumer field so that changes to it are visible to the
-   * controller.
-   *
-   * @return The measurement of the process variable
-   */
-  void UseOutput(double output);
 };
 }  // namespace frc2
