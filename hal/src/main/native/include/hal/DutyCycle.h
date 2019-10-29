@@ -35,6 +35,15 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_Handle digitalSourceHandle,
 void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle);
 
 /**
+ * Indicates the duty cycle is used by a simulated device.
+ *
+ * @param handle the duty cycle handle
+ * @param device simulated device handle
+ */
+void HAL_SetDutyCycleSimDevice(HAL_DutyCycleHandle handle,
+                             HAL_SimDeviceHandle device);
+
+/**
  * Get the frequency of the duty cycle signal.
  *
  * @param dutyCycleHandle the duty cycle handle

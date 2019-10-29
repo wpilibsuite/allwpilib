@@ -32,6 +32,7 @@ void InitializeHAL() {
   InitializeCanData();
   InitializeCANAPI();
   InitializeDigitalPWMData();
+  InitializeDutyCycleData();
   InitializeDIOData();
   InitializeDriverStationData();
   InitializeEncoderData();
