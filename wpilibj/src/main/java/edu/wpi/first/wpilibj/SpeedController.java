@@ -24,6 +24,9 @@ public interface SpeedController extends PIDOutput {
    * useful when the voltage outputs are "meaningful" (e.g. they come from a feedforward
    * calculation).
    *
+   * <p>NOTE: This function *must* be called regularly in order for voltage compensation to work
+   * properly - unlike the ordinary set function, it is not "set it and forget it."
+   *
    * @param outputVolts The voltage to output.
    */
   default void setVoltage(double outputVolts) {

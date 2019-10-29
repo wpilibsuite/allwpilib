@@ -34,6 +34,10 @@ class SpeedController : public PIDOutput {
    * when battery voltage fluctuates - highly useful when the voltage outputs
    * are "meaningful" (e.g. they come from a feedforward calculation).
    *
+   * <p>NOTE: This function *must* be called regularly in order for voltage
+   * compensation to work properly - unlike the ordinary set function, it is not
+   * "set it and forget it."
+   *
    * @param output The voltage to output.
    */
   virtual void SetVoltage(units::volt_t output) {
