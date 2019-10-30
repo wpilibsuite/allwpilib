@@ -364,8 +364,7 @@ HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
 
   while (newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
-      auto timedOut =
-          newDSDataAvailableCond->wait_until(lock, timeoutTime);
+      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
       if (timedOut == std::cv_status::timeout) {
         return false;
       }
