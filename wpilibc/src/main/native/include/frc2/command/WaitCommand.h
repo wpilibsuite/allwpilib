@@ -12,7 +12,7 @@
 
 #include "CommandBase.h"
 #include "CommandHelper.h"
-#include "frc/Timer.h"
+#include "frc2/Timer.h"
 
 namespace frc2 {
 /**
@@ -43,7 +43,7 @@ class WaitCommand : public CommandHelper<CommandBase, WaitCommand> {
   bool RunsWhenDisabled() const override;
 
  protected:
-  frc::Timer m_timer;
+  Timer m_timer;
 
  private:
   units::second_t m_duration;

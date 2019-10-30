@@ -41,7 +41,7 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& state) {
 
   // Calculate the turning motor output from the turning PID controller.
   const auto turnOutput = m_turningPIDController.Calculate(
-      m_turningEncoder.Get(),
+      units::meter_t(m_turningEncoder.Get()),
       // We have to convert to the meters type here because that's what
       // ProfiledPIDController wants.
       units::meter_t(state.angle.Radians().to<double>()));

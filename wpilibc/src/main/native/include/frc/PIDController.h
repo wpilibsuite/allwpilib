@@ -102,9 +102,6 @@ class PIDController : public PIDBase, public Controller {
 
   ~PIDController() override;
 
-  PIDController(PIDController&&) = default;
-  PIDController& operator=(PIDController&&) = default;
-
   /**
    * Begin running the PIDController.
    */

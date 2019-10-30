@@ -29,7 +29,9 @@ KilloughDrive::KilloughDrive(SpeedController& leftMotor,
                              SpeedController& rightMotor,
                              SpeedController& backMotor, double leftMotorAngle,
                              double rightMotorAngle, double backMotorAngle)
-    : m_leftMotor(leftMotor), m_rightMotor(rightMotor), m_backMotor(backMotor) {
+    : m_leftMotor(&leftMotor),
+      m_rightMotor(&rightMotor),
+      m_backMotor(&backMotor) {
   m_leftVec = {std::cos(leftMotorAngle * (wpi::math::pi / 180.0)),
                std::sin(leftMotorAngle * (wpi::math::pi / 180.0))};
   m_rightVec = {std::cos(rightMotorAngle * (wpi::math::pi / 180.0)),
@@ -37,9 +39,9 @@ KilloughDrive::KilloughDrive(SpeedController& leftMotor,
   m_backVec = {std::cos(backMotorAngle * (wpi::math::pi / 180.0)),
                std::sin(backMotorAngle * (wpi::math::pi / 180.0))};
   auto& registry = SendableRegistry::GetInstance();
-  registry.AddChild(this, &m_leftMotor);
-  registry.AddChild(this, &m_rightMotor);
-  registry.AddChild(this, &m_backMotor);
+  registry.AddChild(this, m_leftMotor);
+  registry.AddChild(this, m_rightMotor);
+  registry.AddChild(this, m_backMotor);
   static int instances = 0;
   ++instances;
   registry.AddLW(this, "KilloughDrive", instances);
@@ -70,9 +72,9 @@ void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
 
   Normalize(wheelSpeeds);
 
-  m_leftMotor.Set(wheelSpeeds[kLeft] * m_maxOutput);
-  m_rightMotor.Set(wheelSpeeds[kRight] * m_maxOutput);
-  m_backMotor.Set(wheelSpeeds[kBack] * m_maxOutput);
+  m_leftMotor->Set(wheelSpeeds[kLeft] * m_maxOutput);
+  m_rightMotor->Set(wheelSpeeds[kRight] * m_maxOutput);
+  m_backMotor->Set(wheelSpeeds[kBack] * m_maxOutput);
 
   Feed();
 }
@@ -91,9 +93,9 @@ void KilloughDrive::DrivePolar(double magnitude, double angle,
 }
 
 void KilloughDrive::StopMotor() {
-  m_leftMotor.StopMotor();
-  m_rightMotor.StopMotor();
-  m_backMotor.StopMotor();
+  m_leftMotor->StopMotor();
+  m_rightMotor->StopMotor();
+  m_backMotor->StopMotor();
   Feed();
 }
 
@@ -106,12 +108,12 @@ void KilloughDrive::InitSendable(SendableBuilder& builder) {
   builder.SetActuator(true);
   builder.SetSafeState([=] { StopMotor(); });
   builder.AddDoubleProperty("Left Motor Speed",
-                            [=]() { return m_leftMotor.Get(); },
-                            [=](double value) { m_leftMotor.Set(value); });
+                            [=]() { return m_leftMotor->Get(); },
+                            [=](double value) { m_leftMotor->Set(value); });
   builder.AddDoubleProperty("Right Motor Speed",
-                            [=]() { return m_rightMotor.Get(); },
-                            [=](double value) { m_rightMotor.Set(value); });
+                            [=]() { return m_rightMotor->Get(); },
+                            [=](double value) { m_rightMotor->Set(value); });
   builder.AddDoubleProperty("Back Motor Speed",
-                            [=]() { return m_backMotor.Get(); },
-                            [=](double value) { m_backMotor.Set(value); });
+                            [=]() { return m_backMotor->Get(); },
+                            [=](double value) { m_backMotor->Set(value); });
 }

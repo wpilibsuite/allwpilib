@@ -31,7 +31,7 @@ public class AnalogAccelerometer implements PIDSource, Sendable, AutoCloseable {
    */
   private void initAccelerometer() {
     HAL.report(tResourceType.kResourceType_Accelerometer,
-                                   m_analogChannel.getChannel());
+                                   m_analogChannel.getChannel() + 1);
     SendableRegistry.addLW(this, "Accelerometer", m_analogChannel.getChannel());
   }
 

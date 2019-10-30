@@ -137,10 +137,10 @@ class MecanumDrive : public RobotDriveBase,
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  SpeedController& m_frontLeftMotor;
-  SpeedController& m_rearLeftMotor;
-  SpeedController& m_frontRightMotor;
-  SpeedController& m_rearRightMotor;
+  SpeedController* m_frontLeftMotor;
+  SpeedController* m_rearLeftMotor;
+  SpeedController* m_frontRightMotor;
+  SpeedController* m_rearRightMotor;
 
   double m_rightSideInvertMultiplier = -1.0;
 

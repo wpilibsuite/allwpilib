@@ -38,7 +38,7 @@ DigitalGlitchFilter::DigitalGlitchFilter() {
   *index = true;
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalGlitchFilter,
-             m_channelIndex);
+             m_channelIndex + 1);
   SendableRegistry::GetInstance().AddLW(this, "DigitalGlitchFilter",
                                         m_channelIndex);
 }
@@ -87,9 +87,6 @@ void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requestedIndex) {
     int actualIndex =
         HAL_GetFilterSelect(input->GetPortHandleForRouting(), &status);
     wpi_assertEqual(actualIndex, requestedIndex);
-
-    HAL_Report(HALUsageReporting::kResourceType_DigitalInput,
-               input->GetChannel());
   }
 }
 

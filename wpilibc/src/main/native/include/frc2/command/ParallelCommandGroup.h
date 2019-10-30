@@ -7,6 +7,11 @@
 
 #pragma once
 
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 4521)
+#endif
+
 #include <memory>
 #include <unordered_map>
 #include <utility>
@@ -57,7 +62,12 @@ class ParallelCommandGroup
   // No copy constructors for commandgroups
   ParallelCommandGroup(const ParallelCommandGroup&) = delete;
 
-  template <class... Types>
+  // Prevent template expansion from emulating copy ctor
+  ParallelCommandGroup(ParallelCommandGroup&) = delete;
+
+  template <class... Types,
+            typename = std::enable_if_t<std::conjunction_v<
+                std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
   void AddCommands(Types&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
     ((void)foo.emplace_back(std::make_unique<std::remove_reference_t<Types>>(
@@ -84,3 +94,7 @@ class ParallelCommandGroup
   bool isRunning = false;
 };
 }  // namespace frc2
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif

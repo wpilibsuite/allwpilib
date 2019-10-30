@@ -18,7 +18,7 @@ static void DisplayRoboRio() {
   ImGui::Button("User Button");
   HALSIM_SetRoboRioFPGAButton(0, ImGui::IsItemActive());
 
-  ImGui::PushItemWidth(100);
+  ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
 
   if (ImGui::CollapsingHeader("RoboRIO Input")) {
     {

@@ -32,7 +32,7 @@ cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 
 doxygen {
   executables {
-     doxygen version : '1.8.8'
+     doxygen version : '1.8.16'
   }
 }
 
@@ -67,6 +67,7 @@ doxygen {
     use_mathjax true
     html_timestamp true
     generate_treeview true
+    extract_static true
 }
 
 tasks.register("zipCppDocs", Zip) {

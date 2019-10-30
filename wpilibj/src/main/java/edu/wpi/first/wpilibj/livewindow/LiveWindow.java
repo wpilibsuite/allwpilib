@@ -12,7 +12,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 
@@ -22,7 +21,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  */
 public class LiveWindow {
   private static class Component {
-    final SendableBuilderImpl m_builder = new SendableBuilderImpl();
     boolean m_firstTime = true;
     boolean m_telemetryEnabled = true;
   }
@@ -73,13 +71,9 @@ public class LiveWindow {
         scheduler.removeAll();
       } else {
         System.out.println("stopping live window mode.");
-        SendableRegistry.foreachLiveWindow(dataHandle,
-            (sendable, name, subsystem, parent, data) -> {
-              if (data != null) {
-                ((Component) data).m_builder.stopLiveWindowMode();
-              }
-              return data;
-          });
+        SendableRegistry.foreachLiveWindow(dataHandle, cbdata -> {
+          cbdata.builder.stopLiveWindowMode();
+        });
         scheduler.enable();
       }
       enabledEntry.setBoolean(enabled);
@@ -111,12 +105,11 @@ public class LiveWindow {
    */
   public static synchronized void disableAllTelemetry() {
     telemetryEnabled = false;
-    SendableRegistry.foreachLiveWindow(dataHandle, (sendable, name, subsystem, parent, data) -> {
-      if (data == null) {
-        data = new Component();
+    SendableRegistry.foreachLiveWindow(dataHandle, cbdata -> {
+      if (cbdata.data == null) {
+        cbdata.data = new Component();
       }
-      ((Component) data).m_telemetryEnabled = false;
-      return data;
+      ((Component) cbdata.data).m_telemetryEnabled = false;
     });
   }
 
@@ -133,19 +126,19 @@ public class LiveWindow {
       return;
     }
 
-    SendableRegistry.foreachLiveWindow(dataHandle, (sendable, name, subsystem, parent, data) -> {
-      if (sendable == null || parent != null) {
-        return data;
+    SendableRegistry.foreachLiveWindow(dataHandle, cbdata -> {
+      if (cbdata.sendable == null || cbdata.parent != null) {
+        return;
       }
 
-      if (data == null) {
-        data = new Component();
+      if (cbdata.data == null) {
+        cbdata.data = new Component();
       }
 
-      Component component = (Component) data;
+      Component component = (Component) cbdata.data;
 
       if (!liveWindowEnabled && !component.m_telemetryEnabled) {
-        return data;
+        return;
       }
 
       if (component.m_firstTime) {
@@ -153,30 +146,29 @@ public class LiveWindow {
         // components to be redefined. This allows default sensor and actuator
         // values to be created that are replaced with the custom names from
         // users calling setName.
-        if (name.isEmpty()) {
-          return data;
+        if (cbdata.name.isEmpty()) {
+          return;
         }
-        NetworkTable ssTable = liveWindowTable.getSubTable(subsystem);
+        NetworkTable ssTable = liveWindowTable.getSubTable(cbdata.subsystem);
         NetworkTable table;
         // Treat name==subsystem as top level of subsystem
-        if (name.equals(subsystem)) {
+        if (cbdata.name.equals(cbdata.subsystem)) {
           table = ssTable;
         } else {
-          table = ssTable.getSubTable(name);
+          table = ssTable.getSubTable(cbdata.name);
         }
-        table.getEntry(".name").setString(name);
-        component.m_builder.setTable(table);
-        sendable.initSendable(component.m_builder);
+        table.getEntry(".name").setString(cbdata.name);
+        cbdata.builder.setTable(table);
+        cbdata.sendable.initSendable(cbdata.builder);
         ssTable.getEntry(".type").setString("LW Subsystem");
 
         component.m_firstTime = false;
       }
 
       if (startLiveWindow) {
-        component.m_builder.startLiveWindowMode();
+        cbdata.builder.startLiveWindowMode();
       }
-      component.m_builder.updateTable();
-      return data;
+      cbdata.builder.updateTable();
     });
 
     startLiveWindow = false;

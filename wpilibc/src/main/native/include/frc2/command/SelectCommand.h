@@ -7,6 +7,11 @@
 
 #pragma once
 
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 4521)
+#endif
+
 #include <memory>
 #include <unordered_map>
 #include <utility>
@@ -88,6 +93,9 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
   // No copy constructors for command groups
   SelectCommand(const SelectCommand& other) = delete;
 
+  // Prevent template expansion from emulating copy ctor
+  SelectCommand(SelectCommand&) = delete;
+
   /**
    * Creates a new selectcommand.
    *
@@ -139,3 +147,7 @@ void SelectCommand<T>::Initialize() {
 }
 
 }  // namespace frc2
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif

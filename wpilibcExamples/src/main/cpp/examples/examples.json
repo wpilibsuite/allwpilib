@@ -316,7 +316,7 @@
       "PID"
     ],
     "foldername": "Frisbeebot",
-    "mainclass": "Main"
+    "gradlebase": "cpp"
   },
   {
     "name": "Gyro Drive Commands",
@@ -327,7 +327,7 @@
       "Gyro"
     ],
     "foldername": "GyroDriveCommands",
-    "mainclass": "Main"
+    "gradlebase": "cpp"
   },
   {
     "name": "SwerveBot",
@@ -354,6 +354,19 @@
       "DifferentialDriveBot"
     ],
     "foldername": "DifferentialDriveBot",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "RamseteCommand",
+    "description": "An example command-based robot demonstrating the use of a RamseteCommand to follow a pregenerated trajectory.",
+    "tags": [
+      "RamseteCommand",
+      "PID",
+      "Ramsete",
+      "Trajectory",
+      "Path following"
+    ],
+    "foldername": "RamseteCommand",
     "gradlebase": "cpp"
   }
 ]

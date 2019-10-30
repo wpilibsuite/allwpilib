@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.spline.PoseWithCurvature;
 import edu.wpi.first.wpilibj.spline.Spline;
 import edu.wpi.first.wpilibj.spline.SplineHelper;
 import edu.wpi.first.wpilibj.spline.SplineParameterizer;
-import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
 
 public final class TrajectoryGenerator {
   /**
@@ -28,110 +27,152 @@ public final class TrajectoryGenerator {
   }
 
   /**
-   * Generates a trajectory with the given waypoints and constraints.
+   * Generates a trajectory from the given control vectors and config. This method uses clamped
+   * cubic splines -- a method in which the exterior control vectors and interior waypoints
+   * are provided. The headings are automatically determined at the interior points to
+   * ensure continuous curvature.
    *
-   * @param waypoints                        A vector of points that the trajectory must go through.
-   * @param constraints                      A vector of various velocity and acceleration
-   *                                         constraints.
-   * @param startVelocityMetersPerSecond     The start velocity for the trajectory.
-   * @param endVelocityMetersPerSecond       The end velocity for the trajectory.
-   * @param maxVelocityMetersPerSecond       The max velocity for the trajectory.
-   * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
-   * @param reversed                         Whether the robot should move backwards. Note that the
-   *                                         robot will still move from a -&gt; b -&gt; ... -&gt; z
-   *                                         as defined in the waypoints.
-   * @return The trajectory.
+   * @param initial           The initial control vector.
+   * @param interiorWaypoints The interior waypoints.
+   * @param end               The ending control vector.
+   * @param config            The configuration for the trajectory.
+   * @return The generated trajectory.
    */
-
   public static Trajectory generateTrajectory(
-      List<Pose2d> waypoints,
-      List<TrajectoryConstraint> constraints,
-      double startVelocityMetersPerSecond,
-      double endVelocityMetersPerSecond,
-      double maxVelocityMetersPerSecond,
-      double maxAccelerationMetersPerSecondSq,
-      boolean reversed
+      Spline.ControlVector initial,
+      List<Translation2d> interiorWaypoints,
+      Spline.ControlVector end,
+      TrajectoryConfig config
   ) {
-    final var flip = new Transform2d(new Translation2d(), Rotation2d.fromDegrees(-180.0));
+    final var flip = new Transform2d(new Translation2d(), Rotation2d.fromDegrees(180.0));
 
-    // Make theta normal for trajectory generation if path is reversed.
-    final var newWaypoints = new ArrayList<Pose2d>(waypoints.size());
-    for (final var point : waypoints) {
-      newWaypoints.add(reversed ? point.plus(flip) : point);
+    // Clone the control vectors.
+    var newInitial = new Spline.ControlVector(initial.x, initial.y);
+    var newEnd = new Spline.ControlVector(end.x, end.y);
+
+    // Change the orientation if reversed.
+    if (config.isReversed()) {
+      newInitial.x[1] *= -1;
+      newInitial.y[1] *= -1;
+      newEnd.x[1] *= -1;
+      newEnd.y[1] *= -1;
     }
 
-    var points = splinePointsFromSplines(SplineHelper.getQuinticSplinesFromWaypoints(
-        newWaypoints.toArray(new Pose2d[0])
+    // Get the spline points
+    var points = splinePointsFromSplines(SplineHelper.getCubicSplinesFromControlVectors(
+        newInitial, interiorWaypoints.toArray(new Translation2d[0]), newEnd
     ));
 
-    // After trajectory generation, flip theta back so it's relative to the
-    // field. Also fix curvature.
-    if (reversed) {
+    // Change the points back to their original orientation.
+    if (config.isReversed()) {
       for (var point : points) {
         point.poseMeters = point.poseMeters.plus(flip);
         point.curvatureRadPerMeter *= -1;
       }
     }
 
-    return TrajectoryParameterizer.timeParameterizeTrajectory(points, constraints,
-        startVelocityMetersPerSecond, endVelocityMetersPerSecond, maxVelocityMetersPerSecond,
-        maxAccelerationMetersPerSecondSq, reversed);
+    // Generate and return trajectory.
+    return TrajectoryParameterizer.timeParameterizeTrajectory(points, config.getConstraints(),
+        config.getStartVelocity(), config.getEndVelocity(), config.getMaxVelocity(),
+        config.getMaxAcceleration(), config.isReversed());
   }
 
   /**
-   * Generates a trajectory with the given waypoints and constraints.
+   * Generates a trajectory from the given waypoints and config. This method uses clamped
+   * cubic splines -- a method in which the initial pose, final pose, and interior waypoints
+   * are provided.  The headings are automatically determined at the interior points to
+   * ensure continuous curvature.
    *
-   * @param start                            The starting pose for the trajectory.
-   * @param waypoints                        The interior waypoints for the trajectory. The headings
-   *                                         will be determined automatically to ensure continuous
-   *                                         curvature.
-   * @param end                              The ending pose for the trajectory.
-   * @param constraints                      A vector of various velocity and acceleration
-   *                                         constraints.
-   * @param startVelocityMetersPerSecond     The start velocity for the trajectory.
-   * @param endVelocityMetersPerSecond       The end velocity for the trajectory.
-   * @param maxVelocityMetersPerSecond       The max velocity for the trajectory.
-   * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
-   * @param reversed                         Whether the robot should move backwards. Note that the
-   *                                         robot will still move from a -&gt; b -&gt; ... -&gt; z
-   *                                         as defined in the waypoints.
-   * @return The trajectory.
+   * @param start             The starting pose.
+   * @param interiorWaypoints The interior waypoints.
+   * @param end               The ending pose.
+   * @param config            The configuration for the trajectory.
+   * @return The generated trajectory.
    */
   public static Trajectory generateTrajectory(
-      Pose2d start,
-      List<Translation2d> waypoints,
-      Pose2d end,
-      List<TrajectoryConstraint> constraints,
-      double startVelocityMetersPerSecond,
-      double endVelocityMetersPerSecond,
-      double maxVelocityMetersPerSecond,
-      double maxAccelerationMetersPerSecondSq,
-      boolean reversed
+      Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end,
+      TrajectoryConfig config
   ) {
-    final var flip = new Transform2d(new Translation2d(), Rotation2d.fromDegrees(-180.0));
+    var controlVectors = SplineHelper.getCubicControlVectorsFromWaypoints(
+        start, interiorWaypoints.toArray(new Translation2d[0]), end
+    );
 
-    final var newStart = reversed ? start.plus(flip) : start;
-    final var newEnd = reversed ? end.plus(flip) : end;
+    // Return the generated trajectory.
+    return generateTrajectory(controlVectors[0], interiorWaypoints, controlVectors[1], config);
+  }
 
-    var points = splinePointsFromSplines(SplineHelper.getCubicSplinesFromWaypoints(
-        newStart, waypoints.toArray(new Translation2d[0]), newEnd
+  /**
+   * Generates a trajectory from the given quintic control vectors and config. This method
+   * uses quintic hermite splines -- therefore, all points must be represented by control
+   * vectors. Continuous curvature is guaranteed in this method.
+   *
+   * @param controlVectors List of quintic control vectors.
+   * @param config         The configuration for the trajectory.
+   * @return The generated trajectory.
+   */
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+  public static Trajectory generateTrajectory(
+      ControlVectorList controlVectors,
+      TrajectoryConfig config
+  ) {
+    final var flip = new Transform2d(new Translation2d(), Rotation2d.fromDegrees(180.0));
+    final var newControlVectors = new ArrayList<Spline.ControlVector>(controlVectors.size());
+
+    // Create a new control vector list, flipping the orientation if reversed.
+    for (final var vector : controlVectors) {
+      var newVector = new Spline.ControlVector(vector.x, vector.y);
+      if (config.isReversed()) {
+        newVector.x[1] *= -1;
+        newVector.y[1] *= -1;
+      }
+      newControlVectors.add(newVector);
+    }
+
+    // Get the spline points
+    var points = splinePointsFromSplines(SplineHelper.getQuinticSplinesFromControlVectors(
+        newControlVectors.toArray(new Spline.ControlVector[]{})
     ));
 
-    // After trajectory generation, flip theta back so it's relative to the
-    // field. Also fix curvature.
-    if (reversed) {
+    // Change the points back to their original orientation.
+    if (config.isReversed()) {
       for (var point : points) {
         point.poseMeters = point.poseMeters.plus(flip);
         point.curvatureRadPerMeter *= -1;
       }
     }
 
-    return TrajectoryParameterizer.timeParameterizeTrajectory(points, constraints,
-        startVelocityMetersPerSecond, endVelocityMetersPerSecond, maxVelocityMetersPerSecond,
-        maxAccelerationMetersPerSecondSq, reversed);
+    // Generate and return trajectory.
+    return TrajectoryParameterizer.timeParameterizeTrajectory(points, config.getConstraints(),
+        config.getStartVelocity(), config.getEndVelocity(), config.getMaxVelocity(),
+        config.getMaxAcceleration(), config.isReversed());
+
   }
 
-  private static List<PoseWithCurvature> splinePointsFromSplines(
+  /**
+   * Generates a trajectory from the given waypoints and config. This method
+   * uses quintic hermite splines -- therefore, all points must be represented by Pose2d
+   * objects. Continuous curvature is guaranteed in this method.
+   *
+   * @param waypoints List of waypoints..
+   * @param config    The configuration for the trajectory.
+   * @return The generated trajectory.
+   */
+  @SuppressWarnings("LocalVariableName")
+  public static Trajectory generateTrajectory(List<Pose2d> waypoints, TrajectoryConfig config) {
+    var originalList = SplineHelper.getQuinticControlVectorsFromWaypoints(waypoints);
+    var newList = new ControlVectorList();
+    newList.addAll(originalList);
+    return generateTrajectory(newList, config);
+  }
+
+  /**
+   * Generate spline points from a vector of splines by parameterizing the
+   * splines.
+   *
+   * @param splines The splines to parameterize.
+   * @return The spline points for use in time parameterization of a trajectory.
+   */
+  public static List<PoseWithCurvature> splinePointsFromSplines(
       Spline[] splines) {
     // Create the vector of spline points.
     var splinePoints = new ArrayList<PoseWithCurvature>();
@@ -150,5 +191,9 @@ public final class TrajectoryGenerator {
       splinePoints.addAll(points.subList(1, points.size()));
     }
     return splinePoints;
+  }
+
+  // Work around type erasure signatures
+  private static class ControlVectorList extends ArrayList<Spline.ControlVector> {
   }
 }

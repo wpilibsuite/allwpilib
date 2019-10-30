@@ -41,5 +41,5 @@ AnalogTriggerOutput::AnalogTriggerOutput(const AnalogTrigger& trigger,
                                          AnalogTriggerType outputType)
     : m_trigger(&trigger), m_outputType(outputType) {
   HAL_Report(HALUsageReporting::kResourceType_AnalogTriggerOutput,
-             trigger.GetIndex(), static_cast<uint8_t>(outputType));
+             trigger.GetIndex() + 1, static_cast<uint8_t>(outputType) + 1);
 }

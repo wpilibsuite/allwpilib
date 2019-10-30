@@ -132,9 +132,9 @@ class KilloughDrive : public RobotDriveBase,
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  SpeedController& m_leftMotor;
-  SpeedController& m_rightMotor;
-  SpeedController& m_backMotor;
+  SpeedController* m_leftMotor;
+  SpeedController* m_rightMotor;
+  SpeedController* m_backMotor;
 
   Vector2d m_leftVec;
   Vector2d m_rightVec;

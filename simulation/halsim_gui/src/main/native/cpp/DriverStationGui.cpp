@@ -211,7 +211,12 @@ void RobotJoystick::Update() {
   const unsigned char* sysButtons;
   if (sys->isGamepad && useGamepad) {
     sysAxes = sys->gamepadState.axes;
+    // don't remap on windows
+#ifdef _WIN32
+    sysButtons = sys->buttons;
+#else
     sysButtons = sys->gamepadState.buttons;
+#endif
   } else {
     sysAxes = sys->axes;
     sysButtons = sys->buttons;
@@ -226,12 +231,32 @@ void RobotJoystick::Update() {
   desc.buttonCount = (std::min)(sys->buttonCount, 32);
   desc.povCount = (std::min)(sys->hatCount, HAL_kMaxJoystickPOVs);
 
-  axes.count = desc.axisCount;
-  std::memcpy(axes.axes, sysAxes, axes.count * sizeof(&axes.axes[0]));
-
   buttons.count = desc.buttonCount;
   for (int j = 0; j < buttons.count; ++j)
     buttons.buttons |= (sysButtons[j] ? 1u : 0u) << j;
+
+  axes.count = desc.axisCount;
+  if (sys->isGamepad && useGamepad) {
+    // the FRC DriverStation maps gamepad (XInput) trigger values to 0-1 range
+    // on axis 2 and 3.
+    axes.axes[0] = sysAxes[0];
+    axes.axes[1] = sysAxes[1];
+    axes.axes[2] = 0.5 + sysAxes[4] / 2.0;
+    axes.axes[3] = 0.5 + sysAxes[5] / 2.0;
+    axes.axes[4] = sysAxes[2];
+    axes.axes[5] = sysAxes[3];
+
+    // the start button for gamepads is not mapped on the FRC DriverStation
+    // platforms, so remove it if present
+    if (buttons.count == 11) {
+      --desc.buttonCount;
+      --buttons.count;
+      buttons.buttons =
+          (buttons.buttons & 0xff) | ((buttons.buttons >> 1) & 0x300);
+    }
+  } else {
+    std::memcpy(axes.axes, sysAxes, axes.count * sizeof(&axes.axes[0]));
+  }
 
   povs.count = desc.povCount;
   for (int j = 0; j < povs.count; ++j) povs.povs[j] = HatToAngle(sys->hats[j]);
@@ -326,7 +351,7 @@ static void DisplayFMS() {
   static const char* stations[] = {"Red 1",  "Red 2",  "Red 3",
                                    "Blue 1", "Blue 2", "Blue 3"};
   int allianceStationId = HALSIM_GetDriverStationAllianceStationId();
-  ImGui::SetNextItemWidth(100);
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   if (ImGui::Combo("Alliance Station", &allianceStationId, stations, 6))
     HALSIM_SetDriverStationAllianceStationId(
         static_cast<HAL_AllianceStationID>(allianceStationId));
@@ -337,7 +362,7 @@ static void DisplayFMS() {
 
   static double startMatchTime = 0.0;
   double matchTime = HALSIM_GetDriverStationMatchTime();
-  ImGui::SetNextItemWidth(100);
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   if (ImGui::InputDouble("Match Time", &matchTime, 0, 0, "%.1f",
                          ImGuiInputTextFlags_EnterReturnsTrue)) {
     HALSIM_SetDriverStationMatchTime(matchTime);
@@ -355,7 +380,7 @@ static void DisplayFMS() {
 
   // Game Specific Message
   static HAL_MatchInfo matchInfo;
-  ImGui::SetNextItemWidth(100);
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   if (ImGui::InputText("Game Specific",
                        reinterpret_cast<char*>(matchInfo.gameSpecificMessage),
                        sizeof(matchInfo.gameSpecificMessage),
@@ -395,7 +420,7 @@ static void DisplaySystemJoysticks() {
 
 static void DisplayJoysticks() {
   // imgui doesn't size columns properly with autoresize, so force it
-  ImGui::Dummy(ImVec2(14.0 * 9 * HAL_kMaxJoysticks, 0));
+  ImGui::Dummy(ImVec2(ImGui::GetFontSize() * 10 * HAL_kMaxJoysticks, 0));
 
   ImGui::Columns(HAL_kMaxJoysticks, "Joysticks", false);
   for (int i = 0; i < HAL_kMaxJoysticks; ++i) {

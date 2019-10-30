@@ -31,13 +31,13 @@ TEST_F(CommandDecoratorTest, WithTimeoutTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(CommandDecoratorTest, InterruptOnTest) {
+TEST_F(CommandDecoratorTest, WithInterruptTest) {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
 
   auto command =
-      RunCommand([] {}, {}).InterruptOn([&finished] { return finished; });
+      RunCommand([] {}, {}).WithInterrupt([&finished] { return finished; });
 
   scheduler.Schedule(&command);
 
@@ -68,13 +68,13 @@ TEST_F(CommandDecoratorTest, BeforeStartingTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(CommandDecoratorTest, WhenFinishedTest) {
+TEST_F(CommandDecoratorTest, AndThenTest) {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
 
   auto command =
-      InstantCommand([] {}, {}).WhenFinished([&finished] { finished = true; });
+      InstantCommand([] {}, {}).AndThen([&finished] { finished = true; });
 
   scheduler.Schedule(&command);
 

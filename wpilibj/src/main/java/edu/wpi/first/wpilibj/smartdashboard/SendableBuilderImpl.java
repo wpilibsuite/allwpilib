@@ -80,6 +80,14 @@ public class SendableBuilderImpl implements SendableBuilder {
   }
 
   /**
+   * Return whether this sendable has an associated table.
+   * @return True if it has a table, false if not.
+   */
+  public boolean hasTable() {
+    return m_table != null;
+  }
+
+  /**
    * Return whether this sendable should be treated as an actuator.
    *
    * @return True if actuator, false if not.
@@ -146,6 +154,14 @@ public class SendableBuilderImpl implements SendableBuilder {
     if (m_safeState != null) {
       m_safeState.run();
     }
+  }
+
+  /**
+   * Clear properties.
+   */
+  public void clearProperties() {
+    stopListeners();
+    m_properties.clear();
   }
 
   /**

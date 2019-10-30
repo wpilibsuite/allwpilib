@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -46,6 +46,12 @@ class SendableBuilderImpl : public SendableBuilder {
   std::shared_ptr<nt::NetworkTable> GetTable();
 
   /**
+   * Return whether this sendable has an associated table.
+   * @return True if it has a table, false if not.
+   */
+  bool HasTable() const;
+
+  /**
    * Return whether this sendable should be treated as an actuator.
    * @return True if actuator, false if not.
    */
@@ -77,6 +83,11 @@ class SendableBuilderImpl : public SendableBuilder {
    * calls the SafeState function if one was provided.
    */
   void StopLiveWindowMode();
+
+  /**
+   * Clear properties.
+   */
+  void ClearProperties();
 
   void SetSmartDashboardType(const wpi::Twine& type) override;
   void SetActuator(bool value) override;

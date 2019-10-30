@@ -39,7 +39,7 @@ public class Servo extends PWM {
     setBounds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
     setPeriodMultiplier(PeriodMultiplier.k4X);
 
-    HAL.report(tResourceType.kResourceType_Servo, getChannel());
+    HAL.report(tResourceType.kResourceType_Servo, getChannel() + 1);
     SendableRegistry.setName(this, "Servo", getChannel());
   }
 

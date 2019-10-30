@@ -37,6 +37,7 @@ SimDeviceData::Value* SimDeviceData::LookupValue(HAL_SimValueHandle handle) {
 
   // look up device
   Device* deviceImpl = LookupDevice(handle >> 16);
+  if (!deviceImpl) return nullptr;
 
   // look up value
   handle &= 0xffff;

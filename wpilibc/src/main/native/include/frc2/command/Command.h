@@ -122,7 +122,7 @@ class Command : public frc::ErrorBase {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  ParallelRaceGroup InterruptOn(std::function<bool()> condition) &&;
+  ParallelRaceGroup WithInterrupt(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command with a runnable to run before this command starts.
@@ -138,7 +138,7 @@ class Command : public frc::ErrorBase {
    * @param toRun the Runnable to run
    * @return the decorated command
    */
-  SequentialCommandGroup WhenFinished(std::function<void()> toRun) &&;
+  SequentialCommandGroup AndThen(std::function<void()> toRun) &&;
 
   /**
    * Decorates this command to run perpetually, ignoring its ordinary end

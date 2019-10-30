@@ -24,15 +24,10 @@ class DefaultCameraServerShared : public frc::CameraServerShared {
 };
 }  // namespace
 
-namespace frc {
-
-static std::unique_ptr<CameraServerShared> cameraServerShared = nullptr;
+static std::unique_ptr<frc::CameraServerShared> cameraServerShared = nullptr;
 static wpi::mutex setLock;
 
-void SetCameraServerShared(std::unique_ptr<CameraServerShared> shared) {
-  std::unique_lock lock(setLock);
-  cameraServerShared = std::move(shared);
-}
+namespace frc {
 CameraServerShared* GetCameraServerShared() {
   std::unique_lock lock(setLock);
   if (!cameraServerShared) {
@@ -41,3 +36,10 @@ CameraServerShared* GetCameraServerShared() {
   return cameraServerShared.get();
 }
 }  // namespace frc
+
+extern "C" {
+void CameraServer_SetCameraServerShared(frc::CameraServerShared* shared) {
+  std::unique_lock lock(setLock);
+  cameraServerShared.reset(shared);
+}
+}  // extern "C"

@@ -32,6 +32,6 @@ VictorSP::VictorSP(int channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_VictorSP, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_VictorSP, GetChannel() + 1);
   SendableRegistry::GetInstance().SetName(this, "VictorSP", GetChannel());
 }

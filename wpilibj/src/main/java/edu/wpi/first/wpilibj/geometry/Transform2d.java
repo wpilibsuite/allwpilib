@@ -79,6 +79,11 @@ public class Transform2d {
     return m_rotation;
   }
 
+  @Override
+  public String toString() {
+    return String.format("Transform2d(%s, %s)", m_translation, m_rotation);
+  }
+
   /**
    * Checks equality between this Transform2d and another object.
    *

@@ -31,3 +31,13 @@ ExternalProject_Add(imgui
   INSTALL_COMMAND   ""
   TEST_COMMAND      ""
 )
+ExternalProject_Add(proggyfonts
+  GIT_REPOSITORY    https://github.com/bluescan/proggyfonts.git
+  GIT_TAG           v1.1.5
+  SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/proggyfonts-src"
+  BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/proggyfonts-build"
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND     ""
+  INSTALL_COMMAND   ""
+  TEST_COMMAND      ""
+)

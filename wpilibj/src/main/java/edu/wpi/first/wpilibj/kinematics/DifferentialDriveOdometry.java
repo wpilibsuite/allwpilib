@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.kinematics;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
@@ -65,6 +66,14 @@ public class DifferentialDriveOdometry {
   }
 
   /**
+   * Returns the position of the robot on the field.
+   * @return The pose of the robot (x and y are in meters).
+   */
+  public Pose2d getPoseMeters() {
+    return m_poseMeters;
+  }
+
+  /**
    * Updates the robot's position on the field using forward kinematics and
    * integration of the pose over time. This method takes in the current time as
    * a parameter to calculate period (difference between two timestamps). The
@@ -108,7 +117,7 @@ public class DifferentialDriveOdometry {
    */
   public Pose2d update(Rotation2d angle,
                        DifferentialDriveWheelSpeeds wheelSpeeds) {
-    return updateWithTime(System.currentTimeMillis() / 1000.0,
+    return updateWithTime(Timer.getFPGATimestamp(),
         angle, wheelSpeeds);
   }
 }

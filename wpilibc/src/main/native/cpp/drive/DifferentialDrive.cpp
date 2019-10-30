@@ -20,10 +20,10 @@ using namespace frc;
 
 DifferentialDrive::DifferentialDrive(SpeedController& leftMotor,
                                      SpeedController& rightMotor)
-    : m_leftMotor(leftMotor), m_rightMotor(rightMotor) {
+    : m_leftMotor(&leftMotor), m_rightMotor(&rightMotor) {
   auto& registry = SendableRegistry::GetInstance();
-  registry.AddChild(this, &m_leftMotor);
-  registry.AddChild(this, &m_rightMotor);
+  registry.AddChild(this, m_leftMotor);
+  registry.AddChild(this, m_rightMotor);
   static int instances = 0;
   ++instances;
   registry.AddLW(this, "DifferentialDrive", instances);
@@ -77,9 +77,9 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
     }
   }
 
-  m_leftMotor.Set(std::clamp(leftMotorOutput, -1.0, 1.0) * m_maxOutput);
+  m_leftMotor->Set(std::clamp(leftMotorOutput, -1.0, 1.0) * m_maxOutput);
   double maxOutput = m_maxOutput * m_rightSideInvertMultiplier;
-  m_rightMotor.Set(std::clamp(rightMotorOutput, -1.0, 1.0) * maxOutput);
+  m_rightMotor->Set(std::clamp(rightMotorOutput, -1.0, 1.0) * maxOutput);
 
   Feed();
 }
@@ -151,9 +151,9 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
     rightMotorOutput /= maxMagnitude;
   }
 
-  m_leftMotor.Set(leftMotorOutput * m_maxOutput);
-  m_rightMotor.Set(rightMotorOutput * m_maxOutput *
-                   m_rightSideInvertMultiplier);
+  m_leftMotor->Set(leftMotorOutput * m_maxOutput);
+  m_rightMotor->Set(rightMotorOutput * m_maxOutput *
+                    m_rightSideInvertMultiplier);
 
   Feed();
 }
@@ -180,8 +180,8 @@ void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
     rightSpeed = std::copysign(rightSpeed * rightSpeed, rightSpeed);
   }
 
-  m_leftMotor.Set(leftSpeed * m_maxOutput);
-  m_rightMotor.Set(rightSpeed * m_maxOutput * m_rightSideInvertMultiplier);
+  m_leftMotor->Set(leftSpeed * m_maxOutput);
+  m_rightMotor->Set(rightSpeed * m_maxOutput * m_rightSideInvertMultiplier);
 
   Feed();
 }
@@ -203,8 +203,8 @@ void DifferentialDrive::SetRightSideInverted(bool rightSideInverted) {
 }
 
 void DifferentialDrive::StopMotor() {
-  m_leftMotor.StopMotor();
-  m_rightMotor.StopMotor();
+  m_leftMotor->StopMotor();
+  m_rightMotor->StopMotor();
   Feed();
 }
 
@@ -217,12 +217,12 @@ void DifferentialDrive::InitSendable(SendableBuilder& builder) {
   builder.SetActuator(true);
   builder.SetSafeState([=] { StopMotor(); });
   builder.AddDoubleProperty("Left Motor Speed",
-                            [=]() { return m_leftMotor.Get(); },
-                            [=](double value) { m_leftMotor.Set(value); });
+                            [=]() { return m_leftMotor->Get(); },
+                            [=](double value) { m_leftMotor->Set(value); });
   builder.AddDoubleProperty(
       "Right Motor Speed",
-      [=]() { return m_rightMotor.Get() * m_rightSideInvertMultiplier; },
+      [=]() { return m_rightMotor->Get() * m_rightSideInvertMultiplier; },
       [=](double value) {
-        m_rightMotor.Set(value * m_rightSideInvertMultiplier);
+        m_rightMotor->Set(value * m_rightSideInvertMultiplier);
       });
 }

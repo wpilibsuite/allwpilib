@@ -50,6 +50,7 @@ class PIDBase : public PIDInterface,
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    */
+  WPI_DEPRECATED("All APIs which use this have been deprecated.")
   PIDBase(double p, double i, double d, PIDSource& source, PIDOutput& output);
 
   /**
@@ -61,13 +62,11 @@ class PIDBase : public PIDInterface,
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    */
+  WPI_DEPRECATED("All APIs which use this have been deprecated.")
   PIDBase(double p, double i, double d, double f, PIDSource& source,
           PIDOutput& output);
 
   virtual ~PIDBase() = default;
-
-  PIDBase(PIDBase&&) = default;
-  PIDBase& operator=(PIDBase&&) = default;
 
   /**
    * Return the current PID result.

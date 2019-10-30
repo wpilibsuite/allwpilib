@@ -31,7 +31,10 @@ static void DisplaySolenoids() {
     for (int j = 0; j < numChannels; ++j) {
       if (HALSIM_GetPCMSolenoidInitialized(i, j)) {
         anyInit = true;
-        channels[j] = HALSIM_GetPCMSolenoidOutput(i, j) ? 1 : -1;
+        channels[j] = (!HALSimGui::AreOutputsDisabled() &&
+                       HALSIM_GetPCMSolenoidOutput(i, j))
+                          ? 1
+                          : -1;
       } else {
         channels[j] = -2;
       }

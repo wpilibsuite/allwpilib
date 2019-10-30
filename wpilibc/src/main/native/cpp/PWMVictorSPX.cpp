@@ -31,6 +31,6 @@ PWMVictorSPX::PWMVictorSPX(int channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_PWMVictorSPX, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_PWMVictorSPX, GetChannel() + 1);
   SendableRegistry::GetInstance().SetName(this, "PWMVictorSPX", GetChannel());
 }

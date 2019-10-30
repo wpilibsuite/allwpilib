@@ -18,5 +18,5 @@
  */
 
 namespace OIConstants {
-const int kDriverControllerPort = 1;
+constexpr int kDriverControllerPort = 1;
 }  // namespace OIConstants

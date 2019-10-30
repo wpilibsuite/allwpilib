@@ -52,7 +52,8 @@ public class RobotContainer {
           // Reset the encoders before starting
           .beforeStarting(m_robotDrive::resetEncoders)
           // End the command when the robot's driven distance exceeds the desired value
-          .interruptOn(() -> m_robotDrive.getAverageEncoderDistance() >= kAutoDriveDistanceInches);
+          .withInterrupt(() -> m_robotDrive.getAverageEncoderDistance()
+              >= kAutoDriveDistanceInches);
 
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
   private final Command m_complexAuto = new ComplexAutoCommand(m_robotDrive, m_hatchSubsystem);
@@ -78,7 +79,7 @@ public class RobotContainer {
         new RunCommand(() -> m_robotDrive.arcadeDrive(
             m_driverController.getY(GenericHID.Hand.kLeft),
             m_driverController.getX(GenericHID.Hand.kRight)),
-            m_robotDrive)
+                       m_robotDrive)
     );
 
     // Add commands to the autonomous command chooser
@@ -92,7 +93,7 @@ public class RobotContainer {
   /**
    * Use this method to define your button->command mappings.  Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {

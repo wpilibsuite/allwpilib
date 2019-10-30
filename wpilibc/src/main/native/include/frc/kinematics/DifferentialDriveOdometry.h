@@ -11,6 +11,7 @@
 
 #include "DifferentialDriveKinematics.h"
 #include "frc/geometry/Pose2d.h"
+#include "frc2/Timer.h"
 
 namespace frc {
 /**
@@ -48,6 +49,12 @@ class DifferentialDriveOdometry {
   }
 
   /**
+   * Returns the position of the robot on the field.
+   * @return The pose of the robot.
+   */
+  const Pose2d& GetPose() const { return m_pose; }
+
+  /**
    * Updates the robot's position on the field using forward kinematics and
    * integration of the pose over time. This method takes in the current time as
    * a parameter to calculate period (difference between two timestamps). The
@@ -80,9 +87,7 @@ class DifferentialDriveOdometry {
    */
   const Pose2d& Update(const Rotation2d& angle,
                        const DifferentialDriveWheelSpeeds& wheelSpeeds) {
-    const auto now = std::chrono::system_clock::now().time_since_epoch();
-    units::second_t time{now};
-    return UpdateWithTime(time, angle, wheelSpeeds);
+    return UpdateWithTime(frc2::Timer::GetFPGATimestamp(), angle, wheelSpeeds);
   }
 
  private:

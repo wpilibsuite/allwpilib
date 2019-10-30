@@ -196,6 +196,11 @@ public class Pose2d {
     return new Twist2d(translationPart.getX(), translationPart.getY(), dtheta);
   }
 
+  @Override
+  public String toString() {
+    return String.format("Pose2d(%s, %s)", m_translation, m_rotation);
+  }
+
   /**
    * Checks equality between this Pose2d and another object.
    *
