@@ -114,7 +114,7 @@ Java_edu_wpi_first_hal_PDPJNI_getPDPAllCurrents
     return;
   }
 
-  env->SetDoubleArrayRegion(jarr, 0, 16, storage));
+  env->SetDoubleArrayRegion(jarr, 0, 16, storage);
 }
 
 /*
