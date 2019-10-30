@@ -108,7 +108,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_PDPJNI_getPDPAllCurrents
 {
   double storage[16];
   int32_t status = 0;
-  HAL_GetPDPAllChannelCurrents(handle, storage, status);
+  HAL_GetPDPAllChannelCurrents(handle, storage, &status);
   if (!CheckStatus(env, status, false)) {
     return;
   }
