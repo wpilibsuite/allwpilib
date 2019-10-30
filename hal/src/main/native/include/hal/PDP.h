@@ -80,6 +80,17 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
                                 int32_t* status);
 
 /**
+ * Gets the current of all 16 channels on the PDP.
+ *
+ * The array must be large enough to hold all channels.
+ *
+ * @param handle the module handle
+ * @param current the currents (output)
+ */
+void HAL_GetPDPAllChannelCurrents(HAL_PDPHandle handle, double* currents,
+                                  int32_t* status);
+
+/**
  * Gets the total current of the PDP.
  *
  * @param handle the module handle

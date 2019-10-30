@@ -49,6 +49,23 @@ DEFINE_CAPI(HAL_Bool, ClosedLoopEnabled, closedLoopEnabled)
 DEFINE_CAPI(HAL_Bool, PressureSwitch, pressureSwitch)
 DEFINE_CAPI(double, CompressorCurrent, compressorCurrent)
 
+void HALSIM_GetPCMAllSolenoids(int32_t index, uint8_t* values) {
+  auto& data = SimPCMData[index].solenoidOutput;
+  uint8_t ret = 0;
+  for (int i = kNumSolenoidChannels - 1; i >= 0; i--) {
+    ret |= (data[i] << i);
+  }
+  *values = ret;
+}
+
+void HALSIM_SetPCMAllSolenoids(int32_t index, uint8_t values) {
+  auto& data = SimPCMData[index].solenoidOutput;
+  for (int i = 0; i < kNumSolenoidChannels; i++) {
+    data[i] = (values & 0x1) != 0;
+    values >>= 1;
+  }
+}
+
 #define REGISTER(NAME) \
   SimPCMData[index].NAME.RegisterCallback(callback, param, initialNotify)
 

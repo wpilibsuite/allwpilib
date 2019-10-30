@@ -74,6 +74,9 @@ void HALSIM_CancelPCMCompressorCurrentCallback(int32_t index, int32_t uid);
 double HALSIM_GetPCMCompressorCurrent(int32_t index);
 void HALSIM_SetPCMCompressorCurrent(int32_t index, double compressorCurrent);
 
+void HALSIM_GetPCMAllSolenoids(int32_t index, uint8_t* values);
+void HALSIM_SetPCMAllSolenoids(int32_t index, uint8_t values);
+
 void HALSIM_RegisterPCMAllNonSolenoidCallbacks(int32_t index,
                                                HAL_NotifyCallback callback,
                                                void* param,

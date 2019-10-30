@@ -42,6 +42,20 @@ DEFINE_CAPI(double, Voltage, voltage)
 HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(double, HALSIM, PDPCurrent, SimPDPData,
                                      current)
 
+void HALSIM_GetPDPAllCurrents(int32_t index, double* currents) {
+  auto& data = SimPDPData[index].current;
+  for (int i = 0; i < kNumPDPChannels; i++) {
+    currents[i] = data[i];
+  }
+}
+
+void HALSIM_SetPDPAllCurrents(int32_t index, const double* currents) {
+  auto& data = SimPDPData[index].current;
+  for (int i = 0; i < kNumPDPChannels; i++) {
+    data[i] = currents[i];
+  }
+}
+
 #define REGISTER(NAME) \
   SimPDPData[index].NAME.RegisterCallback(callback, param, initialNotify)
 

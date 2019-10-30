@@ -79,6 +79,14 @@ class PDPSim {
     HALSIM_SetPDPCurrent(m_index, channel, current);
   }
 
+  void GetAllCurrents(double* currents) {
+    HALSIM_GetPDPAllCurrents(m_index, currents);
+  }
+
+  void SetAllCurrents(const double* currents) {
+    HALSIM_SetPDPAllCurrents(m_index, currents);
+  }
+
   void ResetData() { HALSIM_ResetPDPData(m_index); }
 
  private:
