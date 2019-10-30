@@ -40,6 +40,8 @@ nativeUtils.exportsConfigs {
 
 apply from: "${rootDir}/shared/nilibraries.gradle"
 
+apply plugin: DisableBuildingGTest
+
 model {
     components {}
     binaries {
