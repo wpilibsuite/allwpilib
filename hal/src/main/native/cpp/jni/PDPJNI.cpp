@@ -103,8 +103,9 @@ Java_edu_wpi_first_hal_PDPJNI_getPDPChannelCurrent
  * Method:    getPDPAllCurrents
  * Signature: (I[D)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_PDPJNI_getPDPAllCurrents
-  (JNIEnv * env, jclass, jint handle, jdoubleArray jarr)
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_PDPJNI_getPDPAllCurrents
+  (JNIEnv* env, jclass, jint handle, jdoubleArray jarr)
 {
   double storage[16];
   int32_t status = 0;

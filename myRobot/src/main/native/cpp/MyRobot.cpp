@@ -5,19 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <frc/IterativeRobot.h>
-#include <frc/Timer.h>
-#include <iostream>
+#include <frc/TimedRobot.h>
 
-class MyRobot : public frc::IterativeRobot {
-  frc2::Timer timer;
+class MyRobot : public frc::TimedRobot {
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
-  void RobotInit() override {
-    timer.Start();
-  }
+  void RobotInit() override {}
 
   /**
    * This function is run once each time the robot enters autonomous mode
@@ -47,11 +42,7 @@ class MyRobot : public frc::IterativeRobot {
   /**
    * This function is called periodically during all modes
    */
-  void RobotPeriodic() override {
-    auto time = timer.Get();
-    std::cout << time.to<double>() << std::endl;
-    timer.Reset();
-  }
+  void RobotPeriodic() override {}
 };
 
 int main() { return frc::StartRobot<MyRobot>(); }
