@@ -32,6 +32,7 @@ SD540::SD540(int channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_MindsensorsSD540, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_MindsensorsSD540,
+             GetChannel() + 1);
   SendableRegistry::GetInstance().SetName(this, "SD540", GetChannel());
 }

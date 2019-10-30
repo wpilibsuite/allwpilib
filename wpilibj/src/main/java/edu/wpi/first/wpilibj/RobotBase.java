@@ -45,12 +45,12 @@ public abstract class RobotBase implements AutoCloseable {
 
       @Override
       public void reportVideoServer(int id) {
-        HAL.report(tResourceType.kResourceType_PCVideoServer, id);
+        HAL.report(tResourceType.kResourceType_PCVideoServer, id + 1);
       }
 
       @Override
       public void reportUsbCamera(int id) {
-        HAL.report(tResourceType.kResourceType_UsbCamera, id);
+        HAL.report(tResourceType.kResourceType_UsbCamera, id + 1);
       }
 
       @Override
@@ -60,7 +60,7 @@ public abstract class RobotBase implements AutoCloseable {
 
       @Override
       public void reportAxisCamera(int id) {
-        HAL.report(tResourceType.kResourceType_AxisCamera, id);
+        HAL.report(tResourceType.kResourceType_AxisCamera, id + 1);
       }
 
       @Override

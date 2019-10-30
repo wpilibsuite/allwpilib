@@ -80,7 +80,7 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
     m_pidSource = PIDSourceType.kDisplacement;
 
     int fpgaIndex = getFPGAIndex();
-    HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex, type.value);
+    HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex + 1, type.value + 1);
     SendableRegistry.addLW(this, "Encoder", fpgaIndex);
   }
 

@@ -254,7 +254,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
       reverseDirection, (HAL_EncoderEncodingType)encodingType, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex(),
+  HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex() + 1,
              encodingType);
   SendableRegistry::GetInstance().AddLW(this, "Encoder",
                                         m_aSource->GetChannel());

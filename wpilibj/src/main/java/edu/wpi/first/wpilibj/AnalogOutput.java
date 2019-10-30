@@ -33,7 +33,7 @@ public class AnalogOutput implements Sendable, AutoCloseable {
     final int portHandle = HAL.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogOutputPort(portHandle);
 
-    HAL.report(tResourceType.kResourceType_AnalogOutput, channel);
+    HAL.report(tResourceType.kResourceType_AnalogOutput, channel + 1);
     SendableRegistry.addLW(this, "AnalogOutput", channel);
   }
 

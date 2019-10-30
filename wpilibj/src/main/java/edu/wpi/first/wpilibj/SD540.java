@@ -34,7 +34,7 @@ public class SD540 extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    HAL.report(tResourceType.kResourceType_MindsensorsSD540, getChannel());
+    HAL.report(tResourceType.kResourceType_MindsensorsSD540, getChannel() + 1);
     SendableRegistry.setName(this, "SD540", getChannel());
   }
 

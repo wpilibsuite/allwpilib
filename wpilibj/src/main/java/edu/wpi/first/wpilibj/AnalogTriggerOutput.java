@@ -74,7 +74,7 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
     m_trigger = trigger;
     m_outputType = outputType;
     HAL.report(tResourceType.kResourceType_AnalogTriggerOutput,
-        trigger.getIndex(), outputType.value);
+        trigger.getIndex() + 1, outputType.value + 1);
   }
 
   /**

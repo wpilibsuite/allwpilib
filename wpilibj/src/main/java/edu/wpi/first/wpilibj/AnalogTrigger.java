@@ -83,8 +83,13 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
 
     int index = getIndex();
 
+<<<<<<< HEAD
     HAL.report(tResourceType.kResourceType_AnalogTrigger, index);
     SendableRegistry.addLW(this, "AnalogTrigger", index);
+=======
+    HAL.report(tResourceType.kResourceType_AnalogTrigger, m_index + 1);
+    SendableRegistry.addLW(this, "AnalogTrigger", channel.getChannel());
+>>>>>>> wpilibsuite/master
   }
 
   @Override

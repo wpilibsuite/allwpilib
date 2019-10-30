@@ -46,8 +46,8 @@ Solenoid::Solenoid(int moduleNumber, int channel)
     return;
   }
 
-  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel,
-             m_moduleNumber);
+  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel + 1,
+             m_moduleNumber + 1);
   SendableRegistry::GetInstance().AddLW(this, "Solenoid", m_moduleNumber,
                                         m_channel);
 }

@@ -56,9 +56,9 @@ public class GearTooth extends Counter {
     super(channel);
     enableDirectionSensing(directionSensitive);
     if (directionSensitive) {
-      HAL.report(tResourceType.kResourceType_GearTooth, channel, 0, "D");
+      HAL.report(tResourceType.kResourceType_GearTooth, channel + 1, 0, "D");
     } else {
-      HAL.report(tResourceType.kResourceType_GearTooth, channel, 0);
+      HAL.report(tResourceType.kResourceType_GearTooth, channel + 1, 0);
     }
     SendableRegistry.setName(this, "GearTooth", channel);
   }
@@ -75,9 +75,9 @@ public class GearTooth extends Counter {
     super(source);
     enableDirectionSensing(directionSensitive);
     if (directionSensitive) {
-      HAL.report(tResourceType.kResourceType_GearTooth, source.getChannel(), 0, "D");
+      HAL.report(tResourceType.kResourceType_GearTooth, source.getChannel() + 1, 0, "D");
     } else {
-      HAL.report(tResourceType.kResourceType_GearTooth, source.getChannel(), 0);
+      HAL.report(tResourceType.kResourceType_GearTooth, source.getChannel() + 1, 0);
     }
     SendableRegistry.setName(this, "GearTooth", source.getChannel());
   }

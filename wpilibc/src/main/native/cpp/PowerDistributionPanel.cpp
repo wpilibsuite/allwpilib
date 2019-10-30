@@ -34,7 +34,7 @@ PowerDistributionPanel::PowerDistributionPanel(int module) {
     return;
   }
 
-  HAL_Report(HALUsageReporting::kResourceType_PDP, module);
+  HAL_Report(HALUsageReporting::kResourceType_PDP, module + 1);
   SendableRegistry::GetInstance().AddLW(this, "PowerDistributionPanel", module);
 }
 

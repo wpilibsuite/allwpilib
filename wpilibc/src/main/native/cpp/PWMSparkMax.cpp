@@ -27,6 +27,6 @@ PWMSparkMax::PWMSparkMax(int channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_RevSparkMaxPWM, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_RevSparkMaxPWM, GetChannel() + 1);
   SendableRegistry::GetInstance().SetName(this, "PWMSparkMax", GetChannel());
 }
