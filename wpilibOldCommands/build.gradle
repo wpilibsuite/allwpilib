@@ -49,13 +49,11 @@ model {
             }
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
             lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
-            lib project: ':cscore', library: 'cscore', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
 
             if (it.component.name == "${nativeName}Dev") {
               lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
-              lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
               project(':hal').addHalJniDependency(it)
             }
         }
