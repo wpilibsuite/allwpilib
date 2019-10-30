@@ -42,7 +42,7 @@ AnalogOutput::AnalogOutput(int channel) {
     return;
   }
 
-  HAL_Report(HALUsageReporting::kResourceType_AnalogOutput, m_channel);
+  HAL_Report(HALUsageReporting::kResourceType_AnalogOutput, m_channel + 1);
   SendableRegistry::GetInstance().AddLW(this, "AnalogOutput", m_channel);
 }
 

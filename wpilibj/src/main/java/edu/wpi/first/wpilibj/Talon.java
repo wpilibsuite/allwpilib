@@ -39,7 +39,7 @@ public class Talon extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    HAL.report(tResourceType.kResourceType_Talon, getChannel());
+    HAL.report(tResourceType.kResourceType_Talon, getChannel() + 1);
     SendableRegistry.setName(this, "Talon", getChannel());
   }
 }

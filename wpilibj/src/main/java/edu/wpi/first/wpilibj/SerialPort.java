@@ -120,7 +120,7 @@ public class SerialPort implements AutoCloseable {
 
     disableTermination();
 
-    HAL.report(tResourceType.kResourceType_SerialPort, 0);
+    HAL.report(tResourceType.kResourceType_SerialPort, port.value + 1);
   }
 
   /**
@@ -151,7 +151,7 @@ public class SerialPort implements AutoCloseable {
 
     disableTermination();
 
-    HAL.report(tResourceType.kResourceType_SerialPort, 0);
+    HAL.report(tResourceType.kResourceType_SerialPort, port.value + 1);
   }
 
   /**

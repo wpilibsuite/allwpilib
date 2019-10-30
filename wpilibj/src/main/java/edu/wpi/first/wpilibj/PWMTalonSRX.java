@@ -40,7 +40,7 @@ public class PWMTalonSRX extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    HAL.report(tResourceType.kResourceType_PWMTalonSRX, getChannel());
+    HAL.report(tResourceType.kResourceType_PWMTalonSRX, getChannel() + 1);
     SendableRegistry.setName(this, "PWMTalonSRX", getChannel());
   }
 }

@@ -35,7 +35,7 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
         m_channelIndex = index;
         m_filterAllocated[index] = true;
         HAL.report(tResourceType.kResourceType_DigitalGlitchFilter,
-            m_channelIndex, 0);
+            m_channelIndex + 1, 0);
         SendableRegistry.addLW(this, "DigitalGlitchFilter", index);
       }
     }

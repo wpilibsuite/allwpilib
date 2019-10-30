@@ -41,7 +41,7 @@ Relay::Relay(int channel, Relay::Direction direction)
       m_reverseHandle = HAL_kInvalidHandle;
       return;
     }
-    HAL_Report(HALUsageReporting::kResourceType_Relay, m_channel);
+    HAL_Report(HALUsageReporting::kResourceType_Relay, m_channel + 1);
   }
   if (m_direction == kBothDirections || m_direction == kReverseOnly) {
     int32_t status = 0;

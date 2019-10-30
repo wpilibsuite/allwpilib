@@ -32,6 +32,6 @@ Spark::Spark(int channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_RevSPARK, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_RevSPARK, GetChannel() + 1);
   SendableRegistry::GetInstance().SetName(this, "Spark", GetChannel());
 }

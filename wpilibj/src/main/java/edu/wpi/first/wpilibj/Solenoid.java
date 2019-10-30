@@ -48,7 +48,7 @@ public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
     int portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
     m_solenoidHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
 
-    HAL.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
+    HAL.report(tResourceType.kResourceType_Solenoid, m_channel + 1, m_moduleNumber + 1);
     SendableRegistry.addLW(this, "Solenoid", m_moduleNumber, m_channel);
   }
 

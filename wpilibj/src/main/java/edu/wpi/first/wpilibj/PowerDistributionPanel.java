@@ -29,7 +29,7 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
     SensorUtil.checkPDPModule(module);
     m_handle = PDPJNI.initializePDP(module);
 
-    HAL.report(tResourceType.kResourceType_PDP, module);
+    HAL.report(tResourceType.kResourceType_PDP, module + 1);
     SendableRegistry.addLW(this, "PowerDistributionPanel", module);
   }
 

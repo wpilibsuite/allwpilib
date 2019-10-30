@@ -47,7 +47,7 @@ public class SPI implements AutoCloseable {
 
     SPIJNI.spiInitialize(m_port);
 
-    HAL.report(tResourceType.kResourceType_SPI, port.value);
+    HAL.report(tResourceType.kResourceType_SPI, port.value + 1);
   }
 
   @Override
