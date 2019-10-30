@@ -40,6 +40,8 @@ nativeUtils.exportsConfigs {
     }
 }
 
+apply from: "${rootDir}/shared/nilibraries.gradle"
+
 model {
     components {}
     binaries {
