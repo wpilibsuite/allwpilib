@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -120,6 +120,15 @@ void HAL_SetSolenoid(HAL_SolenoidHandle solenoidPortHandle, HAL_Bool value,
 
   HALSIM_SetPCMSolenoidOutput(port->module, port->channel, value);
 }
+
+void HAL_SetAllSolenoids(int32_t module, int32_t state, int32_t* status) {
+  for (int i = 0; i < kNumSolenoidChannels; i++) {
+    int set = state & 1;
+    HALSIM_SetPCMSolenoidOutput(module, i, set);
+    state >>= 1;
+  }
+}
+
 int32_t HAL_GetPCMSolenoidBlackList(int32_t module, int32_t* status) {
   return 0;
 }
