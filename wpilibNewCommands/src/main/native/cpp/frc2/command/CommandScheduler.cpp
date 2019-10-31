@@ -9,7 +9,6 @@
 
 #include <frc/RobotState.h>
 #include <frc/WPIErrors.h>
-#include <frc/commands/Scheduler.h>
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <frc/smartdashboard/SendableRegistry.h>
 #include <frc2/command/CommandGroupBase.h>
