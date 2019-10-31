@@ -52,6 +52,7 @@ model {
                         cppCompiler.args "-Wno-unused-variable"
                         cppCompiler.args "-Wno-error=deprecated-declarations"
                     }
+                    lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'

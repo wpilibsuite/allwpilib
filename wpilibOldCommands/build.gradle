@@ -58,8 +58,9 @@ model {
               lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
               project(':hal').addHalJniDependency(it)
             }
+
             if (it instanceof GoogleTestTestSuiteBinarySpec) {
-                nativeUtils.useRequiredLibrary('opencv_shared')
+                nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
             }
         }
