@@ -6,7 +6,8 @@
       "class"
     ],
     "foldername": "emptyclass",
-    "replacename": "ReplaceMeEmptyClass"
+    "replacename": "ReplaceMeEmptyClass",
+    "version": 0
   },
   {
     "name": "Command",
@@ -15,7 +16,8 @@
       "command"
     ],
     "foldername": "command",
-    "replacename": "ReplaceMeCommand"
+    "replacename": "ReplaceMeCommand",
+    "version": 1
   },
   {
     "name": "Command Group",
@@ -24,7 +26,8 @@
       "commandgroup"
     ],
     "foldername": "commandgroup",
-    "replacename": "ReplaceMeCommandGroup"
+    "replacename": "ReplaceMeCommandGroup",
+    "version": 1
   },
   {
     "name": "Instant Command",
@@ -33,7 +36,8 @@
       "instantcommand"
     ],
     "foldername": "instant",
-    "replacename": "ReplaceMeInstantCommand"
+    "replacename": "ReplaceMeInstantCommand",
+    "version": 1
   },
   {
     "name": "Subsystem",
@@ -42,7 +46,8 @@
       "subsystem"
     ],
     "foldername": "subsystem",
-    "replacename": "ReplaceMeSubsystem"
+    "replacename": "ReplaceMeSubsystem",
+    "version": 1
   },
   {
     "name": "PID Subsystem",
@@ -52,7 +57,8 @@
       "pid"
     ],
     "foldername": "pidsubsystem",
-    "replacename": "ReplaceMePIDSubsystem"
+    "replacename": "ReplaceMePIDSubsystem",
+    "version": 1
   },
   {
     "name": "Timed Command",
@@ -61,7 +67,8 @@
       "timedcommand"
     ],
     "foldername": "timed",
-    "replacename": "ReplaceMeTimedCommand"
+    "replacename": "ReplaceMeTimedCommand",
+    "version": 1
   },
   {
     "name": "Trigger",
@@ -70,6 +77,127 @@
       "trigger"
     ],
     "foldername": "trigger",
-    "replacename": "ReplaceMeTrigger"
+    "replacename": "ReplaceMeTrigger",
+    "version": 1
+  },
+  {
+    "name": "Command",
+    "description": "A command.",
+    "tags": [
+      "command"
+    ],
+    "foldername": "wpilibj2/command",
+    "replacename": "ReplaceMeCommand",
+    "version": 2
+  },
+  {
+    "name": "InstantCommand",
+    "description": "A command that finishes instantly.",
+    "tags": [
+      "instantcommand"
+    ],
+    "foldername": "wpilibj2/instantcommand",
+    "replacename": "ReplaceMeInstantCommand",
+    "version": 2
+  },
+  {
+    "name": "ParallelCommandGroup",
+    "description": "A command group that runs commands in parallel, ending when all commands have finished.",
+    "tags": [
+      "parallelcommandgroup"
+    ],
+    "foldername": "wpilibj2/parallelcommandgroup",
+    "replacename": "ReplaceMeParallelCommandGroup",
+    "version": 2
+  },
+  {
+    "name": "ParallelDeadlineGroup",
+    "description": "A command group that runs commands in parallel, ending when a specific command has finished.",
+    "tags": [
+      "paralleldeadlinegroup"
+    ],
+    "foldername": "wpilibj2/paralleldeadlinegroup",
+    "replacename": "ReplaceMeParallelDeadlineGroup",
+    "version": 2
+  },
+  {
+    "name": "ParallelRaceGroup",
+    "description": "A command that runs commands in parallel, ending as soon as any command has finished.",
+    "tags": [
+      "parallelracegroup"
+    ],
+    "foldername": "wpilibj2/parallelracegroup",
+    "replacename": "ReplaceMeParallelRaceGroup",
+    "version": 2
+  },
+  {
+    "name": "PIDCommand",
+    "description": "A command that runs a PIDController.",
+    "tags": [
+      "pidcommand"
+    ],
+    "foldername": "wpilibj2/pidcommand",
+    "replacename": "ReplaceMePIDCommand",
+    "version": 2
+  },
+  {
+    "name": "PIDSubsystem",
+    "description": "A subsystem that runs a PIDController.",
+    "tags": [
+      "pidsubsystem"
+    ],
+    "foldername": "wpilibj2/pidsubsystem",
+    "replacename": "ReplaceMePIDSubsystem",
+    "version": 2
+  },
+  {
+    "name": "ProfiledPIDCommand",
+    "description": "A command that runs a ProfiledPIDController.",
+    "tags": [
+      "profiledpidcommand"
+    ],
+    "foldername": "wpilibj2/profiledpidcommand",
+    "replacename": "ReplaceMeProfiledPIDCommand",
+    "version": 2
+  },
+  {
+    "name": "ProfiledPIDSubsystem",
+    "description": "A subsystem that runs a ProfiledPIDController.",
+    "tags": [
+      "profiledpidsubsystem"
+    ],
+    "foldername": "wpilibj2/profiledpidsubsystem",
+    "replacename": "ReplaceMeProfiledPIDSubsystem",
+    "version": 2
+  },
+  {
+    "name": "SequentialCommandGroup",
+    "description": "A command group that runs commands in sequence.",
+    "tags": [
+      "sequentialcommandgroup"
+    ],
+    "foldername": "wpilibj2/sequentialcommandgroup",
+    "replacename": "ReplaceMeSequentialCommandGroup",
+    "version": 2
+  },
+  {
+    "name": "Subsystem",
+    "description": "A robot subsystem.",
+    "tags": [
+      "subsystem"
+    ],
+    "foldername": "wpilibj2/subsystem",
+    "replacename": "ReplaceMeSubsystem",
+    "version": 2
+  },
+  {
+    "name": "TrapezoidProfileCommand",
+    "description": "A command that executes a trapezoidal motion profile.",
+    "tags": [
+      "trapezoidprofilecommand"
+    ],
+    "foldername": "wpilibj2/trapezoidprofilecommand",
+    "replacename": "ReplaceMeTrapezoidProfileCommand",
+    "version": 2
   }
 ]
