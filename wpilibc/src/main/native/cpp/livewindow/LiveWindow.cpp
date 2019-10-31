@@ -12,6 +12,7 @@
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/mutex.h>
 
+#include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableBuilderImpl.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -102,7 +103,8 @@ void LiveWindow::SetEnabled(bool enabled) {
   m_impl->liveWindowEnabled = enabled;
   // Force table generation now to make sure everything is defined
   UpdateValuesUnsafe();
-  if (enabled) {} else {
+  if (enabled) {
+  } else {
     m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
       cbdata.builder.StopLiveWindowMode();
     });
