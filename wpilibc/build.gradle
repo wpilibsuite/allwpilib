@@ -50,18 +50,6 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
     }
 }
 
-ext {
-    sharedCvConfigs = [wpilibc    : [],
-                       wpilibcBase: [],
-                       wpilibcDev : [],
-                       wpilibcTest: []]
-    staticCvConfigs = [:]
-    useJava = false
-    useCpp = true
-}
-
-apply from: "${rootDir}/shared/opencv.gradle"
-
 project(':').libraryBuild.dependsOn build
 
 ext {
@@ -147,6 +135,7 @@ model {
                 } else {
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                 }
 
             }
@@ -174,6 +163,7 @@ model {
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                nativeUtils.useRequiredLibrary(it, 'opencv_shared')
             }
         }
     }
@@ -219,6 +209,7 @@ model {
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+            nativeUtils.useRequiredLibrary(it, 'opencv_shared')
             lib library: nativeName, linkage: 'shared'
         }
     }
