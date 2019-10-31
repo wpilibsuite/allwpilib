@@ -36,8 +36,9 @@ class ProfiledPIDSubsystem : public SubsystemBase {
    * Uses the output from the ProfiledPIDController.
    *
    * @param output the output of the ProfiledPIDController
+   * @param setpoint the setpoint of the ProfiledPIDController
    */
-  virtual void UseOutput(double output, State state) = 0;
+  virtual void UseOutput(double output, State setpoint) = 0;
 
   /**
    * Returns the goal used by the ProfiledPIDController.
