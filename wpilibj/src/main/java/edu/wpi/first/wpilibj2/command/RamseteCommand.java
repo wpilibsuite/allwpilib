@@ -35,11 +35,12 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * the PID and feedforward functionality, returning only the raw wheel speeds from the RAMSETE
  * controller.
  */
+@SuppressWarnings("PMD.TooManyFields")
 public class RamseteCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private DifferentialDriveWheelSpeeds m_prevSpeeds;
   private double m_prevTime;
-  private boolean m_usePID;
+  private final boolean m_usePID;
 
   private final Trajectory m_trajectory;
   private final Supplier<Pose2d> m_pose;
