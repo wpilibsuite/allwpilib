@@ -10,7 +10,6 @@
 #include <units/units.h>
 
 #include "frc/PIDOutput.h"
-#include "frc/RobotController.h"
 
 namespace frc {
 
@@ -30,8 +29,8 @@ class SpeedController : public PIDOutput {
 
   /**
    * Sets the voltage output of the SpeedController.  Compensates for
-   * fluctuations in the bus voltage to keep the output voltage constant even
-   * when battery voltage fluctuates - highly useful when the voltage outputs
+   * the current bus voltage to ensure that the desired voltage is output even
+   * if the battery voltage is below 12V - highly useful when the voltage outputs
    * are "meaningful" (e.g. they come from a feedforward calculation).
    *
    * <p>NOTE: This function *must* be called regularly in order for voltage
@@ -40,9 +39,7 @@ class SpeedController : public PIDOutput {
    *
    * @param output The voltage to output.
    */
-  virtual void SetVoltage(units::volt_t output) {
-    Set(output / units::volt_t(RobotController::GetInputVoltage()));
-  }
+  virtual void SetVoltage(units::volt_t output);
 
   /**
    * Common interface for getting the current set speed of a speed controller.
