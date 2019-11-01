@@ -71,7 +71,7 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(new Rotation2d(getHeading()),
+    m_odometry.update(Rotation2d.fromDegrees(getHeading()),
                                   new DifferentialDriveWheelSpeeds(
                                       m_leftEncoder.getRate(),
                                       m_rightEncoder.getRate()
