@@ -31,29 +31,9 @@ PIDCommand::PIDCommand(PIDController controller,
 void PIDCommand::Initialize() { m_controller.Reset(); }
 
 void PIDCommand::Execute() {
-  UseOutput(m_controller.Calculate(GetMeasurement(), m_setpoint()));
+  m_useOutput(m_controller.Calculate(m_measurement(), m_setpoint()));
 }
 
-void PIDCommand::End(bool interrupted) { UseOutput(0); }
-
-void PIDCommand::SetOutput(std::function<void(double)> useOutput) {
-  m_useOutput = useOutput;
-}
-
-void PIDCommand::SetSetpoint(std::function<double()> setpointSource) {
-  m_setpoint = setpointSource;
-}
-
-void PIDCommand::SetSetpoint(double setpoint) {
-  m_setpoint = [setpoint] { return setpoint; };
-}
-
-void PIDCommand::SetSetpointRelative(double relativeSetpoint) {
-  SetSetpoint(m_setpoint() + relativeSetpoint);
-}
-
-double PIDCommand::GetMeasurement() { return m_measurement(); }
-
-void PIDCommand::UseOutput(double output) { m_useOutput(output); }
+void PIDCommand::End(bool interrupted) { m_useOutput(0); }
 
 PIDController& PIDCommand::getController() { return m_controller; }
