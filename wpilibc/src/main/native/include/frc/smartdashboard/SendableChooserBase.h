@@ -31,8 +31,8 @@ class SendableChooserBase : public Sendable,
   SendableChooserBase();
   ~SendableChooserBase() override = default;
 
-  SendableChooserBase(SendableChooserBase&&) = default;
-  SendableChooserBase& operator=(SendableChooserBase&&) = default;
+  SendableChooserBase(SendableChooserBase&& oth);
+  SendableChooserBase& operator=(SendableChooserBase&& oth);
 
  protected:
   static constexpr const char* kDefault = "default";

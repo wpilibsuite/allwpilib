@@ -63,7 +63,7 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
 
     PWMJNI.setPWMEliminateDeadband(m_handle, false);
 
-    HAL.report(tResourceType.kResourceType_PWM, channel);
+    HAL.report(tResourceType.kResourceType_PWM, channel + 1);
     SendableRegistry.addLW(this, "PWM", channel);
 
     setSafetyEnabled(false);

@@ -21,6 +21,8 @@ static void ConvertToC(CS_UsbCameraInfo* out, const UsbCameraInfo& in) {
   out->otherPathsCount = in.otherPaths.size();
   for (size_t i = 0; i < in.otherPaths.size(); ++i)
     out->otherPaths[i] = cs::ConvertToC(in.otherPaths[i]);
+  out->vendorId = in.vendorId;
+  out->productId = in.productId;
 }
 
 static void FreeUsbCameraInfo(CS_UsbCameraInfo* info) {

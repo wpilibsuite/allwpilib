@@ -40,7 +40,7 @@ DigitalInput::DigitalInput(int channel) {
     return;
   }
 
-  HAL_Report(HALUsageReporting::kResourceType_DigitalInput, channel);
+  HAL_Report(HALUsageReporting::kResourceType_DigitalInput, channel + 1);
   SendableRegistry::GetInstance().AddLW(this, "DigitalInput", channel);
 }
 

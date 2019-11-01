@@ -14,6 +14,7 @@
 #include <imgui.h>
 #include <mockdata/PCMData.h>
 
+#include "HALSimGui.h"
 #include "SimDeviceGui.h"
 
 using namespace halsimgui;
@@ -28,7 +29,10 @@ static void DisplayCompressors() {
       HAL_Value value;
 
       // enabled
-      value = HAL_MakeBoolean(HALSIM_GetPCMCompressorOn(i));
+      if (HALSimGui::AreOutputsDisabled())
+        value = HAL_MakeBoolean(false);
+      else
+        value = HAL_MakeBoolean(HALSIM_GetPCMCompressorOn(i));
       if (SimDeviceGui::DisplayValue("Running", false, &value))
         HALSIM_SetPCMCompressorOn(i, value.data.v_boolean);
 

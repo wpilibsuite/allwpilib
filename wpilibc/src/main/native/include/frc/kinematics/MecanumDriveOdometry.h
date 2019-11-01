@@ -12,6 +12,7 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/kinematics/MecanumDriveWheelSpeeds.h"
+#include "frc2/Timer.h"
 
 namespace frc {
 
@@ -84,9 +85,7 @@ class MecanumDriveOdometry {
    */
   const Pose2d& Update(const Rotation2d& angle,
                        MecanumDriveWheelSpeeds wheelSpeeds) {
-    const auto now = std::chrono::system_clock::now().time_since_epoch();
-    units::second_t time{now};
-    return UpdateWithTime(time, angle, wheelSpeeds);
+    return UpdateWithTime(frc2::Timer::GetFPGATimestamp(), angle, wheelSpeeds);
   }
 
  private:

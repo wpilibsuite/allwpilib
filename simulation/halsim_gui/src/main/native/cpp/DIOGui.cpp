@@ -56,7 +56,7 @@ static void DisplayDIO() {
     }
   }
 
-  ImGui::PushItemWidth(100);
+  ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
   for (int i = 0; i < numDIO; ++i) {
     if (HALSIM_GetDIOInitialized(i)) {
       hasAny = true;

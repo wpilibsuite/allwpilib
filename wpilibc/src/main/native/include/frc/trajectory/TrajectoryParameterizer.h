@@ -67,7 +67,7 @@ class TrajectoryParameterizer {
    */
   static Trajectory TimeParameterizeTrajectory(
       const std::vector<PoseWithCurvature>& points,
-      std::vector<std::unique_ptr<TrajectoryConstraint>>&& constraints,
+      const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
       units::meters_per_second_t startVelocity,
       units::meters_per_second_t endVelocity,
       units::meters_per_second_t maxVelocity,

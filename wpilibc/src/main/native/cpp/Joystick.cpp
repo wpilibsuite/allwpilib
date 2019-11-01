@@ -24,7 +24,7 @@ Joystick::Joystick(int port) : GenericHID(port) {
   m_axes[Axis::kTwist] = kDefaultTwistChannel;
   m_axes[Axis::kThrottle] = kDefaultThrottleChannel;
 
-  HAL_Report(HALUsageReporting::kResourceType_Joystick, port);
+  HAL_Report(HALUsageReporting::kResourceType_Joystick, port + 1);
 }
 
 void Joystick::SetXChannel(int channel) { m_axes[Axis::kX] = channel; }

@@ -180,6 +180,11 @@ public class Rotation2d {
     return m_sin / m_cos;
   }
 
+  @Override
+  public String toString() {
+    return String.format("Rotation2d(Rads: %.2f, Deg: %.2f)", m_value, Math.toDegrees(m_value));
+  }
+
   /**
    * Checks equality between this Rotation2d and another object.
    *

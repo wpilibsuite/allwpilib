@@ -34,7 +34,7 @@ public class Spark extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    HAL.report(tResourceType.kResourceType_RevSPARK, getChannel());
+    HAL.report(tResourceType.kResourceType_RevSPARK, getChannel() + 1);
     SendableRegistry.setName(this, "Spark", getChannel());
   }
 

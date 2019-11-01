@@ -32,8 +32,13 @@ class CubicHermiteSplineTest {
     var start = System.nanoTime();
 
     // Generate and parameterize the spline.
+    var controlVectors =
+        SplineHelper.getCubicControlVectorsFromWaypoints(a,
+            waypoints.toArray(new Translation2d[0]), b);
     var splines
-        = SplineHelper.getCubicSplinesFromWaypoints(a, waypoints.toArray(new Translation2d[0]), b);
+        = SplineHelper.getCubicSplinesFromControlVectors(
+        controlVectors[0], waypoints.toArray(new Translation2d[0]), controlVectors[1]);
+
     var poses = new ArrayList<PoseWithCurvature>();
 
     poses.add(splines[0].getPoint(0.0));

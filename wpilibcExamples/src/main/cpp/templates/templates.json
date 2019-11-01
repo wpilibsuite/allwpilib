@@ -1,14 +1,5 @@
 [
   {
-    "name": "Iterative Robot",
-    "description": "Iterative style",
-    "tags": [
-      "Iterative"
-    ],
-    "foldername": "iterative",
-    "gradlebase": "cpp"
-  },
-  {
     "name": "Timed Robot",
     "description": "Timed style",
     "tags": [

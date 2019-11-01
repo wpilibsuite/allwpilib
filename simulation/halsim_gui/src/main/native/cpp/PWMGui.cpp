@@ -42,7 +42,7 @@ static void DisplayPWMs() {
 
       char name[32];
       std::snprintf(name, sizeof(name), "PWM[%d]", i);
-      float val = HALSIM_GetPWMSpeed(i);
+      float val = HALSimGui::AreOutputsDisabled() ? 0 : HALSIM_GetPWMSpeed(i);
       ImGui::Value(name, val, "%0.3f");
 
       // lazily build history storage

@@ -39,7 +39,7 @@ public class DMC60 extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    HAL.report(tResourceType.kResourceType_DigilentDMC60, getChannel());
+    HAL.report(tResourceType.kResourceType_DigilentDMC60, getChannel() + 1);
     SendableRegistry.setName(this, "DMC60", getChannel());
   }
 }

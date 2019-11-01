@@ -46,7 +46,7 @@ PWM::PWM(int channel) {
   HAL_SetPWMEliminateDeadband(m_handle, false, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  HAL_Report(HALUsageReporting::kResourceType_PWM, channel);
+  HAL_Report(HALUsageReporting::kResourceType_PWM, channel + 1);
   SendableRegistry::GetInstance().AddLW(this, "PWM", channel);
 
   SetSafetyEnabled(false);

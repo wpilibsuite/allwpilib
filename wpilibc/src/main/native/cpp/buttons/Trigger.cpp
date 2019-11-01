@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,6 +14,27 @@
 #include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
+
+Trigger::Trigger(const Trigger& rhs) : SendableHelper(rhs) {}
+
+Trigger& Trigger::operator=(const Trigger& rhs) {
+  SendableHelper::operator=(rhs);
+  m_sendablePressed = false;
+  return *this;
+}
+
+Trigger::Trigger(Trigger&& rhs)
+    : SendableHelper(std::move(rhs)),
+      m_sendablePressed(rhs.m_sendablePressed.load()) {
+  rhs.m_sendablePressed = false;
+}
+
+Trigger& Trigger::operator=(Trigger&& rhs) {
+  SendableHelper::operator=(std::move(rhs));
+  m_sendablePressed = rhs.m_sendablePressed.load();
+  rhs.m_sendablePressed = false;
+  return *this;
+}
 
 bool Trigger::Grab() { return Get() || m_sendablePressed; }
 

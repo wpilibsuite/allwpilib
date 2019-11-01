@@ -81,49 +81,12 @@ public class PIDCommand extends CommandBase {
   }
 
   /**
-   * Sets the function that uses the output of the PIDController.
-   *
-   * @param useOutput The function that uses the output.
-   */
-  public final void setOutput(DoubleConsumer useOutput) {
-    m_useOutput = useOutput;
-  }
-
-  /**
    * Returns the PIDController used by the command.
    *
    * @return The PIDController
    */
   public PIDController getController() {
     return m_controller;
-  }
-
-  /**
-   * Sets the setpoint for the controller to track the given source.
-   *
-   * @param setpointSource The setpoint source
-   */
-  public void setSetpoint(DoubleSupplier setpointSource) {
-    m_setpoint = setpointSource;
-  }
-
-  /**
-   * Sets the setpoint for the controller to a constant value.
-   *
-   * @param setpoint The setpoint
-   */
-  public void setSetpoint(double setpoint) {
-    setSetpoint(() -> setpoint);
-  }
-
-  /**
-   * Sets the setpoint for the controller to a constant value relative (i.e. added to) the current
-   * setpoint.
-   *
-   * @param relativeReference The change in setpoint
-   */
-  public void setSetpointRelative(double relativeReference) {
-    setSetpoint(m_controller.getSetpoint() + relativeReference);
   }
 
   /**

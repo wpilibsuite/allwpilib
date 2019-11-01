@@ -24,15 +24,15 @@ MecanumDrive::MecanumDrive(SpeedController& frontLeftMotor,
                            SpeedController& rearLeftMotor,
                            SpeedController& frontRightMotor,
                            SpeedController& rearRightMotor)
-    : m_frontLeftMotor(frontLeftMotor),
-      m_rearLeftMotor(rearLeftMotor),
-      m_frontRightMotor(frontRightMotor),
-      m_rearRightMotor(rearRightMotor) {
+    : m_frontLeftMotor(&frontLeftMotor),
+      m_rearLeftMotor(&rearLeftMotor),
+      m_frontRightMotor(&frontRightMotor),
+      m_rearRightMotor(&rearRightMotor) {
   auto& registry = SendableRegistry::GetInstance();
-  registry.AddChild(this, &m_frontLeftMotor);
-  registry.AddChild(this, &m_rearLeftMotor);
-  registry.AddChild(this, &m_frontRightMotor);
-  registry.AddChild(this, &m_rearRightMotor);
+  registry.AddChild(this, m_frontLeftMotor);
+  registry.AddChild(this, m_rearLeftMotor);
+  registry.AddChild(this, m_frontRightMotor);
+  registry.AddChild(this, m_rearRightMotor);
   static int instances = 0;
   ++instances;
   registry.AddLW(this, "MecanumDrive", instances);
@@ -64,12 +64,12 @@ void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
 
   Normalize(wheelSpeeds);
 
-  m_frontLeftMotor.Set(wheelSpeeds[kFrontLeft] * m_maxOutput);
-  m_frontRightMotor.Set(wheelSpeeds[kFrontRight] * m_maxOutput *
+  m_frontLeftMotor->Set(wheelSpeeds[kFrontLeft] * m_maxOutput);
+  m_frontRightMotor->Set(wheelSpeeds[kFrontRight] * m_maxOutput *
+                         m_rightSideInvertMultiplier);
+  m_rearLeftMotor->Set(wheelSpeeds[kRearLeft] * m_maxOutput);
+  m_rearRightMotor->Set(wheelSpeeds[kRearRight] * m_maxOutput *
                         m_rightSideInvertMultiplier);
-  m_rearLeftMotor.Set(wheelSpeeds[kRearLeft] * m_maxOutput);
-  m_rearRightMotor.Set(wheelSpeeds[kRearRight] * m_maxOutput *
-                       m_rightSideInvertMultiplier);
 
   Feed();
 }
@@ -96,10 +96,10 @@ void MecanumDrive::SetRightSideInverted(bool rightSideInverted) {
 }
 
 void MecanumDrive::StopMotor() {
-  m_frontLeftMotor.StopMotor();
-  m_frontRightMotor.StopMotor();
-  m_rearLeftMotor.StopMotor();
-  m_rearRightMotor.StopMotor();
+  m_frontLeftMotor->StopMotor();
+  m_frontRightMotor->StopMotor();
+  m_rearLeftMotor->StopMotor();
+  m_rearRightMotor->StopMotor();
   Feed();
 }
 
@@ -111,22 +111,22 @@ void MecanumDrive::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("MecanumDrive");
   builder.SetActuator(true);
   builder.SetSafeState([=] { StopMotor(); });
-  builder.AddDoubleProperty("Front Left Motor Speed",
-                            [=]() { return m_frontLeftMotor.Get(); },
-                            [=](double value) { m_frontLeftMotor.Set(value); });
+  builder.AddDoubleProperty(
+      "Front Left Motor Speed", [=]() { return m_frontLeftMotor->Get(); },
+      [=](double value) { m_frontLeftMotor->Set(value); });
   builder.AddDoubleProperty(
       "Front Right Motor Speed",
-      [=]() { return m_frontRightMotor.Get() * m_rightSideInvertMultiplier; },
+      [=]() { return m_frontRightMotor->Get() * m_rightSideInvertMultiplier; },
       [=](double value) {
-        m_frontRightMotor.Set(value * m_rightSideInvertMultiplier);
+        m_frontRightMotor->Set(value * m_rightSideInvertMultiplier);
       });
   builder.AddDoubleProperty("Rear Left Motor Speed",
-                            [=]() { return m_rearLeftMotor.Get(); },
-                            [=](double value) { m_rearLeftMotor.Set(value); });
+                            [=]() { return m_rearLeftMotor->Get(); },
+                            [=](double value) { m_rearLeftMotor->Set(value); });
   builder.AddDoubleProperty(
       "Rear Right Motor Speed",
-      [=]() { return m_rearRightMotor.Get() * m_rightSideInvertMultiplier; },
+      [=]() { return m_rearRightMotor->Get() * m_rightSideInvertMultiplier; },
       [=](double value) {
-        m_rearRightMotor.Set(value * m_rightSideInvertMultiplier);
+        m_rearRightMotor->Set(value * m_rightSideInvertMultiplier);
       });
 }

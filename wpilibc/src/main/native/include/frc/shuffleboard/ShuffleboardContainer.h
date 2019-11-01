@@ -501,3 +501,17 @@ class ShuffleboardContainer : public virtual ShuffleboardValue,
 #include "frc/shuffleboard/ComplexWidget.h"
 #include "frc/shuffleboard/ShuffleboardLayout.h"
 #include "frc/shuffleboard/SimpleWidget.h"
+
+#ifndef DYNAMIC_CAMERA_SERVER
+#include "frc/shuffleboard/SendableCameraWrapper.h"
+
+inline frc::ComplexWidget& frc::ShuffleboardContainer::Add(
+    const cs::VideoSource& video) {
+  return Add(frc::SendableCameraWrapper::Wrap(video));
+}
+
+inline frc::ComplexWidget& frc::ShuffleboardContainer::Add(
+    const wpi::Twine& title, const cs::VideoSource& video) {
+  return Add(title, frc::SendableCameraWrapper::Wrap(video));
+}
+#endif

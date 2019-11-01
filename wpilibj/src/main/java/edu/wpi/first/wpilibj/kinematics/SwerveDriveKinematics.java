@@ -149,7 +149,7 @@ public class SwerveDriveKinematics {
    *                    module states should be same as passed into the constructor of this class.
    * @return The resulting chassis speed.
    */
-  ChassisSpeeds toChassisSpeeds(SwerveModuleState... wheelStates) {
+  public ChassisSpeeds toChassisSpeeds(SwerveModuleState... wheelStates) {
     if (wheelStates.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "

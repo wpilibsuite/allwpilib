@@ -21,7 +21,7 @@ static void DisplayPDP() {
   bool hasAny = false;
   static int numPDP = HAL_GetNumPDPModules();
   static int numChannels = HAL_GetNumPDPChannels();
-  ImGui::PushItemWidth(150);
+  ImGui::PushItemWidth(ImGui::GetFontSize() * 13);
   for (int i = 0; i < numPDP; ++i) {
     if (HALSIM_GetPDPInitialized(i)) {
       hasAny = true;

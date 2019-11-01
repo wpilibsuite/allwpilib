@@ -34,8 +34,10 @@ class Trigger : public Sendable, public SendableHelper<Trigger> {
   Trigger() = default;
   ~Trigger() override = default;
 
-  Trigger(Trigger&&) = default;
-  Trigger& operator=(Trigger&&) = default;
+  Trigger(const Trigger& rhs);
+  Trigger& operator=(const Trigger& rhs);
+  Trigger(Trigger&& rhs);
+  Trigger& operator=(Trigger&& rhs);
 
   bool Grab();
   virtual bool Get() = 0;

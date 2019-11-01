@@ -23,6 +23,8 @@ std::shared_ptr<nt::NetworkTable> SendableBuilderImpl::GetTable() {
   return m_table;
 }
 
+bool SendableBuilderImpl::HasTable() const { return m_table != nullptr; }
+
 bool SendableBuilderImpl::IsActuator() const { return m_actuator; }
 
 void SendableBuilderImpl::UpdateTable() {
@@ -52,6 +54,8 @@ void SendableBuilderImpl::StopLiveWindowMode() {
   StopListeners();
   if (m_safeState) m_safeState();
 }
+
+void SendableBuilderImpl::ClearProperties() { m_properties.clear(); }
 
 void SendableBuilderImpl::SetSmartDashboardType(const wpi::Twine& type) {
   m_table->GetEntry(".type").SetString(type);

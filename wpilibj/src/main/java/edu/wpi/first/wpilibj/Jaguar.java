@@ -37,7 +37,7 @@ public class Jaguar extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    HAL.report(tResourceType.kResourceType_Jaguar, getChannel());
+    HAL.report(tResourceType.kResourceType_Jaguar, getChannel() + 1);
     SendableRegistry.setName(this, "Jaguar", getChannel());
   }
 }

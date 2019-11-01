@@ -44,7 +44,7 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
     m_pwm = new PWM(pwmChannel);
     SendableRegistry.addChild(this, m_pwm);
 
-    HAL.report(tResourceType.kResourceType_NidecBrushless, pwmChannel);
+    HAL.report(tResourceType.kResourceType_NidecBrushless, pwmChannel + 1);
     SendableRegistry.addLW(this, "Nidec Brushless", pwmChannel);
   }
 

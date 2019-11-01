@@ -56,6 +56,10 @@ struct UsbCameraInfo {
   std::string name;
   /** Other path aliases to device (e.g. '/dev/v4l/by-id/...' etc on Linux) */
   std::vector<std::string> otherPaths;
+  /** USB Vendor Id */
+  int vendorId = -1;
+  /** USB Product Id */
+  int productId = -1;
 };
 
 /**

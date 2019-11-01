@@ -40,7 +40,7 @@ public class PWMVictorSPX extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    HAL.report(tResourceType.kResourceType_PWMVictorSPX, getChannel());
+    HAL.report(tResourceType.kResourceType_PWMVictorSPX, getChannel() + 1);
     SendableRegistry.setName(this, "PWMVictorSPX", getChannel());
   }
 }

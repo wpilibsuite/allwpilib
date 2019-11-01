@@ -379,5 +379,19 @@
     "foldername": "differentialdrivebot",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "RamseteCommand",
+    "description": "An example command-based robot demonstrating the use of a RamseteCommand to follow a pregenerated trajectory.",
+    "tags": [
+      "RamseteCommand",
+      "PID",
+      "Ramsete",
+      "Trajectory",
+      "Path following"
+    ],
+    "foldername": "ramsetecommand",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]

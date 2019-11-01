@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <atomic>
-
 #include "frc/DigitalOutput.h"
 #include "frc/ErrorBase.h"
 #include "frc/MotorSafety.h"
@@ -102,7 +100,7 @@ class NidecBrushless : public SpeedController,
 
  private:
   bool m_isInverted = false;
-  std::atomic_bool m_disabled{false};
+  bool m_disabled = false;
   DigitalOutput m_dio;
   PWM m_pwm;
   double m_speed = 0.0;

@@ -72,10 +72,10 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
   m_forwardMask = 1 << m_forwardChannel;
   m_reverseMask = 1 << m_reverseChannel;
 
-  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_forwardChannel,
-             m_moduleNumber);
-  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel,
-             m_moduleNumber);
+  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_forwardChannel + 1,
+             m_moduleNumber + 1);
+  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel + 1,
+             m_moduleNumber + 1);
 
   SendableRegistry::GetInstance().AddLW(this, "DoubleSolenoid", m_moduleNumber,
                                         m_forwardChannel);

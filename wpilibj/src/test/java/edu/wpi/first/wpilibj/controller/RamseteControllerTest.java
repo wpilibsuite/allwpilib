@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,6 +23,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class RamseteControllerTest {
   private static final double kTolerance = 1 / 12.0;
   private static final double kAngularTolerance = Math.toRadians(2);
+
+  private static double boundRadians(double value) {
+    while (value > Math.PI) {
+      value -= Math.PI * 2;
+    }
+    while (value <= -Math.PI) {
+      value += Math.PI * 2;
+    }
+    return value;
+  }
 
   @Test
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
@@ -33,8 +43,8 @@ class RamseteControllerTest {
     final var waypoints = new ArrayList<Pose2d>();
     waypoints.add(new Pose2d(2.75, 22.521, new Rotation2d(0)));
     waypoints.add(new Pose2d(24.73, 19.68, new Rotation2d(5.846)));
-    final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints,
-        new ArrayList<TrajectoryConstraint>(), 0, 0, 8.8, 0.1, false);
+    var config = new TrajectoryConfig(8.8, 0.1);
+    final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
 
     final double kDt = 0.02;
     final var totalTime = trajectory.getTotalTimeSeconds();
@@ -54,23 +64,13 @@ class RamseteControllerTest {
     final var finalRobotPose = robotPose;
     assertAll(
         () -> assertEquals(endPose.getTranslation().getX(), finalRobotPose.getTranslation().getX(),
-                           kTolerance),
+            kTolerance),
         () -> assertEquals(endPose.getTranslation().getY(), finalRobotPose.getTranslation().getY(),
-                           kTolerance),
+            kTolerance),
         () -> assertEquals(0.0,
             boundRadians(endPose.getRotation().getRadians()
-              - finalRobotPose.getRotation().getRadians()),
+                - finalRobotPose.getRotation().getRadians()),
             kAngularTolerance)
     );
-  }
-
-  private static double boundRadians(double value) {
-    while (value > Math.PI) {
-      value -= Math.PI * 2;
-    }
-    while (value <= -Math.PI) {
-      value += Math.PI * 2;
-    }
-    return value;
   }
 }

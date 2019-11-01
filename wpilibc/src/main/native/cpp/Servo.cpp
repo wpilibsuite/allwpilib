@@ -27,7 +27,7 @@ Servo::Servo(int channel) : PWM(channel) {
   // Assign defaults for period multiplier for the servo PWM control signal
   SetPeriodMultiplier(kPeriodMultiplier_4X);
 
-  HAL_Report(HALUsageReporting::kResourceType_Servo, channel);
+  HAL_Report(HALUsageReporting::kResourceType_Servo, channel + 1);
   SendableRegistry::GetInstance().SetName(this, "Servo", channel);
 }
 

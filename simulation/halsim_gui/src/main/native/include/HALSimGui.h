@@ -23,6 +23,7 @@ void HALSIMGUI_SetWindowVisibility(const char* name, int32_t visibility);
 void HALSIMGUI_SetDefaultWindowPos(const char* name, float x, float y);
 void HALSIMGUI_SetDefaultWindowSize(const char* name, float width,
                                     float height);
+int HALSIMGUI_AreOutputsDisabled(void);
 
 }  // extern "C"
 
@@ -125,6 +126,13 @@ class HALSimGui {
    * @param height height
    */
   static void SetDefaultWindowSize(const char* name, float width, float height);
+
+  /**
+   * Returns true if outputs are disabled.
+   *
+   * @return true if outputs are disabled, false otherwise.
+   */
+  static bool AreOutputsDisabled();
 };
 
 }  // namespace halsimgui
