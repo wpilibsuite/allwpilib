@@ -47,9 +47,9 @@ constexpr double kEncoderDistancePerPulse =
 constexpr int kShooterMotorPort = 4;
 constexpr int kFeederMotorPort = 5;
 
-constexpr double kShooterFreeRPS = 5300;
-constexpr double kShooterTargetRPS = 4000;
-constexpr double kShooterToleranceRPS = 50;
+constexpr auto kShooterFreeRPS = 5300_tr / 1_s;
+constexpr auto kShooterTargetRPS = 4000_tr / 1_s;
+constexpr auto kShooterToleranceRPS = 50_tr / 1_s;
 
 constexpr double kP = 1;
 constexpr double kI = 0;
@@ -57,10 +57,10 @@ constexpr double kD = 0;
 
 // On a real robot the feedforward constants should be empirically determined;
 // these are reasonable guesses.
-constexpr double kSFractional = .05;
-constexpr double kVFractional =
-    // Should have value 1 at free speed...
-    1. / kShooterFreeRPS;
+constexpr auto kS = .05_V;
+constexpr auto kV =
+    // Should have value 12V at free speed...
+    12_V / kShooterFreeRPS;
 
 constexpr double kFeederSpeed = .5;
 }  // namespace ShooterConstants

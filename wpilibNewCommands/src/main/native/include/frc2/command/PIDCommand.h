@@ -64,51 +64,6 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
   void End(bool interrupted) override;
 
   /**
-   * Sets the function that uses the output of the PIDController.
-   *
-   * @param useOutput The function that uses the output.
-   */
-  void SetOutput(std::function<void(double)> useOutput);
-
-  /**
-   * Sets the setpoint for the controller to track the given source.
-   *
-   * @param setpointSource The setpoint source
-   */
-  void SetSetpoint(std::function<double()> setpointSource);
-
-  /**
-   * Sets the setpoint for the controller to a constant value.
-   *
-   * @param setpoint The setpoint
-   */
-  void SetSetpoint(double setpoint);
-
-  /**
-   * Sets the setpoint for the controller to a constant value relative (i.e.
-   * added to) the current setpoint.
-   *
-   * @param relativeReference The change in setpoint
-   */
-  void SetSetpointRelative(double relativeSetpoint);
-
-  /**
-   * Gets the measurement of the process variable. Wraps the passed-in function
-   * for readability.
-   *
-   * @return The measurement of the process variable
-   */
-  virtual double GetMeasurement();
-
-  /**
-   * Gets the measurement of the process variable. Wraps the passed-in function
-   * for readability.
-   *
-   * @return The measurement of the process variable
-   */
-  virtual void UseOutput(double output);
-
-  /**
    * Returns the PIDController used by the command.
    *
    * @return The PIDController

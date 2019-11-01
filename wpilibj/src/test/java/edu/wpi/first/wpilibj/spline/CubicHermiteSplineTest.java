@@ -76,6 +76,20 @@ class CubicHermiteSplineTest {
             poses.get(0).poseMeters.getRotation().getRadians(), 1E-9)
     );
 
+    // Check interior waypoints
+    boolean interiorsGood = true;
+    for (var waypoint : waypoints) {
+      boolean found = false;
+      for (var state : poses) {
+        if (waypoint.getDistance(state.poseMeters.getTranslation()) == 0) {
+          found = true;
+        }
+      }
+      interiorsGood &= found;
+    }
+
+    assertTrue(interiorsGood);
+
     // Check last point
     assertAll(
         () -> assertEquals(b.getTranslation().getX(),
@@ -101,6 +115,17 @@ class CubicHermiteSplineTest {
     waypoints.add(new Translation2d(1, 1));
     waypoints.add(new Translation2d(2, -1));
     var end = new Pose2d(3, 0, Rotation2d.fromDegrees(90.0));
+
+    run(start, waypoints, end);
+  }
+
+  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+  @Test
+  void testOneInterior() {
+    var start = new Pose2d(0, 0, Rotation2d.fromDegrees(0.0));
+    ArrayList<Translation2d> waypoints = new ArrayList<>();
+    waypoints.add(new Translation2d(2.0, 0.0));
+    var end = new Pose2d(4, 0, Rotation2d.fromDegrees(0.0));
 
     run(start, waypoints, end);
   }

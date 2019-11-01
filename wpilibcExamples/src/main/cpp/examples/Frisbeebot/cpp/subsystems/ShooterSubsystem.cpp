@@ -18,13 +18,14 @@ ShooterSubsystem::ShooterSubsystem()
       m_shooterMotor(kShooterMotorPort),
       m_feederMotor(kFeederMotorPort),
       m_shooterEncoder(kEncoderPorts[0], kEncoderPorts[1]) {
-  m_controller.SetTolerance(kShooterToleranceRPS);
+  m_controller.SetTolerance(kShooterToleranceRPS.to<double>());
   m_shooterEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
 }
 
 void ShooterSubsystem::UseOutput(double output) {
   // Use a feedforward of the form kS + kV * velocity
-  m_shooterMotor.Set(output + kSFractional + kVFractional * kShooterTargetRPS);
+  m_shooterMotor.SetVoltage(units::volt_t(output) + kS +
+                            kV * kShooterTargetRPS);
 }
 
 void ShooterSubsystem::Disable() {
@@ -38,7 +39,9 @@ bool ShooterSubsystem::AtSetpoint() { return m_controller.AtSetpoint(); }
 
 double ShooterSubsystem::GetMeasurement() { return m_shooterEncoder.GetRate(); }
 
-double ShooterSubsystem::GetSetpoint() { return kShooterTargetRPS; }
+double ShooterSubsystem::GetSetpoint() {
+  return kShooterTargetRPS.to<double>();
+}
 
 void ShooterSubsystem::RunFeeder() { m_feederMotor.Set(kFeederSpeed); }
 

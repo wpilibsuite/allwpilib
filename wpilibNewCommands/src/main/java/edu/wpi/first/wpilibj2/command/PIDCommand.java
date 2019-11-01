@@ -72,12 +72,13 @@ public class PIDCommand extends CommandBase {
 
   @Override
   public void execute() {
-    useOutput(m_controller.calculate(getMeasurement(), getSetpoint()));
+    m_useOutput.accept(m_controller.calculate(m_measurement.getAsDouble(),
+                                              m_setpoint.getAsDouble()));
   }
 
   @Override
   public void end(boolean interrupted) {
-    useOutput(0);
+    m_useOutput.accept(0);
   }
 
   /**
@@ -87,32 +88,5 @@ public class PIDCommand extends CommandBase {
    */
   public PIDController getController() {
     return m_controller;
-  }
-
-  /**
-   * Gets the setpoint for the controller.  Wraps the passed-in function for readability.
-   *
-   * @return The setpoint for the controller
-   */
-  private double getSetpoint() {
-    return m_setpoint.getAsDouble();
-  }
-
-  /**
-   * Gets the measurement of the process variable. Wraps the passed-in function for readability.
-   *
-   * @return The measurement of the process variable
-   */
-  private double getMeasurement() {
-    return m_measurement.getAsDouble();
-  }
-
-  /**
-   * Uses the output of the controller.  Wraps the passed-in function for readability.
-   *
-   * @param output The output value to use
-   */
-  private void useOutput(double output) {
-    m_useOutput.accept(output);
   }
 }

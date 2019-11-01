@@ -101,22 +101,6 @@ class ProfiledPIDCommand
   void End(bool interrupted) override;
 
   /**
-   * Gets the measurement of the process variable. Wraps the passed-in function
-   * for readability.
-   *
-   * @return The measurement of the process variable
-   */
-  virtual units::meter_t GetMeasurement();
-
-  /**
-   * Gets the measurement of the process variable. Wraps the passed-in function
-   * for readability.
-   *
-   * @return The measurement of the process variable
-   */
-  virtual void UseOutput(double output, State state);
-
-  /**
    * Returns the ProfiledPIDController used by the command.
    *
    * @return The ProfiledPIDController
