@@ -143,5 +143,6 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
   Timer m_timer;
   units::second_t m_prevTime;
   frc::DifferentialDriveWheelSpeeds m_prevSpeeds;
+  bool m_usePID;
 };
 }  // namespace frc2

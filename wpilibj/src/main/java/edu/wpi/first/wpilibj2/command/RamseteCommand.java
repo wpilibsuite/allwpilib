@@ -39,6 +39,7 @@ public class RamseteCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private DifferentialDriveWheelSpeeds m_prevSpeeds;
   private double m_prevTime;
+  private boolean m_usePID;
 
   private final Trajectory m_trajectory;
   private final Supplier<Pose2d> m_pose;
@@ -113,6 +114,8 @@ public class RamseteCommand extends CommandBase {
     m_rightController = requireNonNullParam(rightController, "rightController", "RamseteCommand");
     m_output = requireNonNullParam(outputVolts, "outputVolts", "RamseteCommand");
 
+    m_usePID = true;
+
     addRequirements(requirements);
   }
 
@@ -150,6 +153,8 @@ public class RamseteCommand extends CommandBase {
     m_leftController = null;
     m_rightController = null;
 
+    m_usePID = false;
+
     addRequirements(requirements);
   }
 
@@ -164,7 +169,7 @@ public class RamseteCommand extends CommandBase {
                               * initialState.velocityMetersPerSecond));
     m_timer.reset();
     m_timer.start();
-    if (m_leftController != null) {
+    if (m_usePID) {
       m_leftController.reset();
       m_rightController.reset();
     }
@@ -184,7 +189,7 @@ public class RamseteCommand extends CommandBase {
     double leftOutput;
     double rightOutput;
 
-    if (m_leftController != null) {
+    if (m_usePID) {
       double leftFeedforward =
           m_ks * Math.signum(leftSpeedSetpoint)
               + m_kv * leftSpeedSetpoint
