@@ -37,7 +37,8 @@ RamseteCommand::RamseteCommand(
       m_rightSpeed(rightSpeed),
       m_leftController(std::make_unique<frc2::PIDController>(leftController)),
       m_rightController(std::make_unique<frc2::PIDController>(rightController)),
-      m_outputVolts(output) {
+      m_outputVolts(output),
+      m_usePID(true) {
   AddRequirements(requirements);
 }
 
@@ -55,7 +56,8 @@ RamseteCommand::RamseteCommand(
       m_kv(0),
       m_ka(0),
       m_kinematics(kinematics),
-      m_outputVel(output) {
+      m_outputVel(output),
+      m_usePID(false) {
   AddRequirements(requirements);
 }
 
@@ -67,8 +69,10 @@ void RamseteCommand::Initialize() {
                          initialState.velocity * initialState.curvature});
   m_timer.Reset();
   m_timer.Start();
-  m_leftController->Reset();
-  m_rightController->Reset();
+  if (m_usePID) {
+    m_leftController->Reset();
+    m_rightController->Reset();
+  }
 }
 
 void RamseteCommand::Execute() {
@@ -78,7 +82,7 @@ void RamseteCommand::Execute() {
   auto targetWheelSpeeds = m_kinematics.ToWheelSpeeds(
       m_controller.Calculate(m_pose(), m_trajectory.Sample(curTime)));
 
-  if (m_leftController.get() != nullptr) {
+  if (m_usePID) {
     auto leftFeedforward =
         m_ks * sgn(targetWheelSpeeds.left) + m_kv * targetWheelSpeeds.left +
         m_ka * (targetWheelSpeeds.left - m_prevSpeeds.left) / dt;
