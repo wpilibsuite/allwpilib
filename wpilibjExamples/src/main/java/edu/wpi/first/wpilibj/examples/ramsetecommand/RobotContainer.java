@@ -123,12 +123,12 @@ public class RobotContainer {
         m_robotDrive.getRightEncoder()::getRate,
         new PIDController(kPDriveVel, 0, 0),
         new PIDController(kPDriveVel, 0, 0),
-        // RamseteCommand passes volts to the callback, so we have to rescale here
-        (left, right) -> m_robotDrive.tankDrive(left / 12., right / 12.),
+        // RamseteCommand passes volts to the callback
+        m_robotDrive::tankDriveVolts,
         m_robotDrive
     );
 
     // Run path following command, then stop at the end.
-    return ramseteCommand.andThen(() -> m_robotDrive.tankDrive(0, 0));
+    return ramseteCommand.andThen(() -> m_robotDrive.tankDriveVolts(0, 0));
   }
 }

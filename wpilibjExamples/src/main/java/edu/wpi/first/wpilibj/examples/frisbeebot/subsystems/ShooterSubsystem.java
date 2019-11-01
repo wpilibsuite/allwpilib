@@ -20,11 +20,11 @@ import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstan
 import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kFeederSpeed;
 import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kI;
 import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kP;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kSFractional;
+import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kSVolts;
 import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kShooterMotorPort;
 import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kShooterTargetRPS;
 import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kShooterToleranceRPS;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kVFractional;
+import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kVVoltSecondsPerRotation;
 
 public class ShooterSubsystem extends PIDSubsystem {
   private final PWMVictorSPX m_shooterMotor = new PWMVictorSPX(kShooterMotorPort);
@@ -44,7 +44,7 @@ public class ShooterSubsystem extends PIDSubsystem {
   @Override
   public void useOutput(double output) {
     // Use a feedforward of the form kS + kV * velocity
-    m_shooterMotor.set(output + kSFractional + kVFractional * kShooterTargetRPS);
+    m_shooterMotor.setVoltage(output + kSVolts + kVVoltSecondsPerRotation * kShooterTargetRPS);
   }
 
   @Override
