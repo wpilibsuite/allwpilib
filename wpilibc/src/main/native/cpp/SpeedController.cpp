@@ -7,6 +7,8 @@
 
 #include "frc/SpeedController.h"
 
+#include <frc/RobotController.h>
+
 using namespace frc;
 
 void SpeedController::SetVoltage(units::volt_t output) {
