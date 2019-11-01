@@ -30,8 +30,8 @@ class SpeedController : public PIDOutput {
   /**
    * Sets the voltage output of the SpeedController.  Compensates for
    * the current bus voltage to ensure that the desired voltage is output even
-   * if the battery voltage is below 12V - highly useful when the voltage outputs
-   * are "meaningful" (e.g. they come from a feedforward calculation).
+   * if the battery voltage is below 12V - highly useful when the voltage
+   * outputs are "meaningful" (e.g. they come from a feedforward calculation).
    *
    * <p>NOTE: This function *must* be called regularly in order for voltage
    * compensation to work properly - unlike the ordinary set function, it is not
