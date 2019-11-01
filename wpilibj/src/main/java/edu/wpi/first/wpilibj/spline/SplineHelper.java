@@ -175,7 +175,7 @@ public final class SplineHelper {
           / 4.0;
 
       double[] midXControlVector = {waypoints[0].getX(), xDeriv};
-      double[] midYControlVector = {waypoints[0].getX(), yDeriv};
+      double[] midYControlVector = {waypoints[0].getY(), yDeriv};
 
       splines[0] = new CubicHermiteSpline(xInitial, midXControlVector,
           yInitial, midYControlVector);
