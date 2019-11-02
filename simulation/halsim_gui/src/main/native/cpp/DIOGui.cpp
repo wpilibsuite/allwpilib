@@ -15,6 +15,7 @@
 #include <imgui.h>
 #include <mockdata/DIOData.h>
 #include <mockdata/DigitalPWMData.h>
+#include <mockdata/DutyCycleData.h>
 #include <mockdata/EncoderData.h>
 #include <mockdata/SimDeviceData.h>
 
@@ -33,11 +34,14 @@ static void DisplayDIO() {
   static int numDIO = HAL_GetNumDigitalChannels();
   static int numPWM = HAL_GetNumDigitalPWMOutputs();
   static int numEncoder = HAL_GetNumEncoders();
+  static int numDutyCycle = HAL_GetNumDutyCycles();
   static auto pwmMap = std::make_unique<int[]>(numDIO);
   static auto encoderMap = std::make_unique<int[]>(numDIO);
+  static auto dutyCycleMap = std::make_unique<int[]>(numDIO);
 
   std::memset(pwmMap.get(), 0, numDIO * sizeof(pwmMap[0]));
   std::memset(encoderMap.get(), 0, numDIO * sizeof(encoderMap[0]));
+  std::memset(dutyCycleMap.get(), 0, numDIO * sizeof(dutyCycleMap[0]));
 
   for (int i = 0; i < numPWM; ++i) {
     if (HALSIM_GetDigitalPWMInitialized(i)) {
@@ -53,6 +57,13 @@ static void DisplayDIO() {
       if (channel >= 0 && channel < numDIO) encoderMap[channel] = i + 1;
       channel = HALSIM_GetEncoderDigitalChannelB(i);
       if (channel >= 0 && channel < numDIO) encoderMap[channel] = i + 1;
+    }
+  }
+
+  for (int i = 0; i < numDutyCycle; ++i) {
+    if (HALSIM_GetDutyCycleInitialized(i)) {
+      int channel = HALSIM_GetDutyCycleDigitalChannel(i);
+      if (channel >= 0 && channel < numDIO) dutyCycleMap[channel] = i + 1;
     }
   }
 
@@ -79,6 +90,16 @@ static void DisplayDIO() {
                            HALSIM_GetEncoderDigitalChannelA(encoderMap[i] - 1),
                            HALSIM_GetEncoderDigitalChannelB(encoderMap[i] - 1));
           ImGui::PopStyleColor();
+        }
+      } else if (dutyCycleMap[i] > 0) {
+        std::snprintf(name, sizeof(name), "PWM[%d]", i);
+        if (auto simDevice =
+                HALSIM_GetDutyCycleSimDevice(dutyCycleMap[i] - 1)) {
+          LabelSimDevice(name, simDevice);
+        } else {
+          double val = HALSIM_GetDutyCycleOutput(dutyCycleMap[i] - 1);
+          if (ImGui::InputDouble(name, &val))
+            HALSIM_SetDutyCycleOutput(dutyCycleMap[i] - 1, val);
         }
       } else if (!HALSIM_GetDIOIsInput(i)) {
         std::snprintf(name, sizeof(name), "Out[%d]", i);
