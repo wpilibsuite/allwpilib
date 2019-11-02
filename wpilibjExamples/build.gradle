@@ -18,6 +18,8 @@ dependencies {
     compile project(':ntcore')
     compile project(':cscore')
     compile project(':cameraserver')
+    compile project(':wpilibOldCommands')
+    compile project(':wpilibNewCommands')
 }
 
 if (!project.hasProperty('skipPMD')) {
