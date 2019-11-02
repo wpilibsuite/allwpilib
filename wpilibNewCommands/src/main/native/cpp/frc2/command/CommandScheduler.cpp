@@ -174,7 +174,7 @@ void CommandScheduler::Run() {
   // Add default commands for un-required registered subsystems.
   for (auto&& subsystem : m_subsystems) {
     auto s = m_requirements.find(subsystem.getFirst());
-    if (s == m_requirements.end()) {
+    if (s == m_requirements.end() && subsystem.getSecond()) {
       Schedule({subsystem.getSecond().get()});
     }
   }
