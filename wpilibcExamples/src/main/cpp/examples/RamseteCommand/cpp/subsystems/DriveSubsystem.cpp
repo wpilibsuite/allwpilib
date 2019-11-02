@@ -7,8 +7,6 @@
 
 #include "subsystems/DriveSubsystem.h"
 
-#include <units/units.h>
-
 #include <frc/geometry/Rotation2d.h>
 #include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
 
@@ -39,8 +37,9 @@ void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
   m_drive.ArcadeDrive(fwd, rot);
 }
 
-void DriveSubsystem::TankDrive(double left, double right) {
-  m_drive.TankDrive(left, right, false);
+void DriveSubsystem::TankDriveVolts(units::volt_t left, units::volt_t right) {
+  m_leftMotors.SetVoltage(left);
+  m_rightMotors.SetVoltage(-right);
 }
 
 void DriveSubsystem::ResetEncoders() {

@@ -138,6 +138,16 @@ class PCMSim {
     HALSIM_SetPCMCompressorCurrent(m_index, compressorCurrent);
   }
 
+  uint8_t GetAllSolenoidOutputs() {
+    uint8_t ret = 0;
+    HALSIM_GetPCMAllSolenoids(m_index, &ret);
+    return ret;
+  }
+
+  void SetAllSolenoidOutputs(uint8_t outputs) {
+    HALSIM_SetPCMAllSolenoids(m_index, outputs);
+  }
+
   void ResetData() { HALSIM_ResetPCMData(m_index); }
 
  private:

@@ -71,7 +71,7 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(new Rotation2d(getHeading()),
+    m_odometry.update(Rotation2d.fromDegrees(getHeading()),
                                   new DifferentialDriveWheelSpeeds(
                                       m_leftEncoder.getRate(),
                                       m_rightEncoder.getRate()
@@ -107,14 +107,14 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Drives the robot using tank controls.  Does not square inputs to enable composition with
-   * external controllers.
+   * Controls the left and right sides of the drive directly with voltages.
    *
-   * @param left the commanded left output
-   * @param right the commanded right output
+   * @param leftVolts  the commanded left output
+   * @param rightVolts the commanded right output
    */
-  public void tankDrive(double left, double right) {
-    m_drive.tankDrive(left, right, false);
+  public void tankDriveVolts(double leftVolts, double rightVolts) {
+    m_leftMotors.setVoltage(leftVolts);
+    m_rightMotors.setVoltage(-rightVolts);
   }
 
   /**

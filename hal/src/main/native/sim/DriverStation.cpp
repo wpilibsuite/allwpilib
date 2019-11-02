@@ -210,7 +210,11 @@ static void InitLastCountKey(void) {
 }
 #endif
 
-HAL_Bool HAL_IsNewControlData(void) {
+static int& GetThreadLocalLastCount() {
+  // There is a rollover error condition here. At Packet# = n * (uintmax), this
+  // will return false when instead it should return true. However, this at a
+  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
+  // worth the cycles to check.
 #ifdef __APPLE__
   pthread_once(&lastCountKeyOnce, InitLastCountKey);
   int* lastCountPtr = static_cast<int*>(pthread_getspecific(lastCountKey));
@@ -223,13 +227,43 @@ HAL_Bool HAL_IsNewControlData(void) {
 #else
   thread_local int lastCount{-1};
 #endif
-  // There is a rollover error condition here. At Packet# = n * (uintmax), this
-  // will return false when instead it should return true. However, this at a
-  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
-  // worth the cycles to check.
+  return lastCount;
+}
+
+HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
+  int& lastCount = GetThreadLocalLastCount();
+  std::unique_lock lock(newDSDataAvailableMutex);
+  int currentCount = newDSDataAvailableCounter;
+  if (lastCount != currentCount) {
+    lastCount = currentCount;
+    return true;
+  }
+
+  if (isFinalized.load()) {
+    return false;
+  }
+
+  auto timeoutTime =
+      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
+
+  while (newDSDataAvailableCounter == currentCount) {
+    if (timeout > 0) {
+      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
+      if (timedOut == std::cv_status::timeout) {
+        return false;
+      }
+    } else {
+      newDSDataAvailableCond->wait(lock);
+    }
+  }
+  return true;
+}
+
+HAL_Bool HAL_IsNewControlData(void) {
+  int& lastCount = GetThreadLocalLastCount();
   int currentCount = 0;
   {
-    std::unique_lock lock(newDSDataAvailableMutex);
+    std::scoped_lock lock(newDSDataAvailableMutex);
     currentCount = newDSDataAvailableCounter;
   }
   if (lastCount == currentCount) return false;
