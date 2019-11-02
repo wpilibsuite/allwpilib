@@ -52,7 +52,7 @@ DEFINE_CAPI(double, CompressorCurrent, compressorCurrent)
 void HALSIM_GetPCMAllSolenoids(int32_t index, uint8_t* values) {
   auto& data = SimPCMData[index].solenoidOutput;
   uint8_t ret = 0;
-  for (int i = kNumSolenoidChannels - 1; i >= 0; i--) {
+  for (int i = 0; i < kNumSolenoidChannels; i++) {
     ret |= (data[i] << i);
   }
   *values = ret;
