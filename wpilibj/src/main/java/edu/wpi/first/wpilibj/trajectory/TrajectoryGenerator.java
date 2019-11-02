@@ -203,8 +203,8 @@ public final class TrajectoryGenerator {
       super();
     }
 
-    public ControlVectorList(Collection<? extends Spline.ControlVector> c) {
-      super(c);
+    public ControlVectorList(Collection<? extends Spline.ControlVector> collection) {
+      super(collection);
     }
   }
 }

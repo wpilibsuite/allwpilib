@@ -11,6 +11,12 @@
 
 #include "Rotation2d.h"
 
+namespace wpi {
+
+class json;
+
+}  // namespace wpi
+
 namespace frc {
 
 /**
@@ -211,4 +217,9 @@ class Translation2d {
   units::meter_t m_x = 0_m;
   units::meter_t m_y = 0_m;
 };
+
+void to_json(wpi::json& json, const Translation2d& state);
+
+void from_json(const wpi::json& json, Translation2d& state);
+
 }  // namespace frc

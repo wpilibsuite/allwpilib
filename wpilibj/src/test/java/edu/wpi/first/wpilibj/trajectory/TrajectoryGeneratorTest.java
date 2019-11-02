@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TrajectoryGeneratorTest {
-  static Trajectory getTrajectory(List<TrajectoryConstraint> constraints) {
+  static Trajectory getTrajectory(List<? extends TrajectoryConstraint> constraints) {
     final double maxVelocity = feetToMeters(12.0);
     final double maxAccel = feetToMeters(12);
 
