@@ -7,7 +7,19 @@
 
 #include "frc/trajectory/Trajectory.h"
 
+#include <wpi/json.h>
+
 using namespace frc;
+
+bool Trajectory::State::operator==(const Trajectory::State& other) const {
+  return t == other.t && velocity == other.velocity &&
+         acceleration == other.acceleration && pose == other.pose &&
+         curvature == other.curvature;
+}
+
+bool Trajectory::State::operator!=(const Trajectory::State& other) const {
+  return !operator==(other);
+}
 
 Trajectory::State Trajectory::State::Interpolate(State endValue,
                                                  double i) const {
@@ -93,4 +105,22 @@ Trajectory::State Trajectory::Sample(units::second_t t) const {
   // Interpolate between the two states for the state that we want.
   return prevSample.Interpolate(sample,
                                 (t - prevSample.t) / (sample.t - prevSample.t));
+}
+
+void frc::to_json(wpi::json& json, const Trajectory::State& state) {
+  json = wpi::json{{"time", state.t.to<double>()},
+                   {"velocity", state.velocity.to<double>()},
+                   {"acceleration", state.acceleration.to<double>()},
+                   {"pose", state.pose},
+                   {"curvature", state.curvature.to<double>()}};
+}
+
+void frc::from_json(const wpi::json& json, Trajectory::State& state) {
+  state.pose = json.at("pose").get<Pose2d>();
+  state.t = units::second_t{json.at("time").get<double>()};
+  state.velocity =
+      units::meters_per_second_t{json.at("velocity").get<double>()};
+  state.acceleration =
+      units::meters_per_second_squared_t{json.at("acceleration").get<double>()};
+  state.curvature = frc::curvature_t{json.at("curvature").get<double>()};
 }

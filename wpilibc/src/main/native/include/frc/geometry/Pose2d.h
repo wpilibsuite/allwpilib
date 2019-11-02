@@ -11,6 +11,10 @@
 #include "Translation2d.h"
 #include "Twist2d.h"
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 namespace frc {
 
 /**
@@ -167,4 +171,9 @@ class Pose2d {
   Translation2d m_translation;
   Rotation2d m_rotation;
 };
+
+void to_json(wpi::json& json, const Pose2d& pose);
+
+void from_json(const wpi::json& json, Pose2d& pose);
+
 }  // namespace frc

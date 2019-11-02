@@ -8,7 +8,10 @@
 package edu.wpi.first.wpilibj.trajectory;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 
@@ -137,18 +140,23 @@ public class Trajectory {
   @SuppressWarnings("MemberName")
   public static class State {
     // The time elapsed since the beginning of the trajectory.
+    @JsonProperty("time")
     public double timeSeconds;
 
     // The speed at that point of the trajectory.
+    @JsonProperty("velocity")
     public double velocityMetersPerSecond;
 
     // The acceleration at that point of the trajectory.
+    @JsonProperty("acceleration")
     public double accelerationMetersPerSecondSq;
 
     // The pose at that point of the trajectory.
+    @JsonProperty("pose")
     public Pose2d poseMeters;
 
     // The curvature at that point of the trajectory.
+    @JsonProperty("curvature")
     public double curvatureRadPerMeter;
 
     public State() {
@@ -227,6 +235,29 @@ public class Trajectory {
         "State(Sec: %.2f, Vel m/s: %.2f, Accel m/s/s: %.2f, Pose: %s, Curvature: %.2f)",
         timeSeconds, velocityMetersPerSecond, accelerationMetersPerSecondSq,
         poseMeters, curvatureRadPerMeter);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (!(obj instanceof State)) {
+        return false;
+      }
+      State state = (State) obj;
+      return Double.compare(state.timeSeconds, timeSeconds) == 0
+              && Double.compare(state.velocityMetersPerSecond, velocityMetersPerSecond) == 0
+              && Double.compare(state.accelerationMetersPerSecondSq,
+                accelerationMetersPerSecondSq) == 0
+              && Double.compare(state.curvatureRadPerMeter, curvatureRadPerMeter) == 0
+              && Objects.equals(poseMeters, state.poseMeters);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(timeSeconds, velocityMetersPerSecond,
+              accelerationMetersPerSecondSq, poseMeters, curvatureRadPerMeter);
     }
   }
 

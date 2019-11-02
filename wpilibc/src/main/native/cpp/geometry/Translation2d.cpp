@@ -7,6 +7,8 @@
 
 #include "frc/geometry/Translation2d.h"
 
+#include <wpi/json.h>
+
 using namespace frc;
 
 Translation2d::Translation2d(units::meter_t x, units::meter_t y)
@@ -72,4 +74,14 @@ bool Translation2d::operator!=(const Translation2d& other) const {
 Translation2d& Translation2d::operator/=(double scalar) {
   *this *= (1.0 / scalar);
   return *this;
+}
+
+void frc::to_json(wpi::json& json, const Translation2d& translation) {
+  json = wpi::json{{"x", translation.X().to<double>()},
+                   {"y", translation.Y().to<double>()}};
+}
+
+void frc::from_json(const wpi::json& json, Translation2d& translation) {
+  translation = Translation2d{units::meter_t{json.at("x").get<double>()},
+                              units::meter_t{json.at("y").get<double>()}};
 }
