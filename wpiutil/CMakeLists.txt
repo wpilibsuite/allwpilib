@@ -14,7 +14,7 @@ if (NOT WITHOUT_JAVA)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
 
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/ejml-simple-0.38.jar")
+  if(NOT EXISTS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/ejml/ejml-simple-0.38.jar")
       set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
       set(JAR_ROOT "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/ejml")
 
@@ -38,7 +38,7 @@ if (NOT WITHOUT_JAVA)
       message(STATUS "All files downloaded.")
   endif()
 
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/ejml-simple-0.38.jar")
+  if(NOT EXISTS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.10.0.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
         set(JAR_ROOT "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson")
 
