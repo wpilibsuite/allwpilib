@@ -14,7 +14,7 @@
 #include <frc2/command/CommandGroupBase.h>
 #include <frc2/command/Subsystem.h>
 
-#include <hal/HAL.h>
+#include <hal/HALBase.h>
 
 using namespace frc2;
 template <typename TMap, typename TKey>

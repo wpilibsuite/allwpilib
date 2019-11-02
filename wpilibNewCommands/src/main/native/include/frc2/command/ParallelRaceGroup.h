@@ -13,8 +13,6 @@
 #endif
 
 #include <memory>
-#include <set>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -78,7 +76,7 @@ class ParallelRaceGroup
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override;
 
-  std::set<std::unique_ptr<Command>> m_commands;
+  std::vector<std::unique_ptr<Command>> m_commands;
   bool m_runWhenDisabled{true};
   bool m_finished{false};
   bool isRunning = false;

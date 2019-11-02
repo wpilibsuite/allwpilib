@@ -9,8 +9,8 @@
 
 #include <frc/ErrorBase.h>
 
+#include <initializer_list>
 #include <memory>
-#include <set>
 #include <vector>
 
 #include "CommandBase.h"

@@ -58,7 +58,7 @@ void ParallelRaceGroup::AddCommands(
       command->SetGrouped(true);
       AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
-      m_commands.emplace(std::move(command));
+      m_commands.emplace_back(std::move(command));
     } else {
       wpi_setWPIErrorWithContext(CommandIllegalUse,
                                  "Multiple commands in a parallel group cannot "
