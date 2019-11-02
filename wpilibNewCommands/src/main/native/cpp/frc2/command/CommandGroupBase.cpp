@@ -7,11 +7,7 @@
 
 #include "frc2/command/CommandGroupBase.h"
 
-#include "frc/WPIErrors.h"
-#include "frc2/command/ParallelCommandGroup.h"
-#include "frc2/command/ParallelDeadlineGroup.h"
-#include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/SequentialCommandGroup.h"
+#include <frc/WPIErrors.h>
 
 using namespace frc2;
 

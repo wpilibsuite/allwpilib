@@ -7,24 +7,70 @@
 
 #include "frc2/command/CommandScheduler.h"
 
+#include <hal/HALBase.h>
 #include <frc/RobotState.h>
 #include <frc/WPIErrors.h>
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <frc/smartdashboard/SendableRegistry.h>
-#include <frc2/command/CommandGroupBase.h>
-#include <frc2/command/Subsystem.h>
+#include <networktables/NetworkTableEntry.h>
+#include <wpi/DenseMap.h>
 
-#include <hal/HALBase.h>
+#include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/CommandState.h"
+#include "frc2/command/Subsystem.h"
 
 using namespace frc2;
+
+class CommandScheduler::Impl {
+ public:
+  // A map from commands to their scheduling state.  Also used as a set of the
+  // currently-running commands.
+  wpi::DenseMap<Command*, CommandState> scheduledCommands;
+
+  // A map from required subsystems to their requiring commands.  Also used as a
+  // set of the currently-required subsystems.
+  wpi::DenseMap<Subsystem*, Command*> requirements;
+
+  // A map from subsystems registered with the scheduler to their default
+  // commands.  Also used as a list of currently-registered subsystems.
+  wpi::DenseMap<Subsystem*, std::unique_ptr<Command>> subsystems;
+
+  // The set of currently-registered buttons that will be polled every
+  // iteration.
+  wpi::SmallVector<wpi::unique_function<void()>, 4> buttons;
+
+  bool disabled{false};
+
+  // NetworkTable entries for use in Sendable impl
+  nt::NetworkTableEntry namesEntry;
+  nt::NetworkTableEntry idsEntry;
+  nt::NetworkTableEntry cancelEntry;
+
+  // Lists of user-supplied actions to be executed on scheduling events for
+  // every command.
+  wpi::SmallVector<Action, 4> initActions;
+  wpi::SmallVector<Action, 4> executeActions;
+  wpi::SmallVector<Action, 4> interruptActions;
+  wpi::SmallVector<Action, 4> finishActions;
+
+  // Flag and queues for avoiding concurrent modification if commands are
+  // scheduled/canceled during run
+
+  bool inRunLoop = false;
+  wpi::DenseMap<Command*, bool> toSchedule;
+  wpi::SmallVector<Command*, 4> toCancel;
+};
+
 template <typename TMap, typename TKey>
 static bool ContainsKey(const TMap& map, TKey keyToCheck) {
   return map.find(keyToCheck) != map.end();
 }
 
-CommandScheduler::CommandScheduler() {
+CommandScheduler::CommandScheduler() : m_impl(new Impl) {
   frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
 }
+
+CommandScheduler::~CommandScheduler() {}
 
 CommandScheduler& CommandScheduler::GetInstance() {
   static CommandScheduler scheduler;
@@ -32,14 +78,14 @@ CommandScheduler& CommandScheduler::GetInstance() {
 }
 
 void CommandScheduler::AddButton(wpi::unique_function<void()> button) {
-  m_buttons.emplace_back(std::move(button));
+  m_impl->buttons.emplace_back(std::move(button));
 }
 
-void CommandScheduler::ClearButtons() { m_buttons.clear(); }
+void CommandScheduler::ClearButtons() { m_impl->buttons.clear(); }
 
 void CommandScheduler::Schedule(bool interruptible, Command* command) {
-  if (m_inRunLoop) {
-    m_toSchedule.try_emplace(command, interruptible);
+  if (m_impl->inRunLoop) {
+    m_impl->toSchedule.try_emplace(command, interruptible);
     return;
   }
 
@@ -49,9 +95,9 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
                                "cannot be independently scheduled");
     return;
   }
-  if (m_disabled ||
+  if (m_impl->disabled ||
       (frc::RobotState::IsDisabled() && !command->RunsWhenDisabled()) ||
-      ContainsKey(m_scheduledCommands, command)) {
+      ContainsKey(m_impl->scheduledCommands, command)) {
     return;
   }
 
@@ -61,10 +107,11 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
 
   bool isDisjoint = true;
   bool allInterruptible = true;
-  for (auto&& i1 : m_requirements) {
+  for (auto&& i1 : m_impl->requirements) {
     if (requirements.find(i1.first) != requirements.end()) {
       isDisjoint = false;
-      allInterruptible &= m_scheduledCommands[i1.second].IsInterruptible();
+      allInterruptible &=
+          m_impl->scheduledCommands[i1.second].IsInterruptible();
       intersection.emplace_back(i1.second);
     }
   }
@@ -76,12 +123,12 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
       }
     }
     command->Initialize();
-    m_scheduledCommands[command] = CommandState{interruptible};
-    for (auto&& action : m_initActions) {
+    m_impl->scheduledCommands[command] = CommandState{interruptible};
+    for (auto&& action : m_impl->initActions) {
       action(*command);
     }
     for (auto&& requirement : requirements) {
-      m_requirements[requirement] = command;
+      m_impl->requirements[requirement] = command;
     }
   }
 }
@@ -115,24 +162,24 @@ void CommandScheduler::Schedule(std::initializer_list<Command*> commands) {
 }
 
 void CommandScheduler::Run() {
-  if (m_disabled) {
+  if (m_impl->disabled) {
     return;
   }
 
   // Run the periodic method of all registered subsystems.
-  for (auto&& subsystem : m_subsystems) {
+  for (auto&& subsystem : m_impl->subsystems) {
     subsystem.getFirst()->Periodic();
   }
 
   // Poll buttons for new commands to add.
-  for (auto&& button : m_buttons) {
+  for (auto&& button : m_impl->buttons) {
     button();
   }
 
-  m_inRunLoop = true;
+  m_impl->inRunLoop = true;
   // Run scheduled commands, remove finished commands.
-  for (auto iterator = m_scheduledCommands.begin();
-       iterator != m_scheduledCommands.end(); iterator++) {
+  for (auto iterator = m_impl->scheduledCommands.begin();
+       iterator != m_impl->scheduledCommands.end(); iterator++) {
     Command* command = iterator->getFirst();
 
     if (!command->RunsWhenDisabled() && frc::RobotState::IsDisabled()) {
@@ -141,53 +188,53 @@ void CommandScheduler::Run() {
     }
 
     command->Execute();
-    for (auto&& action : m_executeActions) {
+    for (auto&& action : m_impl->executeActions) {
       action(*command);
     }
 
     if (command->IsFinished()) {
       command->End(false);
-      for (auto&& action : m_finishActions) {
+      for (auto&& action : m_impl->finishActions) {
         action(*command);
       }
 
       for (auto&& requirement : command->GetRequirements()) {
-        m_requirements.erase(requirement);
+        m_impl->requirements.erase(requirement);
       }
 
-      m_scheduledCommands.erase(iterator);
+      m_impl->scheduledCommands.erase(iterator);
     }
   }
-  m_inRunLoop = false;
+  m_impl->inRunLoop = false;
 
-  for (auto&& commandInterruptible : m_toSchedule) {
+  for (auto&& commandInterruptible : m_impl->toSchedule) {
     Schedule(commandInterruptible.second, commandInterruptible.first);
   }
 
-  for (auto&& command : m_toCancel) {
+  for (auto&& command : m_impl->toCancel) {
     Cancel(command);
   }
 
-  m_toSchedule.clear();
-  m_toCancel.clear();
+  m_impl->toSchedule.clear();
+  m_impl->toCancel.clear();
 
   // Add default commands for un-required registered subsystems.
-  for (auto&& subsystem : m_subsystems) {
-    auto s = m_requirements.find(subsystem.getFirst());
-    if (s == m_requirements.end() && subsystem.getSecond()) {
+  for (auto&& subsystem : m_impl->subsystems) {
+    auto s = m_impl->requirements.find(subsystem.getFirst());
+    if (s == m_impl->requirements.end() && subsystem.getSecond()) {
       Schedule({subsystem.getSecond().get()});
     }
   }
 }
 
 void CommandScheduler::RegisterSubsystem(Subsystem* subsystem) {
-  m_subsystems[subsystem] = nullptr;
+  m_impl->subsystems[subsystem] = nullptr;
 }
 
 void CommandScheduler::UnregisterSubsystem(Subsystem* subsystem) {
-  auto s = m_subsystems.find(subsystem);
-  if (s != m_subsystems.end()) {
-    m_subsystems.erase(s);
+  auto s = m_impl->subsystems.find(subsystem);
+  if (s != m_impl->subsystems.end()) {
+    m_impl->subsystems.erase(s);
   }
 }
 
@@ -206,8 +253,8 @@ void CommandScheduler::UnregisterSubsystem(
 }
 
 Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
-  auto&& find = m_subsystems.find(subsystem);
-  if (find != m_subsystems.end()) {
+  auto&& find = m_impl->subsystems.find(subsystem);
+  if (find != m_impl->subsystems.end()) {
     return find->second.get();
   } else {
     return nullptr;
@@ -215,21 +262,21 @@ Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
 }
 
 void CommandScheduler::Cancel(Command* command) {
-  if (m_inRunLoop) {
-    m_toCancel.emplace_back(command);
+  if (m_impl->inRunLoop) {
+    m_impl->toCancel.emplace_back(command);
     return;
   }
 
-  auto find = m_scheduledCommands.find(command);
-  if (find == m_scheduledCommands.end()) return;
+  auto find = m_impl->scheduledCommands.find(command);
+  if (find == m_impl->scheduledCommands.end()) return;
   command->End(true);
-  for (auto&& action : m_interruptActions) {
+  for (auto&& action : m_impl->interruptActions) {
     action(*command);
   }
-  m_scheduledCommands.erase(find);
-  for (auto&& requirement : m_requirements) {
+  m_impl->scheduledCommands.erase(find);
+  for (auto&& requirement : m_impl->requirements) {
     if (requirement.second == command) {
-      m_requirements.erase(requirement.first);
+      m_impl->requirements.erase(requirement.first);
     }
   }
 }
@@ -247,14 +294,14 @@ void CommandScheduler::Cancel(std::initializer_list<Command*> commands) {
 }
 
 void CommandScheduler::CancelAll() {
-  for (auto&& command : m_scheduledCommands) {
+  for (auto&& command : m_impl->scheduledCommands) {
     Cancel(command.first);
   }
 }
 
 double CommandScheduler::TimeSinceScheduled(const Command* command) const {
-  auto find = m_scheduledCommands.find(command);
-  if (find != m_scheduledCommands.end()) {
+  auto find = m_impl->scheduledCommands.find(command);
+  if (find != m_impl->scheduledCommands.end()) {
     return find->second.TimeSinceInitialized();
   } else {
     return -1;
@@ -281,65 +328,72 @@ bool CommandScheduler::IsScheduled(
 }
 
 bool CommandScheduler::IsScheduled(const Command* command) const {
-  return m_scheduledCommands.find(command) != m_scheduledCommands.end();
+  return m_impl->scheduledCommands.find(command) !=
+         m_impl->scheduledCommands.end();
 }
 
 Command* CommandScheduler::Requiring(const Subsystem* subsystem) const {
-  auto find = m_requirements.find(subsystem);
-  if (find != m_requirements.end()) {
+  auto find = m_impl->requirements.find(subsystem);
+  if (find != m_impl->requirements.end()) {
     return find->second;
   } else {
     return nullptr;
   }
 }
 
-void CommandScheduler::Disable() { m_disabled = true; }
+void CommandScheduler::Disable() { m_impl->disabled = true; }
 
-void CommandScheduler::Enable() { m_disabled = false; }
+void CommandScheduler::Enable() { m_impl->disabled = false; }
 
 void CommandScheduler::OnCommandInitialize(Action action) {
-  m_initActions.emplace_back(std::move(action));
+  m_impl->initActions.emplace_back(std::move(action));
 }
 
 void CommandScheduler::OnCommandExecute(Action action) {
-  m_executeActions.emplace_back(std::move(action));
+  m_impl->executeActions.emplace_back(std::move(action));
 }
 
 void CommandScheduler::OnCommandInterrupt(Action action) {
-  m_interruptActions.emplace_back(std::move(action));
+  m_impl->interruptActions.emplace_back(std::move(action));
 }
 
 void CommandScheduler::OnCommandFinish(Action action) {
-  m_finishActions.emplace_back(std::move(action));
+  m_impl->finishActions.emplace_back(std::move(action));
 }
 
 void CommandScheduler::InitSendable(frc::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Scheduler");
-  m_namesEntry = builder.GetEntry("Names");
-  m_idsEntry = builder.GetEntry("Ids");
-  m_cancelEntry = builder.GetEntry("Cancel");
+  m_impl->namesEntry = builder.GetEntry("Names");
+  m_impl->idsEntry = builder.GetEntry("Ids");
+  m_impl->cancelEntry = builder.GetEntry("Cancel");
 
   builder.SetUpdateTable([this] {
     double tmp[1];
     tmp[0] = 0;
-    auto toCancel = m_cancelEntry.GetDoubleArray(tmp);
+    auto toCancel = m_impl->cancelEntry.GetDoubleArray(tmp);
     for (auto cancel : toCancel) {
       uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
       Command* command = reinterpret_cast<Command*>(ptrTmp);
-      if (m_scheduledCommands.find(command) != m_scheduledCommands.end()) {
+      if (m_impl->scheduledCommands.find(command) !=
+          m_impl->scheduledCommands.end()) {
         Cancel(command);
       }
-      m_cancelEntry.SetDoubleArray(wpi::ArrayRef<double>{});
+      m_impl->cancelEntry.SetDoubleArray(wpi::ArrayRef<double>{});
     }
 
     wpi::SmallVector<std::string, 8> names;
     wpi::SmallVector<double, 8> ids;
-    for (auto&& command : m_scheduledCommands) {
+    for (auto&& command : m_impl->scheduledCommands) {
       names.emplace_back(command.first->GetName());
       uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(command.first);
       ids.emplace_back(static_cast<double>(ptrTmp));
     }
-    m_namesEntry.SetStringArray(names);
-    m_idsEntry.SetDoubleArray(ids);
+    m_impl->namesEntry.SetStringArray(names);
+    m_impl->idsEntry.SetDoubleArray(ids);
   });
+}
+
+void CommandScheduler::SetDefaultCommandImpl(Subsystem* subsystem,
+                                             std::unique_ptr<Command> command) {
+  m_impl->subsystems[subsystem] = std::move(command);
 }

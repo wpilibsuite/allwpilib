@@ -11,7 +11,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "Command.h"
+#include "frc2/command/Command.h"
 
 namespace frc2 {
 

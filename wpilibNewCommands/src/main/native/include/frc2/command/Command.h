@@ -7,18 +7,17 @@
 
 #pragma once
 
-#include <frc/ErrorBase.h>
-#include <frc/WPIErrors.h>
-#include <frc2/command/Subsystem.h>
-
+#include <functional>
 #include <memory>
 #include <string>
 
+#include <frc/ErrorBase.h>
 #include <units/units.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
-#include <wpi/Twine.h>
+
+#include "frc2/command/Subsystem.h"
 
 namespace frc2 {
 

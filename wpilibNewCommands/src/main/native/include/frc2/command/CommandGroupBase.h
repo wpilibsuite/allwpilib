@@ -11,10 +11,9 @@
 #include <memory>
 #include <vector>
 
-#include <frc/ErrorBase.h>
 #include <wpi/ArrayRef.h>
 
-#include "CommandBase.h"
+#include "frc2/command/CommandBase.h"
 
 namespace frc2 {
 

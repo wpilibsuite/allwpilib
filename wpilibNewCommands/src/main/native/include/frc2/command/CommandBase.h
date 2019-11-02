@@ -15,7 +15,7 @@
 #include <wpi/SmallSet.h>
 #include <wpi/Twine.h>
 
-#include "Command.h"
+#include "frc2/command/Command.h"
 
 namespace frc2 {
 /**

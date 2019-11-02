@@ -15,11 +15,12 @@
 #include <memory>
 #include <unordered_map>
 #include <utility>
+#include <type_traits>
 #include <vector>
 
-#include "CommandBase.h"
-#include "CommandGroupBase.h"
-#include "PrintCommand.h"
+#include "frc2/command/CommandBase.h"
+#include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/PrintCommand.h"
 
 namespace frc2 {
 template <typename Key>

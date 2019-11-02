@@ -7,8 +7,10 @@
 
 #pragma once
 
-#include "CommandBase.h"
-#include "CommandHelper.h"
+#include <functional>
+
+#include "frc2/command/CommandBase.h"
+#include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**

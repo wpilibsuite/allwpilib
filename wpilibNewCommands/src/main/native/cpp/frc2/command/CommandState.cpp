@@ -7,7 +7,7 @@
 
 #include "frc2/command/CommandState.h"
 
-#include "frc/Timer.h"
+#include <frc/Timer.h>
 
 using namespace frc2;
 CommandState::CommandState(bool interruptible)
