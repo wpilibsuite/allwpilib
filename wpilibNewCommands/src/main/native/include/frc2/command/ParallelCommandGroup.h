@@ -13,7 +13,6 @@
 #endif
 
 #include <memory>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -89,7 +88,7 @@ class ParallelCommandGroup
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override;
 
-  std::unordered_map<std::unique_ptr<Command>, bool> m_commands;
+  std::vector<std::pair<std::unique_ptr<Command>, bool>> m_commands;
   bool m_runWhenDisabled{true};
   bool isRunning = false;
 };
