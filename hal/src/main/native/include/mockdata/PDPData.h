@@ -46,6 +46,9 @@ void HALSIM_CancelPDPCurrentCallback(int32_t index, int32_t channel,
 double HALSIM_GetPDPCurrent(int32_t index, int32_t channel);
 void HALSIM_SetPDPCurrent(int32_t index, int32_t channel, double current);
 
+void HALSIM_GetPDPAllCurrents(int32_t index, double* currents);
+void HALSIM_SetPDPAllCurrents(int32_t index, const double* currents);
+
 void HALSIM_RegisterPDPAllNonCurrentCallbacks(int32_t index, int32_t channel,
                                               HAL_NotifyCallback callback,
                                               void* param,

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -48,6 +48,23 @@ DEFINE_CAPI(HAL_Bool, CompressorOn, compressorOn)
 DEFINE_CAPI(HAL_Bool, ClosedLoopEnabled, closedLoopEnabled)
 DEFINE_CAPI(HAL_Bool, PressureSwitch, pressureSwitch)
 DEFINE_CAPI(double, CompressorCurrent, compressorCurrent)
+
+void HALSIM_GetPCMAllSolenoids(int32_t index, uint8_t* values) {
+  auto& data = SimPCMData[index].solenoidOutput;
+  uint8_t ret = 0;
+  for (int i = 0; i < kNumSolenoidChannels; i++) {
+    ret |= (data[i] << i);
+  }
+  *values = ret;
+}
+
+void HALSIM_SetPCMAllSolenoids(int32_t index, uint8_t values) {
+  auto& data = SimPCMData[index].solenoidOutput;
+  for (int i = 0; i < kNumSolenoidChannels; i++) {
+    data[i] = (values & 0x1) != 0;
+    values >>= 1;
+  }
+}
 
 #define REGISTER(NAME) \
   SimPCMData[index].NAME.RegisterCallback(callback, param, initialNotify)
