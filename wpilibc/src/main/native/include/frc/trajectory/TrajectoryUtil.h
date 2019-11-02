@@ -9,6 +9,7 @@
 
 #include <string>
 
+#include <wpi/StringRef.h>
 #include <wpi/Twine.h>
 
 #include "frc/trajectory/Trajectory.h"
@@ -53,6 +54,6 @@ class TrajectoryUtil {
 
    * @return the string containing the serialized JSON
    */
-  static Trajectory DeserializeTrajectory(const std::string& json_str);
+  static Trajectory DeserializeTrajectory(wpi::StringRef json_str);
 };
 }  // namespace frc

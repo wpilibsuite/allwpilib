@@ -11,9 +11,7 @@
 #include <wpi/math>
 
 namespace wpi {
-
 class json;
-
 }  // namespace wpi
 
 namespace frc {

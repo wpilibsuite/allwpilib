@@ -50,7 +50,9 @@ std::string TrajectoryUtil::SerializeTrajectory(const Trajectory& trajectory) {
   wpi::json json = trajectory.States();
   return json.dump();
 }
-Trajectory TrajectoryUtil::DeserializeTrajectory(const std::string& json_str) {
+
+Trajectory TrajectoryUtil::DeserializeTrajectory(
+    const wpi::StringRef json_str) {
   wpi::json json = wpi::json::parse(json_str);
   return Trajectory{json.get<std::vector<Trajectory::State>>()};
 }

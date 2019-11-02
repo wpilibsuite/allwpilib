@@ -12,9 +12,7 @@
 #include "Rotation2d.h"
 
 namespace wpi {
-
 class json;
-
 }  // namespace wpi
 
 namespace frc {

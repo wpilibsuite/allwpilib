@@ -12,9 +12,7 @@
 #include "Twist2d.h"
 
 namespace wpi {
-
 class json;
-
 }  // namespace wpi
 
 namespace frc {
