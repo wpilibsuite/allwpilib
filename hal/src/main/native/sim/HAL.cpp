@@ -32,6 +32,7 @@ void InitializeHAL() {
   InitializeCanData();
   InitializeCANAPI();
   InitializeDigitalPWMData();
+  InitializeDutyCycleData();
   InitializeDIOData();
   InitializeDriverStationData();
   InitializeEncoderData();
@@ -56,6 +57,7 @@ void InitializeHAL() {
   InitializeCounter();
   InitializeDigitalInternal();
   InitializeDIO();
+  InitializeDutyCycle();
   InitializeDriverStation();
   InitializeEncoder();
   InitializeExtensions();
@@ -199,6 +201,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_PWM_SCALE_ERROR_MESSAGE;
     case HAL_CAN_TIMEOUT:
       return HAL_CAN_TIMEOUT_MESSAGE;
+    case HAL_SIM_NOT_SUPPORTED:
+      return HAL_SIM_NOT_SUPPORTED_MESSAGE;
     default:
       return "Unknown error status";
   }

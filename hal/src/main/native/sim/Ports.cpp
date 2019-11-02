@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -36,5 +36,5 @@ int32_t HAL_GetNumPCMModules(void) { return kNumPCMModules; }
 int32_t HAL_GetNumSolenoidChannels(void) { return kNumSolenoidChannels; }
 int32_t HAL_GetNumPDPModules(void) { return kNumPDPModules; }
 int32_t HAL_GetNumPDPChannels(void) { return kNumPDPChannels; }
-int32_t HAL_GetNumCanTalons(void) { return kNumCanTalons; }
+int32_t HAL_GetNumDutyCycles(void) { return kNumDutyCycles; }
 }  // extern "C"

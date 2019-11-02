@@ -33,7 +33,7 @@ AnalogTriggerType AnalogTriggerOutput::GetAnalogTriggerTypeForRouting() const {
 
 bool AnalogTriggerOutput::IsAnalogTrigger() const { return true; }
 
-int AnalogTriggerOutput::GetChannel() const { return m_trigger->m_index; }
+int AnalogTriggerOutput::GetChannel() const { return m_trigger->GetIndex(); }
 
 void AnalogTriggerOutput::InitSendable(SendableBuilder&) {}
 

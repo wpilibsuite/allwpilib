@@ -89,3 +89,4 @@ kResourceType_Kinematics = 87
 kResourceType_Odometry = 88
 kResourceType_Units = 89
 kResourceType_TrapezoidProfile = 90
+kResourceType_DutyCycle = 91

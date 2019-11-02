@@ -13,6 +13,7 @@
 enum HALSIM_AnalogTriggerMode : int32_t {
   HALSIM_AnalogTriggerUnassigned,
   HALSIM_AnalogTriggerFiltered,
+  HALSIM_AnalogTriggerDutyCycle,
   HALSIM_AnalogTriggerAveraged
 };
 
