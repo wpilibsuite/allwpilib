@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <frc/smartdashboard/Sendable.h>
-#include <frc/smartdashboard/SendableHelper.h>
-
+#include <initializer_list>
 #include <string>
 
+#include <frc/smartdashboard/Sendable.h>
+#include <frc/smartdashboard/SendableHelper.h>
 #include <wpi/SmallSet.h>
 #include <wpi/Twine.h>
 

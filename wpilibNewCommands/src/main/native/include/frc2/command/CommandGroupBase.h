@@ -7,11 +7,12 @@
 
 #pragma once
 
-#include <frc/ErrorBase.h>
-
 #include <initializer_list>
 #include <memory>
 #include <vector>
+
+#include <frc/ErrorBase.h>
+#include <wpi/ArrayRef.h>
 
 #include "CommandBase.h"
 

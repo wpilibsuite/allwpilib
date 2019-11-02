@@ -5,7 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#pragma once
+
 #include <functional>
+#include <initializer_list>
 #include <memory>
 
 #include <units/units.h>
@@ -18,8 +21,6 @@
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/Trajectory.h"
 #include "frc2/Timer.h"
-
-#pragma once
 
 namespace frc2 {
 /**

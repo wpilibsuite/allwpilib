@@ -7,8 +7,10 @@
 
 #pragma once
 
-#include <frc/Notifier.h>
+#include <functional>
+#include <initializer_list>
 
+#include <frc/Notifier.h>
 #include <units/units.h>
 
 #include "CommandBase.h"

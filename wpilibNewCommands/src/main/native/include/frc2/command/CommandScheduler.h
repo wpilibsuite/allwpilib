@@ -7,17 +7,17 @@
 
 #pragma once
 
+#include <initializer_list>
+#include <memory>
+#include <utility>
+
 #include <frc/ErrorBase.h>
 #include <frc/RobotState.h>
 #include <frc/WPIErrors.h>
 #include <frc/smartdashboard/Sendable.h>
 #include <frc/smartdashboard/SendableHelper.h>
-
-#include <memory>
-#include <unordered_map>
-#include <utility>
-
 #include <networktables/NetworkTableEntry.h>
+#include <wpi/ArrayRef.h>
 #include <wpi/DenseMap.h>
 #include <wpi/FunctionExtras.h>
 #include <wpi/SmallSet.h>

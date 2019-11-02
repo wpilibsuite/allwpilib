@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <functional>
+#include <initializer_list>
+
 #include <units/units.h>
 
 #include "frc/controller/ProfiledPIDController.h"
