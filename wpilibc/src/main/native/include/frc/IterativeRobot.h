@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <atomic>
+
 #include "frc/IterativeRobotBase.h"
 
 namespace frc {
@@ -38,6 +40,14 @@ class IterativeRobot : public IterativeRobotBase {
    * with the DS packets.
    */
   void StartCompetition() override;
+
+  /**
+   * Ends the main loop in StartCompetition().
+   */
+  void EndCompetition() override;
+
+ private:
+  std::atomic<bool> m_exit{false};
 };
 
 }  // namespace frc

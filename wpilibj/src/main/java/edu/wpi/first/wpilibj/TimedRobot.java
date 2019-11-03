@@ -83,6 +83,14 @@ public class TimedRobot extends IterativeRobotBase {
   }
 
   /**
+   * Ends the main loop in startCompetition().
+   */
+  @Override
+  public void endCompetition() {
+    NotifierJNI.stopNotifier(m_notifier);
+  }
+
+  /**
    * Get time period between calls to Periodic() functions.
    */
   public double getPeriod() {
