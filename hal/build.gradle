@@ -176,12 +176,10 @@ nativeUtils.exportsConfigs {
                             '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
                             '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
     }
+}
+
+nativeUtils.privateExportsConfigs {
     halJNI {
-        x86SymbolFilter = { symbols ->
-            symbols.removeIf({ !it.startsWith('HAL_') && !it.startsWith('HALSIM_') })
-        }
-        x64SymbolFilter = { symbols ->
-            symbols.removeIf({ !it.startsWith('HAL_') && !it.startsWith('HALSIM_') })
-        }
+        exportsFile = project.file("src/main/native/symbols.txt")
     }
 }
