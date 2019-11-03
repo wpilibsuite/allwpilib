@@ -7,6 +7,7 @@
 
 package edu.wpi.first.hal.sim;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.sim.mockdata.DriverStationDataJNI;
 
 public class DriverStationSim {
@@ -77,6 +78,12 @@ public class DriverStationSim {
   }
   public void notifyNewData() {
     DriverStationDataJNI.notifyNewData();
+  }
+  public void waitForCachedControlData() {
+    HAL.waitForDSData();
+  }
+  public boolean waitForCachedControlDataTimeout(double timeout) {
+    return HAL.waitForDSDataTimeout(timeout);
   }
 
   public void resetData() {

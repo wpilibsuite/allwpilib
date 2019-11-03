@@ -8,29 +8,37 @@
 package edu.wpi.first.wpilibj;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.sim.DriverStationSim;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RobotStateTest extends UtilityClassTest {
+class RobotStateTest extends UtilityClassTest<RobotState> {
   RobotStateTest() {
     super(RobotState.class);
   }
 
   @Test
   void isDisabledTest(@SimDs DriverStationSim ds) {
+    HAL.isNewControlData();
     ds.setEnabled(false);
+    ds.notifyNewData();
+
+    ds.waitForCachedControlData();
 
     assertTrue(RobotState.isDisabled());
   }
 
   @Test
-  void isNotDisabledTest(@SimDs DriverStationSim ds) throws InterruptedException {
+  void isNotDisabledTest(@SimDs DriverStationSim ds) {
+    HAL.isNewControlData();
     ds.setEnabled(true);
+    ds.notifyNewData();
 
-    Thread.sleep(55);
+    ds.waitForCachedControlData();
 
     assertFalse(RobotState.isDisabled());
   }
