@@ -14,9 +14,9 @@ if (NOT WITHOUT_JAVA)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
 
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/ejml-simple-0.38.jar")
+  if(NOT EXISTS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/ejml/ejml-simple-0.38.jar")
       set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
-      set(JAR_ROOT "${CMAKE_BINARY_DIR}/wpiutil/thirdparty")
+      set(JAR_ROOT "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/ejml")
 
       message(STATUS "Downloading EJML jarfiles...")
 
@@ -38,8 +38,27 @@ if (NOT WITHOUT_JAVA)
       message(STATUS "All files downloaded.")
   endif()
 
+  if(NOT EXISTS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.10.0.jar")
+        set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
+        set(JAR_ROOT "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson")
+
+        message(STATUS "Downloading Jackson jarfiles...")
+
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.10.0/jackson-core-2.10.0.jar"
+            "${JAR_ROOT}/jackson-core-2.10.0.jar")
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.10.0/jackson-databind-2.10.0.jar"
+            "${JAR_ROOT}/jackson-databind-2.10.0.jar")
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.10.0/jackson-annotations-2.10.0.jar"
+            "${JAR_ROOT}/jackson-annotations-2.10.0.jar")
+
+        message(STATUS "All files downloaded.")
+    endif()
+
   file(GLOB EJML_JARS
-      ${CMAKE_BINARY_DIR}/wpiutil/thirdparty/*.jar)
+      ${CMAKE_BINARY_DIR}/wpiutil/thirdparty/ejml/*.jar)
+
+  file(GLOB JACKSON_JARS
+        ${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar)
 
   set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${EJML_JARS})
 
@@ -51,9 +70,9 @@ if (NOT WITHOUT_JAVA)
 
   if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
     set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} OUTPUT_NAME wpiutil)
+    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} ${JACKSON_JARS} OUTPUT_NAME wpiutil)
   else()
-    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} OUTPUT_NAME wpiutil GENERATE_NATIVE_HEADERS wpiutil_jni_headers)
+    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} ${JACKSON_JARS} OUTPUT_NAME wpiutil GENERATE_NATIVE_HEADERS wpiutil_jni_headers)
   endif()
 
   get_property(WPIUTIL_JAR_FILE TARGET wpiutil_jar PROPERTY JAR_FILE)

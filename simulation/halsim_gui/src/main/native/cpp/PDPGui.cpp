@@ -8,6 +8,7 @@
 #include "PDPGui.h"
 
 #include <cstdio>
+#include <memory>
 
 #include <hal/Ports.h>
 #include <imgui.h>
@@ -21,6 +22,7 @@ static void DisplayPDP() {
   bool hasAny = false;
   static int numPDP = HAL_GetNumPDPModules();
   static int numChannels = HAL_GetNumPDPChannels();
+  static auto channelCurrents = std::make_unique<double[]>(numChannels);
   ImGui::PushItemWidth(ImGui::GetFontSize() * 13);
   for (int i = 0; i < numPDP; ++i) {
     if (HALSIM_GetPDPInitialized(i)) {
@@ -42,6 +44,7 @@ static void DisplayPDP() {
           HALSIM_SetPDPVoltage(i, volts);
 
         // channel currents; show as two columns laid out like PDP
+        HALSIM_GetPDPAllCurrents(i, channelCurrents.get());
         ImGui::Text("Channel Current (A)");
         ImGui::Columns(2, "channels", false);
         for (int left = 0, right = numChannels - 1; left < right;
@@ -49,13 +52,13 @@ static void DisplayPDP() {
           double val;
 
           std::snprintf(name, sizeof(name), "[%d]", left);
-          val = HALSIM_GetPDPCurrent(i, left);
+          val = channelCurrents[left];
           if (ImGui::InputDouble(name, &val))
             HALSIM_SetPDPCurrent(i, left, val);
           ImGui::NextColumn();
 
           std::snprintf(name, sizeof(name), "[%d]", right);
-          val = HALSIM_GetPDPCurrent(i, right);
+          val = channelCurrents[right];
           if (ImGui::InputDouble(name, &val))
             HALSIM_SetPDPCurrent(i, right, val);
           ImGui::NextColumn();

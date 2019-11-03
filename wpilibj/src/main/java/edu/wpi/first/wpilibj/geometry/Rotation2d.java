@@ -7,12 +7,26 @@
 
 package edu.wpi.first.wpilibj.geometry;
 
+import java.io.IOException;
 import java.util.Objects;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
  * A rotation in a 2d coordinate frame represented a point on the unit circle
  * (cosine and sine).
  */
+@JsonSerialize(using = Rotation2d.RotationSerializer.class)
+@JsonDeserialize(using = Rotation2d.RotationDeserializer.class)
 public class Rotation2d {
   private final double m_value;
   private final double m_cos;
@@ -202,5 +216,36 @@ public class Rotation2d {
   @Override
   public int hashCode() {
     return Objects.hash(m_value);
+  }
+
+  static class RotationSerializer extends StdSerializer<Rotation2d> {
+    RotationSerializer() {
+      super(Rotation2d.class);
+    }
+
+    @Override
+    public void serialize(
+            Rotation2d value, JsonGenerator jgen, SerializerProvider provider)
+            throws IOException, JsonProcessingException {
+
+      jgen.writeStartObject();
+      jgen.writeNumberField("radians", value.m_value);
+      jgen.writeEndObject();
+    }
+  }
+
+  static class RotationDeserializer extends StdDeserializer<Rotation2d> {
+    RotationDeserializer() {
+      super(Rotation2d.class);
+    }
+
+    @Override
+    public Rotation2d deserialize(JsonParser jp, DeserializationContext ctxt)
+            throws IOException, JsonProcessingException {
+      JsonNode node = jp.getCodec().readTree(jp);
+      double radians = node.get("radians").numberValue().doubleValue();
+
+      return new Rotation2d(radians);
+    }
   }
 }

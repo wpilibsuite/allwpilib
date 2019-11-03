@@ -19,6 +19,7 @@
 namespace frc {
 
 class AnalogInput;
+class DutyCycle;
 class SendableBuilder;
 
 class AnalogTrigger : public ErrorBase,
@@ -45,6 +46,13 @@ class AnalogTrigger : public ErrorBase,
    */
   explicit AnalogTrigger(AnalogInput* channel);
 
+  /**
+   * Construct an analog trigger given a duty cycle input.
+   *
+   * @param channel The pointer to the existing DutyCycle object
+   */
+  explicit AnalogTrigger(DutyCycle* dutyCycle);
+
   ~AnalogTrigger() override;
 
   AnalogTrigger(AnalogTrigger&& rhs);
@@ -59,6 +67,16 @@ class AnalogTrigger : public ErrorBase,
    * @param upper The upper limit of the trigger in Volts.
    */
   void SetLimitsVoltage(double lower, double upper);
+
+  /**
+   * Set the upper and lower duty cycle limits of the analog trigger.
+   *
+   * The limits are given as floating point values between 0 and 1.
+   *
+   * @param lower The lower limit of the trigger in percentage.
+   * @param upper The upper limit of the trigger in percentage.
+   */
+  void SetLimitsDutyCycle(double lower, double upper);
 
   /**
    * Set the upper and lower limits of the analog trigger.
@@ -81,6 +99,17 @@ class AnalogTrigger : public ErrorBase,
    *                         instantaneous reading
    */
   void SetAveraged(bool useAveragedValue);
+
+  /**
+   * Configure the analog trigger to use the duty cycle vs. raw values.
+   *
+   * If the value is true, then the duty cycle value is selected for the analog
+   * trigger, otherwise the immediate value is used.
+   *
+   * @param useDutyCycle If true, use the duty cycle value, otherwise use the
+   *                         instantaneous reading
+   */
+  void SetDutyCycle(bool useDutyCycle);
 
   /**
    * Configure the analog trigger to use a filtered value.
@@ -139,9 +168,9 @@ class AnalogTrigger : public ErrorBase,
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  int m_index;
   hal::Handle<HAL_AnalogTriggerHandle> m_trigger;
   AnalogInput* m_analogInput = nullptr;
+  DutyCycle* m_dutyCycle = nullptr;
   bool m_ownsAnalog = false;
 };
 

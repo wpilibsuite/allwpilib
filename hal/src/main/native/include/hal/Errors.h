@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -116,6 +116,9 @@
 
 #define HAL_CAN_TIMEOUT -1154
 #define HAL_CAN_TIMEOUT_MESSAGE "HAL: CAN Receive has Timed Out"
+
+#define HAL_SIM_NOT_SUPPORTED -1155
+#define HAL_SIM_NOT_SUPPORTED_MESSAGE "HAL: Method not supported in sim"
 
 #define VI_ERROR_SYSTEM_ERROR_MESSAGE "HAL - VISA: System Error";
 #define VI_ERROR_INV_OBJECT_MESSAGE "HAL - VISA: Invalid Object"

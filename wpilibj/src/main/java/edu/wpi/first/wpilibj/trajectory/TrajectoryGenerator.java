@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.trajectory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -160,8 +161,7 @@ public final class TrajectoryGenerator {
   @SuppressWarnings("LocalVariableName")
   public static Trajectory generateTrajectory(List<Pose2d> waypoints, TrajectoryConfig config) {
     var originalList = SplineHelper.getQuinticControlVectorsFromWaypoints(waypoints);
-    var newList = new ControlVectorList();
-    newList.addAll(originalList);
+    var newList = new ControlVectorList(originalList);
     return generateTrajectory(newList, config);
   }
 
@@ -194,6 +194,17 @@ public final class TrajectoryGenerator {
   }
 
   // Work around type erasure signatures
-  private static class ControlVectorList extends ArrayList<Spline.ControlVector> {
+  public static class ControlVectorList extends ArrayList<Spline.ControlVector> {
+    public ControlVectorList(int initialCapacity) {
+      super(initialCapacity);
+    }
+
+    public ControlVectorList() {
+      super();
+    }
+
+    public ControlVectorList(Collection<? extends Spline.ControlVector> collection) {
+      super(collection);
+    }
   }
 }

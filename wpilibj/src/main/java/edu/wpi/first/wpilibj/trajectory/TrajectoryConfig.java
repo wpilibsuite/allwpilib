@@ -59,7 +59,7 @@ public class TrajectoryConfig {
    * @param constraints List of user-defined constraints.
    * @return Instance of the current config object.
    */
-  public TrajectoryConfig addConstraints(List<TrajectoryConstraint> constraints) {
+  public TrajectoryConfig addConstraints(List<? extends TrajectoryConstraint> constraints) {
     m_constraints.addAll(constraints);
     return this;
   }

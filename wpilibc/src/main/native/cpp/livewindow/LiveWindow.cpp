@@ -12,7 +12,7 @@
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/mutex.h>
 
-#include "frc/commands/Scheduler.h"
+#include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableBuilderImpl.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -99,19 +99,15 @@ bool LiveWindow::IsEnabled() const {
 void LiveWindow::SetEnabled(bool enabled) {
   std::scoped_lock lock(m_impl->mutex);
   if (m_impl->liveWindowEnabled == enabled) return;
-  Scheduler* scheduler = Scheduler::GetInstance();
   m_impl->startLiveWindow = enabled;
   m_impl->liveWindowEnabled = enabled;
   // Force table generation now to make sure everything is defined
   UpdateValuesUnsafe();
   if (enabled) {
-    scheduler->SetEnabled(false);
-    scheduler->RemoveAll();
   } else {
     m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
       cbdata.builder.StopLiveWindowMode();
     });
-    scheduler->SetEnabled(true);
   }
   m_impl->enabledEntry.SetBoolean(enabled);
 }

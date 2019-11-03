@@ -12,6 +12,7 @@
 #include <hal/HAL.h>
 
 #include "frc/AnalogInput.h"
+#include "frc/DutyCycle.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -26,19 +27,31 @@ AnalogTrigger::AnalogTrigger(int channel)
 AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   m_analogInput = input;
   int32_t status = 0;
-  int index = 0;
-  m_trigger = HAL_InitializeAnalogTrigger(input->m_port, &index, &status);
+  m_trigger = HAL_InitializeAnalogTrigger(input->m_port, &status);
   if (status != 0) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-    m_index = std::numeric_limits<int>::max();
     m_trigger = HAL_kInvalidHandle;
     return;
   }
-  m_index = index;
+  int index = GetIndex();
 
-  HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, m_index + 1);
-  SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger",
-                                        input->GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
+  SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
+}
+
+AnalogTrigger::AnalogTrigger(DutyCycle* input) {
+  m_dutyCycle = input;
+  int32_t status = 0;
+  m_trigger = HAL_InitializeAnalogTriggerDutyCycle(input->m_handle, &status);
+  if (status != 0) {
+    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    m_trigger = HAL_kInvalidHandle;
+    return;
+  }
+  int index = GetIndex();
+
+  HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
+  SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
 }
 
 AnalogTrigger::~AnalogTrigger() {
@@ -53,9 +66,9 @@ AnalogTrigger::~AnalogTrigger() {
 AnalogTrigger::AnalogTrigger(AnalogTrigger&& rhs)
     : ErrorBase(std::move(rhs)),
       SendableHelper(std::move(rhs)),
-      m_index(std::move(rhs.m_index)),
       m_trigger(std::move(rhs.m_trigger)) {
   std::swap(m_analogInput, rhs.m_analogInput);
+  std::swap(m_dutyCycle, rhs.m_dutyCycle);
   std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
 }
 
@@ -63,9 +76,9 @@ AnalogTrigger& AnalogTrigger::operator=(AnalogTrigger&& rhs) {
   ErrorBase::operator=(std::move(rhs));
   SendableHelper::operator=(std::move(rhs));
 
-  m_index = std::move(rhs.m_index);
   m_trigger = std::move(rhs.m_trigger);
   std::swap(m_analogInput, rhs.m_analogInput);
+  std::swap(m_dutyCycle, rhs.m_dutyCycle);
   std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
 
   return *this;
@@ -75,6 +88,13 @@ void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsVoltage(m_trigger, lower, upper, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+void AnalogTrigger::SetLimitsDutyCycle(double lower, double upper) {
+  if (StatusIsFatal()) return;
+  int32_t status = 0;
+  HAL_SetAnalogTriggerLimitsDutyCycle(m_trigger, lower, upper, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -101,7 +121,10 @@ void AnalogTrigger::SetFiltered(bool useFilteredValue) {
 
 int AnalogTrigger::GetIndex() const {
   if (StatusIsFatal()) return -1;
-  return m_index;
+  int32_t status = 0;
+  auto ret = HAL_GetAnalogTriggerFPGAIndex(m_trigger, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  return ret;
 }
 
 bool AnalogTrigger::GetInWindow() {
