@@ -421,6 +421,7 @@ static void newDataOccur(uint32_t refNum) {
   // to signal our threads
   if (refNum != refNumber) return;
   // Notify all threads
+  std::lock_guard lock{*newDSDataAvailableMutex};
   newDSDataAvailableCounter++;
   newDSDataAvailableCond->notify_all();
 }
