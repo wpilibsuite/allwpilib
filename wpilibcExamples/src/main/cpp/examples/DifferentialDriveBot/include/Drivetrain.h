@@ -67,7 +67,7 @@ class Drivetrain {
   frc::SpeedControllerGroup m_rightGroup{m_rightMaster, m_rightFollower};
 
   frc::Encoder m_leftEncoder{0, 1};
-  frc::Encoder m_rightEncoder{0, 1};
+  frc::Encoder m_rightEncoder{2, 3};
 
   frc2::PIDController m_leftPIDController{1.0, 0.0, 0.0};
   frc2::PIDController m_rightPIDController{1.0, 0.0, 0.0};
