@@ -27,7 +27,7 @@ public class SwerveModule {
   private final Spark m_turningMotor;
 
   private final Encoder m_driveEncoder = new Encoder(0, 1);
-  private final Encoder m_turningEncoder = new Encoder(0, 1);
+  private final Encoder m_turningEncoder = new Encoder(2, 3);
 
   private final PIDController m_drivePIDController = new PIDController(1, 0, 0);
 

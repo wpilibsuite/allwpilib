@@ -38,7 +38,7 @@ class SwerveModule {
   frc::Spark m_turningMotor;
 
   frc::Encoder m_driveEncoder{0, 1};
-  frc::Encoder m_turningEncoder{0, 1};
+  frc::Encoder m_turningEncoder{2, 3};
 
   frc2::PIDController m_drivePIDController{1.0, 0, 0};
   frc::ProfiledPIDController m_turningPIDController{

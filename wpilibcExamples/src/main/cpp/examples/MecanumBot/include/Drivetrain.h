@@ -51,9 +51,9 @@ class Drivetrain {
   frc::Spark m_backRightMotor{4};
 
   frc::Encoder m_frontLeftEncoder{0, 1};
-  frc::Encoder m_frontRightEncoder{0, 1};
-  frc::Encoder m_backLeftEncoder{0, 1};
-  frc::Encoder m_backRightEncoder{0, 1};
+  frc::Encoder m_frontRightEncoder{2, 3};
+  frc::Encoder m_backLeftEncoder{4, 5};
+  frc::Encoder m_backRightEncoder{6, 7};
 
   frc::Translation2d m_frontLeftLocation{0.381_m, 0.381_m};
   frc::Translation2d m_frontRightLocation{0.381_m, -0.381_m};
