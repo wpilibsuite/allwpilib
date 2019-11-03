@@ -7,6 +7,15 @@
 
 #pragma once
 
+// clang-format off
+#ifdef _MSC_VER
+#pragma message "warning: Including this header drastically increases compilation times and is bad style. Include only what you use instead."
+#else
+#warning "Including this header drastically increases compilation times and is bad style. Include only what you use instead."
+#endif
+
+// clang-format on
+
 #include <cameraserver/CameraServer.h>
 #include <vision/VisionRunner.h>
 
@@ -56,7 +65,6 @@
 #include "frc/RobotDrive.h"
 #include "frc/SD540.h"
 #include "frc/SPI.h"
-#include "frc/SampleRobot.h"
 #include "frc/SensorUtil.h"
 #include "frc/SerialPort.h"
 #include "frc/Servo.h"
@@ -82,7 +90,6 @@
 #include "frc/commands/PIDCommand.h"
 #include "frc/commands/PIDSubsystem.h"
 #include "frc/commands/PrintCommand.h"
-#include "frc/commands/Scheduler.h"
 #include "frc/commands/StartCommand.h"
 #include "frc/commands/Subsystem.h"
 #include "frc/commands/WaitCommand.h"

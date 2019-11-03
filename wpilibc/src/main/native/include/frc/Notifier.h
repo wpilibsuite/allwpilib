@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,13 +15,13 @@
 #include <utility>
 
 #include <hal/Types.h>
+#include <units/units.h>
+#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
 #include "frc/ErrorBase.h"
 
 namespace frc {
-
-using TimerEventHandler = std::function<void()>;
 
 class Notifier : public ErrorBase {
  public:
@@ -31,7 +31,7 @@ class Notifier : public ErrorBase {
    * @param handler The handler is called at the notification time which is set
    *                using StartSingle or StartPeriodic.
    */
-  explicit Notifier(TimerEventHandler handler);
+  explicit Notifier(std::function<void()> handler);
 
   template <typename Callable, typename Arg, typename... Args>
   Notifier(Callable&& f, Arg&& arg, Args&&... args)
@@ -51,7 +51,7 @@ class Notifier : public ErrorBase {
    *
    * @param handler Handler
    */
-  void SetHandler(TimerEventHandler handler);
+  void SetHandler(std::function<void()> handler);
 
   /**
    * Register for single event notification.
@@ -60,7 +60,17 @@ class Notifier : public ErrorBase {
    *
    * @param delay Seconds to wait before the handler is called.
    */
+  WPI_DEPRECATED("Use unit-safe StartSingle method instead.")
   void StartSingle(double delay);
+
+  /**
+   * Register for single event notification.
+   *
+   * A timer event is queued for a single event after the specified delay.
+   *
+   * @param delay Amount of time to wait before the handler is called.
+   */
+  void StartSingle(units::second_t delay);
 
   /**
    * Register for periodic event notification.
@@ -72,7 +82,20 @@ class Notifier : public ErrorBase {
    * @param period Period in seconds to call the handler starting one period
    *               after the call to this method.
    */
+  WPI_DEPRECATED("Use unit-safe StartPeriodic method instead.")
   void StartPeriodic(double period);
+
+  /**
+   * Register for periodic event notification.
+   *
+   * A timer event is queued for periodic event notification. Each time the
+   * interrupt occurs, the event will be immediately requeued for the same time
+   * interval.
+   *
+   * @param period Period to call the handler starting one period
+   *               after the call to this method.
+   */
+  void StartPeriodic(units::second_t period);
 
   /**
    * Stop timer events from occuring.
@@ -108,7 +131,7 @@ class Notifier : public ErrorBase {
   std::atomic<HAL_NotifierHandle> m_notifier{0};
 
   // Address of the handler
-  TimerEventHandler m_handler;
+  std::function<void()> m_handler;
 
   // The absolute expiration time
   double m_expirationTime = 0;

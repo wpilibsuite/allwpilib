@@ -7,8 +7,6 @@
 
 #pragma once
 
-#ifndef __FRC_ROBORIO__
-
 #include "hal/Types.h"
 
 extern "C" {
@@ -23,5 +21,3 @@ typedef int32_t (*HALSIM_SendErrorHandler)(
 void HALSIM_SetSendError(HALSIM_SendErrorHandler handler);
 
 }  // extern "C"
-
-#endif

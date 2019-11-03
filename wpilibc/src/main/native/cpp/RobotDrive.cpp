@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -120,8 +120,8 @@ void RobotDrive::Drive(double outputMagnitude, double curve) {
   double leftOutput, rightOutput;
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-               HALUsageReporting::kRobotDrive_ArcadeRatioCurve);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive_ArcadeRatioCurve, GetNumMotors());
     reported = true;
   }
 
@@ -180,8 +180,8 @@ void RobotDrive::TankDrive(double leftValue, double rightValue,
                            bool squaredInputs) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-               HALUsageReporting::kRobotDrive_Tank);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive_Tank, GetNumMotors());
     reported = true;
   }
 
@@ -230,8 +230,8 @@ void RobotDrive::ArcadeDrive(double moveValue, double rotateValue,
                              bool squaredInputs) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-               HALUsageReporting::kRobotDrive_ArcadeStandard);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive_ArcadeStandard, GetNumMotors());
     reported = true;
   }
 
@@ -273,8 +273,8 @@ void RobotDrive::MecanumDrive_Cartesian(double x, double y, double rotation,
                                         double gyroAngle) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-               HALUsageReporting::kRobotDrive_MecanumCartesian);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive_MecanumCartesian, GetNumMotors());
     reported = true;
   }
 
@@ -305,8 +305,8 @@ void RobotDrive::MecanumDrive_Polar(double magnitude, double direction,
                                     double rotation) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-               HALUsageReporting::kRobotDrive_MecanumPolar);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive_MecanumPolar, GetNumMotors());
     reported = true;
   }
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control.
@@ -39,7 +40,7 @@ public class PWMTalonSRX extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    HAL.report(tResourceType.kResourceType_PWMTalonSRX, getChannel());
-    setName("PWMTalonSRX", getChannel());
+    HAL.report(tResourceType.kResourceType_PWMTalonSRX, getChannel() + 1);
+    SendableRegistry.setName(this, "PWMTalonSRX", getChannel());
   }
 }

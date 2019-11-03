@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,13 +13,14 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.sim.AccelerometerSim;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Built-in accelerometer.
  *
  * <p>This class allows access to the roboRIO's internal accelerometer.
  */
-public class BuiltInAccelerometer extends SendableBase implements Accelerometer {
+public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoCloseable {
   /**
    * Constructor.
    *
@@ -28,7 +29,7 @@ public class BuiltInAccelerometer extends SendableBase implements Accelerometer 
   public BuiltInAccelerometer(Range range) {
     setRange(range);
     HAL.report(tResourceType.kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
-    setName("BuiltInAccel", 0);
+    SendableRegistry.addLW(this, "BuiltInAccel", 0);
   }
 
   /**
@@ -36,6 +37,11 @@ public class BuiltInAccelerometer extends SendableBase implements Accelerometer 
    */
   public BuiltInAccelerometer() {
     this(Range.k8G);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   @Override

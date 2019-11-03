@@ -28,7 +28,7 @@ static wpi::condition_variable* newDSDataAvailableCond;
 static wpi::mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
 static std::atomic_bool isFinalized{false};
-static HALSIM_SendErrorHandler sendErrorHandler{nullptr};
+static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 
 namespace hal {
 namespace init {
@@ -42,12 +42,18 @@ void InitializeDriverStation() {
 using namespace hal;
 
 extern "C" {
+
+void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {
+  sendErrorHandler.store(handler);
+}
+
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg) {
-  if (sendErrorHandler)
-    return sendErrorHandler(isError, errorCode, isLVCode, details, location,
-                            callStack, printMsg);
+  auto errorHandler = sendErrorHandler.load();
+  if (errorHandler)
+    return errorHandler(isError, errorCode, isLVCode, details, location,
+                        callStack, printMsg);
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
@@ -204,7 +210,11 @@ static void InitLastCountKey(void) {
 }
 #endif
 
-HAL_Bool HAL_IsNewControlData(void) {
+static int& GetThreadLocalLastCount() {
+  // There is a rollover error condition here. At Packet# = n * (uintmax), this
+  // will return false when instead it should return true. However, this at a
+  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
+  // worth the cycles to check.
 #ifdef __APPLE__
   pthread_once(&lastCountKeyOnce, InitLastCountKey);
   int* lastCountPtr = static_cast<int*>(pthread_getspecific(lastCountKey));
@@ -217,13 +227,43 @@ HAL_Bool HAL_IsNewControlData(void) {
 #else
   thread_local int lastCount{-1};
 #endif
-  // There is a rollover error condition here. At Packet# = n * (uintmax), this
-  // will return false when instead it should return true. However, this at a
-  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
-  // worth the cycles to check.
+  return lastCount;
+}
+
+HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
+  int& lastCount = GetThreadLocalLastCount();
+  std::unique_lock lock(newDSDataAvailableMutex);
+  int currentCount = newDSDataAvailableCounter;
+  if (lastCount != currentCount) {
+    lastCount = currentCount;
+    return true;
+  }
+
+  if (isFinalized.load()) {
+    return false;
+  }
+
+  auto timeoutTime =
+      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
+
+  while (newDSDataAvailableCounter == currentCount) {
+    if (timeout > 0) {
+      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
+      if (timedOut == std::cv_status::timeout) {
+        return false;
+      }
+    } else {
+      newDSDataAvailableCond->wait(lock);
+    }
+  }
+  return true;
+}
+
+HAL_Bool HAL_IsNewControlData(void) {
+  int& lastCount = GetThreadLocalLastCount();
   int currentCount = 0;
   {
-    std::unique_lock lock(newDSDataAvailableMutex);
+    std::scoped_lock lock(newDSDataAvailableMutex);
     currentCount = newDSDataAvailableCounter;
   }
   if (lastCount == currentCount) return false;

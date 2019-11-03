@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,10 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
-public abstract class UtilityClassTest {
-  private final Class m_clazz;
+public abstract class UtilityClassTest<T> {
+  private final Class<T> m_clazz;
 
-  protected UtilityClassTest(Class clazz) {
+  protected UtilityClassTest(Class<T> clazz) {
     m_clazz = clazz;
   }
 
@@ -39,16 +39,16 @@ public abstract class UtilityClassTest {
 
   @Test
   public void constructorPrivateTest() {
-    Constructor constructor = m_clazz.getDeclaredConstructors()[0];
+    Constructor<?> constructor = m_clazz.getDeclaredConstructors()[0];
 
-    assertFalse(constructor.isAccessible(), "Constructor is not private");
+    assertFalse(constructor.canAccess(null), "Constructor is not private");
   }
 
   @Test
   public void constructorReflectionTest() {
-    Constructor constructor = m_clazz.getDeclaredConstructors()[0];
+    Constructor<?> constructor = m_clazz.getDeclaredConstructors()[0];
     constructor.setAccessible(true);
-    assertThrows(InvocationTargetException.class, () -> constructor.newInstance());
+    assertThrows(InvocationTargetException.class, constructor::newInstance);
   }
 
   @TestFactory

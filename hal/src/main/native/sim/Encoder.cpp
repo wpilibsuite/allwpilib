@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -82,8 +82,10 @@ HAL_EncoderHandle HAL_InitializeEncoder(
   }
   int16_t index = getHandleIndex(handle);
   SimEncoderData[index].digitalChannelA = getHandleIndex(digitalSourceHandleA);
+  SimEncoderData[index].digitalChannelB = getHandleIndex(digitalSourceHandleB);
   SimEncoderData[index].initialized = true;
   SimEncoderData[index].reverseDirection = reverseDirection;
+  SimEncoderData[index].simDevice = 0;
   // TODO: Add encoding type to Sim data
   encoder->index = index;
   encoder->nativeHandle = nativeHandle;
@@ -102,6 +104,13 @@ void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
     counterHandles->Free(encoder->nativeHandle);
   }
   SimEncoderData[encoder->index].initialized = false;
+}
+
+void HAL_SetEncoderSimDevice(HAL_EncoderHandle handle,
+                             HAL_SimDeviceHandle device) {
+  auto encoder = encoderHandles->Get(handle);
+  if (encoder == nullptr) return;
+  SimEncoderData[encoder->index].simDevice = device;
 }
 
 static inline int EncodingScaleFactor(Encoder* encoder) {

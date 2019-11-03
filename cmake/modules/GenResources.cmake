@@ -1,3 +1,4 @@
+set(SCRIPTS_DIR "${CMAKE_CURRENT_LIST_DIR}/../scripts")
 MACRO(GENERATE_RESOURCES inputDir outputDir prefix namespace outputFiles)
   FILE(GLOB inputFiles ${inputDir}/*)
   SET(${outputFiles})
@@ -16,9 +17,9 @@ MACRO(GENERATE_RESOURCES inputDir outputDir prefix namespace outputFiles)
         "-Doutput=${output}"
         "-Dprefix=${prefix}"
         "-Dnamespace=${namespace}"
-        -P "${CMAKE_SOURCE_DIR}/cmake/scripts/GenResource.cmake"
+        -P "${SCRIPTS_DIR}/GenResource.cmake"
       MAIN_DEPENDENCY ${input}
-      DEPENDS ${CMAKE_SOURCE_DIR}/cmake/scripts/GenResource.cmake
+      DEPENDS ${SCRIPTS_DIR}/GenResource.cmake
       VERBATIM
     )
   ENDFOREACH()

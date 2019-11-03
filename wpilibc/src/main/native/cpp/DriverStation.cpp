@@ -11,7 +11,6 @@
 
 #include <hal/HAL.h>
 #include <hal/Power.h>
-#include <hal/cpp/Log.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
@@ -334,6 +333,12 @@ bool DriverStation::IsDisabled() const {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return !(controlWord.enabled && controlWord.dsAttached);
+}
+
+bool DriverStation::IsEStopped() const {
+  HAL_ControlWord controlWord;
+  HAL_GetControlWord(&controlWord);
+  return controlWord.eStop;
 }
 
 bool DriverStation::IsAutonomous() const {

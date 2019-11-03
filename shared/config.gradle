@@ -1,14 +1,17 @@
 import org.gradle.internal.os.OperatingSystem
 
 nativeUtils.addWpiNativeUtils()
+nativeUtils.withRoboRIO()
 nativeUtils.withRaspbian()
+nativeUtils.withBionic()
 nativeUtils {
   wpi {
     configureDependencies {
       wpiVersion = "-1"
-      niLibVersion = "2019.12.1"
-      opencvVersion = "3.4.4-5"
-      googleTestVersion = "1.8.1-1-f71fb4f"
+      niLibVersion = "2020.5.1"
+      opencvVersion = "3.4.7-2"
+      googleTestVersion = "1.9.0-3-437e100"
+      imguiVersion = "1.72b-2"
     }
   }
 }
@@ -17,14 +20,6 @@ nativeUtils.wpi.addWarnings()
 nativeUtils.wpi.addWarningsAsErrors()
 
 nativeUtils.setSinglePrintPerPlatform()
-
-toolchainsPlugin.crossCompilers.named(nativeUtils.wpi.platforms.roborio) {
-    optional.set(true)
-}
-
-nativeUtils.configurePlatform(nativeUtils.wpi.platforms.raspbian) {
-  linker.args << '-latomic'
-}
 
 model {
     components {
@@ -116,33 +111,6 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
         addTaskToCopyAllOutputs(task)
     }
     return taskList
-}
-
-ext.createAllCombined = { list, name, base, type, project ->
-    def outputsFolder = file("$project.buildDir/outputs")
-
-    def task = project.tasks.create(base + "-all", type) {
-        description = "Creates component archive for all classifiers"
-        destinationDir = outputsFolder
-        classifier = "all"
-        baseName = base
-        duplicatesStrategy = 'exclude'
-
-        list.each {
-            if (it.name.endsWith('debug')) return
-            from project.zipTree(it.archivePath)
-            dependsOn it
-        }
-    }
-
-    project.build.dependsOn task
-
-    project.artifacts {
-        task
-    }
-
-    return task
-
 }
 
 ext.includeStandardZipFormat = { task, value ->

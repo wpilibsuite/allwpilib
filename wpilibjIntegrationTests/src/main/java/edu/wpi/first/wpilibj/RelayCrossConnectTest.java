@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -39,7 +39,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
 
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     m_relayFixture = TestBench.getRelayCrossConnectFixture();
     m_relayFixture.setup();
     m_builder = new SendableBuilderImpl();
@@ -48,7 +48,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     m_relayFixture.reset();
     m_relayFixture.teardown();
   }

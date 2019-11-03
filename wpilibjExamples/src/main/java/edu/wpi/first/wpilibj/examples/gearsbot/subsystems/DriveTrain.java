@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,30 +10,26 @@ package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
-import edu.wpi.first.wpilibj.examples.gearsbot.commands.TankDriveWithJoystick;
 
-/**
- * The DriveTrain subsystem incorporates the sensors and actuators attached to
- * the robots chassis. These include four drive motors, a left and right encoder
- * and a gyro.
- */
-public class DriveTrain extends Subsystem {
-  private final SpeedController m_leftMotor
-      = new SpeedControllerGroup(new PWMVictorSPX(0), new PWMVictorSPX(1));
-  private final SpeedController m_rightMotor
-      = new SpeedControllerGroup(new PWMVictorSPX(2), new PWMVictorSPX(3));
+public class DriveTrain extends SubsystemBase {
+  /**
+   * The DriveTrain subsystem incorporates the sensors and actuators attached to the robots chassis.
+   * These include four drive motors, a left and right encoder and a gyro.
+   */
+  private final SpeedController m_leftMotor =
+      new SpeedControllerGroup(new PWMVictorSPX(0), new PWMVictorSPX(1));
+  private final SpeedController m_rightMotor =
+      new SpeedControllerGroup(new PWMVictorSPX(2), new PWMVictorSPX(3));
 
-  private final DifferentialDrive m_drive
-      = new DifferentialDrive(m_leftMotor, m_rightMotor);
+  private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
   private final Encoder m_leftEncoder = new Encoder(1, 2);
   private final Encoder m_rightEncoder = new Encoder(3, 4);
@@ -69,15 +65,6 @@ public class DriveTrain extends Subsystem {
   }
 
   /**
-   * When no other command is running let the operator drive around using the
-   * PS3 joystick.
-   */
-  @Override
-  public void initDefaultCommand() {
-    setDefaultCommand(new TankDriveWithJoystick());
-  }
-
-  /**
    * The log method puts interesting information to the SmartDashboard.
    */
   public void log() {
@@ -91,20 +78,11 @@ public class DriveTrain extends Subsystem {
   /**
    * Tank style driving for the DriveTrain.
    *
-   * @param left Speed in range [-1,1]
+   * @param left  Speed in range [-1,1]
    * @param right Speed in range [-1,1]
    */
   public void drive(double left, double right) {
     m_drive.tankDrive(left, right);
-  }
-
-  /**
-   * Tank style driving for the DriveTrain.
-   *
-   * @param joy The ps3 style joystick to use to drive tank style.
-   */
-  public void drive(Joystick joy) {
-    drive(-joy.getY(), -joy.getThrottle());
   }
 
   /**

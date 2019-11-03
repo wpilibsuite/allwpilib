@@ -53,6 +53,9 @@ public class DriverStation {
 
     HALJoystickPOVs(int count) {
       m_povs = new short[count];
+      for (int i = 0; i < count; i++) {
+        m_povs[i] = -1;
+      }
     }
   }
 
@@ -282,7 +285,7 @@ public class DriverStation {
     } else {
       locString = "";
     }
-    StringBuilder traceString = new StringBuilder("");
+    StringBuilder traceString = new StringBuilder();
     if (printTrace) {
       boolean haveLoc = false;
       for (int i = stackTraceFirst; i < stackTrace.length; i++) {
@@ -461,6 +464,7 @@ public class DriverStation {
         m_cacheDataMutex.unlock();
         reportJoystickUnpluggedWarning("Joystick POV " + pov + " on port " + stick
             + " not available, check if controller is plugged in");
+        return -1;
       }
     } finally {
       if (m_cacheDataMutex.isHeldByCurrentThread()) {
@@ -623,6 +627,18 @@ public class DriverStation {
    */
   public boolean isDisabled() {
     return !isEnabled();
+  }
+
+  /**
+   * Gets a value indicating whether the Robot is e-stopped.
+   *
+   * @return True if the robot is e-stopped, false otherwise.
+   */
+  public boolean isEStopped() {
+    synchronized (m_controlWordMutex) {
+      updateControlWord(false);
+      return m_controlWordCache.getEStop();
+    }
   }
 
   /**

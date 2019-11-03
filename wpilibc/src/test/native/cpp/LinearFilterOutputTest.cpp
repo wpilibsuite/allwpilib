@@ -12,11 +12,14 @@
 #include <memory>
 #include <random>
 
+#include <units/units.h>
+#include <wpi/math>
+
 #include "gtest/gtest.h"
 
 // Filter constants
-static constexpr double kFilterStep = 0.005;
-static constexpr double kFilterTime = 2.0;
+static constexpr units::second_t kFilterStep = 0.005_s;
+static constexpr units::second_t kFilterTime = 2.0_s;
 static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
 static constexpr double kSinglePoleIIRExpectedOutput = -3.2172003;
 static constexpr double kHighPassTimeConstant = 0.006631;
@@ -52,8 +55,8 @@ std::ostream& operator<<(std::ostream& os,
 }
 
 static double GetData(double t) {
-  constexpr double kPi = 3.14159265358979323846;
-  return 100.0 * std::sin(2.0 * kPi * t) + 20.0 * std::cos(50.0 * kPi * t);
+  return 100.0 * std::sin(2.0 * wpi::math::pi * t) +
+         20.0 * std::cos(50.0 * wpi::math::pi * t);
 }
 
 static double GetPulseData(double t) {
@@ -117,8 +120,8 @@ class LinearFilterOutputTest
  */
 TEST_P(LinearFilterOutputTest, Output) {
   double filterOutput = 0.0;
-  for (double t = 0.0; t < kFilterTime; t += kFilterStep) {
-    filterOutput = m_filter->Calculate(m_data(t));
+  for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
+    filterOutput = m_filter->Calculate(m_data(t.to<double>()));
   }
 
   RecordProperty("LinearFilterOutput", filterOutput);

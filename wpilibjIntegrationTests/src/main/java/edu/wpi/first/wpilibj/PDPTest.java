@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -41,13 +41,12 @@ public class PDPTest extends AbstractComsSetup {
   private final double m_expectedStoppedCurrentDraw;
 
   @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
+  public static void setUpBeforeClass() {
     pdp = new PowerDistributionPanel();
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
-    pdp.close();
+  public static void tearDownAfterClass() {
     pdp = null;
     me.teardown();
     me = null;
@@ -70,11 +69,11 @@ public class PDPTest extends AbstractComsSetup {
   public static Collection<Object[]> generateData() {
     // logger.fine("Loading the MotorList");
     return Arrays.asList(new Object[][]{
-        {TestBench.getInstance().getTalonPair(), new Double(0.0)}});
+        {TestBench.getInstance().getTalonPair(), 0.0}});
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     me.reset();
   }
 

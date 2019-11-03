@@ -31,7 +31,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
                              double period)
     : PIDBase(Kp, Ki, Kd, Kf, source, output) {
   m_controlLoop = std::make_unique<Notifier>(&PIDController::Calculate, this);
-  m_controlLoop->StartPeriodic(period);
+  m_controlLoop->StartPeriodic(units::second_t(period));
 }
 
 PIDController::~PIDController() {

@@ -9,8 +9,9 @@ package edu.wpi.first.cameraserver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.wpi.cscore.AxisCamera;
@@ -170,13 +171,9 @@ public final class CameraServer {
       int sink = i.getHandle();
 
       // Get the source's subtable (if none exists, we're done)
-      int source;
-      Integer fixedSource = m_fixedSources.get(sink);
-      if (fixedSource != null) {
-        source = fixedSource;
-      } else {
-        source = CameraServerJNI.getSinkSource(sink);
-      }
+      int source = Objects.requireNonNullElseGet(m_fixedSources.get(sink),
+          () -> CameraServerJNI.getSinkSource(sink));
+
       if (source == 0) {
         continue;
       }
@@ -305,10 +302,10 @@ public final class CameraServer {
       "PMD.NPathComplexity"})
   private CameraServer() {
     m_defaultUsbDevice = new AtomicInteger();
-    m_sources = new Hashtable<>();
-    m_sinks = new Hashtable<>();
-    m_fixedSources = new Hashtable<>();
-    m_tables = new Hashtable<>();
+    m_sources = new HashMap<>();
+    m_sinks = new HashMap<>();
+    m_fixedSources = new HashMap<>();
+    m_tables = new HashMap<>();
     m_publishTable = NetworkTableInstance.getDefault().getTable(kPublishName);
     m_nextPort = kBasePort;
     m_addresses = new String[0];
@@ -619,7 +616,9 @@ public final class CameraServer {
     // create a dummy CvSource
     CvSource source = new CvSource(name, VideoMode.PixelFormat.kMJPEG, 160, 120, 30);
     MjpegServer server = startAutomaticCapture(source);
-    m_fixedSources.put(server.getHandle(), source.getHandle());
+    synchronized (this) {
+      m_fixedSources.put(server.getHandle(), source.getHandle());
+    }
 
     return server;
   }

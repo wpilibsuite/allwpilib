@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,15 +10,20 @@
 #include <hal/Types.h>
 
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the
  * CAN PDP.
  */
-class PowerDistributionPanel : public ErrorBase, public SendableBase {
+class PowerDistributionPanel : public ErrorBase,
+                               public Sendable,
+                               public SendableHelper<PowerDistributionPanel> {
  public:
   PowerDistributionPanel();
   explicit PowerDistributionPanel(int module);
@@ -83,7 +88,7 @@ class PowerDistributionPanel : public ErrorBase, public SendableBase {
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  HAL_PDPHandle m_handle = HAL_kInvalidHandle;
+  hal::Handle<HAL_PDPHandle> m_handle;
 };
 
 }  // namespace frc

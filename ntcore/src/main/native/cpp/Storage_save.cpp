@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -203,7 +203,7 @@ const char* Storage::SavePersistent(const Twine& filename,
     err = "could not open file";
     goto done;
   }
-  DEBUG("saving persistent file '" << filename << "'");
+  DEBUG0("saving persistent file '" << filename << "'");
   SavePersistentImpl(os).Save(entries);
   os.close();
   if (os.has_error()) {
@@ -252,7 +252,7 @@ const char* Storage::SaveEntries(const Twine& filename,
   if (ec.value() != 0) {
     return "could not open file";
   }
-  DEBUG("saving file '" << filename << "'");
+  DEBUG0("saving file '" << filename << "'");
   SavePersistentImpl(os).Save(entries);
   os.close();
   if (os.has_error()) {

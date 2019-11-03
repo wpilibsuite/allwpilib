@@ -217,6 +217,7 @@ void CS_SetSinkDescription(CS_Sink sink, const char* description,
   return cs::SetSinkDescription(sink, description, status);
 }
 
+#if CV_VERSION_MAJOR < 4
 uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image,
                           CS_Status* status) {
   auto mat = cv::cvarrToMat(image);
@@ -228,6 +229,7 @@ uint64_t CS_GrabSinkFrameTimeout(CS_Sink sink, struct CvMat* image,
   auto mat = cv::cvarrToMat(image);
   return cs::GrabSinkFrameTimeout(sink, mat, timeout, status);
 }
+#endif  // CV_VERSION_MAJOR < 4
 
 uint64_t CS_GrabSinkFrameCpp(CS_Sink sink, cv::Mat* image, CS_Status* status) {
   return cs::GrabSinkFrame(sink, *image, status);

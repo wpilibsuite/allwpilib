@@ -68,6 +68,8 @@ class TrapezoidProfile {
   TrapezoidProfile(Constraints constraints, State goal,
                    State initial = State{0_m, 0_mps});
 
+  TrapezoidProfile(const TrapezoidProfile&) = default;
+  TrapezoidProfile& operator=(const TrapezoidProfile&) = default;
   TrapezoidProfile(TrapezoidProfile&&) = default;
   TrapezoidProfile& operator=(TrapezoidProfile&&) = default;
 

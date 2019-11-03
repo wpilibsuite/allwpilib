@@ -11,10 +11,10 @@
 #include <wpi/raw_ostream.h>
 
 #include "frc/shuffleboard/ComplexWidget.h"
-#include "frc/shuffleboard/SendableCameraWrapper.h"
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 #include "frc/shuffleboard/ShuffleboardLayout.h"
 #include "frc/shuffleboard/SimpleWidget.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -74,20 +74,12 @@ ComplexWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
   return *ptr;
 }
 
-ComplexWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
-                                          const cs::VideoSource& video) {
-  return Add(title, SendableCameraWrapper::Wrap(video));
-}
-
 ComplexWidget& ShuffleboardContainer::Add(Sendable& sendable) {
-  if (sendable.GetName().empty()) {
+  auto name = SendableRegistry::GetInstance().GetName(&sendable);
+  if (name.empty()) {
     wpi::outs() << "Sendable must have a name\n";
   }
-  return Add(sendable.GetName(), sendable);
-}
-
-ComplexWidget& ShuffleboardContainer::Add(const cs::VideoSource& video) {
-  return Add(SendableCameraWrapper::Wrap(video));
+  return Add(name, sendable);
 }
 
 SimpleWidget& ShuffleboardContainer::Add(

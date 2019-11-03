@@ -32,6 +32,7 @@ void InitializeHAL() {
   InitializeCanData();
   InitializeCANAPI();
   InitializeDigitalPWMData();
+  InitializeDutyCycleData();
   InitializeDIOData();
   InitializeDriverStationData();
   InitializeEncoderData();
@@ -41,6 +42,7 @@ void InitializeHAL() {
   InitializePWMData();
   InitializeRelayData();
   InitializeRoboRioData();
+  InitializeSimDeviceData();
   InitializeSPIAccelerometerData();
   InitializeSPIData();
   InitializeAccelerometer();
@@ -55,11 +57,13 @@ void InitializeHAL() {
   InitializeCounter();
   InitializeDigitalInternal();
   InitializeDIO();
+  InitializeDutyCycle();
   InitializeDriverStation();
   InitializeEncoder();
   InitializeExtensions();
   InitializeI2C();
   InitializeInterrupts();
+  InitializeMain();
   InitializeMockHooks();
   InitializeNotifier();
   InitializePDP();
@@ -68,6 +72,7 @@ void InitializeHAL() {
   InitializePWM();
   InitializeRelay();
   InitializeSerialPort();
+  InitializeSimDevice();
   InitializeSolenoid();
   InitializeSPI();
   InitializeThreads();
@@ -196,6 +201,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_PWM_SCALE_ERROR_MESSAGE;
     case HAL_CAN_TIMEOUT:
       return HAL_CAN_TIMEOUT_MESSAGE;
+    case HAL_SIM_NOT_SUPPORTED:
+      return HAL_SIM_NOT_SUPPORTED_MESSAGE;
     default:
       return "Unknown error status";
   }

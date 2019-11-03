@@ -20,7 +20,7 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
     - Substantial changes often need to have corresponding LabVIEW changes. To do this, we will work with NI on these large changes.
 - Changes should have tests.
 - Code should be well documented.
-    - This often involves ScreenSteps. To add content to ScreenSteps, we will work with you to get the appropriate articles written.
+    - This involves writing tutorials and/or usage guides for your submitted feature. These articles are then hosted on the [WPILib](https://docs.wpilib.org/) documentation website. See the [frc-docs repository](https://github.com/wpilibsuite/frc-docs) for more information.
 
 ## What to Contribute
 
@@ -53,4 +53,4 @@ When you first submit changes, Travis-CI will attempt to run `./gradlew check` o
 
 ## Licensing
 
-By contributing to WPILib, you agree that your code will be distributed with WPILib, and licensed under the license for the WPILib project. You should not contribute code that you do not have permission to relicense in this manner. This includes code that is licensed under the GPL that you do not have permission to relicense, as WPILib is not released under a copyleft license. Our license is the 3-clause BSD license, which you can find [here](license.txt).
+By contributing to WPILib, you agree that your code will be distributed with WPILib, and licensed under the license for the WPILib project. You should not contribute code that you do not have permission to relicense in this manner. This includes code that is licensed under the GPL that you do not have permission to relicense, as WPILib is not released under a copyleft license. Our license is the 3-clause BSD license, which you can find [here](LICENSE.txt).

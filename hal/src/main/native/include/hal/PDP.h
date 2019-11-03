@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -78,6 +78,17 @@ double HAL_GetPDPVoltage(HAL_PDPHandle handle, int32_t* status);
  */
 double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
                                 int32_t* status);
+
+/**
+ * Gets the current of all 16 channels on the PDP.
+ *
+ * The array must be large enough to hold all channels.
+ *
+ * @param handle the module handle
+ * @param current the currents (output)
+ */
+void HAL_GetPDPAllChannelCurrents(HAL_PDPHandle handle, double* currents,
+                                  int32_t* status);
 
 /**
  * Gets the total current of the PDP.

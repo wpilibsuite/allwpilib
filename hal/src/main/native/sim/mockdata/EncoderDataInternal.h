@@ -26,18 +26,23 @@ class EncoderData {
   HAL_SIMDATAVALUE_DEFINE_NAME(DistancePerPulse)
 
  public:
-  std::atomic<int16_t> digitalChannelA{0};
-  SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
-  SimDataValue<int32_t, MakeInt, GetCountName> count{0};
-  SimDataValue<double, MakeDouble, GetPeriodName> period{
-      (std::numeric_limits<double>::max)()};
-  SimDataValue<HAL_Bool, MakeBoolean, GetResetName> reset{false};
-  SimDataValue<double, MakeDouble, GetMaxPeriodName> maxPeriod{0};
-  SimDataValue<HAL_Bool, MakeBoolean, GetDirectionName> direction{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetReverseDirectionName> reverseDirection{
+  std::atomic<int32_t> digitalChannelA{0};
+  std::atomic<int32_t> digitalChannelB{0};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
       false};
-  SimDataValue<int32_t, MakeInt, GetSamplesToAverageName> samplesToAverage{0};
-  SimDataValue<double, MakeDouble, GetDistancePerPulseName> distancePerPulse{1};
+  std::atomic<HAL_SimDeviceHandle> simDevice;
+  SimDataValue<int32_t, HAL_MakeInt, GetCountName> count{0};
+  SimDataValue<double, HAL_MakeDouble, GetPeriodName> period{
+      (std::numeric_limits<double>::max)()};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetResetName> reset{false};
+  SimDataValue<double, HAL_MakeDouble, GetMaxPeriodName> maxPeriod{0};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetDirectionName> direction{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetReverseDirectionName>
+      reverseDirection{false};
+  SimDataValue<int32_t, HAL_MakeInt, GetSamplesToAverageName> samplesToAverage{
+      0};
+  SimDataValue<double, HAL_MakeDouble, GetDistancePerPulseName>
+      distancePerPulse{1};
 
   virtual void ResetData();
 };

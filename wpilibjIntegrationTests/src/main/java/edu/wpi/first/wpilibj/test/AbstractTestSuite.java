@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,9 +7,10 @@
 
 package edu.wpi.first.wpilibj.test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -37,7 +38,7 @@ public abstract class AbstractTestSuite {
    */
   protected List<Class<?>> getAnnotatedTestClasses() {
     SuiteClasses annotation = getClass().getAnnotation(SuiteClasses.class);
-    List<Class<?>> classes = new Vector<Class<?>>();
+    List<Class<?>> classes = new ArrayList<>();
     if (annotation == null) {
       throw new RuntimeException(String.format("class '%s' must have a SuiteClasses annotation",
           getClass().getName()));
@@ -77,7 +78,7 @@ public abstract class AbstractTestSuite {
   }
 
   protected List<ClassMethodPair> getMethodMatching(final String regex) {
-    List<ClassMethodPair> classMethodPairs = new Vector<ClassMethodPair>();
+    List<ClassMethodPair> classMethodPairs = new ArrayList<>();
     // Get all of the test classes
     for (Class<?> c : getAllContainedBaseTests()) {
       for (Method m : c.getMethods()) {
@@ -107,11 +108,12 @@ public abstract class AbstractTestSuite {
       if (areAnySuperClassesOfTypeAbstractTestSuite(c)) {
         // Create a new instance of this class so that we can retrieve its data
         try {
-          AbstractTestSuite suite = (AbstractTestSuite) c.newInstance();
+          AbstractTestSuite suite = (AbstractTestSuite) c.getDeclaredConstructor().newInstance();
           // Add the tests from this suite that match the regex to the list of
           // tests to run
           runningList = suite.getAllContainedBaseTests(runningList);
-        } catch (InstantiationException | IllegalAccessException ex) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException
+            | IllegalAccessException ex) {
           // This shouldn't happen unless the constructor is changed in some
           // way.
           logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.",
@@ -136,7 +138,7 @@ public abstract class AbstractTestSuite {
    * @return The list of base test classes.
    */
   public List<Class<?>> getAllContainedBaseTests() {
-    List<Class<?>> runningBaseTests = new Vector<Class<?>>();
+    List<Class<?>> runningBaseTests = new ArrayList<>();
     return getAllContainedBaseTests(runningBaseTests);
   }
 
@@ -167,7 +169,7 @@ public abstract class AbstractTestSuite {
    * @return The list of classes matching the regex pattern
    */
   public List<Class<?>> getAllClassMatching(final String regex) {
-    final List<Class<?>> matchingClasses = new Vector<Class<?>>();
+    final List<Class<?>> matchingClasses = new ArrayList<>();
     return getAllClassMatching(regex, matchingClasses);
   }
 
@@ -200,13 +202,14 @@ public abstract class AbstractTestSuite {
           if (areAnySuperClassesOfTypeAbstractTestSuite(c)) {
             // Create a new instance of this class so that we can retrieve its
             // data.
-            suite = (AbstractTestSuite) c.newInstance();
+            suite = (AbstractTestSuite) c.getDeclaredConstructor().newInstance();
             // Add the tests from this suite that match the regex to the list of
             // tests to run
             runningList = suite.getSuiteOrTestMatchingRegex(regex, runningList);
           }
 
-        } catch (InstantiationException | IllegalAccessException ex) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException
+            | IllegalAccessException ex) {
           // This shouldn't happen unless the constructor is changed in some
           // way.
           logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.",
@@ -226,7 +229,7 @@ public abstract class AbstractTestSuite {
    * @return the list of suite and/or test classes matching the regex.
    */
   protected List<Class<?>> getSuiteOrTestMatchingRegex(final String regex) {
-    final List<Class<?>> matchingClasses = new Vector<Class<?>>();
+    final List<Class<?>> matchingClasses = new ArrayList<>();
     return getSuiteOrTestMatchingRegex(regex, matchingClasses);
   }
 
@@ -248,7 +251,7 @@ public abstract class AbstractTestSuite {
    * @throws RuntimeException If the <code>@SuiteClasses</code> annotation is missing.
    */
   public List<String> getAllClassName() {
-    List<String> classNames = new Vector<String>();
+    List<String> classNames = new ArrayList<>();
     for (Class<?> c : getAnnotatedTestClasses()) {
       classNames.add(c.getName());
     }

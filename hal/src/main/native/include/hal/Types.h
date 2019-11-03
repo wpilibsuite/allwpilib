@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -49,7 +49,15 @@ typedef HAL_Handle HAL_RelayHandle;
 
 typedef HAL_Handle HAL_SolenoidHandle;
 
+typedef HAL_Handle HAL_SerialPortHandle;
+
 typedef HAL_Handle HAL_CANHandle;
+
+typedef HAL_Handle HAL_SimDeviceHandle;
+
+typedef HAL_Handle HAL_SimValueHandle;
+
+typedef HAL_Handle HAL_DutyCycleHandle;
 
 typedef HAL_CANHandle HAL_PDPHandle;
 
@@ -61,5 +69,38 @@ typedef int32_t HAL_Bool;
 #define HAL_ENUM(name)  \
   typedef int32_t name; \
   enum name
+#endif
+
+#ifdef __cplusplus
+namespace hal {
+
+/**
+ * A move-only C++ wrapper around a HAL handle.
+ * Does not ensure destruction.
+ */
+template <typename CType, int32_t CInvalid = HAL_kInvalidHandle>
+class Handle {
+ public:
+  Handle() = default;
+  /*implicit*/ Handle(CType val) : m_handle(val) {}  // NOLINT(runtime/explicit)
+
+  Handle(const Handle&) = delete;
+  Handle& operator=(const Handle&) = delete;
+
+  Handle(Handle&& rhs) : m_handle(rhs.m_handle) { rhs.m_handle = CInvalid; }
+
+  Handle& operator=(Handle&& rhs) {
+    m_handle = rhs.m_handle;
+    rhs.m_handle = CInvalid;
+    return *this;
+  }
+
+  operator CType() const { return m_handle; }
+
+ private:
+  CType m_handle = CInvalid;
+};
+
+}  // namespace hal
 #endif
 /** @} */

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -63,8 +63,8 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   port->channel = static_cast<uint8_t>(channel);
 
   SimDIOData[channel].initialized = true;
-
   SimDIOData[channel].isInput = input;
+  SimDIOData[channel].simDevice = 0;
 
   return handle;
 }
@@ -78,7 +78,13 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   // no status, so no need to check for a proper free.
   digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) return;
-  SimDIOData[port->channel].initialized = true;
+  SimDIOData[port->channel].initialized = false;
+}
+
+void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
+  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
+  if (port == nullptr) return;
+  SimDIOData[port->channel].simDevice = device;
 }
 
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {

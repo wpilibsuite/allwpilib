@@ -10,6 +10,8 @@
 #include <wpi/raw_ostream.h>
 
 #include "frc/drive/RobotDriveBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -96,7 +98,9 @@ class SpeedController;
  * RobotDrive#Drive(double, double) with the addition of a quick turn
  * mode. However, it is not designed to give exactly the same response.
  */
-class DifferentialDrive : public RobotDriveBase {
+class DifferentialDrive : public RobotDriveBase,
+                          public Sendable,
+                          public SendableHelper<DifferentialDrive> {
  public:
   static constexpr double kDefaultQuickStopThreshold = 0.2;
   static constexpr double kDefaultQuickStopAlpha = 0.1;
@@ -208,8 +212,8 @@ class DifferentialDrive : public RobotDriveBase {
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  SpeedController& m_leftMotor;
-  SpeedController& m_rightMotor;
+  SpeedController* m_leftMotor;
+  SpeedController* m_rightMotor;
 
   double m_quickStopThreshold = kDefaultQuickStopThreshold;
   double m_quickStopAlpha = kDefaultQuickStopAlpha;

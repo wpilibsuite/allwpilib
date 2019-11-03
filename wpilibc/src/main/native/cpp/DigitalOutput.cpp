@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,6 +17,7 @@
 #include "frc/SensorUtil.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -40,8 +41,8 @@ DigitalOutput::DigitalOutput(int channel) {
     return;
   }
 
-  HAL_Report(HALUsageReporting::kResourceType_DigitalOutput, channel);
-  SetName("DigitalOutput", channel);
+  HAL_Report(HALUsageReporting::kResourceType_DigitalOutput, channel + 1);
+  SendableRegistry::GetInstance().AddLW(this, "DigitalOutput", channel);
 }
 
 DigitalOutput::~DigitalOutput() {
@@ -50,25 +51,6 @@ DigitalOutput::~DigitalOutput() {
   DisablePWM();
 
   HAL_FreeDIOPort(m_handle);
-}
-
-DigitalOutput::DigitalOutput(DigitalOutput&& rhs)
-    : ErrorBase(std::move(rhs)),
-      SendableBase(std::move(rhs)),
-      m_channel(std::move(rhs.m_channel)),
-      m_pwmGenerator(std::move(rhs.m_pwmGenerator)) {
-  std::swap(m_handle, rhs.m_handle);
-}
-
-DigitalOutput& DigitalOutput::operator=(DigitalOutput&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-  SendableBase::operator=(std::move(rhs));
-
-  m_channel = std::move(rhs.m_channel);
-  std::swap(m_handle, rhs.m_handle);
-  m_pwmGenerator = std::move(rhs.m_pwmGenerator);
-
-  return *this;
 }
 
 void DigitalOutput::Set(bool value) {
@@ -156,6 +138,10 @@ void DigitalOutput::UpdateDutyCycle(double dutyCycle) {
   int32_t status = 0;
   HAL_SetDigitalPWMDutyCycle(m_pwmGenerator, dutyCycle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {
+  HAL_SetDIOSimDevice(m_handle, device);
 }
 
 void DigitalOutput::InitSendable(SendableBuilder& builder) {

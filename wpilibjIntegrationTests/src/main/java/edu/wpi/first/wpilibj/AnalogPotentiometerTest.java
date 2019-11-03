@@ -32,7 +32,7 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
   private static final double DOUBLE_COMPARISON_DELTA = 2.0;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     m_analogIO = TestBench.getAnalogCrossConnectFixture();
     m_potSource = new FakePotentiometerSource(m_analogIO.getOutput(), 360);
     m_pot = new AnalogPotentiometer(m_analogIO.getInput(), 360.0, 0);
@@ -40,7 +40,7 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     m_potSource.reset();
     m_pot.close();
     m_analogIO.teardown();

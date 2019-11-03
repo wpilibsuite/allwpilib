@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -58,8 +58,8 @@ class CAN : public ErrorBase {
    */
   ~CAN() override;
 
-  CAN(CAN&& rhs);
-  CAN& operator=(CAN&& rhs);
+  CAN(CAN&&) = default;
+  CAN& operator=(CAN&&) = default;
 
   /**
    * Write a packet to the CAN device with a specific ID. This ID is 10 bits.
@@ -82,6 +82,16 @@ class CAN : public ErrorBase {
    */
   void WritePacketRepeating(const uint8_t* data, int length, int apiId,
                             int repeatMs);
+
+  /**
+   * Write an RTR frame to the CAN device with a specific ID. This ID is 10
+   * bits. The length by spec must match what is returned by the responding
+   * device
+   *
+   * @param length The length to request (0 to 8)
+   * @param apiId The API ID to write.
+   */
+  void WriteRTRFrame(int length, int apiId);
 
   /**
    * Stop a repeating packet with a specific ID. This ID is 10 bits.
@@ -122,28 +132,11 @@ class CAN : public ErrorBase {
    */
   bool ReadPacketTimeout(int apiId, int timeoutMs, CANData* data);
 
-  /**
-   * Read a CAN packet. The will return the last packet received until the
-   * packet is older then the requested timeout. Then it will return false. The
-   * period parameter is used when you know the packet is sent at specific
-   * intervals, so calls will not attempt to read a new packet from the network
-   * until that period has passed. We do not recommend users use this API unless
-   * they know the implications.
-   *
-   * @param apiId The API ID to read.
-   * @param timeoutMs The timeout time for the packet
-   * @param periodMs The usual period for the packet
-   * @param data Storage for the received data.
-   * @return True if the data is valid, otherwise false.
-   */
-  bool ReadPeriodicPacket(int apiId, int timeoutMs, int periodMs,
-                          CANData* data);
-
   static constexpr HAL_CANManufacturer kTeamManufacturer = HAL_CAN_Man_kTeamUse;
   static constexpr HAL_CANDeviceType kTeamDeviceType =
       HAL_CAN_Dev_kMiscellaneous;
 
  private:
-  HAL_CANHandle m_handle = HAL_kInvalidHandle;
+  hal::Handle<HAL_CANHandle> m_handle;
 };
 }  // namespace frc

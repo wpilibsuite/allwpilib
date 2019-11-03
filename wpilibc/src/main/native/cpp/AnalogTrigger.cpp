@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,31 +12,46 @@
 #include <hal/HAL.h>
 
 #include "frc/AnalogInput.h"
+#include "frc/DutyCycle.h"
 #include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 AnalogTrigger::AnalogTrigger(int channel)
     : AnalogTrigger(new AnalogInput(channel)) {
   m_ownsAnalog = true;
-  AddChild(m_analogInput);
+  SendableRegistry::GetInstance().AddChild(this, m_analogInput);
 }
 
 AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   m_analogInput = input;
   int32_t status = 0;
-  int index = 0;
-  m_trigger = HAL_InitializeAnalogTrigger(input->m_port, &index, &status);
+  m_trigger = HAL_InitializeAnalogTrigger(input->m_port, &status);
   if (status != 0) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-    m_index = std::numeric_limits<int>::max();
     m_trigger = HAL_kInvalidHandle;
     return;
   }
-  m_index = index;
+  int index = GetIndex();
 
-  HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, input->m_channel);
-  SetName("AnalogTrigger", input->GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
+  SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
+}
+
+AnalogTrigger::AnalogTrigger(DutyCycle* input) {
+  m_dutyCycle = input;
+  int32_t status = 0;
+  m_trigger = HAL_InitializeAnalogTriggerDutyCycle(input->m_handle, &status);
+  if (status != 0) {
+    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    m_trigger = HAL_kInvalidHandle;
+    return;
+  }
+  int index = GetIndex();
+
+  HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
+  SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
 }
 
 AnalogTrigger::~AnalogTrigger() {
@@ -50,20 +65,20 @@ AnalogTrigger::~AnalogTrigger() {
 
 AnalogTrigger::AnalogTrigger(AnalogTrigger&& rhs)
     : ErrorBase(std::move(rhs)),
-      SendableBase(std::move(rhs)),
-      m_index(std::move(rhs.m_index)) {
-  std::swap(m_trigger, rhs.m_trigger);
+      SendableHelper(std::move(rhs)),
+      m_trigger(std::move(rhs.m_trigger)) {
   std::swap(m_analogInput, rhs.m_analogInput);
+  std::swap(m_dutyCycle, rhs.m_dutyCycle);
   std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
 }
 
 AnalogTrigger& AnalogTrigger::operator=(AnalogTrigger&& rhs) {
   ErrorBase::operator=(std::move(rhs));
-  SendableBase::operator=(std::move(rhs));
+  SendableHelper::operator=(std::move(rhs));
 
-  m_index = std::move(rhs.m_index);
-  std::swap(m_trigger, rhs.m_trigger);
+  m_trigger = std::move(rhs.m_trigger);
   std::swap(m_analogInput, rhs.m_analogInput);
+  std::swap(m_dutyCycle, rhs.m_dutyCycle);
   std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
 
   return *this;
@@ -73,6 +88,13 @@ void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsVoltage(m_trigger, lower, upper, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+void AnalogTrigger::SetLimitsDutyCycle(double lower, double upper) {
+  if (StatusIsFatal()) return;
+  int32_t status = 0;
+  HAL_SetAnalogTriggerLimitsDutyCycle(m_trigger, lower, upper, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -99,7 +121,10 @@ void AnalogTrigger::SetFiltered(bool useFilteredValue) {
 
 int AnalogTrigger::GetIndex() const {
   if (StatusIsFatal()) return -1;
-  return m_index;
+  int32_t status = 0;
+  auto ret = HAL_GetAnalogTriggerFPGAIndex(m_trigger, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  return ret;
 }
 
 bool AnalogTrigger::GetInWindow() {

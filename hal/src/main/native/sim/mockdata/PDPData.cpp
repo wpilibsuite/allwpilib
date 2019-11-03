@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -41,6 +41,20 @@ DEFINE_CAPI(double, Temperature, temperature)
 DEFINE_CAPI(double, Voltage, voltage)
 HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(double, HALSIM, PDPCurrent, SimPDPData,
                                      current)
+
+void HALSIM_GetPDPAllCurrents(int32_t index, double* currents) {
+  auto& data = SimPDPData[index].current;
+  for (int i = 0; i < kNumPDPChannels; i++) {
+    currents[i] = data[i];
+  }
+}
+
+void HALSIM_SetPDPAllCurrents(int32_t index, const double* currents) {
+  auto& data = SimPDPData[index].current;
+  for (int i = 0; i < kNumPDPChannels; i++) {
+    data[i] = currents[i];
+  }
+}
 
 #define REGISTER(NAME) \
   SimPDPData[index].NAME.RegisterCallback(callback, param, initialNotify)

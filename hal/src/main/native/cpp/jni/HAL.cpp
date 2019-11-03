@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,19 +17,10 @@
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_HAL.h"
 #include "hal/DriverStation.h"
-#include "hal/cpp/Log.h"
+#include "hal/Main.h"
 
 using namespace frc;
 using namespace wpi::java;
-
-// set the logging level
-static TLogLevel netCommLogLevel = logWARNING;
-
-#define NETCOMM_LOG(level)     \
-  if (level > netCommLogLevel) \
-    ;                          \
-  else                         \
-    Log().Get(level)
 
 extern "C" {
 
@@ -43,6 +34,42 @@ Java_edu_wpi_first_hal_HAL_initialize
   (JNIEnv*, jclass, jint timeout, jint mode)
 {
   return HAL_Initialize(timeout, mode);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
+ * Method:    hasMain
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_HAL_hasMain
+  (JNIEnv*, jclass)
+{
+  return HAL_HasMain();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
+ * Method:    runMain
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_HAL_runMain
+  (JNIEnv*, jclass)
+{
+  HAL_RunMain();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
+ * Method:    exitMain
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_HAL_exitMain
+  (JNIEnv*, jclass)
+{
+  HAL_ExitMain();
 }
 
 /*
@@ -116,11 +143,6 @@ Java_edu_wpi_first_hal_HAL_report
    jint paramContext, jstring paramFeature)
 {
   JStringRef featureStr{paramEnv, paramFeature};
-  NETCOMM_LOG(logDEBUG) << "Calling HAL report "
-                        << "res:" << paramResource
-                        << " instance:" << paramInstanceNumber
-                        << " context:" << paramContext
-                        << " feature:" << featureStr.c_str();
   jint returnValue = HAL_Report(paramResource, paramInstanceNumber,
                                 paramContext, featureStr.c_str());
   return returnValue;
@@ -135,7 +157,6 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_HAL_nativeGetControlWord
   (JNIEnv*, jclass)
 {
-  NETCOMM_LOG(logDEBUG) << "Calling HAL Control Word";
   static_assert(sizeof(HAL_ControlWord) == sizeof(jint),
                 "Java int must match the size of control word");
   HAL_ControlWord controlWord;
@@ -155,7 +176,6 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_HAL_nativeGetAllianceStation
   (JNIEnv*, jclass)
 {
-  NETCOMM_LOG(logDEBUG) << "Calling HAL Alliance Station";
   int32_t status = 0;
   auto allianceStation = HAL_GetAllianceStation(&status);
   return static_cast<jint>(allianceStation);
@@ -170,7 +190,6 @@ JNIEXPORT jshort JNICALL
 Java_edu_wpi_first_hal_HAL_getJoystickAxes
   (JNIEnv* env, jclass, jbyte joystickNum, jfloatArray axesArray)
 {
-  NETCOMM_LOG(logDEBUG) << "Calling HALJoystickAxes";
   HAL_JoystickAxes axes;
   HAL_GetJoystickAxes(joystickNum, &axes);
 
@@ -200,7 +219,6 @@ JNIEXPORT jshort JNICALL
 Java_edu_wpi_first_hal_HAL_getJoystickPOVs
   (JNIEnv* env, jclass, jbyte joystickNum, jshortArray povsArray)
 {
-  NETCOMM_LOG(logDEBUG) << "Calling HALJoystickPOVs";
   HAL_JoystickPOVs povs;
   HAL_GetJoystickPOVs(joystickNum, &povs);
 
@@ -230,15 +248,11 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_HAL_getJoystickButtons
   (JNIEnv* env, jclass, jbyte joystickNum, jobject count)
 {
-  NETCOMM_LOG(logDEBUG) << "Calling HALJoystickButtons";
   HAL_JoystickButtons joystickButtons;
   HAL_GetJoystickButtons(joystickNum, &joystickButtons);
   jbyte* countPtr =
       reinterpret_cast<jbyte*>(env->GetDirectBufferAddress(count));
-  NETCOMM_LOG(logDEBUG) << "Buttons = " << joystickButtons.buttons;
-  NETCOMM_LOG(logDEBUG) << "Count = " << (jint)joystickButtons.count;
   *countPtr = joystickButtons.count;
-  NETCOMM_LOG(logDEBUG) << "CountBuffer = " << (jint)*countPtr;
   return joystickButtons.buttons;
 }
 
@@ -252,10 +266,6 @@ Java_edu_wpi_first_hal_HAL_setJoystickOutputs
   (JNIEnv*, jclass, jbyte port, jint outputs, jshort leftRumble,
    jshort rightRumble)
 {
-  NETCOMM_LOG(logDEBUG) << "Calling HAL_SetJoystickOutputs on port " << port;
-  NETCOMM_LOG(logDEBUG) << "Outputs: " << outputs;
-  NETCOMM_LOG(logDEBUG) << "Left Rumble: " << leftRumble
-                        << " Right Rumble: " << rightRumble;
   return HAL_SetJoystickOutputs(port, outputs, leftRumble, rightRumble);
 }
 
@@ -268,7 +278,6 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_HAL_getJoystickIsXbox
   (JNIEnv*, jclass, jbyte port)
 {
-  NETCOMM_LOG(logDEBUG) << "Calling HAL_GetJoystickIsXbox";
   return HAL_GetJoystickIsXbox(port);
 }
 
@@ -281,7 +290,6 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_HAL_getJoystickType
   (JNIEnv*, jclass, jbyte port)
 {
-  NETCOMM_LOG(logDEBUG) << "Calling HAL_GetJoystickType";
   return HAL_GetJoystickType(port);
 }
 
@@ -294,7 +302,6 @@ JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_hal_HAL_getJoystickName
   (JNIEnv* env, jclass, jbyte port)
 {
-  NETCOMM_LOG(logDEBUG) << "Calling HAL_GetJoystickName";
   char* joystickName = HAL_GetJoystickName(port);
   jstring str = MakeJString(env, joystickName);
   HAL_FreeJoystickName(joystickName);
@@ -310,7 +317,6 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_HAL_getJoystickAxisType
   (JNIEnv*, jclass, jbyte joystickNum, jbyte axis)
 {
-  NETCOMM_LOG(logDEBUG) << "Calling HAL_GetJoystickAxisType";
   return HAL_GetJoystickAxisType(joystickNum, axis);
 }
 
@@ -436,9 +442,6 @@ Java_edu_wpi_first_hal_HAL_sendError
   JStringRef locationStr{env, location};
   JStringRef callStackStr{env, callStack};
 
-  NETCOMM_LOG(logDEBUG) << "Send Error: " << detailsStr.c_str();
-  NETCOMM_LOG(logDEBUG) << "Location: " << locationStr.c_str();
-  NETCOMM_LOG(logDEBUG) << "Call Stack: " << callStackStr.c_str();
   jint returnValue =
       HAL_SendError(isError, errorCode, isLVCode, detailsStr.c_str(),
                     locationStr.c_str(), callStackStr.c_str(), printMsg);
@@ -454,11 +457,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_HAL_getPortWithModule
   (JNIEnv* env, jclass, jbyte module, jbyte channel)
 {
-  // FILE_LOG(logDEBUG) << "Calling HAL getPortWithModlue";
-  // FILE_LOG(logDEBUG) << "Module = " << (jint)module;
-  // FILE_LOG(logDEBUG) << "Channel = " << (jint)channel;
   HAL_PortHandle port = HAL_GetPortWithModule(module, channel);
-  // FILE_LOG(logDEBUG) << "Port Handle = " << port;
   return (jint)port;
 }
 
@@ -471,11 +470,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_HAL_getPort
   (JNIEnv* env, jclass, jbyte channel)
 {
-  // FILE_LOG(logDEBUG) << "Calling HAL getPortWithModlue";
-  // FILE_LOG(logDEBUG) << "Module = " << (jint)module;
-  // FILE_LOG(logDEBUG) << "Channel = " << (jint)channel;
   HAL_PortHandle port = HAL_GetPort(channel);
-  // FILE_LOG(logDEBUG) << "Port Handle = " << port;
   return (jint)port;
 }
 

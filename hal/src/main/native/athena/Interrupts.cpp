@@ -64,18 +64,18 @@ class InterruptThreadOwner : public wpi::SafeThreadOwner<InterruptThread> {
   }
 };
 
-}  // namespace
-
-static void threadedInterruptHandler(uint32_t mask, void* param) {
-  static_cast<InterruptThreadOwner*>(param)->Notify(mask);
-}
-
 struct Interrupt {
   std::unique_ptr<tInterrupt> anInterrupt;
   std::unique_ptr<tInterruptManager> manager;
   std::unique_ptr<InterruptThreadOwner> threadOwner = nullptr;
   void* param = nullptr;
 };
+
+}  // namespace
+
+static void threadedInterruptHandler(uint32_t mask, void* param) {
+  static_cast<InterruptThreadOwner*>(param)->Notify(mask);
+}
 
 static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                              HAL_HandleEnum::Interrupt>* interruptHandles;
@@ -118,7 +118,7 @@ void* HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle,
   if (anInterrupt == nullptr) {
     return nullptr;
   }
-  anInterrupt->manager->enable(status);
+  anInterrupt->manager->disable(status);
   void* param = anInterrupt->param;
   return param;
 }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,9 +12,12 @@ import java.util.StringJoiner;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.wpiutil.math.MathUtils;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as the Kit of Parts drive
@@ -93,7 +96,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * {@link edu.wpi.first.wpilibj.RobotDrive#drive(double, double)} with the addition of a quick turn
  * mode. However, it is not designed to give exactly the same response.
  */
-public class DifferentialDrive extends RobotDriveBase {
+public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   public static final double kDefaultQuickStopThreshold = 0.2;
   public static final double kDefaultQuickStopAlpha = 0.1;
 
@@ -118,10 +121,15 @@ public class DifferentialDrive extends RobotDriveBase {
     verify(leftMotor, rightMotor);
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
-    addChild(m_leftMotor);
-    addChild(m_rightMotor);
+    SendableRegistry.addChild(this, m_leftMotor);
+    SendableRegistry.addChild(this, m_rightMotor);
     instances++;
-    setName("DifferentialDrive", instances);
+    SendableRegistry.addLW(this, "DifferentialDrive", instances);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**
@@ -171,15 +179,15 @@ public class DifferentialDrive extends RobotDriveBase {
   @SuppressWarnings("ParameterName")
   public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
-                 tInstances.kRobotDrive2_DifferentialArcade);
+      HAL.report(tResourceType.kResourceType_RobotDrive,
+                 tInstances.kRobotDrive2_DifferentialArcade, 2);
       m_reported = true;
     }
 
-    xSpeed = limit(xSpeed);
+    xSpeed = MathUtils.clamp(xSpeed, -1.0, 1.0);
     xSpeed = applyDeadband(xSpeed, m_deadband);
 
-    zRotation = limit(zRotation);
+    zRotation = MathUtils.clamp(zRotation, -1.0, 1.0);
     zRotation = applyDeadband(zRotation, m_deadband);
 
     // Square the inputs (while preserving the sign) to increase fine control
@@ -214,8 +222,9 @@ public class DifferentialDrive extends RobotDriveBase {
       }
     }
 
-    m_leftMotor.set(limit(leftMotorOutput) * m_maxOutput);
-    m_rightMotor.set(limit(rightMotorOutput) * m_maxOutput * m_rightSideInvertMultiplier);
+    m_leftMotor.set(MathUtils.clamp(leftMotorOutput, -1.0, 1.0) * m_maxOutput);
+    double maxOutput = m_maxOutput * m_rightSideInvertMultiplier;
+    m_rightMotor.set(MathUtils.clamp(rightMotorOutput, -1.0, 1.0) * maxOutput);
 
     feed();
   }
@@ -237,15 +246,15 @@ public class DifferentialDrive extends RobotDriveBase {
   @SuppressWarnings({"ParameterName", "PMD.CyclomaticComplexity"})
   public void curvatureDrive(double xSpeed, double zRotation, boolean isQuickTurn) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
-                 tInstances.kRobotDrive2_DifferentialCurvature);
+      HAL.report(tResourceType.kResourceType_RobotDrive,
+                 tInstances.kRobotDrive2_DifferentialCurvature, 2);
       m_reported = true;
     }
 
-    xSpeed = limit(xSpeed);
+    xSpeed = MathUtils.clamp(xSpeed, -1.0, 1.0);
     xSpeed = applyDeadband(xSpeed, m_deadband);
 
-    zRotation = limit(zRotation);
+    zRotation = MathUtils.clamp(zRotation, -1.0, 1.0);
     zRotation = applyDeadband(zRotation, m_deadband);
 
     double angularPower;
@@ -254,7 +263,7 @@ public class DifferentialDrive extends RobotDriveBase {
     if (isQuickTurn) {
       if (Math.abs(xSpeed) < m_quickStopThreshold) {
         m_quickStopAccumulator = (1 - m_quickStopAlpha) * m_quickStopAccumulator
-            + m_quickStopAlpha * limit(zRotation) * 2;
+            + m_quickStopAlpha * MathUtils.clamp(zRotation, -1.0, 1.0) * 2;
       }
       overPower = true;
       angularPower = zRotation;
@@ -328,15 +337,15 @@ public class DifferentialDrive extends RobotDriveBase {
    */
   public void tankDrive(double leftSpeed, double rightSpeed, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
-                 tInstances.kRobotDrive2_DifferentialTank);
+      HAL.report(tResourceType.kResourceType_RobotDrive,
+                 tInstances.kRobotDrive2_DifferentialTank, 2);
       m_reported = true;
     }
 
-    leftSpeed = limit(leftSpeed);
+    leftSpeed = MathUtils.clamp(leftSpeed, -1.0, 1.0);
     leftSpeed = applyDeadband(leftSpeed, m_deadband);
 
-    rightSpeed = limit(rightSpeed);
+    rightSpeed = MathUtils.clamp(rightSpeed, -1.0, 1.0);
     rightSpeed = applyDeadband(rightSpeed, m_deadband);
 
     // Square the inputs (while preserving the sign) to increase fine control

@@ -81,11 +81,6 @@ public class VideoSource implements AutoCloseable {
     m_handle = handle;
   }
 
-  @Deprecated
-  public void free() {
-    close();
-  }
-
   @Override
   public synchronized void close() {
     if (m_handle != 0) {

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -25,7 +25,7 @@ void TimedRobot::StartCompetition() {
   // Tell the DS that the robot is ready to be enabled
   HAL_ObserveUserProgramStarting();
 
-  m_expirationTime = Timer::GetFPGATimestamp() + m_period;
+  m_expirationTime = units::second_t{Timer::GetFPGATimestamp()} + m_period;
   UpdateAlarm();
 
   // Loop forever, calling the appropriate mode-dependent function
@@ -43,9 +43,13 @@ void TimedRobot::StartCompetition() {
   }
 }
 
-double TimedRobot::GetPeriod() const { return m_period; }
+units::second_t TimedRobot::GetPeriod() const {
+  return units::second_t(m_period);
+}
 
-TimedRobot::TimedRobot(double period) : IterativeRobotBase(period) {
+TimedRobot::TimedRobot(double period) : TimedRobot(units::second_t(period)) {}
+
+TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -61,22 +65,6 @@ TimedRobot::~TimedRobot() {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   HAL_CleanNotifier(m_notifier, &status);
-}
-
-TimedRobot::TimedRobot(TimedRobot&& rhs)
-    : IterativeRobotBase(std::move(rhs)),
-      m_expirationTime(std::move(rhs.m_expirationTime)) {
-  std::swap(m_notifier, rhs.m_notifier);
-}
-
-TimedRobot& TimedRobot::operator=(TimedRobot&& rhs) {
-  IterativeRobotBase::operator=(std::move(rhs));
-  ErrorBase::operator=(std::move(rhs));
-
-  std::swap(m_notifier, rhs.m_notifier);
-  m_expirationTime = std::move(rhs.m_expirationTime);
-
-  return *this;
 }
 
 void TimedRobot::UpdateAlarm() {

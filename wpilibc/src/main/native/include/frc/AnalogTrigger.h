@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,13 +13,18 @@
 
 #include "frc/AnalogTriggerOutput.h"
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class AnalogInput;
+class DutyCycle;
+class SendableBuilder;
 
-class AnalogTrigger : public ErrorBase, public SendableBase {
+class AnalogTrigger : public ErrorBase,
+                      public Sendable,
+                      public SendableHelper<AnalogTrigger> {
   friend class AnalogTriggerOutput;
 
  public:
@@ -41,6 +46,13 @@ class AnalogTrigger : public ErrorBase, public SendableBase {
    */
   explicit AnalogTrigger(AnalogInput* channel);
 
+  /**
+   * Construct an analog trigger given a duty cycle input.
+   *
+   * @param channel The pointer to the existing DutyCycle object
+   */
+  explicit AnalogTrigger(DutyCycle* dutyCycle);
+
   ~AnalogTrigger() override;
 
   AnalogTrigger(AnalogTrigger&& rhs);
@@ -55,6 +67,16 @@ class AnalogTrigger : public ErrorBase, public SendableBase {
    * @param upper The upper limit of the trigger in Volts.
    */
   void SetLimitsVoltage(double lower, double upper);
+
+  /**
+   * Set the upper and lower duty cycle limits of the analog trigger.
+   *
+   * The limits are given as floating point values between 0 and 1.
+   *
+   * @param lower The lower limit of the trigger in percentage.
+   * @param upper The upper limit of the trigger in percentage.
+   */
+  void SetLimitsDutyCycle(double lower, double upper);
 
   /**
    * Set the upper and lower limits of the analog trigger.
@@ -77,6 +99,17 @@ class AnalogTrigger : public ErrorBase, public SendableBase {
    *                         instantaneous reading
    */
   void SetAveraged(bool useAveragedValue);
+
+  /**
+   * Configure the analog trigger to use the duty cycle vs. raw values.
+   *
+   * If the value is true, then the duty cycle value is selected for the analog
+   * trigger, otherwise the immediate value is used.
+   *
+   * @param useDutyCycle If true, use the duty cycle value, otherwise use the
+   *                         instantaneous reading
+   */
+  void SetDutyCycle(bool useDutyCycle);
 
   /**
    * Configure the analog trigger to use a filtered value.
@@ -135,9 +168,9 @@ class AnalogTrigger : public ErrorBase, public SendableBase {
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  int m_index;
-  HAL_AnalogTriggerHandle m_trigger = HAL_kInvalidHandle;
+  hal::Handle<HAL_AnalogTriggerHandle> m_trigger;
   AnalogInput* m_analogInput = nullptr;
+  DutyCycle* m_dutyCycle = nullptr;
   bool m_ownsAnalog = false;
 };
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.Vector;
+import java.util.Collection;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -16,7 +16,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * The preferences class provides a relatively simple way to save important values to the roboRIO to
@@ -72,12 +72,11 @@ public final class Preferences {
   }
 
   /**
-   * Gets the vector of keys.
-   * @return a vector of the keys
+   * Gets the preferences keys.
+   * @return a collection of the keys
    */
-  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
-  public Vector<String> getKeys() {
-    return new Vector<>(m_table.getKeys());
+  public Collection<String> getKeys() {
+    return m_table.getKeys();
   }
 
   /**
@@ -88,7 +87,7 @@ public final class Preferences {
    * @throws NullPointerException if value is null
    */
   public void putString(String key, String value) {
-    requireNonNull(value, "Provided value was null");
+    requireNonNullParam(value, "value", "putString");
 
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setString(value);

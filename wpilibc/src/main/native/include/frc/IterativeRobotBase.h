@@ -1,11 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+
+#include <units/units.h>
+#include <wpi/deprecated.h>
 
 #include "frc/RobotBase.h"
 #include "frc/Watchdog.h"
@@ -141,7 +144,15 @@ class IterativeRobotBase : public RobotBase {
    *
    * @param period Period in seconds.
    */
+  WPI_DEPRECATED("Use ctor with unit-safety instead.")
   explicit IterativeRobotBase(double period);
+
+  /**
+   * Constructor for IterativeRobotBase.
+   *
+   * @param period Period.
+   */
+  explicit IterativeRobotBase(units::second_t period);
 
   virtual ~IterativeRobotBase() = default;
 
@@ -150,7 +161,7 @@ class IterativeRobotBase : public RobotBase {
 
   void LoopFunc();
 
-  double m_period;
+  units::second_t m_period;
 
  private:
   enum class Mode { kNone, kDisabled, kAutonomous, kTeleop, kTest };

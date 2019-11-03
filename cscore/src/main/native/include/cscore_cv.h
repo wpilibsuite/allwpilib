@@ -19,6 +19,8 @@
 
 #endif
 
+#if CV_VERSION_MAJOR < 4
+
 #ifdef __cplusplus
 extern "C" {  // NOLINT(build/include_order)
 #endif
@@ -35,6 +37,8 @@ uint64_t CS_GrabSinkFrameTimeout(CS_Sink sink, struct CvMat* image,
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+
+#endif  // CV_VERSION_MAJOR < 4
 
 #ifdef __cplusplus
 

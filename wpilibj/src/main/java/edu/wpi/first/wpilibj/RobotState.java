@@ -21,6 +21,10 @@ public final class RobotState {
     return DriverStation.getInstance().isEnabled();
   }
 
+  public static boolean isEStopped() {
+    return DriverStation.getInstance().isEStopped();
+  }
+
   public static boolean isOperatorControl() {
     return DriverStation.getInstance().isOperatorControl();
   }

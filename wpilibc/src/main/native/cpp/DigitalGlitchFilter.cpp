@@ -20,6 +20,7 @@
 #include "frc/SensorUtil.h"
 #include "frc/Utility.h"
 #include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -37,8 +38,9 @@ DigitalGlitchFilter::DigitalGlitchFilter() {
   *index = true;
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalGlitchFilter,
-             m_channelIndex);
-  SetName("DigitalGlitchFilter", m_channelIndex);
+             m_channelIndex + 1);
+  SendableRegistry::GetInstance().AddLW(this, "DigitalGlitchFilter",
+                                        m_channelIndex);
 }
 
 DigitalGlitchFilter::~DigitalGlitchFilter() {
@@ -49,13 +51,13 @@ DigitalGlitchFilter::~DigitalGlitchFilter() {
 }
 
 DigitalGlitchFilter::DigitalGlitchFilter(DigitalGlitchFilter&& rhs)
-    : ErrorBase(std::move(rhs)), SendableBase(std::move(rhs)) {
+    : ErrorBase(std::move(rhs)), SendableHelper(std::move(rhs)) {
   std::swap(m_channelIndex, rhs.m_channelIndex);
 }
 
 DigitalGlitchFilter& DigitalGlitchFilter::operator=(DigitalGlitchFilter&& rhs) {
   ErrorBase::operator=(std::move(rhs));
-  SendableBase::operator=(std::move(rhs));
+  SendableHelper::operator=(std::move(rhs));
 
   std::swap(m_channelIndex, rhs.m_channelIndex);
 
@@ -85,9 +87,6 @@ void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requestedIndex) {
     int actualIndex =
         HAL_GetFilterSelect(input->GetPortHandleForRouting(), &status);
     wpi_assertEqual(actualIndex, requestedIndex);
-
-    HAL_Report(HALUsageReporting::kResourceType_DigitalInput,
-               input->GetChannel());
   }
 }
 

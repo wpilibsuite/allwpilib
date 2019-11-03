@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,8 +12,8 @@
 #include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/SpeedControllerGroup.h>
-#include <frc/commands/Subsystem.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc2/command/SubsystemBase.h>
 
 namespace frc {
 class Joystick;
@@ -24,15 +24,9 @@ class Joystick;
  * the robots chassis. These include four drive motors, a left and right encoder
  * and a gyro.
  */
-class DriveTrain : public frc::Subsystem {
+class DriveTrain : public frc2::SubsystemBase {
  public:
   DriveTrain();
-
-  /**
-   * When no other command is running let the operator drive around
-   * using the PS3 joystick.
-   */
-  void InitDefaultCommand() override;
 
   /**
    * The log method puts interesting information to the SmartDashboard.

@@ -14,8 +14,8 @@
 #include <wpi/FileSystem.h>
 #include <wpi/StringRef.h>
 
-#include "../visa/visa.h"
 #include "hal/Errors.h"
+#include "visa/visa.h"
 
 constexpr const char* OnboardResourceVISA = "ASRL1::INSTR";
 constexpr const char* MxpResourceVISA = "ASRL2::INSTR";

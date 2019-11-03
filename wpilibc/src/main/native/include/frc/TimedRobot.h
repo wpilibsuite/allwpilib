@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,6 +8,8 @@
 #pragma once
 
 #include <hal/Types.h>
+#include <units/units.h>
+#include <wpi/deprecated.h>
 
 #include "frc/ErrorBase.h"
 #include "frc/IterativeRobotBase.h"
@@ -25,7 +27,7 @@ namespace frc {
  */
 class TimedRobot : public IterativeRobotBase, public ErrorBase {
  public:
-  static constexpr double kDefaultPeriod = 0.02;
+  static constexpr units::second_t kDefaultPeriod = 20_ms;
 
   /**
    * Provide an alternate "main loop" via StartCompetition().
@@ -35,25 +37,33 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
   /**
    * Get the time period between calls to Periodic() functions.
    */
-  double GetPeriod() const;
+  units::second_t GetPeriod() const;
 
   /**
    * Constructor for TimedRobot.
    *
    * @param period Period in seconds.
    */
-  explicit TimedRobot(double period = kDefaultPeriod);
+  WPI_DEPRECATED("Use constructor with unit-safety instead.")
+  explicit TimedRobot(double period);
+
+  /**
+   * Constructor for TimedRobot.
+   *
+   * @param period Period.
+   */
+  explicit TimedRobot(units::second_t period = kDefaultPeriod);
 
   ~TimedRobot() override;
 
-  TimedRobot(TimedRobot&& rhs);
-  TimedRobot& operator=(TimedRobot&& rhs);
+  TimedRobot(TimedRobot&&) = default;
+  TimedRobot& operator=(TimedRobot&&) = default;
 
  private:
-  HAL_NotifierHandle m_notifier{0};
+  hal::Handle<HAL_NotifierHandle> m_notifier;
 
   // The absolute expiration time
-  double m_expirationTime = 0;
+  units::second_t m_expirationTime{0};
 
   /**
    * Update the HAL alarm time.

@@ -18,6 +18,8 @@ dependencies {
     compile project(':ntcore')
     compile project(':cscore')
     compile project(':cameraserver')
+    compile project(':wpilibOldCommands')
+    compile project(':wpilibNewCommands')
 }
 
 if (!project.hasProperty('skipPMD')) {
@@ -33,7 +35,7 @@ if (!project.hasProperty('skipPMD')) {
 
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) {
-        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "-Werror"
     }
 }
 
@@ -48,4 +50,7 @@ ext {
     commandFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/commands.json")
 }
 
+ext {
+    isCppCommands = false
+}
 apply from: "${rootDir}/shared/examplecheck.gradle"

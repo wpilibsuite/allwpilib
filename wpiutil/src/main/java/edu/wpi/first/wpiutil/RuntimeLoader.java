@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -69,7 +69,6 @@ public final class RuntimeLoader<T> {
     try {
       // First, try loading path
       System.loadLibrary(m_libraryName);
-      return;
     } catch (UnsatisfiedLinkError ule) {
       // Then load the hash from the resources
       String hashName = RuntimeDetector.getHashLibraryResource(m_libraryName);
@@ -115,7 +114,6 @@ public final class RuntimeLoader<T> {
     try {
       // First, try loading path
       System.loadLibrary(m_libraryName);
-      return;
     } catch (UnsatisfiedLinkError ule) {
       // Then load the hash from the input file
       String resname = RuntimeDetector.getLibraryResource(m_libraryName);
