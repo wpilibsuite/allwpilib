@@ -30,9 +30,6 @@ class IterativeRobot : public IterativeRobotBase {
   IterativeRobot();
   virtual ~IterativeRobot() = default;
 
-  IterativeRobot(IterativeRobot&&) = default;
-  IterativeRobot& operator=(IterativeRobot&&) = default;
-
   /**
    * Provide an alternate "main loop" via StartCompetition().
    *
