@@ -154,7 +154,7 @@ void HAL_SetAnalogTriggerLimitsDutyCycle(
 
   trigger->trigger->writeLowerLimit(static_cast<int32_t>(scaleFactor * lower),
                                     status);
-  trigger->trigger->writeLowerLimit(static_cast<int32_t>(scaleFactor * upper),
+  trigger->trigger->writeUpperLimit(static_cast<int32_t>(scaleFactor * upper),
                                     status);
 }
 

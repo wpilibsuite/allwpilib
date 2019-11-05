@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <thread>
+#include <iostream>
 
 #include <wpi/raw_ostream.h>
 
