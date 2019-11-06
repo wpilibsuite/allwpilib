@@ -7,13 +7,15 @@
 
 #include "frc2/command/WaitUntilCommand.h"
 
+#include <frc2/Timer.h>
+
 using namespace frc2;
 
 WaitUntilCommand::WaitUntilCommand(std::function<bool()> condition)
     : m_condition{std::move(condition)} {}
 
-WaitUntilCommand::WaitUntilCommand(double time)
-    : m_condition{[=] { return frc::Timer::GetMatchTime() - time > 0; }} {}
+WaitUntilCommand::WaitUntilCommand(units::second_t time)
+    : m_condition{[=] { return Timer::GetMatchTime() - time > 0_s; }} {}
 
 bool WaitUntilCommand::IsFinished() { return m_condition(); }
 

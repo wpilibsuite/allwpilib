@@ -1,0 +1,8 @@
+includeOtherLibs {
+  ^HAL/
+  ^networktables/
+  ^frc/
+  ^units/
+  ^wpi/
+  ^frc2/Timer
+}

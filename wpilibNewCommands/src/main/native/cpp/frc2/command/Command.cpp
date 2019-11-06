@@ -7,8 +7,6 @@
 
 #include "frc2/command/Command.h"
 
-#include <iostream>
-
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelCommandGroup.h"

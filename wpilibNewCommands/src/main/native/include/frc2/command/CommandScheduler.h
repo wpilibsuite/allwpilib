@@ -7,22 +7,16 @@
 
 #pragma once
 
+#include <initializer_list>
+#include <memory>
+#include <utility>
+
 #include <frc/ErrorBase.h>
-#include <frc/RobotState.h>
 #include <frc/WPIErrors.h>
 #include <frc/smartdashboard/Sendable.h>
 #include <frc/smartdashboard/SendableHelper.h>
-
-#include <memory>
-#include <unordered_map>
-#include <utility>
-
-#include <networktables/NetworkTableEntry.h>
-#include <wpi/DenseMap.h>
+#include <wpi/ArrayRef.h>
 #include <wpi/FunctionExtras.h>
-#include <wpi/SmallSet.h>
-
-#include "CommandState.h"
 
 namespace frc2 {
 class Command;
@@ -45,6 +39,10 @@ class CommandScheduler final : public frc::Sendable,
    * @return the instance
    */
   static CommandScheduler& GetInstance();
+
+  ~CommandScheduler();
+  CommandScheduler(const CommandScheduler&) = delete;
+  CommandScheduler& operator=(const CommandScheduler&) = delete;
 
   using Action = std::function<void(const Command&)>;
 
@@ -186,8 +184,9 @@ class CommandScheduler final : public frc::Sendable,
                                  "Default commands should not end!");
       return;
     }
-    m_subsystems[subsystem] = std::make_unique<std::remove_reference_t<T>>(
-        std::forward<T>(defaultCommand));
+    SetDefaultCommandImpl(subsystem,
+                          std::make_unique<std::remove_reference_t<T>>(
+                              std::forward<T>(defaultCommand)));
   }
 
   /**
@@ -330,42 +329,11 @@ class CommandScheduler final : public frc::Sendable,
   // Constructor; private as this is a singleton
   CommandScheduler();
 
-  // A map from commands to their scheduling state.  Also used as a set of the
-  // currently-running commands.
-  wpi::DenseMap<Command*, CommandState> m_scheduledCommands;
+  void SetDefaultCommandImpl(Subsystem* subsystem,
+                             std::unique_ptr<Command> command);
 
-  // A map from required subsystems to their requiring commands.  Also used as a
-  // set of the currently-required subsystems.
-  wpi::DenseMap<Subsystem*, Command*> m_requirements;
-
-  // A map from subsystems registered with the scheduler to their default
-  // commands.  Also used as a list of currently-registered subsystems.
-  wpi::DenseMap<Subsystem*, std::unique_ptr<Command>> m_subsystems;
-
-  // The set of currently-registered buttons that will be polled every
-  // iteration.
-  wpi::SmallVector<wpi::unique_function<void()>, 4> m_buttons;
-
-  bool m_disabled{false};
-
-  // NetworkTable entries for use in Sendable impl
-  nt::NetworkTableEntry m_namesEntry;
-  nt::NetworkTableEntry m_idsEntry;
-  nt::NetworkTableEntry m_cancelEntry;
-
-  // Lists of user-supplied actions to be executed on scheduling events for
-  // every command.
-  wpi::SmallVector<Action, 4> m_initActions;
-  wpi::SmallVector<Action, 4> m_executeActions;
-  wpi::SmallVector<Action, 4> m_interruptActions;
-  wpi::SmallVector<Action, 4> m_finishActions;
-
-  // Flag and queues for avoiding concurrent modification if commands are
-  // scheduled/canceled during run
-
-  bool m_inRunLoop = false;
-  wpi::DenseMap<Command*, bool> m_toSchedule;
-  wpi::SmallVector<Command*, 4> m_toCancel;
+  class Impl;
+  std::unique_ptr<Impl> m_impl;
 
   friend class CommandTestBase;
 };

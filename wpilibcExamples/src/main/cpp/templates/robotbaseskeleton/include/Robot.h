@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <atomic>
+
 #include <frc/RobotBase.h>
 
 class Robot : public frc::RobotBase {
@@ -18,4 +20,8 @@ class Robot : public frc::RobotBase {
   void Test();
 
   void StartCompetition() override;
+  void EndCompetition() override;
+
+ private:
+  std::atomic<bool> m_exit{false};
 };

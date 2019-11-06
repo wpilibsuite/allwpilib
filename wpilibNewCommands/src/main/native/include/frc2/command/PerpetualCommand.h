@@ -15,9 +15,9 @@
 #include <memory>
 #include <utility>
 
-#include "CommandBase.h"
-#include "CommandGroupBase.h"
-#include "CommandHelper.h"
+#include "frc2/command/CommandBase.h"
+#include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**

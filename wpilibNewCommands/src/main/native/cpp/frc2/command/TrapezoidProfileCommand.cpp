@@ -7,8 +7,6 @@
 
 #include "frc2/command/TrapezoidProfileCommand.h"
 
-#include <units/units.h>
-
 using namespace frc2;
 
 TrapezoidProfileCommand::TrapezoidProfileCommand(
