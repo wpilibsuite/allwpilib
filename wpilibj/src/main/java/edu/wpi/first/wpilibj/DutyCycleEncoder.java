@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
- * Class for supporting duty cycle encoders, such as the US Digital MA3 with PWM Output,
+ * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with PWM Output,
  * the CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag Encoder.
  */
 public class DutyCycleEncoder implements Sendable, AutoCloseable {

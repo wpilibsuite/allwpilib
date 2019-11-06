@@ -20,12 +20,30 @@
 namespace frc {
 class AnalogInput;
 
+/**
+ * Class for supporting continuous analog encoders, such as the US Digital MA3.
+ */
 class AnalogEncoder : public ErrorBase,
                       public Sendable,
                       public SendableHelper<AnalogEncoder> {
  public:
+  /**
+   * Construct a new AnalogEncoder attached to a specific AnalogInput.
+   *
+   * @param analogInput the analog input to attach to
+   */
   explicit AnalogEncoder(AnalogInput& analogInput);
+  /**
+   * Construct a new AnalogEncoder attached to a specific AnalogInput.
+   *
+   * @param analogInput the analog input to attach to
+   */
   explicit AnalogEncoder(AnalogInput* analogInput);
+  /**
+   * Construct a new AnalogEncoder attached to a specific AnalogInput.
+   *
+   * @param analogInput the analog input to attach to
+   */
   explicit AnalogEncoder(std::shared_ptr<AnalogInput> analogInput);
 
   ~AnalogEncoder() override = default;
@@ -33,16 +51,74 @@ class AnalogEncoder : public ErrorBase,
   AnalogEncoder(AnalogEncoder&&) = default;
   AnalogEncoder& operator=(AnalogEncoder&&) = default;
 
+  /**
+   * Reset the Encoder distance to zero.
+   */
   void Reset();
 
+  /**
+   * Get the encoder value since the last reset.
+   *
+   * This is reported in rotations since the last reset.
+   *
+   * @return the encoder value in rotations
+   */
   double Get() const;
+
+  /**
+   * Get the number of whole rotations since the last reset.
+   *
+   * @return number of whole rotations
+   */
   int GetRotations() const;
+
+  /**
+   * Get the absolute position in the rotation.
+   *
+   * This is not affected by reset(), and is always just the absolute value
+   * straight from the encoder.
+   *
+   * @return the encoder absolute position
+   */
   double GetPositionInRotation() const;
 
+  /**
+   * Get the offset of position relative to the last reset.
+   *
+   * GetPositionInRotation() - GetPositionOffset() will give an encoder absolute
+   * position relative to the last reset. This could potentially be negative,
+   * which needs to be accounted for.
+   *
+   * @return the position offset
+   */
   double GetPositionOffset() const;
 
+  /**
+   * Set the distance per rotation of the encoder. This sets the multiplier used
+   * to determine the distance driven based on the rotation value from the
+   * encoder. Set this value based on the how far the mechanism travels in 1
+   * rotation of the encoder, and factor in gearing reductions following the
+   * encoder shaft. This distance can be in any units you like, linear or
+   * angular.
+   *
+   * @param distancePerRotation the distance per rotation of the encoder
+   */
   void SetDistancePerRotation(double distancePerRotation);
+
+  /**
+   * Get the distance per rotation for this encoder.
+   *
+   * @return The scale factor that will be used to convert rotation to useful
+   * units.
+   */
   double GetDistancePerRotation() const;
+
+  /**
+   * Get the distance the sensor has driven since the last reset as scaled by
+   * the value from SetDistancePerRotation.
+   *
+   * @return The distance driven since the last reset
+   */
   double GetDistance() const;
 
   void InitSendable(SendableBuilder& builder) override;

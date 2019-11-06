@@ -21,16 +21,51 @@ namespace frc {
 class DutyCycle;
 class DigitalSource;
 
+/**
+ * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with
+ * PWM Output, the CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag
+ * Encoder.
+ */
 class DutyCycleEncoder : public ErrorBase,
                          public Sendable,
                          public SendableHelper<DutyCycleEncoder> {
  public:
+  /**
+   * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
+   *
+   * @param dutyCycle the duty cycle to attach to
+   */
   explicit DutyCycleEncoder(DutyCycle& dutyCycle);
+  /**
+   * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
+   *
+   * @param dutyCycle the duty cycle to attach to
+   */
   explicit DutyCycleEncoder(DutyCycle* dutyCycle);
+  /**
+   * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
+   *
+   * @param dutyCycle the duty cycle to attach to
+   */
   explicit DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle);
 
+  /**
+   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
+   *
+   * @param source the digital source to attach to
+   */
   explicit DutyCycleEncoder(DigitalSource& digitalSource);
+  /**
+   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
+   *
+   * @param source the digital source to attach to
+   */
   explicit DutyCycleEncoder(DigitalSource* digitalSource);
+  /**
+   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
+   *
+   * @param source the digital source to attach to
+   */
   explicit DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource);
 
   ~DutyCycleEncoder() override = default;
@@ -38,21 +73,100 @@ class DutyCycleEncoder : public ErrorBase,
   DutyCycleEncoder(DutyCycleEncoder&&) = default;
   DutyCycleEncoder& operator=(DutyCycleEncoder&&) = default;
 
+  /**
+   * Get the frequency in Hz of the duty cycle signal from the encoder.
+   *
+   * @return duty cycle frequency in Hz
+   */
   int GetFrequency() const;
 
+  /**
+   * Get if the sensor is connected
+   *
+   * This uses the duty cycle frequency to determine if the sensor is connected.
+   * By default, a value of 100 Hz is used as the threshold, and this value can
+   * be changed with SetConnectedFrequencyThreshold.
+   *
+   * @return true if the sensor is connected
+   */
   bool IsConnected() const;
+
+  /**
+   * Change the frequency threshold for detecting connection used by
+   * IsConnected.
+   *
+   * @param frequency the minimum frequency in Hz.
+   */
   void SetConnectedFrequencyThreshold(int frequency);
 
+  /**
+   * Reset the Encoder distance to zero.
+   */
   void Reset();
 
+  /**
+   * Get the encoder value since the last reset.
+   *
+   * This is reported in rotations since the last reset.
+   *
+   * @return the encoder value in rotations
+   */
   double Get() const;
+
+  /**
+   * Get the number of whole rotations since the last reset.
+   *
+   * @return number of whole rotations
+   */
   int GetRotations() const;
+
+  /**
+   * Get the absolute position in the rotation.
+   *
+   * This is not affected by reset(), and is always just the absolute value
+   * straight from the encoder.
+   *
+   * @return the encoder absolute position
+   */
   double GetPositionInRotation() const;
 
+  /**
+   * Get the offset of position relative to the last reset.
+   *
+   * getPositionInRotation() - getPositionOffset() will give an encoder absolute
+   * position relative to the last reset. This could potentially be negative,
+   * which needs to be accounted for.
+   *
+   * @return the position offset
+   */
   double GetPositionOffset() const;
 
+  /**
+   * Set the distance per rotation of the encoder. This sets the multiplier used
+   * to determine the distance driven based on the rotation value from the
+   * encoder. Set this value based on the how far the mechanism travels in 1
+   * rotation of the encoder, and factor in gearing reductions following the
+   * encoder shaft. This distance can be in any units you like, linear or
+   * angular.
+   *
+   * @param distancePerRotation the distance per rotation of the encoder
+   */
   void SetDistancePerRotation(double distancePerRotation);
+
+  /**
+   * Get the distance per rotation for this encoder.
+   *
+   * @return The scale factor that will be used to convert rotation to useful
+   * units.
+   */
   double GetDistancePerRotation() const;
+
+  /**
+   * Get the distance the sensor has driven since the last reset as scaled by
+   * the value from SetDistancePerRotation.
+   *
+   * @return The distance driven since the last reset
+   */
   double GetDistance() const;
 
   void InitSendable(SendableBuilder& builder) override;
