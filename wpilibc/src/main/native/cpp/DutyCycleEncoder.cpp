@@ -52,25 +52,63 @@ DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource)
 }
 
 void DutyCycleEncoder::Init() {
-  m_analogTrigger.SetLimitsDutyCycle(0.05, 0.95);
-  m_counter.SetUpSource(m_analogTrigger.CreateOutput(AnalogTriggerType::kRisingPulse));
-  m_counter.SetDownSource(m_analogTrigger.CreateOutput(AnalogTriggerType::kFallingPulse));
+  m_analogTrigger.SetLimitsDutyCycle(0.25, 0.75);
+  m_counter.SetUpSource(
+      m_analogTrigger.CreateOutput(AnalogTriggerType::kRisingPulse));
+  m_counter.SetDownSource(
+      m_analogTrigger.CreateOutput(AnalogTriggerType::kFallingPulse));
+
+  SendableRegistry::GetInstance().AddLW(this, "DutyCycle Encoder",
+                                        m_dutyCycle->GetSourceChannel());
 }
 
+int DutyCycleEncoder::GetRotations() const { return m_counter.Get(); }
 
-int DutyCycleEncoder::GetRotations() const {
-  return m_counter.Get();
+double DutyCycleEncoder::Get() const {
+  return GetRotations() + GetPositionInRotation() - m_positionOffset;
+}
+
+double DutyCycleEncoder::GetPositionInRotation() const {
+  return m_dutyCycle->GetOutput();
+}
+
+double DutyCycleEncoder::GetPositionOffset() const { return m_positionOffset; }
+
+void DutyCycleEncoder::SetDistancePerRotation(double distancePerRotation) {
+  m_distancePerRotation = distancePerRotation;
+}
+double DutyCycleEncoder::GetDistancePerRotation() const {
+  return m_distancePerRotation;
+}
+double DutyCycleEncoder::GetDistance() const {
+  return Get() * GetDistancePerRotation();
 }
 
 int DutyCycleEncoder::GetFrequency() const {
   return m_dutyCycle->GetFrequency();
 }
 
-void DutyCycleEncoder::InitSendable(SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Encoder");
-  builder.AddDoubleProperty("Frequency",
-                            [this] { return this->GetFrequency(); }, nullptr);
-  builder.AddDoubleProperty("Rotations", [this] { return this->GetRotations(); },
-                            nullptr);
+void DutyCycleEncoder::Reset() {
+  m_counter.Reset();
+  m_positionOffset = m_dutyCycle->GetOutput();
+}
 
+bool DutyCycleEncoder::IsConnected() const {
+  return m_dutyCycle->GetFrequency() > m_frequencyThreshold;
+}
+void DutyCycleEncoder::SetConnectedFrequencyThreshold(int frequency) {
+  if (frequency < 0) {
+    frequency = 0;
+  }
+  m_frequencyThreshold = frequency;
+}
+
+void DutyCycleEncoder::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("AbsoluteEncoder");
+  builder.AddBooleanProperty("Connected",
+                             [this] { return this->IsConnected(); }, nullptr);
+  builder.AddDoubleProperty("Distance", [this] { return this->GetDistance(); },
+                            nullptr);
+  builder.AddDoubleProperty("Distance Per Rotation",
+                            [this] { return this->GetDistancePerRotation(); }, nullptr);
 }

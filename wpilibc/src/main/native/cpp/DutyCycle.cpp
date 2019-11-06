@@ -90,6 +90,10 @@ unsigned int DutyCycle::GetOutputScaleFactor() const {
   return retVal;
 }
 
+int DutyCycle::GetSourceChannel() const {
+  return m_source->GetChannel();
+}
+
 void DutyCycle::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Duty Cycle");
   builder.AddDoubleProperty("Frequency",

@@ -37,21 +37,22 @@ class DutyCycleEncoder : public ErrorBase, public Sendable, public SendableHelpe
   DutyCycleEncoder(DutyCycleEncoder&&) = default;
   DutyCycleEncoder& operator=(DutyCycleEncoder&&) = default;
 
-  void SetCountsPerRotation(int countsPerRotation);
-
   int GetFrequency() const;
+
+  bool IsConnected() const;
+  void SetConnectedFrequencyThreshold(int frequency);
 
   void Reset();
 
-  int Get() const;
+  double Get() const;
   int GetRotations() const;
-  int GetPositionInRotation() const;
+  double GetPositionInRotation() const;
 
-  void SetDistancePerPulse(double distancePerPulse);
-  double GetDistancePerPulse(double distancePerPulse) const;
+  double GetPositionOffset() const;
+
+  void SetDistancePerRotation(double distancePerRotation);
+  double GetDistancePerRotation() const;
   double GetDistance() const;
-
-  void SetSimDevice(HAL_SimDeviceHandle device);
 
   void InitSendable(SendableBuilder& builder) override;
 
@@ -61,7 +62,8 @@ class DutyCycleEncoder : public ErrorBase, public Sendable, public SendableHelpe
   std::shared_ptr<DutyCycle> m_dutyCycle;
   AnalogTrigger m_analogTrigger;
   Counter m_counter;
-  int m_countsPerRotation = 1024;
-  int m_positionOffset = 0;
+  int m_frequencyThreshold = 100;
+  double m_positionOffset = 0;
+  double m_distancePerRotation = 1.0;
 };
 }
