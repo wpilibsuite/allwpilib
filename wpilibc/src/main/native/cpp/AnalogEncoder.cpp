@@ -66,7 +66,7 @@ double AnalogEncoder::GetDistance() const {
 
 void AnalogEncoder::Reset() {
   m_counter.Reset();
-  m_positionOffset = GetPositionInRotation();;
+  m_positionOffset = GetPositionInRotation();
 }
 
 void AnalogEncoder::InitSendable(SendableBuilder& builder) {

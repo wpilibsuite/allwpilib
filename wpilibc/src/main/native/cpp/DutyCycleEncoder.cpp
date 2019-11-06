@@ -94,7 +94,7 @@ void DutyCycleEncoder::Reset() {
 }
 
 bool DutyCycleEncoder::IsConnected() const {
-  return m_dutyCycle->GetFrequency() > m_frequencyThreshold;
+  return GetFrequency() > m_frequencyThreshold;
 }
 void DutyCycleEncoder::SetConnectedFrequencyThreshold(int frequency) {
   if (frequency < 0) {
