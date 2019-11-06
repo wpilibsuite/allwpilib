@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * available from CTRE.
  *
  * <p>- 2.004ms = full "forward" - 1.52ms = the "high end" of the deadband range - 1.50ms =
- * center of the deadband range (off) - 1.48ms = the "low end" of the deadband range - .997ms = 
+ * center of the deadband range (off) - 1.48ms = the "low end" of the deadband range - .997ms =
  * full "reverse"
  */
 public class PWMTalonSRX extends PWMSpeedController {
