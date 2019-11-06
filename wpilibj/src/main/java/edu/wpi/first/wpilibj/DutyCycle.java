@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 public class DutyCycle implements Sendable, AutoCloseable {
   // Explicitly package private
   final int m_handle;
-  
+
   private final DigitalSource m_source;
 
   /**
@@ -109,7 +109,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
   public final int getFPGAIndex() {
     return DutyCycleJNI.getFPGAIndex(m_handle);
   }
-  
+
   public int getSourceChannel() {
     return m_source.getChannel();
   }

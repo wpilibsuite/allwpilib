@@ -6,9 +6,11 @@
 /*----------------------------------------------------------------------------*/
 
 #include "frc/AnalogEncoder.h"
+
+#include <frc/AnalogInput.h>
+
 #include "frc/Counter.h"
 #include "frc/smartdashboard/SendableBuilder.h"
-#include <frc/AnalogInput.h>
 
 using namespace frc;
 
@@ -74,5 +76,6 @@ void AnalogEncoder::InitSendable(SendableBuilder& builder) {
   builder.AddDoubleProperty("Distance", [this] { return this->GetDistance(); },
                             nullptr);
   builder.AddDoubleProperty("Distance Per Rotation",
-                            [this] { return this->GetDistancePerRotation(); }, nullptr);
+                            [this] { return this->GetDistancePerRotation(); },
+                            nullptr);
 }

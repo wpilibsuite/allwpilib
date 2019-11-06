@@ -5,13 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <frc/TimedRobot.h>
-#include <frc/DutyCycleEncoder.h>
-#include <frc/DutyCycle.h>
 #include <frc/DigitalInput.h>
 #include <frc/DigitalOutput.h>
+#include <frc/DutyCycle.h>
+#include <frc/DutyCycleEncoder.h>
+#include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-
 
 class MyRobot : public frc::TimedRobot {
   frc::DigitalInput di{0};
@@ -28,7 +27,6 @@ class MyRobot : public frc::TimedRobot {
     digO.UpdateDutyCycle(0.75);
 
     frc::SmartDashboard::PutNumber("DC", 0.75);
-
   }
 
   /**

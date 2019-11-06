@@ -13,7 +13,6 @@
 
 #include "frc/AnalogTrigger.h"
 #include "frc/Counter.h"
-
 #include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
@@ -21,7 +20,9 @@
 namespace frc {
 class AnalogInput;
 
-class AnalogEncoder : public ErrorBase, public Sendable, public SendableHelper<AnalogEncoder> {
+class AnalogEncoder : public ErrorBase,
+                      public Sendable,
+                      public SendableHelper<AnalogEncoder> {
  public:
   explicit AnalogEncoder(AnalogInput& analogInput);
   explicit AnalogEncoder(AnalogInput* analogInput);
@@ -55,4 +56,4 @@ class AnalogEncoder : public ErrorBase, public Sendable, public SendableHelper<A
   double m_positionOffset = 0;
   double m_distancePerRotation = 1.0;
 };
-}
+}  // namespace frc

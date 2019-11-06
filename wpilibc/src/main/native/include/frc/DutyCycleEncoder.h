@@ -13,7 +13,6 @@
 
 #include "frc/AnalogTrigger.h"
 #include "frc/Counter.h"
-
 #include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
@@ -22,7 +21,9 @@ namespace frc {
 class DutyCycle;
 class DigitalSource;
 
-class DutyCycleEncoder : public ErrorBase, public Sendable, public SendableHelper<DutyCycleEncoder> {
+class DutyCycleEncoder : public ErrorBase,
+                         public Sendable,
+                         public SendableHelper<DutyCycleEncoder> {
  public:
   explicit DutyCycleEncoder(DutyCycle& dutyCycle);
   explicit DutyCycleEncoder(DutyCycle* dutyCycle);
@@ -66,4 +67,4 @@ class DutyCycleEncoder : public ErrorBase, public Sendable, public SendableHelpe
   double m_positionOffset = 0;
   double m_distancePerRotation = 1.0;
 };
-}
+}  // namespace frc

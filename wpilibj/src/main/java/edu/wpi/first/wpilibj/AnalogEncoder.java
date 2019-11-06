@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
@@ -8,15 +15,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * Class for supporting continuous analog encoders, such as the US Digital MA3.
  */
 public class AnalogEncoder implements Sendable, AutoCloseable {
-  private AnalogInput m_analogInput;
+  private final AnalogInput m_analogInput;
   private AnalogTrigger m_analogTrigger;
   private Counter m_counter;
-  private double m_positionOffset = 0;
+  private double m_positionOffset;
   private double m_distancePerRotation = 1.0;
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
-   * 
+   *
    * @param analogInput the analog input to attach to
    */
   public AnalogEncoder(AnalogInput analogInput) {
@@ -37,7 +44,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   /**
    * Get the number of whole rotations since the last reset.
-   * 
+   *
    * @return number of whole rotations
    */
   public int getRotations() {
@@ -46,9 +53,9 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   /**
    * Get the encoder value since the last reset.
-   * 
+   *
    * <p>This is reported in rotations since the last reset.
-   * 
+   *
    * @return the encoder value in rotations
    */
   public double get() {
@@ -57,10 +64,10 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   /**
    * Get the absolute position in the rotation.
-   * 
+   *
    * <p>This is not affected by reset(), and is always just the absolute value straight
    * from the encoder.
-   * 
+   *
    * @return the encoder absolute position
    */
   public double getPositionInRotation() {
@@ -69,11 +76,11 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   /**
    * Get the offset of position relative to the last reset.
-   * 
+   *
    * <p>getPositionInRotation() - getPositionOffset() will give an encoder absolute position
    * relative to the last reset. This could potentially be negative, which needs to be accounted
    * for.
-   * 
+   *
    * @return the position offset
    */
   public double getPositionOffset() {
@@ -82,11 +89,11 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   /**
    * Set the distance per rotation of the encoder. This sets the multiplier used to determine the
-   * distance driven based on the rotation value from the encoder. Set this value based on 
-   * the how far the mechanism travels in 1 rotation of the encoder, and factor in gearing 
-   * reductions following the encoder shaft. This distance can be in any units you like, 
+   * distance driven based on the rotation value from the encoder. Set this value based on
+   * the how far the mechanism travels in 1 rotation of the encoder, and factor in gearing
+   * reductions following the encoder shaft. This distance can be in any units you like,
    * linear or angular.
-   * 
+   *
    * @param distancePerRotation the distance per rotation of the encoder
    */
   public void setDistancePerRotation(double distancePerRotation) {
@@ -133,7 +140,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     builder.addDoubleProperty("Distance Per Rotation", this::getDistancePerRotation, null);
 
   }
-  
-  
+
+
 
 }

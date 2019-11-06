@@ -6,9 +6,10 @@
 /*----------------------------------------------------------------------------*/
 
 #include "frc/DutyCycleEncoder.h"
-#include "frc/DutyCycle.h"
-#include "frc/DigitalSource.h"
+
 #include "frc/Counter.h"
+#include "frc/DigitalSource.h"
+#include "frc/DutyCycle.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
@@ -108,5 +109,6 @@ void DutyCycleEncoder::InitSendable(SendableBuilder& builder) {
   builder.AddDoubleProperty("Distance", [this] { return this->GetDistance(); },
                             nullptr);
   builder.AddDoubleProperty("Distance Per Rotation",
-                            [this] { return this->GetDistancePerRotation(); }, nullptr);
+                            [this] { return this->GetDistancePerRotation(); },
+                            nullptr);
 }
