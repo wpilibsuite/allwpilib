@@ -48,14 +48,15 @@ public class ArmFeedforward {
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
-   * @param velocity     The velocity setpoint.
-   * @param acceleration The acceleration setpoint.
+   * @param velocityRadPerSec     The velocity setpoint.
+   * @param accelRadPerSecSquared The acceleration setpoint.
    * @return The computed feedforward.
    */
-  public double calculate(double positionRadians, double velocity,
-                          double acceleration) {
-    return m_ks * Math.signum(velocity) + m_kcos * Math.cos(positionRadians) + m_kv * velocity
-        + m_ka * acceleration;
+  public double calculate(double positionRadians, double velocityRadPerSec,
+                          double accelRadPerSecSquared) {
+    return m_ks * Math.signum(velocityRadPerSec) + m_kcos * Math.cos(positionRadians)
+        + m_kv * velocityRadPerSec
+        + m_ka * accelRadPerSecSquared;
   }
 
   /**
