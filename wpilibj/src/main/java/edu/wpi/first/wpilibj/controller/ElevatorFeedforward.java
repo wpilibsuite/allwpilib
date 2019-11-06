@@ -12,37 +12,37 @@ package edu.wpi.first.wpilibj.controller;
  * acting against the force of gravity).
  */
 public class ElevatorFeedforward {
-  private final double m_kS;
-  private final double m_kG;
-  private final double m_kV;
-  private final double m_kA;
+  private final double m_ks;
+  private final double m_kg;
+  private final double m_kv;
+  private final double m_ka;
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains.  Units of the gain values
    * will dictate units of the computed feedforward.
    *
-   * @param kS The static gain.
-   * @param kG The gravity gain.
-   * @param kV The velocity gain.
-   * @param kA The acceleration gain.
+   * @param ks The static gain.
+   * @param kg The gravity gain.
+   * @param kv The velocity gain.
+   * @param ka The acceleration gain.
    */
-  public ElevatorFeedforward(double kS, double kG, double kV, double kA) {
-    m_kS = kS;
-    m_kG = kG;
-    m_kV = kV;
-    m_kA = kA;
+  public ElevatorFeedforward(double ks, double kg, double kv, double ka) {
+    m_ks = ks;
+    m_kg = kg;
+    m_kv = kv;
+    m_ka = ka;
   }
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains.  Acceleration gain is
    * defaulted to zero.  Units of the gain values will dictate units of the computed feedforward.
    *
-   * @param kS The static gain.
-   * @param kG The gravity gain.
-   * @param kV The velocity gain.
+   * @param ks The static gain.
+   * @param kg The gravity gain.
+   * @param kv The velocity gain.
    */
-  public ElevatorFeedforward(double kS, double kG, double kV) {
-    this(kS, kG, kV, 0);
+  public ElevatorFeedforward(double ks, double kg, double kv) {
+    this(ks, kg, kv, 0);
   }
 
   /**
@@ -53,7 +53,7 @@ public class ElevatorFeedforward {
    * @return The computed feedforward.
    */
   public double calculate(double velocity, double acceleration) {
-    return m_kS * Math.signum(velocity) + m_kG + m_kV * velocity + m_kA * acceleration;
+    return m_ks * Math.signum(velocity) + m_kg + m_kv * velocity + m_ka * acceleration;
   }
 
   /**

@@ -11,33 +11,33 @@ package edu.wpi.first.wpilibj.controller;
  * A helper class that computes feedforward outputs for a simple permanent-magnet DC motor.
  */
 public class SimpleMotorFeedforward {
-  private final double m_kS;
-  private final double m_kV;
-  private final double m_kA;
+  private final double m_ks;
+  private final double m_kv;
+  private final double m_ka;
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains.  Units of the gain values
    * will dictate units of the computed feedforward.
    *
-   * @param kS The static gain.
-   * @param kV The velocity gain.
-   * @param kA The acceleration gain.
+   * @param ks The static gain.
+   * @param kv The velocity gain.
+   * @param ka The acceleration gain.
    */
-  public SimpleMotorFeedforward(double kS, double kV, double kA) {
-    m_kS = kS;
-    m_kV = kV;
-    m_kA = kA;
+  public SimpleMotorFeedforward(double ks, double kv, double ka) {
+    m_ks = ks;
+    m_kv = kv;
+    m_ka = ka;
   }
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains.  Acceleration gain is
    * defaulted to zero.  Units of the gain values will dictate units of the computed feedforward.
    *
-   * @param kS The static gain.
-   * @param kV The velocity gain.
+   * @param ks The static gain.
+   * @param kv The velocity gain.
    */
-  public SimpleMotorFeedforward(double kS, double kV) {
-    this(kS, kV, 0);
+  public SimpleMotorFeedforward(double ks, double kv) {
+    this(ks, kv, 0);
   }
 
   /**
@@ -48,7 +48,7 @@ public class SimpleMotorFeedforward {
    * @return The computed feedforward.
    */
   public double calculate(double velocity, double acceleration) {
-    return m_kS * Math.signum(velocity) + m_kV * velocity + m_kA * acceleration;
+    return m_ks * Math.signum(velocity) + m_kv * velocity + m_ka * acceleration;
   }
 
   /**

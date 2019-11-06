@@ -12,37 +12,37 @@ package edu.wpi.first.wpilibj.controller;
  * acting against the force of gravity on a beam suspended at an angle).
  */
 public class ArmFeedforward {
-  private final double m_kS;
-  private final double m_kCos;
-  private final double m_kV;
-  private final double m_kA;
+  private final double m_ks;
+  private final double m_kcos;
+  private final double m_kv;
+  private final double m_ka;
 
   /**
    * Creates a new ArmFeedforward with the specified gains.  Units of the gain values
    * will dictate units of the computed feedforward.
    *
-   * @param kS   The static gain.
-   * @param kCos The gravity gain.
-   * @param kV   The velocity gain.
-   * @param kA   The acceleration gain.
+   * @param ks   The static gain.
+   * @param kcos The gravity gain.
+   * @param kv   The velocity gain.
+   * @param ka   The acceleration gain.
    */
-  public ArmFeedforward(double kS, double kCos, double kV, double kA) {
-    m_kS = kS;
-    m_kCos = kCos;
-    m_kV = kV;
-    m_kA = kA;
+  public ArmFeedforward(double ks, double kcos, double kv, double ka) {
+    m_ks = ks;
+    m_kcos = kcos;
+    m_kv = kv;
+    m_ka = ka;
   }
 
   /**
    * Creates a new ArmFeedforward with the specified gains.  Acceleration gain is
    * defaulted to zero.  Units of the gain values will dictate units of the computed feedforward.
    *
-   * @param kS   The static gain.
-   * @param kCos The gravity gain.
-   * @param kV   The velocity gain.
+   * @param ks   The static gain.
+   * @param kcos The gravity gain.
+   * @param kv   The velocity gain.
    */
-  public ArmFeedforward(double kS, double kCos, double kV) {
-    this(kS, kCos, kV, 0);
+  public ArmFeedforward(double ks, double kcos, double kv) {
+    this(ks, kcos, kv, 0);
   }
 
   /**
@@ -54,8 +54,8 @@ public class ArmFeedforward {
    */
   public double calculate(double positionRadians, double velocity,
                           double acceleration) {
-    return m_kS * Math.signum(velocity) + m_kCos * Math.cos(positionRadians) + m_kV * velocity
-        + m_kA * acceleration;
+    return m_ks * Math.signum(velocity) + m_kcos * Math.cos(positionRadians) + m_kv * velocity
+        + m_ka * acceleration;
   }
 
   /**
