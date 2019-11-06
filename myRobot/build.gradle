@@ -97,8 +97,8 @@ model {
                 }
             }
             binaries.all { binary ->
-                    lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
-                    lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                    lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'static'
+                    lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'static'
                     lib project: ':cscore', library: 'cscore', linkage: 'static'
