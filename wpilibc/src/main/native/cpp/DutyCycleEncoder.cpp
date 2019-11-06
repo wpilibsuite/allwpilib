@@ -90,7 +90,7 @@ int DutyCycleEncoder::GetFrequency() const {
 
 void DutyCycleEncoder::Reset() {
   m_counter.Reset();
-  m_positionOffset = m_dutyCycle->GetOutput();
+  m_positionOffset = GetPositionInRotation();
 }
 
 bool DutyCycleEncoder::IsConnected() const {
@@ -105,8 +105,6 @@ void DutyCycleEncoder::SetConnectedFrequencyThreshold(int frequency) {
 
 void DutyCycleEncoder::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder");
-  builder.AddBooleanProperty("Connected",
-                             [this] { return this->IsConnected(); }, nullptr);
   builder.AddDoubleProperty("Distance", [this] { return this->GetDistance(); },
                             nullptr);
   builder.AddDoubleProperty("Distance Per Rotation",
