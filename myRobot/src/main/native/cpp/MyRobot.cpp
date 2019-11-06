@@ -5,29 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <frc/DigitalInput.h>
-#include <frc/DigitalOutput.h>
-#include <frc/DutyCycle.h>
-#include <frc/DutyCycleEncoder.h>
 #include <frc/TimedRobot.h>
-#include <frc/smartdashboard/SmartDashboard.h>
 
 class MyRobot : public frc::TimedRobot {
-  frc::DigitalInput di{0};
-  frc::DutyCycle dc{di};
-  frc::DutyCycleEncoder dce{dc};
-  frc::DigitalOutput digO{1};
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
-  void RobotInit() override {
-    digO.SetPWMRate(500);
-    digO.EnablePWM(0.5);
-    digO.UpdateDutyCycle(0.75);
-
-    frc::SmartDashboard::PutNumber("DC", 0.75);
-  }
+  void RobotInit() override {}
 
   /**
    * This function is run once each time the robot enters autonomous mode
@@ -57,12 +42,7 @@ class MyRobot : public frc::TimedRobot {
   /**
    * This function is called periodically during all modes
    */
-  void RobotPeriodic() override {
-    double val = frc::SmartDashboard::GetNumber("DC", 0.5);
-    if (val < 0) val = 0;
-    if (val > 1) val = 1;
-    digO.UpdateDutyCycle(val);
-  }
+  void RobotPeriodic() override {}
 };
 
 int main() { return frc::StartRobot<MyRobot>(); }
