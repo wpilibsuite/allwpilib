@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include <frc/ErrorBase.h>
-
+#include <initializer_list>
 #include <memory>
-#include <set>
 #include <vector>
 
-#include "CommandBase.h"
+#include <wpi/ArrayRef.h>
+
+#include "frc2/command/CommandBase.h"
 
 namespace frc2 {
 

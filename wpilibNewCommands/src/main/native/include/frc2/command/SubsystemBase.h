@@ -7,12 +7,12 @@
 
 #pragma once
 
+#include <string>
+
 #include <frc/smartdashboard/Sendable.h>
 #include <frc/smartdashboard/SendableHelper.h>
 
-#include <string>
-
-#include "Subsystem.h"
+#include "frc2/command/Subsystem.h"
 
 namespace frc2 {
 /**

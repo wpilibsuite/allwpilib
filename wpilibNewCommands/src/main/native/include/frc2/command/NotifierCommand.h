@@ -7,12 +7,14 @@
 
 #pragma once
 
-#include <frc/Notifier.h>
+#include <functional>
+#include <initializer_list>
 
+#include <frc/Notifier.h>
 #include <units/units.h>
 
-#include "CommandBase.h"
-#include "CommandHelper.h"
+#include "frc2/command/CommandBase.h"
+#include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**

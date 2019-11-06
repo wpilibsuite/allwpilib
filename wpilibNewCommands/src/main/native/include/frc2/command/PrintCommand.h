@@ -8,10 +8,9 @@
 #pragma once
 
 #include <wpi/Twine.h>
-#include <wpi/raw_ostream.h>
 
-#include "CommandHelper.h"
-#include "InstantCommand.h"
+#include "frc2/command/CommandHelper.h"
+#include "frc2/command/InstantCommand.h"
 
 namespace frc2 {
 /**

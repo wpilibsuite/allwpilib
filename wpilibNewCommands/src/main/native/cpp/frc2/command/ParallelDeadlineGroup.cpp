@@ -67,7 +67,7 @@ void ParallelDeadlineGroup::AddCommands(
       command->SetGrouped(true);
       AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
-      m_commands[std::move(command)] = false;
+      m_commands.emplace_back(std::move(command), false);
     } else {
       wpi_setWPIErrorWithContext(CommandIllegalUse,
                                  "Multiple commands in a parallel group cannot "
@@ -80,7 +80,7 @@ void ParallelDeadlineGroup::AddCommands(
 void ParallelDeadlineGroup::SetDeadline(std::unique_ptr<Command>&& deadline) {
   m_deadline = deadline.get();
   m_deadline->SetGrouped(true);
-  m_commands[std::move(deadline)] = false;
+  m_commands.emplace_back(std::move(deadline), false);
   AddRequirements(m_deadline->GetRequirements());
   m_runWhenDisabled &= m_deadline->RunsWhenDisabled();
 }
