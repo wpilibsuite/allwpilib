@@ -78,7 +78,7 @@ double DutyCycle::GetOutput() const {
 
 unsigned int DutyCycle::GetOutputRaw() const {
   int32_t status = 0;
-  auto retVal = HAL_GetDutyCycleOutput(m_handle, &status);
+  auto retVal = HAL_GetDutyCycleOutputRaw(m_handle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
