@@ -74,7 +74,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    */
   RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
                  frc::RamseteController controller,
-                 frc::SimpleMotorFeedforward<units::meters_per_second_t> feedforward,
+                 frc::SimpleMotorFeedforward<units::meters> feedforward,
                  frc::DifferentialDriveKinematics kinematics,
                  std::function<units::meters_per_second_t()> leftSpeed,
                  std::function<units::meters_per_second_t()> rightSpeed,
@@ -119,7 +119,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
   frc::Trajectory m_trajectory;
   std::function<frc::Pose2d()> m_pose;
   frc::RamseteController m_controller;
-  frc::SimpleMotorFeedforward<units::meters_per_second_t> m_feedforward;
+  frc::SimpleMotorFeedforward<units::meters> m_feedforward;
   frc::DifferentialDriveKinematics m_kinematics;
   std::function<units::meters_per_second_t()> m_leftSpeed;
   std::function<units::meters_per_second_t()> m_rightSpeed;

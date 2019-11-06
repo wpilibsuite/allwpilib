@@ -8,34 +8,34 @@
 #pragma once
 
 #include <units/units.h>
-#include <wpi/MathExtras.h>
 
 namespace frc {
-template <class Distance>
-class SimpleMotorFeedforward {
-  using Velocity =
-      units::compound_unit<Distance, units::inverse<units::seconds>>;
-  using Acceleration =
-      units::compound_unit<Velocity, units::inverse<units::seconds>>;
-  using kv_unit = units::compound_unit<units::volts, units::inverse<Velocity>>;
+class ArmFeedforward {
+  using Angle = units::radians;
+  using Velocity = units::radians_per_second;
+  using Acceleration = units::compound_unit<units::radians_per_second,
+                                            units::inverse<units::second>>;
+  using kv_unit =
+      units::compound_unit<units::volts,
+                           units::inverse<units::radians_per_second>>;
   using ka_unit =
       units::compound_unit<units::volts, units::inverse<Acceleration>>;
 
  public:
-  SimpleMotorFeedforward() = default;
+  ArmFeedforward() = default;
 
-  SimpleMotorFeedforward(units::volt_t kS, units::unit_t<kv_unit> kV,
-                         units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
-      : m_kS(kS), m_kV(kV), m_kA(kA) {}
+  ArmFeedforward(units::volt_t kS, units::volt_t kCos,
+                 units::unit_t<kv_unit> kV,
+                 units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0));
 
-  units::volt_t Calculate(units::unit_t<Velocity> velocity,
+  units::volt_t Calculate(units::unit_t<Angle> angle,
+                          units::unit_t<Velocity> velocity,
                           units::unit_t<Acceleration> acceleration =
-                              units::unit_t<Acceleration>(0)) {
-    return m_kS * wpi::sgn(velocity) + m_kV * velocity + m_kA * acceleration;
-  }
+                              units::unit_t<Acceleration>(0));
 
  private:
   units::volt_t m_kS{0};
+  units::volt_t m_kCos{0};
   units::unit_t<kv_unit> m_kV{0};
   units::unit_t<ka_unit> m_kA{0};
 };

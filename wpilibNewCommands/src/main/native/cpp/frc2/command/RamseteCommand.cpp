@@ -13,7 +13,7 @@ using namespace units;
 RamseteCommand::RamseteCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::RamseteController controller,
-    frc::SimpleMotorFeedforward<units::meters_per_second_t> feedforward,
+    frc::SimpleMotorFeedforward<units::meters> feedforward,
     frc::DifferentialDriveKinematics kinematics,
     std::function<units::meters_per_second_t()> leftSpeed,
     std::function<units::meters_per_second_t()> rightSpeed,

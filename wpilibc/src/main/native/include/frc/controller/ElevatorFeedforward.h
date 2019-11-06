@@ -12,7 +12,7 @@
 
 namespace frc {
 template <class Distance>
-class SimpleMotorFeedforward {
+class ElevatorFeedforward {
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
   using Acceleration =
@@ -22,20 +22,23 @@ class SimpleMotorFeedforward {
       units::compound_unit<units::volts, units::inverse<Acceleration>>;
 
  public:
-  SimpleMotorFeedforward() = default;
+  ElevatorFeedforward() = default;
 
-  SimpleMotorFeedforward(units::volt_t kS, units::unit_t<kv_unit> kV,
-                         units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
-      : m_kS(kS), m_kV(kV), m_kA(kA) {}
+  ElevatorFeedforward(units::volt_t kS, units::volt_t kG,
+                      units::unit_t<kv_unit> kV,
+                      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
+      : m_kS(kS), m_kG(kG), m_kV(kV), m_kA(kA) {}
 
   units::volt_t Calculate(units::unit_t<Velocity> velocity,
                           units::unit_t<Acceleration> acceleration =
                               units::unit_t<Acceleration>(0)) {
-    return m_kS * wpi::sgn(velocity) + m_kV * velocity + m_kA * acceleration;
+    return m_kS * wpi::sgn(velocity) + m_kG + m_kV * velocity +
+           m_kA * acceleration;
   }
 
  private:
   units::volt_t m_kS{0};
+  units::volt_t m_kG{0};
   units::unit_t<kv_unit> m_kV{0};
   units::unit_t<ka_unit> m_kA{0};
 };
