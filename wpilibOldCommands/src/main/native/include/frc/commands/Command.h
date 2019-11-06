@@ -388,6 +388,7 @@ class Command : public ErrorBase,
 
   friend class ConditionalCommand;
 
+ public:
   /**
    * Gets the name of this Command.
    *
