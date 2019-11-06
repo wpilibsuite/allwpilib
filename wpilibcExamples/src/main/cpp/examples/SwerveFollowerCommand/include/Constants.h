@@ -60,12 +60,6 @@ constexpr auto kTrackWidth =
 constexpr auto kTrackLength =
     .7_m;  // Distance between centers of front and back wheels on robot
 
-frc::SwerveDriveKinematics<4> kDriveKinematics{
-    frc::Translation2d(kTrackLength / 2, kTrackWidth / 2),
-    frc::Translation2d(kTrackLength / 2, -kTrackWidth / 2),
-    frc::Translation2d(-kTrackLength / 2, kTrackWidth / 2),
-    frc::Translation2d(-kTrackLength / 2, -kTrackWidth / 2)};
-
 constexpr bool kGyroReversed = false;
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!

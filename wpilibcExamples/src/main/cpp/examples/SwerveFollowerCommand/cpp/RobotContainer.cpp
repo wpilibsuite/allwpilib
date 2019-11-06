@@ -32,11 +32,9 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-        m_drive.Drive(units::meters_per_second_t(
-                          m_driverController.GetY(frc::GenericHID::kLeftHand)),
-                      units::meters_per_second_t((frc::GenericHID::kRightHand)),
-                      units::radians_per_second_t(
-                          m_driverController.GetX(frc::GenericHID::kLeftHand)),
+        m_drive.Drive(units::meters_per_second_t(m_driverController.GetY(frc::GenericHID::kLeftHand)),
+                      units::meters_per_second_t(m_driverController.GetY(frc::GenericHID::kRightHand)),
+                      units::radians_per_second_t(m_driverController.GetX(frc::GenericHID::kLeftHand)),
                       false);
       },
       {&m_drive}));
@@ -49,7 +47,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);
   // Add kinematics to ensure max speed is actually obeyed
-  config.SetKinematics(kDriveKinematics);
+  config.SetKinematics(m_drive.kDriveKinematics);
 
   // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
@@ -65,7 +63,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   frc2::SwerveFollowerCommand<4> swerveFollowerCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
-      kDriveKinematics,
+      m_drive.kDriveKinematics,
 
       frc2::PIDController(AutoConstants::kPXController, 0, 0),
       frc2::PIDController(AutoConstants::kPYController, 0, 0),
