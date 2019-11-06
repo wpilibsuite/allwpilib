@@ -65,7 +65,8 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
       frc::RamseteController(AutoConstants::kRamseteB,
                              AutoConstants::kRamseteZeta),
-      DriveConstants::ks, DriveConstants::kv, DriveConstants::ka,
+      frc::SimpleMotorFeedforward<units::meters_per_second_t>(
+          DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
       DriveConstants::kDriveKinematics,
       [this] {
         return units::meters_per_second_t(m_drive.GetLeftEncoder().GetRate());

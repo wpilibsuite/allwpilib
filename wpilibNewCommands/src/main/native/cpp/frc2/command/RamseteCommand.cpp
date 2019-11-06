@@ -10,16 +10,10 @@
 using namespace frc2;
 using namespace units;
 
-template <typename T>
-int sgn(T val) {
-  return (T(0) < val) - (val < T(0));
-}
-
 RamseteCommand::RamseteCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-    frc::RamseteController controller, volt_t ks,
-    units::unit_t<voltsecondspermeter> kv,
-    units::unit_t<voltsecondssquaredpermeter> ka,
+    frc::RamseteController controller,
+    frc::SimpleMotorFeedforward<units::meters_per_second_t> feedforward,
     frc::DifferentialDriveKinematics kinematics,
     std::function<units::meters_per_second_t()> leftSpeed,
     std::function<units::meters_per_second_t()> rightSpeed,
@@ -29,9 +23,7 @@ RamseteCommand::RamseteCommand(
     : m_trajectory(trajectory),
       m_pose(pose),
       m_controller(controller),
-      m_ks(ks),
-      m_kv(kv),
-      m_ka(ka),
+      m_feedforward(feedforward),
       m_kinematics(kinematics),
       m_leftSpeed(leftSpeed),
       m_rightSpeed(rightSpeed),
@@ -52,9 +44,6 @@ RamseteCommand::RamseteCommand(
     : m_trajectory(trajectory),
       m_pose(pose),
       m_controller(controller),
-      m_ks(0),
-      m_kv(0),
-      m_ka(0),
       m_kinematics(kinematics),
       m_outputVel(output),
       m_usePID(false) {
@@ -84,12 +73,12 @@ void RamseteCommand::Execute() {
 
   if (m_usePID) {
     auto leftFeedforward =
-        m_ks * sgn(targetWheelSpeeds.left) + m_kv * targetWheelSpeeds.left +
-        m_ka * (targetWheelSpeeds.left - m_prevSpeeds.left) / dt;
+        m_feedforward.Calculate(targetWheelSpeeds.left,
+            (targetWheelSpeeds.left - m_prevSpeeds.left) / dt);
 
     auto rightFeedforward =
-        m_ks * sgn(targetWheelSpeeds.right) + m_kv * targetWheelSpeeds.right +
-        m_ka * (targetWheelSpeeds.right - m_prevSpeeds.right) / dt;
+        m_feedforward.Calculate(targetWheelSpeeds.right,
+            (targetWheelSpeeds.right - m_prevSpeeds.right) / dt);
 
     auto leftOutput =
         volt_t(m_leftController->Calculate(
