@@ -393,5 +393,33 @@
     "foldername": "ramsetecommand",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "MecanumFollowerCommand",
+    "description": "An example command-based robot demonstrating the use of a MecanumFollowerCommand to follow a pregenerated trajectory.",
+    "tags": [
+      "MecanumFollowerCommand",
+      "Mecanum",
+      "PID",
+      "Trajectory",
+      "Path following"
+    ],
+    "foldername": "mecanumfollowercommand",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "SwerveFollowerCommand",
+    "description": "An example command-based robot demonstrating the use of a SwerveFollowerCommand to follow a pregenerated trajectory.",
+    "tags": [
+      "SwerveFollowerCommand",
+      "Swerve",
+      "PID",
+      "Trajectory",
+      "Path following"
+    ],
+    "foldername": "swervefollowercommand",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
