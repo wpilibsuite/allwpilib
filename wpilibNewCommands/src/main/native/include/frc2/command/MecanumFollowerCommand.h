@@ -121,7 +121,8 @@ class MecanumFollowerCommand
    * right wheel speeds.
    * @param requirements          The subsystems to require.
    */
-  MecanumFollowerCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+  MecanumFollowerCommand(
+      frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
       frc2::PIDController yController,
       frc::ProfiledPIDController thetaController,
