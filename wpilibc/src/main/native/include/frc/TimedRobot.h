@@ -35,6 +35,11 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
   void StartCompetition() override;
 
   /**
+   * Ends the main loop in StartCompetition().
+   */
+  void EndCompetition() override;
+
+  /**
    * Get the time period between calls to Periodic() functions.
    */
   units::second_t GetPeriod() const;

@@ -394,6 +394,11 @@ class DriverStation : public ErrorBase {
    */
   void InTest(bool entering) { m_userInTest = entering; }
 
+  /**
+   * Forces WaitForData() to return immediately.
+   */
+  void WakeupWaitForData();
+
  protected:
   /**
    * Copy data from the DS task for the user.

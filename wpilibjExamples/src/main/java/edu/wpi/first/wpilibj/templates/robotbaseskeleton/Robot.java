@@ -33,6 +33,8 @@ public class Robot extends RobotBase {
   public void test() {
   }
 
+  private volatile boolean m_exit;
+
   @SuppressWarnings("PMD.CyclomaticComplexity")
   @Override
   public void startCompetition() {
@@ -41,7 +43,7 @@ public class Robot extends RobotBase {
     // Tell the DS that the robot is ready to be enabled
     HAL.observeUserProgramStarting();
 
-    while (!Thread.currentThread().isInterrupted()) {
+    while (!Thread.currentThread().isInterrupted() && !m_exit) {
       if (isDisabled()) {
         m_ds.InDisabled(true);
         disabled();
@@ -76,5 +78,10 @@ public class Robot extends RobotBase {
         }
       }
     }
+  }
+
+  @Override
+  public void endCompetition() {
+    m_exit = true;
   }
 }
