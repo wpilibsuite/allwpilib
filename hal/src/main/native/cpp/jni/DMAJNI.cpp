@@ -208,10 +208,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_stopDMA
 /*
  * Class:     edu_wpi_first_hal_DMAJNI
  * Method:    readDMA
- * Signature: (II[I)J
+ * Signature: (II[I[I])J
  */
 JNIEXPORT jlong JNICALL Java_edu_wpi_first_hal_DMAJNI_readDMA
-  (JNIEnv * env, jclass, jint handle, jint timeoutMs, jintArray arr) {
+  (JNIEnv * env, jclass, jint handle, jint timeoutMs, jintArray buf, jintArray store) {
                     int32_t status = 0;
     HAL_DMASample dmaSample;
     int32_t remaining = 0;
@@ -220,11 +220,16 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_hal_DMAJNI_readDMA
 
     static_assert(sizeof(uint32_t) == sizeof(jint), "Java ints must be 32 bits");
 
-    uint32_t* nativeArr = static_cast<uint32_t*>(env->GetPrimitiveArrayCritical(arr, nullptr));
+    env->SetIntArrayRegion(buf, 0, dmaSample.captureSize, dmaSample.readBuffer);
 
-    env->ReleasePrimitiveArrayCritical(arr, nativeArr, JNI_ABORT);
+    int32_t* nativeArr = static_cast<int32_t*>(env->GetPrimitiveArrayCritical(store, nullptr));
 
+    std::copy_n(dmaSample.channelOffsets, sizeof(dmaSample.channelOffsets) / sizeof(dmaSample.channelOffsets[0]), nativeArr);
+    nativeArr[22] = static_cast<int32_t>(dmaSample.captureSize);
+    nativeArr[23] = static_cast<int32_t>(dmaSample.triggerChannels);
+    nativeArr[24] = remaining;
 
+    env->ReleasePrimitiveArrayCritical(store, nativeArr, JNI_ABORT);
 
     return dmaSample.timeStamp;
   }

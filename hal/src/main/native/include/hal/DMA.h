@@ -118,9 +118,6 @@ int64_t HAL_GetDMASampleAnalogAccumulatorCount(const HAL_DMASample* dmaSample,
 int32_t HAL_GetDMASampleDutyCycleOutput(const HAL_DMASample* dmaSample,
                                         HAL_DutyCycleHandle dutyCycleHandle,
                                         int32_t* status);
-int32_t HAL_GetDMASampleDutyCycleFrequency(const HAL_DMASample* dmaSample,
-                                           HAL_DutyCycleHandle dutyCycleHandle,
-                                           int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

@@ -497,7 +497,7 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
   int index = 0;
   auto triggerChannels = dma->captureStore.triggerChannels;
   do {
-    if ((triggerChannels >> index) & 0x1 == 0) {
+    if (((triggerChannels >> index) & 0x1) == 0) {
       break;
     }
     index++;
@@ -980,7 +980,7 @@ int64_t HAL_GetDMASampleAnalogAccumulatorValue(const HAL_DMASample* dmaSample,
     return 0xFFFFFFFF;
   }
 
-  return static_cast<int64_t>(dmaWordHigh) << 32 | dmaWord;
+  return static_cast<int64_t>(dmaWord) << 32 | dmaWordHigh;
 }
 
 int32_t HAL_GetDMASampleDutyCycleOutput(const HAL_DMASample* dmaSample,
@@ -1010,37 +1010,6 @@ int32_t HAL_GetDMASampleDutyCycleOutput(const HAL_DMASample* dmaSample,
   if (*status != 0) {
     return -1;
   }
-  return (dmaWord >> 16) & 0xff;
+  return dmaWord;
 }
-
-int32_t HAL_GetDMASampleDutyCycleFrequency(const HAL_DMASample* dmaSample,
-                                           HAL_DutyCycleHandle dutyCycleHandle,
-                                           int32_t* status) {
-  if (getHandleType(dutyCycleHandle) != HAL_HandleEnum::DutyCycle) {
-    *status = HAL_HANDLE_ERROR;
-    return -1;
-  }
-
-  int32_t index = getHandleIndex(dutyCycleHandle);
-  if (index < 0) {
-    *status = HAL_HANDLE_ERROR;
-    return -1;
-  }
-
-  uint32_t dmaWord = 0;
-  *status = 0;
-  if (index < 4) {
-    dmaWord = ReadDMAValue(*dmaSample, kEnable_DutyCycle_Low, index, status);
-  } else if (index < 8) {
-    dmaWord =
-        ReadDMAValue(*dmaSample, kEnable_DutyCycle_High, index - 4, status);
-  } else {
-    *status = NiFpga_Status_ResourceNotFound;
-  }
-  if (*status != 0) {
-    return -1;
-  }
-  return dmaWord & 0xFFFF;
-}
-
 }  // extern "C"
