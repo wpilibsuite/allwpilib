@@ -67,6 +67,8 @@ model {
                     binary.buildable = false
                     return
                 }
+                lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
+                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
@@ -92,6 +94,8 @@ model {
             "${key}"(NativeExecutableSpec) {
                 targetBuildTypes 'debug'
                 binaries.all { binary ->
+                    lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
+                    lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
@@ -134,6 +138,8 @@ model {
             "${key}"(NativeExecutableSpec) {
                 targetBuildTypes 'debug'
                 binaries.all { binary ->
+                    lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
+                    lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
@@ -234,4 +240,7 @@ ext {
     commandFile = new File("$projectDir/src/main/cpp/commands/commands.json")
 }
 
+ext {
+    isCppCommands = true
+}
 apply from: "${rootDir}/shared/examplecheck.gradle"

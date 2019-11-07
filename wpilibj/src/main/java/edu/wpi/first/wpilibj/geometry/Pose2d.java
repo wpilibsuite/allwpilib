@@ -7,11 +7,25 @@
 
 package edu.wpi.first.wpilibj.geometry;
 
+import java.io.IOException;
 import java.util.Objects;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
  * Represents a 2d pose containing translational and rotational elements.
  */
+@JsonSerialize(using = Pose2d.PoseSerializer.class)
+@JsonDeserialize(using = Pose2d.PoseDeserializer.class)
 public class Pose2d {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
@@ -196,6 +210,11 @@ public class Pose2d {
     return new Twist2d(translationPart.getX(), translationPart.getY(), dtheta);
   }
 
+  @Override
+  public String toString() {
+    return String.format("Pose2d(%s, %s)", m_translation, m_rotation);
+  }
+
   /**
    * Checks equality between this Pose2d and another object.
    *
@@ -214,5 +233,39 @@ public class Pose2d {
   @Override
   public int hashCode() {
     return Objects.hash(m_translation, m_rotation);
+  }
+
+  static class PoseSerializer extends StdSerializer<Pose2d> {
+    PoseSerializer() {
+      super(Pose2d.class);
+    }
+
+    @Override
+    public void serialize(
+            Pose2d value, JsonGenerator jgen, SerializerProvider provider)
+            throws IOException, JsonProcessingException {
+
+      jgen.writeStartObject();
+      jgen.writeObjectField("translation", value.m_translation);
+      jgen.writeObjectField("rotation", value.m_rotation);
+      jgen.writeEndObject();
+    }
+  }
+
+  static class PoseDeserializer extends StdDeserializer<Pose2d> {
+    PoseDeserializer() {
+      super(Pose2d.class);
+    }
+
+    @Override
+    public Pose2d deserialize(JsonParser jp, DeserializationContext ctxt)
+            throws IOException, JsonProcessingException {
+      JsonNode node = jp.getCodec().readTree(jp);
+
+      Translation2d translation =
+              jp.getCodec().treeToValue(node.get("translation"), Translation2d.class);
+      Rotation2d rotation = jp.getCodec().treeToValue(node.get("rotation"), Rotation2d.class);
+      return new Pose2d(translation, rotation);
+    }
   }
 }

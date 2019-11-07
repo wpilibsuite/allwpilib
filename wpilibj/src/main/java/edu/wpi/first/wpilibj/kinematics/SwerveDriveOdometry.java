@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.kinematics;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
@@ -113,6 +114,6 @@ public class SwerveDriveOdometry {
    * @return The new pose of the robot.
    */
   public Pose2d update(Rotation2d angle, SwerveModuleState... moduleStates) {
-    return updateWithTime(System.currentTimeMillis() / 1000.0, angle, moduleStates);
+    return updateWithTime(Timer.getFPGATimestamp(), angle, moduleStates);
   }
 }

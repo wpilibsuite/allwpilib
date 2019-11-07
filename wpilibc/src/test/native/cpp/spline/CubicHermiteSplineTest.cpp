@@ -29,8 +29,12 @@ class CubicHermiteSplineTest : public ::testing::Test {
     const auto start = std::chrono::high_resolution_clock::now();
 
     // Generate and parameterize the spline.
+
+    const auto [startCV, endCV] =
+        SplineHelper::CubicControlVectorsFromWaypoints(a, waypoints, b);
+
     const auto splines =
-        SplineHelper::CubicSplinesFromWaypoints(a, waypoints, b);
+        SplineHelper::CubicSplinesFromControlVectors(startCV, waypoints, endCV);
     std::vector<Spline<3>::PoseWithCurvature> poses;
 
     poses.push_back(splines[0].GetPoint(0.0));
@@ -69,6 +73,22 @@ class CubicHermiteSplineTest : public ::testing::Test {
     EXPECT_NEAR(poses.front().first.Rotation().Radians().to<double>(),
                 a.Rotation().Radians().to<double>(), 1E-9);
 
+    // Check interior waypoints
+    bool interiorsGood = true;
+    for (auto& waypoint : waypoints) {
+      bool found = false;
+      for (auto& state : poses) {
+        if (std::abs(
+                waypoint.Distance(state.first.Translation()).to<double>()) <
+            1E-9) {
+          found = true;
+        }
+      }
+      interiorsGood &= found;
+    }
+
+    EXPECT_TRUE(interiorsGood);
+
     // Check last point.
     EXPECT_NEAR(poses.back().first.Translation().X().to<double>(),
                 b.Translation().X().to<double>(), 1E-9);
@@ -91,5 +111,12 @@ TEST_F(CubicHermiteSplineTest, SCurve) {
   std::vector<Translation2d> waypoints{Translation2d(1_m, 1_m),
                                        Translation2d(2_m, -1_m)};
   Pose2d end{3_m, 0_m, Rotation2d{90_deg}};
+  Run(start, waypoints, end);
+}
+
+TEST_F(CubicHermiteSplineTest, OneInterior) {
+  Pose2d start{0_m, 0_m, 0_rad};
+  std::vector<Translation2d> waypoints{Translation2d(2_m, 0_m)};
+  Pose2d end{4_m, 0_m, 0_rad};
   Run(start, waypoints, end);
 }

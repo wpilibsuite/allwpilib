@@ -25,6 +25,7 @@ import edu.wpi.first.hal.HAL;
 @Deprecated
 public class IterativeRobot extends IterativeRobotBase {
   private static final double kPacketPeriod = 0.02;
+  private volatile boolean m_exit;
 
   /**
    * Create a new IterativeRobot.
@@ -49,8 +50,20 @@ public class IterativeRobot extends IterativeRobotBase {
     while (!Thread.currentThread().isInterrupted()) {
       // Wait for new data to arrive
       m_ds.waitForData();
+      if (m_exit) {
+        break;
+      }
 
       loopFunc();
     }
+  }
+
+  /**
+   * Ends the main loop in startCompetition().
+   */
+  @Override
+  public void endCompetition() {
+    m_exit = true;
+    m_ds.wakeupWaitForData();
   }
 }

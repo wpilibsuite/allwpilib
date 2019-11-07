@@ -148,7 +148,7 @@ void AnalogGyro::InitGyro() {
     return;
   }
 
-  HAL_Report(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel() + 1);
 
   SendableRegistry::GetInstance().AddLW(this, "AnalogGyro",
                                         m_analog->GetChannel());

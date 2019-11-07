@@ -32,7 +32,7 @@ void Robot::StartCompetition() {
   // Tell the DS that the robot is ready to be enabled
   HAL_ObserveUserProgramStarting();
 
-  while (true) {
+  while (!m_exit) {
     if (IsDisabled()) {
       m_ds.InDisabled(true);
       Disabled();
@@ -60,6 +60,8 @@ void Robot::StartCompetition() {
     }
   }
 }
+
+void Robot::EndCompetition() { m_exit = true; }
 
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }

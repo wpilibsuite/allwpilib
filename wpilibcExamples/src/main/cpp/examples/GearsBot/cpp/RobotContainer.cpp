@@ -31,11 +31,9 @@ RobotContainer::RobotContainer()
   m_drivetrain.Log();
 
   m_drivetrain.SetDefaultCommand(TankDrive(
-      &m_drivetrain,
       [this] { return m_joy.GetY(frc::GenericHID::JoystickHand::kLeftHand); },
-      [this] {
-        return m_joy.GetY(frc::GenericHID::JoystickHand::kRightHand);
-      }));
+      [this] { return m_joy.GetY(frc::GenericHID::JoystickHand::kRightHand); },
+      &m_drivetrain));
 
   // Configure the button bindings
   ConfigureButtonBindings();

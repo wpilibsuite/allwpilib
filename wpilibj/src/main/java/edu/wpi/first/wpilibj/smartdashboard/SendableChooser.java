@@ -16,7 +16,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.command.Command;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
@@ -25,7 +24,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * {@link SmartDashboard}.
  *
  * <p>For instance, you may wish to be able to select between multiple autonomous modes. You can do
- * this by putting every possible {@link Command} you want to run as an autonomous into a {@link
+ * this by putting every possible Command you want to run as an autonomous into a {@link
  * SendableChooser} and then put it into the {@link SmartDashboard} to have a list of options appear
  * on the laptop. Once autonomous starts, simply ask the {@link SendableChooser} what the selected
  * value is.

@@ -194,6 +194,24 @@ int32_t HAL_GetMatchInfo(HAL_MatchInfo* info);
 void HAL_ReleaseDSMutex(void);
 
 /**
+ * Checks if new control data has arrived since the last
+ * HAL_WaitForCachedControlData or HAL_IsNewControlData call. If new data has
+ * not arrived, waits for new data to arrive. Otherwise, returns immediately.
+ */
+void HAL_WaitForCachedControlData(void);
+
+/**
+ * Checks if new control data has arrived since the last
+ * HAL_WaitForCachedControlData or HAL_IsNewControlData call. If new data has
+ * not arrived, waits for new data to arrive, or a timeout. Otherwise, returns
+ * immediately.
+ *
+ * @param timeout timeout in seconds
+ * @return        true for new data, false for timeout
+ */
+HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout);
+
+/**
  * Has a new control packet from the driver station arrived since the last
  * time this function was called?
  *

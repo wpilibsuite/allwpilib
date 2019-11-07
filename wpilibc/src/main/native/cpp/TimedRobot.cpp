@@ -43,6 +43,11 @@ void TimedRobot::StartCompetition() {
   }
 }
 
+void TimedRobot::EndCompetition() {
+  int32_t status = 0;
+  HAL_StopNotifier(m_notifier, &status);
+}
+
 units::second_t TimedRobot::GetPeriod() const {
   return units::second_t(m_period);
 }

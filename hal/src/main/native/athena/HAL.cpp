@@ -57,6 +57,7 @@ void InitializeHAL() {
   InitializeDigitalInternal();
   InitializeDIO();
   InitializeDMA();
+  InitializeDutyCycle();
   InitializeEncoder();
   InitializeFPGAEncoder();
   InitializeFRCDriverStation();
@@ -300,24 +301,6 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return !(watchdog->readStatus_PowerAlive(status));
 }
 
-void HAL_BaseInitialize(int32_t* status) {
-  static std::atomic_bool initialized{false};
-  static wpi::mutex initializeMutex;
-  // Initial check, as if it's true initialization has finished
-  if (initialized) return;
-
-  std::scoped_lock lock(initializeMutex);
-  // Second check in case another thread was waiting
-  if (initialized) return;
-  // image 4; Fixes errors caused by multiple processes. Talk to NI about this
-  nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
-      nLoadOut::kTargetClass_RoboRIO;
-
-  global.reset(tGlobal::create(status));
-  watchdog.reset(tSysWatchdog::create(status));
-  initialized = true;
-}
-
 static bool killExistingProgram(int timeout, int mode) {
   // Kill any previous robot programs
   std::fstream fs;
@@ -391,8 +374,14 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     setNewDataSem(nullptr);
   });
 
+  // image 4; Fixes errors caused by multiple processes. Talk to NI about this
+  nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
+      nLoadOut::kTargetClass_RoboRIO;
+
   int32_t status = 0;
-  HAL_BaseInitialize(&status);
+  global.reset(tGlobal::create(&status));
+  watchdog.reset(tSysWatchdog::create(&status));
+
   if (status != 0) return false;
 
   HAL_InitializeDriverStation();

@@ -17,14 +17,14 @@
  */
 class TankDrive : public frc2::CommandHelper<frc2::CommandBase, TankDrive> {
  public:
-  TankDrive(DriveTrain* drivetrain, std::function<double()> left,
-            std::function<double()> right);
+  TankDrive(std::function<double()> left, std::function<double()> right,
+            DriveTrain* drivetrain);
   void Execute() override;
   bool IsFinished() override;
   void End(bool interrupted) override;
 
  private:
-  DriveTrain* m_drivetrain;
   std::function<double()> m_left;
   std::function<double()> m_right;
+  DriveTrain* m_drivetrain;
 };

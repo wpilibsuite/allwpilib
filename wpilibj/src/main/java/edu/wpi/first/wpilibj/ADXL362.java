@@ -129,7 +129,7 @@ public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
     transferBuffer.put(2, (byte) (kPowerCtl_Measure | kPowerCtl_UltraLowNoise));
     m_spi.write(transferBuffer, 3);
 
-    HAL.report(tResourceType.kResourceType_ADXL362, port.value);
+    HAL.report(tResourceType.kResourceType_ADXL362, port.value + 1);
     SendableRegistry.addLW(this, "ADXL362", port.value);
   }
 

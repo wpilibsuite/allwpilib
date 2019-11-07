@@ -13,6 +13,10 @@
 
 #include "frc/geometry/Pose2d.h"
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 namespace frc {
 
 /**
@@ -46,6 +50,22 @@ class Trajectory {
 
     // The curvature at that point of the trajectory.
     curvature_t curvature{0.0};
+
+    /**
+     * Checks equality between this State and another object.
+     *
+     * @param other The other object.
+     * @return Whether the two objects are equal.
+     */
+    bool operator==(const State& other) const;
+
+    /**
+     * Checks inequality between this State and another object.
+     *
+     * @param other The other object.
+     * @return Whether the two objects are not equal.
+     */
+    bool operator!=(const State& other) const;
 
     /**
      * Interpolates between two States.
@@ -103,4 +123,9 @@ class Trajectory {
     return startValue + (endValue - startValue) * t;
   }
 };
+
+void to_json(wpi::json& json, const Trajectory::State& state);
+
+void from_json(const wpi::json& json, Trajectory::State& state);
+
 }  // namespace frc

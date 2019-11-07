@@ -7,7 +7,19 @@
 
 package edu.wpi.first.wpilibj.geometry;
 
+import java.io.IOException;
 import java.util.Objects;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
  * Represents a translation in 2d space.
@@ -17,6 +29,8 @@ import java.util.Objects;
  * When the robot is placed on the origin, facing toward the X direction,
  * moving forward increases the X, whereas moving to the left increases the Y.
  */
+@JsonSerialize(using = Translation2d.TranslationSerializer.class)
+@JsonDeserialize(using = Translation2d.TranslationDeserializer.class)
 @SuppressWarnings({"ParameterName", "MemberName"})
 public class Translation2d {
   private final double m_x;
@@ -165,6 +179,11 @@ public class Translation2d {
     return new Translation2d(m_x / scalar, m_y / scalar);
   }
 
+  @Override
+  public String toString() {
+    return String.format("Translation2d(X: %.2f, Y: %.2f)", m_x, m_y);
+  }
+
   /**
    * Checks equality between this Translation2d and another object.
    *
@@ -183,5 +202,38 @@ public class Translation2d {
   @Override
   public int hashCode() {
     return Objects.hash(m_x, m_y);
+  }
+
+  static class TranslationSerializer extends StdSerializer<Translation2d> {
+    TranslationSerializer() {
+      super(Translation2d.class);
+    }
+
+    @Override
+    public void serialize(
+            Translation2d value, JsonGenerator jgen, SerializerProvider provider)
+            throws IOException, JsonProcessingException {
+
+      jgen.writeStartObject();
+      jgen.writeNumberField("x", value.m_x);
+      jgen.writeNumberField("y", value.m_y);
+      jgen.writeEndObject();
+    }
+  }
+
+  static class TranslationDeserializer extends StdDeserializer<Translation2d> {
+    TranslationDeserializer() {
+      super(Translation2d.class);
+    }
+
+    @Override
+    public Translation2d deserialize(JsonParser jp, DeserializationContext ctxt)
+            throws IOException, JsonProcessingException {
+      JsonNode node = jp.getCodec().readTree(jp);
+      double xval = node.get("x").numberValue().doubleValue();
+      double yval = node.get("y").numberValue().doubleValue();
+
+      return new Translation2d(xval, yval);
+    }
   }
 }

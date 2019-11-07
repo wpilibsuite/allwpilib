@@ -31,6 +31,6 @@ PWMTalonSRX::PWMTalonSRX(int channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_PWMTalonSRX, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_PWMTalonSRX, GetChannel() + 1);
   SendableRegistry::GetInstance().SetName(this, "PWMTalonSRX", GetChannel());
 }

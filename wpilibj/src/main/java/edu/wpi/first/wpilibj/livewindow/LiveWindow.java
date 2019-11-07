@@ -11,7 +11,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 
@@ -64,17 +63,13 @@ public class LiveWindow {
       startLiveWindow = enabled;
       liveWindowEnabled = enabled;
       updateValues(); // Force table generation now to make sure everything is defined
-      Scheduler scheduler = Scheduler.getInstance();
       if (enabled) {
         System.out.println("Starting live window mode.");
-        scheduler.disable();
-        scheduler.removeAll();
       } else {
         System.out.println("stopping live window mode.");
         SendableRegistry.foreachLiveWindow(dataHandle, cbdata -> {
           cbdata.builder.stopLiveWindowMode();
         });
-        scheduler.enable();
       }
       enabledEntry.setBoolean(enabled);
     }

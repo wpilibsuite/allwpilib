@@ -48,6 +48,11 @@ public class Twist2d {
     this.dtheta = dtheta;
   }
 
+  @Override
+  public String toString() {
+    return String.format("Twist2d(dX: %.2f, dY: %.2f, dTheta: %.2f)", dx, dy, dtheta);
+  }
+
   /**
    * Checks equality between this Twist2d and another object.
    *

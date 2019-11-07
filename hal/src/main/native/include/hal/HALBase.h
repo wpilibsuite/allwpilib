@@ -78,16 +78,6 @@ HAL_Bool HAL_GetSystemActive(int32_t* status);
 HAL_Bool HAL_GetBrownedOut(int32_t* status);
 
 /**
- * The base HAL initialize function. Useful if you need to ensure the DS and
- * base HAL functions (the ones above this declaration in HAL.h) are properly
- * initialized. For normal programs and executables, please use HAL_Initialize.
- *
- * This is mainly expected to be use from libraries that are expected to be used
- * from LabVIEW, as it handles its own initialization for objects.
- */
-void HAL_BaseInitialize(int32_t* status);
-
-/**
  * Gets a port handle for a specific channel.
  *
  * The created handle does not need to be freed.

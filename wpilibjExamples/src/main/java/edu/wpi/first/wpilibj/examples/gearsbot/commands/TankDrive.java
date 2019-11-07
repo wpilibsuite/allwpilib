@@ -25,11 +25,11 @@ public class TankDrive extends CommandBase {
   /**
    * Creates a new TankDrive command.
    *
-   * @param drivetrain The drivetrain subsystem to drive
    * @param left       The control input for the left side of the drive
    * @param right      The control input for the right sight of the drive
+   * @param drivetrain The drivetrain subsystem to drive
    */
-  public TankDrive(DriveTrain drivetrain, DoubleSupplier left, DoubleSupplier right) {
+  public TankDrive(DoubleSupplier left, DoubleSupplier right, DriveTrain drivetrain) {
     m_drivetrain = drivetrain;
     m_left = left;
     m_right = right;

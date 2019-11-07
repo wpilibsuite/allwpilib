@@ -39,7 +39,7 @@ public class Compressor implements Sendable, AutoCloseable {
 
     m_compressorHandle = CompressorJNI.initializeCompressor((byte) module);
 
-    HAL.report(tResourceType.kResourceType_Compressor, module);
+    HAL.report(tResourceType.kResourceType_Compressor, module + 1);
     SendableRegistry.addLW(this, "Compressor", module);
   }
 

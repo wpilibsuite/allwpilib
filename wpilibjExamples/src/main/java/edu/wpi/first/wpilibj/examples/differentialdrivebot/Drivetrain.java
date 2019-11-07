@@ -35,7 +35,7 @@ public class Drivetrain {
   private final Spark m_rightFollower = new Spark(4);
 
   private final Encoder m_leftEncoder = new Encoder(0, 1);
-  private final Encoder m_rightEncoder = new Encoder(0, 1);
+  private final Encoder m_rightEncoder = new Encoder(2, 3);
 
   private final SpeedControllerGroup m_leftGroup
       = new SpeedControllerGroup(m_leftMaster, m_leftFollower);

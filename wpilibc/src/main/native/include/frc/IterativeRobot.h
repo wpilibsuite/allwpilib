@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+
+#include <atomic>
 
 #include "frc/IterativeRobotBase.h"
 
@@ -28,9 +30,6 @@ class IterativeRobot : public IterativeRobotBase {
   IterativeRobot();
   virtual ~IterativeRobot() = default;
 
-  IterativeRobot(IterativeRobot&&) = default;
-  IterativeRobot& operator=(IterativeRobot&&) = default;
-
   /**
    * Provide an alternate "main loop" via StartCompetition().
    *
@@ -38,6 +37,14 @@ class IterativeRobot : public IterativeRobotBase {
    * with the DS packets.
    */
   void StartCompetition() override;
+
+  /**
+   * Ends the main loop in StartCompetition().
+   */
+  void EndCompetition() override;
+
+ private:
+  std::atomic<bool> m_exit{false};
 };
 
 }  // namespace frc

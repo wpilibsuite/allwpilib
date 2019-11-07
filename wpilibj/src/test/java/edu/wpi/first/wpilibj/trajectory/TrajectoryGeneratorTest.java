@@ -23,9 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TrajectoryGeneratorTest {
-  static Trajectory getTrajectory(List<TrajectoryConstraint> constraints) {
-    final double startVelocity = 0;
-    final double endVelocity = 0;
+  static Trajectory getTrajectory(List<? extends TrajectoryConstraint> constraints) {
     final double maxVelocity = feetToMeters(12.0);
     final double maxAccel = feetToMeters(12);
 
@@ -45,15 +43,11 @@ class TrajectoryGeneratorTest {
             Rotation2d.fromDegrees(-90))));
     waypoints.add(crossScale);
 
-    return TrajectoryGenerator.generateTrajectory(
-        waypoints,
-        constraints,
-        startVelocity,
-        endVelocity,
-        maxVelocity,
-        maxAccel,
-        true
-    );
+    TrajectoryConfig config = new TrajectoryConfig(maxVelocity, maxAccel)
+        .setReversed(true)
+        .addConstraints(constraints);
+
+    return TrajectoryGenerator.generateTrajectory(waypoints, config);
   }
 
   @Test

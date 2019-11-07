@@ -41,7 +41,7 @@ DigitalOutput::DigitalOutput(int channel) {
     return;
   }
 
-  HAL_Report(HALUsageReporting::kResourceType_DigitalOutput, channel);
+  HAL_Report(HALUsageReporting::kResourceType_DigitalOutput, channel + 1);
   SendableRegistry::GetInstance().AddLW(this, "DigitalOutput", channel);
 }
 

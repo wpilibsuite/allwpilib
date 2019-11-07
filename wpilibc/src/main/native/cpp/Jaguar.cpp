@@ -27,6 +27,6 @@ Jaguar::Jaguar(int channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_Jaguar, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_Jaguar, GetChannel() + 1);
   SendableRegistry::GetInstance().SetName(this, "Jaguar", GetChannel());
 }
