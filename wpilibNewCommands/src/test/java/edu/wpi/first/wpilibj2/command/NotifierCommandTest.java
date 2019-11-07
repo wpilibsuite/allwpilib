@@ -13,7 +13,7 @@ import org.junit.jupiter.api.condition.OS;
 
 import edu.wpi.first.wpilibj.Timer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisabledOnOs(OS.MAC)
 class NotifierCommandTest extends CommandTestBase {
@@ -29,6 +29,7 @@ class NotifierCommandTest extends CommandTestBase {
     Timer.delay(.25);
     scheduler.cancel(command);
 
-    assertEquals(.25, 0.01 * counter.m_counter, .025);
+    assertTrue(counter.m_counter > 10, "Should have hit at least 10 triggers");
+    assertTrue(counter.m_counter < 100, "Shouldn't hit more then 100 triggers");
   }
 }
