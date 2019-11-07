@@ -236,10 +236,6 @@ HAL_IsPulsing
 HAL_LatchPWMZero
 HAL_LoadExtensions
 HAL_LoadOneExtension
-HAL_MakeBoolean
-HAL_MakeDouble
-HAL_MakeInt
-HAL_MakeLong
 HAL_ObserveUserProgramAutonomous
 HAL_ObserveUserProgramDisabled
 HAL_ObserveUserProgramStarting
