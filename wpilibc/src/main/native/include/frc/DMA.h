@@ -10,8 +10,10 @@ class Counter;
 class DigitalSource;
 class DutyCycle;
 class AnalogInput;
+class DMASample;
 
 class DMA : ErrorBase {
+  friend class DMASample;
  public:
   DMA();
   ~DMA() override;
