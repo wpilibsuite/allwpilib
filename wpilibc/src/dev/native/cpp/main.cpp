@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 
 #include "WPILibVersion.h"
 
