@@ -7,7 +7,7 @@
 
 #include "frc/ADXL362.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/DriverStation.h"
 #include "frc/smartdashboard/SendableBuilder.h"

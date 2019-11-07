@@ -9,7 +9,7 @@
 
 #include <cmath>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <wpi/math>
 
 #include "frc/DriverStation.h"

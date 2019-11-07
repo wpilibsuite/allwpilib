@@ -7,7 +7,7 @@
 
 #include "frc/ADXRS450_Gyro.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/DriverStation.h"
 #include "frc/Timer.h"

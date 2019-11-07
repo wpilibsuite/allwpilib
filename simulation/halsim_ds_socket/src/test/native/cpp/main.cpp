@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <hal/HAL.h>
+#include <hal/HALBase.h>
 
 #include "gtest/gtest.h"
 

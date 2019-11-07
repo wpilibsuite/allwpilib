@@ -9,7 +9,8 @@
 
 #include <cstdio>
 
-#include <hal/HAL.h>
+#include <hal/DriverStation.h>
+#include <hal/FRCUsageReporting.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>

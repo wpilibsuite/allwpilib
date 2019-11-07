@@ -7,7 +7,8 @@
 
 #include "frc/IterativeRobot.h"
 
-#include <hal/HAL.h>
+#include <hal/DriverStation.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/DriverStation.h"
 

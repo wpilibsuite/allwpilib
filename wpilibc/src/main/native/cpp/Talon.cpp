@@ -7,7 +7,7 @@
 
 #include "frc/Talon.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/smartdashboard/SendableRegistry.h"
 
