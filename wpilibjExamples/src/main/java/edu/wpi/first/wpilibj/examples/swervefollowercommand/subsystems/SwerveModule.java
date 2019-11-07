@@ -16,11 +16,11 @@ import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.ModuleConstants.kDriveEncoderDistancePerPulse;
-import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
 import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared;
 import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond;
 import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.ModuleConstants.kPModuleDriveController;
 import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.ModuleConstants.kPModuleTurningController;
+import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
 
 public class SwerveModule {
   private final Spark m_driveMotor;

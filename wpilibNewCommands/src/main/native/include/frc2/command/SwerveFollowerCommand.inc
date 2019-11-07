@@ -9,20 +9,13 @@
  * A command that uses two PID controllers ({@link PIDController}) and a
  * ProfiledPIDController ({@link ProfiledPIDController}) to follow a trajectory
  * {@link Trajectory} with a swerve drive.
- *
- * <p>The command handles trajectory-following, Velocity PID calculations, and
- * feedforwards internally. This is intended to be a more-or-less "complete
- * solution" that can be used by teams without a great deal of controls
- * expertise.
- *
- * <p>Advanced teams seeking more flexibility (for example, those who wish to
- * use the onboard PID functionality of a "smart" motor controller) may use the
- * secondary constructor that omits the PID and feedforward functionality,
- * returning only the raw module states from the position PID controllers.
+ * 
+ * <p>This command outputs the raw desired Swerve Module States ({@link SwerveModuleState})
+ * in an array. The desired wheel and module rotation velocities should be taken
+ * from those and used in velocity PIDs.
  *
  * <p>The robot angle controller does not follow the angle given by
- * the trajectory but rather goes to the angle given in the final state of the
- * trajectory.
+ * the trajectory but rather goes to the angle given in the final state of the trajectory.
  */
 
 template <typename T>
@@ -31,31 +24,28 @@ int sgn(T val) {
 }
 
 /**
- * Constructs a new SwerveFollowerCommand that, when executed, will follow the
- * provided trajectory. This command will not return output voltages but rather
- * raw module states from the position controllers which need to be put into a
- * velocty PID.
+ * Constructs a new SwerveFollowerCommand that when executed will follow the provided trajectory.
+ * This command will not return output voltages but rather raw module states from
+ * the position controllers which need to be put into a velocity PID.
  *
- * <p>Note: The controllers will *not* set the outputVolts to zero upon
- * completion of the path- this is left to the user, since it is not appropriate
- * for paths with nonstationary endstates.
+ * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path-
+ * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
  *
- * <p>Note2: The rotation controller will calculate the rotation based on the
- * final pose in the trajectory, not the poses at each time step.
+ * <p>Note2: The rotation controller will calculate the rotation based on the final pose 
+ * in the trajectory, not the poses at each time step.
  *
  * @param trajectory                        The trajectory to follow.
- * @param pose                              A function that supplies the robot
- * pose - use one of the odometry classes to provide this.
- * @param kinematics                        The kinematics for the robot
- * drivetrain.
- * @param xController                       The Trajectory Tracker PID
- * controller for the robot's x position.
- * @param yController                       The Trajectory Tracker PID
- * controller for the robot's y position.
- * @param thetaController                   The Trajectory Tracker PID
- * controller for angle for the robot.
- * @param outputModuleStates                The raw output module states from
- * the psoiton contollers.
+ * @param pose                              A function that supplies the robot pose - use one of
+ *                                          the odometry classes to provide this.
+ * @param kinematics                        The kinematics for the robot drivetrain.
+ * @param xdController                      The Trajectory Tracker PID controller
+ *                                          for the robot's x position.
+ * @param ydController                      The Trajectory Tracker PID controller
+ *                                          for the robot's y position.
+ * @param thetaController                   The Trajectory Tracker PID controller
+ *                                          for angle for the robot.
+ * @param outputModuleStates                The raw output module states from the
+ *                                          position controllers.
  * @param requirements                      The subsystems to require.
  */
 

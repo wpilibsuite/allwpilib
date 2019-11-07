@@ -50,7 +50,7 @@ public class SwerveFollowerCommand extends CommandBase {
   /**
    * Constructs a new SwerveFollowerCommand that when executed will follow the provided trajectory.
    * This command will not return output voltages but rather raw module states from
-   * the position controllers which need to be put into a velocty PID.
+   * the position controllers which need to be put into a velocity PID.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path-
    * this is left to the user, since it is not appropriate for paths with nonstationary endstates.

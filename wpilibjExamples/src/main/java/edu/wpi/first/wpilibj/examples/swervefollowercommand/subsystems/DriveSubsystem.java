@@ -45,6 +45,7 @@ import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.Dri
 import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.DriveConstants.kRearRightTurningEncoderReversed;
 import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.DriveConstants.kRearRightTurningMotorPort;
 
+@SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystem extends SubsystemBase {
 
   //Robot swerve modules
