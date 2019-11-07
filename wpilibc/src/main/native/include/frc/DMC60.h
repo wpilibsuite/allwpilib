@@ -13,6 +13,19 @@ namespace frc {
 
 /**
  * Digilent DMC 60 Speed Controller.
+ *
+ * Note that the DMC 60 uses the following bounds for PWM values. These
+ * values should work reasonably well for most controllers, but if users
+ * experience issues such as asymmetric behavior around the deadband or
+ * inability to saturate the controller in either direction, calibration is
+ * recommended. The calibration procedure can be found in the DMC 60 User
+ * Manual available from Digilent.
+ *
+ * \li 2.004ms = full "forward"
+ * \li 1.52ms = the "high end" of the deadband range
+ * \li 1.50ms = center of the deadband range (off)
+ * \li 1.48ms = the "low end" of the deadband range
+ * \li 0.997ms = full "reverse"
  */
 class DMC60 : public PWMSpeedController {
  public:

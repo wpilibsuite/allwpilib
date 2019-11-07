@@ -13,6 +13,19 @@ namespace frc {
 
 /**
  * Luminary Micro / Vex Robotics Jaguar Speed Controller with PWM control.
+ *
+ * Note that the Jaguar uses the following bounds for PWM values. These values
+ * should work reasonably well for most controllers, but if users experience
+ * issues such as asymmetric behavior around the deadband or inability to
+ * saturate the controller in either direction, calibration is recommended. The
+ * calibration procedure can be found in the Jaguar User Manual available from
+ * Vex.
+ *
+ * \li 2.31ms = full "forward"
+ * \li 1.55ms = the "high end" of the deadband range
+ * \li 1.507ms = center of the deadband range (off)
+ * \li 1.454s = the "low end" of the deadband range
+ * \li 0.697ms = full "reverse"
  */
 class Jaguar : public PWMSpeedController {
  public:
