@@ -168,6 +168,12 @@ nativeUtils.exportsConfigs {
     }
 }
 
+nativeUtils.privateExportsConfigs {
+    wpiutilJNI {
+        exportsFile = project.file("src/main/native/symbols.txt")
+    }
+}
+
 cppHeadersZip {
     from('src/main/native/libuv/include') {
         into '/'

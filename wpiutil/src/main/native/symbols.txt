@@ -1,0 +1,4 @@
+JNI_OnLoad
+JNI_OnUnload
+Java_edu_wpi_first_wpiutil_WPIUtilJNI_addPortForwarder
+Java_edu_wpi_first_wpiutil_WPIUtilJNI_removePortForwarder

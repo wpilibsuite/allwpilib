@@ -16,13 +16,11 @@ nativeUtils.exportsConfigs {
                             '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
                             '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
     }
+}
+
+nativeUtils.privateExportsConfigs {
     ntcoreJNI {
-        x86SymbolFilter = { symbols ->
-            symbols.removeIf({ !it.startsWith('NT_') })
-        }
-        x64SymbolFilter = { symbols ->
-            symbols.removeIf({ !it.startsWith('NT_') })
-        }
+        exportsFile = project.file("src/main/native/symbols.txt")
     }
 }
 
