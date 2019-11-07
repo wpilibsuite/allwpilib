@@ -40,9 +40,8 @@ struct DMA {
 };
 }  // namespace
 
-static constexpr size_t kChannelSize[20] = {
-    2, 2, 4, 4, 2, 2, 4, 4, 3, 3, 2, 1, 4, 4, 4, 4, 4, 4, 4, 4,
-};
+static constexpr size_t kChannelSize[22] = {2, 2, 4, 4, 2, 2, 4, 4, 3, 3, 2,
+                                            1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4};
 
 enum DMAOffsetConstants {
   kEnable_AI0_Low = 0,
@@ -65,6 +64,8 @@ enum DMAOffsetConstants {
   kEnable_Encoders_High = 17,
   kEnable_EncoderTimers_Low = 18,
   kEnable_EncoderTimers_High = 19,
+  kEnable_DutyCycle_Low = 20,
+  kEnable_DutyCycle_High = 21,
 };
 
 static hal::LimitedHandleResource<HAL_DMAHandle, DMA, 1, HAL_HandleEnum::DMA>*
@@ -376,6 +377,39 @@ void HAL_AddDMAAnalogInput(HAL_DMAHandle handle,
   }
 }
 
+void HAL_AddDMADutyCycle(HAL_DMAHandle handle,
+                         HAL_DutyCycleHandle dutyCycleHandle, int32_t* status) {
+  auto dma = dmaHandles->Get(handle);
+  if (!dma) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  if (dma->manager) {
+    *status = HAL_INVALID_DMA_ADDITION;
+    return;
+  }
+
+  if (getHandleType(dutyCycleHandle) != HAL_HandleEnum::DutyCycle) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  int32_t index = getHandleIndex(dutyCycleHandle);
+  if (index < 0) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  if (index < 4) {
+    dma->aDMA->writeConfig_Enable_DutyCycle_Low(true, status);
+  } else if (index < 8) {
+    dma->aDMA->writeConfig_Enable_DutyCycle_High(true, status);
+  } else {
+    *status = NiFpga_Status_InvalidParameter;
+  }
+}
+
 void HAL_AddDMAAveragedAnalogInput(HAL_DMAHandle handle,
                                    HAL_AnalogInputHandle aInHandle,
                                    int32_t* status) {
@@ -411,8 +445,8 @@ void HAL_AddDMAAveragedAnalogInput(HAL_DMAHandle handle,
 }
 
 void HAL_AddDMAAnalogAccumulator(HAL_DMAHandle handle,
-                              HAL_AnalogInputHandle aInHandle,
-                              int32_t* status) {
+                                 HAL_AnalogInputHandle aInHandle,
+                                 int32_t* status) {
   auto dma = dmaHandles->Get(handle);
   if (!dma) {
     *status = HAL_HANDLE_ERROR;
@@ -449,7 +483,7 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
                                HAL_AnalogTriggerType analogTriggerType,
                                HAL_Bool rising, HAL_Bool falling,
                                int32_t* status) {
-auto dma = dmaHandles->Get(handle);
+  auto dma = dmaHandles->Get(handle);
   if (!dma) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -473,7 +507,7 @@ auto dma = dmaHandles->Get(handle);
     *status = NO_AVAILABLE_RESOURCES;
     return;
   }
-  
+
   dma->captureStore.triggerChannels |= (1 << index);
 
   auto channelIndex = index;
@@ -489,7 +523,8 @@ auto dma = dmaHandles->Get(handle);
   uint8_t pin = 0;
   uint8_t module = 0;
   bool analogTrigger = false;
-  bool success = remapDigitalSource(digitalSourceHandle, analogTriggerType, pin, module, analogTrigger);
+  bool success = remapDigitalSource(digitalSourceHandle, analogTriggerType, pin,
+                                    module, analogTrigger);
 
   if (!success) {
     *status = PARAMETER_OUT_OF_RANGE;
@@ -503,7 +538,8 @@ auto dma = dmaHandles->Get(handle);
   newTrigger.ExternalClockSource_Channel = pin;
   newTrigger.ExternalClockSource_Module = module;
 
-  dma->aDMA->writeExternalTriggers(channelIndex / 4, channelIndex % 4, newTrigger, status);
+  dma->aDMA->writeExternalTriggers(channelIndex / 4, channelIndex % 4,
+                                   newTrigger, status);
 }
 
 void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
@@ -550,6 +586,8 @@ void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
     SET_SIZE(Enable_Encoders_High);
     SET_SIZE(Enable_EncoderTimers_Low);
     SET_SIZE(Enable_EncoderTimers_High);
+    SET_SIZE(Enable_DutyCycle_Low);
+    SET_SIZE(Enable_DutyCycle_High);
 #undef SET_SIZE
     dma->captureStore.captureSize = accum_size + 1;
   }
@@ -882,9 +920,9 @@ int32_t HAL_GetDMASampleAveragedAnalogInput(const HAL_DMASample* dmaSample,
   return dmaWord;
 }
 
-int32_t HAL_GetDMASampleAnalogAccumulator(const HAL_DMASample* dmaSample,
-                                          HAL_AnalogInputHandle aInHandle,
-                                          int32_t* status) {
+int64_t HAL_GetDMASampleAnalogAccumulatorCount(const HAL_DMASample* dmaSample,
+                                               HAL_AnalogInputHandle aInHandle,
+                                               int32_t* status) {
   if (!HAL_IsAccumulatorChannel(aInHandle, status)) {
     *status = HAL_INVALID_ACCUMULATOR_CHANNEL;
     return 0xFFFFFFFF;
@@ -910,4 +948,99 @@ int32_t HAL_GetDMASampleAnalogAccumulator(const HAL_DMASample* dmaSample,
 
   return dmaWord;
 }
+
+int64_t HAL_GetDMASampleAnalogAccumulatorValue(const HAL_DMASample* dmaSample,
+                                               HAL_AnalogInputHandle aInHandle,
+                                               int32_t* status) {
+  if (!HAL_IsAccumulatorChannel(aInHandle, status)) {
+    *status = HAL_INVALID_ACCUMULATOR_CHANNEL;
+    return 0xFFFFFFFF;
+  }
+
+  int32_t index = getHandleIndex(aInHandle);
+  if (index < 0) {
+    *status = HAL_HANDLE_ERROR;
+    return 0xFFFFFFFF;
+  }
+
+  uint32_t dmaWord = 0;
+  uint32_t dmaWordHigh = 0;
+  if (index == 0) {
+    dmaWord = ReadDMAValue(*dmaSample, kEnable_Accumulator0, index + 1, status);
+    dmaWordHigh =
+        ReadDMAValue(*dmaSample, kEnable_Accumulator0, index + 2, status);
+  } else if (index == 1) {
+    dmaWord = ReadDMAValue(*dmaSample, kEnable_Accumulator1, index, status);
+    dmaWordHigh =
+        ReadDMAValue(*dmaSample, kEnable_Accumulator1, index + 1, status);
+  } else {
+    *status = NiFpga_Status_ResourceNotFound;
+  }
+  if (*status != 0) {
+    return 0xFFFFFFFF;
+  }
+
+  return static_cast<int64_t>(dmaWordHigh) << 32 | dmaWord;
+}
+
+int32_t HAL_GetDMASampleDutyCycleOutput(const HAL_DMASample* dmaSample,
+                                        HAL_DutyCycleHandle dutyCycleHandle,
+                                        int32_t* status) {
+  if (getHandleType(dutyCycleHandle) != HAL_HandleEnum::DutyCycle) {
+    *status = HAL_HANDLE_ERROR;
+    return -1;
+  }
+
+  int32_t index = getHandleIndex(dutyCycleHandle);
+  if (index < 0) {
+    *status = HAL_HANDLE_ERROR;
+    return -1;
+  }
+
+  uint32_t dmaWord = 0;
+  *status = 0;
+  if (index < 4) {
+    dmaWord = ReadDMAValue(*dmaSample, kEnable_DutyCycle_Low, index, status);
+  } else if (index < 8) {
+    dmaWord =
+        ReadDMAValue(*dmaSample, kEnable_DutyCycle_High, index - 4, status);
+  } else {
+    *status = NiFpga_Status_ResourceNotFound;
+  }
+  if (*status != 0) {
+    return -1;
+  }
+  return (dmaWord >> 16) & 0xff;
+}
+
+int32_t HAL_GetDMASampleDutyCycleFrequency(const HAL_DMASample* dmaSample,
+                                           HAL_DutyCycleHandle dutyCycleHandle,
+                                           int32_t* status) {
+  if (getHandleType(dutyCycleHandle) != HAL_HandleEnum::DutyCycle) {
+    *status = HAL_HANDLE_ERROR;
+    return -1;
+  }
+
+  int32_t index = getHandleIndex(dutyCycleHandle);
+  if (index < 0) {
+    *status = HAL_HANDLE_ERROR;
+    return -1;
+  }
+
+  uint32_t dmaWord = 0;
+  *status = 0;
+  if (index < 4) {
+    dmaWord = ReadDMAValue(*dmaSample, kEnable_DutyCycle_Low, index, status);
+  } else if (index < 8) {
+    dmaWord =
+        ReadDMAValue(*dmaSample, kEnable_DutyCycle_High, index - 4, status);
+  } else {
+    *status = NiFpga_Status_ResourceNotFound;
+  }
+  if (*status != 0) {
+    return -1;
+  }
+  return dmaWord & 0xFFFF;
+}
+
 }  // extern "C"

@@ -24,8 +24,8 @@ HAL_ENUM(HAL_DMAReadStatus ) {
 // clang-format on
 
 struct HAL_DMASample {
-  uint32_t readBuffer[64];
-  int32_t channelOffsets[20];
+  uint32_t readBuffer[74];
+  int32_t channelOffsets[22];
   uint64_t timeStamp;
   uint32_t captureSize;
   uint8_t triggerChannels;
@@ -59,7 +59,11 @@ void HAL_AddDMAAveragedAnalogInput(HAL_DMAHandle handle,
                                    int32_t* status);
 
 void HAL_AddDMAAnalogAccumulator(HAL_DMAHandle handle,
-                              HAL_AnalogInputHandle aInHandle, int32_t* status);
+                                 HAL_AnalogInputHandle aInHandle,
+                                 int32_t* status);
+
+void HAL_AddDMADutyCycle(HAL_DMAHandle handle,
+                         HAL_DutyCycleHandle dutyCycleHandle, int32_t* status);
 
 void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
                                HAL_Handle digitalSourceHandle,
@@ -86,12 +90,12 @@ int32_t HAL_GetDMASampleCounter(const HAL_DMASample* dmaSample,
                                 int32_t* status);
 
 int32_t HAL_GetDMASampleEncoderRate(const HAL_DMASample* dmaSample,
-                                HAL_EncoderHandle encoderHandle,
-                                int32_t* status);
+                                    HAL_EncoderHandle encoderHandle,
+                                    int32_t* status);
 
 int32_t HAL_GetDMASampleCounterRate(const HAL_DMASample* dmaSample,
-                                HAL_CounterHandle counterHandle,
-                                int32_t* status);
+                                    HAL_CounterHandle counterHandle,
+                                    int32_t* status);
 HAL_Bool HAL_GetDMASampleDigitalSource(const HAL_DMASample* dmaSample,
                                        HAL_Handle dSourceHandle,
                                        int32_t* status);
@@ -103,9 +107,20 @@ int32_t HAL_GetDMASampleAveragedAnalogInput(const HAL_DMASample* dmaSample,
                                             HAL_AnalogInputHandle aInHandle,
                                             int32_t* status);
 
-int32_t HAL_GetDMASampleAnalogAccumulator(const HAL_DMASample* dmaSample,
-                                          HAL_AnalogInputHandle aInHandle,
-                                          int32_t* status);
+int64_t HAL_GetDMASampleAnalogAccumulatorValue(const HAL_DMASample* dmaSample,
+                                               HAL_AnalogInputHandle aInHandle,
+                                               int32_t* status);
+
+int64_t HAL_GetDMASampleAnalogAccumulatorCount(const HAL_DMASample* dmaSample,
+                                               HAL_AnalogInputHandle aInHandle,
+                                               int32_t* status);
+
+int32_t HAL_GetDMASampleDutyCycleOutput(const HAL_DMASample* dmaSample,
+                                        HAL_DutyCycleHandle dutyCycleHandle,
+                                        int32_t* status);
+int32_t HAL_GetDMASampleDutyCycleFrequency(const HAL_DMASample* dmaSample,
+                                           HAL_DutyCycleHandle dutyCycleHandle,
+                                           int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

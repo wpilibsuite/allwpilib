@@ -109,6 +109,18 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_addCounterRate
     CheckStatus(env, status);
   }
 
+  /*
+ * Class:     edu_wpi_first_hal_DMAJNI
+ * Method:    addDutyCycle
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_addDutyCycle
+  (JNIEnv *env, jclass, jint handle, jint dutyCycleHandle) {
+        int32_t status = 0;
+    HAL_AddDMADutyCycle(handle, dutyCycleHandle, &status);
+    CheckStatus(env, status);
+  }
+
 /*
  * Class:     edu_wpi_first_hal_DMAJNI
  * Method:    addDigitalSource

@@ -22,6 +22,9 @@ public class DMAJNI extends JNIWrapper {
   public static native void addCounterRate(int handle, int counterHandle);
 
   public static native void addDigitalSource(int handle, int digitalSourceHandle);
+
+  public static native void addDutyCycle(int handle, int dutyCycleHandle);
+
   public static native void addAnalogInput(int handle, int analogInputHandle);
   public static native void addAveragedAnalogInput(int handle, int analogInputHandle);
   public static native void addAnalogAccumulator(int handle, int analogInputHandle);
@@ -32,11 +35,11 @@ public class DMAJNI extends JNIWrapper {
   public static native void startDMA(int handle, int queueDepth);
   public static native void stopDMA(int handle);
 
-  // 0-63: readBuffer
-  // 64-83 channelOffsets
-  // 84: capture size
-  // 85: triggerChannels (bitflags)
-  // 86: remaining
+  // 0-73: readBuffer
+  // 74-95 channelOffsets
+  // 96: capture size
+  // 97: triggerChannels (bitflags)
+  // 98: remaining
   public static native long readDMA(int handle, int timeoutMs, int[] sampleStore);
 
   public static native DMAJNISample.BaseStore getSensorReadData(int handle);
