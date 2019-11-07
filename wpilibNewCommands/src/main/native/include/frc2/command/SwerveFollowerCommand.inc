@@ -5,8 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc2/command/SwerveFollowerCommand.h"
-
 /**
  * A command that uses two PID controllers ({@link PIDController}) and a
  * ProfiledPIDController ({@link ProfiledPIDController}) to follow a trajectory
@@ -26,9 +24,6 @@
  * the trajectory but rather goes to the angle given in the final state of the
  * trajectory.
  */
-
-using namespace frc2;
-using namespace units;
 
 template <typename T>
 int sgn(T val) {
@@ -64,6 +59,8 @@ int sgn(T val) {
  * @param requirements                      The subsystems to require.
  */
 
+namespace frc2 {
+
 template <int NumModules>
 SwerveFollowerCommand<NumModules>::SwerveFollowerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
@@ -73,70 +70,69 @@ SwerveFollowerCommand<NumModules>::SwerveFollowerCommand(
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
     std::initializer_list<Subsystem*> requirements)
     : m_trajectory(trajectory),
-      m_pose(pose),
-      m_kinematics(kinematics),
-      m_xController(std::make_unique<frc2::PIDController>(xController)),
-      m_yController(std::make_unique<frc2::PIDController>(yController)),
-      m_thetaController(
-          std::make_unique<frc::ProfiledPIDController>(thetaController)),
-      m_outputStates(output) {
-  this->AddRequirements(requirements);
+    m_pose(pose),
+    m_kinematics(kinematics),
+    m_xController(std::make_unique<frc2::PIDController>(xController)),
+    m_yController(std::make_unique<frc2::PIDController>(yController)),
+    m_thetaController(
+        std::make_unique<frc::ProfiledPIDController>(thetaController)),
+    m_outputStates(output) {
+this->AddRequirements(requirements);
 }
 
 template <int NumModules>
 void SwerveFollowerCommand<NumModules>::Initialize() {
-  auto m_finalPose = m_trajectory.Sample(m_trajectory.TotalTime).pose;
+auto m_finalPose = m_trajectory.Sample(m_trajectory.TotalTime()).pose;
 
-  m_timer.Reset();
-  m_timer.Start();
+m_timer.Reset();
+m_timer.Start();
 }
 
 template <int NumModules>
 void SwerveFollowerCommand<NumModules>::Execute() {
-  auto curTime = second_t(m_timer.Get());
+auto curTime = units::second_t(m_timer.Get());
 
-  auto m_desiredState = m_trajectory.Sample(curTime);
-  auto m_desiredPose = m_desiredState.pose;
+auto m_desiredState = m_trajectory.Sample(curTime);
+auto m_desiredPose = m_desiredState.pose;
 
-  auto m_poseError = m_desiredPose.RelativeTo(m_pose());
+auto m_poseError = m_desiredPose.RelativeTo(m_pose());
 
-  auto targetXVel = velocity::meters_per_second_t(
-      m_xController->Calculate((m_pose().Translation().X().to<double>()),
-                               (m_desiredPose.Translation().X().to<double>())));
-  auto targetYVel = velocity::meters_per_second_t(
-      m_yController->Calculate((m_pose().Translation().Y().to<double>()),
-                               (m_desiredPose.Translation().Y().to<double>())));
-  auto targetAngularVel =
-      angular_velocity::radians_per_second_t(m_thetaController->Calculate(
-          m_pose().Rotation().Radians().to<double>(),
-          units::meter_t(
-              m_finalPose.Rotation()
-                  .Radians()
-                  .to<double>())));  // Profiled PID Controller only takes
-                                     // meters as setpoint and measurement
-  // The robot will go to the desired rotation of the final pose in the
-  // trajectory, not following the poses at individual states.
+auto targetXVel = units::velocity::meters_per_second_t(
+    m_xController->Calculate((m_pose().Translation().X().to<double>()),
+                            (m_desiredPose.Translation().X().to<double>())));
+auto targetYVel = units::velocity::meters_per_second_t(
+    m_yController->Calculate((m_pose().Translation().Y().to<double>()),
+                            (m_desiredPose.Translation().Y().to<double>())));
+auto targetAngularVel =
+    units::angular_velocity::radians_per_second_t(m_thetaController->Calculate(
+        units::meter_t(m_pose().Rotation().Radians().to<double>()), units::meter_t(m_finalPose.Rotation().Radians().to<double>())));  
+        // Profiled PID Controller only takes
+        // meters as setpoint and measurement
+// The robot will go to the desired rotation of the final pose in the
+// trajectory, not following the poses at individual states.
 
-  auto vRef = m_desiredState.velocity;
+auto vRef = m_desiredState.velocity;
 
-  targetXVel += vRef * std::sin(m_poseError.Rotation().Radians().to<double>());
-  targetYVel += vRef * std::cos(m_poseError.Rotation().Radians().to<double>());
+targetXVel += vRef * std::sin(m_poseError.Rotation().Radians().to<double>());
+targetYVel += vRef * std::cos(m_poseError.Rotation().Radians().to<double>());
 
-  auto targetChassisSpeeds =
-      frc::ChassisSpeeds{targetXVel, targetYVel, targetAngularVel};
+auto targetChassisSpeeds =
+    frc::ChassisSpeeds{targetXVel, targetYVel, targetAngularVel};
 
-  auto targetModuleStates =
-      m_kinematics.ToSwerveModuleStates(targetChassisSpeeds);
+auto targetModuleStates =
+    m_kinematics.ToSwerveModuleStates(targetChassisSpeeds);
 
-  m_outputStates(targetModuleStates);
+m_outputStates(targetModuleStates);
 }
 
 template <int NumModules>
 void SwerveFollowerCommand<NumModules>::End(bool interrupted) {
-  m_timer.Stop();
+m_timer.Stop();
 }
 
 template <int NumModules>
 bool SwerveFollowerCommand<NumModules>::IsFinished() {
-  return m_timer.HasPeriodPassed(m_trajectory.TotalTime().to<double>());
+return m_timer.HasPeriodPassed(m_trajectory.TotalTime().to<double>());
+}
+
 }

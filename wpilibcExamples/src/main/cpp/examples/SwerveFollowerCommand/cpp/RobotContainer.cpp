@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "RobotContainer.h"
+#include "subsystems/DriveSubsystem.h"
 
 #include <units/units.h>
 

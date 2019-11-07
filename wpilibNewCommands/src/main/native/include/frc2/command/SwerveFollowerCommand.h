@@ -136,3 +136,5 @@ class SwerveFollowerCommand
       m_outputStates;
 };
 }  // namespace frc2
+
+#include "SwerveFollowerCommand.inc"
