@@ -24,6 +24,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -35,7 +36,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * Subsystem#periodic()} methods to be called and for their default commands to be scheduled.
  */
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods", "PMD.TooManyFields"})
-public final class CommandScheduler implements Sendable {
+public final class CommandScheduler implements Sendable, AutoCloseable {
   /**
    * The Singleton Instance.
    */
@@ -91,6 +92,20 @@ public final class CommandScheduler implements Sendable {
   CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
+    LiveWindow.setEnabledListener(() -> {
+      disable();
+      cancelAll();
+    });
+    LiveWindow.setDisabledListener(() -> {
+      enable();
+    });
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
+    LiveWindow.setEnabledListener(null);
+    LiveWindow.setDisabledListener(null);
   }
 
   /**

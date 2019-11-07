@@ -104,10 +104,12 @@ void LiveWindow::SetEnabled(bool enabled) {
   // Force table generation now to make sure everything is defined
   UpdateValuesUnsafe();
   if (enabled) {
+    this->enabled();
   } else {
     m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
       cbdata.builder.StopLiveWindowMode();
     });
+    this->disabled();
   }
   m_impl->enabledEntry.SetBoolean(enabled);
 }

@@ -17,6 +17,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -98,11 +99,20 @@ public final class Scheduler implements Sendable, AutoCloseable {
   private Scheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
+    LiveWindow.setEnabledListener(() -> {
+      disable();
+      removeAll();
+    });
+    LiveWindow.setDisabledListener(() -> {
+      enable();
+    });
   }
 
   @Override
   public void close() {
     SendableRegistry.remove(this);
+    LiveWindow.setEnabledListener(null);
+    LiveWindow.setDisabledListener(null);
   }
 
   /**

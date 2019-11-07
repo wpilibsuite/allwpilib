@@ -12,6 +12,7 @@
 #include <frc/WPIErrors.h>
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <frc/smartdashboard/SendableRegistry.h>
+#include <frc/livewindow/LiveWindow.h>
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/DenseMap.h>
 
@@ -68,9 +69,22 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
 
 CommandScheduler::CommandScheduler() : m_impl(new Impl) {
   frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
+  auto scheduler = frc::LiveWindow::GetInstance();
+  scheduler->enabled = [this]{
+    this->Disable();
+    this->CancelAll();
+  };
+  scheduler->disabled = [this]{
+    this->Enable();
+  };
 }
 
-CommandScheduler::~CommandScheduler() {}
+CommandScheduler::~CommandScheduler() {
+  frc::SendableRegistry::GetInstance().Remove(this);
+  auto scheduler = frc::LiveWindow::GetInstance();
+  scheduler->enabled = nullptr;
+  scheduler->disabled = nullptr;
+}
 
 CommandScheduler& CommandScheduler::GetInstance() {
   static CommandScheduler scheduler;
