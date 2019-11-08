@@ -8,6 +8,7 @@
 #include <thread>
 
 #include <hal/HALBase.h>
+#include <hal/DriverStation.h>
 #include <wpi/Format.h>
 #include <wpi/raw_ostream.h>
 
