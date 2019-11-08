@@ -133,7 +133,7 @@ public final class SplineHelper {
 
       // populate above-diagonal and below-diagonal vectors
       a[0] = 0.0;
-      for (int i = 0; i < newWaypts.length - 4; i++) {
+      for (int i = 0; i < newWaypts.length - 3; i++) {
         a[i + 1] = 1;
         c[i] = 1;
       }
