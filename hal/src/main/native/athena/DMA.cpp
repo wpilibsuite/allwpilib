@@ -19,6 +19,7 @@
 #include "PortsInternal.h"
 #include "hal/AnalogAccumulator.h"
 #include "hal/AnalogInput.h"
+#include "hal/AnalogGyro.h"
 #include "hal/ChipObject.h"
 #include "hal/Errors.h"
 #include "hal/HALBase.h"
@@ -206,7 +207,7 @@ void HAL_AddDMAEncoder(HAL_DMAHandle handle, HAL_EncoderHandle encoderHandle,
   }
 }
 
-void HAL_AddDMAEncoderRate(HAL_DMAHandle handle,
+void HAL_AddDMAEncoderPeriod(HAL_DMAHandle handle,
                            HAL_EncoderHandle encoderHandle, int32_t* status) {
   // Detect a counter encoder vs an actual encoder, and use the right DMA calls
   HAL_FPGAEncoderHandle fpgaEncoderHandle = HAL_kInvalidHandle;
@@ -221,7 +222,7 @@ void HAL_AddDMAEncoderRate(HAL_DMAHandle handle,
   }
 
   if (counterHandle != HAL_kInvalidHandle) {
-    HAL_AddDMACounterRate(handle, counterHandle, status);
+    HAL_AddDMACounterPeriod(handle, counterHandle, status);
     return;
   }
 
@@ -289,7 +290,7 @@ void HAL_AddDMACounter(HAL_DMAHandle handle, HAL_CounterHandle counterHandle,
   }
 }
 
-void HAL_AddDMACounterRate(HAL_DMAHandle handle,
+void HAL_AddDMACounterPeriod(HAL_DMAHandle handle,
                            HAL_CounterHandle counterHandle, int32_t* status) {
   auto dma = dmaHandles->Get(handle);
   if (!dma) {
@@ -616,15 +617,13 @@ void HAL_StopDMA(HAL_DMAHandle handle, int32_t* status) {
   }
 }
 
-enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
-                                   HAL_DMASample* dmaSample, int32_t timeoutMs,
-                                   int32_t* remainingOut, int32_t* status) {
+void* HAL_GetDMADirectPointer(HAL_DMAHandle handle) {
   auto dma = dmaHandles->Get(handle);
-  if (!dma) {
-    *status = HAL_HANDLE_ERROR;
-    return HAL_DMA_ERROR;
-  }
+  return dma.get();
+}
 
+enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer, HAL_DMASample* dmaSample, int32_t timeoutMs, int32_t* remainingOut, int32_t* status) {
+  DMA* dma = static_cast<DMA*>(dmaPointer);
   *remainingOut = 0;
   size_t remainingBytes = 0;
 
@@ -658,6 +657,18 @@ enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
   }
 }
 
+enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
+                                   HAL_DMASample* dmaSample, int32_t timeoutMs,
+                                   int32_t* remainingOut, int32_t* status) {
+  auto dma = dmaHandles->Get(handle);
+  if (!dma) {
+    *status = HAL_HANDLE_ERROR;
+    return HAL_DMA_ERROR;
+  }
+
+  return HAL_ReadDMADirect(dma.get(), dmaSample, timeoutMs, remainingOut, status);
+}
+
 static uint32_t ReadDMAValue(const HAL_DMASample& dma, int valueType, int index,
                              int32_t* status) {
   auto offset = dma.channelOffsets[valueType];
@@ -672,7 +683,7 @@ uint64_t HAL_GetDMASampleTime(const HAL_DMASample* dmaSample, int32_t* status) {
   return dmaSample->timeStamp;
 }
 
-int32_t HAL_GetDMASampleEncoder(const HAL_DMASample* dmaSample,
+int32_t HAL_GetDMASampleEncoderRaw(const HAL_DMASample* dmaSample,
                                 HAL_EncoderHandle encoderHandle,
                                 int32_t* status) {
   HAL_FPGAEncoderHandle fpgaEncoderHandle = 0;
@@ -718,7 +729,7 @@ int32_t HAL_GetDMASampleEncoder(const HAL_DMASample* dmaSample,
   return result;
 }
 
-int32_t HAL_GetDMASampleEncoderRate(const HAL_DMASample* dmaSample,
+int32_t HAL_GetDMASampleEncoderPeriodRaw(const HAL_DMASample* dmaSample,
                                     HAL_EncoderHandle encoderHandle,
                                     int32_t* status) {
   HAL_FPGAEncoderHandle fpgaEncoderHandle = 0;
@@ -732,7 +743,7 @@ int32_t HAL_GetDMASampleEncoderRate(const HAL_DMASample* dmaSample,
   }
 
   if (counterHandle != HAL_kInvalidHandle) {
-    return HAL_GetDMASampleCounterRate(dmaSample, counterHandle, status);
+    return HAL_GetDMASampleCounterPeriod(dmaSample, counterHandle, status);
   }
 
   if (getHandleType(fpgaEncoderHandle) != HAL_HandleEnum::FPGAEncoder) {
@@ -797,7 +808,7 @@ int32_t HAL_GetDMASampleCounter(const HAL_DMASample* dmaSample,
   return result;
 }
 
-int32_t HAL_GetDMASampleCounterRate(const HAL_DMASample* dmaSample,
+int32_t HAL_GetDMASampleCounterPeriod(const HAL_DMASample* dmaSample,
                                     HAL_CounterHandle counterHandle,
                                     int32_t* status) {
   if (getHandleType(counterHandle) != HAL_HandleEnum::Counter) {
@@ -856,7 +867,7 @@ HAL_Bool HAL_GetDMASampleDigitalSource(const HAL_DMASample* dmaSample,
   }
   return false;
 }
-int32_t HAL_GetDMASampleAnalogInput(const HAL_DMASample* dmaSample,
+int32_t HAL_GetDMASampleAnalogInputRaw(const HAL_DMASample* dmaSample,
                                     HAL_AnalogInputHandle aInHandle,
                                     int32_t* status) {
   if (getHandleType(aInHandle) != HAL_HandleEnum::AnalogInput) {
@@ -890,7 +901,7 @@ int32_t HAL_GetDMASampleAnalogInput(const HAL_DMASample* dmaSample,
   }
 }
 
-int32_t HAL_GetDMASampleAveragedAnalogInput(const HAL_DMASample* dmaSample,
+int32_t HAL_GetDMASampleAveragedAnalogInputRaw(const HAL_DMASample* dmaSample,
                                             HAL_AnalogInputHandle aInHandle,
                                             int32_t* status) {
   if (getHandleType(aInHandle) != HAL_HandleEnum::AnalogInput) {
@@ -920,70 +931,45 @@ int32_t HAL_GetDMASampleAveragedAnalogInput(const HAL_DMASample* dmaSample,
   return dmaWord;
 }
 
-int64_t HAL_GetDMASampleAnalogAccumulatorCount(const HAL_DMASample* dmaSample,
+void HAL_GetDMASampleAnalogAccumulator(const HAL_DMASample* dmaSample,
                                                HAL_AnalogInputHandle aInHandle,
+                                               int64_t* count, int64_t* value,
                                                int32_t* status) {
   if (!HAL_IsAccumulatorChannel(aInHandle, status)) {
     *status = HAL_INVALID_ACCUMULATOR_CHANNEL;
-    return 0xFFFFFFFF;
+    return;
   }
 
   int32_t index = getHandleIndex(aInHandle);
   if (index < 0) {
     *status = HAL_HANDLE_ERROR;
-    return 0xFFFFFFFF;
+    return;
   }
 
   uint32_t dmaWord = 0;
+  uint32_t dmaValue1 = 0;
+  uint32_t dmaValue2 = 0;
   if (index == 0) {
     dmaWord = ReadDMAValue(*dmaSample, kEnable_Accumulator0, index, status);
+    dmaValue1 = ReadDMAValue(*dmaSample, kEnable_Accumulator0, index + 1, status);
+    dmaValue2 = ReadDMAValue(*dmaSample, kEnable_Accumulator0, index + 2, status);
   } else if (index == 1) {
     dmaWord = ReadDMAValue(*dmaSample, kEnable_Accumulator1, index - 1, status);
+    dmaValue1 = ReadDMAValue(*dmaSample, kEnable_Accumulator0, index, status);
+    dmaValue2 = ReadDMAValue(*dmaSample, kEnable_Accumulator0, index + 1, status);
   } else {
     *status = NiFpga_Status_ResourceNotFound;
   }
   if (*status != 0) {
-    return 0xFFFFFFFF;
+    return;
   }
 
-  return dmaWord;
+  *count = dmaWord;
+
+  *value = static_cast<int64_t>(dmaValue1) << 32 | dmaValue2;
 }
 
-int64_t HAL_GetDMASampleAnalogAccumulatorValue(const HAL_DMASample* dmaSample,
-                                               HAL_AnalogInputHandle aInHandle,
-                                               int32_t* status) {
-  if (!HAL_IsAccumulatorChannel(aInHandle, status)) {
-    *status = HAL_INVALID_ACCUMULATOR_CHANNEL;
-    return 0xFFFFFFFF;
-  }
-
-  int32_t index = getHandleIndex(aInHandle);
-  if (index < 0) {
-    *status = HAL_HANDLE_ERROR;
-    return 0xFFFFFFFF;
-  }
-
-  uint32_t dmaWord = 0;
-  uint32_t dmaWordHigh = 0;
-  if (index == 0) {
-    dmaWord = ReadDMAValue(*dmaSample, kEnable_Accumulator0, index + 1, status);
-    dmaWordHigh =
-        ReadDMAValue(*dmaSample, kEnable_Accumulator0, index + 2, status);
-  } else if (index == 1) {
-    dmaWord = ReadDMAValue(*dmaSample, kEnable_Accumulator1, index, status);
-    dmaWordHigh =
-        ReadDMAValue(*dmaSample, kEnable_Accumulator1, index + 1, status);
-  } else {
-    *status = NiFpga_Status_ResourceNotFound;
-  }
-  if (*status != 0) {
-    return 0xFFFFFFFF;
-  }
-
-  return static_cast<int64_t>(dmaWord) << 32 | dmaWordHigh;
-}
-
-int32_t HAL_GetDMASampleDutyCycleOutput(const HAL_DMASample* dmaSample,
+int32_t HAL_GetDMASampleDutyCycleOutputRaw(const HAL_DMASample* dmaSample,
                                         HAL_DutyCycleHandle dutyCycleHandle,
                                         int32_t* status) {
   if (getHandleType(dutyCycleHandle) != HAL_HandleEnum::DutyCycle) {

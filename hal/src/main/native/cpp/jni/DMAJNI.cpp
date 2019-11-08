@@ -75,13 +75,13 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_addEncoder
 
 /*
  * Class:     edu_wpi_first_hal_DMAJNI
- * Method:    addEncoderRate
+ * Method:    addEncoderPeriod
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_addEncoderRate
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_addEncoderPeriod
   (JNIEnv *env, jclass, jint handle, jint encoderHandle) {
         int32_t status = 0;
-    HAL_AddDMAEncoderRate(handle, encoderHandle, &status);
+    HAL_AddDMAEncoderPeriod(handle, encoderHandle, &status);
     CheckStatus(env, status);
   }
 
@@ -99,13 +99,13 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_addCounter
 
 /*
  * Class:     edu_wpi_first_hal_DMAJNI
- * Method:    addCounterRate
+ * Method:    addCounterPeriod
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_addCounterRate
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_addCounterPeriod
   (JNIEnv *env, jclass, jint handle, jint counterHandle) {
         int32_t status = 0;
-    HAL_AddDMACounterRate(handle, counterHandle, &status);
+    HAL_AddDMACounterPeriod(handle, counterHandle, &status);
     CheckStatus(env, status);
   }
 

@@ -57,7 +57,7 @@ class MyRobot : public frc::TimedRobot {
     triggerOutput.Set(true);
 
     if (dmaStatus == HAL_DMAReadStatus::HAL_DMA_OK) {
-      frc::SmartDashboard::PutNumber("DMA Analog Input", sample.GetAnalogInput(&analogInput, &status));
+      frc::SmartDashboard::PutNumber("DMA Analog Input", sample.GetAnalogInputVoltage(&analogInput, &status));
       frc::SmartDashboard::PutNumber("DMA Duty Cycle", sample.GetDutyCycleOutput(&dutyCycle, &status));
     }
 

@@ -7,6 +7,7 @@
 #include "frc/Counter.h"
 #include "frc/AnalogInput.h"
 #include "frc/DutyCycle.h"
+#include "hal/AnalogInput.h"
 
 namespace frc {
 class DMASample : public HAL_DMASample {
@@ -26,20 +27,27 @@ class DMASample : public HAL_DMASample {
     return units::second_t{static_cast<double>(GetTime()) * 1.0e-6};
   }
 
-  int32_t GetEncoder(const Encoder* encoder, int32_t* status) const {
-    return HAL_GetDMASampleEncoder(this, encoder->m_encoder, status);
+  int32_t GetEncoderRaw(const Encoder* encoder, int32_t* status) const {
+    return HAL_GetDMASampleEncoderRaw(this, encoder->m_encoder, status);
   }
 
-  int32_t GetEncoderRate(const Encoder* encoder, int32_t* status) const {
-    return HAL_GetDMASampleEncoderRate(this, encoder->m_encoder, status);
+  double GetEncoderDistance(const Encoder* encoder, int32_t* status) const {
+    double val = GetEncoderRaw(encoder, status);
+    val *= encoder->DecodingScaleFactor();
+    val *= encoder->GetDistancePerPulse();
+    return val;
+  }
+
+  int32_t GetEncoderPeriodRaw(const Encoder* encoder, int32_t* status) const {
+    return HAL_GetDMASampleEncoderPeriodRaw(this, encoder->m_encoder, status);
   }
 
   int32_t GetCounter(const Counter* counter, int32_t* status) const {
     return HAL_GetDMASampleCounter(this, counter->m_counter, status);
   }
 
-  int32_t GetCounterRate(const Counter* counter, int32_t* status) const {
-    return HAL_GetDMASampleCounterRate(this, counter->m_counter, status);
+  int32_t GetCounterPeriod(const Counter* counter, int32_t* status) const {
+    return HAL_GetDMASampleCounterPeriod(this, counter->m_counter, status);
   }
 
   bool GetDigitalSource(const DigitalSource* digitalSource,
@@ -48,32 +56,38 @@ class DMASample : public HAL_DMASample {
         this, digitalSource->GetPortHandleForRouting(), status);
   }
 
-  int32_t GetAnalogInput(const AnalogInput* analogInput,
+  int32_t GetAnalogInputRaw(const AnalogInput* analogInput,
                          int32_t* status) const {
-    return HAL_GetDMASampleAnalogInput(this, analogInput->m_port, status);
+    return HAL_GetDMASampleAnalogInputRaw(this, analogInput->m_port, status);
   }
 
-  int32_t GetAveragedAnalogInput(const AnalogInput* analogInput,
+  double GetAnalogInputVoltage(const AnalogInput* analogInput, int32_t* status) {
+    return HAL_GetAnalogValueToVolts(analogInput->m_port, GetAnalogInputRaw(analogInput, status), status);
+  }
+
+  int32_t GetAveragedAnalogInputRaw(const AnalogInput* analogInput,
                                  int32_t* status) const {
-    return HAL_GetDMASampleAveragedAnalogInput(this, analogInput->m_port,
+    return HAL_GetDMASampleAveragedAnalogInputRaw(this, analogInput->m_port,
                                                status);
   }
 
-  int64_t GetAnalogAccumulatorCount(const AnalogInput* analogInput,
+  double GetAveragedAnalogInputVoltage(const AnalogInput* analogInput, int32_t* status) {
+    return HAL_GetAnalogValueToVolts(analogInput->m_port, GetAveragedAnalogInputRaw(analogInput, status), status);
+  }
+
+  void GetAnalogAccumulator(const AnalogInput* analogInput, int64_t* count, int64_t* value,
                                     int32_t* status) const {
-    return HAL_GetDMASampleAnalogAccumulatorCount(this, analogInput->m_port,
+    return HAL_GetDMASampleAnalogAccumulator(this, analogInput->m_port, count, value,
                                                   status);
   }
 
-  int64_t GetAnalogAccumulatorValue(const AnalogInput* analogInput,
-                                    int32_t* status) const {
-    return HAL_GetDMASampleAnalogAccumulatorValue(this, analogInput->m_port,
-                                                  status);
-  }
-
-  int32_t GetDutyCycleOutput(const DutyCycle* dutyCycle,
+  int32_t GetDutyCycleOutputRaw(const DutyCycle* dutyCycle,
                              int32_t* status) const {
-    return HAL_GetDMASampleDutyCycleOutput(this, dutyCycle->m_handle, status);
+    return HAL_GetDMASampleDutyCycleOutputRaw(this, dutyCycle->m_handle, status);
+  }
+
+  double GetDutyCycleOutput(const DutyCycle* dutyCycle, int32_t* status) {
+    return GetDutyCycleOutputRaw(dutyCycle, status) / static_cast<double>(dutyCycle->GetOutputScaleFactor());
   }
 };
 
