@@ -145,8 +145,8 @@ public final class SplineHelper {
 
       if (newWaypts.length > 4) {
         for (int i = 1; i <= newWaypts.length; i++) {
-          dx[i] = newWaypts[i + 1].getX() - newWaypts[i - 1].getX();
-          dy[i] = newWaypts[i + 1].getY() - newWaypts[i - 1].getY();
+          dx[i] = 3 * (newWaypts[i + 1].getX() - newWaypts[i - 1].getX());
+          dy[i] = 3 * (newWaypts[i + 1].getY() - newWaypts[i - 1].getY());
         }
       }
 
