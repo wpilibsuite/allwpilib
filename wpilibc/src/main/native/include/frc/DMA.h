@@ -32,11 +32,13 @@ class DMA : ErrorBase {
 
   void AddDigitalSource(const DigitalSource* digitalSource);
 
+  void AddDutyCycle(const DutyCycle* digitalSource);
+
   void AddAnalogInput(const AnalogInput* analogInput);
   void AddAveragedAnalogInput(const AnalogInput* analogInput);
   void AddAnalogAccumulator(const AnalogInput* analogInput);
 
-  void SetExternalTrigger(DigitalSource source, bool rising, bool falling);
+  void SetExternalTrigger(DigitalSource* source, bool rising, bool falling);
 
   void StartDMA(int queueDepth);
   void StopDMA();

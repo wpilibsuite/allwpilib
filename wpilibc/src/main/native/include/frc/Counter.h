@@ -21,6 +21,8 @@ namespace frc {
 
 class DigitalGlitchFilter;
 class SendableBuilder;
+class DMA;
+class DMASample;
 
 /**
  * Class for counting the number of ticks on a digital input channel.
@@ -36,6 +38,8 @@ class Counter : public ErrorBase,
                 public CounterBase,
                 public Sendable,
                 public SendableHelper<Counter> {
+  friend class DMA;
+  friend class DMASample;
  public:
   enum Mode {
     kTwoPulse = 0,

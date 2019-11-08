@@ -26,11 +26,12 @@ public final class DMAJNISample {
   }
 
   private final int[] m_dataBuffer = new int[100];
+  private final int[] m_storage = new int[100];
   private long m_timeStamp;
   private Map<Integer, BaseStore> m_propertyMap = new HashMap<>();
 
   public void update(int dmaHandle, int timeoutMs) {
-    m_timeStamp = DMAJNI.readDMA(dmaHandle, timeoutMs, m_dataBuffer);
+    m_timeStamp = DMAJNI.readDMA(dmaHandle, timeoutMs, m_dataBuffer, m_storage);
   }
 
   public long getTime() {

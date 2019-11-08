@@ -23,6 +23,8 @@ namespace frc {
 class DigitalSource;
 class DigitalGlitchFilter;
 class SendableBuilder;
+class DMA;
+class DMASample;
 
 /**
  * Class to read quad encoders.
@@ -44,6 +46,8 @@ class Encoder : public ErrorBase,
                 public PIDSource,
                 public Sendable,
                 public SendableHelper<Encoder> {
+  friend class DMA;
+  friend class DMASample;
  public:
   enum IndexingType {
     kResetWhileHigh,
