@@ -213,6 +213,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return ERR_FRCSystem_NetCommNotResponding_MESSAGE;
     case ERR_FRCSystem_NoDSConnection:
       return ERR_FRCSystem_NoDSConnection_MESSAGE;
+    case HAL_CAN_BUFFER_OVERRUN:
+      return HAL_CAN_BUFFER_OVERRUN_MESSAGE;
     default:
       return "Unknown error status";
   }
