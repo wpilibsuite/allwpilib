@@ -402,5 +402,31 @@
     "foldername": "RamseteCommand",
     "gradlebase": "cpp",
     "commandversion": 2
+  },
+  {
+    "name": "Arcade Drive Xbox Controller",
+    "description": "An example program which demonstrates the use of Arcade Drive with the DifferentialDrive class and an Xbox Controller.",
+    "tags": [
+      "Getting Started with C++",
+      "Robot and Motor",
+      "XboxController",
+      "Complete List"
+    ],
+    "foldername": "ArcadeDriveXboxController",
+    "gradlebase": "cpp",
+    "commandversion": 1
+  },
+  {
+    "name": "Tank Drive Xbox Controller",
+    "description": "An example program which demonstrates the use of Tank Drive with the DifferentialDrive class and an Xbox Controller.",
+    "tags": [
+      "Getting Started with C++",
+      "Robot and Motor",
+      "XboxController",
+      "Complete List"
+    ],
+    "foldername": "TankDriveXboxController",
+    "gradlebase": "cpp",
+    "commandversion": 1
   }
 ]

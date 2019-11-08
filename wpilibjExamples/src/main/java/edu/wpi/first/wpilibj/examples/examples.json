@@ -427,5 +427,27 @@
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
+  },
+  {
+    "name": "Arcade Drive Xbox Controller",
+    "description": "Demonstrates the use of the DifferentialDrive class to drive a robot with Arcade Drive and an Xbox Controller",
+    "tags": [
+      "Getting Started with Java"
+    ],
+    "foldername": "arcadedrivexboxcontroller",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 1
+  },
+  {
+    "name": "Tank Drive Xbox Controller",
+    "description": "Demonstrates the use of the DifferentialDrive class to drive a robot with Tank Drive and an Xbox Controller",
+    "tags": [
+      "Getting Started with Java"
+    ],
+    "foldername": "tankdrivexboxcontroller",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 1
   }
 ]
