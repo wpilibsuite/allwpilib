@@ -7,7 +7,8 @@
     ],
     "foldername": "timed",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Timed Skeleton (Advanced)",
@@ -17,7 +18,8 @@
     ],
     "foldername": "timedskeleton",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "RobotBase Skeleton (Advanced)",
@@ -27,7 +29,8 @@
     ],
     "foldername": "robotbaseskeleton",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Command Robot",
@@ -37,6 +40,7 @@
     ],
     "foldername": "commandbased",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 2
   }
 ]

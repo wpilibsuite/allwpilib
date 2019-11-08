@@ -70,6 +70,14 @@ bool DigitalOutput::Get() const {
   return val;
 }
 
+HAL_Handle DigitalOutput::GetPortHandleForRouting() const { return m_handle; }
+
+AnalogTriggerType DigitalOutput::GetAnalogTriggerTypeForRouting() const {
+  return (AnalogTriggerType)0;
+}
+
+bool DigitalOutput::IsAnalogTrigger() const { return false; }
+
 int DigitalOutput::GetChannel() const { return m_channel; }
 
 void DigitalOutput::Pulse(double length) {
