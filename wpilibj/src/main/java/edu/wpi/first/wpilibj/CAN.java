@@ -101,6 +101,39 @@ public class CAN implements Closeable {
   }
 
   /**
+   * Write a packet to the CAN device with a specific ID. This ID is 10 bits.
+   *
+   * @param data The data to write (8 bytes max)
+   * @param apiId The API ID to write.
+   */
+  public int writePacketNoThrow(byte[] data, int apiId) {
+    return CANAPIJNI.writeCANPacketNoThrow(m_handle, data, apiId);
+  }
+
+  /**
+   * Write a repeating packet to the CAN device with a specific ID. This ID is 10 bits.
+   * The RoboRIO will automatically repeat the packet at the specified interval
+   *
+   * @param data The data to write (8 bytes max)
+   * @param apiId The API ID to write.
+   * @param repeatMs The period to repeat the packet at.
+   */
+  public int writePacketRepeatingNoThrow(byte[] data, int apiId, int repeatMs) {
+    return CANAPIJNI.writeCANPacketRepeatingNoThrow(m_handle, data, apiId, repeatMs);
+  }
+
+  /**
+   * Write an RTR frame to the CAN device with a specific ID. This ID is 10 bits.
+   * The length by spec must match what is returned by the responding device
+   *
+   * @param length The length to request (0 to 8)
+   * @param apiId The API ID to write.
+   */
+  public int writeRTRFrameNoThrow(int length, int apiId) {
+    return CANAPIJNI.writeCANRTRFrameNoThrow(m_handle, length, apiId);
+  }
+
+  /**
    * Stop a repeating packet with a specific ID. This ID is 10 bits.
    *
    * @param apiId The API ID to stop repeating

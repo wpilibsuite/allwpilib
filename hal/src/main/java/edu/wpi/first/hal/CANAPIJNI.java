@@ -20,6 +20,13 @@ public class CANAPIJNI extends JNIWrapper {
 
   public static native void writeCANRTRFrame(int handle, int length, int apiId);
 
+  public static native int writeCANPacketNoThrow(int handle, byte[] data, int apiId);
+
+  public static native int writeCANPacketRepeatingNoThrow(int handle, byte[] data, int apiId,
+                                                         int repeatMs);
+
+  public static native int writeCANRTRFrameNoThrow(int handle, int length, int apiId);
+
   public static native void stopCANPacketRepeating(int handle, int apiId);
 
   public static native boolean readCANPacketNew(int handle, int apiId, CANData data);

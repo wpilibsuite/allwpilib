@@ -71,6 +71,25 @@ void CAN::WriteRTRFrame(int length, int apiId) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
+int CAN::WritePacketNoError(const uint8_t* data, int length, int apiId) {
+  int32_t status = 0;
+  HAL_WriteCANPacket(m_handle, data, length, apiId, &status);
+  return status;
+}
+
+int CAN::WritePacketRepeatingNoError(const uint8_t* data, int length, int apiId,
+                               int repeatMs) {
+  int32_t status = 0;
+  HAL_WriteCANPacketRepeating(m_handle, data, length, apiId, repeatMs, &status);
+  return status;
+}
+
+int CAN::WriteRTRFrameNoError(int length, int apiId) {
+  int32_t status = 0;
+  HAL_WriteCANRTRFrame(m_handle, length, apiId, &status);
+  return status;
+}
+
 void CAN::StopPacketRepeating(int apiId) {
   int32_t status = 0;
   HAL_StopCANPacketRepeating(m_handle, apiId, &status);
