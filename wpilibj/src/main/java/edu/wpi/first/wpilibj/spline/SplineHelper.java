@@ -86,10 +86,10 @@ public final class SplineHelper {
    *                  wish to create a path with two waypoints.
    * @param end       The ending control vector.
    * @return A vector of cubic hermite splines that interpolate through the
-   *         provided waypoints and control vectors.
+   * provided waypoints and control vectors.
    */
   @SuppressWarnings({"LocalVariableName", "PMD.ExcessiveMethodLength",
-      "PMD.AvoidInstantiatingObjectsInLoops"})
+                        "PMD.AvoidInstantiatingObjectsInLoops"})
   public static CubicHermiteSpline[] getCubicSplinesFromControlVectors(
       Spline.ControlVector start, Translation2d[] waypoints, Spline.ControlVector end) {
 
@@ -108,11 +108,11 @@ public final class SplineHelper {
       System.arraycopy(waypoints, 0, newWaypts, 1, waypoints.length);
       newWaypts[newWaypts.length - 1] = new Translation2d(xFinal[0], yFinal[0]);
 
-      // Populate tridiagonal system for clamped cubic, matrix looks as follows:
-      // 4 1 0
-      // 1 4 1
-      // 0 1 4
-
+      // Populate tridiagonal system for clamped cubic
+      /* See:
+      https://www.uio.no/studier/emner/matnat/ifi/nedlagte-emner/INF-MAT4350/h08
+      /undervisningsmateriale/chap7alecture.pdf
+      */
       // Above-diagonal of tridiagonal matrix, zero-padded
       final double[] a = new double[newWaypts.length - 2];
 
@@ -191,12 +191,12 @@ public final class SplineHelper {
       double[] midYControlVector = {waypoints[0].getY(), yDeriv};
 
       splines[0] = new CubicHermiteSpline(xInitial, midXControlVector,
-          yInitial, midYControlVector);
+                                          yInitial, midYControlVector);
       splines[1] = new CubicHermiteSpline(midXControlVector, xFinal,
-          midYControlVector, yFinal);
+                                          midYControlVector, yFinal);
     } else {
       splines[0] = new CubicHermiteSpline(xInitial, xFinal,
-          yInitial, yFinal);
+                                          yInitial, yFinal);
     }
     return splines;
   }
@@ -208,7 +208,7 @@ public final class SplineHelper {
    *
    * @param controlVectors The control vectors.
    * @return A vector of quintic hermite splines that interpolate through the
-   *         provided waypoints.
+   * provided waypoints.
    */
   @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
   public static QuinticHermiteSpline[] getQuinticSplinesFromControlVectors(
@@ -220,7 +220,7 @@ public final class SplineHelper {
       var yInitial = controlVectors[i].y;
       var yFinal = controlVectors[i + 1].y;
       splines[i] = new QuinticHermiteSpline(xInitial, xFinal,
-          yInitial, yFinal);
+                                            yInitial, yFinal);
     }
     return splines;
   }

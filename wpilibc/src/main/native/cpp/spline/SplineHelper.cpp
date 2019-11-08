@@ -28,10 +28,11 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
     waypoints.emplace_back(
         Translation2d{units::meter_t(xFinal[0]), units::meter_t(yFinal[0])});
 
-    // Populate tridiagonal system for clamped cubic, matrix looks as follows:
-    // 4 1 0
-    // 1 4 1
-    // 0 1 4
+    // Populate tridiagonal system for clamped cubic
+    /* See:
+    https://www.uio.no/studier/emner/matnat/ifi/nedlagte-emner/INF-MAT4350/h08
+    /undervisningsmateriale/chap7alecture.pdf
+    */
 
     // Above-diagonal of tridiagonal matrix, zero-padded
     std::vector<double> a;
