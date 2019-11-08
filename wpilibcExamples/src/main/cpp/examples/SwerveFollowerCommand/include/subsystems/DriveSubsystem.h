@@ -106,6 +106,6 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::ADXRS450_Gyro m_gyro;
 
   // Odometry class for tracking robot pose
-  // 4 defines the numebr of modules
+  // 4 defines the number of modules
   frc::SwerveDriveOdometry<4> m_odometry;
 };

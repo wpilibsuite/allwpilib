@@ -41,3 +41,5 @@ class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
   units::meters_per_second_t m_maxSpeed;
 };
 }  // namespace frc
+
+#include "SwerveDriveKinematicsConstraint.inc"

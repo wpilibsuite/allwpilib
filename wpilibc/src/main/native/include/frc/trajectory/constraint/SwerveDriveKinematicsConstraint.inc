@@ -5,9 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc/trajectory/constraint/SwerveDriveKinematicsConstraint.h"
+#pragma once
 
-using namespace frc;
+/**
+ * A class that enforces constraints on the differential drive kinematics.
+ * This can be used to ensure that the trajectory is constructed so that the
+ * commanded velocities for both sides of the drivetrain stay below a certain
+ * limit.
+ */
+
+namespace frc {
 
 template <int NumModules>
 SwerveDriveKinematicsConstraint<NumModules>::SwerveDriveKinematicsConstraint(
@@ -24,7 +31,7 @@ SwerveDriveKinematicsConstraint<NumModules>::MaxVelocity(
   auto yVelocity = velocity * cos(pose.Rotation().Radians().to<double>());
   auto wheelSpeeds = m_kinematics.ToSwerveModuleStates(
       {xVelocity, yVelocity, velocity * curvature});
-  m_kinematics.NormalizeWheelSpeeds(wheelSpeeds);
+  m_kinematics.NormalizeWheelSpeeds(wheelSpeeds, m_maxSpeed);
 
   return m_kinematics.ToChassisSpeeds(wheelSpeeds).vx;
 }
@@ -36,3 +43,5 @@ SwerveDriveKinematicsConstraint<NumModules>::MinMaxAcceleration(
     units::meters_per_second_t speed) {
   return {};
 }
+
+} // namespace frc
