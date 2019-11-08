@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 
 #include "gtest/gtest.h"
 
