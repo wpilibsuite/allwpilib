@@ -7,6 +7,8 @@
 
 #include "frc2/command/PrintCommand.h"
 
+#include <wpi/raw_ostream.h>
+
 using namespace frc2;
 
 PrintCommand::PrintCommand(const wpi::Twine& message)

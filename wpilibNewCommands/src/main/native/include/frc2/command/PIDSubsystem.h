@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "frc/controller/PIDController.h"
+#include <frc/controller/PIDController.h>
+
 #include "frc2/command/SubsystemBase.h"
 
 namespace frc2 {

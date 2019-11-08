@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import edu.wpi.cscore.CameraServerJNI;
@@ -189,6 +190,11 @@ public abstract class RobotBase implements AutoCloseable {
    */
   public abstract void startCompetition();
 
+  /**
+   * Ends the main loop in startCompetition().
+   */
+  public abstract void endCompetition();
+
   @SuppressWarnings("JavadocMethod")
   public static boolean getBooleanProperty(String name, boolean defaultValue) {
     String propVal = System.getProperty(name);
@@ -203,6 +209,10 @@ public abstract class RobotBase implements AutoCloseable {
       throw new IllegalStateException(propVal);
     }
   }
+
+  private static final ReentrantLock m_runMutex = new ReentrantLock();
+  private static RobotBase m_robotCopy;
+  private static boolean m_suppressExitWarning;
 
   /**
    * Run the robot main loop.
@@ -231,6 +241,10 @@ public abstract class RobotBase implements AutoCloseable {
       DriverStation.reportError("Could not instantiate robot " + robotName + "!", false);
       return;
     }
+
+    m_runMutex.lock();
+    m_robotCopy = robot;
+    m_runMutex.unlock();
 
     if (isReal()) {
       try {
@@ -265,16 +279,30 @@ public abstract class RobotBase implements AutoCloseable {
           throwable.getStackTrace());
       errorOnExit = true;
     } finally {
-      // startCompetition never returns unless exception occurs....
-      DriverStation.reportWarning("Robots should not quit, but yours did!", false);
-      if (errorOnExit) {
-        DriverStation.reportError(
-            "The startCompetition() method (or methods called by it) should have "
-                + "handled the exception above.", false);
-      } else {
-        DriverStation.reportError("Unexpected return from startCompetition() method.", false);
+      m_runMutex.lock();
+      boolean suppressExitWarning = m_suppressExitWarning;
+      m_runMutex.unlock();
+      if (!suppressExitWarning) {
+        // startCompetition never returns unless exception occurs....
+        DriverStation.reportWarning("Robots should not quit, but yours did!", false);
+        if (errorOnExit) {
+          DriverStation.reportError(
+              "The startCompetition() method (or methods called by it) should have "
+                  + "handled the exception above.", false);
+        } else {
+          DriverStation.reportError("Unexpected return from startCompetition() method.", false);
+        }
       }
     }
+  }
+
+  /**
+   * Suppress the "Robots should not quit" message.
+   */
+  public static void suppressExitWarning(boolean value) {
+    m_runMutex.lock();
+    m_suppressExitWarning = value;
+    m_runMutex.unlock();
   }
 
   /**
@@ -299,6 +327,18 @@ public abstract class RobotBase implements AutoCloseable {
       thread.setDaemon(true);
       thread.start();
       HAL.runMain();
+      suppressExitWarning(true);
+      m_runMutex.lock();
+      RobotBase robot = m_robotCopy;
+      m_runMutex.unlock();
+      if (robot != null) {
+        robot.endCompetition();
+      }
+      try {
+        thread.join(1000);
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
+      }
     } else {
       runRobot(robotSupplier);
     }

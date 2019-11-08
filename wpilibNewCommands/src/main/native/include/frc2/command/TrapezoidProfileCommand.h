@@ -5,15 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#pragma once
+
+#include <functional>
+#include <initializer_list>
+
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <frc2/Timer.h>
 
-#include <functional>
-
-#include "CommandBase.h"
-#include "CommandHelper.h"
-
-#pragma once
+#include "frc2/command/CommandBase.h"
+#include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**

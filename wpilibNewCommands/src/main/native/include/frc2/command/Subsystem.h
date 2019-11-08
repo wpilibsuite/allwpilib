@@ -7,9 +7,10 @@
 
 #pragma once
 
-#include <frc2/command/CommandScheduler.h>
-
+#include <type_traits>
 #include <utility>
+
+#include "frc2/command/CommandScheduler.h"
 
 namespace frc2 {
 class Command;

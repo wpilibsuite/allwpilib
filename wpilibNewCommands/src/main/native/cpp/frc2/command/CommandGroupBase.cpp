@@ -7,19 +7,10 @@
 
 #include "frc2/command/CommandGroupBase.h"
 
-#include <set>
-
-#include "frc/WPIErrors.h"
-#include "frc2/command/ParallelCommandGroup.h"
-#include "frc2/command/ParallelDeadlineGroup.h"
-#include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/SequentialCommandGroup.h"
+#include <frc/WPIErrors.h>
 
 using namespace frc2;
-template <typename TMap, typename TKey>
-static bool ContainsKey(const TMap& map, TKey keyToCheck) {
-  return map.find(keyToCheck) != map.end();
-}
+
 bool CommandGroupBase::RequireUngrouped(Command& command) {
   if (command.IsGrouped()) {
     wpi_setGlobalWPIErrorWithContext(
