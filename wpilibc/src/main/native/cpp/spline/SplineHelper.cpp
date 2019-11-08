@@ -28,13 +28,24 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
     waypoints.emplace_back(
         Translation2d{units::meter_t(xFinal[0]), units::meter_t(yFinal[0])});
 
+    // Populate tridiagonal system for clamped cubic, matrix looks as follows:
+    // 4 1 0
+    // 1 4 1
+    // 0 1 4
+
+    // Above-diagonal of tridiagonal matrix, zero-padded
     std::vector<double> a;
+    // Diagonal of tridiagonal matrix
     std::vector<double> b(waypoints.size() - 2, 4.0);
+    // Below-diagonal of tridiagonal matrix, zero-padded
     std::vector<double> c;
+    // rhs vectors
     std::vector<double> dx, dy;
+    // solution vectors
     std::vector<double> fx(waypoints.size() - 2, 0.0),
         fy(waypoints.size() - 2, 0.0);
 
+    // populate above-diagonal and below-diagonal vectors
     a.emplace_back(0);
     for (size_t i = 0; i < waypoints.size() - 3; ++i) {
       a.emplace_back(1);
@@ -42,6 +53,7 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
     }
     c.emplace_back(0);
 
+    // populate rhs vectors
     dx.emplace_back(
         3 * (waypoints[2].X().to<double>() - waypoints[0].X().to<double>()) -
         xInitial[1]);
@@ -63,6 +75,7 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
                          waypoints[waypoints.size() - 3].Y().to<double>()) -
                     yFinal[1]);
 
+    // Compute solution to tridiagonal system
     ThomasAlgorithm(a, b, c, dx, &fx);
     ThomasAlgorithm(a, b, c, dy, &fy);
 

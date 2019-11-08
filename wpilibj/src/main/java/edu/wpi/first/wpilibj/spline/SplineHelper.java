@@ -108,26 +108,38 @@ public final class SplineHelper {
       System.arraycopy(waypoints, 0, newWaypts, 1, waypoints.length);
       newWaypts[newWaypts.length - 1] = new Translation2d(xFinal[0], yFinal[0]);
 
-      final double[] a = new double[1 + newWaypts.length - 3];
+      // Populate tridiagonal system for clamped cubic, matrix looks as follows:
+      // 4 1 0
+      // 1 4 1
+      // 0 1 4
 
+      // Above-diagonal of tridiagonal matrix, zero-padded
+      final double[] a = new double[newWaypts.length - 2];
+
+      // Diagonal of tridiagonal matrix
       final double[] b = new double[newWaypts.length - 2];
       Arrays.fill(b, 4.0);
 
-      final double[] c = new double[1 + newWaypts.length - 3];
+      // Below-diagonal of tridiagonal matrix, zero-padded
+      final double[] c = new double[newWaypts.length - 2];
 
-      final double[] dx = new double[2 + newWaypts.length - 4];
-      final double[] dy = new double[2 + newWaypts.length - 4];
+      // rhs vectors
+      final double[] dx = new double[newWaypts.length - 2];
+      final double[] dy = new double[newWaypts.length - 2];
 
+      // solution vectors
       final double[] fx = new double[newWaypts.length - 2];
       final double[] fy = new double[newWaypts.length - 2];
 
+      // populate above-diagonal and below-diagonal vectors
       a[0] = 0.0;
-      for (int i = 0; i < newWaypts.length - 3; i++) {
+      for (int i = 0; i < newWaypts.length - 4; i++) {
         a[i + 1] = 1;
         c[i] = 1;
       }
       c[c.length - 1] = 0.0;
 
+      // populate rhs vectors
       dx[0] = 3 * (newWaypts[2].getX() - newWaypts[0].getX()) - xInitial[1];
       dy[0] = 3 * (newWaypts[2].getY() - newWaypts[0].getY()) - yInitial[1];
 
@@ -143,6 +155,7 @@ public final class SplineHelper {
       dy[dy.length - 1] = 3 * (newWaypts[newWaypts.length - 1].getY()
           - newWaypts[newWaypts.length - 3].getY()) - yFinal[1];
 
+      // Compute solution to tridiagonal system
       thomasAlgorithm(a, b, c, dx, fx);
       thomasAlgorithm(a, b, c, dy, fy);
 
