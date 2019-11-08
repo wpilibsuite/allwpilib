@@ -86,7 +86,7 @@ public final class SplineHelper {
    *                  wish to create a path with two waypoints.
    * @param end       The ending control vector.
    * @return A vector of cubic hermite splines that interpolate through the
-   * provided waypoints and control vectors.
+   *         provided waypoints and control vectors.
    */
   @SuppressWarnings({"LocalVariableName", "PMD.ExcessiveMethodLength",
                         "PMD.AvoidInstantiatingObjectsInLoops"})
@@ -208,7 +208,7 @@ public final class SplineHelper {
    *
    * @param controlVectors The control vectors.
    * @return A vector of quintic hermite splines that interpolate through the
-   * provided waypoints.
+   *         provided waypoints.
    */
   @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
   public static QuinticHermiteSpline[] getQuinticSplinesFromControlVectors(
