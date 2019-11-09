@@ -133,15 +133,15 @@ class CubicHermiteSplineTest {
   @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   @Test
   void testWindyPath() {
-    var start = new Pose2d(0, 0, Rotation2d.fromDegrees(0.0));
-    ArrayList<Translation2d> waypoints = new ArrayList<>();
+    final var start = new Pose2d(0, 0, Rotation2d.fromDegrees(0.0));
+    final ArrayList<Translation2d> waypoints = new ArrayList<>();
     waypoints.add(new Translation2d(0.5, 0.5));
     waypoints.add(new Translation2d(0.5, 0.5));
     waypoints.add(new Translation2d(1.0, 0.0));
     waypoints.add(new Translation2d(1.5, 0.5));
     waypoints.add(new Translation2d(2.0, 0.0));
     waypoints.add(new Translation2d(2.5, 0.5));
-    var end = new Pose2d(3.0, 0.0, Rotation2d.fromDegrees(0.0));
+    final var end = new Pose2d(3.0, 0.0, Rotation2d.fromDegrees(0.0));
 
     run(start, waypoints, end);
   }
