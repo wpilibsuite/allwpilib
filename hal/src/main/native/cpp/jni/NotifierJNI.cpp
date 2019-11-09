@@ -10,6 +10,8 @@
 #include <cassert>
 #include <cstdio>
 
+#include <wpi/jni_util.h>
+
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_NotifierJNI.h"
 #include "hal/Notifier.h"
@@ -35,6 +37,21 @@ Java_edu_wpi_first_hal_NotifierJNI_initializeNotifier
   }
 
   return (jint)notifierHandle;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_NotifierJNI
+ * Method:    setNotifierName
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_NotifierJNI_setNotifierName
+  (JNIEnv* env, jclass cls, jint notifierHandle, jstring name)
+{
+  int32_t status = 0;
+  HAL_SetNotifierName((HAL_NotifierHandle)notifierHandle,
+                      wpi::java::JStringRef{env, name}.c_str(), &status);
+  CheckStatus(env, status);
 }
 
 /*

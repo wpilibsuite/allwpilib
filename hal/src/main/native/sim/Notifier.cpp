@@ -8,6 +8,7 @@
 #include "hal/Notifier.h"
 
 #include <chrono>
+#include <string>
 
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
@@ -20,6 +21,7 @@
 
 namespace {
 struct Notifier {
+  std::string name;
   uint64_t waitTime;
   bool updatedAlarm = false;
   bool active = true;
@@ -69,6 +71,14 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
     return HAL_kInvalidHandle;
   }
   return handle;
+}
+
+void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,
+                         int32_t* status) {
+  auto notifier = notifierHandles->Get(notifierHandle);
+  if (!notifier) return;
+  std::scoped_lock lock(notifier->mutex);
+  notifier->name = name;
 }
 
 void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
