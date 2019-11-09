@@ -91,7 +91,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
                  frc2::PIDController leftController,
                  frc2::PIDController rightController,
                  std::function<void(units::volt_t, units::volt_t)> output,
-                 std::initializer_list<Subsystem*> requirements);
+                 std::initializer_list<Subsystem*> requirements = {});
 
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the
