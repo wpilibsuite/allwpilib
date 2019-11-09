@@ -49,7 +49,7 @@ public final class RobotController {
    *
    * @return The current time in microseconds according to the FPGA.
    */
-  public static long getFPGATime() {
+  public static long getFPGATimeMicroSeconds() {
     return HALUtil.getFPGATime();
   }
 
@@ -104,7 +104,7 @@ public final class RobotController {
    *
    * @return The controller input current value in Amps
    */
-  public static double getInputCurrent() {
+  public static double getInputCurrentAmps() {
     return PowerJNI.getVinCurrent();
   }
 
@@ -120,9 +120,9 @@ public final class RobotController {
   /**
    * Get the current output of the 3.3V rail.
    *
-   * @return The controller 3.3V rail output current value in Volts
+   * @return The controller 3.3V rail output current value in Amps
    */
-  public static double getCurrent3V3() {
+  public static double getCurrent3V3Amps() {
     return PowerJNI.getUserCurrent3V3();
   }
 

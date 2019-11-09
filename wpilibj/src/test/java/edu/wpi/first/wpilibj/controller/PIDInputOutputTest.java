@@ -46,7 +46,7 @@ class PIDInputOutputTest {
       out = m_controller.calculate(.025, 0);
     }
 
-    assertEquals(-0.5 * m_controller.getPeriod(), out, 1e-5);
+    assertEquals(-0.5 * m_controller.getPeriodSeconds(), out, 1e-5);
   }
 
   @Test
@@ -55,6 +55,6 @@ class PIDInputOutputTest {
 
     m_controller.calculate(0, 0);
 
-    assertEquals(-0.01 / m_controller.getPeriod(), m_controller.calculate(0.0025, 0), 1e-5);
+    assertEquals(-0.01 / m_controller.getPeriodSeconds(), m_controller.calculate(0.0025, 0), 1e-5);
   }
 }

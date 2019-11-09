@@ -99,7 +99,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
 
     @Override
     public void interruptFired(int interruptAssertedMask, InterruptCounter param) {
-      m_interruptFireTime.set(RobotController.getFPGATime());
+      m_interruptFireTime.set(RobotController.getFPGATimeMicroSeconds());
       m_counter.increment();
       try {
         // This won't cause the test to fail
@@ -130,9 +130,9 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
 
     setInterruptLow();
     Timer.delay(0.01);
-    // Note: Utility.getFPGATime() is used because double values can turn over
+    // Note: RobotController.getFPGATime() is used because double values can turn over
     // after the robot has been running for a long time
-    final long interruptTriggerTime = RobotController.getFPGATime();
+    final long interruptTriggerTimeMicroS = RobotController.getFPGATimeMicroSeconds();
     setInterruptHigh();
 
     // Delay until the interrupt is complete
@@ -147,17 +147,17 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
     if (function.m_exceptionThrown.get()) {
       throw function.m_ex;
     }
-    final long range = 10000; // in microseconds
+    final long rangeMicroS = 10000; // in microseconds
     assertThat(
         "The interrupt did not fire within the expected time period (values in milliseconds)",
         function.m_interruptFireTime.get(),
-        both(greaterThan(interruptTriggerTime - range)).and(lessThan(interruptTriggerTime
-            + range)));
+        both(greaterThan(interruptTriggerTimeMicroS - rangeMicroS)).and(lessThan(
+            interruptTriggerTimeMicroS + rangeMicroS)));
     assertThat(
         "The readRisingTimestamp() did not return the correct value (values in seconds)",
         getInterruptable().readRisingTimestamp(),
-        both(greaterThan((interruptTriggerTime - range) / 1e6)).and(
-            lessThan((interruptTriggerTime + range) / 1e6)));
+        both(greaterThan((interruptTriggerTimeMicroS - rangeMicroS) / 1e6)).and(
+            lessThan((interruptTriggerTimeMicroS + rangeMicroS) / 1e6)));
   }
 
   @Test(timeout = 2000)
@@ -205,17 +205,17 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
 
     // Note: the long time value is used because doubles can flip if the robot
     // is left running for long enough
-    final long startTimeStamp = RobotController.getFPGATime();
+    final long startTimeStampMicroS = RobotController.getFPGATimeMicroSeconds();
     new Thread(runnable).start();
     // Delay for twice as long as the timeout so the test should fail first
     getInterruptable().waitForInterrupt(synchronousTimeout * 2);
-    final long stopTimeStamp = RobotController.getFPGATime();
+    final long stopTimeStampMicroS = RobotController.getFPGATimeMicroSeconds();
 
     // Then
     // The test will not have timed out and:
-    final double interruptRunTime = (stopTimeStamp - startTimeStamp) * 1e-6;
+    final double interruptRunTimeSeconds = (stopTimeStampMicroS - startTimeStampMicroS) * 1e-6;
     assertEquals("The interrupt did not run for the expected amount of time (units in seconds)",
-        synchronousDelay, interruptRunTime, .1);
+        synchronousDelay, interruptRunTimeSeconds, .1);
   }
 
   @Test(timeout = (long) (synchronousTimeout * 1e3))

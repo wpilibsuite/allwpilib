@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 public class MotorEncoderTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(MotorEncoderTest.class.getName());
 
-  private static final double MOTOR_RUNTIME = .25;
+  private static final double MOTOR_RUNTIME_SECONDS = .25;
 
   // private static final List<MotorEncoderFixture> pairs = new
   // ArrayList<MotorEncoderFixture>();
@@ -109,7 +109,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     int startValue = me.getEncoder().get();
 
     me.getMotor().set(.2);
-    Timer.delay(MOTOR_RUNTIME);
+    Timer.delay(MOTOR_RUNTIME_SECONDS);
     int currentValue = me.getEncoder().get();
     assertTrue(me.getType() + " Encoder not incremented: start: " + startValue + "; current: "
         + currentValue, startValue < currentValue);
@@ -125,7 +125,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     int startValue = me.getEncoder().get();
 
     me.getMotor().set(-.2);
-    Timer.delay(MOTOR_RUNTIME);
+    Timer.delay(MOTOR_RUNTIME_SECONDS);
     int currentValue = me.getEncoder().get();
     assertTrue(me.getType() + " Encoder not decremented: start: " + startValue + "; current: "
         + currentValue, startValue > currentValue);
@@ -140,7 +140,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     final int counter2Start = me.getCounters()[1].get();
 
     me.getMotor().set(.75);
-    Timer.delay(MOTOR_RUNTIME);
+    Timer.delay(MOTOR_RUNTIME_SECONDS);
     int counter1End = me.getCounters()[0].get();
     int counter2End = me.getCounters()[1].get();
     assertTrue(me.getType() + " Counter not incremented: start: " + counter1Start + "; current: "
@@ -184,7 +184,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     Notifier pidRunner = new Notifier(
         () -> me.getMotor().set(pidController.calculate(me.getEncoder().getDistance())));
 
-    pidRunner.startPeriodic(pidController.getPeriod());
+    pidRunner.startPeriodic(pidController.getPeriodSeconds());
     Timer.delay(10.0);
     pidRunner.stop();
 
@@ -205,7 +205,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     Notifier pidRunner =
         new Notifier(() -> me.getMotor().set(filter.calculate(me.getEncoder().getRate()) + 8e-5));
 
-    pidRunner.startPeriodic(pidController.getPeriod());
+    pidRunner.startPeriodic(pidController.getPeriodSeconds());
     Timer.delay(10.0);
     pidRunner.stop();
 

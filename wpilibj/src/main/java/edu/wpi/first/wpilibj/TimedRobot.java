@@ -20,29 +20,29 @@ import edu.wpi.first.hal.NotifierJNI;
  * <p>periodic() functions from the base class are called on an interval by a Notifier instance.
  */
 public class TimedRobot extends IterativeRobotBase {
-  public static final double kDefaultPeriod = 0.02;
+  public static final double kDefaultPeriodSeconds = 0.02;
 
   // The C pointer to the notifier object. We don't use it directly, it is
   // just passed to the JNI bindings.
   private final int m_notifier = NotifierJNI.initializeNotifier();
 
-  // The absolute expiration time
-  private double m_expirationTime;
+  // The absolute expiration time in seconds
+  private double m_expirationTimeSeconds;
 
   /**
    * Constructor for TimedRobot.
    */
   protected TimedRobot() {
-    this(kDefaultPeriod);
+    this(kDefaultPeriodSeconds);
   }
 
   /**
    * Constructor for TimedRobot.
    *
-   * @param period Period in seconds.
+   * @param periodSeconds Period in seconds.
    */
-  protected TimedRobot(double period) {
-    super(period);
+  protected TimedRobot(double periodSeconds) {
+    super(periodSeconds);
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
   }
@@ -65,7 +65,7 @@ public class TimedRobot extends IterativeRobotBase {
     // Tell the DS that the robot is ready to be enabled
     HAL.observeUserProgramStarting();
 
-    m_expirationTime = RobotController.getFPGATime() * 1e-6 + m_period;
+    m_expirationTimeSeconds = RobotController.getFPGATimeMicroSeconds() * 1e-6 + m_periodSeconds;
     updateAlarm();
 
     // Loop forever, calling the appropriate mode-dependent function
@@ -75,7 +75,7 @@ public class TimedRobot extends IterativeRobotBase {
         break;
       }
 
-      m_expirationTime += m_period;
+      m_expirationTimeSeconds += m_periodSeconds;
       updateAlarm();
 
       loopFunc();
@@ -92,9 +92,11 @@ public class TimedRobot extends IterativeRobotBase {
 
   /**
    * Get time period between calls to Periodic() functions.
+   *
+   * @return the time period between calls in seconds.
    */
-  public double getPeriod() {
-    return m_period;
+  public double getPeriodSeconds() {
+    return m_periodSeconds;
   }
 
   /**
@@ -102,6 +104,6 @@ public class TimedRobot extends IterativeRobotBase {
    */
   @SuppressWarnings("UnsafeFinalization")
   private void updateAlarm() {
-    NotifierJNI.updateNotifierAlarm(m_notifier, (long) (m_expirationTime * 1e6));
+    NotifierJNI.updateNotifierAlarm(m_notifier, (long) (m_expirationTimeSeconds * 1e6));
   }
 }

@@ -70,8 +70,8 @@ public class DriverStation {
     None, Practice, Qualification, Elimination
   }
 
-  private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
-  private double m_nextMessageTime;
+  private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL_SECONDS = 1.0;
+  private double m_nextMessageTimeSeconds;
 
   private static class DriverStationTask implements Runnable {
     private final DriverStation m_ds;
@@ -858,21 +858,21 @@ public class DriverStation {
    * Wait for new data or for timeout, which ever comes first. If timeout is 0, wait for new data
    * only.
    *
-   * @param timeout The maximum time in seconds to wait.
+   * @param timeoutSeconds The maximum time in seconds to wait.
    * @return true if there is new data, otherwise false
    */
-  public boolean waitForData(double timeout) {
-    long startTime = RobotController.getFPGATime();
-    long timeoutMicros = (long) (timeout * 1000000);
+  public boolean waitForData(double timeoutSeconds) {
+    long startTimeMicros = RobotController.getFPGATimeMicroSeconds();
+    long timeoutMicros = (long) (timeoutSeconds * 1000000);
     m_waitForDataMutex.lock();
     try {
       int currentCount = m_waitForDataCount;
       while (m_waitForDataCount == currentCount) {
-        if (timeout > 0) {
-          long now = RobotController.getFPGATime();
-          if (now < startTime + timeoutMicros) {
+        if (timeoutSeconds > 0) {
+          long now = RobotController.getFPGATimeMicroSeconds();
+          if (now < startTimeMicros + timeoutMicros) {
             // We still have time to wait
-            boolean signaled = m_waitForDataCond.await(startTime + timeoutMicros - now,
+            boolean signaled = m_waitForDataCond.await(startTimeMicros + timeoutMicros - now,
                                                 TimeUnit.MICROSECONDS);
             if (!signaled) {
               // Return false if a timeout happened
@@ -901,10 +901,26 @@ public class DriverStation {
    * but does send an approximate match time. The value will count down the time remaining in the
    * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
    * dispute ref calls or guarantee that a function will trigger before the match ends) The
-   * Practice Match function of the DS approximates the behaviour seen on the field.
+   * Practice Match function of the DS approximates the behavior seen on the field.
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
+  public double getMatchTimeSeconds() {
+    return HAL.getMatchTime();
+  }
+
+  /**
+   * Return the approximate match time. The FMS does not send an official match time to the robots,
+   * but does send an approximate match time. The value will count down the time remaining in the
+   * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
+   * dispute ref calls or guarantee that a function will trigger before the match ends) The
+   * Practice Match function of the DS approximates the behavior seen on the field.
+   *
+   * @return Time remaining in current match period (auto or teleop) in seconds
+   *
+   * @deprecated Use {@link getMatchTimeSeconds} instead.
+   */
+  @Deprecated(since = "2020")
   public double getMatchTime() {
     return HAL.getMatchTime();
   }
@@ -1080,10 +1096,10 @@ public class DriverStation {
    * the DS.
    */
   private void reportJoystickUnpluggedError(String message) {
-    double currentTime = Timer.getFPGATimestamp();
-    if (currentTime > m_nextMessageTime) {
+    double currentTimeSeconds = Timer.getFPGATimestampSeconds();
+    if (currentTimeSeconds > m_nextMessageTimeSeconds) {
       reportError(message, false);
-      m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
+      m_nextMessageTimeSeconds = currentTimeSeconds + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL_SECONDS;
     }
   }
 
@@ -1092,10 +1108,10 @@ public class DriverStation {
    * the DS.
    */
   private void reportJoystickUnpluggedWarning(String message) {
-    double currentTime = Timer.getFPGATimestamp();
-    if (currentTime > m_nextMessageTime) {
+    double currentTimeSeconds = Timer.getFPGATimestampSeconds();
+    if (currentTimeSeconds > m_nextMessageTimeSeconds) {
       reportWarning(message, false);
-      m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
+      m_nextMessageTimeSeconds = currentTimeSeconds + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL_SECONDS;
     }
   }
 

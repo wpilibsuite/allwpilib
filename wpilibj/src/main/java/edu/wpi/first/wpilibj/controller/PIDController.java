@@ -34,7 +34,7 @@ public class PIDController implements Sendable, AutoCloseable {
   private double m_Kd;
 
   // The period (in seconds) of the loop that calls the controller
-  private final double m_period;
+  private final double m_periodSeconds;
 
   private double m_maximumIntegral = 1.0;
 
@@ -84,18 +84,18 @@ public class PIDController implements Sendable, AutoCloseable {
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
    *
-   * @param Kp     The proportional coefficient.
-   * @param Ki     The integral coefficient.
-   * @param Kd     The derivative coefficient.
-   * @param period The period between controller updates in seconds.
+   * @param Kp            The proportional coefficient.
+   * @param Ki            The integral coefficient.
+   * @param Kd            The derivative coefficient.
+   * @param periodSeconds The period between controller updates in seconds.
    */
   @SuppressWarnings("ParameterName")
-  public PIDController(double Kp, double Ki, double Kd, double period) {
+  public PIDController(double Kp, double Ki, double Kd, double periodSeconds) {
     m_Kp = Kp;
     m_Ki = Ki;
     m_Kd = Kd;
 
-    m_period = period;
+    m_periodSeconds = periodSeconds;
 
     instances++;
     SendableRegistry.addLW(this, "PIDController", instances);
@@ -184,10 +184,21 @@ public class PIDController implements Sendable, AutoCloseable {
   /**
    * Returns the period of this controller.
    *
-   * @return the period of the controller.
+   * @return the period of the controller in Seconds.
    */
+  public double getPeriodSeconds() {
+    return m_periodSeconds;
+  }
+
+  /**
+   * Returns the period of this controller.
+   *
+   * @return the period of the controller in Seconds.
+   * @deprecated Use {@link getPeriodSeconds} instead.
+   */
+  @Deprecated(since = "2020")
   public double getPeriod() {
-    return m_period;
+    return m_periodSeconds;
   }
 
   /**
@@ -317,10 +328,10 @@ public class PIDController implements Sendable, AutoCloseable {
   public double calculate(double measurement) {
     m_prevError = m_positionError;
     m_positionError = getContinuousError(m_setpoint - measurement);
-    m_velocityError = (m_positionError - m_prevError) / m_period;
+    m_velocityError = (m_positionError - m_prevError) / m_periodSeconds;
 
     if (m_Ki != 0) {
-      m_totalError = MathUtils.clamp(m_totalError + m_positionError * m_period,
+      m_totalError = MathUtils.clamp(m_totalError + m_positionError * m_periodSeconds,
           m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
     }
 

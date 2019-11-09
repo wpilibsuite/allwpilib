@@ -160,7 +160,7 @@ public class PIDTest extends AbstractComsSetup {
         m_controller.getPositionError(), 0);
     Notifier pidRunner = new Notifier(
         () -> me.getMotor().set(m_controller.calculate(me.getEncoder().getDistance())));
-    pidRunner.startPeriodic(m_controller.getPeriod());
+    pidRunner.startPeriodic(m_controller.getPeriodSeconds());
     Timer.delay(5);
     pidRunner.stop();
     assertTrue(pidData() + "Was not on Target. Controller Error: "

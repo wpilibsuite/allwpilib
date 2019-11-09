@@ -26,14 +26,14 @@ import java.util.concurrent.locks.ReentrantLock;
 @SuppressWarnings("PMD.TooManyMethods")
 public class Watchdog implements Closeable, Comparable<Watchdog> {
   // Used for timeout print rate-limiting
-  private static final long kMinPrintPeriod = 1000000; // us
+  private static final long kMinPrintPeriodMicroS = 1000000; // us
 
-  private long m_startTime; // us
-  private long m_timeout; // us
-  private long m_expirationTime; // us
+  private long m_startTimeMicroS; // us
+  private long m_timeoutMicroS; // us
+  private long m_expirationTimeMicroS; // us
   private final Runnable m_callback;
-  private long m_lastTimeoutPrintTime; // us
-  private long m_lastEpochsPrintTime; // us
+  private long m_lastTimeoutPrintTimeMicroS; // us
+  private long m_lastEpochsPrintTimeMicroS; // us
 
   @SuppressWarnings("PMD.UseConcurrentHashMap")
   private final Map<String, Long> m_epochs = new HashMap<>();
@@ -52,11 +52,11 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Watchdog constructor.
    *
-   * @param timeout  The watchdog's timeout in seconds with microsecond resolution.
-   * @param callback This function is called when the timeout expires.
+   * @param timeoutSeconds The watchdog's timeout in seconds with microsecond resolution.
+   * @param callback       This function is called when the timeout expires.
    */
-  public Watchdog(double timeout, Runnable callback) {
-    m_timeout = (long) (timeout * 1.0e6);
+  public Watchdog(double timeoutSeconds, Runnable callback) {
+    m_timeoutMicroS = (long) (timeoutSeconds * 1.0e6);
     m_callback = callback;
   }
 
@@ -69,33 +69,33 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   public int compareTo(Watchdog rhs) {
     // Elements with sooner expiration times are sorted as lesser. The head of
     // Java's PriorityQueue is the least element.
-    return Long.compare(m_expirationTime, rhs.m_expirationTime);
+    return Long.compare(m_expirationTimeMicroS, rhs.m_expirationTimeMicroS);
   }
 
   /**
    * Returns the time in seconds since the watchdog was last fed.
    */
-  public double getTime() {
-    return (RobotController.getFPGATime() - m_startTime) / 1.0e6;
+  public double getTimeSeconds() {
+    return (RobotController.getFPGATimeMicroSeconds() - m_startTimeMicroS) / 1.0e6;
   }
 
   /**
    * Sets the watchdog's timeout.
    *
-   * @param timeout The watchdog's timeout in seconds with microsecond
-   *                resolution.
+   * @param timeoutSeconds The watchdog's timeout in seconds with microsecond
+   *                       resolution.
    */
-  public void setTimeout(double timeout) {
-    m_startTime = RobotController.getFPGATime();
+  public void setTimeout(double timeoutSeconds) {
+    m_startTimeMicroS = RobotController.getFPGATimeMicroSeconds();
     m_epochs.clear();
 
     m_queueMutex.lock();
     try {
-      m_timeout = (long) (timeout * 1.0e6);
+      m_timeoutMicroS = (long) (timeoutSeconds * 1.0e6);
       m_isExpired = false;
 
       m_watchdogs.remove(this);
-      m_expirationTime = m_startTime + m_timeout;
+      m_expirationTimeMicroS = m_startTimeMicroS + m_timeoutMicroS;
       m_watchdogs.add(this);
       m_schedulerWaiter.signalAll();
     } finally {
@@ -106,13 +106,23 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Returns the watchdog's timeout in seconds.
    */
-  public double getTimeout() {
+  public double getTimeoutSeconds() {
     m_queueMutex.lock();
     try {
-      return m_timeout / 1.0e6;
+      return m_timeoutMicroS / 1.0e6;
     } finally {
       m_queueMutex.unlock();
     }
+  }
+
+  /**
+   * Returns the watchdog's timeout in seconds.
+   *
+   * @deprecated Use {@link getTimeoutSeconds} instead.
+   */
+  @Deprecated(since = "2020")
+  public double getTimeout() {
+    return getTimeoutSeconds();
   }
 
   /**
@@ -136,18 +146,18 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * @param epochName The name to associate with the epoch.
    */
   public void addEpoch(String epochName) {
-    long currentTime = RobotController.getFPGATime();
-    m_epochs.put(epochName, currentTime - m_startTime);
-    m_startTime = currentTime;
+    long currentTimeMicroS = RobotController.getFPGATimeMicroSeconds();
+    m_epochs.put(epochName, currentTimeMicroS - m_startTimeMicroS);
+    m_startTimeMicroS = currentTimeMicroS;
   }
 
   /**
    * Prints list of epochs added so far and their times.
    */
   public void printEpochs() {
-    long now = RobotController.getFPGATime();
-    if (now  - m_lastEpochsPrintTime > kMinPrintPeriod) {
-      m_lastEpochsPrintTime = now;
+    long nowMicroS = RobotController.getFPGATimeMicroSeconds();
+    if (nowMicroS  - m_lastEpochsPrintTimeMicroS > kMinPrintPeriodMicroS) {
+      m_lastEpochsPrintTimeMicroS = nowMicroS;
       m_epochs.forEach((key, value) -> System.out.format("\t%s: %.6fs\n", key, value / 1.0e6));
     }
   }
@@ -165,7 +175,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * Enables the watchdog timer.
    */
   public void enable() {
-    m_startTime = RobotController.getFPGATime();
+    m_startTimeMicroS = RobotController.getFPGATimeMicroSeconds();
     m_epochs.clear();
 
     m_queueMutex.lock();
@@ -173,7 +183,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
       m_isExpired = false;
 
       m_watchdogs.remove(this);
-      m_expirationTime = m_startTime + m_timeout;
+      m_expirationTimeMicroS = m_startTimeMicroS + m_timeoutMicroS;
       m_watchdogs.add(this);
       m_schedulerWaiter.signalAll();
     } finally {
@@ -220,10 +230,11 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     try {
       while (!Thread.currentThread().isInterrupted()) {
         if (m_watchdogs.size() > 0) {
-          boolean timedOut = !awaitUntil(m_schedulerWaiter, m_watchdogs.peek().m_expirationTime);
+          boolean timedOut = !awaitUntil(m_schedulerWaiter,
+              m_watchdogs.peek().m_expirationTimeMicroS);
           if (timedOut) {
-            if (m_watchdogs.size() == 0 || m_watchdogs.peek().m_expirationTime
-                > RobotController.getFPGATime()) {
+            if (m_watchdogs.size() == 0 || m_watchdogs.peek().m_expirationTimeMicroS
+                > RobotController.getFPGATimeMicroSeconds()) {
               continue;
             }
 
@@ -231,11 +242,12 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
             // has occurred, so call its timeout function.
             Watchdog watchdog = m_watchdogs.poll();
 
-            long now = RobotController.getFPGATime();
-            if (now  - watchdog.m_lastTimeoutPrintTime > kMinPrintPeriod) {
-              watchdog.m_lastTimeoutPrintTime = now;
+            long nowMicroS = RobotController.getFPGATimeMicroSeconds();
+            if (nowMicroS - watchdog.m_lastTimeoutPrintTimeMicroS > kMinPrintPeriodMicroS) {
+              watchdog.m_lastTimeoutPrintTimeMicroS = nowMicroS;
               if (!watchdog.m_suppressTimeoutMessage) {
-                System.out.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout / 1.0e6);
+                System.out.format("Watchdog not fed within %.6fs\n",
+                    watchdog.m_timeoutMicroS / 1.0e6);
               }
             }
 
@@ -265,12 +277,12 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Wrapper emulating functionality of C++'s std::condition_variable::wait_until().
    *
-   * @param cond The condition variable on which to wait.
-   * @param time The time at which to stop waiting.
+   * @param cond             The condition variable on which to wait.
+   * @param timeMicroSeconds The time at which to stop waiting in microseconds.
    * @return False if the deadline has elapsed upon return, else true.
    */
-  private static boolean awaitUntil(Condition cond, long time) {
-    long delta = time - RobotController.getFPGATime();
+  private static boolean awaitUntil(Condition cond, long timeMicroSeconds) {
+    long delta = timeMicroSeconds - RobotController.getFPGATimeMicroSeconds();
     try {
       return cond.await(delta, TimeUnit.MICROSECONDS);
     } catch (InterruptedException ex) {

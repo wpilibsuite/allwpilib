@@ -15,8 +15,8 @@ public class Timer {
    * @return Robot running time in seconds.
    */
   @SuppressWarnings("AbbreviationAsWordInName")
-  public static double getFPGATimestamp() {
-    return RobotController.getFPGATime() / 1000000.0;
+  public static double getFPGATimestampSeconds() {
+    return RobotController.getFPGATimeMicroSeconds() / 1000000.0;
   }
 
   /**
@@ -24,12 +24,28 @@ public class Timer {
    * but does send an approximate match time. The value will count down the time remaining in the
    * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
    * dispute ref calls or guarantee that a function will trigger before the match ends) The
-   * Practice Match function of the DS approximates the behaviour seen on the field.
+   * Practice Match function of the DS approximates the behavior seen on the field.
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
+  public static double getMatchTimeSeconds() {
+    return DriverStation.getInstance().getMatchTimeSeconds();
+  }
+
+  /**
+   * Return the approximate match time. The FMS does not send an official match time to the robots,
+   * but does send an approximate match time. The value will count down the time remaining in the
+   * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
+   * dispute ref calls or guarantee that a function will trigger before the match ends) The
+   * Practice Match function of the DS approximates the behavior seen on the field.
+   *
+   * @return Time remaining in current match period (auto or teleop) in seconds
+   *
+   * @deprecated Use {@link getMatchTimeSeconds} instead.
+   */
+  @Deprecated(since = "2020")
   public static double getMatchTime() {
-    return DriverStation.getInstance().getMatchTime();
+    return DriverStation.getInstance().getMatchTimeSeconds();
   }
 
   /**
@@ -38,7 +54,7 @@ public class Timer {
    * sensors will continue to update. Only the task containing the wait will pause until the wait
    * time is expired.
    *
-   * @param seconds Length of time to pause
+   * @param seconds Length of time to pause in seconds
    */
   public static void delay(final double seconds) {
     try {
@@ -58,7 +74,7 @@ public class Timer {
   }
 
   private double getMsClock() {
-    return RobotController.getFPGATime() / 1000.0;
+    return RobotController.getFPGATimeMicroSeconds() / 1000.0;
   }
 
   /**
@@ -109,14 +125,14 @@ public class Timer {
    * This is useful to decide if it's time to do periodic work without drifting later by the time it
    * took to get around to checking.
    *
-   * @param period The period to check for (in seconds).
-   * @return If the period has passed.
+   * @param periodSeconds The period to check for (in seconds).
+   * @return True if the period has passed.
    */
-  public synchronized boolean hasPeriodPassed(double period) {
-    if (get() > period) {
+  public synchronized boolean hasPeriodPassed(double periodSeconds) {
+    if (get() > periodSeconds) {
       // Advance the start time by the period.
       // Don't set it to the current time... we want to avoid drift.
-      m_startTime += period * 1000;
+      m_startTime += periodSeconds * 1000;
       return true;
     }
     return false;

@@ -18,8 +18,8 @@ import static org.junit.Assert.assertEquals;
 
 public class TimerTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(TimerTest.class.getName());
-  private static final long TIMER_TOLERANCE = (long) (2.5 * 1000);
-  private static final long TIMER_RUNTIME = 5 * 1000000;
+  private static final long TIMER_TOLERANCE_MICROS = (long) (2.5 * 1000);
+  private static final long TIMER_RUNTIME_MICROS = 5 * 1000000;
 
   @Override
   protected Logger getClassLogger() {
@@ -29,17 +29,17 @@ public class TimerTest extends AbstractComsSetup {
   @Test
   public void delayTest() {
     // Given
-    long startTime = RobotController.getFPGATime();
+    long startTimeMicroS = RobotController.getFPGATimeMicroSeconds();
 
     // When
-    Timer.delay(TIMER_RUNTIME / 1000000);
-    long endTime = RobotController.getFPGATime();
-    long difference = endTime - startTime;
+    Timer.delay(TIMER_RUNTIME_MICROS / 1000000);
+    long endTimeMicroS = RobotController.getFPGATimeMicroSeconds();
+    long differenceMicroS = endTimeMicroS - startTimeMicroS;
 
     // Then
-    long offset = difference - TIMER_RUNTIME;
-    assertEquals("Timer.delay ran " + offset + " microseconds too long", TIMER_RUNTIME, difference,
-        TIMER_TOLERANCE);
+    long offset = differenceMicroS - TIMER_RUNTIME_MICROS;
+    assertEquals("Timer.delay ran " + offset + " microseconds too long", TIMER_RUNTIME_MICROS,
+        differenceMicroS, TIMER_TOLERANCE_MICROS);
   }
 
 }

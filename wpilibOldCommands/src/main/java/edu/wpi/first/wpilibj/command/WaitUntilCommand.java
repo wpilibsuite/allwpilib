@@ -14,11 +14,15 @@ import edu.wpi.first.wpilibj.Timer;
  * some value, then continue to the next command.
  */
 public class WaitUntilCommand extends Command {
-  private final double m_time;
+  private final double m_timeSeconds;
 
-  public WaitUntilCommand(double time) {
-    super("WaitUntil(" + time + ")");
-    m_time = time;
+  /**
+   * Constructor for WaitUntilCommand.
+   * @param timeSeconds match time to wait until (in seconds)
+   */
+  public WaitUntilCommand(double timeSeconds) {
+    super("WaitUntil(" + timeSeconds + ")");
+    m_timeSeconds = timeSeconds;
   }
 
   /**
@@ -26,6 +30,6 @@ public class WaitUntilCommand extends Command {
    */
   @Override
   public boolean isFinished() {
-    return Timer.getMatchTime() >= m_time;
+    return Timer.getMatchTimeSeconds() >= m_timeSeconds;
   }
 }

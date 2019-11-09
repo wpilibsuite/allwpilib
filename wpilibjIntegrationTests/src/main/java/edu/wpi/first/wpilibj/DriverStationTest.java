@@ -18,8 +18,8 @@ import static org.junit.Assert.assertEquals;
 
 public class DriverStationTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(TimerTest.class.getName());
-  private static final double TIMER_TOLERANCE = 0.2;
-  private static final long TIMER_RUNTIME = 1000000; // 1 second
+  private static final double TIMER_TOLERANCE_MICROS = 0.2;
+  private static final long TIMER_RUNTIME_MICROS = 1000000; // 1 second
 
   @Override
   protected Logger getClassLogger() {
@@ -28,17 +28,17 @@ public class DriverStationTest extends AbstractComsSetup {
 
   @Test
   public void waitForDataTest() {
-    long startTime = RobotController.getFPGATime();
+    long startTimeMicroS = RobotController.getFPGATimeMicroSeconds();
 
     // Wait for data 50 times
     for (int i = 0; i < 50; i++) {
       DriverStation.getInstance().waitForData();
     }
-    long endTime = RobotController.getFPGATime();
-    long difference = endTime - startTime;
+    long endTimeMicroS = RobotController.getFPGATimeMicroSeconds();
+    long differenceMicroS = endTimeMicroS - startTimeMicroS;
 
-    assertEquals("DriverStation waitForData did not wait long enough", TIMER_RUNTIME, difference,
-        TIMER_TOLERANCE * TIMER_RUNTIME);
+    assertEquals("DriverStation waitForData did not wait long enough", TIMER_RUNTIME_MICROS,
+        differenceMicroS, TIMER_TOLERANCE_MICROS * TIMER_RUNTIME_MICROS);
   }
 
 }
