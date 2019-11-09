@@ -12,13 +12,13 @@
 namespace frc {
 
 /**
- * REV Robotics Spark Speed Controller.
+ * REV Robotics SPARK Speed Controller.
  *
- * Note that the Spark uses the following bounds for PWM values. These values
+ * Note that the SPARK uses the following bounds for PWM values. These values
  * should work reasonably well for most controllers, but if users experience
  * issues such as asymmetric behavior around the deadband or inability to
  * saturate the controller in either direction, calibration is recommended.
- * The calibration procedure can be found in the Spark User Manual available
+ * The calibration procedure can be found in the SPARK User Manual available
  * from REV Robotics.
  *
  * \li 2.003ms = full "forward"
@@ -30,9 +30,9 @@ namespace frc {
 class Spark : public PWMSpeedController {
  public:
   /**
-   * Constructor for a Spark.
+   * Constructor for a SPARK.
    *
-   * @param channel The PWM channel that the Spark is attached to. 0-9 are
+   * @param channel The PWM channel that the SPARK is attached to. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
   explicit Spark(int channel);

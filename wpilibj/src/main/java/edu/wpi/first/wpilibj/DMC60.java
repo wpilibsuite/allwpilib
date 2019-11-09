@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * reasonably well for most controllers, but if users experience issues such as asymmetric
  * behavior around the deadband or inability to saturate the controller in either direction,
  * calibration is recommended. The calibration procedure can be found in the DMC 60 User Manual
- * available from Digilent
+ * available from Digilent.
  *
  * <p><ul>
  * <li>2.004ms = full "forward"

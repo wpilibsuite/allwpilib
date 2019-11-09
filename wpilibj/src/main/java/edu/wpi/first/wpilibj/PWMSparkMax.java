@@ -12,12 +12,12 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
- * REV Robotics SparkMax Speed Controller.
+ * REV Robotics SPARK MAX Speed Controller with PWM control.
  *
- * <P>Note that the SPARK Max uses the following bounds for PWM values. These values should work
+ * <P>Note that the SPARK MAX uses the following bounds for PWM values. These values should work
  * reasonably well for most controllers, but if users experience issues such as asymmetric
  * behavior around the deadband or inability to saturate the controller in either direction,
- * calibration is recommended. The calibration procedure can be found in the Spark Max User Manual
+ * calibration is recommended. The calibration procedure can be found in the SPARK MAX User Manual
  * available from REV Robotics.
  *
  * <p><ul>

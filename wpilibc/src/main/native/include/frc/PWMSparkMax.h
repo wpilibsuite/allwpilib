@@ -12,13 +12,13 @@
 namespace frc {
 
 /**
- * REV Robotics SparkMax Speed Controller.
+ * REV Robotics SPARK MAX Speed Controller.
  *
- * Note that the SPARK Max uses the following bounds for PWM values. These
+ * Note that the SPARK MAX uses the following bounds for PWM values. These
  * values should work reasonably well for most controllers, but if users
  * experience issues such as asymmetric behavior around the deadband or
  * inability to saturate the controller in either direction, calibration is
- * recommended. The calibration procedure can be found in the Spark Max User
+ * recommended. The calibration procedure can be found in the SPARK MAX User
  * Manual available from REV Robotics.
  *
  * \li 2.003ms = full "forward"
@@ -30,9 +30,9 @@ namespace frc {
 class PWMSparkMax : public PWMSpeedController {
  public:
   /**
-   * Constructor for a SparkMax.
+   * Constructor for a SPARK MAX.
    *
-   * @param channel The PWM channel that the Spark is attached to. 0-9 are
+   * @param channel The PWM channel that the SPARK MAX is attached to. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
   explicit PWMSparkMax(int channel);

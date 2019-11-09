@@ -23,7 +23,7 @@ namespace frc {
  * if users experience issues such as asymmetric behavior around the deadband
  * or inability to saturate the controller in either direction, calibration is
  * recommended. The calibration procedure can be found in the Victor 884 User
- * Manual available from IFI.
+ * Manual available from Vex.
  *
  * \li 2.027ms = full "forward"
  * \li 1.525ms = the "high end" of the deadband range

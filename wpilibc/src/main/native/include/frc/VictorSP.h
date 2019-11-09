@@ -14,11 +14,11 @@ namespace frc {
 /**
  * Vex Robotics Victor SP Speed Controller.
  *
- * Note that the VictorSP uses the following bounds for PWM values. These
+ * Note that the Victor SP uses the following bounds for PWM values. These
  * values should work reasonably well for most controllers, but if users
  * experience issues such as asymmetric behavior around the deadband or
  * inability to saturate the controller in either direction, calibration is
- * recommended. The calibration procedure can be found in the VictorSP User
+ * recommended. The calibration procedure can be found in the Victor SP User
  * Manual available from Vex.
  *
  * \li 2.004ms = full "forward"

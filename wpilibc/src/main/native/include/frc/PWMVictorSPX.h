@@ -21,6 +21,7 @@ namespace frc {
  * inability to saturate the controller in either direction, calibration is
  * recommended. The calibration procedure can be found in the Victor SPX User
  * Manual available from Cross The Road Electronics.
+ *
  * \li 2.004ms = full "forward"
  * \li 1.520ms = the "high end" of the deadband range
  * \li 1.500ms = center of the deadband range (off)
