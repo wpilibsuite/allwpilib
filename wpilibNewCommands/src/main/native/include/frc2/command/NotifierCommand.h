@@ -37,7 +37,7 @@ class NotifierCommand : public CommandHelper<CommandBase, NotifierCommand> {
    * @param requirements the subsystems required by this command
    */
   NotifierCommand(std::function<void()> toRun, units::second_t period,
-                  std::initializer_list<Subsystem*> requirements);
+                  std::initializer_list<Subsystem*> requirements = {});
 
   NotifierCommand(NotifierCommand&& other);
 

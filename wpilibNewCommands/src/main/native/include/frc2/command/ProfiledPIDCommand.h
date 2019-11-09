@@ -44,7 +44,7 @@ class ProfiledPIDCommand
                      std::function<units::meter_t()> measurementSource,
                      std::function<State()> goalSource,
                      std::function<void(double, State)> useOutput,
-                     std::initializer_list<Subsystem*> requirements);
+                     std::initializer_list<Subsystem*> requirements = {});
 
   /**
    * Creates a new PIDCommand, which controls the given output with a

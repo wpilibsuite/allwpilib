@@ -32,7 +32,7 @@ class StartEndCommand : public CommandHelper<CommandBase, StartEndCommand> {
    * @param requirements the subsystems required by this command
    */
   StartEndCommand(std::function<void()> onInit, std::function<void()> onEnd,
-                  std::initializer_list<Subsystem*> requirements);
+                  std::initializer_list<Subsystem*> requirements = {});
 
   StartEndCommand(StartEndCommand&& other) = default;
 
