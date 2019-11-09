@@ -73,16 +73,15 @@ public class SwerveFollowerCommand extends CommandBase {
    * @param requirements                      The subsystems to require.
    */
 
-  public SwerveFollowerCommand(
-                        Trajectory trajectory,
-                        Supplier<Pose2d> pose,
-                        SwerveDriveKinematics kinematics,
-                        PIDController xdController,
-                        PIDController ydController,
-                        ProfiledPIDController thetaController,
+  public SwerveFollowerCommand(Trajectory trajectory,
+                               Supplier<Pose2d> pose,
+                               SwerveDriveKinematics kinematics,
+                               PIDController xdController,
+                               PIDController ydController,
+                               ProfiledPIDController thetaController,
 
-                        Consumer<SwerveModuleState[]> outputModuleStates,
-                        Subsystem... requirements) {
+                               Consumer<SwerveModuleState[]> outputModuleStates,
+                               Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "SwerveFollowerCommand");
     m_pose = requireNonNullParam(pose, "pose", "SwerveFollowerCommand");
     m_kinematics = requireNonNullParam(kinematics, "kinematics", "SwerveFollowerCommand");
@@ -101,6 +100,7 @@ public class SwerveFollowerCommand extends CommandBase {
 
   @Override
   public void initialize() {
+    // Sample final pose to get robot rotation
     m_finalPose = m_trajectory.sample(m_trajectory.getTotalTimeSeconds()).poseMeters;
 
     m_timer.reset();
@@ -124,16 +124,16 @@ public class SwerveFollowerCommand extends CommandBase {
         m_pose.get().getTranslation().getY(),
         desiredPose.getTranslation().getY());
 
+    // The robot will go to the desired rotation of the final pose in the trajectory,
+    // not following the poses at individual states.
     double targetAngularVel = m_thetaController.calculate(
         m_pose.get().getRotation().getRadians(),
         m_finalPose.getRotation().getRadians());
-    // The robot will go to the desired rotation of the final pose in the trajectory,
-    // not following the poses at individual states.
 
     double dvRef = desiredState.velocityMetersPerSecond;
 
-    targetXVel += dvRef * Math.sin(poseError.getRotation().getRadians());
-    targetYVel += dvRef * Math.cos(poseError.getRotation().getRadians());
+    targetXVel += dvRef * poseError.getRotation().getCos();
+    targetYVel += dvRef * poseError.getRotation().getSin();
 
     var targetChassisSpeeds = new ChassisSpeeds(targetXVel, targetYVel, targetAngularVel);
 

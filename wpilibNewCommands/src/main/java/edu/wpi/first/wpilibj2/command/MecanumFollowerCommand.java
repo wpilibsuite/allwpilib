@@ -109,30 +109,30 @@ public class MecanumFollowerCommand extends CommandBase {
 
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public MecanumFollowerCommand(Trajectory trajectory,
-                        Supplier<Pose2d> pose,
-                        double ksVolts,
-                        double kvVoltSecondsPerMeter,
-                        double kaVoltSecondsSquaredPerMeter,
-                        MecanumDriveKinematics kinematics,
+                                Supplier<Pose2d> pose,
+                                double ksVolts,
+                                double kvVoltSecondsPerMeter,
+                                double kaVoltSecondsSquaredPerMeter,
+                                MecanumDriveKinematics kinematics,
 
-                        PIDController xdController,
-                        PIDController ydController,
-                        ProfiledPIDController thetaController,
+                                PIDController xdController,
+                                PIDController ydController,
+                                ProfiledPIDController thetaController,
 
-                        double maxWheelVelocityMetersPerSecond,
+                                double maxWheelVelocityMetersPerSecond,
 
-                        PIDController frontLeftController,
-                        PIDController rearLeftController,
-                        PIDController frontRightController,
-                        PIDController rearRightController,
+                                PIDController frontLeftController,
+                                PIDController rearLeftController,
+                                PIDController frontRightController,
+                                PIDController rearRightController,
 
-                        Supplier<MecanumDriveWheelSpeeds> currentWheelSpeeds,
+                                Supplier<MecanumDriveWheelSpeeds> currentWheelSpeeds,
 
-                        DoubleConsumer frontLeftOutputVolts,
-                        DoubleConsumer rearLeftOutputVolts,
-                        DoubleConsumer frontRightOutputVolts,
-                        DoubleConsumer rearRightOutputVolts,
-                        Subsystem... requirements) {
+                                DoubleConsumer frontLeftOutputVolts,
+                                DoubleConsumer rearLeftOutputVolts,
+                                DoubleConsumer frontRightOutputVolts,
+                                DoubleConsumer rearRightOutputVolts,
+                                Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumFollowerCommand");
     m_pose = requireNonNullParam(pose, "pose", "MecanumFollowerCommand");
     m_ks = ksVolts;
@@ -204,19 +204,19 @@ public class MecanumFollowerCommand extends CommandBase {
 
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public MecanumFollowerCommand(Trajectory trajectory,
-                        Supplier<Pose2d> pose,
-                        MecanumDriveKinematics kinematics,
-                        PIDController xdController,
-                        PIDController ydController,
-                        ProfiledPIDController thetaController,
+                                Supplier<Pose2d> pose,
+                                MecanumDriveKinematics kinematics,
+                                PIDController xdController,
+                                PIDController ydController,
+                                ProfiledPIDController thetaController,
 
-                        double maxWheelVelocityMetersPerSecond,
+                                double maxWheelVelocityMetersPerSecond,
 
-                        DoubleConsumer frontLeftOutputMetersPerSecond,
-                        DoubleConsumer rearLeftOutputMetersPerSecond,
-                        DoubleConsumer frontRightOutputMetersPerSecond,
-                        DoubleConsumer rearRightOutputMetersPerSecond,
-                        Subsystem... requirements) {
+                                DoubleConsumer frontLeftOutputMetersPerSecond,
+                                DoubleConsumer rearLeftOutputMetersPerSecond,
+                                DoubleConsumer frontRightOutputMetersPerSecond,
+                                DoubleConsumer rearRightOutputMetersPerSecond,
+                                Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumFollowerCommand");
     m_pose = requireNonNullParam(pose, "pose", "MecanumFollowerCommand");
     m_ks = 0;
@@ -256,16 +256,17 @@ public class MecanumFollowerCommand extends CommandBase {
   @Override
   public void initialize() {
     var initialState = m_trajectory.sample(0);
+
+    // Sample final pose to get robot rotation
     m_finalPose = m_trajectory.sample(m_trajectory.getTotalTimeSeconds()).poseMeters; 
-    //Sample final pose to get robot rotation
 
     var initialXVelocity = initialState.velocityMetersPerSecond 
         * Math.sin(initialState.poseMeters.getRotation().getRadians());
     var initialYVelocity = initialState.velocityMetersPerSecond 
         * Math.cos(initialState.poseMeters.getRotation().getRadians());
 
-    m_prevSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(initialXVelocity, initialYVelocity,
-      initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
+    m_prevSpeeds = m_kinematics.toWheelSpeeds(
+      new ChassisSpeeds(initialXVelocity, initialYVelocity, 0.0));
 
     m_timer.reset();
     m_timer.start();
@@ -289,16 +290,16 @@ public class MecanumFollowerCommand extends CommandBase {
         m_pose.get().getTranslation().getY(),
         desiredPose.getTranslation().getY());
 
+    // The robot will go to the desired rotation of the final pose in the trajectory,
+    // not following the poses at individual states.
     double targetAngularVel = m_thetaController.calculate(
         m_pose.get().getRotation().getRadians(),
         m_finalPose.getRotation().getRadians());
-    // The robot will go to the desired rotation of the final pose in the trajectory,
-    // not following the poses at individual states.
 
     double dvRef = desiredState.velocityMetersPerSecond;
 
-    targetXVel += dvRef * Math.sin(poseError.getRotation().getRadians());
-    targetYVel += dvRef * Math.cos(poseError.getRotation().getRadians());
+    targetXVel += dvRef * poseError.getRotation().getCos();
+    targetYVel += dvRef * poseError.getRotation().getSin();
 
     var targetChassisSpeeds = new ChassisSpeeds(targetXVel, targetYVel, targetAngularVel);
 

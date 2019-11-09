@@ -5,49 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-/**
- * A command that uses two PID controllers ({@link PIDController}) and a
- * ProfiledPIDController ({@link ProfiledPIDController}) to follow a trajectory
- * {@link Trajectory} with a swerve drive.
- * 
- * <p>This command outputs the raw desired Swerve Module States ({@link SwerveModuleState})
- * in an array. The desired wheel and module rotation velocities should be taken
- * from those and used in velocity PIDs.
- *
- * <p>The robot angle controller does not follow the angle given by
- * the trajectory but rather goes to the angle given in the final state of the trajectory.
- */
-
 template <typename T>
 int sgn(T val) {
   return (T(0) < val) - (val < T(0));
 }
 
-/**
- * Constructs a new SwerveFollowerCommand that when executed will follow the provided trajectory.
- * This command will not return output voltages but rather raw module states from
- * the position controllers which need to be put into a velocity PID.
- *
- * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path-
- * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
- *
- * <p>Note2: The rotation controller will calculate the rotation based on the final pose 
- * in the trajectory, not the poses at each time step.
- *
- * @param trajectory                        The trajectory to follow.
- * @param pose                              A function that supplies the robot pose - use one of
- *                                          the odometry classes to provide this.
- * @param kinematics                        The kinematics for the robot drivetrain.
- * @param xdController                      The Trajectory Tracker PID controller
- *                                          for the robot's x position.
- * @param ydController                      The Trajectory Tracker PID controller
- *                                          for the robot's y position.
- * @param thetaController                   The Trajectory Tracker PID controller
- *                                          for angle for the robot.
- * @param outputModuleStates                The raw output module states from the
- *                                          position controllers.
- * @param requirements                      The subsystems to require.
- */
 
 namespace frc2 {
 
@@ -93,18 +55,18 @@ auto targetXVel = units::velocity::meters_per_second_t(
 auto targetYVel = units::velocity::meters_per_second_t(
     m_yController->Calculate((m_pose().Translation().Y().to<double>()),
                             (m_desiredPose.Translation().Y().to<double>())));
+
+// Profiled PID Controller only takes meters as setpoint and measurement
+// The robot will go to the desired rotation of the final pose in the
+// trajectory, not following the poses at individual states.
 auto targetAngularVel =
     units::angular_velocity::radians_per_second_t(m_thetaController->Calculate(
         units::meter_t(m_pose().Rotation().Radians().to<double>()), units::meter_t(m_finalPose.Rotation().Radians().to<double>())));  
-        // Profiled PID Controller only takes
-        // meters as setpoint and measurement
-// The robot will go to the desired rotation of the final pose in the
-// trajectory, not following the poses at individual states.
 
 auto vRef = m_desiredState.velocity;
 
-targetXVel += vRef * std::sin(m_poseError.Rotation().Radians().to<double>());
-targetYVel += vRef * std::cos(m_poseError.Rotation().Radians().to<double>());
+targetXVel += vRef * m_poseError.Rotation().Cos();
+targetYVel += vRef * m_poseError.Rotation().Sin();
 
 auto targetChassisSpeeds =
     frc::ChassisSpeeds{targetXVel, targetYVel, targetAngularVel};
