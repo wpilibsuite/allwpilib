@@ -63,17 +63,22 @@ void DutyCycleEncoder::Init() {
                                         m_dutyCycle->GetSourceChannel());
 }
 
-int DutyCycleEncoder::GetRotations() const { return m_counter.Get(); }
+units::turn_t DutyCycleEncoder::Get() const {
+  // As the values are not atomic, keep trying until we get 2 reads of the same value
+  // If we don't within 10 attempts, error
+  for (int i = 0; i < 10; i++) {
+    auto counter = m_counter.Get();
+    auto pos = m_dutyCycle->GetOutput();
+    auto counter2 = m_counter.Get();
+    if (counter == counter2) {
+      units::turn_t turns{counter + pos - m_positionOffset};
+      return turns;
+    }
+  }
 
-double DutyCycleEncoder::Get() const {
-  return GetRotations() + GetPositionInRotation() - m_positionOffset;
+  wpi_setErrnoErrorWithContext("Failed to read DutyCycle Encoder. Potential Speed Overrun");
+  return units::turn_t{0.0};
 }
-
-double DutyCycleEncoder::GetPositionInRotation() const {
-  return m_dutyCycle->GetOutput();
-}
-
-double DutyCycleEncoder::GetPositionOffset() const { return m_positionOffset; }
 
 void DutyCycleEncoder::SetDistancePerRotation(double distancePerRotation) {
   m_distancePerRotation = distancePerRotation;
@@ -82,7 +87,7 @@ double DutyCycleEncoder::GetDistancePerRotation() const {
   return m_distancePerRotation;
 }
 double DutyCycleEncoder::GetDistance() const {
-  return Get() * GetDistancePerRotation();
+  return Get().to<double>() * GetDistancePerRotation();
 }
 
 int DutyCycleEncoder::GetFrequency() const {
@@ -91,7 +96,7 @@ int DutyCycleEncoder::GetFrequency() const {
 
 void DutyCycleEncoder::Reset() {
   m_counter.Reset();
-  m_positionOffset = GetPositionInRotation();
+  m_positionOffset = m_dutyCycle->GetOutput();;
 }
 
 bool DutyCycleEncoder::IsConnected() const {

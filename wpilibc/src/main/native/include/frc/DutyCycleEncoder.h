@@ -10,6 +10,7 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <units/units.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/Counter.h"
@@ -111,35 +112,7 @@ class DutyCycleEncoder : public ErrorBase,
    *
    * @return the encoder value in rotations
    */
-  double Get() const;
-
-  /**
-   * Get the number of whole rotations since the last reset.
-   *
-   * @return number of whole rotations
-   */
-  int GetRotations() const;
-
-  /**
-   * Get the absolute position in the rotation.
-   *
-   * This is not affected by reset(), and is always just the absolute value
-   * straight from the encoder.
-   *
-   * @return the encoder absolute position
-   */
-  double GetPositionInRotation() const;
-
-  /**
-   * Get the offset of position relative to the last reset.
-   *
-   * getPositionInRotation() - getPositionOffset() will give an encoder absolute
-   * position relative to the last reset. This could potentially be negative,
-   * which needs to be accounted for.
-   *
-   * @return the position offset
-   */
-  double GetPositionOffset() const;
+  units::turn_t Get() const;
 
   /**
    * Set the distance per rotation of the encoder. This sets the multiplier used
