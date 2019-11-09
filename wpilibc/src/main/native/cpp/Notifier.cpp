@@ -11,6 +11,7 @@
 
 #include <hal/FRCUsageReporting.h>
 #include <hal/Notifier.h>
+#include <wpi/SmallString.h>
 
 #include "frc/Timer.h"
 #include "frc/Utility.h"
@@ -89,6 +90,13 @@ Notifier& Notifier::operator=(Notifier&& rhs) {
   m_periodic = std::move(rhs.m_periodic);
 
   return *this;
+}
+
+void Notifier::SetName(const wpi::Twine& name) {
+  wpi::SmallString<64> nameBuf;
+  int32_t status = 0;
+  HAL_SetNotifierName(m_notifier,
+                      name.toNullTerminatedStringRef(nameBuf).data(), &status);
 }
 
 void Notifier::SetHandler(std::function<void()> handler) {
