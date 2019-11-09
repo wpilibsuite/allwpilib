@@ -7,7 +7,7 @@
 
 #include "frc/AnalogAccelerometer.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"

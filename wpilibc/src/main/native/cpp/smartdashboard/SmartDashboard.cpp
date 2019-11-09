@@ -7,7 +7,7 @@
 
 #include "frc/smartdashboard/SmartDashboard.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/StringMap.h>
