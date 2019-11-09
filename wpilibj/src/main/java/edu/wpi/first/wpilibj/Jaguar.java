@@ -19,10 +19,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * behavior around the deadband or inability to saturate the controller in either direction,
  * calibration is recommended. The calibration procedure can be found in the Jaguar User Manual
  * available from Vex.
- *
- * <p>- 2.31ms = full "forward" - 1.55ms = the "high end" of the deadband range - 1.507ms =
- * center of the deadband range (off) - 1.454ms = the "low end" of the deadband range - 0.697ms =
- * full "reverse"
+ * <p><ul>
+ * <li>2.310ms = full "forward"
+ * <li>1.550ms = the "high end" of the deadband range
+ * <li>1.507ms = center of the deadband range (off)
+ * <li>1.454ms = the "low end" of the deadband range
+ * <li>0.697ms = full "reverse"
+ * </ul>
  */
 public class Jaguar extends PWMSpeedController {
   /**

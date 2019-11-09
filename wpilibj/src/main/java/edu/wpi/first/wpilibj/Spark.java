@@ -19,10 +19,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * behavior around the deadband or inability to saturate the controller in either direction,
  * calibration is recommended. The calibration procedure can be found in the Spark User Manual
  * available from REV Robotics.
- *
- * <p>- 2.003ms = full "forward" - 1.55ms = the "high end" of the deadband range - 1.50ms =
- * center of the deadband range (off) - 1.46ms = the "low end" of the deadband range - .999ms =
- * full "reverse"
+ * <p><ul>
+ * <li>2.003ms = full "forward"
+ * <li>1.550ms = the "high end" of the deadband range
+ * <li>1.500ms = center of the deadband range (off)
+ * <li>1.460ms = the "low end" of the deadband range
+ * <li>0.999ms = full "reverse"
+ * </ul>
  */
 public class Spark extends PWMSpeedController {
   /**
