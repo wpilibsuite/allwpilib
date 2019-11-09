@@ -26,7 +26,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * A command that uses two PID controllers ({@link PIDController}) and a
  * ProfiledPIDController ({@link ProfiledPIDController}) to follow a trajectory
  * {@link Trajectory} with a swerve drive.
- * 
+ *
  * <p>This command outputs the raw desired Swerve Module States ({@link SwerveModuleState})
  * in an array. The desired wheel and module rotation velocities should be taken
  * from those and used in velocity PIDs.
@@ -55,7 +55,7 @@ public class SwerveFollowerCommand extends CommandBase {
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path-
    * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
    *
-   * <p>Note2: The rotation controller will calculate the rotation based on the final pose 
+   * <p>Note2: The rotation controller will calculate the rotation based on the final pose
    * in the trajectory, not the poses at each time step.
    *
    * @param trajectory                        The trajectory to follow.

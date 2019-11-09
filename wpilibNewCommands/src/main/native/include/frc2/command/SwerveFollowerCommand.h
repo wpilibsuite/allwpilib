@@ -66,7 +66,7 @@ class SwerveFollowerCommand
  * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path-
  * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
  *
- * <p>Note2: The rotation controller will calculate the rotation based on the final pose 
+ * <p>Note2: The rotation controller will calculate the rotation based on the final pose
  * in the trajectory, not the poses at each time step.
  *
  * @param trajectory                        The trajectory to follow.

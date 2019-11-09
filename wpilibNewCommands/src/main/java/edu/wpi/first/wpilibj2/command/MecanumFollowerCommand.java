@@ -89,7 +89,7 @@ public class MecanumFollowerCommand extends CommandBase {
    * @param kinematics                        The kinematics for the robot drivetrain.
    * @param xdController                      The Trajectory Tracker PID controller
    *                                          for the robot's x position.
-   * @param ydController                      The Trajectory Tracker PID controller 
+   * @param ydController                      The Trajectory Tracker PID controller
    *                                          for the robot's y position.
    * @param thetaController                   The Trajectory Tracker PID controller
    *                                          for angle for the robot.
@@ -258,11 +258,11 @@ public class MecanumFollowerCommand extends CommandBase {
     var initialState = m_trajectory.sample(0);
 
     // Sample final pose to get robot rotation
-    m_finalPose = m_trajectory.sample(m_trajectory.getTotalTimeSeconds()).poseMeters; 
+    m_finalPose = m_trajectory.sample(m_trajectory.getTotalTimeSeconds()).poseMeters;
 
-    var initialXVelocity = initialState.velocityMetersPerSecond 
+    var initialXVelocity = initialState.velocityMetersPerSecond
         * Math.sin(initialState.poseMeters.getRotation().getRadians());
-    var initialYVelocity = initialState.velocityMetersPerSecond 
+    var initialYVelocity = initialState.velocityMetersPerSecond
         * Math.cos(initialState.poseMeters.getRotation().getRadians());
 
     m_prevSpeeds = m_kinematics.toWheelSpeeds(

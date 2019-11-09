@@ -61,7 +61,7 @@ auto targetYVel = units::velocity::meters_per_second_t(
 // trajectory, not following the poses at individual states.
 auto targetAngularVel =
     units::angular_velocity::radians_per_second_t(m_thetaController->Calculate(
-        units::meter_t(m_pose().Rotation().Radians().to<double>()), units::meter_t(m_finalPose.Rotation().Radians().to<double>())));  
+        units::meter_t(m_pose().Rotation().Radians().to<double>()), units::meter_t(m_finalPose.Rotation().Radians().to<double>())));
 
 auto vRef = m_desiredState.velocity;
 

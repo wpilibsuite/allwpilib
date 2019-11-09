@@ -88,7 +88,7 @@ void MecanumFollowerCommand::Initialize() {
   auto initialState = m_trajectory.Sample(0_s);
 
   auto initialXVelocity =
-      initialState.velocity * 
+      initialState.velocity *
       initialState.pose.Rotation().Cos();
   auto initialYVelocity =
       initialState.velocity *
@@ -130,7 +130,7 @@ void MecanumFollowerCommand::Execute() {
   auto targetAngularVel =
       angular_velocity::radians_per_second_t(m_thetaController->Calculate(
           units::meter_t(m_pose().Rotation().Radians().to<double>()),
-          units::meter_t(m_finalPose.Rotation().Radians().to<double>()))); 
+          units::meter_t(m_finalPose.Rotation().Radians().to<double>())));
 
   auto vRef = m_desiredState.velocity;
 

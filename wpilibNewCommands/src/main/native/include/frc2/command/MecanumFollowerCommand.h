@@ -76,7 +76,7 @@ class MecanumFollowerCommand
    * @param kinematics                        The kinematics for the robot drivetrain.
    * @param xController                      The Trajectory Tracker PID controller
    *                                          for the robot's x position.
-   * @param yController                      The Trajectory Tracker PID controller 
+   * @param yController                      The Trajectory Tracker PID controller
    *                                          for the robot's y position.
    * @param thetaController                   The Trajectory Tracker PID controller
    *                                          for angle for the robot.
@@ -87,10 +87,10 @@ class MecanumFollowerCommand
    * @param frontRightController              The front right wheel velocity PID.
    * @param rearRightController               The rear right wheel velocity PID.
    *                                          the current wheel speeds.
-   * @param output                            The output of the velocity PIDs in volts. 
+   * @param output                            The output of the velocity PIDs in volts.
    * @param requirements                      The subsystems to require.
    */
-  
+
   MecanumFollowerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       units::voltage::volt_t ks, units::unit_t<voltsecondspermeter> kv,
@@ -131,7 +131,7 @@ class MecanumFollowerCommand
    * @param thetaController                   The Trajectory Tracker PID controller
    *                                          for angle for the robot.
    * @param maxWheelVelocityMetersPerSecond   The maximum velocity of a drivetrain wheel.
-   * @param output                            The output of the velocity PID's in volts. 
+   * @param output                            The output of the velocity PID's in volts.
    * @param requirements                      The subsystems to require.
    */
   MecanumFollowerCommand(
