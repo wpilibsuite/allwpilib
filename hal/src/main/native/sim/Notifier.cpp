@@ -8,6 +8,8 @@
 #include "hal/Notifier.h"
 
 #include <chrono>
+#include <cstdio>
+#include <cstring>
 #include <string>
 
 #include <wpi/condition_variable.h>
@@ -164,6 +166,48 @@ uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
     return HAL_GetFPGATime(status);
   }
   return 0;
+}
+
+uint64_t HALSIM_GetNextNotifierTimeout(void) {
+  uint64_t timeout = UINT64_MAX;
+  notifierHandles->ForEach([&](HAL_NotifierHandle, Notifier* notifier) {
+    std::scoped_lock lock(notifier->mutex);
+    if (notifier->active && notifier->running && timeout > notifier->waitTime)
+      timeout = notifier->waitTime;
+  });
+  return timeout;
+}
+
+int32_t HALSIM_GetNumNotifiers(void) {
+  int32_t count = 0;
+  notifierHandles->ForEach([&](HAL_NotifierHandle, Notifier* notifier) {
+    std::scoped_lock lock(notifier->mutex);
+    if (notifier->active) ++count;
+  });
+  return count;
+}
+
+int32_t HALSIM_GetNotifierInfo(struct HALSIM_NotifierInfo* arr, int32_t size) {
+  int32_t num = 0;
+  notifierHandles->ForEach([&](HAL_NotifierHandle handle, Notifier* notifier) {
+    std::scoped_lock lock(notifier->mutex);
+    if (!notifier->active) return;
+    if (num < size) {
+      arr[num].handle = handle;
+      if (notifier->name.empty()) {
+        std::snprintf(arr[num].name, sizeof(arr[num].name), "Notifier%d",
+                      static_cast<int>(getHandleIndex(handle)));
+      } else {
+        std::strncpy(arr[num].name, notifier->name.c_str(),
+                     sizeof(arr[num].name));
+        arr[num].name[sizeof(arr[num].name) - 1] = '\0';
+      }
+      arr[num].timeout = notifier->waitTime;
+      arr[num].running = notifier->running;
+    }
+    ++num;
+  });
+  return num;
 }
 
 }  // extern "C"
