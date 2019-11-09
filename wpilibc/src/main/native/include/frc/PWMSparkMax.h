@@ -22,9 +22,9 @@ namespace frc {
  * Manual available from REV Robotics.
  *
  * \li 2.003ms = full "forward"
- * \li 1.55ms = the "high end" of the deadband range
- * \li 1.50ms = center of the deadband range (off)
- * \li 1.46ms = the "low end" of the deadband range
+ * \li 1.550ms = the "high end" of the deadband range
+ * \li 1.500ms = center of the deadband range (off)
+ * \li 1.460ms = the "low end" of the deadband range
  * \li 0.999ms = full "reverse"
  */
 class PWMSparkMax : public PWMSpeedController {

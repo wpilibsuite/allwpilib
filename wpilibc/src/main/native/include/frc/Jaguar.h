@@ -21,10 +21,10 @@ namespace frc {
  * calibration procedure can be found in the Jaguar User Manual available from
  * Vex.
  *
- * \li 2.31ms = full "forward"
- * \li 1.55ms = the "high end" of the deadband range
+ * \li 2.310ms = full "forward"
+ * \li 1.550ms = the "high end" of the deadband range
  * \li 1.507ms = center of the deadband range (off)
- * \li 1.454s = the "low end" of the deadband range
+ * \li 1.454ms = the "low end" of the deadband range
  * \li 0.697ms = full "reverse"
  */
 class Jaguar : public PWMSpeedController {

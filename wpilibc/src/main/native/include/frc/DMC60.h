@@ -22,9 +22,9 @@ namespace frc {
  * Manual available from Digilent.
  *
  * \li 2.004ms = full "forward"
- * \li 1.52ms = the "high end" of the deadband range
- * \li 1.50ms = center of the deadband range (off)
- * \li 1.48ms = the "low end" of the deadband range
+ * \li 1.520ms = the "high end" of the deadband range
+ * \li 1.500ms = center of the deadband range (off)
+ * \li 1.480ms = the "low end" of the deadband range
  * \li 0.997ms = full "reverse"
  */
 class DMC60 : public PWMSpeedController {

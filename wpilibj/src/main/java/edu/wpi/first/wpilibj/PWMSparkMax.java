@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * behavior around the deadband or inability to saturate the controller in either direction,
  * calibration is recommended. The calibration procedure can be found in the Spark Max User Manual
  * available from REV Robotics.
+ *
  * <p><ul>
  * <li> 2.003ms = full "forward"
  * <li> 1.550ms = the "high end" of the deadband range

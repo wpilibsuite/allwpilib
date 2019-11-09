@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * the deadband or inability to saturate the controller in either direction, calibration is
  * recommended. The calibration procedure can be found in the Victor 884 User Manual available
  * from VEX Robotics: http://content.vexrobotics.com/docs/ifi-v884-users-manual-9-25-06.pdf
+ *
  * <p><ul>
  * <li>2.027ms = full "forward"
  * <li>1.525ms = the "high end" of the deadband range

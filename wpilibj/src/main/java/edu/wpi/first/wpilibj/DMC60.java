@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * behavior around the deadband or inability to saturate the controller in either direction,
  * calibration is recommended. The calibration procedure can be found in the DMC 60 User Manual
  * available from Digilent
+ *
  * <p><ul>
  * <li>2.004ms = full "forward"
  * <li>1.520ms = the "high end" of the deadband range
