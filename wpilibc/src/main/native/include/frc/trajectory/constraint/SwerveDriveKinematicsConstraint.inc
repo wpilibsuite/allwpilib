@@ -31,9 +31,10 @@ SwerveDriveKinematicsConstraint<NumModules>::MaxVelocity(
   auto yVelocity = velocity * cos(pose.Rotation().Radians().to<double>());
   auto wheelSpeeds = m_kinematics.ToSwerveModuleStates(
       {xVelocity, yVelocity, velocity * curvature});
-  m_kinematics.NormalizeWheelSpeeds(wheelSpeeds, m_maxSpeed);
+  m_kinematics.NormalizeWheelSpeeds(&wheelSpeeds, m_maxSpeed);
 
-  return m_kinematics.ToChassisSpeeds(wheelSpeeds).vx;
+  return m_kinematics.ToChassisSpeeds(wheelSpeeds[0], wheelSpeeds[1],
+    wheelSpeeds[2], wheelSpeeds[3]).vx;
 }
 
 template <int NumModules>
