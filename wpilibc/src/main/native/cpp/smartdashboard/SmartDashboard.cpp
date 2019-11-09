@@ -81,6 +81,10 @@ void SmartDashboard::Delete(wpi::StringRef key) {
   Singleton::GetInstance().table->Delete(key);
 }
 
+nt::NetworkTableEntry SmartDashboard::GetEntry(wpi::StringRef key) {
+  Singleton::GetInstance().table->GetEntry(key);
+}
+
 void SmartDashboard::PutData(wpi::StringRef key, Sendable* data) {
   if (data == nullptr) {
     wpi_setGlobalWPIErrorWithContext(NullParameter, "value");

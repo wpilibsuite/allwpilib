@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
 
 #include "frc/ErrorBase.h"
@@ -95,6 +96,16 @@ class SmartDashboard : public ErrorBase,
    * @param key the key name
    */
   static void Delete(wpi::StringRef key);
+
+  /**
+   * Returns an NT Entry mapping to the specified key
+   * 
+   * This is useful if an entry is used often, or is read and then modified.
+   * 
+   * @param key the key
+   * @return    the entry for the key
+   */
+  static nt::NetworkTableEntry GetEntry(wpi::StringRef key);
 
   /**
    * Maps the specified key to the specified value in this table.
