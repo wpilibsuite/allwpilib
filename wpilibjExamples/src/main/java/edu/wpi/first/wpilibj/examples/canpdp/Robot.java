@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
      * current in increments of 0.125A. At low currents
      * the current readings tend to be less accurate.
      */
-    SmartDashboard.putNumber("Current Channel 7", m_pdp.getCurrent(7));
+    SmartDashboard.putNumber("Current Channel 7", m_pdp.getCurrentAmps(7));
 
     /*
      * Get the voltage going into the PDP, in Volts.
@@ -38,6 +38,6 @@ public class Robot extends TimedRobot {
     /*
      * Retrieves the temperature of the PDP, in degrees Celsius.
      */
-    SmartDashboard.putNumber("Temperature", m_pdp.getTemperature());
+    SmartDashboard.putNumber("Temperature", m_pdp.getTemperatureDegC());
   }
 }

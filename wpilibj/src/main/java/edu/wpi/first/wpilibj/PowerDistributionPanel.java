@@ -59,6 +59,17 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
    *
    * @return The temperature of the PDP in degrees Celsius
    */
+  public double getTemperatureDegC() {
+    return PDPJNI.getPDPTemperature(m_handle);
+  }
+
+  /**
+   * Query the temperature of the PDP.
+   *
+   * @return The temperature of the PDP in degrees Celsius
+   * @deprecated Use {@link getTemperatureDegC} instead.
+   */
+  @Deprecated(since = "2020")
   public double getTemperature() {
     return PDPJNI.getPDPTemperature(m_handle);
   }
@@ -68,6 +79,21 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
    *
    * @return The current of one of the PDP channels (channels 0-15) in Amperes
    */
+  public double getCurrentAmps(int channel) {
+    double current = PDPJNI.getPDPChannelCurrent((byte) channel, m_handle);
+
+    SensorUtil.checkPDPChannel(channel);
+
+    return current;
+  }
+
+  /**
+   * Query the current of a single channel of the PDP.
+   *
+   * @return The current of one of the PDP channels (channels 0-15) in Amperes
+   * @deprecated Use {@link getCurrentAmps} instead.
+   */
+  @Deprecated(since = "2020")
   public double getCurrent(int channel) {
     double current = PDPJNI.getPDPChannelCurrent((byte) channel, m_handle);
 
@@ -81,6 +107,17 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
    *
    * @return The current of all the channels in Amperes
    */
+  public double getTotalCurrentAmps() {
+    return PDPJNI.getPDPTotalCurrent(m_handle);
+  }
+
+  /**
+   * Query the current of all monitored PDP channels (0-15).
+   *
+   * @return The current of all the channels in Amperes
+   * @deprecated Use {@link getTotalCurrentAmps} instead.
+   */
+  @Deprecated(since = "2020")
   public double getTotalCurrent() {
     return PDPJNI.getPDPTotalCurrent(m_handle);
   }
@@ -90,6 +127,17 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
    *
    * @return the total power in Watts
    */
+  public double getTotalPowerWatts() {
+    return PDPJNI.getPDPTotalPower(m_handle);
+  }
+
+  /**
+   * Query the total power drawn from the monitored PDP channels.
+   *
+   * @return the total power in Watts
+   * @deprecated Use {@link getTotalPowerWatts} instead.
+   */
+  @Deprecated(since = "2020")
   public double getTotalPower() {
     return PDPJNI.getPDPTotalPower(m_handle);
   }
@@ -99,6 +147,17 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
    *
    * @return the total energy in Joules
    */
+  public double getTotalEnergyJoules() {
+    return PDPJNI.getPDPTotalEnergy(m_handle);
+  }
+
+  /**
+   * Query the total energy drawn from the monitored PDP channels.
+   *
+   * @return the total energy in Joules
+   * @deprecated Use {@link getTotalEnergyJoules} instead.
+   */
+  @Deprecated(since = "2020")
   public double getTotalEnergy() {
     return PDPJNI.getPDPTotalEnergy(m_handle);
   }

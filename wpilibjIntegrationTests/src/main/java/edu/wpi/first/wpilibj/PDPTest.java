@@ -87,7 +87,7 @@ public class PDPTest extends AbstractComsSetup {
 
     /* The Current should be 0 */
     assertEquals("The low current was not within the expected range.", m_expectedStoppedCurrentDraw,
-        pdp.getCurrent(me.getPDPChannel()), 0.001);
+        pdp.getCurrentAmps(me.getPDPChannel()), 0.001);
   }
 
   /**
@@ -101,7 +101,7 @@ public class PDPTest extends AbstractComsSetup {
 
     /* The current should now be greater than the low current */
     assertThat("The driven current is not greater than the resting current.",
-        pdp.getCurrent(me.getPDPChannel()), is(greaterThan(m_expectedStoppedCurrentDraw)));
+        pdp.getCurrentAmps(me.getPDPChannel()), is(greaterThan(m_expectedStoppedCurrentDraw)));
   }
 
   @Override
