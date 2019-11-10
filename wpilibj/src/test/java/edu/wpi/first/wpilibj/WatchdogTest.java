@@ -104,7 +104,7 @@ class WatchdogTest {
     }
     watchdog.setTimeout(0.2);
 
-    assertEquals(0.2, watchdog.getTimeoutSeconds());
+    assertEquals(0.2, watchdog.getTimeout());
     assertEquals(0, watchdogCounter.get(), "Watchdog triggered early");
 
     try {

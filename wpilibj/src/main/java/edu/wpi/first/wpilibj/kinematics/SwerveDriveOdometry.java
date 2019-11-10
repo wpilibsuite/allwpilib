@@ -114,6 +114,6 @@ public class SwerveDriveOdometry {
    * @return The new pose of the robot.
    */
   public Pose2d update(Rotation2d angle, SwerveModuleState... moduleStates) {
-    return updateWithTime(Timer.getFPGATimestampSeconds(), angle, moduleStates);
+    return updateWithTime(Timer.getFPGATimestamp(), angle, moduleStates);
   }
 }

@@ -45,12 +45,12 @@ public abstract class Command implements Sendable, AutoCloseable {
   /**
    * The time since this command was initialized.
    */
-  private double m_startTimeSeconds = -1;
+  private double m_startTime = -1;
 
   /**
    * The time (in seconds) before this command "times out" (or -1 if no timeout).
    */
-  private double m_timeoutSeconds = -1;
+  private double m_timeout = -1;
 
   /**
    * Whether or not this command has been initialized.
@@ -122,16 +122,16 @@ public abstract class Command implements Sendable, AutoCloseable {
    * Creates a new command with the given timeout and a default name. The default name is the name
    * of the class.
    *
-   * @param timeoutSeconds the time (in seconds) before this command "times out"
+   * @param timeout the time (in seconds) before this command "times out"
    * @throws IllegalArgumentException if given a negative timeout
    * @see Command#isTimedOut() isTimedOut()
    */
-  public Command(double timeoutSeconds) {
+  public Command(double timeout) {
     this();
-    if (timeoutSeconds < 0) {
-      throw new IllegalArgumentException("Timeout must not be negative.  Given:" + timeoutSeconds);
+    if (timeout < 0) {
+      throw new IllegalArgumentException("Timeout must not be negative.  Given:" + timeout);
     }
-    m_timeoutSeconds = timeoutSeconds;
+    m_timeout = timeout;
   }
 
   /**
@@ -163,44 +163,44 @@ public abstract class Command implements Sendable, AutoCloseable {
    * Creates a new command with the given timeout and a default name. The default name is the name
    * of the class.
    *
-   * @param timeoutSeconds the time (in seconds) before this command "times out"
-   * @param subsystem      the subsystem that this command requires
+   * @param timeout   the time (in seconds) before this command "times out"
+   * @param subsystem the subsystem that this command requires
    * @throws IllegalArgumentException if given a negative timeout
    * @see Command#isTimedOut() isTimedOut()
    */
-  public Command(double timeoutSeconds, Subsystem subsystem) {
-    this(timeoutSeconds);
+  public Command(double timeout, Subsystem subsystem) {
+    this(timeout);
     requires(subsystem);
   }
 
   /**
    * Creates a new command with the given name and timeout.
    *
-   * @param name           the name of the command
-   * @param timeoutSeconds the time (in seconds) before this command "times out"
+   * @param name    the name of the command
+   * @param timeout the time (in seconds) before this command "times out"
    * @throws IllegalArgumentException if given a negative timeout or name was null.
    * @see Command#isTimedOut() isTimedOut()
    */
-  public Command(String name, double timeoutSeconds) {
+  public Command(String name, double timeout) {
     this(name);
-    if (timeoutSeconds < 0) {
-      throw new IllegalArgumentException("Timeout must not be negative.  Given:" + timeoutSeconds);
+    if (timeout < 0) {
+      throw new IllegalArgumentException("Timeout must not be negative.  Given:" + timeout);
     }
-    m_timeoutSeconds = timeoutSeconds;
+    m_timeout = timeout;
   }
 
   /**
    * Creates a new command with the given name and timeout.
    *
-   * @param name           the name of the command
-   * @param timeoutSeconds the time (in seconds) before this command "times out"
-   * @param subsystem      the subsystem that this command requires
+   * @param name      the name of the command
+   * @param timeout   the time (in seconds) before this command "times out"
+   * @param subsystem the subsystem that this command requires
    * @throws IllegalArgumentException if given a negative timeout
    * @throws IllegalArgumentException if given a negative timeout or name was null.
    * @see Command#isTimedOut() isTimedOut()
    */
-  public Command(String name, double timeoutSeconds, Subsystem subsystem) {
-    this(name, timeoutSeconds);
+  public Command(String name, double timeout, Subsystem subsystem) {
+    this(name, timeout);
     requires(subsystem);
   }
 
@@ -220,7 +220,7 @@ public abstract class Command implements Sendable, AutoCloseable {
     if (seconds < 0) {
       throw new IllegalArgumentException("Seconds must be positive.  Given:" + seconds);
     }
-    m_timeoutSeconds = seconds;
+    m_timeout = seconds;
   }
 
   /**
@@ -230,7 +230,7 @@ public abstract class Command implements Sendable, AutoCloseable {
    * @return the time since this command was initialized (in seconds).
    */
   public final synchronized double timeSinceInitialized() {
-    return m_startTimeSeconds < 0 ? 0 : Timer.getFPGATimestampSeconds() - m_startTimeSeconds;
+    return m_startTime < 0 ? 0 : Timer.getFPGATimestamp() - m_startTime;
   }
 
   /**
@@ -377,7 +377,7 @@ public abstract class Command implements Sendable, AutoCloseable {
    * Command#initialize() initialize()} is, inside the {@link Command#run() run()} method.
    */
   private void startTiming() {
-    m_startTimeSeconds = Timer.getFPGATimestampSeconds();
+    m_startTime = Timer.getFPGATimestamp();
   }
 
   /**
@@ -388,7 +388,7 @@ public abstract class Command implements Sendable, AutoCloseable {
    * @return whether the time has expired
    */
   protected synchronized boolean isTimedOut() {
-    return m_timeoutSeconds != -1 && timeSinceInitialized() >= m_timeoutSeconds;
+    return m_timeout != -1 && timeSinceInitialized() >= m_timeout;
   }
 
   /**
@@ -482,7 +482,7 @@ public abstract class Command implements Sendable, AutoCloseable {
    */
   synchronized void startRunning() {
     m_running = true;
-    m_startTimeSeconds = -1;
+    m_startTime = -1;
   }
 
   /**

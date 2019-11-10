@@ -37,10 +37,10 @@ public class WaitUntilCommand extends CommandBase {
    * guarantee that the time at which the action is performed will be judged to be legal by the
    * referees.  When in doubt, add a safety factor or time the action manually.
    *
-   * @param timeSeconds the match time after which to end, in seconds
+   * @param time the match time after which to end, in seconds
    */
-  public WaitUntilCommand(double timeSeconds) {
-    this(() -> Timer.getMatchTimeSeconds() - timeSeconds > 0);
+  public WaitUntilCommand(double time) {
+    this(() -> Timer.getMatchTime() - time > 0);
   }
 
   @Override

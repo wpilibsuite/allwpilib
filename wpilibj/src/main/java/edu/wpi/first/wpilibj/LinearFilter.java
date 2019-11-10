@@ -80,12 +80,12 @@ public class LinearFilter {
    *
    * <p>This filter is stable for time constants greater than zero.
    *
-   * @param timeConstantSeconds  The discrete-time time constant in seconds.
-   * @param periodSeconds        The period in seconds between samples taken by the user.
+   * @param timeConstant The discrete-time time constant in seconds.
+   * @param period       The period in seconds between samples taken by the user.
    */
-  public static LinearFilter singlePoleIIR(double timeConstantSeconds,
-                                           double periodSeconds) {
-    double gain = Math.exp(-periodSeconds / timeConstantSeconds);
+  public static LinearFilter singlePoleIIR(double timeConstant,
+                                           double period) {
+    double gain = Math.exp(-period / timeConstant);
     double[] ffGains = {1.0 - gain};
     double[] fbGains = {-gain};
 
@@ -98,12 +98,12 @@ public class LinearFilter {
    *
    * <p>This filter is stable for time constants greater than zero.
    *
-   * @param timeConstantSeconds The discrete-time time constant in seconds.
-   * @param periodSeconds       The period in seconds between samples taken by the user.
+   * @param timeConstant The discrete-time time constant in seconds.
+   * @param period       The period in seconds between samples taken by the user.
    */
-  public static LinearFilter highPass(double timeConstantSeconds,
-                                      double periodSeconds) {
-    double gain = Math.exp(-periodSeconds / timeConstantSeconds);
+  public static LinearFilter highPass(double timeConstant,
+                                      double period) {
+    double gain = Math.exp(-period / timeConstant);
     double[] ffGains = {gain, -gain};
     double[] fbGains = {-gain};
 

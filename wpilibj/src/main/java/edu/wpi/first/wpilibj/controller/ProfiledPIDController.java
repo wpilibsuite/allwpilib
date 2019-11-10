@@ -41,18 +41,18 @@ public class ProfiledPIDController implements Sendable {
    * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and
    * Kd.
    *
-   * @param Kp            The proportional coefficient.
-   * @param Ki            The integral coefficient.
-   * @param Kd            The derivative coefficient.
-   * @param constraints   Velocity and acceleration constraints for goal.
-   * @param periodSeconds The period between controller updates in seconds. The
-   *                      default is 0.02 seconds.
+   * @param Kp          The proportional coefficient.
+   * @param Ki          The integral coefficient.
+   * @param Kd          The derivative coefficient.
+   * @param constraints Velocity and acceleration constraints for goal.
+   * @param period      The period between controller updates in seconds. The
+   *                    default is 0.02 seconds.
    */
   @SuppressWarnings("ParameterName")
   public ProfiledPIDController(double Kp, double Ki, double Kd,
                         TrapezoidProfile.Constraints constraints,
-                        double periodSeconds) {
-    m_controller = new PIDController(Kp, Ki, Kd, periodSeconds);
+                        double period) {
+    m_controller = new PIDController(Kp, Ki, Kd, period);
     m_constraints = constraints;
   }
 
@@ -130,21 +130,10 @@ public class ProfiledPIDController implements Sendable {
   /**
    * Gets the period of this controller.
    *
-   * @return The period of the controller in Seconds.
+   * @return The period of the controller.
    */
-  public double getPeriodSeconds() {
-    return m_controller.getPeriodSeconds();
-  }
-
-  /**
-   * Gets the period of this controller.
-   *
-   * @return The period of the controller in Seconds.
-   * @deprecated Use {@link getPeriodSeconds} instead.
-   */
-  @Deprecated(since = "2020")
   public double getPeriod() {
-    return m_controller.getPeriodSeconds();
+    return m_controller.getPeriod();
   }
 
   /**
@@ -284,7 +273,7 @@ public class ProfiledPIDController implements Sendable {
    */
   public double calculate(double measurement) {
     var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
-    m_setpoint = profile.calculate(getPeriodSeconds());
+    m_setpoint = profile.calculate(getPeriod());
     return m_controller.calculate(measurement, m_setpoint.position);
   }
 

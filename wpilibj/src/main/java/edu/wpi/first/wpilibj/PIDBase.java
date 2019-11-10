@@ -32,7 +32,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 @Deprecated(since = "2020", forRemoval = true)
 @SuppressWarnings("PMD.TooManyFields")
 public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable {
-  public static final double kDefaultPeriodSeconds = 0.05;
+  public static final double kDefaultPeriod = 0.05;
   private static int instances;
 
   // Factor for "proportional" control

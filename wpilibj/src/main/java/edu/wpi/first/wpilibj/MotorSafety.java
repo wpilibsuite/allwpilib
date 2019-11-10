@@ -17,11 +17,11 @@ import java.util.Set;
  * <p>The subclass should call feed() whenever the motor value is updated.
  */
 public abstract class MotorSafety {
-  private static final double kDefaultSafetyExpirationSeconds = 0.1;
+  private static final double kDefaultSafetyExpiration = 0.1;
 
-  private double m_expirationSeconds = kDefaultSafetyExpirationSeconds;
+  private double m_expiration = kDefaultSafetyExpiration;
   private boolean m_enabled;
-  private double m_stopTimeSeconds = Timer.getFPGATimestampSeconds();
+  private double m_stopTime = Timer.getFPGATimestamp();
   private final Object m_thisMutex = new Object();
   private static final Set<MotorSafety> m_instanceList = new LinkedHashSet<>();
   private static final Object m_listMutex = new Object();
@@ -42,18 +42,18 @@ public abstract class MotorSafety {
    */
   public void feed() {
     synchronized (m_thisMutex) {
-      m_stopTimeSeconds = Timer.getFPGATimestampSeconds() + m_expirationSeconds;
+      m_stopTime = Timer.getFPGATimestamp() + m_expiration;
     }
   }
 
   /**
    * Set the expiration time for the corresponding motor safety object.
    *
-   * @param expirationTimeSeconds The timeout value in seconds.
+   * @param expirationTime The timeout value in seconds.
    */
-  public void setExpiration(double expirationTimeSeconds) {
+  public void setExpiration(double expirationTime) {
     synchronized (m_thisMutex) {
-      m_expirationSeconds = expirationTimeSeconds;
+      m_expiration = expirationTime;
     }
   }
 
@@ -62,21 +62,10 @@ public abstract class MotorSafety {
    *
    * @return the timeout value in seconds.
    */
-  public double getExpirationSeconds() {
-    synchronized (m_thisMutex) {
-      return m_expirationSeconds;
-    }
-  }
-
-  /**
-   * Retrieve the timeout value for the corresponding motor safety object.
-   *
-   * @return the timeout value in seconds.
-   * @deprecated Use {@link getExpirationSeconds} instead.
-   */
-  @Deprecated(since = "2020")
   public double getExpiration() {
-    return getExpirationSeconds();
+    synchronized (m_thisMutex) {
+      return m_expiration;
+    }
   }
 
   /**
@@ -86,7 +75,7 @@ public abstract class MotorSafety {
    */
   public boolean isAlive() {
     synchronized (m_thisMutex) {
-      return !m_enabled || m_stopTimeSeconds > Timer.getFPGATimestampSeconds();
+      return !m_enabled || m_stopTime > Timer.getFPGATimestamp();
     }
   }
 
@@ -97,18 +86,18 @@ public abstract class MotorSafety {
    */
   public void check() {
     boolean enabled;
-    double stopTimeSeconds;
+    double stopTime;
 
     synchronized (m_thisMutex) {
       enabled = m_enabled;
-      stopTimeSeconds = m_stopTimeSeconds;
+      stopTime = m_stopTime;
     }
 
     if (!enabled || RobotState.isDisabled() || RobotState.isTest()) {
       return;
     }
 
-    if (stopTimeSeconds < Timer.getFPGATimestampSeconds()) {
+    if (stopTime < Timer.getFPGATimestamp()) {
       DriverStation.reportError(getDescription() + "... Output not updated often enough.", false);
 
       stopMotor();

@@ -117,7 +117,7 @@ public class DifferentialDriveOdometry {
    */
   public Pose2d update(Rotation2d angle,
                        DifferentialDriveWheelSpeeds wheelSpeeds) {
-    return updateWithTime(Timer.getFPGATimestampSeconds(),
+    return updateWithTime(Timer.getFPGATimestamp(),
         angle, wheelSpeeds);
   }
 }

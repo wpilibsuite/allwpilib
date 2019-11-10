@@ -28,41 +28,41 @@ public class PIDController extends PIDBase implements Controller, AutoCloseable 
   /**
    * Allocate a PID object with the given constants for P, I, D, and F.
    *
-   * @param Kp            the proportional coefficient
-   * @param Ki            the integral coefficient
-   * @param Kd            the derivative coefficient
-   * @param Kf            the feed forward term
-   * @param source        The PIDSource object that is used to get values
-   * @param output        The PIDOutput object that is set to the output percentage
-   * @param periodSeconds the loop time for doing calculations in seconds.
-   *                      This particularly affects calculations of
-   *                      the integral and differential terms.
-   *                      The default is 0.05 (50ms).
+   * @param Kp     the proportional coefficient
+   * @param Ki     the integral coefficient
+   * @param Kd     the derivative coefficient
+   * @param Kf     the feed forward term
+   * @param source The PIDSource object that is used to get values
+   * @param output The PIDOutput object that is set to the output percentage
+   * @param period the loop time for doing calculations in seconds.
+   *               This particularly affects calculations of
+   *               the integral and differential terms.
+   *               The default is 0.05 (50ms).
    */
   @SuppressWarnings("ParameterName")
   public PIDController(double Kp, double Ki, double Kd, double Kf, PIDSource source,
-                       PIDOutput output, double periodSeconds) {
+                       PIDOutput output, double period) {
     super(Kp, Ki, Kd, Kf, source, output);
-    m_controlLoop.startPeriodic(periodSeconds);
+    m_controlLoop.startPeriodic(period);
   }
 
   /**
    * Allocate a PID object with the given constants for P, I, D and period.
    *
-   * @param Kp            the proportional coefficient
-   * @param Ki            the integral coefficient
-   * @param Kd            the derivative coefficient
-   * @param source        the PIDSource object that is used to get values
-   * @param output        the PIDOutput object that is set to the output percentage
-   * @param periodSeconds the loop time for doing calculations in seconds.
-   *                      This particularly affects calculations of
-   *                      the integral and differential terms.
-   *                      The default is 0.05 (50ms).
+   * @param Kp     the proportional coefficient
+   * @param Ki     the integral coefficient
+   * @param Kd     the derivative coefficient
+   * @param source the PIDSource object that is used to get values
+   * @param output the PIDOutput object that is set to the output percentage
+   * @param period the loop time for doing calculations in seconds.
+   *               This particularly affects calculations of
+   *               the integral and differential terms.
+   *               The default is 0.05 (50ms).
    */
   @SuppressWarnings("ParameterName")
   public PIDController(double Kp, double Ki, double Kd, PIDSource source, PIDOutput output,
-                       double periodSeconds) {
-    this(Kp, Ki, Kd, 0.0, source, output, periodSeconds);
+                       double period) {
+    this(Kp, Ki, Kd, 0.0, source, output, period);
   }
 
   /**
@@ -76,7 +76,7 @@ public class PIDController extends PIDBase implements Controller, AutoCloseable 
    */
   @SuppressWarnings("ParameterName")
   public PIDController(double Kp, double Ki, double Kd, PIDSource source, PIDOutput output) {
-    this(Kp, Ki, Kd, source, output, kDefaultPeriodSeconds);
+    this(Kp, Ki, Kd, source, output, kDefaultPeriod);
   }
 
   /**
@@ -92,7 +92,7 @@ public class PIDController extends PIDBase implements Controller, AutoCloseable 
   @SuppressWarnings("ParameterName")
   public PIDController(double Kp, double Ki, double Kd, double Kf, PIDSource source,
                        PIDOutput output) {
-    this(Kp, Ki, Kd, Kf, source, output, kDefaultPeriodSeconds);
+    this(Kp, Ki, Kd, Kf, source, output, kDefaultPeriod);
   }
 
   @Override

@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
  */
 class CommandState {
   //The time since this command was initialized.
-  private double m_startTimeSeconds = -1;
+  private double m_startTime = -1;
 
   //Whether or not it is interruptible.
   private final boolean m_interruptible;
@@ -27,11 +27,11 @@ class CommandState {
   }
 
   private void startTiming() {
-    m_startTimeSeconds = Timer.getFPGATimestampSeconds();
+    m_startTime = Timer.getFPGATimestamp();
   }
 
   synchronized void startRunning() {
-    m_startTimeSeconds = -1;
+    m_startTime = -1;
   }
 
   boolean isInterruptible() {
@@ -39,6 +39,6 @@ class CommandState {
   }
 
   double timeSinceInitialized() {
-    return m_startTimeSeconds != -1 ? Timer.getFPGATimestampSeconds() - m_startTimeSeconds : -1;
+    return m_startTime != -1 ? Timer.getFPGATimestamp() - m_startTime : -1;
   }
 }

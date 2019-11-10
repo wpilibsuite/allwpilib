@@ -44,7 +44,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public abstract class IterativeRobotBase extends RobotBase {
-  protected double m_periodSeconds;
+  protected double m_period;
 
   private enum Mode {
     kNone,
@@ -60,11 +60,11 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Constructor for IterativeRobotBase.
    *
-   * @param periodSeconds Period in seconds.
+   * @param period Period in seconds.
    */
-  protected IterativeRobotBase(double periodSeconds) {
-    m_periodSeconds = periodSeconds;
-    m_watchdog = new Watchdog(periodSeconds, this::printLoopOverrunMessage);
+  protected IterativeRobotBase(double period) {
+    m_period = period;
+    m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
   }
 
   /**
@@ -273,6 +273,6 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   private void printLoopOverrunMessage() {
-    DriverStation.reportWarning("Loop time of " + m_periodSeconds + "s overrun\n", false);
+    DriverStation.reportWarning("Loop time of " + m_period + "s overrun\n", false);
   }
 }

@@ -323,10 +323,10 @@ public class SPI implements AutoCloseable {
    * <p>{@link #initAuto(int)} and {@link #setAutoTransmitData(byte[], int)} must
    * be called before calling this function.
    *
-   * @param periodSeconds period between transfers, in seconds (us resolution)
+   * @param period period between transfers, in seconds (us resolution)
    */
-  public void startAutoRate(double periodSeconds) {
-    SPIJNI.spiStartAutoRate(m_port, periodSeconds);
+  public void startAutoRate(double period) {
+    SPIJNI.spiStartAutoRate(m_port, period);
   }
 
   /**
@@ -374,10 +374,10 @@ public class SPI implements AutoCloseable {
    *
    * @param buffer buffer where read words are stored
    * @param numToRead number of words to read
-   * @param timeoutSeconds timeout in seconds (ms resolution)
+   * @param timeout timeout in seconds (ms resolution)
    * @return Number of words remaining to be read
    */
-  public int readAutoReceivedData(ByteBuffer buffer, int numToRead, double timeoutSeconds) {
+  public int readAutoReceivedData(ByteBuffer buffer, int numToRead, double timeout) {
     if (!buffer.isDirect()) {
       throw new IllegalArgumentException("must be a direct buffer");
     }
@@ -385,7 +385,7 @@ public class SPI implements AutoCloseable {
       throw new IllegalArgumentException("buffer is too small, must be at least "
           + (numToRead * 4));
     }
-    return SPIJNI.spiReadAutoReceivedData(m_port, buffer, numToRead, timeoutSeconds);
+    return SPIJNI.spiReadAutoReceivedData(m_port, buffer, numToRead, timeout);
   }
 
   /**
@@ -404,14 +404,14 @@ public class SPI implements AutoCloseable {
    *
    * @param buffer array where read words are stored
    * @param numToRead number of words to read
-   * @param timeoutSeconds timeout in seconds (ms resolution)
+   * @param timeout timeout in seconds (ms resolution)
    * @return Number of words remaining to be read
    */
-  public int readAutoReceivedData(int[] buffer, int numToRead, double timeoutSeconds) {
+  public int readAutoReceivedData(int[] buffer, int numToRead, double timeout) {
     if (buffer.length < numToRead) {
       throw new IllegalArgumentException("buffer is too small, must be at least " + numToRead);
     }
-    return SPIJNI.spiReadAutoReceivedData(m_port, buffer, numToRead, timeoutSeconds);
+    return SPIJNI.spiReadAutoReceivedData(m_port, buffer, numToRead, timeout);
   }
 
   /**
@@ -561,17 +561,17 @@ public class SPI implements AutoCloseable {
   /**
    * Initialize the accumulator.
    *
-   * @param periodSeconds Time between reads in seconds
-   * @param cmd           SPI command to send to request data
-   * @param xferSize      SPI transfer size, in bytes
-   * @param validMask     Mask to apply to received data for validity checking
-   * @param validValue    After validMask is applied, required matching value for validity checking
-   * @param dataShift     Bit shift to apply to received data to get actual data value
-   * @param dataSize      Size (in bits) of data field
-   * @param isSigned      Is data field signed?
-   * @param bigEndian     Is device big endian?
+   * @param period     Time between reads
+   * @param cmd        SPI command to send to request data
+   * @param xferSize   SPI transfer size, in bytes
+   * @param validMask  Mask to apply to received data for validity checking
+   * @param validValue After validMask is applied, required matching value for validity checking
+   * @param dataShift  Bit shift to apply to received data to get actual data value
+   * @param dataSize   Size (in bits) of data field
+   * @param isSigned   Is data field signed?
+   * @param bigEndian  Is device big endian?
    */
-  public void initAccumulator(double periodSeconds, int cmd, int xferSize,
+  public void initAccumulator(double period, int cmd, int xferSize,
                               int validMask, int validValue,
                               int dataShift, int dataSize,
                               boolean isSigned, boolean bigEndian) {
@@ -592,11 +592,11 @@ public class SPI implements AutoCloseable {
       cmdBytes[3] = (byte) (cmd & 0xff);
     }
     setAutoTransmitData(cmdBytes, xferSize - 4);
-    startAutoRate(periodSeconds);
+    startAutoRate(period);
 
     m_accum = new Accumulator(m_port, xferSize, validMask, validValue, dataShift, dataSize,
                               isSigned, bigEndian);
-    m_accum.m_notifier.startPeriodic(periodSeconds * 1024);
+    m_accum.m_notifier.startPeriodic(period * 1024);
   }
 
   /**

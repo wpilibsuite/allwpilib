@@ -110,7 +110,7 @@ public class MecanumDriveOdometry {
    */
   public Pose2d update(Rotation2d angle,
                        MecanumDriveWheelSpeeds wheelSpeeds) {
-    return updateWithTime(Timer.getFPGATimestampSeconds(), angle,
+    return updateWithTime(Timer.getFPGATimestamp(), angle,
         wheelSpeeds);
   }
 }
