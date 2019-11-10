@@ -103,6 +103,17 @@ public class Compressor implements Sendable, AutoCloseable {
    *
    * @return current consumed by the compressor in amps
    */
+  public double getCompressorCurrentAmps() {
+    return CompressorJNI.getCompressorCurrent(m_compressorHandle);
+  }
+
+  /**
+   * Get the current being used by the compressor.
+   *
+   * @return current consumed by the compressor in amps
+   * @deprecated Use {@link getCompressorCurrentAmps} instead.
+   */
+  @Deprecated(since = "2020")
   public double getCompressorCurrent() {
     return CompressorJNI.getCompressorCurrent(m_compressorHandle);
   }
@@ -187,7 +198,7 @@ public class Compressor implements Sendable, AutoCloseable {
    * Clear ALL sticky faults inside PCM that Compressor is wired to.
    *
    * <p>If a sticky fault is set, then it will be persistently cleared. The compressor might
-   * momentarily disable while the flags are being cleared. Doo not call this method too
+   * momentarily disable while the flags are being cleared. Do not call this method too
    * frequently, otherwise normal compressor functionality may be prevented.
    *
    * <p>If no sticky faults are set then this call will have no effect.
