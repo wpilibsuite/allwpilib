@@ -153,7 +153,7 @@ public final class RobotController {
    * Get the current output of the 3.3V rail.
    *
    * @return The controller 3.3V rail output current value in Amps
-   * @deprecated Use {@link getUserCurrent3V3Amps} instead.
+   * @deprecated Use {@link getCurrent3V3Amps} instead.
    */
   @Deprecated(since = "2020")
   public static double getCurrent3V3() {
