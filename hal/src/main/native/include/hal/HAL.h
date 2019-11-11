@@ -24,6 +24,7 @@
 #include "hal/DriverStation.h"
 #include "hal/Encoder.h"
 #include "hal/Errors.h"
+#include "hal/FRCUsageReporting.h"
 #include "hal/HALBase.h"
 #include "hal/I2C.h"
 #include "hal/Interrupts.h"
@@ -41,7 +42,3 @@
 #include "hal/Threads.h"
 #include "hal/Types.h"
 #include "hal/Value.h"
-
-#ifdef __cplusplus
-#include "hal/FRCUsageReporting.h"
-#endif
