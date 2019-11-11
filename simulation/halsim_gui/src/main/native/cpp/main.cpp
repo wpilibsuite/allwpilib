@@ -23,6 +23,7 @@
 #include "RoboRioGui.h"
 #include "SimDeviceGui.h"
 #include "SolenoidGui.h"
+#include "TimingGui.h"
 
 using namespace halsimgui;
 
@@ -45,6 +46,7 @@ __declspec(dllexport)
   HALSimGui::Add(RoboRioGui::Initialize);
   HALSimGui::Add(SimDeviceGui::Initialize);
   HALSimGui::Add(SolenoidGui::Initialize);
+  HALSimGui::Add(TimingGui::Initialize);
 
   wpi::outs() << "Simulator GUI Initializing.\n";
   if (!HALSimGui::Initialize()) return 0;
