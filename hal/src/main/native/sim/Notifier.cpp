@@ -7,6 +7,7 @@
 
 #include "hal/Notifier.h"
 
+#include <atomic>
 #include <chrono>
 #include <cstdio>
 #include <cstring>
@@ -17,15 +18,16 @@
 #include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
+#include "NotifierInternal.h"
 #include "hal/HAL.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/UnlimitedHandleResource.h"
+#include "mockdata/NotifierData.h"
 
 namespace {
 struct Notifier {
   std::string name;
   uint64_t waitTime;
-  bool updatedAlarm = false;
   bool active = true;
   bool running = false;
   wpi::mutex mutex;
@@ -52,6 +54,7 @@ class NotifierHandleContainer
 };
 
 static NotifierHandleContainer* notifierHandles;
+static std::atomic<bool> notifiersPaused{false};
 
 namespace hal {
 namespace init {
@@ -60,6 +63,19 @@ void InitializeNotifier() {
   notifierHandles = &nH;
 }
 }  // namespace init
+
+void PauseNotifiers() { notifiersPaused = true; }
+
+void ResumeNotifiers() {
+  notifiersPaused = false;
+  WakeupNotifiers();
+}
+
+void WakeupNotifiers() {
+  notifierHandles->ForEach([](HAL_NotifierHandle handle, Notifier* notifier) {
+    notifier->cond.notify_all();
+  });
+}
 }  // namespace hal
 
 extern "C" {
@@ -117,7 +133,6 @@ void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
     std::scoped_lock lock(notifier->mutex);
     notifier->waitTime = triggerTime;
     notifier->running = true;
-    notifier->updatedAlarm = true;
   }
 
   // We wake up any waiters to change how long they're sleeping for
@@ -143,27 +158,22 @@ uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
   std::unique_lock lock(notifier->mutex);
   while (notifier->active) {
     double waitTime;
-    if (!notifier->running) {
+    if (!notifier->running || notifiersPaused) {
       waitTime = (HAL_GetFPGATime(status) * 1e-6) + 1000.0;
       // If not running, wait 1000 seconds
     } else {
       waitTime = notifier->waitTime * 1e-6;
     }
 
-    // Don't wait twice
-    notifier->updatedAlarm = false;
-
     auto timeoutTime =
         hal::fpga_clock::epoch() + std::chrono::duration<double>(waitTime);
     notifier->cond.wait_until(lock, timeoutTime);
-    if (notifier->updatedAlarm) {
-      notifier->updatedAlarm = false;
-      continue;
-    }
     if (!notifier->running) continue;
     if (!notifier->active) break;
+    uint64_t curTime = HAL_GetFPGATime(status);
+    if (curTime < notifier->waitTime) continue;
     notifier->running = false;
-    return HAL_GetFPGATime(status);
+    return curTime;
   }
   return 0;
 }
