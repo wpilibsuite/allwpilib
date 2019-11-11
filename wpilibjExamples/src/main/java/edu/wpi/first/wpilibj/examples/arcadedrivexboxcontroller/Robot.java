@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class.
- * Runs the motors with arcade steering and an Xbox controller.
+ * Runs the motors with split arcade steering and an Xbox controller.
  */
 public class Robot extends TimedRobot {
   private final PWMVictorSPX m_leftMotor = new PWMVictorSPX(0);
@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    // Drive with arcade drive.
+    // Drive with split arcade drive.
     // That means that the Y axis of the left stick moves forward
     // and backward, and the X of the right stick turns left and right.
     m_robotDrive.arcadeDrive(m_driverController.getY(Hand.kLeft),

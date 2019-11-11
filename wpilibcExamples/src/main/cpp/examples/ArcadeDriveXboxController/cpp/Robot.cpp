@@ -13,7 +13,7 @@
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class.
- * Runs the motors with arcade steering and an Xbox controller.
+ * Runs the motors with split arcade steering and an Xbox controller.
  */
 class Robot : public frc::TimedRobot {
   frc::PWMVictorSPX m_leftMotor{0};
@@ -23,7 +23,9 @@ class Robot : public frc::TimedRobot {
 
  public:
   void TeleopPeriodic() {
-    // Drive with arcade style
+    // Drive with split arcade style
+    // That means that the Y axis of the left stick moves forward
+    // and backward, and the X of the right stick turns left and right.
     m_robotDrive.ArcadeDrive(
         m_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand),
         m_driverController.GetX(frc::GenericHID::JoystickHand::kRightHand));
