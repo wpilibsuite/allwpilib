@@ -46,10 +46,10 @@ public class SwerveDriveKinematicsConstraint implements TrajectoryConstraint {
   public double getMaxVelocityMetersPerSecond(Pose2d poseMeters, double curvatureRadPerMeter,
                                               double velocityMetersPerSecond) {
     // Represents the velocity of the chassis in the x direction
-    var xdVelocity = velocityMetersPerSecond * Math.sin(poseMeters.getRotation().getRadians());
+    var xdVelocity = velocityMetersPerSecond * poseMeters.getRotation().getCos();
 
     // Represents the velocity of the chassis in the y direction
-    var ydVelocity = velocityMetersPerSecond * Math.cos(poseMeters.getRotation().getRadians());
+    var ydVelocity = velocityMetersPerSecond * poseMeters.getRotation().getSin();
 
     // Create an object to represent the current chassis speeds.
     var chassisSpeeds = new ChassisSpeeds(xdVelocity,
@@ -58,9 +58,12 @@ public class SwerveDriveKinematicsConstraint implements TrajectoryConstraint {
     // Get the wheel speeds and normalize them to within the max velocity.
     var wheelSpeeds = m_kinematics.toSwerveModuleStates(chassisSpeeds);
     SwerveDriveKinematics.normalizeWheelSpeeds(wheelSpeeds, m_maxSpeedMetersPerSecond);
+    
+    // Convert normalized wheel speeds back to chassis speeds
+    var normSpeeds = m_kinematics.toChassisSpeeds(wheelSpeeds);
 
     // Return the new linear chassis speed.
-    return m_kinematics.toChassisSpeeds(wheelSpeeds).vxMetersPerSecond;
+    return Math.hypot(normSpeeds.vxMetersPerSecond, normSpeeds.vyMetersPerSecond);
   }
 
   /**

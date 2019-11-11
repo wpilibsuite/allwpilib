@@ -27,14 +27,16 @@ units::meters_per_second_t
 SwerveDriveKinematicsConstraint<NumModules>::MaxVelocity(
     const Pose2d& pose, curvature_t curvature,
     units::meters_per_second_t velocity) {
-  auto xVelocity = velocity * sin(pose.Rotation().Radians().to<double>());
-  auto yVelocity = velocity * cos(pose.Rotation().Radians().to<double>());
+  auto xVelocity = velocity * pose.Rotation().Cos();
+  auto yVelocity = velocity * pose.Rotation().Sin();
   auto wheelSpeeds = m_kinematics.ToSwerveModuleStates(
       {xVelocity, yVelocity, velocity * curvature});
   m_kinematics.NormalizeWheelSpeeds(&wheelSpeeds, m_maxSpeed);
+  
+  auto normSpeeds = m_kinematics.ToChassisSpeeds(wheelSpeeds[0], wheelSpeeds[1],
+    wheelSpeeds[2], wheelSpeeds[3]);
 
-  return m_kinematics.ToChassisSpeeds(wheelSpeeds[0], wheelSpeeds[1],
-    wheelSpeeds[2], wheelSpeeds[3]).vx;
+  return units::math::hypot(normSpeeds.vx, normSpeeds.vy);
 }
 
 template <int NumModules>
