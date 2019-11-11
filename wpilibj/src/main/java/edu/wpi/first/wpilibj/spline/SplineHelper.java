@@ -89,7 +89,7 @@ public final class SplineHelper {
    *         provided waypoints and control vectors.
    */
   @SuppressWarnings({"LocalVariableName", "PMD.ExcessiveMethodLength",
-      "PMD.AvoidInstantiatingObjectsInLoops"})
+                        "PMD.AvoidInstantiatingObjectsInLoops"})
   public static CubicHermiteSpline[] getCubicSplinesFromControlVectors(
       Spline.ControlVector start, Translation2d[] waypoints, Spline.ControlVector end) {
 
@@ -108,19 +108,30 @@ public final class SplineHelper {
       System.arraycopy(waypoints, 0, newWaypts, 1, waypoints.length);
       newWaypts[newWaypts.length - 1] = new Translation2d(xFinal[0], yFinal[0]);
 
-      final double[] a = new double[1 + newWaypts.length - 3];
+      // Populate tridiagonal system for clamped cubic
+      /* See:
+      https://www.uio.no/studier/emner/matnat/ifi/nedlagte-emner/INF-MAT4350/h08
+      /undervisningsmateriale/chap7alecture.pdf
+      */
+      // Above-diagonal of tridiagonal matrix, zero-padded
+      final double[] a = new double[newWaypts.length - 2];
 
+      // Diagonal of tridiagonal matrix
       final double[] b = new double[newWaypts.length - 2];
       Arrays.fill(b, 4.0);
 
-      final double[] c = new double[1 + newWaypts.length - 3];
+      // Below-diagonal of tridiagonal matrix, zero-padded
+      final double[] c = new double[newWaypts.length - 2];
 
-      final double[] dx = new double[2 + newWaypts.length - 4];
-      final double[] dy = new double[2 + newWaypts.length - 4];
+      // rhs vectors
+      final double[] dx = new double[newWaypts.length - 2];
+      final double[] dy = new double[newWaypts.length - 2];
 
+      // solution vectors
       final double[] fx = new double[newWaypts.length - 2];
       final double[] fy = new double[newWaypts.length - 2];
 
+      // populate above-diagonal and below-diagonal vectors
       a[0] = 0.0;
       for (int i = 0; i < newWaypts.length - 3; i++) {
         a[i + 1] = 1;
@@ -128,13 +139,14 @@ public final class SplineHelper {
       }
       c[c.length - 1] = 0.0;
 
+      // populate rhs vectors
       dx[0] = 3 * (newWaypts[2].getX() - newWaypts[0].getX()) - xInitial[1];
       dy[0] = 3 * (newWaypts[2].getY() - newWaypts[0].getY()) - yInitial[1];
 
       if (newWaypts.length > 4) {
-        for (int i = 1; i <= newWaypts.length; i++) {
-          dx[i] = newWaypts[i + 1].getX() - newWaypts[i - 1].getX();
-          dy[i] = newWaypts[i + 1].getY() - newWaypts[i - 1].getY();
+        for (int i = 1; i <= newWaypts.length - 4; i++) {
+          dx[i] = 3 * (newWaypts[i + 1].getX() - newWaypts[i - 1].getX());
+          dy[i] = 3 * (newWaypts[i + 1].getY() - newWaypts[i - 1].getY());
         }
       }
 
@@ -143,6 +155,7 @@ public final class SplineHelper {
       dy[dy.length - 1] = 3 * (newWaypts[newWaypts.length - 1].getY()
           - newWaypts[newWaypts.length - 3].getY()) - yFinal[1];
 
+      // Compute solution to tridiagonal system
       thomasAlgorithm(a, b, c, dx, fx);
       thomasAlgorithm(a, b, c, dy, fy);
 
@@ -178,12 +191,12 @@ public final class SplineHelper {
       double[] midYControlVector = {waypoints[0].getY(), yDeriv};
 
       splines[0] = new CubicHermiteSpline(xInitial, midXControlVector,
-          yInitial, midYControlVector);
+                                          yInitial, midYControlVector);
       splines[1] = new CubicHermiteSpline(midXControlVector, xFinal,
-          midYControlVector, yFinal);
+                                          midYControlVector, yFinal);
     } else {
       splines[0] = new CubicHermiteSpline(xInitial, xFinal,
-          yInitial, yFinal);
+                                          yInitial, yFinal);
     }
     return splines;
   }
@@ -207,7 +220,7 @@ public final class SplineHelper {
       var yInitial = controlVectors[i].y;
       var yFinal = controlVectors[i + 1].y;
       splines[i] = new QuinticHermiteSpline(xInitial, xFinal,
-          yInitial, yFinal);
+                                            yInitial, yFinal);
     }
     return splines;
   }
