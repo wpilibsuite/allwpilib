@@ -14,7 +14,8 @@
 #include <cstdio>
 
 #include <cameraserver/CameraServerShared.h>
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <networktables/NetworkTableInstance.h>
 
 #include "WPILibVersion.h"
@@ -117,11 +118,6 @@ bool RobotBase::IsNewDataAvailable() const { return m_ds.IsNewControlData(); }
 std::thread::id RobotBase::GetThreadId() { return m_threadId; }
 
 RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
-  if (!HAL_Initialize(500, 0)) {
-    wpi::errs() << "FATAL ERROR: HAL could not be initialized\n";
-    wpi::errs().flush();
-    std::terminate();
-  }
   m_threadId = std::this_thread::get_id();
 
   SetupCameraServerShared();

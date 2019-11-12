@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,7 @@
 #include <hal/AnalogInput.h>
 #include <hal/AnalogOutput.h>
 #include <hal/DIO.h>
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <hal/PDP.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>

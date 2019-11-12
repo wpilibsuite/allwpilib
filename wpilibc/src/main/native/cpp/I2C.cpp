@@ -9,7 +9,7 @@
 
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <hal/I2C.h>
 
 #include "frc/WPIErrors.h"
@@ -20,7 +20,7 @@ I2C::I2C(Port port, int deviceAddress)
     : m_port(static_cast<HAL_I2CPort>(port)), m_deviceAddress(deviceAddress) {
   int32_t status = 0;
   HAL_InitializeI2C(m_port, &status);
-  // wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  // wpi_setHALError(status);
 
   HAL_Report(HALUsageReporting::kResourceType_I2C, deviceAddress);
 }
@@ -32,7 +32,7 @@ bool I2C::Transaction(uint8_t* dataToSend, int sendSize, uint8_t* dataReceived,
   int32_t status = 0;
   status = HAL_TransactionI2C(m_port, m_deviceAddress, dataToSend, sendSize,
                               dataReceived, receiveSize);
-  // wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  // wpi_setHALError(status);
   return status < 0;
 }
 

@@ -7,7 +7,7 @@
 
 #include "frc/Ultrasonic.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"

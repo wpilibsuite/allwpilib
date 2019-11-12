@@ -44,10 +44,10 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   /**
    * Uses the output from the ProfiledPIDController.
    *
-   * @param output the output of the ProfiledPIDController
-   * @param goal   the goal state of the ProfiledPIDController, for feedforward
+   * @param output   the output of the ProfiledPIDController
+   * @param setpoint the setpoint state of the ProfiledPIDController, for feedforward
    */
-  public abstract void useOutput(double output, State goal);
+  public abstract void useOutput(double output, State setpoint);
 
   /**
    * Returns the goal used by the ProfiledPIDController.

@@ -9,7 +9,9 @@
 
 #include <chrono>
 
-#include <hal/HAL.h>
+#include <hal/DriverStation.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <hal/Power.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
