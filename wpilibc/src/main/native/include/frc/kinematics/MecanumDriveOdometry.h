@@ -79,7 +79,7 @@ class MecanumDriveOdometry {
    * angular rate that is calculated from forward kinematics.
    *
    * @param angle The angle of the robot.
-   * @param wheelSpeeds     The current wheel speeds.
+   * @param wheelSpeeds The current wheel speeds.
    *
    * @return The new pose of the robot.
    */
