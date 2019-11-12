@@ -15,7 +15,7 @@ package edu.wpi.first.wpilibj.kinematics;
  * velocity components whereas forward kinematics converts left and right
  * component velocities into a linear and angular chassis speed.
  */
-@SuppressWarnings("MemberNames")
+@SuppressWarnings("MemberName")
 public class DifferentialDriveKinematics {
   public final double trackWidthMeters;
 

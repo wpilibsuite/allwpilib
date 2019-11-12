@@ -11,11 +11,12 @@ package edu.wpi.first.wpilibj.controller;
  * A helper class that computes feedforward outputs for a simple arm (modeled as a motor
  * acting against the force of gravity on a beam suspended at an angle).
  */
+@SuppressWarnings("MemberName")
 public class ArmFeedforward {
-  private final double m_ks;
-  private final double m_kcos;
-  private final double m_kv;
-  private final double m_ka;
+  public final double ks;
+  public final double kcos;
+  public final double kv;
+  public final double ka;
 
   /**
    * Creates a new ArmFeedforward with the specified gains.  Units of the gain values
@@ -27,10 +28,10 @@ public class ArmFeedforward {
    * @param ka   The acceleration gain.
    */
   public ArmFeedforward(double ks, double kcos, double kv, double ka) {
-    m_ks = ks;
-    m_kcos = kcos;
-    m_kv = kv;
-    m_ka = ka;
+    this.ks = ks;
+    this.kcos = kcos;
+    this.kv = kv;
+    this.ka = ka;
   }
 
   /**
@@ -54,9 +55,9 @@ public class ArmFeedforward {
    */
   public double calculate(double positionRadians, double velocityRadPerSec,
                           double accelRadPerSecSquared) {
-    return m_ks * Math.signum(velocityRadPerSec) + m_kcos * Math.cos(positionRadians)
-        + m_kv * velocityRadPerSec
-        + m_ka * accelRadPerSecSquared;
+    return ks * Math.signum(velocityRadPerSec) + kcos * Math.cos(positionRadians)
+        + kv * velocityRadPerSec
+        + ka * accelRadPerSecSquared;
   }
 
   /**

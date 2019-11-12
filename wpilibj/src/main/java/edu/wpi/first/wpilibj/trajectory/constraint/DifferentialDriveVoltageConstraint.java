@@ -56,8 +56,8 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
                                                        double velocityMetersPerSecond) {
 
     var wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(velocityMetersPerSecond, 0,
-                                                                   velocityMetersPerSecond *
-                                                                       curvatureRadPerMeter));
+                                                                   velocityMetersPerSecond
+                                                                       * curvatureRadPerMeter));
 
     double maxWheelSpeed = Math.max(wheelSpeeds.leftMetersPerSecond,
                                     wheelSpeeds.rightMetersPerSecond);
@@ -65,22 +65,22 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
                                     wheelSpeeds.rightMetersPerSecond);
 
     double maxWheelAcceleration =
-        (m_maxVoltage - m_feedforward.ks * Math.signum(maxWheelSpeed) -
-            m_feedforward.kv * maxWheelSpeed) / m_feedforward.ka;
+        (m_maxVoltage - m_feedforward.ks * Math.signum(maxWheelSpeed)
+            - m_feedforward.kv * maxWheelSpeed) / m_feedforward.ka;
     double minWheelAcceleration =
-        (-m_maxVoltage - m_feedforward.ks * Math.signum(minWheelSpeed) -
-            m_feedforward.kv * minWheelSpeed) / m_feedforward.ka;
+        (-m_maxVoltage - m_feedforward.ks * Math.signum(minWheelSpeed)
+            - m_feedforward.kv * minWheelSpeed) / m_feedforward.ka;
 
     // If moving forward, max acceleration constraint corresponds to wheel on outside of turn
     // If moving backward, max acceleration constraint corresponds to wheel on inside of turn
     double maxChassisAcceleration =
-        maxWheelAcceleration /
-            (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter) *
-                Math.signum(velocityMetersPerSecond) / 2);
+        maxWheelAcceleration
+            / (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter)
+                * Math.signum(velocityMetersPerSecond) / 2);
     double minChassisAcceleration =
-        minWheelAcceleration /
-            (1 - m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter) *
-                Math.signum(velocityMetersPerSecond) / 2);
+        minWheelAcceleration
+            / (1 - m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter)
+                * Math.signum(velocityMetersPerSecond) / 2);
 
     return new MinMax(minChassisAcceleration, maxChassisAcceleration);
   }

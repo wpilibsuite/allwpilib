@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.controller;
 /**
  * A helper class that computes feedforward outputs for a simple permanent-magnet DC motor.
  */
-@SuppressWarnings("MemberNames")
+@SuppressWarnings("MemberName")
 public class SimpleMotorFeedforward {
   public final double ks;
   public final double kv;

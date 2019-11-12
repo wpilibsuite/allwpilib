@@ -58,10 +58,9 @@ class ArmFeedforward {
            m_kV * velocity + m_kA * acceleration;
   }
 
- private:
-  units::volt_t m_kS{0};
-  units::volt_t m_kCos{0};
-  units::unit_t<kv_unit> m_kV{0};
-  units::unit_t<ka_unit> m_kA{0};
+  units::volt_t kS{0};
+  units::volt_t kCos{0};
+  units::unit_t<kv_unit> kV{0};
+  units::unit_t<ka_unit> kA{0};
 };
 }  // namespace frc

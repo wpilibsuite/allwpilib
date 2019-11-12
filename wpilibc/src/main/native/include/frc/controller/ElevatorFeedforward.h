@@ -26,7 +26,7 @@ class ElevatorFeedforward {
       units::compound_unit<units::volts, units::inverse<Acceleration>>;
 
  public:
-  constexpr ElevatorFeedforward() = default;
+  ElevatorFeedforward() = default;
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains.
@@ -36,10 +36,10 @@ class ElevatorFeedforward {
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds^2 per distance.
    */
-  constexpr ElevatorFeedforward(
-      units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
-      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
-      : m_kS(kS), m_kG(kG), m_kV(kV), m_kA(kA) {}
+  constexpr ElevatorFeedforward(units::volt_t kS, units::volt_t kG,
+                      units::unit_t<kv_unit> kV,
+                      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
+      : kS(kS), kG(kG), kV(kV), kA(kA) {}
 
   /**
    * Calculates the feedforward from the gains and setpoints.
@@ -49,16 +49,15 @@ class ElevatorFeedforward {
    * @return The computed feedforward, in volts.
    */
   constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity,
-                                    units::unit_t<Acceleration> acceleration =
-                                        units::unit_t<Acceleration>(0)) const {
-    return m_kS * wpi::sgn(velocity) + m_kG + m_kV * velocity +
-           m_kA * acceleration;
+                          units::unit_t<Acceleration> acceleration =
+                              units::unit_t<Acceleration>(0)) {
+    return kS * wpi::sgn(velocity) + kG + kV * velocity +
+           kA * acceleration;
   }
 
- private:
-  units::volt_t m_kS{0};
-  units::volt_t m_kG{0};
-  units::unit_t<kv_unit> m_kV{0};
-  units::unit_t<ka_unit> m_kA{0};
+  units::volt_t kS{0};
+  units::volt_t kG{0};
+  units::unit_t<kv_unit> kV{0};
+  units::unit_t<ka_unit> kA{0};
 };
 }  // namespace frc
