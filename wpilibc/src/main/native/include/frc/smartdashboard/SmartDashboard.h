@@ -99,9 +99,9 @@ class SmartDashboard : public ErrorBase,
 
   /**
    * Returns an NT Entry mapping to the specified key
-   * 
+   *
    * This is useful if an entry is used often, or is read and then modified.
-   * 
+   *
    * @param key the key
    * @return    the entry for the key
    */

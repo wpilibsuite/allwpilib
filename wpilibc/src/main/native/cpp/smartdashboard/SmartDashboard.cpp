@@ -82,7 +82,7 @@ void SmartDashboard::Delete(wpi::StringRef key) {
 }
 
 nt::NetworkTableEntry SmartDashboard::GetEntry(wpi::StringRef key) {
-  Singleton::GetInstance().table->GetEntry(key);
+  return Singleton::GetInstance().table->GetEntry(key);
 }
 
 void SmartDashboard::PutData(wpi::StringRef key, Sendable* data) {
