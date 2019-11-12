@@ -33,8 +33,7 @@ SwerveDriveKinematicsConstraint<NumModules>::MaxVelocity(
       {xVelocity, yVelocity, velocity * curvature});
   m_kinematics.NormalizeWheelSpeeds(&wheelSpeeds, m_maxSpeed);
   
-  auto normSpeeds = m_kinematics.ToChassisSpeeds(wheelSpeeds[0], wheelSpeeds[1],
-    wheelSpeeds[2], wheelSpeeds[3]);
+  auto normSpeeds = m_kinematics.ToChassisSpeeds(wheelSpeeds);
 
   return units::math::hypot(normSpeeds.vx, normSpeeds.vy);
 }

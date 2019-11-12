@@ -82,6 +82,28 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
 }
 
 template <size_t NumModules>
+template <typename... ModuleStates>
+ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(std::array<SwerveModuleState,
+    NumModules> moduleStates) {
+  Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix;
+
+  for (size_t i = 0; i < NumModules; i++) {
+    SwerveModuleState module = moduleStates[i];
+    moduleStatesMatrix.row(i * 2)
+        << module.speed.to<double>() * module.angle.Cos();
+    moduleStatesMatrix.row(i * 2 + 1)
+        << module.speed.to<double>() * module.angle.Sin();
+  }
+
+  Eigen::Vector3d chassisSpeedsVector =
+      m_forwardKinematics.solve(moduleStatesMatrix);
+
+  return {units::meters_per_second_t{chassisSpeedsVector(0)},
+          units::meters_per_second_t{chassisSpeedsVector(1)},
+          units::radians_per_second_t{chassisSpeedsVector(2)}};
+  }
+
+template <size_t NumModules>
 void SwerveDriveKinematics<NumModules>::NormalizeWheelSpeeds(
     std::array<SwerveModuleState, NumModules>* moduleStates,
     units::meters_per_second_t attainableMaxSpeed) {
