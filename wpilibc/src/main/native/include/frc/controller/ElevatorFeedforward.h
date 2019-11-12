@@ -51,8 +51,7 @@ class ElevatorFeedforward {
   constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity,
                           units::unit_t<Acceleration> acceleration =
                               units::unit_t<Acceleration>(0)) {
-    return kS * wpi::sgn(velocity) + kG + kV * velocity +
-           kA * acceleration;
+    return kS * wpi::sgn(velocity) + kG + kV * velocity + kA * acceleration;
   }
 
   units::volt_t kS{0};
