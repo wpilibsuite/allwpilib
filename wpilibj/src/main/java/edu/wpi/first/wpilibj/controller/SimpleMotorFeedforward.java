@@ -10,10 +10,11 @@ package edu.wpi.first.wpilibj.controller;
 /**
  * A helper class that computes feedforward outputs for a simple permanent-magnet DC motor.
  */
+@SuppressWarnings("MemberNames")
 public class SimpleMotorFeedforward {
-  private final double m_ks;
-  private final double m_kv;
-  private final double m_ka;
+  public final double ks;
+  public final double kv;
+  public final double ka;
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains.  Units of the gain values
@@ -24,9 +25,9 @@ public class SimpleMotorFeedforward {
    * @param ka The acceleration gain.
    */
   public SimpleMotorFeedforward(double ks, double kv, double ka) {
-    m_ks = ks;
-    m_kv = kv;
-    m_ka = ka;
+    this.ks = ks;
+    this.kv = kv;
+    this.ka = ka;
   }
 
   /**
@@ -48,7 +49,7 @@ public class SimpleMotorFeedforward {
    * @return The computed feedforward.
    */
   public double calculate(double velocity, double acceleration) {
-    return m_ks * Math.signum(velocity) + m_kv * velocity + m_ka * acceleration;
+    return ks * Math.signum(velocity) + kv * velocity + ka * acceleration;
   }
 
   /**
