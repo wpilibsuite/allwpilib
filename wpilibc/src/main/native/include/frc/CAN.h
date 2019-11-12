@@ -113,7 +113,7 @@ class CAN : public ErrorBase {
    * @param repeatMs The period to repeat the packet at.
    */
   int WritePacketRepeatingNoError(const uint8_t* data, int length, int apiId,
-                            int repeatMs);
+                                  int repeatMs);
 
   /**
    * Write an RTR frame to the CAN device with a specific ID. This ID is 10

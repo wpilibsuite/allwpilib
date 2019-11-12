@@ -78,7 +78,7 @@ int CAN::WritePacketNoError(const uint8_t* data, int length, int apiId) {
 }
 
 int CAN::WritePacketRepeatingNoError(const uint8_t* data, int length, int apiId,
-                               int repeatMs) {
+                                     int repeatMs) {
   int32_t status = 0;
   HAL_WriteCANPacketRepeating(m_handle, data, length, apiId, repeatMs, &status);
   return status;

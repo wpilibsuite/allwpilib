@@ -141,7 +141,8 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeatingNoThrow
   int32_t status = 0;
   HAL_WriteCANPacketRepeating(halHandle,
                               reinterpret_cast<const uint8_t*>(arrRef.data()),
-    return status;
+                              arrRef.size(), apiId, timeoutMs, &status);
+  return status;
 }
 
 /*
