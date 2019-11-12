@@ -36,14 +36,14 @@ repositories {
 }
 
 dependencies {
-    compile project(':wpilibj')
-    compile project(':hal')
-    compile project(':wpiutil')
-    compile project(':ntcore')
-    compile project(':cscore')
-    compile project(':cameraserver')
-    compile project(':wpilibOldCommands')
-    compile project(':wpilibNewCommands')
+    implementation project(':wpilibj')
+    implementation project(':hal')
+    implementation project(':wpiutil')
+    implementation project(':ntcore')
+    implementation project(':cscore')
+    implementation project(':cameraserver')
+    implementation project(':wpilibOldCommands')
+    implementation project(':wpilibNewCommands')
 }
 
 jar {

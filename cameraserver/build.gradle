@@ -10,12 +10,12 @@ evaluationDependsOn(':hal')
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
 dependencies {
-    compile project(':wpiutil')
-    compile project(':ntcore')
-    compile project(':cscore')
-    devCompile project(':wpiutil')
-    devCompile project(':ntcore')
-    devCompile project(':cscore')
+    implementation project(':wpiutil')
+    implementation project(':ntcore')
+    implementation project(':cscore')
+    devImplementation project(':wpiutil')
+    devImplementation project(':ntcore')
+    devImplementation project(':cscore')
 }
 
 ext {

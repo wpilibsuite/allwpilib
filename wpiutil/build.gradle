@@ -242,10 +242,10 @@ model {
 }
 
 dependencies {
-    compile "org.ejml:ejml-simple:0.38"
-    compile "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
-    compile "com.fasterxml.jackson.core:jackson-core:2.10.0"
-    compile "com.fasterxml.jackson.core:jackson-databind:2.10.0"
+    implementation "org.ejml:ejml-simple:0.38"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
+    implementation "com.fasterxml.jackson.core:jackson-core:2.10.0"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.10.0"
 }
 
 def wpilibNumberFileInput = file("src/generate/GenericNumber.java.in")
