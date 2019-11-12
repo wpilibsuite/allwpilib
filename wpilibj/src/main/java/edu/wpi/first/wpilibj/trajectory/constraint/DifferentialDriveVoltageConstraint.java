@@ -22,10 +22,10 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
    * Creates a new DifferentialDriveVoltageConstraint.
    *
    * @param feedforward A feedforward component describing the behavior of the drive.
-   * @param kinematics A kinematics component describing the drive geometry.
-   * @param maxVoltage The maximum voltage available to the motors while following the path.
-   *                   Should be somewhat less than the nominal battery voltage (12V) to account
-   *                   for "voltage sag" due to current draw.
+   * @param kinematics  A kinematics component describing the drive geometry.
+   * @param maxVoltage  The maximum voltage available to the motors while following the path.
+   *                    Should be somewhat less than the nominal battery voltage (12V) to account
+   *                    for "voltage sag" due to current draw.
    */
   public DifferentialDriveVoltageConstraint(SimpleMotorFeedforward feedforward,
                                             DifferentialDriveKinematics kinematics,
@@ -50,12 +50,29 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
     var wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(velocityMetersPerSecond, 0,
                                                                    velocityMetersPerSecond *
                                                                        curvatureRadPerMeter));
-    double maxWheelSpeed = Math.max(Math.abs(wheelSpeeds.leftMetersPerSecond),
-                                    Math.abs(wheelSpeeds.rightMetersPerSecond));
+    double maxWheelSpeed = Math.max(wheelSpeeds.leftMetersPerSecond,
+                                    wheelSpeeds.rightMetersPerSecond);
+    double minWheelSpeed = Math.min(wheelSpeeds.leftMetersPerSecond,
+                                    wheelSpeeds.rightMetersPerSecond);
+
     double maxWheelAcceleration =
-        (m_maxVoltage - m_feedforward.ks - m_feedforward.kv * maxWheelSpeed) / m_feedforward.ka;
+        (m_maxVoltage - m_feedforward.ks * Math.signum(maxWheelSpeed) -
+            m_feedforward.kv * maxWheelSpeed) / m_feedforward.ka;
+    double minWheelAcceleration =
+        (-m_maxVoltage - m_feedforward.ks * Math.signum(minWheelSpeed) -
+            m_feedforward.kv * minWheelSpeed) / m_feedforward.ka;
+
+    // If moving forward, max acceleration constraint corresponds to wheel on outside of turn
+    // If moving backward, max acceleration constraint corresponds to wheel on inside of turn
     double maxChassisAcceleration =
-        maxWheelAcceleration / (1 + m_kinematics.trackWidthMeters * curvatureRadPerMeter / 2);
-    return new MinMax(-maxChassisAcceleration, maxChassisAcceleration);
+        maxWheelAcceleration /
+            (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter) *
+                Math.signum(velocityMetersPerSecond) / 2);
+    double minChassisAcceleration =
+        minWheelAcceleration /
+            (1 - m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter) *
+                Math.signum(velocityMetersPerSecond) / 2);
+
+    return new MinMax(minChassisAcceleration, maxChassisAcceleration);
   }
 }
